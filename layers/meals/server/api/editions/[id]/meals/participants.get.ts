@@ -1,3 +1,4 @@
+import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
@@ -44,26 +45,6 @@ export default wrapApiHandler(
           },
           include: {
             volunteer: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    nom: true,
-                    prenom: true,
-                    email: true,
-                    phone: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        artistMealSelections: {
-          where: {
-            accepted: true,
-          },
-          include: {
-            artist: {
               include: {
                 user: {
                   select: {
@@ -129,6 +110,12 @@ export default wrapApiHandler(
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 
+    // Étape 2 (port artists) : participants artistes acceptés par repas (le layer ne lit plus
+    // les modèles artistes).
+    const artistParticipantsByMeal = await useMealsPorts().artists.getMealParticipants(
+      meals.map((m) => m.id)
+    )
+
     // Construire la liste plate de tous les participants avec leurs repas
     let participants: Array<{
       userId: number | null
@@ -171,23 +158,23 @@ export default wrapApiHandler(
         })
       })
 
-      // Ajouter les artistes
-      meal.artistMealSelections.forEach((selection) => {
+      // Ajouter les artistes (via le port)
+      ;(artistParticipantsByMeal[meal.id] ?? []).forEach((a) => {
         participants.push({
-          userId: selection.artist.user.id,
-          nom: selection.artist.user.nom,
-          prenom: selection.artist.user.prenom,
-          email: selection.artist.user.email,
-          phone: selection.artist.user.phone,
+          userId: a.userId,
+          nom: a.nom ?? '',
+          prenom: a.prenom ?? '',
+          email: a.email ?? '',
+          phone: a.phone,
           type: 'artist',
           mealId: meal.id,
           mealDate: meal.date,
           mealType: meal.mealType,
           mealPhases: meal.phases,
-          dietaryPreference: selection.artist.dietaryPreference,
-          allergies: selection.artist.allergies,
-          allergySeverity: selection.artist.allergySeverity,
-          afterShow: selection.afterShow,
+          dietaryPreference: a.dietaryPreference,
+          allergies: a.allergies,
+          allergySeverity: a.allergySeverity,
+          afterShow: a.afterShow,
         })
       })
 

@@ -1,3 +1,4 @@
+import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '#server/utils/permissions/edition-permissions'
@@ -140,43 +141,21 @@ export default wrapApiHandler(
 
     // 2. Artistes non validés
     if (type === 'artist' || type === 'all') {
-      const artistMealSelections = await prisma.artistMealSelection.findMany({
-        where: {
-          mealId,
-          artist: {
-            editionId,
-          },
-          consumedAt: null, // Non validé
-        },
-        include: {
-          artist: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  email: true,
-                  prenom: true,
-                  nom: true,
-                  pseudo: true,
-                  phone: true,
-                },
-              },
-            },
-          },
-        },
-      })
+      // Via le port artists : toutes les sélections, filtrées sur non consommées.
+      const artistSelections = (
+        await useMealsPorts().artists.listMealSelections(editionId, mealId)
+      ).filter((s) => s.consumedAt === null)
 
-      for (const selection of artistMealSelections) {
-        const artist = selection.artist
+      for (const row of artistSelections) {
         pending.push({
-          uniqueId: `artist-${selection.id}`,
-          id: selection.id,
+          uniqueId: `artist-${row.selectionId}`,
+          id: row.selectionId,
           type: 'artist',
-          firstName: artist.user.prenom,
-          lastName: artist.user.nom,
-          pseudo: artist.user.pseudo,
-          email: artist.user.email,
-          phone: artist.user.phone,
+          firstName: row.prenom,
+          lastName: row.nom,
+          pseudo: row.pseudo,
+          email: row.email,
+          phone: row.phone,
         })
       }
     }

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '#server/utils/permissions/edition-permissions'
@@ -79,32 +80,17 @@ export default wrapApiHandler(
         })
       }
     } else if (validatedData.type === 'artist') {
-      // Vérifier que la sélection existe
-      const selection = await prisma.artistMealSelection.findUnique({
-        where: { id: validatedData.id },
-        include: {
-          artist: true,
-        },
-      })
-
-      if (!selection || selection.artist.editionId !== editionId || selection.mealId !== mealId) {
-        throw createError({
-          status: 404,
-          message: 'Sélection de repas non trouvée',
-        })
-      }
-
-      // Mise à jour atomique : ne met à jour que si consumedAt est null
-      const result = await prisma.artistMealSelection.updateMany({
-        where: { id: validatedData.id, consumedAt: null },
-        data: { consumedAt: now },
-      })
-
-      if (result.count === 0) {
-        throw createError({
-          status: 400,
-          message: 'Ce repas a déjà été validé',
-        })
+      // Étape 2 (port artists) : validation déléguée (le layer ne lit plus les modèles artistes).
+      const res = await useMealsPorts().artists.markConsumed(
+        editionId,
+        mealId,
+        validatedData.id,
+        now
+      )
+      if (!res.ok) {
+        throw res.reason === 'already'
+          ? createError({ status: 400, message: 'Ce repas a déjà été validé' })
+          : createError({ status: 404, message: 'Sélection de repas non trouvée' })
       }
     } else if (validatedData.type === 'participant') {
       // L'id correspond à un orderItemId

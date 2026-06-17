@@ -1,3 +1,4 @@
+import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrMealValidation } from '#server/utils/permissions/edition-permissions'
@@ -150,51 +151,27 @@ export default wrapApiHandler(
       }
     }
 
-    // 2. Rechercher dans les artistes qui ont accès à ce repas
-    const artistMealSelections = await prisma.artistMealSelection.findMany({
-      where: {
-        mealId,
-        artist: {
-          editionId,
-        },
-      },
-      include: {
-        artist: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                prenom: true,
-                nom: true,
-                pseudo: true,
-                phone: true,
-              },
-            },
-          },
-        },
-      },
-    })
+    // 2. Rechercher dans les artistes qui ont accès à ce repas (via le port artists)
+    const artistSelections = await useMealsPorts().artists.listMealSelections(editionId, mealId)
 
-    for (const selection of artistMealSelections) {
-      const artist = selection.artist
+    for (const row of artistSelections) {
       const matchesSearch =
-        artist.user.nom?.toLowerCase().includes(searchLower) ||
-        artist.user.prenom?.toLowerCase().includes(searchLower) ||
-        artist.user.pseudo?.toLowerCase().includes(searchLower) ||
-        artist.user.email?.toLowerCase().includes(searchLower)
+        row.nom?.toLowerCase().includes(searchLower) ||
+        row.prenom?.toLowerCase().includes(searchLower) ||
+        row.pseudo?.toLowerCase().includes(searchLower) ||
+        row.email?.toLowerCase().includes(searchLower)
 
       if (matchesSearch) {
         results.push({
-          uniqueId: `artist-${selection.id}`,
-          id: selection.id,
+          uniqueId: `artist-${row.selectionId}`,
+          id: row.selectionId,
           type: 'artist',
-          firstName: artist.user.prenom,
-          lastName: artist.user.nom,
-          pseudo: artist.user.pseudo,
-          email: artist.user.email,
-          phone: artist.user.phone,
-          consumedAt: selection.consumedAt,
+          firstName: row.prenom,
+          lastName: row.nom,
+          pseudo: row.pseudo,
+          email: row.email,
+          phone: row.phone,
+          consumedAt: row.consumedAt,
         })
       }
     }
