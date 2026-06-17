@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
+import { DEFAULT_HEX_PALETTE } from '#imports'
 
 interface TagItem {
   id: number

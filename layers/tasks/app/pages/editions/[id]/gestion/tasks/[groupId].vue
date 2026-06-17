@@ -300,7 +300,8 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskFiltersValue } from '~/components/tasks/TaskFilters.vue'
+// Composant frère du même layer → import relatif (le type n'est pas exposé par #components).
+import type { TaskFiltersValue } from '../../../../../components/tasks/TaskFilters.vue'
 
 definePageMeta({
   layout: 'edition-dashboard',

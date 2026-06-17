@@ -100,8 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { markdownToHtml } from '~/utils/markdown'
+import { useAuthStore, markdownToHtml } from '#imports'
 
 interface CommentUser {
   id: number
