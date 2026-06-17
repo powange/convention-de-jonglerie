@@ -406,11 +406,14 @@
 </template>
 
 <script setup lang="ts">
-import { useDebounce } from '~/composables/useDebounce'
-import { useMealTypeLabel } from '~/composables/useMeals'
-import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
-import { formatMealDate } from '~/utils/meals'
+// Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
+import {
+  useDebounce,
+  useMealTypeLabel,
+  useAuthStore,
+  useEditionStore,
+  formatMealDate,
+} from '#imports'
 
 const route = useRoute()
 const editionStore = useEditionStore()

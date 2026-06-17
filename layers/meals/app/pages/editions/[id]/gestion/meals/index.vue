@@ -125,8 +125,8 @@
 import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
+// Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
+import { useAuthStore, useEditionStore } from '#imports'
 
 const route = useRoute()
 const editionStore = useEditionStore()
