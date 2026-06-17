@@ -270,18 +270,19 @@ export default wrapApiHandler(
       organizers.push(counts.organizers)
     })
 
-    // Périodes pour les filtres
+    // Périodes pour les filtres (Étape 0bis : dates portées par l'Event, via evStart/evEnd ;
+    // l'ancienne variable `edition` n'existe plus dans ce handler).
     const periods = {
       setup: {
         start: setupStart.toISOString(),
-        end: edition.startDate.toISOString(),
+        end: evStart.toISOString(),
       },
       event: {
-        start: edition.startDate.toISOString(),
-        end: edition.endDate.toISOString(),
+        start: evStart.toISOString(),
+        end: evEnd.toISOString(),
       },
       teardown: {
-        start: edition.endDate.toISOString(),
+        start: evEnd.toISOString(),
         end: teardownEnd.toISOString(),
       },
     }
