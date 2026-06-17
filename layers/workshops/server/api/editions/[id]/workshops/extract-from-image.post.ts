@@ -74,7 +74,7 @@ export default wrapApiHandler(
 Analyse cette image et extrais TOUS les workshops que tu peux identifier. Pour chaque workshop détecté, fournis les informations suivantes :
 - title : Le titre du workshop (obligatoire)
 - description : Une brève description si disponible (optionnel)
-- startDateTime : La date et heure de début au format ISO 8601 (ex: "2024-10-23T14:00:00"). Si seule l'heure est visible, utilise les dates de l'édition (${edition.startDate.toISOString()} à ${edition.endDate.toISOString()})
+- startDateTime : La date et heure de début au format ISO 8601 (ex: "2024-10-23T14:00:00"). Si seule l'heure est visible, utilise les dates de l'édition (${cfg.startDate?.toISOString()} à ${cfg.endDate?.toISOString()})
 - endDateTime : La date et heure de fin au format ISO 8601. Si non spécifiée, estime une durée raisonnable (généralement 1-2h)
 - maxParticipants : Le nombre maximum de participants si mentionné (optionnel, nombre entier)
 - location : Le lieu du workshop si mentionné (optionnel, texte)
@@ -86,7 +86,7 @@ IMPORTANT :
 - Pour les dates/heures partielles, utilise les dates de l'édition comme référence
 - Si plusieurs workshops ont le même titre mais à des horaires différents, crée des entrées séparées
 
-L'édition se déroule du ${edition.startDate.toLocaleDateString('fr-FR')} au ${edition.endDate.toLocaleDateString('fr-FR')}.
+L'édition se déroule du ${cfg.startDate?.toLocaleDateString('fr-FR')} au ${cfg.endDate?.toLocaleDateString('fr-FR')}.
 
 Exemple de réponse attendue :
 {
