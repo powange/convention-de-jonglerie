@@ -1,3 +1,28 @@
+import { canEditEdition } from './edition-permissions'
+
+import type { UserForPermissions } from './types'
+
+/**
+ * Vérifie si un utilisateur peut gérer les lieux d'atelier (et l'import par image) d'une édition :
+ * réservé aux éditeurs de l'édition (organisateurs / auteur / créateur / admin global). Lit l'édition
+ * en interne (côté core) puis délègue à `canEditEdition` — le layer ateliers n'a donc pas à lire
+ * `Edition` lui-même.
+ */
+export async function canManageWorkshopLocations(
+  user: UserForPermissions,
+  editionId: number
+): Promise<boolean> {
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    include: {
+      convention: { include: { organizers: true } },
+      organizerPermissions: { include: { organizer: true } },
+    },
+  })
+  if (!edition) return false
+  return canEditEdition(edition, user)
+}
+
 /**
  * Vérifie si un utilisateur peut créer un workshop pour une édition donnée
  * Un utilisateur peut créer un workshop s'il est :

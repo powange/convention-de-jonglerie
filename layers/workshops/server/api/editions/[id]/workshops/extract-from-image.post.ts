@@ -2,36 +2,30 @@ import { getEffectiveAIConfigAsync } from '#server/utils/ai-config'
 import { createAIProvider, type ExtractedWorkshop } from '#server/utils/ai-providers'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { canManageWorkshopLocations } from '#server/utils/permissions/workshop-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { useWorkshopsPorts } from '#server/workshops/ports/registry'
 
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    // Vérifier que l'édition existe et que les workshops sont activés
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      include: {
-        convention: {
-          include: {
-            organizers: true,
-          },
-        },
-      },
-      errorMessage: 'Édition non trouvée',
-    })
+    // Existence + activation via le port (le layer ne lit pas Edition directement)
+    const cfg = await useWorkshopsPorts().event.getConfig(editionId)
+    if (!cfg.found) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
+    }
 
-    if (!edition.workshopsEnabled) {
+    if (!cfg.enabled) {
       throw createError({
         status: 403,
         message: 'Les workshops ne sont pas activés pour cette édition',
       })
     }
 
-    // Vérifier que l'utilisateur peut éditer cette édition
-    if (!canEditEdition(edition, user)) {
+    // Vérifier que l'utilisateur peut gérer cette édition (organisateur / admin) — via util core
+    if (!(await canManageWorkshopLocations(user, editionId))) {
       throw createError({
         status: 403,
         message:
