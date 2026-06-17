@@ -19,69 +19,15 @@ export default wrapApiHandler(
     }
 
     // Vérifier que le repas existe et appartient à cette édition
-    // Structure identique à participants.get.ts qui fonctionne
-    const meal = await prisma.volunteerMeal.findFirst({
-      where: {
-        id: mealId,
-        editionId,
-      },
-      include: {
-        tiers: {
-          include: {
-            tier: {
-              include: {
-                orderItems: {
-                  where: {
-                    entryValidated: true,
-                  },
-                  select: {
-                    id: true,
-                    mealAccess: {
-                      where: { mealId },
-                      select: { id: true, consumedAt: true },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        // Structure identique à participants.get.ts
-        options: {
-          include: {
-            option: {
-              include: {
-                orderItemSelections: {
-                  where: {
-                    orderItem: {
-                      entryValidated: true,
-                    },
-                  },
-                  include: {
-                    orderItem: {
-                      select: {
-                        id: true,
-                        mealAccess: {
-                          where: { mealId },
-                          select: { id: true, consumedAt: true },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
+    const meal = await prisma.volunteerMeal.findFirst({ where: { id: mealId, editionId } })
     if (!meal) {
       throw createError({
         status: 404,
         message: 'Repas non trouvé',
       })
     }
+
+    const ports = useMealsPorts()
 
     // 1. Compter les bénévoles ayant accès à ce repas
     const volunteerCount = await prisma.volunteerMealSelection.count({
@@ -106,46 +52,14 @@ export default wrapApiHandler(
     })
 
     // 2. Compter les artistes ayant accès à ce repas (via le port artists)
-    const artistSelections = await useMealsPorts().artists.listMealSelections(editionId, mealId)
+    const artistSelections = await ports.artists.listMealSelections(editionId, mealId)
     const artistCount = artistSelections.length
     const artistValidatedCount = artistSelections.filter((s) => s.consumedAt !== null).length
 
-    // 3. Compter les participants ayant accès à ce repas (via tarifs ET options, avec déduplication)
-    // Structure identique à participants.get.ts
-    const uniqueOrderItemIds = new Set<number>()
-    const validatedOrderItemIds = new Set<number>()
-
-    // Compter les orderItems via les tarifs
-    for (const tierMeal of meal.tiers) {
-      for (const orderItem of tierMeal.tier.orderItems) {
-        uniqueOrderItemIds.add(orderItem.id)
-        // Vérifier si le repas a été consommé
-        const hasConsumed = orderItem.mealAccess.some((ma) => ma.consumedAt !== null)
-        if (hasConsumed) {
-          validatedOrderItemIds.add(orderItem.id)
-        }
-      }
-    }
-
-    // Compter les orderItems via les options
-    for (const optionMeal of meal.options) {
-      for (const selection of optionMeal.option.orderItemSelections) {
-        const orderItem = selection.orderItem
-
-        // Ajouter uniquement si pas déjà ajouté via tarif (déduplication)
-        if (!uniqueOrderItemIds.has(orderItem.id)) {
-          uniqueOrderItemIds.add(orderItem.id)
-          // Vérifier si le repas a été consommé
-          const hasConsumed = orderItem.mealAccess.some((ma) => ma.consumedAt !== null)
-          if (hasConsumed) {
-            validatedOrderItemIds.add(orderItem.id)
-          }
-        }
-      }
-    }
-
-    const participantCount = uniqueOrderItemIds.size
-    const participantValidatedCount = validatedOrderItemIds.size
+    // 3. Compter les participants billetterie (via le port ticketing, déjà dédupliqués)
+    const ticketRows = await ports.ticketing.listMealTicketParticipants(mealId)
+    const participantCount = ticketRows.length
+    const participantValidatedCount = ticketRows.filter((r) => r.consumedAt !== null).length
 
     const total = volunteerCount + artistCount + participantCount
     const validated = volunteerValidatedCount + artistValidatedCount + participantValidatedCount

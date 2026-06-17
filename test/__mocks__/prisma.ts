@@ -66,6 +66,7 @@ export const prismaMock = {
   // Modèles billetterie
   ticketingOrder: createModelMock(),
   ticketingOrderItem: createModelMock(),
+  ticketingOrderItemMeal: createModelMock(),
   ticketingTier: createModelMock(),
   ticketingQuota: createModelMock(),
   ticketingOption: createModelMock(),

@@ -60,6 +60,57 @@ export interface MealsArtistsPort {
   ): Promise<MealConsumptionResult>
 }
 
+/** Participant billetterie d'un repas (vue participants — commandes traitées). */
+export interface MealTicketParticipant {
+  orderItemId: number
+  lastName: string | null
+  firstName: string | null
+  email: string | null
+  dietaryPreference: string | null
+  allergies: string | null
+  allergySeverity: string | null
+}
+
+/** Participant billetterie d'un repas (vue recherche / pending / stats — entrée validée). */
+export interface MealTicketValidationRow {
+  orderItemId: number
+  firstName: string | null
+  lastName: string | null
+  email: string | null
+  consumedAt: Date | null
+}
+
+/** Résultat d'une validation de consommation billetterie. */
+export type MealTicketConsumptionResult =
+  | { ok: true }
+  | { ok: false; reason: 'not_found' | 'refunded' | 'no_access' | 'already' }
+
+/**
+ * Accès au module **billetterie** depuis le module repas. Jonglerie : tarifs/options « avec repas »
+ * (`TicketingTierMeal`/`TicketingOptionMeal`), `TicketingOrderItem`, `TicketingOrderItemMeal`.
+ * Domaine sans billetterie : listes vides / `{ ok: false, reason: 'not_found' }`.
+ */
+export interface MealsTicketingPort {
+  /** Participants billetterie (commandes **traitées**) par repas, avec régime/allergies. */
+  getMealTicketParticipants(mealIds: number[]): Promise<Record<number, MealTicketParticipant[]>>
+  /** Participants billetterie (**entrée validée**) d'un repas, avec date de consommation. */
+  listMealTicketParticipants(mealId: number): Promise<MealTicketValidationRow[]>
+  /** Valide la consommation d'un billet (contrôles remboursement + accès au repas). */
+  validateConsumption(
+    editionId: number,
+    mealId: number,
+    orderItemId: number,
+    at: Date
+  ): Promise<MealTicketConsumptionResult>
+  /** Annule la consommation d'un billet pour un repas. */
+  cancelConsumption(
+    editionId: number,
+    mealId: number,
+    orderItemId: number
+  ): Promise<MealConsumptionResult>
+}
+
 export interface MealsPorts {
   artists: MealsArtistsPort
+  ticketing: MealsTicketingPort
 }

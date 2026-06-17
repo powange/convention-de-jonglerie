@@ -72,28 +72,15 @@ export default wrapApiHandler(
         throw createError({ status: 404, message: 'Sélection de repas non trouvée' })
       }
     } else if (validatedData.type === 'participant') {
-      // L'id correspond à un orderItemId
-      const orderItem = await prisma.ticketingOrderItem.findUnique({
-        where: { id: validatedData.id },
-        include: {
-          order: true,
-        },
-      })
-
-      if (!orderItem || orderItem.order.editionId !== editionId) {
-        throw createError({
-          status: 404,
-          message: 'Participant non trouvé',
-        })
+      // Étape 2 (port ticketing) : annulation déléguée (le layer ne lit plus la billetterie).
+      const res = await useMealsPorts().ticketing.cancelConsumption(
+        editionId,
+        mealId,
+        validatedData.id
+      )
+      if (!res.ok) {
+        throw createError({ status: 404, message: 'Participant non trouvé' })
       }
-
-      // Supprimer la validation de repas
-      await prisma.ticketingOrderItemMeal.deleteMany({
-        where: {
-          orderItemId: validatedData.id,
-          mealId,
-        },
-      })
     }
 
     return createSuccessResponse(null)
