@@ -3,8 +3,10 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { encrypt } from '#server/utils/encryption'
-import { canManageTicketing } from '#server/utils/permissions/edition-permissions'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import {
+  canManageTicketing,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -49,21 +51,10 @@ export default wrapApiHandler(
       throw error
     }
 
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
-      errorMessage: 'Edition introuvable',
-      select: {
-        id: true,
-        convention: {
-          include: {
-            organizers: { where: { userId: user.id } },
-          },
-        },
-        organizerPermissions: {
-          where: { organizer: { userId: user.id } },
-          include: { organizer: { select: { userId: true } } },
-        },
-      },
-    })
+    const edition = await getEditionWithPermissions(editionId, { userId: user.id })
+    if (!edition) {
+      throw createError({ status: 404, message: 'Edition introuvable' })
+    }
 
     if (!canManageTicketing(edition, user)) {
       throw createError({
