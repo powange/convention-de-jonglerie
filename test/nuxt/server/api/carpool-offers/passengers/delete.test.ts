@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import handler from '../../../../../../server/api/carpool-offers/[id]/passengers/[userId].delete'
+import handler from '../../../../../../layers/carpool/server/api/carpool-offers/[id]/passengers/[userId].delete'
 
 describe('/api/carpool-offers/[id]/passengers/[userId] DELETE (Deprecated)', () => {
   it('devrait retourner une erreur 410 Gone', async () => {

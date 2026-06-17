@@ -3,7 +3,7 @@ import { version as nuxtVersion } from 'nuxt/package.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // Layers modulaires (étape 2) — bénévole, repas, tâches, FAQ, objets trouvés, ateliers
+  // Layers modulaires (étape 2) — bénévole, repas, tâches, FAQ, objets trouvés, ateliers, covoiturage
   extends: [
     './layers/volunteers',
     './layers/meals',
@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     './layers/faq',
     './layers/lost-found',
     './layers/workshops',
+    './layers/carpool',
   ],
 
   compatibilityDate: '2026-03-02',
