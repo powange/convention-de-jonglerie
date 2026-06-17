@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../server/api/editions/[id]/carpool-offers/index.post'
+import handler from '../../../../../layers/carpool/server/api/editions/[id]/carpool-offers/index.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -70,8 +70,10 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
     const result = await handler(mockEvent as any)
 
     expect(result).toEqual({ success: true, data: mockCarpoolOffer })
+    // L'existence passe désormais par le port carpool (sélection minimale { id }).
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
+      select: { id: true },
     })
     expect(prismaMock.carpoolOffer.create).toHaveBeenCalledWith({
       data: {

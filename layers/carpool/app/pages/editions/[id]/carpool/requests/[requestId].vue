@@ -13,14 +13,14 @@
       />
     </div>
 
-    <div v-else-if="!offer">
+    <div v-else-if="!carpoolRequest">
       <EditionHeader :edition="edition" current-page="carpool" />
       <UAlert
         class="mt-6"
         icon="i-lucide-alert-triangle"
         color="error"
         variant="soft"
-        :title="$t('components.carpool.offer_not_found')"
+        :title="$t('components.carpool.request_not_found')"
       />
     </div>
 
@@ -38,24 +38,23 @@
         {{ $t('components.carpool.back_to_list') }}
       </UButton>
 
-      <!-- Détail de l'offre -->
-      <EditionCarpoolOfferDetail
-        :offer="offer"
+      <!-- Détail de la demande -->
+      <EditionCarpoolRequestDetail
+        :request="carpoolRequest"
         :edition-id="editionId"
         @edit="openEditModal"
         @deleted="navigateTo(`/editions/${editionId}/carpool`)"
-        @comment-added="refreshOffer"
-        @booking-updated="refreshOffer"
+        @comment-added="refreshRequest"
       />
 
       <!-- Modal d'édition -->
-      <UModal v-model:open="showEditModal" :title="$t('components.carpool.edit_offer')">
+      <UModal v-model:open="showEditModal" :title="$t('components.carpool.edit_request')">
         <template #body>
-          <EditionCarpoolOfferForm
+          <EditionCarpoolRequestForm
             :edition-id="editionId"
-            :initial-data="offer"
+            :initial-data="carpoolRequest"
             :is-editing="true"
-            @success="onOfferEdited"
+            @success="onRequestEdited"
             @cancel="showEditModal = false"
           />
         </template>
@@ -65,13 +64,13 @@
 </template>
 
 <script setup lang="ts">
-import { useEditionStore } from '~/stores/editions'
+import { useEditionStore } from '#imports'
 
 const route = useRoute()
 const editionStore = useEditionStore()
 
 const editionId = parseInt(route.params.id as string)
-const offerId = parseInt(route.params.offerId as string)
+const requestId = parseInt(route.params.requestId as string)
 
 // Charger l'édition
 const { data: edition, pending: loading } = await useApiFetch(`/api/editions/${editionId}`, {
@@ -82,8 +81,10 @@ const { data: edition, pending: loading } = await useApiFetch(`/api/editions/${e
   },
 })
 
-// Charger l'offre
-const { data: offer, refresh: refreshOffer } = await useLazyFetch(`/api/carpool-offers/${offerId}`)
+// Charger la demande
+const { data: carpoolRequest, refresh: refreshRequest } = await useLazyFetch(
+  `/api/carpool-requests/${requestId}`
+)
 
 // Modal d'édition
 const showEditModal = ref(false)
@@ -92,14 +93,16 @@ const openEditModal = () => {
   showEditModal.value = true
 }
 
-const onOfferEdited = () => {
+const onRequestEdited = () => {
   showEditModal.value = false
-  refreshOffer()
+  refreshRequest()
 }
 
 useSeoMeta({
   title: computed(() =>
-    offer.value ? `${offer.value.user?.pseudo} — ${offer.value.locationCity}` : ''
+    carpoolRequest.value
+      ? `${carpoolRequest.value.user?.pseudo} — ${carpoolRequest.value.locationCity}`
+      : ''
   ),
 })
 </script>

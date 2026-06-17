@@ -1,9 +1,9 @@
+import { useCarpoolPorts } from '#server/carpool/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { carpoolOfferSchema } from '#server/utils/validation-schemas'
+import { carpoolRequestSchema } from '#server/utils/validation-schemas'
 
 export default wrapApiHandler(
   async (event) => {
@@ -13,22 +13,22 @@ export default wrapApiHandler(
     const body = await readBody(event)
 
     // Validation des données avec Zod
-    const validatedData = carpoolOfferSchema.parse(body)
+    const validatedData = carpoolRequestSchema.parse(body)
 
-    // Vérifier que l'édition existe
-    await fetchResourceOrFail(prisma.edition, editionId, {
-      errorMessage: 'Edition non trouvée',
-    })
+    // Vérifier que l'événement existe (via le port ; le layer ne lit pas Edition directement)
+    const exists = await useCarpoolPorts().event.eventExists(editionId)
+    if (!exists) {
+      throw createError({ status: 404, message: 'Edition non trouvée' })
+    }
 
-    // Créer l'offre de covoiturage
-    const carpoolOffer = await prisma.carpoolOffer.create({
+    // Créer la demande de covoiturage
+    const carpoolRequest = await prisma.carpoolRequest.create({
       data: {
         editionId,
         userId: user.id,
         tripDate: new Date(validatedData.tripDate),
         locationCity: validatedData.locationCity,
-        locationAddress: validatedData.locationAddress,
-        availableSeats: validatedData.availableSeats,
+        seatsNeeded: validatedData.seatsNeeded,
         direction: validatedData.direction,
         description: validatedData.description,
         phoneNumber: validatedData.phoneNumber,
@@ -40,7 +40,7 @@ export default wrapApiHandler(
       },
     })
 
-    return createSuccessResponse(carpoolOffer)
+    return createSuccessResponse(carpoolRequest)
   },
-  { operationName: 'CreateCarpoolOffer' }
+  { operationName: 'CreateCarpoolRequest' }
 )
