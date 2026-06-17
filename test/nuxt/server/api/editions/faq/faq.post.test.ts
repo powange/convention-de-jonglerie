@@ -12,7 +12,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 
-import handler from '../../../../../../server/api/editions/[id]/faq/index.post'
+import handler from '../../../../../../layers/faq/server/api/editions/[id]/faq/index.post'
 
 const prismaMock = (globalThis as any).prisma
 

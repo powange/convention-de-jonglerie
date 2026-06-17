@@ -197,10 +197,16 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 
-import { useAuthStore } from '~/stores/auth'
-import { useEditionStore } from '~/stores/editions'
-import { countMatches, highlightHtml, highlightText, parseSearchTerms } from '~/utils/highlight'
-import { markdownToHtml } from '~/utils/markdown'
+// Layer faq : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
+import {
+  countMatches,
+  highlightHtml,
+  highlightText,
+  markdownToHtml,
+  parseSearchTerms,
+  useAuthStore,
+  useEditionStore,
+} from '#imports'
 
 definePageMeta({
   layout: 'edition-dashboard',
