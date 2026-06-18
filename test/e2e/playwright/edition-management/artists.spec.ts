@@ -47,9 +47,9 @@ test.describe.serial('Module Artistes (gestion)', () => {
 
     await expect(async () => {
       await goto(`/editions/${editionId}/gestion/artists`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('heading', { name: /gestion des artistes/i }).first()).toBeVisible(
-        { timeout: 5000 }
-      )
+      await expect(
+        page.getByRole('heading', { name: /gestion des artistes/i }).first()
+      ).toBeVisible({ timeout: 5000 })
       await expect(page.getByText(/artistee2e/i).first()).toBeVisible({ timeout: 5000 })
     }).toPass({ timeout: 30000, intervals: [2000, 3000, 5000] })
   })
@@ -60,7 +60,9 @@ test.describe.serial('Module Artistes (gestion)', () => {
     expect(response.ok()).toBe(true)
     const body = await response.json()
     const artists = body?.data?.artists ?? body?.artists ?? []
-    expect(artists.some((a: { user: { email: string } }) => a.user.email === ARTIST_EMAIL)).toBe(true)
+    expect(artists.some((a: { user: { email: string } }) => a.user.email === ARTIST_EMAIL)).toBe(
+      true
+    )
   })
 
   test('nettoyage : supprimer l’artiste, vider les infos et désactiver', async ({ page }) => {
