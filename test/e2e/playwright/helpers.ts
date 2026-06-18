@@ -316,6 +316,191 @@ export async function enableArtistProfile(page: Page) {
   return response
 }
 
+/**
+ * Construit un body de candidature valide pour `createShowApplicationSchema`.
+ * Tous les champs minimaux requis sont remplis ; surchargeable via `overrides`.
+ */
+export function buildShowApplicationBody(overrides: Record<string, unknown> = {}) {
+  const performer = {
+    lastName: 'PerfNom',
+    firstName: 'PerfPrenom',
+    email: `e2e-perf-${Date.now()}@example.com`,
+    phone: '+33612345678',
+  }
+  return {
+    // Informations personnelles (mises à jour dans le profil)
+    lastName: 'E2E-Candidat',
+    firstName: 'E2E-Prenom',
+    phone: '+33612345678',
+    // Infos artiste
+    artistName: 'E2E Artiste API',
+    artistBio: 'Bio de test E2E',
+    portfolioUrl: 'https://example.com/portfolio',
+    videoUrl: 'https://example.com/video',
+    // Infos spectacle
+    showTitle: 'E2E Spectacle API',
+    showDescription: 'Description du spectacle de test E2E suffisamment longue.',
+    showDuration: 30,
+    showCategory: 'jonglage',
+    technicalNeeds: 'Scène 4x4m, sono, éclairage',
+    // Artistes additionnels (au moins 1 requis par le schéma)
+    additionalPerformersCount: 1,
+    additionalPerformers: [performer],
+    accommodationNeeded: false,
+    ...overrides,
+  }
+}
+
+/**
+ * Soumet une candidature à un appel à spectacles via l'API (POST applications).
+ * Retourne l'objet candidature créé.
+ */
+export async function submitShowApplicationViaApi(
+  page: Page,
+  editionId: string,
+  showCallId: string,
+  data: Record<string, unknown>
+) {
+  const response = await apiPost(
+    page,
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/applications`,
+    { data }
+  )
+  if (!response.ok()) {
+    throw new Error(`POST application a échoué (${response.status()}): ${await response.text()}`)
+  }
+  const body = await response.json()
+  return body.data?.application || body.data || body
+}
+
+/**
+ * Modifie sa propre candidature (PUT my-application).
+ */
+export async function updateMyShowApplication(
+  page: Page,
+  editionId: string,
+  showCallId: string,
+  data: Record<string, unknown>
+) {
+  const response = await apiPut(
+    page,
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/my-application`,
+    { data }
+  )
+  if (!response.ok()) {
+    throw new Error(`PUT my-application a échoué (${response.status()}): ${await response.text()}`)
+  }
+  const body = await response.json()
+  return body.data?.application || body.data || body
+}
+
+/**
+ * Récupère sa propre candidature (GET my-application).
+ */
+export async function getMyShowApplication(page: Page, editionId: string, showCallId: string) {
+  const response = await page.request.get(
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/my-application`
+  )
+  expect(response.ok()).toBe(true)
+  const body = await response.json()
+  return body.data || body
+}
+
+/**
+ * Crée le sondage technique (POST survey/token). Génère le token + ouvre le sondage.
+ */
+export async function createSurveyToken(page: Page, editionId: string, showCallId: string) {
+  const response = await apiPost(
+    page,
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/survey/token`
+  )
+  if (!response.ok()) {
+    throw new Error(`POST survey/token a échoué (${response.status()}): ${await response.text()}`)
+  }
+  const body = await response.json()
+  return body.data || body
+}
+
+/**
+ * Ouvre/ferme le sondage technique (PATCH survey/status). Body attendu : { open: boolean }.
+ */
+export async function setSurveyStatus(
+  page: Page,
+  editionId: string,
+  showCallId: string,
+  open: boolean
+) {
+  const response = await apiPatch(
+    page,
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/survey/status`,
+    { data: { open } }
+  )
+  if (!response.ok()) {
+    throw new Error(`PATCH survey/status a échoué (${response.status()}): ${await response.text()}`)
+  }
+  const body = await response.json()
+  return body.data || body
+}
+
+/**
+ * Récupère les résultats du sondage technique (GET survey/results).
+ */
+export async function getSurveyResults(page: Page, editionId: string, showCallId: string) {
+  const response = await page.request.get(
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/survey/results`
+  )
+  expect(response.ok()).toBe(true)
+  const body = await response.json()
+  return body.data || body
+}
+
+/**
+ * Récupère les besoins techniques agrégés (GET shows-call/technical-needs).
+ */
+export async function getShowCallTechnicalNeeds(page: Page, editionId: string) {
+  const response = await page.request.get(
+    `${BASE_URL}/api/editions/${editionId}/shows-call/technical-needs`
+  )
+  expect(response.ok()).toBe(true)
+  const body = await response.json()
+  return body.data || body
+}
+
+/**
+ * Importe un performer d'une candidature ACCEPTÉE comme EditionArtist.
+ */
+export async function importPerformerFromApplication(
+  page: Page,
+  editionId: string,
+  showCallId: string,
+  applicationId: string,
+  data: { performerIndex: number; applyApplicationData?: boolean }
+) {
+  const response = await apiPost(
+    page,
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/applications/${applicationId}/import-performer`,
+    { data }
+  )
+  if (!response.ok()) {
+    throw new Error(
+      `POST import-performer a échoué (${response.status()}): ${await response.text()}`
+    )
+  }
+  const body = await response.json()
+  return body.data || body
+}
+
+/**
+ * Récupère la liste des artistes d'une édition (GET /artists).
+ */
+export async function getEditionArtists(page: Page, editionId: string) {
+  const response = await page.request.get(`${BASE_URL}/api/editions/${editionId}/artists`)
+  expect(response.ok()).toBe(true)
+  const body = await response.json()
+  const data = body.data || body
+  return data.artists || data
+}
+
 // ──────────────────────────────────────────────
 // Volunteers settings helpers
 // ──────────────────────────────────────────────
