@@ -101,7 +101,10 @@ test.describe.serial('FAQ — API, gestion et page publique', () => {
 
     // Page de gestion (route du layer, sous-répertoire gestion/faq)
     await goto(`/editions/${editionId}/gestion/faq`, { waitUntil: 'hydration' })
-    await expect(page.locator('h1')).toContainText('FAQ', { timeout: 15000 })
+    // Cible le h1 « FAQ » précis (la page peut comporter plusieurs h1 → évite la violation strict mode)
+    await expect(page.locator('h1').filter({ hasText: /faq/i }).first()).toBeVisible({
+      timeout: 15000,
+    })
 
     // Page publique (route du layer, faq.vue → faq/index.vue) : l'entrée publique est affichée
     await goto(`/editions/${editionId}/faq`, { waitUntil: 'hydration' })
