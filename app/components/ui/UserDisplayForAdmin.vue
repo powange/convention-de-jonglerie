@@ -8,8 +8,14 @@
         </p>
         <slot name="badge" />
       </div>
-      <p v-if="user.nom || user.prenom" class="text-sm text-gray-600 dark:text-gray-300 truncate">
+      <p
+        v-if="user.nom || user.prenom || user.pronouns"
+        class="text-sm text-gray-600 dark:text-gray-300 truncate"
+      >
         {{ `${user.prenom || ''} ${user.nom || ''}`.trim() }}
+        <span v-if="user.pronouns" class="text-gray-400 dark:text-gray-500">
+          ({{ user.pronouns }})
+        </span>
       </p>
       <p v-if="showEmail && user.email" class="text-sm text-gray-500 dark:text-gray-400 truncate">
         {{ user.email }}
@@ -27,6 +33,7 @@ interface User {
   pseudo: string
   nom?: string | null
   prenom?: string | null
+  pronouns?: string | null
   email?: string
   emailHash: string
   phone?: string | null

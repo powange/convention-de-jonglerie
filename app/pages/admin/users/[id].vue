@@ -160,6 +160,20 @@
 
               <div class="flex justify-between">
                 <span class="text-gray-600 dark:text-gray-400"
+                  >{{ $t('admin.preferred_language') }}:</span
+                >
+                <span class="font-medium flex items-center gap-2">
+                  <span
+                    v-if="preferredLanguageFlag"
+                    :class="preferredLanguageFlag"
+                    class="w-4 h-3 shrink-0"
+                  />
+                  {{ preferredLanguageLabel }}
+                </span>
+              </div>
+
+              <div class="flex justify-between">
+                <span class="text-gray-600 dark:text-gray-400"
                   >{{ $t('profile.member_since') }}:</span
                 >
                 <span class="font-medium">{{ formatDate(user.createdAt) }}</span>
@@ -355,6 +369,7 @@
 
 <script setup lang="ts">
 import { formatDate } from '~/utils/date'
+import { LOCALES_CONFIG, languageCodeToFlag } from '~/utils/locales'
 // Type pour l'utilisateur depuis l'API
 interface UserProfile {
   id: number
@@ -362,6 +377,8 @@ interface UserProfile {
   pseudo: string
   nom: string
   prenom: string
+  pronouns?: string | null
+  preferredLanguage?: string | null
   phone?: string | null
   profilePicture?: string | null
   isEmailVerified: boolean
@@ -603,6 +620,17 @@ const {
   error,
   refresh,
 } = await useFetch<UserProfile>(`/api/admin/users/${userId}`)
+
+// Langue préférée : libellé lisible + classe drapeau (cohérent avec le sélecteur de langue)
+const preferredLanguageLabel = computed(() => {
+  const code = user.value?.preferredLanguage
+  if (!code) return '-'
+  return LOCALES_CONFIG.find((l) => l.code === code)?.name || code
+})
+const preferredLanguageFlag = computed(() => {
+  const code = user.value?.preferredLanguage
+  return code ? languageCodeToFlag(code) : undefined
+})
 
 // Gestionnaire de changement de photo de profil
 const onProfilePictureChanged = async (newProfilePicture: string | null) => {
