@@ -56,6 +56,9 @@ export const publicRoutes: PublicRoute[] = [
   // ====== Feedback (anonyme ou authentifié) ======
   { path: '/api/feedback', methods: ['POST'], hydrateSession: true },
 
+  // ====== Remontée des clés i18n manquantes (anonyme ou authentifié) ======
+  { path: '/api/i18n/missing-keys', methods: ['POST'], hydrateSession: true },
+
   // ====== API publique (authentifiée par token, pas par session) ======
   // Le contrôle d'accès est fait dans le handler via le token d'API.
   { prefix: '/api/public/', methods: ['GET'] },
