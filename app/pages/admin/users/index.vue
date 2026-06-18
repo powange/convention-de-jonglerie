@@ -182,6 +182,7 @@ import { h, resolveComponent } from 'vue'
 import type { AdminUser } from '~/composables/useUserDeletion'
 import { useAuthStore } from '~/stores/auth'
 import { useImpersonationStore } from '~/stores/impersonation'
+import { LOCALES_CONFIG, languageCodeToFlag } from '~/utils/locales'
 
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
@@ -197,6 +198,8 @@ interface AdminUserWithConnection extends AdminUser {
   isVolunteer: boolean
   isArtist: boolean
   isOrganizer: boolean
+  preferredLanguage: string
+  pronouns?: string | null
 }
 
 interface PaginationData {
@@ -372,6 +375,20 @@ const columns = [
           : h(resolveComponent('UBadge'), { color: 'warning', variant: 'soft', size: 'xs' }, () =>
               t('admin.not_verified')
             ),
+      ])
+    },
+  },
+  {
+    accessorKey: 'language',
+    header: t('admin.preferred_language'),
+    cell: ({ row }: { row: any }) => {
+      const user = row.original as AdminUserWithConnection
+      const code = user.preferredLanguage
+      const name = LOCALES_CONFIG.find((l) => l.code === code)?.name || code || '-'
+      const flag = languageCodeToFlag(code)
+      return h('div', { class: 'flex items-center gap-2' }, [
+        flag ? h('span', { class: `${flag} w-4 h-3 shrink-0` }) : null,
+        h('span', name),
       ])
     },
   },

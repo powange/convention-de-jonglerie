@@ -16,6 +16,7 @@ export default wrapApiHandler(
         nom: true,
         prenom: true,
         pronouns: true,
+        preferredLanguage: true,
         phone: true,
         isEmailVerified: true,
         isGlobalAdmin: true,

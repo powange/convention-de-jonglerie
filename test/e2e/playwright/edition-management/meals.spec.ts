@@ -23,9 +23,9 @@ test.describe.serial('Module Repas', () => {
   test('la page de configuration des repas se charge', async ({ page, goto }) => {
     const { editionId } = loadState()
     await goto(`/editions/${editionId}/gestion/meals`, { waitUntil: 'hydration' })
-    await expect(page.getByRole('heading', { name: /configuration des repas/i }).first()).toBeVisible(
-      { timeout: 10000 }
-    )
+    await expect(
+      page.getByRole('heading', { name: /configuration des repas/i }).first()
+    ).toBeVisible({ timeout: 10000 })
   })
 
   test('GET meals répond', async ({ page }) => {
