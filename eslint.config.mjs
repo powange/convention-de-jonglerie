@@ -3,6 +3,8 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 // Étend la config Nuxt (flat config ESLint v9) avec quelques overrides pragmatiques
 export default withNuxt(
+  // La 2ᵉ app (apps/*) est un projet Nuxt séparé avec sa propre config → exclue du lint principal.
+  { ignores: ['apps/**'] },
   // Règles globales légères pour réduire le bruit sans masquer les erreurs importantes
   {
     files: ['**/*.{js,cjs,mjs,ts,tsx,vue}'],

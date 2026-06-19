@@ -1,0 +1,20 @@
+{
+  "name": "app2",
+  "private": true,
+  "type": "module",
+  "description": "Deuxième application (placeholder de test) — Nuxt 4 autonome, sans layers pour l'instant",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "nuxt": "^4.4.8",
+    "vue": "^3.5.17"
+  },
+  "engines": {
+    "node": ">=22 <26"
+  }
+}
