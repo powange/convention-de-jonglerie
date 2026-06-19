@@ -3,9 +3,9 @@ import { randomBytes } from 'node:crypto'
 import { sendRedirect, getQuery, setCookie, getCookie, getRequestURL, createError } from 'h3'
 import { $fetch } from 'ofetch'
 
-import { getEmailHash } from '../../utils/email-hash'
-import { sanitizeReturnTo } from '../../utils/safe-redirect'
-import { setAuthSession } from '../../utils/session-helpers'
+import { getEmailHash } from '#server/utils/email-hash'
+import { sanitizeReturnTo } from '#server/utils/safe-redirect'
+import { setAuthSession } from '#server/utils/session-helpers'
 
 function slugifyPseudo(base: string) {
   const clean =
@@ -28,25 +28,25 @@ async function uniquePseudo(base: string) {
 }
 
 export default defineEventHandler(async (event) => {
-  const clientId = process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID
-  const clientSecret = process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET
+  const clientId = process.env.NUXT_OAUTH_FACEBOOK_CLIENT_ID
+  const clientSecret = process.env.NUXT_OAUTH_FACEBOOK_CLIENT_SECRET
   if (!clientId || !clientSecret) {
     console.error(
-      'Google OAuth non configuré: définir NUXT_OAUTH_GOOGLE_CLIENT_ID et NUXT_OAUTH_GOOGLE_CLIENT_SECRET'
+      'Facebook OAuth non configuré: définir NUXT_OAUTH_FACEBOOK_CLIENT_ID et NUXT_OAUTH_FACEBOOK_CLIENT_SECRET'
     )
     return sendRedirect(event, '/login')
   }
 
   const url = getRequestURL(event)
-  const redirectUri = process.env.NUXT_OAUTH_GOOGLE_REDIRECT_URL || `${url.origin}/auth/google`
+  const redirectUri = process.env.NUXT_OAUTH_FACEBOOK_REDIRECT_URL || `${url.origin}/auth/facebook`
   const query = getQuery(event) as Record<string, string | undefined>
 
-  // Étape 1: Rediriger vers Google si absence de code
+  // Étape 1: Rediriger vers Facebook si absence de code
   if (!query.code) {
     // Token OAuth state cryptographiquement sûr (protection CSRF OAuth)
     const state = randomBytes(32).toString('hex')
     // Conserver un état court (10 min)
-    setCookie(event, 'oauth_state', state, {
+    setCookie(event, 'oauth_state_fb', state, {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     // Conserver le paramètre returnTo dans un cookie séparé
     const returnTo = query.returnTo as string
     if (returnTo) {
-      setCookie(event, 'oauth_returnTo', returnTo, {
+      setCookie(event, 'oauth_returnTo_fb', returnTo, {
         httpOnly: true,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
@@ -66,74 +66,67 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')
+    const authUrl = new URL('https://www.facebook.com/v25.0/dialog/oauth')
     authUrl.searchParams.set('client_id', clientId)
     authUrl.searchParams.set('redirect_uri', redirectUri)
     authUrl.searchParams.set('response_type', 'code')
-    authUrl.searchParams.set('scope', 'openid email profile')
-    authUrl.searchParams.set('prompt', 'select_account')
-    authUrl.searchParams.set('access_type', 'offline')
-    authUrl.searchParams.set('include_granted_scopes', 'true')
+    authUrl.searchParams.set('scope', 'email,public_profile')
     authUrl.searchParams.set('state', state)
 
     return sendRedirect(event, authUrl.toString())
   }
 
-  // Étape 2: Retour Google: valider l'état
+  // Étape 2: Retour Facebook: valider l'état
   const sentState = query.state
-  const cookieState = getCookie(event, 'oauth_state')
+  const cookieState = getCookie(event, 'oauth_state_fb')
   if (!sentState || !cookieState || sentState !== cookieState) {
     throw createError({ status: 400, message: 'Invalid OAuth state' })
   }
 
-  // Échanger le code contre des jetons
-  const tokenEndpoint = 'https://oauth2.googleapis.com/token'
-  const form = new URLSearchParams()
-  form.set('client_id', clientId)
-  form.set('client_secret', clientSecret)
-  form.set('code', String(query.code))
-  form.set('grant_type', 'authorization_code')
-  form.set('redirect_uri', redirectUri)
+  // Échanger le code contre un access_token
+  const tokenEndpoint = 'https://graph.facebook.com/v25.0/oauth/access_token'
+  const tokenParams = new URLSearchParams()
+  tokenParams.set('client_id', clientId)
+  tokenParams.set('client_secret', clientSecret)
+  tokenParams.set('code', String(query.code))
+  tokenParams.set('redirect_uri', redirectUri)
 
-  const tokenRes = await $fetch<any>(tokenEndpoint, {
-    method: 'POST',
-    body: form,
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  const tokenRes = await $fetch<any>(`${tokenEndpoint}?${tokenParams.toString()}`, {
+    method: 'GET',
   })
 
   const accessToken = tokenRes.access_token as string | undefined
   if (!accessToken) {
-    console.error('Google OAuth: access_token manquant', tokenRes)
+    console.error('Facebook OAuth: access_token manquant', tokenRes)
     return sendRedirect(event, '/login')
   }
 
   // Récupérer le profil utilisateur
-  const userInfo = await $fetch<any>('https://openidconnect.googleapis.com/v1/userinfo', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  })
+  const fields = ['id', 'name', 'first_name', 'last_name', 'email', 'picture.type(large)'].join(',')
+  const userInfo = await $fetch<any>(
+    `https://graph.facebook.com/me?fields=${encodeURIComponent(fields)}&access_token=${encodeURIComponent(accessToken)}`
+  )
 
   const email = userInfo?.email as string | undefined
   const name = (userInfo?.name as string | undefined) || ''
-  const givenName = (userInfo?.given_name as string | undefined) || ''
-  const familyName = (userInfo?.family_name as string | undefined) || ''
-  const picture = (userInfo?.picture as string | undefined) || ''
+  const givenName = (userInfo?.first_name as string | undefined) || ''
+  const familyName = (userInfo?.last_name as string | undefined) || ''
+  const picture = (userInfo?.picture?.data?.url as string | undefined) || ''
+
+  // Facebook peut ne pas renvoyer d'email selon la configuration/permissions
   if (!email) {
-    console.error('Google OAuth: email manquant dans userinfo')
+    console.error('Facebook OAuth: email indisponible dans userinfo (permission email manquante ?)')
     return sendRedirect(event, '/login')
   }
 
   // Essayer de retrouver l'utilisateur par email
   let dbUser = await prisma.user.findUnique({ where: { email } })
 
-  // Variable pour savoir si c'est une nouvelle inscription
-  let isNewUser = false
-
   // Créer l'utilisateur si inexistant
   if (!dbUser) {
-    isNewUser = true
     const [prenomRaw, ...rest] = name.trim().split(/\s+/)
     const prenom = (givenName || prenomRaw || email.split('@')[0]).trim()
-    const nom = (familyName || rest.join(' ') || 'Google').trim()
+    const nom = (familyName || rest.join(' ') || 'Facebook').trim()
     const basePseudo = email.split('@')[0]
     const pseudo = await uniquePseudo(basePseudo)
 
@@ -145,14 +138,14 @@ export default defineEventHandler(async (event) => {
         nom,
         prenom,
         password: null, // Pas de mot de passe pour les utilisateurs OAuth
-        authProvider: 'google',
+        authProvider: 'facebook',
         isEmailVerified: true,
         ...(picture ? { profilePicture: picture } : {}),
       },
     })
   }
 
-  // Mettre à jour la photo de profil si elle est vide et que Google fournit une image
+  // Mettre à jour la photo de profil si elle est vide et que Facebook fournit une image
   if (dbUser && !dbUser.profilePicture && picture) {
     try {
       dbUser = await prisma.user.update({
@@ -160,7 +153,7 @@ export default defineEventHandler(async (event) => {
         data: { profilePicture: picture },
       })
     } catch (e) {
-      console.warn('Impossible de mettre à jour la photo de profil depuis Google:', e)
+      console.warn('Impossible de mettre à jour la photo de profil depuis Facebook:', e)
     }
   }
 
@@ -170,9 +163,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Si l'utilisateur a été créé manuellement (authProvider = MANUAL),
-  // on met à jour son authProvider vers 'google' lors de sa première connexion
+  // on met à jour son authProvider vers 'facebook' lors de sa première connexion
   if (dbUser.authProvider === 'MANUAL') {
-    updateData.authProvider = 'google'
+    updateData.authProvider = 'facebook'
   }
 
   await prisma.user.update({
@@ -215,24 +208,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Récupérer le returnTo depuis le cookie et nettoyer le cookie
-  const returnTo = getCookie(event, 'oauth_returnTo')
+  const returnTo = getCookie(event, 'oauth_returnTo_fb')
   if (returnTo) {
-    setCookie(event, 'oauth_returnTo', '', { maxAge: 0 }) // Supprimer le cookie
-  }
-
-  // Si c'est un nouvel utilisateur, rediriger vers la page de complétion du profil
-  if (isNewUser) {
-    // Stocker la destination finale dans un cookie pour y retourner après la complétion
-    if (returnTo) {
-      setCookie(event, 'profile_completion_returnTo', returnTo, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        path: '/',
-        maxAge: 600,
-      })
-    }
-    return sendRedirect(event, '/auth/complete-profile')
+    setCookie(event, 'oauth_returnTo_fb', '', { maxAge: 0 }) // Supprimer le cookie
   }
 
   // Valider returnTo : chemin relatif interne uniquement (protection Open Redirect)

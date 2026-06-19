@@ -427,9 +427,8 @@ import { z } from 'zod'
 
 import { useDebounce } from '~/composables/useDebounce'
 import { usePasswordStrength } from '~/composables/usePasswordStrength'
+import { useAuthStore } from '~/stores/auth'
 import type { HttpError } from '~/types'
-
-import { useAuthStore } from '../stores/auth'
 
 const onGoogleLogin = async () => {
   // Détecter si on est en mode PWA et stocker l'info dans un cookie
