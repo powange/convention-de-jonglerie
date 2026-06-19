@@ -18,7 +18,7 @@ import {
   generateVerificationEmailHtml,
 } from '../../../../../server/utils/emailService'
 import { emailRateLimiter } from '../../../../../server/utils/rate-limiter'
-import handler from '../../../../../server/api/auth/resend-verification.post'
+import handler from '../../../../../layers/auth/server/api/auth/resend-verification.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

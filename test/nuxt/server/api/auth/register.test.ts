@@ -25,7 +25,7 @@ import {
   generateVerificationEmailHtml,
 } from '../../../../../server/utils/emailService'
 import bcrypt from 'bcryptjs'
-import registerHandler from '../../../../../server/api/auth/register.post'
+import registerHandler from '../../../../../layers/auth/server/api/auth/register.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
