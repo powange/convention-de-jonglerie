@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     './layers/stock',
     './layers/artists',
     './layers/ticketing',
+    './layers/auth',
   ],
 
   compatibilityDate: '2026-03-02',
