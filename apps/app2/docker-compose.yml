@@ -1,0 +1,15 @@
+# 2ᵉ app — lancement autonome (indépendant de l'app principale).
+# Usage : depuis apps/app2/  →  docker compose up --build -d   (puis http://localhost:3001)
+services:
+  app2:
+    image: app2:latest
+    container_name: app2
+    build:
+      context: .
+      target: runtime
+    ports:
+      - '3001:3000' # hôte 3001 → conteneur 3000 (évite le clash avec l'app principale sur 3000)
+    environment:
+      NITRO_HOST: 0.0.0.0
+      NITRO_PORT: '3000'
+    restart: unless-stopped
