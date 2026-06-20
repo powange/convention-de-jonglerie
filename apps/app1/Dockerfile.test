@@ -1,6 +1,7 @@
-# Dockerfile pour l'environnement de test
+# Dockerfile pour l'environnement de test (monorepo)
+# Contexte de build = RACINE du repo (pour inclure layers/). Layout /app/apps/app1 + /app/layers.
 # Image de base paramétrable pour contourner d'éventuels soucis de registry / credentials.
-# Utilisation: docker build --build-arg BASE_NODE_IMAGE=node:22 -f Dockerfile.test .
+# Utilisation: docker build --build-arg BASE_NODE_IMAGE=node:22 -f apps/app1/Dockerfile.test .
 ARG BASE_NODE_IMAGE=node:24-slim
 FROM ${BASE_NODE_IMAGE}
 
@@ -12,12 +13,12 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /app/apps/app1
 
 # Copier les fichiers de configuration
-COPY package*.json ./
-COPY prisma.config.ts ./
-COPY prisma ./prisma/
+COPY apps/app1/package*.json ./
+COPY apps/app1/prisma.config.ts ./
+COPY apps/app1/prisma ./prisma/
 
 # Installer toutes les dépendances (dev + prod)
 RUN if [ -f package-lock.json ]; then \
@@ -26,14 +27,15 @@ RUN if [ -f package-lock.json ]; then \
 			echo "No package-lock.json -> npm install (test stage)" && npm install; \
 		fi
 
-# Copier le reste du code
-COPY . .
+# Copier le code de l'app + les layers partagés (requis pour extends ../../layers)
+COPY apps/app1/ ./
+COPY layers/ /app/layers/
 
 # Générer le client Prisma (avec DATABASE_URL factice pour Prisma 7)
 RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
 
 # Créer les dossiers nécessaires
-RUN mkdir -p /app/public/uploads /app/.nuxt /app/.output
+RUN mkdir -p /app/apps/app1/public/uploads /app/apps/app1/.nuxt /app/apps/app1/.output
 
 # Variables d'environnement pour les tests
 ENV NODE_ENV=test

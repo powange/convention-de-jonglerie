@@ -24,7 +24,9 @@ services:
   # Application Nuxt.js
   app-prod:
     build:
-      context: .
+      # Monorepo : contexte = racine du repo (inclut layers/) ; layout /app/apps/app1
+      context: ../..
+      dockerfile: apps/app1/Dockerfile
       target: runtime
     container_name: convention-app-prod
     restart: unless-stopped
@@ -42,8 +44,8 @@ services:
       # URL Ollama avec hostname Docker
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
     volumes:
-      - /home/powange/docker_workspaces/convention-de-jonglerie-prod/backups:/app/backups
-      - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads_data:/app/public/uploads
+      - /home/powange/docker_workspaces/convention-de-jonglerie-prod/backups:/app/apps/app1/backups
+      - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads_data:/app/apps/app1/public/uploads
       - /home/powange/docker_workspaces/convention-de-jonglerie-prod/uploads:/uploads
     depends_on:
       database-prod:

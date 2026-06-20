@@ -24,7 +24,9 @@ services:
   # Application Nuxt.js
   app:
     build:
-      context: .
+      # Monorepo : contexte = racine du repo (inclut layers/) ; layout /app/apps/app1
+      context: ../..
+      dockerfile: apps/app1/Dockerfile
       target: runtime
       args:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
@@ -45,8 +47,8 @@ services:
       # URL Ollama avec hostname Docker
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
     volumes:
-      - /home/powange/docker_workspaces/convention-de-jonglerie-release/backups:/app/backups
-      - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/public/uploads
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/backups:/app/apps/app1/backups
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/apps/app1/public/uploads
       - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads:/uploads
     depends_on:
       database:

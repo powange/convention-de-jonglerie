@@ -1,25 +1,26 @@
+name: convention-de-jonglerie
 services:
   # Container pour les tests unitaires uniquement (sans DB)
   test-unit:
     build:
-      context: .
-      dockerfile: Dockerfile.test
+      context: ../..
+      dockerfile: apps/app1/Dockerfile.test
     container_name: convention-test-unit
     environment:
       NODE_ENV: 'test'
       CI: 'true'
     volumes:
-      - ./app:/app/app:cached
-      - ./layers:/app/layers:cached
-      - ./server:/app/server:cached
-      - ./shared:/app/shared:cached
-      - ./test:/app/test:cached
-      - ./scripts:/app/scripts:cached
-      - ./prisma:/app/prisma:cached
-      - ./public:/app/public:cached
-      - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-      - ./vitest.config.ts:/app/vitest.config.ts:cached
-      - node_modules:/app/node_modules
+      - ./app:/app/apps/app1/app:cached
+      - ../../layers:/app/layers:cached
+      - ./server:/app/apps/app1/server:cached
+      - ./shared:/app/apps/app1/shared:cached
+      - ./test:/app/apps/app1/test:cached
+      - ./scripts:/app/apps/app1/scripts:cached
+      - ./prisma:/app/apps/app1/prisma:cached
+      - ./public:/app/apps/app1/public:cached
+      - ./nuxt.config.ts:/app/apps/app1/nuxt.config.ts:cached
+      - ./vitest.config.ts:/app/apps/app1/vitest.config.ts:cached
+      - node_modules:/app/apps/app1/node_modules
     command:
       - sh
       - -c
