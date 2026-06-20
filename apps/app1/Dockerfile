@@ -1,10 +1,14 @@
-# Dockerfile multi-stage pour Convention de Jonglerie
+# Dockerfile multi-stage pour Convention de Jonglerie (app1)
+#
+# Monorepo : le CONTEXTE de build est la RACINE du repo (pour inclure les layers
+# partagés). Le conteneur reproduit le layout hôte : /app/apps/app1 + /app/layers,
+# afin que `extends: '../../layers/*'` (nuxt.config) résolve aussi dans l'image.
 
 # Stage de base commun (image paramétrable)
 ARG BASE_NODE_IMAGE=node:24-slim
 FROM ${BASE_NODE_IMAGE} AS base
 RUN apt-get update && apt-get install -y curl openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
+WORKDIR /app/apps/app1
 
 # -------------------------
 # Stage builder (production)
@@ -12,9 +16,9 @@ WORKDIR /app
 FROM base AS builder
 
 # Copier les manifests et Prisma (pour le client)
-COPY package*.json ./
-COPY prisma.config.ts ./
-COPY prisma ./prisma/
+COPY apps/app1/package*.json ./
+COPY apps/app1/prisma.config.ts ./
+COPY apps/app1/prisma ./prisma/
 
 # Installer dépendances complètes (ci si lock, sinon install)
 RUN if [ -f package-lock.json ]; then \
@@ -26,11 +30,12 @@ RUN if [ -f package-lock.json ]; then \
 # Générer le client Prisma AVANT le build (requis pour Prisma 7)
 RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
 
-# Copier le reste du code et construire
-COPY . .
+# Copier le code de l'app + les layers partagés (requis pour extends ../../layers)
+COPY apps/app1/ ./
+COPY layers/ /app/layers/
 # Augmenter la limite de mémoire pour le build Docker (8GB)
 # --mount=type=cache : persiste le cache Nuxt/Vite entre les builds Docker (accélère les rebuilds via Portainer)
-RUN --mount=type=cache,target=/app/node_modules/.cache \
+RUN --mount=type=cache,target=/app/apps/app1/node_modules/.cache \
     NODE_OPTIONS='--max-old-space-size=8192' npx nuxt build
 
 # Conserver uniquement les dépendances de prod
@@ -41,43 +46,43 @@ RUN npm prune --omit=dev
 # -------------------------
 FROM ${BASE_NODE_IMAGE} AS runtime
 RUN apt-get update && apt-get install -y openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
+WORKDIR /app/apps/app1
 
 # Dossiers requis au runtime
-RUN mkdir -p /app/public/uploads /app/backups /uploads
+RUN mkdir -p /app/apps/app1/public/uploads /app/apps/app1/backups /uploads
 
-# Copier artefacts et dépendances depuis builder
-COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./
-COPY --from=builder /app/server/generated ./server/generated
-COPY --from=builder /app/server/prompts ./server/prompts
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/scripts ./scripts
-COPY --from=builder /app/i18n ./i18n
+# Copier artefacts et dépendances depuis builder (le .output Nitro embarque déjà le code des layers)
+COPY --from=builder /app/apps/app1/.output ./.output
+COPY --from=builder /app/apps/app1/public ./public
+COPY --from=builder /app/apps/app1/node_modules ./node_modules
+COPY --from=builder /app/apps/app1/prisma ./prisma
+COPY --from=builder /app/apps/app1/prisma.config.ts ./
+COPY --from=builder /app/apps/app1/server/generated ./server/generated
+COPY --from=builder /app/apps/app1/server/prompts ./server/prompts
+COPY --from=builder /app/apps/app1/package*.json ./
+COPY --from=builder /app/apps/app1/scripts ./scripts
+COPY --from=builder /app/apps/app1/i18n ./i18n
 
 # Script d'entrée: appliquer les migrations Prisma avant de démarrer Nuxt
-COPY docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY apps/app1/docker/entrypoint.sh /app/apps/app1/entrypoint.sh
+RUN chmod +x /app/apps/app1/entrypoint.sh
 
 ENV NODE_ENV=production
 EXPOSE 3000
-CMD ["/app/entrypoint.sh"]
+CMD ["/app/apps/app1/entrypoint.sh"]
 
 # -------------------------
 # Stage dev (optionnel pour iso image)
 # -------------------------
 FROM base AS dev
 # Ce stage sert d'image de dev avec les dépendances pré-installées
-# Le code est monté en volume pour le hot-reload, node_modules reste dans un volume Docker
-COPY package*.json ./
-COPY prisma.config.ts ./
-COPY prisma ./prisma/
+# Le code (app + layers) est monté en volume pour le hot-reload, node_modules reste dans un volume Docker
+COPY apps/app1/package*.json ./
+COPY apps/app1/prisma.config.ts ./
+COPY apps/app1/prisma ./prisma/
 
 # Créer les dossiers requis pour le développement
-RUN mkdir -p /app/public/uploads /app/backups /uploads
+RUN mkdir -p /app/apps/app1/public/uploads /app/apps/app1/backups /uploads
 
 # Installer les dépendances dans l'image pour un démarrage rapide
 RUN if [ -f package-lock.json ]; then \

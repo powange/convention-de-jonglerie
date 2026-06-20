@@ -1,48 +1,46 @@
-# Fichiers de développement
-node_modules
-npm-debug.log*
-.npm
-.env
-.env.*
-!.env.example
+# .dockerignore RACINE — contexte de build = racine du repo (monorepo).
+# Les patterns Docker s'évaluent depuis la racine du contexte : il FAUT des globs **/
+# pour exclure les artefacts nichés sous apps/* et layers/*.
 
-# Fichiers de build Nuxt
-.nuxt
-.output
-.cache
-dist
+# Dépendances et artefacts de build (à toute profondeur)
+**/node_modules
+**/.nuxt
+**/.output
+**/.nitro
+**/.cache
+**/.data
+**/dist
+**/tsconfig.tsbuildinfo
 
-# Fichiers système
-.DS_Store
+# Fichiers d'env (ne jamais embarquer ; fournis au runtime via compose)
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.docker.example
+!**/.env.portainer.example
+
+# Git / CI / éditeur / docs (inutiles au build)
 .git
-.gitignore
-README.md
-Dockerfile
-Dockerfile.test
-docker-compose.yml
-docker-compose*.yml
-.dockerignore
-
-# Logs
-logs
-*.log
-
-# Fichiers de développement
+.github
 .vscode
-.idea
-*.swp
-*.swo
+.claude
+docs
 
-# Fichiers temporaires
-.tmp
-.temp
+# Autres apps (le build d'app1 n'a pas besoin d'app2)
+apps/app2
 
-# Uploads locaux (seront montés en volume)
-public/uploads/*
+# Logs et divers
+**/*.log
+**/logs
+**/.DS_Store
+**/.history
 
-# Fichiers de test
-coverage
-.nyc_output
+# Uploads locaux (montés en volume)
+**/public/uploads/*
 
-# Histoire des fichiers
-.history
+# Tests / rapports (inutiles à l'image de prod ; le stage dev réinstalle ce qu'il faut)
+**/coverage
+**/.nyc_output
+**/test-results
+**/playwright-report
+**/blob-report

@@ -4,18 +4,19 @@ import { version as nuxtVersion } from 'nuxt/package.json'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // Layers modulaires (étape 2) — bénévole, repas, tâches, FAQ, objets trouvés, ateliers, covoiturage
+  // Monorepo : les layers sont partagés à la racine (../../layers), pas dans l'app.
   extends: [
-    './layers/volunteers',
-    './layers/meals',
-    './layers/tasks',
-    './layers/faq',
-    './layers/lost-found',
-    './layers/workshops',
-    './layers/carpool',
-    './layers/stock',
-    './layers/artists',
-    './layers/ticketing',
-    './layers/auth',
+    '../../layers/volunteers',
+    '../../layers/meals',
+    '../../layers/tasks',
+    '../../layers/faq',
+    '../../layers/lost-found',
+    '../../layers/workshops',
+    '../../layers/carpool',
+    '../../layers/stock',
+    '../../layers/artists',
+    '../../layers/ticketing',
+    '../../layers/auth',
   ],
 
   compatibilityDate: '2026-03-02',

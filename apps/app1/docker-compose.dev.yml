@@ -1,4 +1,10 @@
 # Docker Compose pour Convention de Jonglerie (développement iso release)
+# Monorepo : contexte de build = racine du repo (../..) ; le conteneur reproduit
+# le layout hôte /app/apps/app1 + /app/layers (layers partagés à la racine).
+#
+# `name:` fige le nom de projet : sans lui, lancer depuis apps/app1/ le déduirait
+# du dossier (« app1 ») et créerait de NOUVEAUX volumes (DB de dev perdue).
+name: convention-de-jonglerie
 services:
   # Base de données MySQL
   database:
@@ -30,17 +36,18 @@ services:
   app:
     image: convention-de-jonglerie-app:dev
     build:
-      context: .
+      context: ../..
+      dockerfile: apps/app1/Dockerfile
       target: dev
       args:
         BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
     container_name: convention-app-dev
-    working_dir: /app
+    working_dir: /app/apps/app1
     # Note: pas de user: spécifié pour éviter les problèmes de permissions avec les volumes
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
     # Optimisé pour réduire les temps de démarrage avec gestion des permissions
-    command: sh -lc "/app/scripts/docker-start.sh"
-    # Charger toutes les variables d'environnement depuis le fichier .env
+    command: sh -lc "/app/apps/app1/scripts/docker-start.sh"
+    # Charger toutes les variables d'environnement depuis le fichier .env (apps/app1/.env)
     env_file:
       - .env
     # Variables d'environnement spécifiques à Docker (peuvent override le .env)
@@ -58,35 +65,35 @@ services:
       # URL Ollama avec hostname Docker
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
     volumes:
-      # Monter uniquement le code pour ne pas écraser node_modules
-      - ./app:/app/app:cached
-      - ./layers:/app/layers:cached
-      - ./i18n:/app/i18n:cached
-      - ./server:/app/server:cached
-      - ./shared:/app/shared:cached
-      - ./test:/app/test:cached
-      - ./scripts:/app/scripts:cached
-      - ./prisma:/app/prisma:cached
-      - ./public:/app/public:cached
-      - ./backups:/app/backups:cached
-      - ./lib:/app/lib:cached
-      - ./types:/app/types:cached
+      # Code de l'app (chemins hôte relatifs à apps/app1 → cibles /app/apps/app1/*)
+      - ./app:/app/apps/app1/app:cached
+      - ./i18n:/app/apps/app1/i18n:cached
+      - ./server:/app/apps/app1/server:cached
+      - ./shared:/app/apps/app1/shared:cached
+      - ./test:/app/apps/app1/test:cached
+      - ./scripts:/app/apps/app1/scripts:cached
+      - ./prisma:/app/apps/app1/prisma:cached
+      - ./public:/app/apps/app1/public:cached
+      - ./backups:/app/apps/app1/backups:cached
+      - ./lib:/app/apps/app1/lib:cached
+      - ./types:/app/apps/app1/types:cached
+      # Layers PARTAGÉS (racine du repo → /app/layers, résout extends ../../layers)
+      - ../../layers:/app/layers:cached
       # Persister les uploads comme en release (évite d'écraser en rebuild)
-      - uploads_data:/app/public/uploads
+      - uploads_data:/app/apps/app1/public/uploads
       - uploads:/uploads
       # Fichiers de configuration
-      - ./nuxt.config.ts:/app/nuxt.config.ts:cached
-      - ./app.config.ts:/app/app.config.ts:cached
-      - ./eslint.config.mjs:/app/eslint.config.mjs:cached
-      - ./tsconfig.json:/app/tsconfig.json:cached
-      - ./vitest.config.ts:/app/vitest.config.ts:cached
-      - ./vitest.config.ui.ts:/app/vitest.config.ui.ts:cached
-      - ./prisma.config.ts:/app/prisma.config.ts:cached
+      - ./nuxt.config.ts:/app/apps/app1/nuxt.config.ts:cached
+      - ./app.config.ts:/app/apps/app1/app.config.ts:cached
+      - ./eslint.config.mjs:/app/apps/app1/eslint.config.mjs:cached
+      - ./tsconfig.json:/app/apps/app1/tsconfig.json:cached
+      - ./vitest.config.ts:/app/apps/app1/vitest.config.ts:cached
+      - ./prisma.config.ts:/app/apps/app1/prisma.config.ts:cached
       # Node modules dans un volume Docker persistant (pas synchronisé avec l'hôte)
-      - node_modules:/app/node_modules
+      - node_modules:/app/apps/app1/node_modules
       # Synchroniser les dossiers de build du container vers l'hôte
-      - ./.nuxt:/app/.nuxt
-      - ./.output:/app/.output
+      - ./.nuxt:/app/apps/app1/.nuxt
+      - ./.output:/app/apps/app1/.output
     ports:
       - '3000:3000' # Application Nuxt
       - '24678:24678' # Vite HMR (Hot Module Replacement)
