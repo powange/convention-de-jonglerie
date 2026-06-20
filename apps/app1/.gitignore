@@ -1,0 +1,59 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+.history
+
+# Test coverage
+coverage
+
+# Local env files
+.env
+.env.*
+!.env.example
+!.env.docker.example
+!.env.portainer.example
+
+# Prisma generated client
+server/generated/prisma
+
+# TS build info
+tsconfig.tsbuildinfo
+
+# Uploaded files
+public/uploads/
+!public/uploads/.gitkeep
+
+# Backup folder (local development)
+backup
+backups/*
+!backups/.gitkeep
+i18n/locales-backup/
+
+# Translation config files (generated)
+scripts/translation/translations-config.json
+scripts/translation/translations-config.template.json
+scripts/translation/todo-*.json
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+!.gitkeep
