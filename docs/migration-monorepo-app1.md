@@ -1,7 +1,12 @@
 # Migration monorepo — déplacer l'app1 dans `apps/app1/`
 
-> **Statut** : 📋 **Planifié / non exécuté**. Première tentative live échouée (cf. [Post-mortem](#post-mortem--pourquoi-la-1ère-tentative-a-échoué)).
-> Cette doc décrit la procédure **à froid** à suivre pour réussir.
+> **Statut** : 🟢 **Implémenté à froid** sur la branche `feat/monorepo-app1` (3 commits :
+> déplacement → câblage dev validé 200 → prod/CI/proxy). La 1ʳᵉ tentative *live* avait échoué
+> (cf. [Post-mortem](#post-mortem--pourquoi-la-1ère-tentative-a-échoué)) ; la reprise **à froid**
+> (conteneurs arrêtés, commit du `git mv` avant tout build) a réussi.
+> **Reste à faire côté humain** : pousser la branche (validation CI), puis recâbler les stacks
+> Portainer (chemin compose `apps/app1/docker-compose.{release,prod}.yml`, contexte racine) —
+> tester **release** d'abord.
 > **Date** : 2026-06-20.
 
 ## Objectif
