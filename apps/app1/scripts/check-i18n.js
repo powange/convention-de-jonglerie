@@ -27,6 +27,8 @@ const CYAN = '\x1b[36m'
 const BOLD = '\x1b[1m'
 
 const projectRoot = path.resolve(__dirname, '..')
+// Monorepo : les layers sont partagés à la racine du repo (../../layers depuis l'app).
+const layersRoot = path.resolve(projectRoot, '..', '..', 'layers')
 const localeDir = path.join(projectRoot, 'i18n', 'locales', 'fr')
 
 // Fichiers à exclure de l'analyse (qui génèrent des faux positifs)
@@ -153,7 +155,6 @@ function loadLocaleFiles() {
       .readdirSync(localeDir)
       .filter((file) => file.endsWith('.json'))
       .map((name) => ({ name, path: path.join(localeDir, name) }))
-    const layersRoot = path.join(projectRoot, 'layers')
     if (fs.existsSync(layersRoot)) {
       for (const layer of fs.readdirSync(layersRoot)) {
         const layerFr = path.join(layersRoot, layer, 'i18n', 'locales', 'fr')
@@ -618,20 +619,25 @@ async function getAllRelevantFiles() {
     'middleware/**/*.js',
     'utils/**/*.js',
     'server/**/*.js',
-    // Layers modulaires (ex. layers/volunteers) : composants/pages/serveur
-    'layers/**/*.vue',
-    'layers/**/*.ts',
-    'layers/**/*.js',
     // Fichiers de configuration Nuxt
     'nuxt.config.ts',
     'nuxt.config.js',
   ]
+
+  // Monorepo : les layers sont partagés à la racine du repo (hors projectRoot) → scannés à part.
+  const layerPatterns = ['**/*.vue', '**/*.ts', '**/*.js']
 
   let files = []
   for (const pattern of patterns) {
     const found = await glob(path.join(projectRoot, pattern).replace(/\\/g, '/'))
     // glob v10+ retourne un itérable, il faut le convertir en tableau
     files = files.concat([...found])
+  }
+  if (fs.existsSync(layersRoot)) {
+    for (const pattern of layerPatterns) {
+      const found = await glob(path.join(layersRoot, pattern).replace(/\\/g, '/'))
+      files = files.concat([...found])
+    }
   }
 
   // Filtrer les fichiers exclus (fichiers individuels et dossiers)
