@@ -262,6 +262,25 @@ Les scripts `docker:*` référencent `-f docker-compose.*.yml`. Deux options :
 5. **Tests** : `npm run test:unit:run` + `npm run test:nuxt:run` verts.
 6. **CI** : pousser la branche, vérifier les 8 jobs + Playwright verts avant merge.
 
+> ⚠️ **Le smoke-test home (200) ne suffit pas** : certaines erreurs sont *lazy*. Ex. rencontré —
+> `translation-loaders.ts` importait les traductions du layer volunteers via `~~/layers/...`. Or
+> `~~` = rootDir de l'app (`apps/app1`), **pas** la racine du repo où vivent les layers → l'import
+> n'échoue qu'au chargement de la page bénévole (`/profile/mes-candidatures-benevole`), pas sur `/`.
+> **Smoke-tester au moins une page de chaque module** (bénévoles, billetterie…).
+
+### Piège : références `~~/layers/...` et alias `#...`
+
+Tout code app1 qui pointait vers un fichier **layer-local** via `~~/layers/<layer>/...` casse (le
+`~~` suit l'app, les layers ont remonté à la racine). Corriger en **chemin relatif** vers
+`../../../../layers/<layer>/...` (4 niveaux depuis `app/utils/`). ⚠️ **Ne pas** créer d'alias
+préfixé `#` (ex. `#shared-layers`) : Vite interprète `#...` comme un *subpath import* Node
+(`imports` de package.json) et lève `Missing "…" specifier in "nuxt" package`.
+
+```bash
+# Détecter tous les usages avant migration :
+grep -rn "~~/layers" apps/app1/app apps/app1/server apps/app1/shared
+```
+
 ---
 
 ## Coordination déploiement (Portainer)
