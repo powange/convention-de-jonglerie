@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../../layers/carpool/server/api/carpool-offers/[id]/bookings/[bookingId].put'
+import handler from '../../../../../../../../layers/carpool/server/api/carpool-offers/[id]/bookings/[bookingId].put'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

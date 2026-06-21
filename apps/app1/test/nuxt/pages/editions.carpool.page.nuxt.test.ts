@@ -5,8 +5,11 @@ describe('Page /editions/[id]/carpool', () => {
     // Test simple : vérifier que le composant peut être importé
     // Le rendu complet est lent (~2s) et sera couvert par les tests e2e
     // Page déplacée dans le layer carpool (modularisation).
-    const modulePath = '../../../layers/carpool/app/pages/editions/[id]/carpool/index.vue'
-    const module = await import(modulePath)
+    // Littéral inliné (pas de variable) pour que Vite résolve le chemin au transform,
+    // relativement à ce fichier (monorepo : layers à la racine, ../../../../../layers).
+    const module = await import(
+      '../../../../../layers/carpool/app/pages/editions/[id]/carpool/index.vue'
+    )
 
     expect(module.default).toBeDefined()
     expect(typeof module.default).toBe('object')

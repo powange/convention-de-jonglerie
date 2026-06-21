@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import handler from '../../../../../layers/auth/server/api/auth/check-email.post'
+import handler from '../../../../../../../layers/auth/server/api/auth/check-email.post'
 
 const prismaMock = (globalThis as any).prisma
 

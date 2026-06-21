@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/[itemId]/comments.post'
+import handler from '../../../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/[itemId]/comments.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

@@ -27,7 +27,7 @@ vi.mock('#server/utils/notification-service', () => ({
   safeNotify: mockSafeNotify,
 }))
 
-import handler from '../../../../../../../layers/tasks/server/api/editions/[id]/tasks/[taskId]/comments/index.post'
+import handler from '../../../../../../../../../layers/tasks/server/api/editions/[id]/tasks/[taskId]/comments/index.post'
 
 const prismaMock = (globalThis as any).prisma
 

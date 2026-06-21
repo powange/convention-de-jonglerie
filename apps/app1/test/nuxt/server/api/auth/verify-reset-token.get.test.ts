@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import handler from '../../../../../layers/auth/server/api/auth/verify-reset-token.get'
+import handler from '../../../../../../../layers/auth/server/api/auth/verify-reset-token.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

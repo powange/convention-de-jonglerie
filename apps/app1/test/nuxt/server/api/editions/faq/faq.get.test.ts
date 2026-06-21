@@ -20,7 +20,7 @@ vi.mock('#server/faq/ports/registry', () => ({
   useFaqPorts: () => ({ directory: { getFaqVisibility: mockGetFaqVisibility } }),
 }))
 
-import handler from '../../../../../../layers/faq/server/api/editions/[id]/faq/index.get'
+import handler from '../../../../../../../../layers/faq/server/api/editions/[id]/faq/index.get'
 
 const prismaMock = (globalThis as any).prisma
 

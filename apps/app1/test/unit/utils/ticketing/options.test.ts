@@ -6,7 +6,7 @@ import {
   updateOption,
   deleteOption,
   type OptionFormData,
-} from '../../../../layers/ticketing/app/utils/ticketing/options'
+} from '../../../../../../layers/ticketing/app/utils/ticketing/options'
 
 describe('utils billetterie - options', () => {
   const optionFormData: OptionFormData = {

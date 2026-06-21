@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import { fetchOrders } from '../../../../layers/ticketing/app/utils/ticketing/orders'
+import { fetchOrders } from '../../../../../../layers/ticketing/app/utils/ticketing/orders'
 
 describe('utils billetterie - orders', () => {
   beforeEach(() => {

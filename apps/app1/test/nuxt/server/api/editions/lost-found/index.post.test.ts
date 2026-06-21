@@ -14,7 +14,7 @@ vi.mock('#server/lost-found/ports/registry', () => ({
 
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 
-import handler from '../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.post'
+import handler from '../../../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

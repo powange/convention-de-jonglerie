@@ -8,7 +8,7 @@ import {
   updateTier,
   deleteTier,
   type TierFormData,
-} from '../../../../layers/ticketing/app/utils/ticketing/tiers'
+} from '../../../../../../layers/ticketing/app/utils/ticketing/tiers'
 
 describe('utils billetterie - tiers', () => {
   describe('isFreePrice (fonction pure)', () => {

@@ -27,7 +27,7 @@ vi.mock('#server/workshops/ports/registry', () => ({
   useWorkshopsPorts: () => ({ event: { getConfig: mockGetConfig } }),
 }))
 
-import handler from '../../../../../../layers/workshops/server/api/editions/[id]/workshops/index.get'
+import handler from '../../../../../../../../layers/workshops/server/api/editions/[id]/workshops/index.get'
 
 const prismaMock = (globalThis as any).prisma
 

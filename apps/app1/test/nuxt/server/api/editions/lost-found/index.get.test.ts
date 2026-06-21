@@ -7,7 +7,7 @@ vi.mock('#server/lost-found/ports/registry', () => ({
   useLostFoundPorts: () => ({ event: { getEventTiming: mockGetEventTiming } }),
 }))
 
-import handler from '../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.get'
+import handler from '../../../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
