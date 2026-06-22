@@ -1,0 +1,115 @@
+# Docker Compose pour Convention de Jonglerie (développement iso release)
+# Monorepo : contexte de build = racine du repo (../..) ; le conteneur reproduit
+# le layout hôte /app/apps/app1 + /app/layers (layers partagés à la racine).
+#
+# `name:` fige le nom de projet : sans lui, lancer depuis apps/app1/ le déduirait
+# du dossier (« app1 ») et créerait de NOUVEAUX volumes (DB de dev perdue).
+name: convention-de-jonglerie
+services:
+  # Base de données MySQL
+  database:
+    image: mysql:8.0
+    container_name: convention-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
+      MYSQL_USER: ${MYSQL_USER:-convention_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Scripts SQL exécutés au PREMIER démarrage (volume mysql_data vide).
+      # Inclut les GRANT nécessaires à `prisma migrate dev` (shadow database).
+      # Pour appliquer sur une base existante : `npm run docker:dev:down -v` puis `npm run docker:dev`
+      # (attention : supprime les données) — ou exécuter le SQL manuellement.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
+      timeout: 2s
+      interval: 3s
+      retries: 15
+      start_period: 5s
+
+  # Application Nuxt.js (mode développement)
+  app:
+    image: convention-de-jonglerie-app:dev
+    build:
+      context: ../..
+      dockerfile: apps/app1/Dockerfile
+      target: dev
+      args:
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
+    container_name: convention-app-dev
+    working_dir: /app/apps/app1
+    # Note: pas de user: spécifié pour éviter les problèmes de permissions avec les volumes
+    # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
+    # Optimisé pour réduire les temps de démarrage avec gestion des permissions
+    command: sh -lc "/app/apps/app1/scripts/docker-start.sh"
+    # Charger toutes les variables d'environnement depuis le fichier .env (apps/app1/.env)
+    env_file:
+      - .env
+    # Variables d'environnement spécifiques à Docker (peuvent override le .env)
+    environment:
+      # Database URL avec le hostname Docker
+      DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
+      # Configuration Nuxt pour Docker
+      NUXT_HOST: '0.0.0.0'
+      NUXT_PORT: '3000'
+      NODE_ENV: 'development'
+      NODE_OPTIONS: '--max-old-space-size=6144'
+      # Force le polling pour Windows (hot reload)
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '1000'
+      # URL Ollama avec hostname Docker
+      OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
+    volumes:
+      # Code de l'app (chemins hôte relatifs à apps/app1 → cibles /app/apps/app1/*)
+      - ./app:/app/apps/app1/app:cached
+      - ./i18n:/app/apps/app1/i18n:cached
+      - ./server:/app/apps/app1/server:cached
+      - ./shared:/app/apps/app1/shared:cached
+      - ./test:/app/apps/app1/test:cached
+      - ./scripts:/app/apps/app1/scripts:cached
+      - ./prisma:/app/apps/app1/prisma:cached
+      - ./public:/app/apps/app1/public:cached
+      - ./backups:/app/apps/app1/backups:cached
+      - ./lib:/app/apps/app1/lib:cached
+      - ./types:/app/apps/app1/types:cached
+      # Layers PARTAGÉS (racine du repo → /app/layers, résout extends ../../layers)
+      - ../../layers:/app/layers:cached
+      # Persister les uploads comme en release (évite d'écraser en rebuild)
+      - uploads_data:/app/apps/app1/public/uploads
+      - uploads:/uploads
+      # Fichiers de configuration
+      - ./nuxt.config.ts:/app/apps/app1/nuxt.config.ts:cached
+      - ./app.config.ts:/app/apps/app1/app.config.ts:cached
+      - ./eslint.config.mjs:/app/apps/app1/eslint.config.mjs:cached
+      - ./tsconfig.json:/app/apps/app1/tsconfig.json:cached
+      - ./vitest.config.ts:/app/apps/app1/vitest.config.ts:cached
+      - ./prisma.config.ts:/app/apps/app1/prisma.config.ts:cached
+      # Node modules dans un volume Docker persistant (pas synchronisé avec l'hôte)
+      - node_modules:/app/apps/app1/node_modules
+      # Synchroniser les dossiers de build du container vers l'hôte
+      - ./.nuxt:/app/apps/app1/.nuxt
+      - ./.output:/app/apps/app1/.output
+    ports:
+      - '3000:3000' # Application Nuxt
+      - '24678:24678' # Vite HMR (Hot Module Replacement)
+    depends_on:
+      database:
+        condition: service_healthy
+    # Permet d'accéder aux services de l'hôte (LM Studio, etc.)
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+volumes:
+  mysql_data:
+    driver: local
+  uploads_data:
+    driver: local
+  uploads:
+    driver: local
+  node_modules:
+    driver: local

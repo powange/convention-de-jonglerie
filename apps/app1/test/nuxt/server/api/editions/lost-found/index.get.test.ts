@@ -1,0 +1,236 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+const mockGetEventTiming = vi.hoisted(() => vi.fn())
+
+// Étape modularisation : l'existence de l'événement vient désormais du port lost-found.
+vi.mock('#server/lost-found/ports/registry', () => ({
+  useLostFoundPorts: () => ({ event: { getEventTiming: mockGetEventTiming } }),
+}))
+
+import handler from '../../../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.get'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
+
+const mockEvent = {}
+
+const mockLostFoundItems = [
+  {
+    id: 1,
+    editionId: 1,
+    userId: 1,
+    description: 'Gants noirs trouvés près de la scène',
+    imageUrl: '/uploads/lost-found/item-1.jpg',
+    status: 'LOST',
+    createdAt: new Date('2024-01-04T10:00:00Z'),
+    user: {
+      id: 1,
+      pseudo: 'finder1',
+      prenom: 'John',
+      nom: 'Doe',
+      profilePicture: null,
+      emailHash: 'hash-finder1',
+    },
+    comments: [
+      {
+        id: 1,
+        content: "Je pense que c'est à moi",
+        createdAt: new Date('2024-01-04T11:00:00Z'),
+        user: {
+          id: 2,
+          pseudo: 'owner1',
+          prenom: 'Jane',
+          nom: 'Smith',
+          profilePicture: null,
+          emailHash: 'hash-owner1',
+        },
+      },
+    ],
+  },
+  {
+    id: 2,
+    editionId: 1,
+    userId: 2,
+    description: 'Téléphone oublié sur une table',
+    imageUrl: null,
+    status: 'RETURNED',
+    createdAt: new Date('2024-01-04T09:00:00Z'),
+    user: {
+      id: 2,
+      pseudo: 'finder2',
+      prenom: 'Alice',
+      nom: 'Johnson',
+      profilePicture: '/avatars/alice.jpg',
+      emailHash: 'hash-finder2',
+    },
+    comments: [],
+  },
+]
+
+describe('/api/editions/[id]/lost-found GET', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetEventTiming.mockResolvedValue({ found: true, startDate: new Date('2024-01-01') })
+    prismaMock.lostFoundItem.findMany.mockReset()
+    global.getRouterParam = vi.fn().mockReturnValue('1')
+  })
+
+  it("devrait récupérer tous les objets trouvés d'une édition", async () => {
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+    const result = await handler(mockEvent as any)
+
+    // Vérifie longueur identique
+    expect(result).toHaveLength(mockLostFoundItems.length)
+    // Vérifie structure minimale du premier élément (sans exiger égalité stricte car on ajoute emailHash)
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        id: mockLostFoundItems[0].id,
+        description: mockLostFoundItems[0].description,
+        status: mockLostFoundItems[0].status,
+      })
+    )
+    expect(result[0].user).toEqual(
+      expect.objectContaining({
+        id: mockLostFoundItems[0].user.id,
+        pseudo: mockLostFoundItems[0].user.pseudo,
+        prenom: mockLostFoundItems[0].user.prenom,
+        nom: mockLostFoundItems[0].user.nom,
+        profilePicture: mockLostFoundItems[0].user.profilePicture,
+      })
+    )
+    // emailHash peut être undefined si pas d'email mocké
+    expect(result[0].user).toHaveProperty('emailHash')
+
+    expect(mockGetEventTiming).toHaveBeenCalledWith(1)
+    // Tolère champs additionnels (email, updatedAt)
+    expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { editionId: 1 },
+        include: expect.objectContaining({
+          user: expect.objectContaining({ select: expect.objectContaining({ id: true }) }),
+          comments: expect.any(Object),
+        }),
+        orderBy: { createdAt: 'desc' },
+      })
+    )
+  })
+
+  it('devrait retourner une liste vide si aucun objet trouvé', async () => {
+    prismaMock.lostFoundItem.findMany.mockResolvedValue([])
+
+    const result = await handler(mockEvent as any)
+
+    expect(result).toEqual([])
+  })
+
+  it("devrait rejeter si ID d'édition invalide", async () => {
+    global.getRouterParam.mockReturnValue('invalid')
+
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+  })
+
+  it("devrait rejeter si ID d'édition est NaN", async () => {
+    global.getRouterParam.mockReturnValue('abc')
+
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+  })
+
+  it("devrait rejeter si ID d'édition est 0", async () => {
+    global.getRouterParam.mockReturnValue('0')
+
+    await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition invalide")
+  })
+
+  it('devrait rejeter si édition non trouvée', async () => {
+    mockGetEventTiming.mockResolvedValue({ found: false, startDate: null })
+
+    await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
+    expect(prismaMock.lostFoundItem.findMany).not.toHaveBeenCalled()
+  })
+
+  it('devrait inclure tous les détails utilisateur', async () => {
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+    const result = await handler(mockEvent as any)
+
+    expect(result[0].user).toHaveProperty('id')
+    expect(result[0].user).toHaveProperty('pseudo')
+    expect(result[0].user).toHaveProperty('prenom')
+    expect(result[0].user).toHaveProperty('nom')
+    expect(result[0].user).toHaveProperty('profilePicture')
+    expect(result[0].user).toHaveProperty('emailHash')
+  })
+
+  it('devrait inclure les commentaires avec les détails utilisateur', async () => {
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+    const result = await handler(mockEvent as any)
+
+    expect(result[0].comments).toHaveLength(1)
+    expect(result[0].comments[0].user).toHaveProperty('id')
+    expect(result[0].comments[0].user).toHaveProperty('pseudo')
+    expect(result[0].comments[0].user).toHaveProperty('prenom')
+    expect(result[0].comments[0].user).toHaveProperty('nom')
+    expect(result[0].comments[0].user).toHaveProperty('profilePicture')
+    expect(result[0].comments[0].user).toHaveProperty('emailHash')
+  })
+
+  it('devrait trier les objets par date de création décroissante', async () => {
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+    await handler(mockEvent as any)
+
+    expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { createdAt: 'desc' } })
+    )
+  })
+
+  it('devrait trier les commentaires par date de création croissante', async () => {
+    prismaMock.lostFoundItem.findMany.mockResolvedValue(mockLostFoundItems)
+
+    await handler(mockEvent as any)
+
+    expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        include: expect.objectContaining({
+          comments: expect.objectContaining({
+            orderBy: { createdAt: 'asc' },
+          }),
+        }),
+      })
+    )
+  })
+
+  it('devrait gérer les erreurs de base de données', async () => {
+    prismaMock.lostFoundItem.findMany.mockRejectedValue(new Error('DB Error'))
+
+    await expect(handler(mockEvent as any)).rejects.toThrow('Erreur serveur interne')
+  })
+
+  it('devrait relancer les erreurs HTTP', async () => {
+    const httpError = {
+      statusCode: 403,
+      statusMessage: 'Access denied',
+    }
+
+    mockGetEventTiming.mockRejectedValue(httpError)
+
+    await expect(handler(mockEvent as any)).rejects.toEqual(httpError)
+  })
+
+  it("devrait traiter correctement l'ID numérique", async () => {
+    global.getRouterParam.mockReturnValue('123')
+
+    prismaMock.lostFoundItem.findMany.mockResolvedValue([])
+
+    await handler(mockEvent as any)
+
+    expect(mockGetEventTiming).toHaveBeenCalledWith(123)
+    expect(prismaMock.lostFoundItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { editionId: 123 },
+      })
+    )
+  })
+})

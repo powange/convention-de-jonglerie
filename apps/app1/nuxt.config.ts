@@ -1,0 +1,654 @@
+import vue from '@vitejs/plugin-vue'
+import { version as nuxtVersion } from 'nuxt/package.json'
+
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  // Layers modulaires (étape 2) — bénévole, repas, tâches, FAQ, objets trouvés, ateliers, covoiturage
+  // Monorepo : les layers sont partagés à la racine (../../layers), pas dans l'app.
+  extends: [
+    '../../layers/volunteers',
+    '../../layers/meals',
+    '../../layers/tasks',
+    '../../layers/faq',
+    '../../layers/lost-found',
+    '../../layers/workshops',
+    '../../layers/carpool',
+    '../../layers/stock',
+    '../../layers/artists',
+    '../../layers/ticketing',
+    '../../layers/auth',
+  ],
+
+  compatibilityDate: '2026-03-02',
+
+  // Préparer la migration vers Nuxt 5
+  future: {
+    compatibilityVersion: 5,
+    typescriptBundlerResolution: true,
+  },
+
+  // Configuration SEO du site
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://juggling-convention.com',
+    name: 'Juggling Convention',
+    description:
+      'Find and manage your favorite juggling conventions. Collaborative platform for jugglers and event organizers.',
+    defaultLocale: 'en',
+  },
+
+  app: {
+    head: {
+      titleTemplate: '%s | Juggling Convention',
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/logos/logo-jc.svg?v=4' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicons/favicon-32x32.png?v=4' },
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '192x192',
+          href: '/favicons/favicon-192x192.png?v=4',
+        },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicons/favicon-180x180.png?v=4' },
+        { rel: 'manifest', href: '/api/site.webmanifest?v=4' },
+        { rel: 'alternate icon', href: '/favicon.ico?v=4' },
+      ],
+    },
+  },
+  // Active en dev uniquement
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
+  // Enregistre explicitement les helpers de session pour l'alias #imports (utile en environnement de test)
+  imports: {
+    imports: [
+      { from: 'nuxt-auth-utils', name: 'getUserSession' },
+      { from: 'nuxt-auth-utils', name: 'requireUserSession' },
+      { from: 'nuxt-auth-utils', name: 'setUserSession' },
+      { from: 'nuxt-auth-utils', name: 'clearUserSession' },
+    ],
+  },
+
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/image',
+    '@nuxt/scripts',
+    // Activer le module de test-utils sur tous les environnements non-production (incl. test)
+    process.env.NODE_ENV !== 'production' ? '@nuxt/test-utils/module' : undefined,
+    '@nuxt/ui',
+    '@pinia/nuxt',
+    'nuxt-auth-utils',
+    'nuxt-security',
+    '@nuxtjs/i18n',
+    '@vueuse/nuxt',
+    'nuxt-file-storage',
+    '@nuxtjs/seo',
+    'nuxt-qrcode',
+  ].filter(Boolean),
+
+  // Optimisation des images (WebP/AVIF avec qualité 80)
+  image: {
+    quality: 80,
+    format: ['webp', 'avif'],
+  },
+
+  // Destructuration réactive des props dans <script setup>
+  vue: {
+    propsDestructure: true,
+  },
+
+  // Restreindre les collections d'icônes empaquetées côté serveur
+  icon: {
+    // Utiliser le mode `remote` pour éviter d'empaqueter les collections locales volumineuses
+    // et ne récupérer que les icônes utilisées à l'exécution (taille serveur fortement réduite)
+    serverBundle: 'remote',
+  },
+  // Sécurité HTTP — CSP + headers de protection
+  security: {
+    nonce: true,
+    sri: true,
+    headers: {
+      contentSecurityPolicy: {
+        'script-src': [
+          "'self'",
+          "'strict-dynamic'",
+          "'nonce-{{nonce}}'",
+          'https:',
+          "'unsafe-inline'",
+        ],
+        'style-src': ["'self'", 'https:', "'unsafe-inline'"],
+        'img-src': ["'self'", 'data:', 'https:'],
+        'font-src': ["'self'", 'https:', 'data:'],
+        'connect-src': [
+          "'self'",
+          'https://*.googleapis.com',
+          'https://*.firebaseio.com',
+          'wss://*.firebaseio.com',
+          'https://fcm.googleapis.com',
+          'https://api.stripe.com',
+          'https://www.google.com',
+          // Geocoding OSM utilisé pour l'autocomplétion d'adresses
+          'https://nominatim.openstreetmap.org',
+          // Nuxt Icon en mode `serverBundle: 'remote'` : fetch direct
+          // des collections d'icônes depuis le CDN iconify côté client.
+          'https://api.iconify.design',
+          // Leaflet (carte) chargé dynamiquement depuis unpkg : autorise le
+          // fetch des source maps (.js.map) déclenché quand le devtools est ouvert.
+          'https://unpkg.com',
+          // WebSocket pour le HMR Vite en dev (ws:) et la production HTTPS (wss:)
+          ...(process.env.NODE_ENV === 'production' ? ['wss:'] : ['ws:', 'wss:']),
+        ],
+        'frame-src': [
+          'https://js.stripe.com',
+          'https://hooks.stripe.com',
+          'https://www.google.com/recaptcha/',
+          'https://recaptcha.google.com',
+          // Lecteur YouTube intégré (candidatures artistes, etc.)
+          'https://www.youtube.com',
+          'https://www.youtube-nocookie.com',
+          // Lecteur Vimeo intégré (candidatures artistes, etc.)
+          'https://player.vimeo.com',
+        ],
+        'base-uri': ["'none'"],
+        'object-src': ["'none'"],
+        'script-src-attr': ["'none'"],
+        'upgrade-insecure-requests': true,
+      },
+      crossOriginEmbedderPolicy: false,
+      // Le navigateur envoie l'URL complète (avec le path) en `Referer` pour les
+      // requêtes same-origin, mais seulement l'origine vers les destinations
+      // cross-origin. Permet de tracer la page d'origine des appels API dans les
+      // logs d'erreur (cf. ApiErrorLog.referer) sans fuiter d'URL vers des tiers.
+      // Surcharge le défaut de nuxt-security (`no-referrer`).
+      referrerPolicy: 'strict-origin-when-cross-origin',
+      // Autoriser l'accès à la caméra (scan QR code billetterie / contrôle d'accès)
+      permissionsPolicy: {
+        camera: ['self'],
+      },
+    },
+    rateLimiter: false,
+    xssValidator: false,
+    removeLoggers: false,
+  },
+
+  nitro: {
+    // Preset explicite pour builds déterministes en Docker
+    preset: 'node-server',
+    ignore: ['**/*.spec.ts', '**/*.test.ts', 'test/**', '__tests__/**', 'scripts/**'],
+    // Routes avec timeout étendu pour les appels IA longs
+    routeRules: {
+      '/api/admin/generate-import-json': {
+        // Headers pour indiquer au client que la requête peut être longue
+        headers: { 'X-Accel-Buffering': 'no' },
+      },
+    },
+    externals: {
+      external: ['@prisma/client'],
+    },
+    experimental: {
+      tasks: true,
+    },
+    rollupConfig: {
+      plugins: [vue()],
+    },
+    esbuild: {
+      options: {
+        target: 'es2020', // Support pour BigInt et autres fonctionnalités modernes
+      },
+    },
+    // Compression des assets statiques (gzip et brotli)
+    compressPublicAssets: {
+      gzip: true,
+      brotli: true,
+    },
+    // Configuration du cache pour les assets statiques
+    publicAssets: [
+      {
+        // Assets statiques dans /public avec cache de 1 mois
+        dir: '../public',
+        maxAge: 60 * 60 * 24 * 30, // 30 jours
+      },
+    ],
+  },
+  i18n: {
+    lazy: true, // Activer le lazy loading
+    defaultLocale: 'en',
+    locales: [
+      {
+        code: 'cs',
+        language: 'cs',
+        name: 'Čeština',
+        files: [
+          'cs/common.json',
+          'cs/notifications.json',
+          'cs/components.json',
+          'cs/app.json',
+          'cs/public.json',
+          'cs/feedback.json',
+        ],
+      },
+      {
+        code: 'da',
+        language: 'da',
+        name: 'Dansk',
+        files: [
+          'da/common.json',
+          'da/notifications.json',
+          'da/components.json',
+          'da/app.json',
+          'da/public.json',
+          'da/feedback.json',
+        ],
+      },
+      {
+        code: 'de',
+        language: 'de',
+        name: 'Deutsch',
+        files: [
+          'de/common.json',
+          'de/notifications.json',
+          'de/components.json',
+          'de/app.json',
+          'de/public.json',
+          'de/feedback.json',
+        ],
+      },
+      {
+        code: 'en',
+        language: 'en',
+        name: 'English',
+        files: [
+          'en/common.json',
+          'en/notifications.json',
+          'en/components.json',
+          'en/app.json',
+          'en/public.json',
+          'en/feedback.json',
+        ],
+      },
+      {
+        code: 'es',
+        language: 'es',
+        name: 'Español',
+        files: [
+          'es/common.json',
+          'es/notifications.json',
+          'es/components.json',
+          'es/app.json',
+          'es/public.json',
+          'es/feedback.json',
+        ],
+      },
+      {
+        code: 'fr',
+        language: 'fr',
+        name: 'Français',
+        files: [
+          'fr/common.json',
+          'fr/notifications.json',
+          'fr/components.json',
+          'fr/app.json',
+          'fr/public.json',
+          'fr/feedback.json',
+          'fr/gestion.json',
+        ],
+      },
+      {
+        code: 'it',
+        language: 'it',
+        name: 'Italiano',
+        files: [
+          'it/common.json',
+          'it/notifications.json',
+          'it/components.json',
+          'it/app.json',
+          'it/public.json',
+          'it/feedback.json',
+        ],
+      },
+      {
+        code: 'nl',
+        language: 'nl',
+        name: 'Nederlands',
+        files: [
+          'nl/common.json',
+          'nl/notifications.json',
+          'nl/components.json',
+          'nl/app.json',
+          'nl/public.json',
+          'nl/feedback.json',
+        ],
+      },
+      {
+        code: 'pl',
+        language: 'pl',
+        name: 'Polski',
+        files: [
+          'pl/common.json',
+          'pl/notifications.json',
+          'pl/components.json',
+          'pl/app.json',
+          'pl/public.json',
+          'pl/feedback.json',
+        ],
+      },
+      {
+        code: 'pt',
+        language: 'pt',
+        name: 'Português',
+        files: [
+          'pt/common.json',
+          'pt/notifications.json',
+          'pt/components.json',
+          'pt/app.json',
+          'pt/public.json',
+          'pt/feedback.json',
+        ],
+      },
+      {
+        code: 'ru',
+        language: 'ru',
+        name: 'Русский',
+        files: [
+          'ru/common.json',
+          'ru/notifications.json',
+          'ru/components.json',
+          'ru/app.json',
+          'ru/public.json',
+          'ru/feedback.json',
+        ],
+      },
+      {
+        code: 'sv',
+        language: 'sv',
+        name: 'Svenska',
+        files: [
+          'sv/common.json',
+          'sv/notifications.json',
+          'sv/components.json',
+          'sv/app.json',
+          'sv/public.json',
+          'sv/feedback.json',
+        ],
+      },
+      {
+        code: 'uk',
+        language: 'uk',
+        name: 'Українська',
+        files: [
+          'uk/common.json',
+          'uk/notifications.json',
+          'uk/components.json',
+          'uk/app.json',
+          'uk/public.json',
+          'uk/feedback.json',
+        ],
+      },
+    ],
+    langDir: 'locales/',
+    compilation: {
+      strictMessage: false,
+      escapeHtml: false,
+    },
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      cookieDomain: null,
+      cookieSecure: false,
+      cookieCrossOrigin: false,
+      redirectOn: 'root',
+      alwaysRedirect: false,
+      fallbackLocale: 'en',
+    },
+    // Optimiser les traductions pour réduire la taille des bundles
+    bundle: {
+      compositionOnly: true,
+      runtimeOnly: false,
+      fullInstall: false,
+      // Garder le compilateur de messages même en prod pour éviter les erreurs SSR (intlify)
+      dropMessageCompiler: false,
+    },
+    vueI18n: './i18n/i18n.config.ts',
+  },
+  css: ['~/assets/css/main.css', 'flag-icons/css/flag-icons.min.css'],
+  // Configuration pour nuxt-file-storage
+  fileStorage: {
+    mount: process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads',
+  },
+
+  runtimeConfig: {
+    // Version Nuxt (injectée au build)
+    nuxtVersion,
+    // Private keys that are only available on the server
+    session: {
+      password: process.env.NUXT_SESSION_PASSWORD || '',
+      maxAge: 60 * 60 * 24 * 30, // 30 jours par défaut (peut être overridé par login avec "remember me")
+    },
+    sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
+    emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
+    smtpUser: process.env.SMTP_USER || '', // SMTP username for email sending
+    smtpPass: process.env.SMTP_PASS || '', // SMTP password for email sending
+    smtpFrom: process.env.SMTP_FROM || '', // Adresse d'expéditeur (alias Gmail, ex: notifications@juggling-convention.com)
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY || '', // Anthropic Claude API key for AI features
+    // Configuration du provider IA (anthropic, ollama ou lmstudio)
+    aiProvider: process.env.AI_PROVIDER || 'anthropic', // Provider IA à utiliser (anthropic par défaut)
+    ollamaBaseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434', // URL de base d'Ollama
+    ollamaModel: process.env.OLLAMA_MODEL || 'llava', // Modèle Ollama avec vision
+    // Browserless pour le scraping de pages web (JavaScript rendu)
+    browserlessUrl: process.env.BROWSERLESS_URL || '', // URL du service browserless (ex: http://192.168.0.13:3001)
+    // Supporte aussi la convention Nuxt NUXT_*
+    recaptchaSecretKey: process.env.NUXT_RECAPTCHA_SECRET_KEY || '', // reCAPTCHA secret key for server-side verification
+    recaptchaMinScore: Number(process.env.NUXT_RECAPTCHA_MIN_SCORE || '0.5'), // seuil configurable pour v3
+    recaptchaExpectedHostname: process.env.NUXT_RECAPTCHA_EXPECTED_HOSTNAME || '', // optionnel: valider le hostname retourné par Google
+    recaptchaDevBypass:
+      process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
+    stripeCoffeeProductName: process.env.STRIPE_COFFEE_PRODUCT_NAME || 'Un café pour le projet', // Nom du produit affiché sur Stripe
+    public: {
+      // Public keys that are available on both client and server
+      // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget
+      firebaseVapidKey: process.env.NUXT_PUBLIC_FIREBASE_VAPID_KEY || '', // Firebase VAPID public key for FCM
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '', // Base URL of the site
+      // Firebase configuration (varies by environment)
+      firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
+      firebaseAuthDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+      firebaseProjectId: process.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      firebaseStorageBucket: process.env.NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+      firebaseMessagingSenderId: process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+      firebaseAppId: process.env.NUXT_PUBLIC_FIREBASE_APP_ID || '',
+    },
+  },
+  vite: {
+    // Supprimer les console.log/debug en production (conserve console.error/warn)
+    esbuild: {
+      pure: process.env.NODE_ENV === 'production' ? ['console.log', 'console.debug'] : [],
+    },
+    css: {
+      devSourcemap: true,
+    },
+    build: {
+      chunkSizeWarningLimit: 800, // Seuil optimal pour les performances
+      // Optimisation des imports
+      dynamicImportVarsOptions: {
+        warnOnError: true,
+        exclude: [/node_modules/],
+      },
+    },
+    // Configuration Vite pour le hot reload dans Docker sur Windows
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 1000,
+      },
+      // Autoriser le hostname de NUXT_PUBLIC_SITE_URL (ex: dev.juggling-convention.com)
+      allowedHosts: (() => {
+        const siteUrl = process.env.NUXT_PUBLIC_SITE_URL
+        if (!siteUrl) return []
+        try {
+          return [new URL(siteUrl).hostname]
+        } catch {
+          return []
+        }
+      })(),
+    },
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        'i18n-iso-countries',
+        'firebase/app',
+        'firebase/messaging',
+        'vue3-json-viewer',
+        '@internationalized/date',
+        '@unhead/schema-org/vue',
+        'zod',
+        'luxon',
+        '@fullcalendar/vue3',
+        '@fullcalendar/daygrid',
+        '@fullcalendar/list',
+        '@fullcalendar/interaction',
+        '@fullcalendar/core/locales-all',
+        'rehype-sanitize',
+        'rehype-stringify',
+        'remark-gfm',
+        'remark-parse',
+        'remark-rehype',
+        'unified',
+        'unist-util-visit',
+        '@nuxt/ui > prosemirror-state',
+        '@nuxt/ui > prosemirror-transform',
+        '@nuxt/ui > prosemirror-model',
+        '@nuxt/ui > prosemirror-view',
+        '@nuxt/ui > prosemirror-gapcursor',
+        '@tiptap/extension-emoji',
+      ],
+      exclude: ['node-cron', '@prisma/client'],
+    },
+  },
+  // Désactiver les sourcemaps en production (économie mémoire au build)
+  sourcemap: {
+    server: false,
+    client: process.env.NODE_ENV !== 'production',
+  },
+
+  // Layouts et optimisations par route
+  routeRules: {
+    // Pages de gestion : pas de SSR (utilisateurs authentifiés, pas de SEO)
+    '/editions/*/gestion/**': { appLayout: 'edition-dashboard', ssr: false },
+    // Pages admin : pas de SSR
+    '/admin/**': { ssr: false },
+    // Upload de backup : autoriser jusqu'à 100 MB (surcharge la limite par défaut de nuxt-security)
+    '/api/admin/backup/restore': {
+      security: {
+        requestSizeLimiter: {
+          maxRequestSizeInBytes: 100_000_000,
+          maxUploadFileRequestInBytes: 100_000_000,
+          throwError: true,
+        },
+      },
+    },
+    // Uploads de fichiers (affiches, profils, etc.) : le body contient le fichier
+    // encodé en base64, ce qui augmente la taille d'environ 33 %. Pour rester
+    // cohérent avec MAX_IMAGE_SIZE = 10 MB côté serveur, on autorise 15 MB.
+    '/api/files/**': {
+      security: {
+        requestSizeLimiter: {
+          maxRequestSizeInBytes: 15_000_000,
+          maxUploadFileRequestInBytes: 15_000_000,
+          throwError: true,
+        },
+      },
+    },
+  },
+
+  experimental: {
+    // Améliorer les performances avec la lazy hydration
+    lazyHydration: true,
+    // Optimiser la gestion d'erreur des chunks
+    emitRouteChunkError: 'automatic',
+    // Cache des artefacts de build (accélère les rebuilds)
+    buildCache: true,
+    // Transitions natives du navigateur entre pages (respecte prefers-reduced-motion)
+    viewTransition: true,
+    // Prefetching cross-origin via Speculation Rules API
+    crossOriginPrefetch: true,
+    // Defaults NuxtLink : prefetch au premier signe d'interaction
+    defaults: {
+      nuxtLink: {
+        prefetch: true,
+        prefetchOn: { interaction: true },
+      },
+    },
+  },
+
+  // Configuration des modules SEO
+  robots: {
+    // Permettre l'indexation uniquement sur le domaine principal en production
+    disallow: process.env.NUXT_ENV === 'staging' || process.env.NUXT_ENV === 'release' ? ['/'] : [],
+    sitemap: '/sitemap.xml',
+    debug: false,
+  },
+
+  sitemap: {
+    // Désactiver le sitemap sur les environnements non-production
+    enabled:
+      process.env.NODE_ENV === 'production' &&
+      process.env.NUXT_ENV !== 'staging' &&
+      process.env.NUXT_ENV !== 'release',
+    // Exclure certaines routes du sitemap
+    exclude: [
+      '/admin/**',
+      '/register',
+      '/logout',
+      '/verify-email',
+      '/auth/**',
+      '/profile',
+      '/my-**',
+      '/favorites',
+      '/notifications',
+      '/api/**',
+      '/editions/add',
+    ],
+    // Inclure les routes dynamiques importantes
+    sources: [
+      '/api/__sitemap__/editions',
+      '/api/__sitemap__/carpool',
+      '/api/__sitemap__/volunteers',
+    ],
+    // Définir explicitement les routes autorisées
+    urls: [
+      {
+        loc: '/',
+        lastmod: new Date(),
+        changefreq: 'daily',
+        priority: 1.0,
+      },
+      {
+        loc: '/privacy-policy',
+        lastmod: new Date(),
+        changefreq: 'monthly',
+        priority: 0.3,
+      },
+    ],
+  },
+
+  ogImage: {
+    // Active la génération d'images OG seulement si SSR est disponible
+    enabled: process.env.NODE_ENV !== 'test',
+    defaults: {
+      // Utilise le logo comme fallback
+      component: 'NuxtSeo',
+      width: 1200,
+      height: 630,
+    },
+  },
+
+  schemaOrg: {
+    // Active Schema.org
+    enabled: true,
+  },
+
+  linkChecker: {
+    // Active la vérification des liens en dev
+    enabled: process.env.NODE_ENV !== 'production',
+    excludeLinks: ['mailto:*', 'tel:*'],
+  },
+})

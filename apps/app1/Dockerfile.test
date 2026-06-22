@@ -1,0 +1,48 @@
+# Dockerfile pour l'environnement de test (monorepo)
+# Contexte de build = RACINE du repo (pour inclure layers/). Layout /app/apps/app1 + /app/layers.
+# Image de base paramétrable pour contourner d'éventuels soucis de registry / credentials.
+# Utilisation: docker build --build-arg BASE_NODE_IMAGE=node:22 -f apps/app1/Dockerfile.test .
+ARG BASE_NODE_IMAGE=node:24-slim
+FROM ${BASE_NODE_IMAGE}
+
+# Installer les dépendances système nécessaires
+RUN apt-get update && apt-get install -y \
+    curl \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/apps/app1
+
+# Copier les fichiers de configuration
+COPY apps/app1/package*.json ./
+COPY apps/app1/prisma.config.ts ./
+COPY apps/app1/prisma ./prisma/
+
+# Installer toutes les dépendances (dev + prod)
+RUN if [ -f package-lock.json ]; then \
+			echo "Using npm ci (test stage)" && npm ci; \
+		else \
+			echo "No package-lock.json -> npm install (test stage)" && npm install; \
+		fi
+
+# Copier le code de l'app + les layers partagés (requis pour extends ../../layers)
+COPY apps/app1/ ./
+COPY layers/ /app/layers/
+
+# Générer le client Prisma (avec DATABASE_URL factice pour Prisma 7)
+RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
+
+# Créer les dossiers nécessaires
+RUN mkdir -p /app/apps/app1/public/uploads /app/apps/app1/.nuxt /app/apps/app1/.output
+
+# Variables d'environnement pour les tests
+ENV NODE_ENV=test
+ENV CI=true
+
+# Exposer les ports pour les tests
+EXPOSE 3000 9229
+
+# Par défaut, lancer les tests
+CMD ["npm", "run", "test:run"]

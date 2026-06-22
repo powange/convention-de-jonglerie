@@ -86,11 +86,20 @@
 - **Nuxt Scripts** v0.11.10 & **Nuxt Image** v1.10.0 - Optimisations
 - **Prettier** v3.3.3 - Formatage de code
 
-**Architecture :**
+**Architecture (monorepo) :**
 
-- `app/` : Frontend Nuxt (pages, composants, stores)
-- `server/api/` : API backend (auth, conventions)
-- `prisma/` : Schéma DB et migrations
+- `apps/app1/` : l'application jonglerie (le code historique vit ici désormais)
+  - `apps/app1/app/` : Frontend Nuxt (pages, composants, stores)
+  - `apps/app1/server/api/` : API backend (auth, conventions)
+  - `apps/app1/prisma/` : Schéma DB et migrations
+- `apps/app2/` : 2ᵉ app (placeholder, autonome)
+- `layers/` : layers Nuxt **partagés** à la racine (auth, volunteers, ticketing, meals, tasks,
+  faq, lost-found, workshops, carpool, stock, artists), consommés via `extends: '../../layers/*'`
+- **Commandes depuis la racine** : un `package.json` racine proxifie tous les scripts vers
+  `apps/app1` (`npm run docker:dev`, `npm run lint`, `npm run test:unit:run`… fonctionnent depuis
+  la racine, inchangés). Pour passer des arguments, lancer depuis `apps/app1/`.
+- **Docker** : contexte de build = racine du repo ; le conteneur reproduit le layout
+  `/app/apps/app1` + `/app/layers`. Cf. [docs/migration-monorepo-app1.md](docs/migration-monorepo-app1.md).
 - Structure full-stack TypeScript moderne
 
 ## Documentation de référence

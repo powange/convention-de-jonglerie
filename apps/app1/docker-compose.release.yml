@@ -1,0 +1,64 @@
+# Docker Compose pour Convention de Jonglerie
+services:
+  # Base de données MySQL
+  database:
+    image: mysql:8.0
+    container_name: convention-db-release
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
+      MYSQL_USER: ${MYSQL_USER:-convention_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - '3308:3306'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
+      timeout: 2s
+      interval: 3s
+      retries: 15
+      start_period: 5s
+
+  # Application Nuxt.js
+  app:
+    build:
+      # Monorepo : contexte = racine du repo (inclut layers/) ; layout /app/apps/app1
+      context: ../..
+      dockerfile: apps/app1/Dockerfile
+      target: runtime
+      args:
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
+    container_name: convention-app-release
+    restart: unless-stopped
+    # Charger toutes les variables d'environnement depuis le fichier stack.env (Portainer)
+    env_file:
+      - stack.env
+    # Variables d'environnement spécifiques à Docker (peuvent override le .env)
+    environment:
+      # Database URL avec le hostname Docker
+      DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
+      # Configuration Nuxt pour Docker
+      NUXT_HOST: '0.0.0.0'
+      NUXT_PORT: '3000'
+      NODE_ENV: 'production'
+      NUXT_ENV: 'release'
+      # URL Ollama avec hostname Docker
+      OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
+    volumes:
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/backups:/app/apps/app1/backups
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads_data:/app/apps/app1/public/uploads
+      - /home/powange/docker_workspaces/convention-de-jonglerie-release/uploads:/uploads
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  default:
+    external: true
+    name: proxy-network

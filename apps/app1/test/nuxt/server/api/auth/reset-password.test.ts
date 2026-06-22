@@ -1,0 +1,190 @@
+import bcrypt from 'bcryptjs'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+vi.mock('nuxt-auth-utils', () => ({
+  clearUserSession: vi.fn(),
+}))
+
+import resetPasswordHandler from '../../../../../../../layers/auth/server/api/auth/reset-password.post'
+
+// Utiliser le mock global de Prisma défini dans test/setup-common.ts
+const prismaMock = (globalThis as any).prisma
+
+// Import du handler après les mocks
+
+describe('API Reset Password', () => {
+  const mockToken = {
+    id: 1,
+    token: 'valid-reset-token',
+    userId: 1,
+    expiresAt: new Date(Date.now() + 3600000), // 1 heure dans le futur
+    used: false,
+    user: {
+      id: 1,
+      email: 'test@example.com',
+    },
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.spyOn(bcrypt, 'hash').mockImplementation((password) => Promise.resolve(`hashed_${password}`))
+  })
+
+  it('devrait réinitialiser le mot de passe avec un token valide', async () => {
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
+
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    const result = await resetPasswordHandler(mockEvent)
+
+    expect(result).toEqual({
+      success: true,
+      message: 'Votre mot de passe a été réinitialisé avec succès',
+      data: null,
+    })
+
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: mockToken.userId },
+      data: { password: 'hashed_NewPassword123!' },
+    })
+
+    // Désormais on supprime tous les tokens de l'utilisateur (au lieu de marquer used: true)
+    expect(prismaMock.passwordResetToken.deleteMany).toHaveBeenCalledWith({
+      where: { userId: mockToken.userId },
+    })
+  })
+
+  it('devrait rejeter un token invalide', async () => {
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(null)
+
+    const requestBody = {
+      token: 'invalid-token',
+      newPassword: 'NewPassword123!',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await expect(resetPasswordHandler(mockEvent)).rejects.toThrow(
+      'Token de réinitialisation invalide'
+    )
+  })
+
+  it('devrait rejeter un token expiré', async () => {
+    const expiredToken = {
+      ...mockToken,
+      expiresAt: new Date(Date.now() - 3600000), // 1 heure dans le passé
+    }
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(expiredToken)
+
+    const requestBody = {
+      token: 'expired-token',
+      newPassword: 'NewPassword123!',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await expect(resetPasswordHandler(mockEvent)).rejects.toThrow(
+      'Le token de réinitialisation a expiré'
+    )
+  })
+
+  it('devrait rejeter un token déjà utilisé', async () => {
+    const usedToken = {
+      ...mockToken,
+      used: true,
+    }
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(usedToken)
+
+    const requestBody = {
+      token: 'used-token',
+      newPassword: 'NewPassword123!',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Ce token a déjà été utilisé')
+  })
+
+  it('devrait valider la force du nouveau mot de passe', async () => {
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
+
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'weak',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await expect(resetPasswordHandler(mockEvent)).rejects.toThrow()
+  })
+
+  it('devrait hacher le nouveau mot de passe', async () => {
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
+    const hashSpy = vi.spyOn(bcrypt, 'hash')
+
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await resetPasswordHandler(mockEvent)
+
+    expect(hashSpy).toHaveBeenCalledWith('NewPassword123!', 12)
+  })
+
+  it('devrait gérer les dates UTC correctement', async () => {
+    // Token qui expire dans exactement 30 minutes
+    const futureDate = new Date()
+    futureDate.setMinutes(futureDate.getMinutes() + 30)
+
+    const tokenWithUTCDate = {
+      ...mockToken,
+      expiresAt: futureDate,
+    }
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(tokenWithUTCDate)
+
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    const result = await resetPasswordHandler(mockEvent)
+
+    expect(result).toEqual({
+      success: true,
+      message: 'Votre mot de passe a été réinitialisé avec succès',
+      data: null,
+    })
+  })
+
+  it('devrait gérer les erreurs de base de données', async () => {
+    prismaMock.passwordResetToken.findUnique.mockResolvedValue(mockToken)
+    prismaMock.user.update.mockRejectedValue(new Error('Database error'))
+
+    const requestBody = {
+      token: 'valid-reset-token',
+      newPassword: 'NewPassword123!',
+    }
+
+    const mockEvent = {}
+    global.readBody.mockResolvedValue(requestBody)
+
+    await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Erreur serveur interne')
+  })
+})

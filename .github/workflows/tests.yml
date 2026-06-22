@@ -19,6 +19,12 @@ env:
   # à utiliser le runtime Node 24 (au lieu de Node 20 déprécié)
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+# Monorepo : les commandes `run:` s'exécutent dans apps/app1. Les chemins des actions
+# (`uses:` cache/upload, hashFiles) restent relatifs à la racine → préfixés apps/app1/.
+defaults:
+  run:
+    working-directory: apps/app1
+
 jobs:
   # Job pour installer les dépendances une seule fois
   setup:
@@ -38,21 +44,21 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'apps/app1/package-lock.json'
 
       - name: Generate cache keys
         id: cache-keys
         run: |
-          echo "deps=${{ runner.os }}-deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('prisma/schema/**', 'prisma.config.ts') }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('nuxt.config.ts', 'tsconfig.json', 'app.config.ts') }}" >> $GITHUB_OUTPUT
+          echo "deps=${{ runner.os }}-deps-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('apps/app1/nuxt.config.ts', 'apps/app1/tsconfig.json', 'apps/app1/app.config.ts') }}" >> $GITHUB_OUTPUT
 
       - name: Cache Node dependencies
         id: cache-deps
         uses: actions/cache@v4
         with:
           path: |
-            node_modules
+            apps/app1/node_modules
             ~/.npm
           key: ${{ steps.cache-keys.outputs.deps }}
           # Pas de restore-keys pour éviter les caches incompatibles avec le lockfile
@@ -61,7 +67,7 @@ jobs:
         id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: server/generated/prisma
+          path: apps/app1/server/generated/prisma
           key: ${{ steps.cache-keys.outputs.prisma }}
           restore-keys: |
             ${{ runner.os }}-prisma-
@@ -70,7 +76,7 @@ jobs:
         id: cache-nuxt
         uses: actions/cache@v4
         with:
-          path: .nuxt
+          path: apps/app1/.nuxt
           key: ${{ steps.cache-keys.outputs.nuxt }}
           restore-keys: |
             ${{ runner.os }}-nuxt-
@@ -94,10 +100,10 @@ jobs:
         with:
           name: deps-${{ github.run_id }}
           path: |
-            node_modules
-            .nuxt
-            package.json
-            package-lock.json
+            apps/app1/node_modules
+            apps/app1/.nuxt
+            apps/app1/package.json
+            apps/app1/package-lock.json
           retention-days: 1
 
   # Job pour le linting (rapide, pas besoin de DB)
@@ -115,13 +121,13 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'apps/app1/package-lock.json'
 
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
           path: |
-            node_modules
+            apps/app1/node_modules
             ~/.npm
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
@@ -130,7 +136,7 @@ jobs:
         id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: server/generated/prisma
+          path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
 
       - name: Generate Prisma Client (if cache miss)
@@ -141,7 +147,7 @@ jobs:
         id: cache-nuxt
         uses: actions/cache@v4
         with:
-          path: .nuxt
+          path: apps/app1/.nuxt
           key: ${{ needs.setup.outputs.nuxt-cache-key }}
 
       # Régénère .nuxt si le cache manque (clé nuxt-cache-key change quand nuxt.config.ts change ;
@@ -169,13 +175,13 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'apps/app1/package-lock.json'
 
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
           path: |
-            node_modules
+            apps/app1/node_modules
             ~/.npm
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
@@ -184,7 +190,7 @@ jobs:
         id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: server/generated/prisma
+          path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
 
       - name: Generate Prisma Client (if cache miss)
@@ -195,7 +201,7 @@ jobs:
         id: cache-nuxt
         uses: actions/cache@v4
         with:
-          path: .nuxt
+          path: apps/app1/.nuxt
           key: ${{ needs.setup.outputs.nuxt-cache-key }}
 
       - name: Prepare Nuxt (if cache miss)
@@ -231,13 +237,13 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'apps/app1/package-lock.json'
 
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
           path: |
-            node_modules
+            apps/app1/node_modules
             ~/.npm
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
@@ -246,7 +252,7 @@ jobs:
         id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: server/generated/prisma
+          path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
 
       - name: Generate Prisma Client
@@ -262,8 +268,8 @@ jobs:
         with:
           name: build-artifacts-${{ github.run_id }}
           path: |
-            .nuxt/
-            .output/
+            apps/app1/.nuxt/
+            apps/app1/.output/
           retention-days: 7
 
   # Tests en parallèle avec matrice
@@ -306,13 +312,13 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'apps/app1/package-lock.json'
 
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
           path: |
-            node_modules
+            apps/app1/node_modules
             ~/.npm
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
@@ -321,7 +327,7 @@ jobs:
         id: cache-prisma
         uses: actions/cache@v4
         with:
-          path: server/generated/prisma
+          path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
 
       - name: Generate Prisma Client (if cache miss)
@@ -332,7 +338,7 @@ jobs:
         id: cache-nuxt
         uses: actions/cache@v4
         with:
-          path: .nuxt
+          path: apps/app1/.nuxt
           key: ${{ needs.setup.outputs.nuxt-cache-key }}
 
       - name: Prepare Nuxt (if cache miss)
@@ -355,9 +361,9 @@ jobs:
         with:
           name: test-results-${{ matrix.test-group.name }}-${{ github.run_id }}
           path: |
-            test-results/
-            coverage/
-            .nuxt/
+            apps/app1/test-results/
+            apps/app1/coverage/
+            apps/app1/.nuxt/
           retention-days: 7
 
       - name: Upload coverage reports
@@ -365,5 +371,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-reports-${{ matrix.test-group.name }}-${{ github.run_id }}
-          path: coverage/
+          path: apps/app1/coverage/
           retention-days: 30
