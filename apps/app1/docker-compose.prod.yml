@@ -30,9 +30,10 @@ services:
       target: runtime
     container_name: convention-app-prod
     restart: unless-stopped
-    # Charger toutes les variables d'environnement depuis le fichier stack.env (Portainer)
+    # Charger les variables d'env depuis stack.env. Portainer l'écrit à la RACINE de la stack
+    # (/data/compose/<id>/stack.env) ; le compose étant dans apps/app1/, on remonte de 2 niveaux.
     env_file:
-      - stack.env
+      - ../../stack.env
     # Variables d'environnement spécifiques à Docker (peuvent override le .env)
     environment:
       # Database URL avec le hostname Docker
