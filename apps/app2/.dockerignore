@@ -8,3 +8,16 @@ dist
 Dockerfile
 docker-compose.yml
 .dockerignore
+
+# Secrets et base locale : ne jamais embarquer dans l'image
+.env
+.env.*
+
+# Base SQLite locale
+*.db
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# Client Prisma généré (régénéré dans l'image)
+server/generated

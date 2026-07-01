@@ -5,9 +5,17 @@ ARG NODE_IMAGE=node:22-alpine
 # --- Étape de build ---
 FROM ${NODE_IMAGE} AS builder
 WORKDIR /app
-COPY package.json package-lock.json* ./
+# Outils de compilation pour les modules natifs (better-sqlite3)
+RUN apk add --no-cache python3 make g++
+# Le postinstall lance `prisma generate` : le schéma + prisma.config doivent être
+# présents AVANT npm ci. URL factice (generate lit la config mais ne se connecte pas).
+ENV DATABASE_URL=file:./build.db
+COPY package.json package-lock.json* prisma.config.ts ./
+COPY prisma ./prisma
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
+# Le packaging Nitro est gourmand en mémoire : on relève la limite du heap Node.
+ENV NODE_OPTIONS=--max-old-space-size=4096
 RUN npm run build
 
 # --- Image de production (sert le build Nitro) ---
@@ -23,8 +31,13 @@ CMD ["node", ".output/server/index.mjs"]
 # --- Image de dev (HMR) ---
 FROM ${NODE_IMAGE} AS dev
 WORKDIR /app
+# Outils de compilation pour les modules natifs (better-sqlite3)
+RUN apk add --no-cache python3 make g++
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
-COPY package.json package-lock.json* ./
+# Idem builder : schéma + prisma.config nécessaires au postinstall (prisma generate).
+ENV DATABASE_URL=file:./dev.db
+COPY package.json package-lock.json* prisma.config.ts ./
+COPY prisma ./prisma
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
 EXPOSE 3000 24678

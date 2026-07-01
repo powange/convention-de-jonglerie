@@ -230,5 +230,13 @@ Cette commande s'arrête si une étape échoue.
 - **UdropdownMenu** : Composant de menu déroulant pour les actions
 - **UTable** : Tableau de données (TanStack) avec slots `#<col>-cell`/`#<col>-header`, tri, visibilité de colonnes (`tableApi`) et `@select` pour le clic ligne
 - **UCheckbox** : Case à cocher pour les formulaires et sélections multiples
+- **UApp** : Wrapper racine de l'application (toasts, overlays) — englobe `NuxtLayout`/`NuxtPage`
+- **UContainer** : Conteneur centré avec largeur max et padding responsive
+- **UForm** : Formulaire avec validation (`:state`, `:schema` zod) et `@submit`
+- **UAlert** : Encart d'information (`title`, `description`, `icon`, `color`, `variant`)
+- **USeparator** : Séparateur horizontal/vertical, supporte un `label`
+- **USkeleton** : Placeholder de chargement (squelette)
+- **ULink** : Lien stylé (équivalent `NuxtLink` intégré au thème Nuxt UI)
+- **UIcon** : Icône (bibliothèque Nuxt Icon, ex. `i-heroicons-*`)
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.
