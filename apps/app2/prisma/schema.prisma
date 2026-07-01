@@ -1,0 +1,51 @@
+// Schéma Prisma d'app2 (SQLite en dev). Modèles minimaux : compte utilisateur,
+// événements créés par l'utilisateur, et abonnement (paiement simulé) qui
+// débloque l'accès aux fonctionnalités d'organisation.
+//
+// SQLite ne supporte pas les `enum` Prisma : `plan` et `status` sont des String
+// dont les valeurs autorisées sont validées côté serveur (cf. server/utils/subscription.ts).
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  password     String
+  name         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  events       Event[]
+  subscription Subscription?
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  location    String?
+  startDate   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     Int
+
+  @@index([ownerId])
+}
+
+model Subscription {
+  id               Int      @id @default(autoincrement())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           Int      @unique
+  plan             String // "monthly" | "annual"
+  status           String   @default("active") // "active" | "inactive"
+  currentPeriodEnd DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
