@@ -34,7 +34,7 @@ export default wrapApiHandler(
       where: {
         mealId,
         volunteer: {
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
         },
       },
@@ -44,7 +44,7 @@ export default wrapApiHandler(
       where: {
         mealId,
         volunteer: {
-          editionId,
+          eventId: editionId,
           status: 'ACCEPTED',
         },
         consumedAt: { not: null },
