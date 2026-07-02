@@ -2193,8 +2193,17 @@ const closeEditApplicationModal = () => {
 // Fonction pour sauvegarder les modifications d'une candidature (ApplicationModal)
 const handleEditApplicationUpdate = async (data: any) => {
   try {
+    // Le modal expose le régime alimentaire sous la clé `dietPreference`,
+    // mais l'API (updateVolunteerApplication) attend `dietaryPreference`.
+    // Sans ce mapping, la nouvelle valeur arrive en `undefined` côté serveur
+    // et n'est jamais enregistrée (bien que la requête réponde en succès).
+    const { dietPreference, ...rest } = data
+
     // Appeler l'API pour sauvegarder les changements via l'utilitaire
-    await updateVolunteerApplication(props.editionId, data)
+    await updateVolunteerApplication(props.editionId, {
+      ...rest,
+      dietaryPreference: dietPreference,
+    })
 
     // Rafraîchir les données
     emit('refreshVolunteersInfo')
