@@ -258,7 +258,12 @@ const isVolunteersModeInternal = computed(() => volunteersMode.value === 'INTERN
 
 // Charger les données au montage
 onMounted(async () => {
-  if (!edition.value) {
+  // Recharger l'édition complète si elle est absente OU si la version en cache est
+  // une version « liste » allégée (sans convention.organizers). Sans les organisateurs,
+  // les vérifications de droits (canEditEdition/canManageArtists) échouent au premier
+  // affichage : l'utilisateur arrivant via un lien (ex. notification) voit « Accès refusé »
+  // tant qu'il ne rafraîchit pas la page (le refresh vide le store → fetch complet).
+  if (!edition.value || !edition.value.convention?.organizers) {
     await editionStore.fetchEditionById(editionId.value, { force: true })
   }
 
