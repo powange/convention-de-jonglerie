@@ -263,8 +263,10 @@ export async function ensureVolunteerToOrganizersConversation(
   let conversation: any
 
   if (!existingConversation) {
-    // 3. Créer une nouvelle conversation avec le bénévole + tous les organisateurs
-    const allParticipantIds = [volunteerId, ...organizerUserIds]
+    // 3. Créer une nouvelle conversation avec le bénévole + tous les organisateurs.
+    // Dédupliquer : le bénévole peut aussi être organisateur → sans ça, un doublon
+    // (conversationId, userId) violerait la contrainte @@unique des participants (500).
+    const allParticipantIds = [...new Set([volunteerId, ...organizerUserIds])]
     conversation = await client.conversation.create({
       data: {
         editionId,
