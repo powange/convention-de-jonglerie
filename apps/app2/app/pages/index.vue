@@ -2,7 +2,11 @@
   <div>
     <!-- Hero -->
     <UContainer class="py-20 text-center">
-      <UBadge color="primary" variant="subtle" class="mb-4" label="Organisation d'événements" />
+      <div class="mb-3 flex items-center justify-center gap-2">
+        <UIcon name="i-heroicons-calendar-days" class="text-3xl text-primary" />
+        <span class="text-2xl font-bold tracking-tight">Flowvent</span>
+      </div>
+      <p class="mb-6 text-base font-medium text-primary">Le flow de vos événements</p>
       <h1 class="mx-auto max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
         Organisez vos événements, gérez vos bénévoles, sans prise de tête.
       </h1>
@@ -51,7 +55,7 @@
 const { loggedIn } = useUserSession()
 
 useSeoMeta({
-  title: 'EventOrga — Organisation d\'événements',
+  title: 'Flowvent — Organisation d\'événements',
   description: 'Créez vos événements et gérez vos bénévoles avec un abonnement simple.',
 })
 

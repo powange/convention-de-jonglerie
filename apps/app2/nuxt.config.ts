@@ -1,5 +1,5 @@
-// Configuration Nuxt de la 2ᵉ app : plateforme SaaS d'organisation d'événements.
-// App autonome (port 3001), base SQLite via Prisma, auth via nuxt-auth-utils.
+// Configuration Nuxt de Flowvent (app2) : plateforme SaaS d'organisation d'événements.
+// App autonome, base MySQL via Prisma (adapter mariadb), auth via nuxt-auth-utils.
 export default defineNuxtConfig({
   compatibilityDate: '2026-03-02',
   devtools: { enabled: true },

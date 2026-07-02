@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 
 import { PrismaClient, Prisma } from '../generated/prisma/client'
 
@@ -17,8 +17,17 @@ if (!databaseUrl) {
   throw new Error("La variable d'environnement DATABASE_URL n'est pas définie")
 }
 
-// Adaptateur SQLite (Prisma 7 utilise les driver adapters)
-const adapter = new PrismaBetterSqlite3({ url: databaseUrl })
+// Adaptateur MySQL/MariaDB (Prisma 7 utilise les driver adapters).
+// Format attendu : mysql://user:password@host:port/database
+const url = new URL(databaseUrl)
+const adapter = new PrismaMariaDb({
+  host: url.hostname,
+  port: parseInt(url.port) || 3306,
+  user: decodeURIComponent(url.username),
+  password: decodeURIComponent(url.password),
+  database: url.pathname.slice(1),
+  connectionLimit: 10,
+})
 
 const prisma = globalThis.__prisma || new PrismaClient({ adapter })
 

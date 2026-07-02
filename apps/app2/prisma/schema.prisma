@@ -1,9 +1,9 @@
-// Schéma Prisma d'app2 (SQLite en dev). Modèles minimaux : compte utilisateur,
+// Schéma Prisma de Flowvent (app2, MySQL). Modèles minimaux : compte utilisateur,
 // événements créés par l'utilisateur, et abonnement (paiement simulé) qui
 // débloque l'accès aux fonctionnalités d'organisation.
 //
-// SQLite ne supporte pas les `enum` Prisma : `plan` et `status` sont des String
-// dont les valeurs autorisées sont validées côté serveur (cf. server/utils/subscription.ts).
+// `plan` et `status` restent des String (validés côté serveur, cf.
+// server/utils/subscription.ts) plutôt que des enum, pour garder le schéma simple.
 
 generator client {
   provider = "prisma-client-js"
@@ -11,7 +11,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
 }
 
 model User {
@@ -28,7 +28,7 @@ model User {
 model Event {
   id          Int       @id @default(autoincrement())
   name        String
-  description String?
+  description String?   @db.Text
   location    String?
   startDate   DateTime?
   createdAt   DateTime  @default(now())

@@ -2,9 +2,12 @@
   <div class="min-h-screen flex flex-col bg-default">
     <header class="sticky top-0 z-10 border-b border-default bg-default/75 backdrop-blur">
       <UContainer class="flex h-16 items-center justify-between gap-4">
-        <NuxtLink to="/" class="flex items-center gap-2 text-lg font-semibold">
+        <NuxtLink to="/" class="flex items-center gap-2">
           <UIcon name="i-heroicons-calendar-days" class="text-2xl text-primary" />
-          <span>EventOrga</span>
+          <span class="flex flex-col leading-tight">
+            <span class="text-lg font-semibold">Flowvent</span>
+            <span class="text-[11px] text-muted max-sm:hidden">Le flow de vos événements</span>
+          </span>
         </NuxtLink>
 
         <nav class="flex items-center gap-2">
@@ -52,7 +55,7 @@
       <UContainer
         class="flex flex-col items-center justify-between gap-1 text-sm text-muted sm:flex-row"
       >
-        <span>© EventOrga — démonstration</span>
+        <span>© Flowvent — démonstration</span>
         <span class="flex items-center gap-1">
           <UIcon name="i-heroicons-information-circle" />
           Paiement simulé · aucune transaction réelle

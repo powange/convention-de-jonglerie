@@ -1,0 +1,54 @@
+# Flowvent (app2) — RELEASE (pré-prod). Image runtime, MySQL, derrière le reverse proxy.
+# Déployé comme stack Portainer (compose path = apps/app2/docker-compose.release.yml).
+# Variables lues depuis stack.env à la racine de la stack (../../stack.env).
+name: flowvent-release
+services:
+  flowvent-db-release:
+    image: mysql:8.0
+    container_name: flowvent-db-release
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-flowvent_db}
+      MYSQL_USER: ${MYSQL_USER:-flowvent_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-flowvent_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # Pas de port publié sur l'hôte : l'app accède à la base via le réseau interne.
+    # (débogage ponctuel : `docker exec -it flowvent-db-release mysql -uflowvent_user -p`)
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
+      timeout: 2s
+      interval: 3s
+      retries: 15
+      start_period: 5s
+
+  flowvent-app-release:
+    image: flowvent-app:release
+    build:
+      context: .
+      target: runtime
+      args:
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
+    container_name: flowvent-app-release
+    restart: unless-stopped
+    env_file:
+      - ../../stack.env
+    environment:
+      DATABASE_URL: 'mysql://${MYSQL_USER:-flowvent_user}:${MYSQL_PASSWORD:-flowvent_password}@flowvent-db-release:3306/${MYSQL_DATABASE:-flowvent_db}'
+      NUXT_HOST: '0.0.0.0'
+      NUXT_PORT: '3000'
+      NODE_ENV: 'production'
+      NUXT_ENV: 'release'
+    depends_on:
+      flowvent-db-release:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  default:
+    external: true
+    name: proxy-network

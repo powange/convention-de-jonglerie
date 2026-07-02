@@ -1,6 +1,6 @@
-# App2 — Plateforme SaaS d'organisation d'événements
+# Flowvent (app2) — Plateforme SaaS d'organisation d'événements
 
-App2 (`apps/app2/`) est une **2ᵉ application autonome** du monorepo : un SaaS où des utilisateurs se
+**Flowvent** (`apps/app2/`) est une **2ᵉ application autonome** du monorepo : un SaaS où des utilisateurs se
 connectent, créent un événement, puis accèdent aux **fonctionnalités d'organisation** (gestion des
 bénévoles…) via un **abonnement payant** (mensuel ou annuel).
 
@@ -12,7 +12,7 @@ Cette première itération privilégie une **interface épurée et lisible** et 
 | Sujet | Choix | Raison |
 | --- | --- | --- |
 | Couplage avec app1 | **Autonome** (aucun layer partagé) | App2 est un produit distinct ; le layer `volunteers` d'app1 est câblé sur le modèle Édition/Convention et n'est pas réutilisable tel quel |
-| Base de données (dev) | **SQLite** via Prisma 7 (`@prisma/adapter-better-sqlite3`) | Démarrage ultra-rapide, zéro infra ; à migrer vers MySQL avant la prod |
+| Base de données | **MySQL** via Prisma 7 (`@prisma/adapter-mariadb`) | Parité avec app1 ; 3 environnements Docker (dev/release/prod), chacun avec son service MySQL dédié |
 | Authentification | **nuxt-auth-utils** (session, email/mot de passe) | Même librairie éprouvée qu'app1, sans coupler le code |
 | Abonnement | **Persisté en base** (1 par compte) | Débloque les fonctionnalités d'orga ; prêt à brancher un vrai paiement plus tard |
 | i18n | **Français en dur** (pas de module i18n) | Garder la 1ʳᵉ itération simple ; à ajouter ensuite |
@@ -24,8 +24,8 @@ Cette première itération privilégie une **interface épurée et lisible** et 
 - **Subscription** — `userId` (unique), `plan` (`monthly`|`annual`), `status` (`active`|`inactive`),
   `currentPeriodEnd`
 
-> SQLite ne supporte pas les `enum` Prisma : `plan`/`status` sont des `String` dont les valeurs sont
-> validées côté serveur (`server/utils/subscription.ts`, constante `SUBSCRIPTION_PLANS`).
+> `plan`/`status` sont des `String` (validés côté serveur via la constante `SUBSCRIPTION_PLANS` dans
+> `server/utils/subscription.ts`) plutôt que des enum, pour garder le schéma simple.
 
 ## Parcours utilisateur
 
@@ -57,19 +57,33 @@ Gardes : `requireUserSession` (auth) côté API, et côté util `requireActiveSu
 `isSubscriptionActive` pour l'abonnement. Côté front, middlewares `auth`, `guest-only`,
 `subscription`.
 
-## Lancer en local
+## Environnements Docker (parité app1)
 
-Voir `apps/app2/README.md`. En résumé, depuis `apps/app2/` :
+Trois composes autonomes (contexte de build = `apps/app2`), chacun avec un service MySQL dédié :
+
+| Environnement | Compose | Cible | Conteneur app | MySQL (hôte) |
+| --- | --- | --- | --- | --- |
+| **dev** | `docker-compose.dev.yml` | `dev` (HMR) | `flowvent-app` | `3307` (publié) |
+| **release** | `docker-compose.release.yml` | `runtime` | `flowvent-app-release` | interne |
+| **prod** | `docker-compose.prod.yml` | `runtime` | `flowvent-app-prod` | interne |
+
+- **dev** lit `apps/app2/.env` ; **release/prod** lisent `../../stack.env` (comme app1).
+- Les migrations sont appliquées au démarrage : `docker/entrypoint.sh` (runtime) et la `command` du
+  compose dev exécutent `prisma migrate deploy`.
+- dev + release + prod sont sur le réseau externe `proxy-network` (reverse proxy).
+
+## Lancer en local (Docker dev)
+
+Depuis `apps/app2/` :
 
 ```bash
 cp .env.example .env       # renseigner NUXT_SESSION_PASSWORD
-npm install
-npx prisma migrate dev --name init
-npm run dev                # http://localhost:3000
+docker compose -f docker-compose.dev.yml up --build -d
+docker compose -f docker-compose.dev.yml exec flowvent-app npx prisma migrate dev --name init  # 1re fois
+# → https://dev.event.powange.com (ou http://localhost:3001)
 ```
 
-## Reste à faire avant la prod
+## Reste à faire
 
-- Migrer **SQLite → MySQL** (adapter `@prisma/adapter-mariadb`) + finaliser la cible Docker `runtime`.
 - Remplacer le **paiement simulé** par un vrai prestataire (ex. Stripe).
 - Ajouter **i18n** et **tests** (unitaires + E2E).

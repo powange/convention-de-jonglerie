@@ -53,7 +53,7 @@
 import { z } from 'zod'
 
 definePageMeta({ middleware: 'guest-only' })
-useSeoMeta({ title: 'Connexion — EventOrga' })
+useSeoMeta({ title: 'Connexion — Flowvent' })
 
 const toast = useToast()
 const { fetch: refreshSession } = useUserSession()

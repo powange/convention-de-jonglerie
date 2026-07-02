@@ -57,7 +57,7 @@
 import { z } from 'zod'
 
 definePageMeta({ middleware: 'auth' })
-useSeoMeta({ title: 'Nouvel événement — EventOrga' })
+useSeoMeta({ title: 'Nouvel événement — Flowvent' })
 
 const toast = useToast()
 

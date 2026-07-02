@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
-useSeoMeta({ title: 'Tableau de bord — EventOrga' })
+useSeoMeta({ title: 'Tableau de bord — Flowvent' })
 
 const { data: eventsData, pending } = await useFetch('/api/events')
 const events = computed(() => eventsData.value?.events ?? [])

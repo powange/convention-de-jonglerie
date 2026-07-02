@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-useSeoMeta({ title: 'Tarifs — EventOrga' })
+useSeoMeta({ title: 'Tarifs — Flowvent' })
 
 const toast = useToast()
 const { loggedIn } = useUserSession()

@@ -62,7 +62,7 @@
 import { z } from 'zod'
 
 definePageMeta({ middleware: 'guest-only' })
-useSeoMeta({ title: 'Créer un compte — EventOrga' })
+useSeoMeta({ title: 'Créer un compte — Flowvent' })
 
 const toast = useToast()
 const { fetch: refreshSession } = useUserSession()

@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 definePageMeta({ middleware: ['auth', 'subscription'] })
-useSeoMeta({ title: 'Bénévoles — EventOrga' })
+useSeoMeta({ title: 'Bénévoles — Flowvent' })
 
 const route = useRoute()
 

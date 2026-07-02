@@ -2,7 +2,7 @@ import { createError, type H3Event } from 'h3'
 
 import prisma from './prisma'
 
-// SQLite ne supporte pas les enums Prisma : on centralise ici les valeurs valides.
+// Valeurs de plan valides, centralisées ici et validées côté serveur (String plutôt qu'enum).
 export const SUBSCRIPTION_PLANS = ['monthly', 'annual'] as const
 export type SubscriptionPlan = (typeof SUBSCRIPTION_PLANS)[number]
 
@@ -20,7 +20,12 @@ export async function getActiveSubscription(userId: number) {
   return isSubscriptionActive(subscription) ? subscription : null
 }
 
-/** Garde serveur : lève une 402 si l'utilisateur n'a pas d'abonnement actif. */
+/**
+ * Garde SERVEUR : lève une 402 si l'utilisateur n'a pas d'abonnement actif.
+ * À appeler dans tout futur endpoint de fonctionnalité payante (ex. gestion des bénévoles).
+ * Le middleware de route `subscription` ne protège que la navigation ; l'enforcement réel
+ * des données passe par cette garde côté API.
+ */
 export async function requireActiveSubscription(_event: H3Event, userId: number) {
   const subscription = await getActiveSubscription(userId)
   if (!subscription) {
