@@ -210,7 +210,7 @@ routeRules: {
 
 #### 2.1 Activer `buildCache`
 
-**Probleme** : Chaque `npm run build` reconstruit tout depuis zero. Avec `buildCache`, Nuxt met en cache les artefacts de build et ne reconstruit que ce qui a change.
+**Probleme** : Chaque `npm run app1:build` reconstruit tout depuis zero. Avec `buildCache`, Nuxt met en cache les artefacts de build et ne reconstruit que ce qui a change.
 
 **Solution** :
 

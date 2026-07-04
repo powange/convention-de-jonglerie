@@ -149,8 +149,8 @@ et le layout `edition-dashboard`) vivent dans `common.json` (`edition.*`) car il
 
 ## Vérification
 
-- `npm run check-i18n` : clés manquantes / inutilisées / mal placées.
-- `npm run check-translations` : couverture et synchronisation des 13 langues.
+- `npm run app1:check-i18n` : clés manquantes / inutilisées / mal placées.
+- `npm run app1:check-translations` : couverture et synchronisation des 13 langues.
 - Runtime : DevTools → Network → filtrer `json`, naviguer, vérifier que chaque domaine
   n'est chargé que sur ses routes.
 

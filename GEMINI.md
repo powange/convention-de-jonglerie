@@ -81,7 +81,7 @@ L'application est full-stack TypeScript avec Nuxt 4 (frontend + serveur Nitro), 
 ## Coding Style & Conventions
 
 - **Linting :** ESLint (`eslint.config.mjs`)
-- **Formatage :** Prettier (`npm run format`)
+- **Formatage :** Prettier (`npm run app1:format`)
 - **Composants :** PascalCase (`MyComponent.vue`)
 - **Pages :** kebab-case (`my-page.vue`)
 - **Endpoints API :** kebab-case avec extension HTTP (`my-endpoint.post.ts`)
@@ -91,15 +91,15 @@ L'application est full-stack TypeScript avec Nuxt 4 (frontend + serveur Nitro), 
 ## Commandes courantes
 
 - **Dépendances :** `npm install`
-- **Dev server :** `npm run dev` (Docker : `npm run docker:dev`)
-- **Build :** `npm run build`
-- **Lint :** `npm run lint` (auto-fix : `npm run lint -- --fix`)
-- **Format :** `npm run format`
-- **Tests unitaires :** `npm run test:unit:run`
-- **Tests Nuxt :** `npm run test:nuxt:run`
+- **Dev server :** `npm run app1:dev` (Docker : `npm run app1:docker:dev`)
+- **Build :** `npm run app1:build`
+- **Lint :** `npm run app1:lint` (auto-fix : `npm run app1:lint:fix`)
+- **Format :** `npm run app1:format`
+- **Tests unitaires :** `npm run app1:test:unit:run`
+- **Tests Nuxt :** `npm run app1:test:nuxt:run`
 - **Migrations Prisma :** `npx prisma migrate dev` (laissé à l'humain)
 - **Génération Prisma :** `npx prisma generate`
-- **Vérif i18n :** `npm run check-i18n` / `npm run check-translations`
+- **Vérif i18n :** `npm run app1:check-i18n` / `npm run app1:check-translations`
 
 ## Goals for Gemini
 

@@ -64,7 +64,7 @@ Changer d'image sans modifier les fichiers :
 BASE_NODE_IMAGE=node:24-slim docker compose -f docker-compose.test-all.yml build
 
 # Lancer les tests avec override
-BASE_NODE_IMAGE=node:24-slim npm run docker:test
+BASE_NODE_IMAGE=node:24-slim npm run app1:docker:test
 
 # En développement
 BASE_NODE_IMAGE=node:24-slim docker compose -f docker-compose.dev.yml up -d --build

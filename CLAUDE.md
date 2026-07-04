@@ -6,8 +6,8 @@
 
 ## Règles importantes
 
-- **NE JAMAIS lancer `npm run dev`** - Le serveur de développement est déjà en cours d'exécution
-- **Pour lire les logs de l'application, utiliser `npm run docker:dev:logs`**
+- **NE JAMAIS lancer `npm run app1:dev`** - Le serveur de développement est déjà en cours d'exécution
+- **Pour lire les logs de l'application, utiliser `npm run app1:docker:dev:logs`**
 - **NE JAMAIS exécuter les migrations Prisma** - L'utilisateur s'occupe toujours de créer et d'appliquer les migrations. Fournir uniquement la commande de migration sans l'exécuter.
 - **Niveau de log Prisma configurable** - Utiliser la variable d'environnement `PRISMA_LOG_LEVEL` dans `.env` pour ajuster les logs (valeurs: `error,warn` par défaut, `query,error,warn,info` pour verbose, `error` pour minimal)
 - L'url de l'application en développement est : http://localhost:3000
@@ -95,9 +95,12 @@
 - `apps/app2/` : 2ᵉ app (placeholder, autonome)
 - `layers/` : layers Nuxt **partagés** à la racine (auth, volunteers, ticketing, meals, tasks,
   faq, lost-found, workshops, carpool, stock, artists), consommés via `extends: '../../layers/*'`
-- **Commandes depuis la racine** : un `package.json` racine proxifie tous les scripts vers
-  `apps/app1` (`npm run docker:dev`, `npm run lint`, `npm run test:unit:run`… fonctionnent depuis
-  la racine, inchangés). Pour passer des arguments, lancer depuis `apps/app1/`.
+- **Commandes depuis la racine** : un `package.json` racine proxifie les scripts d'`apps/app1`,
+  préfixés par `app1:` (`npm run app1:docker:dev`, `npm run app1:docker:dev:logs`…) — le préfixe
+  réserve la place aux futurs scripts `app2:*`. ⚠️ Ce proxy ne fonctionne que **sans arguments**
+  (le double `npm run` les avale). Pour passer des arguments (`-- …`) ou pour les scripts internes
+  (tests, lint, i18n, skills), lancer **depuis `apps/app1/`** avec le nom **non préfixé**
+  (`npm run lint`, `npm run check-i18n -- -s 2`…).
 - **Docker** : contexte de build = racine du repo ; le conteneur reproduit le layout
   `/app/apps/app1` + `/app/layers`. Cf. [docs/migration-monorepo-app1.md](docs/migration-monorepo-app1.md).
 - Structure full-stack TypeScript moderne
@@ -125,26 +128,26 @@
 
 **Scripts de développement :**
 
-- `npm run dev` : Lancer le serveur de développement
-- `npm run build` : Construire l'application pour la production
-- `npm run preview` : Prévisualiser la version de production
-- `npm run lint` : Vérifier le code avec ESLint
-- `npm run db:seed:dev` : Peupler la base de données avec des données de développement
+- `npm run app1:dev` : Lancer le serveur de développement
+- `npm run app1:build` : Construire l'application pour la production
+- `npm run app1:preview` : Prévisualiser la version de production
+- `npm run app1:lint` : Vérifier le code avec ESLint
+- `npm run app1:db:seed:dev` : Peupler la base de données avec des données de développement
 
 **Scripts Docker pour le développement :**
 
-- `npm run docker:dev` : Environnement de développement (build + up)
-- `npm run docker:dev:detached` : Environnement de développement en mode détaché
-- `npm run docker:dev:down` : Arrêter les services de développement
-- `npm run docker:dev:logs` : Afficher les logs de l'application
-- `npm run docker:dev:exec` : Ouvrir un shell dans le conteneur de l'application
-- `npm run docker:dev:get-lockfile` : Copier le package-lock.json du conteneur vers l'hôte
-- `npm run docker:dev:get-package` : Copier le package.json du conteneur vers l'hôte
+- `npm run app1:docker:dev` : Environnement de développement (build + up)
+- `npm run app1:docker:dev:detached` : Environnement de développement en mode détaché
+- `npm run app1:docker:dev:down` : Arrêter les services de développement
+- `npm run app1:docker:dev:logs` : Afficher les logs de l'application
+- `npm run app1:docker:dev:exec` : Ouvrir un shell dans le conteneur de l'application
+- `npm run app1:docker:dev:get-lockfile` : Copier le package-lock.json du conteneur vers l'hôte
+- `npm run app1:docker:dev:get-package` : Copier le package.json du conteneur vers l'hôte
 
 **Scripts de traduction i18n :**
 
-- `npm run check-i18n` : Analyse clés manquantes/inutilisées/dupliquées/hardcodées (compatible avec la structure lazy loading)
-- `npm run check-translations` : Compare les traductions entre locales
+- `npm run app1:check-i18n` : Analyse clés manquantes/inutilisées/dupliquées/hardcodées (compatible avec la structure lazy loading)
+- `npm run app1:check-translations` : Compare les traductions entre locales
 
 **Note importante sur l'i18n :**
 

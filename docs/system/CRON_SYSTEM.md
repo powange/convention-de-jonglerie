@@ -15,7 +15,7 @@ Le système utilise **Nitro Tasks** (natif Nuxt 4) + **[cron](https://github.com
 
 ```bash
 # Pour activer les crons en développement
-ENABLE_CRON=true npm run dev
+ENABLE_CRON=true npm run app1:dev
 ```
 
 ### En production

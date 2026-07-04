@@ -230,8 +230,8 @@ Assurez-vous d'avoir Node.js, npm (ou pnpm, yarn, bun) et MySQL installés.
 
 4.  **Lancer le serveur de développement :**
     ```bash
-    npm run dev
-    # ou pnpm dev / yarn dev / bun run dev
+    npm run app1:dev
+    # ou pnpm app1:dev / yarn app1:dev / bun run app1:dev
     ```
     L'application sera accessible sur `http://localhost:3000`.
 
@@ -239,32 +239,32 @@ Assurez-vous d'avoir Node.js, npm (ou pnpm, yarn, bun) et MySQL installés.
 
 ```bash
 # npm
-npm run build
+npm run app1:build
 
 # pnpm
-pnpm build
+pnpm app1:build
 
 # yarn
-yarn build
+yarn app1:build
 
 # bun
-bun run build
+bun run app1:build
 ```
 
 ## Prévisualisation de la Production (localement)
 
 ```bash
 # npm
-npm run preview
+npm run app1:preview
 
 # pnpm
-pnpm preview
+pnpm app1:preview
 
 # yarn
-yarn preview
+yarn app1:preview
 
 # bun
-bun run preview
+bun run app1:preview
 ```
 
 Pour plus d'informations sur le déploiement, consultez la [documentation Nuxt](https://nuxt.com/docs/getting-started/deployment).
@@ -301,7 +301,7 @@ L'application dispose d'un script pour géocoder automatiquement les adresses de
 
 ```bash
 # Géocoder toutes les éditions sans coordonnées
-npm run geocode
+npm run app1:geocode
 ```
 
 Ce script utilise l'API Nominatim (OpenStreetMap) avec une stratégie de fallback pour maximiser le taux de succès.

@@ -206,5 +206,5 @@ Il est recommandé de supprimer régulièrement les anciennes sauvegardes pour �
 
 ### Debugging
 
-- Vérifier les logs du conteneur : `npm run docker:dev:logs`
+- Vérifier les logs du conteneur : `npm run app1:docker:dev:logs`
 - Vérifier les permissions des fichiers dans `/app/backup/`

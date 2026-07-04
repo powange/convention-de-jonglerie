@@ -1350,7 +1350,7 @@ connect()
 3. ✅ Vérifier les logs serveur
 
    ```bash
-   npm run docker:dev:logs
+   npm run app1:docker:dev:logs
    ```
 
 4. ✅ Vérifier la connexion SSE

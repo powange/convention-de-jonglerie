@@ -38,7 +38,7 @@ La variable est automatiquement récupérée depuis votre fichier `.env` et pass
 Si vous voulez la surcharger temporairement sans modifier `.env` :
 
 ```bash
-PRISMA_LOG_LEVEL=query,error,warn npm run docker:dev
+PRISMA_LOG_LEVEL=query,error,warn npm run app1:docker:dev
 ```
 
 ## Cas d'usage
@@ -54,14 +54,14 @@ PRISMA_LOG_LEVEL=query,error,warn,info
 Puis redémarrez le conteneur :
 
 ```bash
-npm run docker:dev:down
-npm run docker:dev
+npm run app1:docker:dev:down
+npm run app1:docker:dev
 ```
 
 Vous verrez alors toutes les requêtes SQL dans les logs :
 
 ```bash
-npm run docker:dev:logs
+npm run app1:docker:dev:logs
 ```
 
 ### Production (minimal)
