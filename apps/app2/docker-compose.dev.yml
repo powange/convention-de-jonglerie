@@ -25,7 +25,10 @@ services:
       # Init SQL au premier démarrage (grants shadow DB pour `prisma migrate dev`)
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
+      # -h 127.0.0.1 force le TCP : le serveur temporaire d'init MySQL n'écoute que sur
+      # le socket local, donc le healthcheck ne passe au vert qu'une fois le vrai serveur
+      # à l'écoute sur 3306 → évite le P1001 de l'app au tout premier démarrage (volume vierge).
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '--silent']
       timeout: 2s
       interval: 3s
       retries: 15
@@ -80,11 +83,3 @@ volumes:
     driver: local
   node_modules:
     driver: local
-
-# Réseau du reverse proxy (https://dev.event.powange.com).
-# Le proxy atteint le conteneur par son nom `flowvent-app` sur le port 3000.
-# Si ton proxy vise l'hôte (localhost:3001), remplace ce bloc par un réseau bridge classique.
-networks:
-  default:
-    external: true
-    name: proxy-network

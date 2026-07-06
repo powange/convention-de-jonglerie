@@ -3,7 +3,7 @@
     <!-- Hero -->
     <UContainer class="py-20 text-center">
       <div class="mb-3 flex items-center justify-center gap-2">
-        <UIcon name="i-heroicons-calendar-days" class="text-3xl text-primary" />
+        <img :src="logoUrl" alt="Flowvent" class="h-9 w-auto" />
         <span class="text-2xl font-bold tracking-tight">Flowvent</span>
       </div>
       <p class="mb-6 text-base font-medium text-primary">Le flow de vos événements</p>
@@ -52,6 +52,8 @@
 </template>
 
 <script setup lang="ts">
+import logoUrl from '~/assets/flowvent_v2_logo.svg?url'
+
 const { loggedIn } = useUserSession()
 
 useSeoMeta({

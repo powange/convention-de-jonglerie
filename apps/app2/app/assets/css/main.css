@@ -1,2 +1,34 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+
+/* Palette de marque Flowvent — dérivée du logo (orange #FF6A00 + accent teal).
+   Nuxt UI exige toutes les nuances 50→950 pour une couleur. `@theme static`
+   force leur génération afin qu'elles soient référençables par nom dans
+   app.config.ts (primary: 'flow', secondary: 'flowteal'). */
+@theme static {
+  /* Primaire — Flowvent Orange */
+  --color-flow-50: #fff4ec;
+  --color-flow-100: #ffe3cf;
+  --color-flow-200: #ffc59b;
+  --color-flow-300: #ffa667;
+  --color-flow-400: #ff8836;
+  --color-flow-500: #ff6a00;
+  --color-flow-600: #e85f00;
+  --color-flow-700: #c24e00;
+  --color-flow-800: #983e02;
+  --color-flow-900: #7a3308;
+  --color-flow-950: #431900;
+
+  /* Accent — Teal */
+  --color-flowteal-50: #e7fbf6;
+  --color-flowteal-100: #c4f5eb;
+  --color-flowteal-200: #8febda;
+  --color-flowteal-300: #54dec7;
+  --color-flowteal-400: #22d3b8;
+  --color-flowteal-500: #0fd5bb;
+  --color-flowteal-600: #0bb1a0;
+  --color-flowteal-700: #0d8b7f;
+  --color-flowteal-800: #106e66;
+  --color-flowteal-900: #115a54;
+  --color-flowteal-950: #053632;
+}
