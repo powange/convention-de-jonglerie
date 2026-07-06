@@ -3,7 +3,7 @@
     <header class="sticky top-0 z-10 border-b border-default bg-default/75 backdrop-blur">
       <UContainer class="flex h-16 items-center justify-between gap-4">
         <NuxtLink to="/" class="flex items-center gap-2">
-          <img :src="logoUrl" alt="Flowvent" class="h-8 w-auto" />
+          <AppLogo class="h-8 w-auto text-highlighted" />
           <span class="flex flex-col leading-tight">
             <span class="text-lg font-semibold">Flow<span style="color: #ff6a00">vent</span></span>
             <span class="text-[11px] text-muted max-sm:hidden">Le flow de vos événements</span>
@@ -68,7 +68,6 @@
 
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-import logoUrl from '~/assets/flowvent_v2_logo.svg?url'
 
 const { loggedIn, user, clear } = useUserSession()
 const toast = useToast()

@@ -53,6 +53,9 @@ services:
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'development'
+      # Heap Node élargi : le serveur de dev Nuxt (HMR + polling) dépasse la limite
+      # par défaut (~2 Go) sur de longues sessions → évite les crashs OOM.
+      NODE_OPTIONS: '--max-old-space-size=4096'
       # Force le polling pour le hot reload (WSL/Windows)
       CHOKIDAR_USEPOLLING: 'true'
       CHOKIDAR_INTERVAL: '1000'
