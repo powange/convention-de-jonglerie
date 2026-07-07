@@ -26,11 +26,14 @@
   },
   "dependencies": {
     "@nuxt/ui": "^4.8.1",
+    "@nuxtjs/i18n": "^10.4.0",
+    "@pinia/nuxt": "^0.11.3",
     "@prisma/adapter-mariadb": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "nuxt": "^4.4.8",
     "nuxt-auth-utils": "^0.5.29",
+    "pinia": "^3.0.4",
     "prisma": "^7.8.0",
     "vue": "^3.5.17",
     "zod": "^4.3.6"
@@ -40,6 +43,7 @@
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
-    "@iconify-json/lucide": "^1.2.116"
+    "@iconify-json/lucide": "^1.2.116",
+    "@iconify-json/simple-icons": "^1.2.89"
   }
 }

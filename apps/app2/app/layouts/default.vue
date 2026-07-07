@@ -31,7 +31,7 @@
             />
             <UDropdownMenu :items="userMenuItems">
               <UButton
-                :label="user?.name || user?.email"
+                :label="user?.pseudo || user?.email"
                 icon="i-heroicons-user-circle"
                 trailing-icon="i-heroicons-chevron-down"
                 color="neutral"

@@ -70,6 +70,10 @@ services:
       - ./app.config.ts:/app/app.config.ts:cached
       - ./tsconfig.json:/app/tsconfig.json:cached
       - ./prisma.config.ts:/app/prisma.config.ts:cached
+      - ./i18n:/app/i18n:cached
+      # Layer d'auth partagé (vit à la racine du repo, HORS du contexte de build d'app2).
+      # Monté pour que `extends: '../../layers/auth'` (→ /layers/auth dans le conteneur) résolve.
+      - ../../layers/auth:/layers/auth:cached
       # node_modules et dossiers de build dans des volumes (pas synchronisés avec l'hôte)
       - node_modules:/app/node_modules
       - ./.nuxt:/app/.nuxt
