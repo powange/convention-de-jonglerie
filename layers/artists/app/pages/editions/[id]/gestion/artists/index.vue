@@ -330,6 +330,31 @@
               <span v-else class="text-gray-400">-</span>
             </template>
 
+            <!-- Remboursement des consommables -->
+            <template #consumables-cell="{ row }">
+              <div
+                v-if="row.original.consumablesMax || row.original.consumablesActual"
+                class="space-y-1"
+              >
+                <div v-if="row.original.consumablesMax" class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">Max:</span>
+                  <span class="font-medium">{{ row.original.consumablesMax }}€</span>
+                </div>
+                <div v-if="row.original.consumablesActual" class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500">Réel:</span>
+                  <span class="font-medium">{{ row.original.consumablesActual }}€</span>
+                  <UBadge
+                    :color="row.original.consumablesActualPaid ? 'success' : 'warning'"
+                    variant="soft"
+                    size="sm"
+                  >
+                    {{ row.original.consumablesActualPaid ? '✓' : '○' }}
+                  </UBadge>
+                </div>
+              </div>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+
             <!-- Hébergement -->
             <template #accommodation-cell="{ row }">
               <div class="space-y-1">
@@ -675,6 +700,7 @@ const getColumnLabel = (columnId: string): string => {
     shows: t('artists.shows'),
     payment: t('artists.payment_amount'),
     reimbursement: t('artists.reimbursement_max_actual'),
+    consumables: t('artists.consumables_max_actual'),
     accommodation: t('artists.accommodation'),
     invoice: t('artists.invoice_short'),
     fee: t('artists.fee_short'),
@@ -758,6 +784,11 @@ const columns = computed((): TableColumn<any>[] => [
     id: 'reimbursement',
     accessorFn: (row: any) => row.reimbursementMax || row.reimbursementActual || 0,
     header: ({ column }) => getSortableHeader(column, t('artists.reimbursement_max_actual')),
+  },
+  {
+    id: 'consumables',
+    accessorFn: (row: any) => row.consumablesMax || row.consumablesActual || 0,
+    header: ({ column }) => getSortableHeader(column, t('artists.consumables_max_actual')),
   },
   {
     id: 'accommodation',

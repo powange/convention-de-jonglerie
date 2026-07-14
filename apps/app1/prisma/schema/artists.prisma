@@ -45,6 +45,9 @@ model EditionArtist {
   reimbursementMax        Decimal?           @db.Decimal(10, 2)
   reimbursementActual     Decimal?           @db.Decimal(10, 2)
   reimbursementActualPaid Boolean            @default(false)
+  consumablesMax          Decimal?           @db.Decimal(10, 2)
+  consumablesActual       Decimal?           @db.Decimal(10, 2)
+  consumablesActualPaid   Boolean            @default(false)
   organizerNotes          String?            @db.Text
   accommodationAutonomous Boolean            @default(false)
   accommodationType       AccommodationType?

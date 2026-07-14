@@ -9,49 +9,63 @@ import {
 import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
-const updateArtistSchema = z
-  .object({
-    arrivalDateTime: z.string().optional().nullable(),
-    departureDateTime: z.string().optional().nullable(),
-    dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
-    allergies: z.string().optional().nullable(),
-    allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
-    payment: z.number().nonnegative().max(100000).optional().nullable(),
-    paymentPaid: z.boolean().optional(),
-    reimbursementMax: z.number().nonnegative().max(100000).optional().nullable(),
-    reimbursementActual: z.number().nonnegative().max(100000).optional().nullable(),
-    reimbursementActualPaid: z.boolean().optional(),
-    accommodationAutonomous: z.boolean().optional(),
-    accommodationType: z.enum(['TENT', 'VEHICLE', 'HOSTED', 'OTHER']).optional().nullable(),
-    accommodationTypeOther: z.string().max(500).optional().nullable(),
-    accommodationProposal: z.string().optional().nullable(),
-    invoiceRequested: z.boolean().optional(),
-    invoiceProvided: z.boolean().optional(),
-    feeRequested: z.boolean().optional(),
-    feeProvided: z.boolean().optional(),
-    pickupRequired: z.boolean().optional(),
-    pickupLocation: z.string().optional().nullable(),
-    pickupResponsibleId: z.number().int().positive().optional().nullable(),
-    dropoffRequired: z.boolean().optional(),
-    dropoffLocation: z.string().optional().nullable(),
-    dropoffResponsibleId: z.number().int().positive().optional().nullable(),
-    // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
-    userEmail: z.string().email().optional(),
-    userPrenom: z.string().min(1).optional(),
-    userNom: z.string().min(1).optional(),
-    userPhone: z.string().optional().nullable(),
-    // Relier l'artiste à un utilisateur existant (remplace l'utilisateur MANUAL)
-    switchToUserId: z.number().int().positive().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.reimbursementActual != null && data.reimbursementMax != null) {
-        return data.reimbursementActual <= data.reimbursementMax
-      }
-      return true
-    },
-    { message: 'Le remboursement réel ne peut pas dépasser le maximum autorisé' }
-  )
+const updateArtistSchema = z.object({
+  arrivalDateTime: z.string().optional().nullable(),
+  departureDateTime: z.string().optional().nullable(),
+  dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
+  allergies: z.string().optional().nullable(),
+  allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
+  payment: z.number().nonnegative().max(100000).optional().nullable(),
+  paymentPaid: z.boolean().optional(),
+  reimbursementMax: z.number().nonnegative().max(100000).optional().nullable(),
+  reimbursementActual: z.number().nonnegative().max(100000).optional().nullable(),
+  reimbursementActualPaid: z.boolean().optional(),
+  consumablesMax: z.number().nonnegative().max(100000).optional().nullable(),
+  consumablesActual: z.number().nonnegative().max(100000).optional().nullable(),
+  consumablesActualPaid: z.boolean().optional(),
+  accommodationAutonomous: z.boolean().optional(),
+  accommodationType: z.enum(['TENT', 'VEHICLE', 'HOSTED', 'OTHER']).optional().nullable(),
+  accommodationTypeOther: z.string().max(500).optional().nullable(),
+  accommodationProposal: z.string().optional().nullable(),
+  invoiceRequested: z.boolean().optional(),
+  invoiceProvided: z.boolean().optional(),
+  feeRequested: z.boolean().optional(),
+  feeProvided: z.boolean().optional(),
+  pickupRequired: z.boolean().optional(),
+  pickupLocation: z.string().optional().nullable(),
+  pickupResponsibleId: z.number().int().positive().optional().nullable(),
+  dropoffRequired: z.boolean().optional(),
+  dropoffLocation: z.string().optional().nullable(),
+  dropoffResponsibleId: z.number().int().positive().optional().nullable(),
+  // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
+  userEmail: z.string().email().optional(),
+  userPrenom: z.string().min(1).optional(),
+  userNom: z.string().min(1).optional(),
+  userPhone: z.string().optional().nullable(),
+  // Relier l'artiste à un utilisateur existant (remplace l'utilisateur MANUAL)
+  switchToUserId: z.number().int().positive().optional(),
+})
+
+// Vérification croisée d'un couple max/réel en fusionnant le payload et la valeur en base.
+// Couvre aussi le cas où les deux montants sont fournis, d'où l'absence de .refine() zod :
+// une seule violation métier, un seul format d'erreur.
+// undefined = non fourni (garder la valeur existante), null = effacement explicite
+function assertMaxCoversActual(
+  payload: { max: number | null | undefined; actual: number | null | undefined },
+  existing: { max: unknown; actual: unknown },
+  messages: { exceeds: string; maxRemoved: string }
+) {
+  const toNumber = (value: unknown) => (value == null ? null : Number(value))
+  const effectiveMax = payload.max !== undefined ? payload.max : toNumber(existing.max)
+  const effectiveActual = payload.actual !== undefined ? payload.actual : toNumber(existing.actual)
+
+  if (effectiveActual != null && effectiveMax != null && effectiveActual > effectiveMax) {
+    throw createError({ status: 400, message: messages.exceeds })
+  }
+  if (effectiveMax == null && effectiveActual != null) {
+    throw createError({ status: 400, message: messages.maxRemoved })
+  }
+}
 
 export default wrapApiHandler(
   async (event) => {
@@ -102,29 +116,25 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = updateArtistSchema.parse(body)
 
-    // Vérification croisée remboursement vs valeur en base
-    // undefined = non fourni (garder la valeur existante), null = effacement explicite
-    const effectiveMax =
-      validatedData.reimbursementMax !== undefined
-        ? validatedData.reimbursementMax
-        : existingArtist.reimbursementMax
-    const effectiveActual =
-      validatedData.reimbursementActual !== undefined
-        ? validatedData.reimbursementActual
-        : existingArtist.reimbursementActual
-    if (effectiveActual != null && effectiveMax != null && effectiveActual > effectiveMax) {
-      throw createError({
-        status: 400,
-        message: 'Le remboursement réel ne peut pas dépasser le maximum autorisé',
-      })
-    }
-    if (effectiveMax == null && effectiveActual != null) {
-      throw createError({
-        status: 400,
-        message:
+    assertMaxCoversActual(
+      { max: validatedData.reimbursementMax, actual: validatedData.reimbursementActual },
+      { max: existingArtist.reimbursementMax, actual: existingArtist.reimbursementActual },
+      {
+        exceeds: 'Le remboursement réel ne peut pas dépasser le maximum autorisé',
+        maxRemoved:
           "Le remboursement maximum ne peut pas être supprimé tant qu'un remboursement réel est enregistré",
-      })
-    }
+      }
+    )
+
+    assertMaxCoversActual(
+      { max: validatedData.consumablesMax, actual: validatedData.consumablesActual },
+      { max: existingArtist.consumablesMax, actual: existingArtist.consumablesActual },
+      {
+        exceeds: 'Le remboursement réel des consommables ne peut pas dépasser le maximum autorisé',
+        maxRemoved:
+          "Le remboursement maximum des consommables ne peut pas être supprimé tant qu'un remboursement réel est enregistré",
+      }
+    )
 
     // Relier l'artiste à un utilisateur existant (remplace l'utilisateur MANUAL)
     if (validatedData.switchToUserId) {
