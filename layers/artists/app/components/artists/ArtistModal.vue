@@ -263,6 +263,43 @@
               :label="$t('artists.reimbursement_paid')"
             />
           </UFormField>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <UFormField :label="$t('artists.consumables_max')">
+              <UInput
+                v-model="formData.consumablesMax"
+                type="number"
+                step="0.01"
+                min="0"
+                :placeholder="$t('artists.consumables_max_placeholder')"
+              >
+                <template #trailing>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                </template>
+              </UInput>
+            </UFormField>
+
+            <UFormField :label="$t('artists.consumables_actual')">
+              <UInput
+                v-model="formData.consumablesActual"
+                type="number"
+                step="0.01"
+                min="0"
+                :placeholder="$t('artists.consumables_actual_placeholder')"
+              >
+                <template #trailing>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                </template>
+              </UInput>
+            </UFormField>
+          </div>
+
+          <UFormField v-if="formData.consumablesActual" :label="$t('artists.consumables_status')">
+            <UCheckbox
+              v-model="formData.consumablesActualPaid"
+              :label="$t('artists.consumables_paid')"
+            />
+          </UFormField>
         </div>
 
         <!-- Hébergement -->
@@ -500,6 +537,9 @@ const formData = ref({
   reimbursementMax: '',
   reimbursementActual: '',
   reimbursementActualPaid: false,
+  consumablesMax: '',
+  consumablesActual: '',
+  consumablesActualPaid: false,
   accommodationAutonomous: false,
   accommodationType: null as string | null,
   accommodationTypeOther: '',
@@ -689,6 +729,11 @@ const buildBasePayload = () => ({
     ? parseFloat(formData.value.reimbursementActual)
     : null,
   reimbursementActualPaid: formData.value.reimbursementActualPaid,
+  consumablesMax: formData.value.consumablesMax ? parseFloat(formData.value.consumablesMax) : null,
+  consumablesActual: formData.value.consumablesActual
+    ? parseFloat(formData.value.consumablesActual)
+    : null,
+  consumablesActualPaid: formData.value.consumablesActualPaid,
   accommodationAutonomous: formData.value.accommodationAutonomous,
   accommodationType: formData.value.accommodationType || null,
   accommodationTypeOther:
@@ -807,6 +852,9 @@ const resetForm = () => {
     reimbursementMax: '',
     reimbursementActual: '',
     reimbursementActualPaid: false,
+    consumablesMax: '',
+    consumablesActual: '',
+    consumablesActualPaid: false,
     accommodationAutonomous: false,
     accommodationType: null as string | null,
     accommodationTypeOther: '',
@@ -865,6 +913,11 @@ watch(
           ? newArtist.reimbursementActual.toString()
           : '',
         reimbursementActualPaid: newArtist.reimbursementActualPaid || false,
+        consumablesMax: newArtist.consumablesMax ? newArtist.consumablesMax.toString() : '',
+        consumablesActual: newArtist.consumablesActual
+          ? newArtist.consumablesActual.toString()
+          : '',
+        consumablesActualPaid: newArtist.consumablesActualPaid || false,
         accommodationAutonomous: newArtist.accommodationAutonomous || false,
         accommodationType: newArtist.accommodationType || null,
         accommodationTypeOther: newArtist.accommodationTypeOther || '',

@@ -10,36 +10,51 @@ import {
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
-const artistSchema = z.object({
-  userId: z.number().int().positive().optional(),
-  email: z.string().email().optional(),
-  prenom: z.string().min(1).optional(),
-  nom: z.string().min(1).optional(),
-  arrivalDateTime: z.string().optional().nullable(),
-  departureDateTime: z.string().optional().nullable(),
-  dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).default('NONE'),
-  allergies: z.string().optional().nullable(),
-  allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
-  payment: z.number().optional().nullable(),
-  paymentPaid: z.boolean().optional(),
-  reimbursementMax: z.number().optional().nullable(),
-  reimbursementActual: z.number().optional().nullable(),
-  reimbursementActualPaid: z.boolean().optional(),
-  accommodationAutonomous: z.boolean().optional(),
-  accommodationType: z.enum(['TENT', 'VEHICLE', 'HOSTED', 'OTHER']).optional().nullable(),
-  accommodationTypeOther: z.string().max(500).optional().nullable(),
-  accommodationProposal: z.string().optional().nullable(),
-  invoiceRequested: z.boolean().optional(),
-  invoiceProvided: z.boolean().optional(),
-  feeRequested: z.boolean().optional(),
-  feeProvided: z.boolean().optional(),
-  pickupRequired: z.boolean().optional(),
-  pickupLocation: z.string().optional().nullable(),
-  pickupResponsibleId: z.number().int().positive().optional().nullable(),
-  dropoffRequired: z.boolean().optional(),
-  dropoffLocation: z.string().optional().nullable(),
-  dropoffResponsibleId: z.number().int().positive().optional().nullable(),
-})
+// Un montant réel supérieur à son plafond rendrait l'artiste inéditable : le PUT
+// rejette cet état sur toute mise à jour, même sans rapport avec les montants.
+const maxCoversActual = (max: number | null | undefined, actual: number | null | undefined) =>
+  actual == null || max == null || actual <= max
+
+const artistSchema = z
+  .object({
+    userId: z.number().int().positive().optional(),
+    email: z.string().email().optional(),
+    prenom: z.string().min(1).optional(),
+    nom: z.string().min(1).optional(),
+    arrivalDateTime: z.string().optional().nullable(),
+    departureDateTime: z.string().optional().nullable(),
+    dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).default('NONE'),
+    allergies: z.string().optional().nullable(),
+    allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),
+    payment: z.number().nonnegative().max(100000).optional().nullable(),
+    paymentPaid: z.boolean().optional(),
+    reimbursementMax: z.number().nonnegative().max(100000).optional().nullable(),
+    reimbursementActual: z.number().nonnegative().max(100000).optional().nullable(),
+    reimbursementActualPaid: z.boolean().optional(),
+    consumablesMax: z.number().nonnegative().max(100000).optional().nullable(),
+    consumablesActual: z.number().nonnegative().max(100000).optional().nullable(),
+    consumablesActualPaid: z.boolean().optional(),
+    accommodationAutonomous: z.boolean().optional(),
+    accommodationType: z.enum(['TENT', 'VEHICLE', 'HOSTED', 'OTHER']).optional().nullable(),
+    accommodationTypeOther: z.string().max(500).optional().nullable(),
+    accommodationProposal: z.string().optional().nullable(),
+    invoiceRequested: z.boolean().optional(),
+    invoiceProvided: z.boolean().optional(),
+    feeRequested: z.boolean().optional(),
+    feeProvided: z.boolean().optional(),
+    pickupRequired: z.boolean().optional(),
+    pickupLocation: z.string().optional().nullable(),
+    pickupResponsibleId: z.number().int().positive().optional().nullable(),
+    dropoffRequired: z.boolean().optional(),
+    dropoffLocation: z.string().optional().nullable(),
+    dropoffResponsibleId: z.number().int().positive().optional().nullable(),
+  })
+  .refine((data) => maxCoversActual(data.reimbursementMax, data.reimbursementActual), {
+    message: 'Le remboursement réel ne peut pas dépasser le maximum autorisé',
+  })
+  .refine((data) => maxCoversActual(data.consumablesMax, data.consumablesActual), {
+    message: 'Le remboursement réel des consommables ne peut pas dépasser le maximum autorisé',
+  })
 
 export default wrapApiHandler(
   async (event) => {
@@ -162,6 +177,9 @@ export default wrapApiHandler(
         reimbursementMax: validatedData.reimbursementMax,
         reimbursementActual: validatedData.reimbursementActual,
         reimbursementActualPaid: validatedData.reimbursementActualPaid ?? false,
+        consumablesMax: validatedData.consumablesMax,
+        consumablesActual: validatedData.consumablesActual,
+        consumablesActualPaid: validatedData.consumablesActualPaid ?? false,
         accommodationAutonomous: validatedData.accommodationAutonomous ?? false,
         accommodationType: validatedData.accommodationType,
         accommodationTypeOther: validatedData.accommodationTypeOther,

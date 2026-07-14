@@ -435,8 +435,14 @@
         </div>
       </UCard>
 
-      <!-- Paiement et défraiement -->
-      <UCard v-if="artist.payment !== null || artist.reimbursementMax !== null">
+      <!-- Paiement et remboursements -->
+      <UCard
+        v-if="
+          artist.payment !== null ||
+          artist.reimbursementMax !== null ||
+          artist.consumablesMax !== null
+        "
+      >
         <template #header>
           <h2 class="text-lg font-semibold flex items-center gap-2">
             <UIcon name="i-heroicons-banknotes" class="text-emerald-500" />
@@ -482,6 +488,32 @@
                 artist.reimbursementActualPaid
                   ? $t('artists.reimbursement_paid')
                   : $t('artists.reimbursement_pending')
+              }}
+            </UBadge>
+          </div>
+
+          <!-- Remboursement des consommables -->
+          <div v-if="artist.consumablesMax !== null" class="flex items-center justify-between">
+            <div class="space-y-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ $t('artists.consumables_max') }}
+              </p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ $t('artists.payment_amount_value', { amount: artist.consumablesMax }) }}
+                <span
+                  v-if="artist.consumablesActual !== null"
+                  class="text-sm font-normal text-gray-500"
+                >
+                  ({{ $t('artists.consumables_actual') }} :
+                  {{ $t('artists.payment_amount_value', { amount: artist.consumablesActual }) }})
+                </span>
+              </p>
+            </div>
+            <UBadge :color="artist.consumablesActualPaid ? 'success' : 'warning'" variant="soft">
+              {{
+                artist.consumablesActualPaid
+                  ? $t('artists.consumables_paid')
+                  : $t('artists.consumables_pending')
               }}
             </UBadge>
           </div>
@@ -620,6 +652,9 @@ interface ArtistInfo {
   reimbursementMax: number | null
   reimbursementActual: number | null
   reimbursementActualPaid: boolean
+  consumablesMax: number | null
+  consumablesActual: number | null
+  consumablesActualPaid: boolean
   accommodationAutonomous: boolean
   accommodationType: string | null
   accommodationTypeOther: string | null
