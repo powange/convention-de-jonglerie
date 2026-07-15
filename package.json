@@ -68,6 +68,24 @@
     "app1:format:check": "cd apps/app1 && npm run format:check",
     "app1:favicons": "cd apps/app1 && npm run favicons",
     "app1:deps:reset": "cd apps/app1 && npm run deps:reset",
-    "app1:jcodemunch:watch": "cd apps/app1 && npm run jcodemunch:watch"
+    "app1:jcodemunch:watch": "cd apps/app1 && npm run jcodemunch:watch",
+    "app2:build": "cd apps/app2 && npm run build",
+    "app2:dev": "cd apps/app2 && npm run dev",
+    "app2:generate": "cd apps/app2 && npm run generate",
+    "app2:preview": "cd apps/app2 && npm run preview",
+    "app2:db:generate": "cd apps/app2 && npm run db:generate",
+    "app2:db:migrate": "cd apps/app2 && npm run db:migrate",
+    "app2:db:studio": "cd apps/app2 && npm run db:studio",
+    "app2:docker:dev": "cd apps/app2 && npm run docker:dev",
+    "app2:docker:dev:detached": "cd apps/app2 && npm run docker:dev:detached",
+    "app2:docker:dev:detached:nocache": "cd apps/app2 && npm run docker:dev:detached:nocache",
+    "app2:docker:dev:down": "cd apps/app2 && npm run docker:dev:down",
+    "app2:docker:dev:clean-modules": "cd apps/app2 && npm run docker:dev:clean-modules",
+    "app2:docker:dev:logs": "cd apps/app2 && npm run docker:dev:logs",
+    "app2:docker:dev:exec": "cd apps/app2 && npm run docker:dev:exec",
+    "app2:docker:prod:up": "cd apps/app2 && npm run docker:prod:up",
+    "app2:docker:prod:down": "cd apps/app2 && npm run docker:prod:down",
+    "app2:docker:release:up": "cd apps/app2 && npm run docker:release:up",
+    "app2:docker:release:down": "cd apps/app2 && npm run docker:release:down"
   }
 }

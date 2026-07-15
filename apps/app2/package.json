@@ -2,19 +2,48 @@
   "name": "app2",
   "private": true,
   "type": "module",
-  "description": "Deuxième application (placeholder de test) — Nuxt 4 autonome, sans layers pour l'instant",
+  "description": "Flowvent — Plateforme SaaS d'organisation d'événements (abonnement simulé) — Nuxt 4 autonome",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
+    "docker:dev:detached": "docker compose -f docker-compose.dev.yml up -d --build",
+    "docker:dev:detached:nocache": "docker compose -f docker-compose.dev.yml build --no-cache && docker compose -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
+    "docker:dev:clean-modules": "docker compose -f docker-compose.dev.yml down && docker volume rm flowvent_node_modules && echo '✓ Volume node_modules supprimé. Relancez docker:dev pour réinstaller.'",
+    "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f flowvent-app",
+    "docker:dev:exec": "docker compose -f docker-compose.dev.yml exec flowvent-app sh",
+    "docker:prod:up": "docker compose -f docker-compose.prod.yml up -d --build",
+    "docker:prod:down": "docker compose -f docker-compose.prod.yml down",
+    "docker:release:up": "docker compose -f docker-compose.release.yml up -d --build",
+    "docker:release:down": "docker compose -f docker-compose.release.yml down"
   },
   "dependencies": {
+    "@nuxt/ui": "^4.8.1",
+    "@nuxtjs/i18n": "^10.4.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
     "nuxt": "^4.4.8",
-    "vue": "^3.5.17"
+    "nuxt-auth-utils": "^0.5.29",
+    "pinia": "^3.0.4",
+    "prisma": "^7.8.0",
+    "vue": "^3.5.17",
+    "zod": "^4.3.6"
   },
   "engines": {
     "node": ">=22 <26"
+  },
+  "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.3",
+    "@iconify-json/lucide": "^1.2.116",
+    "@iconify-json/simple-icons": "^1.2.89"
   }
 }

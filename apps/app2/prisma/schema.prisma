@@ -1,0 +1,81 @@
+// Schéma Prisma de Flowvent (app2, MySQL). Compte utilisateur (auth partagée via
+// le layer layers/auth : email/mot de passe + OAuth Google), événements créés par
+// l'utilisateur, et abonnement (paiement simulé) qui débloque l'organisation.
+//
+// Le model User reprend les champs attendus par le layer d'authentification
+// (`layers/auth`) : pseudo unique, emailHash, password nullable (null pour OAuth),
+// authProvider, vérification d'email, profilePicture (= avatar Google), etc.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id                     Int       @id @default(autoincrement())
+  email                  String    @unique
+  emailHash              String
+  pseudo                 String    @unique
+  nom                    String?
+  prenom                 String?
+  password               String? // nullable : null pour les comptes OAuth (Google)
+  authProvider           String    @default("email") // "email" | "google" | "facebook" | "MANUAL"
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  lastLoginAt            DateTime?
+  profilePicture         String? // avatar (photo de profil Google)
+  emailVerificationCode  String?
+  isEmailVerified        Boolean   @default(false)
+  verificationCodeExpiry DateTime?
+  isGlobalAdmin          Boolean   @default(false)
+  phone                  String?
+  preferredLanguage      String    @default("fr")
+  isVolunteer            Boolean   @default(false)
+  isArtist               Boolean   @default(false)
+  isOrganizer            Boolean   @default(false)
+
+  events              Event[]
+  subscription        Subscription?
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?   @db.Text
+  location    String?
+  startDate   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     Int
+
+  @@index([ownerId])
+}
+
+model Subscription {
+  id               Int      @id @default(autoincrement())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           Int      @unique
+  plan             String // "monthly" | "annual"
+  status           String   @default("active") // "active" | "inactive"
+  currentPeriodEnd DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

@@ -1,0 +1,92 @@
+# Flowvent (app2) — DÉVELOPPEMENT (MySQL + HMR).
+#
+# Depuis apps/app2/ :
+#   docker compose -f docker-compose.dev.yml up --build -d
+#   docker compose -f docker-compose.dev.yml exec flowvent-app npx prisma migrate dev --name init   # 1re fois
+#   → https://dev.event.powange.com (reverse proxy) ou http://localhost:3001
+#
+# `name:` fige le nom de projet pour que les volumes (DB de dev) persistent entre les lancements.
+name: flowvent
+services:
+  # Base de données MySQL
+  flowvent-db:
+    image: mysql:8.0
+    container_name: flowvent-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-flowvent_db}
+      MYSQL_USER: ${MYSQL_USER:-flowvent_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-flowvent_password}
+    ports:
+      - '3307:3306' # évite le clash avec le MySQL d'app1 (3306)
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Init SQL au premier démarrage (grants shadow DB pour `prisma migrate dev`)
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # -h 127.0.0.1 force le TCP : le serveur temporaire d'init MySQL n'écoute que sur
+      # le socket local, donc le healthcheck ne passe au vert qu'une fois le vrai serveur
+      # à l'écoute sur 3306 → évite le P1001 de l'app au tout premier démarrage (volume vierge).
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '--silent']
+      timeout: 2s
+      interval: 3s
+      retries: 15
+      start_period: 5s
+
+  # Application Nuxt (mode développement)
+  flowvent-app:
+    image: flowvent-app:dev
+    container_name: flowvent-app
+    build:
+      context: .
+      target: dev
+      args:
+        BASE_NODE_IMAGE: ${BASE_NODE_IMAGE-node:24-slim}
+    # Générer le client Prisma + appliquer les migrations, puis lancer Nuxt en dev.
+    command: sh -lc "npx prisma generate && npx prisma migrate deploy && npm run dev"
+    env_file:
+      - .env
+    environment:
+      # DATABASE_URL avec le hostname Docker (surcharge le .env)
+      DATABASE_URL: 'mysql://${MYSQL_USER:-flowvent_user}:${MYSQL_PASSWORD:-flowvent_password}@flowvent-db:3306/${MYSQL_DATABASE:-flowvent_db}'
+      NUXT_HOST: '0.0.0.0'
+      NUXT_PORT: '3000'
+      NODE_ENV: 'development'
+      # Heap Node élargi : le serveur de dev Nuxt (HMR + polling) dépasse la limite
+      # par défaut (~2 Go) sur de longues sessions → évite les crashs OOM.
+      NODE_OPTIONS: '--max-old-space-size=4096'
+      # Force le polling pour le hot reload (WSL/Windows)
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '1000'
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?Definir NUXT_SESSION_PASSWORD dans apps/app2/.env (>= 32 caracteres)}
+    volumes:
+      # Code monté pour le hot-reload
+      - ./app:/app/app:cached
+      - ./server:/app/server:cached
+      - ./prisma:/app/prisma:cached
+      - ./types:/app/types:cached
+      - ./nuxt.config.ts:/app/nuxt.config.ts:cached
+      - ./app.config.ts:/app/app.config.ts:cached
+      - ./tsconfig.json:/app/tsconfig.json:cached
+      - ./prisma.config.ts:/app/prisma.config.ts:cached
+      - ./i18n:/app/i18n:cached
+      # Layer d'auth partagé (vit à la racine du repo, HORS du contexte de build d'app2).
+      # Monté pour que `extends: '../../layers/auth'` (→ /layers/auth dans le conteneur) résolve.
+      - ../../layers/auth:/layers/auth:cached
+      # node_modules et dossiers de build dans des volumes (pas synchronisés avec l'hôte)
+      - node_modules:/app/node_modules
+      - ./.nuxt:/app/.nuxt
+      - ./.output:/app/.output
+    ports:
+      - '3001:3000' # Application Nuxt
+      - '24678:24678' # Vite HMR
+    depends_on:
+      flowvent-db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
+  node_modules:
+    driver: local

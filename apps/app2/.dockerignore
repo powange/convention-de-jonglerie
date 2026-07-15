@@ -6,5 +6,12 @@ node_modules
 dist
 *.log
 Dockerfile
-docker-compose.yml
+docker-compose*.yml
 .dockerignore
+
+# Secrets : ne jamais embarquer dans l'image
+.env
+.env.*
+
+# Client Prisma généré (régénéré dans l'image)
+server/generated
