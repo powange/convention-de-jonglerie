@@ -10,6 +10,8 @@ import PasswordResetEmail from '../emails/PasswordResetEmail.vue'
 import VerificationEmail from '../emails/VerificationEmail.vue'
 import VolunteerScheduleEmail from '../emails/VolunteerScheduleEmail.vue'
 
+import { getBccRecipients } from './email-bcc'
+
 export interface EmailOptions {
   to: string
   subject: string
@@ -37,6 +39,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   const smtpUser = process.env.SMTP_USER || (config.smtpUser as string) || ''
   const smtpPass = process.env.SMTP_PASS || (config.smtpPass as string) || ''
   const smtpFrom = process.env.SMTP_FROM || (config.smtpFrom as string) || smtpUser
+  const smtpBcc = process.env.SMTP_BCC || (config.smtpBcc as string) || ''
 
   // Bloquer les envois vers les domaines de test
   const recipientDomain = options.to.split('@')[1]?.toLowerCase()
@@ -100,16 +103,35 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
     if (!transporter) return false
 
+    const bcc = getBccRecipients(smtpBcc, BLOCKED_EMAIL_DOMAINS)
+
     const mailOptions = {
       from: `"Juggling Convention" <${smtpFrom}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
       text: options.text,
+      ...(bcc.length > 0 ? { bcc } : {}),
     }
 
-    await transporter.sendMail(mailOptions)
-    console.log(`✅ Email envoyé à ${options.to}`)
+    const info = await transporter.sendMail(mailOptions)
+
+    // Nodemailer ne lève que si TOUS les destinataires sont rejetés. Avec une copie en BCC, un
+    // rejet du destinataire réel passerait donc pour un succès dès que la copie est acceptée,
+    // et une copie rejetée (quota, greylisting) donnerait une archive vide sans un bruit.
+    const rejected: string[] = (info.rejected || []).map((address) => String(address))
+    if (rejected.length > 0) {
+      console.error(`⚠️ Destinataires rejetés par le serveur SMTP : ${rejected.join(', ')}`)
+    }
+
+    const isRejected = (address: string) =>
+      rejected.some((r) => r.toLowerCase() === address.toLowerCase())
+
+    if (isRejected(options.to)) return false
+
+    console.log(
+      `✅ Email envoyé à ${options.to}${bcc.length > 0 ? ` (copie : ${bcc.join(', ')})` : ''}`
+    )
     return true
   } catch (error) {
     console.error('❌ Erreur envoi email:', error)
