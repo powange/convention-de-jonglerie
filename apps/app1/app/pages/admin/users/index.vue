@@ -156,8 +156,9 @@
 
       <!-- Pagination -->
       <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
+        <!-- page contrôlée : un changement de filtre remet currentPage à 1, le widget doit suivre -->
         <UPagination
-          :default-page="currentPage"
+          v-model:page="currentPage"
           :items-per-page="pagination.limit"
           :total="pagination.totalCount"
           @update:page="onPageChange"
@@ -227,8 +228,8 @@ useSeoMeta({
 })
 
 // Composables
-const route = useRoute()
 const router = useRouter()
+const { queryValue, queryEnum, queryBool, queryNumber, queryList } = useQueryFilters()
 
 // État réactif
 const loading = ref(false)
@@ -274,25 +275,14 @@ const DEFAULT_EMAIL_FILTER = 'all'
 const DEFAULT_SORT = 'createdAt:desc'
 
 // Filtres initialisés depuis l'URL, pour qu'un lien partagé restitue la vue telle quelle.
-// Chaque valeur est validée contre les options connues : une URL trafiquée retombe sur le défaut.
-const queryValue = (key: string) => {
-  const value = route.query[key]
-  return Array.isArray(value) ? value[0] : value
-}
-
-const queryEnum = (key: string, options: { value: string }[], fallback: string) => {
-  const value = queryValue(key)
-  return options.some((o) => o.value === value) ? (value as string) : fallback
-}
-
-const initialCategories = (queryValue('categories') || '').split(',')
+const initialCategories = queryList('categories')
 
 const searchQuery = ref(queryValue('search') || '')
 const adminFilter = ref(queryEnum('admin', adminFilterOptions, DEFAULT_ADMIN_FILTER))
 const emailFilter = ref(queryEnum('email', emailFilterOptions, DEFAULT_EMAIL_FILTER))
 const sortOption = ref(queryEnum('sort', sortOptions, DEFAULT_SORT))
-const currentPage = ref(Math.max(1, Number.parseInt(queryValue('page') || '1', 10) || 1))
-const onlineFilter = ref(queryValue('online') === 'true')
+const currentPage = ref(queryNumber('page', 1))
+const onlineFilter = ref(queryBool('online'))
 const categoryFilters = reactive(
   Object.fromEntries(CATEGORY_KEYS.map((k) => [k, initialCategories.includes(k)])) as Record<
     (typeof CATEGORY_KEYS)[number],

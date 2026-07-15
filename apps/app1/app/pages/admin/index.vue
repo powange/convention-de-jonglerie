@@ -128,18 +128,26 @@
         </UCard>
       </NuxtLink>
 
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.super_admins') }}
-            </p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.totalAdmins }}</p>
-            <p class="text-xs text-gray-500">{{ $t('admin.active_administrators') }}</p>
+      <NuxtLink
+        to="/admin/users?admin=admins"
+        class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        :aria-label="$t('admin.super_administrators')"
+      >
+        <UCard class="h-full hover:shadow-lg transition-shadow cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('admin.super_admins') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ stats.totalAdmins }}
+              </p>
+              <p class="text-xs text-gray-500">{{ $t('admin.active_administrators') }}</p>
+            </div>
+            <UIcon name="i-heroicons-shield-check" class="h-8 w-8 text-red-500" />
           </div>
-          <UIcon name="i-heroicons-shield-check" class="h-8 w-8 text-red-500" />
-        </div>
-      </UCard>
+        </UCard>
+      </NuxtLink>
 
       <NuxtLink
         to="/admin/feedback"

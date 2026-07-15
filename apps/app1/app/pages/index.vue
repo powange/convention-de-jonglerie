@@ -324,42 +324,40 @@ useIntersectionObserver(stickyBarSentinel, ([entry]) => {
 const { getTranslatedServices, getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const services = getTranslatedServices
 const servicesByCategory = getTranslatedServicesByCategory
+const { queryValue, queryEnum, queryBool } = useQueryFilters()
+
+const VIEW_MODES = [{ value: 'grid' }, { value: 'map' }, { value: 'agenda' }] as const
+
 // Initialiser le mode de vue depuis l'URL ou par défaut 'grid'
-const getInitialViewMode = (): 'grid' | 'map' | 'agenda' => {
-  const urlView = route.query.view as string
-  if (urlView === 'agenda' || urlView === 'map' || urlView === 'grid') {
-    return urlView
-  }
-  return 'grid'
-}
+const getInitialViewMode = (): 'grid' | 'map' | 'agenda' => queryEnum('view', VIEW_MODES, 'grid')
 
 const viewMode = ref<'grid' | 'map' | 'agenda'>(getInitialViewMode())
 
 // Fonction pour initialiser les filtres depuis l'URL
 const initFiltersFromUrl = () => {
-  const query = route.query
-
-  // Parser les pays avec gestion d'erreur
+  // Les pays sont sérialisés en JSON dans l'URL : format historique, conservé tel quel pour ne
+  // pas invalider les liens déjà partagés.
   let countries: string[] = []
-  if (query.countries) {
+  const rawCountries = queryValue('countries')
+  if (rawCountries) {
     try {
-      countries = JSON.parse(query.countries as string)
+      countries = JSON.parse(rawCountries)
     } catch {
       countries = []
     }
   }
 
   return {
-    name: (query.name as string) || '',
-    startDate: (query.startDate as string) || '',
-    endDate: (query.endDate as string) || '',
+    name: queryValue('name') || '',
+    startDate: queryValue('startDate') || '',
+    endDate: queryValue('endDate') || '',
     countries,
-    showPast: query.showPast ? query.showPast === 'true' : false,
-    showCurrent: query.showCurrent ? query.showCurrent === 'true' : true,
-    showFuture: query.showFuture ? query.showFuture === 'true' : true,
+    showPast: queryBool('showPast', false),
+    showCurrent: queryBool('showCurrent', true),
+    showFuture: queryBool('showFuture', true),
     // Initialiser les services depuis l'URL ou false par défaut
     ...Object.fromEntries(
-      services.value.map((service: any) => [service.key, query[service.key] === 'true'])
+      services.value.map((service: any) => [service.key, queryBool(service.key)])
     ),
   }
 }

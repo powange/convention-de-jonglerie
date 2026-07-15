@@ -484,8 +484,8 @@ import type { Convention } from '~/types'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
-const route = useRoute()
 const router = useRouter()
+const { queryValue, queryEnum } = useQueryFilters()
 
 // Métadonnées de la page
 definePageMeta({
@@ -521,19 +521,7 @@ const sortOptions = computed(() => [
 const DEFAULT_ARCHIVED_FILTER = 'all'
 const DEFAULT_SORT = 'name-asc'
 
-// Filtres initialisés depuis l'URL, pour qu'un lien partagé restitue la vue telle quelle.
-// Chaque valeur est validée contre les options connues : une URL trafiquée retombe sur le défaut.
-const queryValue = (key: string) => {
-  const value = route.query[key]
-  return Array.isArray(value) ? value[0] : value
-}
-
-const queryEnum = (key: string, options: { value: string }[], fallback: string) => {
-  const value = queryValue(key)
-  return options.some((o) => o.value === value) ? (value as string) : fallback
-}
-
-// État local
+// État local, initialisé depuis l'URL pour qu'un lien partagé restitue la vue telle quelle
 const searchQuery = ref(queryValue('search') || '')
 const debouncedSearchQuery = useDebounce(searchQuery, 300)
 const archivedFilter = ref(
