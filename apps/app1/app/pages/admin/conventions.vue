@@ -484,6 +484,8 @@ import type { Convention } from '~/types'
 
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
+const route = useRoute()
+const router = useRouter()
 
 // Métadonnées de la page
 definePageMeta({
@@ -495,20 +497,7 @@ useHead({
   title: computed(() => t('admin.conventions_management')),
 })
 
-// État local
-const searchQuery = ref('')
-const debouncedSearchQuery = useDebounce(searchQuery, 300)
-const archivedFilter = ref('all')
-const sortBy = ref('name-asc')
-const expandedConventions = ref<number[]>([])
-
-// État pour l'export JSON
-const showExportModal = ref(false)
-const exportedJson = ref('')
-const exportError = ref('')
-const copied = ref(false)
-
-// Options de filtre
+// Options de filtre (déclarées avant les filtres : elles servent aussi à valider l'URL)
 const archivedFilterOptions = computed(() => [
   { label: t('admin.filter_all_conventions'), value: 'all' },
   { label: t('admin.filter_active_conventions'), value: 'active' },
@@ -527,6 +516,53 @@ const sortOptions = computed(() => [
   { label: t('admin.sort.editions_desc'), value: 'editions-desc' },
   { label: t('admin.sort.editions_asc'), value: 'editions-asc' },
 ])
+
+// Valeurs par défaut : ce qui vaut le défaut est omis de l'URL, pour garder un lien court
+const DEFAULT_ARCHIVED_FILTER = 'all'
+const DEFAULT_SORT = 'name-asc'
+
+// Filtres initialisés depuis l'URL, pour qu'un lien partagé restitue la vue telle quelle.
+// Chaque valeur est validée contre les options connues : une URL trafiquée retombe sur le défaut.
+const queryValue = (key: string) => {
+  const value = route.query[key]
+  return Array.isArray(value) ? value[0] : value
+}
+
+const queryEnum = (key: string, options: { value: string }[], fallback: string) => {
+  const value = queryValue(key)
+  return options.some((o) => o.value === value) ? (value as string) : fallback
+}
+
+// État local
+const searchQuery = ref(queryValue('search') || '')
+const debouncedSearchQuery = useDebounce(searchQuery, 300)
+const archivedFilter = ref(
+  queryEnum('archived', archivedFilterOptions.value, DEFAULT_ARCHIVED_FILTER)
+)
+const sortBy = ref(queryEnum('sort', sortOptions.value, DEFAULT_SORT))
+const expandedConventions = ref<number[]>([])
+
+// Refléter les filtres dans l'URL pour qu'elle soit partageable.
+// On se cale sur la recherche debouncée, pas sur la saisie brute : chaque replace est une
+// navigation vue-router complète (middlewares inclus), donc un par caractère serait coûteux.
+// replace plutôt que push, sinon une saisie laisserait autant d'entrées d'historique que de mots.
+const updateUrlFromFilters = () => {
+  const query: Record<string, string> = {}
+
+  if (debouncedSearchQuery.value) query.search = debouncedSearchQuery.value
+  if (archivedFilter.value !== DEFAULT_ARCHIVED_FILTER) query.archived = archivedFilter.value
+  if (sortBy.value !== DEFAULT_SORT) query.sort = sortBy.value
+
+  router.replace({ query })
+}
+
+watch([debouncedSearchQuery, archivedFilter, sortBy], updateUrlFromFilters)
+
+// État pour l'export JSON
+const showExportModal = ref(false)
+const exportedJson = ref('')
+const exportError = ref('')
+const copied = ref(false)
 
 // Récupération des données
 const { data, pending, error, refresh } = await useLazyFetch('/api/admin/conventions')

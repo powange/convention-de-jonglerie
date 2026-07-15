@@ -227,7 +227,8 @@ useSeoMeta({
 })
 
 // Composables
-// const router = useRouter() // Supprimé car non utilisé
+const route = useRoute()
+const router = useRouter()
 
 // État réactif
 const loading = ref(false)
@@ -241,17 +242,63 @@ const pagination = ref<PaginationData>({
   hasPrevPage: false,
 })
 
-const searchQuery = ref('')
-const adminFilter = ref('all')
-const emailFilter = ref('all')
-const sortOption = ref('createdAt:desc')
-const currentPage = ref(1)
-const onlineFilter = ref(false)
-const categoryFilters = reactive({
-  volunteer: false,
-  artist: false,
-  organizer: false,
-})
+// Options de filtrage (déclarées avant les filtres : elles servent aussi à valider l'URL)
+const adminFilterOptions = [
+  { label: t('admin.all_users'), value: 'all' },
+  { label: t('admin.normal_users'), value: 'users' },
+  { label: t('admin.super_administrators'), value: 'admins' },
+]
+
+const emailFilterOptions = [
+  { label: t('admin.all_emails'), value: 'all' },
+  { label: t('admin.verified_emails'), value: 'verified' },
+  { label: t('admin.unverified_emails'), value: 'unverified' },
+]
+
+const sortOptions = [
+  { label: t('admin.newest_first'), value: 'createdAt:desc' },
+  { label: t('admin.oldest_first'), value: 'createdAt:asc' },
+  { label: t('admin.last_login_recent'), value: 'lastLoginAt:desc' },
+  { label: t('admin.last_login_oldest'), value: 'lastLoginAt:asc' },
+  { label: t('admin.name_a_z'), value: 'nom:asc' },
+  { label: t('admin.name_z_a'), value: 'nom:desc' },
+  { label: t('admin.email_a_z'), value: 'email:asc' },
+  { label: t('admin.email_z_a'), value: 'email:desc' },
+]
+
+const CATEGORY_KEYS = ['volunteer', 'artist', 'organizer'] as const
+
+// Valeurs par défaut : ce qui vaut le défaut est omis de l'URL, pour garder un lien court
+const DEFAULT_ADMIN_FILTER = 'all'
+const DEFAULT_EMAIL_FILTER = 'all'
+const DEFAULT_SORT = 'createdAt:desc'
+
+// Filtres initialisés depuis l'URL, pour qu'un lien partagé restitue la vue telle quelle.
+// Chaque valeur est validée contre les options connues : une URL trafiquée retombe sur le défaut.
+const queryValue = (key: string) => {
+  const value = route.query[key]
+  return Array.isArray(value) ? value[0] : value
+}
+
+const queryEnum = (key: string, options: { value: string }[], fallback: string) => {
+  const value = queryValue(key)
+  return options.some((o) => o.value === value) ? (value as string) : fallback
+}
+
+const initialCategories = (queryValue('categories') || '').split(',')
+
+const searchQuery = ref(queryValue('search') || '')
+const adminFilter = ref(queryEnum('admin', adminFilterOptions, DEFAULT_ADMIN_FILTER))
+const emailFilter = ref(queryEnum('email', emailFilterOptions, DEFAULT_EMAIL_FILTER))
+const sortOption = ref(queryEnum('sort', sortOptions, DEFAULT_SORT))
+const currentPage = ref(Math.max(1, Number.parseInt(queryValue('page') || '1', 10) || 1))
+const onlineFilter = ref(queryValue('online') === 'true')
+const categoryFilters = reactive(
+  Object.fromEntries(CATEGORY_KEYS.map((k) => [k, initialCategories.includes(k)])) as Record<
+    (typeof CATEGORY_KEYS)[number],
+    boolean
+  >
+)
 
 // État pour le modal de suppression
 const userToDelete = ref<AdminUserWithConnection | null>(null)
@@ -614,30 +661,6 @@ const columns = [
   },
 ]
 
-// Options de filtrage
-const adminFilterOptions = [
-  { label: t('admin.all_users'), value: 'all' },
-  { label: t('admin.normal_users'), value: 'users' },
-  { label: t('admin.super_administrators'), value: 'admins' },
-]
-
-const emailFilterOptions = [
-  { label: t('admin.all_emails'), value: 'all' },
-  { label: t('admin.verified_emails'), value: 'verified' },
-  { label: t('admin.unverified_emails'), value: 'unverified' },
-]
-
-const sortOptions = [
-  { label: t('admin.newest_first'), value: 'createdAt:desc' },
-  { label: t('admin.oldest_first'), value: 'createdAt:asc' },
-  { label: t('admin.last_login_recent'), value: 'lastLoginAt:desc' },
-  { label: t('admin.last_login_oldest'), value: 'lastLoginAt:asc' },
-  { label: t('admin.name_a_z'), value: 'nom:asc' },
-  { label: t('admin.name_z_a'), value: 'nom:desc' },
-  { label: t('admin.email_a_z'), value: 'email:asc' },
-  { label: t('admin.email_z_a'), value: 'email:desc' },
-]
-
 // Fonctions utilitaires
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString(undefined, {
@@ -989,8 +1012,17 @@ const debouncedSearch = () => {
   searchTimeout = setTimeout(() => {
     currentPage.value = 1
     fetchUsers()
+    // L'URL suit la recherche debouncée : chaque replace est une navigation vue-router
+    // complète (middlewares inclus), donc un par caractère serait coûteux.
+    updateUrlFromFilters()
   }, 300)
 }
+
+// Sans ce nettoyage, un tir tardif après démontage déclencherait un router.replace sur la
+// route quittée, ce qui annulerait silencieusement la navigation en cours.
+onUnmounted(() => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+})
 
 // Fonction pour gérer le changement de page
 const onPageChange = (page: number) => {
@@ -1100,4 +1132,29 @@ watch(categoryFilters, () => {
   currentPage.value = 1
   fetchUsers()
 })
+
+// Refléter les filtres dans l'URL pour qu'elle soit partageable.
+// Seules les valeurs non-défaut y figurent, et on utilise replace : sinon une saisie laisserait
+// autant d'entrées d'historique que de mots tapés.
+// La recherche n'est pas dans le watch ci-dessous : elle passe par debouncedSearch().
+const updateUrlFromFilters = () => {
+  const query: Record<string, string> = {}
+
+  if (searchQuery.value) query.search = searchQuery.value
+  if (adminFilter.value !== DEFAULT_ADMIN_FILTER) query.admin = adminFilter.value
+  if (emailFilter.value !== DEFAULT_EMAIL_FILTER) query.email = emailFilter.value
+  if (sortOption.value !== DEFAULT_SORT) query.sort = sortOption.value
+  if (currentPage.value > 1) query.page = currentPage.value.toString()
+  if (onlineFilter.value) query.online = 'true'
+
+  const categories = CATEGORY_KEYS.filter((k) => categoryFilters[k])
+  if (categories.length > 0) query.categories = categories.join(',')
+
+  router.replace({ query })
+}
+
+watch(
+  [adminFilter, emailFilter, sortOption, currentPage, onlineFilter, () => ({ ...categoryFilters })],
+  updateUrlFromFilters
+)
 </script>
