@@ -59,101 +59,141 @@
 
     <!-- Statistiques rapides -->
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.total_users') }}
-            </p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.totalUsers }}</p>
-            <p class="text-xs text-green-600">
-              {{ $t('admin.new_users_this_month', { count: stats.newUsersThisMonth }) }}
-            </p>
+      <NuxtLink
+        to="/admin/users"
+        class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        :aria-label="$t('admin.user_management')"
+      >
+        <UCard class="h-full hover:shadow-lg transition-shadow cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('admin.total_users') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.totalUsers }}</p>
+              <p class="text-xs text-green-600">
+                {{ $t('admin.new_users_this_month', { count: stats.newUsersThisMonth }) }}
+              </p>
+            </div>
+            <UIcon name="i-heroicons-users" class="h-8 w-8 text-blue-500" />
           </div>
-          <UIcon name="i-heroicons-users" class="h-8 w-8 text-blue-500" />
-        </div>
-      </UCard>
+        </UCard>
+      </NuxtLink>
 
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.conventions') }}
-            </p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
-              {{ stats.totalConventions }}
-            </p>
-            <p class="text-xs text-green-600">
-              {{ $t('admin.new_conventions_this_month', { count: stats.newConventionsThisMonth }) }}
-            </p>
+      <NuxtLink
+        to="/admin/conventions"
+        class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        :aria-label="$t('admin.conventions_management')"
+      >
+        <UCard class="h-full hover:shadow-lg transition-shadow cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('admin.conventions') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ stats.totalConventions }}
+              </p>
+              <p class="text-xs text-green-600">
+                {{
+                  $t('admin.new_conventions_this_month', { count: stats.newConventionsThisMonth })
+                }}
+              </p>
+            </div>
+            <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-purple-500" />
           </div>
-          <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-purple-500" />
-        </div>
-      </UCard>
+        </UCard>
+      </NuxtLink>
 
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.editions') }}
-            </p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
-              {{ stats.totalEditions }}
-            </p>
-            <p class="text-xs text-green-600">
-              {{ $t('admin.new_editions_this_month', { count: stats.newEditionsThisMonth }) }}
-            </p>
+      <NuxtLink
+        to="/admin/conventions"
+        class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        :aria-label="$t('admin.conventions_management')"
+      >
+        <UCard class="h-full hover:shadow-lg transition-shadow cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('admin.editions') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ stats.totalEditions }}
+              </p>
+              <p class="text-xs text-green-600">
+                {{ $t('admin.new_editions_this_month', { count: stats.newEditionsThisMonth }) }}
+              </p>
+            </div>
+            <UIcon name="i-heroicons-calendar" class="h-8 w-8 text-green-500" />
           </div>
-          <UIcon name="i-heroicons-calendar" class="h-8 w-8 text-green-500" />
-        </div>
-      </UCard>
+        </UCard>
+      </NuxtLink>
 
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.super_admins') }}
-            </p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ stats.totalAdmins }}</p>
-            <p class="text-xs text-gray-500">{{ $t('admin.active_administrators') }}</p>
+      <NuxtLink
+        to="/admin/users?admin=admins"
+        class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        :aria-label="$t('admin.super_administrators')"
+      >
+        <UCard class="h-full hover:shadow-lg transition-shadow cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('admin.super_admins') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ stats.totalAdmins }}
+              </p>
+              <p class="text-xs text-gray-500">{{ $t('admin.active_administrators') }}</p>
+            </div>
+            <UIcon name="i-heroicons-shield-check" class="h-8 w-8 text-red-500" />
           </div>
-          <UIcon name="i-heroicons-shield-check" class="h-8 w-8 text-red-500" />
-        </div>
-      </UCard>
+        </UCard>
+      </NuxtLink>
 
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.feedback.unresolved') }}
-            </p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
-              {{ stats.unresolvedFeedbacks }}
-            </p>
-            <p class="text-xs text-orange-600">
-              {{ $t('admin.feedback.require_attention') }}
-            </p>
+      <NuxtLink
+        to="/admin/feedback"
+        class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        :aria-label="$t('admin.feedback.title')"
+      >
+        <UCard class="h-full hover:shadow-lg transition-shadow cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('admin.feedback.unresolved') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ stats.unresolvedFeedbacks }}
+              </p>
+              <p class="text-xs text-orange-600">
+                {{ $t('admin.feedback.require_attention') }}
+              </p>
+            </div>
+            <UIcon name="i-heroicons-chat-bubble-left-ellipsis" class="h-8 w-8 text-green-500" />
           </div>
-          <UIcon name="i-heroicons-chat-bubble-left-ellipsis" class="h-8 w-8 text-green-500" />
-        </div>
-      </UCard>
+        </UCard>
+      </NuxtLink>
 
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {{ $t('admin.error_logs.unresolved') }}
-            </p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">
-              {{ stats.unresolvedErrorLogs }}
-            </p>
-            <p class="text-xs text-red-600">
-              {{ $t('admin.error_logs.need_investigation') }}
-            </p>
+      <NuxtLink
+        to="/admin/error-logs"
+        class="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+        :aria-label="$t('admin.api_error_logs')"
+      >
+        <UCard class="h-full hover:shadow-lg transition-shadow cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ $t('admin.error_logs.unresolved') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ stats.unresolvedErrorLogs }}
+              </p>
+              <p class="text-xs text-red-600">
+                {{ $t('admin.error_logs.need_investigation') }}
+              </p>
+            </div>
+            <UIcon name="i-heroicons-exclamation-triangle" class="h-8 w-8 text-red-500" />
           </div>
-          <UIcon name="i-heroicons-exclamation-triangle" class="h-8 w-8 text-red-500" />
-        </div>
-      </UCard>
+        </UCard>
+      </NuxtLink>
     </div>
 
     <!-- Navigation des outils d'administration -->
