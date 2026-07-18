@@ -1426,7 +1426,15 @@ const { execute: executeCreateNotification, loading: creatingNotification } = us
     silentSuccess: true,
     errorMessages: { default: "Impossible d'envoyer la notification" },
     onSuccess: async (result: any) => {
-      toast.add({ color: 'success', title: 'Notification envoyée', description: result.message })
+      // La notification peut être refusée par les préférences de la personne ciblée ; le toast
+      // ne doit alors pas annoncer un envoi. useApiAction ne transmet ici que `data`, d'où la
+      // lecture directe de `blocked` (et non de `result.data` ou `result.message`).
+      const blocked = !!result?.blocked
+      toast.add({
+        color: blocked ? 'warning' : 'success',
+        title: blocked ? 'Notification non envoyée' : 'Notification envoyée',
+        description: blocked ? result?.blockedReason : undefined,
+      })
       showCreateModal.value = false
       resetCreateForm()
       await executeLoadStats()
