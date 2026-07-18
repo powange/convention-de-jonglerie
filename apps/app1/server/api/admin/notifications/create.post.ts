@@ -45,6 +45,10 @@ export default wrapApiHandler(
     const notification = await NotificationService.create({
       userId: targetUserId,
       type: parsed.type as any,
+      // Sans notificationType, NotificationService n'envoie que la notification in-app et le push :
+      // tout le bloc d'envoi d'email est conditionné à ce champ. En contrepartie, le type soumet
+      // aussi l'envoi aux préférences de la personne ciblée, qui peut donc le refuser.
+      notificationType: 'system_notification',
       // Utiliser titleText/messageText en priorité, sinon les anciens champs
       titleText: parsed.titleText || parsed.title,
       messageText: parsed.messageText || parsed.message,
@@ -55,7 +59,26 @@ export default wrapApiHandler(
       actionText: parsed.actionText,
     })
 
-    return createSuccessResponse({ notification, targetUser }, 'Notification créée avec succès')
+    // create() renvoie null quand la personne ciblée a désactivé les notifications système :
+    // rien n'est créé, il ne faut donc pas annoncer un envoi réussi.
+    // L'état est porté par `data` et non par `message` : côté client, useApiAction déballe
+    // l'enveloppe et ne transmet que `data` à onSuccess.
+    if (!notification) {
+      return createSuccessResponse(
+        {
+          notification: null,
+          targetUser,
+          blocked: true,
+          blockedReason: `${targetUser.pseudo} a désactivé les notifications système`,
+        },
+        'Notification non envoyée'
+      )
+    }
+
+    return createSuccessResponse(
+      { notification, targetUser, blocked: false },
+      'Notification créée avec succès'
+    )
   },
   { operationName: 'CreateAdminNotification' }
 )
