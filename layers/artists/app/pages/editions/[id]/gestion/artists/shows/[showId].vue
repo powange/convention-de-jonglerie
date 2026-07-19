@@ -67,17 +67,17 @@ onBeforeRouteLeave(() => {
   return confirm(t('gestion.shows.leave_confirm'))
 })
 
-// Il n'existe pas d'endpoint unitaire pour un spectacle : on prend celui de la liste,
-// qui renvoie déjà la composition complète (artistes et numéros).
-const { execute: fetchShow } = useApiAction(() => `/api/editions/${editionId.value}/shows`, {
-  method: 'GET',
-  silentSuccess: true,
-  errorMessages: { default: t('gestion.shows.error_loading') },
-  onSuccess: (result: any) => {
-    const shows = result?.shows ?? []
-    show.value = shows.find((s: any) => s.id === showId.value) ?? null
-  },
-})
+const { execute: fetchShow } = useApiAction(
+  () => `/api/editions/${editionId.value}/shows/${showId.value}`,
+  {
+    method: 'GET',
+    silentSuccess: true,
+    errorMessages: { default: t('gestion.shows.error_loading') },
+    onSuccess: (result: any) => {
+      show.value = result?.show ?? null
+    },
+  }
+)
 
 onMounted(async () => {
   if (!edition.value || edition.value.id !== editionId.value) {

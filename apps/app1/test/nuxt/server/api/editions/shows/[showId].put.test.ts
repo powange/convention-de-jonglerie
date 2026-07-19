@@ -103,6 +103,10 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
     beforeEach(() => {
       prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
       prismaMock.show.findFirst.mockResolvedValue(mockExistingShow)
+      // La réponse est relue en fin de transaction, une fois la composition réécrite
+      prismaMock.show.findUniqueOrThrow.mockImplementation(() =>
+        Promise.resolve(prismaMock.show.update.mock.results.at(-1)?.value ?? mockUpdatedShow)
+      )
     })
 
     it('devrait mettre à jour le titre', async () => {
@@ -193,6 +197,15 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       })
     })
 
+    it('devrait refuser artistIds seul sur un cabaret', async () => {
+      // Sans acts, la recomposition effacerait tout le déroulé sans que l'appelant s'en doute
+      prismaMock.show.findFirst.mockResolvedValue({ id: 1, editionId: 1, type: 'CABARET' })
+      global.readBody.mockResolvedValue({ artistIds: [2] })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toThrow(/numéros/i)
+      expect(prismaMock.showAct.deleteMany).not.toHaveBeenCalled()
+    })
+
     it('devrait effacer les numéros quand un cabaret repasse en spectacle standard', async () => {
       prismaMock.show.update.mockResolvedValue(mockUpdatedShow)
       // Le spectacle existant est un cabaret
@@ -222,15 +235,13 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       expect(prismaMock.showHandoutItem.deleteMany).toHaveBeenCalledWith({
         where: { showId: 1 },
       })
-      expect(prismaMock.show.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            handoutItems: {
-              create: [{ handoutItemId: 4 }, { handoutItemId: 5 }],
-            },
-          }),
-        })
-      )
+      expect(prismaMock.showHandoutItem.deleteMany).toHaveBeenCalledWith({ where: { showId: 1 } })
+      expect(prismaMock.showHandoutItem.createMany).toHaveBeenCalledWith({
+        data: [
+          { showId: 1, handoutItemId: 4 },
+          { showId: 1, handoutItemId: 5 },
+        ],
+      })
     })
   })
 

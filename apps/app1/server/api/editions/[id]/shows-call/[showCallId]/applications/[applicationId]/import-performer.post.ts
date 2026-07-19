@@ -217,13 +217,23 @@ export default wrapApiHandler(
       }
     }
 
-    // Si la candidature est liée à un Show et que le lien n'existe pas, le créer
+    // Si la candidature est liée à un Show et que le lien n'existe pas, le créer.
+    // Un spectacle cabaret est exclu : ses artistes vivent dans ses numéros, et un lien posé
+    // au niveau du spectacle serait invisible dans le formulaire puis effacé au premier
+    // enregistrement. L'organisateur ajoute l'artiste au numéro voulu depuis la page du
+    // spectacle.
     let showLinkCreated = false
-    if (application.showId) {
+    const targetShow = application.showId
+      ? await prisma.show.findUnique({
+          where: { id: application.showId },
+          select: { type: true },
+        })
+      : null
+
+    if (application.showId && targetShow?.type !== 'CABARET') {
       // findFirst et non findUnique : la clé unique porte désormais aussi actId, et MySQL
       // considère deux NULL comme distincts — l'unicité des liens sans numéro est donc
-      // garantie ici, pas par le schéma. Le lien est créé au niveau du spectacle ; sur un
-      // cabaret, l'organisateur rattache ensuite l'artiste au numéro voulu.
+      // garantie ici, pas par le schéma.
       const existingLink = await prisma.showArtist.findFirst({
         where: { showId: application.showId, actId: null, artistId: artist.id },
       })

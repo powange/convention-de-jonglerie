@@ -8,7 +8,9 @@ import type { Prisma } from '@prisma/client'
  * les trous et les doublons qu'un champ libre finirait par produire.
  */
 export const showActSchema = z.object({
-  title: z.string().min(1, 'Le titre du numéro est requis').max(255),
+  // 191 et non 255 : c'est la taille de la colonne, un titre plus long ferait échouer
+  // l'écriture au milieu de la recomposition
+  title: z.string().min(1, 'Le titre du numéro est requis').max(191),
   duration: z.number().int().positive().max(1440).optional().nullable(),
   description: z.string().max(2000).optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional().default([]),

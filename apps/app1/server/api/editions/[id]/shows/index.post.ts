@@ -10,7 +10,7 @@ import { replaceShowComposition, showActSchema } from '#server/utils/show-acts'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const showSchema = z.object({
-  title: z.string().min(1, 'Le titre est requis'),
+  title: z.string().min(1, 'Le titre est requis').max(191),
   type: z.enum(['STANDARD', 'CABARET']).optional().default('STANDARD'),
   description: z.string().optional().nullable(),
   startDateTime: z.string().datetime(),
@@ -60,35 +60,40 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = showSchema.parse(body)
 
-    // Créer le spectacle (sans image pour obtenir l'ID)
-    const show = await prisma.show.create({
-      data: {
-        editionId,
-        title: validatedData.title,
-        type: validatedData.type,
-        description: validatedData.description,
-        startDateTime: new Date(validatedData.startDateTime),
-        duration: validatedData.duration,
-        location: validatedData.location,
-        zoneId: validatedData.zoneId || null,
-        markerId: validatedData.markerId || null,
-        isPublic: validatedData.isPublic,
-        handoutItems: {
-          create: validatedData.handoutItemIds.map((handoutItemId) => ({
-            handoutItemId,
-          })),
+    // Création et composition dans la même transaction : un numéro invalide ne doit pas
+    // laisser derrière lui un spectacle à moitié constitué.
+    const show = await prisma.$transaction(async (tx) => {
+      const created = await tx.show.create({
+        data: {
+          editionId,
+          title: validatedData.title,
+          type: validatedData.type,
+          description: validatedData.description,
+          startDateTime: new Date(validatedData.startDateTime),
+          duration: validatedData.duration,
+          location: validatedData.location,
+          zoneId: validatedData.zoneId || null,
+          markerId: validatedData.markerId || null,
+          isPublic: validatedData.isPublic,
+          handoutItems: {
+            create: validatedData.handoutItemIds.map((handoutItemId) => ({
+              handoutItemId,
+            })),
+          },
         },
-      },
-    })
+      })
 
-    // Les numéros ont besoin de l'id du spectacle, d'où cette seconde étape
-    await replaceShowComposition(
-      prisma,
-      show.id,
-      validatedData.type,
-      validatedData.artistIds,
-      validatedData.acts
-    )
+      // Les numéros ont besoin de l'id du spectacle, d'où cette seconde étape
+      await replaceShowComposition(
+        tx,
+        created.id,
+        validatedData.type,
+        validatedData.artistIds,
+        validatedData.acts
+      )
+
+      return created
+    })
 
     // Gérer l'image avec le helper centralisé
     const finalImageFilename = await handleFileUpload(validatedData.imageUrl, null, {
