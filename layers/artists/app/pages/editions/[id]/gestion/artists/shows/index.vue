@@ -34,12 +34,7 @@
         <template #header>
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold">{{ $t('gestion.shows.title') }}</h2>
-            <UButton
-              v-if="canEdit"
-              color="primary"
-              icon="i-heroicons-plus"
-              @click="openAddShowModal"
-            >
+            <UButton v-if="canEdit" color="primary" icon="i-heroicons-plus" @click="goToAddShow">
               {{ $t('gestion.shows.add_show') }}
             </UButton>
           </div>
@@ -123,13 +118,45 @@
                       class="w-12 h-12 object-cover rounded-lg shrink-0"
                     />
                     <div>
-                      <div class="font-medium">{{ show.title }}</div>
+                      <div class="font-medium flex items-center gap-2">
+                        {{ show.title }}
+                        <UBadge
+                          v-if="show.type === 'CABARET'"
+                          color="info"
+                          variant="subtle"
+                          size="sm"
+                        >
+                          {{ $t('gestion.shows.type_cabaret') }}
+                        </UBadge>
+                      </div>
                       <div
                         v-if="show.description"
                         class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1"
                       >
                         {{ show.description }}
                       </div>
+                      <!-- Déroulé du cabaret : chaque numéro avec ses artistes -->
+                      <ol
+                        v-if="show.type === 'CABARET' && show.acts?.length"
+                        class="text-xs text-gray-500 dark:text-gray-400 mt-2 space-y-0.5 list-decimal list-inside"
+                      >
+                        <li v-for="act in show.acts" :key="act.id">
+                          {{ act.title }}
+                          <span v-if="act.duration" class="text-gray-400">
+                            · {{ act.duration }} min
+                          </span>
+                          <span v-if="act.artists?.length" class="text-gray-400">
+                            —
+                            {{
+                              act.artists
+                                .map((sa) =>
+                                  `${sa.artist.user.prenom} ${sa.artist.user.nom}`.trim()
+                                )
+                                .join(', ')
+                            }}
+                          </span>
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </td>
@@ -169,15 +196,15 @@
                   </div>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                  <div v-if="show.artists && show.artists.length > 0" class="flex flex-wrap gap-1">
+                  <div v-if="uniqueArtists(show).length > 0" class="flex flex-wrap gap-1">
                     <UBadge
-                      v-for="showArtist in show.artists"
-                      :key="showArtist.artist.id"
+                      v-for="artist in uniqueArtists(show)"
+                      :key="artist.id"
                       color="yellow"
                       variant="subtle"
                       size="sm"
                     >
-                      <UiUserName :user="showArtist.artist.user" />
+                      <UiUserName :user="artist.user" />
                     </UBadge>
                   </div>
                   <span v-else class="text-gray-400">{{
@@ -201,7 +228,7 @@
                       color="primary"
                       variant="ghost"
                       size="sm"
-                      @click="openEditShowModal(show)"
+                      @click="goToEditShow(show)"
                     />
                     <UButton
                       icon="i-heroicons-trash"
@@ -245,14 +272,6 @@
       </UCard>
     </div>
 
-    <!-- Modal spectacle -->
-    <ShowsShowModal
-      v-model="showShowModal"
-      :show="selectedShow"
-      :edition-id="editionId"
-      @show-saved="handleShowSaved"
-    />
-
     <!-- Modal confirmation suppression -->
     <UiConfirmModal
       v-model="showDeleteConfirm"
@@ -270,6 +289,7 @@ definePageMeta({
 })
 
 const route = useRoute()
+const router = useRouter()
 const { t, locale } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -293,8 +313,6 @@ const canEdit = computed(() => canAccess.value)
 
 // Données
 const shows = ref<any[]>([])
-const showShowModal = ref(false)
-const selectedShow = ref<any>(null)
 const showDeleteConfirm = ref(false)
 const showToDelete = ref<any>(null)
 
@@ -307,6 +325,19 @@ const sortedShows = computed(() => {
     return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
   })
 })
+
+// Sur un cabaret, un artiste présent dans plusieurs numéros a autant de liens : on ne
+// l'affiche qu'une fois dans la colonne « Artistes » du spectacle.
+const uniqueArtists = (show: any) => {
+  const seen = new Set<number>()
+  return (show.artists ?? [])
+    .map((showArtist: any) => showArtist.artist)
+    .filter((artist: any) => {
+      if (!artist || seen.has(artist.id)) return false
+      seen.add(artist.id)
+      return true
+    })
+}
 
 // Charger l'édition
 onMounted(async () => {
@@ -328,22 +359,13 @@ const { execute: fetchShows, loading } = useApiAction(
   }
 )
 
-// Ouvrir le modal d'ajout
-const openAddShowModal = () => {
-  selectedShow.value = null
-  showShowModal.value = true
-}
+// Ajout et édition passent par une page dédiée : le formulaire d'un cabaret peut contenir
+// une dizaine de numéros, ce qu'une modale ne peut pas présenter lisiblement.
+const showsPath = computed(() => `/editions/${editionId.value}/gestion/artists/shows`)
 
-// Ouvrir le modal d'édition
-const openEditShowModal = (show: any) => {
-  selectedShow.value = show
-  showShowModal.value = true
-}
+const goToAddShow = () => router.push(`${showsPath.value}/new`)
 
-// Gérer la sauvegarde
-const handleShowSaved = () => {
-  fetchShows()
-}
+const goToEditShow = (show: any) => router.push(`${showsPath.value}/${show.id}`)
 
 // --- Export PDF des besoins techniques ---
 interface TechnicalApplication {
