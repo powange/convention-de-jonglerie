@@ -198,18 +198,62 @@ describe('/api/editions/[id]/shows POST', () => {
 
       await handler(mockEvent as any)
 
+      // Les articles restent créés avec le spectacle ; les artistes passent par une seconde
+      // étape, les numéros d'un cabaret ayant besoin de l'id du spectacle
       expect(prismaMock.show.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            artists: {
-              create: [{ artistId: 1 }, { artistId: 2 }],
-            },
+            type: 'STANDARD',
             handoutItems: {
               create: [{ handoutItemId: 3 }, { handoutItemId: 4 }],
             },
           }),
         })
       )
+      expect(prismaMock.showArtist.createMany).toHaveBeenCalledWith({
+        data: [
+          { showId: 10, artistId: 1 },
+          { showId: 10, artistId: 2 },
+        ],
+      })
+    })
+
+    it('devrait créer les numéros et leurs artistes pour un cabaret', async () => {
+      global.readBody.mockResolvedValue({
+        ...validBody,
+        type: 'CABARET',
+        acts: [
+          { title: 'Diabolo', duration: 6, artistIds: [1, 2] },
+          { title: 'Massues', artistIds: [2] },
+        ],
+      })
+      prismaMock.showAct.create.mockImplementation(({ data }: any) =>
+        Promise.resolve({ id: data.position === 0 ? 100 : 101, ...data })
+      )
+
+      await handler({ context: { user: mockUser } } as any)
+
+      // La position vient de l'ordre du tableau
+      expect(prismaMock.showAct.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ showId: 10, title: 'Diabolo', position: 0, duration: 6 }),
+        })
+      )
+      expect(prismaMock.showAct.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ title: 'Massues', position: 1, duration: null }),
+        })
+      )
+      // showId est renseigné en plus de actId, pour que l'artiste reste rattaché au spectacle
+      expect(prismaMock.showArtist.createMany).toHaveBeenCalledWith({
+        data: [
+          { showId: 10, actId: 100, artistId: 1 },
+          { showId: 10, actId: 100, artistId: 2 },
+        ],
+      })
+      expect(prismaMock.showArtist.createMany).toHaveBeenCalledWith({
+        data: [{ showId: 10, actId: 101, artistId: 2 }],
+      })
     })
   })
 

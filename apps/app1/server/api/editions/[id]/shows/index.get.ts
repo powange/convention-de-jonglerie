@@ -1,7 +1,7 @@
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
-import { showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -20,23 +20,7 @@ export default wrapApiHandler(
     const shows = await prisma.show.findMany({
       where: { editionId },
       include: {
-        artists: {
-          include: {
-            artist: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    email: true,
-                    prenom: true,
-                    nom: true,
-                    pronouns: true,
-                  },
-                },
-              },
-            },
-          },
-        },
+        ...showCompositionInclude,
         handoutItems: {
           include: {
             handoutItem: {

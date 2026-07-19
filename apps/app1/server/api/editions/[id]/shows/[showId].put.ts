@@ -5,11 +5,13 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
-import { showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import { replaceShowComposition, showActSchema } from '#server/utils/show-acts'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const updateShowSchema = z.object({
   title: z.string().min(1, 'Le titre est requis').optional(),
+  type: z.enum(['STANDARD', 'CABARET']).optional(),
   description: z.string().optional().nullable(),
   startDateTime: z.string().datetime().optional(),
   duration: z.number().int().positive().optional().nullable(),
@@ -18,6 +20,7 @@ const updateShowSchema = z.object({
   zoneId: z.number().int().positive().optional().nullable(),
   markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional(),
+  acts: z.array(showActSchema).optional(),
   handoutItemIds: z.array(z.number().int().positive()).optional(),
   isPublic: z.boolean().optional(),
 })
@@ -75,6 +78,7 @@ export default wrapApiHandler(
     const updateData: any = {}
 
     if (validatedData.title !== undefined) updateData.title = validatedData.title
+    if (validatedData.type !== undefined) updateData.type = validatedData.type
     if (validatedData.description !== undefined) updateData.description = validatedData.description
     if (validatedData.startDateTime !== undefined)
       updateData.startDateTime = new Date(validatedData.startDateTime)
@@ -98,21 +102,21 @@ export default wrapApiHandler(
         finalImageFilename !== undefined ? finalImageFilename : existingShow.imageUrl
     }
 
-    // Si des artistIds sont fournis, mettre à jour les associations
-    if (validatedData.artistIds !== undefined) {
-      // Supprimer les anciennes associations
-      await prisma.showArtist.deleteMany({
-        where: { showId },
-      })
-
-      // Créer les nouvelles associations
-      if (validatedData.artistIds.length > 0) {
-        updateData.artists = {
-          create: validatedData.artistIds.map((artistId) => ({
-            artistId,
-          })),
-        }
-      }
+    // Recomposer artistes et numéros dès que l'un des trois champs est fourni : ils sont liés,
+    // et le type détermine laquelle des deux formes est conservée.
+    const composedType = validatedData.type ?? existingShow.type
+    if (
+      validatedData.artistIds !== undefined ||
+      validatedData.acts !== undefined ||
+      (validatedData.type !== undefined && validatedData.type !== existingShow.type)
+    ) {
+      await replaceShowComposition(
+        prisma,
+        showId,
+        composedType,
+        validatedData.artistIds ?? [],
+        validatedData.acts ?? []
+      )
     }
 
     // Si des handoutItemIds sont fournis, mettre à jour les associations
@@ -137,22 +141,7 @@ export default wrapApiHandler(
       where: { id: showId },
       data: updateData,
       include: {
-        artists: {
-          include: {
-            artist: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    email: true,
-                    prenom: true,
-                    nom: true,
-                  },
-                },
-              },
-            },
-          },
-        },
+        ...showCompositionInclude,
         handoutItems: {
           include: {
             handoutItem: {

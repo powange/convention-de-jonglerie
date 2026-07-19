@@ -220,8 +220,12 @@ export default wrapApiHandler(
     // Si la candidature est liée à un Show et que le lien n'existe pas, le créer
     let showLinkCreated = false
     if (application.showId) {
-      const existingLink = await prisma.showArtist.findUnique({
-        where: { showId_artistId: { showId: application.showId, artistId: artist.id } },
+      // findFirst et non findUnique : la clé unique porte désormais aussi actId, et MySQL
+      // considère deux NULL comme distincts — l'unicité des liens sans numéro est donc
+      // garantie ici, pas par le schéma. Le lien est créé au niveau du spectacle ; sur un
+      // cabaret, l'organisateur rattache ensuite l'artiste au numéro voulu.
+      const existingLink = await prisma.showArtist.findFirst({
+        where: { showId: application.showId, actId: null, artistId: artist.id },
       })
       if (!existingLink) {
         await prisma.showArtist.create({

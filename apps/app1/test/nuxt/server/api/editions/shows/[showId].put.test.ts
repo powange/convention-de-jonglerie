@@ -179,16 +179,33 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
 
       await handler(mockEvent as any)
 
+      // La composition est réécrite hors du show.update : les numéros d'un cabaret
+      // se créent en plusieurs étapes
+      expect(prismaMock.showAct.deleteMany).toHaveBeenCalledWith({ where: { showId: 1 } })
       expect(prismaMock.showArtist.deleteMany).toHaveBeenCalledWith({
         where: { showId: 1 },
       })
+      expect(prismaMock.showArtist.createMany).toHaveBeenCalledWith({
+        data: [
+          { showId: 1, artistId: 2 },
+          { showId: 1, artistId: 3 },
+        ],
+      })
+    })
+
+    it('devrait effacer les numéros quand un cabaret repasse en spectacle standard', async () => {
+      prismaMock.show.update.mockResolvedValue(mockUpdatedShow)
+      // Le spectacle existant est un cabaret
+      prismaMock.show.findFirst.mockResolvedValue({ id: 1, editionId: 1, type: 'CABARET' })
+
+      global.readBody.mockResolvedValue({ type: 'STANDARD' })
+
+      await handler({ context: { user: mockUser } } as any)
+
+      expect(prismaMock.showAct.deleteMany).toHaveBeenCalledWith({ where: { showId: 1 } })
       expect(prismaMock.show.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
-            artists: {
-              create: [{ artistId: 2 }, { artistId: 3 }],
-            },
-          }),
+          data: expect.objectContaining({ type: 'STANDARD' }),
         })
       )
     })
