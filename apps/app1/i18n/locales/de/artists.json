@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "z. B.: 80,00",
     "consumables_paid": "Verbrauchsmaterial erstattet",
     "consumables_pending": "Verbrauchsmaterial ausstehend",
-    "consumables_status": "Status Verbrauchsmaterial"
+    "consumables_status": "Status Verbrauchsmaterial",
+    "validation": {
+      "amount_invalid": "Ungültiger Betrag (Zahl zwischen 0 und 100000)",
+      "consumables_exceeds": "Das tatsächliche Verbrauchsmaterial darf das Maximum nicht überschreiten",
+      "email_invalid": "Ungültige E-Mail-Adresse",
+      "email_required": "E-Mail ist erforderlich",
+      "firstname_required": "Vorname ist erforderlich",
+      "lastname_required": "Nachname ist erforderlich",
+      "reimbursement_exceeds": "Die tatsächlichen Fahrtkosten dürfen das Maximum nicht überschreiten",
+      "too_long": "Dieses Feld darf {max} Zeichen nicht überschreiten",
+      "max_required_with_actual": "Ein Maximum ist erforderlich, solange ein tatsächlicher Betrag angegeben ist"
+    }
   }
 }

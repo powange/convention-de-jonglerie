@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "Ex: 80.00",
     "consumables_paid": "Consumables reimbursed",
     "consumables_pending": "Consumables pending",
-    "consumables_status": "Consumables status"
+    "consumables_status": "Consumables status",
+    "validation": {
+      "amount_invalid": "Invalid amount (number between 0 and 100000)",
+      "consumables_exceeds": "Actual consumables cannot exceed the maximum",
+      "email_invalid": "Invalid email address",
+      "email_required": "Email is required",
+      "firstname_required": "First name is required",
+      "lastname_required": "Last name is required",
+      "reimbursement_exceeds": "Actual travel expenses cannot exceed the maximum",
+      "too_long": "This field cannot exceed {max} characters",
+      "max_required_with_actual": "A maximum is required as long as an actual amount is set"
+    }
   }
 }

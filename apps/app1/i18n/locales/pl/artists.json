@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "Np.: 80,00",
     "consumables_paid": "Materiały zużywalne zwrócone",
     "consumables_pending": "Materiały zużywalne oczekujące",
-    "consumables_status": "Status materiałów zużywalnych"
+    "consumables_status": "Status materiałów zużywalnych",
+    "validation": {
+      "amount_invalid": "Nieprawidłowa kwota (liczba od 0 do 100000)",
+      "consumables_exceeds": "Rzeczywiste materiały zużywalne nie mogą przekraczać maksimum",
+      "email_invalid": "Nieprawidłowy adres e-mail",
+      "email_required": "E-mail jest wymagany",
+      "firstname_required": "Imię jest wymagane",
+      "lastname_required": "Nazwisko jest wymagane",
+      "reimbursement_exceeds": "Rzeczywiste koszty podróży nie mogą przekraczać maksimum",
+      "too_long": "To pole nie może przekraczać {max} znaków",
+      "max_required_with_actual": "Maksimum jest wymagane, dopóki podana jest kwota rzeczywista"
+    }
   }
 }

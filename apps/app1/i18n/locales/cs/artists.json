@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "Např.: 80,00",
     "consumables_paid": "Spotřební materiál uhrazen",
     "consumables_pending": "Spotřební materiál čeká na úhradu",
-    "consumables_status": "Stav spotřebního materiálu"
+    "consumables_status": "Stav spotřebního materiálu",
+    "validation": {
+      "amount_invalid": "Neplatná částka (číslo mezi 0 a 100000)",
+      "consumables_exceeds": "Skutečný spotřební materiál nesmí překročit maximum",
+      "email_invalid": "Neplatná e-mailová adresa",
+      "email_required": "E-mail je povinný",
+      "firstname_required": "Jméno je povinné",
+      "lastname_required": "Příjmení je povinné",
+      "reimbursement_exceeds": "Skutečné cestovné nesmí překročit maximum",
+      "too_long": "Toto pole nesmí překročit {max} znaků",
+      "max_required_with_actual": "Maximum je povinné, dokud je uvedena skutečná částka"
+    }
   }
 }

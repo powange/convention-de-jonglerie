@@ -1,7 +1,13 @@
 <template>
   <UModal v-model:open="isOpen" :title="title">
     <template #body>
-      <form class="space-y-5" @submit.prevent="handleSubmit">
+      <UForm
+        :schema="validationSchema"
+        :state="formData"
+        class="space-y-5"
+        @submit="handleSubmit"
+        @error="onValidationError"
+      >
         <!-- Sélection utilisateur existant OU création nouveau (mode ajout) -->
         <div v-if="!artist" class="space-y-4">
           <UFormField :label="$t('artists.search_user')">
@@ -26,7 +32,7 @@
             </div>
           </div>
 
-          <UFormField :label="$t('artists.user_email')">
+          <UFormField name="email" :label="$t('artists.user_email')">
             <UInput
               v-model="formData.email"
               type="email"
@@ -37,7 +43,7 @@
           </UFormField>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField :label="$t('artists.user_firstname')">
+            <UFormField name="prenom" :label="$t('artists.user_firstname')">
               <UInput
                 v-model="formData.prenom"
                 :placeholder="$t('artists.user_firstname')"
@@ -45,7 +51,7 @@
               />
             </UFormField>
 
-            <UFormField :label="$t('artists.user_lastname')">
+            <UFormField name="nom" :label="$t('artists.user_lastname')">
               <UInput
                 v-model="formData.nom"
                 :placeholder="$t('artists.user_lastname')"
@@ -67,7 +73,7 @@
             </h3>
           </div>
 
-          <UFormField :label="$t('artists.user_email')">
+          <UFormField name="email" :label="$t('artists.user_email')">
             <UInput
               v-model="formData.email"
               type="email"
@@ -104,7 +110,7 @@
           </UAlert>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField :label="$t('artists.user_firstname')">
+            <UFormField name="prenom" :label="$t('artists.user_firstname')">
               <UInput
                 v-model="formData.prenom"
                 :placeholder="$t('artists.user_firstname')"
@@ -112,7 +118,7 @@
               />
             </UFormField>
 
-            <UFormField :label="$t('artists.user_lastname')">
+            <UFormField name="nom" :label="$t('artists.user_lastname')">
               <UInput
                 v-model="formData.nom"
                 :placeholder="$t('artists.user_lastname')"
@@ -205,7 +211,7 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField :label="$t('artists.payment_amount')">
+            <UFormField name="payment" :label="$t('artists.payment_amount')">
               <UInput
                 v-model="formData.payment"
                 type="number"
@@ -225,7 +231,7 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField :label="$t('artists.reimbursement_max')">
+            <UFormField name="reimbursementMax" :label="$t('artists.reimbursement_max')">
               <UInput
                 v-model="formData.reimbursementMax"
                 type="number"
@@ -239,7 +245,7 @@
               </UInput>
             </UFormField>
 
-            <UFormField :label="$t('artists.reimbursement_actual')">
+            <UFormField name="reimbursementActual" :label="$t('artists.reimbursement_actual')">
               <UInput
                 v-model="formData.reimbursementActual"
                 type="number"
@@ -265,7 +271,7 @@
           </UFormField>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <UFormField :label="$t('artists.consumables_max')">
+            <UFormField name="consumablesMax" :label="$t('artists.consumables_max')">
               <UInput
                 v-model="formData.consumablesMax"
                 type="number"
@@ -279,7 +285,7 @@
               </UInput>
             </UFormField>
 
-            <UFormField :label="$t('artists.consumables_actual')">
+            <UFormField name="consumablesActual" :label="$t('artists.consumables_actual')">
               <UInput
                 v-model="formData.consumablesActual"
                 type="number"
@@ -331,6 +337,7 @@
 
           <UFormField
             v-if="formData.accommodationType === 'OTHER'"
+            name="accommodationTypeOther"
             :label="$t('artists.accommodation_type_other')"
           >
             <UInput
@@ -477,12 +484,14 @@
             {{ artist ? $t('common.save') : $t('common.add') }}
           </UButton>
         </div>
-      </form>
+      </UForm>
     </template>
   </UModal>
 </template>
 
 <script setup lang="ts">
+import { z } from 'zod'
+
 import {
   getAccommodationTypeSelectOptions,
   getAllergySeveritySelectOptions,
@@ -569,6 +578,108 @@ const existingUserMatch = ref<{
   prenom?: string | null
   nom?: string | null
 } | null>(null)
+
+// L'identité (email/prénom/nom) n'est requise que lorsqu'on définit un utilisateur à la main :
+// à l'ajout sans compte sélectionné, ou à l'édition d'un utilisateur MANUAL non rattaché.
+const requiresIdentity = computed(() => {
+  if (!props.artist) return !selectedUser.value
+  return isManualUser.value && !existingUserMatch.value
+})
+
+// Un montant est renseigné (ni vide, ni null)
+const hasAmount = (v: unknown) => v !== '' && v !== null && v !== undefined
+
+// Schéma de validation côté front, reflet des règles du serveur. UInput type="number" renvoie
+// tantôt une chaîne (champ vide initial), tantôt un nombre (après saisie) : le schéma accepte
+// les deux.
+const validationSchema = computed(() => {
+  const amount = z
+    .union([z.string(), z.number()])
+    .nullable()
+    .optional()
+    .refine(
+      (v) => !hasAmount(v) || (Number.isFinite(Number(v)) && Number(v) >= 0 && Number(v) <= 100000),
+      { message: t('artists.validation.amount_invalid') }
+    )
+
+  return z
+    .object({
+      email: requiresIdentity.value
+        ? z
+            .string()
+            .min(1, t('artists.validation.email_required'))
+            .email(t('artists.validation.email_invalid'))
+        : z.string().email(t('artists.validation.email_invalid')).or(z.literal('')),
+      prenom: requiresIdentity.value
+        ? z.string().trim().min(1, t('artists.validation.firstname_required'))
+        : z.string(),
+      nom: requiresIdentity.value
+        ? z.string().trim().min(1, t('artists.validation.lastname_required'))
+        : z.string(),
+      payment: amount,
+      reimbursementMax: amount,
+      reimbursementActual: amount,
+      consumablesMax: amount,
+      consumablesActual: amount,
+      // Contrainte conditionnelle : le champ n'est rendu que pour le type OTHER. La valider hors
+      // de ce cas bloquerait le formulaire sur un champ masqué, sans erreur visible ni focus.
+      accommodationTypeOther:
+        formData.value.accommodationType === 'OTHER'
+          ? z.string().max(500, t('artists.validation.too_long', { max: 500 }))
+          : z.string(),
+    })
+    .passthrough()
+    .superRefine((data, ctx) => {
+      // Mêmes garde-fous croisés que le serveur, rattachés au champ « réel » pour le mettre en avant
+      if (hasAmount(data.reimbursementMax) && hasAmount(data.reimbursementActual)) {
+        if (Number(data.reimbursementActual) > Number(data.reimbursementMax)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['reimbursementActual'],
+            message: t('artists.validation.reimbursement_exceeds'),
+          })
+        }
+      }
+      if (hasAmount(data.consumablesMax) && hasAmount(data.consumablesActual)) {
+        if (Number(data.consumablesActual) > Number(data.consumablesMax)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['consumablesActual'],
+            message: t('artists.validation.consumables_exceeds'),
+          })
+        }
+      }
+      // En édition, le serveur (PUT) refuse de vider le maximum tant qu'un réel est renseigné.
+      // On reflète la règle ici, sinon l'utilisateur reçoit un 400 opaque (message serveur masqué
+      // par errorMessages.default d'useApiAction).
+      if (props.artist) {
+        if (hasAmount(data.reimbursementActual) && !hasAmount(data.reimbursementMax)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['reimbursementMax'],
+            message: t('artists.validation.max_required_with_actual'),
+          })
+        }
+        if (hasAmount(data.consumablesActual) && !hasAmount(data.consumablesMax)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['consumablesMax'],
+            message: t('artists.validation.max_required_with_actual'),
+          })
+        }
+      }
+    })
+})
+
+// À la soumission invalide, amener le premier champ en erreur à l'écran
+const onValidationError = (event: { errors: { id?: string }[] }) => {
+  const firstId = event.errors?.[0]?.id
+  if (!firstId) return
+  const el = document.getElementById(firstId)
+  el?.focus()
+  el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
 let emailCheckTimeout: ReturnType<typeof setTimeout> | null = null
 let skipEmailWatch = false
 

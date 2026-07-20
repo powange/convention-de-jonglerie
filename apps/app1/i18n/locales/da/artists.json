@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "F.eks.: 80,00",
     "consumables_paid": "Forbrugsvarer refunderet",
     "consumables_pending": "Forbrugsvarer afventer",
-    "consumables_status": "Status for forbrugsvarer"
+    "consumables_status": "Status for forbrugsvarer",
+    "validation": {
+      "amount_invalid": "Ugyldigt beløb (tal mellem 0 og 100000)",
+      "consumables_exceeds": "De faktiske forbrugsvarer må ikke overstige maksimum",
+      "email_invalid": "Ugyldig e-mailadresse",
+      "email_required": "E-mail er påkrævet",
+      "firstname_required": "Fornavn er påkrævet",
+      "lastname_required": "Efternavn er påkrævet",
+      "reimbursement_exceeds": "De faktiske rejseudgifter må ikke overstige maksimum",
+      "too_long": "Dette felt må ikke overstige {max} tegn",
+      "max_required_with_actual": "Et maksimum er påkrævet, så længe et faktisk beløb er angivet"
+    }
   }
 }

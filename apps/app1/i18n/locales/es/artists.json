@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "Ex: 80,00",
     "consumables_paid": "Consumibles reembolsados",
     "consumables_pending": "Consumibles pendientes",
-    "consumables_status": "Estado de los consumibles"
+    "consumables_status": "Estado de los consumibles",
+    "validation": {
+      "amount_invalid": "Importe no válido (número entre 0 y 100000)",
+      "consumables_exceeds": "Los consumibles reales no pueden superar el máximo",
+      "email_invalid": "Dirección de correo no válida",
+      "email_required": "El correo electrónico es obligatorio",
+      "firstname_required": "El nombre es obligatorio",
+      "lastname_required": "El apellido es obligatorio",
+      "reimbursement_exceeds": "Los gastos de viaje reales no pueden superar el máximo",
+      "too_long": "Este campo no puede superar los {max} caracteres",
+      "max_required_with_actual": "Se requiere un máximo mientras haya un importe real indicado"
+    }
   }
 }

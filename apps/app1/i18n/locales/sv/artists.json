@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "T.ex.: 80,00",
     "consumables_paid": "Förbrukningsvaror ersatta",
     "consumables_pending": "Förbrukningsvaror väntar",
-    "consumables_status": "Status för förbrukningsvaror"
+    "consumables_status": "Status för förbrukningsvaror",
+    "validation": {
+      "amount_invalid": "Ogiltigt belopp (tal mellan 0 och 100000)",
+      "consumables_exceeds": "De faktiska förbrukningsvarorna får inte överstiga maximum",
+      "email_invalid": "Ogiltig e-postadress",
+      "email_required": "E-post krävs",
+      "firstname_required": "Förnamn krävs",
+      "lastname_required": "Efternamn krävs",
+      "reimbursement_exceeds": "De faktiska resekostnaderna får inte överstiga maximum",
+      "too_long": "Detta fält får inte överstiga {max} tecken",
+      "max_required_with_actual": "Ett maximum krävs så länge ett faktiskt belopp är angivet"
+    }
   }
 }
