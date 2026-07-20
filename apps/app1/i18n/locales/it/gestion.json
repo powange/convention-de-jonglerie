@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Palco 4×4 m, audio, 2 tagli di luce...",
       "technical_needs": "Esigenze tecniche",
       "technical_needs_hint": "Nota interna, non visibile sulla pagina pubblica",
-      "technical_needs_placeholder": "Palco, audio, luci, regia, montaggio/smontaggio..."
+      "technical_needs_placeholder": "Palco, audio, luci, regia, montaggio/smontaggio...",
+      "act_stage_setup": "Allestimento scena",
+      "act_stage_setup_placeholder": "Stato della scena prima del numero, ripristino dopo..."
     },
     "stock": {
       "available_now": "{available}/{total} disponibile/i",

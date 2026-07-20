@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Stage 4×4 m, PA, 2 light washes...",
       "technical_needs": "Technical needs",
       "technical_needs_hint": "Internal note, not shown on the public page",
-      "technical_needs_placeholder": "Stage, sound, lighting, control, setup/teardown..."
+      "technical_needs_placeholder": "Stage, sound, lighting, control, setup/teardown...",
+      "act_stage_setup": "Stage setup",
+      "act_stage_setup_placeholder": "State of the stage before the act, reset afterwards..."
     },
     "stock": {
       "available_now": "{available}/{total} available",

@@ -74,6 +74,15 @@
         />
       </UFormField>
 
+      <UFormField :label="$t('gestion.shows.act_stage_setup')">
+        <UTextarea
+          v-model="act.stageSetup"
+          :placeholder="$t('gestion.shows.act_stage_setup_placeholder')"
+          rows="2"
+          class="w-full"
+        />
+      </UFormField>
+
       <UFormField :label="$t('gestion.shows.act_artists')">
         <USelectMenu
           v-model="act.artistIds"
@@ -113,6 +122,7 @@ interface ActInput {
   duration: number | string | null
   description: string | null
   technicalNeeds: string | null
+  stageSetup: string | null
   artistIds: number[]
 }
 
@@ -134,7 +144,14 @@ const artistsOf = (act: ActInput) => props.artists.filter((a) => act.artistIds.i
 const add = () => {
   acts.value = [
     ...acts.value,
-    { title: '', duration: null, description: null, technicalNeeds: null, artistIds: [] },
+    {
+      title: '',
+      duration: null,
+      description: null,
+      technicalNeeds: null,
+      stageSetup: null,
+      artistIds: [],
+    },
   ]
 }
 

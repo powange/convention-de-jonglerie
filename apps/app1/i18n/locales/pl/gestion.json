@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Scena 4×4 m, nagłośnienie, 2 plany świetlne...",
       "technical_needs": "Wymagania techniczne",
       "technical_needs_hint": "Notatka wewnętrzna, niewidoczna na stronie publicznej",
-      "technical_needs_placeholder": "Scena, dźwięk, światło, reżyserka, montaż/demontaż..."
+      "technical_needs_placeholder": "Scena, dźwięk, światło, reżyserka, montaż/demontaż...",
+      "act_stage_setup": "Przygotowanie sceny",
+      "act_stage_setup_placeholder": "Stan sceny przed numerem, przywrócenie po..."
     },
     "stock": {
       "available_now": "{available}/{total} dostępnych",

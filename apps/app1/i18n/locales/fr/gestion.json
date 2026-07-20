@@ -205,6 +205,8 @@
       "act_title_placeholder": "Ex : Duo de massues",
       "act_technical_needs": "Besoins techniques",
       "act_technical_needs_placeholder": "Scène 4×4 m, sono, 2 douches de lumière...",
+      "act_stage_setup": "Mise en place scène",
+      "act_stage_setup_placeholder": "État de la scène avant le numéro, remise en état après...",
       "acts": "Numéros",
       "add_act": "Ajouter un numéro",
       "add_show": "Ajouter un spectacle",

@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Palco 4×4 m, som, 2 focos de luz...",
       "technical_needs": "Necessidades técnicas",
       "technical_needs_hint": "Nota interna, não visível na página pública",
-      "technical_needs_placeholder": "Palco, som, luz, régie, montagem/desmontagem..."
+      "technical_needs_placeholder": "Palco, som, luz, régie, montagem/desmontagem...",
+      "act_stage_setup": "Preparação do palco",
+      "act_stage_setup_placeholder": "Estado do palco antes do número, reposição depois..."
     },
     "stock": {
       "available_now": "{available}/{total} disponível(eis)",

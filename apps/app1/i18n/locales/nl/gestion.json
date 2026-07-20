@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Podium 4×4 m, geluid, 2 lichtwassingen...",
       "technical_needs": "Technische behoeften",
       "technical_needs_hint": "Interne notitie, niet zichtbaar op de openbare pagina",
-      "technical_needs_placeholder": "Podium, geluid, licht, regie, op-/afbouw..."
+      "technical_needs_placeholder": "Podium, geluid, licht, regie, op-/afbouw...",
+      "act_stage_setup": "Podiumopbouw",
+      "act_stage_setup_placeholder": "Staat van het podium voor het nummer, herstel achteraf..."
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",

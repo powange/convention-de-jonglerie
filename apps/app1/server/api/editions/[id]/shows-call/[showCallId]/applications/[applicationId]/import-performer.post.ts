@@ -97,6 +97,13 @@ export default wrapApiHandler(
         id: true,
         status: true,
         showId: true,
+        // Champs repris vers le numéro d'un cabaret ou vers un spectacle standard
+        // (voir bloc de rattachement)
+        showTitle: true,
+        showDescription: true,
+        showDuration: true,
+        technicalNeeds: true,
+        stageSetup: true,
         additionalPerformers: true,
         accommodationNeeded: true,
         accommodationNotes: true,
@@ -217,20 +224,65 @@ export default wrapApiHandler(
       }
     }
 
-    // Si la candidature est liée à un Show et que le lien n'existe pas, le créer.
-    // Un spectacle cabaret est exclu : ses artistes vivent dans ses numéros, et un lien posé
-    // au niveau du spectacle serait invisible dans le formulaire puis effacé au premier
-    // enregistrement. L'organisateur ajoute l'artiste au numéro voulu depuis la page du
-    // spectacle.
+    // Rattachement au spectacle lié à la candidature (si le lien n'existe pas déjà).
+    // - Spectacle STANDARD : lien ShowArtist au niveau du spectacle (actId null).
+    // - Spectacle CABARET : la candidature devient un numéro. Tous les performers d'une même
+    //   candidature partagent ce numéro, retrouvé par son titre (= showTitle de la candidature).
+    //   On ne stocke pas l'id de candidature sur le numéro : l'enregistrement d'un cabaret
+    //   recompose (supprime puis recrée) tous ses numéros et effacerait un tel lien ; le titre,
+    //   lui, survit à ce cycle.
     let showLinkCreated = false
+    let actCreated = false
+    let showTechNeedsAppended = false
     const targetShow = application.showId
       ? await prisma.show.findUnique({
           where: { id: application.showId },
-          select: { type: true },
+          select: { type: true, technicalNeeds: true },
         })
       : null
 
-    if (application.showId && targetShow?.type !== 'CABARET') {
+    if (application.showId && targetShow?.type === 'CABARET') {
+      // Le titre de candidature accepte jusqu'à 200 caractères, mais la colonne ShowAct.title est
+      // en varchar(191) : on tronque pour éviter un échec d'insertion, et on réutilise cette même
+      // valeur pour le rapprochement par titre (cohérence lookup/création).
+      const actTitle = application.showTitle.slice(0, 191)
+      // Trouver ou créer le numéro correspondant à la candidature (identifié par son titre).
+      let act = await prisma.showAct.findFirst({
+        where: { showId: application.showId, title: actTitle },
+        select: { id: true },
+      })
+      if (!act) {
+        const lastAct = await prisma.showAct.findFirst({
+          where: { showId: application.showId },
+          orderBy: { position: 'desc' },
+          select: { position: true },
+        })
+        act = await prisma.showAct.create({
+          data: {
+            showId: application.showId,
+            title: actTitle,
+            position: (lastAct?.position ?? -1) + 1,
+            duration: application.showDuration,
+            description: application.showDescription,
+            technicalNeeds: application.technicalNeeds,
+            stageSetup: application.stageSetup,
+          },
+          select: { id: true },
+        })
+        actCreated = true
+      }
+
+      // Rattacher l'artiste au numéro s'il n'y est pas déjà.
+      const existingActLink = await prisma.showArtist.findFirst({
+        where: { showId: application.showId, actId: act.id, artistId: artist.id },
+      })
+      if (!existingActLink) {
+        await prisma.showArtist.create({
+          data: { showId: application.showId, actId: act.id, artistId: artist.id },
+        })
+        showLinkCreated = true
+      }
+    } else if (application.showId) {
       // findFirst et non findUnique : la clé unique porte désormais aussi actId, et MySQL
       // considère deux NULL comme distincts — l'unicité des liens sans numéro est donc
       // garantie ici, pas par le schéma.
@@ -243,17 +295,44 @@ export default wrapApiHandler(
         })
         showLinkCreated = true
       }
+
+      // Concaténer les besoins techniques de la candidature à ceux du spectacle standard, sans
+      // écraser l'existant : le spectacle peut regrouper plusieurs candidatures. Fait quel que
+      // soit le choix « appliquer les infos ». Idempotent : on n'ajoute pas deux fois le même
+      // texte (plusieurs performers d'une même candidature, ou ré-import).
+      const appTechNeeds = application.technicalNeeds?.trim()
+      if (appTechNeeds) {
+        const current = targetShow?.technicalNeeds ?? ''
+        if (!current.includes(appTechNeeds)) {
+          await prisma.show.update({
+            where: { id: application.showId },
+            data: {
+              technicalNeeds: current.trim()
+                ? `${current.trim()}\n\n${appTechNeeds}`
+                : appTechNeeds,
+            },
+          })
+          showTechNeedsAppended = true
+        }
+      }
     }
 
-    // Rien à faire : l'artiste existe déjà, pas de mise à jour, pas de lien spectacle à créer
-    if (!artistCreated && !showLinkCreated && !artistDataApplied) {
+    // Rien à faire : l'artiste existe déjà, pas de mise à jour, pas de lien ni de besoins ajoutés
+    if (!artistCreated && !showLinkCreated && !artistDataApplied && !showTechNeedsAppended) {
       throw createError({
         status: 409,
         message: 'Cet artiste est déjà importé et à jour',
       })
     }
 
-    return createSuccessResponse({ artist, artistCreated, showLinkCreated, artistDataApplied })
+    return createSuccessResponse({
+      artist,
+      artistCreated,
+      showLinkCreated,
+      actCreated,
+      showTechNeedsAppended,
+      artistDataApplied,
+    })
   },
   { operationName: 'ImportPerformerAsArtist' }
 )

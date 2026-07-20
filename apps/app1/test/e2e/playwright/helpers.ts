@@ -501,6 +501,61 @@ export async function getEditionArtists(page: Page, editionId: string) {
   return data.artists || data
 }
 
+/**
+ * Crée un spectacle (POST /shows). `type` peut valoir 'STANDARD' (défaut) ou 'CABARET'.
+ */
+export async function createShow(page: Page, editionId: string, data: Record<string, unknown>) {
+  const response = await apiPost(page, `${BASE_URL}/api/editions/${editionId}/shows`, { data })
+  if (!response.ok()) {
+    throw new Error(`POST show a échoué (${response.status()}): ${await response.text()}`)
+  }
+  const body = await response.json()
+  return body.data?.show || body.data || body
+}
+
+/**
+ * Récupère un spectacle et sa composition complète (GET /shows/[showId]).
+ */
+export async function getShow(page: Page, editionId: string, showId: string | number) {
+  const response = await page.request.get(`${BASE_URL}/api/editions/${editionId}/shows/${showId}`)
+  expect(response.ok()).toBe(true)
+  const body = await response.json()
+  return body.data?.show || body.data || body
+}
+
+/**
+ * Supprime un spectacle (DELETE /shows/[showId]).
+ */
+export async function deleteShow(page: Page, editionId: string, showId: string | number) {
+  const response = await apiDelete(page, `${BASE_URL}/api/editions/${editionId}/shows/${showId}`)
+  expect(response.ok()).toBe(true)
+  return response
+}
+
+/**
+ * Lie une candidature à un spectacle de l'édition (PATCH application { showId }).
+ */
+export async function linkApplicationToShow(
+  page: Page,
+  editionId: string,
+  showCallId: string,
+  applicationId: string,
+  showId: number
+) {
+  const response = await apiPatch(
+    page,
+    `${BASE_URL}/api/editions/${editionId}/shows-call/${showCallId}/applications/${applicationId}`,
+    { data: { showId } }
+  )
+  if (!response.ok()) {
+    throw new Error(
+      `PATCH application (showId) a échoué (${response.status()}): ${await response.text()}`
+    )
+  }
+  const body = await response.json()
+  return body.data?.application || body.data || body
+}
+
 // ──────────────────────────────────────────────
 // Volunteers settings helpers
 // ──────────────────────────────────────────────

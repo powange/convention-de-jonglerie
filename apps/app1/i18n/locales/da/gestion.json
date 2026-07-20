@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Scene 4×4 m, lyd, 2 lysvaske...",
       "technical_needs": "Tekniske behov",
       "technical_needs_hint": "Intern note, ikke synlig på den offentlige side",
-      "technical_needs_placeholder": "Scene, lyd, lys, regi, op-/nedrigning..."
+      "technical_needs_placeholder": "Scene, lyd, lys, regi, op-/nedrigning...",
+      "act_stage_setup": "Sceneopsætning",
+      "act_stage_setup_placeholder": "Scenens tilstand før nummeret, nulstilling bagefter..."
     },
     "stock": {
       "available_now": "{available}/{total} tilgængelige",
