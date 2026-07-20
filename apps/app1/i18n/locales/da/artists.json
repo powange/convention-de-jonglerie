@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "De faktiske rejseudgifter må ikke overstige maksimum",
       "too_long": "Dette felt må ikke overstige {max} tegn",
       "max_required_with_actual": "Et maksimum er påkrævet, så længe et faktisk beløb er angivet"
-    }
+    },
+    "stage_setup_label": "Sceneopsætning",
+    "stage_setup_placeholder": "Scenens tilstand før dit optræden, nulstilling bagefter...",
+    "tech_needs_conflict": "Dette felt er blevet ændret, siden det blev indlæst (af arrangøren eller en anden artist). Den aktuelle værdi vises ovenfor — tjek den, før du gemmer igen.",
+    "tech_needs_conflict_title": "Ændret i mellemtiden",
+    "tech_needs_label": "Tekniske behov",
+    "tech_needs_placeholder": "Scenerum, lyd, lys, styring...",
+    "tech_needs_save_error": "Fejl ved lagring af de tekniske behov",
+    "tech_needs_saved": "Tekniske behov gemt"
   }
 }

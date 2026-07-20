@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "Die tatsächlichen Fahrtkosten dürfen das Maximum nicht überschreiten",
       "too_long": "Dieses Feld darf {max} Zeichen nicht überschreiten",
       "max_required_with_actual": "Ein Maximum ist erforderlich, solange ein tatsächlicher Betrag angegeben ist"
-    }
+    },
+    "stage_setup_label": "Bühnenaufbau",
+    "stage_setup_placeholder": "Zustand der Bühne vor Ihrem Auftritt, Wiederherstellung danach...",
+    "tech_needs_conflict": "Dieses Feld wurde seit dem Laden geändert (vom Veranstalter oder einem anderen Künstler). Der aktuelle Wert wird oben angezeigt – prüfen Sie ihn, bevor Sie erneut speichern.",
+    "tech_needs_conflict_title": "Zwischenzeitlich geändert",
+    "tech_needs_label": "Technische Anforderungen",
+    "tech_needs_placeholder": "Bühnenfläche, Ton, Licht, Regie...",
+    "tech_needs_save_error": "Fehler beim Speichern der technischen Anforderungen",
+    "tech_needs_saved": "Technische Anforderungen gespeichert"
   }
 }

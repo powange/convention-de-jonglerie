@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "As despesas de viagem reais não podem exceder o máximo",
       "too_long": "Este campo não pode exceder {max} caracteres",
       "max_required_with_actual": "É necessário um máximo enquanto houver um montante real indicado"
-    }
+    },
+    "stage_setup_label": "Preparação do palco",
+    "stage_setup_placeholder": "Estado do palco antes da sua atuação, reposição depois...",
+    "tech_needs_conflict": "Este campo foi modificado desde que foi carregado (pelo organizador ou por outro artista). O valor atual é apresentado acima — verifique-o antes de guardar novamente.",
+    "tech_needs_conflict_title": "Modificado entretanto",
+    "tech_needs_label": "Necessidades técnicas",
+    "tech_needs_placeholder": "Espaço cénico, som, luz, régie...",
+    "tech_needs_save_error": "Erro ao guardar as necessidades técnicas",
+    "tech_needs_saved": "Necessidades técnicas guardadas"
   }
 }

@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "Rzeczywiste koszty podróży nie mogą przekraczać maksimum",
       "too_long": "To pole nie może przekraczać {max} znaków",
       "max_required_with_actual": "Maksimum jest wymagane, dopóki podana jest kwota rzeczywista"
-    }
+    },
+    "stage_setup_label": "Przygotowanie sceny",
+    "stage_setup_placeholder": "Stan sceny przed twoim występem, przywrócenie po...",
+    "tech_needs_conflict": "To pole zostało zmienione od czasu wczytania (przez organizatora lub innego artystę). Aktualna wartość jest pokazana powyżej — sprawdź ją przed ponownym zapisaniem.",
+    "tech_needs_conflict_title": "Zmienione w międzyczasie",
+    "tech_needs_label": "Wymagania techniczne",
+    "tech_needs_placeholder": "Przestrzeń sceniczna, dźwięk, światło, realizacja...",
+    "tech_needs_save_error": "Błąd podczas zapisywania wymagań technicznych",
+    "tech_needs_saved": "Zapisano wymagania techniczne"
   }
 }

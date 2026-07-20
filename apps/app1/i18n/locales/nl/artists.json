@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "De werkelijke reiskosten mogen het maximum niet overschrijden",
       "too_long": "Dit veld mag niet langer zijn dan {max} tekens",
       "max_required_with_actual": "Een maximum is vereist zolang er een werkelijk bedrag is ingevuld"
-    }
+    },
+    "stage_setup_label": "Podiumopbouw",
+    "stage_setup_placeholder": "Staat van het podium vóór je optreden, herstel achteraf...",
+    "tech_needs_conflict": "Dit veld is gewijzigd sinds het is geladen (door de organisator of een andere artiest). De huidige waarde staat hierboven — controleer die voordat je opnieuw opslaat.",
+    "tech_needs_conflict_title": "Ondertussen gewijzigd",
+    "tech_needs_label": "Technische behoeften",
+    "tech_needs_placeholder": "Podiumruimte, geluid, licht, regie...",
+    "tech_needs_save_error": "Fout bij het opslaan van de technische behoeften",
+    "tech_needs_saved": "Technische behoeften opgeslagen"
   }
 }

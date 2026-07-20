@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "Skutečné cestovné nesmí překročit maximum",
       "too_long": "Toto pole nesmí překročit {max} znaků",
       "max_required_with_actual": "Maximum je povinné, dokud je uvedena skutečná částka"
-    }
+    },
+    "stage_setup_label": "Příprava scény",
+    "stage_setup_placeholder": "Stav scény před vaším vystoupením, uvedení do původního stavu po...",
+    "tech_needs_conflict": "Toto pole bylo od načtení změněno (organizátorem nebo jiným umělcem). Aktuální hodnota je zobrazena výše — před opětovným uložením ji zkontrolujte.",
+    "tech_needs_conflict_title": "Mezitím změněno",
+    "tech_needs_label": "Technické požadavky",
+    "tech_needs_placeholder": "Jevištní prostor, zvuk, světlo, režie...",
+    "tech_needs_save_error": "Chyba při ukládání technických požadavků",
+    "tech_needs_saved": "Technické požadavky uloženy"
   }
 }
