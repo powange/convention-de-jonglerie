@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "De faktiska resekostnaderna får inte överstiga maximum",
       "too_long": "Detta fält får inte överstiga {max} tecken",
       "max_required_with_actual": "Ett maximum krävs så länge ett faktiskt belopp är angivet"
-    }
+    },
+    "stage_setup_label": "Scenuppställning",
+    "stage_setup_placeholder": "Scenens tillstånd före ditt framträdande, återställning efteråt...",
+    "tech_needs_conflict": "Det här fältet har ändrats sedan det laddades (av arrangören eller en annan artist). Det aktuella värdet visas ovan — kontrollera det innan du sparar igen.",
+    "tech_needs_conflict_title": "Ändrat under tiden",
+    "tech_needs_label": "Tekniska behov",
+    "tech_needs_placeholder": "Scenutrymme, ljud, ljus, regi...",
+    "tech_needs_save_error": "Fel när de tekniska behoven skulle sparas",
+    "tech_needs_saved": "Tekniska behov sparade"
   }
 }

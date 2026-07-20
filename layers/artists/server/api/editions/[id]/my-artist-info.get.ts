@@ -51,9 +51,11 @@ export default wrapApiHandler(
         },
         // distinct : un artiste jouant dans plusieurs numéros d'un cabaret a autant de
         // liens ShowArtist pour le même spectacle, qui apparaîtrait sinon en double
+        // Pas de `distinct` : un artiste peut jouer dans plusieurs numéros d'un même cabaret ;
+        // on regroupe ensuite par spectacle en collectant ses numéros (voir mapping plus bas).
         shows: {
-          distinct: ['showId'],
           select: {
+            actId: true,
             show: {
               select: {
                 id: true,
@@ -62,6 +64,16 @@ export default wrapApiHandler(
                 startDateTime: true,
                 duration: true,
                 location: true,
+                type: true,
+                technicalNeeds: true,
+              },
+            },
+            act: {
+              select: {
+                id: true,
+                title: true,
+                technicalNeeds: true,
+                stageSetup: true,
               },
             },
           },
@@ -91,6 +103,58 @@ export default wrapApiHandler(
         artist: null,
       }
     }
+
+    // Regrouper les liens ShowArtist par spectacle. Pour un cabaret, on collecte les numéros où
+    // l'artiste joue (chacun éditable : besoins techniques + mise en place). Pour un standard,
+    // le champ éditable est le `technicalNeeds` du spectacle lui-même.
+    type EditableAct = {
+      id: number
+      title: string
+      technicalNeeds: string | null
+      stageSetup: string | null
+    }
+    const showsById = new Map<
+      number,
+      {
+        id: number
+        title: string
+        description: string | null
+        startDateTime: Date
+        duration: number | null
+        location: string | null
+        type: string
+        technicalNeeds: string | null
+        acts: EditableAct[]
+      }
+    >()
+    for (const sa of artist.shows) {
+      const s = sa.show
+      let entry = showsById.get(s.id)
+      if (!entry) {
+        entry = {
+          id: s.id,
+          title: s.title,
+          description: s.description,
+          startDateTime: s.startDateTime,
+          duration: s.duration,
+          location: s.location,
+          type: s.type,
+          // Éditable par l'artiste seulement pour un STANDARD (un cabaret édite ses numéros).
+          technicalNeeds: s.type === 'STANDARD' ? s.technicalNeeds : null,
+          acts: [],
+        }
+        showsById.set(s.id, entry)
+      }
+      if (sa.act) {
+        entry.acts.push({
+          id: sa.act.id,
+          title: sa.act.title,
+          technicalNeeds: sa.act.technicalNeeds,
+          stageSetup: sa.act.stageSetup,
+        })
+      }
+    }
+    const groupedShows = [...showsById.values()]
 
     return {
       artist: {
@@ -124,14 +188,7 @@ export default wrapApiHandler(
         invoiceProvided: artist.invoiceProvided,
         feeRequested: artist.feeRequested,
         feeProvided: artist.feeProvided,
-        shows: artist.shows.map((sa) => ({
-          id: sa.show.id,
-          title: sa.show.title,
-          description: sa.show.description,
-          startDateTime: sa.show.startDateTime,
-          duration: sa.show.duration,
-          location: sa.show.location,
-        })),
+        shows: groupedShows,
         mealSelections: artist.mealSelections.map((ms) => ({
           id: ms.id,
           afterShow: ms.afterShow,

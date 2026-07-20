@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "Actual travel expenses cannot exceed the maximum",
       "too_long": "This field cannot exceed {max} characters",
       "max_required_with_actual": "A maximum is required as long as an actual amount is set"
-    }
+    },
+    "stage_setup_label": "Stage setup",
+    "stage_setup_placeholder": "State of the stage before your act, reset afterwards...",
+    "tech_needs_conflict": "This field was modified since it was loaded (by the organizer or another artist). The current value is shown above — check it before saving again.",
+    "tech_needs_conflict_title": "Modified in the meantime",
+    "tech_needs_label": "Technical needs",
+    "tech_needs_placeholder": "Stage space, sound, lighting, control desk...",
+    "tech_needs_save_error": "Error saving the technical needs",
+    "tech_needs_saved": "Technical needs saved"
   }
 }

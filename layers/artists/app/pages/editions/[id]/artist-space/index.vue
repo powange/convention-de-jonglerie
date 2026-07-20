@@ -116,7 +116,7 @@
           <div
             v-for="show in artist.shows"
             :key="show.id"
-            class="flex items-start justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+            class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 space-y-3"
           >
             <div class="space-y-1">
               <p class="font-medium text-gray-900 dark:text-white">{{ show.title }}</p>
@@ -133,6 +133,34 @@
                   <UIcon name="i-heroicons-map-pin" class="w-4 h-4" />
                   {{ show.location }}
                 </span>
+              </div>
+            </div>
+
+            <!-- Spectacle standard : l'artiste édite les besoins techniques du spectacle -->
+            <ArtistsMyShowTechnicalNeeds
+              v-if="show.type === 'STANDARD'"
+              :edition-id="editionId"
+              :show-id="show.id"
+              :technical-needs="show.technicalNeeds"
+              :stage-setup="null"
+            />
+            <!-- Cabaret : un bloc éditable par numéro où l'artiste joue -->
+            <div v-else-if="show.acts && show.acts.length" class="space-y-3">
+              <div
+                v-for="act in show.acts"
+                :key="act.id"
+                class="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2"
+              >
+                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  {{ act.title }}
+                </p>
+                <ArtistsMyShowTechnicalNeeds
+                  :edition-id="editionId"
+                  :act-id="act.id"
+                  :has-stage-setup="true"
+                  :technical-needs="act.technicalNeeds"
+                  :stage-setup="act.stageSetup"
+                />
               </div>
             </div>
           </div>
@@ -617,6 +645,13 @@ import {
   markdownToHtml,
 } from '#imports'
 
+interface ArtistShowAct {
+  id: number
+  title: string
+  technicalNeeds: string | null
+  stageSetup: string | null
+}
+
 interface ArtistShow {
   id: number
   title: string
@@ -624,6 +659,11 @@ interface ArtistShow {
   startDateTime: string
   duration: number | null
   location: string | null
+  type: string
+  // Besoins techniques éditables par l'artiste (spectacle STANDARD uniquement).
+  technicalNeeds: string | null
+  // Numéros du cabaret où l'artiste joue (chacun éditable : besoins techniques + mise en place).
+  acts: ArtistShowAct[]
 }
 
 interface MealSelection {

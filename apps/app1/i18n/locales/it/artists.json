@@ -164,6 +164,14 @@
       "reimbursement_exceeds": "Le spese di viaggio reali non possono superare il massimo",
       "too_long": "Questo campo non può superare {max} caratteri",
       "max_required_with_actual": "È richiesto un massimo finché è indicato un importo reale"
-    }
+    },
+    "stage_setup_label": "Allestimento scena",
+    "stage_setup_placeholder": "Stato della scena prima della tua esibizione, ripristino dopo...",
+    "tech_needs_conflict": "Questo campo è stato modificato dopo il caricamento (dall'organizzatore o da un altro artista). Il valore attuale è mostrato sopra — verificalo prima di salvare di nuovo.",
+    "tech_needs_conflict_title": "Modificato nel frattempo",
+    "tech_needs_label": "Esigenze tecniche",
+    "tech_needs_placeholder": "Spazio scenico, audio, luci, regia...",
+    "tech_needs_save_error": "Errore durante il salvataggio delle esigenze tecniche",
+    "tech_needs_saved": "Esigenze tecniche salvate"
   }
 }
