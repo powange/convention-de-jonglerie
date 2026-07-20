@@ -17,7 +17,9 @@ ENV DATABASE_URL="mysql://user:pass@localhost:3306/db"
 COPY package*.json ./
 COPY prisma.config.ts ./
 COPY prisma ./prisma/
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+# --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
+RUN --mount=type=cache,target=/root/.npm \
+    if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
 # Le packaging Nitro est gourmand en mémoire ; le cache Nuxt/Vite accélère les rebuilds.
 RUN --mount=type=cache,target=/app/node_modules/.cache \
@@ -53,7 +55,9 @@ ENV DATABASE_URL="mysql://user:pass@localhost:3306/db"
 COPY package*.json ./
 COPY prisma.config.ts ./
 COPY prisma ./prisma/
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+# --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
+RUN --mount=type=cache,target=/root/.npm \
+    if [ -f package-lock.json ]; then npm ci; else npm install; fi
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
 EXPOSE 3000 24678
 # Le compose surcharge `command` pour lancer les migrations avant `npm run dev`.
