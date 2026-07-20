@@ -104,7 +104,10 @@
       "visibility_private": "Privado",
       "visibility_private_desc": "Acessível apenas através de um link direto",
       "visibility_public": "Público",
-      "visibility_public_desc": "Visível para todos e listado na plataforma"
+      "visibility_public_desc": "Visível para todos e listado na plataforma",
+      "confirm_reapply_performer_desc": "Reaplicar as informações da candidatura para {name}? Apenas os campos ainda vazios do número serão preenchidos — nada será sobrescrito.",
+      "confirm_reapply_performer_title": "Reaplicar as informações",
+      "reapply_performer_info": "Reaplicar as informações"
     }
   }
 }

@@ -104,7 +104,10 @@
       "visibility_private": "Privé",
       "visibility_private_desc": "Alleen toegankelijk via een directe link",
       "visibility_public": "Openbaar",
-      "visibility_public_desc": "Zichtbaar voor iedereen en vermeld op het platform"
+      "visibility_public_desc": "Zichtbaar voor iedereen en vermeld op het platform",
+      "confirm_reapply_performer_desc": "Info van de aanmelding opnieuw toepassen voor {name}? Alleen de nog lege velden van het nummer worden ingevuld — er wordt niets overschreven.",
+      "confirm_reapply_performer_title": "Info opnieuw toepassen",
+      "reapply_performer_info": "Info opnieuw toepassen"
     }
   }
 }

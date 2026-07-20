@@ -104,7 +104,10 @@
       "visibility_private": "Privat",
       "visibility_private_desc": "Nur über einen direkten Link zugänglich",
       "visibility_public": "Öffentlich",
-      "visibility_public_desc": "Für alle sichtbar und auf der Plattform gelistet"
+      "visibility_public_desc": "Für alle sichtbar und auf der Plattform gelistet",
+      "confirm_reapply_performer_desc": "Infos der Bewerbung für {name} erneut anwenden? Nur die noch leeren Felder der Nummer werden ausgefüllt – nichts wird überschrieben.",
+      "confirm_reapply_performer_title": "Infos erneut anwenden",
+      "reapply_performer_info": "Infos erneut anwenden"
     }
   }
 }

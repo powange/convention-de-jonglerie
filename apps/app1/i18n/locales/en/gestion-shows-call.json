@@ -104,7 +104,10 @@
       "visibility_private": "Private",
       "visibility_private_desc": "Accessible only via a direct link",
       "visibility_public": "Public",
-      "visibility_public_desc": "Visible to everyone and listed on the platform"
+      "visibility_public_desc": "Visible to everyone and listed on the platform",
+      "confirm_reapply_performer_desc": "Reapply the application info for {name}? Only the still-empty fields of the act will be filled in — nothing will be overwritten.",
+      "confirm_reapply_performer_title": "Reapply info",
+      "reapply_performer_info": "Reapply info"
     }
   }
 }
