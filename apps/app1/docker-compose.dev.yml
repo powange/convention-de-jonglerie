@@ -32,6 +32,33 @@ services:
       retries: 15
       start_period: 5s
 
+  # Base "shadow" dédiée à `prisma migrate dev` — datadir sur tmpfs (RAM).
+  # À chaque migration, Prisma reconstruit TOUT le schéma sur la shadow DB pour détecter les
+  # divergences. Sur le volume disque (WSL2) ce rejeu des 32 migrations prend ~2 min 28 s, à
+  # cause du fsync par instruction DDL de MySQL 8 ; en RAM il tombe à ~5-8 s (0_init : 96 s → 3 s).
+  # Base 100 % jetable (aucune donnée à conserver) : durabilité relâchée, binlog désactivé,
+  # doublewrite off. Utilisée uniquement par `migrate dev` (lancé depuis l'hôte via le port 3308 ;
+  # 3307 est déjà pris par flowvent-db) ; `migrate deploy` au démarrage de l'app n'utilise PAS de
+  # shadow, donc `app` n'en dépend pas.
+  shadow-db:
+    image: mysql:8.0
+    container_name: convention-shadow-db
+    restart: unless-stopped
+    command: --innodb-flush-log-at-trx-commit=2 --skip-log-bin --innodb-doublewrite=0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_SHADOW_DATABASE:-convention_shadow}
+    ports:
+      - '3308:3306'
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '--silent']
+      timeout: 2s
+      interval: 3s
+      retries: 15
+      start_period: 5s
+
   # Application Nuxt.js (mode développement)
   app:
     image: convention-de-jonglerie-app:dev

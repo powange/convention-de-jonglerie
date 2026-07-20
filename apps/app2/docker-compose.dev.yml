@@ -34,6 +34,30 @@ services:
       retries: 15
       start_period: 5s
 
+  # Base "shadow" dédiée à `prisma migrate dev` — datadir sur tmpfs (RAM).
+  # Prisma reconstruit tout le schéma sur la shadow DB à chaque migration ; sur le volume disque
+  # (WSL2) ce rejeu est très lent (fsync par instruction DDL de MySQL 8), quasi instantané en RAM.
+  # Base 100 % jetable (durabilité relâchée, binlog off, doublewrite off).
+  # Voir apps/app1/docs/optimization/prisma-migrate-shadow-db.md pour le diagnostic complet.
+  flowvent-shadow-db:
+    image: mysql:8.0
+    container_name: flowvent-shadow-db
+    restart: unless-stopped
+    command: --innodb-flush-log-at-trx-commit=2 --skip-log-bin --innodb-doublewrite=0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_SHADOW_DATABASE:-flowvent_shadow}
+    ports:
+      - '3309:3306' # 3306=app1-db, 3307=flowvent-db, 3308=shadow app1
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '--silent']
+      timeout: 2s
+      interval: 3s
+      retries: 15
+      start_period: 5s
+
   # Application Nuxt (mode développement)
   flowvent-app:
     image: flowvent-app:dev
@@ -50,6 +74,8 @@ services:
     environment:
       # DATABASE_URL avec le hostname Docker (surcharge le .env)
       DATABASE_URL: 'mysql://${MYSQL_USER:-flowvent_user}:${MYSQL_PASSWORD:-flowvent_password}@flowvent-db:3306/${MYSQL_DATABASE:-flowvent_db}'
+      # Shadow DB (RAM) pour `prisma migrate dev` lancé DANS ce conteneur : via le réseau Docker.
+      SHADOW_DATABASE_URL: 'mysql://root:${MYSQL_ROOT_PASSWORD:-rootpassword}@flowvent-shadow-db:3306/${MYSQL_SHADOW_DATABASE:-flowvent_shadow}'
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
       NODE_ENV: 'development'
