@@ -153,6 +153,17 @@
     "user_info": "Informations de l'utilisateur",
     "user_info_readonly": "Les informations de l'utilisateur ne peuvent pas être modifiées car il ne s'agit pas d'un utilisateur créé manuellement",
     "user_lastname": "Nom",
+    "validation": {
+      "amount_invalid": "Montant invalide (nombre entre 0 et 100000)",
+      "consumables_exceeds": "Le remboursement réel des consommables ne peut pas dépasser le maximum",
+      "email_invalid": "Adresse email invalide",
+      "email_required": "L'email est requis",
+      "firstname_required": "Le prénom est requis",
+      "lastname_required": "Le nom est requis",
+      "max_required_with_actual": "Le maximum est requis tant qu'un montant réel est renseigné",
+      "reimbursement_exceeds": "Le défraiement réel ne peut pas dépasser le maximum",
+      "too_long": "Ce champ ne peut pas dépasser {max} caractères"
+    },
     "view_qr_code": "Mon QR Code"
   }
 }

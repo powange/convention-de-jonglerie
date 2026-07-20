@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "Bijv.: 80,00",
     "consumables_paid": "Verbruiksartikelen vergoed",
     "consumables_pending": "Verbruiksartikelen in afwachting",
-    "consumables_status": "Status verbruiksartikelen"
+    "consumables_status": "Status verbruiksartikelen",
+    "validation": {
+      "amount_invalid": "Ongeldig bedrag (getal tussen 0 en 100000)",
+      "consumables_exceeds": "De werkelijke verbruiksartikelen mogen het maximum niet overschrijden",
+      "email_invalid": "Ongeldig e-mailadres",
+      "email_required": "E-mail is verplicht",
+      "firstname_required": "Voornaam is verplicht",
+      "lastname_required": "Achternaam is verplicht",
+      "reimbursement_exceeds": "De werkelijke reiskosten mogen het maximum niet overschrijden",
+      "too_long": "Dit veld mag niet langer zijn dan {max} tekens",
+      "max_required_with_actual": "Een maximum is vereist zolang er een werkelijk bedrag is ingevuld"
+    }
   }
 }

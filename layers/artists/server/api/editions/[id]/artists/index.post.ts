@@ -87,10 +87,14 @@ export default wrapApiHandler(
 
     // Si pas d'userId fourni, créer un nouvel utilisateur
     if (!targetUserId) {
-      if (!validatedData.email || !validatedData.prenom || !validatedData.nom) {
+      const missing: string[] = []
+      if (!validatedData.email) missing.push('email')
+      if (!validatedData.prenom) missing.push('prénom')
+      if (!validatedData.nom) missing.push('nom')
+      if (missing.length > 0) {
         throw createError({
           status: 400,
-          message: 'Email, prénom et nom sont requis pour créer un nouvel utilisateur',
+          message: `Champs requis manquants pour créer un nouvel utilisateur : ${missing.join(', ')}`,
         })
       }
 

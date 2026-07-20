@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "Напр.: 80.00",
     "consumables_paid": "Витратні матеріали відшкодовано",
     "consumables_pending": "Витратні матеріали в очікуванні",
-    "consumables_status": "Статус витратних матеріалів"
+    "consumables_status": "Статус витратних матеріалів",
+    "validation": {
+      "amount_invalid": "Недійсна сума (число від 0 до 100000)",
+      "consumables_exceeds": "Фактичні витратні матеріали не можуть перевищувати максимум",
+      "email_invalid": "Недійсна адреса електронної пошти",
+      "email_required": "Електронна пошта обов'язкова",
+      "firstname_required": "Ім'я обов'язкове",
+      "lastname_required": "Прізвище обов'язкове",
+      "reimbursement_exceeds": "Фактичні дорожні витрати не можуть перевищувати максимум",
+      "too_long": "Це поле не може перевищувати {max} символів",
+      "max_required_with_actual": "Максимум обов'язковий, доки вказано фактичну суму"
+    }
   }
 }

@@ -153,6 +153,17 @@
     "consumables_max_placeholder": "Es: 80,00",
     "consumables_paid": "Materiali di consumo rimborsati",
     "consumables_pending": "Materiali di consumo in attesa",
-    "consumables_status": "Stato dei materiali di consumo"
+    "consumables_status": "Stato dei materiali di consumo",
+    "validation": {
+      "amount_invalid": "Importo non valido (numero tra 0 e 100000)",
+      "consumables_exceeds": "I materiali di consumo reali non possono superare il massimo",
+      "email_invalid": "Indirizzo email non valido",
+      "email_required": "L'email è obbligatoria",
+      "firstname_required": "Il nome è obbligatorio",
+      "lastname_required": "Il cognome è obbligatorio",
+      "reimbursement_exceeds": "Le spese di viaggio reali non possono superare il massimo",
+      "too_long": "Questo campo non può superare {max} caratteri",
+      "max_required_with_actual": "È richiesto un massimo finché è indicato un importo reale"
+    }
   }
 }
