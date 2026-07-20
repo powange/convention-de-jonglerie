@@ -243,7 +243,7 @@
       "act_default_title": "Número 1",
       "act_delete": "Eliminar el número",
       "act_description": "Descripción",
-      "act_description_placeholder": "Notas técnicas, accesorios, indicaciones de luz...",
+      "act_description_placeholder": "Nota de intención, propósito del número, artistas...",
       "act_duration": "Duración (min)",
       "act_move_down": "Bajar el número",
       "act_move_up": "Subir el número",
@@ -260,7 +260,12 @@
       "type": "Tipo de espectáculo",
       "type_cabaret": "Cabaré",
       "type_hint": "Un cabaré se compone de números, cada uno con sus propios artistas.",
-      "type_standard": "Espectáculo"
+      "type_standard": "Espectáculo",
+      "act_technical_needs": "Necesidades técnicas",
+      "act_technical_needs_placeholder": "Escenario 4×4 m, sonido, 2 baños de luz...",
+      "technical_needs": "Necesidades técnicas",
+      "technical_needs_hint": "Nota interna, no visible en la página pública",
+      "technical_needs_placeholder": "Escenario, sonido, luz, regiduría, montaje/desmontaje..."
     },
     "stock": {
       "available_now": "{available}/{total} disponible(s)",

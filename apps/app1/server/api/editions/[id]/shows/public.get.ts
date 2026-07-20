@@ -11,6 +11,10 @@ export default wrapApiHandler(
         editionId,
         isPublic: true,
       },
+      // technicalNeeds est une note d'organisation : on l'exclut de la réponse publique
+      omit: {
+        technicalNeeds: true,
+      },
       include: {
         ...showZoneMarkerInclude,
       },

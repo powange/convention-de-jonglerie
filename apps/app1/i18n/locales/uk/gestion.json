@@ -243,7 +243,7 @@
       "act_default_title": "Номер 1",
       "act_delete": "Видалити номер",
       "act_description": "Опис",
-      "act_description_placeholder": "Технічні нотатки, реквізит, вказівки щодо світла...",
+      "act_description_placeholder": "Нотатка про задум, зміст номера, артисти...",
       "act_duration": "Тривалість (хв)",
       "act_move_down": "Перемістити номер вниз",
       "act_move_up": "Перемістити номер вгору",
@@ -260,7 +260,12 @@
       "type": "Тип вистави",
       "type_cabaret": "Кабаре",
       "type_hint": "Кабаре складається з номерів, кожен зі своїми артистами.",
-      "type_standard": "Вистава"
+      "type_standard": "Вистава",
+      "act_technical_needs": "Технічні потреби",
+      "act_technical_needs_placeholder": "Сцена 4×4 м, звук, 2 світлові заливки...",
+      "technical_needs": "Технічні потреби",
+      "technical_needs_hint": "Внутрішня нотатка, не видно на публічній сторінці",
+      "technical_needs_placeholder": "Сцена, звук, світло, режисура, монтаж/демонтаж..."
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

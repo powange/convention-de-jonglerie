@@ -243,7 +243,7 @@
       "act_default_title": "Nummer 1",
       "act_delete": "Nummer löschen",
       "act_description": "Beschreibung",
-      "act_description_placeholder": "Technische Hinweise, Requisiten, Lichtvorgaben...",
+      "act_description_placeholder": "Absichtserklärung, Inhalt der Nummer, Künstler...",
       "act_duration": "Dauer (Min.)",
       "act_move_down": "Nummer nach unten",
       "act_move_up": "Nummer nach oben",
@@ -260,7 +260,12 @@
       "type": "Art der Show",
       "type_cabaret": "Varieté",
       "type_hint": "Ein Varieté besteht aus Nummern mit jeweils eigenen Künstlern.",
-      "type_standard": "Show"
+      "type_standard": "Show",
+      "act_technical_needs": "Technische Anforderungen",
+      "act_technical_needs_placeholder": "Bühne 4×4 m, Beschallung, 2 Lichtwäschen...",
+      "technical_needs": "Technische Anforderungen",
+      "technical_needs_hint": "Interne Notiz, nicht auf der öffentlichen Seite sichtbar",
+      "technical_needs_placeholder": "Bühne, Ton, Licht, Regie, Auf-/Abbau..."
     },
     "stock": {
       "available_now": "{available}/{total} verfügbar",

@@ -14,6 +14,7 @@ const updateShowSchema = z.object({
   title: z.string().min(1, 'Le titre est requis').max(191).optional(),
   type: z.enum(['STANDARD', 'CABARET']).optional(),
   description: z.string().optional().nullable(),
+  technicalNeeds: z.string().max(2000).optional().nullable(),
   startDateTime: z.string().datetime().optional(),
   duration: z.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),
@@ -81,6 +82,8 @@ export default wrapApiHandler(
     if (validatedData.title !== undefined) updateData.title = validatedData.title
     if (validatedData.type !== undefined) updateData.type = validatedData.type
     if (validatedData.description !== undefined) updateData.description = validatedData.description
+    if (validatedData.technicalNeeds !== undefined)
+      updateData.technicalNeeds = validatedData.technicalNeeds
     if (validatedData.startDateTime !== undefined)
       updateData.startDateTime = new Date(validatedData.startDateTime)
     if (validatedData.duration !== undefined) updateData.duration = validatedData.duration

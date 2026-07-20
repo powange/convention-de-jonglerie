@@ -13,6 +13,7 @@ export const showActSchema = z.object({
   title: z.string().min(1, 'Le titre du numéro est requis').max(191),
   duration: z.number().int().positive().max(1440).optional().nullable(),
   description: z.string().max(2000).optional().nullable(),
+  technicalNeeds: z.string().max(2000).optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional().default([]),
 })
 
@@ -56,6 +57,7 @@ export async function replaceShowComposition(
           position: index,
           duration: act.duration ?? null,
           description: act.description ?? null,
+          technicalNeeds: act.technicalNeeds ?? null,
         },
       })
 

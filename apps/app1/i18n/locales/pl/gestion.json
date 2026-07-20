@@ -243,7 +243,7 @@
       "act_default_title": "Numer 1",
       "act_delete": "Usuń numer",
       "act_description": "Opis",
-      "act_description_placeholder": "Uwagi techniczne, rekwizyty, wskazówki świetlne...",
+      "act_description_placeholder": "Nota intencyjna, treść numeru, artyści...",
       "act_duration": "Czas trwania (min)",
       "act_move_down": "Przesuń numer w dół",
       "act_move_up": "Przesuń numer w górę",
@@ -260,7 +260,12 @@
       "type": "Typ spektaklu",
       "type_cabaret": "Kabaret",
       "type_hint": "Kabaret składa się z numerów, każdy z własnymi artystami.",
-      "type_standard": "Spektakl"
+      "type_standard": "Spektakl",
+      "act_technical_needs": "Wymagania techniczne",
+      "act_technical_needs_placeholder": "Scena 4×4 m, nagłośnienie, 2 plany świetlne...",
+      "technical_needs": "Wymagania techniczne",
+      "technical_needs_hint": "Notatka wewnętrzna, niewidoczna na stronie publicznej",
+      "technical_needs_placeholder": "Scena, dźwięk, światło, reżyserka, montaż/demontaż..."
     },
     "stock": {
       "available_now": "{available}/{total} dostępnych",

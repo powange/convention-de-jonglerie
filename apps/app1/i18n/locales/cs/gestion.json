@@ -243,7 +243,7 @@
       "act_default_title": "Číslo 1",
       "act_delete": "Smazat číslo",
       "act_description": "Popis",
-      "act_description_placeholder": "Technické poznámky, rekvizity, pokyny ke světlu...",
+      "act_description_placeholder": "Poznámka k záměru, obsah čísla, účinkující...",
       "act_duration": "Délka (min)",
       "act_move_down": "Posunout číslo dolů",
       "act_move_up": "Posunout číslo nahoru",
@@ -260,7 +260,12 @@
       "type": "Typ představení",
       "type_cabaret": "Kabaret",
       "type_hint": "Kabaret se skládá z čísel, každé má vlastní účinkující.",
-      "type_standard": "Představení"
+      "type_standard": "Představení",
+      "act_technical_needs": "Technické požadavky",
+      "act_technical_needs_placeholder": "Jeviště 4×4 m, ozvučení, 2 světelné plochy...",
+      "technical_needs": "Technické požadavky",
+      "technical_needs_hint": "Interní poznámka, nezobrazuje se na veřejné stránce",
+      "technical_needs_placeholder": "Jeviště, zvuk, světlo, režie, stavba/bourání..."
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",

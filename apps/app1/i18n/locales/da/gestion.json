@@ -243,7 +243,7 @@
       "act_default_title": "Nummer 1",
       "act_delete": "Slet nummeret",
       "act_description": "Beskrivelse",
-      "act_description_placeholder": "Tekniske noter, rekvisitter, lysanvisninger...",
+      "act_description_placeholder": "Intentionsnote, numrets indhold, artister...",
       "act_duration": "Varighed (min.)",
       "act_move_down": "Flyt nummeret ned",
       "act_move_up": "Flyt nummeret op",
@@ -260,7 +260,12 @@
       "type": "Type forestilling",
       "type_cabaret": "Kabaret",
       "type_hint": "En kabaret består af numre, hvert med sine egne artister.",
-      "type_standard": "Forestilling"
+      "type_standard": "Forestilling",
+      "act_technical_needs": "Tekniske behov",
+      "act_technical_needs_placeholder": "Scene 4×4 m, lyd, 2 lysvaske...",
+      "technical_needs": "Tekniske behov",
+      "technical_needs_hint": "Intern note, ikke synlig på den offentlige side",
+      "technical_needs_placeholder": "Scene, lyd, lys, regi, op-/nedrigning..."
     },
     "stock": {
       "available_now": "{available}/{total} tilgængelige",

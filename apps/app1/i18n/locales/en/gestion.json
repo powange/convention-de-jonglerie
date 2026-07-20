@@ -243,7 +243,7 @@
       "act_default_title": "Act 1",
       "act_delete": "Delete act",
       "act_description": "Description",
-      "act_description_placeholder": "Technical notes, props, lighting cues...",
+      "act_description_placeholder": "Intent note, purpose of the act, performers...",
       "act_duration": "Duration (min)",
       "act_move_down": "Move act down",
       "act_move_up": "Move act up",
@@ -260,7 +260,12 @@
       "type": "Show type",
       "type_cabaret": "Cabaret",
       "type_hint": "A cabaret is made up of acts, each with its own performers.",
-      "type_standard": "Show"
+      "type_standard": "Show",
+      "act_technical_needs": "Technical needs",
+      "act_technical_needs_placeholder": "Stage 4×4 m, PA, 2 light washes...",
+      "technical_needs": "Technical needs",
+      "technical_needs_hint": "Internal note, not shown on the public page",
+      "technical_needs_placeholder": "Stage, sound, lighting, control, setup/teardown..."
     },
     "stock": {
       "available_now": "{available}/{total} available",

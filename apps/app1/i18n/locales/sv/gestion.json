@@ -243,7 +243,7 @@
       "act_default_title": "Nummer 1",
       "act_delete": "Ta bort numret",
       "act_description": "Beskrivning",
-      "act_description_placeholder": "Tekniska noteringar, rekvisita, ljusanvisningar...",
+      "act_description_placeholder": "Intentionsnot, numrets innehåll, artister...",
       "act_duration": "Längd (min)",
       "act_move_down": "Flytta numret nedåt",
       "act_move_up": "Flytta numret uppåt",
@@ -260,7 +260,12 @@
       "type": "Typ av föreställning",
       "type_cabaret": "Kabaré",
       "type_hint": "En kabaré består av nummer, vart och ett med egna artister.",
-      "type_standard": "Föreställning"
+      "type_standard": "Föreställning",
+      "act_technical_needs": "Tekniska behov",
+      "act_technical_needs_placeholder": "Scen 4×4 m, ljud, 2 ljusytor...",
+      "technical_needs": "Tekniska behov",
+      "technical_needs_hint": "Intern notering, visas inte på den offentliga sidan",
+      "technical_needs_placeholder": "Scen, ljud, ljus, regi, upp-/nedmontering..."
     },
     "stock": {
       "available_now": "{available}/{total} tillgängliga",

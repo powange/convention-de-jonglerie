@@ -42,6 +42,19 @@
           />
         </UFormField>
 
+        <!-- Besoins techniques : note d'organisation, non exposée publiquement -->
+        <UFormField
+          :label="$t('gestion.shows.technical_needs')"
+          :description="$t('gestion.shows.technical_needs_hint')"
+        >
+          <UTextarea
+            v-model="formData.technicalNeeds"
+            :placeholder="$t('gestion.shows.technical_needs_placeholder')"
+            rows="3"
+            class="w-full"
+          />
+        </UFormField>
+
         <!-- Date et heure -->
         <UiDateTimePicker
           v-model="formData.startDateTime"
@@ -193,6 +206,7 @@ interface ActInput {
   title: string
   duration: number | string | null
   description: string | null
+  technicalNeeds: string | null
   artistIds: number[]
 }
 
@@ -200,6 +214,7 @@ const formData = ref({
   title: '',
   type: 'STANDARD' as 'STANDARD' | 'CABARET',
   description: '',
+  technicalNeeds: '',
   startDateTime: '',
   duration: null as number | null,
   location: '',
@@ -243,6 +258,7 @@ watch(
             title: formData.value.title || t('gestion.shows.act_default_title'),
             duration: null,
             description: null,
+            technicalNeeds: null,
             artistIds: [...formData.value.artistIds],
           },
         ]
@@ -390,6 +406,7 @@ const buildPayload = () => {
   return {
     title: formData.value.title,
     description: formData.value.description || null,
+    technicalNeeds: formData.value.technicalNeeds || null,
     startDateTime: localDate.toISOString(),
     duration: formData.value.duration,
     location: formData.value.location || null,
@@ -408,6 +425,7 @@ const buildPayload = () => {
               title: act.title.trim(),
               duration: act.duration ? Number(act.duration) : null,
               description: act.description || null,
+              technicalNeeds: act.technicalNeeds || null,
               artistIds: act.artistIds,
             }))
         : [],
@@ -463,6 +481,7 @@ const resetForm = () => {
     title: '',
     type: 'STANDARD',
     description: '',
+    technicalNeeds: '',
     startDateTime: defaultStartDateTime.value,
     duration: null,
     location: '',
@@ -492,6 +511,7 @@ watch(
         title: newShow.title || '',
         type: newShow.type === 'CABARET' ? 'CABARET' : 'STANDARD',
         description: newShow.description || '',
+        technicalNeeds: newShow.technicalNeeds || '',
         startDateTime: formattedDateTime,
         duration: newShow.duration || null,
         location: newShow.location || '',
@@ -509,6 +529,7 @@ watch(
             title: act.title || '',
             duration: act.duration ?? null,
             description: act.description ?? null,
+            technicalNeeds: act.technicalNeeds ?? null,
             artistIds: act.artists?.map((showArtist: any) => showArtist.artistId) || [],
           })) || [],
         isPublic: newShow.isPublic || false,

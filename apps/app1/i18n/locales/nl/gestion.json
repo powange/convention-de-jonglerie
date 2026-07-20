@@ -243,7 +243,7 @@
       "act_default_title": "Nummer 1",
       "act_delete": "Nummer verwijderen",
       "act_description": "Beschrijving",
-      "act_description_placeholder": "Technische notities, rekwisieten, lichtaanwijzingen...",
+      "act_description_placeholder": "Intentienota, inhoud van het nummer, artiesten...",
       "act_duration": "Duur (min)",
       "act_move_down": "Nummer omlaag",
       "act_move_up": "Nummer omhoog",
@@ -260,7 +260,12 @@
       "type": "Type voorstelling",
       "type_cabaret": "Cabaret",
       "type_hint": "Een cabaret bestaat uit nummers, elk met eigen artiesten.",
-      "type_standard": "Voorstelling"
+      "type_standard": "Voorstelling",
+      "act_technical_needs": "Technische behoeften",
+      "act_technical_needs_placeholder": "Podium 4×4 m, geluid, 2 lichtwassingen...",
+      "technical_needs": "Technische behoeften",
+      "technical_needs_hint": "Interne notitie, niet zichtbaar op de openbare pagina",
+      "technical_needs_placeholder": "Podium, geluid, licht, regie, op-/afbouw..."
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",
