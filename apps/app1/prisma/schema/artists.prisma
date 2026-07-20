@@ -20,6 +20,11 @@ enum ShowApplicationStatus {
   REJECTED
 }
 
+enum ShowType {
+  STANDARD // Spectacle d'un seul tenant : les artistes sont associés au spectacle
+  CABARET // Suite de numéros : les artistes sont associés à un numéro
+}
+
 enum AccommodationType {
   TENT // Tente
   VEHICLE // Véhicule aménagé (van, camion, camping-car)
@@ -84,24 +89,27 @@ model EditionArtist {
 }
 
 model Show {
-  id            Int      @id @default(autoincrement())
-  editionId     Int
-  title         String
-  description   String?  @db.Text
-  startDateTime DateTime
-  duration      Int?
-  location      String?
-  imageUrl      String?
-  zoneId        Int?
-  markerId      Int?
-  isPublic      Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  editionId      Int
+  title          String
+  type           ShowType @default(STANDARD)
+  description    String?  @db.Text
+  technicalNeeds String?  @db.Text // Besoins techniques du spectacle (interne, non exposé publiquement)
+  startDateTime  DateTime
+  duration       Int?
+  location       String?
+  imageUrl       String?
+  zoneId         Int?
+  markerId       Int?
+  isPublic       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   edition      Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
   zone         EditionZone?      @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   marker       EditionMarker?    @relation(fields: [markerId], references: [id], onDelete: SetNull)
   artists      ShowArtist[]
+  acts         ShowAct[]
   handoutItems ShowHandoutItem[]
   applications ShowApplication[]
 
@@ -112,17 +120,48 @@ model Show {
   @@index([markerId])
 }
 
+// Numéro d'un spectacle de type CABARET : une prestation courte au sein de la soirée.
+// Les artistes d'un cabaret sont rattachés à un numéro, pas au spectacle.
+model ShowAct {
+  id             Int      @id @default(autoincrement())
+  showId         Int
+  title          String
+  position       Int // Ordre de passage dans le déroulé du cabaret
+  duration       Int? // En minutes
+  description    String?  @db.Text
+  technicalNeeds String?  @db.Text // Besoins techniques (espace, son, lumière)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  show    Show         @relation(fields: [showId], references: [id], onDelete: Cascade)
+  artists ShowArtist[]
+
+  @@index([showId])
+  @@index([showId, position])
+}
+
 model ShowArtist {
   id        Int      @id @default(autoincrement())
   showId    Int
+  // Renseigné uniquement quand l'artiste participe via un numéro (spectacle CABARET).
+  // showId reste rempli dans tous les cas : c'est lui qui répond à « à quels spectacles
+  // cet artiste participe-t-il ? », question posée par la billetterie, l'espace artiste
+  // et le tableau de gestion.
+  actId     Int?
   artistId  Int
   createdAt DateTime @default(now())
 
   show   Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  act    ShowAct?      @relation(fields: [actId], references: [id], onDelete: Cascade)
   artist EditionArtist @relation(fields: [artistId], references: [id], onDelete: Cascade)
 
-  @@unique([showId, artistId])
+  // Un artiste peut apparaître dans plusieurs numéros du même cabaret, d'où actId dans la clé.
+  // Attention : MySQL considère deux NULL comme distincts, cette contrainte ne protège donc
+  // pas les liens sans numéro (actId null). Leur unicité est assurée par le code appelant,
+  // qui remplace l'ensemble des liens à chaque mise à jour d'un spectacle.
+  @@unique([showId, actId, artistId])
   @@index([showId])
+  @@index([actId])
   @@index([artistId])
 }
 

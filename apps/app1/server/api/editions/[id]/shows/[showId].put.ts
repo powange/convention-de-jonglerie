@@ -5,12 +5,16 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { canEditEdition } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
-import { showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import { replaceShowComposition, showActSchema } from '#server/utils/show-acts'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const updateShowSchema = z.object({
-  title: z.string().min(1, 'Le titre est requis').optional(),
+  // 191 = taille de la colonne : au-delà, l'écriture échouerait au milieu de la transaction
+  title: z.string().min(1, 'Le titre est requis').max(191).optional(),
+  type: z.enum(['STANDARD', 'CABARET']).optional(),
   description: z.string().optional().nullable(),
+  technicalNeeds: z.string().max(2000).optional().nullable(),
   startDateTime: z.string().datetime().optional(),
   duration: z.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),
@@ -18,6 +22,7 @@ const updateShowSchema = z.object({
   zoneId: z.number().int().positive().optional().nullable(),
   markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional(),
+  acts: z.array(showActSchema).optional(),
   handoutItemIds: z.array(z.number().int().positive()).optional(),
   isPublic: z.boolean().optional(),
 })
@@ -75,7 +80,10 @@ export default wrapApiHandler(
     const updateData: any = {}
 
     if (validatedData.title !== undefined) updateData.title = validatedData.title
+    if (validatedData.type !== undefined) updateData.type = validatedData.type
     if (validatedData.description !== undefined) updateData.description = validatedData.description
+    if (validatedData.technicalNeeds !== undefined)
+      updateData.technicalNeeds = validatedData.technicalNeeds
     if (validatedData.startDateTime !== undefined)
       updateData.startDateTime = new Date(validatedData.startDateTime)
     if (validatedData.duration !== undefined) updateData.duration = validatedData.duration
@@ -98,73 +106,71 @@ export default wrapApiHandler(
         finalImageFilename !== undefined ? finalImageFilename : existingShow.imageUrl
     }
 
-    // Si des artistIds sont fournis, mettre à jour les associations
-    if (validatedData.artistIds !== undefined) {
-      // Supprimer les anciennes associations
-      await prisma.showArtist.deleteMany({
-        where: { showId },
-      })
+    // La recomposition efface avant de recréer : sans transaction, un échec en cours de route
+    // (titre trop long, zone supprimée entre-temps) laisserait le spectacle amputé de ses
+    // artistes, de ses numéros et de ses articles, sans moyen de les retrouver.
+    const composedType = validatedData.type ?? existingShow.type
+    const recompose =
+      validatedData.artistIds !== undefined ||
+      validatedData.acts !== undefined ||
+      (validatedData.type !== undefined && validatedData.type !== existingShow.type)
 
-      // Créer les nouvelles associations
-      if (validatedData.artistIds.length > 0) {
-        updateData.artists = {
-          create: validatedData.artistIds.map((artistId) => ({
-            artistId,
-          })),
-        }
-      }
+    // Un cabaret porte ses artistes dans ses numéros : accepter artistIds sans acts
+    // reviendrait à effacer silencieusement tout le déroulé.
+    if (recompose && composedType === 'CABARET' && validatedData.acts === undefined) {
+      throw createError({
+        status: 400,
+        message: 'Les artistes d’un spectacle cabaret se définissent dans ses numéros (acts)',
+      })
     }
 
-    // Si des handoutItemIds sont fournis, mettre à jour les associations
-    if (validatedData.handoutItemIds !== undefined) {
-      // Supprimer les anciennes associations
-      await prisma.showHandoutItem.deleteMany({
-        where: { showId },
+    const updatedShow = await prisma.$transaction(async (tx) => {
+      // L'update d'abord : il valide les champs du spectacle, et un échec ici ne doit pas
+      // laisser la composition à moitié réécrite.
+      const show = await tx.show.update({
+        where: { id: showId },
+        data: updateData,
       })
 
-      // Créer les nouvelles associations
-      if (validatedData.handoutItemIds.length > 0) {
-        updateData.handoutItems = {
-          create: validatedData.handoutItemIds.map((handoutItemId) => ({
-            handoutItemId,
-          })),
+      if (recompose) {
+        await replaceShowComposition(
+          tx,
+          showId,
+          composedType,
+          validatedData.artistIds ?? [],
+          validatedData.acts ?? []
+        )
+      }
+
+      if (validatedData.handoutItemIds !== undefined) {
+        await tx.showHandoutItem.deleteMany({ where: { showId } })
+        if (validatedData.handoutItemIds.length > 0) {
+          await tx.showHandoutItem.createMany({
+            data: validatedData.handoutItemIds.map((handoutItemId) => ({
+              showId,
+              handoutItemId,
+            })),
+          })
         }
       }
-    }
 
-    // Mettre à jour le spectacle
-    const updatedShow = await prisma.show.update({
-      where: { id: showId },
-      data: updateData,
-      include: {
-        artists: {
-          include: {
-            artist: {
-              include: {
-                user: {
-                  select: {
-                    id: true,
-                    email: true,
-                    prenom: true,
-                    nom: true,
-                  },
+      return tx.show.findUniqueOrThrow({
+        where: { id: show.id },
+        include: {
+          ...showCompositionInclude,
+          handoutItems: {
+            include: {
+              handoutItem: {
+                select: {
+                  id: true,
+                  name: true,
                 },
               },
             },
           },
+          ...showZoneMarkerInclude,
         },
-        handoutItems: {
-          include: {
-            handoutItem: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        ...showZoneMarkerInclude,
-      },
+      })
     })
 
     return createSuccessResponse({ show: updatedShow })

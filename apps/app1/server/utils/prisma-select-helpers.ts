@@ -632,3 +632,46 @@ export const showZoneMarkerInclude = {
     select: showMarkerSelect,
   },
 } satisfies Prisma.ShowInclude
+
+/**
+ * Include des artistes d'un spectacle, avec leur utilisateur.
+ * Sur un spectacle CABARET, cette liste couvre aussi les artistes rattachés à un numéro :
+ * showId est renseigné dans tous les cas.
+ */
+export const showArtistsInclude = {
+  include: {
+    artist: {
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            prenom: true,
+            nom: true,
+            // Requis par UiUserName, qui affiche les pronoms à côté du nom
+            pronouns: true,
+          },
+        },
+      },
+    },
+  },
+} satisfies Prisma.Show$artistsArgs
+
+/**
+ * Include des numéros d'un spectacle CABARET, dans l'ordre de passage, avec leurs artistes.
+ */
+export const showActsInclude = {
+  orderBy: { position: 'asc' },
+  include: {
+    artists: showArtistsInclude,
+  },
+} satisfies Prisma.Show$actsArgs
+
+/**
+ * Include complet de la composition d'un spectacle : artistes et numéros.
+ * Les endpoints de spectacles le réutilisent pour renvoyer une forme homogène.
+ */
+export const showCompositionInclude = {
+  artists: showArtistsInclude,
+  acts: showActsInclude,
+} satisfies Prisma.ShowInclude

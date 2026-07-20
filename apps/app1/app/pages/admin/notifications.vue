@@ -1427,8 +1427,8 @@ const { execute: executeCreateNotification, loading: creatingNotification } = us
     errorMessages: { default: "Impossible d'envoyer la notification" },
     onSuccess: async (result: any) => {
       // La notification peut être refusée par les préférences de la personne ciblée ; le toast
-      // ne doit alors pas annoncer un envoi. useApiAction ne transmet ici que `data`, d'où la
-      // lecture directe de `blocked` (et non de `result.data` ou `result.message`).
+      // ne doit alors pas annoncer un envoi. useApiAction déballe l'enveloppe de réponse et ne
+      // transmet que son contenu : on lit donc blocked à la racine, et non sous data ou message.
       const blocked = !!result?.blocked
       toast.add({
         color: blocked ? 'warning' : 'success',

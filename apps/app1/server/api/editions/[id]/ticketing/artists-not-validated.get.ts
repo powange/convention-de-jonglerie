@@ -36,7 +36,10 @@ export default wrapApiHandler(
               profilePicture: true,
             },
           },
+          // distinct : un artiste jouant dans plusieurs numéros d'un cabaret a autant de
+          // liens ShowArtist pour le même spectacle, qui apparaîtrait sinon en double
           shows: {
+            distinct: ['showId'],
             select: {
               show: {
                 select: {
