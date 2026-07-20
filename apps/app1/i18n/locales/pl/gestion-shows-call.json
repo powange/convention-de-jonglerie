@@ -104,7 +104,10 @@
       "visibility_private": "Prywatny",
       "visibility_private_desc": "Dostępny tylko przez bezpośredni link",
       "visibility_public": "Publiczny",
-      "visibility_public_desc": "Widoczny dla wszystkich i wyświetlany na platformie"
+      "visibility_public_desc": "Widoczny dla wszystkich i wyświetlany na platformie",
+      "confirm_reapply_performer_desc": "Zastosować ponownie dane zgłoszenia dla {name}? Uzupełnione zostaną tylko wciąż puste pola numeru — nic nie zostanie nadpisane.",
+      "confirm_reapply_performer_title": "Zastosuj ponownie dane",
+      "reapply_performer_info": "Zastosuj ponownie dane"
     }
   }
 }

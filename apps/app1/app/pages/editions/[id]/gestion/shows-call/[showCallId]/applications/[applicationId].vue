@@ -338,17 +338,27 @@
                     </div>
                     <!-- Bouton/badge import : visible uniquement si la candidature est ACCEPTED -->
                     <template v-if="application.status === 'ACCEPTED'">
-                      <UBadge
+                      <div
                         v-if="
                           isPerformerImported(performer.email) &&
                           isPerformerLinkedToCurrentShow(performer.email)
                         "
-                        color="success"
-                        variant="soft"
-                        icon="i-heroicons-check-circle"
+                        class="flex items-center gap-2"
                       >
-                        {{ $t('gestion.shows_call.performer_imported') }}
-                      </UBadge>
+                        <UBadge color="success" variant="soft" icon="i-heroicons-check-circle">
+                          {{ $t('gestion.shows_call.performer_imported') }}
+                        </UBadge>
+                        <UButton
+                          color="neutral"
+                          variant="ghost"
+                          size="xs"
+                          icon="i-heroicons-arrow-path"
+                          :loading="importingPerformerIndex === index"
+                          @click="confirmImportPerformer(index)"
+                        >
+                          {{ $t('gestion.shows_call.reapply_performer_info') }}
+                        </UButton>
+                      </div>
                       <UButton
                         v-else-if="isPerformerImported(performer.email)"
                         color="primary"
@@ -922,6 +932,19 @@ const importPerformerModalTexts = computed(() => {
   const performer = pendingImportPerformer.value
   const name = performer ? `${performer.firstName} ${performer.lastName}` : ''
   const alreadyImported = performer ? isPerformerImported(performer.email) : false
+  const alreadyLinked = performer ? isPerformerLinkedToCurrentShow(performer.email) : false
+
+  if (alreadyImported && alreadyLinked) {
+    // Cas "réappliquer" : déjà importé ET rattaché. On relance l'import pour compléter les infos
+    // non appliquées la 1ʳᵉ fois (champs vides du numéro, infos artiste) — sans rien écraser.
+    return {
+      title: t('gestion.shows_call.confirm_reapply_performer_title'),
+      description: t('gestion.shows_call.confirm_reapply_performer_desc', { name }),
+      confirmLabel: t('gestion.shows_call.reapply_performer_info'),
+      confirmIcon: 'i-heroicons-arrow-path',
+      iconName: 'i-heroicons-arrow-path',
+    }
+  }
 
   if (alreadyImported && application.value?.showId) {
     // Cas "lier au spectacle" : l'artiste est déjà importé sur l'édition mais

@@ -104,7 +104,10 @@
       "visibility_private": "Приватный",
       "visibility_private_desc": "Доступен только по прямой ссылке",
       "visibility_public": "Публичный",
-      "visibility_public_desc": "Виден всем и отображается на платформе"
+      "visibility_public_desc": "Виден всем и отображается на платформе",
+      "confirm_reapply_performer_desc": "Применить данные заявки для {name} повторно? Будут заполнены только ещё пустые поля номера — ничего не будет перезаписано.",
+      "confirm_reapply_performer_title": "Применить данные повторно",
+      "reapply_performer_info": "Применить данные повторно"
     }
   }
 }

@@ -502,3 +502,117 @@ test.describe.serial('Import performer sur un standard : concaténation besoins 
     if (showCallId) await deleteShowCall(page, editionId, showCallId)
   })
 })
+
+// ════════════════════════════════════════════════════════════════
+// Réimport cabaret : complète les champs VIDES du numéro (sans écraser)
+// ════════════════════════════════════════════════════════════════
+
+const REIMPORT_SHOW_CALL_NAME = `E2E Réimport appel ${Date.now()}`
+const REIMPORT_NUMERO_TITLE = `E2E Réimport numéro ${Date.now()}`
+const REIMPORT_TECH = `Besoins tech candidature ${Date.now()}`
+const REIMPORT_STAGE = `Mise en place candidature ${Date.now()}`
+const REIMPORT_PERF_EMAIL = `e2e-reimport-perf-${Date.now()}@example.com`
+
+test.describe.serial('Réimport cabaret : complète les champs vides du numéro', () => {
+  let editionId: string
+  let showCallId: string
+  let applicationId: string
+  let cabaretShowId: number
+
+  test.beforeAll(() => {
+    editionId = loadState().editionId
+  })
+
+  test('préparer : candidature (besoins tech + mise en place) acceptée', async ({ page }) => {
+    await updateEdition(page, editionId, { artistsEnabled: true })
+
+    const showCall = await createShowCall(page, editionId, {
+      name: REIMPORT_SHOW_CALL_NAME,
+      description: 'Appel E2E pour réimport (remplissage des champs vides du numéro)',
+    })
+    expect(showCall.id).toBeTruthy()
+    showCallId = String(showCall.id)
+
+    const deadline = new Date()
+    deadline.setDate(deadline.getDate() + 30)
+    await updateShowCall(page, editionId, showCallId, {
+      name: REIMPORT_SHOW_CALL_NAME,
+      visibility: 'PUBLIC',
+      mode: 'INTERNAL',
+      deadline: deadline.toISOString(),
+      requirePhone: false,
+    })
+
+    await enableArtistProfile(page)
+
+    const application = await submitShowApplicationViaApi(
+      page,
+      editionId,
+      showCallId,
+      buildShowApplicationBody({
+        showTitle: REIMPORT_NUMERO_TITLE,
+        showDuration: 15,
+        technicalNeeds: REIMPORT_TECH,
+        stageSetup: REIMPORT_STAGE,
+        additionalPerformersCount: 1,
+        additionalPerformers: [
+          {
+            lastName: 'ReimpNom',
+            firstName: 'ReimpPrenom',
+            email: REIMPORT_PERF_EMAIL,
+            phone: '+33611130001',
+          },
+        ],
+      })
+    )
+    expect(application.id).toBeTruthy()
+    applicationId = String(application.id)
+
+    await updateShowCallApplicationStatus(page, editionId, showCallId, applicationId, {
+      status: 'ACCEPTED',
+    })
+  })
+
+  test('créer un cabaret avec un numéro AUX CHAMPS VIDES (même titre) et lier', async ({
+    page,
+  }) => {
+    const show = await createShow(page, editionId, {
+      title: `E2E Cabaret réimport ${Date.now()}`,
+      type: 'CABARET',
+      startDateTime: new Date().toISOString(),
+      // Numéro pré-existant, même titre que la candidature, mais durée/description/besoins/mise en
+      // place VIDES → l'import devra les compléter depuis la candidature.
+      acts: [{ title: REIMPORT_NUMERO_TITLE }],
+    })
+    expect(show.type).toBe('CABARET')
+    cabaretShowId = show.id
+
+    await linkApplicationToShow(page, editionId, showCallId, applicationId, cabaretShowId)
+  })
+
+  test('import → complète les champs vides du numéro (sans le recréer)', async ({ page }) => {
+    const result = await importPerformerFromApplication(
+      page,
+      editionId,
+      showCallId,
+      applicationId,
+      { performerIndex: 0 }
+    )
+    expect(result.artistCreated).toBe(true)
+    expect(result.actCreated).toBe(false) // le numéro existait déjà (créé à la main)
+    expect(result.actFieldsFilled).toBe(true) // ses champs vides ont été complétés
+    expect(result.showLinkCreated).toBe(true)
+
+    const show = await getShow(page, editionId, cabaretShowId)
+    const act = (show.acts || []).find((a: { title: string }) => a.title === REIMPORT_NUMERO_TITLE)
+    expect(act).toBeTruthy()
+    expect(act.technicalNeeds).toBe(REIMPORT_TECH)
+    expect(act.stageSetup).toBe(REIMPORT_STAGE)
+    expect(act.duration).toBe(15)
+  })
+
+  test('nettoyer : supprimer le spectacle et l’appel', async ({ page }) => {
+    if (cabaretShowId) await deleteShow(page, editionId, cabaretShowId)
+    if (showCallId) await deleteShowCall(page, editionId, showCallId)
+  })
+})

@@ -104,7 +104,10 @@
       "visibility_private": "Privat",
       "visibility_private_desc": "Kun tilgængelig via et direkte link",
       "visibility_public": "Offentlig",
-      "visibility_public_desc": "Synlig for alle og opført på platformen"
+      "visibility_public_desc": "Synlig for alle og opført på platformen",
+      "confirm_reapply_performer_desc": "Anvend ansøgningens oplysninger for {name} igen? Kun nummerets stadig tomme felter udfyldes — intet overskrives.",
+      "confirm_reapply_performer_title": "Anvend oplysningerne igen",
+      "reapply_performer_info": "Anvend oplysningerne igen"
     }
   }
 }

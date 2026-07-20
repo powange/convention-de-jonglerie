@@ -104,7 +104,10 @@
       "visibility_private": "Soukromé",
       "visibility_private_desc": "Přístupné pouze přes přímý odkaz",
       "visibility_public": "Veřejné",
-      "visibility_public_desc": "Viditelné pro všechny a uvedené na platformě"
+      "visibility_public_desc": "Viditelné pro všechny a uvedené na platformě",
+      "confirm_reapply_performer_desc": "Znovu použít údaje z přihlášky pro {name}? Doplní se pouze dosud prázdná pole čísla — nic se nepřepíše.",
+      "confirm_reapply_performer_title": "Znovu použít údaje",
+      "reapply_performer_info": "Znovu použít údaje"
     }
   }
 }

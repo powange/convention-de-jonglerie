@@ -233,6 +233,7 @@ export default wrapApiHandler(
     //   lui, survit à ce cycle.
     let showLinkCreated = false
     let actCreated = false
+    let actFieldsFilled = false
     let showTechNeedsAppended = false
     const targetShow = application.showId
       ? await prisma.show.findUnique({
@@ -246,10 +247,17 @@ export default wrapApiHandler(
       // en varchar(191) : on tronque pour éviter un échec d'insertion, et on réutilise cette même
       // valeur pour le rapprochement par titre (cohérence lookup/création).
       const actTitle = application.showTitle.slice(0, 191)
+      const actFieldsSelect = {
+        id: true,
+        duration: true,
+        description: true,
+        technicalNeeds: true,
+        stageSetup: true,
+      } as const
       // Trouver ou créer le numéro correspondant à la candidature (identifié par son titre).
       let act = await prisma.showAct.findFirst({
         where: { showId: application.showId, title: actTitle },
-        select: { id: true },
+        select: actFieldsSelect,
       })
       if (!act) {
         const lastAct = await prisma.showAct.findFirst({
@@ -267,9 +275,33 @@ export default wrapApiHandler(
             technicalNeeds: application.technicalNeeds,
             stageSetup: application.stageSetup,
           },
-          select: { id: true },
+          select: actFieldsSelect,
         })
         actCreated = true
+      } else {
+        // Numéro déjà présent (réimport, ou autre performer de la candidature) : on complète
+        // uniquement ses champs ENCORE VIDES depuis la candidature, sans jamais écraser une
+        // saisie manuelle de l'organisateur. Permet de rattraper des infos ajoutées à la
+        // candidature après un premier import.
+        const isBlank = (v: string | null) => v == null || v.trim() === ''
+        const fill: {
+          duration?: number
+          description?: string
+          technicalNeeds?: string
+          stageSetup?: string
+        } = {}
+        if (act.duration == null && application.showDuration != null)
+          fill.duration = application.showDuration
+        if (isBlank(act.description) && !isBlank(application.showDescription))
+          fill.description = application.showDescription
+        if (isBlank(act.technicalNeeds) && !isBlank(application.technicalNeeds))
+          fill.technicalNeeds = application.technicalNeeds as string
+        if (isBlank(act.stageSetup) && !isBlank(application.stageSetup))
+          fill.stageSetup = application.stageSetup as string
+        if (Object.keys(fill).length > 0) {
+          await prisma.showAct.update({ where: { id: act.id }, data: fill })
+          actFieldsFilled = true
+        }
       }
 
       // Rattacher l'artiste au numéro s'il n'y est pas déjà.
@@ -318,7 +350,13 @@ export default wrapApiHandler(
     }
 
     // Rien à faire : l'artiste existe déjà, pas de mise à jour, pas de lien ni de besoins ajoutés
-    if (!artistCreated && !showLinkCreated && !artistDataApplied && !showTechNeedsAppended) {
+    if (
+      !artistCreated &&
+      !showLinkCreated &&
+      !artistDataApplied &&
+      !showTechNeedsAppended &&
+      !actFieldsFilled
+    ) {
       throw createError({
         status: 409,
         message: 'Cet artiste est déjà importé et à jour',
@@ -330,6 +368,7 @@ export default wrapApiHandler(
       artistCreated,
       showLinkCreated,
       actCreated,
+      actFieldsFilled,
       showTechNeedsAppended,
       artistDataApplied,
     })
