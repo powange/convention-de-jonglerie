@@ -207,6 +207,7 @@ interface ActInput {
   duration: number | string | null
   description: string | null
   technicalNeeds: string | null
+  stageSetup: string | null
   artistIds: number[]
 }
 
@@ -259,6 +260,7 @@ watch(
             duration: null,
             description: null,
             technicalNeeds: null,
+            stageSetup: null,
             artistIds: [...formData.value.artistIds],
           },
         ]
@@ -426,6 +428,7 @@ const buildPayload = () => {
               duration: act.duration ? Number(act.duration) : null,
               description: act.description || null,
               technicalNeeds: act.technicalNeeds || null,
+              stageSetup: act.stageSetup || null,
               artistIds: act.artistIds,
             }))
         : [],
@@ -530,6 +533,7 @@ watch(
             duration: act.duration ?? null,
             description: act.description ?? null,
             technicalNeeds: act.technicalNeeds ?? null,
+            stageSetup: act.stageSetup ?? null,
             artistIds: act.artists?.map((showArtist: any) => showArtist.artistId) || [],
           })) || [],
         isPublic: newShow.isPublic || false,

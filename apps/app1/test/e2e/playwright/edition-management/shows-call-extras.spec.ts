@@ -3,14 +3,18 @@ import { expect, test } from '@nuxt/test-utils/playwright'
 import {
   apiPost,
   buildShowApplicationBody,
+  createShow,
   createShowCall,
+  deleteShow,
   deleteShowCall,
   enableArtistProfile,
   getEditionArtists,
   getMyShowApplication,
+  getShow,
   getShowCallApplications,
   getShowCallTechnicalNeeds,
   importPerformerFromApplication,
+  linkApplicationToShow,
   loadState,
   submitShowApplicationViaApi,
   updateEdition,
@@ -213,5 +217,288 @@ test.describe.serial('Appel à spectacles : besoins techniques, édition et impo
     if (showCallId) {
       await deleteShowCall(page, editionId, showCallId)
     }
+  })
+})
+
+// ════════════════════════════════════════════════════════════════
+// Import sur un spectacle CABARET : la candidature devient un numéro
+// ════════════════════════════════════════════════════════════════
+
+const CABARET_SHOW_CALL_NAME = `E2E Cabaret appel ${Date.now()}`
+// showTitle de la candidature = titre du numéro créé, et clé de rapprochement
+const CABARET_NUMERO_TITLE = `E2E Numéro cabaret ${Date.now()}`
+// Deux performers d'une même candidature : ils doivent atterrir dans LE MÊME numéro
+const CABARET_PERF_1_EMAIL = `e2e-cab-perf1-${Date.now()}@example.com`
+const CABARET_PERF_2_EMAIL = `e2e-cab-perf2-${Date.now()}@example.com`
+// Mise en place scène : reprise dans le nouveau champ stageSetup du numéro
+const CABARET_STAGE_SETUP = 'Praticable 4x4 + tapis de chute, à retirer après le numéro'
+
+test.describe.serial('Import performer sur un cabaret : création de numéro', () => {
+  let editionId: string
+  let showCallId: string
+  let applicationId: string
+  let cabaretShowId: number
+
+  test.beforeAll(() => {
+    editionId = loadState().editionId
+  })
+
+  test('préparer : appel + candidature à 2 performers, acceptée', async ({ page }) => {
+    await updateEdition(page, editionId, { artistsEnabled: true })
+
+    const showCall = await createShowCall(page, editionId, {
+      name: CABARET_SHOW_CALL_NAME,
+      description: 'Appel E2E pour import cabaret',
+    })
+    expect(showCall.id).toBeTruthy()
+    showCallId = String(showCall.id)
+
+    const deadline = new Date()
+    deadline.setDate(deadline.getDate() + 30)
+    await updateShowCall(page, editionId, showCallId, {
+      name: CABARET_SHOW_CALL_NAME,
+      visibility: 'PUBLIC',
+      mode: 'INTERNAL',
+      deadline: deadline.toISOString(),
+      requirePhone: false,
+    })
+
+    await enableArtistProfile(page)
+
+    const application = await submitShowApplicationViaApi(
+      page,
+      editionId,
+      showCallId,
+      buildShowApplicationBody({
+        showTitle: CABARET_NUMERO_TITLE,
+        showDuration: 12,
+        stageSetup: CABARET_STAGE_SETUP,
+        additionalPerformersCount: 2,
+        additionalPerformers: [
+          {
+            lastName: 'CabNom1',
+            firstName: 'CabPrenom1',
+            email: CABARET_PERF_1_EMAIL,
+            phone: '+33611110001',
+          },
+          {
+            lastName: 'CabNom2',
+            firstName: 'CabPrenom2',
+            email: CABARET_PERF_2_EMAIL,
+            phone: '+33611110002',
+          },
+        ],
+      })
+    )
+    expect(application.id).toBeTruthy()
+    applicationId = String(application.id)
+
+    await updateShowCallApplicationStatus(page, editionId, showCallId, applicationId, {
+      status: 'ACCEPTED',
+    })
+  })
+
+  test('créer un spectacle CABARET et y lier la candidature', async ({ page }) => {
+    const show = await createShow(page, editionId, {
+      title: `E2E Cabaret ${Date.now()}`,
+      type: 'CABARET',
+      startDateTime: new Date().toISOString(),
+      acts: [],
+    })
+    expect(show.id).toBeTruthy()
+    expect(show.type).toBe('CABARET')
+    cabaretShowId = show.id
+
+    const linked = await linkApplicationToShow(
+      page,
+      editionId,
+      showCallId,
+      applicationId,
+      cabaretShowId
+    )
+    expect(linked.showId).toBe(cabaretShowId)
+  })
+
+  test('importer le 1er performer crée le numéro', async ({ page }) => {
+    const result = await importPerformerFromApplication(
+      page,
+      editionId,
+      showCallId,
+      applicationId,
+      { performerIndex: 0 }
+    )
+    expect(result.artistCreated).toBe(true)
+    expect(result.actCreated).toBe(true)
+    expect(result.showLinkCreated).toBe(true)
+  })
+
+  test('importer le 2e performer réutilise le même numéro (pas de doublon)', async ({ page }) => {
+    const result = await importPerformerFromApplication(
+      page,
+      editionId,
+      showCallId,
+      applicationId,
+      { performerIndex: 1 }
+    )
+    expect(result.artistCreated).toBe(true)
+    // Le numéro existe déjà (créé au 1er import) → pas de nouvelle création
+    expect(result.actCreated).toBe(false)
+    expect(result.showLinkCreated).toBe(true)
+  })
+
+  test('le cabaret contient un unique numéro avec les 2 performers', async ({ page }) => {
+    const show = await getShow(page, editionId, cabaretShowId)
+    expect(show.type).toBe('CABARET')
+
+    const matching = (show.acts || []).filter(
+      (a: { title: string }) => a.title === CABARET_NUMERO_TITLE
+    )
+    expect(matching).toHaveLength(1)
+
+    // La mise en place scène de la candidature est reprise dans le numéro
+    expect(matching[0].stageSetup).toBe(CABARET_STAGE_SETUP)
+
+    const emails = (matching[0].artists || []).map(
+      (sa: { artist: { user: { email: string } } }) => sa.artist.user.email
+    )
+    expect(emails).toContain(CABARET_PERF_1_EMAIL)
+    expect(emails).toContain(CABARET_PERF_2_EMAIL)
+  })
+
+  test('nettoyer : supprimer le spectacle et l’appel', async ({ page }) => {
+    if (cabaretShowId) await deleteShow(page, editionId, cabaretShowId)
+    if (showCallId) await deleteShowCall(page, editionId, showCallId)
+  })
+})
+
+// ════════════════════════════════════════════════════════════════
+// Import sur un spectacle STANDARD : concaténation des besoins techniques
+// ════════════════════════════════════════════════════════════════
+
+const STD_SHOW_CALL_NAME = `E2E Standard appel ${Date.now()}`
+// Besoins techniques déjà saisis sur le spectacle : ne doivent PAS être écrasés
+const STD_INITIAL_TECH = `Besoins existants spectacle ${Date.now()}`
+// Besoins techniques de la candidature : doivent être AJOUTÉS à la suite
+const STD_APP_TECH = `Besoins candidature ${Date.now()}`
+const STD_PERF_1_EMAIL = `e2e-std-perf1-${Date.now()}@example.com`
+const STD_PERF_2_EMAIL = `e2e-std-perf2-${Date.now()}@example.com`
+
+test.describe.serial('Import performer sur un standard : concaténation besoins techniques', () => {
+  let editionId: string
+  let showCallId: string
+  let applicationId: string
+  let standardShowId: number
+
+  test.beforeAll(() => {
+    editionId = loadState().editionId
+  })
+
+  test('préparer : appel + candidature à 2 performers, acceptée', async ({ page }) => {
+    await updateEdition(page, editionId, { artistsEnabled: true })
+
+    const showCall = await createShowCall(page, editionId, {
+      name: STD_SHOW_CALL_NAME,
+      description: 'Appel E2E pour concaténation besoins techniques',
+    })
+    expect(showCall.id).toBeTruthy()
+    showCallId = String(showCall.id)
+
+    const deadline = new Date()
+    deadline.setDate(deadline.getDate() + 30)
+    await updateShowCall(page, editionId, showCallId, {
+      name: STD_SHOW_CALL_NAME,
+      visibility: 'PUBLIC',
+      mode: 'INTERNAL',
+      deadline: deadline.toISOString(),
+      requirePhone: false,
+    })
+
+    await enableArtistProfile(page)
+
+    const application = await submitShowApplicationViaApi(
+      page,
+      editionId,
+      showCallId,
+      buildShowApplicationBody({
+        showTitle: `E2E Standard spectacle ${Date.now()}`,
+        technicalNeeds: STD_APP_TECH,
+        additionalPerformersCount: 2,
+        additionalPerformers: [
+          {
+            lastName: 'StdNom1',
+            firstName: 'StdPrenom1',
+            email: STD_PERF_1_EMAIL,
+            phone: '+33611120001',
+          },
+          {
+            lastName: 'StdNom2',
+            firstName: 'StdPrenom2',
+            email: STD_PERF_2_EMAIL,
+            phone: '+33611120002',
+          },
+        ],
+      })
+    )
+    expect(application.id).toBeTruthy()
+    applicationId = String(application.id)
+
+    await updateShowCallApplicationStatus(page, editionId, showCallId, applicationId, {
+      status: 'ACCEPTED',
+    })
+  })
+
+  test('créer un spectacle STANDARD (avec besoins existants) et y lier la candidature', async ({
+    page,
+  }) => {
+    const show = await createShow(page, editionId, {
+      title: `E2E Standard ${Date.now()}`,
+      type: 'STANDARD',
+      startDateTime: new Date().toISOString(),
+      technicalNeeds: STD_INITIAL_TECH,
+    })
+    expect(show.id).toBeTruthy()
+    standardShowId = show.id
+
+    await linkApplicationToShow(page, editionId, showCallId, applicationId, standardShowId)
+  })
+
+  test('importer le 1er performer ajoute les besoins de la candidature', async ({ page }) => {
+    const result = await importPerformerFromApplication(
+      page,
+      editionId,
+      showCallId,
+      applicationId,
+      { performerIndex: 0 }
+    )
+    expect(result.artistCreated).toBe(true)
+    expect(result.showLinkCreated).toBe(true)
+    expect(result.showTechNeedsAppended).toBe(true)
+
+    const show = await getShow(page, editionId, standardShowId)
+    // L'existant est conservé ET les besoins de la candidature sont ajoutés
+    expect(show.technicalNeeds).toContain(STD_INITIAL_TECH)
+    expect(show.technicalNeeds).toContain(STD_APP_TECH)
+  })
+
+  test('importer le 2e performer ne duplique pas les besoins (idempotent)', async ({ page }) => {
+    const result = await importPerformerFromApplication(
+      page,
+      editionId,
+      showCallId,
+      applicationId,
+      { performerIndex: 1 }
+    )
+    expect(result.artistCreated).toBe(true)
+    // Les besoins de la candidature sont déjà présents → pas de nouvel ajout
+    expect(result.showTechNeedsAppended).toBe(false)
+
+    const show = await getShow(page, editionId, standardShowId)
+    const occurrences = (show.technicalNeeds as string).split(STD_APP_TECH).length - 1
+    expect(occurrences).toBe(1)
+  })
+
+  test('nettoyer : supprimer le spectacle et l’appel', async ({ page }) => {
+    if (standardShowId) await deleteShow(page, editionId, standardShowId)
+    if (showCallId) await deleteShowCall(page, editionId, showCallId)
   })
 })

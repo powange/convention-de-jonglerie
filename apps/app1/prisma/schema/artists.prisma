@@ -130,6 +130,7 @@ model ShowAct {
   duration       Int? // En minutes
   description    String?  @db.Text
   technicalNeeds String?  @db.Text // Besoins techniques (espace, son, lumière)
+  stageSetup     String?  @db.Text // Mise en place scène (état de la scène avant/après le numéro)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

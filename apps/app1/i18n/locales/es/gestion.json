@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Escenario 4×4 m, sonido, 2 baños de luz...",
       "technical_needs": "Necesidades técnicas",
       "technical_needs_hint": "Nota interna, no visible en la página pública",
-      "technical_needs_placeholder": "Escenario, sonido, luz, regiduría, montaje/desmontaje..."
+      "technical_needs_placeholder": "Escenario, sonido, luz, regiduría, montaje/desmontaje...",
+      "act_stage_setup": "Preparación del escenario",
+      "act_stage_setup_placeholder": "Estado del escenario antes del número, restablecimiento después..."
     },
     "stock": {
       "available_now": "{available}/{total} disponible(s)",

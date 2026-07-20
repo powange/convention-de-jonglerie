@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Scen 4×4 m, ljud, 2 ljusytor...",
       "technical_needs": "Tekniska behov",
       "technical_needs_hint": "Intern notering, visas inte på den offentliga sidan",
-      "technical_needs_placeholder": "Scen, ljud, ljus, regi, upp-/nedmontering..."
+      "technical_needs_placeholder": "Scen, ljud, ljus, regi, upp-/nedmontering...",
+      "act_stage_setup": "Scenuppställning",
+      "act_stage_setup_placeholder": "Scenens tillstånd före numret, återställning efteråt..."
     },
     "stock": {
       "available_now": "{available}/{total} tillgängliga",

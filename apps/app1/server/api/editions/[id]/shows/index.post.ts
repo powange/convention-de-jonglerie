@@ -13,7 +13,8 @@ const showSchema = z.object({
   title: z.string().min(1, 'Le titre est requis').max(191),
   type: z.enum(['STANDARD', 'CABARET']).optional().default('STANDARD'),
   description: z.string().optional().nullable(),
-  technicalNeeds: z.string().max(2000).optional().nullable(),
+  // Sans plafond (comme description) : agrège les besoins techniques importés des candidatures
+  technicalNeeds: z.string().optional().nullable(),
   startDateTime: z.string().datetime(),
   duration: z.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),

@@ -12,8 +12,11 @@ export const showActSchema = z.object({
   // l'écriture au milieu de la recomposition
   title: z.string().min(1, 'Le titre du numéro est requis').max(191),
   duration: z.number().int().positive().max(1440).optional().nullable(),
-  description: z.string().max(2000).optional().nullable(),
-  technicalNeeds: z.string().max(2000).optional().nullable(),
+  // Plafonds alignés sur ceux de la candidature (validation-schemas) pour qu'un numéro importé
+  // depuis une candidature reste éditable/ré-enregistrable via le formulaire.
+  description: z.string().max(5000).optional().nullable(),
+  technicalNeeds: z.string().max(3000).optional().nullable(),
+  stageSetup: z.string().max(3000).optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional().default([]),
 })
 
@@ -58,6 +61,7 @@ export async function replaceShowComposition(
           duration: act.duration ?? null,
           description: act.description ?? null,
           technicalNeeds: act.technicalNeeds ?? null,
+          stageSetup: act.stageSetup ?? null,
         },
       })
 

@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Bühne 4×4 m, Beschallung, 2 Lichtwäschen...",
       "technical_needs": "Technische Anforderungen",
       "technical_needs_hint": "Interne Notiz, nicht auf der öffentlichen Seite sichtbar",
-      "technical_needs_placeholder": "Bühne, Ton, Licht, Regie, Auf-/Abbau..."
+      "technical_needs_placeholder": "Bühne, Ton, Licht, Regie, Auf-/Abbau...",
+      "act_stage_setup": "Bühnenaufbau",
+      "act_stage_setup_placeholder": "Zustand der Bühne vor der Nummer, Wiederherstellung danach..."
     },
     "stock": {
       "available_now": "{available}/{total} verfügbar",

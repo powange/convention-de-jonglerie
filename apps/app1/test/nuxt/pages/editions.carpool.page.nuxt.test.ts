@@ -7,9 +7,8 @@ describe('Page /editions/[id]/carpool', () => {
     // Page déplacée dans le layer carpool (modularisation).
     // Littéral inliné (pas de variable) pour que Vite résolve le chemin au transform,
     // relativement à ce fichier (monorepo : layers à la racine, ../../../../../layers).
-    const module = await import(
-      '../../../../../layers/carpool/app/pages/editions/[id]/carpool/index.vue'
-    )
+    const module =
+      await import('../../../../../layers/carpool/app/pages/editions/[id]/carpool/index.vue')
 
     expect(module.default).toBeDefined()
     expect(typeof module.default).toBe('object')

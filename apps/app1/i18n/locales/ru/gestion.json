@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Сцена 4×4 м, звук, 2 световые заливки...",
       "technical_needs": "Технические требования",
       "technical_needs_hint": "Внутренняя заметка, не видна на публичной странице",
-      "technical_needs_placeholder": "Сцена, звук, свет, режиссура, монтаж/демонтаж..."
+      "technical_needs_placeholder": "Сцена, звук, свет, режиссура, монтаж/демонтаж...",
+      "act_stage_setup": "Подготовка сцены",
+      "act_stage_setup_placeholder": "Состояние сцены до номера, восстановление после..."
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

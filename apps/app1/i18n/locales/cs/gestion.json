@@ -265,7 +265,9 @@
       "act_technical_needs_placeholder": "Jeviště 4×4 m, ozvučení, 2 světelné plochy...",
       "technical_needs": "Technické požadavky",
       "technical_needs_hint": "Interní poznámka, nezobrazuje se na veřejné stránce",
-      "technical_needs_placeholder": "Jeviště, zvuk, světlo, režie, stavba/bourání..."
+      "technical_needs_placeholder": "Jeviště, zvuk, světlo, režie, stavba/bourání...",
+      "act_stage_setup": "Příprava scény",
+      "act_stage_setup_placeholder": "Stav scény před číslem, uvedení do původního stavu po..."
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",
