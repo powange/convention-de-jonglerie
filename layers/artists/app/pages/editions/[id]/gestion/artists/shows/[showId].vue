@@ -28,7 +28,7 @@
         ref="formRef"
         :edition-id="editionId"
         :show="show"
-        @saved="goBackToShows"
+        @saved="handleSaved"
         @cancel="goBackToShows"
       />
     </template>
@@ -78,6 +78,11 @@ const { execute: fetchShow } = useApiAction(
     },
   }
 )
+
+// Après enregistrement, on reste sur la page. Le rechargement resynchronise l'en-tête (titre)
+// et le formulaire avec ce qui est réellement en base, et remet isDirty à false via la
+// réhydratation ; le formulaire a déjà affiché le toast de succès.
+const handleSaved = () => fetchShow()
 
 onMounted(async () => {
   if (!edition.value || edition.value.id !== editionId.value) {
