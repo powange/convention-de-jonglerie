@@ -55,8 +55,8 @@
     "docker:dev:clean-modules": "docker compose -f docker-compose.dev.yml down && docker volume rm convention-de-jonglerie_node_modules && echo '✓ Volume node_modules supprimé. Relancez docker:dev pour réinstaller.'",
     "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f app",
     "docker:dev:exec": "docker compose -f docker-compose.dev.yml exec app sh",
-    "docker:dev:get-lockfile": "docker cp convention-app-dev:/app/package-lock.json ./package-lock.json && echo '✓ package-lock.json copié depuis le conteneur'",
-    "docker:dev:get-package": "docker cp convention-app-dev:/app/package.json ./package.json && echo '✓ package.json copié depuis le conteneur'",
+    "docker:dev:get-lockfile": "docker cp convention-app-dev:/app/apps/app1/package-lock.json ./package-lock.json && echo '✓ package-lock.json copié depuis le conteneur'",
+    "docker:dev:get-package": "docker cp convention-app-dev:/app/apps/app1/package.json ./package.json && echo '✓ package.json copié depuis le conteneur'",
     "db:seed:dev": "npx tsx scripts/seed-dev.ts",
     "db:seed:password": "npx tsx scripts/list-seed-accounts.ts",
     "db:e2e:accounts": "npx tsx scripts/list-e2e-accounts.ts",
@@ -121,7 +121,7 @@
     "luxon": "^3.7.2",
     "md5": "^2.3.0",
     "nodemailer": "^8.0.2",
-    "nuxt": "^4.4.8",
+    "nuxt": "^4.5.0",
     "nuxt-auth-utils": "^0.5.29",
     "nuxt-qrcode": "^0.4.8",
     "nuxt-security": "^2.5.1",
@@ -173,7 +173,8 @@
     "wait-on": "^9.0.4"
   },
   "overrides": {
-    "vue": "3.5.38"
+    "vue": "3.5.38",
+    "vite": "^8.0.0"
   },
   "engines": {
     "node": ">=22 <26"
