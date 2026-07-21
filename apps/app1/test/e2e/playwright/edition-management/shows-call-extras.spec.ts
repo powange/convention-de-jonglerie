@@ -12,7 +12,6 @@ import {
   getMyShowApplication,
   getShow,
   getShowCallApplications,
-  getShowCallTechnicalNeeds,
   importPerformerFromApplication,
   linkApplicationToShow,
   loadState,
@@ -30,11 +29,10 @@ const PERFORMER_EMAIL = `e2e-import-perf-${Date.now()}@example.com`
 /**
  * Couvre les fonctionnalités annexes des appels à spectacles non testées
  * par shows-call.spec.ts :
- *  - GET shows-call/technical-needs    : besoins techniques agrégés (organisateur)
  *  - PUT shows-call/[id]/my-application : édition de sa candidature (PENDING)
  *  - POST applications/[id]/import-performer : import d'un performer accepté
  *
- * Un seul appel + une seule candidature pilotent ces trois scénarios.
+ * Un seul appel + une seule candidature pilotent ces scénarios.
  */
 test.describe.serial('Appel à spectacles : besoins techniques, édition et import', () => {
   let editionId: string
@@ -126,41 +124,13 @@ test.describe.serial('Appel à spectacles : besoins techniques, édition et impo
   })
 
   // ──────────────────────────────────────────────
-  // Besoins techniques agrégés (technical-needs GET)
+  // Acceptation de la candidature (prérequis des étapes suivantes)
   // ──────────────────────────────────────────────
-
-  test('GET technical-needs : vide tant que la candidature est PENDING', async ({ page }) => {
-    // L'endpoint n'agrège que les candidatures ACCEPTÉES
-    const data = await getShowCallTechnicalNeeds(page, editionId)
-    expect(Array.isArray(data.groups)).toBe(true)
-    const found = data.groups
-      .flatMap((g: { applications: { showTitle: string }[] }) => g.applications)
-      .find((a: { showTitle: string }) => a.showTitle === 'E2E Extras - Spectacle MODIFIÉ')
-    expect(found).toBeFalsy()
-  })
 
   test('accepter la candidature pour les étapes suivantes', async ({ page }) => {
     await updateShowCallApplicationStatus(page, editionId, showCallId, applicationId, {
       status: 'ACCEPTED',
     })
-  })
-
-  test('GET technical-needs : la candidature acceptée apparaît avec ses besoins', async ({
-    page,
-  }) => {
-    const data = await getShowCallTechnicalNeeds(page, editionId)
-    expect(data).toHaveProperty('editionName')
-    expect(Array.isArray(data.groups)).toBe(true)
-
-    const allApps = data.groups.flatMap(
-      (g: { applications: { showTitle: string; technicalNeeds: string | null }[] }) =>
-        g.applications
-    )
-    const entry = allApps.find(
-      (a: { showTitle: string }) => a.showTitle === 'E2E Extras - Spectacle MODIFIÉ'
-    )
-    expect(entry).toBeTruthy()
-    expect(entry.technicalNeeds).toContain('scène 5x5m')
   })
 
   // ──────────────────────────────────────────────

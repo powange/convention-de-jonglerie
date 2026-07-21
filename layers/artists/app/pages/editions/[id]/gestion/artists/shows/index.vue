@@ -224,6 +224,15 @@
                 <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
                   <div class="flex items-center justify-end gap-2">
                     <UButton
+                      v-if="show.type === 'CABARET'"
+                      icon="i-heroicons-queue-list"
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      :title="$t('gestion.shows.edit_acts')"
+                      @click="goToEditActs(show)"
+                    />
+                    <UButton
                       icon="i-heroicons-pencil"
                       color="primary"
                       variant="ghost"
@@ -366,17 +375,21 @@ const showsPath = computed(() => `/editions/${editionId.value}/gestion/artists/s
 const goToAddShow = () => router.push(`${showsPath.value}/new`)
 
 const goToEditShow = (show: any) => router.push(`${showsPath.value}/${show.id}`)
+const goToEditActs = (show: any) => router.push(`${showsPath.value}/${show.id}/numeros`)
 
 // --- Export PDF des besoins techniques ---
-interface TechnicalApplication {
-  id: number
-  artistName: string
-  showTitle: string
+interface TechnicalAct {
+  title: string
   technicalNeeds: string | null
+  stageSetup: string | null
+  artists: string[]
 }
-interface TechnicalGroup {
-  show: { id: number; title: string } | null
-  applications: TechnicalApplication[]
+interface TechnicalShow {
+  title: string
+  type: string
+  technicalNeeds: string | null
+  artists: string[]
+  acts: TechnicalAct[]
 }
 const exportingTechnicalPdf = ref(false)
 
@@ -395,9 +408,9 @@ async function exportTechnicalNeedsPdf() {
   try {
     const res = await $fetch<{
       success: boolean
-      data: { editionName: string; groups: TechnicalGroup[] }
-    }>(`/api/editions/${editionId.value}/shows-call/technical-needs`)
-    const { editionName, groups } = res.data
+      data: { editionName: string; shows: TechnicalShow[] }
+    }>(`/api/editions/${editionId.value}/shows/technical-needs`)
+    const { editionName, shows } = res.data
 
     const { jsPDF } = await import('jspdf')
     const doc = new jsPDF({ unit: 'mm', format: 'a4' })
@@ -451,25 +464,47 @@ async function exportTechnicalNeedsPdf() {
     )
     y += 4
 
-    if (!groups.length) {
+    if (!shows.length) {
       writeWrapped(t('gestion.shows.technical_pdf_empty'), { size: 11 })
     }
 
-    for (const group of groups) {
+    for (const show of shows) {
       ensureSpace(10)
-      // Titre du show (ou "Sans spectacle lié")
-      const showTitle = group.show
-        ? group.show.title
-        : t('gestion.shows.technical_pdf_no_show_group')
-      writeWrapped(showTitle, { size: 14, bold: true, color: [80, 50, 130] })
+      writeWrapped(show.title, { size: 14, bold: true, color: [80, 50, 130] })
       y += 1
 
-      for (const app of group.applications) {
+      // Besoins techniques au niveau du spectacle
+      if (show.technicalNeeds?.trim()) {
+        writeWrapped(show.technicalNeeds.trim(), { size: 10 })
+      } else if (show.type !== 'CABARET') {
+        writeWrapped(t('gestion.shows.technical_pdf_no_needs'), { size: 10 })
+      }
+      // Artistes du spectacle (STANDARD : les artistes vivent au niveau du spectacle)
+      if (show.type !== 'CABARET' && show.artists.length) {
+        writeWrapped(t('gestion.shows.technical_pdf_artists', { artists: show.artists.join(', ') }), {
+          size: 9,
+          color: [110, 110, 110],
+        })
+      }
+
+      // Numéros (CABARET) : besoins techniques + mise en place scène + artistes
+      for (const act of show.acts) {
         ensureSpace(8)
-        const sub = `${app.artistName} — ${app.showTitle}`
-        writeWrapped(sub, { size: 11, bold: true })
-        const needs = app.technicalNeeds?.trim() || t('gestion.shows.technical_pdf_no_needs')
+        writeWrapped(act.title, { size: 11, bold: true })
+        const needs = act.technicalNeeds?.trim() || t('gestion.shows.technical_pdf_no_needs')
         writeWrapped(needs, { size: 10 })
+        if (act.stageSetup?.trim()) {
+          writeWrapped(
+            t('gestion.shows.technical_pdf_stage_setup', { value: act.stageSetup.trim() }),
+            { size: 10 }
+          )
+        }
+        if (act.artists.length) {
+          writeWrapped(
+            t('gestion.shows.technical_pdf_artists', { artists: act.artists.join(', ') }),
+            { size: 9, color: [110, 110, 110] }
+          )
+        }
         y += 3
       }
       y += 3

@@ -455,18 +455,6 @@ export async function getSurveyResults(page: Page, editionId: string, showCallId
 }
 
 /**
- * Récupère les besoins techniques agrégés (GET shows-call/technical-needs).
- */
-export async function getShowCallTechnicalNeeds(page: Page, editionId: string) {
-  const response = await page.request.get(
-    `${BASE_URL}/api/editions/${editionId}/shows-call/technical-needs`
-  )
-  expect(response.ok()).toBe(true)
-  const body = await response.json()
-  return body.data || body
-}
-
-/**
  * Importe un performer d'une candidature ACCEPTÉE comme EditionArtist.
  */
 export async function importPerformerFromApplication(
