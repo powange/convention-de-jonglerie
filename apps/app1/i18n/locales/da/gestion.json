@@ -273,7 +273,15 @@
       "edit_acts": "Rediger numre",
       "not_a_cabaret": "Denne forestilling er ikke en cabaret.",
       "technical_pdf_artists": "Artister: {artists}",
-      "technical_pdf_stage_setup": "Sceneopsætning: {value}"
+      "technical_pdf_stage_setup": "Sceneopsætning: {value}",
+      "act_number": "Nummer {number}",
+      "act_untitled": "Nummer uden titel",
+      "acts_count": "{count} numre",
+      "minutes": "min",
+      "section_cast": "Artister og numre",
+      "section_publishing": "Offentliggørelse og internt",
+      "section_schedule": "Planlægning",
+      "section_show": "Forestillingen"
     },
     "stock": {
       "available_now": "{available}/{total} tilgængelige",

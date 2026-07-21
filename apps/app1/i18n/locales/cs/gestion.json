@@ -273,7 +273,15 @@
       "edit_acts": "Upravit čísla",
       "not_a_cabaret": "Toto představení není kabaret.",
       "technical_pdf_artists": "Umělci: {artists}",
-      "technical_pdf_stage_setup": "Příprava scény: {value}"
+      "technical_pdf_stage_setup": "Příprava scény: {value}",
+      "act_number": "Číslo {number}",
+      "act_untitled": "Číslo bez názvu",
+      "acts_count": "{count} čísel",
+      "minutes": "min",
+      "section_cast": "Umělci a čísla",
+      "section_publishing": "Zveřejnění a interní",
+      "section_schedule": "Plánování",
+      "section_show": "Představení"
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",

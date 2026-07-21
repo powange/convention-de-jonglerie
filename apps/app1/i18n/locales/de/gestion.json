@@ -273,7 +273,15 @@
       "edit_acts": "Nummern bearbeiten",
       "not_a_cabaret": "Diese Aufführung ist kein Cabaret.",
       "technical_pdf_artists": "Künstler: {artists}",
-      "technical_pdf_stage_setup": "Bühnenaufbau: {value}"
+      "technical_pdf_stage_setup": "Bühnenaufbau: {value}",
+      "act_number": "Nummer {number}",
+      "act_untitled": "Nummer ohne Titel",
+      "acts_count": "{count} Nummer(n)",
+      "minutes": "Min.",
+      "section_cast": "Künstler und Nummern",
+      "section_publishing": "Veröffentlichung und Intern",
+      "section_schedule": "Terminplanung",
+      "section_show": "Die Show"
     },
     "stock": {
       "available_now": "{available}/{total} verfügbar",
