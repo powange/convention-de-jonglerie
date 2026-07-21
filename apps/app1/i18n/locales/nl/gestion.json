@@ -273,7 +273,15 @@
       "edit_acts": "Nummers bewerken",
       "not_a_cabaret": "Deze voorstelling is geen cabaret.",
       "technical_pdf_artists": "Artiesten: {artists}",
-      "technical_pdf_stage_setup": "Podiumopbouw: {value}"
+      "technical_pdf_stage_setup": "Podiumopbouw: {value}",
+      "act_number": "Nummer {number}",
+      "act_untitled": "Nummer zonder titel",
+      "acts_count": "{count} nummer(s)",
+      "minutes": "min",
+      "section_cast": "Artiesten en nummers",
+      "section_publishing": "Publicatie en intern",
+      "section_schedule": "Planning",
+      "section_show": "De voorstelling"
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",

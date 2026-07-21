@@ -273,7 +273,15 @@
       "edit_acts": "Modifica i numeri",
       "not_a_cabaret": "Questo spettacolo non è un cabaret.",
       "technical_pdf_artists": "Artisti: {artists}",
-      "technical_pdf_stage_setup": "Allestimento scena: {value}"
+      "technical_pdf_stage_setup": "Allestimento scena: {value}",
+      "act_number": "Numero {number}",
+      "act_untitled": "Numero senza titolo",
+      "acts_count": "{count} numeri",
+      "minutes": "min",
+      "section_cast": "Artisti e numeri",
+      "section_publishing": "Diffusione e interno",
+      "section_schedule": "Programmazione",
+      "section_show": "Lo spettacolo"
     },
     "stock": {
       "available_now": "{available}/{total} disponibile/i",

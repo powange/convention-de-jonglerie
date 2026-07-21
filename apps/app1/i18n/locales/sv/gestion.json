@@ -273,7 +273,15 @@
       "edit_acts": "Redigera nummer",
       "not_a_cabaret": "Den här föreställningen är inte en kabaret.",
       "technical_pdf_artists": "Artister: {artists}",
-      "technical_pdf_stage_setup": "Scenuppställning: {value}"
+      "technical_pdf_stage_setup": "Scenuppställning: {value}",
+      "act_number": "Nummer {number}",
+      "act_untitled": "Namnlöst nummer",
+      "acts_count": "{count} nummer",
+      "minutes": "min",
+      "section_cast": "Artister och nummer",
+      "section_publishing": "Publicering och internt",
+      "section_schedule": "Schemaläggning",
+      "section_show": "Föreställningen"
     },
     "stock": {
       "available_now": "{available}/{total} tillgängliga",

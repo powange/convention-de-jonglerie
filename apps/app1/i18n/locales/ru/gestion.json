@@ -273,7 +273,15 @@
       "edit_acts": "Редактировать номера",
       "not_a_cabaret": "Это выступление не является кабаре.",
       "technical_pdf_artists": "Артисты: {artists}",
-      "technical_pdf_stage_setup": "Подготовка сцены: {value}"
+      "technical_pdf_stage_setup": "Подготовка сцены: {value}",
+      "act_number": "Номер {number}",
+      "act_untitled": "Номер без названия",
+      "acts_count": "{count} номер(ов)",
+      "minutes": "мин",
+      "section_cast": "Артисты и номера",
+      "section_publishing": "Публикация и внутреннее",
+      "section_schedule": "Расписание",
+      "section_show": "Спектакль"
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

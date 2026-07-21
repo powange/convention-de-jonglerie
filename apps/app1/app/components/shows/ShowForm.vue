@@ -1,195 +1,253 @@
 <template>
   <form @submit.prevent="handleSubmit">
-    <UCard>
-      <div class="space-y-4">
-        <!-- Image / Affiche -->
-        <UFormField :label="$t('gestion.shows.image')">
-          <UiImageUpload
-            v-model="formData.imageUrl"
-            :endpoint="uploadEndpoint"
-            :options="{
-              validation: {
-                maxSize: 5 * 1024 * 1024,
-                allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-                allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
-              },
-              resetAfterUpload: false,
-            }"
-            :alt="formData.title || $t('gestion.shows.image')"
-            :placeholder="$t('gestion.shows.image_placeholder')"
-            @uploaded="onImageUploaded"
-            @deleted="onImageDeleted"
-          />
-        </UFormField>
+    <div class="space-y-6">
+      <!-- Le spectacle (2/3) + Programmation (1/3) côte à côte sur écran large -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Le spectacle -->
+        <UCard class="lg:col-span-2">
+          <template #header>
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-sparkles" />
+              {{ $t('gestion.shows.section_show') }}
+            </h2>
+          </template>
 
-        <!-- Titre -->
-        <UFormField :label="$t('gestion.shows.show_title')" required>
-          <UInput
-            v-model="formData.title"
-            :placeholder="$t('gestion.shows.show_title')"
-            required
-            class="w-full"
-          />
-        </UFormField>
+          <div class="space-y-4">
+            <!-- Titre -->
+            <UFormField :label="$t('gestion.shows.show_title')" required>
+              <UInput
+                v-model="formData.title"
+                :placeholder="$t('gestion.shows.show_title')"
+                required
+                class="w-full"
+              />
+            </UFormField>
 
-        <!-- Description -->
-        <UFormField :label="$t('gestion.shows.description')">
-          <UTextarea
-            v-model="formData.description"
-            :placeholder="$t('gestion.shows.description')"
-            rows="3"
-            class="w-full"
-          />
-        </UFormField>
+            <!-- Type de spectacle : détermine où vivent les artistes -->
+            <UFormField
+              :label="$t('gestion.shows.type')"
+              :description="$t('gestion.shows.type_hint')"
+            >
+              <URadioGroup
+                v-model="formData.type"
+                :items="typeOptions"
+                value-key="value"
+                variant="table"
+                orientation="horizontal"
+                indicator="hidden"
+              />
+            </UFormField>
 
-        <!-- Besoins techniques : note d'organisation, non exposée publiquement -->
-        <UFormField
-          :label="$t('gestion.shows.technical_needs')"
-          :description="$t('gestion.shows.technical_needs_hint')"
-        >
-          <UTextarea
-            v-model="formData.technicalNeeds"
-            :placeholder="$t('gestion.shows.technical_needs_placeholder')"
-            rows="3"
-            class="w-full"
-          />
-        </UFormField>
+            <!-- Description -->
+            <UFormField :label="$t('gestion.shows.description')">
+              <UTextarea
+                v-model="formData.description"
+                :placeholder="$t('gestion.shows.description')"
+                rows="3"
+                class="w-full"
+              />
+            </UFormField>
 
-        <!-- Date et heure -->
-        <UiDateTimePicker
-          v-model="formData.startDateTime"
-          :date-label="$t('gestion.shows.start_date')"
-          :time-label="$t('gestion.shows.start_time')"
-          :placeholder="$t('gestion.shows.start_datetime')"
-          required
-        />
+            <!-- Image / Affiche -->
+            <UFormField :label="$t('gestion.shows.image')">
+              <UiImageUpload
+                v-model="formData.imageUrl"
+                :endpoint="uploadEndpoint"
+                :options="{
+                  validation: {
+                    maxSize: 5 * 1024 * 1024,
+                    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+                    allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp'],
+                  },
+                  resetAfterUpload: false,
+                }"
+                :alt="formData.title || $t('gestion.shows.image')"
+                :placeholder="$t('gestion.shows.image_placeholder')"
+                @uploaded="onImageUploaded"
+                @deleted="onImageDeleted"
+              />
+            </UFormField>
+          </div>
+        </UCard>
 
-        <!-- Durée -->
-        <UFormField :label="$t('gestion.shows.duration')">
-          <UInput
-            v-model.number="formData.duration"
-            type="number"
-            min="0"
-            :placeholder="$t('gestion.shows.duration')"
-          />
-        </UFormField>
+        <!-- Programmation -->
+        <UCard class="lg:col-span-1">
+          <template #header>
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-calendar-days" />
+              {{ $t('gestion.shows.section_schedule') }}
+            </h2>
+          </template>
 
-        <!-- Lieu -->
-        <UFormField :label="$t('gestion.shows.location')">
-          <div class="space-y-2">
-            <URadioGroup
-              v-if="edition?.siteMapEnabled"
-              v-model="locationType"
-              orientation="horizontal"
-              :items="locationTypeOptions"
+          <div class="space-y-4">
+            <!-- Date et heure -->
+            <UiDateTimePicker
+              v-model="formData.startDateTime"
+              :date-label="$t('gestion.shows.start_date')"
+              :time-label="$t('gestion.shows.start_time')"
+              :placeholder="$t('gestion.shows.start_datetime')"
+              required
             />
 
-            <!-- Mode zone/marqueur -->
-            <USelect
-              v-if="edition?.siteMapEnabled && locationType === 'zone'"
-              v-model="selectedLocationRef"
-              :items="locationOptions"
-              :placeholder="$t('gestion.shows.select_zone_or_marker')"
-              class="w-full"
-            />
+            <!-- Durée -->
+            <UFormField :label="$t('gestion.shows.duration')">
+              <div class="flex items-center gap-2">
+                <UInputNumber v-model="formData.duration" :min="0" :step="5" class="w-40" />
+                <span class="text-sm text-gray-500">{{ $t('gestion.shows.minutes') }}</span>
+              </div>
+            </UFormField>
 
-            <!-- Mode texte libre -->
-            <UInput
-              v-else
-              v-model="formData.location"
-              :placeholder="$t('gestion.shows.free_text_placeholder')"
-              class="w-full"
-            />
+            <!-- Lieu -->
+            <UFormField :label="$t('gestion.shows.location')">
+              <div class="space-y-2">
+                <URadioGroup
+                  v-if="edition?.siteMapEnabled"
+                  v-model="locationType"
+                  orientation="horizontal"
+                  :items="locationTypeOptions"
+                />
+
+                <!-- Mode zone/marqueur -->
+                <USelect
+                  v-if="edition?.siteMapEnabled && locationType === 'zone'"
+                  v-model="selectedLocationRef"
+                  :items="locationOptions"
+                  :placeholder="$t('gestion.shows.select_zone_or_marker')"
+                  class="w-full"
+                />
+
+                <!-- Mode texte libre -->
+                <UInput
+                  v-else
+                  v-model="formData.location"
+                  :placeholder="$t('gestion.shows.free_text_placeholder')"
+                  class="w-full"
+                />
+              </div>
+            </UFormField>
           </div>
-        </UFormField>
-
-        <!-- Type de spectacle : détermine où vivent les artistes -->
-        <UFormField :label="$t('gestion.shows.type')" :description="$t('gestion.shows.type_hint')">
-          <USelect v-model="formData.type" :items="typeOptions" value-key="value" class="w-full" />
-        </UFormField>
-
-        <!-- Spectacle standard : les artistes sont associés au spectacle -->
-        <template v-if="formData.type === 'STANDARD'">
-          <UFormField :label="$t('gestion.shows.artists')">
-            <USelectMenu
-              v-model="formData.artistIds"
-              :items="artistOptions"
-              value-key="value"
-              multiple
-              :placeholder="$t('gestion.shows.select_artists')"
-              class="w-full"
-            >
-              <template #label>
-                <span v-if="formData.artistIds.length === 0">
-                  {{ $t('gestion.shows.no_artists_selected') }}
-                </span>
-                <span v-else>
-                  {{ $t('gestion.shows.artists_count', { count: formData.artistIds.length }) }}
-                </span>
-              </template>
-            </USelectMenu>
-          </UFormField>
-
-          <!-- Liste des artistes sélectionnés -->
-          <div v-if="selectedArtists.length > 0" class="flex flex-wrap gap-2">
-            <UBadge
-              v-for="artist in selectedArtists"
-              :key="artist.id"
-              color="warning"
-              variant="subtle"
-            >
-              <UiUserName :user="artist.user" />
-            </UBadge>
-          </div>
-          <p v-else class="text-sm text-gray-500">
-            {{ $t('gestion.shows.no_artists_selected') }}
-          </p>
-        </template>
-
-        <!-- Cabaret : les numéros (et leurs artistes) -->
-        <UFormField v-else :label="$t('gestion.shows.acts')">
-          <!-- Cabaret existant : édition des numéros sur une page dédiée -->
-          <div
-            v-if="props.show && props.show.type === 'CABARET'"
-            class="flex flex-wrap items-center gap-3"
-          >
-            <p class="text-sm text-gray-500">{{ $t('gestion.shows.acts_edit_dedicated_hint') }}</p>
-            <UButton
-              :to="actsPath"
-              icon="i-heroicons-queue-list"
-              color="primary"
-              variant="soft"
-              size="sm"
-            >
-              {{ $t('gestion.shows.edit_acts') }}
-            </UButton>
-          </div>
-          <!-- Création ou passage en cabaret : le cabaret est créé vide, les numéros s'ajoutent
-               ensuite sur leur page dédiée -->
-          <p v-else class="text-sm text-gray-500">
-            {{ $t('gestion.shows.acts_after_switch_hint') }}
-          </p>
-        </UFormField>
-
-        <!-- Visibilité publique -->
-        <USwitch
-          v-model="formData.isPublic"
-          :label="$t('gestion.shows.is_public')"
-          :description="$t('gestion.shows.is_public_hint')"
-        />
+        </UCard>
       </div>
 
-      <template #footer>
-        <div class="flex justify-end gap-2">
-          <UButton type="button" color="neutral" variant="ghost" @click="emit('cancel')">
-            {{ $t('common.cancel') }}
-          </UButton>
-          <UButton type="submit" color="primary" :loading="loading">
-            {{ show ? $t('common.save') : $t('common.add') }}
-          </UButton>
+      <!-- Artistes et numéros -->
+      <UCard>
+        <template #header>
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <UIcon name="i-heroicons-user-group" />
+            {{ $t('gestion.shows.section_cast') }}
+          </h2>
+        </template>
+
+        <div class="space-y-4">
+          <!-- Spectacle standard : les artistes sont associés au spectacle -->
+          <template v-if="formData.type === 'STANDARD'">
+            <UFormField :label="$t('gestion.shows.artists')">
+              <USelectMenu
+                v-model="formData.artistIds"
+                :items="artistOptions"
+                value-key="value"
+                multiple
+                :placeholder="$t('gestion.shows.select_artists')"
+                class="w-full"
+              >
+                <template #label>
+                  <span v-if="formData.artistIds.length === 0">
+                    {{ $t('gestion.shows.no_artists_selected') }}
+                  </span>
+                  <span v-else>
+                    {{ $t('gestion.shows.artists_count', { count: formData.artistIds.length }) }}
+                  </span>
+                </template>
+              </USelectMenu>
+            </UFormField>
+
+            <!-- Liste des artistes sélectionnés -->
+            <div v-if="selectedArtists.length > 0" class="flex flex-wrap gap-2">
+              <UBadge
+                v-for="artist in selectedArtists"
+                :key="artist.id"
+                color="warning"
+                variant="subtle"
+              >
+                <UiUserName :user="artist.user" />
+              </UBadge>
+            </div>
+            <p v-else class="text-sm text-gray-500">
+              {{ $t('gestion.shows.no_artists_selected') }}
+            </p>
+          </template>
+
+          <!-- Cabaret : les numéros (et leurs artistes) -->
+          <UFormField v-else :label="$t('gestion.shows.acts')">
+            <!-- Cabaret existant : édition des numéros sur une page dédiée -->
+            <div
+              v-if="props.show && props.show.type === 'CABARET'"
+              class="flex flex-wrap items-center gap-3"
+            >
+              <p class="text-sm text-gray-500">
+                {{ $t('gestion.shows.acts_edit_dedicated_hint') }}
+              </p>
+              <UButton
+                :to="actsPath"
+                icon="i-heroicons-queue-list"
+                color="primary"
+                variant="soft"
+                size="sm"
+              >
+                {{ $t('gestion.shows.edit_acts') }}
+              </UButton>
+            </div>
+            <!-- Création ou passage en cabaret : le cabaret est créé vide, les numéros s'ajoutent
+                 ensuite sur leur page dédiée -->
+            <p v-else class="text-sm text-gray-500">
+              {{ $t('gestion.shows.acts_after_switch_hint') }}
+            </p>
+          </UFormField>
         </div>
-      </template>
-    </UCard>
+      </UCard>
+
+      <!-- Diffusion et interne -->
+      <UCard>
+        <template #header>
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <UIcon name="i-heroicons-megaphone" />
+            {{ $t('gestion.shows.section_publishing') }}
+          </h2>
+        </template>
+
+        <div class="space-y-4">
+          <!-- Besoins techniques : note d'organisation, non exposée publiquement -->
+          <UFormField
+            :label="$t('gestion.shows.technical_needs')"
+            :description="$t('gestion.shows.technical_needs_hint')"
+          >
+            <UTextarea
+              v-model="formData.technicalNeeds"
+              :placeholder="$t('gestion.shows.technical_needs_placeholder')"
+              rows="3"
+              class="w-full"
+            />
+          </UFormField>
+
+          <!-- Visibilité publique -->
+          <USwitch
+            v-model="formData.isPublic"
+            :label="$t('gestion.shows.is_public')"
+            :description="$t('gestion.shows.is_public_hint')"
+          />
+        </div>
+      </UCard>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-2">
+        <UButton type="button" color="neutral" variant="ghost" @click="emit('cancel')">
+          {{ $t('common.cancel') }}
+        </UButton>
+        <UButton type="submit" color="primary" :loading="loading">
+          {{ show ? $t('common.save') : $t('common.add') }}
+        </UButton>
+      </div>
+    </div>
   </form>
 </template>
 

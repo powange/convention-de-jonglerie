@@ -273,7 +273,15 @@
       "edit_acts": "Edit acts",
       "not_a_cabaret": "This show is not a cabaret.",
       "technical_pdf_artists": "Artists: {artists}",
-      "technical_pdf_stage_setup": "Stage setup: {value}"
+      "technical_pdf_stage_setup": "Stage setup: {value}",
+      "act_number": "Act {number}",
+      "act_untitled": "Untitled act",
+      "acts_count": "{count} act(s)",
+      "minutes": "min",
+      "section_cast": "Artists and acts",
+      "section_publishing": "Publishing and internal",
+      "section_schedule": "Scheduling",
+      "section_show": "The show"
     },
     "stock": {
       "available_now": "{available}/{total} available",

@@ -27,18 +27,25 @@
         <h1 class="text-2xl font-bold mt-2">
           {{ $t('gestion.shows.acts_of', { title: show.title }) }}
         </h1>
+        <p v-if="acts.length > 0" class="text-sm text-gray-500 mt-1">
+          {{ $t('gestion.shows.acts_count', { count: acts.length }) }}
+        </p>
       </div>
 
-      <UCard>
-        <ShowsShowActsEditor v-model="acts" :artists="artists" />
-        <template #footer>
-          <div class="flex justify-end">
-            <UButton icon="i-heroicons-check" :loading="saving" @click="save">
-              {{ $t('common.save') }}
-            </UButton>
-          </div>
-        </template>
-      </UCard>
+      <ShowsShowActsEditor v-model="acts" :artists="artists" />
+
+      <!-- Barre d'enregistrement collante -->
+      <div class="sticky bottom-4 mt-6 flex justify-end">
+        <UButton
+          icon="i-heroicons-check"
+          size="lg"
+          :loading="saving"
+          class="shadow-lg"
+          @click="save"
+        >
+          {{ $t('common.save') }}
+        </UButton>
+      </div>
     </template>
   </div>
 </template>
