@@ -3,6 +3,55 @@ import { version as nuxtVersion } from 'nuxt/package.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  hooks: {
+    /**
+     * Injection CSRF dans le `$fetch` global (Double Submit Cookie).
+     *
+     * Nuxt 4.5+ génère `#build/fetch` avec `export const $fetch = globalThis.$fetch`
+     * (capture à l'évaluation du module) et l'entrée client l'importe AVANT d'exécuter
+     * les plugins. Impossible donc d'intercepter `$fetch` via un plugin client.
+     * On patche le template généré pour wrapper l'instance avec l'intercepteur qui
+     * ajoute le header `x-csrf-token` depuis le cookie (cf. server/utils/csrf.ts).
+     */
+    'app:templates'(app) {
+      const tpl = app.templates.find((t) => t.filename === 'fetch.mjs')
+      if (!tpl || typeof tpl.getContents !== 'function') return
+      const original = tpl.getContents
+      tpl.getContents = async (data: unknown) => {
+        const code: string = await (original as (d: unknown) => string | Promise<string>).call(
+          tpl,
+          data
+        )
+        const csrfWrap = [
+          "const __CSRF_SAFE = new Set(['GET', 'HEAD', 'OPTIONS'])",
+          'function __readCsrfToken() {',
+          "  if (typeof document === 'undefined') return null",
+          '  const m = document.cookie.match(/(?:^|; )csrf_token=([^;]+)/)',
+          '  return m ? decodeURIComponent(m[1]) : null',
+          '}',
+          'if (globalThis.$fetch && !globalThis.$fetch.__csrfWrapped) {',
+          '  globalThis.$fetch = globalThis.$fetch.create({',
+          '    onRequest({ options }) {',
+          "      const method = (options.method || 'GET').toString().toUpperCase()",
+          '      if (__CSRF_SAFE.has(method)) return',
+          '      const token = __readCsrfToken()',
+          '      if (!token) return',
+          '      const headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers || {})',
+          "      if (!headers.has('x-csrf-token')) headers.set('x-csrf-token', token)",
+          '      options.headers = headers',
+          '    },',
+          '  })',
+          '  globalThis.$fetch.__csrfWrapped = true',
+          '}',
+        ].join('\n')
+        return code.replace(
+          'export const $fetch = globalThis.$fetch',
+          `${csrfWrap}\nexport const $fetch = globalThis.$fetch`
+        )
+      }
+    },
+  },
+
   // Layers modulaires (étape 2) — bénévole, repas, tâches, FAQ, objets trouvés, ateliers, covoiturage
   // Monorepo : les layers sont partagés à la racine (../../layers), pas dans l'app.
   extends: [
