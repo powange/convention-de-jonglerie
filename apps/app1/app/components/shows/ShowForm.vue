@@ -146,9 +146,29 @@
           </p>
         </template>
 
-        <!-- Cabaret : les artistes sont associés à chaque numéro -->
+        <!-- Cabaret : les numéros (et leurs artistes) -->
         <UFormField v-else :label="$t('gestion.shows.acts')">
-          <ShowsShowActsEditor v-model="formData.acts" :artists="artists" />
+          <!-- Cabaret existant : édition des numéros sur une page dédiée -->
+          <div
+            v-if="props.show && props.show.type === 'CABARET'"
+            class="flex flex-wrap items-center gap-3"
+          >
+            <p class="text-sm text-gray-500">{{ $t('gestion.shows.acts_edit_dedicated_hint') }}</p>
+            <UButton
+              :to="actsPath"
+              icon="i-heroicons-queue-list"
+              color="primary"
+              variant="soft"
+              size="sm"
+            >
+              {{ $t('gestion.shows.edit_acts') }}
+            </UButton>
+          </div>
+          <!-- Création ou passage en cabaret : le cabaret est créé vide, les numéros s'ajoutent
+               ensuite sur leur page dédiée -->
+          <p v-else class="text-sm text-gray-500">
+            {{ $t('gestion.shows.acts_after_switch_hint') }}
+          </p>
         </UFormField>
 
         <!-- Visibilité publique -->
@@ -402,10 +422,18 @@ const fetchMarkers = async () => {
   }
 }
 
-// Construit le payload pour l'API
+// Lien vers la page dédiée d'édition des numéros (cabaret existant).
+const actsPath = computed(() =>
+  props.show ? `/editions/${props.editionId}/gestion/artists/shows/${props.show.id}/numeros` : ''
+)
+
+// Construit le payload pour l'API.
+// Cabaret : les numéros se gèrent sur une page dédiée. On ne les envoie donc PAS pour un cabaret
+// EXISTANT (ils resteraient intacts). On les compose à la création (éditeur inline) et lors d'une
+// bascule standard→cabaret (sinon le serveur refuse un cabaret sans numéros).
 const buildPayload = () => {
   const localDate = parseDateTimeLocal(formData.value.startDateTime)
-  return {
+  const base = {
     title: formData.value.title,
     description: formData.value.description || null,
     technicalNeeds: formData.value.technicalNeeds || null,
@@ -416,24 +444,19 @@ const buildPayload = () => {
     zoneId: formData.value.zoneId,
     markerId: formData.value.markerId,
     type: formData.value.type,
-    // Le serveur ne retient que la forme correspondant au type ; on envoie les deux champs
-    // pour qu'une bascule efface bien celle qui n'est plus pertinente.
-    artistIds: formData.value.type === 'STANDARD' ? formData.value.artistIds : [],
-    acts:
-      formData.value.type === 'CABARET'
-        ? formData.value.acts
-            .filter((act) => act.title.trim().length > 0)
-            .map((act) => ({
-              title: act.title.trim(),
-              duration: act.duration ? Number(act.duration) : null,
-              description: act.description || null,
-              technicalNeeds: act.technicalNeeds || null,
-              stageSetup: act.stageSetup || null,
-              artistIds: act.artistIds,
-            }))
-        : [],
     isPublic: formData.value.isPublic,
   }
+  if (formData.value.type === 'STANDARD') {
+    return { ...base, artistIds: formData.value.artistIds }
+  }
+  // Cabaret déjà existant : on ne touche pas aux numéros (édités sur leur page dédiée).
+  if (props.show?.type === 'CABARET') {
+    return base
+  }
+  // Création ou bascule vers cabaret : on crée un cabaret VIDE. Les numéros s'ajoutent ensuite
+  // sur leur page dédiée. `acts: []` est requis pour que le serveur compose bien un cabaret
+  // (sinon il refuse un cabaret sans numéros).
+  return { ...base, acts: [] }
 }
 
 // Callback commun après succès
