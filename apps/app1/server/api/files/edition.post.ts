@@ -1,6 +1,9 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import {
+  canEditEdition,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 import { validateUploadedFile } from '#server/utils/upload-validation'
 
 export default wrapApiHandler(
@@ -43,17 +46,12 @@ export default wrapApiHandler(
     }
 
     if (!isNewEdition) {
-      // Pour les éditions existantes, vérifier les permissions
-      const edition = await prisma.edition.findUnique({
-        where: { id: editionId! },
-        include: {
-          convention: {
-            include: {
-              organizers: true,
-            },
-          },
-        },
-      })
+      // Pour les éditions existantes, vérifier les permissions.
+      // getEditionWithPermissions inclut convention.organizers ET organizerPermissions
+      // (droits spécifiques à l'édition) — les deux voies évaluées par canEditEdition.
+      // Le findUnique manuel précédent oubliait organizerPermissions, ce qui rejetait
+      // en 403 les organisateurs n'ayant que des droits au niveau de l'édition.
+      const edition = await getEditionWithPermissions(editionId!, { userId: user.id })
 
       if (!edition) {
         throw createError({
