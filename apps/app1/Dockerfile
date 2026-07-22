@@ -8,6 +8,9 @@
 ARG BASE_NODE_IMAGE=node:24-slim
 FROM ${BASE_NODE_IMAGE} AS base
 RUN apt-get update && apt-get install -y curl openssl default-mysql-client && rm -rf /var/lib/apt/lists/*
+# npm 12 : les install scripts des dépendances sont OFF par défaut ; les packages de
+# confiance sont explicitement autorisés via le champ `allowScripts` de package.json.
+RUN npm install -g npm@12 && npm --version
 WORKDIR /app/apps/app1
 
 # -------------------------
