@@ -178,5 +178,19 @@
   },
   "engines": {
     "node": ">=22 <26"
+  },
+  "allowScripts": {
+    "core-js@3.49.0": true,
+    "esbuild@0.27.7": true,
+    "esbuild@0.28.1": true,
+    "esbuild@0.25.12": true,
+    "prisma@7.9.0": true,
+    "protobufjs@7.5.8": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.11.1": true,
+    "vue-demi@0.14.10": true,
+    "@firebase/util@1.13.0": true,
+    "@parcel/watcher@2.5.6": true,
+    "@prisma/engines@7.9.0": true
   }
 }
