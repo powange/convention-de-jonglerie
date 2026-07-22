@@ -1,4 +1,7 @@
-import { canManageEditionOrganizers } from '#server/utils/permissions/edition-permissions'
+import {
+  canManageEditionOrganizers,
+  canManageTicketing,
+} from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 
 export default wrapApiHandler(
@@ -44,8 +47,15 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier les permissions
-    if (!canManageEditionOrganizers(edition, user)) {
+    // Vérifier les permissions.
+    // La liste des organisateurs de l'édition est consommée par DEUX features :
+    // la gestion des organisateurs ET la billetterie (page handout-items, section
+    // « articles spécifiques par organisateur »). On autorise donc les deux rôles :
+    // gestionnaire d'organisateurs OU gestionnaire de billetterie.
+    // Un gestionnaire billetterie (sans droit sur les organisateurs) n'accède qu'aux
+    // infos non sensibles (voir le masquage email/téléphone plus bas).
+    const canManageOrganizers = canManageEditionOrganizers(edition, user)
+    if (!canManageOrganizers && !canManageTicketing(edition, user)) {
       throw createError({
         status: 403,
         message: "Vous n'avez pas les droits pour gérer les organisateurs",
@@ -103,10 +113,13 @@ export default wrapApiHandler(
             prenom: eo.organizer.user.prenom,
             nom: eo.organizer.user.nom,
             pronouns: eo.organizer.user.pronouns,
-            email: eo.organizer.user.email,
             emailHash: eo.organizer.user.emailHash,
-            phone: eo.organizer.user.phone,
             profilePicture: eo.organizer.user.profilePicture,
+            // Infos sensibles (email, téléphone) réservées aux gestionnaires
+            // d'organisateurs. Masquées pour un accès via la billetterie (handout-items).
+            ...(canManageOrganizers
+              ? { email: eo.organizer.user.email, phone: eo.organizer.user.phone }
+              : {}),
           },
         })),
         total: editionOrganizers.length,
