@@ -280,11 +280,30 @@ const formatPopupDateTime = (dateTimeStr: string) => {
   return `${day} ${time}`
 }
 
-// Workshops — affichés dans les popups des zones/marqueurs
-const { data: workshops } = useApiFetch<any[]>(`/api/editions/${editionId.value}/workshops`, {
-  lazy: true,
-  transform: (payload: any) => payload?.workshops || payload || [],
-})
+// Workshops — affichés dans les popups des zones/marqueurs.
+// On ne charge les ateliers que si le module est activé pour l'édition : inutile
+// d'appeler l'API (qui renverrait 403) quand la fonctionnalité est désactivée.
+const workshopsEnabled = computed(() => edition.value?.workshopsEnabled === true)
+
+const { data: workshops, execute: loadWorkshops } = useApiFetch<any[]>(
+  `/api/editions/${editionId.value}/workshops`,
+  {
+    lazy: true,
+    immediate: false,
+    transform: (payload: any) => payload?.workshops || payload || [],
+  }
+)
+
+// L'édition est chargée de façon asynchrone (store / onMounted) : on déclenche le
+// fetch dès que le flag d'activation est connu et vrai. `workshopsEnabled` ne
+// repasse jamais à true → false ici, donc l'appel n'est effectué qu'une fois.
+watch(
+  workshopsEnabled,
+  (enabled) => {
+    if (enabled) loadWorkshops()
+  },
+  { immediate: true }
+)
 
 // Filtrer les workshops non terminés
 const upcomingWorkshops = computed(() => {
