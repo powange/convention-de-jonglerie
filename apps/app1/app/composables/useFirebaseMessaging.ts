@@ -1,13 +1,61 @@
-import { getToken, onMessage, type MessagePayload } from 'firebase/messaging'
+import { getFirebaseConfig } from '../config/firebase.config'
+
+import type { FirebaseOptions } from 'firebase/app'
+import type { MessagePayload, Messaging } from 'firebase/messaging'
 
 /**
- * Composable pour gérer Firebase Cloud Messaging
+ * Chargement PARESSEUX de Firebase (app + messaging).
+ *
+ * Firebase (~150-200 Ko) n'est téléchargé et initialisé qu'au PREMIER usage réel
+ * du push (ouverture des réglages de notifications, promo push…), et non plus au
+ * boot de chaque page comme le faisait l'ancien plugin `firebase.client.ts`.
+ * Le résultat est mémoïsé (singleton) pour ne charger/initialiser qu'une seule fois.
+ */
+let firebaseMessagingPromise: Promise<{
+  messaging: Messaging
+  getToken: typeof import('firebase/messaging').getToken
+  onMessage: typeof import('firebase/messaging').onMessage
+} | null> | null = null
+
+async function loadFirebaseMessaging(firebaseConfig: FirebaseOptions) {
+  if (firebaseMessagingPromise) return firebaseMessagingPromise
+
+  firebaseMessagingPromise = (async () => {
+    try {
+      const [{ initializeApp, getApps }, { getMessaging, isSupported, getToken, onMessage }] =
+        await Promise.all([import('firebase/app'), import('firebase/messaging')])
+
+      if (!(await isSupported())) {
+        // Condition permanente (navigateur non compatible) → on garde le null mémoïsé.
+        console.warn('⚠️ Firebase Cloud Messaging non supporté dans ce navigateur')
+        return null
+      }
+
+      const existingApps = getApps()
+      const app = existingApps.length > 0 ? existingApps[0]! : initializeApp(firebaseConfig)
+      return { messaging: getMessaging(app), getToken, onMessage }
+    } catch (error) {
+      // Échec potentiellement transitoire (chunk réseau, init) → on réinitialise le
+      // singleton pour autoriser un nouvel essai au prochain appel, sans reload de page.
+      console.error("❌ Erreur lors de l'initialisation de Firebase Messaging:", error)
+      firebaseMessagingPromise = null
+      return null
+    }
+  })()
+
+  return firebaseMessagingPromise
+}
+
+/**
+ * Composable pour gérer Firebase Cloud Messaging.
+ * Firebase est chargé paresseusement (dynamic import) au premier usage.
  */
 export function useFirebaseMessaging() {
-  const { $firebase } = useNuxtApp()
   const toast = useToast()
   const config = useRuntimeConfig()
   const { getDeviceId } = useDeviceId()
+  // Résolu dans le contexte du composant (setup), puis passé au loader paresseux.
+  const firebaseConfig = getFirebaseConfig()
 
   // Cache pour éviter les appels trop fréquents
   let lastTokenRequest = 0
@@ -60,7 +108,8 @@ export function useFirebaseMessaging() {
    * Demander la permission pour les notifications et obtenir le token FCM
    */
   const requestPermissionAndGetToken = async (): Promise<string | null> => {
-    if (!$firebase.messaging) {
+    const fb = await loadFirebaseMessaging(firebaseConfig)
+    if (!fb) {
       console.warn('Firebase Messaging non disponible')
       return null
     }
@@ -108,7 +157,7 @@ export function useFirebaseMessaging() {
 
       console.log('⏳ Demande du token FCM...')
 
-      const token = await getToken($firebase.messaging, {
+      const token = await fb.getToken(fb.messaging, {
         vapidKey,
         serviceWorkerRegistration: registration,
       })
@@ -200,7 +249,8 @@ export function useFirebaseMessaging() {
   }
 
   /**
-   * Écouter les messages en temps réel (foreground)
+   * Écouter les messages en temps réel (foreground).
+   * Charge Firebase paresseusement ; renvoie une fonction de nettoyage synchrone.
    */
   const listenToMessages = (
     callback: (payload: MessagePayload) => void = (payload) => {
@@ -217,22 +267,42 @@ export function useFirebaseMessaging() {
       }
     }
   ) => {
-    if (!$firebase.messaging) {
-      console.warn('Firebase Messaging non disponible')
-      return () => {}
+    let unsub: (() => void) | null = null
+    let cancelled = false
+
+    loadFirebaseMessaging(firebaseConfig).then((fb) => {
+      if (!fb || cancelled) {
+        if (!fb) console.warn('Firebase Messaging non disponible')
+        return
+      }
+      // Écouter les messages quand l'app est au premier plan
+      unsub = fb.onMessage(fb.messaging, callback)
+    })
+
+    return () => {
+      cancelled = true
+      unsub?.()
     }
-
-    // Écouter les messages quand l'app est au premier plan
-    const unsubscribe = onMessage($firebase.messaging, callback)
-
-    return unsubscribe
   }
+
+  // Disponibilité du push évaluée via les capacités du navigateur, SANS charger
+  // Firebase (approxime `isSupported()` de firebase/messaging). Le contrôle réel
+  // est refait par `loadFirebaseMessaging` au moment de l'activation.
+  const isAvailable = computed(
+    () =>
+      import.meta.client &&
+      typeof navigator !== 'undefined' &&
+      'serviceWorker' in navigator &&
+      typeof window !== 'undefined' &&
+      'PushManager' in window &&
+      'Notification' in window
+  )
 
   return {
     requestPermissionAndGetToken,
     unsubscribe,
     listenToMessages,
     registerServiceWorker,
-    isAvailable: computed(() => !!$firebase.messaging),
+    isAvailable,
   }
 }
