@@ -89,6 +89,7 @@
     "meal_after_show": "Après spectacle",
     "meals": {
       "after_show": "Après spectacle",
+      "check_all": "Tout cocher",
       "confirm_close_unsaved": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?",
       "description": "Sélectionnez les repas auxquels l'artiste participera",
       "error_loading": "Erreur lors du chargement des repas",
@@ -97,6 +98,7 @@
       "no_meals": "Aucun repas configuré pour cette édition",
       "saved_success": "Les repas ont été sauvegardés avec succès",
       "title": "Repas de {name}",
+      "uncheck_all": "Tout décocher",
       "unsaved_changes": "Vous avez des modifications non sauvegardées"
     },
     "my_accommodation": "Mon hébergement",

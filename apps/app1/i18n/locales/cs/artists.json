@@ -89,7 +89,9 @@
       "no_meals": "Pro tuto edici nejsou nakonfigurována žádná jídla",
       "saved_success": "Úspěšně zálohovaná jídla",
       "title": "Jídlo od {name}",
-      "unsaved_changes": "Máte neuložené změny"
+      "unsaved_changes": "Máte neuložené změny",
+      "check_all": "Zaškrtnout vše",
+      "uncheck_all": "Odškrtnout vše"
     },
     "my_accommodation": "Mé ubytování",
     "my_artist_pass": "Můj umělecký průkaz",

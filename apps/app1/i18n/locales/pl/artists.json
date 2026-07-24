@@ -89,7 +89,9 @@
       "no_meals": "Brak posiłków skonfigurowanych dla tej edycji",
       "saved_success": "Posiłki zostały pomyślnie zapisane",
       "title": "Posiłek od {name}",
-      "unsaved_changes": "Masz niezapisane zmiany"
+      "unsaved_changes": "Masz niezapisane zmiany",
+      "check_all": "Zaznacz wszystkie",
+      "uncheck_all": "Odznacz wszystkie"
     },
     "my_accommodation": "Moje zakwaterowanie",
     "my_artist_pass": "Moja przepustka dla artystów",

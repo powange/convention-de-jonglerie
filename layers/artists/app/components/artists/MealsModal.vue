@@ -13,8 +13,21 @@
       </div>
 
       <div v-else class="space-y-6">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('artists.meals.description') }}
+        <div class="flex items-start justify-between gap-3">
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            {{ $t('artists.meals.description') }}
+          </div>
+          <UButton
+            color="neutral"
+            variant="soft"
+            size="xs"
+            class="shrink-0"
+            :icon="allMealsAccepted ? 'i-heroicons-x-mark' : 'i-heroicons-check'"
+            :disabled="savingMeals"
+            @click="toggleAllMeals"
+          >
+            {{ allMealsAccepted ? $t('artists.meals.uncheck_all') : $t('artists.meals.check_all') }}
+          </UButton>
         </div>
 
         <div class="space-y-4">
@@ -141,6 +154,18 @@ const hasUnsavedMealChanges = computed(() => {
     return meal.accepted !== initialMeal?.accepted || meal.afterShow !== initialMeal?.afterShow
   })
 })
+
+// Tout cocher / décocher : le bouton bascule selon l'état courant.
+const allMealsAccepted = computed(
+  () => meals.value.length > 0 && meals.value.every((meal) => meal.accepted)
+)
+
+const toggleAllMeals = () => {
+  const next = !allMealsAccepted.value
+  for (const meal of meals.value) {
+    meal.accepted = next
+  }
+}
 
 // Charger les repas
 const { execute: executeFetchMeals, loading: loadingMeals } = useApiAction(

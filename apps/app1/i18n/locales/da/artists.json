@@ -89,7 +89,9 @@
       "no_meals": "Ingen måltider konfigureret til denne udgave",
       "saved_success": "Måltiderne er blevet gemt med succes",
       "title": "Måltid fra {name}",
-      "unsaved_changes": "Du har ikke gemte ændringer"
+      "unsaved_changes": "Du har ikke gemte ændringer",
+      "check_all": "Markér alle",
+      "uncheck_all": "Afmarkér alle"
     },
     "my_accommodation": "Min indkvartering",
     "my_artist_pass": "Mit kunstnerpas",
