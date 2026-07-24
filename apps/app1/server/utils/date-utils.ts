@@ -32,6 +32,9 @@ export function formatDuration(ms: number): string {
 export const TOKEN_DURATIONS = {
   EMAIL_VERIFICATION: 15 * 60 * 1000, // 15 minutes
   PASSWORD_RESET: 60 * 60 * 1000, // 1 heure
+  // Invitation (artiste/bénévole ajouté manuellement) : la personne peut ouvrir
+  // l'email bien plus tard qu'une auto-inscription → durée volontairement longue.
+  INVITATION: 7 * 24 * 60 * 60 * 1000, // 7 jours
   CLAIM_CODE: 60 * 60 * 1000, // 1 heure
   REMEMBER_ME: 30 * 24 * 60 * 60 * 1000, // 30 jours
   SESSION: 60 * 60 * 1000, // 1 heure
