@@ -200,9 +200,14 @@ const isUnclaimedConvention = computed(() => {
   return !edition.value.convention.organizers || edition.value.convention.organizers.length === 0
 })
 
-const _canManageArtists = computed(() => {
+const canManageArtists = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageArtists(edition.value, authStore.user.id)
+})
+
+const canManageMeals = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageMeals(edition.value, authStore.user.id)
 })
 
 const canManageTasks = computed(() => {
@@ -422,8 +427,9 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     }
   }
 
-  // Artistes
-  if (edition.value?.artistsEnabled && isOrganizer.value) {
+  // Artistes — toute la partie artiste (liste, spectacles, appels à spectacles)
+  // exige le droit de gérer les artistes (au niveau édition ou convention).
+  if (edition.value?.artistsEnabled && canManageArtists.value) {
     const artistsChildren: NavigationMenuItem[] = [
       {
         label: t('gestion.artists.list_title'),
@@ -451,11 +457,12 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
-  // Repas
-  if (edition.value?.mealsEnabled && (isOrganizer.value || canAccessMealValidation.value)) {
+  // Repas — configuration/liste réservées à canManageMeals ; la validation reste
+  // accessible aux bénévoles de l'équipe de validation (canAccessMealValidation).
+  if (edition.value?.mealsEnabled && (canManageMeals.value || canAccessMealValidation.value)) {
     const mealsChildren: NavigationMenuItem[] = []
 
-    if (isOrganizer.value) {
+    if (canManageMeals.value) {
       mealsChildren.push(
         {
           label: t('gestion.meals.configuration_title'),

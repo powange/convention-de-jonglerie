@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionDataOrMealValidation } from '#server/utils/permissions/edition-permissions'
+import { canManageMealsOrValidation } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const validateMealSchema = z.object({
@@ -17,7 +17,7 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const mealId = validateResourceId(event, 'mealId', 'repas')
 
-    const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
+    const allowed = await canManageMealsOrValidation(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         status: 403,

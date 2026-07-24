@@ -254,7 +254,7 @@
         </UCard>
 
         <!-- Gestion des artistes -->
-        <UCard v-if="edition.artistsEnabled && isOrganizer">
+        <UCard v-if="edition.artistsEnabled && canManageArtists">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-star" class="text-yellow-500" />
@@ -300,7 +300,7 @@
         </UCard>
 
         <!-- Repas (accès complet pour organisateurs) -->
-        <UCard v-if="edition.mealsEnabled && isOrganizer">
+        <UCard v-if="edition.mealsEnabled && canManageMeals">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="cbi:mealie" class="text-orange-500" />
@@ -648,6 +648,18 @@ const canManageVolunteers = computed(() => {
 const canManageOrganizers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageOrganizers(edition.value, authStore.user.id)
+})
+
+// Droit dédié « gérer les artistes » (édition ou convention) — éditer ne suffit pas
+const canManageArtists = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageArtists(edition.value, authStore.user.id)
+})
+
+// Droit dédié « gérer les repas » (édition ou convention)
+const canManageMeals = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageMeals(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur est organisateur de la convention

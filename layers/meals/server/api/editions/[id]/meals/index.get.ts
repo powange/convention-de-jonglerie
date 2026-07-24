@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionDataOrMealValidation } from '#server/utils/permissions/edition-permissions'
+import { canManageMealsOrValidation } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -8,7 +8,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const allowed = await canAccessEditionDataOrMealValidation(editionId, user.id, event)
+    const allowed = await canManageMealsOrValidation(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         status: 403,

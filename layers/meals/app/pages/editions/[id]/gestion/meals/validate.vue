@@ -458,27 +458,12 @@ const selectedMeal = computed(() => {
 // État pour les permissions de validation des repas
 const canAccessMealValidation = ref(false)
 
-// Vérifier l'accès à cette page
+// Vérifier l'accès à cette page : gestion des repas (droit dédié, édition ou
+// convention) OU accès à la validation (bénévole/leader de l'équipe de validation).
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-
-  // Super Admin en mode admin
-  if (authStore.isAdminModeActive) return true
-
-  // Créateur de l'édition
-  if (authStore.user.id === edition.value.creatorId) return true
-
-  // Organisateurs de la convention
-  if (edition.value.convention?.organizers) {
-    const isOrganizer = edition.value.convention.organizers.some(
-      (collab) => collab.user.id === authStore.user?.id
-    )
-    if (isOrganizer) return true
-  }
-
-  // Bénévoles avec accès à la validation des repas (leader ou créneau actif)
+  if (editionStore.canManageMeals(edition.value, authStore.user.id)) return true
   if (canAccessMealValidation.value) return true
-
   return false
 })
 

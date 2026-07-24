@@ -511,17 +511,36 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Organisateur avec droits explicites
+      // Organisateur avec le droit de gérer les artistes (convention OU édition).
+      // Le droit d'ÉDITER (editConvention/editAllEditions/canEdit) NE donne PAS
+      // accès aux artistes — cohérent avec le helper serveur canManageArtists.
       return edition.convention.organizers.some((collab) => {
         if (collab.user.id !== userId) return false
-        // Droit global de gérer les artistes
+        // Droit de gérer les artistes au niveau convention (toutes les éditions)
         if (collab.rights?.manageArtists) return true
-        // Droit global d'éditer la convention implique gestion des artistes
-        if (collab.rights?.editConvention || collab.rights?.editAllEditions) return true
-        // Droit spécifique sur cette édition
+        // Droit de gérer les artistes spécifique à cette édition
         if (collab.perEditionRights) {
           const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageArtists || per?.canEdit) return true
+          if (per?.canManageArtists) return true
+        }
+        return false
+      })
+    },
+
+    // Vérifier si l'utilisateur peut gérer les repas d'une édition (droit dédié,
+    // aligné sur le helper serveur canManageMeals ; éditer l'édition ne suffit pas).
+    canManageMeals(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore()
+      if (authStore.isAdminModeActive) return true
+      if (edition.creatorId && edition.creatorId === userId) return true
+      if (!edition.convention || !edition.convention.organizers) return false
+      if (edition.convention.authorId && edition.convention.authorId === userId) return true
+      return edition.convention.organizers.some((collab) => {
+        if (collab.user.id !== userId) return false
+        if (collab.rights?.manageMeals) return true
+        if (collab.perEditionRights) {
+          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
+          if (per?.canManageMeals) return true
         }
         return false
       })
