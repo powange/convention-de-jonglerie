@@ -401,6 +401,46 @@ export async function canManageMealsOrValidation(
 }
 
 /**
+ * Variante de canAccessEditionData réservée à la GESTION DE LA BILLETTERIE :
+ * n'autorise QUE les organisateurs ayant le droit « gérer la billetterie »
+ * (convention ou édition). Même signature que canAccessEditionData pour un
+ * remplacement direct dans les endpoints (hors flux public, contrôle d'accès et
+ * guichets à token qui restent volontairement ouverts).
+ */
+export async function canManageTicketingById(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      creatorId: true,
+      convention: {
+        select: {
+          authorId: true,
+          organizers: { where: { userId }, select: { canManageTicketing: true } },
+        },
+      },
+      organizerPermissions: {
+        where: { organizer: { userId } },
+        select: { canManageTicketing: true },
+      },
+    },
+  })
+
+  if (!edition) return false
+  if (edition.creatorId === userId) return true
+  if (edition.convention.authorId === userId) return true
+  if (edition.convention.organizers?.some((o) => o.canManageTicketing)) return true
+  if (edition.organizerPermissions?.some((p) => p.canManageTicketing)) return true
+  return false
+}
+
+/**
  * Vérifie si un utilisateur peut gérer les artistes d'une édition
  */
 export function canManageArtists(

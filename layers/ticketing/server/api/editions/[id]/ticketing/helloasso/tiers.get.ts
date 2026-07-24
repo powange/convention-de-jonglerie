@@ -1,7 +1,7 @@
 import { requireAuth } from '#server/utils/auth-utils'
 import { getHelloAssoTiersAndOptions } from '#server/utils/editions/ticketing/helloasso'
 import { decrypt } from '#server/utils/encryption'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
   async (event) => {
@@ -10,7 +10,7 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
 
     // Vérifier les permissions
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

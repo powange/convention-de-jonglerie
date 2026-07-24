@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { updateHandoutItem } from '#server/utils/editions/ticketing/handout-items'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 const updateItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
@@ -15,7 +15,7 @@ export default wrapApiHandler(
     const itemId = validateResourceId(event, 'itemId', 'item')
 
     // Vérifier les permissions
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

@@ -18,7 +18,7 @@ vi.mock('#server/utils/auth-utils', () => ({
   requireAuth: vi.fn((event) => event.context.user),
 }))
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canAccessEditionData: mockCanAccessEditionData,
+  canManageTicketingById: mockCanAccessEditionData,
 }))
 
 import handler from '../../../../../../server/api/editions/[id]/ticketing/stats/validations.get'

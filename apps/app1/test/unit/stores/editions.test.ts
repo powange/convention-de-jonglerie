@@ -627,6 +627,44 @@ describe('useEditionStore', () => {
       })
     })
 
+    describe('canManageTicketing', () => {
+      const ticketingEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it('autorise le droit « gérer la billetterie » au niveau convention', () => {
+        const ed = ticketingEdition({ rights: { manageTicketing: true } })
+        expect(editionStore.canManageTicketing(ed as any, 1)).toBe(true)
+      })
+
+      it("autorise le droit billetterie spécifique à l'édition (perEditionRights)", () => {
+        const ed = ticketingEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageTicketing: true }],
+        })
+        expect(editionStore.canManageTicketing(ed as any, 1)).toBe(true)
+      })
+
+      // RÉGRESSION : éditer l'édition ou gérer les bénévoles NE donne PAS l'accès billetterie.
+      it('refuse editConvention seul (éditer ≠ gérer la billetterie)', () => {
+        const ed = ticketingEdition({ rights: { editConvention: true } })
+        expect(editionStore.canManageTicketing(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse canManageVolunteers seul', () => {
+        const ed = ticketingEdition({ rights: { manageVolunteers: true } })
+        expect(editionStore.canManageTicketing(ed as any, 1)).toBe(false)
+      })
+    })
+
     describe('canDeleteEdition', () => {
       it("devrait autoriser l'admin global en mode admin", () => {
         authStore.user = { ...mockUser, isGlobalAdmin: true }

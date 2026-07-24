@@ -360,7 +360,7 @@
         </UCard>
 
         <!-- Billeterie -->
-        <UCard v-if="edition.ticketingEnabled && isOrganizer">
+        <UCard v-if="edition.ticketingEnabled && canManageTicketing">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-ticket" class="text-blue-500" />
@@ -660,6 +660,12 @@ const canManageArtists = computed(() => {
 const canManageMeals = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageMeals(edition.value, authStore.user.id)
+})
+
+// Droit dédié « gérer la billetterie » (édition ou convention)
+const canManageTicketing = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur est organisateur de la convention

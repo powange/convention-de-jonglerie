@@ -493,10 +493,10 @@ const { t } = useI18n()
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// Vérifier l'accès à cette page (organisateurs seulement)
+// Vérifier l'accès à cette page — gestion de la billetterie (droit dédié).
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.isOrganizer(edition.value, authStore.user.id)
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
 // Items pour les selects

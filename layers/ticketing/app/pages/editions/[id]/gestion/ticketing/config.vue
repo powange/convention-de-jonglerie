@@ -377,13 +377,11 @@ useSeoMeta({
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
-// Permissions
-const isOrganizer = computed(() => {
+// Permissions — gestion de la billetterie (droit dédié, édition ou convention).
+const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.isOrganizer(edition.value, authStore.user.id)
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
-
-const canAccess = computed(() => isOrganizer.value)
 
 // Utiliser le composable pour gérer les paramètres
 const { settings, loading, updating, fetchSettings, updateSettings } = useTicketingSettings(

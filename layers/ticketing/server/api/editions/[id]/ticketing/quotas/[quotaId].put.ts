@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 const updateQuotaSchema = z.object({
   title: z.string().min(1, 'Le titre est obligatoire'),
@@ -17,7 +17,7 @@ export default wrapApiHandler(
     const quotaId = validateResourceId(event, 'quotaId', 'quota')
 
     // Vérifier les permissions
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

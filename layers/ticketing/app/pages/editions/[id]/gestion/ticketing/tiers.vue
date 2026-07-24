@@ -276,26 +276,10 @@ const { execute: refreshData, loading: refreshing } = useApiAction(
 )
 
 // Permissions
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
-const canManageVolunteers = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
-})
-
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  if (authStore.user.id === edition.value.creatorId) return true
-  if (canEdit.value || canManageVolunteers.value) return true
-  if (edition.value.convention?.organizers) {
-    return edition.value.convention.organizers.some(
-      (collab) => collab.user.id === authStore.user?.id
-    )
-  }
-  return false
+  // Gestion de la billetterie (droit dédié, édition ou convention).
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
 // Fonctions pour les quotas

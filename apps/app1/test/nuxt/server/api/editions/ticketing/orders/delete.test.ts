@@ -5,9 +5,9 @@ import handler from '../../../../../../../../../layers/ticketing/server/api/edit
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
-// Mock de canAccessEditionData pour autoriser l'accès
+// Mock de canManageTicketingById pour autoriser l'accès
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canAccessEditionData: vi.fn().mockResolvedValue(true),
+  canManageTicketingById: vi.fn().mockResolvedValue(true),
 }))
 
 // Mock de requireAuth pour simuler un utilisateur authentifié
