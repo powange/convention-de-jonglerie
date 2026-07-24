@@ -246,21 +246,14 @@ const createForm = ref({
 })
 const createErrors = ref<Record<string, string>>({})
 
-// Permissions
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
+// Permissions — la partie artiste (dont les appels à spectacles) exige le droit
+// de gérer les artistes ; éditer l'édition ne suffit pas.
 const canManageArtists = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageArtists(edition.value, authStore.user.id)
 })
 
-const canAccess = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return canEdit.value || canManageArtists.value
-})
+const canAccess = computed(() => canManageArtists.value)
 
 // Charger les appels à spectacles
 const fetchShowCalls = async () => {

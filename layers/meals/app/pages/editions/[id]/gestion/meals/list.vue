@@ -280,21 +280,8 @@ const edition = computed(() => editionStore.getEditionById(editionId.value))
 
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-
-  // Créateur de l'édition
-  if (authStore.user.id === edition.value.creatorId) return true
-
-  // Utilisateurs avec droits d'édition
-  if (editionStore.canEditEdition(edition.value, authStore.user.id)) return true
-
-  // Tous les organisateurs de la convention
-  if (edition.value.convention?.organizers) {
-    return edition.value.convention.organizers.some(
-      (collab) => collab.user.id === authStore.user?.id
-    )
-  }
-
-  return false
+  // Droit « gérer les repas » (édition ou convention) uniquement.
+  return editionStore.canManageMeals(edition.value, authStore.user.id)
 })
 
 // État

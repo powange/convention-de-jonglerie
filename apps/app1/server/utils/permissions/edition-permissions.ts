@@ -348,6 +348,59 @@ export async function canAccessEditionDataOrMealValidation(
 }
 
 /**
+ * Variante de canAccessEditionData réservée à la GESTION DES REPAS : n'autorise
+ * QUE les organisateurs ayant le droit « gérer les repas » (convention ou
+ * édition) — pas n'importe quel organisateur. Même signature que
+ * canAccessEditionData pour un remplacement direct dans les endpoints.
+ */
+export async function canManageMealsById(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      creatorId: true,
+      convention: {
+        select: {
+          authorId: true,
+          organizers: { where: { userId }, select: { canManageMeals: true } },
+        },
+      },
+      organizerPermissions: {
+        where: { organizer: { userId } },
+        select: { canManageMeals: true },
+      },
+    },
+  })
+
+  if (!edition) return false
+  if (edition.creatorId === userId) return true
+  if (edition.convention.authorId === userId) return true
+  if (edition.convention.organizers?.some((o) => o.canManageMeals)) return true
+  if (edition.organizerPermissions?.some((p) => p.canManageMeals)) return true
+  return false
+}
+
+/**
+ * Gestion des repas OU accès à la validation des repas (bénévole/leader de
+ * l'équipe de validation). Pour les endpoints de validation.
+ */
+export async function canManageMealsOrValidation(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  if (await canManageMealsById(editionId, userId, event)) return true
+  const { canAccessMealValidation } = await import('./meal-validation-permissions')
+  return await canAccessMealValidation(userId, editionId)
+}
+
+/**
  * Vérifie si un utilisateur peut gérer les artistes d'une édition
  */
 export function canManageArtists(

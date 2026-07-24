@@ -546,6 +546,87 @@ describe('useEditionStore', () => {
       })
     })
 
+    describe('canManageArtists', () => {
+      // Édition où l'utilisateur 1 n'est NI créateur NI auteur : l'accès dépend
+      // uniquement des droits d'organisateur.
+      const artistEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it('autorise le droit « gérer les artistes » au niveau convention', () => {
+        const ed = artistEdition({ rights: { manageArtists: true } })
+        expect(editionStore.canManageArtists(ed as any, 1)).toBe(true)
+      })
+
+      it("autorise le droit artistes spécifique à l'édition (perEditionRights)", () => {
+        const ed = artistEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageArtists: true }],
+        })
+        expect(editionStore.canManageArtists(ed as any, 1)).toBe(true)
+      })
+
+      // RÉGRESSION : éditer l'édition/la convention NE donne PAS l'accès artistes.
+      it('refuse editConvention/editAllEditions seuls (éditer ≠ gérer les artistes)', () => {
+        const ed = artistEdition({ rights: { editConvention: true, editAllEditions: true } })
+        expect(editionStore.canManageArtists(ed as any, 1)).toBe(false)
+      })
+
+      it("refuse le canEdit spécifique à l'édition seul", () => {
+        const ed = artistEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canEdit: true }],
+        })
+        expect(editionStore.canManageArtists(ed as any, 1)).toBe(false)
+      })
+    })
+
+    describe('canManageMeals', () => {
+      const mealsEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it('autorise le droit « gérer les repas » au niveau convention', () => {
+        const ed = mealsEdition({ rights: { manageMeals: true } })
+        expect(editionStore.canManageMeals(ed as any, 1)).toBe(true)
+      })
+
+      it("autorise le droit repas spécifique à l'édition (perEditionRights)", () => {
+        const ed = mealsEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageMeals: true }],
+        })
+        expect(editionStore.canManageMeals(ed as any, 1)).toBe(true)
+      })
+
+      // RÉGRESSION : éditer l'édition ou gérer les bénévoles NE donne PAS l'accès repas.
+      it('refuse editConvention seul (éditer ≠ gérer les repas)', () => {
+        const ed = mealsEdition({ rights: { editConvention: true } })
+        expect(editionStore.canManageMeals(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse canManageVolunteers seul', () => {
+        const ed = mealsEdition({ rights: { manageVolunteers: true } })
+        expect(editionStore.canManageMeals(ed as any, 1)).toBe(false)
+      })
+    })
+
     describe('canDeleteEdition', () => {
       it("devrait autoriser l'admin global en mode admin", () => {
         authStore.user = { ...mockUser, isGlobalAdmin: true }

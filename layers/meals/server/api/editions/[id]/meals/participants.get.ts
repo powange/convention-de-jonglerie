@@ -1,7 +1,7 @@
 import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
 
 const DEFAULT_PAGE_SIZE = 20
@@ -11,7 +11,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageMealsById(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         status: 403,

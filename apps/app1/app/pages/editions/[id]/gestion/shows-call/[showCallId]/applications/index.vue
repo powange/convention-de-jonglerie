@@ -334,21 +334,14 @@ const statusOptions = computed(() => [
   { value: 'REJECTED', label: t('shows_call.status_rejected') },
 ])
 
-// Permissions
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
+// Permissions — la partie artiste (dont les appels à spectacles) exige le droit
+// de gérer les artistes ; éditer l'édition ne suffit pas.
 const canManageArtists = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageArtists(edition.value, authStore.user.id)
 })
 
-const canAccess = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return canEdit.value || canManageArtists.value
-})
+const canAccess = computed(() => canManageArtists.value)
 
 // Helpers
 const getStatusColor = (status: ShowApplicationStatus) => {

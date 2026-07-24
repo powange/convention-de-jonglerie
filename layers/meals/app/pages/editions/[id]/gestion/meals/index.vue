@@ -235,23 +235,11 @@ const handleMealChange = async (meal: any) => {
   await executeSaveMeal()
 }
 
-// Vérifier l'accès à cette page
+// Vérifier l'accès à cette page — droit « gérer les repas » (édition ou convention) ;
+// éditer l'édition ou gérer les bénévoles ne suffit pas.
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return (
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
-  )
-})
-
-// Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
-const canManageVolunteers = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
+  return editionStore.canManageMeals(edition.value, authStore.user.id)
 })
 
 // Charger l'édition, les repas et les articles
