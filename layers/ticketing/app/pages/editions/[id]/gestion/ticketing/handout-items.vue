@@ -676,25 +676,10 @@ function formatMealLabel(meal: any): string {
   return `${date} — ${getMealTypeLabel(meal.mealType)}`
 }
 
-// Permissions (mêmes règles que la page tarifs)
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-const canManageVolunteers = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
-})
+// Permissions — gestion de la billetterie (droit dédié, édition ou convention).
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  if (authStore.user.id === edition.value.creatorId) return true
-  if (canEdit.value || canManageVolunteers.value) return true
-  if (edition.value.convention?.organizers) {
-    return edition.value.convention.organizers.some(
-      (collab) => collab.user.id === authStore.user?.id
-    )
-  }
-  return false
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
 const loadHandoutItems = async () => {

@@ -12,10 +12,10 @@ vi.hoisted(() => {
   }
 })
 
-// Mock de canAccessEditionData pour contrôler l'accès
+// Mock de canManageTicketingById pour contrôler l'accès
 const mockCanAccessEditionData = vi.hoisted(() => vi.fn())
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canAccessEditionData: mockCanAccessEditionData,
+  canManageTicketingById: mockCanAccessEditionData,
 }))
 
 // Mock de requireAuth pour simuler un utilisateur authentifié

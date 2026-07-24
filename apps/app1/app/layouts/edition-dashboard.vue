@@ -210,6 +210,11 @@ const canManageMeals = computed(() => {
   return editionStore.canManageMeals(edition.value, authStore.user.id)
 })
 
+const canManageTicketing = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
+})
+
 const canManageTasks = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   const userId = authStore.user.id
@@ -493,7 +498,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   }
 
   // Billeterie
-  if (edition.value?.ticketingEnabled && isOrganizer.value) {
+  if (edition.value?.ticketingEnabled && canManageTicketing.value) {
     managementSection.push({
       label: t('gestion.ticketing.title'),
       icon: 'i-heroicons-ticket',

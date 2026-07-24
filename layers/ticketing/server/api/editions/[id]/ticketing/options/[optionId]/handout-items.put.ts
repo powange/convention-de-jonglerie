@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -21,7 +21,7 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const optionId = validateResourceId(event, 'optionId', 'option')
 
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }

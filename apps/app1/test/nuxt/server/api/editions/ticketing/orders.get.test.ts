@@ -2,16 +2,16 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('../../../../../../server/utils/permissions/edition-permissions', () => ({
-  canAccessEditionData: vi.fn(),
+  canManageTicketingById: vi.fn(),
 }))
 
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import handler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/orders.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
-const mockCanAccess = canAccessEditionData as ReturnType<typeof vi.fn>
+const mockCanAccess = canManageTicketingById as ReturnType<typeof vi.fn>
 
 const baseEvent = {
   context: {

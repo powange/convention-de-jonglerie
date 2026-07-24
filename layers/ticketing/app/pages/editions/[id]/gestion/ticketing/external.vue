@@ -1016,35 +1016,10 @@ const loadHelloAssoTiers = () => {
   executeLoadTiers()
 }
 
-// Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
-const canManageVolunteers = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
-})
-
-// Vérifier l'accès à cette page
+// Permissions — gestion de la billetterie (droit dédié, édition ou convention).
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-
-  // Créateur de l'édition
-  if (authStore.user.id === edition.value.creatorId) return true
-
-  // Utilisateurs avec des droits spécifiques
-  if (canEdit.value || canManageVolunteers.value) return true
-
-  // Tous les organisateurs de la convention (même sans droits)
-  if (edition.value.convention?.organizers) {
-    return edition.value.convention.organizers.some(
-      (collab) => collab.user.id === authStore.user?.id
-    )
-  }
-
-  return false
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
 // Surveiller les changements de permissions (mode admin, etc.)

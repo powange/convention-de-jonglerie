@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
   tierIds: z.array(z.number()).optional(),
@@ -30,7 +30,7 @@ export default wrapApiHandler(
     const customFieldId = validateResourceId(event, 'customFieldId', 'custom field')
 
     // Vérifier les permissions
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

@@ -1,6 +1,6 @@
 import { requireAuth } from '#server/utils/auth-utils'
 import { deleteOption } from '#server/utils/editions/ticketing/options'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
   async (event) => {
@@ -9,7 +9,7 @@ export default wrapApiHandler(
     const optionId = validateResourceId(event, 'optionId', 'option')
 
     // Vérifier les permissions
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,
