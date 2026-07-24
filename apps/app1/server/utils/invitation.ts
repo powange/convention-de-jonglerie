@@ -105,6 +105,12 @@ export async function createPendingUserAndInvite(params: CreatePendingUserAndInv
     },
   })
 
+  // En dev / E2E, exposer le token dans les logs (comme [DEV_VERIFICATION_CODE]) :
+  // les emails vers les domaines de test sont bloqués avant tout log de contenu.
+  if (import.meta.dev || process.env.E2E_TEST === 'true') {
+    console.log(`[DEV_INVITATION_TOKEN] ${token}`)
+  }
+
   const invitationLink = `${getSiteUrl()}/auth/invitation?token=${token}`
   try {
     const html = await generateInvitationEmailHtml(
