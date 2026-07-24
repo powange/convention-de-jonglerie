@@ -163,10 +163,13 @@
 import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
+import { useAuthStore } from '~/stores/auth'
+
 const route = useRoute()
 const toast = useToast()
 const { t } = useI18n()
 const { fetch: refreshSession } = useUserSession()
+const authStore = useAuthStore()
 
 // Rediriger les utilisateurs déjà connectés
 definePageMeta({
@@ -289,8 +292,11 @@ const { execute: executeAccept, loading } = useApiAction('/api/auth/accept-invit
   },
   errorMessages: { default: t('errors.server_error') },
   onSuccess: async () => {
-    // Le compte est connecté côté serveur → rafraîchir la session client.
+    // Le compte est connecté côté serveur. Rafraîchir la session nuxt-auth-utils
+    // ET ré-hydrater le store Pinia (le header lit `useAuthStore`, pas
+    // `useUserSession`) pour que l'état connecté s'affiche sans recharger la page.
     await refreshSession()
+    authStore.initializeAuth()
     activated.value = true
   },
   onError: (error) => {

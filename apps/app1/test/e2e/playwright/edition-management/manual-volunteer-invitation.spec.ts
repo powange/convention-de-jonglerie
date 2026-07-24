@@ -58,6 +58,10 @@ test.describe.serial("Ajout manuel d'un bénévole → invitation par lien", () 
       waitUntil: 'domcontentloaded',
     })
 
+    // Avant activation : header déconnecté (bouton « Connexion »).
+    const loginLink = page.getByRole('link', { name: 'Connexion', exact: true })
+    await expect(loginLink).toBeVisible({ timeout: 10000 })
+
     const pw = page.locator('input[type="password"]')
     await expect(pw.first()).toBeVisible({ timeout: 10000 })
     await pw.first().fill(PASSWORD)
@@ -73,6 +77,9 @@ test.describe.serial("Ajout manuel d'un bénévole → invitation par lien", () 
     ).toBe(true)
 
     await expect(page.getByText(/compte activé/i).first()).toBeVisible({ timeout: 10000 })
+
+    // RÉGRESSION : le header passe en connecté sans recharger la page.
+    await expect(loginLink).toBeHidden({ timeout: 10000 })
 
     await context.close()
   })
