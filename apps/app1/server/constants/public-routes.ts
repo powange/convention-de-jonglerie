@@ -43,6 +43,7 @@ export const publicRoutes: PublicRoute[] = [
   { path: '/api/auth/login', methods: ['POST'] },
   { path: '/api/auth/verify-email', methods: ['POST'] },
   { path: '/api/auth/set-password-and-verify', methods: ['POST'] },
+  { path: '/api/auth/accept-invitation', methods: ['POST'] },
   { path: '/api/auth/resend-verification', methods: ['POST'] },
   { path: '/api/auth/request-password-reset', methods: ['POST'] },
   { path: '/api/auth/reset-password', methods: ['POST'] },

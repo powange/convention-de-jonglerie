@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { getEmailHash } from '#server/utils/email-hash'
+import { createPendingUserAndInvite } from '#server/utils/invitation'
 import {
   getEditionWithPermissions,
   canManageArtists,
@@ -106,17 +106,19 @@ export default wrapApiHandler(
       if (existingUser) {
         targetUserId = existingUser.id
       } else {
-        // Créer un nouvel utilisateur
-        const newUser = await prisma.user.create({
-          data: {
-            email: validatedData.email,
-            emailHash: getEmailHash(validatedData.email),
-            prenom: validatedData.prenom,
-            nom: validatedData.nom,
-            pseudo: `${validatedData.prenom.toLowerCase()}_${validatedData.nom.toLowerCase()}_${Date.now()}`,
-            isEmailVerified: false,
-            authProvider: 'MANUAL', // Utilisateur créé manuellement
-          },
+        // Créer un compte « en attente » + envoyer l'email d'invitation (lien
+        // d'activation où l'artiste choisit son mot de passe).
+        const eventRecord = await prisma.event.findUnique({
+          where: { id: editionId },
+          select: { name: true },
+        })
+        const { user: newUser } = await createPendingUserAndInvite({
+          email: validatedData.email!,
+          prenom: validatedData.prenom!,
+          nom: validatedData.nom!,
+          role: 'artist',
+          eventName: eventRecord?.name || '',
+          event,
         })
         targetUserId = newUser.id
       }

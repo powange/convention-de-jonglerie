@@ -94,6 +94,29 @@ export function getVerificationCodeFromLogs(): string {
   return matches[matches.length - 1][1]
 }
 
+/**
+ * Récupère le dernier token d'invitation (artiste/bénévole ajouté manuellement)
+ * depuis les logs serveur (log dev `[DEV_INVITATION_TOKEN]` émis par
+ * `createPendingUserAndInvite`). Le token fait 64 caractères hexadécimaux.
+ */
+export function getInvitationTokenFromLogs(): string {
+  let logs: string
+  const serverLogFile = process.env.NUXT_SERVER_LOG
+  if (serverLogFile) {
+    logs = fs.readFileSync(serverLogFile, 'utf-8')
+  } else {
+    logs = execSync('docker compose -f docker-compose.dev.yml logs app --tail=200 2>&1', {
+      encoding: 'utf-8',
+      timeout: 10000,
+    })
+  }
+  const matches = [...logs.matchAll(/\[DEV_INVITATION_TOKEN]\s*([a-f0-9]{64})/g)]
+  if (matches.length === 0) {
+    throw new Error("Token d'invitation non trouvé dans les logs")
+  }
+  return matches[matches.length - 1][1]
+}
+
 // ──────────────────────────────────────────────
 // State
 // ──────────────────────────────────────────────

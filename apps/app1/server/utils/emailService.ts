@@ -5,6 +5,7 @@ import { render } from '@vue-email/render'
 import nodemailer from 'nodemailer'
 
 import AccountDeletionEmail from '../emails/AccountDeletionEmail.vue'
+import InvitationEmail from '../emails/InvitationEmail.vue'
 import NotificationEmail from '../emails/NotificationEmail.vue'
 import PasswordResetEmail from '../emails/PasswordResetEmail.vue'
 import VerificationEmail from '../emails/VerificationEmail.vue'
@@ -241,6 +242,34 @@ export async function generatePasswordResetEmailHtml(
       prenom,
       resetLink,
       baseUrl,
+    },
+    {
+      pretty: true,
+    }
+  )
+  return html
+}
+
+/**
+ * Génère l'email d'invitation (artiste/bénévole ajouté manuellement).
+ * Contient un lien vers la page d'activation où la personne définit son mot de passe.
+ */
+export async function generateInvitationEmailHtml(
+  invitationLink: string,
+  prenom: string,
+  roleLabel: string,
+  eventName: string
+): Promise<string> {
+  const baseUrl = getSiteUrl()
+
+  const html = await render(
+    InvitationEmail,
+    {
+      prenom,
+      invitationLink,
+      baseUrl,
+      roleLabel,
+      eventName,
     },
     {
       pretty: true,

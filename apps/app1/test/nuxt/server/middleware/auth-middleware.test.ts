@@ -78,6 +78,8 @@ describe("Middleware d'authentification", () => {
         '/api/auth/register',
         '/api/auth/login',
         '/api/auth/verify-email',
+        '/api/auth/set-password-and-verify',
+        '/api/auth/accept-invitation',
         '/api/auth/resend-verification',
         '/api/auth/request-password-reset',
         '/api/auth/reset-password',
