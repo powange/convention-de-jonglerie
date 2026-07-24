@@ -89,7 +89,9 @@
       "no_meals": "Keine Mahlzeiten für diese Ausgabe konfiguriert",
       "saved_success": "Die Mahlzeiten wurden erfolgreich gesichert",
       "title": "Mahlzeit von {name}",
-      "unsaved_changes": "Sie haben ungesicherte Änderungen"
+      "unsaved_changes": "Sie haben ungesicherte Änderungen",
+      "check_all": "Alle auswählen",
+      "uncheck_all": "Alle abwählen"
     },
     "my_accommodation": "Meine Unterkunft",
     "my_artist_pass": "Mein Künstlerpass",

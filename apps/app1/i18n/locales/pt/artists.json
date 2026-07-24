@@ -89,7 +89,9 @@
       "no_meals": "Não há refeições configuradas para esta edição",
       "saved_success": "As refeições foram guardadas com sucesso",
       "title": "Refeição de {name}",
-      "unsaved_changes": "Tem alterações não guardadas"
+      "unsaved_changes": "Tem alterações não guardadas",
+      "check_all": "Marcar todos",
+      "uncheck_all": "Desmarcar todos"
     },
     "my_accommodation": "Meu alojamento",
     "my_artist_pass": "O meu passe de artista",

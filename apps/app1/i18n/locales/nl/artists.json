@@ -89,7 +89,9 @@
       "no_meals": "Geen maaltijden geconfigureerd voor deze editie",
       "saved_success": "Maaltijden zijn succesvol opgeslagen",
       "title": "Maaltijd van {name}",
-      "unsaved_changes": "Je hebt niet-opgeslagen wijzigingen"
+      "unsaved_changes": "Je hebt niet-opgeslagen wijzigingen",
+      "check_all": "Alles aanvinken",
+      "uncheck_all": "Alles uitvinken"
     },
     "my_accommodation": "Mijn accommodatie",
     "my_artist_pass": "Mijn artiestenpas",

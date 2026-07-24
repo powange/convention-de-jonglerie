@@ -89,7 +89,9 @@
       "no_meals": "Inga måltider konfigurerade för denna utgåva",
       "saved_success": "Måltiderna har sparats framgångsrikt",
       "title": "Måltid från {name}",
-      "unsaved_changes": "Du har förändringar som inte är frälsta"
+      "unsaved_changes": "Du har förändringar som inte är frälsta",
+      "check_all": "Markera alla",
+      "uncheck_all": "Avmarkera alla"
     },
     "my_accommodation": "Mitt boende",
     "my_artist_pass": "Mitt artistpass",

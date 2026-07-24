@@ -89,7 +89,9 @@
       "no_meals": "Nessun pasto configurato per questa edizione",
       "saved_success": "I pasti sono stati salvati con successo",
       "title": "Pasto da {name}",
-      "unsaved_changes": "Le modifiche non sono state salvate"
+      "unsaved_changes": "Le modifiche non sono state salvate",
+      "check_all": "Seleziona tutti",
+      "uncheck_all": "Deseleziona tutti"
     },
     "my_accommodation": "Il mio alloggio",
     "my_artist_pass": "Il mio pass per artisti",

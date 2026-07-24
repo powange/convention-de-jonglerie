@@ -89,7 +89,9 @@
       "no_meals": "No meals configured for this edition",
       "saved_success": "Meals have been successfully saved",
       "title": "Meal from {name}",
-      "unsaved_changes": "You have unsaved changes"
+      "unsaved_changes": "You have unsaved changes",
+      "check_all": "Check all",
+      "uncheck_all": "Uncheck all"
     },
     "my_accommodation": "My accommodation",
     "my_artist_pass": "My artist pass",
