@@ -179,7 +179,8 @@
     "volunteers_short": "Voluntarios",
     "warning": "Atención",
     "week": "Semana",
-    "yes": "Sí"
+    "yes": "Sí",
+    "workshops_short": "Talleres"
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",

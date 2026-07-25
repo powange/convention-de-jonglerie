@@ -87,7 +87,9 @@ describe('API Accept Invitation', () => {
     })
     global.readBody.mockResolvedValue({ token: 'expired', password: 'NewPassword123!' })
 
-    await expect(acceptInvitationHandler(mockEvent)).rejects.toThrow("Le lien d'invitation a expiré")
+    await expect(acceptInvitationHandler(mockEvent)).rejects.toThrow(
+      "Le lien d'invitation a expiré"
+    )
   })
 
   it('rejette un lien déjà utilisé', async () => {

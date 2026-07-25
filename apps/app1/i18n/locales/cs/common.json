@@ -179,7 +179,8 @@
     "volunteers_short": "Dobrovolníci",
     "warning": "Pozor",
     "week": "Týden",
-    "yes": "Ano"
+    "yes": "Ano",
+    "workshops_short": "Workshopy"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

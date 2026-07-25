@@ -179,7 +179,8 @@
     "volunteers_short": "Voluntários",
     "warning": "Atenção",
     "week": "Semana",
-    "yes": "Sim"
+    "yes": "Sim",
+    "workshops_short": "Workshops"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

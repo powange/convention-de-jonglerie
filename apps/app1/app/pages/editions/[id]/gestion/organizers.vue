@@ -380,6 +380,7 @@ const newOrganizerRights = ref({
     deleteAllEditions: false,
     manageMeals: false,
     manageTicketing: false,
+    manageWorkshops: false,
   },
   title: '',
   perEdition: [],

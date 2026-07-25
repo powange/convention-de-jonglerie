@@ -88,6 +88,9 @@
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.stock_short') }}
                 </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.workshops_short') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -185,6 +188,17 @@
                       color="primary"
                       :model-value="localValue.rights.manageStock"
                       @update:model-value="(val) => updateRight('manageStock', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageWorkshops')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageWorkshops"
+                      @update:model-value="(val) => updateRight('manageWorkshops', val)"
                     />
                   </div>
                 </td>
@@ -300,6 +314,18 @@
                     />
                   </div>
                 </td>
+                <td class="px-3 py-2 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.workshops_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageWorkshops"
+                      :model-value="hasEditionFlag(ed.id, 'canManageWorkshops')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageWorkshops', val)"
+                    />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -327,6 +353,7 @@ interface PerEditionRight {
   canManageTicketing?: boolean
   canManageTasks?: boolean
   canManageStock?: boolean
+  canManageWorkshops?: boolean
 }
 interface ModelValue {
   title: string | null
@@ -364,6 +391,7 @@ const props = withDefaults(
       { key: 'manageTicketing', label: 'permissions.manageTicketing' },
       { key: 'manageTasks', label: 'permissions.manageTasks' },
       { key: 'manageStock', label: 'permissions.manageStock' },
+      { key: 'manageWorkshops', label: 'permissions.manageWorkshops' },
     ],
     hideTitle: false,
     size: 'xs',
@@ -421,6 +449,7 @@ const globalRightsOutsideTable = computed(() =>
         'manageTicketing',
         'manageTasks',
         'manageStock',
+        'manageWorkshops',
       ].includes(p.key)
   )
 )
@@ -513,6 +542,12 @@ function updateRight(key: string, value: any) {
       if (p.canManageStock) p.canManageStock = false
     })
   }
+  // If enabling manageWorkshops we clean perEdition workshops flags
+  if (key === 'manageWorkshops' && localValue.rights.manageWorkshops) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageWorkshops) p.canManageWorkshops = false
+    })
+  }
   // Clean up empty entries
   localValue.perEdition = localValue.perEdition.filter(
     (p) =>
@@ -523,7 +558,8 @@ function updateRight(key: string, value: any) {
       p.canManageMeals ||
       p.canManageTicketing ||
       p.canManageTasks ||
-      p.canManageStock
+      p.canManageStock ||
+      p.canManageWorkshops
   )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
@@ -538,6 +574,7 @@ function hasEditionFlag(
     | 'canManageTicketing'
     | 'canManageTasks'
     | 'canManageStock'
+    | 'canManageWorkshops'
 ) {
   return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
 }
@@ -551,7 +588,8 @@ function toggleEdition(
     | 'canManageMeals'
     | 'canManageTicketing'
     | 'canManageTasks'
-    | 'canManageStock',
+    | 'canManageStock'
+    | 'canManageWorkshops',
   value: any
 ) {
   const boolVal = !!value
@@ -567,6 +605,7 @@ function toggleEdition(
       canManageTicketing: false,
       canManageTasks: false,
       canManageStock: false,
+      canManageWorkshops: false,
     }
     localValue.perEdition.push(entry)
   }
@@ -581,7 +620,8 @@ function toggleEdition(
     !entry.canManageMeals &&
     !entry.canManageTicketing &&
     !entry.canManageTasks &&
-    !entry.canManageStock
+    !entry.canManageStock &&
+    !entry.canManageWorkshops
   ) {
     localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
   }
