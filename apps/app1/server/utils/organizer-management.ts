@@ -220,6 +220,7 @@ interface AddConventionOrganizerInput {
     manageArtists: boolean
     manageMeals: boolean
     manageTicketing: boolean
+    manageWorkshops: boolean
     manageTasks: boolean
     manageStock: boolean
   }>
@@ -232,6 +233,7 @@ interface AddConventionOrganizerInput {
     canManageArtists?: boolean
     canManageMeals?: boolean
     canManageTicketing?: boolean
+    canManageWorkshops?: boolean
     canManageTasks?: boolean
     canManageStock?: boolean
   }>
@@ -298,6 +300,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
         canManageArtists: rights?.manageArtists ?? false,
         canManageMeals: rights?.manageMeals ?? false,
         canManageTicketing: rights?.manageTicketing ?? false,
+        canManageWorkshops: rights?.manageWorkshops ?? false,
         canManageTasks: rights?.manageTasks ?? false,
         canManageStock: rights?.manageStock ?? false,
       },
@@ -314,6 +317,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
             p.canManageArtists ||
             p.canManageMeals ||
             p.canManageTicketing ||
+            p.canManageWorkshops ||
             p.canManageTasks ||
             p.canManageStock)
       )
@@ -328,6 +332,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
             canManageArtists: !!p.canManageArtists,
             canManageMeals: !!p.canManageMeals,
             canManageTicketing: !!p.canManageTicketing,
+            canManageWorkshops: !!p.canManageWorkshops,
             canManageTasks: !!p.canManageTasks,
             canManageStock: !!p.canManageStock,
           })),
@@ -539,6 +544,7 @@ export async function updateOrganizerRights(params: {
     manageArtists: boolean
     manageMeals: boolean
     manageTicketing: boolean
+    manageWorkshops: boolean
     manageTasks: boolean
     manageStock: boolean
   }>
@@ -551,6 +557,7 @@ export async function updateOrganizerRights(params: {
     canManageArtists?: boolean
     canManageMeals?: boolean
     canManageTicketing?: boolean
+    canManageWorkshops?: boolean
     canManageTasks?: boolean
     canManageStock?: boolean
   }>
@@ -578,6 +585,7 @@ export async function updateOrganizerRights(params: {
         canManageArtists: rights?.manageArtists ?? organizer.canManageArtists,
         canManageMeals: rights?.manageMeals ?? organizer.canManageMeals,
         canManageTicketing: rights?.manageTicketing ?? organizer.canManageTicketing,
+        canManageWorkshops: rights?.manageWorkshops ?? organizer.canManageWorkshops,
         canManageTasks: rights?.manageTasks ?? organizer.canManageTasks,
         canManageStock: rights?.manageStock ?? organizer.canManageStock,
       },
@@ -601,6 +609,7 @@ export async function updateOrganizerRights(params: {
             p.canManageArtists ||
             p.canManageMeals ||
             p.canManageTicketing ||
+            p.canManageWorkshops ||
             p.canManageTasks ||
             p.canManageStock)
       )
@@ -615,6 +624,7 @@ export async function updateOrganizerRights(params: {
             canManageArtists: !!p.canManageArtists,
             canManageMeals: !!p.canManageMeals,
             canManageTicketing: !!p.canManageTicketing,
+            canManageWorkshops: !!p.canManageWorkshops,
             canManageTasks: !!p.canManageTasks,
             canManageStock: !!p.canManageStock,
           })),

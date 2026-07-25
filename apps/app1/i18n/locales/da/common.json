@@ -179,7 +179,8 @@
     "volunteers_short": "Frivillige",
     "warning": "Bemærk",
     "week": "Uge",
-    "yes": "Ja"
+    "yes": "Ja",
+    "workshops_short": "Workshops"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",

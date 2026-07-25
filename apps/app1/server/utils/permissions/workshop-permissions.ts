@@ -1,12 +1,12 @@
-import { canEditEdition } from './edition-permissions'
+import { canManageWorkshops } from './edition-permissions'
 
 import type { UserForPermissions } from './types'
 
 /**
  * Vérifie si un utilisateur peut gérer les lieux d'atelier (et l'import par image) d'une édition :
- * réservé aux éditeurs de l'édition (organisateurs / auteur / créateur / admin global). Lit l'édition
- * en interne (côté core) puis délègue à `canEditEdition` — le layer ateliers n'a donc pas à lire
- * `Edition` lui-même.
+ * réservé aux organisateurs ayant le droit « gérer les ateliers » (édition ou convention), ainsi
+ * qu'au créateur/auteur/admin. Lit l'édition en interne (côté core) puis délègue à
+ * `canManageWorkshops` — le layer ateliers n'a donc pas à lire `Edition` lui-même.
  */
 export async function canManageWorkshopLocations(
   user: UserForPermissions,
@@ -20,7 +20,7 @@ export async function canManageWorkshopLocations(
     },
   })
   if (!edition) return false
-  return canEditEdition(edition, user)
+  return canManageWorkshops(edition, user)
 }
 
 /**
@@ -131,7 +131,7 @@ export async function canEditWorkshop(userId: number, workshopId: number): Promi
     return true
   }
 
-  // Récupérer le workshop avec l'édition et la convention
+  // Récupérer le workshop avec l'édition, la convention et les droits par édition
   const workshop = await prisma.workshop.findUnique({
     where: { id: workshopId },
     include: {
@@ -142,6 +142,7 @@ export async function canEditWorkshop(userId: number, workshopId: number): Promi
               organizers: true,
             },
           },
+          organizerPermissions: { include: { organizer: true } },
         },
       },
     },
@@ -151,25 +152,11 @@ export async function canEditWorkshop(userId: number, workshopId: number): Promi
     return false
   }
 
-  // Vérifier si l'utilisateur est le créateur du workshop
+  // Le créateur du workshop peut toujours modifier/supprimer son propre atelier
   if (workshop.creatorId === userId) {
     return true
   }
 
-  // Vérifier si l'utilisateur est le créateur de l'édition
-  if (workshop.edition.creatorId === userId) {
-    return true
-  }
-
-  // Vérifier si l'utilisateur est l'auteur de la convention
-  if (workshop.edition.convention.authorId === userId) {
-    return true
-  }
-
-  // Vérifier si l'utilisateur est un organisateur de la convention
-  const isOrganizer = workshop.edition.convention.organizers.some(
-    (collab) => collab.userId === userId
-  )
-
-  return isOrganizer
+  // Sinon, il faut le droit « gérer les ateliers » (édition ou convention).
+  return canManageWorkshops(workshop.edition, { id: userId, isGlobalAdmin: false })
 }

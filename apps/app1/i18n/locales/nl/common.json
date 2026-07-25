@@ -179,7 +179,8 @@
     "volunteers_short": "Vrijwilligers",
     "warning": "Let op",
     "week": "Week",
-    "yes": "Ja"
+    "yes": "Ja",
+    "workshops_short": "Workshops"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

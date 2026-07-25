@@ -20,7 +20,9 @@ describe('/api/editions/[id]/my-show-technical-needs PUT', () => {
     prismaMock.show.findFirst.mockReset()
     prismaMock.show.update.mockReset()
     global.readBody = vi.fn()
-    global.getRouterParam = vi.fn().mockImplementation((_e: any, p: string) => (p === 'id' ? '1' : null))
+    global.getRouterParam = vi
+      .fn()
+      .mockImplementation((_e: any, p: string) => (p === 'id' ? '1' : null))
   })
 
   it('rejette un utilisateur non connecté', async () => {

@@ -336,17 +336,15 @@ const handleWorkshopsImportSuccess = () => {
   // On pourrait recharger les données si nécessaire
 }
 
-// Vérifier l'accès à cette page
-const canAccess = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return canEdit.value || authStore.user?.id === edition.value?.creatorId
-})
-
-// Permissions calculées
+// Permissions — gestion des ateliers (droit dédié, édition ou convention).
+// canEdit gouverne aussi les contrôles d'édition dans le template.
 const canEdit = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
+  return editionStore.canManageWorkshops(edition.value, authStore.user.id)
 })
+
+// Vérifier l'accès à cette page
+const canAccess = computed(() => canEdit.value)
 
 // Charger l'édition et les données
 onMounted(async () => {

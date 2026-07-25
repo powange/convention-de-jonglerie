@@ -215,6 +215,11 @@ const canManageTicketing = computed(() => {
   return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
+const canManageWorkshops = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageWorkshops(edition.value, authStore.user.id)
+})
+
 const canManageTasks = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   const userId = authStore.user.id
@@ -553,8 +558,8 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
-  // Workshops
-  if (isOrganizer.value && edition.value?.workshopsEnabled) {
+  // Workshops — droit dédié « gérer les ateliers » (édition ou convention).
+  if (canManageWorkshops.value && edition.value?.workshopsEnabled) {
     managementSection.push({
       label: t('gestion.workshops.title'),
       icon: 'i-heroicons-academic-cap',

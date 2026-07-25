@@ -179,7 +179,8 @@
     "volunteers_short": "Volontärer",
     "warning": "Observera",
     "week": "Veckan",
-    "yes": "Ja"
+    "yes": "Ja",
+    "workshops_short": "Workshops"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

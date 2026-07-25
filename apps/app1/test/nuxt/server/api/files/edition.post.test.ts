@@ -73,7 +73,7 @@ describe('/api/files/edition POST', () => {
     await expect(handler(mockEvent as any)).rejects.toThrow('Aucun fichier fourni')
   })
 
-  it("rejette si entityId manquant", async () => {
+  it('rejette si entityId manquant', async () => {
     global.readBody.mockResolvedValue({ files: [mockFile], metadata: {} })
     await expect(handler(mockEvent as any)).rejects.toThrow("ID d'édition requis")
   })

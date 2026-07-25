@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockCanEditEdition = vi.hoisted(() => vi.fn())
+const mockCanManageWorkshops = vi.hoisted(() => vi.fn())
 
-// canManageWorkshopLocations délègue à canEditEdition après avoir lu l'Edition côté core.
+// canManageWorkshopLocations délègue à canManageWorkshops (droit dédié « gérer les ateliers »)
+// après avoir lu l'Edition côté core.
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canEditEdition: mockCanEditEdition,
+  canManageWorkshops: mockCanManageWorkshops,
 }))
 
 import { canManageWorkshopLocations } from '../../../../../server/utils/permissions/workshop-permissions'
@@ -18,28 +19,28 @@ describe('canManageWorkshopLocations', () => {
     vi.clearAllMocks()
   })
 
-  it('false si l’édition est introuvable (sans appeler canEditEdition)', async () => {
+  it('false si l’édition est introuvable (sans appeler canManageWorkshops)', async () => {
     prismaMock.edition.findUnique.mockResolvedValue(null)
     expect(await canManageWorkshopLocations(user, 10)).toBe(false)
-    expect(mockCanEditEdition).not.toHaveBeenCalled()
+    expect(mockCanManageWorkshops).not.toHaveBeenCalled()
   })
 
-  it('délègue à canEditEdition quand l’édition existe (autorisé)', async () => {
+  it('délègue à canManageWorkshops quand l’édition existe (autorisé)', async () => {
     const edition = { id: 10, convention: { organizers: [] }, organizerPermissions: [] }
     prismaMock.edition.findUnique.mockResolvedValue(edition)
-    mockCanEditEdition.mockReturnValue(true)
+    mockCanManageWorkshops.mockReturnValue(true)
 
     expect(await canManageWorkshopLocations(user, 10)).toBe(true)
-    expect(mockCanEditEdition).toHaveBeenCalledWith(edition, user)
+    expect(mockCanManageWorkshops).toHaveBeenCalledWith(edition, user)
   })
 
-  it('false quand canEditEdition refuse', async () => {
+  it('false quand canManageWorkshops refuse', async () => {
     prismaMock.edition.findUnique.mockResolvedValue({
       id: 10,
       convention: { organizers: [] },
       organizerPermissions: [],
     })
-    mockCanEditEdition.mockReturnValue(false)
+    mockCanManageWorkshops.mockReturnValue(false)
     expect(await canManageWorkshopLocations(user, 10)).toBe(false)
   })
 })

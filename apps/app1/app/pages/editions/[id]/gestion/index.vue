@@ -445,7 +445,7 @@
         </UCard>
 
         <!-- Workshops -->
-        <UCard v-if="isOrganizer && edition.workshopsEnabled">
+        <UCard v-if="canManageWorkshops && edition.workshopsEnabled">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-academic-cap" class="text-indigo-500" />
@@ -666,6 +666,12 @@ const canManageMeals = computed(() => {
 const canManageTicketing = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageTicketing(edition.value, authStore.user.id)
+})
+
+// Droit dédié « gérer les ateliers » (édition ou convention)
+const canManageWorkshops = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageWorkshops(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur est organisateur de la convention

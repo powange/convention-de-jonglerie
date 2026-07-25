@@ -590,6 +590,36 @@ export function canManageTicketing(
 }
 
 /**
+ * Vérifie si un utilisateur peut gérer les ateliers (workshops) d'une édition
+ */
+export function canManageWorkshops(
+  edition: EditionWithPermissions,
+  user: UserForPermissions
+): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  const hasConventionWorkshopsRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageWorkshops
+    ) || false
+
+  const hasEditionWorkshopsRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageWorkshops === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionWorkshopsRights ||
+    hasEditionWorkshopsRights ||
+    isGlobalAdmin
+  )
+}
+
+/**
  * Vérifie si un utilisateur peut gérer les organisateurs d'une édition
  */
 export function canManageEditionOrganizers(

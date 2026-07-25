@@ -665,6 +665,44 @@ describe('useEditionStore', () => {
       })
     })
 
+    describe('canManageWorkshops', () => {
+      const workshopsEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it('autorise le droit « gérer les ateliers » au niveau convention', () => {
+        const ed = workshopsEdition({ rights: { manageWorkshops: true } })
+        expect(editionStore.canManageWorkshops(ed as any, 1)).toBe(true)
+      })
+
+      it("autorise le droit ateliers spécifique à l'édition (perEditionRights)", () => {
+        const ed = workshopsEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageWorkshops: true }],
+        })
+        expect(editionStore.canManageWorkshops(ed as any, 1)).toBe(true)
+      })
+
+      // RÉGRESSION : éditer l'édition ou gérer les bénévoles NE donne PAS l'accès ateliers.
+      it('refuse editConvention seul (éditer ≠ gérer les ateliers)', () => {
+        const ed = workshopsEdition({ rights: { editConvention: true } })
+        expect(editionStore.canManageWorkshops(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse canManageVolunteers seul', () => {
+        const ed = workshopsEdition({ rights: { manageVolunteers: true } })
+        expect(editionStore.canManageWorkshops(ed as any, 1)).toBe(false)
+      })
+    })
+
     describe('canDeleteEdition', () => {
       it("devrait autoriser l'admin global en mode admin", () => {
         authStore.user = { ...mockUser, isGlobalAdmin: true }

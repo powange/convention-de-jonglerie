@@ -179,7 +179,8 @@
     "volunteers_short": "Волонтери",
     "warning": "Увага",
     "week": "Тиждень",
-    "yes": "Так"
+    "yes": "Так",
+    "workshops_short": "Майстер-класи"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",
