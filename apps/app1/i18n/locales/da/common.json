@@ -180,7 +180,9 @@
     "warning": "Bemærk",
     "week": "Uge",
     "yes": "Ja",
-    "workshops_short": "Workshops"
+    "workshops_short": "Workshops",
+    "faq_short": "FAQ",
+    "information_short": "Information"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",

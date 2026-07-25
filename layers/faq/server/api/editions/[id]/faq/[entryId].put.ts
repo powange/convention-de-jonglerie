@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
-  canEditEdition,
+  canManageFAQ,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -29,7 +29,7 @@ export default wrapApiHandler(
     if (!edition) {
       throw createError({ status: 404, message: 'Édition non trouvée' })
     }
-    if (!canEditEdition(edition, user)) {
+    if (!canManageFAQ(edition, user)) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }
 

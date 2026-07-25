@@ -4,7 +4,7 @@
     "admin": "Administrator",
     "deleteAllEditions": "Usuń wszystkie edycje",
     "deleteConvention": "Usuń konwencję",
-    "editAllEditions": "Edytuj wszystkie edycje",
+    "editAllEditions": "Informacje (wszystkie edycje)",
     "editConvention": "Edytuj konwencję",
     "editor": "Redaktor",
     "manageArtists": "Zarządzanie artystami",
@@ -17,6 +17,7 @@
     "manager": "Menedżer",
     "moderator": "Moderator",
     "viewer": "Przeglądający",
-    "manageWorkshops": "Zarządzaj warsztatami"
+    "manageWorkshops": "Zarządzaj warsztatami",
+    "manageFAQ": "Zarządzaj FAQ"
   }
 }

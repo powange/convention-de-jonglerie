@@ -4,7 +4,7 @@
     "admin": "Direktör",
     "deleteAllEditions": "Radera alla utgåvor",
     "deleteConvention": "Ta bort avtalet",
-    "editAllEditions": "Ändra alla utgåvor",
+    "editAllEditions": "Information (alla utgåvor)",
     "editConvention": "Ändring av avtalet",
     "editor": "Utgivare",
     "manageArtists": "Hantera artister",
@@ -17,6 +17,7 @@
     "manager": "Avancerad hantering",
     "moderator": "Moderator",
     "viewer": "Spelare",
-    "manageWorkshops": "Hantera workshops"
+    "manageWorkshops": "Hantera workshops",
+    "manageFAQ": "Hantera FAQ"
   }
 }

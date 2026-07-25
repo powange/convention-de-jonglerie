@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockGetEditionWithPermissions = vi.hoisted(() => vi.fn())
-const mockCanEditEdition = vi.hoisted(() => vi.fn())
+const mockCanManageFAQ = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
   getEditionWithPermissions: mockGetEditionWithPermissions,
-  canEditEdition: mockCanEditEdition,
+  canManageFAQ: mockCanManageFAQ,
 }))
 
 vi.mock('#server/utils/auth-utils', () => ({
@@ -28,7 +28,7 @@ describe('PUT /api/editions/[id]/faq/reorder', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetEditionWithPermissions.mockResolvedValue(mockEdition)
-    mockCanEditEdition.mockReturnValue(true)
+    mockCanManageFAQ.mockReturnValue(true)
     prismaMock.faqEntry.findMany.mockReset()
     prismaMock.faqEntry.updateMany.mockReset()
     prismaMock.faqEntry.updateMany.mockResolvedValue({ count: 1 })
@@ -52,8 +52,8 @@ describe('PUT /api/editions/[id]/faq/reorder', () => {
     })
   })
 
-  it('rejette 403 si pas canEditEdition', async () => {
-    mockCanEditEdition.mockReturnValue(false)
+  it('rejette 403 si pas canManageFAQ', async () => {
+    mockCanManageFAQ.mockReturnValue(false)
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
     expect(prismaMock.faqEntry.updateMany).not.toHaveBeenCalled()
   })

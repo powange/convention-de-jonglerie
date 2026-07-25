@@ -96,11 +96,13 @@
     "error": "Erreur",
     "event": "Évènement",
     "export_success": "Export réussi",
+    "faq_short": "FAQ",
     "favorite": "Favori",
     "filters": "Filtres",
     "first_name": "Prénom",
     "hidden": "Masquée",
     "inactive": "Inactif",
+    "information_short": "Informations",
     "item": "Article",
     "item_selected": "élément sélectionné",
     "items": "Articles",
@@ -179,7 +181,7 @@
     "volunteers_short": "Bénévoles",
     "warning": "Attention",
     "week": "Semaine",
-    "workshops_short": "Ateliers",
+    "workshops_short": "Workshops",
     "yes": "Oui"
   },
   "dates": {

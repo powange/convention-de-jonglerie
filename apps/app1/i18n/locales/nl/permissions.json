@@ -4,7 +4,7 @@
     "admin": "Beheerder",
     "deleteAllEditions": "Alle edities verwijderen",
     "deleteConvention": "Conventie verwijderen",
-    "editAllEditions": "Alle edities bewerken",
+    "editAllEditions": "Informatie (alle edities)",
     "editConvention": "Conventie bewerken",
     "editor": "Redacteur",
     "manageArtists": "Artiesten beheren",
@@ -17,6 +17,7 @@
     "manager": "Manager",
     "moderator": "Moderator",
     "viewer": "Kijker",
-    "manageWorkshops": "Workshops beheren"
+    "manageWorkshops": "Workshops beheren",
+    "manageFAQ": "FAQ beheren"
   }
 }

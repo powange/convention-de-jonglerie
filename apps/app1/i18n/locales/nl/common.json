@@ -180,7 +180,9 @@
     "warning": "Let op",
     "week": "Week",
     "yes": "Ja",
-    "workshops_short": "Workshops"
+    "workshops_short": "Workshops",
+    "faq_short": "FAQ",
+    "information_short": "Informatie"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

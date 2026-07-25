@@ -180,7 +180,9 @@
     "warning": "Внимание",
     "week": "Неделя",
     "yes": "Да",
-    "workshops_short": "Мастер-классы"
+    "workshops_short": "Мастер-классы",
+    "faq_short": "FAQ",
+    "information_short": "Информация"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

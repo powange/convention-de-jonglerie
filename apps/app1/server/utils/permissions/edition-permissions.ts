@@ -620,6 +620,33 @@ export function canManageWorkshops(
 }
 
 /**
+ * Vérifie si un utilisateur peut gérer la FAQ d'une édition
+ */
+export function canManageFAQ(edition: EditionWithPermissions, user: UserForPermissions): boolean {
+  const isCreator = edition.creatorId === user.id
+  const isConventionAuthor = edition.convention.authorId === user.id
+  const isGlobalAdmin = user.isGlobalAdmin || false
+
+  const hasConventionFAQRights =
+    edition.convention.organizers?.some(
+      (collab) => collab.userId === user.id && collab.canManageFAQ
+    ) || false
+
+  const hasEditionFAQRights =
+    edition.organizerPermissions?.some(
+      (perm) => perm.organizer.userId === user.id && perm.canManageFAQ === true
+    ) || false
+
+  return (
+    isCreator ||
+    isConventionAuthor ||
+    hasConventionFAQRights ||
+    hasEditionFAQRights ||
+    isGlobalAdmin
+  )
+}
+
+/**
  * Vérifie si un utilisateur peut gérer les organisateurs d'une édition
  */
 export function canManageEditionOrganizers(

@@ -584,6 +584,25 @@ export const useEditionStore = defineStore('editions', {
       })
     },
 
+    // Vérifier si l'utilisateur peut gérer la FAQ d'une édition (droit dédié,
+    // aligné sur le helper serveur canManageFAQ ; éditer l'édition ne suffit pas).
+    canManageFAQ(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore()
+      if (authStore.isAdminModeActive) return true
+      if (edition.creatorId && edition.creatorId === userId) return true
+      if (!edition.convention || !edition.convention.organizers) return false
+      if (edition.convention.authorId && edition.convention.authorId === userId) return true
+      return edition.convention.organizers.some((collab) => {
+        if (collab.user.id !== userId) return false
+        if (collab.rights?.manageFAQ) return true
+        if (collab.perEditionRights) {
+          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
+          if (per?.canManageFAQ) return true
+        }
+        return false
+      })
+    },
+
     // Vérifier si l'utilisateur peut gérer les organisateurs d'une convention
     canManageOrganizers(edition: Edition, userId: number): boolean {
       const authStore = useAuthStore()

@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockGetEditionWithPermissions = vi.hoisted(() => vi.fn())
-const mockCanEditEdition = vi.hoisted(() => vi.fn())
+const mockCanManageFAQ = vi.hoisted(() => vi.fn())
 const mockOptionalAuth = vi.hoisted(() => vi.fn())
 const mockGetFaqVisibility = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
   getEditionWithPermissions: mockGetEditionWithPermissions,
-  canEditEdition: mockCanEditEdition,
+  canManageFAQ: mockCanManageFAQ,
 }))
 
 vi.mock('#server/utils/auth-utils', () => ({
@@ -36,7 +36,7 @@ describe('GET /api/editions/[id]/faq', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetEditionWithPermissions.mockResolvedValue(mockEdition)
-    mockCanEditEdition.mockReturnValue(false)
+    mockCanManageFAQ.mockReturnValue(false)
     mockOptionalAuth.mockReturnValue(null)
     mockGetFaqVisibility.mockResolvedValue({ enabled: true, pagePublic: true })
     prismaMock.faqEntry.findMany.mockReset()
@@ -54,9 +54,9 @@ describe('GET /api/editions/[id]/faq', () => {
     )
   })
 
-  it('retourne toutes les entrées pour un organisateur avec canEditEdition', async () => {
+  it('retourne toutes les entrées pour un organisateur avec canManageFAQ', async () => {
     mockOptionalAuth.mockReturnValue({ id: 42 })
-    mockCanEditEdition.mockReturnValue(true)
+    mockCanManageFAQ.mockReturnValue(true)
     await handler(baseEvent as any)
     expect(prismaMock.faqEntry.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -67,7 +67,7 @@ describe('GET /api/editions/[id]/faq', () => {
 
   it('force le filtre isPublic même pour un éditeur quand publicOnly=1', async () => {
     mockOptionalAuth.mockReturnValue({ id: 42 })
-    mockCanEditEdition.mockReturnValue(true)
+    mockCanManageFAQ.mockReturnValue(true)
     ;(globalThis as any).getQuery = vi.fn().mockReturnValue({ publicOnly: '1' })
     await handler(baseEvent as any)
     expect(prismaMock.faqEntry.findMany).toHaveBeenCalledWith(
@@ -103,7 +103,7 @@ describe('GET /api/editions/[id]/faq', () => {
 
   it('autorise un éditeur à accéder à la FAQ même si la page publique est désactivée', async () => {
     mockOptionalAuth.mockReturnValue({ id: 42 })
-    mockCanEditEdition.mockReturnValue(true)
+    mockCanManageFAQ.mockReturnValue(true)
     mockGetFaqVisibility.mockResolvedValue({ enabled: true, pagePublic: false })
     await handler(baseEvent as any)
     expect(prismaMock.faqEntry.findMany).toHaveBeenCalled()

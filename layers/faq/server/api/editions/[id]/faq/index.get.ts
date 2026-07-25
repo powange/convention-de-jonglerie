@@ -2,7 +2,7 @@ import { useFaqPorts } from '#server/faq/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import {
-  canEditEdition,
+  canManageFAQ,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -11,7 +11,7 @@ import { validateEditionId } from '#server/utils/validation-helpers'
  * GET /api/editions/[id]/faq
  *
  * Liste les entrées de FAQ d'une édition.
- * - Organisateur avec `canEditEdition` : toutes les entrées (publiques + privées)
+ * - Organisateur avec `canManageFAQ` : toutes les entrées (publiques + privées)
  * - Visiteur ou query `?publicOnly=1` : seulement les entrées `isPublic = true`
  *
  * Le query param `publicOnly` permet à la page publique d'éviter de recevoir
@@ -30,7 +30,7 @@ export default wrapApiHandler(
     }
 
     const user = optionalAuth(event)
-    const isEditor = !!user && canEditEdition(edition, user)
+    const isFaqManager = !!user && canManageFAQ(edition, user)
 
     // Visibilité FAQ propre au domaine via le port (le layer ne lit plus les flags faqEnabled /
     // faqPagePublic sur l'Edition ; jonglerie : ils en viennent, générique : autre résolution).
@@ -39,13 +39,13 @@ export default wrapApiHandler(
 
     // Côté visiteur, si la page publique est désactivée ou le module FAQ off,
     // on ne fuit pas l'info et on ne tape pas la table.
-    if (!isEditor && (!faqEnabled || !faqPagePublic)) {
+    if (!isFaqManager && (!faqEnabled || !faqPagePublic)) {
       throw createError({ status: 404, message: 'FAQ non disponible' })
     }
 
     // Pour la page publique, on force toujours le filtre isPublic même si
-    // l'utilisateur est éditeur (sinon il verrait les privées sur le public).
-    const restrictToPublic = !isEditor || publicOnly
+    // l'utilisateur gère la FAQ (sinon il verrait les privées sur le public).
+    const restrictToPublic = !isFaqManager || publicOnly
 
     const entries = await prisma.faqEntry.findMany({
       where: {
