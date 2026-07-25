@@ -65,7 +65,7 @@
               >
                 <th class="text-left font-medium px-2 py-1"></th>
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
-                  {{ $t('common.edit') }}
+                  {{ $t('common.information_short') }}
                 </th>
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.delete') }}
@@ -90,6 +90,9 @@
                 </th>
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.workshops_short') }}
+                </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.faq_short') }}
                 </th>
               </tr>
             </thead>
@@ -202,6 +205,17 @@
                     />
                   </div>
                 </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageFAQ')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageFAQ"
+                      @update:model-value="(val) => updateRight('manageFAQ', val)"
+                    />
+                  </div>
+                </td>
               </tr>
 
               <!-- Lignes pour chaque édition -->
@@ -219,7 +233,7 @@
                 <td class="px-3 py-2 align-middle">
                   <div class="flex justify-center">
                     <USwitch
-                      :aria-label="$t('common.edit')"
+                      :aria-label="$t('common.information_short')"
                       :size="switchSize"
                       color="primary"
                       :disabled="localValue.rights.editAllEditions"
@@ -326,6 +340,18 @@
                     />
                   </div>
                 </td>
+                <td class="px-3 py-2 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.faq_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageFAQ"
+                      :model-value="hasEditionFlag(ed.id, 'canManageFAQ')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageFAQ', val)"
+                    />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -354,6 +380,7 @@ interface PerEditionRight {
   canManageTasks?: boolean
   canManageStock?: boolean
   canManageWorkshops?: boolean
+  canManageFAQ?: boolean
 }
 interface ModelValue {
   title: string | null
@@ -392,6 +419,7 @@ const props = withDefaults(
       { key: 'manageTasks', label: 'permissions.manageTasks' },
       { key: 'manageStock', label: 'permissions.manageStock' },
       { key: 'manageWorkshops', label: 'permissions.manageWorkshops' },
+      { key: 'manageFAQ', label: 'permissions.manageFAQ' },
     ],
     hideTitle: false,
     size: 'xs',
@@ -450,6 +478,7 @@ const globalRightsOutsideTable = computed(() =>
         'manageTasks',
         'manageStock',
         'manageWorkshops',
+        'manageFAQ',
       ].includes(p.key)
   )
 )
@@ -548,6 +577,12 @@ function updateRight(key: string, value: any) {
       if (p.canManageWorkshops) p.canManageWorkshops = false
     })
   }
+  // If enabling manageFAQ we clean perEdition FAQ flags
+  if (key === 'manageFAQ' && localValue.rights.manageFAQ) {
+    localValue.perEdition.forEach((p) => {
+      if (p.canManageFAQ) p.canManageFAQ = false
+    })
+  }
   // Clean up empty entries
   localValue.perEdition = localValue.perEdition.filter(
     (p) =>
@@ -559,7 +594,8 @@ function updateRight(key: string, value: any) {
       p.canManageTicketing ||
       p.canManageTasks ||
       p.canManageStock ||
-      p.canManageWorkshops
+      p.canManageWorkshops ||
+      p.canManageFAQ
   )
   if (!syncingFromParent) emit('update:modelValue', JSON.parse(JSON.stringify(localValue)))
 }
@@ -575,6 +611,7 @@ function hasEditionFlag(
     | 'canManageTasks'
     | 'canManageStock'
     | 'canManageWorkshops'
+    | 'canManageFAQ'
 ) {
   return !!localValue.perEdition.find((p) => p.editionId === editionId && (p as any)[field])
 }
@@ -589,7 +626,8 @@ function toggleEdition(
     | 'canManageTicketing'
     | 'canManageTasks'
     | 'canManageStock'
-    | 'canManageWorkshops',
+    | 'canManageWorkshops'
+    | 'canManageFAQ',
   value: any
 ) {
   const boolVal = !!value
@@ -606,6 +644,7 @@ function toggleEdition(
       canManageTasks: false,
       canManageStock: false,
       canManageWorkshops: false,
+      canManageFAQ: false,
     }
     localValue.perEdition.push(entry)
   }
@@ -621,7 +660,8 @@ function toggleEdition(
     !entry.canManageTicketing &&
     !entry.canManageTasks &&
     !entry.canManageStock &&
-    !entry.canManageWorkshops
+    !entry.canManageWorkshops &&
+    !entry.canManageFAQ
   ) {
     localValue.perEdition = localValue.perEdition.filter((p) => p !== entry)
   }

@@ -180,7 +180,9 @@
     "warning": "Uwaga",
     "week": "Tydzień",
     "yes": "Tak",
-    "workshops_short": "Warsztaty"
+    "workshops_short": "Warsztaty",
+    "faq_short": "FAQ",
+    "information_short": "Informacje"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

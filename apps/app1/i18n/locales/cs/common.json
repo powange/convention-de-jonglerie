@@ -180,7 +180,9 @@
     "warning": "Pozor",
     "week": "Týden",
     "yes": "Ano",
-    "workshops_short": "Workshopy"
+    "workshops_short": "Workshopy",
+    "faq_short": "FAQ",
+    "information_short": "Informace"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

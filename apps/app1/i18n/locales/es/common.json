@@ -180,7 +180,9 @@
     "warning": "Atención",
     "week": "Semana",
     "yes": "Sí",
-    "workshops_short": "Talleres"
+    "workshops_short": "Talleres",
+    "faq_short": "FAQ",
+    "information_short": "Información"
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",

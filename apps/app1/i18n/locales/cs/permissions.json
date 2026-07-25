@@ -4,7 +4,7 @@
     "admin": "Ředitel",
     "deleteAllEditions": "Smazat všechny edice",
     "deleteConvention": "Vymazat dohodu",
-    "editAllEditions": "Upravit všechny edice",
+    "editAllEditions": "Informace (všechny edice)",
     "editConvention": "Úprava dohody",
     "editor": "Vydavatel",
     "manageArtists": "Správa umělců",
@@ -17,6 +17,7 @@
     "manager": "Pokročilé řízení",
     "moderator": "Moderátor",
     "viewer": "Hráč",
-    "manageWorkshops": "Spravovat workshopy"
+    "manageWorkshops": "Spravovat workshopy",
+    "manageFAQ": "Spravovat FAQ"
   }
 }

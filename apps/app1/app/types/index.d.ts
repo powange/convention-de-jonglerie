@@ -148,6 +148,7 @@ export interface ConventionOrganizerWithRights {
     canManageTasks?: boolean
     canManageStock?: boolean
     canManageWorkshops?: boolean
+    canManageFAQ?: boolean
   }[]
   title?: string | null // résumé (ex: Administrateur, Éditeur...)
 }
@@ -167,6 +168,7 @@ export interface EditionOrganizer {
     canManageTasks?: boolean
     canManageStock?: boolean
     canManageWorkshops?: boolean
+    canManageFAQ?: boolean
   }[]
   title?: string | null
 }

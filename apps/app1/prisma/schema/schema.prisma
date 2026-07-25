@@ -310,6 +310,7 @@ model ConventionOrganizer {
   canManageTasks        Boolean                      @default(false)
   canManageStock        Boolean                      @default(false)
   canManageWorkshops    Boolean                      @default(false)
+  canManageFAQ          Boolean                      @default(false)
   addedBy               User                         @relation("AddedOrganizers", fields: [addedById], references: [id])
   convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -334,6 +335,7 @@ model EditionOrganizerPermission {
   canManageTasks      Boolean             @default(false)
   canManageStock      Boolean             @default(false)
   canManageWorkshops  Boolean             @default(false)
+  canManageFAQ        Boolean             @default(false)
   organizer           ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   edition             Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
 

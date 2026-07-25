@@ -9,6 +9,7 @@ import {
   canManageMeals,
   canManageTicketing,
   canManageWorkshops,
+  canManageFAQ,
   canManageEditionOrganizers,
   type EditionWithPermissions,
 } from '../../../../../server/utils/permissions/edition-permissions'
@@ -626,6 +627,45 @@ describe('edition-permissions', () => {
       const user = createMockUser({ id: 9999 })
 
       expect(canManageWorkshops(edition, user)).toBe(false)
+    })
+  })
+
+  describe('canManageFAQ', () => {
+    it('devrait autoriser un organisateur avec canManageFAQ', () => {
+      const edition = createMockEdition({
+        convention: {
+          ...createMockEdition().convention,
+          organizers: [
+            {
+              id: 1,
+              conventionId: 10,
+              userId: 42,
+              canEditAllEditions: false,
+              canEditConvention: false,
+              canDeleteAllEditions: false,
+              canDeleteConvention: false,
+              canManageOrganizers: false,
+              canManageArtists: false,
+              canManageMeals: false,
+              canManageTicketing: false,
+              canManageWorkshops: false,
+              canManageFAQ: true,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ],
+        },
+      })
+      const user = createMockUser({ id: 42 })
+
+      expect(canManageFAQ(edition, user)).toBe(true)
+    })
+
+    it('devrait refuser un utilisateur sans droits', () => {
+      const edition = createMockEdition()
+      const user = createMockUser({ id: 9999 })
+
+      expect(canManageFAQ(edition, user)).toBe(false)
     })
   })
 

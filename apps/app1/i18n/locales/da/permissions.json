@@ -4,7 +4,7 @@
     "admin": "Administrator",
     "deleteAllEditions": "Slet alle udgaver",
     "deleteConvention": "Slet konvention",
-    "editAllEditions": "Rediger alle udgaver",
+    "editAllEditions": "Oplysninger (alle udgaver)",
     "editConvention": "Rediger konvention",
     "editor": "Redaktør",
     "manageArtists": "Administrer kunstnere",
@@ -17,6 +17,7 @@
     "manager": "Manager",
     "moderator": "Moderator",
     "viewer": "Læser",
-    "manageWorkshops": "Administrer workshops"
+    "manageWorkshops": "Administrer workshops",
+    "manageFAQ": "Administrer FAQ"
   }
 }

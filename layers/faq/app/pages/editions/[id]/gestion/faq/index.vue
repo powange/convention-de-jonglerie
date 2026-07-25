@@ -239,13 +239,14 @@ const faqPagePublicLocal = ref(false)
 const savingPagePublic = ref(false)
 
 // La page est accessible aux organisateurs et bénévoles avec accès gestion
-// (le menu latéral filtre déjà la visibilité du lien). Seuls les utilisateurs
-// avec `canEditEdition` peuvent modifier : créer/éditer/supprimer/réordonner
-// /toggler la visibilité publique. Les API serveur appliquent la même règle.
+// (le menu latéral filtre déjà la visibilité du lien) pour consultation. Seuls
+// les utilisateurs avec le droit dédié `canManageFAQ` (édition ou convention)
+// peuvent modifier : créer/éditer/supprimer/réordonner/toggler la visibilité
+// publique. Les API serveur appliquent la même règle.
 const edition = computed(() => editionStore.getEditionById(editionId))
 const canManage = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
+  return editionStore.canManageFAQ(edition.value, authStore.user.id)
 })
 
 // --- Recherche ---

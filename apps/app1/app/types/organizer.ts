@@ -12,6 +12,7 @@ export interface OrganizerRights {
   manageMeals?: boolean
   manageTicketing?: boolean
   manageWorkshops?: boolean
+  manageFAQ?: boolean
   addEdition?: boolean
   editAllEditions?: boolean
   deleteAllEditions?: boolean
@@ -30,6 +31,7 @@ export interface OrganizerPerEditionRights {
     canManageMeals?: boolean
     canManageTicketing?: boolean
     canManageWorkshops?: boolean
+    canManageFAQ?: boolean
   }
 }
 

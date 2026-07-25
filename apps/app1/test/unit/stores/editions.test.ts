@@ -703,6 +703,44 @@ describe('useEditionStore', () => {
       })
     })
 
+    describe('canManageFAQ', () => {
+      const faqEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it('autorise le droit « gérer la FAQ » au niveau convention', () => {
+        const ed = faqEdition({ rights: { manageFAQ: true } })
+        expect(editionStore.canManageFAQ(ed as any, 1)).toBe(true)
+      })
+
+      it("autorise le droit FAQ spécifique à l'édition (perEditionRights)", () => {
+        const ed = faqEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageFAQ: true }],
+        })
+        expect(editionStore.canManageFAQ(ed as any, 1)).toBe(true)
+      })
+
+      // RÉGRESSION : éditer l'édition ou gérer les bénévoles NE donne PAS l'accès FAQ.
+      it('refuse editConvention seul (éditer ≠ gérer la FAQ)', () => {
+        const ed = faqEdition({ rights: { editConvention: true } })
+        expect(editionStore.canManageFAQ(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse canManageVolunteers seul', () => {
+        const ed = faqEdition({ rights: { manageVolunteers: true } })
+        expect(editionStore.canManageFAQ(ed as any, 1)).toBe(false)
+      })
+    })
+
     describe('canDeleteEdition', () => {
       it("devrait autoriser l'admin global en mode admin", () => {
         authStore.user = { ...mockUser, isGlobalAdmin: true }
