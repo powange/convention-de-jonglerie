@@ -361,10 +361,11 @@ const canAccess = computed(() => {
   return !!authStore.user?.id
 })
 
-// Vérifier si l'utilisateur peut gérer le compteur (régénérer le token)
+// Vérifier si l'utilisateur peut gérer le compteur (régénérer le token).
+// Droit dédié billetterie, aligné sur les endpoints counters (canManageTicketingById).
 const canManageCounter = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
 const formatDateTime = (dateString: string) => {

@@ -2,10 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import handler from '../../../../../../server/api/editions/[id]/shows/index.get'
 
-const mockCanAccessEditionData = vi.hoisted(() => vi.fn())
+const mockCanManageArtistsById = vi.hoisted(() => vi.fn())
+const mockCanManageTicketingById = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canAccessEditionData: mockCanAccessEditionData,
+  canManageArtistsById: mockCanManageArtistsById,
+  canManageTicketingById: mockCanManageTicketingById,
 }))
 
 const prismaMock = (globalThis as any).prisma
@@ -79,18 +81,33 @@ describe('/api/editions/[id]/shows GET', () => {
       await expect(handler(mockEvent as any)).rejects.toThrow('Unauthorized')
     })
 
-    it('devrait rejeter les utilisateurs sans droits', async () => {
-      mockCanAccessEditionData.mockResolvedValue(false)
+    it('devrait rejeter les utilisateurs sans droits artistes ni billetterie', async () => {
+      mockCanManageArtistsById.mockResolvedValue(false)
+      mockCanManageTicketingById.mockResolvedValue(false)
 
       const mockEvent = { context: { user: mockUser } }
 
       await expect(handler(mockEvent as any)).rejects.toThrow(/droits/i)
     })
+
+    // La page des articles à remettre (billetterie) liste les spectacles pour
+    // leur associer des articles : le droit billetterie seul suffit à lire.
+    it('devrait autoriser un gestionnaire billetterie sans droit artistes', async () => {
+      mockCanManageArtistsById.mockResolvedValue(false)
+      mockCanManageTicketingById.mockResolvedValue(true)
+      prismaMock.show.findMany.mockResolvedValue([])
+
+      const mockEvent = { context: { user: mockUser } }
+      const result = await handler(mockEvent as any)
+
+      expect(result.success).toBe(true)
+    })
   })
 
   describe('Listing réussi', () => {
     beforeEach(() => {
-      mockCanAccessEditionData.mockResolvedValue(true)
+      mockCanManageArtistsById.mockResolvedValue(true)
+      mockCanManageTicketingById.mockResolvedValue(false)
     })
 
     it('devrait retourner la liste des spectacles avec zone et marqueur', async () => {
@@ -154,9 +171,9 @@ describe('/api/editions/[id]/shows GET', () => {
   })
 
   describe("Cas avec l'admin global", () => {
-    it("devrait autoriser l'admin global via canAccessEditionData", async () => {
+    it("devrait autoriser l'admin global via canManageArtistsById", async () => {
       const adminUser = { ...mockUser, isGlobalAdmin: true }
-      mockCanAccessEditionData.mockResolvedValue(true)
+      mockCanManageArtistsById.mockResolvedValue(true)
       prismaMock.show.findMany.mockResolvedValue([])
 
       const mockEvent = { context: { user: adminUser } }

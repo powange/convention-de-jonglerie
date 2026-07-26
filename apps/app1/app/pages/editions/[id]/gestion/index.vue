@@ -506,7 +506,7 @@
         </UCard>
 
         <!-- FAQ -->
-        <UCard v-if="edition.faqEnabled && canEdit">
+        <UCard v-if="edition.faqEnabled && canManageFAQ">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-question-mark-circle" class="text-indigo-500" />
@@ -672,6 +672,12 @@ const canManageTicketing = computed(() => {
 const canManageWorkshops = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageWorkshops(edition.value, authStore.user.id)
+})
+
+// Droit dédié « gérer la FAQ » (édition ou convention)
+const canManageFAQ = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageFAQ(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur est organisateur de la convention
