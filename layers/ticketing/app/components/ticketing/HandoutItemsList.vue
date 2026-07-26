@@ -23,10 +23,12 @@
           <UCheckbox
             :model-value="item.cumulative"
             variant="card"
-            indicator="hidden"
             size="sm"
             :label="$t('ticketing.handout_items.list.cumulative_short')"
-            :ui="{ root: 'rounded-none' }"
+            :ui="{
+              root: 'rounded-none py-0 px-3 self-stretch items-center whitespace-nowrap',
+              wrapper: 'text-xs',
+            }"
             @update:model-value="updateItemCumulative(item, $event === true)"
           />
           <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
@@ -45,10 +47,12 @@
           <UCheckbox
             v-model="form.cumulative"
             variant="card"
-            indicator="hidden"
             size="sm"
             :label="$t('ticketing.handout_items.list.cumulative_short')"
-            :ui="{ root: 'rounded-none' }"
+            :ui="{
+              root: 'rounded-none py-0 px-3 self-stretch items-center whitespace-nowrap',
+              wrapper: 'text-xs',
+            }"
           />
           <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
         </UFieldGroup>
