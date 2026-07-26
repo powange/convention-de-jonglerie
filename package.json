@@ -4,6 +4,7 @@
   "description": "Monorepo — proxy racine vers apps/app1 (et, à terme, apps/app2). Les scripts sont préfixés par app (`app1:*`) pour permettre d'ajouter les équivalents `app2:*` sans collision de noms. Chaque script proxifie `cd apps/app1 && npm run <script>`.",
   "scripts": {
     "app1:build": "cd apps/app1 && npm run build",
+    "app1:analyze": "cd apps/app1 && npm run analyze",
     "app1:dev": "cd apps/app1 && npm run dev",
     "app1:generate": "cd apps/app1 && npm run generate",
     "app1:preview": "cd apps/app1 && npm run preview",
