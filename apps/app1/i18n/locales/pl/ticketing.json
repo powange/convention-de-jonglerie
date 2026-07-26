@@ -100,7 +100,9 @@
         "delete_label": "Usuń",
         "delete_title": "Usuń przedmiot",
         "loading": "Ładowanie...",
-        "name_placeholder": "Nazwa przedmiotu"
+        "name_placeholder": "Nazwa przedmiotu",
+        "cumulative_help": "Przedmiot kumulatywny jest wydawany tyle razy, ile razy jest powiązany z uczestnikiem (na przykład artysta występujący w dwóch spektaklach). W przeciwnym razie jest wydawany tylko raz.",
+        "cumulative_short": "Kumulatywny"
       },
       "volunteer": {
         "choose_placeholder": "Wybierz przedmiot do wydania...",

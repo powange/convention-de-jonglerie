@@ -802,6 +802,8 @@ interface TicketData {
             }
             source?: 'tier' | 'customField'
             customFieldName?: string
+            /** Nombre d'exemplaires à remettre (articles cumulables) */
+            quantity?: number
           }>
         }
         selectedOptions?: Array<{
@@ -851,6 +853,8 @@ interface VolunteerData {
     handoutItems?: Array<{
       id: number
       name: string
+      /** Nombre d'exemplaires à remettre (articles cumulables) */
+      quantity?: number
     }>
     meals?: Array<{
       id: number
@@ -885,6 +889,8 @@ interface ArtistData {
     handoutItems?: Array<{
       id: number
       name: string
+      /** Nombre d'exemplaires à remettre (articles cumulables) */
+      quantity?: number
     }>
     meals?: Array<{
       id: number
@@ -982,6 +988,12 @@ const handoutItemsToDistribute = computed(() => {
   const itemsList: Array<{ id: string; name: string; participantName?: string }> = []
   let globalIndex = 0 // Compteur global pour garantir l'unicité
 
+  // Un article cumulable peut devoir être remis plusieurs fois (ex. artiste jouant
+  // dans deux spectacles). On génère une ligne cochable par exemplaire, numérotée
+  // « (1/2) », « (2/2) », pour que l'opérateur coche chaque objet remis.
+  const labelWithCopy = (name: string, index: number, quantity: number) =>
+    quantity > 1 ? `${name} (${index + 1}/${quantity})` : name
+
   // Articles pour les billets
   if (props.participant && 'ticket' in props.participant) {
     const itemsToCheck =
@@ -1004,11 +1016,14 @@ const handoutItemsToDistribute = computed(() => {
 
           // Créer un ID unique en utilisant un index global pour éviter les collisions
           // même si plusieurs billets ont le même tarif et la même réponse au champ personnalisé
-          itemsList.push({
-            id: `${item.id}-tier-${tierItem.handoutItem.id}-${globalIndex++}`,
-            name: `${itemName} - ${participantName}`,
-            participantName,
-          })
+          const quantity = tierItem.quantity ?? 1
+          for (let copy = 0; copy < quantity; copy++) {
+            itemsList.push({
+              id: `${item.id}-tier-${tierItem.handoutItem.id}-${globalIndex++}`,
+              name: `${labelWithCopy(itemName, copy, quantity)} - ${participantName}`,
+              participantName,
+            })
+          }
         }
       }
 
@@ -1037,11 +1052,14 @@ const handoutItemsToDistribute = computed(() => {
 
     if (props.participant.volunteer.handoutItems) {
       for (const item of props.participant.volunteer.handoutItems) {
-        itemsList.push({
-          id: `volunteer-${item.id}-${globalIndex++}`,
-          name: `${item.name} - ${volunteerName}`,
-          participantName: volunteerName,
-        })
+        const quantity = item.quantity ?? 1
+        for (let copy = 0; copy < quantity; copy++) {
+          itemsList.push({
+            id: `volunteer-${item.id}-${globalIndex++}`,
+            name: `${labelWithCopy(item.name, copy, quantity)} - ${volunteerName}`,
+            participantName: volunteerName,
+          })
+        }
       }
     }
   }
@@ -1054,11 +1072,14 @@ const handoutItemsToDistribute = computed(() => {
 
     if (props.participant.artist.handoutItems) {
       for (const item of props.participant.artist.handoutItems) {
-        itemsList.push({
-          id: `artist-${item.id}-${globalIndex++}`,
-          name: `${item.name} - ${artistName}`,
-          participantName: artistName,
-        })
+        const quantity = item.quantity ?? 1
+        for (let copy = 0; copy < quantity; copy++) {
+          itemsList.push({
+            id: `artist-${item.id}-${globalIndex++}`,
+            name: `${labelWithCopy(item.name, copy, quantity)} - ${artistName}`,
+            participantName: artistName,
+          })
+        }
       }
     }
   }

@@ -6,6 +6,7 @@ import { canManageTicketingById } from '#server/utils/permissions/edition-permis
 
 const updateItemSchema = z.object({
   name: z.string().min(1, 'Le nom est obligatoire'),
+  cumulative: z.boolean().optional(),
 })
 
 export default wrapApiHandler(

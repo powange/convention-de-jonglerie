@@ -97,6 +97,8 @@
     "handout_items": {
       "list": {
         "add_placeholder": "Nouvel item...",
+        "cumulative_help": "Un article cumulable est remis autant de fois qu'il est associé au participant (par exemple un artiste jouant dans deux spectacles). Sinon il n'est remis qu'une seule fois.",
+        "cumulative_short": "Cumulable",
         "delete_label": "Supprimer",
         "delete_title": "Supprimer l'item",
         "loading": "Chargement...",

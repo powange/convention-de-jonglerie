@@ -100,7 +100,9 @@
         "delete_label": "Radera",
         "delete_title": "Ta bort objekt",
         "loading": "Laddar...",
-        "name_placeholder": "Artikelns namn"
+        "name_placeholder": "Artikelns namn",
+        "cumulative_help": "En kumulativ artikel delas ut lika många gånger som den är kopplad till deltagaren (till exempel en artist som uppträder i två föreställningar). Annars delas den ut endast en gång.",
+        "cumulative_short": "Kumulativ"
       },
       "volunteer": {
         "choose_placeholder": "Välj ett objekt att lämna ut...",

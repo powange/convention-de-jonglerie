@@ -100,7 +100,9 @@
         "delete_label": "Slet",
         "delete_title": "Slet varen",
         "loading": "Indlæser...",
-        "name_placeholder": "Navn på varen"
+        "name_placeholder": "Navn på varen",
+        "cumulative_help": "En kumulativ effekt udleveres lige så mange gange, som den er knyttet til deltageren (f.eks. en artist der optræder i to shows). Ellers udleveres den kun én gang.",
+        "cumulative_short": "Kumulativ"
       },
       "volunteer": {
         "choose_placeholder": "Vælg en genstand til udlevering...",
