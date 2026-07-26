@@ -38,32 +38,42 @@ test.describe.serial('Création convention + édition (parcours UI)', () => {
 
     // --- Step 1 : Informations générales ---
 
+    // Sélectionne un jour dans le calendrier ouvert en le ciblant par sa date ISO.
+    // La grille affiche aussi les jours des mois adjacents (`data-outside-view`),
+    // qui sont désactivés : les cibler par leur seul numéro rendait le test
+    // dépendant de la date (ex. le 28 juin affiché en tête de la grille de juillet).
+    const clickCalendarDay = async (date: Date) => {
+      const iso = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0'),
+      ].join('-')
+      await page
+        .locator(`[data-slot="cellTrigger"][data-value="${iso}"]:not([data-outside-view]):visible`)
+        .first()
+        .click()
+    }
+
     // Date de début
     const selectButtons = page.getByRole('button', { name: /sélectionner/i })
     await selectButtons.first().click()
     const today = new Date()
-    await page
-      .locator('table td')
-      .getByText(today.getDate().toString(), { exact: true })
-      .first()
-      .click()
+    await clickCalendarDay(today)
 
-    // Date de fin
+    // Date de fin (J+2 ; le Date gère lui-même le passage au mois suivant)
     await page
       .getByRole('button', { name: /sélectionner/i })
       .first()
       .click()
-    const futureDay = today.getDate() + 2
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
-    if (futureDay > lastDay) {
+    const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2)
+    if (endDate.getMonth() !== today.getMonth()) {
       // Naviguer vers le mois suivant si la date dépasse le mois courant
       await page
         .getByRole('button', { name: /mois suivant|next month/i })
         .first()
         .click()
     }
-    const displayDay = futureDay > lastDay ? (futureDay - lastDay).toString() : futureDay.toString()
-    await page.locator('table td').getByText(displayDay, { exact: true }).first().click()
+    await clickCalendarDay(endDate)
 
     // Adresse
     const addressInput = page.locator('input[name="addressLine1"]')
