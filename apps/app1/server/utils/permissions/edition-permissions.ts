@@ -441,6 +441,45 @@ export async function canManageTicketingById(
 }
 
 /**
+ * Variante de canAccessEditionData réservée à la GESTION DES ARTISTES :
+ * n'autorise QUE les organisateurs ayant le droit « gérer les artistes »
+ * (convention ou édition). Même signature que canAccessEditionData pour un
+ * remplacement direct dans les endpoints.
+ */
+export async function canManageArtistsById(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      creatorId: true,
+      convention: {
+        select: {
+          authorId: true,
+          organizers: { where: { userId }, select: { canManageArtists: true } },
+        },
+      },
+      organizerPermissions: {
+        where: { organizer: { userId } },
+        select: { canManageArtists: true },
+      },
+    },
+  })
+
+  if (!edition) return false
+  if (edition.creatorId === userId) return true
+  if (edition.convention.authorId === userId) return true
+  if (edition.convention.organizers?.some((o) => o.canManageArtists)) return true
+  if (edition.organizerPermissions?.some((p) => p.canManageArtists)) return true
+  return false
+}
+
+/**
  * Vérifie si un utilisateur peut gérer les artistes d'une édition
  */
 export function canManageArtists(
