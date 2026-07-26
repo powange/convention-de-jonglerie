@@ -69,7 +69,7 @@
                   :items="volunteerModeItems"
                   size="lg"
                   class="flex flex-row gap-6"
-                  :disabled="!(canEdit || canManageVolunteers)"
+                  :disabled="!canAccess"
                   @update:model-value="handleChangeMode"
                 />
               </UFormField>
@@ -83,11 +83,11 @@
                   <UInput
                     v-model="volunteersExternalUrlLocal"
                     :placeholder="$t('gestion.volunteers.external_url_placeholder')"
-                    :disabled="!(canEdit || canManageVolunteers)"
+                    :disabled="!canAccess"
                     class="w-full"
-                    @blur="(canEdit || canManageVolunteers) && persistVolunteerSettings()"
+                    @blur="canAccess && persistVolunteerSettings()"
                     @keydown.enter.prevent="
-                      (canEdit || canManageVolunteers) && persistVolunteerSettings()
+                      canAccess && persistVolunteerSettings()
                     "
                   />
                 </UFormField>
@@ -120,7 +120,7 @@
                   <UPopover>
                     <UFieldGroup>
                       <UButton
-                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        :disabled="savingVolunteers || !canAccess"
                         variant="outline"
                         color="neutral"
                         icon="i-heroicons-calendar-days"
@@ -136,7 +136,7 @@
                         icon="i-heroicons-x-mark"
                         color="neutral"
                         variant="outline"
-                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        :disabled="savingVolunteers || !canAccess"
                         @click="handleClearSetupStartDate"
                       />
                     </UFieldGroup>
@@ -159,7 +159,7 @@
                   <UPopover>
                     <UFieldGroup>
                       <UButton
-                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        :disabled="savingVolunteers || !canAccess"
                         variant="outline"
                         color="neutral"
                         icon="i-heroicons-calendar-days"
@@ -175,7 +175,7 @@
                         icon="i-heroicons-x-mark"
                         color="neutral"
                         variant="outline"
-                        :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                        :disabled="savingVolunteers || !canAccess"
                         @click="handleClearTeardownEndDate"
                       />
                     </UFieldGroup>
@@ -338,21 +338,14 @@ const volunteerModeItems = computed(() => [
 ])
 
 // Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
 })
 
-// Vérifier les permissions
-const canAccess = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return canEdit.value || canManageVolunteers.value
-})
+// Vérifier les permissions : la gestion des bénévoles exige le droit dédié
+// (éditer l'édition ne suffit pas), comme côté serveur.
+const canAccess = computed(() => canManageVolunteers.value)
 
 const applyVolunteerSettings = () => {
   if (volunteersSettings.value) {

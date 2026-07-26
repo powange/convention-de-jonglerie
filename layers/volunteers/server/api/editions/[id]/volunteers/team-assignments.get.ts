@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -12,7 +12,7 @@ export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = validateEditionId(event)
 
-  const allowed = await canAccessEditionData(editionId, user.id, event)
+  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
 
   // Si l'utilisateur n'a pas accès complet, vérifier s'il est team leader
   let isTeamLeader = false

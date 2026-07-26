@@ -60,7 +60,7 @@ const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   // Accès pour gestionnaires classiques
   const hasManagementAccess =
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
+    canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
   // OU accès pour bénévoles en créneau actif de contrôle d'accès
   const hasAccessControlAccess = canAccessAccessControl.value
 
@@ -68,11 +68,6 @@ const canAccess = computed(() => {
 })
 
 // Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)

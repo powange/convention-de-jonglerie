@@ -546,6 +546,53 @@ describe('useEditionStore', () => {
       })
     })
 
+    describe('canManageVolunteers', () => {
+      const volunteersEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it('autorise le droit « gérer les bénévoles » au niveau convention', () => {
+        const ed = volunteersEdition({ rights: { manageVolunteers: true } })
+        expect(editionStore.canManageVolunteers(ed as any, 1)).toBe(true)
+      })
+
+      it("autorise le droit bénévoles spécifique à l'édition (perEditionRights)", () => {
+        const ed = volunteersEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageVolunteers: true }],
+        })
+        expect(editionStore.canManageVolunteers(ed as any, 1)).toBe(true)
+      })
+
+      // RÉGRESSION : éditer l'édition NE donne PAS l'accès aux bénévoles
+      // (aligné sur requireVolunteerManagementAccess côté serveur).
+      it('refuse editConvention seul (éditer ≠ gérer les bénévoles)', () => {
+        const ed = volunteersEdition({ rights: { editConvention: true } })
+        expect(editionStore.canManageVolunteers(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse editAllEditions seul', () => {
+        const ed = volunteersEdition({ rights: { editAllEditions: true } })
+        expect(editionStore.canManageVolunteers(ed as any, 1)).toBe(false)
+      })
+
+      it("refuse canEdit per-édition seul (droit d'édition sur l'édition)", () => {
+        const ed = volunteersEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canEdit: true }],
+        })
+        expect(editionStore.canManageVolunteers(ed as any, 1)).toBe(false)
+      })
+    })
+
     describe('canManageArtists', () => {
       // Édition où l'utilisateur 1 n'est NI créateur NI auteur : l'accès dépend
       // uniquement des droits d'organisateur.

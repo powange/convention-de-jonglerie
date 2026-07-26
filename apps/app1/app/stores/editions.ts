@@ -471,17 +471,18 @@ export const useEditionStore = defineStore('editions', {
         return true
       }
 
-      // Organisateur avec droits explicites
+      // Organisateur avec le droit de gérer les bénévoles (convention OU édition).
+      // Le droit d'ÉDITER (editConvention/editAllEditions/canEdit) NE donne PAS
+      // accès aux bénévoles — cohérent avec le helper serveur
+      // requireVolunteerManagementAccess / canManageEditionVolunteers.
       return edition.convention.organizers.some((collab) => {
         if (collab.user.id !== userId) return false
-        // Droit global de gérer les bénévoles
+        // Droit de gérer les bénévoles au niveau convention (toutes les éditions)
         if (collab.rights?.manageVolunteers) return true
-        // Droit global d'éditer la convention implique gestion des bénévoles
-        if (collab.rights?.editConvention || collab.rights?.editAllEditions) return true
-        // Droit spécifique sur cette édition
+        // Droit de gérer les bénévoles spécifique à cette édition
         if (collab.perEditionRights) {
           const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageVolunteers || per?.canEdit) return true
+          if (per?.canManageVolunteers) return true
         }
         return false
       })

@@ -58,10 +58,10 @@
                 class="w-full"
                 :error="fieldErrors.description"
               >
-                <div v-if="canEdit || canManageVolunteers" class="space-y-2">
+                <div v-if="canAccess" class="space-y-2">
                   <MarkdownEditor
                     v-model="volunteersDescriptionLocal"
-                    :disabled="savingVolunteers || !(canEdit || canManageVolunteers)"
+                    :disabled="savingVolunteers || !canAccess"
                     class="min-h-40"
                   />
                 </div>
@@ -77,7 +77,7 @@
                 </div>
               </UFormField>
               <div
-                v-if="canEdit || canManageVolunteers"
+                v-if="canAccess"
                 class="flex items-center justify-between text-[11px] text-gray-500"
               >
                 <span>{{ remainingVolunteerDescriptionChars }} / 5000</span>
@@ -152,17 +152,11 @@ const remainingVolunteerDescriptionChars = computed(
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return (
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
-  )
+  // La gestion des bénévoles exige le droit dédié (éditer l'édition ne suffit pas).
+  return canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
 })
 
 // Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
