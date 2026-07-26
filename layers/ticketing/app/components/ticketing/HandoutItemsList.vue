@@ -23,7 +23,6 @@
           <UCheckbox
             :model-value="item.cumulative"
             variant="card"
-            indicator="hidden"
             size="sm"
             :label="$t('ticketing.handout_items.list.cumulative_short')"
             :ui="{
@@ -48,7 +47,6 @@
           <UCheckbox
             v-model="form.cumulative"
             variant="card"
-            indicator="hidden"
             size="sm"
             :label="$t('ticketing.handout_items.list.cumulative_short')"
             :ui="{
