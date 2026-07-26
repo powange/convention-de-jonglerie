@@ -20,7 +20,7 @@ L'application permet aux utilisateurs de :
   - [Nuxt 4](https://nuxt.com/) (v4.4.2+) : Framework Vue.js (Vue 3) universel
   - [Nuxt UI 4](https://ui.nuxt.com/) (v4.5.1+) : Bibliothèque de composants UI basée sur Tailwind CSS
   - [Pinia](https://pinia.vuejs.org/) (v3.x) : Gestion d'état pour Vue.js
-  - [@nuxtjs/i18n](https://i18n.nuxtjs.org/) : Internationalisation (12 langues, lazy loading par domaine)
+  - [@nuxtjs/i18n](https://i18n.nuxtjs.org/) : Internationalisation (13 langues, lazy loading par domaine)
   - [Chart.js](https://www.chartjs.org/), [FullCalendar](https://fullcalendar.io/), [Leaflet](https://leafletjs.com/)
 - **Backend :**
   - [Nitro](https://nitro.unjs.io/) : Moteur de serveur de Nuxt pour la création d'API RESTful
@@ -70,7 +70,7 @@ L'application permet aux utilisateurs de :
 - **Calendrier** — FullCalendar pour le planning bénévoles et le calendrier des éditions
 - **Messagerie** ([`docs/messenger.md`](docs/messenger.md)) — Conversations privées, groupes d'équipes, organisateurs, artistes (temps réel via SSE)
 - **Toasts** et **modales** Nuxt UI pour les actions
-- **i18n** — 12 langues synchronisées avec lazy loading par domaine
+- **i18n** — 13 langues synchronisées avec lazy loading par domaine
 
 ### Modèle de Permissions Organisateurs
 
@@ -92,8 +92,10 @@ Champs de droits stockés sur `ConventionOrganizer` :
 | manageTicketing   | canManageTicketing   | Gérer la billetterie de toutes les éditions                  |
 | manageTasks       | canManageTasks       | Gérer les tâches internes de toutes les éditions             |
 | manageStock       | canManageStock       | Gérer le stock matériel de toutes les éditions               |
+| manageWorkshops   | canManageWorkshops   | Gérer les workshops de toutes les éditions                   |
+| manageFAQ         | canManageFAQ         | Gérer la FAQ de toutes les éditions                          |
 
-La table `EditionOrganizerPermission` permet d'accorder ces droits **per-édition** lorsqu'un organisateur ne possède pas les droits globaux (`canEdit`, `canDelete`, `canManageVolunteers`, `canManageArtists`, `canManageMeals`, `canManageTicketing`, `canManageTasks`, `canManageStock` sur une édition précise).
+La table `EditionOrganizerPermission` permet d'accorder ces droits **per-édition** lorsqu'un organisateur ne possède pas les droits globaux (`canEdit`, `canDelete`, `canManageVolunteers`, `canManageArtists`, `canManageMeals`, `canManageTicketing`, `canManageTasks`, `canManageStock`, `canManageWorkshops`, `canManageFAQ` sur une édition précise).
 
 #### Matrice : Module édition ↔ Permission requise
 
@@ -107,8 +109,8 @@ Pour chaque module optionnel d'une édition, voici le drapeau d'activation (`Edi
 | Billetterie           | `ticketingEnabled` (+ `ticketingSumupEnabled`, `ticketingHandoutItemsEnabled`, `ticketingAllow*`, `ticketingPayment*`) | `canManageTicketing`                             | `canManageTicketing`   | `/editions/[id]/gestion/ticketing`                 |
 | Tâches                | `tasksEnabled`                                                                                                         | `canManageTasks`                                 | `canManageTasks`       | `/editions/[id]/gestion/tasks`                     |
 | Stock matériel        | `stockEnabled`                                                                                                         | `canManageStock`                                 | `canManageStock`       | `/editions/[id]/gestion/stock`                     |
-| Workshops             | `workshopsEnabled` (+ `workshopLocationsFreeInput`)                                                                    | `canEditAllEditions`                             | `canEdit`              | `/editions/[id]/gestion/workshops`                 |
-| FAQ                   | `faqEnabled` (+ `faqPagePublic`)                                                                                       | `canEditAllEditions`                             | `canEdit`              | `/editions/[id]/gestion/faq`                       |
+| Workshops             | `workshopsEnabled` (+ `workshopLocationsFreeInput`)                                                                    | `canManageWorkshops`                             | `canManageWorkshops`   | `/editions/[id]/gestion/workshops`                 |
+| FAQ                   | `faqEnabled` (+ `faqPagePublic`)                                                                                       | `canManageFAQ`                                   | `canManageFAQ`         | `/editions/[id]/gestion/faq`                       |
 | Carte du site         | `siteMapEnabled` (+ `mapPublic`)                                                                                       | `canEditAllEditions`                             | `canEdit`              | gestion via édition (zones / markers)              |
 | Covoiturage           | _toujours actif_                                                                                                       | _participation libre_ — modération via `canEdit` | `canEdit`              | pas de back-office dédié (modération sur fiche)    |
 | Objets trouvés        | _toujours actif_                                                                                                       | `canEditAllEditions`                             | `canEdit`              | accessible via fiche édition                       |
@@ -118,7 +120,7 @@ Pour chaque module optionnel d'une édition, voici le drapeau d'activation (`Edi
 
 - L'**accès au module** côté participant dépend uniquement du flag `*Enabled` (et éventuellement de la visibilité publique : `volunteersPagePublic`, `faqPagePublic`, `mapPublic`).
 - L'**administration du module** requiert au minimum **soit** la permission convention globale, **soit** la permission per-édition correspondante.
-- Les modules sans `canManage*` dédié (workshops, FAQ, carte, lost-found, carpool) sont gouvernés par `canEdit` (per-édition) ou `canEditAllEditions` (convention).
+- Les modules sans `canManage*` dédié (carte, lost-found, carpool) sont gouvernés par `canEdit` (per-édition) ou `canEditAllEditions` (convention).
 - Le **super-admin** (`User.isGlobalAdmin`) court-circuite l'ensemble de la matrice.
 - Le **créateur d'édition** (`Edition.creatorId`) conserve un accès complet à son édition.
 
@@ -168,7 +170,7 @@ Les handlers ignorent désormais tout champ `role` legacy. Les tests garantissen
 - `prisma/` — Schéma multi-fichiers et migrations
   - `schema/*.prisma` — Schéma découpé par domaine (artists, carpool, meals, messenger, tasks, ticketing, volunteer, workshops, etc.)
   - `migrations/` — Migrations versionnées
-- `i18n/locales/` — Traductions (12 langues, organisées par domaine : `common`, `admin`, `edition`, `auth`, `gestion`, etc.)
+- `i18n/locales/` — Traductions (13 langues, organisées par domaine : `common`, `admin`, `edition`, `auth`, `gestion`, etc.)
 - `docs/` — Documentation technique ([`docs/README.md`](docs/README.md) sert d'index)
 - `tests/` — Tests Vitest (unit + Nuxt) et Playwright (e2e)
 - `public/` — Fichiers statiques (favicon, etc.)
