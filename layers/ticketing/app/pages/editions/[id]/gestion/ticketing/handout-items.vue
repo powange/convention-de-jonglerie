@@ -327,7 +327,49 @@
             </template>
 
             <template #artists>
+              <!-- Bloc 1 : articles remis à TOUS les artistes -->
               <div class="space-y-3">
+                <div class="flex items-center justify-between gap-3">
+                  <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                    {{ $t('gestion.ticketing.all_artists_handout_items') }}
+                  </h3>
+                  <UButton
+                    size="sm"
+                    color="primary"
+                    variant="soft"
+                    icon="i-heroicons-pencil"
+                    @click="artistItemsModalOpen = true"
+                  >
+                    {{ $t('common.edit') }}
+                  </UButton>
+                </div>
+                <div v-if="loadingArtistItems" class="text-center py-6">
+                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
+                </div>
+                <div v-else-if="allArtistItems.length > 0" class="flex flex-wrap gap-2">
+                  <UBadge
+                    v-for="item in allArtistItems"
+                    :key="item.id"
+                    color="warning"
+                    variant="soft"
+                    size="md"
+                  >
+                    {{ item.handoutItemName }}
+                  </UBadge>
+                </div>
+                <div v-else class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <UIcon name="i-heroicons-gift" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                  <p class="text-sm text-gray-500">
+                    {{ $t('gestion.organizers.no_global_handout_items') }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Bloc 2 : articles spécifiques par spectacle -->
+              <div class="mt-8 space-y-3">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                  {{ $t('gestion.ticketing.per_show_handout_items_title') }}
+                </h3>
                 <div v-if="loadingShows" class="text-center py-6">
                   <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
                 </div>
@@ -463,6 +505,12 @@
           :edition-id="editionId"
           :show="showItemsModalTarget"
           @saved="loadShows"
+        />
+
+        <TicketingManageArtistsHandoutItemsModal
+          v-model:open="artistItemsModalOpen"
+          :edition-id="editionId"
+          @items-updated="loadArtistItems"
         />
 
         <MealsManageHandoutItemsModal
@@ -616,6 +664,11 @@ const shows = ref<any[]>([])
 const showItemsModalOpen = ref(false)
 const showItemsModalTarget = ref<any>(null)
 
+// Articles à remettre à TOUS les artistes de l'édition (complètent ceux des spectacles).
+const loadingArtistItems = ref(true)
+const allArtistItems = ref<any[]>([])
+const artistItemsModalOpen = ref(false)
+
 // Repas de l'édition (pour l'onglet Repas). On n'affiche que les repas
 // activés (`enabled === true`) sur la page de gestion des repas.
 const loadingMeals = ref(true)
@@ -756,6 +809,19 @@ const openOrganizerItemsModal = (organizer: any | null) => {
 }
 
 // Charge la liste des spectacles de l'édition (avec leurs articles associés).
+// Charge les articles remis à tous les artistes de l'édition.
+const loadArtistItems = async () => {
+  loadingArtistItems.value = true
+  try {
+    const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/artists/handout-items`)
+    allArtistItems.value = response.items || []
+  } catch {
+    // Erreur silencieuse
+  } finally {
+    loadingArtistItems.value = false
+  }
+}
+
 const loadShows = async () => {
   loadingShows.value = true
   try {
@@ -867,6 +933,7 @@ onMounted(async () => {
     await loadOptions()
     await loadCustomFields()
     if (edition.value?.artistsEnabled) {
+      await loadArtistItems()
       await loadShows()
     }
     if (edition.value?.mealsEnabled) {
@@ -886,6 +953,7 @@ watch(canAccess, async (newValue, oldValue) => {
     await loadOptions()
     await loadCustomFields()
     if (edition.value?.artistsEnabled) {
+      await loadArtistItems()
       await loadShows()
     }
     if (edition.value?.mealsEnabled) {

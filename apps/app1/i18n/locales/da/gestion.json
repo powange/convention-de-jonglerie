@@ -544,7 +544,10 @@
       "tiers_description": "Administrer tariffer, optioner, kvoter og varer, der skal returneres",
       "tiers_handout_items_manage_for": "Genstande til udlevering — {name}",
       "tiers_title": "Priser, optioner og kvoter",
-      "title": "Billetter"
+      "title": "Billetter",
+      "all_artists_handout_items": "Effekter til udlevering til alle artister",
+      "all_artists_handout_items_help": "Disse effekter udleveres til hver artist på udgaven, ud over dem der er knyttet til deres shows.",
+      "per_show_handout_items_title": "Effekter specifikke for hvert show"
     },
     "title": "Administration",
     "view_edition": "Se udgaven",

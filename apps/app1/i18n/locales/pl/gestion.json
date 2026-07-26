@@ -544,7 +544,10 @@
       "tiers_description": "Zarządzanie taryfami, opcjami, kwotami i pozycjami do zwrotu.",
       "tiers_handout_items_manage_for": "Przedmioty do wydania — {name}",
       "tiers_title": "Stawki, opcje i kwoty",
-      "title": "Bilety"
+      "title": "Bilety",
+      "all_artists_handout_items": "Przedmioty do wydania wszystkim artystom",
+      "all_artists_handout_items_help": "Te przedmioty są wydawane każdemu artyście edycji, oprócz tych powiązanych z jego spektaklami.",
+      "per_show_handout_items_title": "Przedmioty przypisane do spektaklu"
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

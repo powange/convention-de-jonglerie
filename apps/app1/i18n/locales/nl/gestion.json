@@ -544,7 +544,10 @@
       "tiers_description": "Tarieven, opties, quota en te retourneren items beheren",
       "tiers_handout_items_manage_for": "Te overhandigen voorwerpen — {name}",
       "tiers_title": "Tarieven, opties & quota",
-      "title": "Tickets"
+      "title": "Tickets",
+      "all_artists_handout_items": "Uit te reiken artikelen voor alle artiesten",
+      "all_artists_handout_items_help": "Deze artikelen worden aan elke artiest van de editie uitgereikt, naast die welke aan hun shows zijn gekoppeld.",
+      "per_show_handout_items_title": "Showspecifieke artikelen"
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",

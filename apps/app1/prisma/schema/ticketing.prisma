@@ -152,6 +152,7 @@ model TicketingHandoutItem {
   tiers                          TicketingTierHandoutItem[]
   options                        TicketingOptionHandoutItem[]
   volunteerTicketingHandoutItems EditionVolunteerHandoutItem[]
+  artistTicketingHandoutItems    EditionArtistHandoutItem[]
   customFields                   TicketingTierCustomFieldHandoutItem[]
   shows                          ShowHandoutItem[]
   meals                          VolunteerMealHandoutItem[]
@@ -175,6 +176,23 @@ model EditionVolunteerHandoutItem {
   @@index([editionId])
   @@index([handoutItemId])
   @@index([teamId])
+}
+
+/// Articles à remettre à TOUS les artistes de l'édition (en complément des
+/// articles associés à un spectacle précis via ShowHandoutItem).
+model EditionArtistHandoutItem {
+  id            Int      @id @default(autoincrement())
+  editionId     Int
+  handoutItemId Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  edition     Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, handoutItemId])
+  @@index([editionId])
+  @@index([handoutItemId])
 }
 
 model EditionOrganizerHandoutItem {
