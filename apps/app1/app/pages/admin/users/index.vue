@@ -152,7 +152,15 @@
 
     <!-- Tableau des utilisateurs -->
     <UCard>
-      <UTable :data="users" :columns="columns" :loading="loading" class="w-full" />
+      <UContextMenu :items="contextMenuItems">
+        <UTable
+          :data="users"
+          :columns="columns"
+          :loading="loading"
+          class="w-full"
+          @contextmenu="onRowContextmenu"
+        />
+      </UContextMenu>
 
       <!-- Pagination -->
       <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
@@ -683,6 +691,13 @@ const formatRelativeTime = (date: string) => {
       style: 'short',
     },
   }).value
+}
+
+// Menu contextuel (clic droit sur une ligne) : reprend les actions de la colonne
+// « Actions », pour éviter d'avoir à viser le bouton.
+const contextMenuItems = ref<any[]>([])
+const onRowContextmenu = (_e: Event, row: { original: AdminUserWithConnection }) => {
+  contextMenuItems.value = getUserActions(row.original)
 }
 
 const getUserActions = (user: AdminUserWithConnection) => {
