@@ -4,6 +4,7 @@ interface Show {
   title: string
   handoutItems?: Array<{
     handoutItemId: number
+    quantity?: number
     handoutItem?: { id: number; name: string }
   }>
 }
@@ -27,16 +28,13 @@ const isOpen = computed({
 })
 
 const availableItems = ref<Array<{ id: number; name: string }>>([])
-const selectedItemIds = ref<number[]>([])
+// Articles associés au spectacle, avec le nombre d'exemplaires de chacun
+const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
 
 const modalTitle = computed(() =>
   props.show
     ? t('gestion.ticketing.shows_handout_items_manage_for', { title: props.show.title })
     : ''
-)
-
-const itemOptions = computed(() =>
-  availableItems.value.map((item) => ({ label: item.name, value: item.id }))
 )
 
 const { execute: loadAvailableItems, loading } = useApiAction<
@@ -55,7 +53,10 @@ watch(
   () => props.open,
   (open) => {
     if (open) {
-      selectedItemIds.value = props.show?.handoutItems?.map((ri) => ri.handoutItemId) ?? []
+      selection.value = (props.show?.handoutItems ?? []).map((ri) => ({
+        handoutItemId: ri.handoutItemId,
+        quantity: ri.quantity ?? 1,
+      }))
       loadAvailableItems()
     }
   },
@@ -66,7 +67,7 @@ const { execute: save, loading: saving } = useApiAction(
   () => `/api/editions/${props.editionId}/shows/${props.show?.id}`,
   {
     method: 'PUT',
-    body: () => ({ handoutItemIds: selectedItemIds.value }),
+    body: () => ({ handoutItemIds: selection.value }),
     successMessage: { title: t('common.saved') },
     errorMessages: { default: t('common.error') },
     onSuccess: () => {
@@ -90,25 +91,7 @@ const { execute: save, loading: saving } = useApiAction(
         </p>
 
         <UFormField :label="$t('gestion.shows.handout_items')">
-          <USelectMenu
-            v-model="selectedItemIds"
-            :items="itemOptions"
-            value-key="value"
-            multiple
-            :placeholder="$t('gestion.ticketing.select_handout_items_placeholder')"
-            class="w-full"
-          >
-            <template #label>
-              <span v-if="selectedItemIds.length === 0">
-                {{ $t('gestion.ticketing.no_items_selected') }}
-              </span>
-              <span v-else>
-                {{
-                  $t('gestion.ticketing.items_selected_count', { count: selectedItemIds.length })
-                }}
-              </span>
-            </template>
-          </USelectMenu>
+          <TicketingHandoutItemsQuantityPicker v-model="selection" :items="availableItems" />
         </UFormField>
 
         <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">

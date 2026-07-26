@@ -7,6 +7,7 @@ import { canManageArtists } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
 import { replaceShowComposition, showActSchema } from '#server/utils/show-acts'
+import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const updateShowSchema = z.object({
@@ -24,7 +25,18 @@ const updateShowSchema = z.object({
   markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional(),
   acts: z.array(showActSchema).optional(),
-  handoutItemIds: z.array(z.number().int().positive()).optional(),
+  // Un identifiant nu (quantité 1) ou un couple identifiant + quantité.
+  handoutItemIds: z
+    .array(
+      z.union([
+        z.number().int().positive(),
+        z.object({
+          handoutItemId: z.number().int().positive(),
+          quantity: z.number().int().min(1).max(999).optional(),
+        }),
+      ])
+    )
+    .optional(),
   isPublic: z.boolean().optional(),
 })
 
@@ -145,11 +157,13 @@ export default wrapApiHandler(
 
       if (validatedData.handoutItemIds !== undefined) {
         await tx.showHandoutItem.deleteMany({ where: { showId } })
-        if (validatedData.handoutItemIds.length > 0) {
+        const associations = normalizeHandoutItemAssociations(validatedData.handoutItemIds)
+        if (associations.length > 0) {
           await tx.showHandoutItem.createMany({
-            data: validatedData.handoutItemIds.map((handoutItemId) => ({
+            data: associations.map(({ handoutItemId, quantity }) => ({
               showId,
               handoutItemId,
+              quantity,
             })),
           })
         }

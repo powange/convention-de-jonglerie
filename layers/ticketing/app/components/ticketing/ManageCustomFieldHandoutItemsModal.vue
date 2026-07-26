@@ -81,6 +81,7 @@ watch(
         props.customField?.handoutItems?.map((ri) => ({
           handoutItemId: ri.handoutItemId,
           choiceValue: ri.choiceValue ?? null,
+          quantity: ri.quantity ?? 1,
         })) ?? []
       loadAvailableItems()
     }
@@ -89,7 +90,7 @@ watch(
 )
 
 function addAssociation() {
-  associations.value.push({ handoutItemId: null, choiceValue: null })
+  associations.value.push({ handoutItemId: null, choiceValue: null, quantity: 1 })
 }
 
 function removeAssociation(index: number) {
@@ -104,6 +105,7 @@ const buildSaveBody = () => {
     .map((a) => ({
       handoutItemId: a.handoutItemId,
       choiceValue: isChoiceList.value ? a.choiceValue : null,
+      quantity: a.quantity ?? 1,
     }))
   return { items: valid }
 }
@@ -168,7 +170,10 @@ const { execute: save, loading: saving } = useApiAction(
         <div v-else class="space-y-3">
           <UCard v-for="(assoc, index) in associations" :key="index">
             <div
-              :class="['grid gap-4', isChoiceList ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1']"
+              :class="[
+                'grid gap-4',
+                isChoiceList ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2',
+              ]"
             >
               <UFormField :label="$t('gestion.ticketing.custom_fields_article_label')" required>
                 <USelect
@@ -178,6 +183,10 @@ const { execute: save, loading: saving } = useApiAction(
                   value-key="value"
                   class="w-full"
                 />
+              </UFormField>
+
+              <UFormField :label="$t('common.quantity')">
+                <UInputNumber v-model="assoc.quantity" :min="1" :max="999" class="w-full" />
               </UFormField>
 
               <UFormField

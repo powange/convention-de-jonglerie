@@ -170,6 +170,8 @@ model ShowHandoutItem {
   id            Int      @id @default(autoincrement())
   showId        Int
   handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

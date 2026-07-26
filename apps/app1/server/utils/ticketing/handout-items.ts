@@ -9,32 +9,46 @@ export interface HandoutItemLike {
 }
 
 /**
- * Agrège une liste d'articles à remettre provenant de plusieurs associations
- * (tarif, champ personnalisé, spectacle, repas, équipe, édition…).
+ * Association entre un article et un porteur (tarif, option, champ personnalisé,
+ * spectacle, repas, équipe, édition…). `quantity` est le nombre d'exemplaires
+ * défini sur CETTE association ; absent vaut 1.
+ */
+export interface HandoutItemAssociation {
+  handoutItem: HandoutItemLike
+  quantity?: number | null
+}
+
+/**
+ * Agrège les articles à remettre provenant de plusieurs associations.
  *
- * - article **non cumulable** (défaut) : une seule occurrence, `quantity = 1`,
- *   même s'il est associé plusieurs fois (ex. un bracelet).
- * - article **cumulable** : `quantity` = nombre d'associations (ex. un artiste
- *   jouant dans deux spectacles reçoit deux fois l'article).
+ * - article **non cumulable** (défaut) : on retient la plus grande quantité
+ *   définie sur ses associations. Deux spectacles associant un bracelet chacun
+ *   n'en donnent qu'un ; une association « 2 bracelets » en donne bien deux.
+ * - article **cumulable** : on additionne les quantités. Un artiste jouant dans
+ *   deux spectacles à 3 tickets boisson en reçoit six.
  *
  * Centralisé ici pour que toutes les populations (participants, bénévoles,
  * artistes, organisateurs) appliquent exactement la même règle.
  */
-export function aggregateHandoutItems<T extends HandoutItemLike>(
-  items: T[]
-): Array<T & { quantity: number }> {
-  const aggregated = new Map<number, T & { quantity: number }>()
+export function aggregateHandoutItems(
+  associations: HandoutItemAssociation[]
+): Array<HandoutItemLike & { quantity: number }> {
+  const aggregated = new Map<number, HandoutItemLike & { quantity: number }>()
 
-  for (const item of items) {
+  for (const association of associations) {
+    const item = association.handoutItem
+    if (!item) continue
+    // Une quantité absente, nulle ou invalide vaut un exemplaire.
+    const quantity = Math.max(1, Math.trunc(association.quantity ?? 1) || 1)
+
     const existing = aggregated.get(item.id)
     if (!existing) {
-      aggregated.set(item.id, { ...item, quantity: 1 })
+      aggregated.set(item.id, { ...item, quantity })
       continue
     }
-    // Un article non cumulable reste à 1 quel que soit le nombre d'associations
-    if (item.cumulative) {
-      existing.quantity += 1
-    }
+    existing.quantity = item.cumulative
+      ? existing.quantity + quantity
+      : Math.max(existing.quantity, quantity)
   }
 
   return Array.from(aggregated.values())
@@ -57,7 +71,9 @@ export function calculateHandoutItemsForTicket(item: any) {
     handoutItem: {
       id: ri.handoutItem.id,
       name: ri.handoutItem.name,
+      cumulative: ri.handoutItem.cumulative,
     },
+    quantity: ri.quantity,
     source: 'tier' as const,
   }))
 
@@ -81,7 +97,9 @@ export function calculateHandoutItemsForTicket(item: any) {
               handoutItem: {
                 id: cfItem.handoutItem.id,
                 name: cfItem.handoutItem.name,
+                cumulative: cfItem.handoutItem.cumulative,
               },
+              quantity: cfItem.quantity,
               source: 'customField' as const,
               customFieldName: answeredField.name,
             })
@@ -95,9 +113,7 @@ export function calculateHandoutItemsForTicket(item: any) {
   // tarif et à un champ personnalisé n'est remis qu'une fois ; un article
   // cumulable l'est autant de fois qu'il est associé.
   const allItems = [...directItems, ...customFieldItems]
-  const quantities = aggregateHandoutItems(
-    allItems.map((entry: any) => entry.handoutItem as HandoutItemLike)
-  )
+  const quantities = aggregateHandoutItems(allItems)
   const quantityById = new Map(quantities.map((q) => [q.id, q.quantity]))
 
   // On conserve la première occurrence de chaque article (avec son origine,
@@ -137,4 +153,29 @@ export const handoutItemsIncludes = {
       },
     },
   },
+}
+
+/**
+ * Entrée acceptée par les endpoints qui associent des articles : soit un simple
+ * identifiant (quantité implicite de 1), soit un couple identifiant + quantité.
+ * Les deux formes coexistent pour ne pas casser les appels existants.
+ */
+export type HandoutItemAssociationInput = number | { handoutItemId: number; quantity?: number }
+
+/**
+ * Normalise ces entrées en couples { handoutItemId, quantity }, quantité bornée
+ * à un minimum de 1.
+ */
+export function normalizeHandoutItemAssociations(
+  input: HandoutItemAssociationInput[] | undefined | null
+): Array<{ handoutItemId: number; quantity: number }> {
+  if (!input) return []
+  return input.map((entry) =>
+    typeof entry === 'number'
+      ? { handoutItemId: entry, quantity: 1 }
+      : {
+          handoutItemId: entry.handoutItemId,
+          quantity: Math.max(1, Math.trunc(entry.quantity ?? 1) || 1),
+        }
+  )
 }

@@ -142,9 +142,9 @@ model TicketingQuota {
 }
 
 model TicketingHandoutItem {
-  id        Int    @id @default(autoincrement())
-  editionId Int
-  name      String
+  id         Int      @id @default(autoincrement())
+  editionId  Int
+  name       String
   /// Cumulable : l'article est remis autant de fois qu'il est associé au
   /// participant (ex. un artiste jouant dans deux spectacles). Par défaut il
   /// n'est remis qu'une seule fois, quel que soit le nombre d'associations.
@@ -168,6 +168,8 @@ model EditionVolunteerHandoutItem {
   id            Int      @id @default(autoincrement())
   editionId     Int
   handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
   teamId        String? // NULL = global (tous les bénévoles), défini = équipe spécifique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -188,6 +190,8 @@ model EditionArtistHandoutItem {
   id            Int      @id @default(autoincrement())
   editionId     Int
   handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -203,6 +207,8 @@ model EditionOrganizerHandoutItem {
   id            Int      @id @default(autoincrement())
   editionId     Int
   handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
   organizerId   Int? // NULL = global (tous les organisateurs), défini = organisateur spécifique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -234,6 +240,8 @@ model TicketingTierHandoutItem {
   tierId        Int
   handoutItemId Int
 
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity    Int                  @default(1)
   tier        TicketingTier        @relation(fields: [tierId], references: [id], onDelete: Cascade)
   handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
@@ -273,6 +281,8 @@ model TicketingOptionHandoutItem {
   optionId      Int
   handoutItemId Int
 
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity    Int                  @default(1)
   option      TicketingOption      @relation(fields: [optionId], references: [id], onDelete: Cascade)
   handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
 
@@ -440,6 +450,8 @@ model TicketingTierCustomFieldHandoutItem {
   id            Int     @id @default(autoincrement())
   customFieldId Int
   handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int     @default(1)
   choiceValue   String? // Si le custom field est de type ChoiceList, le choix spécifique qui déclenche la remise
 
   customField TicketingTierCustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)

@@ -7,6 +7,7 @@
 // ports (ArtistsPort, TicketingPort) ; ce service ne traite que la part bénévole + définitions de repas.
 import type { MealToggle, MealUpdateInput, MealVolunteerParticipant } from './meals-types'
 
+import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
 import {
   isVolunteerEligibleForMeal,
   getAvailableMealsOnArrival,
@@ -224,7 +225,9 @@ export async function updateEditionMealsConfig(editionId: number, meals: MealUpd
       await prisma.volunteerMealHandoutItem.deleteMany({ where: { mealId: meal.id } })
       if (meal.handoutItemIds.length > 0) {
         await prisma.volunteerMealHandoutItem.createMany({
-          data: meal.handoutItemIds.map((itemId) => ({ mealId: meal.id, handoutItemId: itemId })),
+          data: normalizeHandoutItemAssociations(meal.handoutItemIds).map(
+            ({ handoutItemId, quantity }) => ({ mealId: meal.id, handoutItemId, quantity })
+          ),
         })
       }
     })

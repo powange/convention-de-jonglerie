@@ -6,6 +6,8 @@ import { canManageTicketingById } from '#server/utils/permissions/edition-permis
 
 const bodySchema = z.object({
   handoutItemId: z.number(),
+  /** Nombre d'exemplaires remis pour cette association */
+  quantity: z.number().int().min(1).max(999).optional(),
   teamId: z.string().nullable().optional(), // NULL ou undefined = global, string = équipe spécifique
 })
 
@@ -83,6 +85,7 @@ export default wrapApiHandler(
           editionId,
           handoutItemId: body.handoutItemId,
           teamId: body.teamId ?? null,
+          quantity: body.quantity ?? 1,
         },
         include: {
           handoutItem: true,

@@ -101,7 +101,8 @@
             color="info"
             variant="soft"
           >
-            {{ itemRelation.handoutItem.name }}
+            {{ itemRelation.handoutItem.name
+            }}{{ itemRelation.quantity > 1 ? ` ×${itemRelation.quantity}` : '' }}
           </UBadge>
         </div>
 

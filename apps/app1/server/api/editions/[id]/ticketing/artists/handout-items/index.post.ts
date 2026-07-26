@@ -6,6 +6,8 @@ import { canManageTicketingById } from '#server/utils/permissions/edition-permis
 
 const bodySchema = z.object({
   handoutItemId: z.number(),
+  /** Nombre d'exemplaires remis pour cette association */
+  quantity: z.number().int().min(1).max(999).optional(),
 })
 
 /**
@@ -54,7 +56,7 @@ export default wrapApiHandler(
       }
 
       const item = await prisma.editionArtistHandoutItem.create({
-        data: { editionId, handoutItemId: body.handoutItemId },
+        data: { editionId, handoutItemId: body.handoutItemId, quantity: body.quantity ?? 1 },
       })
 
       return createSuccessResponse({
@@ -62,6 +64,7 @@ export default wrapApiHandler(
           id: item.id,
           handoutItemId: item.handoutItemId,
           handoutItemName: handoutItem.name,
+          quantity: item.quantity,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         },

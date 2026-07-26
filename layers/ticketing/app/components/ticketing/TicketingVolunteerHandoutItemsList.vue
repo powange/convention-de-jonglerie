@@ -169,6 +169,14 @@
           size="lg"
           :disabled="availableHandoutItems.length === 0"
         />
+        <UInputNumber
+          v-model="selectedQuantity"
+          :min="1"
+          :max="999"
+          size="lg"
+          class="w-28 shrink-0"
+          :aria-label="$t('common.quantity')"
+        />
         <UButton
           icon="i-heroicons-plus"
           color="primary"
@@ -244,6 +252,8 @@ const toast = useToast()
 const deleteConfirmOpen = ref(false)
 const itemToDelete = ref<VolunteerHandoutItem | null>(null)
 const selectedItemId = ref<number | null>(null)
+// Nombre d'exemplaires remis pour l'article ajouté
+const selectedQuantity = ref<number>(1)
 const selectedTeamId = ref<string | null>(null) // null = global par défaut, string = équipe spécifique
 const allHandoutItems = ref<TicketingHandoutItem[]>([])
 // Flag pour éviter d'afficher le message "tous associés" avant le premier
@@ -379,6 +389,7 @@ const { execute: executeHandleAdd, loading: saving } = useApiAction(
     body: () => ({
       handoutItemId: selectedItemId.value,
       teamId: selectedTeamId.value,
+      quantity: selectedQuantity.value,
     }),
     silentSuccess: true,
     errorMessages: { default: "Impossible d'ajouter l'article" },

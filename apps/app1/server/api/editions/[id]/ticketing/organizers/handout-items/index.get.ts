@@ -69,6 +69,7 @@ export default wrapApiHandler(
           id: item.id,
           handoutItemId: item.handoutItemId,
           handoutItemName: handoutItemsMap.get(item.handoutItemId) ?? 'Article inconnu',
+          quantity: item.quantity,
           organizerId: item.organizerId,
           organizer: item.organizer
             ? {

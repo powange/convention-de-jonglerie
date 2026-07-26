@@ -1,3 +1,8 @@
+import {
+  normalizeHandoutItemAssociations,
+  type HandoutItemAssociationInput,
+} from '#server/utils/ticketing/handout-items'
+
 export interface OptionData {
   name: string
   description?: string | null
@@ -7,7 +12,7 @@ export interface OptionData {
   price?: number | null // Prix en centimes
   position: number
   quotaIds?: number[]
-  handoutItemIds?: number[]
+  handoutItemIds?: HandoutItemAssociationInput[]
   tierIds?: number[] // Tarifs associés à cette option
   mealIds?: number[] // Repas associés à cette option
 }
@@ -60,9 +65,9 @@ export async function createOption(editionId: number, data: OptionData) {
         create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
       },
       handoutItems: {
-        create: (data.handoutItemIds || []).map((handoutItemId) => ({
-          handoutItemId,
-        })),
+        create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+          ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
+        ),
       },
       tiers: {
         create: (data.tierIds || []).map((tierId) => ({ tierId })),
@@ -119,9 +124,9 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: data.handoutItemIds.map((handoutItemId) => ({
-                    handoutItemId,
-                  })),
+                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                    ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
+                  ),
                 },
               }
             : {}),
@@ -151,9 +156,9 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: data.handoutItemIds.map((handoutItemId) => ({
-                    handoutItemId,
-                  })),
+                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                    ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
+                  ),
                 },
               }
             : {}),

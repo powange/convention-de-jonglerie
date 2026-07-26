@@ -32,16 +32,13 @@ const isOpen = computed({
 })
 
 const availableItems = ref<Array<{ id: number; name: string }>>([])
-const selectedItemIds = ref<number[]>([])
+// Articles associés, avec le nombre d'exemplaires de chacun
+const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
 
 const modalTitle = computed(() =>
   props.mealLabel
     ? t('gestion.ticketing.meals_handout_items_manage_for', { meal: props.mealLabel })
     : t('gestion.ticketing.meals_handout_items_title')
-)
-
-const itemOptions = computed(() =>
-  availableItems.value.map((item) => ({ label: item.name, value: item.id }))
 )
 
 const { execute: loadAvailableItems, loading } = useApiAction<
@@ -60,7 +57,10 @@ watch(
   () => props.open,
   (open) => {
     if (open) {
-      selectedItemIds.value = props.meal?.handoutItems?.map((ri) => ri.handoutItemId) ?? []
+      selection.value = (props.meal?.handoutItems ?? []).map((ri: any) => ({
+        handoutItemId: ri.handoutItemId,
+        quantity: ri.quantity ?? 1,
+      }))
       loadAvailableItems()
     }
   },
@@ -75,7 +75,7 @@ const buildSaveBody = () => ({
       id: props.meal?.id,
       enabled: props.meal?.enabled,
       phases: props.meal?.phases,
-      handoutItemIds: selectedItemIds.value,
+      handoutItemIds: selection.value,
     },
   ],
 })
@@ -108,25 +108,7 @@ const { execute: save, loading: saving } = useApiAction(
         </p>
 
         <UFormField :label="$t('gestion.meals.handout_items_label')">
-          <USelectMenu
-            v-model="selectedItemIds"
-            :items="itemOptions"
-            value-key="value"
-            multiple
-            :placeholder="$t('gestion.ticketing.select_handout_items_placeholder')"
-            class="w-full"
-          >
-            <template #label>
-              <span v-if="selectedItemIds.length === 0">
-                {{ $t('gestion.ticketing.no_items_selected') }}
-              </span>
-              <span v-else>
-                {{
-                  $t('gestion.ticketing.items_selected_count', { count: selectedItemIds.length })
-                }}
-              </span>
-            </template>
-          </USelectMenu>
+          <TicketingHandoutItemsQuantityPicker v-model="selection" :items="availableItems" />
         </UFormField>
 
         <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">

@@ -22,6 +22,8 @@ const bodySchema = z.object({
       z.object({
         handoutItemId: z.number(),
         choiceValue: z.string().optional(), // Pour ChoiceList
+        /** Nombre d'exemplaires remis pour cette association */
+        quantity: z.number().int().min(1).max(999).optional(),
       })
     )
     .optional(),
@@ -159,6 +161,7 @@ export default wrapApiHandler(
               customFieldId: cf.id,
               handoutItemId: ri.handoutItemId,
               choiceValue: ri.choiceValue || null,
+              quantity: ri.quantity ?? 1,
             })),
           })
         }
