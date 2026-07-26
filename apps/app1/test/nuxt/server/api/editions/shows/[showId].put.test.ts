@@ -223,6 +223,7 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       )
     })
 
+    // Forme historique : des identifiants nus, sans quantité (un exemplaire chacun).
     it('devrait mettre à jour les associations articles à remettre', async () => {
       prismaMock.showHandoutItem.deleteMany.mockResolvedValue({ count: 1 })
       prismaMock.show.update.mockResolvedValue(mockUpdatedShow)
@@ -235,11 +236,30 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       expect(prismaMock.showHandoutItem.deleteMany).toHaveBeenCalledWith({
         where: { showId: 1 },
       })
-      expect(prismaMock.showHandoutItem.deleteMany).toHaveBeenCalledWith({ where: { showId: 1 } })
       expect(prismaMock.showHandoutItem.createMany).toHaveBeenCalledWith({
         data: [
-          { showId: 1, handoutItemId: 4 },
-          { showId: 1, handoutItemId: 5 },
+          { showId: 1, handoutItemId: 4, quantity: 1 },
+          { showId: 1, handoutItemId: 5, quantity: 1 },
+        ],
+      })
+    })
+
+    it('devrait enregistrer la quantité définie sur chaque association', async () => {
+      prismaMock.showHandoutItem.deleteMany.mockResolvedValue({ count: 1 })
+      prismaMock.show.update.mockResolvedValue(mockUpdatedShow)
+
+      global.readBody.mockResolvedValue({
+        handoutItemIds: [{ handoutItemId: 4, quantity: 3 }, { handoutItemId: 5 }],
+      })
+      const mockEvent = { context: { user: mockUser } }
+
+      await handler(mockEvent as any)
+
+      expect(prismaMock.showHandoutItem.createMany).toHaveBeenCalledWith({
+        data: [
+          { showId: 1, handoutItemId: 4, quantity: 3 },
+          // Quantité absente : un exemplaire par défaut
+          { showId: 1, handoutItemId: 5, quantity: 1 },
         ],
       })
     })

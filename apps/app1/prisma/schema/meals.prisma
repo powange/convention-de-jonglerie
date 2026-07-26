@@ -77,6 +77,8 @@ model VolunteerMealHandoutItem {
   id            Int      @id @default(autoincrement())
   mealId        Int
   handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

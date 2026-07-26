@@ -206,7 +206,8 @@
             variant="soft"
             size="xs"
           >
-            {{ itemRelation.handoutItem.name }}
+            {{ itemRelation.handoutItem.name
+            }}{{ itemRelation.quantity > 1 ? ` ×${itemRelation.quantity}` : '' }}
           </UBadge>
         </div>
         <span v-else class="text-xs text-gray-400">-</span>

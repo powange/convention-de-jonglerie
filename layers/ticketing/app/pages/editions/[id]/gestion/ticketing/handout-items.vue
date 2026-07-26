@@ -75,7 +75,7 @@
                         variant="soft"
                         size="md"
                       >
-                        {{ ri.handoutItem?.name }}
+                        {{ ri.handoutItem?.name }}{{ ri.quantity > 1 ? ` ×${ri.quantity}` : '' }}
                       </UBadge>
                     </div>
                     <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -132,7 +132,7 @@
                         variant="soft"
                         size="md"
                       >
-                        {{ ri.handoutItem?.name }}
+                        {{ ri.handoutItem?.name }}{{ ri.quantity > 1 ? ` ×${ri.quantity}` : '' }}
                       </UBadge>
                     </div>
                     <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -191,7 +191,7 @@
                         variant="soft"
                         size="md"
                       >
-                        {{ ri.handoutItem?.name }}
+                        {{ ri.handoutItem?.name }}{{ ri.quantity > 1 ? ` ×${ri.quantity}` : '' }}
                         <span v-if="ri.choiceValue" class="opacity-75 ml-1"
                           >({{ ri.choiceValue }})</span
                         >
@@ -252,7 +252,7 @@
                     variant="soft"
                     size="md"
                   >
-                    {{ item.handoutItemName }}
+                    {{ item.handoutItemName }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
                   </UBadge>
                 </div>
                 <div v-else class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -305,7 +305,8 @@
                           variant="soft"
                           size="md"
                         >
-                          {{ item.handoutItemName }}
+                          {{ item.handoutItemName
+                          }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
                         </UBadge>
                       </div>
                       <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -354,7 +355,7 @@
                     variant="soft"
                     size="md"
                   >
-                    {{ item.handoutItemName }}
+                    {{ item.handoutItemName }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
                   </UBadge>
                 </div>
                 <div v-else class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -403,7 +404,8 @@
                           variant="soft"
                           size="md"
                         >
-                          {{ item.handoutItem.name }}
+                          {{ item.handoutItem.name
+                          }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
                         </UBadge>
                       </div>
                       <p v-else class="text-xs text-gray-400 italic mt-1">
@@ -468,7 +470,8 @@
                               variant="soft"
                               size="md"
                             >
-                              {{ item.handoutItem?.name }}
+                              {{ item.handoutItem?.name
+                              }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
                             </UBadge>
                           </div>
                           <p v-else class="text-xs text-gray-400 italic mt-1">

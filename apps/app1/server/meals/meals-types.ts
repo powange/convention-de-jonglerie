@@ -1,3 +1,5 @@
+import type { HandoutItemAssociationInput } from '#server/utils/ticketing/handout-items'
+
 // DTO du module repas. Partagés par le service (server/meals) et le contrat du port
 // (server/volunteers/ports/types.ts → MealsPort). `phases` est typé `unknown` car porté en `Json`
 // côté Prisma (le front le consomme comme un tableau de chaînes).
@@ -44,7 +46,7 @@ export interface MealUpdateInput {
   id: number
   enabled?: boolean
   phases?: string[]
-  handoutItemIds?: number[]
+  handoutItemIds?: HandoutItemAssociationInput[]
 }
 
 /** Participant bénévole d'un repas (catering). */

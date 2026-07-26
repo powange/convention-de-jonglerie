@@ -386,7 +386,7 @@ export default wrapApiHandler(
         }
 
         // Collecter les articles (équipes) ; l'agrégation a lieu après les repas.
-        const volunteerItemEntries = volunteerHandoutItems.map((item) => item.handoutItem)
+        const volunteerItemEntries: any[] = [...volunteerHandoutItems]
 
         // Récupérer les repas associés au bénévole
         const volunteerMeals = await prisma.volunteerMealSelection.findMany({
@@ -428,7 +428,7 @@ export default wrapApiHandler(
         // Ajouter les articles à remettre des repas
         volunteerMeals.forEach((selection) => {
           selection.meal.handoutItems.forEach((mealItem) => {
-            volunteerItemEntries.push(mealItem.handoutItem)
+            volunteerItemEntries.push(mealItem)
           })
         })
 
@@ -527,10 +527,10 @@ export default wrapApiHandler(
         // Collecter les articles de tous les spectacles ; l'agrégation a lieu
         // après les repas. Un artiste jouant dans deux spectacles reçoit deux
         // fois un article cumulable, une seule fois un article non cumulable.
-        const artistItemEntries: any[] = editionArtistHandoutItems.map((item) => item.handoutItem)
+        const artistItemEntries: any[] = [...editionArtistHandoutItems]
         artist.shows.forEach((showArtist) => {
           showArtist.show.handoutItems.forEach((item) => {
-            artistItemEntries.push(item.handoutItem)
+            artistItemEntries.push(item)
           })
         })
 
@@ -574,7 +574,7 @@ export default wrapApiHandler(
         // Ajouter les articles à remettre des repas
         artistMeals.forEach((selection) => {
           selection.meal.handoutItems.forEach((mealItem) => {
-            artistItemEntries.push(mealItem.handoutItem)
+            artistItemEntries.push(mealItem)
           })
         })
 

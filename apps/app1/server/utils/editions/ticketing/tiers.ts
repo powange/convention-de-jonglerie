@@ -1,3 +1,8 @@
+import {
+  normalizeHandoutItemAssociations,
+  type HandoutItemAssociationInput,
+} from '#server/utils/ticketing/handout-items'
+
 export interface TierData {
   name: string
   customName?: string | null
@@ -11,7 +16,7 @@ export interface TierData {
   validFrom?: string | null
   validUntil?: string | null
   quotaIds?: number[]
-  handoutItemIds?: number[]
+  handoutItemIds?: HandoutItemAssociationInput[]
   mealIds?: number[]
 }
 
@@ -138,9 +143,9 @@ export async function createTier(editionId: number, data: TierData) {
         create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
       },
       handoutItems: {
-        create: (data.handoutItemIds || []).map((handoutItemId) => ({
-          handoutItemId,
-        })),
+        create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+          ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
+        ),
       },
       meals: {
         create: (data.mealIds || []).map((mealId) => ({ mealId })),
@@ -197,9 +202,9 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: data.handoutItemIds.map((handoutItemId) => ({
-                    handoutItemId,
-                  })),
+                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                    ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
+                  ),
                 },
               }
             : {}),
@@ -229,9 +234,9 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: data.handoutItemIds.map((handoutItemId) => ({
-                    handoutItemId,
-                  })),
+                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                    ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
+                  ),
                 },
               }
             : {}),

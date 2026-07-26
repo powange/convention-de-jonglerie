@@ -26,6 +26,8 @@ const availableItems = ref<any[]>([])
 const assignedItems = ref<any[]>([])
 const globalItems = ref<any[]>([]) // Articles globaux (pour tous les organisateurs)
 const selectedItemId = ref<number | null>(null)
+// Nombre d'exemplaires remis pour l'article ajouté
+const selectedQuantity = ref<number>(1)
 const deleteConfirmOpen = ref(false)
 const itemToDelete = ref<{ id: number; name: string } | null>(null)
 
@@ -88,11 +90,13 @@ const { execute: executeAddItem, loading: isAdding } = useApiAction(
     body: () => ({
       handoutItemId: selectedItemId.value,
       organizerId: props.organizer?.id ?? null,
+      quantity: selectedQuantity.value,
     }),
     successMessage: { title: t('gestion.organizers.item_added_success') },
     errorMessages: { default: t('gestion.organizers.error_adding_item') },
     onSuccess: async () => {
       selectedItemId.value = null
+      selectedQuantity.value = 1
       await loadData()
       emit('itemsUpdated')
     },
@@ -175,6 +179,7 @@ watch(
     } else {
       // Réinitialiser l'état quand le modal se ferme
       selectedItemId.value = null
+      selectedQuantity.value = 1
     }
   }
 )
@@ -203,6 +208,13 @@ watch(
                 :placeholder="$t('gestion.organizers.select_handout_item')"
                 class="flex-1"
                 :disabled="availableForSelection.length === 0"
+              />
+              <UInputNumber
+                v-model="selectedQuantity"
+                :min="1"
+                :max="999"
+                class="w-28 shrink-0"
+                :aria-label="$t('common.quantity')"
               />
               <UButton
                 color="primary"
@@ -244,6 +256,9 @@ watch(
               <div class="flex items-center gap-2">
                 <UIcon name="i-heroicons-gift" class="text-orange-500" />
                 <span class="text-sm">{{ item.handoutItemName }}</span>
+                <UBadge v-if="item.quantity > 1" color="warning" variant="soft" size="sm">
+                  ×{{ item.quantity }}
+                </UBadge>
               </div>
               <UButton
                 color="red"

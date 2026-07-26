@@ -152,7 +152,8 @@
                         variant="subtle"
                         size="xs"
                       >
-                        {{ item.handoutItem.name }}
+                        {{ item.handoutItem.name
+                        }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
                         <span v-if="item.choiceValue"> ({{ item.choiceValue }})</span>
                       </UBadge>
                     </div>
