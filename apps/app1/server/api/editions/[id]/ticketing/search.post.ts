@@ -514,11 +514,14 @@ export default wrapApiHandler(
         Array<{ id: number; date: Date; mealType: string; phases: string[] }>
       >()
 
-      // Articles remis à TOUS les artistes de l'édition (une requête pour tous).
-      const editionArtistHandoutItems = await prisma.editionArtistHandoutItem.findMany({
-        where: { editionId },
-        include: { handoutItem: true },
-      })
+      // Articles remis à TOUS les artistes de l'édition : une seule requête pour
+      // l'ensemble des artistes, et aucune s'il n'y en a pas dans les résultats.
+      const editionArtistHandoutItems = artists.length
+        ? await prisma.editionArtistHandoutItem.findMany({
+            where: { editionId },
+            include: { handoutItem: true },
+          })
+        : []
 
       for (const artist of artists) {
         // Collecter les articles de tous les spectacles ; l'agrégation a lieu
