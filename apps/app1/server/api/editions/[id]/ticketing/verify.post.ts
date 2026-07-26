@@ -312,9 +312,14 @@ export default wrapApiHandler(
             })
           }
 
-          // Collecter les articles de tous les spectacles ; l'agrégation a lieu
-          // après les repas (un article cumulable est remis une fois par spectacle).
-          const artistItemEntries: any[] = []
+          // Articles remis à TOUS les artistes de l'édition, puis ceux de chaque
+          // spectacle ; l'agrégation a lieu après les repas (un article cumulable
+          // est remis une fois par association).
+          const editionArtistHandoutItems = await prisma.editionArtistHandoutItem.findMany({
+            where: { editionId },
+            include: { handoutItem: true },
+          })
+          const artistItemEntries: any[] = editionArtistHandoutItems.map((item) => item.handoutItem)
           artist.shows.forEach((showArtist) => {
             showArtist.show.handoutItems.forEach((item) => {
               artistItemEntries.push(item.handoutItem)

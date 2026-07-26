@@ -514,11 +514,17 @@ export default wrapApiHandler(
         Array<{ id: number; date: Date; mealType: string; phases: string[] }>
       >()
 
+      // Articles remis à TOUS les artistes de l'édition (une requête pour tous).
+      const editionArtistHandoutItems = await prisma.editionArtistHandoutItem.findMany({
+        where: { editionId },
+        include: { handoutItem: true },
+      })
+
       for (const artist of artists) {
         // Collecter les articles de tous les spectacles ; l'agrégation a lieu
         // après les repas. Un artiste jouant dans deux spectacles reçoit deux
         // fois un article cumulable, une seule fois un article non cumulable.
-        const artistItemEntries: any[] = []
+        const artistItemEntries: any[] = editionArtistHandoutItems.map((item) => item.handoutItem)
         artist.shows.forEach((showArtist) => {
           showArtist.show.handoutItems.forEach((item) => {
             artistItemEntries.push(item.handoutItem)
