@@ -544,7 +544,10 @@
       "tiers_description": "Manage tariffs, options, quotas and items to be returned",
       "tiers_handout_items_manage_for": "Items to hand out — {name}",
       "tiers_title": "Rates, options & quotas",
-      "title": "Tickets"
+      "title": "Tickets",
+      "all_artists_handout_items": "Items to hand out to all artists",
+      "all_artists_handout_items_help": "These items are handed out to every artist of the edition, in addition to those linked to their shows.",
+      "per_show_handout_items_title": "Show-specific items"
     },
     "title": "Management",
     "view_edition": "View edition",

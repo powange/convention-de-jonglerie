@@ -544,7 +544,10 @@
       "tiers_description": "Verwalten von Tarifen, Optionen, Quoten und zurückzugebenden Artikeln",
       "tiers_handout_items_manage_for": "Artikel zur Ausgabe — {name}",
       "tiers_title": "Tarife, Optionen & Quoten",
-      "title": "Eintrittskarten"
+      "title": "Eintrittskarten",
+      "all_artists_handout_items": "Artikel zur Ausgabe an alle Künstler",
+      "all_artists_handout_items_help": "Diese Artikel werden jedem Künstler der Ausgabe ausgehändigt, zusätzlich zu denen, die mit seinen Shows verknüpft sind.",
+      "per_show_handout_items_title": "Show-spezifische Artikel"
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

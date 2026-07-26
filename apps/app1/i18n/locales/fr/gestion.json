@@ -376,6 +376,8 @@
     "ticketing": {
       "access_control_description": "Scanner et valider les billets à l'entrée",
       "access_control_title": "Contrôle d'accès",
+      "all_artists_handout_items": "Articles à remettre à tous les artistes",
+      "all_artists_handout_items_help": "Ces articles sont remis à chaque artiste de l'édition, en plus de ceux associés à ses spectacles.",
       "allow_anonymous_orders": "Autoriser les commandes anonymes",
       "allow_anonymous_orders_description": "Permet de créer des commandes sans compte utilisateur",
       "allow_onsite_registration": "Autoriser l'ajout de participant sur place",
@@ -477,6 +479,7 @@
       "payment_methods_note": "L'option « Non spécifié » reste toujours disponible pour les cas où le paiement n'est pas encore encaissé",
       "payment_methods_title": "Moyens de paiement acceptés",
       "per_organizer_handout_items_title": "Articles spécifiques par organisateur",
+      "per_show_handout_items_title": "Articles spécifiques par spectacle",
       "select_handout_items_placeholder": "Sélectionner des articles",
       "settings_title": "Paramètres",
       "shows_handout_items_help": "Sélectionnez les articles à remettre aux artistes liés à ce spectacle lors de leur arrivée.",

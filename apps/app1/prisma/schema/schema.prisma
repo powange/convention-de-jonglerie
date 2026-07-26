@@ -215,6 +215,7 @@ model Edition {
   orders                           TicketingOrder[]
   volunteerTicketingHandoutItems   EditionVolunteerHandoutItem[]
   organizerTicketingHandoutItems   EditionOrganizerHandoutItem[]
+  artistTicketingHandoutItems      EditionArtistHandoutItem[]
   tierCustomFields                 TicketingTierCustomField[]
   workshops                        Workshop[]
   workshopLocations                WorkshopLocation[]
