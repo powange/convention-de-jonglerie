@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import {
+  aggregateHandoutItems,
   calculateHandoutItemsForTicket,
   handoutItemsIncludes,
 } from '#server/utils/ticketing/handout-items'
@@ -342,7 +343,10 @@ export default wrapApiHandler(
       })
 
       // Récupérer les articles à remettre pour chaque bénévole
-      const handoutItemsByVolunteerId = new Map<number, Array<{ id: number; name: string }>>()
+      const handoutItemsByVolunteerId = new Map<
+        number,
+        Array<{ id: number; name: string; quantity: number }>
+      >()
       const mealsByVolunteerId = new Map<
         number,
         Array<{ id: number; date: Date; mealType: string; phases: string[] }>
@@ -381,22 +385,8 @@ export default wrapApiHandler(
           })
         }
 
-        // Dédupliquer les articles (si le bénévole est dans plusieurs équipes avec le même article)
-        const uniqueItems = new Map()
-        volunteerHandoutItems.forEach((item) => {
-          if (!uniqueItems.has(item.handoutItem.id)) {
-            uniqueItems.set(item.handoutItem.id, item.handoutItem)
-          }
-        })
-        const deduplicatedItems = Array.from(uniqueItems.values())
-
-        handoutItemsByVolunteerId.set(
-          volunteer.id,
-          deduplicatedItems.map((item) => ({
-            id: item.id,
-            name: item.name,
-          }))
-        )
+        // Collecter les articles (équipes) ; l'agrégation a lieu après les repas.
+        const volunteerItemEntries = volunteerHandoutItems.map((item) => item.handoutItem)
 
         // Récupérer les repas associés au bénévole
         const volunteerMeals = await prisma.volunteerMealSelection.findMany({
@@ -435,22 +425,21 @@ export default wrapApiHandler(
           }))
         )
 
-        // Ajouter les articles à remettre des repas aux articles existants
+        // Ajouter les articles à remettre des repas
         volunteerMeals.forEach((selection) => {
           selection.meal.handoutItems.forEach((mealItem) => {
-            if (!uniqueItems.has(mealItem.handoutItem.id)) {
-              uniqueItems.set(mealItem.handoutItem.id, mealItem.handoutItem)
-            }
+            volunteerItemEntries.push(mealItem.handoutItem)
           })
         })
 
-        // Mettre à jour les articles dédupliqués avec les articles des repas
-        const allDeduplicatedItems = Array.from(uniqueItems.values())
+        // Agréger : un article non cumulable n'est remis qu'une fois, un article
+        // cumulable autant de fois qu'il est associé (équipes + repas).
         handoutItemsByVolunteerId.set(
           volunteer.id,
-          allDeduplicatedItems.map((item) => ({
+          aggregateHandoutItems(volunteerItemEntries).map((item) => ({
             id: item.id,
             name: item.name,
+            quantity: item.quantity,
           }))
         )
       }
@@ -516,20 +505,23 @@ export default wrapApiHandler(
       }
 
       // Récupérer les articles à remettre pour chaque artiste
-      const handoutItemsByArtistId = new Map<number, Array<{ id: number; name: string }>>()
+      const handoutItemsByArtistId = new Map<
+        number,
+        Array<{ id: number; name: string; quantity: number }>
+      >()
       const mealsByArtistId = new Map<
         number,
         Array<{ id: number; date: Date; mealType: string; phases: string[] }>
       >()
 
       for (const artist of artists) {
-        // Récupérer et dédupliquer les articles à remettre depuis tous les spectacles
-        const uniqueItems = new Map()
+        // Collecter les articles de tous les spectacles ; l'agrégation a lieu
+        // après les repas. Un artiste jouant dans deux spectacles reçoit deux
+        // fois un article cumulable, une seule fois un article non cumulable.
+        const artistItemEntries: any[] = []
         artist.shows.forEach((showArtist) => {
           showArtist.show.handoutItems.forEach((item) => {
-            if (!uniqueItems.has(item.handoutItem.id)) {
-              uniqueItems.set(item.handoutItem.id, item.handoutItem)
-            }
+            artistItemEntries.push(item.handoutItem)
           })
         })
 
@@ -570,22 +562,19 @@ export default wrapApiHandler(
           }))
         )
 
-        // Ajouter les articles à remettre des repas aux articles existants
+        // Ajouter les articles à remettre des repas
         artistMeals.forEach((selection) => {
           selection.meal.handoutItems.forEach((mealItem) => {
-            if (!uniqueItems.has(mealItem.handoutItem.id)) {
-              uniqueItems.set(mealItem.handoutItem.id, mealItem.handoutItem)
-            }
+            artistItemEntries.push(mealItem.handoutItem)
           })
         })
 
-        // Mettre à jour les articles dédupliqués avec les articles des repas
-        const allDeduplicatedItems = Array.from(uniqueItems.values())
         handoutItemsByArtistId.set(
           artist.id,
-          allDeduplicatedItems.map((item) => ({
+          aggregateHandoutItems(artistItemEntries).map((item) => ({
             id: item.id,
             name: item.name,
+            quantity: item.quantity,
           }))
         )
       }

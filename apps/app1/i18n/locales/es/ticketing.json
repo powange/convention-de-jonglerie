@@ -100,7 +100,9 @@
         "delete_label": "Eliminar",
         "delete_title": "Eliminar artículo",
         "loading": "Cargando...",
-        "name_placeholder": "Nombre del artículo"
+        "name_placeholder": "Nombre del artículo",
+        "cumulative_help": "Un artículo acumulable se entrega tantas veces como esté asociado al participante (por ejemplo, un artista que actúa en dos espectáculos). En caso contrario, solo se entrega una vez.",
+        "cumulative_short": "Acumulable"
       },
       "volunteer": {
         "choose_placeholder": "Elegir un artículo a entregar...",

@@ -142,11 +142,15 @@ model TicketingQuota {
 }
 
 model TicketingHandoutItem {
-  id        Int      @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   editionId Int
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  /// Cumulable : l'article est remis autant de fois qu'il est associé au
+  /// participant (ex. un artiste jouant dans deux spectacles). Par défaut il
+  /// n'est remis qu'une seule fois, quel que soit le nombre d'associations.
+  cumulative Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   edition                        Edition                               @relation(fields: [editionId], references: [id], onDelete: Cascade)
   tiers                          TicketingTierHandoutItem[]

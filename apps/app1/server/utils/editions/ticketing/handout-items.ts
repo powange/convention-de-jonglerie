@@ -1,5 +1,7 @@
 export interface HandoutItemData {
   name: string
+  /** Remis autant de fois qu'il est associé au participant (défaut : une seule fois) */
+  cumulative?: boolean
 }
 
 /**
@@ -20,6 +22,7 @@ export async function createHandoutItem(editionId: number, data: HandoutItemData
     data: {
       editionId,
       name: data.name,
+      cumulative: data.cumulative ?? false,
     },
   })
 }
@@ -48,6 +51,7 @@ export async function updateHandoutItem(itemId: number, editionId: number, data:
     where: { id: itemId },
     data: {
       name: data.name,
+      ...(data.cumulative !== undefined ? { cumulative: data.cumulative } : {}),
     },
   })
 }

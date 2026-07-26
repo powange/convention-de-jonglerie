@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import {
+  aggregateHandoutItems,
   calculateHandoutItemsForTicket,
   handoutItemsIncludes,
 } from '#server/utils/ticketing/handout-items'
@@ -154,13 +155,8 @@ export default wrapApiHandler(
             })
           }
 
-          // Dédupliquer les articles (si le bénévole est dans plusieurs équipes avec le même article)
-          const uniqueItems = new Map()
-          volunteerHandoutItems.forEach((item) => {
-            if (!uniqueItems.has(item.handoutItem.id)) {
-              uniqueItems.set(item.handoutItem.id, item.handoutItem)
-            }
-          })
+          // Collecter les articles (équipes) ; l'agrégation a lieu après les repas.
+          const volunteerItemEntries = volunteerHandoutItems.map((item) => item.handoutItem)
 
           // Récupérer les repas associés au bénévole
           const volunteerMeals = await prisma.volunteerMealSelection.findMany({
@@ -189,15 +185,13 @@ export default wrapApiHandler(
             },
           })
 
-          // Ajouter les articles à remettre des repas aux articles existants
+          // Ajouter les articles à remettre des repas
           volunteerMeals.forEach((selection) => {
             selection.meal.handoutItems.forEach((mealItem) => {
-              if (!uniqueItems.has(mealItem.handoutItem.id)) {
-                uniqueItems.set(mealItem.handoutItem.id, mealItem.handoutItem)
-              }
+              volunteerItemEntries.push(mealItem.handoutItem)
             })
           })
-          const allDeduplicatedItems = Array.from(uniqueItems.values())
+          const allHandoutItems = aggregateHandoutItems(volunteerItemEntries)
 
           return createSuccessResponse(
             {
@@ -225,9 +219,10 @@ export default wrapApiHandler(
                     startDateTime: assignment.timeSlot.startDateTime,
                     endDateTime: assignment.timeSlot.endDateTime,
                   })),
-                  handoutItems: allDeduplicatedItems.map((item) => ({
+                  handoutItems: allHandoutItems.map((item) => ({
                     id: item.id,
                     name: item.name,
+                    quantity: item.quantity,
                   })),
                   meals: volunteerMeals.map((selection) => ({
                     id: selection.meal.id,
@@ -317,13 +312,12 @@ export default wrapApiHandler(
             })
           }
 
-          // Récupérer et dédupliquer les articles à remettre depuis tous les spectacles
-          const uniqueItems = new Map()
+          // Collecter les articles de tous les spectacles ; l'agrégation a lieu
+          // après les repas (un article cumulable est remis une fois par spectacle).
+          const artistItemEntries: any[] = []
           artist.shows.forEach((showArtist) => {
             showArtist.show.handoutItems.forEach((item) => {
-              if (!uniqueItems.has(item.handoutItem.id)) {
-                uniqueItems.set(item.handoutItem.id, item.handoutItem)
-              }
+              artistItemEntries.push(item.handoutItem)
             })
           })
 
@@ -354,15 +348,13 @@ export default wrapApiHandler(
             },
           })
 
-          // Ajouter les articles à remettre des repas aux articles existants
+          // Ajouter les articles à remettre des repas
           artistMeals.forEach((selection) => {
             selection.meal.handoutItems.forEach((mealItem) => {
-              if (!uniqueItems.has(mealItem.handoutItem.id)) {
-                uniqueItems.set(mealItem.handoutItem.id, mealItem.handoutItem)
-              }
+              artistItemEntries.push(mealItem.handoutItem)
             })
           })
-          const allDeduplicatedItems = Array.from(uniqueItems.values())
+          const allHandoutItems = aggregateHandoutItems(artistItemEntries)
 
           return createSuccessResponse(
             {
@@ -384,9 +376,10 @@ export default wrapApiHandler(
                     startDateTime: showArtist.show.startDateTime,
                     location: showArtist.show.location,
                   })),
-                  handoutItems: allDeduplicatedItems.map((item) => ({
+                  handoutItems: allHandoutItems.map((item) => ({
                     id: item.id,
                     name: item.name,
+                    quantity: item.quantity,
                   })),
                   meals: artistMeals.map((selection) => ({
                     id: selection.meal.id,

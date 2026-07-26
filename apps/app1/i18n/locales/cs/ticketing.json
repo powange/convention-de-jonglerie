@@ -100,7 +100,9 @@
         "delete_label": "Odstranit",
         "delete_title": "Odstranit položku",
         "loading": "Načítání...",
-        "name_placeholder": "Název položky"
+        "name_placeholder": "Název položky",
+        "cumulative_help": "Kumulativní předmět se vydává tolikrát, kolikrát je k účastníkovi přiřazen (například umělec vystupující ve dvou představeních). Jinak se vydává pouze jednou.",
+        "cumulative_short": "Kumulativní"
       },
       "volunteer": {
         "choose_placeholder": "Vyberte předmět k vydání...",

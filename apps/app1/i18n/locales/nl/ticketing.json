@@ -100,7 +100,9 @@
         "delete_label": "Verwijderen",
         "delete_title": "Artikel verwijderen",
         "loading": "Laden...",
-        "name_placeholder": "Naam van het artikel"
+        "name_placeholder": "Naam van het artikel",
+        "cumulative_help": "Een cumulatief artikel wordt net zo vaak uitgereikt als het aan de deelnemer is gekoppeld (bijvoorbeeld een artiest die in twee shows optreedt). Anders wordt het slechts één keer uitgereikt.",
+        "cumulative_short": "Cumulatief"
       },
       "volunteer": {
         "choose_placeholder": "Kies een uit te reiken artikel...",

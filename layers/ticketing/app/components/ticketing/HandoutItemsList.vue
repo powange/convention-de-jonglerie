@@ -20,6 +20,15 @@
             class="flex-1"
             @blur="updateItem(item.id, $event.target.value)"
           />
+          <UCheckbox
+            :model-value="item.cumulative"
+            variant="card"
+            indicator="hidden"
+            size="sm"
+            :label="$t('ticketing.handout_items.list.cumulative_short')"
+            :ui="{ root: 'rounded-none' }"
+            @update:model-value="updateItemCumulative(item, $event === true)"
+          />
           <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
         </UFieldGroup>
       </div>
@@ -33,10 +42,22 @@
             class="flex-1"
             @keydown.enter="handleSave"
           />
+          <UCheckbox
+            v-model="form.cumulative"
+            variant="card"
+            indicator="hidden"
+            size="sm"
+            :label="$t('ticketing.handout_items.list.cumulative_short')"
+            :ui="{ root: 'rounded-none' }"
+          />
           <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
         </UFieldGroup>
       </div>
     </div>
+
+    <p class="text-xs text-gray-500 dark:text-gray-400">
+      {{ $t('ticketing.handout_items.list.cumulative_help') }}
+    </p>
   </div>
 
   <!-- Modal de confirmation de suppression d'item à remettre -->
@@ -59,10 +80,12 @@
 interface TicketingHandoutItem {
   id: number
   name: string
+  cumulative?: boolean
 }
 
 interface HandoutItemForm {
   name: string
+  cumulative: boolean
 }
 
 const props = defineProps<{
@@ -81,6 +104,7 @@ const itemToDelete = ref<TicketingHandoutItem | null>(null)
 
 const form = ref<HandoutItemForm>({
   name: '',
+  cumulative: false,
 })
 
 const confirmDeleteItem = (item: TicketingHandoutItem) => {
@@ -110,13 +134,14 @@ const deleteItem = () => {
   executeDeleteItem()
 }
 
-const pendingUpdateName = ref('')
+// L'API exige toujours le nom : on envoie le couple (nom, cumulable) à chaque mise à jour.
+const pendingUpdate = ref<{ name: string; cumulative: boolean }>({ name: '', cumulative: false })
 
 const { execute: executeUpdateItem } = useApiActionById(
   (itemId) => `/api/editions/${props.editionId}/ticketing/handout-items/${itemId}`,
   {
     method: 'PUT',
-    body: () => ({ name: pendingUpdateName.value }),
+    body: () => ({ ...pendingUpdate.value }),
     silentSuccess: true,
     errorMessages: { default: "Impossible de mettre à jour l'item" },
     onSuccess: () => {
@@ -135,15 +160,22 @@ const updateItem = (itemId: number, name: string) => {
     })
     return
   }
-  pendingUpdateName.value = name.trim()
+  const current = props.items.find((i) => i.id === itemId)
+  pendingUpdate.value = { name: name.trim(), cumulative: current?.cumulative ?? false }
   executeUpdateItem(itemId)
+}
+
+// Bascule le caractère cumulable d'un article existant (sauvegarde immédiate).
+const updateItemCumulative = (item: TicketingHandoutItem, cumulative: boolean) => {
+  pendingUpdate.value = { name: item.name, cumulative }
+  executeUpdateItem(item.id)
 }
 
 const { execute: executeHandleSave, loading: saving } = useApiAction(
   () => `/api/editions/${props.editionId}/ticketing/handout-items`,
   {
     method: 'POST',
-    body: () => ({ name: form.value.name.trim() }),
+    body: () => ({ name: form.value.name.trim(), cumulative: form.value.cumulative }),
     successMessage: {
       title: 'Item créé',
       description: "L'item à remettre a été créé avec succès",
@@ -151,6 +183,7 @@ const { execute: executeHandleSave, loading: saving } = useApiAction(
     errorMessages: { default: "Impossible d'enregistrer l'item" },
     onSuccess: () => {
       form.value.name = ''
+      form.value.cumulative = false
       emit('refresh')
     },
   }

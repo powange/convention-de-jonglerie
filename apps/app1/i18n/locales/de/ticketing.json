@@ -100,7 +100,9 @@
         "delete_label": "Löschen",
         "delete_title": "Artikel löschen",
         "loading": "Lädt...",
-        "name_placeholder": "Name des Artikels"
+        "name_placeholder": "Name des Artikels",
+        "cumulative_help": "Ein kumulierbarer Artikel wird so oft ausgegeben, wie er dem Teilnehmer zugeordnet ist (zum Beispiel bei einem Künstler, der in zwei Shows auftritt). Andernfalls wird er nur einmal ausgegeben.",
+        "cumulative_short": "Kumulierbar"
       },
       "volunteer": {
         "choose_placeholder": "Einen auszugebenden Artikel auswählen...",
