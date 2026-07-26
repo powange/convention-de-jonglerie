@@ -179,7 +179,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <!-- Configuration bénévolat -->
               <ManagementNavigationCard
-                v-if="canEdit || canManageVolunteers"
+                v-if="canManageVolunteers"
                 :to="`/editions/${edition.id}/gestion/volunteers/config`"
                 icon="i-heroicons-cog-6-tooth"
                 :title="$t('gestion.volunteers.config_title')"
@@ -189,7 +189,7 @@
 
               <!-- Page bénévoles -->
               <ManagementNavigationCard
-                v-if="canEdit || canManageVolunteers"
+                v-if="canManageVolunteers"
                 :to="`/editions/${edition.id}/gestion/volunteers/page`"
                 icon="i-heroicons-clipboard-document-list"
                 :title="$t('edition.volunteers.volunteer_page')"
@@ -201,7 +201,7 @@
               <template v-if="edition.volunteersMode === 'INTERNAL'">
                 <!-- Formulaire d'appel à bénévole -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers"
+                  v-if="canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/form`"
                   icon="i-heroicons-megaphone"
                   :title="$t('edition.volunteers.volunteer_form')"
@@ -211,7 +211,7 @@
 
                 <!-- Gestion des candidatures -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers"
+                  v-if="canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/applications`"
                   icon="i-heroicons-document-text"
                   :title="$t('edition.volunteers.application_management')"
@@ -221,7 +221,7 @@
 
                 <!-- Les équipes -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers"
+                  v-if="canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/teams`"
                   icon="i-heroicons-user-group"
                   :title="$t('edition.volunteers.teams')"
@@ -231,7 +231,7 @@
 
                 <!-- Planning (pas visible pour les team leaders seuls) -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers"
+                  v-if="canManageVolunteers"
                   :to="`/editions/${edition.id}/gestion/volunteers/planning`"
                   icon="i-heroicons-calendar-days"
                   :title="$t('edition.volunteers.planning')"
@@ -241,7 +241,7 @@
 
                 <!-- Notifications bénévoles (visible pour les team leaders) -->
                 <ManagementNavigationCard
-                  v-if="canEdit || canManageVolunteers || isTeamLeaderValue"
+                  v-if="canManageVolunteers || isTeamLeaderValue"
                   :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
                   icon="i-heroicons-bell"
                   :title="$t('edition.volunteers.volunteer_notifications')"

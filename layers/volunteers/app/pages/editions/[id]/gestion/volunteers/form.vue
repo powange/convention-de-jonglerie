@@ -45,7 +45,7 @@
             </div>
 
             <EditionVolunteerInternalModeOptions
-              v-if="canEdit || canManageVolunteers"
+              v-if="canAccess"
               :edition-id="editionId"
               :initial-data="volunteersInternalData"
               :show-title="false"
@@ -119,17 +119,11 @@ const volunteersInternalData = computed(() => {
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  return (
-    canEdit.value || canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
-  )
+  // La gestion des bénévoles exige le droit dédié (éditer l'édition ne suffit pas).
+  return canManageVolunteers.value || authStore.user?.id === edition.value?.creatorId
 })
 
 // Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)

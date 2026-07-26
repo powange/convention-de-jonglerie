@@ -378,17 +378,11 @@ const canAccess = computed(() => {
     return true
   }
 
-  // Utilisateurs avec des droits spécifiques
-  if (canEdit.value || canManageVolunteers.value) {
-    return true
-  }
-
-  // Tous les organisateurs de la convention (même sans droits)
-  if (isOrganizer.value) {
-    return true
-  }
-
-  return false
+  // Droit dédié « gérer les bénévoles » (convention ou édition).
+  // Ni le droit d'éditer l'édition ni le simple statut d'organisateur ne
+  // suffisent : le planning expose les données des bénévoles, et l'API
+  // (canManageEditionVolunteers) applique la même règle.
+  return canManageVolunteers.value
 })
 
 // Fonction utilitaire pour formater les dates
@@ -702,16 +696,6 @@ const volunteersStatsIndividual = computed(() =>
 )
 
 // Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
-const isOrganizer = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.isOrganizer(edition.value, authStore.user.id)
-})
-
 // Charger l'édition si nécessaire
 onMounted(async () => {
   try {

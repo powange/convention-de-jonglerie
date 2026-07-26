@@ -215,8 +215,9 @@ const { execute: sendScheduleNotifications, loading: sendingNotifications } = us
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
+  // Les responsables d'équipe conservent l'accès aux notifications ; en revanche
+  // le simple droit d'éditer l'édition ne suffit pas (aligné sur le serveur).
   return (
-    canEdit.value ||
     canManageVolunteers.value ||
     isTeamLeaderValue.value ||
     authStore.user?.id === edition.value?.creatorId
@@ -224,11 +225,6 @@ const canAccess = computed(() => {
 })
 
 // Permissions calculées
-const canEdit = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  return editionStore.canEditEdition(edition.value, authStore.user.id)
-})
-
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
