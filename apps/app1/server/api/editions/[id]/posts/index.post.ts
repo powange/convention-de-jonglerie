@@ -1,6 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
 import { sanitizeUserContent, validateEditionId } from '#server/utils/validation-helpers'
 import { editionPostSchema, validateAndSanitize } from '#server/utils/validation-schemas'
 
@@ -9,13 +8,15 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    // Vérifier que l'utilisateur est organisateur de cette édition
-    const hasPermission = await canAccessEditionData(editionId, user.id, event)
-    if (!hasPermission) {
-      throw createError({
-        status: 403,
-        message: "Vous n'êtes pas autorisé à créer un post sur cette édition",
-      })
+    // Espace de discussion de l'édition : toute personne connectée peut publier.
+    // La modération reste réservée : l'auteur supprime sa publication, les
+    // organisateurs modèrent celles des autres, l'épinglage exige canEdit.
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      select: { id: true },
+    })
+    if (!edition) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
     }
 
     // Valider les données

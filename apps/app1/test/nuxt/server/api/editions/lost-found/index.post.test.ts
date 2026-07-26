@@ -4,7 +4,7 @@ const mockGetEventTiming = vi.hoisted(() => vi.fn())
 
 // Mock des utilitaires - DOIT être avant les imports
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canAccessEditionData: vi.fn(),
+  canEditEditionById: vi.fn(),
 }))
 
 // Étape modularisation : existence + date de début de l'événement via le port lost-found.
@@ -12,14 +12,14 @@ vi.mock('#server/lost-found/ports/registry', () => ({
   useLostFoundPorts: () => ({ event: { getEventTiming: mockGetEventTiming } }),
 }))
 
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
 
 import handler from '../../../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.post'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
-const mockHasPermission = canAccessEditionData as ReturnType<typeof vi.fn>
+const mockHasPermission = canEditEditionById as ReturnType<typeof vi.fn>
 
 const mockEvent = {
   context: {

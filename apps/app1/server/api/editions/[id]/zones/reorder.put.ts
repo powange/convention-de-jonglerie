@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
 import { editionZoneSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -15,7 +15,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canEditEditionById(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         status: 403,

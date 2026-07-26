@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Mock de canAccessEditionData pour autoriser l'accès par défaut
+// Mock de canEditEditionById pour autoriser l'accès par défaut
 // vi.hoisted() permet de hisser la variable avec vi.mock()
-const mockCanAccessEditionData = vi.hoisted(() => vi.fn())
+const mockCanEditEditionById = vi.hoisted(() => vi.fn())
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canAccessEditionData: mockCanAccessEditionData,
+  canEditEditionById: mockCanEditEditionById,
 }))
 
 // Mock de requireAuth pour simuler un utilisateur authentifié
@@ -47,7 +47,7 @@ describe('API Markers - Suppression (DELETE)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Par défaut, autoriser l'accès
-    mockCanAccessEditionData.mockResolvedValue(true)
+    mockCanEditEditionById.mockResolvedValue(true)
   })
 
   it('devrait supprimer un marker avec succès', async () => {
@@ -87,7 +87,7 @@ describe('API Markers - Suppression (DELETE)', () => {
     }
 
     // Refuser l'accès pour cet utilisateur
-    mockCanAccessEditionData.mockResolvedValue(false)
+    mockCanEditEditionById.mockResolvedValue(false)
 
     await expect(markersDeleteHandler(otherUserEvent as any)).rejects.toThrow('Droits insuffisants')
   })

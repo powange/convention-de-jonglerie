@@ -1,7 +1,7 @@
 import { useLostFoundPorts } from '#server/lost-found/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
 import {
   sanitizeString,
   sanitizeUserContent,
@@ -35,7 +35,7 @@ export default wrapApiHandler(
     }
 
     // Vérifier que l'utilisateur est un organisateur
-    const hasPermission = await canAccessEditionData(editionId, userId, event)
+    const hasPermission = await canEditEditionById(editionId, userId, event)
     if (!hasPermission) {
       throw createError({
         status: 403,
