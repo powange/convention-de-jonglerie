@@ -121,11 +121,6 @@
     "welcome": "Benvenuto!",
     "pronouns": "Pronome",
     "pronouns_help": "Come preferisci che ci si rivolga a te",
-    "pronouns_none": "Non specificato",
-    "pronouns_options": {
-      "she": "lei",
-      "he": "lui",
-      "they": "loro"
-    }
+    "pronouns_none": "Non specificato"
   }
 }

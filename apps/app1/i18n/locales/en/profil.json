@@ -121,11 +121,6 @@
     "welcome": "Welcome!",
     "pronouns": "Pronoun",
     "pronouns_help": "How you'd like to be addressed",
-    "pronouns_none": "Not specified",
-    "pronouns_options": {
-      "she": "she",
-      "he": "he",
-      "they": "they"
-    }
+    "pronouns_none": "Not specified"
   }
 }

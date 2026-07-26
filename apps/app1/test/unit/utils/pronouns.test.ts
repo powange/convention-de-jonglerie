@@ -10,9 +10,9 @@ import {
 // Fausse fonction de traduction : reproduit le mapping fr des pronoms.
 const t = (key: string) => {
   const labels: Record<string, string> = {
-    'profile.pronouns_options.she': 'elle',
-    'profile.pronouns_options.he': 'il',
-    'profile.pronouns_options.they': 'iel',
+    'common.pronouns_options.she': 'elle',
+    'common.pronouns_options.he': 'il',
+    'common.pronouns_options.they': 'iel',
   }
   return labels[key] ?? key
 }

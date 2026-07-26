@@ -96,11 +96,13 @@
     "error": "Ошибка",
     "event": "Событие",
     "export_success": "Экспорт успешен",
+    "faq_short": "FAQ",
     "favorite": "Избранное",
     "filters": "Фильтры",
     "first_name": "Имя",
     "hidden": "Скрытая",
     "inactive": "Неактивный",
+    "information_short": "Информация",
     "item": "Предмет",
     "item_selected": "элемент выбран",
     "items": "Предметы",
@@ -129,6 +131,11 @@
     "previous": "Назад",
     "private": "Частный",
     "program": "Программа",
+    "pronouns_options": {
+      "she": "она",
+      "he": "он",
+      "they": "они"
+    },
     "public": "Публичный",
     "quantity": "Количество",
     "refresh": "Обновить",
@@ -179,10 +186,8 @@
     "volunteers_short": "Волонтёры",
     "warning": "Внимание",
     "week": "Неделя",
-    "yes": "Да",
     "workshops_short": "Мастер-классы",
-    "faq_short": "FAQ",
-    "information_short": "Информация"
+    "yes": "Да"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

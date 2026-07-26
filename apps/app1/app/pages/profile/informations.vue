@@ -189,7 +189,7 @@ const languageOptions = LOCALES_CONFIG.map((locale) => ({
 
 const pronounsOptions = computed(() => [
   { value: PRONOUN_NONE, label: t('profile.pronouns_none') },
-  ...USER_PRONOUNS.map((p) => ({ value: p, label: t(`profile.pronouns_options.${p}`) })),
+  ...USER_PRONOUNS.map((p) => ({ value: p, label: t(`common.pronouns_options.${p}`) })),
 ])
 
 const schema = z.object({

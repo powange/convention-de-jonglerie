@@ -121,11 +121,6 @@
     "welcome": "Bienvenue !",
     "pronouns": "Pronom",
     "pronouns_help": "Comment souhaitez-vous qu'on s'adresse à vous",
-    "pronouns_none": "Non renseigné",
-    "pronouns_options": {
-      "she": "elle",
-      "he": "il",
-      "they": "iel"
-    }
+    "pronouns_none": "Non renseigné"
   }
 }
