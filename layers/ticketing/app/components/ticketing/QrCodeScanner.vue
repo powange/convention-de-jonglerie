@@ -95,8 +95,11 @@
 </template>
 
 <script setup lang="ts">
-import { Html5Qrcode } from 'html5-qrcode'
 import { ref, watch, onBeforeUnmount, nextTick } from 'vue'
+
+// Import de type uniquement : la bibliothèque (~113 kB gzip avec zxing) est
+// chargée dynamiquement au premier scan, pas au chargement de la page.
+import type { Html5Qrcode } from 'html5-qrcode'
 
 interface Props {
   open: boolean
@@ -140,6 +143,18 @@ const startScanning = async () => {
 
     // Attendre que le DOM soit mis à jour avec l'élément #qr-reader
     await nextTick()
+
+    // Charger la bibliothèque à la demande (voir l'import de type plus haut)
+    const { Html5Qrcode } = await import('html5-qrcode')
+
+    // La modale a pu être fermée pendant le téléchargement : dans ce cas
+    // l'élément #qr-reader n'existe plus, inutile d'instancier le scanner.
+    if (!isOpen.value) {
+      loading.value = false
+      scanning.value = false
+      isTransitioning.value = false
+      return
+    }
 
     // Créer une instance de Html5Qrcode maintenant que l'élément existe
     html5QrCode = new Html5Qrcode('qr-reader')

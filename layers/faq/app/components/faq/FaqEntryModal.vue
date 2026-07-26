@@ -15,7 +15,8 @@
         </UFormField>
 
         <UFormField :label="$t('gestion.faq.answer')" required :error="fieldErrors.answer">
-          <MarkdownEditor v-model="formData.answer" :disabled="saving" class="min-h-32" />
+          <!-- Lazy : l'éditeur (~284 kB gzip) n'est chargé qu'à l'ouverture de la modale -->
+          <LazyMarkdownEditor v-model="formData.answer" :disabled="saving" class="min-h-32" />
         </UFormField>
 
         <USwitch

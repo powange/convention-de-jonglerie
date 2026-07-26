@@ -81,7 +81,8 @@
         </UFormField>
 
         <UFormField :label="$t('tasks.task_description')" :error="fieldErrors.description">
-          <MarkdownEditor v-model="formData.description" class="min-h-40" />
+          <!-- Lazy : l'éditeur (~284 kB gzip) n'est chargé qu'à l'ouverture de la modale -->
+          <LazyMarkdownEditor v-model="formData.description" class="min-h-40" />
         </UFormField>
 
         <UFormField

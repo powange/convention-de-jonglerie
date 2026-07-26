@@ -52,7 +52,8 @@
 
           <!-- Édition inline -->
           <div v-if="editingId === c.id" class="space-y-2">
-            <MarkdownEditor
+            <!-- Lazy : l'éditeur n'est chargé que si on passe un commentaire en édition -->
+            <LazyMarkdownEditor
               v-model="editingContent"
               :placeholder="$t('tasks.comments.placeholder')"
               class="min-h-24"
@@ -78,7 +79,8 @@
 
     <!-- Formulaire d'ajout -->
     <div v-if="canPost" class="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-2">
-      <MarkdownEditor
+      <!-- Lazy : évite de tirer l'éditeur pour qui ne peut pas commenter -->
+      <LazyMarkdownEditor
         v-model="newContent"
         :placeholder="$t('tasks.comments.placeholder')"
         class="min-h-20"
