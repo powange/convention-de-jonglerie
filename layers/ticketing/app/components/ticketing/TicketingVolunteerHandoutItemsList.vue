@@ -56,7 +56,7 @@
             variant="ghost"
             size="xs"
             square
-            class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            :aria-label="$t('ticketing.handout_items.volunteer.remove_label')"
             @click="confirmDeleteItem(item)"
           />
         </div>
@@ -121,7 +121,7 @@
             variant="ghost"
             size="xs"
             square
-            class="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            :aria-label="$t('ticketing.handout_items.volunteer.remove_label')"
             @click="confirmDeleteItem(item)"
           />
         </div>
