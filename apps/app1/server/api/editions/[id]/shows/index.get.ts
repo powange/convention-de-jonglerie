@@ -1,6 +1,9 @@
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import {
+  canManageArtistsById,
+  canManageTicketingById,
+} from '#server/utils/permissions/edition-permissions'
 import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -9,7 +12,11 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    // Lecture ouverte à la gestion des artistes ET à celle de la billetterie :
+    // la page des articles à remettre liste les spectacles pour leur en associer.
+    const allowed =
+      (await canManageArtistsById(editionId, user.id, event)) ||
+      (await canManageTicketingById(editionId, user.id, event))
     if (!allowed) {
       throw createError({
         status: 403,

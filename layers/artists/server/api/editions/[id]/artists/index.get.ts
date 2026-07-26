@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -10,7 +10,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageArtistsById(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         status: 403,

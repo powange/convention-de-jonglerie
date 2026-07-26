@@ -1,6 +1,6 @@
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canAccessEditionData } from '#server/utils/permissions/edition-permissions'
+import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
 import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
@@ -16,7 +16,7 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const showId = validateResourceId(event, 'showId', 'spectacle')
 
-    const allowed = await canAccessEditionData(editionId, user.id, event)
+    const allowed = await canManageArtistsById(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         status: 403,

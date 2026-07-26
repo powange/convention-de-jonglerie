@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
-  canEditEdition,
+  canManageArtists,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -22,7 +22,7 @@ export default wrapApiHandler(
       })
     }
 
-    const hasPermission = canEditEdition(edition, user)
+    const hasPermission = canManageArtists(edition, user)
     if (!hasPermission) {
       throw createError({
         status: 403,

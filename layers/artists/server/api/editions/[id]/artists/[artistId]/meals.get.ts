@@ -2,7 +2,7 @@ import { useArtistsPorts } from '#server/artists/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
-  canEditEdition,
+  canManageArtists,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -24,7 +24,7 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Édition introuvable' })
     }
 
-    if (!canEditEdition(edition, user)) {
+    if (!canManageArtists(edition, user)) {
       throw createError({
         status: 403,
         message: "Vous n'êtes pas autorisé à gérer les artistes de cette édition",
