@@ -462,6 +462,7 @@ export default wrapApiHandler(
           },
           select: {
             handoutItemId: true,
+            quantity: true,
           },
         })
 
@@ -481,6 +482,7 @@ export default wrapApiHandler(
           },
           select: {
             handoutItemId: true,
+            quantity: true,
           },
         })
 
@@ -492,14 +494,22 @@ export default wrapApiHandler(
           },
         })
 
+        // Quantité définie sur chaque association, reportée sur les articles chargés.
+        const specificQuantityById = new Map(
+          organizerSpecificItemIds.map((a) => [a.handoutItemId, a.quantity])
+        )
+        const globalQuantityById = new Map(globalItemIds.map((a) => [a.handoutItemId, a.quantity]))
+
         handoutItemsByOrganizerId.set(organizer.id, {
           specific: specificItems.map((item) => ({
             id: item.id,
             name: item.name,
+            quantity: specificQuantityById.get(item.id) ?? 1,
           })),
           global: globalItems.map((item) => ({
             id: item.id,
             name: item.name,
+            quantity: globalQuantityById.get(item.id) ?? 1,
           })),
         })
       }
@@ -646,6 +656,7 @@ export default wrapApiHandler(
                       handoutItems: so.option.handoutItems.map((ri) => ({
                         id: ri.handoutItem.id,
                         name: ri.handoutItem.name,
+                        quantity: ri.quantity,
                       })),
                     },
                   })),
