@@ -130,31 +130,6 @@ export async function canManageOrganizers(
 }
 
 /**
- * Vérifie si un utilisateur peut gérer les bénévoles d'une convention
- */
-export async function canManageVolunteers(
-  conventionId: number,
-  userId: number,
-  event?: H3Event
-): Promise<boolean> {
-  // Vérifier le mode admin en premier
-  const isAdminMode = await checkAdminMode(userId, event)
-  if (isAdminMode) return true
-
-  const convention = await prisma.convention.findUnique({
-    where: { id: conventionId },
-    select: {
-      authorId: true,
-      organizers: { where: { userId }, select: { canManageVolunteers: true } },
-    },
-  })
-  if (!convention) return false
-  if (convention.authorId === userId) return true
-  const collab = convention.organizers[0]
-  return !!(collab && collab.canManageVolunteers)
-}
-
-/**
  * Vérifie si un utilisateur peut gérer les bénévoles d'une édition spécifique
  */
 export async function canManageEditionVolunteers(

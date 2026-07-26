@@ -683,39 +683,13 @@ const isOrganizer = computed(() => {
 // Vérifier si l'utilisateur peut gérer les tâches de cette édition
 const canManageTasks = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  const userId = authStore.user.id
-  if (authStore.isAdminModeActive) return true
-  if (edition.value.creatorId === userId) return true
-  if (edition.value.convention?.authorId === userId) return true
-  const organizers = edition.value.convention?.organizers || []
-  return organizers.some((collab: any) => {
-    if (collab.user?.id !== userId) return false
-    if (collab.rights?.manageTasks || collab.rights?.editConvention) return true
-    if (collab.perEditionRights) {
-      const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
-      if (per?.canManageTasks || per?.canEdit) return true
-    }
-    return false
-  })
+  return editionStore.canManageTasks(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur peut gérer le stock matériel
 const canManageStock = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
-  const userId = authStore.user.id
-  if (authStore.isAdminModeActive) return true
-  if (edition.value.creatorId === userId) return true
-  if (edition.value.convention?.authorId === userId) return true
-  const organizers = edition.value.convention?.organizers || []
-  return organizers.some((collab: any) => {
-    if (collab.user?.id !== userId) return false
-    if (collab.rights?.manageStock || collab.rights?.editConvention) return true
-    if (collab.perEditionRights) {
-      const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
-      if (per?.canManageStock || per?.canEdit) return true
-    }
-    return false
-  })
+  return editionStore.canManageStock(edition.value, authStore.user.id)
 })
 
 const canAccessStock = computed(() => canManageStock.value || isTeamLeaderValue.value)

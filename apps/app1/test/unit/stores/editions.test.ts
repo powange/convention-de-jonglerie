@@ -593,6 +593,56 @@ describe('useEditionStore', () => {
       })
     })
 
+    describe('canManageTasks / canManageStock', () => {
+      const orgEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it('autorise les droits dédiés au niveau convention', () => {
+        expect(
+          editionStore.canManageTasks(orgEdition({ rights: { manageTasks: true } }) as any, 1)
+        ).toBe(true)
+        expect(
+          editionStore.canManageStock(orgEdition({ rights: { manageStock: true } }) as any, 1)
+        ).toBe(true)
+      })
+
+      it("autorise les droits dédiés spécifiques à l'édition", () => {
+        const tasks = orgEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageTasks: true }],
+        })
+        const stock = orgEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canManageStock: true }],
+        })
+        expect(editionStore.canManageTasks(tasks as any, 1)).toBe(true)
+        expect(editionStore.canManageStock(stock as any, 1)).toBe(true)
+      })
+
+      // RÉGRESSION : la logique dupliquée dans le layout et l'accueil de gestion
+      // accordait l'accès sur editConvention / canEdit, à l'inverse du serveur.
+      it('refuse editConvention seul (éditer ≠ gérer les tâches ou le stock)', () => {
+        const ed = orgEdition({ rights: { editConvention: true } })
+        expect(editionStore.canManageTasks(ed as any, 1)).toBe(false)
+        expect(editionStore.canManageStock(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse canEdit per-édition seul', () => {
+        const ed = orgEdition({ rights: {}, perEditionRights: [{ editionId: 1, canEdit: true }] })
+        expect(editionStore.canManageTasks(ed as any, 1)).toBe(false)
+        expect(editionStore.canManageStock(ed as any, 1)).toBe(false)
+      })
+    })
+
     describe('canManageArtists', () => {
       // Édition où l'utilisateur 1 n'est NI créateur NI auteur : l'accès dépend
       // uniquement des droits d'organisateur.
