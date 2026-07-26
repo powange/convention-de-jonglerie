@@ -96,11 +96,13 @@
     "error": "Error",
     "event": "Event",
     "export_success": "Export successful",
+    "faq_short": "FAQ",
     "favorite": "Favorite",
     "filters": "Filters",
     "first_name": "First name",
     "hidden": "Hidden",
     "inactive": "Inactive",
+    "information_short": "Information",
     "item": "Item",
     "item_selected": "item selected",
     "items": "Items",
@@ -129,6 +131,11 @@
     "previous": "Previous",
     "private": "Private",
     "program": "Program",
+    "pronouns_options": {
+      "she": "she",
+      "he": "he",
+      "they": "they"
+    },
     "public": "Public",
     "quantity": "Quantity",
     "refresh": "Refresh",
@@ -179,10 +186,8 @@
     "volunteers_short": "Volunteers",
     "warning": "Warning",
     "week": "Week",
-    "yes": "Yes",
     "workshops_short": "Workshops",
-    "faq_short": "FAQ",
-    "information_short": "Information"
+    "yes": "Yes"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

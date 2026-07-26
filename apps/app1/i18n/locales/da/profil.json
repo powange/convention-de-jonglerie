@@ -121,11 +121,6 @@
     "welcome": "Velkommen!",
     "pronouns": "Pronomen",
     "pronouns_help": "Hvordan du gerne vil tiltales",
-    "pronouns_none": "Ikke angivet",
-    "pronouns_options": {
-      "she": "hun",
-      "he": "han",
-      "they": "hen"
-    }
+    "pronouns_none": "Ikke angivet"
   }
 }

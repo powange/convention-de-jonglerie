@@ -121,11 +121,6 @@
     "welcome": "Welkom!",
     "pronouns": "Voornaamwoord",
     "pronouns_help": "Hoe je aangesproken wilt worden",
-    "pronouns_none": "Niet opgegeven",
-    "pronouns_options": {
-      "she": "zij",
-      "he": "hij",
-      "they": "die"
-    }
+    "pronouns_none": "Niet opgegeven"
   }
 }

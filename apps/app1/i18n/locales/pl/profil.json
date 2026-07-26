@@ -121,11 +121,6 @@
     "welcome": "Witamy!",
     "pronouns": "Zaimek",
     "pronouns_help": "Jak chcesz, aby się do Ciebie zwracano",
-    "pronouns_none": "Nie podano",
-    "pronouns_options": {
-      "she": "ona",
-      "he": "on",
-      "they": "ono"
-    }
+    "pronouns_none": "Nie podano"
   }
 }
