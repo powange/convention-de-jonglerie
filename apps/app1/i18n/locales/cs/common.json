@@ -96,11 +96,13 @@
     "error": "Chyba",
     "event": "Událost",
     "export_success": "Úspěšný vývoz",
+    "faq_short": "FAQ",
     "favorite": "Oblíbené stránky",
     "filters": "Filtry",
     "first_name": "Křestní jméno",
     "hidden": "Skrytá",
     "inactive": "Neaktivní",
+    "information_short": "Informace",
     "item": "Článek",
     "item_selected": "vybraná položka",
     "items": "Články",
@@ -129,6 +131,11 @@
     "previous": "Předchozí",
     "private": "Soukromé",
     "program": "Program",
+    "pronouns_options": {
+      "she": "ona",
+      "he": "on",
+      "they": "ono"
+    },
     "public": "Veřejný",
     "quantity": "Množství",
     "refresh": "Obnovit",
@@ -179,10 +186,8 @@
     "volunteers_short": "Dobrovolníci",
     "warning": "Pozor",
     "week": "Týden",
-    "yes": "Ano",
     "workshops_short": "Workshopy",
-    "faq_short": "FAQ",
-    "information_short": "Informace"
+    "yes": "Ano"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

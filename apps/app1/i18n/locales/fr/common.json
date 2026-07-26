@@ -131,6 +131,11 @@
     "previous": "Précédent",
     "private": "Privé",
     "program": "Programme",
+    "pronouns_options": {
+      "she": "elle",
+      "he": "il",
+      "they": "iel"
+    },
     "public": "Public",
     "quantity": "Quantité",
     "refresh": "Rafraîchir",

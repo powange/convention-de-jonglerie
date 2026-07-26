@@ -121,11 +121,6 @@
     "welcome": "Vítejte!",
     "pronouns": "Zájmeno",
     "pronouns_help": "Jak vás máme oslovovat",
-    "pronouns_none": "Neuvedeno",
-    "pronouns_options": {
-      "she": "ona",
-      "he": "on",
-      "they": "ono"
-    }
+    "pronouns_none": "Neuvedeno"
   }
 }

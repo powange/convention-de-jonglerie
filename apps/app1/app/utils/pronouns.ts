@@ -2,7 +2,7 @@
  * Pronoms utilisateur.
  *
  * Les **valeurs** stockées sont neutres (langue-indépendantes) ; le **libellé**
- * affiché est traduit via i18n (`profile.pronouns_options.<value>`).
+ * affiché est traduit via i18n (`common.pronouns_options.<value>`).
  * Ex. la valeur `she` s'affiche « elle » en français, « she » en anglais, etc.
  */
 export const USER_PRONOUNS = ['she', 'he', 'they'] as const
@@ -31,7 +31,7 @@ export function formatPronoun(
   if (!pronouns || pronouns === PRONOUN_NONE || !USER_PRONOUNS.includes(pronouns as UserPronoun)) {
     return ''
   }
-  return t(`profile.pronouns_options.${pronouns}`)
+  return t(`common.pronouns_options.${pronouns}`)
 }
 
 /**

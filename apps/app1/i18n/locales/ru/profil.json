@@ -121,11 +121,6 @@
     "welcome": "Добро пожаловать!",
     "pronouns": "Местоимение",
     "pronouns_help": "Как к вам обращаться",
-    "pronouns_none": "Не указано",
-    "pronouns_options": {
-      "she": "она",
-      "he": "он",
-      "they": "они"
-    }
+    "pronouns_none": "Не указано"
   }
 }

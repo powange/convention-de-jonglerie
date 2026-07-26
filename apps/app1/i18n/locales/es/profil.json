@@ -121,11 +121,6 @@
     "welcome": "¡Bienvenido!",
     "pronouns": "Pronombre",
     "pronouns_help": "Cómo prefieres que se dirijan a ti",
-    "pronouns_none": "Sin especificar",
-    "pronouns_options": {
-      "she": "ella",
-      "he": "él",
-      "they": "elle"
-    }
+    "pronouns_none": "Sin especificar"
   }
 }

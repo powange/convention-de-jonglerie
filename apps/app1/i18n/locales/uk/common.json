@@ -96,11 +96,13 @@
     "error": "Помилка",
     "event": "Подія",
     "export_success": "Експорт успішний",
+    "faq_short": "FAQ",
     "favorite": "Улюблене",
     "filters": "Фільтри",
     "first_name": "Ім'я",
     "hidden": "Прихована",
     "inactive": "Неактивний",
+    "information_short": "Інформація",
     "item": "Предмет",
     "item_selected": "елемент вибрано",
     "items": "Предмети",
@@ -129,6 +131,11 @@
     "previous": "Назад",
     "private": "Приватний",
     "program": "Програма",
+    "pronouns_options": {
+      "she": "вона",
+      "he": "він",
+      "they": "вони"
+    },
     "public": "Публічний",
     "quantity": "Кількість",
     "refresh": "Оновити",
@@ -179,10 +186,8 @@
     "volunteers_short": "Волонтери",
     "warning": "Увага",
     "week": "Тиждень",
-    "yes": "Так",
     "workshops_short": "Майстер-класи",
-    "faq_short": "FAQ",
-    "information_short": "Інформація"
+    "yes": "Так"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",
