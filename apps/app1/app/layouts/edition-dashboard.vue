@@ -229,7 +229,8 @@ const canManageTasks = computed(() => {
   const organizers = edition.value.convention?.organizers || []
   return organizers.some((collab: any) => {
     if (collab.user?.id !== userId) return false
-    if (collab.rights?.canManageTasks || collab.rights?.editConvention) return true
+    // L'API expose les droits convention en clé courte (`manageTasks`), pas `canManageTasks`.
+    if (collab.rights?.manageTasks || collab.rights?.editConvention) return true
     if (collab.perEditionRights) {
       const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
       if (per?.canManageTasks || per?.canEdit) return true
