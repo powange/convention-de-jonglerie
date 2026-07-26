@@ -465,6 +465,7 @@ export default wrapApiHandler(
             },
             select: {
               handoutItemId: true,
+              quantity: true,
             },
           })
 
@@ -476,6 +477,11 @@ export default wrapApiHandler(
             },
           })
 
+          // Quantité définie sur chaque association, reportée sur les articles chargés.
+          const organizerSpecificQuantityById = new Map(
+            organizerSpecificItemIds.map((a) => [a.handoutItemId, a.quantity])
+          )
+
           // Articles globaux (pour tous les organisateurs)
           const globalItemIds = await prisma.editionOrganizerHandoutItem.findMany({
             where: {
@@ -484,6 +490,7 @@ export default wrapApiHandler(
             },
             select: {
               handoutItemId: true,
+              quantity: true,
             },
           })
 
@@ -494,6 +501,10 @@ export default wrapApiHandler(
               },
             },
           })
+
+          const globalQuantityById = new Map(
+            globalItemIds.map((a) => [a.handoutItemId, a.quantity])
+          )
 
           return createSuccessResponse(
             {
@@ -513,10 +524,12 @@ export default wrapApiHandler(
                   handoutItems: organizerSpecificItems.map((item) => ({
                     id: item.id,
                     name: item.name,
+                    quantity: organizerSpecificQuantityById.get(item.id) ?? 1,
                   })),
                   globalHandoutItems: globalItems.map((item) => ({
                     id: item.id,
                     name: item.name,
+                    quantity: globalQuantityById.get(item.id) ?? 1,
                   })),
                   entryValidated: editionOrganizer.entryValidated,
                   entryValidatedAt: editionOrganizer.entryValidatedAt,
