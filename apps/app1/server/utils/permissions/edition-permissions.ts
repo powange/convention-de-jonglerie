@@ -111,6 +111,48 @@ export function canEditEdition(edition: EditionWithPermissions, user: UserForPer
 }
 
 /**
+ * Variante de canEditEdition à même signature que canAccessEditionData, pour les
+ * endpoints qui ne chargent pas l'édition eux-mêmes (carte du site, objets
+ * trouvés). Le droit d'édition couvre la « partie information » de l'édition.
+ */
+export async function canEditEditionById(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      creatorId: true,
+      convention: {
+        select: {
+          authorId: true,
+          organizers: {
+            where: { userId },
+            select: { canEditAllEditions: true, canEditConvention: true },
+          },
+        },
+      },
+      organizerPermissions: {
+        where: { organizer: { userId } },
+        select: { canEdit: true },
+      },
+    },
+  })
+
+  if (!edition) return false
+  if (edition.creatorId === userId) return true
+  if (edition.convention.authorId === userId) return true
+  if (edition.convention.organizers?.some((o) => o.canEditAllEditions || o.canEditConvention))
+    return true
+  if (edition.organizerPermissions?.some((p) => p.canEdit)) return true
+  return false
+}
+
+/**
  * Vérifie si un utilisateur peut supprimer une édition
  */
 export function canDeleteEdition(
