@@ -46,6 +46,7 @@ export default wrapApiHandler(
           handoutItemId: item.handoutItemId,
           teamId: item.teamId,
           name: item.handoutItem.name,
+          quantity: item.quantity,
           team: item.team,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,

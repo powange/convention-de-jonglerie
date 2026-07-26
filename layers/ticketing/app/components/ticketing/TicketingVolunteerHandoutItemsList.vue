@@ -42,7 +42,7 @@
           <!-- Nom de l'article -->
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-gray-900 dark:text-white break-words">
-              {{ item.name }}
+              {{ item.name }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {{ $t('ticketing.handout_items.volunteer.given_to_all') }}
@@ -107,7 +107,7 @@
           <!-- Nom de l'article -->
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-gray-900 dark:text-white break-words">
-              {{ item.name }}
+              {{ item.name }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
             </p>
             <p class="text-xs text-orange-600 dark:text-orange-400 mt-1 font-medium">
               Équipe uniquement
