@@ -179,311 +179,321 @@
         </div>
 
         <div v-else class="overflow-x-auto">
-          <UTable
-            ref="tableRef"
-            v-model:sorting="sorting"
-            v-model:column-visibility="columnVisibility"
-            v-model:global-filter="globalFilter"
-            :data="filteredArtists"
-            :columns="columns"
-            class="w-full"
-          >
-            <!-- Nom -->
-            <template #name-cell="{ row }">
-              <div class="flex items-center gap-2">
-                <UiUserAvatar :user="row.original.user" size="sm" />
-                <span class="font-medium">
-                  <UiUserName :user="row.original.user" />
-                </span>
-              </div>
-            </template>
-
-            <!-- Email -->
-            <template #email-cell="{ row }">
-              <span class="text-gray-600 dark:text-gray-400">{{ row.original.user.email }}</span>
-            </template>
-
-            <!-- Téléphone -->
-            <template #phone-cell="{ row }">
-              <span class="text-gray-600 dark:text-gray-400">{{
-                row.original.user.phone || '-'
-              }}</span>
-            </template>
-
-            <!-- Arrivée -->
-            <template #arrival-cell="{ row }">
-              <div v-if="row.original.arrivalDateTime" class="space-y-1">
-                <div class="text-gray-900 dark:text-white font-medium">
-                  {{ formatDateTime(row.original.arrivalDateTime) }}
+          <UContextMenu :items="contextMenuItems">
+            <UTable
+              ref="tableRef"
+              v-model:sorting="sorting"
+              v-model:column-visibility="columnVisibility"
+              v-model:global-filter="globalFilter"
+              :data="filteredArtists"
+              :columns="columns"
+              class="w-full"
+              @contextmenu="onRowContextmenu"
+            >
+              <!-- Nom -->
+              <template #name-cell="{ row }">
+                <div class="flex items-center gap-2">
+                  <UiUserAvatar :user="row.original.user" size="sm" />
+                  <span class="font-medium">
+                    <UiUserName :user="row.original.user" />
+                  </span>
                 </div>
-                <div v-if="row.original.pickupRequired" class="text-xs space-y-0.5">
-                  <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
-                    <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
-                    <span>{{ row.original.pickupLocation || $t('artists.pickup_location') }}</span>
-                  </div>
-                  <div
-                    v-if="row.original.pickupResponsible"
-                    class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
-                  >
-                    <UIcon name="i-heroicons-user" class="h-3 w-3" />
-                    <span>{{ row.original.pickupResponsible.pseudo }}</span>
-                  </div>
-                </div>
-              </div>
-              <span v-else class="text-gray-400">-</span>
-            </template>
+              </template>
 
-            <!-- Départ -->
-            <template #departure-cell="{ row }">
-              <div v-if="row.original.departureDateTime" class="space-y-1">
-                <div class="text-gray-900 dark:text-white font-medium">
-                  {{ formatDateTime(row.original.departureDateTime) }}
-                </div>
-                <div v-if="row.original.dropoffRequired" class="text-xs space-y-0.5">
-                  <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
-                    <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
-                    <span>{{
-                      row.original.dropoffLocation || $t('artists.dropoff_location')
-                    }}</span>
+              <!-- Email -->
+              <template #email-cell="{ row }">
+                <span class="text-gray-600 dark:text-gray-400">{{ row.original.user.email }}</span>
+              </template>
+
+              <!-- Téléphone -->
+              <template #phone-cell="{ row }">
+                <span class="text-gray-600 dark:text-gray-400">{{
+                  row.original.user.phone || '-'
+                }}</span>
+              </template>
+
+              <!-- Arrivée -->
+              <template #arrival-cell="{ row }">
+                <div v-if="row.original.arrivalDateTime" class="space-y-1">
+                  <div class="text-gray-900 dark:text-white font-medium">
+                    {{ formatDateTime(row.original.arrivalDateTime) }}
                   </div>
-                  <div
-                    v-if="row.original.dropoffResponsible"
-                    class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
-                  >
-                    <UIcon name="i-heroicons-user" class="h-3 w-3" />
-                    <span>{{ row.original.dropoffResponsible.pseudo }}</span>
+                  <div v-if="row.original.pickupRequired" class="text-xs space-y-0.5">
+                    <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
+                      <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
+                      <span>{{
+                        row.original.pickupLocation || $t('artists.pickup_location')
+                      }}</span>
+                    </div>
+                    <div
+                      v-if="row.original.pickupResponsible"
+                      class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
+                    >
+                      <UIcon name="i-heroicons-user" class="h-3 w-3" />
+                      <span>{{ row.original.pickupResponsible.pseudo }}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <span v-else class="text-gray-400">-</span>
-            </template>
+                <span v-else class="text-gray-400">-</span>
+              </template>
 
-            <!-- Repas -->
-            <template #meals-cell="{ row }">
-              <UButton
-                :color="getAcceptedMealsCount(row.original) > 0 ? 'primary' : 'neutral'"
-                variant="soft"
-                size="sm"
-                @click="openMealsModal(row.original)"
-              >
-                <span class="font-medium">{{ getMealsDisplayText(row.original) }}</span>
-                <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
-              </UButton>
-            </template>
+              <!-- Départ -->
+              <template #departure-cell="{ row }">
+                <div v-if="row.original.departureDateTime" class="space-y-1">
+                  <div class="text-gray-900 dark:text-white font-medium">
+                    {{ formatDateTime(row.original.departureDateTime) }}
+                  </div>
+                  <div v-if="row.original.dropoffRequired" class="text-xs space-y-0.5">
+                    <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
+                      <UIcon name="i-heroicons-map-pin" class="h-3 w-3" />
+                      <span>{{
+                        row.original.dropoffLocation || $t('artists.dropoff_location')
+                      }}</span>
+                    </div>
+                    <div
+                      v-if="row.original.dropoffResponsible"
+                      class="flex items-center gap-1 text-gray-600 dark:text-gray-400"
+                    >
+                      <UIcon name="i-heroicons-user" class="h-3 w-3" />
+                      <span>{{ row.original.dropoffResponsible.pseudo }}</span>
+                    </div>
+                  </div>
+                </div>
+                <span v-else class="text-gray-400">-</span>
+              </template>
 
-            <!-- Spectacles -->
-            <template #shows-cell="{ row }">
-              <div
-                v-if="row.original.shows && row.original.shows.length > 0"
-                class="flex flex-wrap gap-1"
-              >
-                <UBadge
-                  v-for="showArtist in row.original.shows"
-                  :key="showArtist.show.id"
-                  color="purple"
-                  variant="subtle"
-                  size="sm"
-                >
-                  {{ showArtist.show.title }}
-                </UBadge>
-              </div>
-              <span v-else class="text-gray-400">-</span>
-            </template>
-
-            <!-- Paiement -->
-            <template #payment-cell="{ row }">
-              <div v-if="row.original.payment" class="flex items-center gap-2">
-                <span class="font-medium">{{ row.original.payment }}€</span>
-                <UBadge
-                  :color="row.original.paymentPaid ? 'success' : 'warning'"
+              <!-- Repas -->
+              <template #meals-cell="{ row }">
+                <UButton
+                  :color="getAcceptedMealsCount(row.original) > 0 ? 'primary' : 'neutral'"
                   variant="soft"
                   size="sm"
+                  @click="openMealsModal(row.original)"
                 >
-                  {{ row.original.paymentPaid ? '✓' : '○' }}
-                </UBadge>
-              </div>
-              <span v-else class="text-gray-400">-</span>
-            </template>
+                  <span class="font-medium">{{ getMealsDisplayText(row.original) }}</span>
+                  <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
+                </UButton>
+              </template>
 
-            <!-- Remboursement -->
-            <template #reimbursement-cell="{ row }">
-              <div
-                v-if="row.original.reimbursementMax || row.original.reimbursementActual"
-                class="space-y-1"
-              >
-                <div v-if="row.original.reimbursementMax" class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500">Max:</span>
-                  <span class="font-medium">{{ row.original.reimbursementMax }}€</span>
-                </div>
-                <div v-if="row.original.reimbursementActual" class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500">Réel:</span>
-                  <span class="font-medium">{{ row.original.reimbursementActual }}€</span>
-                  <UBadge
-                    :color="row.original.reimbursementActualPaid ? 'success' : 'warning'"
-                    variant="soft"
-                    size="sm"
-                  >
-                    {{ row.original.reimbursementActualPaid ? '✓' : '○' }}
-                  </UBadge>
-                </div>
-              </div>
-              <span v-else class="text-gray-400">-</span>
-            </template>
-
-            <!-- Remboursement des consommables -->
-            <template #consumables-cell="{ row }">
-              <div
-                v-if="row.original.consumablesMax || row.original.consumablesActual"
-                class="space-y-1"
-              >
-                <div v-if="row.original.consumablesMax" class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500">Max:</span>
-                  <span class="font-medium">{{ row.original.consumablesMax }}€</span>
-                </div>
-                <div v-if="row.original.consumablesActual" class="flex items-center gap-2">
-                  <span class="text-xs text-gray-500">Réel:</span>
-                  <span class="font-medium">{{ row.original.consumablesActual }}€</span>
-                  <UBadge
-                    :color="row.original.consumablesActualPaid ? 'success' : 'warning'"
-                    variant="soft"
-                    size="sm"
-                  >
-                    {{ row.original.consumablesActualPaid ? '✓' : '○' }}
-                  </UBadge>
-                </div>
-              </div>
-              <span v-else class="text-gray-400">-</span>
-            </template>
-
-            <!-- Hébergement -->
-            <template #accommodation-cell="{ row }">
-              <div class="space-y-1">
-                <div v-if="row.original.accommodationAutonomous" class="flex items-center gap-2">
-                  <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
-                  <span class="text-sm text-gray-700 dark:text-gray-300">
-                    {{ $t('artists.accommodation_autonomous_yes') }}
-                  </span>
-                </div>
-                <div v-if="row.original.accommodationType" class="flex items-center gap-1 text-xs">
-                  <UBadge color="info" variant="subtle" size="sm">
-                    {{ accommodationTypeLabel(row.original.accommodationType) }}
-                  </UBadge>
-                  <span
-                    v-if="
-                      row.original.accommodationType === 'OTHER' &&
-                      row.original.accommodationTypeOther
-                    "
-                    class="text-gray-500 truncate max-w-30"
-                    :title="row.original.accommodationTypeOther"
-                  >
-                    {{ row.original.accommodationTypeOther }}
-                  </span>
-                </div>
-                <button
-                  v-if="!row.original.accommodationAutonomous && row.original.accommodationProposal"
-                  class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
-                  @click="openAccommodationModal(row.original)"
-                >
-                  <UIcon name="i-heroicons-home" class="h-5 w-5 text-primary-500 shrink-0" />
-                  <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1 flex-1">
-                    {{ row.original.accommodationProposal }}
-                  </span>
-                  <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-primary-500" />
-                </button>
+              <!-- Spectacles -->
+              <template #shows-cell="{ row }">
                 <div
-                  v-if="
-                    !row.original.accommodationAutonomous &&
-                    !row.original.accommodationProposal &&
-                    !row.original.accommodationType
-                  "
-                  class="flex items-center gap-2"
+                  v-if="row.original.shows && row.original.shows.length > 0"
+                  class="flex flex-wrap gap-1"
                 >
-                  <UIcon name="i-heroicons-question-mark-circle" class="h-5 w-5 text-gray-400" />
-                  <span class="text-sm text-gray-400">
-                    {{ $t('artists.accommodation_not_specified') }}
-                  </span>
+                  <UBadge
+                    v-for="showArtist in row.original.shows"
+                    :key="showArtist.show.id"
+                    color="purple"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    {{ showArtist.show.title }}
+                  </UBadge>
                 </div>
-              </div>
-            </template>
+                <span v-else class="text-gray-400">-</span>
+              </template>
 
-            <!-- Facture -->
-            <template #invoice-cell="{ row }">
-              <UTooltip :text="getInvoiceStatusText(row.original)">
-                <UBadge
-                  :color="getInvoiceStatusColor(row.original)"
-                  variant="soft"
-                  size="sm"
-                  class="cursor-help"
+              <!-- Paiement -->
+              <template #payment-cell="{ row }">
+                <div v-if="row.original.payment" class="flex items-center gap-2">
+                  <span class="font-medium">{{ row.original.payment }}€</span>
+                  <UBadge
+                    :color="row.original.paymentPaid ? 'success' : 'warning'"
+                    variant="soft"
+                    size="sm"
+                  >
+                    {{ row.original.paymentPaid ? '✓' : '○' }}
+                  </UBadge>
+                </div>
+                <span v-else class="text-gray-400">-</span>
+              </template>
+
+              <!-- Remboursement -->
+              <template #reimbursement-cell="{ row }">
+                <div
+                  v-if="row.original.reimbursementMax || row.original.reimbursementActual"
+                  class="space-y-1"
                 >
-                  {{ getInvoiceStatusIcon(row.original) }}
-                </UBadge>
-              </UTooltip>
-            </template>
+                  <div v-if="row.original.reimbursementMax" class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Max:</span>
+                    <span class="font-medium">{{ row.original.reimbursementMax }}€</span>
+                  </div>
+                  <div v-if="row.original.reimbursementActual" class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Réel:</span>
+                    <span class="font-medium">{{ row.original.reimbursementActual }}€</span>
+                    <UBadge
+                      :color="row.original.reimbursementActualPaid ? 'success' : 'warning'"
+                      variant="soft"
+                      size="sm"
+                    >
+                      {{ row.original.reimbursementActualPaid ? '✓' : '○' }}
+                    </UBadge>
+                  </div>
+                </div>
+                <span v-else class="text-gray-400">-</span>
+              </template>
 
-            <!-- Cachet -->
-            <template #fee-cell="{ row }">
-              <UTooltip :text="getFeeStatusText(row.original)">
-                <UBadge
-                  :color="getFeeStatusColor(row.original)"
-                  variant="soft"
-                  size="sm"
-                  class="cursor-help"
+              <!-- Remboursement des consommables -->
+              <template #consumables-cell="{ row }">
+                <div
+                  v-if="row.original.consumablesMax || row.original.consumablesActual"
+                  class="space-y-1"
                 >
-                  {{ getFeeStatusIcon(row.original) }}
-                </UBadge>
-              </UTooltip>
-            </template>
-
-            <!-- Notes organisateur -->
-            <template #notes-cell="{ row }">
-              <button
-                v-if="row.original.organizerNotes"
-                class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                @click="openNotesModal(row.original)"
-              >
-                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3">
-                  {{ row.original.organizerNotes }}
-                </p>
-                <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
-                  <span>{{ $t('common.view_more') }}</span>
-                  <UIcon name="i-heroicons-chevron-right" class="h-3 w-3" />
+                  <div v-if="row.original.consumablesMax" class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Max:</span>
+                    <span class="font-medium">{{ row.original.consumablesMax }}€</span>
+                  </div>
+                  <div v-if="row.original.consumablesActual" class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Réel:</span>
+                    <span class="font-medium">{{ row.original.consumablesActual }}€</span>
+                    <UBadge
+                      :color="row.original.consumablesActualPaid ? 'success' : 'warning'"
+                      variant="soft"
+                      size="sm"
+                    >
+                      {{ row.original.consumablesActualPaid ? '✓' : '○' }}
+                    </UBadge>
+                  </div>
                 </div>
-              </button>
-              <button
-                v-else
-                class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                @click="openNotesModal(row.original)"
-              >
-                <p class="text-gray-400 italic text-xs">
-                  {{ $t('artists.no_notes') }}
-                </p>
-                <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
-                  <span>{{ $t('common.add') }}</span>
-                  <UIcon name="i-heroicons-plus" class="h-3 w-3" />
-                </div>
-              </button>
-            </template>
+                <span v-else class="text-gray-400">-</span>
+              </template>
 
-            <!-- Actions -->
-            <template #actions-cell="{ row }">
-              <div class="flex items-center justify-end gap-2">
-                <UButton
-                  icon="i-heroicons-pencil"
-                  color="primary"
-                  variant="ghost"
-                  size="sm"
-                  @click="openEditArtistModal(row.original)"
-                />
-                <UButton
-                  icon="i-heroicons-trash"
-                  color="error"
-                  variant="ghost"
-                  size="sm"
-                  @click="confirmDeleteArtist(row.original)"
-                />
-              </div>
-            </template>
-          </UTable>
+              <!-- Hébergement -->
+              <template #accommodation-cell="{ row }">
+                <div class="space-y-1">
+                  <div v-if="row.original.accommodationAutonomous" class="flex items-center gap-2">
+                    <UIcon name="i-heroicons-check-circle" class="h-5 w-5 text-success-500" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                      {{ $t('artists.accommodation_autonomous_yes') }}
+                    </span>
+                  </div>
+                  <div
+                    v-if="row.original.accommodationType"
+                    class="flex items-center gap-1 text-xs"
+                  >
+                    <UBadge color="info" variant="subtle" size="sm">
+                      {{ accommodationTypeLabel(row.original.accommodationType) }}
+                    </UBadge>
+                    <span
+                      v-if="
+                        row.original.accommodationType === 'OTHER' &&
+                        row.original.accommodationTypeOther
+                      "
+                      class="text-gray-500 truncate max-w-30"
+                      :title="row.original.accommodationTypeOther"
+                    >
+                      {{ row.original.accommodationTypeOther }}
+                    </span>
+                  </div>
+                  <button
+                    v-if="
+                      !row.original.accommodationAutonomous && row.original.accommodationProposal
+                    "
+                    class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer w-full text-left"
+                    @click="openAccommodationModal(row.original)"
+                  >
+                    <UIcon name="i-heroicons-home" class="h-5 w-5 text-primary-500 shrink-0" />
+                    <span class="text-sm text-gray-700 dark:text-gray-300 line-clamp-1 flex-1">
+                      {{ row.original.accommodationProposal }}
+                    </span>
+                    <UIcon name="i-heroicons-chevron-right" class="h-4 w-4 text-primary-500" />
+                  </button>
+                  <div
+                    v-if="
+                      !row.original.accommodationAutonomous &&
+                      !row.original.accommodationProposal &&
+                      !row.original.accommodationType
+                    "
+                    class="flex items-center gap-2"
+                  >
+                    <UIcon name="i-heroicons-question-mark-circle" class="h-5 w-5 text-gray-400" />
+                    <span class="text-sm text-gray-400">
+                      {{ $t('artists.accommodation_not_specified') }}
+                    </span>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Facture -->
+              <template #invoice-cell="{ row }">
+                <UTooltip :text="getInvoiceStatusText(row.original)">
+                  <UBadge
+                    :color="getInvoiceStatusColor(row.original)"
+                    variant="soft"
+                    size="sm"
+                    class="cursor-help"
+                  >
+                    {{ getInvoiceStatusIcon(row.original) }}
+                  </UBadge>
+                </UTooltip>
+              </template>
+
+              <!-- Cachet -->
+              <template #fee-cell="{ row }">
+                <UTooltip :text="getFeeStatusText(row.original)">
+                  <UBadge
+                    :color="getFeeStatusColor(row.original)"
+                    variant="soft"
+                    size="sm"
+                    class="cursor-help"
+                  >
+                    {{ getFeeStatusIcon(row.original) }}
+                  </UBadge>
+                </UTooltip>
+              </template>
+
+              <!-- Notes organisateur -->
+              <template #notes-cell="{ row }">
+                <button
+                  v-if="row.original.organizerNotes"
+                  class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                  @click="openNotesModal(row.original)"
+                >
+                  <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-3">
+                    {{ row.original.organizerNotes }}
+                  </p>
+                  <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
+                    <span>{{ $t('common.view_more') }}</span>
+                    <UIcon name="i-heroicons-chevron-right" class="h-3 w-3" />
+                  </div>
+                </button>
+                <button
+                  v-else
+                  class="w-full text-left p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                  @click="openNotesModal(row.original)"
+                >
+                  <p class="text-gray-400 italic text-xs">
+                    {{ $t('artists.no_notes') }}
+                  </p>
+                  <div class="flex items-center gap-1 text-xs text-primary-500 mt-1">
+                    <span>{{ $t('common.add') }}</span>
+                    <UIcon name="i-heroicons-plus" class="h-3 w-3" />
+                  </div>
+                </button>
+              </template>
+
+              <!-- Actions -->
+              <template #actions-cell="{ row }">
+                <div class="flex items-center justify-end gap-2">
+                  <UButton
+                    icon="i-heroicons-pencil"
+                    color="primary"
+                    variant="ghost"
+                    size="sm"
+                    @click="openEditArtistModal(row.original)"
+                  />
+                  <UButton
+                    icon="i-heroicons-trash"
+                    color="error"
+                    variant="ghost"
+                    size="sm"
+                    @click="confirmDeleteArtist(row.original)"
+                  />
+                </div>
+              </template>
+            </UTable>
+          </UContextMenu>
         </div>
       </UCard>
     </div>
@@ -853,6 +863,44 @@ const openAddArtistModal = () => {
 }
 
 // Ouvrir le modal d'édition
+// Menu contextuel (clic droit sur une ligne) : regroupe les actions dispersées
+// dans les cellules (repas, hébergement, notes) et celles de la colonne Actions.
+const contextMenuItems = ref<any[]>([])
+const onRowContextmenu = (_e: Event, row: { original: any }) => {
+  const artist = row.original
+  contextMenuItems.value = [
+    { type: 'label', label: artist.user?.pseudo || artist.name || t('common.artist') },
+    {
+      label: t('common.edit'),
+      icon: 'i-heroicons-pencil',
+      onSelect: () => openEditArtistModal(artist),
+    },
+    { type: 'separator' },
+    {
+      label: t('common.meals_short'),
+      icon: 'i-heroicons-cake',
+      onSelect: () => openMealsModal(artist),
+    },
+    {
+      label: t('artists.accommodation'),
+      icon: 'i-heroicons-home',
+      onSelect: () => openAccommodationModal(artist),
+    },
+    {
+      label: t('artists.organizer_notes'),
+      icon: 'i-heroicons-chat-bubble-left-ellipsis',
+      onSelect: () => openNotesModal(artist),
+    },
+    { type: 'separator' },
+    {
+      label: t('common.delete'),
+      icon: 'i-heroicons-trash',
+      color: 'error',
+      onSelect: () => confirmDeleteArtist(artist),
+    },
+  ]
+}
+
 const openEditArtistModal = (artist: any) => {
   selectedArtist.value = artist
   showArtistModal.value = true

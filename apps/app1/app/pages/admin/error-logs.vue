@@ -239,156 +239,161 @@
           <p class="text-sm text-gray-400">{{ $t('admin.good_news') }}</p>
         </div>
 
-        <UTable
-          v-else
-          ref="table"
-          :data="logs"
-          :columns="columns"
-          class="w-full"
-          :ui="{ tr: 'cursor-pointer' }"
-          @select="onRowSelect"
-        >
-          <!-- Statut (résolu / non résolu) -->
-          <template #status-cell="{ row }">
-            <UIcon
-              :name="
-                row.original.resolved
-                  ? 'i-heroicons-check-circle'
-                  : 'i-heroicons-exclamation-circle'
-              "
-              class="h-5 w-5"
-              :class="row.original.resolved ? 'text-green-500' : 'text-red-500'"
-              :title="
-                row.original.resolved
-                  ? $t('admin.error_logs.resolved')
-                  : $t('admin.error_logs.unresolved_short')
-              "
-            />
-          </template>
+        <UContextMenu v-else :items="contextMenuItems">
+          <UTable
+            ref="table"
+            :data="logs"
+            :columns="columns"
+            class="w-full"
+            :ui="{ tr: 'cursor-pointer' }"
+            @select="onRowSelect"
+            @contextmenu="onRowContextmenu"
+          >
+            <!-- Statut (résolu / non résolu) -->
+            <template #status-cell="{ row }">
+              <UIcon
+                :name="
+                  row.original.resolved
+                    ? 'i-heroicons-check-circle'
+                    : 'i-heroicons-exclamation-circle'
+                "
+                class="h-5 w-5"
+                :class="row.original.resolved ? 'text-green-500' : 'text-red-500'"
+                :title="
+                  row.original.resolved
+                    ? $t('admin.error_logs.resolved')
+                    : $t('admin.error_logs.unresolved_short')
+                "
+              />
+            </template>
 
-          <!-- Date (triable) -->
-          <template #createdAt-header>
-            <UButton
-              :label="$t('admin.error_logs.col_date')"
-              :icon="sortIcon('createdAt')"
-              color="neutral"
-              variant="ghost"
-              size="xs"
-              class="-mx-1.5"
-              @click="toggleSort('createdAt')"
-            />
-          </template>
-          <template #createdAt-cell="{ row }">
-            <div class="whitespace-nowrap">
-              <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ formatRelative(row.original.createdAt) }}
-              </p>
-              <p class="text-xs text-gray-500">{{ formatDateTime(row.original.createdAt) }}</p>
-            </div>
-          </template>
-
-          <!-- Code HTTP (triable) -->
-          <template #statusCode-header>
-            <UButton
-              :label="$t('admin.error_logs.col_code')"
-              :icon="sortIcon('statusCode')"
-              color="neutral"
-              variant="ghost"
-              size="xs"
-              class="-mx-1.5"
-              @click="toggleSort('statusCode')"
-            />
-          </template>
-          <template #statusCode-cell="{ row }">
-            <UBadge :color="getStatusCodeColor(row.original.statusCode)" variant="subtle">
-              {{ row.original.statusCode }}
-            </UBadge>
-          </template>
-
-          <!-- Type d'erreur -->
-          <template #errorType-cell="{ row }">
-            <UBadge v-if="row.original.errorType" color="neutral" variant="outline">
-              {{ row.original.errorType }}
-            </UBadge>
-            <span v-else class="text-gray-400">—</span>
-          </template>
-
-          <!-- Endpoint (méthode + path, triable par path) -->
-          <template #endpoint-header>
-            <UButton
-              :label="$t('admin.error_logs.col_endpoint')"
-              :icon="sortIcon('path')"
-              color="neutral"
-              variant="ghost"
-              size="xs"
-              class="-mx-1.5"
-              @click="toggleSort('path')"
-            />
-          </template>
-          <template #endpoint-cell="{ row }">
-            <div class="flex items-center gap-2 whitespace-nowrap">
-              <UBadge color="neutral" variant="soft" size="sm">{{ row.original.method }}</UBadge>
-              <code class="text-xs text-gray-600 dark:text-gray-300" :title="row.original.path">
-                {{ row.original.path }}
-              </code>
-            </div>
-          </template>
-
-          <!-- Message -->
-          <template #message-cell="{ row }">
-            <p
-              class="max-w-md truncate text-sm text-gray-900 dark:text-white"
-              :title="row.original.message"
-            >
-              {{ row.original.message }}
-            </p>
-          </template>
-
-          <!-- Utilisateur -->
-          <template #user-cell="{ row }">
-            <span v-if="row.original.user" class="text-sm">{{ row.original.user.pseudo }}</span>
-            <span v-else class="text-sm italic text-gray-400">
-              {{ $t('admin.error_logs.anonymous') }}
-            </span>
-          </template>
-
-          <!-- Page d'origine (referer) -->
-          <template #referer-cell="{ row }">
-            <a
-              v-if="row.original.referer"
-              :href="row.original.referer"
-              target="_blank"
-              rel="noopener"
-              class="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-              :title="row.original.referer"
-              @click.stop
-            >
-              {{ truncateUrl(row.original.referer, 40) }}
-            </a>
-            <span v-else class="text-gray-400">—</span>
-          </template>
-
-          <!-- IP -->
-          <template #ip-cell="{ row }">
-            <span v-if="row.original.ip" class="font-mono text-xs text-gray-600 dark:text-gray-300">
-              {{ row.original.ip }}
-            </span>
-            <span v-else class="text-gray-400">—</span>
-          </template>
-
-          <!-- Actions -->
-          <template #actions-cell="{ row }">
-            <UDropdownMenu :items="rowActions(row.original)" :content="{ align: 'end' }">
+            <!-- Date (triable) -->
+            <template #createdAt-header>
               <UButton
-                icon="i-heroicons-ellipsis-vertical"
+                :label="$t('admin.error_logs.col_date')"
+                :icon="sortIcon('createdAt')"
                 color="neutral"
                 variant="ghost"
-                square
-                @click.stop
+                size="xs"
+                class="-mx-1.5"
+                @click="toggleSort('createdAt')"
               />
-            </UDropdownMenu>
-          </template>
-        </UTable>
+            </template>
+            <template #createdAt-cell="{ row }">
+              <div class="whitespace-nowrap">
+                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  {{ formatRelative(row.original.createdAt) }}
+                </p>
+                <p class="text-xs text-gray-500">{{ formatDateTime(row.original.createdAt) }}</p>
+              </div>
+            </template>
+
+            <!-- Code HTTP (triable) -->
+            <template #statusCode-header>
+              <UButton
+                :label="$t('admin.error_logs.col_code')"
+                :icon="sortIcon('statusCode')"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="-mx-1.5"
+                @click="toggleSort('statusCode')"
+              />
+            </template>
+            <template #statusCode-cell="{ row }">
+              <UBadge :color="getStatusCodeColor(row.original.statusCode)" variant="subtle">
+                {{ row.original.statusCode }}
+              </UBadge>
+            </template>
+
+            <!-- Type d'erreur -->
+            <template #errorType-cell="{ row }">
+              <UBadge v-if="row.original.errorType" color="neutral" variant="outline">
+                {{ row.original.errorType }}
+              </UBadge>
+              <span v-else class="text-gray-400">—</span>
+            </template>
+
+            <!-- Endpoint (méthode + path, triable par path) -->
+            <template #endpoint-header>
+              <UButton
+                :label="$t('admin.error_logs.col_endpoint')"
+                :icon="sortIcon('path')"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="-mx-1.5"
+                @click="toggleSort('path')"
+              />
+            </template>
+            <template #endpoint-cell="{ row }">
+              <div class="flex items-center gap-2 whitespace-nowrap">
+                <UBadge color="neutral" variant="soft" size="sm">{{ row.original.method }}</UBadge>
+                <code class="text-xs text-gray-600 dark:text-gray-300" :title="row.original.path">
+                  {{ row.original.path }}
+                </code>
+              </div>
+            </template>
+
+            <!-- Message -->
+            <template #message-cell="{ row }">
+              <p
+                class="max-w-md truncate text-sm text-gray-900 dark:text-white"
+                :title="row.original.message"
+              >
+                {{ row.original.message }}
+              </p>
+            </template>
+
+            <!-- Utilisateur -->
+            <template #user-cell="{ row }">
+              <span v-if="row.original.user" class="text-sm">{{ row.original.user.pseudo }}</span>
+              <span v-else class="text-sm italic text-gray-400">
+                {{ $t('admin.error_logs.anonymous') }}
+              </span>
+            </template>
+
+            <!-- Page d'origine (referer) -->
+            <template #referer-cell="{ row }">
+              <a
+                v-if="row.original.referer"
+                :href="row.original.referer"
+                target="_blank"
+                rel="noopener"
+                class="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                :title="row.original.referer"
+                @click.stop
+              >
+                {{ truncateUrl(row.original.referer, 40) }}
+              </a>
+              <span v-else class="text-gray-400">—</span>
+            </template>
+
+            <!-- IP -->
+            <template #ip-cell="{ row }">
+              <span
+                v-if="row.original.ip"
+                class="font-mono text-xs text-gray-600 dark:text-gray-300"
+              >
+                {{ row.original.ip }}
+              </span>
+              <span v-else class="text-gray-400">—</span>
+            </template>
+
+            <!-- Actions -->
+            <template #actions-cell="{ row }">
+              <UDropdownMenu :items="rowActions(row.original)" :content="{ align: 'end' }">
+                <UButton
+                  icon="i-heroicons-ellipsis-vertical"
+                  color="neutral"
+                  variant="ghost"
+                  square
+                  @click.stop
+                />
+              </UDropdownMenu>
+            </template>
+          </UTable>
+        </UContextMenu>
 
         <!-- Pagination -->
         <div
@@ -850,6 +855,12 @@ const onRowSelect = (_e: Event, row: any) => {
 }
 
 // Menu d'actions par ligne
+// Menu contextuel (clic droit) : mêmes actions que le menu déroulant de la ligne.
+const contextMenuItems = ref<any[]>([])
+const onRowContextmenu = (_e: Event, row: { original: any }) => {
+  contextMenuItems.value = rowActions(row.original)
+}
+
 const rowActions = (log: any) => [
   [
     {
