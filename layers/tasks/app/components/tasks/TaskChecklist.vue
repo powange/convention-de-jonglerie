@@ -51,7 +51,7 @@
             size="xs"
             color="neutral"
             variant="ghost"
-            class="opacity-0 group-hover:opacity-100 transition-opacity"
+            class="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
             @click="startEdit(item)"
           />
           <UButton
@@ -60,7 +60,7 @@
             size="xs"
             color="error"
             variant="ghost"
-            class="opacity-0 group-hover:opacity-100 transition-opacity"
+            class="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
             :loading="deletingIds.has(item.id)"
             @click="deleteItem(item)"
           />

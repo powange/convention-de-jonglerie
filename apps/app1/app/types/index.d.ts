@@ -1,3 +1,5 @@
+import type { OrganizerEditionRights } from '~~/shared/utils/organizer-rights'
+
 export interface User {
   id: number
   email: string
@@ -137,19 +139,8 @@ export interface ConventionOrganizerWithRights {
   id: number
   user: PublicUser
   rights?: Record<string, boolean> // ex: editConvention, deleteConvention...
-  perEditionRights?: {
-    editionId: number
-    canEdit?: boolean
-    canDelete?: boolean
-    canManageVolunteers?: boolean
-    canManageArtists?: boolean
-    canManageMeals?: boolean
-    canManageTicketing?: boolean
-    canManageTasks?: boolean
-    canManageStock?: boolean
-    canManageWorkshops?: boolean
-    canManageFAQ?: boolean
-  }[]
+  // Dérivé de EDITION_RIGHTS (shared/utils/organizer-rights).
+  perEditionRights?: ({ editionId: number } & OrganizerEditionRights)[]
   title?: string | null // résumé (ex: Administrateur, Éditeur...)
 }
 
@@ -157,19 +148,8 @@ export interface EditionOrganizer {
   id: number
   user: PublicUser
   rights?: Record<string, boolean>
-  perEditionRights?: {
-    editionId: number
-    canEdit?: boolean
-    canDelete?: boolean
-    canManageVolunteers?: boolean
-    canManageArtists?: boolean
-    canManageMeals?: boolean
-    canManageTicketing?: boolean
-    canManageTasks?: boolean
-    canManageStock?: boolean
-    canManageWorkshops?: boolean
-    canManageFAQ?: boolean
-  }[]
+  // Dérivé de EDITION_RIGHTS (shared/utils/organizer-rights).
+  perEditionRights?: ({ editionId: number } & OrganizerEditionRights)[]
   title?: string | null
 }
 

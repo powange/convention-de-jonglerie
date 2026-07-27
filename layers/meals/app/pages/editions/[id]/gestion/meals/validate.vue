@@ -133,7 +133,7 @@
                       mealStats.breakdown.volunteers.total >
                       mealStats.breakdown.volunteers.validated
                     "
-                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                   >
                     {{
                       mealStats.breakdown.volunteers.total -
@@ -168,7 +168,7 @@
                   </div>
                   <div
                     v-if="mealStats.breakdown.artists.total > mealStats.breakdown.artists.validated"
-                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                   >
                     {{ mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated }}
                     restant{{
@@ -202,7 +202,7 @@
                       mealStats.breakdown.participants.total >
                       mealStats.breakdown.participants.validated
                     "
-                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                   >
                     {{
                       mealStats.breakdown.participants.total -

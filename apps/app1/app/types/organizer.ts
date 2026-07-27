@@ -1,38 +1,22 @@
 import type { User } from './index'
+import type {
+  OrganizerConventionRights,
+  OrganizerEditionRights,
+} from '~~/shared/utils/organizer-rights'
 
 /**
- * Droits globaux d'un organisateur sur une convention
+ * Droits globaux d'un organisateur sur une convention.
+ * Dérivé de CONVENTION_RIGHTS : ajouter un droit là-bas suffit.
  */
-export interface OrganizerRights {
-  editConvention?: boolean
-  deleteConvention?: boolean
-  manageOrganizers?: boolean
-  manageVolunteers?: boolean
-  manageArtists?: boolean
-  manageMeals?: boolean
-  manageTicketing?: boolean
-  manageWorkshops?: boolean
-  manageFAQ?: boolean
-  addEdition?: boolean
-  editAllEditions?: boolean
-  deleteAllEditions?: boolean
-}
+export type OrganizerRights = OrganizerConventionRights
 
 /**
- * Droits spécifiques d'un organisateur sur une édition
+ * Droits spécifiques d'un organisateur sur une édition.
+ * Dérivé de EDITION_RIGHTS.
  */
 export interface OrganizerPerEditionRights {
   editionId: number
-  rights: {
-    canEdit?: boolean
-    canDelete?: boolean
-    canManageVolunteers?: boolean
-    canManageArtists?: boolean
-    canManageMeals?: boolean
-    canManageTicketing?: boolean
-    canManageWorkshops?: boolean
-    canManageFAQ?: boolean
-  }
+  rights: OrganizerEditionRights
 }
 
 /**

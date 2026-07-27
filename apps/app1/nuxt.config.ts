@@ -608,6 +608,18 @@ export default defineNuxtConfig({
     },
   },
 
+  features: {
+    // Le CSS n'est plus inliné dans le HTML rendu côté serveur mais servi en feuille externe,
+    // donc mise en cache par le navigateur. Mesuré sur la page d'accueil en production :
+    // 39 ko de CSS inlinés, soit 23 % du HTML, renvoyés à chaque navigation.
+    // Coût : une requête bloquante de plus au tout premier affichage.
+    // Gain : ces 39 ko en moins sur chaque page ensuite, et 15 à 23 % de temps de build
+    // (nuxt:ssr-styles était le deuxième poste de temps, derrière la protection des imports).
+    // Les pages de gestion et d'admin étant déjà en `ssr: false`, elles payaient ce coût de
+    // build sans jamais profiter de l'inlining.
+    inlineStyles: false,
+  },
+
   experimental: {
     // Améliorer les performances avec la lazy hydration
     lazyHydration: true,

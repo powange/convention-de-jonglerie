@@ -362,6 +362,8 @@
 </template>
 
 <script setup lang="ts">
+import { CONVENTION_RIGHTS, rightLabelKey } from '~~/shared/utils/organizer-rights'
+
 interface EditionLite {
   id: number
   name: string | null
@@ -405,22 +407,9 @@ const props = withDefaults(
     size?: 'xs' | 'sm'
   }>(),
   {
-    permissionList: () => [
-      { key: 'editConvention', label: 'permissions.editConvention' },
-      { key: 'deleteConvention', label: 'permissions.deleteConvention' },
-      { key: 'manageOrganizers', label: 'permissions.manageOrganizers' },
-      { key: 'addEdition', label: 'permissions.addEdition' },
-      { key: 'editAllEditions', label: 'permissions.editAllEditions' },
-      { key: 'deleteAllEditions', label: 'permissions.deleteAllEditions' },
-      { key: 'manageVolunteers', label: 'permissions.manageVolunteers' },
-      { key: 'manageArtists', label: 'permissions.manageArtists' },
-      { key: 'manageMeals', label: 'permissions.manageMeals' },
-      { key: 'manageTicketing', label: 'permissions.manageTicketing' },
-      { key: 'manageTasks', label: 'permissions.manageTasks' },
-      { key: 'manageStock', label: 'permissions.manageStock' },
-      { key: 'manageWorkshops', label: 'permissions.manageWorkshops' },
-      { key: 'manageFAQ', label: 'permissions.manageFAQ' },
-    ],
+    // Dérivé de CONVENTION_RIGHTS : un droit ajouté à la source unique apparaît ici sans
+    // intervention, plutôt que de rester silencieusement non attribuable.
+    permissionList: () => CONVENTION_RIGHTS.map((key) => ({ key, label: rightLabelKey(key) })),
     hideTitle: false,
     size: 'xs',
   }
