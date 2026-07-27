@@ -148,7 +148,9 @@ const handleToggleChange = async (newValue: boolean) => {
 
   try {
     if (newValue) {
-      console.log('[PushToggle] Activation des notifications FCM...')
+      if (import.meta.dev) {
+        console.log('[PushToggle] Activation des notifications FCM...')
+      }
 
       const token = await requestPermissionAndGetToken()
 
@@ -172,7 +174,9 @@ const handleToggleChange = async (newValue: boolean) => {
         }
       }
     } else {
-      console.log('[PushToggle] Désactivation des notifications FCM...')
+      if (import.meta.dev) {
+        console.log('[PushToggle] Désactivation des notifications FCM...')
+      }
 
       await unsubscribeFcm()
       isSubscribed.value = false

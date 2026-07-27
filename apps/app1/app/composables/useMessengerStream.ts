@@ -62,13 +62,17 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
       if (authStore.isAdminModeActive) {
         url += '?adminMode=true'
       }
-      console.log('[Messenger SSE] Connexion à:', url)
+      if (import.meta.dev) {
+        console.log('[Messenger SSE] Connexion à:', url)
+      }
 
       eventSource = new EventSource(url)
 
       // Gestion de l'ouverture
       eventSource.onopen = () => {
-        console.log('[Messenger SSE] ✅ Connexion établie')
+        if (import.meta.dev) {
+          console.log('[Messenger SSE] ✅ Connexion établie')
+        }
         streamStats.value.isConnected = true
         streamStats.value.isConnecting = false
         reconnectAttempts = 0
@@ -152,7 +156,9 @@ export const useMessengerStream = (conversationId: Ref<string | null>) => {
    */
   const disconnect = () => {
     if (eventSource) {
-      console.log('[Messenger SSE] Déconnexion du stream')
+      if (import.meta.dev) {
+        console.log('[Messenger SSE] Déconnexion du stream')
+      }
       eventSource.close()
       eventSource = null
     }

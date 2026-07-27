@@ -333,8 +333,6 @@ const upload = async () => {
   error.value = null
 
   try {
-    console.log('Uploading files:', serverFiles.value)
-
     // Construire l'URL de l'API selon l'endpoint
     let apiUrl: string
     switch (props.endpoint.type) {

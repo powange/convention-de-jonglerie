@@ -110,7 +110,6 @@ onMounted(() => {
 
   // Écouter l'événement d'installation réussie
   window.addEventListener('appinstalled', () => {
-    console.log('PWA installée avec succès')
     showBanner.value = false
   })
 })

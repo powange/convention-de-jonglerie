@@ -84,10 +84,7 @@ const closeNotificationModal = () => {
   volunteerApplications.value = []
 }
 
-const onNotificationSent = (data: any) => {
-  // Notification envoyée avec succès
-  console.log('Notification envoyée:', data)
-
+const onNotificationSent = () => {
   // Émettre l'événement pour informer le parent
   emit('notificationSent')
 }

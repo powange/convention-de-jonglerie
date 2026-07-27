@@ -414,7 +414,9 @@ const startPolling = () => {
 
   // Polling uniquement comme fallback quand SSE n'est pas disponible
   const interval = 5000 // Toujours 5 secondes pour le fallback
-  console.log('[NotificationCenter] Démarrage polling fallback (SSE non disponible)')
+  if (import.meta.dev) {
+    console.log('[NotificationCenter] Démarrage polling fallback (SSE non disponible)')
+  }
 
   pollingInterval = setInterval(async () => {
     // Double vérification : arrêter si SSE se reconnecte
@@ -494,11 +496,15 @@ const handlePushNotificationsDisabled = () => {}
 // Effet pour synchroniser l'état realTimeEnabled avec la connexion SSE
 watch(isConnected, (connected) => {
   if (connected) {
-    console.log('[NotificationCenter] SSE connecté, activation du mode temps réel')
+    if (import.meta.dev) {
+      console.log('[NotificationCenter] SSE connecté, activation du mode temps réel')
+    }
     notificationsStore.setRealTimeEnabled(true)
     stopPolling()
   } else if (authStore.user) {
-    console.log('[NotificationCenter] SSE déconnecté, désactivation du mode temps réel')
+    if (import.meta.dev) {
+      console.log('[NotificationCenter] SSE déconnecté, désactivation du mode temps réel')
+    }
     notificationsStore.setRealTimeEnabled(false)
   }
 })
