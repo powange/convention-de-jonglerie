@@ -4,6 +4,9 @@ import type { Edition, ConventionOrganizer, HttpError } from '~/types'
 
 import { useAuthStore } from '../stores/auth' // Use relative path
 
+import type { EditionModuleRight, EditionRight } from '~~/shared/utils/organizer-rights'
+
+
 // Interface pour les filtres d'éditions
 interface EditionFilters {
   page?: number
@@ -447,199 +450,64 @@ export const useEditionStore = defineStore('editions', {
       })
     },
 
-    // Vérifier si l'utilisateur peut gérer les bénévoles d'une édition
+    // Les huit droits « métier » d'une édition partagent exactement la même règle. Elle vivait
+    // dupliquée en huit fonctions de ~38 lignes, ce qui rendait toute correction faillible et
+    // laissait chaque nouveau module réécrire la même chose. Elle est ici écrite une fois.
+    //
+    // Point important : le droit d'ÉDITER l'édition (editConvention / editAllEditions / canEdit)
+    // n'ouvre volontairement AUCUN module — il faut le droit dédié. Cohérent avec les helpers
+    // serveur (requireVolunteerManagementAccess, canManageArtists…).
+    hasEditionModuleRight(edition: Edition, userId: number, right: EditionModuleRight): boolean {
+      const authStore = useAuthStore()
+
+      // Un admin global en mode admin peut tout gérer
+      if (authStore.isAdminModeActive) return true
+      // Le créateur de l'édition aussi
+      if (edition.creatorId && edition.creatorId === userId) return true
+      if (!edition.convention || !edition.convention.organizers) return false
+      // L'auteur de la convention également, sur toutes ses éditions
+      if (edition.convention.authorId && edition.convention.authorId === userId) return true
+
+      return edition.convention.organizers.some((collab) => {
+        if (collab.user.id !== userId) return false
+        // Droit accordé au niveau convention (vaut pour toutes les éditions)
+        if (collab.rights?.[right]) return true
+        // ou spécifiquement pour cette édition
+        const per = collab.perEditionRights?.find((r) => r.editionId === edition.id)
+        return !!per?.[`can${right.charAt(0).toUpperCase()}${right.slice(1)}` as EditionRight]
+      })
+    },
+
     canManageVolunteers(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-
-      // Les admins globaux en mode admin peuvent tout gérer
-      if (authStore.isAdminModeActive) {
-        return true
-      }
-
-      // Le créateur de l'édition peut gérer les bénévoles
-      if (edition.creatorId && edition.creatorId === userId) {
-        return true
-      }
-
-      // Vérifier si la convention a des organisateurs
-      if (!edition.convention || !edition.convention.organizers) {
-        return false
-      }
-
-      // L'auteur de la convention peut gérer tous les bénévoles
-      if (edition.convention.authorId && edition.convention.authorId === userId) {
-        return true
-      }
-
-      // Organisateur avec le droit de gérer les bénévoles (convention OU édition).
-      // Le droit d'ÉDITER (editConvention/editAllEditions/canEdit) NE donne PAS
-      // accès aux bénévoles — cohérent avec le helper serveur
-      // requireVolunteerManagementAccess / canManageEditionVolunteers.
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        // Droit de gérer les bénévoles au niveau convention (toutes les éditions)
-        if (collab.rights?.manageVolunteers) return true
-        // Droit de gérer les bénévoles spécifique à cette édition
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageVolunteers) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageVolunteers')
     },
 
-    // Vérifier si l'utilisateur peut gérer les artistes d'une édition
     canManageArtists(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-
-      // Les admins globaux en mode admin peuvent tout gérer
-      if (authStore.isAdminModeActive) {
-        return true
-      }
-
-      // Le créateur de l'édition peut gérer les artistes
-      if (edition.creatorId && edition.creatorId === userId) {
-        return true
-      }
-
-      // Vérifier si la convention a des organisateurs
-      if (!edition.convention || !edition.convention.organizers) {
-        return false
-      }
-
-      // L'auteur de la convention peut gérer tous les artistes
-      if (edition.convention.authorId && edition.convention.authorId === userId) {
-        return true
-      }
-
-      // Organisateur avec le droit de gérer les artistes (convention OU édition).
-      // Le droit d'ÉDITER (editConvention/editAllEditions/canEdit) NE donne PAS
-      // accès aux artistes — cohérent avec le helper serveur canManageArtists.
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        // Droit de gérer les artistes au niveau convention (toutes les éditions)
-        if (collab.rights?.manageArtists) return true
-        // Droit de gérer les artistes spécifique à cette édition
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageArtists) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageArtists')
     },
 
-    // Vérifier si l'utilisateur peut gérer les repas d'une édition (droit dédié,
-    // aligné sur le helper serveur canManageMeals ; éditer l'édition ne suffit pas).
     canManageMeals(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-      if (authStore.isAdminModeActive) return true
-      if (edition.creatorId && edition.creatorId === userId) return true
-      if (!edition.convention || !edition.convention.organizers) return false
-      if (edition.convention.authorId && edition.convention.authorId === userId) return true
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        if (collab.rights?.manageMeals) return true
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageMeals) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageMeals')
     },
 
-    // Vérifier si l'utilisateur peut gérer la billetterie d'une édition (droit dédié,
-    // aligné sur le helper serveur canManageTicketing ; éditer l'édition ne suffit pas).
     canManageTicketing(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-      if (authStore.isAdminModeActive) return true
-      if (edition.creatorId && edition.creatorId === userId) return true
-      if (!edition.convention || !edition.convention.organizers) return false
-      if (edition.convention.authorId && edition.convention.authorId === userId) return true
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        if (collab.rights?.manageTicketing) return true
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageTicketing) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageTicketing')
     },
 
-    // Vérifier si l'utilisateur peut gérer les ateliers (workshops) d'une édition (droit dédié,
-    // aligné sur le helper serveur canManageWorkshops ; éditer l'édition ne suffit pas).
     canManageWorkshops(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-      if (authStore.isAdminModeActive) return true
-      if (edition.creatorId && edition.creatorId === userId) return true
-      if (!edition.convention || !edition.convention.organizers) return false
-      if (edition.convention.authorId && edition.convention.authorId === userId) return true
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        if (collab.rights?.manageWorkshops) return true
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageWorkshops) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageWorkshops')
     },
 
-    // Vérifier si l'utilisateur peut gérer la FAQ d'une édition (droit dédié,
-    // aligné sur le helper serveur canManageFAQ ; éditer l'édition ne suffit pas).
     canManageFAQ(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-      if (authStore.isAdminModeActive) return true
-      if (edition.creatorId && edition.creatorId === userId) return true
-      if (!edition.convention || !edition.convention.organizers) return false
-      if (edition.convention.authorId && edition.convention.authorId === userId) return true
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        if (collab.rights?.manageFAQ) return true
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageFAQ) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageFAQ')
     },
 
-    // Vérifier si l'utilisateur peut gérer les tâches d'une édition (droit dédié,
-    // aligné sur le helper serveur canManageTasks ; éditer l'édition ne suffit pas).
     canManageTasks(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-      if (authStore.isAdminModeActive) return true
-      if (edition.creatorId && edition.creatorId === userId) return true
-      if (!edition.convention || !edition.convention.organizers) return false
-      if (edition.convention.authorId && edition.convention.authorId === userId) return true
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        if (collab.rights?.manageTasks) return true
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageTasks) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageTasks')
     },
 
-    // Vérifier si l'utilisateur peut gérer le stock d'une édition (droit dédié,
-    // aligné sur le helper serveur canManageStock ; éditer l'édition ne suffit pas).
     canManageStock(edition: Edition, userId: number): boolean {
-      const authStore = useAuthStore()
-      if (authStore.isAdminModeActive) return true
-      if (edition.creatorId && edition.creatorId === userId) return true
-      if (!edition.convention || !edition.convention.organizers) return false
-      if (edition.convention.authorId && edition.convention.authorId === userId) return true
-      return edition.convention.organizers.some((collab) => {
-        if (collab.user.id !== userId) return false
-        if (collab.rights?.manageStock) return true
-        if (collab.perEditionRights) {
-          const per = collab.perEditionRights.find((r) => r.editionId === edition.id)
-          if (per?.canManageStock) return true
-        }
-        return false
-      })
+      return this.hasEditionModuleRight(edition, userId, 'manageStock')
     },
 
     // Vérifier si l'utilisateur peut gérer les organisateurs d'une convention
