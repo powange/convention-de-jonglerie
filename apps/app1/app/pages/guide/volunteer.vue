@@ -158,7 +158,78 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Guide Bénévole',
+  subtitle: 'Participez en tant que bénévole et gérez vos créneaux.',
+  sections: {
+    apply: {
+      title: 'Postuler comme bénévole',
+      intro:
+        "Rejoignez l'équipe de bénévoles d'une convention pour vivre l'événement de l'intérieur.",
+      find: {
+        title: 'Trouver un appel',
+        content:
+          "Sur la page d'une édition, si un appel à bénévoles est ouvert, un bouton « Devenir bénévole » est visible. Certains organisateurs partagent également un lien direct vers le formulaire de candidature.",
+      },
+      form: {
+        title: 'Formulaire de candidature',
+        intro: 'Le formulaire de candidature vous demande plusieurs informations :',
+        info: 'Informations personnelles (nom, prénom, téléphone).',
+        availability: "Vos disponibilités pendant l'événement.",
+        teamPrefs: "Vos préférences d'équipes et de créneaux horaires.",
+        emergency: "Contact d'urgence.",
+        dietary: 'Allergies alimentaires et régime spécial (pour les repas bénévoles).',
+      },
+    },
+    tracking: {
+      title: 'Suivi de candidature',
+      intro: 'Suivez le statut de vos candidatures bénévoles.',
+      page: 'Accédez à la page « Mes candidatures bénévoles » depuis le menu de votre profil.',
+      statuses: 'Consultez le statut : en attente, accepté ou refusé.',
+      modify: "Vous pouvez modifier ou retirer votre candidature tant qu'elle est en attente.",
+      notifications:
+        'Vous recevez une notification lorsque votre candidature est acceptée ou refusée.',
+    },
+    planning: {
+      title: 'Planning et créneaux',
+      intro: 'Une fois accepté, consultez votre planning de bénévole.',
+      schedule: {
+        title: 'Voir ses créneaux',
+        content:
+          "Votre planning affiche tous vos créneaux assignés dans un calendrier interactif. Vous pouvez voir l'équipe, l'horaire et le lieu de chaque créneau.",
+      },
+      export: {
+        title: 'Exporter le planning',
+        content:
+          "Exportez votre planning personnel au format iCal (pour l'ajouter à votre agenda) ou en PDF (pour l'imprimer).",
+      },
+    },
+    communication: {
+      title: 'Communication',
+      intro: 'Restez informé des dernières actualités et consignes des organisateurs.',
+      orgNotifications:
+        'Recevez les notifications envoyées par les organisateurs (rappels, changements de planning, informations importantes).',
+      confirm:
+        'Confirmez la lecture des messages importants pour que les organisateurs sachent que vous êtes informé.',
+      messaging:
+        'Utilisez la messagerie intégrée pour communiquer avec les organisateurs si vous avez des questions.',
+    },
+    during: {
+      title: "Pendant l'événement",
+      intro: 'Quelques fonctionnalités utiles pendant la convention.',
+      qrcode: 'Votre QR code bénévole peut être scanné pour valider votre présence et vos accès.',
+      meals: 'Consultez les repas prévus pour les bénévoles selon vos créneaux.',
+      team: "Retrouvez les informations de votre équipe et de vos responsables d'équipe.",
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({
   layout: 'guide',
@@ -176,65 +247,3 @@ useHead({
   ],
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Guide Bénévole",
-    "subtitle": "Participez en tant que bénévole et gérez vos créneaux.",
-    "sections": {
-      "apply": {
-        "title": "Postuler comme bénévole",
-        "intro": "Rejoignez l'équipe de bénévoles d'une convention pour vivre l'événement de l'intérieur.",
-        "find": {
-          "title": "Trouver un appel",
-          "content": "Sur la page d'une édition, si un appel à bénévoles est ouvert, un bouton « Devenir bénévole » est visible. Certains organisateurs partagent également un lien direct vers le formulaire de candidature."
-        },
-        "form": {
-          "title": "Formulaire de candidature",
-          "intro": "Le formulaire de candidature vous demande plusieurs informations :",
-          "info": "Informations personnelles (nom, prénom, téléphone).",
-          "availability": "Vos disponibilités pendant l'événement.",
-          "teamPrefs": "Vos préférences d'équipes et de créneaux horaires.",
-          "emergency": "Contact d'urgence.",
-          "dietary": "Allergies alimentaires et régime spécial (pour les repas bénévoles)."
-        }
-      },
-      "tracking": {
-        "title": "Suivi de candidature",
-        "intro": "Suivez le statut de vos candidatures bénévoles.",
-        "page": "Accédez à la page « Mes candidatures bénévoles » depuis le menu de votre profil.",
-        "statuses": "Consultez le statut : en attente, accepté ou refusé.",
-        "modify": "Vous pouvez modifier ou retirer votre candidature tant qu'elle est en attente.",
-        "notifications": "Vous recevez une notification lorsque votre candidature est acceptée ou refusée."
-      },
-      "planning": {
-        "title": "Planning et créneaux",
-        "intro": "Une fois accepté, consultez votre planning de bénévole.",
-        "schedule": {
-          "title": "Voir ses créneaux",
-          "content": "Votre planning affiche tous vos créneaux assignés dans un calendrier interactif. Vous pouvez voir l'équipe, l'horaire et le lieu de chaque créneau."
-        },
-        "export": {
-          "title": "Exporter le planning",
-          "content": "Exportez votre planning personnel au format iCal (pour l'ajouter à votre agenda) ou en PDF (pour l'imprimer)."
-        }
-      },
-      "communication": {
-        "title": "Communication",
-        "intro": "Restez informé des dernières actualités et consignes des organisateurs.",
-        "orgNotifications": "Recevez les notifications envoyées par les organisateurs (rappels, changements de planning, informations importantes).",
-        "confirm": "Confirmez la lecture des messages importants pour que les organisateurs sachent que vous êtes informé.",
-        "messaging": "Utilisez la messagerie intégrée pour communiquer avec les organisateurs si vous avez des questions."
-      },
-      "during": {
-        "title": "Pendant l'événement",
-        "intro": "Quelques fonctionnalités utiles pendant la convention.",
-        "qrcode": "Votre QR code bénévole peut être scanné pour valider votre présence et vos accès.",
-        "meals": "Consultez les repas prévus pour les bénévoles selon vos créneaux.",
-        "team": "Retrouvez les informations de votre équipe et de vos responsables d'équipe."
-      }
-    }
-  }
-}
-</i18n>

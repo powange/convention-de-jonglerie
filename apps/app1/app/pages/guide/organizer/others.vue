@@ -7,6 +7,20 @@
 
     <div class="space-y-6">
       <GuideSection
+        icon="i-heroicons-question-mark-circle"
+        :title="t('sections.faq.title')"
+        color="green"
+      >
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.faq.intro') }}</p>
+        <ul class="space-y-2">
+          <li v-for="item in faqItems" :key="item" class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ item }}</span>
+          </li>
+        </ul>
+      </GuideSection>
+
+      <GuideSection
         icon="i-heroicons-academic-cap"
         :title="t('sections.workshops.title')"
         color="indigo"
@@ -120,7 +134,62 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Autres fonctionnalités',
+  subtitle: 'FAQ, workshops, objets trouvés, publications et covoiturage.',
+  sections: {
+    faq: {
+      title: 'FAQ',
+      intro:
+        "Répondez d'avance aux questions qui reviennent chaque année : accès, horaires, camping, animaux, moyens de paiement…",
+      create:
+        "Rédigez chaque question et sa réponse avec l'éditeur Markdown : titres, listes, gras, liens et emojis sont pris en charge.",
+      organize: 'Réordonnez les entrées par glisser-déposer pour placer les plus utiles en tête.',
+      visibility:
+        "L'interrupteur « Visible publiquement » décide de l'affichage : tant qu'il est désactivé, l'entrée reste réservée à l'équipe d'organisation et n'apparaît pas sur la page publique.",
+    },
+    workshops: {
+      title: 'Workshops',
+      intro: 'Organisez des ateliers et workshops pendant votre édition.',
+      create: 'Créez un workshop avec un titre, une description, une date et un lieu.',
+      info: 'Précisez le niveau requis, le matériel nécessaire et le nombre de places disponibles.',
+      instructor: 'Associez un animateur (utilisateur de la plateforme ou nom libre).',
+      registration: "Les participants peuvent s'inscrire directement depuis la page de l'édition.",
+    },
+    lostFound: {
+      title: 'Objets trouvés',
+      intro: "Activez le système d'objets trouvés pendant votre édition.",
+      activate: "Le module est disponible uniquement pendant la durée de l'édition.",
+      report:
+        'Les participants et bénévoles peuvent signaler un objet trouvé avec photo et description.',
+      list: 'Consultez la liste de tous les objets signalés depuis le tableau de bord.',
+      recover: 'Marquez un objet comme récupéré lorsque son propriétaire le réclame.',
+    },
+    publications: {
+      title: 'Publications',
+      intro: "Publiez des actualités sur le fil d'activité de votre édition.",
+      create:
+        'Créez des publications pour informer les participants des nouveautés, changements ou rappels.',
+      content: 'Ajoutez du texte, des images et des liens à vos publications.',
+      visibility: "Les publications sont visibles par tous les visiteurs de la page de l'édition.",
+    },
+    carpooling: {
+      title: 'Covoiturage',
+      intro: "Facilitez l'accès à votre événement grâce au covoiturage.",
+      feature:
+        'Les participants peuvent proposer ou rechercher des trajets de covoiturage vers votre édition.',
+      moderation:
+        "En tant qu'organisateur, vous pouvez modérer les annonces de covoiturage si nécessaire.",
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Autres fonctionnalités' })
 
@@ -129,48 +198,14 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Guide organisateur : workshops, objets trouvés, publications et covoiturage.',
+      content: 'Guide organisateur : FAQ, workshops, objets trouvés, publications et covoiturage.',
     },
   ],
 })
-</script>
 
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Autres fonctionnalités",
-    "subtitle": "Workshops, objets trouvés, publications et covoiturage.",
-    "sections": {
-      "workshops": {
-        "title": "Workshops",
-        "intro": "Organisez des ateliers et workshops pendant votre édition.",
-        "create": "Créez un workshop avec un titre, une description, une date et un lieu.",
-        "info": "Précisez le niveau requis, le matériel nécessaire et le nombre de places disponibles.",
-        "instructor": "Associez un animateur (utilisateur de la plateforme ou nom libre).",
-        "registration": "Les participants peuvent s'inscrire directement depuis la page de l'édition."
-      },
-      "lostFound": {
-        "title": "Objets trouvés",
-        "intro": "Activez le système d'objets trouvés pendant votre édition.",
-        "activate": "Le module est disponible uniquement pendant la durée de l'édition.",
-        "report": "Les participants et bénévoles peuvent signaler un objet trouvé avec photo et description.",
-        "list": "Consultez la liste de tous les objets signalés depuis le tableau de bord.",
-        "recover": "Marquez un objet comme récupéré lorsque son propriétaire le réclame."
-      },
-      "publications": {
-        "title": "Publications",
-        "intro": "Publiez des actualités sur le fil d'activité de votre édition.",
-        "create": "Créez des publications pour informer les participants des nouveautés, changements ou rappels.",
-        "content": "Ajoutez du texte, des images et des liens à vos publications.",
-        "visibility": "Les publications sont visibles par tous les visiteurs de la page de l'édition."
-      },
-      "carpooling": {
-        "title": "Covoiturage",
-        "intro": "Facilitez l'accès à votre événement grâce au covoiturage.",
-        "feature": "Les participants peuvent proposer ou rechercher des trajets de covoiturage vers votre édition.",
-        "moderation": "En tant qu'organisateur, vous pouvez modérer les annonces de covoiturage si nécessaire."
-      }
-    }
-  }
-}
-</i18n>
+const faqItems = computed(() => [
+  t('sections.faq.create'),
+  t('sections.faq.organize'),
+  t('sections.faq.visibility'),
+])
+</script>

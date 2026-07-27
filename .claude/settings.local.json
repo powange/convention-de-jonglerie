@@ -24,7 +24,6 @@
       "Bash(node -e:*)",
       "Bash(openssl rand:*)",
       "Bash(curl:*)",
-
       "Bash(npm install:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run lint:fix:*)",
@@ -46,12 +45,10 @@
       "Bash(npx nuxt prepare)",
       "Bash(npx prisma:*)",
       "Bash(npx web-push:*)",
-
       "Bash(node scripts/translation/list-todo-keys.js:*)",
       "Bash(node scripts/translation/apply-translations.js:*)",
       "Bash(node scripts/translation/mark-todo.js:*)",
       "Bash(node scripts/translation/generate-todo-files.js:*)",
-
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
@@ -63,19 +60,15 @@
       "Bash(git mv:*)",
       "Bash(git config:*)",
       "Bash(git check-ignore:*)",
-
       "Bash(docker exec:*)",
       "Bash(docker ps:*)",
       "Bash(docker logs:*)",
       "Bash(docker images:*)",
       "Bash(docker restart:*)",
-
       "Bash(pkill -f playwright)",
       "Bash(pkill -f chrome-headless-shell)",
-
       "Edit(.claude/error-logs-monitor.json)",
       "Write(.claude/error-logs-monitor.json)",
-
       "Bash(bash scripts/check-error-logs.sh:*)",
       "Bash(scripts/check-error-logs.sh:*)",
       "Bash(./scripts/check-error-logs.sh:*)",
@@ -87,7 +80,6 @@
       "Bash(./scripts/update-error-logs-state.sh:*)",
       "Skill(check-error-logs)",
       "Skill(check-error-logs:*)",
-
       "SlashCommand(/lint-fix)",
       "SlashCommand(/run-tests)",
       "SlashCommand(/commit-push)",
@@ -102,14 +94,12 @@
       "Skill(translate-todos:*)",
       "Skill(analyze-codebase)",
       "Skill(analyze-codebase:*)",
-
       "mcp__nuxt-ui__get-component",
       "mcp__nuxt-ui__get-component-metadata",
       "mcp__nuxt-ui__list-components",
       "mcp__nuxt-ui__search-components-by-category",
       "mcp__jcodemunch__get_repo_outline",
       "mcp__jcodemunch__find_references",
-
       "WebSearch",
       "WebFetch(domain:ui.nuxt.com)",
       "WebFetch(domain:nuxt.com)",
@@ -120,7 +110,8 @@
       "WebFetch(domain:h3.unjs.io)",
       "WebFetch(domain:v1.h3.dev)",
       "WebFetch(domain:lucide.dev)",
-      "WebFetch(domain:unpkg.com)"
+      "WebFetch(domain:unpkg.com)",
+      "Bash(cd apps/app1/app/pages/guide && wc -l *.vue organizer/*.vue | sort -n; echo \"=== layout + sidebar ===\"; wc -l ../../layouts/guide.vue ../../components/guide/*.vue)"
     ],
     "deny": [],
     "ask": [],

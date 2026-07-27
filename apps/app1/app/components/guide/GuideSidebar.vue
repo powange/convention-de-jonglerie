@@ -24,7 +24,33 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const route = useRoute()
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: "Guide d'utilisation",
+  nav: {
+    user: 'Utilisateur',
+    artist: 'Artiste',
+    organizer: 'Organisateur',
+    orgOverview: "Vue d'ensemble",
+    conventions: 'Conventions & Éditions',
+    organizers: 'Co-organisateurs',
+    tasks: 'Gestion des tâches',
+    stock: 'Gestion du matériel',
+    volunteers: 'Bénévoles',
+    artists: 'Artistes & Spectacles',
+    meals: 'Repas',
+    ticketing: 'Billetterie',
+    map: 'Carte interactive',
+    other: 'Autres',
+    volunteer: 'Bénévole',
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 const emit = defineEmits<{
   navigate: []
@@ -117,28 +143,3 @@ const items = computed<NavigationMenuItem[][]>(() => [
   ],
 ])
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Guide d'utilisation",
-    "nav": {
-      "user": "Utilisateur",
-      "artist": "Artiste",
-      "organizer": "Organisateur",
-      "orgOverview": "Vue d'ensemble",
-      "conventions": "Conventions & Éditions",
-      "organizers": "Co-organisateurs",
-      "tasks": "Gestion des tâches",
-      "stock": "Gestion du matériel",
-      "volunteers": "Bénévoles",
-      "artists": "Artistes & Spectacles",
-      "meals": "Repas",
-      "ticketing": "Billetterie",
-      "map": "Carte interactive",
-      "other": "Autres",
-      "volunteer": "Bénévole"
-    }
-  }
-}
-</i18n>

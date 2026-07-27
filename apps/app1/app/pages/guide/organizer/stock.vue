@@ -134,7 +134,62 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Gestion du matériel',
+  subtitle: 'Inventoriez le matériel de votre édition et gérez ses réservations dans le temps.',
+  sections: {
+    groups: {
+      title: 'Groupes de matériel',
+      intro: 'Le matériel est organisé en groupes pour structurer votre inventaire.',
+      create: 'Créez autant de groupes que nécessaire, avec un nom et une description optionnelle.',
+      examples:
+        'Organisez par type de matériel (son, lumière, feu, structures, mobilier…) ou par lieu de stockage.',
+      reorder:
+        "Réordonnez les groupes par glisser-déposer pour les présenter dans l'ordre qui vous convient.",
+    },
+    items: {
+      title: 'Articles de matériel',
+      intro: 'Ajoutez les articles dans chaque groupe pour constituer votre inventaire.',
+      fields: 'Chaque article possède un nom, une description et des notes optionnelles.',
+      quantity: "Indiquez la quantité d'exemplaires identiques disponibles pour cet article.",
+      location:
+        "Définissez l'emplacement de rangement : texte libre, zone ou marqueur de la carte interactive.",
+    },
+    externalLoan: {
+      title: 'Prêt externe',
+      intro: 'Suivez le matériel prêté par une personne extérieure à la convention.',
+      owner: 'Marquez un article comme prêt externe et renseignez le contact du propriétaire.',
+      returnDue:
+        "Indiquez la date prévue de retour au propriétaire, puis marquez l'article comme rendu une fois restitué.",
+      overdue:
+        'Les prêts non rendus dont la date de retour est dépassée sont signalés comme en retard.',
+    },
+    reservations: {
+      title: 'Réservations',
+      intro:
+        "Réservez du matériel sur des périodes précises pour éviter les conflits d'utilisation.",
+      period:
+        "Réservez une quantité d'un article sur une période (début et fin), avec un lieu d'utilisation (texte, zone ou marqueur).",
+      usage: "Précisez l'usage de la réservation (ex : « Spectacle de feu samedi 22h »).",
+      status: "Suivez l'état de chaque réservation : Réservé, Sorti, Rendu ou Annulé.",
+      bulk: 'Réservez plusieurs articles en une seule fois grâce à la réservation en masse.',
+    },
+    planning: {
+      title: 'Disponibilité & planning',
+      intro: "Gardez une vue d'ensemble de l'utilisation de votre matériel.",
+      availability:
+        "La disponibilité tient compte des réservations existantes pour éviter de réserver plus d'exemplaires que disponibles.",
+      view: "Le planning d'un groupe affiche les réservations dans le temps pour repérer les périodes chargées.",
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Gestion du matériel' })
 
@@ -149,49 +204,3 @@ useHead({
   ],
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Gestion du matériel",
-    "subtitle": "Inventoriez le matériel de votre édition et gérez ses réservations dans le temps.",
-    "sections": {
-      "groups": {
-        "title": "Groupes de matériel",
-        "intro": "Le matériel est organisé en groupes pour structurer votre inventaire.",
-        "create": "Créez autant de groupes que nécessaire, avec un nom et une description optionnelle.",
-        "examples": "Organisez par type de matériel (son, lumière, feu, structures, mobilier…) ou par lieu de stockage.",
-        "reorder": "Réordonnez les groupes par glisser-déposer pour les présenter dans l'ordre qui vous convient."
-      },
-      "items": {
-        "title": "Articles de matériel",
-        "intro": "Ajoutez les articles dans chaque groupe pour constituer votre inventaire.",
-        "fields": "Chaque article possède un nom, une description et des notes optionnelles.",
-        "quantity": "Indiquez la quantité d'exemplaires identiques disponibles pour cet article.",
-        "location": "Définissez l'emplacement de rangement : texte libre, zone ou marqueur de la carte interactive."
-      },
-      "externalLoan": {
-        "title": "Prêt externe",
-        "intro": "Suivez le matériel prêté par une personne extérieure à la convention.",
-        "owner": "Marquez un article comme prêt externe et renseignez le contact du propriétaire.",
-        "returnDue": "Indiquez la date prévue de retour au propriétaire, puis marquez l'article comme rendu une fois restitué.",
-        "overdue": "Les prêts non rendus dont la date de retour est dépassée sont signalés comme en retard."
-      },
-      "reservations": {
-        "title": "Réservations",
-        "intro": "Réservez du matériel sur des périodes précises pour éviter les conflits d'utilisation.",
-        "period": "Réservez une quantité d'un article sur une période (début et fin), avec un lieu d'utilisation (texte, zone ou marqueur).",
-        "usage": "Précisez l'usage de la réservation (ex : « Spectacle de feu samedi 22h »).",
-        "status": "Suivez l'état de chaque réservation : Réservé, Sorti, Rendu ou Annulé.",
-        "bulk": "Réservez plusieurs articles en une seule fois grâce à la réservation en masse."
-      },
-      "planning": {
-        "title": "Disponibilité & planning",
-        "intro": "Gardez une vue d'ensemble de l'utilisation de votre matériel.",
-        "availability": "La disponibilité tient compte des réservations existantes pour éviter de réserver plus d'exemplaires que disponibles.",
-        "view": "Le planning d'un groupe affiche les réservations dans le temps pour repérer les périodes chargées."
-      }
-    }
-  }
-}
-</i18n>

@@ -9,21 +9,25 @@
       <GuideSection icon="i-heroicons-user-plus" :title="t('sections.add.title')" color="purple">
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.add.intro') }}</p>
         <ul class="space-y-2">
-          <li class="flex items-start gap-2">
+          <li v-for="item in addSteps" :key="item" class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.add.search') }}</span>
+            <span class="text-gray-600 dark:text-gray-400">{{ item }}</span>
           </li>
-          <li class="flex items-start gap-2">
+        </ul>
+      </GuideSection>
+
+      <GuideSection
+        icon="i-heroicons-square-3-stack-3d"
+        :title="t('sections.levels.title')"
+        color="purple"
+      >
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.levels.intro') }}</p>
+        <ul class="space-y-2">
+          <li v-for="item in levelItems" :key="item.label" class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{
-              t('sections.add.customTitle')
-            }}</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400">{{
-              t('sections.add.notification')
-            }}</span>
+            <span class="text-gray-600 dark:text-gray-400">
+              <strong>{{ item.label }}</strong> — {{ item.desc }}
+            </span>
           </li>
         </ul>
       </GuideSection>
@@ -35,118 +39,37 @@
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.conventionPerms.intro') }}</p>
         <ul class="space-y-2">
-          <li class="flex items-start gap-2">
+          <li v-for="right in conventionRights" :key="right.label" class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.editConvention.label') }}</strong> —
-              {{ t('sections.conventionPerms.editConvention.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.deleteConvention.label') }}</strong> —
-              {{ t('sections.conventionPerms.deleteConvention.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.manageOrganizers.label') }}</strong> —
-              {{ t('sections.conventionPerms.manageOrganizers.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.manageVolunteers.label') }}</strong> —
-              {{ t('sections.conventionPerms.manageVolunteers.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.addEdition.label') }}</strong> —
-              {{ t('sections.conventionPerms.addEdition.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.editAllEditions.label') }}</strong> —
-              {{ t('sections.conventionPerms.editAllEditions.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.deleteAllEditions.label') }}</strong> —
-              {{ t('sections.conventionPerms.deleteAllEditions.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.manageMeals.label') }}</strong> —
-              {{ t('sections.conventionPerms.manageMeals.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.conventionPerms.manageTicketing.label') }}</strong> —
-              {{ t('sections.conventionPerms.manageTicketing.desc') }}</span
-            >
+            <span class="text-gray-600 dark:text-gray-400">
+              <strong>{{ right.label }}</strong> — {{ right.desc }}
+            </span>
           </li>
         </ul>
       </GuideSection>
 
-      <GuideSection icon="i-heroicons-key" :title="t('sections.editionPerms.title')" color="purple">
+      <GuideSection
+        icon="i-heroicons-adjustments-horizontal"
+        :title="t('sections.editionPerms.title')"
+        color="purple"
+      >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.editionPerms.intro') }}</p>
         <ul class="space-y-2">
-          <li class="flex items-start gap-2">
+          <li v-for="right in editionRights" :key="right.label" class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.editionPerms.manageArtists.label') }}</strong> —
-              {{ t('sections.editionPerms.manageArtists.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.editionPerms.manageVolunteers.label') }}</strong> —
-              {{ t('sections.editionPerms.manageVolunteers.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.editionPerms.manageShows.label') }}</strong> —
-              {{ t('sections.editionPerms.manageShows.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.editionPerms.manageMap.label') }}</strong> —
-              {{ t('sections.editionPerms.manageMap.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.editionPerms.manageTicketing.label') }}</strong> —
-              {{ t('sections.editionPerms.manageTicketing.desc') }}</span
-            >
-          </li>
-          <li class="flex items-start gap-2">
-            <UIcon name="i-heroicons-check-circle" class="size-5 text-purple-500 mt-0.5 shrink-0" />
-            <span class="text-gray-600 dark:text-gray-400"
-              ><strong>{{ t('sections.editionPerms.manageMeals.label') }}</strong> —
-              {{ t('sections.editionPerms.manageMeals.desc') }}</span
-            >
+            <span class="text-gray-600 dark:text-gray-400">
+              <strong>{{ right.label }}</strong> — {{ right.desc }}
+            </span>
           </li>
         </ul>
+
+        <UAlert
+          icon="i-heroicons-exclamation-triangle"
+          color="warning"
+          variant="subtle"
+          :title="t('sections.editionPerms.warningTitle')"
+          :description="t('sections.editionPerms.warningText')"
+        />
       </GuideSection>
 
       <GuideSection icon="i-heroicons-map-pin" :title="t('sections.presence.title')" color="purple">
@@ -161,7 +84,161 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Co-organisateurs & Permissions',
+  subtitle: 'Invitez des collaborateurs et donnez à chacun exactement les droits dont il a besoin.',
+  sections: {
+    add: {
+      title: 'Ajouter un co-organisateur',
+      intro: "Invitez des personnes à rejoindre l'équipe d'organisation.",
+      search:
+        "Recherchez un utilisateur déjà inscrit par e-mail ou par pseudo, puis ajoutez-le à l'équipe.",
+      invite:
+        "Si la personne n'a pas encore de compte, saisissez son e-mail : elle reçoit une invitation contenant un lien qui lui permet de choisir son mot de passe et de rejoindre directement l'équipe.",
+      customTitle:
+        "Attribuez un titre personnalisé (ex : « Responsable bénévoles », « Trésorier ») affiché dans la liste de l'équipe.",
+      notification: "L'invité reçoit une notification dès son ajout.",
+    },
+    levels: {
+      title: 'Deux niveaux de droits',
+      intro:
+        'Un même droit peut être accordé à deux échelles différentes. Comprendre cette distinction évite bien des surprises :',
+      convention: {
+        label: 'Au niveau de la convention',
+        desc: "le droit s'applique à toutes les éditions, y compris celles créées plus tard. Pratique pour un membre permanent de l'équipe.",
+      },
+      edition: {
+        label: "Au niveau d'une édition",
+        desc: 'le droit ne vaut que pour cette édition précise. Adapté à un renfort ponctuel, recruté pour une seule année.',
+      },
+    },
+    conventionPerms: {
+      title: 'Droits au niveau convention',
+      intro: "Ces droits s'appliquent à la convention et à l'ensemble de ses éditions :",
+      editConvention: {
+        label: 'Modifier la convention',
+        desc: 'modifier les informations de la convention elle-même (nom, description, logo).',
+      },
+      deleteConvention: {
+        label: 'Supprimer la convention',
+        desc: 'supprimer la convention entière, avec toutes ses éditions.',
+      },
+      manageOrganizers: {
+        label: 'Gérer les organisateurs',
+        desc: 'ajouter ou retirer des co-organisateurs et modifier leurs droits. À accorder avec parcimonie.',
+      },
+      addEdition: {
+        label: 'Ajouter des éditions',
+        desc: 'créer de nouvelles éditions pour cette convention.',
+      },
+      editAllEditions: {
+        label: 'Informations (toutes les éditions)',
+        desc: "modifier les informations générales de n'importe quelle édition : description, dates, lieu, services, carte, liens externes et modules activés.",
+      },
+      deleteAllEditions: {
+        label: 'Supprimer toutes les éditions',
+        desc: "supprimer n'importe quelle édition de la convention.",
+      },
+      manageVolunteers: {
+        label: 'Gérer les bénévoles',
+        desc: 'appel à bénévoles, candidatures, équipes, planning et notifications, sur toutes les éditions.',
+      },
+      manageArtists: {
+        label: 'Gérer les artistes',
+        desc: 'appels à spectacles, candidatures, programmation et espace artiste, sur toutes les éditions.',
+      },
+      manageMeals: {
+        label: 'Gérer les repas',
+        desc: 'configuration des repas, listes récapitulatives et validation sur place.',
+      },
+      manageTicketing: {
+        label: 'Gérer la billetterie',
+        desc: "tarifs, options, commandes, contrôle d'accès, comptoirs et statistiques.",
+      },
+      manageTasks: {
+        label: 'Gérer les tâches',
+        desc: 'groupes de tâches, assignations, étiquettes et checklists.',
+      },
+      manageStock: {
+        label: 'Gérer le stock matériel',
+        desc: 'inventaire, prêts externes et réservations de matériel.',
+      },
+      manageWorkshops: {
+        label: 'Gérer les workshops',
+        desc: "créer et programmer les ateliers proposés pendant l'édition.",
+      },
+      manageFAQ: {
+        label: 'Gérer la FAQ',
+        desc: "rédiger et organiser les questions fréquentes de l'édition.",
+      },
+    },
+    editionPerms: {
+      title: 'Droits par édition',
+      intro:
+        'Les mêmes droits métier peuvent être accordés édition par édition, en complément ou à la place des droits de convention :',
+      edit: {
+        label: 'Informations',
+        desc: "modifier les informations générales de l'édition : description, dates, lieu, services, carte, liens externes et modules activés.",
+      },
+      delete: {
+        label: 'Supprimer',
+        desc: 'supprimer cette édition.',
+      },
+      manageVolunteers: {
+        label: 'Bénévoles',
+        desc: 'appel à bénévoles, candidatures, équipes, planning et notifications.',
+      },
+      manageArtists: {
+        label: 'Artistes',
+        desc: 'appels à spectacles, candidatures, programmation des spectacles et espace artiste.',
+      },
+      manageMeals: {
+        label: 'Repas',
+        desc: 'configuration des repas, listes et validation sur place.',
+      },
+      manageTicketing: {
+        label: 'Billetterie',
+        desc: "tarifs, options, articles à remettre, commandes, contrôle d'accès et comptoirs.",
+      },
+      manageTasks: {
+        label: 'Tâches',
+        desc: 'groupes de tâches, assignations, étiquettes et checklists.',
+      },
+      manageStock: {
+        label: 'Stock matériel',
+        desc: 'inventaire, prêts externes et réservations.',
+      },
+      manageWorkshops: {
+        label: 'Workshops',
+        desc: 'créer et programmer les ateliers.',
+      },
+      manageFAQ: {
+        label: 'FAQ',
+        desc: 'rédiger et organiser les questions fréquentes.',
+      },
+      warningTitle: '« Informations » ne donne pas accès aux modules',
+      warningText:
+        "Le droit « Informations » couvre uniquement la fiche de l'édition : description, dates, lieu, services, carte, liens externes et activation des modules. Il n'ouvre aucun module métier. Pour que quelqu'un accède aux bénévoles, aux artistes, à la billetterie ou à la FAQ, il faut lui accorder explicitement le droit correspondant — sans quoi les liens vers ces pages ne lui apparaîtront même pas.",
+    },
+    presence: {
+      title: "Présence sur l'édition",
+      content:
+        "Indiquez quels organisateurs seront physiquement présents lors de l'édition. Cette information sert à la coordination sur place et peut être affichée aux bénévoles et aux participants.",
+    },
+    history: {
+      title: 'Historique',
+      content:
+        "Consultez l'historique des modifications de droits pour chaque co-organisateur. Chaque changement est horodaté et tracé, ce qui permet de savoir qui a accordé quoi et quand.",
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Co-organisateurs' })
 
@@ -175,98 +252,64 @@ useHead({
     },
   ],
 })
-</script>
 
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Co-organisateurs & Permissions",
-    "subtitle": "Invitez des collaborateurs et gérez finement les droits d'accès.",
-    "sections": {
-      "add": {
-        "title": "Ajouter un co-organisateur",
-        "intro": "Invitez des personnes à rejoindre l'équipe d'organisation.",
-        "search": "Recherchez un utilisateur par e-mail ou par nom pour l'ajouter comme co-organisateur.",
-        "customTitle": "Attribuez un titre personnalisé (ex : « Responsable bénévoles », « Trésorier »).",
-        "notification": "L'utilisateur invité reçoit une notification et est automatiquement ajouté à l'équipe."
-      },
-      "conventionPerms": {
-        "title": "Permissions au niveau convention",
-        "intro": "Les permissions de convention s'appliquent à toutes les éditions de cette convention :",
-        "editConvention": {
-          "label": "Modifier la convention",
-          "desc": "permet de modifier les informations de la convention (nom, description, logo)."
-        },
-        "deleteConvention": {
-          "label": "Supprimer la convention",
-          "desc": "permet de supprimer la convention entière."
-        },
-        "manageOrganizers": {
-          "label": "Gérer les organisateurs",
-          "desc": "permet d'ajouter/supprimer des co-organisateurs et de modifier leurs permissions."
-        },
-        "manageVolunteers": {
-          "label": "Gérer les bénévoles",
-          "desc": "permet de gérer les bénévoles sur toutes les éditions."
-        },
-        "addEdition": {
-          "label": "Ajouter des éditions",
-          "desc": "permet de créer de nouvelles éditions."
-        },
-        "editAllEditions": {
-          "label": "Modifier toutes les éditions",
-          "desc": "permet de modifier toutes les éditions existantes."
-        },
-        "deleteAllEditions": {
-          "label": "Supprimer toutes les éditions",
-          "desc": "permet de supprimer n'importe quelle édition."
-        },
-        "manageMeals": {
-          "label": "Gérer les repas",
-          "desc": "permet de gérer la configuration des repas."
-        },
-        "manageTicketing": {
-          "label": "Gérer la billetterie",
-          "desc": "permet de gérer la billetterie sur toutes les éditions."
-        }
-      },
-      "editionPerms": {
-        "title": "Permissions par édition",
-        "intro": "Des permissions supplémentaires peuvent être attribuées spécifiquement pour une édition :",
-        "manageArtists": {
-          "label": "Artistes",
-          "desc": "gérer les appels à spectacles et les candidatures artistiques."
-        },
-        "manageVolunteers": {
-          "label": "Bénévoles",
-          "desc": "gérer les candidatures bénévoles, les équipes et le planning."
-        },
-        "manageShows": {
-          "label": "Spectacles",
-          "desc": "créer et programmer les spectacles."
-        },
-        "manageMap": {
-          "label": "Carte",
-          "desc": "gérer la carte interactive (zones et marqueurs)."
-        },
-        "manageTicketing": {
-          "label": "Billetterie",
-          "desc": "gérer la billetterie de cette édition."
-        },
-        "manageMeals": {
-          "label": "Repas",
-          "desc": "gérer les repas de cette édition."
-        }
-      },
-      "presence": {
-        "title": "Présence sur l'édition",
-        "content": "Indiquez quels organisateurs seront physiquement présents lors de l'édition. Cette information est utile pour la coordination sur place et peut être affichée aux bénévoles et participants."
-      },
-      "history": {
-        "title": "Historique",
-        "content": "Consultez l'historique des modifications de permissions pour chaque co-organisateur. Chaque changement est horodaté et tracé pour assurer la transparence au sein de l'équipe."
-      }
-    }
-  }
-}
-</i18n>
+const addSteps = computed(() => [
+  t('sections.add.search'),
+  t('sections.add.invite'),
+  t('sections.add.customTitle'),
+  t('sections.add.notification'),
+])
+
+const levelItems = computed(() =>
+  ['convention', 'edition'].map((key) => ({
+    label: t(`sections.levels.${key}.label`),
+    desc: t(`sections.levels.${key}.desc`),
+  }))
+)
+
+// Droits proposés au niveau convention. L'ordre suit celui du formulaire de gestion.
+const CONVENTION_RIGHT_KEYS = [
+  'editConvention',
+  'deleteConvention',
+  'manageOrganizers',
+  'addEdition',
+  'editAllEditions',
+  'deleteAllEditions',
+  'manageVolunteers',
+  'manageArtists',
+  'manageMeals',
+  'manageTicketing',
+  'manageTasks',
+  'manageStock',
+  'manageWorkshops',
+  'manageFAQ',
+]
+
+// Droits attribuables édition par édition.
+const EDITION_RIGHT_KEYS = [
+  'edit',
+  'delete',
+  'manageVolunteers',
+  'manageArtists',
+  'manageMeals',
+  'manageTicketing',
+  'manageTasks',
+  'manageStock',
+  'manageWorkshops',
+  'manageFAQ',
+]
+
+const conventionRights = computed(() =>
+  CONVENTION_RIGHT_KEYS.map((key) => ({
+    label: t(`sections.conventionPerms.${key}.label`),
+    desc: t(`sections.conventionPerms.${key}.desc`),
+  }))
+)
+
+const editionRights = computed(() =>
+  EDITION_RIGHT_KEYS.map((key) => ({
+    label: t(`sections.editionPerms.${key}.label`),
+    desc: t(`sections.editionPerms.${key}.desc`),
+  }))
+)
+</script>

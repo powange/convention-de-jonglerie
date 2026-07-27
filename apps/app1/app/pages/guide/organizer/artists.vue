@@ -358,7 +358,130 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Artistes & Spectacles',
+  subtitle: 'Recrutez des artistes et programmez les spectacles de votre édition.',
+  sections: {
+    showCalls: {
+      title: 'Appels à spectacles',
+      intro:
+        'Publiez des appels à spectacles pour recruter des artistes. Chaque édition peut avoir plusieurs appels simultanés (scène ouverte, gala, spectacles de rue, etc.).',
+      create: {
+        title: 'Créer un appel',
+        mode: 'Choisissez le mode : intégré (formulaire sur la plateforme) ou externe (lien vers un formulaire tiers).',
+        name: "Donnez un nom à l'appel (ex : « Appel à spectacles — Édition 2025 »).",
+        description:
+          "Décrivez les types de numéros recherchés, les conditions d'accueil et les avantages proposés.",
+        deadline: 'Fixez une date limite de candidature (optionnel).',
+        activate: "Activez ou désactivez l'appel à tout moment.",
+      },
+    },
+    visibility: {
+      title: "Visibilité de l'appel",
+      intro:
+        'Contrôlez qui peut voir et candidater à votre appel grâce à quatre niveaux de visibilité.',
+      offline: "Hors ligne : l'appel est invisible partout, utile pour les brouillons.",
+      closed: "Fermé : l'appel est visible mais n'accepte plus de nouvelles candidatures.",
+      private: 'Privé : accessible uniquement via un lien direct à partager aux artistes ciblés.',
+      public: 'Public : visible par tous et référencé sur la plateforme.',
+    },
+    config: {
+      title: "Configuration de l'appel",
+      intro: 'Personnalisez le formulaire de candidature selon vos besoins.',
+      mode: {
+        title: 'Mode de candidature',
+        internal:
+          "Mode intégré : les artistes remplissent le formulaire directement sur la plateforme. Les données sont stockées et gérables depuis l'interface.",
+        external:
+          "Mode externe : les artistes sont redirigés vers un lien externe (Google Forms, etc.). Vous fournissez l'URL du formulaire.",
+      },
+      formFields: {
+        title: 'Champs du formulaire (mode intégré)',
+        intro: 'Activez ou désactivez les champs optionnels du formulaire de candidature :',
+        portfolio: "Portfolio / Site web : lien vers le site ou portfolio de l'artiste.",
+        video:
+          'Vidéo de démonstration : lien vers une vidéo du spectacle (lecture YouTube intégrée).',
+        technical: 'Besoins techniques : espace, son, lumière et autres contraintes techniques.',
+        stageSetup:
+          'Mise en place sur scène : installation du numéro avant le passage et état dans lequel la scène est laissée à la fin.',
+        accommodation: "Hébergement : demander si l'artiste a besoin d'un hébergement.",
+        departureCity: 'Ville de départ : pour estimer les frais de déplacement.',
+        social: "Réseaux sociaux : liens vers les réseaux sociaux de l'artiste.",
+      },
+    },
+    applications: {
+      title: 'Gestion des candidatures',
+      intro:
+        'Traitez les candidatures reçues pour vos appels à spectacles. Un tableau de bord affiche les compteurs en temps réel (total, en attente, acceptées, refusées).',
+      list: "Consultez la liste de toutes les candidatures avec leur statut, filtrez par statut ou recherchez par nom d'artiste ou titre de spectacle.",
+      details:
+        'Accédez aux détails de chaque proposition : titre, description, durée, artistes supplémentaires, besoins techniques, mise en place sur scène, vidéo intégrée.',
+      accept: 'Acceptez les candidatures qui correspondent à votre programmation.',
+      reject: 'Refusez les candidatures qui ne conviennent pas.',
+      notification:
+        'Les artistes sont automatiquement notifiés de votre décision par e-mail et notification push.',
+      notes:
+        'Ajoutez des notes internes visibles uniquement par les organisateurs pour chaque candidature.',
+      linkShow:
+        "Associez une candidature acceptée à un spectacle de l'édition pour faciliter la programmation.",
+      messaging:
+        "Échangez directement avec l'artiste via la messagerie intégrée pour poser des questions sur sa candidature.",
+    },
+    survey: {
+      title: 'Sondage collaboratif',
+      intro:
+        'Évaluez collectivement les candidatures avec les autres organisateurs grâce au système de sondage intégré.',
+      generate: 'Générez un lien de sondage unique à partager avec les organisateurs participants.',
+      share: 'Partagez le lien : chaque organisateur peut noter les candidatures de 1 à 5.',
+      vote: 'Les votes sont anonymes et indépendants, chaque organisateur évalue selon ses critères.',
+      results:
+        'Consultez les résultats : score moyen et nombre de votes pour chaque candidature, triés par pertinence.',
+      toggle:
+        "Ouvrez ou fermez le sondage à tout moment. Un sondage fermé n'accepte plus de nouveaux votes.",
+    },
+    shows: {
+      title: 'Programmation des spectacles',
+      intro: 'Créez et gérez le programme complet des spectacles de votre édition.',
+      create: {
+        title: 'Informations du spectacle',
+        titleField: 'Titre du spectacle.',
+        description: 'Description détaillée du numéro.',
+        image: "Image d'illustration (affiche du spectacle).",
+        dateTime: 'Date et heure de début.',
+        duration: 'Durée en minutes.',
+      },
+      location: {
+        title: 'Localisation du spectacle',
+        intro: 'Trois options pour indiquer où se déroule le spectacle :',
+        zone: 'Zone sur la carte : associez le spectacle à une zone définie (scène principale, chapiteau, etc.).',
+        marker: "Marqueur sur la carte : placez le spectacle sur un point d'intérêt précis.",
+        text: 'Adresse textuelle : indiquez simplement le nom du lieu.',
+      },
+    },
+    artists: {
+      title: 'Assigner des artistes',
+      intro: 'Associez des artistes à chaque spectacle.',
+      assign:
+        "Sélectionnez un ou plusieurs artistes pour chaque spectacle depuis la liste des artistes de l'édition.",
+      multiple:
+        'Un spectacle peut impliquer plusieurs artistes (spectacle collectif, collaboration).',
+    },
+    handoutItems: {
+      title: 'Articles à remettre',
+      intro: 'Gérez les articles à remettre aux artistes lors de leur arrivée.',
+      assign: 'Attribuez des articles spécifiques à chaque spectacle ou artiste.',
+      examples: "Exemples : badges d'accès, pass backstage, clés de loge, matériel technique.",
+      tracking: "Suivez la remise des articles à l'accueil.",
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Artistes & Spectacles' })
 
@@ -373,107 +496,3 @@ useHead({
   ],
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Artistes & Spectacles",
-    "subtitle": "Recrutez des artistes et programmez les spectacles de votre édition.",
-    "sections": {
-      "showCalls": {
-        "title": "Appels à spectacles",
-        "intro": "Publiez des appels à spectacles pour recruter des artistes. Chaque édition peut avoir plusieurs appels simultanés (scène ouverte, gala, spectacles de rue, etc.).",
-        "create": {
-          "title": "Créer un appel",
-          "mode": "Choisissez le mode : intégré (formulaire sur la plateforme) ou externe (lien vers un formulaire tiers).",
-          "name": "Donnez un nom à l'appel (ex : « Appel à spectacles — Édition 2025 »).",
-          "description": "Décrivez les types de numéros recherchés, les conditions d'accueil et les avantages proposés.",
-          "deadline": "Fixez une date limite de candidature (optionnel).",
-          "activate": "Activez ou désactivez l'appel à tout moment."
-        }
-      },
-      "visibility": {
-        "title": "Visibilité de l'appel",
-        "intro": "Contrôlez qui peut voir et candidater à votre appel grâce à quatre niveaux de visibilité.",
-        "offline": "Hors ligne : l'appel est invisible partout, utile pour les brouillons.",
-        "closed": "Fermé : l'appel est visible mais n'accepte plus de nouvelles candidatures.",
-        "private": "Privé : accessible uniquement via un lien direct à partager aux artistes ciblés.",
-        "public": "Public : visible par tous et référencé sur la plateforme."
-      },
-      "config": {
-        "title": "Configuration de l'appel",
-        "intro": "Personnalisez le formulaire de candidature selon vos besoins.",
-        "mode": {
-          "title": "Mode de candidature",
-          "internal": "Mode intégré : les artistes remplissent le formulaire directement sur la plateforme. Les données sont stockées et gérables depuis l'interface.",
-          "external": "Mode externe : les artistes sont redirigés vers un lien externe (Google Forms, etc.). Vous fournissez l'URL du formulaire."
-        },
-        "formFields": {
-          "title": "Champs du formulaire (mode intégré)",
-          "intro": "Activez ou désactivez les champs optionnels du formulaire de candidature :",
-          "portfolio": "Portfolio / Site web : lien vers le site ou portfolio de l'artiste.",
-          "video": "Vidéo de démonstration : lien vers une vidéo du spectacle (lecture YouTube intégrée).",
-          "technical": "Besoins techniques : espace, son, lumière et autres contraintes techniques.",
-          "stageSetup": "Mise en place sur scène : installation du numéro avant le passage et état dans lequel la scène est laissée à la fin.",
-          "accommodation": "Hébergement : demander si l'artiste a besoin d'un hébergement.",
-          "departureCity": "Ville de départ : pour estimer les frais de déplacement.",
-          "social": "Réseaux sociaux : liens vers les réseaux sociaux de l'artiste."
-        }
-      },
-      "applications": {
-        "title": "Gestion des candidatures",
-        "intro": "Traitez les candidatures reçues pour vos appels à spectacles. Un tableau de bord affiche les compteurs en temps réel (total, en attente, acceptées, refusées).",
-        "list": "Consultez la liste de toutes les candidatures avec leur statut, filtrez par statut ou recherchez par nom d'artiste ou titre de spectacle.",
-        "details": "Accédez aux détails de chaque proposition : titre, description, durée, artistes supplémentaires, besoins techniques, mise en place sur scène, vidéo intégrée.",
-        "accept": "Acceptez les candidatures qui correspondent à votre programmation.",
-        "reject": "Refusez les candidatures qui ne conviennent pas.",
-        "notification": "Les artistes sont automatiquement notifiés de votre décision par e-mail et notification push.",
-        "notes": "Ajoutez des notes internes visibles uniquement par les organisateurs pour chaque candidature.",
-        "linkShow": "Associez une candidature acceptée à un spectacle de l'édition pour faciliter la programmation.",
-        "messaging": "Échangez directement avec l'artiste via la messagerie intégrée pour poser des questions sur sa candidature."
-      },
-      "survey": {
-        "title": "Sondage collaboratif",
-        "intro": "Évaluez collectivement les candidatures avec les autres organisateurs grâce au système de sondage intégré.",
-        "generate": "Générez un lien de sondage unique à partager avec les organisateurs participants.",
-        "share": "Partagez le lien : chaque organisateur peut noter les candidatures de 1 à 5.",
-        "vote": "Les votes sont anonymes et indépendants, chaque organisateur évalue selon ses critères.",
-        "results": "Consultez les résultats : score moyen et nombre de votes pour chaque candidature, triés par pertinence.",
-        "toggle": "Ouvrez ou fermez le sondage à tout moment. Un sondage fermé n'accepte plus de nouveaux votes."
-      },
-      "shows": {
-        "title": "Programmation des spectacles",
-        "intro": "Créez et gérez le programme complet des spectacles de votre édition.",
-        "create": {
-          "title": "Informations du spectacle",
-          "titleField": "Titre du spectacle.",
-          "description": "Description détaillée du numéro.",
-          "image": "Image d'illustration (affiche du spectacle).",
-          "dateTime": "Date et heure de début.",
-          "duration": "Durée en minutes."
-        },
-        "location": {
-          "title": "Localisation du spectacle",
-          "intro": "Trois options pour indiquer où se déroule le spectacle :",
-          "zone": "Zone sur la carte : associez le spectacle à une zone définie (scène principale, chapiteau, etc.).",
-          "marker": "Marqueur sur la carte : placez le spectacle sur un point d'intérêt précis.",
-          "text": "Adresse textuelle : indiquez simplement le nom du lieu."
-        }
-      },
-      "artists": {
-        "title": "Assigner des artistes",
-        "intro": "Associez des artistes à chaque spectacle.",
-        "assign": "Sélectionnez un ou plusieurs artistes pour chaque spectacle depuis la liste des artistes de l'édition.",
-        "multiple": "Un spectacle peut impliquer plusieurs artistes (spectacle collectif, collaboration)."
-      },
-      "handoutItems": {
-        "title": "Articles à remettre",
-        "intro": "Gérez les articles à remettre aux artistes lors de leur arrivée.",
-        "assign": "Attribuez des articles spécifiques à chaque spectacle ou artiste.",
-        "examples": "Exemples : badges d'accès, pass backstage, clés de loge, matériel technique.",
-        "tracking": "Suivez la remise des articles à l'accueil."
-      }
-    }
-  }
-}
-</i18n>
