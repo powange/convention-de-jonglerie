@@ -1770,7 +1770,6 @@ watch(
 watch(
   () => pagination.value.limit,
   (newLimit, oldLimit) => {
-    console.log('Limit changed from', oldLimit, 'to', newLimit)
     // Réinitialiser à la page 1 et recharger quand on change la limite
     if (newLimit !== oldLimit) {
       pagination.value.page = 1

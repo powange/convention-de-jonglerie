@@ -75,7 +75,9 @@ export function useFirebaseMessaging() {
       const registrations = await navigator.serviceWorker.getRegistrations()
       for (const registration of registrations) {
         if (registration.active?.scriptURL.includes('firebase-messaging-sw')) {
-          console.log('🗑️ Désinstallation ancien SW Firebase:', registration.active.scriptURL)
+          if (import.meta.dev) {
+            console.log('🗑️ Désinstallation ancien SW Firebase:', registration.active.scriptURL)
+          }
           await registration.unregister()
         }
       }
@@ -96,7 +98,9 @@ export function useFirebaseMessaging() {
       // Attendre que le SW soit prêt
       await navigator.serviceWorker.ready
 
-      console.log('✅ Service Worker Firebase enregistré:', registration.scope)
+      if (import.meta.dev) {
+        console.log('✅ Service Worker Firebase enregistré:', registration.scope)
+      }
       return true
     } catch (error) {
       console.error("❌ Erreur lors de l'enregistrement du Service Worker Firebase:", error)
@@ -126,7 +130,9 @@ export function useFirebaseMessaging() {
 
     try {
       // 1. Enregistrer le Service Worker en premier
-      console.log('📝 Enregistrement du Service Worker Firebase...')
+      if (import.meta.dev) {
+        console.log('📝 Enregistrement du Service Worker Firebase...')
+      }
       const swRegistered = await registerServiceWorker()
       if (!swRegistered) {
         console.error("❌ Impossible d'enregistrer le Service Worker")
@@ -137,7 +143,9 @@ export function useFirebaseMessaging() {
       const permission = await Notification.requestPermission()
 
       if (permission !== 'granted') {
-        console.log('Permission de notification refusée')
+        if (import.meta.dev) {
+          console.log('Permission de notification refusée')
+        }
         return null
       }
 
@@ -149,13 +157,19 @@ export function useFirebaseMessaging() {
         return null
       }
 
-      console.log('🔑 Utilisation de la clé VAPID:', vapidKey.substring(0, 20) + '...')
+      if (import.meta.dev) {
+        console.log('🔑 Utilisation de la clé VAPID:', vapidKey.substring(0, 20) + '...')
+      }
 
       // 4. Obtenir le token FCM avec le Service Worker enregistré
       const registration = await navigator.serviceWorker.ready
-      console.log('✅ Service Worker prêt')
+      if (import.meta.dev) {
+        console.log('✅ Service Worker prêt')
+      }
 
-      console.log('⏳ Demande du token FCM...')
+      if (import.meta.dev) {
+        console.log('⏳ Demande du token FCM...')
+      }
 
       const token = await fb.getToken(fb.messaging, {
         vapidKey,
@@ -163,7 +177,9 @@ export function useFirebaseMessaging() {
       })
 
       if (token) {
-        console.log('✅ Token FCM obtenu:', token.substring(0, 20) + '...')
+        if (import.meta.dev) {
+          console.log('✅ Token FCM obtenu:', token.substring(0, 20) + '...')
+        }
 
         // Enregistrer le token côté serveur avec le deviceId
         try {
@@ -172,14 +188,18 @@ export function useFirebaseMessaging() {
             method: 'POST',
             body: { token, deviceId },
           })
-          console.log('✅ Token FCM enregistré côté serveur')
+          if (import.meta.dev) {
+            console.log('✅ Token FCM enregistré côté serveur')
+          }
         } catch (error) {
           console.error("❌ Erreur lors de l'enregistrement du token FCM:", error)
         }
 
         return token
       } else {
-        console.log("❌ Impossible d'obtenir le token FCM")
+        if (import.meta.dev) {
+          console.log("❌ Impossible d'obtenir le token FCM")
+        }
         return null
       }
     } catch (error: any) {
@@ -240,7 +260,9 @@ export function useFirebaseMessaging() {
       await $fetch('/api/notifications/fcm/unsubscribe', {
         method: 'POST',
       })
-      console.log('✅ Token FCM désactivé côté serveur')
+      if (import.meta.dev) {
+        console.log('✅ Token FCM désactivé côté serveur')
+      }
       return true
     } catch (error) {
       console.error('❌ Erreur lors de la désactivation du token FCM:', error)
@@ -254,7 +276,9 @@ export function useFirebaseMessaging() {
    */
   const listenToMessages = (
     callback: (payload: MessagePayload) => void = (payload) => {
-      console.log('Message reçu en foreground:', payload)
+      if (import.meta.dev) {
+        console.log('Message reçu en foreground:', payload)
+      }
 
       // Afficher un toast par défaut
       if (payload.notification) {

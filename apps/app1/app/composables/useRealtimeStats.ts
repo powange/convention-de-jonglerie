@@ -26,7 +26,9 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
   // Vérifier si une connexion existe déjà pour cette édition
   if (sseConnections.has(editionIdValue)) {
     const existing = sseConnections.get(editionIdValue)!
-    console.log('[SSE Client] Reusing existing connection for edition', editionIdValue)
+    if (import.meta.dev) {
+      console.log('[SSE Client] Reusing existing connection for edition', editionIdValue)
+    }
     return {
       isConnected: existing.isConnected,
       lastUpdate: existing.lastUpdate,
@@ -55,7 +57,9 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
 
     // Si déjà connecté, ne rien faire
     if (connection.eventSource && connection.eventSource.readyState !== EventSource.CLOSED) {
-      console.log('[SSE Client] Already connected to edition', edId)
+      if (import.meta.dev) {
+        console.log('[SSE Client] Already connected to edition', edId)
+      }
       return
     }
 
@@ -68,13 +72,17 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
       sseUrl += '?adminMode=true'
     }
 
-    console.log('[SSE Client] Connecting to', sseUrl)
+    if (import.meta.dev) {
+      console.log('[SSE Client] Connecting to', sseUrl)
+    }
 
     try {
       connection.eventSource = new EventSource(sseUrl)
 
       connection.eventSource.onopen = () => {
-        console.log('[SSE Client] Connected')
+        if (import.meta.dev) {
+          console.log('[SSE Client] Connected')
+        }
         connection.isConnected.value = true
         connection.reconnectAttempts = 0
       }
@@ -82,7 +90,9 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
       connection.eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
-          console.log('[SSE Client] Message received:', data)
+          if (import.meta.dev) {
+            console.log('[SSE Client] Message received:', data)
+          }
 
           if (
             data.type === 'entry-validated' ||
@@ -92,7 +102,9 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
             // Mettre à jour le timestamp pour déclencher un rafraîchissement
             connection.lastUpdate.value = new Date()
           } else if (data.type === 'connected') {
-            console.log('[SSE Client] Connection confirmed for edition', data.editionId)
+            if (import.meta.dev) {
+              console.log('[SSE Client] Connection confirmed for edition', data.editionId)
+            }
           }
         } catch (error) {
           console.error('[SSE Client] Error parsing message:', error)
@@ -106,15 +118,19 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
         // EventSource se reconnecte automatiquement, mais on gère aussi manuellement
         // pour avoir plus de contrôle sur les tentatives
         if (connection.eventSource && connection.eventSource.readyState === EventSource.CLOSED) {
-          console.log('[SSE Client] Connection closed')
+          if (import.meta.dev) {
+            console.log('[SSE Client] Connection closed')
+          }
           disconnect(edId)
 
           // Tentative de reconnexion
           if (connection.reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
             connection.reconnectAttempts++
-            console.log(
-              `[SSE Client] Reconnecting... (attempt ${connection.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`
-            )
+            if (import.meta.dev) {
+              console.log(
+                `[SSE Client] Reconnecting... (attempt ${connection.reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`
+              )
+            }
             connection.reconnectTimeout = setTimeout(() => connect(edId), RECONNECT_DELAY)
           } else {
             console.error('[SSE Client] Max reconnection attempts reached')
@@ -136,7 +152,9 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
     }
 
     if (connection.eventSource) {
-      console.log('[SSE Client] Disconnecting')
+      if (import.meta.dev) {
+        console.log('[SSE Client] Disconnecting')
+      }
       connection.eventSource.close()
       connection.eventSource = null
     }
@@ -154,7 +172,9 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
     // Surveiller les changements d'editionId
     watch(editionIdRef, (newId, oldId) => {
       if (newId !== oldId) {
-        console.log('[SSE Client] Edition changed, reconnecting')
+        if (import.meta.dev) {
+          console.log('[SSE Client] Edition changed, reconnecting')
+        }
         disconnect(oldId)
         connect(newId)
       }

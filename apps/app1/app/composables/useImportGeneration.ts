@@ -219,11 +219,15 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
-          console.log('[SSE] Event received:', data.type)
+          if (import.meta.dev) {
+            console.log('[SSE] Event received:', data.type)
+          }
 
           switch (data.type) {
             case 'connected':
-              console.log(`[SSE] Connecté: method=${data.method}, urls=${data.urlCount}`)
+              if (import.meta.dev) {
+                console.log(`[SSE] Connecté: method=${data.method}, urls=${data.urlCount}`)
+              }
               break
 
             case 'ping':
@@ -252,7 +256,9 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
               break
 
             case 'url_fetched': {
-              console.log(`[SSE] URL récupérée: ${data.currentUrl}`)
+              if (import.meta.dev) {
+                console.log(`[SSE] URL récupérée: ${data.currentUrl}`)
+              }
               // Ajouter comme sous-étape de la dernière étape
               const lastStep = stepHistory.value[stepHistory.value.length - 1]
               if (lastStep) {

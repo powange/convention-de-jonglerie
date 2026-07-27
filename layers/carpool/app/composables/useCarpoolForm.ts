@@ -182,12 +182,10 @@ export function useCarpoolForm(config: CarpoolFormConfig) {
     isSubmitting.value = true
 
     try {
-      const response = await $fetch(config.endpoint, {
+      await $fetch(config.endpoint, {
         method: config.method || 'POST',
         body: form,
       })
-
-      console.log('Réponse API:', response)
 
       toast.add({
         title: config.successTitle,

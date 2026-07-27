@@ -50,7 +50,9 @@ export function useTicketingCounter(editionId: number, token: string) {
   // Initialiser le sessionId si ce n'est pas déjà fait
   if (!sessionId.value) {
     sessionId.value = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    console.log(`[Counter SSE] SessionId généré: ${sessionId.value}`)
+    if (import.meta.dev) {
+      console.log(`[Counter SSE] SessionId généré: ${sessionId.value}`)
+    }
   }
 
   /**
@@ -111,7 +113,9 @@ export function useTicketingCounter(editionId: number, token: string) {
     isSyncing.value = true
     const operations = [...pendingOperations.value]
 
-    console.log(`[Counter] Synchronisation de ${operations.length} opération(s) en attente...`)
+    if (import.meta.dev) {
+      console.log(`[Counter] Synchronisation de ${operations.length} opération(s) en attente...`)
+    }
 
     for (const op of operations) {
       try {
@@ -141,9 +145,11 @@ export function useTicketingCounter(editionId: number, token: string) {
     }
 
     isSyncing.value = false
-    console.log(
-      `[Counter] Synchronisation terminée. ${pendingOperations.value.length} opération(s) restante(s)`
-    )
+    if (import.meta.dev) {
+      console.log(
+        `[Counter] Synchronisation terminée. ${pendingOperations.value.length} opération(s) restante(s)`
+      )
+    }
   }
 
   /**
@@ -155,20 +161,26 @@ export function useTicketingCounter(editionId: number, token: string) {
     }
 
     const url = `/api/editions/${editionId}/ticketing/counters/token/${token}/stream?sessionId=${sessionId.value}`
-    console.log(`[Counter SSE] Connexion avec sessionId: ${sessionId.value}`)
+    if (import.meta.dev) {
+      console.log(`[Counter SSE] Connexion avec sessionId: ${sessionId.value}`)
+    }
     eventSource = new EventSource(url, { withCredentials: true })
 
     eventSource.addEventListener('connected', (event) => {
       const data = JSON.parse(event.data)
       isConnected.value = true
       activeConnections.value = data.activeConnections || 0
-      console.log('[Counter SSE] Connecté:', data)
+      if (import.meta.dev) {
+        console.log('[Counter SSE] Connecté:', data)
+      }
 
       // Synchroniser les opérations en attente dès la reconnexion
       if (pendingOperations.value.length > 0) {
-        console.log(
-          `[Counter SSE] Reconnexion détectée, ${pendingOperations.value.length} opération(s) à synchroniser`
-        )
+        if (import.meta.dev) {
+          console.log(
+            `[Counter SSE] Reconnexion détectée, ${pendingOperations.value.length} opération(s) à synchroniser`
+          )
+        }
         syncPendingOperations()
       }
     })
@@ -192,7 +204,9 @@ export function useTicketingCounter(editionId: number, token: string) {
 
       // Ne pas tenter de reconnexion si on est en train de déconnecter volontairement
       if (isDisconnecting) {
-        console.log('[Counter SSE] Erreur ignorée : déconnexion en cours')
+        if (import.meta.dev) {
+          console.log('[Counter SSE] Erreur ignorée : déconnexion en cours')
+        }
         return
       }
 
@@ -202,7 +216,9 @@ export function useTicketingCounter(editionId: number, token: string) {
       }
 
       reconnectTimeout = setTimeout(() => {
-        console.log('[Counter SSE] Tentative de reconnexion...')
+        if (import.meta.dev) {
+          console.log('[Counter SSE] Tentative de reconnexion...')
+        }
         connectSSE()
       }, 5000)
     }
@@ -214,7 +230,9 @@ export function useTicketingCounter(editionId: number, token: string) {
   const disconnectSSE = async () => {
     // Éviter les doubles déconnexions
     if (isDisconnecting) {
-      console.log('[Counter SSE] Déconnexion déjà en cours, ignorée')
+      if (import.meta.dev) {
+        console.log('[Counter SSE] Déconnexion déjà en cours, ignorée')
+      }
       return
     }
 
@@ -225,9 +243,11 @@ export function useTicketingCounter(editionId: number, token: string) {
 
     if (eventSource) {
       isDisconnecting = true
-      console.log(
-        `[Counter SSE] Déconnexion explicite - envoi du signal au serveur (session: ${sessionId.value})`
-      )
+      if (import.meta.dev) {
+        console.log(
+          `[Counter SSE] Déconnexion explicite - envoi du signal au serveur (session: ${sessionId.value})`
+        )
+      }
 
       // Envoyer un signal de déconnexion au serveur AVANT de fermer
       try {
@@ -235,7 +255,9 @@ export function useTicketingCounter(editionId: number, token: string) {
           method: 'POST',
           body: { sessionId: sessionId.value },
         })
-        console.log(`[Counter SSE] Signal de déconnexion envoyé avec succès`)
+        if (import.meta.dev) {
+          console.log(`[Counter SSE] Signal de déconnexion envoyé avec succès`)
+        }
       } catch (err) {
         console.error('[Counter SSE] Erreur lors de la déconnexion:', err)
       }
@@ -263,7 +285,9 @@ export function useTicketingCounter(editionId: number, token: string) {
 
     // Si hors-ligne, ajouter à la file d'attente
     if (!isConnected.value) {
-      console.log('[Counter] Hors-ligne : opération mise en attente', operation)
+      if (import.meta.dev) {
+        console.log('[Counter] Hors-ligne : opération mise en attente', operation)
+      }
       pendingOperations.value.push(operation)
       localValue.value += step
       return
@@ -279,7 +303,9 @@ export function useTicketingCounter(editionId: number, token: string) {
       // La mise à jour sera reçue via SSE
     } catch (err: any) {
       // En cas d'échec, mettre en attente
-      console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
+      if (import.meta.dev) {
+        console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
+      }
       pendingOperations.value.push(operation)
       localValue.value += step
       error.value = err?.data?.message || err?.message || "Erreur lors de l'incrémentation"
@@ -305,7 +331,9 @@ export function useTicketingCounter(editionId: number, token: string) {
 
     // Si hors-ligne, ajouter à la file d'attente
     if (!isConnected.value) {
-      console.log('[Counter] Hors-ligne : opération mise en attente', operation)
+      if (import.meta.dev) {
+        console.log('[Counter] Hors-ligne : opération mise en attente', operation)
+      }
       pendingOperations.value.push(operation)
       localValue.value = Math.max(0, localValue.value - step)
       return
@@ -321,7 +349,9 @@ export function useTicketingCounter(editionId: number, token: string) {
       // La mise à jour sera reçue via SSE
     } catch (err: any) {
       // En cas d'échec, mettre en attente
-      console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
+      if (import.meta.dev) {
+        console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
+      }
       pendingOperations.value.push(operation)
       localValue.value = Math.max(0, localValue.value - step)
       error.value = err?.data?.message || err?.message || 'Erreur lors de la décrémentation'
@@ -346,7 +376,9 @@ export function useTicketingCounter(editionId: number, token: string) {
 
     // Si hors-ligne, ajouter à la file d'attente
     if (!isConnected.value) {
-      console.log('[Counter] Hors-ligne : opération mise en attente', operation)
+      if (import.meta.dev) {
+        console.log('[Counter] Hors-ligne : opération mise en attente', operation)
+      }
       pendingOperations.value.push(operation)
       localValue.value = 0
       return
@@ -361,7 +393,9 @@ export function useTicketingCounter(editionId: number, token: string) {
       // La mise à jour sera reçue via SSE
     } catch (err: any) {
       // En cas d'échec, mettre en attente
-      console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
+      if (import.meta.dev) {
+        console.log("[Counter] Échec de l'envoi : opération mise en attente", err)
+      }
       pendingOperations.value.push(operation)
       localValue.value = 0
       error.value = err?.data?.message || err?.message || 'Erreur lors de la réinitialisation'

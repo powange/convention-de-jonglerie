@@ -106,15 +106,21 @@ export const useNotificationStream = () => {
     connectionStats.value.error = null
 
     try {
-      console.log('[SSE Client] Tentative de connexion à /api/notifications/stream')
+      if (import.meta.dev) {
+        console.log('[SSE Client] Tentative de connexion à /api/notifications/stream')
+      }
       eventSource = new EventSource('/api/notifications/stream')
-      console.log('[SSE Client] EventSource créé, readyState:', eventSource.readyState)
+      if (import.meta.dev) {
+        console.log('[SSE Client] EventSource créé, readyState:', eventSource.readyState)
+      }
 
       // Événement de connexion établie
       eventSource.addEventListener('connected', (event) => {
         const data = JSON.parse(event.data)
 
-        console.log('[SSE Client] ✅ Connexion SSE établie:', data.connectionId)
+        if (import.meta.dev) {
+          console.log('[SSE Client] ✅ Connexion SSE établie:', data.connectionId)
+        }
         connectionStats.value.isConnected = true
         connectionStats.value.isConnecting = false
         connectionStats.value.connectionId = data.connectionId
@@ -311,7 +317,9 @@ export const useNotificationStream = () => {
    * Ferme la connexion SSE
    */
   const disconnect = () => {
-    console.log('[SSE Client] Déconnexion du stream')
+    if (import.meta.dev) {
+      console.log('[SSE Client] Déconnexion du stream')
+    }
 
     if (eventSource) {
       eventSource.close()
@@ -434,7 +442,9 @@ export const useNotificationStream = () => {
         !connectionStats.value.isConnecting &&
         authStore.user
       ) {
-        console.log('[SSE Client] Page visible, reconnexion...')
+        if (import.meta.dev) {
+          console.log('[SSE Client] Page visible, reconnexion...')
+        }
         reconnect()
       }
     } else {

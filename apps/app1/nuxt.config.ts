@@ -507,10 +507,9 @@ export default defineNuxtConfig({
     },
   },
   vite: {
-    // Supprimer les console.log/debug en production (conserve console.error/warn)
-    esbuild: {
-      pure: process.env.NODE_ENV === 'production' ? ['console.log', 'console.debug'] : [],
-    },
+    // Pas de suppression des console.* au build : oxc n'offre pas d'équivalent à `pure_funcs`
+    // (seulement `dropConsole`, qui emporterait aussi error/warn). Les traces de débogage sont
+    // donc conditionnées à `import.meta.dev` directement dans le code — voir `logDebug`.
     css: {
       devSourcemap: true,
     },

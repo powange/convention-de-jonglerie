@@ -761,7 +761,6 @@ const getUserActions = (user: AdminUserWithConnection) => {
       label: t('admin.promote_to_admin'),
       icon: 'i-heroicons-shield-check',
       onSelect: () => {
-        console.log('Promote clicked for:', user.pseudo)
         promoteToAdmin(user)
       },
     })
@@ -770,7 +769,6 @@ const getUserActions = (user: AdminUserWithConnection) => {
       label: t('admin.demote'),
       icon: 'i-heroicons-shield-exclamation',
       onSelect: () => {
-        console.log('Demote clicked for:', user.pseudo)
         demoteFromAdmin(user)
       },
     })
@@ -782,7 +780,6 @@ const getUserActions = (user: AdminUserWithConnection) => {
       label: t('admin.delete_account'),
       icon: 'i-heroicons-trash',
       onSelect: () => {
-        console.log('Delete clicked for:', user.pseudo)
         openDeletionModal(user)
       },
     })
