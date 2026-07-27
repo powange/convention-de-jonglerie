@@ -84,6 +84,8 @@
 </template>
 
 <script setup lang="ts">
+import { CONVENTION_RIGHTS, EDITION_RIGHTS } from '~~/shared/utils/organizer-rights'
+
 // Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
 // s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
 // autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
@@ -267,49 +269,24 @@ const levelItems = computed(() =>
   }))
 )
 
-// Droits proposés au niveau convention. L'ordre suit celui du formulaire de gestion.
-const CONVENTION_RIGHT_KEYS = [
-  'editConvention',
-  'deleteConvention',
-  'manageOrganizers',
-  'addEdition',
-  'editAllEditions',
-  'deleteAllEditions',
-  'manageVolunteers',
-  'manageArtists',
-  'manageMeals',
-  'manageTicketing',
-  'manageTasks',
-  'manageStock',
-  'manageWorkshops',
-  'manageFAQ',
-]
-
-// Droits attribuables édition par édition.
-const EDITION_RIGHT_KEYS = [
-  'edit',
-  'delete',
-  'manageVolunteers',
-  'manageArtists',
-  'manageMeals',
-  'manageTicketing',
-  'manageTasks',
-  'manageStock',
-  'manageWorkshops',
-  'manageFAQ',
-]
-
+// Les deux listes dérivent de la source unique : un droit ajouté au schéma et à
+// shared/utils/organizer-rights apparaît ici automatiquement. S'il n'a pas de libellé, le test
+// permissions-sync.test.ts le signale.
 const conventionRights = computed(() =>
-  CONVENTION_RIGHT_KEYS.map((key) => ({
+  CONVENTION_RIGHTS.map((key) => ({
     label: t(`sections.conventionPerms.${key}.label`),
     desc: t(`sections.conventionPerms.${key}.desc`),
   }))
 )
 
+// Le guide nomme les droits d'édition sans le préfixe `can` : canManageFAQ → manageFAQ.
 const editionRights = computed(() =>
-  EDITION_RIGHT_KEYS.map((key) => ({
-    label: t(`sections.editionPerms.${key}.label`),
-    desc: t(`sections.editionPerms.${key}.desc`),
-  }))
+  EDITION_RIGHTS.map((right) => {
+    const key = right.charAt(3).toLowerCase() + right.slice(4)
+    return {
+      label: t(`sections.editionPerms.${key}.label`),
+      desc: t(`sections.editionPerms.${key}.desc`),
+    }
+  })
 )
 </script>

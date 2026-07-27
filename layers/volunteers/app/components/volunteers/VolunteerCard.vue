@@ -40,10 +40,12 @@
       {{ $t('pages.volunteers.team_distribution.leader_badge') }}
     </UBadge>
 
-    <!-- Boutons au survol (uniquement si teamId fourni pour les actions) -->
+    <!-- Boutons au survol (uniquement si teamId fourni pour les actions).
+         `pointer-coarse:opacity-100` les rend visibles en permanence sur écran tactile, où il
+         n'y a pas de survol : sans cela ces actions y sont tout simplement inatteignables. -->
     <div
       v-if="teamId"
-      class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+      class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity duration-200 z-10"
     >
       <!-- Toggle responsable -->
       <UButton

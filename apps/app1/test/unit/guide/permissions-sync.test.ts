@@ -3,16 +3,19 @@ import path from 'node:path'
 
 import { describe, it, expect } from 'vitest'
 
+import { CONVENTION_RIGHTS, EDITION_RIGHTS } from '../../../shared/utils/organizer-rights'
+
 /**
- * Garde-fou contre la dérive du guide des permissions.
+ * Garde-fou contre la dérive des droits d'organisateur.
  *
- * Les droits d'organisateur sont énumérés à la main à plusieurs endroits, dont la page
- * /guide/organizer/organizers. Rien ne signalait jusqu'ici qu'un droit ajouté au schéma n'y
- * était pas documenté : c'est ainsi que Workshops, FAQ, Tâches et Stock sont restés absents du
- * guide pendant des mois, et que deux droits inventés (« Spectacles », « Carte ») y ont figuré
- * sans jamais avoir existé.
+ * Les droits étaient recopiés à la main dans les types, le formulaire, le store, le menu et le
+ * guide. Rien ne reliait ces copies : quand Workshops, FAQ, Tâches et Stock ont été ajoutés au
+ * schéma, plusieurs sont restées en arrière, et le guide a longtemps documenté deux droits qui
+ * n'ont jamais existé.
  *
- * Ce test compare les deux listes et échoue dans les deux sens.
+ * shared/utils/organizer-rights est désormais la source unique. Ce test vérifie qu'elle
+ * correspond au schéma Prisma, et que le guide fournit un libellé pour chacun de ses droits —
+ * les listes du guide et du formulaire en dérivant directement, elles ne peuvent plus diverger.
  */
 
 const schemaPath = path.resolve(__dirname, '../../../prisma/schema/schema.prisma')
@@ -26,47 +29,40 @@ function rightsOfModel(modelName: string): string[] {
   const model = schema.match(new RegExp(`model ${modelName}\\s*\\{([\\s\\S]*?)\\n\\}`))
   if (!model) throw new Error(`Modèle Prisma introuvable : ${modelName}`)
 
-  return [...model[1].matchAll(/^\s*(can[A-Za-z]+)\s+Boolean/gm)].map((m) => m[1]!)
+  return [...model[1]!.matchAll(/^\s*(can[A-Za-z]+)\s+Boolean/gm)].map((m) => m[1]!)
 }
 
-/** Extrait un tableau de clés déclaré dans la page du guide. */
-function guideKeys(constName: string): string[] {
-  const declaration = guide.match(new RegExp(`const ${constName} = \\[([\\s\\S]*?)\\]`))
-  if (!declaration) throw new Error(`Constante introuvable dans le guide : ${constName}`)
+/** Le schéma préfixe de `can` ; les droits de convention sont exposés sans ce préfixe. */
+const withoutCanPrefix = (field: string) => field.charAt(3).toLowerCase() + field.slice(4)
 
-  return [...declaration[1].matchAll(/'([A-Za-z]+)'/g)].map((m) => m[1]!)
-}
-
-/**
- * Le guide nomme les droits sans le préfixe `can`, et en minuscule initiale :
- * `canManageFAQ` → `manageFAQ`, `canEdit` → `edit`.
- */
-const toGuideKey = (field: string) => field.charAt(3)!.toLowerCase() + field.slice(4)
-
-describe('guide des permissions — synchronisation avec le schéma Prisma', () => {
-  it('documente exactement les droits de convention', () => {
-    const expected = rightsOfModel('ConventionOrganizer').map(toGuideKey)
-    expect([...guideKeys('CONVENTION_RIGHT_KEYS')].sort()).toEqual([...expected].sort())
+describe('droits d’organisateur — la source unique suit le schéma Prisma', () => {
+  it('couvre exactement les droits de convention', () => {
+    const expected = rightsOfModel('ConventionOrganizer').map(withoutCanPrefix)
+    expect([...CONVENTION_RIGHTS].sort()).toEqual([...expected].sort())
   })
 
-  it('documente exactement les droits par édition', () => {
-    const expected = rightsOfModel('EditionOrganizerPermission').map(toGuideKey)
-    expect([...guideKeys('EDITION_RIGHT_KEYS')].sort()).toEqual([...expected].sort())
+  it('couvre exactement les droits par édition', () => {
+    const expected = rightsOfModel('EditionOrganizerPermission')
+    expect([...EDITION_RIGHTS].sort()).toEqual([...expected].sort())
+  })
+})
+
+describe('guide des permissions — un libellé pour chaque droit', () => {
+  /** Vérifie que la page du guide définit `<clé>: {` dans la section attendue. */
+  function expectDocumented(section: string, keys: readonly string[]) {
+    const block = guide.match(new RegExp(`${section}: \\{([\\s\\S]*?)\\n {4}\\}`))
+    expect(block, `section ${section} introuvable dans le guide`).not.toBeNull()
+
+    for (const key of keys) {
+      expect(block![1], `${section}.${key} : libellé manquant dans le guide`).toContain(`${key}: {`)
+    }
+  }
+
+  it('documente chaque droit de convention', () => {
+    expectDocumented('conventionPerms', CONVENTION_RIGHTS)
   })
 
-  it('fournit un libellé et une description pour chaque droit documenté', () => {
-    const sections = {
-      conventionPerms: guideKeys('CONVENTION_RIGHT_KEYS'),
-      editionPerms: guideKeys('EDITION_RIGHT_KEYS'),
-    }
-
-    for (const [section, keys] of Object.entries(sections)) {
-      for (const key of keys) {
-        // Les libellés vivent dans l'objet `messages` de la page, sous sections.<section>.<clé>.
-        const block = guide.match(new RegExp(`${section}: \\{([\\s\\S]*?)\\n {4}\\}`))
-        expect(block, `section ${section} introuvable`).not.toBeNull()
-        expect(block![1], `${section}.${key} : libellé manquant`).toContain(`${key}: {`)
-      }
-    }
+  it('documente chaque droit par édition', () => {
+    expectDocumented('editionPerms', EDITION_RIGHTS.map(withoutCanPrefix))
   })
 })
