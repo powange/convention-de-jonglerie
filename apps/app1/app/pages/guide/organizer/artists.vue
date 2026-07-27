@@ -435,13 +435,15 @@ const messages = {
       title: 'Sondage collaboratif',
       intro:
         'Évaluez collectivement les candidatures avec les autres organisateurs grâce au système de sondage intégré.',
-      generate: 'Générez un lien de sondage unique à partager avec les organisateurs participants.',
-      share: 'Partagez le lien : chaque organisateur peut noter les candidatures de 1 à 5.',
-      vote: 'Les votes sont anonymes et indépendants, chaque organisateur évalue selon ses critères.',
+      generate:
+        'Générez un lien de sondage unique à partager avec les personnes que vous voulez associer au choix. Le lien peut être régénéré à tout moment, ce qui invalide immédiatement le précédent.',
+      share:
+        'Un compte sur la plateforme est nécessaire pour voter : le lien seul ne suffit pas. Chaque votant note les candidatures en attente de 1 à 5.',
+      vote: "Pour juger, chacun dispose des informations du spectacle : durée, nombre d'artistes, vidéo et portfolio.",
       results:
-        'Consultez les résultats : score moyen et nombre de votes pour chaque candidature, triés par pertinence.',
+        "Les résultats affichent le score moyen et le nombre de votes par candidature. Les notes individuelles ne sont pas exposées, mais chaque vote reste rattaché à son auteur : il est modifiable, et un même votant ne compte qu'une fois.",
       toggle:
-        "Ouvrez ou fermez le sondage à tout moment. Un sondage fermé n'accepte plus de nouveaux votes.",
+        'Ouvrez ou fermez le sondage à tout moment. Une fois fermé, les votants gardent accès aux résultats mais ne peuvent plus voter.',
     },
     shows: {
       title: 'Programmation des spectacles',
