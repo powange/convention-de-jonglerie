@@ -3,7 +3,11 @@ import path from 'node:path'
 
 import { describe, it, expect } from 'vitest'
 
-import { CONVENTION_RIGHTS, EDITION_RIGHTS } from '../../../shared/utils/organizer-rights'
+import {
+  CONVENTION_RIGHTS,
+  EDITION_MODULE_RIGHTS,
+  EDITION_RIGHTS,
+} from '../../../shared/utils/organizer-rights'
 
 /**
  * Garde-fou contre la dérive des droits d'organisateur.
@@ -20,9 +24,13 @@ import { CONVENTION_RIGHTS, EDITION_RIGHTS } from '../../../shared/utils/organiz
 
 const schemaPath = path.resolve(__dirname, '../../../prisma/schema/schema.prisma')
 const guidePath = path.resolve(__dirname, '../../../app/pages/guide/organizer/organizers.vue')
+const storePath = path.resolve(__dirname, '../../../app/stores/editions.ts')
+const menuPath = path.resolve(__dirname, '../../../app/layouts/edition-dashboard.vue')
 
 const schema = fs.readFileSync(schemaPath, 'utf8')
 const guide = fs.readFileSync(guidePath, 'utf8')
+const store = fs.readFileSync(storePath, 'utf8')
+const menu = fs.readFileSync(menuPath, 'utf8')
 
 /** Extrait les champs booléens `canX` déclarés dans un modèle Prisma. */
 function rightsOfModel(modelName: string): string[] {
@@ -64,5 +72,34 @@ describe('guide des permissions — un libellé pour chaque droit', () => {
 
   it('documente chaque droit par édition', () => {
     expectDocumented('editionPerms', EDITION_RIGHTS.map(withoutCanPrefix))
+  })
+})
+
+/**
+ * Les droits métier décident de ce que l'utilisateur voit réellement. Un droit ajouté sans
+ * méthode de store ni entrée de menu donne une fonctionnalité qui existe mais reste
+ * inaccessible — c'est précisément ce qui s'était produit avant l'audit des permissions.
+ */
+describe('droits métier — accessibles depuis le store et le menu', () => {
+  it('expose une méthode de store par droit métier', () => {
+    for (const right of EDITION_MODULE_RIGHTS) {
+      const method = `can${right.charAt(0).toUpperCase()}${right.slice(1)}`
+      expect(store, `${method}() manquant dans le store des éditions`).toContain(
+        `${method}(edition: Edition, userId: number)`
+      )
+    }
+  })
+
+  // La FAQ fait exception : son entrée de menu est volontairement ouverte plus largement, parce
+  // que responsables d'équipe et bénévoles en créneau doivent pouvoir la consulter sur place.
+  // Seules les modifications exigent `canManageFAQ`, appliqué côté page et côté API.
+  const MENU_EXEMPT: readonly string[] = ['manageFAQ']
+
+  it('déclare chaque droit métier dans le menu de gestion', () => {
+    for (const right of EDITION_MODULE_RIGHTS) {
+      if (MENU_EXEMPT.includes(right)) continue
+      const method = `can${right.charAt(0).toUpperCase()}${right.slice(1)}`
+      expect(menu, `${method} absent du menu de gestion`).toContain(`editionStore.${method}(`)
+    }
   })
 })

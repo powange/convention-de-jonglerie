@@ -58,6 +58,29 @@ export const EDITION_RIGHTS = [
 
 export type EditionRight = (typeof EDITION_RIGHTS)[number]
 
+/**
+ * Droits « métier » d'une édition : les modules, à l'exclusion de `canEdit` et `canDelete` qui
+ * portent sur la fiche de l'édition elle-même.
+ *
+ * Exprimés en clé courte, car c'est sous cette forme qu'ils apparaissent dans les droits de
+ * convention (`rights.manageFAQ`), le pendant par édition étant `canManageFAQ`.
+ *
+ * Tous obéissent à la même règle d'accès : le store en dérive ses huit méthodes, et un test
+ * vérifie qu'aucun n'est oublié.
+ */
+export const EDITION_MODULE_RIGHTS = [
+  'manageVolunteers',
+  'manageArtists',
+  'manageMeals',
+  'manageTicketing',
+  'manageTasks',
+  'manageStock',
+  'manageWorkshops',
+  'manageFAQ',
+] as const
+
+export type EditionModuleRight = (typeof EDITION_MODULE_RIGHTS)[number]
+
 /** Droits de convention d'un organisateur, tous optionnels. */
 export type OrganizerConventionRights = Partial<Record<ConventionRight, boolean>>
 

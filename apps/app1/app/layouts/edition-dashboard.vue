@@ -562,10 +562,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
-  // FAQ : visible pour les organisateurs (même sans canEdit), les
-  // responsables d'équipe bénévoles et les bénévoles actuellement en
-  // créneau (contrôle d'accès ou validation des repas). Les actions
-  // de modification sont gardées côté page + côté API par `canEditEdition`.
+  // FAQ : volontairement visible plus largement que les autres modules — organisateurs (même
+  // sans canEdit), responsables d'équipe bénévoles et bénévoles actuellement en créneau
+  // (contrôle d'accès ou validation des repas) —, car ils ont besoin de la CONSULTER sur place.
+  // Les modifications, elles, exigent le droit dédié `canManageFAQ`, appliqué côté page et côté
+  // API. C'est la raison pour laquelle cette entrée n'est pas conditionnée à `canManageFAQ`.
   if (
     edition.value?.faqEnabled &&
     (canEdit.value ||
