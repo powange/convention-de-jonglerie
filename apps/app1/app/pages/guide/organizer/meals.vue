@@ -130,7 +130,74 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Gestion des repas',
+  subtitle: 'Configurez et gérez les repas pour vos bénévoles et artistes.',
+  sections: {
+    config: {
+      title: 'Configuration des repas',
+      intro: 'Définissez les repas disponibles pour chaque jour de votre édition.',
+      types: {
+        title: 'Types de repas',
+        breakfast: 'Petit-déjeuner',
+        lunch: 'Déjeuner',
+        dinner: 'Dîner',
+        snack: 'Collation / Goûter',
+      },
+      phases: {
+        title: "Phases d'activation",
+        intro: "Chaque repas peut être activé pour une ou plusieurs phases de l'événement :",
+        setup: {
+          label: 'Montage',
+          desc: "pour les bénévoles présents avant le début officiel de l'édition.",
+        },
+        event: {
+          label: 'Événement',
+          desc: "pendant la durée de l'édition.",
+        },
+        teardown: {
+          label: 'Démontage',
+          desc: "pour les bénévoles restant après la fin de l'édition.",
+        },
+      },
+    },
+    sync: {
+      title: 'Synchronisation automatique',
+      content:
+        'Les repas configurés sont automatiquement synchronisés avec les différents acteurs de votre édition :',
+      volunteers:
+        'Repas bénévoles : chaque bénévole accepté se voit attribuer les repas correspondant à ses créneaux.',
+      artists: 'Repas artistes : les artistes programmés bénéficient des repas configurés.',
+      automatic:
+        'La synchronisation est automatique : toute modification de la configuration des repas est immédiatement répercutée.',
+    },
+    items: {
+      title: 'Articles de repas',
+      content:
+        "Associez des articles à remettre aux repas (ex : tickets repas, bracelets). Ces articles permettent de contrôler l'accès aux repas et de suivre leur distribution.",
+    },
+    list: {
+      title: 'Liste récapitulative',
+      content:
+        "La page de liste offre une vue d'ensemble de tous les repas avec le nombre de personnes attendues par repas et par jour, facilitant la planification logistique.",
+    },
+    validate: {
+      title: 'Validation sur place',
+      intro: "Pendant l'événement, validez les repas en temps réel.",
+      scan: "Scannez le QR code du bénévole ou de l'artiste pour valider son repas.",
+      search: "Recherchez un participant par nom si le scan n'est pas possible.",
+      history: "Consultez l'historique des validations pour éviter les doublons.",
+      access: "Les bénévoles d'équipes de validation ont accès à cette fonctionnalité.",
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Gestion des repas' })
 
@@ -145,64 +212,3 @@ useHead({
   ],
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Gestion des repas",
-    "subtitle": "Configurez et gérez les repas pour vos bénévoles et artistes.",
-    "sections": {
-      "config": {
-        "title": "Configuration des repas",
-        "intro": "Définissez les repas disponibles pour chaque jour de votre édition.",
-        "types": {
-          "title": "Types de repas",
-          "breakfast": "Petit-déjeuner",
-          "lunch": "Déjeuner",
-          "dinner": "Dîner",
-          "snack": "Collation / Goûter"
-        },
-        "phases": {
-          "title": "Phases d'activation",
-          "intro": "Chaque repas peut être activé pour une ou plusieurs phases de l'événement :",
-          "setup": {
-            "label": "Montage",
-            "desc": "pour les bénévoles présents avant le début officiel de l'édition."
-          },
-          "event": {
-            "label": "Événement",
-            "desc": "pendant la durée de l'édition."
-          },
-          "teardown": {
-            "label": "Démontage",
-            "desc": "pour les bénévoles restant après la fin de l'édition."
-          }
-        }
-      },
-      "sync": {
-        "title": "Synchronisation automatique",
-        "content": "Les repas configurés sont automatiquement synchronisés avec les différents acteurs de votre édition :",
-        "volunteers": "Repas bénévoles : chaque bénévole accepté se voit attribuer les repas correspondant à ses créneaux.",
-        "artists": "Repas artistes : les artistes programmés bénéficient des repas configurés.",
-        "automatic": "La synchronisation est automatique : toute modification de la configuration des repas est immédiatement répercutée."
-      },
-      "items": {
-        "title": "Articles de repas",
-        "content": "Associez des articles à remettre aux repas (ex : tickets repas, bracelets). Ces articles permettent de contrôler l'accès aux repas et de suivre leur distribution."
-      },
-      "list": {
-        "title": "Liste récapitulative",
-        "content": "La page de liste offre une vue d'ensemble de tous les repas avec le nombre de personnes attendues par repas et par jour, facilitant la planification logistique."
-      },
-      "validate": {
-        "title": "Validation sur place",
-        "intro": "Pendant l'événement, validez les repas en temps réel.",
-        "scan": "Scannez le QR code du bénévole ou de l'artiste pour valider son repas.",
-        "search": "Recherchez un participant par nom si le scan n'est pas possible.",
-        "history": "Consultez l'historique des validations pour éviter les doublons.",
-        "access": "Les bénévoles d'équipes de validation ont accès à cette fonctionnalité."
-      }
-    }
-  }
-}
-</i18n>

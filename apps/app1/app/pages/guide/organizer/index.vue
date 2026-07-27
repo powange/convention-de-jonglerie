@@ -34,7 +34,59 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Guide Organisateur',
+  subtitle: 'Créez et gérez vos conventions, éditions et événements.',
+  sections: {
+    conventions: {
+      title: 'Conventions & Éditions',
+      description: 'Créer, configurer et publier vos événements.',
+    },
+    organizers: {
+      title: 'Co-organisateurs',
+      description: 'Inviter des collaborateurs et gérer les permissions.',
+    },
+    tasks: {
+      title: 'Gestion des tâches',
+      description: 'Groupes, assignations, étiquettes, checklists et suivi.',
+    },
+    stock: {
+      title: 'Gestion du matériel',
+      description: 'Inventaire, prêts externes et réservations sur périodes.',
+    },
+    volunteers: {
+      title: 'Bénévoles',
+      description: 'Appel, équipes, planning et notifications.',
+    },
+    artists: {
+      title: 'Artistes & Spectacles',
+      description: 'Appels à spectacles, candidatures et programme.',
+    },
+    meals: {
+      title: 'Repas',
+      description: 'Configuration, synchronisation et validation.',
+    },
+    ticketing: {
+      title: 'Billetterie',
+      description: "Tarifs, commandes, contrôle d'accès et stats.",
+    },
+    map: {
+      title: 'Carte interactive',
+      description: 'Zones, marqueurs et plan du site.',
+    },
+    other: {
+      title: 'Autres',
+      description: 'Workshops, objets trouvés, publications.',
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({
   layout: 'guide',
@@ -135,54 +187,3 @@ const sections = computed(() => [
   },
 ])
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Guide Organisateur",
-    "subtitle": "Créez et gérez vos conventions, éditions et événements.",
-    "sections": {
-      "conventions": {
-        "title": "Conventions & Éditions",
-        "description": "Créer, configurer et publier vos événements."
-      },
-      "organizers": {
-        "title": "Co-organisateurs",
-        "description": "Inviter des collaborateurs et gérer les permissions."
-      },
-      "tasks": {
-        "title": "Gestion des tâches",
-        "description": "Groupes, assignations, étiquettes, checklists et suivi."
-      },
-      "stock": {
-        "title": "Gestion du matériel",
-        "description": "Inventaire, prêts externes et réservations sur périodes."
-      },
-      "volunteers": {
-        "title": "Bénévoles",
-        "description": "Appel, équipes, planning et notifications."
-      },
-      "artists": {
-        "title": "Artistes & Spectacles",
-        "description": "Appels à spectacles, candidatures et programme."
-      },
-      "meals": {
-        "title": "Repas",
-        "description": "Configuration, synchronisation et validation."
-      },
-      "ticketing": {
-        "title": "Billetterie",
-        "description": "Tarifs, commandes, contrôle d'accès et stats."
-      },
-      "map": {
-        "title": "Carte interactive",
-        "description": "Zones, marqueurs et plan du site."
-      },
-      "other": {
-        "title": "Autres",
-        "description": "Workshops, objets trouvés, publications."
-      }
-    }
-  }
-}
-</i18n>

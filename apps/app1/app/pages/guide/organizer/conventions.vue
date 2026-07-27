@@ -168,7 +168,81 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Conventions & Éditions',
+  subtitle: 'Créez et configurez vos conventions et leurs éditions.',
+  sections: {
+    concept: {
+      title: 'Concept : Convention vs Édition',
+      intro: "La plateforme distingue deux niveaux d'organisation :",
+      convention: {
+        label: 'Convention',
+        desc: "l'événement récurrent dans son ensemble (ex : « Convention de Jonglerie de Paris »). Elle regroupe toutes les éditions passées et futures.",
+      },
+      edition: {
+        label: 'Édition',
+        desc: 'une occurrence précise de la convention (ex : « Édition 2025 »). Chaque édition a ses propres dates, lieu, équipe et configuration.',
+      },
+    },
+    createConvention: {
+      title: 'Créer une convention',
+      intro: 'Depuis votre espace, créez une nouvelle convention en renseignant :',
+      name: 'Nom de la convention.',
+      description: 'Description en texte enrichi (Markdown supporté).',
+      logo: 'Logo ou image de la convention.',
+    },
+    claim: {
+      title: 'Revendiquer une convention existante',
+      content:
+        'Si une convention existe déjà sur la plateforme (créée par un autre organisateur ou importée), vous pouvez demander à en devenir organisateur. Votre demande sera examinée par les administrateurs.',
+    },
+    addEdition: {
+      title: 'Ajouter une édition',
+      intro: 'Une fois votre convention créée, ajoutez une édition en précisant :',
+      dates: "Dates de début et de fin de l'événement.",
+      location: 'Lieu (ville, adresse, pays).',
+      gps: 'Coordonnées GPS pour la carte interactive.',
+      services: 'Services disponibles (camping, repas, douches, parking, etc.).',
+      price: 'Fourchette de prix indicative.',
+      poster: "Affiche de l'édition.",
+    },
+    statuses: {
+      title: "Statuts d'édition",
+      intro: 'Chaque édition passe par différents statuts :',
+      offline: {
+        label: 'Hors ligne',
+        desc: "l'édition est en préparation et n'est pas visible publiquement.",
+      },
+      planned: {
+        label: 'Planifiée',
+        desc: 'les dates sont confirmées mais les détails sont encore en cours.',
+      },
+      published: {
+        label: 'Publiée',
+        desc: "l'édition est visible par tous et les inscriptions peuvent commencer.",
+      },
+      cancelled: {
+        label: 'Annulée',
+        desc: "l'édition a été annulée. Les participants inscrits sont notifiés.",
+      },
+    },
+    manage: {
+      title: 'Gérer une édition',
+      intro: "Depuis le tableau de bord de l'édition, vous pouvez :",
+      edit: "Modifier toutes les informations de l'édition à tout moment.",
+      delete: "Supprimer l'édition (action irréversible, nécessite une confirmation).",
+      dashboard:
+        'Accéder au tableau de bord complet pour gérer tous les aspects : bénévoles, artistes, billetterie, carte, etc.',
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Conventions & Éditions' })
 
@@ -183,74 +257,3 @@ useHead({
   ],
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Conventions & Éditions",
-    "subtitle": "Créez et configurez vos conventions et leurs éditions.",
-    "sections": {
-      "concept": {
-        "title": "Concept : Convention vs Édition",
-        "intro": "La plateforme distingue deux niveaux d'organisation :",
-        "convention": {
-          "label": "Convention",
-          "desc": "l'événement récurrent dans son ensemble (ex : « Convention de Jonglerie de Paris »). Elle regroupe toutes les éditions passées et futures."
-        },
-        "edition": {
-          "label": "Édition",
-          "desc": "une occurrence précise de la convention (ex : « Édition 2025 »). Chaque édition a ses propres dates, lieu, équipe et configuration."
-        }
-      },
-      "createConvention": {
-        "title": "Créer une convention",
-        "intro": "Depuis votre espace, créez une nouvelle convention en renseignant :",
-        "name": "Nom de la convention.",
-        "description": "Description en texte enrichi (Markdown supporté).",
-        "logo": "Logo ou image de la convention."
-      },
-      "claim": {
-        "title": "Revendiquer une convention existante",
-        "content": "Si une convention existe déjà sur la plateforme (créée par un autre organisateur ou importée), vous pouvez demander à en devenir organisateur. Votre demande sera examinée par les administrateurs."
-      },
-      "addEdition": {
-        "title": "Ajouter une édition",
-        "intro": "Une fois votre convention créée, ajoutez une édition en précisant :",
-        "dates": "Dates de début et de fin de l'événement.",
-        "location": "Lieu (ville, adresse, pays).",
-        "gps": "Coordonnées GPS pour la carte interactive.",
-        "services": "Services disponibles (camping, repas, douches, parking, etc.).",
-        "price": "Fourchette de prix indicative.",
-        "poster": "Affiche de l'édition."
-      },
-      "statuses": {
-        "title": "Statuts d'édition",
-        "intro": "Chaque édition passe par différents statuts :",
-        "offline": {
-          "label": "Hors ligne",
-          "desc": "l'édition est en préparation et n'est pas visible publiquement."
-        },
-        "planned": {
-          "label": "Planifiée",
-          "desc": "les dates sont confirmées mais les détails sont encore en cours."
-        },
-        "published": {
-          "label": "Publiée",
-          "desc": "l'édition est visible par tous et les inscriptions peuvent commencer."
-        },
-        "cancelled": {
-          "label": "Annulée",
-          "desc": "l'édition a été annulée. Les participants inscrits sont notifiés."
-        }
-      },
-      "manage": {
-        "title": "Gérer une édition",
-        "intro": "Depuis le tableau de bord de l'édition, vous pouvez :",
-        "edit": "Modifier toutes les informations de l'édition à tout moment.",
-        "delete": "Supprimer l'édition (action irréversible, nécessite une confirmation).",
-        "dashboard": "Accéder au tableau de bord complet pour gérer tous les aspects : bénévoles, artistes, billetterie, carte, etc."
-      }
-    }
-  }
-}
-</i18n>

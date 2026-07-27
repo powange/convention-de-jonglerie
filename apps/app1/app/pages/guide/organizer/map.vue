@@ -84,7 +84,54 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Carte interactive',
+  subtitle: "Créez le plan de votre site avec zones et points d'intérêt.",
+  sections: {
+    publish: {
+      title: 'Publication de la carte',
+      content:
+        "Activez la carte interactive pour la rendre visible aux visiteurs de votre édition. Tant que la carte n'est pas publiée, seuls les organisateurs y ont accès pour la préparer.",
+    },
+    zones: {
+      title: 'Zones',
+      intro:
+        'Les zones sont des surfaces colorées sur la carte qui délimitent les différentes aires de votre site.',
+      draw: 'Dessinez des polygones directement sur la carte en cliquant pour placer chaque sommet.',
+      name: 'Donnez un nom descriptif à chaque zone.',
+      color: 'Attribuez une couleur distincte pour un repérage visuel immédiat.',
+      examples:
+        'Exemples de zones : parking, camping, scène principale, chapiteau, espace restauration, zone de jeu.',
+      edit: "Modifiez les contours d'une zone en déplaçant ses sommets, ou supprimez-la.",
+    },
+    markers: {
+      title: 'Marqueurs',
+      intro: "Les marqueurs sont des points d'intérêt précis sur la carte.",
+      place: "Cliquez sur la carte pour placer un marqueur à l'emplacement souhaité.",
+      icon: 'Choisissez une icône représentative (toilettes, bar, info, premiers secours, scène, etc.).',
+      color: 'Attribuez une couleur au marqueur pour le distinguer des autres.',
+      label: "Ajoutez un libellé qui s'affiche au survol ou au clic.",
+      dragDrop: 'Repositionnez les marqueurs par glisser-déposer.',
+    },
+    legend: {
+      title: 'Légende interactive',
+      content:
+        'La carte génère automatiquement une légende basée sur vos zones et marqueurs. Les visiteurs peuvent cliquer sur un élément de la légende pour le mettre en évidence sur la carte.',
+    },
+    shows: {
+      title: 'Association avec les spectacles',
+      content:
+        'Associez vos spectacles à des zones ou des marqueurs de la carte. Les visiteurs pourront ainsi localiser facilement où se déroulent les spectacles depuis le programme.',
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Carte interactive' })
 
@@ -99,44 +146,3 @@ useHead({
   ],
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Carte interactive",
-    "subtitle": "Créez le plan de votre site avec zones et points d'intérêt.",
-    "sections": {
-      "publish": {
-        "title": "Publication de la carte",
-        "content": "Activez la carte interactive pour la rendre visible aux visiteurs de votre édition. Tant que la carte n'est pas publiée, seuls les organisateurs y ont accès pour la préparer."
-      },
-      "zones": {
-        "title": "Zones",
-        "intro": "Les zones sont des surfaces colorées sur la carte qui délimitent les différentes aires de votre site.",
-        "draw": "Dessinez des polygones directement sur la carte en cliquant pour placer chaque sommet.",
-        "name": "Donnez un nom descriptif à chaque zone.",
-        "color": "Attribuez une couleur distincte pour un repérage visuel immédiat.",
-        "examples": "Exemples de zones : parking, camping, scène principale, chapiteau, espace restauration, zone de jeu.",
-        "edit": "Modifiez les contours d'une zone en déplaçant ses sommets, ou supprimez-la."
-      },
-      "markers": {
-        "title": "Marqueurs",
-        "intro": "Les marqueurs sont des points d'intérêt précis sur la carte.",
-        "place": "Cliquez sur la carte pour placer un marqueur à l'emplacement souhaité.",
-        "icon": "Choisissez une icône représentative (toilettes, bar, info, premiers secours, scène, etc.).",
-        "color": "Attribuez une couleur au marqueur pour le distinguer des autres.",
-        "label": "Ajoutez un libellé qui s'affiche au survol ou au clic.",
-        "dragDrop": "Repositionnez les marqueurs par glisser-déposer."
-      },
-      "legend": {
-        "title": "Légende interactive",
-        "content": "La carte génère automatiquement une légende basée sur vos zones et marqueurs. Les visiteurs peuvent cliquer sur un élément de la légende pour le mettre en évidence sur la carte."
-      },
-      "shows": {
-        "title": "Association avec les spectacles",
-        "content": "Associez vos spectacles à des zones ou des marqueurs de la carte. Les visiteurs pourront ainsi localiser facilement où se déroulent les spectacles depuis le programme."
-      }
-    }
-  }
-}
-</i18n>

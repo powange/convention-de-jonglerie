@@ -178,7 +178,76 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: 'Gestion des tâches',
+  subtitle: 'Organisez le travail de votre équipe pour préparer et suivre votre édition.',
+  sections: {
+    groups: {
+      title: 'Groupes de tâches',
+      intro: 'Les tâches sont organisées en groupes pour structurer le travail selon vos besoins.',
+      create: 'Créez autant de groupes que nécessaire, avec un nom et une description optionnelle.',
+      examples:
+        'Organisez les groupes par phase (avant / pendant / après), par équipe ou par thème (logistique, communication, technique…).',
+      reorder:
+        "Réordonnez les groupes par glisser-déposer pour les présenter dans l'ordre qui vous convient.",
+    },
+    tasks: {
+      title: 'Créer et suivre les tâches',
+      intro: 'Ajoutez des tâches dans chaque groupe et suivez leur avancement.',
+      fields: 'Chaque tâche possède un titre et une description détaillée optionnelle.',
+      status: "Suivez l'état d'une tâche : À faire, En cours, Terminée ou Annulée.",
+      deadline: "Fixez une date d'échéance optionnelle pour ne rien oublier.",
+    },
+    organize: {
+      title: 'Organisation visuelle',
+      intro: "Visualisez et organisez les tâches d'un groupe d'un coup d'œil.",
+      kanban: 'Affichage en colonnes (tableau kanban) regroupant les tâches par statut.',
+      dragdrop:
+        'Déplacez les tâches par glisser-déposer pour changer leur statut ou les réordonner.',
+      filters: 'Filtrez les tâches par statut, par personne assignée ou par étiquette.',
+    },
+    assign: {
+      title: 'Assignation',
+      intro: 'Répartissez le travail en assignant les tâches aux membres de votre équipe.',
+      who: "Assignez les tâches aux co-organisateurs et aux bénévoles acceptés de l'édition.",
+      multiple: 'Une tâche peut être assignée à plusieurs personnes simultanément.',
+      permission: 'La gestion des tâches nécessite la permission « Gérer les tâches ».',
+    },
+    tags: {
+      title: 'Étiquettes',
+      intro: "Catégorisez finement les tâches au sein d'un groupe grâce aux étiquettes.",
+      create:
+        'Créez des étiquettes colorées propres à chaque groupe (ex : « urgent », « matériel », « à valider »).',
+      assign: 'Attribuez une ou plusieurs étiquettes à chaque tâche pour la retrouver facilement.',
+    },
+    checklists: {
+      title: 'Checklists',
+      intro: 'Découpez une tâche complexe en sous-étapes cochables sans créer de nouvelles tâches.',
+      add: 'Ajoutez des éléments de checklist à une tâche pour lister les étapes à réaliser.',
+      check: 'Cochez les éléments au fur et à mesure pour suivre la progression de la tâche.',
+    },
+    comments: {
+      title: 'Commentaires',
+      intro: 'Échangez avec votre équipe directement sur chaque tâche.',
+      discuss:
+        'Ajoutez des commentaires pour discuter, partager des informations ou poser des questions.',
+      edit: 'Modifiez ou supprimez vos propres commentaires à tout moment.',
+    },
+    myTasks: {
+      title: 'Mes tâches',
+      intro: 'Chaque membre retrouve facilement le travail qui lui est confié.',
+      view: "La page « Mes tâches » regroupe toutes les tâches assignées à la personne connectée sur l'édition.",
+      update: "Chacun peut suivre et mettre à jour l'avancement des tâches qui le concernent.",
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({ layout: 'guide', title: 'Guide - Gestion des tâches' })
 
@@ -193,66 +262,3 @@ useHead({
   ],
 })
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Gestion des tâches",
-    "subtitle": "Organisez le travail de votre équipe pour préparer et suivre votre édition.",
-    "sections": {
-      "groups": {
-        "title": "Groupes de tâches",
-        "intro": "Les tâches sont organisées en groupes pour structurer le travail selon vos besoins.",
-        "create": "Créez autant de groupes que nécessaire, avec un nom et une description optionnelle.",
-        "examples": "Organisez les groupes par phase (avant / pendant / après), par équipe ou par thème (logistique, communication, technique…).",
-        "reorder": "Réordonnez les groupes par glisser-déposer pour les présenter dans l'ordre qui vous convient."
-      },
-      "tasks": {
-        "title": "Créer et suivre les tâches",
-        "intro": "Ajoutez des tâches dans chaque groupe et suivez leur avancement.",
-        "fields": "Chaque tâche possède un titre et une description détaillée optionnelle.",
-        "status": "Suivez l'état d'une tâche : À faire, En cours, Terminée ou Annulée.",
-        "deadline": "Fixez une date d'échéance optionnelle pour ne rien oublier."
-      },
-      "organize": {
-        "title": "Organisation visuelle",
-        "intro": "Visualisez et organisez les tâches d'un groupe d'un coup d'œil.",
-        "kanban": "Affichage en colonnes (tableau kanban) regroupant les tâches par statut.",
-        "dragdrop": "Déplacez les tâches par glisser-déposer pour changer leur statut ou les réordonner.",
-        "filters": "Filtrez les tâches par statut, par personne assignée ou par étiquette."
-      },
-      "assign": {
-        "title": "Assignation",
-        "intro": "Répartissez le travail en assignant les tâches aux membres de votre équipe.",
-        "who": "Assignez les tâches aux co-organisateurs et aux bénévoles acceptés de l'édition.",
-        "multiple": "Une tâche peut être assignée à plusieurs personnes simultanément.",
-        "permission": "La gestion des tâches nécessite la permission « Gérer les tâches »."
-      },
-      "tags": {
-        "title": "Étiquettes",
-        "intro": "Catégorisez finement les tâches au sein d'un groupe grâce aux étiquettes.",
-        "create": "Créez des étiquettes colorées propres à chaque groupe (ex : « urgent », « matériel », « à valider »).",
-        "assign": "Attribuez une ou plusieurs étiquettes à chaque tâche pour la retrouver facilement."
-      },
-      "checklists": {
-        "title": "Checklists",
-        "intro": "Découpez une tâche complexe en sous-étapes cochables sans créer de nouvelles tâches.",
-        "add": "Ajoutez des éléments de checklist à une tâche pour lister les étapes à réaliser.",
-        "check": "Cochez les éléments au fur et à mesure pour suivre la progression de la tâche."
-      },
-      "comments": {
-        "title": "Commentaires",
-        "intro": "Échangez avec votre équipe directement sur chaque tâche.",
-        "discuss": "Ajoutez des commentaires pour discuter, partager des informations ou poser des questions.",
-        "edit": "Modifiez ou supprimez vos propres commentaires à tout moment."
-      },
-      "myTasks": {
-        "title": "Mes tâches",
-        "intro": "Chaque membre retrouve facilement le travail qui lui est confié.",
-        "view": "La page « Mes tâches » regroupe toutes les tâches assignées à la personne connectée sur l'édition.",
-        "update": "Chacun peut suivre et mettre à jour l'avancement des tâches qui le concernent."
-      }
-    }
-  }
-}
-</i18n>

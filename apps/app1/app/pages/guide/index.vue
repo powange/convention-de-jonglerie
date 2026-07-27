@@ -5,15 +5,6 @@
       {{ t('description') }}
     </p>
 
-    <UAlert
-      icon="i-heroicons-wrench-screwdriver"
-      color="warning"
-      variant="subtle"
-      title="Guide under construction"
-      description="This guide is currently only available in French. Translations to other languages will be added later."
-      class="mb-8"
-    />
-
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <NuxtLink
         v-for="role in roles"
@@ -43,7 +34,37 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Le guide est rédigé en français uniquement : ses libellés ne passent pas par i18n, sinon ils
+// s'afficheraient sous forme de clés brutes pour les visiteurs dont l'interface est dans une
+// autre langue. Ils sont définis ici et rendus tels quels. Cf. l'encart du layout, qui invite
+// les non-francophones à utiliser la traduction intégrée de leur navigateur.
+const messages = {
+  title: "Guide d'utilisation",
+  description: 'Découvrez toutes les fonctionnalités de Convention de Jonglerie selon votre rôle.',
+  roles: {
+    user: {
+      title: 'Utilisateur',
+      description:
+        'Découvrez les conventions de jonglerie, gérez vos favoris et participez à la communauté.',
+    },
+    artist: {
+      title: 'Artiste',
+      description:
+        'Proposez vos spectacles aux conventions et suivez vos candidatures artistiques.',
+    },
+    organizer: {
+      title: 'Organisateur',
+      description: 'Créez et gérez vos conventions, éditions, bénévoles et billetterie.',
+    },
+    volunteer: {
+      title: 'Bénévole',
+      description: 'Postulez en tant que bénévole, consultez votre planning et gérez vos créneaux.',
+    },
+  },
+}
+
+const t = (path: string): string =>
+  path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
 
 definePageMeta({
   layout: 'guide',
@@ -96,30 +117,3 @@ const roles = computed(() => [
   },
 ])
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "title": "Guide d'utilisation",
-    "description": "Découvrez toutes les fonctionnalités de Convention de Jonglerie selon votre rôle.",
-    "roles": {
-      "user": {
-        "title": "Utilisateur",
-        "description": "Découvrez les conventions de jonglerie, gérez vos favoris et participez à la communauté."
-      },
-      "artist": {
-        "title": "Artiste",
-        "description": "Proposez vos spectacles aux conventions et suivez vos candidatures artistiques."
-      },
-      "organizer": {
-        "title": "Organisateur",
-        "description": "Créez et gérez vos conventions, éditions, bénévoles et billetterie."
-      },
-      "volunteer": {
-        "title": "Bénévole",
-        "description": "Postulez en tant que bénévole, consultez votre planning et gérez vos créneaux."
-      }
-    }
-  }
-}
-</i18n>
