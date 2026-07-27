@@ -139,6 +139,23 @@
           </li>
         </ul>
       </GuideSection>
+
+      <GuideSection
+        icon="i-heroicons-identification"
+        :title="t('sections.space.title')"
+        color="yellow"
+      >
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.space.intro') }}</p>
+        <ul class="space-y-2">
+          <li v-for="item in spaceItems" :key="item.label" class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-yellow-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">
+              <strong>{{ item.label }}</strong> — {{ item.desc }}
+            </span>
+          </li>
+        </ul>
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.space.editable') }}</p>
+      </GuideSection>
     </div>
   </div>
 </template>
@@ -150,8 +167,39 @@
 // les non-francophones à utiliser la traduction intégrée de leur navigateur.
 const messages = {
   title: 'Guide Artiste',
-  subtitle: 'Proposez vos spectacles et gérez vos candidatures artistiques.',
+  subtitle: 'Proposez vos spectacles, suivez vos candidatures et préparez votre venue.',
   sections: {
+    space: {
+      title: 'Mon espace artiste',
+      intro:
+        "Une fois votre candidature retenue, un espace personnel s'ouvre sur la page de l'édition. Il rassemble tout ce qui vous concerne pour cette convention, sans avoir à relancer l'organisation :",
+      shows: {
+        label: 'Mes spectacles',
+        desc: 'les spectacles où vous êtes programmé, avec leur horaire et leur lieu.',
+      },
+      qrcode: {
+        label: 'QR code artiste',
+        desc: "votre code personnel, scanné à l'entrée pour valider votre accès et les articles qui vous sont dus.",
+      },
+      meals: {
+        label: 'Mes repas',
+        desc: "les repas qui vous sont attribués selon vos horaires de présence, y compris le repas d'après-spectacle.",
+      },
+      accommodation: {
+        label: 'Mon hébergement',
+        desc: "la proposition de l'organisation, ou l'indication que vous venez en autonomie. Le type d'hébergement est précisé.",
+      },
+      transport: {
+        label: 'Mon transport',
+        desc: "vos horaires d'arrivée et de départ, et si vous avez besoin d'être récupéré sur place.",
+      },
+      payment: {
+        label: 'Paiement et remboursements',
+        desc: 'le cachet demandé et celui accordé, le statut de votre facture, et le suivi de vos consommables (plafond, dépenses réelles, montants payés ou en attente).',
+      },
+      editable:
+        "Deux informations restent modifiables par vous à tout moment : votre préférence alimentaire (dont les régimes végétarien et végétalien) et vos allergies, avec leur degré de gravité. Autant les renseigner tôt : elles alimentent directement les listes de repas de l'organisation.",
+    },
     activate: {
       title: 'Activer le profil artiste',
       intro:
@@ -202,6 +250,16 @@ const messages = {
 
 const t = (path: string): string =>
   path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
+
+// Rubriques de l'espace artiste, dans l'ordre où elles apparaissent sur la page.
+const SPACE_KEYS = ['shows', 'qrcode', 'meals', 'accommodation', 'transport', 'payment']
+
+const spaceItems = computed(() =>
+  SPACE_KEYS.map((key) => ({
+    label: t(`sections.space.${key}.label`),
+    desc: t(`sections.space.${key}.desc`),
+  }))
+)
 
 definePageMeta({
   layout: 'guide',

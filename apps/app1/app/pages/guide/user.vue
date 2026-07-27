@@ -132,6 +132,17 @@
         </p>
       </GuideSection>
 
+      <GuideSection icon="i-heroicons-banknotes" :title="t('sections.costs.title')" color="blue">
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.costs.intro') }}</p>
+        <ul class="space-y-2">
+          <li v-for="item in costItems" :key="item" class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ item }}</span>
+          </li>
+        </ul>
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.costs.donate') }}</p>
+      </GuideSection>
+
       <GuideSection
         icon="i-heroicons-user-circle"
         :title="t('sections.profile.title')"
@@ -261,6 +272,21 @@ const messages = {
           "Vous êtes averti des événements qui vous concernent : réponse à une candidature, message reçu, rappel avant un créneau bénévole. La cloche du menu regroupe l'historique, et vous choisissez dans votre profil ce que vous souhaitez recevoir par e-mail ou en notification push sur votre téléphone.",
       },
     },
+    costs: {
+      title: 'Coûts du projet',
+      intro:
+        'La plateforme est développée bénévolement. La page « Coûts du projet », accessible depuis le pied de page, affiche sans filtre ce que son fonctionnement coûte réellement :',
+      breakdown:
+        'Le détail des dépenses par catégorie : hébergement, nom de domaine, électricité, matériel, logiciels et services.',
+      recurring:
+        "La distinction entre les frais récurrents, ramenés au mois et à l'année, et les achats ponctuels.",
+      autonomy:
+        "Un indicateur d'autonomie : combien de temps le projet peut encore tourner avec ce qui a été reçu.",
+      balance:
+        'Le solde du moment, qui indique si les dons sont en avance ou si le développeur avance de sa poche.',
+      donate:
+        "Si vous souhaitez soutenir le projet, vous pouvez offrir un café — 1 € l'unité, quantité libre, paiement par Stripe. C'est entièrement facultatif : rien sur la plateforme n'est réservé aux donateurs, et les dons peuvent être suspendus quand le projet est à l'équilibre.",
+    },
     profile: {
       title: 'Mon profil',
       intro: 'Personnalisez votre expérience en configurant votre profil.',
@@ -274,6 +300,13 @@ const messages = {
 
 const t = (path: string): string =>
   path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
+
+const costItems = computed(() => [
+  t('sections.costs.breakdown'),
+  t('sections.costs.recurring'),
+  t('sections.costs.autonomy'),
+  t('sections.costs.balance'),
+])
 
 definePageMeta({
   layout: 'guide',
