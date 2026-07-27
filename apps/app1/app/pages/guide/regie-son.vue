@@ -53,6 +53,9 @@
         color="orange"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.create.intro') }}</p>
+
+        <GuideScreenshot src="/images/guide/regie-son/accueil.png" :caption="t('shots.accueil')" />
+
         <ul class="space-y-2">
           <li v-for="item in createSteps" :key="item" class="flex items-start gap-2">
             <UIcon name="i-heroicons-check-circle" class="size-5 text-orange-500 mt-0.5 shrink-0" />
@@ -81,6 +84,8 @@
           {{ t('sections.steps.pause.title') }}
         </h3>
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.steps.pause.content') }}</p>
+
+        <GuideScreenshot src="/images/guide/regie-son/editeur.png" :caption="t('shots.editeur')" />
       </GuideSection>
 
       <GuideSection
@@ -97,6 +102,11 @@
             </span>
           </li>
         </ul>
+
+        <GuideScreenshot
+          src="/images/guide/regie-son/parametres-piste.png"
+          :caption="t('shots.parametres')"
+        />
 
         <UAlert
           icon="i-heroicons-megaphone"
@@ -122,6 +132,11 @@
             <span class="text-gray-600 dark:text-gray-400">{{ item }}</span>
           </li>
         </ul>
+
+        <GuideScreenshot
+          src="/images/guide/regie-son/verification.png"
+          :caption="t('shots.verification')"
+        />
       </GuideSection>
 
       <GuideSection
@@ -130,6 +145,8 @@
         color="orange"
       >
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.export.intro') }}</p>
+
+        <GuideScreenshot src="/images/guide/regie-son/export.png" :caption="t('shots.export')" />
 
         <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
           {{ t('sections.export.file.title') }}
@@ -176,6 +193,20 @@ const messages = {
   title: 'Régie Son — guide artiste',
   subtitle:
     'Préparez la bande-son de votre numéro chez vous, et transmettez-la prête à jouer au régisseur.',
+  // Légendes des captures. Elles servent aussi de texte alternatif : elles décrivent donc ce que
+  // montre l'image, et pas seulement ce qu'il faut en retenir.
+  shots: {
+    accueil:
+      "L'écran d'accueil sépare « SPECTACLE » et « NUMÉRO ». En tant qu'artiste, visez « Nouveau numéro », dans le groupe du bas.",
+    editeur:
+      'Un numéro et ses trois étapes : une musique, une pause, une musique. Le champ « Top de départ » attend sous chacune, et le curseur de volume se règle à droite du nom de la piste.',
+    parametres:
+      "Les paramètres d'une piste : la forme d'onde en haut, avec son bouton d'écoute, puis les champs de début, de fin et des deux fondus.",
+    verification:
+      'La vérification signale ici des fondus cumulés plus longs que la durée réellement jouée — de quoi tronquer la musique en représentation.',
+    export:
+      'La fenêtre d’export propose le fichier « .regiesonnumero » à transmettre soi-même, ou un partage en ligne renvoyant un code.',
+  },
   standalone: {
     title: 'Un logiciel séparé, gratuit et open source',
     description:
