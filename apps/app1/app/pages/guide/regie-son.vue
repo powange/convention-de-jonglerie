@@ -192,9 +192,9 @@ const messages = {
     create: {
       title: 'Créer son numéro',
       intro:
-        "Sur l'écran d'accueil, deux boutons cohabitent : « Nouveau spectacle » et « Nouveau numéro ». En tant qu'artiste, c'est le second qu'il vous faut — le spectacle complet, c'est l'affaire du régisseur, qui assemblera les numéros de tout le plateau.",
+        "L'écran d'accueil sépare deux univers : « SPECTACLE » en haut, « NUMÉRO » en bas. En tant qu'artiste, c'est la partie du bas qui vous concerne — le spectacle complet est l'affaire du régisseur, qui assemblera les numéros de tout le plateau.",
       button:
-        "Cliquez sur « Nouveau numéro ». L'application vous demande un « Nom du numéro » et un « Dossier du numéro ».",
+        "Cliquez sur « Nouveau numéro ». L'application vous demande un « Nom du numéro » et un « Dossier du numéro ». Par la suite, « Ouvrir un numéro » vous ramènera dessus.",
       folder:
         "Le dossier choisi contiendra tout : la description de votre numéro et les fichiers audio, copiés à l'intérieur. Il reste donc déplaçable d'un ordinateur à l'autre sans rien casser.",
       autosave:
@@ -229,18 +229,19 @@ const messages = {
     },
     settings: {
       title: 'Régler chaque musique',
-      intro: 'Chaque piste se règle indépendamment, sans jamais modifier le fichier d’origine :',
-      volume: {
-        label: 'Volume',
-        desc: 'de 0 à 100, propre à cette piste — utile pour rattraper un morceau enregistré plus fort que les autres.',
-      },
+      intro:
+        "Le volume se règle directement sur la ligne de la piste, avec le curseur affiché à côté de son nom. Le reste se trouve derrière l'icône d'engrenage de la piste, qui ouvre ses paramètres — et rien de tout cela ne modifie le fichier d'origine :",
       trim: {
         label: 'Début et fin',
-        desc: "pour ne jouer qu'un extrait. Les points se posent visuellement sur la forme d'onde, plutôt qu'en tapant des secondes à l'aveugle.",
+        desc: "pour ne jouer qu'un extrait. Deux façons de faire, au choix : saisir les valeurs dans les champs (« 0:30 » ou « 30»), ou attraper directement la zone colorée sur la forme d'onde et la déplacer ou l'étirer. Les deux restent synchronisés.",
       },
       fades: {
         label: 'Fade in et fade out',
         desc: 'une durée en secondes pour monter ou descendre le son progressivement, au lieu d’une coupure sèche.',
+      },
+      preview: {
+        label: 'Écoute',
+        desc: "le bouton de lecture au-dessus de la forme d'onde fait entendre le résultat, extrait et fondus compris, avant de valider.",
       },
       cueTitle: 'Le « Top de départ », votre message au régisseur',
       cueText:
@@ -249,7 +250,7 @@ const messages = {
     check: {
       title: 'Vérifier avant d’envoyer',
       intro:
-        "Le bouton de vérification contrôle en un clic ce qui casse une représentation. Prenez l'habitude de le lancer avant d'exporter — il repère notamment :",
+        "L'icône de bouclier, en haut de l'éditeur, contrôle en un clic ce qui casse une représentation. La fenêtre s'intitule « Vérification du spectacle » même pour un numéro seul — ne vous laissez pas dérouter. Prenez l'habitude de la lancer avant d'exporter, elle repère notamment :",
       missing: 'un fichier audio manquant ou déplacé',
       order: 'un point de début placé après le point de fin',
       fades: "des fondus cumulés plus longs que l'extrait à jouer",
@@ -262,7 +263,7 @@ const messages = {
       file: {
         title: 'En fichier',
         content:
-          "« Exporter le numéro » produit un fichier « .regiesonnumero » : une archive contenant à la fois le déroulé et toutes vos musiques, avec vos réglages. C'est le format à joindre à un mail ou à déposer sur une clé USB.",
+          "L'icône de partage, en haut de l'éditeur, ouvre la fenêtre « Exporter le numéro ». La première option, « Exporter en fichier .regiesonnumero », enregistre une archive contenant à la fois le déroulé et toutes vos musiques, avec vos réglages. C'est le format à joindre à un mail ou à déposer sur une clé USB.",
       },
       cloud: {
         title: 'En ligne',
@@ -343,7 +344,7 @@ const audioSources = computed(() =>
 )
 
 const trackSettings = computed(() =>
-  ['volume', 'trim', 'fades'].map((key) => ({
+  ['trim', 'fades', 'preview'].map((key) => ({
     label: t(`sections.settings.${key}.label`),
     desc: t(`sections.settings.${key}.desc`),
   }))
