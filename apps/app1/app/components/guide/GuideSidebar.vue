@@ -46,6 +46,7 @@ const messages = {
     map: 'Carte interactive',
     other: 'Autres',
     volunteer: 'Bénévole',
+    regieSon: 'Régie Son',
   },
 }
 
@@ -138,6 +139,16 @@ const items = computed<NavigationMenuItem[][]>(() => [
       label: t('nav.volunteer'),
       icon: 'i-heroicons-hand-raised',
       to: '/guide/volunteer',
+      onSelect: () => emit('navigate'),
+    },
+  ],
+  // Groupe distinct : Régie Son est un logiciel séparé, pas une fonctionnalité du site.
+  // UNavigationMenu rend chaque groupe avec un séparateur, ce qui marque bien la différence.
+  [
+    {
+      label: t('nav.regieSon'),
+      icon: 'i-heroicons-musical-note',
+      to: '/guide/regie-son',
       onSelect: () => emit('navigate'),
     },
   ],
