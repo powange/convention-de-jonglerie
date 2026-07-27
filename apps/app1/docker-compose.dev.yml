@@ -112,7 +112,9 @@ services:
       # Fichiers de configuration
       - ./nuxt.config.ts:/app/apps/app1/nuxt.config.ts:cached
       - ./app.config.ts:/app/apps/app1/app.config.ts:cached
-      - ./eslint.config.mjs:/app/apps/app1/eslint.config.mjs:cached
+      # La config ESLint vit à la racine du monorepo pour couvrir apps/app1 ET layers
+      # (base path d'ESLint) — cf. le commentaire en tête d'eslint.config.mjs.
+      - ../../eslint.config.mjs:/app/eslint.config.mjs:cached
       - ./tsconfig.json:/app/apps/app1/tsconfig.json:cached
       - ./vitest.config.ts:/app/apps/app1/vitest.config.ts:cached
       - ./prisma.config.ts:/app/apps/app1/prisma.config.ts:cached

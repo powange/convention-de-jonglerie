@@ -166,7 +166,6 @@ import { z } from 'zod'
 import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
-const toast = useToast()
 const { t } = useI18n()
 const { fetch: refreshSession } = useUserSession()
 const authStore = useAuthStore()
