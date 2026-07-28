@@ -440,25 +440,56 @@
         </template>
 
         <div class="space-y-3">
-          <div v-if="artist.pickupRequired" class="flex items-center gap-2">
-            <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500" />
-            <span class="text-gray-700 dark:text-gray-300">
-              {{
-                artist.pickupLocation
-                  ? $t('artists.pickup_at', { location: artist.pickupLocation })
-                  : $t('artists.pickup_required')
-              }}
-            </span>
+          <div v-if="artist.pickupRequired" class="flex items-start gap-2">
+            <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500 mt-0.5 shrink-0" />
+            <div class="space-y-1">
+              <p class="text-gray-700 dark:text-gray-300">
+                {{
+                  artist.pickupLocation
+                    ? $t('artists.pickup_at', { location: artist.pickupLocation })
+                    : $t('artists.pickup_required')
+                }}
+              </p>
+              <p v-if="artist.pickupResponsible" class="text-sm text-gray-500 dark:text-gray-400">
+                {{ $t('artists.pickup_responsible') }} :
+                <span class="font-medium">{{ responsibleName(artist.pickupResponsible) }}</span>
+                <template v-if="artist.pickupResponsible.telephone">
+                  —
+                  <a
+                    :href="`tel:${artist.pickupResponsible.telephone}`"
+                    class="text-primary-600 dark:text-primary-400 hover:underline"
+                  >
+                    {{ artist.pickupResponsible.telephone }}
+                  </a>
+                </template>
+              </p>
+            </div>
           </div>
-          <div v-if="artist.dropoffRequired" class="flex items-center gap-2">
-            <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500" />
-            <span class="text-gray-700 dark:text-gray-300">
-              {{
-                artist.dropoffLocation
-                  ? $t('artists.dropoff_at', { location: artist.dropoffLocation })
-                  : $t('artists.dropoff_required')
-              }}
-            </span>
+
+          <div v-if="artist.dropoffRequired" class="flex items-start gap-2">
+            <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500 mt-0.5 shrink-0" />
+            <div class="space-y-1">
+              <p class="text-gray-700 dark:text-gray-300">
+                {{
+                  artist.dropoffLocation
+                    ? $t('artists.dropoff_at', { location: artist.dropoffLocation })
+                    : $t('artists.dropoff_required')
+                }}
+              </p>
+              <p v-if="artist.dropoffResponsible" class="text-sm text-gray-500 dark:text-gray-400">
+                {{ $t('artists.dropoff_responsible') }} :
+                <span class="font-medium">{{ responsibleName(artist.dropoffResponsible) }}</span>
+                <template v-if="artist.dropoffResponsible.telephone">
+                  —
+                  <a
+                    :href="`tel:${artist.dropoffResponsible.telephone}`"
+                    class="text-primary-600 dark:text-primary-400 hover:underline"
+                  >
+                    {{ artist.dropoffResponsible.telephone }}
+                  </a>
+                </template>
+              </p>
+            </div>
           </div>
         </div>
       </UCard>
@@ -676,6 +707,14 @@ interface MealSelection {
   }
 }
 
+/** Organisateur chargé d'aller chercher l'artiste ou de le ramener. */
+interface TransportResponsible {
+  prenom: string | null
+  nom: string | null
+  pseudo: string
+  telephone: string | null
+}
+
 interface ArtistInfo {
   id: number
   firstName: string
@@ -701,8 +740,10 @@ interface ArtistInfo {
   accommodationProposal: string | null
   pickupRequired: boolean
   pickupLocation: string | null
+  pickupResponsible: TransportResponsible | null
   dropoffRequired: boolean
   dropoffLocation: string | null
+  dropoffResponsible: TransportResponsible | null
   invoiceRequested: boolean
   invoiceProvided: boolean
   feeRequested: boolean
@@ -751,6 +792,12 @@ const { data: artistResponse, pending: loading } = await useFetch<{ artist: Arti
 )
 
 const artist = computed(() => artistResponse.value?.artist ?? null)
+
+/** Nom affichable du responsable : son identité civile si connue, sinon son pseudo. */
+const responsibleName = (person: TransportResponsible) => {
+  const fullName = [person.prenom, person.nom].filter(Boolean).join(' ').trim()
+  return fullName || person.pseudo
+}
 
 // Redirection si pas artiste
 watch(
