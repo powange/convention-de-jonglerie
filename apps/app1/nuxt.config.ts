@@ -457,7 +457,11 @@ export default defineNuxtConfig({
     },
     vueI18n: './i18n/i18n.config.ts',
   },
-  css: ['~/assets/css/main.css', 'flag-icons/css/flag-icons.min.css'],
+  // flag-icons a été retiré : sa feuille embarquait les ~250 pays du monde dans entry.css, soit
+  // 77 ko compressés (69 % de la feuille principale) téléchargés par chaque visiteur, drapeau
+  // affiché ou non. Les drapeaux passent par la collection Iconify `flag`, comme les autres
+  // icônes : seuls ceux réellement rendus produisent du CSS. Cf. app/components/FlagIcon.vue.
+  css: ['~/assets/css/main.css'],
   // Configuration pour nuxt-file-storage
   fileStorage: {
     mount: process.env.NUXT_FILE_STORAGE_MOUNT || '/uploads',

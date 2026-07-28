@@ -223,22 +223,25 @@ export function getLocaleName(code: string): string | undefined {
 }
 
 /**
- * Mapping des codes de langues vers les classes CSS des drapeaux (flag-icons)
+ * Mapping des codes de langues vers le drapeau correspondant, au format Iconify.
+ *
+ * Le code du pays diffère parfois de celui de la langue : l'anglais prend le drapeau
+ * britannique, le danois le danois, l'ukrainien celui de l'Ukraine, etc.
  */
 const FLAG_MAP: Record<string, string> = {
-  en: 'fi fi-gb',
-  da: 'fi fi-dk',
-  de: 'fi fi-de',
-  es: 'fi fi-es',
-  fr: 'fi fi-fr',
-  it: 'fi fi-it',
-  nl: 'fi fi-nl',
-  pl: 'fi fi-pl',
-  pt: 'fi fi-pt',
-  ru: 'fi fi-ru',
-  uk: 'fi fi-ua',
-  cs: 'fi fi-cz',
-  sv: 'fi fi-se',
+  en: 'i-flag:gb-4x3',
+  da: 'i-flag:dk-4x3',
+  de: 'i-flag:de-4x3',
+  es: 'i-flag:es-4x3',
+  fr: 'i-flag:fr-4x3',
+  it: 'i-flag:it-4x3',
+  nl: 'i-flag:nl-4x3',
+  pl: 'i-flag:pl-4x3',
+  pt: 'i-flag:pt-4x3',
+  ru: 'i-flag:ru-4x3',
+  uk: 'i-flag:ua-4x3',
+  cs: 'i-flag:cz-4x3',
+  sv: 'i-flag:se-4x3',
 } as const
 
 /**

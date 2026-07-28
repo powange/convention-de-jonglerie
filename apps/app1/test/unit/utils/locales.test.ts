@@ -128,23 +128,23 @@ describe('locales utils', () => {
   })
 
   describe('languageCodeToFlag', () => {
-    it('retourne la classe drapeau pour les codes connus', () => {
-      expect(languageCodeToFlag('fr')).toBe('fi fi-fr')
-      expect(languageCodeToFlag('de')).toBe('fi fi-de')
-      expect(languageCodeToFlag('es')).toBe('fi fi-es')
+    it("retourne le nom d'icône du drapeau pour les codes connus", () => {
+      expect(languageCodeToFlag('fr')).toBe('i-flag:fr-4x3')
+      expect(languageCodeToFlag('de')).toBe('i-flag:de-4x3')
+      expect(languageCodeToFlag('es')).toBe('i-flag:es-4x3')
     })
 
     it('mappe les codes vers le bon pays quand ils diffèrent', () => {
       // anglais -> drapeau Royaume-Uni
-      expect(languageCodeToFlag('en')).toBe('fi fi-gb')
+      expect(languageCodeToFlag('en')).toBe('i-flag:gb-4x3')
       // danois -> Danemark
-      expect(languageCodeToFlag('da')).toBe('fi fi-dk')
+      expect(languageCodeToFlag('da')).toBe('i-flag:dk-4x3')
       // ukrainien -> Ukraine (ua)
-      expect(languageCodeToFlag('uk')).toBe('fi fi-ua')
+      expect(languageCodeToFlag('uk')).toBe('i-flag:ua-4x3')
       // tchèque -> République tchèque (cz)
-      expect(languageCodeToFlag('cs')).toBe('fi fi-cz')
+      expect(languageCodeToFlag('cs')).toBe('i-flag:cz-4x3')
       // suédois -> Suède (se)
-      expect(languageCodeToFlag('sv')).toBe('fi fi-se')
+      expect(languageCodeToFlag('sv')).toBe('i-flag:se-4x3')
     })
 
     it('retourne undefined pour un code inconnu', () => {
@@ -156,7 +156,7 @@ describe('locales utils', () => {
       for (const code of SUPPORTED_LOCALE_CODES) {
         const flag = languageCodeToFlag(code)
         expect(flag).toBeDefined()
-        expect(flag).toMatch(/^fi fi-[a-z]{2}$/)
+        expect(flag).toMatch(/^i-flag:[a-z]{2}-4x3$/)
       }
     })
   })

@@ -112,7 +112,6 @@
     "facebook-event-scraper": "^0.2.6",
     "firebase": "12.9.0",
     "firebase-admin": "13.6.1",
-    "flag-icons": "^7.5.0",
     "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",
     "i18n-iso-countries": "^7.14.0",
