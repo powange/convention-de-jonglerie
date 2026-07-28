@@ -39,8 +39,8 @@ export default wrapApiHandler(
         dropoffRequired: true,
         dropoffLocation: true,
         // L'artiste doit savoir qui vient le chercher, pas seulement où et quand.
-        pickupResponsible: { select: { prenom: true, nom: true, pseudo: true, telephone: true } },
-        dropoffResponsible: { select: { prenom: true, nom: true, pseudo: true, telephone: true } },
+        pickupResponsible: { select: { prenom: true, nom: true, pseudo: true, phone: true } },
+        dropoffResponsible: { select: { prenom: true, nom: true, pseudo: true, phone: true } },
         invoiceRequested: true,
         invoiceProvided: true,
         feeRequested: true,

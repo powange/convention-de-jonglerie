@@ -453,13 +453,13 @@
               <p v-if="artist.pickupResponsible" class="text-sm text-gray-500 dark:text-gray-400">
                 {{ $t('artists.pickup_responsible') }} :
                 <span class="font-medium">{{ responsibleName(artist.pickupResponsible) }}</span>
-                <template v-if="artist.pickupResponsible.telephone">
+                <template v-if="artist.pickupResponsible.phone">
                   —
                   <a
-                    :href="`tel:${artist.pickupResponsible.telephone}`"
+                    :href="`tel:${artist.pickupResponsible.phone}`"
                     class="text-primary-600 dark:text-primary-400 hover:underline"
                   >
-                    {{ artist.pickupResponsible.telephone }}
+                    {{ artist.pickupResponsible.phone }}
                   </a>
                 </template>
               </p>
@@ -479,13 +479,13 @@
               <p v-if="artist.dropoffResponsible" class="text-sm text-gray-500 dark:text-gray-400">
                 {{ $t('artists.dropoff_responsible') }} :
                 <span class="font-medium">{{ responsibleName(artist.dropoffResponsible) }}</span>
-                <template v-if="artist.dropoffResponsible.telephone">
+                <template v-if="artist.dropoffResponsible.phone">
                   —
                   <a
-                    :href="`tel:${artist.dropoffResponsible.telephone}`"
+                    :href="`tel:${artist.dropoffResponsible.phone}`"
                     class="text-primary-600 dark:text-primary-400 hover:underline"
                   >
-                    {{ artist.dropoffResponsible.telephone }}
+                    {{ artist.dropoffResponsible.phone }}
                   </a>
                 </template>
               </p>
@@ -712,7 +712,7 @@ interface TransportResponsible {
   prenom: string | null
   nom: string | null
   pseudo: string
-  telephone: string | null
+  phone: string | null
 }
 
 interface ArtistInfo {
