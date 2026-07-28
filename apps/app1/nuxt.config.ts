@@ -16,6 +16,17 @@ export default defineNuxtConfig({
     'app:templates'(app) {
       const tpl = app.templates.find((t) => t.filename === 'fetch.mjs')
       if (!tpl || typeof tpl.getContents !== 'function') return
+
+      // `app:templates` se déclenche à CHAQUE régénération des templates — typiquement quand on
+      // ajoute une page en développement. Sans ce garde, chaque passage capturait le
+      // `getContents` déjà enveloppé du tour précédent et réinjectait le bloc CSRF : au deuxième
+      // tour, `const __CSRF_SAFE` était déclaré deux fois dans le même module, ce qui produisait
+      // l'erreur « virtual:nuxt:.nuxt/fetch.mjs — oxc transform error » et exigeait un
+      // redémarrage complet du serveur de dev.
+      const patched = tpl as typeof tpl & { __csrfPatched?: boolean }
+      if (patched.__csrfPatched) return
+      patched.__csrfPatched = true
+
       const original = tpl.getContents
       tpl.getContents = async (data: unknown) => {
         const code: string = await (original as (d: unknown) => string | Promise<string>).call(
@@ -44,6 +55,10 @@ export default defineNuxtConfig({
           '  globalThis.$fetch.__csrfWrapped = true',
           '}',
         ].join('\n')
+        // Seconde sécurité, indépendante du garde ci-dessus : si le bloc est déjà présent,
+        // ne rien réinjecter. Une double déclaration de `__CSRF_SAFE` casserait le module.
+        if (code.includes('__CSRF_SAFE')) return code
+
         return code.replace(
           'export const $fetch = globalThis.$fetch',
           `${csrfWrap}\nexport const $fetch = globalThis.$fetch`
