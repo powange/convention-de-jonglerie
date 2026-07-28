@@ -17,6 +17,14 @@ export default async function errorLoggingPlugin(nitroApp: NitroApp) {
 
     // Ne pas logger les 401 (non authentifié) et les 404 sauf si c'est vraiment une erreur
     if (statusCode === 401) return
+
+    // Rejets CSRF : événements de sécurité, pas des pannes applicatives. Les scanners qui
+    // sondent des chemins inexistants en POST (/api/graphql, /api/wp-admin…) sont tous arrêtés
+    // par le middleware CSRF avant la résolution de route et rempliraient le journal pour rien.
+    //
+    // On teste le marqueur porté par l'erreur, jamais le code 403 : les refus de permission
+    // partagent ce code et doivent, eux, rester journalisés.
+    if ((error as any).data?.csrfRejection === true) return
     if (statusCode === 404 && event.node.req.url?.includes('/api/')) {
       // Logger uniquement les 404 sur des routes API qui devraient exister
       const isApiRoute = /^\/api\/[^/]+/.test(event.node.req.url)

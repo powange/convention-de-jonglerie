@@ -51,10 +51,16 @@ export function assertCsrfToken(event: H3Event): void {
   const cookieToken = getCookie(event, CSRF_COOKIE)
   const headerToken = getHeader(event, CSRF_HEADER)
 
+  // `csrfRejection` marque ces erreurs pour que le journal des erreurs API les ignore : ce sont
+  // des rejets de sécurité, pas des pannes applicatives. Les scanners qui sondent des chemins
+  // comme /api/graphql en POST atterrissent tous ici et rempliraient le journal pour rien.
+  // Le marqueur est porté par l'erreur plutôt que déduit de son message : reformuler le message
+  // ne doit pas remettre le bruit en silence.
   if (!cookieToken || !headerToken) {
     throw createError({
       status: 403,
       message: 'CSRF token manquant',
+      data: { csrfRejection: true },
     })
   }
 
@@ -62,6 +68,7 @@ export function assertCsrfToken(event: H3Event): void {
     throw createError({
       status: 403,
       message: 'CSRF token invalide',
+      data: { csrfRejection: true },
     })
   }
 }
