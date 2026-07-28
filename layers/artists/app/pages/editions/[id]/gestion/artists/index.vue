@@ -27,6 +27,33 @@
         </p>
       </div>
 
+      <!-- Lien de l'espace artiste : identique pour tous les artistes de l'édition, chacun n'y
+           voyant que ses propres informations. Affiché ici pour que l'organisateur puisse le
+           communiquer sans avoir à le reconstruire à la main. -->
+      <UCard class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ $t('artists.artist_space_link') }}
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {{ $t('artists.artist_space_link_help') }}
+            </p>
+            <p class="mt-2 text-xs font-mono text-gray-600 dark:text-gray-300 break-all">
+              {{ artistSpaceUrl }}
+            </p>
+          </div>
+          <UButton
+            variant="outline"
+            icon="i-heroicons-clipboard-document"
+            class="shrink-0"
+            @click="copyArtistSpaceUrl"
+          >
+            {{ $t('common.copy_link') }}
+          </UButton>
+        </div>
+      </UCard>
+
       <!-- Informations artistes -->
       <UCard class="mb-6">
         <template #header>
@@ -107,6 +134,27 @@
           </p>
         </template>
       </UCard>
+
+      <!-- Totaux financiers. Ils suivent les filtres du tableau : filtrer par spectacle donne
+           le budget de ce spectacle, ce qui est plus utile qu'un total figé de l'édition. -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <UCard v-for="total in financialTotals" :key="total.label">
+          <div class="flex items-start gap-3">
+            <div class="rounded-lg p-2 shrink-0" :class="total.iconBg">
+              <UIcon :name="total.icon" class="size-5" :class="total.iconColor" />
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm text-gray-600 dark:text-gray-400">{{ total.label }}</p>
+              <p class="text-xl font-semibold text-gray-900 dark:text-white">
+                {{ formatAmount(total.value) }}
+              </p>
+              <p v-if="total.hint" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {{ total.hint }}
+              </p>
+            </div>
+          </div>
+        </UCard>
+      </div>
 
       <!-- Contenu -->
       <UCard>
@@ -563,6 +611,29 @@ const { formatDateTime } = useDateFormat()
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
 
+// URL absolue de l'espace artiste, à communiquer aux artistes de l'édition. `useRequestURL()`
+// donne l'origine réelle côté serveur comme côté client, sans la deviner ni la coder en dur.
+const artistSpaceUrl = computed(
+  () => `${useRequestURL().origin}/editions/${editionId.value}/artist-space`
+)
+
+const copyArtistSpaceUrl = async () => {
+  try {
+    await navigator.clipboard.writeText(artistSpaceUrl.value)
+    toast.add({
+      title: t('common.success'),
+      description: t('common.link_copied'),
+      color: 'success',
+    })
+  } catch {
+    toast.add({
+      title: t('common.error'),
+      description: t('common.copy_error'),
+      color: 'error',
+    })
+  }
+}
+
 // Permissions — toute la page est réservée aux organisateurs qui gèrent les artistes
 const canAccess = computed(() => {
   if (!edition.value || !authStore.user) return false
@@ -674,6 +745,47 @@ const filteredArtists = computed(() => {
     artist.shows?.some((sa: any) => String(sa.show.id) === showFilter.value)
   )
 })
+
+/**
+ * Somme d'un champ monétaire sur les artistes affichés, les montants non saisis comptant pour 0.
+ *
+ * Le `Number()` n'est pas décoratif : ces colonnes sont des `Decimal` Prisma, qui traversent
+ * JSON sous forme de chaînes (« 150.00 »). Les additionner directement concaténerait.
+ */
+const sumField = (field: string) =>
+  filteredArtists.value.reduce((total, artist) => total + (Number(artist[field]) || 0), 0)
+
+/** Montant en euros, sans décimales inutiles : « 1 250 € » plutôt que « 1250.00 € ». */
+const formatAmount = (amount: number) => `${new Intl.NumberFormat('fr-FR').format(amount)} €`
+
+// Le défraiement et les consommables affichent le réel en grand et le plafond en dessous :
+// c'est l'écart entre les deux qui indique si l'enveloppe est tenue.
+const financialTotals = computed(() => [
+  {
+    label: t('artists.total_payments'),
+    value: sumField('payment'),
+    hint: '',
+    icon: 'i-heroicons-banknotes',
+    iconBg: 'bg-emerald-100 dark:bg-emerald-900/40',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
+  },
+  {
+    label: t('artists.total_reimbursements'),
+    value: sumField('reimbursementActual'),
+    hint: t('artists.total_of_max', { amount: formatAmount(sumField('reimbursementMax')) }),
+    icon: 'i-heroicons-truck',
+    iconBg: 'bg-sky-100 dark:bg-sky-900/40',
+    iconColor: 'text-sky-600 dark:text-sky-400',
+  },
+  {
+    label: t('artists.total_consumables'),
+    value: sumField('consumablesActual'),
+    hint: t('artists.total_of_max', { amount: formatAmount(sumField('consumablesMax')) }),
+    icon: 'i-heroicons-shopping-bag',
+    iconBg: 'bg-amber-100 dark:bg-amber-900/40',
+    iconColor: 'text-amber-600 dark:text-amber-400',
+  },
+])
 
 const resetFilters = () => {
   globalFilter.value = ''
