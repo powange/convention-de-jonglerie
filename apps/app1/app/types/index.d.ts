@@ -8,8 +8,16 @@ export interface User {
   imageUrl?: string | null
   prenom?: string | null
   nom?: string | null
-  telephone?: string | null
-  phone?: string | null // compat ancien champ
+  /**
+   * Téléphone de l'utilisateur. `phone` est le nom du champ partout où il compte : colonne
+   * Prisma, sélections serveur, réponses d'API.
+   *
+   * À ne pas confondre avec `telephone`, qui n'existe que comme nom de champ dans le CORPS de
+   * la requête `PUT /api/profile/update` (voir profileUpdateSchema) et que le serveur écrit
+   * ensuite dans `phone`. Aucun endpoint ne renvoie `telephone` — il n'a donc rien à faire sur
+   * ce type, et l'y avoir laissé a déjà coûté une requête Prisma invalide.
+   */
+  phone?: string | null
   pronouns?: string | null
   profilePicture?: string | null
   isGlobalAdmin?: boolean

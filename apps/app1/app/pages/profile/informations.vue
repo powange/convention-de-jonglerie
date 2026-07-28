@@ -210,7 +210,9 @@ const state = reactive({
   pseudo: authStore.user?.pseudo || '',
   nom: (authStore.user as any)?.nom || '',
   prenom: (authStore.user as any)?.prenom || '',
-  telephone: (authStore.user as any)?.telephone || (authStore.user as any)?.phone || '',
+  // Le formulaire envoie `telephone` (nom attendu par l'API), alimenté depuis `phone`,
+  // seul champ que le serveur renvoie.
+  telephone: authStore.user?.phone || '',
   pronouns: (authStore.user as any)?.pronouns || PRONOUN_NONE,
   preferredLanguage: (authStore.user as any)?.preferredLanguage || 'fr',
 })
@@ -221,8 +223,7 @@ const hasChanges = computed(() => {
     state.pseudo !== (authStore.user?.pseudo || '') ||
     state.nom !== ((authStore.user as any)?.nom || '') ||
     state.prenom !== ((authStore.user as any)?.prenom || '') ||
-    state.telephone !==
-      ((authStore.user as any)?.telephone || (authStore.user as any)?.phone || '') ||
+    state.telephone !== (authStore.user?.phone || '') ||
     (state.pronouns === PRONOUN_NONE ? '' : state.pronouns) !==
       ((authStore.user as any)?.pronouns || '') ||
     state.preferredLanguage !== ((authStore.user as any)?.preferredLanguage || 'fr')

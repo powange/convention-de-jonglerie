@@ -1188,7 +1188,7 @@ onMounted(async () => {
         // Informations personnelles
         formState.lastName = authStore.user?.nom || ''
         formState.firstName = authStore.user?.prenom || ''
-        formState.phone = authStore.user?.telephone || authStore.user?.phone || ''
+        formState.phone = authStore.user?.phone || ''
         // Informations artiste
         formState.artistName = app.artistName
         formState.artistBio = app.artistBio || ''
@@ -1236,7 +1236,7 @@ onMounted(async () => {
           if (user) {
             if (user.nom) formState.lastName = user.nom
             if (user.prenom) formState.firstName = user.prenom
-            if (user.telephone || user.phone) formState.phone = user.telephone || user.phone || ''
+            if (user.phone) formState.phone = user.phone
             if (user.pseudo && !formState.artistName) {
               formState.artistName = user.pseudo
             }
