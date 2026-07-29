@@ -298,6 +298,30 @@
         </div>
       </UCard>
 
+      <!-- Délai commun à tous les fournisseurs : c'est la lenteur du modèle qui le dicte, pas
+           le fournisseur choisi. -->
+      <UCard>
+        <template #header>
+          <h2 class="text-lg font-semibold flex items-center gap-2">
+            <UIcon name="i-heroicons-clock" class="text-orange-500" />
+            {{ $t('admin.ai_timeout_title') }}
+          </h2>
+        </template>
+
+        <UFormField
+          :label="$t('admin.ai_timeout_label')"
+          :description="$t('admin.ai_timeout_help')"
+        >
+          <UInputNumber
+            v-model="form.llmTimeoutSeconds"
+            :min="30"
+            :max="1800"
+            :step="30"
+            class="w-40"
+          />
+        </UFormField>
+      </UCard>
+
       <!-- Bouton Enregistrer -->
       <div class="flex justify-end">
         <UButton size="lg" icon="i-heroicons-check" :loading="saving" @click="saveConfig">
@@ -339,6 +363,9 @@ const form = reactive({
   anthropicApiKey: '' as string,
   ollamaBaseUrl: 'http://localhost:11434',
   ollamaModel: 'llava',
+  // Saisi en secondes : demander des millisecondes à un administrateur est une invitation à
+  // se tromper d'un facteur mille.
+  llmTimeoutSeconds: 180,
 })
 
 const models = ref<Array<{ id: number; provider: string; modelId: string; name: string }>>([])
@@ -386,6 +413,7 @@ const { pending: configPending } = await useLazyFetch('/api/admin/ai/config', {
       form.anthropicApiKey = cfg.anthropicApiKey ?? ''
       form.ollamaBaseUrl = cfg.ollamaBaseUrl || 'http://localhost:11434'
       form.ollamaModel = cfg.ollamaModel || 'llava'
+      form.llmTimeoutSeconds = Math.round((cfg.llmTimeoutMs || 180000) / 1000)
     }
   },
 })
@@ -537,6 +565,8 @@ const { execute: executeSave, loading: saving } = useApiAction('/api/admin/ai/co
     anthropicApiKey: form.anthropicApiKey || null,
     ollamaBaseUrl: form.ollamaBaseUrl,
     ollamaModel: form.ollamaModel,
+    // Saisi en secondes côté interface, stocké en millisecondes.
+    llmTimeoutMs: form.llmTimeoutSeconds * 1000,
   }),
   successMessage: { title: t('admin.ai_config_saved') },
   errorMessages: { default: t('admin.ai_config_save_error') },

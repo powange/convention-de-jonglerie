@@ -320,7 +320,8 @@ export async function generateImportJson(
         effectiveConfig.lmstudioBaseUrl || 'http://localhost:1234',
         effectiveConfig.lmstudioTextModel || effectiveConfig.lmstudioModel || 'auto',
         combinedContent,
-        dynamicMaxContent
+        dynamicMaxContent,
+        effectiveConfig.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
       )
     } else if (aiProvider === 'anthropic' && effectiveConfig.anthropicApiKey) {
       generatedJson = await callAnthropic(effectiveConfig.anthropicApiKey, combinedContent)
@@ -655,7 +656,10 @@ async function callLMStudio(
   baseUrl: string,
   model: string,
   content: string,
-  maxContent: number
+  maxContent: number,
+  // Délai réglable depuis /admin/ai-config : un modèle local lent s'accommode mal des 3 minutes
+  // par défaut, et l'administrateur doit pouvoir l'ajuster sans redéploiement.
+  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST
 ): Promise<string> {
   // Limiter le contenu selon le context length du modèle
   const truncatedContent =
@@ -687,13 +691,13 @@ async function callLMStudio(
           max_tokens: 1024,
         }),
       },
-      AI_TIMEOUTS.LLM_REQUEST
+      timeoutMs
     )
   } catch (error: any) {
     if (error.name === 'AbortError') {
       throw createError({
         status: 504,
-        message: `Timeout LM Studio: le modèle n'a pas répondu dans les ${AI_TIMEOUTS.LLM_REQUEST / 1000} secondes. Essayez avec moins d'URLs ou un modèle plus rapide.`,
+        message: `Timeout LM Studio: le modèle n'a pas répondu dans les ${Math.round(timeoutMs / 1000)} secondes. Essayez avec moins d'URLs, un modèle plus rapide, ou augmentez le délai dans /admin/ai-config.`,
       })
     }
     throw createError({

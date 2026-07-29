@@ -92,8 +92,12 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   const agentPagesVisited = ref(0)
   const agentResult = ref<GenerationResult | null>(null)
 
-  // Timeout par défaut: 5 minutes
-  const defaultTimeout = options.timeout ?? 8 * 60 * 1000
+  // Plafond global du flux SSE. Il doit rester SUPÉRIEUR au délai serveur (AI_TIMEOUT_LLM,
+  // 3 minutes par défaut), sans quoi c'est le client qui couperait — et l'utilisateur verrait un
+  // « Timeout » générique au lieu du message expliquant que le modèle est trop lent.
+  // Exposé par runtimeConfig pour qu'un modèle local lent puisse être accompagné sans recompiler.
+  const configuredTimeout = Number(useRuntimeConfig().public.aiGenerationTimeout) || 0
+  const defaultTimeout = options.timeout ?? (configuredTimeout || 8 * 60 * 1000)
 
   /**
    * Vérifie si l'index correspond à l'étape en cours

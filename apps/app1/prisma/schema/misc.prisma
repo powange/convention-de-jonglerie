@@ -222,6 +222,11 @@ model AiConfig {
   ollamaBaseUrl String @default("http://localhost:11434")
   ollamaModel   String @default("llava")
 
+  // Délai maximum accordé à un appel au modèle, en millisecondes.
+  // Configurable ici plutôt qu'en variable d'environnement : un modèle local lent se change au
+  // même endroit que le modèle lui-même, sans redéploiement. 3 minutes par défaut.
+  llmTimeoutMs Int @default(180000)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

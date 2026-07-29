@@ -511,6 +511,10 @@ export default defineNuxtConfig({
       process.env.NUXT_RECAPTCHA_DEV_BYPASS === 'true' || process.env.NODE_ENV !== 'production', // bypass en dev par défaut
     stripeCoffeeProductName: process.env.STRIPE_COFFEE_PRODUCT_NAME || 'Un café pour le projet', // Nom du produit affiché sur Stripe
     public: {
+      // Plafond du flux SSE de génération d'import IA, côté client (ms). À garder supérieur à
+      // AI_TIMEOUT_LLM : un modèle local lent doit expirer côté serveur, qui explique alors ce
+      // qui s'est passé, plutôt que côté client, qui ne peut afficher qu'un « Timeout » sec.
+      aiGenerationTimeout: process.env.NUXT_PUBLIC_AI_GENERATION_TIMEOUT || '',
       // Public keys that are available on both client and server
       // Supporte aussi la convention Nuxt NUXT_PUBLIC_*
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY || '', // reCAPTCHA site key for client-side widget

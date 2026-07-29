@@ -31,7 +31,11 @@ import {
   facebookEventToImportJson,
   type FacebookScraperResult,
 } from '#server/utils/facebook-event-scraper'
-import { BROWSER_HEADERS, fetchWithTimeout } from '#server/utils/fetch-helpers'
+import {
+  BROWSER_HEADERS,
+  fetchLocalModelWithTimeout,
+  fetchWithTimeout,
+} from '#server/utils/fetch-helpers'
 import {
   type ProgressCallback,
   sendProgressEvent,
@@ -268,7 +272,7 @@ async function callAgentLLM(
   let responseText: string
 
   if (aiProvider === 'lmstudio') {
-    const response = await fetchWithTimeout(
+    const response = await fetchLocalModelWithTimeout(
       `${config.lmstudioBaseUrl || 'http://localhost:1234'}/v1/chat/completions`,
       {
         method: 'POST',
@@ -280,7 +284,8 @@ async function callAgentLLM(
           max_tokens: 4096,
         }),
       },
-      AI_TIMEOUTS.LLM_REQUEST
+      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST,
+      'LM Studio'
     )
 
     if (!response.ok) {
@@ -316,7 +321,7 @@ async function callAgentLLM(
       .map((block) => (block as any).text)
       .join('')
   } else if (aiProvider === 'ollama') {
-    const response = await fetchWithTimeout(
+    const response = await fetchLocalModelWithTimeout(
       `${config.ollamaBaseUrl || 'http://localhost:11434'}/api/generate`,
       {
         method: 'POST',
@@ -327,7 +332,8 @@ async function callAgentLLM(
           stream: false,
         }),
       },
-      AI_TIMEOUTS.LLM_REQUEST
+      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST,
+      'Ollama'
     )
 
     if (!response.ok) {

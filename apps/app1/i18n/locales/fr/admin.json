@@ -705,6 +705,9 @@
     "view_profiles": "Voir les profils",
     "volunteer_applications": "Candidatures bénévole",
     "volunteer_reminders": "Rappels bénévoles",
-    "workshops_created": "Ateliers créés"
+    "workshops_created": "Ateliers créés",
+    "ai_timeout_title": "Délai d'attente du modèle",
+    "ai_timeout_label": "Délai maximum (secondes)",
+    "ai_timeout_help": "Temps accordé au modèle pour répondre à un appel. Un modèle local lent a besoin de plus : au-delà, la génération est abandonnée. Entre 30 et 1800 secondes."
   }
 }
