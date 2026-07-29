@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} stock item | {n} stock items",
       "import_dep_reservations": "{n} stock reservation | {n} stock reservations",
       "import_deleted": "Object deleted",
-      "import_delete_error": "This object could not be deleted"
+      "import_delete_error": "This object could not be deleted",
+      "import_reimport": "Re-import"
     }
   }
 }

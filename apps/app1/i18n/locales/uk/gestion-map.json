@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} складова позиція | {n} складових позицій",
       "import_dep_reservations": "{n} складове бронювання | {n} складових бронювань",
       "import_deleted": "Об'єкт видалено",
-      "import_delete_error": "Не вдалося видалити цей об'єкт"
+      "import_delete_error": "Не вдалося видалити цей об'єкт",
+      "import_reimport": "Імпортувати знову"
     }
   }
 }

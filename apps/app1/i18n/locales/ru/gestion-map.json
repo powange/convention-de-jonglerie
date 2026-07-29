@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} складская позиция | {n} складских позиций",
       "import_dep_reservations": "{n} складская бронь | {n} складских броней",
       "import_deleted": "Объект удалён",
-      "import_delete_error": "Не удалось удалить этот объект"
+      "import_delete_error": "Не удалось удалить этот объект",
+      "import_reimport": "Импортировать снова"
     }
   }
 }

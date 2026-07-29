@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} articolo di magazzino | {n} articoli di magazzino",
       "import_dep_reservations": "{n} prenotazione di magazzino | {n} prenotazioni di magazzino",
       "import_deleted": "Oggetto eliminato",
-      "import_delete_error": "Impossibile eliminare questo oggetto"
+      "import_delete_error": "Impossibile eliminare questo oggetto",
+      "import_reimport": "Reimporta"
     }
   }
 }

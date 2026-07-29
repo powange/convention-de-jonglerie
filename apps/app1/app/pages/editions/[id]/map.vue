@@ -17,68 +17,94 @@
       <!-- En-tête avec navigation -->
       <EditionHeader :edition="edition" current-page="map" />
 
-      <!-- Carte externe de l'organisateur : affichée à la place de la carte interne quand elle
-           est renseignée. Un organisateur qui a déjà cartographié son terrain sur Google n'a pas
-           à tout refaire ici. -->
-      <UCard
-        v-if="externalMapEmbedUrl"
-        class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-14rem)]"
-        :ui="{ body: 'h-full p-0' }"
-      >
-        <iframe
-          :src="externalMapEmbedUrl"
-          class="h-full w-full rounded-lg border-0"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          :title="$t('edition.site_map')"
-        />
-      </UCard>
-
-      <!-- Message si pas de zones ni de markers -->
-      <UAlert
-        v-if="!externalMapEmbedUrl && zones.length === 0 && markers.length === 0"
-        icon="i-lucide-map"
-        color="info"
-        variant="soft"
-        :title="$t('map.no_items')"
-      />
-
-      <!-- Contenu principal -->
-      <div
-        v-if="!externalMapEmbedUrl && (zones.length > 0 || markers.length > 0)"
-        class="grid grid-cols-1 gap-6 lg:grid-cols-3"
-      >
-        <!-- Carte -->
-        <div class="lg:col-span-2 relative z-0">
-          <UCard
-            class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-16rem)]"
-            :ui="{ body: 'h-full p-0' }"
-          >
-            <div ref="mapContainerRef" class="h-full w-full rounded-lg" />
-          </UCard>
-        </div>
-
-        <!-- Légende -->
-        <div class="space-y-4">
-          <UCard>
-            <template #header>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-lucide-layers" class="h-5 w-5" />
-                <h2 class="font-semibold">{{ $t('map.zones_list') }}</h2>
-              </div>
-            </template>
-
-            <ZonesLegend
-              :zones="zones"
-              :markers="markers"
-              :editable="false"
-              @focus="handleFocusZone"
-              @focus-marker="handleFocusMarker"
-              @toggle-visibility="handleToggleVisibility"
-            />
-          </UCard>
-        </div>
+      <!-- Tant que zones et marqueurs chargent, on ignore si la carte du site a du contenu, donc
+           quelle vue retenir. Attendre évite de montrer une carte puis de basculer sur l'autre. -->
+      <div v-if="siteMapLoading" class="flex items-center justify-center py-12">
+        <UIcon name="i-lucide-loader-2" class="h-8 w-8 animate-spin text-primary" />
       </div>
+
+      <template v-else>
+        <!-- Le sélecteur n'a de sens que si les deux cartes existent : sinon on affiche
+             simplement celle qui est disponible. -->
+        <UFieldGroup v-if="canSwitchView" size="sm">
+          <UButton
+            icon="i-lucide-layers"
+            :color="activeView === 'site' ? 'primary' : 'neutral'"
+            :variant="activeView === 'site' ? 'solid' : 'outline'"
+            :label="$t('edition.site_map')"
+            @click="selectedView = 'site'"
+          />
+          <UButton
+            icon="i-lucide-map"
+            :color="activeView === 'google' ? 'primary' : 'neutral'"
+            :variant="activeView === 'google' ? 'solid' : 'outline'"
+            :label="$t('map.view_external')"
+            @click="selectedView = 'google'"
+          />
+        </UFieldGroup>
+
+        <!-- Carte externe de l'organisateur. Un organisateur qui a déjà cartographié son terrain
+             sur Google n'a pas à tout refaire ici. -->
+        <UCard
+          v-if="activeView === 'google'"
+          class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-14rem)]"
+          :ui="{ body: 'h-full p-0' }"
+        >
+          <iframe
+            :src="externalMapEmbedUrl!"
+            class="h-full w-full rounded-lg border-0"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            :title="$t('edition.site_map')"
+          />
+        </UCard>
+
+        <!-- Message si pas de zones ni de markers -->
+        <UAlert
+          v-if="activeView === 'site' && !hasSiteMap"
+          icon="i-lucide-map"
+          color="info"
+          variant="soft"
+          :title="$t('map.no_items')"
+        />
+
+        <!-- Contenu principal -->
+        <div
+          v-if="activeView === 'site' && hasSiteMap"
+          class="grid grid-cols-1 gap-6 lg:grid-cols-3"
+        >
+          <!-- Carte -->
+          <div class="lg:col-span-2 relative z-0">
+            <UCard
+              class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-16rem)]"
+              :ui="{ body: 'h-full p-0' }"
+            >
+              <div ref="mapContainerRef" class="h-full w-full rounded-lg" />
+            </UCard>
+          </div>
+
+          <!-- Légende -->
+          <div class="space-y-4">
+            <UCard>
+              <template #header>
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-lucide-layers" class="h-5 w-5" />
+                  <h2 class="font-semibold">{{ $t('map.zones_list') }}</h2>
+                </div>
+              </template>
+
+              <ZonesLegend
+                :zones="zones"
+                :markers="markers"
+                :editable="false"
+                @focus="handleFocusZone"
+                @focus-marker="handleFocusMarker"
+                @toggle-visibility="handleToggleVisibility"
+              />
+            </UCard>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -140,10 +166,33 @@ const externalMapEmbedUrl = computed(() => {
 })
 
 // Zones
-const { zones } = useEditionZones(editionId)
+const { zones, loading: zonesLoading } = useEditionZones(editionId)
 
 // Markers
-const { markers } = useEditionMarkers(editionId)
+const { markers, loading: markersLoading } = useEditionMarkers(editionId)
+
+const siteMapLoading = computed(() => zonesLoading.value || markersLoading.value)
+const hasSiteMap = computed(() => zones.value.length > 0 || markers.value.length > 0)
+
+/**
+ * Vue choisie par le visiteur. Volontairement non mémorisée : c'est un choix de consultation, pas
+ * un réglage, et le retenir créerait un état invisible difficile à comprendre au retour.
+ */
+const selectedView = ref<'site' | 'google'>('site')
+
+/** Le sélecteur n'a de sens que si les deux cartes existent. */
+const canSwitchView = computed(() => !!externalMapEmbedUrl.value && hasSiteMap.value)
+
+/**
+ * Vue réellement affichée. Le choix du visiteur ne s'applique que lorsqu'il y a un choix à faire :
+ * sans carte externe on montre celle du site, et sans contenu sur celle du site on montre
+ * l'externe — sinon la page paraîtrait vide alors qu'une carte existe.
+ */
+const activeView = computed<'site' | 'google'>(() => {
+  if (!externalMapEmbedUrl.value) return 'site'
+  if (!hasSiteMap.value) return 'google'
+  return selectedView.value
+})
 
 // Map (mode lecture seule)
 const mapContainerRef = ref<HTMLElement | null>(null)
@@ -175,6 +224,15 @@ const {
   typeLabel: (type: string) => t(`map.types.${type.toLowerCase()}`),
   popupLabels: { navigate: t('map.popup_navigate') },
 })
+
+// Passer sur la carte Google démonte celle du site. Au retour, une nouvelle instance est créée :
+// sans cette remise à zéro elle s'ouvrirait sur le centre par défaut plutôt que sur le contenu.
+watch(
+  () => map.value,
+  (instance) => {
+    if (!instance) initialViewSet.value = false
+  }
+)
 
 // Ajouter les zones à la carte quand elles sont chargées ET que la carte est prête
 // Note: addZones vérifie déjà les doublons via polygons.value.has(zone.id)

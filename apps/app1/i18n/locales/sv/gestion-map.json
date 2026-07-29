@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} lagerartikel | {n} lagerartiklar",
       "import_dep_reservations": "{n} lagerbokning | {n} lagerbokningar",
       "import_deleted": "Objekt borttaget",
-      "import_delete_error": "Det gick inte att ta bort objektet"
+      "import_delete_error": "Det gick inte att ta bort objektet",
+      "import_reimport": "Importera igen"
     }
   }
 }

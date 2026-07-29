@@ -939,7 +939,14 @@ export const useLeafletEditable = (
   // (nécessaire car le conteneur peut être dans un v-if/v-else)
   watch(
     mapContainer,
-    (newContainer) => {
+    (newContainer, previousContainer) => {
+      // Le conteneur a disparu : sans ce démontage, `leafletMapInstance` resterait accroché à un
+      // nœud détaché du document. Au retour du v-if, la garde `!leafletMapInstance` empêcherait
+      // alors toute réinitialisation et la carte reviendrait vide.
+      if (!newContainer && previousContainer && leafletMapInstance) {
+        destroy()
+        return
+      }
       if (newContainer && !leafletMapInstance) {
         initializeMap()
       }

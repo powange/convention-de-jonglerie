@@ -36,6 +36,7 @@
       "toilets": "Aseos",
       "truck_camping": "Camping autocaravana",
       "workshops": "Talleres"
-    }
+    },
+    "view_external": "Mapa de Google"
   }
 }

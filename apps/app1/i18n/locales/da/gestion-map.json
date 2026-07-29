@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} lagervare | {n} lagervarer",
       "import_dep_reservations": "{n} lagerreservation | {n} lagerreservationer",
       "import_deleted": "Objekt slettet",
-      "import_delete_error": "Dette objekt kunne ikke slettes"
+      "import_delete_error": "Dette objekt kunne ikke slettes",
+      "import_reimport": "Importér igen"
     }
   }
 }

@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} voorraadartikel | {n} voorraadartikelen",
       "import_dep_reservations": "{n} voorraadreservering | {n} voorraadreserveringen",
       "import_deleted": "Object verwijderd",
-      "import_delete_error": "Dit object kon niet worden verwijderd"
+      "import_delete_error": "Dit object kon niet worden verwijderd",
+      "import_reimport": "Opnieuw importeren"
     }
   }
 }

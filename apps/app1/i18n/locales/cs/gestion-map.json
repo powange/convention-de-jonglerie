@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} skladová položka | {n} skladových položek",
       "import_dep_reservations": "{n} skladová rezervace | {n} skladových rezervací",
       "import_deleted": "Objekt smazán",
-      "import_delete_error": "Tento objekt se nepodařilo smazat"
+      "import_delete_error": "Tento objekt se nepodařilo smazat",
+      "import_reimport": "Znovu importovat"
     }
   }
 }
