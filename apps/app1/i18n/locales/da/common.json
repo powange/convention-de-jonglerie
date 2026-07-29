@@ -374,7 +374,10 @@
       "validated_today": "Valideret i dag",
       "volunteer": "Frivillig",
       "volunteer_accepted": "Frivillig accepteret",
-      "volunteer_management": "Frivilligstyring"
+      "volunteer_management": "Frivilligstyring",
+      "free_order_title": "Intet at betale",
+      "free_order_help": "Ordrens beløb er nul: den registreres som betalt, uden at der skal vælges en betalingsmetode.",
+      "order_payment_title": "Betaling af ordren"
     },
     "ticketing_title": "Billetsystem",
     "useful_links": "Nyttige links",

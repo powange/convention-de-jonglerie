@@ -374,7 +374,10 @@
       "validated_today": "Validados hoje",
       "volunteer": "Voluntário",
       "volunteer_accepted": "Voluntário aceito",
-      "volunteer_management": "Gestão de voluntários"
+      "volunteer_management": "Gestão de voluntários",
+      "free_order_title": "Nada a pagar",
+      "free_order_help": "O montante da encomenda é zero: fica registada como liquidada, sem método de pagamento a escolher.",
+      "order_payment_title": "Pagamento da encomenda"
     },
     "ticketing_title": "Bilheteria",
     "useful_links": "Ligações úteis",

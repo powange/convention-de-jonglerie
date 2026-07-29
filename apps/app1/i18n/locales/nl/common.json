@@ -374,7 +374,10 @@
       "validated_today": "Vandaag gevalideerd",
       "volunteer": "Vrijwilliger",
       "volunteer_accepted": "Vrijwilliger geaccepteerd",
-      "volunteer_management": "Vrijwilligersbeheer"
+      "volunteer_management": "Vrijwilligersbeheer",
+      "free_order_title": "Niets te betalen",
+      "free_order_help": "Het orderbedrag is nul: de bestelling wordt als voldaan geregistreerd, zonder betaalmethode te kiezen.",
+      "order_payment_title": "Betaling van de bestelling"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nuttige links",

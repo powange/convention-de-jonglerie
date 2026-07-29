@@ -374,7 +374,10 @@
       "validated_today": "Перевірено сьогодні",
       "volunteer": "Волонтер",
       "volunteer_accepted": "Волонтера прийнято",
-      "volunteer_management": "Управління волонтерами"
+      "volunteer_management": "Управління волонтерами",
+      "free_order_title": "Немає чого сплачувати",
+      "free_order_help": "Сума замовлення нульова: воно записується як оплачене, без вибору способу оплати.",
+      "order_payment_title": "Оплата замовлення"
     },
     "ticketing_title": "Продаж квитків",
     "useful_links": "Корисні посилання",
