@@ -484,11 +484,19 @@ model EditionZone {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Provenance : objet de la carte externe dont cette zone est issue. L'identifiant du
+  // fournisseur survit aux déplacements et aux renommages, ce qui permet de distinguer, lors d'un
+  // réimport, une zone déplacée d'une zone supprimée. `importedAt` sert à repérer les zones
+  // retouchées à la main depuis l'import (comparaison avec `updatedAt`).
+  externalMapObjectId String?   @db.VarChar(64)
+  externalMapImportedAt DateTime?
+
   shows             Show[]
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
   stockReservations StockReservation[]
 
+  @@unique([editionId, externalMapObjectId])
   @@index([editionId])
 }
 
@@ -506,10 +514,15 @@ model EditionMarker {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Provenance : voir EditionZone.externalMapObjectId
+  externalMapObjectId String?   @db.VarChar(64)
+  externalMapImportedAt DateTime?
+
   shows             Show[]
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
   stockReservations StockReservation[]
 
+  @@unique([editionId, externalMapObjectId])
   @@index([editionId])
 }

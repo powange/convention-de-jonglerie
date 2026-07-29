@@ -11,6 +11,29 @@ const LOCALES_DIR = path.join(__dirname, '..', '..', 'i18n', 'locales')
 const REFERENCE_LANG = 'fr' // Langue de référence
 
 /**
+ * Fusionne deux arborescences de traductions en profondeur.
+ *
+ * Une fusion superficielle ne conviendrait pas : plusieurs fichiers partagent la même racine
+ * (`gestion-map.json` porte `{ gestion: { map } }`, `gestion-tasks.json` porte
+ * `{ gestion: { task } }`). Le dernier fichier lu écraserait alors la racine entière des
+ * précédents, et le script annoncerait « aucune clé [TODO] » alors que des centaines attendent
+ * d'être traduites.
+ */
+function deepMerge(target, source) {
+  for (const [key, value] of Object.entries(source)) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
+        target[key] = {}
+      }
+      deepMerge(target[key], value)
+    } else {
+      target[key] = value
+    }
+  }
+  return target
+}
+
+/**
  * Charge tous les fichiers JSON d'un dossier de langue et les fusionne
  */
 function loadLocaleFiles(locale) {
@@ -26,13 +49,11 @@ function loadLocaleFiles(locale) {
     return null
   }
 
-  // Fusionner tous les fichiers de cette langue
   const mergedData = {}
   for (const file of files) {
     const filePath = path.join(localeDir, file)
     const content = fs.readFileSync(filePath, 'utf8')
-    const data = JSON.parse(content)
-    Object.assign(mergedData, data)
+    deepMerge(mergedData, JSON.parse(content))
   }
 
   return mergedData
