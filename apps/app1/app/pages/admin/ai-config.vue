@@ -312,11 +312,15 @@
           :label="$t('admin.ai_timeout_label')"
           :description="$t('admin.ai_timeout_help')"
         >
+          <!-- step-snapping désactivé : le pas de 30 s aide au réglage grossier, mais sans cela
+               la saisie est ramenée au multiple le plus proche et une valeur comme 45 s est
+               impossible à entrer. -->
           <UInputNumber
             v-model="form.llmTimeoutSeconds"
             :min="30"
             :max="1800"
             :step="30"
+            :step-snapping="false"
             class="w-40"
           />
         </UFormField>

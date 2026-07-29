@@ -92,7 +92,15 @@
             <!-- Durée -->
             <UFormField :label="$t('gestion.shows.duration')">
               <div class="flex items-center gap-2">
-                <UInputNumber v-model="formData.duration" :min="0" :step="5" class="w-40" />
+                <!-- step-snapping désactivé : voir ShowActsEditor, une durée hors multiple de 5 doit
+                     rester saisissable. -->
+                <UInputNumber
+                  v-model="formData.duration"
+                  :min="0"
+                  :step="5"
+                  :step-snapping="false"
+                  class="w-40"
+                />
                 <span class="text-sm text-gray-500">{{ $t('gestion.shows.minutes') }}</span>
               </div>
             </UFormField>
