@@ -111,6 +111,24 @@
           :description="$t('gestion.map.external_map_active')"
           class="mt-3"
         />
+
+        <!-- L'import reprend les objets de la carte externe pour en faire des zones du site :
+             il n'a de sens qu'une fois une carte renseignée. -->
+        <div
+          v-if="edition?.externalMapRef"
+          class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ $t('gestion.map.import_open_help') }}
+          </p>
+          <UButton
+            icon="i-lucide-download"
+            color="neutral"
+            variant="outline"
+            :to="`/editions/${editionId}/gestion/map-import`"
+            :label="$t('gestion.map.import_open')"
+          />
+        </div>
       </UCard>
 
       <!-- Contenu principal -->

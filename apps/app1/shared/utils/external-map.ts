@@ -73,3 +73,14 @@ export function externalMapViewerUrl(map: ExternalMapRef): string | null {
   }
   return null
 }
+
+/**
+ * URL d'export de la carte, utilisée pour l'import des zones. `forcekml=1` évite l'archive
+ * compressée que Google renvoie par défaut.
+ */
+export function externalMapKmlUrl(map: ExternalMapRef): string | null {
+  if (map.provider === 'google') {
+    return `https://www.google.com/maps/d/kml?mid=${encodeURIComponent(map.ref)}&forcekml=1`
+  }
+  return null
+}
