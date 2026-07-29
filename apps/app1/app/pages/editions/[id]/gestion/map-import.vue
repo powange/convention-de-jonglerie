@@ -93,13 +93,15 @@
               </div>
 
               <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <USelect
+                <USelectMenu
                   v-model="layerTypes[layer.key]"
                   multiple
+                  value-key="value"
                   :items="typeItems"
                   size="sm"
                   class="w-56"
                   :placeholder="$t('gestion.map.import_layer_types')"
+                  :search-input="{ placeholder: $t('common.search') }"
                 />
                 <UButton
                   size="sm"
@@ -143,14 +145,16 @@
                 </UBadge>
               </div>
 
-              <template v-else-if="row.state === 'importable'">
+              <template v-else-if="row.state === 'importable' || row.state === 'imported'">
                 <div class="flex flex-wrap items-center gap-2">
-                  <USelect
+                  <USelectMenu
                     v-model="draft[row.key]!.types"
                     multiple
+                    value-key="value"
                     :items="typeItems"
                     size="sm"
                     class="w-48"
+                    :search-input="{ placeholder: $t('common.search') }"
                   />
                   <UPopover>
                     <UButton size="sm" color="neutral" variant="outline">
@@ -172,25 +176,37 @@
                       </div>
                     </template>
                   </UPopover>
-                  <UButton
-                    size="sm"
-                    icon="i-lucide-download"
-                    :loading="importAction.isLoading(row.key)"
-                    :label="$t('gestion.map.import_action')"
-                    @click="importRow(row)"
-                  />
-                </div>
-              </template>
 
-              <template v-else-if="row.state === 'imported'">
-                <div class="flex flex-wrap items-center gap-2">
-                  <UBadge color="success" variant="subtle" icon="i-lucide-check">
+                  <!-- Une fois importée, la ligne affiche son état plutôt qu'un bouton toujours
+                       actif. Le bouton revient dès qu'un réglage diffère de ce qui est enregistré :
+                       c'est alors un réimport, qui écrase les valeurs précédentes. -->
+                  <UBadge
+                    v-if="row.state === 'imported' && !canReimport(row)"
+                    color="success"
+                    variant="subtle"
+                    icon="i-lucide-check"
+                  >
                     {{ $t('gestion.map.import_state_imported') }}
                   </UBadge>
+                  <UButton
+                    v-else
+                    size="sm"
+                    icon="i-lucide-download"
+                    :color="row.state === 'imported' ? 'warning' : 'primary'"
+                    :loading="importAction.isLoading(row.key)"
+                    :label="
+                      row.state === 'imported'
+                        ? $t('gestion.map.import_reimport')
+                        : $t('gestion.map.import_action')
+                    "
+                    @click="importRow(row)"
+                  />
+
                   <UBadge v-if="row.editedLocally" color="warning" variant="subtle">
                     {{ $t('gestion.map.import_state_edited') }}
                   </UBadge>
                   <UButton
+                    v-if="row.state === 'imported'"
                     size="sm"
                     color="neutral"
                     variant="outline"
@@ -289,10 +305,13 @@
             :label="$t('common.cancel')"
             @click="pendingDelete = null"
           />
+          <!-- `deleteAction.loading` est une ref à l'intérieur d'un objet : le template ne la
+               déballe pas et elle serait toujours vraie, laissant le bouton désactivé.
+               `isLoading()` renvoie un booléen. -->
           <UButton
             color="error"
             :label="$t('common.delete')"
-            :loading="deleteAction.loading"
+            :loading="!!pendingDelete && deleteAction.isLoading(pendingDelete.key)"
             @click="runDelete"
           />
         </div>
@@ -354,6 +373,8 @@ interface ApiRow {
     id: number
     name: string
     kind: 'zone' | 'marker'
+    color: string | null
+    types: string[]
     dependencies: {
       shows: number
       workshops: number
@@ -463,10 +484,19 @@ watch(
   rows,
   (list) => {
     for (const row of list) {
-      if (row.state !== 'importable' || draft[row.key]) continue
-      draft[row.key] = {
-        types: ['OTHER'],
-        color: row.object?.color ?? ZONE_TYPE_COLORS.OTHER,
+      if (draft[row.key]) continue
+      if (row.state === 'importable') {
+        draft[row.key] = {
+          types: ['OTHER'],
+          color: row.object?.color ?? ZONE_TYPE_COLORS.OTHER,
+        }
+      } else if (row.state === 'imported' && row.record) {
+        // Une ligne déjà importée part de ce qui est enregistré : c'est l'écart avec ces
+        // valeurs, et lui seul, qui fera réapparaître le bouton de réimport.
+        draft[row.key] = {
+          types: (row.record.types.length ? row.record.types : ['OTHER']) as EditionZoneType[],
+          color: row.record.color ?? row.object?.color ?? ZONE_TYPE_COLORS.OTHER,
+        }
       }
     }
     for (const layer of layers.value) {
@@ -475,6 +505,31 @@ watch(
   },
   { immediate: true }
 )
+
+/**
+ * Vrai quand les réglages de la ligne diffèrent de ce qui est enregistré. Comparer aux valeurs
+ * de la base plutôt qu'à un instantané local évite de proposer un réimport après un simple
+ * rechargement de page.
+ */
+function hasPendingChanges(row: ViewRow): boolean {
+  const entry = draft[row.key]
+  if (!entry || !row.record) return false
+  if ((entry.color ?? '').toUpperCase() !== (row.record.color ?? '').toUpperCase()) return true
+  const current = [...entry.types].sort()
+  const stored = [...row.record.types].sort()
+  return current.length !== stored.length || current.some((t, i) => t !== stored[i])
+}
+
+/**
+ * Deux raisons de rouvrir l'import d'une ligne déjà importée :
+ *
+ * - ses réglages ont été modifiés ici et n'ont pas encore été appliqués ;
+ * - l'objet a été retouché dans l'application depuis l'import, et l'organisateur peut vouloir
+ *   revenir à la version de la carte d'origine. Sans cela, une retouche locale figerait la ligne.
+ */
+function canReimport(row: ViewRow): boolean {
+  return row.state === 'imported' && (hasPendingChanges(row) || row.editedLocally)
+}
 
 function kindIcon(row: ViewRow): string {
   if (row.object?.kind === 'point' || row.record?.kind === 'marker') return 'i-lucide-map-pin'
@@ -518,10 +573,16 @@ const importAction = useApiActionById<{ item: unknown; alreadyImported: boolean 
   }
 )
 
-async function importRow(row: ViewRow): Promise<boolean> {
+/**
+ * `refresh` est désactivé pendant un import groupé, qui rafraîchit une seule fois à la fin :
+ * recharger après chaque objet rendrait la liste instable sous les yeux de l'organisateur.
+ */
+async function importRow(row: ViewRow, { refresh = true } = {}): Promise<boolean> {
   const object = row.object
   if (!draft[row.key] || !object || object.kind === 'line') return false
-  return (await importAction.execute(row.key)) !== null
+  const ok = (await importAction.execute(row.key)) !== null
+  if (ok && refresh) await reload()
+  return ok
 }
 
 const layerImporting = ref<string | null>(null)
@@ -535,7 +596,7 @@ async function importLayer(layer: LayerGroup) {
   let imported = 0
   try {
     for (const row of [...layer.pending]) {
-      const ok = await importRow(row)
+      const ok = await importRow(row, { refresh: false })
       if (!ok) break
       imported++
     }

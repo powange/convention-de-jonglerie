@@ -36,6 +36,7 @@
       "toilets": "Toiletter",
       "truck_camping": "Autocampercamping",
       "workshops": "Workshops"
-    }
+    },
+    "view_external": "Google-kort"
   }
 }

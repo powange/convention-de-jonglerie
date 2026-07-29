@@ -17,6 +17,10 @@ import type { ExternalMapObject } from './google-my-maps-import'
 export interface ImportedRecord {
   id: number
   name: string
+  /** Couleur enregistrée, pour repérer une modification depuis l'import. */
+  color: string | null
+  /** Catégories enregistrées, même usage. */
+  types: string[]
   externalMapObjectId: string | null
   externalMapImportedAt: Date | null
   updatedAt: Date

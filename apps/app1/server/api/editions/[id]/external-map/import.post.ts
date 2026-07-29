@@ -77,23 +77,55 @@ export default wrapApiHandler(
       throw createError({ status: 400, message: 'Un point demande exactement une coordonnée' })
     }
 
-    // Un double-clic ne doit pas créer deux fois le même objet. L'identifiant du fournisseur
-    // survit aux déplacements et aux renommages, ce qui en fait une clé fiable — quand il existe.
-    if (data.externalId) {
-      const existing =
-        data.kind === 'polygon'
-          ? await prisma.editionZone.findFirst({
-              where: { editionId, externalMapObjectId: data.externalId },
-              select: editionZoneSelect,
-            })
-          : await prisma.editionMarker.findFirst({
-              where: { editionId, externalMapObjectId: data.externalId },
-              select: editionMarkerSelect,
-            })
-      if (existing) return createSuccessResponse({ item: existing, alreadyImported: true })
-    }
-
     const importedAt = new Date()
+
+    // Un objet déjà importé est mis à jour, pas dupliqué. L'identifiant du fournisseur survit aux
+    // déplacements et aux renommages, ce qui en fait une clé fiable — quand il existe.
+    //
+    // Réécrire plutôt que ne rien faire rend le réimport utile : c'est ainsi que l'organisateur
+    // corrige des catégories ou une couleur, et que la géométrie suit un objet déplacé sur la
+    // carte d'origine. Deux clics identiques écrivent deux fois la même chose, sans dommage.
+    if (data.externalId) {
+      const where = { editionId, externalMapObjectId: data.externalId }
+
+      if (data.kind === 'polygon') {
+        const existing = await prisma.editionZone.findFirst({ where, select: { id: true } })
+        if (existing) {
+          const zone = await prisma.editionZone.update({
+            where: { id: existing.id },
+            data: {
+              name: data.name,
+              description: data.description ?? null,
+              color: data.color,
+              coordinates: data.coordinates,
+              zoneTypes: data.types,
+              externalMapImportedAt: importedAt,
+            },
+            select: editionZoneSelect,
+          })
+          return createSuccessResponse({ item: zone, alreadyImported: true })
+        }
+      } else {
+        const existing = await prisma.editionMarker.findFirst({ where, select: { id: true } })
+        if (existing) {
+          const [latitude, longitude] = data.coordinates[0]!
+          const marker = await prisma.editionMarker.update({
+            where: { id: existing.id },
+            data: {
+              name: data.name,
+              description: data.description ?? null,
+              color: data.color,
+              latitude,
+              longitude,
+              markerTypes: data.types,
+              externalMapImportedAt: importedAt,
+            },
+            select: editionMarkerSelect,
+          })
+          return createSuccessResponse({ item: marker, alreadyImported: true })
+        }
+      }
+    }
 
     if (data.kind === 'polygon') {
       const count = await prisma.editionZone.count({ where: { editionId } })

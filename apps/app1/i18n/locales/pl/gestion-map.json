@@ -64,7 +64,8 @@
       "import_dep_stock": "{n} pozycja magazynowa | {n} pozycji magazynowych",
       "import_dep_reservations": "{n} rezerwacja magazynowa | {n} rezerwacji magazynowych",
       "import_deleted": "Obiekt usunięty",
-      "import_delete_error": "Nie udało się usunąć tego obiektu"
+      "import_delete_error": "Nie udało się usunąć tego obiektu",
+      "import_reimport": "Importuj ponownie"
     }
   }
 }

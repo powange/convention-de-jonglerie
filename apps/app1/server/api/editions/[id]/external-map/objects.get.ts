@@ -12,6 +12,7 @@ import { validateEditionId } from '#server/utils/validation-helpers'
 const importedSelect = {
   id: true,
   name: true,
+  color: true,
   externalMapObjectId: true,
   externalMapImportedAt: true,
   updatedAt: true,
@@ -20,9 +21,21 @@ const importedSelect = {
   },
 } as const
 
+// Les catégories ne portent pas le même nom d'un modèle à l'autre, d'où deux sélections.
+const zoneSelect = { ...importedSelect, zoneTypes: true } as const
+const markerSelect = { ...importedSelect, markerTypes: true } as const
+
+/**
+ * Les valeurs enregistrées accompagnent chaque objet importé : c'est ce qui permet à l'écran de
+ * savoir si l'organisateur a modifié une catégorie ou une couleur depuis, et donc de proposer un
+ * réimport plutôt qu'un bouton toujours actif.
+ */
 function toRecord(row: {
   id: number
   name: string
+  color: string | null
+  zoneTypes?: unknown
+  markerTypes?: unknown
   externalMapObjectId: string | null
   externalMapImportedAt: Date | null
   updatedAt: Date
@@ -33,9 +46,12 @@ function toRecord(row: {
     stockReservations: number
   }
 }): ImportedRecord {
+  const rawTypes = row.zoneTypes ?? row.markerTypes
   return {
     id: row.id,
     name: row.name,
+    color: row.color,
+    types: Array.isArray(rawTypes) ? (rawTypes as string[]) : [],
     externalMapObjectId: row.externalMapObjectId,
     externalMapImportedAt: row.externalMapImportedAt,
     updatedAt: row.updatedAt,
@@ -69,8 +85,8 @@ export default wrapApiHandler(
 
     const [map, zones, markers] = await Promise.all([
       fetchExternalMapObjects(edition.externalMapProvider, edition.externalMapRef),
-      prisma.editionZone.findMany({ where: { editionId }, select: importedSelect }),
-      prisma.editionMarker.findMany({ where: { editionId }, select: importedSelect }),
+      prisma.editionZone.findMany({ where: { editionId }, select: zoneSelect }),
+      prisma.editionMarker.findMany({ where: { editionId }, select: markerSelect }),
     ])
 
     const importedCount = [...zones, ...markers].filter((r) => r.externalMapObjectId).length

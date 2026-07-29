@@ -36,6 +36,7 @@
       "toilets": "Toaletter",
       "truck_camping": "Husbilscamping",
       "workshops": "Workshops"
-    }
+    },
+    "view_external": "Google-karta"
   }
 }

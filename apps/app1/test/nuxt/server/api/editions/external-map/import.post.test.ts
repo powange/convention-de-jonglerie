@@ -60,6 +60,8 @@ describe('POST /api/editions/[id]/external-map/import', () => {
       prismaMock[model].aggregate.mockResolvedValue({ _max: { order: 2 } })
       prismaMock[model].create.mockReset()
       prismaMock[model].create.mockResolvedValue({ id: 9 })
+      prismaMock[model].update.mockReset()
+      prismaMock[model].update.mockResolvedValue({ id: 5 })
     }
   })
 
@@ -96,6 +98,35 @@ describe('POST /api/editions/[id]/external-map/import', () => {
 
     expect(result.data.alreadyImported).toBe(true)
     expect(prismaMock.editionZone.create).not.toHaveBeenCalled()
+  })
+
+  // Réécrire plutôt que ne rien faire rend le réimport utile : c'est ainsi que l'organisateur
+  // corrige des catégories ou une couleur, et que la géométrie suit un objet déplacé.
+  it('met à jour un objet déjà importé avec les nouveaux réglages', async () => {
+    setBody({ ...POLYGON, color: '#FF0000', types: ['PARKING'] })
+    prismaMock.editionZone.findFirst.mockResolvedValue({ id: 5 })
+
+    await handler(baseEvent as any)
+
+    const call = prismaMock.editionZone.update.mock.calls[0][0]
+    expect(call.where).toEqual({ id: 5 })
+    expect(call.data.color).toBe('#FF0000')
+    expect(call.data.zoneTypes).toEqual(['PARKING'])
+    expect(call.data.coordinates).toEqual(POLYGON.coordinates)
+    expect(call.data.externalMapImportedAt).toBeInstanceOf(Date)
+  })
+
+  it('met à jour un marqueur déjà importé, géométrie comprise', async () => {
+    setBody({ ...POINT, coordinates: [[46.9, 15.1]] })
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ id: 8 })
+
+    await handler(baseEvent as any)
+
+    const call = prismaMock.editionMarker.update.mock.calls[0][0]
+    expect(call.where).toEqual({ id: 8 })
+    expect(call.data.latitude).toBe(46.9)
+    expect(call.data.longitude).toBe(15.1)
+    expect(prismaMock.editionMarker.create).not.toHaveBeenCalled()
   })
 
   // Deux clics rapprochés passent tous deux la vérification avant que le premier n'écrive :
