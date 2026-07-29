@@ -22,6 +22,35 @@ export const BROWSER_HEADERS: Record<string, string> = {
 }
 
 /**
+ * Appelle un modèle local (LM Studio, Ollama) en traduisant l'expiration du délai en une erreur
+ * exploitable.
+ *
+ * Sans cela, `fetchWithTimeout` abandonne sans motif et l'utilisateur reçoit le message brut
+ * d'undici — « This operation was aborted » — qui ne dit ni ce qui a expiré, ni quoi y faire.
+ * Un modèle local lent est pourtant la cause la plus fréquente : à quelques tokens par seconde,
+ * une génération dépasse facilement le délai par défaut.
+ */
+export async function fetchLocalModelWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeout: number,
+  modelLabel: string
+): Promise<Response> {
+  try {
+    return await fetchWithTimeout(url, options, timeout)
+  } catch (error: any) {
+    if (error?.name === 'AbortError') {
+      throw new Error(
+        `${modelLabel} n'a pas répondu dans les ${Math.round(timeout / 1000)} secondes. ` +
+          `Le modèle est probablement trop lent pour cette tâche : essayez avec moins d'URLs, ` +
+          `un modèle plus rapide, ou augmentez le délai depuis /admin/ai-config.`
+      )
+    }
+    throw error
+  }
+}
+
+/**
  * Fetch avec timeout
  */
 export async function fetchWithTimeout(

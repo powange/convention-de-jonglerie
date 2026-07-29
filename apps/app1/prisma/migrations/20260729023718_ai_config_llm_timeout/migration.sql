@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `AiConfig` ADD COLUMN `llmTimeoutMs` INTEGER NOT NULL DEFAULT 180000;

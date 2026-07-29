@@ -16,6 +16,9 @@ const bodySchema = z.object({
   anthropicApiKey: z.string().nullable().default(null),
   ollamaBaseUrl: z.string().url().default('http://localhost:11434'),
   ollamaModel: z.string().default('llava'),
+  // Entre 30 s et 30 min : en dessous aucun modèle local n'a le temps, au-dessus l'utilisateur
+  // resterait bloqué sur une page sans retour pendant une demi-heure.
+  llmTimeoutMs: z.number().int().min(30_000).max(1_800_000).default(180_000),
 })
 
 /**
@@ -36,6 +39,7 @@ export default wrapApiHandler(
       lmstudioTextModelId: data.lmstudioTextModelId,
       ollamaBaseUrl: data.ollamaBaseUrl,
       ollamaModel: data.ollamaModel,
+      llmTimeoutMs: data.llmTimeoutMs,
     }
 
     // Gestion clé API Anthropic :

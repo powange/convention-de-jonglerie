@@ -101,6 +101,8 @@ export async function getEffectiveAIConfigAsync() {
     anthropicApiKey: dbConfig.anthropicApiKey,
     ollamaBaseUrl: dbConfig.ollamaBaseUrl,
     ollamaModel: dbConfig.ollamaModel,
+    // Délai des appels au modèle : la valeur en base prime, AI_TIMEOUT_LLM sert de secours.
+    llmTimeoutMs: dbConfig.llmTimeoutMs || AI_TIMEOUTS.LLM_REQUEST,
     browserlessUrl:
       process.env.BROWSERLESS_URL || process.env.NUXT_BROWSERLESS_URL || config.browserlessUrl,
   }
@@ -130,6 +132,7 @@ export function serializeAiConfig(config: {
   anthropicApiKey: string | null
   ollamaBaseUrl: string
   ollamaModel: string
+  llmTimeoutMs: number
 }) {
   return {
     provider: config.provider,
@@ -139,6 +142,7 @@ export function serializeAiConfig(config: {
     anthropicApiKey: config.anthropicApiKey ? '****' : null,
     ollamaBaseUrl: config.ollamaBaseUrl,
     ollamaModel: config.ollamaModel,
+    llmTimeoutMs: config.llmTimeoutMs,
   }
 }
 
