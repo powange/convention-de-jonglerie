@@ -705,6 +705,9 @@
     "volunteer_applications": "Volontäransökningar",
     "volunteer_reminders": "Påminnelser om volontärarbete",
     "workshops_created": "Skapade workshops",
-    "preferred_language": "Språk"
+    "preferred_language": "Språk",
+    "ai_timeout_title": "Modellens tidsgräns",
+    "ai_timeout_label": "Maximal tid (sekunder)",
+    "ai_timeout_help": "Tid som modellen får för att svara på ett anrop. En långsam lokal modell behöver mer: därefter avbryts genereringen. Mellan 30 och 1800 sekunder."
   }
 }

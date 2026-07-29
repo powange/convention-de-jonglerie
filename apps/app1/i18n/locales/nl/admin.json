@@ -705,6 +705,9 @@
     "volunteer_applications": "Vrijwilligersaanvragen",
     "volunteer_reminders": "Vrijwilligersherinneringen",
     "workshops_created": "Aangemaakte workshops",
-    "preferred_language": "Taal"
+    "preferred_language": "Taal",
+    "ai_timeout_title": "Time-out van het model",
+    "ai_timeout_label": "Maximale tijd (seconden)",
+    "ai_timeout_help": "Tijd die het model krijgt om op een aanroep te antwoorden. Een traag lokaal model heeft meer nodig: daarna wordt de generatie afgebroken. Tussen 30 en 1800 seconden."
   }
 }

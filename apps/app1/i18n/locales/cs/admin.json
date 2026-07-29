@@ -705,6 +705,9 @@
     "volunteer_applications": "Přihlášky dobrovolníků",
     "volunteer_reminders": "Připomínky pro dobrovolníky",
     "workshops_created": "Vytvořené workshopy",
-    "preferred_language": "Jazyk"
+    "preferred_language": "Jazyk",
+    "ai_timeout_title": "Časový limit modelu",
+    "ai_timeout_label": "Maximální doba (sekundy)",
+    "ai_timeout_help": "Doba, kterou má model na odpověď na volání. Pomalý lokální model potřebuje více: po jejím uplynutí je generování přerušeno. Mezi 30 a 1800 sekundami."
   }
 }

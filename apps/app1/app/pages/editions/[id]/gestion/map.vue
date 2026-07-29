@@ -84,6 +84,35 @@
         </div>
       </div>
 
+      <!-- Carte externe : un organisateur ayant déjà cartographié son terrain sur Google My Maps
+           colle son URL ici plutôt que de tout refaire. Elle remplace alors la carte interne. -->
+      <UCard>
+        <UFormField
+          :label="$t('gestion.map.external_map_label')"
+          :description="$t('gestion.map.external_map_help')"
+        >
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <UInput
+              v-model="externalMapUrl"
+              :placeholder="$t('gestion.map.external_map_placeholder')"
+              class="flex-1"
+            />
+            <UButton :loading="savingExternalMap" @click="saveExternalMap">
+              {{ $t('common.save') }}
+            </UButton>
+          </div>
+        </UFormField>
+
+        <UAlert
+          v-if="edition?.externalMapRef"
+          icon="i-heroicons-information-circle"
+          color="info"
+          variant="subtle"
+          :description="$t('gestion.map.external_map_active')"
+          class="mt-3"
+        />
+      </UCard>
+
       <!-- Contenu principal -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Carte -->
@@ -209,6 +238,10 @@ import type { EditionZone } from '~/composables/useEditionZones'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+import type { ExternalMapProvider } from '~~/shared/utils/external-map'
+
+import { externalMapViewerUrl } from '~~/shared/utils/external-map'
+
 definePageMeta({
   middleware: ['auth-protected'],
 })
@@ -233,12 +266,23 @@ const canEdit = computed(() => {
 const { t } = useI18n()
 const mapPublic = ref(false)
 
+// Carte externe. Le champ affiche l'URL du visualiseur reconstruite depuis la référence stockée,
+// pour que l'organisateur retrouve quelque chose qu'il reconnaît plutôt qu'un identifiant nu.
+const externalMapUrl = ref('')
+const savingExternalMap = ref(false)
+
+const viewerUrlFor = (provider?: string | null, mapRef?: string | null) =>
+  provider && mapRef
+    ? (externalMapViewerUrl({ provider: provider as ExternalMapProvider, ref: mapRef }) ?? '')
+    : ''
+
 // Synchroniser mapPublic avec l'édition
 watch(
   edition,
   (newEdition) => {
     if (newEdition) {
       mapPublic.value = newEdition.mapPublic ?? false
+      externalMapUrl.value = viewerUrlFor(newEdition.externalMapProvider, newEdition.externalMapRef)
     }
   },
   { immediate: true }
@@ -266,6 +310,39 @@ const { execute: updateMapPublic, loading: updatingMapPublic } = useApiAction(
 
 const handleMapPublicChange = () => {
   updateMapPublic()
+}
+
+// Le serveur ne conserve que le fournisseur et la référence de la carte : c'est lui qui valide
+// l'URL et refuse ce qu'il ne reconnaît pas, plutôt que d'effacer silencieusement le réglage.
+const { execute: updateExternalMap } = useApiAction(
+  () => `/api/editions/${editionId.value}/external-map`,
+  {
+    method: 'PATCH',
+    body: () => ({ url: externalMapUrl.value }),
+    successMessage: { title: t('gestion.map.external_map_saved') },
+    errorMessages: { default: t('gestion.map.external_map_error') },
+    onSuccess: (data: any) => {
+      const provider = data?.externalMapProvider ?? null
+      const mapRef = data?.externalMapRef ?? null
+      if (edition.value) {
+        editionStore.setEdition({
+          ...edition.value,
+          externalMapProvider: provider,
+          externalMapRef: mapRef,
+        })
+      }
+      externalMapUrl.value = viewerUrlFor(provider, mapRef)
+    },
+  }
+)
+
+const saveExternalMap = async () => {
+  savingExternalMap.value = true
+  try {
+    await updateExternalMap()
+  } finally {
+    savingExternalMap.value = false
+  }
 }
 
 // Zones

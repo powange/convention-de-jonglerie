@@ -23,7 +23,13 @@
       "zone_color": "Färg",
       "zone_description": "Beskrivning",
       "zone_name": "Zonnamn",
-      "zone_types": "Zontyp(er)"
+      "zone_types": "Zontyp(er)",
+      "external_map_label": "Befintlig Google My Maps-karta",
+      "external_map_help": "Om du redan har kartlagt ditt område i Google My Maps klistrar du in adressen till din karta: den visas för deltagarna i stället för kartan nedan. Lämna tomt för att använda webbplatsens karta. Din karta måste vara offentligt delad.",
+      "external_map_placeholder": "https://www.google.com/maps/d/viewer?mid=...",
+      "external_map_active": "Det är den här kartan deltagarna ser. Zonerna och markörerna nedan förblir sparade men visas inte.",
+      "external_map_saved": "Extern karta sparad",
+      "external_map_error": "Det gick inte att spara den externa kartan"
     }
   }
 }

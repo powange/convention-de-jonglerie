@@ -209,6 +209,10 @@ export default defineNuxtConfig({
           'https://www.youtube-nocookie.com',
           // Lecteur Vimeo intégré (candidatures artistes, etc.)
           'https://player.vimeo.com',
+          // Carte Google My Maps d'une édition, intégrée sur /editions/:id/map quand
+          // l'organisateur en a déjà réalisé une. Chemin restreint à My Maps : le reste de
+          // google.com n'a pas à pouvoir être encadré dans le site.
+          'https://www.google.com/maps/d/',
         ],
         'base-uri': ["'none'"],
         'object-src': ["'none'"],

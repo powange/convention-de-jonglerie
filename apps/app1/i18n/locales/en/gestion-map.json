@@ -23,7 +23,13 @@
       "zone_color": "Color",
       "zone_description": "Description",
       "zone_name": "Zone name",
-      "zone_types": "Zone type(s)"
+      "zone_types": "Zone type(s)",
+      "external_map_label": "Existing Google My Maps map",
+      "external_map_help": "If you have already mapped your site on Google My Maps, paste your map's address: it will be shown to attendees instead of the map below. Leave empty to use the site's own map. Your map must be shared publicly.",
+      "external_map_placeholder": "https://www.google.com/maps/d/viewer?mid=...",
+      "external_map_active": "This is the map attendees see. The zones and markers below remain saved but are not displayed.",
+      "external_map_saved": "External map saved",
+      "external_map_error": "Unable to save the external map"
     }
   }
 }

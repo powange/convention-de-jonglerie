@@ -174,6 +174,12 @@
     "tech_needs_label": "Necessidades técnicas",
     "tech_needs_placeholder": "Espaço cénico, som, luz, régie...",
     "tech_needs_save_error": "Erro ao guardar as necessidades técnicas",
-    "tech_needs_saved": "Necessidades técnicas guardadas"
+    "tech_needs_saved": "Necessidades técnicas guardadas",
+    "artist_space_link": "Ligação do espaço do artista",
+    "artist_space_link_help": "A mesma para todos os artistas da edição: cada um encontra aí os seus próprios espetáculos, refeições, alojamento e transporte.",
+    "total_consumables": "Total de consumíveis reais",
+    "total_of_max": "de {amount} no máximo",
+    "total_payments": "Total de pagamentos",
+    "total_reimbursements": "Total de ajudas de custo de viagem reais"
   }
 }

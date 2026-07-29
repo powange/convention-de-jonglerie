@@ -174,6 +174,12 @@
     "tech_needs_label": "Technische behoeften",
     "tech_needs_placeholder": "Podiumruimte, geluid, licht, regie...",
     "tech_needs_save_error": "Fout bij het opslaan van de technische behoeften",
-    "tech_needs_saved": "Technische behoeften opgeslagen"
+    "tech_needs_saved": "Technische behoeften opgeslagen",
+    "artist_space_link": "Link naar de artiestenruimte",
+    "artist_space_link_help": "Dezelfde voor alle artiesten van de editie: iedereen vindt er zijn eigen voorstellingen, maaltijden, verblijf en vervoer.",
+    "total_consumables": "Totaal werkelijke verbruiksgoederen",
+    "total_of_max": "van maximaal {amount}",
+    "total_payments": "Totaal betalingen",
+    "total_reimbursements": "Totaal werkelijke reiskostenvergoedingen"
   }
 }

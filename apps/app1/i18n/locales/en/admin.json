@@ -705,6 +705,9 @@
     "volunteer_applications": "Volunteer applications",
     "volunteer_reminders": "Volunteer reminders",
     "workshops_created": "Workshops created",
-    "preferred_language": "Language"
+    "preferred_language": "Language",
+    "ai_timeout_title": "Model timeout",
+    "ai_timeout_label": "Maximum time (seconds)",
+    "ai_timeout_help": "Time allowed for the model to answer a call. A slow local model needs more: beyond that, generation is aborted. Between 30 and 1800 seconds."
   }
 }

@@ -23,7 +23,13 @@
       "zone_color": "Barva",
       "zone_description": "Popis",
       "zone_name": "Název zóny",
-      "zone_types": "Typ(y) zóny"
+      "zone_types": "Typ(y) zóny",
+      "external_map_label": "Existující mapa Google My Maps",
+      "external_map_help": "Pokud jste své místo již zmapovali v Google My Maps, vložte adresu své mapy: zobrazí se účastníkům místo mapy níže. Ponechte prázdné, chcete-li použít mapu webu. Vaše mapa musí být veřejně sdílená.",
+      "external_map_placeholder": "https://www.google.com/maps/d/viewer?mid=...",
+      "external_map_active": "Právě tuto mapu vidí účastníci. Zóny a značky níže zůstávají uložené, ale nezobrazují se.",
+      "external_map_saved": "Externí mapa uložena",
+      "external_map_error": "Externí mapu se nepodařilo uložit"
     }
   }
 }

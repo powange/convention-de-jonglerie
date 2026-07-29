@@ -17,9 +17,26 @@
       <!-- En-tête avec navigation -->
       <EditionHeader :edition="edition" current-page="map" />
 
+      <!-- Carte externe de l'organisateur : affichée à la place de la carte interne quand elle
+           est renseignée. Un organisateur qui a déjà cartographié son terrain sur Google n'a pas
+           à tout refaire ici. -->
+      <UCard
+        v-if="externalMapEmbedUrl"
+        class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-14rem)]"
+        :ui="{ body: 'h-full p-0' }"
+      >
+        <iframe
+          :src="externalMapEmbedUrl"
+          class="h-full w-full rounded-lg border-0"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          :title="$t('edition.site_map')"
+        />
+      </UCard>
+
       <!-- Message si pas de zones ni de markers -->
       <UAlert
-        v-if="zones.length === 0 && markers.length === 0"
+        v-if="!externalMapEmbedUrl && zones.length === 0 && markers.length === 0"
         icon="i-lucide-map"
         color="info"
         variant="soft"
@@ -28,7 +45,7 @@
 
       <!-- Contenu principal -->
       <div
-        v-if="zones.length > 0 || markers.length > 0"
+        v-if="!externalMapEmbedUrl && (zones.length > 0 || markers.length > 0)"
         class="grid grid-cols-1 gap-6 lg:grid-cols-3"
       >
         <!-- Carte -->
@@ -74,6 +91,10 @@ import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { escapeHtml } from '~/utils/mapMarkers'
 
+import type { ExternalMapProvider } from '~~/shared/utils/external-map'
+
+import { externalMapEmbedUrl as buildExternalMapEmbedUrl } from '~~/shared/utils/external-map'
+
 const route = useRoute()
 const { t, locale } = useI18n()
 const editionStore = useEditionStore()
@@ -109,6 +130,14 @@ useSeoMeta({
   description: seoDescription,
 })
 const loading = computed(() => editionStore.loading)
+
+// Carte externe éventuelle de l'organisateur. Seule la référence est stockée : l'URL intégrable
+// se reconstruit ici, ce qui évite d'avoir figé un cadrage ou un numéro de compte en base.
+const externalMapEmbedUrl = computed(() => {
+  const { externalMapProvider: provider, externalMapRef: mapRef } = edition.value ?? {}
+  if (!provider || !mapRef) return null
+  return buildExternalMapEmbedUrl({ provider: provider as ExternalMapProvider, ref: mapRef })
+})
 
 // Zones
 const { zones } = useEditionZones(editionId)

@@ -23,7 +23,13 @@
       "zone_color": "Colore",
       "zone_description": "Descrizione",
       "zone_name": "Nome della zona",
-      "zone_types": "Tipo/i di zona"
+      "zone_types": "Tipo/i di zona",
+      "external_map_label": "Mappa Google My Maps esistente",
+      "external_map_help": "Se hai già mappato il tuo terreno su Google My Maps, incolla l'indirizzo della tua mappa: verrà mostrata ai partecipanti al posto della mappa qui sotto. Lascia vuoto per usare la mappa del sito. La tua mappa deve essere condivisa pubblicamente.",
+      "external_map_placeholder": "https://www.google.com/maps/d/viewer?mid=...",
+      "external_map_active": "È questa la mappa che vedono i partecipanti. Le zone e i marcatori qui sotto restano salvati ma non vengono visualizzati.",
+      "external_map_saved": "Mappa esterna salvata",
+      "external_map_error": "Impossibile salvare la mappa esterna"
     }
   }
 }

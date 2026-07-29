@@ -705,6 +705,9 @@
     "volunteer_applications": "Candidaturas de voluntario",
     "volunteer_reminders": "Recordatorios de voluntarios",
     "workshops_created": "Talleres creados",
-    "preferred_language": "Idioma"
+    "preferred_language": "Idioma",
+    "ai_timeout_title": "Tiempo de espera del modelo",
+    "ai_timeout_label": "Tiempo máximo (segundos)",
+    "ai_timeout_help": "Tiempo concedido al modelo para responder a una llamada. Un modelo local lento necesita más: al superarlo, se cancela la generación. Entre 30 y 1800 segundos."
   }
 }
