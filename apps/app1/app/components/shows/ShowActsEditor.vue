@@ -68,7 +68,16 @@
           </UFormField>
 
           <UFormField :label="$t('gestion.shows.act_duration')" class="sm:w-40">
-            <UInputNumber v-model="act.duration" :min="0" :step="5" class="w-full" />
+            <!-- Pas de 5 min sur les boutons, pratique pour les durées courantes, mais step-snapping
+                 désactivé : sans lui la saisie est ramenée au multiple le plus proche et une durée
+                 de 6 minutes devient impossible à entrer. -->
+            <UInputNumber
+              v-model="act.duration"
+              :min="0"
+              :step="5"
+              :step-snapping="false"
+              class="w-full"
+            />
           </UFormField>
         </div>
 
