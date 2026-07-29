@@ -374,7 +374,10 @@
       "validated_today": "Проверено сегодня",
       "volunteer": "Волонтер",
       "volunteer_accepted": "Волонтер принят",
-      "volunteer_management": "Управление волонтерами"
+      "volunteer_management": "Управление волонтерами",
+      "free_order_title": "Платить нечего",
+      "free_order_help": "Сумма заказа равна нулю: он записывается как оплаченный, без выбора способа оплаты.",
+      "order_payment_title": "Оплата заказа"
     },
     "ticketing_title": "Продажа билетов",
     "useful_links": "Полезные ссылки",

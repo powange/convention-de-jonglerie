@@ -374,7 +374,10 @@
       "validated_today": "Heute validiert",
       "volunteer": "Freiwilliger",
       "volunteer_accepted": "Freiwilliger akzeptiert",
-      "volunteer_management": "Freiwilligenverwaltung"
+      "volunteer_management": "Freiwilligenverwaltung",
+      "free_order_title": "Nichts zu zahlen",
+      "free_order_help": "Der Bestellbetrag ist null: Die Bestellung wird als beglichen erfasst, ohne dass eine Zahlungsart zu wählen ist.",
+      "order_payment_title": "Zahlung der Bestellung"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nützliche Links",

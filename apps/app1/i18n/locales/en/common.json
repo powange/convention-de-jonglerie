@@ -374,7 +374,10 @@
       "validated_today": "Validated today",
       "volunteer": "Volunteer",
       "volunteer_accepted": "Volunteer accepted",
-      "volunteer_management": "Volunteer management"
+      "volunteer_management": "Volunteer management",
+      "free_order_title": "Nothing to pay",
+      "free_order_help": "The order total is zero: it is recorded as settled, with no payment method to choose.",
+      "order_payment_title": "Order payment"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Useful links",

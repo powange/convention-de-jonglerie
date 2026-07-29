@@ -643,19 +643,36 @@
         <div v-if="currentStep === paymentStepIndex" class="space-y-4">
           <div class="text-center py-6">
             <div
-              class="mx-auto w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4"
+              class="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4"
+              :class="
+                isFreeOrder ? 'bg-green-100 dark:bg-green-900/30' : 'bg-blue-100 dark:bg-blue-900/30'
+              "
             >
               <UIcon
-                name="i-heroicons-credit-card"
-                class="h-8 w-8 text-blue-600 dark:text-blue-400"
+                :name="isFreeOrder ? 'i-heroicons-check-circle' : 'i-heroicons-credit-card'"
+                class="h-8 w-8"
+                :class="
+                  isFreeOrder
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-blue-600 dark:text-blue-400'
+                "
               />
             </div>
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Paiement de la commande
+              {{
+                isFreeOrder
+                  ? $t('edition.ticketing.free_order_title')
+                  : $t('edition.ticketing.order_payment_title')
+              }}
             </h3>
+            <p v-if="isFreeOrder" class="text-sm text-gray-500 dark:text-gray-400">
+              {{ $t('edition.ticketing.free_order_help') }}
+            </p>
           </div>
 
+          <!-- Rien à encaisser : demander un mode de paiement serait une question sans objet. -->
           <TicketingPaymentMethodSelector
+            v-if="!isFreeOrder"
             v-model="paymentMethod"
             v-model:check-number="checkNumber"
             :amount="totalAmount"
@@ -1004,6 +1021,19 @@ const canGoNext = computed(() => {
   }
   return true
 })
+
+/**
+ * Commande sans rien à encaisser (tarifs gratuits, ou invitation).
+ *
+ * On enregistre « liquide » en transparence plutôt que de poser une question sans objet. Ce n'est
+ * pas cosmétique : sans mode de paiement, le serveur laisse la commande en statut « Pending »,
+ * c'est-à-dire en attente de règlement — alors qu'il n'y a rien à régler.
+ *
+ * Le mode est décidé au moment de l'envoi plutôt que porté par un état : `resetForm` remet
+ * `paymentMethod` à null, et un observateur ne se redéclencherait pas si le montant n'a pas
+ * changé entre-temps.
+ */
+const isFreeOrder = computed(() => totalAmount.value === 0)
 
 // La validation est faite dans canGoNext pour l'étape 2
 const canSubmit = computed(() => true)
@@ -1365,7 +1395,7 @@ const buildOrderData = () => {
     payerLastName: form.value.payerLastName,
     payerEmail: form.value.payerEmail,
     items: Object.values(itemsByTierAndPrice),
-    paymentMethod: paymentMethod.value,
+    paymentMethod: isFreeOrder.value ? 'cash' : paymentMethod.value,
     checkNumber: paymentMethod.value === 'check' ? checkNumber.value : undefined,
   }
 }

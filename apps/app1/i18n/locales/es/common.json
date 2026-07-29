@@ -374,7 +374,10 @@
       "validated_today": "Validados hoy",
       "volunteer": "Voluntario",
       "volunteer_accepted": "Voluntario aceptado",
-      "volunteer_management": "Gestión de voluntarios"
+      "volunteer_management": "Gestión de voluntarios",
+      "free_order_title": "Nada que pagar",
+      "free_order_help": "El importe del pedido es cero: se registra como abonado, sin necesidad de elegir un método de pago.",
+      "order_payment_title": "Pago del pedido"
     },
     "ticketing_title": "Venta de entradas",
     "useful_links": "Enlaces útiles",

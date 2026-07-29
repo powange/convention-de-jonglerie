@@ -374,7 +374,10 @@
       "validated_today": "Validerad idag",
       "volunteer": "Frivilligarbetare",
       "volunteer_accepted": "Volontärer accepteras",
-      "volunteer_management": "Frivillig förvaltning"
+      "volunteer_management": "Frivillig förvaltning",
+      "free_order_title": "Inget att betala",
+      "free_order_help": "Orderbeloppet är noll: den registreras som betald, utan att någon betalningsmetod behöver väljas.",
+      "order_payment_title": "Betalning av ordern"
     },
     "ticketing_title": "Biljetter",
     "useful_links": "Användbara länkar",
