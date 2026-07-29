@@ -167,11 +167,17 @@ export const usePushNotificationPromo = () => {
   const checkPeriodically = () => {
     if (!import.meta.client) return
 
-    const interval = setInterval(() => {
-      if (checkShouldShow()) {
-        state.shouldShow = true
-        clearInterval(interval)
-      }
+    const interval = setInterval(async () => {
+      if (!checkShouldShow()) return
+
+      // Dernière vérification auprès du serveur avant d'afficher : l'abonnement a pu être créé
+      // depuis un autre onglet, ou la première vérification avoir eu lieu trop tôt. Afficher la
+      // modale à un utilisateur déjà abonné est le pire des cas — autant payer un appel de plus.
+      await checkSubscription()
+      if (!checkShouldShow()) return
+
+      state.shouldShow = true
+      clearInterval(interval)
     }, 1000) // Vérifier toutes les secondes
 
     // Nettoyer l'interval après 1 minute maximum
@@ -191,8 +197,12 @@ export const usePushNotificationPromo = () => {
     state.shouldShow = false
     state.isDismissedForSession = true
     state.isSubscribed = true
+    // `lastDismissed` est posé ici aussi, alors que l'utilisateur a accepté et non refusé.
+    // C'est un filet : si la vérification d'abonnement venait à échouer (serveur injoignable,
+    // token en cours de rotation), on ne harcèlerait pas pendant une semaine quelqu'un qui vient
+    // précisément de dire oui. Sans cela, seuls ceux qui REFUSENT bénéficiaient d'une trêve.
+    state.lastDismissed = Date.now()
     saveState()
-    // Ne pas sauvegarder lastDismissed car l'utilisateur a activé
   }
 
   // Reset pour les tests
@@ -208,19 +218,35 @@ export const usePushNotificationPromo = () => {
   }
 
   // Initialisation
-  onMounted(async () => {
+  onMounted(() => {
     loadState()
-    await checkSubscription()
 
-    // Attendre que l'auth store soit initialisé
-    watchEffect(() => {
-      if (authStore.isAuthenticated === true) {
-        nextTick(() => {
-          initSessionTimer()
-          checkPeriodically()
-        })
-      }
-    })
+    // La session est hydratée de façon ASYNCHRONE : le plugin auth.client lance
+    // `/api/session/me` sans l'attendre. Au montage, `isAuthenticated` est donc encore faux dans
+    // la quasi-totalité des cas.
+    //
+    // La vérification de l'abonnement était lancée ici même : elle sortait aussitôt faute de
+    // session, `isSubscribed` restait à false et n'était plus jamais réévalué. La modale
+    // s'affichait alors à des utilisateurs déjà abonnés — et comme `markAsEnabled()` ne pose pas
+    // `lastDismissed`, ceux qui venaient d'activer les notifications la revoyaient à chaque
+    // session, sans la trêve de 7 jours dont bénéficient ceux qui refusent.
+    //
+    // On attend donc que la session soit là avant d'interroger le serveur.
+    // `started` suffit à garantir un seul démarrage : arrêter le watcher depuis son propre
+    // callback échouerait, `immediate: true` le déclenchant avant que la fonction d'arrêt existe.
+    let started = false
+    watch(
+      () => authStore.isAuthenticated,
+      async (authenticated) => {
+        if (!authenticated || started) return
+        started = true
+
+        await checkSubscription()
+        initSessionTimer()
+        checkPeriodically()
+      },
+      { immediate: true }
+    )
   })
 
   return {
