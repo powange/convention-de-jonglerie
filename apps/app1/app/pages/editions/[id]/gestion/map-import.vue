@@ -385,12 +385,7 @@ interface ApiRow {
   editedLocally?: boolean
 }
 
-const {
-  data,
-  pending,
-  error,
-  refresh: reload,
-} = await useFetch<{
+const { data, pending, error } = await useFetch<{
   mapName: string | null
   identified: boolean
   rows: ApiRow[]
@@ -403,9 +398,15 @@ const {
 const draft = reactive<Record<string, { types: EditionZoneType[]; color: string }>>({})
 const layerTypes = reactive<Record<string, EditionZoneType[]>>({})
 
+/**
+ * L'identifiant du fournisseur est préféré : il ne change pas quand la ligne passe de « à
+ * importer » à « importé ». Une clé qui changerait ferait perdre le brouillon de saisie et
+ * remonterait la ligne comme neuve.
+ */
 function rowKey(row: ApiRow, index: number): string {
+  if (row.object?.externalId) return `obj-${row.object.externalId}`
   if (row.record) return `${row.record.kind}-${row.record.id}`
-  return `obj-${row.object?.externalId ?? index}`
+  return `obj-${index}`
 }
 
 interface ViewRow {
@@ -577,12 +578,46 @@ const importAction = useApiActionById<{ item: unknown; alreadyImported: boolean 
  * `refresh` est désactivé pendant un import groupé, qui rafraîchit une seule fois à la fin :
  * recharger après chaque objet rendrait la liste instable sous les yeux de l'organisateur.
  */
-async function importRow(row: ViewRow, { refresh = true } = {}): Promise<boolean> {
+/**
+ * Met à jour la ligne à partir de la réponse, sans recharger la liste.
+ *
+ * Un rechargement referait télécharger et analyser la carte du fournisseur à chaque objet — une
+ * centaine de kilo-octets et deux requêtes externes pour un seul clic — et ferait sauter la page
+ * sous les yeux de l'organisateur.
+ */
+function applyImportedItem(row: ViewRow, item: Record<string, any>) {
+  const apiRow = (data.value?.rows ?? []).find((r, i) => rowKey(r, i) === row.key)
+  if (!apiRow || !row.object) return
+
+  const rawTypes = item.zoneTypes ?? item.markerTypes
+  apiRow.state = 'imported'
+  apiRow.editedLocally = false
+  apiRow.record = {
+    id: item.id,
+    name: item.name,
+    kind: row.object.kind === 'polygon' ? 'zone' : 'marker',
+    color: item.color ?? null,
+    types: Array.isArray(rawTypes) ? rawTypes : [],
+    // Un objet fraîchement importé n'a encore rien qui en dépende ; un réimport ne change pas
+    // ce qui y est rattaché, d'où la reprise de la valeur connue.
+    dependencies: row.record?.dependencies ?? {
+      shows: 0,
+      workshops: 0,
+      stockItems: 0,
+      stockReservations: 0,
+    },
+  }
+}
+
+async function importRow(row: ViewRow): Promise<boolean> {
   const object = row.object
   if (!draft[row.key] || !object || object.kind === 'line') return false
-  const ok = (await importAction.execute(row.key)) !== null
-  if (ok && refresh) await reload()
-  return ok
+
+  const result = await importAction.execute(row.key)
+  if (!result) return false
+
+  applyImportedItem(row, (result as { item: Record<string, any> }).item)
+  return true
 }
 
 const layerImporting = ref<string | null>(null)
@@ -596,7 +631,7 @@ async function importLayer(layer: LayerGroup) {
   let imported = 0
   try {
     for (const row of [...layer.pending]) {
-      const ok = await importRow(row, { refresh: false })
+      const ok = await importRow(row)
       if (!ok) break
       imported++
     }
@@ -609,7 +644,6 @@ async function importLayer(layer: LayerGroup) {
         color: 'success',
       })
     }
-    await reload()
   }
 }
 
@@ -636,9 +670,27 @@ const deleteAction = useApiActionById(
 async function runDelete() {
   const row = pendingDelete.value
   if (!row) return
-  await deleteAction.execute(row.key)
+
+  const result = await deleteAction.execute(row.key)
   pendingDelete.value = null
-  await reload()
+  if (result === null) return
+
+  // Là encore, pas de rechargement : la carte du fournisseur n'a pas changé, seule la ligne
+  // concernée bouge.
+  const rows = data.value?.rows
+  if (!rows) return
+  const index = rows.findIndex((r, i) => rowKey(r, i) === row.key)
+  if (index === -1) return
+
+  if (rows[index]!.object) {
+    // L'objet existe toujours sur la carte : il redevient importable.
+    rows[index]!.state = 'importable'
+    rows[index]!.record = undefined
+    rows[index]!.editedLocally = false
+  } else {
+    // Ligne « plus retrouvée sur la carte » : plus rien ne la rattache à quoi que ce soit.
+    rows.splice(index, 1)
+  }
 }
 
 const switching = ref(false)
