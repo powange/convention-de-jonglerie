@@ -192,6 +192,13 @@ model Edition {
   workshopLocationsFreeInput       Boolean                       @default(false)
   siteMapEnabled                   Boolean                       @default(false)
   mapPublic                        Boolean                       @default(false)
+  // Carte déjà réalisée par l'organisateur sur un service tiers, affichée à la place de la carte
+  // interne quand elle est renseignée. Seul Google My Maps est reconnu pour l'instant, d'où le
+  // couple (fournisseur, référence) plutôt qu'un champ dédié à Google : accueillir un autre
+  // service ne demandera pas de migration. On ne stocke pas l'URL collée, qui varie selon le
+  // compte et la position de la vue et n'est pas intégrable telle quelle.
+  externalMapProvider              String?
+  externalMapRef                   String?
   tasksEnabled                     Boolean                       @default(false)
   stockEnabled                     Boolean                       @default(false)
   faqEnabled                       Boolean                       @default(false)

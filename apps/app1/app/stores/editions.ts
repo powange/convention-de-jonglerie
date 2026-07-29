@@ -6,7 +6,6 @@ import { useAuthStore } from '../stores/auth' // Use relative path
 
 import type { EditionModuleRight, EditionRight } from '~~/shared/utils/organizer-rights'
 
-
 // Interface pour les filtres d'éditions
 interface EditionFilters {
   page?: number

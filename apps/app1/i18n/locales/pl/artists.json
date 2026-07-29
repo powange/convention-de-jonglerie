@@ -174,6 +174,12 @@
     "tech_needs_label": "Wymagania techniczne",
     "tech_needs_placeholder": "Przestrzeń sceniczna, dźwięk, światło, realizacja...",
     "tech_needs_save_error": "Błąd podczas zapisywania wymagań technicznych",
-    "tech_needs_saved": "Zapisano wymagania techniczne"
+    "tech_needs_saved": "Zapisano wymagania techniczne",
+    "artist_space_link": "Link do strefy artysty",
+    "artist_space_link_help": "Ten sam dla wszystkich artystów edycji: każdy znajdzie tam własne występy, posiłki, zakwaterowanie i transport.",
+    "total_consumables": "Suma rzeczywistych materiałów",
+    "total_of_max": "z maksymalnie {amount}",
+    "total_payments": "Suma płatności",
+    "total_reimbursements": "Suma rzeczywistych zwrotów kosztów podróży"
   }
 }

@@ -23,7 +23,13 @@
       "zone_color": "Farve",
       "zone_description": "Beskrivelse",
       "zone_name": "Zonenavn",
-      "zone_types": "Zonetype(r)"
+      "zone_types": "Zonetype(r)",
+      "external_map_label": "Eksisterende Google My Maps-kort",
+      "external_map_help": "Hvis du allerede har kortlagt dit område på Google My Maps, kan du indsætte adressen på dit kort: det vises til deltagerne i stedet for kortet nedenfor. Lad feltet stå tomt for at bruge sidens eget kort. Dit kort skal være delt offentligt.",
+      "external_map_placeholder": "https://www.google.com/maps/d/viewer?mid=...",
+      "external_map_active": "Det er dette kort, deltagerne ser. Zonerne og markørerne nedenfor forbliver gemt, men vises ikke.",
+      "external_map_saved": "Eksternt kort gemt",
+      "external_map_error": "Det eksterne kort kunne ikke gemmes"
     }
   }
 }

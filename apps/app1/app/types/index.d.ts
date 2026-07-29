@@ -101,6 +101,10 @@ export interface Edition {
   faqEnabled?: boolean
   faqPagePublic?: boolean
   mapPublic?: boolean
+  /** Service hébergeant la carte externe de l'organisateur, si elle remplace la carte interne. */
+  externalMapProvider?: string | null
+  /** Identifiant de cette carte chez le service (le `mid` chez Google My Maps). */
+  externalMapRef?: string | null
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean

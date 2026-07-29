@@ -72,8 +72,11 @@ export default wrapApiHandler(
         // Config workshops
         workshopsEnabled: true,
         workshopLocationsFreeInput: true,
-        // Carte
+        // Carte : les zones et marqueurs sont recopiés plus bas, la carte externe suit le même
+        // sort — sinon une édition dupliquée perdrait sa carte en gardant tout le reste.
         mapPublic: true,
+        externalMapProvider: true,
+        externalMapRef: true,
         // Config bénévole (étape 0bis) : portée par Event/EventVolunteerSettings
         event: { select: { volunteerSettings: true } },
       },

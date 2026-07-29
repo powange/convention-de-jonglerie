@@ -705,6 +705,9 @@
     "volunteer_applications": "Frivilligansøgninger",
     "volunteer_reminders": "Frivillig påmindelser",
     "workshops_created": "Oprettede workshops",
-    "preferred_language": "Sprog"
+    "preferred_language": "Sprog",
+    "ai_timeout_title": "Modellens tidsgrænse",
+    "ai_timeout_label": "Maksimal tid (sekunder)",
+    "ai_timeout_help": "Tid, modellen får til at svare på et kald. En langsom lokal model har brug for mere: derefter afbrydes genereringen. Mellem 30 og 1800 sekunder."
   }
 }

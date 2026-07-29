@@ -23,7 +23,13 @@
       "zone_color": "Kleur",
       "zone_description": "Beschrijving",
       "zone_name": "Zonenaam",
-      "zone_types": "Zonetype(n)"
+      "zone_types": "Zonetype(n)",
+      "external_map_label": "Bestaande Google My Maps-kaart",
+      "external_map_help": "Hebt u uw terrein al in kaart gebracht op Google My Maps, plak dan het adres van uw kaart: die wordt aan de deelnemers getoond in plaats van de kaart hieronder. Laat leeg om de kaart van de site te gebruiken. Uw kaart moet openbaar gedeeld zijn.",
+      "external_map_placeholder": "https://www.google.com/maps/d/viewer?mid=...",
+      "external_map_active": "Dit is de kaart die de deelnemers zien. De zones en markeringen hieronder blijven bewaard maar worden niet weergegeven.",
+      "external_map_saved": "Externe kaart opgeslagen",
+      "external_map_error": "Kan de externe kaart niet opslaan"
     }
   }
 }

@@ -705,6 +705,9 @@
     "volunteer_applications": "Freiwilligenbewerbungen",
     "volunteer_reminders": "Freiwilligen-Erinnerungen",
     "workshops_created": "Erstellte Workshops",
-    "preferred_language": "Sprache"
+    "preferred_language": "Sprache",
+    "ai_timeout_title": "Zeitlimit des Modells",
+    "ai_timeout_label": "Maximale Zeit (Sekunden)",
+    "ai_timeout_help": "Zeit, die dem Modell für die Antwort auf einen Aufruf zugestanden wird. Ein langsames lokales Modell braucht mehr: darüber hinaus wird die Generierung abgebrochen. Zwischen 30 und 1800 Sekunden."
   }
 }

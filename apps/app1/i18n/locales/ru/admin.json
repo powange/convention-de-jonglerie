@@ -705,6 +705,9 @@
     "volunteer_applications": "Заявки волонтёров",
     "volunteer_reminders": "Напоминания волонтерам",
     "workshops_created": "Созданные мастер-классы",
-    "preferred_language": "Язык"
+    "preferred_language": "Язык",
+    "ai_timeout_title": "Тайм-аут модели",
+    "ai_timeout_label": "Максимальное время (секунды)",
+    "ai_timeout_help": "Время, отведённое модели на ответ. Медленной локальной модели нужно больше: по истечении генерация прерывается. От 30 до 1800 секунд."
   }
 }

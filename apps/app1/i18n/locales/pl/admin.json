@@ -705,6 +705,9 @@
     "volunteer_applications": "Kandydatury wolontariackie",
     "volunteer_reminders": "Przypomnienia wolontariuszy",
     "workshops_created": "Utworzone warsztaty",
-    "preferred_language": "Język"
+    "preferred_language": "Język",
+    "ai_timeout_title": "Limit czasu modelu",
+    "ai_timeout_label": "Maksymalny czas (sekundy)",
+    "ai_timeout_help": "Czas przyznany modelowi na odpowiedź na wywołanie. Wolny model lokalny potrzebuje go więcej: po jego przekroczeniu generowanie zostaje przerwane. Od 30 do 1800 sekund."
   }
 }

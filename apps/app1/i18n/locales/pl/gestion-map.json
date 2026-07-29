@@ -23,7 +23,13 @@
       "zone_color": "Kolor",
       "zone_description": "Opis",
       "zone_name": "Nazwa strefy",
-      "zone_types": "Typ(y) strefy"
+      "zone_types": "Typ(y) strefy",
+      "external_map_label": "Istniejąca mapa Google My Maps",
+      "external_map_help": "Jeśli teren został już zmapowany w Google My Maps, wklej adres swojej mapy: zostanie ona pokazana uczestnikom zamiast mapy poniżej. Pozostaw puste, aby użyć mapy serwisu. Mapa musi być udostępniona publicznie.",
+      "external_map_placeholder": "https://www.google.com/maps/d/viewer?mid=...",
+      "external_map_active": "To właśnie tę mapę widzą uczestnicy. Strefy i znaczniki poniżej pozostają zapisane, ale nie są wyświetlane.",
+      "external_map_saved": "Zapisano mapę zewnętrzną",
+      "external_map_error": "Nie udało się zapisać mapy zewnętrznej"
     }
   }
 }

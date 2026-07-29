@@ -643,15 +643,15 @@ const myTasksTabVisible = computed<boolean>(() => {
   return (props.edition as { tasksEnabled?: boolean }).tasksEnabled === true
 })
 
-// Visibilité onglet carte: visible si siteMapEnabled + mapPublic sont activés et l'édition a des coordonnées définies
+// Visibilité onglet carte: le module doit être activé et la carte rendue publique. Reste à avoir
+// quelque chose à montrer — soit une carte externe, soit des coordonnées pour centrer la carte
+// interne. Les coordonnées ne concernent que cette dernière : les exiger dans tous les cas
+// masquerait l'onglet d'une édition dont l'organisateur a justement fourni une carte externe.
 const mapTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
-  return !!(
-    props.edition.siteMapEnabled &&
-    props.edition.mapPublic &&
-    props.edition.latitude &&
-    props.edition.longitude
-  )
+  if (!props.edition.siteMapEnabled || !props.edition.mapPublic) return false
+  if (props.edition.externalMapRef) return true
+  return !!(props.edition.latitude && props.edition.longitude)
 })
 
 // Gestion des favoris - Initialisation automatique si utilisateur connecté
