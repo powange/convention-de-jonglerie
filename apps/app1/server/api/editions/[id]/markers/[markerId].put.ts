@@ -3,7 +3,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
 import { editionMarkerSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
-import { updateMarkerSchema } from '#server/utils/zone-validation'
+import { resolveMarkerZoneId, updateMarkerSchema } from '#server/utils/zone-validation'
 
 export default wrapApiHandler(
   async (event) => {
@@ -37,6 +37,10 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const data = updateMarkerSchema.parse(body)
 
+    // `undefined` traverse Prisma sans rien écrire : le rattachement ne change que s'il est
+    // explicitement fourni, et `null` détache.
+    const zoneId = await resolveMarkerZoneId(editionId, data.zoneId)
+
     const marker = await prisma.editionMarker.update({
       where: { id: markerId },
       data: {
@@ -46,6 +50,7 @@ export default wrapApiHandler(
         longitude: data.longitude,
         markerTypes: data.markerTypes,
         color: data.color,
+        zoneId,
       },
       select: editionMarkerSelect,
     })

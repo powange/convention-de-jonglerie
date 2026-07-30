@@ -122,6 +122,43 @@ describe('API Markers - Mise à jour (PUT)', () => {
     expect(result.data.marker.longitude).toBe(updateData.longitude)
   })
 
+  // `undefined` veut dire « non fourni », `null` veut dire « détacher ». Les confondre ferait
+  // perdre son rattachement à une entrée au premier renommage venu.
+  it('ne touche pas au rattachement quand il n’est pas fourni', async () => {
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ ...mockMarker, zoneId: 7 })
+    prismaMock.editionMarker.update.mockResolvedValue({ ...mockMarker, zoneId: 7 })
+    global.readBody.mockResolvedValue({ name: 'Nouveau nom uniquement' })
+
+    await markersPutHandler(mockEvent as any)
+
+    expect(prismaMock.editionZone.findFirst).not.toHaveBeenCalled()
+    expect(prismaMock.editionMarker.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ zoneId: undefined }) })
+    )
+  })
+
+  it('détache le marqueur quand le rattachement est explicitement vidé', async () => {
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ ...mockMarker, zoneId: 7 })
+    prismaMock.editionMarker.update.mockResolvedValue({ ...mockMarker, zoneId: null })
+    global.readBody.mockResolvedValue({ zoneId: null })
+
+    await markersPutHandler(mockEvent as any)
+
+    expect(prismaMock.editionZone.findFirst).not.toHaveBeenCalled()
+    expect(prismaMock.editionMarker.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ zoneId: null }) })
+    )
+  })
+
+  it("refuse un rattachement vers une zone d'une autre édition", async () => {
+    prismaMock.editionMarker.findFirst.mockResolvedValue(mockMarker)
+    prismaMock.editionZone.findFirst.mockResolvedValue(null)
+    global.readBody.mockResolvedValue({ zoneId: 999 })
+
+    await expect(markersPutHandler(mockEvent as any)).rejects.toThrow()
+    expect(prismaMock.editionMarker.update).not.toHaveBeenCalled()
+  })
+
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const unauthEvent = {
       context: {

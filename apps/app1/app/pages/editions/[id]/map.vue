@@ -115,6 +115,12 @@ import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
+import {
+  buildMarkerAttachmentHtml,
+  buildZoneAttachmentHtml,
+  groupMarkersByZone,
+  zoneNavigationTarget,
+} from '~/utils/map-zone-attachment'
 import { escapeHtml } from '~/utils/mapMarkers'
 
 import type { ExternalMapProvider } from '~~/shared/utils/external-map'
@@ -207,6 +213,7 @@ const {
   focusOnZone,
   focusOnMarker,
   setPopupExtra,
+  setZoneNavigationTarget,
   showZone,
   hideZone,
   showMarker,
@@ -464,19 +471,38 @@ watch(
   () => {
     if (!map.value) return
 
+    // Un seul `extra` par élément : le rattachement et les spectacles se composent, sinon le
+    // dernier appel effacerait le précédent.
+    const attachedByZone = groupMarkersByZone(markers.value)
+    const zoneNameById = new Map(zones.value.map((zone) => [zone.id, zone.name]))
+
     for (const zone of zones.value) {
       const zoneShows = showsByZone.value.get(zone.id) || []
       const zoneWorkshops = workshopsByZone.value.get(zone.id) || []
-      if (zoneShows.length > 0 || zoneWorkshops.length > 0) {
-        setPopupExtra('zone', zone.id, buildItemsPopupHtml(zoneShows, zoneWorkshops))
+      const attached = attachedByZone.get(zone.id)
+      const attachmentHtml = buildZoneAttachmentHtml(attached, t('map.zone_entrances'))
+      if (attachmentHtml || zoneShows.length > 0 || zoneWorkshops.length > 0) {
+        setPopupExtra(
+          'zone',
+          zone.id,
+          attachmentHtml + buildItemsPopupHtml(zoneShows, zoneWorkshops)
+        )
       }
+      setZoneNavigationTarget(zone.id, zoneNavigationTarget(attached))
     }
 
     for (const marker of markers.value) {
       const markerShows = showsByMarker.value.get(marker.id) || []
       const markerWorkshops = workshopsByMarker.value.get(marker.id) || []
-      if (markerShows.length > 0 || markerWorkshops.length > 0) {
-        setPopupExtra('marker', marker.id, buildItemsPopupHtml(markerShows, markerWorkshops))
+      const attachmentHtml = marker.zoneId
+        ? buildMarkerAttachmentHtml(zoneNameById.get(marker.zoneId), t('map.marker_entrance_of'))
+        : ''
+      if (attachmentHtml || markerShows.length > 0 || markerWorkshops.length > 0) {
+        setPopupExtra(
+          'marker',
+          marker.id,
+          attachmentHtml + buildItemsPopupHtml(markerShows, markerWorkshops)
+        )
       }
     }
   },

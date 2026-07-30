@@ -764,6 +764,41 @@ export const useLeafletEditable = (
     }
   }
 
+  /**
+   * Retarge le lien « itinéraire » d'une zone vers un point choisi — son entrée.
+   *
+   * Par défaut ce lien vise la moyenne des sommets du polygone, et l'icône de type se pose au
+   * centre de sa boîte englobante : deux points différents, tous deux hors du bâtiment dès que
+   * la forme est concave. Une entrée explicite est la seule destination qui ait un sens pour
+   * quelqu'un qui cherche à entrer.
+   *
+   * `null` rétablit le centre calculé.
+   */
+  const setZoneNavigationTarget = (zoneId: number, coords: [number, number] | null) => {
+    const key = `zone:${zoneId}`
+    const base = popupBaseData.get(key)
+    const polygon = polygons.value.get(zoneId)
+    if (!base || !polygon) return
+
+    const fallback = polygon.getLatLngs()[0] as any[]
+    const restored: [number, number] = [
+      fallback.reduce((sum: number, p: any) => sum + p.lat, 0) / fallback.length,
+      fallback.reduce((sum: number, p: any) => sum + p.lng, 0) / fallback.length,
+    ]
+    base.coords = coords ?? restored
+
+    polygon.setPopupContent(
+      buildPopupContent(
+        base.name,
+        base.description,
+        base.types,
+        popupExtraContent.get(key),
+        base.coords,
+        key
+      )
+    )
+  }
+
   const updateMarkerIcon = (
     markerId: number,
     markerTypes: string[],
@@ -992,6 +1027,7 @@ export const useLeafletEditable = (
     fitBoundsToItems,
     // Contenu supplémentaire dans les popups
     setPopupExtra,
+    setZoneNavigationTarget,
     // Fonctions de visibilité
     showZone,
     hideZone,

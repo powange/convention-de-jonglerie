@@ -37,6 +37,8 @@
       "truck_camping": "Camping camion",
       "workshops": "Ateliers"
     },
-    "view_external": "Carte Google"
+    "view_external": "Carte Google",
+    "zone_entrances": "Entrées :",
+    "marker_entrance_of": "Entrée de :"
   }
 }

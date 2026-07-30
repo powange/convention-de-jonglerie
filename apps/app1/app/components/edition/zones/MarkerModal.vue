@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EditionMarker } from '~/composables/useEditionMarkers'
+import type { EditionZone } from '~/composables/useEditionZones'
 import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
 
 import { EDITION_ZONE_TYPES, getZoneTypeIcon } from '~~/shared/utils/zone-types'
@@ -8,6 +9,8 @@ interface Props {
   marker?: EditionMarker | null
   open: boolean
   loading?: boolean
+  /** Zones de l'édition, proposées comme rattachement (une entrée appartient à une salle). */
+  zones?: EditionZone[]
 }
 
 interface Emits {
@@ -19,11 +22,12 @@ interface Emits {
       description: string | null
       markerTypes: string[]
       color: string
+      zoneId: number | null
     }
   ): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), { zones: () => [] })
 const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
@@ -38,11 +42,19 @@ const markerTypes = computed(() =>
 
 const defaultColors = DEFAULT_HEX_PALETTE
 
+// `null` plutôt qu'une valeur absente : le sélecteur doit pouvoir exprimer « aucune zone »,
+// c'est-à-dire détacher un marqueur qui l'était.
+const zoneOptions = computed(() => [
+  { label: t('gestion.map.marker_no_zone'), value: null as number | null },
+  ...props.zones.map((zone) => ({ label: zone.name, value: zone.id as number | null })),
+])
+
 const form = reactive({
   name: '',
   description: '',
   markerTypes: ['OTHER'] as string[],
   color: defaultColors[0]!,
+  zoneId: null as number | null,
 })
 
 // Remplir le formulaire avec les données du marqueur si il existe
@@ -55,12 +67,14 @@ watch(
         form.description = props.marker.description || ''
         form.markerTypes = [...props.marker.markerTypes]
         form.color = props.marker.color || defaultColors[0]!
+        form.zoneId = props.marker.zoneId ?? null
       } else {
         // Reset pour un nouveau marqueur
         form.name = ''
         form.description = ''
         form.markerTypes = ['OTHER']
         form.color = defaultColors[0]!
+        form.zoneId = null
       }
     }
   },
@@ -77,6 +91,7 @@ const handleSave = () => {
     description: form.description.trim() || null,
     markerTypes: form.markerTypes,
     color: form.color,
+    zoneId: form.zoneId,
   })
 }
 
@@ -120,6 +135,23 @@ const modalTitle = computed(() =>
             multiple
             :items="markerTypes"
             :icon="form.markerTypes.length > 0 ? getZoneTypeIcon(form.markerTypes[0]) : undefined"
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField
+          v-if="zones.length > 0"
+          :label="t('gestion.map.marker_zone')"
+          :description="t('gestion.map.marker_zone_help')"
+        >
+          <!-- Même libellé en repli qu'en option : que le composant affiche l'entrée « Aucune
+               zone » ou retombe sur son placeholder, l'absence de rattachement se lit pareil. -->
+          <USelectMenu
+            v-model="form.zoneId"
+            :items="zoneOptions"
+            value-key="value"
+            :placeholder="t('gestion.map.marker_no_zone')"
+            :search-input="{ placeholder: t('common.search') }"
             class="w-full"
           />
         </UFormField>

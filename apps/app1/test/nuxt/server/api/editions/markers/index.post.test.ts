@@ -88,6 +88,68 @@ describe('API Markers - Création (POST)', () => {
     })
   })
 
+  it('devrait rattacher le marqueur à une zone de la même édition', async () => {
+    prismaMock.editionMarker.count.mockResolvedValue(0)
+    prismaMock.editionMarker.aggregate.mockResolvedValue({ _max: { order: null } })
+    prismaMock.editionMarker.create.mockResolvedValue({ ...mockMarker, zoneId: 7 })
+    prismaMock.editionZone.findFirst.mockResolvedValue({ id: 7 })
+    global.readBody.mockResolvedValue({
+      name: 'Entrée principale',
+      latitude: 48.8566,
+      longitude: 2.3522,
+      zoneId: 7,
+    })
+
+    await markersPostHandler(mockEvent as any)
+
+    // La zone est cherchée dans l'édition de la requête, pas globalement.
+    expect(prismaMock.editionZone.findFirst).toHaveBeenCalledWith({
+      where: { id: 7, editionId: 1 },
+      select: { id: true },
+    })
+    expect(prismaMock.editionMarker.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ zoneId: 7 }),
+      select: expect.any(Object),
+    })
+  })
+
+  // Sans ce contrôle, un identifiant venu du corps de la requête suffirait à rattacher une
+  // entrée à la zone d'une autre édition : la clé étrangère l'accepterait sans broncher, et le
+  // rattachement serait invisible depuis les deux cartes.
+  it("devrait refuser une zone qui n'appartient pas à l'édition", async () => {
+    prismaMock.editionMarker.count.mockResolvedValue(0)
+    prismaMock.editionMarker.aggregate.mockResolvedValue({ _max: { order: null } })
+    prismaMock.editionZone.findFirst.mockResolvedValue(null)
+    global.readBody.mockResolvedValue({
+      name: 'Entrée principale',
+      latitude: 48.8566,
+      longitude: 2.3522,
+      zoneId: 999,
+    })
+
+    await expect(markersPostHandler(mockEvent as any)).rejects.toThrow()
+    expect(prismaMock.editionMarker.create).not.toHaveBeenCalled()
+  })
+
+  it('devrait créer un marqueur autonome quand aucune zone n’est fournie', async () => {
+    prismaMock.editionMarker.count.mockResolvedValue(0)
+    prismaMock.editionMarker.aggregate.mockResolvedValue({ _max: { order: null } })
+    prismaMock.editionMarker.create.mockResolvedValue(mockMarker)
+    global.readBody.mockResolvedValue({
+      name: 'Point isolé',
+      latitude: 48.8566,
+      longitude: 2.3522,
+    })
+
+    await markersPostHandler(mockEvent as any)
+
+    expect(prismaMock.editionZone.findFirst).not.toHaveBeenCalled()
+    expect(prismaMock.editionMarker.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ zoneId: null }),
+      select: expect.any(Object),
+    })
+  })
+
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const unauthEvent = {
       context: {
