@@ -548,7 +548,8 @@
       "title": "Bilety",
       "all_artists_handout_items": "Przedmioty do wydania wszystkim artystom",
       "all_artists_handout_items_help": "Te przedmioty są wydawane każdemu artyście edycji, oprócz tych powiązanych z jego spektaklami.",
-      "per_show_handout_items_title": "Przedmioty przypisane do spektaklu"
+      "per_show_handout_items_title": "Przedmioty przypisane do spektaklu",
+      "infomaniak_currency_mismatch": "Infomaniak zwróci kwoty w {infomaniak}, podczas gdy edycja jest ustawiona na {edition}: zostałyby wyświetlone w niewłaściwej walucie. Ujednolić oba ustawienia."
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

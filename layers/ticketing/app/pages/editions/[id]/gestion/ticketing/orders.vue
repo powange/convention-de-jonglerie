@@ -101,7 +101,7 @@
               <div class="flex-1">
                 <p class="text-sm text-gray-600 dark:text-gray-400">Montant total</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                  {{ (stats.totalAmount / 100).toFixed(2) }}€
+                  {{ money(stats.totalAmount) }}
                 </p>
               </div>
               <UIcon name="i-heroicons-chevron-right" class="h-5 w-5 text-gray-400" />
@@ -119,7 +119,7 @@
                   {{ stats.totalDonations }}
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-500">
-                  {{ (stats.totalDonationsAmount / 100).toFixed(2) }}€
+                  {{ money(stats.totalDonationsAmount) }}
                 </p>
               </div>
             </div>
@@ -206,7 +206,7 @@
                       <div class="flex items-center justify-between w-full">
                         <span>{{ item.label }}</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400">
-                          {{ (item.price / 100).toFixed(2) }}€
+                          {{ money(item.price) }}
                         </span>
                       </div>
                     </template>
@@ -248,7 +248,7 @@
                           v-if="item.price > 0"
                           class="text-xs text-gray-500 dark:text-gray-400"
                         >
-                          +{{ (item.price / 100).toFixed(2) }}€
+                          +{{ money(item.price) }}
                         </span>
                       </div>
                     </template>
@@ -608,7 +608,7 @@
               <!-- Montant + menu actions -->
               <div class="flex items-start gap-2 flex-shrink-0">
                 <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  {{ (order.amount / 100).toFixed(2) }}€
+                  {{ money(order.amount) }}
                 </div>
                 <!-- Menu d'actions -->
                 <UDropdownMenu :items="getOrderMenuItems(order)" :ui="{ content: 'min-w-48' }">
@@ -714,7 +714,7 @@
                           v-if="selectedOption.amount > 0"
                           class="text-gray-500 dark:text-gray-500"
                         >
-                          (+{{ (selectedOption.amount / 100).toFixed(2) }}€)
+                          (+{{ money(selectedOption.amount) }})
                         </span>
                       </div>
                     </div>
@@ -724,7 +724,7 @@
                 <div class="flex items-start gap-2 flex-shrink-0">
                   <div class="text-right flex flex-col items-end gap-1">
                     <div class="font-bold text-lg text-primary-600 dark:text-primary-400">
-                      {{ getItemTotalAmount(item) }}€
+                      {{ money(getItemTotalAmount(item)) }}
                     </div>
                     <UBadge
                       :color="
@@ -849,7 +849,7 @@
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Montant :</span>
               <span class="font-medium text-gray-900 dark:text-white">
-                {{ (orderToCancel.amount / 100).toFixed(2) }}€
+                {{ money(orderToCancel.amount) }}
               </span>
             </div>
             <div class="flex items-center justify-between">
@@ -944,7 +944,7 @@
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Montant :</span>
               <span class="font-medium text-gray-900 dark:text-white">
-                {{ (itemToValidate.amount / 100).toFixed(2) }}€
+                {{ money(itemToValidate.amount) }}
               </span>
             </div>
           </div>
@@ -1012,7 +1012,7 @@
                 </div>
               </div>
               <p class="text-lg font-bold text-green-600">
-                {{ (stats.amountsByPaymentMethod.cardHelloAsso / 100).toFixed(2) }}€
+                {{ money(stats.amountsByPaymentMethod.cardHelloAsso) }}
               </p>
             </div>
 
@@ -1038,7 +1038,7 @@
                 </div>
               </div>
               <p class="text-lg font-bold text-teal-600">
-                {{ (stats.amountsByPaymentMethod.cardOnsite / 100).toFixed(2) }}€
+                {{ money(stats.amountsByPaymentMethod.cardOnsite) }}
               </p>
             </div>
 
@@ -1059,7 +1059,7 @@
                 </div>
               </div>
               <p class="text-lg font-bold text-blue-600">
-                {{ (stats.amountsByPaymentMethod.cash / 100).toFixed(2) }}€
+                {{ money(stats.amountsByPaymentMethod.cash) }}
               </p>
             </div>
 
@@ -1078,7 +1078,7 @@
                 </div>
               </div>
               <p class="text-lg font-bold text-purple-600">
-                {{ (stats.amountsByPaymentMethod.check / 100).toFixed(2) }}€
+                {{ money(stats.amountsByPaymentMethod.check) }}
               </p>
             </div>
 
@@ -1101,7 +1101,7 @@
                 </div>
               </div>
               <p class="text-lg font-bold text-gray-600">
-                {{ (stats.amountsByPaymentMethod.online / 100).toFixed(2) }}€
+                {{ money(stats.amountsByPaymentMethod.online) }}
               </p>
             </div>
 
@@ -1122,7 +1122,7 @@
                 </div>
               </div>
               <p class="text-lg font-bold text-yellow-600">
-                {{ (stats.amountsByPaymentMethod.pending / 100).toFixed(2) }}€
+                {{ money(stats.amountsByPaymentMethod.pending) }}
               </p>
             </div>
 
@@ -1145,7 +1145,7 @@
                 </div>
               </div>
               <p class="text-lg font-bold text-red-600">
-                {{ (stats.amountsByPaymentMethod.refunded / 100).toFixed(2) }}€
+                {{ money(stats.amountsByPaymentMethod.refunded) }}
               </p>
             </div>
           </div>
@@ -1162,7 +1162,7 @@
                 <p class="text-lg font-semibold text-gray-900 dark:text-white">Total général</p>
               </div>
               <p class="text-2xl font-bold text-primary-600">
-                {{ (stats.totalAmount / 100).toFixed(2) }}€
+                {{ money(stats.totalAmount) }}
               </p>
             </div>
           </div>
@@ -1176,7 +1176,7 @@
       title="Définir la méthode de paiement"
       :description="
         selectedOrder
-          ? `Commande de ${selectedOrder.payerFirstName} ${selectedOrder.payerLastName} - ${(selectedOrder.amount / 100).toFixed(2)}€`
+          ? `Commande de ${selectedOrder.payerFirstName} ${selectedOrder.payerLastName} - ${money(selectedOrder.amount)}`
           : ''
       "
     >
@@ -1385,6 +1385,8 @@ import {
   type ItemType,
 } from '../../../../../utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/tiers'
+
+const { money } = useEditionCurrency()
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -1770,7 +1772,8 @@ const getItemTotalAmount = (item: any) => {
   const baseAmount = item.amount || 0
   const optionsAmount =
     item.selectedOptions?.reduce((sum: number, opt: any) => sum + (opt.amount || 0), 0) || 0
-  return ((baseAmount + optionsAmount) / 100).toFixed(2)
+  // Rend des centimes ; la mise en forme et la devise sont l’affaire de `money()`.
+  return baseAmount + optionsAmount
 }
 
 // Charger les commandes avec pagination

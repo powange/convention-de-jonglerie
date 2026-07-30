@@ -548,7 +548,8 @@
       "title": "Vstupenky",
       "all_artists_handout_items": "Předměty k předání všem umělcům",
       "all_artists_handout_items_help": "Tyto předměty se předávají každému umělci ročníku, navíc k předmětům spojeným s jeho představeními.",
-      "per_show_handout_items_title": "Předměty specifické pro představení"
+      "per_show_handout_items_title": "Předměty specifické pro představení",
+      "infomaniak_currency_mismatch": "Infomaniak vrátí částky v {infomaniak}, zatímco ročník je nastaven na {edition}: zobrazily by se v nesprávné měně. Sjednoťte obě nastavení."
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",

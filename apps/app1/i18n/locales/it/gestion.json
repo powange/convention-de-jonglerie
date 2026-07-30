@@ -548,7 +548,8 @@
       "title": "Biglietti",
       "all_artists_handout_items": "Articoli da consegnare a tutti gli artisti",
       "all_artists_handout_items_help": "Questi articoli vengono consegnati a ogni artista dell'edizione, oltre a quelli associati ai suoi spettacoli.",
-      "per_show_handout_items_title": "Articoli specifici per spettacolo"
+      "per_show_handout_items_title": "Articoli specifici per spettacolo",
+      "infomaniak_currency_mismatch": "Infomaniak restituirà gli importi in {infomaniak}, mentre l'edizione è impostata su {edition}: verrebbero mostrati nella valuta sbagliata. Allinea le due impostazioni."
     },
     "title": "Gestione",
     "view_edition": "Vedi l'edizione",

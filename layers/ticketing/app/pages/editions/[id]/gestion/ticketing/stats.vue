@@ -466,6 +466,8 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+const { money } = useEditionCurrency()
+
 const AccessValidationChart = defineAsyncComponent(
   () => import('~/components/ticketing/stats/AccessValidationChart.vue')
 )
@@ -602,7 +604,7 @@ const purchaseGranularityItems = computed(() => [
 
 const tierItems = computed(() =>
   tiers.value.map((tier) => ({
-    label: `${tier.name} (${(tier.price / 100).toFixed(2)} €)`,
+    label: `${tier.name} (${money(tier.price)})`,
     value: tier.id,
   }))
 )

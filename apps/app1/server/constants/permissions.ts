@@ -30,6 +30,7 @@ export const ORGANIZER_RIGHTS = {
   MANAGE_STOCK: 'canManageStock',
   MANAGE_WORKSHOPS: 'canManageWorkshops',
   MANAGE_FAQ: 'canManageFAQ',
+  MANAGE_TREASURY: 'canManageTreasury',
 } as const
 
 /**
@@ -86,6 +87,7 @@ export const RESOURCE_RIGHTS = [
   ORGANIZER_RIGHTS.MANAGE_STOCK,
   ORGANIZER_RIGHTS.MANAGE_WORKSHOPS,
   ORGANIZER_RIGHTS.MANAGE_FAQ,
+  ORGANIZER_RIGHTS.MANAGE_TREASURY,
 ] as const
 
 /**

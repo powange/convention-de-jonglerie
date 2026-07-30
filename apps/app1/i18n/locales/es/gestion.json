@@ -548,7 +548,8 @@
       "title": "Entradas",
       "all_artists_handout_items": "Artículos a entregar a todos los artistas",
       "all_artists_handout_items_help": "Estos artículos se entregan a cada artista de la edición, además de los asociados a sus espectáculos.",
-      "per_show_handout_items_title": "Artículos específicos por espectáculo"
+      "per_show_handout_items_title": "Artículos específicos por espectáculo",
+      "infomaniak_currency_mismatch": "Infomaniak devolverá los importes en {infomaniak}, mientras que la edición está configurada en {edition}: se mostrarían en la moneda equivocada. Alinee ambos ajustes."
     },
     "title": "Gestión",
     "view_edition": "Ver la edición",

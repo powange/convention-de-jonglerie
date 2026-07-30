@@ -216,6 +216,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+const { money } = useEditionCurrency()
+
 export type PaymentMethod = 'cash' | 'card' | 'check' | null
 
 const props = withDefaults(
@@ -294,6 +296,6 @@ function openSumup() {
 }
 
 function formatPrice(cents: number): string {
-  return (cents / 100).toFixed(2) + ' €'
+  return money(cents)
 }
 </script>
