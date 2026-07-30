@@ -1,5 +1,5 @@
 ---
-description: 'Pipeline complet : i18n, traductions, code review avec corrections, puis quality-check (lint, tests, commit)'
+description: 'Pipeline complet : i18n, traductions, code review avec corrections, quality-check (lint, tests, commit), puis PR, CI et merge si on est sur une branche'
 thinking: false
 ---
 
@@ -45,6 +45,29 @@ Lancer la commande `/quality-check` qui enchaîne :
 2. `/run-tests` — Exécution des tests
 3. `/commit-push` — Commit et push si tout est OK
 
+## Étape 6 : Pull request, CI et merge
+
+**Uniquement si le commit a été fait sur une branche** — vérifier avec `git branch --show-current`.
+Si la branche courante est `main`, le travail est déjà sur la branche principale : ne rien faire
+de plus et terminer.
+
+1. **Ouvrir la PR** avec `gh pr create --base main`. Le corps explique *pourquoi* le changement
+   existe : le problème constaté, ce qui a été prouvé plutôt qu'affirmé, et ce qui reste ouvert.
+   Ne pas se contenter d'un résumé du diff, que la PR affiche déjà.
+
+2. **Attendre la CI** en scrutant `gh pr checks <numéro>` jusqu'à ce qu'aucun statut ne soit
+   `pending`. Une attente longue se fait en tâche de fond, pas en enchaînant des `sleep`.
+
+3. **Interpréter le verdict** :
+   - tout passe → merger avec `gh pr merge <numéro> --squash --delete-branch` ;
+   - un échec → **ne pas merger**. Lire le journal du job fautif, diagnostiquer, et distinguer
+     une vraie régression d'une attente de test devenue fausse. Corriger, pousser, reprendre à
+     l'étape 2.
+
+**Ne jamais déployer** dans ce skill : le déploiement reste une décision explicite de
+l'utilisateur, via `/deploy`.
+
 ---
 
-**Règle d'arrêt** : Si une étape échoue (erreur i18n non résoluble, tests cassés, etc.), le processus s'arrête immédiatement et signale l'erreur à l'utilisateur.
+**Règle d'arrêt** : Si une étape échoue (erreur i18n non résoluble, tests cassés, CI rouge non
+résoluble), le processus s'arrête immédiatement et signale l'erreur à l'utilisateur.
