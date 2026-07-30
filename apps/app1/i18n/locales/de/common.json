@@ -771,5 +771,11 @@
     "program_max_10000": "Das Programm darf 10000 Zeichen nicht überschreiten",
     "url_invalid": "Die URL muss mit http:// oder https:// beginnen",
     "url_max_191": "Die URL darf 191 Zeichen nicht überschreiten"
-  }
+  },
+  "guide": {
+    "menu": "Handbuch-Menü",
+    "french_only_title": "Dieses Handbuch ist nur auf Französisch verfügbar",
+    "french_only_description": "Das Handbuch liegt nur auf Französisch vor. Ihr Browser kann es für Sie übersetzen: Klicken Sie mit der rechten Maustaste auf die Seite und wählen Sie „Übersetzen“."
+  },
+  "profil_menu": "Profilmenü"
 }

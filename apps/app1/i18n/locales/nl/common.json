@@ -771,5 +771,11 @@
     "program_max_10000": "Het programma mag niet meer dan 10000 tekens bevatten",
     "url_invalid": "De URL moet beginnen met http:// of https://",
     "url_max_191": "De URL mag niet langer zijn dan 191 tekens"
-  }
+  },
+  "guide": {
+    "menu": "Menu van de gids",
+    "french_only_title": "Deze gids is alleen in het Frans beschikbaar",
+    "french_only_description": "De gids is alleen in het Frans geschreven. Uw browser kan hem vertalen: klik met de rechtermuisknop op de pagina en kies 'Vertalen'."
+  },
+  "profil_menu": "Profielmenu"
 }

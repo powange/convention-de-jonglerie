@@ -771,5 +771,11 @@
     "program_max_10000": "Programmet får inte innehålla mer än 10000 tecken",
     "url_invalid": "URL:en måste börja med http:// eller https://",
     "url_max_191": "URL:en får inte överstiga 191 tecken"
-  }
+  },
+  "guide": {
+    "menu": "Guidemeny",
+    "french_only_title": "Den här guiden finns bara på franska",
+    "french_only_description": "Guiden är skriven enbart på franska. Din webbläsare kan översätta den: högerklicka på sidan och välj ”Översätt”."
+  },
+  "profil_menu": "Profilmeny"
 }

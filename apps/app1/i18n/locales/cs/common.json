@@ -771,5 +771,11 @@
     "program_max_10000": "Program nesmí překročit 10000 znaků",
     "url_invalid": "Adresa URL musí začínat http:// nebo https://",
     "url_max_191": "Adresa URL nesmí překročit 191 znaků"
-  }
+  },
+  "guide": {
+    "menu": "Nabídka průvodce",
+    "french_only_title": "Tento průvodce je dostupný pouze ve francouzštině",
+    "french_only_description": "Průvodce je napsán pouze francouzsky. Váš prohlížeč jej může přeložit: klikněte pravým tlačítkem na stránku a zvolte „Přeložit“."
+  },
+  "profil_menu": "Nabídka profilu"
 }
