@@ -36,7 +36,11 @@ export default defineConfig<ConfigOptions>({
     {
       name: 'setup',
       testMatch: /auth\.setup\.ts/,
-      timeout: 60000,
+      // 2 minutes : en local, la première visite d'une page compile le serveur de développement
+      // — 48 s mesurées sur /login, contre 0 s ensuite. Avec 60 s il ne restait qu'une douzaine
+      // de secondes pour la création de compte, et l'étape échouait une fois sur deux. En CI
+      // l'application est pré-construite, ce délai n'y change rien.
+      timeout: 120000,
       use: { ...devices['Desktop Chrome'], locale: 'fr-FR' },
     },
     // Data setup : crée convention + édition via API

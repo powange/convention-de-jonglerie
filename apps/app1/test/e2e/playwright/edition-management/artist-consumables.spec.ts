@@ -103,9 +103,11 @@ test.describe.serial('Remboursement des consommables des artistes', () => {
 
     // Cible la ligne par l'email : le libellé d'en-tête « Consommables » contient
     // sinon le prénom de l'artiste de test.
+    // Les montants sont formatés dans la devise de l'édition depuis la trésorerie : le réel
+    // s'affiche « 62,50 € », plus le nombre brut « 62.5 » d'avant la bascule en centimes.
     const row = page.locator('tr', { hasText: ARTIST_EMAIL }).first()
-    await expect(row).toContainText('80')
-    await expect(row).toContainText('62.5')
+    await expect(row).toContainText('Max:80')
+    await expect(row).toContainText('62,50')
   })
 
   test('l’artiste voit ses consommables dans son espace artiste', async ({ page, goto }) => {
