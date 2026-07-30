@@ -26,6 +26,7 @@ export function getTranslationsToLoad(path: string): string[] {
     '/verify-email': ['auth'],
     '/welcome': ['auth', 'profil'],
     '/messenger': ['messenger'],
+    '/privacy-policy': ['privacy'],
   }
 
   // Vérifier les routes statiques
@@ -340,6 +341,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     uk: () => import('../../../../layers/volunteers/i18n/locales/uk/gestion-volunteers.json'),
     cs: () => import('../../../../layers/volunteers/i18n/locales/cs/gestion-volunteers.json'),
     sv: () => import('../../../../layers/volunteers/i18n/locales/sv/gestion-volunteers.json'),
+  },
+  privacy: {
+    en: () => import('~~/i18n/locales/en/privacy.json'),
+    da: () => import('~~/i18n/locales/da/privacy.json'),
+    de: () => import('~~/i18n/locales/de/privacy.json'),
+    es: () => import('~~/i18n/locales/es/privacy.json'),
+    fr: () => import('~~/i18n/locales/fr/privacy.json'),
+    it: () => import('~~/i18n/locales/it/privacy.json'),
+    nl: () => import('~~/i18n/locales/nl/privacy.json'),
+    pl: () => import('~~/i18n/locales/pl/privacy.json'),
+    pt: () => import('~~/i18n/locales/pt/privacy.json'),
+    ru: () => import('~~/i18n/locales/ru/privacy.json'),
+    uk: () => import('~~/i18n/locales/uk/privacy.json'),
+    cs: () => import('~~/i18n/locales/cs/privacy.json'),
+    sv: () => import('~~/i18n/locales/sv/privacy.json'),
   },
   'project-costs': {
     en: () => import('~~/i18n/locales/en/project-costs.json'),

@@ -1,0 +1,72 @@
+{
+  "privacy": {
+    "title": "Datenschutzrichtlinie",
+    "last_updated": "Zuletzt aktualisiert",
+    "update_date": "11. September 2025",
+    "sections": {
+      "data_controller": {
+        "title": "Datenverantwortlicher",
+        "content": "Convention de Jonglerie ist der Datenverantwortliche für Ihre personenbezogenen Daten. Wir verpflichten uns, Ihre Privatsphäre zu schützen und Ihre personenbezogenen Daten transparent und in Übereinstimmung mit der Datenschutz-Grundverordnung (DSGVO) zu verarbeiten."
+      },
+      "data_collected": {
+        "title": "Erhobene Daten",
+        "intro": "Wir erheben die folgenden Arten von personenbezogenen Daten:",
+        "items": {
+          "identity": "Identitätsinformationen: Nachname, Vorname, Benutzername",
+          "contact": "Kontaktinformationen: E-Mail-Adresse",
+          "preferences": "Benutzerpräferenzen: Lieblings-Conventions, Benachrichtigungseinstellungen"
+        }
+      },
+      "purpose": {
+        "title": "Verarbeitungszwecke",
+        "intro": "Ihre personenbezogenen Daten werden für die folgenden Zwecke verarbeitet:",
+        "items": {
+          "account_management": "Verwaltung Ihres Benutzerkontos und Authentifizierung",
+          "service_provision": "Bereitstellung der Plattformdienste (Durchsuchen, Hinzufügen von Conventions)",
+          "communication": "Service-bezogene Kommunikation und wichtige Benachrichtigungen",
+          "improvement": "Verbesserung unserer Dienste und Nutzungsanalyse"
+        }
+      },
+      "legal_basis": {
+        "title": "Rechtsgrundlage",
+        "content": "Die Verarbeitung Ihrer personenbezogenen Daten basiert auf Ihrer Einwilligung zur Kontoerstellung und Dienstnutzung sowie auf unserem berechtigten Interesse an der Verbesserung unserer Dienste und der Plattformsicherheit."
+      },
+      "data_sharing": {
+        "title": "Datenweitergabe",
+        "content": "Wir verkaufen, vermieten oder teilen Ihre personenbezogenen Daten nicht mit Dritten, außer in den folgenden Fällen: gesetzliche Verpflichtung, Schutz unserer Rechte oder mit Ihrer ausdrücklichen Einwilligung. Daten können mit unseren technischen Dienstleistern streng im Rahmen der Diensterbringung geteilt werden."
+      },
+      "data_retention": {
+        "title": "Datenspeicherung",
+        "content": "Ihre personenbezogenen Daten werden für die Dauer gespeichert, die für die Zwecke erforderlich ist, für die sie erhoben wurden. Konten, die länger als 3 Jahre inaktiv sind, können nach vorheriger Benachrichtigung gelöscht werden."
+      },
+      "user_rights": {
+        "title": "Ihre Rechte",
+        "intro": "In Übereinstimmung mit der DSGVO haben Sie die folgenden Rechte:",
+        "items": {
+          "access": "Auskunftsrecht: eine Kopie Ihrer personenbezogenen Daten erhalten",
+          "rectification": "Berichtigungsrecht: Ihre unrichtigen oder unvollständigen Daten korrigieren",
+          "erasure": "Recht auf Löschung: Ihre personenbezogenen Daten löschen",
+          "portability": "Recht auf Datenübertragbarkeit: Ihre Daten in einem strukturierten Format abrufen",
+          "objection": "Widerspruchsrecht: der Verarbeitung Ihrer Daten widersprechen"
+        }
+      },
+      "cookies": {
+        "title": "Cookies und ähnliche Technologien",
+        "content": "Wir verwenden technische Cookies, die für den Betrieb der Website erforderlich sind, insbesondere für die Verwaltung Ihrer Anmeldesitzung. Diese Cookies erfordern nicht Ihre vorherige Einwilligung, da sie für die Diensterbringung unbedingt erforderlich sind."
+      },
+      "security": {
+        "title": "Datensicherheit",
+        "content": "Wir implementieren angemessene technische und organisatorische Maßnahmen zum Schutz Ihrer personenbezogenen Daten vor Verlust, Missbrauch, unbefugtem Zugriff, Offenlegung, Änderung oder unbefugter Zerstörung."
+      },
+      "updates": {
+        "title": "Richtlinien-Updates",
+        "content": "Diese Datenschutzrichtlinie kann regelmäßig aktualisiert werden. Wir werden Sie über wesentliche Änderungen per E-Mail oder über eine Benachrichtigung auf der Website informieren."
+      },
+      "contact": {
+        "title": "Kontakt",
+        "content": "Für Fragen zu dieser Datenschutzrichtlinie oder zur Ausübung Ihrer Rechte können Sie uns kontaktieren unter:",
+        "email_label": "E-Mail"
+      }
+    }
+  }
+}

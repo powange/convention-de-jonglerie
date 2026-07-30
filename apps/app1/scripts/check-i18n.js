@@ -32,8 +32,13 @@ const layersRoot = path.resolve(projectRoot, '..', '..', 'layers')
 const localeDir = path.join(projectRoot, 'i18n', 'locales', 'fr')
 
 // Fichiers à exclure de l'analyse (qui génèrent des faux positifs)
-// Ces fichiers contiennent leurs propres traductions intégrées
-const EXCLUDED_FILES = ['app/pages/privacy-policy.vue']
+// Ces fichiers contiennent leurs propres traductions intégrées.
+//
+// La liste est vide, et mieux vaut qu'elle le reste : une page exclue d'ici est une page dont
+// les traductions dérivent sans que rien ne le signale. C'est ce qui est arrivé à
+// privacy-policy.vue, dont le bloc `<i18n>` local ne couvrait que quatre langues — les neuf
+// autres affichaient la clé brute, un bloc local ne bénéficiant d'aucun repli.
+const EXCLUDED_FILES = []
 
 // Fichiers exclus uniquement de l'étape 4 (textes hardcodés)
 // Ces fichiers contiennent des textes techniques intentionnellement non traduits
