@@ -188,7 +188,8 @@
     "week": "Woche",
     "workshops_short": "Workshops",
     "yes": "Ja",
-    "currency": "Währung"
+    "currency": "Währung",
+    "amount": "Betrag"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

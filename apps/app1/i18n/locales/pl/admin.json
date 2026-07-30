@@ -580,7 +580,6 @@
         "add": "Dodaj taryfę",
         "amount": "Kwota",
         "confirm_delete": "Czy na pewno chcesz usunąć tę taryfę?",
-        "currency": "Waluta",
         "edit": "Edytuj taryfę",
         "end_date": "Data zakończenia",
         "end_date_hint": "Zostaw puste, jeśli taryfa nadal obowiązuje",

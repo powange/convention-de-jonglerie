@@ -574,7 +574,42 @@
       "list_description": "Spravujte různé výzvy k přihláškám představení pro tuto akci"
     },
     "treasury": {
-      "title": "Pokladna"
+      "title": "Pokladna",
+      "subtitle": "Náklady a výnosy ročníku. Řádky pocházející od umělců a ze vstupenek se opravují u zdroje.",
+      "expenses": "Náklady",
+      "incomes": "Výnosy",
+      "expense": "Náklad",
+      "income": "Výnos",
+      "balance": "Zůstatek",
+      "balance_hint": "Uhrazené výnosy minus uhrazené náklady",
+      "pending_amount": "z toho {amount} přislíbeno",
+      "open_source": "Otevřít zdroj",
+      "manage_codes": "Spravovat kódy",
+      "add_entry": "Přidat řádek",
+      "edit_entry": "Upravit řádek",
+      "entry_kind": "Povaha",
+      "entry_title": "Označení",
+      "entry_code": "Účetní kód",
+      "entry_saved": "Řádek uložen",
+      "entry_error": "Řádek se nepodařilo uložit",
+      "entry_deleted": "Řádek smazán",
+      "entry_delete_error": "Řádek se nepodařilo smazat",
+      "no_code": "Bez kódu",
+      "code_error": "Zařazení se nepodařilo uložit",
+      "codes_help": "Kódy patří konventu a používají se opakovaně z ročníku na ročník. Smazání kódu jej odebere z dotčených řádků, aniž by změnilo jejich částku.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Odměny zprostředkovatelům",
+      "code_created": "Kód vytvořen",
+      "code_create_error": "Kód se nepodařilo vytvořit",
+      "code_deleted": "Kód smazán",
+      "code_delete_error": "Kód se nepodařilo smazat",
+      "no_codes_yet": "Zatím žádný kód.",
+      "source": {
+        "ARTIST_PAYMENT": "Honoráře umělců",
+        "ARTIST_REIMBURSEMENT": "Náhrady cestovného umělců",
+        "ARTIST_CONSUMABLES": "Spotřební materiál umělců",
+        "TICKETING_ORDERS": "Objednávky vstupenek"
+      }
     }
   }
 }

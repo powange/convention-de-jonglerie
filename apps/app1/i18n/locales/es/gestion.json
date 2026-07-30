@@ -574,7 +574,42 @@
       "list_description": "Gestione las diferentes convocatorias de espectáculos para esta edición"
     },
     "treasury": {
-      "title": "Tesorería"
+      "title": "Tesorería",
+      "subtitle": "Gastos e ingresos de la edición. Las líneas procedentes de artistas y entradas se corrigen en su origen.",
+      "expenses": "Gastos",
+      "incomes": "Ingresos",
+      "expense": "Gasto",
+      "income": "Ingreso",
+      "balance": "Saldo",
+      "balance_hint": "Ingresos cobrados menos gastos pagados",
+      "pending_amount": "de los cuales {amount} comprometidos",
+      "open_source": "Abrir el origen",
+      "manage_codes": "Gestionar los códigos",
+      "add_entry": "Añadir una línea",
+      "edit_entry": "Editar la línea",
+      "entry_kind": "Naturaleza",
+      "entry_title": "Concepto",
+      "entry_code": "Código contable",
+      "entry_saved": "Línea guardada",
+      "entry_error": "No se ha podido guardar la línea",
+      "entry_deleted": "Línea eliminada",
+      "entry_delete_error": "No se ha podido eliminar la línea",
+      "no_code": "Sin código",
+      "code_error": "No se ha podido guardar la imputación",
+      "codes_help": "Los códigos pertenecen a la convención: se reutilizan de una edición a otra. Eliminar un código lo quita de las líneas que lo usan, sin modificar su importe.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Honorarios de intermediarios",
+      "code_created": "Código creado",
+      "code_create_error": "No se ha podido crear el código",
+      "code_deleted": "Código eliminado",
+      "code_delete_error": "No se ha podido eliminar el código",
+      "no_codes_yet": "Aún no hay ningún código.",
+      "source": {
+        "ARTIST_PAYMENT": "Caché de los artistas",
+        "ARTIST_REIMBURSEMENT": "Dietas de viaje de los artistas",
+        "ARTIST_CONSUMABLES": "Consumibles de los artistas",
+        "TICKETING_ORDERS": "Pedidos de entradas"
+      }
     }
   }
 }

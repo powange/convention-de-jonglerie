@@ -188,7 +188,8 @@
     "week": "Semaine",
     "workshops_short": "Workshops",
     "yes": "Oui",
-    "currency": "Devise"
+    "currency": "Devise",
+    "amount": "Montant"
   },
   "dates": {
     "date_range": "Du {startDate} au {endDate}",

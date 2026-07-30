@@ -574,7 +574,42 @@
       "list_description": "Administrer forskellige forestillingsopkald for dette arrangement"
     },
     "treasury": {
-      "title": "Økonomi"
+      "title": "Økonomi",
+      "subtitle": "Udgifter og indtægter for udgaven. Linjer fra kunstnere og billetsalg rettes ved kilden.",
+      "expenses": "Udgifter",
+      "incomes": "Indtægter",
+      "expense": "Udgift",
+      "income": "Indtægt",
+      "balance": "Saldo",
+      "balance_hint": "Modtagne indtægter minus betalte udgifter",
+      "pending_amount": "heraf {amount} tilsagt",
+      "open_source": "Åbn kilden",
+      "manage_codes": "Administrér koder",
+      "add_entry": "Tilføj en linje",
+      "edit_entry": "Redigér linjen",
+      "entry_kind": "Type",
+      "entry_title": "Betegnelse",
+      "entry_code": "Bogføringskonto",
+      "entry_saved": "Linje gemt",
+      "entry_error": "Linjen kunne ikke gemmes",
+      "entry_deleted": "Linje slettet",
+      "entry_delete_error": "Linjen kunne ikke slettes",
+      "no_code": "Uden konto",
+      "code_error": "Konteringen kunne ikke gemmes",
+      "codes_help": "Koderne hører til konventet og genbruges fra én udgave til den næste. Sletning af en kode fjerner den fra de berørte linjer uden at ændre deres beløb.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Honorarer til mellemled",
+      "code_created": "Kode oprettet",
+      "code_create_error": "Koden kunne ikke oprettes",
+      "code_deleted": "Kode slettet",
+      "code_delete_error": "Koden kunne ikke slettes",
+      "no_codes_yet": "Ingen kode endnu.",
+      "source": {
+        "ARTIST_PAYMENT": "Kunstnerhonorarer",
+        "ARTIST_REIMBURSEMENT": "Kunstnernes rejsegodtgørelse",
+        "ARTIST_CONSUMABLES": "Kunstnernes forbrugsvarer",
+        "TICKETING_ORDERS": "Billetordrer"
+      }
     }
   }
 }

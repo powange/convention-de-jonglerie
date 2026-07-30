@@ -574,7 +574,42 @@
       "list_description": "Hantera olika föreställningsutlysningar för detta evenemang"
     },
     "treasury": {
-      "title": "Ekonomi"
+      "title": "Ekonomi",
+      "subtitle": "Utgifter och intäkter för upplagan. Rader från artister och biljetter rättas vid källan.",
+      "expenses": "Utgifter",
+      "incomes": "Intäkter",
+      "expense": "Utgift",
+      "income": "Intäkt",
+      "balance": "Saldo",
+      "balance_hint": "Erhållna intäkter minus betalda utgifter",
+      "pending_amount": "varav {amount} utlovat",
+      "open_source": "Öppna källan",
+      "manage_codes": "Hantera koder",
+      "add_entry": "Lägg till en rad",
+      "edit_entry": "Redigera raden",
+      "entry_kind": "Typ",
+      "entry_title": "Benämning",
+      "entry_code": "Bokföringskonto",
+      "entry_saved": "Raden sparad",
+      "entry_error": "Det gick inte att spara raden",
+      "entry_deleted": "Raden borttagen",
+      "entry_delete_error": "Det gick inte att ta bort raden",
+      "no_code": "Utan konto",
+      "code_error": "Det gick inte att spara konteringen",
+      "codes_help": "Koderna tillhör konventet och återanvänds från en upplaga till nästa. Att ta bort en kod tar bort den från berörda rader utan att ändra deras belopp.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Arvoden till mellanhänder",
+      "code_created": "Kod skapad",
+      "code_create_error": "Det gick inte att skapa koden",
+      "code_deleted": "Kod borttagen",
+      "code_delete_error": "Det gick inte att ta bort koden",
+      "no_codes_yet": "Ingen kod ännu.",
+      "source": {
+        "ARTIST_PAYMENT": "Artistgager",
+        "ARTIST_REIMBURSEMENT": "Artisternas reseersättningar",
+        "ARTIST_CONSUMABLES": "Artisternas förbrukningsmaterial",
+        "TICKETING_ORDERS": "Biljettbeställningar"
+      }
     }
   }
 }

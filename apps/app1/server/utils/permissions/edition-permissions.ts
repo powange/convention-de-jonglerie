@@ -468,6 +468,46 @@ export async function canManageTicketingById(
  * (convention ou édition). Même signature que canAccessEditionData pour un
  * remplacement direct dans les endpoints.
  */
+/**
+ * Vérifie si un utilisateur peut gérer la trésorerie d'une édition.
+ *
+ * Droit dédié et non dérivé des droits sectoriels : la trésorerie donne à voir les montants des
+ * artistes comme ceux de la billetterie, si bien que l'ouvrir à l'un de ces modules exposerait
+ * plus que son périmètre.
+ */
+export async function canManageTreasuryById(
+  editionId: number,
+  userId: number,
+  event?: any
+): Promise<boolean> {
+  const isAdminMode = await checkAdminMode(userId, event)
+  if (isAdminMode) return true
+
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      creatorId: true,
+      convention: {
+        select: {
+          authorId: true,
+          organizers: { where: { userId }, select: { canManageTreasury: true } },
+        },
+      },
+      organizerPermissions: {
+        where: { organizer: { userId } },
+        select: { canManageTreasury: true },
+      },
+    },
+  })
+
+  if (!edition) return false
+  if (edition.creatorId === userId) return true
+  if (edition.convention.authorId === userId) return true
+  if (edition.convention.organizers?.some((o) => o.canManageTreasury)) return true
+  if (edition.organizerPermissions?.some((p) => p.canManageTreasury)) return true
+  return false
+}
+
 export async function canManageArtistsById(
   editionId: number,
   userId: number,

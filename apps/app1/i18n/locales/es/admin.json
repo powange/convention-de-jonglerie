@@ -580,7 +580,6 @@
         "add": "Añadir tarifa",
         "amount": "Importe",
         "confirm_delete": "¿Está seguro de que desea eliminar esta tarifa?",
-        "currency": "Moneda",
         "edit": "Editar tarifa",
         "end_date": "Fecha de fin",
         "end_date_hint": "Dejar vacío si la tarifa sigue vigente",

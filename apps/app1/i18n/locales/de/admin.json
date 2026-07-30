@@ -580,7 +580,6 @@
         "add": "Tarif hinzufügen",
         "amount": "Betrag",
         "confirm_delete": "Möchten Sie diesen Tarif wirklich löschen?",
-        "currency": "Währung",
         "edit": "Tarif bearbeiten",
         "end_date": "Enddatum",
         "end_date_hint": "Leer lassen, wenn der Tarif noch gilt",

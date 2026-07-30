@@ -188,7 +188,8 @@
     "week": "Týden",
     "workshops_short": "Workshopy",
     "yes": "Ano",
-    "currency": "Měna"
+    "currency": "Měna",
+    "amount": "Částka"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

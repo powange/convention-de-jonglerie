@@ -580,7 +580,6 @@
         "add": "Aggiungi tariffa",
         "amount": "Importo",
         "confirm_delete": "Sei sicuro di voler eliminare questa tariffa?",
-        "currency": "Valuta",
         "edit": "Modifica tariffa",
         "end_date": "Data di fine",
         "end_date_hint": "Lasciare vuoto se la tariffa è ancora in vigore",

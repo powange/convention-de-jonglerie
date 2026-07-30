@@ -574,7 +574,42 @@
       "list_description": "Die verschiedenen Show-Aufrufe für diese Ausgabe verwalten"
     },
     "treasury": {
-      "title": "Buchhaltung"
+      "title": "Buchhaltung",
+      "subtitle": "Ausgaben und Einnahmen der Ausgabe. Zeilen aus Künstlern und Ticketing werden an ihrer Quelle korrigiert.",
+      "expenses": "Ausgaben",
+      "incomes": "Einnahmen",
+      "expense": "Ausgabe",
+      "income": "Einnahme",
+      "balance": "Saldo",
+      "balance_hint": "Beglichene Einnahmen abzüglich beglichener Ausgaben",
+      "pending_amount": "davon {amount} zugesagt",
+      "open_source": "Quelle öffnen",
+      "manage_codes": "Konten verwalten",
+      "add_entry": "Zeile hinzufügen",
+      "edit_entry": "Zeile bearbeiten",
+      "entry_kind": "Art",
+      "entry_title": "Bezeichnung",
+      "entry_code": "Buchungskonto",
+      "entry_saved": "Zeile gespeichert",
+      "entry_error": "Die Zeile konnte nicht gespeichert werden",
+      "entry_deleted": "Zeile gelöscht",
+      "entry_delete_error": "Die Zeile konnte nicht gelöscht werden",
+      "no_code": "Ohne Konto",
+      "code_error": "Die Zuordnung konnte nicht gespeichert werden",
+      "codes_help": "Die Konten gehören zur Convention und werden von einer Ausgabe zur nächsten wiederverwendet. Ein gelöschtes Konto wird aus den betroffenen Zeilen entfernt, ohne deren Betrag zu verändern.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Vermittlungshonorare",
+      "code_created": "Konto angelegt",
+      "code_create_error": "Das Konto konnte nicht angelegt werden",
+      "code_deleted": "Konto gelöscht",
+      "code_delete_error": "Das Konto konnte nicht gelöscht werden",
+      "no_codes_yet": "Noch kein Konto.",
+      "source": {
+        "ARTIST_PAYMENT": "Künstlergagen",
+        "ARTIST_REIMBURSEMENT": "Fahrtkostenerstattungen der Künstler",
+        "ARTIST_CONSUMABLES": "Verbrauchsmaterialien der Künstler",
+        "TICKETING_ORDERS": "Ticketing-Bestellungen"
+      }
     }
   }
 }

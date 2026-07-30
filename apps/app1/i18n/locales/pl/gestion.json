@@ -574,7 +574,42 @@
       "list_description": "Zarządzaj różnymi naborami spektakli na tę edycję"
     },
     "treasury": {
-      "title": "Finanse"
+      "title": "Finanse",
+      "subtitle": "Koszty i przychody edycji. Pozycje pochodzące od artystów i z biletów poprawia się u źródła.",
+      "expenses": "Koszty",
+      "incomes": "Przychody",
+      "expense": "Koszt",
+      "income": "Przychód",
+      "balance": "Saldo",
+      "balance_hint": "Wpływy minus poniesione koszty",
+      "pending_amount": "w tym {amount} zadeklarowane",
+      "open_source": "Otwórz źródło",
+      "manage_codes": "Zarządzaj kodami",
+      "add_entry": "Dodaj pozycję",
+      "edit_entry": "Edytuj pozycję",
+      "entry_kind": "Rodzaj",
+      "entry_title": "Nazwa",
+      "entry_code": "Kod księgowy",
+      "entry_saved": "Pozycja zapisana",
+      "entry_error": "Nie udało się zapisać pozycji",
+      "entry_deleted": "Pozycja usunięta",
+      "entry_delete_error": "Nie udało się usunąć pozycji",
+      "no_code": "Bez kodu",
+      "code_error": "Nie udało się zapisać dekretacji",
+      "codes_help": "Kody należą do konwentu i są używane ponownie w kolejnych edycjach. Usunięcie kodu odbiera go pozycjom, które go używają, bez zmiany ich kwoty.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Wynagrodzenia pośredników",
+      "code_created": "Kod utworzony",
+      "code_create_error": "Nie udało się utworzyć kodu",
+      "code_deleted": "Kod usunięty",
+      "code_delete_error": "Nie udało się usunąć kodu",
+      "no_codes_yet": "Brak kodów.",
+      "source": {
+        "ARTIST_PAYMENT": "Honoraria artystów",
+        "ARTIST_REIMBURSEMENT": "Zwroty kosztów podróży artystów",
+        "ARTIST_CONSUMABLES": "Materiały artystów",
+        "TICKETING_ORDERS": "Zamówienia biletów"
+      }
     }
   }
 }
