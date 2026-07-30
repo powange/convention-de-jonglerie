@@ -7,6 +7,10 @@ import {
   checkAdminMode,
   findUserByPseudoOrEmail,
 } from '#server/utils/organizer-management'
+import {
+  conventionRightsZodShape,
+  editionRightsZodShape,
+} from '#server/utils/permissions/rights-shapes'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateConventionId } from '#server/utils/validation-helpers'
@@ -16,44 +20,11 @@ const addOrganizerschema = z
     userIdentifier: z.string().min(1, 'Pseudo ou email requis').optional(),
     userId: z.number().positive().optional(),
     // Droits optionnels (sinon valeurs par défaut côté service)
-    rights: z
-      .object({
-        editConvention: z.boolean().optional(),
-        deleteConvention: z.boolean().optional(),
-        manageOrganizers: z.boolean().optional(),
-        manageVolunteers: z.boolean().optional(),
-        manageArtists: z.boolean().optional(),
-        manageMeals: z.boolean().optional(),
-        manageTicketing: z.boolean().optional(),
-        manageWorkshops: z.boolean().optional(),
-        manageFAQ: z.boolean().optional(),
-        manageTreasury: z.boolean().optional(),
-        manageTasks: z.boolean().optional(),
-        manageStock: z.boolean().optional(),
-        addEdition: z.boolean().optional(),
-        editAllEditions: z.boolean().optional(),
-        deleteAllEditions: z.boolean().optional(),
-      })
-      .partial()
-      .optional(),
+    // Dérivés de la source unique : un droit ajouté y est accepté sans retoucher ce fichier.
+    rights: z.object(conventionRightsZodShape()).partial().optional(),
     title: z.string().max(120).optional().nullable(),
     perEdition: z
-      .array(
-        z.object({
-          editionId: z.number().int().positive(),
-          canEdit: z.boolean().optional(),
-          canDelete: z.boolean().optional(),
-          canManageVolunteers: z.boolean().optional(),
-          canManageArtists: z.boolean().optional(),
-          canManageMeals: z.boolean().optional(),
-          canManageTicketing: z.boolean().optional(),
-          canManageWorkshops: z.boolean().optional(),
-          canManageFAQ: z.boolean().optional(),
-          canManageTreasury: z.boolean().optional(),
-          canManageTasks: z.boolean().optional(),
-          canManageStock: z.boolean().optional(),
-        })
-      )
+      .array(z.object({ editionId: z.number().int().positive(), ...editionRightsZodShape() }))
       .optional(),
   })
   .refine((data) => data.userIdentifier || data.userId, {

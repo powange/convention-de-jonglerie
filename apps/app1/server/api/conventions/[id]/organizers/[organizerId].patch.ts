@@ -8,47 +8,25 @@ import type {
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageOrganizers } from '#server/utils/organizer-management'
+import {
+  applyConventionRights,
+  conventionRightsZodShape,
+  editionRightsZodShape,
+  readEditionRights,
+} from '#server/utils/permissions/rights-shapes'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateConventionId, validateResourceId } from '#server/utils/validation-helpers'
 
 // Schéma combiné (droits globaux + perEdition + title)
+// Dérivé de la source unique : un droit ajouté y est accepté sans retoucher ce fichier.
 const perEditionSchema = z.object({
   editionId: z.number().int().positive(),
-  canEdit: z.boolean().optional(),
-  canDelete: z.boolean().optional(),
-  canManageVolunteers: z.boolean().optional(),
-  canManageArtists: z.boolean().optional(),
-  canManageMeals: z.boolean().optional(),
-  canManageTicketing: z.boolean().optional(),
-  canManageWorkshops: z.boolean().optional(),
-  canManageFAQ: z.boolean().optional(),
-  canManageTreasury: z.boolean().optional(),
-  canManageTasks: z.boolean().optional(),
-  canManageStock: z.boolean().optional(),
+  ...editionRightsZodShape(),
 })
 
 const payloadSchema = z.object({
   title: z.string().max(120).optional().nullable(),
-  rights: z
-    .object({
-      editConvention: z.boolean().optional(),
-      deleteConvention: z.boolean().optional(),
-      manageOrganizers: z.boolean().optional(),
-      manageVolunteers: z.boolean().optional(),
-      manageArtists: z.boolean().optional(),
-      manageMeals: z.boolean().optional(),
-      manageTicketing: z.boolean().optional(),
-      manageWorkshops: z.boolean().optional(),
-      manageFAQ: z.boolean().optional(),
-      manageTreasury: z.boolean().optional(),
-      manageTasks: z.boolean().optional(),
-      manageStock: z.boolean().optional(),
-      addEdition: z.boolean().optional(),
-      editAllEditions: z.boolean().optional(),
-      deleteAllEditions: z.boolean().optional(),
-    })
-    .partial()
-    .optional(),
+  rights: z.object(conventionRightsZodShape()).partial().optional(),
   perEdition: z.array(perEditionSchema).optional(),
 })
 
@@ -112,35 +90,8 @@ export default wrapApiHandler(
     const updateData: OrganizerUpdateInput = {}
     if (parsed.title !== undefined) updateData.title = parsed.title || null
     if (parsed.rights) {
-      if (parsed.rights.editConvention !== undefined)
-        updateData.canEditConvention = parsed.rights.editConvention
-      if (parsed.rights.deleteConvention !== undefined)
-        updateData.canDeleteConvention = parsed.rights.deleteConvention
-      if (parsed.rights.manageOrganizers !== undefined)
-        updateData.canManageOrganizers = parsed.rights.manageOrganizers
-      if (parsed.rights.manageVolunteers !== undefined)
-        updateData.canManageVolunteers = parsed.rights.manageVolunteers
-      if (parsed.rights.manageArtists !== undefined)
-        updateData.canManageArtists = parsed.rights.manageArtists
-      if (parsed.rights.manageMeals !== undefined)
-        updateData.canManageMeals = parsed.rights.manageMeals
-      if (parsed.rights.manageTicketing !== undefined)
-        updateData.canManageTicketing = parsed.rights.manageTicketing
-      if (parsed.rights.manageWorkshops !== undefined)
-        updateData.canManageWorkshops = parsed.rights.manageWorkshops
-      if (parsed.rights.manageFAQ !== undefined) updateData.canManageFAQ = parsed.rights.manageFAQ
-      if (parsed.rights.manageTreasury !== undefined)
-        updateData.canManageTreasury = parsed.rights.manageTreasury
-      if (parsed.rights.manageTasks !== undefined)
-        updateData.canManageTasks = parsed.rights.manageTasks
-      if (parsed.rights.manageStock !== undefined)
-        updateData.canManageStock = parsed.rights.manageStock
-      if (parsed.rights.addEdition !== undefined)
-        updateData.canAddEdition = parsed.rights.addEdition
-      if (parsed.rights.editAllEditions !== undefined)
-        updateData.canEditAllEditions = parsed.rights.editAllEditions
-      if (parsed.rights.deleteAllEditions !== undefined)
-        updateData.canDeleteAllEditions = parsed.rights.deleteAllEditions
+      // Dérivé de la source unique : chaque droit fourni est recopié, les absents ignorés.
+      applyConventionRights(updateData, parsed.rights)
     }
     const perEditionInput = parsed.perEdition || null
 
@@ -162,17 +113,9 @@ export default wrapApiHandler(
                 data: {
                   organizerId,
                   editionId: p.editionId,
-                  canEdit: !!p.canEdit,
-                  canDelete: !!p.canDelete,
-                  canManageVolunteers: !!p.canManageVolunteers,
-                  canManageArtists: !!p.canManageArtists,
-                  canManageMeals: !!p.canManageMeals,
-                  canManageTicketing: !!p.canManageTicketing,
-                  canManageWorkshops: !!p.canManageWorkshops,
-                  canManageFAQ: !!p.canManageFAQ,
-                  canManageTreasury: !!p.canManageTreasury,
-                  canManageTasks: !!p.canManageTasks,
-                  canManageStock: !!p.canManageStock,
+                  // Couvre canEdit et canDelete comme les droits métier : la source unique les
+                  // liste tous.
+                  ...readEditionRights(p),
                 },
               })
             )
