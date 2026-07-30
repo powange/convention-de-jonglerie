@@ -12,6 +12,11 @@ export default defineTask({
    *
    * Les jetons encore actifs ne sont jamais touchés, quelle que soit leur ancienneté : un
    * appareil peu utilisé reste un abonnement valide.
+   *
+   * Cette tâche ne supprime que des jetons, jamais de compte — et aucun nettoyage ne doit le
+   * faire sur le critère de l'e-mail non validé : les artistes, bénévoles et participants
+   * ajoutés à la main sont créés sans validation, et une telle purge les effacerait avec leurs
+   * candidatures, leurs créneaux et leurs commandes.
    */
   async run({ payload: _payload }) {
     try {
