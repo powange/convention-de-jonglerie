@@ -497,6 +497,10 @@ export const useEditionStore = defineStore('editions', {
       return this.hasEditionModuleRight(edition, userId, 'manageWorkshops')
     },
 
+    canManageTreasury(edition: Edition, userId: number): boolean {
+      return this.hasEditionModuleRight(edition, userId, 'manageTreasury')
+    },
+
     canManageFAQ(edition: Edition, userId: number): boolean {
       return this.hasEditionModuleRight(edition, userId, 'manageFAQ')
     },

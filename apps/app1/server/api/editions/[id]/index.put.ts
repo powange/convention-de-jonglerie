@@ -74,6 +74,7 @@ export default wrapApiHandler(
       tasksEnabled,
       stockEnabled,
       faqEnabled,
+      treasuryEnabled,
       faqPagePublic,
       hasATM,
       hasCashPayment,
@@ -181,6 +182,7 @@ export default wrapApiHandler(
     if (tasksEnabled !== undefined) updatedData.tasksEnabled = tasksEnabled
     if (stockEnabled !== undefined) updatedData.stockEnabled = stockEnabled
     if (faqEnabled !== undefined) updatedData.faqEnabled = faqEnabled
+    if (treasuryEnabled !== undefined) updatedData.treasuryEnabled = treasuryEnabled
     if (faqPagePublic !== undefined) updatedData.faqPagePublic = faqPagePublic
     if (hasATM !== undefined) updatedData.hasATM = hasATM
     if (hasCashPayment !== undefined) updatedData.hasCashPayment = hasCashPayment

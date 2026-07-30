@@ -177,6 +177,10 @@ const messages = {
         label: 'Gérer la FAQ',
         desc: "rédiger et organiser les questions fréquentes de l'édition.",
       },
+      manageTreasury: {
+        label: 'Gérer la trésorerie',
+        desc: "consulter et tenir les charges et produits de l'édition.",
+      },
     },
     editionPerms: {
       title: 'Droits par édition',
@@ -221,6 +225,10 @@ const messages = {
       manageFAQ: {
         label: 'FAQ',
         desc: 'rédiger et organiser les questions fréquentes.',
+      },
+      manageTreasury: {
+        label: 'Trésorerie',
+        desc: "tenir les charges et produits, et voir l'ensemble des montants de l'édition.",
       },
       warningTitle: '« Informations » ne donne pas accès aux modules',
       warningText:

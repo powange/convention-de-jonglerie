@@ -1,0 +1,85 @@
+// =============================================================================
+// Trésorerie d'une édition
+// =============================================================================
+//
+// Charges et produits d'une édition, en une vue.
+//
+// Les lignes provenant des artistes et de la billetterie ne sont **pas** recopiées ici : elles
+// sont calculées à la lecture depuis leur source. Un montant corrigé se répercute donc
+// immédiatement, là où une copie exigerait une resynchronisation et finirait par diverger en
+// silence. Seuls le code d'imputation choisi pour chaque source et les lignes saisies à la main
+// sont stockés.
+//
+// Tous les montants sont en centimes entiers, dans la devise de l'édition.
+
+enum TreasuryEntryKind {
+  EXPENSE // charge
+  INCOME // produit
+}
+
+/// Origine d'une ligne calculée, pour lui rattacher un code d'imputation.
+enum TreasurySource {
+  ARTIST_PAYMENT // cachets des artistes
+  ARTIST_REIMBURSEMENT // défraiements trajet
+  ARTIST_CONSUMABLES // consommables
+  TICKETING_ORDERS // commandes de billetterie, remboursements déduits
+}
+
+/// Code d'imputation comptable, défini au niveau de la convention.
+///
+/// Rattaché à la convention et non à l'édition : un plan comptable se réutilise d'une année sur
+/// l'autre. Volontairement libre — code et libellé — pour ne présumer d'aucune réglementation
+/// nationale, tout en évitant la saisie ligne à ligne qui produirait « 6257 » et « 6 257 » côte
+/// à côte, sans regroupement fiable possible.
+model TreasuryCode {
+  id           Int      @id @default(autoincrement())
+  conventionId Int
+  code         String   @db.VarChar(32)
+  label        String   @db.VarChar(120)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  convention  Convention           @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+  entries     TreasuryEntry[]
+  sourceCodes TreasurySourceCode[]
+
+  @@unique([conventionId, code])
+  @@index([conventionId])
+}
+
+/// Ligne saisie à la main, en charge ou en produit.
+model TreasuryEntry {
+  id          Int               @id @default(autoincrement())
+  editionId   Int
+  kind        TreasuryEntryKind
+  title       String            @db.VarChar(150)
+  description String?           @db.Text
+  /// Montant en centimes, toujours positif : c'est `kind` qui porte le sens.
+  amount      Int
+  codeId      Int?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  edition Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  code    TreasuryCode? @relation(fields: [codeId], references: [id], onDelete: SetNull)
+
+  @@index([editionId])
+  @@index([codeId])
+}
+
+/// Code d'imputation choisi pour une origine calculée.
+///
+/// Un code par origine et non par artiste : un comptable impute l'ensemble des cachets sur un
+/// même compte, pas chaque artiste séparément.
+model TreasurySourceCode {
+  id        Int            @id @default(autoincrement())
+  editionId Int
+  source    TreasurySource
+  codeId    Int
+
+  edition Edition      @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  code    TreasuryCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, source])
+  @@index([codeId])
+}

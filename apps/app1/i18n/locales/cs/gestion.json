@@ -72,7 +72,8 @@
       "ticketing_description": "Povolit správu vstupenek pro tuto edici",
       "title": "Funkce",
       "volunteers_description": "Povolit správu dobrovolníků pro tuto edici",
-      "workshops_description": "Umožnit účastníkům a dobrovolníkům vytvářet workshopy"
+      "workshops_description": "Umožnit účastníkům a dobrovolníkům vytvářet workshopy",
+      "treasury_description": "Sledovat náklady a výnosy ročníku s účetním zařazením."
     },
     "general_info": {
       "description": "Upravte název, data, časové pásmo a adresu vaší akce.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Výzva k přihláškám představení",
       "list_description": "Spravujte různé výzvy k přihláškám představení pro tuto akci"
+    },
+    "treasury": {
+      "title": "Pokladna"
     }
   }
 }

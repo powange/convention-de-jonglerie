@@ -72,7 +72,8 @@
       "ticketing_description": "Włącz zarządzanie biletami dla tej edycji",
       "title": "Funkcje",
       "volunteers_description": "Włącz zarządzanie wolontariuszami dla tej edycji",
-      "workshops_description": "Pozwól uczestnikom i wolontariuszom tworzyć warsztaty"
+      "workshops_description": "Pozwól uczestnikom i wolontariuszom tworzyć warsztaty",
+      "treasury_description": "Śledź koszty i przychody edycji wraz z dekretacją księgową."
     },
     "general_info": {
       "description": "Edytuj nazwę, daty, strefę czasową i adres swojego wydarzenia.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Nabór spektakli",
       "list_description": "Zarządzaj różnymi naborami spektakli na tę edycję"
+    },
+    "treasury": {
+      "title": "Finanse"
     }
   }
 }

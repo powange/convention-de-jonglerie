@@ -102,6 +102,7 @@ export interface Edition {
   stockEnabled?: boolean
   faqEnabled?: boolean
   faqPagePublic?: boolean
+  treasuryEnabled?: boolean
   mapPublic?: boolean
   /** Service hébergeant la carte externe de l'organisateur, si elle remplace la carte interne. */
   externalMapProvider?: string | null

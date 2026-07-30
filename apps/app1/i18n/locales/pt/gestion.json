@@ -72,7 +72,8 @@
       "ticketing_description": "Permitir a gestão de bilhética para esta edição",
       "title": "Funcionalidades",
       "volunteers_description": "Permitir a gestão de voluntários para esta edição",
-      "workshops_description": "Permitir aos participantes e voluntários criar workshops"
+      "workshops_description": "Permitir aos participantes e voluntários criar workshops",
+      "treasury_description": "Acompanhar as despesas e receitas da edição, com imputação contabilística."
     },
     "general_info": {
       "description": "Edite o nome, as datas, o fuso horário e o endereço do seu evento.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Convocatória de espetáculos",
       "list_description": "Gerir as diferentes convocatórias de espetáculos para esta edição"
+    },
+    "treasury": {
+      "title": "Tesouraria"
     }
   }
 }

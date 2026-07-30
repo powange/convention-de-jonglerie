@@ -72,7 +72,8 @@
       "ticketing_description": "Aktivera hantering av biljettförsäljning för denna upplaga",
       "title": "Funktioner",
       "volunteers_description": "Aktivera hantering av volontärer för denna upplaga",
-      "workshops_description": "Låt deltagare och volontärer skapa workshops"
+      "workshops_description": "Låt deltagare och volontärer skapa workshops",
+      "treasury_description": "Följ upplagans utgifter och intäkter, med bokföringskonton."
     },
     "general_info": {
       "description": "Redigera namn, datum, tidszon och adress för ditt evenemang.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Föreställningsutlysning",
       "list_description": "Hantera olika föreställningsutlysningar för detta evenemang"
+    },
+    "treasury": {
+      "title": "Ekonomi"
     }
   }
 }

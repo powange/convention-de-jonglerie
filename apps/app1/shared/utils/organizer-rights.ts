@@ -33,6 +33,7 @@ export const CONVENTION_RIGHTS = [
   'manageStock',
   'manageWorkshops',
   'manageFAQ',
+  'manageTreasury',
 ] as const
 
 export type ConventionRight = (typeof CONVENTION_RIGHTS)[number]
@@ -54,6 +55,7 @@ export const EDITION_RIGHTS = [
   'canManageStock',
   'canManageWorkshops',
   'canManageFAQ',
+  'canManageTreasury',
 ] as const
 
 export type EditionRight = (typeof EDITION_RIGHTS)[number]
@@ -77,6 +79,7 @@ export const EDITION_MODULE_RIGHTS = [
   'manageStock',
   'manageWorkshops',
   'manageFAQ',
+  'manageTreasury',
 ] as const
 
 export type EditionModuleRight = (typeof EDITION_MODULE_RIGHTS)[number]

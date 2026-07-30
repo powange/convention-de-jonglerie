@@ -72,7 +72,8 @@
       "ticketing_description": "Abilitare la gestione della biglietteria per questa edizione",
       "title": "Funzionalità",
       "volunteers_description": "Abilitare la gestione dei volontari per questa edizione",
-      "workshops_description": "Permettere ai partecipanti e ai volontari di creare workshop"
+      "workshops_description": "Permettere ai partecipanti e ai volontari di creare workshop",
+      "treasury_description": "Seguire le spese e le entrate dell'edizione, con imputazione contabile."
     },
     "general_info": {
       "description": "Modifica il nome, le date, il fuso orario e l'indirizzo del tuo evento.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Bando per spettacoli",
       "list_description": "Gestisci i diversi bandi per spettacoli per questa edizione"
+    },
+    "treasury": {
+      "title": "Tesoreria"
     }
   }
 }
