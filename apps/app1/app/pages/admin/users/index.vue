@@ -432,7 +432,7 @@ const columns = [
       const name = LOCALES_CONFIG.find((l) => l.code === code)?.name || code || '-'
       const flag = languageCodeToFlag(code)
       return h('div', { class: 'flex items-center gap-2' }, [
-        flag ? h('span', { class: `${flag} w-4 h-3 shrink-0` }) : null,
+        flag ? h(resolveComponent('UIcon'), { name: flag, class: 'w-4 h-3 shrink-0' }) : null,
         h('span', name),
       ])
     },

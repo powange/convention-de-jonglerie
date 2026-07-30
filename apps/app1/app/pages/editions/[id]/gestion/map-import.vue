@@ -127,6 +127,7 @@
             <div
               v-for="row in layer.rows"
               :key="row.key"
+              data-testid="map-import-row"
               class="flex flex-col gap-3 py-3 lg:flex-row lg:items-center"
             >
               <div class="flex min-w-0 flex-1 items-center gap-3">
@@ -675,6 +676,23 @@ function confirmDelete(row: ViewRow) {
   pendingDelete.value = row
 }
 
+/**
+ * Retire la ligne supprimée, sans rechargement : la carte du fournisseur n'a pas changé.
+ *
+ * Un objet toujours présent sur la carte redevient importable ; une ligne « plus retrouvée »
+ * disparaît, plus rien ne la rattachant à quoi que ce soit.
+ */
+function applyDeletedRow(key: string) {
+  replaceRows((rows) =>
+    rows.flatMap((r, i) => {
+      if (rowKey(r, i) !== key) return [r]
+      return r.object
+        ? [{ ...r, state: 'importable' as const, record: undefined, editedLocally: false }]
+        : []
+    })
+  )
+}
+
 const deleteAction = useApiActionById(
   (key) => {
     const row = rows.value.find((r) => r.key === key)
@@ -686,29 +704,18 @@ const deleteAction = useApiActionById(
     method: 'DELETE',
     successMessage: { title: t('gestion.map.import_deleted') },
     errorMessages: { default: t('gestion.map.import_delete_error') },
+    // La mise à jour passe par `onSuccess`, pas par la valeur de retour : les endpoints de
+    // suppression répondent `createSuccessResponse(null)`, donc `execute` rend `null` alors que
+    // tout s'est bien passé. Se fier au retour laissait la ligne inchangée malgré le toast.
+    onSuccess: (_result, key) => applyDeletedRow(String(key)),
   }
 )
 
 async function runDelete() {
   const row = pendingDelete.value
   if (!row) return
-
-  const result = await deleteAction.execute(row.key)
+  await deleteAction.execute(row.key)
   pendingDelete.value = null
-  if (result === null) return
-
-  // Là encore, pas de rechargement : la carte du fournisseur n'a pas changé, seule la ligne
-  // concernée bouge.
-  replaceRows((rows) =>
-    rows.flatMap((r, i) => {
-      if (rowKey(r, i) !== row.key) return [r]
-      // L'objet existe toujours sur la carte : il redevient importable. Sinon la ligne « plus
-      // retrouvée » disparaît, plus rien ne la rattachant à quoi que ce soit.
-      return r.object
-        ? [{ ...r, state: 'importable' as const, record: undefined, editedLocally: false }]
-        : []
-    })
-  )
 }
 
 const switching = ref(false)
