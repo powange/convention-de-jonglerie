@@ -163,9 +163,9 @@
                   >{{ $t('admin.preferred_language') }}:</span
                 >
                 <span class="font-medium flex items-center gap-2">
-                  <span
+                  <UIcon
                     v-if="preferredLanguageFlag"
-                    :class="preferredLanguageFlag"
+                    :name="preferredLanguageFlag"
                     class="w-4 h-3 shrink-0"
                   />
                   {{ preferredLanguageLabel }}

@@ -7,13 +7,17 @@
       :class="showLabel ? '' : 'sm:size-sm!'"
       :title="$t('footer.language_selector')"
     >
-      <span v-if="currentLanguageFlag" :class="currentLanguageFlag" class="w-4 h-3" />
+      <UIcon v-if="currentLanguageFlag" :name="currentLanguageFlag" class="w-4 h-3" />
       <span v-if="showLabel" class="text-sm">{{ currentLanguageName }}</span>
     </UButton>
 
-    <!-- Slots pour les drapeaux de chaque langue -->
+    <!-- Slots pour les drapeaux de chaque langue.
+         Passer par UIcon plutôt que par la classe seule : la classe `i-flag:xx-4x3` ne produit
+         rien tant qu'aucun UIcon n'a chargé cette icône dans la page. Seuls les drapeaux
+         présents ailleurs — la locale courante, le pays d'une édition affichée — s'affichaient,
+         les autres restaient vides. -->
     <template v-for="lang in locales" :key="lang.code" #[`lang-${lang.code}-leading`]>
-      <span :class="languageCodeToFlag(lang.code)" class="w-4 h-3 shrink-0" />
+      <UIcon :name="languageCodeToFlag(lang.code) ?? ''" class="w-4 h-3 shrink-0" />
     </template>
   </UDropdownMenu>
 </template>
@@ -45,7 +49,6 @@ const languageItems = computed(() => {
     onSelect: () => changeLanguage(lang.code),
     class: locale.value === lang.code ? 'bg-gray-100 dark:bg-gray-700' : '',
     slot: `lang-${lang.code}`,
-    flagClass: languageCodeToFlag(lang.code),
   }))
 })
 
