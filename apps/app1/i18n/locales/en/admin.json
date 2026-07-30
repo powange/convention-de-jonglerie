@@ -580,7 +580,6 @@
         "add": "Add rate",
         "amount": "Amount",
         "confirm_delete": "Are you sure you want to delete this rate?",
-        "currency": "Currency",
         "edit": "Edit rate",
         "end_date": "End date",
         "end_date_hint": "Leave empty if the rate is still in effect",

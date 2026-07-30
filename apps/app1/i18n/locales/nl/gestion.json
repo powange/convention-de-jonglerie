@@ -574,7 +574,42 @@
       "list_description": "Beheer de verschillende show-oproepen voor deze editie"
     },
     "treasury": {
-      "title": "Financiën"
+      "title": "Financiën",
+      "subtitle": "Uitgaven en inkomsten van de editie. Regels uit artiesten en ticketing worden bij de bron gecorrigeerd.",
+      "expenses": "Uitgaven",
+      "incomes": "Inkomsten",
+      "expense": "Uitgave",
+      "income": "Inkomst",
+      "balance": "Saldo",
+      "balance_hint": "Ontvangen inkomsten min betaalde uitgaven",
+      "pending_amount": "waarvan {amount} toegezegd",
+      "open_source": "Bron openen",
+      "manage_codes": "Codes beheren",
+      "add_entry": "Regel toevoegen",
+      "edit_entry": "Regel bewerken",
+      "entry_kind": "Aard",
+      "entry_title": "Omschrijving",
+      "entry_code": "Boekhoudcode",
+      "entry_saved": "Regel opgeslagen",
+      "entry_error": "Kan de regel niet opslaan",
+      "entry_deleted": "Regel verwijderd",
+      "entry_delete_error": "Kan de regel niet verwijderen",
+      "no_code": "Zonder code",
+      "code_error": "Kan de toewijzing niet opslaan",
+      "codes_help": "De codes horen bij de conventie en worden van de ene editie op de andere hergebruikt. Een code verwijderen haalt hem weg bij de betrokken regels, zonder hun bedrag te wijzigen.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Vergoedingen tussenpersonen",
+      "code_created": "Code aangemaakt",
+      "code_create_error": "Kan de code niet aanmaken",
+      "code_deleted": "Code verwijderd",
+      "code_delete_error": "Kan de code niet verwijderen",
+      "no_codes_yet": "Nog geen enkele code.",
+      "source": {
+        "ARTIST_PAYMENT": "Gages van de artiesten",
+        "ARTIST_REIMBURSEMENT": "Reiskostenvergoedingen van de artiesten",
+        "ARTIST_CONSUMABLES": "Verbruiksgoederen van de artiesten",
+        "TICKETING_ORDERS": "Ticketbestellingen"
+      }
     }
   }
 }

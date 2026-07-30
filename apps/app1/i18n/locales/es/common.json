@@ -188,7 +188,8 @@
     "week": "Semana",
     "workshops_short": "Talleres",
     "yes": "Sí",
-    "currency": "Moneda"
+    "currency": "Moneda",
+    "amount": "Importe"
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",

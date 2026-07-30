@@ -580,7 +580,6 @@
         "add": "Přidat tarif",
         "amount": "Částka",
         "confirm_delete": "Opravdu chcete smazat tento tarif?",
-        "currency": "Měna",
         "edit": "Upravit tarif",
         "end_date": "Datum ukončení",
         "end_date_hint": "Ponechte prázdné, pokud tarif stále platí",

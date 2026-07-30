@@ -188,7 +188,8 @@
     "week": "Settimana",
     "workshops_short": "Workshop",
     "yes": "Sì",
-    "currency": "Valuta"
+    "currency": "Valuta",
+    "amount": "Importo"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

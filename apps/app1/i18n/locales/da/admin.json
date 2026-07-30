@@ -580,7 +580,6 @@
         "add": "Tilføj tarif",
         "amount": "Beløb",
         "confirm_delete": "Er du sikker på, at du vil slette denne tarif?",
-        "currency": "Valuta",
         "edit": "Rediger tarif",
         "end_date": "Slutdato",
         "end_date_hint": "Lad stå tomt, hvis tariffen stadig gælder",

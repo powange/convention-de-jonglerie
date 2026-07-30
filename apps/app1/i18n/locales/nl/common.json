@@ -188,7 +188,8 @@
     "week": "Week",
     "workshops_short": "Workshops",
     "yes": "Ja",
-    "currency": "Valuta"
+    "currency": "Valuta",
+    "amount": "Bedrag"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

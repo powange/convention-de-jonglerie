@@ -574,7 +574,42 @@
       "list_description": "Manage the different calls for shows for this edition"
     },
     "treasury": {
-      "title": "Treasury"
+      "title": "Treasury",
+      "subtitle": "Expenses and income of the edition. Lines from artists and ticketing are corrected at their source.",
+      "expenses": "Expenses",
+      "incomes": "Income",
+      "expense": "Expense",
+      "income": "Income",
+      "balance": "Balance",
+      "balance_hint": "Settled income minus settled expenses",
+      "pending_amount": "including {amount} committed",
+      "open_source": "Open the source",
+      "manage_codes": "Manage codes",
+      "add_entry": "Add a line",
+      "edit_entry": "Edit the line",
+      "entry_kind": "Type",
+      "entry_title": "Label",
+      "entry_code": "Accounting code",
+      "entry_saved": "Line saved",
+      "entry_error": "Unable to save the line",
+      "entry_deleted": "Line deleted",
+      "entry_delete_error": "Unable to delete the line",
+      "no_code": "No code",
+      "code_error": "Unable to save the code assignment",
+      "codes_help": "Codes belong to the convention: they are reused from one edition to the next. Deleting a code removes it from the lines using it, without changing their amount.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Intermediary fees",
+      "code_created": "Code created",
+      "code_create_error": "Unable to create the code",
+      "code_deleted": "Code deleted",
+      "code_delete_error": "Unable to delete the code",
+      "no_codes_yet": "No code yet.",
+      "source": {
+        "ARTIST_PAYMENT": "Artist fees",
+        "ARTIST_REIMBURSEMENT": "Artist travel reimbursements",
+        "ARTIST_CONSUMABLES": "Artist consumables",
+        "TICKETING_ORDERS": "Ticketing orders"
+      }
     }
   }
 }

@@ -580,7 +580,6 @@
         "add": "Lägg till tariff",
         "amount": "Belopp",
         "confirm_delete": "Är du säker på att du vill ta bort denna tariff?",
-        "currency": "Valuta",
         "edit": "Redigera tariff",
         "end_date": "Slutdatum",
         "end_date_hint": "Lämna tomt om tariffen fortfarande gäller",

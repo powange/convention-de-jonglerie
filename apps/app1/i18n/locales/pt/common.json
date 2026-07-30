@@ -188,7 +188,8 @@
     "week": "Semana",
     "workshops_short": "Workshops",
     "yes": "Sim",
-    "currency": "Moeda"
+    "currency": "Moeda",
+    "amount": "Montante"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

@@ -188,7 +188,8 @@
     "week": "Veckan",
     "workshops_short": "Workshops",
     "yes": "Ja",
-    "currency": "Valuta"
+    "currency": "Valuta",
+    "amount": "Belopp"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

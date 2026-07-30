@@ -574,7 +574,42 @@
       "list_description": "Gestisci i diversi bandi per spettacoli per questa edizione"
     },
     "treasury": {
-      "title": "Tesoreria"
+      "title": "Tesoreria",
+      "subtitle": "Spese ed entrate dell'edizione. Le righe provenienti da artisti e biglietteria si correggono alla fonte.",
+      "expenses": "Spese",
+      "incomes": "Entrate",
+      "expense": "Spesa",
+      "income": "Entrata",
+      "balance": "Saldo",
+      "balance_hint": "Entrate incassate meno spese pagate",
+      "pending_amount": "di cui {amount} impegnati",
+      "open_source": "Apri la fonte",
+      "manage_codes": "Gestisci i codici",
+      "add_entry": "Aggiungi una riga",
+      "edit_entry": "Modifica la riga",
+      "entry_kind": "Natura",
+      "entry_title": "Descrizione",
+      "entry_code": "Codice contabile",
+      "entry_saved": "Riga salvata",
+      "entry_error": "Impossibile salvare la riga",
+      "entry_deleted": "Riga eliminata",
+      "entry_delete_error": "Impossibile eliminare la riga",
+      "no_code": "Senza codice",
+      "code_error": "Impossibile salvare l'imputazione",
+      "codes_help": "I codici appartengono alla convention: si riutilizzano da un'edizione all'altra. Eliminare un codice lo toglie dalle righe che lo usano, senza modificarne l'importo.",
+      "code_placeholder": "6257",
+      "code_label_placeholder": "Compensi a intermediari",
+      "code_created": "Codice creato",
+      "code_create_error": "Impossibile creare il codice",
+      "code_deleted": "Codice eliminato",
+      "code_delete_error": "Impossibile eliminare il codice",
+      "no_codes_yet": "Ancora nessun codice.",
+      "source": {
+        "ARTIST_PAYMENT": "Cachet degli artisti",
+        "ARTIST_REIMBURSEMENT": "Rimborsi viaggio degli artisti",
+        "ARTIST_CONSUMABLES": "Materiali di consumo degli artisti",
+        "TICKETING_ORDERS": "Ordini di biglietteria"
+      }
     }
   }
 }

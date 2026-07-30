@@ -188,7 +188,8 @@
     "week": "Тиждень",
     "workshops_short": "Майстер-класи",
     "yes": "Так",
-    "currency": "Валюта"
+    "currency": "Валюта",
+    "amount": "Сума"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",

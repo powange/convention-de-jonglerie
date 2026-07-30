@@ -188,7 +188,8 @@
     "week": "Uge",
     "workshops_short": "Workshops",
     "yes": "Ja",
-    "currency": "Valuta"
+    "currency": "Valuta",
+    "amount": "Beløb"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",
