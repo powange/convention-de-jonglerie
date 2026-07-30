@@ -583,7 +583,6 @@
       "income": "Einnahme",
       "balance": "Saldo",
       "balance_hint": "Beglichene Einnahmen abzüglich beglichener Ausgaben",
-      "pending_amount": "davon {amount} zugesagt",
       "open_source": "Quelle öffnen",
       "manage_codes": "Konten verwalten",
       "add_entry": "Zeile hinzufügen",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Fahrtkostenerstattungen der Künstler",
         "ARTIST_CONSUMABLES": "Verbrauchsmaterialien der Künstler",
         "TICKETING_ORDERS": "Ticketing-Bestellungen"
-      }
+      },
+      "settled_amount": "davon {amount} beglichen"
     }
   }
 }

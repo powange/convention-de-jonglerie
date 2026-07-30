@@ -583,7 +583,6 @@
       "income": "Intäkt",
       "balance": "Saldo",
       "balance_hint": "Erhållna intäkter minus betalda utgifter",
-      "pending_amount": "varav {amount} utlovat",
       "open_source": "Öppna källan",
       "manage_codes": "Hantera koder",
       "add_entry": "Lägg till en rad",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Artisternas reseersättningar",
         "ARTIST_CONSUMABLES": "Artisternas förbrukningsmaterial",
         "TICKETING_ORDERS": "Biljettbeställningar"
-      }
+      },
+      "settled_amount": "varav {amount} betalt"
     }
   }
 }

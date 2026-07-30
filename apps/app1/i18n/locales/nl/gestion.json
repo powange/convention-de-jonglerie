@@ -583,7 +583,6 @@
       "income": "Inkomst",
       "balance": "Saldo",
       "balance_hint": "Ontvangen inkomsten min betaalde uitgaven",
-      "pending_amount": "waarvan {amount} toegezegd",
       "open_source": "Bron openen",
       "manage_codes": "Codes beheren",
       "add_entry": "Regel toevoegen",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Reiskostenvergoedingen van de artiesten",
         "ARTIST_CONSUMABLES": "Verbruiksgoederen van de artiesten",
         "TICKETING_ORDERS": "Ticketbestellingen"
-      }
+      },
+      "settled_amount": "waarvan {amount} voldaan"
     }
   }
 }

@@ -53,8 +53,10 @@ export default wrapApiHandler(
         select: {
           payment: true,
           paymentPaid: true,
+          reimbursementMax: true,
           reimbursementActual: true,
           reimbursementActualPaid: true,
+          consumablesMax: true,
           consumablesActual: true,
           consumablesActualPaid: true,
         },

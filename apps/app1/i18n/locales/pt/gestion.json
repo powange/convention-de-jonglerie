@@ -583,7 +583,6 @@
       "income": "Receita",
       "balance": "Saldo",
       "balance_hint": "Receitas cobradas menos despesas pagas",
-      "pending_amount": "dos quais {amount} comprometidos",
       "open_source": "Abrir a origem",
       "manage_codes": "Gerir os códigos",
       "add_entry": "Adicionar uma linha",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Ajudas de custo de viagem dos artistas",
         "ARTIST_CONSUMABLES": "Consumíveis dos artistas",
         "TICKETING_ORDERS": "Encomendas de bilheteira"
-      }
+      },
+      "settled_amount": "dos quais {amount} liquidados"
     }
   }
 }

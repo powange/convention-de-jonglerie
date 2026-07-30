@@ -582,8 +582,7 @@
       "expense": "Charge",
       "income": "Produit",
       "balance": "Solde",
-      "balance_hint": "Produits réglés moins charges réglées",
-      "pending_amount": "dont {amount} engagé",
+      "balance_hint": "Produits moins charges, réglés ou non",
       "open_source": "Ouvrir la source",
       "manage_codes": "Gérer les codes",
       "add_entry": "Ajouter une ligne",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Défraiements trajet des artistes",
         "ARTIST_CONSUMABLES": "Consommables des artistes",
         "TICKETING_ORDERS": "Commandes de billetterie"
-      }
+      },
+      "settled_amount": "dont {amount} réglé"
     }
   }
 }
