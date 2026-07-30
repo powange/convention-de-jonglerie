@@ -189,7 +189,8 @@
     "workshops_short": "Workshops",
     "yes": "Ja",
     "currency": "Währung",
-    "amount": "Betrag"
+    "amount": "Betrag",
+    "treasury_short": "Buchhaltung"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

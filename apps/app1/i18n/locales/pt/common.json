@@ -189,7 +189,8 @@
     "workshops_short": "Workshops",
     "yes": "Sim",
     "currency": "Moeda",
-    "amount": "Montante"
+    "amount": "Montante",
+    "treasury_short": "Tesouraria"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

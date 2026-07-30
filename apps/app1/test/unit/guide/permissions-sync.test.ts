@@ -33,6 +33,10 @@ const guide = fs.readFileSync(guidePath, 'utf8')
 const store = fs.readFileSync(storePath, 'utf8')
 const menu = fs.readFileSync(menuPath, 'utf8')
 const dashboard = fs.readFileSync(dashboardPath, 'utf8')
+const rightsForm = fs.readFileSync(
+  path.resolve(__dirname, '../../../app/components/organizer/RightsFields.vue'),
+  'utf8'
+)
 
 /**
  * Chemins d'écriture des droits d'organisateur. Chacun énumère les champs à la main : un droit
@@ -117,6 +121,23 @@ describe('droits métier — accessibles depuis le store et le menu', () => {
       if (MENU_EXEMPT.includes(right)) continue
       const method = `can${right.charAt(0).toUpperCase()}${right.slice(1)}`
       expect(menu, `${method} absent du menu de gestion`).toContain(`editionStore.${method}(`)
+    }
+  })
+
+  /**
+   * Le formulaire énumère lui aussi ses colonnes à la main, au niveau convention comme au niveau
+   * édition. Un droit absent n'y est tout simplement pas attribuable : la trésorerie n'y figurait
+   * nulle part alors qu'elle existait partout ailleurs.
+   */
+  it('propose chaque droit métier dans le formulaire des droits', () => {
+    for (const right of EDITION_MODULE_RIGHTS) {
+      const field = `can${right.charAt(0).toUpperCase()}${right.slice(1)}`
+      expect(rightsForm, `${right} absent des droits de convention du formulaire`).toContain(
+        `updateRight('${right}'`
+      )
+      expect(rightsForm, `${field} absent du tableau par édition du formulaire`).toContain(
+        `'${field}'`
+      )
     }
   })
 

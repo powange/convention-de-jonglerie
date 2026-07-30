@@ -189,7 +189,8 @@
     "workshops_short": "Workshops",
     "yes": "Oui",
     "currency": "Devise",
-    "amount": "Montant"
+    "amount": "Montant",
+    "treasury_short": "Trésorerie"
   },
   "dates": {
     "date_range": "Du {startDate} au {endDate}",
