@@ -134,7 +134,8 @@
       "ticketing_link": "Ticketverkooplink",
       "ticketing_section_description": "Informatie voor het kopen van tickets",
       "ticketing_section_title": "Ticketverkoop",
-      "timezone_description": "Datums en tijden worden in deze tijdzone weergegeven"
+      "timezone_description": "Datums en tijden worden in deze tijdzone weergegeven",
+      "currency_description": "Geldt voor alle bedragen van de editie: artiesten, ticketing en financiën."
     },
     "favorites_map": {
       "all_favorites": "Alle zijn favorieten",

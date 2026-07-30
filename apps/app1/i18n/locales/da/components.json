@@ -134,7 +134,8 @@
       "ticketing_link": "Billetsalgslink",
       "ticketing_section_description": "Information om køb af billetter",
       "ticketing_section_title": "Billetsalg",
-      "timezone_description": "Datoer og tidspunkter vil blive vist i denne tidszone"
+      "timezone_description": "Datoer og tidspunkter vil blive vist i denne tidszone",
+      "currency_description": "Gælder alle udgavens beløb: kunstnere, billetsalg og økonomi."
     },
     "favorites_map": {
       "all_favorites": "Alle er favoritter",

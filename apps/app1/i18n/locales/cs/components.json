@@ -134,7 +134,8 @@
       "ticketing_link": "Odkaz na prodej vstupenek",
       "ticketing_section_description": "Informace o nákupu vstupenek",
       "ticketing_section_title": "Vstupenky",
-      "timezone_description": "Data a časy budou zobrazeny v tomto časovém pásmu"
+      "timezone_description": "Data a časy budou zobrazeny v tomto časovém pásmu",
+      "currency_description": "Platí pro všechny částky ročníku: umělci, vstupenky a pokladna."
     },
     "favorites_map": {
       "all_favorites": "Všichni jsou oblíbení",

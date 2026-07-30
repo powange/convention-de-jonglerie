@@ -187,7 +187,8 @@
     "warning": "Attenzione",
     "week": "Settimana",
     "workshops_short": "Workshop",
-    "yes": "Sì"
+    "yes": "Sì",
+    "currency": "Valuta"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

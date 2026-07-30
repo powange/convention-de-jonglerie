@@ -345,7 +345,7 @@
               <!-- Paiement -->
               <template #payment-cell="{ row }">
                 <div v-if="row.original.payment" class="flex items-center gap-2">
-                  <span class="font-medium">{{ row.original.payment }}€</span>
+                  <span class="font-medium">{{ formatAmount(Number(row.original.payment)) }}</span>
                   <UBadge
                     :color="row.original.paymentPaid ? 'success' : 'warning'"
                     variant="soft"
@@ -365,11 +365,11 @@
                 >
                   <div v-if="row.original.reimbursementMax" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Max:</span>
-                    <span class="font-medium">{{ row.original.reimbursementMax }}€</span>
+                    <span class="font-medium">{{ formatAmount(Number(row.original.reimbursementMax)) }}</span>
                   </div>
                   <div v-if="row.original.reimbursementActual" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Réel:</span>
-                    <span class="font-medium">{{ row.original.reimbursementActual }}€</span>
+                    <span class="font-medium">{{ formatAmount(Number(row.original.reimbursementActual)) }}</span>
                     <UBadge
                       :color="row.original.reimbursementActualPaid ? 'success' : 'warning'"
                       variant="soft"
@@ -390,11 +390,11 @@
                 >
                   <div v-if="row.original.consumablesMax" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Max:</span>
-                    <span class="font-medium">{{ row.original.consumablesMax }}€</span>
+                    <span class="font-medium">{{ formatAmount(Number(row.original.consumablesMax)) }}</span>
                   </div>
                   <div v-if="row.original.consumablesActual" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Réel:</span>
-                    <span class="font-medium">{{ row.original.consumablesActual }}€</span>
+                    <span class="font-medium">{{ formatAmount(Number(row.original.consumablesActual)) }}</span>
                     <UBadge
                       :color="row.original.consumablesActualPaid ? 'success' : 'warning'"
                       variant="soft"
@@ -592,17 +592,20 @@
 </template>
 
 <script setup lang="ts">
+
 import { getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
+
+import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 definePageMeta({
   middleware: ['auth-protected'],
 })
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -755,8 +758,19 @@ const filteredArtists = computed(() => {
 const sumField = (field: string) =>
   filteredArtists.value.reduce((total, artist) => total + (Number(artist[field]) || 0), 0)
 
-/** Montant en euros, sans décimales inutiles : « 1 250 € » plutôt que « 1250.00 € ». */
-const formatAmount = (amount: number) => `${new Intl.NumberFormat('fr-FR').format(amount)} €`
+/**
+ * Montant dans la devise de l'édition, sans décimales inutiles : « 1 250 € » plutôt que
+ * « 1250,00 € ». La devise vient de l'édition et non d'un « € » écrit en dur : une édition en
+ * francs suisses afficherait sinon des euros.
+ */
+const editionCurrency = computed(() => edition.value?.currency || DEFAULT_CURRENCY)
+
+const formatAmount = (amount: number) =>
+  new Intl.NumberFormat(locale.value, {
+    style: 'currency',
+    currency: editionCurrency.value,
+    maximumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+  }).format(amount)
 
 // Le défraiement et les consommables affichent le réel en grand et le plafond en dessous :
 // c'est l'écart entre les deux qui indique si l'enveloppe est tenue.

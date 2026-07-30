@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { getSupportedLocalesCodes } from '~/utils/locales'
 import { isValidPronoun } from '~/utils/pronouns'
 
+import { SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
+
 /**
  * Validation d'un numéro de téléphone international.
  * Accepte uniquement le format E.164 (`+[code pays][numéro]`) parsable par
@@ -170,6 +172,9 @@ export const editionSchema = z
     startDate: dateSchema,
     endDate: dateSchema,
     timezone: z.string().nullable().optional(),
+    // Devise de l'édition. Restreinte à la liste connue : une valeur libre casserait la mise en
+    // forme `Intl`, qui exige un code ISO 4217 valide.
+    currency: z.enum(SUPPORTED_CURRENCIES).optional(),
     addressLine1: z
       .string()
       .min(1, 'Adresse ligne 1 requise')
@@ -266,6 +271,9 @@ export const updateEditionSchema = z
     startDate: optionalDateSchema,
     endDate: optionalDateSchema,
     timezone: z.string().nullable().optional(),
+    // Devise de l'édition. Restreinte à la liste connue : une valeur libre casserait la mise en
+    // forme `Intl`, qui exige un code ISO 4217 valide.
+    currency: z.enum(SUPPORTED_CURRENCIES).optional(),
     addressLine1: z
       .string()
       .min(1, 'Adresse ligne 1 requise')

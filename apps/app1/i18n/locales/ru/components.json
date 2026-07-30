@@ -134,7 +134,8 @@
       "ticketing_link": "Ссылка на билеты",
       "ticketing_section_description": "Информация для покупки билетов",
       "ticketing_section_title": "Билеты",
-      "timezone_description": "Даты и время будут отображаться в этом часовом поясе"
+      "timezone_description": "Даты и время будут отображаться в этом часовом поясе",
+      "currency_description": "Применяется ко всем суммам выпуска: артисты, билеты и касса."
     },
     "favorites_map": {
       "all_favorites": "Все избранные",

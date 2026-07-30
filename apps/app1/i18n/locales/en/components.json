@@ -134,7 +134,8 @@
       "ticketing_link": "Ticketing link",
       "ticketing_section_description": "Information for purchasing tickets",
       "ticketing_section_title": "Ticketing",
-      "timezone_description": "Dates and times will be displayed in this timezone"
+      "timezone_description": "Dates and times will be displayed in this timezone",
+      "currency_description": "Applies to every amount of the edition: artists, ticketing and treasury."
     },
     "favorites_map": {
       "all_favorites": "All are favorites",

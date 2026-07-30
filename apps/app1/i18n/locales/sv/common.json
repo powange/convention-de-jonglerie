@@ -187,7 +187,8 @@
     "warning": "Observera",
     "week": "Veckan",
     "workshops_short": "Workshops",
-    "yes": "Ja"
+    "yes": "Ja",
+    "currency": "Valuta"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

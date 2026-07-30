@@ -187,7 +187,8 @@
     "warning": "Let op",
     "week": "Week",
     "workshops_short": "Workshops",
-    "yes": "Ja"
+    "yes": "Ja",
+    "currency": "Valuta"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

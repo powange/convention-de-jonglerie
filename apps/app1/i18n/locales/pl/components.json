@@ -134,7 +134,8 @@
       "ticketing_link": "Link do biletów",
       "ticketing_section_description": "Informacje o zakupie biletów",
       "ticketing_section_title": "Bilety",
-      "timezone_description": "Daty i godziny będą wyświetlane w tej strefie czasowej"
+      "timezone_description": "Daty i godziny będą wyświetlane w tej strefie czasowej",
+      "currency_description": "Dotyczy wszystkich kwot edycji: artystów, biletów i finansów."
     },
     "favorites_map": {
       "all_favorites": "Wszystkie są ulubione",

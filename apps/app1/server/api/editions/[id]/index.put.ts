@@ -31,6 +31,7 @@ export default wrapApiHandler(
       startDate,
       endDate,
       timezone,
+      currency,
       addressLine1,
       addressLine2,
       postalCode,
@@ -142,6 +143,7 @@ export default wrapApiHandler(
     }
 
     if (timezone !== undefined) updatedData.timezone = timezone
+    if (currency !== undefined) updatedData.currency = currency
     if (ticketingUrl !== undefined) updatedData.ticketingUrl = ticketingUrl
     if (officialWebsiteUrl !== undefined) updatedData.officialWebsiteUrl = officialWebsiteUrl
     if (facebookUrl !== undefined) updatedData.facebookUrl = facebookUrl
