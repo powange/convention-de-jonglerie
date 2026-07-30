@@ -61,3 +61,66 @@ export function buildMarkerAttachmentHtml(zoneName: string | undefined, label: s
   if (!zoneName) return ''
   return `<div style="margin-top:4px;font-size:12px;color:#6b7280">${escapeHtml(label)} ${escapeHtml(zoneName)}</div>`
 }
+
+/** Le minimum qu'une ligne de légende doit exposer pour être regroupée. */
+export interface GroupableLegendItem {
+  id: number
+  name: string
+  types: string[]
+  itemType: 'zone' | 'marker'
+  zoneId: number | null
+}
+
+/** Une zone en tête et ses entrées en retrait, ou un élément seul. */
+export interface LegendGroup<T> {
+  key: string
+  name: string
+  rows: T[]
+}
+
+/**
+ * Regroupe les lignes de légende : chaque zone emmène ses entrées, les autres restent seules.
+ *
+ * Deux cas méritent attention. Une entrée n'apparaît jamais deux fois — elle vit sous sa zone,
+ * pas à la racine. Et une entrée dont la zone est absente de la liste est remontée à la racine
+ * plutôt que de disparaître sans un mot : c'est ce qui arriverait si le rattachement pointait
+ * vers une zone que la liste ne contient pas.
+ */
+export function groupLegendItems<T extends GroupableLegendItem>(
+  items: readonly T[]
+): LegendGroup<T>[] {
+  const attachedByZone = new Map<number, T[]>()
+  for (const item of items) {
+    if (item.itemType !== 'marker' || item.zoneId === null) continue
+    const list = attachedByZone.get(item.zoneId)
+    if (list) list.push(item)
+    else attachedByZone.set(item.zoneId, [item])
+  }
+
+  const zoneIds = new Set(items.filter((i) => i.itemType === 'zone').map((i) => i.id))
+  const groups: LegendGroup<T>[] = []
+
+  for (const item of items) {
+    const isAttached = item.itemType === 'marker' && item.zoneId !== null
+    if (isAttached && zoneIds.has(item.zoneId as number)) continue
+    const children = item.itemType === 'zone' ? (attachedByZone.get(item.id) ?? []) : []
+    groups.push({ key: `${item.itemType}-${item.id}`, name: item.name, rows: [item, ...children] })
+  }
+
+  return groups.sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+}
+
+/**
+ * Le groupe est l'unité du filtre : une zone retenue emmène ses entrées, et une entrée retenue
+ * fait apparaître sa zone. Filtrer ligne à ligne détacherait visuellement ce qu'on vient de
+ * regrouper.
+ */
+export function filterLegendGroups<T extends GroupableLegendItem>(
+  groups: LegendGroup<T>[],
+  activeFilters: ReadonlySet<string>
+): LegendGroup<T>[] {
+  if (activeFilters.size === 0) return groups
+  return groups.filter((group) =>
+    group.rows.some((row) => row.types.some((t) => activeFilters.has(t)))
+  )
+}

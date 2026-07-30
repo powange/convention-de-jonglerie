@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import type { GroupableLegendItem } from '../../../app/utils/map-zone-attachment'
 import {
   buildMarkerAttachmentHtml,
   buildZoneAttachmentHtml,
+  filterLegendGroups,
+  groupLegendItems,
   groupMarkersByZone,
   zoneNavigationTarget,
 } from '../../../app/utils/map-zone-attachment'
@@ -84,5 +87,95 @@ describe('construction des popups', () => {
 
     const zoneHtml = buildZoneAttachmentHtml([marker({ name: '<script>' })], 'Entrées :')
     expect(zoneHtml).not.toContain('<script>')
+  })
+})
+
+const legendItem = (over: Partial<GroupableLegendItem> = {}): GroupableLegendItem => ({
+  id: 1,
+  name: 'Salle A',
+  types: ['OTHER'],
+  itemType: 'zone',
+  zoneId: null,
+  ...over,
+})
+
+describe('groupLegendItems', () => {
+  it('range les entrées sous leur zone, la zone en tête', () => {
+    const groups = groupLegendItems([
+      legendItem({ id: 1, name: 'Salle A', itemType: 'zone' }),
+      legendItem({ id: 9, name: 'Entrée principale', itemType: 'marker', zoneId: 1 }),
+    ])
+
+    expect(groups).toHaveLength(1)
+    expect(groups[0]!.rows.map((r) => r.name)).toEqual(['Salle A', 'Entrée principale'])
+  })
+
+  // Une entrée listée à la fois sous sa zone et à la racine se dupliquerait à l'écran.
+  it('n’affiche jamais une entrée deux fois', () => {
+    const groups = groupLegendItems([
+      legendItem({ id: 1, itemType: 'zone' }),
+      legendItem({ id: 9, name: 'Entrée', itemType: 'marker', zoneId: 1 }),
+    ])
+
+    const names = groups.flatMap((g) => g.rows.map((r) => r.name))
+    expect(names.filter((n) => n === 'Entrée')).toHaveLength(1)
+  })
+
+  // Le rattachement pourrait pointer une zone absente de la liste : la faire disparaître
+  // silencieusement priverait l'organisateur du seul moyen de la corriger.
+  it('remonte une entrée dont la zone est absente', () => {
+    const groups = groupLegendItems([
+      legendItem({ id: 9, name: 'Entrée orpheline', itemType: 'marker', zoneId: 404 }),
+    ])
+
+    expect(groups).toHaveLength(1)
+    expect(groups[0]!.rows.map((r) => r.name)).toEqual(['Entrée orpheline'])
+  })
+
+  it('laisse les marqueurs autonomes seuls dans leur groupe', () => {
+    const groups = groupLegendItems([
+      legendItem({ id: 1, name: 'Salle A', itemType: 'zone' }),
+      legendItem({ id: 9, name: 'Buvette', itemType: 'marker', zoneId: null }),
+    ])
+
+    expect(groups.map((g) => g.rows.length)).toEqual([1, 1])
+  })
+
+  it('trie les groupes par nom', () => {
+    const groups = groupLegendItems([
+      legendItem({ id: 1, name: 'Zone B', itemType: 'zone' }),
+      legendItem({ id: 2, name: 'Accueil', itemType: 'zone' }),
+    ])
+
+    expect(groups.map((g) => g.name)).toEqual(['Accueil', 'Zone B'])
+  })
+})
+
+describe('filterLegendGroups', () => {
+  const groups = () =>
+    groupLegendItems([
+      legendItem({ id: 1, name: 'Salle A', itemType: 'zone', types: ['FOOD'] }),
+      legendItem({ id: 9, name: 'Entrée', itemType: 'marker', zoneId: 1, types: ['ENTRANCE'] }),
+      legendItem({ id: 2, name: 'Camping', itemType: 'zone', types: ['CAMPING'] }),
+    ])
+
+  // Trois éléments, mais deux groupes : l'entrée vit sous sa zone.
+  it('sans filtre, rend tous les groupes', () => {
+    const result = filterLegendGroups(groups(), new Set())
+    expect(result.map((g) => g.name)).toEqual(['Camping', 'Salle A'])
+    expect(result.flatMap((g) => g.rows)).toHaveLength(3)
+  })
+
+  // Le groupe est l'unité : filtrer ligne à ligne détacherait ce qu'on vient de regrouper.
+  it('retient la zone entière quand la zone correspond', () => {
+    const result = filterLegendGroups(groups(), new Set(['FOOD']))
+    expect(result).toHaveLength(1)
+    expect(result[0]!.rows.map((r) => r.name)).toEqual(['Salle A', 'Entrée'])
+  })
+
+  it('fait apparaître la zone quand seule son entrée correspond', () => {
+    const result = filterLegendGroups(groups(), new Set(['ENTRANCE']))
+    expect(result).toHaveLength(1)
+    expect(result[0]!.rows.map((r) => r.name)).toEqual(['Salle A', 'Entrée'])
   })
 })

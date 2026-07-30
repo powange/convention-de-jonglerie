@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
+import { filterLegendGroups, groupLegendItems } from '~/utils/map-zone-attachment'
 
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
@@ -13,6 +14,8 @@ interface LegendItem {
   color?: string // Seulement pour les zones
   itemType: 'zone' | 'marker'
   navigationUrl: string | null
+  /** Zone dont ce marqueur est l'entrée. Les zones et les marqueurs autonomes valent `null`. */
+  zoneId: number | null
 }
 
 interface Props {
@@ -74,6 +77,7 @@ const sortedItems = computed<LegendItem[]>(() => {
       color: zone.color,
       itemType: 'zone',
       navigationUrl,
+      zoneId: null,
     })
   })
 
@@ -86,6 +90,7 @@ const sortedItems = computed<LegendItem[]>(() => {
       color: marker.color || undefined,
       itemType: 'marker',
       navigationUrl: `https://www.google.com/maps/search/?api=1&query=${marker.latitude},${marker.longitude}`,
+      zoneId: marker.zoneId ?? null,
     })
   })
 
@@ -118,10 +123,9 @@ const toggleFilter = (type: string) => {
   activeFilters.value = next
 }
 
-const filteredItems = computed(() => {
-  if (activeFilters.value.size === 0) return sortedItems.value
-  return sortedItems.value.filter((item) => item.types.some((t) => activeFilters.value.has(t)))
-})
+const groups = computed(() => groupLegendItems(sortedItems.value))
+const filteredGroups = computed(() => filterLegendGroups(groups.value, activeFilters.value))
+const filteredItems = computed(() => filteredGroups.value.flatMap((group) => group.rows))
 
 // Synchroniser la visibilité sur la carte quand les filtres changent
 // N'émettre que pour les items dont l'état a réellement changé
@@ -199,96 +203,104 @@ const handleDelete = (item: LegendItem) => {
     </div>
 
     <div
-      v-for="item in filteredItems"
-      :key="`${item.itemType}-${item.id}`"
-      class="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-      @click="handleFocus(item)"
+      v-for="group in filteredGroups"
+      :key="group.key"
+      class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
     >
-      <!-- Indicateur visuel : pastille pour zone, icône pour marker -->
-      <template v-if="item.itemType === 'zone'">
-        <div
-          class="h-4 w-4 shrink-0 rounded-full border border-gray-300 dark:border-gray-600"
-          :style="{ backgroundColor: item.color }"
-        />
-      </template>
-      <template v-else>
-        <UIcon
-          :name="getZoneTypeIcon(item.types[0] || 'OTHER')"
-          class="h-4 w-4 shrink-0"
-          :style="{ color: item.color || getZoneTypeColor(item.types[0] || 'OTHER') }"
-        />
-      </template>
+      <!-- La zone en tête, ses entrées en retrait : une seule carte pour un seul lieu. -->
+      <div
+        v-for="(item, index) in group.rows"
+        :key="`${item.itemType}-${item.id}`"
+        class="flex cursor-pointer items-center gap-3 p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+        :class="index > 0 ? 'border-t border-gray-100 pl-8 dark:border-gray-800' : ''"
+        @click="handleFocus(item)"
+      >
+        <!-- Indicateur visuel : pastille pour zone, icône pour marker -->
+        <template v-if="item.itemType === 'zone'">
+          <div
+            class="h-4 w-4 shrink-0 rounded-full border border-gray-300 dark:border-gray-600"
+            :style="{ backgroundColor: item.color }"
+          />
+        </template>
+        <template v-else>
+          <UIcon
+            :name="getZoneTypeIcon(item.types[0] || 'OTHER')"
+            class="h-4 w-4 shrink-0"
+            :style="{ color: item.color || getZoneTypeColor(item.types[0] || 'OTHER') }"
+          />
+        </template>
 
-      <!-- Infos -->
-      <div class="min-w-0 flex-1">
-        <p
-          class="truncate text-sm font-medium"
-          :class="{ 'text-gray-400 dark:text-gray-500': !isVisible(item) }"
-        >
-          {{ item.name }}
-        </p>
-        <div v-if="item.types.length > 0" class="mt-0.5 flex flex-wrap items-center gap-1">
-          <span
-            v-for="type in item.types"
-            :key="type"
-            class="inline-flex items-center gap-0.5 text-xs"
-            :style="{ color: getZoneTypeColor(type) }"
+        <!-- Infos -->
+        <div class="min-w-0 flex-1">
+          <p
+            class="truncate text-sm font-medium"
+            :class="{ 'text-gray-400 dark:text-gray-500': !isVisible(item) }"
           >
-            <UIcon :name="getZoneTypeIcon(type)" class="h-3 w-3" />
-            {{ getTypeLabel(type) }}
-          </span>
+            {{ item.name }}
+          </p>
+          <div v-if="item.types.length > 0" class="mt-0.5 flex flex-wrap items-center gap-1">
+            <span
+              v-for="type in item.types"
+              :key="type"
+              class="inline-flex items-center gap-0.5 text-xs"
+              :style="{ color: getZoneTypeColor(type) }"
+            >
+              <UIcon :name="getZoneTypeIcon(type)" class="h-3 w-3" />
+              {{ getTypeLabel(type) }}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <!-- Actions (mode lecture) -->
-      <div v-if="!editable" class="flex shrink-0 gap-1" @click.stop>
-        <UButton
-          v-if="item.navigationUrl"
-          icon="i-lucide-navigation"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          :aria-label="t('map.open_in_maps')"
-          :to="item.navigationUrl"
-          target="_blank"
-        />
-        <UButton
-          :icon="isVisible(item) ? 'i-lucide-eye' : 'i-lucide-eye-off'"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          :aria-label="isVisible(item) ? t('map.hide_item') : t('map.show_item')"
-          @click="toggleVisibility(item)"
-        />
-      </div>
+        <!-- Actions (mode lecture) -->
+        <div v-if="!editable" class="flex shrink-0 gap-1" @click.stop>
+          <UButton
+            v-if="item.navigationUrl"
+            icon="i-lucide-navigation"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+            :aria-label="t('map.open_in_maps')"
+            :to="item.navigationUrl"
+            target="_blank"
+          />
+          <UButton
+            :icon="isVisible(item) ? 'i-lucide-eye' : 'i-lucide-eye-off'"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+            :aria-label="isVisible(item) ? t('map.hide_item') : t('map.show_item')"
+            @click="toggleVisibility(item)"
+          />
+        </div>
 
-      <!-- Actions (mode édition) -->
-      <div v-if="editable" class="flex shrink-0 gap-1" @click.stop>
-        <UButton
-          :icon="isVisible(item) ? 'i-lucide-eye' : 'i-lucide-eye-off'"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          :aria-label="isVisible(item) ? t('map.hide_item') : t('map.show_item')"
-          @click="toggleVisibility(item)"
-        />
-        <UButton
-          icon="i-lucide-pencil"
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          :aria-label="item.itemType === 'zone' ? t('map.edit_zone') : t('map.edit_marker')"
-          @click="handleEdit(item)"
-        />
-        <UButton
-          icon="i-lucide-trash-2"
-          size="xs"
-          color="error"
-          variant="ghost"
-          :aria-label="item.itemType === 'zone' ? t('map.delete_zone') : t('map.delete_marker')"
-          :loading="loading"
-          @click="handleDelete(item)"
-        />
+        <!-- Actions (mode édition) -->
+        <div v-if="editable" class="flex shrink-0 gap-1" @click.stop>
+          <UButton
+            :icon="isVisible(item) ? 'i-lucide-eye' : 'i-lucide-eye-off'"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+            :aria-label="isVisible(item) ? t('map.hide_item') : t('map.show_item')"
+            @click="toggleVisibility(item)"
+          />
+          <UButton
+            icon="i-lucide-pencil"
+            size="xs"
+            color="neutral"
+            variant="ghost"
+            :aria-label="item.itemType === 'zone' ? t('map.edit_zone') : t('map.edit_marker')"
+            @click="handleEdit(item)"
+          />
+          <UButton
+            icon="i-lucide-trash-2"
+            size="xs"
+            color="error"
+            variant="ghost"
+            :aria-label="item.itemType === 'zone' ? t('map.delete_zone') : t('map.delete_marker')"
+            :loading="loading"
+            @click="handleDelete(item)"
+          />
+        </div>
       </div>
     </div>
   </div>
