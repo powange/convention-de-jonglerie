@@ -1,6 +1,8 @@
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { fromCents } from '~~/shared/utils/money'
 
 export default wrapApiHandler(
   async (event) => {
@@ -171,13 +173,15 @@ export default wrapApiHandler(
         dietaryPreference: artist.dietaryPreference,
         allergies: artist.allergies,
         allergySeverity: artist.allergySeverity,
-        payment: artist.payment ? Number(artist.payment) : null,
+        // La base est en centimes, l'API expose des unités courantes : `Number()` seul rendrait
+        // désormais des centimes bruts, soit des montants multipliés par cent.
+        payment: fromCents(artist.payment),
         paymentPaid: artist.paymentPaid,
-        reimbursementMax: artist.reimbursementMax ? Number(artist.reimbursementMax) : null,
-        reimbursementActual: artist.reimbursementActual ? Number(artist.reimbursementActual) : null,
+        reimbursementMax: fromCents(artist.reimbursementMax),
+        reimbursementActual: fromCents(artist.reimbursementActual),
         reimbursementActualPaid: artist.reimbursementActualPaid,
-        consumablesMax: artist.consumablesMax ? Number(artist.consumablesMax) : null,
-        consumablesActual: artist.consumablesActual ? Number(artist.consumablesActual) : null,
+        consumablesMax: fromCents(artist.consumablesMax),
+        consumablesActual: fromCents(artist.consumablesActual),
         consumablesActualPaid: artist.consumablesActualPaid,
         accommodationAutonomous: artist.accommodationAutonomous,
         accommodationType: artist.accommodationType,

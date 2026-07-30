@@ -45,13 +45,17 @@ model EditionArtist {
   entryValidated          Boolean            @default(false)
   entryValidatedAt        DateTime?
   entryValidatedBy        Int?
-  payment                 Decimal?           @db.Decimal(10, 2)
+  // Montants en **centimes entiers**, dans la devise de l'édition. Les additionner en flottant
+  // ferait apparaître des écarts d'arrondi invisibles ligne à ligne mais réels au total ; la
+  // trésorerie les agrège avec ceux de la billetterie, déjà en centimes. Conversion depuis les
+  // unités courantes dans `shared/utils/money.ts`, jamais par un `* 100` disséminé.
+  payment                 Int?
   paymentPaid             Boolean            @default(false)
-  reimbursementMax        Decimal?           @db.Decimal(10, 2)
-  reimbursementActual     Decimal?           @db.Decimal(10, 2)
+  reimbursementMax        Int?
+  reimbursementActual     Int?
   reimbursementActualPaid Boolean            @default(false)
-  consumablesMax          Decimal?           @db.Decimal(10, 2)
-  consumablesActual       Decimal?           @db.Decimal(10, 2)
+  consumablesMax          Int?
+  consumablesActual       Int?
   consumablesActualPaid   Boolean            @default(false)
   organizerNotes          String?            @db.Text
   accommodationAutonomous Boolean            @default(false)
