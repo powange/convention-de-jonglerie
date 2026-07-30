@@ -184,6 +184,7 @@
     <MarkerModal
       :open="markerModalOpen"
       :marker="editingMarker"
+      :zones="zones"
       :loading="creatingMarker || updatingMarker"
       @close="closeMarkerModal"
       @save="handleSaveMarker"
@@ -255,6 +256,12 @@ import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import {
+  buildMarkerAttachmentHtml,
+  buildZoneAttachmentHtml,
+  groupMarkersByZone,
+  zoneNavigationTarget,
+} from '~/utils/map-zone-attachment'
 
 import type { ExternalMapProvider } from '~~/shared/utils/external-map'
 
@@ -377,6 +384,7 @@ const {
   updateMarker,
   deleteMarker,
   updateMarkerPosition,
+  fetchMarkers,
 } = useEditionMarkers(editionId)
 
 // Map
@@ -408,6 +416,8 @@ const {
   showMarker,
   hideMarker,
   fitBoundsToItems,
+  setPopupExtra,
+  setZoneNavigationTarget,
 } = useLeafletEditable(mapContainerRef, {
   center: computed(() => {
     if (edition.value?.latitude && edition.value?.longitude) {
@@ -554,6 +564,35 @@ const closeModal = () => {
 
 // Modal Marker
 const markerModalOpen = ref(false)
+// Rattachement zone/entrée : les popups se citent mutuellement et l'itinéraire d'une zone vise
+// son entrée. Le modèle garde deux éléments, l'affichage n'en montre qu'un.
+watch(
+  [zones, markers, map],
+  () => {
+    if (!map.value) return
+
+    const attachedByZone = groupMarkersByZone(markers.value)
+    const zoneNameById = new Map(zones.value.map((zone) => [zone.id, zone.name]))
+
+    for (const zone of zones.value) {
+      const attached = attachedByZone.get(zone.id)
+      setPopupExtra('zone', zone.id, buildZoneAttachmentHtml(attached, t('map.zone_entrances')))
+      setZoneNavigationTarget(zone.id, zoneNavigationTarget(attached))
+    }
+
+    for (const marker of markers.value) {
+      setPopupExtra(
+        'marker',
+        marker.id,
+        marker.zoneId
+          ? buildMarkerAttachmentHtml(zoneNameById.get(marker.zoneId), t('map.marker_entrance_of'))
+          : ''
+      )
+    }
+  },
+  { immediate: true }
+)
+
 const editingMarker = ref<EditionMarker | null>(null)
 
 const openMarkerModal = (marker?: EditionMarker) => {
@@ -598,6 +637,10 @@ const confirmDelete = async () => {
 
   if (success) {
     removePolygon(zoneId)
+    // La base a détaché les entrées de cette zone (`SetNull`) ; sans relecture, la liste locale
+    // garderait un rattachement mort et le renvoyer au serveur ferait échouer la moindre
+    // modification du marqueur.
+    await fetchMarkers()
   }
 
   deleteConfirmOpen.value = false
@@ -673,6 +716,7 @@ const handleSaveMarker = async (data: {
   description: string | null
   markerTypes: string[]
   color: string
+  zoneId: number | null
 }) => {
   if (editingMarker.value) {
     // Mise à jour

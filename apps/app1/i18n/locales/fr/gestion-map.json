@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} réservation de stock | {n} réservations de stock",
       "import_deleted": "Objet supprimé",
       "import_delete_error": "Impossible de supprimer cet objet",
-      "import_reimport": "Réimporter"
+      "import_reimport": "Réimporter",
+      "marker_zone": "Zone de rattachement",
+      "marker_zone_help": "Rattachez ce point à une zone dont il est l'entrée ou l'accès.",
+      "marker_no_zone": "Aucune zone"
     }
   }
 }

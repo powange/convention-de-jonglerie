@@ -37,6 +37,8 @@
       "truck_camping": "Camping camper",
       "workshops": "Laboratori"
     },
-    "view_external": "Mappa Google"
+    "view_external": "Mappa Google",
+    "zone_entrances": "Ingressi:",
+    "marker_entrance_of": "Ingresso di:"
   }
 }

@@ -37,6 +37,8 @@
       "truck_camping": "Camping autocaravana",
       "workshops": "Oficinas"
     },
-    "view_external": "Mapa Google"
+    "view_external": "Mapa Google",
+    "zone_entrances": "Entradas:",
+    "marker_entrance_of": "Entrada de:"
   }
 }

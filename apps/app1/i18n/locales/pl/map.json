@@ -37,6 +37,8 @@
       "truck_camping": "Kemping kamperowy",
       "workshops": "Warsztaty"
     },
-    "view_external": "Mapa Google"
+    "view_external": "Mapa Google",
+    "zone_entrances": "Wejścia:",
+    "marker_entrance_of": "Wejście do:"
   }
 }

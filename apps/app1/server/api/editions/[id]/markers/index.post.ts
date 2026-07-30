@@ -3,7 +3,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
 import { editionMarkerSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { createMarkerSchema } from '#server/utils/zone-validation'
+import { createMarkerSchema, resolveMarkerZoneId } from '#server/utils/zone-validation'
 import { ZONE_LIMITS } from '~~/shared/utils/zone-types'
 
 export default wrapApiHandler(
@@ -41,6 +41,8 @@ export default wrapApiHandler(
     })
     const nextOrder = (maxOrderResult._max.order ?? -1) + 1
 
+    const zoneId = await resolveMarkerZoneId(editionId, data.zoneId)
+
     const marker = await prisma.editionMarker.create({
       data: {
         editionId,
@@ -51,6 +53,7 @@ export default wrapApiHandler(
         markerTypes: data.markerTypes,
         color: data.color,
         order: nextOrder,
+        zoneId: zoneId ?? null,
       },
       select: editionMarkerSelect,
     })

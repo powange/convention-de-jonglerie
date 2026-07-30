@@ -54,6 +54,8 @@ export const createMarkerSchema = z.object({
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide (format #RRGGBB)')
     .optional()
     .nullable(),
+  // Zone à laquelle ce marqueur est rattaché (son entrée, son accès). `null` détache.
+  zoneId: z.number().int().positive().optional().nullable(),
 })
 
 /**
@@ -70,7 +72,34 @@ export const updateMarkerSchema = z.object({
     .regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide (format #RRGGBB)')
     .optional()
     .nullable(),
+  // Absent = inchangé, `null` = détaché. Confondre les deux détacherait un marqueur que
+  // personne n'a demandé à détacher — un simple renommage suffirait à le faire.
+  zoneId: z.number().int().positive().optional().nullable(),
 })
+
+/**
+ * Vérifie qu'une zone appartient bien à l'édition avant d'y rattacher un marqueur.
+ *
+ * Sans ce contrôle, l'identifiant venant du corps de la requête suffirait à rattacher l'entrée
+ * d'une salle à la zone d'une autre édition — la clé étrangère l'accepterait sans broncher, et
+ * la carte afficherait un rattachement invisible depuis les deux côtés.
+ */
+export async function resolveMarkerZoneId(
+  editionId: number,
+  zoneId: number | null | undefined
+): Promise<number | null | undefined> {
+  if (zoneId === undefined) return undefined
+  if (zoneId === null) return null
+
+  const zone = await prisma.editionZone.findFirst({
+    where: { id: zoneId, editionId },
+    select: { id: true },
+  })
+  if (!zone) {
+    throw createError({ status: 400, message: 'Zone introuvable pour cette édition' })
+  }
+  return zone.id
+}
 
 export type CreateZoneInput = z.infer<typeof createZoneSchema>
 export type UpdateZoneInput = z.infer<typeof updateZoneSchema>

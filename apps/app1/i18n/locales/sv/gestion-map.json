@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} lagerbokning | {n} lagerbokningar",
       "import_deleted": "Objekt borttaget",
       "import_delete_error": "Det gick inte att ta bort objektet",
-      "import_reimport": "Importera igen"
+      "import_reimport": "Importera igen",
+      "marker_zone": "Kopplad zon",
+      "marker_zone_help": "Koppla den här punkten till en zon som den är ingång eller entré till.",
+      "marker_no_zone": "Ingen zon"
     }
   }
 }

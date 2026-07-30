@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} lagerreservation | {n} lagerreservationer",
       "import_deleted": "Objekt slettet",
       "import_delete_error": "Dette objekt kunne ikke slettes",
-      "import_reimport": "Importér igen"
+      "import_reimport": "Importér igen",
+      "marker_zone": "Tilknyttet zone",
+      "marker_zone_help": "Tilknyt dette punkt til en zone, som det er indgangen eller adgangen til.",
+      "marker_no_zone": "Ingen zone"
     }
   }
 }

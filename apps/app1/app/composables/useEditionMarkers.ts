@@ -7,6 +7,8 @@ export interface EditionMarker {
   markerTypes: string[]
   color: string | null
   order: number
+  /** Zone à laquelle ce marqueur est rattaché — son entrée. `null` quand il est autonome. */
+  zoneId: number | null
   createdAt: string
   updatedAt: string
 }
@@ -18,6 +20,7 @@ export interface CreateMarkerData {
   longitude: number
   markerTypes?: string[]
   color?: string | null
+  zoneId?: number | null
 }
 
 export interface UpdateMarkerData {
@@ -27,6 +30,8 @@ export interface UpdateMarkerData {
   longitude?: number
   markerTypes?: string[]
   color?: string | null
+  /** Absent = inchangé, `null` = détaché. */
+  zoneId?: number | null
 }
 
 export const useEditionMarkers = (editionId: Ref<number | undefined>) => {

@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} Lagerreservierung | {n} Lagerreservierungen",
       "import_deleted": "Objekt gelöscht",
       "import_delete_error": "Dieses Objekt konnte nicht gelöscht werden",
-      "import_reimport": "Erneut importieren"
+      "import_reimport": "Erneut importieren",
+      "marker_zone": "Zugeordneter Bereich",
+      "marker_zone_help": "Ordnen Sie diesen Punkt einem Bereich zu, dessen Eingang oder Zugang er ist.",
+      "marker_no_zone": "Kein Bereich"
     }
   }
 }

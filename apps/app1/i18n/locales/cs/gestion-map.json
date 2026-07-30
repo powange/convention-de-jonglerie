@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} skladová rezervace | {n} skladových rezervací",
       "import_deleted": "Objekt smazán",
       "import_delete_error": "Tento objekt se nepodařilo smazat",
-      "import_reimport": "Znovu importovat"
+      "import_reimport": "Znovu importovat",
+      "marker_zone": "Přiřazená zóna",
+      "marker_zone_help": "Přiřaďte tento bod k zóně, jejímž je vchodem nebo přístupem.",
+      "marker_no_zone": "Žádná zóna"
     }
   }
 }

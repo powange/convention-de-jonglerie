@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} складове бронювання | {n} складових бронювань",
       "import_deleted": "Об'єкт видалено",
       "import_delete_error": "Не вдалося видалити цей об'єкт",
-      "import_reimport": "Імпортувати знову"
+      "import_reimport": "Імпортувати знову",
+      "marker_zone": "Пов’язана зона",
+      "marker_zone_help": "Пов’яжіть цю точку із зоною, входом або доступом до якої вона є.",
+      "marker_no_zone": "Без зони"
     }
   }
 }

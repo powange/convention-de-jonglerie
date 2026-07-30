@@ -37,6 +37,8 @@
       "truck_camping": "Camper camping",
       "workshops": "Workshops"
     },
-    "view_external": "Google-kaart"
+    "view_external": "Google-kaart",
+    "zone_entrances": "Ingangen:",
+    "marker_entrance_of": "Ingang van:"
   }
 }

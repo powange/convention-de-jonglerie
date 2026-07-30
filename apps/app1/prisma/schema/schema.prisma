@@ -501,6 +501,8 @@ model EditionZone {
   externalMapObjectId String?   @db.VarChar(64)
   externalMapImportedAt DateTime?
 
+  // Marqueurs rattachés à cette zone : ses entrées, ses accès. Voir EditionMarker.zoneId.
+  markers           EditionMarker[]
   shows             Show[]
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
@@ -528,6 +530,15 @@ model EditionMarker {
   externalMapObjectId String?   @db.VarChar(64)
   externalMapImportedAt DateTime?
 
+  // Rattachement facultatif à une zone : une salle et son entrée forment un seul élément aux
+  // yeux du visiteur, alors que le modèle en garde deux. L'unité est une affaire d'affichage.
+  //
+  // `SetNull` et non `Cascade` : supprimer une salle ne doit pas effacer ses entrées au passage.
+  // Les quatre tables qui référencent un marqueur sont elles-mêmes en `SetNull`, si bien qu'une
+  // cascade ferait perdre son lieu à un spectacle sans le moindre signal.
+  zone   EditionZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  zoneId Int?
+
   shows             Show[]
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
@@ -535,4 +546,5 @@ model EditionMarker {
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
+  @@index([zoneId])
 }
