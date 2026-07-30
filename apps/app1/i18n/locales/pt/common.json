@@ -187,7 +187,8 @@
     "warning": "Atenção",
     "week": "Semana",
     "workshops_short": "Workshops",
-    "yes": "Sim"
+    "yes": "Sim",
+    "currency": "Moeda"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

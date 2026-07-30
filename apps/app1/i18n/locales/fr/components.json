@@ -134,7 +134,8 @@
       "ticketing_link": "Lien de la billetterie",
       "ticketing_section_description": "Informations pour l'achat de billets",
       "ticketing_section_title": "Billetterie",
-      "timezone_description": "Les dates et heures seront affichées dans ce fuseau horaire"
+      "timezone_description": "Les dates et heures seront affichées dans ce fuseau horaire",
+      "currency_description": "S'applique à tous les montants de l'édition : artistes, billetterie et trésorerie."
     },
     "favorites_map": {
       "all_favorites": "Toutes sont favorites",

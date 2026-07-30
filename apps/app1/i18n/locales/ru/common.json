@@ -187,7 +187,8 @@
     "warning": "Внимание",
     "week": "Неделя",
     "workshops_short": "Мастер-классы",
-    "yes": "Да"
+    "yes": "Да",
+    "currency": "Валюта"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

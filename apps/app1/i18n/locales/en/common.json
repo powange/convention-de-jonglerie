@@ -187,7 +187,8 @@
     "warning": "Warning",
     "week": "Week",
     "workshops_short": "Workshops",
-    "yes": "Yes"
+    "yes": "Yes",
+    "currency": "Currency"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

@@ -187,7 +187,8 @@
     "warning": "Uwaga",
     "week": "Tydzień",
     "workshops_short": "Warsztaty",
-    "yes": "Tak"
+    "yes": "Tak",
+    "currency": "Waluta"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

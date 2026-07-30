@@ -570,7 +570,7 @@
                 class="w-full"
               />
             </UFormField>
-            <UFormField :label="t('admin.project_costs.rates.currency')">
+            <UFormField :label="t('common.currency')">
               <USelect
                 v-model="rateForm.currency"
                 :items="currencyOptions"

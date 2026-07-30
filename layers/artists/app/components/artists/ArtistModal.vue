@@ -220,7 +220,7 @@
                 :placeholder="$t('artists.payment_amount_placeholder')"
               >
                 <template #trailing>
-                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">{{ currencySymbol }}</span>
                 </template>
               </UInput>
             </UFormField>
@@ -240,7 +240,7 @@
                 :placeholder="$t('artists.reimbursement_max_placeholder')"
               >
                 <template #trailing>
-                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">{{ currencySymbol }}</span>
                 </template>
               </UInput>
             </UFormField>
@@ -254,7 +254,7 @@
                 :placeholder="$t('artists.reimbursement_actual_placeholder')"
               >
                 <template #trailing>
-                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">{{ currencySymbol }}</span>
                 </template>
               </UInput>
             </UFormField>
@@ -280,7 +280,7 @@
                 :placeholder="$t('artists.consumables_max_placeholder')"
               >
                 <template #trailing>
-                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">{{ currencySymbol }}</span>
                 </template>
               </UInput>
             </UFormField>
@@ -294,7 +294,7 @@
                 :placeholder="$t('artists.consumables_actual_placeholder')"
               >
                 <template #trailing>
-                  <span class="text-gray-500 dark:text-gray-400 text-sm">€</span>
+                  <span class="text-gray-500 dark:text-gray-400 text-sm">{{ currencySymbol }}</span>
                 </template>
               </UInput>
             </UFormField>
@@ -490,6 +490,7 @@
 </template>
 
 <script setup lang="ts">
+
 import { z } from 'zod'
 
 import {
@@ -497,6 +498,8 @@ import {
   getAllergySeveritySelectOptions,
   formatDateTimeLocal,
 } from '#imports'
+
+import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 const props = defineProps<{
   modelValue: boolean
@@ -509,7 +512,25 @@ const emit = defineEmits<{
   'artist-saved': []
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+/**
+ * Symbole de la devise de l'édition. Un « € » écrit en dur afficherait des euros sur une
+ * édition en francs suisses, alors que les montants saisis y sont dans une autre devise.
+ *
+ * `Intl` rend le symbole seul en mettant en forme zéro puis en retirant chiffres et espaces —
+ * il n'expose pas de méthode dédiée.
+ */
+const editionStore = useEditionStore()
+
+const currencySymbol = computed(() => {
+  const edition = editionStore.getEditionById(props.editionId)
+  const code = edition?.currency || DEFAULT_CURRENCY
+  return new Intl.NumberFormat(locale.value, { style: 'currency', currency: code })
+    .format(0)
+    .replace(/[\d\s.,\u00a0\u202f]/g, '')
+})
+
 
 const isOpen = computed({
   get: () => props.modelValue,

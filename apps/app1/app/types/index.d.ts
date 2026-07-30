@@ -48,6 +48,8 @@ export interface Edition {
   startDate: string
   endDate: string
   timezone?: string | null
+  /** Devise de l'édition (ISO 4217). Vaut pour tous ses montants. */
+  currency?: string
   addressLine1: string
   addressLine2?: string | null
   postalCode: string

@@ -187,7 +187,8 @@
     "warning": "Pozor",
     "week": "Týden",
     "workshops_short": "Workshopy",
-    "yes": "Ano"
+    "yes": "Ano",
+    "currency": "Měna"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

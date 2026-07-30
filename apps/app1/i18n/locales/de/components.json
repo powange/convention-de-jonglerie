@@ -134,7 +134,8 @@
       "ticketing_link": "Ticketing-Link",
       "ticketing_section_description": "Informationen zum Ticketkauf",
       "ticketing_section_title": "Ticketverkauf",
-      "timezone_description": "Datum und Uhrzeit werden in dieser Zeitzone angezeigt"
+      "timezone_description": "Datum und Uhrzeit werden in dieser Zeitzone angezeigt",
+      "currency_description": "Gilt für alle Beträge der Ausgabe: Künstler, Ticketing und Buchhaltung."
     },
     "favorites_map": {
       "all_favorites": "Alle sind Favoriten",

@@ -187,7 +187,8 @@
     "warning": "Atención",
     "week": "Semana",
     "workshops_short": "Talleres",
-    "yes": "Sí"
+    "yes": "Sí",
+    "currency": "Moneda"
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",

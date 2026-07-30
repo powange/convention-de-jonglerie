@@ -134,7 +134,8 @@
       "ticketing_link": "Länk till biljettförsäljning",
       "ticketing_section_description": "Information om biljettköp",
       "ticketing_section_title": "Biljetter",
-      "timezone_description": "Datum och tider kommer att visas i denna tidszon"
+      "timezone_description": "Datum och tider kommer att visas i denna tidszon",
+      "currency_description": "Gäller alla belopp i upplagan: artister, biljetter och ekonomi."
     },
     "favorites_map": {
       "all_favorites": "Alla är favoriter",

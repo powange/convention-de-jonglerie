@@ -580,7 +580,6 @@
         "add": "Ajouter un tarif",
         "amount": "Montant",
         "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce tarif ?",
-        "currency": "Devise",
         "edit": "Modifier le tarif",
         "end_date": "Date de fin",
         "end_date_hint": "Laisser vide si le tarif est toujours en vigueur",

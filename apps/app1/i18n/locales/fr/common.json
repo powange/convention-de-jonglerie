@@ -187,7 +187,8 @@
     "warning": "Attention",
     "week": "Semaine",
     "workshops_short": "Workshops",
-    "yes": "Oui"
+    "yes": "Oui",
+    "currency": "Devise"
   },
   "dates": {
     "date_range": "Du {startDate} au {endDate}",

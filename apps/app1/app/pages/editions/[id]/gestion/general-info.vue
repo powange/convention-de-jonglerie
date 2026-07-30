@@ -141,6 +141,23 @@
           <TimezoneSelectMenu v-model="timezone" />
         </UFormField>
 
+        <!-- Devise : vaut pour tous les montants de l'édition (artistes, billetterie,
+             trésorerie), d'où sa place ici avec les réglages généraux plutôt que dans un
+             module particulier. -->
+        <UFormField
+          :label="$t('common.currency')"
+          name="currency"
+          :description="$t('components.edition_form.currency_description')"
+        >
+          <USelectMenu
+            v-model="currency"
+            value-key="value"
+            :items="currencyItems"
+            class="w-full sm:w-64"
+            :search-input="{ placeholder: $t('common.search') }"
+          />
+        </UFormField>
+
         <!-- Adresse -->
         <div class="space-y-4">
           <div class="flex items-center gap-2 mb-2">
@@ -304,6 +321,8 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { countrySelectOptions } from '~/utils/countries'
 
+import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
+
 definePageMeta({
   middleware: ['auth-protected'],
 })
@@ -331,6 +350,15 @@ const name = ref('')
 const startDate = ref<Date | null>(null)
 const endDate = ref<Date | null>(null)
 const timezone = ref<string | null>(null)
+const currency = ref<string>(DEFAULT_CURRENCY)
+
+/** Code ISO et nom localisé : « EUR — euro » se choisit plus sûrement que « EUR » seul. */
+const currencyItems = computed(() =>
+  SUPPORTED_CURRENCIES.map((code) => ({
+    value: code,
+    label: `${code} — ${new Intl.DisplayNames([locale.value], { type: 'currency' }).of(code) ?? code}`,
+  }))
+)
 const addressLine1 = ref('')
 const addressLine2 = ref('')
 const postalCode = ref('')
@@ -399,6 +427,7 @@ watch(
     if (newEdition) {
       name.value = newEdition.name || ''
       timezone.value = newEdition.timezone || null
+      currency.value = newEdition.currency || DEFAULT_CURRENCY
       addressLine1.value = newEdition.addressLine1 || ''
       addressLine2.value = newEdition.addressLine2 || ''
       postalCode.value = newEdition.postalCode || ''
@@ -526,6 +555,7 @@ const { execute: save, loading: saving } = useApiAction(() => `/api/editions/${e
     startDate: toApiFormat(startDate.value),
     endDate: toApiFormat(endDate.value),
     timezone: timezone.value || null,
+    currency: currency.value,
     addressLine1: addressLine1.value?.trim() || '',
     addressLine2: addressLine2.value?.trim() || null,
     postalCode: postalCode.value?.trim() || '',

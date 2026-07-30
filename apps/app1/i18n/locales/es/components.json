@@ -134,7 +134,8 @@
       "ticketing_link": "Enlace de venta de entradas",
       "ticketing_section_description": "Información para comprar entradas",
       "ticketing_section_title": "Venta de entradas",
-      "timezone_description": "Las fechas y horas se mostrarán en esta zona horaria"
+      "timezone_description": "Las fechas y horas se mostrarán en esta zona horaria",
+      "currency_description": "Se aplica a todos los importes de la edición: artistas, entradas y tesorería."
     },
     "favorites_map": {
       "all_favorites": "Todas son favoritas",

@@ -134,7 +134,8 @@
       "ticketing_link": "Link biglietteria",
       "ticketing_section_description": "Informazioni per l'acquisto dei biglietti",
       "ticketing_section_title": "Biglietteria",
-      "timezone_description": "Le date e gli orari saranno visualizzati in questo fuso orario"
+      "timezone_description": "Le date e gli orari saranno visualizzati in questo fuso orario",
+      "currency_description": "Vale per tutti gli importi dell'edizione: artisti, biglietteria e tesoreria."
     },
     "favorites_map": {
       "all_favorites": "Tutte sono preferite",
