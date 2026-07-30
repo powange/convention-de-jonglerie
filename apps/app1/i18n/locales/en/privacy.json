@@ -1,0 +1,72 @@
+{
+  "privacy": {
+    "title": "Privacy Policy",
+    "last_updated": "Last updated",
+    "update_date": "September 11, 2025",
+    "sections": {
+      "data_controller": {
+        "title": "Data Controller",
+        "content": "Convention de Jonglerie is the data controller for your personal data. We are committed to protecting your privacy and processing your personal data transparently and in compliance with the General Data Protection Regulation (GDPR)."
+      },
+      "data_collected": {
+        "title": "Data Collected",
+        "intro": "We collect the following types of personal data:",
+        "items": {
+          "identity": "Identity information: last name, first name, username",
+          "contact": "Contact information: email address",
+          "preferences": "User preferences: favorite conventions, notification settings"
+        }
+      },
+      "purpose": {
+        "title": "Processing Purposes",
+        "intro": "Your personal data is processed for the following purposes:",
+        "items": {
+          "account_management": "User account management and authentication",
+          "service_provision": "Platform service provision (browsing, adding conventions)",
+          "communication": "Service-related communication and important notifications",
+          "improvement": "Service improvement and usage analysis"
+        }
+      },
+      "legal_basis": {
+        "title": "Legal Basis",
+        "content": "The processing of your personal data is based on your consent for account creation and service use, as well as our legitimate interest in improving our services and platform security."
+      },
+      "data_sharing": {
+        "title": "Data Sharing",
+        "content": "We do not sell, rent, or share your personal data with third parties, except in the following cases: legal obligation, protection of our rights, or with your explicit consent. Data may be shared with our technical service providers strictly within the scope of service provision."
+      },
+      "data_retention": {
+        "title": "Data Retention",
+        "content": "Your personal data is retained for the duration necessary for the purposes for which it was collected. Accounts inactive for more than 3 years may be deleted after prior notification."
+      },
+      "user_rights": {
+        "title": "Your Rights",
+        "intro": "In accordance with GDPR, you have the following rights:",
+        "items": {
+          "access": "Right of access: obtain a copy of your personal data",
+          "rectification": "Right of rectification: correct your inaccurate or incomplete data",
+          "erasure": "Right to erasure: delete your personal data",
+          "portability": "Right to portability: retrieve your data in a structured format",
+          "objection": "Right to objection: object to the processing of your data"
+        }
+      },
+      "cookies": {
+        "title": "Cookies and Similar Technologies",
+        "content": "We use technical cookies necessary for the site's operation, particularly for managing your login session. These cookies do not require your prior consent as they are strictly necessary for service provision."
+      },
+      "security": {
+        "title": "Data Security",
+        "content": "We implement appropriate technical and organizational measures to protect your personal data against loss, misuse, unauthorized access, disclosure, alteration, or unauthorized destruction."
+      },
+      "updates": {
+        "title": "Policy Updates",
+        "content": "This privacy policy may be updated periodically. We will inform you of any substantial changes by email or via a notification on the site."
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "For any questions regarding this privacy policy or to exercise your rights, you can contact us at:",
+        "email_label": "Email"
+      }
+    }
+  }
+}

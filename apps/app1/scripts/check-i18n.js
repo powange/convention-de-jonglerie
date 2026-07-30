@@ -27,13 +27,21 @@ const CYAN = '\x1b[36m'
 const BOLD = '\x1b[1m'
 
 const projectRoot = path.resolve(__dirname, '..')
+// Détecté pendant la collecte des fichiers, bien avant `hasErrors` : hissé pour être reporté
+// sur le code de sortie.
+let localScopeIsFatal = false
 // Monorepo : les layers sont partagés à la racine du repo (../../layers depuis l'app).
 const layersRoot = path.resolve(projectRoot, '..', '..', 'layers')
 const localeDir = path.join(projectRoot, 'i18n', 'locales', 'fr')
 
 // Fichiers à exclure de l'analyse (qui génèrent des faux positifs)
-// Ces fichiers contiennent leurs propres traductions intégrées
-const EXCLUDED_FILES = ['app/pages/privacy-policy.vue']
+// Ces fichiers contiennent leurs propres traductions intégrées.
+//
+// La liste est vide, et mieux vaut qu'elle le reste : une page exclue d'ici est une page dont
+// les traductions dérivent sans que rien ne le signale. C'est ce qui est arrivé à
+// privacy-policy.vue, dont le bloc `<i18n>` local ne couvrait que quatre langues — les neuf
+// autres affichaient la clé brute, un bloc local ne bénéficiant d'aucun repli.
+const EXCLUDED_FILES = []
 
 // Fichiers exclus uniquement de l'étape 4 (textes hardcodés)
 // Ces fichiers contiennent des textes techniques intentionnellement non traduits
@@ -729,15 +737,23 @@ async function main() {
   const tsFiles = allFiles.filter((file) => file.endsWith('.ts'))
   const jsFiles = allFiles.filter((file) => file.endsWith('.js'))
 
-  // Compter les fichiers Vue avec scope local (exclus de l'analyse des clés)
+  // Un scope local est un défaut, pas une variante : le bloc `<i18n>` d'un composant ne
+  // bénéficie d'aucun repli, si bien que toute langue qu'il ne déclare pas affiche la clé
+  // brute à l'écran. Ses clés échappent en outre à toute cette analyse et à la chaîne de
+  // traduction, donc rien ne signale la dérive — trois pages en ont vécu ainsi, jusqu'à
+  // douze locales cassées chacune.
   const localScopeFiles = vueFiles.filter((file) => {
     const content = fs.readFileSync(file, 'utf8')
     return usesLocalScope(content)
   })
   if (localScopeFiles.length > 0) {
     console.log(
-      `${YELLOW}ℹ️  ${localScopeFiles.length} fichier(s) Vue avec useScope: 'local' (clés i18n ignorées)${RESET}`
+      `${RED}❌ ${localScopeFiles.length} fichier(s) Vue en useScope: 'local'${RESET}\n` +
+        `   Leurs clés échappent à l'analyse, et les langues non déclarées afficheront la clé brute.\n` +
+        `   Déplacer ces traductions dans i18n/locales/{langue}/ :\n` +
+        localScopeFiles.map((f) => `     - ${path.relative(projectRoot, f)}`).join('\n')
     )
+    localScopeIsFatal = true
   }
 
   console.log(
@@ -767,7 +783,7 @@ async function main() {
   // Créer un Set simple pour la compatibilité avec le code existant
   const usedKeys = new Set(usedKeysMap.keys())
 
-  let hasErrors = false
+  let hasErrors = localScopeIsFatal
 
   // Traiter les préfixes dynamiques
   const dynamicPrefixes = [...usedKeys]

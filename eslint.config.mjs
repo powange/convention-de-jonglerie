@@ -58,7 +58,10 @@ export default [
   // La 2ᵉ app est un projet Nuxt séparé avec sa propre config → exclue du lint principal.
   // Le client Prisma généré ne doit jamais être linté (ignore explicite : l'intégration
   // gitignore de withNuxt ne couvre pas ce chemin de façon fiable en monorepo).
-  { ignores: ['apps/app2/**', `${APP_DIR}/server/generated/**`] },
+  // Les rapports Playwright embarquent un visualiseur minifié : lintés, ils produisent des
+  // centaines d'erreurs qui noient les vraies. Gitignorés, mais l'intégration gitignore de
+  // withNuxt ne couvre pas ce chemin en monorepo.
+  { ignores: ['apps/app2/**', `${APP_DIR}/server/generated/**`, 'playwright-report/**'] },
   // Règles globales légères pour réduire le bruit sans masquer les erreurs importantes
   {
     files: ['**/*.{js,cjs,mjs,ts,tsx,vue}'],
