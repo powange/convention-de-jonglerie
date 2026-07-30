@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createPendingUserAndInvite } from '#server/utils/invitation'
@@ -9,6 +10,7 @@ import {
 } from '#server/utils/permissions/edition-permissions'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { toCents } from '~~/shared/utils/money'
 
 // Un montant réel supérieur à son plafond rendrait l'artiste inéditable : le PUT
 // rejette cet état sur toute mise à jour, même sans rapport avec les montants.
@@ -178,13 +180,14 @@ export default wrapApiHandler(
         dietaryPreference: validatedData.dietaryPreference,
         allergies: validatedData.allergies,
         allergySeverity: validatedData.allergySeverity,
-        payment: validatedData.payment,
+        // L'API parle en unité courante, la base en centimes entiers : la frontière est ici.
+        payment: toCents(validatedData.payment),
         paymentPaid: validatedData.paymentPaid ?? false,
-        reimbursementMax: validatedData.reimbursementMax,
-        reimbursementActual: validatedData.reimbursementActual,
+        reimbursementMax: toCents(validatedData.reimbursementMax),
+        reimbursementActual: toCents(validatedData.reimbursementActual),
         reimbursementActualPaid: validatedData.reimbursementActualPaid ?? false,
-        consumablesMax: validatedData.consumablesMax,
-        consumablesActual: validatedData.consumablesActual,
+        consumablesMax: toCents(validatedData.consumablesMax),
+        consumablesActual: toCents(validatedData.consumablesActual),
         consumablesActualPaid: validatedData.consumablesActualPaid ?? false,
         accommodationAutonomous: validatedData.accommodationAutonomous ?? false,
         accommodationType: validatedData.accommodationType,

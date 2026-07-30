@@ -142,6 +142,10 @@ model Edition {
   postalCode                       String
   region                           String?
   timezone                         String? // IANA timezone (ex: "Europe/Paris", "America/New_York")
+  // Devise de l'édition, en code ISO 4217. Elle vaut pour tous ses montants — artistes,
+  // billetterie, trésorerie. À ne pas confondre avec le champ `currency` d'InfomaniakConfig,
+  // qui code « 1 / 2 » pour un en-tête de leur API et ne concerne que cette intégration.
+  currency                         String                        @default("EUR") @db.VarChar(3)
   latitude                         Float?
   longitude                        Float?
   facebookUrl                      String?

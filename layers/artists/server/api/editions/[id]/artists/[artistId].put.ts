@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
@@ -8,6 +9,7 @@ import {
 } from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { toCents } from '~~/shared/utils/money'
 
 const updateArtistSchema = z.object({
   arrivalDateTime: z.string().optional().nullable(),
@@ -55,6 +57,7 @@ function assertMaxCoversActual(
   existing: { max: unknown; actual: unknown },
   messages: { exceeds: string; maxRemoved: string }
 ) {
+  // Les deux côtés sont désormais en centimes entiers : la conversion a lieu avant l'appel.
   const toNumber = (value: unknown) => (value == null ? null : Number(value))
   const effectiveMax = payload.max !== undefined ? payload.max : toNumber(existing.max)
   const effectiveActual = payload.actual !== undefined ? payload.actual : toNumber(existing.actual)
@@ -115,6 +118,24 @@ export default wrapApiHandler(
 
     const body = await readBody(event)
     const validatedData = updateArtistSchema.parse(body)
+
+    // Passage en centimes dès la validation : la comparaison ci-dessous confronte la saisie aux
+    // valeurs en base, déjà en centimes. Convertir plus tard reviendrait à comparer des euros à
+    // des centimes, sans qu'aucune erreur ne le signale.
+    //
+    // `undefined` doit rester `undefined` : ici il veut dire « champ non fourni », là où `null`
+    // veut dire « effacer ». Les confondre effacerait un montant qu'on ne cherchait pas à toucher.
+    for (const field of [
+      'payment',
+      'reimbursementMax',
+      'reimbursementActual',
+      'consumablesMax',
+      'consumablesActual',
+    ] as const) {
+      if (validatedData[field] !== undefined) {
+        validatedData[field] = toCents(validatedData[field])
+      }
+    }
 
     assertMaxCoversActual(
       { max: validatedData.reimbursementMax, actual: validatedData.reimbursementActual },

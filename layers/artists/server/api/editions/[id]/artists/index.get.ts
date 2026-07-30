@@ -1,9 +1,11 @@
 import { createHash } from 'node:crypto'
 
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
+import { fromCents } from '~~/shared/utils/money'
 
 export default wrapApiHandler(
   async (event) => {
@@ -88,8 +90,17 @@ export default wrapApiHandler(
     })
 
     // Ajouter le hash de l'email pour chaque artiste
+    //
+    // Les montants repassent en unité courante : la base les stocke en centimes, mais toute
+    // l'API des artistes — création comme mise à jour — parle en euros. Renvoyer les centimes
+    // bruts ici afficherait des montants multipliés par cent côté gestion.
     const artistsWithEmailHash = artists.map((artist) => ({
       ...artist,
+      payment: fromCents(artist.payment),
+      reimbursementMax: fromCents(artist.reimbursementMax),
+      reimbursementActual: fromCents(artist.reimbursementActual),
+      consumablesMax: fromCents(artist.consumablesMax),
+      consumablesActual: fromCents(artist.consumablesActual),
       user: {
         ...artist.user,
         emailHash: createHash('md5').update(sanitizeEmail(artist.user.email)).digest('hex'),
