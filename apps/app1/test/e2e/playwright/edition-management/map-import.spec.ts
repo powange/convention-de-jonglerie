@@ -42,11 +42,21 @@ test.describe.serial("Import des objets d'une carte externe", () => {
 
     await goto(`/editions/${editionId}/gestion/map-import`, { waitUntil: 'hydration' })
 
-    // La liste vient d'un appel serveur vers le fournisseur : lui laisser le temps d'aboutir.
+    // Le fournisseur est une dépendance externe : s'il est injoignable ou si la carte de test a
+    // disparu, ce parcours ne peut pas s'exécuter. L'ignorer le dit honnêtement, là où un échec
+    // ferait passer une panne tierce pour une régression et bloquerait les fusions.
+    const objects = await page.request.get(
+      `http://localhost:3000/api/editions/${editionId}/external-map/objects`
+    )
+    test.skip(
+      !objects.ok(),
+      `Carte de test injoignable (${objects.status()}) — parcours non exécutable`
+    )
+
     const importButtons = page.getByRole('button', { name: 'Importer', exact: true })
     await expect(
       importButtons.first(),
-      'Aucun objet importable : la carte de test est-elle toujours partagée publiquement ?'
+      'Aucun objet importable alors que la carte a répondu : régression probable'
     ).toBeVisible({ timeout: 45000 })
 
     // La ligne est repérée par son nom, pas par son bouton : le bouton « Importer » disparaît

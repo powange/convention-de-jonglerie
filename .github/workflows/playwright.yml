@@ -1,7 +1,14 @@
 name: Playwright E2E Tests
 
 on:
-  workflow_dispatch: # Lancement manuel uniquement
+  # Sur les PR : ces tests couvrent des parcours que rien d'autre ne vérifie — import de carte,
+  # trésorerie, droits d'organisateur. En déclenchement manuel, ils ne tournaient jamais, et
+  # trois défauts d'affilée n'ont été détectés qu'à l'usage.
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 env:
   E2E_TEST: true
