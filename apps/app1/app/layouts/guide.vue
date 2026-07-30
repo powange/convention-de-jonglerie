@@ -14,7 +14,7 @@
                     icon="i-heroicons-bars-3"
                     variant="outline"
                     color="neutral"
-                    :label="t('menu')"
+                    :label="t('guide.menu')"
                   />
 
                   <template #body>
@@ -32,8 +32,8 @@
                 icon="i-heroicons-language"
                 color="info"
                 variant="subtle"
-                :title="t('frenchOnly.title')"
-                :description="t('frenchOnly.description')"
+                :title="t('guide.french_only_title')"
+                :description="t('guide.french_only_description')"
                 class="mb-6"
               />
 
@@ -65,26 +65,10 @@
 </template>
 
 <script setup lang="ts">
-const { t, locale } = useI18n({ useScope: 'local' })
+// Portée globale : un bloc `<i18n>` local ne bénéficie pas du repli de langue, si bien que les
+// onze locales qu'il ne déclarait pas affichaient la clé brute. Ces blocs échappent en outre à
+// l'outillage i18n, qui ne lit que les fichiers de traduction — la dérive passait inaperçue.
+const { t, locale } = useI18n()
 
 const drawerOpen = ref(false)
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "menu": "Menu du guide",
-    "frenchOnly": {
-      "title": "Guide disponible en français uniquement",
-      "description": "Ce guide n'est rédigé qu'en français. Votre navigateur peut le traduire automatiquement : faites un clic droit sur la page puis choisissez « Traduire »."
-    }
-  },
-  "en": {
-    "menu": "Guide menu",
-    "frenchOnly": {
-      "title": "This guide is only available in French",
-      "description": "The guide is written in French only. Your browser can translate it for you: right-click anywhere on the page and choose \"Translate\". This works in Chrome, Edge and other Chromium-based browsers."
-    }
-  }
-}
-</i18n>

@@ -771,5 +771,11 @@
     "program_max_10000": "Program nie może przekraczać 10000 znaków",
     "url_invalid": "Adres URL musi zaczynać się od http:// lub https://",
     "url_max_191": "Adres URL nie może przekraczać 191 znaków"
-  }
+  },
+  "guide": {
+    "menu": "Menu przewodnika",
+    "french_only_title": "Ten przewodnik jest dostępny wyłącznie po francusku",
+    "french_only_description": "Przewodnik napisano tylko po francusku. Przeglądarka może go przetłumaczyć: kliknij stronę prawym przyciskiem i wybierz „Przetłumacz”."
+  },
+  "profil_menu": "Menu profilu"
 }

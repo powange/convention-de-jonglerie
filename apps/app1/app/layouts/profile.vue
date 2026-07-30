@@ -14,7 +14,7 @@
                     icon="i-heroicons-bars-3"
                     variant="outline"
                     color="neutral"
-                    :label="t('menu')"
+                    :label="t('profil_menu')"
                   />
 
                   <template #body>
@@ -49,15 +49,9 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n({ useScope: 'local' })
+// Portée globale : voir le layout du guide — un bloc local n'a pas de repli de langue, et les
+// douze locales absentes de celui-ci affichaient la clé brute.
+const { t } = useI18n()
 
 const drawerOpen = ref(false)
 </script>
-
-<i18n lang="json">
-{
-  "fr": {
-    "menu": "Menu du profil"
-  }
-}
-</i18n>

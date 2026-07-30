@@ -771,5 +771,11 @@
     "program_max_10000": "The program cannot exceed 10000 characters",
     "url_invalid": "URL must start with http:// or https://",
     "url_max_191": "The URL cannot exceed 191 characters"
-  }
+  },
+  "guide": {
+    "menu": "Guide menu",
+    "french_only_title": "This guide is only available in French",
+    "french_only_description": "The guide is written in French only. Your browser can translate it for you: right-click anywhere on the page and choose \"Translate\"."
+  },
+  "profil_menu": "Profile menu"
 }
