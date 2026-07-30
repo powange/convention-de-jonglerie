@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} rezerwacja magazynowa | {n} rezerwacji magazynowych",
       "import_deleted": "Obiekt usunięty",
       "import_delete_error": "Nie udało się usunąć tego obiektu",
-      "import_reimport": "Importuj ponownie"
+      "import_reimport": "Importuj ponownie",
+      "marker_zone": "Powiązana strefa",
+      "marker_zone_help": "Powiąż ten punkt ze strefą, której jest wejściem lub dojściem.",
+      "marker_no_zone": "Brak strefy"
     }
   }
 }

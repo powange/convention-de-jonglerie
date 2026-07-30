@@ -37,6 +37,8 @@
       "truck_camping": "Karavanový kemp",
       "workshops": "Workshopy"
     },
-    "view_external": "Mapa Google"
+    "view_external": "Mapa Google",
+    "zone_entrances": "Vchody:",
+    "marker_entrance_of": "Vchod do:"
   }
 }

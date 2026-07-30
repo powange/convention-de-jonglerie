@@ -37,6 +37,8 @@
       "truck_camping": "Autocampercamping",
       "workshops": "Workshops"
     },
-    "view_external": "Google-kort"
+    "view_external": "Google-kort",
+    "zone_entrances": "Indgange:",
+    "marker_entrance_of": "Indgang til:"
   }
 }

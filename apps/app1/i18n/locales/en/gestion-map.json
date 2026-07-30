@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} stock reservation | {n} stock reservations",
       "import_deleted": "Object deleted",
       "import_delete_error": "This object could not be deleted",
-      "import_reimport": "Re-import"
+      "import_reimport": "Re-import",
+      "marker_zone": "Attached zone",
+      "marker_zone_help": "Attach this point to a zone it serves as an entrance or access to.",
+      "marker_no_zone": "No zone"
     }
   }
 }

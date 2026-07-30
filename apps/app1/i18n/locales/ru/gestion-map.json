@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} складская бронь | {n} складских броней",
       "import_deleted": "Объект удалён",
       "import_delete_error": "Не удалось удалить этот объект",
-      "import_reimport": "Импортировать снова"
+      "import_reimport": "Импортировать снова",
+      "marker_zone": "Связанная зона",
+      "marker_zone_help": "Свяжите эту точку с зоной, входом или проходом в которую она является.",
+      "marker_no_zone": "Без зоны"
     }
   }
 }

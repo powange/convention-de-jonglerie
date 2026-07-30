@@ -37,6 +37,8 @@
       "truck_camping": "Camper van camping",
       "workshops": "Workshops"
     },
-    "view_external": "Google map"
+    "view_external": "Google map",
+    "zone_entrances": "Entrances:",
+    "marker_entrance_of": "Entrance to:"
   }
 }

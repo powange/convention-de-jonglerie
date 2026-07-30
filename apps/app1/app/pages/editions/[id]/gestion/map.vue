@@ -384,6 +384,7 @@ const {
   updateMarker,
   deleteMarker,
   updateMarkerPosition,
+  fetchMarkers,
 } = useEditionMarkers(editionId)
 
 // Map
@@ -636,6 +637,10 @@ const confirmDelete = async () => {
 
   if (success) {
     removePolygon(zoneId)
+    // La base a détaché les entrées de cette zone (`SetNull`) ; sans relecture, la liste locale
+    // garderait un rattachement mort et le renvoyer au serveur ferait échouer la moindre
+    // modification du marqueur.
+    await fetchMarkers()
   }
 
   deleteConfirmOpen.value = false

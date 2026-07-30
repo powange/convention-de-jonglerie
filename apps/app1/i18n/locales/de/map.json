@@ -37,6 +37,8 @@
       "truck_camping": "Wohnmobil-Camping",
       "workshops": "Workshops"
     },
-    "view_external": "Google-Karte"
+    "view_external": "Google-Karte",
+    "zone_entrances": "Eingänge:",
+    "marker_entrance_of": "Eingang zu:"
   }
 }

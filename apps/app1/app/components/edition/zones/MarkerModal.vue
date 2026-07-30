@@ -67,7 +67,11 @@ watch(
         form.description = props.marker.description || ''
         form.markerTypes = [...props.marker.markerTypes]
         form.color = props.marker.color || defaultColors[0]!
-        form.zoneId = props.marker.zoneId ?? null
+        // Un rattachement vers une zone absente de la liste — supprimée entre-temps — serait
+        // renvoyé tel quel au serveur, qui le rejetterait. Le simple fait de renommer l'entrée
+        // échouerait alors sur une erreur incompréhensible depuis cette modale.
+        const attachedZone = props.marker.zoneId
+        form.zoneId = props.zones.some((zone) => zone.id === attachedZone) ? attachedZone : null
       } else {
         // Reset pour un nouveau marqueur
         form.name = ''

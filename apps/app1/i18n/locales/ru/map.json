@@ -37,6 +37,8 @@
       "truck_camping": "Автокемпинг",
       "workshops": "Мастер-классы"
     },
-    "view_external": "Карта Google"
+    "view_external": "Карта Google",
+    "zone_entrances": "Входы:",
+    "marker_entrance_of": "Вход в:"
   }
 }

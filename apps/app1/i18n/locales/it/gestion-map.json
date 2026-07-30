@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} prenotazione di magazzino | {n} prenotazioni di magazzino",
       "import_deleted": "Oggetto eliminato",
       "import_delete_error": "Impossibile eliminare questo oggetto",
-      "import_reimport": "Reimporta"
+      "import_reimport": "Reimporta",
+      "marker_zone": "Zona associata",
+      "marker_zone_help": "Associa questo punto a una zona di cui è l'ingresso o l'accesso.",
+      "marker_no_zone": "Nessuna zona"
     }
   }
 }

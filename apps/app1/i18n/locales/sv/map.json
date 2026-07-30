@@ -37,6 +37,8 @@
       "truck_camping": "Husbilscamping",
       "workshops": "Workshops"
     },
-    "view_external": "Google-karta"
+    "view_external": "Google-karta",
+    "zone_entrances": "Ingångar:",
+    "marker_entrance_of": "Ingång till:"
   }
 }

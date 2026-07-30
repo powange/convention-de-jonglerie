@@ -65,7 +65,10 @@
       "import_dep_reservations": "{n} voorraadreservering | {n} voorraadreserveringen",
       "import_deleted": "Object verwijderd",
       "import_delete_error": "Dit object kon niet worden verwijderd",
-      "import_reimport": "Opnieuw importeren"
+      "import_reimport": "Opnieuw importeren",
+      "marker_zone": "Gekoppelde zone",
+      "marker_zone_help": "Koppel dit punt aan een zone waarvan het de ingang of toegang is.",
+      "marker_no_zone": "Geen zone"
     }
   }
 }
