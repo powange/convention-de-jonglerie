@@ -23,7 +23,7 @@ const importedSelect = {
 
 // Les catégories ne portent pas le même nom d'un modèle à l'autre, d'où deux sélections.
 const zoneSelect = { ...importedSelect, zoneTypes: true } as const
-const markerSelect = { ...importedSelect, markerTypes: true } as const
+const markerSelect = { ...importedSelect, markerTypes: true, zoneId: true } as const
 
 /**
  * Les valeurs enregistrées accompagnent chaque objet importé : c'est ce qui permet à l'écran de
@@ -36,6 +36,7 @@ function toRecord(row: {
   color: string | null
   zoneTypes?: unknown
   markerTypes?: unknown
+  zoneId?: number | null
   externalMapObjectId: string | null
   externalMapImportedAt: Date | null
   updatedAt: Date
@@ -53,6 +54,8 @@ function toRecord(row: {
     color: row.color,
     types: Array.isArray(rawTypes) ? (rawTypes as string[]) : [],
     externalMapObjectId: row.externalMapObjectId,
+    // Rattachement enregistré, pour que l'écran sache si l'organisateur l'a changé depuis.
+    zoneId: row.zoneId ?? null,
     externalMapImportedAt: row.externalMapImportedAt,
     updatedAt: row.updatedAt,
     dependencies: {

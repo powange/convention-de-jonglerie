@@ -157,6 +157,18 @@
                     class="w-48"
                     :search-input="{ placeholder: $t('common.search') }"
                   />
+                  <!-- Rattachement : proposé uniquement sur les points, et seulement s'il
+                       existe une zone à laquelle les rattacher. -->
+                  <USelectMenu
+                    v-if="isPointRow(row) && editionZones.length > 0"
+                    v-model="draft[row.key]!.zoneId"
+                    value-key="value"
+                    :items="zoneOptions"
+                    size="sm"
+                    class="w-48"
+                    :placeholder="$t('gestion.map.marker_no_zone')"
+                    :search-input="{ placeholder: $t('common.search') }"
+                  />
                   <UPopover>
                     <UButton size="sm" color="neutral" variant="outline">
                       <span
@@ -376,6 +388,7 @@ interface ApiRow {
     kind: 'zone' | 'marker'
     color: string | null
     types: string[]
+    zoneId: number | null
     dependencies: {
       shows: number
       workshops: number
@@ -395,8 +408,29 @@ const { data, pending, error } = await useFetch<{
   transform: (payload: any) => payload?.data ?? payload,
 })
 
+/**
+ * Zones de l'édition, proposées comme rattachement pour les points.
+ *
+ * La liste vient de la base plutôt que des lignes de cet écran : une zone dessinée à la main
+ * n'est jamais passée par l'import et n'y figurerait donc pas, alors qu'elle peut parfaitement
+ * avoir une entrée.
+ */
+const { zones: editionZones } = useEditionZones(editionId)
+
+const zoneOptions = computed(() => [
+  { label: t('gestion.map.marker_no_zone'), value: null as number | null },
+  ...editionZones.value.map((zone) => ({ label: zone.name, value: zone.id as number | null })),
+])
+
+/** Le rattachement n'a de sens que pour un point : une zone ne s'attache pas à une zone. */
+function isPointRow(row: ViewRow): boolean {
+  return row.object?.kind === 'point' || row.record?.kind === 'marker'
+}
+
 /** Brouillon de saisie par ligne : catégories et couleur, pré-remplis depuis la carte. */
-const draft = reactive<Record<string, { types: EditionZoneType[]; color: string }>>({})
+const draft = reactive<
+  Record<string, { types: EditionZoneType[]; color: string; zoneId: number | null }>
+>({})
 const layerTypes = reactive<Record<string, EditionZoneType[]>>({})
 
 /**
@@ -491,6 +525,7 @@ watch(
         draft[row.key] = {
           types: ['OTHER'],
           color: row.object?.color ?? ZONE_TYPE_COLORS.OTHER,
+          zoneId: null,
         }
       } else if (row.state === 'imported' && row.record) {
         // Une ligne déjà importée part de ce qui est enregistré : c'est l'écart avec ces
@@ -498,6 +533,7 @@ watch(
         draft[row.key] = {
           types: (row.record.types.length ? row.record.types : ['OTHER']) as EditionZoneType[],
           color: row.record.color ?? row.object?.color ?? ZONE_TYPE_COLORS.OTHER,
+          zoneId: row.record.zoneId ?? null,
         }
       }
     }
@@ -517,6 +553,7 @@ function hasPendingChanges(row: ViewRow): boolean {
   const entry = draft[row.key]
   if (!entry || !row.record) return false
   if ((entry.color ?? '').toUpperCase() !== (row.record.color ?? '').toUpperCase()) return true
+  if ((entry.zoneId ?? null) !== (row.record.zoneId ?? null)) return true
   const current = [...entry.types].sort()
   const stored = [...row.record.types].sort()
   return current.length !== stored.length || current.some((t, i) => t !== stored[i])
@@ -562,6 +599,8 @@ function importBodyFor(key: string | number) {
     color: entry.color,
     types: entry.types.length ? entry.types : ['OTHER'],
     coordinates: object.coordinates,
+    // Réservé aux points : le serveur refuse un rattachement sur un polygone.
+    ...(object.kind === 'point' ? { zoneId: entry.zoneId } : {}),
   }
 }
 
