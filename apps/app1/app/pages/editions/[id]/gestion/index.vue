@@ -525,6 +525,26 @@
           </div>
         </UCard>
 
+        <!-- Trésorerie -->
+        <UCard v-if="edition.treasuryEnabled && canManageTreasury">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-calculator" class="text-sky-600" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.treasury.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/treasury`"
+                icon="i-heroicons-calculator"
+                :title="$t('gestion.treasury.title')"
+                :description="$t('gestion.treasury.subtitle')"
+                color="sky"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Objets trouvés (pas visible pour les team leaders seuls) -->
         <UCard v-if="!isTeamLeaderValue || canEdit || canManageVolunteers">
           <div class="space-y-4">
@@ -678,6 +698,11 @@ const canManageWorkshops = computed(() => {
 const canManageFAQ = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageFAQ(edition.value, authStore.user.id)
+})
+
+const canManageTreasury = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageTreasury(edition.value, authStore.user.id)
 })
 
 // Vérifier si l'utilisateur est organisateur de la convention

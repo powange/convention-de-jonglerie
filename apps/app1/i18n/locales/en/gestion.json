@@ -548,7 +548,8 @@
       "title": "Tickets",
       "all_artists_handout_items": "Items to hand out to all artists",
       "all_artists_handout_items_help": "These items are handed out to every artist of the edition, in addition to those linked to their shows.",
-      "per_show_handout_items_title": "Show-specific items"
+      "per_show_handout_items_title": "Show-specific items",
+      "infomaniak_currency_mismatch": "Infomaniak will return amounts in {infomaniak}, while the edition is set to {edition}: they would be displayed in the wrong currency. Align both settings."
     },
     "title": "Management",
     "view_edition": "View edition",

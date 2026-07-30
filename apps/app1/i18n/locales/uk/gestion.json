@@ -548,7 +548,8 @@
       "title": "Квитки",
       "all_artists_handout_items": "Предмети для видачі всім артистам",
       "all_artists_handout_items_help": "Ці предмети видаються кожному артисту випуску — на додачу до тих, що прив'язані до його вистав.",
-      "per_show_handout_items_title": "Предмети для конкретної вистави"
+      "per_show_handout_items_title": "Предмети для конкретної вистави",
+      "infomaniak_currency_mismatch": "Infomaniak поверне суми у {infomaniak}, тоді як для випуску задано {edition}: їх буде показано не в тій валюті. Узгодьте обидва налаштування."
     },
     "title": "Керування",
     "view_edition": "Переглянути випуск",

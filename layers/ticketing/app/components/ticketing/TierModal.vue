@@ -98,7 +98,7 @@
             <UFormField
               :label="$t('ticketing.tiers.modal.min_amount_label')"
               name="minAmount"
-              help="Peut être à 0€ pour permettre la participation gratuite"
+              help="Peut être à 0 pour permettre la participation gratuite"
             >
               <UInput
                 v-model="form.minAmountInEuros"

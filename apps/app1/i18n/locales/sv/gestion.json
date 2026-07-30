@@ -548,7 +548,8 @@
       "title": "Biljetter",
       "all_artists_handout_items": "Artiklar att dela ut till alla artister",
       "all_artists_handout_items_help": "Dessa artiklar delas ut till varje artist i utgåvan, utöver de som är kopplade till deras föreställningar.",
-      "per_show_handout_items_title": "Föreställningsspecifika artiklar"
+      "per_show_handout_items_title": "Föreställningsspecifika artiklar",
+      "infomaniak_currency_mismatch": "Infomaniak returnerar beloppen i {infomaniak}, medan upplagan är inställd på {edition}: de skulle visas i fel valuta. Samordna de två inställningarna."
     },
     "title": "Hantering",
     "view_edition": "Visa upplagan",

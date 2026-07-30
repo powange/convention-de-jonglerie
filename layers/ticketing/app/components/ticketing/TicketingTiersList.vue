@@ -99,7 +99,7 @@
             >
               {{ (row.original.price / 100).toFixed(2) }}
             </span>
-            <span class="text-xs text-gray-500">€</span>
+            <span class="text-xs text-gray-500">{{ symbol }}</span>
           </div>
           <!-- Prix libre -->
           <div v-else class="flex flex-col gap-1">
@@ -113,13 +113,13 @@
             </span>
             <div class="text-xs text-gray-500">
               <span v-if="row.original.minAmount != null"
-                >Min: {{ (row.original.minAmount / 100).toFixed(2) }}€</span
+                >Min: {{ money(row.original.minAmount) }}</span
               >
               <span v-if="row.original.minAmount != null && row.original.maxAmount != null">
                 •
               </span>
               <span v-if="row.original.maxAmount != null"
-                >Max: {{ (row.original.maxAmount / 100).toFixed(2) }}€</span
+                >Max: {{ money(row.original.maxAmount) }}</span
               >
             </div>
           </div>
@@ -286,6 +286,8 @@ import { formatMealDisplay } from '~/utils/meals'
 import { isFixedPrice, type TicketingTier } from '../../utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
+
+const { symbol } = useEditionCurrency()
 
 const props = defineProps<{
   tiers: TicketingTier[]

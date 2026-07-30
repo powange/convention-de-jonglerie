@@ -249,12 +249,12 @@
                               : 'text-primary-600 dark:text-primary-400'
                           "
                         >
-                          {{ (getItemTotalAmount(item) / 100).toFixed(2) }} €
+                          {{ money(getItemTotalAmount(item)) }}
                           <span
                             v-if="item.selectedOptions && item.selectedOptions.length > 0"
                             class="text-xs opacity-75"
                           >
-                            ({{ (item.amount / 100).toFixed(2) }} € + options)
+                            ({{ money(item.amount) }} + options)
                           </span>
                         </p>
                       </div>
@@ -344,7 +344,7 @@
                       >
                         {{ selectedOption.option.name }}
                         <span v-if="selectedOption.option.price" class="ml-1 opacity-75">
-                          (+{{ (selectedOption.option.price / 100).toFixed(2) }} €)
+                          (+{{ money(selectedOption.option.price) }})
                         </span>
                       </UBadge>
                     </div>
@@ -438,7 +438,7 @@
                         {{ $t('edition.ticketing.amount') }}
                       </p>
                       <p class="text-sm font-medium text-pink-600 dark:text-pink-400">
-                        {{ (item.amount / 100).toFixed(2) }} €
+                        {{ money(item.amount) }}
                       </p>
                     </div>
                   </div>
@@ -497,7 +497,7 @@
                         {{ $t('edition.ticketing.amount') }}
                       </p>
                       <p class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                        {{ (item.amount / 100).toFixed(2) }} €
+                        {{ money(item.amount) }}
                       </p>
                     </div>
                   </div>
@@ -556,7 +556,7 @@
                         {{ $t('edition.ticketing.amount') }}
                       </p>
                       <p class="text-sm font-medium text-purple-600 dark:text-purple-400">
-                        {{ (item.amount / 100).toFixed(2) }} €
+                        {{ money(item.amount) }}
                       </p>
                     </div>
                   </div>
@@ -714,7 +714,7 @@
               </span>
             </div>
             <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">
-              {{ (amountToPay / 100).toFixed(2) }} €
+              {{ money(amountToPay) }}
             </span>
           </div>
         </div>
@@ -752,6 +752,8 @@ import { computed, ref, watch } from 'vue'
 import ArtistDetailsCard from './ArtistDetailsCard.vue'
 import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
 import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
+
+const { money } = useEditionCurrency()
 
 const { getParticipantTypeConfig } = useParticipantTypes()
 const ticketConfig = getParticipantTypeConfig('ticket')

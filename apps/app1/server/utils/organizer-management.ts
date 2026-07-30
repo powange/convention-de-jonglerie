@@ -197,6 +197,7 @@ interface AddConventionOrganizerInput {
     manageTicketing: boolean
     manageWorkshops: boolean
     manageFAQ: boolean
+    manageTreasury: boolean
     manageTasks: boolean
     manageStock: boolean
   }>
@@ -211,6 +212,7 @@ interface AddConventionOrganizerInput {
     canManageTicketing?: boolean
     canManageWorkshops?: boolean
     canManageFAQ?: boolean
+    canManageTreasury?: boolean
     canManageTasks?: boolean
     canManageStock?: boolean
   }>
@@ -279,6 +281,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
         canManageTicketing: rights?.manageTicketing ?? false,
         canManageWorkshops: rights?.manageWorkshops ?? false,
         canManageFAQ: rights?.manageFAQ ?? false,
+        canManageTreasury: rights?.manageTreasury ?? false,
         canManageTasks: rights?.manageTasks ?? false,
         canManageStock: rights?.manageStock ?? false,
       },
@@ -297,6 +300,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
             p.canManageTicketing ||
             p.canManageWorkshops ||
             p.canManageFAQ ||
+            p.canManageTreasury ||
             p.canManageTasks ||
             p.canManageStock)
       )
@@ -313,6 +317,7 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
             canManageTicketing: !!p.canManageTicketing,
             canManageWorkshops: !!p.canManageWorkshops,
             canManageFAQ: !!p.canManageFAQ,
+            canManageTreasury: !!p.canManageTreasury,
             canManageTasks: !!p.canManageTasks,
             canManageStock: !!p.canManageStock,
           })),
@@ -526,6 +531,7 @@ export async function updateOrganizerRights(params: {
     manageTicketing: boolean
     manageWorkshops: boolean
     manageFAQ: boolean
+    manageTreasury: boolean
     manageTasks: boolean
     manageStock: boolean
   }>
@@ -540,6 +546,7 @@ export async function updateOrganizerRights(params: {
     canManageTicketing?: boolean
     canManageWorkshops?: boolean
     canManageFAQ?: boolean
+    canManageTreasury?: boolean
     canManageTasks?: boolean
     canManageStock?: boolean
   }>
@@ -569,6 +576,7 @@ export async function updateOrganizerRights(params: {
         canManageTicketing: rights?.manageTicketing ?? organizer.canManageTicketing,
         canManageWorkshops: rights?.manageWorkshops ?? organizer.canManageWorkshops,
         canManageFAQ: rights?.manageFAQ ?? organizer.canManageFAQ,
+        canManageTreasury: rights?.manageTreasury ?? organizer.canManageTreasury,
         canManageTasks: rights?.manageTasks ?? organizer.canManageTasks,
         canManageStock: rights?.manageStock ?? organizer.canManageStock,
       },
@@ -594,6 +602,7 @@ export async function updateOrganizerRights(params: {
             p.canManageTicketing ||
             p.canManageWorkshops ||
             p.canManageFAQ ||
+            p.canManageTreasury ||
             p.canManageTasks ||
             p.canManageStock)
       )
@@ -610,6 +619,7 @@ export async function updateOrganizerRights(params: {
             canManageTicketing: !!p.canManageTicketing,
             canManageWorkshops: !!p.canManageWorkshops,
             canManageFAQ: !!p.canManageFAQ,
+            canManageTreasury: !!p.canManageTreasury,
             canManageTasks: !!p.canManageTasks,
             canManageStock: !!p.canManageStock,
           })),

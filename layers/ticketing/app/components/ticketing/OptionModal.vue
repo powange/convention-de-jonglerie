@@ -51,7 +51,7 @@
             class="w-full"
           >
             <template #trailing>
-              <span class="text-gray-500">€</span>
+              <span class="text-gray-500">{{ symbol }}</span>
             </template>
           </UInput>
         </UFormField>
@@ -198,6 +198,8 @@
 import { computed, ref, watch } from 'vue'
 
 import { useEditionStore } from '~/stores/editions'
+
+const { symbol } = useEditionCurrency()
 
 interface TicketingOption {
   id: number

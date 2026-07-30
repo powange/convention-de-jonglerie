@@ -548,7 +548,8 @@
       "title": "Eintrittskarten",
       "all_artists_handout_items": "Artikel zur Ausgabe an alle Künstler",
       "all_artists_handout_items_help": "Diese Artikel werden jedem Künstler der Ausgabe ausgehändigt, zusätzlich zu denen, die mit seinen Shows verknüpft sind.",
-      "per_show_handout_items_title": "Show-spezifische Artikel"
+      "per_show_handout_items_title": "Show-spezifische Artikel",
+      "infomaniak_currency_mismatch": "Infomaniak liefert die Beträge in {infomaniak}, während die Ausgabe auf {edition} eingestellt ist: Sie würden in der falschen Währung angezeigt. Gleichen Sie beide Einstellungen ab."
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

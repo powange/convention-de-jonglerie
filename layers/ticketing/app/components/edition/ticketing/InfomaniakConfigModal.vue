@@ -113,6 +113,23 @@
             required
           >
             <USelect v-model="localConfig.currency" :items="currencyOptions" size="lg" />
+
+            <!-- Infomaniak exprime les montants dans la devise demandée en en-tête ; l'affichage
+                 du site utilise celle de l'édition. Un désaccord entre les deux ferait présenter
+                 des francs comme des euros, sans aucune erreur pour le signaler. -->
+            <UAlert
+              v-if="currencyMismatch"
+              class="mt-3"
+              icon="i-heroicons-exclamation-triangle"
+              color="warning"
+              variant="subtle"
+              :description="
+                $t('gestion.ticketing.infomaniak_currency_mismatch', {
+                  infomaniak: infomaniakCurrencyCode,
+                  edition: editionCurrency,
+                })
+              "
+            />
           </UFormField>
         </div>
 
@@ -254,6 +271,19 @@ const currencyOptions = [
   { label: 'EUR (€)', value: '2' },
   { label: 'CHF (Fr.)', value: '1' },
 ]
+
+/** Correspondance entre le code interne d'Infomaniak et le code ISO utilisé par l'édition. */
+const INFOMANIAK_CURRENCY_CODES: Record<string, string> = { '1': 'CHF', '2': 'EUR' }
+
+const { currency: editionCurrency } = useEditionCurrency()
+
+const infomaniakCurrencyCode = computed(
+  () => INFOMANIAK_CURRENCY_CODES[localConfig.value.currency] ?? ''
+)
+
+const currencyMismatch = computed(
+  () => !!infomaniakCurrencyCode.value && infomaniakCurrencyCode.value !== editionCurrency.value
+)
 
 const availableEvents = ref<InfomaniakEventSummary[]>([])
 const selectedEventId = ref<number | undefined>()

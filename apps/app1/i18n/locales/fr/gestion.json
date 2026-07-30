@@ -548,7 +548,8 @@
       "tiers_description": "Gérer les tarifs, options et quotas",
       "tiers_handout_items_manage_for": "Articles à remettre — {name}",
       "tiers_title": "Tarifs, options & quotas",
-      "title": "Billetterie"
+      "title": "Billetterie",
+      "infomaniak_currency_mismatch": "Infomaniak renverra les montants en {infomaniak}, alors que l'édition est réglée en {edition} : ils seraient affichés dans la mauvaise devise. Alignez les deux réglages."
     },
     "title": "Gestion",
     "view_edition": "Voir l'édition",

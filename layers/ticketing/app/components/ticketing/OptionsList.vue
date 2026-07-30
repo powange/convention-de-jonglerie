@@ -33,7 +33,7 @@
                 v-if="option.price"
                 class="text-sm font-semibold text-primary-600 dark:text-primary-400"
               >
-                + {{ (option.price / 100).toFixed(2) }} €
+                + {{ money(option.price) }}
               </span>
             </div>
             <div class="flex items-center gap-2 mt-1">

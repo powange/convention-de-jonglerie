@@ -548,7 +548,8 @@
       "title": "Billetter",
       "all_artists_handout_items": "Effekter til udlevering til alle artister",
       "all_artists_handout_items_help": "Disse effekter udleveres til hver artist på udgaven, ud over dem der er knyttet til deres shows.",
-      "per_show_handout_items_title": "Effekter specifikke for hvert show"
+      "per_show_handout_items_title": "Effekter specifikke for hvert show",
+      "infomaniak_currency_mismatch": "Infomaniak returnerer beløbene i {infomaniak}, mens udgaven er sat til {edition}: de ville blive vist i den forkerte valuta. Ret de to indstillinger ind efter hinanden."
     },
     "title": "Administration",
     "view_edition": "Se udgaven",

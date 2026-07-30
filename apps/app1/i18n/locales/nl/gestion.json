@@ -548,7 +548,8 @@
       "title": "Tickets",
       "all_artists_handout_items": "Uit te reiken artikelen voor alle artiesten",
       "all_artists_handout_items_help": "Deze artikelen worden aan elke artiest van de editie uitgereikt, naast die welke aan hun shows zijn gekoppeld.",
-      "per_show_handout_items_title": "Showspecifieke artikelen"
+      "per_show_handout_items_title": "Showspecifieke artikelen",
+      "infomaniak_currency_mismatch": "Infomaniak geeft de bedragen terug in {infomaniak}, terwijl de editie op {edition} staat: ze zouden in de verkeerde valuta worden getoond. Stem beide instellingen op elkaar af."
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",

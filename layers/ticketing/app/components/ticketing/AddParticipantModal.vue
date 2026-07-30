@@ -424,7 +424,7 @@
 
                 <!-- Champ de montant personnalisé pour les tarifs à prix libre -->
                 <div v-if="isFreePrice(item)">
-                  <UFormField label="Montant (€)" :error="getItemAmountError(item)">
+                  <UFormField :label="`${$t('common.amount')} (${symbol})`" :error="getItemAmountError(item)">
                     <UInput
                       :model-value="getFreePriceDisplay(item, index)"
                       inputmode="decimal"
@@ -733,6 +733,8 @@
 import { ref, computed, watch } from 'vue'
 
 import { isFreePrice, isFixedPrice } from '../../utils/ticketing/tiers'
+
+const { money, symbol } = useEditionCurrency()
 
 interface TicketingOption {
   id: number
@@ -1058,7 +1060,7 @@ const totalAmount = computed(() => {
 })
 
 const formatPrice = (priceInCents: number) => {
-  return (priceInCents / 100).toFixed(2) + ' €'
+  return money(priceInCents)
 }
 
 // Gestion du prix libre : on garde le texte brut pour ne pas reformater pendant la saisie

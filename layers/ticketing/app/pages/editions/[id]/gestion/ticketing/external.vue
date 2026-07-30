@@ -403,7 +403,7 @@
                               >
                                 {{ (tier.price / 100).toFixed(2) }}
                               </span>
-                              <span class="text-sm text-gray-500">€</span>
+                              <span class="text-sm text-gray-500">{{ symbol }}</span>
                             </div>
                           </div>
 
@@ -443,7 +443,7 @@
                                     v-if="option.price"
                                     class="text-sm font-semibold text-primary-600 dark:text-primary-400"
                                   >
-                                    + {{ (option.price / 100).toFixed(2) }} €
+                                    + {{ money(option.price) }}
                                   </span>
                                 </div>
                                 <p
@@ -650,7 +650,7 @@
                               <div
                                 class="font-semibold text-sm text-primary-600 dark:text-primary-400"
                               >
-                                {{ (item.amount / 100).toFixed(2) }} €
+                                {{ money(item.amount) }}
                               </div>
                               <UBadge
                                 :color="item.state === 'Processed' ? 'success' : 'neutral'"
@@ -869,6 +869,8 @@ import InfomaniakConfigModal from '../../../../../components/edition/ticketing/I
 
 import type { InfomaniakConfig } from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
 import type { TabsItem } from '@nuxt/ui'
+
+const { symbol } = useEditionCurrency()
 
 const route = useRoute()
 const editionStore = useEditionStore()
