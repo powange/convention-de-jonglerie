@@ -72,7 +72,8 @@
       "ticketing_description": "Aktivér administration af billetsalg for denne udgave",
       "title": "Funktioner",
       "volunteers_description": "Aktivér administration af frivillige for denne udgave",
-      "workshops_description": "Giv deltagere og frivillige mulighed for at oprette workshops"
+      "workshops_description": "Giv deltagere og frivillige mulighed for at oprette workshops",
+      "treasury_description": "Følg udgifter og indtægter for udgaven, med bogføringskonti."
     },
     "general_info": {
       "description": "Rediger navn, datoer, tidszone og adresse for dit arrangement.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Forestillingsopkald",
       "list_description": "Administrer forskellige forestillingsopkald for dette arrangement"
+    },
+    "treasury": {
+      "title": "Økonomi"
     }
   }
 }

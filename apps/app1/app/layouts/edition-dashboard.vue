@@ -230,6 +230,11 @@ const canManageStock = computed(() => {
   return editionStore.canManageStock(edition.value, authStore.user.id)
 })
 
+const canManageTreasury = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageTreasury(edition.value, authStore.user.id)
+})
+
 // Affichage du stock : organisateurs avec canManageStock OU team leaders bénévoles
 const canAccessStock = computed(() => canManageStock.value || isTeamLeader.value)
 
@@ -559,6 +564,18 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-heroicons-archive-box',
       to: `/editions/${editionId.value}/gestion/stock`,
       tooltip: { content: t('gestion.stock.title') },
+    })
+  }
+
+  // Trésorerie : charges et produits de l'édition. Contrairement à la FAQ, l'entrée exige le
+  // droit dédié — elle donne à voir l'ensemble des montants, y compris ceux d'artistes que les
+  // droits sectoriels ne couvrent pas.
+  if (edition.value?.treasuryEnabled && canManageTreasury.value) {
+    managementSection.push({
+      label: t('gestion.treasury.title'),
+      icon: 'i-heroicons-calculator',
+      to: `/editions/${editionId.value}/gestion/treasury`,
+      tooltip: { content: t('gestion.treasury.title') },
     })
   }
 

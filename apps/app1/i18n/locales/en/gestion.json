@@ -72,7 +72,8 @@
       "ticketing_description": "Enable ticketing management for this edition",
       "title": "Features",
       "volunteers_description": "Enable volunteer management for this edition",
-      "workshops_description": "Allow participants and volunteers to create workshops"
+      "workshops_description": "Allow participants and volunteers to create workshops",
+      "treasury_description": "Track the edition's expenses and income, with accounting codes."
     },
     "general_info": {
       "description": "Edit the name, dates, timezone and address of your event.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Call for shows",
       "list_description": "Manage the different calls for shows for this edition"
+    },
+    "treasury": {
+      "title": "Treasury"
     }
   }
 }

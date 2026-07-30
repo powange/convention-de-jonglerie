@@ -206,7 +206,10 @@ model Edition {
   tasksEnabled                     Boolean                       @default(false)
   stockEnabled                     Boolean                       @default(false)
   faqEnabled                       Boolean                       @default(false)
+  treasuryEnabled                  Boolean                       @default(false)
   faqPagePublic                    Boolean                       @default(false)
+  treasuryEntries                  TreasuryEntry[]
+  treasurySourceCodes              TreasurySourceCode[]
   carpoolOffers                    CarpoolOffer[]
   carpoolRequests                  CarpoolRequest[]
   event                            Event                         @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -264,6 +267,7 @@ model Convention {
   organizers        ConventionOrganizer[]
   editions          Edition[]
   claimRequests     ConventionClaimRequest[]
+  treasuryCodes     TreasuryCode[]
 
   @@index([authorId], map: "Convention_authorId_fkey")
 }
@@ -323,6 +327,7 @@ model ConventionOrganizer {
   canManageStock        Boolean                      @default(false)
   canManageWorkshops    Boolean                      @default(false)
   canManageFAQ          Boolean                      @default(false)
+  canManageTreasury     Boolean                      @default(false)
   addedBy               User                         @relation("AddedOrganizers", fields: [addedById], references: [id])
   convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -348,6 +353,7 @@ model EditionOrganizerPermission {
   canManageStock      Boolean             @default(false)
   canManageWorkshops  Boolean             @default(false)
   canManageFAQ        Boolean             @default(false)
+  canManageTreasury   Boolean             @default(false)
   organizer           ConventionOrganizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   edition             Edition             @relation(fields: [editionId], references: [id], onDelete: Cascade)
 

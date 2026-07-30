@@ -72,7 +72,8 @@
       "ticketing_description": "Verwaltung des Ticketverkaufs für diese Ausgabe aktivieren",
       "title": "Funktionen",
       "volunteers_description": "Verwaltung der Freiwilligen für diese Ausgabe aktivieren",
-      "workshops_description": "Teilnehmern und Freiwilligen ermöglichen, Workshops zu erstellen"
+      "workshops_description": "Teilnehmern und Freiwilligen ermöglichen, Workshops zu erstellen",
+      "treasury_description": "Ausgaben und Einnahmen der Ausgabe verfolgen, mit Buchungskonten."
     },
     "general_info": {
       "description": "Bearbeiten Sie Name, Daten, Zeitzone und Adresse Ihrer Veranstaltung.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Show-Aufruf",
       "list_description": "Die verschiedenen Show-Aufrufe für diese Ausgabe verwalten"
+    },
+    "treasury": {
+      "title": "Buchhaltung"
     }
   }
 }

@@ -72,7 +72,8 @@
       "ticketing_description": "Beheer van ticketverkoop voor deze editie inschakelen",
       "title": "Functies",
       "volunteers_description": "Beheer van vrijwilligers voor deze editie inschakelen",
-      "workshops_description": "Deelnemers en vrijwilligers toestaan om workshops te maken"
+      "workshops_description": "Deelnemers en vrijwilligers toestaan om workshops te maken",
+      "treasury_description": "Volg de uitgaven en inkomsten van de editie, met boekhoudkundige codes."
     },
     "general_info": {
       "description": "Bewerk de naam, data, tijdzone en het adres van uw evenement.",
@@ -571,6 +572,9 @@
     "shows_call": {
       "title": "Show-oproep",
       "list_description": "Beheer de verschillende show-oproepen voor deze editie"
+    },
+    "treasury": {
+      "title": "Financiën"
     }
   }
 }

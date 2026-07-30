@@ -242,6 +242,30 @@
             />
           </div>
         </UCard>
+
+        <!-- Trésorerie -->
+        <UCard>
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <UIcon name="i-heroicons-calculator" class="text-primary-500 size-5" />
+              <div>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('gestion.treasury.title') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.features.treasury_description') }}
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="treasuryEnabledLocal"
+              :loading="savingTreasury"
+              :disabled="savingTreasury"
+              color="primary"
+              @update:model-value="handleToggleTreasury"
+            />
+          </div>
+        </UCard>
       </div>
     </div>
   </div>
@@ -285,6 +309,7 @@ const stockEnabledLocal = ref(false)
 
 // Gestion de l'activation de la FAQ
 const faqEnabledLocal = ref(false)
+const treasuryEnabledLocal = ref(false)
 
 watch(
   edition,
@@ -299,6 +324,7 @@ watch(
       tasksEnabledLocal.value = (newEdition as any).tasksEnabled || false
       stockEnabledLocal.value = (newEdition as any).stockEnabled || false
       faqEnabledLocal.value = (newEdition as any).faqEnabled || false
+      treasuryEnabledLocal.value = (newEdition as any).treasuryEnabled || false
     }
   },
   { immediate: true }
@@ -482,6 +508,26 @@ const { execute: executeToggleFaq, loading: savingFaq } = useApiAction(
 
 const handleToggleFaq = () => {
   executeToggleFaq()
+}
+
+const { execute: executeToggleTreasury, loading: savingTreasury } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ treasuryEnabled: treasuryEnabledLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    onError: () => {
+      treasuryEnabledLocal.value = !treasuryEnabledLocal.value
+    },
+  }
+)
+
+const handleToggleTreasury = () => {
+  executeToggleTreasury()
 }
 
 // Vérifier l'accès à cette page
