@@ -189,7 +189,8 @@
     "workshops_short": "Warsztaty",
     "yes": "Tak",
     "currency": "Waluta",
-    "amount": "Kwota"
+    "amount": "Kwota",
+    "treasury_short": "Finanse"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

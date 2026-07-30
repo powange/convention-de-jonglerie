@@ -10,8 +10,10 @@ function artist(overrides: Partial<ArtistAmountsRow> = {}): ArtistAmountsRow {
   return {
     payment: null,
     paymentPaid: false,
+    reimbursementMax: null,
     reimbursementActual: null,
     reimbursementActualPaid: false,
+    consumablesMax: null,
     consumablesActual: null,
     consumablesActualPaid: false,
     ...overrides,
@@ -74,6 +76,80 @@ describe('computeTreasury — montants d’artistes', () => {
     expect(lineOf(report, 'source:ARTIST_CONSUMABLES')).toMatchObject({
       settled: 0,
       pending: 6250,
+    })
+  })
+})
+
+describe('computeTreasury — repli sur le plafond', () => {
+  // Tant que le justificatif n'est pas arrivé, le plafond est ce que l'édition s'est engagée à
+  // couvrir. L'ignorer sous-estimerait la dépense à venir.
+  it('retient le plafond quand le réel est inconnu', () => {
+    const report = computeTreasury(
+      input({ artists: [artist({ reimbursementMax: 15000, reimbursementActual: null })] })
+    )
+    expect(lineOf(report, 'source:ARTIST_REIMBURSEMENT')).toMatchObject({
+      settled: 0,
+      pending: 15000,
+    })
+  })
+
+  it('préfère le réel dès qu’il est connu, même inférieur au plafond', () => {
+    const report = computeTreasury(
+      input({
+        artists: [
+          artist({
+            reimbursementMax: 15000,
+            reimbursementActual: 9851,
+            reimbursementActualPaid: true,
+          }),
+        ],
+      })
+    )
+    expect(lineOf(report, 'source:ARTIST_REIMBURSEMENT')).toMatchObject({
+      settled: 9851,
+      pending: 0,
+    })
+  })
+
+  // On ne paie pas une somme qu'on ne connaît pas encore : un montant issu du plafond reste
+  // engagé, quel que soit l'indicateur de règlement.
+  it('ne compte jamais un plafond comme réglé', () => {
+    const report = computeTreasury(
+      input({
+        artists: [
+          artist({
+            reimbursementMax: 15000,
+            reimbursementActual: null,
+            reimbursementActualPaid: true,
+          }),
+        ],
+      })
+    )
+    expect(lineOf(report, 'source:ARTIST_REIMBURSEMENT')).toMatchObject({
+      settled: 0,
+      pending: 15000,
+    })
+  })
+
+  it('applique la même règle aux consommables', () => {
+    const report = computeTreasury(
+      input({ artists: [artist({ consumablesMax: 8000, consumablesActual: null })] })
+    )
+    expect(lineOf(report, 'source:ARTIST_CONSUMABLES')).toMatchObject({
+      settled: 0,
+      pending: 8000,
+    })
+  })
+
+  // Un réel explicitement nul est une information : le défraiement a été renoncé, il ne faut pas
+  // retomber sur le plafond.
+  it('respecte un réel à zéro plutôt que de revenir au plafond', () => {
+    const report = computeTreasury(
+      input({ artists: [artist({ reimbursementMax: 15000, reimbursementActual: 0 })] })
+    )
+    expect(lineOf(report, 'source:ARTIST_REIMBURSEMENT')).toMatchObject({
+      settled: 0,
+      pending: 0,
     })
   })
 })
@@ -153,7 +229,7 @@ describe('computeTreasury — lignes saisies', () => {
 })
 
 describe('computeTreasury — totaux', () => {
-  it('ne compte que le réglé dans le solde, et remonte l’engagé à part', () => {
+  it('compte le réglé et l’engagé dans le résultat, en les distinguant', () => {
     const report = computeTreasury(
       input({
         artists: [artist({ payment: 50000, paymentPaid: true }), artist({ payment: 10000 })],
@@ -163,7 +239,9 @@ describe('computeTreasury — totaux', () => {
 
     expect(report.totals.expense).toEqual({ settled: 50000, pending: 10000 })
     expect(report.totals.income).toEqual({ settled: 120000, pending: 5000 })
-    expect(report.totals.balance).toBe(70000)
+    // Résultat : (120000 + 5000) - (50000 + 10000). Ne retenir que le réglé afficherait 70000 et
+    // masquerait les 10000 encore dus.
+    expect(report.totals.balance).toBe(65000)
   })
 
   it('rend un solde négatif quand l’édition est déficitaire', () => {

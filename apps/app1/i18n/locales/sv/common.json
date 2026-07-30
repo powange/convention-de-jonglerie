@@ -189,7 +189,8 @@
     "workshops_short": "Workshops",
     "yes": "Ja",
     "currency": "Valuta",
-    "amount": "Belopp"
+    "amount": "Belopp",
+    "treasury_short": "Ekonomi"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

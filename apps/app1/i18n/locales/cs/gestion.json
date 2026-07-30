@@ -583,7 +583,6 @@
       "income": "Výnos",
       "balance": "Zůstatek",
       "balance_hint": "Uhrazené výnosy minus uhrazené náklady",
-      "pending_amount": "z toho {amount} přislíbeno",
       "open_source": "Otevřít zdroj",
       "manage_codes": "Spravovat kódy",
       "add_entry": "Přidat řádek",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Náhrady cestovného umělců",
         "ARTIST_CONSUMABLES": "Spotřební materiál umělců",
         "TICKETING_ORDERS": "Objednávky vstupenek"
-      }
+      },
+      "settled_amount": "z toho {amount} uhrazeno"
     }
   }
 }

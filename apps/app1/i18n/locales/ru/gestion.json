@@ -583,7 +583,6 @@
       "income": "Доход",
       "balance": "Сальдо",
       "balance_hint": "Полученные доходы за вычетом оплаченных расходов",
-      "pending_amount": "из них {amount} начислено",
       "open_source": "Открыть источник",
       "manage_codes": "Управление кодами",
       "add_entry": "Добавить строку",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Компенсации проезда артистов",
         "ARTIST_CONSUMABLES": "Расходные материалы артистов",
         "TICKETING_ORDERS": "Заказы билетов"
-      }
+      },
+      "settled_amount": "из них {amount} оплачено"
     }
   }
 }

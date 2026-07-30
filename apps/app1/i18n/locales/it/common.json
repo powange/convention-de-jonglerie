@@ -189,7 +189,8 @@
     "workshops_short": "Workshop",
     "yes": "Sì",
     "currency": "Valuta",
-    "amount": "Importo"
+    "amount": "Importo",
+    "treasury_short": "Tesoreria"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

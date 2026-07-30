@@ -94,6 +94,9 @@
                 <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
                   {{ $t('common.faq_short') }}
                 </th>
+                <th class="text-center font-medium px-2 py-1 uppercase tracking-wide">
+                  {{ $t('common.treasury_short') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -213,6 +216,17 @@
                       color="primary"
                       :model-value="localValue.rights.manageFAQ"
                       @update:model-value="(val) => updateRight('manageFAQ', val)"
+                    />
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('permissions.manageTreasury')"
+                      :size="switchSize"
+                      color="primary"
+                      :model-value="localValue.rights.manageTreasury"
+                      @update:model-value="(val) => updateRight('manageTreasury', val)"
                     />
                   </div>
                 </td>
@@ -352,6 +366,18 @@
                     />
                   </div>
                 </td>
+                <td class="px-3 py-2 align-middle">
+                  <div class="flex justify-center">
+                    <USwitch
+                      :aria-label="$t('common.treasury_short')"
+                      :size="switchSize"
+                      color="primary"
+                      :disabled="localValue.rights.manageTreasury"
+                      :model-value="hasEditionFlag(ed.id, 'canManageTreasury')"
+                      @update:model-value="(val) => toggleEdition(ed.id, 'canManageTreasury', val)"
+                    />
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -468,6 +494,7 @@ const globalRightsOutsideTable = computed(() =>
         'manageStock',
         'manageWorkshops',
         'manageFAQ',
+        'manageTreasury',
       ].includes(p.key)
   )
 )

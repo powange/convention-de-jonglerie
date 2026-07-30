@@ -583,7 +583,6 @@
       "income": "Ingreso",
       "balance": "Saldo",
       "balance_hint": "Ingresos cobrados menos gastos pagados",
-      "pending_amount": "de los cuales {amount} comprometidos",
       "open_source": "Abrir el origen",
       "manage_codes": "Gestionar los códigos",
       "add_entry": "Añadir una línea",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Dietas de viaje de los artistas",
         "ARTIST_CONSUMABLES": "Consumibles de los artistas",
         "TICKETING_ORDERS": "Pedidos de entradas"
-      }
+      },
+      "settled_amount": "de los cuales {amount} abonados"
     }
   }
 }

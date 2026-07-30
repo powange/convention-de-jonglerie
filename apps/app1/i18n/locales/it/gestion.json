@@ -583,7 +583,6 @@
       "income": "Entrata",
       "balance": "Saldo",
       "balance_hint": "Entrate incassate meno spese pagate",
-      "pending_amount": "di cui {amount} impegnati",
       "open_source": "Apri la fonte",
       "manage_codes": "Gestisci i codici",
       "add_entry": "Aggiungi una riga",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Rimborsi viaggio degli artisti",
         "ARTIST_CONSUMABLES": "Materiali di consumo degli artisti",
         "TICKETING_ORDERS": "Ordini di biglietteria"
-      }
+      },
+      "settled_amount": "di cui {amount} saldati"
     }
   }
 }

@@ -40,8 +40,10 @@ export interface TreasuryLine extends TreasuryAmounts {
 export interface ArtistAmountsRow {
   payment: number | null
   paymentPaid: boolean
+  reimbursementMax: number | null
   reimbursementActual: number | null
   reimbursementActualPaid: boolean
+  consumablesMax: number | null
   consumablesActual: number | null
   consumablesActualPaid: boolean
 }
@@ -85,6 +87,37 @@ function sumArtistField(
   return { settled, pending }
 }
 
+/**
+ * Défraiements et consommables : le réel s'il est connu, sinon le plafond.
+ *
+ * Le plafond est ce que l'édition s'est engagée à couvrir ; l'ignorer tant que le justificatif
+ * n'est pas arrivé sous-estimerait la dépense à venir, précisément au moment où l'organisateur a
+ * besoin de l'anticiper.
+ *
+ * Un montant issu du plafond ne peut pas être réglé — on ne paie pas une somme qu'on ne connaît
+ * pas encore — il compte donc toujours comme engagé.
+ */
+function sumWithMaxFallback(
+  rows: ArtistAmountsRow[],
+  actualOf: (row: ArtistAmountsRow) => number | null,
+  maxOf: (row: ArtistAmountsRow) => number | null,
+  paidOf: (row: ArtistAmountsRow) => boolean
+): TreasuryAmounts {
+  let settled = 0
+  let pending = 0
+  for (const row of rows) {
+    const actual = actualOf(row)
+    if (actual !== null && actual !== undefined) {
+      if (actual === 0) continue
+      if (paidOf(row)) settled += actual
+      else pending += actual
+      continue
+    }
+    pending += maxOf(row) ?? 0
+  }
+  return { settled, pending }
+}
+
 export interface ComputeInput {
   artists: ArtistAmountsRow[]
   ticketing: TicketingTotals
@@ -98,7 +131,13 @@ export interface TreasuryReport {
   totals: {
     expense: TreasuryAmounts
     income: TreasuryAmounts
-    /** Produits réglés moins charges réglées. Négatif quand l'édition est déficitaire. */
+    /**
+     * Résultat de l'édition : produits moins charges, **réglés ou non**.
+     *
+     * Ne retenir que le réglé donnerait un solde à zéro sur une édition qui n'a encore rien payé
+     * mais doit déjà plusieurs milliers d'euros — une impression d'équilibre trompeuse au moment
+     * précis où l'organisateur a besoin de savoir où il en est.
+     */
     balance: number
   }
 }
@@ -134,18 +173,20 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
     sourceLine(
       'ARTIST_REIMBURSEMENT',
       'EXPENSE',
-      sumArtistField(
+      sumWithMaxFallback(
         artists,
         (a) => a.reimbursementActual,
+        (a) => a.reimbursementMax,
         (a) => a.reimbursementActualPaid
       )
     ),
     sourceLine(
       'ARTIST_CONSUMABLES',
       'EXPENSE',
-      sumArtistField(
+      sumWithMaxFallback(
         artists,
         (a) => a.consumablesActual,
+        (a) => a.consumablesMax,
         (a) => a.consumablesActualPaid
       )
     ),
@@ -188,8 +229,10 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
   const expense = accumulate('EXPENSE')
   const income = accumulate('INCOME')
 
+  const engaged = (amounts: TreasuryAmounts) => amounts.settled + amounts.pending
+
   return {
     lines,
-    totals: { expense, income, balance: income.settled - expense.settled },
+    totals: { expense, income, balance: engaged(income) - engaged(expense) },
   }
 }

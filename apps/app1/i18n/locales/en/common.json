@@ -189,7 +189,8 @@
     "workshops_short": "Workshops",
     "yes": "Yes",
     "currency": "Currency",
-    "amount": "Amount"
+    "amount": "Amount",
+    "treasury_short": "Treasury"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

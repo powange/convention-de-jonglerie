@@ -94,10 +94,17 @@
             />
 
             <div class="flex items-center gap-3 lg:w-56 lg:justify-end">
+              <!-- Le montant engagé est le chiffre principal : une charge existe dès qu'elle est
+                   due, pas quand elle est payée. Le réglé n'apparaît que s'il diffère, pour ne pas
+                   alourdir les lignes déjà soldées. -->
               <div class="text-right">
-                <p class="font-semibold">{{ money(line.settled) }}</p>
-                <p v-if="line.pending" class="text-xs text-amber-600 dark:text-amber-400">
-                  {{ $t('gestion.treasury.pending_amount', { amount: money(line.pending) }) }}
+                <p class="font-semibold">{{ money(lineTotal(line)) }}</p>
+                <p
+                  v-if="line.pending"
+                  class="text-xs text-gray-500 dark:text-gray-400"
+                  :class="{ 'text-amber-600 dark:text-amber-400': !line.settled }"
+                >
+                  {{ $t('gestion.treasury.settled_amount', { amount: money(line.settled) }) }}
                 </p>
               </div>
 
@@ -234,17 +241,22 @@ const groups = computed(() => {
   ]
 })
 
+/** Montant d'une ligne : ce qui est dû, réglé ou non. */
+const lineTotal = (line: TreasuryLine) => line.settled + line.pending
+
 const totalCards = computed(() => {
   const totals = data.value?.totals
-  const hint = (amount: number) =>
-    amount ? t('gestion.treasury.pending_amount', { amount: money(amount) }) : ''
+  const engaged = (amounts?: { settled: number; pending: number }) =>
+    (amounts?.settled ?? 0) + (amounts?.pending ?? 0)
+  const hint = (amounts?: { settled: number; pending: number }) =>
+    amounts?.pending ? t('gestion.treasury.settled_amount', { amount: money(amounts.settled) }) : ''
 
   return [
     {
       key: 'expense',
       label: t('gestion.treasury.expenses'),
-      value: money(totals?.expense.settled ?? 0),
-      hint: hint(totals?.expense.pending ?? 0),
+      value: money(engaged(totals?.expense)),
+      hint: hint(totals?.expense),
       icon: 'i-lucide-trending-down',
       iconBg: 'bg-red-100 dark:bg-red-900/40',
       iconColor: 'text-red-600 dark:text-red-400',
@@ -253,8 +265,8 @@ const totalCards = computed(() => {
     {
       key: 'income',
       label: t('gestion.treasury.incomes'),
-      value: money(totals?.income.settled ?? 0),
-      hint: hint(totals?.income.pending ?? 0),
+      value: money(engaged(totals?.income)),
+      hint: hint(totals?.income),
       icon: 'i-lucide-trending-up',
       iconBg: 'bg-emerald-100 dark:bg-emerald-900/40',
       iconColor: 'text-emerald-600 dark:text-emerald-400',

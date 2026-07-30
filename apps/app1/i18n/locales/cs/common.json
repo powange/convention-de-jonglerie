@@ -189,7 +189,8 @@
     "workshops_short": "Workshopy",
     "yes": "Ano",
     "currency": "Měna",
-    "amount": "Částka"
+    "amount": "Částka",
+    "treasury_short": "Pokladna"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

@@ -583,7 +583,6 @@
       "income": "Дохід",
       "balance": "Сальдо",
       "balance_hint": "Отримані доходи мінус сплачені витрати",
-      "pending_amount": "з них {amount} нараховано",
       "open_source": "Відкрити джерело",
       "manage_codes": "Керувати кодами",
       "add_entry": "Додати рядок",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Компенсації проїзду артистів",
         "ARTIST_CONSUMABLES": "Витратні матеріали артистів",
         "TICKETING_ORDERS": "Замовлення квитків"
-      }
+      },
+      "settled_amount": "з них {amount} сплачено"
     }
   }
 }

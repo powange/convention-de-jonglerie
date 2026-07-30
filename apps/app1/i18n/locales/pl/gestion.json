@@ -583,7 +583,6 @@
       "income": "Przychód",
       "balance": "Saldo",
       "balance_hint": "Wpływy minus poniesione koszty",
-      "pending_amount": "w tym {amount} zadeklarowane",
       "open_source": "Otwórz źródło",
       "manage_codes": "Zarządzaj kodami",
       "add_entry": "Dodaj pozycję",
@@ -610,7 +609,8 @@
         "ARTIST_REIMBURSEMENT": "Zwroty kosztów podróży artystów",
         "ARTIST_CONSUMABLES": "Materiały artystów",
         "TICKETING_ORDERS": "Zamówienia biletów"
-      }
+      },
+      "settled_amount": "w tym {amount} opłacone"
     }
   }
 }

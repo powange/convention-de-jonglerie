@@ -189,7 +189,8 @@
     "workshops_short": "Майстер-класи",
     "yes": "Так",
     "currency": "Валюта",
-    "amount": "Сума"
+    "amount": "Сума",
+    "treasury_short": "Каса"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",

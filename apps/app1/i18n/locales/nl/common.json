@@ -189,7 +189,8 @@
     "workshops_short": "Workshops",
     "yes": "Ja",
     "currency": "Valuta",
-    "amount": "Bedrag"
+    "amount": "Bedrag",
+    "treasury_short": "Financiën"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",
