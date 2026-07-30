@@ -579,6 +579,19 @@ const importAction = useApiActionById<{ item: unknown; alreadyImported: boolean 
  * recharger après chaque objet rendrait la liste instable sous les yeux de l'organisateur.
  */
 /**
+ * Remplace la liste des lignes.
+ *
+ * `useFetch` expose ses données dans une référence **superficielle** (`options.deep ? ref :
+ * shallowRef`). Modifier une ligne sur place ne déclencherait donc aucun rendu : il faut
+ * réaffecter `data.value`. Le rechargement d'avant masquait le problème en remplaçant tout.
+ */
+function replaceRows(update: (rows: ApiRow[]) => ApiRow[]) {
+  const current = data.value
+  if (!current) return
+  data.value = { ...current, rows: update([...current.rows]) }
+}
+
+/**
  * Met à jour la ligne à partir de la réponse, sans recharger la liste.
  *
  * Un rechargement referait télécharger et analyser la carte du fournisseur à chaque objet — une
@@ -586,27 +599,36 @@ const importAction = useApiActionById<{ item: unknown; alreadyImported: boolean 
  * sous les yeux de l'organisateur.
  */
 function applyImportedItem(row: ViewRow, item: Record<string, any>) {
-  const apiRow = (data.value?.rows ?? []).find((r, i) => rowKey(r, i) === row.key)
-  if (!apiRow || !row.object) return
-
+  if (!row.object) return
+  const kind = row.object.kind === 'polygon' ? 'zone' : 'marker'
   const rawTypes = item.zoneTypes ?? item.markerTypes
-  apiRow.state = 'imported'
-  apiRow.editedLocally = false
-  apiRow.record = {
-    id: item.id,
-    name: item.name,
-    kind: row.object.kind === 'polygon' ? 'zone' : 'marker',
-    color: item.color ?? null,
-    types: Array.isArray(rawTypes) ? rawTypes : [],
-    // Un objet fraîchement importé n'a encore rien qui en dépende ; un réimport ne change pas
-    // ce qui y est rattaché, d'où la reprise de la valeur connue.
-    dependencies: row.record?.dependencies ?? {
-      shows: 0,
-      workshops: 0,
-      stockItems: 0,
-      stockReservations: 0,
-    },
-  }
+
+  replaceRows((rows) =>
+    rows.map((r, i) =>
+      rowKey(r, i) === row.key
+        ? {
+            ...r,
+            state: 'imported' as const,
+            editedLocally: false,
+            record: {
+              id: item.id,
+              name: item.name,
+              kind,
+              color: item.color ?? null,
+              types: Array.isArray(rawTypes) ? rawTypes : [],
+              // Un objet fraîchement importé n'a encore rien qui en dépende ; un réimport ne
+              // change pas ce qui y est rattaché, d'où la reprise de la valeur connue.
+              dependencies: r.record?.dependencies ?? {
+                shows: 0,
+                workshops: 0,
+                stockItems: 0,
+                stockReservations: 0,
+              },
+            },
+          }
+        : r
+    )
+  )
 }
 
 async function importRow(row: ViewRow): Promise<boolean> {
@@ -677,20 +699,16 @@ async function runDelete() {
 
   // Là encore, pas de rechargement : la carte du fournisseur n'a pas changé, seule la ligne
   // concernée bouge.
-  const rows = data.value?.rows
-  if (!rows) return
-  const index = rows.findIndex((r, i) => rowKey(r, i) === row.key)
-  if (index === -1) return
-
-  if (rows[index]!.object) {
-    // L'objet existe toujours sur la carte : il redevient importable.
-    rows[index]!.state = 'importable'
-    rows[index]!.record = undefined
-    rows[index]!.editedLocally = false
-  } else {
-    // Ligne « plus retrouvée sur la carte » : plus rien ne la rattache à quoi que ce soit.
-    rows.splice(index, 1)
-  }
+  replaceRows((rows) =>
+    rows.flatMap((r, i) => {
+      if (rowKey(r, i) !== row.key) return [r]
+      // L'objet existe toujours sur la carte : il redevient importable. Sinon la ligne « plus
+      // retrouvée » disparaît, plus rien ne la rattachant à quoi que ce soit.
+      return r.object
+        ? [{ ...r, state: 'importable' as const, record: undefined, editedLocally: false }]
+        : []
+    })
+  )
 }
 
 const switching = ref(false)
