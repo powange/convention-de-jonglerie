@@ -515,29 +515,15 @@ const compareResults = (aiData: any) => {
       const aiValue = aiData.edition[key]
       if (!aiValue) continue
 
-      // Pour les dates, convertir la valeur IA en UTC si elle est en heure locale (sans Z)
-      // puis comparer les timestamps pour éviter les faux positifs
+      // L'IA renvoie une heure murale : elle ne vaut quelque chose qu'accompagnée du fuseau de
+      // l'édition. On compare ensuite des instants, pas des chaînes, pour ne pas proposer de
+      // remplacer une date par elle-même.
       if (key === 'startDate' || key === 'endDate') {
-        let aiDateStr = String(aiValue)
-
-        // Si la date IA n'a pas de Z (heure locale), la convertir en UTC via le timezone de l'édition
-        if (aiDateStr.includes('T') && !aiDateStr.endsWith('Z')) {
-          const tz = aiData.edition.timezone || ed.timezone || 'UTC'
-          try {
-            // Interpréter la date dans le timezone de l'édition et convertir en ISO UTC
-            const localDate = new Date(
-              new Date(aiDateStr).toLocaleString('en-US', { timeZone: 'UTC' })
-            )
-            const tzOffset =
-              new Date(new Date(aiDateStr).toLocaleString('en-US', { timeZone: tz })).getTime() -
-              localDate.getTime()
-            const utcDate = new Date(new Date(aiDateStr).getTime() - tzOffset)
-            aiDateStr = utcDate.toISOString()
-          } catch {
-            // Fallback : ajouter Z pour forcer UTC
-            aiDateStr = aiDateStr + 'Z'
-          }
-        }
+        const tz = aiData.edition.timezone || ed.timezone || 'UTC'
+        const aiDateStr = wallClockToUtcIso(String(aiValue), tz)
+        // Une date illisible n'est pas une proposition : la passer sous silence vaut mieux que
+        // de proposer d'écraser une date correcte par une valeur inventée.
+        if (!aiDateStr) continue
 
         const currentDate = edValue ? new Date(edValue).getTime() : 0
         const aiDate = new Date(aiDateStr).getTime()

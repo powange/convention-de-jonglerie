@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+
 export interface DateFormatOptions {
   locale?: string
   includeTime?: boolean
@@ -189,4 +191,30 @@ export const formatDurationCompact = (ms: number): string => {
 
   // Afficher heures et minutes
   return `${hours}h${minutes.toString().padStart(2, '0')}`
+}
+
+/**
+ * Lit une heure « murale » sans fuseau dans le fuseau donné et rend l'instant UTC.
+ *
+ * `new Date('2026-09-08T01:00')` interprète la chaîne dans le fuseau **du navigateur**, jamais
+ * dans celui de l'édition. Sur un poste réglé à Paris, une heure murale parisienne donnait donc
+ * déjà le bon instant — et la corriger d'un décalage la faussait de deux heures. Sur un poste
+ * réglé ailleurs, elle était fausse dès la lecture.
+ *
+ * Luxon lit la chaîne dans le fuseau demandé, quel que soit celui du navigateur, et applique
+ * l'heure d'été en vigueur à cette date-là plutôt qu'aujourd'hui.
+ *
+ * @param wallClock Heure murale, ex. `2026-09-08T01:00` (un `Z` final la rend déjà absolue)
+ * @param timeZone Fuseau dans lequel lire cette heure, ex. `Europe/Paris`
+ * @returns Instant en ISO UTC, ou `null` si l'entrée est illisible
+ */
+export const wallClockToUtcIso = (wallClock: string, timeZone: string): string | null => {
+  if (!wallClock) return null
+  // Déjà absolue : la normaliser suffit, la relire dans un fuseau la décalerait.
+  if (wallClock.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(wallClock)) {
+    const absolute = DateTime.fromISO(wallClock)
+    return absolute.isValid ? absolute.toUTC().toISO() : null
+  }
+  const parsed = DateTime.fromISO(wallClock, { zone: timeZone })
+  return parsed.isValid ? parsed.toUTC().toISO() : null
 }
