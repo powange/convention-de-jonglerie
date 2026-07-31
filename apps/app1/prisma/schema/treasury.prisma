@@ -22,7 +22,9 @@ enum TreasurySource {
   ARTIST_PAYMENT // cachets des artistes
   ARTIST_REIMBURSEMENT // défraiements trajet
   ARTIST_CONSUMABLES // consommables
-  TICKETING_ORDERS // commandes de billetterie, remboursements déduits
+  TICKETING_PARTICIPANTS // billets comptés comme participants, remboursements déduits
+  TICKETING_DONATIONS // dons, sans contrepartie
+  TICKETING_OTHER // ventes annexes et tarifs non comptés comme participants
 }
 
 /// Code d'imputation comptable, défini au niveau de la convention.

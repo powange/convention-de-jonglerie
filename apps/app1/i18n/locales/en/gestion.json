@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Artist fees",
         "ARTIST_REIMBURSEMENT": "Artist travel reimbursements",
         "ARTIST_CONSUMABLES": "Artist consumables",
-        "TICKETING_ORDERS": "Ticketing orders"
+        "TICKETING_PARTICIPANTS": "Participant tickets",
+        "TICKETING_DONATIONS": "Donations",
+        "TICKETING_OTHER": "Ticketing — other income"
       },
       "settled_amount": "including {amount} settled"
     }

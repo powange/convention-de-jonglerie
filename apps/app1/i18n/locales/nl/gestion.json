@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Gages van de artiesten",
         "ARTIST_REIMBURSEMENT": "Reiskostenvergoedingen van de artiesten",
         "ARTIST_CONSUMABLES": "Verbruiksgoederen van de artiesten",
-        "TICKETING_ORDERS": "Ticketbestellingen"
+        "TICKETING_PARTICIPANTS": "Deelnemerstickets",
+        "TICKETING_DONATIONS": "Donaties",
+        "TICKETING_OTHER": "Ticketing — overige inkomsten"
       },
       "settled_amount": "waarvan {amount} voldaan"
     }

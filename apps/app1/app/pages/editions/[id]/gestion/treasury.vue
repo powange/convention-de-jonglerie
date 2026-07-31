@@ -212,7 +212,7 @@ const lineTitle = (line: TreasuryLine) =>
 
 /** Chaque origine renvoie vers la page où son montant se corrige. */
 const sourceLink = (line: TreasuryLine) =>
-  line.source === 'TICKETING_ORDERS'
+  line.source?.startsWith('TICKETING_')
     ? `/editions/${editionId.value}/gestion/ticketing/orders`
     : `/editions/${editionId.value}/gestion/artists`
 

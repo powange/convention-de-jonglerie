@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Kunstnerhonorarer",
         "ARTIST_REIMBURSEMENT": "Kunstnernes rejsegodtgørelse",
         "ARTIST_CONSUMABLES": "Kunstnernes forbrugsvarer",
-        "TICKETING_ORDERS": "Billetordrer"
+        "TICKETING_PARTICIPANTS": "Deltagerbilletter",
+        "TICKETING_DONATIONS": "Donationer",
+        "TICKETING_OTHER": "Billetsalg — andre indtægter"
       },
       "settled_amount": "heraf {amount} betalt"
     }

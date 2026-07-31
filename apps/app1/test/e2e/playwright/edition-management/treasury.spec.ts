@@ -36,9 +36,11 @@ test.describe.serial("Trésorerie d'une édition", () => {
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
     await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
 
-    // Les quatre lignes calculées (cachets, défraiements, billetterie, remboursements) sont
-    // toujours présentes, quel que soit leur montant.
-    await expect(page.getByTestId('treasury-line')).toHaveCount(4)
+    // Les lignes calculées sont toujours là, quel que soit leur montant. Leur nombre suit les
+    // origines et change quand on en ajoute une — le compter en dur ferait échouer ce parcours
+    // à chaque enrichissement de la trésorerie, sans qu'aucune régression n'ait eu lieu.
+    const baseLines = await page.getByTestId('treasury-line').count()
+    expect(baseLines, 'aucune ligne calculée : la trésorerie ne charge pas').toBeGreaterThan(0)
 
     // L'édition est partagée avec les autres parcours, qui y ajoutent des artistes : son solde
     // de départ n'est pas nul et dépend de l'ordre d'exécution. C'est l'écart qui prouve
@@ -47,10 +49,10 @@ test.describe.serial("Trésorerie d'une édition", () => {
     const before = await readBalance(page)
 
     await addEntry(page, { kind: 'Charge', title: 'Location salle E2E', amount: 150 })
-    await expect(page.getByTestId('treasury-line')).toHaveCount(5)
+    await expect(page.getByTestId('treasury-line')).toHaveCount(baseLines + 1)
 
     await addEntry(page, { kind: 'Produit', title: 'Subvention E2E', amount: 400 })
-    await expect(page.getByTestId('treasury-line')).toHaveCount(6)
+    await expect(page.getByTestId('treasury-line')).toHaveCount(baseLines + 2)
 
     // 400 encaissés moins 150 dépensés : le solde doit progresser de 250, et lui seul le prouve.
     await expect.poll(() => readBalance(page), { timeout: 15000 }).toBeCloseTo(before + 250, 2)
@@ -62,6 +64,8 @@ test.describe.serial("Trésorerie d'une édition", () => {
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
     await expect(page.getByTestId('treasury-line').first()).toBeVisible({ timeout: 20000 })
 
+    const before = await page.getByTestId('treasury-line').count()
+
     // Les lignes calculées n'ont pas de bouton de suppression : seules les saisies en portent un.
     for (const title of ['Location salle E2E', 'Subvention E2E']) {
       const row = page.getByTestId('treasury-line').filter({ hasText: title })
@@ -69,7 +73,8 @@ test.describe.serial("Trésorerie d'une édition", () => {
       await expect(row).toHaveCount(0, { timeout: 15000 })
     }
 
-    await expect(page.getByTestId('treasury-line')).toHaveCount(4)
+    // Les deux saisies partent, les lignes calculées restent.
+    await expect(page.getByTestId('treasury-line')).toHaveCount(before - 2)
   })
 })
 

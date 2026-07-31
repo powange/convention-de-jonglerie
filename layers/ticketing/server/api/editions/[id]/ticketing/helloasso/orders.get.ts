@@ -3,6 +3,21 @@ import { fetchOrdersFromHelloAsso } from '#server/utils/editions/ticketing/hello
 import { decrypt } from '#server/utils/encryption'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
+/**
+ * Total d'une commande : ses lignes, **options comprises**.
+ *
+ * Le prix d'une option est enregistré dans sa propre table et n'entrait dans aucun total. Sur
+ * une édition, deux cent quatre-vingt-onze euros de bouteilles étaient ainsi encaissés sans
+ * apparaître : ni dans le montant affiché de la commande, ni dans la trésorerie.
+ */
+function orderTotal(order: { items: Array<{ amount: number; options?: Array<{ amount?: number }> }> }) {
+  return order.items.reduce(
+    (sum, item) =>
+      sum + item.amount + (item.options ?? []).reduce((s, option) => s + (option.amount || 0), 0),
+    0
+  )
+}
+
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
@@ -81,7 +96,7 @@ export default wrapApiHandler(
                 payerFirstName: order.payer.firstName,
                 payerLastName: order.payer.lastName,
                 payerEmail: order.payer.email,
-                amount: order.items.reduce((sum, item) => sum + item.amount, 0),
+                amount: orderTotal(order),
                 status: 'Processed', // TODO: récupérer le statut réel
                 paymentMethod: 'card', // HelloAsso = paiement par carte
                 orderDate: new Date(order.date), // Date de la commande HelloAsso
@@ -90,7 +105,7 @@ export default wrapApiHandler(
                 payerFirstName: order.payer.firstName,
                 payerLastName: order.payer.lastName,
                 payerEmail: order.payer.email,
-                amount: order.items.reduce((sum, item) => sum + item.amount, 0),
+                amount: orderTotal(order),
                 status: 'Processed',
                 paymentMethod: 'card', // HelloAsso = paiement par carte
                 orderDate: new Date(order.date), // Mettre à jour la date si elle a changé

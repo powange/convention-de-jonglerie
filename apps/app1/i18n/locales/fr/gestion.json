@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Cachets des artistes",
         "ARTIST_REIMBURSEMENT": "Défraiements trajet des artistes",
         "ARTIST_CONSUMABLES": "Consommables des artistes",
-        "TICKETING_ORDERS": "Commandes de billetterie"
+        "TICKETING_PARTICIPANTS": "Billets participants",
+        "TICKETING_DONATIONS": "Dons",
+        "TICKETING_OTHER": "Billetterie — autres produits"
       },
       "settled_amount": "dont {amount} réglé"
     }

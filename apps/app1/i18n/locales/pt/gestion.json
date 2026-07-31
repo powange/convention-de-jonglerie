@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Cachês dos artistas",
         "ARTIST_REIMBURSEMENT": "Ajudas de custo de viagem dos artistas",
         "ARTIST_CONSUMABLES": "Consumíveis dos artistas",
-        "TICKETING_ORDERS": "Encomendas de bilheteira"
+        "TICKETING_PARTICIPANTS": "Bilhetes de participantes",
+        "TICKETING_DONATIONS": "Doações",
+        "TICKETING_OTHER": "Bilheteira — outras receitas"
       },
       "settled_amount": "dos quais {amount} liquidados"
     }

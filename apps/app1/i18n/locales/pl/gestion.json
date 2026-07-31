@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Honoraria artystów",
         "ARTIST_REIMBURSEMENT": "Zwroty kosztów podróży artystów",
         "ARTIST_CONSUMABLES": "Materiały artystów",
-        "TICKETING_ORDERS": "Zamówienia biletów"
+        "TICKETING_PARTICIPANTS": "Bilety uczestników",
+        "TICKETING_DONATIONS": "Darowizny",
+        "TICKETING_OTHER": "Bilety — pozostałe przychody"
       },
       "settled_amount": "w tym {amount} opłacone"
     }

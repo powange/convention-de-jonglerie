@@ -3,19 +3,11 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
 import {
   computeTreasury,
+  aggregateTicketingItems,
   type TicketingTotals,
   type TreasurySourceKey,
 } from '#server/utils/treasury-compute'
 import { validateEditionId } from '#server/utils/validation-helpers'
-
-/**
- * Statuts de commande, tels que la billetterie les enregistre.
- *
- * `Processed` et `Onsite` sont encaissés — l'un par la billetterie externe, l'autre sur place ;
- * ils restent distincts parce que le calcul les additionne lui-même.
- */
-const PENDING_STATUSES = ['Pending']
-const REFUNDED_STATUSES = ['Refunded']
 
 /**
  * GET /api/editions/:id/treasury
@@ -47,7 +39,7 @@ export default wrapApiHandler(
 
     const codeSelect = { id: true, code: true, label: true } as const
 
-    const [artists, ordersByStatus, manualEntries, sourceCodeRows, codes] = await Promise.all([
+    const [artists, orderItems, manualEntries, sourceCodeRows, codes] = await Promise.all([
       prisma.editionArtist.findMany({
         where: { editionId },
         select: {
@@ -61,10 +53,19 @@ export default wrapApiHandler(
           consumablesActualPaid: true,
         },
       }),
-      prisma.ticketingOrder.groupBy({
-        by: ['status'],
-        where: { editionId },
-        _sum: { amount: true },
+      // Descendre à la ligne de commande est la seule façon de distinguer une entrée d'une
+      // vente annexe : le partage vit sur le tarif, pas sur la commande.
+      prisma.ticketingOrderItem.findMany({
+        where: { order: { editionId } },
+        select: {
+          amount: true,
+          type: true,
+          order: { select: { status: true } },
+          tier: { select: { countAsParticipant: true } },
+          // Le prix d'une option n'est nulle part ailleurs : ni dans la ligne, ni dans le total
+          // de la commande, tous deux calculés avant que les options n'existent.
+          selectedOptions: { select: { amount: true } },
+        },
       }),
       prisma.treasuryEntry.findMany({
         where: { editionId },
@@ -89,17 +90,14 @@ export default wrapApiHandler(
       }),
     ])
 
-    const sumOf = (statuses: string[]) =>
-      ordersByStatus
-        .filter((row) => statuses.includes(row.status))
-        .reduce((total, row) => total + (row._sum.amount ?? 0), 0)
-
-    const ticketing: TicketingTotals = {
-      processed: sumOf(['Processed']),
-      onsite: sumOf(['Onsite']),
-      pending: sumOf(PENDING_STATUSES),
-      refunded: sumOf(REFUNDED_STATUSES),
-    }
+    const ticketing: TicketingTotals = aggregateTicketingItems(
+      orderItems.map((item) => ({
+        amount: item.amount + item.selectedOptions.reduce((sum, option) => sum + option.amount, 0),
+        orderStatus: item.order.status,
+        countAsParticipant: item.tier?.countAsParticipant ?? null,
+        type: item.type,
+      }))
+    )
     const sourceCodes = Object.fromEntries(
       sourceCodeRows.map((row) => [row.source as TreasurySourceKey, row.code])
     )

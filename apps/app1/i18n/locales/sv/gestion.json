@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Artistgager",
         "ARTIST_REIMBURSEMENT": "Artisternas reseersättningar",
         "ARTIST_CONSUMABLES": "Artisternas förbrukningsmaterial",
-        "TICKETING_ORDERS": "Biljettbeställningar"
+        "TICKETING_PARTICIPANTS": "Deltagarbiljetter",
+        "TICKETING_DONATIONS": "Donationer",
+        "TICKETING_OTHER": "Biljettförsäljning — övriga intäkter"
       },
       "settled_amount": "varav {amount} betalt"
     }
