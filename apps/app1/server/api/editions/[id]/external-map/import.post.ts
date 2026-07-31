@@ -5,7 +5,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionForEdit } from '#server/utils/permissions/edition-permissions'
 import { editionMarkerSelect, editionZoneSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { zoneTypesArraySchema } from '#server/utils/zone-validation'
+import { resolveMarkerZoneId, zoneTypesArraySchema } from '#server/utils/zone-validation'
 import { ZONE_LIMITS } from '~~/shared/utils/zone-types'
 
 /** Code Prisma d'une violation de contrainte d'unicité. */
@@ -48,6 +48,8 @@ const bodySchema = z.object({
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Couleur invalide (format #RRGGBB)'),
   types: zoneTypesArraySchema,
   coordinates: z.array(z.tuple([z.number().min(-90).max(90), z.number().min(-180).max(180)])),
+  /** Zone dont ce point est l'entrée. Réservé aux points ; `null` détache. */
+  zoneId: z.number().int().positive().nullable().optional(),
 })
 
 /**
@@ -76,6 +78,14 @@ export default wrapApiHandler(
     if (data.kind === 'point' && data.coordinates.length !== 1) {
       throw createError({ status: 400, message: 'Un point demande exactement une coordonnée' })
     }
+    // Refuser plutôt qu'ignorer : un rattachement silencieusement écarté se remarquerait bien
+    // plus tard, quand la zone n'apparaîtrait nulle part.
+    if (data.kind === 'polygon' && data.zoneId !== undefined) {
+      throw createError({ status: 400, message: 'Une zone ne se rattache pas à une autre zone' })
+    }
+
+    // Vérifié une fois pour les deux chemins : la zone doit appartenir à cette édition.
+    const zoneId = await resolveMarkerZoneId(editionId, data.zoneId)
 
     const importedAt = new Date()
 
@@ -118,6 +128,8 @@ export default wrapApiHandler(
               latitude,
               longitude,
               markerTypes: data.types,
+              // Un réimport applique le rattachement comme il applique les catégories.
+              zoneId,
               externalMapImportedAt: importedAt,
             },
             select: editionMarkerSelect,
@@ -190,6 +202,7 @@ export default wrapApiHandler(
           longitude,
           markerTypes: data.types,
           color: data.color,
+          zoneId: zoneId ?? null,
           order: (maxOrder._max.order ?? -1) + 1,
           externalMapObjectId: data.externalId,
           externalMapImportedAt: importedAt,

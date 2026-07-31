@@ -22,6 +22,8 @@ export interface ImportedRecord {
   /** Catégories enregistrées, même usage. */
   types: string[]
   externalMapObjectId: string | null
+  /** Zone dont ce marqueur est l'entrée. Toujours `null` pour une zone. */
+  zoneId: number | null
   externalMapImportedAt: Date | null
   updatedAt: Date
   /** Ce qui perdrait son lieu si on supprimait cet objet. */

@@ -89,6 +89,58 @@ describe('POST /api/editions/[id]/external-map/import', () => {
     expect(data.externalMapObjectId).toBe('BBB1')
   })
 
+  it('rattache le point importé à une zone de l’édition', async () => {
+    setBody({ ...POINT, zoneId: 7 })
+    prismaMock.editionZone.findFirst.mockResolvedValue({ id: 7 })
+
+    await handler(baseEvent as any)
+
+    expect(prismaMock.editionZone.findFirst).toHaveBeenCalledWith({
+      where: { id: 7, editionId: 24 },
+      select: { id: true },
+    })
+    expect(prismaMock.editionMarker.create.mock.calls[0][0].data.zoneId).toBe(7)
+  })
+
+  // Le réimport applique le rattachement comme il applique les catégories : c'est ce qui permet
+  // de corriger une entrée depuis cet écran sans repasser par la carte.
+  it('applique le rattachement lors d’un réimport', async () => {
+    setBody({ ...POINT, zoneId: 7 })
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ id: 5 })
+    prismaMock.editionZone.findFirst.mockResolvedValue({ id: 7 })
+
+    await handler(baseEvent as any)
+
+    expect(prismaMock.editionMarker.update.mock.calls[0][0].data.zoneId).toBe(7)
+  })
+
+  it('détache le point quand le rattachement est vidé', async () => {
+    setBody({ ...POINT, zoneId: null })
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ id: 5 })
+
+    await handler(baseEvent as any)
+
+    expect(prismaMock.editionZone.findFirst).not.toHaveBeenCalled()
+    expect(prismaMock.editionMarker.update.mock.calls[0][0].data.zoneId).toBeNull()
+  })
+
+  it("refuse une zone qui n'appartient pas à l'édition", async () => {
+    setBody({ ...POINT, zoneId: 999 })
+    prismaMock.editionZone.findFirst.mockResolvedValue(null)
+
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+    expect(prismaMock.editionMarker.create).not.toHaveBeenCalled()
+  })
+
+  // Ignorer le rattachement se remarquerait bien plus tard, quand la zone n'apparaîtrait nulle
+  // part : mieux vaut refuser tout de suite.
+  it('refuse un rattachement porté par un polygone', async () => {
+    setBody({ ...POLYGON, zoneId: 7 })
+
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+    expect(prismaMock.editionZone.create).not.toHaveBeenCalled()
+  })
+
   // Un double-clic ne doit pas créer deux fois le même objet.
   it('ne recrée pas un objet déjà importé', async () => {
     setBody(POLYGON)
