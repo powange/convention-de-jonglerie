@@ -870,7 +870,7 @@ import InfomaniakConfigModal from '../../../../../components/edition/ticketing/I
 import type { InfomaniakConfig } from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
 import type { TabsItem } from '@nuxt/ui'
 
-const { symbol } = useEditionCurrency()
+const { money, symbol } = useEditionCurrency()
 
 const route = useRoute()
 const editionStore = useEditionStore()

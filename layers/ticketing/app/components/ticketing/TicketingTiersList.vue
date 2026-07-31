@@ -287,7 +287,7 @@ import { isFixedPrice, type TicketingTier } from '../../utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
 
-const { symbol } = useEditionCurrency()
+const { money, symbol } = useEditionCurrency()
 
 const props = defineProps<{
   tiers: TicketingTier[]
