@@ -1,71 +1,71 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Политика конфиденциальности",
+    "last_updated": "Последнее обновление",
+    "update_date": "11 сентября 2025 г.",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Оператор обработки данных",
+        "content": "Convention de Jonglerie является оператором обработки ваших персональных данных. Мы обязуемся защищать вашу частную жизнь и обрабатывать ваши персональные данные прозрачно и в соответствии с Общим регламентом по защите данных (GDPR)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Собираемые данные",
+        "intro": "Мы собираем следующие категории персональных данных:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Идентификационные данные: фамилия, имя, псевдоним",
+          "contact": "Контактные данные: адрес электронной почты",
+          "preferences": "Пользовательские настройки: избранные конвенты, параметры уведомлений"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Цели обработки",
+        "intro": "Ваши персональные данные обрабатываются в следующих целях:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Управление вашей учётной записью и аутентификация",
+          "service_provision": "Предоставление услуг платформы (просмотр, добавление конвентов)",
+          "communication": "Обмен сообщениями об услуге и важные уведомления",
+          "improvement": "Улучшение наших услуг и анализ использования"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Правовое основание",
+        "content": "Обработка ваших персональных данных основана на вашем согласии на создание учётной записи и использование услуги, а также на нашем законном интересе в улучшении услуг и обеспечении безопасности платформы."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Передача данных",
+        "content": "Мы не продаём, не сдаём в аренду и не передаём ваши персональные данные третьим лицам, за исключением следующих случаев: требование закона, защита наших прав или ваше явное согласие. Данные могут передаваться нашим техническим поставщикам строго в объёме, необходимом для предоставления услуги."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Хранение данных",
+        "content": "Ваши персональные данные хранятся в течение срока, необходимого для целей, ради которых они были собраны. Учётные записи, неактивные более 3 лет, могут быть удалены после предварительного уведомления."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Ваши права",
+        "intro": "В соответствии с GDPR вы обладаете следующими правами:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Право на доступ: получить копию своих персональных данных",
+          "rectification": "Право на исправление: исправить неточные или неполные данные",
+          "erasure": "Право на удаление: удалить свои персональные данные",
+          "portability": "Право на переносимость: получить свои данные в структурированном формате",
+          "objection": "Право на возражение: возразить против обработки своих данных"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Файлы cookie и аналогичные технологии",
+        "content": "Мы используем технические файлы cookie, необходимые для работы сайта, в частности для управления сеансом входа. Эти файлы cookie не требуют вашего предварительного согласия, поскольку строго необходимы для предоставления услуги."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Безопасность данных",
+        "content": "Мы применяем надлежащие технические и организационные меры для защиты ваших персональных данных от утраты, неправомерного использования, несанкционированного доступа, раскрытия, изменения или несанкционированного уничтожения."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Изменения политики",
+        "content": "Настоящая политика конфиденциальности может периодически обновляться. Мы сообщим вам о любом существенном изменении по электронной почте или через уведомление на сайте."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
-        "email_label": "E-mail"
+        "title": "Контакты",
+        "content": "По любым вопросам, касающимся настоящей политики конфиденциальности, или для осуществления своих прав вы можете связаться с нами по адресу:",
+        "email_label": "Эл. почта"
       }
     }
   }

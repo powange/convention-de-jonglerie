@@ -1,70 +1,70 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Polityka prywatności",
+    "last_updated": "Ostatnia aktualizacja",
+    "update_date": "11 września 2025",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Administrator danych",
+        "content": "Convention de Jonglerie jest administratorem Twoich danych osobowych. Zobowiązujemy się chronić Twoją prywatność oraz przetwarzać Twoje dane osobowe w sposób przejrzysty i zgodny z Ogólnym rozporządzeniem o ochronie danych (RODO)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Zbierane dane",
+        "intro": "Zbieramy następujące rodzaje danych osobowych:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Dane identyfikacyjne: nazwisko, imię, pseudonim",
+          "contact": "Dane kontaktowe: adres e-mail",
+          "preferences": "Preferencje użytkownika: ulubione konwenty, ustawienia powiadomień"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Cele przetwarzania",
+        "intro": "Twoje dane osobowe są przetwarzane w następujących celach:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Zarządzanie Twoim kontem użytkownika i uwierzytelnianie",
+          "service_provision": "Świadczenie usług platformy (przeglądanie, dodawanie konwentów)",
+          "communication": "Komunikacja dotycząca usługi i ważne powiadomienia",
+          "improvement": "Ulepszanie naszych usług i analiza korzystania"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Podstawa prawna",
+        "content": "Przetwarzanie Twoich danych osobowych opiera się na Twojej zgodzie na założenie konta i korzystanie z usługi, a także na naszym prawnie uzasadnionym interesie polegającym na ulepszaniu usług i zapewnieniu bezpieczeństwa platformy."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Udostępnianie danych",
+        "content": "Nie sprzedajemy, nie wynajmujemy ani nie udostępniamy Twoich danych osobowych osobom trzecim, z wyjątkiem następujących przypadków: obowiązek prawny, ochrona naszych praw lub Twoja wyraźna zgoda. Dane mogą być udostępniane naszym dostawcom technicznym wyłącznie w zakresie niezbędnym do świadczenia usługi."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Przechowywanie danych",
+        "content": "Twoje dane osobowe są przechowywane przez okres niezbędny do celów, dla których zostały zebrane. Konta nieaktywne od ponad 3 lat mogą zostać usunięte po uprzednim powiadomieniu."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Twoje prawa",
+        "intro": "Zgodnie z RODO przysługują Ci następujące prawa:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Prawo dostępu: uzyskanie kopii swoich danych osobowych",
+          "rectification": "Prawo do sprostowania: poprawienie nieprawidłowych lub niekompletnych danych",
+          "erasure": "Prawo do usunięcia: usunięcie swoich danych osobowych",
+          "portability": "Prawo do przenoszenia: otrzymanie swoich danych w ustrukturyzowanym formacie",
+          "objection": "Prawo do sprzeciwu: wniesienie sprzeciwu wobec przetwarzania swoich danych"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Pliki cookie i podobne technologie",
+        "content": "Stosujemy techniczne pliki cookie niezbędne do działania serwisu, w szczególności do obsługi sesji logowania. Te pliki cookie nie wymagają Twojej uprzedniej zgody, ponieważ są ściśle niezbędne do świadczenia usługi."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Bezpieczeństwo danych",
+        "content": "Wdrażamy odpowiednie środki techniczne i organizacyjne w celu ochrony Twoich danych osobowych przed utratą, niewłaściwym wykorzystaniem, nieuprawnionym dostępem, ujawnieniem, zmianą lub nieuprawnionym zniszczeniem."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Zmiany polityki",
+        "content": "Niniejsza polityka prywatności może być okresowo aktualizowana. O każdej istotnej zmianie poinformujemy Cię pocztą elektroniczną lub za pomocą powiadomienia w serwisie."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
+        "title": "Kontakt",
+        "content": "W przypadku pytań dotyczących niniejszej polityki prywatności lub w celu skorzystania ze swoich praw możesz skontaktować się z nami pod adresem:",
         "email_label": "E-mail"
       }
     }

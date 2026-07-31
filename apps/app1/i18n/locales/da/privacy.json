@@ -1,70 +1,70 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Privatlivspolitik",
+    "last_updated": "Senest opdateret",
+    "update_date": "11. september 2025",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Dataansvarlig",
+        "content": "Convention de Jonglerie er dataansvarlig for behandlingen af dine personoplysninger. Vi forpligter os til at beskytte dit privatliv og behandle dine personoplysninger gennemsigtigt og i overensstemmelse med databeskyttelsesforordningen (GDPR)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Indsamlede oplysninger",
+        "intro": "Vi indsamler følgende typer personoplysninger:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Identitetsoplysninger: efternavn, fornavn, brugernavn",
+          "contact": "Kontaktoplysninger: e-mailadresse",
+          "preferences": "Brugerpræferencer: foretrukne konventer, notifikationsindstillinger"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Formål med behandlingen",
+        "intro": "Dine personoplysninger behandles til følgende formål:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Administration af din brugerkonto og godkendelse",
+          "service_provision": "Levering af platformens tjenester (visning, tilføjelse af konventer)",
+          "communication": "Kommunikation om tjenesten og vigtige notifikationer",
+          "improvement": "Forbedring af vores tjenester og analyse af brugen"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Retsgrundlag",
+        "content": "Behandlingen af dine personoplysninger hviler på dit samtykke til oprettelse af konto og brug af tjenesten samt på vores legitime interesse i at forbedre vores tjenester og sikre platformen."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Videregivelse af oplysninger",
+        "content": "Vi sælger, udlejer eller deler ikke dine personoplysninger med tredjeparter, undtagen i følgende tilfælde: retlig forpligtelse, beskyttelse af vores rettigheder eller med dit udtrykkelige samtykke. Oplysninger kan deles med vores tekniske leverandører, udelukkende i det omfang det er nødvendigt for at levere tjenesten."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Opbevaring af oplysninger",
+        "content": "Dine personoplysninger opbevares, så længe det er nødvendigt til de formål, hvortil de er indsamlet. Konti, der har været inaktive i mere end 3 år, kan slettes efter forudgående varsel."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Dine rettigheder",
+        "intro": "I henhold til GDPR har du følgende rettigheder:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Ret til indsigt: at få en kopi af dine personoplysninger",
+          "rectification": "Ret til berigtigelse: at få urigtige eller ufuldstændige oplysninger rettet",
+          "erasure": "Ret til sletning: at få dine personoplysninger slettet",
+          "portability": "Ret til dataportabilitet: at modtage dine oplysninger i et struktureret format",
+          "objection": "Ret til indsigelse: at gøre indsigelse mod behandlingen af dine oplysninger"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Cookies og lignende teknologier",
+        "content": "Vi anvender tekniske cookies, der er nødvendige for sidens funktion, navnlig til håndtering af din login-session. Disse cookies kræver ikke dit forudgående samtykke, da de er strengt nødvendige for at levere tjenesten."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Datasikkerhed",
+        "content": "Vi iværksætter passende tekniske og organisatoriske foranstaltninger for at beskytte dine personoplysninger mod tab, misbrug, uautoriseret adgang, videregivelse, ændring eller uautoriseret tilintetgørelse."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Ændringer af politikken",
+        "content": "Denne privatlivspolitik kan blive opdateret med jævne mellemrum. Vi underretter dig om enhver væsentlig ændring via e-mail eller ved en meddelelse på siden."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
+        "title": "Kontakt",
+        "content": "Har du spørgsmål til denne privatlivspolitik, eller ønsker du at udøve dine rettigheder, kan du kontakte os på:",
         "email_label": "E-mail"
       }
     }

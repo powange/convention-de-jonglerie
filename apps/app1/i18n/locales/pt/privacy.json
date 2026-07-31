@@ -1,70 +1,70 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Política de privacidade",
+    "last_updated": "Última atualização",
+    "update_date": "11 de setembro de 2025",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Responsável pelo tratamento",
+        "content": "A Convention de Jonglerie é responsável pelo tratamento dos seus dados pessoais. Comprometemo-nos a proteger a sua privacidade e a tratar os seus dados pessoais de forma transparente e em conformidade com o Regulamento Geral sobre a Proteção de Dados (RGPD)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Dados recolhidos",
+        "intro": "Recolhemos os seguintes tipos de dados pessoais:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Dados de identificação: apelido, nome próprio, pseudónimo",
+          "contact": "Dados de contacto: endereço de e-mail",
+          "preferences": "Preferências do utilizador: convenções favoritas, definições de notificação"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Finalidades do tratamento",
+        "intro": "Os seus dados pessoais são tratados para as seguintes finalidades:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Gestão da sua conta de utilizador e autenticação",
+          "service_provision": "Prestação dos serviços da plataforma (consulta, adição de convenções)",
+          "communication": "Comunicações relativas ao serviço e notificações importantes",
+          "improvement": "Melhoria dos nossos serviços e análise de utilização"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Base legal",
+        "content": "O tratamento dos seus dados pessoais assenta no seu consentimento para a criação da conta e a utilização do serviço, bem como no nosso interesse legítimo na melhoria dos serviços e na segurança da plataforma."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Partilha de dados",
+        "content": "Não vendemos, não alugamos nem partilhamos os seus dados pessoais com terceiros, salvo nos seguintes casos: obrigação legal, proteção dos nossos direitos ou com o seu consentimento explícito. Os dados podem ser partilhados com os nossos prestadores técnicos no âmbito estrito da prestação do serviço."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Conservação dos dados",
+        "content": "Os seus dados pessoais são conservados pelo tempo necessário às finalidades para as quais foram recolhidos. As contas inativas há mais de 3 anos podem ser eliminadas após notificação prévia."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Os seus direitos",
+        "intro": "Nos termos do RGPD, dispõe dos seguintes direitos:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Direito de acesso: obter uma cópia dos seus dados pessoais",
+          "rectification": "Direito de retificação: corrigir dados inexatos ou incompletos",
+          "erasure": "Direito ao apagamento: eliminar os seus dados pessoais",
+          "portability": "Direito à portabilidade: obter os seus dados num formato estruturado",
+          "objection": "Direito de oposição: opor-se ao tratamento dos seus dados"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Cookies e tecnologias semelhantes",
+        "content": "Utilizamos cookies técnicos necessários ao funcionamento do site, nomeadamente para a gestão da sua sessão de início de sessão. Estes cookies não exigem o seu consentimento prévio por serem estritamente necessários à prestação do serviço."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Segurança dos dados",
+        "content": "Aplicamos medidas técnicas e organizativas adequadas para proteger os seus dados pessoais contra a perda, a utilização abusiva, o acesso não autorizado, a divulgação, a alteração ou a destruição não autorizada."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Alterações à política",
+        "content": "Esta política de privacidade pode ser atualizada periodicamente. Informá-lo-emos de qualquer alteração substancial por e-mail ou através de uma notificação no site."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
+        "title": "Contacto",
+        "content": "Para qualquer questão sobre esta política de privacidade ou para exercer os seus direitos, pode contactar-nos através de:",
         "email_label": "E-mail"
       }
     }
