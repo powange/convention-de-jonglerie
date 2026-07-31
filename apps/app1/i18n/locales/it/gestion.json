@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Cachet degli artisti",
         "ARTIST_REIMBURSEMENT": "Rimborsi viaggio degli artisti",
         "ARTIST_CONSUMABLES": "Materiali di consumo degli artisti",
-        "TICKETING_ORDERS": "Ordini di biglietteria"
+        "TICKETING_PARTICIPANTS": "Biglietti partecipanti",
+        "TICKETING_DONATIONS": "Donazioni",
+        "TICKETING_OTHER": "Biglietteria — altri ricavi"
       },
       "settled_amount": "di cui {amount} saldati"
     }

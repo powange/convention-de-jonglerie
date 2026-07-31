@@ -11,7 +11,9 @@ const bodySchema = z.object({
     'ARTIST_PAYMENT',
     'ARTIST_REIMBURSEMENT',
     'ARTIST_CONSUMABLES',
-    'TICKETING_ORDERS',
+    'TICKETING_PARTICIPANTS',
+    'TICKETING_DONATIONS',
+    'TICKETING_OTHER',
   ]),
   /** `null` retire l'imputation de cette origine. */
   codeId: z.number().int().positive().nullable(),

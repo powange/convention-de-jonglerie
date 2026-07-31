@@ -14,7 +14,9 @@ export type TreasurySourceKey =
   | 'ARTIST_PAYMENT'
   | 'ARTIST_REIMBURSEMENT'
   | 'ARTIST_CONSUMABLES'
-  | 'TICKETING_ORDERS'
+  | 'TICKETING_PARTICIPANTS'
+  | 'TICKETING_DONATIONS'
+  | 'TICKETING_OTHER'
 
 /** Ce qui est réellement réglé, et ce qui est engagé sans l'être encore. */
 export interface TreasuryAmounts {
@@ -48,12 +50,32 @@ export interface ArtistAmountsRow {
   consumablesActualPaid: boolean
 }
 
-/** Commandes agrégées par statut, en centimes. */
-export interface TicketingTotals {
+/** Lignes de commande agrégées par statut, en centimes. */
+export interface TicketingStatusTotals {
   processed: number
   onsite: number
   pending: number
   refunded: number
+}
+
+/**
+ * Billetterie séparée en deux produits distincts.
+ *
+ * Une entrée et un tee-shirt ne se lisent pas de la même façon : la première suit la
+ * fréquentation, le second est une vente annexe. Les confondre en une seule ligne empêche de
+ * rapprocher le produit des entrées du nombre de participants.
+ *
+ * Le partage suit `countAsParticipant`, déjà porté par les tarifs et déjà utilisé par les
+ * statistiques : ce qui est compté comme participant là-bas l'est ici aussi.
+ *
+ * Les dons forment une troisième ligne : ce ne sont ni une contrepartie ni une vente, et bien
+ * des conventions les imputent à un compte distinct. Les ventes annexes — vêtements, options —
+ * restent avec les autres produits.
+ */
+export interface TicketingTotals {
+  participants: TicketingStatusTotals
+  donations: TicketingStatusTotals
+  other: TicketingStatusTotals
 }
 
 export interface ManualEntryRow {
@@ -142,6 +164,80 @@ export interface TreasuryReport {
   }
 }
 
+/** Une ligne de commande, réduite à ce dont le partage a besoin. */
+export interface TicketingItemRow {
+  /**
+   * Prix de la ligne, **options comprises**.
+   *
+   * Le prix d'une option vit dans sa propre table et n'entrait dans aucun total : sur une
+   * édition, deux cent quatre-vingt-onze euros de bouteilles étaient enregistrés sans être
+   * comptés nulle part. Une option suit la ligne qui la porte, donc son produit aussi.
+   */
+  amount: number
+  /**
+   * Statut de la **commande**, qui gouverne — et non l'état de la ligne.
+   *
+   * Les deux divergent souvent sans que cela ait un sens comptable : une commande encaissée sur
+   * place porte `Onsite` quand ses lignes portent `Processed`. Le statut de commande est le seul
+   * qui distingue l'encaissement sur place de l'externe, et c'est lui qui a toujours servi de
+   * base au total.
+   */
+  orderStatus: string
+  /** `null` quand la ligne n'a pas de tarif : don, vêtement ajouté à la main. */
+  countAsParticipant: boolean | null
+  /**
+   * Type de ligne tel que la billetterie l'enregistre. `Donation` isole les dons, que rien
+   * d'autre ne distingue : ils n'ont pas de tarif, comme les ventes annexes.
+   */
+  type: string | null
+}
+
+/** Statuts de commande, tels que la billetterie les enregistre. */
+const PENDING_STATUSES = ['Pending']
+const REFUNDED_STATUSES = ['Refunded']
+
+/**
+ * Ventile les lignes de commande entre entrées et autres produits, par statut.
+ *
+ * Les dons passent avant tout autre critère : ils n'ont pas de tarif, exactement comme les
+ * ventes annexes, et rien d'autre que leur type ne les en distingue.
+ *
+ * Une ligne sans tarif ni type de don rejoint les autres produits. La compter comme participant
+ * gonflerait le produit des entrées d'un montant qui n'en est pas.
+ */
+export function aggregateTicketingItems(rows: TicketingItemRow[]): TicketingTotals {
+  const empty = (): TicketingStatusTotals => ({
+    processed: 0,
+    onsite: 0,
+    pending: 0,
+    refunded: 0,
+  })
+  const totals: TicketingTotals = { participants: empty(), donations: empty(), other: empty() }
+
+  for (const row of rows) {
+    const bucket =
+      row.type === 'Donation'
+        ? totals.donations
+        : row.countAsParticipant === true
+          ? totals.participants
+          : totals.other
+    if (row.orderStatus === 'Processed') bucket.processed += row.amount
+    else if (row.orderStatus === 'Onsite') bucket.onsite += row.amount
+    else if (PENDING_STATUSES.includes(row.orderStatus)) bucket.pending += row.amount
+    else if (REFUNDED_STATUSES.includes(row.orderStatus)) bucket.refunded += row.amount
+  }
+
+  return totals
+}
+
+/** Même règle pour les deux produits de billetterie : encaissé moins remboursé, attente à part. */
+function ticketingAmounts(totals: TicketingStatusTotals): TreasuryAmounts {
+  return {
+    settled: totals.processed + totals.onsite - totals.refunded,
+    pending: totals.pending,
+  }
+}
+
 export function computeTreasury(input: ComputeInput): TreasuryReport {
   const { artists, ticketing, manualEntries, sourceCodes } = input
 
@@ -192,10 +288,9 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
     ),
     // Un remboursement vient en déduction des produits : c'est de l'argent encaissé puis rendu,
     // pas une charge d'exploitation. Une commande en attente est engagée sans être encaissée.
-    sourceLine('TICKETING_ORDERS', 'INCOME', {
-      settled: ticketing.processed + ticketing.onsite - ticketing.refunded,
-      pending: ticketing.pending,
-    }),
+    sourceLine('TICKETING_PARTICIPANTS', 'INCOME', ticketingAmounts(ticketing.participants)),
+    sourceLine('TICKETING_DONATIONS', 'INCOME', ticketingAmounts(ticketing.donations)),
+    sourceLine('TICKETING_OTHER', 'INCOME', ticketingAmounts(ticketing.other)),
   ]
 
   for (const entry of manualEntries) {

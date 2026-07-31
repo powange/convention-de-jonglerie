@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Гонорары артистов",
         "ARTIST_REIMBURSEMENT": "Компенсации проезда артистов",
         "ARTIST_CONSUMABLES": "Расходные материалы артистов",
-        "TICKETING_ORDERS": "Заказы билетов"
+        "TICKETING_PARTICIPANTS": "Билеты участников",
+        "TICKETING_DONATIONS": "Пожертвования",
+        "TICKETING_OTHER": "Билеты — прочие доходы"
       },
       "settled_amount": "из них {amount} оплачено"
     }

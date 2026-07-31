@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Künstlergagen",
         "ARTIST_REIMBURSEMENT": "Fahrtkostenerstattungen der Künstler",
         "ARTIST_CONSUMABLES": "Verbrauchsmaterialien der Künstler",
-        "TICKETING_ORDERS": "Ticketing-Bestellungen"
+        "TICKETING_PARTICIPANTS": "Teilnehmertickets",
+        "TICKETING_DONATIONS": "Spenden",
+        "TICKETING_OTHER": "Ticketing — sonstige Erlöse"
       },
       "settled_amount": "davon {amount} beglichen"
     }

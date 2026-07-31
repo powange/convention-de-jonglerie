@@ -608,7 +608,9 @@
         "ARTIST_PAYMENT": "Honoráře umělců",
         "ARTIST_REIMBURSEMENT": "Náhrady cestovného umělců",
         "ARTIST_CONSUMABLES": "Spotřební materiál umělců",
-        "TICKETING_ORDERS": "Objednávky vstupenek"
+        "TICKETING_PARTICIPANTS": "Vstupenky účastníků",
+        "TICKETING_DONATIONS": "Dary",
+        "TICKETING_OTHER": "Vstupenky — ostatní výnosy"
       },
       "settled_amount": "z toho {amount} uhrazeno"
     }
