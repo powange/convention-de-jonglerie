@@ -1,71 +1,71 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Політика конфіденційності",
+    "last_updated": "Останнє оновлення",
+    "update_date": "11 вересня 2025 р.",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Контролер даних",
+        "content": "Convention de Jonglerie є контролером обробки ваших персональних даних. Ми зобов’язуємося захищати вашу приватність та обробляти ваші персональні дані прозоро й відповідно до Загального регламенту про захист даних (GDPR)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Дані, які ми збираємо",
+        "intro": "Ми збираємо такі категорії персональних даних:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Ідентифікаційні дані: прізвище, ім’я, псевдонім",
+          "contact": "Контактні дані: адреса електронної пошти",
+          "preferences": "Налаштування користувача: улюблені конвенти, параметри сповіщень"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Цілі обробки",
+        "intro": "Ваші персональні дані обробляються з такими цілями:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Керування вашим обліковим записом та автентифікація",
+          "service_provision": "Надання послуг платформи (перегляд, додавання конвентів)",
+          "communication": "Комунікація щодо послуги та важливі сповіщення",
+          "improvement": "Покращення наших послуг і аналіз використання"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Правова підстава",
+        "content": "Обробка ваших персональних даних ґрунтується на вашій згоді на створення облікового запису та користування послугою, а також на нашому законному інтересі щодо покращення послуг і безпеки платформи."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Передавання даних",
+        "content": "Ми не продаємо, не здаємо в оренду й не передаємо ваші персональні дані третім особам, за винятком таких випадків: вимога закону, захист наших прав або ваша явна згода. Дані можуть передаватися нашим технічним постачальникам виключно в обсязі, потрібному для надання послуги."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Зберігання даних",
+        "content": "Ваші персональні дані зберігаються протягом строку, необхідного для цілей, задля яких їх було зібрано. Облікові записи, неактивні понад 3 роки, можуть бути видалені після попереднього повідомлення."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Ваші права",
+        "intro": "Відповідно до GDPR ви маєте такі права:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Право на доступ: отримати копію своїх персональних даних",
+          "rectification": "Право на виправлення: виправити неточні або неповні дані",
+          "erasure": "Право на видалення: видалити свої персональні дані",
+          "portability": "Право на перенесення: отримати свої дані у структурованому форматі",
+          "objection": "Право на заперечення: заперечити проти обробки своїх даних"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Файли cookie та подібні технології",
+        "content": "Ми використовуємо технічні файли cookie, потрібні для роботи сайту, зокрема для керування сеансом входу. Ці файли cookie не потребують вашої попередньої згоди, оскільки є суворо необхідними для надання послуги."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Безпека даних",
+        "content": "Ми вживаємо належних технічних та організаційних заходів для захисту ваших персональних даних від втрати, неправомірного використання, несанкціонованого доступу, розкриття, зміни або несанкціонованого знищення."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Зміни політики",
+        "content": "Цю політику конфіденційності може бути періодично оновлено. Ми повідомимо вас про будь-яку суттєву зміну електронною поштою або через сповіщення на сайті."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
-        "email_label": "E-mail"
+        "title": "Контакти",
+        "content": "З будь-яких питань щодо цієї політики конфіденційності або для реалізації своїх прав ви можете звернутися до нас за адресою:",
+        "email_label": "Ел. пошта"
       }
     }
   }

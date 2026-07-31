@@ -1,71 +1,71 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Integritetspolicy",
+    "last_updated": "Senast uppdaterad",
+    "update_date": "11 september 2025",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Personuppgiftsansvarig",
+        "content": "Convention de Jonglerie är personuppgiftsansvarig för behandlingen av dina personuppgifter. Vi åtar oss att skydda din integritet och att behandla dina personuppgifter öppet och i enlighet med dataskyddsförordningen (GDPR)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Insamlade uppgifter",
+        "intro": "Vi samlar in följande typer av personuppgifter:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Identitetsuppgifter: efternamn, förnamn, användarnamn",
+          "contact": "Kontaktuppgifter: e-postadress",
+          "preferences": "Användarinställningar: favoritkonvent, aviseringsinställningar"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Ändamål med behandlingen",
+        "intro": "Dina personuppgifter behandlas för följande ändamål:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Hantering av ditt användarkonto och autentisering",
+          "service_provision": "Tillhandahållande av plattformens tjänster (visning, tillägg av konvent)",
+          "communication": "Kommunikation om tjänsten och viktiga aviseringar",
+          "improvement": "Förbättring av våra tjänster och analys av användningen"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Rättslig grund",
+        "content": "Behandlingen av dina personuppgifter grundar sig på ditt samtycke till att skapa ett konto och använda tjänsten, samt på vårt berättigade intresse av att förbättra våra tjänster och skydda plattformen."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Delning av uppgifter",
+        "content": "Vi säljer, hyr inte ut och delar inte dina personuppgifter med tredje part, utom i följande fall: rättslig skyldighet, skydd av våra rättigheter eller med ditt uttryckliga samtycke. Uppgifter kan delas med våra tekniska leverantörer, enbart i den utsträckning det krävs för att leverera tjänsten."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Lagring av uppgifter",
+        "content": "Dina personuppgifter lagras så länge det är nödvändigt för de ändamål för vilka de samlades in. Konton som varit inaktiva i mer än 3 år kan raderas efter föregående meddelande."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Dina rättigheter",
+        "intro": "Enligt GDPR har du följande rättigheter:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Rätt till tillgång: att få en kopia av dina personuppgifter",
+          "rectification": "Rätt till rättelse: att få felaktiga eller ofullständiga uppgifter rättade",
+          "erasure": "Rätt till radering: att få dina personuppgifter raderade",
+          "portability": "Rätt till dataportabilitet: att få dina uppgifter i ett strukturerat format",
+          "objection": "Rätt att göra invändningar: att invända mot behandlingen av dina uppgifter"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Kakor och liknande tekniker",
+        "content": "Vi använder tekniska kakor som är nödvändiga för att webbplatsen ska fungera, särskilt för att hantera din inloggningssession. Dessa kakor kräver inte ditt förhandssamtycke eftersom de är strikt nödvändiga för att leverera tjänsten."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Datasäkerhet",
+        "content": "Vi vidtar lämpliga tekniska och organisatoriska åtgärder för att skydda dina personuppgifter mot förlust, missbruk, obehörig åtkomst, spridning, ändring eller obehörig förstöring."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Ändringar av policyn",
+        "content": "Denna integritetspolicy kan komma att uppdateras med jämna mellanrum. Vi informerar dig om varje väsentlig ändring via e-post eller genom ett meddelande på webbplatsen."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
-        "email_label": "E-mail"
+        "title": "Kontakt",
+        "content": "Om du har frågor om denna integritetspolicy eller vill utöva dina rättigheter kan du kontakta oss på:",
+        "email_label": "E-post"
       }
     }
   }

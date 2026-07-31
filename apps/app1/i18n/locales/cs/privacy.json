@@ -1,70 +1,70 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Zásady ochrany osobních údajů",
+    "last_updated": "Poslední aktualizace",
+    "update_date": "11. září 2025",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Správce údajů",
+        "content": "Convention de Jonglerie je správcem vašich osobních údajů. Zavazujeme se chránit vaše soukromí a zpracovávat vaše osobní údaje transparentně a v souladu s Obecným nařízením o ochraně osobních údajů (GDPR)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Shromažďované údaje",
+        "intro": "Shromažďujeme následující druhy osobních údajů:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Identifikační údaje: příjmení, jméno, přezdívka",
+          "contact": "Kontaktní údaje: e-mailová adresa",
+          "preferences": "Uživatelské předvolby: oblíbené konventy, nastavení oznámení"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Účely zpracování",
+        "intro": "Vaše osobní údaje zpracováváme pro tyto účely:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Správa vašeho uživatelského účtu a ověřování totožnosti",
+          "service_provision": "Poskytování služeb platformy (prohlížení, přidávání konventů)",
+          "communication": "Komunikace týkající se služby a důležitá oznámení",
+          "improvement": "Zlepšování našich služeb a analýza užívání"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Právní základ",
+        "content": "Zpracování vašich osobních údajů se opírá o váš souhlas se založením účtu a užíváním služby a o náš oprávněný zájem na zlepšování služeb a zabezpečení platformy."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Sdílení údajů",
+        "content": "Vaše osobní údaje neprodáváme, nepronajímáme ani nesdílíme s třetími stranami, s výjimkou těchto případů: zákonná povinnost, ochrana našich práv nebo váš výslovný souhlas. Údaje mohou být sdíleny s našimi technickými dodavateli výhradně v rozsahu nezbytném pro poskytování služby."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Uchovávání údajů",
+        "content": "Vaše osobní údaje uchováváme po dobu nezbytnou k účelům, pro které byly shromážděny. Účty neaktivní déle než 3 roky mohou být po předchozím upozornění smazány."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Vaše práva",
+        "intro": "V souladu s GDPR máte tato práva:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Právo na přístup: získat kopii svých osobních údajů",
+          "rectification": "Právo na opravu: opravit nepřesné nebo neúplné údaje",
+          "erasure": "Právo na výmaz: nechat své osobní údaje smazat",
+          "portability": "Právo na přenositelnost: získat své údaje ve strukturovaném formátu",
+          "objection": "Právo vznést námitku: vznést námitku proti zpracování svých údajů"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Soubory cookie a podobné technologie",
+        "content": "Používáme technické soubory cookie nezbytné pro fungování webu, zejména pro správu vaší přihlašovací relace. Tyto soubory cookie nevyžadují váš předchozí souhlas, neboť jsou nezbytně nutné k poskytování služby."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Zabezpečení údajů",
+        "content": "Zavádíme vhodná technická a organizační opatření k ochraně vašich osobních údajů před ztrátou, zneužitím, neoprávněným přístupem, zveřejněním, změnou nebo neoprávněným zničením."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Změny zásad",
+        "content": "Tyto zásady ochrany osobních údajů mohou být pravidelně aktualizovány. O každé podstatné změně vás budeme informovat e-mailem nebo oznámením na webu."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
+        "title": "Kontakt",
+        "content": "S jakýmkoli dotazem k těmto zásadám ochrany osobních údajů nebo pro uplatnění svých práv nás můžete kontaktovat na adrese:",
         "email_label": "E-mail"
       }
     }

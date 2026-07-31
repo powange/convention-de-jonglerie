@@ -1,70 +1,70 @@
 {
   "privacy": {
-    "title": "Politique de confidentialité",
-    "last_updated": "Dernière mise à jour",
-    "update_date": "11 septembre 2025",
+    "title": "Privacybeleid",
+    "last_updated": "Laatst bijgewerkt",
+    "update_date": "11 september 2025",
     "sections": {
       "data_controller": {
-        "title": "Responsable du traitement",
-        "content": "Convention de Jonglerie est responsable du traitement de vos données personnelles. Nous nous engageons à protéger votre vie privée et à traiter vos données personnelles de manière transparente et conforme au Règlement Général sur la Protection des Données (RGPD)."
+        "title": "Verwerkingsverantwoordelijke",
+        "content": "Convention de Jonglerie is verwerkingsverantwoordelijke voor uw persoonsgegevens. Wij zetten ons in om uw privacy te beschermen en uw persoonsgegevens transparant te verwerken, in overeenstemming met de Algemene verordening gegevensbescherming (AVG)."
       },
       "data_collected": {
-        "title": "Données collectées",
-        "intro": "Nous collectons les types de données personnelles suivants :",
+        "title": "Verzamelde gegevens",
+        "intro": "Wij verzamelen de volgende soorten persoonsgegevens:",
         "items": {
-          "identity": "Informations d'identité : nom, prénom, pseudonyme",
-          "contact": "Informations de contact : adresse e-mail",
-          "preferences": "Préférences utilisateur : conventions favorites, paramètres de notification"
+          "identity": "Identiteitsgegevens: achternaam, voornaam, gebruikersnaam",
+          "contact": "Contactgegevens: e-mailadres",
+          "preferences": "Gebruikersvoorkeuren: favoriete conventies, meldingsinstellingen"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
-        "intro": "Vos données personnelles sont traitées pour les finalités suivantes :",
+        "title": "Doeleinden van de verwerking",
+        "intro": "Uw persoonsgegevens worden verwerkt voor de volgende doeleinden:",
         "items": {
-          "account_management": "Gestion de votre compte utilisateur et authentification",
-          "service_provision": "Fourniture des services de la plateforme (consultation, ajout de conventions)",
-          "communication": "Communication relative au service et notifications importantes",
-          "improvement": "Amélioration de nos services et analyse d'usage"
+          "account_management": "Beheer van uw gebruikersaccount en authenticatie",
+          "service_provision": "Levering van de diensten van het platform (raadplegen, conventies toevoegen)",
+          "communication": "Communicatie over de dienst en belangrijke meldingen",
+          "improvement": "Verbetering van onze diensten en gebruiksanalyse"
         }
       },
       "legal_basis": {
-        "title": "Base légale",
-        "content": "Le traitement de vos données personnelles repose sur votre consentement pour la création de compte et l'utilisation du service, ainsi que sur notre intérêt légitime pour l'amélioration de nos services et la sécurité de la plateforme."
+        "title": "Rechtsgrond",
+        "content": "De verwerking van uw persoonsgegevens berust op uw toestemming voor het aanmaken van een account en het gebruik van de dienst, en op ons gerechtvaardigd belang bij de verbetering van onze diensten en de beveiliging van het platform."
       },
       "data_sharing": {
-        "title": "Partage des données",
-        "content": "Nous ne vendons, ne louons, ni ne partageons vos données personnelles avec des tiers, sauf dans les cas suivants : obligation légale, protection de nos droits, ou avec votre consentement explicite. Les données peuvent être partagées avec nos prestataires techniques dans le cadre strict de la fourniture du service."
+        "title": "Delen van gegevens",
+        "content": "Wij verkopen, verhuren of delen uw persoonsgegevens niet met derden, behalve in de volgende gevallen: wettelijke verplichting, bescherming van onze rechten of met uw uitdrukkelijke toestemming. Gegevens kunnen worden gedeeld met onze technische dienstverleners, uitsluitend voor zover noodzakelijk voor de levering van de dienst."
       },
       "data_retention": {
-        "title": "Conservation des données",
-        "content": "Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées. Les comptes inactifs depuis plus de 3 ans peuvent être supprimés après notification préalable."
+        "title": "Bewaring van gegevens",
+        "content": "Uw persoonsgegevens worden bewaard zolang dat nodig is voor de doeleinden waarvoor ze zijn verzameld. Accounts die langer dan 3 jaar inactief zijn, kunnen na voorafgaande kennisgeving worden verwijderd."
       },
       "user_rights": {
-        "title": "Vos droits",
-        "intro": "Conformément au RGPD, vous disposez des droits suivants :",
+        "title": "Uw rechten",
+        "intro": "Op grond van de AVG beschikt u over de volgende rechten:",
         "items": {
-          "access": "Droit d'accès : obtenir une copie de vos données personnelles",
-          "rectification": "Droit de rectification : corriger vos données inexactes ou incomplètes",
-          "erasure": "Droit à l'effacement : supprimer vos données personnelles",
-          "portability": "Droit à la portabilité : récupérer vos données dans un format structuré",
-          "objection": "Droit d'opposition : vous opposer au traitement de vos données"
+          "access": "Recht op inzage: een kopie van uw persoonsgegevens verkrijgen",
+          "rectification": "Recht op rectificatie: onjuiste of onvolledige gegevens corrigeren",
+          "erasure": "Recht op wissing: uw persoonsgegevens laten verwijderen",
+          "portability": "Recht op overdraagbaarheid: uw gegevens in een gestructureerd formaat ontvangen",
+          "objection": "Recht van bezwaar: bezwaar maken tegen de verwerking van uw gegevens"
         }
       },
       "cookies": {
-        "title": "Cookies et technologies similaires",
-        "content": "Nous utilisons des cookies techniques nécessaires au fonctionnement du site, notamment pour la gestion de votre session de connexion. Ces cookies ne nécessitent pas votre consentement préalable car ils sont strictement nécessaires à la fourniture du service."
+        "title": "Cookies en vergelijkbare technologieën",
+        "content": "Wij gebruiken technische cookies die noodzakelijk zijn voor de werking van de site, met name voor het beheer van uw aanmeldsessie. Voor deze cookies is geen voorafgaande toestemming vereist, omdat zij strikt noodzakelijk zijn voor de levering van de dienst."
       },
       "security": {
-        "title": "Sécurité des données",
-        "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'utilisation abusive, l'accès non autorisé, la divulgation, la modification ou la destruction non autorisée."
+        "title": "Beveiliging van gegevens",
+        "content": "Wij treffen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen tegen verlies, misbruik, ongeoorloofde toegang, openbaarmaking, wijziging of ongeoorloofde vernietiging."
       },
       "updates": {
-        "title": "Modifications de la politique",
-        "content": "Cette politique de confidentialité peut être mise à jour périodiquement. Nous vous informerons de toute modification substantielle par e-mail ou via une notification sur le site."
+        "title": "Wijzigingen van het beleid",
+        "content": "Dit privacybeleid kan periodiek worden bijgewerkt. Wij informeren u over elke wezenlijke wijziging per e-mail of via een melding op de site."
       },
       "contact": {
         "title": "Contact",
-        "content": "Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, vous pouvez nous contacter à :",
+        "content": "Voor vragen over dit privacybeleid of om uw rechten uit te oefenen, kunt u contact met ons opnemen via:",
         "email_label": "E-mail"
       }
     }
