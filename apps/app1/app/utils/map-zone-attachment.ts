@@ -124,3 +124,24 @@ export function filterLegendGroups<T extends GroupableLegendItem>(
     group.rows.some((row) => row.types.some((t) => activeFilters.has(t)))
   )
 }
+
+/**
+ * Valeur du choix « aucune zone » dans les sélecteurs.
+ *
+ * `null` ne convient pas : Nuxt UI le lit comme « rien de sélectionné » plutôt que comme une
+ * option, si bien que le choix existait dans la liste sans pouvoir être retenu — un rattachement
+ * s'ajoutait donc, mais ne se retirait plus.
+ *
+ * Zéro n'entre en conflit avec aucun identifiant, ceux-ci commençant à un.
+ */
+export const NO_ZONE = 0
+
+/** Rattachement enregistré → valeur du sélecteur. */
+export function toZoneSelection(zoneId: number | null | undefined): number {
+  return zoneId ?? NO_ZONE
+}
+
+/** Valeur du sélecteur → rattachement à enregistrer, `null` détachant. */
+export function fromZoneSelection(selection: number | null | undefined): number | null {
+  return !selection || selection === NO_ZONE ? null : selection
+}

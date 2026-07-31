@@ -417,9 +417,11 @@ const { data, pending, error } = await useFetch<{
  */
 const { zones: editionZones } = useEditionZones(editionId)
 
+// Valeur sentinelle plutôt que `null`, que Nuxt UI lit comme « rien de sélectionné » : le choix
+// « aucune zone » figurait dans la liste sans pouvoir être retenu.
 const zoneOptions = computed(() => [
-  { label: t('gestion.map.marker_no_zone'), value: null as number | null },
-  ...editionZones.value.map((zone) => ({ label: zone.name, value: zone.id as number | null })),
+  { label: t('gestion.map.marker_no_zone'), value: NO_ZONE },
+  ...editionZones.value.map((zone) => ({ label: zone.name, value: zone.id })),
 ])
 
 /** Le rattachement n'a de sens que pour un point : une zone ne s'attache pas à une zone. */
@@ -428,9 +430,9 @@ function isPointRow(row: ViewRow): boolean {
 }
 
 /** Brouillon de saisie par ligne : catégories et couleur, pré-remplis depuis la carte. */
-const draft = reactive<
-  Record<string, { types: EditionZoneType[]; color: string; zoneId: number | null }>
->({})
+const draft = reactive<Record<string, { types: EditionZoneType[]; color: string; zoneId: number }>>(
+  {}
+)
 const layerTypes = reactive<Record<string, EditionZoneType[]>>({})
 
 /**
@@ -525,7 +527,7 @@ watch(
         draft[row.key] = {
           types: ['OTHER'],
           color: row.object?.color ?? ZONE_TYPE_COLORS.OTHER,
-          zoneId: null,
+          zoneId: NO_ZONE,
         }
       } else if (row.state === 'imported' && row.record) {
         // Une ligne déjà importée part de ce qui est enregistré : c'est l'écart avec ces
@@ -533,7 +535,7 @@ watch(
         draft[row.key] = {
           types: (row.record.types.length ? row.record.types : ['OTHER']) as EditionZoneType[],
           color: row.record.color ?? row.object?.color ?? ZONE_TYPE_COLORS.OTHER,
-          zoneId: row.record.zoneId ?? null,
+          zoneId: toZoneSelection(row.record.zoneId),
         }
       }
     }
@@ -553,7 +555,7 @@ function hasPendingChanges(row: ViewRow): boolean {
   const entry = draft[row.key]
   if (!entry || !row.record) return false
   if ((entry.color ?? '').toUpperCase() !== (row.record.color ?? '').toUpperCase()) return true
-  if ((entry.zoneId ?? null) !== (row.record.zoneId ?? null)) return true
+  if (fromZoneSelection(entry.zoneId) !== (row.record.zoneId ?? null)) return true
   const current = [...entry.types].sort()
   const stored = [...row.record.types].sort()
   return current.length !== stored.length || current.some((t, i) => t !== stored[i])
@@ -600,7 +602,7 @@ function importBodyFor(key: string | number) {
     types: entry.types.length ? entry.types : ['OTHER'],
     coordinates: object.coordinates,
     // Réservé aux points : le serveur refuse un rattachement sur un polygone.
-    ...(object.kind === 'point' ? { zoneId: entry.zoneId } : {}),
+    ...(object.kind === 'point' ? { zoneId: fromZoneSelection(entry.zoneId) } : {}),
   }
 }
 

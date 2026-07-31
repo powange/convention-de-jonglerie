@@ -2,6 +2,7 @@
 import type { EditionMarker } from '~/composables/useEditionMarkers'
 import type { EditionZone } from '~/composables/useEditionZones'
 import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
+import { fromZoneSelection, NO_ZONE, toZoneSelection } from '~/utils/map-zone-attachment'
 
 import { EDITION_ZONE_TYPES, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
@@ -42,11 +43,12 @@ const markerTypes = computed(() =>
 
 const defaultColors = DEFAULT_HEX_PALETTE
 
-// `null` plutôt qu'une valeur absente : le sélecteur doit pouvoir exprimer « aucune zone »,
-// c'est-à-dire détacher un marqueur qui l'était.
+// « Aucune zone » porte une valeur sentinelle et non `null`, que Nuxt UI lirait comme « rien de
+// sélectionné » : le choix existait alors dans la liste sans pouvoir être retenu, et un
+// rattachement une fois posé ne se retirait plus.
 const zoneOptions = computed(() => [
-  { label: t('gestion.map.marker_no_zone'), value: null as number | null },
-  ...props.zones.map((zone) => ({ label: zone.name, value: zone.id as number | null })),
+  { label: t('gestion.map.marker_no_zone'), value: NO_ZONE },
+  ...props.zones.map((zone) => ({ label: zone.name, value: zone.id })),
 ])
 
 const form = reactive({
@@ -54,7 +56,7 @@ const form = reactive({
   description: '',
   markerTypes: ['OTHER'] as string[],
   color: defaultColors[0]!,
-  zoneId: null as number | null,
+  zoneId: NO_ZONE,
 })
 
 // Remplir le formulaire avec les données du marqueur si il existe
@@ -71,14 +73,16 @@ watch(
         // renvoyé tel quel au serveur, qui le rejetterait. Le simple fait de renommer l'entrée
         // échouerait alors sur une erreur incompréhensible depuis cette modale.
         const attachedZone = props.marker.zoneId
-        form.zoneId = props.zones.some((zone) => zone.id === attachedZone) ? attachedZone : null
+        form.zoneId = props.zones.some((zone) => zone.id === attachedZone)
+          ? toZoneSelection(attachedZone)
+          : NO_ZONE
       } else {
         // Reset pour un nouveau marqueur
         form.name = ''
         form.description = ''
         form.markerTypes = ['OTHER']
         form.color = defaultColors[0]!
-        form.zoneId = null
+        form.zoneId = NO_ZONE
       }
     }
   },
@@ -95,7 +99,7 @@ const handleSave = () => {
     description: form.description.trim() || null,
     markerTypes: form.markerTypes,
     color: form.color,
-    zoneId: form.zoneId,
+    zoneId: fromZoneSelection(form.zoneId),
   })
 }
 
