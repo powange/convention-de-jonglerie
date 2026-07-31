@@ -5,7 +5,10 @@ import {
   buildMarkerAttachmentHtml,
   buildZoneAttachmentHtml,
   filterLegendGroups,
+  fromZoneSelection,
   groupLegendItems,
+  NO_ZONE,
+  toZoneSelection,
   groupMarkersByZone,
   zoneNavigationTarget,
 } from '../../../app/utils/map-zone-attachment'
@@ -177,5 +180,39 @@ describe('filterLegendGroups', () => {
     const result = filterLegendGroups(groups(), new Set(['ENTRANCE']))
     expect(result).toHaveLength(1)
     expect(result[0]!.rows.map((r) => r.name)).toEqual(['Salle A', 'Entrée'])
+  })
+})
+
+/**
+ * Le sélecteur ne peut pas porter `null` : Nuxt UI le lit comme « rien de sélectionné ». Le
+ * choix « aucune zone » existait donc dans la liste sans jamais pouvoir être retenu, et un
+ * rattachement une fois posé ne se retirait plus.
+ */
+describe('valeur du sélecteur de zone', () => {
+  it('représente l’absence de rattachement par une valeur choisissable', () => {
+    expect(toZoneSelection(null)).toBe(NO_ZONE)
+    expect(toZoneSelection(undefined)).toBe(NO_ZONE)
+    expect(NO_ZONE).not.toBeNull()
+  })
+
+  it('conserve un rattachement existant', () => {
+    expect(toZoneSelection(42)).toBe(42)
+  })
+
+  it('retraduit le choix « aucune zone » en détachement', () => {
+    expect(fromZoneSelection(NO_ZONE)).toBeNull()
+    expect(fromZoneSelection(null)).toBeNull()
+    expect(fromZoneSelection(undefined)).toBeNull()
+  })
+
+  it('retraduit une zone choisie en son identifiant', () => {
+    expect(fromZoneSelection(42)).toBe(42)
+  })
+
+  // La conversion doit faire l'aller-retour sans rien perdre, dans les deux sens.
+  it('fait l’aller-retour', () => {
+    for (const zoneId of [null, 1, 42]) {
+      expect(fromZoneSelection(toZoneSelection(zoneId))).toBe(zoneId)
+    }
   })
 })
