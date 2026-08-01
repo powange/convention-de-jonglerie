@@ -39,6 +39,8 @@
     },
     "view_external": "Карта Google",
     "zone_entrances": "Входи:",
-    "marker_entrance_of": "Вхід до:"
+    "marker_entrance_of": "Вхід до:",
+    "offline_title": "Карта показана офлайн",
+    "offline_description": "Ці відомості отримано під час вашого останнього візиту й могли змінитися."
   }
 }

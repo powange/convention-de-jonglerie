@@ -39,6 +39,8 @@
     },
     "view_external": "Carte Google",
     "zone_entrances": "Entrées :",
-    "marker_entrance_of": "Entrée de :"
+    "marker_entrance_of": "Entrée de :",
+    "offline_title": "Carte affichée hors ligne",
+    "offline_description": "Ces informations proviennent de votre dernière visite et peuvent avoir changé depuis."
   }
 }

@@ -41,6 +41,15 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  /**
+   * Vrai quand la réponse vient du cache hors ligne plutôt que du réseau.
+   *
+   * Le service worker le signale par un en-tête : la requête réussit dans les deux cas, et rien
+   * d'autre ne les distingue. L'indicateur du navigateur ne suffirait pas — il vaut vrai sur un
+   * réseau sans accès à Internet, c'est-à-dire le wifi d'une convention.
+   */
+  const servedFromCache = ref(false)
+
   const fetchMarkers = async () => {
     if (!editionId.value) return
 
@@ -49,7 +58,12 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
 
     try {
       const response = await $fetch<{ success: boolean; data: { markers: EditionMarker[] } }>(
-        `/api/editions/${editionId.value}/markers`
+        `/api/editions/${editionId.value}/markers`,
+        {
+          onResponse({ response: raw }) {
+            servedFromCache.value = raw.headers.get('x-from-cache') === '1'
+          },
+        }
       )
       markers.value = response.data.markers
     } catch (err: any) {
@@ -181,6 +195,7 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
     deleting: readonly(deleting),
     reordering: readonly(reordering),
     error: readonly(error),
+    servedFromCache: readonly(servedFromCache),
     fetchMarkers,
     createMarker: createNewMarker,
     updateMarker: updateExistingMarker,

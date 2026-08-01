@@ -160,17 +160,42 @@ async function trimCache(cacheName, maxEntries) {
   for (let i = 0; i < keys.length - maxEntries; i++) await cache.delete(keys[i])
 }
 
+/**
+ * Marque une réponse servie par le cache, pour que l'application puisse le dire au visiteur.
+ *
+ * Sans ce signal, elle n'a aucun moyen de distinguer une donnée fraîche d'une donnée gardée :
+ * la requête réussit dans les deux cas. L'indicateur du navigateur ne le dirait pas non plus — il vaut
+ * vrai sur un réseau sans accès à Internet, c'est-à-dire le wifi d'une convention.
+ */
+function markAsCached(response) {
+  const marked = new Response(response.body, response)
+  marked.headers.set('x-from-cache', '1')
+  return marked
+}
+
 /** Sert le cache immédiatement et rafraîchit derrière : une carte datée vaut mieux que rien. */
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName)
   const cached = await cache.match(request)
+
   const network = fetch(request)
     .then((response) => {
       if (response && response.ok) cache.put(request, response.clone())
       return response
     })
     .catch(() => null)
-  return cached || (await network) || Response.error()
+
+  // Le réseau d'abord quand il répond vite : sur une connexion correcte, rien ne justifie
+  // d'afficher une donnée datée. C'est seulement quand il tarde ou échoue que le cache prend
+  // le relais, et c'est alors que le visiteur doit le savoir.
+  if (!cached) return (await network) || Response.error()
+
+  const raced = await Promise.race([
+    network,
+    new Promise((resolve) => setTimeout(() => resolve(null), 2500)),
+  ])
+  if (raced && raced.ok) return raced
+  return markAsCached(cached)
 }
 
 /** Contenu immuable — tuile ou fichier de build : le cache d'abord, le réseau s'il manque. */

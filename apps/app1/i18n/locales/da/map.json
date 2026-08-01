@@ -39,6 +39,8 @@
     },
     "view_external": "Google-kort",
     "zone_entrances": "Indgange:",
-    "marker_entrance_of": "Indgang til:"
+    "marker_entrance_of": "Indgang til:",
+    "offline_title": "Kort vist offline",
+    "offline_description": "Disse oplysninger stammer fra dit seneste besøg og kan have ændret sig siden."
   }
 }

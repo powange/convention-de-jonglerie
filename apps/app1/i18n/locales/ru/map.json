@@ -39,6 +39,8 @@
     },
     "view_external": "Карта Google",
     "zone_entrances": "Входы:",
-    "marker_entrance_of": "Вход в:"
+    "marker_entrance_of": "Вход в:",
+    "offline_title": "Карта показана офлайн",
+    "offline_description": "Эти сведения получены при вашем последнем посещении и могли измениться."
   }
 }

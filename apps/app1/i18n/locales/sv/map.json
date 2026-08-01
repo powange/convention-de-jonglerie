@@ -39,6 +39,8 @@
     },
     "view_external": "Google-karta",
     "zone_entrances": "Ingångar:",
-    "marker_entrance_of": "Ingång till:"
+    "marker_entrance_of": "Ingång till:",
+    "offline_title": "Karta visad offline",
+    "offline_description": "Uppgifterna kommer från ditt senaste besök och kan ha ändrats sedan dess."
   }
 }
