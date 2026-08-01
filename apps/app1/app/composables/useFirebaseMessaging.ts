@@ -71,18 +71,12 @@ export function useFirebaseMessaging() {
     }
 
     try {
-      // Désinscrire tous les anciens Service Workers Firebase d'abord
-      const registrations = await navigator.serviceWorker.getRegistrations()
-      for (const registration of registrations) {
-        if (registration.active?.scriptURL.includes('firebase-messaging-sw')) {
-          if (import.meta.dev) {
-            console.log('🗑️ Désinstallation ancien SW Firebase:', registration.active.scriptURL)
-          }
-          await registration.unregister()
-        }
-      }
+      // Le worker n'est plus désinscrit avant d'être réenregistré. Il porte désormais aussi le
+      // cache hors ligne : le désinscrire laisserait la page sans contrôleur le temps du
+      // remplacement, c'est-à-dire sans cache, et pour rien — `update()` ci-dessous suffit à
+      // forcer la prise en compte d'une nouvelle version.
 
-      // Enregistrer le nouveau Service Worker avec option de mise à jour forcée
+      // Enregistrer le Service Worker avec option de mise à jour forcée
       const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
         updateViaCache: 'none', // Ne jamais utiliser le cache
       })
