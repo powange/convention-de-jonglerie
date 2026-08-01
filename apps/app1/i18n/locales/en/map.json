@@ -39,6 +39,8 @@
     },
     "view_external": "Google map",
     "zone_entrances": "Entrances:",
-    "marker_entrance_of": "Entrance to:"
+    "marker_entrance_of": "Entrance to:",
+    "offline_title": "Map shown offline",
+    "offline_description": "This information comes from your last visit and may have changed since."
   }
 }

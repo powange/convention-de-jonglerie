@@ -39,6 +39,8 @@
     },
     "view_external": "Mappa Google",
     "zone_entrances": "Ingressi:",
-    "marker_entrance_of": "Ingresso di:"
+    "marker_entrance_of": "Ingresso di:",
+    "offline_title": "Mappa mostrata offline",
+    "offline_description": "Queste informazioni provengono dalla tua ultima visita e potrebbero essere cambiate."
   }
 }

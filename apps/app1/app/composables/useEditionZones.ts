@@ -33,6 +33,15 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  /**
+   * Vrai quand la réponse vient du cache hors ligne plutôt que du réseau.
+   *
+   * Le service worker le signale par un en-tête : la requête réussit dans les deux cas, et rien
+   * d'autre ne les distingue. L'indicateur du navigateur ne suffirait pas — il vaut vrai sur un
+   * réseau sans accès à Internet, c'est-à-dire le wifi d'une convention.
+   */
+  const servedFromCache = ref(false)
+
   const fetchZones = async () => {
     if (!editionId.value) return
 
@@ -41,7 +50,12 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
 
     try {
       const response = await $fetch<{ success: boolean; data: { zones: EditionZone[] } }>(
-        `/api/editions/${editionId.value}/zones`
+        `/api/editions/${editionId.value}/zones`,
+        {
+          onResponse({ response: raw }) {
+            servedFromCache.value = raw.headers.get('x-from-cache') === '1'
+          },
+        }
       )
       zones.value = response.data.zones
     } catch (err: any) {
@@ -173,6 +187,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
     deleting: readonly(deleting),
     reordering: readonly(reordering),
     error: readonly(error),
+    servedFromCache: readonly(servedFromCache),
     fetchZones,
     createZone: createNewZone,
     updateZone: updateExistingZone,

@@ -94,7 +94,12 @@ describe('useEditionZones', () => {
       // Attendre que la promesse soit résolue
       await new Promise((resolve) => setTimeout(resolve, 0))
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/editions/1/zones')
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/editions/1/zones',
+        // Second argument depuis le repère hors ligne : l'appel lit l'en-tête de la réponse
+        // pour savoir si elle vient du cache.
+        expect.any(Object)
+      )
       expect(zones.value).toEqual(mockZones)
     })
 
@@ -315,7 +320,12 @@ describe('useEditionZones', () => {
       await nextTick()
       await new Promise((resolve) => setTimeout(resolve, 0))
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/editions/1/zones')
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/editions/1/zones',
+        // Second argument depuis le repère hors ligne : l'appel lit l'en-tête de la réponse
+        // pour savoir si elle vient du cache.
+        expect.any(Object)
+      )
       expect(zones.value).toEqual(mockZones)
     })
   })
