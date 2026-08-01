@@ -16,19 +16,28 @@ import { describe, expect, it } from 'vitest'
 
 const SOURCE = path.resolve(__dirname, '../../../server/routes/firebase-messaging-sw.js.ts')
 
-describe('gabarit du service worker', () => {
+/** Le fichier porte deux gabarits : le corps du worker, et le bloc de cache qu'il inclut. */
+const ANCHORS = [
+  { nom: 'corps du worker', debut: 'const swContent = `' },
+  { nom: 'bloc de cache', debut: '  return `' },
+]
+
+function literalAfter(source: string, anchor: string): string {
+  const start = source.indexOf(anchor)
+  expect(start, `gabarit introuvable : ${anchor}`).toBeGreaterThan(-1)
+  const body = source.slice(start + anchor.length)
+  // La fin est l'accent grave en début de ligne : le corps du worker le fait suivre d'un saut,
+  // le bloc de cache d'une accolade fermante.
+  const end = body.indexOf('\n`')
+  expect(end, `fin de gabarit introuvable : ${anchor}`).toBeGreaterThan(-1)
+  return body.slice(0, end)
+}
+
+describe('gabarits du service worker', () => {
   const source = fs.readFileSync(SOURCE, 'utf8')
 
-  it('ne contient aucun accent grave égaré dans le corps du worker', () => {
-    const start = source.indexOf('const swContent = `')
-    expect(start, 'le littéral du worker est introuvable').toBeGreaterThan(-1)
-
-    const body = source.slice(start + 'const swContent = `'.length)
-    const end = body.indexOf('\n`\n')
-    expect(end, 'la fin du littéral est introuvable').toBeGreaterThan(-1)
-
-    const inside = body.slice(0, end)
-    const stray = inside
+  it.each(ANCHORS)('$nom : aucun accent grave égaré', ({ debut }) => {
+    const stray = literalAfter(source, debut)
       .split('\n')
       .map((line, index) => ({ line, index }))
       .filter(({ line }) => line.includes('`'))
@@ -41,14 +50,10 @@ describe('gabarit du service worker', () => {
 
   // Le worker est servi tel quel au navigateur : une erreur de syntaxe ne se verrait qu'à
   // l'exécution, et seulement chez les visiteurs.
-  it('produit du JavaScript analysable', () => {
-    const start = source.indexOf('const swContent = `')
-    const body = source.slice(start + 'const swContent = `'.length)
-    const inside = body.slice(0, body.indexOf('\n`\n'))
-
+  it.each(ANCHORS)('$nom : produit du JavaScript analysable', ({ debut }) => {
     // Les interpolations sont remplacées par une valeur neutre : on vérifie la structure du
     // gabarit, pas les valeurs injectées à l'exécution.
-    const neutral = inside.replace(/\$\{[^}]*\}/g, 'null')
+    const neutral = literalAfter(source, debut).replace(/\$\{[^}]*\}/g, 'null')
     expect(() => new Function(neutral)).not.toThrow()
   })
 })
