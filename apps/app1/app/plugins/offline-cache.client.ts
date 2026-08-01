@@ -33,6 +33,27 @@ export default defineNuxtPlugin(() => {
     }
   }
 
+  /**
+   * S'assure qu'une version de la liste des éditions est conservée.
+   *
+   * Sur un premier affichage, cette liste arrive avec le rendu serveur : le navigateur ne la
+   * demande jamais, donc le worker ne la voit pas passer et n'a rien à garder. À la réouverture
+   * hors ligne, l'accueil s'affichait alors sur une erreur réseau.
+   *
+   * Une seule requête suffit, quels que soient ses filtres : la recherche dans le cache tolère
+   * des paramètres différents.
+   */
+  const keepEditionList = async () => {
+    try {
+      const cache = await caches.open(OFFLINE_CACHES.mapData)
+      const existing = await cache.match('/api/editions', { ignoreSearch: true })
+      if (existing) return
+      await cache.add('/api/editions?page=1&limit=12')
+    } catch (error) {
+      warn('liste des éditions non conservée :', error)
+    }
+  }
+
   const start = async () => {
     try {
       await navigator.serviceWorker.register('/firebase-messaging-sw.js')
@@ -43,6 +64,7 @@ export default defineNuxtPlugin(() => {
     }
 
     await keepPage(window.location.pathname)
+    await keepEditionList()
 
     // Les navigations suivantes se font sans rechargement : le worker ne les voit pas passer.
     useRouter().afterEach((to) => {
