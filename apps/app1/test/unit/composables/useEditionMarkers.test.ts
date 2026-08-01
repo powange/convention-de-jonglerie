@@ -85,7 +85,12 @@ describe('useEditionMarkers', () => {
       await nextTick()
       await new Promise((resolve) => setTimeout(resolve, 0))
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/editions/1/markers')
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/editions/1/markers',
+        // Second argument depuis le repère hors ligne : l'appel lit l'en-tête de la réponse
+        // pour savoir si elle vient du cache.
+        expect.any(Object)
+      )
       expect(markers.value).toEqual(mockMarkers)
     })
 
@@ -293,7 +298,12 @@ describe('useEditionMarkers', () => {
       await nextTick()
       await new Promise((resolve) => setTimeout(resolve, 0))
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/editions/1/markers')
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/editions/1/markers',
+        // Second argument depuis le repère hors ligne : l'appel lit l'en-tête de la réponse
+        // pour savoir si elle vient du cache.
+        expect.any(Object)
+      )
       expect(markers.value).toEqual(mockMarkers)
     })
   })

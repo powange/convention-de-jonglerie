@@ -59,6 +59,17 @@
           />
         </UCard>
 
+        <!-- Données servies par le cache hors ligne : le dire plutôt que de laisser croire
+             qu'elles sont fraîches. -->
+        <UAlert
+          v-if="activeView === 'site' && showingCachedMap"
+          icon="i-lucide-cloud-off"
+          color="warning"
+          variant="soft"
+          :title="$t('map.offline_title')"
+          :description="$t('map.offline_description')"
+        />
+
         <!-- Message si pas de zones ni de markers -->
         <UAlert
           v-if="activeView === 'site' && !hasSiteMap"
@@ -172,10 +183,23 @@ const externalMapEmbedUrl = computed(() => {
 })
 
 // Zones
-const { zones, loading: zonesLoading } = useEditionZones(editionId)
+const { zones, loading: zonesLoading, servedFromCache: zonesFromCache } = useEditionZones(editionId)
 
 // Markers
-const { markers, loading: markersLoading } = useEditionMarkers(editionId)
+const {
+  markers,
+  loading: markersLoading,
+  servedFromCache: markersFromCache,
+} = useEditionMarkers(editionId)
+
+/**
+ * Vrai dès qu'une des deux listes vient du cache hors ligne.
+ *
+ * Sans ce repère, rien ne distingue une carte à jour d'une carte gardée depuis la dernière
+ * visite : c'est la même page, avec les mêmes éléments. Le dire évite de laisser quelqu'un se
+ * fier à un plan qui a pu changer depuis.
+ */
+const showingCachedMap = computed(() => zonesFromCache.value || markersFromCache.value)
 
 const siteMapLoading = computed(() => zonesLoading.value || markersLoading.value)
 const hasSiteMap = computed(() => zones.value.length > 0 || markers.value.length > 0)

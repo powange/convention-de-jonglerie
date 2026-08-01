@@ -39,6 +39,8 @@
     },
     "view_external": "Google-kaart",
     "zone_entrances": "Ingangen:",
-    "marker_entrance_of": "Ingang van:"
+    "marker_entrance_of": "Ingang van:",
+    "offline_title": "Kaart offline getoond",
+    "offline_description": "Deze gegevens komen van uw laatste bezoek en kunnen sindsdien zijn gewijzigd."
   }
 }

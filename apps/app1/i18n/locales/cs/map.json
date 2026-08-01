@@ -39,6 +39,8 @@
     },
     "view_external": "Mapa Google",
     "zone_entrances": "Vchody:",
-    "marker_entrance_of": "Vchod do:"
+    "marker_entrance_of": "Vchod do:",
+    "offline_title": "Mapa zobrazená offline",
+    "offline_description": "Tyto údaje pocházejí z vaší poslední návštěvy a mohly se od té doby změnit."
   }
 }
