@@ -30,6 +30,17 @@ describe('classifyRequest', () => {
   })
 
   /**
+   * Constaté à l'usage : la page d'accueil était conservée mais pas sa liste d'éditions, si bien
+   * qu'elle s'affichait vide hors ligne — un site en apparence cassé plutôt qu'un contenu daté.
+   * Ces réponses sont publiques et identiques pour tous.
+   */
+  it('garde la liste des éditions et leur fiche', () => {
+    expect(classifyRequest(`${ORIGIN}/api/editions`, 'empty', ORIGIN)).toBe('map-data')
+    expect(classifyRequest(`${ORIGIN}/api/editions?limit=20`, 'empty', ORIGIN)).toBe('map-data')
+    expect(classifyRequest(`${ORIGIN}/api/editions/24`, 'empty', ORIGIN)).toBe('map-data')
+  })
+
+  /**
    * Une carte datée reste utile ; une commande ou un droit périmé induit en erreur. La règle par
    * défaut de l'API est donc de ne rien garder.
    */
@@ -38,7 +49,7 @@ describe('classifyRequest', () => {
       '/api/editions/24/treasury',
       '/api/editions/24/ticketing/orders',
       '/api/auth/session',
-      '/api/editions/24',
+      '/api/editions/24/volunteers',
     ]) {
       expect(classifyRequest(ORIGIN + path, 'empty', ORIGIN), path).toBeNull()
     }

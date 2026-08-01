@@ -69,6 +69,11 @@ export function classifyRequest(url: string, destination: string, origin: string
   // Données de la carte d'une édition : petites, et c'est ce qui porte tout le contenu.
   if (/^\/api\/editions\/\d+\/(zones|markers)(\/|$)/.test(parsed.pathname)) return 'map-data'
 
+  // La liste des éditions et leur fiche. Garder la page d'accueil sans elles la rendait vide :
+  // le visiteur voyait un site en apparence cassé plutôt qu'un contenu daté. Ces réponses sont
+  // publiques et identiques pour tout le monde, donc sans risque à conserver.
+  if (/^\/api\/editions(\/\d+)?$/.test(parsed.pathname)) return 'map-data'
+
   // Le reste de l'API n'est pas mis en cache : une commande ou un droit périmé induirait en
   // erreur bien plus qu'une carte datée.
   if (parsed.pathname.indexOf('/api/') === 0) return null
