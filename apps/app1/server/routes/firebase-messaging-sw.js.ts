@@ -82,10 +82,24 @@ function markAsCached(response) {
   return marked
 }
 
+/**
+ * Retrouve une réponse gardée, même si les paramètres de la requête ont changé.
+ *
+ * Le cache s'apparie sur l'URL entière : la liste des éditions demandée avec d'autres filtres
+ * — une autre page, d'autres cases cochées — ne retrouvait rien de ce qui avait été conservé,
+ * et l'accueil s'affichait sur une erreur réseau. Une liste filtrée autrement vaut mieux que
+ * pas de liste.
+ */
+async function matchTolerant(cache, request) {
+  const exact = await cache.match(request)
+  if (exact) return exact
+  return cache.match(request, { ignoreSearch: true })
+}
+
 /** Sert le cache immédiatement et rafraîchit derrière : une carte datée vaut mieux que rien. */
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName)
-  const cached = await cache.match(request)
+  const cached = await matchTolerant(cache, request)
 
   const network = fetch(request)
     .then((response) => {
