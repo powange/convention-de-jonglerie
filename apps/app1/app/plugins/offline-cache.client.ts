@@ -54,6 +54,51 @@ export default defineNuxtPlugin(() => {
     }
   }
 
+  /**
+   * Attend que le worker contrôle réellement cette page.
+   *
+   * `ready` ne l'assure pas : sur la toute première visite, le worker s'active alors que la page
+   * est déjà chargée, et ne la contrôle qu'une fois `clients.claim()` passé. Tout ce qu'on
+   * demande avant lui échappe, et n'entre donc jamais dans le cache.
+   */
+  const whenControlled = () =>
+    new Promise<void>((resolve) => {
+      if (navigator.serviceWorker.controller) return resolve()
+      navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true })
+      // Ne pas rester suspendu si le contrôle n'arrive jamais : le reste doit continuer.
+      setTimeout(resolve, 5000)
+    })
+
+  /**
+   * Conserve les fichiers de build que la page a réellement chargés.
+   *
+   * Les traductions en font partie : le module i18n les charge par imports dynamiques, et
+   * demandées avant que le worker ne contrôle la page, elles lui échappent — hors ligne,
+   * l'interface affichait ses clés brutes à la place des libellés.
+   *
+   * Plutôt que de deviner qui demande quoi, on relit ce que la page a effectivement chargé.
+   * C'est plus sûr que d'énumérer des chargeurs : ce que le navigateur a demandé est la seule
+   * liste qui ne puisse pas être incomplète.
+   */
+  const keepPageAssets = async () => {
+    try {
+      const cache = await caches.open(OFFLINE_CACHES.assets)
+      const urls = performance
+        .getEntriesByType('resource')
+        .map((entry) => entry.name)
+        .filter((url) => url.startsWith(`${window.location.origin}/_nuxt/`))
+
+      await Promise.all(
+        [...new Set(urls)].map(async (url) => {
+          if (await cache.match(url)) return
+          await cache.add(url).catch(() => undefined)
+        })
+      )
+    } catch (error) {
+      warn('fichiers de build non conservés :', error)
+    }
+  }
+
   const start = async () => {
     try {
       await navigator.serviceWorker.register('/firebase-messaging-sw.js')
@@ -63,12 +108,17 @@ export default defineNuxtPlugin(() => {
       return
     }
 
+    await whenControlled()
+
     await keepPage(window.location.pathname)
     await keepEditionList()
+    await keepPageAssets()
 
     // Les navigations suivantes se font sans rechargement : le worker ne les voit pas passer.
     useRouter().afterEach((to) => {
       keepPage(to.path)
+      // Une navigation charge de nouveaux morceaux : les capturer aussi.
+      setTimeout(keepPageAssets, 1500)
     })
   }
 
