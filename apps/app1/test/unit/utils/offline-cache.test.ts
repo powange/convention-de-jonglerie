@@ -144,3 +144,34 @@ describe('shouldPrecachePage', () => {
     }
   })
 })
+
+/**
+ * Observé en interrogeant la page réelle : les traductions ne passent pas par le dossier des
+ * fichiers de build, contrairement à ce que j'avais supposé pendant trois correctifs. Le module
+ * i18n les prérend en fichiers statiques hachés servis depuis un chemin à part.
+ *
+ * Sans cette règle, l'interface revenait hors ligne avec ses clés à la place des libellés.
+ */
+describe('ressources servies hors du dossier de build', () => {
+  it('garde les messages de traduction', () => {
+    expect(classifyRequest(`${ORIGIN}/_i18n/66788b4e/fr/messages.json`, 'empty', ORIGIN)).toBe(
+      'asset'
+    )
+    expect(classifyRequest(`${ORIGIN}/_i18n/66788b4e/pl/messages.json`, 'empty', ORIGIN)).toBe(
+      'asset'
+    )
+  })
+
+  // Servies par l'API, mais publiques et stables. Sans elles, plus le moindre pictogramme.
+  it('garde les collections d’icônes', () => {
+    expect(
+      classifyRequest(`${ORIGIN}/api/_nuxt_icon/lucide.json?icons=moon`, 'empty', ORIGIN)
+    ).toBe('asset')
+  })
+
+  // La règle des icônes ne doit pas ouvrir le reste de l'API.
+  it('n’ouvre pas le reste de l’API au passage', () => {
+    expect(classifyRequest(`${ORIGIN}/api/session/me`, 'empty', ORIGIN)).toBeNull()
+    expect(classifyRequest(`${ORIGIN}/api/editions/24/treasury`, 'empty', ORIGIN)).toBeNull()
+  })
+})

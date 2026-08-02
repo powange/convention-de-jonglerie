@@ -74,6 +74,10 @@ export function classifyRequest(url: string, destination: string, origin: string
   // publiques et identiques pour tout le monde, donc sans risque à conserver.
   if (/^\/api\/editions(\/\d+)?$/.test(parsed.pathname)) return 'map-data'
 
+  // Collections d'icônes, servies par l'API mais publiques et stables. Sans elles, l'interface
+  // revient sans le moindre pictogramme.
+  if (parsed.pathname.indexOf('/api/_nuxt_icon/') === 0) return 'asset'
+
   // Le reste de l'API n'est pas mis en cache : une commande ou un droit périmé induirait en
   // erreur bien plus qu'une carte datée.
   if (parsed.pathname.indexOf('/api/') === 0) return null
@@ -82,6 +86,11 @@ export function classifyRequest(url: string, destination: string, origin: string
   // l'application ne peut pas reprendre la main. Leur nom portant une empreinte, ils ne changent
   // jamais de contenu — le cache prime donc sur le réseau.
   if (parsed.pathname.indexOf('/_nuxt/') === 0) return 'asset'
+
+  // Traductions. Le module i18n les prérend en fichiers statiques hachés, servis depuis un
+  // chemin à part — et non depuis le dossier des fichiers de build, comme je l'ai longtemps cru.
+  // Hors ligne, l'interface affichait donc ses clés à la place des libellés.
+  if (parsed.pathname.indexOf('/_i18n/') === 0) return 'asset'
 
   if (destination === 'document') return 'page'
 
