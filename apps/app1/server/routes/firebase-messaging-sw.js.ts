@@ -113,6 +113,14 @@ async function staleWhileRevalidate(request, cacheName) {
   // le relais, et c'est alors que le visiteur doit le savoir.
   if (!cached) return (await network) || Response.error()
 
+  // Quand le navigateur se sait hors ligne, attendre ne sert à rien : le délai de courtoisie
+  // ci-dessous se payait alors sur chaque requête, et la page mettait plusieurs secondes de plus
+  // à s'afficher — précisément là où le cache devait la rendre instantanée.
+  //
+  // L'indicateur du navigateur ne dit pas la vérité dans un sens — il vaut vrai sur un réseau
+  // sans accès à Internet — mais il la dit dans l'autre : s'il annonce hors ligne, il l'est.
+  if (self.navigator && self.navigator.onLine === false) return markAsCached(cached)
+
   const raced = await Promise.race([
     network,
     new Promise((resolve) => setTimeout(() => resolve(null), 2500)),
@@ -143,6 +151,13 @@ async function cacheFirst(request, cacheName, maxEntries) {
 /** Le réseau d'abord pour les pages : la version en cache ne sert qu'en cas d'échec. */
 async function networkFirstPage(request) {
   const cache = await caches.open(CACHES.pages)
+
+  // Hors ligne avéré : inutile de tenter le réseau et d'attendre son échec.
+  if (self.navigator && self.navigator.onLine === false) {
+    const cached = await cache.match(request)
+    if (cached) return cached
+  }
+
   try {
     const response = await fetch(request)
     if (response && response.ok) cache.put(request, response.clone())
