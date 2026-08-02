@@ -109,3 +109,20 @@ export function shouldPrecachePage(pathname: string): boolean {
   if (pathname === '/') return true
   return /^\/editions\/\d+\/map\/?$/.test(pathname)
 }
+
+/**
+ * URL d'enregistrement du service worker, portant l'identifiant du build.
+ *
+ * Le chemin se termine par « .js », et le CDN le traite en conséquence : il le met en cache
+ * pendant vingt-trois heures malgré le `no-store` envoyé par l'application. Mesuré sur release,
+ * un worker de dix-huit heures était encore servi — aux navigateurs des visiteurs comme à mes
+ * propres vérifications.
+ *
+ * Un identifiant de build dans l'URL rend chaque version distincte pour le CDN, sans changer la
+ * portée du worker, qui reste la racine grâce à l'en-tête `Service-Worker-Allowed`.
+ */
+export function serviceWorkerUrl(buildId: string | undefined): string {
+  return buildId
+    ? `/firebase-messaging-sw.js?build=${encodeURIComponent(buildId)}`
+    : '/firebase-messaging-sw.js'
+}
