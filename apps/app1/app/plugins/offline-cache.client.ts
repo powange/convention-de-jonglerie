@@ -1,4 +1,9 @@
-import { OFFLINE_CACHES, serviceWorkerUrl, shouldPrecachePage } from '~~/shared/utils/offline-cache'
+import {
+  classifyRequest,
+  OFFLINE_CACHES,
+  serviceWorkerUrl,
+  shouldPrecachePage,
+} from '~~/shared/utils/offline-cache'
 
 /**
  * Enregistre le service worker pour tous les visiteurs, et met de côté les pages qui servent
@@ -70,23 +75,24 @@ export default defineNuxtPlugin(() => {
     })
 
   /**
-   * Conserve les fichiers de build que la page a réellement chargés.
+   * Conserve les ressources durables que la page a réellement chargées.
    *
-   * Les traductions en font partie : le module i18n les charge par imports dynamiques, et
-   * demandées avant que le worker ne contrôle la page, elles lui échappent — hors ligne,
-   * l'interface affichait ses clés brutes à la place des libellés.
+   * Le tri revient à `classifyRequest`, celui-là même dont le worker se sert. Filtrer ici sur un
+   * préfixe écrit à la main a déjà échoué : je ne retenais que le dossier des fichiers de build,
+   * si bien que les traductions — servies depuis un chemin à part — n'étaient jamais conservées
+   * et que l'interface revenait hors ligne avec ses clés à la place des libellés.
    *
-   * Plutôt que de deviner qui demande quoi, on relit ce que la page a effectivement chargé.
-   * C'est plus sûr que d'énumérer des chargeurs : ce que le navigateur a demandé est la seule
-   * liste qui ne puisse pas être incomplète.
+   * Relire ce que la page a effectivement demandé, et le trier avec la règle du worker : deux
+   * listes qui ne peuvent plus diverger.
    */
   const keepPageAssets = async () => {
     try {
       const cache = await caches.open(OFFLINE_CACHES.assets)
+      const origin = window.location.origin
       const urls = performance
         .getEntriesByType('resource')
         .map((entry) => entry.name)
-        .filter((url) => url.startsWith(`${window.location.origin}/_nuxt/`))
+        .filter((url) => classifyRequest(url, 'script', origin) === 'asset')
 
       await Promise.all(
         [...new Set(urls)].map(async (url) => {
@@ -100,6 +106,11 @@ export default defineNuxtPlugin(() => {
   }
 
   const start = async () => {
+    // Hors ligne, tout ce qui suit échoue — et échoue lentement. Chaque mise de côté devient une
+    // requête vouée à expirer, multipliée par le nombre de ressources de la page : c'est ce qui
+    // rendait l'affichage hors ligne plus lent qu'en ligne, exactement l'inverse du but.
+    if (navigator.onLine === false) return
+
     try {
       await navigator.serviceWorker.register(serviceWorkerUrl(useRuntimeConfig().app.buildId))
       await navigator.serviceWorker.ready
@@ -116,6 +127,7 @@ export default defineNuxtPlugin(() => {
 
     // Les navigations suivantes se font sans rechargement : le worker ne les voit pas passer.
     useRouter().afterEach((to) => {
+      if (navigator.onLine === false) return
       keepPage(to.path)
       // Une navigation charge de nouveaux morceaux : les capturer aussi.
       setTimeout(keepPageAssets, 1500)
