@@ -1,5 +1,7 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
+import { apiPost, loadState } from '../helpers'
+
 /**
  * Consultation hors ligne, le seul endroit où elle est observable automatiquement.
  *
@@ -7,9 +9,14 @@ import { expect, test } from '@nuxt/test-utils/playwright'
  * qui changent à chaque édition du code — si bien que ce comportement ne s'exerce nulle part
  * ailleurs que sur un build de production, celui que ce parcours utilise.
  *
- * Faute de ce parcours, quatre défauts sont partis en release avant d'être découverts à la main :
- * la page jamais mise en cache, ses scripts absents, la liste des éditions non conservée, puis
- * la même liste introuvable à cause de ses paramètres de requête. Chacun se serait vu ici.
+ * Faute de ce parcours, cinq défauts sont partis en release avant d'être découverts à la main :
+ * la page jamais mise en cache, ses scripts absents, la liste des éditions non conservée, la
+ * même liste introuvable à cause de ses paramètres de requête, puis les traductions manquantes.
+ * Chacun se serait vu ici.
+ *
+ * Il vit parmi les parcours de gestion, et non les parcours publics, uniquement pour disposer
+ * d'une édition : sa première version s'ignorait faute de zone à afficher, et un test vert qui
+ * ne vérifie rien vaut moins qu'un test absent.
  */
 test.describe('Consultation hors ligne', () => {
   /**
@@ -26,26 +33,25 @@ test.describe('Consultation hors ligne', () => {
   }
 
   test('la carte du site revient sans réseau', async ({ page, context }) => {
-    // L'édition est choisie parmi celles qui existent réellement, et parmi elles la première qui
-    // porte une carte. Viser un identifiant fixe ferait passer ce parcours en silence le jour où
-    // il disparaît — un test qui s'ignore ne vaut pas mieux que pas de test.
-    const liste = await page.request.get('/api/editions?limit=20')
-    expect(liste.ok(), 'la liste des éditions est injoignable').toBe(true)
-    const editions = (await liste.json())?.data ?? []
-    expect(editions.length, 'aucune édition en base').toBeGreaterThan(0)
+    const { editionId } = loadState()
 
-    let cible: number | null = null
-    for (const edition of editions) {
-      const zones = await page.request.get(`/api/editions/${edition.id}/zones`)
-      if (!zones.ok()) continue
-      if (((await zones.json())?.data?.zones ?? []).length > 0) {
-        cible = edition.id
-        break
-      }
-    }
-    test.skip(cible === null, 'aucune édition ne porte de zone : rien à vérifier hors ligne')
+    // La zone est créée ici plutôt qu'espérée : sans elle, la première version de ce parcours
+    // se déclarait ignorée et ne vérifiait rien du tout.
+    const creation = await apiPost(page, `http://localhost:3000/api/editions/${editionId}/zones`, {
+      data: {
+        name: 'Zone hors ligne E2E',
+        color: '#3B82F6',
+        zoneTypes: ['OTHER'],
+        coordinates: [
+          [46.4, 15.8],
+          [46.5, 15.9],
+          [46.6, 15.7],
+        ],
+      },
+    })
+    expect(creation.ok(), `création de zone échouée : ${await creation.text()}`).toBe(true)
 
-    await visitUntilControlled(page, `/editions/${cible}/map`)
+    await visitUntilControlled(page, `/editions/${editionId}/map`)
 
     const zonesEnLigne = await page.locator('path.leaflet-interactive').count()
     expect(zonesEnLigne, 'la carte ne s’affiche pas même en ligne').toBeGreaterThan(0)
@@ -75,5 +81,12 @@ test.describe('Consultation hors ligne', () => {
     const texte = (await page.locator('body').innerText()).toLowerCase()
     expect(texte, 'l’accueil est revenu sur une erreur réseau').not.toContain('failed to fetch')
     expect(texte.length, 'l’accueil est revenu vide').toBeGreaterThan(200)
+
+    // Les traductions sont chargées par imports dynamiques. Demandées avant que le worker ne
+    // contrôle la page, elles lui échappaient : l'interface affichait ses clés à la place des
+    // libellés — visible d'un coup d'œil, mais qu'aucune assertion ne relevait.
+    const cles = texte.match(/\b[a-z][a-z_]+\.[a-z][a-z_]+(\.[a-z_]+)*\b/g) ?? []
+    const suspectes = cles.filter((cle) => !/\.(com|fr|org|net|io)$/.test(cle))
+    expect(suspectes, 'des clés de traduction s’affichent au lieu des libellés').toEqual([])
   })
 })
