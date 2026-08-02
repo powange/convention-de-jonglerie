@@ -77,9 +77,10 @@ export function useFirebaseMessaging() {
       // forcer la prise en compte d'une nouvelle version.
 
       // Enregistrer le Service Worker avec option de mise à jour forcée
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-        updateViaCache: 'none', // Ne jamais utiliser le cache
-      })
+      const registration = await navigator.serviceWorker.register(
+        serviceWorkerUrl(useRuntimeConfig().app.buildId),
+        { updateViaCache: 'none' } // Ne jamais utiliser le cache du navigateur
+      )
 
       // Forcer la mise à jour immédiate
       await registration.update()

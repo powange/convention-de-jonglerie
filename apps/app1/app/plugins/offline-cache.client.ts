@@ -1,4 +1,4 @@
-import { OFFLINE_CACHES, shouldPrecachePage } from '~~/shared/utils/offline-cache'
+import { OFFLINE_CACHES, serviceWorkerUrl, shouldPrecachePage } from '~~/shared/utils/offline-cache'
 
 /**
  * Enregistre le service worker pour tous les visiteurs, et met de côté les pages qui servent
@@ -101,7 +101,7 @@ export default defineNuxtPlugin(() => {
 
   const start = async () => {
     try {
-      await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      await navigator.serviceWorker.register(serviceWorkerUrl(useRuntimeConfig().app.buildId))
       await navigator.serviceWorker.ready
     } catch (error) {
       warn('enregistrement impossible :', error)

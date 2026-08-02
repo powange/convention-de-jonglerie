@@ -4,6 +4,7 @@ import {
   classifyRequest,
   MAX_CACHED_TILES,
   OFFLINE_CACHES,
+  serviceWorkerUrl,
   shouldPrecachePage,
   type CacheKind,
 } from '../../../shared/utils/offline-cache'
@@ -173,5 +174,28 @@ describe('ressources servies hors du dossier de build', () => {
   it('n’ouvre pas le reste de l’API au passage', () => {
     expect(classifyRequest(`${ORIGIN}/api/session/me`, 'empty', ORIGIN)).toBeNull()
     expect(classifyRequest(`${ORIGIN}/api/editions/24/treasury`, 'empty', ORIGIN)).toBeNull()
+  })
+})
+
+/**
+ * Le chemin du worker se termine par « .js », et le CDN le traite en conséquence : mesuré sur
+ * release, il servait une copie vieille de dix-huit heures malgré le `no-store` envoyé par
+ * l'application — aux navigateurs des visiteurs comme aux vérifications de déploiement.
+ *
+ * Un identifiant de build dans l'URL rend chaque version distincte pour le CDN.
+ */
+describe('serviceWorkerUrl', () => {
+  it('porte l’identifiant du build', () => {
+    expect(serviceWorkerUrl('abc123')).toBe('/firebase-messaging-sw.js?build=abc123')
+  })
+
+  it('échappe ce qui doit l’être', () => {
+    expect(serviceWorkerUrl('a b/c')).toBe('/firebase-messaging-sw.js?build=a%20b%2Fc')
+  })
+
+  // Sans identifiant, mieux vaut l'URL nue qu'un paramètre vide qui changerait à chaque appel.
+  it('reste utilisable sans identifiant', () => {
+    expect(serviceWorkerUrl(undefined)).toBe('/firebase-messaging-sw.js')
+    expect(serviceWorkerUrl('')).toBe('/firebase-messaging-sw.js')
   })
 })
