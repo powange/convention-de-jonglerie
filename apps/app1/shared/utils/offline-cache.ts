@@ -10,8 +10,15 @@
  * vérifierait.
  */
 
-/** Nom des caches. La version force le renouvellement quand la politique change. */
-export const OFFLINE_CACHE_VERSION = 'v1'
+/**
+ * Nom des caches. La version force le renouvellement quand la politique change.
+ *
+ * Passée à v2 : les caches de la première version ont été remplis par des règles depuis
+ * corrigées — sans les traductions, notamment. Un navigateur qui les conserve reste bloqué sur
+ * cet état, son ancien worker lui servant l'ancien code depuis son propre cache, donc sans
+ * jamais recevoir le correctif. Changer de version les fait effacer à l'activation.
+ */
+export const OFFLINE_CACHE_VERSION = 'v2'
 export const OFFLINE_CACHES = {
   pages: `pages-${OFFLINE_CACHE_VERSION}`,
   assets: `assets-${OFFLINE_CACHE_VERSION}`,
