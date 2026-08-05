@@ -21,6 +21,26 @@ import {
 export default defineNuxtPlugin(() => {
   if (!import.meta.client || !('serviceWorker' in navigator)) return
 
+  /**
+   * Ressources durables chargées par la page, relevées au fil de l'eau.
+   *
+   * `performance.getEntriesByType('resource')` ne suffit pas : son tampon est plafonné à deux
+   * cent cinquante entrées, et la page en charge davantage. Les traductions, demandées tard,
+   * en étaient purement et simplement absentes — elles n'étaient donc jamais conservées, et
+   * l'interface revenait hors ligne avec ses clés à la place des libellés.
+   *
+   * Un observateur posé dès le démarrage ne connaît pas cette limite.
+   */
+  const chargees = new Set<string>()
+  const origin = window.location.origin
+  const retenir = (url: string) => {
+    if (classifyRequest(url, 'script', origin) === 'asset') chargees.add(url)
+  }
+  for (const entry of performance.getEntriesByType('resource')) retenir(entry.name)
+  new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) retenir(entry.name)
+  }).observe({ type: 'resource', buffered: true })
+
   const warn = (message: string, error: unknown) => {
     // Un échec n'a pas à se voir : le site fonctionne sans cache, simplement sans hors ligne.
     if (import.meta.dev) console.warn(`[sw] ${message}`, error)
@@ -88,11 +108,7 @@ export default defineNuxtPlugin(() => {
   const keepPageAssets = async () => {
     try {
       const cache = await caches.open(OFFLINE_CACHES.assets)
-      const origin = window.location.origin
-      const urls = performance
-        .getEntriesByType('resource')
-        .map((entry) => entry.name)
-        .filter((url) => classifyRequest(url, 'script', origin) === 'asset')
+      const urls = [...chargees]
 
       await Promise.all(
         [...new Set(urls)].map(async (url) => {
