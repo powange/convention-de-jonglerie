@@ -52,9 +52,23 @@ export default defineAppConfig({
         },
       },
     },
+    // Panneau d'options ajusté à son contenu, pour tous les sélecteurs du projet — qui en compte
+    // cent quarante-quatre, dont seize seulement portaient ce réglage à la main.
+    //
+    // Ces deux clés suivent la syntaxe de Nuxt UI 4. Le reste de ce fichier est resté en syntaxe
+    // v2 — « background », « border », « primary »… — et n'a donc plus aucun effet. Sa reprise
+    // change l'apparence de nombreux écrans et mérite d'être traitée à part.
+    //
+    // À CONFIRMER : l'effet de ces deux clés n'a pas pu être vérifié en développement, où une
+    // modification de ce fichier ne semble pas reprise sans redémarrage du serveur. Le réglage
+    // posé sur chaque champ reste donc en place, lui vérifié.
     select: {
+      slots: { content: 'min-w-fit' },
       background: 'bg-white dark:bg-gray-700',
       border: 'border border-gray-300 dark:border-violet-600/40',
+    },
+    selectMenu: {
+      slots: { content: 'min-w-fit' },
     },
     textarea: {
       background: 'bg-white dark:bg-gray-700',

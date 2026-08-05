@@ -247,6 +247,8 @@
                     v-model="dietForm.dietaryPreference"
                     :items="dietaryOptions"
                     value-key="value"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
                   />
                 </UFormField>
 
@@ -264,6 +266,8 @@
                     v-model="dietForm.allergySeverity"
                     :items="allergySeverityOptions"
                     value-key="value"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
                   />
                 </UFormField>
 
