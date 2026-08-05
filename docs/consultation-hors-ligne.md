@@ -130,7 +130,7 @@ curl -s "https://test.juggling-convention.com/?v=$RANDOM" \
   | grep -oE '/_nuxt/[A-Za-z0-9._-]+\.js' | sort -u | md5sum
 ```
 
-Compter environ **trois minutes** de construction sur release, **cinq** en production.
+Compter environ **cinq minutes** entre le déclenchement et la bascule, construction comprise.
 
 Une seule mesure ne prouve rien quand le résultat dépend d'un enchaînement temporel : le fichier
 de traductions a été vu en cache une fois, puis absent aux mesures suivantes, sur les deux
