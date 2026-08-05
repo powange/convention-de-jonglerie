@@ -111,15 +111,24 @@ export default defineNuxtPlugin(() => {
    * Relire ce que la page a effectivement demandé, et le trier avec la règle du worker : deux
    * listes qui ne peuvent plus diverger.
    */
+  const conservees = new Set<string>()
+
   const keepPageAssets = async () => {
     try {
       const cache = await caches.open(OFFLINE_CACHES.assets)
-      const urls = [...chargees]
+      // Ne repasser que sur les nouveautés : la mise en cache se relance à chaque ressource
+      // découverte, et réinterroger le cache pour les centaines déjà traitées à chaque fois
+      // coûterait sans rien apporter.
+      const restantes = [...chargees].filter((url) => !conservees.has(url))
 
       await Promise.all(
-        [...new Set(urls)].map(async (url) => {
+        restantes.map(async (url) => {
+          conservees.add(url)
           if (await cache.match(url)) return
-          await cache.add(url).catch(() => undefined)
+          await cache.add(url).catch(() => {
+            // Une ressource qui échoue reste candidate : elle sera retentée au passage suivant.
+            conservees.delete(url)
+          })
         })
       )
     } catch (error) {

@@ -149,9 +149,15 @@ async function cacheFirst(request, cacheName, maxEntries) {
   if (cached) return cached
   try {
     const response = await fetch(request)
-    // Les tuiles arrivent en réponse opaque : son statut est illisible, mais elle s'affiche.
-    // Une erreur réseau, elle, lève et n'est donc jamais mise en cache.
-    if (response) {
+    // Une réponse en erreur ne doit surtout pas être gardée : ces caches servent en priorité et
+    // sans expiration, si bien qu'un 404 passager condamnerait la ressource durablement, y
+    // compris une fois le réseau revenu.
+    //
+    // Les tuiles font exception par nature : venant d'un autre domaine, elles arrivent en réponse
+    // opaque, dont le statut est illisible. Elles s'affichent pourtant, et une erreur réseau lève
+    // plutôt que de produire une telle réponse.
+    const conservable = response && (response.ok || response.type === 'opaque')
+    if (conservable) {
       await cache.put(request, response.clone())
       trimCache(cacheName, maxEntries)
     }
