@@ -77,9 +77,13 @@ async function matchAnyVersion(cache, request, options) {
 
 /** Borne le nombre d'entrées d'un cache, en retirant les plus anciennes. */
 async function trimCache(cacheName, maxEntries) {
-  const cache = await caches.open(cacheName)
-  const keys = await cache.keys()
-  for (let i = 0; i < keys.length - maxEntries; i++) await cache.delete(keys[i])
+  try {
+    const cache = await caches.open(cacheName)
+    const keys = await cache.keys()
+    for (let i = 0; i < keys.length - maxEntries; i++) await cache.delete(keys[i])
+  } catch (error) {
+    // Un élagage qui échoue n'est pas une raison de faire échouer la requête en cours.
+  }
 }
 
 /**
@@ -116,7 +120,7 @@ async function staleWhileRevalidate(request, cacheName) {
 
   const network = fetch(request)
     .then((response) => {
-      if (response && response.ok) cache.put(request, response.clone())
+      if (response && response.ok) cache.put(request, response.clone()).catch(() => undefined)
       return response
     })
     .catch(() => null)
@@ -147,24 +151,30 @@ async function cacheFirst(request, cacheName, maxEntries) {
   const cache = await caches.open(cacheName)
   const cached = await matchAnyVersion(cache, request)
   if (cached) return cached
+  let response
   try {
-    const response = await fetch(request)
-    // Une réponse en erreur ne doit surtout pas être gardée : ces caches servent en priorité et
-    // sans expiration, si bien qu'un 404 passager condamnerait la ressource durablement, y
-    // compris une fois le réseau revenu.
-    //
-    // Les tuiles font exception par nature : venant d'un autre domaine, elles arrivent en réponse
-    // opaque, dont le statut est illisible. Elles s'affichent pourtant, et une erreur réseau lève
-    // plutôt que de produire une telle réponse.
-    const conservable = response && (response.ok || response.type === 'opaque')
-    if (conservable) {
-      await cache.put(request, response.clone())
-      trimCache(cacheName, maxEntries)
-    }
-    return response
+    response = await fetch(request)
   } catch (error) {
     return Response.error()
   }
+
+  // Une réponse en erreur ne doit surtout pas être gardée : ces caches servent en priorité et
+  // sans expiration, si bien qu'un 404 passager condamnerait la ressource durablement, y compris
+  // une fois le réseau revenu.
+  //
+  // Les tuiles font exception par nature : venant d'un autre domaine, elles arrivent en réponse
+  // opaque, dont le statut est illisible. Elles s'affichent pourtant, et une erreur réseau lève
+  // plutôt que de produire une telle réponse.
+  if (response && (response.ok || response.type === 'opaque')) {
+    // L'écriture est volontairement hors du chemin de la réponse. Elle peut échouer — quota du
+    // navigateur atteint, notamment sur un téléphone — et cet échec ne doit pas transformer une
+    // réponse parfaitement valide en erreur, ce qui reviendrait à casser le site faute de place.
+    cache
+      .put(request, response.clone())
+      .then(() => trimCache(cacheName, maxEntries))
+      .catch(() => undefined)
+  }
+  return response
 }
 
 /** Le réseau d'abord pour les pages : la version en cache ne sert qu'en cas d'échec. */
@@ -179,7 +189,8 @@ async function networkFirstPage(request) {
 
   try {
     const response = await fetch(request)
-    if (response && response.ok) cache.put(request, response.clone())
+    // Écriture hors du chemin de la réponse, pour la même raison que ci-dessus.
+    if (response && response.ok) cache.put(request, response.clone()).catch(() => undefined)
     return response
   } catch (error) {
     const cached = await matchAnyVersion(cache, request)

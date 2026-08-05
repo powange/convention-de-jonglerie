@@ -138,6 +138,15 @@ for (const n of await caches.keys()) {
 L'affichage seul ne prouve rien : le rendu serveur peut donner une page correcte en français tout
 en masquant l'absence totale de cache.
 
+### Une écriture de cache ne doit pas casser une réponse valide
+
+L'écriture se fait **hors du chemin de la réponse**. Elle peut échouer — quota du navigateur
+atteint, notamment sur un téléphone — et cet échec ne doit pas transformer une réponse
+parfaitement valide en erreur, ce qui reviendrait à casser le site faute de place.
+
+De même, une réponse en erreur n'est jamais conservée : ces caches servent en priorité et sans
+expiration, si bien qu'un 404 passager condamnerait la ressource durablement.
+
 ## Ce qui reste ouvert
 
 - **`/api/session/me` n'est pas conservée** et ne peut pas l'être telle quelle : elle dépend de
