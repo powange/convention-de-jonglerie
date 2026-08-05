@@ -96,6 +96,15 @@ parfaitement valide en erreur, ce qui reviendrait à casser le site faute de pla
 De même, une réponse en erreur n'est jamais conservée : ces caches servent en priorité et sans
 expiration, si bien qu'un 404 passager condamnerait la ressource durablement.
 
+### Relever les ressources après coup ne suffit pas
+
+L'observateur de performances est censé voir passer chaque ressource. En pratique, les
+traductions n'y apparaissaient qu'une fois sur plusieurs — l'ordre entre leur arrivée et
+l'amorçage du cache n'étant garanti par rien.
+
+Les requêtes sont donc aussi relevées **à la source**, en enveloppant `fetch`. Une conservation
+qui dépend d'un enchaînement temporel n'en est pas une.
+
 ### Le CDN met le worker en cache
 
 Le chemin se termine par `.js` : Cloudflare l'a servi pendant **vingt-trois heures** malgré le
@@ -121,7 +130,11 @@ curl -s "https://test.juggling-convention.com/?v=$RANDOM" \
   | grep -oE '/_nuxt/[A-Za-z0-9._-]+\.js' | sort -u | md5sum
 ```
 
-Compter environ trois minutes de construction après le déclenchement.
+Compter environ **trois minutes** de construction sur release, **cinq** en production.
+
+Une seule mesure ne prouve rien quand le résultat dépend d'un enchaînement temporel : le fichier
+de traductions a été vu en cache une fois, puis absent aux mesures suivantes, sur les deux
+environnements. Répéter la mesure avant de conclure.
 
 ## Vérifier le comportement
 

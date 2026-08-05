@@ -47,6 +47,29 @@ export default defineNuxtPlugin(() => {
     for (const entry of list.getEntries()) retenir(entry.name)
   }).observe({ type: 'resource', buffered: true })
 
+  /**
+   * Relève aussi les requêtes au moment où elles partent.
+   *
+   * L'observateur de performances est censé suffire, mais les traductions n'y apparaissaient pas
+   * de façon fiable : mesuré sur les deux environnements, le fichier de messages était conservé
+   * une fois sur plusieurs. Une conservation qui dépend d'un enchaînement temporel n'en est pas
+   * une.
+   *
+   * Envelopper `fetch` capte la requête à la source, avant même qu'elle n'aboutisse. Le relais
+   * est transparent : on note l'URL et on laisse passer.
+   */
+  const fetchOriginal = window.fetch.bind(window)
+  window.fetch = (input, init) => {
+    try {
+      const url =
+        typeof input === 'string' ? input : input instanceof Request ? input.url : String(input)
+      retenir(new URL(url, origin).href)
+    } catch {
+      // Une URL illisible ne doit pas empêcher la requête d'aboutir.
+    }
+    return fetchOriginal(input, init)
+  }
+
   const warn = (message: string, error: unknown) => {
     // Un échec n'a pas à se voir : le site fonctionne sans cache, simplement sans hors ligne.
     if (import.meta.dev) console.warn(`[sw] ${message}`, error)
