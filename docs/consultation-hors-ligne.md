@@ -87,6 +87,15 @@ hors ligne avant d'avoir revisité se retrouvait **sans rien** — moins bien se
 Les anciens caches sont donc conservés, et les lectures les traversent. Les entrées obsolètes ne
 gênent pas : les noms portant une empreinte, elles ne sont plus jamais demandées.
 
+### Une écriture de cache ne doit pas casser une réponse valide
+
+L'écriture se fait **hors du chemin de la réponse**. Elle peut échouer — quota du navigateur
+atteint, notamment sur un téléphone — et cet échec ne doit pas transformer une réponse
+parfaitement valide en erreur, ce qui reviendrait à casser le site faute de place.
+
+De même, une réponse en erreur n'est jamais conservée : ces caches servent en priorité et sans
+expiration, si bien qu'un 404 passager condamnerait la ressource durablement.
+
 ### Le CDN met le worker en cache
 
 Le chemin se termine par `.js` : Cloudflare l'a servi pendant **vingt-trois heures** malgré le
@@ -137,15 +146,6 @@ for (const n of await caches.keys()) {
 
 L'affichage seul ne prouve rien : le rendu serveur peut donner une page correcte en français tout
 en masquant l'absence totale de cache.
-
-### Une écriture de cache ne doit pas casser une réponse valide
-
-L'écriture se fait **hors du chemin de la réponse**. Elle peut échouer — quota du navigateur
-atteint, notamment sur un téléphone — et cet échec ne doit pas transformer une réponse
-parfaitement valide en erreur, ce qui reviendrait à casser le site faute de place.
-
-De même, une réponse en erreur n'est jamais conservée : ces caches servent en priorité et sans
-expiration, si bien qu'un 404 passager condamnerait la ressource durablement.
 
 ## Ce qui reste ouvert
 
