@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   classifyRequest,
+  MAX_CACHED_ASSETS,
   MAX_CACHED_TILES,
   OFFLINE_CACHES,
   serviceWorkerUrl,
@@ -116,6 +117,13 @@ describe('paramètres des caches', () => {
   it('plafonne les tuiles conservées', () => {
     expect(MAX_CACHED_TILES).toBeGreaterThan(0)
     expect(MAX_CACHED_TILES).toBeLessThanOrEqual(2000)
+  })
+
+  // Mesuré : la seule page d un accueil charge plus de quatre cents fichiers. Un plafond
+  // inférieur fait s evincer le cache lui-meme, et les dernieres ressources ajoutees — dont les
+  // traductions — disparaissent aussitot.
+  it('laisse la place a plusieurs pages de fichiers durables', () => {
+    expect(MAX_CACHED_ASSETS).toBeGreaterThan(400)
   })
 })
 

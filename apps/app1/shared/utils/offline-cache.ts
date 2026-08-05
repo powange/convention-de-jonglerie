@@ -36,12 +36,20 @@ export const OFFLINE_CACHES = {
 export const MAX_CACHED_TILES = 600
 
 /**
- * Nombre de fichiers de build conservés.
+ * Nombre de fichiers durables conservés.
  *
  * Leur nom porte une empreinte : une nouvelle version produit de nouveaux noms plutôt que de
  * remplacer les anciens. Sans plafond, chaque déploiement laisserait sa strate derrière lui.
+ *
+ * Le plafond précédent valait deux cents, fixé au jugé. Mesure faite, la seule page d'accueil
+ * en charge plus de quatre cents : le cache s'évinçait lui-même en permanence, et les
+ * traductions — ajoutées tardivement — en faisaient les frais. L'interface revenait donc hors
+ * ligne avec ses clés à la place des libellés, sans que la règle de tri y soit pour rien.
+ *
+ * Ces fichiers pèsent quelques kilo-octets : mille cinq cents laissent la place à plusieurs
+ * pages et à quelques déploiements successifs, loin des quotas d'un navigateur.
  */
-export const MAX_CACHED_ASSETS = 200
+export const MAX_CACHED_ASSETS = 1500
 
 export type CacheKind = 'page' | 'map-data' | 'tile' | 'asset' | null
 
