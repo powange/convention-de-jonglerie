@@ -51,16 +51,29 @@ self.addEventListener('install', () => {
 })
 
 self.addEventListener('activate', (event) => {
-  const keep = Object.values(CACHES)
-  event.waitUntil(
-    caches
-      .keys()
-      .then((names) =>
-        Promise.all(names.map((name) => (keep.indexOf(name) === -1 ? caches.delete(name) : null)))
-      )
-      .then(() => self.clients.claim())
-  )
+  // Les caches des versions précédentes ne sont plus effacés ici.
+  //
+  // Ils l'étaient, et le remède est devenu le mal : changer de version vidait tout, si bien
+  // qu'un visiteur passant hors ligne avant d'avoir revisité en ligne se retrouvait sans rien —
+  // moins bien servi qu'avant la mise à jour, alors qu'elle venait l'améliorer.
+  //
+  // Les entrées obsolètes ne gênent pas : les fichiers portent une empreinte dans leur nom, donc
+  // les anciens ne sont plus jamais demandés. Ils seront simplement évincés par le navigateur
+  // quand il aura besoin de place.
+  event.waitUntil(self.clients.claim())
 })
+
+/**
+ * Cherche dans le cache de la version courante, puis dans n'importe quelle autre.
+ *
+ * C'est ce qui donne la continuité d'une version à la suivante : le temps que les nouveaux
+ * caches se remplissent, ceux de la version précédente répondent encore.
+ */
+async function matchAnyVersion(cache, request, options) {
+  const courant = await cache.match(request, options)
+  if (courant) return courant
+  return caches.match(request, options)
+}
 
 /** Borne le nombre d'entrées d'un cache, en retirant les plus anciennes. */
 async function trimCache(cacheName, maxEntries) {
@@ -91,9 +104,9 @@ function markAsCached(response) {
  * pas de liste.
  */
 async function matchTolerant(cache, request) {
-  const exact = await cache.match(request)
+  const exact = await matchAnyVersion(cache, request)
   if (exact) return exact
-  return cache.match(request, { ignoreSearch: true })
+  return matchAnyVersion(cache, request, { ignoreSearch: true })
 }
 
 /** Sert le cache immédiatement et rafraîchit derrière : une carte datée vaut mieux que rien. */
@@ -132,7 +145,7 @@ async function staleWhileRevalidate(request, cacheName) {
 /** Contenu immuable — tuile ou fichier de build : le cache d'abord, le réseau s'il manque. */
 async function cacheFirst(request, cacheName, maxEntries) {
   const cache = await caches.open(cacheName)
-  const cached = await cache.match(request)
+  const cached = await matchAnyVersion(cache, request)
   if (cached) return cached
   try {
     const response = await fetch(request)
@@ -154,7 +167,7 @@ async function networkFirstPage(request) {
 
   // Hors ligne avéré : inutile de tenter le réseau et d'attendre son échec.
   if (self.navigator && self.navigator.onLine === false) {
-    const cached = await cache.match(request)
+    const cached = await matchAnyVersion(cache, request)
     if (cached) return cached
   }
 
@@ -163,7 +176,7 @@ async function networkFirstPage(request) {
     if (response && response.ok) cache.put(request, response.clone())
     return response
   } catch (error) {
-    const cached = await cache.match(request)
+    const cached = await matchAnyVersion(cache, request)
     if (cached) return cached
     throw error
   }
