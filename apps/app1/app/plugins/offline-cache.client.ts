@@ -33,8 +33,14 @@ export default defineNuxtPlugin(() => {
    */
   const chargees = new Set<string>()
   const origin = window.location.origin
+  /** Relance une mise en cache différée dès qu'une ressource nouvelle apparaît. */
+  let planifier: (() => void) | null = null
+
   const retenir = (url: string) => {
-    if (classifyRequest(url, 'script', origin) === 'asset') chargees.add(url)
+    if (classifyRequest(url, 'script', origin) !== 'asset') return
+    if (chargees.has(url)) return
+    chargees.add(url)
+    planifier?.()
   }
   for (const entry of performance.getEntriesByType('resource')) retenir(entry.name)
   new PerformanceObserver((list) => {
@@ -137,9 +143,31 @@ export default defineNuxtPlugin(() => {
 
     await whenControlled()
 
+    /**
+     * La mise en cache ne peut pas se faire en une seule fois.
+     *
+     * Les traductions sont demandées après l'événement de chargement — quarante millisecondes
+     * après, mesuré — donc après un passage unique déclenché à ce moment-là. L'observateur les
+     * voyait bien, mais plus personne n'écoutait : le cache restait sans elles, et l'interface
+     * revenait hors ligne avec ses clés à la place des libellés.
+     *
+     * Chaque ressource nouvelle relance donc une mise en cache, groupée pour ne pas en
+     * déclencher une par fichier.
+     */
+    let attente: ReturnType<typeof setTimeout> | null = null
+    planifier = () => {
+      if (navigator.onLine === false) return
+      if (attente) clearTimeout(attente)
+      attente = setTimeout(() => {
+        attente = null
+        keepPageAssets()
+      }, 1500)
+    }
+
     await keepPage(window.location.pathname)
     await keepEditionList()
     await keepPageAssets()
+    planifier()
 
     // Les navigations suivantes se font sans rechargement : le worker ne les voit pas passer.
     useRouter().afterEach((to) => {
