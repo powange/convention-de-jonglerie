@@ -462,8 +462,7 @@
     },
     "my_tasks": "Moje zadania",
     "tasks": "Zadania",
-    "site_map": "Mapa terenu",
-    "program_by_day": "Program dzień po dniu"
+    "site_map": "Mapa terenu"
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",
