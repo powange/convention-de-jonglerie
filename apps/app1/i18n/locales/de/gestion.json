@@ -5,7 +5,12 @@
       "save": "Speichern",
       "save_error": "Fehler beim Aktualisieren der Informationen",
       "save_success": "Informationen erfolgreich aktualisiert",
-      "title": "Über uns"
+      "title": "Über uns",
+      "program_general_help": "Was nicht von einem Datum abhängt: Anfahrt, Preise, Regeln des Zusammenlebens.",
+      "program_days": "Programm nach Tagen",
+      "program_days_help": "Ein leer gelassener Tag wird öffentlich nicht angezeigt.",
+      "program_day_placeholder": "Workshops, Shows, Mahlzeiten…",
+      "program_day_outside": "Außerhalb der Veranstaltungsdaten"
     },
     "ai_update": {
       "apply_selected": "{count} Änderung(en) anwenden",

@@ -462,7 +462,8 @@
     },
     "my_tasks": "Meine Aufgaben",
     "tasks": "Aufgaben",
-    "site_map": "Geländekarte"
+    "site_map": "Geländekarte",
+    "program_by_day": "Programm nach Tagen"
   },
   "errors": {
     "access_denied": "Zugang verweigert",

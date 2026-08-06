@@ -84,7 +84,7 @@
         </UFormField>
 
         <!-- Programme jour par jour -->
-        <div v-if="programDays.length > 0" class="space-y-4">
+        <div v-if="programDaysLoaded && programDays.length > 0" class="space-y-4">
           <div>
             <h3 class="font-semibold">{{ $t('gestion.about.program_days') }}</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -174,6 +174,15 @@ const program = ref('')
  */
 const programDays = ref<ProgramDaySlot[]>([])
 
+/**
+ * Vrai quand le programme par jour a bien été chargé.
+ *
+ * Sans ce garde-fou, un échec de chargement laissait la liste vide, et l'enregistrement — qui
+ * remplace l'ensemble — aurait supprimé tout le programme existant. Un incident réseau passager
+ * aurait suffi à effacer le travail de l'organisateur, sans le moindre signal.
+ */
+const programDaysLoaded = ref(false)
+
 const formatDayLabel = (date: string) =>
   new Date(`${date}T12:00:00Z`).toLocaleDateString(locale.value, {
     weekday: 'long',
@@ -234,17 +243,23 @@ const onImageError = (error: string) => {
 /** Recompose la liste des jours dès que les dates de l'édition ou les contenus arrivent. */
 const chargerProgrammeParJour = async () => {
   if (!edition.value) return
-  let enregistres: ProgramDayRecord[] = []
   try {
     const reponse = await $fetch<{ data: { days: ProgramDayRecord[] } }>(
       `/api/editions/${editionId.value}/program-days`
     )
-    enregistres = reponse.data.days
+    programDays.value = buildProgramDays(
+      edition.value.startDate,
+      edition.value.endDate,
+      reponse.data.days
+    )
+    programDaysLoaded.value = true
   } catch (error) {
-    // Sans ces jours, la page reste utilisable pour le programme général : ne pas la bloquer.
+    // La page reste utilisable pour le programme général, mais les jours ne seront pas
+    // enregistrés : mieux vaut ne rien écrire que d'écraser ce qu'on n'a pas su lire.
     console.error('Programme par jour non chargé :', error)
+    programDays.value = []
+    programDaysLoaded.value = false
   }
-  programDays.value = buildProgramDays(edition.value.startDate, edition.value.endDate, enregistres)
 }
 
 // Sauvegarde
@@ -288,7 +303,8 @@ const saving = computed(() => savingEdition.value || savingDays.value)
 const save = async () => {
   const okEdition = await saveEdition()
   if (!okEdition) return
-  const okDays = programDays.value.length === 0 || (await saveDays())
+  // Ne rien écrire tant que la lecture a échoué : l'enregistrement remplace l'ensemble.
+  const okDays = !programDaysLoaded.value || (await saveDays())
   if (okDays) toast.add({ title: t('gestion.about.save_success'), color: 'success' })
 }
 

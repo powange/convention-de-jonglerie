@@ -462,7 +462,8 @@
     },
     "my_tasks": "Mine opgaver",
     "tasks": "Opgaver",
-    "site_map": "Områdekort"
+    "site_map": "Områdekort",
+    "program_by_day": "Program dag for dag"
   },
   "errors": {
     "access_denied": "Adgang nægtet",

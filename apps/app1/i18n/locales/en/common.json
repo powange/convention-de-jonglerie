@@ -462,7 +462,8 @@
     },
     "my_tasks": "My tasks",
     "tasks": "Tasks",
-    "site_map": "Site map"
+    "site_map": "Site map",
+    "program_by_day": "Day-by-day programme"
   },
   "errors": {
     "access_denied": "Access denied",

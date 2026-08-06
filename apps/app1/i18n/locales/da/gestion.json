@@ -5,7 +5,12 @@
       "save": "Gem",
       "save_error": "Fejl ved opdatering af oplysninger",
       "save_success": "Oplysninger opdateret",
-      "title": "Om"
+      "title": "Om",
+      "program_general_help": "Det, der ikke afhænger af en dato: adgang, priser, fælles leveregler.",
+      "program_days": "Program dag for dag",
+      "program_days_help": "En dag, der efterlades tom, vises ikke offentligt.",
+      "program_day_placeholder": "Workshops, forestillinger, måltider…",
+      "program_day_outside": "Uden for arrangementets datoer"
     },
     "ai_update": {
       "apply_selected": "Anvend {count} ændring(er)",

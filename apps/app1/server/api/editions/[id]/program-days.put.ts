@@ -41,6 +41,16 @@ export default wrapApiHandler(
       throw createError({ status: 400, message: 'Un même jour est fourni plusieurs fois' })
     }
 
+    // Le format seul ne suffit pas : « 2026-13-45 » le respecte et donnerait une date invalide,
+    // que Prisma rejetterait par une erreur serveur au lieu d'une requête mal formée.
+    const invalide = dates.find((date) => {
+      const parsed = new Date(`${date}T00:00:00.000Z`)
+      return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date
+    })
+    if (invalide) {
+      throw createError({ status: 400, message: `Jour invalide : ${invalide}` })
+    }
+
     const remplis = days.filter((d) => d.content.trim() !== '')
 
     await prisma.$transaction(async (tx) => {
