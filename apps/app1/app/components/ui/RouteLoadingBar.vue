@@ -10,7 +10,22 @@
  * composable officiel qui l'alimente permet la même chose en bas, où la barre gêne moins la
  * lecture du contenu qui arrive.
  */
-const { isLoading, progress } = useLoadingIndicator()
+/**
+ * Les réglages par défaut retardaient la barre de part et d'autre du chargement, au point qu'elle
+ * semblait n'apparaître qu'une fois la page arrivée :
+ *
+ * - `throttle` (200 ms par défaut) diffère l'apparition, pour éviter un clignotement sur les
+ *   navigations instantanées. Ramené à zéro : le clic doit se voir tout de suite, c'est la raison
+ *   d'être de cette barre. Une navigation immédiate garde de toute façon `hideDelay` avant de
+ *   disparaître, donc la barre reste perceptible plutôt que clignotante.
+ * - `hideDelay` (500 ms par défaut) la maintient affichée après l'arrivée de la page ; c'est cette
+ *   traîne, pendant laquelle la progression finit sa course jusqu'à 100 %, qu'on prenait pour un
+ *   affichage tardif. Raccourcie.
+ *
+ * `hideDelay` n'est pas documenté mais bien lu par `createLoadingIndicator` (voir
+ * `nuxt/dist/app/composables/loading-indicator.js`) : à revérifier lors d'une montée de version.
+ */
+const { isLoading, progress } = useLoadingIndicator({ throttle: 0, hideDelay: 150 })
 const { t } = useI18n()
 </script>
 
@@ -18,8 +33,8 @@ const { t } = useI18n()
   <!-- `fixed` et non `sticky` : la barre doit tenir le bas de la fenêtre quel que soit le
        défilement, y compris sur une page plus courte que l'écran. -->
   <Transition
-    enter-active-class="transition-opacity duration-200"
-    leave-active-class="transition-opacity duration-500"
+    enter-active-class="transition-opacity duration-75"
+    leave-active-class="transition-opacity duration-300"
     enter-from-class="opacity-0"
     leave-to-class="opacity-0"
   >
@@ -32,9 +47,11 @@ const { t } = useI18n()
       aria-valuemin="0"
       aria-valuemax="100"
     >
+      <!-- Largeur plancher : la progression estimée part de zéro et ne dépasse 1 % qu'après une
+           poignée de millisecondes. Sans ce minimum, le clic n'afficherait qu'un trait vide. -->
       <div
         class="h-full bg-primary transition-[width] duration-150 ease-out"
-        :style="{ width: `${progress}%` }"
+        :style="{ width: `${Math.max(progress, 3)}%` }"
       />
     </div>
   </Transition>
