@@ -18,6 +18,9 @@
         <NotificationsPushPromoModal />
       </ClientOnly>
 
+      <!-- Signe de vie pendant une navigation : discret, en bas, hors du chemin de lecture. -->
+      <UiRouteLoadingBar />
+
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
