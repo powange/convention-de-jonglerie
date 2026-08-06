@@ -5,7 +5,12 @@
       "save": "Save",
       "save_error": "Error updating information",
       "save_success": "Information updated successfully",
-      "title": "About"
+      "title": "About",
+      "program_general_help": "What does not depend on a date: access, prices, house rules.",
+      "program_days": "Day-by-day programme",
+      "program_days_help": "A day left empty is not shown publicly.",
+      "program_day_placeholder": "Workshops, shows, meals…",
+      "program_day_outside": "Outside the edition dates"
     },
     "ai_update": {
       "apply_selected": "Apply {count} change(s)",

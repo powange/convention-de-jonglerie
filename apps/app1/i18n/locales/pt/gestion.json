@@ -5,7 +5,12 @@
       "save": "Guardar",
       "save_error": "Erro ao atualizar as informações",
       "save_success": "Informações atualizadas com sucesso",
-      "title": "Sobre"
+      "title": "Sobre",
+      "program_general_help": "O que não depende de uma data: acesso, preços, regras de convivência.",
+      "program_days": "Programa dia a dia",
+      "program_days_help": "Um dia deixado vazio não é apresentado publicamente.",
+      "program_day_placeholder": "Ateliês, espetáculos, refeições…",
+      "program_day_outside": "Fora das datas da edição"
     },
     "ai_update": {
       "apply_selected": "Aplicar {count} alteração(ões)",

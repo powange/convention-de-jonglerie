@@ -164,6 +164,23 @@
             </div>
           </UCard>
 
+          <!-- Programme jour par jour -->
+          <UCard v-if="programDays && programDays.length > 0" variant="subtle">
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold">{{ $t('edition.program_by_day') }}</h3>
+              <div v-for="jour in programDays" :key="jour.date" class="space-y-2">
+                <h4 class="font-medium capitalize text-gray-900 dark:text-gray-100">
+                  {{ formatProgramDay(jour.date) }}
+                </h4>
+                <div class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
+                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <div v-html="jour.html" />
+                </div>
+              </div>
+            </div>
+          </UCard>
+
           <!-- Spectacles publics -->
           <UCard v-if="publicShows && publicShows.length > 0" variant="subtle">
             <!-- Version mobile/tablette (< xl) : Collapsible -->
@@ -768,6 +785,8 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
+import { buildProgramDays, type ProgramDayRecord } from '~~/shared/utils/program-days'
+
 const { formatDateTimeRange } = useDateFormat()
 
 const route = useRoute()
@@ -1103,6 +1122,46 @@ const { data: programHtml } = await useAsyncData(`edition-program-${route.params
   }
   return await markdownToHtml(edition.value.program)
 })
+
+/**
+ * Programme jour par jour, rendu côté serveur comme le programme général.
+ *
+ * Seuls les jours réellement écrits sont affichés : une journée sans contenu n'a rien à montrer,
+ * et lister des titres vides encombrerait la lecture. Les jours sortis des dates de l'édition
+ * n'apparaissent pas non plus au public — ils restent visibles en gestion, où ils peuvent être
+ * repris ou vidés.
+ */
+const { data: programDays } = await useAsyncData(
+  `edition-program-days-${route.params.id}`,
+  async () => {
+    if (!edition.value) return []
+    let enregistres: ProgramDayRecord[] = []
+    try {
+      const reponse = await $fetch<{ data: { days: ProgramDayRecord[] } }>(
+        `/api/editions/${route.params.id}/program-days`
+      )
+      enregistres = reponse.data.days
+    } catch {
+      return []
+    }
+    const jours = buildProgramDays(
+      edition.value.startDate,
+      edition.value.endDate,
+      enregistres
+    ).filter((jour) => !jour.outsideDates && jour.content.trim() !== '')
+
+    return Promise.all(
+      jours.map(async (jour) => ({ date: jour.date, html: await markdownToHtml(jour.content) }))
+    )
+  }
+)
+
+const formatProgramDay = (date: string) =>
+  new Date(`${date}T12:00:00Z`).toLocaleDateString(locale.value, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
 
 const isAttending = computed(() => (_editionId: number) => {
   return edition.value?.attendingUsers?.some((u) => u.id === authStore.user?.id) || false

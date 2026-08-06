@@ -462,7 +462,8 @@
     },
     "my_tasks": "Moje úkoly",
     "tasks": "Úkoly",
-    "site_map": "Mapa areálu"
+    "site_map": "Mapa areálu",
+    "program_by_day": "Program po dnech"
   },
   "errors": {
     "access_denied": "Neoprávněný přístup",

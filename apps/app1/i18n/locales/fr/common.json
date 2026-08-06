@@ -462,7 +462,8 @@
     },
     "my_tasks": "Mes tâches",
     "tasks": "Tâches",
-    "site_map": "Carte du site"
+    "site_map": "Carte du site",
+    "program_by_day": "Programme jour par jour"
   },
   "errors": {
     "access_denied": "Accès non autorisé",

@@ -5,7 +5,12 @@
       "save": "Uložit",
       "save_error": "Chyba při aktualizaci informací",
       "save_success": "Informace úspěšně aktualizovány",
-      "title": "O akci"
+      "title": "O akci",
+      "program_general_help": "Co nezávisí na datu: doprava, ceny, pravidla soužití.",
+      "program_days": "Program po dnech",
+      "program_days_help": "Den ponechaný prázdný se veřejně nezobrazuje.",
+      "program_day_placeholder": "Workshopy, představení, jídlo…",
+      "program_day_outside": "Mimo termín konání"
     },
     "ai_update": {
       "apply_selected": "Použít {count} změnu/změn",

@@ -462,7 +462,8 @@
     },
     "my_tasks": "Mina uppgifter",
     "tasks": "Uppgifter",
-    "site_map": "Områdeskarta"
+    "site_map": "Områdeskarta",
+    "program_by_day": "Program dag för dag"
   },
   "errors": {
     "access_denied": "Obehörig åtkomst",

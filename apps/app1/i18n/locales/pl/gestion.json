@@ -5,7 +5,12 @@
       "save": "Zapisz",
       "save_error": "Błąd podczas aktualizacji informacji",
       "save_success": "Informacje zaktualizowane pomyślnie",
-      "title": "O nas"
+      "title": "O nas",
+      "program_general_help": "To, co nie zależy od daty: dojazd, ceny, zasady wspólnego pobytu.",
+      "program_days": "Program dzień po dniu",
+      "program_days_help": "Dzień pozostawiony pusty nie jest pokazywany publicznie.",
+      "program_day_placeholder": "Warsztaty, pokazy, posiłki…",
+      "program_day_outside": "Poza datami edycji"
     },
     "ai_update": {
       "apply_selected": "Zastosuj {count} zmianę/zmian",

@@ -5,7 +5,12 @@
       "save": "Spara",
       "save_error": "Fel vid uppdatering av information",
       "save_success": "Information uppdaterad",
-      "title": "Om"
+      "title": "Om",
+      "program_general_help": "Det som inte beror på ett datum: hitta hit, priser, gemensamma regler.",
+      "program_days": "Program dag för dag",
+      "program_days_help": "En dag som lämnas tom visas inte offentligt.",
+      "program_day_placeholder": "Workshoppar, föreställningar, måltider…",
+      "program_day_outside": "Utanför konventets datum"
     },
     "ai_update": {
       "apply_selected": "Tillämpa {count} ändring(ar)",

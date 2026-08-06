@@ -5,7 +5,12 @@
       "save": "Opslaan",
       "save_error": "Fout bij het bijwerken van de informatie",
       "save_success": "Informatie succesvol bijgewerkt",
-      "title": "Over"
+      "title": "Over",
+      "program_general_help": "Wat niet van een datum afhangt: bereikbaarheid, tarieven, leefregels.",
+      "program_days": "Programma per dag",
+      "program_days_help": "Een leeg gelaten dag wordt niet openbaar getoond.",
+      "program_day_placeholder": "Workshops, voorstellingen, maaltijden…",
+      "program_day_outside": "Buiten de data van de editie"
     },
     "ai_update": {
       "apply_selected": "{count} wijziging(en) toepassen",
