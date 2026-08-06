@@ -113,6 +113,8 @@ export const publicRoutes: PublicRoute[] = [
 
   // ====== Carte (zones et marqueurs) ======
   { pattern: /^\/api\/editions\/\d+\/zones$/, methods: ['GET'], hydrateSession: true },
+  // Programme détaillé, jour par jour : information d'affiche, comme le programme général.
+  { pattern: /^\/api\/editions\/\d+\/program-days$/, methods: ['GET'], hydrateSession: true },
   { pattern: /^\/api\/editions\/\d+\/markers$/, methods: ['GET'], hydrateSession: true },
 
   // ====== FAQ (entrées publiques) ======

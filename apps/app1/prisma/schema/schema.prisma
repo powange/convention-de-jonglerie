@@ -129,6 +129,8 @@ model Edition {
   name                             String?
   description                      String?                       @db.Text
   program                          String?                       @db.Text
+  /// Programme détaillé, une ligne par jour. Voir EditionProgramDay.
+  programDays                      EditionProgramDay[]
   artistInfo                       String?                       @db.Text
   createdAt                        DateTime                      @default(now())
   updatedAt                        DateTime                      @updatedAt
@@ -479,6 +481,28 @@ enum EditionZoneType {
   ACCESSIBILITY
   FORBIDDEN
   OTHER
+}
+
+/// Programme d'une journée d'édition.
+///
+/// Le champ `Edition.program` subsiste pour ce qui ne se rattache à aucune date — plan d'accès,
+/// tarifs, principes de vie commune. Ces lignes-ci portent le détail jour par jour.
+///
+/// Aucune contrainte ne lie `date` aux dates de l'édition : celles-ci bougent, et effacer le
+/// texte écrit pour un jour devenu hors bornes ferait perdre du travail que personne n'a demandé
+/// à jeter. L'affichage le signale plutôt que la base ne l'interdise.
+model EditionProgramDay {
+  id        Int      @id @default(autoincrement())
+  edition   Edition  @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId Int
+  /// Jour concerné, sans heure.
+  date      DateTime @db.Date
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([editionId, date])
+  @@index([editionId])
 }
 
 model EditionZone {
