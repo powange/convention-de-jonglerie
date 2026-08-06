@@ -462,8 +462,7 @@
     },
     "my_tasks": "Minhas tarefas",
     "tasks": "Tarefas",
-    "site_map": "Mapa do local",
-    "program_by_day": "Programa dia a dia"
+    "site_map": "Mapa do local"
   },
   "errors": {
     "access_denied": "Acesso negado",
