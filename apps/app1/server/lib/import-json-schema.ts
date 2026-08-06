@@ -26,7 +26,7 @@ export const REQUIRED_FIELDS =
  * Liste des champs optionnels importants (partagée ED/EI)
  */
 export const OPTIONAL_FIELDS =
-  'region (Région/État/Province), timezone, imageUrl, ticketingUrl, facebookUrl, instagramUrl, jugglingEdgeUrl, latitude, longitude'
+  'region (Région/État/Province), timezone, imageUrl, ticketingUrl, facebookUrl, instagramUrl, jugglingEdgeUrl, latitude, longitude, programDays (programme jour par jour, à privilégier), program (programme sans date)'
 
 /**
  * Génère la section des champs pour les prompts compacts
@@ -68,7 +68,9 @@ export const JSON_FORMAT_FOR_COMPLETION = `{
     "instagramUrl": "optionnel",
     "officialWebsiteUrl": "optionnel",
     "jugglingEdgeUrl": "optionnel - URL JugglingEdge si la source est jugglingedge.com",
-    "imageUrl": "optionnel"
+    "imageUrl": "optionnel",
+    "programDays": "optionnel - À PRIVILÉGIER - [{ \\"date\\": \\"YYYY-MM-DD\\", \\"content\\": \\"déroulé de cette journée\\" }]",
+    "program": "optionnel - uniquement ce qui ne se rattache à aucune journée précise"
   }
 }`
 
@@ -125,6 +127,26 @@ export const IMPORT_SCHEMA_FIELDS = {
         "URL de l'événement sur JugglingEdge (https://www.jugglingedge.com/event.php?EventID=...)",
     },
 
+    // Programme
+    //
+    // Deux champs pour une seule information, et un ordre de préférence : une convention se vit
+    // jour par jour, et un programme découpé se lit sur place bien mieux qu'un bloc unique.
+    // Le champ général ne garde que ce qui ne se rattache à aucune date.
+    programDays: {
+      required: false,
+      description:
+        "À PRIVILÉGIER dès que la source détaille le déroulé. Tableau d'objets " +
+        '{ "date": "YYYY-MM-DD", "content": "déroulé de cette journée" }, une entrée par ' +
+        "journée mentionnée, uniquement pour les jours compris dans les dates de l'édition.",
+    },
+    program: {
+      required: false,
+      description:
+        "Programme général. N'y mettre que ce qui ne se rattache à aucune journée précise " +
+        "(principes de vie commune, tarifs, plan d'accès). Ne pas y recopier le déroulé " +
+        'jour par jour : il va dans programDays.',
+    },
+
     // Bénévolat
     volunteersOpen: {
       required: false,
@@ -169,6 +191,11 @@ export function generateJsonExample(): string {
         instagramUrl: 'https://instagram.com/...',
         officialWebsiteUrl: 'https://...',
         jugglingEdgeUrl: 'https://www.jugglingedge.com/event.php?EventID=...',
+        programDays: [
+          { date: '2025-07-15', content: 'Accueil à partir de 14h, repas partagé le soir' },
+          { date: '2025-07-16', content: 'Ateliers le matin, gala à 20h30' },
+        ],
+        program: 'Ce qui ne se rattache à aucune journée précise, sinon chaîne vide',
         volunteersOpen: false,
         volunteersDescription: '',
         volunteersExternalUrl: '',
@@ -245,6 +272,8 @@ export function generateCompactJsonFormat(): string {
       instagramUrl: '',
       officialWebsiteUrl: '',
       jugglingEdgeUrl: '',
+      programDays: [{ date: 'YYYY-MM-DD', content: '' }],
+      program: '',
       volunteersOpen: false,
       ...featuresObj,
     },
