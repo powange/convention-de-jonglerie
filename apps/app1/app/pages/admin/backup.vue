@@ -96,7 +96,7 @@
     <!-- Liste des sauvegardes -->
     <UCard>
       <template #header>
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <h2 class="text-xl font-semibold">{{ $t('admin.backup_list') }}</h2>
           <UButton variant="outline" size="sm" :loading="loadingBackups" @click="loadBackups">
             <UIcon name="i-heroicons-arrow-path" class="h-4 w-4" />
@@ -119,18 +119,20 @@
         <div
           v-for="backup in backups"
           :key="backup.filename"
-          class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+          class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
         >
-          <div class="flex items-center gap-4">
-            <div class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <!-- `min-w-0` : sans lui, le nom de fichier impose sa largeur au conteneur flex et
+               repousse les actions hors de l'écran au lieu de se couper. -->
+          <div class="flex items-center gap-4 min-w-0">
+            <div class="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0">
               <UIcon
                 name="i-heroicons-document-text"
                 class="h-5 w-5 text-gray-600 dark:text-gray-400"
               />
             </div>
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <h4 class="font-medium">{{ backup.filename }}</h4>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-1">
+                <h4 class="font-medium break-all">{{ backup.filename }}</h4>
                 <UBadge v-if="backup.type === 'archive'" color="success" variant="subtle" size="sm">
                   <UIcon name="i-heroicons-photo" class="h-3 w-3" />
                   Avec images
@@ -140,7 +142,7 @@
                   SQL uniquement
                 </UBadge>
               </div>
-              <div class="flex items-center gap-4 text-sm text-gray-500">
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
                 <span class="flex items-center gap-1">
                   <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
                   {{ formatDate(backup.createdAt) }}
@@ -152,7 +154,8 @@
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-2">
+          <!-- `shrink-0` : les actions gardent leur largeur, c'est le nom de fichier qui cède. -->
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
             <UButton
               variant="outline"
               size="xs"

@@ -5,6 +5,7 @@ import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { downloadAndStoreImage } from '#server/utils/file-helpers'
+import { editionDayKeys } from '~~/shared/utils/program-days'
 
 /**
  * Convertit une date string en Date UTC en tenant compte du timezone.
@@ -68,6 +69,19 @@ export const importSchema = z.object({
     officialWebsiteUrl: z.string().url().or(z.literal('')).nullable().optional(),
     jugglingEdgeUrl: z.string().url().or(z.literal('')).nullable().optional(),
     imageUrl: z.string().nullable().optional(),
+    // Programme : le détaillé par journée est privilégié, le général ne garde que ce qui ne se
+    // rattache à aucune date. Les journées hors des dates de l'édition sont écartées à la
+    // création plutôt que refusées : une source approximative ne doit pas faire échouer un import.
+    program: z.string().max(10000).nullable().optional(),
+    programDays: z
+      .array(
+        z.object({
+          date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          content: z.string().max(20000),
+        })
+      )
+      .max(60)
+      .optional(),
     // Caractéristiques booléennes
     hasFoodTrucks: z.boolean().optional(),
     hasKidsZone: z.boolean().optional(),
@@ -171,6 +185,7 @@ export default wrapApiHandler(
         conventionId: convention.id,
         name: validatedData.edition.name || null,
         description: validatedData.edition.description,
+        program: validatedData.edition.program || null,
         startDate,
         endDate,
         addressLine1: validatedData.edition.addressLine1,
@@ -228,6 +243,31 @@ export default wrapApiHandler(
         externalUrl: validatedData.edition.volunteersExternalUrl || null,
       },
     })
+    // Programme par journée. Les jours hors des dates de l'édition sont écartés plutôt que de
+    // faire échouer l'import : une source approximative arrive, et mieux vaut importer le reste.
+    const joursDeLEdition = new Set(editionDayKeys(startDate, endDate))
+    const dejaVus = new Set<string>()
+    const joursValides = (validatedData.edition.programDays ?? []).filter((jour) => {
+      if (!jour.content.trim()) return false
+      // « 2026-13-45 » satisfait l'expression régulière du schéma sans être une date.
+      const parsed = new Date(`${jour.date}T00:00:00.000Z`)
+      if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== jour.date) {
+        return false
+      }
+      if (!joursDeLEdition.has(jour.date) || dejaVus.has(jour.date)) return false
+      dejaVus.add(jour.date)
+      return true
+    })
+    if (joursValides.length) {
+      await prisma.editionProgramDay.createMany({
+        data: joursValides.map((jour) => ({
+          editionId: edition.id,
+          date: new Date(`${jour.date}T00:00:00.000Z`),
+          content: jour.content.trim(),
+        })),
+      })
+    }
+
     // Renseigner les métadonnées génériques de l'Event (name/dates/status) depuis l'édition
     await syncEventMetadataFromEdition(edition.id)
 

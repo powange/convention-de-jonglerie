@@ -6,3 +6,4 @@
 - dates avec heures si trouvées (YYYY-MM-DDTHH:MM:SS)
 - caractéristiques=true seulement si explicitement mentionné
 - PRIORITÉ données structurées (Facebook, JugglingEdge JSON-LD)
+- programme: remplis programDays (par journée, date YYYY-MM-DD) PLUTÔT QUE program ; program=seulement ce qui n'a pas de date ; jamais les deux avec le même contenu ; pas de journée inventée
