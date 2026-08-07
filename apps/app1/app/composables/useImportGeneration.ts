@@ -7,6 +7,8 @@
 
 import type { StepHistoryEntry, SubStepEntry } from '~/composables/useElapsedTimer'
 
+import { buildGenerationStreamUrl } from '~~/shared/utils/generation-stream-url'
+
 /**
  * Méthodes de génération disponibles
  */
@@ -203,18 +205,13 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     detectServicesEnabled = true
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
-      const encodedUrls = urls.map((url) => encodeURIComponent(url)).join('\n')
-
-      // Construire l'URL SSE avec les paramètres
-      let sseUrl = `/api/admin/generate-import-json-stream?method=${method}&urls=${encodedUrls}`
-      if (previewedImageUrl) {
-        sseUrl += `&previewedImageUrl=${encodeURIComponent(previewedImageUrl)}`
-      }
-      if (provider) {
-        sseUrl += `&provider=${encodeURIComponent(provider)}`
-      }
-      // Toujours transmettre l'état de la recherche des services (true par défaut côté serveur)
-      sseUrl += `&detectServices=${detectServicesEnabled ? 'true' : 'false'}`
+      const sseUrl = buildGenerationStreamUrl({
+        method,
+        urls,
+        previewedImageUrl,
+        provider,
+        detectServices: detectServicesEnabled,
+      })
 
       // withCredentials: true pour envoyer les cookies de session
       const eventSource = new EventSource(sseUrl, { withCredentials: true })
