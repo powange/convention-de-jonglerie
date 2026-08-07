@@ -135,7 +135,10 @@
       "ticketing_section_description": "Informatie voor het kopen van tickets",
       "ticketing_section_title": "Ticketverkoop",
       "timezone_description": "Datums en tijden worden in deze tijdzone weergegeven",
-      "currency_description": "Geldt voor alle bedragen van de editie: artiesten, ticketing en financiën."
+      "currency_description": "Geldt voor alle bedragen van de editie: artiesten, ticketing en financiën.",
+      "program_link": "Link naar het programma",
+      "program_section_title": "Programma",
+      "program_section_description": "Houdt u uw programma elders bij, geef dan de pagina op die het beschrijft"
     },
     "favorites_map": {
       "all_favorites": "Alle zijn favorieten",

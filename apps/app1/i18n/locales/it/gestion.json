@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Sei sicuro di voler rottamare questa edizione?",
     "delete_edition": "Cancella modifica",
     "external_links": {
-      "description": "Gestisci i link al tuo sito web, biglietteria e social media.",
+      "description": "Gestisci i link al tuo sito web, biglietteria, programma e social media.",
       "save": "Salva",
       "save_error": "Errore durante l'aggiornamento dei link",
       "save_success": "Link aggiornati con successo",

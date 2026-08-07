@@ -135,7 +135,10 @@
       "ticketing_section_description": "Information om biljettköp",
       "ticketing_section_title": "Biljetter",
       "timezone_description": "Datum och tider kommer att visas i denna tidszon",
-      "currency_description": "Gäller alla belopp i upplagan: artister, biljetter och ekonomi."
+      "currency_description": "Gäller alla belopp i upplagan: artister, biljetter och ekonomi.",
+      "program_link": "Länk till programmet",
+      "program_section_title": "Program",
+      "program_section_description": "Om du har ditt program någon annanstans, ange sidan som beskriver det"
     },
     "favorites_map": {
       "all_favorites": "Alla är favoriter",

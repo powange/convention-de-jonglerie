@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Weet je zeker dat je deze editie wilt schrappen?",
     "delete_edition": "Bewerken verwijderen",
     "external_links": {
-      "description": "Beheer links naar uw website, ticketverkoop en sociale media.",
+      "description": "Beheer links naar uw website, ticketverkoop, programma en sociale media.",
       "save": "Opslaan",
       "save_error": "Fout bij het bijwerken van de links",
       "save_success": "Links succesvol bijgewerkt",

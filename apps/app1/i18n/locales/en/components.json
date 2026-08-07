@@ -135,7 +135,10 @@
       "ticketing_section_description": "Information for purchasing tickets",
       "ticketing_section_title": "Ticketing",
       "timezone_description": "Dates and times will be displayed in this timezone",
-      "currency_description": "Applies to every amount of the edition: artists, ticketing and treasury."
+      "currency_description": "Applies to every amount of the edition: artists, ticketing and treasury.",
+      "program_link": "Programme link",
+      "program_section_title": "Programme",
+      "program_section_description": "If you keep your programme elsewhere, give the page that describes it"
     },
     "favorites_map": {
       "all_favorites": "All are favorites",

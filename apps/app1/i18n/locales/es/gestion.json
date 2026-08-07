@@ -41,7 +41,7 @@
     "confirm_delete_edition": "¿Estás seguro de que quieres desechar esta edición?",
     "delete_edition": "Borrar edición",
     "external_links": {
-      "description": "Gestione los enlaces a su sitio web, venta de entradas y redes sociales.",
+      "description": "Gestione los enlaces a su sitio web, venta de entradas, programa y redes sociales.",
       "save": "Guardar",
       "save_error": "Error al actualizar los enlaces",
       "save_success": "Enlaces actualizados con éxito",

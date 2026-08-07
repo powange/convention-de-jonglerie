@@ -625,6 +625,7 @@
             v-if="
               edition.officialWebsiteUrl ||
               edition.ticketingUrl ||
+              edition.programUrl ||
               edition.facebookUrl ||
               edition.instagramUrl
             "
@@ -668,6 +669,14 @@
                     >{{ $t('edition.ticketing_title') }}</UButton
                   >
                   <UButton
+                    v-if="edition.programUrl"
+                    icon="i-heroicons-calendar-days"
+                    :to="edition.programUrl"
+                    target="_blank"
+                    size="sm"
+                    >{{ $t('edition.program') }}</UButton
+                  >
+                  <UButton
                     v-if="edition.facebookUrl"
                     icon="i-simple-icons-facebook"
                     :to="edition.facebookUrl"
@@ -709,6 +718,14 @@
                   target="_blank"
                   size="sm"
                   >{{ $t('edition.ticketing_title') }}</UButton
+                >
+                <UButton
+                  v-if="edition.programUrl"
+                  icon="i-heroicons-calendar-days"
+                  :to="edition.programUrl"
+                  target="_blank"
+                  size="sm"
+                  >{{ $t('edition.program') }}</UButton
                 >
                 <UButton
                   v-if="edition.facebookUrl"

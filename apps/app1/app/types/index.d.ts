@@ -69,6 +69,8 @@ export interface Edition {
   facebookUrl?: string | null
   instagramUrl?: string | null
   officialWebsiteUrl?: string | null
+  /** Page externe décrivant le programme, quand il n'est pas saisi dans l'application. */
+  programUrl?: string | null
   jugglingEdgeUrl?: string | null
   hasFoodTrucks: boolean
   hasKidsZone: boolean
@@ -278,6 +280,7 @@ export interface EditionFormData {
   facebookUrl?: string
   instagramUrl?: string
   officialWebsiteUrl?: string
+  programUrl?: string
   hasFoodTrucks?: boolean
   hasKidsZone?: boolean
   acceptsPets?: boolean

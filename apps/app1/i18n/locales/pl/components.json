@@ -135,7 +135,10 @@
       "ticketing_section_description": "Informacje o zakupie biletów",
       "ticketing_section_title": "Bilety",
       "timezone_description": "Daty i godziny będą wyświetlane w tej strefie czasowej",
-      "currency_description": "Dotyczy wszystkich kwot edycji: artystów, biletów i finansów."
+      "currency_description": "Dotyczy wszystkich kwot edycji: artystów, biletów i finansów.",
+      "program_link": "Link do programu",
+      "program_section_title": "Program",
+      "program_section_description": "Jeśli prowadzisz program gdzie indziej, podaj stronę, która go opisuje"
     },
     "favorites_map": {
       "all_favorites": "Wszystkie są ulubione",

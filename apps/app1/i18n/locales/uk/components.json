@@ -135,7 +135,10 @@
       "ticketing_section_description": "Інформація для придбання квитків",
       "ticketing_section_title": "Квитки",
       "timezone_description": "Дати та час відображатимуться в цьому часовому поясі",
-      "currency_description": "Стосується всіх сум випуску: артисти, квитки та каса."
+      "currency_description": "Стосується всіх сум випуску: артисти, квитки та каса.",
+      "program_link": "Посилання на програму",
+      "program_section_title": "Програма",
+      "program_section_description": "Якщо ваша програма розміщена в іншому місці, вкажіть сторінку з її описом"
     },
     "favorites_map": {
       "all_favorites": "Всі улюблені",

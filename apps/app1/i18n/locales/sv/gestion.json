@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Är du säker på att du vill skrota den här utgåvan?",
     "delete_edition": "Radera redigera",
     "external_links": {
-      "description": "Hantera länkar till din webbplats, biljettförsäljning och sociala medier.",
+      "description": "Hantera länkar till din webbplats, biljettförsäljning, program och sociala medier.",
       "save": "Spara",
       "save_error": "Fel vid uppdatering av länkar",
       "save_success": "Länkar uppdaterade",
