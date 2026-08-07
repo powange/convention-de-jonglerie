@@ -40,6 +40,7 @@ export default wrapApiHandler(
       country,
       ticketingUrl,
       officialWebsiteUrl,
+      programUrl,
       facebookUrl,
       instagramUrl,
       jugglingEdgeUrl,
@@ -147,6 +148,7 @@ export default wrapApiHandler(
     if (currency !== undefined) updatedData.currency = currency
     if (ticketingUrl !== undefined) updatedData.ticketingUrl = ticketingUrl
     if (officialWebsiteUrl !== undefined) updatedData.officialWebsiteUrl = officialWebsiteUrl
+    if (programUrl !== undefined) updatedData.programUrl = programUrl
     if (facebookUrl !== undefined) updatedData.facebookUrl = facebookUrl
     if (instagramUrl !== undefined) updatedData.instagramUrl = instagramUrl
     if (jugglingEdgeUrl !== undefined) updatedData.jugglingEdgeUrl = jugglingEdgeUrl

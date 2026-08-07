@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Jesteś pewien, że chcesz wyrzucić tę edycję?",
     "delete_edition": "Usuń edycję",
     "external_links": {
-      "description": "Zarządzaj linkami do swojej strony internetowej, sprzedaży biletów i mediów społecznościowych.",
+      "description": "Zarządzaj linkami do swojej strony internetowej, sprzedaży biletów, programu i mediów społecznościowych.",
       "save": "Zapisz",
       "save_error": "Błąd podczas aktualizacji linków",
       "save_success": "Linki zaktualizowane pomyślnie",

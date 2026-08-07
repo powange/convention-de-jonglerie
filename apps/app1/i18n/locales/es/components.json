@@ -135,7 +135,10 @@
       "ticketing_section_description": "Información para comprar entradas",
       "ticketing_section_title": "Venta de entradas",
       "timezone_description": "Las fechas y horas se mostrarán en esta zona horaria",
-      "currency_description": "Se aplica a todos los importes de la edición: artistas, entradas y tesorería."
+      "currency_description": "Se aplica a todos los importes de la edición: artistas, entradas y tesorería.",
+      "program_link": "Enlace del programa",
+      "program_section_title": "Programa",
+      "program_section_description": "Si mantiene su programa en otro sitio, indique la página que lo describe"
     },
     "favorites_map": {
       "all_favorites": "Todas son favoritas",

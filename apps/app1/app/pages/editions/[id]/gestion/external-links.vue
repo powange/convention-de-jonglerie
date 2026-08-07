@@ -79,6 +79,31 @@
           </UFormField>
         </div>
 
+        <!-- Section Programme -->
+        <div class="space-y-4">
+          <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              {{ $t('components.edition_form.program_section_title') }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('components.edition_form.program_section_description') }}
+            </p>
+          </div>
+          <UFormField :label="$t('components.edition_form.program_link')" name="programUrl">
+            <UInput
+              v-model="programUrl"
+              type="url"
+              placeholder="https://ma-convention.fr/programme"
+              class="w-full"
+              @blur="programUrl = programUrl?.trim() || ''"
+            >
+              <template #leading>
+                <UIcon name="i-heroicons-calendar-days" />
+              </template>
+            </UInput>
+          </UFormField>
+        </div>
+
         <!-- Section Réseaux sociaux -->
         <div class="space-y-4">
           <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
@@ -163,6 +188,7 @@ const canEdit = computed(() => {
 // État local
 const officialWebsiteUrl = ref('')
 const ticketingUrl = ref('')
+const programUrl = ref('')
 const facebookUrl = ref('')
 const instagramUrl = ref('')
 
@@ -173,6 +199,7 @@ watch(
     if (newEdition) {
       officialWebsiteUrl.value = newEdition.officialWebsiteUrl || ''
       ticketingUrl.value = newEdition.ticketingUrl || ''
+      programUrl.value = newEdition.programUrl || ''
       facebookUrl.value = newEdition.facebookUrl || ''
       instagramUrl.value = newEdition.instagramUrl || ''
     }
@@ -186,6 +213,7 @@ const { execute: save, loading: saving } = useApiAction(() => `/api/editions/${e
   body: () => ({
     officialWebsiteUrl: officialWebsiteUrl.value?.trim() || null,
     ticketingUrl: ticketingUrl.value?.trim() || null,
+    programUrl: programUrl.value?.trim() || null,
     facebookUrl: facebookUrl.value?.trim() || null,
     instagramUrl: instagramUrl.value?.trim() || null,
   }),

@@ -135,7 +135,10 @@
       "ticketing_section_description": "Information om køb af billetter",
       "ticketing_section_title": "Billetsalg",
       "timezone_description": "Datoer og tidspunkter vil blive vist i denne tidszone",
-      "currency_description": "Gælder alle udgavens beløb: kunstnere, billetsalg og økonomi."
+      "currency_description": "Gælder alle udgavens beløb: kunstnere, billetsalg og økonomi.",
+      "program_link": "Link til programmet",
+      "program_section_title": "Program",
+      "program_section_description": "Hvis du har dit program et andet sted, så angiv siden, der beskriver det"
     },
     "favorites_map": {
       "all_favorites": "Alle er favoritter",

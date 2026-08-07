@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Sind Sie sicher, dass Sie diese Ausgabe löschen möchten?",
     "delete_edition": "Ausgabe löschen",
     "external_links": {
-      "description": "Verwalten Sie Links zu Ihrer Website, Ticketing und sozialen Medien.",
+      "description": "Verwalten Sie Links zu Ihrer Website, Ticketing, Programm und sozialen Medien.",
       "save": "Speichern",
       "save_error": "Fehler beim Aktualisieren der Links",
       "save_success": "Links erfolgreich aktualisiert",

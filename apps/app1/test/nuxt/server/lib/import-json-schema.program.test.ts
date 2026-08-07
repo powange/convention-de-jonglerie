@@ -33,6 +33,17 @@ describe('contrat de champs soumis à l’IA : programme', () => {
   it('cite le programme par jour dans la liste des champs optionnels', () => {
     expect(OPTIONAL_FIELDS).toMatch(/programDays/)
     expect(OPTIONAL_FIELDS).toMatch(/program \(/)
+    expect(OPTIONAL_FIELDS).toMatch(/programUrl/)
+  })
+
+  /**
+   * Certaines conventions tiennent leur programme sur leur propre site et n'ont pas vocation à le
+   * recopier. Le lien se cumule avec les deux autres champs plutôt que de les remplacer.
+   */
+  it('expose le lien externe dans les trois formats', () => {
+    expect(JSON.parse(generateJsonExample()).edition).toHaveProperty('programUrl')
+    expect(JSON.parse(generateCompactJsonFormat()).edition).toHaveProperty('programUrl')
+    expect(JSON_FORMAT_FOR_COMPLETION).toMatch(/programUrl/)
   })
 
   it('expose les deux champs dans le format complet, avec un exemple de journée', () => {
@@ -75,6 +86,7 @@ describe('contrat de champs soumis à l’IA : programme', () => {
 
     expect(prompt).toMatch(/programDays/)
     expect(prompt).toMatch(/PLUTÔT QUE program/)
+    expect(prompt).toMatch(/programUrl/)
   })
 })
 

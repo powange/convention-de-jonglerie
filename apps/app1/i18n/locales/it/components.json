@@ -135,7 +135,10 @@
       "ticketing_section_description": "Informazioni per l'acquisto dei biglietti",
       "ticketing_section_title": "Biglietteria",
       "timezone_description": "Le date e gli orari saranno visualizzati in questo fuso orario",
-      "currency_description": "Vale per tutti gli importi dell'edizione: artisti, biglietteria e tesoreria."
+      "currency_description": "Vale per tutti gli importi dell'edizione: artisti, biglietteria e tesoreria.",
+      "program_link": "Link del programma",
+      "program_section_title": "Programma",
+      "program_section_description": "Se tieni il tuo programma altrove, indica la pagina che lo descrive"
     },
     "favorites_map": {
       "all_favorites": "Tutte sono preferite",

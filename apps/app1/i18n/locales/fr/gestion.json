@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
     "delete_edition": "Supprimer l'édition",
     "external_links": {
-      "description": "Gérez les liens vers votre site web, billetterie et réseaux sociaux.",
+      "description": "Gérez les liens vers votre site web, billetterie, programme et réseaux sociaux.",
       "save": "Enregistrer",
       "save_error": "Erreur lors de la mise à jour des liens",
       "save_success": "Liens mis à jour avec succès",

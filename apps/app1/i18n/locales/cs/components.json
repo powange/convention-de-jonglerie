@@ -135,7 +135,10 @@
       "ticketing_section_description": "Informace o nákupu vstupenek",
       "ticketing_section_title": "Vstupenky",
       "timezone_description": "Data a časy budou zobrazeny v tomto časovém pásmu",
-      "currency_description": "Platí pro všechny částky ročníku: umělci, vstupenky a pokladna."
+      "currency_description": "Platí pro všechny částky ročníku: umělci, vstupenky a pokladna.",
+      "program_link": "Odkaz na program",
+      "program_section_title": "Program",
+      "program_section_description": "Pokud svůj program vedete jinde, uveďte stránku, která jej popisuje"
     },
     "favorites_map": {
       "all_favorites": "Všichni jsou oblíbení",

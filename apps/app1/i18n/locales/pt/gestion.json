@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Tens a certeza de que queres eliminar esta edição?",
     "delete_edition": "Eliminar edição",
     "external_links": {
-      "description": "Gerir os links para o seu site, bilheteira e redes sociais.",
+      "description": "Gerir os links para o seu site, bilheteira, programa e redes sociais.",
       "save": "Guardar",
       "save_error": "Erro ao atualizar os links",
       "save_success": "Links atualizados com sucesso",

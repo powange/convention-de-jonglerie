@@ -72,6 +72,7 @@ export const importSchema = z.object({
     // Programme : le détaillé par journée est privilégié, le général ne garde que ce qui ne se
     // rattache à aucune date. Les journées hors des dates de l'édition sont écartées à la
     // création plutôt que refusées : une source approximative ne doit pas faire échouer un import.
+    programUrl: z.string().url().or(z.literal('')).nullable().optional(),
     program: z.string().max(10000).nullable().optional(),
     programDays: z
       .array(
@@ -185,6 +186,7 @@ export default wrapApiHandler(
         conventionId: convention.id,
         name: validatedData.edition.name || null,
         description: validatedData.edition.description,
+        programUrl: validatedData.edition.programUrl || null,
         program: validatedData.edition.program || null,
         startDate,
         endDate,

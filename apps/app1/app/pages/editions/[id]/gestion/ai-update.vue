@@ -499,6 +499,7 @@ const fieldLabels: Record<string, string> = {
   'edition.officialWebsiteUrl': 'Site officiel',
   'edition.latitude': 'Latitude',
   'edition.longitude': 'Longitude',
+  'edition.programUrl': 'Lien du programme',
   'edition.program': 'Programme général',
 }
 
@@ -545,6 +546,7 @@ const compareResults = (aiData: any) => {
     const editionFields: Array<{ key: string; edValue: any }> = [
       { key: 'name', edValue: ed.name },
       { key: 'description', edValue: ed.description },
+      { key: 'programUrl', edValue: ed.programUrl },
       { key: 'program', edValue: ed.program },
       { key: 'startDate', edValue: ed.startDate },
       { key: 'endDate', edValue: ed.endDate },

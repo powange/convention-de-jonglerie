@@ -91,6 +91,7 @@ const IGNORED_MISSING_KEYS = [
   'edition.facebookUrl',
   'edition.instagramUrl',
   'edition.officialWebsiteUrl',
+  'edition.programUrl',
   'edition.latitude',
   'edition.longitude',
   'convention.logo',

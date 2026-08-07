@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Er du sikker på, at du vil skrotte denne udgave?",
     "delete_edition": "Slet redigering",
     "external_links": {
-      "description": "Administrer links til din hjemmeside, billetsalg og sociale medier.",
+      "description": "Administrer links til din hjemmeside, billetsalg, program og sociale medier.",
       "save": "Gem",
       "save_error": "Fejl ved opdatering af links",
       "save_success": "Links opdateret",

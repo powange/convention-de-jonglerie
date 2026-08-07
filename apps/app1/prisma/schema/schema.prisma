@@ -183,6 +183,10 @@ model Edition {
   hasLongShow                      Boolean                       @default(false)
   status                           EditionStatus                 @default(OFFLINE)
   officialWebsiteUrl               String?
+  /// Page externe décrivant le programme, quand il n'est pas saisi ici (voir `program` et
+  /// `EditionProgramDay`). Certaines conventions tiennent leur programme ailleurs et n'ont pas
+  /// vocation à le recopier.
+  programUrl                       String?
   // Config bénévole (volunteers*) déplacée vers EventVolunteerSettings à l'étape 0bis.
   mealsEnabled                     Boolean                       @default(false)
   artistsEnabled                   Boolean                       @default(false)

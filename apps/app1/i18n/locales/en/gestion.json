@@ -41,7 +41,7 @@
     "confirm_delete_edition": "Are you sure you want to scrap this edition?",
     "delete_edition": "Delete edit",
     "external_links": {
-      "description": "Manage links to your website, ticketing and social media.",
+      "description": "Manage links to your website, ticketing, programme and social media.",
       "save": "Save",
       "save_error": "Error updating links",
       "save_success": "Links updated successfully",

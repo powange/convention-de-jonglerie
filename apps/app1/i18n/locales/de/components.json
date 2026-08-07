@@ -135,7 +135,10 @@
       "ticketing_section_description": "Informationen zum Ticketkauf",
       "ticketing_section_title": "Ticketverkauf",
       "timezone_description": "Datum und Uhrzeit werden in dieser Zeitzone angezeigt",
-      "currency_description": "Gilt für alle Beträge der Ausgabe: Künstler, Ticketing und Buchhaltung."
+      "currency_description": "Gilt für alle Beträge der Ausgabe: Künstler, Ticketing und Buchhaltung.",
+      "program_link": "Programm-Link",
+      "program_section_title": "Programm",
+      "program_section_description": "Wenn Sie Ihr Programm anderswo pflegen, geben Sie die Seite an, die es beschreibt"
     },
     "favorites_map": {
       "all_favorites": "Alle sind Favoriten",
