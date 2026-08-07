@@ -25,6 +25,14 @@ const __dirname = path.dirname(__filename)
 
 // Configuration
 const LOCALES_DIR = path.resolve(__dirname, '../../i18n/locales')
+/**
+ * Racine du dépôt, distincte de celle de l'application depuis le passage en monorepo.
+ *
+ * `git diff --name-only` renvoie des chemins relatifs à la racine du dépôt — donc préfixés
+ * `apps/app1/` — alors que les commandes git tournent depuis l'application. Les résoudre depuis
+ * cette dernière donnait `apps/app1/apps/app1/…` et le mode automatique ne trouvait plus rien.
+ */
+const REPO_ROOT = path.resolve(__dirname, '../../../..')
 const REFERENCE_LANG = 'fr'
 const ALL_LANGS = ['cs', 'da', 'de', 'en', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'sv', 'uk']
 
@@ -290,8 +298,9 @@ function detectModifiedKeysAdvanced() {
     const modifiedKeys = []
 
     for (const filePath of modifiedFiles) {
-      // Charger la version actuelle du fichier
-      const fullPath = path.resolve(__dirname, '../..', filePath)
+      // Charger la version actuelle du fichier. Le chemin vient de git, donc relatif à la racine
+      // du dépôt : c'est de là qu'il faut le résoudre, pas depuis l'application.
+      const fullPath = path.resolve(REPO_ROOT, filePath)
       const currentData = loadJson(fullPath)
       if (!currentData) continue
 
