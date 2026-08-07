@@ -695,7 +695,9 @@ const searchForUpdates = async () => {
   differences.value = []
 
   const urlsText = selectedUrls.value.join('\n')
-  const result = await generate(urlsText)
+  // La page du programme est signalée à part : elle reçoit une passe d'extraction dédiée, le
+  // budget de l'extraction générale étant partagé entre toutes les sources.
+  const result = await generate(urlsText, undefined, edition.value?.programUrl || undefined)
 
   if (result?.json) {
     try {

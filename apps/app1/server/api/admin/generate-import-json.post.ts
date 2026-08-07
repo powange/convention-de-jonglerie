@@ -4,6 +4,7 @@ import {
   generateCompactDirectPrompt,
   generateFeaturesDescription,
   generateJsonExample,
+  generateProgramDayPrompt,
   getPrefilledJsonPrompt,
 } from '../../lib/import-json-schema'
 import { loadPrompt } from '../../lib/prompt-loader'
@@ -27,6 +28,7 @@ import {
 } from '#server/utils/facebook-event-scraper'
 import {
   BROWSER_HEADERS,
+  fetchLocalModelWithTimeout,
   fetchWithBrowserless,
   fetchWithTimeout,
   isBrowserlessAvailable,
@@ -43,6 +45,7 @@ import {
   scrapeJugglingEdgeEvent,
 } from '#server/utils/jugglingedge-scraper'
 import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
+import { editionDayKeys } from '~~/shared/utils/program-days'
 
 const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),
@@ -77,6 +80,7 @@ export const GENERATION_STEPS = {
   scraping_jugglingedge: 'Récupération des données JugglingEdge...',
   fetching_urls: 'Récupération du contenu des URLs...',
   generating_json: 'Génération du JSON via IA...',
+  extracting_program: 'Lecture du programme jour par jour...',
   extracting_features: 'Détection des services (camping, restauration, spectacles...)',
   completed: 'Terminé',
 } as const
@@ -118,6 +122,14 @@ export interface GenerateImportOptions {
   provider?: 'lmstudio' | 'anthropic' | 'ollama'
   /** Active la recherche des services (caractéristiques) via IA (true par défaut) */
   detectServices?: boolean
+  /**
+   * URL de la page décrivant le programme, quand l'édition en désigne une.
+   *
+   * Elle reçoit une passe dédiée : l'extraction générale partage son budget entre toutes les
+   * sources, ce qui ne laissait qu'un quart d'un budget déjà réduit à une page de programme —
+   * mesuré à 1,5 % de son contenu, insuffisant pour un déroulé de neuf jours.
+   */
+  programUrl?: string
 }
 
 /**
@@ -133,7 +145,14 @@ export async function generateImportJson(
   urls: string[],
   options: GenerateImportOptions = {}
 ): Promise<GenerateImportResult> {
-  const { taskId, onProgress, previewedImageUrl, provider, detectServices = true } = options
+  const {
+    taskId,
+    onProgress,
+    previewedImageUrl,
+    provider,
+    detectServices = true,
+    programUrl,
+  } = options
   // Récupérer la config IA effective (BDD en priorité, fallback env)
   const effectiveConfig = await getEffectiveAIConfigAsync()
 
@@ -218,6 +237,8 @@ export async function generateImportJson(
 
   // Étape 2: Récupérer le contenu des autres URLs
   const otherContents: string[] = []
+  // Contenu de la page du programme, conservé à part et sans partage de budget.
+  let programPageContent: string | null = null
   // Stocker les images OG trouvées pour les injecter plus tard (l'IA peut halluciner les URLs)
   const foundOgImages: string[] = []
 
@@ -267,6 +288,15 @@ export async function generateImportJson(
       const extraction = extractWebContent(html, url)
       const textContent = formatExtractionForAI(extraction, maxContentPerUrl)
       otherContents.push(textContent)
+
+      // La page du programme est en plus conservée entière — à hauteur du budget complet — pour
+      // la passe dédiée. Sa part dans l'extraction générale reste inchangée.
+      if (programUrl && url === programUrl) {
+        programPageContent = formatExtractionForAI(extraction, dynamicMaxContent)
+        console.log(
+          `[GENERATE-IMPORT] Page programme conservée pour la passe dédiée: ${programPageContent.length} caractères`
+        )
+      }
 
       // Stocker l'image OG si trouvée (pour la réinjecter après la génération IA)
       if (extraction.openGraph.image) {
@@ -422,6 +452,45 @@ export async function generateImportJson(
     // On continue avec le JSON de base si l'extraction échoue
   }
 
+  // Passe dédiée au programme jour par jour, sur la seule page du programme.
+  if (programPageContent) {
+    try {
+      const parsed = JSON.parse(finalJson)
+      const debut = String(parsed?.edition?.startDate || '').slice(0, 10)
+      const fin = String(parsed?.edition?.endDate || '').slice(0, 10)
+
+      // Sans les bornes, le modèle n'a aucun moyen de dater des journées désignées par leur nom,
+      // et rien ne permettrait d'écarter celles qui tombent hors de l'édition.
+      if (/^\d{4}-\d{2}-\d{2}$/.test(debut) && /^\d{4}-\d{2}-\d{2}$/.test(fin)) {
+        updateStep(taskId, 'extracting_program', onProgress)
+        const jours = await extractProgramDays(
+          effectiveConfig,
+          aiProvider,
+          programPageContent,
+          debut,
+          fin,
+          dynamicMaxContent,
+          onProgress
+        )
+        if (jours.length > 0) {
+          console.log(`[GENERATE-IMPORT] Programme: ${jours.length} journée(s) extraite(s)`)
+          parsed.edition = { ...parsed.edition, programDays: jours }
+          finalJson = JSON.stringify(parsed, null, 2)
+        } else {
+          console.log('[GENERATE-IMPORT] Programme: aucune journée extraite')
+        }
+      } else {
+        console.log(
+          `[GENERATE-IMPORT] Programme ignoré: dates d'édition inexploitables (${debut} → ${fin})`
+        )
+      }
+    } catch (error: any) {
+      // Un échec ici ne doit pas perdre le reste de l'extraction, qui a déjà coûté plusieurs
+      // minutes. Le programme est un complément, pas le cœur du résultat.
+      console.error(`[GENERATE-IMPORT] Erreur passe programme: ${error.message}`)
+    }
+  }
+
   // Marquer comme terminé
   updateStep(taskId, 'completed', onProgress)
 
@@ -431,6 +500,161 @@ export async function generateImportJson(
     provider: prefilledJson && otherContents.length === 0 ? 'facebook-direct' : aiProvider,
     urlsProcessed: urls,
   }
+}
+
+/**
+ * Passe dédiée : extrait le programme jour par jour d'une seule page.
+ *
+ * Séparée de l'extraction générale parce que celle-ci partage son budget de contenu entre toutes
+ * les sources. Une page de programme n'en recevait qu'un quart d'un budget déjà réduit — mesuré à
+ * 1,5 % de la page sur une convention de neuf jours — et aucune journée n'en ressortait. Ici la
+ * page est seule et on ne demande qu'une chose.
+ *
+ * Le retour du modèle est filtré plutôt que cru : une journée hors des dates de l'édition ne
+ * pourrait pas s'afficher, et une date inventée vaut mieux écartée que proposée.
+ */
+async function extractProgramDays(
+  config: EffectiveAIConfig,
+  aiProvider: string,
+  pageContent: string,
+  startDate: string,
+  endDate: string,
+  maxContent: number,
+  onProgress?: ProgressCallback
+): Promise<Array<{ date: string; content: string }>> {
+  const timeoutMs = config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
+  const contenu =
+    pageContent.length > maxContent
+      ? pageContent.substring(0, maxContent) + '\n...(tronqué)'
+      : pageContent
+
+  const jours = editionDayKeys(startDate, endDate)
+  // Une convention démesurément longue viendrait d'une saisie fautive et coûterait autant d'appels
+  // au modèle. On s'arrête, en le disant plutôt qu'en tronquant en silence.
+  const MAX_JOURNEES = 31
+  const aTraiter = jours.slice(0, MAX_JOURNEES)
+  if (jours.length > aTraiter.length) {
+    console.warn(
+      `[GENERATE-IMPORT] Programme: ${jours.length} jours, seules les ${MAX_JOURNEES} premières journées sont interrogées`
+    )
+  }
+
+  console.log(
+    `[GENERATE-IMPORT] Passe programme: ${contenu.length} caractères, ${aTraiter.length} journée(s) à interroger (${startDate} → ${endDate})`
+  )
+
+  const retenus: Array<{ date: string; content: string }> = []
+
+  for (const [i, date] of aTraiter.entries()) {
+    const midi = new Date(`${date}T12:00:00Z`)
+    const systemPrompt = generateProgramDayPrompt({
+      date,
+      jourFr: midi.toLocaleDateString('fr-FR', { weekday: 'long', timeZone: 'UTC' }),
+      jourEn: midi.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }),
+      index: i + 1,
+      total: aTraiter.length,
+      startDate,
+      endDate,
+    })
+
+    try {
+      const brut = await appelerModele(config, aiProvider, systemPrompt, contenu, timeoutMs)
+      const extrait = lireContenuJournee(brut)
+      if (extrait) retenus.push({ date, content: extrait })
+
+      if (onProgress) {
+        const libelle = midi.toLocaleDateString('fr-FR', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          timeZone: 'UTC',
+        })
+        sendUrlFetchedEvent(
+          onProgress,
+          extrait ? `${libelle} — ${extrait.length} caractères` : `${libelle} — rien à cette date`
+        )
+      }
+    } catch (error: any) {
+      // Une journée qui échoue ne doit pas emporter les autres : chacune est indépendante.
+      console.error(`[GENERATE-IMPORT] Programme ${date}: ${error.message}`)
+      if (onProgress) sendUrlFetchedEvent(onProgress, `${date} — échec`)
+    }
+  }
+
+  return retenus
+}
+
+/** Lit le `content` d'une réponse de journée, en tolérant du bavardage autour du JSON. */
+function lireContenuJournee(reponse: string): string {
+  const match = reponse.match(/\{[\s\S]*\}/)
+  if (!match) return ''
+  try {
+    const objet = JSON.parse(match[0]) as { content?: unknown }
+    return String(objet?.content || '').trim()
+  } catch {
+    return ''
+  }
+}
+
+/** Un appel au modèle, quel que soit le fournisseur configuré. */
+async function appelerModele(
+  config: EffectiveAIConfig,
+  aiProvider: string,
+  systemPrompt: string,
+  contenu: string,
+  timeoutMs: number
+): Promise<string> {
+  let reponse: string
+
+  if (aiProvider === 'anthropic' && config.anthropicApiKey) {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk')
+    const client = new Anthropic({ apiKey: config.anthropicApiKey, timeout: timeoutMs })
+    const message = await client.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: contenu }],
+    })
+    reponse = message.content[0]?.type === 'text' ? message.content[0].text : ''
+  } else if (aiProvider === 'ollama') {
+    const res = await fetchLocalModelWithTimeout(
+      `${config.ollamaBaseUrl || 'http://localhost:11434'}/api/generate`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: config.ollamaModel || 'llama3',
+          prompt: `${systemPrompt}\n\n${contenu}`,
+          stream: false,
+        }),
+      },
+      timeoutMs,
+      'Ollama'
+    )
+    reponse = (await res.json()).response || ''
+  } else {
+    const res = await fetchLocalModelWithTimeout(
+      `${config.lmstudioBaseUrl || 'http://localhost:1234'}/v1/chat/completions`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: config.lmstudioTextModel || config.lmstudioModel || 'auto',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: contenu },
+          ],
+          temperature: 0.2,
+          max_tokens: 4096,
+        }),
+      },
+      timeoutMs,
+      'LM Studio'
+    )
+    reponse = (await res.json()).choices?.[0]?.message?.content || ''
+  }
+
+  return reponse
 }
 
 /**
@@ -478,7 +702,10 @@ async function callAIToCompleteJson(
       config.lmstudioBaseUrl || 'http://localhost:1234',
       config.lmstudioTextModel || config.lmstudioModel || 'auto',
       userPrompt,
-      maxContent
+      maxContent,
+      // Le délai réglé dans /admin/ai-config était ignoré ici : seule la variable
+      // d'environnement s'appliquait, et l'augmenter depuis l'écran ne changeait rien.
+      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
     )
   } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
     return await callAnthropicComplete(config.anthropicApiKey, userPrompt)
@@ -486,7 +713,8 @@ async function callAIToCompleteJson(
     return await callOllamaComplete(
       config.ollamaBaseUrl || 'http://localhost:11434',
       config.ollamaModel || 'llama3',
-      userPrompt
+      userPrompt,
+      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
     )
   } else {
     throw new Error(`Provider IA non configuré ou non supporté: ${aiProvider}`)
@@ -500,7 +728,8 @@ async function callLMStudioComplete(
   baseUrl: string,
   model: string,
   userPrompt: string,
-  maxContent: number
+  maxContent: number,
+  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST
 ): Promise<string> {
   // Limiter le contenu selon le context length du modèle
   const truncatedPrompt =
@@ -512,7 +741,10 @@ async function callLMStudioComplete(
     `[GENERATE-IMPORT] LM Studio Complete: ${userPrompt.length} -> ${truncatedPrompt.length} caractères (max: ${maxContent})`
   )
 
-  const response = await fetchWithTimeout(
+  // Passe par le helper plutôt que par `fetchWithTimeout` : sans lui, l'expiration remonte le
+  // message brut d'undici, « This operation was aborted », qui ne dit ni ce qui a expiré ni quoi
+  // y faire. C'est ce que voyait l'utilisateur.
+  const response = await fetchLocalModelWithTimeout(
     `${baseUrl}/v1/chat/completions`,
     {
       method: 'POST',
@@ -527,7 +759,8 @@ async function callLMStudioComplete(
         max_tokens: 1024,
       }),
     },
-    AI_TIMEOUTS.LLM_REQUEST
+    timeoutMs,
+    'LM Studio'
   )
 
   if (!response.ok) {
@@ -590,17 +823,25 @@ async function callAnthropicComplete(apiKey: string, userPrompt: string): Promis
 async function callOllamaComplete(
   baseUrl: string,
   model: string,
-  userPrompt: string
+  userPrompt: string,
+  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST
 ): Promise<string> {
-  const response = await fetch(`${baseUrl}/api/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model,
-      prompt: `${getPrefilledJsonPrompt()}\n\n${userPrompt}`,
-      stream: false,
-    }),
-  })
+  // `fetch` nu, sans délai : un modèle qui ne répond jamais laissait la requête suspendue
+  // indéfiniment, sans message ni fin.
+  const response = await fetchLocalModelWithTimeout(
+    `${baseUrl}/api/generate`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        prompt: `${getPrefilledJsonPrompt()}\n\n${userPrompt}`,
+        stream: false,
+      }),
+    },
+    timeoutMs,
+    'Ollama'
+  )
 
   if (!response.ok) {
     throw createError({ status: 503, message: `Erreur Ollama: ${response.statusText}` })

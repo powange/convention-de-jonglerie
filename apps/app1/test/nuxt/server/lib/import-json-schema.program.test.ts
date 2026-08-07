@@ -10,6 +10,7 @@ import {
   generateCompactDirectPrompt,
   generateCompactJsonFormat,
   generateJsonExample,
+  getPrefilledJsonPrompt,
 } from '../../../../server/lib/import-json-schema'
 
 /**
@@ -87,6 +88,22 @@ describe('contrat de champs soumis à l’IA : programme', () => {
     expect(prompt).toMatch(/programDays/)
     expect(prompt).toMatch(/PLUTÔT QUE program/)
     expect(prompt).toMatch(/programUrl/)
+  })
+
+  /**
+   * Le quatrième prompt, oublié d'abord — et c'est le plus utilisé : il sert dès qu'un lien
+   * Facebook est présent. Il n'hérite pas des fichiers de règles, seulement du format JSON ; ses
+   * consignes lui sont propres. Décrire le champ dans le format ne suffisait pas : la liste des
+   * champs prioritaires orientait le modèle ailleurs, et aucune journée n'était extraite d'une
+   * source qui en publiait pourtant neuf.
+   */
+  it('porte la consigne dans le prompt de complétion pré-remplie', () => {
+    const prompt = getPrefilledJsonPrompt()
+
+    expect(prompt).toMatch(/programDays/)
+    expect(prompt).toMatch(/programUrl/)
+    expect(prompt).toMatch(/JOUR PAR JOUR/)
+    expect(prompt).toMatch(/privilégie programDays/)
   })
 })
 

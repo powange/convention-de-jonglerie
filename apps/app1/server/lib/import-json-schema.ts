@@ -328,6 +328,37 @@ export function generateCompactAgentSystemPrompt(): string {
 }
 
 /**
+ * Prompt d'une journée unique.
+ *
+ * Demander les neuf journées d'un coup n'en rendait que quatre : un modèle local suit mal une
+ * consigne qui exige de balayer toute une page et d'en trier neuf sections. Découpé, chaque appel
+ * ne pose qu'une question, sur la page entière — c'est bien plus à sa portée.
+ *
+ * Le nom du jour est fourni dans les deux langues, et son rang dans la convention : les pages de
+ * programme désignent les journées tantôt par leur date, tantôt par « Saturday », tantôt par
+ * « day 3 ».
+ */
+export function generateProgramDayPrompt(params: {
+  date: string
+  jourFr: string
+  jourEn: string
+  index: number
+  total: number
+  startDate: string
+  endDate: string
+}): string {
+  return loadPrompt('program-day', {
+    DATE: params.date,
+    JOUR_FR: params.jourFr,
+    JOUR_EN: params.jourEn,
+    INDEX: String(params.index),
+    TOTAL: String(params.total),
+    START_DATE: params.startDate,
+    END_DATE: params.endDate,
+  })
+}
+
+/**
  * Génère le prompt de forçage de génération JSON
  */
 export function generateForceGenerationPrompt(

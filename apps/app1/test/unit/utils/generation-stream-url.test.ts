@@ -75,6 +75,22 @@ describe('buildGenerationStreamUrl', () => {
     expect(p.get('detectServices')).toBe('false')
   })
 
+  // La page du programme est signalée à part pour recevoir une passe d'extraction dédiée : sans
+  // ce paramètre, le serveur ne saurait pas laquelle des sources mérite le budget entier.
+  it('signale la page du programme quand elle est fournie', () => {
+    const p = analyser(
+      buildGenerationStreamUrl({
+        method: 'direct',
+        urls: ['https://ejc.example/', 'https://ejc.example/program/'],
+        programUrl: 'https://ejc.example/program/',
+        detectServices: true,
+      })
+    ).searchParams
+
+    expect(p.get('programUrl')).toBe('https://ejc.example/program/')
+    expect(p.get('urls')?.split('\n')).toHaveLength(2)
+  })
+
   it('n’ajoute les paramètres optionnels que s’ils sont fournis', () => {
     const sans = analyser(
       buildGenerationStreamUrl({
@@ -84,6 +100,7 @@ describe('buildGenerationStreamUrl', () => {
       })
     ).searchParams
     expect(sans.has('provider')).toBe(false)
+    expect(sans.has('programUrl')).toBe(false)
     expect(sans.has('previewedImageUrl')).toBe(false)
 
     const avec = analyser(
