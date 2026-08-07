@@ -31,7 +31,8 @@
       "search_updates": "Suche nach Aktualisierungen",
       "search_updates_description": "Die KI analysiert die ausgewählten Links und vergleicht die gefundenen Informationen mit den aktuellen Daten der Ausgabe.",
       "title": "KI-Aktualisierung",
-      "updates_applied": "Aktualisierungen erfolgreich angewendet"
+      "updates_applied": "Aktualisierungen erfolgreich angewendet",
+      "link_program": "Programm"
     },
     "artists": {
       "list_title": "Verwaltung von Künstlern",

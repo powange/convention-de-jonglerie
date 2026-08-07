@@ -31,7 +31,8 @@
       "search_updates": "Hledání aktualizací",
       "search_updates_description": "AI analyzuje vybrané odkazy a porovná nalezené informace s aktuálními daty edice.",
       "title": "AI aktualizace",
-      "updates_applied": "Aktualizace úspěšně použity"
+      "updates_applied": "Aktualizace úspěšně použity",
+      "link_program": "Program"
     },
     "artists": {
       "list_title": "Správa umělců",

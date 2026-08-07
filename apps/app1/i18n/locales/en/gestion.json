@@ -31,7 +31,8 @@
       "search_updates": "Searching for updates",
       "search_updates_description": "The AI will analyse the selected links and compare the information found with the current edition data.",
       "title": "AI Update",
-      "updates_applied": "Updates applied successfully"
+      "updates_applied": "Updates applied successfully",
+      "link_program": "Programme"
     },
     "artists": {
       "list_title": "Artist management",

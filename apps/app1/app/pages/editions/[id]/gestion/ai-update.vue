@@ -384,6 +384,16 @@ watch(
         selected: true,
       })
     }
+    // Cochée d'office : une page dédiée au programme est, par construction, la source la plus
+    // riche pour ce que l'IA sait maintenant en tirer — le déroulé jour par jour.
+    if (ed.programUrl) {
+      links.push({
+        url: ed.programUrl,
+        label: t('gestion.ai_update.link_program'),
+        icon: 'i-lucide-calendar-days',
+        selected: true,
+      })
+    }
     externalUrls.value = links
   },
   { immediate: true }

@@ -31,7 +31,8 @@
       "search_updates": "Søger efter opdateringer",
       "search_updates_description": "AI vil analysere de valgte links og sammenligne de fundne oplysninger med de aktuelle data for udgaven.",
       "title": "AI-opdatering",
-      "updates_applied": "Opdateringer anvendt med succes"
+      "updates_applied": "Opdateringer anvendt med succes",
+      "link_program": "Program"
     },
     "artists": {
       "list_title": "Management af kunstnere",
