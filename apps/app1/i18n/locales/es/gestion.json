@@ -31,7 +31,8 @@
       "search_updates": "Buscando actualizaciones",
       "search_updates_description": "La IA analizará los enlaces seleccionados y comparará la información encontrada con los datos actuales de la edición.",
       "title": "Actualización IA",
-      "updates_applied": "Actualizaciones aplicadas con éxito"
+      "updates_applied": "Actualizaciones aplicadas con éxito",
+      "link_program": "Programa"
     },
     "artists": {
       "list_title": "Gestión de artistas",

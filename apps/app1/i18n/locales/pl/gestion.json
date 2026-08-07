@@ -31,7 +31,8 @@
       "search_updates": "Wyszukiwanie aktualizacji",
       "search_updates_description": "AI przeanalizuje wybrane linki i porówna znalezione informacje z aktualnymi danymi edycji.",
       "title": "Aktualizacja AI",
-      "updates_applied": "Aktualizacje zastosowane pomyślnie"
+      "updates_applied": "Aktualizacje zastosowane pomyślnie",
+      "link_program": "Program"
     },
     "artists": {
       "list_title": "Zarządzanie artystami",

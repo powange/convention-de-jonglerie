@@ -31,7 +31,8 @@
       "search_updates": "Zoeken naar updates",
       "search_updates_description": "De AI analyseert de geselecteerde links en vergelijkt de gevonden informatie met de huidige editiegegevens.",
       "title": "AI-update",
-      "updates_applied": "Updates succesvol toegepast"
+      "updates_applied": "Updates succesvol toegepast",
+      "link_program": "Programma"
     },
     "artists": {
       "list_title": "Artiestenmanagement",
