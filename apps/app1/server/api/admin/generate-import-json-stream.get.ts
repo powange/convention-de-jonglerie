@@ -12,6 +12,9 @@ import { sendErrorEvent, sendResultEvent } from '#server/utils/import-generation
 const querySchema = z.object({
   method: z.enum(['direct', 'agent']).default('direct'),
   urls: z.string().min(1), // URLs séparées par des retours à la ligne (\n)
+  // Page du programme, quand l'édition en désigne une : elle reçoit une passe d'extraction
+  // dédiée, l'extraction générale partageant son budget entre toutes les sources.
+  programUrl: z.string().url().optional(),
   // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
   previewedImageUrl: z.string().url().optional(),
   // Provider IA à utiliser (optionnel, utilise la config serveur par défaut)
@@ -46,6 +49,7 @@ export default wrapApiHandler(
       previewedImageUrl,
       provider,
       detectServices,
+      programUrl,
     } = querySchema.parse(query)
 
     // Parser les URLs (séparées par \n pour éviter les conflits avec les virgules dans les URLs)
@@ -175,6 +179,7 @@ export default wrapApiHandler(
                 previewedImageUrl,
                 provider,
                 detectServices,
+                programUrl,
               })
             } else {
               // Exploration Intelligente (EI)

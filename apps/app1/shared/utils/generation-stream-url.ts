@@ -20,6 +20,8 @@ export interface GenerationStreamParams {
   previewedImageUrl?: string
   provider?: string
   detectServices: boolean
+  /** Page du programme, qui reçoit une passe d'extraction dédiée côté serveur. */
+  programUrl?: string
 }
 
 export function buildGenerationStreamUrl({
@@ -28,12 +30,14 @@ export function buildGenerationStreamUrl({
   previewedImageUrl,
   provider,
   detectServices,
+  programUrl,
 }: GenerationStreamParams): string {
   const params = new URLSearchParams()
   params.set('method', method)
   params.set('urls', urls.join('\n'))
   if (previewedImageUrl) params.set('previewedImageUrl', previewedImageUrl)
   if (provider) params.set('provider', provider)
+  if (programUrl) params.set('programUrl', programUrl)
   // Toujours transmise : le serveur l'active par défaut, l'omettre changerait le comportement.
   params.set('detectServices', detectServices ? 'true' : 'false')
 

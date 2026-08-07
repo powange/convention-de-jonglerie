@@ -48,8 +48,10 @@ export interface UseImportGenerationOptions {
   onComplete?: (result: GenerationResult) => void
   /** Callback appelé en cas d'erreur */
   onError?: (error: string) => void
-  /** Timeout de sécurité en ms (par défaut: 5 minutes) */
+  /** Plafond absolu en ms, dernier recours (par défaut: 30 minutes) */
   timeout?: number
+  /** Silence toléré entre deux événements du flux avant d'abandonner (par défaut: 60 s) */
+  silenceTimeout?: number
 }
 
 /**
@@ -94,12 +96,25 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   const agentPagesVisited = ref(0)
   const agentResult = ref<GenerationResult | null>(null)
 
-  // Plafond global du flux SSE. Il doit rester SUPÉRIEUR au délai serveur (AI_TIMEOUT_LLM,
-  // 3 minutes par défaut), sans quoi c'est le client qui couperait — et l'utilisateur verrait un
-  // « Timeout » générique au lieu du message expliquant que le modèle est trop lent.
-  // Exposé par runtimeConfig pour qu'un modèle local lent puisse être accompagné sans recompiler.
+  /**
+   * L'abandon se décide sur le SILENCE, pas sur la durée totale.
+   *
+   * Le serveur pingue toutes les dix secondes tant qu'il travaille : la preuve qu'il est vivant
+   * existe en continu. Un plafond sur la durée totale ignorait ces pings, et aucune valeur ne
+   * pouvait convenir — trop courte, elle coupait des analyses en bonne santé (l'extraction fait
+   * désormais jusqu'à trois appels au modèle) ; trop longue, elle laissait l'utilisateur devant un
+   * écran figé une demi-heure quand la connexion était réellement morte.
+   *
+   * Six pings manqués suffisent à conclure. Le plafond absolu ne sert plus que de dernier
+   * recours, pour un serveur qui pinguerait sans jamais aboutir : il est donc large à dessein.
+   * Une extraction interroge le modèle une fois par journée de convention — mesuré à 24 min 30 s
+   * sur neuf jours avec un modèle local — et ce plafond ne doit jamais être ce qui l'arrête.
+   */
+  const SILENCE_PAR_DEFAUT = 60 * 1000
+  const PLAFOND_ABSOLU_PAR_DEFAUT = 2 * 60 * 60 * 1000
   const configuredTimeout = Number(useRuntimeConfig().public.aiGenerationTimeout) || 0
-  const defaultTimeout = options.timeout ?? (configuredTimeout || 8 * 60 * 1000)
+  const defaultTimeout = options.timeout ?? (configuredTimeout || PLAFOND_ABSOLU_PAR_DEFAUT)
+  const silenceTimeout = options.silenceTimeout ?? SILENCE_PAR_DEFAUT
 
   /**
    * Vérifie si l'index correspond à l'étape en cours
@@ -202,7 +217,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     method: 'direct' | 'agent',
     previewedImageUrl?: string,
     provider?: string,
-    detectServicesEnabled = true
+    detectServicesEnabled = true,
+    programUrl?: string
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
       const sseUrl = buildGenerationStreamUrl({
@@ -211,13 +227,49 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
         previewedImageUrl,
         provider,
         detectServices: detectServicesEnabled,
+        programUrl,
       })
 
       // withCredentials: true pour envoyer les cookies de session
       const eventSource = new EventSource(sseUrl, { withCredentials: true })
       let result: GenerationResult | null = null
 
+      let minuterieSilence: ReturnType<typeof setTimeout> | null = null
+      let minuteriePlafond: ReturnType<typeof setTimeout> | null = null
+
+      const arreterMinuteries = () => {
+        if (minuterieSilence) clearTimeout(minuterieSilence)
+        if (minuteriePlafond) clearTimeout(minuteriePlafond)
+        minuterieSilence = null
+        minuteriePlafond = null
+      }
+
+      /** Abandonne, en rendant le résultat s'il était déjà arrivé. */
+      const abandonner = (message: string) => {
+        arreterMinuteries()
+        if (eventSource.readyState === EventSource.CLOSED) return
+        eventSource.close()
+        if (result) {
+          resolve(result)
+        } else {
+          options.onError?.(message)
+          reject(new Error(message))
+        }
+      }
+
+      // Réarmée à chaque événement reçu, ping compris.
+      const relancerSilence = () => {
+        if (minuterieSilence) clearTimeout(minuterieSilence)
+        minuterieSilence = setTimeout(
+          () => abandonner('Le serveur ne répond plus : connexion interrompue'),
+          silenceTimeout
+        )
+      }
+      relancerSilence()
+
       eventSource.onmessage = (event) => {
+        // Avant même de lire le contenu : tout événement prouve que le serveur travaille.
+        relancerSilence()
         try {
           const data = JSON.parse(event.data)
           if (import.meta.dev) {
@@ -293,6 +345,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
               break
 
             case 'error':
+              arreterMinuteries()
               eventSource.close()
               options.onError?.(data.message || 'Erreur inconnue')
               reject(new Error(data.message || 'Erreur inconnue'))
@@ -304,6 +357,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       }
 
       eventSource.onerror = () => {
+        arreterMinuteries()
         eventSource.close()
         // Si on a un résultat, c'est que la connexion s'est fermée normalement après le résultat
         if (result) {
@@ -315,19 +369,11 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
         }
       }
 
-      // Timeout de sécurité
-      setTimeout(() => {
-        if (eventSource.readyState !== EventSource.CLOSED) {
-          eventSource.close()
-          if (result) {
-            resolve(result)
-          } else {
-            const errorMsg = 'Timeout: la génération a pris trop de temps'
-            options.onError?.(errorMsg)
-            reject(new Error(errorMsg))
-          }
-        }
-      }, defaultTimeout)
+      // Dernier recours : un serveur qui pinguerait sans jamais aboutir.
+      minuteriePlafond = setTimeout(
+        () => abandonner('Timeout: la génération a pris trop de temps'),
+        defaultTimeout
+      )
     })
   }
 
@@ -340,7 +386,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
    */
   const generate = async (
     urlsInput: string,
-    previewedImageUrl?: string
+    previewedImageUrl?: string,
+    programUrl?: string
   ): Promise<GenerationResult | null> => {
     // Réinitialiser l'état
     generateError.value = ''
@@ -374,7 +421,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
         method,
         previewedImageUrl,
         provider,
-        detectServices.value
+        detectServices.value,
+        programUrl
       )
 
       if (generationMethod.value === 'agent') {

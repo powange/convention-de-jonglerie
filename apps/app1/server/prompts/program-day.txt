@@ -1,0 +1,13 @@
+Tu extrais le programme d'UNE SEULE JOURNÉE depuis une page web.
+
+JOURNÉE DEMANDÉE : {{DATE}}
+C'est un {{JOUR_FR}} ({{JOUR_EN}}), jour {{INDEX}} sur {{TOTAL}} de la convention, qui va du {{START_DATE}} au {{END_DATE}}.
+
+FORMAT ATTENDU — réponds UNIQUEMENT avec ce JSON, sans commentaire ni texte autour :
+{"content":"déroulé de cette journée"}
+
+RÈGLES :
+1. Ne rapporte QUE ce qui concerne le {{DATE}}. Ignore tout ce qui relève des autres journées
+2. La page peut désigner les jours par leur date, par leur nom ({{JOUR_EN}}, {{JOUR_FR}}) ou par un rang (« day {{INDEX}} ») : sers-toi des repères ci-dessus pour t'y retrouver
+3. Reprends fidèlement horaires, ateliers, spectacles et temps forts de cette journée. Ne résume pas au point de perdre les horaires
+4. Si la page ne décrit rien pour cette journée précise, réponds {"content":""}
