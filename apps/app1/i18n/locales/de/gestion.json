@@ -40,7 +40,11 @@
       "scope_program_help": "Ein Durchgang pro Veranstaltungstag: am längsten, aber am vollständigsten",
       "scope_program_missing": "Tragen Sie zuerst den Programm-Link unter Externe Links ein",
       "scope_services": "Angebote",
-      "scope_services_help": "Camping, Verpflegung, Shows und weitere Merkmale"
+      "scope_services_help": "Camping, Verpflegung, Shows und weitere Merkmale",
+      "scope_days_count": "{count} von {total} Tag(en)",
+      "scope_days_all": "Alle auswählen",
+      "scope_days_none": "Alle abwählen",
+      "scope_day_already_filled": "— bereits ausgefüllt"
     },
     "artists": {
       "list_title": "Verwaltung von Künstlern",

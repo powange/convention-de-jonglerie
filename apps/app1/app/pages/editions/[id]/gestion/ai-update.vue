@@ -139,6 +139,44 @@
                     : $t('gestion.ai_update.scope_program_missing')
                 "
               />
+              <!-- Journées à relever : chacune coûte un appel au modèle. -->
+              <div
+                v-if="perimetreProgramme && edition.programUrl && journeesDeLEdition.length > 0"
+                class="ml-6 pl-3 border-l border-gray-200 dark:border-gray-700 space-y-1"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {{
+                      $t('gestion.ai_update.scope_days_count', {
+                        count: journeesSelectionnees.length,
+                        total: journeesDeLEdition.length,
+                      })
+                    }}
+                  </span>
+                  <UButton size="xs" variant="link" @click="basculerToutesLesJournees">
+                    {{
+                      toutesJourneesCochees
+                        ? $t('gestion.ai_update.scope_days_none')
+                        : $t('gestion.ai_update.scope_days_all')
+                    }}
+                  </UButton>
+                </div>
+                <div
+                  v-for="jour in journeesDeLEdition"
+                  :key="jour.date"
+                  class="flex items-center gap-2"
+                >
+                  <UCheckbox
+                    :model-value="journeesSelectionnees.includes(jour.date)"
+                    @update:model-value="basculerJournee(jour.date)"
+                  />
+                  <span class="text-sm capitalize">{{ jour.label }}</span>
+                  <span v-if="jour.dejaRenseignee" class="text-xs text-gray-400">
+                    {{ $t('gestion.ai_update.scope_day_already_filled') }}
+                  </span>
+                </div>
+              </div>
+
               <UCheckbox
                 v-model="perimetreServices"
                 :label="$t('gestion.ai_update.scope_services')"
@@ -341,7 +379,9 @@ const perimetreValide = computed(
   () =>
     perimetreInfos.value ||
     perimetreServices.value ||
-    (perimetreProgramme.value && !!edition.value?.programUrl)
+    (perimetreProgramme.value &&
+      !!edition.value?.programUrl &&
+      journeesSelectionnees.value.length > 0)
 )
 
 const currentProgramDays = ref<Record<string, string>>({})
@@ -567,6 +607,55 @@ const formatProgramDayLabel = (date: string) =>
     month: 'long',
   })
 
+/** Journées de l'édition, avec ce qui est déjà renseigné : de quoi ne redemander que le manquant. */
+const journeesDeLEdition = computed(() => {
+  if (!edition.value) return []
+  return editionDayKeys(edition.value.startDate, edition.value.endDate).map((date) => ({
+    date,
+    label: formatProgramDayLabel(date),
+    dejaRenseignee: !!currentProgramDays.value[date],
+  }))
+})
+
+/** Dates cochées. Chacune coûte un appel au modèle, d'où le choix laissé à l'utilisateur. */
+const journeesSelectionnees = ref<string[]>([])
+
+/**
+ * Tout est proposé à l'arrivée des journées — ne rien cocher d'office obligerait à tout cliquer.
+ *
+ * Une seule fois, cependant : se contenter de tester « rien n'est coché » ferait tout recocher
+ * dans le dos de quelqu'un qui vient de tout décocher, au premier rafraîchissement venu.
+ */
+const selectionInitialisee = ref(false)
+watch(
+  journeesDeLEdition,
+  (journees) => {
+    if (journees.length && !selectionInitialisee.value) {
+      journeesSelectionnees.value = journees.map((j) => j.date)
+      selectionInitialisee.value = true
+    }
+  },
+  { immediate: true }
+)
+
+const toutesJourneesCochees = computed(
+  () =>
+    journeesDeLEdition.value.length > 0 &&
+    journeesSelectionnees.value.length === journeesDeLEdition.value.length
+)
+
+const basculerToutesLesJournees = () => {
+  journeesSelectionnees.value = toutesJourneesCochees.value
+    ? []
+    : journeesDeLEdition.value.map((j) => j.date)
+}
+
+const basculerJournee = (date: string) => {
+  const i = journeesSelectionnees.value.indexOf(date)
+  if (i === -1) journeesSelectionnees.value.push(date)
+  else journeesSelectionnees.value.splice(i, 1)
+}
+
 // Comparer les données IA avec l'édition actuelle
 const compareResults = (aiData: any) => {
   const diffs: typeof differences.value = []
@@ -750,6 +839,7 @@ const searchForUpdates = async () => {
     extractProgram: perimetreProgramme.value,
     editionStartDate: edition.value?.startDate?.slice(0, 10),
     editionEndDate: edition.value?.endDate?.slice(0, 10),
+    programDates: perimetreProgramme.value ? journeesSelectionnees.value : undefined,
   })
 
   if (result?.json) {

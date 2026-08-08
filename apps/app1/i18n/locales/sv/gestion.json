@@ -40,7 +40,11 @@
       "scope_program_help": "En läsning per dag av konventet: längst, men mest fullständigt",
       "scope_program_missing": "Ange först programlänken under Externa länkar",
       "scope_services": "Faciliteter",
-      "scope_services_help": "Camping, mat, föreställningar och andra faciliteter"
+      "scope_services_help": "Camping, mat, föreställningar och andra faciliteter",
+      "scope_days_count": "{count} av {total} dag(ar)",
+      "scope_days_all": "Markera alla",
+      "scope_days_none": "Avmarkera alla",
+      "scope_day_already_filled": "— redan ifylld"
     },
     "artists": {
       "list_title": "Artisthantering",

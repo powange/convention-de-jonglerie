@@ -40,7 +40,11 @@
       "scope_program_help": "Jedno odczytanie na każdy dzień edycji: najdłuższe, ale najpełniejsze",
       "scope_program_missing": "Najpierw podaj link do programu w Linkach zewnętrznych",
       "scope_services": "Udogodnienia",
-      "scope_services_help": "Kemping, gastronomia, pokazy i inne udogodnienia"
+      "scope_services_help": "Kemping, gastronomia, pokazy i inne udogodnienia",
+      "scope_days_count": "{count} z {total} dnia/dni",
+      "scope_days_all": "Zaznacz wszystko",
+      "scope_days_none": "Odznacz wszystko",
+      "scope_day_already_filled": "— już uzupełnione"
     },
     "artists": {
       "list_title": "Zarządzanie artystami",

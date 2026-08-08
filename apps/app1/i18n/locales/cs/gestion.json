@@ -40,7 +40,11 @@
       "scope_program_help": "Jedno čtení na každý den ročníku: nejdelší, ale nejúplnější",
       "scope_program_missing": "Nejprve vyplňte odkaz na program v Externích odkazech",
       "scope_services": "Služby",
-      "scope_services_help": "Kempování, stravování, představení a další vlastnosti"
+      "scope_services_help": "Kempování, stravování, představení a další vlastnosti",
+      "scope_days_count": "{count} z {total} dne/dnů",
+      "scope_days_all": "Vybrat vše",
+      "scope_days_none": "Zrušit výběr",
+      "scope_day_already_filled": "— již vyplněno"
     },
     "artists": {
       "list_title": "Správa umělců",

@@ -26,6 +26,11 @@ const querySchema = z.object({
     .transform((v) => v !== 'false'),
   editionStartDate: z.string().optional(),
   editionEndDate: z.string().optional(),
+  /** Journées à relever, séparées par des virgules. Absent vaut « toutes ». */
+  programDates: z
+    .string()
+    .optional()
+    .transform((v) => (v ? v.split(',').filter(Boolean) : undefined)),
   // Image trouvée lors du test (pour éviter de refaire une requête qui retourne une URL différente)
   previewedImageUrl: z.string().url().optional(),
   // Provider IA à utiliser (optionnel, utilise la config serveur par défaut)
@@ -65,6 +70,7 @@ export default wrapApiHandler(
       extractProgram,
       editionStartDate,
       editionEndDate,
+      programDates,
     } = querySchema.parse(query)
 
     // Parser les URLs (séparées par \n pour éviter les conflits avec les virgules dans les URLs)
@@ -199,6 +205,7 @@ export default wrapApiHandler(
                 extractProgram,
                 editionStartDate,
                 editionEndDate,
+                programDates,
               })
             } else {
               // Exploration Intelligente (EI)

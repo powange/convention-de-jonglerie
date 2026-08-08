@@ -146,6 +146,11 @@ export interface GenerateImportOptions {
    */
   editionStartDate?: string
   editionEndDate?: string
+  /**
+   * Journées à relever. Chacune coûte un appel au modèle : n'en demander que celles qui manquent
+   * raccourcit la séance d'autant. Absent ou vide vaut « toutes celles de l'édition ».
+   */
+  programDates?: string[]
 }
 
 /**
@@ -172,6 +177,7 @@ export async function generateImportJson(
     extractProgram = true,
     editionStartDate,
     editionEndDate,
+    programDates,
   } = options
 
   console.log(
@@ -515,7 +521,8 @@ export async function generateImportJson(
           debut,
           fin,
           dynamicMaxContent,
-          onProgress
+          onProgress,
+          programDates
         )
         if (jours.length > 0) {
           console.log(`[GENERATE-IMPORT] Programme: ${jours.length} journée(s) extraite(s)`)
@@ -565,14 +572,25 @@ async function extractProgramDays(
   startDate: string,
   endDate: string,
   maxContent: number,
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
+  datesDemandees?: string[]
 ): Promise<Array<{ date: string; content: string }>> {
   const timeoutMs = config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
   // On découpe la page ENTIÈRE : tronquer avant amputerait les dernières journées. Seule la
   // matière envoyée au modèle, une section à la fois, est ramenée à son budget.
   const contenu = pageContent
 
-  const jours = editionDayKeys(startDate, endDate)
+  // Les journées demandées, intersectées avec celles de l'édition : une date fantaisiste ne doit
+  // pas engendrer un appel au modèle pour une journée qui n'existe pas.
+  const toutesLesJournees = editionDayKeys(startDate, endDate)
+  const jours = datesDemandees?.length
+    ? toutesLesJournees.filter((j) => datesDemandees.includes(j))
+    : toutesLesJournees
+  if (datesDemandees?.length) {
+    console.log(
+      `[GENERATE-IMPORT] Programme: ${jours.length} journée(s) demandée(s) sur ${toutesLesJournees.length}`
+    )
+  }
   // Une convention démesurément longue viendrait d'une saisie fautive et coûterait autant d'appels
   // au modèle. On s'arrête, en le disant plutôt qu'en tronquant en silence.
   const MAX_JOURNEES = 31
@@ -591,7 +609,12 @@ async function extractProgramDays(
 
   // Repérer les sections coûte zéro appel au modèle. Sans ça, il relisait toute la page à chaque
   // journée : neuf lectures de la même page pour en tirer neuf extraits.
-  const descripteurs = aTraiter.map((date, i) => {
+  // Les descripteurs couvrent TOUTES les journées de l'édition, même non demandées : une section
+  // court jusqu'au repère de la journée suivante, et sans ce repère elle s'étendrait jusqu'au bout
+  // de la page. C'est ce qui arrivait en ne demandant que les deux premiers jours — la seconde
+  // section faisait 6 077 caractères au lieu de 700. Le rang annoncé au modèle est également
+  // celui de la convention entière : « jour 2 sur 9 », et non « jour 2 sur 2 ».
+  const descripteurs = toutesLesJournees.map((date, i) => {
     const midi = new Date(`${date}T12:00:00Z`)
     return {
       date,
@@ -601,19 +624,19 @@ async function extractProgramDays(
     }
   })
   const sections = decouperParJournee(contenu, descripteurs)
-  const localisees = Object.values(sections).filter(Boolean).length
+  const localiseesDemandees = aTraiter.filter((date) => sections[date]).length
   console.log(
-    `[GENERATE-IMPORT] Programme: ${localisees}/${aTraiter.length} journée(s) localisée(s) dans la page`
+    `[GENERATE-IMPORT] Programme: ${localiseesDemandees}/${aTraiter.length} journée(s) demandée(s) localisée(s) dans la page`
   )
 
-  for (const [i, date] of aTraiter.entries()) {
-    const descripteur = descripteurs[i]!
+  for (const date of aTraiter) {
+    const descripteur = descripteurs.find((d) => d.date === date)!
     const systemPrompt = generateProgramDayPrompt({
       date,
       jourFr: descripteur.jourFr,
       jourEn: descripteur.jourEn,
-      index: i + 1,
-      total: aTraiter.length,
+      index: descripteur.index,
+      total: toutesLesJournees.length,
       startDate,
       endDate,
     })

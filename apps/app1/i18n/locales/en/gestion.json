@@ -40,7 +40,11 @@
       "scope_program_help": "One reading per day of the edition: the longest, but the most complete",
       "scope_program_missing": "First add the programme link in External links",
       "scope_services": "Services",
-      "scope_services_help": "Camping, catering, shows and other features"
+      "scope_services_help": "Camping, catering, shows and other features",
+      "scope_days_count": "{count} of {total} day(s)",
+      "scope_days_all": "Select all",
+      "scope_days_none": "Clear all",
+      "scope_day_already_filled": "— already filled in"
     },
     "artists": {
       "list_title": "Artist management",
