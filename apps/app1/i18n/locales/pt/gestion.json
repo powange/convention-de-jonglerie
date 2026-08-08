@@ -32,7 +32,15 @@
       "search_updates_description": "A IA analisará os links selecionados e comparará as informações encontradas com os dados atuais da edição.",
       "title": "Atualização IA",
       "updates_applied": "Atualizações aplicadas com sucesso",
-      "link_program": "Programa"
+      "link_program": "Programa",
+      "scope_label": "O que atualizar?",
+      "scope_infos": "Informações gerais",
+      "scope_infos_help": "Datas, morada, descrição, ligações e cartaz, a partir de todas as fontes selecionadas",
+      "scope_program": "Programa dia a dia",
+      "scope_program_help": "Uma leitura por cada dia da edição: o mais demorado, mas o mais completo",
+      "scope_program_missing": "Indique primeiro a ligação do programa em Ligações externas",
+      "scope_services": "Serviços",
+      "scope_services_help": "Campismo, restauração, espetáculos e outras características"
     },
     "artists": {
       "list_title": "Gestão de artistas",

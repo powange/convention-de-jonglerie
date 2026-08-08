@@ -22,6 +22,12 @@ export interface GenerationStreamParams {
   detectServices: boolean
   /** Page du programme, qui reçoit une passe d'extraction dédiée côté serveur. */
   programUrl?: string
+  /** Périmètre demandé : chaque volet omis épargne des minutes d'appels au modèle. */
+  extractInfos?: boolean
+  extractProgram?: boolean
+  /** Bornes de l'édition, qui font autorité pour décider quelles journées existent. */
+  editionStartDate?: string
+  editionEndDate?: string
 }
 
 export function buildGenerationStreamUrl({
@@ -31,6 +37,10 @@ export function buildGenerationStreamUrl({
   provider,
   detectServices,
   programUrl,
+  extractInfos,
+  extractProgram,
+  editionStartDate,
+  editionEndDate,
 }: GenerationStreamParams): string {
   const params = new URLSearchParams()
   params.set('method', method)
@@ -38,6 +48,11 @@ export function buildGenerationStreamUrl({
   if (previewedImageUrl) params.set('previewedImageUrl', previewedImageUrl)
   if (provider) params.set('provider', provider)
   if (programUrl) params.set('programUrl', programUrl)
+  // Transmis explicitement quand ils valent false : leur absence vaut « demandé » côté serveur.
+  if (extractInfos === false) params.set('extractInfos', 'false')
+  if (extractProgram === false) params.set('extractProgram', 'false')
+  if (editionStartDate) params.set('editionStartDate', editionStartDate)
+  if (editionEndDate) params.set('editionEndDate', editionEndDate)
   // Toujours transmise : le serveur l'active par défaut, l'omettre changerait le comportement.
   params.set('detectServices', detectServices ? 'true' : 'false')
 

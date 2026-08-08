@@ -32,7 +32,15 @@
       "search_updates_description": "AI vil analysere de valgte links og sammenligne de fundne oplysninger med de aktuelle data for udgaven.",
       "title": "AI-opdatering",
       "updates_applied": "Opdateringer anvendt med succes",
-      "link_program": "Program"
+      "link_program": "Program",
+      "scope_label": "Hvad skal opdateres?",
+      "scope_infos": "Generelle oplysninger",
+      "scope_infos_help": "Datoer, adresse, beskrivelse, links og plakat fra alle valgte kilder",
+      "scope_program": "Program dag for dag",
+      "scope_program_help": "Én læsning pr. dag af stævnet: det længste, men det mest komplette",
+      "scope_program_missing": "Angiv først programlinket under Eksterne links",
+      "scope_services": "Faciliteter",
+      "scope_services_help": "Camping, forplejning, forestillinger og andre faciliteter"
     },
     "artists": {
       "list_title": "Management af kunstnere",

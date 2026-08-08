@@ -32,7 +32,15 @@
       "search_updates_description": "The AI will analyse the selected links and compare the information found with the current edition data.",
       "title": "AI Update",
       "updates_applied": "Updates applied successfully",
-      "link_program": "Programme"
+      "link_program": "Programme",
+      "scope_label": "What should be updated?",
+      "scope_infos": "General information",
+      "scope_infos_help": "Dates, address, description, links and poster, from every selected source",
+      "scope_program": "Day-by-day programme",
+      "scope_program_help": "One reading per day of the edition: the longest, but the most complete",
+      "scope_program_missing": "First add the programme link in External links",
+      "scope_services": "Services",
+      "scope_services_help": "Camping, catering, shows and other features"
     },
     "artists": {
       "list_title": "Artist management",
