@@ -32,7 +32,15 @@
       "search_updates_description": "De AI analyseert de geselecteerde links en vergelijkt de gevonden informatie met de huidige editiegegevens.",
       "title": "AI-update",
       "updates_applied": "Updates succesvol toegepast",
-      "link_program": "Programma"
+      "link_program": "Programma",
+      "scope_label": "Wat moet er worden bijgewerkt?",
+      "scope_infos": "Algemene informatie",
+      "scope_infos_help": "Data, adres, beschrijving, links en affiche, uit alle aangevinkte bronnen",
+      "scope_program": "Programma per dag",
+      "scope_program_help": "Eén lezing per dag van de editie: het langst, maar het volledigst",
+      "scope_program_missing": "Vul eerst de programmalink in bij Externe links",
+      "scope_services": "Voorzieningen",
+      "scope_services_help": "Camping, catering, voorstellingen en andere kenmerken"
     },
     "artists": {
       "list_title": "Artiestenmanagement",

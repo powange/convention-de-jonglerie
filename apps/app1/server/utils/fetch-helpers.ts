@@ -46,7 +46,22 @@ export async function fetchLocalModelWithTimeout(
           `un modèle plus rapide, ou augmentez le délai depuis /admin/ai-config.`
       )
     }
-    throw error
+
+    // Sans cela, une panne de connexion remonte le « fetch failed » d'undici : trois mots qui ne
+    // disent ni qui on essayait de joindre, ni où, ni quoi y faire. On nomme les trois.
+    const origine = (() => {
+      try {
+        return new URL(url).origin
+      } catch {
+        return url
+      }
+    })()
+    const cause = error?.cause?.code || error?.code || error?.message || 'raison inconnue'
+    throw new Error(
+      `Impossible de joindre ${modelLabel} sur ${origine} (${cause}). ` +
+        `Vérifiez qu'il est démarré, qu'un modèle y est chargé, et que l'adresse configurée ` +
+        `dans /admin/ai-config est joignable depuis le serveur.`
+    )
   }
 }
 

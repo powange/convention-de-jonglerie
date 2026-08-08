@@ -218,7 +218,13 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
     previewedImageUrl?: string,
     provider?: string,
     detectServicesEnabled = true,
-    programUrl?: string
+    programUrl?: string,
+    perimetre?: {
+      extractInfos?: boolean
+      extractProgram?: boolean
+      editionStartDate?: string
+      editionEndDate?: string
+    }
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
       const sseUrl = buildGenerationStreamUrl({
@@ -228,6 +234,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
         provider,
         detectServices: detectServicesEnabled,
         programUrl,
+        ...perimetre,
       })
 
       // withCredentials: true pour envoyer les cookies de session
@@ -387,7 +394,13 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
   const generate = async (
     urlsInput: string,
     previewedImageUrl?: string,
-    programUrl?: string
+    programUrl?: string,
+    perimetre?: {
+      extractInfos?: boolean
+      extractProgram?: boolean
+      editionStartDate?: string
+      editionEndDate?: string
+    }
   ): Promise<GenerationResult | null> => {
     // Réinitialiser l'état
     generateError.value = ''
@@ -422,7 +435,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
         previewedImageUrl,
         provider,
         detectServices.value,
-        programUrl
+        programUrl,
+        perimetre
       )
 
       if (generationMethod.value === 'agent') {

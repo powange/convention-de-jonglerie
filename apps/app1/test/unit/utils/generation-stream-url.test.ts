@@ -91,6 +91,41 @@ describe('buildGenerationStreamUrl', () => {
     expect(p.get('urls')?.split('\n')).toHaveLength(2)
   })
 
+  /**
+   * Le périmètre n'est transmis que lorsqu'il vaut `false` : le serveur traite l'absence comme
+   * « demandé », pour ne rien changer aux appelants qui l'ignorent. Envoyer `true` serait inutile,
+   * mais oublier d'envoyer `false` ferait tourner un volet que l'utilisateur a décoché.
+   */
+  it('transmet un volet refusé, et tait un volet accepté', () => {
+    const refuse = analyser(
+      buildGenerationStreamUrl({
+        method: 'direct',
+        urls: ['https://a.example/x'],
+        extractInfos: false,
+        extractProgram: true,
+        detectServices: true,
+      })
+    ).searchParams
+
+    expect(refuse.get('extractInfos')).toBe('false')
+    expect(refuse.has('extractProgram')).toBe(false)
+  })
+
+  it('porte les bornes de l’édition quand elles sont connues', () => {
+    const p = analyser(
+      buildGenerationStreamUrl({
+        method: 'direct',
+        urls: ['https://a.example/x'],
+        editionStartDate: '2026-08-01',
+        editionEndDate: '2026-08-09',
+        detectServices: true,
+      })
+    ).searchParams
+
+    expect(p.get('editionStartDate')).toBe('2026-08-01')
+    expect(p.get('editionEndDate')).toBe('2026-08-09')
+  })
+
   it('n’ajoute les paramètres optionnels que s’ils sont fournis', () => {
     const sans = analyser(
       buildGenerationStreamUrl({
@@ -101,6 +136,8 @@ describe('buildGenerationStreamUrl', () => {
     ).searchParams
     expect(sans.has('provider')).toBe(false)
     expect(sans.has('programUrl')).toBe(false)
+    expect(sans.has('extractInfos')).toBe(false)
+    expect(sans.has('editionStartDate')).toBe(false)
     expect(sans.has('previewedImageUrl')).toBe(false)
 
     const avec = analyser(

@@ -45,7 +45,10 @@ import {
   scrapeJugglingEdgeEvent,
 } from '#server/utils/jugglingedge-scraper'
 import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
+import { htmlVersTexte } from '~~/shared/utils/html-to-text'
 import { editionDayKeys } from '~~/shared/utils/program-days'
+import { mesurerFidelite } from '~~/shared/utils/program-fidelity'
+import { decouperParJournee } from '~~/shared/utils/program-page-slicing'
 
 const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),
@@ -130,6 +133,19 @@ export interface GenerateImportOptions {
    * mesuré à 1,5 % de son contenu, insuffisant pour un déroulé de neuf jours.
    */
   programUrl?: string
+  /**
+   * Périmètre de l'extraction. Chaque volet coûte des minutes d'appels au modèle : les
+   * informations générales interrogent toutes les sources, le programme une fois par journée de
+   * convention. Pouvoir n'en demander qu'un raccourcit d'autant la séance.
+   */
+  extractInfos?: boolean
+  extractProgram?: boolean
+  /**
+   * Bornes de l'édition, quand l'appelant les connaît. Elles font autorité pour décider quelles
+   * journées existent — plus que celles proposées par le modèle, qui peuvent être erronées.
+   */
+  editionStartDate?: string
+  editionEndDate?: string
 }
 
 /**
@@ -152,7 +168,15 @@ export async function generateImportJson(
     provider,
     detectServices = true,
     programUrl,
+    extractInfos = true,
+    extractProgram = true,
+    editionStartDate,
+    editionEndDate,
   } = options
+
+  console.log(
+    `[GENERATE-IMPORT] Périmètre: infos=${extractInfos}, programme=${extractProgram}, services=${detectServices}`
+  )
   // Récupérer la config IA effective (BDD en priorité, fallback env)
   const effectiveConfig = await getEffectiveAIConfigAsync()
 
@@ -180,7 +204,7 @@ export async function generateImportJson(
   let prefilledJson: FacebookImportJson | null = null
 
   // Étape 1: Traiter les URLs Facebook avec facebook-event-scraper
-  if (facebookUrls.length > 0) {
+  if (extractInfos && facebookUrls.length > 0) {
     updateStep(taskId, 'scraping_facebook', onProgress)
   }
 
@@ -208,7 +232,7 @@ export async function generateImportJson(
   }
 
   // Étape 1b: Si pas de données Facebook, essayer JugglingEdge
-  if (!prefilledJson && jugglingEdgeUrls.length > 0) {
+  if (extractInfos && !prefilledJson && jugglingEdgeUrls.length > 0) {
     updateStep(taskId, 'scraping_jugglingedge', onProgress)
 
     for (const url of jugglingEdgeUrls) {
@@ -263,6 +287,9 @@ export async function generateImportJson(
   }
 
   for (const url of otherUrls) {
+    // Les pages nourrissent aussi bien l'extraction générale que la détection des services.
+    // Si ni l'une ni l'autre n'est demandée, seule la page du programme reste utile.
+    if (!extractInfos && !detectServices && url !== programUrl) continue
     try {
       let html: string
 
@@ -292,7 +319,14 @@ export async function generateImportJson(
       // La page du programme est en plus conservée entière — à hauteur du budget complet — pour
       // la passe dédiée. Sa part dans l'extraction générale reste inchangée.
       if (programUrl && url === programUrl) {
-        programPageContent = formatExtractionForAI(extraction, dynamicMaxContent)
+        // Texte brut, et non l'extraction structurée : celle-ci résume la page pour la faire
+        // tenir dans un prompt — 5 164 caractères tirés de 63 536 — et les dernières journées de
+        // la convention y disparaissaient. C'est le bon comportement pour décrire un événement,
+        // le mauvais pour relever un déroulé heure par heure. La passe découpe ce texte et
+        // n'envoie qu'une section par appel : elle n'a pas besoin qu'il tienne dans un prompt.
+        // Plafond de sécurité, sans rapport avec le budget du modèle : il borne ce qu'on garde
+        // en mémoire et balaie, pour qu'une page pathologique ne coûte pas plus qu'un programme.
+        programPageContent = htmlVersTexte(html).slice(0, 200_000)
         console.log(
           `[GENERATE-IMPORT] Page programme conservée pour la passe dédiée: ${programPageContent.length} caractères`
         )
@@ -323,9 +357,13 @@ export async function generateImportJson(
   let generatedJson: string
 
   // Étape 3: Générer ou compléter le JSON via IA
-  updateStep(taskId, 'generating_json', onProgress)
-
-  if (prefilledJson && otherContents.length === 0) {
+  if (!extractInfos) {
+    // Seul le programme est demandé : on part d'une édition vide, que la passe dédiée remplira.
+    // L'écran de comparaison ne propose que les champs présents, les autres restent intacts.
+    console.log("[GENERATE-IMPORT] Informations générales non demandées, pas d'appel au modèle")
+    generatedJson = JSON.stringify({ edition: {} }, null, 2)
+  } else if (prefilledJson && otherContents.length === 0) {
+    updateStep(taskId, 'generating_json', onProgress)
     // Cas 1: Uniquement Facebook, pas d'IA - retourne le JSON tel quel
     console.log("[GENERATE-IMPORT] Facebook seul, pas d'IA")
     generatedJson = JSON.stringify(prefilledJson, null, 2)
@@ -369,7 +407,8 @@ export async function generateImportJson(
   // Étape 4: Extraire les caractéristiques (services) de l'édition via IA
   // On utilise la description de l'édition pour détecter les services offerts
   // (étape ignorée si la recherche des services est désactivée)
-  if (detectServices) {
+  const detecterServices = detectServices
+  if (detecterServices) {
     updateStep(taskId, 'extracting_features', onProgress)
   }
 
@@ -417,11 +456,15 @@ export async function generateImportJson(
       console.log('[GENERATE-IMPORT] Données Facebook réinjectées (description, dates, timezone)')
     }
 
-    if (!detectServices) {
+    if (!detecterServices) {
       console.log('[GENERATE-IMPORT] Recherche des services désactivée, étape ignorée')
       finalJson = generatedJson // Utiliser le JSON avec l'image corrigée
     } else {
-      const description = parsedJson.edition?.description || ''
+      // Sans extraction générale il n'y a pas de description produite par le modèle. Le contenu
+      // récupéré des pages fait alors office de matière : les services y sont mentionnés de toute
+      // façon, c'est de là que la description elle-même serait tirée.
+      const description =
+        parsedJson.edition?.description || (extractInfos ? '' : otherContents.join('\n\n'))
 
       if (description && description.length >= 50) {
         console.log('[GENERATE-IMPORT] Extraction des caractéristiques via IA...')
@@ -453,11 +496,13 @@ export async function generateImportJson(
   }
 
   // Passe dédiée au programme jour par jour, sur la seule page du programme.
-  if (programPageContent) {
+  if (extractProgram && programPageContent) {
     try {
       const parsed = JSON.parse(finalJson)
-      const debut = String(parsed?.edition?.startDate || '').slice(0, 10)
-      const fin = String(parsed?.edition?.endDate || '').slice(0, 10)
+      // Les dates de l'édition font autorité quand l'appelant les connaît : celles proposées par
+      // le modèle peuvent être fausses, et décideraient alors quelles journées existent.
+      const debut = String(editionStartDate || parsed?.edition?.startDate || '').slice(0, 10)
+      const fin = String(editionEndDate || parsed?.edition?.endDate || '').slice(0, 10)
 
       // Sans les bornes, le modèle n'a aucun moyen de dater des journées désignées par leur nom,
       // et rien ne permettrait d'écarter celles qui tombent hors de l'édition.
@@ -523,10 +568,9 @@ async function extractProgramDays(
   onProgress?: ProgressCallback
 ): Promise<Array<{ date: string; content: string }>> {
   const timeoutMs = config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
-  const contenu =
-    pageContent.length > maxContent
-      ? pageContent.substring(0, maxContent) + '\n...(tronqué)'
-      : pageContent
+  // On découpe la page ENTIÈRE : tronquer avant amputerait les dernières journées. Seule la
+  // matière envoyée au modèle, une section à la fois, est ramenée à son budget.
+  const contenu = pageContent
 
   const jours = editionDayKeys(startDate, endDate)
   // Une convention démesurément longue viendrait d'une saisie fautive et coûterait autant d'appels
@@ -545,25 +589,55 @@ async function extractProgramDays(
 
   const retenus: Array<{ date: string; content: string }> = []
 
-  for (const [i, date] of aTraiter.entries()) {
+  // Repérer les sections coûte zéro appel au modèle. Sans ça, il relisait toute la page à chaque
+  // journée : neuf lectures de la même page pour en tirer neuf extraits.
+  const descripteurs = aTraiter.map((date, i) => {
     const midi = new Date(`${date}T12:00:00Z`)
-    const systemPrompt = generateProgramDayPrompt({
+    return {
       date,
       jourFr: midi.toLocaleDateString('fr-FR', { weekday: 'long', timeZone: 'UTC' }),
       jourEn: midi.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }),
+      index: i + 1,
+    }
+  })
+  const sections = decouperParJournee(contenu, descripteurs)
+  const localisees = Object.values(sections).filter(Boolean).length
+  console.log(
+    `[GENERATE-IMPORT] Programme: ${localisees}/${aTraiter.length} journée(s) localisée(s) dans la page`
+  )
+
+  for (const [i, date] of aTraiter.entries()) {
+    const descripteur = descripteurs[i]!
+    const systemPrompt = generateProgramDayPrompt({
+      date,
+      jourFr: descripteur.jourFr,
+      jourEn: descripteur.jourEn,
       index: i + 1,
       total: aTraiter.length,
       startDate,
       endDate,
     })
 
+    // La section si on l'a trouvée, la page entière sinon : mieux vaut une lecture lente qu'une
+    // section fausse.
+    const section = sections[date] || contenu
+    const matiere =
+      section.length > maxContent ? section.substring(0, maxContent) + '\n...(tronqué)' : section
+
     try {
-      const brut = await appelerModele(config, aiProvider, systemPrompt, contenu, timeoutMs)
+      const brut = await appelerModele(config, aiProvider, systemPrompt, matiere, timeoutMs)
       const extrait = lireContenuJournee(brut)
-      if (extrait) retenus.push({ date, content: extrait })
+      if (extrait) {
+        // La consigne demande de recopier la page ; cette mesure dit si elle a été suivie.
+        const fidelite = mesurerFidelite(extrait, matiere)
+        console.log(
+          `[GENERATE-IMPORT] Programme ${date}: ${extrait.length} caractères, fidélité ${Math.round(fidelite * 100)}% (matière ${matiere.length})`
+        )
+        retenus.push({ date, content: extrait })
+      }
 
       if (onProgress) {
-        const libelle = midi.toLocaleDateString('fr-FR', {
+        const libelle = new Date(`${date}T12:00:00Z`).toLocaleDateString('fr-FR', {
           weekday: 'long',
           day: 'numeric',
           month: 'long',

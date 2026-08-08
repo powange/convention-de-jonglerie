@@ -32,7 +32,15 @@
       "search_updates_description": "Die KI analysiert die ausgewählten Links und vergleicht die gefundenen Informationen mit den aktuellen Daten der Ausgabe.",
       "title": "KI-Aktualisierung",
       "updates_applied": "Aktualisierungen erfolgreich angewendet",
-      "link_program": "Programm"
+      "link_program": "Programm",
+      "scope_label": "Was soll aktualisiert werden?",
+      "scope_infos": "Allgemeine Informationen",
+      "scope_infos_help": "Daten, Adresse, Beschreibung, Links und Plakat, aus allen ausgewählten Quellen",
+      "scope_program": "Programm nach Tagen",
+      "scope_program_help": "Ein Durchgang pro Veranstaltungstag: am längsten, aber am vollständigsten",
+      "scope_program_missing": "Tragen Sie zuerst den Programm-Link unter Externe Links ein",
+      "scope_services": "Angebote",
+      "scope_services_help": "Camping, Verpflegung, Shows und weitere Merkmale"
     },
     "artists": {
       "list_title": "Verwaltung von Künstlern",

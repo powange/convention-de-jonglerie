@@ -32,7 +32,15 @@
       "search_updates_description": "AI przeanalizuje wybrane linki i porówna znalezione informacje z aktualnymi danymi edycji.",
       "title": "Aktualizacja AI",
       "updates_applied": "Aktualizacje zastosowane pomyślnie",
-      "link_program": "Program"
+      "link_program": "Program",
+      "scope_label": "Co należy zaktualizować?",
+      "scope_infos": "Informacje ogólne",
+      "scope_infos_help": "Daty, adres, opis, linki i plakat ze wszystkich zaznaczonych źródeł",
+      "scope_program": "Program dzień po dniu",
+      "scope_program_help": "Jedno odczytanie na każdy dzień edycji: najdłuższe, ale najpełniejsze",
+      "scope_program_missing": "Najpierw podaj link do programu w Linkach zewnętrznych",
+      "scope_services": "Udogodnienia",
+      "scope_services_help": "Kemping, gastronomia, pokazy i inne udogodnienia"
     },
     "artists": {
       "list_title": "Zarządzanie artystami",

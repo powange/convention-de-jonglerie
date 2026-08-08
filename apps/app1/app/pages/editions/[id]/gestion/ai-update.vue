@@ -121,11 +121,37 @@
             />
           </UFormField>
 
+          <!-- Périmètre : chaque volet coûte des minutes d'appels au modèle. -->
+          <UFormField :label="$t('gestion.ai_update.scope_label')">
+            <div class="space-y-2">
+              <UCheckbox
+                v-model="perimetreInfos"
+                :label="$t('gestion.ai_update.scope_infos')"
+                :description="$t('gestion.ai_update.scope_infos_help')"
+              />
+              <UCheckbox
+                v-model="perimetreProgramme"
+                :disabled="!edition.programUrl"
+                :label="$t('gestion.ai_update.scope_program')"
+                :description="
+                  edition.programUrl
+                    ? $t('gestion.ai_update.scope_program_help')
+                    : $t('gestion.ai_update.scope_program_missing')
+                "
+              />
+              <UCheckbox
+                v-model="perimetreServices"
+                :label="$t('gestion.ai_update.scope_services')"
+                :description="$t('gestion.ai_update.scope_services_help')"
+              />
+            </div>
+          </UFormField>
+
           <UButton
             color="warning"
             icon="i-lucide-sparkles"
             :loading="generating"
-            :disabled="selectedUrls.length === 0"
+            :disabled="selectedUrls.length === 0 || !perimetreValide"
             @click="searchForUpdates"
           >
             {{ $t('gestion.ai_update.launch_search') }}
@@ -290,6 +316,7 @@ const {
   selectedProvider,
   loadingProviders,
   loadProviders,
+  detectServices,
 } = useImportGeneration()
 
 /**
@@ -298,6 +325,25 @@ const {
  * L'édition du store ne le porte pas : il vit dans sa propre table. Sans lui, chaque journée
  * proposée par l'IA paraîtrait nouvelle et on écraserait du texte déjà écrit sans le montrer.
  */
+/**
+ * Périmètre de l'analyse.
+ *
+ * Chaque volet coûte des minutes d'appels au modèle — les informations générales interrogent
+ * toutes les sources, le programme une fois par journée de convention. Ne demander que ce qu'on
+ * veut réellement mettre à jour raccourcit d'autant la séance.
+ */
+const perimetreInfos = ref(true)
+const perimetreProgramme = ref(true)
+const perimetreServices = ref(true)
+
+/** Les trois volets sont indépendants : chacun se suffit, aucun n'en présuppose un autre. */
+const perimetreValide = computed(
+  () =>
+    perimetreInfos.value ||
+    perimetreServices.value ||
+    (perimetreProgramme.value && !!edition.value?.programUrl)
+)
+
 const currentProgramDays = ref<Record<string, string>>({})
 
 /**
@@ -691,13 +737,20 @@ const compareResults = (aiData: any) => {
 
 // Lancer la recherche
 const searchForUpdates = async () => {
+  // `detectServices` est porté par le composable : on l'aligne sur le périmètre choisi.
+  detectServices.value = perimetreServices.value
   updateResult.value = null
   differences.value = []
 
   const urlsText = selectedUrls.value.join('\n')
   // La page du programme est signalée à part : elle reçoit une passe d'extraction dédiée, le
   // budget de l'extraction générale étant partagé entre toutes les sources.
-  const result = await generate(urlsText, undefined, edition.value?.programUrl || undefined)
+  const result = await generate(urlsText, undefined, edition.value?.programUrl || undefined, {
+    extractInfos: perimetreInfos.value,
+    extractProgram: perimetreProgramme.value,
+    editionStartDate: edition.value?.startDate?.slice(0, 10),
+    editionEndDate: edition.value?.endDate?.slice(0, 10),
+  })
 
   if (result?.json) {
     try {

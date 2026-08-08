@@ -32,7 +32,15 @@
       "search_updates_description": "AI analyzuje vybrané odkazy a porovná nalezené informace s aktuálními daty edice.",
       "title": "AI aktualizace",
       "updates_applied": "Aktualizace úspěšně použity",
-      "link_program": "Program"
+      "link_program": "Program",
+      "scope_label": "Co se má aktualizovat?",
+      "scope_infos": "Obecné informace",
+      "scope_infos_help": "Termíny, adresa, popis, odkazy a plakát ze všech vybraných zdrojů",
+      "scope_program": "Program po dnech",
+      "scope_program_help": "Jedno čtení na každý den ročníku: nejdelší, ale nejúplnější",
+      "scope_program_missing": "Nejprve vyplňte odkaz na program v Externích odkazech",
+      "scope_services": "Služby",
+      "scope_services_help": "Kempování, stravování, představení a další vlastnosti"
     },
     "artists": {
       "list_title": "Správa umělců",
