@@ -364,7 +364,8 @@ async function main() {
   const results = compareTranslations(locales, referenceLocale)
 
   // Compter les clés TODO
-  const { todoStats, totalTodoKeys } = countTodoKeys(locales)
+  // `let` : le remplissage ci-dessous ajoute des clés [TODO], et le compte doit en tenir compte.
+  let { todoStats, totalTodoKeys } = countTodoKeys(locales)
 
   // Vérifier la structure fichier par fichier
   const misplacedKeys = compareFileStructure(referenceLocale)
@@ -503,6 +504,10 @@ async function main() {
     for (const [loc, d] of Object.entries(updated)) {
       if (languagesToShow[loc]) languagesToShow[loc] = d
     }
+    // Le compte des [TODO] aussi : il était établi avant le remplissage, donc aveugle aux clés
+    // que celui-ci vient d'écrire. Le résumé annonçait 0 quand douze venaient d'être ajoutées —
+    // de quoi croire la synchronisation faite alors que tout restait à traduire.
+    ;({ todoStats, totalTodoKeys } = countTodoKeys(locales))
   }
 
   for (const [locale, data] of Object.entries(languagesToShow)) {
