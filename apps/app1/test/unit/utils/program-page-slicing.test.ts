@@ -93,6 +93,104 @@ describe('decouperParJournee', () => {
     expect(Object.values(s)).toEqual([null, null, null])
   })
 
+  /**
+   * Le cas signalé : la dernière journée n'a pas de repère suivant, sa section court jusqu'au bout
+   * de la page. Un modèle à qui l'on demande de recopier fidèlement recopiait alors les crédits du
+   * site comme s'ils faisaient partie du programme du dimanche.
+   */
+  it('coupe la dernière journée avant le pied de page', () => {
+    const page = [
+      'Saturday — accueil',
+      'Sunday — ateliers',
+      'Monday — from 10:00 | Goodbye and see you soon!',
+      '© 2026',
+      'Designed and built with ❤️ by Andrej',
+    ].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-03']).toContain('Goodbye and see you soon!')
+    expect(s['2026-08-03']).not.toContain('©')
+    expect(s['2026-08-03']).not.toContain('Andrej')
+  })
+
+  /**
+   * L'avertissement observé sur la page de l'EJC. Demander au modèle de l'ignorer ne suffisait
+   * pas : on lui demande par ailleurs de recopier fidèlement ce qu'on lui donne. Mieux vaut ne
+   * pas le lui donner.
+   */
+  it('coupe avant un avertissement adressé au lecteur de la page', () => {
+    const page = [
+      'Saturday — accueil',
+      'Sunday — ateliers',
+      'Monday — from 10:00 | Goodbye and see you soon!',
+      'The program is still under development, so we reserve the right to change times, locations, etc.',
+      '© 2026',
+    ].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-03']).toBe('Monday — from 10:00 | Goodbye and see you soon!')
+  })
+
+  it('reconnaît un avertissement en français', () => {
+    const page = [
+      'Saturday — accueil',
+      'Sunday — ateliers',
+      'Monday — départ à 14h',
+      'Ce programme est susceptible de modification jusqu’au dernier moment.',
+    ].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-03']).toBe('Monday — départ à 14h')
+  })
+
+  /**
+   * Le risque du filtrage : « subject to change » peut apparaître dans le programme réel d'une
+   * journée. Le chercher partout ferait perdre tout ce qui suit cette ligne. On ne l'applique
+   * donc qu'à la dernière section, la seule qui s'étende jusqu'au bout de la page.
+   */
+  it('ne coupe pas sur un avertissement au milieu du programme', () => {
+    const page = [
+      'Saturday — accueil',
+      'Sunday — 10:00 ateliers (times subject to change)',
+      '20:30 gala',
+      'Monday — départ',
+    ].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-02']).toContain('20:30 gala')
+  })
+
+  it('reconnaît les mentions légales et la politique de confidentialité', () => {
+    const page = [
+      'Saturday — accueil',
+      'Sunday — ateliers',
+      'Monday — départ',
+      'Mentions légales',
+      'Politique de confidentialité',
+    ].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-03']).toBe('Monday — départ')
+  })
+
+  // Vider une section parce qu'elle commence par un tel marqueur ferait perdre la journée entière.
+  it('ne coupe jamais sur la première ligne', () => {
+    const page = ['Saturday — accueil', 'Sunday — ateliers', 'Monday © soirée de clôture'].join(
+      '\n'
+    )
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-03']).toContain('soirée de clôture')
+  })
+
+  it('laisse intactes les journées suivies d’un repère', () => {
+    const page = ['Saturday — accueil', '© 2026', 'Sunday — ateliers', 'Monday — départ'].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-01']).toBe('Saturday — accueil')
+    expect(s['2026-08-02']).toContain('ateliers')
+  })
+
   // La casse de la page ne doit pas décider du découpage.
   it('ignore la casse des repères', () => {
     const s = decouperParJournee('SATURDAY: accueil\nSUNDAY: ateliers\nMONDAY: fin', journees)
