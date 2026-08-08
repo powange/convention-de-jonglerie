@@ -99,6 +99,65 @@ function trouverPosition(page: string, jour: JourneeARepererer, depuis: number):
 }
 
 /**
+ * Repères de pied de page.
+ *
+ * La dernière journée d'une convention n'a pas de repère suivant : sa section court jusqu'au bout
+ * de la page et emporte crédits, copyright et mentions légales. Un modèle à qui l'on demande de
+ * recopier fidèlement recopie alors « Designed and built with ❤️ by Andrej » comme s'il
+ * s'agissait du programme du dimanche.
+ */
+const MARQUEURS_DE_PIED = [
+  '©',
+  'copyright',
+  'all rights reserved',
+  'tous droits réservés',
+  'designed and built',
+  'designed by',
+  'powered by',
+  'mentions légales',
+  'privacy policy',
+  'politique de confidentialité',
+  'cookie',
+]
+
+/**
+ * Avertissements adressés au lecteur de la page, et non au participant d'une journée.
+ *
+ * Ils ne sont cherchés que dans la DERNIÈRE section — la seule qui s'étende jusqu'au bout de la
+ * page faute de repère suivant. Les chercher partout serait dangereux : une journée dont le
+ * programme réel mentionnerait « horaires subject to change » perdrait tout ce qui suit cette
+ * ligne. Le risque n'est acceptable que là où le bruit est certain.
+ */
+const MARQUEURS_AVERTISSEMENT = [
+  'reserve the right',
+  'subject to change',
+  'still under development',
+  'sous réserve de modification',
+  'susceptible de modification',
+  'peut encore changer',
+  'programme prévisionnel',
+]
+
+/**
+ * Coupe une section au premier signe de pied de page.
+ *
+ * Jamais sur la première ligne : une section qui commencerait par un tel marqueur n'aurait pas
+ * été localisée là par hasard, et la vider ferait perdre la journée entière.
+ */
+function couperAvantLePied(section: string, derniereSection: boolean): string {
+  const marqueurs = derniereSection
+    ? [...MARQUEURS_DE_PIED, ...MARQUEURS_AVERTISSEMENT]
+    : MARQUEURS_DE_PIED
+  const lignes = section.split('\n')
+  const index = lignes.findIndex((ligne, i) => {
+    if (i === 0) return false
+    const normalisee = ligne.toLowerCase()
+    return marqueurs.some((marqueur) => normalisee.includes(marqueur))
+  })
+  return index === -1 ? section : lignes.slice(0, index).join('\n').trim()
+}
+
+/**
  * Rend, pour chaque journée, sa section de la page — ou `null` si elle n'a pas été localisée.
  *
  * Les clés sont les dates, dans l'ordre reçu.
@@ -128,7 +187,10 @@ export function decouperParJournee(
     }
     const suivant = positions.slice(i + 1).find((p) => p.position !== -1)
     const fin = suivant ? suivant.position : pageContent.length
-    sections[courant.date] = pageContent.slice(courant.position, fin).trim()
+    sections[courant.date] = couperAvantLePied(
+      pageContent.slice(courant.position, fin).trim(),
+      !suivant
+    )
   }
 
   return sections

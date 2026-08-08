@@ -21,5 +21,9 @@ RÈGLES ABSOLUES :
    celle-ci et laisse le reste
 7. La page peut désigner les jours par leur date, par leur nom ({{JOUR_EN}}, {{JOUR_FR}}) ou par
    un rang (« day {{INDEX}} ») : sers-toi des repères ci-dessus pour t'y retrouver
-8. Si la page ne décrit rien pour cette journée précise, réponds {"content":""}. Une réponse vide
+8. Ne rapporte que le DÉROULÉ de la journée : horaires, ateliers, spectacles, temps forts.
+   Laisse de côté ce qui s'adresse au lecteur de la page et non au participant de cette journée —
+   avertissements du type « le programme peut encore changer », crédits du site, mentions légales,
+   politique de confidentialité — même si ces lignes suivent immédiatement la dernière journée
+9. Si la page ne décrit rien pour cette journée précise, réponds {"content":""}. Une réponse vide
    est un résultat correct, pas un échec
