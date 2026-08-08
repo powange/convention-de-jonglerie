@@ -224,6 +224,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       extractProgram?: boolean
       editionStartDate?: string
       editionEndDate?: string
+      programDates?: string[]
     }
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
@@ -400,6 +401,7 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       extractProgram?: boolean
       editionStartDate?: string
       editionEndDate?: string
+      programDates?: string[]
     }
   ): Promise<GenerationResult | null> => {
     // Réinitialiser l'état

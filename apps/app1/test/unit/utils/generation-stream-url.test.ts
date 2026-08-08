@@ -126,6 +126,33 @@ describe('buildGenerationStreamUrl', () => {
     expect(p.get('editionEndDate')).toBe('2026-08-09')
   })
 
+  /**
+   * Chaque journée demandée coûte un appel au modèle. Une liste vide ne doit surtout pas être
+   * transmise comme telle : côté serveur, l'absence vaut « toutes », et envoyer une liste vide
+   * ferait relever zéro journée alors que l'utilisateur en attend neuf.
+   */
+  it('transmet les journées demandées, et tait une liste vide', () => {
+    const avec = analyser(
+      buildGenerationStreamUrl({
+        method: 'direct',
+        urls: ['https://a.example/x'],
+        programDates: ['2026-08-01', '2026-08-03'],
+        detectServices: true,
+      })
+    ).searchParams
+    expect(avec.get('programDates')).toBe('2026-08-01,2026-08-03')
+
+    const sansListe = analyser(
+      buildGenerationStreamUrl({
+        method: 'direct',
+        urls: ['https://a.example/x'],
+        programDates: [],
+        detectServices: true,
+      })
+    ).searchParams
+    expect(sansListe.has('programDates')).toBe(false)
+  })
+
   it('n’ajoute les paramètres optionnels que s’ils sont fournis', () => {
     const sans = analyser(
       buildGenerationStreamUrl({

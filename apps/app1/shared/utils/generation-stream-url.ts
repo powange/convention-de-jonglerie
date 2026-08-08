@@ -28,6 +28,11 @@ export interface GenerationStreamParams {
   /** Bornes de l'édition, qui font autorité pour décider quelles journées existent. */
   editionStartDate?: string
   editionEndDate?: string
+  /**
+   * Journées à relever, au format `AAAA-MM-JJ`. Chacune coûte un appel au modèle : n'en demander
+   * que quelques-unes raccourcit la séance d'autant. Vide ou absent vaut « toutes ».
+   */
+  programDates?: string[]
 }
 
 export function buildGenerationStreamUrl({
@@ -41,6 +46,7 @@ export function buildGenerationStreamUrl({
   extractProgram,
   editionStartDate,
   editionEndDate,
+  programDates,
 }: GenerationStreamParams): string {
   const params = new URLSearchParams()
   params.set('method', method)
@@ -53,6 +59,8 @@ export function buildGenerationStreamUrl({
   if (extractProgram === false) params.set('extractProgram', 'false')
   if (editionStartDate) params.set('editionStartDate', editionStartDate)
   if (editionEndDate) params.set('editionEndDate', editionEndDate)
+  // Une date ne contient pas de virgule : le séparateur ne peut pas prêter à confusion.
+  if (programDates?.length) params.set('programDates', programDates.join(','))
   // Toujours transmise : le serveur l'active par défaut, l'omettre changerait le comportement.
   params.set('detectServices', detectServices ? 'true' : 'false')
 

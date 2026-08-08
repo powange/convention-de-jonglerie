@@ -40,7 +40,11 @@
       "scope_program_help": "Eén lezing per dag van de editie: het langst, maar het volledigst",
       "scope_program_missing": "Vul eerst de programmalink in bij Externe links",
       "scope_services": "Voorzieningen",
-      "scope_services_help": "Camping, catering, voorstellingen en andere kenmerken"
+      "scope_services_help": "Camping, catering, voorstellingen en andere kenmerken",
+      "scope_days_count": "{count} van {total} dag(en)",
+      "scope_days_all": "Alles aanvinken",
+      "scope_days_none": "Alles uitvinken",
+      "scope_day_already_filled": "— al ingevuld"
     },
     "artists": {
       "list_title": "Artiestenmanagement",

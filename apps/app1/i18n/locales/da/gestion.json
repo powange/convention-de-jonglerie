@@ -40,7 +40,11 @@
       "scope_program_help": "Én læsning pr. dag af stævnet: det længste, men det mest komplette",
       "scope_program_missing": "Angiv først programlinket under Eksterne links",
       "scope_services": "Faciliteter",
-      "scope_services_help": "Camping, forplejning, forestillinger og andre faciliteter"
+      "scope_services_help": "Camping, forplejning, forestillinger og andre faciliteter",
+      "scope_days_count": "{count} af {total} dag(e)",
+      "scope_days_all": "Vælg alle",
+      "scope_days_none": "Fravælg alle",
+      "scope_day_already_filled": "— allerede udfyldt"
     },
     "artists": {
       "list_title": "Management af kunstnere",

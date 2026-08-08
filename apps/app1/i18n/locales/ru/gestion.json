@@ -40,7 +40,11 @@
       "scope_program_help": "По одному запросу на каждый день конвенции: дольше всего, но полнее всего",
       "scope_program_missing": "Сначала укажите ссылку на программу в разделе «Внешние ссылки»",
       "scope_services": "Услуги",
-      "scope_services_help": "Кемпинг, питание, представления и другие особенности"
+      "scope_services_help": "Кемпинг, питание, представления и другие особенности",
+      "scope_days_count": "{count} из {total} дн.",
+      "scope_days_all": "Выбрать все",
+      "scope_days_none": "Снять выбор",
+      "scope_day_already_filled": "— уже заполнен"
     },
     "artists": {
       "list_title": "Управление артистами",

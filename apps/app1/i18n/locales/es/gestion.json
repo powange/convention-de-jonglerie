@@ -40,7 +40,11 @@
       "scope_program_help": "Una lectura por cada día de la edición: lo más largo, pero lo más completo",
       "scope_program_missing": "Añada primero el enlace del programa en Enlaces externos",
       "scope_services": "Servicios",
-      "scope_services_help": "Camping, restauración, espectáculos y otras características"
+      "scope_services_help": "Camping, restauración, espectáculos y otras características",
+      "scope_days_count": "{count} de {total} día(s)",
+      "scope_days_all": "Marcar todo",
+      "scope_days_none": "Desmarcar todo",
+      "scope_day_already_filled": "— ya cumplimentado"
     },
     "artists": {
       "list_title": "Gestión de artistas",
