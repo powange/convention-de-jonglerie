@@ -629,8 +629,28 @@ async function extractProgramDays(
     `[GENERATE-IMPORT] Programme: ${localiseesDemandees}/${aTraiter.length} journée(s) demandée(s) localisée(s) dans la page`
   )
 
-  for (const date of aTraiter) {
-    const descripteur = descripteurs.find((d) => d.date === date)!
+  /**
+   * Nombre de journées interrogées de front.
+   *
+   * Mesuré sur neuf journées avec un modèle local : 730 s en séquentiel, 446 puis 458 s à trois,
+   * 393 s à cinq. Le gain de trois à cinq est réel, mais cette exécution-là a perdu une journée
+   * sur un `UND_ERR_HEADERS_TIMEOUT` — le modèle n'a pas répondu à temps, saturé. Une minute
+   * gagnée ne vaut pas une journée perdue, d'où trois.
+   *
+   * Ce plafond protège une machine modeste ; un fournisseur hébergé en supporterait bien
+   * davantage. À revoir le jour où le choix du fournisseur pourra l'ajuster.
+   */
+  const CONCURRENCE = 3
+
+  const traiterJournee = async (date: string) => {
+    // Garde plutôt qu'une assertion : levée ici, hors du try, l'exception ferait rejeter le
+    // travailleur puis `Promise.all`, et emporterait toute la passe — l'inverse de l'isolation
+    // par journée qu'on cherche.
+    const descripteur = descripteurs.find((d) => d.date === date)
+    if (!descripteur) {
+      console.warn(`[GENERATE-IMPORT] Programme ${date}: journée sans descripteur, ignorée`)
+      return
+    }
     const systemPrompt = generateProgramDayPrompt({
       date,
       jourFr: descripteur.jourFr,
@@ -678,7 +698,22 @@ async function extractProgramDays(
     }
   }
 
-  return retenus
+  // File partagée entre quelques travailleurs : les journées ne se répartissent pas d'avance,
+  // leurs durées étant très inégales — une journée creuse répond en secondes, une journée dense
+  // en minutes.
+  const enAttente = [...aTraiter]
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCE, enAttente.length) }, async () => {
+      // `!== undefined` et non une simple vérité : la file est vide quand `shift` ne rend rien,
+      // pas quand une valeur est vide.
+      for (let date = enAttente.shift(); date !== undefined; date = enAttente.shift()) {
+        await traiterJournee(date)
+      }
+    })
+  )
+
+  // L'ordre d'arrivée dépend des durées : on rétablit celui du calendrier.
+  return retenus.sort((a, b) => a.date.localeCompare(b.date))
 }
 
 /** Lit le `content` d'une réponse de journée, en tolérant du bavardage autour du JSON. */
