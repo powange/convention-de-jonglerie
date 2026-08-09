@@ -152,6 +152,117 @@ describe('fetchLocalModelAvecSecours', () => {
     expect(appels).toHaveLength(1)
   })
 
+  /**
+   * Le cas signalé : LM Studio démarré sans modèle chargé. Il répond poliment une erreur, donc
+   * l'adresse est joignable — mais elle ne sert à rien, et le secours en a peut-être un.
+   */
+  it('bascule quand le serveur répond sans modèle chargé', async () => {
+    const appels: string[] = []
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        appels.push(url)
+        if (url.startsWith('http://principal')) {
+          return {
+            ok: false,
+            status: 400,
+            text: async () =>
+              '{"error":{"message":"No models loaded. Please load a model in the developer page."}}',
+          } as unknown as Response
+        }
+        return reponse(url)
+      })
+    )
+
+    const r = await fetchLocalModelAvecSecours(
+      ['http://principal:1234', 'http://secours:1234'],
+      '/v1/chat/completions',
+      {},
+      1000,
+      'LM Studio',
+      0
+    )
+
+    // Trois appels : la principale est réessayée une fois avant qu'on la déclare perdue.
+    expect(r.url).toBe('http://secours:1234/v1/chat/completions')
+    expect(appels).toHaveLength(3)
+  })
+
+  // Sans secours, le message doit dire quoi faire — pas rendre le JSON de l'API.
+  it('explique l’absence de modèle plutôt que de recopier le JSON', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        status: 400,
+        text: async () => '{"error":{"message":"No models loaded."}}',
+      })) as unknown as typeof fetch
+    )
+
+    await expect(
+      fetchLocalModelAvecSecours(
+        ['http://principal:1234'],
+        '/v1/chat/completions',
+        {},
+        1000,
+        'LM Studio',
+        0
+      )
+    ).rejects.toThrow(/aucun modèle n'y est chargé/)
+  })
+
+  it('rapporte un refus inattendu avec son statut', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        status: 500,
+        text: async () => 'boom',
+      })) as unknown as typeof fetch
+    )
+
+    await expect(
+      fetchLocalModelAvecSecours(['http://principal:1234'], '/v1/models', {}, 1000, 'LM Studio')
+    ).rejects.toThrow(/HTTP 500.*boom/)
+  })
+
+  /**
+   * « Aucun modèle chargé » est souvent passager : LM Studio décharge un modèle pour en charger un
+   * autre quand la mémoire ne permet pas de tenir les deux, et une requête tombant pendant cette
+   * bascule trouve la mémoire vide. Conclure au premier refus condamnerait une analyse pour un
+   * état transitoire de quelques secondes.
+   */
+  it('réessaie la même adresse avant de conclure à l’absence de modèle', async () => {
+    let appels = 0
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        appels++
+        if (appels === 1) {
+          return {
+            ok: false,
+            status: 400,
+            text: async () => '{"error":{"message":"No models loaded."}}',
+          } as unknown as Response
+        }
+        return reponse(url)
+      })
+    )
+
+    const r = await fetchLocalModelAvecSecours(
+      ['http://principal:1234', 'http://secours:1234'],
+      '/v1/chat/completions',
+      {},
+      1000,
+      'LM Studio',
+      0
+    )
+
+    // La même adresse, au second essai : on ne part au secours que si elle persiste.
+    expect(r.url).toBe('http://principal:1234/v1/chat/completions')
+    expect(appels).toBe(2)
+  })
+
   it('refuse de partir sans aucune adresse', async () => {
     await expect(
       fetchLocalModelAvecSecours([], '/v1/models', {}, 1000, 'LM Studio')

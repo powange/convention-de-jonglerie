@@ -949,31 +949,38 @@ async function callLMStudioComplete(
   // Passe par le helper plutôt que par `fetchWithTimeout` : sans lui, l'expiration remonte le
   // message brut d'undici, « This operation was aborted », qui ne dit ni ce qui a expiré ni quoi
   // y faire. C'est ce que voyait l'utilisateur.
-  const response = await fetchLocalModelAvecSecours(
-    bases,
-    '/v1/chat/completions',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: getPrefilledJsonPrompt() },
-          { role: 'user', content: truncatedPrompt },
-        ],
-        temperature: 0.3,
-        max_tokens: 1024,
-      }),
-    },
-    timeoutMs,
-    'LM Studio'
-  )
-
-  if (!response.ok) {
-    const error = await response.text()
-    throw createError({ status: 503, message: `Erreur LM Studio: ${error}` })
+  // Le catch n'est pas décoratif : sans lui, une Error simple remonte à Nitro, qui masque son
+  // message en « Internal Server Error » — l'utilisateur perdrait l'explication du helper.
+  let response: Response
+  try {
+    response = await fetchLocalModelAvecSecours(
+      bases,
+      '/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: getPrefilledJsonPrompt() },
+            { role: 'user', content: truncatedPrompt },
+          ],
+          temperature: 0.3,
+          max_tokens: 1024,
+        }),
+      },
+      timeoutMs,
+      'LM Studio'
+    )
+  } catch (error: any) {
+    throw createError({
+      status: error?.[ERREUR_EXPIRATION] === true ? 504 : 503,
+      message: error.message,
+    })
   }
 
+  // Pas de contrôle de `response.ok` ici : le helper ne rend qu'une réponse servie, et traduit
+  // lui-même un refus en message lisible. Le recopier ici rendrait le JSON brut de l'API.
   const data = await response.json()
   const responseText = data.choices?.[0]?.message?.content || ''
 
@@ -1151,14 +1158,7 @@ async function callLMStudio(
     })
   }
 
-  if (!response.ok) {
-    const error = await response.text()
-    throw createError({
-      status: 503,
-      message: `Erreur LM Studio: ${error}. Vérifiez que LM Studio est démarré avec un modèle chargé.`,
-    })
-  }
-
+  // Voir plus haut : le helper garantit une réponse servie, et dit déjà quoi faire en cas de refus.
   const data = await response.json()
   const responseText = data.choices?.[0]?.message?.content || ''
 
