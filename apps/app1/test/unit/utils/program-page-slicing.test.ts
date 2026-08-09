@@ -191,6 +191,60 @@ describe('decouperParJournee', () => {
     expect(s['2026-08-02']).toContain('ateliers')
   })
 
+  /**
+   * Les deux défauts signalés sur l'EJC : l'en-tête « August 8th » se retrouvait en tête du
+   * relevé, et le début de l'en-tête suivant — « 📅 Sunday, » — restait accroché à la fin, parce
+   * que la coupe tombait à la position exacte du repère et non au début de sa ligne.
+   */
+  it('retire l’en-tête de la journée et n’emporte pas le début du suivant', () => {
+    const page = [
+      '📅 SATURDAY, August 1st',
+      '09:00 | JOGGLING ROAD RACE 5km',
+      '17:00 | Gala show',
+      '📅 Sunday, August 2nd',
+      '10:00 | Ateliers',
+    ].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-01']).toBe('09:00 | JOGGLING ROAD RACE 5km\n17:00 | Gala show')
+    expect(s['2026-08-01']).not.toContain('August 1st')
+    expect(s['2026-08-01']).not.toContain('Sunday')
+  })
+
+  // Une journée dont le déroulé commence sur la ligne du titre ne doit pas être amputée.
+  it('conserve la première ligne quand elle porte aussi le contenu', () => {
+    const page = ['Saturday — accueil', 'Sunday — ateliers', 'Monday — départ à 14h'].join('\n')
+    const s = decouperParJournee(page, journees)
+
+    expect(s['2026-08-01']).toBe('Saturday — accueil')
+    expect(s['2026-08-03']).toBe('Monday — départ à 14h')
+  })
+
+  it('retire un en-tête même sans émoji ni ponctuation', () => {
+    const page = ['August 1', '10:00 accueil', 'August 2', '10:00 ateliers'].join('\n')
+    const s = decouperParJournee(page, journees)
+
+    expect(s['2026-08-01']).toBe('10:00 accueil')
+  })
+
+  /**
+   * Les marqueurs doivent rester assez précis pour ne pas mordre sur du vrai programme : un
+   * atelier « Cookie decorating » est une activité de convention parfaitement ordinaire.
+   */
+  it('ne coupe pas sur un mot qui appartient au programme', () => {
+    const page = [
+      'Saturday — accueil',
+      'Sunday — 10:00 Cookie decorating workshop',
+      '14:00 show designed by Anna',
+      '20:30 gala',
+      'Monday — départ',
+    ].join('\n')
+
+    const s = decouperParJournee(page, journees)
+    expect(s['2026-08-02']).toContain('Cookie decorating')
+    expect(s['2026-08-02']).toContain('20:30 gala')
+  })
+
   // La casse de la page ne doit pas décider du découpage.
   it('ignore la casse des repères', () => {
     const s = decouperParJournee('SATURDAY: accueil\nSUNDAY: ateliers\nMONDAY: fin', journees)
