@@ -44,7 +44,9 @@
       "scope_days_count": "{count} z {total} dnia/dni",
       "scope_days_all": "Zaznacz wszystko",
       "scope_days_none": "Odznacz wszystko",
-      "scope_day_already_filled": "— już uzupełnione"
+      "scope_day_already_filled": "— już uzupełnione",
+      "program_days_failed_title": "brak nieudanych dni | Nie udało się pobrać jednego dnia | Nie udało się pobrać {count} dni",
+      "program_days_failed_description": "Model nie odpowiedział dla: {days}. Te dni pozostały bez zmian — uruchom analizę ponownie, zaznaczając tylko je."
     },
     "artists": {
       "list_title": "Zarządzanie artystami",

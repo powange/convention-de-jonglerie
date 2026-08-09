@@ -41,6 +41,8 @@
       "scope_days_all": "Tout cocher",
       "scope_days_none": "Tout décocher",
       "scope_day_already_filled": "— déjà renseignée",
+      "program_days_failed_title": "aucune journée en échec | Une journée n'a pas pu être relevée | {count} journées n'ont pas pu être relevées",
+      "program_days_failed_description": "Le modèle n'a pas répondu pour : {days}. Rien n'a changé pour ces journées — relancez l'analyse en ne cochant qu'elles.",
       "scope_services": "Services",
       "scope_services_help": "Camping, restauration, spectacles et autres caractéristiques",
       "title": "Mise à jour IA",

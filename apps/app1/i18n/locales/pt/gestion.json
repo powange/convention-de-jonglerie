@@ -44,7 +44,9 @@
       "scope_days_count": "{count} de {total} dia(s)",
       "scope_days_all": "Selecionar tudo",
       "scope_days_none": "Desmarcar tudo",
-      "scope_day_already_filled": "— já preenchido"
+      "scope_day_already_filled": "— já preenchido",
+      "program_days_failed_title": "nenhum dia falhado | Não foi possível obter um dia | Não foi possível obter {count} dias",
+      "program_days_failed_description": "O modelo não respondeu para: {days}. Nada mudou nesses dias — volte a lançar a análise selecionando apenas esses."
     },
     "artists": {
       "list_title": "Gestão de artistas",

@@ -44,7 +44,9 @@
       "scope_days_count": "{count} of {total} day(s)",
       "scope_days_all": "Select all",
       "scope_days_none": "Clear all",
-      "scope_day_already_filled": "— already filled in"
+      "scope_day_already_filled": "— already filled in",
+      "program_days_failed_title": "no failed day | One day could not be retrieved | {count} days could not be retrieved",
+      "program_days_failed_description": "The model did not answer for: {days}. Nothing changed for those days — run the analysis again with only those selected."
     },
     "artists": {
       "list_title": "Artist management",

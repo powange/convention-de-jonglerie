@@ -44,7 +44,9 @@
       "scope_days_count": "{count} з {total} дн.",
       "scope_days_all": "Вибрати все",
       "scope_days_none": "Зняти вибір",
-      "scope_day_already_filled": "— уже заповнено"
+      "scope_day_already_filled": "— уже заповнено",
+      "program_days_failed_title": "немає невдалих днів | Один день не вдалося отримати | Не вдалося отримати днів: {count}",
+      "program_days_failed_description": "Модель не відповіла для: {days}. Для цих днів нічого не змінилося — запустіть аналіз знову, вибравши лише їх."
     },
     "artists": {
       "list_title": "Менеджмент артистів",

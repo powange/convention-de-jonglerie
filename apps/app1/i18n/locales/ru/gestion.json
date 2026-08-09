@@ -44,7 +44,9 @@
       "scope_days_count": "{count} из {total} дн.",
       "scope_days_all": "Выбрать все",
       "scope_days_none": "Снять выбор",
-      "scope_day_already_filled": "— уже заполнен"
+      "scope_day_already_filled": "— уже заполнен",
+      "program_days_failed_title": "нет неудачных дней | Один день не удалось получить | Не удалось получить дней: {count}",
+      "program_days_failed_description": "Модель не ответила для: {days}. Для этих дней ничего не изменилось — запустите анализ снова, выбрав только их."
     },
     "artists": {
       "list_title": "Управление артистами",
