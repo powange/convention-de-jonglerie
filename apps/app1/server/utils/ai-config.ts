@@ -55,6 +55,7 @@ interface DbAiConfig {
   id: string
   provider: string
   lmstudioBaseUrl: string
+  lmstudioBackupBaseUrl: string | null
   lmstudioModelId: string | null
   lmstudioTextModelId: string | null
   anthropicApiKey: string | null
@@ -96,6 +97,7 @@ export async function getEffectiveAIConfigAsync() {
   return {
     aiProvider: dbConfig.provider,
     lmstudioBaseUrl: dbConfig.lmstudioBaseUrl,
+    lmstudioBackupBaseUrl: dbConfig.lmstudioBackupBaseUrl,
     lmstudioModel: dbConfig.lmstudioModelId,
     lmstudioTextModel: dbConfig.lmstudioTextModelId,
     anthropicApiKey: dbConfig.anthropicApiKey,
@@ -127,6 +129,7 @@ export type EffectiveAIConfig = Awaited<ReturnType<typeof getEffectiveAIConfigAs
 export function serializeAiConfig(config: {
   provider: string
   lmstudioBaseUrl: string
+  lmstudioBackupBaseUrl: string | null
   lmstudioModelId: string | null
   lmstudioTextModelId: string | null
   anthropicApiKey: string | null
@@ -137,6 +140,7 @@ export function serializeAiConfig(config: {
   return {
     provider: config.provider,
     lmstudioBaseUrl: config.lmstudioBaseUrl,
+    lmstudioBackupBaseUrl: config.lmstudioBackupBaseUrl,
     lmstudioModelId: config.lmstudioModelId,
     lmstudioTextModelId: config.lmstudioTextModelId,
     anthropicApiKey: config.anthropicApiKey ? '****' : null,

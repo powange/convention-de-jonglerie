@@ -11,6 +11,9 @@ import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers
 const bodySchema = z.object({
   provider: z.enum(['lmstudio', 'anthropic', 'ollama']),
   lmstudioBaseUrl: z.string().url().default('http://host.docker.internal:1234'),
+  // Facultative, et tolérant la chaîne vide : laisser le champ blanc doit vouloir dire
+  // « pas de secours », pas « adresse invalide ».
+  lmstudioBackupBaseUrl: z.string().url().or(z.literal('')).nullish(),
   lmstudioModelId: z.string().nullable().default(null),
   lmstudioTextModelId: z.string().nullable().default(null),
   anthropicApiKey: z.string().nullable().default(null),
@@ -35,6 +38,7 @@ export default wrapApiHandler(
     const updateData: Record<string, unknown> = {
       provider: data.provider,
       lmstudioBaseUrl: data.lmstudioBaseUrl,
+      lmstudioBackupBaseUrl: data.lmstudioBackupBaseUrl || null,
       lmstudioModelId: data.lmstudioModelId,
       lmstudioTextModelId: data.lmstudioTextModelId,
       ollamaBaseUrl: data.ollamaBaseUrl,
