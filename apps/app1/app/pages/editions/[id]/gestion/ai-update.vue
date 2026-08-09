@@ -265,6 +265,22 @@
                   />
                   <p v-else class="text-gray-400 mt-1">-</p>
                 </template>
+                <!-- Comparaison ligne à ligne dès que la valeur en compte plusieurs : les lignes
+                     disparues ressortent, les inchangées s'effacent. -->
+                <div v-else-if="comparaisonDe(diff)" class="mt-1 space-y-0.5">
+                  <p
+                    v-for="(ligne, i) in comparaisonDe(diff)!.anciennes"
+                    :key="i"
+                    class="break-words whitespace-pre-wrap px-1 rounded"
+                    :class="
+                      ligne.modifiee
+                        ? 'bg-red-200/70 dark:bg-red-800/50 text-red-900 dark:text-red-100'
+                        : 'text-gray-500 dark:text-gray-400'
+                    "
+                  >
+                    {{ ligne.texte || '\u00a0' }}
+                  </p>
+                </div>
                 <p
                   v-else
                   class="text-gray-700 dark:text-gray-300 mt-1 break-words whitespace-pre-line"
@@ -285,6 +301,20 @@
                   />
                   <p v-else class="text-gray-400 mt-1">-</p>
                 </template>
+                <div v-else-if="comparaisonDe(diff)" class="mt-1 space-y-0.5">
+                  <p
+                    v-for="(ligne, i) in comparaisonDe(diff)!.nouvelles"
+                    :key="i"
+                    class="break-words whitespace-pre-wrap px-1 rounded"
+                    :class="
+                      ligne.modifiee
+                        ? 'bg-green-200/70 dark:bg-green-800/50 text-green-900 dark:text-green-100'
+                        : 'text-gray-500 dark:text-gray-400'
+                    "
+                  >
+                    {{ ligne.texte || '\u00a0' }}
+                  </p>
+                </div>
                 <p
                   v-else
                   class="text-gray-700 dark:text-gray-300 mt-1 break-words whitespace-pre-line"
@@ -318,6 +348,7 @@
 </template>
 
 <script setup lang="ts">
+import { comparerLignes, meriteUnDiff, type ComparaisonLignes } from '~~/shared/utils/diff-lignes'
 import { editionDayKeys } from '~~/shared/utils/program-days'
 
 definePageMeta({
@@ -576,6 +607,31 @@ const formatDiffValue = (field: string, value: string): string => {
   return value
 }
 
+/**
+ * Comparaison ligne à ligne d'une différence, ou `null` si elle n'apporte rien.
+ *
+ * Calculée une fois par différence et mémorisée : le gabarit l'invoque deux fois par ligne
+ * affichée, et refaire une plus longue sous-séquence commune à chaque rendu serait ruineux.
+ * Le cache est vidé à chaque nouvelle analyse, les différences étant alors toutes remplacées.
+ */
+const cacheComparaisons = new Map<string, ComparaisonLignes | null>()
+
+const comparaisonDe = (diff: {
+  field: string
+  currentValue: string
+  newValue: string
+}): ComparaisonLignes | null => {
+  const cle = diff.field
+  if (cacheComparaisons.has(cle)) return cacheComparaisons.get(cle)!
+
+  const ancien = formatDiffValue(diff.field, diff.currentValue)
+  const nouveau = formatDiffValue(diff.field, diff.newValue)
+  const comparaison = meriteUnDiff(ancien, nouveau) ? comparerLignes(ancien, nouveau) : null
+
+  cacheComparaisons.set(cle, comparaison)
+  return comparaison
+}
+
 const fieldLabels: Record<string, string> = {
   'convention.name': 'Nom de la convention',
   'convention.email': 'Email',
@@ -826,6 +882,8 @@ const compareResults = (aiData: any) => {
 
 // Lancer la recherche
 const searchForUpdates = async () => {
+  // Les différences vont être remplacées : les comparaisons mémorisées ne valent plus rien.
+  cacheComparaisons.clear()
   // `detectServices` est porté par le composable : on l'aligne sur le périmètre choisi.
   detectServices.value = perimetreServices.value
   updateResult.value = null

@@ -24,6 +24,7 @@ export type GenerationStep =
   | 'fetching_urls'
   | 'generating_json'
   | 'exploring_page' // EI uniquement
+  | 'extracting_program'
   | 'extracting_features'
   | 'completed'
 
@@ -37,6 +38,9 @@ export const STEP_LABELS: Record<GenerationStep, string> = {
   fetching_urls: 'Récupération du contenu des URLs...',
   generating_json: 'Génération du JSON via IA...',
   exploring_page: 'Exploration des pages...',
+  // Cette table est distincte de GENERATION_STEPS, côté génération : une étape ajoutée là-bas
+  // sans l'être ici arrive au navigateur sans libellé, et s'affiche sous sa clé brute.
+  extracting_program: 'Lecture du programme jour par jour...',
   extracting_features: 'Détection des services...',
   completed: 'Terminé',
 }

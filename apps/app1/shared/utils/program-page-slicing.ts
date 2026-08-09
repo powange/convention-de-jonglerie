@@ -112,12 +112,16 @@ const MARQUEURS_DE_PIED = [
   'all rights reserved',
   'tous droits réservés',
   'designed and built',
-  'designed by',
   'powered by',
   'mentions légales',
   'privacy policy',
   'politique de confidentialité',
-  'cookie',
+  // « cookie » et « designed by » seuls seraient trop larges : un atelier « Cookie decorating »
+  // ou un « show designed by » sont des lignes de programme plausibles, et couper là ferait
+  // perdre tout le reste de la journée.
+  'cookie policy',
+  'politique de cookies',
+  'paramètres des cookies',
 ]
 
 /**
@@ -137,6 +141,53 @@ const MARQUEURS_AVERTISSEMENT = [
   'peut encore changer',
   'programme prévisionnel',
 ]
+
+/** Recule jusqu'au début de la ligne contenant `position`. */
+function debutDeLigne(texte: string, position: number): number {
+  const precedent = texte.lastIndexOf('\n', position - 1)
+  return precedent === -1 ? 0 : precedent + 1
+}
+
+/**
+ * Une ligne porte-t-elle un horaire ?
+ *
+ * C'est ce qui distingue un en-tête de journée — « 📅 Sunday, August 2nd » — d'une ligne de
+ * programme qui commencerait par la même chose : « Monday — from 10:00 | Goodbye ».
+ */
+function porteUnHoraire(ligne: string): boolean {
+  return /\d{1,2}\s*[:h]\s*\d{2}/.test(ligne)
+}
+
+/**
+ * Retire l'en-tête de journée en tête de section.
+ *
+ * « 📅 SATURDAY, August 1st » n'est pas du programme : c'est le repère qui a servi à trouver la
+ * section. Mais « Monday — départ à 14h » l'est, et la même ligne porte alors le titre ET le
+ * contenu.
+ *
+ * On ne retire donc la première ligne que s'il n'en reste rien une fois ôtés les repères du jour
+ * et la ponctuation d'usage. Un horaire suffit également à la conserver.
+ */
+function retirerEnTete(section: string, reperes: readonly string[]): string {
+  const saut = section.indexOf('\n')
+  if (saut === -1) return section
+
+  const premiere = section.slice(0, saut)
+  if (porteUnHoraire(premiere)) return section
+
+  let reste = premiere.toLowerCase()
+  // Du plus long au plus court : retirer « august » avant « aug » éviterait de laisser « ust ».
+  for (const repere of [...reperes].sort((x, y) => y.length - x.length)) {
+    reste = reste.split(repere.toLowerCase()).join(' ')
+  }
+  // Ponctuation, ordinaux anglais et décorations qui accompagnent les titres de journée.
+  reste = reste
+    .replace(/\b(st|nd|rd|th)\b/g, ' ')
+    .replace(/[\d\s,.;:—–\-|/()[\]]/g, '')
+    .replace(/[^\p{L}]/gu, '')
+
+  return reste.length === 0 ? section.slice(saut + 1).trim() : section
+}
 
 /**
  * Coupe une section au premier signe de pied de page.
@@ -186,9 +237,13 @@ export function decouperParJournee(
       continue
     }
     const suivant = positions.slice(i + 1).find((p) => p.position !== -1)
-    const fin = suivant ? suivant.position : pageContent.length
+    // Bornes ramenées au début de leur ligne : couper à la position exacte du repère laissait le
+    // début de l'en-tête suivant — « 📅 Sunday, » — accroché à la fin de la section précédente.
+    const debut = debutDeLigne(pageContent, courant.position)
+    const fin = suivant ? debutDeLigne(pageContent, suivant.position) : pageContent.length
+    const jour = journees.find((j) => j.date === courant.date)!
     sections[courant.date] = couperAvantLePied(
-      pageContent.slice(courant.position, fin).trim(),
+      retirerEnTete(pageContent.slice(debut, fin).trim(), reperesDeLaJournee(jour)),
       !suivant
     )
   }
