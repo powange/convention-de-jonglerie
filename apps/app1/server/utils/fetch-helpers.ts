@@ -37,15 +37,21 @@ export const ERREUR_EXPIRATION = 'ModeleExpire'
  * seconde adresse évite d'aller changer la configuration au moment précis où l'on a besoin du
  * service.
  *
- * On ne bascule que sur une adresse INJOIGNABLE. Une expiration signifie que la première a bien
- * répondu, trop lentement : réessayer ailleurs doublerait l'attente pour le même verdict.
+ * On bascule quand une adresse est INUTILISABLE : injoignable, ou joignable mais incapable de
+ * servir — typiquement un LM Studio démarré sans modèle chargé, qui répond poliment une erreur.
+ * Un serveur sans modèle n'est pas plus utile qu'un serveur éteint.
+ *
+ * On ne bascule PAS sur une expiration : la première a bien répondu, trop lentement, et réessayer
+ * ailleurs doublerait l'attente pour le même verdict.
  */
 export async function fetchLocalModelAvecSecours(
   bases: readonly string[],
   chemin: string,
   options: RequestInit,
   timeout: number,
-  modelLabel: string
+  modelLabel: string,
+  // Le défaut couvre une bascule de modèle ; les tests passent 0 pour ne pas attendre pour rien.
+  pauseRechargementMs = 3000
 ): Promise<Response> {
   const adresses = bases.map((b) => b.trim()).filter(Boolean)
   if (adresses.length === 0) {
@@ -54,24 +60,66 @@ export async function fetchLocalModelAvecSecours(
 
   let derniereErreur: unknown
   for (const [index, base] of adresses.entries()) {
+    const derniere = index === adresses.length - 1
     try {
-      return await fetchLocalModelWithTimeout(
-        `${base.replace(/\/+$/, '')}${chemin}`,
-        options,
-        timeout,
-        modelLabel
+      const url = `${base.replace(/\/+$/, '')}${chemin}`
+      let reponse = await fetchLocalModelWithTimeout(url, options, timeout, modelLabel)
+      if (reponse.ok) return reponse
+
+      // Le serveur répond mais refuse de servir. On lit le corps une fois : la réponse ne sera
+      // pas rendue à l'appelant, et son message est la seule chose exploitable.
+      let corps = await reponse.text().catch(() => '')
+
+      // « Aucun modèle chargé » est souvent passager : LM Studio charge à la demande, et décharge
+      // un modèle pour en charger un autre quand la mémoire ne permet pas de tenir les deux. Une
+      // requête tombant pendant cette bascule trouve la mémoire vide. On laisse le temps de
+      // finir avant de conclure — ou de partir vers le secours.
+      if (/no models loaded/i.test(corps)) {
+        console.warn(
+          `[FETCH] ${modelLabel} sans modèle chargé sur ${base}, nouvel essai dans ${pauseRechargementMs} ms`
+        )
+        await new Promise((resoudre) => setTimeout(resoudre, pauseRechargementMs))
+        reponse = await fetchLocalModelWithTimeout(url, options, timeout, modelLabel)
+        if (reponse.ok) return reponse
+        corps = await reponse.text().catch(() => '')
+      }
+      derniereErreur = new Error(messageIndisponible(modelLabel, base, reponse.status, corps))
+      if (derniere) throw derniereErreur
+      console.warn(
+        `[FETCH] ${modelLabel} inutilisable sur ${base} (HTTP ${reponse.status}), tentative sur l'adresse de secours`
       )
+      continue
     } catch (error: any) {
       derniereErreur = error
-      const expiration = error?.[ERREUR_EXPIRATION] === true
-      const derniere = index === adresses.length - 1
-      if (expiration || derniere) throw error
+      if (error?.[ERREUR_EXPIRATION] === true || derniere) throw error
       console.warn(
         `[FETCH] ${modelLabel} injoignable sur ${base}, tentative sur l'adresse de secours`
       )
     }
   }
   throw derniereErreur
+}
+
+/**
+ * Traduit un refus du serveur en une phrase qui dit quoi faire.
+ *
+ * Le cas courant est un LM Studio démarré sans modèle chargé : il répond un JSON d'erreur que
+ * l'utilisateur recevait tel quel, accolades comprises.
+ */
+function messageIndisponible(
+  modelLabel: string,
+  base: string,
+  status: number,
+  corps: string
+): string {
+  if (/no models loaded/i.test(corps)) {
+    return (
+      `${modelLabel} répond sur ${base} mais aucun modèle n'y est chargé. ` +
+      `Chargez-en un depuis son onglet Developer, ou activez le chargement à la demande.`
+    )
+  }
+  const extrait = corps.trim().slice(0, 300)
+  return `${modelLabel} a refusé la requête sur ${base} (HTTP ${status})${extrait ? ` : ${extrait}` : ''}`
 }
 
 /**
