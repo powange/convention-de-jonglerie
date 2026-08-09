@@ -62,6 +62,13 @@ export interface GenerateImportResult {
   json: string
   provider: string
   urlsProcessed: number
+  /**
+   * Journées que la passe programme n'a pas pu relever, malgré une seconde tentative.
+   *
+   * Sans cette remontée, une journée perdue est indiscernable d'une journée sans changement :
+   * l'écran ne montre rien dans les deux cas, et l'utilisateur croit la fonctionnalité muette.
+   */
+  programDayFailures?: string[]
 }
 
 // Note: getPrefilledJsonPrompt est importé depuis import-json-schema.ts (partagé ED/EI)
@@ -210,11 +217,16 @@ export async function generateImportJson(
   let prefilledJson: FacebookImportJson | null = null
 
   // Étape 1: Traiter les URLs Facebook avec facebook-event-scraper
+  //
+  // La garde porte sur la BOUCLE, pas seulement sur l'annonce de l'étape : ne conditionner que
+  // l'affichage laissait le relevé Facebook s'exécuter, et ses données étaient réinjectées plus
+  // bas — description, dates, fuseau — donc proposées comme différences alors que personne
+  // n'avait demandé les informations générales.
   if (extractInfos && facebookUrls.length > 0) {
     updateStep(taskId, 'scraping_facebook', onProgress)
   }
 
-  for (const url of facebookUrls) {
+  for (const url of extractInfos ? facebookUrls : []) {
     try {
       console.log(`[GENERATE-IMPORT] Scraping Facebook Event: ${url}`)
       const fbEvent = await scrapeFacebookEvent(url)
@@ -501,6 +513,9 @@ export async function generateImportJson(
     // On continue avec le JSON de base si l'extraction échoue
   }
 
+  /** Journées que la passe n'a pas pu relever : elles doivent être dites, pas tues. */
+  let journeesEnEchec: string[] = []
+
   // Passe dédiée au programme jour par jour, sur la seule page du programme.
   if (extractProgram && programPageContent) {
     try {
@@ -514,7 +529,7 @@ export async function generateImportJson(
       // et rien ne permettrait d'écarter celles qui tombent hors de l'édition.
       if (/^\d{4}-\d{2}-\d{2}$/.test(debut) && /^\d{4}-\d{2}-\d{2}$/.test(fin)) {
         updateStep(taskId, 'extracting_program', onProgress)
-        const jours = await extractProgramDays(
+        const resultat = await extractProgramDays(
           effectiveConfig,
           aiProvider,
           programPageContent,
@@ -524,12 +539,20 @@ export async function generateImportJson(
           onProgress,
           programDates
         )
-        if (jours.length > 0) {
-          console.log(`[GENERATE-IMPORT] Programme: ${jours.length} journée(s) extraite(s)`)
-          parsed.edition = { ...parsed.edition, programDays: jours }
+        journeesEnEchec = resultat.echecs
+        if (resultat.journees.length > 0) {
+          console.log(
+            `[GENERATE-IMPORT] Programme: ${resultat.journees.length} journée(s) extraite(s)`
+          )
+          parsed.edition = { ...parsed.edition, programDays: resultat.journees }
           finalJson = JSON.stringify(parsed, null, 2)
         } else {
           console.log('[GENERATE-IMPORT] Programme: aucune journée extraite')
+        }
+        if (resultat.echecs.length > 0) {
+          console.warn(
+            `[GENERATE-IMPORT] Programme: ${resultat.echecs.length} journée(s) en échec — ${resultat.echecs.join(', ')}`
+          )
         }
       } else {
         console.log(
@@ -539,7 +562,15 @@ export async function generateImportJson(
     } catch (error: any) {
       // Un échec ici ne doit pas perdre le reste de l'extraction, qui a déjà coûté plusieurs
       // minutes. Le programme est un complément, pas le cœur du résultat.
+      //
+      // Mais il doit se voir : sans cela, une passe entièrement tombée serait indiscernable d'une
+      // analyse sans changement — le défaut même qu'on vient de corriger, un cran plus haut.
       console.error(`[GENERATE-IMPORT] Erreur passe programme: ${error.message}`)
+      if (journeesEnEchec.length === 0) {
+        journeesEnEchec = programDates?.length
+          ? [...programDates]
+          : editionDayKeys(editionStartDate || '', editionEndDate || '')
+      }
     }
   }
 
@@ -551,6 +582,7 @@ export async function generateImportJson(
     json: finalJson,
     provider: prefilledJson && otherContents.length === 0 ? 'facebook-direct' : aiProvider,
     urlsProcessed: urls,
+    programDayFailures: journeesEnEchec,
   }
 }
 
@@ -574,7 +606,7 @@ async function extractProgramDays(
   maxContent: number,
   onProgress?: ProgressCallback,
   datesDemandees?: string[]
-): Promise<Array<{ date: string; content: string }>> {
+): Promise<{ journees: Array<{ date: string; content: string }>; echecs: string[] }> {
   const timeoutMs = config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
   // On découpe la page ENTIÈRE : tronquer avant amputerait les dernières journées. Seule la
   // matière envoyée au modèle, une section à la fois, est ramenée à son budget.
@@ -606,6 +638,8 @@ async function extractProgramDays(
   )
 
   const retenus: Array<{ date: string; content: string }> = []
+  /** Journées perdues malgré la seconde tentative, remontées jusqu'à l'écran. */
+  const echecs: string[] = []
 
   // Repérer les sections coûte zéro appel au modèle. Sans ça, il relisait toute la page à chaque
   // journée : neuf lectures de la même page pour en tirer neuf extraits.
@@ -668,7 +702,26 @@ async function extractProgramDays(
       section.length > maxContent ? section.substring(0, maxContent) + '\n...(tronqué)' : section
 
     try {
-      const brut = await appelerModele(config, aiProvider, systemPrompt, matiere, timeoutMs)
+      // Une seconde tentative avant d'abandonner : les échecs observés sont transitoires — un
+      // modèle occupé qui ne répond pas à temps — et perdre une journée pour cela serait dommage
+      // alors qu'on a déjà payé la lecture de la page.
+      let brut: string
+      try {
+        brut = await appelerModele(config, aiProvider, systemPrompt, matiere, timeoutMs)
+      } catch (premiereErreur: any) {
+        // Pas de seconde tentative après une expiration : le délai est déjà généreux — trente
+        // minutes chez certains — et réessayer doublerait l'attente pour le même résultat. On ne
+        // réessaie que les échecs rapides, connexion refusée ou en-têtes non reçus, qui sont ceux
+        // qu'on observe quand le modèle est momentanément occupé.
+        const expiration = /n'a pas répondu dans les/.test(String(premiereErreur?.message))
+        if (expiration) throw premiereErreur
+
+        console.warn(
+          `[GENERATE-IMPORT] Programme ${date}: première tentative échouée (${premiereErreur.message}), nouvel essai`
+        )
+        await new Promise((resoudre) => setTimeout(resoudre, 2000))
+        brut = await appelerModele(config, aiProvider, systemPrompt, matiere, timeoutMs)
+      }
       const extrait = lireContenuJournee(brut)
       if (extrait) {
         // La consigne demande de recopier la page ; cette mesure dit si elle a été suivie.
@@ -692,8 +745,11 @@ async function extractProgramDays(
         )
       }
     } catch (error: any) {
-      // Une journée qui échoue ne doit pas emporter les autres : chacune est indépendante.
+      // Une journée qui échoue ne doit pas emporter les autres : chacune est indépendante. Mais
+      // elle doit se voir : sans cela, une journée perdue est indiscernable d'une journée sans
+      // changement, et l'écran ne montre rien dans les deux cas.
       console.error(`[GENERATE-IMPORT] Programme ${date}: ${error.message}`)
+      echecs.push(date)
       if (onProgress) sendUrlFetchedEvent(onProgress, `${date} — échec`)
     }
   }
@@ -713,7 +769,10 @@ async function extractProgramDays(
   )
 
   // L'ordre d'arrivée dépend des durées : on rétablit celui du calendrier.
-  return retenus.sort((a, b) => a.date.localeCompare(b.date))
+  return {
+    journees: retenus.sort((a, b) => a.date.localeCompare(b.date)),
+    echecs: echecs.sort(),
+  }
 }
 
 /** Lit le `content` d'une réponse de journée, en tolérant du bavardage autour du JSON. */

@@ -34,6 +34,8 @@ export interface GenerationResult {
   provider: string
   urlsProcessed?: string[]
   iterations?: number
+  /** Journées de programme que le modèle n'a pas pu relever, à signaler à l'utilisateur. */
+  programDayFailures?: string[]
 }
 
 /**
@@ -342,6 +344,9 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
                 provider: data.provider,
                 urlsProcessed: Array.isArray(data.urlsProcessed) ? data.urlsProcessed : undefined,
                 iterations: data.iterations,
+                programDayFailures: Array.isArray(data.programDayFailures)
+                  ? data.programDayFailures
+                  : undefined,
               }
               if (method === 'agent') {
                 agentPagesVisited.value = Array.isArray(data.urlsProcessed)

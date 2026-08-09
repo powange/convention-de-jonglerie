@@ -44,7 +44,9 @@
       "scope_days_count": "{count} van {total} dag(en)",
       "scope_days_all": "Alles aanvinken",
       "scope_days_none": "Alles uitvinken",
-      "scope_day_already_filled": "— al ingevuld"
+      "scope_day_already_filled": "— al ingevuld",
+      "program_days_failed_title": "geen mislukte dag | Eén dag kon niet worden opgehaald | {count} dagen konden niet worden opgehaald",
+      "program_days_failed_description": "Het model gaf geen antwoord voor: {days}. Voor die dagen is niets gewijzigd — start de analyse opnieuw met alleen die dagen aangevinkt."
     },
     "artists": {
       "list_title": "Artiestenmanagement",

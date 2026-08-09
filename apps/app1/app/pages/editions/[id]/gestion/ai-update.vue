@@ -226,6 +226,27 @@
         </div>
       </UCard>
 
+      <!-- Journées perdues : sans ce rappel, un échec ressemble à « rien à changer ». -->
+      <UAlert
+        v-if="journeesEnEchec.length > 0 && !generating"
+        class="mt-6"
+        icon="i-heroicons-exclamation-triangle"
+        color="warning"
+        variant="soft"
+        :title="
+          $t(
+            'gestion.ai_update.program_days_failed_title',
+            { count: journeesEnEchec.length },
+            journeesEnEchec.length
+          )
+        "
+        :description="
+          $t('gestion.ai_update.program_days_failed_description', {
+            days: journeesEnEchec.map((d) => formatProgramDayLabel(d)).join(', '),
+          })
+        "
+      />
+
       <!-- Résultats -->
       <UCard v-if="updateResult && !generating" class="mt-6">
         <template #header>
@@ -881,9 +902,13 @@ const compareResults = (aiData: any) => {
 }
 
 // Lancer la recherche
+/** Journées que le modèle n'a pas pu relever lors de la dernière analyse. */
+const journeesEnEchec = ref<string[]>([])
+
 const searchForUpdates = async () => {
   // Les différences vont être remplacées : les comparaisons mémorisées ne valent plus rien.
   cacheComparaisons.clear()
+  journeesEnEchec.value = []
   // `detectServices` est porté par le composable : on l'aligne sur le périmètre choisi.
   detectServices.value = perimetreServices.value
   updateResult.value = null
@@ -899,6 +924,8 @@ const searchForUpdates = async () => {
     editionEndDate: edition.value?.endDate?.slice(0, 10),
     programDates: perimetreProgramme.value ? journeesSelectionnees.value : undefined,
   })
+
+  journeesEnEchec.value = result?.programDayFailures ?? []
 
   if (result?.json) {
     try {

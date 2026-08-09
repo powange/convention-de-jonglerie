@@ -231,7 +231,10 @@ export default wrapApiHandler(
               result.json,
               result.provider,
               result.urlsProcessed,
-              result.iterations
+              result.iterations,
+              undefined, // imageDownloaded : renseigné par l'import admin, pas ici
+              undefined, // imageError : idem
+              'programDayFailures' in result ? result.programDayFailures : undefined
             )
 
             console.log(`[GENERATE-STREAM] Génération terminée: success=${result.success}`)

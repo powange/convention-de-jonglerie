@@ -44,7 +44,9 @@
       "scope_days_count": "{count} av {total} dag(ar)",
       "scope_days_all": "Markera alla",
       "scope_days_none": "Avmarkera alla",
-      "scope_day_already_filled": "— redan ifylld"
+      "scope_day_already_filled": "— redan ifylld",
+      "program_days_failed_title": "ingen misslyckad dag | En dag kunde inte hämtas | {count} dagar kunde inte hämtas",
+      "program_days_failed_description": "Modellen svarade inte för: {days}. Inget har ändrats för dessa dagar — kör analysen igen med endast dessa valda."
     },
     "artists": {
       "list_title": "Artisthantering",

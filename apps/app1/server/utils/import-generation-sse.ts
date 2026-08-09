@@ -134,7 +134,8 @@ export function sendResultEvent(
   urlsProcessed: string[] | number,
   iterations?: number,
   imageDownloaded?: boolean,
-  imageError?: string
+  imageError?: string,
+  programDayFailures?: string[]
 ): void {
   callback({
     type: 'result',
@@ -145,6 +146,7 @@ export function sendResultEvent(
     iterations,
     imageDownloaded,
     imageError,
+    programDayFailures,
   })
 }
 
