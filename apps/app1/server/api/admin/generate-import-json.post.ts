@@ -28,6 +28,7 @@ import {
 } from '#server/utils/facebook-event-scraper'
 import {
   BROWSER_HEADERS,
+  ERREUR_EXPIRATION,
   fetchLocalModelWithTimeout,
   fetchWithBrowserless,
   fetchWithTimeout,
@@ -403,7 +404,7 @@ export async function generateImportJson(
 
     if (aiProvider === 'lmstudio') {
       generatedJson = await callLMStudio(
-        effectiveConfig.lmstudioBaseUrl || 'http://localhost:1234',
+        basesLmStudio(effectiveConfig),
         effectiveConfig.lmstudioTextModel || effectiveConfig.lmstudioModel || 'auto',
         combinedContent,
         dynamicMaxContent,
@@ -713,8 +714,7 @@ async function extractProgramDays(
         // minutes chez certains — et réessayer doublerait l'attente pour le même résultat. On ne
         // réessaie que les échecs rapides, connexion refusée ou en-têtes non reçus, qui sont ceux
         // qu'on observe quand le modèle est momentanément occupé.
-        const expiration = /n'a pas répondu dans les/.test(String(premiereErreur?.message))
-        if (expiration) throw premiereErreur
+        if (premiereErreur?.[ERREUR_EXPIRATION] === true) throw premiereErreur
 
         console.warn(
           `[GENERATE-IMPORT] Programme ${date}: première tentative échouée (${premiereErreur.message}), nouvel essai`
@@ -787,6 +787,19 @@ function lireContenuJournee(reponse: string): string {
   }
 }
 
+/**
+ * Adresses LM Studio à essayer, dans l'ordre.
+ *
+ * La seconde n'est tentée que si la première est injoignable — machine éteinte, port fermé. Une
+ * adresse vide vient d'un champ laissé blanc et ne compte pas.
+ */
+function basesLmStudio(config: EffectiveAIConfig): string[] {
+  return [
+    config.lmstudioBaseUrl || 'http://localhost:1234',
+    config.lmstudioBackupBaseUrl || '',
+  ].filter((b) => b.trim() !== '')
+}
+
 /** Un appel au modèle, quel que soit le fournisseur configuré. */
 async function appelerModele(
   config: EffectiveAIConfig,
@@ -824,8 +837,9 @@ async function appelerModele(
     )
     reponse = (await res.json()).response || ''
   } else {
-    const res = await fetchLocalModelWithTimeout(
-      `${config.lmstudioBaseUrl || 'http://localhost:1234'}/v1/chat/completions`,
+    const res = await fetchLocalModelAvecSecours(
+      basesLmStudio(config),
+      '/v1/chat/completions',
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -890,7 +904,7 @@ async function callAIToCompleteJson(
 
   if (aiProvider === 'lmstudio') {
     return await callLMStudioComplete(
-      config.lmstudioBaseUrl || 'http://localhost:1234',
+      basesLmStudio(config),
       config.lmstudioTextModel || config.lmstudioModel || 'auto',
       userPrompt,
       maxContent,
@@ -916,7 +930,7 @@ async function callAIToCompleteJson(
  * Appel LM Studio pour compléter un JSON (prompt optimisé)
  */
 async function callLMStudioComplete(
-  baseUrl: string,
+  bases: string[],
   model: string,
   userPrompt: string,
   maxContent: number,
@@ -935,8 +949,9 @@ async function callLMStudioComplete(
   // Passe par le helper plutôt que par `fetchWithTimeout` : sans lui, l'expiration remonte le
   // message brut d'undici, « This operation was aborted », qui ne dit ni ce qui a expiré ni quoi
   // y faire. C'est ce que voyait l'utilisateur.
-  const response = await fetchLocalModelWithTimeout(
-    `${baseUrl}/v1/chat/completions`,
+  const response = await fetchLocalModelAvecSecours(
+    bases,
+    '/v1/chat/completions',
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1085,7 +1100,7 @@ export default wrapApiHandler(
  * Utilise le prompt compact pour respecter la limite de contexte
  */
 async function callLMStudio(
-  baseUrl: string,
+  bases: string[],
   model: string,
   content: string,
   maxContent: number,
@@ -1103,8 +1118,11 @@ async function callLMStudio(
 
   let response: Response
   try {
-    response = await fetchWithTimeout(
-      `${baseUrl}/v1/chat/completions`,
+    // Passe par la bascule : le helper essaie l'adresse de secours si la première est
+    // injoignable, et traduit déjà expiration et panne de connexion en messages explicites.
+    response = await fetchLocalModelAvecSecours(
+      bases,
+      '/v1/chat/completions',
       {
         method: 'POST',
         headers: {
@@ -1123,18 +1141,13 @@ async function callLMStudio(
           max_tokens: 1024,
         }),
       },
-      timeoutMs
+      timeoutMs,
+      'LM Studio'
     )
   } catch (error: any) {
-    if (error.name === 'AbortError') {
-      throw createError({
-        status: 504,
-        message: `Timeout LM Studio: le modèle n'a pas répondu dans les ${Math.round(timeoutMs / 1000)} secondes. Essayez avec moins d'URLs, un modèle plus rapide, ou augmentez le délai dans /admin/ai-config.`,
-      })
-    }
     throw createError({
-      status: 503,
-      message: `Erreur de connexion à LM Studio: ${error.message}. Vérifiez que LM Studio est démarré.`,
+      status: error?.[ERREUR_EXPIRATION] === true ? 504 : 503,
+      message: error.message,
     })
   }
 

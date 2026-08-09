@@ -82,6 +82,30 @@
             />
           </UFormField>
 
+          <!-- Adresse de secours -->
+          <UFormField
+            :label="$t('admin.ai_lmstudio_backup_base_url')"
+            :description="$t('admin.ai_lmstudio_backup_base_url_help')"
+          >
+            <div class="flex gap-2 items-center">
+              <UInput
+                v-model="form.lmstudioBackupBaseUrl"
+                class="w-full max-w-md"
+                placeholder="http://192.168.0.12:1234"
+              />
+              <!-- Une adresse de secours qu'on ne peut pas éprouver est une fausse assurance :
+                   on découvrirait qu'elle est fausse au moment précis où la première tombe. -->
+              <UButton
+                variant="soft"
+                :loading="testSecoursEnCours"
+                :disabled="!form.lmstudioBackupBaseUrl"
+                @click="testerAdresseDeSecours"
+              >
+                {{ $t('admin.ai_backup_test') }}
+              </UButton>
+            </div>
+          </UFormField>
+
           <!-- Liste des modèles -->
           <div>
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -362,6 +386,7 @@ const { t } = useI18n()
 const form = reactive({
   provider: 'lmstudio',
   lmstudioBaseUrl: 'http://host.docker.internal:1234',
+  lmstudioBackupBaseUrl: '',
   lmstudioModelId: '' as string,
   lmstudioTextModelId: '' as string,
   anthropicApiKey: '' as string,
@@ -412,6 +437,7 @@ const { pending: configPending } = await useLazyFetch('/api/admin/ai/config', {
       const cfg = response._data.config
       form.provider = cfg.provider || 'lmstudio'
       form.lmstudioBaseUrl = cfg.lmstudioBaseUrl || 'http://host.docker.internal:1234'
+      form.lmstudioBackupBaseUrl = cfg.lmstudioBackupBaseUrl || ''
       form.lmstudioModelId = cfg.lmstudioModelId ?? ''
       form.lmstudioTextModelId = cfg.lmstudioTextModelId ?? ''
       form.anthropicApiKey = cfg.anthropicApiKey ?? ''
@@ -499,6 +525,31 @@ const { execute: executeDetect, loading: detecting } = useApiAction('/api/admin/
   },
 })
 
+/**
+ * Éprouve l'adresse de secours sans toucher à la liste des modèles détectés, qui décrit la
+ * principale : les mélanger laisserait croire que ces modèles viennent d'elle.
+ */
+const { execute: executerTestSecours, loading: testSecoursEnCours } = useApiAction(
+  '/api/admin/ai/models/detect',
+  {
+    method: 'POST',
+    body: () => ({ baseUrl: form.lmstudioBackupBaseUrl }),
+    silentSuccess: true,
+    errorMessages: { default: t('admin.ai_backup_test_error') },
+    onSuccess: (result: any) => {
+      const nombre = result?.models?.length ?? 0
+      useToast().add({
+        title: t('admin.ai_backup_test_ok', { count: nombre }),
+        color: nombre > 0 ? 'success' : 'warning',
+      })
+    },
+  }
+)
+
+async function testerAdresseDeSecours() {
+  await executerTestSecours()
+}
+
 async function detectModels() {
   detectedModels.value = []
   await executeDetect()
@@ -564,6 +615,7 @@ const { execute: executeSave, loading: saving } = useApiAction('/api/admin/ai/co
   body: () => ({
     provider: form.provider,
     lmstudioBaseUrl: form.lmstudioBaseUrl,
+    lmstudioBackupBaseUrl: form.lmstudioBackupBaseUrl,
     lmstudioModelId: form.lmstudioModelId || null,
     lmstudioTextModelId: form.lmstudioTextModelId || null,
     anthropicApiKey: form.anthropicApiKey || null,

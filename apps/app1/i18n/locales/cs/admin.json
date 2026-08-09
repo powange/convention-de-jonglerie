@@ -707,6 +707,11 @@
     "preferred_language": "Jazyk",
     "ai_timeout_title": "Časový limit modelu",
     "ai_timeout_label": "Maximální doba (sekundy)",
-    "ai_timeout_help": "Doba, kterou má model na odpověď na volání. Pomalý lokální model potřebuje více: po jejím uplynutí je generování přerušeno. Mezi 30 a 1800 sekundami."
+    "ai_timeout_help": "Doba, kterou má model na odpověď na volání. Pomalý lokální model potřebuje více: po jejím uplynutí je generování přerušeno. Mezi 30 a 1800 sekundami.",
+    "ai_lmstudio_backup_base_url": "Záložní adresa",
+    "ai_lmstudio_backup_base_url_help": "Použije se, když je první nedostupná — vypnutý stroj, zavřený port. Nechte prázdné, pokud žádná není.",
+    "ai_backup_test": "Otestovat",
+    "ai_backup_test_ok": "Záložní adresa dostupná — nalezeno modelů: {count}",
+    "ai_backup_test_error": "Záložní adresa nedostupná"
   }
 }

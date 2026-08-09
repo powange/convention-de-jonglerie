@@ -707,6 +707,11 @@
     "preferred_language": "Taal",
     "ai_timeout_title": "Time-out van het model",
     "ai_timeout_label": "Maximale tijd (seconden)",
-    "ai_timeout_help": "Tijd die het model krijgt om op een aanroep te antwoorden. Een traag lokaal model heeft meer nodig: daarna wordt de generatie afgebroken. Tussen 30 en 1800 seconden."
+    "ai_timeout_help": "Tijd die het model krijgt om op een aanroep te antwoorden. Een traag lokaal model heeft meer nodig: daarna wordt de generatie afgebroken. Tussen 30 en 1800 seconden.",
+    "ai_lmstudio_backup_base_url": "Reserveadres",
+    "ai_lmstudio_backup_base_url_help": "Wordt geprobeerd als het eerste onbereikbaar is — machine uit, poort dicht. Laat leeg als er geen is.",
+    "ai_backup_test": "Testen",
+    "ai_backup_test_ok": "Reserveadres bereikbaar — {count} model(len) gevonden",
+    "ai_backup_test_error": "Reserveadres onbereikbaar"
   }
 }

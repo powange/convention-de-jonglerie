@@ -22,6 +22,59 @@ export const BROWSER_HEADERS: Record<string, string> = {
 }
 
 /**
+ * Marque posée sur une erreur d'expiration, pour la distinguer d'une machine injoignable.
+ *
+ * La différence commande le comportement de secours : une adresse qui expire répond — elle est
+ * seulement lente — et basculer ne ferait que doubler l'attente. Une adresse injoignable, elle,
+ * ne répondra jamais.
+ */
+export const ERREUR_EXPIRATION = 'ModeleExpire'
+
+/**
+ * Appelle un modèle local, en essayant les adresses dans l'ordre jusqu'à ce que l'une réponde.
+ *
+ * Le modèle tourne sur une machine du réseau : elle s'éteint, redémarre, change d'adresse. Une
+ * seconde adresse évite d'aller changer la configuration au moment précis où l'on a besoin du
+ * service.
+ *
+ * On ne bascule que sur une adresse INJOIGNABLE. Une expiration signifie que la première a bien
+ * répondu, trop lentement : réessayer ailleurs doublerait l'attente pour le même verdict.
+ */
+export async function fetchLocalModelAvecSecours(
+  bases: readonly string[],
+  chemin: string,
+  options: RequestInit,
+  timeout: number,
+  modelLabel: string
+): Promise<Response> {
+  const adresses = bases.map((b) => b.trim()).filter(Boolean)
+  if (adresses.length === 0) {
+    throw new Error(`Aucune adresse configurée pour ${modelLabel}.`)
+  }
+
+  let derniereErreur: unknown
+  for (const [index, base] of adresses.entries()) {
+    try {
+      return await fetchLocalModelWithTimeout(
+        `${base.replace(/\/+$/, '')}${chemin}`,
+        options,
+        timeout,
+        modelLabel
+      )
+    } catch (error: any) {
+      derniereErreur = error
+      const expiration = error?.[ERREUR_EXPIRATION] === true
+      const derniere = index === adresses.length - 1
+      if (expiration || derniere) throw error
+      console.warn(
+        `[FETCH] ${modelLabel} injoignable sur ${base}, tentative sur l'adresse de secours`
+      )
+    }
+  }
+  throw derniereErreur
+}
+
+/**
  * Appelle un modèle local (LM Studio, Ollama) en traduisant l'expiration du délai en une erreur
  * exploitable.
  *
@@ -40,11 +93,14 @@ export async function fetchLocalModelWithTimeout(
     return await fetchWithTimeout(url, options, timeout)
   } catch (error: any) {
     if (error?.name === 'AbortError') {
-      throw new Error(
+      const expiration: Error & { [ERREUR_EXPIRATION]?: boolean } = new Error(
         `${modelLabel} n'a pas répondu dans les ${Math.round(timeout / 1000)} secondes. ` +
           `Le modèle est probablement trop lent pour cette tâche : essayez avec moins d'URLs, ` +
           `un modèle plus rapide, ou augmentez le délai depuis /admin/ai-config.`
       )
+      // Marquée plutôt que reconnue au texte : un message se traduit ou se réécrit, un drapeau non.
+      expiration[ERREUR_EXPIRATION] = true
+      throw expiration
     }
 
     // Sans cela, une panne de connexion remonte le « fetch failed » d'undici : trois mots qui ne

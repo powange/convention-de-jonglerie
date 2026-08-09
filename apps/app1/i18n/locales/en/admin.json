@@ -707,6 +707,11 @@
     "preferred_language": "Language",
     "ai_timeout_title": "Model timeout",
     "ai_timeout_label": "Maximum time (seconds)",
-    "ai_timeout_help": "Time allowed for the model to answer a call. A slow local model needs more: beyond that, generation is aborted. Between 30 and 1800 seconds."
+    "ai_timeout_help": "Time allowed for the model to answer a call. A slow local model needs more: beyond that, generation is aborted. Between 30 and 1800 seconds.",
+    "ai_lmstudio_backup_base_url": "Backup address",
+    "ai_lmstudio_backup_base_url_help": "Tried when the first one is unreachable — machine off, port closed. Leave empty if there is none.",
+    "ai_backup_test": "Test",
+    "ai_backup_test_ok": "Backup address reachable — {count} model(s) found",
+    "ai_backup_test_error": "Backup address unreachable"
   }
 }

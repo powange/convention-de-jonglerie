@@ -707,6 +707,11 @@
     "preferred_language": "Språk",
     "ai_timeout_title": "Modellens tidsgräns",
     "ai_timeout_label": "Maximal tid (sekunder)",
-    "ai_timeout_help": "Tid som modellen får för att svara på ett anrop. En långsam lokal modell behöver mer: därefter avbryts genereringen. Mellan 30 och 1800 sekunder."
+    "ai_timeout_help": "Tid som modellen får för att svara på ett anrop. En långsam lokal modell behöver mer: därefter avbryts genereringen. Mellan 30 och 1800 sekunder.",
+    "ai_lmstudio_backup_base_url": "Reservadress",
+    "ai_lmstudio_backup_base_url_help": "Används om den första inte går att nå — maskinen avstängd, porten stängd. Lämna tomt om det inte finns någon.",
+    "ai_backup_test": "Testa",
+    "ai_backup_test_ok": "Reservadress nåbar — {count} modell(er) hittades",
+    "ai_backup_test_error": "Reservadress går inte att nå"
   }
 }

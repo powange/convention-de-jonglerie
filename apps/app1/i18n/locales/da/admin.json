@@ -707,6 +707,11 @@
     "preferred_language": "Sprog",
     "ai_timeout_title": "Modellens tidsgrænse",
     "ai_timeout_label": "Maksimal tid (sekunder)",
-    "ai_timeout_help": "Tid, modellen får til at svare på et kald. En langsom lokal model har brug for mere: derefter afbrydes genereringen. Mellem 30 og 1800 sekunder."
+    "ai_timeout_help": "Tid, modellen får til at svare på et kald. En langsom lokal model har brug for mere: derefter afbrydes genereringen. Mellem 30 og 1800 sekunder.",
+    "ai_lmstudio_backup_base_url": "Reserveadresse",
+    "ai_lmstudio_backup_base_url_help": "Forsøges, hvis den første ikke kan nås — maskinen slukket, porten lukket. Lad stå tomt, hvis der ikke er nogen.",
+    "ai_backup_test": "Test",
+    "ai_backup_test_ok": "Reserveadresse kan nås — {count} model(ler) fundet",
+    "ai_backup_test_error": "Reserveadresse kan ikke nås"
   }
 }

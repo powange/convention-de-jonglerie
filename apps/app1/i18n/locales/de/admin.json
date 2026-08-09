@@ -707,6 +707,11 @@
     "preferred_language": "Sprache",
     "ai_timeout_title": "Zeitlimit des Modells",
     "ai_timeout_label": "Maximale Zeit (Sekunden)",
-    "ai_timeout_help": "Zeit, die dem Modell für die Antwort auf einen Aufruf zugestanden wird. Ein langsames lokales Modell braucht mehr: darüber hinaus wird die Generierung abgebrochen. Zwischen 30 und 1800 Sekunden."
+    "ai_timeout_help": "Zeit, die dem Modell für die Antwort auf einen Aufruf zugestanden wird. Ein langsames lokales Modell braucht mehr: darüber hinaus wird die Generierung abgebrochen. Zwischen 30 und 1800 Sekunden.",
+    "ai_lmstudio_backup_base_url": "Ausweichadresse",
+    "ai_lmstudio_backup_base_url_help": "Wird versucht, wenn die erste nicht erreichbar ist — Rechner aus, Port geschlossen. Leer lassen, wenn keine vorhanden ist.",
+    "ai_backup_test": "Testen",
+    "ai_backup_test_ok": "Ausweichadresse erreichbar — {count} Modell(e) gefunden",
+    "ai_backup_test_error": "Ausweichadresse nicht erreichbar"
   }
 }

@@ -707,6 +707,11 @@
     "preferred_language": "Język",
     "ai_timeout_title": "Limit czasu modelu",
     "ai_timeout_label": "Maksymalny czas (sekundy)",
-    "ai_timeout_help": "Czas przyznany modelowi na odpowiedź na wywołanie. Wolny model lokalny potrzebuje go więcej: po jego przekroczeniu generowanie zostaje przerwane. Od 30 do 1800 sekund."
+    "ai_timeout_help": "Czas przyznany modelowi na odpowiedź na wywołanie. Wolny model lokalny potrzebuje go więcej: po jego przekroczeniu generowanie zostaje przerwane. Od 30 do 1800 sekund.",
+    "ai_lmstudio_backup_base_url": "Adres zapasowy",
+    "ai_lmstudio_backup_base_url_help": "Używany, gdy pierwszy jest nieosiągalny — maszyna wyłączona, port zamknięty. Zostaw puste, jeśli go nie ma.",
+    "ai_backup_test": "Testuj",
+    "ai_backup_test_ok": "Adres zapasowy dostępny — znaleziono modeli: {count}",
+    "ai_backup_test_error": "Adres zapasowy niedostępny"
   }
 }

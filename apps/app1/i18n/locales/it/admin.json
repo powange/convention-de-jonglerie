@@ -707,6 +707,11 @@
     "preferred_language": "Lingua",
     "ai_timeout_title": "Timeout del modello",
     "ai_timeout_label": "Tempo massimo (secondi)",
-    "ai_timeout_help": "Tempo concesso al modello per rispondere a una chiamata. Un modello locale lento ne richiede di più: oltre tale limite la generazione viene interrotta. Tra 30 e 1800 secondi."
+    "ai_timeout_help": "Tempo concesso al modello per rispondere a una chiamata. Un modello locale lento ne richiede di più: oltre tale limite la generazione viene interrotta. Tra 30 e 1800 secondi.",
+    "ai_lmstudio_backup_base_url": "Indirizzo di riserva",
+    "ai_lmstudio_backup_base_url_help": "Usato se il primo non è raggiungibile — macchina spenta, porta chiusa. Lascia vuoto se non ce n'è uno.",
+    "ai_backup_test": "Prova",
+    "ai_backup_test_ok": "Indirizzo di riserva raggiungibile — {count} modello/i trovato/i",
+    "ai_backup_test_error": "Indirizzo di riserva non raggiungibile"
   }
 }
