@@ -1,6 +1,22 @@
 import vue from '@vitejs/plugin-vue'
 import { version as nuxtVersion } from 'nuxt/package.json'
 
+/**
+ * Réception d'un fichier de sauvegarde : archive complète (dump + images), donc bien
+ * au-delà de la limite par défaut de nuxt-security. Partagé par la restauration et
+ * l'import simple — une route de sauvegarde qui reçoit un fichier sans cette règle
+ * répond 413 dès quelques dizaines de Mo.
+ */
+const backupUploadSecurity = {
+  security: {
+    requestSizeLimiter: {
+      maxRequestSizeInBytes: 2_000_000_000,
+      maxUploadFileRequestInBytes: 2_000_000_000,
+      throwError: true,
+    },
+  },
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   hooks: {
@@ -611,16 +627,9 @@ export default defineNuxtConfig({
     '/editions/*/gestion/**': { appLayout: 'edition-dashboard', ssr: false },
     // Pages admin : pas de SSR
     '/admin/**': { ssr: false },
-    // Upload de backup : autoriser jusqu'à 100 MB (surcharge la limite par défaut de nuxt-security)
-    '/api/admin/backup/restore': {
-      security: {
-        requestSizeLimiter: {
-          maxRequestSizeInBytes: 100_000_000,
-          maxUploadFileRequestInBytes: 100_000_000,
-          throwError: true,
-        },
-      },
-    },
+    // Réception d'un fichier de sauvegarde : jusqu'à 100 MB (cf. backupUploadSecurity)
+    '/api/admin/backup/restore': backupUploadSecurity,
+    '/api/admin/backup/upload': backupUploadSecurity,
     // Uploads de fichiers (affiches, profils, etc.) : le body contient le fichier
     // encodé en base64, ce qui augmente la taille d'environ 33 %. Pour rester
     // cohérent avec MAX_IMAGE_SIZE = 10 MB côté serveur, on autorise 15 MB.

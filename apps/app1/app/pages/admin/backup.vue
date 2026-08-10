@@ -79,18 +79,38 @@
               class="hidden"
               @change="handleFileUpload"
             />
-            <UButton
-              color="info"
-              :loading="restoring"
-              :disabled="restoring"
-              @click="openFileDialog"
-            >
-              <UIcon name="i-heroicons-arrow-up-tray" class="h-4 w-4" />
-              {{ restoring ? $t('admin.backup_restoring') : $t('admin.backup_restore_button') }}
-            </UButton>
+            <div class="flex flex-wrap gap-2">
+              <UButton
+                color="info"
+                :loading="restoring"
+                :disabled="restoring || importing"
+                @click="openFileDialog('restore')"
+              >
+                <UIcon name="i-heroicons-arrow-up-tray" class="h-4 w-4" />
+                {{ restoring ? $t('admin.backup_restoring') : $t('admin.backup_restore_button') }}
+              </UButton>
+              <UButton
+                color="neutral"
+                variant="outline"
+                :loading="importing"
+                :disabled="restoring || importing"
+                @click="openFileDialog('import')"
+              >
+                <UIcon name="i-heroicons-inbox-arrow-down" class="h-4 w-4" />
+                {{ importing ? $t('admin.backup_importing') : $t('admin.backup_import_button') }}
+              </UButton>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+              {{ $t('admin.backup_import_hint') }}
+            </p>
           </div>
         </div>
       </UCard>
+    </div>
+
+    <!-- Recherche d'une valeur de champ dans les sauvegardes -->
+    <div class="mb-8">
+      <AdminBackupSearch />
     </div>
 
     <!-- Liste des sauvegardes -->
@@ -306,8 +326,11 @@ const { execute: executeCreateBackup, loading: creating } = useApiAction<
 
 const createBackup = () => executeCreateBackup()
 
-// Ouvrir le dialogue de fichier
-const openFileDialog = () => {
+// Le même sélecteur de fichier sert aux deux actions : import seul ou restauration
+const pendingAction = ref<'restore' | 'import'>('restore')
+
+const openFileDialog = (action: 'restore' | 'import') => {
+  pendingAction.value = action
   fileInput.value?.click()
 }
 
@@ -326,13 +349,53 @@ const handleFileUpload = (event: Event) => {
       return
     }
 
-    pendingRestore.value = file
-    showConfirmModal.value = true
+    if (pendingAction.value === 'import') {
+      // Import seul : rien n'est écrasé, pas de confirmation à demander
+      pendingImport.value = file
+      executeImport()
+    } else {
+      pendingRestore.value = file
+      showConfirmModal.value = true
+    }
   }
 
   // Reset input
   target.value = ''
 }
+
+// Importer une sauvegarde sans la restaurer
+const pendingImport = ref<File | null>(null)
+
+const { execute: executeImport, loading: importing } = useApiAction<
+  File,
+  { storedFilename: string }
+>('/api/admin/backup/upload', {
+  method: 'POST',
+  // Fichier brut plutôt que multipart : le serveur l'écrit en flux sur le disque,
+  // ce qui permet d'importer une archive de plusieurs centaines de Mo
+  body: () => pendingImport.value as File,
+  headers: () => ({
+    'content-type': 'application/octet-stream',
+    // encodeURIComponent : un en-tête HTTP n'accepte pas les accents ni les emojis
+    'x-backup-filename': encodeURIComponent(pendingImport.value?.name ?? ''),
+  }),
+  silentSuccess: true,
+  errorMessages: { default: t('admin.backup_import_error') },
+  onSuccess: async (response: { storedFilename: string }) => {
+    pendingImport.value = null
+    toast.add({
+      color: 'success',
+      title: t('admin.backup_import_success'),
+      description: t('admin.backup_import_success_description', {
+        filename: response.storedFilename,
+      }),
+    })
+    await loadBackups()
+  },
+  onError: () => {
+    pendingImport.value = null
+  },
+})
 
 // Restaurer une sauvegarde existante
 const restoreBackup = (filename: string) => {
