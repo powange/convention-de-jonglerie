@@ -61,6 +61,27 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Recherche dans les sauvegardes (dump
       data: { eventId, open: true, mode: 'INTERNAL', description },
     })
 
+    // Une seconde ligne : la CI part d'une base vierge, et le test de limite doit
+    // pouvoir constater qu'on lui rend moins de lignes qu'il n'en existe.
+    const secondAnchor = await prismaTest.event.create({ data: {} })
+    await prismaTest.edition.create({
+      data: {
+        id: secondAnchor.id,
+        eventId: secondAnchor.id,
+        name: `Édition backup-search bis ${ts}`,
+        conventionId: convention.id,
+        startDate: new Date('2024-07-01'),
+        endDate: new Date('2024-07-03'),
+        addressLine1: '2 rue du Test',
+        city: 'Lyon',
+        country: 'France',
+        postalCode: '69001',
+      },
+    })
+    await prismaTest.eventVolunteerSettings.create({
+      data: { eventId: secondAnchor.id, open: false, mode: 'INTERNAL', description: 'Autre' },
+    })
+
     // Dump réel, avec les mêmes options que create.post.ts
     const url = new URL(process.env.TEST_DATABASE_URL || (process.env.DATABASE_URL as string))
     const { stdout } = await execFileAsync(
@@ -69,6 +90,9 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Recherche dans les sauvegardes (dump
         `-h${url.hostname}`,
         `-P${url.port || '3306'}`,
         `-u${url.username}`,
+        // Sans cela, `-h localhost` fait basculer le client sur le socket Unix et
+        // ignore le port : en CI la base est un service TCP, sans socket local.
+        '--protocol=TCP',
         '--single-transaction',
         '--add-drop-table',
         '--quick',
@@ -183,10 +207,11 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Recherche dans les sauvegardes (dump
     const { rows } = await scanDumpForTable(dumpPath, {
       table: 'EventVolunteerSettings',
       columns: ['eventId'],
-      limit: 2,
+      limit: 1,
     })
 
-    expect(rows).toHaveLength(2)
+    // Deux lignes existent dans le dump : la limite doit n'en rendre qu'une
+    expect(rows).toHaveLength(1)
   })
 
   it("n'écrit rien : la donnée en base est intacte après la recherche", async () => {
