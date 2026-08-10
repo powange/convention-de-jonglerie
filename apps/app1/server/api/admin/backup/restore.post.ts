@@ -10,6 +10,18 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 const execFileAsync = promisify(execFile)
 
 /**
+ * Nom sûr pour stocker un fichier uploadé dans le dossier `backups` :
+ * on ne garde que le nom de base (pas de path traversal), on neutralise les
+ * caractères exotiques et on préfixe par un horodatage pour ne jamais écraser
+ * une sauvegarde existante.
+ */
+function buildStoredBackupFilename(originalFilename: string): string {
+  const base = path.basename(originalFilename).replace(/[^a-zA-Z0-9._-]/g, '_')
+  const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '-')
+  return `uploaded-${timestamp}-${base}`
+}
+
+/**
  * Trouve récursivement le premier fichier .sql dans un dossier.
  * Remplace l'usage non-sécurisé de `find` via execSync.
  */
@@ -36,6 +48,8 @@ export default wrapApiHandler(
     const uploadsMountPath = config.fileStorage?.mount || '/uploads'
     let sqlContent: string
     let tempExtractDir: string | null = null
+    // Nom sous lequel le fichier uploadé a été conservé dans `backups` (null si non conservé)
+    let storedFilename: string | null = null
 
     // Vérifier si c'est un upload de fichier ou une restauration depuis un fichier existant
     const contentType = getHeader(event, 'content-type') || ''
@@ -60,16 +74,45 @@ export default wrapApiHandler(
         })
       }
 
+      // Valider le format avant d'écrire quoi que ce soit sur le disque
+      if (!filename.endsWith('.tar.gz') && !filename.endsWith('.sql')) {
+        throw createError({
+          status: 400,
+          statusText: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
+        })
+      }
+
+      // Conserver le fichier uploadé dans `backups` AVANT la restauration : il apparaît
+      // ainsi dans « Sauvegardes disponibles » même si la restauration échoue ensuite.
+      const backupsDir = path.join(process.cwd(), 'backups')
+      let uploadPath: string | null = null
+      try {
+        await mkdir(backupsDir, { recursive: true })
+        storedFilename = buildStoredBackupFilename(filename)
+        uploadPath = path.join(backupsDir, storedFilename)
+        await writeFile(uploadPath, fileData.data)
+        console.log(`Sauvegarde uploadée conservée: ${storedFilename}`)
+      } catch (storeError) {
+        // L'archivage est un bonus : on ne bloque pas la restauration s'il échoue
+        console.warn("Impossible de conserver la sauvegarde uploadée dans 'backups':", storeError)
+        storedFilename = null
+        uploadPath = null
+      }
+
       // Gérer les archives tar.gz ou les fichiers SQL
       if (filename.endsWith('.tar.gz')) {
         // Extraire l'archive via execFile (pas d'injection shell)
         tempExtractDir = path.join(tmpdir(), `restore-${Date.now()}`)
         await mkdir(tempExtractDir, { recursive: true })
 
-        const tempArchivePath = path.join(tempExtractDir, 'backup.tar.gz')
-        await writeFile(tempArchivePath, fileData.data)
+        // Extraire depuis la copie conservée si elle existe, sinon depuis un temporaire
+        let archivePath = uploadPath
+        if (!archivePath) {
+          archivePath = path.join(tempExtractDir, 'backup.tar.gz')
+          await writeFile(archivePath, fileData.data)
+        }
 
-        await execFileAsync('tar', ['-xzf', tempArchivePath, '-C', tempExtractDir], {
+        await execFileAsync('tar', ['-xzf', archivePath, '-C', tempExtractDir], {
           maxBuffer: 1024 * 1024 * 100,
         })
 
@@ -84,13 +127,8 @@ export default wrapApiHandler(
         }
 
         sqlContent = await readFile(sqlFile, 'utf8')
-      } else if (filename.endsWith('.sql')) {
-        sqlContent = fileData.data.toString('utf8')
       } else {
-        throw createError({
-          status: 400,
-          statusText: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
-        })
+        sqlContent = fileData.data.toString('utf8')
       }
     } else {
       // Restauration depuis un fichier existant
@@ -237,7 +275,10 @@ export default wrapApiHandler(
       }
     }
 
-    return createSuccessResponse(null, 'Base de données et fichiers restaurés avec succès')
+    return createSuccessResponse(
+      { storedFilename },
+      'Base de données et fichiers restaurés avec succès'
+    )
   },
   { operationName: 'RestoreBackup' }
 )

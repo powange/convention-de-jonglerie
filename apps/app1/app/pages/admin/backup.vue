@@ -358,9 +358,18 @@ const { execute: executeRestore, loading: restoring } = useApiAction('/api/admin
     description: t('admin.backup_restore_success_description'),
   },
   errorMessages: { default: t('admin.backup_restore_error') },
-  onSuccess: () => {
+  onSuccess: async () => {
     showConfirmModal.value = false
     pendingRestore.value = null
+    // Un fichier restauré depuis l'ordinateur est conservé côté serveur : il apparaît
+    // désormais dans la liste des sauvegardes disponibles
+    await loadBackups()
+  },
+  onError: async () => {
+    showConfirmModal.value = false
+    pendingRestore.value = null
+    // Le fichier uploadé est conservé même si la restauration a échoué
+    await loadBackups()
   },
 })
 
