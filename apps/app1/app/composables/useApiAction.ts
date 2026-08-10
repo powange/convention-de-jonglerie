@@ -37,6 +37,9 @@ export interface ApiActionOptions<TData = unknown, TResult = unknown> {
   /** Paramètres de requête */
   query?: Record<string, unknown> | (() => Record<string, unknown>)
 
+  /** En-têtes HTTP additionnels - peut être une fonction pour valeurs dynamiques */
+  headers?: Record<string, string> | (() => Record<string, string>)
+
   /** Messages toast en cas de succès */
   successMessage?: {
     title: string
@@ -248,6 +251,7 @@ export function useApiAction<TData = unknown, TResult = unknown>(
     method = 'POST',
     body,
     query,
+    headers,
     successMessage,
     errorMessages = {},
     silent = false,
@@ -279,6 +283,7 @@ export function useApiAction<TData = unknown, TResult = unknown>(
         method,
         body: requestBody as Record<string, unknown> | undefined,
         query: requestQuery,
+        headers: typeof headers === 'function' ? headers() : headers,
       })
 
       const unwrapped = unwrapApiResponse(result)
@@ -405,6 +410,7 @@ export function useApiActionById<TResult = unknown>(
     method = 'DELETE',
     body,
     query,
+    headers,
     successMessage,
     errorMessages = {},
     silent = false,
@@ -443,6 +449,7 @@ export function useApiActionById<TResult = unknown>(
         method,
         body: requestBody as Record<string, unknown> | undefined,
         query: requestQuery,
+        headers: typeof headers === 'function' ? headers() : headers,
       })
 
       // Unwrap createSuccessResponse avant tout traitement

@@ -40,7 +40,9 @@ public/uploads/
 !public/uploads/.gitkeep
 
 # Backup folder (local development)
-backup
+# Le slash initial est indispensable : sans lui, le motif ignore TOUT dossier nommé
+# `backup`, y compris le code source (server/api/admin/backup/) et les tests.
+/backup
 backups/*
 !backups/.gitkeep
 i18n/locales-backup/

@@ -6,20 +6,13 @@ import path from 'path'
 import { promisify } from 'util'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import {
+  backupsDir,
+  buildStoredBackupFilename,
+  isSupportedBackupName,
+} from '#server/utils/backup-files'
 
 const execFileAsync = promisify(execFile)
-
-/**
- * Nom sûr pour stocker un fichier uploadé dans le dossier `backups` :
- * on ne garde que le nom de base (pas de path traversal), on neutralise les
- * caractères exotiques et on préfixe par un horodatage pour ne jamais écraser
- * une sauvegarde existante.
- */
-function buildStoredBackupFilename(originalFilename: string): string {
-  const base = path.basename(originalFilename).replace(/[^a-zA-Z0-9._-]/g, '_')
-  const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '-')
-  return `uploaded-${timestamp}-${base}`
-}
 
 /**
  * Trouve récursivement le premier fichier .sql dans un dossier.
@@ -75,7 +68,7 @@ export default wrapApiHandler(
       }
 
       // Valider le format avant d'écrire quoi que ce soit sur le disque
-      if (!filename.endsWith('.tar.gz') && !filename.endsWith('.sql')) {
+      if (!isSupportedBackupName(filename)) {
         throw createError({
           status: 400,
           statusText: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
@@ -84,12 +77,11 @@ export default wrapApiHandler(
 
       // Conserver le fichier uploadé dans `backups` AVANT la restauration : il apparaît
       // ainsi dans « Sauvegardes disponibles » même si la restauration échoue ensuite.
-      const backupsDir = path.join(process.cwd(), 'backups')
       let uploadPath: string | null = null
       try {
-        await mkdir(backupsDir, { recursive: true })
+        await mkdir(backupsDir(), { recursive: true })
         storedFilename = buildStoredBackupFilename(filename)
-        uploadPath = path.join(backupsDir, storedFilename)
+        uploadPath = path.join(backupsDir(), storedFilename)
         await writeFile(uploadPath, fileData.data)
         console.log(`Sauvegarde uploadée conservée: ${storedFilename}`)
       } catch (storeError) {
