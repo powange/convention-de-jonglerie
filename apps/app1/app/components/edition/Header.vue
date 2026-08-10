@@ -1,10 +1,14 @@
 <template>
-  <div class="mb-6">
+  <div :class="compactOnMobile ? 'mb-2 md:mb-6' : 'mb-6'">
     <!-- En-tête avec le nom de l'édition -->
-    <div class="mb-4">
+    <div :class="compactOnMobile ? 'mb-1 md:mb-4' : 'mb-4'">
       <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div class="flex items-start gap-4">
-          <div v-if="edition.convention?.logo" class="flex-shrink-0">
+          <div
+            v-if="edition.convention?.logo"
+            class="flex-shrink-0"
+            :class="{ 'hidden md:block': compactOnMobile }"
+          >
             <img
               :src="
                 getImageUrl(edition.convention.logo, 'convention', edition.convention?.id) || ''
@@ -16,12 +20,20 @@
           <div
             v-else
             class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center shadow-md"
+            :class="{ 'hidden md:flex': compactOnMobile }"
           >
             <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
           </div>
           <div class="flex-1">
             <div class="flex items-start justify-between gap-1">
-              <h1 class="text-2xl md:text-3xl font-bold">{{ getEditionDisplayName(edition) }}</h1>
+              <!-- En mode compact, l'interligne compte autant que la taille : c'est lui qui fixe
+                   la hauteur de la ligne, pas la police. -->
+              <h1
+                class="font-bold md:text-3xl md:leading-normal"
+                :class="compactOnMobile ? 'text-lg leading-tight' : 'text-2xl'"
+              >
+                {{ getEditionDisplayName(edition) }}
+              </h1>
               <ClientOnly>
                 <UButton
                   v-if="authStore.isAuthenticated"
@@ -30,12 +42,14 @@
                   variant="ghost"
                   size="sm"
                   class="shrink-0 md:hidden"
+                  :class="{ hidden: compactOnMobile }"
                   @click="toggleFavorite"
                 />
               </ClientOnly>
             </div>
             <div
               class="flex flex-col md:flex-row md:items-center md:gap-4 mt-2 text-gray-500 text-sm md:text-base"
+              :class="{ 'hidden md:flex': compactOnMobile }"
             >
               <span class="inline-flex items-center gap-1">
                 {{ edition.city }},
@@ -86,7 +100,10 @@
       </div>
 
       <!-- Boutons actions (hors du conteneur logo pour pleine largeur mobile) -->
-      <div class="mt-2 md:mt-3 md:ml-20 flex flex-wrap gap-2">
+      <div
+        class="mt-2 md:mt-3 md:ml-20 flex flex-wrap gap-2"
+        :class="{ 'hidden md:flex': compactOnMobile }"
+      >
         <UButton
           variant="ghost"
           size="sm"
@@ -113,13 +130,18 @@
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
       <!-- Mobile : select navigation -->
-      <nav class="md:hidden p-3" :aria-label="$t('navigation.tabs')">
+      <!-- En mode compact, le sélecteur passe de `xl` à `md` et perd son rembourrage : 64 px de
+           haut contre 40, tout en restant au-dessus des 40 px recommandés pour une cible tactile. -->
+      <nav
+        :class="compactOnMobile ? 'md:hidden p-1' : 'md:hidden p-3'"
+        :aria-label="$t('navigation.tabs')"
+      >
         <ClientOnly>
           <USelect
             :model-value="props.currentPage"
             :items="mobileTabItems"
             :aria-label="$t('navigation.tabs')"
-            size="xl"
+            :size="compactOnMobile ? 'md' : 'xl'"
             color="neutral"
             class="w-full"
             :ui="{ content: 'max-h-[70vh]', viewport: 'max-h-[70vh]' }"
@@ -435,6 +457,18 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+/**
+ * En dessous de `md`, l'en-tête se réduit au titre de l'édition et à la navigation : ni logo, ni
+ * ville, ni dates, ni boutons d'action.
+ *
+ * Déduit de l'onglet plutôt que passé en propriété : la présentation de l'édition a sa place sur
+ * « À propos de cette édition », qui est faite pour ça, et nulle part ailleurs. Sur les autres
+ * onglets, ces six lignes répètent une information déjà lue et prennent la moitié d'un écran de
+ * téléphone — la carte du site en était l'exemple le plus net. Sans effet à partir de `md`, où la
+ * place ne manque pas.
+ */
+const compactOnMobile = computed(() => props.currentPage !== 'details')
 
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
