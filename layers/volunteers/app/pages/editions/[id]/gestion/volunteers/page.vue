@@ -168,7 +168,9 @@ const saveVolunteerDescription = async () => {
 
   try {
     const updatedSettings = await updateSettings({
-      description: volunteersDescriptionLocal.value.trim() || undefined,
+      // `null` (et non `undefined`) pour que vider le champ efface bien la description :
+      // côté API, un champ absent du PATCH laisse la valeur en base inchangée.
+      description: volunteersDescriptionLocal.value.trim() || null,
     })
 
     if (updatedSettings) {

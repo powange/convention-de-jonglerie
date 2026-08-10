@@ -2,9 +2,10 @@ import { ref } from 'vue'
 
 export interface VolunteerSettings {
   open: boolean
-  description?: string
+  // `null` = effacement explicite lors d'un PATCH (un champ absent laisse la valeur en base)
+  description?: string | null
   mode: 'INTERNAL' | 'EXTERNAL'
-  externalUrl?: string
+  externalUrl?: string | null
   counts: Record<string, number>
   myApplication?: any
   setupStartDate?: string

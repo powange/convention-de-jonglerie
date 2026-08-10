@@ -160,9 +160,11 @@ export default wrapApiHandler(
     const mappedData = {
       pagePublic: parsed.pagePublic,
       open: parsed.open,
-      description: parsed.description || null,
+      // PATCH partiel : `undefined` = champ absent du body, on ne touche pas à la valeur en base.
+      // `null` ou chaîne vide = effacement explicite demandé par l'utilisateur.
+      description: parsed.description === undefined ? undefined : parsed.description || null,
       mode: parsed.mode,
-      externalUrl: parsed.externalUrl || null,
+      externalUrl: parsed.externalUrl === undefined ? undefined : parsed.externalUrl || null,
       askDiet: parsed.askDiet,
       askAllergies: parsed.askAllergies,
       askTimePreferences: parsed.askTimePreferences,

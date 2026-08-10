@@ -512,7 +512,9 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
       mode: volunteersModeLocal.value,
     }
     if (volunteersModeLocal.value === 'EXTERNAL') {
-      body.externalUrl = volunteersExternalUrlLocal.value.trim() || undefined
+      // `null` et non `undefined` : un champ absent laisse la valeur en base inchangée,
+      // alors qu'une URL vidée en mode EXTERNAL doit remonter l'erreur de validation.
+      body.externalUrl = volunteersExternalUrlLocal.value.trim() || null
     }
 
     const updatedSettings = await updateSettings(body)
