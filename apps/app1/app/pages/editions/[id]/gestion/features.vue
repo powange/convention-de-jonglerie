@@ -148,6 +148,30 @@
             />
           </div>
         </UCard>
+        <!-- Programme -->
+        <UCard>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <UIcon name="i-heroicons-calendar-days" class="text-amber-500 size-5" />
+              <div>
+                <h3 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('edition.program') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('gestion.features.program_description') }}
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="programEnabledLocal"
+              :loading="savingProgram"
+              :disabled="savingProgram"
+              color="primary"
+              @update:model-value="handleToggleProgram"
+            />
+          </div>
+        </UCard>
+
         <!-- Carte du site -->
         <UCard>
           <div class="flex items-center justify-between">
@@ -299,6 +323,7 @@ const ticketingEnabledLocal = ref(false)
 const workshopsEnabledLocal = ref(false)
 
 // Gestion de l'activation de la carte du site
+const programEnabledLocal = ref(false)
 const siteMapEnabledLocal = ref(false)
 
 // Gestion de l'activation des tâches
@@ -320,6 +345,7 @@ watch(
       artistsEnabledLocal.value = newEdition.artistsEnabled || false
       ticketingEnabledLocal.value = newEdition.ticketingEnabled || false
       workshopsEnabledLocal.value = newEdition.workshopsEnabled || false
+      programEnabledLocal.value = (newEdition as any).programEnabled || false
       siteMapEnabledLocal.value = newEdition.siteMapEnabled || false
       tasksEnabledLocal.value = (newEdition as any).tasksEnabled || false
       stockEnabledLocal.value = (newEdition as any).stockEnabled || false
@@ -428,6 +454,28 @@ const { execute: executeToggleWorkshops, loading: savingWorkshops } = useApiActi
 
 const handleToggleWorkshops = () => {
   executeToggleWorkshops()
+}
+
+const { execute: executeToggleProgram, loading: savingProgram } = useApiAction(
+  `/api/editions/${editionId}`,
+  {
+    method: 'PUT',
+    body: () => ({ programEnabled: programEnabledLocal.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      await editionStore.fetchEditionById(editionId, { force: true })
+    },
+    // L'interrupteur a déjà bougé quand l'appel part : le remettre en place évite d'afficher un
+    // état que la base ne connaît pas.
+    onError: () => {
+      programEnabledLocal.value = !programEnabledLocal.value
+    },
+  }
+)
+
+const handleToggleProgram = () => {
+  executeToggleProgram()
 }
 
 const { execute: executeToggleSiteMap, loading: savingSiteMap } = useApiAction(
