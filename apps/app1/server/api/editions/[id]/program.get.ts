@@ -1,0 +1,107 @@
+import { wrapApiHandler } from '#server/utils/api-helpers'
+import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
+import { construireFriseProgramme } from '~~/shared/utils/program-timeline'
+
+/**
+ * Programme d'une édition : workshops, spectacles et éléments libres réunis en une seule frise.
+ *
+ * Route publique, mais qui s'adapte à qui la lit. Un organisateur y voit aussi les brouillons,
+ * chaque entrée portant son état de publication : c'est la même lecture qui sert la page publique
+ * et la page de composition, ce qui évite deux vues qui divergeraient à la première évolution.
+ *
+ * Chaque source reste soumise à son propre interrupteur : couper les workshops ou les artistes doit
+ * les retirer du programme, sans quoi le module désactivé continuerait de s'afficher ailleurs.
+ */
+export default wrapApiHandler(
+  async (event) => {
+    const editionId = validateEditionId(event)
+
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      select: {
+        id: true,
+        programEnabled: true,
+        workshopsEnabled: true,
+        artistsEnabled: true,
+      },
+    })
+
+    if (!edition) {
+      throw createError({ status: 404, message: 'Édition non trouvée' })
+    }
+
+    if (!edition.programEnabled) {
+      throw createError({
+        status: 404,
+        message: 'Le programme n’est pas activé pour cette édition',
+      })
+    }
+
+    const user = event.context.user
+    const peutEditer = user ? await canEditEditionById(editionId, user.id, event) : false
+
+    const [workshops, spectacles, elements] = await Promise.all([
+      edition.workshopsEnabled
+        ? prisma.workshop.findMany({
+            where: { editionId },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              startDateTime: true,
+              endDateTime: true,
+              location: { select: { name: true, zoneId: true, markerId: true } },
+            },
+          })
+        : [],
+      edition.artistsEnabled
+        ? prisma.show.findMany({
+            // Le filtre sur `isPublic` est posé ici plutôt qu'à la fusion : inutile de faire
+            // remonter des spectacles non publiés à un visiteur anonyme.
+            where: { editionId, ...(peutEditer ? {} : { isPublic: true }) },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              startDateTime: true,
+              duration: true,
+              location: true,
+              zoneId: true,
+              markerId: true,
+              isPublic: true,
+            },
+          })
+        : [],
+      prisma.editionProgramItem.findMany({
+        where: { editionId, ...(peutEditer ? {} : { isPublic: true }) },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          startDateTime: true,
+          endDateTime: true,
+          locationName: true,
+          zoneId: true,
+          markerId: true,
+          isPublic: true,
+        },
+      }),
+    ])
+
+    const entrees = construireFriseProgramme(
+      { workshops, spectacles, elements },
+      { inclureBrouillons: peutEditer }
+    )
+
+    return {
+      success: true,
+      data: {
+        entrees,
+        /** Permet à l'affichage de signaler les brouillons plutôt que de les mêler au reste. */
+        inclutBrouillons: peutEditer,
+      },
+    }
+  },
+  { operationName: 'Programme d’une édition' }
+)

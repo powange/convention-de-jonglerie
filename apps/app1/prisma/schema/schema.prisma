@@ -199,6 +199,10 @@ model Edition {
   ticketingSumupEnabled            Boolean                       @default(false)
   ticketingHandoutItemsEnabled     Boolean                       @default(true)
   workshopsEnabled                 Boolean                       @default(false)
+  /// Programme de l'édition : la frise horaire qui réunit ateliers, spectacles et éléments
+  /// libres. Éteinte par défaut, comme les autres modules — une édition qui n'a rien saisi ne
+  /// doit pas exposer un onglet vide.
+  programEnabled                   Boolean                       @default(false)
   workshopLocationsFreeInput       Boolean                       @default(false)
   siteMapEnabled                   Boolean                       @default(false)
   mapPublic                        Boolean                       @default(false)
@@ -248,6 +252,7 @@ model Edition {
   showCalls                        EditionShowCall[]
   zones                            EditionZone[]
   markers                          EditionMarker[]
+  programItems                     EditionProgramItem[]
   taskGroups                       TaskGroup[]
   stockGroups                      StockGroup[]
   faqEntries                       FaqEntry[]
@@ -526,7 +531,7 @@ model EditionZone {
   // fournisseur survit aux déplacements et aux renommages, ce qui permet de distinguer, lors d'un
   // réimport, une zone déplacée d'une zone supprimée. `importedAt` sert à repérer les zones
   // retouchées à la main depuis l'import (comparaison avec `updatedAt`).
-  externalMapObjectId String?   @db.VarChar(64)
+  externalMapObjectId   String?   @db.VarChar(64)
   externalMapImportedAt DateTime?
 
   // Marqueurs rattachés à cette zone : ses entrées, ses accès. Voir EditionMarker.zoneId.
@@ -535,6 +540,7 @@ model EditionZone {
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
   stockReservations StockReservation[]
+  programItems      EditionProgramItem[]
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
@@ -555,7 +561,7 @@ model EditionMarker {
   updatedAt   DateTime @updatedAt
 
   // Provenance : voir EditionZone.externalMapObjectId
-  externalMapObjectId String?   @db.VarChar(64)
+  externalMapObjectId   String?   @db.VarChar(64)
   externalMapImportedAt DateTime?
 
   // Rattachement facultatif à une zone : une salle et son entrée forment un seul élément aux
@@ -571,6 +577,7 @@ model EditionMarker {
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
   stockReservations StockReservation[]
+  programItems      EditionProgramItem[]
 
   @@unique([editionId, externalMapObjectId])
   @@index([editionId])
