@@ -738,6 +738,9 @@
     "backup_search_table": "Tabela",
     "backup_search_table_missing": "Brak tabeli w tej kopii zapasowej",
     "backup_search_table_placeholder": "Wybierz tabelę",
-    "backup_search_title": "Szukaj w kopiach zapasowych"
+    "backup_search_title": "Szukaj w kopiach zapasowych",
+    "backup_search_include_legacy": "Uwzględnij tabele ze starszych kopii zapasowych",
+    "backup_search_legacy_loaded": "Uwzględniono tabele ze starszych kopii ({count} brakuje w bieżącym schemacie)",
+    "backup_search_legacy_suffix": "(dawna)"
   }
 }

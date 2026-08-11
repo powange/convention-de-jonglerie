@@ -7,8 +7,10 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
 import { backupsDir } from '../../server/utils/backup-files'
 import {
+  collectSearchableTables,
   listSearchableTables,
   scanDumpForTable,
+  scanDumpStructure,
   searchBackups,
   validateSearchRequest,
 } from '../../server/utils/backup-search'
@@ -127,19 +129,46 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Recherche dans les sauvegardes (dump
     expect(settings?.columns.map((column) => column.name)).not.toContain('event')
   })
 
-  it('refuse une table ou une colonne hors schéma', () => {
-    expect(() => validateSearchRequest({ table: 'Inconnue', columns: ['id'], limit: 10 })).toThrow(
-      /Table inconnue/
-    )
-
+  it('refuse un identifiant syntaxiquement douteux', () => {
     expect(() =>
       validateSearchRequest({
         table: 'EventVolunteerSettings',
         columns: ['description; DROP TABLE Users'],
         limit: 10,
       })
-    ).toThrow(/Colonne inconnue/)
+    ).toThrow(/Identifiant invalide/)
   })
+
+  it('accepte une table hors du schéma actuel', () => {
+    // Une table supprimée depuis ne vit plus que dans les anciennes sauvegardes :
+    // la refuser reviendrait à interdire le cas d'usage principal
+    expect(() =>
+      validateSearchRequest({
+        table: 'EditionVolunteerSettings',
+        columns: ['description'],
+        limit: 10,
+      })
+    ).not.toThrow()
+  })
+
+  it('relève la structure complète du dump', async () => {
+    const structures = await scanDumpStructure(dumpPath)
+
+    expect(structures.has('EventVolunteerSettings')).toBe(true)
+    expect(structures.get('EventVolunteerSettings')).toContain('description')
+    // Le relevé couvre toutes les tables du dump, pas seulement celle recherchée
+    expect(structures.size).toBeGreaterThan(1)
+  })
+
+  it('ajoute au schéma actuel les tables vues uniquement dans les sauvegardes', async () => {
+    const tables = await collectSearchableTables()
+    const settings = tables.find((table) => table.name === 'EventVolunteerSettings')
+
+    expect(settings?.inCurrentSchema).toBe(true)
+    // Toutes les tables du dump sont proposables, avec leur origine
+    expect(tables.length).toBeGreaterThanOrEqual(listSearchableTables().length)
+    expect(tables.every((table) => typeof table.inCurrentSchema === 'boolean')).toBe(true)
+  }, 120000)
 
   it('ne lit que la section de la table demandée', async () => {
     const { rows, tableFound } = await scanDumpForTable(dumpPath, {

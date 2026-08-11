@@ -738,6 +738,9 @@
     "backup_search_table": "Tabelle",
     "backup_search_table_missing": "Tabelle in dieser Sicherung nicht vorhanden",
     "backup_search_table_placeholder": "Eine Tabelle auswählen",
-    "backup_search_title": "Sicherungen durchsuchen"
+    "backup_search_title": "Sicherungen durchsuchen",
+    "backup_search_include_legacy": "Tabellen aus älteren Sicherungen einbeziehen",
+    "backup_search_legacy_loaded": "Tabellen aus älteren Sicherungen einbezogen ({count} fehlen im aktuellen Schema)",
+    "backup_search_legacy_suffix": "(ehemalig)"
   }
 }
