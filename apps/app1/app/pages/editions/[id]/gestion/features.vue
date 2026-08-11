@@ -345,7 +345,7 @@ watch(
       artistsEnabledLocal.value = newEdition.artistsEnabled || false
       ticketingEnabledLocal.value = newEdition.ticketingEnabled || false
       workshopsEnabledLocal.value = newEdition.workshopsEnabled || false
-      programEnabledLocal.value = (newEdition as any).programEnabled || false
+      programEnabledLocal.value = newEdition.programEnabled || false
       siteMapEnabledLocal.value = newEdition.siteMapEnabled || false
       tasksEnabledLocal.value = (newEdition as any).tasksEnabled || false
       stockEnabledLocal.value = (newEdition as any).stockEnabled || false

@@ -196,6 +196,26 @@
         </NuxtLink>
 
         <NuxtLink
+          v-if="programTabVisible"
+          :to="`/editions/${edition.id}/program`"
+          :class="[
+            'py-3 px-3 md:py-2 md:px-1 border-b-2 font-medium text-sm flex items-center',
+            currentPage === 'program'
+              ? 'border-primary-500 text-primary-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+          ]"
+          :title="t('edition.program')"
+        >
+          <UIcon
+            name="i-heroicons-calendar-days"
+            :class="['md:mr-1']"
+            size="24"
+            class="md:w-4! md:h-4!"
+          />
+          <span class="hidden md:inline">{{ t('edition.program') }}</span>
+        </NuxtLink>
+
+        <NuxtLink
           v-if="faqTabVisible"
           :to="`/editions/${edition.id}/faq`"
           :class="[
@@ -451,6 +471,7 @@ interface Props {
     | 'workshops'
     | 'shows-call'
     | 'map'
+    | 'program'
     | 'artist-space'
     | 'faq'
     | 'my-tasks'
@@ -574,6 +595,14 @@ const mobileTabItems = computed<{ label: string; value: string; icon: string; pa
         path: `/editions/${editionId}/map`,
       })
     }
+    if (programTabVisible.value) {
+      items.push({
+        label: t('edition.program'),
+        value: 'program',
+        icon: 'i-heroicons-calendar-days',
+        path: `/editions/${editionId}/program`,
+      })
+    }
     if (faqTabVisible.value) {
       items.push({
         label: t('faq.title'),
@@ -681,6 +710,13 @@ const myTasksTabVisible = computed<boolean>(() => {
 // quelque chose à montrer — soit une carte externe, soit des coordonnées pour centrer la carte
 // interne. Les coordonnées ne concernent que cette dernière : les exiger dans tous les cas
 // masquerait l'onglet d'une édition dont l'organisateur a justement fourni une carte externe.
+/**
+ * L'onglet suit le seul interrupteur du module. Inutile d'exiger qu'il y ait déjà quelque chose au
+ * programme : la page sait dire qu'il est vide, et masquer l'onglet ferait disparaître une entrée
+ * que l'organisateur vient d'activer.
+ */
+const programTabVisible = computed<boolean>(() => !!props.edition?.programEnabled)
+
 const mapTabVisible = computed<boolean>(() => {
   if (!props.edition) return false
   if (!props.edition.siteMapEnabled || !props.edition.mapPublic) return false

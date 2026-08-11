@@ -1,0 +1,11 @@
+{
+  "program": {
+    "empty": "Le programme n'est pas encore publié.",
+    "no_end_time": "Heure de fin non précisée",
+    "source": {
+      "workshop": "Workshop",
+      "spectacle": "Spectacle",
+      "element": "Programme"
+    }
+  }
+}

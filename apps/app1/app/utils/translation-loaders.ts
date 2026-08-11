@@ -82,6 +82,12 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion\/artists/,
       translations: ['artists'],
     },
+    // Gestion du programme : la frise réunit trois modules, d'où les libellés partagés du
+    // domaine public en plus des clés de composition.
+    {
+      pattern: /^\/editions\/\d+\/gestion\/program/,
+      translations: ['program'],
+    },
     // Gestion appel à spectacles : survey (sondages) + shows-call (clés publiques
     // partagées shows_call.*) + gestion-shows-call (détail management gestion.shows_call.*)
     {
@@ -98,6 +104,11 @@ export function getTranslationsToLoad(path: string): string[] {
     {
       pattern: /^\/editions\/\d+\/map/,
       translations: ['map'],
+    },
+    // Programme public : la frise de l'édition
+    {
+      pattern: /^\/editions\/\d+\/program/,
+      translations: ['program'],
     },
     // Bénévolat public (page d'inscription/candidature) : domaine volunteers partagé
     {
