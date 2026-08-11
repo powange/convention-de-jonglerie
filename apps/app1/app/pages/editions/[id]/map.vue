@@ -133,10 +133,12 @@
           v-if="estMobile && activeView === 'site' && hasSiteMap"
           v-model:open="panneauOuvert"
           :snap-points="CRANS_PANNEAU"
+          :active-snap-point="cranImpose"
           :modal="false"
           :overlay="false"
           :dismissible="false"
           :ui="UI_PANNEAU"
+          @drag="rendreLaMain"
         >
           <template #header>
             <div class="flex items-center gap-2">
@@ -687,12 +689,48 @@ watch(carteHauteur, () =>
   })
 )
 
+/**
+ * Cran imposé de l'extérieur, le temps d'un repli.
+ *
+ * `undefined` la plupart du temps : la propriété est alors absente et vaul gère seul ses crans.
+ * La lier en permanence le fige entre deux positions dès qu'on tire le panneau ailleurs que par la
+ * poignée — vaul n'émet alors aucun changement, la valeur imposée reste la même, et plus rien ne
+ * remet la feuille en place. Mesuré : arrêt définitif à 555 px, entre le repos et la moitié.
+ *
+ * On ne prend donc la main que pour redescendre le panneau, et on la rend juste après.
+ */
+const cranImpose = ref<string | number | undefined>(undefined)
+let minuterieRepli: ReturnType<typeof setTimeout> | undefined
+
+/** Rend la main à vaul, qu'on la lui ait reprise par minuterie ou par un geste de l'utilisateur. */
+const rendreLaMain = () => {
+  clearTimeout(minuterieRepli)
+  cranImpose.value = undefined
+}
+
+/**
+ * Redescend le panneau au repos après un choix : sans cela, il masque le point qu'on vient de
+ * demander à voir.
+ */
+const replierPanneau = () => {
+  clearTimeout(minuterieRepli)
+  cranImpose.value = CRANS_PANNEAU[0]
+  // Rendre la main une fois l'animation finie. Trop tôt, la feuille repartirait d'où elle venait.
+  // Un geste de l'utilisateur pendant ce délai la rend aussitôt, via `@drag` : sans cela, une main
+  // posée sur le panneau dans cette fenêtre retomberait sur le blocage décrit plus haut.
+  minuterieRepli = setTimeout(rendreLaMain, 600)
+}
+
+onBeforeUnmount(() => clearTimeout(minuterieRepli))
+
 const handleFocusZone = (zone: EditionZone) => {
   focusOnZone(zone.id)
+  replierPanneau()
 }
 
 const handleFocusMarker = (marker: EditionMarker) => {
   focusOnMarker(marker.id)
+  replierPanneau()
 }
 
 const handleToggleVisibility = (item: {
