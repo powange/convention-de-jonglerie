@@ -23,12 +23,12 @@ export interface SearchableColumn {
 export interface SearchableTable {
   name: string
   columns: SearchableColumn[]
+  /** false : table vue uniquement dans d'anciennes sauvegardes, absente du schéma actuel */
+  inCurrentSchema: boolean
 }
 
 /**
- * Tables et colonnes interrogeables, dérivées du schéma Prisma (DMMF).
- * Sert de liste blanche : tout identifiant reçu du client est vérifié contre elle.
- *
+ * Tables et colonnes du schéma actuel, dérivées du DMMF Prisma.
  * Les champs de relation (`kind: 'object'`) sont écartés : ils n'existent pas en base.
  */
 export function listSearchableTables(): SearchableTable[] {
@@ -38,6 +38,7 @@ export function listSearchableTables(): SearchableTable[] {
       columns: model.fields
         .filter((field) => field.kind !== 'object' && !field.isList)
         .map((field) => ({ name: field.dbName || field.name, type: field.type })),
+      inCurrentSchema: true,
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
 }
@@ -53,25 +54,26 @@ export interface SearchRequest {
 }
 
 /**
- * Valide la demande contre le schéma Prisma. Lève une erreur explicite si une table ou
- * une colonne n'existe pas.
+ * Valide les identifiants de la demande.
+ *
+ * Volontairement syntaxique, et non restreinte au schéma actuel : une table ou une colonne
+ * supprimée depuis reste présente dans les anciennes sauvegardes, et c'est précisément
+ * là qu'on vient chercher une donnée disparue. Aucun risque à l'ouvrir — la recherche lit
+ * le dump comme du texte, sans construire la moindre requête SQL ; l'identifiant ne sert
+ * qu'à repérer une section et à nommer une colonne.
  */
-export function validateSearchRequest(request: SearchRequest): SearchableTable {
-  const table = listSearchableTables().find((candidate) => candidate.name === request.table)
-  if (!table) {
-    throw createError({ status: 400, message: `Table inconnue: ${request.table}` })
-  }
-
-  const known = new Set(table.columns.map((column) => column.name))
-  const unknown = [...request.columns, ...(request.filterColumn ? [request.filterColumn] : [])]
-    .filter((column) => !known.has(column) || !isSafeIdentifier(column))
+export function validateSearchRequest(request: SearchRequest): void {
+  const invalid = [
+    request.table,
+    ...request.columns,
+    ...(request.filterColumn ? [request.filterColumn] : []),
+  ]
+    .filter((identifier) => !isSafeIdentifier(identifier))
     .join(', ')
 
-  if (unknown) {
-    throw createError({ status: 400, message: `Colonne inconnue: ${unknown}` })
+  if (invalid) {
+    throw createError({ status: 400, message: `Identifiant invalide: ${invalid}` })
   }
-
-  return table
 }
 
 /**
@@ -191,6 +193,111 @@ function extractTuples(fragment: string): string[] {
   }
 
   return tuples
+}
+
+/**
+ * Relève la structure d'un dump : chaque table et ses colonnes, dans l'ordre du CREATE TABLE.
+ * Lecture en flux et sans parsing des données — seules les lignes de structure comptent.
+ */
+export async function scanDumpStructure(sqlFilePath: string): Promise<Map<string, string[]>> {
+  const sectionMarker = '-- Table structure for table `'
+  const structures = new Map<string, string[]>()
+
+  const lines = createInterface({
+    input: createReadStream(sqlFilePath, { encoding: 'utf8' }),
+    crlfDelay: Infinity,
+  })
+
+  let currentTable: string | null = null
+  let inCreateTable = false
+
+  try {
+    for await (const line of lines) {
+      if (line.startsWith(sectionMarker)) {
+        currentTable = line.slice(sectionMarker.length, line.lastIndexOf('`'))
+        structures.set(currentTable, [])
+        inCreateTable = false
+        continue
+      }
+      if (!currentTable) continue
+
+      if (line.startsWith('CREATE TABLE')) {
+        inCreateTable = true
+        continue
+      }
+      if (!inCreateTable) continue
+
+      const trimmed = line.trim()
+      if (trimmed.startsWith('`')) {
+        structures.get(currentTable)?.push(trimmed.slice(1, trimmed.indexOf('`', 1)))
+      } else if (trimmed.startsWith(')')) {
+        inCreateTable = false
+      }
+    }
+  } finally {
+    lines.close()
+  }
+
+  return structures
+}
+
+/**
+ * Mémoïsation du relevé de structure : une sauvegarde est un fichier figé, son schéma ne
+ * change pas. La clé inclut taille et date pour qu'un fichier remplacé soit relu.
+ */
+const structureCache = new Map<string, Map<string, string[]>>()
+
+/**
+ * Tables et colonnes proposables à la recherche : le schéma actuel, enrichi de tout ce que
+ * les sauvegardes contiennent encore. Une table supprimée depuis, ou une colonne renommée,
+ * reste ainsi accessible — c'est le cas d'usage même de la fonctionnalité.
+ */
+export async function collectSearchableTables(): Promise<SearchableTable[]> {
+  const tables = new Map<string, SearchableTable>()
+
+  for (const current of listSearchableTables()) {
+    tables.set(current.name, { ...current, columns: [...current.columns] })
+  }
+
+  for (const backup of await listBackupFiles()) {
+    const cacheKey = `${backup.filename}:${backup.size}:${backup.createdAt}`
+    let structures = structureCache.get(cacheKey)
+
+    if (!structures) {
+      let tempDir: string | null = null
+      try {
+        const opened = await openBackupSql(backup.filename)
+        tempDir = opened.tempDir
+        structures = await scanDumpStructure(opened.sqlPath)
+        structureCache.set(cacheKey, structures)
+      } catch (error) {
+        // Une sauvegarde illisible ne doit pas priver l'écran des autres
+        console.warn(`[BACKUP-SEARCH] Structure illisible (${backup.filename}):`, error)
+        continue
+      } finally {
+        if (tempDir) await rm(tempDir, { recursive: true, force: true }).catch(() => {})
+      }
+    }
+
+    for (const [tableName, columns] of structures) {
+      const known = tables.get(tableName)
+      if (!known) {
+        tables.set(tableName, {
+          name: tableName,
+          columns: columns.map((name) => ({ name, type: 'inconnu' })),
+          inCurrentSchema: false,
+        })
+        continue
+      }
+      // Colonnes disparues du schéma mais encore présentes dans d'anciennes sauvegardes
+      const seen = new Set(known.columns.map((column) => column.name))
+      for (const name of columns) {
+        if (!seen.has(name)) known.columns.push({ name, type: 'inconnu' })
+      }
+    }
+  }
+
+  return [...tables.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export interface DumpScanResult {

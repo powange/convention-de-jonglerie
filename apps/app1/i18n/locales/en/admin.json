@@ -738,6 +738,9 @@
     "backup_search_table": "Table",
     "backup_search_table_missing": "Table missing from this backup",
     "backup_search_table_placeholder": "Choose a table",
-    "backup_search_title": "Search the backups"
+    "backup_search_title": "Search the backups",
+    "backup_search_include_legacy": "Include tables from older backups",
+    "backup_search_legacy_loaded": "Tables from older backups included ({count} missing from the current schema)",
+    "backup_search_legacy_suffix": "(former)"
   }
 }

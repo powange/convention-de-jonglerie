@@ -13,33 +13,43 @@
     <div class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <UFormField :label="$t('admin.backup_search_table')" required>
+          <!-- `create-item` : une table absente des listes reste saisissable à la main -->
           <USelectMenu
             v-model="selectedTable"
-            :items="tableNames"
+            :items="tableItems"
             :loading="loadingSchema"
             :placeholder="$t('admin.backup_search_table_placeholder')"
+            value-key="value"
+            create-item
             class="w-full"
+            @create="onCreateTable"
           />
         </UFormField>
 
         <UFormField :label="$t('admin.backup_search_columns')" required>
           <USelectMenu
             v-model="selectedColumns"
-            :items="columnNames"
+            :items="columnItems"
             :disabled="!selectedTable"
             :placeholder="$t('admin.backup_search_columns_placeholder')"
+            value-key="value"
             multiple
+            create-item
             class="w-full"
+            @create="onCreateColumn"
           />
         </UFormField>
 
         <UFormField :label="$t('admin.backup_search_filter_column')">
           <USelectMenu
             v-model="filterColumn"
-            :items="columnNames"
+            :items="columnItems"
             :disabled="!selectedTable"
             :placeholder="$t('admin.backup_search_filter_column_placeholder')"
+            value-key="value"
+            create-item
             class="w-full"
+            @create="onCreateFilterColumn"
           />
         </UFormField>
 
@@ -52,6 +62,25 @@
             @keydown.enter="canSearch && startSearch()"
           />
         </UFormField>
+      </div>
+
+      <!-- Tables et colonnes des sauvegardes anciennes : relevé à la demande, car il faut
+           lire chaque dump (et extraire le .sql des archives) -->
+      <div class="flex flex-wrap items-center gap-2">
+        <UButton
+          v-if="!includesBackups"
+          size="xs"
+          variant="outline"
+          color="neutral"
+          :loading="loadingSchema"
+          @click="loadSchema(true)"
+        >
+          <UIcon name="i-heroicons-clock" class="h-3 w-3" />
+          {{ $t('admin.backup_search_include_legacy') }}
+        </UButton>
+        <span v-else class="text-xs text-gray-500">
+          {{ $t('admin.backup_search_legacy_loaded', { count: legacyCount }) }}
+        </span>
       </div>
 
       <UAlert
@@ -153,6 +182,8 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 interface SearchableTable {
   name: string
   columns: { name: string; type: string }[]
+  /** false : table vue uniquement dans d'anciennes sauvegardes */
+  inCurrentSchema: boolean
 }
 
 interface SearchResult {
@@ -168,6 +199,12 @@ const toast = useToast()
 
 const tables = ref<SearchableTable[]>([])
 const loadingSchema = ref(false)
+const includesBackups = ref(false)
+const legacyCount = ref(0)
+// Identifiants saisis à la main : conservés comme items, sinon `value-key` n'aurait
+// rien à quoi rattacher la valeur et le champ paraîtrait vide
+const customTables = ref<string[]>([])
+const customColumns = ref<string[]>([])
 
 const selectedTable = ref<string | undefined>()
 const selectedColumns = ref<string[]>([])
@@ -182,13 +219,47 @@ const progress = ref({ current: 0, total: 0 })
 
 let eventSource: EventSource | null = null
 
-const tableNames = computed(() => tables.value.map((table) => table.name))
+// Le libellé signale ce qui ne vit plus que dans les sauvegardes, la valeur reste le nom brut
+const tableItems = computed(() => [
+  ...tables.value.map((table) => ({
+    value: table.name,
+    label: table.inCurrentSchema
+      ? table.name
+      : `${table.name} ${t('admin.backup_search_legacy_suffix')}`,
+  })),
+  ...customTables.value.map((name) => ({ value: name, label: name })),
+])
 
-const columnNames = computed(
-  () =>
-    tables.value.find((table) => table.name === selectedTable.value)?.columns.map((c) => c.name) ??
-    []
+const currentColumns = computed(
+  () => tables.value.find((table) => table.name === selectedTable.value)?.columns ?? []
 )
+
+const columnItems = computed(() => [
+  ...currentColumns.value.map((column) => ({
+    value: column.name,
+    label:
+      column.type === 'inconnu'
+        ? `${column.name} ${t('admin.backup_search_legacy_suffix')}`
+        : column.name,
+  })),
+  ...customColumns.value.map((name) => ({ value: name, label: name })),
+])
+
+const onCreateTable = (name: string) => {
+  if (!customTables.value.includes(name)) customTables.value.push(name)
+  selectedTable.value = name
+}
+
+const onCreateColumn = (name: string) => {
+  if (!customColumns.value.includes(name)) customColumns.value.push(name)
+  if (!selectedColumns.value.includes(name))
+    selectedColumns.value = [...selectedColumns.value, name]
+}
+
+const onCreateFilterColumn = (name: string) => {
+  if (!customColumns.value.includes(name)) customColumns.value.push(name)
+  filterColumn.value = name
+}
 
 const matchCount = computed(() => results.value.filter((result) => result.rows.length > 0).length)
 
@@ -201,15 +272,20 @@ watch(selectedTable, () => {
   selectedColumns.value = []
   filterColumn.value = undefined
   filterValue.value = ''
+  customColumns.value = []
 })
 
-const loadSchema = async () => {
+const loadSchema = async (includeBackups = false) => {
   loadingSchema.value = true
   try {
-    const response = await $fetch<{ data: { tables: SearchableTable[] } }>(
-      '/api/admin/backup/searchable-schema'
-    )
+    const response = await $fetch<{
+      data: { tables: SearchableTable[]; includesBackups: boolean; legacyCount: number }
+    }>('/api/admin/backup/searchable-schema', {
+      query: includeBackups ? { includeBackups: 'true' } : undefined,
+    })
     tables.value = response.data.tables
+    includesBackups.value = response.data.includesBackups
+    legacyCount.value = response.data.legacyCount
   } catch {
     toast.add({
       color: 'error',

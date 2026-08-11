@@ -738,6 +738,9 @@
     "backup_search_table": "Tabella",
     "backup_search_table_missing": "Tabella assente da questo backup",
     "backup_search_table_placeholder": "Scegli una tabella",
-    "backup_search_title": "Cerca nei backup"
+    "backup_search_title": "Cerca nei backup",
+    "backup_search_include_legacy": "Includi le tabelle dei backup più vecchi",
+    "backup_search_legacy_loaded": "Tabelle dei backup più vecchi incluse ({count} assenti dallo schema attuale)",
+    "backup_search_legacy_suffix": "(vecchia)"
   }
 }

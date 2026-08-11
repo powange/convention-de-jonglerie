@@ -738,6 +738,9 @@
     "backup_search_table": "Tabel",
     "backup_search_table_missing": "Tabel ontbreekt in deze back-up",
     "backup_search_table_placeholder": "Kies een tabel",
-    "backup_search_title": "Zoeken in de back-ups"
+    "backup_search_title": "Zoeken in de back-ups",
+    "backup_search_include_legacy": "Tabellen uit oudere back-ups meenemen",
+    "backup_search_legacy_loaded": "Tabellen uit oudere back-ups meegenomen ({count} ontbreken in het huidige schema)",
+    "backup_search_legacy_suffix": "(voormalig)"
   }
 }

@@ -738,6 +738,9 @@
     "backup_search_table": "Tabell",
     "backup_search_table_missing": "Tabellen saknas i denna säkerhetskopia",
     "backup_search_table_placeholder": "Välj en tabell",
-    "backup_search_title": "Sök i säkerhetskopiorna"
+    "backup_search_title": "Sök i säkerhetskopiorna",
+    "backup_search_include_legacy": "Inkludera tabeller från äldre säkerhetskopior",
+    "backup_search_legacy_loaded": "Tabeller från äldre säkerhetskopior inkluderade ({count} saknas i nuvarande schema)",
+    "backup_search_legacy_suffix": "(tidigare)"
   }
 }

@@ -738,6 +738,9 @@
     "backup_search_table": "Таблиця",
     "backup_search_table_missing": "Таблиця відсутня в цій резервній копії",
     "backup_search_table_placeholder": "Оберіть таблицю",
-    "backup_search_title": "Шукати в резервних копіях"
+    "backup_search_title": "Шукати в резервних копіях",
+    "backup_search_include_legacy": "Включити таблиці зі старих резервних копій",
+    "backup_search_legacy_loaded": "Таблиці зі старих копій включено ({count} відсутні в поточній схемі)",
+    "backup_search_legacy_suffix": "(колишня)"
   }
 }

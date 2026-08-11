@@ -738,6 +738,9 @@
     "backup_search_table": "Tabela",
     "backup_search_table_missing": "Tabela ausente desta cópia de segurança",
     "backup_search_table_placeholder": "Escolher uma tabela",
-    "backup_search_title": "Pesquisar nas cópias de segurança"
+    "backup_search_title": "Pesquisar nas cópias de segurança",
+    "backup_search_include_legacy": "Incluir as tabelas das cópias antigas",
+    "backup_search_legacy_loaded": "Tabelas das cópias antigas incluídas ({count} ausentes do esquema atual)",
+    "backup_search_legacy_suffix": "(antiga)"
   }
 }

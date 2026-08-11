@@ -738,6 +738,9 @@
     "backup_search_table": "Tabulka",
     "backup_search_table_missing": "Tabulka v této záloze chybí",
     "backup_search_table_placeholder": "Vyberte tabulku",
-    "backup_search_title": "Hledat v zálohách"
+    "backup_search_title": "Hledat v zálohách",
+    "backup_search_include_legacy": "Zahrnout tabulky ze starších záloh",
+    "backup_search_legacy_loaded": "Tabulky ze starších záloh zahrnuty ({count} chybí v aktuálním schématu)",
+    "backup_search_legacy_suffix": "(bývalá)"
   }
 }
