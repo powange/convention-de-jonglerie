@@ -46,7 +46,20 @@
       "scope_days_none": "Снять выбор",
       "scope_day_already_filled": "— уже заполнен",
       "program_days_failed_title": "нет неудачных дней | Один день не удалось получить | Не удалось получить дней: {count}",
-      "program_days_failed_description": "Модель не ответила для: {days}. Для этих дней ничего не изменилось — запустите анализ снова, выбрав только их."
+      "program_days_failed_description": "Модель не ответила для: {days}. Для этих дней ничего не изменилось — запустите анализ снова, выбрав только их.",
+      "program_items_found": "Предложено элементов программы: {count}",
+      "program_new": "Новый",
+      "program_update": "Исправить",
+      "apply_program_items": "Применить: {count}",
+      "program_applied": "Сохранено: {count}",
+      "program_partial_failure": "Не сохранено: {count}",
+      "field": {
+        "titre": "Название",
+        "description": "Описание",
+        "debut": "Начало",
+        "fin": "Окончание",
+        "lieu": "Место"
+      }
     },
     "artists": {
       "list_title": "Управление артистами",

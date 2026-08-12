@@ -359,6 +359,33 @@ export function generateProgramDayPrompt(params: {
 }
 
 /**
+ * Variante qui demande des **éléments** plutôt qu'un bloc de texte.
+ *
+ * Le modèle ne rend que des heures — jamais de date — pour une journée qu'on lui a nommée : la
+ * date est recomposée côté serveur. Lui confier le calcul reviendrait à lui demander un exercice
+ * de calendrier, où il se trompe d'un jour sans que rien ne le signale.
+ */
+export function generateProgramDayItemsPrompt(params: {
+  date: string
+  jourFr: string
+  jourEn: string
+  index: number
+  total: number
+  startDate: string
+  endDate: string
+}): string {
+  return loadPrompt('program-day-items', {
+    DATE: params.date,
+    JOUR_FR: params.jourFr,
+    JOUR_EN: params.jourEn,
+    INDEX: String(params.index),
+    TOTAL: String(params.total),
+    START_DATE: params.startDate,
+    END_DATE: params.endDate,
+  })
+}
+
+/**
  * Génère le prompt de forçage de génération JSON
  */
 export function generateForceGenerationPrompt(

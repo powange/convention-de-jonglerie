@@ -46,7 +46,20 @@
       "scope_days_none": "Odznacz wszystko",
       "scope_day_already_filled": "— już uzupełnione",
       "program_days_failed_title": "brak nieudanych dni | Nie udało się pobrać jednego dnia | Nie udało się pobrać {count} dni",
-      "program_days_failed_description": "Model nie odpowiedział dla: {days}. Te dni pozostały bez zmian — uruchom analizę ponownie, zaznaczając tylko je."
+      "program_days_failed_description": "Model nie odpowiedział dla: {days}. Te dni pozostały bez zmian — uruchom analizę ponownie, zaznaczając tylko je.",
+      "program_items_found": "Zaproponowano {count} element(ów) programu",
+      "program_new": "Nowy",
+      "program_update": "Do poprawy",
+      "apply_program_items": "Zastosuj {count} element(ów)",
+      "program_applied": "Zapisano {count} element(ów)",
+      "program_partial_failure": "Nie zapisano {count} element(ów)",
+      "field": {
+        "titre": "Tytuł",
+        "description": "Opis",
+        "debut": "Początek",
+        "fin": "Koniec",
+        "lieu": "Miejsce"
+      }
     },
     "artists": {
       "list_title": "Zarządzanie artystami",

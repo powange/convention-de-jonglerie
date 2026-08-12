@@ -46,7 +46,20 @@
       "scope_days_none": "Avmarkera alla",
       "scope_day_already_filled": "— redan ifylld",
       "program_days_failed_title": "ingen misslyckad dag | En dag kunde inte hämtas | {count} dagar kunde inte hämtas",
-      "program_days_failed_description": "Modellen svarade inte för: {days}. Inget har ändrats för dessa dagar — kör analysen igen med endast dessa valda."
+      "program_days_failed_description": "Modellen svarade inte för: {days}. Inget har ändrats för dessa dagar — kör analysen igen med endast dessa valda.",
+      "program_items_found": "{count} programpunkt(er) föreslagna",
+      "program_new": "Ny",
+      "program_update": "Att korrigera",
+      "apply_program_items": "Tillämpa {count} punkt(er)",
+      "program_applied": "{count} punkt(er) sparade",
+      "program_partial_failure": "{count} punkt(er) ej sparade",
+      "field": {
+        "titre": "Titel",
+        "description": "Beskrivning",
+        "debut": "Start",
+        "fin": "Slut",
+        "lieu": "Plats"
+      }
     },
     "artists": {
       "list_title": "Artisthantering",

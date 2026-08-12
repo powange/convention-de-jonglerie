@@ -46,7 +46,20 @@
       "scope_services": "Services",
       "scope_services_help": "Camping, restauration, spectacles et autres caractéristiques",
       "title": "Mise à jour IA",
-      "updates_applied": "Mises à jour appliquées avec succès"
+      "updates_applied": "Mises à jour appliquées avec succès",
+      "program_items_found": "{count} élément(s) de programme proposé(s)",
+      "program_new": "Nouveau",
+      "program_update": "À corriger",
+      "apply_program_items": "Appliquer {count} élément(s)",
+      "program_applied": "{count} élément(s) enregistré(s)",
+      "program_partial_failure": "{count} élément(s) non enregistré(s)",
+      "field": {
+        "titre": "Titre",
+        "description": "Description",
+        "debut": "Début",
+        "fin": "Fin",
+        "lieu": "Lieu"
+      }
     },
     "artists": {
       "list_title": "Gestion des artistes",

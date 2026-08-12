@@ -357,7 +357,81 @@
           </UButton>
         </div>
 
-        <div v-else class="text-center py-8">
+        <!-- Programme : des éléments, pas des champs. Chacun se relit séparément, parce qu'ici
+             le modèle n'a pas recopié mais interprété — découpé des créneaux, converti des heures.
+             C'est le seul garde-fou contre un horaire inventé. -->
+        <div
+          v-if="planAffiche.length > 0"
+          class="space-y-3"
+          :class="{ 'mt-6': differences.length }"
+        >
+          <h3 class="font-semibold">
+            {{ $t('gestion.ai_update.program_items_found', { count: planAffiche.length }) }}
+          </h3>
+
+          <div
+            v-for="(entree, index) in planAffiche"
+            :key="index"
+            class="rounded-lg border border-gray-200 p-3 dark:border-gray-700"
+          >
+            <div class="flex items-start gap-3">
+              <UCheckbox v-model="entree.retenu" class="mt-1" />
+              <div class="min-w-0 flex-1 space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-medium">{{ entree.action.propose.titre }}</span>
+                  <UBadge
+                    :color="entree.action.action === 'creer' ? 'success' : 'warning'"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    {{
+                      entree.action.action === 'creer'
+                        ? $t('gestion.ai_update.program_new')
+                        : $t('gestion.ai_update.program_update')
+                    }}
+                  </UBadge>
+                </div>
+
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ libelleCreneau(entree.action.propose) }}
+                  <template v-if="entree.action.propose.lieu">
+                    — {{ entree.action.propose.lieu }}
+                  </template>
+                </p>
+
+                <!-- Une mise à jour ne montre que ce qui change : le reste est déjà à l'écran
+                     sur la frise, et le répéter noierait la seule information utile. -->
+                <ul
+                  v-if="entree.action.action === 'mettre_a_jour'"
+                  class="space-y-0.5 text-sm text-gray-600 dark:text-gray-400"
+                >
+                  <li v-for="m in entree.action.modifications" :key="m.champ">
+                    <span class="font-medium">{{ $t(`gestion.ai_update.field.${m.champ}`) }}</span>
+                    :
+                    <span class="text-red-600 line-through dark:text-red-400">
+                      {{ afficherValeur(m.champ, m.avant) || '—' }}
+                    </span>
+                    →
+                    <span class="text-green-600 dark:text-green-400">
+                      {{ afficherValeur(m.champ, m.apres) || '—' }}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <UButton
+            color="primary"
+            :loading="applicationProgramme"
+            :disabled="elementsRetenus.length === 0"
+            @click="appliquerProgramme"
+          >
+            {{ $t('gestion.ai_update.apply_program_items', { count: elementsRetenus.length }) }}
+          </UButton>
+        </div>
+
+        <div v-if="differences.length === 0 && planAffiche.length === 0" class="text-center py-8">
           <UIcon name="i-lucide-check-circle" class="mx-auto h-12 w-12 text-green-500 mb-4" />
           <p class="text-gray-600 dark:text-gray-400">
             {{ $t('gestion.ai_update.no_differences') }}
@@ -369,8 +443,15 @@
 </template>
 
 <script setup lang="ts">
+
 import { comparerLignes, meriteUnDiff, type ComparaisonLignes } from '~~/shared/utils/diff-lignes'
 import { editionDayKeys } from '~~/shared/utils/program-days'
+import {
+  planifierImportProgramme,
+  type ActionImport,
+  type ElementExistant,
+  type ElementPropose,
+} from '~~/shared/utils/program-import'
 
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
@@ -586,6 +667,126 @@ const differences = ref<
 >([])
 
 const selectedDifferences = computed(() => differences.value.filter((d) => d.apply))
+
+/**
+ * Éléments de programme proposés, confrontés à ceux déjà en base.
+ *
+ * L'extraction est rejouée d'une séance à l'autre : sans cette confrontation, une seconde passe
+ * doublerait le programme. Les éléments identiques sont écartés de la revue — les montrer
+ * n'apporterait rien et noierait ce qui change réellement.
+ */
+const elementsExistants = ref<ElementExistant[]>([])
+const planAffiche = ref<Array<{ action: ActionImport; retenu: boolean }>>([])
+const applicationProgramme = ref(false)
+
+const elementsRetenus = computed(() => planAffiche.value.filter((e) => e.retenu))
+
+const chargerElementsExistants = async () => {
+  try {
+    const reponse = await $fetch<{ data: { items: ElementExistant[] } }>(
+      `/api/editions/${editionId}/program-items`
+    )
+    elementsExistants.value = reponse.data?.items ?? []
+  } catch (error) {
+    // Sans cette lecture on ne peut pas distinguer un ajout d'un doublon : mieux vaut ne rien
+    // proposer que de proposer de tout recréer.
+    console.error('Lecture des éléments de programme impossible', error)
+    elementsExistants.value = []
+    throw error
+  }
+}
+
+const libelleCreneau = (element: ElementPropose) => {
+  const heure = (iso: string) =>
+    new Date(iso).toLocaleString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  return element.fin
+    ? `${heure(element.debut)} → ${new Date(element.fin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+    : heure(element.debut)
+}
+
+/** Les instants s'affichent en heure locale ; le reste tel quel. */
+const afficherValeur = (champ: string, valeur: string | null) => {
+  if (!valeur) return ''
+  if (champ !== 'debut' && champ !== 'fin') return valeur
+  return new Date(valeur).toLocaleString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/**
+ * Applique les éléments retenus : création ou correction, un appel par élément.
+ *
+ * Les créations arrivent en **brouillon**. Une extraction automatique peut se tromper d'horaire,
+ * et rien ne doit paraître au public avant d'avoir été relu sur la frise.
+ */
+const appliquerProgramme = async () => {
+  applicationProgramme.value = true
+  const echecs: string[] = []
+  try {
+    for (const entree of elementsRetenus.value) {
+      const { action } = entree
+      const corps = {
+        title: action.propose.titre,
+        description: action.propose.description ?? null,
+        startDateTime: action.propose.debut,
+        endDateTime: action.propose.fin ?? null,
+        locationName: action.propose.lieu ?? null,
+      }
+      try {
+        if (action.action === 'creer') {
+          await $fetch(`/api/editions/${editionId}/program-items`, {
+            method: 'POST',
+            body: { ...corps, isPublic: false },
+          })
+        } else if (action.action === 'mettre_a_jour') {
+          // `isPublic` est volontairement absent : corriger un horaire ne doit pas dépublier un
+          // élément que l'organisateur avait déjà rendu visible.
+          await $fetch(`/api/editions/${editionId}/program-items/${action.existantId}`, {
+            method: 'PUT',
+            body: corps,
+          })
+        }
+      } catch (error: any) {
+        // Un élément refusé ne doit pas emporter les suivants : on poursuit et on récapitule.
+        echecs.push(`${action.propose.titre} — ${error?.data?.message || error?.message || ''}`)
+      }
+    }
+
+    const traites = elementsRetenus.value.length - echecs.length
+    if (traites > 0) {
+      useToast().add({
+        title: t('gestion.ai_update.program_applied', { count: traites }),
+        color: 'success',
+        icon: 'i-heroicons-check-circle',
+      })
+    }
+    if (echecs.length > 0) {
+      useToast().add({
+        title: t('gestion.ai_update.program_partial_failure', { count: echecs.length }),
+        description: echecs.slice(0, 3).join(' · '),
+        color: 'warning',
+        icon: 'i-lucide-alert-triangle',
+      })
+    }
+
+    // Ce qui est passé disparaît de la revue ; ce qui a échoué y reste, décoché.
+    await chargerElementsExistants()
+    planAffiche.value = planAffiche.value
+      .filter((e) => !e.retenu || echecs.some((m) => m.startsWith(e.action.propose.titre)))
+      .map((e) => ({ ...e, retenu: false }))
+  } finally {
+    applicationProgramme.value = false
+  }
+}
 
 // Labels lisibles pour les champs
 // Champs qui contiennent des URLs d'images
@@ -932,6 +1133,21 @@ const searchForUpdates = async () => {
       const parsed = JSON.parse(result.json)
       updateResult.value = parsed
       differences.value = compareResults(parsed)
+
+      // Le plan de programme se calcule à part : ce ne sont pas des champs à comparer mais des
+      // éléments à créer ou à corriger, chacun avec sa propre décision.
+      const proposes = Array.isArray(parsed?.edition?.programItems)
+        ? (parsed.edition.programItems as ElementPropose[])
+        : []
+      if (proposes.length > 0) {
+        await chargerElementsExistants()
+        planAffiche.value = planifierImportProgramme(proposes, elementsExistants.value)
+          // Les éléments inchangés n'appellent aucune décision : les afficher noierait le reste.
+          .filter((action) => action.action !== 'inchange')
+          .map((action) => ({ action, retenu: true }))
+      } else {
+        planAffiche.value = []
+      }
     } catch {
       generateError.value = "Erreur lors de l'analyse du résultat IA"
     }

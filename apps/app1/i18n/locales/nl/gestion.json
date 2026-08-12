@@ -46,7 +46,20 @@
       "scope_days_none": "Alles uitvinken",
       "scope_day_already_filled": "— al ingevuld",
       "program_days_failed_title": "geen mislukte dag | Eén dag kon niet worden opgehaald | {count} dagen konden niet worden opgehaald",
-      "program_days_failed_description": "Het model gaf geen antwoord voor: {days}. Voor die dagen is niets gewijzigd — start de analyse opnieuw met alleen die dagen aangevinkt."
+      "program_days_failed_description": "Het model gaf geen antwoord voor: {days}. Voor die dagen is niets gewijzigd — start de analyse opnieuw met alleen die dagen aangevinkt.",
+      "program_items_found": "{count} programmaonderdeel/-delen voorgesteld",
+      "program_new": "Nieuw",
+      "program_update": "Te corrigeren",
+      "apply_program_items": "{count} onderde(e)l(en) toepassen",
+      "program_applied": "{count} onderde(e)l(en) opgeslagen",
+      "program_partial_failure": "{count} onderde(e)l(en) niet opgeslagen",
+      "field": {
+        "titre": "Titel",
+        "description": "Beschrijving",
+        "debut": "Begin",
+        "fin": "Einde",
+        "lieu": "Locatie"
+      }
     },
     "artists": {
       "list_title": "Artiestenmanagement",
