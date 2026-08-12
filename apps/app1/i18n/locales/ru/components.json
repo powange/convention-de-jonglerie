@@ -175,6 +175,14 @@
       "reply_to_post": "Прокомментируйте эту публикацию",
       "your_comment": "Ваш комментарий",
       "your_comment_placeholder": "Ваш комментарий..."
+    },
+    "location_picker": {
+      "on_map": "На карте площадки",
+      "free_text": "Произвольный текст",
+      "select": "Выберите зону или метку",
+      "free_text_placeholder": "Напр.: перед баром",
+      "zones": "Зоны",
+      "markers": "Метки"
     }
   },
   "forms": {

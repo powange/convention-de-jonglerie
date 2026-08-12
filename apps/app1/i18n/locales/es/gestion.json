@@ -111,7 +111,8 @@
       "general_info_description": "Editar el nombre, las fechas y la dirección",
       "map_description": "Definir las zonas en el mapa del sitio",
       "services_description": "Gestionar los servicios e instalaciones disponibles",
-      "title": "Información"
+      "title": "Información",
+      "program_description": "Componga la cronología: workshops, espectáculos y otros momentos."
     },
     "lost_found_active_description": "Los participantes pueden notificar objetos perdidos",
     "lost_found_description": "Consultar y gestionar objetos encontrados o perdidos",
@@ -656,10 +657,6 @@
         "published": "Visible para el público",
         "start_time": "Hora de inicio",
         "end_time": "Hora de fin",
-        "place_map": "En el mapa del recinto",
-        "place_free": "Texto libre",
-        "select_place": "Elegir una zona o un marcador",
-        "location_placeholder": "Ej.: delante del bar",
         "end_optional": "Fin (opcional)"
       },
       "workshop_always_public": "Los workshops siempre son visibles para el público.",

@@ -111,7 +111,8 @@
       "general_info_description": "Rediger navn, datoer og adresse",
       "map_description": "Definer zonerne på områdekortet",
       "services_description": "Administrer tilgængelige tjenester og faciliteter",
-      "title": "Information"
+      "title": "Information",
+      "program_description": "Sammensæt tidslinjen: workshops, shows og andre programpunkter."
     },
     "lost_found_active_description": "Deltagere kan rapportere tabte og fundne genstande",
     "lost_found_description": "Se og administrere fundne eller tabte genstande",
@@ -656,10 +657,6 @@
         "published": "Synlig for publikum",
         "start_time": "Starttidspunkt",
         "end_time": "Sluttidspunkt",
-        "place_map": "På områdekortet",
-        "place_free": "Fri tekst",
-        "select_place": "Vælg en zone eller markør",
-        "location_placeholder": "F.eks. foran baren",
         "end_optional": "Slut (valgfri)"
       },
       "workshop_always_public": "Workshops er altid synlige for publikum.",

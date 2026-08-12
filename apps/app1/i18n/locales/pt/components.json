@@ -175,6 +175,14 @@
       "reply_to_post": "Comente esta publicação",
       "your_comment": "Seu comentário",
       "your_comment_placeholder": "Seu comentário..."
+    },
+    "location_picker": {
+      "on_map": "No mapa do recinto",
+      "free_text": "Texto livre",
+      "select": "Escolher uma zona ou marcador",
+      "free_text_placeholder": "Ex.: em frente ao bar",
+      "zones": "Zonas",
+      "markers": "Marcadores"
     }
   },
   "forms": {

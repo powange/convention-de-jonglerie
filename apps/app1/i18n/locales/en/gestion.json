@@ -111,7 +111,8 @@
       "general_info_description": "Edit the name, dates and address",
       "map_description": "Define zones on the site map",
       "services_description": "Manage available services and facilities",
-      "title": "Information"
+      "title": "Information",
+      "program_description": "Build the timeline: workshops, shows and other moments."
     },
     "lost_found_active_description": "Participants can report lost and found items",
     "lost_found_description": "View and manage lost or found items",
@@ -656,10 +657,6 @@
         "published": "Visible to the public",
         "start_time": "Start time",
         "end_time": "End time",
-        "place_map": "On the site map",
-        "place_free": "Free text",
-        "select_place": "Choose a zone or a marker",
-        "location_placeholder": "E.g. in front of the bar",
         "end_optional": "End (optional)"
       },
       "workshop_always_public": "Workshops are always visible to the public.",

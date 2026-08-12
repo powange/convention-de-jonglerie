@@ -111,7 +111,8 @@
       "general_info_description": "Upravit název, data a adresu",
       "map_description": "Definovat zóny na mapě areálu",
       "services_description": "Spravovat dostupné služby a vybavení",
-      "title": "Informace"
+      "title": "Informace",
+      "program_description": "Sestavte časovou osu: workshopy, představení a další body programu."
     },
     "lost_found_active_description": "Účastníci mohou nahlásit ztracené a nalezené předměty",
     "lost_found_description": "Prohlížet a spravovat ztracené nebo nalezené předměty",
@@ -656,10 +657,6 @@
         "published": "Viditelné pro veřejnost",
         "start_time": "Čas začátku",
         "end_time": "Čas konce",
-        "place_map": "Na mapě areálu",
-        "place_free": "Volný text",
-        "select_place": "Vyberte zónu nebo značku",
-        "location_placeholder": "Např. před barem",
         "end_optional": "Konec (nepovinné)"
       },
       "workshop_always_public": "Workshopy jsou vždy viditelné pro veřejnost.",

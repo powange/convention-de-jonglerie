@@ -175,6 +175,14 @@
       "reply_to_post": "Kommenter denne publikation",
       "your_comment": "Din kommentar",
       "your_comment_placeholder": "Din kommentar..."
+    },
+    "location_picker": {
+      "on_map": "På områdekortet",
+      "free_text": "Fri tekst",
+      "select": "Vælg en zone eller markør",
+      "free_text_placeholder": "F.eks. foran baren",
+      "zones": "Zoner",
+      "markers": "Markører"
     }
   },
   "forms": {

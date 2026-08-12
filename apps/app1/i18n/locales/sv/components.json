@@ -175,6 +175,14 @@
       "reply_to_post": "Kommentera denna publikation",
       "your_comment": "Dina kommentarer",
       "your_comment_placeholder": "Din kommentar..."
+    },
+    "location_picker": {
+      "on_map": "På områdeskartan",
+      "free_text": "Fritext",
+      "select": "Välj en zon eller markör",
+      "free_text_placeholder": "T.ex. framför baren",
+      "zones": "Zoner",
+      "markers": "Markörer"
     }
   },
   "forms": {

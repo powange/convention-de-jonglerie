@@ -111,7 +111,8 @@
       "general_info_description": "Edytuj nazwę, daty i adres",
       "map_description": "Zdefiniuj strefy na mapie terenu",
       "services_description": "Zarządzaj dostępnymi usługami i udogodnieniami",
-      "title": "Informacje"
+      "title": "Informacje",
+      "program_description": "Ułóż oś czasu: warsztaty, pokazy i inne wydarzenia."
     },
     "lost_found_active_description": "Uczestnicy mogą zgłaszać zgubione i znalezione przedmioty",
     "lost_found_description": "Przeglądaj i zarządzaj zgubionymi lub znalezionymi przedmiotami",
@@ -656,10 +657,6 @@
         "published": "Widoczne publicznie",
         "start_time": "Godzina rozpoczęcia",
         "end_time": "Godzina zakończenia",
-        "place_map": "Na mapie terenu",
-        "place_free": "Dowolny tekst",
-        "select_place": "Wybierz strefę lub znacznik",
-        "location_placeholder": "Np. przed barem",
         "end_optional": "Koniec (opcjonalnie)"
       },
       "workshop_always_public": "Warsztaty są zawsze widoczne publicznie.",

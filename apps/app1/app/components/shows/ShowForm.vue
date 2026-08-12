@@ -106,33 +106,16 @@
             </UFormField>
 
             <!-- Lieu -->
-            <UFormField :label="$t('gestion.shows.location')">
-              <div class="space-y-2">
-                <URadioGroup
-                  v-if="edition?.siteMapEnabled"
-                  v-model="locationType"
-                  orientation="horizontal"
-                  :items="locationTypeOptions"
-                />
-
-                <!-- Mode zone/marqueur -->
-                <USelect
-                  v-if="edition?.siteMapEnabled && locationType === 'zone'"
-                  v-model="selectedLocationRef"
-                  :items="locationOptions"
-                  :placeholder="$t('gestion.shows.select_zone_or_marker')"
-                  class="w-full"
-                />
-
-                <!-- Mode texte libre -->
-                <UInput
-                  v-else
-                  v-model="formData.location"
-                  :placeholder="$t('gestion.shows.free_text_placeholder')"
-                  class="w-full"
-                />
-              </div>
-            </UFormField>
+            <EditionLocationPicker
+              v-model:location-name="formData.location"
+              v-model:zone-id="formData.zoneId"
+              v-model:marker-id="formData.markerId"
+              :edition-id="editionId"
+              :site-map-enabled="edition?.siteMapEnabled"
+              :label="$t('gestion.shows.location')"
+              :placeholder-carte="$t('gestion.shows.select_zone_or_marker')"
+              :placeholder-texte="$t('gestion.shows.free_text_placeholder')"
+            />
           </div>
         </UCard>
       </div>
@@ -282,8 +265,6 @@ const defaultStartDateTime = computed(() => {
 })
 
 const artists = ref<any[]>([])
-const zones = ref<any[]>([])
-const markers = ref<any[]>([])
 
 interface ActInput {
   title: string
@@ -358,12 +339,6 @@ watch(
 )
 
 // Type de localisation : zone/marqueur ou texte libre
-const locationType = ref<'zone' | 'text'>('zone')
-
-const locationTypeOptions = computed(() => [
-  { label: t('gestion.shows.zone_or_marker'), value: 'zone' },
-  { label: t('gestion.shows.free_text'), value: 'text' },
-])
 
 // Configuration pour l'upload d'image
 const uploadEndpoint = computed(() => ({
@@ -381,68 +356,8 @@ const onImageDeleted = () => {
   formData.value.imageUrl = null
 }
 
-// Nettoyer les données de l'autre mode au changement
-watch(locationType, (newType) => {
-  if (newType === 'zone') {
-    formData.value.location = ''
-  } else {
-    formData.value.zoneId = null
-    formData.value.markerId = null
-  }
-})
-
 // Sélection combinée zone/marqueur
 // Format de la valeur : "zone:{id}" ou "marker:{id}" ou "" (aucun)
-const selectedLocationRef = computed({
-  get: () => {
-    if (formData.value.zoneId) return `zone:${formData.value.zoneId}`
-    if (formData.value.markerId) return `marker:${formData.value.markerId}`
-    return ''
-  },
-  set: (value: string) => {
-    if (!value) {
-      formData.value.zoneId = null
-      formData.value.markerId = null
-      return
-    }
-    const [type, id] = value.split(':')
-    if (type === 'zone') {
-      formData.value.zoneId = parseInt(id)
-      formData.value.markerId = null
-    } else if (type === 'marker') {
-      formData.value.markerId = parseInt(id)
-      formData.value.zoneId = null
-    }
-  },
-})
-
-// Options combinées zones + marqueurs pour le select
-const locationOptions = computed(() => {
-  const zoneItems = zones.value.map((zone) => ({
-    label: zone.name,
-    value: `zone:${zone.id}`,
-  }))
-
-  const markerItems = markers.value.map((marker) => ({
-    label: marker.name,
-    value: `marker:${marker.id}`,
-  }))
-
-  const groups: any[][] = []
-
-  if (zoneItems.length > 0) {
-    groups.push([{ label: t('gestion.shows.zones_group'), type: 'label' as const }, ...zoneItems])
-  }
-
-  if (markerItems.length > 0) {
-    groups.push([
-      { label: t('gestion.shows.markers_group'), type: 'label' as const },
-      ...markerItems,
-    ])
-  }
-
-  return groups
-})
 
 const artistOptions = computed(() => {
   return artists.value.map((artist) => ({
@@ -462,26 +377,6 @@ const fetchArtists = async () => {
     artists.value = response.data?.artists || []
   } catch (error) {
     console.error('Error fetching artists:', error)
-  }
-}
-
-// Charger les zones de l'édition
-const fetchZones = async () => {
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/zones`)
-    zones.value = response.data?.zones || []
-  } catch (error) {
-    console.error('Error fetching zones:', error)
-  }
-}
-
-// Charger les marqueurs de l'édition
-const fetchMarkers = async () => {
-  try {
-    const response = await $fetch(`/api/editions/${props.editionId}/markers`)
-    markers.value = response.data?.markers || []
-  } catch (error) {
-    console.error('Error fetching markers:', error)
   }
 }
 
@@ -565,7 +460,6 @@ const handleSubmit = () => {
 }
 
 const resetForm = () => {
-  locationType.value = 'zone'
   formData.value = {
     title: '',
     type: 'STANDARD',
@@ -624,15 +518,6 @@ watch(
           })) || [],
         isPublic: newShow.isPublic || false,
       }
-
-      // Auto-détecter le mode selon les données existantes
-      if (newShow.zoneId || newShow.markerId) {
-        locationType.value = 'zone'
-      } else if (newShow.location) {
-        locationType.value = 'text'
-      } else {
-        locationType.value = 'zone'
-      }
     } else {
       resetForm()
     }
@@ -647,7 +532,7 @@ watch(
 // Charger les référentiels au montage. Pas d'await au niveau racine : cela rendrait le
 // composant asynchrone et imposerait un Suspense au parent.
 onMounted(() => {
-  Promise.all([fetchArtists(), fetchZones(), fetchMarkers()])
+  Promise.all([fetchArtists()])
 })
 
 defineExpose({ isDirty })

@@ -160,34 +160,14 @@
             />
           </div>
 
-          <!-- Repris du formulaire de spectacle : un choix entre la carte du site et du texte
-               libre, plutôt que deux champs qu'on pourrait remplir en même temps. -->
-          <UFormField :label="$t('gestion.program.field.place')">
-            <div class="space-y-2">
-              <URadioGroup
-                v-if="edition?.siteMapEnabled"
-                v-model="typeDeLieu"
-                orientation="horizontal"
-                :items="optionsTypeDeLieu"
-              />
-
-              <USelect
-                v-if="edition?.siteMapEnabled && typeDeLieu === 'carte'"
-                v-model="lieuChoisi"
-                :items="lieuxDisponibles"
-                :placeholder="$t('gestion.program.field.select_place')"
-                class="w-full"
-              />
-
-              <UInput
-                v-else
-                v-model="formulaire.locationName"
-                :placeholder="$t('gestion.program.field.location_placeholder')"
-                class="w-full"
-                maxlength="150"
-              />
-            </div>
-          </UFormField>
+          <EditionLocationPicker
+            v-model:location-name="formulaire.locationName"
+            v-model:zone-id="formulaire.zoneId"
+            v-model:marker-id="formulaire.markerId"
+            :edition-id="editionId"
+            :site-map-enabled="edition?.siteMapEnabled"
+            :label="$t('gestion.program.field.place')"
+          />
 
           <USwitch
             v-model="formulaire.isPublic"
@@ -257,48 +237,6 @@ const {
 
 const journees = computed(() => grouperParJournee(donneesFrise.value?.data?.entrees ?? []))
 
-// Zones et repères, pour rattacher un élément à la carte du site.
-const { data: donneesZones } = await useFetch<{ data: { zones: { id: number; name: string }[] } }>(
-  () => `/api/editions/${editionId.value}/zones`,
-  { default: () => ({ data: { zones: [] } }) }
-)
-const { data: donneesReperes } = await useFetch<{
-  data: { markers: { id: number; name: string }[] }
-}>(() => `/api/editions/${editionId.value}/markers`, {
-  default: () => ({ data: { markers: [] } }),
-})
-
-/**
- * Bornes du sélecteur : les dates de l'édition, telles quelles.
- *
- * Volontairement identiques à celles du formulaire des workshops, y compris dans leur simplicité :
- * un même geste doit donner le même calendrier d'une page à l'autre.
- */
-const premierJour = computed(() =>
-  edition.value?.startDate ? new Date(edition.value.startDate) : undefined
-)
-const dernierJour = computed(() =>
-  edition.value?.endDate ? new Date(edition.value.endDate) : undefined
-)
-
-/** Carte du site ou texte libre : les deux champs ne se remplissent pas en même temps. */
-const typeDeLieu = ref<'carte' | 'texte'>('texte')
-const optionsTypeDeLieu = computed(() => [
-  { label: t('gestion.program.field.place_map'), value: 'carte' },
-  { label: t('gestion.program.field.place_free'), value: 'texte' },
-])
-
-const lieuxDisponibles = computed(() => [
-  ...(donneesZones.value?.data?.zones ?? []).map((z) => ({
-    label: z.name,
-    value: `zone:${z.id}`,
-  })),
-  ...(donneesReperes.value?.data?.markers ?? []).map((m) => ({
-    label: m.name,
-    value: `marker:${m.id}`,
-  })),
-])
-
 /**
  * Réduit une colonne à la largeur de son contenu.
  *
@@ -361,22 +299,31 @@ const formulaireVide = () => ({
   description: '',
   startDateTime: '',
   endDateTime: '',
-  locationName: '',
+  locationName: null as string | null,
+  zoneId: null as number | null,
+  markerId: null as number | null,
   isPublic: false,
 })
 const formulaire = ref(formulaireVide())
-
-/**
- * Zone et repère tiennent dans un seul choix : l'API refuse les deux à la fois, et deux listes
- * séparées laisseraient composer une saisie que le serveur rejette.
- */
-const lieuChoisi = ref('')
 
 const titreFormulaire = computed(() =>
   elementEnCours.value ? t('gestion.program.edit_title') : t('gestion.program.add')
 )
 
 /** Les champs `datetime-local` attendent l'heure locale, pas l'ISO en temps universel. */
+/**
+ * Bornes du sélecteur : les dates de l'édition, telles quelles.
+ *
+ * Volontairement identiques à celles du formulaire des workshops, y compris dans leur simplicité :
+ * un même geste doit donner le même calendrier d'une page à l'autre.
+ */
+const premierJour = computed(() =>
+  edition.value?.startDate ? new Date(edition.value.startDate) : undefined
+)
+const dernierJour = computed(() =>
+  edition.value?.endDate ? new Date(edition.value.endDate) : undefined
+)
+
 const versChampLocal = (iso: string) => {
   const d = new Date(iso)
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -388,8 +335,6 @@ const versChampLocal = (iso: string) => {
 const ouvrirCreation = () => {
   elementEnCours.value = null
   formulaire.value = formulaireVide()
-  lieuChoisi.value = ''
-  typeDeLieu.value = 'texte'
   erreurFormulaire.value = ''
   formulaireOuvert.value = true
 }
@@ -401,22 +346,19 @@ const ouvrirEdition = (entree: EntreeProgramme) => {
     description: entree.description ?? '',
     startDateTime: versChampLocal(entree.debut),
     endDateTime: entree.fin ? versChampLocal(entree.fin) : '',
-    locationName: entree.lieu ?? '',
+    // `lieu` porte le nom de la zone quand l'élément y est rattaché : on ne le recopie donc en
+    // texte libre que s'il n'y a pas de rattachement, sinon on dupliquerait un nom déjà porté
+    // par la carte.
+    locationName: entree.zoneId || entree.markerId ? null : (entree.lieu ?? null),
+    zoneId: entree.zoneId,
+    markerId: entree.markerId,
     isPublic: entree.publie,
   }
-  lieuChoisi.value = entree.zoneId
-    ? `zone:${entree.zoneId}`
-    : entree.markerId
-      ? `marker:${entree.markerId}`
-      : ''
-  typeDeLieu.value = lieuChoisi.value ? 'carte' : 'texte'
   erreurFormulaire.value = ''
   formulaireOuvert.value = true
 }
 
 const corpsElement = () => {
-  const surLaCarte = typeDeLieu.value === 'carte' && !!lieuChoisi.value
-  const [genre, id] = surLaCarte ? lieuChoisi.value.split(':') : []
   return {
     title: formulaire.value.title,
     description: formulaire.value.description || null,
@@ -426,9 +368,9 @@ const corpsElement = () => {
     endDateTime: formulaire.value.endDateTime
       ? parseDateTimeLocal(formulaire.value.endDateTime).toISOString()
       : null,
-    locationName: surLaCarte ? null : formulaire.value.locationName || null,
-    zoneId: genre === 'zone' ? Number(id) : null,
-    markerId: genre === 'marker' ? Number(id) : null,
+    locationName: formulaire.value.locationName || null,
+    zoneId: formulaire.value.zoneId,
+    markerId: formulaire.value.markerId,
     isPublic: formulaire.value.isPublic,
   }
 }

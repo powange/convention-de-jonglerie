@@ -175,6 +175,14 @@
       "reply_to_post": "Comment on this post",
       "your_comment": "Your comment",
       "your_comment_placeholder": "Your comment..."
+    },
+    "location_picker": {
+      "on_map": "On the site map",
+      "free_text": "Free text",
+      "select": "Choose a zone or a marker",
+      "free_text_placeholder": "E.g. in front of the bar",
+      "zones": "Zones",
+      "markers": "Markers"
     }
   },
   "forms": {

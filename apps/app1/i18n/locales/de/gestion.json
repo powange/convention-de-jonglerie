@@ -111,7 +111,8 @@
       "general_info_description": "Name, Daten und Adresse bearbeiten",
       "map_description": "Zonen auf der Geländekarte definieren",
       "services_description": "Verfügbare Dienste und Einrichtungen verwalten",
-      "title": "Informationen"
+      "title": "Informationen",
+      "program_description": "Stellen Sie den Zeitplan zusammen: Workshops, Shows und weitere Momente."
     },
     "lost_found_active_description": "Teilnehmer können gefundene oder verlorene Gegenstände melden",
     "lost_found_description": "Gefundene oder verlorene Gegenstände ansehen und verwalten",
@@ -656,10 +657,6 @@
         "published": "Öffentlich sichtbar",
         "start_time": "Startzeit",
         "end_time": "Endzeit",
-        "place_map": "Auf dem Geländeplan",
-        "place_free": "Freitext",
-        "select_place": "Zone oder Markierung wählen",
-        "location_placeholder": "z. B. vor der Bar",
         "end_optional": "Ende (optional)"
       },
       "workshop_always_public": "Workshops sind immer öffentlich sichtbar.",
