@@ -175,6 +175,14 @@
       "reply_to_post": "Прокоментуйте цю публікацію",
       "your_comment": "Ваш коментар",
       "your_comment_placeholder": "Ваш коментар..."
+    },
+    "location_picker": {
+      "on_map": "На карті майданчика",
+      "free_text": "Довільний текст",
+      "select": "Виберіть зону або мітку",
+      "free_text_placeholder": "Напр.: перед баром",
+      "zones": "Зони",
+      "markers": "Мітки"
     }
   },
   "forms": {

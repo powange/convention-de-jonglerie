@@ -175,6 +175,14 @@
       "reply_to_post": "Skomentuj ten wpis",
       "your_comment": "Twój komentarz",
       "your_comment_placeholder": "Twój komentarz..."
+    },
+    "location_picker": {
+      "on_map": "Na mapie terenu",
+      "free_text": "Dowolny tekst",
+      "select": "Wybierz strefę lub znacznik",
+      "free_text_placeholder": "Np. przed barem",
+      "zones": "Strefy",
+      "markers": "Znaczniki"
     }
   },
   "forms": {

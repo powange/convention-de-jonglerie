@@ -657,10 +657,6 @@
         "published": "Visible du public",
         "start_time": "Heure de début",
         "end_time": "Heure de fin",
-        "place_map": "Sur la carte du site",
-        "place_free": "Texte libre",
-        "select_place": "Choisir une zone ou un repère",
-        "location_placeholder": "Ex. : devant la buvette",
         "end_optional": "Fin (facultative)"
       },
       "workshop_always_public": "Les workshops sont toujours visibles du public.",

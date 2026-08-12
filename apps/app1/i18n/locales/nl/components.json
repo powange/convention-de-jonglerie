@@ -175,6 +175,14 @@
       "reply_to_post": "Reageer op deze publicatie",
       "your_comment": "Jouw reactie",
       "your_comment_placeholder": "Jouw reactie..."
+    },
+    "location_picker": {
+      "on_map": "Op de plattegrond",
+      "free_text": "Vrije tekst",
+      "select": "Kies een zone of markering",
+      "free_text_placeholder": "Bijv. voor de bar",
+      "zones": "Zones",
+      "markers": "Markeringen"
     }
   },
   "forms": {

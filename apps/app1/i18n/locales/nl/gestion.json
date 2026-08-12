@@ -657,10 +657,6 @@
         "published": "Zichtbaar voor publiek",
         "start_time": "Begintijd",
         "end_time": "Eindtijd",
-        "place_map": "Op de plattegrond",
-        "place_free": "Vrije tekst",
-        "select_place": "Kies een zone of markering",
-        "location_placeholder": "Bijv. voor de bar",
         "end_optional": "Einde (optioneel)"
       },
       "workshop_always_public": "Workshops zijn altijd zichtbaar voor het publiek.",

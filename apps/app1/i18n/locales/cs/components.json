@@ -175,6 +175,14 @@
       "reply_to_post": "Komentář k této publikaci",
       "your_comment": "Vaše připomínky",
       "your_comment_placeholder": "Váš komentář..."
+    },
+    "location_picker": {
+      "on_map": "Na mapě areálu",
+      "free_text": "Volný text",
+      "select": "Vyberte zónu nebo značku",
+      "free_text_placeholder": "Např. před barem",
+      "zones": "Zóny",
+      "markers": "Značky"
     }
   },
   "forms": {

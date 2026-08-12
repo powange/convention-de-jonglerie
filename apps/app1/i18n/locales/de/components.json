@@ -175,6 +175,14 @@
       "reply_to_post": "Kommentieren Sie diese Veröffentlichung",
       "your_comment": "Ihr Kommentar",
       "your_comment_placeholder": "Ihr Kommentar..."
+    },
+    "location_picker": {
+      "on_map": "Auf dem Geländeplan",
+      "free_text": "Freitext",
+      "select": "Zone oder Markierung wählen",
+      "free_text_placeholder": "z. B. vor der Bar",
+      "zones": "Zonen",
+      "markers": "Markierungen"
     }
   },
   "forms": {

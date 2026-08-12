@@ -147,6 +147,14 @@
       "past": "Passées",
       "upcoming": "À venir"
     },
+    "location_picker": {
+      "on_map": "Sur la carte du site",
+      "free_text": "Texte libre",
+      "select": "Choisir une zone ou un repère",
+      "free_text_placeholder": "Ex. : devant la buvette",
+      "zones": "Zones",
+      "markers": "Points de repère"
+    },
     "map": {
       "editions_on_map": "{count} édition sur la carte | {count} éditions sur la carte",
       "incomplete_address_warning": "Les éditions sans adresse complète ne peuvent pas être affichées sur la carte.",

@@ -657,10 +657,6 @@
         "published": "Viditelné pro veřejnost",
         "start_time": "Čas začátku",
         "end_time": "Čas konce",
-        "place_map": "Na mapě areálu",
-        "place_free": "Volný text",
-        "select_place": "Vyberte zónu nebo značku",
-        "location_placeholder": "Např. před barem",
         "end_optional": "Konec (nepovinné)"
       },
       "workshop_always_public": "Workshopy jsou vždy viditelné pro veřejnost.",

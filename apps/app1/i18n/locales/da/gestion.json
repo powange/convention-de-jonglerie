@@ -657,10 +657,6 @@
         "published": "Synlig for publikum",
         "start_time": "Starttidspunkt",
         "end_time": "Sluttidspunkt",
-        "place_map": "På områdekortet",
-        "place_free": "Fri tekst",
-        "select_place": "Vælg en zone eller markør",
-        "location_placeholder": "F.eks. foran baren",
         "end_optional": "Slut (valgfri)"
       },
       "workshop_always_public": "Workshops er altid synlige for publikum.",

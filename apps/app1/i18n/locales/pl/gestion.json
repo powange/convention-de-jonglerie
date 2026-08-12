@@ -657,10 +657,6 @@
         "published": "Widoczne publicznie",
         "start_time": "Godzina rozpoczęcia",
         "end_time": "Godzina zakończenia",
-        "place_map": "Na mapie terenu",
-        "place_free": "Dowolny tekst",
-        "select_place": "Wybierz strefę lub znacznik",
-        "location_placeholder": "Np. przed barem",
         "end_optional": "Koniec (opcjonalnie)"
       },
       "workshop_always_public": "Warsztaty są zawsze widoczne publicznie.",

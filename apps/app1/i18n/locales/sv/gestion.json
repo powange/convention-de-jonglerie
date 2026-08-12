@@ -657,10 +657,6 @@
         "published": "Synlig för publiken",
         "start_time": "Starttid",
         "end_time": "Sluttid",
-        "place_map": "På områdeskartan",
-        "place_free": "Fritext",
-        "select_place": "Välj en zon eller markör",
-        "location_placeholder": "T.ex. framför baren",
         "end_optional": "Slut (valfritt)"
       },
       "workshop_always_public": "Workshops är alltid synliga för publiken.",

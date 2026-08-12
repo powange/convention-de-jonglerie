@@ -657,10 +657,6 @@
         "published": "Öffentlich sichtbar",
         "start_time": "Startzeit",
         "end_time": "Endzeit",
-        "place_map": "Auf dem Geländeplan",
-        "place_free": "Freitext",
-        "select_place": "Zone oder Markierung wählen",
-        "location_placeholder": "z. B. vor der Bar",
         "end_optional": "Ende (optional)"
       },
       "workshop_always_public": "Workshops sind immer öffentlich sichtbar.",
