@@ -115,11 +115,15 @@
                   :items="locationTypeOptions"
                 />
 
-                <!-- Mode zone/marqueur -->
-                <USelect
+                <!-- Mode zone/marqueur. `USelectMenu` plutôt que `USelect` : il apporte une
+                     recherche intégrée, indispensable dès qu'une édition compte une dizaine de
+                     zones et de repères. `value-key` est nécessaire — sans lui le composant lie
+                     l'objet entier, là où le modèle attend la chaîne « zone:12 ». -->
+                <USelectMenu
                   v-if="edition?.siteMapEnabled && locationType === 'zone'"
                   v-model="selectedLocationRef"
                   :items="locationOptions"
+                  value-key="value"
                   :placeholder="$t('gestion.shows.select_zone_or_marker')"
                   class="w-full"
                 />
