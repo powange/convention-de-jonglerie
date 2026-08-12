@@ -662,7 +662,14 @@
         "location_placeholder": "Ex. : devant la buvette",
         "end_optional": "Fin (facultative)"
       },
-      "workshop_always_public": "Les workshops sont toujours visibles du public."
+      "workshop_always_public": "Les workshops sont toujours visibles du public.",
+      "column": {
+        "time": "Heure",
+        "title": "Titre",
+        "source": "Type",
+        "place": "Lieu",
+        "visibility": "Visibilité"
+      }
     }
   }
 }

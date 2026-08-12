@@ -116,7 +116,7 @@ const {
   pending: chargementFrise,
   error: erreurFrise,
 } = await useFetch<{
-  data: { entrees: EntreeProgramme[] }
+  data: { entrees: EntreeProgramme[]; carteConsultable: boolean }
 }>(() => `/api/editions/${editionId.value}/program`, {
   default: () => ({ data: { entrees: [] } }),
 })
@@ -168,7 +168,7 @@ const formaterJour = (date: string) =>
  * vers une page qui n'existe pas pour le visiteur serait pire que pas de lien du tout.
  */
 const lienCarte = (entree: EntreeProgramme): string | null => {
-  if (!edition.value?.siteMapEnabled || !edition.value?.mapPublic) return null
+  if (!donneesFrise.value?.data?.carteConsultable) return null
   if (entree.zoneId) return `/editions/${editionId.value}/map?focusZone=${entree.zoneId}`
   if (entree.markerId) return `/editions/${editionId.value}/map?focusMarker=${entree.markerId}`
   return null

@@ -56,6 +56,8 @@ export interface SpectacleSource {
   location?: string | null
   zoneId?: number | null
   markerId?: number | null
+  zone?: { name: string } | null
+  marker?: { name: string } | null
   isPublic: boolean
 }
 
@@ -70,6 +72,8 @@ export interface ElementSource {
   locationName?: string | null
   zoneId?: number | null
   markerId?: number | null
+  zone?: { name: string } | null
+  marker?: { name: string } | null
   isPublic: boolean
 }
 
@@ -98,6 +102,20 @@ const enIso = (valeur: Date | string): string =>
  * qu'une fin inventée, qui ferait dire à la frise qu'un spectacle est terminé alors qu'on n'en
  * sait rien.
  */
+/**
+ * Nom du lieu à afficher.
+ *
+ * Le texte libre l'emporte quand il existe : c'est une précision volontaire de l'organisateur
+ * (« côté buvette »). Sinon on nomme la zone ou le repère — sans quoi une entrée rattachée à la
+ * carte n'afficherait aucun lieu du tout, et le lien vers la carte resterait invisible faute
+ * d'étiquette à cliquer.
+ */
+const nomDuLieu = (
+  texteLibre?: string | null,
+  zone?: { name: string } | null,
+  marker?: { name: string } | null
+): string | null => texteLibre || zone?.name || marker?.name || null
+
 const finDuSpectacle = (debut: Date | string, dureeMinutes?: number | null): string | null => {
   if (!dureeMinutes || dureeMinutes <= 0) return null
   const d = typeof debut === 'string' ? new Date(debut) : debut
@@ -149,7 +167,7 @@ export function construireFriseProgramme(
       description: s.description ?? null,
       debut: enIso(s.startDateTime),
       fin: finDuSpectacle(s.startDateTime, s.duration),
-      lieu: s.location ?? null,
+      lieu: nomDuLieu(s.location, s.zone, s.marker),
       zoneId: s.zoneId ?? null,
       markerId: s.markerId ?? null,
       publie: s.isPublic,
@@ -166,7 +184,7 @@ export function construireFriseProgramme(
       description: e.description ?? null,
       debut: enIso(e.startDateTime),
       fin: e.endDateTime ? enIso(e.endDateTime) : null,
-      lieu: e.locationName ?? null,
+      lieu: nomDuLieu(e.locationName, e.zone, e.marker),
       zoneId: e.zoneId ?? null,
       markerId: e.markerId ?? null,
       publie: e.isPublic,

@@ -24,6 +24,8 @@ export default wrapApiHandler(
         programEnabled: true,
         workshopsEnabled: true,
         artistsEnabled: true,
+        siteMapEnabled: true,
+        mapPublic: true,
       },
     })
 
@@ -69,6 +71,8 @@ export default wrapApiHandler(
               location: true,
               zoneId: true,
               markerId: true,
+              zone: { select: { name: true } },
+              marker: { select: { name: true } },
               isPublic: true,
             },
           })
@@ -84,6 +88,8 @@ export default wrapApiHandler(
           locationName: true,
           zoneId: true,
           markerId: true,
+          zone: { select: { name: true } },
+          marker: { select: { name: true } },
           isPublic: true,
         },
       }),
@@ -100,6 +106,12 @@ export default wrapApiHandler(
         entrees,
         /** Permet à l'affichage de signaler les brouillons plutôt que de les mêler au reste. */
         inclutBrouillons: peutEditer,
+        /**
+         * Dit si un lieu peut renvoyer vers la carte du site. Rendu ici plutôt que déduit côté
+         * client : l'édition n'y est chargée qu'après le montage, si bien que le rendu serveur
+         * n'affichait aucun lien — ils n'apparaissaient qu'après coup, ou pas du tout.
+         */
+        carteConsultable: edition.siteMapEnabled && edition.mapPublic,
       },
     }
   },

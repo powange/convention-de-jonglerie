@@ -60,64 +60,72 @@
       <div v-for="journee in journees" v-else :key="journee.date" class="space-y-2">
         <h2 class="font-semibold capitalize">{{ formaterJour(journee.date) }}</h2>
 
-        <UCard v-for="entree in journee.entrees" :key="entree.cle" :ui="{ body: 'p-3 sm:p-4' }">
-          <div class="flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="font-medium">{{ entree.titre }}</span>
-                <UBadge :color="couleurSource(entree.source)" variant="subtle" size="sm">
-                  {{ $t(`gestion.program.source.${entree.source}`) }}
-                </UBadge>
-              </div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ plageHoraire(entree) }}
-                <template v-if="entree.lieu"> — {{ entree.lieu }}</template>
-              </p>
-            </div>
+        <UTable :data="journee.entrees" :columns="colonnes" class="w-full">
+          <template #heure-cell="{ row }">
+            <span class="font-mono text-sm whitespace-nowrap">{{
+              plageHoraire(row.original)
+            }}</span>
+          </template>
 
-            <!-- Seuls les éléments libres s'éditent ici. -->
-            <div v-if="entree.source === 'element'" class="flex shrink-0 gap-1">
-              <UButton
-                icon="i-heroicons-pencil-square"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                :aria-label="$t('common.edit')"
-                @click="ouvrirEdition(entree)"
-              />
-              <UButton
-                icon="i-heroicons-trash"
-                color="error"
-                variant="ghost"
-                size="sm"
-                :loading="chargeSuppression(entree.cle)"
-                :aria-label="$t('common.delete')"
-                @click="supprimer(entree)"
-              />
-            </div>
+          <template #titre-cell="{ row }">
+            <span class="font-medium">{{ row.original.titre }}</span>
+          </template>
 
-            <!-- L'interrupteur remplace une étiquette « brouillon » : il dit l'état ET permet d'en
-                 changer, sans quitter la frise. Placé après les actions, il ferme la ligne sur ce
-                 qu'on montre au public. Les workshops n'ont aucun état de publication en base ;
-                 leur interrupteur est donc figé sur « public », et le titre explique pourquoi
-                 plutôt que de laisser un trou dans la colonne. -->
+          <template #source-cell="{ row }">
+            <UBadge :color="couleurSource(row.original.source)" variant="subtle" size="sm">
+              {{ $t(`gestion.program.source.${row.original.source}`) }}
+            </UBadge>
+          </template>
+
+          <template #lieu-cell="{ row }">
+            <span class="text-sm text-gray-600 dark:text-gray-400">
+              {{ row.original.lieu || '—' }}
+            </span>
+          </template>
+
+          <template #visibilite-cell="{ row }">
+            <!-- Les workshops n'ont aucun état de publication en base : leur interrupteur est figé
+                 sur « public », et le titre explique pourquoi plutôt que de laisser une case vide. -->
             <USwitch
-              :model-value="entree.publie"
-              :disabled="entree.source === 'workshop' || visibiliteEnCours(entree.cle)"
-              :loading="visibiliteEnCours(entree.cle)"
+              :model-value="row.original.publie"
+              :disabled="row.original.source === 'workshop' || visibiliteEnCours(row.original.cle)"
+              :loading="visibiliteEnCours(row.original.cle)"
               :title="
-                entree.source === 'workshop'
+                row.original.source === 'workshop'
                   ? $t('gestion.program.workshop_always_public')
                   : $t('gestion.program.field.published')
               "
               :aria-label="$t('gestion.program.field.published')"
               color="primary"
               size="sm"
-              class="shrink-0"
-              @update:model-value="(v: boolean) => basculerVisibilite(entree, v)"
+              @update:model-value="(v: boolean) => basculerVisibilite(row.original, v)"
             />
-          </div>
-        </UCard>
+          </template>
+
+          <!-- Seuls les éléments libres s'éditent ici : workshops et spectacles gardent leur
+               propre formulaire, qu'il ne s'agit pas de dupliquer. -->
+          <template #actions-cell="{ row }">
+            <div v-if="row.original.source === 'element'" class="flex justify-end gap-1">
+              <UButton
+                icon="i-heroicons-pencil-square"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :aria-label="$t('common.edit')"
+                @click="ouvrirEdition(row.original)"
+              />
+              <UButton
+                icon="i-heroicons-trash"
+                color="error"
+                variant="ghost"
+                size="sm"
+                :loading="chargeSuppression(row.original.cle)"
+                :aria-label="$t('common.delete')"
+                @click="supprimer(row.original)"
+              />
+            </div>
+          </template>
+        </UTable>
       </div>
     </div>
 
@@ -289,6 +297,39 @@ const lieuxDisponibles = computed(() => [
     label: m.name,
     value: `marker:${m.id}`,
   })),
+])
+
+/**
+ * Réduit une colonne à la largeur de son contenu.
+ *
+ * `w-px` sur une table à disposition automatique : le navigateur ne peut pas descendre sous la
+ * largeur du contenu, et une largeur demandée d'un pixel revient donc à demander « le minimum ».
+ * `whitespace-nowrap` empêche que ce minimum soit obtenu en cassant le texte sur deux lignes.
+ */
+const auContenu = { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } }
+
+/**
+ * Colonnes de la frise. Les identifiants servent aussi de noms de créneaux (`#heure-cell`), d'où
+ * des clés propres plutôt que les champs bruts de l'entrée.
+ */
+const colonnes = computed(() => [
+  { accessorKey: 'debut', id: 'heure', header: t('gestion.program.column.time'), meta: auContenu },
+  // Seule colonne sans contrainte : elle absorbe la largeur que les autres ne prennent pas.
+  { accessorKey: 'titre', id: 'titre', header: t('gestion.program.column.title') },
+  {
+    accessorKey: 'source',
+    id: 'source',
+    header: t('gestion.program.column.source'),
+    meta: auContenu,
+  },
+  { accessorKey: 'lieu', id: 'lieu', header: t('gestion.program.column.place'), meta: auContenu },
+  {
+    accessorKey: 'publie',
+    id: 'visibilite',
+    header: t('gestion.program.column.visibility'),
+    meta: auContenu,
+  },
+  { id: 'actions', header: '', meta: auContenu },
 ])
 
 const couleurSource = (source: EntreeProgramme['source']) =>

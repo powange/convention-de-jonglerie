@@ -244,6 +244,54 @@ describe('construireFriseProgramme', () => {
     }
   })
 
+  /**
+   * Sans cette reprise, une entrée rattachée à la carte n'affichait aucun lieu — et le lien vers
+   * la carte restait invisible faute d'étiquette à cliquer.
+   */
+  it('nomme le lieu d’après la zone ou le repère quand le texte libre manque', () => {
+    const frise = construireFriseProgramme({
+      spectacles: [
+        {
+          id: 1,
+          title: 'Gala',
+          startDateTime: '2026-10-02T20:00:00.000Z',
+          zoneId: 9,
+          zone: { name: 'Salle des fêtes' },
+          isPublic: true,
+        },
+      ],
+      elements: [
+        {
+          id: 1,
+          title: 'Feu',
+          startDateTime: '2026-10-02T22:00:00.000Z',
+          markerId: 6,
+          marker: { name: 'Esplanade' },
+          isPublic: true,
+        },
+      ],
+    })
+    expect(frise.map((e) => e.lieu)).toEqual(['Salle des fêtes', 'Esplanade'])
+  })
+
+  // Le texte libre est une précision voulue par l'organisateur : il prime sur le nom de la zone.
+  it('préfère le texte libre au nom de la zone', () => {
+    const frise = construireFriseProgramme({
+      elements: [
+        {
+          id: 1,
+          title: 'Apéro',
+          startDateTime: '2026-10-02T18:00:00.000Z',
+          locationName: 'côté buvette',
+          zoneId: 9,
+          zone: { name: 'Salle des fêtes' },
+          isPublic: true,
+        },
+      ],
+    })
+    expect(frise[0]!.lieu).toBe('côté buvette')
+  })
+
   it('accepte des sources absentes', () => {
     expect(construireFriseProgramme({})).toEqual([])
   })
