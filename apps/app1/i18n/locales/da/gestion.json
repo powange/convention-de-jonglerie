@@ -93,7 +93,8 @@
       "title": "Funktioner",
       "volunteers_description": "Aktivér administration af frivillige for denne udgave",
       "workshops_description": "Giv deltagere og frivillige mulighed for at oprette workshops",
-      "treasury_description": "Følg udgifter og indtægter for udgaven, med bogføringskonti."
+      "treasury_description": "Følg udgifter og indtægter for udgaven, med bogføringskonti.",
+      "program_description": "Tidslinje for udgaven: workshops, shows og andre programpunkter samlet på én side."
     },
     "general_info": {
       "description": "Rediger navn, datoer, tidszone og adresse for dit arrangement.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Billetsalg — andre indtægter"
       },
       "settled_amount": "heraf {amount} betalt"
+    },
+    "program": {
+      "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",
+      "add": "Tilføj et element",
+      "edit_title": "Rediger element",
+      "empty": "Ingen programpunkter endnu.",
+      "sources_hint": "Workshops og shows vises her, men redigeres på deres egen side. Deres synlighed indstilles dog her.",
+      "confirm_delete": "Fjern “{title}” fra programmet?",
+      "error_end_before_start": "Sluttidspunktet skal ligge efter starten.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Show",
+        "element": "Program"
+      },
+      "field": {
+        "title": "Titel",
+        "description": "Beskrivelse",
+        "start": "Start",
+        "place": "Sted på kortet",
+        "published": "Synlig for publikum",
+        "start_time": "Starttidspunkt",
+        "end_time": "Sluttidspunkt",
+        "place_map": "På områdekortet",
+        "place_free": "Fri tekst",
+        "select_place": "Vælg en zone eller markør",
+        "location_placeholder": "F.eks. foran baren",
+        "end_optional": "Slut (valgfri)"
+      },
+      "workshop_always_public": "Workshops er altid synlige for publikum.",
+      "column": {
+        "time": "Tid",
+        "title": "Titel",
+        "source": "Type",
+        "place": "Sted",
+        "visibility": "Synlighed"
+      }
     }
   }
 }

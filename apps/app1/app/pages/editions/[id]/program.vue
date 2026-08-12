@@ -16,6 +16,17 @@
     <div v-else class="space-y-6">
       <EditionHeader :edition="edition" current-page="program" />
 
+      <!-- Filtres par source, sur le modèle de ceux de la carte : aucune case cochée vaut « tout
+           afficher », ce qui évite d'avoir à cocher les trois pour revenir à l'état de départ.
+           Masqués quand une seule source est présente : filtrer n'y aurait aucun effet utile. -->
+      <UCheckboxGroup
+        v-if="sourcesPresentes.length > 1"
+        v-model="filtresActifs"
+        :items="itemsFiltre"
+        orientation="horizontal"
+        size="md"
+      />
+
       <div v-if="chargementFrise" class="flex items-center justify-center py-12">
         <UIcon name="i-lucide-loader-2" class="h-8 w-8 animate-spin text-primary" />
       </div>
@@ -25,7 +36,8 @@
         icon="i-heroicons-calendar-days"
         color="info"
         variant="soft"
-        :title="$t('program.empty')"
+        :title="filtresActifs.length > 0 ? $t('program.no_result') : $t('program.empty')"
+        :description="filtresActifs.length > 0 ? $t('program.no_result_hint') : undefined"
       />
 
       <div v-for="journee in journees" v-else :key="journee.date" class="space-y-3">
@@ -118,7 +130,7 @@ const {
 } = await useFetch<{
   data: { entrees: EntreeProgramme[]; carteConsultable: boolean }
 }>(() => `/api/editions/${editionId.value}/program`, {
-  default: () => ({ data: { entrees: [] } }),
+  default: () => ({ data: { entrees: [], carteConsultable: false } }),
 })
 
 /**
@@ -137,7 +149,46 @@ if (erreurFrise.value) {
   })
 }
 
-const journees = computed(() => grouperParJournee(donneesFrise.value?.data?.entrees ?? []))
+const entrees = computed(() => donneesFrise.value?.data?.entrees ?? [])
+
+/**
+ * Filtres par source.
+ *
+ * Même convention que les filtres de la carte : une sélection vide signifie « tout afficher ».
+ * Sans cette règle, décocher la dernière case viderait la page, et il faudrait recocher les trois
+ * pour revenir à l'état initial.
+ */
+const filtresActifs = ref<EntreeProgramme['source'][]>([])
+
+/** Seules les sources réellement présentes sont proposées : filtrer sur du vide n'aide personne. */
+const sourcesPresentes = computed(() => {
+  const ordre: EntreeProgramme['source'][] = ['workshop', 'spectacle', 'element']
+  const vues = new Set(entrees.value.map((e) => e.source))
+  return ordre.filter((s) => vues.has(s))
+})
+
+const iconeSource = (source: EntreeProgramme['source']) =>
+  source === 'workshop'
+    ? 'i-heroicons-academic-cap'
+    : source === 'spectacle'
+      ? 'i-heroicons-sparkles'
+      : 'i-heroicons-calendar-days'
+
+const itemsFiltre = computed(() =>
+  sourcesPresentes.value.map((source) => ({
+    label: t(`program.source.${source}`),
+    value: source,
+    icon: iconeSource(source),
+  }))
+)
+
+const entreesFiltrees = computed(() =>
+  filtresActifs.value.length === 0
+    ? entrees.value
+    : entrees.value.filter((e) => filtresActifs.value.includes(e.source))
+)
+
+const journees = computed(() => grouperParJournee(entreesFiltrees.value))
 
 const couleurSource = (source: EntreeProgramme['source']) =>
   source === 'workshop' ? 'info' : source === 'spectacle' ? 'primary' : 'neutral'

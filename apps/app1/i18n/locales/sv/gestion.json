@@ -93,7 +93,8 @@
       "title": "Funktioner",
       "volunteers_description": "Aktivera hantering av volontärer för denna upplaga",
       "workshops_description": "Låt deltagare och volontärer skapa workshops",
-      "treasury_description": "Följ upplagans utgifter och intäkter, med bokföringskonton."
+      "treasury_description": "Följ upplagans utgifter och intäkter, med bokföringskonton.",
+      "program_description": "Tidslinje för upplagan: workshops, föreställningar och andra programpunkter samlade på en sida."
     },
     "general_info": {
       "description": "Redigera namn, datum, tidszon och adress för ditt evenemang.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Biljettförsäljning — övriga intäkter"
       },
       "settled_amount": "varav {amount} betalt"
+    },
+    "program": {
+      "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",
+      "add": "Lägg till ett objekt",
+      "edit_title": "Redigera objekt",
+      "empty": "Inga programpunkter ännu.",
+      "sources_hint": "Workshops och föreställningar visas här men redigeras på sina egna sidor. Synligheten ställs dock in här.",
+      "confirm_delete": "Ta bort ”{title}” från programmet?",
+      "error_end_before_start": "Sluttiden måste vara efter starttiden.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Föreställning",
+        "element": "Program"
+      },
+      "field": {
+        "title": "Titel",
+        "description": "Beskrivning",
+        "start": "Start",
+        "place": "Plats på kartan",
+        "published": "Synlig för publiken",
+        "start_time": "Starttid",
+        "end_time": "Sluttid",
+        "place_map": "På områdeskartan",
+        "place_free": "Fritext",
+        "select_place": "Välj en zon eller markör",
+        "location_placeholder": "T.ex. framför baren",
+        "end_optional": "Slut (valfritt)"
+      },
+      "workshop_always_public": "Workshops är alltid synliga för publiken.",
+      "column": {
+        "time": "Tid",
+        "title": "Titel",
+        "source": "Typ",
+        "place": "Plats",
+        "visibility": "Synlighet"
+      }
     }
   }
 }

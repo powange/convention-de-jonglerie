@@ -93,7 +93,8 @@
       "title": "Funktionen",
       "volunteers_description": "Verwaltung der Freiwilligen für diese Ausgabe aktivieren",
       "workshops_description": "Teilnehmern und Freiwilligen ermöglichen, Workshops zu erstellen",
-      "treasury_description": "Ausgaben und Einnahmen der Ausgabe verfolgen, mit Buchungskonten."
+      "treasury_description": "Ausgaben und Einnahmen der Ausgabe verfolgen, mit Buchungskonten.",
+      "program_description": "Zeitplan der Ausgabe: Workshops, Shows und weitere Programmpunkte auf einer einzigen Seite."
     },
     "general_info": {
       "description": "Bearbeiten Sie Name, Daten, Zeitzone und Adresse Ihrer Veranstaltung.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Ticketing — sonstige Erlöse"
       },
       "settled_amount": "davon {amount} beglichen"
+    },
+    "program": {
+      "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",
+      "add": "Element hinzufügen",
+      "edit_title": "Element bearbeiten",
+      "empty": "Noch keine Programmpunkte.",
+      "sources_hint": "Workshops und Shows erscheinen hier, werden aber auf ihren eigenen Seiten bearbeitet. Ihre Sichtbarkeit wird jedoch hier eingestellt.",
+      "confirm_delete": "„{title}“ aus dem Programm entfernen?",
+      "error_end_before_start": "Das Ende muss nach dem Beginn liegen.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Show",
+        "element": "Programm"
+      },
+      "field": {
+        "title": "Titel",
+        "description": "Beschreibung",
+        "start": "Beginn",
+        "place": "Ort auf der Karte",
+        "published": "Öffentlich sichtbar",
+        "start_time": "Startzeit",
+        "end_time": "Endzeit",
+        "place_map": "Auf dem Geländeplan",
+        "place_free": "Freitext",
+        "select_place": "Zone oder Markierung wählen",
+        "location_placeholder": "z. B. vor der Bar",
+        "end_optional": "Ende (optional)"
+      },
+      "workshop_always_public": "Workshops sind immer öffentlich sichtbar.",
+      "column": {
+        "time": "Uhrzeit",
+        "title": "Titel",
+        "source": "Typ",
+        "place": "Ort",
+        "visibility": "Sichtbarkeit"
+      }
     }
   }
 }

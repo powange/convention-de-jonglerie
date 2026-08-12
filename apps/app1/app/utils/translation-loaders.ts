@@ -290,6 +290,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     sv: () => import('~~/i18n/locales/sv/gestion-tasks.json'),
   },
   // Clés UI de la carte (partagées public + gestion, namespace map.*)
+  program: {
+    en: () => import('~~/i18n/locales/en/program.json'),
+    da: () => import('~~/i18n/locales/da/program.json'),
+    de: () => import('~~/i18n/locales/de/program.json'),
+    es: () => import('~~/i18n/locales/es/program.json'),
+    fr: () => import('~~/i18n/locales/fr/program.json'),
+    it: () => import('~~/i18n/locales/it/program.json'),
+    nl: () => import('~~/i18n/locales/nl/program.json'),
+    pl: () => import('~~/i18n/locales/pl/program.json'),
+    pt: () => import('~~/i18n/locales/pt/program.json'),
+    ru: () => import('~~/i18n/locales/ru/program.json'),
+    uk: () => import('~~/i18n/locales/uk/program.json'),
+    cs: () => import('~~/i18n/locales/cs/program.json'),
+    sv: () => import('~~/i18n/locales/sv/program.json'),
+  },
   map: {
     en: () => import('~~/i18n/locales/en/map.json'),
     da: () => import('~~/i18n/locales/da/map.json'),

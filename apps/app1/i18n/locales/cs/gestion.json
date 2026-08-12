@@ -93,7 +93,8 @@
       "title": "Funkce",
       "volunteers_description": "Povolit správu dobrovolníků pro tuto edici",
       "workshops_description": "Umožnit účastníkům a dobrovolníkům vytvářet workshopy",
-      "treasury_description": "Sledovat náklady a výnosy ročníku s účetním zařazením."
+      "treasury_description": "Sledovat náklady a výnosy ročníku s účetním zařazením.",
+      "program_description": "Časová osa ročníku: workshopy, představení a další body programu na jedné stránce."
     },
     "general_info": {
       "description": "Upravte název, data, časové pásmo a adresu vaší akce.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Vstupenky — ostatní výnosy"
       },
       "settled_amount": "z toho {amount} uhrazeno"
+    },
+    "program": {
+      "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",
+      "add": "Přidat položku",
+      "edit_title": "Upravit položku",
+      "empty": "Zatím žádné body programu.",
+      "sources_hint": "Workshopy a představení se zde zobrazují, ale upravují se na vlastní stránce. Jejich viditelnost se však nastavuje zde.",
+      "confirm_delete": "Odebrat „{title}“ z programu?",
+      "error_end_before_start": "Konec musí být po začátku.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Představení",
+        "element": "Program"
+      },
+      "field": {
+        "title": "Název",
+        "description": "Popis",
+        "start": "Začátek",
+        "place": "Místo na mapě",
+        "published": "Viditelné pro veřejnost",
+        "start_time": "Čas začátku",
+        "end_time": "Čas konce",
+        "place_map": "Na mapě areálu",
+        "place_free": "Volný text",
+        "select_place": "Vyberte zónu nebo značku",
+        "location_placeholder": "Např. před barem",
+        "end_optional": "Konec (nepovinné)"
+      },
+      "workshop_always_public": "Workshopy jsou vždy viditelné pro veřejnost.",
+      "column": {
+        "time": "Čas",
+        "title": "Název",
+        "source": "Typ",
+        "place": "Místo",
+        "visibility": "Viditelnost"
+      }
     }
   }
 }

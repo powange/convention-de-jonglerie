@@ -6,6 +6,8 @@
       "workshop": "Workshop",
       "spectacle": "Spectacle",
       "element": "Programme"
-    }
+    },
+    "no_result": "Aucun élément ne correspond à ce filtre.",
+    "no_result_hint": "Décochez une case pour élargir la sélection."
   }
 }

@@ -1,0 +1,13 @@
+{
+  "program": {
+    "empty": "Programmet är ännu inte publicerat.",
+    "no_end_time": "Sluttid ej angiven",
+    "source": {
+      "workshop": "Workshop",
+      "spectacle": "Föreställning",
+      "element": "Program"
+    },
+    "no_result": "Inga poster matchar detta filter.",
+    "no_result_hint": "Avmarkera en ruta för att bredda urvalet."
+  }
+}

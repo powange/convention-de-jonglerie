@@ -93,7 +93,8 @@
       "title": "Features",
       "volunteers_description": "Enable volunteer management for this edition",
       "workshops_description": "Allow participants and volunteers to create workshops",
-      "treasury_description": "Track the edition's expenses and income, with accounting codes."
+      "treasury_description": "Track the edition's expenses and income, with accounting codes.",
+      "program_description": "Timeline of the edition: workshops, shows and other programme moments, gathered on a single page."
     },
     "general_info": {
       "description": "Edit the name, dates, timezone and address of your event.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Ticketing — other income"
       },
       "settled_amount": "including {amount} settled"
+    },
+    "program": {
+      "description": "Build the edition's timeline: workshops, shows and other moments.",
+      "add": "Add an item",
+      "edit_title": "Edit item",
+      "empty": "No programme items yet.",
+      "sources_hint": "Workshops and shows appear here but are edited from their own pages. Their visibility, however, is set on this timeline.",
+      "confirm_delete": "Remove “{title}” from the programme?",
+      "error_end_before_start": "The end must be after the start.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Show",
+        "element": "Programme"
+      },
+      "field": {
+        "title": "Title",
+        "description": "Description",
+        "start": "Start",
+        "place": "Location on the map",
+        "published": "Visible to the public",
+        "start_time": "Start time",
+        "end_time": "End time",
+        "place_map": "On the site map",
+        "place_free": "Free text",
+        "select_place": "Choose a zone or a marker",
+        "location_placeholder": "E.g. in front of the bar",
+        "end_optional": "End (optional)"
+      },
+      "workshop_always_public": "Workshops are always visible to the public.",
+      "column": {
+        "time": "Time",
+        "title": "Title",
+        "source": "Type",
+        "place": "Location",
+        "visibility": "Visibility"
+      }
     }
   }
 }

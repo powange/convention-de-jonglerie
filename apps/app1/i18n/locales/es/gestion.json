@@ -93,7 +93,8 @@
       "title": "Funcionalidades",
       "volunteers_description": "Permitir la gestión de voluntarios para esta edición",
       "workshops_description": "Permitir a los participantes y voluntarios crear talleres",
-      "treasury_description": "Seguir los gastos e ingresos de la edición, con imputación contable."
+      "treasury_description": "Seguir los gastos e ingresos de la edición, con imputación contable.",
+      "program_description": "Cronología de la edición: workshops, espectáculos y otros momentos del programa, reunidos en una sola página."
     },
     "general_info": {
       "description": "Edite el nombre, las fechas, la zona horaria y la dirección de su evento.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Entradas — otros ingresos"
       },
       "settled_amount": "de los cuales {amount} abonados"
+    },
+    "program": {
+      "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",
+      "add": "Añadir un elemento",
+      "edit_title": "Editar el elemento",
+      "empty": "Aún no hay elementos en el programa.",
+      "sources_hint": "Los workshops y los espectáculos aparecen aquí pero se editan desde su propia página. Su visibilidad, en cambio, se ajusta en esta cronología.",
+      "confirm_delete": "¿Eliminar «{title}» del programa?",
+      "error_end_before_start": "El final debe ser posterior al inicio.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Espectáculo",
+        "element": "Programa"
+      },
+      "field": {
+        "title": "Título",
+        "description": "Descripción",
+        "start": "Inicio",
+        "place": "Lugar en el mapa",
+        "published": "Visible para el público",
+        "start_time": "Hora de inicio",
+        "end_time": "Hora de fin",
+        "place_map": "En el mapa del recinto",
+        "place_free": "Texto libre",
+        "select_place": "Elegir una zona o un marcador",
+        "location_placeholder": "Ej.: delante del bar",
+        "end_optional": "Fin (opcional)"
+      },
+      "workshop_always_public": "Los workshops siempre son visibles para el público.",
+      "column": {
+        "time": "Hora",
+        "title": "Título",
+        "source": "Tipo",
+        "place": "Lugar",
+        "visibility": "Visibilidad"
+      }
     }
   }
 }

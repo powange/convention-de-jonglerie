@@ -93,7 +93,8 @@
       "title": "Funkcje",
       "volunteers_description": "Włącz zarządzanie wolontariuszami dla tej edycji",
       "workshops_description": "Pozwól uczestnikom i wolontariuszom tworzyć warsztaty",
-      "treasury_description": "Śledź koszty i przychody edycji wraz z dekretacją księgową."
+      "treasury_description": "Śledź koszty i przychody edycji wraz z dekretacją księgową.",
+      "program_description": "Oś czasu edycji: warsztaty, pokazy i inne punkty programu zebrane na jednej stronie."
     },
     "general_info": {
       "description": "Edytuj nazwę, daty, strefę czasową i adres swojego wydarzenia.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Bilety — pozostałe przychody"
       },
       "settled_amount": "w tym {amount} opłacone"
+    },
+    "program": {
+      "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",
+      "add": "Dodaj element",
+      "edit_title": "Edytuj element",
+      "empty": "Brak elementów programu.",
+      "sources_hint": "Warsztaty i pokazy pojawiają się tutaj, ale edytuje się je na ich własnych stronach. Widoczność ustawia się jednak tutaj.",
+      "confirm_delete": "Usunąć „{title}” z programu?",
+      "error_end_before_start": "Koniec musi być po początku.",
+      "source": {
+        "workshop": "Warsztat",
+        "spectacle": "Pokaz",
+        "element": "Program"
+      },
+      "field": {
+        "title": "Tytuł",
+        "description": "Opis",
+        "start": "Początek",
+        "place": "Miejsce na mapie",
+        "published": "Widoczne publicznie",
+        "start_time": "Godzina rozpoczęcia",
+        "end_time": "Godzina zakończenia",
+        "place_map": "Na mapie terenu",
+        "place_free": "Dowolny tekst",
+        "select_place": "Wybierz strefę lub znacznik",
+        "location_placeholder": "Np. przed barem",
+        "end_optional": "Koniec (opcjonalnie)"
+      },
+      "workshop_always_public": "Warsztaty są zawsze widoczne publicznie.",
+      "column": {
+        "time": "Godzina",
+        "title": "Tytuł",
+        "source": "Typ",
+        "place": "Miejsce",
+        "visibility": "Widoczność"
+      }
     }
   }
 }
