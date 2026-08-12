@@ -111,7 +111,8 @@
       "general_info_description": "Rediger navn, datoer og adresse",
       "map_description": "Definer zonerne på områdekortet",
       "services_description": "Administrer tilgængelige tjenester og faciliteter",
-      "title": "Information"
+      "title": "Information",
+      "program_description": "Sammensæt tidslinjen: workshops, shows og andre programpunkter."
     },
     "lost_found_active_description": "Deltagere kan rapportere tabte og fundne genstande",
     "lost_found_description": "Se og administrere fundne eller tabte genstande",

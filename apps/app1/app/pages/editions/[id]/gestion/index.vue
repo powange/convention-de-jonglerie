@@ -97,6 +97,17 @@
                 color="violet"
               />
 
+              <!-- Programme. Même rang que dans le panneau latéral, juste avant la carte du
+                   site : les deux décrivent ce qui se passe et où. -->
+              <ManagementNavigationCard
+                v-if="edition.programEnabled"
+                :to="`/editions/${edition.id}/gestion/program`"
+                icon="i-heroicons-calendar-days"
+                :title="$t('edition.program')"
+                :description="$t('gestion.infos.program_description')"
+                color="amber"
+              />
+
               <!-- Carte du site -->
               <ManagementNavigationCard
                 v-if="edition.siteMapEnabled"

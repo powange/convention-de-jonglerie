@@ -111,7 +111,8 @@
       "general_info_description": "Redigera namn, datum och adress",
       "map_description": "Definiera zonerna på områdeskartan",
       "services_description": "Hantera tillgängliga tjänster och faciliteter",
-      "title": "Information"
+      "title": "Information",
+      "program_description": "Sätt samman tidslinjen: workshops, föreställningar och andra moment."
     },
     "lost_found_active_description": "Deltagarna kan rapportera borttappade och upphittade föremål",
     "lost_found_description": "Visa och hantera hittegods eller förlorade föremål",
