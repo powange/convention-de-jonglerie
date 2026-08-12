@@ -82,6 +82,12 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion\/artists/,
       translations: ['artists'],
     },
+    // Gestion du programme : la frise réunit trois modules, d'où les libellés partagés du
+    // domaine public en plus des clés de composition.
+    {
+      pattern: /^\/editions\/\d+\/gestion\/program/,
+      translations: ['program'],
+    },
     // Gestion appel à spectacles : survey (sondages) + shows-call (clés publiques
     // partagées shows_call.*) + gestion-shows-call (détail management gestion.shows_call.*)
     {
@@ -98,6 +104,11 @@ export function getTranslationsToLoad(path: string): string[] {
     {
       pattern: /^\/editions\/\d+\/map/,
       translations: ['map'],
+    },
+    // Programme public : la frise de l'édition
+    {
+      pattern: /^\/editions\/\d+\/program/,
+      translations: ['program'],
     },
     // Bénévolat public (page d'inscription/candidature) : domaine volunteers partagé
     {
@@ -279,6 +290,21 @@ export const translationLoaders: Record<string, Record<string, () => Promise<any
     sv: () => import('~~/i18n/locales/sv/gestion-tasks.json'),
   },
   // Clés UI de la carte (partagées public + gestion, namespace map.*)
+  program: {
+    en: () => import('~~/i18n/locales/en/program.json'),
+    da: () => import('~~/i18n/locales/da/program.json'),
+    de: () => import('~~/i18n/locales/de/program.json'),
+    es: () => import('~~/i18n/locales/es/program.json'),
+    fr: () => import('~~/i18n/locales/fr/program.json'),
+    it: () => import('~~/i18n/locales/it/program.json'),
+    nl: () => import('~~/i18n/locales/nl/program.json'),
+    pl: () => import('~~/i18n/locales/pl/program.json'),
+    pt: () => import('~~/i18n/locales/pt/program.json'),
+    ru: () => import('~~/i18n/locales/ru/program.json'),
+    uk: () => import('~~/i18n/locales/uk/program.json'),
+    cs: () => import('~~/i18n/locales/cs/program.json'),
+    sv: () => import('~~/i18n/locales/sv/program.json'),
+  },
   map: {
     en: () => import('~~/i18n/locales/en/map.json'),
     da: () => import('~~/i18n/locales/da/map.json'),

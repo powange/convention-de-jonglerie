@@ -70,6 +70,7 @@ export default wrapApiHandler(
       artistsEnabled,
       ticketingEnabled,
       workshopsEnabled,
+      programEnabled,
       workshopLocationsFreeInput,
       siteMapEnabled,
       tasksEnabled,
@@ -178,6 +179,7 @@ export default wrapApiHandler(
     if (artistsEnabled !== undefined) updatedData.artistsEnabled = artistsEnabled
     if (ticketingEnabled !== undefined) updatedData.ticketingEnabled = ticketingEnabled
     if (workshopsEnabled !== undefined) updatedData.workshopsEnabled = workshopsEnabled
+    if (programEnabled !== undefined) updatedData.programEnabled = programEnabled
     if (workshopLocationsFreeInput !== undefined)
       updatedData.workshopLocationsFreeInput = workshopLocationsFreeInput
     if (siteMapEnabled !== undefined) updatedData.siteMapEnabled = siteMapEnabled

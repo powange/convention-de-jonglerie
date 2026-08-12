@@ -1,0 +1,13 @@
+{
+  "program": {
+    "empty": "Program zatím nebyl zveřejněn.",
+    "no_end_time": "Čas konce neuveden",
+    "source": {
+      "workshop": "Workshop",
+      "spectacle": "Představení",
+      "element": "Program"
+    },
+    "no_result": "Tomuto filtru neodpovídá žádná položka.",
+    "no_result_hint": "Zrušte zaškrtnutí pro rozšíření výběru."
+  }
+}

@@ -93,6 +93,7 @@
       "title": "Fonctionnalités",
       "volunteers_description": "Permettre la gestion des bénévoles pour cette édition",
       "workshops_description": "Permettre aux participants et bénévoles de créer des workshops",
+      "program_description": "Frise horaire de l'édition : workshops, spectacles et autres moments du programme, réunis sur une seule page.",
       "treasury_description": "Suivre les charges et produits de l'édition, avec imputation comptable."
     },
     "general_info": {
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Billetterie — autres produits"
       },
       "settled_amount": "dont {amount} réglé"
+    },
+    "program": {
+      "description": "Composez la frise horaire de l'édition : workshops, spectacles et autres moments.",
+      "add": "Ajouter un élément",
+      "edit_title": "Modifier l'élément",
+      "empty": "Aucun élément au programme pour l'instant.",
+      "sources_hint": "Les workshops et les spectacles apparaissent ici mais se modifient depuis leur propre page. Leur visibilité, elle, se règle sur cette frise.",
+      "confirm_delete": "Supprimer « {title} » du programme ?",
+      "error_end_before_start": "La fin doit être postérieure au début.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Spectacle",
+        "element": "Programme"
+      },
+      "field": {
+        "title": "Titre",
+        "description": "Description",
+        "start": "Début",
+        "place": "Lieu sur la carte",
+        "published": "Visible du public",
+        "start_time": "Heure de début",
+        "end_time": "Heure de fin",
+        "place_map": "Sur la carte du site",
+        "place_free": "Texte libre",
+        "select_place": "Choisir une zone ou un repère",
+        "location_placeholder": "Ex. : devant la buvette",
+        "end_optional": "Fin (facultative)"
+      },
+      "workshop_always_public": "Les workshops sont toujours visibles du public.",
+      "column": {
+        "time": "Heure",
+        "title": "Titre",
+        "source": "Type",
+        "place": "Lieu",
+        "visibility": "Visibilité"
+      }
     }
   }
 }

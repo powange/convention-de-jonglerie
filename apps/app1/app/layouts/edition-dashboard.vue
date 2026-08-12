@@ -315,6 +315,15 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-lucide-link',
           to: `/editions/${editionId.value}/gestion/external-links`,
         },
+        ...(edition.value?.programEnabled
+          ? [
+              {
+                label: t('edition.program'),
+                icon: 'i-heroicons-calendar-days',
+                to: `/editions/${editionId.value}/gestion/program`,
+              },
+            ]
+          : []),
         ...(edition.value?.siteMapEnabled
           ? [
               {

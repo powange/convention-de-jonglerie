@@ -211,13 +211,13 @@ model AiConfig {
   provider String @default("lmstudio") // "lmstudio", "anthropic", "ollama"
 
   // LM Studio
-  lmstudioBaseUrl     String  @default("http://host.docker.internal:1234")
+  lmstudioBaseUrl       String  @default("http://host.docker.internal:1234")
   /// Adresse de secours, essayée quand la première est injoignable — machine éteinte, port fermé,
   /// service redémarré. Elle ne prend pas le relais sur une expiration : dans ce cas la première
   /// répond, elle est seulement lente, et basculer ne ferait que doubler l'attente.
   lmstudioBackupBaseUrl String?
-  lmstudioModelId     String? // ID du modèle vision sélectionné (référence AiModel.modelId)
-  lmstudioTextModelId String? // ID du modèle texte sélectionné
+  lmstudioModelId       String? // ID du modèle vision sélectionné (référence AiModel.modelId)
+  lmstudioTextModelId   String? // ID du modèle texte sélectionné
 
   // Anthropic
   anthropicApiKey String? @db.Text

@@ -1,0 +1,13 @@
+{
+  "program": {
+    "empty": "Het programma is nog niet gepubliceerd.",
+    "no_end_time": "Eindtijd niet opgegeven",
+    "source": {
+      "workshop": "Workshop",
+      "spectacle": "Show",
+      "element": "Programma"
+    },
+    "no_result": "Geen enkel item voldoet aan dit filter.",
+    "no_result_hint": "Vink een vakje uit om de selectie te verbreden."
+  }
+}

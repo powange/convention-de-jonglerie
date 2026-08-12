@@ -93,7 +93,8 @@
       "title": "Functies",
       "volunteers_description": "Beheer van vrijwilligers voor deze editie inschakelen",
       "workshops_description": "Deelnemers en vrijwilligers toestaan om workshops te maken",
-      "treasury_description": "Volg de uitgaven en inkomsten van de editie, met boekhoudkundige codes."
+      "treasury_description": "Volg de uitgaven en inkomsten van de editie, met boekhoudkundige codes.",
+      "program_description": "Tijdlijn van de editie: workshops, shows en andere programmamomenten, samen op één pagina."
     },
     "general_info": {
       "description": "Bewerk de naam, data, tijdzone en het adres van uw evenement.",
@@ -633,6 +634,42 @@
         "TICKETING_OTHER": "Ticketing — overige inkomsten"
       },
       "settled_amount": "waarvan {amount} voldaan"
+    },
+    "program": {
+      "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",
+      "add": "Item toevoegen",
+      "edit_title": "Item bewerken",
+      "empty": "Nog geen programmaonderdelen.",
+      "sources_hint": "Workshops en shows verschijnen hier, maar worden op hun eigen pagina bewerkt. Hun zichtbaarheid stel je wel hier in.",
+      "confirm_delete": "'{title}' uit het programma verwijderen?",
+      "error_end_before_start": "Het einde moet na het begin liggen.",
+      "source": {
+        "workshop": "Workshop",
+        "spectacle": "Show",
+        "element": "Programma"
+      },
+      "field": {
+        "title": "Titel",
+        "description": "Beschrijving",
+        "start": "Begin",
+        "place": "Locatie op de kaart",
+        "published": "Zichtbaar voor publiek",
+        "start_time": "Begintijd",
+        "end_time": "Eindtijd",
+        "place_map": "Op de plattegrond",
+        "place_free": "Vrije tekst",
+        "select_place": "Kies een zone of markering",
+        "location_placeholder": "Bijv. voor de bar",
+        "end_optional": "Einde (optioneel)"
+      },
+      "workshop_always_public": "Workshops zijn altijd zichtbaar voor het publiek.",
+      "column": {
+        "time": "Tijd",
+        "title": "Titel",
+        "source": "Type",
+        "place": "Locatie",
+        "visibility": "Zichtbaarheid"
+      }
     }
   }
 }

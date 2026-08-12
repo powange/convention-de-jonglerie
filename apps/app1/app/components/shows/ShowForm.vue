@@ -237,12 +237,9 @@
             />
           </UFormField>
 
-          <!-- Visibilité publique -->
-          <USwitch
-            v-model="formData.isPublic"
-            :label="$t('gestion.shows.is_public')"
-            :description="$t('gestion.shows.is_public_hint')"
-          />
+          <!-- La visibilité publique se règle depuis la frise du programme, où l'on voit d'un coup
+               d'œil ce qui est publié et ce qui ne l'est pas. La garder ici en doublon exposerait
+               à deux réglages du même état, à deux endroits, avec le risque qu'ils divergent. -->
         </div>
       </UCard>
 

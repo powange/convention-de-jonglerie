@@ -99,6 +99,7 @@ export interface Edition {
   artistsEnabled?: boolean
   ticketingEnabled?: boolean
   workshopsEnabled?: boolean
+  programEnabled?: boolean
   siteMapEnabled?: boolean
   tasksEnabled?: boolean
   stockEnabled?: boolean

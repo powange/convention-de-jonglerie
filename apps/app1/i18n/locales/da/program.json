@@ -1,0 +1,13 @@
+{
+  "program": {
+    "empty": "Programmet er endnu ikke offentliggjort.",
+    "no_end_time": "Sluttidspunkt ikke angivet",
+    "source": {
+      "workshop": "Workshop",
+      "spectacle": "Show",
+      "element": "Program"
+    },
+    "no_result": "Ingen elementer matcher dette filter.",
+    "no_result_hint": "Fjern et flueben for at udvide udvalget."
+  }
+}

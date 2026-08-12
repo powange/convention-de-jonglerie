@@ -1,0 +1,13 @@
+{
+  "program": {
+    "empty": "Program nie został jeszcze opublikowany.",
+    "no_end_time": "Nie podano godziny zakończenia",
+    "source": {
+      "workshop": "Warsztat",
+      "spectacle": "Pokaz",
+      "element": "Program"
+    },
+    "no_result": "Żaden element nie pasuje do tego filtra.",
+    "no_result_hint": "Odznacz pole, aby poszerzyć wybór."
+  }
+}

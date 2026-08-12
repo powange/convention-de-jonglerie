@@ -1,0 +1,13 @@
+{
+  "program": {
+    "empty": "O programa ainda não foi publicado.",
+    "no_end_time": "Hora de fim não indicada",
+    "source": {
+      "workshop": "Workshop",
+      "spectacle": "Espetáculo",
+      "element": "Programa"
+    },
+    "no_result": "Nenhum elemento corresponde a este filtro.",
+    "no_result_hint": "Desmarque uma caixa para alargar a seleção."
+  }
+}

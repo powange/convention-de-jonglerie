@@ -1,0 +1,45 @@
+/// Élément de programmation qui n'est ni un atelier ni un spectacle : un repas, une scène
+/// ouverte, l'ouverture de l'accueil, un concert.
+///
+/// Le programme d'une édition se compose de trois sources — `Workshop`, `Show` et ces éléments —
+/// que l'affichage réunit en une seule frise. Cette table n'existe donc pas pour concurrencer les
+/// deux autres, mais pour accueillir ce qu'elles ne savent pas représenter : les ateliers portent
+/// un nombre de places, les spectacles des artistes et des besoins techniques, et forcer un repas
+/// dans l'un ou l'autre reviendrait à traîner des champs vides et une étiquette fausse.
+model EditionProgramItem {
+  id        Int     @id @default(autoincrement())
+  edition   Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  editionId Int
+
+  title       String  @db.VarChar(200)
+  description String? @db.Text
+
+  startDateTime DateTime
+  /// Facultative : bien des moments d'un programme n'ont pas de fin annoncée — un accueil qui
+  /// ouvre, une scène ouverte qui dure ce qu'elle dure. Exiger une heure de fin obligerait à en
+  /// inventer une, que la frise afficherait ensuite comme une certitude.
+  endDateTime   DateTime?
+
+  /// Lieu en clair, pour les éditions sans carte du site ou pour un lieu qui n'y figure pas
+  /// (« devant la buvette »). Coexiste avec le rattachement à une zone ou un repère : quand les
+  /// deux sont renseignés, la carte fait foi et ce texte sert de précision.
+  locationName String?        @db.VarChar(150)
+  zone         EditionZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  zoneId       Int?
+  marker       EditionMarker? @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  markerId     Int?
+
+  /// Faux tant que l'élément est en préparation. Un programme se saisit sur des semaines : sans
+  /// cet état, chaque essai serait aussitôt visible du public.
+  isPublic Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([editionId])
+  /// Sert la lecture publique, qui filtre sur ces deux colonnes puis trie par date.
+  @@index([editionId, isPublic])
+  @@index([startDateTime])
+  @@index([zoneId])
+  @@index([markerId])
+}
