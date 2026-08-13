@@ -13,6 +13,17 @@
   >
     <template #body>
       <div class="space-y-4 w-full">
+        <!-- En tête, pour être lu avant d'avoir rempli quoi que ce soit : rien de ce qui sera
+             saisi ici ne partira. -->
+        <UAlert
+          v-if="props.apercu"
+          color="info"
+          variant="subtle"
+          icon="i-heroicons-eye"
+          :title="t('volunteers.preview_banner_title')"
+          :description="t('volunteers.preview_banner_description')"
+        />
+
         <!-- Section: Vos informations personnelles -->
         <div class="space-y-4 w-full">
           <h3
@@ -567,7 +578,7 @@
           size="lg"
           color="primary"
           :loading="applying"
-          :disabled="applying || !isFormValid"
+          :disabled="applying || !isFormValid || props.apercu"
           icon="i-heroicons-paper-airplane"
           @click="handleSubmit"
         >
@@ -633,6 +644,13 @@ interface Props {
   existingApplication?: any | null
   // Droits d'organisateur
   canManageEdition?: boolean
+  /**
+   * Aperçu : le formulaire se parcourt, mais ne s'envoie pas.
+   *
+   * Sert à relire son questionnaire avant d'ouvrir le recrutement. La garde n'est pas seulement
+   * ici : le point d'API refuse déjà toute candidature tant que les candidatures sont fermées.
+   */
+  apercu?: boolean
 }
 
 interface Emits {
@@ -1156,6 +1174,10 @@ const handleAllergiesChange = () => {
 }
 
 const handleSubmit = () => {
+  // En aperçu, rien ne part : le bouton est déjà désactivé, mais s'en remettre à l'état d'un
+  // bouton pour protéger une écriture serait fragile.
+  if (props.apercu) return
+
   // Activer l'affichage de toutes les erreurs lors de la soumission
   showAllErrors.value = true
 

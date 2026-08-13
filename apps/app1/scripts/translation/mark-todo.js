@@ -20,6 +20,8 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import { LOCALES_ROOTS } from './shared-config.js'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -35,6 +37,17 @@ const LOCALES_DIR = path.resolve(__dirname, '../../i18n/locales')
 const REPO_ROOT = path.resolve(__dirname, '../../../..')
 const REFERENCE_LANG = 'fr'
 const ALL_LANGS = ['cs', 'da', 'de', 'en', 'es', 'it', 'nl', 'pl', 'pt', 'ru', 'sv', 'uk']
+
+/**
+ * Dossiers français à scruter, relatifs à la racine du dépôt.
+ *
+ * Un layer porte ses propres traductions : n'observer que celui de l'application laissait
+ * reformuler un libellé français sans que les douze autres langues soient marquées, et les
+ * traductions périmées restaient en place sans que rien ne le signale.
+ */
+const CHEMINS_FR = LOCALES_ROOTS.map(
+  (racine) => `${path.relative(REPO_ROOT, racine.dir).split(path.sep).join('/')}/${REFERENCE_LANG}/`
+)
 
 // Couleurs pour le terminal
 const colors = {
@@ -199,9 +212,9 @@ function setNestedValue(obj, keyPath, value) {
 function detectModifiedKeys() {
   try {
     // Récupérer le diff des fichiers français non commités
-    const gitDiff = execSync('git diff HEAD -- i18n/locales/fr/', {
+    const gitDiff = execSync(`git diff HEAD -- ${CHEMINS_FR.join(' ')}`, {
       encoding: 'utf-8',
-      cwd: path.resolve(__dirname, '../..'),
+      cwd: REPO_ROOT,
     })
 
     if (!gitDiff.trim()) {
@@ -283,9 +296,9 @@ function extractAllKeys(obj, prefix = '') {
 function detectModifiedKeysAdvanced() {
   try {
     // Récupérer la liste des fichiers français modifiés
-    const modifiedFiles = execSync('git diff --name-only HEAD -- i18n/locales/fr/', {
+    const modifiedFiles = execSync(`git diff --name-only HEAD -- ${CHEMINS_FR.join(' ')}`, {
       encoding: 'utf-8',
-      cwd: path.resolve(__dirname, '../..'),
+      cwd: REPO_ROOT,
     })
       .trim()
       .split('\n')
@@ -350,16 +363,19 @@ function detectModifiedKeysAdvanced() {
  * Trouver le fichier qui contient une clé
  */
 function findFileForKey(lang, keyPath) {
-  const langDir = path.join(LOCALES_DIR, lang)
-  if (!fs.existsSync(langDir)) return null
+  // Toutes les racines, pas seulement celle de l'application : reformuler un libellé français
+  // porté par un layer ne marquait aucune autre langue, et les douze traductions restaient en
+  // place, périmées, sans que rien ne le signale.
+  for (const racine of LOCALES_ROOTS) {
+    const langDir = path.join(racine.dir, lang)
+    if (!fs.existsSync(langDir)) continue
 
-  const files = fs.readdirSync(langDir).filter((f) => f.endsWith('.json'))
-
-  for (const file of files) {
-    const filePath = path.join(langDir, file)
-    const data = loadJson(filePath)
-    if (data && getNestedValue(data, keyPath) !== undefined) {
-      return filePath
+    for (const file of fs.readdirSync(langDir).filter((f) => f.endsWith('.json'))) {
+      const filePath = path.join(langDir, file)
+      const data = loadJson(filePath)
+      if (data && getNestedValue(data, keyPath) !== undefined) {
+        return filePath
+      }
     }
   }
 

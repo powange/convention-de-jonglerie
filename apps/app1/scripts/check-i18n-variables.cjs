@@ -9,15 +9,32 @@
 const fs = require('fs')
 const path = require('path')
 
-const LOCALES_DIR = path.join(__dirname, '..', 'i18n', 'locales')
 const REFERENCE_LANG = 'fr'
 
+// Toutes les racines de traductions : celle de l'application, et celle de chaque layer qui en
+// porte une. Le découpage est le même que dans `translation/shared-config.js`, redit ici parce
+// que ce script est en CommonJS et ne peut pas importer ce module ESM.
+const LOCALES_ROOTS = [
+  path.join(__dirname, '..', 'i18n', 'locales'),
+  ...(() => {
+    const layersDir = path.join(__dirname, '..', '..', '..', 'layers')
+    if (!fs.existsSync(layersDir)) return []
+    return fs
+      .readdirSync(layersDir)
+      .map(layer => path.join(layersDir, layer, 'i18n', 'locales'))
+      .filter(dir => fs.existsSync(dir))
+  })(),
+]
+
 // Détection automatique de toutes les langues disponibles
-const SUPPORTED_LANGS = fs.readdirSync(LOCALES_DIR)
-  .filter(file => {
-    const filePath = path.join(LOCALES_DIR, file)
-    return fs.statSync(filePath).isDirectory() && file !== REFERENCE_LANG
-  })
+const SUPPORTED_LANGS = [
+  ...new Set(
+    LOCALES_ROOTS.flatMap(racine =>
+      fs.readdirSync(racine).filter(file => fs.statSync(path.join(racine, file)).isDirectory())
+    )
+  ),
+]
+  .filter(lang => lang !== REFERENCE_LANG)
   .sort()
 
 // Extrait toutes les variables {xxx} d'une chaîne
@@ -49,29 +66,29 @@ function collectKeysWithVariables(obj, prefix = '') {
 
 // Charge tous les fichiers JSON d'une langue et collecte les clés avec variables
 function loadLanguageKeysWithVariables(lang) {
-  const langDir = path.join(LOCALES_DIR, lang)
   const allKeys = {}
 
-  if (!fs.existsSync(langDir)) {
-    return allKeys
-  }
+  for (const racine of LOCALES_ROOTS) {
+    const langDir = path.join(racine, lang)
+    if (!fs.existsSync(langDir)) continue
 
-  const files = fs.readdirSync(langDir).filter(f => f.endsWith('.json'))
+    const files = fs.readdirSync(langDir).filter(f => f.endsWith('.json'))
 
-  for (const file of files) {
-    const filePath = path.join(langDir, file)
-    const domain = file.replace('.json', '')
+    for (const file of files) {
+      const filePath = path.join(langDir, file)
+      const domain = file.replace('.json', '')
 
-    try {
-      const content = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-      const keysWithVars = collectKeysWithVariables(content)
+      try {
+        const content = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+        const keysWithVars = collectKeysWithVariables(content)
 
-      // Préfixer les clés avec le domaine pour éviter les collisions
-      for (const [key, data] of Object.entries(keysWithVars)) {
-        allKeys[`${domain}.${key}`] = data
+        // Préfixer les clés avec le domaine pour éviter les collisions
+        for (const [key, data] of Object.entries(keysWithVars)) {
+          allKeys[`${domain}.${key}`] = data
+        }
+      } catch (error) {
+        console.error(`❌ Erreur lors de la lecture de ${filePath}:`, error.message)
       }
-    } catch (error) {
-      console.error(`❌ Erreur lors de la lecture de ${filePath}:`, error.message)
     }
   }
 
