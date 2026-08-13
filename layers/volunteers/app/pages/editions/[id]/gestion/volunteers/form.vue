@@ -76,6 +76,32 @@
             </p>
           </div>
         </UCard>
+
+        <!-- Le formulaire ne se juge vraiment que du côté du bénévole : cet encart évite d'aller
+             chercher l'adresse publique à la main, ou de publier le recrutement pour l'essayer.
+             La page publique s'ouvre en aperçu tant que les candidatures sont fermées. -->
+        <UCard v-if="edition && edition.volunteersMode === 'INTERNAL'" variant="subtle">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-start gap-2">
+              <UIcon name="i-heroicons-eye" class="mt-0.5 shrink-0 text-gray-500" />
+              <div>
+                <p class="font-medium">{{ $t('volunteers.preview_public_page') }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('volunteers.preview_public_page_hint') }}
+                </p>
+              </div>
+            </div>
+            <UButton
+              :to="`/editions/${editionId}/volunteers`"
+              target="_blank"
+              color="neutral"
+              variant="outline"
+              icon="i-heroicons-arrow-top-right-on-square"
+            >
+              {{ $t('volunteers.preview_public_page_action') }}
+            </UButton>
+          </div>
+        </UCard>
       </div>
     </div>
   </div>

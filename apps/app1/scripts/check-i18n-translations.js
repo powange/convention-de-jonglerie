@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url'
 import { parseArgs } from 'util'
 
 import {
-  LOCALES_DIR,
+  LOCALES_ROOTS,
+  listerLangues,
   loadLocaleFiles as sharedLoadLocaleFiles,
   writeLocaleFiles,
   flattenObject,
@@ -25,7 +26,6 @@ const CYAN = '\x1b[36m'
 const BOLD = '\x1b[1m'
 
 const projectRoot = path.resolve(__dirname, '..')
-const localesDir = LOCALES_DIR
 
 /**
  * Charge tous les fichiers de traduction depuis le dossier de locales
@@ -36,20 +36,11 @@ function loadLocaleFiles() {
   const locales = {}
 
   try {
-    // Vérifier que le dossier existe
-    if (!fs.existsSync(localesDir)) {
-      console.error(`${RED}Erreur: Le dossier ${localesDir} n'existe pas${RESET}`)
-      process.exit(1)
-    }
-
-    // Lister tous les dossiers de langue
-    const localeDirs = fs.readdirSync(localesDir).filter((item) => {
-      const itemPath = path.join(localesDir, item)
-      return fs.statSync(itemPath).isDirectory()
-    })
+    // Les traductions sont réparties entre l'application et les layers qui en portent.
+    const localeDirs = listerLangues()
 
     if (localeDirs.length === 0) {
-      console.error(`${RED}Erreur: Aucun dossier de langue trouvé dans ${localesDir}${RESET}`)
+      console.error(`${RED}Erreur: Aucun dossier de langue trouvé${RESET}`)
       process.exit(1)
     }
 
@@ -159,54 +150,42 @@ function compareFileStructure(referenceLocale = 'fr') {
   const misplacedKeys = {}
 
   try {
-    // Lister tous les dossiers de langue
-    const localeDirs = fs.readdirSync(localesDir).filter((item) => {
-      const itemPath = path.join(localesDir, item)
-      return fs.statSync(itemPath).isDirectory()
-    })
+    const localeDirs = listerLangues()
 
-    // Charger la structure fichier par fichier de la référence
-    const refDir = path.join(localesDir, referenceLocale)
-    if (!fs.existsSync(refDir)) {
-      return misplacedKeys
+    /**
+     * Emplacement de chaque clé d'une langue, racine comprise.
+     *
+     * La racine fait partie de l'emplacement : une clé rangée dans le `volunteers.json` du layer
+     * en français et dans celui de l'application en anglais serait introuvable à l'exécution,
+     * alors que les deux fichiers portent le même nom.
+     */
+    const emplacements = (locale) => {
+      const mapping = {}
+      for (const racine of LOCALES_ROOTS) {
+        const localeDir = path.join(racine.dir, locale)
+        if (!fs.existsSync(localeDir)) continue
+        for (const f of fs.readdirSync(localeDir).filter((f) => f.endsWith('.json'))) {
+          const content = JSON.parse(fs.readFileSync(path.join(localeDir, f), 'utf-8'))
+          const cible =
+            racine.id === 'app' ? f.replace('.json', '') : `${racine.id}:${f.replace('.json', '')}`
+          for (const key of Object.keys(flattenObject(content))) {
+            mapping[key] = cible
+          }
+        }
+      }
+      return mapping
     }
 
-    const refFiles = fs
-      .readdirSync(refDir)
-      .filter((f) => f.endsWith('.json'))
-      .map((f) => f.replace('.json', ''))
-
-    // Construire le mapping référence: clé -> fichier
-    const refMapping = {}
-    for (const fileName of refFiles) {
-      const filePath = path.join(refDir, `${fileName}.json`)
-      const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
-      const flat = flattenObject(content)
-      for (const key of Object.keys(flat)) {
-        refMapping[key] = fileName
-      }
+    const refMapping = emplacements(referenceLocale)
+    if (Object.keys(refMapping).length === 0) {
+      return misplacedKeys
     }
 
     // Comparer avec chaque langue
     for (const locale of localeDirs) {
       if (locale === referenceLocale) continue
 
-      const localeDir = path.join(localesDir, locale)
-      const localeFiles = fs
-        .readdirSync(localeDir)
-        .filter((f) => f.endsWith('.json'))
-        .map((f) => f.replace('.json', ''))
-
-      // Construire le mapping pour cette langue
-      const localeMapping = {}
-      for (const fileName of localeFiles) {
-        const filePath = path.join(localeDir, `${fileName}.json`)
-        const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
-        const flat = flattenObject(content)
-        for (const key of Object.keys(flat)) {
-          localeMapping[key] = fileName
-        }
-      }
+      const localeMapping = emplacements(locale)
 
       // Trouver les clés mal placées
       for (const [key, refFile] of Object.entries(refMapping)) {

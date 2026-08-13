@@ -58,7 +58,71 @@ export const SPLIT_CONFIG = {
   survey: ['survey'],
 }
 
-export const LOCALES_DIR = path.join(__dirname, '..', '..', 'i18n', 'locales')
+const APP_LOCALES_DIR = path.join(__dirname, '..', '..', 'i18n', 'locales')
+const LAYERS_DIR = path.join(__dirname, '..', '..', '..', '..', 'layers')
+
+/**
+ * Dossier de locales de l'application.
+ *
+ * Conservé pour les scripts qui n'ont besoin que d'énumérer les langues — elles sont les mêmes
+ * partout. Pour lire ou écrire des clés, passer par `LOCALES_ROOTS` : une partie d'entre elles
+ * vit dans les layers.
+ */
+export const LOCALES_DIR = APP_LOCALES_DIR
+
+/**
+ * Tous les dossiers de locales du dépôt : celui de l'application, et celui de chaque layer qui
+ * en déclare un.
+ *
+ * Les layers portent leurs propres traductions, au même titre que leurs pages et leurs points
+ * d'API. Ne regarder que le dossier de l'application faisait dire à l'outillage « 0 clé
+ * manquante » alors qu'une langue entière ignorait un fichier du layer — l'écart ne se voyait
+ * qu'à l'exécution, sur une clé affichée en français au milieu d'une page anglaise.
+ *
+ * L'identifiant sert à savoir où réécrire une clé : une clé lue dans le layer doit y retourner,
+ * et non atterrir dans un fichier de même nom côté application, qui l'aurait dupliquée.
+ */
+export const LOCALES_ROOTS = [
+  { id: 'app', dir: APP_LOCALES_DIR },
+  ...(fs.existsSync(LAYERS_DIR)
+    ? fs
+        .readdirSync(LAYERS_DIR)
+        .map((layer) => ({ id: layer, dir: path.join(LAYERS_DIR, layer, 'i18n', 'locales') }))
+        .filter((racine) => fs.existsSync(racine.dir))
+    : []),
+]
+
+/** Sépare `"volunteers:volunteers"` en sa racine et son fichier de domaine. */
+export function decouperCible(cible) {
+  const separateur = cible.indexOf(':')
+  if (separateur === -1) return { racineId: 'app', fichier: cible }
+  return { racineId: cible.slice(0, separateur), fichier: cible.slice(separateur + 1) }
+}
+
+/** Réunit les langues présentes, quelle que soit la racine qui les porte. */
+export function listerLangues() {
+  const langues = new Set()
+  for (const racine of LOCALES_ROOTS) {
+    if (!fs.existsSync(racine.dir)) continue
+    for (const item of fs.readdirSync(racine.dir)) {
+      if (fs.statSync(path.join(racine.dir, item)).isDirectory()) langues.add(item)
+    }
+  }
+  return [...langues].sort()
+}
+
+/**
+ * Racine où réside déjà un fichier de domaine, à défaut de mapping explicite.
+ *
+ * Sans cette recherche, une écriture sans mapping renverrait `volunteers.json` dans
+ * l'application, où un second fichier du même nom serait apparu à côté de celui du layer.
+ */
+function racineDuFichier(fichier, locale) {
+  const existante = LOCALES_ROOTS.find((racine) =>
+    fs.existsSync(path.join(racine.dir, locale, `${fichier}.json`))
+  )
+  return existante ? existante.id : 'app'
+}
 
 /**
  * Détermine le fichier de domaine cible pour une clé donnée
@@ -90,50 +154,49 @@ export function sortKeys(obj) {
  * @param {object} fileMapping - (Optionnel) Mapping clé -> fichier source. Si fourni, utilise ce mapping au lieu de SPLIT_CONFIG
  */
 export function writeLocaleFiles(locale, data, fileMapping = null) {
-  const localeDir = path.join(LOCALES_DIR, locale)
-
-  // S'assurer que le dossier de la langue existe
-  if (!fs.existsSync(localeDir)) {
-    fs.mkdirSync(localeDir, { recursive: true })
-  }
-
-  // Organiser les données par fichier de domaine
+  // Organiser les données par cible « racine:fichier »
   const fileContents = {}
 
-  // Déterminer quels fichiers nous allons créer
+  // Déterminer quelles cibles nous allons écrire
   if (fileMapping) {
     // Utiliser le mapping fourni (provenant de la langue de référence)
-    const targetFiles = new Set(Object.values(fileMapping))
-    for (const file of targetFiles) {
-      fileContents[file] = {}
+    for (const cible of new Set(Object.values(fileMapping))) {
+      fileContents[cible] = {}
     }
   } else {
     // Utiliser SPLIT_CONFIG par défaut (rétrocompatibilité)
     for (const file of Object.keys(SPLIT_CONFIG)) {
-      fileContents[file] = {}
+      fileContents[`${racineDuFichier(file, locale)}:${file}`] = {}
     }
   }
 
-  // Répartir les clés dans les bons fichiers
+  // Répartir les clés dans les bonnes cibles
   for (const [key, value] of Object.entries(data)) {
-    let targetFile
+    let cible
     if (fileMapping && fileMapping[key]) {
       // Utiliser le mapping si disponible
-      targetFile = fileMapping[key]
+      cible = fileMapping[key]
     } else {
-      // Sinon utiliser SPLIT_CONFIG
-      targetFile = getTargetFile(key)
+      // Sinon utiliser SPLIT_CONFIG, en respectant la racine où le fichier vit déjà
+      const file = getTargetFile(key)
+      cible = `${racineDuFichier(file, locale)}:${file}`
     }
 
-    if (!fileContents[targetFile]) {
-      fileContents[targetFile] = {}
+    if (!fileContents[cible]) {
+      fileContents[cible] = {}
     }
-    fileContents[targetFile][key] = value
+    fileContents[cible][key] = value
   }
 
   // Écrire chaque fichier de domaine
   let updatedFiles = 0
-  for (const [file, content] of Object.entries(fileContents)) {
+  for (const [cible, content] of Object.entries(fileContents)) {
+    const { racineId, fichier: file } = decouperCible(cible)
+    const racine = LOCALES_ROOTS.find((r) => r.id === racineId) || LOCALES_ROOTS[0]
+    const localeDir = path.join(racine.dir, locale)
+    if (Object.keys(content).length > 0 && !fs.existsSync(localeDir)) {
+      fs.mkdirSync(localeDir, { recursive: true })
+    }
     const filePath = path.join(localeDir, `${file}.json`)
     if (Object.keys(content).length > 0) {
       // Préserver l'ordre des clés du fichier existant pour éviter tout diff de
@@ -191,38 +254,35 @@ function deepMerge(target, source) {
  * @returns {object|null} Les données fusionnées, ou { data, fileMapping } si withFileMapping=true
  */
 export function loadLocaleFiles(locale, withFileMapping = false) {
-  const localeDir = path.join(LOCALES_DIR, locale)
-
-  if (!fs.existsSync(localeDir) || !fs.statSync(localeDir).isDirectory()) {
-    return null
-  }
-
-  const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
-
-  if (files.length === 0) {
-    return null
-  }
-
-  // Fusionner tous les fichiers de cette langue
+  // Fusionner tous les fichiers de cette langue, dans toutes les racines
   const mergedData = {}
-  const fileMapping = {} // clé aplatie -> nom du fichier source (sans .json)
+  const fileMapping = {} // clé aplatie -> "racine:fichier" d'origine
+  let fichiersLus = 0
 
-  for (const file of files) {
-    const filePath = path.join(localeDir, file)
-    const content = fs.readFileSync(filePath, 'utf8')
-    const data = JSON.parse(content)
+  for (const racine of LOCALES_ROOTS) {
+    const localeDir = path.join(racine.dir, locale)
+    if (!fs.existsSync(localeDir) || !fs.statSync(localeDir).isDirectory()) continue
 
-    // Si on veut le mapping, enregistrer de quel fichier vient chaque clé
-    if (withFileMapping) {
-      const fileName = file.replace('.json', '')
-      const flatData = flattenObject(data)
-      for (const key of Object.keys(flatData)) {
-        fileMapping[key] = fileName
+    for (const file of fs.readdirSync(localeDir).filter((f) => f.endsWith('.json'))) {
+      const data = JSON.parse(fs.readFileSync(path.join(localeDir, file), 'utf8'))
+      fichiersLus++
+
+      // Si on veut le mapping, enregistrer d'où vient chaque clé — racine comprise, sans quoi
+      // une réécriture la déplacerait d'un layer vers l'application.
+      if (withFileMapping) {
+        const cible = `${racine.id}:${file.replace('.json', '')}`
+        for (const key of Object.keys(flattenObject(data))) {
+          fileMapping[key] = cible
+        }
       }
-    }
 
-    // Utiliser deepMerge au lieu de Object.assign pour préserver les structures imbriquées
-    deepMerge(mergedData, data)
+      // Utiliser deepMerge au lieu de Object.assign pour préserver les structures imbriquées
+      deepMerge(mergedData, data)
+    }
+  }
+
+  if (fichiersLus === 0) {
+    return null
   }
 
   return withFileMapping ? { data: mergedData, fileMapping } : mergedData

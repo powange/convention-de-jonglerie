@@ -229,13 +229,27 @@
             <div
               v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && !myApplication"
             >
-              <UAlert
-                v-if="!volunteersInfo?.open"
-                color="warning"
-                variant="subtle"
-                icon="i-heroicons-lock-closed"
-                :title="t('volunteers.closed_message')"
-              />
+              <div v-if="!volunteersInfo?.open" class="space-y-2">
+                <UAlert
+                  color="warning"
+                  variant="subtle"
+                  icon="i-heroicons-lock-closed"
+                  :title="t('volunteers.closed_message')"
+                />
+                <!-- Réservé à qui gère le recrutement : relire son questionnaire avant de
+                     l'ouvrir, sans le rendre soumettable pour autant. -->
+                <div v-if="apercuFormulaire" class="flex justify-end">
+                  <UButton
+                    size="sm"
+                    color="neutral"
+                    variant="outline"
+                    icon="i-heroicons-eye"
+                    @click="openApplyModal"
+                  >
+                    {{ t('volunteers.preview_form') }}
+                  </UButton>
+                </div>
+              </div>
               <div v-else>
                 <UCard
                   variant="subtle"
@@ -276,6 +290,7 @@
         :user="authStore.user"
         :applying="volunteersApplying"
         :can-manage-edition="canManageEdition"
+        :apercu="apercuFormulaire"
         @close="closeApplyModal"
         @submit="applyAsVolunteer"
       />
@@ -422,6 +437,29 @@ const canManageEdition = computed(() => {
 
 // Message d'info quand la page est visible grâce aux droits d'éditeur/gestionnaire
 // (page publique désactivée OU candidatures fermées)
+/**
+ * Droit d'entrer dans les coulisses du recrutement.
+ *
+ * Même règle que l'accès à la page en aperçu, plus haut : gérer les bénévoles suffit, éditer
+ * l'édition aussi. Nommé une fois ici plutôt que recalculé à chaque endroit qui en dépend.
+ */
+const peutGererBenevoles = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return (
+    editionStore.canEditEdition(edition.value, authStore.user.id) ||
+    editionStore.canManageVolunteers(edition.value, authStore.user.id)
+  )
+})
+
+/**
+ * Aperçu du formulaire, quand les candidatures sont fermées.
+ *
+ * Un organisateur qui vient de composer son questionnaire doit pouvoir le relire tel que les
+ * bénévoles le verront, sans avoir à ouvrir le recrutement pour cela — donc sans exposer un
+ * recrutement qui n'est pas prêt. La soumission reste refusée, à l'écran comme au serveur.
+ */
+const apercuFormulaire = computed(() => !volunteersInfo.value?.open && peutGererBenevoles.value)
+
 const closedVisibilityReason = computed<string | null>(() => {
   if (!edition.value || !authStore.user?.id) return null
   const e = edition.value as { volunteersOpen?: boolean; volunteersPagePublic?: boolean }

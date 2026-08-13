@@ -4,10 +4,11 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import { LOCALES_ROOTS, listerLangues } from './shared-config.js'
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const LOCALES_DIR = path.join(__dirname, '..', '..', 'i18n', 'locales')
 const REFERENCE_LANG = 'fr' // Langue de référence
 
 /**
@@ -34,29 +35,26 @@ function deepMerge(target, source) {
 }
 
 /**
- * Charge tous les fichiers JSON d'un dossier de langue et les fusionne
+ * Charge tous les fichiers JSON d'une langue et les fusionne.
+ *
+ * Toutes les racines sont lues, pas seulement celle de l'application : les layers portent leurs
+ * propres traductions, et un `[TODO]` qui y dort ne serait jamais listé — donc jamais traduit.
  */
 function loadLocaleFiles(locale) {
-  const localeDir = path.join(LOCALES_DIR, locale)
-
-  if (!fs.existsSync(localeDir) || !fs.statSync(localeDir).isDirectory()) {
-    return null
-  }
-
-  const files = fs.readdirSync(localeDir).filter((file) => file.endsWith('.json'))
-
-  if (files.length === 0) {
-    return null
-  }
-
   const mergedData = {}
-  for (const file of files) {
-    const filePath = path.join(localeDir, file)
-    const content = fs.readFileSync(filePath, 'utf8')
-    deepMerge(mergedData, JSON.parse(content))
+  let fichiersLus = 0
+
+  for (const racine of LOCALES_ROOTS) {
+    const localeDir = path.join(racine.dir, locale)
+    if (!fs.existsSync(localeDir) || !fs.statSync(localeDir).isDirectory()) continue
+
+    for (const file of fs.readdirSync(localeDir).filter((f) => f.endsWith('.json'))) {
+      deepMerge(mergedData, JSON.parse(fs.readFileSync(path.join(localeDir, file), 'utf8')))
+      fichiersLus++
+    }
   }
 
-  return mergedData
+  return fichiersLus === 0 ? null : mergedData
 }
 
 // Couleurs pour l'affichage
@@ -103,14 +101,7 @@ function getNestedValue(obj, keyPath) {
  * Charge et analyse tous les fichiers de langue
  */
 function analyzeLanguageFiles() {
-  // Lister tous les dossiers de langue
-  const languageFiles = fs
-    .readdirSync(LOCALES_DIR)
-    .filter((item) => {
-      const itemPath = path.join(LOCALES_DIR, item)
-      return fs.statSync(itemPath).isDirectory()
-    })
-    .sort()
+  const languageFiles = listerLangues()
 
   console.log(`${colors.blue}${colors.bold}=== DIAGNOSTIC DES CLÉS [TODO] ===${colors.reset}\n`)
   console.log(`${colors.cyan}Langues détectées: ${languageFiles.join(', ')}${colors.reset}`)
