@@ -82,38 +82,6 @@
             @blur="program = program?.trim() || ''"
           />
         </UFormField>
-
-        <!-- Programme jour par jour -->
-        <div v-if="programDaysLoaded && programDays.length > 0" class="space-y-4">
-          <div>
-            <h3 class="font-semibold">{{ $t('gestion.about.program_days') }}</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              {{ $t('gestion.about.program_days_help') }}
-            </p>
-          </div>
-
-          <UFormField v-for="jour in programDays" :key="jour.date">
-            <template #label>
-              <span class="capitalize">{{ formatDayLabel(jour.date) }}</span>
-              <!-- Une journée sortie des dates n'est pas effacée : le dire évite de laisser
-                   croire qu'elle s'affichera encore publiquement. -->
-              <UBadge
-                v-if="jour.outsideDates"
-                color="warning"
-                variant="subtle"
-                size="sm"
-                class="ml-2"
-              >
-                {{ $t('gestion.about.program_day_outside') }}
-              </UBadge>
-            </template>
-            <MarkdownEditor
-              v-model="jour.content"
-              :placeholder="$t('gestion.about.program_day_placeholder')"
-              class="min-h-32"
-            />
-          </UFormField>
-        </div>
       </div>
 
       <!-- Bouton enregistrer -->
@@ -133,18 +101,12 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
-import {
-  buildProgramDays,
-  type ProgramDayRecord,
-  type ProgramDaySlot,
-} from '~~/shared/utils/program-days'
-
 definePageMeta({
   middleware: ['auth-protected'],
 })
 
 const route = useRoute()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const toast = useToast()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -164,31 +126,6 @@ const canEdit = computed(() => {
 const imageUrl = ref<string | null>(null)
 const description = ref('')
 const program = ref('')
-
-/**
- * Programme jour par jour.
- *
- * Les jours proposés se déduisent des dates de l'édition. Ceux qui en sont sortis — report,
- * correction de dates — restent présents et signalés : effacer un texte déjà écrit ferait perdre
- * du travail que personne n'a demandé à jeter.
- */
-const programDays = ref<ProgramDaySlot[]>([])
-
-/**
- * Vrai quand le programme par jour a bien été chargé.
- *
- * Sans ce garde-fou, un échec de chargement laissait la liste vide, et l'enregistrement — qui
- * remplace l'ensemble — aurait supprimé tout le programme existant. Un incident réseau passager
- * aurait suffi à effacer le travail de l'organisateur, sans le moindre signal.
- */
-const programDaysLoaded = ref(false)
-
-const formatDayLabel = (date: string) =>
-  new Date(`${date}T12:00:00Z`).toLocaleDateString(locale.value, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  })
 
 // Endpoint d'upload
 const uploadEndpoint = computed(() => ({
@@ -240,28 +177,6 @@ const onImageError = (error: string) => {
   })
 }
 
-/** Recompose la liste des jours dès que les dates de l'édition ou les contenus arrivent. */
-const chargerProgrammeParJour = async () => {
-  if (!edition.value) return
-  try {
-    const reponse = await $fetch<{ data: { days: ProgramDayRecord[] } }>(
-      `/api/editions/${editionId.value}/program-days`
-    )
-    programDays.value = buildProgramDays(
-      edition.value.startDate,
-      edition.value.endDate,
-      reponse.data.days
-    )
-    programDaysLoaded.value = true
-  } catch (error) {
-    // La page reste utilisable pour le programme général, mais les jours ne seront pas
-    // enregistrés : mieux vaut ne rien écrire que d'écraser ce qu'on n'a pas su lire.
-    console.error('Programme par jour non chargé :', error)
-    programDays.value = []
-    programDaysLoaded.value = false
-  }
-}
-
 // Sauvegarde
 const { execute: saveEdition, loading: savingEdition } = useApiAction(
   () => `/api/editions/${editionId.value}`,
@@ -282,30 +197,10 @@ const { execute: saveEdition, loading: savingEdition } = useApiAction(
   }
 )
 
-const { execute: saveDays, loading: savingDays } = useApiAction(
-  () => `/api/editions/${editionId.value}/program-days`,
-  {
-    method: 'PUT',
-    body: () => ({
-      days: programDays.value.map((jour) => ({ date: jour.date, content: jour.content })),
-    }),
-    silentSuccess: true,
-    errorMessages: { default: t('gestion.about.save_error') },
-  }
-)
+const saving = savingEdition
 
-const saving = computed(() => savingEdition.value || savingDays.value)
-
-/**
- * Les deux enregistrements sont séquentiels et non parallèles : un échec sur le second ne doit
- * pas laisser croire que rien n'a été enregistré, ni l'inverse. Un seul message conclut.
- */
 const save = async () => {
-  const okEdition = await saveEdition()
-  if (!okEdition) return
-  // Ne rien écrire tant que la lecture a échoué : l'enregistrement remplace l'ensemble.
-  const okDays = !programDaysLoaded.value || (await saveDays())
-  if (okDays) toast.add({ title: t('gestion.about.save_success'), color: 'success' })
+  if (await saveEdition()) toast.add({ title: t('gestion.about.save_success'), color: 'success' })
 }
 
 // Charger l'édition
@@ -317,18 +212,6 @@ onMounted(async () => {
       console.error('Failed to fetch edition:', error)
     }
   }
-  await chargerProgrammeParJour()
   initialLoading.value = false
 })
-
-// Les dates de l'édition peuvent changer ailleurs : la liste des jours suit, sans perdre ce qui
-// est déjà saisi à l'écran.
-watch(
-  () => [edition.value?.startDate, edition.value?.endDate],
-  () => {
-    if (!edition.value || initialLoading.value) return
-    const saisis = programDays.value.map((j) => ({ date: j.date, content: j.content }))
-    programDays.value = buildProgramDays(edition.value.startDate, edition.value.endDate, saisis)
-  }
-)
 </script>

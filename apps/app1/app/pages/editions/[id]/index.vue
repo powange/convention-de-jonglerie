@@ -164,48 +164,6 @@
             </div>
           </UCard>
 
-          <!-- Programme jour par jour : une carte par journée, sur le modèle du programme
-               général — repliée sur mobile, ouverte à partir du grand écran. Une seule carte
-               contenant tous les jours obligerait à dérouler l'ensemble pour en lire un. -->
-          <UCard v-for="jour in programDays || []" :key="jour.date" variant="subtle">
-            <!-- Version mobile/tablette (< xl) : Collapsible (replié < md, déplié md-lg) -->
-            <UCollapsible v-model:open="expandedDays[jour.date]" class="space-y-4 xl:hidden">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="group w-full justify-between p-0 hover:bg-transparent"
-                :ui="{
-                  trailingIcon:
-                    'group-data-[state=open]:rotate-180 transition-transform duration-200',
-                }"
-              >
-                <h3 class="text-lg font-semibold capitalize">{{ formatProgramDay(jour.date) }}</h3>
-                <UIcon
-                  name="i-heroicons-chevron-down"
-                  class="transition-transform duration-200 group-data-[state=open]:rotate-180"
-                />
-              </UButton>
-
-              <template #content>
-                <div class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
-                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <div v-html="jour.html" />
-                </div>
-              </template>
-            </UCollapsible>
-
-            <!-- Version desktop (≥ xl) : Toujours visible -->
-            <div class="hidden xl:block space-y-4">
-              <h3 class="text-lg font-semibold capitalize">{{ formatProgramDay(jour.date) }}</h3>
-              <div class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
-                <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="jour.html" />
-              </div>
-            </div>
-          </UCard>
-
           <!-- Spectacles publics -->
           <UCard v-if="publicShows && publicShows.length > 0" variant="subtle">
             <!-- Version mobile/tablette (< xl) : Collapsible -->
@@ -828,7 +786,6 @@ import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
 import { formaterHeure, formaterJournee, journeeDeProgramme } from '~~/shared/utils/fuseau-edition'
-import { buildProgramDays, type ProgramDayRecord } from '~~/shared/utils/program-days'
 
 const { formatDateTimeRange } = useDateFormat()
 
@@ -844,13 +801,6 @@ const showImageOverlay = ref(false)
 const isDescriptionExpanded = ref(false)
 const isProgramExpanded = ref(false)
 
-/**
- * Ouverture de chaque carte de journée, par date.
- *
- * Une entrée par jour plutôt qu'un état unique : replier un jour ne doit pas replier les autres,
- * et c'est tout l'intérêt d'avoir séparé les cartes.
- */
-const expandedDays = ref<Record<string, boolean>>({})
 const isServicesExpanded = ref(false)
 const isPracticalInfoExpanded = ref(false)
 const isLinksExpanded = ref(false)
@@ -1170,64 +1120,6 @@ const { data: programHtml } = await useAsyncData(`edition-program-${route.params
   }
   return await markdownToHtml(edition.value.program)
 })
-
-/**
- * Programme jour par jour, rendu côté serveur comme le programme général.
- *
- * Seuls les jours réellement écrits sont affichés : une journée sans contenu n'a rien à montrer,
- * et lister des titres vides encombrerait la lecture. Les jours sortis des dates de l'édition
- * n'apparaissent pas non plus au public — ils restent visibles en gestion, où ils peuvent être
- * repris ou vidés.
- */
-const { data: programDays } = await useAsyncData(
-  `edition-program-days-${route.params.id}`,
-  async () => {
-    if (!edition.value) return []
-    let enregistres: ProgramDayRecord[] = []
-    try {
-      const reponse = await $fetch<{ data: { days: ProgramDayRecord[] } }>(
-        `/api/editions/${route.params.id}/program-days`
-      )
-      enregistres = reponse.data.days
-    } catch {
-      return []
-    }
-    const jours = buildProgramDays(
-      edition.value.startDate,
-      edition.value.endDate,
-      enregistres
-    ).filter((jour) => !jour.outsideDates && jour.content.trim() !== '')
-
-    return Promise.all(
-      jours.map(async (jour) => ({ date: jour.date, html: await markdownToHtml(jour.content) }))
-    )
-  }
-)
-
-/**
- * Les journées suivent la même règle d'ouverture que les autres encarts : repliées sous `md`,
- * dépliées au-delà. Au-delà de `xl`, le repliable est masqué et la valeur n'a plus d'effet.
- *
- * Ce watcher est séparé de celui des autres cartes parce que celui-ci est `immediate` et
- * s'exécute pendant le setup, avant que `programDays` n'existe.
- */
-if (import.meta.client) {
-  const { width } = useWindowSize()
-  watch(
-    [width, programDays],
-    ([largeur, jours]) => {
-      for (const jour of jours || []) expandedDays.value[jour.date] = largeur >= 768
-    },
-    { immediate: true }
-  )
-}
-
-const formatProgramDay = (date: string) =>
-  new Date(`${date}T12:00:00Z`).toLocaleDateString(locale.value, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  })
 
 const isAttending = computed(() => (_editionId: number) => {
   return edition.value?.attendingUsers?.some((u) => u.id === authStore.user?.id) || false

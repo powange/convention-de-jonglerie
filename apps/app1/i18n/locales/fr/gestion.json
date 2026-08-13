@@ -6,11 +6,7 @@
       "save_error": "Erreur lors de la mise à jour des informations",
       "save_success": "Informations mises à jour avec succès",
       "title": "À propos",
-      "program_general_help": "Ce qui ne dépend pas d'une date : accès, tarifs, principes de vie commune.",
-      "program_days": "Programme jour par jour",
-      "program_days_help": "Une journée laissée vide n'apparaît pas publiquement.",
-      "program_day_placeholder": "Ateliers, spectacles, repas…",
-      "program_day_outside": "Hors dates de l'édition"
+      "program_general_help": "Ce qui ne dépend pas d'une date : accès, tarifs, principes de vie commune."
     },
     "ai_update": {
       "apply_selected": "Appliquer {count} modification(s)",
@@ -40,7 +36,6 @@
       "scope_days_count": "{count} journée(s) sur {total}",
       "scope_days_all": "Tout cocher",
       "scope_days_none": "Tout décocher",
-      "scope_day_already_filled": "— déjà renseignée",
       "program_days_failed_title": "aucune journée en échec | Une journée n'a pas pu être relevée | {count} journées n'ont pas pu être relevées",
       "program_days_failed_description": "Le modèle n'a pas répondu pour : {days}. Rien n'a changé pour ces journées — relancez l'analyse en ne cochant qu'elles.",
       "scope_services": "Services",

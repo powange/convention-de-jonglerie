@@ -6,11 +6,7 @@
       "save_error": "Błąd podczas aktualizacji informacji",
       "save_success": "Informacje zaktualizowane pomyślnie",
       "title": "O nas",
-      "program_general_help": "To, co nie zależy od daty: dojazd, ceny, zasady wspólnego pobytu.",
-      "program_days": "Program dzień po dniu",
-      "program_days_help": "Dzień pozostawiony pusty nie jest pokazywany publicznie.",
-      "program_day_placeholder": "Warsztaty, pokazy, posiłki…",
-      "program_day_outside": "Poza datami edycji"
+      "program_general_help": "To, co nie zależy od daty: dojazd, ceny, zasady wspólnego pobytu."
     },
     "ai_update": {
       "apply_selected": "Zastosuj {count} zmianę/zmian",
@@ -44,7 +40,6 @@
       "scope_days_count": "{count} z {total} dnia/dni",
       "scope_days_all": "Zaznacz wszystko",
       "scope_days_none": "Odznacz wszystko",
-      "scope_day_already_filled": "— już uzupełnione",
       "program_days_failed_title": "brak nieudanych dni | Nie udało się pobrać jednego dnia | Nie udało się pobrać {count} dni",
       "program_days_failed_description": "Model nie odpowiedział dla: {days}. Te dni pozostały bez zmian — uruchom analizę ponownie, zaznaczając tylko je.",
       "program_items_found": "Zaproponowano {count} element(ów) programu",

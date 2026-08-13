@@ -171,9 +171,6 @@
                     @update:model-value="basculerJournee(jour.date)"
                   />
                   <span class="text-sm capitalize">{{ jour.label }}</span>
-                  <span v-if="jour.dejaRenseignee" class="text-xs text-gray-400">
-                    {{ $t('gestion.ai_update.scope_day_already_filled') }}
-                  </span>
                 </div>
               </div>
 
@@ -531,38 +528,8 @@ const perimetreValide = computed(
       journeesSelectionnees.value.length > 0)
 )
 
-const currentProgramDays = ref<Record<string, string>>({})
-
-/**
- * Vrai seulement si les journées ont été lues avec succès.
- *
- * Sans ce drapeau, « pas encore chargé » et « aucune journée » sont indiscernables. L'endpoint
- * d'enregistrement remplaçant la totalité, appliquer une journée sur un état vide par erreur
- * supprimerait toutes les autres sans rien signaler. Tant qu'il est faux, on ne propose ni
- * n'enregistre aucune journée : les autres champs restent comparables normalement.
- */
-const programDaysLoaded = ref(false)
-
-const loadProgramDays = async () => {
-  try {
-    const reponse = await $fetch<{ data: { days: Array<{ date: string; content: string }> } }>(
-      `/api/editions/${editionId}/program-days`
-    )
-    currentProgramDays.value = Object.fromEntries(
-      reponse.data.days.map((jour) => [jour.date, jour.content])
-    )
-    programDaysLoaded.value = true
-  } catch {
-    // Un échec ne doit pas empêcher la comparaison des autres champs, mais il interdit de
-    // toucher aux journées : on ne sait pas ce qui existe déjà.
-    currentProgramDays.value = {}
-    programDaysLoaded.value = false
-  }
-}
-
 onMounted(() => {
   loadProviders()
-  loadProgramDays()
   if (!edition.value) {
     editionStore.fetchEditionById(editionId, { force: true })
   }
@@ -904,13 +871,12 @@ const formatProgramDayLabel = (date: string) =>
     month: 'long',
   })
 
-/** Journées de l'édition, avec ce qui est déjà renseigné : de quoi ne redemander que le manquant. */
+/** Journées de l'édition, à cocher pour l'extraction du programme. */
 const journeesDeLEdition = computed(() => {
   if (!edition.value) return []
   return editionDayKeys(edition.value.startDate, edition.value.endDate).map((date) => ({
     date,
     label: formatProgramDayLabel(date),
-    dejaRenseignee: !!currentProgramDays.value[date],
   }))
 })
 
@@ -1085,37 +1051,6 @@ const compareResults = (aiData: any) => {
         })
       }
     }
-
-    /**
-     * Programme par journée : une différence par jour, pas une pour l'ensemble.
-     *
-     * On ne propose que les journées effectivement mentionnées par l'IA. Celles déjà saisies
-     * qu'elle passe sous silence restent intactes — une source incomplète ne doit pas effacer un
-     * programme écrit à la main. Et une journée hors des dates de l'édition est ignorée : elle ne
-     * pourrait pas s'afficher côté public.
-     */
-    const joursDeLEdition = new Set(editionDayKeys(ed.startDate, ed.endDate))
-    const dejaProposes = new Set<string>()
-
-    for (const jour of programDaysLoaded.value && Array.isArray(aiData.edition.programDays)
-      ? aiData.edition.programDays
-      : []) {
-      const date = String(jour?.date || '')
-      const contenu = String(jour?.content || '').trim()
-      if (!contenu || !joursDeLEdition.has(date) || dejaProposes.has(date)) continue
-      dejaProposes.add(date)
-
-      const actuel = currentProgramDays.value[date] || ''
-      if (contenu === actuel) continue
-
-      diffs.push({
-        field: `programDay.${date}`,
-        label: `Programme du ${formatProgramDayLabel(date)}`,
-        currentValue: actuel,
-        newValue: contenu,
-        apply: !actuel,
-      })
-    }
   }
 
   return diffs
@@ -1208,12 +1143,8 @@ const applyUpdates = async () => {
     const editionUpdates: Record<string, any> = {}
     const conventionUpdates: Record<string, any> = {}
 
-    const journeesRetenues: Record<string, string> = {}
-
     for (const diff of selectedDifferences.value) {
-      if (diff.field.startsWith('programDay.')) {
-        journeesRetenues[diff.field.replace('programDay.', '')] = diff.newValue
-      } else if (diff.field.startsWith('edition.')) {
+      if (diff.field.startsWith('edition.')) {
         const key = diff.field.replace('edition.', '')
         editionUpdates[key] =
           diff.newValue === 'true' ? true : diff.newValue === 'false' ? false : diff.newValue
@@ -1229,27 +1160,6 @@ const applyUpdates = async () => {
         method: 'PUT',
         body: editionUpdates,
       })
-    }
-
-    // Le programme par journée s'enregistre en bloc : l'endpoint remplace l'ensemble. On repart
-    // donc des journées déjà saisies et on n'écrase que celles retenues, sinon valider une seule
-    // journée supprimerait toutes les autres.
-    if (Object.keys(journeesRetenues).length > 0) {
-      // Double barrière : la comparaison ne propose déjà rien sans lecture réussie, mais une
-      // journée sélectionnée avant un rechargement raté ne doit pas non plus passer ici.
-      if (!programDaysLoaded.value) {
-        throw new Error(
-          'Le programme par journée n’a pas pu être lu : les journées ne sont pas enregistrées.'
-        )
-      }
-      const fusion = { ...currentProgramDays.value, ...journeesRetenues }
-      await $fetch(`/api/editions/${editionId}/program-days`, {
-        method: 'PUT',
-        body: {
-          days: Object.entries(fusion).map(([date, content]) => ({ date, content })),
-        },
-      })
-      await loadProgramDays()
     }
 
     // Rafraîchir les données

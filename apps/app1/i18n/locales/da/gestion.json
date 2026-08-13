@@ -6,11 +6,7 @@
       "save_error": "Fejl ved opdatering af oplysninger",
       "save_success": "Oplysninger opdateret",
       "title": "Om",
-      "program_general_help": "Det, der ikke afhænger af en dato: adgang, priser, fælles leveregler.",
-      "program_days": "Program dag for dag",
-      "program_days_help": "En dag, der efterlades tom, vises ikke offentligt.",
-      "program_day_placeholder": "Workshops, forestillinger, måltider…",
-      "program_day_outside": "Uden for arrangementets datoer"
+      "program_general_help": "Det, der ikke afhænger af en dato: adgang, priser, fælles leveregler."
     },
     "ai_update": {
       "apply_selected": "Anvend {count} ændring(er)",
@@ -44,7 +40,6 @@
       "scope_days_count": "{count} af {total} dag(e)",
       "scope_days_all": "Vælg alle",
       "scope_days_none": "Fravælg alle",
-      "scope_day_already_filled": "— allerede udfyldt",
       "program_days_failed_title": "ingen mislykket dag | Én dag kunne ikke hentes | {count} dage kunne ikke hentes",
       "program_days_failed_description": "Modellen svarede ikke for: {days}. Der er ikke ændret noget for disse dage — kør analysen igen med kun disse valgt.",
       "program_items_found": "{count} programpunkt(er) foreslået",
