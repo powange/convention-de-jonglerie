@@ -104,9 +104,9 @@
         <template v-else-if="artistInfoLocal">
           <div class="prose prose-sm dark:prose-invert max-w-none">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <div :class="{ 'line-clamp-3': !artistInfoExpanded }" v-html="artistInfoPreviewHtml" />
+            <div ref="apercuInfos" :class="classeApercu" v-html="artistInfoPreviewHtml" />
             <UButton
-              v-if="!artistInfoExpanded"
+              v-if="!artistInfoExpanded && texteInfosDeborde"
               variant="ghost"
               color="primary"
               size="xs"
@@ -116,7 +116,7 @@
               {{ $t('common.see_more') }}...
             </UButton>
             <UButton
-              v-else
+              v-else-if="artistInfoExpanded"
               variant="ghost"
               color="primary"
               size="xs"
@@ -650,6 +650,7 @@ const artistInfoLocal = ref(edition.value?.artistInfo ?? '')
 const artistInfoDirty = computed(() => artistInfoLocal.value !== (edition.value?.artistInfo ?? ''))
 const editingArtistInfo = ref(false)
 const artistInfoExpanded = ref(false)
+
 const artistInfoPreviewHtml = ref('')
 
 const renderArtistInfoPreview = async () => {
@@ -663,6 +664,37 @@ const renderArtistInfoPreview = async () => {
     artistInfoPreviewHtml.value = ''
   }
 }
+
+/**
+ * « Voir plus » n'a de sens que si le texte est réellement tronqué.
+ *
+ * On le mesure plutôt que de compter des caractères : la troncature vient de `line-clamp-3`, qui
+ * dépend de la largeur, de la police et du contenu — deux phrases tiennent sur trois lignes ici et
+ * déborderaient sur un écran étroit. On compare donc la hauteur réelle du contenu à celle
+ * affichée, et seul l'écart décide.
+ */
+const apercuInfos = ref<HTMLElement | null>(null)
+const texteInfosDeborde = ref(false)
+
+// Sorti du gabarit pour que la balise tienne sur une ligne : la désactivation ESLint du `v-html`
+// porte sur la ligne suivante, et se perdrait si la balise était découpée.
+const classeApercu = computed(() => (artistInfoExpanded.value ? '' : 'line-clamp-3'))
+
+const mesurerDebordement = () => {
+  const el = apercuInfos.value
+  // Déplié, la troncature est levée : la mesure ne voudrait plus rien dire. C'est « Voir moins »
+  // qui s'affiche alors, sans condition.
+  if (!el || artistInfoExpanded.value) return
+  // Un pixel de tolérance : les arrondis de rendu créent un écart qui ne se voit pas.
+  texteInfosDeborde.value = el.scrollHeight - el.clientHeight > 1
+}
+
+// La largeur change avec la fenêtre, et le contenu après chaque enregistrement.
+useResizeObserver(apercuInfos, mesurerDebordement)
+watch([artistInfoPreviewHtml, artistInfoExpanded, editingArtistInfo], () =>
+  nextTick(mesurerDebordement)
+)
+onMounted(() => nextTick(mesurerDebordement))
 
 const { execute: saveArtistInfo, loading: savingArtistInfo } = useApiAction(
   () => `/api/editions/${editionId.value}/artist-info`,
