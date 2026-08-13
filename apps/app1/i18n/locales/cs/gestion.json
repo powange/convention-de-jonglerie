@@ -6,11 +6,7 @@
       "save_error": "Chyba při aktualizaci informací",
       "save_success": "Informace úspěšně aktualizovány",
       "title": "O akci",
-      "program_general_help": "Co nezávisí na datu: doprava, ceny, pravidla soužití.",
-      "program_days": "Program po dnech",
-      "program_days_help": "Den ponechaný prázdný se veřejně nezobrazuje.",
-      "program_day_placeholder": "Workshopy, představení, jídlo…",
-      "program_day_outside": "Mimo termín konání"
+      "program_general_help": "Co nezávisí na datu: doprava, ceny, pravidla soužití."
     },
     "ai_update": {
       "apply_selected": "Použít {count} změnu/změn",
@@ -44,7 +40,6 @@
       "scope_days_count": "{count} z {total} dne/dnů",
       "scope_days_all": "Vybrat vše",
       "scope_days_none": "Zrušit výběr",
-      "scope_day_already_filled": "— již vyplněno",
       "program_days_failed_title": "žádný neúspěšný den | Jeden den se nepodařilo načíst | Nepodařilo se načíst {count} dnů",
       "program_days_failed_description": "Model neodpověděl pro: {days}. U těchto dnů se nic nezměnilo — spusťte analýzu znovu a vyberte pouze je.",
       "program_items_found": "Navrženo {count} bodů programu",

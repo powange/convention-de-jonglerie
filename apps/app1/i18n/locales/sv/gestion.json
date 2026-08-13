@@ -6,11 +6,7 @@
       "save_error": "Fel vid uppdatering av information",
       "save_success": "Information uppdaterad",
       "title": "Om",
-      "program_general_help": "Det som inte beror på ett datum: hitta hit, priser, gemensamma regler.",
-      "program_days": "Program dag för dag",
-      "program_days_help": "En dag som lämnas tom visas inte offentligt.",
-      "program_day_placeholder": "Workshoppar, föreställningar, måltider…",
-      "program_day_outside": "Utanför konventets datum"
+      "program_general_help": "Det som inte beror på ett datum: hitta hit, priser, gemensamma regler."
     },
     "ai_update": {
       "apply_selected": "Tillämpa {count} ändring(ar)",
@@ -44,7 +40,6 @@
       "scope_days_count": "{count} av {total} dag(ar)",
       "scope_days_all": "Markera alla",
       "scope_days_none": "Avmarkera alla",
-      "scope_day_already_filled": "— redan ifylld",
       "program_days_failed_title": "ingen misslyckad dag | En dag kunde inte hämtas | {count} dagar kunde inte hämtas",
       "program_days_failed_description": "Modellen svarade inte för: {days}. Inget har ändrats för dessa dagar — kör analysen igen med endast dessa valda.",
       "program_items_found": "{count} programpunkt(er) föreslagna",

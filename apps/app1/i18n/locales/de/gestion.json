@@ -6,11 +6,7 @@
       "save_error": "Fehler beim Aktualisieren der Informationen",
       "save_success": "Informationen erfolgreich aktualisiert",
       "title": "Über uns",
-      "program_general_help": "Was nicht von einem Datum abhängt: Anfahrt, Preise, Regeln des Zusammenlebens.",
-      "program_days": "Programm nach Tagen",
-      "program_days_help": "Ein leer gelassener Tag wird öffentlich nicht angezeigt.",
-      "program_day_placeholder": "Workshops, Shows, Mahlzeiten…",
-      "program_day_outside": "Außerhalb der Veranstaltungsdaten"
+      "program_general_help": "Was nicht von einem Datum abhängt: Anfahrt, Preise, Regeln des Zusammenlebens."
     },
     "ai_update": {
       "apply_selected": "{count} Änderung(en) anwenden",
@@ -44,7 +40,6 @@
       "scope_days_count": "{count} von {total} Tag(en)",
       "scope_days_all": "Alle auswählen",
       "scope_days_none": "Alle abwählen",
-      "scope_day_already_filled": "— bereits ausgefüllt",
       "program_days_failed_title": "kein fehlgeschlagener Tag | Ein Tag konnte nicht erfasst werden | {count} Tage konnten nicht erfasst werden",
       "program_days_failed_description": "Das Modell hat für {days} nicht geantwortet. Für diese Tage hat sich nichts geändert — starten Sie die Analyse erneut und wählen Sie nur diese aus.",
       "program_items_found": "{count} Programmpunkt(e) vorgeschlagen",

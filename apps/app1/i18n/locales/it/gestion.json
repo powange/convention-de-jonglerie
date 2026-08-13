@@ -6,11 +6,7 @@
       "save_error": "Errore durante l'aggiornamento delle informazioni",
       "save_success": "Informazioni aggiornate con successo",
       "title": "Informazioni",
-      "program_general_help": "Ciò che non dipende da una data: accesso, tariffe, regole di convivenza.",
-      "program_days": "Programma giorno per giorno",
-      "program_days_help": "Una giornata lasciata vuota non viene mostrata al pubblico.",
-      "program_day_placeholder": "Laboratori, spettacoli, pasti…",
-      "program_day_outside": "Fuori dalle date dell'edizione"
+      "program_general_help": "Ciò che non dipende da una data: accesso, tariffe, regole di convivenza."
     },
     "ai_update": {
       "apply_selected": "Applica {count} modifica/e",
@@ -44,7 +40,6 @@
       "scope_days_count": "{count} di {total} giornata/e",
       "scope_days_all": "Seleziona tutto",
       "scope_days_none": "Deseleziona tutto",
-      "scope_day_already_filled": "— già compilata",
       "program_days_failed_title": "nessuna giornata fallita | Una giornata non è stata recuperata | {count} giornate non sono state recuperate",
       "program_days_failed_description": "Il modello non ha risposto per: {days}. Nulla è cambiato per quelle giornate — rilancia l'analisi selezionando solo quelle.",
       "program_items_found": "{count} elemento/i di programma proposto/i",

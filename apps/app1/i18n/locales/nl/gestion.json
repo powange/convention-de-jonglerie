@@ -6,11 +6,7 @@
       "save_error": "Fout bij het bijwerken van de informatie",
       "save_success": "Informatie succesvol bijgewerkt",
       "title": "Over",
-      "program_general_help": "Wat niet van een datum afhangt: bereikbaarheid, tarieven, leefregels.",
-      "program_days": "Programma per dag",
-      "program_days_help": "Een leeg gelaten dag wordt niet openbaar getoond.",
-      "program_day_placeholder": "Workshops, voorstellingen, maaltijden…",
-      "program_day_outside": "Buiten de data van de editie"
+      "program_general_help": "Wat niet van een datum afhangt: bereikbaarheid, tarieven, leefregels."
     },
     "ai_update": {
       "apply_selected": "{count} wijziging(en) toepassen",
@@ -44,7 +40,6 @@
       "scope_days_count": "{count} van {total} dag(en)",
       "scope_days_all": "Alles aanvinken",
       "scope_days_none": "Alles uitvinken",
-      "scope_day_already_filled": "— al ingevuld",
       "program_days_failed_title": "geen mislukte dag | Eén dag kon niet worden opgehaald | {count} dagen konden niet worden opgehaald",
       "program_days_failed_description": "Het model gaf geen antwoord voor: {days}. Voor die dagen is niets gewijzigd — start de analyse opnieuw met alleen die dagen aangevinkt.",
       "program_items_found": "{count} programmaonderdeel/-delen voorgesteld",
