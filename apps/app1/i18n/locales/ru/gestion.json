@@ -331,7 +331,8 @@
       "section_show": "Спектакль",
       "company_name": "Труппа / сценический псевдоним",
       "company_name_hint": "Название труппы или сценический псевдоним артиста, представляющего спектакль",
-      "company_name_placeholder": "Напр.: Жонглёрская труппа"
+      "company_name_placeholder": "Напр.: Жонглёрская труппа",
+      "toggle_acts": "Показать или скрыть номера"
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

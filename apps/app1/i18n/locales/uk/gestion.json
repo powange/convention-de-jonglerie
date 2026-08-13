@@ -331,7 +331,8 @@
       "section_show": "Виступ",
       "company_name": "Трупа / сценічний псевдонім",
       "company_name_hint": "Назва трупи або сценічний псевдонім артиста, який представляє виставу",
-      "company_name_placeholder": "Напр.: Жонглерська трупа"
+      "company_name_placeholder": "Напр.: Жонглерська трупа",
+      "toggle_acts": "Показати або сховати номери"
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

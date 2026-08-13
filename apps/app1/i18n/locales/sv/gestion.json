@@ -331,7 +331,8 @@
       "section_show": "Föreställningen",
       "company_name": "Kompani / artistnamn",
       "company_name_hint": "Namnet på kompaniet eller artistnamnet på artisten bakom föreställningen",
-      "company_name_placeholder": "T.ex. Jongleringskompaniet"
+      "company_name_placeholder": "T.ex. Jongleringskompaniet",
+      "toggle_acts": "Visa eller dölj numren"
     },
     "stock": {
       "available_now": "{available}/{total} tillgängliga",

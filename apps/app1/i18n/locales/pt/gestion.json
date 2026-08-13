@@ -331,7 +331,8 @@
       "section_show": "O espetáculo",
       "company_name": "Companhia / nome artístico",
       "company_name_hint": "Nome da companhia ou nome artístico do artista que apresenta o espetáculo",
-      "company_name_placeholder": "Ex.: Cia. das Maças"
+      "company_name_placeholder": "Ex.: Cia. das Maças",
+      "toggle_acts": "Mostrar ou ocultar os números"
     },
     "stock": {
       "available_now": "{available}/{total} disponível(eis)",

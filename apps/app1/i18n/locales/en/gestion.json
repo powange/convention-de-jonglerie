@@ -331,7 +331,8 @@
       "section_show": "The show",
       "company_name": "Company / stage name",
       "company_name_hint": "Name of the company or stage name of the artist behind the show",
-      "company_name_placeholder": "E.g. The Juggling Club"
+      "company_name_placeholder": "E.g. The Juggling Club",
+      "toggle_acts": "Show or hide the acts"
     },
     "stock": {
       "available_now": "{available}/{total} available",

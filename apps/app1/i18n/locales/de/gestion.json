@@ -331,7 +331,8 @@
       "section_show": "Die Show",
       "company_name": "Kompanie / Künstlername",
       "company_name_hint": "Name der Kompanie oder Künstlername des Artisten, der die Show trägt",
-      "company_name_placeholder": "Z. B. Jonglier-Kompanie"
+      "company_name_placeholder": "Z. B. Jonglier-Kompanie",
+      "toggle_acts": "Nummern ein- oder ausblenden"
     },
     "stock": {
       "available_now": "{available}/{total} verfügbar",
