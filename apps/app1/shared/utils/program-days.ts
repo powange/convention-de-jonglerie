@@ -1,29 +1,9 @@
 /**
- * Programme d'une édition, jour par jour.
+ * Découpage d'une édition en journées.
  *
- * Un programme unique convenait mal à une convention qui dure plusieurs jours : le détail d'un
- * samedi n'a rien à voir avec celui d'un dimanche. Le champ général subsiste pour ce qui ne se
- * rattache à aucune date — plan d'accès, tarifs, principes de vie commune.
+ * Sert à l'extraction du programme : le modèle est interrogé une journée à la fois, chaque appel
+ * ne posant qu'une question plutôt que d'exiger le tri de neuf sections d'un coup.
  */
-
-/** Une journée saisie, telle que la base la connaît. */
-export interface ProgramDayRecord {
-  /** Jour concerné, au format `AAAA-MM-JJ`. */
-  date: string
-  content: string
-}
-
-/** Une journée proposée à l'affichage ou à la saisie. */
-export interface ProgramDaySlot extends ProgramDayRecord {
-  /**
-   * Vrai quand ce jour ne tombe plus dans les dates de l'édition.
-   *
-   * Les dates d'une convention bougent — report, prolongation, correction de saisie. Le contenu
-   * déjà écrit n'est alors pas effacé : le supprimer sans un mot ferait perdre du travail que
-   * personne n'a demandé à jeter. Il est conservé et signalé.
-   */
-  outsideDates: boolean
-}
 
 /** `2026-09-08T22:00:00.000Z` → `2026-09-08`, en heure locale de l'édition. */
 function toDayKey(value: Date | string): string {
@@ -55,32 +35,4 @@ export function editionDayKeys(startDate: Date | string, endDate: Date | string)
     curseur.setUTCDate(curseur.getUTCDate() + 1)
   }
   return jours
-}
-
-/**
- * Assemble les jours à présenter : ceux de l'édition, plus ceux déjà écrits qui n'y tombent plus.
- *
- * Les seconds arrivent en fin de liste, signalés, plutôt que d'être perdus ou noyés au milieu.
- */
-export function buildProgramDays(
-  startDate: Date | string,
-  endDate: Date | string,
-  records: readonly ProgramDayRecord[]
-): ProgramDaySlot[] {
-  const parDate = new Map(records.map((r) => [r.date, r.content]))
-  const jours = editionDayKeys(startDate, endDate)
-
-  const slots: ProgramDaySlot[] = jours.map((date) => ({
-    date,
-    content: parDate.get(date) ?? '',
-    outsideDates: false,
-  }))
-
-  const dansLEdition = new Set(jours)
-  const orphelins = records
-    .filter((r) => !dansLEdition.has(r.date) && r.content.trim() !== '')
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .map((r) => ({ date: r.date, content: r.content, outsideDates: true }))
-
-  return [...slots, ...orphelins]
 }
