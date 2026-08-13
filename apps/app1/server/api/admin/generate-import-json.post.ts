@@ -549,6 +549,9 @@ export async function generateImportJson(
           // Des éléments, et non plus du texte par journée : le programme se compose désormais
           // d'entrées structurées, que l'écran de revue compare une à une à ce qui existe déjà.
           parsed.edition = { ...parsed.edition, programItems: resultat.elements }
+          // Sans cette recomposition, la modification reste dans un objet local : c'est
+          // `finalJson` qui part vers l'écran, et les éléments relevés se perdraient en silence.
+          finalJson = JSON.stringify(parsed, null, 2)
         } else {
           console.log('[GENERATE-IMPORT] Programme: aucune journée extraite')
         }
