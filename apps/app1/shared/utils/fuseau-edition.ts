@@ -113,6 +113,17 @@ export const journeeDeProgramme = (instant: string | Date, fuseau?: string | nul
 }
 
 /**
+ * Instant où s'achève une journée de programme `AAAA-MM-JJ`.
+ *
+ * C'est `HEURE_BASCULE_JOURNEE` du lendemain : la journée du 6 août court jusqu'à 3 h le 7. Sert à
+ * décider qu'un moment est terminé quand il n'annonce pas d'heure de fin.
+ */
+export const finDeJourneeDeProgramme = (journee: string, fuseau?: string | null): string => {
+  const dt = DateTime.fromISO(journee, { zone: fuseauUtilisable(fuseau) })
+  return dt.isValid ? dt.plus({ days: 1, hours: HEURE_BASCULE_JOURNEE }).toUTC().toISO()! : ''
+}
+
+/**
  * Libellé d'une journée, à partir soit d'une journée `AAAA-MM-JJ`, soit d'un instant.
  *
  * Les deux formes se présentent : les entêtes de la frise portent une journée nue, les bornes de

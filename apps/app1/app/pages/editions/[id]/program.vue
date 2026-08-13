@@ -19,13 +19,27 @@
       <!-- Filtres par source, sur le modèle de ceux de la carte : aucune case cochée vaut « tout
            afficher », ce qui évite d'avoir à cocher les trois pour revenir à l'état de départ.
            Masqués quand une seule source est présente : filtrer n'y aurait aucun effet utile. -->
-      <UCheckboxGroup
-        v-if="sourcesPresentes.length > 1"
-        v-model="filtresActifs"
-        :items="itemsFiltre"
-        orientation="horizontal"
-        size="md"
-      />
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <UCheckboxGroup
+          v-if="sourcesPresentes.length > 1"
+          v-model="filtresActifs"
+          :items="itemsFiltre"
+          orientation="horizontal"
+          size="md"
+        />
+
+        <!-- Ce qui est terminé encombre la lecture au moment où elle sert le plus : sur place, le
+             nez sur son téléphone. Proposé seulement s'il y a réellement quelque chose à révéler,
+             et sous `ClientOnly` puisque « passé » se juge à l'heure qu'il est. -->
+        <ClientOnly>
+          <UCheckbox
+            v-if="desMomentsPasses"
+            v-model="afficherPasses"
+            :label="$t('program.show_past')"
+            size="md"
+          />
+        </ClientOnly>
+      </div>
 
       <div v-if="chargementFrise" class="flex items-center justify-center py-12">
         <UIcon name="i-lucide-loader-2" class="h-8 w-8 animate-spin text-primary" />
@@ -36,8 +50,8 @@
         icon="i-heroicons-calendar-days"
         color="info"
         variant="soft"
-        :title="filtresActifs.length > 0 ? $t('program.no_result') : $t('program.empty')"
-        :description="filtresActifs.length > 0 ? $t('program.no_result_hint') : undefined"
+        :title="rienNAPasse ? $t('program.empty') : $t('program.no_result')"
+        :description="rienNAPasse ? undefined : $t('program.no_result_hint')"
       />
 
       <!-- Les horaires sont ceux de la convention : un visiteur situé dans un autre fuseau doit
@@ -119,6 +133,7 @@ import {
   formaterJournee,
 } from '~~/shared/utils/fuseau-edition'
 import {
+  estTermine,
   grouperParJournee,
   nomDuLieu,
   type EntreeProgramme,
@@ -186,6 +201,51 @@ const entrees = computed(() => donneesFrise.value?.data?.entrees ?? [])
 const fuseau = computed(() => donneesFrise.value?.data?.fuseau ?? null)
 
 /**
+ * Instant de référence pour décider de ce qui est passé.
+ *
+ * Une valeur figée plutôt que `new Date()` relu à chaque calcul : les moments disparaîtraient
+ * alors un par un au fil des recalculs, sans que rien ne le déclenche à l'écran. Elle avance
+ * toutes les minutes, ce qui suffit pour un programme.
+ */
+const maintenant = ref(new Date())
+let horloge: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  // Réaligné au montage : le rendu serveur a figé l'heure du serveur, qui a pu prendre de l'âge
+  // dans le temps d'acheminement de la page.
+  maintenant.value = new Date()
+  horloge = setInterval(() => (maintenant.value = new Date()), 60_000)
+})
+onBeforeUnmount(() => clearInterval(horloge))
+
+/**
+ * Les moments terminés sont masqués par défaut.
+ *
+ * Un programme se consulte pour savoir où aller ensuite : ce qui est fini n'encombre la lecture
+ * qu'au moment où elle est la plus utile, sur place, le nez sur son téléphone. Ils restent
+ * accessibles d'une case à cocher, pour retrouver le nom d'un spectacle de la veille.
+ */
+const afficherPasses = ref(false)
+
+const entreesVisibles = computed(() =>
+  afficherPasses.value
+    ? entrees.value
+    : entrees.value.filter((e) => !estTermine(e, maintenant.value, fuseau.value))
+)
+
+/** Vrai s'il y a réellement quelque chose à révéler : proposer une case sans effet égare. */
+const desMomentsPasses = computed(() =>
+  entrees.value.some((e) => estTermine(e, maintenant.value, fuseau.value))
+)
+
+/**
+ * Distingue « le programme est vide » de « tout est masqué ».
+ *
+ * Annoncer un programme non publié à qui vient de décocher une source, ou de laisser passer la
+ * dernière soirée, ferait croire que l'organisateur n'a rien saisi.
+ */
+const rienNAPasse = computed(() => entrees.value.length === 0)
+
+/**
  * Filtres par source.
  *
  * Même convention que les filtres de la carte : une sélection vide signifie « tout afficher ».
@@ -197,7 +257,7 @@ const filtresActifs = ref<EntreeProgramme['source'][]>([])
 /** Seules les sources réellement présentes sont proposées : filtrer sur du vide n'aide personne. */
 const sourcesPresentes = computed(() => {
   const ordre: EntreeProgramme['source'][] = ['workshop', 'spectacle', 'element']
-  const vues = new Set(entrees.value.map((e) => e.source))
+  const vues = new Set(entreesVisibles.value.map((e) => e.source))
   return ordre.filter((s) => vues.has(s))
 })
 
@@ -218,8 +278,8 @@ const itemsFiltre = computed(() =>
 
 const entreesFiltrees = computed(() =>
   filtresActifs.value.length === 0
-    ? entrees.value
-    : entrees.value.filter((e) => filtresActifs.value.includes(e.source))
+    ? entreesVisibles.value
+    : entreesVisibles.value.filter((e) => filtresActifs.value.includes(e.source))
 )
 
 const journees = computed(() => grouperParJournee(entreesFiltrees.value, fuseau.value))

@@ -9,6 +9,7 @@
     },
     "no_result": "Ningún elemento coincide con este filtro.",
     "no_result_hint": "Desmarque una casilla para ampliar la selección.",
-    "local_times": "Horarios en la hora local de la convención ({fuseau})."
+    "local_times": "Horarios en la hora local de la convención ({fuseau}).",
+    "show_past": "Mostrar los momentos pasados"
   }
 }

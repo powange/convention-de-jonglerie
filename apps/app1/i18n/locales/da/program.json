@@ -9,6 +9,7 @@
     },
     "no_result": "Ingen elementer matcher dette filter.",
     "no_result_hint": "Fjern et flueben for at udvide udvalget.",
-    "local_times": "Tidspunkter i konventets lokale tid ({fuseau})."
+    "local_times": "Tidspunkter i konventets lokale tid ({fuseau}).",
+    "show_past": "Vis tidligere programpunkter"
   }
 }

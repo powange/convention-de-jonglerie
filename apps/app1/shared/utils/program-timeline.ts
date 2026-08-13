@@ -11,7 +11,7 @@
  * minces et que ces règles soient vérifiables sans base de données.
  */
 
-import { journeeDeProgramme } from './fuseau-edition'
+import { finDeJourneeDeProgramme, journeeDeProgramme } from './fuseau-edition'
 
 /** D'où vient une entrée du programme. Sert à l'affichage (icône, couleur) et aux liens. */
 export type SourceProgramme = 'workshop' | 'spectacle' | 'element'
@@ -225,6 +225,28 @@ export function construireFriseProgramme(
   return entrees.sort(
     (x, y) => x.debut.localeCompare(y.debut) || x.titre.localeCompare(y.titre, 'fr')
   )
+}
+
+/**
+ * Vrai quand un moment est **terminé**, et non simplement commencé.
+ *
+ * La nuance compte pour qui consulte le programme sur place : masquer un gala parce qu'il a
+ * commencé il y a dix minutes ferait disparaître précisément ce que le visiteur cherche à
+ * retrouver.
+ *
+ * Sans heure de fin annoncée — un accueil qui ouvre, une scène ouverte qui dure ce qu'elle dure —
+ * on tient le moment pour terminé à la fin de sa journée de programme, et pas à son début : rien
+ * ne dit qu'il est fini, et le faire disparaître dès son ouverture serait le contraire du service
+ * rendu.
+ */
+export function estTermine(
+  entree: EntreeProgramme,
+  maintenant: Date | string,
+  fuseau?: string | null
+): boolean {
+  const fin = entree.fin ?? finDeJourneeDeProgramme(journeeDeProgramme(entree.debut, fuseau), fuseau)
+  if (!fin) return false
+  return new Date(fin).getTime() <= new Date(maintenant).getTime()
 }
 
 /**
