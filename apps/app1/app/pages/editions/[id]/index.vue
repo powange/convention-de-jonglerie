@@ -118,52 +118,6 @@
             </div>
           </UCard>
 
-          <!-- Programme de l'édition -->
-          <UCard v-if="edition.program && programHtml" variant="subtle">
-            <!-- Version mobile/tablette (< xl) : Collapsible (replié < md, déplié md-lg) -->
-            <UCollapsible v-model:open="isProgramExpanded" class="space-y-4 xl:hidden">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="group w-full justify-between p-0 hover:bg-transparent"
-                :ui="{
-                  trailingIcon:
-                    'group-data-[state=open]:rotate-180 transition-transform duration-200',
-                }"
-              >
-                <h3 class="text-lg font-semibold">{{ $t('edition.program') }}</h3>
-                <UIcon
-                  name="i-heroicons-chevron-down"
-                  class="transition-transform duration-200 group-data-[state=open]:rotate-180"
-                />
-              </UButton>
-
-              <template #content>
-                <div
-                  class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
-                  aria-labelledby="program-heading"
-                >
-                  <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                  <!-- eslint-disable-next-line vue/no-v-html -->
-                  <div v-html="programHtml" />
-                </div>
-              </template>
-            </UCollapsible>
-
-            <!-- Version desktop (≥ xl) : Toujours visible -->
-            <div class="hidden xl:block space-y-4">
-              <h3 class="text-lg font-semibold">{{ $t('edition.program') }}</h3>
-              <div
-                class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
-                aria-labelledby="program-heading"
-              >
-                <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="programHtml" />
-              </div>
-            </div>
-          </UCard>
-
           <UCard variant="subtle">
             <!-- Services - Version mobile/tablette (< xl) : Collapsible -->
             <UCollapsible v-model:open="isServicesExpanded" class="space-y-4 xl:hidden">
@@ -651,7 +605,6 @@ const { getTranslatedServicesByCategory } = useTranslatedConventionServices()
 const editionId = parseInt(route.params.id as string)
 const showImageOverlay = ref(false)
 const isDescriptionExpanded = ref(false)
-const isProgramExpanded = ref(false)
 
 const isServicesExpanded = ref(false)
 const isPracticalInfoExpanded = ref(false)
@@ -666,14 +619,12 @@ if (import.meta.client) {
     (newWidth) => {
       // Si écran >= md et < xl, déplier tous les collapsibles
       if (newWidth >= 768 && newWidth < 1280) {
-        isProgramExpanded.value = true
         isServicesExpanded.value = true
         isPracticalInfoExpanded.value = true
         isLinksExpanded.value = true
       }
       // Si écran < md, replier tous les collapsibles
       else if (newWidth < 768) {
-        isProgramExpanded.value = false
         isServicesExpanded.value = false
         isPracticalInfoExpanded.value = false
         isLinksExpanded.value = false
@@ -914,12 +865,6 @@ const { data: descriptionHtml } = await useAsyncData(
 )
 
 // Programme en HTML (rendu Markdown) - utilise useAsyncData pour le SSR
-const { data: programHtml } = await useAsyncData(`edition-program-${route.params.id}`, async () => {
-  if (!edition.value?.program) {
-    return ''
-  }
-  return await markdownToHtml(edition.value.program)
-})
 
 const isAttending = computed(() => (_editionId: number) => {
   return edition.value?.attendingUsers?.some((u) => u.id === authStore.user?.id) || false

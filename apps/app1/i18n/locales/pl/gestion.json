@@ -5,8 +5,7 @@
       "save": "Zapisz",
       "save_error": "Błąd podczas aktualizacji informacji",
       "save_success": "Informacje zaktualizowane pomyślnie",
-      "title": "O nas",
-      "program_general_help": "To, co nie zależy od daty: dojazd, ceny, zasady wspólnego pobytu."
+      "title": "O nas"
     },
     "ai_update": {
       "apply_selected": "Zastosuj {count} zmianę/zmian",

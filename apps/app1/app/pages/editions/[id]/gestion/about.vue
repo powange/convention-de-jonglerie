@@ -68,20 +68,6 @@
             @blur="description = description?.trim() || ''"
           />
         </UFormField>
-
-        <!-- Programme général : ce qui ne se rattache à aucune date -->
-        <UFormField
-          :label="$t('common.program')"
-          :description="$t('gestion.about.program_general_help')"
-          name="program"
-        >
-          <MarkdownEditor
-            v-model="program"
-            :placeholder="$t('components.edition_form.program_placeholder')"
-            class="min-h-40"
-            @blur="program = program?.trim() || ''"
-          />
-        </UFormField>
       </div>
 
       <!-- Bouton enregistrer -->
@@ -125,7 +111,6 @@ const canEdit = computed(() => {
 // État local
 const imageUrl = ref<string | null>(null)
 const description = ref('')
-const program = ref('')
 
 // Endpoint d'upload
 const uploadEndpoint = computed(() => ({
@@ -140,7 +125,6 @@ watch(
     if (newEdition) {
       imageUrl.value = newEdition.imageUrl || null
       description.value = newEdition.description || ''
-      program.value = newEdition.program || ''
     }
   },
   { immediate: true }
@@ -185,7 +169,6 @@ const { execute: saveEdition, loading: savingEdition } = useApiAction(
     body: () => ({
       imageUrl: imageUrl.value?.trim() || null,
       description: description.value?.trim() || null,
-      program: program.value?.trim() || null,
     }),
     silentSuccess: true,
     errorMessages: { default: t('gestion.about.save_error') },

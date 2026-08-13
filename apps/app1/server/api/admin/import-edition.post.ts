@@ -68,10 +68,9 @@ export const importSchema = z.object({
     officialWebsiteUrl: z.string().url().or(z.literal('')).nullable().optional(),
     jugglingEdgeUrl: z.string().url().or(z.literal('')).nullable().optional(),
     imageUrl: z.string().nullable().optional(),
-    // Programme général, et lien vers une page qui le détaille. Le déroulé horaire, lui, se
-    // compose désormais créneau par créneau sur la frise, et non plus dans un bloc de texte.
+    // Lien vers une page qui décrit le programme. Le programme lui-même se compose créneau par
+    // créneau sur la frise, et non plus dans un bloc de texte.
     programUrl: z.string().url().or(z.literal('')).nullable().optional(),
-    program: z.string().max(10000).nullable().optional(),
     // Caractéristiques booléennes
     hasFoodTrucks: z.boolean().optional(),
     hasKidsZone: z.boolean().optional(),
@@ -176,7 +175,6 @@ export default wrapApiHandler(
         name: validatedData.edition.name || null,
         description: validatedData.edition.description,
         programUrl: validatedData.edition.programUrl || null,
-        program: validatedData.edition.program || null,
         startDate,
         endDate,
         addressLine1: validatedData.edition.addressLine1,
