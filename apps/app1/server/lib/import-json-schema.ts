@@ -26,7 +26,7 @@ export const REQUIRED_FIELDS =
  * Liste des champs optionnels importants (partagée ED/EI)
  */
 export const OPTIONAL_FIELDS =
-  'region (Région/État/Province), timezone, imageUrl, ticketingUrl, facebookUrl, instagramUrl, jugglingEdgeUrl, latitude, longitude, programUrl (page externe du programme), programDays (programme jour par jour, à privilégier), program (programme sans date)'
+  'region (Région/État/Province), timezone, imageUrl, ticketingUrl, facebookUrl, instagramUrl, jugglingEdgeUrl, latitude, longitude, programUrl (page externe du programme), program (programme sans date)'
 
 /**
  * Génère la section des champs pour les prompts compacts
@@ -70,8 +70,7 @@ export const JSON_FORMAT_FOR_COMPLETION = `{
     "jugglingEdgeUrl": "optionnel - URL JugglingEdge si la source est jugglingedge.com",
     "imageUrl": "optionnel",
     "programUrl": "optionnel - URL d'une page décrivant le programme",
-    "programDays": "optionnel - À PRIVILÉGIER - [{ \\"date\\": \\"YYYY-MM-DD\\", \\"content\\": \\"déroulé de cette journée\\" }]",
-    "program": "optionnel - uniquement ce qui ne se rattache à aucune journée précise"
+    "program": "optionnel - programme général, sans découpage par journée"
   }
 }`
 
@@ -139,19 +138,11 @@ export const IMPORT_SCHEMA_FIELDS = {
         "URL d'une page décrivant le programme, quand la source y renvoie plutôt que de le " +
         'détailler. Se cumule avec les deux champs suivants sans les remplacer.',
     },
-    programDays: {
-      required: false,
-      description:
-        "À PRIVILÉGIER dès que la source détaille le déroulé. Tableau d'objets " +
-        '{ "date": "YYYY-MM-DD", "content": "déroulé de cette journée" }, une entrée par ' +
-        "journée mentionnée, uniquement pour les jours compris dans les dates de l'édition.",
-    },
     program: {
       required: false,
       description:
-        "Programme général. N'y mettre que ce qui ne se rattache à aucune journée précise " +
-        "(principes de vie commune, tarifs, plan d'accès). Ne pas y recopier le déroulé " +
-        'jour par jour : il va dans programDays.',
+        'Programme général : les principes de vie commune, les tarifs, le plan d’accès. Le ' +
+        'déroulé horaire ne va pas ici — il est relevé à part, créneau par créneau.',
     },
 
     // Bénévolat
@@ -199,11 +190,7 @@ export function generateJsonExample(): string {
         officialWebsiteUrl: 'https://...',
         jugglingEdgeUrl: 'https://www.jugglingedge.com/event.php?EventID=...',
         programUrl: 'https://.../programme',
-        programDays: [
-          { date: '2025-07-15', content: 'Accueil à partir de 14h, repas partagé le soir' },
-          { date: '2025-07-16', content: 'Ateliers le matin, gala à 20h30' },
-        ],
-        program: 'Ce qui ne se rattache à aucune journée précise, sinon chaîne vide',
+        program: 'Ce qui ne se rattache à aucun horaire, sinon chaîne vide',
         volunteersOpen: false,
         volunteersDescription: '',
         volunteersExternalUrl: '',
@@ -281,7 +268,6 @@ export function generateCompactJsonFormat(): string {
       officialWebsiteUrl: '',
       jugglingEdgeUrl: '',
       programUrl: '',
-      programDays: [{ date: 'YYYY-MM-DD', content: '' }],
       program: '',
       volunteersOpen: false,
       ...featuresObj,
@@ -328,38 +314,13 @@ export function generateCompactAgentSystemPrompt(): string {
 }
 
 /**
- * Prompt d'une journée unique.
+ * Prompt d'extraction des éléments d'une seule journée.
  *
  * Demander les neuf journées d'un coup n'en rendait que quatre : un modèle local suit mal une
  * consigne qui exige de balayer toute une page et d'en trier neuf sections. Découpé, chaque appel
- * ne pose qu'une question, sur la page entière — c'est bien plus à sa portée.
- *
- * Le nom du jour est fourni dans les deux langues, et son rang dans la convention : les pages de
- * programme désignent les journées tantôt par leur date, tantôt par « Saturday », tantôt par
- * « day 3 ».
- */
-export function generateProgramDayPrompt(params: {
-  date: string
-  jourFr: string
-  jourEn: string
-  index: number
-  total: number
-  startDate: string
-  endDate: string
-}): string {
-  return loadPrompt('program-day', {
-    DATE: params.date,
-    JOUR_FR: params.jourFr,
-    JOUR_EN: params.jourEn,
-    INDEX: String(params.index),
-    TOTAL: String(params.total),
-    START_DATE: params.startDate,
-    END_DATE: params.endDate,
-  })
-}
-
-/**
- * Variante qui demande des **éléments** plutôt qu'un bloc de texte.
+ * ne pose qu'une question, sur la page entière — c'est bien plus à sa portée. Le nom du jour est
+ * fourni dans les deux langues, et son rang dans la convention : les pages de programme désignent
+ * les journées tantôt par leur date, tantôt par « Saturday », tantôt par « day 3 ».
  *
  * Le modèle ne rend que des heures — jamais de date — pour une journée qu'on lui a nommée : la
  * date est recomposée côté serveur. Lui confier le calcul reviendrait à lui demander un exercice

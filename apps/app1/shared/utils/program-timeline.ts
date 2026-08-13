@@ -244,7 +244,8 @@ export function estTermine(
   maintenant: Date | string,
   fuseau?: string | null
 ): boolean {
-  const fin = entree.fin ?? finDeJourneeDeProgramme(journeeDeProgramme(entree.debut, fuseau), fuseau)
+  const fin =
+    entree.fin ?? finDeJourneeDeProgramme(journeeDeProgramme(entree.debut, fuseau), fuseau)
   if (!fin) return false
   return new Date(fin).getTime() <= new Date(maintenant).getTime()
 }

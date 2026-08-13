@@ -113,8 +113,6 @@ export const publicRoutes: PublicRoute[] = [
 
   // ====== Carte (zones et marqueurs) ======
   { pattern: /^\/api\/editions\/\d+\/zones$/, methods: ['GET'], hydrateSession: true },
-  // Programme détaillé, jour par jour : information d'affiche, comme le programme général.
-  { pattern: /^\/api\/editions\/\d+\/program-days$/, methods: ['GET'], hydrateSession: true },
   // Frise du programme (ateliers, spectacles, éléments libres). La session est hydratée pour
   // que les organisateurs y voient aussi leurs brouillons ; un visiteur n'a que le publié.
   { pattern: /^\/api\/editions\/\d+\/program$/, methods: ['GET'], hydrateSession: true },
