@@ -331,7 +331,8 @@
       "section_show": "De voorstelling",
       "company_name": "Gezelschap / artiestennaam",
       "company_name_hint": "Naam van het gezelschap of artiestennaam van de artiest die de voorstelling brengt",
-      "company_name_placeholder": "Bijv. Jongleergezelschap"
+      "company_name_placeholder": "Bijv. Jongleergezelschap",
+      "toggle_acts": "Acts tonen of verbergen"
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",

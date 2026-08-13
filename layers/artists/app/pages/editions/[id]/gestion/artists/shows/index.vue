@@ -61,201 +61,204 @@
           <p class="text-gray-500">{{ $t('gestion.shows.no_shows') }}</p>
         </div>
 
-        <div v-else class="overflow-x-auto">
+        <div v-else>
           <UContextMenu :items="contextMenuItems">
-            <table class="w-full">
-              <thead class="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ $t('gestion.shows.show_title') }}
-                  </th>
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ $t('gestion.shows.start_datetime') }}
-                  </th>
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ $t('gestion.shows.duration') }}
-                  </th>
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ $t('gestion.shows.location') }}
-                  </th>
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ $t('gestion.shows.artists') }}
-                  </th>
-                  <th
-                    class="px-4 py-3 text-center text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    {{ $t('gestion.shows.is_public') }}
-                  </th>
-                  <th
-                    v-if="canEdit"
-                    class="px-4 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                <tr
-                  v-for="show in sortedShows"
-                  :key="show.id"
-                  class="hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                  @contextmenu="onRowContextmenu(show)"
-                >
-                  <td class="px-4 py-3 text-sm">
-                    <div class="flex items-center gap-3">
-                      <img
-                        v-if="show.imageUrl"
-                        :src="getShowImageUrl(show)"
-                        :alt="show.title"
-                        class="w-12 h-12 object-cover rounded-lg shrink-0"
-                      />
-                      <div>
-                        <div class="font-medium flex items-center gap-2">
-                          {{ show.title }}
-                          <UBadge
-                            v-if="show.type === 'CABARET'"
-                            color="info"
-                            variant="subtle"
-                            size="sm"
-                          >
-                            {{ $t('gestion.shows.type_cabaret') }}
-                          </UBadge>
-                        </div>
-                        <div
-                          v-if="show.description"
-                          class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1"
-                        >
-                          {{ show.description }}
-                        </div>
-                        <!-- Déroulé du cabaret : chaque numéro avec ses artistes -->
-                        <ol
-                          v-if="show.type === 'CABARET' && show.acts?.length"
-                          class="text-xs text-gray-500 dark:text-gray-400 mt-2 space-y-0.5 list-decimal list-inside"
-                        >
-                          <li v-for="act in show.acts" :key="act.id">
-                            {{ act.title }}
-                            <span v-if="act.duration" class="text-gray-400">
-                              · {{ act.duration }} min
-                            </span>
-                            <span v-if="act.artists?.length" class="text-gray-400">
-                              —
-                              {{
-                                act.artists
-                                  .map((sa) =>
-                                    `${sa.artist.user.prenom} ${sa.artist.user.nom}`.trim()
-                                  )
-                                  .join(', ')
-                              }}
-                            </span>
-                          </li>
-                        </ol>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                    {{ formatDateTime(show.startDateTime) }}
-                  </td>
-                  <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                    {{ show.duration ? `${show.duration} min` : '-' }}
-                  </td>
-                  <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                    <div>
+            <UTable
+              v-model:expanded="expandedRows"
+              :data="tableRows"
+              :columns="columns"
+              :get-sub-rows="(row: ShowTableRow) => row.children"
+              class="w-full"
+              :ui="tableUi"
+              @contextmenu="onContextmenu"
+            >
+              <template #title-cell="{ row }">
+                <!-- Numéro d'un cabaret : décalé sous son spectacle, il n'a ni affiche ni type -->
+                <!-- `ps-16` et non `ps-8` : le titre d'un spectacle est déjà décalé par son
+                     chevron, un retrait plus court alignerait le numéro sur lui au lieu de
+                     l'en distinguer. -->
+                <div v-if="row.original.kind === 'act'" class="flex items-center gap-2 ps-16">
+                  <UBadge color="neutral" variant="subtle" size="sm">
+                    {{ $t('gestion.shows.act_number', { number: row.original.position }) }}
+                  </UBadge>
+                  <span class="font-medium">{{ row.original.act.title }}</span>
+                </div>
+
+                <div v-else class="flex items-center gap-3">
+                  <!-- Bouton d'ouverture, réservé aux cabarets qui ont des numéros -->
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    size="xs"
+                    :icon="
+                      row.getIsExpanded() ? 'i-heroicons-chevron-down' : 'i-heroicons-chevron-right'
+                    "
+                    :class="{ invisible: !row.getCanExpand() }"
+                    :aria-label="$t('gestion.shows.toggle_acts')"
+                    @click="row.toggleExpanded()"
+                  />
+                  <img
+                    v-if="row.original.show.imageUrl"
+                    :src="getShowImageUrl(row.original.show)"
+                    :alt="row.original.show.title"
+                    class="w-12 h-12 object-cover rounded-lg shrink-0"
+                  />
+                  <div>
+                    <div class="font-medium flex items-center gap-2">
+                      {{ row.original.show.title }}
                       <UBadge
-                        v-if="show.zone"
-                        :style="{ backgroundColor: show.zone.color + '20', color: show.zone.color }"
+                        v-if="row.original.show.type === 'CABARET'"
+                        color="info"
                         variant="subtle"
                         size="sm"
                       >
-                        <UIcon name="i-heroicons-map" class="mr-1" />
-                        {{ show.zone.name }}
+                        {{ $t('gestion.shows.type_cabaret') }}
                       </UBadge>
-                      <UBadge
-                        v-else-if="show.marker"
-                        :style="{
-                          backgroundColor: (show.marker.color || '#6b7280') + '20',
-                          color: show.marker.color || '#6b7280',
-                        }"
-                        variant="subtle"
-                        size="sm"
-                      >
-                        <UIcon name="i-heroicons-map-pin" class="mr-1" />
-                        {{ show.marker.name }}
-                      </UBadge>
-                      <span
-                        v-if="show.location"
-                        :class="{ 'mt-1 block': show.zone || show.marker }"
-                      >
-                        {{ show.location }}
-                      </span>
-                      <span v-if="!show.zone && !show.marker && !show.location">-</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3 text-sm">
-                    <div v-if="uniqueArtists(show).length > 0" class="flex flex-wrap gap-1">
-                      <UBadge
-                        v-for="artist in uniqueArtists(show)"
-                        :key="artist.id"
-                        color="yellow"
-                        variant="subtle"
-                        size="sm"
-                      >
-                        <UiUserName :user="artist.user" />
+                      <UBadge v-if="row.getCanExpand()" color="neutral" variant="subtle" size="sm">
+                        {{ $t('gestion.shows.acts_count', { count: row.subRows.length }) }}
                       </UBadge>
                     </div>
-                    <span v-else class="text-gray-400">{{
-                      $t('gestion.shows.no_artists_selected')
-                    }}</span>
-                  </td>
-                  <td class="px-4 py-3 text-sm text-center">
-                    <UIcon
-                      :name="show.isPublic ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'"
-                      :class="
-                        show.isPublic
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-gray-400 dark:text-gray-500'
-                      "
+                    <!-- `whitespace-normal` : les cellules d'UTable interdisent le retour à la
+                         ligne, une description un peu longue étirerait la colonne à l'infini. -->
+                    <div
+                      v-if="row.original.show.description"
+                      class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 max-w-md whitespace-normal"
+                    >
+                      {{ row.original.show.description }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <!-- Un numéro n'a pas d'horaire propre : il se joue dans celui du cabaret -->
+              <template #startDateTime-cell="{ row }">
+                <span v-if="row.original.kind === 'show'" class="text-gray-600 dark:text-gray-400">
+                  {{ formatDateTime(row.original.show.startDateTime) }}
+                </span>
+              </template>
+
+              <template #duration-cell="{ row }">
+                <span class="text-gray-600 dark:text-gray-400">
+                  {{ rowDuration(row.original) }}
+                </span>
+              </template>
+
+              <!-- Idem pour le lieu : c'est celui du spectacle -->
+              <template #location-cell="{ row }">
+                <div v-if="row.original.kind === 'show'" class="text-gray-600 dark:text-gray-400">
+                  <UBadge
+                    v-if="row.original.show.zone"
+                    :style="{
+                      backgroundColor: row.original.show.zone.color + '20',
+                      color: row.original.show.zone.color,
+                    }"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    <UIcon name="i-heroicons-map" class="mr-1" />
+                    {{ row.original.show.zone.name }}
+                  </UBadge>
+                  <UBadge
+                    v-else-if="row.original.show.marker"
+                    :style="{
+                      backgroundColor: (row.original.show.marker.color || '#6b7280') + '20',
+                      color: row.original.show.marker.color || '#6b7280',
+                    }"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    <UIcon name="i-heroicons-map-pin" class="mr-1" />
+                    {{ row.original.show.marker.name }}
+                  </UBadge>
+                  <span
+                    v-if="row.original.show.location"
+                    :class="{
+                      'mt-1 block': row.original.show.zone || row.original.show.marker,
+                    }"
+                  >
+                    {{ row.original.show.location }}
+                  </span>
+                  <span
+                    v-if="
+                      !row.original.show.zone &&
+                      !row.original.show.marker &&
+                      !row.original.show.location
+                    "
+                  >
+                    -
+                  </span>
+                </div>
+              </template>
+
+              <template #artists-cell="{ row }">
+                <div v-if="rowArtists(row.original).length > 0" class="flex flex-wrap gap-1">
+                  <UBadge
+                    v-for="artist in rowArtists(row.original)"
+                    :key="artist.id"
+                    color="yellow"
+                    variant="subtle"
+                    size="sm"
+                  >
+                    <UiUserName :user="artist.user" />
+                  </UBadge>
+                </div>
+                <span v-else class="text-gray-400">
+                  {{ $t('gestion.shows.no_artists_selected') }}
+                </span>
+              </template>
+
+              <template #isPublic-cell="{ row }">
+                <UIcon
+                  v-if="row.original.kind === 'show'"
+                  :name="row.original.show.isPublic ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'"
+                  :class="
+                    row.original.show.isPublic
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-gray-400 dark:text-gray-500'
+                  "
+                />
+              </template>
+
+              <template #actions-cell="{ row }">
+                <div class="flex items-center justify-end gap-2">
+                  <!-- Un numéro se modifie sur la page dédiée du cabaret -->
+                  <UButton
+                    v-if="row.original.kind === 'act'"
+                    icon="i-heroicons-pencil"
+                    color="primary"
+                    variant="ghost"
+                    size="sm"
+                    :title="$t('gestion.shows.edit_acts')"
+                    @click="goToEditActs(row.original.show)"
+                  />
+                  <template v-else>
+                    <UButton
+                      v-if="row.original.show.type === 'CABARET'"
+                      icon="i-heroicons-queue-list"
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      :title="$t('gestion.shows.edit_acts')"
+                      @click="goToEditActs(row.original.show)"
                     />
-                  </td>
-                  <td v-if="canEdit" class="px-4 py-3 text-sm text-right">
-                    <div class="flex items-center justify-end gap-2">
-                      <UButton
-                        v-if="show.type === 'CABARET'"
-                        icon="i-heroicons-queue-list"
-                        color="primary"
-                        variant="ghost"
-                        size="sm"
-                        :title="$t('gestion.shows.edit_acts')"
-                        @click="goToEditActs(show)"
-                      />
-                      <UButton
-                        icon="i-heroicons-pencil"
-                        color="primary"
-                        variant="ghost"
-                        size="sm"
-                        @click="goToEditShow(show)"
-                      />
-                      <UButton
-                        icon="i-heroicons-trash"
-                        color="error"
-                        variant="ghost"
-                        size="sm"
-                        @click="confirmDeleteShow(show)"
-                      />
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <UButton
+                      icon="i-heroicons-pencil"
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      @click="goToEditShow(row.original.show)"
+                    />
+                    <UButton
+                      icon="i-heroicons-trash"
+                      color="error"
+                      variant="ghost"
+                      size="sm"
+                      @click="confirmDeleteShow(row.original.show)"
+                    />
+                  </template>
+                </div>
+              </template>
+            </UTable>
           </UContextMenu>
         </div>
       </UCard>
@@ -299,6 +302,8 @@
 </template>
 
 <script setup lang="ts">
+import type { TableColumn, TableRow } from '@nuxt/ui'
+
 definePageMeta({
   middleware: ['auth-protected'],
 })
@@ -354,6 +359,90 @@ const uniqueArtists = (show: any) => {
     })
 }
 
+// Les numéros d'un cabaret sont des sous-lignes du spectacle : repliés, le tableau reste une
+// liste de spectacles ; dépliés, il montre le déroulé de la soirée sans quitter la page.
+interface ShowTableRow {
+  kind: 'show' | 'act'
+  show: any
+  act?: any
+  position?: number
+  children?: ShowTableRow[]
+}
+
+const tableRows = computed<ShowTableRow[]>(() =>
+  sortedShows.value.map((show) => ({
+    kind: 'show',
+    show,
+    // `undefined` et non un tableau vide : un spectacle sans numéro ne doit pas s'annoncer
+    // dépliable, sinon la table affiche un chevron qui n'ouvre rien.
+    children:
+      show.type === 'CABARET' && show.acts?.length
+        ? [...show.acts]
+            .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
+            .map((act: any, index: number) => ({
+              kind: 'act' as const,
+              show,
+              act,
+              position: index + 1,
+            }))
+        : undefined,
+  }))
+)
+
+// Les cabarets s'ouvrent d'emblée : leur déroulé était déjà visible avant que les numéros
+// ne deviennent des lignes, le replier par défaut aurait masqué une information acquise.
+const expandedRows = ref<Record<string, boolean>>({})
+watch(
+  tableRows,
+  (rows) => {
+    const next: Record<string, boolean> = {}
+    rows.forEach((row, index) => {
+      if (row.children?.length) next[index] = true
+    })
+    expandedRows.value = next
+  },
+  { immediate: true }
+)
+
+// Déplier une ligne fait toujours produire à UTable une ligne supplémentaire pour son slot
+// `#expanded`, que nous n'utilisons pas : elle apparaissait vide entre le cabaret et ses
+// numéros. On la reconnaît à sa cellule unique et vide, là où une vraie ligne en a sept.
+const tableUi = { tbody: '[&>tr:has(>td:only-child:empty)]:hidden' }
+
+const columns = computed<TableColumn<ShowTableRow>[]>(() => {
+  const cols: TableColumn<ShowTableRow>[] = [
+    { id: 'title', header: t('gestion.shows.show_title') },
+    { id: 'startDateTime', header: t('gestion.shows.start_datetime') },
+    { id: 'duration', header: t('gestion.shows.duration') },
+    { id: 'location', header: t('gestion.shows.location') },
+    { id: 'artists', header: t('gestion.shows.artists') },
+    {
+      id: 'isPublic',
+      header: t('gestion.shows.is_public'),
+      meta: { class: { th: 'text-center', td: 'text-center' } },
+    },
+  ]
+  if (canEdit.value) {
+    cols.push({
+      id: 'actions',
+      header: t('common.actions'),
+      meta: { class: { th: 'text-right', td: 'text-right' } },
+    })
+  }
+  return cols
+})
+
+const rowDuration = (row: ShowTableRow) => {
+  const duration = row.kind === 'act' ? row.act.duration : row.show.duration
+  return duration ? `${duration} min` : '-'
+}
+
+// Un numéro porte ses propres artistes ; le spectacle affiche l'ensemble, dédoublonné.
+const rowArtists = (row: ShowTableRow) =>
+  row.kind === 'act'
+    ? (row.act.artists ?? []).map((showArtist: any) => showArtist.artist).filter(Boolean)
+    : uniqueArtists(row.show)
+
 // Charger l'édition
 onMounted(async () => {
   if (!edition.value || edition.value.id !== editionId.value) {
@@ -383,11 +472,27 @@ const goToAddShow = () => router.push(`${showsPath.value}/new`)
 // Menu contextuel (clic droit sur une ligne) : mêmes actions que la colonne
 // « Actions », qui n'est affichée qu'aux utilisateurs pouvant éditer.
 const contextMenuItems = ref<any[]>([])
-const onRowContextmenu = (show: any) => {
+const onContextmenu = (_event: Event, row: TableRow<ShowTableRow>) => {
   if (!canEdit.value) {
     contextMenuItems.value = []
     return
   }
+  const { kind, show, act } = row.original
+
+  // Sur un numéro, les actions du spectacle (modifier, supprimer) porteraient à confusion :
+  // seule l'édition du déroulé a un sens, et elle vise le cabaret entier.
+  if (kind === 'act') {
+    contextMenuItems.value = [
+      { type: 'label', label: act.title },
+      {
+        label: t('gestion.shows.edit_acts'),
+        icon: 'i-heroicons-queue-list',
+        onSelect: () => goToEditActs(show),
+      },
+    ]
+    return
+  }
+
   const items: any[] = [{ type: 'label', label: show.title }]
   if (show.type === 'CABARET') {
     items.push({

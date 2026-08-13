@@ -331,7 +331,8 @@
       "section_show": "Spektakl",
       "company_name": "Zespół / pseudonim sceniczny",
       "company_name_hint": "Nazwa zespołu lub pseudonim sceniczny artysty prowadzącego spektakl",
-      "company_name_placeholder": "Np. Grupa Żonglerska"
+      "company_name_placeholder": "Np. Grupa Żonglerska",
+      "toggle_acts": "Pokaż lub ukryj numery"
     },
     "stock": {
       "available_now": "{available}/{total} dostępnych",

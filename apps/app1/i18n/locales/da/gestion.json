@@ -331,7 +331,8 @@
       "section_show": "Forestillingen",
       "company_name": "Kompagni / kunstnernavn",
       "company_name_hint": "Navnet på kompagniet eller kunstnernavnet på den artist, der står bag forestillingen",
-      "company_name_placeholder": "F.eks. Jonglørkompagniet"
+      "company_name_placeholder": "F.eks. Jonglørkompagniet",
+      "toggle_acts": "Vis eller skjul numrene"
     },
     "stock": {
       "available_now": "{available}/{total} tilgængelige",

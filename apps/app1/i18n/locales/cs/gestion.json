@@ -331,7 +331,8 @@
       "section_show": "Představení",
       "company_name": "Soubor / umělecké jméno",
       "company_name_hint": "Název souboru nebo umělecké jméno umělce, který představení uvádí",
-      "company_name_placeholder": "Např. Žonglérský soubor"
+      "company_name_placeholder": "Např. Žonglérský soubor",
+      "toggle_acts": "Zobrazit nebo skrýt čísla"
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",

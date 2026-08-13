@@ -331,7 +331,8 @@
       "section_show": "Lo spettacolo",
       "company_name": "Compagnia / nome d'arte",
       "company_name_hint": "Nome della compagnia o nome d'arte dell'artista che porta in scena lo spettacolo",
-      "company_name_placeholder": "Es.: Compagnia delle Clave"
+      "company_name_placeholder": "Es.: Compagnia delle Clave",
+      "toggle_acts": "Mostra o nascondi i numeri"
     },
     "stock": {
       "available_now": "{available}/{total} disponibile/i",

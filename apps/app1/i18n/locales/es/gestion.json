@@ -331,7 +331,8 @@
       "section_show": "El espectáculo",
       "company_name": "Compañía / nombre artístico",
       "company_name_hint": "Nombre de la compañía o nombre artístico del artista que presenta el espectáculo",
-      "company_name_placeholder": "Ej.: Cía. de Malabares"
+      "company_name_placeholder": "Ej.: Cía. de Malabares",
+      "toggle_acts": "Mostrar u ocultar los números"
     },
     "stock": {
       "available_now": "{available}/{total} disponible(s)",

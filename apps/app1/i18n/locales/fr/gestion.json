@@ -328,6 +328,7 @@
       "technical_pdf_title_with_edition": "Besoins techniques — {edition}",
       "technical_title": "Technique",
       "title": "Spectacles",
+      "toggle_acts": "Afficher ou masquer les numéros",
       "type": "Type de spectacle",
       "type_cabaret": "Cabaret",
       "type_hint": "Un cabaret est composé de numéros, chacun avec ses propres artistes.",
