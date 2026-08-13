@@ -258,7 +258,8 @@
         "standard": "Standardowe",
         "total": "Łączna liczba posiłków",
         "volunteers": "Posiłki wolontariuszy",
-        "with_allergies": "Z alergiami"
+        "with_allergies": "Z alergiami",
+        "organizers": "Posiłki organizatorów"
       }
     },
     "no_description_available": "Brak dostępnego opisu",

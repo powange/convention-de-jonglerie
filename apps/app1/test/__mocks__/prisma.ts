@@ -93,6 +93,9 @@ export const prismaMock = {
   editionArtist: createModelMock(),
   artistMealSelection: createModelMock(),
 
+  // Repas des organisateurs
+  organizerMealSelection: createModelMock(),
+
   // Modèles carte (zones et marqueurs)
   editionZone: createModelMock(),
   editionMarker: createModelMock(),

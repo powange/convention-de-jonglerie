@@ -258,7 +258,8 @@
         "standard": "Standardní",
         "total": "Celkem jídel",
         "volunteers": "Jídlo dobrovolníků",
-        "with_allergies": "S alergiemi"
+        "with_allergies": "S alergiemi",
+        "organizers": "Jídla organizátorů"
       }
     },
     "no_description_available": "Popis není k dispozici",

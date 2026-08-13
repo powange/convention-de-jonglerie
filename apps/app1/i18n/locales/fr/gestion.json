@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Bénévole",
         "artist": "Artiste",
-        "participant": "Participant"
-      }
+        "participant": "Participant",
+        "organizer": "Organisateur"
+      },
+      "organizers": "Organisateurs"
     },
     "organizers": {
       "access_rights": "Droits d'accès",
@@ -214,7 +216,26 @@
       "select_to_add": "Sélectionner un organisateur à ajouter",
       "status": "Statut du billet",
       "title": "Organisateurs",
-      "title_required": "Le titre de l'organisateur est requis"
+      "title_required": "Le titre de l'organisateur est requis",
+      "meals": {
+        "manage": "Gérer les repas",
+        "title": "Repas de {name}",
+        "description": "Par défaut, un organisateur présent sur l'édition a accès à tous les repas. Décochez ceux qu'il ne prendra pas.",
+        "no_meals": "Aucun repas n'est configuré pour cette édition",
+        "check_all": "Tout cocher",
+        "uncheck_all": "Tout décocher",
+        "already_validated": "Déjà validé",
+        "dietary_section": "Alimentation",
+        "dietary_preference": "Régime alimentaire",
+        "allergies": "Allergies",
+        "allergies_placeholder": "Allergies ou intolérances alimentaires",
+        "allergy_severity": "Gravité de l'allergie",
+        "unsaved_changes": "Vous avez des modifications non enregistrées",
+        "confirm_close_unsaved": "Vous avez des modifications non enregistrées. Voulez-vous vraiment fermer ?",
+        "saved_success": "Les repas de cet organisateur ont été enregistrés",
+        "error_loading": "Impossible de charger les repas de cet organisateur",
+        "error_saving": "Impossible d'enregistrer les repas de cet organisateur"
+      }
     },
     "overview": "Vue d'ensemble",
     "services": {

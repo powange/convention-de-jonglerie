@@ -258,7 +258,8 @@
         "standard": "Standard",
         "total": "Total meals",
         "volunteers": "Volunteers meals",
-        "with_allergies": "With allergies"
+        "with_allergies": "With allergies",
+        "organizers": "Organiser meals"
       }
     },
     "no_description_available": "No description available",

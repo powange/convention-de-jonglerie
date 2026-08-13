@@ -70,6 +70,25 @@ export default wrapApiHandler(
     const artistParticipantsByMeal = await ports.artists.getMealParticipants(mealIds)
     const ticketParticipantsByMeal = await ports.ticketing.getMealTicketParticipants(mealIds)
 
+    // Organisateurs : le droit n'est pas matérialisé, ils ont accès à tous les repas de
+    // l'édition sauf exception explicite (OrganizerMealSelection.accepted = false).
+    const editionOrganizers = await prisma.editionOrganizer.findMany({
+      where: { editionId },
+      include: {
+        mealSelections: {
+          where: { mealId: { in: mealIds } },
+          select: { mealId: true, accepted: true },
+        },
+        organizer: {
+          select: {
+            user: {
+              select: { id: true, nom: true, prenom: true, email: true, phone: true },
+            },
+          },
+        },
+      },
+    })
+
     // Construire la liste plate de tous les participants avec leurs repas
     let participants: Array<{
       userId: number | null
@@ -77,7 +96,7 @@ export default wrapApiHandler(
       prenom: string
       email: string
       phone: string | null
-      type: 'volunteer' | 'artist' | 'participant'
+      type: 'volunteer' | 'artist' | 'participant' | 'organizer'
       mealId: number
       mealDate: Date
       mealType: string
@@ -148,6 +167,29 @@ export default wrapApiHandler(
           afterShow: false,
         })
       })
+
+      // Ajouter les organisateurs présents, hors ceux à qui ce repas a été décoché
+      editionOrganizers.forEach((eo) => {
+        const selection = eo.mealSelections.find((s) => s.mealId === meal.id)
+        if (selection && !selection.accepted) return
+
+        participants.push({
+          userId: eo.organizer.user.id,
+          nom: eo.organizer.user.nom,
+          prenom: eo.organizer.user.prenom,
+          email: eo.organizer.user.email,
+          phone: eo.organizer.user.phone,
+          type: 'organizer',
+          mealId: meal.id,
+          mealDate: meal.date,
+          mealType: meal.mealType,
+          mealPhases: meal.phases,
+          dietaryPreference: eo.dietaryPreference,
+          allergies: eo.allergies,
+          allergySeverity: eo.allergySeverity,
+          afterShow: false,
+        })
+      })
     })
 
     // Appliquer les filtres
@@ -203,6 +245,7 @@ export default wrapApiHandler(
       volunteers: participants.filter((p) => p.type === 'volunteer').length,
       artists: participants.filter((p) => p.type === 'artist').length,
       ticketingParticipants: participants.filter((p) => p.type === 'participant').length,
+      organizers: participants.filter((p) => p.type === 'organizer').length,
       byMealType: {
         BREAKFAST: participants.filter((p) => p.mealType === 'BREAKFAST').length,
         LUNCH: participants.filter((p) => p.mealType === 'LUNCH').length,

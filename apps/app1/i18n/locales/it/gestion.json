@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Volontario",
         "artist": "Artista",
-        "participant": "Partecipante"
-      }
+        "participant": "Partecipante",
+        "organizer": "Organizzatore"
+      },
+      "organizers": "Organizzatori"
     },
     "organizers": {
       "access_rights": "Diritti di accesso",
@@ -214,7 +216,26 @@
       "select_to_add": "Seleziona un organizzatore da aggiungere",
       "status": "Stato del biglietto",
       "title": "Organizzatori",
-      "title_required": "Il titolo dell'organizzatore è obbligatorio"
+      "title_required": "Il titolo dell'organizzatore è obbligatorio",
+      "meals": {
+        "manage": "Gestisci i pasti",
+        "title": "Pasti di {name}",
+        "description": "Per impostazione predefinita, un organizzatore presente all'edizione ha accesso a tutti i pasti. Deseleziona quelli che non consumerà.",
+        "no_meals": "Nessun pasto è configurato per questa edizione",
+        "check_all": "Seleziona tutto",
+        "uncheck_all": "Deseleziona tutto",
+        "already_validated": "Già convalidato",
+        "dietary_section": "Alimentazione",
+        "dietary_preference": "Regime alimentare",
+        "allergies": "Allergie",
+        "allergies_placeholder": "Allergie o intolleranze alimentari",
+        "allergy_severity": "Gravità dell'allergia",
+        "unsaved_changes": "Hai modifiche non salvate",
+        "confirm_close_unsaved": "Hai modifiche non salvate. Vuoi davvero chiudere?",
+        "saved_success": "I pasti di questo organizzatore sono stati salvati",
+        "error_loading": "Impossibile caricare i pasti di questo organizzatore",
+        "error_saving": "Impossibile salvare i pasti di questo organizzatore"
+      }
     },
     "overview": "Panoramica",
     "services": {

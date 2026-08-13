@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Freiwilliger",
         "artist": "Künstler",
-        "participant": "Teilnehmer"
-      }
+        "participant": "Teilnehmer",
+        "organizer": "Organisator"
+      },
+      "organizers": "Organisatoren"
     },
     "organizers": {
       "access_rights": "Zugriffsrechte",
@@ -214,7 +216,26 @@
       "select_to_add": "Wählen Sie einen Organisator zum Hinzufügen aus",
       "status": "Ticketstatus",
       "title": "Organisatoren",
-      "title_required": "Der Titel des Organisators ist erforderlich"
+      "title_required": "Der Titel des Organisators ist erforderlich",
+      "meals": {
+        "manage": "Mahlzeiten verwalten",
+        "title": "Mahlzeiten von {name}",
+        "description": "Standardmäßig hat ein bei der Ausgabe anwesender Organisator Zugang zu allen Mahlzeiten. Wählen Sie die ab, die er nicht einnehmen wird.",
+        "no_meals": "Für diese Ausgabe ist keine Mahlzeit eingerichtet",
+        "check_all": "Alle auswählen",
+        "uncheck_all": "Alle abwählen",
+        "already_validated": "Bereits bestätigt",
+        "dietary_section": "Ernährung",
+        "dietary_preference": "Ernährungsweise",
+        "allergies": "Allergien",
+        "allergies_placeholder": "Lebensmittelallergien oder -unverträglichkeiten",
+        "allergy_severity": "Schweregrad der Allergie",
+        "unsaved_changes": "Sie haben ungespeicherte Änderungen",
+        "confirm_close_unsaved": "Sie haben ungespeicherte Änderungen. Möchten Sie wirklich schließen?",
+        "saved_success": "Die Mahlzeiten dieses Organisators wurden gespeichert",
+        "error_loading": "Die Mahlzeiten dieses Organisators können nicht geladen werden",
+        "error_saving": "Die Mahlzeiten dieses Organisators können nicht gespeichert werden"
+      }
     },
     "overview": "Übersicht",
     "services": {

@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Voluntário",
         "artist": "Artista",
-        "participant": "Participante"
-      }
+        "participant": "Participante",
+        "organizer": "Organizador"
+      },
+      "organizers": "Organizadores"
     },
     "organizers": {
       "access_rights": "Direitos de acesso",
@@ -214,7 +216,26 @@
       "select_to_add": "Selecione um organizador para adicionar",
       "status": "Estado do bilhete",
       "title": "Organizadores",
-      "title_required": "O título do organizador é obrigatório"
+      "title_required": "O título do organizador é obrigatório",
+      "meals": {
+        "manage": "Gerir as refeições",
+        "title": "Refeições de {name}",
+        "description": "Por predefinição, um organizador presente na edição tem acesso a todas as refeições. Desmarque as que não irá tomar.",
+        "no_meals": "Não há nenhuma refeição configurada para esta edição",
+        "check_all": "Marcar tudo",
+        "uncheck_all": "Desmarcar tudo",
+        "already_validated": "Já validada",
+        "dietary_section": "Alimentação",
+        "dietary_preference": "Regime alimentar",
+        "allergies": "Alergias",
+        "allergies_placeholder": "Alergias ou intolerâncias alimentares",
+        "allergy_severity": "Gravidade da alergia",
+        "unsaved_changes": "Tem alterações não guardadas",
+        "confirm_close_unsaved": "Tem alterações não guardadas. Deseja mesmo fechar?",
+        "saved_success": "As refeições deste organizador foram guardadas",
+        "error_loading": "Não foi possível carregar as refeições deste organizador",
+        "error_saving": "Não foi possível guardar as refeições deste organizador"
+      }
     },
     "overview": "Visão geral",
     "services": {

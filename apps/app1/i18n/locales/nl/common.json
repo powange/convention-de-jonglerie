@@ -258,7 +258,8 @@
         "standard": "Standaard",
         "total": "Totaal maaltijden",
         "volunteers": "Maaltijden vrijwilligers",
-        "with_allergies": "Met allergieën"
+        "with_allergies": "Met allergieën",
+        "organizers": "Maaltijden van organisatoren"
       }
     },
     "no_description_available": "Geen beschrijving beschikbaar",

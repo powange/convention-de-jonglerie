@@ -258,7 +258,8 @@
         "standard": "Standard",
         "total": "Gesamtanzahl Mahlzeiten",
         "volunteers": "Freiwilligenmahlzeiten",
-        "with_allergies": "Mit Allergien"
+        "with_allergies": "Mit Allergien",
+        "organizers": "Mahlzeiten der Organisatoren"
       }
     },
     "no_description_available": "Keine Beschreibung verfügbar",

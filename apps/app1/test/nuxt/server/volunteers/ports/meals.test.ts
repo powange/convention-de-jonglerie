@@ -65,26 +65,51 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
   })
 
   describe('getCateringMealsForDate', () => {
-    it('mappe les repas avec leurs participants bénévoles acceptés', async () => {
-      prismaMock.volunteerMeal.findMany.mockResolvedValue([
-        {
-          id: 1,
-          mealType: 'LUNCH',
-          phases: ['EVENT'],
-          mealSelections: [
-            {
-              volunteer: {
-                dietaryPreference: 'VEGAN',
-                allergies: 'arachides',
-                allergySeverity: 'HIGH',
-                emergencyContactName: 'Maman',
-                emergencyContactPhone: '0600',
-                user: { nom: 'Doe', prenom: 'John', email: 'j@x.fr', phone: '0700' },
-              },
+    const dbMeals = [
+      {
+        id: 1,
+        mealType: 'LUNCH',
+        phases: ['EVENT'],
+        mealSelections: [
+          {
+            volunteer: {
+              dietaryPreference: 'VEGAN',
+              allergies: 'arachides',
+              allergySeverity: 'HIGH',
+              emergencyContactName: 'Maman',
+              emergencyContactPhone: '0600',
+              user: { nom: 'Doe', prenom: 'John', email: 'j@x.fr', phone: '0700' },
             },
-          ],
-        },
-      ])
+          },
+        ],
+      },
+    ]
+
+    const expectedVolunteers = [
+      {
+        nom: 'Doe',
+        prenom: 'John',
+        email: 'j@x.fr',
+        phone: '0700',
+        dietaryPreference: 'VEGAN',
+        allergies: 'arachides',
+        allergySeverity: 'HIGH',
+        emergencyContactName: 'Maman',
+        emergencyContactPhone: '0600',
+      },
+    ]
+
+    const dbOrganizer = {
+      dietaryPreference: 'VEGETARIAN',
+      allergies: null,
+      allergySeverity: null,
+      mealSelections: [],
+      organizer: { user: { nom: 'Roe', prenom: 'Jane', email: 'jane@x.fr', phone: '0800' } },
+    }
+
+    it('mappe les repas avec leurs participants bénévoles acceptés', async () => {
+      prismaMock.volunteerMeal.findMany.mockResolvedValue(dbMeals)
+      prismaMock.editionOrganizer.findMany.mockResolvedValue([])
 
       const result = await createDefaultVolunteerPorts().meals.getCateringMealsForDate(
         10,
@@ -96,21 +121,46 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
           id: 1,
           mealType: 'LUNCH',
           phases: ['EVENT'],
-          volunteers: [
-            {
-              nom: 'Doe',
-              prenom: 'John',
-              email: 'j@x.fr',
-              phone: '0700',
-              dietaryPreference: 'VEGAN',
-              allergies: 'arachides',
-              allergySeverity: 'HIGH',
-              emergencyContactName: 'Maman',
-              emergencyContactPhone: '0600',
-            },
-          ],
+          volunteers: expectedVolunteers,
+          organizers: [],
         },
       ])
+    })
+
+    it('ajoute les organisateurs présents, qui ont accès au repas par défaut', async () => {
+      prismaMock.volunteerMeal.findMany.mockResolvedValue(dbMeals)
+      prismaMock.editionOrganizer.findMany.mockResolvedValue([dbOrganizer])
+
+      const result = await createDefaultVolunteerPorts().meals.getCateringMealsForDate(
+        10,
+        '2026-06-16'
+      )
+
+      expect(result[0].organizers).toEqual([
+        {
+          nom: 'Roe',
+          prenom: 'Jane',
+          email: 'jane@x.fr',
+          phone: '0800',
+          dietaryPreference: 'VEGETARIAN',
+          allergies: null,
+          allergySeverity: null,
+        },
+      ])
+    })
+
+    it('exclut un organisateur dont le repas a été décoché', async () => {
+      prismaMock.volunteerMeal.findMany.mockResolvedValue(dbMeals)
+      prismaMock.editionOrganizer.findMany.mockResolvedValue([
+        { ...dbOrganizer, mealSelections: [{ mealId: 1 }] },
+      ])
+
+      const result = await createDefaultVolunteerPorts().meals.getCateringMealsForDate(
+        10,
+        '2026-06-16'
+      )
+
+      expect(result[0].organizers).toEqual([])
     })
   })
 

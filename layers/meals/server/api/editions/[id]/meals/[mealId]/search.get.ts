@@ -139,6 +139,47 @@ export default wrapApiHandler(
       }
     }
 
+    // 4. Rechercher dans les organisateurs présents (accès par défaut, hors exception)
+    const editionOrganizers = await prisma.editionOrganizer.findMany({
+      where: {
+        editionId,
+        NOT: { mealSelections: { some: { mealId, accepted: false } } },
+      },
+      include: {
+        mealSelections: { where: { mealId }, select: { consumedAt: true } },
+        organizer: {
+          select: {
+            user: {
+              select: { id: true, email: true, prenom: true, nom: true, pseudo: true, phone: true },
+            },
+          },
+        },
+      },
+    })
+
+    for (const eo of editionOrganizers) {
+      const organizerUser = eo.organizer.user
+      const matchesSearch =
+        organizerUser.nom?.toLowerCase().includes(searchLower) ||
+        organizerUser.prenom?.toLowerCase().includes(searchLower) ||
+        organizerUser.pseudo?.toLowerCase().includes(searchLower) ||
+        organizerUser.email?.toLowerCase().includes(searchLower)
+
+      if (matchesSearch) {
+        results.push({
+          uniqueId: `organizer-${eo.id}`,
+          id: eo.id,
+          type: 'organizer',
+          firstName: organizerUser.prenom,
+          lastName: organizerUser.nom,
+          pseudo: organizerUser.pseudo,
+          email: organizerUser.email,
+          phone: organizerUser.phone,
+          consumedAt: eo.mealSelections[0]?.consumedAt ?? null,
+        })
+      }
+    }
+
     return { results }
   },
   { operationName: 'SearchMealParticipants' }

@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Volunteer",
         "artist": "Artist",
-        "participant": "Participant"
-      }
+        "participant": "Participant",
+        "organizer": "Organiser"
+      },
+      "organizers": "Organisers"
     },
     "organizers": {
       "access_rights": "Access rights",
@@ -214,7 +216,26 @@
       "select_to_add": "Select an organizer to add",
       "status": "Ticket status",
       "title": "Organizers",
-      "title_required": "Organizer title is required"
+      "title_required": "Organizer title is required",
+      "meals": {
+        "manage": "Manage meals",
+        "title": "{name}'s meals",
+        "description": "By default, an organiser attending the edition has access to every meal. Uncheck the ones they will not have.",
+        "no_meals": "No meal has been set up for this edition",
+        "check_all": "Check all",
+        "uncheck_all": "Uncheck all",
+        "already_validated": "Already validated",
+        "dietary_section": "Food",
+        "dietary_preference": "Dietary preference",
+        "allergies": "Allergies",
+        "allergies_placeholder": "Food allergies or intolerances",
+        "allergy_severity": "Allergy severity",
+        "unsaved_changes": "You have unsaved changes",
+        "confirm_close_unsaved": "You have unsaved changes. Are you sure you want to close?",
+        "saved_success": "This organiser's meals have been saved",
+        "error_loading": "Unable to load this organiser's meals",
+        "error_saving": "Unable to save this organiser's meals"
+      }
     },
     "overview": "Overview",
     "services": {

@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Wolontariusz",
         "artist": "Artysta",
-        "participant": "Uczestnik"
-      }
+        "participant": "Uczestnik",
+        "organizer": "Organizator"
+      },
+      "organizers": "Organizatorzy"
     },
     "organizers": {
       "access_rights": "Prawa dostępu",
@@ -214,7 +216,26 @@
       "select_to_add": "Wybierz organizatora do dodania",
       "status": "Status biletu",
       "title": "Organizatorzy",
-      "title_required": "Tytuł organizatora jest wymagany"
+      "title_required": "Tytuł organizatora jest wymagany",
+      "meals": {
+        "manage": "Zarządzaj posiłkami",
+        "title": "Posiłki organizatora {name}",
+        "description": "Domyślnie organizator obecny na edycji ma dostęp do wszystkich posiłków. Odznacz te, z których nie skorzysta.",
+        "no_meals": "Dla tej edycji nie skonfigurowano żadnego posiłku",
+        "check_all": "Zaznacz wszystko",
+        "uncheck_all": "Odznacz wszystko",
+        "already_validated": "Już zatwierdzone",
+        "dietary_section": "Wyżywienie",
+        "dietary_preference": "Preferencje żywieniowe",
+        "allergies": "Alergie",
+        "allergies_placeholder": "Alergie lub nietolerancje pokarmowe",
+        "allergy_severity": "Nasilenie alergii",
+        "unsaved_changes": "Masz niezapisane zmiany",
+        "confirm_close_unsaved": "Masz niezapisane zmiany. Czy na pewno chcesz zamknąć?",
+        "saved_success": "Posiłki tego organizatora zostały zapisane",
+        "error_loading": "Nie można wczytać posiłków tego organizatora",
+        "error_saving": "Nie można zapisać posiłków tego organizatora"
+      }
     },
     "overview": "Przegląd",
     "services": {

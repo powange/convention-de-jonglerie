@@ -7,7 +7,8 @@ import { canManageMealsOrValidation } from '#server/utils/permissions/edition-pe
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const cancelMealSchema = z.object({
-  type: z.enum(['volunteer', 'artist', 'participant']),
+  type: z.enum(['volunteer', 'artist', 'participant', 'organizer']),
+  // Pour un organisateur, il s'agit de l'id de l'EditionOrganizer (cf. validate.post.ts).
   id: z.number().int().positive(),
 })
 
@@ -70,6 +71,22 @@ export default wrapApiHandler(
       const res = await useMealsPorts().artists.cancelConsumed(editionId, mealId, validatedData.id)
       if (!res.ok) {
         throw createError({ status: 404, message: 'Sélection de repas non trouvée' })
+      }
+    } else if (validatedData.type === 'organizer') {
+      // La ligne reste en base avec consumedAt à null : l'accès par défaut est inchangé.
+      const result = await prisma.organizerMealSelection.updateMany({
+        where: {
+          mealId,
+          editionOrganizer: { id: validatedData.id, editionId },
+        },
+        data: { consumedAt: null },
+      })
+
+      if (result.count === 0) {
+        throw createError({
+          status: 404,
+          message: 'Sélection de repas non trouvée',
+        })
       }
     } else if (validatedData.type === 'participant') {
       // Étape 2 (port ticketing) : annulation déléguée (le layer ne lit plus la billetterie).

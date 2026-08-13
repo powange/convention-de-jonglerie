@@ -20,7 +20,7 @@ export default wrapApiHandler(
 
     // Récupérer le type demandé
     const query = getQuery(event)
-    const type = (query.type as string) || 'all' // 'volunteer', 'artist', 'participant', 'all'
+    const type = (query.type as string) || 'all' // 'volunteer', 'artist', 'participant', 'organizer', 'all'
 
     // Vérifier que le repas existe et appartient à cette édition
     const meal = await prisma.volunteerMeal.findFirst({ where: { id: mealId, editionId } })
@@ -114,6 +114,49 @@ export default wrapApiHandler(
           pseudo: null,
           email: row.email,
           phone: null,
+        })
+      }
+    }
+
+    // 4. Organisateurs non validés. Le droit n'est pas matérialisé : tous les organisateurs
+    // présents sur l'édition ont accès au repas, sauf exception explicite.
+    if (type === 'organizer' || type === 'all') {
+      const editionOrganizers = await prisma.editionOrganizer.findMany({
+        where: {
+          editionId,
+          NOT: { mealSelections: { some: { mealId, accepted: false } } },
+        },
+        include: {
+          mealSelections: { where: { mealId }, select: { consumedAt: true } },
+          organizer: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                  prenom: true,
+                  nom: true,
+                  pseudo: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+        },
+      })
+
+      for (const eo of editionOrganizers) {
+        if (eo.mealSelections[0]?.consumedAt) continue
+
+        pending.push({
+          uniqueId: `organizer-${eo.id}`,
+          id: eo.id,
+          type: 'organizer',
+          firstName: eo.organizer.user.prenom,
+          lastName: eo.organizer.user.nom,
+          pseudo: eo.organizer.user.pseudo,
+          email: eo.organizer.user.email,
+          phone: eo.organizer.user.phone,
         })
       }
     }

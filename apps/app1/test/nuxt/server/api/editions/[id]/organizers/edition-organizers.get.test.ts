@@ -44,6 +44,8 @@ const dbOrganizers = [
     entryValidated: true,
     entryValidatedAt: new Date('2026-07-01'),
     createdAt: new Date('2026-06-01'),
+    // Exceptions repas (accepted = false) ; vide = tous les repas de l'édition
+    mealSelections: [],
     organizer: {
       id: 10,
       title: 'Trésorier',
@@ -74,6 +76,8 @@ describe('GET /api/editions/[id]/organizers/edition-organizers', () => {
     })
     prismaMock.editionOrganizer.findMany.mockReset()
     prismaMock.editionOrganizer.findMany.mockResolvedValue(dbOrganizers)
+    prismaMock.volunteerMeal.findMany.mockReset()
+    prismaMock.volunteerMeal.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }])
   })
 
   it('rejette (404) si édition introuvable', async () => {
@@ -113,5 +117,48 @@ describe('GET /api/editions/[id]/organizers/edition-organizers', () => {
     expect(res.data.organizers[0].user.nom).toBe('Dupont') // noms/avatars OK
     expect(res.data.organizers[0].user).not.toHaveProperty('email')
     expect(res.data.organizers[0].user).not.toHaveProperty('phone')
+  })
+
+  describe('compteur de repas', () => {
+    beforeEach(() => {
+      mockCanManageOrganizers.mockReturnValue(true)
+      mockCanManageTicketing.mockReturnValue(false)
+    })
+
+    it('module repas désactivé : compteur à 0/0, aucune requête repas', async () => {
+      const res = await handler(mockEvent as any)
+
+      expect(res.data.organizers[0].meals).toEqual({ accepted: 0, total: 0 })
+      expect(prismaMock.volunteerMeal.findMany).not.toHaveBeenCalled()
+    })
+
+    it('sans exception : tous les repas activés sont accordés', async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({
+        id: 17,
+        mealsEnabled: true,
+        convention: { organizers: [] },
+        organizerPermissions: [],
+      })
+
+      const res = await handler(mockEvent as any)
+
+      expect(res.data.organizers[0].meals).toEqual({ accepted: 3, total: 3 })
+    })
+
+    it('les repas décochés sont retirés du compteur', async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({
+        id: 17,
+        mealsEnabled: true,
+        convention: { organizers: [] },
+        organizerPermissions: [],
+      })
+      prismaMock.editionOrganizer.findMany.mockResolvedValue([
+        { ...dbOrganizers[0], mealSelections: [{ mealId: 2 }] },
+      ])
+
+      const res = await handler(mockEvent as any)
+
+      expect(res.data.organizers[0].meals).toEqual({ accepted: 2, total: 3 })
+    })
   })
 })

@@ -258,7 +258,8 @@
         "standard": "Standard",
         "total": "Total måltider",
         "volunteers": "Frivilliges måltider",
-        "with_allergies": "Med allergier"
+        "with_allergies": "Med allergier",
+        "organizers": "Arrangørernes måltider"
       }
     },
     "no_description_available": "Ingen beskrivelse tilgængelig",

@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Voluntario",
         "artist": "Artista",
-        "participant": "Participante"
-      }
+        "participant": "Participante",
+        "organizer": "Organizador"
+      },
+      "organizers": "Organizadores"
     },
     "organizers": {
       "access_rights": "Derechos de acceso",
@@ -214,7 +216,26 @@
       "select_to_add": "Seleccione un organizador para agregar",
       "status": "Estado del billete",
       "title": "Organizadores",
-      "title_required": "El título del organizador es obligatorio"
+      "title_required": "El título del organizador es obligatorio",
+      "meals": {
+        "manage": "Gestionar las comidas",
+        "title": "Comidas de {name}",
+        "description": "Por defecto, un organizador presente en la edición tiene acceso a todas las comidas. Desmarca las que no vaya a tomar.",
+        "no_meals": "No hay ninguna comida configurada para esta edición",
+        "check_all": "Marcar todo",
+        "uncheck_all": "Desmarcar todo",
+        "already_validated": "Ya validada",
+        "dietary_section": "Alimentación",
+        "dietary_preference": "Régimen alimentario",
+        "allergies": "Alergias",
+        "allergies_placeholder": "Alergias o intolerancias alimentarias",
+        "allergy_severity": "Gravedad de la alergia",
+        "unsaved_changes": "Tienes cambios sin guardar",
+        "confirm_close_unsaved": "Tienes cambios sin guardar. ¿Seguro que quieres cerrar?",
+        "saved_success": "Se han guardado las comidas de este organizador",
+        "error_loading": "No se han podido cargar las comidas de este organizador",
+        "error_saving": "No se han podido guardar las comidas de este organizador"
+      }
     },
     "overview": "Vista general",
     "services": {

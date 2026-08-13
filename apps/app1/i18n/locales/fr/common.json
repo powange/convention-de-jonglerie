@@ -258,7 +258,8 @@
         "standard": "Standard",
         "total": "Total de repas",
         "volunteers": "Repas bénévoles",
-        "with_allergies": "Avec allergies"
+        "with_allergies": "Avec allergies",
+        "organizers": "Repas organisateurs"
       }
     },
     "no_description_available": "Aucune description disponible",
