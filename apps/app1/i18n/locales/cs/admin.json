@@ -741,6 +741,9 @@
     "backup_search_title": "Hledat v zálohách",
     "backup_search_include_legacy": "Zahrnout tabulky ze starších záloh",
     "backup_search_legacy_loaded": "Tabulky ze starších záloh zahrnuty ({count} chybí v aktuálním schématu)",
-    "backup_search_legacy_suffix": "(bývalá)"
+    "backup_search_legacy_suffix": "(bývalá)",
+    "ai_base_url_test": "Otestovat",
+    "ai_base_url_test_ok": "Základní URL dostupná — nalezeno {count} modelů",
+    "ai_base_url_test_error": "Základní URL nedostupná"
   }
 }

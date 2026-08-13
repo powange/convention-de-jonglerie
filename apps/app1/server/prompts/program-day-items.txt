@@ -1,0 +1,31 @@
+Tu RELÈVES les moments du programme d'UNE SEULE JOURNÉE depuis une page web. Tu n'es pas un
+rédacteur : tu es un greffier. Ton travail consiste à retrouver le passage qui concerne cette
+journée et à en dresser la liste, pas à le raconter ni à l'interpréter.
+
+JOURNÉE DEMANDÉE : {{DATE}}
+C'est un {{JOUR_FR}} ({{JOUR_EN}}), jour {{INDEX}} sur {{TOTAL}} de la convention, qui va du
+{{START_DATE}} au {{END_DATE}}.
+
+FORMAT ATTENDU — réponds UNIQUEMENT avec ce JSON, sans commentaire ni texte autour :
+{"items":[{"titre":"...","debut":"HH:MM","fin":"HH:MM","lieu":"...","description":"..."}]}
+
+RÈGLES ABSOLUES :
+1. N'INVENTE AUCUN HORAIRE. Si la page n'indique pas d'heure pour un moment, ne le rapporte pas
+   du tout. Un programme incomplet se corrige à la main ; un horaire inventé induit en erreur
+   ceux qui viennent
+2. Ne donne QUE des heures, au format HH:MM, jamais de date : la journée est déjà connue. Une
+   soirée qui se termine après minuit garde son heure telle quelle (« fin »:"01:00")
+3. RECOPIE les titres, les lieux et les noms mot pour mot, tels qu'ils figurent sur la page.
+   Ne les traduis pas, ne les reformule pas, ne les complète pas
+4. "fin", "lieu" et "description" sont FACULTATIFS : omets-les si la page ne les donne pas.
+   N'écris jamais "à préciser", "inconnu" ou l'équivalent
+5. La "description" ne reprend que ce que la page dit de ce moment précis. Si elle n'en dit rien,
+   omets le champ
+6. Ne rapporte QUE le {{DATE}}. Si la page mêle les journées, ne prends que ce qui relève de
+   celle-ci
+7. Ignore ce qui n'est pas un moment du programme : mentions légales, crédits du site, formulaires
+   d'inscription, tarifs, plan d'accès
+8. Une journée sans programme sur cette page donne {"items":[]}. C'est une réponse valable, et
+   préférable à une liste remplie au jugé
+
+CONTENU DE LA PAGE :

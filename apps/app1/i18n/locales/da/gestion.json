@@ -46,7 +46,21 @@
       "scope_days_none": "Fravælg alle",
       "scope_day_already_filled": "— allerede udfyldt",
       "program_days_failed_title": "ingen mislykket dag | Én dag kunne ikke hentes | {count} dage kunne ikke hentes",
-      "program_days_failed_description": "Modellen svarede ikke for: {days}. Der er ikke ændret noget for disse dage — kør analysen igen med kun disse valgt."
+      "program_days_failed_description": "Modellen svarede ikke for: {days}. Der er ikke ændret noget for disse dage — kør analysen igen med kun disse valgt.",
+      "program_items_found": "{count} programpunkt(er) foreslået",
+      "program_new": "Ny",
+      "program_update": "Skal rettes",
+      "apply_program_items": "Anvend {count} punkt(er)",
+      "program_applied": "{count} punkt(er) gemt",
+      "program_partial_failure": "{count} punkt(er) ikke gemt",
+      "field": {
+        "titre": "Titel",
+        "description": "Beskrivelse",
+        "debut": "Start",
+        "fin": "Slut",
+        "lieu": "Sted"
+      },
+      "program_compare_failed": "{count} programpunkt(er) fundet, men sammenligningen med det eksisterende program mislykkedes: intet foreslås, for at undgå dubletter."
     },
     "artists": {
       "list_title": "Management af kunstnere",
@@ -666,7 +680,8 @@
         "source": "Type",
         "place": "Sted",
         "visibility": "Synlighed"
-      }
+      },
+      "local_times": "Tidspunkter i konventets lokale tid ({fuseau}), også når de indtastes."
     }
   }
 }

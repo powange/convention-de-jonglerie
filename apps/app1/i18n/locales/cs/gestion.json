@@ -46,7 +46,21 @@
       "scope_days_none": "Zrušit výběr",
       "scope_day_already_filled": "— již vyplněno",
       "program_days_failed_title": "žádný neúspěšný den | Jeden den se nepodařilo načíst | Nepodařilo se načíst {count} dnů",
-      "program_days_failed_description": "Model neodpověděl pro: {days}. U těchto dnů se nic nezměnilo — spusťte analýzu znovu a vyberte pouze je."
+      "program_days_failed_description": "Model neodpověděl pro: {days}. U těchto dnů se nic nezměnilo — spusťte analýzu znovu a vyberte pouze je.",
+      "program_items_found": "Navrženo {count} bodů programu",
+      "program_new": "Nový",
+      "program_update": "K opravě",
+      "apply_program_items": "Použít {count} bodů",
+      "program_applied": "Uloženo {count} bodů",
+      "program_partial_failure": "{count} bodů neuloženo",
+      "field": {
+        "titre": "Název",
+        "description": "Popis",
+        "debut": "Začátek",
+        "fin": "Konec",
+        "lieu": "Místo"
+      },
+      "program_compare_failed": "Nalezeno {count} bodů programu, ale porovnání se stávajícím programem selhalo: nic se nenavrhuje, aby nevznikly duplicity."
     },
     "artists": {
       "list_title": "Správa umělců",
@@ -666,7 +680,8 @@
         "source": "Typ",
         "place": "Místo",
         "visibility": "Viditelnost"
-      }
+      },
+      "local_times": "Časy v místním čase konventu ({fuseau}), a to i při zadávání."
     }
   }
 }

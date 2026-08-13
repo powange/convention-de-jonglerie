@@ -8,6 +8,7 @@
       "element": "Program"
     },
     "no_result": "Żaden element nie pasuje do tego filtra.",
-    "no_result_hint": "Odznacz pole, aby poszerzyć wybór."
+    "no_result_hint": "Odznacz pole, aby poszerzyć wybór.",
+    "local_times": "Godziny w czasie lokalnym konwentu ({fuseau})."
   }
 }

@@ -46,7 +46,21 @@
       "scope_days_none": "Alle abwählen",
       "scope_day_already_filled": "— bereits ausgefüllt",
       "program_days_failed_title": "kein fehlgeschlagener Tag | Ein Tag konnte nicht erfasst werden | {count} Tage konnten nicht erfasst werden",
-      "program_days_failed_description": "Das Modell hat für {days} nicht geantwortet. Für diese Tage hat sich nichts geändert — starten Sie die Analyse erneut und wählen Sie nur diese aus."
+      "program_days_failed_description": "Das Modell hat für {days} nicht geantwortet. Für diese Tage hat sich nichts geändert — starten Sie die Analyse erneut und wählen Sie nur diese aus.",
+      "program_items_found": "{count} Programmpunkt(e) vorgeschlagen",
+      "program_new": "Neu",
+      "program_update": "Zu korrigieren",
+      "apply_program_items": "{count} Punkt(e) übernehmen",
+      "program_applied": "{count} Punkt(e) gespeichert",
+      "program_partial_failure": "{count} Punkt(e) nicht gespeichert",
+      "field": {
+        "titre": "Titel",
+        "description": "Beschreibung",
+        "debut": "Beginn",
+        "fin": "Ende",
+        "lieu": "Ort"
+      },
+      "program_compare_failed": "{count} Programmpunkt(e) gefunden, aber der Abgleich mit dem bestehenden Programm ist fehlgeschlagen: es wird nichts vorgeschlagen, um Dubletten zu vermeiden."
     },
     "artists": {
       "list_title": "Verwaltung von Künstlern",
@@ -666,7 +680,8 @@
         "source": "Typ",
         "place": "Ort",
         "visibility": "Sichtbarkeit"
-      }
+      },
+      "local_times": "Zeiten in der Ortszeit der Convention ({fuseau}), auch bei der Eingabe."
     }
   }
 }

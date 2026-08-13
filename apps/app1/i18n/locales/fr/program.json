@@ -8,6 +8,7 @@
       "element": "Programme"
     },
     "no_result": "Aucun élément ne correspond à ce filtre.",
-    "no_result_hint": "Décochez une case pour élargir la sélection."
+    "no_result_hint": "Décochez une case pour élargir la sélection.",
+    "local_times": "Horaires à l'heure locale de la convention ({fuseau})."
   }
 }

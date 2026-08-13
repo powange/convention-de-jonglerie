@@ -8,6 +8,7 @@
       "element": "Programa"
     },
     "no_result": "Ningún elemento coincide con este filtro.",
-    "no_result_hint": "Desmarque una casilla para ampliar la selección."
+    "no_result_hint": "Desmarque una casilla para ampliar la selección.",
+    "local_times": "Horarios en la hora local de la convención ({fuseau})."
   }
 }

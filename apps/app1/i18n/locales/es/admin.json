@@ -741,6 +741,9 @@
     "backup_search_title": "Buscar en las copias de seguridad",
     "backup_search_include_legacy": "Incluir las tablas de las copias antiguas",
     "backup_search_legacy_loaded": "Tablas de las copias antiguas incluidas ({count} ausentes del esquema actual)",
-    "backup_search_legacy_suffix": "(antigua)"
+    "backup_search_legacy_suffix": "(antigua)",
+    "ai_base_url_test": "Probar",
+    "ai_base_url_test_ok": "URL base accesible — {count} modelo(s) detectado(s)",
+    "ai_base_url_test_error": "URL base inaccesible"
   }
 }

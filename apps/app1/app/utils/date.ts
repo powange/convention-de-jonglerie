@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon'
+import { versInstant } from '~~/shared/utils/fuseau-edition'
 
 export interface DateFormatOptions {
   locale?: string
@@ -201,20 +201,14 @@ export const formatDurationCompact = (ms: number): string => {
  * déjà le bon instant — et la corriger d'un décalage la faussait de deux heures. Sur un poste
  * réglé ailleurs, elle était fausse dès la lecture.
  *
- * Luxon lit la chaîne dans le fuseau demandé, quel que soit celui du navigateur, et applique
- * l'heure d'été en vigueur à cette date-là plutôt qu'aujourd'hui.
+ * Simple adaptateur sur `versInstant`, qui porte désormais ce calcul pour tout le programme et
+ * vit dans `shared/` afin d'être aussi accessible au serveur, aux layers et aux tests. Deux
+ * implémentations du même passage heure murale → instant auraient fini par diverger, et c'est
+ * précisément le genre d'écart qui décale un programme de deux heures.
  *
  * @param wallClock Heure murale, ex. `2026-09-08T01:00` (un `Z` final la rend déjà absolue)
  * @param timeZone Fuseau dans lequel lire cette heure, ex. `Europe/Paris`
  * @returns Instant en ISO UTC, ou `null` si l'entrée est illisible
  */
-export const wallClockToUtcIso = (wallClock: string, timeZone: string): string | null => {
-  if (!wallClock) return null
-  // Déjà absolue : la normaliser suffit, la relire dans un fuseau la décalerait.
-  if (wallClock.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(wallClock)) {
-    const absolute = DateTime.fromISO(wallClock)
-    return absolute.isValid ? absolute.toUTC().toISO() : null
-  }
-  const parsed = DateTime.fromISO(wallClock, { zone: timeZone })
-  return parsed.isValid ? parsed.toUTC().toISO() : null
-}
+export const wallClockToUtcIso = (wallClock: string, timeZone: string): string | null =>
+  versInstant(wallClock, timeZone) || null

@@ -46,7 +46,21 @@
       "scope_days_none": "Desmarcar tudo",
       "scope_day_already_filled": "— já preenchido",
       "program_days_failed_title": "nenhum dia falhado | Não foi possível obter um dia | Não foi possível obter {count} dias",
-      "program_days_failed_description": "O modelo não respondeu para: {days}. Nada mudou nesses dias — volte a lançar a análise selecionando apenas esses."
+      "program_days_failed_description": "O modelo não respondeu para: {days}. Nada mudou nesses dias — volte a lançar a análise selecionando apenas esses.",
+      "program_items_found": "{count} elemento(s) de programa proposto(s)",
+      "program_new": "Novo",
+      "program_update": "A corrigir",
+      "apply_program_items": "Aplicar {count} elemento(s)",
+      "program_applied": "{count} elemento(s) guardado(s)",
+      "program_partial_failure": "{count} elemento(s) não guardado(s)",
+      "field": {
+        "titre": "Título",
+        "description": "Descrição",
+        "debut": "Início",
+        "fin": "Fim",
+        "lieu": "Local"
+      },
+      "program_compare_failed": "{count} elemento(s) de programa encontrado(s), mas a comparação com o programa existente falhou: nada é proposto, para evitar duplicados."
     },
     "artists": {
       "list_title": "Gestão de artistas",
@@ -666,7 +680,8 @@
         "source": "Tipo",
         "place": "Local",
         "visibility": "Visibilidade"
-      }
+      },
+      "local_times": "Horários na hora local da convenção ({fuseau}), incluindo ao introduzi-los."
     }
   }
 }

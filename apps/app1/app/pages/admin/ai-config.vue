@@ -75,11 +75,21 @@
         <div class="space-y-6">
           <!-- URL de base -->
           <UFormField :label="$t('admin.ai_lmstudio_base_url')">
-            <UInput
-              v-model="form.lmstudioBaseUrl"
-              class="w-full max-w-md"
-              placeholder="http://host.docker.internal:1234"
-            />
+            <div class="flex gap-2 items-center">
+              <UInput
+                v-model="form.lmstudioBaseUrl"
+                class="w-full max-w-md"
+                placeholder="http://host.docker.internal:1234"
+              />
+              <UButton
+                variant="soft"
+                :loading="testUrlDeBaseEnCours"
+                :disabled="!form.lmstudioBaseUrl"
+                @click="testerUrlDeBase"
+              >
+                {{ $t('admin.ai_base_url_test') }}
+              </UButton>
+            </div>
           </UFormField>
 
           <!-- Adresse de secours -->
@@ -526,29 +536,36 @@ const { execute: executeDetect, loading: detecting } = useApiAction('/api/admin/
 })
 
 /**
- * Éprouve l'adresse de secours sans toucher à la liste des modèles détectés, qui décrit la
- * principale : les mélanger laisserait croire que ces modèles viennent d'elle.
+ * Éprouve une adresse sans toucher à la liste des modèles détectés, qui décrit l'URL de base :
+ * les mélanger laisserait croire que ces modèles viennent de l'adresse testée.
  */
-const { execute: executerTestSecours, loading: testSecoursEnCours } = useApiAction(
-  '/api/admin/ai/models/detect',
-  {
+function creerTestDeJoignabilite(baseUrl: () => string, cleOk: string, cleErreur: string) {
+  return useApiAction('/api/admin/ai/models/detect', {
     method: 'POST',
-    body: () => ({ baseUrl: form.lmstudioBackupBaseUrl }),
+    body: () => ({ baseUrl: baseUrl() }),
     silentSuccess: true,
-    errorMessages: { default: t('admin.ai_backup_test_error') },
+    errorMessages: { default: t(cleErreur) },
     onSuccess: (result: any) => {
       const nombre = result?.models?.length ?? 0
       useToast().add({
-        title: t('admin.ai_backup_test_ok', { count: nombre }),
+        title: t(cleOk, { count: nombre }),
         color: nombre > 0 ? 'success' : 'warning',
       })
     },
-  }
+  })
+}
+
+const { execute: testerUrlDeBase, loading: testUrlDeBaseEnCours } = creerTestDeJoignabilite(
+  () => form.lmstudioBaseUrl,
+  'admin.ai_base_url_test_ok',
+  'admin.ai_base_url_test_error'
 )
 
-async function testerAdresseDeSecours() {
-  await executerTestSecours()
-}
+const { execute: testerAdresseDeSecours, loading: testSecoursEnCours } = creerTestDeJoignabilite(
+  () => form.lmstudioBackupBaseUrl,
+  'admin.ai_backup_test_ok',
+  'admin.ai_backup_test_error'
+)
 
 async function detectModels() {
   detectedModels.value = []

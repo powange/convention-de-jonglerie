@@ -741,6 +741,9 @@
     "backup_search_title": "Cerca nei backup",
     "backup_search_include_legacy": "Includi le tabelle dei backup più vecchi",
     "backup_search_legacy_loaded": "Tabelle dei backup più vecchi incluse ({count} assenti dallo schema attuale)",
-    "backup_search_legacy_suffix": "(vecchia)"
+    "backup_search_legacy_suffix": "(vecchia)",
+    "ai_base_url_test": "Prova",
+    "ai_base_url_test_ok": "URL di base raggiungibile — {count} modello/i rilevato/i",
+    "ai_base_url_test_error": "URL di base non raggiungibile"
   }
 }

@@ -741,6 +741,9 @@
     "backup_search_title": "Sök i säkerhetskopiorna",
     "backup_search_include_legacy": "Inkludera tabeller från äldre säkerhetskopior",
     "backup_search_legacy_loaded": "Tabeller från äldre säkerhetskopior inkluderade ({count} saknas i nuvarande schema)",
-    "backup_search_legacy_suffix": "(tidigare)"
+    "backup_search_legacy_suffix": "(tidigare)",
+    "ai_base_url_test": "Testa",
+    "ai_base_url_test_ok": "Bas-URL nåbar — {count} modell(er) hittade",
+    "ai_base_url_test_error": "Bas-URL ej nåbar"
   }
 }

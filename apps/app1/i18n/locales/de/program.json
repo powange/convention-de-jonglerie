@@ -8,6 +8,7 @@
       "element": "Programm"
     },
     "no_result": "Kein Eintrag entspricht diesem Filter.",
-    "no_result_hint": "Entfernen Sie ein Häkchen, um die Auswahl zu erweitern."
+    "no_result_hint": "Entfernen Sie ein Häkchen, um die Auswahl zu erweitern.",
+    "local_times": "Zeiten in der Ortszeit der Convention ({fuseau})."
   }
 }

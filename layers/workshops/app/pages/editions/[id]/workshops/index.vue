@@ -375,12 +375,15 @@
 
 <script setup lang="ts">
 // Layer workshops : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
+import { addHoursToDateTimeLocal, useAuthStore, useEditionStore } from '#imports'
+
 import {
-  addHoursToDateTimeLocal,
-  formatDateTimeLocal,
-  useAuthStore,
-  useEditionStore,
-} from '#imports'
+  formaterHeure,
+  formaterJournee,
+  journeeDans,
+  versChampLocal,
+  versInstant,
+} from '~~/shared/utils/fuseau-edition'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -390,6 +393,13 @@ const { t: $t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 const edition = computed(() => editionStore.getEditionById(editionId))
+
+/**
+ * Fuseau de la convention : les horaires d'un workshop sont des heures de lieu, comme ceux du
+ * programme dont ils font partie. Les saisir et les afficher dans le fuseau du navigateur les
+ * aurait fait diverger de la frise, qui les lit désormais sur place.
+ */
+const fuseau = computed(() => edition.value?.timezone ?? null)
 const workshopsEnabled = computed(() => edition.value?.workshopsEnabled ?? false)
 
 const workshops = ref<any[]>([])
@@ -492,8 +502,8 @@ const isFormValid = computed(() => {
 
   // Vérifier que le workshop est pendant l'édition
   if (edition.value) {
-    const workshopStart = new Date(formData.value.startDateTime)
-    const workshopEnd = new Date(formData.value.endDateTime)
+    const workshopStart = new Date(versInstant(formData.value.startDateTime, fuseau.value))
+    const workshopEnd = new Date(versInstant(formData.value.endDateTime, fuseau.value))
     const editionStart = new Date(edition.value.startDate)
     const editionEnd = new Date(edition.value.endDate)
 
@@ -512,8 +522,8 @@ const dateValidationError = computed(() => {
     return null
   }
 
-  const workshopStart = new Date(formData.value.startDateTime)
-  const workshopEnd = new Date(formData.value.endDateTime)
+  const workshopStart = new Date(versInstant(formData.value.startDateTime, fuseau.value))
+  const workshopEnd = new Date(versInstant(formData.value.endDateTime, fuseau.value))
   const editionStart = new Date(edition.value.startDate)
   const editionEnd = new Date(edition.value.endDate)
 
@@ -603,8 +613,7 @@ const setDuration = (hours: number) => {
   if (!formData.value.startDateTime) {
     // Si pas de date de début, initialiser avec la date de début de l'édition
     if (edition.value) {
-      const editionStart = new Date(edition.value.startDate)
-      formData.value.startDateTime = formatDateTimeLocal(editionStart)
+      formData.value.startDateTime = versChampLocal(edition.value.startDate, fuseau.value)
     } else {
       return
     }
@@ -624,7 +633,8 @@ const workshopsByDay = computed(() => {
   const grouped = new Map<string, any[]>()
 
   filteredWorkshops.forEach((workshop) => {
-    const date = new Date(workshop.startDateTime).toISOString().split('T')[0]
+    // Journée vécue sur place : découpée en temps universel, une soirée basculait au lendemain.
+    const date = journeeDans(workshop.startDateTime, fuseau.value)
     if (!grouped.has(date)) {
       grouped.set(date, [])
     }
@@ -642,23 +652,11 @@ const workshopsByDay = computed(() => {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 })
 
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+// Reçoit aussi bien une journée de la frise (`2026-08-01`) que les bornes de l'édition, qui sont
+// des instants : `formaterJournee` distingue les deux plutôt que de dater la première en UTC.
+const formatDate = (dateStr: string) => formaterJournee(dateStr, fuseau.value, 'fr-FR')
 
-const formatTime = (dateTimeStr: string) => {
-  const date = new Date(dateTimeStr)
-  return date.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+const formatTime = (dateTimeStr: string) => formaterHeure(dateTimeStr, fuseau.value, 'fr-FR')
 
 const { execute: fetchWorkshops, loading } = useApiAction(
   () => `/api/editions/${editionId}/workshops`,
@@ -693,8 +691,8 @@ const editWorkshop = (workshop: any) => {
   formData.value = {
     title: workshop.title,
     description: workshop.description || '',
-    startDateTime: formatDateTimeLocal(new Date(workshop.startDateTime)),
-    endDateTime: formatDateTimeLocal(new Date(workshop.endDateTime)),
+    startDateTime: versChampLocal(workshop.startDateTime, fuseau.value),
+    endDateTime: versChampLocal(workshop.endDateTime, fuseau.value),
     maxParticipants: workshop.maxParticipants,
     locationId: workshop.location?.id || null,
     locationName: workshop.location?.name || '',
@@ -721,8 +719,10 @@ const buildWorkshopBody = () => {
   const body: Record<string, unknown> = {
     title: formData.value.title.trim(),
     description: formData.value.description.trim() || null,
-    startDateTime: new Date(formData.value.startDateTime).toISOString(),
-    endDateTime: new Date(formData.value.endDateTime).toISOString(),
+    // Le champ `datetime-local` ne porte aucun fuseau : c'est celui de la convention qui
+    // l'ancre, et non celui du navigateur de l'organisateur.
+    startDateTime: versInstant(formData.value.startDateTime, fuseau.value),
+    endDateTime: versInstant(formData.value.endDateTime, fuseau.value),
     maxParticipants: formData.value.maxParticipants || null,
   }
 

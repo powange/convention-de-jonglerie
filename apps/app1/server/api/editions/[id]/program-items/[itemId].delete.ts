@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
+import { canManageProgram } from '#server/utils/permissions/program-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -12,7 +12,7 @@ export default wrapApiHandler(
       throw createError({ status: 400, message: 'Identifiant d’élément invalide' })
     }
 
-    const allowed = await canEditEditionById(editionId, user.id, event)
+    const allowed = await canManageProgram(editionId, user, event)
     if (!allowed) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }

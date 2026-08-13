@@ -4,7 +4,7 @@ import {
   generateCompactDirectPrompt,
   generateFeaturesDescription,
   generateJsonExample,
-  generateProgramDayPrompt,
+  generateProgramDayItemsPrompt,
   getPrefilledJsonPrompt,
 } from '../../lib/import-json-schema'
 import { loadPrompt } from '../../lib/prompt-loader'
@@ -48,7 +48,7 @@ import {
 import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
 import { htmlVersTexte } from '~~/shared/utils/html-to-text'
 import { editionDayKeys } from '~~/shared/utils/program-days'
-import { mesurerFidelite } from '~~/shared/utils/program-fidelity'
+import { construireElementsDeJournee, type ElementLu } from '~~/shared/utils/program-import'
 import { decouperParJournee } from '~~/shared/utils/program-page-slicing'
 
 const requestSchema = z.object({
@@ -541,11 +541,16 @@ export async function generateImportJson(
           programDates
         )
         journeesEnEchec = resultat.echecs
-        if (resultat.journees.length > 0) {
+        if (resultat.elements.length > 0) {
           console.log(
-            `[GENERATE-IMPORT] Programme: ${resultat.journees.length} journée(s) extraite(s)`
+            `[GENERATE-IMPORT] Programme: ${resultat.elements.length} élément(s) relevé(s)` +
+              (resultat.ignores ? `, ${resultat.ignores} écarté(s) faute de titre ou d'heure` : '')
           )
-          parsed.edition = { ...parsed.edition, programDays: resultat.journees }
+          // Des éléments, et non plus du texte par journée : le programme se compose désormais
+          // d'entrées structurées, que l'écran de revue compare une à une à ce qui existe déjà.
+          parsed.edition = { ...parsed.edition, programItems: resultat.elements }
+          // Sans cette recomposition, la modification reste dans un objet local : c'est
+          // `finalJson` qui part vers l'écran, et les éléments relevés se perdraient en silence.
           finalJson = JSON.stringify(parsed, null, 2)
         } else {
           console.log('[GENERATE-IMPORT] Programme: aucune journée extraite')
@@ -607,7 +612,7 @@ async function extractProgramDays(
   maxContent: number,
   onProgress?: ProgressCallback,
   datesDemandees?: string[]
-): Promise<{ journees: Array<{ date: string; content: string }>; echecs: string[] }> {
+): Promise<{ elements: ElementLu[]; echecs: string[]; ignores: number }> {
   const timeoutMs = config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
   // On découpe la page ENTIÈRE : tronquer avant amputerait les dernières journées. Seule la
   // matière envoyée au modèle, une section à la fois, est ramenée à son budget.
@@ -638,7 +643,8 @@ async function extractProgramDays(
     `[GENERATE-IMPORT] Passe programme: ${contenu.length} caractères, ${aTraiter.length} journée(s) à interroger (${startDate} → ${endDate})`
   )
 
-  const retenus: Array<{ date: string; content: string }> = []
+  const retenus: ElementLu[] = []
+  let ignoresTotal = 0
   /** Journées perdues malgré la seconde tentative, remontées jusqu'à l'écran. */
   const echecs: string[] = []
 
@@ -686,7 +692,7 @@ async function extractProgramDays(
       console.warn(`[GENERATE-IMPORT] Programme ${date}: journée sans descripteur, ignorée`)
       return
     }
-    const systemPrompt = generateProgramDayPrompt({
+    const systemPrompt = generateProgramDayItemsPrompt({
       date,
       jourFr: descripteur.jourFr,
       jourEn: descripteur.jourEn,
@@ -722,14 +728,17 @@ async function extractProgramDays(
         await new Promise((resoudre) => setTimeout(resoudre, 2000))
         brut = await appelerModele(config, aiProvider, systemPrompt, matiere, timeoutMs)
       }
-      const extrait = lireContenuJournee(brut)
-      if (extrait) {
-        // La consigne demande de recopier la page ; cette mesure dit si elle a été suivie.
-        const fidelite = mesurerFidelite(extrait, matiere)
+      const { elements, ignores } = construireElementsDeJournee(date, lireElementsJournee(brut))
+      ignoresTotal += ignores
+      if (elements.length > 0) {
+        // La fidélité se mesure désormais sur les titres : chacun doit figurer mot pour mot dans
+        // la page. Un titre absent de la source est un titre inventé, et c'est le risque propre à
+        // une extraction structurée — le modèle n'y recopie plus, il interprète.
+        const repris = elements.filter((e) => matiere.includes(e.titre)).length
         console.log(
-          `[GENERATE-IMPORT] Programme ${date}: ${extrait.length} caractères, fidélité ${Math.round(fidelite * 100)}% (matière ${matiere.length})`
+          `[GENERATE-IMPORT] Programme ${date}: ${elements.length} élément(s), ${repris} titre(s) retrouvé(s) mot pour mot, ${ignores} écarté(s) (matière ${matiere.length})`
         )
-        retenus.push({ date, content: extrait })
+        retenus.push(...elements)
       }
 
       if (onProgress) {
@@ -739,9 +748,10 @@ async function extractProgramDays(
           month: 'long',
           timeZone: 'UTC',
         })
+        const combien = construireElementsDeJournee(date, lireElementsJournee(brut)).elements.length
         sendUrlFetchedEvent(
           onProgress,
-          extrait ? `${libelle} — ${extrait.length} caractères` : `${libelle} — rien à cette date`
+          combien ? `${libelle} — ${combien} élément(s)` : `${libelle} — rien à cette date`
         )
       }
     } catch (error: any) {
@@ -768,22 +778,28 @@ async function extractProgramDays(
     })
   )
 
-  // L'ordre d'arrivée dépend des durées : on rétablit celui du calendrier.
+  // L'ordre d'arrivée dépend des durées et de la concurrence : on rétablit celui du calendrier.
   return {
-    journees: retenus.sort((a, b) => a.date.localeCompare(b.date)),
+    elements: retenus.sort((a, b) => a.debut.localeCompare(b.debut)),
     echecs: echecs.sort(),
+    ignores: ignoresTotal,
   }
 }
 
-/** Lit le `content` d'une réponse de journée, en tolérant du bavardage autour du JSON. */
-function lireContenuJournee(reponse: string): string {
+/**
+ * Lit la liste `items` d'une réponse de journée, en tolérant du bavardage autour du JSON.
+ *
+ * On ne valide rien ici : la mise en forme et le tri du bon grain reviennent à
+ * `construireElementsDeJournee`, qui se teste sans modèle.
+ */
+function lireElementsJournee(reponse: string): unknown {
   const match = reponse.match(/\{[\s\S]*\}/)
-  if (!match) return ''
+  if (!match) return []
   try {
-    const objet = JSON.parse(match[0]) as { content?: unknown }
-    return String(objet?.content || '').trim()
+    const objet = JSON.parse(match[0]) as { items?: unknown }
+    return objet?.items ?? []
   } catch {
-    return ''
+    return []
   }
 }
 

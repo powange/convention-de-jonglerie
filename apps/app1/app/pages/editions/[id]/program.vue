@@ -40,7 +40,21 @@
         :description="filtresActifs.length > 0 ? $t('program.no_result_hint') : undefined"
       />
 
-      <div v-for="journee in journees" v-else :key="journee.date" class="space-y-3">
+      <!-- Les horaires sont ceux de la convention : un visiteur situé dans un autre fuseau doit
+           le savoir, sans quoi il lirait ces heures à sa propre montre. Sous `ClientOnly`, car la
+           comparaison porte sur le fuseau du lecteur, que le serveur ne connaît pas : rendue des
+           deux côtés, elle aurait divergé du HTML envoyé. -->
+      <ClientOnly>
+        <UAlert
+          v-if="fuseauADire"
+          icon="i-lucide-clock"
+          color="neutral"
+          variant="subtle"
+          :title="$t('program.local_times', { fuseau: nomFuseau })"
+        />
+      </ClientOnly>
+
+      <div v-for="journee in journees" :key="journee.date" class="space-y-3">
         <h2 class="text-lg font-semibold capitalize">{{ formaterJour(journee.date) }}</h2>
 
         <UCard v-for="entree in journee.entrees" :key="entree.cle" :ui="{ body: 'p-4' }">
@@ -98,6 +112,12 @@
 import { useEditionStore } from '~/stores/editions'
 import { getEditionDisplayName } from '~/utils/editionName'
 
+import {
+  abreviationFuseau,
+  differeDuFuseauLecteur,
+  formaterHeure,
+  formaterJournee,
+} from '~~/shared/utils/fuseau-edition'
 import { grouperParJournee, type EntreeProgramme } from '~~/shared/utils/program-timeline'
 
 const route = useRoute()
@@ -128,9 +148,9 @@ const {
   pending: chargementFrise,
   error: erreurFrise,
 } = await useFetch<{
-  data: { entrees: EntreeProgramme[]; carteConsultable: boolean }
+  data: { entrees: EntreeProgramme[]; carteConsultable: boolean; fuseau: string | null }
 }>(() => `/api/editions/${editionId.value}/program`, {
-  default: () => ({ data: { entrees: [], carteConsultable: false } }),
+  default: () => ({ data: { entrees: [], carteConsultable: false, fuseau: null } }),
 })
 
 /**
@@ -150,6 +170,16 @@ if (erreurFrise.value) {
 }
 
 const entrees = computed(() => donneesFrise.value?.data?.entrees ?? [])
+
+/**
+ * Fuseau de la convention : c'est en lui que le programme se lit.
+ *
+ * Un horaire de programme est une heure de lieu — le gala est à 21 h sur place — et non un instant
+ * à retraduire chez chaque lecteur. L'afficher dans le fuseau du visiteur donnerait une heure
+ * juste et pourtant inutilisable : personne ne se présente à un spectacle à l'heure de son
+ * domicile.
+ */
+const fuseau = computed(() => donneesFrise.value?.data?.fuseau ?? null)
 
 /**
  * Filtres par source.
@@ -188,13 +218,30 @@ const entreesFiltrees = computed(() =>
     : entrees.value.filter((e) => filtresActifs.value.includes(e.source))
 )
 
-const journees = computed(() => grouperParJournee(entreesFiltrees.value))
+const journees = computed(() => grouperParJournee(entreesFiltrees.value, fuseau.value))
+
+/**
+ * Prévenir seulement quand la pendule du lecteur dira autre chose que la frise.
+ *
+ * Le dire toujours serait du bruit pour les visiteurs sur place, qui sont la majorité ; ne jamais
+ * le dire laisserait un visiteur lointain croire à des heures qu'il n'aura pas.
+ */
+const fuseauADire = computed(
+  () =>
+    journees.value.length > 0 &&
+    differeDuFuseauLecteur(journees.value[0]!.entrees[0]!.debut, fuseau.value)
+)
+
+const nomFuseau = computed(() =>
+  journees.value.length > 0
+    ? abreviationFuseau(journees.value[0]!.entrees[0]!.debut, fuseau.value, locale.value)
+    : ''
+)
 
 const couleurSource = (source: EntreeProgramme['source']) =>
   source === 'workshop' ? 'info' : source === 'spectacle' ? 'primary' : 'neutral'
 
-const formatHeure = (iso: string) =>
-  new Date(iso).toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
+const formatHeure = (iso: string) => formaterHeure(iso, fuseau.value, locale.value)
 
 /** Sans heure de fin, on n'affiche que le début — plutôt qu'un tiret suivi du vide. */
 const plageHoraire = (entree: EntreeProgramme) =>
@@ -205,8 +252,9 @@ const plageHoraire = (entree: EntreeProgramme) =>
 const plageHoraireComplete = (entree: EntreeProgramme) =>
   entree.fin ? plageHoraire(entree) : t('program.no_end_time')
 
+// Sans l'année : toutes les journées d'une frise appartiennent à la même édition.
 const formaterJour = (date: string) =>
-  new Date(`${date}T12:00:00`).toLocaleDateString(locale.value, {
+  formaterJournee(date, fuseau.value, locale.value, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',

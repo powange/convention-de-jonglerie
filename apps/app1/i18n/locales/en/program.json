@@ -8,6 +8,7 @@
       "element": "Programme"
     },
     "no_result": "No item matches this filter.",
-    "no_result_hint": "Uncheck a box to widen the selection."
+    "no_result_hint": "Uncheck a box to widen the selection.",
+    "local_times": "Times shown in the convention's local time ({fuseau})."
   }
 }
