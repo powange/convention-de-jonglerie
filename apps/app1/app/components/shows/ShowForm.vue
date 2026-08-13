@@ -38,6 +38,20 @@
               />
             </UFormField>
 
+            <!-- Compagnie / nom de scène : propre au spectacle standard. Sur un cabaret, chaque
+                 numéro a ses artistes, il n'y a pas de compagnie unique à afficher. -->
+            <UFormField
+              v-if="formData.type === 'STANDARD'"
+              :label="$t('gestion.shows.company_name')"
+              :description="$t('gestion.shows.company_name_hint')"
+            >
+              <UInput
+                v-model="formData.companyName"
+                :placeholder="$t('gestion.shows.company_name_placeholder')"
+                class="w-full"
+              />
+            </UFormField>
+
             <!-- Description -->
             <UFormField :label="$t('gestion.shows.description')">
               <UTextarea
@@ -253,6 +267,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { getImageUrl } = useImageUrl()
 const editionStore = useEditionStore()
 
 const edition = computed(() => editionStore.getEditionById(props.editionId))
@@ -283,6 +298,7 @@ interface ActInput {
 const formData = ref({
   title: '',
   type: 'STANDARD' as 'STANDARD' | 'CABARET',
+  companyName: '',
   description: '',
   technicalNeeds: '',
   startDateTime: '',
@@ -397,6 +413,10 @@ const actsPath = computed(() =>
 const buildPayload = () => {
   const base = {
     title: formData.value.title,
+    // Sur un cabaret, la compagnie n'a pas de sens : on l'envoie vide pour ne pas laisser
+    // traîner celle saisie avant une bascule de type.
+    companyName:
+      formData.value.type === 'STANDARD' ? formData.value.companyName.trim() || null : null,
     description: formData.value.description || null,
     technicalNeeds: formData.value.technicalNeeds || null,
     // Le champ `datetime-local` ne porte pas de fuseau : c'est celui de la convention qui l'ancre.
@@ -468,6 +488,7 @@ const resetForm = () => {
   formData.value = {
     title: '',
     type: 'STANDARD',
+    companyName: '',
     description: '',
     technicalNeeds: '',
     startDateTime: defaultStartDateTime.value,
@@ -496,12 +517,17 @@ watch(
       formData.value = {
         title: newShow.title || '',
         type: newShow.type === 'CABARET' ? 'CABARET' : 'STANDARD',
+        companyName: newShow.companyName || '',
         description: newShow.description || '',
         technicalNeeds: newShow.technicalNeeds || '',
         startDateTime: formattedDateTime,
         duration: newShow.duration || null,
         location: newShow.location || '',
-        imageUrl: newShow.imageUrl || null,
+        // L'image est rangée sous le spectacle (`/uploads/shows/{showId}/…`) alors que
+        // l'endpoint d'upload est celui de l'édition : on construit l'URL d'affichage ici,
+        // sinon le composant la chercherait sous l'identifiant de l'édition. Le serveur ne
+        // garde de toute façon que le nom de fichier.
+        imageUrl: getImageUrl(newShow.imageUrl, 'show', newShow.id),
         zoneId: newShow.zoneId || null,
         markerId: newShow.markerId || null,
         // Sur un cabaret, les artistes du spectacle sont ceux des numéros : on ne garde ici

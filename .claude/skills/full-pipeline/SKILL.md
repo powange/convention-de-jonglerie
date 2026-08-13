@@ -1,5 +1,5 @@
 ---
-description: 'Pipeline complet : i18n, traductions, code review avec corrections, quality-check (lint, tests, commit), puis PR, CI et merge si on est sur une branche'
+description: 'Pipeline complet : i18n, traductions, code review avec corrections, quality-check (lint, tests, commit), puis PR, attente de la CI en arrière-plan et merge si elle est verte'
 thinking: false
 ---
 
@@ -55,14 +55,27 @@ de plus et terminer.
    existe : le problème constaté, ce qui a été prouvé plutôt qu'affirmé, et ce qui reste ouvert.
    Ne pas se contenter d'un résumé du diff, que la PR affiche déjà.
 
-2. **Attendre la CI** en scrutant `gh pr checks <numéro>` jusqu'à ce qu'aucun statut ne soit
-   `pending`. Une attente longue se fait en tâche de fond, pas en enchaînant des `sleep`.
+2. **Attendre la CI en arrière-plan** — une CI dure de longues minutes : la surveiller au premier
+   plan bloquerait la session pour rien.
 
-3. **Interpréter le verdict** :
-   - tout passe → merger avec `gh pr merge <numéro> --squash --delete-branch` ;
-   - un échec → **ne pas merger**. Lire le journal du job fautif, diagnostiquer, et distinguer
-     une vraie régression d'une attente de test devenue fausse. Corriger, pousser, reprendre à
-     l'étape 2.
+   ```bash
+   gh pr checks <numéro> --watch --fail-fast
+   ```
+
+   Lancer cette commande **en tâche de fond** (`run_in_background`), puis rendre la main à
+   l'utilisateur en indiquant le numéro de PR et que le merge suivra si la CI passe. Le harness
+   réveille la session à la fin de la commande : ne pas enchaîner de `sleep`, ne pas écrire de
+   boucle d'attente maison (elle prendrait un 502 passager pour un succès) et ne pas relancer un
+   second `--watch` en parallèle.
+
+3. **Interpréter le verdict** au réveil, d'après le code de sortie :
+   - `0` (tout est vert) → merger avec `gh pr merge <numéro> --squash --delete-branch`.
+     ⚠️ `--delete-branch` bascule la copie locale sur `main` : relever la branche courante avant
+     le merge, et y revenir ensuite si le travail continue dessus ;
+   - non nul (`--fail-fast` coupe dès le premier échec) → **ne pas merger**. Lire le journal du
+     job fautif (`gh run view <id> --log-failed`), diagnostiquer, et distinguer une vraie
+     régression d'une attente de test devenue fausse. Corriger, pousser, reprendre à l'étape 2
+     avec un nouveau `--watch` en tâche de fond.
 
 **Ne jamais déployer** dans ce skill : le déploiement reste une décision explicite de
 l'utilisateur, via `/deploy`.

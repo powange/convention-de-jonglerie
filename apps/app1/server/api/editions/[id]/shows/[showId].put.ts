@@ -14,6 +14,7 @@ const updateShowSchema = z.object({
   // 191 = taille de la colonne : au-delà, l'écriture échouerait au milieu de la transaction
   title: z.string().min(1, 'Le titre est requis').max(191).optional(),
   type: z.enum(['STANDARD', 'CABARET']).optional(),
+  companyName: z.string().max(191).optional().nullable(),
   description: z.string().optional().nullable(),
   // Sans plafond (comme description) : agrège les besoins techniques importés des candidatures
   technicalNeeds: z.string().optional().nullable(),
@@ -91,9 +92,14 @@ export default wrapApiHandler(
 
     // Préparer les données de mise à jour
     const updateData: any = {}
+    const composedType = validatedData.type ?? existingShow.type
 
     if (validatedData.title !== undefined) updateData.title = validatedData.title
     if (validatedData.type !== undefined) updateData.type = validatedData.type
+    if (validatedData.companyName !== undefined) updateData.companyName = validatedData.companyName
+    // Un cabaret n'a pas de compagnie unique : en y basculant, on efface celle du spectacle
+    // plutôt que de la laisser réapparaître si l'on revient un jour en STANDARD.
+    if (composedType === 'CABARET') updateData.companyName = null
     if (validatedData.description !== undefined) updateData.description = validatedData.description
     if (validatedData.technicalNeeds !== undefined)
       updateData.technicalNeeds = validatedData.technicalNeeds
@@ -122,7 +128,6 @@ export default wrapApiHandler(
     // La recomposition efface avant de recréer : sans transaction, un échec en cours de route
     // (titre trop long, zone supprimée entre-temps) laisserait le spectacle amputé de ses
     // artistes, de ses numéros et de ses articles, sans moyen de les retrouver.
-    const composedType = validatedData.type ?? existingShow.type
     const recompose =
       validatedData.artistIds !== undefined ||
       validatedData.acts !== undefined ||

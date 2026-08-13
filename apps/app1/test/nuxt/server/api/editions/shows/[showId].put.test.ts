@@ -223,6 +223,41 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       )
     })
 
+    it('devrait mettre à jour la compagnie', async () => {
+      prismaMock.show.update.mockResolvedValue({ ...mockUpdatedShow, companyName: 'Cie Test' })
+
+      global.readBody.mockResolvedValue({ companyName: 'Cie Test' })
+
+      await handler({ context: { user: mockUser } } as any)
+
+      expect(prismaMock.show.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ companyName: 'Cie Test' }),
+        })
+      )
+    })
+
+    it('devrait effacer la compagnie quand le spectacle passe en cabaret', async () => {
+      // Un cabaret n'a pas de compagnie unique : la garder la ferait réapparaître plus tard
+      prismaMock.show.update.mockResolvedValue(mockUpdatedShow)
+      prismaMock.show.findFirst.mockResolvedValue({
+        id: 1,
+        editionId: 1,
+        type: 'STANDARD',
+        companyName: 'Cie Test',
+      })
+
+      global.readBody.mockResolvedValue({ type: 'CABARET', acts: [] })
+
+      await handler({ context: { user: mockUser } } as any)
+
+      expect(prismaMock.show.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ type: 'CABARET', companyName: null }),
+        })
+      )
+    })
+
     // Forme historique : des identifiants nus, sans quantité (un exemplaire chacun).
     it('devrait mettre à jour les associations articles à remettre', async () => {
       prismaMock.showHandoutItem.deleteMany.mockResolvedValue({ count: 1 })

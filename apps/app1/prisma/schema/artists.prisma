@@ -97,6 +97,10 @@ model Show {
   editionId      Int
   title          String
   type           ShowType @default(STANDARD)
+  // Compagnie ou nom de scène de l'artiste qui porte le spectacle. Propre aux spectacles
+  // STANDARD : dans un cabaret, chaque numéro a ses propres artistes, il n'y a pas de
+  // compagnie unique à afficher au niveau de la soirée.
+  companyName    String?
   description    String?  @db.Text
   technicalNeeds String?  @db.Text // Besoins techniques du spectacle (interne, non exposé publiquement)
   startDateTime  DateTime
