@@ -17,7 +17,6 @@ export default wrapApiHandler(
         conventionId: true,
         name: true,
         description: true,
-        program: true,
         startDate: true,
         endDate: true,
         timezone: true,

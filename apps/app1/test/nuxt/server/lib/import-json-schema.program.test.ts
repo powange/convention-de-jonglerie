@@ -42,7 +42,9 @@ describe('contrat de champs soumis à l’IA : programme', () => {
    * le déroulé. Le laisser demander coûtait des jetons pour un texte que personne ne lirait.
    */
   it('ne demande plus de programme général', () => {
-    expect(IMPORT_SCHEMA_FIELDS.edition.program).toBeUndefined()
+    // Lu via un indexeur : le champ ayant disparu du type, l'écrire en clair ne compilerait plus
+    // — ce qui prouve la suppression, mais casserait le typecheck avant de pouvoir la constater.
+    expect((IMPORT_SCHEMA_FIELDS.edition as Record<string, unknown>).program).toBeUndefined()
     expect(JSON.parse(generateJsonExample()).edition).not.toHaveProperty('program')
     expect(JSON.parse(generateCompactJsonFormat()).edition).not.toHaveProperty('program')
     expect(JSON_FORMAT_FOR_COMPLETION).not.toMatch(/"program"/)
