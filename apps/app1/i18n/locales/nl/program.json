@@ -9,6 +9,7 @@
     },
     "no_result": "Geen enkel item voldoet aan dit filter.",
     "no_result_hint": "Vink een vakje uit om de selectie te verbreden.",
-    "local_times": "Tijden in de lokale tijd van de conventie ({fuseau})."
+    "local_times": "Tijden in de lokale tijd van de conventie ({fuseau}).",
+    "show_past": "Voorbije momenten tonen"
   }
 }

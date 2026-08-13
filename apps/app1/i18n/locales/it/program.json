@@ -9,6 +9,7 @@
     },
     "no_result": "Nessun elemento corrisponde a questo filtro.",
     "no_result_hint": "Deseleziona una casella per ampliare la selezione.",
-    "local_times": "Orari nell'ora locale della convention ({fuseau})."
+    "local_times": "Orari nell'ora locale della convention ({fuseau}).",
+    "show_past": "Mostra i momenti passati"
   }
 }

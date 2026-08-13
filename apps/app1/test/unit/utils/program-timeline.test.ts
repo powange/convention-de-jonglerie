@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   construireFriseProgramme,
+  estTermine,
   grouperParJournee,
   nomDuLieu,
   type EntreeProgramme,
@@ -406,5 +407,50 @@ describe('grouperParJournee', () => {
 
   it('rend une liste vide sans entrée', () => {
     expect(grouperParJournee([])).toEqual([])
+  })
+})
+
+/**
+ * Ce qui décide qu'un moment disparaît de la frise publique. La nuance porte sur « terminé » et
+ * non « commencé » : masquer un gala parce qu'il vient de démarrer ferait disparaître ce que le
+ * visiteur cherche précisément à retrouver.
+ */
+describe('estTermine', () => {
+  const entree = (p: Partial<EntreeProgramme>) =>
+    ({ debut: '2026-08-06T19:00:00.000Z', fin: null, ...p }) as EntreeProgramme
+
+  it('tient pour terminé ce dont la fin est passée', () => {
+    const gala = entree({ fin: '2026-08-06T21:00:00.000Z' })
+    expect(estTermine(gala, '2026-08-06T21:00:01.000Z', 'Europe/Paris')).toBe(true)
+  })
+
+  // Un spectacle commencé n'est pas un spectacle fini : c'est même le moment où on le cherche.
+  it('garde un moment en cours', () => {
+    const gala = entree({ fin: '2026-08-06T21:00:00.000Z' })
+    expect(estTermine(gala, '2026-08-06T20:00:00.000Z', 'Europe/Paris')).toBe(false)
+    // La fin pile : le moment s'achève, il bascule.
+    expect(estTermine(gala, '2026-08-06T21:00:00.000Z', 'Europe/Paris')).toBe(true)
+  })
+
+  /**
+   * Sans fin annoncée — un accueil qui ouvre —, le moment court jusqu'au bout de sa journée de
+   * programme. Le faire disparaître dès son ouverture serait le contraire du service rendu.
+   */
+  it('fait durer jusqu’à la fin de sa journée ce qui n’annonce pas de fin', () => {
+    // 21 h à Paris le 6 août, sans fin : la journée de programme s'achève à 3 h le 7.
+    const accueil = entree({ debut: '2026-08-06T19:00:00.000Z' })
+    expect(estTermine(accueil, '2026-08-06T23:00:00.000Z', 'Europe/Paris')).toBe(false)
+    // 02 h 59 à Paris le 7 : encore la soirée du 6.
+    expect(estTermine(accueil, '2026-08-07T00:59:00.000Z', 'Europe/Paris')).toBe(false)
+    // 03 h passées : la journée est close.
+    expect(estTermine(accueil, '2026-08-07T01:01:00.000Z', 'Europe/Paris')).toBe(true)
+  })
+
+  // La bascule se juge sur place, comme le reste de la frise.
+  it('juge la fin de journée dans le fuseau de l’édition', () => {
+    const accueil = entree({ debut: '2026-08-06T19:00:00.000Z' })
+    // Le même instant, jugé depuis un fuseau où la journée est déjà close.
+    expect(estTermine(accueil, '2026-08-07T01:01:00.000Z', 'Europe/Paris')).toBe(true)
+    expect(estTermine(accueil, '2026-08-07T01:01:00.000Z', 'UTC')).toBe(false)
   })
 })

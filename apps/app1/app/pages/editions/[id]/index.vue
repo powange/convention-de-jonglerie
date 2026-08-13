@@ -164,152 +164,6 @@
             </div>
           </UCard>
 
-          <!-- Spectacles publics -->
-          <UCard v-if="publicShows && publicShows.length > 0" variant="subtle">
-            <!-- Version mobile/tablette (< xl) : Collapsible -->
-            <UCollapsible v-model:open="isShowsExpanded" class="space-y-4 xl:hidden">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                class="group w-full justify-between p-0 hover:bg-transparent"
-                :ui="{
-                  trailingIcon:
-                    'group-data-[state=open]:rotate-180 transition-transform duration-200',
-                }"
-              >
-                <h3 class="text-lg font-semibold">{{ $t('edition.public_shows') }}</h3>
-                <UIcon
-                  name="i-heroicons-chevron-down"
-                  class="transition-transform duration-200 group-data-[state=open]:rotate-180"
-                />
-              </UButton>
-
-              <template #content>
-                <div class="space-y-6">
-                  <div v-for="dayGroup in showsByDay" :key="dayGroup.date">
-                    <h4
-                      class="text-base font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2 mb-3"
-                    >
-                      {{ formatShowDate(dayGroup.date) }}
-                    </h4>
-                    <div class="space-y-3">
-                      <div
-                        v-for="show in dayGroup.shows"
-                        :key="show.id"
-                        class="flex gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
-                      >
-                        <img
-                          v-if="show.imageUrl"
-                          :src="getImageUrl(show.imageUrl, 'show', show.id)"
-                          :alt="show.title"
-                          class="w-16 h-16 object-cover rounded-lg shrink-0"
-                        />
-                        <div class="flex-1 min-w-0">
-                          <div class="font-medium text-gray-900 dark:text-white">
-                            {{ show.title }}
-                          </div>
-                          <div
-                            class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-gray-600 dark:text-gray-400"
-                          >
-                            <span class="flex items-center gap-1">
-                              <UIcon name="i-heroicons-clock" class="shrink-0" />
-                              {{ formatShowTime(show.startDateTime) }}
-                            </span>
-                            <span v-if="show.duration" class="flex items-center gap-1">
-                              {{ show.duration }} min
-                            </span>
-                            <NuxtLink
-                              v-if="getShowLocationUrl(show)"
-                              :to="getShowLocationUrl(show)!"
-                              class="flex items-center gap-1 text-primary hover:underline"
-                            >
-                              <UIcon name="i-heroicons-map-pin" class="shrink-0" />
-                              {{ show.zone?.name || show.marker?.name }}
-                            </NuxtLink>
-                            <span
-                              v-else-if="show.zone || show.marker || show.location"
-                              class="flex items-center gap-1"
-                            >
-                              <UIcon name="i-heroicons-map-pin" class="shrink-0" />
-                              {{ show.zone?.name || show.marker?.name || show.location }}
-                            </span>
-                          </div>
-                          <p
-                            v-if="show.description"
-                            class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2"
-                          >
-                            {{ show.description }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </UCollapsible>
-
-            <!-- Version desktop (>= xl) : Toujours visible -->
-            <div class="hidden xl:block space-y-6">
-              <h3 class="text-lg font-semibold">{{ $t('edition.public_shows') }}</h3>
-              <div v-for="dayGroup in showsByDay" :key="dayGroup.date">
-                <h4
-                  class="text-base font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2 mb-3"
-                >
-                  {{ formatShowDate(dayGroup.date) }}
-                </h4>
-                <div class="space-y-3">
-                  <div
-                    v-for="show in dayGroup.shows"
-                    :key="show.id"
-                    class="flex gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
-                  >
-                    <img
-                      v-if="show.imageUrl"
-                      :src="getImageUrl(show.imageUrl, 'show', show.id)"
-                      :alt="show.title"
-                      class="w-16 h-16 object-cover rounded-lg shrink-0"
-                    />
-                    <div class="flex-1 min-w-0">
-                      <div class="font-medium text-gray-900 dark:text-white">{{ show.title }}</div>
-                      <div
-                        class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-gray-600 dark:text-gray-400"
-                      >
-                        <span class="flex items-center gap-1">
-                          <UIcon name="i-heroicons-clock" class="shrink-0" />
-                          {{ formatShowTime(show.startDateTime) }}
-                        </span>
-                        <span v-if="show.duration" class="flex items-center gap-1">
-                          {{ show.duration }} min
-                        </span>
-                        <NuxtLink
-                          v-if="getShowLocationUrl(show)"
-                          :to="getShowLocationUrl(show)!"
-                          class="flex items-center gap-1 text-primary hover:underline"
-                        >
-                          <UIcon name="i-heroicons-map-pin" class="shrink-0" />
-                          {{ show.zone?.name || show.marker?.name }}
-                        </NuxtLink>
-                        <span
-                          v-else-if="show.zone || show.marker || show.location"
-                          class="flex items-center gap-1"
-                        >
-                          <UIcon name="i-heroicons-map-pin" class="shrink-0" />
-                          {{ show.zone?.name || show.marker?.name || show.location }}
-                        </span>
-                      </div>
-                      <p
-                        v-if="show.description"
-                        class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2"
-                      >
-                        {{ show.description }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </UCard>
-
           <UCard variant="subtle">
             <!-- Services - Version mobile/tablette (< xl) : Collapsible -->
             <UCollapsible v-model:open="isServicesExpanded" class="space-y-4 xl:hidden">
@@ -785,8 +639,6 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
-import { formaterHeure, formaterJournee, journeeDeProgramme } from '~~/shared/utils/fuseau-edition'
-
 const { formatDateTimeRange } = useDateFormat()
 
 const route = useRoute()
@@ -804,7 +656,6 @@ const isProgramExpanded = ref(false)
 const isServicesExpanded = ref(false)
 const isPracticalInfoExpanded = ref(false)
 const isLinksExpanded = ref(false)
-const isShowsExpanded = ref(false)
 const { getImageUrl } = useImageUrl()
 
 // Détection de la taille d'écran pour l'état initial des collapsibles
@@ -819,7 +670,6 @@ if (import.meta.client) {
         isServicesExpanded.value = true
         isPracticalInfoExpanded.value = true
         isLinksExpanded.value = true
-        isShowsExpanded.value = true
       }
       // Si écran < md, replier tous les collapsibles
       else if (newWidth < 768) {
@@ -827,7 +677,6 @@ if (import.meta.client) {
         isServicesExpanded.value = false
         isPracticalInfoExpanded.value = false
         isLinksExpanded.value = false
-        isShowsExpanded.value = false
       }
     },
     { immediate: true }
@@ -852,55 +701,6 @@ const { data: tiers } = await useFetch<any[]>(`/api/editions/${editionId}/ticket
   server: true,
   lazy: true,
 })
-
-// Charger les spectacles publics
-const { data: publicShows } = await useApiFetch<any[]>(`/api/editions/${editionId}/shows/public`, {
-  server: true,
-  lazy: true,
-  transform: (payload: any) => payload?.shows || [],
-})
-
-/**
- * Fuseau de la convention : les horaires de spectacle sont des heures de lieu, comme sur la frise
- * du programme. Un visiteur qui consulte la page depuis chez lui doit lire l'heure à laquelle il
- * devra être sur place, pas celle de sa propre pendule.
- */
-const fuseauEdition = computed(() => edition.value?.timezone ?? null)
-
-// Spectacles regroupés par jour
-const showsByDay = computed(() => {
-  if (!publicShows.value || publicShows.value.length === 0) return []
-
-  const grouped = new Map<string, any[]>()
-
-  publicShows.value.forEach((show: any) => {
-    // Journée vécue sur place, et non journée calendaire : un spectacle de fin de soirée qui
-    // commence après minuit se range avec la veille, comme sur la frise du programme.
-    const date = journeeDeProgramme(show.startDateTime, fuseauEdition.value)
-    if (!grouped.has(date)) {
-      grouped.set(date, [])
-    }
-    grouped.get(date)!.push(show)
-  })
-
-  return Array.from(grouped.entries())
-    .map(([date, shows]) => ({
-      date,
-      shows: shows.sort(
-        (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
-      ),
-    }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-})
-
-const formatShowDate = (dateStr: string) =>
-  formaterJournee(dateStr, fuseauEdition.value, locale.value)
-
-const formatShowTime = (dateTimeStr: string) =>
-  formaterHeure(dateTimeStr, fuseauEdition.value, locale.value)
-
-// Lien vers la carte pour les zones/marqueurs
-const { getMapLocationUrl: getShowLocationUrl } = useMapLink(editionId)
 
 // Gestion des erreurs
 if (error.value) {
