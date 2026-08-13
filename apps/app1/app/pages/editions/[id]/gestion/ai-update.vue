@@ -360,6 +360,15 @@
         <!-- Programme : des éléments, pas des champs. Chacun se relit séparément, parce qu'ici
              le modèle n'a pas recopié mais interprété — découpé des créneaux, converti des heures.
              C'est le seul garde-fou contre un horaire inventé. -->
+        <UAlert
+          v-if="erreurProgramme"
+          icon="i-lucide-alert-triangle"
+          color="warning"
+          variant="soft"
+          :title="erreurProgramme"
+          :class="{ 'mt-6': differences.length }"
+        />
+
         <div
           v-if="planAffiche.length > 0"
           class="space-y-3"
@@ -431,7 +440,10 @@
           </UButton>
         </div>
 
-        <div v-if="differences.length === 0 && planAffiche.length === 0" class="text-center py-8">
+        <div
+          v-if="differences.length === 0 && planAffiche.length === 0 && !erreurProgramme"
+          class="text-center py-8"
+        >
           <UIcon name="i-lucide-check-circle" class="mx-auto h-12 w-12 text-green-500 mb-4" />
           <p class="text-gray-600 dark:text-gray-400">
             {{ $t('gestion.ai_update.no_differences') }}
@@ -443,7 +455,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { comparerLignes, meriteUnDiff, type ComparaisonLignes } from '~~/shared/utils/diff-lignes'
 import { editionDayKeys } from '~~/shared/utils/program-days'
 import {
@@ -681,19 +692,23 @@ const applicationProgramme = ref(false)
 
 const elementsRetenus = computed(() => planAffiche.value.filter((e) => e.retenu))
 
-const chargerElementsExistants = async () => {
+const erreurProgramme = ref('')
+
+const chargerElementsExistants = async (): Promise<boolean> => {
   try {
     const reponse = await $fetch<{ data: { items: ElementExistant[] } }>(
       `/api/editions/${editionId}/program-items`
     )
     elementsExistants.value = reponse.data?.items ?? []
   } catch (error) {
-    // Sans cette lecture on ne peut pas distinguer un ajout d'un doublon : mieux vaut ne rien
-    // proposer que de proposer de tout recréer.
+    // Sans cette lecture on ne peut pas distinguer un ajout d'un doublon : on renonce à proposer
+    // le programme plutôt que de proposer de tout recréer. Mais on ne jette pas l'analyse pour
+    // autant — elle a coûté plusieurs minutes, et le reste des résultats demeure exploitable.
     console.error('Lecture des éléments de programme impossible', error)
     elementsExistants.value = []
-    throw error
+    return false
   }
+  return true
 }
 
 const libelleCreneau = (element: ElementPropose) => {
@@ -1139,8 +1154,15 @@ const searchForUpdates = async () => {
       const proposes = Array.isArray(parsed?.edition?.programItems)
         ? (parsed.edition.programItems as ElementPropose[])
         : []
-      if (proposes.length > 0) {
-        await chargerElementsExistants()
+      erreurProgramme.value = ''
+      if (proposes.length > 0 && !(await chargerElementsExistants())) {
+        // Le dire plutôt que d'afficher une carte vide : le modèle a bien relevé des éléments,
+        // c'est la comparaison avec l'existant qui a échoué.
+        erreurProgramme.value = t('gestion.ai_update.program_compare_failed', {
+          count: proposes.length,
+        })
+        planAffiche.value = []
+      } else if (proposes.length > 0) {
         planAffiche.value = planifierImportProgramme(proposes, elementsExistants.value)
           // Les éléments inchangés n'appellent aucune décision : les afficher noierait le reste.
           .filter((action) => action.action !== 'inchange')

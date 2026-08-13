@@ -59,7 +59,8 @@
         "debut": "Začátek",
         "fin": "Konec",
         "lieu": "Místo"
-      }
+      },
+      "program_compare_failed": "Nalezeno {count} bodů programu, ale porovnání se stávajícím programem selhalo: nic se nenavrhuje, aby nevznikly duplicity."
     },
     "artists": {
       "list_title": "Správa umělců",

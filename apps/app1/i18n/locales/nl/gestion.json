@@ -59,7 +59,8 @@
         "debut": "Begin",
         "fin": "Einde",
         "lieu": "Locatie"
-      }
+      },
+      "program_compare_failed": "{count} programmaonderde(e)l(en) gevonden, maar de vergelijking met het bestaande programma is mislukt: er wordt niets voorgesteld, om dubbels te voorkomen."
     },
     "artists": {
       "list_title": "Artiestenmanagement",

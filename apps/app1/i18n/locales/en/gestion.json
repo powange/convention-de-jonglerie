@@ -59,7 +59,8 @@
         "debut": "Start",
         "fin": "End",
         "lieu": "Location"
-      }
+      },
+      "program_compare_failed": "{count} programme item(s) found, but comparison with the existing programme failed: nothing is proposed, to avoid creating duplicates."
     },
     "artists": {
       "list_title": "Artist management",

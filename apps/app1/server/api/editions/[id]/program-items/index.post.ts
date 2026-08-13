@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
+import { canManageProgram } from '#server/utils/permissions/program-permissions'
 import { assurerLieuDeLEdition } from '#server/utils/program-location'
 import { PROGRAM_ITEM_LIMITS, programItemSchema } from '#server/utils/program-validation'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -10,7 +10,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const allowed = await canEditEditionById(editionId, user.id, event)
+    const allowed = await canManageProgram(editionId, user, event)
     if (!allowed) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }

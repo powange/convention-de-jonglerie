@@ -59,7 +59,8 @@
         "debut": "Start",
         "fin": "Slut",
         "lieu": "Sted"
-      }
+      },
+      "program_compare_failed": "{count} programpunkt(er) fundet, men sammenligningen med det eksisterende program mislykkedes: intet foreslås, for at undgå dubletter."
     },
     "artists": {
       "list_title": "Management af kunstnere",

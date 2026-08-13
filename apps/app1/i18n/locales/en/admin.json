@@ -741,6 +741,9 @@
     "backup_search_title": "Search the backups",
     "backup_search_include_legacy": "Include tables from older backups",
     "backup_search_legacy_loaded": "Tables from older backups included ({count} missing from the current schema)",
-    "backup_search_legacy_suffix": "(former)"
+    "backup_search_legacy_suffix": "(former)",
+    "ai_base_url_test": "Test",
+    "ai_base_url_test_ok": "Base URL reachable — {count} model(s) detected",
+    "ai_base_url_test_error": "Base URL unreachable"
   }
 }

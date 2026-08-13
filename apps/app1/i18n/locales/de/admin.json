@@ -741,6 +741,9 @@
     "backup_search_title": "Sicherungen durchsuchen",
     "backup_search_include_legacy": "Tabellen aus älteren Sicherungen einbeziehen",
     "backup_search_legacy_loaded": "Tabellen aus älteren Sicherungen einbezogen ({count} fehlen im aktuellen Schema)",
-    "backup_search_legacy_suffix": "(ehemalig)"
+    "backup_search_legacy_suffix": "(ehemalig)",
+    "ai_base_url_test": "Testen",
+    "ai_base_url_test_ok": "Basis-URL erreichbar — {count} Modell(e) erkannt",
+    "ai_base_url_test_error": "Basis-URL nicht erreichbar"
   }
 }

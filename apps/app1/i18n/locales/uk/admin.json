@@ -741,6 +741,9 @@
     "backup_search_title": "Шукати в резервних копіях",
     "backup_search_include_legacy": "Включити таблиці зі старих резервних копій",
     "backup_search_legacy_loaded": "Таблиці зі старих копій включено ({count} відсутні в поточній схемі)",
-    "backup_search_legacy_suffix": "(колишня)"
+    "backup_search_legacy_suffix": "(колишня)",
+    "ai_base_url_test": "Перевірити",
+    "ai_base_url_test_ok": "Базовий URL доступний — знайдено моделей: {count}",
+    "ai_base_url_test_error": "Базовий URL недоступний"
   }
 }

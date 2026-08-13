@@ -741,6 +741,9 @@
     "backup_search_title": "Søg i sikkerhedskopierne",
     "backup_search_include_legacy": "Medtag tabeller fra ældre sikkerhedskopier",
     "backup_search_legacy_loaded": "Tabeller fra ældre sikkerhedskopier medtaget ({count} mangler i det nuværende skema)",
-    "backup_search_legacy_suffix": "(tidligere)"
+    "backup_search_legacy_suffix": "(tidligere)",
+    "ai_base_url_test": "Test",
+    "ai_base_url_test_ok": "Basis-URL kan nås — {count} model(ler) fundet",
+    "ai_base_url_test_error": "Basis-URL kan ikke nås"
   }
 }

@@ -59,7 +59,8 @@
         "debut": "Start",
         "fin": "Slut",
         "lieu": "Plats"
-      }
+      },
+      "program_compare_failed": "{count} programpunkt(er) hittades, men jämförelsen med det befintliga programmet misslyckades: inget föreslås, för att undvika dubbletter."
     },
     "artists": {
       "list_title": "Artisthantering",

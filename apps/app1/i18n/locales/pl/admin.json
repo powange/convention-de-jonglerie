@@ -741,6 +741,9 @@
     "backup_search_title": "Szukaj w kopiach zapasowych",
     "backup_search_include_legacy": "Uwzględnij tabele ze starszych kopii zapasowych",
     "backup_search_legacy_loaded": "Uwzględniono tabele ze starszych kopii ({count} brakuje w bieżącym schemacie)",
-    "backup_search_legacy_suffix": "(dawna)"
+    "backup_search_legacy_suffix": "(dawna)",
+    "ai_base_url_test": "Testuj",
+    "ai_base_url_test_ok": "Bazowy URL osiągalny — wykryto {count} model(i)",
+    "ai_base_url_test_error": "Bazowy URL nieosiągalny"
   }
 }

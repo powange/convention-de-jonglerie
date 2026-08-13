@@ -59,7 +59,8 @@
         "debut": "Début",
         "fin": "Fin",
         "lieu": "Lieu"
-      }
+      },
+      "program_compare_failed": "{count} élément(s) de programme relevé(s), mais la comparaison avec le programme existant a échoué : rien n'est proposé, pour ne pas risquer de créer des doublons."
     },
     "artists": {
       "list_title": "Gestion des artistes",
