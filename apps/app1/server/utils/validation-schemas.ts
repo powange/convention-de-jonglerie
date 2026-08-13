@@ -163,11 +163,6 @@ export const editionSchema = z
       .max(5000, 'La description ne peut pas dépasser 5000 caractères')
       .nullable()
       .optional(),
-    program: z
-      .string()
-      .max(10000, 'Le programme ne peut pas dépasser 10000 caractères')
-      .nullable()
-      .optional(),
     imageUrl: z.string().nullable().optional(),
     startDate: dateSchema,
     endDate: dateSchema,
@@ -263,11 +258,6 @@ export const updateEditionSchema = z
     description: z
       .string()
       .max(5000, 'La description ne peut pas dépasser 5000 caractères')
-      .nullable()
-      .optional(),
-    program: z
-      .string()
-      .max(10000, 'Le programme ne peut pas dépasser 10000 caractères')
       .nullable()
       .optional(),
     imageUrl: z.string().nullable().optional(),

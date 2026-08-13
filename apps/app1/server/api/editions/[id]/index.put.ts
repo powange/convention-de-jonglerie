@@ -26,7 +26,6 @@ export default wrapApiHandler(
       conventionId,
       name,
       description,
-      program,
       imageUrl,
       startDate,
       endDate,
@@ -129,7 +128,6 @@ export default wrapApiHandler(
     const updatedData: Prisma.EditionUpdateInput = {
       name: name !== undefined ? name?.trim() || null : edition.name,
       description: description || edition.description,
-      program: program !== undefined ? program : edition.program,
       imageUrl: finalImageFilename !== undefined ? finalImageFilename : edition.imageUrl,
       startDate: startDate ? normalizeDateToISO(startDate) || startDate : edition.startDate,
       endDate: endDate ? normalizeDateToISO(endDate) || endDate : edition.endDate,

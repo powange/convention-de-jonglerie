@@ -22,7 +22,6 @@ export default wrapApiHandler(
       conventionId,
       name,
       description,
-      program,
       imageUrl,
       startDate,
       endDate,
@@ -87,7 +86,6 @@ export default wrapApiHandler(
           conventionId,
           name: name?.trim() || null,
           description,
-          program,
           imageUrl: null, // On met null d'abord
           startDate: normalizeDateToISO(startDate) || startDate,
           endDate: normalizeDateToISO(endDate) || endDate,
