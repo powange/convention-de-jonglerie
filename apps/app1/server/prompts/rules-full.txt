@@ -6,4 +6,4 @@
 6. DATES: Inclure l'heure si disponible (format YYYY-MM-DDTHH:MM:SS)
 7. CARACTÉRISTIQUES: Mets true UNIQUEMENT si explicitement mentionné dans le contenu (camping, douches, spectacles, etc.)
 8. PRIORITÉ FACEBOOK/JUGGLINGEDGE: Si des données structurées sont fournies (Facebook, JugglingEdge JSON-LD), elles sont fiables et prioritaires
-9. PROGRAMME: Si la source renvoie vers une page dédiée au programme, mets son URL dans programUrl (COPIER EXACTEMENT, comme les autres URLs). Le champ program ne reçoit que le programme général — principes de vie commune, tarifs, plan d'accès. N'y recopie pas le déroulé horaire : il est relevé à part, créneau par créneau
+9. PROGRAMME: Si la source renvoie vers une page dédiée au programme, mets son URL dans programUrl (COPIER EXACTEMENT, comme les autres URLs). Ne recopie pas le programme lui-même : il est relevé à part, créneau par créneau, depuis cette page

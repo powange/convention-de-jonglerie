@@ -26,7 +26,7 @@ export const REQUIRED_FIELDS =
  * Liste des champs optionnels importants (partagée ED/EI)
  */
 export const OPTIONAL_FIELDS =
-  'region (Région/État/Province), timezone, imageUrl, ticketingUrl, facebookUrl, instagramUrl, jugglingEdgeUrl, latitude, longitude, programUrl (page externe du programme), program (programme sans date)'
+  'region (Région/État/Province), timezone, imageUrl, ticketingUrl, facebookUrl, instagramUrl, jugglingEdgeUrl, latitude, longitude, programUrl (page externe du programme)'
 
 /**
  * Génère la section des champs pour les prompts compacts
@@ -69,8 +69,7 @@ export const JSON_FORMAT_FOR_COMPLETION = `{
     "officialWebsiteUrl": "optionnel",
     "jugglingEdgeUrl": "optionnel - URL JugglingEdge si la source est jugglingedge.com",
     "imageUrl": "optionnel",
-    "programUrl": "optionnel - URL d'une page décrivant le programme",
-    "program": "optionnel - programme général, sans découpage par journée"
+    "programUrl": "optionnel - URL d'une page décrivant le programme"
   }
 }`
 
@@ -129,20 +128,13 @@ export const IMPORT_SCHEMA_FIELDS = {
 
     // Programme
     //
-    // Deux champs pour une seule information, et un ordre de préférence : une convention se vit
-    // jour par jour, et un programme découpé se lit sur place bien mieux qu'un bloc unique.
-    // Le champ général ne garde que ce qui ne se rattache à aucune date.
+    // Seule l'adresse de la page est demandée. Le programme lui-même est relevé à part, créneau
+    // par créneau : un bloc de texte ne se lit pas sur place, et n'a plus où s'afficher.
     programUrl: {
       required: false,
       description:
-        "URL d'une page décrivant le programme, quand la source y renvoie plutôt que de le " +
-        'détailler. Se cumule avec les deux champs suivants sans les remplacer.',
-    },
-    program: {
-      required: false,
-      description:
-        'Programme général : les principes de vie commune, les tarifs, le plan d’accès. Le ' +
-        'déroulé horaire ne va pas ici — il est relevé à part, créneau par créneau.',
+        "URL d'une page décrivant le programme, quand la source y renvoie. C'est cette page qui " +
+        'sera relue journée par journée pour en tirer les créneaux.',
     },
 
     // Bénévolat
@@ -190,7 +182,6 @@ export function generateJsonExample(): string {
         officialWebsiteUrl: 'https://...',
         jugglingEdgeUrl: 'https://www.jugglingedge.com/event.php?EventID=...',
         programUrl: 'https://.../programme',
-        program: 'Ce qui ne se rattache à aucun horaire, sinon chaîne vide',
         volunteersOpen: false,
         volunteersDescription: '',
         volunteersExternalUrl: '',
@@ -268,7 +259,6 @@ export function generateCompactJsonFormat(): string {
       officialWebsiteUrl: '',
       jugglingEdgeUrl: '',
       programUrl: '',
-      program: '',
       volunteersOpen: false,
       ...featuresObj,
     },

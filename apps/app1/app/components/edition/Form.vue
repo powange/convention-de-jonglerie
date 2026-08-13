@@ -413,20 +413,6 @@
               "
             />
           </UFormField>
-
-          <UFormField :label="$t('common.program')" name="program" :error="getProgramError()">
-            <MarkdownEditor
-              v-model="state.program"
-              :placeholder="$t('components.edition_form.program_placeholder')"
-              class="min-h-40"
-              @blur="
-                (() => {
-                  touchedFields.program = true
-                  trimField('program')
-                })()
-              "
-            />
-          </UFormField>
         </div>
       </template>
 
@@ -658,7 +644,6 @@ const touchedFields = reactive({
   conventionId: false,
   name: false,
   description: false,
-  program: false,
   startDate: false,
   endDate: false,
   addressCountry: false,
@@ -671,7 +656,6 @@ const state = reactive({
   conventionId: props.initialData?.conventionId,
   name: props.initialData?.name || '',
   description: props.initialData?.description || '',
-  program: props.initialData?.program || '',
   imageUrl: props.initialData?.imageUrl || null,
   // Les dates sont maintenant des objets Date natifs
   startDate: props.initialData?.startDate ? fromApiFormat(props.initialData.startDate) : null,
@@ -830,7 +814,6 @@ const trimField = (fieldName: string) => {
 const trimAllTextFields = () => {
   trimField('name')
   trimField('description')
-  trimField('program')
   trimField('addressLine1')
   trimField('addressLine2')
   trimField('postalCode')
@@ -876,13 +859,6 @@ const getNameError = () => {
 const getDescriptionError = () => {
   if (touchedFields.description && state.description && state.description.length > 5000) {
     return t('validation.description_max_5000')
-  }
-  return undefined
-}
-
-const getProgramError = () => {
-  if (touchedFields.program && state.program && state.program.length > 10000) {
-    return t('validation.program_max_10000')
   }
   return undefined
 }
@@ -1075,7 +1051,6 @@ const handleSubmit = () => {
     endDate: toApiFormat(state.endDate),
     imageUrl: state.imageUrl?.trim() || null,
     description: state.description?.trim() || null,
-    program: state.program?.trim() || null,
     name: state.name?.trim() || null,
     addressLine2: state.addressLine2?.trim() || null,
     region: state.region?.trim() || null,
@@ -1229,7 +1204,6 @@ watch(
       state.conventionId = newVal.conventionId
       state.name = newVal.name || ''
       state.description = newVal.description || ''
-      state.program = newVal.program || ''
       // Utiliser le nouveau système de dates
       state.startDate = newVal.startDate ? fromApiFormat(newVal.startDate) : null
       state.endDate = newVal.endDate ? fromApiFormat(newVal.endDate) : null

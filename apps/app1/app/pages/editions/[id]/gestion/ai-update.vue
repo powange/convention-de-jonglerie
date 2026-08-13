@@ -860,7 +860,6 @@ const fieldLabels: Record<string, string> = {
   'edition.latitude': 'Latitude',
   'edition.longitude': 'Longitude',
   'edition.programUrl': 'Lien du programme',
-  'edition.program': 'Programme général',
 }
 
 /** `2025-07-16` → `jeudi 16 juillet`. Midi UTC pour ne pas glisser d'un jour selon le fuseau. */
@@ -955,7 +954,6 @@ const compareResults = (aiData: any) => {
       { key: 'name', edValue: ed.name },
       { key: 'description', edValue: ed.description },
       { key: 'programUrl', edValue: ed.programUrl },
-      { key: 'program', edValue: ed.program },
       { key: 'startDate', edValue: ed.startDate },
       { key: 'endDate', edValue: ed.endDate },
       { key: 'addressLine1', edValue: ed.addressLine1 },

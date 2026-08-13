@@ -5,8 +5,7 @@
       "save": "Spara",
       "save_error": "Fel vid uppdatering av information",
       "save_success": "Information uppdaterad",
-      "title": "Om",
-      "program_general_help": "Det som inte beror på ett datum: hitta hit, priser, gemensamma regler."
+      "title": "Om"
     },
     "ai_update": {
       "apply_selected": "Tillämpa {count} ändring(ar)",

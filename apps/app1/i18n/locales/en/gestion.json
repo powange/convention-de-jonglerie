@@ -5,8 +5,7 @@
       "save": "Save",
       "save_error": "Error updating information",
       "save_success": "Information updated successfully",
-      "title": "About",
-      "program_general_help": "What does not depend on a date: access, prices, house rules."
+      "title": "About"
     },
     "ai_update": {
       "apply_selected": "Apply {count} change(s)",

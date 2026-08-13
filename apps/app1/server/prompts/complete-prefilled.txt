@@ -17,5 +17,5 @@ RÈGLES:
 4. convention.email = UNIQUEMENT si trouvé explicitement dans les sources, sinon laisser vide ""
 5. Les champs marqués "(fourni par Facebook, ne pas remplir)" sont gérés automatiquement — IGNORE-LES
 6. startDate, endDate, timezone : NE PAS les modifier s'ils sont déjà remplis
-7. PROGRAMME : le champ program ne reçoit que le programme général (vie commune, tarifs, accès). N'y recopie pas le déroulé horaire, qui est relevé à part
+7. PROGRAMME : renseigne seulement programUrl. Ne recopie pas le programme, relevé à part créneau par créneau
 8. Réponds UNIQUEMENT avec le JSON complet, sans commentaires

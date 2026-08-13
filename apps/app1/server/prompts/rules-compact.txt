@@ -6,4 +6,4 @@
 - dates avec heures si trouvées (YYYY-MM-DDTHH:MM:SS)
 - caractéristiques=true seulement si explicitement mentionné
 - PRIORITÉ données structurées (Facebook, JugglingEdge JSON-LD)
-- programme: URL d'une page dédiée => programUrl (COPIER EXACTEMENT) ; program=programme général seulement (vie commune, tarifs, accès), jamais le déroulé horaire, relevé à part
+- programme: URL d'une page dédiée => programUrl (COPIER EXACTEMENT) ; ne recopie pas le programme, relevé à part créneau par créneau

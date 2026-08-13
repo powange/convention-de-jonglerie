@@ -5,8 +5,7 @@
       "save": "Gem",
       "save_error": "Fejl ved opdatering af oplysninger",
       "save_success": "Oplysninger opdateret",
-      "title": "Om",
-      "program_general_help": "Det, der ikke afhænger af en dato: adgang, priser, fælles leveregler."
+      "title": "Om"
     },
     "ai_update": {
       "apply_selected": "Anvend {count} ændring(er)",

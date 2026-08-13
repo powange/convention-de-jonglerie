@@ -5,8 +5,7 @@
       "save": "Enregistrer",
       "save_error": "Erreur lors de la mise à jour des informations",
       "save_success": "Informations mises à jour avec succès",
-      "title": "À propos",
-      "program_general_help": "Ce qui ne dépend pas d'une date : accès, tarifs, principes de vie commune."
+      "title": "À propos"
     },
     "ai_update": {
       "apply_selected": "Appliquer {count} modification(s)",

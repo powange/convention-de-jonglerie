@@ -130,7 +130,6 @@
     "postal_code": "Postnummer",
     "previous": "Forrige",
     "private": "Privat",
-    "program": "Program",
     "pronouns_options": {
       "she": "hun",
       "he": "han",
@@ -769,7 +768,6 @@
     "name_max_200": "Navnet må ikke overskride 200 tegn",
     "name_min_3": "Navnet skal indeholde mindst 3 tegn",
     "phone_required": "Telefonnummer er påkrævet",
-    "program_max_10000": "Programmet må ikke overstige 10000 tegn",
     "url_invalid": "URL'en skal starte med http:// eller https://",
     "url_max_191": "URL'en må ikke overstige 191 tegn"
   },

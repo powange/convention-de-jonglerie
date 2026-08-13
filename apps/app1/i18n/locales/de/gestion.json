@@ -5,8 +5,7 @@
       "save": "Speichern",
       "save_error": "Fehler beim Aktualisieren der Informationen",
       "save_success": "Informationen erfolgreich aktualisiert",
-      "title": "Über uns",
-      "program_general_help": "Was nicht von einem Datum abhängt: Anfahrt, Preise, Regeln des Zusammenlebens."
+      "title": "Über uns"
     },
     "ai_update": {
       "apply_selected": "{count} Änderung(en) anwenden",

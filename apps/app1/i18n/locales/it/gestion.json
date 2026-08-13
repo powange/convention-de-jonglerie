@@ -5,8 +5,7 @@
       "save": "Salva",
       "save_error": "Errore durante l'aggiornamento delle informazioni",
       "save_success": "Informazioni aggiornate con successo",
-      "title": "Informazioni",
-      "program_general_help": "Ciò che non dipende da una data: accesso, tariffe, regole di convivenza."
+      "title": "Informazioni"
     },
     "ai_update": {
       "apply_selected": "Applica {count} modifica/e",

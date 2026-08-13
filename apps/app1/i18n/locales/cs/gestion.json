@@ -5,8 +5,7 @@
       "save": "Uložit",
       "save_error": "Chyba při aktualizaci informací",
       "save_success": "Informace úspěšně aktualizovány",
-      "title": "O akci",
-      "program_general_help": "Co nezávisí na datu: doprava, ceny, pravidla soužití."
+      "title": "O akci"
     },
     "ai_update": {
       "apply_selected": "Použít {count} změnu/změn",
