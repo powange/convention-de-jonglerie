@@ -45,7 +45,14 @@
         :description="$t('gestion.program.sources_hint')"
       />
 
-      <div v-if="chargementFrise" class="flex items-center justify-center py-12">
+      <!-- Seulement au premier chargement, quand il n'y a encore rien à montrer. Chaque écriture
+           recharge la frise, et ce spinner escamotait alors toute la liste pour la remettre aussitôt :
+           la page sautait sous le curseur au moment même où l'on visait un interrupteur. Une frise
+           déjà affichée reste donc en place, chaque ligne signalant elle-même son travail en cours. -->
+      <div
+        v-if="chargementFrise && journees.length === 0"
+        class="flex items-center justify-center py-12"
+      >
         <UIcon name="i-lucide-loader-2" class="h-8 w-8 animate-spin text-primary" />
       </div>
 
@@ -120,6 +127,18 @@
                propre formulaire, qu'il ne s'agit pas de dupliquer. -->
           <template #actions-cell="{ row }">
             <div v-if="row.original.source === 'element'" class="flex justify-end gap-1">
+              <!-- Convertir : un créneau se saisit vite, puis mérite parfois sa fiche complète
+                   — artistes pour un spectacle, places pour un workshop. -->
+              <UButton
+                v-if="conversionsPossibles.length > 0"
+                icon="i-lucide-shuffle"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :aria-label="$t('gestion.program.convert')"
+                :title="$t('gestion.program.convert')"
+                @click="ouvrirConversion(row.original)"
+              />
               <UButton
                 icon="i-heroicons-pencil-square"
                 color="neutral"
@@ -142,6 +161,61 @@
         </UTable>
       </div>
     </div>
+
+    <UModal v-model:open="conversionOuverte" :title="$t('gestion.program.convert')">
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.program.convert_intro', { title: elementAConvertir?.titre ?? '' }) }}
+          </p>
+
+          <UFormField :label="$t('gestion.program.convert_target')">
+            <URadioGroup v-model="cibleConversion" :items="conversionsPossibles" />
+          </UFormField>
+
+          <!-- Un workshop a toujours une heure de fin : on la réclame plutôt que d'en inventer
+               une, qui paraîtrait aussitôt en public. -->
+          <UFormField
+            v-if="finConversionRequise"
+            :label="$t('gestion.program.field.end_optional')"
+            required
+          >
+            <UiDateTimePicker
+              v-model="finConversion"
+              :date-label="$t('gestion.program.field.end_optional')"
+              :time-label="$t('gestion.program.field.end_time')"
+              :min-date="premierJour"
+              :max-date="dernierJour"
+            />
+          </UFormField>
+
+          <UAlert
+            v-if="cibleConversion === 'workshop' && elementAConvertir && !elementAConvertir.publie"
+            icon="i-lucide-alert-triangle"
+            color="warning"
+            variant="soft"
+            :title="$t('gestion.program.convert_public_warning')"
+          />
+
+          <UAlert
+            v-if="erreurConversion"
+            icon="i-lucide-alert-triangle"
+            color="error"
+            variant="soft"
+            :title="erreurConversion"
+          />
+
+          <div class="flex justify-end gap-2">
+            <UButton color="neutral" variant="ghost" @click="conversionOuverte = false">
+              {{ $t('common.cancel') }}
+            </UButton>
+            <UButton color="primary" :loading="conversionEnCours" @click="convertir">
+              {{ $t('gestion.program.convert') }}
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
 
     <UModal v-model:open="formulaireOuvert" :title="titreFormulaire">
       <template #body>
@@ -369,6 +443,76 @@ const premierJour = computed(() =>
 const dernierJour = computed(() =>
   edition.value?.endDate ? new Date(edition.value.endDate) : undefined
 )
+
+/**
+ * Conversion d'un élément vers un module qui en dit davantage.
+ *
+ * Le serveur crée et supprime dans une même transaction : ou les deux aboutissent, ou rien ne
+ * change. L'écran n'a donc qu'à rassembler ce que l'élément ne porte pas — l'heure de fin qu'un
+ * workshop exige — et à prévenir de ce qu'il ne pourra pas défaire.
+ */
+const conversionOuverte = ref(false)
+const elementAConvertir = ref<EntreeProgramme | null>(null)
+const cibleConversion = ref<'spectacle' | 'workshop'>('spectacle')
+const finConversion = ref('')
+const erreurConversion = ref('')
+
+/** On ne propose que les modules activés : convertir ailleurs créerait une fiche inatteignable. */
+const conversionsPossibles = computed(() => {
+  const options: { label: string; value: 'spectacle' | 'workshop' }[] = []
+  if (edition.value?.artistsEnabled)
+    options.push({ label: t('gestion.program.source.spectacle'), value: 'spectacle' })
+  if (edition.value?.workshopsEnabled)
+    options.push({ label: t('gestion.program.source.workshop'), value: 'workshop' })
+  return options
+})
+
+const finConversionRequise = computed(
+  () => cibleConversion.value === 'workshop' && !elementAConvertir.value?.fin
+)
+
+const ouvrirConversion = (entree: EntreeProgramme) => {
+  elementAConvertir.value = entree
+  cibleConversion.value = conversionsPossibles.value[0]?.value ?? 'spectacle'
+  finConversion.value = entree.fin ? versChampLocal(entree.fin) : ''
+  erreurConversion.value = ''
+  conversionOuverte.value = true
+}
+
+const { execute: executerConversion, isLoading: chargeConversion } = useApiActionById(
+  (cle) => `/api/editions/${editionId.value}/program-items/${String(cle).split('-')[1]}/convert`,
+  {
+    method: 'POST',
+    body: () => ({
+      cible: cibleConversion.value,
+      endDateTime: finConversion.value
+        ? parseDateTimeLocal(finConversion.value).toISOString()
+        : null,
+    }),
+    successMessage: { title: t('gestion.program.converted') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: async () => {
+      conversionOuverte.value = false
+      await rechargerFrise()
+    },
+    onError: (e: any) => {
+      erreurConversion.value = e?.data?.message || e?.message || t('common.error')
+    },
+  }
+)
+
+const conversionEnCours = computed(() =>
+  elementAConvertir.value ? chargeConversion(elementAConvertir.value.cle) : false
+)
+
+const convertir = async () => {
+  erreurConversion.value = ''
+  if (finConversionRequise.value && !finConversion.value) {
+    erreurConversion.value = t('gestion.program.convert_end_required')
+    return
+  }
+  if (elementAConvertir.value) await executerConversion(elementAConvertir.value.cle)
+}
 
 const ouvrirCreation = () => {
   elementEnCours.value = null

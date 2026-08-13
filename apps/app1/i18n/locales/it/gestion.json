@@ -681,7 +681,13 @@
         "place": "Luogo",
         "visibility": "Visibilità"
       },
-      "local_times": "Orari nell'ora locale della convention ({fuseau}), anche in fase di inserimento."
+      "local_times": "Orari nell'ora locale della convention ({fuseau}), anche in fase di inserimento.",
+      "convert": "Converti",
+      "convert_intro": "Trasformare «{title}» in una scheda più completa. L'elemento di programma sarà eliminato.",
+      "convert_target": "Converti in",
+      "convert_end_required": "Indica un'ora di fine: un workshop la richiede.",
+      "convert_public_warning": "I workshop sono sempre visibili al pubblico: questa bozza lo diventerà subito.",
+      "converted": "Elemento convertito"
     }
   }
 }
