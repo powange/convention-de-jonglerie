@@ -681,7 +681,13 @@
         "place": "Location",
         "visibility": "Visibility"
       },
-      "local_times": "Times shown in the convention's local time ({fuseau}), including when entering them."
+      "local_times": "Times shown in the convention's local time ({fuseau}), including when entering them.",
+      "convert": "Convert",
+      "convert_intro": "Turn “{title}” into a fuller record. The programme item will be deleted.",
+      "convert_target": "Convert into",
+      "convert_end_required": "Give an end time: a workshop requires one.",
+      "convert_public_warning": "Workshops are always visible to the public: this draft will become so at once.",
+      "converted": "Item converted"
     }
   }
 }

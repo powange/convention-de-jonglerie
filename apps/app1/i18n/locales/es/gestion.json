@@ -681,7 +681,13 @@
         "place": "Lugar",
         "visibility": "Visibilidad"
       },
-      "local_times": "Horarios en la hora local de la convención ({fuseau}), también al introducirlos."
+      "local_times": "Horarios en la hora local de la convención ({fuseau}), también al introducirlos.",
+      "convert": "Convertir",
+      "convert_intro": "Convertir «{title}» en una ficha más completa. El elemento de programa se eliminará.",
+      "convert_target": "Convertir en",
+      "convert_end_required": "Indique una hora de fin: un workshop la exige.",
+      "convert_public_warning": "Los workshops siempre son visibles para el público: este borrador lo será de inmediato.",
+      "converted": "Elemento convertido"
     }
   }
 }

@@ -681,7 +681,13 @@
         "place": "Sted",
         "visibility": "Synlighed"
       },
-      "local_times": "Tidspunkter i konventets lokale tid ({fuseau}), også når de indtastes."
+      "local_times": "Tidspunkter i konventets lokale tid ({fuseau}), også når de indtastes.",
+      "convert": "Konvertér",
+      "convert_intro": "Lav “{title}” om til en mere komplet post. Programpunktet slettes.",
+      "convert_target": "Konvertér til",
+      "convert_end_required": "Angiv et sluttidspunkt: en workshop kræver det.",
+      "convert_public_warning": "Workshops er altid synlige for publikum: denne kladde bliver det straks.",
+      "converted": "Punkt konverteret"
     }
   }
 }

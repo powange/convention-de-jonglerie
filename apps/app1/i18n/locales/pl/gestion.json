@@ -681,7 +681,13 @@
         "place": "Miejsce",
         "visibility": "Widoczność"
       },
-      "local_times": "Godziny w czasie lokalnym konwentu ({fuseau}), również przy wprowadzaniu."
+      "local_times": "Godziny w czasie lokalnym konwentu ({fuseau}), również przy wprowadzaniu.",
+      "convert": "Konwertuj",
+      "convert_intro": "Zamień „{title}” na pełniejszy wpis. Element programu zostanie usunięty.",
+      "convert_target": "Konwertuj na",
+      "convert_end_required": "Podaj godzinę zakończenia: warsztat jej wymaga.",
+      "convert_public_warning": "Warsztaty są zawsze widoczne publicznie: ten szkic stanie się nim natychmiast.",
+      "converted": "Element skonwertowany"
     }
   }
 }
