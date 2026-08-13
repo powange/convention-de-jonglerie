@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { programItemSchema } from '../../../server/utils/program-validation'
+import {
+  programItemLocationSchema,
+  programItemSchema,
+} from '../../../server/utils/program-validation'
 
 const base = {
   title: 'Repas du soir',
@@ -79,5 +82,51 @@ describe('programItemSchema', () => {
 
   it('refuse une date illisible', () => {
     expect(programItemSchema.safeParse({ ...base, startDateTime: 'hier soir' }).success).toBe(false)
+  })
+})
+
+/**
+ * Le lieu seul, tel que l'envoie la frise quand on le change sur place. Les mêmes règles que le
+ * formulaire complet doivent s'y appliquer : c'est tout l'intérêt de partager le schéma plutôt
+ * que d'en tenir une copie dans le point d'API.
+ */
+describe('programItemLocationSchema', () => {
+  const base = { locationName: null, zoneId: null, markerId: null }
+
+  it('accepte une zone, un repère, ou aucun des deux', () => {
+    expect(programItemLocationSchema.safeParse(base).success).toBe(true)
+    expect(programItemLocationSchema.safeParse({ ...base, zoneId: 3 }).success).toBe(true)
+    expect(programItemLocationSchema.safeParse({ ...base, markerId: 3 }).success).toBe(true)
+  })
+
+  // La carte ne saurait pas lequel des deux montrer.
+  it('refuse une zone et un repère ensemble', () => {
+    expect(programItemLocationSchema.safeParse({ ...base, zoneId: 3, markerId: 4 }).success).toBe(
+      false
+    )
+  })
+
+  /**
+   * Les trois champs ensemble : un fragment laisserait cohabiter une zone fraîchement choisie et
+   * un texte libre oublié.
+   */
+  it('exige les trois champs', () => {
+    expect(programItemLocationSchema.safeParse({ zoneId: 3 }).success).toBe(false)
+    expect(programItemLocationSchema.safeParse({ locationName: 'Chapiteau' }).success).toBe(false)
+  })
+
+  // Une chaîne vide n'est pas une précision : elle vaut « pas de texte ».
+  it('ramène un texte vide ou blanc à l’absence de texte', () => {
+    for (const locationName of ['', '   ']) {
+      const r = programItemLocationSchema.safeParse({ ...base, locationName })
+      expect(r.success, locationName).toBe(true)
+      expect(r.success && r.data.locationName).toBeNull()
+    }
+  })
+
+  it('borne la précision de lieu', () => {
+    expect(
+      programItemLocationSchema.safeParse({ ...base, locationName: 'a'.repeat(151) }).success
+    ).toBe(false)
   })
 })

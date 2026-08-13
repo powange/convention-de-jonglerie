@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { construireFriseProgramme, grouperParJournee } from '../../../shared/utils/program-timeline'
+import {
+  construireFriseProgramme,
+  grouperParJournee,
+  nomDuLieu,
+  type EntreeProgramme,
+} from '../../../shared/utils/program-timeline'
 
 describe('construireFriseProgramme', () => {
   it('réunit les trois sources dans l’ordre chronologique', () => {
@@ -190,7 +195,7 @@ describe('construireFriseProgramme', () => {
           title: 'A',
           startDateTime: '2026-09-26T10:00:00.000Z',
           endDateTime: '2026-09-26T11:00:00.000Z',
-          location: { name: 'Gymnase', zoneId: 4, markerId: null },
+          location: { name: 'Gymnase', zone: { id: 4, name: 'Nord', color: '#ff0000' } },
         },
       ],
       spectacles: [
@@ -199,7 +204,7 @@ describe('construireFriseProgramme', () => {
           title: 'B',
           startDateTime: '2026-09-26T12:00:00.000Z',
           location: 'Chapiteau',
-          markerId: 9,
+          marker: { id: 9, name: 'Entrée', color: null },
           isPublic: true,
         },
       ],
@@ -210,16 +215,39 @@ describe('construireFriseProgramme', () => {
           startDateTime: '2026-09-26T13:00:00.000Z',
           endDateTime: '2026-09-26T14:00:00.000Z',
           locationName: 'Devant la buvette',
-          zoneId: 2,
+          zone: { id: 2, name: 'Sud', color: '#00ff00' },
           isPublic: true,
         },
       ],
     })
-    expect(frise.map((e) => [e.lieu, e.zoneId, e.markerId])).toEqual([
-      ['Gymnase', 4, null],
-      ['Chapiteau', null, 9],
-      ['Devant la buvette', 2, null],
+    expect(frise.map((e) => [e.lieuTexte, e.zone, e.repere])).toEqual([
+      ['Gymnase', { id: 4, nom: 'Nord', couleur: '#ff0000' }, null],
+      ['Chapiteau', null, { id: 9, nom: 'Entrée', couleur: null }],
+      ['Devant la buvette', { id: 2, nom: 'Sud', couleur: '#00ff00' }, null],
     ])
+  })
+
+  /**
+   * Le texte libre et le lieu de carte cohabitent au lieu de se remplacer : « côté buvette »
+   * précise la zone, il ne la désigne pas. Les fondre en un seul nom, comme avant, empêchait la
+   * frise de gestion de réafficher le texte saisi sans risquer d'enregistrer le nom d'une zone
+   * comme s'il avait été tapé à la main.
+   */
+  it('garde le texte libre et le lieu de carte côte à côte', () => {
+    const frise = construireFriseProgramme({
+      elements: [
+        {
+          id: 1,
+          title: 'Apéro',
+          startDateTime: '2026-10-02T18:00:00.000Z',
+          locationName: 'côté buvette',
+          zone: { id: 9, name: 'Salle des fêtes', color: '#123456' },
+          isPublic: true,
+        },
+      ],
+    })
+    expect(frise[0]!.lieuTexte).toBe('côté buvette')
+    expect(frise[0]!.zone).toEqual({ id: 9, nom: 'Salle des fêtes', couleur: '#123456' })
   })
 
   /**
@@ -248,52 +276,42 @@ describe('construireFriseProgramme', () => {
    * Sans cette reprise, une entrée rattachée à la carte n'affichait aucun lieu — et le lien vers
    * la carte restait invisible faute d'étiquette à cliquer.
    */
-  it('nomme le lieu d’après la zone ou le repère quand le texte libre manque', () => {
-    const frise = construireFriseProgramme({
-      spectacles: [
-        {
-          id: 1,
-          title: 'Gala',
-          startDateTime: '2026-10-02T20:00:00.000Z',
-          zoneId: 9,
-          zone: { name: 'Salle des fêtes' },
-          isPublic: true,
-        },
-      ],
-      elements: [
-        {
-          id: 1,
-          title: 'Feu',
-          startDateTime: '2026-10-02T22:00:00.000Z',
-          markerId: 6,
-          marker: { name: 'Esplanade' },
-          isPublic: true,
-        },
-      ],
-    })
-    expect(frise.map((e) => e.lieu)).toEqual(['Salle des fêtes', 'Esplanade'])
+  it('accepte des sources absentes', () => {
+    expect(construireFriseProgramme({})).toEqual([])
+  })
+})
+
+/**
+ * Sans cette règle, une entrée rattachée à la carte n'affichait aucun lieu là où l'on ne montre
+ * qu'un nom — et le lien vers la carte restait invisible faute d'étiquette à cliquer.
+ */
+describe('nomDuLieu', () => {
+  const entree = (p: Partial<EntreeProgramme> = {}) =>
+    ({ lieuTexte: null, zone: null, repere: null, ...p }) as EntreeProgramme
+
+  it('nomme la zone ou le repère quand le texte libre manque', () => {
+    expect(nomDuLieu(entree({ zone: { id: 9, nom: 'Salle des fêtes', couleur: null } }))).toBe(
+      'Salle des fêtes'
+    )
+    expect(nomDuLieu(entree({ repere: { id: 6, nom: 'Esplanade', couleur: null } }))).toBe(
+      'Esplanade'
+    )
   })
 
   // Le texte libre est une précision voulue par l'organisateur : il prime sur le nom de la zone.
   it('préfère le texte libre au nom de la zone', () => {
-    const frise = construireFriseProgramme({
-      elements: [
-        {
-          id: 1,
-          title: 'Apéro',
-          startDateTime: '2026-10-02T18:00:00.000Z',
-          locationName: 'côté buvette',
-          zoneId: 9,
-          zone: { name: 'Salle des fêtes' },
-          isPublic: true,
-        },
-      ],
-    })
-    expect(frise[0]!.lieu).toBe('côté buvette')
+    expect(
+      nomDuLieu(
+        entree({
+          lieuTexte: 'côté buvette',
+          zone: { id: 9, nom: 'Salle des fêtes', couleur: null },
+        })
+      )
+    ).toBe('côté buvette')
   })
 
-  it('accepte des sources absentes', () => {
-    expect(construireFriseProgramme({})).toEqual([])
+  it('ne nomme rien quand il n’y a pas de lieu', () => {
+    expect(nomDuLieu(entree())).toBeNull()
   })
 })
 
@@ -345,6 +363,44 @@ describe('grouperParJournee', () => {
     // évite de faire subir au programme.
     expect(grouperParJournee(frise, 'Australia/Melbourne').map((j) => j.date)).toEqual([
       '2026-09-28',
+    ])
+  })
+
+  /**
+   * Une scène ouverte de 00 h 30 prolonge la soirée de la veille : c'est ainsi que le public la
+   * vit, et la ranger au lendemain la ferait apparaître en tête d'une journée pas encore
+   * commencée, loin des créneaux qu'elle prolonge.
+   */
+  it('rattache le début de nuit à la soirée de la veille', () => {
+    const frise = construireFriseProgramme({
+      elements: [
+        {
+          id: 1,
+          title: 'Gala',
+          // 21 h à Paris le 6 août.
+          startDateTime: '2026-08-06T19:00:00.000Z',
+          isPublic: true,
+        },
+        {
+          id: 2,
+          title: 'Scène ouverte',
+          // 00 h 30 à Paris, donc le 7 au calendrier — mais la soirée du 6.
+          startDateTime: '2026-08-06T22:30:00.000Z',
+          isPublic: true,
+        },
+        {
+          id: 3,
+          title: 'Petit déjeuner',
+          // 08 h à Paris le 7 : une vraie journée nouvelle.
+          startDateTime: '2026-08-07T06:00:00.000Z',
+          isPublic: true,
+        },
+      ],
+    })
+    const journees = grouperParJournee(frise, 'Europe/Paris')
+    expect(journees.map((j) => [j.date, j.entrees.map((e) => e.titre)])).toEqual([
+      ['2026-08-06', ['Gala', 'Scène ouverte']],
+      ['2026-08-07', ['Petit déjeuner']],
     ])
   })
 

@@ -380,7 +380,7 @@ import { addHoursToDateTimeLocal, useAuthStore, useEditionStore } from '#imports
 import {
   formaterHeure,
   formaterJournee,
-  journeeDans,
+  journeeDeProgramme,
   versChampLocal,
   versInstant,
 } from '~~/shared/utils/fuseau-edition'
@@ -633,8 +633,9 @@ const workshopsByDay = computed(() => {
   const grouped = new Map<string, any[]>()
 
   filteredWorkshops.forEach((workshop) => {
-    // Journée vécue sur place : découpée en temps universel, une soirée basculait au lendemain.
-    const date = journeeDans(workshop.startDateTime, fuseau.value)
+    // Journée vécue sur place, et non journée calendaire : un créneau de fin de soirée qui déborde
+    // après minuit se range avec la veille, comme sur la frise du programme.
+    const date = journeeDeProgramme(workshop.startDateTime, fuseau.value)
     if (!grouped.has(date)) {
       grouped.set(date, [])
     }

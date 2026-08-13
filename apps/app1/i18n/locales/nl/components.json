@@ -104,7 +104,8 @@
       "search_country_placeholder": "Zoek een land..."
     },
     "date_time_picker": {
-      "placeholder": "Selecteer een datum"
+      "placeholder": "Selecteer een datum",
+      "clear": "Wissen"
     },
     "edition_form": {
       "address_tip": "Voer een volledig adres in het zoekveld in om automatisch alle onderstaande velden in te vullen. Een nauwkeurig adres maakt het ook mogelijk om uw evenement op de kaart te lokaliseren.",

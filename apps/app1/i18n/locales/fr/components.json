@@ -104,7 +104,8 @@
       "search_country_placeholder": "Rechercher un pays..."
     },
     "date_time_picker": {
-      "placeholder": "Sélectionner une date"
+      "placeholder": "Sélectionner une date",
+      "clear": "Effacer"
     },
     "edition_form": {
       "address_tip": "Saisissez une adresse complète dans le champ de recherche pour préremplir automatiquement tous les champs ci-dessous. Une adresse précise permettra aussi de géolocaliser votre édition sur la carte.",

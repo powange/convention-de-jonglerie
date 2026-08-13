@@ -687,7 +687,9 @@
       "convert_target": "Konvertér til",
       "convert_end_required": "Angiv et sluttidspunkt: en workshop kræver det.",
       "convert_public_warning": "Workshops er altid synlige for publikum: denne kladde bliver det straks.",
-      "converted": "Punkt konverteret"
+      "converted": "Punkt konverteret",
+      "edit_place": "Skift sted",
+      "place_error": "Stedet kunne ikke gemmes."
     }
   }
 }

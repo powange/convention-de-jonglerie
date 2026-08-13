@@ -687,7 +687,9 @@
       "convert_target": "Konvertera till",
       "convert_end_required": "Ange en sluttid: en workshop kräver det.",
       "convert_public_warning": "Workshops är alltid synliga för publiken: detta utkast blir det direkt.",
-      "converted": "Punkt konverterad"
+      "converted": "Punkt konverterad",
+      "edit_place": "Ändra plats",
+      "place_error": "Platsen kunde inte sparas."
     }
   }
 }

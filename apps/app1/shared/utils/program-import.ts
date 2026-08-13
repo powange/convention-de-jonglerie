@@ -9,7 +9,7 @@
  * Ce fichier ne touche ni au réseau ni à la base : il se teste sur des tableaux.
  */
 
-import { journeeDans, versInstant } from './fuseau-edition'
+import { HEURE_BASCULE_JOURNEE, journeeDans, versInstant } from './fuseau-edition'
 
 /**
  * Un élément tel que le modèle vient de le lire, avant tout ancrage.
@@ -275,6 +275,17 @@ export function construireElementsDeJournee(
       continue
     }
 
+    /**
+     * Une heure d'avant l'aube appartient à la nuit qui **suit** la journée annoncée.
+     *
+     * Le modèle lit la section « vendredi » d'un site et y trouve « 01:00 » : l'organisateur
+     * désigne la nuit du vendredi au samedi, pas le petit matin qui a précédé sa journée — rien
+     * ne se passe à 1 h avant l'ouverture. Composer la date civile du vendredi rangeait ce
+     * créneau une journée trop tôt sur la frise, qui fait commencer sa journée à
+     * `HEURE_BASCULE_JOURNEE`.
+     */
+    const decalageNuit = debutMin < HEURE_BASCULE_JOURNEE * 60 ? 24 * 60 : 0
+
     const finMin = enMinutes(brut?.fin)
     // Une fin antérieure au début désigne le lendemain : une scène ouverte qui commence à 23 h
     // et finit à 1 h est courante, et la refuser perdrait le créneau.
@@ -283,8 +294,8 @@ export function construireElementsDeJournee(
     elements.push({
       titre,
       description: texteOuNull(brut?.description),
-      debut: composerDateHeure(date, debutMin),
-      fin: finReportee === null ? null : composerDateHeure(date, finReportee),
+      debut: composerDateHeure(date, debutMin + decalageNuit),
+      fin: finReportee === null ? null : composerDateHeure(date, finReportee + decalageNuit),
       lieu: texteOuNull(brut?.lieu),
     })
   }

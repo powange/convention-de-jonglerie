@@ -687,7 +687,9 @@
       "convert_target": "Converti in",
       "convert_end_required": "Indica un'ora di fine: un workshop la richiede.",
       "convert_public_warning": "I workshop sono sempre visibili al pubblico: questa bozza lo diventerà subito.",
-      "converted": "Elemento convertito"
+      "converted": "Elemento convertito",
+      "edit_place": "Modifica il luogo",
+      "place_error": "Non è stato possibile salvare il luogo."
     }
   }
 }

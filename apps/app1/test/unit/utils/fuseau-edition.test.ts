@@ -6,6 +6,7 @@ import {
   formaterHeure,
   formaterJournee,
   journeeDans,
+  journeeDeProgramme,
   versChampLocal,
   versInstant,
 } from '../../../shared/utils/fuseau-edition'
@@ -93,6 +94,36 @@ describe('journeeDans', () => {
     expect(journeeDans(instant, 'Europe/Paris')).toBe('2026-08-01')
     // Le même instant, lu depuis Melbourne, tombe le lendemain : c'est ce que le fuseau évite.
     expect(journeeDans(instant, 'Australia/Melbourne')).toBe('2026-08-02')
+  })
+})
+
+/**
+ * La journée telle que les gens la vivent, et non celle du calendrier : sur une convention, ce qui
+ * commence à 00 h 30 appartient à la soirée de la veille.
+ */
+describe('journeeDeProgramme', () => {
+  const journee = (heure: string) =>
+    journeeDeProgramme(versInstant(`2026-08-07T${heure}`, 'Europe/Paris'), 'Europe/Paris')
+
+  it('rattache le début de nuit à la veille', () => {
+    expect(journee('00:00')).toBe('2026-08-06')
+    expect(journee('00:30')).toBe('2026-08-06')
+    expect(journee('02:59')).toBe('2026-08-06')
+  })
+
+  // Trois heures pile ouvre la journée : au-delà, on est le matin, plus la soirée d'avant.
+  it('ouvre la journée à trois heures', () => {
+    expect(journee('03:00')).toBe('2026-08-07')
+    expect(journee('09:00')).toBe('2026-08-07')
+    expect(journee('23:59')).toBe('2026-08-07')
+  })
+
+  // La bascule se juge sur place : c'est l'heure de la convention qui décide, pas celle du lecteur.
+  it('juge la bascule dans le fuseau de l’édition', () => {
+    const minuitEtDemiAParis = versInstant('2026-08-07T00:30', 'Europe/Paris')
+    expect(journeeDeProgramme(minuitEtDemiAParis, 'Europe/Paris')).toBe('2026-08-06')
+    // Le même instant est 08 h 30 à Melbourne : une matinée, donc sa propre journée.
+    expect(journeeDeProgramme(minuitEtDemiAParis, 'Australia/Melbourne')).toBe('2026-08-07')
   })
 })
 

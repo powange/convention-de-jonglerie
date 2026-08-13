@@ -104,7 +104,8 @@
       "search_country_placeholder": "Buscar país..."
     },
     "date_time_picker": {
-      "placeholder": "Seleccionar una fecha"
+      "placeholder": "Seleccionar una fecha",
+      "clear": "Borrar"
     },
     "edition_form": {
       "address_tip": "Ingrese una dirección completa en el campo de búsqueda para completar automáticamente todos los campos a continuación. Una dirección precisa también permitirá geolocalizar su evento en el mapa.",

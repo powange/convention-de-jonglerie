@@ -104,7 +104,8 @@
       "search_country_placeholder": "Vyhledejte zemi..."
     },
     "date_time_picker": {
-      "placeholder": "Vyberte datum"
+      "placeholder": "Vyberte datum",
+      "clear": "Vymazat"
     },
     "edition_form": {
       "address_tip": "Zadáním celé adresy do vyhledávacího pole se automaticky předvyplní všechna níže uvedená pole. Přesná adresa také umožní geolokaci vašeho vydání na mapě.",

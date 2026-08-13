@@ -44,6 +44,13 @@ export default wrapApiHandler(
     const user = event.context.user
     const peutEditer = user ? await canEditEditionById(editionId, user.id, event) : false
 
+    /**
+     * La couleur accompagne le nom : la frise de gestion affiche zones et repères sous forme
+     * d'étiquettes colorées, comme la page des spectacles, et une pastille grise ne dirait rien
+     * de l'endroit. Défini une fois pour les trois sources, qui doivent en dire autant.
+     */
+    const lieuDeCarte = { select: { id: true, name: true, color: true } }
+
     const [workshops, spectacles, elements] = await Promise.all([
       edition.workshopsEnabled
         ? prisma.workshop.findMany({
@@ -54,7 +61,7 @@ export default wrapApiHandler(
               description: true,
               startDateTime: true,
               endDateTime: true,
-              location: { select: { name: true, zoneId: true, markerId: true } },
+              location: { select: { name: true, zone: lieuDeCarte, marker: lieuDeCarte } },
             },
           })
         : [],
@@ -70,10 +77,8 @@ export default wrapApiHandler(
               startDateTime: true,
               duration: true,
               location: true,
-              zoneId: true,
-              markerId: true,
-              zone: { select: { name: true } },
-              marker: { select: { name: true } },
+              zone: lieuDeCarte,
+              marker: lieuDeCarte,
               isPublic: true,
             },
           })
@@ -87,10 +92,8 @@ export default wrapApiHandler(
           startDateTime: true,
           endDateTime: true,
           locationName: true,
-          zoneId: true,
-          markerId: true,
-          zone: { select: { name: true } },
-          marker: { select: { name: true } },
+          zone: lieuDeCarte,
+          marker: lieuDeCarte,
           isPublic: true,
         },
       }),

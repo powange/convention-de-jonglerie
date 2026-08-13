@@ -1,40 +1,58 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <!-- Sélecteur de date -->
-    <UFormField :label="dateLabel" :name="dateFieldName" :required="required">
-      <UPopover :popper="{ placement: 'bottom-start' }" class="w-full" :disabled="disabled">
-        <UButton
-          icon="i-heroicons-calendar-days"
-          size="lg"
-          color="neutral"
-          variant="outline"
-          class="w-full justify-start text-left font-normal"
-          :label="displayDate || placeholder"
-          :disabled="disabled"
-          block
-        />
-        <template #content>
-          <UCalendar
-            v-model="calendarDateValue"
-            class="p-2"
-            :placeholder="calendarPlaceholder"
-            :is-date-disabled="isCalendarDateDisabled"
-            @update:model-value="handleDateUpdate"
+  <div class="space-y-1">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <!-- Sélecteur de date -->
+      <UFormField :label="dateLabel" :name="dateFieldName" :required="required">
+        <UPopover :popper="{ placement: 'bottom-start' }" class="w-full" :disabled="disabled">
+          <UButton
+            icon="i-heroicons-calendar-days"
+            size="lg"
+            color="neutral"
+            variant="outline"
+            class="w-full justify-start text-left font-normal"
+            :label="displayDate || placeholder"
+            :disabled="disabled"
+            block
           />
-        </template>
-      </UPopover>
-    </UFormField>
+          <template #content>
+            <UCalendar
+              v-model="calendarDateValue"
+              class="p-2"
+              :placeholder="calendarPlaceholder"
+              :is-date-disabled="isCalendarDateDisabled"
+              @update:model-value="handleDateUpdate"
+            />
+          </template>
+        </UPopover>
+      </UFormField>
 
-    <!-- Sélecteur d'heure -->
-    <UFormField :label="timeLabel" :name="timeFieldName" :required="required">
-      <UInputTime
-        v-model="timeValue"
-        :hour-cycle="24"
-        size="lg"
-        icon="i-heroicons-clock"
+      <!-- Sélecteur d'heure -->
+      <UFormField :label="timeLabel" :name="timeFieldName" :required="required">
+        <UInputTime
+          v-model="timeValue"
+          :hour-cycle="24"
+          size="lg"
+          icon="i-heroicons-clock"
+          :disabled="disabled"
+        />
+      </UFormField>
+    </div>
+
+    <!-- Une fin facultative doit pouvoir redevenir absente : sans cela, une heure saisie par
+         erreur ne se retirait plus, et l'élément annonçait au public une fin qui n'existe pas.
+         Proposé seulement quand l'appelant le demande — un champ obligatoire n'a rien à effacer. -->
+    <div v-if="clearable && modelValue" class="flex justify-end">
+      <UButton
+        icon="i-heroicons-x-mark"
+        color="neutral"
+        variant="link"
+        size="xs"
         :disabled="disabled"
-      />
-    </UFormField>
+        @click="effacer"
+      >
+        {{ t('components.date_time_picker.clear') }}
+      </UButton>
+    </div>
   </div>
 </template>
 
@@ -67,6 +85,8 @@ interface Props {
   maxDate?: Date
   /** Désactive l'interaction (lecture seule) */
   disabled?: boolean
+  /** Propose d'effacer la valeur. Réservé aux champs facultatifs. */
+  clearable?: boolean
 }
 
 const { t } = useI18n()
@@ -184,6 +204,16 @@ const handleDateUpdate = (newCalendarDate: CalendarDate | null) => {
   } else if (newCalendarDate === null) {
     calendarDate.value = null
   }
+}
+
+/**
+ * Efface la valeur.
+ *
+ * Passe par le `v-model` plutôt que par `setValue` directement : le parent doit apprendre
+ * l'effacement, faute de quoi il continuerait d'envoyer l'ancienne date à l'enregistrement.
+ */
+const effacer = () => {
+  emit('update:modelValue', '')
 }
 
 // Watcher pour les changements du v-model parent
