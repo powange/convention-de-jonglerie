@@ -258,7 +258,8 @@
         "standard": "Standard",
         "total": "Totale pasti",
         "volunteers": "Pasti volontari",
-        "with_allergies": "Con allergie"
+        "with_allergies": "Con allergie",
+        "organizers": "Pasti degli organizzatori"
       }
     },
     "no_description_available": "Nessuna descrizione disponibile",

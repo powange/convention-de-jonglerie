@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Volontär",
         "artist": "Artist",
-        "participant": "Deltagare"
-      }
+        "participant": "Deltagare",
+        "organizer": "Arrangör"
+      },
+      "organizers": "Arrangörer"
     },
     "organizers": {
       "access_rights": "Åtkomsträttigheter",
@@ -214,7 +216,26 @@
       "select_to_add": "Välj en arrangör att lägga till",
       "status": "Biljettstatus",
       "title": "Arrangörer",
-      "title_required": "Arrangörens titel är obligatorisk"
+      "title_required": "Arrangörens titel är obligatorisk",
+      "meals": {
+        "manage": "Hantera måltider",
+        "title": "Måltider för {name}",
+        "description": "Som standard har en arrangör som är på plats under upplagan tillgång till alla måltider. Avmarkera dem som hen inte ska ha.",
+        "no_meals": "Ingen måltid är inställd för den här upplagan",
+        "check_all": "Markera alla",
+        "uncheck_all": "Avmarkera alla",
+        "already_validated": "Redan validerad",
+        "dietary_section": "Kost",
+        "dietary_preference": "Kostpreferens",
+        "allergies": "Allergier",
+        "allergies_placeholder": "Matallergier eller intoleranser",
+        "allergy_severity": "Allergins allvarlighetsgrad",
+        "unsaved_changes": "Du har osparade ändringar",
+        "confirm_close_unsaved": "Du har osparade ändringar. Vill du verkligen stänga?",
+        "saved_success": "Den här arrangörens måltider har sparats",
+        "error_loading": "Det gick inte att läsa in den här arrangörens måltider",
+        "error_saving": "Det gick inte att spara den här arrangörens måltider"
+      }
     },
     "overview": "Översikt",
     "services": {

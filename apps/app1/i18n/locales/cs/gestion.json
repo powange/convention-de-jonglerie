@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Dobrovolník",
         "artist": "Umělec",
-        "participant": "Účastník"
-      }
+        "participant": "Účastník",
+        "organizer": "Organizátor"
+      },
+      "organizers": "Organizátoři"
     },
     "organizers": {
       "access_rights": "Přístupová práva",
@@ -214,7 +216,26 @@
       "select_to_add": "Vyberte organizátora k přidání",
       "status": "Stav vstupenky",
       "title": "Organizátoři",
-      "title_required": "Titul organizátora je povinný"
+      "title_required": "Titul organizátora je povinný",
+      "meals": {
+        "manage": "Spravovat jídla",
+        "title": "Jídla organizátora {name}",
+        "description": "Ve výchozím nastavení má organizátor přítomný na ročníku přístup ke všem jídlům. Odškrtněte ta, která si nevezme.",
+        "no_meals": "Pro tento ročník není nastaveno žádné jídlo",
+        "check_all": "Zaškrtnout vše",
+        "uncheck_all": "Odškrtnout vše",
+        "already_validated": "Již potvrzeno",
+        "dietary_section": "Stravování",
+        "dietary_preference": "Stravovací režim",
+        "allergies": "Alergie",
+        "allergies_placeholder": "Potravinové alergie nebo intolerance",
+        "allergy_severity": "Závažnost alergie",
+        "unsaved_changes": "Máte neuložené změny",
+        "confirm_close_unsaved": "Máte neuložené změny. Opravdu chcete zavřít?",
+        "saved_success": "Jídla tohoto organizátora byla uložena",
+        "error_loading": "Jídla tohoto organizátora se nepodařilo načíst",
+        "error_saving": "Jídla tohoto organizátora se nepodařilo uložit"
+      }
     },
     "overview": "Přehled",
     "services": {

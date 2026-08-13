@@ -108,7 +108,7 @@
               </div>
 
               <!-- Détails par catégorie -->
-              <div class="grid grid-cols-3 gap-4 mt-4">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
                 <button
                   class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer group"
                   :disabled="
@@ -149,7 +149,7 @@
                   </div>
                 </button>
                 <button
-                  class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer border-x border-primary-200 dark:border-primary-800 group"
+                  class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer group"
                   :disabled="
                     mealStats.breakdown.artists.total === mealStats.breakdown.artists.validated
                   "
@@ -211,6 +211,45 @@
                     restant{{
                       mealStats.breakdown.participants.total -
                         mealStats.breakdown.participants.validated >
+                      1
+                        ? 's'
+                        : ''
+                    }}
+                  </div>
+                </button>
+                <button
+                  class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer group"
+                  :disabled="
+                    mealStats.breakdown.organizers.total ===
+                    mealStats.breakdown.organizers.validated
+                  "
+                  @click="openPendingModal('organizer')"
+                >
+                  <div
+                    class="text-xs text-gray-600 dark:text-gray-400 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ $t('gestion.meals.organizers') }}
+                  </div>
+                  <div
+                    class="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                  >
+                    {{ mealStats.breakdown.organizers.validated }} /
+                    {{ mealStats.breakdown.organizers.total }}
+                  </div>
+                  <div
+                    v-if="
+                      mealStats.breakdown.organizers.total >
+                      mealStats.breakdown.organizers.validated
+                    "
+                    class="text-xs text-primary-600 dark:text-primary-400 mt-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
+                  >
+                    {{
+                      mealStats.breakdown.organizers.total -
+                      mealStats.breakdown.organizers.validated
+                    }}
+                    restant{{
+                      mealStats.breakdown.organizers.total -
+                        mealStats.breakdown.organizers.validated >
                       1
                         ? 's'
                         : ''
@@ -346,6 +385,9 @@
               <span v-else-if="pendingType === 'participant'"
                 >- {{ $t('gestion.meals.participants') }}</span
               >
+              <span v-else-if="pendingType === 'organizer'"
+                >- {{ $t('gestion.meals.organizers') }}</span
+              >
             </span>
           </div>
         </template>
@@ -434,7 +476,7 @@ const validatingIds = ref<string[]>([])
 const mealStats = ref<any>(null)
 const loadingStats = ref(false)
 const pendingModalOpen = ref(false)
-const pendingType = ref<'volunteer' | 'artist' | 'participant'>('volunteer')
+const pendingType = ref<'volunteer' | 'artist' | 'participant' | 'organizer'>('volunteer')
 const pendingList = ref<any[]>([])
 
 // Debounce pour la recherche
@@ -507,6 +549,8 @@ const getPersonTypeBadgeColor = (type: string) => {
       return 'warning'
     case 'participant':
       return 'secondary'
+    case 'organizer':
+      return 'indigo'
     default:
       return 'neutral'
   }
@@ -634,7 +678,7 @@ const validateMeal = async (person: any) => {
 }
 
 // Ouvrir la modal des personnes non validées
-const openPendingModal = async (type: 'volunteer' | 'artist' | 'participant') => {
+const openPendingModal = async (type: 'volunteer' | 'artist' | 'participant' | 'organizer') => {
   pendingType.value = type
   pendingModalOpen.value = true
   await fetchPendingList()

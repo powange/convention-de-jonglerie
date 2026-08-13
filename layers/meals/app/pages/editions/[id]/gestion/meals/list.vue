@@ -162,6 +162,14 @@
                   </div>
                 </div>
               </UCard>
+              <UCard v-if="stats.organizers > 0">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-indigo-500">{{ stats.organizers }}</div>
+                  <div class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('edition.meals.stats.organizers') }}
+                  </div>
+                </div>
+              </UCard>
             </div>
 
             <!-- Statistiques détaillées -->
@@ -317,6 +325,7 @@ const typeOptions = computed(() => [
   { value: 'participant', label: t('common.participant') },
   { value: 'volunteer', label: t('common.volunteer') },
   { value: 'artist', label: t('common.artist') },
+  { value: 'organizer', label: t('common.organizer') },
 ])
 
 const mealTypeOptions = computed(() => [
@@ -380,6 +389,7 @@ const formattedParticipants = computed(() => {
     if (p.type === 'volunteer') typeLabel = t('common.volunteer')
     else if (p.type === 'artist') typeLabel = t('common.artist')
     else if (p.type === 'participant') typeLabel = t('common.participant')
+    else if (p.type === 'organizer') typeLabel = t('common.organizer')
 
     return {
       nom: p.nom,
@@ -401,6 +411,7 @@ const stats = ref<{
   volunteers: number
   artists: number
   ticketingParticipants: number
+  organizers: number
   byMealType: {
     BREAKFAST: number
     LUNCH: number
@@ -654,6 +665,12 @@ const generateCateringPdf = async () => {
         )
       }
 
+      if (meal.organizerCount > 0) {
+        participantsParts.push(
+          `${meal.organizerCount} organisateur${meal.organizerCount > 1 ? 's' : ''}`
+        )
+      }
+
       doc.text(`Total: ${meal.totalParticipants} (${participantsParts.join(', ')})`, 30, yPosition)
       yPosition += 5
 
@@ -753,7 +770,13 @@ const generateCateringPdf = async () => {
       // Préparer les données du tableau
       const tableData = meal.participants.map((p: any) => {
         const typeLabel =
-          p.type === 'volunteer' ? 'Bénévole' : p.type === 'artist' ? 'Artiste' : 'Participant'
+          p.type === 'volunteer'
+            ? 'Bénévole'
+            : p.type === 'artist'
+              ? 'Artiste'
+              : p.type === 'organizer'
+                ? 'Organisateur'
+                : 'Participant'
         const dietLabel =
           p.dietaryPreference === 'VEGETARIAN'
             ? 'Végétarien'

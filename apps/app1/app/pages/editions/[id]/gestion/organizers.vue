@@ -179,6 +179,22 @@
                   </UBadge>
                 </template>
 
+                <!-- Colonne Repas -->
+                <template #meals-cell="{ row }">
+                  <UButton
+                    :color="row.original.meals?.accepted > 0 ? 'primary' : 'neutral'"
+                    variant="soft"
+                    size="sm"
+                    :title="$t('gestion.organizers.meals.manage')"
+                    @click="openMealsModal(row.original)"
+                  >
+                    <span class="font-medium">
+                      {{ row.original.meals?.accepted ?? 0 }}/{{ row.original.meals?.total ?? 0 }}
+                    </span>
+                    <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
+                  </UButton>
+                </template>
+
                 <!-- Colonne Actions -->
                 <template #actions-cell="{ row }">
                   <div class="flex items-center justify-end">
@@ -298,6 +314,14 @@
       </template>
     </UModal>
 
+    <!-- Modal des repas d'un organisateur présent sur l'édition -->
+    <OrganizersMealsModal
+      v-model="mealsModalOpen"
+      :organizer="organizerForMeals"
+      :edition-id="editionId"
+      @meals-saved="loadEditionOrganizers"
+    />
+
     <!-- Modal de confirmation de suppression d'un organisateur de l'édition -->
     <UiConfirmModal
       v-model="removeFromEditionConfirmOpen"
@@ -368,6 +392,20 @@ const editOrganizerModalOpen = ref(false)
 // État pour la confirmation de suppression d'un organisateur de l'édition
 const removeFromEditionConfirmOpen = ref(false)
 const organizerToRemoveFromEdition = ref<{ id: number; name: string } | null>(null)
+
+// État pour la modal des repas d'un organisateur
+const mealsModalOpen = ref(false)
+const organizerForMeals = ref<any>(null)
+
+const canManageMeals = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageMeals(edition.value, authStore.user.id)
+})
+
+const openMealsModal = (organizer: any) => {
+  organizerForMeals.value = organizer
+  mealsModalOpen.value = true
+}
 
 const newOrganizerRights = ref({
   rights: {
@@ -598,6 +636,16 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
           id: 'status',
           header: t('gestion.organizers.status'),
           size: 150,
+        },
+      ]
+    : []),
+  ...(edition.value?.mealsEnabled && canManageMeals.value
+    ? [
+        {
+          id: 'meals',
+          header: t('common.meals_short'),
+          size: 110,
+          meta: { class: { th: 'text-center', td: 'text-center' } },
         },
       ]
     : []),

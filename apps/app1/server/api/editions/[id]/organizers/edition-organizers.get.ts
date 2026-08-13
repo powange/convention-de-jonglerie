@@ -63,6 +63,18 @@ export default wrapApiHandler(
     }
 
     try {
+      // Repas activés de l'édition : un organisateur y a droit par défaut, seules les
+      // exceptions (accepted = false) sont stockées. Le compteur affiché dans le tableau est
+      // donc « total - exceptions ».
+      const enabledMealIds = edition.mealsEnabled
+        ? (
+            await prisma.volunteerMeal.findMany({
+              where: { editionId, enabled: true },
+              select: { id: true },
+            })
+          ).map((meal) => meal.id)
+        : []
+
       // Récupérer tous les EditionOrganizer pour cette édition
       const editionOrganizers = await prisma.editionOrganizer.findMany({
         where: {
@@ -74,6 +86,10 @@ export default wrapApiHandler(
           entryValidated: true,
           entryValidatedAt: true,
           createdAt: true,
+          mealSelections: {
+            where: { accepted: false, mealId: { in: enabledMealIds } },
+            select: { mealId: true },
+          },
           organizer: {
             select: {
               id: true,
@@ -107,6 +123,10 @@ export default wrapApiHandler(
           entryValidatedAt: eo.entryValidatedAt,
           createdAt: eo.createdAt,
           title: eo.organizer.title,
+          meals: {
+            accepted: enabledMealIds.length - eo.mealSelections.length,
+            total: enabledMealIds.length,
+          },
           user: {
             id: eo.organizer.user.id,
             pseudo: eo.organizer.user.pseudo,

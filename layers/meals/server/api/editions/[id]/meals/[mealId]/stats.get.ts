@@ -61,8 +61,30 @@ export default wrapApiHandler(
     const participantCount = ticketRows.length
     const participantValidatedCount = ticketRows.filter((r) => r.consumedAt !== null).length
 
-    const total = volunteerCount + artistCount + participantCount
-    const validated = volunteerValidatedCount + artistValidatedCount + participantValidatedCount
+    // 4. Compter les organisateurs présents ayant accès à ce repas (accès par défaut, hors
+    // exception explicite) et ceux dont la consommation est déjà tracée.
+    const organizerCount = await prisma.editionOrganizer.count({
+      where: {
+        editionId,
+        NOT: { mealSelections: { some: { mealId, accepted: false } } },
+      },
+    })
+
+    const organizerValidatedCount = await prisma.organizerMealSelection.count({
+      where: {
+        mealId,
+        accepted: true,
+        consumedAt: { not: null },
+        editionOrganizer: { editionId },
+      },
+    })
+
+    const total = volunteerCount + artistCount + participantCount + organizerCount
+    const validated =
+      volunteerValidatedCount +
+      artistValidatedCount +
+      participantValidatedCount +
+      organizerValidatedCount
 
     return createSuccessResponse({
       stats: {
@@ -81,6 +103,10 @@ export default wrapApiHandler(
           participants: {
             total: participantCount,
             validated: participantValidatedCount,
+          },
+          organizers: {
+            total: organizerCount,
+            validated: organizerValidatedCount,
           },
         },
       },

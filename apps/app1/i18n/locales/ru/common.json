@@ -258,7 +258,8 @@
         "standard": "Стандарт",
         "total": "Всего блюд",
         "volunteers": "Питание волонтеров",
-        "with_allergies": "С аллергией"
+        "with_allergies": "С аллергией",
+        "organizers": "Питание организаторов"
       }
     },
     "no_description_available": "Описание недоступно",

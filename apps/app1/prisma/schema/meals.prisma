@@ -1,5 +1,5 @@
 // =============================================================================
-// Repas — Types de repas, sélections bénévoles/artistes, liens billetterie
+// Repas — Types de repas, sélections bénévoles/artistes/organisateurs, liens billetterie
 // =============================================================================
 
 enum VolunteerMealType {
@@ -24,13 +24,14 @@ model VolunteerMeal {
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
 
-  edition                Edition                    @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  mealSelections         VolunteerMealSelection[]
-  artistMealSelections   ArtistMealSelection[]
-  handoutItems           VolunteerMealHandoutItem[]
-  tiers                  TicketingTierMeal[]
-  options                TicketingOptionMeal[]
-  participantValidations TicketingOrderItemMeal[]
+  edition                 Edition                    @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  mealSelections          VolunteerMealSelection[]
+  artistMealSelections    ArtistMealSelection[]
+  organizerMealSelections OrganizerMealSelection[]
+  handoutItems            VolunteerMealHandoutItem[]
+  tiers                   TicketingTierMeal[]
+  options                 TicketingOptionMeal[]
+  participantValidations  TicketingOrderItemMeal[]
 
   @@unique([editionId, date, mealType])
   @@index([editionId])
@@ -69,6 +70,30 @@ model ArtistMealSelection {
 
   @@unique([artistId, mealId])
   @@index([artistId])
+  @@index([mealId])
+}
+
+/// Repas des organisateurs présents sur l'édition.
+///
+/// Contrairement aux bénévoles et aux artistes, le droit n'est pas matérialisé : un
+/// EditionOrganizer a accès à TOUS les repas activés de l'édition par défaut. Une ligne
+/// n'existe donc que pour une exception (`accepted: false`, repas décoché pour cet
+/// organisateur) ou pour tracer une consommation. Même logique que
+/// [TicketingOrderItemMeal] pour les participants billetterie.
+model OrganizerMealSelection {
+  id                 Int       @id @default(autoincrement())
+  editionOrganizerId Int
+  mealId             Int
+  accepted           Boolean   @default(true)
+  consumedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  editionOrganizer EditionOrganizer @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
+  meal             VolunteerMeal    @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([editionOrganizerId, mealId])
+  @@index([editionOrganizerId])
   @@index([mealId])
 }
 

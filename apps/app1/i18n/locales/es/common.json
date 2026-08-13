@@ -258,7 +258,8 @@
         "standard": "Estándar",
         "total": "Total de comidas",
         "volunteers": "Comidas de voluntarios",
-        "with_allergies": "Con alergias"
+        "with_allergies": "Con alergias",
+        "organizers": "Comidas de los organizadores"
       }
     },
     "no_description_available": "Sin descripción disponible",

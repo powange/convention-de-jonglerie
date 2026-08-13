@@ -5,7 +5,12 @@
 //
 // NB : les sélections artistes (ArtistMealSelection) et la billetterie sont gérées par d'autres
 // ports (ArtistsPort, TicketingPort) ; ce service ne traite que la part bénévole + définitions de repas.
-import type { MealToggle, MealUpdateInput, MealVolunteerParticipant } from './meals-types'
+import type {
+  MealToggle,
+  MealUpdateInput,
+  MealOrganizerParticipant,
+  MealVolunteerParticipant,
+} from './meals-types'
 
 import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
 import {
@@ -439,8 +444,13 @@ export async function setVolunteerMeals(
 }
 
 /**
- * Repas (activés) d'une date avec leurs participants **bénévoles** acceptés. (ex-`catering` partie
- * bénévole.) Les participants artistes/billetterie sont fusionnés par l'appelant via leurs ports.
+ * Repas (activés) d'une date avec leurs participants **bénévoles** acceptés et les
+ * **organisateurs** présents sur l'édition. (ex-`catering` partie bénévole.) Les participants
+ * artistes/billetterie sont fusionnés par l'appelant via leurs ports.
+ *
+ * Les organisateurs ont accès à tous les repas par défaut : seules les exceptions
+ * (`OrganizerMealSelection.accepted = false`) sont stockées, d'où le filtrage en mémoire
+ * plutôt qu'une jointure sur les sélections.
  */
 export async function getCateringMealsForDate(editionId: number, targetDate: string) {
   const meals = await prisma.volunteerMeal.findMany({
@@ -460,6 +470,19 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
     orderBy: { mealType: 'asc' },
   })
 
+  const editionOrganizers = await prisma.editionOrganizer.findMany({
+    where: { editionId },
+    include: {
+      mealSelections: {
+        where: { accepted: false, mealId: { in: meals.map((meal) => meal.id) } },
+        select: { mealId: true },
+      },
+      organizer: {
+        select: { user: { select: { nom: true, prenom: true, email: true, phone: true } } },
+      },
+    },
+  })
+
   return meals.map((meal) => ({
     id: meal.id,
     mealType: meal.mealType,
@@ -477,6 +500,19 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
         emergencyContactPhone: selection.volunteer.emergencyContactPhone,
       })
     ),
+    organizers: editionOrganizers
+      .filter((eo) => !eo.mealSelections.some((selection) => selection.mealId === meal.id))
+      .map(
+        (eo): MealOrganizerParticipant => ({
+          nom: eo.organizer.user.nom,
+          prenom: eo.organizer.user.prenom,
+          email: eo.organizer.user.email,
+          phone: eo.organizer.user.phone,
+          dietaryPreference: eo.dietaryPreference,
+          allergies: eo.allergies,
+          allergySeverity: eo.allergySeverity,
+        })
+      ),
   }))
 }
 

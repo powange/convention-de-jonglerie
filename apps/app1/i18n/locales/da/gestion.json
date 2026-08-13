@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Frivillig",
         "artist": "Kunstner",
-        "participant": "Deltager"
-      }
+        "participant": "Deltager",
+        "organizer": "Arrangør"
+      },
+      "organizers": "Arrangører"
     },
     "organizers": {
       "access_rights": "Adgangsrettigheder",
@@ -214,7 +216,26 @@
       "select_to_add": "Vælg en organisator at tilføje",
       "status": "Billetstatus",
       "title": "Organisatorer",
-      "title_required": "Arrangørens titel er påkrævet"
+      "title_required": "Arrangørens titel er påkrævet",
+      "meals": {
+        "manage": "Administrér måltider",
+        "title": "{name}s måltider",
+        "description": "Som standard har en arrangør, der deltager i udgaven, adgang til alle måltider. Fjern markeringen ved dem, vedkommende ikke skal have.",
+        "no_meals": "Der er ikke oprettet noget måltid for denne udgave",
+        "check_all": "Markér alle",
+        "uncheck_all": "Fjern alle markeringer",
+        "already_validated": "Allerede valideret",
+        "dietary_section": "Kost",
+        "dietary_preference": "Kostpræference",
+        "allergies": "Allergier",
+        "allergies_placeholder": "Fødevareallergier eller -intolerancer",
+        "allergy_severity": "Allergiens alvorlighed",
+        "unsaved_changes": "Du har ugemte ændringer",
+        "confirm_close_unsaved": "Du har ugemte ændringer. Vil du virkelig lukke?",
+        "saved_success": "Denne arrangørs måltider er gemt",
+        "error_loading": "Kan ikke indlæse denne arrangørs måltider",
+        "error_saving": "Kan ikke gemme denne arrangørs måltider"
+      }
     },
     "overview": "Oversigt",
     "services": {

@@ -258,7 +258,8 @@
         "standard": "Стандарт",
         "total": "Всього страв",
         "volunteers": "Харчування волонтерів",
-        "with_allergies": "З алергіями"
+        "with_allergies": "З алергіями",
+        "organizers": "Харчування організаторів"
       }
     },
     "no_description_available": "Опис недоступний",

@@ -7,7 +7,9 @@ import { canManageMealsOrValidation } from '#server/utils/permissions/edition-pe
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const validateMealSchema = z.object({
-  type: z.enum(['volunteer', 'artist', 'participant']),
+  type: z.enum(['volunteer', 'artist', 'participant', 'organizer']),
+  // Pour un organisateur, il s'agit de l'id de l'EditionOrganizer et non d'une sélection :
+  // le droit n'est pas matérialisé, la ligne est créée au moment de la validation.
   id: z.number().int().positive(),
 })
 
@@ -87,6 +89,55 @@ export default wrapApiHandler(
         throw res.reason === 'already'
           ? createError({ status: 400, message: 'Ce repas a déjà été validé' })
           : createError({ status: 404, message: 'Sélection de repas non trouvée' })
+      }
+    } else if (validatedData.type === 'organizer') {
+      const editionOrganizer = await prisma.editionOrganizer.findFirst({
+        where: { id: validatedData.id, editionId },
+        select: { id: true },
+      })
+
+      if (!editionOrganizer) {
+        throw createError({
+          status: 404,
+          message: 'Organisateur non trouvé',
+        })
+      }
+
+      // Mise à jour atomique : ne met à jour que si le repas n'est pas décoché ni déjà validé.
+      // Si aucune ligne n'existe (cas nominal, accès par défaut), on la crée.
+      const result = await prisma.organizerMealSelection.updateMany({
+        where: {
+          editionOrganizerId: editionOrganizer.id,
+          mealId,
+          accepted: true,
+          consumedAt: null,
+        },
+        data: { consumedAt: now },
+      })
+
+      if (result.count === 0) {
+        try {
+          await prisma.organizerMealSelection.create({
+            data: { editionOrganizerId: editionOrganizer.id, mealId, consumedAt: now },
+          })
+        } catch (error: any) {
+          if (error.code !== 'P2002') throw error
+
+          // La ligne existe : soit le repas a été décoché, soit il est déjà validé.
+          const existing = await prisma.organizerMealSelection.findUnique({
+            where: {
+              editionOrganizerId_mealId: { editionOrganizerId: editionOrganizer.id, mealId },
+            },
+            select: { accepted: true },
+          })
+
+          throw existing && !existing.accepted
+            ? createError({
+                status: 403,
+                message: "Cet organisateur n'a pas accès à ce repas",
+              })
+            : createError({ status: 400, message: 'Ce repas a déjà été validé' })
+        }
       }
     } else if (validatedData.type === 'participant') {
       // Étape 2 (port ticketing) : validation déléguée (le layer ne lit plus la billetterie).

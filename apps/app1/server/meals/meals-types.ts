@@ -62,10 +62,25 @@ export interface MealVolunteerParticipant {
   emergencyContactPhone: string | null
 }
 
-/** Repas (activé) d'une date avec ses participants bénévoles acceptés (catering). */
+/** Participant organisateur d'un repas (catering). */
+export interface MealOrganizerParticipant {
+  nom: string | null
+  prenom: string | null
+  email: string | null
+  phone: string | null
+  dietaryPreference: string | null
+  allergies: string | null
+  allergySeverity: string | null
+}
+
+/**
+ * Repas (activé) d'une date avec ses participants bénévoles acceptés et les organisateurs
+ * présents sur l'édition (catering).
+ */
 export interface CateringMeal {
   id: number
   mealType: string
   phases: unknown
   volunteers: MealVolunteerParticipant[]
+  organizers: MealOrganizerParticipant[]
 }

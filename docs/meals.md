@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Le module Repas permet aux organisateurs de planifier les **repas servis** durant l'événement (avant, pendant et après), de récolter les **sélections** des bénévoles et artistes, de **valider** la consommation à l'entrée du buffet, et d'**intégrer les repas dans la billetterie** (tarifs et options).
+Le module Repas permet aux organisateurs de planifier les **repas servis** durant l'événement (avant, pendant et après), de récolter les **sélections** des bénévoles, artistes et organisateurs, de **valider** la consommation à l'entrée du buffet, et d'**intégrer les repas dans la billetterie** (tarifs et options).
 
 Le module est désactivé par défaut. Activation : `Édition → Gestion → Fonctionnalités → Repas`.
 
@@ -12,11 +12,22 @@ Le module est désactivé par défaut. Activation : `Édition → Gestion → Fo
 
 Un **créneau de repas** sur une date et un type donné (`BREAKFAST`, `LUNCH`, `DINNER`). Un même type ne peut exister qu'une fois par jour (`@@unique([editionId, date, mealType])`). Les phases applicables (`SETUP`, `EVENT`, `TEARDOWN`) sont stockées sous forme de tableau JSON pour indiquer durant quelles périodes le repas est servi (utile pour les bénévoles dont la disponibilité varie).
 
-> Le nom du modèle est historiquement `VolunteerMeal` mais s'applique à toutes les sélections (bénévoles, artistes, participants billetterie).
+> Le nom du modèle est historiquement `VolunteerMeal` mais s'applique à toutes les sélections (bénévoles, artistes, organisateurs, participants billetterie).
 
 ### VolunteerMealSelection / ArtistMealSelection
 
 Sélection d'un repas pour un bénévole (`EditionVolunteerApplication`) ou un artiste (`EditionArtist`). Stocke `accepted` (le bénéficiaire prend le repas) et `consumedAt` (timestamp de validation à l'entrée).
+
+### OrganizerMealSelection
+
+Repas des **organisateurs présents sur l'édition** (`EditionOrganizer`). Contrairement aux bénévoles et aux artistes, le droit n'est **pas matérialisé** : un organisateur ajouté aux présents a accès à **tous les repas activés** de l'édition, y compris ceux créés après son ajout. Une ligne n'existe donc que pour :
+
+- une **exception** — `accepted: false`, repas décoché pour cet organisateur depuis la modale de gestion ;
+- une **consommation** — `consumedAt`, créée à la volée lors de la validation à l'entrée du buffet.
+
+Retirer un organisateur des présents supprime ses lignes en cascade, donc tous ses repas. C'est la même logique que [`TicketingOrderItemMeal`](#ticketingorderitemmeal) pour les participants billetterie (droit dérivé, ligne créée à la consommation), avec en plus le drapeau `accepted` pour les exceptions.
+
+Les champs `dietaryPreference`, `allergies` et `allergySeverity` vivent sur `EditionOrganizer` (comme sur `EditionArtist`), pour que la liste traiteur reste exacte.
 
 ### TicketingTierMeal / TicketingOptionMeal
 
@@ -48,12 +59,13 @@ model VolunteerMeal {
   enabled   Boolean           @default(true)
   phases    Json              @default("[]")
   // Relations vers tous les sous-systèmes
-  mealSelections         VolunteerMealSelection[]
-  artistMealSelections   ArtistMealSelection[]
-  handoutItems        VolunteerMealHandoutItem[]
-  tiers                  TicketingTierMeal[]
-  options                TicketingOptionMeal[]
-  participantValidations TicketingOrderItemMeal[]
+  mealSelections          VolunteerMealSelection[]
+  artistMealSelections    ArtistMealSelection[]
+  organizerMealSelections OrganizerMealSelection[]
+  handoutItems            VolunteerMealHandoutItem[]
+  tiers                   TicketingTierMeal[]
+  options                 TicketingOptionMeal[]
+  participantValidations  TicketingOrderItemMeal[]
   @@unique([editionId, date, mealType])
 }
 ```
@@ -90,16 +102,17 @@ Préfixe : `/api/editions/:id/meals/`.
 
 ### Sélections individuelles
 
-| Méthode | Endpoint                                          | Description                                                   |
-| ------- | ------------------------------------------------- | ------------------------------------------------------------- |
-| GET     | `/api/editions/:id/volunteers/my-meals`           | Sélections du bénévole connecté                               |
-| PUT     | `/api/editions/:id/volunteers/my-meals`           | Met à jour ses propres sélections                             |
-| GET     | `/api/editions/:id/my-meals`                      | Vue unifiée pour l'utilisateur courant (toutes sources)       |
-| PUT     | `/api/editions/:id/my-meals`                      | Met à jour ses sélections (selon source : bénévole / artiste) |
-| GET/PUT | `/api/editions/:id/volunteers/:volunteerId/meals` | Lecture/écriture par un organisateur sur un bénévole          |
-| GET/PUT | `/api/editions/:id/artists/:artistId/meals`       | Lecture/écriture par un organisateur sur un artiste           |
-| GET     | `/api/editions/:id/volunteers/meals`              | Vue agrégée organisateur : toutes les sélections              |
-| PUT     | `/api/editions/:id/volunteers/meals`              | Mise à jour bulk                                              |
+| Méthode | Endpoint                                                                    | Description                                                                    |
+| ------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| GET     | `/api/editions/:id/volunteers/my-meals`                                     | Sélections du bénévole connecté                                                |
+| PUT     | `/api/editions/:id/volunteers/my-meals`                                     | Met à jour ses propres sélections                                              |
+| GET     | `/api/editions/:id/my-meals`                                                | Vue unifiée pour l'utilisateur courant (toutes sources)                        |
+| PUT     | `/api/editions/:id/my-meals`                                                | Met à jour ses sélections (selon source : bénévole / artiste)                  |
+| GET/PUT | `/api/editions/:id/volunteers/:volunteerId/meals`                           | Lecture/écriture par un organisateur sur un bénévole                           |
+| GET/PUT | `/api/editions/:id/artists/:artistId/meals`                                 | Lecture/écriture par un organisateur sur un artiste                            |
+| GET/PUT | `/api/editions/:id/organizers/edition-organizers/:editionOrganizerId/meals` | Repas et régime alimentaire d'un organisateur présent (droit `canManageMeals`) |
+| GET     | `/api/editions/:id/volunteers/meals`                                        | Vue agrégée organisateur : toutes les sélections                               |
+| PUT     | `/api/editions/:id/volunteers/meals`                                        | Mise à jour bulk                                                               |
 
 ### Intégration billetterie
 
@@ -114,6 +127,7 @@ Voir [`docs/ticketing/`](ticketing/) pour les détails.
 - `app/pages/editions/[id]/gestion/meals/index.vue` — Configuration des repas (création, dates, phases, articles à remettre, intégration billetterie).
 - `app/pages/editions/[id]/gestion/meals/list.vue` — Vue agrégée (qui prend quoi).
 - `app/pages/editions/[id]/gestion/meals/validate.vue` — Interface de validation à l'entrée du buffet (scan QR, recherche, etc.).
+- `app/pages/editions/[id]/gestion/organizers.vue` — bouton « Repas » sur chaque organisateur présent, ouvrant `app/components/organizers/MealsModal.vue` (décocher des repas, renseigner régime et allergies).
 
 ### Pages utilisateur
 
@@ -141,6 +155,7 @@ Toutes les clés sont sous `gestion.meals.*` :
 
 ## Évolutions possibles
 
+- Écran « mes repas » côté organisateur (aujourd'hui seuls les gestionnaires cochent/décochent)
 - Gestion fine des **régimes alimentaires** (allergies, végétarien, vegan) au niveau du repas
 - Notifications push pour rappeler aux participants leurs sélections
 - Statistiques avancées (taux de no-show, gaspillage, etc.)
@@ -148,4 +163,4 @@ Toutes les clés sont sous `gestion.meals.*` :
 
 ---
 
-Dernière mise à jour : 2026-05-13.
+Dernière mise à jour : 2026-08-13.

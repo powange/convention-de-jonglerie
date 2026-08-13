@@ -163,8 +163,10 @@
       "person_type": {
         "volunteer": "Vrijwilliger",
         "artist": "Artiest",
-        "participant": "Deelnemer"
-      }
+        "participant": "Deelnemer",
+        "organizer": "Organisator"
+      },
+      "organizers": "Organisatoren"
     },
     "organizers": {
       "access_rights": "Toegangsrechten",
@@ -214,7 +216,26 @@
       "select_to_add": "Selecteer een organisator om toe te voegen",
       "status": "Ticketstatus",
       "title": "Organisatoren",
-      "title_required": "Titel van organisator is verplicht"
+      "title_required": "Titel van organisator is verplicht",
+      "meals": {
+        "manage": "Maaltijden beheren",
+        "title": "Maaltijden van {name}",
+        "description": "Standaard heeft een organisator die op de editie aanwezig is toegang tot alle maaltijden. Vink de maaltijden uit die hij niet gebruikt.",
+        "no_meals": "Er is geen maaltijd ingesteld voor deze editie",
+        "check_all": "Alles aanvinken",
+        "uncheck_all": "Alles uitvinken",
+        "already_validated": "Al gevalideerd",
+        "dietary_section": "Voeding",
+        "dietary_preference": "Dieet",
+        "allergies": "Allergieën",
+        "allergies_placeholder": "Voedselallergieën of -intoleranties",
+        "allergy_severity": "Ernst van de allergie",
+        "unsaved_changes": "Je hebt niet-opgeslagen wijzigingen",
+        "confirm_close_unsaved": "Je hebt niet-opgeslagen wijzigingen. Weet je zeker dat je wilt sluiten?",
+        "saved_success": "De maaltijden van deze organisator zijn opgeslagen",
+        "error_loading": "Kan de maaltijden van deze organisator niet laden",
+        "error_saving": "Kan de maaltijden van deze organisator niet opslaan"
+      }
     },
     "overview": "Overzicht",
     "services": {

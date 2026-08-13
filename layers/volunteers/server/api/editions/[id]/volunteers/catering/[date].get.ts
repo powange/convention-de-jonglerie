@@ -21,8 +21,9 @@ export default wrapApiHandler(async (event) => {
 
   const ports = useVolunteerPorts()
 
-  // Étape 1bis : repas + participants bénévoles délégués au module repas ; artistes et billetterie
-  // via leurs ports respectifs. Le layer ne lit plus aucun modèle repas/artiste/billetterie.
+  // Étape 1bis : repas + participants bénévoles et organisateurs délégués au module repas ;
+  // artistes et billetterie via leurs ports respectifs. Le layer ne lit plus aucun modèle
+  // repas/artiste/billetterie.
   const meals = await ports.meals.getCateringMealsForDate(editionId, targetDate)
   const mealIds = meals.map((m) => m.id)
   const ticketParticipantsByMeal = await ports.ticketing.getMealTicketParticipants(mealIds)
@@ -36,7 +37,7 @@ export default wrapApiHandler(async (event) => {
     dietaryCounts: {} as Record<string, number>,
     allergies: [] as Array<{
       participantName: string
-      participantType: 'volunteer' | 'artist'
+      participantType: 'volunteer' | 'artist' | 'organizer'
       allergies: string
       allergySeverity: string | null
       emergencyContactName?: string | null
@@ -88,11 +89,26 @@ export default wrapApiHandler(async (event) => {
       emergencyContactPhone: null,
     }))
 
-    const allParticipants = [...volunteers, ...artists, ...ticketParticipants].sort((a, b) => {
-      const nameA = `${a.nom || ''} ${a.prenom || ''}`
-      const nameB = `${b.nom || ''} ${b.prenom || ''}`
-      return nameA.localeCompare(nameB)
-    })
+    const organizers = meal.organizers.map((o) => ({
+      type: 'organizer' as const,
+      nom: o.nom,
+      prenom: o.prenom,
+      email: o.email,
+      phone: o.phone,
+      dietaryPreference: o.dietaryPreference,
+      allergies: o.allergies,
+      allergySeverity: o.allergySeverity,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+    }))
+
+    const allParticipants = [...volunteers, ...artists, ...ticketParticipants, ...organizers].sort(
+      (a, b) => {
+        const nameA = `${a.nom || ''} ${a.prenom || ''}`
+        const nameB = `${b.nom || ''} ${b.prenom || ''}`
+        return nameA.localeCompare(nameB)
+      }
+    )
 
     // Mettre à jour le résumé
     const mealKey = `${meal.mealType}_${phases.join('_')}`
@@ -111,7 +127,7 @@ export default wrapApiHandler(async (event) => {
       if (p.allergies && p.allergies.trim()) {
         summary.allergies.push({
           participantName: `${p.prenom || ''} ${p.nom || ''}`.trim(),
-          participantType: p.type as 'volunteer' | 'artist',
+          participantType: p.type as 'volunteer' | 'artist' | 'organizer',
           allergies: p.allergies,
           allergySeverity: p.allergySeverity,
           emergencyContactName: p.emergencyContactName,
@@ -128,6 +144,7 @@ export default wrapApiHandler(async (event) => {
       volunteerCount: volunteers.length,
       artistCount: artists.length,
       ticketParticipantCount: ticketParticipants.length,
+      organizerCount: organizers.length,
       participants: allParticipants,
     }
   })
