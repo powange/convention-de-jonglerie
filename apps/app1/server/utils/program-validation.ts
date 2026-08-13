@@ -9,6 +9,44 @@ export const PROGRAM_ITEM_LIMITS = {
 } as const
 
 /**
+ * Un élément se rattache à une zone **ou** à un repère, pas aux deux : la carte ne saurait pas
+ * lequel montrer, et l'affichage devrait trancher arbitrairement.
+ */
+const zoneOuRepere = (d: { zoneId?: number | null; markerId?: number | null }) =>
+  !(d.zoneId && d.markerId)
+
+const REGLE_ZONE_OU_REPERE = {
+  message: 'Choisissez une zone ou un repère, pas les deux',
+  path: ['markerId'] as const,
+}
+
+/**
+ * Lieu seul, pour le changer sans toucher au reste de l'élément.
+ *
+ * Les trois champs sont exigés ensemble, chacun pouvant être nul : le lieu se remplace d'un bloc
+ * plutôt que par touches. Accepter un fragment laisserait cohabiter une zone fraîchement choisie
+ * et un texte libre oublié, et la frise afficherait une précision qui ne se rapporte plus à rien.
+ *
+ * Défini ici plutôt que dans le point d'API, pour que la règle « une zone **ou** un repère » soit
+ * énoncée au même endroit que celle du formulaire complet — deux copies auraient fini par
+ * diverger, et l'une des deux voies aurait laissé passer un élément que l'autre refuse.
+ */
+export const programItemLocationSchema = z
+  .object({
+    locationName: z
+      .string()
+      .trim()
+      .max(PROGRAM_ITEM_LIMITS.MAX_LOCATION_NAME_LENGTH)
+      .nullable()
+      .transform((v) => v || null),
+    zoneId: z.number().int().positive().nullable(),
+    markerId: z.number().int().positive().nullable(),
+  })
+  .refine(zoneOuRepere, REGLE_ZONE_OU_REPERE)
+
+export type ProgramItemLocationInput = z.infer<typeof programItemLocationSchema>
+
+/**
  * Élément de programmation, à la création comme à la modification.
  *
  * La modification attend l'objet complet plutôt qu'un fragment : c'est ce qu'envoie le formulaire,
@@ -42,13 +80,6 @@ export const programItemSchema = z
     message: 'La fin doit être postérieure au début',
     path: ['endDateTime'],
   })
-  /**
-   * Un élément se rattache à une zone **ou** à un repère, pas aux deux : la carte ne saurait pas
-   * lequel montrer, et l'affichage devrait trancher arbitrairement.
-   */
-  .refine((d) => !(d.zoneId && d.markerId), {
-    message: 'Choisissez une zone ou un repère, pas les deux',
-    path: ['markerId'],
-  })
+  .refine(zoneOuRepere, REGLE_ZONE_OU_REPERE)
 
 export type ProgramItemInput = z.infer<typeof programItemSchema>

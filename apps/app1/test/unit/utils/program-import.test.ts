@@ -181,6 +181,28 @@ describe('construireElementsDeJournee', () => {
     expect(elements[0]!.fin).toBe('2026-10-02T23:00:00')
   })
 
+  /**
+   * Une heure d'avant l'aube appartient à la nuit qui suit la journée annoncée : la section
+   * « 2 octobre » d'un site qui affiche « 01:00 » désigne la nuit du 2 au 3, pas le petit matin
+   * qui a précédé l'ouverture. Sans ce report, la frise — dont la journée commence à 3 h —
+   * rangeait le créneau à l'avant-veille.
+   */
+  it('reporte à la nuit suivante une heure d’avant l’aube', () => {
+    const { elements } = construireElementsDeJournee('2026-10-02', [
+      { titre: 'Jam de nuit', debut: '01:00', fin: '04:00' },
+    ])
+    expect(elements[0]!.debut).toBe('2026-10-03T01:00:00')
+    expect(elements[0]!.fin).toBe('2026-10-03T04:00:00')
+  })
+
+  // Trois heures pile n'est plus la nuit d'avant : le créneau reste sur sa journée.
+  it('laisse sur sa journée une heure à partir de trois heures', () => {
+    const { elements } = construireElementsDeJournee('2026-10-02', [
+      { titre: 'Lève-tôt', debut: '03:00' },
+    ])
+    expect(elements[0]!.debut).toBe('2026-10-02T03:00:00')
+  })
+
   // Les sites écrivent « 18h30 » aussi souvent que « 18:30 ».
   it('accepte les deux écritures de l’heure', () => {
     for (const debut of ['18:30', '18h30', '18 h 30', '8:05']) {

@@ -827,7 +827,7 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
-import { formaterHeure, formaterJournee, journeeDans } from '~~/shared/utils/fuseau-edition'
+import { formaterHeure, formaterJournee, journeeDeProgramme } from '~~/shared/utils/fuseau-edition'
 import { buildProgramDays, type ProgramDayRecord } from '~~/shared/utils/program-days'
 
 const { formatDateTimeRange } = useDateFormat()
@@ -924,8 +924,9 @@ const showsByDay = computed(() => {
   const grouped = new Map<string, any[]>()
 
   publicShows.value.forEach((show: any) => {
-    // Journée vécue sur place : découpée en temps universel, une soirée basculait au lendemain.
-    const date = journeeDans(show.startDateTime, fuseauEdition.value)
+    // Journée vécue sur place, et non journée calendaire : un spectacle de fin de soirée qui
+    // commence après minuit se range avec la veille, comme sur la frise du programme.
+    const date = journeeDeProgramme(show.startDateTime, fuseauEdition.value)
     if (!grouped.has(date)) {
       grouped.set(date, [])
     }

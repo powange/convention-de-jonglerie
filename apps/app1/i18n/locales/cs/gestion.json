@@ -687,7 +687,9 @@
       "convert_target": "Převést na",
       "convert_end_required": "Zadejte čas konce: workshop jej vyžaduje.",
       "convert_public_warning": "Workshopy jsou vždy viditelné pro veřejnost: tento koncept se jím ihned stane.",
-      "converted": "Bod převeden"
+      "converted": "Bod převeden",
+      "edit_place": "Změnit místo",
+      "place_error": "Místo se nepodařilo uložit."
     }
   }
 }

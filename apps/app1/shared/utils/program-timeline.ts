@@ -11,10 +11,18 @@
  * minces et que ces règles soient vérifiables sans base de données.
  */
 
-import { journeeDans } from './fuseau-edition'
+import { journeeDeProgramme } from './fuseau-edition'
 
 /** D'où vient une entrée du programme. Sert à l'affichage (icône, couleur) et aux liens. */
 export type SourceProgramme = 'workshop' | 'spectacle' | 'element'
+
+/** Zone ou repère de la carte du site, tel qu'une entrée du programme s'y rattache. */
+export interface LieuCarte {
+  id: number
+  nom: string
+  /** `null` sur un repère qui suit la couleur de son type plutôt que d'en porter une. */
+  couleur: string | null
+}
 
 export interface EntreeProgramme {
   /**
@@ -30,9 +38,16 @@ export interface EntreeProgramme {
   debut: string
   /** Fin, en ISO 8601, ou `null` quand la source ne la connaît pas. */
   fin: string | null
-  lieu: string | null
-  zoneId: number | null
-  markerId: number | null
+  /**
+   * Précision libre — « côté buvette » —, indépendante du rattachement à la carte.
+   *
+   * Distincte de `zone` et `repere` plutôt que fondue avec eux dans un seul nom : la frise de
+   * gestion doit pouvoir réafficher le texte saisi sans risquer d'enregistrer le nom d'une zone
+   * comme s'il avait été tapé à la main.
+   */
+  lieuTexte: string | null
+  zone: LieuCarte | null
+  repere: LieuCarte | null
   /** Faux pour un brouillon, que seuls les organisateurs voient. */
   publie: boolean
 }
@@ -44,7 +59,11 @@ export interface WorkshopSource {
   description?: string | null
   startDateTime: Date | string
   endDateTime: Date | string
-  location?: { name?: string | null; zoneId?: number | null; markerId?: number | null } | null
+  location?: {
+    name?: string | null
+    zone?: LieuCarteSource | null
+    marker?: LieuCarteSource | null
+  } | null
 }
 
 /** Un spectacle, tel que lu en base. */
@@ -56,10 +75,8 @@ export interface SpectacleSource {
   /** Durée en minutes. Les spectacles n'ont pas d'heure de fin, mais une durée facultative. */
   duration?: number | null
   location?: string | null
-  zoneId?: number | null
-  markerId?: number | null
-  zone?: { name: string } | null
-  marker?: { name: string } | null
+  zone?: LieuCarteSource | null
+  marker?: LieuCarteSource | null
   isPublic: boolean
 }
 
@@ -72,11 +89,16 @@ export interface ElementSource {
   /** Facultative : tous les moments n'ont pas une fin annoncée. */
   endDateTime?: Date | string | null
   locationName?: string | null
-  zoneId?: number | null
-  markerId?: number | null
-  zone?: { name: string } | null
-  marker?: { name: string } | null
+  zone?: LieuCarteSource | null
+  marker?: LieuCarteSource | null
   isPublic: boolean
+}
+
+/** Zone ou repère tel que la base le rend : les champs y gardent leurs noms Prisma. */
+interface LieuCarteSource {
+  id: number
+  name: string
+  color?: string | null
 }
 
 export interface SourcesProgramme {
@@ -97,6 +119,27 @@ const enIso = (valeur: Date | string): string =>
   typeof valeur === 'string' ? new Date(valeur).toISOString() : valeur.toISOString()
 
 /**
+ * Nom du lieu en un seul tenant, pour un affichage qui ne détaille pas.
+ *
+ * Le texte libre l'emporte quand il existe : c'est une précision volontaire de l'organisateur
+ * (« côté buvette »). Sinon on nomme la zone ou le repère — sans quoi une entrée rattachée à la
+ * carte n'afficherait aucun lieu du tout, et le lien vers la carte resterait invisible faute
+ * d'étiquette à cliquer.
+ *
+ * Exporté plutôt que recopié dans chaque page : c'est une règle d'affichage, et deux pages qui
+ * l'appliqueraient chacune à sa façon finiraient par nommer le même lieu différemment.
+ */
+export const nomDuLieu = (entree: {
+  lieuTexte: string | null
+  zone: LieuCarte | null
+  repere: LieuCarte | null
+}): string | null => entree.lieuTexte || entree.zone?.nom || entree.repere?.nom || null
+
+/** Convertit une zone ou un repère lu en base vers la forme portée par la frise. */
+const enLieuCarte = (source?: LieuCarteSource | null): LieuCarte | null =>
+  source ? { id: source.id, nom: source.name, couleur: source.color ?? null } : null
+
+/**
  * Fin d'un spectacle, déduite de sa durée.
  *
  * Les spectacles stockent une durée en minutes plutôt qu'une heure de fin : c'est ce que connaît
@@ -104,20 +147,6 @@ const enIso = (valeur: Date | string): string =>
  * qu'une fin inventée, qui ferait dire à la frise qu'un spectacle est terminé alors qu'on n'en
  * sait rien.
  */
-/**
- * Nom du lieu à afficher.
- *
- * Le texte libre l'emporte quand il existe : c'est une précision volontaire de l'organisateur
- * (« côté buvette »). Sinon on nomme la zone ou le repère — sans quoi une entrée rattachée à la
- * carte n'afficherait aucun lieu du tout, et le lien vers la carte resterait invisible faute
- * d'étiquette à cliquer.
- */
-const nomDuLieu = (
-  texteLibre?: string | null,
-  zone?: { name: string } | null,
-  marker?: { name: string } | null
-): string | null => texteLibre || zone?.name || marker?.name || null
-
 const finDuSpectacle = (debut: Date | string, dureeMinutes?: number | null): string | null => {
   if (!dureeMinutes || dureeMinutes <= 0) return null
   const d = typeof debut === 'string' ? new Date(debut) : debut
@@ -152,9 +181,9 @@ export function construireFriseProgramme(
       description: a.description ?? null,
       debut: enIso(a.startDateTime),
       fin: enIso(a.endDateTime),
-      lieu: a.location?.name ?? null,
-      zoneId: a.location?.zoneId ?? null,
-      markerId: a.location?.markerId ?? null,
+      lieuTexte: a.location?.name ?? null,
+      zone: enLieuCarte(a.location?.zone),
+      repere: enLieuCarte(a.location?.marker),
       publie: true,
     })
   }
@@ -169,9 +198,9 @@ export function construireFriseProgramme(
       description: s.description ?? null,
       debut: enIso(s.startDateTime),
       fin: finDuSpectacle(s.startDateTime, s.duration),
-      lieu: nomDuLieu(s.location, s.zone, s.marker),
-      zoneId: s.zoneId ?? null,
-      markerId: s.markerId ?? null,
+      lieuTexte: s.location ?? null,
+      zone: enLieuCarte(s.zone),
+      repere: enLieuCarte(s.marker),
       publie: s.isPublic,
     })
   }
@@ -186,9 +215,9 @@ export function construireFriseProgramme(
       description: e.description ?? null,
       debut: enIso(e.startDateTime),
       fin: e.endDateTime ? enIso(e.endDateTime) : null,
-      lieu: nomDuLieu(e.locationName, e.zone, e.marker),
-      zoneId: e.zoneId ?? null,
-      markerId: e.markerId ?? null,
+      lieuTexte: e.locationName ?? null,
+      zone: enLieuCarte(e.zone),
+      repere: enLieuCarte(e.marker),
       publie: e.isPublic,
     })
   }
@@ -201,9 +230,9 @@ export function construireFriseProgramme(
 /**
  * Regroupe la frise par journée, pour un affichage jour par jour.
  *
- * La clé est la date **sur place** au format `AAAA-MM-JJ`, et non la partie date de l'ISO : une
- * soirée qui commence à 23 h appartient à la journée où le public la vit, pas à celle que donnerait
- * un découpage en temps universel.
+ * La clé est la journée **de programme** sur place, au format `AAAA-MM-JJ` : une soirée appartient
+ * au jour où le public la vit, et non à celui que donneraient l'heure universelle ou le passage de
+ * minuit. Une scène ouverte de 00 h 30 se range donc avec la veille, dont elle prolonge la soirée.
  *
  * « Sur place » et non « chez le lecteur » : sans le fuseau de l'édition, cette même soirée passait
  * au lendemain pour qui consultait le programme depuis un fuseau plus à l'est, et la frise
@@ -216,7 +245,7 @@ export function grouperParJournee(
   const parJour = new Map<string, EntreeProgramme[]>()
 
   for (const entree of entrees) {
-    const cle = journeeDans(entree.debut, fuseau)
+    const cle = journeeDeProgramme(entree.debut, fuseau)
     const liste = parJour.get(cle)
     if (liste) liste.push(entree)
     else parJour.set(cle, [entree])

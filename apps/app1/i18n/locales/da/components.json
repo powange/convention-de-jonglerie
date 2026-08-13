@@ -104,7 +104,8 @@
       "search_country_placeholder": "Søg efter et land..."
     },
     "date_time_picker": {
-      "placeholder": "Vælg en dato"
+      "placeholder": "Vælg en dato",
+      "clear": "Ryd"
     },
     "edition_form": {
       "address_tip": "Indtast en komplet adresse i søgefeltet for automatisk at udfylde alle felterne nedenfor. En præcis adresse vil også muliggøre geolokalisering af dit arrangement på kortet.",

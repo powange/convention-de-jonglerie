@@ -98,10 +98,16 @@
             </UBadge>
           </template>
 
+          <!-- Modifiable sur place : changer une salle est le geste le plus courant de la
+               composition d'un programme, et passer par la modale complète pour cela rouvrait
+               titre, description et horaires. -->
           <template #lieu-cell="{ row }">
-            <span class="text-sm text-gray-600 dark:text-gray-400">
-              {{ row.original.lieu || '—' }}
-            </span>
+            <ProgramLieuCell
+              :entree="row.original"
+              :edition-id="editionId"
+              :site-map-enabled="edition?.siteMapEnabled"
+              @enregistre="rechargerFrise"
+            />
           </template>
 
           <template #visibilite-cell="{ row }">
@@ -239,12 +245,15 @@
               :max-date="dernierJour"
               required
             />
+            <!-- Effaçable : la fin est facultative, et une heure saisie par erreur doit pouvoir
+                 être retirée plutôt que de rester annoncée au public. -->
             <UiDateTimePicker
               v-model="formulaire.endDateTime"
               :date-label="$t('gestion.program.field.end_optional')"
               :time-label="$t('gestion.program.field.end_time')"
               :min-date="premierJour"
               :max-date="dernierJour"
+              clearable
             />
           </div>
 
@@ -528,12 +537,9 @@ const ouvrirEdition = (entree: EntreeProgramme) => {
     description: entree.description ?? '',
     startDateTime: versChampLocal(entree.debut, fuseau.value),
     endDateTime: entree.fin ? versChampLocal(entree.fin, fuseau.value) : '',
-    // `lieu` porte le nom de la zone quand l'élément y est rattaché : on ne le recopie donc en
-    // texte libre que s'il n'y a pas de rattachement, sinon on dupliquerait un nom déjà porté
-    // par la carte.
-    locationName: entree.zoneId || entree.markerId ? null : (entree.lieu ?? null),
-    zoneId: entree.zoneId,
-    markerId: entree.markerId,
+    locationName: entree.lieuTexte,
+    zoneId: entree.zone?.id ?? null,
+    markerId: entree.repere?.id ?? null,
     isPublic: entree.publie,
   }
   erreurFormulaire.value = ''

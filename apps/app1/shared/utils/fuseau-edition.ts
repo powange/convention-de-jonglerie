@@ -92,6 +92,27 @@ export const journeeDans = (instant: string | Date, fuseau?: string | null): str
 }
 
 /**
+ * Heure à laquelle une journée de programme cède la place à la suivante.
+ *
+ * Trois heures du matin, et non minuit : une scène ouverte qui démarre le vendredi à 00 h 30 est,
+ * pour tout le monde sur place, la soirée du jeudi. La ranger au vendredi la ferait apparaître en
+ * tête d'une journée qui n'a pas encore commencé, loin des créneaux qu'elle prolonge.
+ */
+export const HEURE_BASCULE_JOURNEE = 3
+
+/**
+ * Journée **de programme** d'un instant, au format `AAAA-MM-JJ`.
+ *
+ * Distincte de la journée calendaire : tout ce qui commence avant `HEURE_BASCULE_JOURNEE` est
+ * rattaché à la veille. C'est le découpage à utiliser partout où un programme se lit par jour ;
+ * `journeeDans` reste la date civile, pour ce qui doit dater et non regrouper.
+ */
+export const journeeDeProgramme = (instant: string | Date, fuseau?: string | null): string => {
+  const dt = enDateTime(instant, fuseau)
+  return dt.isValid ? dt.minus({ hours: HEURE_BASCULE_JOURNEE }).toFormat('yyyy-MM-dd') : ''
+}
+
+/**
  * Libellé d'une journée, à partir soit d'une journée `AAAA-MM-JJ`, soit d'un instant.
  *
  * Les deux formes se présentent : les entêtes de la frise portent une journée nue, les bornes de

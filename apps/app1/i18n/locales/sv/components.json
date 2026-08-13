@@ -104,7 +104,8 @@
       "search_country_placeholder": "Sök efter ett land..."
     },
     "date_time_picker": {
-      "placeholder": "Välj ett datum"
+      "placeholder": "Välj ett datum",
+      "clear": "Rensa"
     },
     "edition_form": {
       "address_tip": "Ange en fullständig adress i sökfältet för att automatiskt fylla i alla fält nedan. En exakt adress gör också att din utgåva kan geolokaliseras på kartan.",

@@ -86,19 +86,19 @@
                    c'est tout l'intérêt de les avoir liés. Sans carte publique, on n'affiche que
                    le nom, un lien mènerait à une page inaccessible. -->
               <ULink
-                v-if="entree.lieu && lienCarte(entree)"
+                v-if="nomDuLieu(entree) && lienCarte(entree)"
                 :to="lienCarte(entree)!"
                 class="inline-flex items-center gap-1 text-sm text-primary"
               >
                 <UIcon name="i-lucide-map-pin" class="h-4 w-4" />
-                {{ entree.lieu }}
+                {{ nomDuLieu(entree) }}
               </ULink>
               <p
-                v-else-if="entree.lieu"
+                v-else-if="nomDuLieu(entree)"
                 class="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400"
               >
                 <UIcon name="i-lucide-map-pin" class="h-4 w-4" />
-                {{ entree.lieu }}
+                {{ nomDuLieu(entree) }}
               </p>
             </div>
           </div>
@@ -118,7 +118,11 @@ import {
   formaterHeure,
   formaterJournee,
 } from '~~/shared/utils/fuseau-edition'
-import { grouperParJournee, type EntreeProgramme } from '~~/shared/utils/program-timeline'
+import {
+  grouperParJournee,
+  nomDuLieu,
+  type EntreeProgramme,
+} from '~~/shared/utils/program-timeline'
 
 const route = useRoute()
 const { t, locale } = useI18n()
@@ -268,8 +272,8 @@ const formaterJour = (date: string) =>
  */
 const lienCarte = (entree: EntreeProgramme): string | null => {
   if (!donneesFrise.value?.data?.carteConsultable) return null
-  if (entree.zoneId) return `/editions/${editionId.value}/map?focusZone=${entree.zoneId}`
-  if (entree.markerId) return `/editions/${editionId.value}/map?focusMarker=${entree.markerId}`
+  if (entree.zone) return `/editions/${editionId.value}/map?focusZone=${entree.zone.id}`
+  if (entree.repere) return `/editions/${editionId.value}/map?focusMarker=${entree.repere.id}`
   return null
 }
 
