@@ -300,10 +300,19 @@ export async function moveTemporaryFile(
       throw new Error('Nom de fichier temporaire non défini')
     }
 
-    // Construire les chemins (dossier séparé du nom de fichier pour nuxt-file-storage)
+    // Construire les chemins (dossier séparé du nom de fichier pour nuxt-file-storage).
+    // Le dossier temporaire se lit sur l'URL fournie : le reconstruire à partir de
+    // `resourceId` supposerait que l'upload a été rangé sous ce même identifiant, ce qui est
+    // faux pour un spectacle (déposé sous l'édition, rangé ensuite sous le spectacle) — le
+    // fichier restait alors introuvable et l'image ne s'affichait plus après enregistrement.
+    const tempFolderFromUrl = tempUrl
+      .replace(/^\/uploads\//, '')
+      .split('/')
+      .slice(0, -1)
+      .join('/')
     const tempFolder = customTempPath
       ? customTempPath.split('/').slice(0, -1).join('/')
-      : `temp/${resourceType}/${resourceId}`
+      : tempFolderFromUrl || `temp/${resourceType}/${resourceId}`
     const finalPath = customFinalPath || `${resourceType}/${resourceId}`
 
     if (verbose) {

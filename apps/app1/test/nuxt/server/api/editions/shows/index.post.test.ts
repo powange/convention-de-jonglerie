@@ -132,6 +132,36 @@ describe('/api/editions/[id]/shows POST', () => {
       )
     })
 
+    it('devrait enregistrer la compagnie du spectacle', async () => {
+      global.readBody.mockResolvedValue({ ...validBody, companyName: 'Cie Test' })
+
+      await handler({ context: { user: mockUser } } as any)
+
+      expect(prismaMock.show.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ companyName: 'Cie Test' }),
+        })
+      )
+    })
+
+    it('devrait ignorer la compagnie sur un cabaret', async () => {
+      // Les artistes d'un cabaret vivent dans ses numéros : pas de compagnie unique
+      global.readBody.mockResolvedValue({
+        ...validBody,
+        type: 'CABARET',
+        acts: [],
+        companyName: 'Cie Test',
+      })
+
+      await handler({ context: { user: mockUser } } as any)
+
+      expect(prismaMock.show.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ companyName: null }),
+        })
+      )
+    })
+
     it('devrait créer un spectacle avec zoneId', async () => {
       const bodyWithZone = { ...validBody, zoneId: 5 }
       global.readBody.mockResolvedValue(bodyWithZone)

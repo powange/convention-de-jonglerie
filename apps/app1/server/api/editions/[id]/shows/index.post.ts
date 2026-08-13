@@ -12,6 +12,8 @@ import { validateEditionId } from '#server/utils/validation-helpers'
 const showSchema = z.object({
   title: z.string().min(1, 'Le titre est requis').max(191),
   type: z.enum(['STANDARD', 'CABARET']).optional().default('STANDARD'),
+  // 191 = taille de la colonne
+  companyName: z.string().max(191).optional().nullable(),
   description: z.string().optional().nullable(),
   // Sans plafond (comme description) : agrège les besoins techniques importés des candidatures
   technicalNeeds: z.string().optional().nullable(),
@@ -70,6 +72,8 @@ export default wrapApiHandler(
           editionId,
           title: validatedData.title,
           type: validatedData.type,
+          // Un cabaret n'a pas de compagnie unique : ses artistes sont ceux de ses numéros
+          companyName: validatedData.type === 'STANDARD' ? validatedData.companyName : null,
           description: validatedData.description,
           technicalNeeds: validatedData.technicalNeeds,
           startDateTime: new Date(validatedData.startDateTime),
