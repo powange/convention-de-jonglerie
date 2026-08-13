@@ -48,7 +48,7 @@ import {
 import { extractWebContent, formatExtractionForAI } from '#server/utils/web-content-extractor'
 import { htmlVersTexte } from '~~/shared/utils/html-to-text'
 import { editionDayKeys } from '~~/shared/utils/program-days'
-import { construireElementsDeJournee, type ElementPropose } from '~~/shared/utils/program-import'
+import { construireElementsDeJournee, type ElementLu } from '~~/shared/utils/program-import'
 import { decouperParJournee } from '~~/shared/utils/program-page-slicing'
 
 const requestSchema = z.object({
@@ -612,7 +612,7 @@ async function extractProgramDays(
   maxContent: number,
   onProgress?: ProgressCallback,
   datesDemandees?: string[]
-): Promise<{ elements: ElementPropose[]; echecs: string[]; ignores: number }> {
+): Promise<{ elements: ElementLu[]; echecs: string[]; ignores: number }> {
   const timeoutMs = config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
   // On découpe la page ENTIÈRE : tronquer avant amputerait les dernières journées. Seule la
   // matière envoyée au modèle, une section à la fois, est ramenée à son budget.
@@ -643,7 +643,7 @@ async function extractProgramDays(
     `[GENERATE-IMPORT] Passe programme: ${contenu.length} caractères, ${aTraiter.length} journée(s) à interroger (${startDate} → ${endDate})`
   )
 
-  const retenus: ElementPropose[] = []
+  const retenus: ElementLu[] = []
   let ignoresTotal = 0
   /** Journées perdues malgré la seconde tentative, remontées jusqu'à l'écran. */
   const echecs: string[] = []

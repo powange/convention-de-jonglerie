@@ -9,14 +9,31 @@
  * Ce fichier ne touche ni au réseau ni à la base : il se teste sur des tableaux.
  */
 
-/** Un élément tel que le modèle le propose. Les dates sont en ISO 8601. */
-export interface ElementPropose {
+import { journeeDans, versInstant } from './fuseau-edition'
+
+/**
+ * Un élément tel que le modèle vient de le lire, avant tout ancrage.
+ *
+ * `debut` et `fin` sont des date-heures **sans fuseau** — `AAAA-MM-JJTHH:MM:SS` — c'est-à-dire
+ * l'heure telle qu'elle est écrite sur le site de l'organisateur. Elle le reste jusqu'à
+ * `ancrerDansFuseau` : la composer côté serveur revenait à lui accoler le fuseau du serveur, UTC
+ * en conteneur, et « 12:00 » devenait midi UTC — soit 14 h sur la frise d'une convention
+ * européenne.
+ */
+export interface ElementLu {
   titre: string
   description?: string | null
   debut: string
   fin?: string | null
   lieu?: string | null
 }
+
+/**
+ * Un élément ancré dans le fuseau de l'édition : `debut` et `fin` y désignent des instants ISO
+ * 8601, comparables à ce que rend la base. Mêmes champs que `ElementLu`, mais l'un se compare et
+ * s'enregistre quand l'autre ne le peut pas encore — les distinguer évite de les confondre.
+ */
+export type ElementPropose = ElementLu
 
 /** Un élément déjà enregistré, tel que lu en base. */
 export interface ElementExistant {
@@ -57,11 +74,36 @@ export type ActionImport =
 export const normaliserTitre = (titre: string): string =>
   titre.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()
 
-/** Journée locale d'un instant, au format `AAAA-MM-JJ`. */
-const journeeDe = (iso: string): string => {
-  const d = new Date(iso)
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+/**
+ * Ancre dans le fuseau de l'édition les heures lues sur le site.
+ *
+ * C'est le seul endroit où « 12:00 » devient un instant. Le fuseau retenu est celui de la
+ * convention, et non celui du serveur ni celui du navigateur : une heure de programme est une
+ * heure de lieu, et elle doit rester la même que le programme soit relu depuis Paris ou Melbourne.
+ *
+ * Une heure illisible écarte l'élément plutôt que de lui inventer un instant, et le nombre
+ * d'écarts est rendu pour pouvoir le dire. Une heure qui n'existe pas — 2 h 30 la nuit du passage
+ * à l'heure d'été — est en revanche reportée après le saut, et non écartée : le créneau existe
+ * bel et bien sur le site, seule sa notation est ambiguë cette nuit-là.
+ */
+export function ancrerDansFuseau(
+  lus: readonly ElementLu[],
+  fuseau?: string | null
+): { elements: ElementPropose[]; ignores: number } {
+  const elements: ElementPropose[] = []
+  let ignores = 0
+
+  for (const lu of lus) {
+    const debut = versInstant(lu.debut, fuseau)
+    if (!debut) {
+      ignores++
+      continue
+    }
+    const fin = lu.fin ? versInstant(lu.fin, fuseau) : null
+    elements.push({ ...lu, debut, fin: fin || null })
+  }
+
+  return { elements, ignores }
 }
 
 const memeInstant = (a?: string | null, b?: string | null): boolean => {
@@ -81,14 +123,18 @@ const texteEgal = (a?: string | null, b?: string | null): boolean =>
  * apparaître un doublon au lieu d'une correction. Deux moments homonymes le même jour — deux
  * « Scène ouverte » à midi et le soir — restent en revanche indiscernables : le second est traité
  * comme un nouvel élément, ce qui vaut mieux qu'écraser le premier.
+ *
+ * La journée se calcule dans le fuseau de l'édition, comme sur la frise : découpée ailleurs, une
+ * scène ouverte de 23 h basculerait au lendemain et ne s'apparierait plus avec elle-même.
  */
 export function planifierImportProgramme(
   proposes: readonly ElementPropose[],
-  existants: readonly ElementExistant[]
+  existants: readonly ElementExistant[],
+  fuseau?: string | null
 ): ActionImport[] {
   const parCle = new Map<string, ElementExistant>()
   for (const e of existants) {
-    const cle = `${normaliserTitre(e.title)}|${journeeDe(e.startDateTime)}`
+    const cle = `${normaliserTitre(e.title)}|${journeeDans(e.startDateTime, fuseau)}`
     // Le premier gagne : en cas d'homonymes le même jour, on s'accroche toujours au même.
     if (!parCle.has(cle)) parCle.set(cle, e)
   }
@@ -97,7 +143,7 @@ export function planifierImportProgramme(
   const plan: ActionImport[] = []
 
   for (const propose of proposes) {
-    const cle = `${normaliserTitre(propose.titre)}|${journeeDe(propose.debut)}`
+    const cle = `${normaliserTitre(propose.titre)}|${journeeDans(propose.debut, fuseau)}`
     const existant = parCle.get(cle)
 
     if (!existant || dejaApparies.has(existant.id)) {
@@ -186,6 +232,19 @@ const texteOuNull = (valeur: unknown): string | null => {
 }
 
 /**
+ * Date-heure locale `AAAA-MM-JJTHH:MM:SS` à partir d'une journée et de minutes depuis minuit.
+ *
+ * Le calcul passe par UTC — donc par un fuseau fixe — uniquement pour reporter proprement au
+ * lendemain les minutes qui débordent : le résultat est ensuite dépouillé de son `Z`, et ne
+ * désigne aucun instant tant qu'un fuseau ne lui est pas donné.
+ */
+const composerDateHeure = (date: string, minutes: number): string => {
+  const instant = new Date(`${date}T00:00:00Z`)
+  instant.setUTCMinutes(minutes)
+  return instant.toISOString().slice(0, 19)
+}
+
+/**
  * Compose les éléments d'une journée à partir de ce que rend le modèle.
  *
  * On ne lui demande que des **heures** — « 18:30 » — pour une journée qu'on lui a nommée, et la
@@ -195,14 +254,17 @@ const texteOuNull = (valeur: unknown): string | null => {
  *
  * Un élément sans titre ou sans heure de début lisible est écarté : mieux vaut un programme
  * incomplet qu'un créneau inventé. Le nombre d'écarts est rendu pour pouvoir le dire.
+ *
+ * Les date-heures rendues restent sans fuseau : celui de l'édition ne sera appliqué qu'à
+ * `ancrerDansFuseau`, là où il est connu.
  */
 export function construireElementsDeJournee(
   date: string,
   bruts: unknown
-): { elements: ElementPropose[]; ignores: number } {
+): { elements: ElementLu[]; ignores: number } {
   if (!Array.isArray(bruts)) return { elements: [], ignores: 0 }
 
-  const elements: ElementPropose[] = []
+  const elements: ElementLu[] = []
   let ignores = 0
 
   for (const brut of bruts as ElementBrut[]) {
@@ -214,22 +276,15 @@ export function construireElementsDeJournee(
     }
 
     const finMin = enMinutes(brut?.fin)
-    const debut = new Date(`${date}T00:00:00`)
-    debut.setMinutes(debutMin)
-
-    let fin: Date | null = null
-    if (finMin !== null) {
-      fin = new Date(`${date}T00:00:00`)
-      // Une fin antérieure au début désigne le lendemain : une scène ouverte qui commence à 23 h
-      // et finit à 1 h est courante, et la refuser perdrait le créneau.
-      fin.setMinutes(finMin + (finMin <= debutMin ? 24 * 60 : 0))
-    }
+    // Une fin antérieure au début désigne le lendemain : une scène ouverte qui commence à 23 h
+    // et finit à 1 h est courante, et la refuser perdrait le créneau.
+    const finReportee = finMin === null ? null : finMin + (finMin <= debutMin ? 24 * 60 : 0)
 
     elements.push({
       titre,
       description: texteOuNull(brut?.description),
-      debut: debut.toISOString(),
-      fin: fin ? fin.toISOString() : null,
+      debut: composerDateHeure(date, debutMin),
+      fin: finReportee === null ? null : composerDateHeure(date, finReportee),
       lieu: texteOuNull(brut?.lieu),
     })
   }

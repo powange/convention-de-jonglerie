@@ -680,7 +680,8 @@
         "source": "Typ",
         "place": "Ort",
         "visibility": "Sichtbarkeit"
-      }
+      },
+      "local_times": "Zeiten in der Ortszeit der Convention ({fuseau}), auch bei der Eingabe."
     }
   }
 }

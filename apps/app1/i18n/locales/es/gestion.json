@@ -680,7 +680,8 @@
         "source": "Tipo",
         "place": "Lugar",
         "visibility": "Visibilidad"
-      }
+      },
+      "local_times": "Horarios en la hora local de la convención ({fuseau}), también al introducirlos."
     }
   }
 }

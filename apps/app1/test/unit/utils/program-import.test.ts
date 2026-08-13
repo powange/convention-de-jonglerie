@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import { formaterHeure } from '../../../shared/utils/fuseau-edition'
 import {
+  ancrerDansFuseau,
   construireElementsDeJournee,
   normaliserTitre,
   planifierImportProgramme,
   resumerPlan,
   type ElementExistant,
+  type ElementLu,
   type ElementPropose,
 } from '../../../shared/utils/program-import'
 
@@ -164,6 +167,20 @@ describe('construireElementsDeJournee', () => {
     expect(elements[0]!.lieu).toBe('Chapiteau')
   })
 
+  /**
+   * L'heure composée est celle écrite sur le site, sans fuseau. Lui en accoler un revenait à
+   * prendre celui du serveur — UTC en conteneur — et « 12:00 » s'affichait à 14 h chez un
+   * organisateur français. Le test porte donc sur la chaîne elle-même : la relire avec `new Date`
+   * masquerait le décalage, puisque la lecture le compenserait.
+   */
+  it('rend une heure sans fuseau, insensible à celui de la machine', () => {
+    const { elements } = construireElementsDeJournee('2026-10-02', [
+      { titre: 'Registrations', debut: '12:00', fin: '23:00' },
+    ])
+    expect(elements[0]!.debut).toBe('2026-10-02T12:00:00')
+    expect(elements[0]!.fin).toBe('2026-10-02T23:00:00')
+  })
+
   // Les sites écrivent « 18h30 » aussi souvent que « 18:30 ».
   it('accepte les deux écritures de l’heure', () => {
     for (const debut of ['18:30', '18h30', '18 h 30', '8:05']) {
@@ -180,10 +197,8 @@ describe('construireElementsDeJournee', () => {
     const { elements } = construireElementsDeJournee('2026-10-02', [
       { titre: 'Jam', debut: '23:00', fin: '01:00' },
     ])
-    const debut = new Date(elements[0]!.debut)
-    const fin = new Date(elements[0]!.fin!)
-    expect(fin.getTime() - debut.getTime()).toBe(2 * 60 * 60 * 1000)
-    expect(fin.getDate()).toBe(3)
+    expect(elements[0]!.debut).toBe('2026-10-02T23:00:00')
+    expect(elements[0]!.fin).toBe('2026-10-03T01:00:00')
   })
 
   /**
@@ -222,5 +237,63 @@ describe('construireElementsDeJournee', () => {
     ])
     expect(elements[0]!.description).toBeNull()
     expect(elements[0]!.lieu).toBeNull()
+  })
+})
+
+describe('ancrerDansFuseau', () => {
+  const lu = (p: Partial<ElementLu> = {}): ElementLu => ({
+    titre: 'Registrations',
+    debut: '2026-08-01T12:00:00',
+    ...p,
+  })
+
+  /**
+   * Le cas qui a motivé tout ceci : « 12:00 » lu sur le site d'une convention européenne devenait
+   * midi UTC, faute de fuseau, et s'affichait à 14 h.
+   */
+  it('ancre l’heure lue dans le fuseau de la convention', () => {
+    const { elements } = ancrerDansFuseau([lu({ fin: '2026-08-01T23:00:00' })], 'Europe/Paris')
+    expect(elements[0]!.debut).toBe('2026-08-01T10:00:00.000Z')
+    expect(elements[0]!.fin).toBe('2026-08-01T21:00:00.000Z')
+  })
+
+  // La même heure écrite ne désigne pas le même instant d'une convention à l'autre.
+  it('donne deux instants distincts pour deux fuseaux', () => {
+    const paris = ancrerDansFuseau([lu()], 'Europe/Paris').elements[0]!.debut
+    const melbourne = ancrerDansFuseau([lu()], 'Australia/Melbourne').elements[0]!.debut
+    expect(paris).toBe('2026-08-01T10:00:00.000Z')
+    expect(melbourne).toBe('2026-08-01T02:00:00.000Z')
+  })
+
+  /**
+   * Une édition sans fuseau — le champ est facultatif — doit rester importable : on retombe alors
+   * sur la machine, ce qui vaut mieux qu'un programme refusé.
+   */
+  it('retombe sur le fuseau de la machine à défaut', () => {
+    const { elements, ignores } = ancrerDansFuseau([lu()], null)
+    const relu = new Date(elements[0]!.debut)
+    expect(relu.getHours()).toBe(12)
+    expect(ignores).toBe(0)
+  })
+
+  it('écarte et compte ce qui ne s’ancre pas', () => {
+    const { elements, ignores } = ancrerDansFuseau(
+      [lu(), lu({ debut: 'pas une heure' })],
+      'Europe/Paris'
+    )
+    expect(elements).toHaveLength(1)
+    expect(ignores).toBe(1)
+  })
+
+  /**
+   * Bout à bout : ce que le modèle rend, ancré, puis relu sur place. C'est la seule chaîne dont
+   * dépend l'horaire affiché sur la frise.
+   */
+  it('rend, de la lecture à la frise, l’heure écrite sur le site', () => {
+    const { elements: lus } = construireElementsDeJournee('2026-08-01', [
+      { titre: 'Registrations', debut: '12:00' },
+    ])
+    const { elements } = ancrerDansFuseau(lus, 'Europe/Paris')
+    expect(formaterHeure(elements[0]!.debut, 'Europe/Paris')).toBe('12:00')
   })
 })

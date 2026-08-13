@@ -680,7 +680,8 @@
         "source": "Tipo",
         "place": "Local",
         "visibility": "Visibilidade"
-      }
+      },
+      "local_times": "Horários na hora local da convenção ({fuseau}), incluindo ao introduzi-los."
     }
   }
 }

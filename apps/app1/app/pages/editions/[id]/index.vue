@@ -827,6 +827,7 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
+import { formaterHeure, formaterJournee, journeeDans } from '~~/shared/utils/fuseau-edition'
 import { buildProgramDays, type ProgramDayRecord } from '~~/shared/utils/program-days'
 
 const { formatDateTimeRange } = useDateFormat()
@@ -909,6 +910,13 @@ const { data: publicShows } = await useApiFetch<any[]>(`/api/editions/${editionI
   transform: (payload: any) => payload?.shows || [],
 })
 
+/**
+ * Fuseau de la convention : les horaires de spectacle sont des heures de lieu, comme sur la frise
+ * du programme. Un visiteur qui consulte la page depuis chez lui doit lire l'heure à laquelle il
+ * devra être sur place, pas celle de sa propre pendule.
+ */
+const fuseauEdition = computed(() => edition.value?.timezone ?? null)
+
 // Spectacles regroupés par jour
 const showsByDay = computed(() => {
   if (!publicShows.value || publicShows.value.length === 0) return []
@@ -916,7 +924,8 @@ const showsByDay = computed(() => {
   const grouped = new Map<string, any[]>()
 
   publicShows.value.forEach((show: any) => {
-    const date = new Date(show.startDateTime).toISOString().split('T')[0]
+    // Journée vécue sur place : découpée en temps universel, une soirée basculait au lendemain.
+    const date = journeeDans(show.startDateTime, fuseauEdition.value)
     if (!grouped.has(date)) {
       grouped.set(date, [])
     }
@@ -933,23 +942,11 @@ const showsByDay = computed(() => {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 })
 
-const formatShowDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString(locale.value, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+const formatShowDate = (dateStr: string) =>
+  formaterJournee(dateStr, fuseauEdition.value, locale.value)
 
-const formatShowTime = (dateTimeStr: string) => {
-  const date = new Date(dateTimeStr)
-  return date.toLocaleTimeString(locale.value, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+const formatShowTime = (dateTimeStr: string) =>
+  formaterHeure(dateTimeStr, fuseauEdition.value, locale.value)
 
 // Lien vers la carte pour les zones/marqueurs
 const { getMapLocationUrl: getShowLocationUrl } = useMapLink(editionId)

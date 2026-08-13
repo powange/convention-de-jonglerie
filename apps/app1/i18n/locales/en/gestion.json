@@ -680,7 +680,8 @@
         "source": "Type",
         "place": "Location",
         "visibility": "Visibility"
-      }
+      },
+      "local_times": "Times shown in the convention's local time ({fuseau}), including when entering them."
     }
   }
 }

@@ -8,6 +8,7 @@
       "element": "Program"
     },
     "no_result": "Tomuto filtru neodpovídá žádná položka.",
-    "no_result_hint": "Zrušte zaškrtnutí pro rozšíření výběru."
+    "no_result_hint": "Zrušte zaškrtnutí pro rozšíření výběru.",
+    "local_times": "Časy v místním čase konventu ({fuseau})."
   }
 }

@@ -456,11 +456,14 @@
 
 <script setup lang="ts">
 import { comparerLignes, meriteUnDiff, type ComparaisonLignes } from '~~/shared/utils/diff-lignes'
+import { formaterDateHeure, formaterHeure } from '~~/shared/utils/fuseau-edition'
 import { editionDayKeys } from '~~/shared/utils/program-days'
 import {
+  ancrerDansFuseau,
   planifierImportProgramme,
   type ActionImport,
   type ElementExistant,
+  type ElementLu,
   type ElementPropose,
 } from '~~/shared/utils/program-import'
 
@@ -690,6 +693,14 @@ const elementsExistants = ref<ElementExistant[]>([])
 const planAffiche = ref<Array<{ action: ActionImport; retenu: boolean }>>([])
 const applicationProgramme = ref(false)
 
+/**
+ * Fuseau retenu pour ancrer les heures relevées, et pour les réafficher.
+ *
+ * Conservé plutôt que recalculé à chaque affichage : la revue doit montrer exactement l'heure qui
+ * sera enregistrée, y compris si l'édition change de fuseau entre l'analyse et l'enregistrement.
+ */
+const fuseauProgramme = ref<string | null>(null)
+
 const elementsRetenus = computed(() => planAffiche.value.filter((e) => e.retenu))
 
 const erreurProgramme = ref('')
@@ -711,30 +722,21 @@ const chargerElementsExistants = async (): Promise<boolean> => {
   return true
 }
 
-const libelleCreneau = (element: ElementPropose) => {
-  const heure = (iso: string) =>
-    new Date(iso).toLocaleString('fr-FR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  return element.fin
-    ? `${heure(element.debut)} → ${new Date(element.fin).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
-    : heure(element.debut)
-}
+const libelleCreneau = (element: ElementPropose) =>
+  element.fin
+    ? `${formaterDateHeure(element.debut, fuseauProgramme.value, locale.value)} → ${formaterHeure(element.fin, fuseauProgramme.value, locale.value)}`
+    : formaterDateHeure(element.debut, fuseauProgramme.value, locale.value)
 
-/** Les instants s'affichent en heure locale ; le reste tel quel. */
+/**
+ * Les instants s'affichent à l'heure de la convention ; le reste tel quel.
+ *
+ * Le fuseau est celui qui a servi à les ancrer : relire ces heures dans un autre fuseau ferait
+ * valider un horaire différent de celui qui sera enregistré.
+ */
 const afficherValeur = (champ: string, valeur: string | null) => {
   if (!valeur) return ''
   if (champ !== 'debut' && champ !== 'fin') return valeur
-  return new Date(valeur).toLocaleString('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return formaterDateHeure(valeur, fuseauProgramme.value, locale.value)
 }
 
 /**
@@ -752,6 +754,8 @@ const appliquerProgramme = async () => {
       const corps = {
         title: action.propose.titre,
         description: action.propose.description ?? null,
+        // Déjà des instants : les heures lues sur le site ont été ancrées dans le fuseau de
+        // l'édition au moment de l'analyse, avant même d'être comparées à l'existant.
         startDateTime: action.propose.debut,
         endDateTime: action.propose.fin ?? null,
         locationName: action.propose.lieu ?? null,
@@ -1151,9 +1155,22 @@ const searchForUpdates = async () => {
 
       // Le plan de programme se calcule à part : ce ne sont pas des champs à comparer mais des
       // éléments à créer ou à corriger, chacun avec sa propre décision.
-      const proposes = Array.isArray(parsed?.edition?.programItems)
-        ? (parsed.edition.programItems as ElementPropose[])
+      // Les heures relevées sur le site n'ont pas de fuseau : le serveur ne peut pas leur en
+      // donner un sans imposer le sien. Elles deviennent des instants ici, dans celui de la
+      // convention — le seul qui dise à quelle heure le public se présentera.
+      //
+      // Le fuseau se choisit comme pour les dates de l'édition, quelques lignes plus haut : celui
+      // que l'analyse propose d'abord, puisqu'il accompagne les horaires qu'elle vient de lire,
+      // puis celui déjà enregistré. Deux règles différentes sur le même écran auraient fini par
+      // dater deux champs de la même analyse dans deux fuseaux.
+      fuseauProgramme.value = parsed?.edition?.timezone || edition.value?.timezone || null
+      const lus = Array.isArray(parsed?.edition?.programItems)
+        ? (parsed.edition.programItems as ElementLu[])
         : []
+      const { elements: proposes, ignores } = ancrerDansFuseau(lus, fuseauProgramme.value)
+      if (ignores > 0) {
+        console.warn(`[AI-UPDATE] ${ignores} élément(s) de programme sans heure ancrable, écartés`)
+      }
       erreurProgramme.value = ''
       if (proposes.length > 0 && !(await chargerElementsExistants())) {
         // Le dire plutôt que d'afficher une carte vide : le modèle a bien relevé des éléments,
@@ -1163,7 +1180,11 @@ const searchForUpdates = async () => {
         })
         planAffiche.value = []
       } else if (proposes.length > 0) {
-        planAffiche.value = planifierImportProgramme(proposes, elementsExistants.value)
+        planAffiche.value = planifierImportProgramme(
+          proposes,
+          elementsExistants.value,
+          fuseauProgramme.value
+        )
           // Les éléments inchangés n'appellent aucune décision : les afficher noierait le reste.
           .filter((action) => action.action !== 'inchange')
           .map((action) => ({ action, retenu: true }))

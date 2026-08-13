@@ -657,6 +657,7 @@
       "empty": "Aucun élément au programme pour l'instant.",
       "sources_hint": "Les workshops et les spectacles apparaissent ici mais se modifient depuis leur propre page. Leur visibilité, elle, se règle sur cette frise.",
       "confirm_delete": "Supprimer « {title} » du programme ?",
+      "local_times": "Horaires à l'heure locale de la convention ({fuseau}), saisie comprise.",
       "error_end_before_start": "La fin doit être postérieure au début.",
       "source": {
         "workshop": "Workshop",

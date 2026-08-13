@@ -680,7 +680,8 @@
         "source": "Typ",
         "place": "Místo",
         "visibility": "Viditelnost"
-      }
+      },
+      "local_times": "Časy v místním čase konventu ({fuseau}), a to i při zadávání."
     }
   }
 }

@@ -8,6 +8,7 @@
       "element": "Programma"
     },
     "no_result": "Nessun elemento corrisponde a questo filtro.",
-    "no_result_hint": "Deseleziona una casella per ampliare la selezione."
+    "no_result_hint": "Deseleziona una casella per ampliare la selezione.",
+    "local_times": "Orari nell'ora locale della convention ({fuseau})."
   }
 }

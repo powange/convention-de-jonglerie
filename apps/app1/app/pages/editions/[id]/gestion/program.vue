@@ -57,7 +57,21 @@
         :title="$t('gestion.program.empty')"
       />
 
-      <div v-for="journee in journees" v-else :key="journee.date" class="space-y-2">
+      <!-- Les horaires, affichés comme saisis, sont ceux de la convention : un organisateur qui
+           prépare le programme depuis un autre fuseau doit le savoir avant de taper une heure.
+           Sous `ClientOnly`, car la comparaison porte sur le fuseau du lecteur, que le serveur ne
+           connaît pas : rendue des deux côtés, elle aurait divergé du HTML envoyé. -->
+      <ClientOnly>
+        <UAlert
+          v-if="fuseauADire"
+          icon="i-lucide-clock"
+          color="neutral"
+          variant="subtle"
+          :title="$t('gestion.program.local_times', { fuseau: nomFuseau })"
+        />
+      </ClientOnly>
+
+      <div v-for="journee in journees" :key="journee.date" class="space-y-2">
         <h2 class="font-semibold capitalize">{{ formaterJour(journee.date) }}</h2>
 
         <UTable :data="journee.entrees" :columns="colonnes" class="w-full">
@@ -199,8 +213,15 @@
 
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
-import { parseDateTimeLocal } from '~/utils/date'
 
+import {
+  abreviationFuseau,
+  differeDuFuseauLecteur,
+  formaterHeure,
+  formaterJournee,
+  versChampLocal,
+  versInstant,
+} from '~~/shared/utils/fuseau-edition'
 import { grouperParJournee, type EntreeProgramme } from '~~/shared/utils/program-timeline'
 
 definePageMeta({
@@ -230,12 +251,38 @@ const {
   data: donneesFrise,
   pending: chargementFrise,
   refresh: rechargerFrise,
-} = await useFetch<{ data: { entrees: EntreeProgramme[]; inclutBrouillons: boolean } }>(
-  () => `/api/editions/${editionId.value}/program`,
-  { default: () => ({ data: { entrees: [], inclutBrouillons: false } }) }
+} = await useFetch<{
+  data: { entrees: EntreeProgramme[]; inclutBrouillons: boolean; fuseau: string | null }
+}>(() => `/api/editions/${editionId.value}/program`, {
+  default: () => ({ data: { entrees: [], inclutBrouillons: false, fuseau: null } }),
+})
+
+/**
+ * Fuseau de la convention. Il gouverne aussi bien l'affichage que la saisie : un organisateur qui
+ * tape « 21:00 » annonce 21 h sur place, y compris s'il prépare son programme depuis un autre
+ * fuseau — ce qui est le cas courant d'une équipe dispersée.
+ *
+ * Il vient de la frise plutôt que de l'édition du store, qui n'est chargée qu'après le montage :
+ * le rendu serveur aurait sinon formaté les heures en UTC.
+ */
+const fuseau = computed(() => donneesFrise.value?.data?.fuseau ?? null)
+
+const journees = computed(() =>
+  grouperParJournee(donneesFrise.value?.data?.entrees ?? [], fuseau.value)
 )
 
-const journees = computed(() => grouperParJournee(donneesFrise.value?.data?.entrees ?? []))
+/** Signalé seulement si la pendule de l'organisateur dira autre chose que la frise. */
+const fuseauADire = computed(
+  () =>
+    journees.value.length > 0 &&
+    differeDuFuseauLecteur(journees.value[0]!.entrees[0]!.debut, fuseau.value)
+)
+
+const nomFuseau = computed(() =>
+  journees.value.length > 0
+    ? abreviationFuseau(journees.value[0]!.entrees[0]!.debut, fuseau.value, locale.value)
+    : ''
+)
 
 /**
  * Réduit une colonne à la largeur de son contenu.
@@ -273,16 +320,16 @@ const colonnes = computed(() => [
 const couleurSource = (source: EntreeProgramme['source']) =>
   source === 'workshop' ? 'info' : source === 'spectacle' ? 'primary' : 'neutral'
 
-const formatHeure = (iso: string) =>
-  new Date(iso).toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
+const formatHeure = (iso: string) => formaterHeure(iso, fuseau.value, locale.value)
 
 const plageHoraire = (entree: EntreeProgramme) =>
   entree.fin
     ? `${formatHeure(entree.debut)} – ${formatHeure(entree.fin)}`
     : formatHeure(entree.debut)
 
+// Sans l'année : toutes les journées d'une frise appartiennent à la même édition.
 const formaterJour = (date: string) =>
-  new Date(`${date}T12:00:00`).toLocaleDateString(locale.value, {
+  formaterJournee(date, fuseau.value, locale.value, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -310,7 +357,6 @@ const titreFormulaire = computed(() =>
   elementEnCours.value ? t('gestion.program.edit_title') : t('gestion.program.add')
 )
 
-/** Les champs `datetime-local` attendent l'heure locale, pas l'ISO en temps universel. */
 /**
  * Bornes du sélecteur : les dates de l'édition, telles quelles.
  *
@@ -324,14 +370,6 @@ const dernierJour = computed(() =>
   edition.value?.endDate ? new Date(edition.value.endDate) : undefined
 )
 
-const versChampLocal = (iso: string) => {
-  const d = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
-    d.getMinutes()
-  )}`
-}
-
 const ouvrirCreation = () => {
   elementEnCours.value = null
   formulaire.value = formulaireVide()
@@ -344,8 +382,8 @@ const ouvrirEdition = (entree: EntreeProgramme) => {
   formulaire.value = {
     title: entree.titre,
     description: entree.description ?? '',
-    startDateTime: versChampLocal(entree.debut),
-    endDateTime: entree.fin ? versChampLocal(entree.fin) : '',
+    startDateTime: versChampLocal(entree.debut, fuseau.value),
+    endDateTime: entree.fin ? versChampLocal(entree.fin, fuseau.value) : '',
     // `lieu` porte le nom de la zone quand l'élément y est rattaché : on ne le recopie donc en
     // texte libre que s'il n'y a pas de rattachement, sinon on dupliquerait un nom déjà porté
     // par la carte.
@@ -362,11 +400,12 @@ const corpsElement = () => {
   return {
     title: formulaire.value.title,
     description: formulaire.value.description || null,
-    // Converti explicitement : `datetime-local` est une heure locale, et laisser le serveur
-    // l'interpréter le ferait dépendre de SON fuseau, pas de celui du navigateur.
-    startDateTime: parseDateTimeLocal(formulaire.value.startDateTime).toISOString(),
+    // Converti explicitement dans le fuseau de la convention : `datetime-local` ne porte aucun
+    // fuseau, et le laisser interpréter donnerait celui du serveur — UTC — ou celui du navigateur,
+    // dont aucun ne dit à quelle heure le public se présentera.
+    startDateTime: versInstant(formulaire.value.startDateTime, fuseau.value),
     endDateTime: formulaire.value.endDateTime
-      ? parseDateTimeLocal(formulaire.value.endDateTime).toISOString()
+      ? versInstant(formulaire.value.endDateTime, fuseau.value)
       : null,
     locationName: formulaire.value.locationName || null,
     zoneId: formulaire.value.zoneId,

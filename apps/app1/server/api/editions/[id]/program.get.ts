@@ -26,6 +26,7 @@ export default wrapApiHandler(
         artistsEnabled: true,
         siteMapEnabled: true,
         mapPublic: true,
+        timezone: true,
       },
     })
 
@@ -112,6 +113,15 @@ export default wrapApiHandler(
          * n'affichait aucun lien — ils n'apparaissaient qu'après coup, ou pas du tout.
          */
         carteConsultable: edition.siteMapEnabled && edition.mapPublic,
+        /**
+         * Fuseau de la convention, dans lequel les horaires doivent être lus et affichés.
+         *
+         * Rendu ici plutôt que pris sur l'édition côté client, pour la même raison que
+         * `carteConsultable` : l'édition n'est chargée qu'après le montage, si bien que le rendu
+         * serveur aurait formaté les heures dans le fuseau du serveur — UTC — avant de les voir
+         * changer à l'hydratation.
+         */
+        fuseau: edition.timezone,
       },
     }
   },

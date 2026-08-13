@@ -680,7 +680,8 @@
         "source": "Typ",
         "place": "Plats",
         "visibility": "Synlighet"
-      }
+      },
+      "local_times": "Tider i konventets lokala tid ({fuseau}), även när de matas in."
     }
   }
 }

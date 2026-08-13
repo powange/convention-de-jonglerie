@@ -680,7 +680,8 @@
         "source": "Type",
         "place": "Locatie",
         "visibility": "Zichtbaarheid"
-      }
+      },
+      "local_times": "Tijden in de lokale tijd van de conventie ({fuseau}), ook bij het invoeren."
     }
   }
 }

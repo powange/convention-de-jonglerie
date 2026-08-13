@@ -29,6 +29,19 @@ export default defineConfig({
     projects: [
       // Projet 1 : Tests unitaires (Node environment)
       {
+        resolve: {
+          /**
+           * Alias de Nuxt, que ce projet ne reçoit pas autrement — il tourne hors de Nuxt.
+           *
+           * Sans eux, un utilitaire de `app/` ne pouvait pas importer `~~/shared/...` sous peine
+           * de rendre ses tests inexécutables, ce qui poussait à dupliquer le code partagé plutôt
+           * qu'à s'y référer.
+           */
+          alias: {
+            '~~': resolve(__dirname),
+            '~': resolve(__dirname, 'app'),
+          },
+        },
         test: {
           name: 'unit',
           include: ['test/unit/**/*.{test,spec}.ts'],

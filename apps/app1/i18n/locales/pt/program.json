@@ -8,6 +8,7 @@
       "element": "Programa"
     },
     "no_result": "Nenhum elemento corresponde a este filtro.",
-    "no_result_hint": "Desmarque uma caixa para alargar a seleção."
+    "no_result_hint": "Desmarque uma caixa para alargar a seleção.",
+    "local_times": "Horários na hora local da convenção ({fuseau})."
   }
 }

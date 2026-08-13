@@ -11,6 +11,8 @@
  * minces et que ces règles soient vérifiables sans base de données.
  */
 
+import { journeeDans } from './fuseau-edition'
+
 /** D'où vient une entrée du programme. Sert à l'affichage (icône, couleur) et aux liens. */
 export type SourceProgramme = 'workshop' | 'spectacle' | 'element'
 
@@ -199,20 +201,22 @@ export function construireFriseProgramme(
 /**
  * Regroupe la frise par journée, pour un affichage jour par jour.
  *
- * La clé est la date **locale** au format `AAAA-MM-JJ`, et non la partie date de l'ISO : une
+ * La clé est la date **sur place** au format `AAAA-MM-JJ`, et non la partie date de l'ISO : une
  * soirée qui commence à 23 h appartient à la journée où le public la vit, pas à celle que donnerait
  * un découpage en temps universel.
+ *
+ * « Sur place » et non « chez le lecteur » : sans le fuseau de l'édition, cette même soirée passait
+ * au lendemain pour qui consultait le programme depuis un fuseau plus à l'est, et la frise
+ * comptait une journée de trop.
  */
 export function grouperParJournee(
-  entrees: readonly EntreeProgramme[]
+  entrees: readonly EntreeProgramme[],
+  fuseau?: string | null
 ): { date: string; entrees: EntreeProgramme[] }[] {
   const parJour = new Map<string, EntreeProgramme[]>()
 
   for (const entree of entrees) {
-    const d = new Date(entree.debut)
-    const cle = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-      d.getDate()
-    ).padStart(2, '0')}`
+    const cle = journeeDans(entree.debut, fuseau)
     const liste = parJour.get(cle)
     if (liste) liste.push(entree)
     else parJour.set(cle, [entree])

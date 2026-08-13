@@ -680,7 +680,8 @@
         "source": "Type",
         "place": "Sted",
         "visibility": "Synlighed"
-      }
+      },
+      "local_times": "Tidspunkter i konventets lokale tid ({fuseau}), også når de indtastes."
     }
   }
 }

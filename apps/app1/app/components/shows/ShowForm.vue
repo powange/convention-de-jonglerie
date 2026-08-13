@@ -240,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDateTimeLocal, parseDateTimeLocal } from '~/utils/date'
+import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 
 const props = defineProps<{
   show?: any
@@ -257,12 +257,17 @@ const editionStore = useEditionStore()
 
 const edition = computed(() => editionStore.getEditionById(props.editionId))
 
-// Date par défaut : premier jour de l'édition à 10h00
-const defaultStartDateTime = computed(() => {
-  if (!edition.value?.startDate) return ''
-  const date = new Date(edition.value.startDate)
-  return formatDateTimeLocal(date)
-})
+/**
+ * Fuseau de la convention : l'heure d'un spectacle est celle du lieu, comme sur la frise du
+ * programme où il apparaît. Sans lui, un régisseur préparant la soirée depuis un autre fuseau
+ * aurait annoncé une heure fausse au public.
+ */
+const fuseau = computed(() => edition.value?.timezone ?? null)
+
+// Date par défaut : premier jour de l'édition, à l'heure de l'édition
+const defaultStartDateTime = computed(() =>
+  edition.value?.startDate ? versChampLocal(edition.value.startDate, fuseau.value) : ''
+)
 
 const artists = ref<any[]>([])
 
@@ -390,12 +395,12 @@ const actsPath = computed(() =>
 // EXISTANT (ils resteraient intacts). On les compose à la création (éditeur inline) et lors d'une
 // bascule standard→cabaret (sinon le serveur refuse un cabaret sans numéros).
 const buildPayload = () => {
-  const localDate = parseDateTimeLocal(formData.value.startDateTime)
   const base = {
     title: formData.value.title,
     description: formData.value.description || null,
     technicalNeeds: formData.value.technicalNeeds || null,
-    startDateTime: localDate.toISOString(),
+    // Le champ `datetime-local` ne porte pas de fuseau : c'est celui de la convention qui l'ancre.
+    startDateTime: versInstant(formData.value.startDateTime, fuseau.value),
     duration: formData.value.duration,
     location: formData.value.location || null,
     imageUrl: formData.value.imageUrl,
@@ -482,13 +487,11 @@ watch(
   () => props.show,
   (newShow) => {
     if (newShow) {
-      // Convertir la date ISO en format datetime-local (YYYY-MM-DDTHH:mm)
-      // Utilise formatDateTimeLocal pour éviter les décalages de timezone
-      let formattedDateTime = ''
-      if (newShow.startDateTime) {
-        const date = new Date(newShow.startDateTime)
-        formattedDateTime = formatDateTimeLocal(date)
-      }
+      // Réaffiché dans le fuseau de la convention, celui-là même qui a servi à l'enregistrer :
+      // rouvrir le formulaire puis enregistrer ne doit pas déplacer l'horaire.
+      const formattedDateTime = newShow.startDateTime
+        ? versChampLocal(newShow.startDateTime, fuseau.value)
+        : ''
 
       formData.value = {
         title: newShow.title || '',

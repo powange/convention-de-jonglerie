@@ -322,6 +322,32 @@ describe('grouperParJournee', () => {
     expect(journees[0]!.entrees.map((e) => e.titre)).toEqual(['Samedi'])
   })
 
+  /**
+   * Une scène ouverte de 23 h appartient à la soirée où le public la vit. Sans le fuseau de
+   * l'édition, elle basculait au lendemain dès que le programme était consulté depuis un fuseau
+   * plus à l'est, et la frise affichait une journée de trop.
+   */
+  it('rattache une fin de soirée à la journée vécue sur place', () => {
+    const frise = construireFriseProgramme({
+      elements: [
+        {
+          id: 1,
+          title: 'Scène ouverte',
+          // 23 h à Paris le 27, soit déjà le 28 en temps universel.
+          startDateTime: '2026-09-27T21:00:00.000Z',
+          isPublic: true,
+        },
+      ],
+    })
+    expect(grouperParJournee(frise, 'Europe/Paris').map((j) => j.date)).toEqual(['2026-09-27'])
+    expect(grouperParJournee(frise, 'UTC').map((j) => j.date)).toEqual(['2026-09-27'])
+    // Depuis Melbourne, ce même instant tombe au lendemain : c'est ce que le fuseau de l'édition
+    // évite de faire subir au programme.
+    expect(grouperParJournee(frise, 'Australia/Melbourne').map((j) => j.date)).toEqual([
+      '2026-09-28',
+    ])
+  })
+
   it('rend une liste vide sans entrée', () => {
     expect(grouperParJournee([])).toEqual([])
   })

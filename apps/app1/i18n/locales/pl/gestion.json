@@ -680,7 +680,8 @@
         "source": "Typ",
         "place": "Miejsce",
         "visibility": "Widoczność"
-      }
+      },
+      "local_times": "Godziny w czasie lokalnym konwentu ({fuseau}), również przy wprowadzaniu."
     }
   }
 }

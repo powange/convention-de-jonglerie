@@ -8,6 +8,7 @@
       "element": "Program"
     },
     "no_result": "Inga poster matchar detta filter.",
-    "no_result_hint": "Avmarkera en ruta för att bredda urvalet."
+    "no_result_hint": "Avmarkera en ruta för att bredda urvalet.",
+    "local_times": "Tider i konventets lokala tid ({fuseau})."
   }
 }
