@@ -367,10 +367,17 @@ defineExpose({})
 await editionStore.fetchEditionById(editionId)
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-// La page publique n'est accessible que si volunteersPagePublic est activé.
-// Exception : les utilisateurs avec droits d'édition ou de gestion des
-// bénévoles peuvent toujours y accéder (mode preview), un bandeau les
-// informe que la page n'est pas publique (`closedVisibilityReason`).
+/**
+ * La page publique n'est accessible que si `volunteersPagePublic` est activé.
+ *
+ * Trois exceptions, et elles doivent correspondre **exactement** à ce que l'onglet de l'en-tête
+ * laisse espérer : éditeurs et gestionnaires de bénévoles y accèdent en aperçu — un bandeau les
+ * prévient que la page n'est pas publique —, et le bénévole **accepté** y consulte son planning.
+ *
+ * Cette dernière manquait, alors que l'onglet lui était bel et bien affiché : il menait droit à
+ * un 404. Toute divergence entre les deux règles se paie de cette façon, d'où le soin à les
+ * garder jumelles.
+ */
 {
   const e = edition.value as { volunteersPagePublic?: boolean } | undefined
   const isPagePublic = e?.volunteersPagePublic === true
@@ -379,7 +386,24 @@ const edition = computed(() => editionStore.getEditionById(editionId))
     const canManageVolunteers = e
       ? editionStore.canManageVolunteers(e as any, authStore.user?.id)
       : false
-    if (!canEditEdition && !canManageVolunteers) {
+
+    let estBenevoleAccepte = false
+    if (!canEditEdition && !canManageVolunteers && authStore.user?.id) {
+      try {
+        // `useRequestFetch` et non `$fetch` : au rendu serveur, seul le premier transmet le
+        // cookie de session. Sans lui, l'appel partirait anonyme, répondrait 401, et le bénévole
+        // accepté verrait un 404 avant même l'hydratation.
+        const requete = useRequestFetch()
+        const reponse = await requete<{ status?: string | null }>(
+          `/api/editions/${editionId}/volunteers/applications/status`
+        )
+        estBenevoleAccepte = reponse?.status === 'ACCEPTED'
+      } catch {
+        estBenevoleAccepte = false
+      }
+    }
+
+    if (!canEditEdition && !canManageVolunteers && !estBenevoleAccepte) {
       throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
     }
   }

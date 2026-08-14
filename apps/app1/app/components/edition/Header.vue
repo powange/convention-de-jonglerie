@@ -545,8 +545,10 @@ const volunteersTabVisible = computed<boolean>(() => {
     // Visible pour les bénévoles acceptés même si les candidatures sont fermées
     if (isAcceptedVolunteer.value) return true
   }
-  // Visible publiquement uniquement si ouvert
-  return props.edition.volunteersOpen === true
+  // Publiquement, l'onglet suit la visibilité de la **page**, et non l'ouverture des
+  // candidatures : ce sont deux réglages distincts, et se fonder sur le second menait droit à un
+  // 404 — l'onglet promettait une page que sa propre garde refusait ensuite d'ouvrir.
+  return props.edition.volunteersPagePublic === true
 })
 
 // Vérifier si l'édition a commencé (affichage onglet objets trouvés dès le début)
