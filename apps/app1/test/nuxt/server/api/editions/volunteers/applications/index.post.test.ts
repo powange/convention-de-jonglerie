@@ -102,7 +102,7 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           motivation: applicationData.motivation,
           userSnapshotPhone: mockUser.phone,
           setupAvailability: true,
-          teardownAvailability: null,
+          teardownAvailability: false,
           eventAvailability: true,
           arrivalDateTime: applicationData.arrivalDateTime,
           departureDateTime: applicationData.departureDateTime,
@@ -228,7 +228,9 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           motivation: completeApplication.motivation,
           setupAvailability: true,
           teardownAvailability: true,
-          eventAvailability: null,
+          // Un refus explicite s'enregistre comme tel, et non comme une absence de réponse : la
+          // modification de candidature réaffichait sinon ce « non » en « oui ».
+          eventAvailability: false,
           arrivalDateTime: completeApplication.arrivalDateTime,
           departureDateTime: completeApplication.departureDateTime,
           dietaryPreference: 'VEGETARIAN',
@@ -675,6 +677,11 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
   })
 
   describe('Validation des disponibilités', () => {
+    /**
+     * Les trois réponses sont enregistrées telles quelles, y compris les refus. Les ramener à
+     * `null` rendait « non » indistinguable de « pas répondu », et le formulaire de modification
+     * réaffichait alors la case cochée.
+     */
     it('devrait respecter la sélection manuelle si montage ou démontage coché', async () => {
       const applicationData = {
         motivation: 'Je veux aider pour montage et événement',
@@ -698,8 +705,8 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           setupAvailability: true,
-          teardownAvailability: null,
-          eventAvailability: null, // Plus de logique d'auto-sélection
+          teardownAvailability: false,
+          eventAvailability: false,
         }),
         select: expect.any(Object),
       })

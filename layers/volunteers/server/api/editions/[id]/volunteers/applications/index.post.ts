@@ -154,9 +154,12 @@ export default wrapApiHandler(
           settings.askExperience && parsed.hasExperience
             ? sanitizeString(parsed.experienceDetails)
             : null,
-        setupAvailability: parsed.setupAvailability || null,
-        teardownAvailability: parsed.teardownAvailability || null,
-        eventAvailability: parsed.eventAvailability || null,
+        // `??` et non `||` : un refus explicite est une réponse, et doit s'enregistrer comme
+        // telle. Avec `||`, un « non » devenait indistinguable d'une question restée sans
+        // réponse — et le formulaire de modification le réaffichait ensuite comme un « oui ».
+        setupAvailability: parsed.setupAvailability ?? null,
+        teardownAvailability: parsed.teardownAvailability ?? null,
+        eventAvailability: parsed.eventAvailability ?? null,
         arrivalDateTime: sanitizeString(parsed.arrivalDateTime),
         departureDateTime: sanitizeString(parsed.departureDateTime),
         emergencyContactName:
