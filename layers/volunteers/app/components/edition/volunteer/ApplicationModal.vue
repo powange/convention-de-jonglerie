@@ -1155,6 +1155,38 @@ const departureDateOptions = computed(() => {
   return generateDateTimeOptions(startDate, endDate)
 })
 
+/**
+ * Vrai le temps de recopier une candidature enregistrée dans le formulaire.
+ *
+ * Les règles de saisie automatique doivent se taire pendant ce remplissage : elles corrigeraient
+ * une réponse que le bénévole a donnée, au lieu d'accompagner celle qu'il est en train de donner.
+ */
+let hydratationEnCours = false
+
+/**
+ * Efface une date d'arrivée ou de départ que le sélecteur ne propose plus.
+ *
+ * Les créneaux dépendent des disponibilités cochées : décocher « montage » ramène les choix aux
+ * dates de l'édition, et une arrivée située pendant le montage en sort. Elle restait pourtant
+ * dans le formulaire — invisible, puisque absente de la liste — et repartait telle quelle à
+ * l'enregistrement : l'écran disait « rien de choisi » là où la candidature disait le contraire.
+ *
+ * Rien n'est touché pendant l'hydratation : une date déjà enregistrée hors plage — parce que
+ * l'organisateur a déplacé ses dates depuis — appartient au bénévole, et ce n'est pas à
+ * l'ouverture d'un formulaire de la lui retirer.
+ */
+watch([arrivalDateOptions, departureDateOptions], ([creneauxArrivee, creneauxDepart]) => {
+  if (hydratationEnCours) return
+
+  const { arrivalDateTime, departureDateTime } = formData.value
+  if (arrivalDateTime && !creneauxArrivee.some((c) => c.value === arrivalDateTime)) {
+    formData.value.arrivalDateTime = undefined
+  }
+  if (departureDateTime && !creneauxDepart.some((c) => c.value === departureDateTime)) {
+    formData.value.departureDateTime = undefined
+  }
+})
+
 // Items for select/checkbox components
 const teamItems = computed(() => {
   if (!props.volunteersInfo?.askTeamPreferences || !volunteerTeams.value.length) {
@@ -1223,14 +1255,6 @@ const handleSubmit = () => {
     }
   }
 }
-
-/**
- * Vrai le temps de recopier une candidature enregistrée dans le formulaire.
- *
- * Les règles de saisie automatique doivent se taire pendant ce remplissage : elles corrigeraient
- * une réponse que le bénévole a donnée, au lieu d'accompagner celle qu'il est en train de donner.
- */
-let hydratationEnCours = false
 
 /**
  * Coche « présent pendant l'événement » quand ni le montage ni le démontage ne le sont : on ne
