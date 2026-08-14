@@ -126,8 +126,12 @@
             />
           </div>
 
-          <!-- Disponibilité pendant l'événement -->
-          <div class="space-y-2 w-full">
+          <!-- Disponibilité pendant l'événement.
+               Masquée quand ni le montage ni le démontage ne sont demandés : elle serait alors la
+               seule disponibilité possible, et la décocher ferait refuser la candidature. Poser
+               une question dont une seule réponse est acceptée n'informe personne et égare celui
+               qui tente l'autre. -->
+          <div v-if="presenceEvenementFacultative" class="space-y-2 w-full">
             <USwitch
               v-model="formData.eventAvailability"
               :label="t('volunteers.event_availability_label')"
@@ -738,6 +742,32 @@ const personalInfoTitle = computed(() =>
     : t('volunteers.personal_info_title')
 )
 
+/**
+ * Vrai quand le bénévole a réellement le choix de sa présence pendant l'événement.
+ *
+ * Ce choix n'existe que si une autre disponibilité lui est proposée : sans montage ni démontage,
+ * répondre « non » ne laisserait aucune disponibilité, et la candidature serait refusée.
+ */
+const presenceEvenementFacultative = computed(
+  () => !!props.volunteersInfo?.askSetup || !!props.volunteersInfo?.askTeardown
+)
+
+/**
+ * Quand la question ne se pose pas, la réponse est « présent ».
+ *
+ * Sans cela, modifier une candidature ancienne — dont le champ vaut `false` ou n'a jamais été
+ * renseigné — se heurterait à « au moins une disponibilité est requise », sur un formulaire qui
+ * n'offre plus de quoi corriger. Le réglage pouvant arriver après le montage, on suit sa valeur
+ * plutôt que de la lire une seule fois.
+ */
+watch(
+  presenceEvenementFacultative,
+  (facultative) => {
+    if (!facultative) formData.value.eventAvailability = true
+  },
+  { immediate: true }
+)
+
 const presenceTitle = computed(() =>
   isOrganizerEditingApplication.value
     ? t('volunteers.config_presence_title')
@@ -1194,16 +1224,30 @@ const handleSubmit = () => {
   }
 }
 
-// Auto-check event availability when neither setup nor teardown is selected
+/**
+ * Vrai le temps de recopier une candidature enregistrée dans le formulaire.
+ *
+ * Les règles de saisie automatique doivent se taire pendant ce remplissage : elles corrigeraient
+ * une réponse que le bénévole a donnée, au lieu d'accompagner celle qu'il est en train de donner.
+ */
+let hydratationEnCours = false
+
+/**
+ * Coche « présent pendant l'événement » quand ni le montage ni le démontage ne le sont : on ne
+ * peut pas se porter candidat pour rien.
+ *
+ * La règle ne vaut que pour une saisie en cours. Appliquée au chargement, elle réécrivait une
+ * candidature déjà enregistrée — celle qui n'avait répondu à aucune des trois questions
+ * s'affichait comme présente pendant l'événement, ce qu'elle n'avait jamais dit.
+ */
 watch(
   [() => formData.value.setupAvailability, () => formData.value.teardownAvailability],
   ([setupAvail, teardownAvail]) => {
-    // If neither setup nor teardown is available, auto-check event availability
+    if (hydratationEnCours) return
     if (!setupAvail && !teardownAvail) {
       formData.value.eventAvailability = true
     }
-  },
-  { immediate: true }
+  }
 )
 
 // Réinitialiser les erreurs à l'ouverture du modal
@@ -1220,6 +1264,23 @@ watch(
 
 // Function to populate form with existing application data
 const populateForm = () => {
+  hydratationEnCours = true
+  try {
+    remplirFormulaire()
+    // Après le remplissage, et non avant : l'hydratation écraserait sinon la valeur forcée, et la
+    // candidature deviendrait impossible à enregistrer sur un formulaire qui n'offre plus de quoi
+    // la corriger.
+    if (!presenceEvenementFacultative.value) formData.value.eventAvailability = true
+  } finally {
+    // Rendue au tour suivant : les watchers réagissent après le rendu, et lever le drapeau
+    // aussitôt les laisserait s'exécuter comme si l'utilisateur avait saisi quelque chose.
+    nextTick(() => {
+      hydratationEnCours = false
+    })
+  }
+}
+
+const remplirFormulaire = () => {
   if (props.isEditing && props.existingApplication) {
     // Mode édition : pré-remplir avec les données existantes
     const app = props.existingApplication
@@ -1242,9 +1303,11 @@ const populateForm = () => {
       phone: props.user?.phone || app.userSnapshotPhone || '',
       firstName: props.user?.prenom || app.userSnapshotFirstName || '',
       lastName: props.user?.nom || app.userSnapshotLastName || '',
+      // Une question sans réponse s'affiche comme un refus : les deux se valent à l'écran, et
+      // supposer « oui » faisait dire à la candidature le contraire de ce qu'elle disait.
       setupAvailability: app.setupAvailability ?? false,
       teardownAvailability: app.teardownAvailability ?? false,
-      eventAvailability: app.eventAvailability ?? true,
+      eventAvailability: app.eventAvailability ?? false,
       arrivalDateTime: app.arrivalDateTime || undefined,
       departureDateTime: app.departureDateTime || undefined,
       teamPreferences,
