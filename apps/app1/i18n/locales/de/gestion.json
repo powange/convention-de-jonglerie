@@ -703,7 +703,9 @@
       "convert_public_warning": "Workshops sind immer öffentlich sichtbar: dieser Entwurf wird es sofort.",
       "converted": "Punkt umgewandelt",
       "edit_place": "Ort ändern",
-      "place_error": "Der Ort konnte nicht gespeichert werden."
+      "place_error": "Der Ort konnte nicht gespeichert werden.",
+      "page_public": "Öffentliche Seite",
+      "page_public_help": "Macht den Zeitplan für alle sichtbar. Solange dies aus ist, kommen nur Organisatoren hinein und der Reiter bleibt öffentlich verborgen."
     }
   }
 }

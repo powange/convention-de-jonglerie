@@ -54,6 +54,16 @@
         :description="rienNAPasse ? undefined : $t('program.no_result_hint')"
       />
 
+      <!-- Seul un organisateur peut voir cette page tant qu'elle n'est pas publiée : le lui dire
+           évite qu'il la croie déjà visible de tous. -->
+      <UAlert
+        v-if="donneesFrise?.data && !donneesFrise.data.pagePublique"
+        icon="i-lucide-eye-slash"
+        color="warning"
+        variant="subtle"
+        :title="$t('program.not_public_preview')"
+      />
+
       <!-- Les horaires sont ceux de la convention : un visiteur situé dans un autre fuseau doit
            le savoir, sans quoi il lirait ces heures à sa propre montre. Sous `ClientOnly`, car la
            comparaison porte sur le fuseau du lecteur, que le serveur ne connaît pas : rendue des
@@ -167,9 +177,16 @@ const {
   pending: chargementFrise,
   error: erreurFrise,
 } = await useFetch<{
-  data: { entrees: EntreeProgramme[]; carteConsultable: boolean; fuseau: string | null }
+  data: {
+    entrees: EntreeProgramme[]
+    carteConsultable: boolean
+    fuseau: string | null
+    pagePublique: boolean
+  }
 }>(() => `/api/editions/${editionId.value}/program`, {
-  default: () => ({ data: { entrees: [], carteConsultable: false, fuseau: null } }),
+  default: () => ({
+    data: { entrees: [], carteConsultable: false, fuseau: null, pagePublique: true },
+  }),
 })
 
 /**

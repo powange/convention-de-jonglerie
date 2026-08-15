@@ -10,6 +10,7 @@
     "no_result": "Nenhum elemento corresponde a este filtro.",
     "no_result_hint": "Desmarque uma caixa para alargar a seleção.",
     "local_times": "Horários na hora local da convenção ({fuseau}).",
-    "show_past": "Mostrar os momentos passados"
+    "show_past": "Mostrar os momentos passados",
+    "not_public_preview": "Esta página ainda não é pública: está a vê-la como organizador."
   }
 }

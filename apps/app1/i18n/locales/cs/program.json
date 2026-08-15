@@ -10,6 +10,7 @@
     "no_result": "Tomuto filtru neodpovídá žádná položka.",
     "no_result_hint": "Zrušte zaškrtnutí pro rozšíření výběru.",
     "local_times": "Časy v místním čase konventu ({fuseau}).",
-    "show_past": "Zobrazit proběhlé okamžiky"
+    "show_past": "Zobrazit proběhlé okamžiky",
+    "not_public_preview": "Tato stránka zatím není veřejná: vidíte ji jako organizátor."
   }
 }

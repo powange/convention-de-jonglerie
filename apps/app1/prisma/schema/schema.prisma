@@ -200,6 +200,10 @@ model Edition {
   /// libres. Éteinte par défaut, comme les autres modules — une édition qui n'a rien saisi ne
   /// doit pas exposer un onglet vide.
   programEnabled                   Boolean                       @default(false)
+  /// Visibilité publique de la frise, distincte de l'activation du module : on compose un
+  /// programme pendant des semaines avant qu'il ne mérite d'être montré. Même couple que
+  /// `siteMapEnabled`/`mapPublic` et `faqEnabled`/`faqPagePublic`.
+  programPagePublic                Boolean                       @default(false)
   workshopLocationsFreeInput       Boolean                       @default(false)
   siteMapEnabled                   Boolean                       @default(false)
   mapPublic                        Boolean                       @default(false)

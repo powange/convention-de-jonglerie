@@ -703,7 +703,9 @@
       "convert_public_warning": "Warsztaty są zawsze widoczne publicznie: ten szkic stanie się nim natychmiast.",
       "converted": "Element skonwertowany",
       "edit_place": "Zmień miejsce",
-      "place_error": "Nie udało się zapisać miejsca."
+      "place_error": "Nie udało się zapisać miejsca.",
+      "page_public": "Strona publiczna",
+      "page_public_help": "Udostępnia harmonogram wszystkim. Dopóki jest wyłączone, dostęp mają tylko organizatorzy, a zakładka pozostaje ukryta dla publiczności."
     }
   }
 }

@@ -703,7 +703,9 @@
       "convert_public_warning": "Workshops are always visible to the public: this draft will become so at once.",
       "converted": "Item converted",
       "edit_place": "Change the place",
-      "place_error": "The place could not be saved."
+      "place_error": "The place could not be saved.",
+      "page_public": "Public page",
+      "page_public_help": "Makes the schedule visible to everyone. While it is off, only organisers can reach it and the tab stays hidden from the public."
     }
   }
 }

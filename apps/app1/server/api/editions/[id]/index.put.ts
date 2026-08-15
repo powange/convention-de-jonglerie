@@ -77,6 +77,7 @@ export default wrapApiHandler(
       faqEnabled,
       treasuryEnabled,
       faqPagePublic,
+      programPagePublic,
       hasATM,
       hasCashPayment,
       hasCreditCardPayment,
@@ -186,6 +187,7 @@ export default wrapApiHandler(
     if (faqEnabled !== undefined) updatedData.faqEnabled = faqEnabled
     if (treasuryEnabled !== undefined) updatedData.treasuryEnabled = treasuryEnabled
     if (faqPagePublic !== undefined) updatedData.faqPagePublic = faqPagePublic
+    if (programPagePublic !== undefined) updatedData.programPagePublic = programPagePublic
     if (hasATM !== undefined) updatedData.hasATM = hasATM
     if (hasCashPayment !== undefined) updatedData.hasCashPayment = hasCashPayment
     if (hasCreditCardPayment !== undefined) updatedData.hasCreditCardPayment = hasCreditCardPayment

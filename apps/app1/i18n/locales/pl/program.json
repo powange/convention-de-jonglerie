@@ -10,6 +10,7 @@
     "no_result": "Żaden element nie pasuje do tego filtra.",
     "no_result_hint": "Odznacz pole, aby poszerzyć wybór.",
     "local_times": "Godziny w czasie lokalnym konwentu ({fuseau}).",
-    "show_past": "Pokaż minione wydarzenia"
+    "show_past": "Pokaż minione wydarzenia",
+    "not_public_preview": "Ta strona nie jest jeszcze publiczna: widzisz ją jako organizator."
   }
 }

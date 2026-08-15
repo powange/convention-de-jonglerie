@@ -703,7 +703,9 @@
       "convert_public_warning": "I workshop sono sempre visibili al pubblico: questa bozza lo diventerà subito.",
       "converted": "Elemento convertito",
       "edit_place": "Modifica il luogo",
-      "place_error": "Non è stato possibile salvare il luogo."
+      "place_error": "Non è stato possibile salvare il luogo.",
+      "page_public": "Pagina pubblica",
+      "page_public_help": "Rende il programma visibile a tutti. Finché è disattivato, solo gli organizzatori possono accedervi e la scheda resta nascosta al pubblico."
     }
   }
 }
