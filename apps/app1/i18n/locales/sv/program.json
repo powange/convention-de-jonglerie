@@ -10,6 +10,7 @@
     "no_result": "Inga poster matchar detta filter.",
     "no_result_hint": "Avmarkera en ruta för att bredda urvalet.",
     "local_times": "Tider i konventets lokala tid ({fuseau}).",
-    "show_past": "Visa tidigare programpunkter"
+    "show_past": "Visa tidigare programpunkter",
+    "not_public_preview": "Den här sidan är inte offentlig ännu: du ser den som arrangör."
   }
 }

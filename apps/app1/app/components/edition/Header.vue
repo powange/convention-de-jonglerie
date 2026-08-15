@@ -713,11 +713,22 @@ const myTasksTabVisible = computed<boolean>(() => {
 // interne. Les coordonnées ne concernent que cette dernière : les exiger dans tous les cas
 // masquerait l'onglet d'une édition dont l'organisateur a justement fourni une carte externe.
 /**
- * L'onglet suit le seul interrupteur du module. Inutile d'exiger qu'il y ait déjà quelque chose au
- * programme : la page sait dire qu'il est vide, et masquer l'onglet ferait disparaître une entrée
- * que l'organisateur vient d'activer.
+ * L'onglet suit exactement ce que la page accorde, sans quoi il mènerait à un 404 — le défaut
+ * qu'on vient de corriger sur les bénévoles, pour l'avoir laissé se former.
+ *
+ * Le module doit être activé, et la frise publiée. Les organisateurs la voient dans tous les cas :
+ * c'est leur aperçu, signalé par un bandeau sur la page.
+ *
+ * On n'exige pas qu'il y ait déjà quelque chose au programme : la page sait dire qu'il est vide,
+ * et masquer l'onglet ferait disparaître une entrée que l'organisateur vient d'activer.
  */
-const programTabVisible = computed<boolean>(() => !!props.edition?.programEnabled)
+const programTabVisible = computed<boolean>(() => {
+  if (!props.edition?.programEnabled) return false
+  if (authStore.user?.id && editionStore.canEditEdition(props.edition, authStore.user.id)) {
+    return true
+  }
+  return props.edition.programPagePublic === true
+})
 
 const mapTabVisible = computed<boolean>(() => {
   if (!props.edition) return false

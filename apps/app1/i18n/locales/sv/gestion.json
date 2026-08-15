@@ -703,7 +703,9 @@
       "convert_public_warning": "Workshops är alltid synliga för publiken: detta utkast blir det direkt.",
       "converted": "Punkt konverterad",
       "edit_place": "Ändra plats",
-      "place_error": "Platsen kunde inte sparas."
+      "place_error": "Platsen kunde inte sparas.",
+      "page_public": "Offentlig sida",
+      "page_public_help": "Gör programmet synligt för alla. Så länge det är avstängt når bara arrangörer det, och fliken förblir dold för allmänheten."
     }
   }
 }

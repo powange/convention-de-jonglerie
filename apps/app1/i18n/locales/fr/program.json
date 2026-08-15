@@ -10,6 +10,7 @@
     "no_result": "Aucun élément ne correspond à ce filtre.",
     "no_result_hint": "Décochez une case, ou affichez les moments passés, pour élargir la sélection.",
     "local_times": "Horaires à l'heure locale de la convention ({fuseau}).",
-    "show_past": "Afficher les moments passés"
+    "show_past": "Afficher les moments passés",
+    "not_public_preview": "Cette page n'est pas encore publique : vous la voyez en tant qu'organisateur."
   }
 }

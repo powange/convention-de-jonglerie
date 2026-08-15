@@ -703,7 +703,9 @@
       "convert_public_warning": "Workshopy jsou vždy viditelné pro veřejnost: tento koncept se jím ihned stane.",
       "converted": "Bod převeden",
       "edit_place": "Změnit místo",
-      "place_error": "Místo se nepodařilo uložit."
+      "place_error": "Místo se nepodařilo uložit.",
+      "page_public": "Veřejná stránka",
+      "page_public_help": "Zpřístupní program všem. Dokud je vypnuto, dostanou se na něj jen organizátoři a záložka zůstává veřejnosti skrytá."
     }
   }
 }

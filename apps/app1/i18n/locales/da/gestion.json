@@ -703,7 +703,9 @@
       "convert_public_warning": "Workshops er altid synlige for publikum: denne kladde bliver det straks.",
       "converted": "Punkt konverteret",
       "edit_place": "Skift sted",
-      "place_error": "Stedet kunne ikke gemmes."
+      "place_error": "Stedet kunne ikke gemmes.",
+      "page_public": "Offentlig side",
+      "page_public_help": "Gør programmet synligt for alle. Så længe det er slået fra, har kun arrangører adgang, og fanen forbliver skjult for offentligheden."
     }
   }
 }

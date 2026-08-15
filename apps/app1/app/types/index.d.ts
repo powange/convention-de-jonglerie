@@ -99,6 +99,8 @@ export interface Edition {
   ticketingEnabled?: boolean
   workshopsEnabled?: boolean
   programEnabled?: boolean
+  /** Visibilité publique de la frise, distincte de l'activation du module. */
+  programPagePublic?: boolean
   siteMapEnabled?: boolean
   tasksEnabled?: boolean
   stockEnabled?: boolean

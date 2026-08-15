@@ -703,7 +703,9 @@
       "convert_target": "Convertir en",
       "convert_end_required": "Indiquez une heure de fin : un workshop en exige une.",
       "convert_public_warning": "Les workshops sont toujours visibles du public : ce brouillon le deviendra aussitôt.",
-      "converted": "Élément converti"
+      "converted": "Élément converti",
+      "page_public": "Page publique",
+      "page_public_help": "Rend la frise visible de tous. Tant qu'elle est éteinte, seuls les organisateurs y accèdent et l'onglet reste masqué au public."
     }
   }
 }

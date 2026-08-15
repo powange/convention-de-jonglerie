@@ -703,7 +703,9 @@
       "convert_public_warning": "Workshops zijn altijd zichtbaar voor het publiek: dit concept wordt dat meteen.",
       "converted": "Onderdeel omgezet",
       "edit_place": "Locatie wijzigen",
-      "place_error": "De locatie kon niet worden opgeslagen."
+      "place_error": "De locatie kon niet worden opgeslagen.",
+      "page_public": "Openbare pagina",
+      "page_public_help": "Maakt het programma voor iedereen zichtbaar. Zolang dit uit staat, kunnen alleen organisatoren erbij en blijft het tabblad verborgen voor het publiek."
     }
   }
 }

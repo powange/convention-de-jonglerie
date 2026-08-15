@@ -703,7 +703,9 @@
       "convert_public_warning": "Los workshops siempre son visibles para el público: este borrador lo será de inmediato.",
       "converted": "Elemento convertido",
       "edit_place": "Cambiar el lugar",
-      "place_error": "No se ha podido guardar el lugar."
+      "place_error": "No se ha podido guardar el lugar.",
+      "page_public": "Página pública",
+      "page_public_help": "Hace visible el programa para todos. Mientras esté desactivado, solo los organizadores pueden acceder y la pestaña permanece oculta al público."
     }
   }
 }

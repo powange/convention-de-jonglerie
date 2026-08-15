@@ -22,6 +22,7 @@ export default wrapApiHandler(
       select: {
         id: true,
         programEnabled: true,
+        programPagePublic: true,
         workshopsEnabled: true,
         artistsEnabled: true,
         siteMapEnabled: true,
@@ -43,6 +44,21 @@ export default wrapApiHandler(
 
     const user = event.context.user
     const peutEditer = user ? await canEditEditionById(editionId, user.id, event) : false
+
+    /**
+     * Un programme activé mais non publié ne se lit qu'en coulisses.
+     *
+     * On compose une frise pendant des semaines avant qu'elle ne mérite d'être montrée. Les
+     * organisateurs y accèdent en aperçu — un bandeau les prévient —, les autres reçoivent le
+     * même 404 que si le module était éteint : distinguer les deux dirait à un visiteur qu'il y
+     * a quelque chose à voir, ce qui n'est pas son affaire.
+     */
+    if (!edition.programPagePublic && !peutEditer) {
+      throw createError({
+        status: 404,
+        message: 'Le programme n’est pas public pour cette édition',
+      })
+    }
 
     /**
      * La couleur accompagne le nom : la frise de gestion affiche zones et repères sous forme
@@ -116,6 +132,11 @@ export default wrapApiHandler(
          * n'affichait aucun lien — ils n'apparaissaient qu'après coup, ou pas du tout.
          */
         carteConsultable: edition.siteMapEnabled && edition.mapPublic,
+        /**
+         * Dit à l'écran qu'il regarde une frise non publiée, pour qu'il puisse le signaler.
+         * Rendu ici plutôt que déduit du client : l'édition n'y est chargée qu'après le montage.
+         */
+        pagePublique: edition.programPagePublic,
         /**
          * Fuseau de la convention, dans lequel les horaires doivent être lus et affichés.
          *

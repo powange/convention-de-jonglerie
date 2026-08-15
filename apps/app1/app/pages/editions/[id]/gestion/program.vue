@@ -36,6 +36,33 @@
         </UButton>
       </div>
 
+      <!-- Visibilité publique de la frise. Elle vit ici, sur la page où l'on compose le
+           programme, plutôt que dans Fonctionnalités : c'est en le relisant qu'on décide qu'il
+           est prêt à être montré. L'activation du module, elle, reste dans Fonctionnalités. -->
+      <UCard v-if="canEdit">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+              <UIcon
+                :name="pagePubliqueLocale ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'"
+                :class="pagePubliqueLocale ? 'text-success-500' : 'text-gray-400'"
+              />
+              {{ $t('gestion.program.page_public') }}
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {{ $t('gestion.program.page_public_help') }}
+            </p>
+          </div>
+          <USwitch
+            v-model="pagePubliqueLocale"
+            color="primary"
+            :loading="enregistrementVisibilite"
+            :disabled="enregistrementVisibilite"
+            @update:model-value="basculerVisibilitePublique"
+          />
+        </div>
+      </UCard>
+
       <!-- Workshops et spectacles apparaissent ici mais se modifient dans leur propre module :
            dupliquer leur formulaire ferait diverger deux sources de vérité. -->
       <UAlert
@@ -339,6 +366,52 @@ const {
 }>(() => `/api/editions/${editionId.value}/program`, {
   default: () => ({ data: { entrees: [], inclutBrouillons: false, fuseau: null } }),
 })
+
+/**
+ * Copie locale de la visibilité publique.
+ *
+ * L'interrupteur doit répondre au doigt, sans attendre le serveur ; en cas d'échec on le remet
+ * comme il était, plutôt que de laisser l'écran affirmer une publication qui n'a pas eu lieu.
+ */
+const pagePubliqueLocale = ref(false)
+const enregistrementVisibilite = ref(false)
+
+watch(
+  () => edition.value?.programPagePublic,
+  (valeur) => {
+    pagePubliqueLocale.value = valeur === true
+  },
+  { immediate: true }
+)
+
+const basculerVisibilitePublique = async (valeur: boolean) => {
+  enregistrementVisibilite.value = true
+  try {
+    await $fetch(`/api/editions/${editionId.value}`, {
+      method: 'PUT',
+      body: { programPagePublic: valeur },
+    })
+    // Le store porte l'édition consultée par l'en-tête : sans cette mise à jour, l'onglet
+    // public resterait dans son état précédent jusqu'au prochain chargement.
+    if (edition.value) {
+      editionStore.setEdition({ ...edition.value, programPagePublic: valeur })
+    }
+    useToast().add({
+      title: t('common.saved'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (e: any) {
+    pagePubliqueLocale.value = !valeur
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    enregistrementVisibilite.value = false
+  }
+}
 
 /**
  * Fuseau de la convention. Il gouverne aussi bien l'affichage que la saisie : un organisateur qui
