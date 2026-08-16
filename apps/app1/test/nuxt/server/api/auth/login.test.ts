@@ -119,6 +119,45 @@ describe('API Login', () => {
     await expect(loginHandler(mockEvent)).rejects.toThrow('Identifiants invalides')
   })
 
+  // RÉGRESSION : un compte OAuth a password: null en base. bcrypt.compare(string, null) levait
+  // « Illegal arguments: string, object » — un 500 observé en production — au lieu d'expliquer
+  // à l'utilisateur qu'il doit passer par le bouton de son fournisseur.
+  it('devrait renvoyer une 401 explicite pour un compte Google, sans appeler bcrypt', async () => {
+    const googleUser = { ...mockUser, password: null, authProvider: 'google' }
+    // mockResolvedValue et non ...Once : le test appelle le handler deux fois, pour le message
+    // puis pour la charge utile.
+    prismaMock.user.findUnique.mockResolvedValue(googleUser)
+
+    global.readBody.mockResolvedValue({
+      identifier: 'test@example.com',
+      password: 'Password123!',
+    })
+
+    await expect(loginHandler({})).rejects.toThrow('Google')
+    await expect(loginHandler({})).rejects.toMatchObject({
+      data: { requiresOAuth: true, provider: 'google' },
+    })
+    expect(bcrypt.compare).not.toHaveBeenCalled()
+  })
+
+  it("devrait renvoyer une 401 générique si le compte n'a ni mot de passe ni fournisseur connu", async () => {
+    const sansMotDePasse = { ...mockUser, password: null, authProvider: 'email' }
+    prismaMock.user.findUnique.mockResolvedValue(sansMotDePasse)
+
+    global.readBody.mockResolvedValue({
+      identifier: 'test@example.com',
+      password: 'Password123!',
+    })
+
+    await expect(loginHandler({})).rejects.toThrow('Mot de passe oublié')
+    // Pas de requiresOAuth ici : ces 35 comptes de production n'ont aucun fournisseur externe,
+    // et l'annoncer enverrait le client afficher un bouton qui n'existe pas.
+    await expect(loginHandler({})).rejects.toMatchObject({
+      data: { requiresPasswordReset: true },
+    })
+    expect(bcrypt.compare).not.toHaveBeenCalled()
+  })
+
   it("devrait rejeter si l'email n'est pas vérifié", async () => {
     const unverifiedUser = { ...mockUser, isEmailVerified: false }
     prismaMock.user.findUnique.mockResolvedValueOnce(unverifiedUser)
