@@ -218,18 +218,27 @@
 
             <!-- Ajouter un organisateur -->
             <div class="pt-3 border-t border-gray-200 dark:border-gray-700">
-              <div v-if="availableOrganizers.length > 0" class="flex items-center gap-3">
+              <!-- Sur mobile, le nom d'un organisateur suivi de son titre dépasse la largeur de
+                   l'écran : en ligne, le select poussait le bouton « Ajouter » hors du champ de
+                   vision. D'où l'empilement en dessous de sm, et, sur une ligne, un min-w-0 sans
+                   lequel un élément flex refuse de rétrécir sous la largeur de son contenu — le
+                   thème tronque déjà le libellé, encore faut-il l'y autoriser. -->
+              <div
+                v-if="availableOrganizers.length > 0"
+                class="flex flex-col sm:flex-row sm:items-center gap-3"
+              >
                 <USelect
                   v-model="selectedAvailableOrganizer"
                   :items="availableOrganizersOptions"
                   :placeholder="$t('gestion.organizers.select_to_add')"
-                  class="flex-1"
+                  class="w-full sm:flex-1 sm:min-w-0"
                   size="sm"
                 />
                 <UButton
                   color="primary"
                   size="sm"
                   icon="i-heroicons-plus"
+                  class="w-full sm:w-auto sm:shrink-0 justify-center"
                   :disabled="!selectedAvailableOrganizer"
                   @click="addToEdition"
                 >
