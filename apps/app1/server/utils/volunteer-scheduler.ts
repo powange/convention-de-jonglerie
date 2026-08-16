@@ -26,8 +26,16 @@ export interface TimeSlot {
   maxVolunteers: number
   assignedVolunteers: number
   description?: string
-  requiredSkills?: string[]
-  priority?: number // 1-5, 5 = très prioritaire
+}
+
+/**
+ * Bornes de l'événement, qui séparent le montage de l'événement et l'événement du démontage.
+ * Ce sont des instants complets : un créneau de montage le matin du jour d'ouverture, avant
+ * l'heure de début, relève bien du montage.
+ */
+export interface BornesEvenement {
+  debut?: string | null
+  fin?: string | null
 }
 
 export interface Team {
@@ -80,16 +88,19 @@ export class VolunteerScheduler {
   private teams: Team[] = []
   private constraints: SchedulingConstraints = {}
   private assignments: Assignment[] = []
+  private bornes: BornesEvenement = {}
 
   constructor(
     volunteers: VolunteerApplication[],
     timeSlots: TimeSlot[],
     teams: Team[],
-    constraints: SchedulingConstraints = {}
+    constraints: SchedulingConstraints = {},
+    bornes: BornesEvenement = {}
   ) {
     this.volunteers = volunteers
     this.timeSlots = timeSlots
     this.teams = teams
+    this.bornes = bornes
     this.constraints = {
       maxHoursPerVolunteer: 12,
       minHoursPerVolunteer: 2,
@@ -151,9 +162,11 @@ export class VolunteerScheduler {
 
     // Préférence d'équipe
     if (slot.teamId) {
-      const hasTeamPreference = volunteer.teamPreferences?.some(
-        (pref) => pref.teamId === slot.teamId
-      )
+      // Les préférences sont stockées comme une liste d'identifiants d'équipe (z.array(z.string())
+      // à la soumission). Les lire comme des objets `{ teamId }` ne trouvait jamais de
+      // correspondance : le bonus n'était jamais accordé, et en mode strict le bénévole était
+      // écarté de l'équipe qu'il avait justement demandée.
+      const hasTeamPreference = volunteer.teamPreferences?.some((pref) => pref === slot.teamId)
 
       if (hasTeamPreference) {
         score += 15 // Bonus si l'équipe correspond aux préférences
@@ -188,7 +201,7 @@ export class VolunteerScheduler {
 
     // Expérience et compétences
     if (this.constraints.prioritizeExperience) {
-      const experienceBonus = this.calculateExperienceBonus(volunteer, slot)
+      const experienceBonus = this.calculateExperienceBonus(volunteer)
       score += experienceBonus
     }
 
@@ -234,11 +247,6 @@ export class VolunteerScheduler {
       score -= Math.floor((currentHours - avgHours) * 2)
     } else if (currentHours < avgHours) {
       score += Math.floor((avgHours - currentHours) * 1.5)
-    }
-
-    // Priorité du créneau
-    if (slot.priority) {
-      score += slot.priority * 3
     }
 
     // Bonus si le créneau n'est pas encore complet
@@ -322,20 +330,26 @@ export class VolunteerScheduler {
   /**
    * Détermine le type de créneau (montage, événement, démontage)
    */
-  private getSlotType(slot: TimeSlot, _slotDate: DateTime): 'setup' | 'event' | 'teardown' {
-    // Logique simple : on pourrait améliorer avec des métadonnées
-    if (
-      slot.title.toLowerCase().includes('montage') ||
-      slot.title.toLowerCase().includes('setup')
-    ) {
-      return 'setup'
-    }
-    if (
-      slot.title.toLowerCase().includes('démontage') ||
-      slot.title.toLowerCase().includes('teardown')
-    ) {
+  private getSlotType(slot: TimeSlot, slotDate: DateTime): 'setup' | 'event' | 'teardown' {
+    // Les bornes de l'événement font foi : elles disent objectivement ce qui se passe avant
+    // l'ouverture et après la fermeture, là où le titre du créneau ne disait que ce que son
+    // auteur avait bien voulu y écrire. On compare des instants complets, pas des jours : un
+    // créneau qui finit avant l'heure d'ouverture, le jour même, relève encore du montage.
+    const debut = this.bornes.debut ? dt.fromISO(this.bornes.debut) : null
+    const fin = this.bornes.fin ? dt.fromISO(this.bornes.fin) : null
+
+    if (debut?.isValid && slotDate < debut) return 'setup'
+    if (fin?.isValid && slotDate >= fin) return 'teardown'
+    if (debut?.isValid || fin?.isValid) return 'event'
+
+    // Repli quand l'édition n'a pas de dates : l'ancienne lecture du titre, faute de mieux.
+    // « démontage » contient « montage » : le démontage doit donc être testé en premier, sans
+    // quoi tout créneau de démontage est pris pour du montage — ce que faisait le code d'origine.
+    const titre = slot.title.toLowerCase()
+    if (titre.includes('démontage') || titre.includes('demontage') || titre.includes('teardown')) {
       return 'teardown'
     }
+    if (titre.includes('montage') || titre.includes('setup')) return 'setup'
     return 'event'
   }
 
@@ -389,9 +403,11 @@ export class VolunteerScheduler {
   }
 
   /**
-   * Calcule le bonus d'expérience pour un bénévole et un créneau
+   * Calcule le bonus d'expérience d'un bénévole, d'après le texte libre de sa candidature.
+   * Ne dépend plus du créneau depuis le retrait des compétences requises, qui n'étaient jamais
+   * renseignées.
    */
-  private calculateExperienceBonus(volunteer: VolunteerApplication, slot: TimeSlot): number {
+  private calculateExperienceBonus(volunteer: VolunteerApplication): number {
     const experience = volunteer.experience.toLowerCase()
     let bonus = 0
 
@@ -404,15 +420,6 @@ export class VolunteerScheduler {
     }
     if (experience.includes('convention') || experience.includes('festival')) {
       bonus += 3
-    }
-
-    // Bonus compétences spécifiques selon le créneau
-    if (slot.requiredSkills?.length) {
-      slot.requiredSkills.forEach((skill) => {
-        if (experience.includes(skill.toLowerCase())) {
-          bonus += 8
-        }
-      })
     }
 
     return bonus
@@ -499,11 +506,7 @@ export class VolunteerScheduler {
    */
   private getSortedSlots(): TimeSlot[] {
     return [...this.timeSlots].sort((a, b) => {
-      // Priorité d'abord
-      const priorityDiff = (b.priority || 0) - (a.priority || 0)
-      if (priorityDiff !== 0) return priorityDiff
-
-      // Puis par nombre de places restantes (urgence)
+      // Par nombre de places restantes (urgence)
       const remainingA = a.maxVolunteers - a.assignedVolunteers
       const remainingB = b.maxVolunteers - b.assignedVolunteers
       if (remainingA !== remainingB) return remainingA - remainingB

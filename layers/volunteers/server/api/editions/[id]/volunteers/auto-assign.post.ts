@@ -48,9 +48,11 @@ export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
 
   // Étape 0bis : vérif d'existence sur l'Event (les permissions passent par le port organizer).
+  // Les dates de l'événement séparent le montage de l'événement et l'événement du démontage :
+  // le planificateur en a besoin pour classer chaque créneau sans se fier à son titre.
   const eventRecord = await prisma.event.findUnique({
     where: { id: editionId },
-    select: { id: true },
+    select: { id: true, startDate: true, endDate: true },
   })
 
   if (!eventRecord) {
@@ -158,8 +160,6 @@ export default wrapApiHandler(async (event) => {
     // Si on garde les existantes, les comptabiliser dans les places déjà prises
     assignedVolunteers: constraints.keepExistingAssignments ? slot.assignments.length : 0,
     description: slot.description || undefined,
-    requiredSkills: [], // TODO: Ajouter si nécessaire
-    priority: 3, // TODO: Calculer selon critères
   }))
 
   const schedulerTeams = teams.map((team: Team) => ({
@@ -173,7 +173,11 @@ export default wrapApiHandler(async (event) => {
     schedulerVolunteers,
     schedulerTimeSlots,
     schedulerTeams,
-    constraints
+    constraints,
+    {
+      debut: eventRecord.startDate?.toISOString() ?? null,
+      fin: eventRecord.endDate?.toISOString() ?? null,
+    }
   )
 
   const result = scheduler.assignVolunteers()
