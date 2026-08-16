@@ -10,6 +10,13 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { sanitizeString } from '#server/utils/validation-helpers'
 
+// Les fournisseurs OAuth pris en charge, tels qu'ils sont écrits en base par
+// routes/auth/google.get.ts et facebook.get.ts.
+const NOM_DU_FOURNISSEUR: Record<string, string> = {
+  google: 'Google',
+  facebook: 'Facebook',
+}
+
 // Schéma de validation pour le login
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email ou pseudo requis'),
@@ -53,6 +60,23 @@ export default wrapApiHandler<ApiSuccessResponse<LoginResponse>>(
       throw createError({
         status: 401,
         message: 'Identifiants invalides',
+      })
+    }
+
+    // Un compte créé via un fournisseur externe n'a pas de mot de passe (password: null à la
+    // création OAuth). bcrypt.compare recevait alors null — typeof null === 'object' — et levait
+    // « Illegal arguments: string, object », soit un 500 là où l'utilisateur s'est simplement
+    // trompé de porte. On le lui dit, et par où passer.
+    if (!user.password) {
+      throw createError({
+        status: 401,
+        message: NOM_DU_FOURNISSEUR[user.authProvider]
+          ? `Ce compte se connecte avec ${NOM_DU_FOURNISSEUR[user.authProvider]}. Utilisez le bouton correspondant plutôt qu'un mot de passe.`
+          : "Ce compte n'a pas de mot de passe. Utilisez « Mot de passe oublié » pour en définir un.",
+        data: {
+          requiresOAuth: true,
+          provider: user.authProvider,
+        },
       })
     }
 
