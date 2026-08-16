@@ -706,6 +706,15 @@
       "place_error": "Stedet kunne ikke gemmes.",
       "page_public": "Offentlig side",
       "page_public_help": "Gør programmet synligt for alle. Så længe det er slået fra, har kun arrangører adgang, og fanen forbliver skjult for offentligheden."
+    },
+    "convention": {
+      "card_description": "Rediger konventets navn, beskrivelse, logo og e-mail",
+      "description": "Rediger oplysningerne om det konvent, denne udgave hører til.",
+      "save_error": "Fejl ved opdatering af konventet",
+      "save_success": "Konventet blev opdateret",
+      "shared_notice": "Disse oplysninger tilhører konventet “{name}”: de gælder for alle dets udgaver, ikke kun denne.",
+      "submit": "Gem konvent",
+      "title": "Konvent"
     }
   }
 }

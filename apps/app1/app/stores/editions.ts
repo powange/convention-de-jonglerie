@@ -542,6 +542,26 @@ export const useEditionStore = defineStore('editions', {
       })
     },
 
+    // Vérifier si l'utilisateur peut modifier la convention porteuse de l'édition.
+    //
+    // Droit volontairement plus étroit que canEditEdition : le créateur d'une édition, ou un
+    // organisateur qui n'a que editAllEditions, gère ses éditions sans pouvoir toucher au nom
+    // ni au logo de la convention. Seul le droit editConvention — ou l'auteur, ou l'admin —
+    // ouvre cette porte, exactement comme la page /conventions/:id/edit.
+    canEditConvention(edition: Edition, userId: number): boolean {
+      const authStore = useAuthStore()
+
+      if (authStore.isAdminModeActive) return true
+
+      if (edition.convention?.authorId && edition.convention.authorId === userId) return true
+
+      if (!edition.convention?.organizers) return false
+
+      return edition.convention.organizers.some(
+        (collab) => collab.user.id === userId && !!collab.rights?.editConvention
+      )
+    },
+
     // Vérifier si l'utilisateur est organisateur d'une convention
     isOrganizer(edition: Edition, userId: number): boolean {
       const authStore = useAuthStore()

@@ -52,6 +52,27 @@
           </div>
         </UCard>
 
+        <!-- Convention. Avant « Informations de l'édition », comme dans le panneau latéral : on va
+             du plus englobant (la convention, donc toutes ses éditions) au particulier. -->
+        <UCard v-if="canEditConvention">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-building-library" class="text-blue-500" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.convention.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/convention`"
+                icon="i-heroicons-building-library"
+                :title="$t('gestion.convention.title')"
+                :description="$t('gestion.convention.card_description')"
+                color="blue"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Informations -->
         <UCard v-if="canEdit">
           <div class="space-y-4">
@@ -679,6 +700,11 @@ const canManageVolunteers = computed(() => {
 const canManageOrganizers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageOrganizers(edition.value, authStore.user.id)
+})
+
+const canEditConvention = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canEditConvention(edition.value, authStore.user.id)
 })
 
 // Droit dédié « gérer les artistes » (édition ou convention) — éditer ne suffit pas

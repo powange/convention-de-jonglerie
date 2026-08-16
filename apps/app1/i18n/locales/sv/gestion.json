@@ -706,6 +706,15 @@
       "place_error": "Platsen kunde inte sparas.",
       "page_public": "Offentlig sida",
       "page_public_help": "Gör programmet synligt för alla. Så länge det är avstängt når bara arrangörer det, och fliken förblir dold för allmänheten."
+    },
+    "convention": {
+      "card_description": "Redigera konventets namn, beskrivning, logotyp och e-post",
+      "description": "Redigera uppgifterna om konventet som den här utgåvan tillhör.",
+      "save_error": "Fel vid uppdatering av konventet",
+      "save_success": "Konventet har uppdaterats",
+      "shared_notice": "De här uppgifterna tillhör konventet ”{name}”: de gäller för alla dess utgåvor, inte bara den här.",
+      "submit": "Spara konvent",
+      "title": "Konvent"
     }
   }
 }

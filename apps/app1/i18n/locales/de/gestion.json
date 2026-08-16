@@ -706,6 +706,15 @@
       "place_error": "Der Ort konnte nicht gespeichert werden.",
       "page_public": "Öffentliche Seite",
       "page_public_help": "Macht den Zeitplan für alle sichtbar. Solange dies aus ist, kommen nur Organisatoren hinein und der Reiter bleibt öffentlich verborgen."
+    },
+    "convention": {
+      "card_description": "Name, Beschreibung, Logo und E-Mail der Convention bearbeiten",
+      "description": "Bearbeite die Daten der Convention, zu der diese Ausgabe gehört.",
+      "save_error": "Fehler beim Aktualisieren der Convention",
+      "save_success": "Convention erfolgreich aktualisiert",
+      "shared_notice": "Diese Angaben gehören zur Convention „{name}“: Sie gelten für alle ihre Ausgaben, nicht nur für diese.",
+      "submit": "Convention speichern",
+      "title": "Convention"
     }
   }
 }

@@ -706,6 +706,15 @@
       "place_error": "Místo se nepodařilo uložit.",
       "page_public": "Veřejná stránka",
       "page_public_help": "Zpřístupní program všem. Dokud je vypnuto, dostanou se na něj jen organizátoři a záložka zůstává veřejnosti skrytá."
+    },
+    "convention": {
+      "card_description": "Upravit název, popis, logo a e-mail konvence",
+      "description": "Upravte údaje konvence, ke které tato edice patří.",
+      "save_error": "Chyba při aktualizaci konvence",
+      "save_success": "Konvence byla úspěšně aktualizována",
+      "shared_notice": "Tyto údaje patří konvenci „{name}“: platí pro všechny její edice, nejen pro tuto.",
+      "submit": "Uložit konvenci",
+      "title": "Konvence"
     }
   }
 }
