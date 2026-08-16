@@ -68,15 +68,18 @@ export default wrapApiHandler<ApiSuccessResponse<LoginResponse>>(
     // « Illegal arguments: string, object », soit un 500 là où l'utilisateur s'est simplement
     // trompé de porte. On le lui dit, et par où passer.
     if (!user.password) {
+      const fournisseur = NOM_DU_FOURNISSEUR[user.authProvider]
       throw createError({
         status: 401,
-        message: NOM_DU_FOURNISSEUR[user.authProvider]
-          ? `Ce compte se connecte avec ${NOM_DU_FOURNISSEUR[user.authProvider]}. Utilisez le bouton correspondant plutôt qu'un mot de passe.`
+        message: fournisseur
+          ? `Ce compte se connecte avec ${fournisseur}. Utilisez le bouton correspondant plutôt qu'un mot de passe.`
           : "Ce compte n'a pas de mot de passe. Utilisez « Mot de passe oublié » pour en définir un.",
-        data: {
-          requiresOAuth: true,
-          provider: user.authProvider,
-        },
+        // Les comptes sans mot de passe ne sont pas tous des comptes OAuth : la base de production
+        // en compte 35 en authProvider « email » ou « MANUAL ». Leur annoncer requiresOAuth
+        // enverrait le client afficher un bouton de fournisseur qui n'existe pas.
+        data: fournisseur
+          ? { requiresOAuth: true, provider: user.authProvider }
+          : { requiresPasswordReset: true },
       })
     }
 
