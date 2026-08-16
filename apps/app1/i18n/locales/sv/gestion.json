@@ -61,8 +61,8 @@
       "manage_artists_description": "Hantera de inbjudna konstnärerna till denna utgåva",
       "title": "Artisthantering"
     },
-    "confirm_delete_edition": "Är du säker på att du vill skrota den här utgåvan?",
-    "delete_edition": "Radera redigera",
+    "confirm_delete_edition": "Är du säker på att du vill radera den här utgåvan?",
+    "delete_edition": "Radera utgåvan",
     "external_links": {
       "description": "Hantera länkar till din webbplats, biljettförsäljning, program och sociala medier.",
       "save": "Spara",
@@ -119,7 +119,7 @@
       "general_info_description": "Redigera namn, datum och adress",
       "map_description": "Definiera zonerna på områdeskartan",
       "services_description": "Hantera tillgängliga tjänster och faciliteter",
-      "title": "Information",
+      "title": "Information om utgåvan",
       "program_description": "Sätt samman tidslinjen: workshops, föreställningar och andra moment."
     },
     "lost_found_active_description": "Deltagarna kan rapportera borttappade och upphittade föremål",
