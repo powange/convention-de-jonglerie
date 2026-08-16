@@ -706,6 +706,15 @@
       "place_error": "Não foi possível guardar o local.",
       "page_public": "Página pública",
       "page_public_help": "Torna o programa visível para todos. Enquanto estiver desativado, apenas os organizadores lhe acedem e o separador permanece oculto ao público."
+    },
+    "convention": {
+      "card_description": "Editar o nome, a descrição, o logotipo e o e-mail da convenção",
+      "description": "Edite a ficha da convenção à qual esta edição pertence.",
+      "save_error": "Erro ao atualizar a convenção",
+      "save_success": "Convenção atualizada com sucesso",
+      "shared_notice": "Estas informações pertencem à convenção “{name}”: valem para todas as suas edições, não apenas para esta.",
+      "submit": "Salvar convenção",
+      "title": "Convenção"
     }
   }
 }

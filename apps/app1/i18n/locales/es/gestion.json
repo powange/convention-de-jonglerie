@@ -706,6 +706,15 @@
       "place_error": "No se ha podido guardar el lugar.",
       "page_public": "Página pública",
       "page_public_help": "Hace visible el programa para todos. Mientras esté desactivado, solo los organizadores pueden acceder y la pestaña permanece oculta al público."
+    },
+    "convention": {
+      "card_description": "Editar el nombre, la descripción, el logotipo y el correo de la convención",
+      "description": "Edita la ficha de la convención a la que pertenece esta edición.",
+      "save_error": "Error al actualizar la convención",
+      "save_success": "Convención actualizada con éxito",
+      "shared_notice": "Esta información pertenece a la convención «{name}»: se aplica a todas sus ediciones, no solo a esta.",
+      "submit": "Guardar la convención",
+      "title": "Convención"
     }
   }
 }

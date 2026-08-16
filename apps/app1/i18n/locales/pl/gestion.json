@@ -706,6 +706,15 @@
       "place_error": "Nie udało się zapisać miejsca.",
       "page_public": "Strona publiczna",
       "page_public_help": "Udostępnia harmonogram wszystkim. Dopóki jest wyłączone, dostęp mają tylko organizatorzy, a zakładka pozostaje ukryta dla publiczności."
+    },
+    "convention": {
+      "card_description": "Edytuj nazwę, opis, logo i adres e-mail konwencji",
+      "description": "Edytuj dane konwencji, do której należy ta edycja.",
+      "save_error": "Błąd podczas aktualizacji konwencji",
+      "save_success": "Konwencja zaktualizowana pomyślnie",
+      "shared_notice": "Te informacje należą do konwencji „{name}”: dotyczą wszystkich jej edycji, nie tylko tej.",
+      "submit": "Zapisz konwencję",
+      "title": "Konwencja"
     }
   }
 }

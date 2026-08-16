@@ -190,6 +190,11 @@ const canManageOrganizers = computed(() => {
   return editionStore.canManageOrganizers(edition.value, authStore.user.id)
 })
 
+const canEditConvention = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canEditConvention(edition.value, authStore.user.id)
+})
+
 const isOrganizer = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.isOrganizer(edition.value, authStore.user.id)
@@ -288,6 +293,17 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
 
   // Deuxième section : Modules de gestion
   const managementSection: NavigationMenuItem[] = []
+
+  // Convention. En tête de section, avant « Informations de l'édition » : on va du plus englobant
+  // (la convention, donc toutes ses éditions) au particulier (cette édition-ci).
+  if (canEditConvention.value) {
+    managementSection.push({
+      label: t('gestion.convention.title'),
+      icon: 'i-heroicons-building-library',
+      to: `/editions/${editionId.value}/gestion/convention`,
+      tooltip: { content: t('gestion.convention.title') },
+    })
+  }
 
   // Informations
   if (canEdit.value) {

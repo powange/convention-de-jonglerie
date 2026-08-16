@@ -62,6 +62,15 @@
       "title": "Artistes"
     },
     "confirm_delete_edition": "Êtes-vous sûr de vouloir supprimer cette édition ?",
+    "convention": {
+      "card_description": "Modifier le nom, la description, le logo et l'e-mail de la convention",
+      "description": "Modifiez la fiche de la convention qui porte cette édition.",
+      "save_error": "Erreur lors de la mise à jour de la convention",
+      "save_success": "Convention mise à jour avec succès",
+      "shared_notice": "Ces informations appartiennent à la convention « {name} » : elles valent pour toutes ses éditions, pas seulement celle-ci.",
+      "submit": "Enregistrer la convention",
+      "title": "Convention"
+    },
     "delete_edition": "Supprimer l'édition",
     "external_links": {
       "description": "Gérez les liens vers votre site web, billetterie, programme et réseaux sociaux.",

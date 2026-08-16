@@ -706,6 +706,15 @@
       "place_error": "The place could not be saved.",
       "page_public": "Public page",
       "page_public_help": "Makes the schedule visible to everyone. While it is off, only organisers can reach it and the tab stays hidden from the public."
+    },
+    "convention": {
+      "card_description": "Edit the convention's name, description, logo and email",
+      "description": "Edit the details of the convention this edition belongs to.",
+      "save_error": "Error while updating the convention",
+      "save_success": "Convention updated successfully",
+      "shared_notice": "This information belongs to the convention “{name}”: it applies to all of its editions, not only this one.",
+      "submit": "Save convention",
+      "title": "Convention"
     }
   }
 }

@@ -643,6 +643,66 @@ describe('useEditionStore', () => {
       })
     })
 
+    describe('canEditConvention', () => {
+      // Utilisateur 1 ni créateur de l'édition, ni auteur de la convention : seul un droit
+      // explicite peut ouvrir l'édition de la fiche convention.
+      const conventionEdition = (organizer: Record<string, unknown>) => ({
+        ...mockEdition,
+        id: 1,
+        creatorId: 999,
+        convention: {
+          id: 1,
+          name: 'Test Convention',
+          authorId: 999,
+          organizers: [{ id: 1, user: mockUser, ...organizer }],
+        },
+      })
+
+      it("autorise l'admin global en mode admin", () => {
+        authStore.user = { ...mockUser, isGlobalAdmin: true }
+        authStore.adminMode = true
+        expect(editionStore.canEditConvention(conventionEdition({ rights: {} }) as any, 1)).toBe(
+          true
+        )
+      })
+
+      it("autorise l'auteur de la convention", () => {
+        expect(editionStore.canEditConvention(conventionEdition({ rights: {} }) as any, 999)).toBe(
+          true
+        )
+      })
+
+      it('autorise le droit editConvention', () => {
+        const ed = conventionEdition({ rights: { editConvention: true } })
+        expect(editionStore.canEditConvention(ed as any, 1)).toBe(true)
+      })
+
+      // La fiche convention vaut pour TOUTES ses éditions : gérer une édition — même en être
+      // le créateur — ne doit pas suffire à renommer la convention.
+      it('refuse editAllEditions seul', () => {
+        const ed = conventionEdition({ rights: { editAllEditions: true } })
+        expect(editionStore.canEditConvention(ed as any, 1)).toBe(false)
+      })
+
+      it("refuse le créateur de l'édition", () => {
+        const ed = { ...conventionEdition({ rights: {} }), creatorId: 1 }
+        expect(editionStore.canEditConvention(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse canEdit per-édition seul', () => {
+        const ed = conventionEdition({
+          rights: {},
+          perEditionRights: [{ editionId: 1, canEdit: true }],
+        })
+        expect(editionStore.canEditConvention(ed as any, 1)).toBe(false)
+      })
+
+      it('refuse un utilisateur étranger à la convention', () => {
+        const ed = conventionEdition({ rights: { editConvention: true } })
+        expect(editionStore.canEditConvention(ed as any, 42)).toBe(false)
+      })
+    })
+
     describe('canManageArtists', () => {
       // Édition où l'utilisateur 1 n'est NI créateur NI auteur : l'accès dépend
       // uniquement des droits d'organisateur.
