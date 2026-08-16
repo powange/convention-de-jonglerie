@@ -61,8 +61,8 @@
       "manage_artists_description": "Administrer de kunstnere, der er inviteret til denne udgave",
       "title": "Management af kunstnere"
     },
-    "confirm_delete_edition": "Er du sikker på, at du vil skrotte denne udgave?",
-    "delete_edition": "Slet redigering",
+    "confirm_delete_edition": "Er du sikker på, at du vil slette denne udgave?",
+    "delete_edition": "Slet udgaven",
     "external_links": {
       "description": "Administrer links til din hjemmeside, billetsalg, program og sociale medier.",
       "save": "Gem",
@@ -119,7 +119,7 @@
       "general_info_description": "Rediger navn, datoer og adresse",
       "map_description": "Definer zonerne på områdekortet",
       "services_description": "Administrer tilgængelige tjenester og faciliteter",
-      "title": "Information",
+      "title": "Oplysninger om udgaven",
       "program_description": "Sammensæt tidslinjen: workshops, shows og andre programpunkter."
     },
     "lost_found_active_description": "Deltagere kan rapportere tabte og fundne genstande",
