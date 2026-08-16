@@ -180,6 +180,13 @@
       :user="userToDelete"
       @deleted="onUserDeleted"
     />
+
+    <!-- Modal de fusion de deux comptes -->
+    <AdminUserMergeModal
+      v-model:open="showMergeModal"
+      :user="userToMerge"
+      @merged="onUsersMerged"
+    />
   </div>
 </template>
 
@@ -301,6 +308,10 @@ const categoryFilters = reactive(
 // État pour le modal de suppression
 const userToDelete = ref<AdminUserWithConnection | null>(null)
 const showDeletionModal = ref(false)
+
+// État pour le modal de fusion
+const userToMerge = ref<AdminUserWithConnection | null>(null)
+const showMergeModal = ref(false)
 
 // État pour les stats de connexion
 const connectionStats = ref<{ totalActiveConnections: number; totalActiveUsers: number } | null>(
@@ -774,6 +785,16 @@ const getUserActions = (user: AdminUserWithConnection) => {
     })
   }
 
+  // Fusion avec un autre compte : le compte à absorber est choisi dans le modal, celui-ci
+  // peut donc être le compte conservé même s'il est administrateur.
+  actions.push({
+    label: t('admin.merge_accounts'),
+    icon: 'i-heroicons-arrows-pointing-in',
+    onSelect: () => {
+      openMergeModal(user)
+    },
+  })
+
   // Action de suppression (seulement pour les utilisateurs normaux)
   if (!user.isGlobalAdmin) {
     actions.push({
@@ -991,6 +1012,20 @@ const validateUserEmail = (user: AdminUserWithConnection) => {
 const openDeletionModal = (user: AdminUserWithConnection) => {
   userToDelete.value = user
   showDeletionModal.value = true
+}
+
+// Fonction pour ouvrir le modal de fusion
+const openMergeModal = (user: AdminUserWithConnection) => {
+  userToMerge.value = user
+  showMergeModal.value = true
+}
+
+// Fonction appelée après une fusion réussie : un compte a disparu et l'autre a changé,
+// on repart d'une liste fraîche.
+const onUsersMerged = () => {
+  showMergeModal.value = false
+  userToMerge.value = null
+  fetchUsers()
 }
 
 // Fonction appelée après suppression réussie
