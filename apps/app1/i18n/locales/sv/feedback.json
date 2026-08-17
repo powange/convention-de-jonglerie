@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "Captcha har ännu inte laddats, vänligen vänta.",
       "captcha_required": "Vänligen fyll i captcha",
-      "name_required": "Namnet är obligatoriskt",
-      "name_required_desc": "Ange ditt namn så att vi kan identifiera din feedback",
-      "submit": "Ett fel inträffade när du skickade din retur",
-      "title": "Fel vid sändning"
+      "submit": "Ett fel inträffade när du skickade din retur"
     },
     "guest": {
       "info": "Som besökare ber vi dig att lämna dina kontaktuppgifter för eventuell uppföljning."
@@ -72,6 +69,23 @@
         "max": "Ämnet får inte överstiga 200 tecken",
         "min": "Ämnet måste vara minst 5 tecken långt"
       }
+    },
+    "page": {
+      "new_title": "Skicka återkoppling",
+      "new_another": "Skicka en till återkoppling",
+      "success_tracked": "Du kan följa förloppet på den här sidan, under ”Mina återkopplingar”.",
+      "tracking_title": "Mina återkopplingar",
+      "tracking_empty": "Du har inte skickat någon återkoppling ännu.",
+      "tracking_error": "Dina återkopplingar kunde inte laddas just nu.",
+      "tracking_signin_title": "Logga in för att följa dina återkopplingar",
+      "tracking_signin_description": "Återkoppling som skickats med ett konto kan följas här: du ser förloppet och teamets svar.",
+      "team_reply": "Svar från teamet"
+    },
+    "status": {
+      "NEW": "Mottagen",
+      "IN_PROGRESS": "Under hantering",
+      "RESOLVED": "Hanterad",
+      "REJECTED": "Inte aktuell"
     }
   }
 }

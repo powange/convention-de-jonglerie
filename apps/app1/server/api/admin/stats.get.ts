@@ -65,10 +65,10 @@ export default wrapApiHandler(
         },
       }),
 
-      // Feedbacks non résolus
+      // Feedbacks en attente d'une action de l'équipe : ni traités, ni rejetés
       prisma.feedback.count({
         where: {
-          resolved: false,
+          status: { in: ['NEW', 'IN_PROGRESS'] },
         },
       }),
 

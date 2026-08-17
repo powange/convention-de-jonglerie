@@ -179,7 +179,7 @@ export default wrapApiHandler(
         select: {
           id: true,
           type: true,
-          resolved: true,
+          status: true,
           subject: true,
           createdAt: true,
           user: {
@@ -477,10 +477,13 @@ export default wrapApiHandler(
         ? `${feedback.user.prenom || ''} ${feedback.user.nom || ''}`.trim() || feedback.user.pseudo
         : 'Utilisateur anonyme'
 
-      const activityType = feedback.resolved ? 'feedback_resolved' : 'feedback_submitted'
-      const title = feedback.resolved ? 'Feedback résolu' : 'Nouveau feedback'
-      const description = feedback.resolved
-        ? `Feedback "${feedback.subject}" de ${userName} résolu`
+      // Un retour rejeté est traité, lui aussi : c'est l'absence de traitement qui distingue
+      // une soumission d'une résolution, pas le seul état RESOLVED.
+      const traite = feedback.status === 'RESOLVED' || feedback.status === 'REJECTED'
+      const activityType = traite ? 'feedback_resolved' : 'feedback_submitted'
+      const title = traite ? 'Feedback traité' : 'Nouveau feedback'
+      const description = traite
+        ? `Feedback "${feedback.subject}" de ${userName} traité (${feedback.status === 'RESOLVED' ? 'résolu' : 'rejeté'})`
         : `${userName} a soumis un feedback: "${feedback.subject}" (${feedback.type})`
 
       activities.push({

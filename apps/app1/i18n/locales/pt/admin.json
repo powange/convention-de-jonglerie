@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Feedback marcado como resolvido",
-        "unresolve": "Feedback marcado como não resolvido"
+        "unresolve": "Feedback marcado como não resolvido",
+        "updated": "Comentário atualizado: {status}"
       },
       "title": "Gestão de Feedback dos Utilizadores",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Página relacionada",
       "user": "Utilizador",
       "user_agent": "Navegador/SO",
-      "view": "Ver detalhes"
+      "view": "Ver detalhes",
+      "admin_notes_hint": "Nota interna: nunca mostrada ao autor.",
+      "admin_reply": "Resposta ao autor",
+      "admin_reply_hint": "Visível para o autor do comentário na sua página de acompanhamento.",
+      "admin_reply_placeholder": "Responda ao autor: o que foi feito, o que está previsto...",
+      "process": "Tratar",
+      "reply_guest_warning": "Este comentário foi enviado sem conta: o seu autor não tem página de acompanhamento onde ler esta resposta. Contacte-o por email se for necessária uma resposta."
     },
     "feedbacks_count": "Feedback",
     "filter_active_conventions": "Convenções ativas",

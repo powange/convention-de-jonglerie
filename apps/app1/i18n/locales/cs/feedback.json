@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "Captcha se ještě nenačetla, počkejte prosím.",
       "captcha_required": "Vyplňte prosím captcha",
-      "name_required": "Název je povinný",
-      "name_required_desc": "Zadejte prosím své jméno, abychom mohli identifikovat vaši zpětnou vazbu.",
-      "submit": "Při odesílání vrácení došlo k chybě",
-      "title": "Chyba při odesílání"
+      "submit": "Při odesílání vrácení došlo k chybě"
     },
     "guest": {
       "info": "Jako návštěvník nám prosím zanechte své kontaktní údaje pro případné další kroky."
@@ -72,6 +69,23 @@
         "max": "Předmět nesmí přesáhnout 200 znaků",
         "min": "Předmět musí být dlouhý alespoň 5 znaků"
       }
+    },
+    "page": {
+      "new_title": "Odeslat zpětnou vazbu",
+      "new_another": "Odeslat další zpětnou vazbu",
+      "success_tracked": "Její postup můžete sledovat na této stránce v sekci „Moje zpětné vazby“.",
+      "tracking_title": "Moje zpětné vazby",
+      "tracking_empty": "Zatím jste neodeslali žádnou zpětnou vazbu.",
+      "tracking_error": "Vaše zpětné vazby se teď nepodařilo načíst.",
+      "tracking_signin_title": "Přihlaste se pro sledování svých zpětných vazeb",
+      "tracking_signin_description": "Zpětné vazby odeslané s účtem lze sledovat zde: uvidíte jejich postup i odpověď týmu.",
+      "team_reply": "Odpověď týmu"
+    },
+    "status": {
+      "NEW": "Přijato",
+      "IN_PROGRESS": "Zpracovává se",
+      "RESOLVED": "Vyřízeno",
+      "REJECTED": "Nezohledněno"
     }
   }
 }

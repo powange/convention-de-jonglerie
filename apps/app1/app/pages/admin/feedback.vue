@@ -61,7 +61,7 @@
           </div>
           <div class="ml-4">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ stats?.byStatus?.pending || 0 }}
+              {{ enAttente }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               {{ t('admin.feedback.stats.pending') }}
@@ -80,7 +80,7 @@
           </div>
           <div class="ml-4">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ stats?.byStatus?.resolved || 0 }}
+              {{ stats?.byStatus?.RESOLVED || 0 }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               {{ t('admin.feedback.stats.resolved') }}
@@ -124,7 +124,7 @@
           @change="fetchFeedbacks"
         />
         <USelect
-          v-model="filters.resolved"
+          v-model="filters.status"
           :items="statusOptions"
           :placeholder="t('admin.feedback.filter.status')"
           @change="fetchFeedbacks"
@@ -159,10 +159,8 @@
                     :label="t(`admin.feedback.types.${feedback.type.toLowerCase()}`)"
                   />
                   <UBadge
-                    :color="feedback.resolved ? 'success' : 'warning'"
-                    :label="
-                      feedback.resolved ? t('admin.feedback.resolved') : t('admin.feedback.pending')
-                    "
+                    :color="getStatusColor(feedback.status)"
+                    :label="t(`feedback.status.${feedback.status}`)"
                   />
                 </div>
 
@@ -219,22 +217,13 @@
 
               <div class="flex items-center gap-2 ml-4">
                 <UButton
-                  v-if="!feedback.resolved"
                   color="success"
                   variant="soft"
                   size="sm"
+                  icon="i-heroicons-chat-bubble-bottom-center-text"
                   @click="openResolveModal(feedback)"
                 >
-                  {{ t('admin.feedback.resolve') }}
-                </UButton>
-                <UButton
-                  v-else
-                  color="neutral"
-                  variant="soft"
-                  size="sm"
-                  @click="openResolveModal(feedback)"
-                >
-                  {{ t('admin.feedback.unresolve') }}
+                  {{ t('admin.feedback.process') }}
                 </UButton>
                 <UButton
                   color="secondary"
@@ -261,15 +250,8 @@
       </div>
     </UCard>
 
-    <!-- Modal de résolution -->
-    <UModal
-      v-model:open="resolveModal.isOpen"
-      :title="
-        resolveModal.feedback?.resolved
-          ? t('admin.feedback.unresolve')
-          : t('admin.feedback.resolve')
-      "
-    >
+    <!-- Modal de traitement -->
+    <UModal v-model:open="resolveModal.isOpen" :title="t('admin.feedback.process')">
       <template #content>
         <UCard>
           <div class="space-y-4 p-4">
@@ -280,24 +262,54 @@
               </p>
             </div>
 
-            <UFormField :label="t('admin.feedback.admin_notes')">
+            <UFormField :label="t('admin.feedback.status')">
+              <USelect
+                v-model="resolveModal.status"
+                :items="statusChoices"
+                value-key="value"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField
+              :label="t('admin.feedback.admin_reply')"
+              :description="t('admin.feedback.admin_reply_hint')"
+            >
+              <UTextarea
+                v-model="resolveModal.adminReply"
+                :placeholder="t('admin.feedback.admin_reply_placeholder')"
+                :rows="4"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField
+              :label="t('admin.feedback.admin_notes')"
+              :description="t('admin.feedback.admin_notes_hint')"
+            >
               <UTextarea
                 v-model="resolveModal.adminNotes"
                 :placeholder="t('admin.feedback.admin_notes_placeholder')"
-                :rows="4"
+                :rows="3"
+                class="w-full"
               />
             </UFormField>
+
+            <!-- Un retour de visiteur n'a pas de page de suivi où lire la réponse -->
+            <UAlert
+              v-if="resolveModal.adminReply && !resolveModal.feedback?.user"
+              icon="i-heroicons-exclamation-triangle"
+              color="warning"
+              variant="subtle"
+              :title="t('admin.feedback.reply_guest_warning')"
+            />
 
             <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <UButton color="neutral" variant="outline" @click="resolveModal.isOpen = false">
                 {{ t('common.cancel') }}
               </UButton>
               <UButton :loading="resolveLoading" @click="resolveFeedback">
-                {{
-                  resolveModal.feedback?.resolved
-                    ? t('admin.feedback.mark_unresolved')
-                    : t('admin.feedback.mark_resolved')
-                }}
+                {{ t('common.save') }}
               </UButton>
             </div>
           </div>
@@ -325,12 +337,8 @@
                   {{ t('admin.feedback.status') }}
                 </label>
                 <UBadge
-                  :color="detailsModal.feedback.resolved ? 'success' : 'warning'"
-                  :label="
-                    detailsModal.feedback.resolved
-                      ? t('admin.feedback.resolved')
-                      : t('admin.feedback.pending')
-                  "
+                  :color="getStatusColor(detailsModal.feedback.status)"
+                  :label="t(`feedback.status.${detailsModal.feedback.status}`)"
                 />
               </div>
             </div>
@@ -431,6 +439,10 @@ definePageMeta({
   middleware: ['super-admin'],
 })
 
+// Les libellés de statut sont partagés avec la page publique de suivi, et vivent donc dans le
+// domaine `feedback`, que la route /admin ne charge pas d'elle-même.
+await useLazyI18n('feedback')
+
 const { t } = useI18n()
 const toast = useToast()
 
@@ -448,7 +460,7 @@ const pagination = ref({
 const filters = reactive({
   search: '',
   type: '',
-  resolved: 'false',
+  status: 'NEW',
 })
 
 // Options pour les filtres
@@ -462,15 +474,19 @@ const typeOptions = computed(() => [
 
 const statusOptions = computed(() => [
   { value: null, label: t('admin.feedback.filter.all_status') },
-  { value: 'false', label: t('admin.feedback.pending') },
-  { value: 'true', label: t('admin.feedback.resolved') },
+  { value: 'NEW', label: t('feedback.status.NEW') },
+  { value: 'IN_PROGRESS', label: t('feedback.status.IN_PROGRESS') },
+  { value: 'RESOLVED', label: t('feedback.status.RESOLVED') },
+  { value: 'REJECTED', label: t('feedback.status.REJECTED') },
 ])
 
 // Modals
 const resolveModal = reactive({
   isOpen: false,
   feedback: null as any,
+  status: 'IN_PROGRESS',
   adminNotes: '',
+  adminReply: '',
 })
 
 const detailsModal = reactive({
@@ -488,7 +504,7 @@ const { execute: fetchFeedbacks, loading } = useApiAction('/api/admin/feedback',
     }
     if (filters.search) q.search = filters.search
     if (filters.type) q.type = filters.type
-    if (filters.resolved) q.resolved = filters.resolved
+    if (filters.status) q.status = filters.status
     return q
   },
   errorMessages: { default: t('admin.feedback.error.load') },
@@ -517,7 +533,11 @@ const debouncedSearch = () => {
 
 function openResolveModal(feedback: any) {
   resolveModal.feedback = feedback
+  // Un retour qu'on ouvre pour la première fois passe par défaut en cours de traitement :
+  // c'est le geste le plus courant, et laisser NEW ferait mentir le suivi de l'auteur.
+  resolveModal.status = feedback.status === 'NEW' ? 'IN_PROGRESS' : feedback.status
   resolveModal.adminNotes = feedback.adminNotes || ''
+  resolveModal.adminReply = feedback.adminReply || ''
   resolveModal.isOpen = true
 }
 
@@ -532,16 +552,17 @@ const { execute: executeResolve, loading: resolveLoading } = useApiAction(
   {
     method: 'PUT',
     body: () => ({
-      resolved: !resolveModal.feedback?.resolved,
+      status: resolveModal.status,
       adminNotes: resolveModal.adminNotes,
+      adminReply: resolveModal.adminReply,
     }),
     errorMessages: { default: t('admin.feedback.error.resolve') },
-    silentSuccess: true, // On gère le toast manuellement pour le message conditionnel
+    silentSuccess: true, // On gère le toast manuellement pour nommer le statut retenu
     onSuccess: () => {
       toast.add({
-        title: resolveModal.feedback?.resolved
-          ? t('admin.feedback.success.unresolve')
-          : t('admin.feedback.success.resolve'),
+        title: t('admin.feedback.success.updated', {
+          status: t(`feedback.status.${resolveModal.status}`),
+        }),
         color: 'success',
       })
       resolveModal.isOpen = false
@@ -553,6 +574,26 @@ const { execute: executeResolve, loading: resolveLoading } = useApiAction(
 function resolveFeedback() {
   if (!resolveModal.feedback) return
   executeResolve()
+}
+
+// Ce qui attend une action de l'équipe : ni traité, ni rejeté
+const enAttente = computed(
+  () => (stats.value?.byStatus?.NEW || 0) + (stats.value?.byStatus?.IN_PROGRESS || 0)
+)
+
+// Les quatre états assignables, sans l'entrée « tous » réservée au filtre
+const statusChoices = computed(() => statusOptions.value.filter((option) => option.value !== null))
+
+function getStatusColor(status: string) {
+  // Sans annotation, TypeScript infère l'union de littéraux qu'attend `UBadge` :
+  // la typer `Record<string, string>` la ramènerait à `string` et casserait le contrôle.
+  const colors = {
+    NEW: 'warning',
+    IN_PROGRESS: 'info',
+    RESOLVED: 'success',
+    REJECTED: 'neutral',
+  } as const
+  return colors[status as keyof typeof colors] || 'neutral'
 }
 
 function getTypeColor(type: string) {

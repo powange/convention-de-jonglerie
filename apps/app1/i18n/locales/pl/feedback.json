@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "Captcha nie jest jeszcze załadowana, proszę czekać",
       "captcha_required": "Proszę wypełnić captcha",
-      "name_required": "Nazwa jest wymagana",
-      "name_required_desc": "Proszę podać swoje imię, abyśmy mogli zidentyfikować Twoją opinię",
-      "submit": "Wystąpił błąd podczas wysyłania opinii",
-      "title": "Błąd podczas wysyłania"
+      "submit": "Wystąpił błąd podczas wysyłania opinii"
     },
     "guest": {
       "info": "Jako gość, podaj swoje dane kontaktowe w celu ewentualnego kontaktu zwrotnego."
@@ -72,6 +69,23 @@
         "max": "Temat nie może przekraczać 200 znaków",
         "min": "Temat musi zawierać co najmniej 5 znaków"
       }
+    },
+    "page": {
+      "new_title": "Wyślij zgłoszenie",
+      "new_another": "Wyślij kolejne zgłoszenie",
+      "success_tracked": "Możesz śledzić jego postęp na tej stronie, w sekcji „Moje zgłoszenia”.",
+      "tracking_title": "Moje zgłoszenia",
+      "tracking_empty": "Nie wysłałeś jeszcze żadnego zgłoszenia.",
+      "tracking_error": "Nie można teraz wczytać Twoich zgłoszeń.",
+      "tracking_signin_title": "Zaloguj się, aby śledzić swoje zgłoszenia",
+      "tracking_signin_description": "Zgłoszenia wysłane z konta można śledzić tutaj: zobaczysz ich postęp i odpowiedź zespołu.",
+      "team_reply": "Odpowiedź zespołu"
+    },
+    "status": {
+      "NEW": "Otrzymane",
+      "IN_PROGRESS": "W trakcie obsługi",
+      "RESOLVED": "Obsłużone",
+      "REJECTED": "Nieuwzględnione"
     }
   }
 }

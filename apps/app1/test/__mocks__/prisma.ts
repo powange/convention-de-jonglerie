@@ -49,6 +49,7 @@ export const prismaMock = {
   editionArtistHandoutItem: createModelMock(),
   eventVolunteerSettings: createModelMock(),
   apiErrorLog: createModelMock(),
+  feedback: createModelMock(),
   notification: createModelMock(),
   fcmToken: createModelMock(),
 

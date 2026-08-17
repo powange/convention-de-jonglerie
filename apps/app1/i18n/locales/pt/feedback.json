@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "O captcha ainda não está carregado, aguarde por favor",
       "captcha_required": "Por favor complete o captcha",
-      "name_required": "O nome é obrigatório",
-      "name_required_desc": "Por favor indique o seu nome para que possamos identificar o seu feedback",
-      "submit": "Ocorreu um erro ao enviar o seu feedback",
-      "title": "Erro ao enviar"
+      "submit": "Ocorreu um erro ao enviar o seu feedback"
     },
     "guest": {
       "info": "Como visitante, forneça os seus dados de contacto para um possível seguimento."
@@ -72,6 +69,23 @@
         "max": "O assunto não pode exceder 200 caracteres",
         "min": "O assunto deve ter pelo menos 5 caracteres"
       }
+    },
+    "page": {
+      "new_title": "Enviar um comentário",
+      "new_another": "Enviar outro comentário",
+      "success_tracked": "Pode acompanhar o seu progresso nesta página, em «Os meus comentários».",
+      "tracking_title": "Os meus comentários",
+      "tracking_empty": "Ainda não enviou nenhum comentário.",
+      "tracking_error": "Não foi possível carregar os seus comentários neste momento.",
+      "tracking_signin_title": "Inicie sessão para acompanhar os seus comentários",
+      "tracking_signin_description": "Os comentários enviados com uma conta podem ser acompanhados aqui: verá o seu progresso e a resposta da equipa.",
+      "team_reply": "Resposta da equipa"
+    },
+    "status": {
+      "NEW": "Recebido",
+      "IN_PROGRESS": "Em tratamento",
+      "RESOLVED": "Tratado",
+      "REJECTED": "Não retido"
     }
   }
 }

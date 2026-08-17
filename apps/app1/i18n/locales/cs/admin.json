@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Návrat označený jako vyřešený",
-        "unresolve": "Návrat označen jako nevyřešený"
+        "unresolve": "Návrat označen jako nevyřešený",
+        "updated": "Zpětná vazba aktualizována: {status}"
       },
       "title": "Správa zpětné vazby od uživatelů",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Stránka se týká",
       "user": "Uživatel",
       "user_agent": "Prohlížeč/OS",
-      "view": "Viz podrobnosti"
+      "view": "Viz podrobnosti",
+      "admin_notes_hint": "Interní poznámka: autorovi se nikdy nezobrazuje.",
+      "admin_reply": "Odpověď autorovi",
+      "admin_reply_hint": "Viditelná pro autora zpětné vazby na jeho stránce sledování.",
+      "admin_reply_placeholder": "Odpovězte autorovi: co bylo uděláno, co se plánuje...",
+      "process": "Zpracovat",
+      "reply_guest_warning": "Tato zpětná vazba byla odeslána bez účtu: její autor nemá stránku sledování, kde by si tuto odpověď přečetl. Pokud je odpověď potřeba, kontaktujte ho e-mailem."
     },
     "feedbacks_count": "Zpětná vazba",
     "filter_active_conventions": "Aktivní konvence",

@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Feedback als gelöst markiert",
-        "unresolve": "Feedback als ungelöst markiert"
+        "unresolve": "Feedback als ungelöst markiert",
+        "updated": "Rückmeldung aktualisiert: {status}"
       },
       "title": "Verwaltung von Benutzerfeedback",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Verwandte Seite",
       "user": "Benutzer",
       "user_agent": "Browser/OS",
-      "view": "Details anzeigen"
+      "view": "Details anzeigen",
+      "admin_notes_hint": "Interne Notiz: wird dem Verfasser nie angezeigt.",
+      "admin_reply": "Antwort an den Verfasser",
+      "admin_reply_hint": "Für den Verfasser der Rückmeldung auf seiner Übersichtsseite sichtbar.",
+      "admin_reply_placeholder": "Antworten Sie dem Verfasser: was getan wurde, was geplant ist ...",
+      "process": "Bearbeiten",
+      "reply_guest_warning": "Diese Rückmeldung wurde ohne Konto gesendet: Der Verfasser hat keine Übersichtsseite, auf der er diese Antwort lesen könnte. Kontaktieren Sie ihn per E-Mail, falls eine Antwort nötig ist."
     },
     "feedbacks_count": "Feedback",
     "filter_active_conventions": "Aktive Conventions",

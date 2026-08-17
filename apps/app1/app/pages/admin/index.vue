@@ -426,7 +426,7 @@
                   </span>
                   <span class="flex items-center gap-1">
                     <UIcon name="i-heroicons-check-circle" class="h-4 w-4" />
-                    {{ $t('admin.feedback.resolve') }}
+                    {{ $t('admin.feedback.process') }}
                   </span>
                 </div>
               </div>

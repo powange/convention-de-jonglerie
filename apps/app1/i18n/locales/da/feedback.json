@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "Captcha'en er endnu ikke indlæst, vent venligst",
       "captcha_required": "Udfyld venligst captcha'en",
-      "name_required": "Navnet er påkrævet",
-      "name_required_desc": "Angiv venligst dit navn, så vi kan identificere din feedback",
-      "submit": "Der opstod en fejl ved afsendelse af din feedback",
-      "title": "Fejl ved afsendelse"
+      "submit": "Der opstod en fejl ved afsendelse af din feedback"
     },
     "guest": {
       "info": "Som gæst bedes du oplyse dine kontaktoplysninger for mulig opfølgning."
@@ -72,6 +69,23 @@
         "max": "Emnet må ikke overstige 200 tegn",
         "min": "Emnet skal være mindst 5 tegn"
       }
+    },
+    "page": {
+      "new_title": "Send en tilbagemelding",
+      "new_another": "Send en ny tilbagemelding",
+      "success_tracked": "Du kan følge forløbet på denne side under \"Mine tilbagemeldinger\".",
+      "tracking_title": "Mine tilbagemeldinger",
+      "tracking_empty": "Du har endnu ikke sendt nogen tilbagemelding.",
+      "tracking_error": "Dine tilbagemeldinger kunne ikke indlæses lige nu.",
+      "tracking_signin_title": "Log ind for at følge dine tilbagemeldinger",
+      "tracking_signin_description": "Tilbagemeldinger sendt med en konto kan følges her: du kan se forløbet og teamets svar.",
+      "team_reply": "Svar fra teamet"
+    },
+    "status": {
+      "NEW": "Modtaget",
+      "IN_PROGRESS": "Under behandling",
+      "RESOLVED": "Behandlet",
+      "REJECTED": "Ikke medtaget"
     }
   }
 }
