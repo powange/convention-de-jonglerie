@@ -699,7 +699,6 @@
       "convert": "Umwandeln",
       "convert_intro": "„{title}“ in einen vollständigeren Eintrag umwandeln. Der Programmpunkt wird gelöscht.",
       "convert_target": "Umwandeln in",
-      "convert_end_required": "Geben Sie eine Endzeit an: ein Workshop benötigt sie.",
       "convert_public_warning": "Workshops sind immer öffentlich sichtbar: dieser Entwurf wird es sofort.",
       "converted": "Punkt umgewandelt",
       "edit_place": "Ort ändern",

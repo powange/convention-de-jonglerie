@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Vælg eller indtast et sted",
     "workshop_title": "Titel på workshop",
     "workshops_not_enabled": "Workshops er ikke aktiveret for denne udgave",
-    "workshops_selected": "udvalgte workshops"
+    "workshops_selected": "udvalgte workshops",
+    "extraction_ignored": "Ubrugelige workshops",
+    "extraction_ignored_description": "{count} workshop(s) fundet, men frasorteret på grund af manglende brugbare tidspunkter. Vælg en dag i udgaven, og kør udtrækket igen.",
+    "import_forced_day": "Dag i udgaven",
+    "import_forced_day_description": "Hvis billedet ikke angiver en dato, så vælg den dag, workshoppene skal placeres på. Deres klokkeslæt bevares.",
+    "import_forced_day_none": "Brug datoerne læst på billedet"
   }
 }

@@ -7,6 +7,7 @@ import {
   formaterJournee,
   journeeDans,
   journeeDeProgramme,
+  journeesEntre,
   versChampLocal,
   versInstant,
 } from '../../../shared/utils/fuseau-edition'
@@ -124,6 +125,59 @@ describe('journeeDeProgramme', () => {
     expect(journeeDeProgramme(minuitEtDemiAParis, 'Europe/Paris')).toBe('2026-08-06')
     // Le même instant est 08 h 30 à Melbourne : une matinée, donc sa propre journée.
     expect(journeeDeProgramme(minuitEtDemiAParis, 'Australia/Melbourne')).toBe('2026-08-07')
+  })
+})
+
+describe('journeesEntre', () => {
+  it('énumère les journées bornes comprises', () => {
+    expect(
+      journeesEntre(
+        versInstant('2026-08-06T10:00', 'Europe/Paris'),
+        versInstant('2026-08-09T18:00', 'Europe/Paris'),
+        'Europe/Paris'
+      )
+    ).toEqual(['2026-08-06', '2026-08-07', '2026-08-08', '2026-08-09'])
+  })
+
+  it('rend une seule journée pour une édition d’un jour', () => {
+    expect(
+      journeesEntre(
+        versInstant('2026-08-06T09:00', 'Europe/Paris'),
+        versInstant('2026-08-06T23:00', 'Europe/Paris'),
+        'Europe/Paris'
+      )
+    ).toEqual(['2026-08-06'])
+  })
+
+  // Le découpage se fait sur place : une fin de soirée ne doit pas ajouter le lendemain.
+  it('découpe les journées dans le fuseau de l’édition', () => {
+    const debut = versInstant('2026-08-06T10:00', 'Europe/Paris')
+    const fin = versInstant('2026-08-07T01:00', 'Europe/Paris')
+    expect(journeesEntre(debut, fin, 'Europe/Paris')).toEqual(['2026-08-06', '2026-08-07'])
+    // Le même instant de fin est 09 h à Melbourne, mais déjà le 7 : deux journées là-bas aussi,
+    // alors qu'à Los Angeles la fin tombe encore le 6 au soir.
+    expect(journeesEntre(debut, fin, 'America/Los_Angeles')).toEqual(['2026-08-06'])
+  })
+
+  // Une nuit de changement d'heure dure 23 ou 25 heures : avancer par tranches de 24 h
+  // finirait par sauter ou répéter une journée.
+  it('traverse un changement d’heure sans décaler', () => {
+    expect(
+      journeesEntre(
+        versInstant('2026-10-24T12:00', 'Europe/Paris'),
+        versInstant('2026-10-26T12:00', 'Europe/Paris'),
+        'Europe/Paris'
+      )
+    ).toEqual(['2026-10-24', '2026-10-25', '2026-10-26'])
+  })
+
+  it('rend une liste vide sur des bornes absentes ou incohérentes', () => {
+    expect(journeesEntre(null, null, 'Europe/Paris')).toEqual([])
+    expect(journeesEntre('2026-08-06T10:00:00Z', undefined, 'Europe/Paris')).toEqual([])
+    expect(journeesEntre('pas une date', '2026-08-09T10:00:00Z', 'Europe/Paris')).toEqual([])
+    expect(journeesEntre('2026-08-09T10:00:00Z', '2026-08-06T10:00:00Z', 'Europe/Paris')).toEqual(
+      []
+    )
   })
 })
 

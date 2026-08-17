@@ -12,6 +12,8 @@ export interface WorkshopsEventPort {
    * État + bornes temporelles de l'événement pour les ateliers. `found: false` → événement inconnu.
    * `enabled` : module ateliers activé. `locationsFreeInput` : saisie libre de lieu autorisée.
    * `startDate`/`endDate` : bornes de validation des créneaux d'atelier (null si introuvable).
+   * `timezone` : fuseau IANA de l'événement, pour découper ses journées sur place plutôt que dans
+   * celui du serveur (null si l'événement n'en déclare pas).
    */
   getConfig(editionId: number): Promise<{
     found: boolean
@@ -19,6 +21,7 @@ export interface WorkshopsEventPort {
     locationsFreeInput: boolean
     startDate: Date | null
     endDate: Date | null
+    timezone: string | null
   }>
 }
 

@@ -92,6 +92,35 @@ export const journeeDans = (instant: string | Date, fuseau?: string | null): str
 }
 
 /**
+ * Journées `AAAA-MM-JJ` couvertes par une édition, bornes comprises, dans son fuseau.
+ *
+ * Les bornes arrivent en instants — c'est ce que porte l'`Edition` — et doivent être découpées sur
+ * place : une édition qui s'achève à 2 h du matin le dimanche compte bien le dimanche, et une
+ * lecture depuis le fuseau du navigateur ajouterait ou retrancherait une journée selon d'où on
+ * regarde. Renvoie une liste vide si l'une des bornes est illisible ou si la fin précède le début.
+ */
+export const journeesEntre = (
+  debut: string | Date | null | undefined,
+  fin: string | Date | null | undefined,
+  fuseau?: string | null
+): string[] => {
+  if (!debut || !fin) return []
+
+  const zone = fuseauUtilisable(fuseau)
+  const premier = enDateTime(debut, fuseau).startOf('day')
+  const dernier = enDateTime(fin, fuseau).startOf('day')
+  if (!premier.isValid || !dernier.isValid || dernier < premier) return []
+
+  const journees: string[] = []
+  // On avance en jours calendaires du fuseau, et non par tranches de 24 h : les nuits de
+  // changement d'heure en durent 23 ou 25, ce qui finirait par décaler la liste.
+  for (let jour = premier; jour <= dernier; jour = jour.plus({ days: 1 })) {
+    journees.push(jour.setZone(zone).toFormat('yyyy-MM-dd'))
+  }
+  return journees
+}
+
+/**
  * Heure à laquelle une journée de programme cède la place à la suivante.
  *
  * Trois heures du matin, et non minuit : une scène ouverte qui démarre le vendredi à 00 h 30 est,

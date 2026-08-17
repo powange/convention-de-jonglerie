@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Select or enter a location",
     "workshop_title": "Workshop title",
     "workshops_not_enabled": "Workshops are not enabled for this edition",
-    "workshops_selected": "selected workshops"
+    "workshops_selected": "selected workshops",
+    "extraction_ignored": "Unusable workshops",
+    "extraction_ignored_description": "{count} workshop(s) detected but discarded, for lack of usable times. Choose a day of the edition and run the extraction again.",
+    "import_forced_day": "Day of the edition",
+    "import_forced_day_description": "If the photo gives no date, choose the day on which to place the workshops. Their times are kept.",
+    "import_forced_day_none": "Use the dates read from the photo"
   }
 }

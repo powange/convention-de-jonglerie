@@ -39,6 +39,7 @@ const enabledConfig = {
   locationsFreeInput: false,
   startDate: new Date('2026-07-01'),
   endDate: new Date('2026-07-05'),
+  timezone: 'Europe/Paris',
 }
 
 describe('GET /api/editions/[id]/workshops', () => {
@@ -65,6 +66,7 @@ describe('GET /api/editions/[id]/workshops', () => {
       locationsFreeInput: false,
       startDate: null,
       endDate: null,
+      timezone: null,
     })
     await expect(handler(mockEvent as any)).rejects.toThrow('Édition non trouvée')
     expect(prismaMock.workshop.findMany).not.toHaveBeenCalled()

@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Seleziona o inserisci un luogo",
     "workshop_title": "Titolo del workshop",
     "workshops_not_enabled": "I workshop non sono abilitati per questa edizione",
-    "workshops_selected": "laboratori selezionati"
+    "workshops_selected": "laboratori selezionati",
+    "extraction_ignored": "Laboratori inutilizzabili",
+    "extraction_ignored_description": "{count} laboratorio/i rilevato/i ma scartato/i, per mancanza di orari utilizzabili. Scegli una giornata dell'edizione e rilancia l'estrazione.",
+    "import_forced_day": "Giornata dell'edizione",
+    "import_forced_day_description": "Se la foto non indica una data, scegli la giornata su cui collocare i laboratori. I loro orari vengono conservati.",
+    "import_forced_day_none": "Usare le date lette sulla foto"
   }
 }

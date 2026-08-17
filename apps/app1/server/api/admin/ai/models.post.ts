@@ -5,6 +5,9 @@ import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers
 
 const bodySchema = z.object({
   provider: z.string().min(1),
+  // Le serveur auquel ce modèle appartient. Par défaut le principal, ce qui laisse les appels
+  // existants se comporter comme avant.
+  serveur: z.enum(['principal', 'secours']).default('principal'),
   modelId: z.string().min(1),
   name: z.string().min(1),
 })
@@ -22,14 +25,16 @@ export default wrapApiHandler(
 
     const model = await prisma.aiModel.upsert({
       where: {
-        provider_modelId: {
+        provider_serveur_modelId: {
           provider: data.provider,
+          serveur: data.serveur,
           modelId: data.modelId,
         },
       },
       update: { name: data.name },
       create: {
         provider: data.provider,
+        serveur: data.serveur,
         modelId: data.modelId,
         name: data.name,
       },

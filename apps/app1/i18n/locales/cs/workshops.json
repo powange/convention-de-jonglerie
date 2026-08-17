@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Vyberte nebo zadejte místo",
     "workshop_title": "Název semináře",
     "workshops_not_enabled": "Workshopy nejsou pro tuto edici povoleny",
-    "workshops_selected": "vybrané workshopy"
+    "workshops_selected": "vybrané workshopy",
+    "extraction_ignored": "Nepoužitelné workshopy",
+    "extraction_ignored_description": "Rozpoznáno workshopů: {count}, ale byly vyřazeny pro chybějící použitelné časy. Zvolte den ročníku a spusťte extrakci znovu.",
+    "import_forced_day": "Den ročníku",
+    "import_forced_day_description": "Pokud fotografie neuvádí datum, zvolte den, na který se workshopy umístí. Jejich časy zůstanou zachovány.",
+    "import_forced_day_none": "Použít data přečtená z fotografie"
   }
 }

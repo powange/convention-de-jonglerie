@@ -710,9 +710,6 @@
     "ai_timeout_help": "Tid, modellen får til at svare på et kald. En langsom lokal model har brug for mere: derefter afbrydes genereringen. Mellem 30 og 1800 sekunder.",
     "ai_lmstudio_backup_base_url": "Reserveadresse",
     "ai_lmstudio_backup_base_url_help": "Forsøges, hvis den første ikke kan nås — maskinen slukket, porten lukket. Lad stå tomt, hvis der ikke er nogen.",
-    "ai_backup_test": "Test",
-    "ai_backup_test_ok": "Reserveadresse kan nås — {count} model(ler) fundet",
-    "ai_backup_test_error": "Reserveadresse kan ikke nås",
     "backup_import_button": "Importér uden at gendanne",
     "backup_import_error": "Fejl under import af sikkerhedskopien",
     "backup_import_hint": "Importen føjer filen til listen nedenfor uden at røre databasen.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Flet brugerkonti",
     "merge_warning_description": "Den absorberede konto slettes permanent. Dens data knyttes først til den bevarede konto; dubletter (samme udgave, samme samtale osv.) frasorteres til fordel for den bevarede konto.",
     "merge_warning_title": "Uigenkaldelig handling",
-    "users_merged_successfully": "Kontiene blev flettet"
+    "users_merged_successfully": "Kontiene blev flettet",
+    "ai_lmstudio_backup_configured": "Konfigureret",
+    "ai_lmstudio_backup_intro": "Forsøges, når hovedserveren er utilgængelig. Hver maskine har sine egne installerede modeller, så angiv her dem, den er vært for.",
+    "ai_lmstudio_backup_model_help": "Efterlades feltet tomt, anmodes der om hovedserverens model — hvilket fejler, hvis denne maskine ikke er vært for den.",
+    "ai_lmstudio_backup_none": "Ingen",
+    "ai_lmstudio_backup_same_as_primary": "Som hovedserveren",
+    "ai_lmstudio_backup_title": "LM Studio — reserveserver",
+    "ai_lmstudio_primary_title": "LM Studio — hovedserver"
   }
 }

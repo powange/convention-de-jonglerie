@@ -710,9 +710,6 @@
     "ai_timeout_help": "Tid som modellen får för att svara på ett anrop. En långsam lokal modell behöver mer: därefter avbryts genereringen. Mellan 30 och 1800 sekunder.",
     "ai_lmstudio_backup_base_url": "Reservadress",
     "ai_lmstudio_backup_base_url_help": "Används om den första inte går att nå — maskinen avstängd, porten stängd. Lämna tomt om det inte finns någon.",
-    "ai_backup_test": "Testa",
-    "ai_backup_test_ok": "Reservadress nåbar — {count} modell(er) hittades",
-    "ai_backup_test_error": "Reservadress går inte att nå",
     "backup_import_button": "Importera utan att återställa",
     "backup_import_error": "Fel vid import av säkerhetskopian",
     "backup_import_hint": "Importen lägger till filen i listan nedan utan att röra databasen.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Slå samman användarkonton",
     "merge_warning_description": "Det absorberade kontot raderas permanent. Dess data kopplas först till det behållna kontot; dubbletter (samma upplaga, samma konversation osv.) sorteras bort till förmån för det behållna kontot.",
     "merge_warning_title": "Oåterkallelig åtgärd",
-    "users_merged_successfully": "Kontona har slagits samman"
+    "users_merged_successfully": "Kontona har slagits samman",
+    "ai_lmstudio_backup_configured": "Konfigurerad",
+    "ai_lmstudio_backup_intro": "Prövas när huvudservern inte går att nå. Varje maskin har sina egna installerade modeller, så ange här dem som den tillhandahåller.",
+    "ai_lmstudio_backup_model_help": "Lämnas fältet tomt begärs huvudserverns modell — vilket misslyckas om den här maskinen inte tillhandahåller den.",
+    "ai_lmstudio_backup_none": "Ingen",
+    "ai_lmstudio_backup_same_as_primary": "Som huvudservern",
+    "ai_lmstudio_backup_title": "LM Studio — reservserver",
+    "ai_lmstudio_primary_title": "LM Studio — huvudserver"
   }
 }

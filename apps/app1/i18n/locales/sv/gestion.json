@@ -699,7 +699,6 @@
       "convert": "Konvertera",
       "convert_intro": "Gör ”{title}” till en mer komplett post. Programpunkten tas bort.",
       "convert_target": "Konvertera till",
-      "convert_end_required": "Ange en sluttid: en workshop kräver det.",
       "convert_public_warning": "Workshops är alltid synliga för publiken: detta utkast blir det direkt.",
       "converted": "Punkt konverterad",
       "edit_place": "Ändra plats",

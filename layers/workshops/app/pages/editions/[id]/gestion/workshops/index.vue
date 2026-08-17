@@ -171,6 +171,7 @@
     <WorkshopsImportFromImageModal
       v-model:open="importWorkshopsModalOpen"
       :edition-id="editionId"
+      :edition="edition"
       @success="handleWorkshopsImportSuccess"
     />
   </div>

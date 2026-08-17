@@ -710,9 +710,6 @@
     "ai_timeout_help": "Time allowed for the model to answer a call. A slow local model needs more: beyond that, generation is aborted. Between 30 and 1800 seconds.",
     "ai_lmstudio_backup_base_url": "Backup address",
     "ai_lmstudio_backup_base_url_help": "Tried when the first one is unreachable — machine off, port closed. Leave empty if there is none.",
-    "ai_backup_test": "Test",
-    "ai_backup_test_ok": "Backup address reachable — {count} model(s) found",
-    "ai_backup_test_error": "Backup address unreachable",
     "backup_import_button": "Import without restoring",
     "backup_import_error": "Error while importing the backup",
     "backup_import_hint": "Importing adds the file to the list below without touching the database.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Merge user accounts",
     "merge_warning_description": "The absorbed account will be permanently deleted. Its data is first attached to the kept account; duplicates (same edition, same conversation, etc.) are discarded in favour of the kept account.",
     "merge_warning_title": "Irreversible action",
-    "users_merged_successfully": "Accounts merged successfully"
+    "users_merged_successfully": "Accounts merged successfully",
+    "ai_lmstudio_backup_configured": "Configured",
+    "ai_lmstudio_backup_intro": "Tried when the primary server is unreachable. Each machine has its own installed models, so indicate here the ones it hosts.",
+    "ai_lmstudio_backup_model_help": "Left empty, the primary server's model is requested — which fails if this machine does not host it.",
+    "ai_lmstudio_backup_none": "None",
+    "ai_lmstudio_backup_same_as_primary": "Same as the primary server",
+    "ai_lmstudio_backup_title": "LM Studio — backup server",
+    "ai_lmstudio_primary_title": "LM Studio — primary server"
   }
 }

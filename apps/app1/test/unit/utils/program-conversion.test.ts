@@ -35,8 +35,13 @@ describe('dureeEnMinutes', () => {
 })
 
 describe('manquesPourWorkshop', () => {
-  it('signale une heure de fin manquante', () => {
-    expect(manquesPourWorkshop({ endDateTime: null }).finRequise).toBe(true)
+  /**
+   * L'heure de fin n'est plus un manque : un workshop accepte de s'en passer, comme l'élément de
+   * programme dont il est issu. Convertir une scène ouverte sans fin annoncée ne réclame donc
+   * plus d'en inventer une.
+   */
+  it('ne réclame plus d’heure de fin', () => {
+    expect(manquesPourWorkshop({ endDateTime: null }).finRequise).toBe(false)
     expect(manquesPourWorkshop({ endDateTime: '2026-10-02T19:00:00Z' }).finRequise).toBe(false)
   })
 

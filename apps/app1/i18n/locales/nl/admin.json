@@ -710,9 +710,6 @@
     "ai_timeout_help": "Tijd die het model krijgt om op een aanroep te antwoorden. Een traag lokaal model heeft meer nodig: daarna wordt de generatie afgebroken. Tussen 30 en 1800 seconden.",
     "ai_lmstudio_backup_base_url": "Reserveadres",
     "ai_lmstudio_backup_base_url_help": "Wordt geprobeerd als het eerste onbereikbaar is — machine uit, poort dicht. Laat leeg als er geen is.",
-    "ai_backup_test": "Testen",
-    "ai_backup_test_ok": "Reserveadres bereikbaar — {count} model(len) gevonden",
-    "ai_backup_test_error": "Reserveadres onbereikbaar",
     "backup_import_button": "Importeren zonder herstellen",
     "backup_import_error": "Fout bij het importeren van de back-up",
     "backup_import_hint": "Het importeren voegt het bestand toe aan de lijst hieronder zonder de database aan te raken.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Gebruikersaccounts samenvoegen",
     "merge_warning_description": "Het geabsorbeerde account wordt definitief verwijderd. De gegevens worden eerst aan het behouden account gekoppeld; duplicaten (dezelfde editie, hetzelfde gesprek, enz.) worden verwijderd ten gunste van het behouden account.",
     "merge_warning_title": "Onomkeerbare actie",
-    "users_merged_successfully": "Accounts succesvol samengevoegd"
+    "users_merged_successfully": "Accounts succesvol samengevoegd",
+    "ai_lmstudio_backup_configured": "Geconfigureerd",
+    "ai_lmstudio_backup_intro": "Wordt geprobeerd wanneer de hoofdserver onbereikbaar is. Elke machine heeft haar eigen geïnstalleerde modellen, geef hier dus aan welke zij aanbiedt.",
+    "ai_lmstudio_backup_model_help": "Leeg gelaten wordt het model van de hoofdserver opgevraagd — wat mislukt als deze machine het niet aanbiedt.",
+    "ai_lmstudio_backup_none": "Geen",
+    "ai_lmstudio_backup_same_as_primary": "Zoals de hoofdserver",
+    "ai_lmstudio_backup_title": "LM Studio — reserveserver",
+    "ai_lmstudio_primary_title": "LM Studio — hoofdserver"
   }
 }

@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Wybierz lub wprowadź miejsce",
     "workshop_title": "Tytuł warsztatu",
     "workshops_not_enabled": "Warsztaty nie są włączone dla tej edycji",
-    "workshops_selected": "wybrane warsztaty"
+    "workshops_selected": "wybrane warsztaty",
+    "extraction_ignored": "Warsztaty nie do wykorzystania",
+    "extraction_ignored_description": "Wykryto warsztaty: {count}, ale je odrzucono z braku użytecznych godzin. Wybierz dzień edycji i ponów ekstrakcję.",
+    "import_forced_day": "Dzień edycji",
+    "import_forced_day_description": "Jeśli zdjęcie nie podaje daty, wybierz dzień, na którym umieścić warsztaty. Ich godziny zostaną zachowane.",
+    "import_forced_day_none": "Użyj dat odczytanych ze zdjęcia"
   }
 }

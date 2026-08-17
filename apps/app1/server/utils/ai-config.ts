@@ -1,5 +1,7 @@
 import { loggers } from './logger'
 
+import type { ServeurModele } from './fetch-helpers'
+
 const log = loggers.aiConfig
 
 /**
@@ -58,6 +60,8 @@ interface DbAiConfig {
   lmstudioBackupBaseUrl: string | null
   lmstudioModelId: string | null
   lmstudioTextModelId: string | null
+  lmstudioBackupModelId: string | null
+  lmstudioBackupTextModelId: string | null
   anthropicApiKey: string | null
   ollamaBaseUrl: string
   ollamaModel: string
@@ -100,6 +104,10 @@ export async function getEffectiveAIConfigAsync() {
     lmstudioBackupBaseUrl: dbConfig.lmstudioBackupBaseUrl,
     lmstudioModel: dbConfig.lmstudioModelId,
     lmstudioTextModel: dbConfig.lmstudioTextModelId,
+    // Modèles de la machine de secours. Laissés vides, ceux du serveur principal s'appliquent :
+    // les configurations existantes gardent ainsi exactement leur comportement.
+    lmstudioBackupModel: dbConfig.lmstudioBackupModelId,
+    lmstudioBackupTextModel: dbConfig.lmstudioBackupTextModelId,
     anthropicApiKey: dbConfig.anthropicApiKey,
     ollamaBaseUrl: dbConfig.ollamaBaseUrl,
     ollamaModel: dbConfig.ollamaModel,
@@ -108,6 +116,43 @@ export async function getEffectiveAIConfigAsync() {
     browserlessUrl:
       process.env.BROWSERLESS_URL || process.env.NUXT_BROWSERLESS_URL || config.browserlessUrl,
   }
+}
+
+/**
+ * Les serveurs LM Studio à essayer, dans l'ordre, avec le modèle à demander à chacun.
+ *
+ * Deux machines n'hébergent pas forcément les mêmes modèles : réclamer à celle de secours le
+ * modèle de la principale la ferait échouer alors qu'elle répondait. Chaque adresse porte donc
+ * le sien. Quand les modèles de secours ne sont pas renseignés, ceux du serveur principal
+ * s'appliquent — une configuration existante se comporte ainsi exactement comme avant.
+ *
+ * Une adresse vide vient d'un champ laissé blanc et ne compte pas.
+ */
+export function serveursLmStudio(
+  config: {
+    lmstudioBaseUrl?: string | null
+    lmstudioBackupBaseUrl?: string | null
+    lmstudioModel?: string | null
+    lmstudioTextModel?: string | null
+    lmstudioBackupModel?: string | null
+    lmstudioBackupTextModel?: string | null
+  },
+  usage: 'texte' | 'vision'
+): ServeurModele[] {
+  const principal =
+    usage === 'texte'
+      ? config.lmstudioTextModel || config.lmstudioModel
+      : config.lmstudioModel || config.lmstudioTextModel
+
+  const secours =
+    usage === 'texte'
+      ? config.lmstudioBackupTextModel || config.lmstudioBackupModel
+      : config.lmstudioBackupModel || config.lmstudioBackupTextModel
+
+  return [
+    { base: config.lmstudioBaseUrl || 'http://localhost:1234', model: principal || 'auto' },
+    { base: config.lmstudioBackupBaseUrl || '', model: secours || principal || 'auto' },
+  ].filter((s) => s.base.trim() !== '')
 }
 
 /**
@@ -132,6 +177,8 @@ export function serializeAiConfig(config: {
   lmstudioBackupBaseUrl: string | null
   lmstudioModelId: string | null
   lmstudioTextModelId: string | null
+  lmstudioBackupModelId: string | null
+  lmstudioBackupTextModelId: string | null
   anthropicApiKey: string | null
   ollamaBaseUrl: string
   ollamaModel: string
@@ -143,6 +190,8 @@ export function serializeAiConfig(config: {
     lmstudioBackupBaseUrl: config.lmstudioBackupBaseUrl,
     lmstudioModelId: config.lmstudioModelId,
     lmstudioTextModelId: config.lmstudioTextModelId,
+    lmstudioBackupModelId: config.lmstudioBackupModelId,
+    lmstudioBackupTextModelId: config.lmstudioBackupTextModelId,
     anthropicApiKey: config.anthropicApiKey ? '****' : null,
     ollamaBaseUrl: config.ollamaBaseUrl,
     ollamaModel: config.ollamaModel,

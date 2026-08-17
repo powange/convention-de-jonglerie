@@ -71,6 +71,15 @@
             </div>
           </UFormField>
 
+          <!-- Journée à imposer quand l'affiche n'indique pas de date -->
+          <UFormField
+            v-if="dayOptions.length"
+            :label="$t('workshops.import_forced_day')"
+            :description="$t('workshops.import_forced_day_description')"
+          >
+            <USelect v-model="forcedDay" :items="dayOptions" class="w-full" />
+          </UFormField>
+
           <!-- Aide contextuelle -->
           <UAlert
             icon="i-heroicons-information-circle"
@@ -151,12 +160,13 @@
                       :placeholder="$t('workshops.start_datetime')"
                       required
                     />
+                    <!-- Facultative : l'affiche n'annonce pas toujours de fin. -->
                     <UiDateTimePicker
                       v-model="workshop.endDateTime"
                       :date-label="$t('workshops.end_date')"
                       :time-label="$t('workshops.end_time')"
                       :placeholder="$t('workshops.end_datetime')"
-                      required
+                      clearable
                     />
                   </div>
 
@@ -249,22 +259,38 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-const { t } = useI18n()
+import {
+  formaterJournee,
+  journeesEntre,
+  versChampLocal,
+  versInstant,
+} from '~~/shared/utils/fuseau-edition'
+
+const { t, locale } = useI18n()
 const toast = useToast()
 
 interface WorkshopExtracted {
   title: string
   description?: string
   startDateTime: string
+  /** Facultative : l'affiche n'annonce pas toujours de fin, et rien n'est inventé à sa place. */
   endDateTime: string
   maxParticipants?: number
   location?: string
   selected: boolean
 }
 
+/** Bornes et fuseau de l'édition, pour proposer ses journées et ancrer les horaires saisis. */
+interface EditionDates {
+  startDate?: string | Date | null
+  endDate?: string | Date | null
+  timezone?: string | null
+}
+
 interface Props {
   open: boolean
   editionId: number
+  edition?: EditionDates | null
 }
 
 const props = defineProps<Props>()
@@ -288,11 +314,57 @@ const extracting = ref(false)
 const importing = ref(false)
 const extractedWorkshops = ref<WorkshopExtracted[]>([])
 const errorMessage = ref('')
+/**
+ * Valeur du choix « pas de journée imposée ».
+ *
+ * Une chaîne vide serait plus naturelle, mais le Select la réserve à l'effacement de la sélection
+ * et refuse une option qui la porte : il faut donc une valeur sentinelle, traduite en « rien » au
+ * moment de l'appel.
+ */
+const AUCUNE_JOURNEE = 'auto'
+
+const forcedDay = ref<string>(AUCUNE_JOURNEE)
 
 // Computed
 const selectedWorkshopsCount = computed(() => {
   return extractedWorkshops.value.filter((w) => w.selected).length
 })
+
+/** Fuseau de la convention : c'est lui qui ancre les horaires, jamais celui du navigateur. */
+const fuseau = computed(() => props.edition?.timezone ?? null)
+
+/**
+ * Journées de l'édition, proposées quand l'affiche n'indique aucune date. La liste ne sort jamais
+ * des bornes de l'édition, un atelier posé en dehors étant de toute façon refusé à l'création.
+ */
+const dayOptions = computed(() => {
+  const journees = journeesEntre(props.edition?.startDate, props.edition?.endDate, fuseau.value)
+  if (!journees.length) return []
+  return [
+    { label: t('workshops.import_forced_day_none'), value: AUCUNE_JOURNEE },
+    ...journees.map((journee) => ({
+      label: formaterJournee(journee, fuseau.value, locale.value),
+      value: journee,
+    })),
+  ]
+})
+
+/**
+ * Date-heure extraite → champ de saisie `AAAA-MM-JJTHH:MM`.
+ *
+ * L'IA rend une heure de lieu, sans fuseau : « 14 h » veut dire 14 h sur place. La lire avec
+ * `new Date(...)` l'ancrait dans le fuseau du navigateur, puis `toISOString()` la ramenait en UTC —
+ * un organisateur à Paris voyait ses ateliers reculer de deux heures, et un atelier de fin de
+ * soirée changeait de jour, ce qui privait justement de tout effet le choix d'une journée.
+ * Une chaîne qui porterait malgré tout un fuseau est, elle, ramenée dans celui de l'édition.
+ */
+const versChampSaisie = (dateHeure: string | undefined): string => {
+  if (!dateHeure) return ''
+  const porteUnFuseau = /(?:Z|[+-]\d{2}:?\d{2})$/.test(dateHeure)
+  if (porteUnFuseau) return versChampLocal(dateHeure, fuseau.value)
+  const local = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.exec(dateHeure)
+  return local ? dateHeure.slice(0, 16) : ''
+}
 
 // Méthodes de gestion de fichier
 const triggerFileInput = () => {
@@ -375,24 +447,35 @@ const extractWorkshops = async () => {
     const base64Image = reader.result as string
 
     // Appeler l'API d'extraction
-    const response = await $fetch<{ data: { workshops: WorkshopExtracted[] } }>(
-      `/api/editions/${props.editionId}/workshops/extract-from-image`,
-      {
-        method: 'POST',
-        body: {
-          image: base64Image,
-        },
-      }
-    )
+    const response = await $fetch<{
+      data: { workshops: WorkshopExtracted[]; ignoredCount?: number }
+    }>(`/api/editions/${props.editionId}/workshops/extract-from-image`, {
+      method: 'POST',
+      body: {
+        image: base64Image,
+        forcedDate: forcedDay.value === AUCUNE_JOURNEE ? undefined : forcedDay.value,
+      },
+    })
 
     // Marquer tous les workshops comme sélectionnés par défaut
-    // Convertir les dates ISO en format datetime-local (YYYY-MM-DDTHH:mm)
     extractedWorkshops.value = response.data.workshops.map((w) => ({
       ...w,
-      startDateTime: w.startDateTime ? new Date(w.startDateTime).toISOString().slice(0, 16) : '',
-      endDateTime: w.endDateTime ? new Date(w.endDateTime).toISOString().slice(0, 16) : '',
+      startDateTime: versChampSaisie(w.startDateTime),
+      endDateTime: versChampSaisie(w.endDateTime),
       selected: true,
     }))
+
+    // Les ateliers écartés faute de dates exploitables disparaissaient sans un mot.
+    if (response.data.ignoredCount) {
+      toast.add({
+        title: t('workshops.extraction_ignored'),
+        description: t('workshops.extraction_ignored_description', {
+          count: response.data.ignoredCount,
+        }),
+        color: 'warning',
+        icon: 'i-heroicons-exclamation-triangle',
+      })
+    }
 
     if (extractedWorkshops.value.length === 0) {
       toast.add({
@@ -467,8 +550,12 @@ const importSelectedWorkshops = async () => {
           body: {
             title: workshop.title,
             description: workshop.description,
-            startDateTime: workshop.startDateTime,
-            endDateTime: workshop.endDateTime,
+            // Les champs de saisie ne portent aucun fuseau : c'est celui de la convention qui les
+            // ancre, comme pour la création manuelle d'un atelier.
+            startDateTime: versInstant(workshop.startDateTime, fuseau.value),
+            endDateTime: workshop.endDateTime
+              ? versInstant(workshop.endDateTime, fuseau.value)
+              : null,
             maxParticipants: workshop.maxParticipants || null,
             location: workshop.location,
           },
@@ -525,6 +612,7 @@ const resetExtraction = () => {
 const closeModal = () => {
   clearImage()
   resetExtraction()
+  forcedDay.value = AUCUNE_JOURNEE
   isOpen.value = false
 }
 

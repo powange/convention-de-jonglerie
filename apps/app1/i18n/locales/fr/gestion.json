@@ -710,7 +710,6 @@
       "convert": "Convertir",
       "convert_intro": "Transformer « {title} » en une fiche plus complète. L'élément de programme sera supprimé.",
       "convert_target": "Convertir en",
-      "convert_end_required": "Indiquez une heure de fin : un workshop en exige une.",
       "convert_public_warning": "Les workshops sont toujours visibles du public : ce brouillon le deviendra aussitôt.",
       "converted": "Élément converti",
       "page_public": "Page publique",

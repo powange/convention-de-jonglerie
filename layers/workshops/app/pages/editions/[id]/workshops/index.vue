@@ -62,10 +62,13 @@
                     >
                       <div class="flex items-center gap-1">
                         <UIcon name="i-heroicons-clock" />
-                        <span
+                        <!-- Sans heure de fin annoncée, on n'affiche que le début plutôt que
+                             de laisser un tiret suspendu. -->
+                        <span v-if="workshop.endDateTime"
                           >{{ formatTime(workshop.startDateTime) }} -
                           {{ formatTime(workshop.endDateTime) }}</span
                         >
+                        <span v-else>{{ formatTime(workshop.startDateTime) }}</span>
                       </div>
                       <div v-if="workshop.location" class="flex items-center gap-1">
                         <NuxtLink
@@ -274,6 +277,7 @@
                 :max-date="editionEndDate"
                 required
               />
+              <!-- Facultative : un atelier peut n'annoncer que son heure de début. -->
               <UiDateTimePicker
                 v-model="formData.endDateTime"
                 :date-label="$t('workshops.end_date')"
@@ -281,7 +285,7 @@
                 :placeholder="$t('workshops.end_datetime')"
                 :min-date="editionStartDate"
                 :max-date="editionEndDate"
-                required
+                clearable
               />
             </div>
 
@@ -492,24 +496,26 @@ const canEdit = (workshop: any) => {
 }
 
 const isFormValid = computed(() => {
-  if (
-    !formData.value.title.trim() ||
-    !formData.value.startDateTime ||
-    !formData.value.endDateTime
-  ) {
+  // L'heure de fin n'est pas exigée : un atelier peut n'annoncer que son début.
+  if (!formData.value.title.trim() || !formData.value.startDateTime) {
     return false
   }
 
   // Vérifier que le workshop est pendant l'édition
   if (edition.value) {
     const workshopStart = new Date(versInstant(formData.value.startDateTime, fuseau.value))
-    const workshopEnd = new Date(versInstant(formData.value.endDateTime, fuseau.value))
     const editionStart = new Date(edition.value.startDate)
     const editionEnd = new Date(edition.value.endDate)
 
-    // Le workshop doit commencer et finir pendant l'édition
-    if (workshopStart < editionStart || workshopEnd > editionEnd) {
+    if (workshopStart < editionStart || workshopStart > editionEnd) {
       return false
+    }
+
+    if (formData.value.endDateTime) {
+      const workshopEnd = new Date(versInstant(formData.value.endDateTime, fuseau.value))
+      if (workshopEnd <= workshopStart || workshopEnd > editionEnd) {
+        return false
+      }
     }
   }
 
@@ -518,17 +524,29 @@ const isFormValid = computed(() => {
 
 // Message d'erreur si les dates sont hors de l'édition
 const dateValidationError = computed(() => {
-  if (!formData.value.startDateTime || !formData.value.endDateTime || !edition.value) {
+  if (!formData.value.startDateTime || !edition.value) {
     return null
   }
 
   const workshopStart = new Date(versInstant(formData.value.startDateTime, fuseau.value))
-  const workshopEnd = new Date(versInstant(formData.value.endDateTime, fuseau.value))
   const editionStart = new Date(edition.value.startDate)
   const editionEnd = new Date(edition.value.endDate)
 
   if (workshopStart < editionStart) {
     return `Le workshop ne peut pas commencer avant le début de l'édition (${formatDate(edition.value.startDate)})`
+  }
+
+  if (workshopStart > editionEnd) {
+    return `Le workshop ne peut pas commencer après la fin de l'édition (${formatDate(edition.value.endDate)})`
+  }
+
+  // Sans heure de fin annoncée, il n'y a rien de plus à vérifier.
+  if (!formData.value.endDateTime) return null
+
+  const workshopEnd = new Date(versInstant(formData.value.endDateTime, fuseau.value))
+
+  if (workshopEnd <= workshopStart) {
+    return 'La date de fin doit être après la date de début'
   }
 
   if (workshopEnd > editionEnd) {
@@ -598,11 +616,17 @@ const calculatedDuration = computed(() => {
   }
 })
 
-// Ajuster automatiquement la date de fin quand la date de début change
+/**
+ * Recale une heure de fin devenue antérieure au début.
+ *
+ * N'en crée jamais : remplir automatiquement une fin dès la saisie du début reviendrait à
+ * inventer une durée que personne n'a annoncée, et empêcherait d'enregistrer un atelier qui dure
+ * ce qu'il dure. Les raccourcis « durée rapide » restent là pour qui veut en poser une.
+ */
 watch(
   () => formData.value.startDateTime,
   (newVal) => {
-    if (newVal && (!formData.value.endDateTime || formData.value.endDateTime <= newVal)) {
+    if (newVal && formData.value.endDateTime && formData.value.endDateTime <= newVal) {
       formData.value.endDateTime = addHoursToDateTimeLocal(newVal, 1)
     }
   }
@@ -693,7 +717,7 @@ const editWorkshop = (workshop: any) => {
     title: workshop.title,
     description: workshop.description || '',
     startDateTime: versChampLocal(workshop.startDateTime, fuseau.value),
-    endDateTime: versChampLocal(workshop.endDateTime, fuseau.value),
+    endDateTime: workshop.endDateTime ? versChampLocal(workshop.endDateTime, fuseau.value) : '',
     maxParticipants: workshop.maxParticipants,
     locationId: workshop.location?.id || null,
     locationName: workshop.location?.name || '',
@@ -723,7 +747,10 @@ const buildWorkshopBody = () => {
     // Le champ `datetime-local` ne porte aucun fuseau : c'est celui de la convention qui
     // l'ancre, et non celui du navigateur de l'organisateur.
     startDateTime: versInstant(formData.value.startDateTime, fuseau.value),
-    endDateTime: versInstant(formData.value.endDateTime, fuseau.value),
+    // `null` explicite plutôt qu'omis : c'est ce qui permet de retirer une heure de fin.
+    endDateTime: formData.value.endDateTime
+      ? versInstant(formData.value.endDateTime, fuseau.value)
+      : null,
     maxParticipants: formData.value.maxParticipants || null,
   }
 

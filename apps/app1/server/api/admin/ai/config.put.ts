@@ -16,6 +16,9 @@ const bodySchema = z.object({
   lmstudioBackupBaseUrl: z.string().url().or(z.literal('')).nullish(),
   lmstudioModelId: z.string().nullable().default(null),
   lmstudioTextModelId: z.string().nullable().default(null),
+  // Modèles de la machine de secours. Laissés vides, ceux du serveur principal s'appliquent.
+  lmstudioBackupModelId: z.string().nullable().default(null),
+  lmstudioBackupTextModelId: z.string().nullable().default(null),
   anthropicApiKey: z.string().nullable().default(null),
   ollamaBaseUrl: z.string().url().default('http://localhost:11434'),
   ollamaModel: z.string().default('llava'),
@@ -41,6 +44,8 @@ export default wrapApiHandler(
       lmstudioBackupBaseUrl: data.lmstudioBackupBaseUrl || null,
       lmstudioModelId: data.lmstudioModelId,
       lmstudioTextModelId: data.lmstudioTextModelId,
+      lmstudioBackupModelId: data.lmstudioBackupModelId,
+      lmstudioBackupTextModelId: data.lmstudioBackupTextModelId,
       ollamaBaseUrl: data.ollamaBaseUrl,
       ollamaModel: data.ollamaModel,
       llmTimeoutMs: data.llmTimeoutMs,

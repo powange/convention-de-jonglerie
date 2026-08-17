@@ -710,9 +710,6 @@
     "ai_timeout_help": "Tiempo concedido al modelo para responder a una llamada. Un modelo local lento necesita más: al superarlo, se cancela la generación. Entre 30 y 1800 segundos.",
     "ai_lmstudio_backup_base_url": "Dirección de respaldo",
     "ai_lmstudio_backup_base_url_help": "Se usa si la primera no está accesible — máquina apagada, puerto cerrado. Déjelo vacío si no hay ninguna.",
-    "ai_backup_test": "Probar",
-    "ai_backup_test_ok": "Dirección de respaldo accesible — {count} modelo(s) detectado(s)",
-    "ai_backup_test_error": "Dirección de respaldo inaccesible",
     "backup_import_button": "Importar sin restaurar",
     "backup_import_error": "Error al importar la copia de seguridad",
     "backup_import_hint": "La importación añade el archivo a la lista de abajo sin tocar la base de datos.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Fusión de cuentas de usuario",
     "merge_warning_description": "La cuenta absorbida se eliminará definitivamente. Sus datos se vinculan primero a la cuenta conservada; los duplicados (misma edición, misma conversación, etc.) se descartan en favor de la cuenta conservada.",
     "merge_warning_title": "Acción irreversible",
-    "users_merged_successfully": "Cuentas fusionadas con éxito"
+    "users_merged_successfully": "Cuentas fusionadas con éxito",
+    "ai_lmstudio_backup_configured": "Configurado",
+    "ai_lmstudio_backup_intro": "Se intenta cuando el servidor principal es inaccesible. Como cada máquina tiene sus propios modelos instalados, indique aquí los que aloja.",
+    "ai_lmstudio_backup_model_help": "Si se deja vacío, se solicita el modelo del servidor principal, lo que falla si esta máquina no lo aloja.",
+    "ai_lmstudio_backup_none": "Ninguno",
+    "ai_lmstudio_backup_same_as_primary": "Igual que el servidor principal",
+    "ai_lmstudio_backup_title": "LM Studio — servidor de reserva",
+    "ai_lmstudio_primary_title": "LM Studio — servidor principal"
   }
 }

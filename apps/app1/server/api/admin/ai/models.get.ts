@@ -11,8 +11,14 @@ export default wrapApiHandler(
 
     const query = getQuery(event)
     const provider = query.provider as string | undefined
+    // Chaque serveur LM Studio a son propre catalogue : la machine de secours n'héberge pas
+    // forcément les mêmes modèles que la principale.
+    const serveur = query.serveur as string | undefined
 
-    const where = provider ? { provider } : {}
+    const where = {
+      ...(provider ? { provider } : {}),
+      ...(serveur ? { serveur } : {}),
+    }
 
     const models = await prisma.aiModel.findMany({
       where,

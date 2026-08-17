@@ -710,9 +710,6 @@
     "ai_timeout_help": "Zeit, die dem Modell für die Antwort auf einen Aufruf zugestanden wird. Ein langsames lokales Modell braucht mehr: darüber hinaus wird die Generierung abgebrochen. Zwischen 30 und 1800 Sekunden.",
     "ai_lmstudio_backup_base_url": "Ausweichadresse",
     "ai_lmstudio_backup_base_url_help": "Wird versucht, wenn die erste nicht erreichbar ist — Rechner aus, Port geschlossen. Leer lassen, wenn keine vorhanden ist.",
-    "ai_backup_test": "Testen",
-    "ai_backup_test_ok": "Ausweichadresse erreichbar — {count} Modell(e) gefunden",
-    "ai_backup_test_error": "Ausweichadresse nicht erreichbar",
     "backup_import_button": "Importieren ohne Wiederherstellung",
     "backup_import_error": "Fehler beim Importieren der Sicherung",
     "backup_import_hint": "Der Import fügt die Datei der Liste unten hinzu, ohne die Datenbank zu verändern.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Benutzerkonten zusammenführen",
     "merge_warning_description": "Das übernommene Konto wird endgültig gelöscht. Seine Daten werden zuerst dem beibehaltenen Konto zugeordnet; Duplikate (gleiche Ausgabe, gleiche Unterhaltung usw.) werden zugunsten des beibehaltenen Kontos verworfen.",
     "merge_warning_title": "Unwiderrufliche Aktion",
-    "users_merged_successfully": "Konten erfolgreich zusammengeführt"
+    "users_merged_successfully": "Konten erfolgreich zusammengeführt",
+    "ai_lmstudio_backup_configured": "Konfiguriert",
+    "ai_lmstudio_backup_intro": "Wird versucht, wenn der Hauptserver nicht erreichbar ist. Da jede Maschine ihre eigenen Modelle installiert hat, geben Sie hier an, welche sie bereitstellt.",
+    "ai_lmstudio_backup_model_help": "Bleibt das Feld leer, wird das Modell des Hauptservers angefragt — was fehlschlägt, wenn diese Maschine es nicht bereitstellt.",
+    "ai_lmstudio_backup_none": "Keiner",
+    "ai_lmstudio_backup_same_as_primary": "Wie der Hauptserver",
+    "ai_lmstudio_backup_title": "LM Studio — Ersatzserver",
+    "ai_lmstudio_primary_title": "LM Studio — Hauptserver"
   }
 }

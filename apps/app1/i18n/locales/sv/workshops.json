@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Välj eller ange en plats",
     "workshop_title": "Titel på workshop",
     "workshops_not_enabled": "Workshops är inte aktiverade för denna utgåva",
-    "workshops_selected": "utvalda workshops"
+    "workshops_selected": "utvalda workshops",
+    "extraction_ignored": "Oanvändbara workshoppar",
+    "extraction_ignored_description": "{count} workshop(par) hittades men sorterades bort, i brist på användbara tider. Välj en dag i upplagan och kör utdragningen igen.",
+    "import_forced_day": "Dag i upplagan",
+    "import_forced_day_description": "Om fotot inte anger något datum, välj den dag som workshopparna ska placeras på. Deras tider behålls.",
+    "import_forced_day_none": "Använd datumen som lästs på fotot"
   }
 }

@@ -58,199 +58,47 @@
       </UCard>
 
       <!-- LM Studio -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon
-              name="i-heroicons-computer-desktop"
-              class="h-5 w-5 text-blue-600 dark:text-blue-400"
-            />
-            <h2 class="font-semibold text-lg">LM Studio</h2>
-            <UBadge v-if="form.provider === 'lmstudio'" color="success" variant="subtle" size="sm">
-              {{ $t('admin.ai_active') }}
-            </UBadge>
-          </div>
-        </template>
+      <!-- Les deux serveurs LM Studio, chacun avec son adresse, son catalogue et ses modèles.
+           Deux machines distinctes n'hébergent pas forcément les mêmes modèles : réclamer à
+           celle de secours ceux de la principale la ferait échouer alors qu'elle répondait. -->
+      <AdminAiLmStudioCard
+        v-model:base-url="form.lmstudioBaseUrl"
+        v-model:vision-model="form.lmstudioModelId"
+        v-model:text-model="form.lmstudioTextModelId"
+        serveur="principal"
+        :titre="$t('admin.ai_lmstudio_primary_title')"
+        icone="i-heroicons-computer-desktop"
+        couleur-icone="text-blue-600 dark:text-blue-400"
+        placeholder-adresse="http://host.docker.internal:1234"
+        :placeholder-modele="$t('admin.ai_select_model')"
+        :badge="
+          form.provider === 'lmstudio'
+            ? { texte: $t('admin.ai_active'), couleur: 'success' }
+            : undefined
+        "
+      />
 
-        <div class="space-y-6">
-          <!-- URL de base -->
-          <UFormField :label="$t('admin.ai_lmstudio_base_url')">
-            <div class="flex gap-2 items-center">
-              <UInput
-                v-model="form.lmstudioBaseUrl"
-                class="w-full max-w-md"
-                placeholder="http://host.docker.internal:1234"
-              />
-              <UButton
-                variant="soft"
-                :loading="testUrlDeBaseEnCours"
-                :disabled="!form.lmstudioBaseUrl"
-                @click="testerUrlDeBase"
-              >
-                {{ $t('admin.ai_base_url_test') }}
-              </UButton>
-            </div>
-          </UFormField>
-
-          <!-- Adresse de secours -->
-          <UFormField
-            :label="$t('admin.ai_lmstudio_backup_base_url')"
-            :description="$t('admin.ai_lmstudio_backup_base_url_help')"
-          >
-            <div class="flex gap-2 items-center">
-              <UInput
-                v-model="form.lmstudioBackupBaseUrl"
-                class="w-full max-w-md"
-                placeholder="http://192.168.0.12:1234"
-              />
-              <!-- Une adresse de secours qu'on ne peut pas éprouver est une fausse assurance :
-                   on découvrirait qu'elle est fausse au moment précis où la première tombe. -->
-              <UButton
-                variant="soft"
-                :loading="testSecoursEnCours"
-                :disabled="!form.lmstudioBackupBaseUrl"
-                @click="testerAdresseDeSecours"
-              >
-                {{ $t('admin.ai_backup_test') }}
-              </UButton>
-            </div>
-          </UFormField>
-
-          <!-- Liste des modèles -->
-          <div>
-            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              {{ $t('admin.ai_models_list') }}
-            </h3>
-
-            <div v-if="models.length === 0" class="text-sm text-gray-500 dark:text-gray-400 mb-3">
-              {{ $t('admin.ai_no_models') }}
-            </div>
-
-            <div v-else class="space-y-2 mb-3">
-              <div
-                v-for="model in models"
-                :key="model.id"
-                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-              >
-                <div>
-                  <span class="font-medium text-sm">{{ model.name }}</span>
-                  <span class="text-xs text-gray-500 dark:text-gray-400 ml-2"
-                    >({{ model.modelId }})</span
-                  >
-                </div>
-                <UButton
-                  color="error"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-heroicons-trash"
-                  :loading="isDeletingModel(model.id)"
-                  @click="confirmDeleteModel(model)"
-                />
-              </div>
-            </div>
-
-            <!-- Actions modèles -->
-            <div class="flex flex-wrap gap-2">
-              <UButton
-                variant="outline"
-                size="sm"
-                icon="i-heroicons-plus"
-                @click="showAddModel = true"
-              >
-                {{ $t('admin.ai_add_model') }}
-              </UButton>
-              <UButton
-                variant="outline"
-                size="sm"
-                icon="i-heroicons-magnifying-glass"
-                :loading="detecting"
-                @click="detectModels"
-              >
-                {{ $t('admin.ai_detect_models') }}
-              </UButton>
-            </div>
-
-            <!-- Formulaire d'ajout inline -->
-            <div
-              v-if="showAddModel"
-              class="mt-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
-            >
-              <div class="flex flex-col sm:flex-row gap-3">
-                <UFormField :label="$t('admin.ai_model_id')" class="flex-1">
-                  <UInput v-model="newModel.modelId" placeholder="gemma-3-12b-it" />
-                </UFormField>
-                <UFormField :label="$t('admin.ai_model_name')" class="flex-1">
-                  <UInput v-model="newModel.name" placeholder="Gemma 3 12B IT" />
-                </UFormField>
-              </div>
-              <div class="flex gap-2 mt-3">
-                <UButton size="sm" :loading="addingModel" @click="addModel">
-                  {{ $t('common.add') }}
-                </UButton>
-                <UButton size="sm" variant="ghost" @click="showAddModel = false">
-                  {{ $t('common.cancel') }}
-                </UButton>
-              </div>
-            </div>
-
-            <!-- Résultats auto-détection -->
-            <div
-              v-if="detectedModels.length > 0"
-              class="mt-3 p-4 border border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50 dark:bg-blue-900/20"
-            >
-              <h4 class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
-                {{ $t('admin.ai_detected_models', { count: detectedModels.length }) }}
-              </h4>
-              <div class="space-y-2">
-                <div
-                  v-for="detected in detectedModels"
-                  :key="detected.modelId"
-                  class="flex items-center justify-between"
-                >
-                  <div>
-                    <span class="text-sm font-medium">{{ detected.modelId }}</span>
-                    <span v-if="detected.contextLength" class="text-xs text-gray-500 ml-2">
-                      ({{ detected.contextLength }} tokens)
-                    </span>
-                  </div>
-                  <UButton
-                    v-if="!isModelRegistered(detected.modelId)"
-                    size="xs"
-                    variant="soft"
-                    icon="i-heroicons-plus"
-                    @click="addDetectedModel(detected)"
-                  >
-                    {{ $t('common.add') }}
-                  </UButton>
-                  <UBadge v-else color="success" variant="subtle" size="sm">
-                    {{ $t('admin.ai_already_added') }}
-                  </UBadge>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sélection du modèle vision -->
-          <UFormField :label="$t('admin.ai_lmstudio_vision_model')">
-            <USelect
-              v-model="form.lmstudioModelId"
-              class="w-full max-w-md"
-              :items="modelSelectItems"
-              :placeholder="$t('admin.ai_select_model')"
-            />
-          </UFormField>
-
-          <!-- Sélection du modèle texte -->
-          <UFormField :label="$t('admin.ai_lmstudio_text_model')">
-            <USelect
-              v-model="form.lmstudioTextModelId"
-              class="w-full max-w-md"
-              :items="modelSelectItems"
-              :placeholder="$t('admin.ai_select_model')"
-            />
-          </UFormField>
-        </div>
-      </UCard>
+      <AdminAiLmStudioCard
+        v-model:base-url="form.lmstudioBackupBaseUrl"
+        v-model:vision-model="form.lmstudioBackupModelId"
+        v-model:text-model="form.lmstudioBackupTextModelId"
+        serveur="secours"
+        :titre="$t('admin.ai_lmstudio_backup_title')"
+        icone="i-heroicons-lifebuoy"
+        couleur-icone="text-purple-600 dark:text-purple-400"
+        :introduction="$t('admin.ai_lmstudio_backup_intro')"
+        :aide-adresse="$t('admin.ai_lmstudio_backup_base_url_help')"
+        :aide-modeles="$t('admin.ai_lmstudio_backup_model_help')"
+        placeholder-adresse="http://192.168.0.12:1234"
+        :placeholder-modele="$t('admin.ai_lmstudio_backup_same_as_primary')"
+        effacable
+        :libelle-effacer="$t('admin.ai_lmstudio_backup_same_as_primary')"
+        :badge="
+          form.lmstudioBackupBaseUrl
+            ? { texte: $t('admin.ai_lmstudio_backup_configured'), couleur: 'success' }
+            : { texte: $t('admin.ai_lmstudio_backup_none'), couleur: 'neutral' }
+        "
+      />
 
       <!-- Anthropic -->
       <UCard>
@@ -367,20 +215,6 @@
         </UButton>
       </div>
     </div>
-
-    <!-- Modal de confirmation de suppression -->
-    <UiConfirmModal
-      v-model="showDeleteModal"
-      :title="$t('admin.ai_model_confirm_delete_title')"
-      :description="$t('admin.ai_model_confirm_delete', { name: modelToDelete?.name })"
-      :confirm-label="$t('common.delete')"
-      :cancel-label="$t('common.cancel')"
-      confirm-color="error"
-      icon-name="i-heroicons-trash"
-      icon-color="text-red-500"
-      @confirm="executeDeleteModel"
-      @cancel="showDeleteModal = false"
-    />
   </div>
 </template>
 
@@ -399,6 +233,9 @@ const form = reactive({
   lmstudioBackupBaseUrl: '',
   lmstudioModelId: '' as string,
   lmstudioTextModelId: '' as string,
+  // Vides, les modèles du serveur principal s'appliquent au secours.
+  lmstudioBackupModelId: '' as string,
+  lmstudioBackupTextModelId: '' as string,
   anthropicApiKey: '' as string,
   ollamaBaseUrl: 'http://localhost:11434',
   ollamaModel: 'llava',
@@ -407,23 +244,6 @@ const form = reactive({
   llmTimeoutSeconds: 180,
 })
 
-const models = ref<Array<{ id: number; provider: string; modelId: string; name: string }>>([])
-const showAddModel = ref(false)
-const newModel = reactive({ modelId: '', name: '' })
-const detectedModels = ref<Array<{ modelId: string; name: string; contextLength: number | null }>>(
-  []
-)
-
-// --- Confirmation suppression ---
-
-const showDeleteModal = ref(false)
-const modelToDelete = ref<{ id: number; name: string; modelId: string } | null>(null)
-
-function confirmDeleteModel(model: { id: number; name: string; modelId: string }) {
-  modelToDelete.value = model
-  showDeleteModal.value = true
-}
-
 // --- Options ---
 
 const providerOptions = [
@@ -431,13 +251,6 @@ const providerOptions = [
   { label: 'Anthropic (Claude)', value: 'anthropic' },
   { label: 'Ollama', value: 'ollama' },
 ]
-
-const modelSelectItems = computed(() => {
-  return models.value.map((m) => ({
-    label: m.name,
-    value: m.modelId,
-  }))
-})
 
 // --- Chargement initial ---
 
@@ -450,6 +263,8 @@ const { pending: configPending } = await useLazyFetch('/api/admin/ai/config', {
       form.lmstudioBackupBaseUrl = cfg.lmstudioBackupBaseUrl || ''
       form.lmstudioModelId = cfg.lmstudioModelId ?? ''
       form.lmstudioTextModelId = cfg.lmstudioTextModelId ?? ''
+      form.lmstudioBackupModelId = cfg.lmstudioBackupModelId ?? ''
+      form.lmstudioBackupTextModelId = cfg.lmstudioBackupTextModelId ?? ''
       form.anthropicApiKey = cfg.anthropicApiKey ?? ''
       form.ollamaBaseUrl = cfg.ollamaBaseUrl || 'http://localhost:11434'
       form.ollamaModel = cfg.ollamaModel || 'llava'
@@ -457,132 +272,6 @@ const { pending: configPending } = await useLazyFetch('/api/admin/ai/config', {
     }
   },
 })
-
-await useLazyFetch('/api/admin/ai/models', {
-  query: { provider: 'lmstudio' },
-  onResponse({ response }) {
-    if (response._data?.models) {
-      models.value = response._data.models
-    }
-  },
-})
-
-// --- Actions : ajout de modèle ---
-
-const { execute: executeAddModel, loading: addingModel } = useApiAction('/api/admin/ai/models', {
-  method: 'POST',
-  body: () => ({
-    provider: 'lmstudio',
-    modelId: newModel.modelId.trim(),
-    name: newModel.name.trim() || newModel.modelId.trim(),
-  }),
-  successMessage: { title: t('admin.ai_model_added') },
-  errorMessages: { default: t('admin.ai_model_add_error') },
-  onSuccess: (result) => {
-    const model = result.data?.model || result.model
-    if (model && !models.value.find((m) => m.modelId === model.modelId)) {
-      models.value.push(model)
-    }
-    newModel.modelId = ''
-    newModel.name = ''
-    showAddModel.value = false
-  },
-})
-
-async function addModel() {
-  if (!newModel.modelId.trim()) return
-  await executeAddModel()
-}
-
-// --- Actions : suppression de modèle ---
-
-const { execute: executeDeleteById, isLoading: isDeletingModel } = useApiActionById(
-  (id) => `/api/admin/ai/models/${id}`,
-  {
-    method: 'DELETE',
-    successMessage: { title: t('admin.ai_model_deleted') },
-    errorMessages: { default: t('admin.ai_model_delete_error') },
-    onSuccess: () => {
-      if (modelToDelete.value) {
-        const deleted = modelToDelete.value
-        models.value = models.value.filter((m) => m.id !== deleted.id)
-        if (form.lmstudioModelId === deleted.modelId) form.lmstudioModelId = ''
-        if (form.lmstudioTextModelId === deleted.modelId) form.lmstudioTextModelId = ''
-      }
-      showDeleteModal.value = false
-      modelToDelete.value = null
-    },
-  }
-)
-
-async function executeDeleteModel() {
-  if (!modelToDelete.value) return
-  await executeDeleteById(modelToDelete.value.id)
-}
-
-// --- Actions : auto-détection ---
-
-const { execute: executeDetect, loading: detecting } = useApiAction('/api/admin/ai/models/detect', {
-  method: 'POST',
-  body: () => ({ baseUrl: form.lmstudioBaseUrl }),
-  silentSuccess: true,
-  errorMessages: { default: t('admin.ai_detect_error') },
-  onSuccess: (result) => {
-    detectedModels.value = result.models || []
-    if (detectedModels.value.length === 0) {
-      useToast().add({ title: t('admin.ai_no_models_detected'), color: 'warning' })
-    }
-  },
-})
-
-/**
- * Éprouve une adresse sans toucher à la liste des modèles détectés, qui décrit l'URL de base :
- * les mélanger laisserait croire que ces modèles viennent de l'adresse testée.
- */
-function creerTestDeJoignabilite(baseUrl: () => string, cleOk: string, cleErreur: string) {
-  return useApiAction('/api/admin/ai/models/detect', {
-    method: 'POST',
-    body: () => ({ baseUrl: baseUrl() }),
-    silentSuccess: true,
-    errorMessages: { default: t(cleErreur) },
-    onSuccess: (result: any) => {
-      const nombre = result?.models?.length ?? 0
-      useToast().add({
-        title: t(cleOk, { count: nombre }),
-        color: nombre > 0 ? 'success' : 'warning',
-      })
-    },
-  })
-}
-
-const { execute: testerUrlDeBase, loading: testUrlDeBaseEnCours } = creerTestDeJoignabilite(
-  () => form.lmstudioBaseUrl,
-  'admin.ai_base_url_test_ok',
-  'admin.ai_base_url_test_error'
-)
-
-const { execute: testerAdresseDeSecours, loading: testSecoursEnCours } = creerTestDeJoignabilite(
-  () => form.lmstudioBackupBaseUrl,
-  'admin.ai_backup_test_ok',
-  'admin.ai_backup_test_error'
-)
-
-async function detectModels() {
-  detectedModels.value = []
-  await executeDetect()
-}
-
-// --- Actions : ajout de modèle détecté ---
-
-async function addDetectedModel(detected: { modelId: string; name: string }) {
-  newModel.modelId = detected.modelId
-  newModel.name = detected.name
-  await executeAddModel()
-}
-
-function isModelRegistered(modelId: string): boolean {
-  return models.value.some((m) => m.modelId === modelId)
-}
 
 // --- Ollama : détection des modèles installés ---
 
@@ -635,6 +324,8 @@ const { execute: executeSave, loading: saving } = useApiAction('/api/admin/ai/co
     lmstudioBackupBaseUrl: form.lmstudioBackupBaseUrl,
     lmstudioModelId: form.lmstudioModelId || null,
     lmstudioTextModelId: form.lmstudioTextModelId || null,
+    lmstudioBackupModelId: form.lmstudioBackupModelId || null,
+    lmstudioBackupTextModelId: form.lmstudioBackupTextModelId || null,
     anthropicApiKey: form.anthropicApiKey || null,
     ollamaBaseUrl: form.ollamaBaseUrl,
     ollamaModel: form.ollamaModel,

@@ -45,7 +45,8 @@ export default wrapApiHandler(
       trimStrings: true,
       transform: {
         startDateTime: (val) => new Date(val),
-        endDateTime: (val) => new Date(val),
+        // `null` explicite : c'est ainsi qu'on retire une heure de fin déjà enregistrée.
+        endDateTime: (val) => (val ? new Date(val as string) : null),
       },
       exclude: ['locationName'], // Géré séparément
     })
