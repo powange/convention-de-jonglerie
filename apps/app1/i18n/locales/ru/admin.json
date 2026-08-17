@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "Нет",
     "ai_lmstudio_backup_same_as_primary": "Как у основного сервера",
     "ai_lmstudio_backup_title": "LM Studio — резервный сервер",
-    "ai_lmstudio_primary_title": "LM Studio — основной сервер"
+    "ai_lmstudio_primary_title": "LM Studio — основной сервер",
+    "ai_max_tokens_help": "Бюджет, который модель может потратить на написание ответа. Модель, рассуждающая перед ответом, расходует его на размышления: при слишком малом значении её обрывают, прежде чем она успеет что-либо написать, и ответ возвращается пустым.",
+    "ai_max_tokens_label": "Максимум токенов на ответ"
   }
 }

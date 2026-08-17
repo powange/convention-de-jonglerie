@@ -16,7 +16,7 @@
       </p>
 
       <!-- Adresse du serveur -->
-      <UFormField :label="$t('admin.ai_lmstudio_base_url')" :description="aideAdresse">
+      <UFormField :label="libelleAdresse" :description="aideAdresse">
         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
           <UInput
             :model-value="baseUrl"
@@ -233,6 +233,8 @@ const props = defineProps<{
   /** Quel des deux serveurs LM Studio cette carte décrit. */
   serveur: 'principal' | 'secours'
   titre: string
+  /** Intitulé du champ d'adresse : « URL de base » ne dit rien du serveur de secours. */
+  libelleAdresse: string
   icone: string
   couleurIcone: string
   introduction?: string

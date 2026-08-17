@@ -65,7 +65,11 @@ interface DbAiConfig {
   anthropicApiKey: string | null
   ollamaBaseUrl: string
   ollamaModel: string
+  llmMaxTokens?: number
 }
+
+/** Jetons accordés à une réponse quand la configuration n'en fixe pas. */
+export const LIMITE_JETONS_PAR_DEFAUT = 4096
 
 /**
  * Cache mémoire pour la config IA depuis la BDD
@@ -113,6 +117,9 @@ export async function getEffectiveAIConfigAsync() {
     ollamaModel: dbConfig.ollamaModel,
     // Délai des appels au modèle : la valeur en base prime, AI_TIMEOUT_LLM sert de secours.
     llmTimeoutMs: dbConfig.llmTimeoutMs || AI_TIMEOUTS.LLM_REQUEST,
+    // Jetons accordés à la réponse. Réglable parce que la valeur dépend du modèle : celui qui
+    // raisonne avant de répondre consomme ce budget en réflexion.
+    llmMaxTokens: dbConfig.llmMaxTokens || LIMITE_JETONS_PAR_DEFAUT,
     browserlessUrl:
       process.env.BROWSERLESS_URL || process.env.NUXT_BROWSERLESS_URL || config.browserlessUrl,
   }
@@ -183,6 +190,7 @@ export function serializeAiConfig(config: {
   ollamaBaseUrl: string
   ollamaModel: string
   llmTimeoutMs: number
+  llmMaxTokens: number
 }) {
   return {
     provider: config.provider,
@@ -196,6 +204,7 @@ export function serializeAiConfig(config: {
     ollamaBaseUrl: config.ollamaBaseUrl,
     ollamaModel: config.ollamaModel,
     llmTimeoutMs: config.llmTimeoutMs,
+    llmMaxTokens: config.llmMaxTokens,
   }
 }
 

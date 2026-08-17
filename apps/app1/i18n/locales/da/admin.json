@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "Ingen",
     "ai_lmstudio_backup_same_as_primary": "Som hovedserveren",
     "ai_lmstudio_backup_title": "LM Studio — reserveserver",
-    "ai_lmstudio_primary_title": "LM Studio — hovedserver"
+    "ai_lmstudio_primary_title": "LM Studio — hovedserver",
+    "ai_max_tokens_help": "Det budget, modellen må bruge på at skrive sit svar. En model, der ræsonnerer før den svarer, bruger budgettet på at tænke: sat for lavt bliver den afbrudt, før den har skrevet noget, og svaret kommer tomt tilbage.",
+    "ai_max_tokens_label": "Maksimalt antal tokens pr. svar"
   }
 }

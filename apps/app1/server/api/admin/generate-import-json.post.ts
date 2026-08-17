@@ -14,6 +14,7 @@ import {
   AI_TIMEOUTS,
   getEffectiveAIConfigAsync,
   getMaxContentSizeForProvider,
+  LIMITE_JETONS_PAR_DEFAUT,
   serveursLmStudio,
 } from '#server/utils/ai-config'
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -409,10 +410,15 @@ export async function generateImportJson(
         basesLmStudio(effectiveConfig),
         combinedContent,
         dynamicMaxContent,
-        effectiveConfig.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
+        effectiveConfig.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST,
+        effectiveConfig.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
       )
     } else if (aiProvider === 'anthropic' && effectiveConfig.anthropicApiKey) {
-      generatedJson = await callAnthropic(effectiveConfig.anthropicApiKey, combinedContent)
+      generatedJson = await callAnthropic(
+        effectiveConfig.anthropicApiKey,
+        combinedContent,
+        effectiveConfig.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
+      )
     } else if (aiProvider === 'ollama') {
       generatedJson = await callOllama(
         effectiveConfig.ollamaBaseUrl || 'http://localhost:11434',
@@ -495,6 +501,7 @@ export async function generateImportJson(
           anthropicApiKey: effectiveConfig.anthropicApiKey,
           ollamaBaseUrl: effectiveConfig.ollamaBaseUrl,
           ollamaModel: effectiveConfig.ollamaModel,
+          llmMaxTokens: effectiveConfig.llmMaxTokens,
         })
 
         if (Object.keys(features).length > 0) {
@@ -805,6 +812,57 @@ function lireElementsJournee(reponse: string): unknown {
 }
 
 /**
+ * Extrait le JSON d'une réponse de modèle, en disant pourquoi quand il n'y en a pas.
+ *
+ * Le message générique « L'IA n'a pas généré de JSON valide » couvrait trois situations très
+ * différentes, dont deux se règlent d'un geste précis :
+ *
+ * — la réponse a été coupée sur la limite de jetons (`finish_reason: length`) ;
+ * — le modèle raisonne avant de répondre et a épuisé son budget en réflexion, laissant `content`
+ *   vide et tout le texte dans `reasoning_content` — observé avec gemma-4-12b, qui a dépensé
+ *   1021 jetons sur 1024 à réfléchir sans écrire une ligne de JSON ;
+ * — le modèle a bien répondu, mais à côté de la question.
+ *
+ * Les distinguer évite de chercher du côté du prompt un problème qui est de budget.
+ */
+export function extraireJsonDuModele(data: any, etape: string): string {
+  const choix = data?.choices?.[0]
+  const texte: string = choix?.message?.content || ''
+  const raisonnement: string = choix?.message?.reasoning_content || ''
+  const tronquee = choix?.finish_reason === 'length'
+
+  const jsonMatch = texte.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) {
+    if (!texte && raisonnement) {
+      throw createError({
+        status: 500,
+        message: `${etape} : le modèle a épuisé son budget de jetons en raisonnement, sans produire de réponse. Choisissez un modèle qui ne raisonne pas, ou relevez la limite de jetons.`,
+      })
+    }
+    if (tronquee) {
+      throw createError({
+        status: 500,
+        message: `${etape} : la réponse du modèle a été coupée avant la fin, faute de jetons.`,
+      })
+    }
+    throw createError({ status: 500, message: `${etape} : le modèle n'a pas renvoyé de JSON.` })
+  }
+
+  try {
+    JSON.parse(jsonMatch[0])
+  } catch {
+    throw createError({
+      status: 500,
+      message: tronquee
+        ? `${etape} : le JSON du modèle est incomplet, la réponse ayant été coupée faute de jetons.`
+        : `${etape} : le JSON produit par le modèle est invalide.`,
+    })
+  }
+
+  return jsonMatch[0]
+}
+
+/**
  * Adresses LM Studio à essayer, dans l'ordre.
  *
  * La seconde n'est tentée que si la première est injoignable — machine éteinte, port fermé. Une
@@ -829,7 +887,7 @@ async function appelerModele(
     const client = new Anthropic({ apiKey: config.anthropicApiKey, timeout: timeoutMs })
     const message = await client.messages.create({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4096,
+      max_tokens: config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT,
       system: systemPrompt,
       messages: [{ role: 'user', content: contenu }],
     })
@@ -864,7 +922,7 @@ async function appelerModele(
             { role: 'user', content: contenu },
           ],
           temperature: 0.2,
-          max_tokens: 4096,
+          max_tokens: config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT,
         }),
       }),
       timeoutMs,
@@ -923,10 +981,15 @@ async function callAIToCompleteJson(
       maxContent,
       // Le délai réglé dans /admin/ai-config était ignoré ici : seule la variable
       // d'environnement s'appliquait, et l'augmenter depuis l'écran ne changeait rien.
-      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
+      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST,
+      config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
     )
   } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
-    return await callAnthropicComplete(config.anthropicApiKey, userPrompt)
+    return await callAnthropicComplete(
+      config.anthropicApiKey,
+      userPrompt,
+      config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
+    )
   } else if (aiProvider === 'ollama') {
     return await callOllamaComplete(
       config.ollamaBaseUrl || 'http://localhost:11434',
@@ -946,7 +1009,10 @@ async function callLMStudioComplete(
   serveurs: ServeurModele[],
   userPrompt: string,
   maxContent: number,
-  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST
+  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST,
+  // Réglable depuis /admin/ai-config : un modèle qui raisonne avant de répondre dépense ce
+  // budget en réflexion et se fait couper avant d'écrire sa réponse.
+  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT
 ): Promise<string> {
   // Limiter le contenu selon le context length du modèle
   const truncatedPrompt =
@@ -978,7 +1044,10 @@ async function callLMStudioComplete(
             { role: 'user', content: truncatedPrompt },
           ],
           temperature: 0.3,
-          max_tokens: 1024,
+          // 1024 jetons ne suffisaient pas : un JSON d'import complet en consomme déjà plusieurs
+          // centaines, et un modèle qui raisonne avant de répondre épuise ce budget en réflexion
+          // sans écrire une ligne — la réponse revenait alors vide.
+          max_tokens: maxTokens,
         }),
       }),
       timeoutMs,
@@ -994,26 +1063,17 @@ async function callLMStudioComplete(
   // Pas de contrôle de `response.ok` ici : le helper ne rend qu'une réponse servie, et traduit
   // lui-même un refus en message lisible. Le recopier ici rendrait le JSON brut de l'API.
   const data = await response.json()
-  const responseText = data.choices?.[0]?.message?.content || ''
-
-  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) {
-    throw createError({ status: 500, message: "L'IA n'a pas généré de JSON valide" })
-  }
-
-  try {
-    JSON.parse(jsonMatch[0])
-  } catch {
-    throw createError({ status: 500, message: "Le JSON généré par l'IA n'est pas valide" })
-  }
-
-  return jsonMatch[0]
+  return extraireJsonDuModele(data, 'Complétion du JSON')
 }
 
 /**
  * Appel Anthropic pour compléter un JSON
  */
-async function callAnthropicComplete(apiKey: string, userPrompt: string): Promise<string> {
+async function callAnthropicComplete(
+  apiKey: string,
+  userPrompt: string,
+  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT
+): Promise<string> {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')
   const client = new Anthropic({ apiKey, timeout: AI_TIMEOUTS.LLM_REQUEST })
 
@@ -1022,7 +1082,7 @@ async function callAnthropicComplete(apiKey: string, userPrompt: string): Promis
 
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 4096,
+    max_tokens: maxTokens,
     system: getPrefilledJsonPrompt(),
     messages: [{ role: 'user', content: userPrompt }],
   })
@@ -1124,7 +1184,8 @@ async function callLMStudio(
   maxContent: number,
   // Délai réglable depuis /admin/ai-config : un modèle local lent s'accommode mal des 3 minutes
   // par défaut, et l'administrateur doit pouvoir l'ajuster sans redéploiement.
-  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST
+  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST,
+  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT
 ): Promise<string> {
   // Limiter le contenu selon le context length du modèle
   const truncatedContent =
@@ -1156,7 +1217,10 @@ async function callLMStudio(
             },
           ],
           temperature: 0.3,
-          max_tokens: 1024,
+          // 1024 jetons ne suffisaient pas : un JSON d'import complet en consomme déjà plusieurs
+          // centaines, et un modèle qui raisonne avant de répondre épuise ce budget en réflexion
+          // sans écrire une ligne — la réponse revenait alors vide.
+          max_tokens: maxTokens,
         }),
       }),
       timeoutMs,
@@ -1171,34 +1235,17 @@ async function callLMStudio(
 
   // Voir plus haut : le helper garantit une réponse servie, et dit déjà quoi faire en cas de refus.
   const data = await response.json()
-  const responseText = data.choices?.[0]?.message?.content || ''
-
-  // Extraire le JSON de la réponse
-  const jsonMatch = responseText.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) {
-    throw createError({
-      status: 500,
-      message: "L'IA n'a pas généré de JSON valide",
-    })
-  }
-
-  // Valider que c'est un JSON valide
-  try {
-    JSON.parse(jsonMatch[0])
-  } catch {
-    throw createError({
-      status: 500,
-      message: "Le JSON généré par l'IA n'est pas valide",
-    })
-  }
-
-  return jsonMatch[0]
+  return extraireJsonDuModele(data, 'Extraction des informations')
 }
 
 /**
  * Appel à l'API Anthropic avec timeout
  */
-async function callAnthropic(apiKey: string, content: string): Promise<string> {
+async function callAnthropic(
+  apiKey: string,
+  content: string,
+  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT
+): Promise<string> {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')
   const client = new Anthropic({
     apiKey,
@@ -1210,7 +1257,7 @@ async function callAnthropic(apiKey: string, content: string): Promise<string> {
 
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 4096,
+    max_tokens: maxTokens,
     system: getFullSystemPrompt(),
     messages: [
       {

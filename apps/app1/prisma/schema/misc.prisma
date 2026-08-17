@@ -237,6 +237,14 @@ model AiConfig {
   // même endroit que le modèle lui-même, sans redéploiement. 3 minutes par défaut.
   llmTimeoutMs Int @default(180000)
 
+  /// Nombre maximum de jetons que le modèle peut produire pour une réponse.
+  ///
+  /// Configurable ici parce qu'il dépend du modèle et non du code : un modèle qui raisonne avant
+  /// de répondre dépense ce budget en réflexion et peut se faire couper avant d'écrire sa
+  /// réponse — observé avec gemma-4-12b, qui a consommé 1021 jetons sur 1024 à réfléchir sans
+  /// produire une ligne de JSON.
+  llmMaxTokens Int @default(4096)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

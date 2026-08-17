@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "Ingen",
     "ai_lmstudio_backup_same_as_primary": "Som huvudservern",
     "ai_lmstudio_backup_title": "LM Studio — reservserver",
-    "ai_lmstudio_primary_title": "LM Studio — huvudserver"
+    "ai_lmstudio_primary_title": "LM Studio — huvudserver",
+    "ai_max_tokens_help": "Den budget modellen får använda för att skriva sitt svar. En modell som resonerar innan den svarar gör av med budgeten på att tänka: satt för lågt avbryts den innan den hunnit skriva något, och svaret kommer tillbaka tomt.",
+    "ai_max_tokens_label": "Högsta antal tokens per svar"
   }
 }

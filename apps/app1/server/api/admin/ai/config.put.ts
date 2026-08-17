@@ -25,6 +25,9 @@ const bodySchema = z.object({
   // Entre 30 s et 30 min : en dessous aucun modèle local n'a le temps, au-dessus l'utilisateur
   // resterait bloqué sur une page sans retour pendant une demi-heure.
   llmTimeoutMs: z.number().int().min(30_000).max(1_800_000).default(180_000),
+  // Entre 512 et 32 768 jetons : en dessous aucune réponse structurée ne tient, au-dessus on
+  // dépasse ce que la plupart des modèles locaux acceptent de produire d'un trait.
+  llmMaxTokens: z.number().int().min(512).max(32_768).default(4096),
 })
 
 /**
@@ -49,6 +52,7 @@ export default wrapApiHandler(
       ollamaBaseUrl: data.ollamaBaseUrl,
       ollamaModel: data.ollamaModel,
       llmTimeoutMs: data.llmTimeoutMs,
+      llmMaxTokens: data.llmMaxTokens,
     }
 
     // Gestion clé API Anthropic :

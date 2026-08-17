@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "Žádný",
     "ai_lmstudio_backup_same_as_primary": "Stejně jako hlavní server",
     "ai_lmstudio_backup_title": "LM Studio — záložní server",
-    "ai_lmstudio_primary_title": "LM Studio — hlavní server"
+    "ai_lmstudio_primary_title": "LM Studio — hlavní server",
+    "ai_max_tokens_help": "Rozpočet, který model může vynaložit na napsání odpovědi. Model, který před odpovědí uvažuje, spotřebuje tento rozpočet přemýšlením: při příliš nízké hodnotě je přerušen dříve, než cokoli napíše, a odpověď se vrátí prázdná.",
+    "ai_max_tokens_label": "Maximální počet tokenů na odpověď"
   }
 }

@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "Geen",
     "ai_lmstudio_backup_same_as_primary": "Zoals de hoofdserver",
     "ai_lmstudio_backup_title": "LM Studio — reserveserver",
-    "ai_lmstudio_primary_title": "LM Studio — hoofdserver"
+    "ai_lmstudio_primary_title": "LM Studio — hoofdserver",
+    "ai_max_tokens_help": "Budget dat het model mag besteden aan het schrijven van zijn antwoord. Een model dat eerst redeneert, verbruikt dit budget aan denken: te laag ingesteld wordt het afgekapt voordat het iets heeft geschreven en komt het antwoord leeg terug.",
+    "ai_max_tokens_label": "Maximaal aantal tokens per antwoord"
   }
 }
