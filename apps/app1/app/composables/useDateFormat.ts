@@ -1,15 +1,21 @@
+import { toIntlLocale } from '~/utils/locales'
+
 /**
  * Composable pour formatter les dates avec horaires
  */
 export const useDateFormat = () => {
   const { locale, t } = useI18n()
 
+  // Le code i18n (`en`, `fr`…) n'a pas de région : `Intl` compléterait `en` en `en-US` et
+  // sortirait des dates en MM/DD/YYYY. On passe donc toujours par la balise BCP-47.
+  const intlLocale = computed(() => toIntlLocale(locale.value))
+
   /**
    * Formate une date avec l'heure
    */
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleString(locale.value, {
+    return date.toLocaleString(intlLocale.value, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -24,7 +30,7 @@ export const useDateFormat = () => {
    */
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString(locale.value, {
+    return date.toLocaleDateString(intlLocale.value, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -37,7 +43,7 @@ export const useDateFormat = () => {
    */
   const formatDateFull = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString(locale.value, {
+    return date.toLocaleDateString(intlLocale.value, {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
@@ -51,7 +57,7 @@ export const useDateFormat = () => {
    */
   const formatDateWithWeekday = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString(locale.value, {
+    return date.toLocaleDateString(intlLocale.value, {
       weekday: 'short',
       day: '2-digit',
       month: '2-digit',
@@ -65,7 +71,7 @@ export const useDateFormat = () => {
    */
   const formatDateTimeWithWeekday = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleString(locale.value, {
+    return date.toLocaleString(intlLocale.value, {
       weekday: 'short',
       day: '2-digit',
       month: '2-digit',
@@ -86,18 +92,18 @@ export const useDateFormat = () => {
     // Si même jour
     if (startDate.toDateString() === endDate.toDateString()) {
       return t('dates.same_day_with_time', {
-        date: startDate.toLocaleDateString(locale.value, {
+        date: startDate.toLocaleDateString(intlLocale.value, {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
           timeZone: 'Europe/Paris',
         }),
-        startTime: startDate.toLocaleTimeString(locale.value, {
+        startTime: startDate.toLocaleTimeString(intlLocale.value, {
           hour: '2-digit',
           minute: '2-digit',
           timeZone: 'Europe/Paris',
         }),
-        endTime: endDate.toLocaleTimeString(locale.value, {
+        endTime: endDate.toLocaleTimeString(intlLocale.value, {
           hour: '2-digit',
           minute: '2-digit',
           timeZone: 'Europe/Paris',

@@ -8,6 +8,7 @@ import {
   isSupportedLocale,
   getLocaleName,
   languageCodeToFlag,
+  toIntlLocale,
 } from '../../../app/utils/locales'
 
 describe('locales utils', () => {
@@ -158,6 +159,29 @@ describe('locales utils', () => {
         expect(flag).toBeDefined()
         expect(flag).toMatch(/^i-flag:[a-z]{2}-4x3$/)
       }
+    })
+  })
+
+  describe('toIntlLocale', () => {
+    it("régionalise l'anglais en britannique", () => {
+      expect(toIntlLocale('en')).toBe('en-GB')
+    })
+
+    it('renvoie les autres codes tels quels', () => {
+      expect(toIntlLocale('fr')).toBe('fr')
+      expect(toIntlLocale('de')).toBe('de')
+      expect(toIntlLocale('')).toBe('')
+    })
+
+    it('donne un ordre jour/mois/année en anglais', () => {
+      const date = new Date('2026-08-17T12:00:00Z')
+      const formatted = date.toLocaleDateString(toIntlLocale('en'), {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        timeZone: 'Europe/Paris',
+      })
+      expect(formatted).toBe('17/08/2026')
     })
   })
 })
