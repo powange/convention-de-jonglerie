@@ -1158,6 +1158,13 @@ async function main() {
     const subjects = feedbackSubjects[type]
     const messages = feedbackMessages[type]
 
+    // Répartition proche de l'ancien « 60 % résolus », mais étalée sur les quatre états
+    const status = ['NEW', 'IN_PROGRESS', 'RESOLVED', 'RESOLVED', 'RESOLVED', 'REJECTED'][
+      Math.floor(Math.random() * 6)
+    ] as 'NEW' | 'IN_PROGRESS' | 'RESOLVED' | 'REJECTED'
+    // Une réponse sur les retours traités, pour que la page de suivi ait de quoi s'afficher
+    const repondu = status === 'RESOLVED' || status === 'REJECTED'
+
     await prisma.feedback.create({
       data: {
         type,
@@ -1166,8 +1173,10 @@ async function main() {
         email: randomUser?.email || 'anonymous@example.com',
         name: randomUser ? `${randomUser.prenom} ${randomUser.nom}` : 'Utilisateur anonyme',
         userId: randomUser?.id,
-        resolved: Math.random() > 0.4, // 60% résolus
+        status,
         adminNotes: Math.random() > 0.5 ? 'Traité et résolu' : null,
+        adminReply: repondu ? 'Merci pour votre retour, nous en avons tenu compte.' : null,
+        repliedAt: repondu ? new Date() : null,
       },
     })
     feedbackCount++
@@ -1351,7 +1360,7 @@ async function main() {
   console.log(`- ${carpoolBookingsCount} réservations de covoiturage créées`)
   console.log(`- ${carpoolPassengersCount} passagers confirmés`)
   console.log(`- ${lostFoundCount} objets trouvés/perdus ajoutés`)
-  console.log(`- ${feedbackCount} feedbacks créés (60% résolus)`)
+  console.log(`- ${feedbackCount} feedbacks créés (statuts variés, réponse sur ceux traités)`)
   console.log(`- ${claimRequestsCount} demandes de réclamation de conventions`)
   console.log(`- ${volunteerSettingsCount} éditions configurées avec appels à bénévoles`)
   console.log(`- ${volunteerApplicationsCount} candidatures de bénévolat créées (85% acceptées)`)

@@ -299,7 +299,11 @@
     "favorites_count": "favori(s)",
     "feedback": {
       "admin_notes": "Notes admin",
+      "admin_notes_hint": "Note interne : jamais montrée à l'auteur.",
       "admin_notes_placeholder": "Ajoutez vos notes sur la résolution de ce retour...",
+      "admin_reply": "Réponse à l'auteur",
+      "admin_reply_hint": "Visible par l'auteur du retour sur sa page de suivi.",
+      "admin_reply_placeholder": "Répondez à l'auteur : ce qui a été fait, ce qui est prévu...",
       "created_at": "Créé le",
       "description": "Consultez et gérez les retours, suggestions et signalements des utilisateurs.",
       "details": "Détails du retour",
@@ -314,15 +318,12 @@
         "status": "Filtrer par statut",
         "type": "Filtrer par type"
       },
-      "mark_resolved": "Marquer comme résolu",
-      "mark_unresolved": "Marquer comme non résolu",
       "message": {
         "label": "Message"
       },
-      "pending": "En attente",
+      "process": "Traiter",
+      "reply_guest_warning": "Ce retour a été envoyé sans compte : son auteur n'a pas de page de suivi où lire cette réponse. Contactez-le par email si une réponse est nécessaire.",
       "require_attention": "Nécessitent une attention",
-      "resolve": "Résoudre",
-      "resolved": "Résolu",
       "search": "Rechercher dans les retours...",
       "stats": {
         "bugs": "Bugs signalés",
@@ -335,8 +336,7 @@
         "label": "Sujet"
       },
       "success": {
-        "resolve": "Retour marqué comme résolu",
-        "unresolve": "Retour marqué comme non résolu"
+        "updated": "Retour mis à jour : {status}"
       },
       "title": "Gestion des retours utilisateurs",
       "type": {
@@ -348,7 +348,6 @@
         "general": "Général",
         "suggestion": "Suggestion"
       },
-      "unresolve": "Rouvrir",
       "unresolved": "Retours non résolus",
       "url": "Page concernée",
       "user": "Utilisateur",

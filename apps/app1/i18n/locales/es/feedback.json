@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "El captcha aún no está cargado, por favor espere",
       "captcha_required": "Por favor complete el captcha",
-      "name_required": "El nombre es obligatorio",
-      "name_required_desc": "Por favor indique su nombre para que podamos identificar su comentario",
-      "submit": "Se produjo un error al enviar su comentario",
-      "title": "Error al enviar"
+      "submit": "Se produjo un error al enviar su comentario"
     },
     "guest": {
       "info": "Como visitante, por favor proporciona tus datos de contacto para un posible seguimiento."
@@ -72,6 +69,23 @@
         "max": "El asunto no puede exceder los 200 caracteres",
         "min": "El asunto debe tener al menos 5 caracteres"
       }
+    },
+    "page": {
+      "new_title": "Enviar un comentario",
+      "new_another": "Enviar otro comentario",
+      "success_tracked": "Puedes seguir su avance en esta página, en «Mis comentarios».",
+      "tracking_title": "Mis comentarios",
+      "tracking_empty": "Todavía no has enviado ningún comentario.",
+      "tracking_error": "No se han podido cargar tus comentarios en este momento.",
+      "tracking_signin_title": "Inicia sesión para seguir tus comentarios",
+      "tracking_signin_description": "Los comentarios enviados con una cuenta pueden seguirse aquí: verás su avance y la respuesta del equipo.",
+      "team_reply": "Respuesta del equipo"
+    },
+    "status": {
+      "NEW": "Recibido",
+      "IN_PROGRESS": "En curso",
+      "RESOLVED": "Tratado",
+      "REJECTED": "No admitido"
     }
   }
 }

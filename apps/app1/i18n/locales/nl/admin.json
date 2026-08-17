@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Feedback gemarkeerd als opgelost",
-        "unresolve": "Feedback gemarkeerd als niet opgelost"
+        "unresolve": "Feedback gemarkeerd als niet opgelost",
+        "updated": "Feedback bijgewerkt: {status}"
       },
       "title": "Beheer gebruikersfeedback",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Gerelateerde pagina",
       "user": "Gebruiker",
       "user_agent": "Browser/OS",
-      "view": "Details bekijken"
+      "view": "Details bekijken",
+      "admin_notes_hint": "Interne notitie: wordt nooit aan de auteur getoond.",
+      "admin_reply": "Antwoord aan de auteur",
+      "admin_reply_hint": "Zichtbaar voor de auteur van de feedback op zijn opvolgpagina.",
+      "admin_reply_placeholder": "Antwoord de auteur: wat er is gedaan, wat er gepland staat...",
+      "process": "Behandelen",
+      "reply_guest_warning": "Deze feedback is zonder account verstuurd: de auteur heeft geen opvolgpagina waar dit antwoord te lezen is. Neem per e-mail contact op als een antwoord nodig is."
     },
     "feedbacks_count": "Feedback",
     "filter_active_conventions": "Actieve conventies",

@@ -14,6 +14,16 @@ enum FeedbackType {
   COMPLAINT
 }
 
+// Avancement d'un retour, tel que son auteur le voit sur /feedback.
+// Remplace l'ancien booléen `resolved`, qui ne distinguait pas « pas encore regardé »
+// de « en cours de traitement » — la seule question que se pose celui qui attend.
+enum FeedbackStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
 enum NotificationType {
   INFO
   SUCCESS
@@ -53,24 +63,28 @@ model LostFoundComment {
 }
 
 model Feedback {
-  id         Int          @id @default(autoincrement())
+  id         Int            @id @default(autoincrement())
   type       FeedbackType
   subject    String
-  message    String       @db.Text
+  message    String         @db.Text
   email      String?
   name       String?
   userId     Int?
-  userAgent  String?      @db.Text
-  url        String?      @db.Text
-  resolved   Boolean      @default(false)
-  adminNotes String?      @db.Text
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  user       User?        @relation(fields: [userId], references: [id])
+  userAgent  String?        @db.Text
+  url        String?        @db.Text
+  status     FeedbackStatus @default(NEW)
+  // Notes internes de l'équipe : jamais renvoyées à l'auteur du retour.
+  adminNotes String?        @db.Text
+  // Réponse destinée à l'auteur, elle, et affichée sur son suivi.
+  adminReply String?        @db.Text
+  repliedAt  DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  user       User?          @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "Feedback_userId_fkey")
   @@index([type])
-  @@index([resolved])
+  @@index([status])
 }
 
 // ========== LOGS D'ERREURS ==========

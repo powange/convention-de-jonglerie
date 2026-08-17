@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Comentario marcado como resuelto",
-        "unresolve": "Comentario marcado como no resuelto"
+        "unresolve": "Comentario marcado como no resuelto",
+        "updated": "Comentario actualizado: {status}"
       },
       "title": "Gestión de Comentarios de Usuarios",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Página relacionada",
       "user": "Usuario",
       "user_agent": "Navegador/SO",
-      "view": "Ver detalles"
+      "view": "Ver detalles",
+      "admin_notes_hint": "Nota interna: nunca se muestra al autor.",
+      "admin_reply": "Respuesta al autor",
+      "admin_reply_hint": "Visible para el autor del comentario en su página de seguimiento.",
+      "admin_reply_placeholder": "Responde al autor: qué se ha hecho, qué está previsto...",
+      "process": "Tratar",
+      "reply_guest_warning": "Este comentario se envió sin cuenta: su autor no tiene una página de seguimiento donde leer esta respuesta. Contáctalo por correo si hace falta responder."
     },
     "feedbacks_count": "Comentarios",
     "filter_active_conventions": "Convenciones activas",

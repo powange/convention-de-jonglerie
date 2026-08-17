@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Retur markerad som löst",
-        "unresolve": "Retur markerad som olöst"
+        "unresolve": "Retur markerad som olöst",
+        "updated": "Återkoppling uppdaterad: {status}"
       },
       "title": "Hantering av användarfeedback",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Berörd sida",
       "user": "Användare",
       "user_agent": "Webbläsare/OS",
-      "view": "Se mer information"
+      "view": "Se mer information",
+      "admin_notes_hint": "Intern anteckning: visas aldrig för avsändaren.",
+      "admin_reply": "Svar till avsändaren",
+      "admin_reply_hint": "Syns för den som skickat återkopplingen på dennes uppföljningssida.",
+      "admin_reply_placeholder": "Svara avsändaren: vad som gjorts, vad som planeras...",
+      "process": "Hantera",
+      "reply_guest_warning": "Den här återkopplingen skickades utan konto: avsändaren har ingen uppföljningssida där svaret kan läsas. Kontakta personen via e-post om ett svar behövs."
     },
     "feedbacks_count": "Feedback",
     "filter_active_conventions": "Aktiva konventioner",

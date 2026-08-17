@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "Il captcha non è ancora caricato, attendere prego",
       "captcha_required": "Si prega di completare il captcha",
-      "name_required": "Il nome è obbligatorio",
-      "name_required_desc": "Si prega di indicare il proprio nome in modo da poter identificare il feedback",
-      "submit": "Si è verificato un errore durante l'invio del feedback",
-      "title": "Errore durante l'invio"
+      "submit": "Si è verificato un errore durante l'invio del feedback"
     },
     "guest": {
       "info": "Come visitatore, fornisci i tuoi dati di contatto per un eventuale follow-up."
@@ -72,6 +69,23 @@
         "max": "L'oggetto non può superare i 200 caratteri",
         "min": "L'oggetto deve contenere almeno 5 caratteri"
       }
+    },
+    "page": {
+      "new_title": "Invia una segnalazione",
+      "new_another": "Invia un'altra segnalazione",
+      "success_tracked": "Puoi seguirne l'avanzamento in questa pagina, in «Le mie segnalazioni».",
+      "tracking_title": "Le mie segnalazioni",
+      "tracking_empty": "Non hai ancora inviato alcuna segnalazione.",
+      "tracking_error": "Impossibile caricare le tue segnalazioni in questo momento.",
+      "tracking_signin_title": "Accedi per seguire le tue segnalazioni",
+      "tracking_signin_description": "Le segnalazioni inviate con un account possono essere seguite qui: ne vedrai l'avanzamento e la risposta del team.",
+      "team_reply": "Risposta del team"
+    },
+    "status": {
+      "NEW": "Ricevuta",
+      "IN_PROGRESS": "In lavorazione",
+      "RESOLVED": "Gestita",
+      "REJECTED": "Non accolta"
     }
   }
 }

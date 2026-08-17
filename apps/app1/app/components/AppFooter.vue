@@ -27,9 +27,12 @@
           >
             {{ t('footer.project_costs') }}
           </NuxtLink>
-          <UButton variant="ghost" color="neutral" size="sm" @click="openFeedbackModal">
+          <NuxtLink
+            :to="lienRetour"
+            class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          >
             {{ t('footer.feedback') }}
-          </UButton>
+          </NuxtLink>
           <NuxtLink
             to="https://www.facebook.com/profile.php?id=61582110660179"
             target="_blank"
@@ -51,24 +54,22 @@
         </div>
       </div>
     </div>
-
-    <!-- Modal de feedback -->
-    <FeedbackModal v-model:open="showFeedbackModal" />
   </footer>
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
-
-// Lazy loading du composant FeedbackModal
-const FeedbackModal = defineAsyncComponent(() => import('~/components/feedback/FeedbackModal.vue'))
-
 // Composables
 const { t } = useI18n()
+const route = useRoute()
 
-const showFeedbackModal = ref(false)
-
-function openFeedbackModal() {
-  showFeedbackModal.value = true
-}
+/**
+ * La page de retour a besoin de savoir d'où l'on vient : le formulaire y renseignait
+ * l'URL courante, information perdue dès lors qu'on quitte la page pour l'atteindre.
+ * On la transporte donc dans la query, en chemin relatif — la page ne retient que ce
+ * qui appartient au site.
+ */
+const lienRetour = computed(() => ({
+  path: '/feedback',
+  ...(route.path !== '/feedback' && { query: { from: route.fullPath } }),
+}))
 </script>

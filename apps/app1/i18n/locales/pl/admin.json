@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Opinia oznaczona jako rozwiązana",
-        "unresolve": "Opinia oznaczona jako nierozwiązana"
+        "unresolve": "Opinia oznaczona jako nierozwiązana",
+        "updated": "Zgłoszenie zaktualizowane: {status}"
       },
       "title": "Zarządzanie Opiniami Użytkowników",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Powiązana strona",
       "user": "Użytkownik",
       "user_agent": "Przeglądarka/System",
-      "view": "Zobacz szczegóły"
+      "view": "Zobacz szczegóły",
+      "admin_notes_hint": "Notatka wewnętrzna: nigdy nie jest pokazywana autorowi.",
+      "admin_reply": "Odpowiedź dla autora",
+      "admin_reply_hint": "Widoczna dla autora zgłoszenia na jego stronie śledzenia.",
+      "admin_reply_placeholder": "Odpowiedz autorowi: co zostało zrobione, co jest planowane...",
+      "process": "Obsłuż",
+      "reply_guest_warning": "To zgłoszenie wysłano bez konta: jego autor nie ma strony śledzenia, na której mógłby przeczytać tę odpowiedź. Skontaktuj się z nim e-mailem, jeśli odpowiedź jest potrzebna."
     },
     "feedbacks_count": "Opinie",
     "filter_active_conventions": "Aktywne konwencje",

@@ -150,7 +150,6 @@ export default wrapApiHandler(
         userId: isAuthenticated ? user.id : null,
         userAgent: getHeader(event, 'user-agent'),
         url,
-        resolved: false,
       },
       include: {
         user: isAuthenticated

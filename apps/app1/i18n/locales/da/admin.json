@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Feedback markeret som løst",
-        "unresolve": "Feedback markeret som uløst"
+        "unresolve": "Feedback markeret som uløst",
+        "updated": "Tilbagemelding opdateret: {status}"
       },
       "title": "Brugerfeedback Administration",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Relateret side",
       "user": "Bruger",
       "user_agent": "Browser/OS",
-      "view": "Se detaljer"
+      "view": "Se detaljer",
+      "admin_notes_hint": "Intern note: vises aldrig for afsenderen.",
+      "admin_reply": "Svar til afsenderen",
+      "admin_reply_hint": "Synlig for afsenderen af tilbagemeldingen på vedkommendes opfølgningsside.",
+      "admin_reply_placeholder": "Svar afsenderen: hvad der er gjort, hvad der er planlagt...",
+      "process": "Behandl",
+      "reply_guest_warning": "Denne tilbagemelding blev sendt uden konto: afsenderen har ingen opfølgningsside, hvor svaret kan læses. Kontakt vedkommende via e-mail, hvis et svar er nødvendigt."
     },
     "feedbacks_count": "Tilbagemeldinger",
     "filter_active_conventions": "Aktive konventioner",

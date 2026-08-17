@@ -290,7 +290,8 @@
       },
       "success": {
         "resolve": "Feedback marked as resolved",
-        "unresolve": "Feedback marked as unresolved"
+        "unresolve": "Feedback marked as unresolved",
+        "updated": "Feedback updated: {status}"
       },
       "title": "User Feedback Management",
       "type": {
@@ -307,7 +308,13 @@
       "url": "Related page",
       "user": "User",
       "user_agent": "Browser/OS",
-      "view": "View details"
+      "view": "View details",
+      "admin_notes_hint": "Internal note: never shown to the author.",
+      "admin_reply": "Reply to the author",
+      "admin_reply_hint": "Visible to the author of the feedback on their tracking page.",
+      "admin_reply_placeholder": "Reply to the author: what was done, what is planned...",
+      "process": "Process",
+      "reply_guest_warning": "This feedback was sent without an account: its author has no tracking page where they could read this reply. Contact them by email if a reply is needed."
     },
     "feedbacks_count": "Feedback",
     "filter_active_conventions": "Active conventions",

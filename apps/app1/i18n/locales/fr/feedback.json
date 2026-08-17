@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "Le captcha n'est pas encore chargé, veuillez patienter",
       "captcha_required": "Veuillez compléter le captcha",
-      "name_required": "Le nom est obligatoire",
-      "name_required_desc": "Veuillez indiquer votre nom pour que nous puissions identifier votre feedback",
-      "submit": "Une erreur est survenue lors de l'envoi de votre retour",
-      "title": "Erreur lors de l'envoi"
+      "submit": "Une erreur est survenue lors de l'envoi de votre retour"
     },
     "guest": {
       "info": "En tant que visiteur, merci de nous laisser vos coordonnées pour un éventuel suivi."
@@ -24,12 +21,29 @@
       "label": "Votre nom",
       "placeholder": "Votre prénom et nom"
     },
+    "page": {
+      "new_title": "Envoyer un retour",
+      "new_another": "Envoyer un autre retour",
+      "success_tracked": "Vous pouvez suivre son avancement sur cette page, dans « Mes retours ».",
+      "tracking_title": "Mes retours",
+      "tracking_empty": "Vous n'avez pas encore envoyé de retour.",
+      "tracking_error": "Impossible de charger vos retours pour le moment.",
+      "tracking_signin_title": "Connectez-vous pour suivre vos retours",
+      "tracking_signin_description": "Les retours envoyés avec un compte peuvent être suivis ici : vous y verrez leur avancement et la réponse de l'équipe.",
+      "team_reply": "Réponse de l'équipe"
+    },
     "recaptcha": {
       "and": "et les",
       "apply": "s'appliquent",
       "privacy_policy": "Politique de confidentialité",
       "protected_by": "Ce site est protégé par reCAPTCHA et la",
       "terms_of_service": "Conditions d'utilisation"
+    },
+    "status": {
+      "NEW": "Reçu",
+      "IN_PROGRESS": "En cours de traitement",
+      "RESOLVED": "Traité",
+      "REJECTED": "Non retenu"
     },
     "subject": {
       "label": "Sujet",

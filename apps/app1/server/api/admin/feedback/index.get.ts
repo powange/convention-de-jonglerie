@@ -9,8 +9,10 @@ export default wrapApiHandler(
     const { page, limit, skip } = validatePagination(event)
     const query = getQuery(event)
     const type = query.type as string
-    const resolved =
-      query.resolved === 'true' ? true : query.resolved === 'false' ? false : undefined
+    const statutsConnus = ['NEW', 'IN_PROGRESS', 'RESOLVED', 'REJECTED']
+    const status = statutsConnus.includes(query.status as string)
+      ? (query.status as string)
+      : undefined
     const search = query.search as string
 
     // Construction des filtres
@@ -20,8 +22,8 @@ export default wrapApiHandler(
       where.type = type
     }
 
-    if (resolved !== undefined) {
-      where.resolved = resolved
+    if (status) {
+      where.status = status
     }
 
     if (search) {
@@ -55,7 +57,7 @@ export default wrapApiHandler(
 
     // Statistiques rapides
     const stats = await prisma.feedback.groupBy({
-      by: ['type', 'resolved'],
+      by: ['type', 'status'],
       _count: { id: true },
     })
 
@@ -63,18 +65,17 @@ export default wrapApiHandler(
       total,
       byType: {} as Record<string, number>,
       byStatus: {
-        resolved: 0,
-        pending: 0,
-      },
+        NEW: 0,
+        IN_PROGRESS: 0,
+        RESOLVED: 0,
+        REJECTED: 0,
+      } as Record<string, number>,
     }
 
     stats.forEach((stat) => {
       statsFormatted.byType[stat.type] = (statsFormatted.byType[stat.type] || 0) + stat._count.id
-      if (stat.resolved) {
-        statsFormatted.byStatus.resolved += stat._count.id
-      } else {
-        statsFormatted.byStatus.pending += stat._count.id
-      }
+      statsFormatted.byStatus[stat.status] =
+        (statsFormatted.byStatus[stat.status] || 0) + stat._count.id
     })
 
     return {

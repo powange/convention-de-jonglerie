@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "De captcha is nog niet geladen, even geduld",
       "captcha_required": "Vul de captcha in",
-      "name_required": "Naam is verplicht",
-      "name_required_desc": "Geef uw naam op zodat we uw feedback kunnen identificeren",
-      "submit": "Er is een fout opgetreden bij het verzenden van uw feedback",
-      "title": "Fout bij verzenden"
+      "submit": "Er is een fout opgetreden bij het verzenden van uw feedback"
     },
     "guest": {
       "info": "Als bezoeker, geef alsjeblieft je contactgegevens voor mogelijke follow-up."
@@ -72,6 +69,23 @@
         "max": "Het onderwerp mag niet meer dan 200 tekens bevatten",
         "min": "Het onderwerp moet minimaal 5 tekens bevatten"
       }
+    },
+    "page": {
+      "new_title": "Feedback versturen",
+      "new_another": "Nog een feedback versturen",
+      "success_tracked": "Je kunt de voortgang op deze pagina volgen, onder \"Mijn feedback\".",
+      "tracking_title": "Mijn feedback",
+      "tracking_empty": "Je hebt nog geen feedback verstuurd.",
+      "tracking_error": "Je feedback kan op dit moment niet worden geladen.",
+      "tracking_signin_title": "Log in om je feedback te volgen",
+      "tracking_signin_description": "Feedback die met een account is verstuurd, kun je hier volgen: je ziet de voortgang en het antwoord van het team.",
+      "team_reply": "Antwoord van het team"
+    },
+    "status": {
+      "NEW": "Ontvangen",
+      "IN_PROGRESS": "In behandeling",
+      "RESOLVED": "Behandeld",
+      "REJECTED": "Niet weerhouden"
     }
   }
 }

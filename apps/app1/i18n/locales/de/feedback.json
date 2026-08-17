@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "Das Captcha ist noch nicht geladen, bitte warten Sie",
       "captcha_required": "Bitte füllen Sie das Captcha aus",
-      "name_required": "Der Name ist erforderlich",
-      "name_required_desc": "Bitte geben Sie Ihren Namen an, damit wir Ihr Feedback identifizieren können",
-      "submit": "Beim Senden Ihres Feedbacks ist ein Fehler aufgetreten",
-      "title": "Fehler beim Senden"
+      "submit": "Beim Senden Ihres Feedbacks ist ein Fehler aufgetreten"
     },
     "guest": {
       "info": "Als Besucher geben Sie bitte Ihre Kontaktdaten für eine mögliche Nachverfolgung an."
@@ -72,6 +69,23 @@
         "max": "Der Betreff darf 200 Zeichen nicht überschreiten",
         "min": "Der Betreff muss mindestens 5 Zeichen lang sein"
       }
+    },
+    "page": {
+      "new_title": "Rückmeldung senden",
+      "new_another": "Weitere Rückmeldung senden",
+      "success_tracked": "Sie können den Fortschritt auf dieser Seite unter „Meine Rückmeldungen“ verfolgen.",
+      "tracking_title": "Meine Rückmeldungen",
+      "tracking_empty": "Sie haben noch keine Rückmeldung gesendet.",
+      "tracking_error": "Ihre Rückmeldungen können derzeit nicht geladen werden.",
+      "tracking_signin_title": "Melden Sie sich an, um Ihre Rückmeldungen zu verfolgen",
+      "tracking_signin_description": "Mit einem Konto gesendete Rückmeldungen lassen sich hier verfolgen: Sie sehen ihren Fortschritt und die Antwort des Teams.",
+      "team_reply": "Antwort des Teams"
+    },
+    "status": {
+      "NEW": "Eingegangen",
+      "IN_PROGRESS": "In Bearbeitung",
+      "RESOLVED": "Bearbeitet",
+      "REJECTED": "Nicht berücksichtigt"
     }
   }
 }

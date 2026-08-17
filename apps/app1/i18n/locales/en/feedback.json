@@ -8,10 +8,7 @@
     "error": {
       "captcha_not_loaded": "The captcha is not yet loaded, please wait",
       "captcha_required": "Please complete the captcha",
-      "name_required": "Name is required",
-      "name_required_desc": "Please provide your name so we can identify your feedback",
-      "submit": "An error occurred while sending your feedback",
-      "title": "Error sending"
+      "submit": "An error occurred while sending your feedback"
     },
     "guest": {
       "info": "As a visitor, please provide your contact details for potential follow-up."
@@ -72,6 +69,23 @@
         "max": "The subject cannot exceed 200 characters",
         "min": "The subject must be at least 5 characters"
       }
+    },
+    "page": {
+      "new_title": "Send feedback",
+      "new_another": "Send another feedback",
+      "success_tracked": "You can follow its progress on this page, under \"My feedback\".",
+      "tracking_title": "My feedback",
+      "tracking_empty": "You have not sent any feedback yet.",
+      "tracking_error": "Your feedback could not be loaded right now.",
+      "tracking_signin_title": "Sign in to track your feedback",
+      "tracking_signin_description": "Feedback sent while signed in can be tracked here: you will see its progress and the team's reply.",
+      "team_reply": "Reply from the team"
+    },
+    "status": {
+      "NEW": "Received",
+      "IN_PROGRESS": "Being handled",
+      "RESOLVED": "Handled",
+      "REJECTED": "Not retained"
     }
   }
 }
