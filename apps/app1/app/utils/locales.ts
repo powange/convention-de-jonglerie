@@ -250,3 +250,24 @@ const FLAG_MAP: Record<string, string> = {
 export function languageCodeToFlag(code: string): string | undefined {
   return FLAG_MAP[code]
 }
+
+/**
+ * Mapping des codes de langues vers la balise BCP-47 à passer à `Intl`.
+ *
+ * Les options `day`/`month`/`year` d'`Intl` ne fixent que la largeur des champs, jamais leur
+ * ordre : celui-ci vient de la région de la locale. Un `en` sans région se résout vers `en-US`,
+ * qui affiche `MM/DD/YYYY` et des heures en AM/PM ; l'anglais de l'application est britannique,
+ * comme le rappelle déjà son drapeau dans FLAG_MAP.
+ */
+const INTL_LOCALE_MAP: Record<string, string> = {
+  en: 'en-GB',
+}
+
+/**
+ * Retourne la balise BCP-47 à utiliser avec `Intl` pour un code de langue.
+ *
+ * Les codes absents du mapping sont renvoyés tels quels : leur région par défaut convient.
+ */
+export function toIntlLocale(code: string): string {
+  return INTL_LOCALE_MAP[code] ?? code
+}
