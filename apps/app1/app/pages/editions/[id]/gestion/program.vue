@@ -206,12 +206,11 @@
             <URadioGroup v-model="cibleConversion" :items="conversionsPossibles" />
           </UFormField>
 
-          <!-- Un workshop a toujours une heure de fin : on la réclame plutôt que d'en inventer
-               une, qui paraîtrait aussitôt en public. -->
+          <!-- Un workshop accepte de n'avoir pas d'heure de fin, comme l'élément dont il est
+               issu : le champ est proposé pour qui veut en poser une, jamais exigé. -->
           <UFormField
-            v-if="finConversionRequise"
+            v-if="finConversionProposee"
             :label="$t('gestion.program.field.end_optional')"
-            required
           >
             <UiDateTimePicker
               v-model="finConversion"
@@ -549,7 +548,8 @@ const conversionsPossibles = computed(() => {
   return options
 })
 
-const finConversionRequise = computed(
+/** Proposée, non exigée : l'occasion de poser une fin au passage, si on en connaît une. */
+const finConversionProposee = computed(
   () => cibleConversion.value === 'workshop' && !elementAConvertir.value?.fin
 )
 
@@ -589,10 +589,6 @@ const conversionEnCours = computed(() =>
 
 const convertir = async () => {
   erreurConversion.value = ''
-  if (finConversionRequise.value && !finConversion.value) {
-    erreurConversion.value = t('gestion.program.convert_end_required')
-    return
-  }
   if (elementAConvertir.value) await executerConversion(elementAConvertir.value.cle)
 }
 

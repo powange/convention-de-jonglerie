@@ -25,7 +25,11 @@ export function dureeEnMinutes(debut: string | Date, fin?: string | Date | null)
 
 /** Ce qu'une conversion vers un workshop exige et que l'élément ne garantit pas. */
 export interface ManquesConversion {
-  /** Un workshop a toujours une heure de fin, là où un élément peut s'en passer. */
+  /**
+   * Conservé à `false` : un workshop accepte désormais de n'avoir pas d'heure de fin, comme
+   * l'élément dont il est issu. Le champ reste là pour ne pas casser les appelants, et parce
+   * qu'un autre écart pourrait le raviver.
+   */
   finRequise: boolean
   /** Un workshop n'a pas d'état de publication : il paraît dès sa création. */
   publicationImmediate: boolean
@@ -42,7 +46,7 @@ export function manquesPourWorkshop(element: {
   isPublic?: boolean
 }): ManquesConversion {
   return {
-    finRequise: !element.endDateTime,
+    finRequise: false,
     publicationImmediate: element.isPublic === false,
   }
 }

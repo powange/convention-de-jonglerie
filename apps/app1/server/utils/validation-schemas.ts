@@ -536,7 +536,9 @@ const workshopBaseSchema = z.object({
     .nullable()
     .optional(),
   startDateTime: dateSchema,
-  endDateTime: dateSchema,
+  // Facultative : un atelier peut n'annoncer que son heure de début. Cf. le commentaire porté par
+  // `Workshop.endDateTime` dans le schéma Prisma.
+  endDateTime: dateSchema.nullable().optional(),
   maxParticipants: z
     .number()
     .int('Le nombre maximum de participants doit être un entier')
@@ -561,20 +563,25 @@ const workshopBaseSchema = z.object({
 
 // Schéma complet avec refinements pour la création
 export const workshopSchema = workshopBaseSchema
-  .refine((data) => new Date(data.endDateTime) > new Date(data.startDateTime), {
-    message: 'La date de fin doit être après la date de début',
-    path: ['endDateTime'],
-  })
+  .refine(
+    (data) => !data.endDateTime || new Date(data.endDateTime) > new Date(data.startDateTime),
+    {
+      message: 'La date de fin doit être après la date de début',
+      path: ['endDateTime'],
+    }
+  )
   .refine(
     (data) => {
       // Si les dates d'édition sont fournies, vérifier que le workshop est pendant l'édition
       if (data.editionStartDate && data.editionEndDate) {
         const workshopStart = new Date(data.startDateTime)
-        const workshopEnd = new Date(data.endDateTime)
         const editionStart = new Date(data.editionStartDate)
         const editionEnd = new Date(data.editionEndDate)
 
-        return workshopStart >= editionStart && workshopEnd <= editionEnd
+        if (workshopStart < editionStart || workshopStart > editionEnd) return false
+        // Sans heure de fin annoncée, seul le début peut être situé dans l'édition.
+        if (!data.endDateTime) return true
+        return new Date(data.endDateTime) <= editionEnd
       }
       return true
     },

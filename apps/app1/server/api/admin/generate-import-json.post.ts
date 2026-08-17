@@ -14,6 +14,7 @@ import {
   AI_TIMEOUTS,
   getEffectiveAIConfigAsync,
   getMaxContentSizeForProvider,
+  serveursLmStudio,
 } from '#server/utils/ai-config'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { createTask, runTaskInBackground, updateTaskMetadata } from '#server/utils/async-tasks'
@@ -33,6 +34,7 @@ import {
   fetchWithBrowserless,
   fetchWithTimeout,
   isBrowserlessAvailable,
+  type ServeurModele,
 } from '#server/utils/fetch-helpers'
 import {
   type ProgressCallback,
@@ -405,7 +407,6 @@ export async function generateImportJson(
     if (aiProvider === 'lmstudio') {
       generatedJson = await callLMStudio(
         basesLmStudio(effectiveConfig),
-        effectiveConfig.lmstudioTextModel || effectiveConfig.lmstudioModel || 'auto',
         combinedContent,
         dynamicMaxContent,
         effectiveConfig.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
@@ -809,11 +810,8 @@ function lireElementsJournee(reponse: string): unknown {
  * La seconde n'est tentée que si la première est injoignable — machine éteinte, port fermé. Une
  * adresse vide vient d'un champ laissé blanc et ne compte pas.
  */
-function basesLmStudio(config: EffectiveAIConfig): string[] {
-  return [
-    config.lmstudioBaseUrl || 'http://localhost:1234',
-    config.lmstudioBackupBaseUrl || '',
-  ].filter((b) => b.trim() !== '')
+function basesLmStudio(config: EffectiveAIConfig): ServeurModele[] {
+  return serveursLmStudio(config, 'texte')
 }
 
 /** Un appel au modèle, quel que soit le fournisseur configuré. */
@@ -856,11 +854,11 @@ async function appelerModele(
     const res = await fetchLocalModelAvecSecours(
       basesLmStudio(config),
       '/v1/chat/completions',
-      {
+      (serveur) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: config.lmstudioTextModel || config.lmstudioModel || 'auto',
+          model: serveur.model || 'auto',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: contenu },
@@ -868,7 +866,7 @@ async function appelerModele(
           temperature: 0.2,
           max_tokens: 4096,
         }),
-      },
+      }),
       timeoutMs,
       'LM Studio'
     )
@@ -921,7 +919,6 @@ async function callAIToCompleteJson(
   if (aiProvider === 'lmstudio') {
     return await callLMStudioComplete(
       basesLmStudio(config),
-      config.lmstudioTextModel || config.lmstudioModel || 'auto',
       userPrompt,
       maxContent,
       // Le délai réglé dans /admin/ai-config était ignoré ici : seule la variable
@@ -946,8 +943,7 @@ async function callAIToCompleteJson(
  * Appel LM Studio pour compléter un JSON (prompt optimisé)
  */
 async function callLMStudioComplete(
-  bases: string[],
-  model: string,
+  serveurs: ServeurModele[],
   userPrompt: string,
   maxContent: number,
   timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST
@@ -970,13 +966,13 @@ async function callLMStudioComplete(
   let response: Response
   try {
     response = await fetchLocalModelAvecSecours(
-      bases,
+      serveurs,
       '/v1/chat/completions',
-      {
+      (serveur) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model,
+          model: serveur.model || 'auto',
           messages: [
             { role: 'system', content: getPrefilledJsonPrompt() },
             { role: 'user', content: truncatedPrompt },
@@ -984,7 +980,7 @@ async function callLMStudioComplete(
           temperature: 0.3,
           max_tokens: 1024,
         }),
-      },
+      }),
       timeoutMs,
       'LM Studio'
     )
@@ -1123,8 +1119,7 @@ export default wrapApiHandler(
  * Utilise le prompt compact pour respecter la limite de contexte
  */
 async function callLMStudio(
-  bases: string[],
-  model: string,
+  serveurs: ServeurModele[],
   content: string,
   maxContent: number,
   // Délai réglable depuis /admin/ai-config : un modèle local lent s'accommode mal des 3 minutes
@@ -1144,15 +1139,15 @@ async function callLMStudio(
     // Passe par la bascule : le helper essaie l'adresse de secours si la première est
     // injoignable, et traduit déjà expiration et panne de connexion en messages explicites.
     response = await fetchLocalModelAvecSecours(
-      bases,
+      serveurs,
       '/v1/chat/completions',
-      {
+      (serveur) => ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model,
+          model: serveur.model || 'auto',
           messages: [
             { role: 'system', content: generateCompactDirectPrompt() },
             {
@@ -1163,7 +1158,7 @@ async function callLMStudio(
           temperature: 0.3,
           max_tokens: 1024,
         }),
-      },
+      }),
       timeoutMs,
       'LM Studio'
     )

@@ -31,6 +31,18 @@ export const BROWSER_HEADERS: Record<string, string> = {
 export const ERREUR_EXPIRATION = 'ModeleExpire'
 
 /**
+ * Une adresse de modèle local, et le modèle à lui demander.
+ *
+ * Le modèle est porté par l'adresse plutôt que par l'appel : deux serveurs n'hébergent pas
+ * forcément les mêmes modèles, et réclamer à la machine de secours celui du serveur principal
+ * la ferait échouer alors qu'elle répondait.
+ */
+export interface ServeurModele {
+  base: string
+  model?: string
+}
+
+/**
  * Appelle un modèle local, en essayant les adresses dans l'ordre jusqu'à ce que l'une réponde.
  *
  * Le modèle tourne sur une machine du réseau : elle s'éteint, redémarre, change d'adresse. Une
@@ -45,25 +57,33 @@ export const ERREUR_EXPIRATION = 'ModeleExpire'
  * ailleurs doublerait l'attente pour le même verdict.
  */
 export async function fetchLocalModelAvecSecours(
-  bases: readonly string[],
+  bases: readonly (string | ServeurModele)[],
   chemin: string,
-  options: RequestInit,
+  options: RequestInit | ((serveur: ServeurModele) => RequestInit),
   timeout: number,
   modelLabel: string,
   // Le défaut couvre une bascule de modèle ; les tests passent 0 pour ne pas attendre pour rien.
   pauseRechargementMs = 3000
 ): Promise<Response> {
-  const adresses = bases.map((b) => b.trim()).filter(Boolean)
+  const adresses: ServeurModele[] = bases
+    .map((b) => (typeof b === 'string' ? { base: b } : b))
+    .map((s) => ({ ...s, base: s.base.trim() }))
+    .filter((s) => s.base !== '')
   if (adresses.length === 0) {
     throw new Error(`Aucune adresse configurée pour ${modelLabel}.`)
   }
 
   let derniereErreur: unknown
-  for (const [index, base] of adresses.entries()) {
+  for (const [index, serveur] of adresses.entries()) {
+    const base = serveur.base
     const derniere = index === adresses.length - 1
+    // Le corps est reconstruit pour chaque adresse : le modèle demandé peut différer d'un
+    // serveur à l'autre, et c'est tout l'intérêt de la bascule que de ne pas réclamer à la
+    // machine de secours un modèle qu'elle n'héberge pas.
+    const optionsServeur = typeof options === 'function' ? options(serveur) : options
     try {
       const url = `${base.replace(/\/+$/, '')}${chemin}`
-      let reponse = await fetchLocalModelWithTimeout(url, options, timeout, modelLabel)
+      let reponse = await fetchLocalModelWithTimeout(url, optionsServeur, timeout, modelLabel)
       if (reponse.ok) return reponse
 
       // Le serveur répond mais refuse de servir. On lit le corps une fois : la réponse ne sera
@@ -79,7 +99,7 @@ export async function fetchLocalModelAvecSecours(
           `[FETCH] ${modelLabel} sans modèle chargé sur ${base}, nouvel essai dans ${pauseRechargementMs} ms`
         )
         await new Promise((resoudre) => setTimeout(resoudre, pauseRechargementMs))
-        reponse = await fetchLocalModelWithTimeout(url, options, timeout, modelLabel)
+        reponse = await fetchLocalModelWithTimeout(url, optionsServeur, timeout, modelLabel)
         if (reponse.ok) return reponse
         corps = await reponse.text().catch(() => '')
       }

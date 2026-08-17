@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Виберіть або введіть місце",
     "workshop_title": "Назва воркшопу",
     "workshops_not_enabled": "Майстер-класи не ввімкнені для цієї події",
-    "workshops_selected": "вибрані воркшопи"
+    "workshops_selected": "вибрані воркшопи",
+    "extraction_ignored": "Непридатні майстер-класи",
+    "extraction_ignored_description": "Виявлено майстер-класів: {count}, але їх відкинуто через брак придатного часу. Виберіть день випуску й повторіть вилучення.",
+    "import_forced_day": "День випуску",
+    "import_forced_day_description": "Якщо на фотографії немає дати, виберіть день, на який розмістити майстер-класи. Їхній час зберігається.",
+    "import_forced_day_none": "Використовувати дати, прочитані на фотографії"
   }
 }

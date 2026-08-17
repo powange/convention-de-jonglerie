@@ -710,9 +710,6 @@
     "ai_timeout_help": "Czas przyznany modelowi na odpowiedź na wywołanie. Wolny model lokalny potrzebuje go więcej: po jego przekroczeniu generowanie zostaje przerwane. Od 30 do 1800 sekund.",
     "ai_lmstudio_backup_base_url": "Adres zapasowy",
     "ai_lmstudio_backup_base_url_help": "Używany, gdy pierwszy jest nieosiągalny — maszyna wyłączona, port zamknięty. Zostaw puste, jeśli go nie ma.",
-    "ai_backup_test": "Testuj",
-    "ai_backup_test_ok": "Adres zapasowy dostępny — znaleziono modeli: {count}",
-    "ai_backup_test_error": "Adres zapasowy niedostępny",
     "backup_import_button": "Importuj bez przywracania",
     "backup_import_error": "Błąd podczas importu kopii zapasowej",
     "backup_import_hint": "Import dodaje plik do poniższej listy bez ingerencji w bazę danych.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Scalanie kont użytkowników",
     "merge_warning_description": "Wchłonięte konto zostanie trwale usunięte. Jego dane są najpierw przypisywane do zachowanego konta; duplikaty (ta sama edycja, ta sama rozmowa itd.) są odrzucane na rzecz zachowanego konta.",
     "merge_warning_title": "Działanie nieodwracalne",
-    "users_merged_successfully": "Konta scalone pomyślnie"
+    "users_merged_successfully": "Konta scalone pomyślnie",
+    "ai_lmstudio_backup_configured": "Skonfigurowany",
+    "ai_lmstudio_backup_intro": "Próbowany, gdy serwer główny jest niedostępny. Każda maszyna ma własne zainstalowane modele, więc wskaż tutaj te, które udostępnia.",
+    "ai_lmstudio_backup_model_help": "Pozostawione puste, żądany jest model serwera głównego — co zawodzi, jeśli ta maszyna go nie udostępnia.",
+    "ai_lmstudio_backup_none": "Brak",
+    "ai_lmstudio_backup_same_as_primary": "Tak jak serwer główny",
+    "ai_lmstudio_backup_title": "LM Studio — serwer zapasowy",
+    "ai_lmstudio_primary_title": "LM Studio — serwer główny"
   }
 }

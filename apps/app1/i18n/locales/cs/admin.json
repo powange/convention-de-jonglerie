@@ -710,9 +710,6 @@
     "ai_timeout_help": "Doba, kterou má model na odpověď na volání. Pomalý lokální model potřebuje více: po jejím uplynutí je generování přerušeno. Mezi 30 a 1800 sekundami.",
     "ai_lmstudio_backup_base_url": "Záložní adresa",
     "ai_lmstudio_backup_base_url_help": "Použije se, když je první nedostupná — vypnutý stroj, zavřený port. Nechte prázdné, pokud žádná není.",
-    "ai_backup_test": "Otestovat",
-    "ai_backup_test_ok": "Záložní adresa dostupná — nalezeno modelů: {count}",
-    "ai_backup_test_error": "Záložní adresa nedostupná",
     "backup_import_button": "Importovat bez obnovení",
     "backup_import_error": "Chyba při importu zálohy",
     "backup_import_hint": "Import přidá soubor do seznamu níže, aniž by zasáhl do databáze.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Sloučení uživatelských účtů",
     "merge_warning_description": "Pohlcený účet bude trvale smazán. Jeho data se nejprve připojí k zachovanému účtu; duplicity (stejný ročník, stejná konverzace atd.) se vyřadí ve prospěch zachovaného účtu.",
     "merge_warning_title": "Nevratná akce",
-    "users_merged_successfully": "Účty byly úspěšně sloučeny"
+    "users_merged_successfully": "Účty byly úspěšně sloučeny",
+    "ai_lmstudio_backup_configured": "Nastaveno",
+    "ai_lmstudio_backup_intro": "Zkusí se, když je hlavní server nedostupný. Každý stroj má vlastní nainstalované modely, uveďte proto zde ty, které hostuje.",
+    "ai_lmstudio_backup_model_help": "Ponecháte-li prázdné, vyžádá se model hlavního serveru — což selže, pokud jej tento stroj nehostuje.",
+    "ai_lmstudio_backup_none": "Žádný",
+    "ai_lmstudio_backup_same_as_primary": "Stejně jako hlavní server",
+    "ai_lmstudio_backup_title": "LM Studio — záložní server",
+    "ai_lmstudio_primary_title": "LM Studio — hlavní server"
   }
 }

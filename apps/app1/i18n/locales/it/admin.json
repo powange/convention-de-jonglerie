@@ -710,9 +710,6 @@
     "ai_timeout_help": "Tempo concesso al modello per rispondere a una chiamata. Un modello locale lento ne richiede di più: oltre tale limite la generazione viene interrotta. Tra 30 e 1800 secondi.",
     "ai_lmstudio_backup_base_url": "Indirizzo di riserva",
     "ai_lmstudio_backup_base_url_help": "Usato se il primo non è raggiungibile — macchina spenta, porta chiusa. Lascia vuoto se non ce n'è uno.",
-    "ai_backup_test": "Prova",
-    "ai_backup_test_ok": "Indirizzo di riserva raggiungibile — {count} modello/i trovato/i",
-    "ai_backup_test_error": "Indirizzo di riserva non raggiungibile",
     "backup_import_button": "Importa senza ripristinare",
     "backup_import_error": "Errore durante l'importazione del backup",
     "backup_import_hint": "L'importazione aggiunge il file all'elenco sottostante senza toccare il database.",
@@ -783,6 +780,13 @@
     "merge_user_accounts": "Unione di account utente",
     "merge_warning_description": "L'account assorbito sarà eliminato definitivamente. I suoi dati vengono prima collegati all'account conservato; i duplicati (stessa edizione, stessa conversazione, ecc.) vengono scartati a favore dell'account conservato.",
     "merge_warning_title": "Azione irreversibile",
-    "users_merged_successfully": "Account uniti con successo"
+    "users_merged_successfully": "Account uniti con successo",
+    "ai_lmstudio_backup_configured": "Configurato",
+    "ai_lmstudio_backup_intro": "Provato quando il server principale è irraggiungibile. Poiché ogni macchina ha i propri modelli installati, indica qui quelli che ospita.",
+    "ai_lmstudio_backup_model_help": "Lasciato vuoto, viene richiesto il modello del server principale — cosa che fallisce se questa macchina non lo ospita.",
+    "ai_lmstudio_backup_none": "Nessuno",
+    "ai_lmstudio_backup_same_as_primary": "Come il server principale",
+    "ai_lmstudio_backup_title": "LM Studio — server di riserva",
+    "ai_lmstudio_primary_title": "LM Studio — server principale"
   }
 }

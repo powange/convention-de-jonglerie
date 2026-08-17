@@ -4,11 +4,15 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 
+import { AI_TIMEOUTS } from './ai-config'
+import { fetchLocalModelAvecSecours, type ServeurModele } from './fetch-helpers'
+
 export interface ExtractedWorkshop {
   title: string
   description?: string
   startDateTime: string
-  endDateTime: string
+  /** Facultative : une affiche annonce souvent le début d'un atelier sans dire quand il s'achève. */
+  endDateTime?: string
   maxParticipants?: number
   location?: string
 }
@@ -178,12 +182,17 @@ export class OllamaProvider implements AIProvider {
  */
 export class LMStudioProvider implements AIProvider {
   name = 'lmstudio'
-  private baseUrl: string
-  private model: string
+  /**
+   * Les serveurs à essayer, dans l'ordre, chacun avec son propre modèle.
+   *
+   * L'extraction depuis une image ignorait auparavant l'adresse de secours : la machine
+   * principale éteinte, la fonctionnalité tombait, alors même qu'une seconde était configurée
+   * et servait déjà les appels texte.
+   */
+  private serveurs: ServeurModele[]
 
-  constructor(baseUrl: string = 'http://localhost:1234', model: string = 'auto') {
-    this.baseUrl = baseUrl
-    this.model = model
+  constructor(serveurs: ServeurModele[] = [{ base: 'http://localhost:1234', model: 'auto' }]) {
+    this.serveurs = serveurs.length > 0 ? serveurs : [{ base: 'http://localhost:1234' }]
   }
 
   async extractWorkshopsFromImage(
@@ -195,7 +204,7 @@ export class LMStudioProvider implements AIProvider {
 
     try {
       const requestPayload = {
-        model: this.model,
+        model: this.serveurs[0]?.model || 'auto',
         messages: [
           {
             role: 'user',
@@ -219,8 +228,8 @@ export class LMStudioProvider implements AIProvider {
       }
 
       console.log('[LM Studio] Requête envoyée:')
-      console.log('  URL:', `${this.baseUrl}/v1/chat/completions`)
-      console.log('  Model:', this.model)
+      console.log('  Adresses:', this.serveurs.map((s) => s.base).join(', '))
+      console.log('  Modèles:', this.serveurs.map((s) => s.model || 'auto').join(', '))
       console.log('  Prompt length:', prompt.length, 'caractères')
       console.log('  Image type:', imageType)
       console.log('  Image size:', imageBase64.length, 'caractères base64')
@@ -231,49 +240,52 @@ export class LMStudioProvider implements AIProvider {
       console.log(prompt)
       console.log('--- FIN DU PROMPT ---\n')
 
-      // LM Studio utilise l'API compatible OpenAI
+      // LM Studio utilise l'API compatible OpenAI. Le passage par le helper apporte la bascule
+      // vers l'adresse de secours, et le modèle demandé suit l'adresse effectivement atteinte.
       const startTime = Date.now()
-      const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: prompt,
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/${imageType};base64,${imageBase64}`,
+      const response = await fetchLocalModelAvecSecours(
+        this.serveurs,
+        '/v1/chat/completions',
+        (serveur) => ({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: serveur.model || 'auto',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: prompt,
                   },
-                },
-              ],
-            },
-          ],
-          temperature: 0.7,
-          max_tokens: 4096,
-          stream: false,
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:image/${imageType};base64,${imageBase64}`,
+                    },
+                  },
+                ],
+              },
+            ],
+            temperature: 0.7,
+            max_tokens: 4096,
+            stream: false,
+          }),
         }),
-      })
+        AI_TIMEOUTS.LLM_REQUEST,
+        'LM Studio'
+      )
       const responseTime = Date.now() - startTime
 
       console.log('[LM Studio] Réponse reçue:')
       console.log('  Status:', response.status, response.statusText)
       console.log('  Response time:', responseTime, 'ms')
 
-      if (!response.ok) {
-        const errorData = await response.text()
-        console.error('[LM Studio] Erreur API:', errorData)
-        throw new Error(`LM Studio API error: ${response.statusText} - ${errorData}`)
-      }
-
+      // Pas de contrôle de `response.ok` : le helper ne rend qu'une réponse servie, et traduit
+      // lui-même un refus en message lisible.
       const data = await response.json()
       console.log('[LM Studio] Données brutes:')
       console.log('  Choices:', data.choices?.length || 0)
@@ -336,16 +348,14 @@ export function createAIProvider(config: {
   anthropicApiKey?: string
   ollamaBaseUrl?: string
   ollamaModel?: string
-  lmstudioBaseUrl?: string
-  lmstudioModel?: string
+  lmstudioServeurs?: ServeurModele[]
 }): AIProvider {
   const provider = config.provider || 'anthropic'
 
   console.log('[AI Provider] Configuration du provider IA:', provider)
   console.log('[AI Provider] Config complète:', {
     provider,
-    lmstudioBaseUrl: config.lmstudioBaseUrl,
-    lmstudioModel: config.lmstudioModel,
+    lmstudioServeurs: config.lmstudioServeurs,
   })
 
   switch (provider) {
@@ -362,7 +372,7 @@ export function createAIProvider(config: {
       return new OllamaProvider(config.ollamaBaseUrl, config.ollamaModel)
 
     case 'lmstudio':
-      return new LMStudioProvider(config.lmstudioBaseUrl, config.lmstudioModel)
+      return new LMStudioProvider(config.lmstudioServeurs)
 
     default:
       throw createError({

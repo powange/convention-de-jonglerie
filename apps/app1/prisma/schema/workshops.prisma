@@ -9,7 +9,11 @@ model Workshop {
   title           String
   description     String?  @db.Text
   startDateTime   DateTime
-  endDateTime     DateTime
+  /// Facultative, comme pour un élément de programme : bien des ateliers n'annoncent pas de fin —
+  /// un atelier libre qui dure ce qu'il dure, une affiche qui ne donne que l'heure de début.
+  /// L'exiger obligeait à inventer une durée, que l'affichage présentait ensuite comme une
+  /// certitude, et faisait perdre à l'import les ateliers dont la photo ne donnait que le début.
+  endDateTime     DateTime?
   maxParticipants Int?
   locationId      Int?
   createdAt       DateTime @default(now())

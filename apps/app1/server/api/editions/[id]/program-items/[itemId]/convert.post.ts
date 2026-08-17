@@ -61,15 +61,9 @@ export default wrapApiHandler(
     const fin = endDateTime ?? element.endDateTime
 
     if (cible === 'workshop') {
-      // Un workshop a toujours une heure de fin. On la réclame plutôt que d'en inventer une, qui
-      // paraîtrait aussitôt en public — les workshops n'ont pas d'état de brouillon.
-      if (!fin) {
-        throw createError({
-          status: 400,
-          message: 'Une heure de fin est nécessaire pour créer un workshop',
-        })
-      }
-      if (fin <= element.startDateTime) {
+      // L'heure de fin n'est plus réclamée : un workshop peut désormais s'en passer, comme
+      // l'élément de programme dont il est issu. Annoncée, elle doit tenir debout.
+      if (fin && fin <= element.startDateTime) {
         throw createError({ status: 400, message: 'La fin doit être postérieure au début' })
       }
     }
@@ -132,7 +126,7 @@ export default wrapApiHandler(
             title: element.title,
             description: element.description,
             startDateTime: element.startDateTime,
-            endDateTime: fin!,
+            endDateTime: fin,
             locationId,
           },
           select: { id: true },

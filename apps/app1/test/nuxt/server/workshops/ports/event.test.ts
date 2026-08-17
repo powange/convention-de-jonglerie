@@ -11,7 +11,7 @@ describe('port event du module ateliers (câblage jonglerie)', () => {
   })
 
   describe('getConfig', () => {
-    it('lit les flags + dates de l’Edition', async () => {
+    it('lit les flags + dates + fuseau de l’Edition', async () => {
       const startDate = new Date('2026-07-01')
       const endDate = new Date('2026-07-05')
       prismaMock.edition.findUnique.mockResolvedValue({
@@ -19,6 +19,7 @@ describe('port event du module ateliers (câblage jonglerie)', () => {
         workshopLocationsFreeInput: true,
         startDate,
         endDate,
+        timezone: 'Europe/Paris',
       })
 
       const res = await createDefaultWorkshopsPorts().event.getConfig(10)
@@ -29,6 +30,7 @@ describe('port event du module ateliers (câblage jonglerie)', () => {
         locationsFreeInput: true,
         startDate,
         endDate,
+        timezone: 'Europe/Paris',
       })
       expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
         where: { id: 10 },
@@ -37,8 +39,21 @@ describe('port event du module ateliers (câblage jonglerie)', () => {
           workshopLocationsFreeInput: true,
           startDate: true,
           endDate: true,
+          timezone: true,
         },
       })
+    })
+
+    // Le champ est facultatif : les éditions anciennes n'en déclarent pas.
+    it('accepte une édition sans fuseau', async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({
+        workshopsEnabled: true,
+        workshopLocationsFreeInput: false,
+        startDate: new Date('2026-07-01'),
+        endDate: new Date('2026-07-05'),
+        timezone: null,
+      })
+      expect((await createDefaultWorkshopsPorts().event.getConfig(10)).timezone).toBeNull()
     })
 
     it('module désactivé + saisie libre off', async () => {
@@ -62,6 +77,7 @@ describe('port event du module ateliers (câblage jonglerie)', () => {
         locationsFreeInput: false,
         startDate: null,
         endDate: null,
+        timezone: null,
       })
     })
   })

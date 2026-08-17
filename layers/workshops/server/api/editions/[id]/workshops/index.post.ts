@@ -76,7 +76,8 @@ export default wrapApiHandler(
         title: validatedData.title,
         description: validatedData.description || null,
         startDateTime: new Date(validatedData.startDateTime),
-        endDateTime: new Date(validatedData.endDateTime),
+        // Facultative : un atelier peut n'annoncer que son heure de début.
+        endDateTime: validatedData.endDateTime ? new Date(validatedData.endDateTime) : null,
         maxParticipants: validatedData.maxParticipants || null,
         locationId,
         editionId,

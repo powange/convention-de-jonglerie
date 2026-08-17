@@ -699,7 +699,6 @@
       "convert": "Convert",
       "convert_intro": "Turn “{title}” into a fuller record. The programme item will be deleted.",
       "convert_target": "Convert into",
-      "convert_end_required": "Give an end time: a workshop requires one.",
       "convert_public_warning": "Workshops are always visible to the public: this draft will become so at once.",
       "converted": "Item converted",
       "edit_place": "Change the place",

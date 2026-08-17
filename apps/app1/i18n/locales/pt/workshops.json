@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Selecione ou introduza um local",
     "workshop_title": "Título do seminário",
     "workshops_not_enabled": "Os workshops não estão ativados para esta edição",
-    "workshops_selected": "workshops selecionados"
+    "workshops_selected": "workshops selecionados",
+    "extraction_ignored": "Ateliês inutilizáveis",
+    "extraction_ignored_description": "{count} ateliê(s) detetado(s) mas descartado(s), por falta de horários utilizáveis. Escolha um dia da edição e relance a extração.",
+    "import_forced_day": "Dia da edição",
+    "import_forced_day_description": "Se a foto não indicar uma data, escolha o dia em que colocar os ateliês. Os seus horários são conservados.",
+    "import_forced_day_none": "Usar as datas lidas na foto"
   }
 }

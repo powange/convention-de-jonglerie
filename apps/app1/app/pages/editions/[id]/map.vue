@@ -473,7 +473,11 @@ watch(
 const upcomingWorkshops = computed(() => {
   if (!workshops.value) return []
   const now = new Date()
-  return workshops.value.filter((ws) => new Date(ws.endDateTime) > now)
+  return workshops.value.filter((ws) =>
+    // Sans heure de fin annoncée, c'est le début qui décide : un atelier qui dure ce qu'il dure
+    // reste affiché tant qu'il n'a pas commencé, plutôt que de disparaître de la carte.
+    ws.endDateTime ? new Date(ws.endDateTime) > now : new Date(ws.startDateTime) > now
+  )
 })
 
 const workshopsByZone = computed(() => {

@@ -699,7 +699,6 @@
       "convert": "Omzetten",
       "convert_intro": "'{title}' omzetten naar een vollediger item. Het programmaonderdeel wordt verwijderd.",
       "convert_target": "Omzetten naar",
-      "convert_end_required": "Geef een eindtijd op: een workshop vereist die.",
       "convert_public_warning": "Workshops zijn altijd zichtbaar voor het publiek: dit concept wordt dat meteen.",
       "converted": "Onderdeel omgezet",
       "edit_place": "Locatie wijzigen",

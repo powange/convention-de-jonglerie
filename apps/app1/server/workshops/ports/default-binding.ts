@@ -14,6 +14,7 @@ export function createDefaultWorkshopsPorts(): WorkshopsPorts {
             workshopLocationsFreeInput: true,
             startDate: true,
             endDate: true,
+            timezone: true,
           },
         })
         if (!edition) {
@@ -23,6 +24,7 @@ export function createDefaultWorkshopsPorts(): WorkshopsPorts {
             locationsFreeInput: false,
             startDate: null,
             endDate: null,
+            timezone: null,
           }
         }
         return {
@@ -31,6 +33,7 @@ export function createDefaultWorkshopsPorts(): WorkshopsPorts {
           locationsFreeInput: edition.workshopLocationsFreeInput === true,
           startDate: edition.startDate ?? null,
           endDate: edition.endDate ?? null,
+          timezone: edition.timezone ?? null,
         }
       },
     },

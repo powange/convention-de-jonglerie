@@ -72,6 +72,11 @@
     "workshop_location_placeholder": "Ort auswählen oder eingeben",
     "workshop_title": "Titel des Workshops",
     "workshops_not_enabled": "Workshops sind für diese Ausgabe nicht aktiviert",
-    "workshops_selected": "ausgewählte Workshops"
+    "workshops_selected": "ausgewählte Workshops",
+    "extraction_ignored": "Unbrauchbare Workshops",
+    "extraction_ignored_description": "{count} Workshop(s) erkannt, aber mangels brauchbarer Zeiten verworfen. Wählen Sie einen Tag der Ausgabe und starten Sie die Extraktion erneut.",
+    "import_forced_day": "Tag der Ausgabe",
+    "import_forced_day_description": "Wenn das Foto kein Datum nennt, wählen Sie den Tag, auf den die Workshops gelegt werden. Ihre Uhrzeiten bleiben erhalten.",
+    "import_forced_day_none": "Die auf dem Foto gelesenen Daten verwenden"
   }
 }
