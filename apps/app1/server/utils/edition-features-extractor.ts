@@ -119,6 +119,12 @@ export async function extractEditionFeatures(
     anthropicApiKey?: string
     ollamaBaseUrl?: string
     ollamaModel?: string
+    /**
+     * Jetons accordés à la réponse. 512 suffisaient à la liste de services attendue, mais pas à
+     * un modèle qui raisonne avant de répondre : il épuise ce budget en réflexion et se fait
+     * couper avant d'écrire, si bien qu'aucun service n'est jamais détecté.
+     */
+    llmMaxTokens?: number
   }
 ): Promise<EditionFeatures> {
   if (!description || description.trim().length < 50) {
@@ -131,6 +137,10 @@ export async function extractEditionFeatures(
 
   console.log(`[FEATURES-EXTRACTOR] Extraction des caractéristiques via ${aiProvider}`)
 
+  // 512 jetons suffisaient à la liste de services attendue, mais un modèle qui raisonne avant
+  // de répondre les dépense en réflexion. La valeur configurée prime, avec ce plancher.
+  const jetons = Math.max(config.llmMaxTokens ?? 512, 512)
+
   try {
     let responseText: string
 
@@ -139,13 +149,15 @@ export async function extractEditionFeatures(
         config.lmstudioBaseUrl || 'http://localhost:1234',
         config.lmstudioTextModel || config.lmstudioModel || 'auto',
         systemPrompt,
-        userPrompt
+        userPrompt,
+        jetons
       )
     } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
       responseText = await callAnthropicForFeatures(
         config.anthropicApiKey,
         systemPrompt,
-        userPrompt
+        userPrompt,
+        jetons
       )
     } else if (aiProvider === 'ollama') {
       responseText = await callOllamaForFeatures(
@@ -191,7 +203,8 @@ async function callLMStudioForFeatures(
   baseUrl: string,
   model: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  maxTokens: number
 ): Promise<string> {
   const response = await fetch(`${baseUrl}/v1/chat/completions`, {
     method: 'POST',
@@ -203,7 +216,7 @@ async function callLMStudioForFeatures(
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.1, // Très bas pour des réponses cohérentes
-      max_tokens: 512,
+      max_tokens: maxTokens,
     }),
   })
 
@@ -221,14 +234,15 @@ async function callLMStudioForFeatures(
 async function callAnthropicForFeatures(
   apiKey: string,
   systemPrompt: string,
-  userPrompt: string
+  userPrompt: string,
+  maxTokens: number
 ): Promise<string> {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')
   const client = new Anthropic({ apiKey, timeout: 30000 })
 
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 512,
+    max_tokens: maxTokens,
     system: systemPrompt,
     messages: [{ role: 'user', content: userPrompt }],
   })

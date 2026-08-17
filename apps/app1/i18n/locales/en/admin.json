@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "None",
     "ai_lmstudio_backup_same_as_primary": "Same as the primary server",
     "ai_lmstudio_backup_title": "LM Studio — backup server",
-    "ai_lmstudio_primary_title": "LM Studio — primary server"
+    "ai_lmstudio_primary_title": "LM Studio — primary server",
+    "ai_max_tokens_help": "Budget the model may spend writing its answer. A model that reasons before answering spends this budget thinking: set too low, it gets cut off before writing anything and the answer comes back empty.",
+    "ai_max_tokens_label": "Maximum tokens per response"
   }
 }

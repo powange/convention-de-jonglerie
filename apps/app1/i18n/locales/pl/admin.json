@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "Brak",
     "ai_lmstudio_backup_same_as_primary": "Tak jak serwer główny",
     "ai_lmstudio_backup_title": "LM Studio — serwer zapasowy",
-    "ai_lmstudio_primary_title": "LM Studio — serwer główny"
+    "ai_lmstudio_primary_title": "LM Studio — serwer główny",
+    "ai_max_tokens_help": "Budżet, jaki model może przeznaczyć na napisanie odpowiedzi. Model, który rozumuje przed udzieleniem odpowiedzi, zużywa ten budżet na myślenie: przy zbyt niskiej wartości zostaje przerwany, zanim cokolwiek napisze, a odpowiedź wraca pusta.",
+    "ai_max_tokens_label": "Maksymalna liczba tokenów na odpowiedź"
   }
 }

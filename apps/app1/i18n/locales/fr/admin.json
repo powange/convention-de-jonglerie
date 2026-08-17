@@ -39,6 +39,8 @@
     "ai_lmstudio_primary_title": "LM Studio — serveur principal",
     "ai_lmstudio_text_model": "Modèle texte (génération JSON)",
     "ai_lmstudio_vision_model": "Modèle vision (analyse d'images)",
+    "ai_max_tokens_help": "Budget accordé au modèle pour écrire sa réponse. Un modèle qui raisonne avant de répondre dépense ce budget en réflexion : trop bas, il est coupé avant d'avoir rien écrit et la réponse revient vide.",
+    "ai_max_tokens_label": "Jetons maximum par réponse",
     "ai_model_add_error": "Erreur lors de l'ajout du modèle",
     "ai_model_added": "Modèle ajouté",
     "ai_model_confirm_delete": "Voulez-vous vraiment supprimer le modèle « {name} » ?",

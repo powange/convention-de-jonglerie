@@ -787,6 +787,8 @@
     "ai_lmstudio_backup_none": "Ninguno",
     "ai_lmstudio_backup_same_as_primary": "Igual que el servidor principal",
     "ai_lmstudio_backup_title": "LM Studio — servidor de reserva",
-    "ai_lmstudio_primary_title": "LM Studio — servidor principal"
+    "ai_lmstudio_primary_title": "LM Studio — servidor principal",
+    "ai_max_tokens_help": "Presupuesto que el modelo puede gastar para escribir su respuesta. Un modelo que razona antes de responder consume ese presupuesto pensando: si es demasiado bajo, se corta antes de escribir nada y la respuesta vuelve vacía.",
+    "ai_max_tokens_label": "Tokens máximos por respuesta"
   }
 }

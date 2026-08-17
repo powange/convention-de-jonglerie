@@ -67,6 +67,7 @@
         v-model:text-model="form.lmstudioTextModelId"
         serveur="principal"
         :titre="$t('admin.ai_lmstudio_primary_title')"
+        :libelle-adresse="$t('admin.ai_lmstudio_base_url')"
         icone="i-heroicons-computer-desktop"
         couleur-icone="text-blue-600 dark:text-blue-400"
         placeholder-adresse="http://host.docker.internal:1234"
@@ -84,6 +85,7 @@
         v-model:text-model="form.lmstudioBackupTextModelId"
         serveur="secours"
         :titre="$t('admin.ai_lmstudio_backup_title')"
+        :libelle-adresse="$t('admin.ai_lmstudio_backup_base_url')"
         icone="i-heroicons-lifebuoy"
         couleur-icone="text-purple-600 dark:text-purple-400"
         :introduction="$t('admin.ai_lmstudio_backup_intro')"
@@ -206,6 +208,23 @@
             class="w-40"
           />
         </UFormField>
+
+        <!-- Un modèle qui raisonne avant de répondre consomme ce budget en réflexion : trop bas,
+             il se fait couper avant d'écrire quoi que ce soit, et la réponse revient vide. -->
+        <UFormField
+          :label="$t('admin.ai_max_tokens_label')"
+          :description="$t('admin.ai_max_tokens_help')"
+          class="mt-6"
+        >
+          <UInputNumber
+            v-model="form.llmMaxTokens"
+            :min="512"
+            :max="32768"
+            :step="512"
+            :step-snapping="false"
+            class="w-40"
+          />
+        </UFormField>
       </UCard>
 
       <!-- Bouton Enregistrer -->
@@ -242,6 +261,8 @@ const form = reactive({
   // Saisi en secondes : demander des millisecondes à un administrateur est une invitation à
   // se tromper d'un facteur mille.
   llmTimeoutSeconds: 180,
+  // Jetons accordés à la réponse du modèle.
+  llmMaxTokens: 4096,
 })
 
 // --- Options ---
@@ -269,6 +290,7 @@ const { pending: configPending } = await useLazyFetch('/api/admin/ai/config', {
       form.ollamaBaseUrl = cfg.ollamaBaseUrl || 'http://localhost:11434'
       form.ollamaModel = cfg.ollamaModel || 'llava'
       form.llmTimeoutSeconds = Math.round((cfg.llmTimeoutMs || 180000) / 1000)
+      form.llmMaxTokens = cfg.llmMaxTokens || 4096
     }
   },
 })
@@ -331,6 +353,7 @@ const { execute: executeSave, loading: saving } = useApiAction('/api/admin/ai/co
     ollamaModel: form.ollamaModel,
     // Saisi en secondes côté interface, stocké en millisecondes.
     llmTimeoutMs: form.llmTimeoutSeconds * 1000,
+    llmMaxTokens: form.llmMaxTokens,
   }),
   successMessage: { title: t('admin.ai_config_saved') },
   errorMessages: { default: t('admin.ai_config_save_error') },
