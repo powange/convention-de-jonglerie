@@ -34,71 +34,71 @@
     </div>
 
     <!-- Statistiques -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm">
         <div class="flex items-center">
-          <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+          <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg shrink-0">
             <UIcon
               name="i-heroicons-chat-bubble-left-ellipsis"
               class="h-6 w-6 text-blue-600 dark:text-blue-400"
             />
           </div>
-          <div class="ml-4">
+          <div class="ml-4 min-w-0">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ stats?.total || 0 }}
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-gray-600 dark:text-gray-400 break-words">
               {{ t('admin.feedback.stats.total') }}
             </p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+      <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm">
         <div class="flex items-center">
-          <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+          <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg shrink-0">
             <UIcon name="i-heroicons-clock" class="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
           </div>
-          <div class="ml-4">
+          <div class="ml-4 min-w-0">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ enAttente }}
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-gray-600 dark:text-gray-400 break-words">
               {{ t('admin.feedback.stats.pending') }}
             </p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+      <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm">
         <div class="flex items-center">
-          <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+          <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg shrink-0">
             <UIcon
               name="i-heroicons-check-circle"
               class="h-6 w-6 text-green-600 dark:text-green-400"
             />
           </div>
-          <div class="ml-4">
+          <div class="ml-4 min-w-0">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ stats?.byStatus?.RESOLVED || 0 }}
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-gray-600 dark:text-gray-400 break-words">
               {{ t('admin.feedback.stats.resolved') }}
             </p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+      <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm">
         <div class="flex items-center">
-          <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+          <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg shrink-0">
             <UIcon name="i-heroicons-bug-ant" class="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
-          <div class="ml-4">
+          <div class="ml-4 min-w-0">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ stats?.byType?.BUG || 0 }}
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <p class="text-sm text-gray-600 dark:text-gray-400 break-words">
               {{ t('admin.feedback.stats.bugs') }}
             </p>
           </div>
@@ -151,9 +151,9 @@
             :key="feedback.id"
             class="p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
-            <div class="flex items-start justify-between">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-3 mb-2">
+                <div class="flex flex-wrap items-center gap-3 mb-2">
                   <UBadge
                     :color="getTypeColor(feedback.type)"
                     :label="t(`admin.feedback.types.${feedback.type.toLowerCase()}`)"
@@ -172,25 +172,29 @@
                   {{ feedback.message }}
                 </p>
 
-                <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  <div class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-user" class="h-4 w-4" />
-                    <span v-if="feedback.user">
+                <!-- Ces trois informations tiennent rarement sur une ligne : une adresse
+                     électronique suffit à les faire déborder sur mobile. -->
+                <div
+                  class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400 mb-2"
+                >
+                  <div class="flex items-center gap-1 min-w-0">
+                    <UIcon name="i-heroicons-user" class="h-4 w-4 shrink-0" />
+                    <span v-if="feedback.user" class="truncate">
                       {{ feedback.user.pseudo }} ({{ feedback.user.email }})
                     </span>
-                    <span v-else> {{ feedback.name }} ({{ feedback.email }}) </span>
+                    <span v-else class="truncate">
+                      {{ feedback.name }} ({{ feedback.email }})
+                    </span>
                   </div>
-                  <div class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-calendar" class="h-4 w-4" />
+                  <div class="flex items-center gap-1 shrink-0">
+                    <UIcon name="i-heroicons-calendar" class="h-4 w-4 shrink-0" />
                     <time>{{ formatDateWithTime(feedback.createdAt) }}</time>
                   </div>
-                  <div v-if="feedback.url" class="flex items-center gap-1">
-                    <UIcon name="i-heroicons-link" class="h-4 w-4" />
-                    <a
-                      :href="feedback.url"
-                      target="_blank"
-                      class="hover:underline truncate max-w-xs"
-                    >
+                  <!-- min-w-0 sans quoi `truncate` reste sans effet : un élément flex refuse par
+                       défaut de rétrécir sous la largeur de son contenu. -->
+                  <div v-if="feedback.url" class="flex items-center gap-1 min-w-0">
+                    <UIcon name="i-heroicons-link" class="h-4 w-4 shrink-0" />
+                    <a :href="feedback.url" target="_blank" class="hover:underline truncate">
                       {{ feedback.url }}
                     </a>
                   </div>
@@ -215,12 +219,15 @@
                 </div>
               </div>
 
-              <div class="flex items-center gap-2 ml-4">
+              <!-- shrink-0 : sans lui, ce bloc se fait comprimer par le texte de gauche et les
+                   deux boutons finissent par se chevaucher. -->
+              <div class="flex items-center gap-2 sm:ml-4 sm:shrink-0">
                 <UButton
                   color="success"
                   variant="soft"
                   size="sm"
                   icon="i-heroicons-chat-bubble-bottom-center-text"
+                  class="flex-1 justify-center sm:flex-none"
                   @click="openResolveModal(feedback)"
                 >
                   {{ t('admin.feedback.process') }}
@@ -229,6 +236,7 @@
                   color="secondary"
                   variant="soft"
                   size="sm"
+                  class="flex-1 justify-center sm:flex-none"
                   @click="openDetailsModal(feedback)"
                 >
                   {{ t('admin.feedback.view') }}
@@ -257,7 +265,7 @@
           <div class="space-y-4 p-4">
             <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <h4 class="font-medium mb-2">{{ resolveModal.feedback?.subject }}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+              <p class="text-sm text-gray-600 dark:text-gray-400 break-words">
                 {{ resolveModal.feedback?.message }}
               </p>
             </div>
@@ -318,11 +326,17 @@
     </UModal>
 
     <!-- Modal de détails -->
-    <UModal v-model:open="detailsModal.isOpen" :title="t('admin.feedback.details')" size="lg">
+    <!-- Pas de prop `size` sur UModal : elle était passée en pur attribut HTML, sans effet. La
+         largeur vient du thème — w-[calc(100vw-2rem)] max-w-lg — et suit donc déjà l'écran ;
+         c'était le contenu qui la débordait. -->
+    <UModal v-model:open="detailsModal.isOpen" :title="t('admin.feedback.details')">
       <template #content>
         <UCard>
-          <div v-if="detailsModal.feedback" class="space-y-6 p-4">
-            <div class="grid grid-cols-2 gap-4">
+          <div
+            v-if="detailsModal.feedback"
+            class="space-y-6 p-4 overflow-y-auto max-h-[calc(100dvh-6rem)]"
+          >
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {{ t('admin.feedback.type.label') }}
@@ -347,7 +361,9 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {{ t('admin.feedback.subject.label') }}
               </label>
-              <p class="text-gray-900 dark:text-white">{{ detailsModal.feedback.subject }}</p>
+              <p class="text-gray-900 dark:text-white break-words">
+                {{ detailsModal.feedback.subject }}
+              </p>
             </div>
 
             <div>
@@ -355,18 +371,18 @@
                 {{ t('admin.feedback.message.label') }}
               </label>
               <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                <p class="text-gray-900 dark:text-white whitespace-pre-wrap">
+                <p class="text-gray-900 dark:text-white whitespace-pre-wrap break-words">
                   {{ detailsModal.feedback.message }}
                 </p>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {{ t('admin.feedback.user') }}
                 </label>
-                <p class="text-gray-900 dark:text-white">
+                <p class="text-gray-900 dark:text-white break-words">
                   <span v-if="detailsModal.feedback.user">
                     {{ detailsModal.feedback.user.pseudo }} ({{ detailsModal.feedback.user.email }})
                   </span>
@@ -412,7 +428,7 @@
                 {{ t('admin.feedback.admin_notes') }}
               </label>
               <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p class="text-blue-900 dark:text-blue-100 whitespace-pre-wrap">
+                <p class="text-blue-900 dark:text-blue-100 whitespace-pre-wrap break-words">
                   {{ detailsModal.feedback.adminNotes }}
                 </p>
               </div>
