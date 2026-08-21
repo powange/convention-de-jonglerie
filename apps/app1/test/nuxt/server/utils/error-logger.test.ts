@@ -59,4 +59,62 @@ describe('error-logger – logApiError', () => {
 
     expect(prismaMock.apiErrorLog.create).toHaveBeenCalledTimes(1)
   })
+
+  // Une erreur de validation porte le détail des champs refusés dans `data.errors`, mais seul le
+  // message était journalisé : « Données invalides » revenait passage après passage sans qu'on
+  // sache quel champ était en cause.
+  describe('détail des champs refusés par la validation', () => {
+    const erreurValidation = (errors: Record<string, string>) =>
+      Object.assign(new Error('Données invalides'), {
+        data: { errors, message: 'Veuillez corriger les erreurs de saisie' },
+      })
+
+    it('ajoute au message le champ fautif et sa raison', async () => {
+      prismaMock.apiErrorLog.create.mockResolvedValue({})
+
+      await logApiError({
+        error: erreurValidation({ telephone: 'Format de téléphone invalide' }),
+        statusCode: 400,
+        event: makeEvent(7) as any,
+      })
+
+      expect(prismaMock.apiErrorLog.create.mock.calls[0][0].data.message).toBe(
+        'Données invalides (telephone: Format de téléphone invalide)'
+      )
+    })
+
+    it('énumère tous les champs quand plusieurs sont refusés', async () => {
+      prismaMock.apiErrorLog.create.mockResolvedValue({})
+
+      await logApiError({
+        error: erreurValidation({ pseudo: 'Trop court', email: 'Email invalide' }),
+        statusCode: 400,
+        event: makeEvent(7) as any,
+      })
+
+      const message = prismaMock.apiErrorLog.create.mock.calls[0][0].data.message
+      expect(message).toContain('pseudo: Trop court')
+      expect(message).toContain('email: Email invalide')
+    })
+
+    it('laisse le message intact quand l’erreur ne vient pas de la validation', async () => {
+      prismaMock.apiErrorLog.create.mockResolvedValue({})
+
+      await logApiError({ error: new Error('boom'), statusCode: 500, event: makeEvent(7) as any })
+
+      expect(prismaMock.apiErrorLog.create.mock.calls[0][0].data.message).toBe('boom')
+    })
+
+    it('supporte un `data.errors` vide ou mal formé sans altérer le message', async () => {
+      prismaMock.apiErrorLog.create.mockResolvedValue({})
+
+      await logApiError({
+        error: Object.assign(new Error('Données invalides'), { data: { errors: {} } }),
+        statusCode: 400,
+        event: makeEvent(7) as any,
+      })
+
+      expect(prismaMock.apiErrorLog.create.mock.calls[0][0].data.message).toBe('Données invalides')
+    })
+  })
 })

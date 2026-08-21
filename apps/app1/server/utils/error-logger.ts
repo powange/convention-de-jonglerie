@@ -321,6 +321,23 @@ function getClientIP(event: H3Event): string | undefined {
 /**
  * Log une erreur API dans la base de données
  */
+/**
+ * Résume les champs refusés par la validation, sous la forme « champ: raison ; champ: raison ».
+ *
+ * Ne reprend que les noms de champs et les raisons produites par le schéma : les valeurs saisies
+ * n'y figurent pas, ce qui rend le résumé sûr à journaliser.
+ */
+function extraireDetailsValidation(error: any): string | null {
+  const erreurs = error?.data?.errors
+  if (!erreurs || typeof erreurs !== 'object' || Array.isArray(erreurs)) return null
+
+  const parties = Object.entries(erreurs)
+    .filter(([champ, raison]) => champ && typeof raison === 'string')
+    .map(([champ, raison]) => `${champ}: ${raison}`)
+
+  return parties.length > 0 ? parties.join(' ; ') : null
+}
+
 export async function logApiError({ error, statusCode, event }: ErrorInfo): Promise<void> {
   try {
     const url = event.node.req.url || ''
@@ -377,13 +394,23 @@ export async function logApiError({ error, statusCode, event }: ErrorInfo): Prom
         ? `${rootError.message} (réponse: ${error.message})`
         : effectiveError.message
 
+    // Détail des champs refusés par la validation.
+    //
+    // `handleValidationError` construit { errors: { champ: raison } } dans `data`, mais seul le
+    // message était journalisé : « Données invalides » revenait passage après passage sans qu'on
+    // puisse savoir quel champ était en cause, ni donc trancher entre saisie fautive et
+    // validation trop stricte. Seuls les noms de champs et les raisons sont repris — jamais les
+    // valeurs saisies.
+    const detailsValidation =
+      extraireDetailsValidation(error) || extraireDetailsValidation(effectiveError)
+
     // Extraire les détails Prisma/SQL si c'est une erreur de base de données
     const prismaDetails = extractPrismaDetails(effectiveError) || extractPrismaDetails(error)
     const errorType = getErrorType(effectiveError)
 
     // Créer l'enregistrement de log
     const logData = {
-      message,
+      message: detailsValidation ? `${message} (${detailsValidation})` : message,
       statusCode,
       stack: sanitizeStackTrace(effectiveError.stack || error.stack),
       errorType,
