@@ -236,7 +236,10 @@
       "col_user": "Usuario",
       "columns_label": "Columnas",
       "resolved": "Resuelto",
-      "unresolved_short": "Sin resolver"
+      "unresolved_short": "Sin resolver",
+      "clear_filters": "Borrar",
+      "filters": "Filtros",
+      "show_results": "Ver los resultados ({count})"
     },
     "errors_24h": "Errores (24h)",
     "event_reminders": "Recordatorios de eventos",
@@ -268,15 +271,10 @@
         "status": "Filtrar por estado",
         "type": "Filtrar por tipo"
       },
-      "mark_resolved": "Marcar como resuelto",
-      "mark_unresolved": "Marcar como no resuelto",
       "message": {
         "label": "Mensaje"
       },
-      "pending": "Pendiente",
       "require_attention": "Requieren atención",
-      "resolve": "Resolver",
-      "resolved": "Resuelto",
       "search": "Buscar comentarios...",
       "stats": {
         "bugs": "Errores reportados",
@@ -289,8 +287,6 @@
         "label": "Asunto"
       },
       "success": {
-        "resolve": "Comentario marcado como resuelto",
-        "unresolve": "Comentario marcado como no resuelto",
         "updated": "Comentario actualizado: {status}"
       },
       "title": "Gestión de Comentarios de Usuarios",
@@ -303,7 +299,6 @@
         "general": "General",
         "suggestion": "Sugerencia"
       },
-      "unresolve": "Reabrir",
       "unresolved": "Comentarios sin resolver",
       "url": "Página relacionada",
       "user": "Usuario",

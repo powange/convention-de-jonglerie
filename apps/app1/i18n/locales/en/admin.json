@@ -236,7 +236,10 @@
       "col_user": "User",
       "columns_label": "Columns",
       "resolved": "Resolved",
-      "unresolved_short": "Unresolved"
+      "unresolved_short": "Unresolved",
+      "clear_filters": "Clear",
+      "filters": "Filters",
+      "show_results": "Show results ({count})"
     },
     "errors_24h": "Errors (24h)",
     "event_reminders": "Event Reminders",
@@ -268,15 +271,10 @@
         "status": "Filter by status",
         "type": "Filter by type"
       },
-      "mark_resolved": "Mark as resolved",
-      "mark_unresolved": "Mark as unresolved",
       "message": {
         "label": "Message"
       },
-      "pending": "Pending",
       "require_attention": "Require attention",
-      "resolve": "Resolve",
-      "resolved": "Resolved",
       "search": "Search feedback...",
       "stats": {
         "bugs": "Bugs reported",
@@ -289,8 +287,6 @@
         "label": "Subject"
       },
       "success": {
-        "resolve": "Feedback marked as resolved",
-        "unresolve": "Feedback marked as unresolved",
         "updated": "Feedback updated: {status}"
       },
       "title": "User Feedback Management",
@@ -303,7 +299,6 @@
         "general": "General",
         "suggestion": "Suggestion"
       },
-      "unresolve": "Reopen",
       "unresolved": "Unresolved feedback",
       "url": "Related page",
       "user": "User",

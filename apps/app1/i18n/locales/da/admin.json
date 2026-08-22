@@ -236,7 +236,10 @@
       "col_user": "Bruger",
       "columns_label": "Kolonner",
       "resolved": "Løst",
-      "unresolved_short": "Uløst"
+      "unresolved_short": "Uløst",
+      "clear_filters": "Ryd",
+      "filters": "Filtre",
+      "show_results": "Se resultaterne ({count})"
     },
     "errors_24h": "Fejl (24t)",
     "event_reminders": "Begivenhedspåmindelser",
@@ -268,15 +271,10 @@
         "status": "Filtrer efter status",
         "type": "Filtrer efter type"
       },
-      "mark_resolved": "Markér som løst",
-      "mark_unresolved": "Markér som uløst",
       "message": {
         "label": "Besked"
       },
-      "pending": "Afventer",
       "require_attention": "Kræver opmærksomhed",
-      "resolve": "Løs",
-      "resolved": "Løst",
       "search": "Søg i feedback...",
       "stats": {
         "bugs": "Rapporterede fejl",
@@ -289,8 +287,6 @@
         "label": "Emne"
       },
       "success": {
-        "resolve": "Feedback markeret som løst",
-        "unresolve": "Feedback markeret som uløst",
         "updated": "Tilbagemelding opdateret: {status}"
       },
       "title": "Brugerfeedback Administration",
@@ -303,7 +299,6 @@
         "general": "Generel",
         "suggestion": "Forslag"
       },
-      "unresolve": "Åbn igen",
       "unresolved": "Uløst feedback",
       "url": "Relateret side",
       "user": "Bruger",

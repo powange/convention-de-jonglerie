@@ -25,21 +25,25 @@
 
     <!-- En-tête -->
     <div class="mb-8">
-      <div class="flex justify-between items-start">
-        <div>
-          <h1 class="text-3xl font-bold flex items-center gap-3">
-            <UIcon name="i-heroicons-exclamation-triangle" class="text-red-600" />
-            {{ $t('admin.api_error_logs') }}
+      <!-- Titre et actions sur une même ligne : les deux libellés de boutons sont insécables
+           (le thème leur applique `truncate`, donc white-space: nowrap) et réclamaient à eux
+           seuls plus que la largeur d'un téléphone. Ils passent sous le titre en dessous de sm. -->
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-bold flex items-center gap-3">
+            <UIcon name="i-heroicons-exclamation-triangle" class="text-red-600 shrink-0" />
+            <span class="break-words">{{ $t('admin.api_error_logs') }}</span>
           </h1>
           <p class="text-gray-600 dark:text-gray-400 mt-2">
             Surveillance et résolution des erreurs de l'API
           </p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex flex-col gap-3 sm:flex-row sm:shrink-0">
           <UButton
             icon="i-heroicons-trash"
-            color="red"
+            color="error"
             variant="outline"
+            class="w-full justify-center sm:w-auto"
             :loading="cleaningOldLogs"
             @click="cleanupOldLogs"
           >
@@ -48,6 +52,7 @@
           <UButton
             icon="i-heroicons-arrow-path"
             variant="outline"
+            class="w-full justify-center sm:w-auto"
             :loading="loading"
             @click="refreshLogs"
           >
@@ -118,75 +123,56 @@
       </UCard>
     </div>
 
-    <!-- Filtres -->
-    <UCard class="mb-6">
-      <div class="flex flex-wrap gap-4">
-        <div class="flex-1 min-w-64">
-          <UInput
-            v-model="filters.search"
-            icon="i-heroicons-magnifying-glass"
-            :placeholder="$t('admin.search_error_messages')"
-            @input="debouncedSearch"
-          />
-        </div>
-
-        <USelect
-          v-model="filters.status"
-          :items="statusOptions"
-          class="w-40"
-          @change="applyFilters"
-        />
-
-        <USelect
-          v-model="filters.timeRange"
-          :items="timeRangeOptions"
-          class="w-48"
-          @change="applyFilters"
-        />
-
-        <USelect
-          v-model="filters.errorType"
-          :items="errorTypeOptions"
-          class="w-48"
-          @change="applyFilters"
-        />
-
-        <USelect
-          v-model="filters.statusCode"
-          :items="statusCodeOptions"
-          class="w-48"
-          @change="applyFilters"
-        />
-
-        <UInput
-          v-model="filters.path"
-          icon="i-heroicons-link"
-          :placeholder="$t('admin.api_path')"
-          class="w-48"
-          @input="debouncedSearch"
-        />
-
-        <UInput
-          v-model="filters.ip"
-          icon="i-heroicons-globe-alt"
-          :placeholder="$t('admin.filter_by_ip')"
-          class="w-48"
-          @input="debouncedSearch"
-        />
-
-        <UInput
-          v-model="filters.user"
-          icon="i-heroicons-user"
-          :placeholder="$t('admin.filter_by_user')"
-          class="w-56"
-          @input="debouncedSearch"
-        />
-
-        <UButton icon="i-heroicons-x-mark" variant="outline" color="neutral" @click="clearFilters">
-          Effacer
-        </UButton>
-      </div>
+    <!-- Filtres : en carte à partir de md, dans une fenêtre en dessous. Huit champs empilés
+         mangeaient la hauteur d'un écran de téléphone avant même d'atteindre le tableau. -->
+    <UCard class="mb-6 hidden md:block">
+      <AdminErrorLogFilters
+        v-model:filters="filters"
+        :status-options="statusOptions"
+        :time-range-options="timeRangeOptions"
+        :error-type-options="errorTypeOptions"
+        :status-code-options="statusCodeOptions"
+        @apply="applyFilters"
+        @search="debouncedSearch"
+        @clear="clearFilters"
+      />
     </UCard>
+
+    <div class="mb-6 md:hidden">
+      <UButton
+        icon="i-heroicons-funnel"
+        variant="outline"
+        color="neutral"
+        block
+        @click="showFilters = true"
+      >
+        {{ $t('admin.error_logs.filters') }}
+        <!-- Le compte évite d'avoir à ouvrir la fenêtre pour savoir si un filtre est actif. -->
+        <UBadge v-if="activeFilterCount > 0" color="primary" size="sm" variant="solid">
+          {{ activeFilterCount }}
+        </UBadge>
+      </UButton>
+    </div>
+
+    <UModal v-model:open="showFilters" :title="$t('admin.error_logs.filters')">
+      <template #body>
+        <AdminErrorLogFilters
+          v-model:filters="filters"
+          :status-options="statusOptions"
+          :time-range-options="timeRangeOptions"
+          :error-type-options="errorTypeOptions"
+          :status-code-options="statusCodeOptions"
+          @apply="applyFilters"
+          @search="debouncedSearch"
+          @clear="clearFilters"
+        />
+      </template>
+      <template #footer>
+        <UButton block @click="showFilters = false">
+          {{ $t('admin.error_logs.show_results', { count: pagination.total }) }}
+        </UButton>
+      </template>
+    </UModal>
 
     <!-- Table des logs -->
     <UCard>
@@ -625,10 +611,16 @@
               </div>
 
               <!-- Actions -->
-              <div class="flex flex-wrap gap-3">
+              <!-- Le thème applique `truncate` au libellé, donc white-space: nowrap : « Résoudre
+                   tous les logs identiques » est insécable, et le bouton prend la largeur de ce
+                   texte. flex-wrap lui accorde une ligne à lui seul mais ne le rétrécit pas — il
+                   débordait donc du panneau. En pleine largeur sous sm, il ne peut plus dépasser
+                   son conteneur, et le libellé tronque si l'écran est vraiment étroit. -->
+              <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <UButton
                   v-if="!selectedLog.resolved"
                   color="success"
+                  class="w-full justify-center sm:w-auto"
                   :loading="resolving"
                   @click="resolveLog(true)"
                 >
@@ -638,6 +630,7 @@
                   v-else
                   color="error"
                   variant="outline"
+                  class="w-full justify-center sm:w-auto"
                   :loading="resolving"
                   @click="resolveLog(false)"
                 >
@@ -649,13 +642,19 @@
                   color="warning"
                   variant="outline"
                   icon="i-heroicons-squares-plus"
+                  class="w-full justify-center sm:w-auto"
                   :loading="resolvingSimilarLoading"
                   @click="resolveSimilarLogs"
                 >
                   Résoudre tous les logs identiques
                 </UButton>
 
-                <UButton variant="outline" :loading="updatingNotes" @click="updateAdminNotes">
+                <UButton
+                  variant="outline"
+                  class="w-full justify-center sm:w-auto"
+                  :loading="updatingNotes"
+                  @click="updateAdminNotes"
+                >
                   Sauvegarder les notes
                 </UButton>
               </div>
@@ -731,6 +730,24 @@ const FILTER_DEFAULTS = {
   timeRange: '7d',
 } as const
 const DEFAULT_PAGE_SIZE = 20
+
+// Sur mobile, les filtres vivent dans une fenêtre : huit champs empilés repoussaient le tableau
+// hors de l'écran.
+const showFilters = ref(false)
+
+/**
+ * Nombre de filtres qui s'écartent de leur valeur par défaut.
+ *
+ * Affiché sur le bouton : sans lui, il faudrait ouvrir la fenêtre pour savoir si la liste est
+ * filtrée — et une liste filtrée qu'on croit complète est le meilleur moyen de conclure à tort
+ * qu'il n'y a plus d'erreurs.
+ */
+const activeFilterCount = computed(
+  () =>
+    (Object.keys(FILTER_DEFAULTS) as (keyof typeof FILTER_DEFAULTS)[]).filter(
+      (key) => filters.value[key] && filters.value[key] !== FILTER_DEFAULTS[key]
+    ).length
+)
 
 const route = useRoute()
 const router = useRouter()
