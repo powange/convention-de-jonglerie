@@ -425,7 +425,7 @@
           </p>
 
           <!-- Informations principales -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Code de statut
@@ -463,27 +463,33 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Détails de la requête
             </label>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded break-words">
                 <strong>{{ $t('log.method') }}:</strong> {{ selectedLog.method }}
               </div>
-              <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
+              <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded break-words">
                 <strong>{{ $t('log.path') }}:</strong> {{ selectedLog.path }}
               </div>
-              <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2">
+              <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 break-words">
                 <strong>{{ $t('log.full_url') }}:</strong> {{ selectedLog.url }}
               </div>
-              <div v-if="selectedLog.ip" class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
+              <div
+                v-if="selectedLog.ip"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded break-words"
+              >
                 <strong>{{ $t('log.ip') }}:</strong> {{ selectedLog.ip }}
               </div>
-              <div v-if="selectedLog.user" class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
+              <div
+                v-if="selectedLog.user"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded break-words"
+              >
                 <strong>{{ $t('log.user') }}:</strong> {{ selectedLog.user.pseudo }} ({{
                   selectedLog.user.email
                 }})
               </div>
               <div
                 v-if="selectedLog.referer"
-                class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 break-words"
               >
                 <strong>{{ $t('admin.error_logs.referer_page') }}</strong>
                 <a
@@ -496,7 +502,7 @@
               </div>
               <div
                 v-if="selectedLog.origin"
-                class="p-3 bg-gray-50 dark:bg-gray-800 rounded col-span-2"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 break-words"
               >
                 <strong>{{ $t('admin.error_logs.origin_domain') }}</strong> {{ selectedLog.origin }}
               </div>
@@ -505,7 +511,7 @@
 
           <!-- Body POST/PUT si disponible -->
           <div v-if="selectedLog.body && Object.keys(selectedLog.body).length > 0">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Corps de la requête (body)
               </label>
@@ -542,7 +548,7 @@
 
           <!-- Paramètres de requête -->
           <div v-if="selectedLog.queryParams && Object.keys(selectedLog.queryParams).length > 0">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Paramètres de requête
               </label>
@@ -571,7 +577,7 @@
 
           <!-- Headers HTTP -->
           <div v-if="selectedLog.headers && Object.keys(selectedLog.headers).length > 0">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 En-têtes HTTP
               </label>
@@ -594,7 +600,7 @@
 
           <!-- Section de résolution -->
           <div class="border-t pt-6">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
               <h4 class="text-md font-medium">{{ $t('log.resolution') }}</h4>
               <UBadge
                 :color="selectedLog.resolved ? 'success' : 'error'"
