@@ -236,7 +236,10 @@
       "col_user": "Uživatel",
       "columns_label": "Sloupce",
       "resolved": "Vyřešeno",
-      "unresolved_short": "Nevyřešeno"
+      "unresolved_short": "Nevyřešeno",
+      "clear_filters": "Vymazat",
+      "filters": "Filtry",
+      "show_results": "Zobrazit výsledky ({count})"
     },
     "errors_24h": "Chyby (24h)",
     "event_reminders": "Připomínky událostí",
@@ -268,15 +271,10 @@
         "status": "Filtrování podle stavu",
         "type": "Filtrování podle typu"
       },
-      "mark_resolved": "Označit jako vyřešené",
-      "mark_unresolved": "Označit jako nevyřešené",
       "message": {
         "label": "Zpráva"
       },
-      "pending": "Na počkání",
       "require_attention": "Vyžaduje pozornost",
-      "resolve": "Řešení",
-      "resolved": "Vyřešeno",
       "search": "Vyhledávání ve výnosech...",
       "stats": {
         "bugs": "Nahlášené chyby",
@@ -289,8 +287,6 @@
         "label": "Předmět"
       },
       "success": {
-        "resolve": "Návrat označený jako vyřešený",
-        "unresolve": "Návrat označen jako nevyřešený",
         "updated": "Zpětná vazba aktualizována: {status}"
       },
       "title": "Správa zpětné vazby od uživatelů",
@@ -303,7 +299,6 @@
         "general": "Obecné",
         "suggestion": "Návrh"
       },
-      "unresolve": "Znovu otevřít",
       "unresolved": "Nevyřešené návraty",
       "url": "Stránka se týká",
       "user": "Uživatel",

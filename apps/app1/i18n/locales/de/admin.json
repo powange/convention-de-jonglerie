@@ -236,7 +236,10 @@
       "col_user": "Benutzer",
       "columns_label": "Spalten",
       "resolved": "Gelöst",
-      "unresolved_short": "Ungelöst"
+      "unresolved_short": "Ungelöst",
+      "clear_filters": "Zurücksetzen",
+      "filters": "Filter",
+      "show_results": "Ergebnisse anzeigen ({count})"
     },
     "errors_24h": "Fehler (24h)",
     "event_reminders": "Veranstaltungserinnerungen",
@@ -268,15 +271,10 @@
         "status": "Nach Status filtern",
         "type": "Nach Typ filtern"
       },
-      "mark_resolved": "Als gelöst markieren",
-      "mark_unresolved": "Als ungelöst markieren",
       "message": {
         "label": "Nachricht"
       },
-      "pending": "Ausstehend",
       "require_attention": "Erfordern Aufmerksamkeit",
-      "resolve": "Lösen",
-      "resolved": "Gelöst",
       "search": "Feedback durchsuchen...",
       "stats": {
         "bugs": "Gemeldete Fehler",
@@ -289,8 +287,6 @@
         "label": "Betreff"
       },
       "success": {
-        "resolve": "Feedback als gelöst markiert",
-        "unresolve": "Feedback als ungelöst markiert",
         "updated": "Rückmeldung aktualisiert: {status}"
       },
       "title": "Verwaltung von Benutzerfeedback",
@@ -303,7 +299,6 @@
         "general": "Allgemein",
         "suggestion": "Vorschlag"
       },
-      "unresolve": "Wieder öffnen",
       "unresolved": "Ungelöstes Feedback",
       "url": "Verwandte Seite",
       "user": "Benutzer",

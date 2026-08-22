@@ -236,7 +236,10 @@
       "col_user": "Gebruiker",
       "columns_label": "Kolommen",
       "resolved": "Opgelost",
-      "unresolved_short": "Onopgelost"
+      "unresolved_short": "Onopgelost",
+      "clear_filters": "Wissen",
+      "filters": "Filters",
+      "show_results": "Resultaten bekijken ({count})"
     },
     "errors_24h": "Fouten (24u)",
     "event_reminders": "Evenementherinneringen",
@@ -268,15 +271,10 @@
         "status": "Filteren op status",
         "type": "Filteren op type"
       },
-      "mark_resolved": "Markeren als opgelost",
-      "mark_unresolved": "Markeren als niet opgelost",
       "message": {
         "label": "Bericht"
       },
-      "pending": "In afwachting",
       "require_attention": "Vereisen aandacht",
-      "resolve": "Oplossen",
-      "resolved": "Opgelost",
       "search": "Zoeken in feedback...",
       "stats": {
         "bugs": "Gemelde bugs",
@@ -289,8 +287,6 @@
         "label": "Onderwerp"
       },
       "success": {
-        "resolve": "Feedback gemarkeerd als opgelost",
-        "unresolve": "Feedback gemarkeerd als niet opgelost",
         "updated": "Feedback bijgewerkt: {status}"
       },
       "title": "Beheer gebruikersfeedback",
@@ -303,7 +299,6 @@
         "general": "Algemeen",
         "suggestion": "Suggestie"
       },
-      "unresolve": "Heropenen",
       "unresolved": "Onopgeloste feedback",
       "url": "Gerelateerde pagina",
       "user": "Gebruiker",

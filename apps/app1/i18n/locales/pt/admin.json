@@ -236,7 +236,10 @@
       "col_user": "Utilizador",
       "columns_label": "Colunas",
       "resolved": "Resolvido",
-      "unresolved_short": "Não resolvido"
+      "unresolved_short": "Não resolvido",
+      "clear_filters": "Limpar",
+      "filters": "Filtros",
+      "show_results": "Ver os resultados ({count})"
     },
     "errors_24h": "Erros (24h)",
     "event_reminders": "Lembretes de eventos",
@@ -268,15 +271,10 @@
         "status": "Filtrar por estado",
         "type": "Filtrar por tipo"
       },
-      "mark_resolved": "Marcar como resolvido",
-      "mark_unresolved": "Marcar como não resolvido",
       "message": {
         "label": "Mensagem"
       },
-      "pending": "Pendente",
       "require_attention": "Requerem atenção",
-      "resolve": "Resolver",
-      "resolved": "Resolvido",
       "search": "Pesquisar feedback...",
       "stats": {
         "bugs": "Bugs reportados",
@@ -289,8 +287,6 @@
         "label": "Assunto"
       },
       "success": {
-        "resolve": "Feedback marcado como resolvido",
-        "unresolve": "Feedback marcado como não resolvido",
         "updated": "Comentário atualizado: {status}"
       },
       "title": "Gestão de Feedback dos Utilizadores",
@@ -303,7 +299,6 @@
         "general": "Geral",
         "suggestion": "Sugestão"
       },
-      "unresolve": "Reabrir",
       "unresolved": "Feedback não resolvido",
       "url": "Página relacionada",
       "user": "Utilizador",

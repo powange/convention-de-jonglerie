@@ -236,7 +236,10 @@
       "col_user": "Utente",
       "columns_label": "Colonne",
       "resolved": "Risolto",
-      "unresolved_short": "Non risolto"
+      "unresolved_short": "Non risolto",
+      "clear_filters": "Cancella",
+      "filters": "Filtri",
+      "show_results": "Vedi i risultati ({count})"
     },
     "errors_24h": "Errori (24h)",
     "event_reminders": "Promemoria eventi",
@@ -268,15 +271,10 @@
         "status": "Filtra per stato",
         "type": "Filtra per tipo"
       },
-      "mark_resolved": "Segna come risolto",
-      "mark_unresolved": "Segna come non risolto",
       "message": {
         "label": "Messaggio"
       },
-      "pending": "In attesa",
       "require_attention": "Richiedono attenzione",
-      "resolve": "Risolvi",
-      "resolved": "Risolto",
       "search": "Cerca nei feedback...",
       "stats": {
         "bugs": "Bug segnalati",
@@ -289,8 +287,6 @@
         "label": "Oggetto"
       },
       "success": {
-        "resolve": "Feedback segnato come risolto",
-        "unresolve": "Feedback segnato come non risolto",
         "updated": "Segnalazione aggiornata: {status}"
       },
       "title": "Gestione Feedback Utenti",
@@ -303,7 +299,6 @@
         "general": "Generale",
         "suggestion": "Suggerimento"
       },
-      "unresolve": "Riapri",
       "unresolved": "Feedback non risolti",
       "url": "Pagina correlata",
       "user": "Utente",

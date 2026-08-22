@@ -236,7 +236,10 @@
       "col_user": "Användare",
       "columns_label": "Kolumner",
       "resolved": "Löst",
-      "unresolved_short": "Olöst"
+      "unresolved_short": "Olöst",
+      "clear_filters": "Rensa",
+      "filters": "Filter",
+      "show_results": "Visa resultaten ({count})"
     },
     "errors_24h": "Fel (24h)",
     "event_reminders": "Påminnelser om evenemang",
@@ -268,15 +271,10 @@
         "status": "Filtrera efter status",
         "type": "Filtrera efter typ"
       },
-      "mark_resolved": "Markera som löst",
-      "mark_unresolved": "Markera som olöst",
       "message": {
         "label": "Meddelande"
       },
-      "pending": "I vänteläge",
       "require_attention": "Kräver uppmärksamhet",
-      "resolve": "Lösning",
-      "resolved": "Lösning",
       "search": "Sök i avkastning...",
       "stats": {
         "bugs": "Rapporterade buggar",
@@ -289,8 +287,6 @@
         "label": "Ämne"
       },
       "success": {
-        "resolve": "Retur markerad som löst",
-        "unresolve": "Retur markerad som olöst",
         "updated": "Återkoppling uppdaterad: {status}"
       },
       "title": "Hantering av användarfeedback",
@@ -303,7 +299,6 @@
         "general": "Allmänt",
         "suggestion": "Förslag till beslut"
       },
-      "unresolve": "Återöppna",
       "unresolved": "Oavslutade returer",
       "url": "Berörd sida",
       "user": "Användare",
