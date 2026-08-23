@@ -210,7 +210,11 @@
         "drag_tooltip": "Arrastrar para reordenar",
         "loading": "Cargando...",
         "name_placeholder": "Título de la cuota",
-        "title": "Gestión de cuotas"
+        "title": "Gestión de cuotas",
+        "edit_button": "Editar el cupo",
+        "edit_title": "Editar el cupo",
+        "name_label": "Nombre",
+        "quantity_label": "Cantidad"
       },
       "order_updated": "Orden de cuotas actualizado",
       "quantity_min": "La cantidad debe ser al menos 1",

@@ -210,7 +210,11 @@
         "drag_tooltip": "Ziehen zum Neuordnen",
         "loading": "Lädt...",
         "name_placeholder": "Titel des Kontingents",
-        "title": "Kontingentverwaltung"
+        "title": "Kontingentverwaltung",
+        "edit_button": "Kontingent bearbeiten",
+        "edit_title": "Kontingent bearbeiten",
+        "name_label": "Name",
+        "quantity_label": "Menge"
       },
       "order_updated": "Kontingentreihenfolge aktualisiert",
       "quantity_min": "Menge muss mindestens 1 sein",

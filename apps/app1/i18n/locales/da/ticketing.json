@@ -210,7 +210,11 @@
         "drag_tooltip": "Træk for at omarrangere",
         "loading": "Indlæser...",
         "name_placeholder": "Kvotens titel",
-        "title": "Kvoterstyring"
+        "title": "Kvoterstyring",
+        "edit_button": "Rediger kvote",
+        "edit_title": "Rediger kvote",
+        "name_label": "Navn",
+        "quantity_label": "Antal"
       },
       "order_updated": "Kvoterækkefølge opdateret",
       "quantity_min": "Antal skal være mindst 1",

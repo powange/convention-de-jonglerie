@@ -210,7 +210,11 @@
         "drag_tooltip": "Přetáhněte pro změnu pořadí",
         "loading": "Načítání...",
         "name_placeholder": "Název kvóty",
-        "title": "Správa kvót"
+        "title": "Správa kvót",
+        "edit_button": "Upravit kvótu",
+        "edit_title": "Upravit kvótu",
+        "name_label": "Název",
+        "quantity_label": "Množství"
       },
       "order_updated": "Pořadí kvót aktualizováno",
       "quantity_min": "Množství musí být alespoň 1",

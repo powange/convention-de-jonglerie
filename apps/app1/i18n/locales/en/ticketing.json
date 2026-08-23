@@ -210,7 +210,11 @@
         "drag_tooltip": "Drag to reorder",
         "loading": "Loading...",
         "name_placeholder": "Quota title",
-        "title": "Quota management"
+        "title": "Quota management",
+        "edit_button": "Edit quota",
+        "edit_title": "Edit quota",
+        "name_label": "Name",
+        "quantity_label": "Quantity"
       },
       "order_updated": "Quota order updated",
       "quantity_min": "Quantity must be at least 1",

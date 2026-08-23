@@ -210,7 +210,11 @@
         "drag_tooltip": "Arrastar para reordenar",
         "loading": "Carregando...",
         "name_placeholder": "Título da quota",
-        "title": "Gestão de quotas"
+        "title": "Gestão de quotas",
+        "edit_button": "Editar a cota",
+        "edit_title": "Editar a cota",
+        "name_label": "Nome",
+        "quantity_label": "Quantidade"
       },
       "order_updated": "Ordem das quotas atualizada",
       "quantity_min": "A quantidade deve ser pelo menos 1",

@@ -210,7 +210,11 @@
         "drag_tooltip": "Trascina per riordinare",
         "loading": "Caricamento...",
         "name_placeholder": "Titolo della quota",
-        "title": "Gestione delle quote"
+        "title": "Gestione delle quote",
+        "edit_button": "Modifica la quota",
+        "edit_title": "Modifica la quota",
+        "name_label": "Nome",
+        "quantity_label": "Quantità"
       },
       "order_updated": "Ordine delle quote aggiornato",
       "quantity_min": "La quantità deve essere almeno 1",

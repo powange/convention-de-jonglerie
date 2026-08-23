@@ -210,7 +210,11 @@
         "drag_tooltip": "Przeciągnij, aby zmienić kolejność",
         "loading": "Ładowanie...",
         "name_placeholder": "Tytuł kwoty",
-        "title": "Zarządzanie kwotami"
+        "title": "Zarządzanie kwotami",
+        "edit_button": "Edytuj limit",
+        "edit_title": "Edytuj limit",
+        "name_label": "Nazwa",
+        "quantity_label": "Liczba"
       },
       "order_updated": "Kolejność limitów zaktualizowana",
       "quantity_min": "Ilość musi wynosić co najmniej 1",

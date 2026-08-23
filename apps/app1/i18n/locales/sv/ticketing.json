@@ -210,7 +210,11 @@
         "drag_tooltip": "Dra för att ordna om",
         "loading": "Laddar...",
         "name_placeholder": "Titel på kvot",
-        "title": "Hantering av kvoter"
+        "title": "Hantering av kvoter",
+        "edit_button": "Redigera kvot",
+        "edit_title": "Redigera kvot",
+        "name_label": "Namn",
+        "quantity_label": "Antal"
       },
       "order_updated": "Kvotordning uppdaterad",
       "quantity_min": "Antal måste vara minst 1",

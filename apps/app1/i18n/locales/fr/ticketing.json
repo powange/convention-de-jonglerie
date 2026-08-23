@@ -208,8 +208,12 @@
         "description_label": "description",
         "description_placeholder": "Description (optionnel)",
         "drag_tooltip": "Glisser pour réordonner",
+        "edit_button": "Modifier le quota",
+        "edit_title": "Modifier le quota",
         "loading": "Chargement...",
+        "name_label": "Nom",
         "name_placeholder": "Titre du quota",
+        "quantity_label": "Quantité",
         "title": "Gestion des quotas"
       },
       "order_updated": "Ordre des quotas mis à jour",

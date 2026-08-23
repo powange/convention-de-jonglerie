@@ -15,11 +15,15 @@
     />
 
     <div class="space-y-2">
-      <!-- Liste des quotas existants -->
+      <!-- Liste des quotas existants.
+           En lecture seule : le titre et la quantité s'y consultent, et se modifient dans la
+           fenêtre d'édition. Les champs de saisie en ligne écrasaient le nom du quota sur un
+           écran étroit, et le sélecteur numérique, contrôlé par la liste, revenait à l'ancienne
+           valeur dès qu'on cliquait sur ses flèches. -->
       <div
         v-for="(quota, index) in sortedQuotas"
         :key="quota.id"
-        class="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+        class="flex flex-col gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors sm:flex-row sm:items-center"
         :class="[
           draggedQuotaId === quota.id && 'opacity-50',
           dragOverQuotaId === quota.id && 'border-primary-500 border-2',
@@ -30,86 +34,110 @@
         @dragover.prevent="handleDragOver(quota, $event)"
         @drop="handleDrop(quota, $event)"
       >
-        <!-- Poignée de drag -->
-        <div
-          class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          :title="$t('ticketing.quotas.list.drag_tooltip')"
-        >
-          <UIcon name="i-heroicons-bars-3" class="h-5 w-5" />
-        </div>
+        <!-- Première ligne : ce qu'il faut lire -->
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <div
+            class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0"
+            :title="$t('ticketing.quotas.list.drag_tooltip')"
+          >
+            <UIcon name="i-heroicons-bars-3" class="h-5 w-5" />
+          </div>
 
-        <!-- Numéro de position -->
-        <div class="flex-shrink-0 w-8 text-center">
-          <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <span
+            class="text-sm font-medium text-gray-500 dark:text-gray-400 w-6 text-center shrink-0"
+          >
             {{ index + 1 }}
           </span>
+
+          <span class="font-medium truncate" :title="quota.title">{{ quota.title }}</span>
+
+          <UBadge color="neutral" variant="subtle" class="shrink-0">
+            {{ quota.quantity }}
+          </UBadge>
         </div>
 
-        <UFieldGroup>
-          <UInput
-            :model-value="quota.title"
-            :placeholder="$t('ticketing.quotas.list.name_placeholder')"
-            @blur="updateQuota(quota.id, { title: $event.target.value })"
+        <!-- Seconde ligne sous sm : les actions -->
+        <div class="flex items-center gap-2 sm:shrink-0 pl-7 sm:pl-0">
+          <UButton
+            icon="i-heroicons-pencil"
+            color="neutral"
+            variant="outline"
+            :title="$t('ticketing.quotas.list.edit_button')"
+            @click="ouvrirEdition(quota)"
           />
-          <UInputNumber
-            :model-value="quota.quantity"
-            :min="1"
-            :ui="{ base: 'w-32' }"
-            @update:model-value="updateQuota(quota.id, { quantity: $event })"
+          <UButton
+            icon="i-heroicons-trash"
+            color="error"
+            :title="$t('ticketing.quotas.list.delete_button')"
+            @click="confirmDeleteQuota(quota)"
           />
-          <UModal>
-            <UButton icon="i-heroicons-pencil" color="neutral" variant="outline" />
-            <template #body>
-              <UFormField :label="$t('ticketing.quotas.list.description_label')">
-                <textarea
-                  v-model="quota.description"
-                  :placeholder="$t('ticketing.quotas.list.description_placeholder')"
-                  color="neutral"
-                  variant="outline"
-                  class="w-full"
-                  @blur="updateQuota(quota.id, { description: $event.target.value || null })"
-                />
-              </UFormField>
-            </template>
-          </UModal>
-          <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteQuota(quota)" />
-        </UFieldGroup>
+        </div>
       </div>
 
       <!-- Ligne d'ajout -->
-      <div class="flex items-center py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-        <UFieldGroup>
-          <UInput
-            v-model="form.title"
-            :placeholder="$t('ticketing.quotas.list.name_placeholder')"
-            @keydown.enter="handleSave"
+      <div
+        class="flex flex-col gap-2 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 sm:flex-row sm:items-center"
+      >
+        <UInput
+          v-model="form.title"
+          class="flex-1 min-w-0"
+          :placeholder="$t('ticketing.quotas.list.name_placeholder')"
+          @keydown.enter="handleSave"
+        />
+        <div class="flex items-center gap-2 sm:shrink-0">
+          <UInputNumber v-model="form.quantity" :min="1" class="w-32" @keydown.enter="handleSave" />
+          <UButton
+            icon="i-heroicons-plus"
+            color="primary"
+            :loading="saving"
+            :title="$t('common.add')"
+            @click="handleSave"
           />
-          <UInputNumber
-            v-model="form.quantity"
-            :min="1"
-            :ui="{ base: 'w-32' }"
-            @keydown.enter="handleSave"
-          />
-          <UModal>
-            <UButton icon="i-heroicons-pencil" color="neutral" variant="outline" />
-            <template #body>
-              <UFormField :label="$t('ticketing.quotas.list.description_label')">
-                <textarea
-                  v-model="form.description"
-                  :placeholder="$t('ticketing.quotas.list.description_placeholder')"
-                  color="neutral"
-                  variant="outline"
-                  class="w-full"
-                  @keydown.enter="handleSave"
-                />
-              </UFormField>
-            </template>
-          </UModal>
-          <UButton icon="i-heroicons-plus" color="primary" :loading="saving" @click="handleSave" />
-        </UFieldGroup>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Fenêtre d'édition : titre, quantité et description se règlent ici, et l'enregistrement est
+       explicite — l'ancienne saisie en ligne enregistrait à la perte de focus, sans que rien ne
+       dise ce qui était parti. -->
+  <UModal v-model:open="editionOuverte" :title="$t('ticketing.quotas.list.edit_title')">
+    <template #body>
+      <div class="space-y-4">
+        <UFormField :label="$t('ticketing.quotas.list.name_label')" required>
+          <UInput
+            v-model="editionForm.title"
+            class="w-full"
+            :placeholder="$t('ticketing.quotas.list.name_placeholder')"
+          />
+        </UFormField>
+
+        <UFormField :label="$t('ticketing.quotas.list.quantity_label')" required>
+          <UInputNumber v-model="editionForm.quantity" :min="1" class="w-40" />
+        </UFormField>
+
+        <UFormField :label="$t('ticketing.quotas.list.description_label')">
+          <UTextarea
+            v-model="editionForm.description"
+            class="w-full"
+            :rows="3"
+            :placeholder="$t('ticketing.quotas.list.description_placeholder')"
+          />
+        </UFormField>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="flex justify-end gap-2 w-full">
+        <UButton color="neutral" variant="outline" @click="editionOuverte = false">
+          {{ $t('common.cancel') }}
+        </UButton>
+        <UButton color="primary" @click="enregistrerEdition">
+          {{ $t('common.save') }}
+        </UButton>
+      </div>
+    </template>
+  </UModal>
 
   <!-- Modal de confirmation de suppression de quota -->
   <UiConfirmModal
@@ -156,6 +184,47 @@ const toast = useToast()
 
 const deleteConfirmOpen = ref(false)
 const quotaToDelete = ref<Quota | null>(null)
+
+/**
+ * Édition d'un quota dans une fenêtre dédiée.
+ *
+ * Le formulaire travaille sur une copie : tant que l'enregistrement n'est pas demandé, la liste
+ * ne bouge pas. C'est ce qui manquait à la saisie en ligne — elle envoyait à chaque perte de
+ * focus, et le sélecteur numérique, dont la valeur venait de la liste, revenait à l'ancien
+ * nombre dès qu'on cliquait sur ses flèches.
+ */
+const editionOuverte = ref(false)
+const quotaEnEdition = ref<Quota | null>(null)
+const editionForm = ref({ title: '', quantity: 1, description: '' })
+
+const ouvrirEdition = (quota: Quota) => {
+  quotaEnEdition.value = quota
+  editionForm.value = {
+    title: quota.title,
+    quantity: quota.quantity,
+    description: quota.description || '',
+  }
+  editionOuverte.value = true
+}
+
+const enregistrerEdition = () => {
+  const quota = quotaEnEdition.value
+  if (!quota) return
+
+  const saisie = editionForm.value
+  // updateQuota porte déjà la validation et signale l'erreur par un message. On refait le même
+  // constat ici pour une seule raison : laisser la fenêtre ouverte quand la saisie est refusée,
+  // sans quoi la correction serait impossible.
+  const valide = saisie.title.trim() !== '' && saisie.quantity >= 1
+
+  updateQuota(quota.id, {
+    title: saisie.title,
+    quantity: saisie.quantity,
+    description: saisie.description.trim() || null,
+  })
+
+  if (valide) editionOuverte.value = false
+}
 
 // Drag and drop
 const draggedQuotaId = ref<number | null>(null)
