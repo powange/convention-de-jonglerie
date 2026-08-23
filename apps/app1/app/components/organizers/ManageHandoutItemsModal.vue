@@ -261,7 +261,7 @@ watch(
                 </UBadge>
               </div>
               <UButton
-                color="red"
+                color="error"
                 variant="ghost"
                 size="xs"
                 icon="i-heroicons-trash"

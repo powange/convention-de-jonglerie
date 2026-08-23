@@ -26,7 +26,7 @@
               </h3>
               <UBadge
                 v-if="quota.currentCount > quota.quantity"
-                color="red"
+                color="error"
                 variant="solid"
                 size="xs"
               >
