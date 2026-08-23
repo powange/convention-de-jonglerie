@@ -210,7 +210,11 @@
         "drag_tooltip": "Sleep om te herordenen",
         "loading": "Laden...",
         "name_placeholder": "Titel van het quotum",
-        "title": "Quotumbeheer"
+        "title": "Quotumbeheer",
+        "edit_button": "Quotum bewerken",
+        "edit_title": "Quotum bewerken",
+        "name_label": "Naam",
+        "quantity_label": "Aantal"
       },
       "order_updated": "Quotumvolgorde bijgewerkt",
       "quantity_min": "Aantal moet minimaal 1 zijn",
