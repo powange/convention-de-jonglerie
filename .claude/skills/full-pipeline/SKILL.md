@@ -1,5 +1,5 @@
 ---
-description: 'Pipeline complet : i18n, traductions, code review avec corrections, quality-check (lint, tests, commit), puis PR, attente de la CI en arrière-plan et merge si elle est verte'
+description: "Pipeline complet : i18n, traductions, code review avec corrections, quality-check (lint, tests, commit), puis PR, attente de la CI en arrière-plan et merge si elle est verte"
 thinking: false
 ---
 
@@ -51,7 +51,7 @@ Lancer la commande `/quality-check` qui enchaîne :
 Si la branche courante est `main`, le travail est déjà sur la branche principale : ne rien faire
 de plus et terminer.
 
-1. **Ouvrir la PR** avec `gh pr create --base main`. Le corps explique *pourquoi* le changement
+1. **Ouvrir la PR** avec `gh pr create --base main`. Le corps explique _pourquoi_ le changement
    existe : le problème constaté, ce qui a été prouvé plutôt qu'affirmé, et ce qui reste ouvert.
    Ne pas se contenter d'un résumé du diff, que la PR affiche déjà.
 
@@ -59,23 +59,53 @@ de plus et terminer.
    plan bloquerait la session pour rien.
 
    ```bash
-   gh pr checks <numéro> --watch --fail-fast
+   until OUT=$(gh pr checks <numéro> 2>&1) \
+      && ! echo "$OUT" | grep -qE "pending|skipping|HTTP 5[0-9][0-9]"; do
+     sleep 30
+   done
+   echo "$OUT"
+   if echo "$OUT" | grep -q "fail"; then echo "VERDICT: ROUGE"; else echo "VERDICT: VERT"; fi
    ```
 
    Lancer cette commande **en tâche de fond** (`run_in_background`), puis rendre la main à
    l'utilisateur en indiquant le numéro de PR et que le merge suivra si la CI passe. Le harness
-   réveille la session à la fin de la commande : ne pas enchaîner de `sleep`, ne pas écrire de
-   boucle d'attente maison (elle prendrait un 502 passager pour un succès) et ne pas relancer un
-   second `--watch` en parallèle.
+   réveille la session à la fin. Ne pas relancer un second `--watch` en parallèle.
 
-3. **Interpréter le verdict** au réveil, d'après le code de sortie :
-   - `0` (tout est vert) → merger avec `gh pr merge <numéro> --squash --delete-branch`.
+   **Pourquoi cette boucle plutôt que `gh pr checks --watch --fail-fast`** : `--watch` s'interrompt
+   et rend le code **0** dès que l'API GitHub renvoie une erreur — un 503 en pleine surveillance
+   devient alors indiscernable d'une CI verte. Constaté trois fois en une seule session, sur des
+   PR dont des jobs étaient encore en cours. La boucle ci-dessus ne sort que sur un état
+   _observé_ : la commande a réussi, et plus aucun job n'est `pending` ni `skipping`. Une erreur
+   d'API remet simplement en attente au lieu de conclure.
+
+   `skipping` compte comme une attente : un job sauté l'est parce qu'un autre a échoué, et la
+   sortie porte alors un `fail` que la ligne de verdict relèvera.
+
+3. **Interpréter le verdict** au réveil, d'après la ligne `VERDICT:` :
+   - **VERT** → merger avec `gh pr merge <numéro> --squash --delete-branch`.
      ⚠️ `--delete-branch` bascule la copie locale sur `main` : relever la branche courante avant
      le merge, et y revenir ensuite si le travail continue dessus ;
-   - non nul (`--fail-fast` coupe dès le premier échec) → **ne pas merger**. Lire le journal du
-     job fautif (`gh run view <id> --log-failed`), diagnostiquer, et distinguer une vraie
-     régression d'une attente de test devenue fausse. Corriger, pousser, reprendre à l'étape 2
-     avec un nouveau `--watch` en tâche de fond.
+   - **ROUGE** → **ne pas merger**. Lire le journal du job fautif
+     (`gh run view <id> --log-failed`), diagnostiquer, et distinguer une vraie régression d'une
+     attente de test devenue fausse. Corriger, pousser, reprendre à l'étape 2.
+
+   Un échec de `build` mérite une attention particulière : le serveur de développement et la CI
+   ne résolvent pas les imports de la même façon. Un chemin relatif erroné peut fonctionner en
+   développement, passer le lint et les tests unitaires — qui importent le module directement —
+   et ne tomber qu'au build. Après correction d'une erreur de ce genre, vérifier par un vrai
+   `npm run build` avant de repousser, plutôt que d'attendre un second aller-retour de CI.
+
+4. **Vérifier que le merge a bien eu lieu**, plutôt que de le supposer :
+
+   ```bash
+   gh pr view <numéro> --json state --jq .state   # doit rendre MERGED
+   git fetch origin -q && git log origin/main -1  # doit porter le commit attendu
+   ```
+
+   L'API peut échouer au moment du merge : lors d'une session, `gh pr merge` a renvoyé un 503
+   alors que le merge avait réussi, et l'inverse est tout aussi possible. Seul `origin/main` fait
+   foi. Cette vérification conditionne tout déploiement ultérieur — un webhook déclenché sur un
+   `main` inchangé reconstruit le même commit et ne livre rien.
 
 **Ne jamais déployer** dans ce skill : le déploiement reste une décision explicite de
 l'utilisateur, via `/deploy`.

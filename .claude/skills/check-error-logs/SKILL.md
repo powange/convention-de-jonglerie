@@ -113,7 +113,23 @@ Uniquement si au moins une correction (cause certaine) a été appliquée :
 
 1. Lancer `/full-pipeline` (i18n, code review + corrections, lint, tests, commit/push).
    Si une étape échoue → **arrêter**, signaler l'erreur, ne PAS déployer.
-2. Le pipeline réussi, **déployer la prod automatiquement, sans demander de confirmation**
+
+2. **Vérifier que le merge a réellement eu lieu**, plutôt que de s'en remettre au fait que le
+   pipeline s'est terminé :
+
+   ```bash
+   gh pr view <numéro> --json state --jq .state   # doit rendre MERGED
+   git fetch origin -q && git log origin/main -1  # doit porter le commit attendu
+   ```
+
+   Sans ce contrôle, le déploiement peut _sembler_ réussir — webhook à 204, build qui bascule —
+   tout en ne livrant rien : un webhook déclenché sur un `main` inchangé reconstruit simplement
+   le même commit. Le cas est réel : l'API GitHub a déjà renvoyé un 503 en plein merge, et seul
+   `origin/main` a permis de savoir si celui-ci était passé.
+
+   Si le merge n'a pas eu lieu → **ne pas déployer**, signaler et attendre.
+
+3. Le merge confirmé, **déployer la prod automatiquement, sans demander de confirmation**
    (déploiement auto assumé dans ce flux). Déclencher directement le webhook Portainer de prod
    sans afficher l'URL (qui contient un secret), en n'affichant que le code HTTP :
 
@@ -129,6 +145,17 @@ Uniquement si au moins une correction (cause certaine) a été appliquée :
    Ne PAS passer par `/deploy` ici : cette commande impose une confirmation interactive, alors que
    ce flux est volontairement automatique. Si `PORTAINER_PROD_WEBHOOK_URL` est absente → signaler
    que les corrections sont commit/push mais que le déploiement n'a pas pu être déclenché.
+
+4. **Contrôler la bascule sur l'API, et pas seulement sur l'accueil.** Attendre que
+   `/_nuxt/builds/latest.json` change d'identifiant, puis vérifier une page ET un endpoint qui
+   interroge la base. L'accueil peut répondre 200 alors que tout ce qui touche la base échoue :
+   c'est exactement ce qui s'est produit lors de la panne du 23 août 2026, où seul l'appel à une
+   route d'API a révélé l'étendue du problème.
+
+5. **Ce flux ne déploie que la production.** Release reste alors en arrière, ce qui lui retire son
+   rôle de galop d'essai pour les migrations à venir — elle ne prouve plus rien si elle ne porte
+   pas le même code. Le signaler à l'utilisateur en fin de compte rendu, et proposer un
+   `/deploy release` pour réaligner.
 
 ### 7. Mettre à jour l'état
 
