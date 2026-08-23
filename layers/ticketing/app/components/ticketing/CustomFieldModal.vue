@@ -91,9 +91,12 @@
           <p v-else class="text-sm text-gray-500">Aucun tarif disponible</p>
         </div>
 
-        <!-- Note pour les associations avancées -->
+        <!-- Note pour les associations avancées.
+             Réservée à la création : sur un champ existant, les associations se configurent
+             déjà depuis la liste, et annoncer qu'il faudra attendre « après la création » d'un
+             champ créé de longue date n'apprend rien et laisse croire à un blocage. -->
         <UAlert
-          v-if="form.type === 'ChoiceList'"
+          v-if="!customField && form.type === 'ChoiceList'"
           icon="i-heroicons-information-circle"
           color="info"
           variant="soft"
