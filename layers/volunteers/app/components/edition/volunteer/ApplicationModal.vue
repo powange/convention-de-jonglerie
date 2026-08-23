@@ -1164,6 +1164,17 @@ const departureDateOptions = computed(() => {
 let hydratationEnCours = false
 
 /**
+ * Brouillon de la saisie en cours, conservé sur l'appareil.
+ *
+ * Il ne vaut que pour une PREMIÈRE candidature : en édition, le formulaire part de la candidature
+ * enregistrée, et lui superposer un brouillon ressusciterait une saisie abandonnée par-dessus des
+ * réponses bien réelles. En aperçu, c'est un organisateur qui relit son questionnaire — il n'a
+ * rien à sauvegarder.
+ */
+const brouillon = useBrouillonCandidature(props.edition.id, () => props.user?.id)
+const brouillonApplicable = computed(() => !props.isEditing && !props.apercu)
+
+/**
  * Efface une date d'arrivée ou de départ que le sélecteur ne propose plus.
  *
  * Les créneaux dépendent des disponibilités cochées : décocher « montage » ramène les choix aux
@@ -1185,6 +1196,33 @@ watch([arrivalDateOptions, departureDateOptions], ([creneauxArrivee, creneauxDep
   if (departureDateTime && !creneauxDepart.some((c) => c.value === departureDateTime)) {
     formData.value.departureDateTime = undefined
   }
+})
+
+/**
+ * Enregistre la saisie au fil de l'eau.
+ *
+ * `hydratationEnCours` est décisif : sans lui, le remplissage initial écraserait aussitôt le
+ * brouillon par les valeurs par défaut, et il ne resterait jamais rien à restaurer.
+ *
+ * Le délai évite d'écrire à chaque touche frappée dans un champ de motivation de 2000 signes.
+ */
+let minuterieBrouillon: ReturnType<typeof setTimeout> | null = null
+
+watch(
+  formData,
+  (valeurs) => {
+    if (hydratationEnCours || !brouillonApplicable.value || !props.modelValue) return
+
+    if (minuterieBrouillon) clearTimeout(minuterieBrouillon)
+    minuterieBrouillon = setTimeout(() => {
+      brouillon.enregistrer({ ...valeurs })
+    }, 600)
+  },
+  { deep: true }
+)
+
+onBeforeUnmount(() => {
+  if (minuterieBrouillon) clearTimeout(minuterieBrouillon)
 })
 
 // Items for select/checkbox components
@@ -1252,6 +1290,10 @@ const handleSubmit = () => {
       })
     } else {
       emit('submit', formData.value)
+      // La candidature part : le brouillon n'a plus d'objet. Effacé ici plutôt qu'à la réponse
+      // du serveur, faute d'un retour de succès jusqu'à ce composant ; en cas d'échec, la
+      // modale reste ouverte avec la saisie intacte, qu'un nouveau changement réenregistrera.
+      brouillon.effacer()
     }
   }
 }
@@ -1291,6 +1333,17 @@ const populateForm = () => {
   hydratationEnCours = true
   try {
     remplirFormulaire()
+
+    // Après le remplissage : le brouillon décrit ce que le bénévole avait commencé à écrire, et
+    // prime donc sur les valeurs par défaut. Restauration silencieuse — les champs se
+    // repré-remplissent, sans rien annoncer.
+    if (props.existingApplication) {
+      // La candidature est enregistrée : ce qui restait en brouillon n'a plus d'objet.
+      brouillon.effacer()
+    } else if (brouillonApplicable.value) {
+      const repris = brouillon.restaurer(formData.value)
+      if (repris) Object.assign(formData.value, repris)
+    }
     // Après le remplissage, et non avant : l'hydratation écraserait sinon la valeur forcée, et la
     // candidature deviendrait impossible à enregistrer sur un formulaire qui n'offre plus de quoi
     // la corriger.
