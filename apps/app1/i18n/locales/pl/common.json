@@ -462,7 +462,12 @@
     },
     "my_tasks": "Moje zadania",
     "tasks": "Zadania",
-    "site_map": "Mapa terenu"
+    "site_map": "Mapa terenu",
+    "sur_place": {
+      "titre": "Jesteś na {nom}",
+      "description": "Trafiłeś tutaj, ponieważ ta konwencja odbywa się w twojej okolicy.",
+      "retour_accueil": "Powrót do strony głównej"
+    }
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",

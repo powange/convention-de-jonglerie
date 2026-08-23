@@ -462,7 +462,12 @@
     },
     "my_tasks": "Meine Aufgaben",
     "tasks": "Aufgaben",
-    "site_map": "Geländekarte"
+    "site_map": "Geländekarte",
+    "sur_place": {
+      "titre": "Du bist bei {nom}",
+      "description": "Du wurdest hierher geführt, weil diese Convention gerade in deiner Umgebung stattfindet.",
+      "retour_accueil": "Zurück zur Startseite"
+    }
   },
   "errors": {
     "access_denied": "Zugang verweigert",

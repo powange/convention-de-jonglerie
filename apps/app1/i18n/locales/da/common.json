@@ -462,7 +462,12 @@
     },
     "my_tasks": "Mine opgaver",
     "tasks": "Opgaver",
-    "site_map": "Områdekort"
+    "site_map": "Områdekort",
+    "sur_place": {
+      "titre": "Du er ved {nom}",
+      "description": "Du er ført hertil, fordi dette konvent finder sted omkring dig.",
+      "retour_accueil": "Tilbage til forsiden"
+    }
   },
   "errors": {
     "access_denied": "Adgang nægtet",

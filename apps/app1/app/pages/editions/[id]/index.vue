@@ -7,6 +7,9 @@
       <p>{{ $t('edition.not_found') }}</p>
     </div>
     <div v-else>
+      <!-- Amené ici par la détection de position : le dire, et offrir d'en repartir. -->
+      <EditionBandeauSurPlace />
+
       <!-- Message si l'édition n'est pas publiée -->
       <UAlert
         v-if="edition.status !== 'PUBLISHED' && canManageEdition"

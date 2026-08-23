@@ -462,7 +462,12 @@
     },
     "my_tasks": "My tasks",
     "tasks": "Tasks",
-    "site_map": "Site map"
+    "site_map": "Site map",
+    "sur_place": {
+      "titre": "You are at {nom}",
+      "description": "You were brought here because this convention is taking place around you.",
+      "retour_accueil": "Back to home"
+    }
   },
   "errors": {
     "access_denied": "Access denied",
