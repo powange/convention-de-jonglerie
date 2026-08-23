@@ -462,7 +462,12 @@
     },
     "my_tasks": "Mes tâches",
     "tasks": "Tâches",
-    "site_map": "Carte du site"
+    "site_map": "Carte du site",
+    "sur_place": {
+      "titre": "Vous êtes à {nom}",
+      "description": "Vous avez été amené ici parce que cette convention se déroule autour de vous.",
+      "retour_accueil": "Revenir à l'accueil"
+    }
   },
   "errors": {
     "access_denied": "Accès non autorisé",

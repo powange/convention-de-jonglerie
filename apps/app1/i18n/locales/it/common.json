@@ -462,7 +462,12 @@
     },
     "my_tasks": "Le mie attività",
     "tasks": "Attività",
-    "site_map": "Mappa del sito"
+    "site_map": "Mappa del sito",
+    "sur_place": {
+      "titre": "Sei a {nom}",
+      "description": "Sei stato portato qui perché questa convention si sta svolgendo intorno a te.",
+      "retour_accueil": "Torna alla home"
+    }
   },
   "errors": {
     "access_denied": "Accesso non autorizzato",

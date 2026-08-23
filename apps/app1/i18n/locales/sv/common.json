@@ -462,7 +462,12 @@
     },
     "my_tasks": "Mina uppgifter",
     "tasks": "Uppgifter",
-    "site_map": "Områdeskarta"
+    "site_map": "Områdeskarta",
+    "sur_place": {
+      "titre": "Du är på {nom}",
+      "description": "Du fördes hit eftersom det här konventet äger rum omkring dig.",
+      "retour_accueil": "Tillbaka till startsidan"
+    }
   },
   "errors": {
     "access_denied": "Obehörig åtkomst",

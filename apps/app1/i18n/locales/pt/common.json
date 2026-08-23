@@ -462,7 +462,12 @@
     },
     "my_tasks": "Minhas tarefas",
     "tasks": "Tarefas",
-    "site_map": "Mapa do local"
+    "site_map": "Mapa do local",
+    "sur_place": {
+      "titre": "Você está em {nom}",
+      "description": "Você foi trazido para cá porque esta convenção está acontecendo à sua volta.",
+      "retour_accueil": "Voltar ao início"
+    }
   },
   "errors": {
     "access_denied": "Acesso negado",

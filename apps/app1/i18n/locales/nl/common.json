@@ -462,7 +462,12 @@
     },
     "my_tasks": "Mijn taken",
     "tasks": "Taken",
-    "site_map": "Plattegrond"
+    "site_map": "Plattegrond",
+    "sur_place": {
+      "titre": "Je bent bij {nom}",
+      "description": "Je bent hierheen gebracht omdat deze conventie in jouw omgeving plaatsvindt.",
+      "retour_accueil": "Terug naar de startpagina"
+    }
   },
   "errors": {
     "access_denied": "Toegang geweigerd",

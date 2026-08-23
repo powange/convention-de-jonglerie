@@ -462,7 +462,12 @@
     },
     "my_tasks": "Moje úkoly",
     "tasks": "Úkoly",
-    "site_map": "Mapa areálu"
+    "site_map": "Mapa areálu",
+    "sur_place": {
+      "titre": "Jsi na {nom}",
+      "description": "Dostal ses sem, protože se tato konvence koná ve tvém okolí.",
+      "retour_accueil": "Zpět na úvodní stránku"
+    }
   },
   "errors": {
     "access_denied": "Neoprávněný přístup",

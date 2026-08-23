@@ -75,6 +75,15 @@ export const publicRoutes: PublicRoute[] = [
   // ====== Fichiers statiques ======
   { prefix: '/api/uploads/', methods: ['GET'] },
 
+  // ====== Éditions en cours géolocalisées ======
+  // Publique : un visiteur non connecté a autant besoin d'être orienté vers l'édition où il se
+  // trouve. La session est hydratée quand elle existe, pour savoir s'il y est bénévole accepté.
+  {
+    path: '/api/editions/en-cours-localisees',
+    methods: ['GET'],
+    hydrateSession: true,
+  },
+
   // ====== Détails convention / édition ======
   { pattern: /^\/api\/conventions\/\d+$/, methods: ['GET'], hydrateSession: true },
   { pattern: /^\/api\/editions\/\d+$/, methods: ['GET'], hydrateSession: true },

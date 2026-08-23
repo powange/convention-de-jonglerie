@@ -3,6 +3,9 @@
     <EditionHeader :edition="edition" current-page="volunteers" />
 
     <div class="space-y-6">
+      <!-- Amené ici par la détection de position : le dire, et offrir d'en repartir. -->
+      <EditionBandeauSurPlace />
+
       <!-- Message d'information pour les éditeurs/gestionnaires quand la page n'est pas publique -->
       <ClientOnly>
         <UAlert

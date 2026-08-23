@@ -615,7 +615,14 @@ const handleFilterUpdate = ({ key, value }: { key: string; value: any }) => {
   Object.assign(filters, { [key]: value })
 }
 
+// Emmène l'utilisateur sur l'édition où il se trouve, quand il en existe une en cours et que
+// l'autorisation de localisation est déjà accordée. Lancé sans être attendu : la page ne doit
+// pas patienter après une détection qui, la plupart du temps, ne donnera rien.
+const { detecterEtRediriger } = useEditionSurPlace()
+
 onMounted(async () => {
+  detecterEtRediriger()
+
   // Charger les éditions initiales
   const initialFilters = { ...filters, page: currentPage.value, limit: itemsPerPage }
   const fetchPromises = [editionStore.fetchEditions(initialFilters)]
