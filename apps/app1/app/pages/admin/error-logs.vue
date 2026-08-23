@@ -63,39 +63,39 @@
     </div>
 
     <!-- Statistiques rapides -->
-    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
       <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400 break-words">
               {{ $t('admin.errors_24h') }}
             </p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats.totalLast24h }}
             </p>
           </div>
-          <UIcon name="i-heroicons-clock" class="h-8 w-8 text-blue-500" />
+          <UIcon name="i-heroicons-clock" class="h-8 w-8 text-blue-500 shrink-0" />
         </div>
       </UCard>
 
       <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400 break-words">
               {{ $t('admin.unresolved') }}
             </p>
             <p class="text-2xl font-bold text-red-600">
               {{ stats.unresolvedCount }}
             </p>
           </div>
-          <UIcon name="i-heroicons-exclamation-circle" class="h-8 w-8 text-red-500" />
+          <UIcon name="i-heroicons-exclamation-circle" class="h-8 w-8 text-red-500 shrink-0" />
         </div>
       </UCard>
 
       <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400 break-words">
               {{ $t('admin.main_type') }}
             </p>
             <p class="text-lg font-bold text-gray-900 dark:text-white">
@@ -103,14 +103,14 @@
             </p>
             <p class="text-xs text-gray-500">{{ stats.errorTypes[0]?.count || 0 }} occurrences</p>
           </div>
-          <UIcon name="i-heroicons-bug-ant" class="h-8 w-8 text-yellow-500" />
+          <UIcon name="i-heroicons-bug-ant" class="h-8 w-8 text-yellow-500 shrink-0" />
         </div>
       </UCard>
 
       <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400 break-words">
               Code d'erreur principal
             </p>
             <p class="text-lg font-bold text-gray-900 dark:text-white">
@@ -118,7 +118,7 @@
             </p>
             <p class="text-xs text-gray-500">{{ stats.statusCodes[0]?.count || 0 }} occurrences</p>
           </div>
-          <UIcon name="i-heroicons-signal-slash" class="h-8 w-8 text-purple-500" />
+          <UIcon name="i-heroicons-signal-slash" class="h-8 w-8 text-purple-500 shrink-0" />
         </div>
       </UCard>
     </div>
@@ -514,7 +514,13 @@
             <div
               class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
             >
-              <JsonViewer :value="selectedLog.body" :expand-depth="2" boxed sort theme="dark" />
+              <JsonViewer
+                :value="selectedLog.body"
+                :expand-depth="2"
+                boxed
+                sort
+                :theme="jsonViewerTheme"
+              />
             </div>
           </div>
 
@@ -556,7 +562,7 @@
                 :expand-depth="3"
                 boxed
                 sort
-                theme="dark"
+                :theme="jsonViewerTheme"
               />
             </div>
           </div>
@@ -580,7 +586,13 @@
             <div
               class="bg-gray-50 dark:bg-gray-800 p-3 rounded overflow-x-auto border border-gray-200 dark:border-gray-700"
             >
-              <JsonViewer :value="selectedLog.headers" :expand-depth="1" boxed sort theme="dark" />
+              <JsonViewer
+                :value="selectedLog.headers"
+                :expand-depth="1"
+                boxed
+                sort
+                :theme="jsonViewerTheme"
+              />
             </div>
           </div>
 
@@ -677,6 +689,11 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
+// Les visionneuses JSON étaient figées sur le thème sombre : en affichage clair, trois grands
+// blocs noirs au milieu du panneau. vue3-json-viewer n'accepte que « light » ou « dark ».
+const colorMode = useColorMode()
+const jsonViewerTheme = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
 const toast = useToast()
 const table = useTemplateRef('table')
 
