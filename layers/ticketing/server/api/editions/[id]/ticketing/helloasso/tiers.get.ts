@@ -1,4 +1,4 @@
-import { synchronisationUnique } from '../../../../../../utils/synchronisation-unique'
+import { synchronisationUnique } from '../../../../../utils/synchronisation-unique'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { getHelloAssoTiersAndOptions } from '#server/utils/editions/ticketing/helloasso'
