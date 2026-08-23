@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Du är på {nom}",
       "description": "Du fördes hit eftersom det här konventet äger rum omkring dig.",
-      "retour_accueil": "Tillbaka till startsidan"
+      "retour_accueil": "Tillbaka till startsidan",
+      "aucune_trouvee": "Inget konvent i din närhet.",
+      "proposition_action": "Se om jag är där",
+      "proposition_description": "Om du är där kan appen ta dig direkt till dess sida.",
+      "proposition_titre": "Ett konvent pågår just nu",
+      "recherche_en_cours": "Söker efter konventet du befinner dig på …"
     }
   },
   "errors": {

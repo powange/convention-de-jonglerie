@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Du er ved {nom}",
       "description": "Du er ført hertil, fordi dette konvent finder sted omkring dig.",
-      "retour_accueil": "Tilbage til forsiden"
+      "retour_accueil": "Tilbage til forsiden",
+      "aucune_trouvee": "Intet konvent i nærheden af dig.",
+      "proposition_action": "Se, om jeg er der",
+      "proposition_description": "Hvis du er der, kan appen tage dig direkte til siden.",
+      "proposition_titre": "Et konvent finder sted lige nu",
+      "recherche_en_cours": "Leder efter det konvent, du er på …"
     }
   },
   "errors": {

@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Jesteś na {nom}",
       "description": "Trafiłeś tutaj, ponieważ ta konwencja odbywa się w twojej okolicy.",
-      "retour_accueil": "Powrót do strony głównej"
+      "retour_accueil": "Powrót do strony głównej",
+      "aucune_trouvee": "Brak konwencji w twojej okolicy.",
+      "proposition_action": "Sprawdź, czy tam jestem",
+      "proposition_description": "Jeśli tam jesteś, aplikacja przeniesie cię prosto na jej stronę.",
+      "proposition_titre": "Trwa właśnie konwencja",
+      "recherche_en_cours": "Szukanie konwencji, na której jesteś…"
     }
   },
   "errors": {

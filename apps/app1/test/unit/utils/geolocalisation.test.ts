@@ -3,7 +3,9 @@ import { describe, it, expect } from 'vitest'
 import {
   distanceKm,
   editionSurPlace,
+  PRECISION_INEXPLOITABLE_KM,
   RAYON_SUR_PLACE_KM,
+  TOLERANCE_PRECISION_MAX_KM,
 } from '../../../shared/utils/geolocalisation'
 
 const PARIS = { latitude: 48.8566, longitude: 2.3522 }
@@ -69,5 +71,43 @@ describe('editionSurPlace', () => {
     const aUnKm = edition(1, 48.8656, 2.3522)
     expect(editionSurPlace(PARIS, [aUnKm], 0.5)).toBeNull()
     expect(editionSurPlace(PARIS, [aUnKm], RAYON_SUR_PLACE_KM)?.id).toBe(1)
+  })
+
+  // Cas réel : sur place, mais l'ordinateur n'a pas de GPS et déduit sa position du réseau. Le
+  // navigateur annonce alors une incertitude de plusieurs kilomètres ; la comparer à un rayon
+  // strict de deux kilomètres répondait toujours « non », y compris depuis le site.
+  describe('imprécision de la position', () => {
+    // ~4 km au nord : hors des 2 km, mais dans la marge d'une mesure imprécise à ±4 km.
+    const aQuatreKm = { id: 1, latitude: 48.8926, longitude: 2.3522 }
+
+    it('écarte une édition hors rayon quand la position est précise', () => {
+      expect(editionSurPlace({ ...PARIS, precisionM: 20 }, [aQuatreKm])).toBeNull()
+    })
+
+    it('retient la même édition quand la mesure est annoncée imprécise', () => {
+      expect(editionSurPlace({ ...PARIS, precisionM: 4000 }, [aQuatreKm])?.id).toBe(1)
+    })
+
+    it('plafonne la tolérance accordée à l’imprécision', () => {
+      // Une incertitude de 15 km n'élargit que du plafond : au-delà, tout deviendrait proche.
+      const auDela = {
+        id: 1,
+        latitude: 48.8566 + (RAYON_SUR_PLACE_KM + TOLERANCE_PRECISION_MAX_KM + 1) / 111,
+        longitude: 2.3522,
+      }
+      expect(editionSurPlace({ ...PARIS, precisionM: 15000 }, [auDela])).toBeNull()
+    })
+
+    it('ne conclut rien d’une position trop grossière', () => {
+      const juste = { id: 1, latitude: 48.8576, longitude: 2.3522 } // ~100 m
+      const trop = (PRECISION_INEXPLOITABLE_KM + 1) * 1000
+      expect(editionSurPlace({ ...PARIS, precisionM: trop }, [juste])).toBeNull()
+    })
+
+    it('se comporte comme avant quand la précision est absente', () => {
+      const proche = { id: 1, latitude: 48.8666, longitude: 2.3522 }
+      expect(editionSurPlace(PARIS, [proche])?.id).toBe(1)
+      expect(editionSurPlace({ ...PARIS, precisionM: null }, [proche])?.id).toBe(1)
+    })
   })
 })

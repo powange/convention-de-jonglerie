@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Estás en {nom}",
       "description": "Te hemos traído aquí porque esta convención se celebra a tu alrededor.",
-      "retour_accueil": "Volver al inicio"
+      "retour_accueil": "Volver al inicio",
+      "aucune_trouvee": "No hay ninguna convención a tu alrededor.",
+      "proposition_action": "Ver si estoy allí",
+      "proposition_description": "Si estás allí, la aplicación puede llevarte directamente a su página.",
+      "proposition_titre": "Hay una convención en curso",
+      "recherche_en_cours": "Buscando la convención en la que te encuentras…"
     }
   },
   "errors": {

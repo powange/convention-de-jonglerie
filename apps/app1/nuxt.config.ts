@@ -242,9 +242,15 @@ export default defineNuxtConfig({
       // logs d'erreur (cf. ApiErrorLog.referer) sans fuiter d'URL vers des tiers.
       // Surcharge le défaut de nuxt-security (`no-referrer`).
       referrerPolicy: 'strict-origin-when-cross-origin',
-      // Autoriser l'accès à la caméra (scan QR code billetterie / contrôle d'accès)
+      // nuxt-security interdit ces capacités par défaut, y compris à l'application elle-même :
+      // il faut ré-autoriser explicitement celles dont on se sert.
       permissionsPolicy: {
+        // Scan des QR codes (billetterie, contrôle d'accès).
         camera: ['self'],
+        // Détection de l'édition où se trouve l'utilisateur. Sans cette ligne, le navigateur
+        // refuse la demande avant même de l'afficher — « Geolocation has been disabled in this
+        // document by permissions policy » — quel que soit le consentement de l'utilisateur.
+        geolocation: ['self'],
       },
     },
     rateLimiter: false,

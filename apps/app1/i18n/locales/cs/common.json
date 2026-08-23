@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Jsi na {nom}",
       "description": "Dostal ses sem, protože se tato konvence koná ve tvém okolí.",
-      "retour_accueil": "Zpět na úvodní stránku"
+      "retour_accueil": "Zpět na úvodní stránku",
+      "aucune_trouvee": "Ve tvém okolí neprobíhá žádná konvence.",
+      "proposition_action": "Zjistit, jestli tam jsem",
+      "proposition_description": "Pokud jsi tam, aplikace tě přenese rovnou na její stránku.",
+      "proposition_titre": "Právě probíhá konvence",
+      "recherche_en_cours": "Hledám konvenci, na které se nacházíš…"
     }
   },
   "errors": {

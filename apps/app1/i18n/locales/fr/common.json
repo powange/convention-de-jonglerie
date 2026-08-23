@@ -464,9 +464,14 @@
     "tasks": "Tâches",
     "site_map": "Carte du site",
     "sur_place": {
-      "titre": "Vous êtes à {nom}",
+      "aucune_trouvee": "Aucune convention en cours autour de vous.",
       "description": "Vous avez été amené ici parce que cette convention se déroule autour de vous.",
-      "retour_accueil": "Revenir à l'accueil"
+      "proposition_action": "Voir si j’y suis",
+      "proposition_description": "Si vous y êtes, l'application peut vous emmener directement sur sa page.",
+      "proposition_titre": "Une convention se déroule en ce moment",
+      "recherche_en_cours": "Recherche de la convention où vous vous trouvez…",
+      "retour_accueil": "Revenir à l'accueil",
+      "titre": "Vous êtes à {nom}"
     }
   },
   "errors": {
