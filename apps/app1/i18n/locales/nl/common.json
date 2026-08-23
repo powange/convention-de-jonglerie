@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Je bent bij {nom}",
       "description": "Je bent hierheen gebracht omdat deze conventie in jouw omgeving plaatsvindt.",
-      "retour_accueil": "Terug naar de startpagina"
+      "retour_accueil": "Terug naar de startpagina",
+      "aucune_trouvee": "Geen conventie in jouw omgeving.",
+      "proposition_action": "Kijken of ik er ben",
+      "proposition_description": "Als je daar bent, brengt de app je rechtstreeks naar de pagina.",
+      "proposition_titre": "Er is nu een conventie aan de gang",
+      "recherche_en_cours": "Zoeken naar de conventie waar je bent…"
     }
   },
   "errors": {

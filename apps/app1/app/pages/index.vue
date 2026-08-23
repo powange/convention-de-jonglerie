@@ -27,6 +27,10 @@
 
     <!-- Contenu principal à droite -->
     <div class="flex-1 min-w-0">
+      <!-- Proposition de rejoindre l'édition où l'on se trouve, quand la détection automatique
+           n'a pas pu s'exécuter faute de connaître l'état de l'autorisation de localisation. -->
+      <EditionBoutonSurPlace />
+
       <!-- Sentinelle pour détecter l'état sticky -->
       <div ref="stickyBarSentinel" class="h-0" />
       <!-- En-tête avec boutons (sticky sous le header) -->

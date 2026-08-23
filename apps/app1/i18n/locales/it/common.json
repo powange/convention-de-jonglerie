@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Sei a {nom}",
       "description": "Sei stato portato qui perché questa convention si sta svolgendo intorno a te.",
-      "retour_accueil": "Torna alla home"
+      "retour_accueil": "Torna alla home",
+      "aucune_trouvee": "Nessuna convention nei tuoi dintorni.",
+      "proposition_action": "Vedere se sono lì",
+      "proposition_description": "Se sei lì, l'applicazione può portarti direttamente alla sua pagina.",
+      "proposition_titre": "Una convention è in corso",
+      "recherche_en_cours": "Ricerca della convention in cui ti trovi…"
     }
   },
   "errors": {

@@ -9,6 +9,23 @@
 /** Rayon autour de l'adresse en deçà duquel on considère être sur place, en kilomètres. */
 export const RAYON_SUR_PLACE_KM = 2
 
+/**
+ * Tolérance maximale ajoutée au titre de l'imprécision de la position, en kilomètres.
+ *
+ * Le navigateur annonce l'incertitude de sa mesure : quelques mètres avec un GPS, plusieurs
+ * kilomètres quand elle est déduite du réseau — le cas d'un ordinateur de bureau. Comparer une
+ * position connue à ±8 km avec un rayon strict de 2 km ne peut que répondre « non », même en
+ * étant sur le site. On élargit donc d'autant, sans dépasser ce plafond : au-delà, la mesure ne
+ * dit plus rien d'utile et tout deviendrait « à proximité ».
+ */
+export const TOLERANCE_PRECISION_MAX_KM = 5
+
+/**
+ * Au-delà de cette incertitude, la position est jugée inexploitable et rien n'est proposé.
+ * Une mesure à ±30 km ne permet pas de distinguer une commune d'un département.
+ */
+export const PRECISION_INEXPLOITABLE_KM = 20
+
 export interface EditionLocalisee {
   id: number
   latitude: number
@@ -49,13 +66,24 @@ export function distanceKm(
  * rien proposer.
  */
 export function editionSurPlace<T extends EditionLocalisee>(
-  position: { latitude: number; longitude: number } | null | undefined,
+  position: { latitude: number; longitude: number; precisionM?: number | null } | null | undefined,
   editions: readonly T[],
   rayonKm: number = RAYON_SUR_PLACE_KM
 ): T | null {
   if (!position || !Number.isFinite(position.latitude) || !Number.isFinite(position.longitude)) {
     return null
   }
+
+  // L'incertitude annoncée par le navigateur élargit le rayon, dans la limite du plafond. Une
+  // mesure trop grossière ne permet plus de conclure : mieux vaut ne rien proposer que de
+  // désigner une convention à cinquante kilomètres.
+  const precisionKm =
+    typeof position.precisionM === 'number' && Number.isFinite(position.precisionM)
+      ? Math.max(0, position.precisionM) / 1000
+      : 0
+  if (precisionKm > PRECISION_INEXPLOITABLE_KM) return null
+
+  const tolerance = rayonKm + Math.min(precisionKm, TOLERANCE_PRECISION_MAX_KM)
 
   let meilleure: T | null = null
   let meilleureDistance = Number.POSITIVE_INFINITY
@@ -64,7 +92,7 @@ export function editionSurPlace<T extends EditionLocalisee>(
     if (!Number.isFinite(edition.latitude) || !Number.isFinite(edition.longitude)) continue
 
     const distance = distanceKm(position, edition)
-    if (distance <= rayonKm && distance < meilleureDistance) {
+    if (distance <= tolerance && distance < meilleureDistance) {
       meilleure = edition
       meilleureDistance = distance
     }

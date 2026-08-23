@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Du bist bei {nom}",
       "description": "Du wurdest hierher geführt, weil diese Convention gerade in deiner Umgebung stattfindet.",
-      "retour_accueil": "Zurück zur Startseite"
+      "retour_accueil": "Zurück zur Startseite",
+      "aucune_trouvee": "Keine Convention in deiner Umgebung.",
+      "proposition_action": "Nachsehen, ob ich dort bin",
+      "proposition_description": "Wenn du dort bist, bringt dich die App direkt auf ihre Seite.",
+      "proposition_titre": "Gerade findet eine Convention statt",
+      "recherche_en_cours": "Suche nach der Convention, auf der du bist …"
     }
   },
   "errors": {

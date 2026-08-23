@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "Você está em {nom}",
       "description": "Você foi trazido para cá porque esta convenção está acontecendo à sua volta.",
-      "retour_accueil": "Voltar ao início"
+      "retour_accueil": "Voltar ao início",
+      "aucune_trouvee": "Nenhuma convenção à sua volta.",
+      "proposition_action": "Ver se estou lá",
+      "proposition_description": "Se estiver lá, a aplicação pode levá-lo diretamente à sua página.",
+      "proposition_titre": "Uma convenção está a decorrer",
+      "recherche_en_cours": "A procurar a convenção onde se encontra…"
     }
   },
   "errors": {

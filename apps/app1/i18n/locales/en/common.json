@@ -466,7 +466,12 @@
     "sur_place": {
       "titre": "You are at {nom}",
       "description": "You were brought here because this convention is taking place around you.",
-      "retour_accueil": "Back to home"
+      "retour_accueil": "Back to home",
+      "aucune_trouvee": "No convention taking place around you.",
+      "proposition_action": "Check if I'm there",
+      "proposition_description": "If you are there, the app can take you straight to its page.",
+      "proposition_titre": "A convention is taking place right now",
+      "recherche_en_cours": "Looking for the convention you are at…"
     }
   },
   "errors": {
