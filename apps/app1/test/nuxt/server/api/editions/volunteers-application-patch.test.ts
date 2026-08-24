@@ -148,6 +148,31 @@ describe('PATCH /api/editions/[id]/volunteers/applications/[applicationId]', () 
     expect(prismaMock.user.findUnique).not.toHaveBeenCalled()
   })
 
+  it('accepte la charge utile réelle du formulaire, champs vides compris', async () => {
+    // Le test qui manquait. Les précédents n'envoyaient qu'un champ à la fois, alors que le
+    // formulaire envoie TOUT son état : `modificationNote` part en chaîne vide même chez un
+    // bénévole, à qui la section organisateur n'est pas affichée. Le filtre des champs
+    // réservés s'en offusquait et le 403 revenait — signalé depuis l'application.
+    await expect(
+      appeler(BENEVOLE, {
+        motivation: 'Toujours motivé',
+        modificationNote: '',
+        emergencyContactPhone: '',
+        teamPreferences: [],
+        companionName: '',
+      })
+    ).resolves.toBeTruthy()
+  })
+
+  it('refuse en revanche une note de modification réellement écrite', async () => {
+    await expect(
+      appeler(BENEVOLE, { modificationNote: 'Je me note quelque chose' })
+    ).rejects.toMatchObject({
+      statusCode: 403,
+      message: expect.stringContaining('réservés aux organisateurs'),
+    })
+  })
+
   it("accepte un contact d'urgence laissé vide", async () => {
     // Le formulaire envoie ses champs tels quels lors d'une modification : un contact non
     // renseigné part en chaîne vide. La refuser bloquerait la modification de la plupart des

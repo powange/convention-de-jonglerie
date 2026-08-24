@@ -103,9 +103,20 @@ export default wrapApiHandler(
     // Ce qui reste l'affaire des organisateurs : décider du sort d'une candidature, affecter
     // des équipes, y joindre une note. Sans ce filtre, ouvrir la modification à l'intéressé lui
     // donnerait le moyen de s'accepter lui-même.
+    //
+    // Seule une valeur RENSEIGNÉE compte comme une tentative. Le formulaire envoie ses champs
+    // tels quels : `modificationNote` part en chaîne vide même chez un bénévole, à qui la
+    // section n'est pas affichée. Refuser sur la seule présence de la clé rendait la
+    // modification impossible — le 403 revenait, avec un motif absurde.
     if (!peutGerer) {
-      const reserves = (['status', 'teams', 'note', 'modificationNote'] as const).filter(
-        (champ) => parsed[champ] !== undefined
+      const estRenseigne = (valeur: unknown) =>
+        valeur !== undefined &&
+        valeur !== null &&
+        valeur !== '' &&
+        !(Array.isArray(valeur) && valeur.length === 0)
+
+      const reserves = (['status', 'teams', 'note', 'modificationNote'] as const).filter((champ) =>
+        estRenseigne(parsed[champ])
       )
       if (reserves.length)
         throw createError({
