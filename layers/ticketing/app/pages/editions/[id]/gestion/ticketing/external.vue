@@ -965,7 +965,7 @@ const { execute: executeLoadTiers, loading: loadingTiers } = useApiAction<
   never,
   { tiers?: any[]; options?: any[] }
 >(`/api/editions/${editionId}/ticketing/helloasso/tiers`, {
-  method: 'GET',
+  method: 'POST',
   silentSuccess: true, // Message dynamique géré dans onSuccess
   errorMessages: { default: $t('ticketing.external.tiers_load_error') },
   onSuccess: (response) => {
