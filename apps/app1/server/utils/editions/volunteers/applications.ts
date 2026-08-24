@@ -1,3 +1,4 @@
+import { isValidPhoneNumber } from 'libphonenumber-js'
 import { z } from 'zod'
 
 import { requiresEmergencyContact } from '../../../utils/allergy-severity'
@@ -14,14 +15,44 @@ export const VALID_TIME_SLOTS = [
   'night',
 ] as const
 
+/**
+ * Un numéro de téléphone réellement valide, et pas seulement de la bonne forme.
+ *
+ * L'ancien contrôle ne regardait que les caractères employés : un numéro français à huit
+ * chiffres passait sans broncher, et la candidature partait avec un téléphone injoignable —
+ * constaté. `libphonenumber` connaît les longueurs et les préfixes réellement attribués, pays
+ * par pays ; c'est lui qui tranche désormais.
+ *
+ * Le repli en France couvre les versions antérieures de l'application encore en cache sur un
+ * téléphone : elles envoient le numéro au format national. Il n'élargit rien par rapport à
+ * l'ancien contrôle, qui acceptait déjà `0712345678`.
+ */
+export function telephoneCandidatureValide(valeur: string): boolean {
+  const v = valeur.trim()
+  if (!v) return false
+  return v.startsWith('+') ? isValidPhoneNumber(v) : isValidPhoneNumber(v, 'FR')
+}
+
+/** Champ téléphone d'une candidature : forme, longueur, puis validité réelle. */
+const telephoneCandidature = z
+  .string()
+  .min(6, 'Téléphone trop court')
+  .max(30, 'Téléphone trop long')
+  .regex(/^[+0-9 ().-]{6,30}$/, 'Format de téléphone invalide')
+  .refine(telephoneCandidatureValide, 'Numéro de téléphone invalide')
+
+/**
+ * Même chose, mais la chaîne vide vaut « non renseigné » et non « invalide ».
+ *
+ * Indispensable au contact d'urgence : le formulaire envoie ses champs tels quels lors d'une
+ * modification, si bien qu'un contact laissé vide part en `''`. Le refuser aurait bloqué la
+ * modification de toute candidature qui n'en déclare pas — soit la plupart.
+ */
+const telephoneCandidatureFacultatif = z.union([z.literal(''), telephoneCandidature])
+
 export const volunteerApplicationBodySchema = z.object({
   motivation: z.string().max(2000).optional().nullable(),
-  phone: z
-    .string()
-    .min(6, 'Téléphone trop court')
-    .max(30, 'Téléphone trop long')
-    .regex(/^[+0-9 ().-]{6,30}$/, 'Format de téléphone invalide')
-    .optional(),
+  phone: telephoneCandidature.optional(),
   nom: z.string().min(1, 'Nom requis').max(100, 'Nom trop long').optional(),
   prenom: z.string().min(1, 'Prénom requis').max(100, 'Prénom trop long').optional(),
   dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
@@ -65,6 +96,8 @@ export const volunteerApplicationBodySchema = z.object({
     .min(6, 'Téléphone contact urgence trop court')
     .max(30, 'Téléphone contact urgence trop long')
     .regex(/^[+0-9 ().-]{6,30}$/, 'Format téléphone contact urgence invalide')
+    .refine(telephoneCandidatureValide, 'Numéro du contact d’urgence invalide')
+    .or(z.literal(''))
     .optional()
     .nullable(),
 })
@@ -78,12 +111,7 @@ export const volunteerApplicationPatchSchema = z.object({
   note: z.string().optional(),
 
   // Données personnelles
-  phone: z
-    .string()
-    .min(6, 'Téléphone trop court')
-    .max(30, 'Téléphone trop long')
-    .regex(/^[+0-9 ().-]{6,30}$/, 'Format de téléphone invalide')
-    .optional(),
+  phone: telephoneCandidature.optional(),
 
   // Disponibilités
   setupAvailability: z.boolean().optional(),
@@ -103,7 +131,7 @@ export const volunteerApplicationPatchSchema = z.object({
   allergies: z.string().optional(),
   allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional(),
   emergencyContactName: z.string().optional(),
-  emergencyContactPhone: z.string().optional(),
+  emergencyContactPhone: telephoneCandidatureFacultatif.optional(),
 
   // Informations complémentaires
   hasPets: z.boolean().optional(),

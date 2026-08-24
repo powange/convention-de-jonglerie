@@ -85,12 +85,11 @@
           <!-- Champ téléphone (toujours affiché) -->
           <div class="w-full">
             <UFormField :label="t('volunteers.phone')" :error="phoneError" class="w-full">
-              <UInput
+              <UiPhoneInput
                 v-model="formData.phone"
-                :placeholder="user?.phone || t('volunteers.phone_placeholder')"
-                autocomplete="tel"
-                class="w-full"
-                @blur="markFieldTouched('phone')"
+                :placeholder="t('volunteers.phone_placeholder')"
+                size="md"
+                @update:model-value="markFieldTouched('phone')"
               />
             </UFormField>
           </div>
@@ -358,12 +357,11 @@
                 :error="emergencyContactPhoneError"
                 class="w-full"
               >
-                <UInput
+                <UiPhoneInput
                   v-model="formData.emergencyContactPhone"
                   :placeholder="t('volunteers.emergency_contact_phone_placeholder')"
-                  autocomplete="tel"
-                  class="w-full"
-                  @blur="markFieldTouched('emergencyContactPhone')"
+                  size="md"
+                  @update:model-value="markFieldTouched('emergencyContactPhone')"
                 />
               </UFormField>
             </div>
@@ -655,6 +653,15 @@ interface Props {
    * ici : le point d'API refuse déjà toute candidature tant que les candidatures sont fermées.
    */
   apercu?: boolean
+  /**
+   * Erreurs renvoyées par le serveur, par nom de champ.
+   *
+   * Le point d'API rend déjà le détail (`data.errors`), mais il ne servait à rien : la page se
+   * contentait d'un toast « Données invalides », qui disparaît et ne dit pas quel champ reprendre.
+   * Sur un formulaire de cette longueur, c'est une impasse — constaté en production, quelqu'un a
+   * réessayé trois fois en vingt-cinq secondes avant d'abandonner.
+   */
+  serverErrors?: Record<string, string> | null
 }
 
 interface Emits {
@@ -809,8 +816,27 @@ const markFieldTouched = (fieldName: string) => {
   touchedFields.value.add(fieldName)
 }
 
+/**
+ * L'erreur que le serveur a renvoyée pour ce champ, s'il en a renvoyé une.
+ *
+ * Elle prime sur la validation locale : c'est le refus qui vient d'avoir lieu, et il est plus
+ * précis que « ce champ est requis » — un champ rempli mais mal formé n'aurait autrement
+ * aucun marqueur.
+ */
+const erreurServeur = (champ: string) => {
+  const erreurs = props.serverErrors
+  if (!erreurs) return undefined
+  // Le point d'API nomme deux champs autrement que le formulaire (`submitVolunteerApplication`
+  // remappe `firstName → prenom` et `lastName → nom`). Sans ces alias, un refus sur le nom
+  // reviendrait sans marqueur, exactement le défaut que l'on corrige.
+  const alias: Record<string, string> = { firstName: 'prenom', lastName: 'nom' }
+  return erreurs[champ] || (alias[champ] ? erreurs[alias[champ]] : undefined) || undefined
+}
+
 // Individual field validation computed properties
 const phoneError = computed(() => {
+  const serveur = erreurServeur('phone')
+  if (serveur) return serveur
   if (!showAllErrors.value && !touchedFields.value.has('phone')) return undefined
   if (!formData.value.phone?.trim()) {
     return t('validation.phone_required')
@@ -819,6 +845,8 @@ const phoneError = computed(() => {
 })
 
 const firstNameError = computed(() => {
+  const serveur = erreurServeur('firstName')
+  if (serveur) return serveur
   if (!showAllErrors.value && !touchedFields.value.has('firstName')) return undefined
   if (!formData.value.firstName?.trim()) {
     return t('validation.first_name_required')
@@ -827,6 +855,8 @@ const firstNameError = computed(() => {
 })
 
 const lastNameError = computed(() => {
+  const serveur = erreurServeur('lastName')
+  if (serveur) return serveur
   if (!showAllErrors.value && !touchedFields.value.has('lastName')) return undefined
   if (!formData.value.lastName?.trim()) {
     return t('validation.last_name_required')
@@ -910,6 +940,8 @@ const emergencyContactNameError = computed(() => {
 
 const emergencyContactPhoneError = computed(() => {
   if (!shouldAskEmergencyContact.value) return undefined
+  const serveur = erreurServeur('emergencyContactPhone')
+  if (serveur) return serveur
   if (!showAllErrors.value && !touchedFields.value.has('emergencyContactPhone')) return undefined
   if (!formData.value.emergencyContactPhone?.trim()) {
     return t('validation.emergency_contact_phone_required')

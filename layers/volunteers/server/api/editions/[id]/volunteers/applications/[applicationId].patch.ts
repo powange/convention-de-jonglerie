@@ -31,18 +31,14 @@ export default wrapApiHandler(
       })
     }
 
-    const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
-    if (!allowed)
-      throw createError({
-        status: 403,
-        message: 'Droits insuffisants pour gérer les bénévoles',
-      })
-
+    // La candidature est chargée AVANT d'autoriser : sans savoir à qui elle appartient, on ne
+    // peut pas distinguer un organisateur d'un bénévole qui modifie la sienne.
     const application = await prisma.editionVolunteerApplication.findUnique({
       where: { id: applicationId },
       select: {
         id: true,
         eventId: true,
+        userId: true,
         status: true,
 
         // Données personnelles (snapshot)
@@ -91,16 +87,48 @@ export default wrapApiHandler(
     if (!application || application.eventId !== editionId)
       throw createError({ status: 404, message: 'Candidature introuvable' })
 
+    const peutGerer = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
+    const estLaSienne = application.userId === user.id
+
+    // Un bénévole peut reprendre sa propre candidature. C'était l'intention — la notification
+    // plus bas s'abstient déjà « si la modification est faite par le bénévole lui-même » — mais
+    // le contrôle d'accès ne laissait jamais ce cas se produire : le bouton « Modifier la
+    // candidature » de sa propre page répondait 403.
+    if (!peutGerer && !estLaSienne)
+      throw createError({
+        status: 403,
+        message: 'Droits insuffisants pour gérer les bénévoles',
+      })
+
+    // Ce qui reste l'affaire des organisateurs : décider du sort d'une candidature, affecter
+    // des équipes, y joindre une note. Sans ce filtre, ouvrir la modification à l'intéressé lui
+    // donnerait le moyen de s'accepter lui-même.
+    if (!peutGerer) {
+      const reserves = (['status', 'teams', 'note', 'modificationNote'] as const).filter(
+        (champ) => parsed[champ] !== undefined
+      )
+      if (reserves.length)
+        throw createError({
+          status: 403,
+          message: `Champs réservés aux organisateurs : ${reserves.join(', ')}`,
+        })
+    }
+
     // Si on modifie les données de la candidature (sans changer le statut)
     if (parsed.status === undefined && hasApplicationDataChanges(parsed)) {
-      // Si le téléphone est modifié, récupérer les données utilisateur
-      let user = null
+      // Si le téléphone est modifié, récupérer les données utilisateur.
+      //
+      // Nommé `profil` et non `user` : la seconde forme masquait l'utilisateur authentifié du
+      // début de la fonction. `isOwnApplication` comparait alors `application.user.id` à un
+      // objet sans `id` — voire à `null` dès que le téléphone n'était pas touché, ce qui
+      // faisait échouer la requête.
+      let profil = null
       if (parsed.phone !== undefined) {
-        user = await prisma.user.findUnique({
+        profil = await prisma.user.findUnique({
           where: { id: application.user.id },
           select: { phone: true, nom: true, prenom: true },
         })
-        if (!user) throw createError({ status: 404, message: 'Utilisateur introuvable' })
+        if (!profil) throw createError({ status: 404, message: 'Utilisateur introuvable' })
       }
 
       // Comparer les données avant/après pour détecter les modifications
@@ -109,11 +137,11 @@ export default wrapApiHandler(
       const { changes } = applicationChanges
 
       // Construire les données de mise à jour
-      const updateData = buildVolunteerApplicationUpdateData(parsed, user || undefined)
+      const updateData = buildVolunteerApplicationUpdateData(parsed, profil || undefined)
 
       // Mettre à jour le profil utilisateur si le téléphone a changé
-      if (parsed.phone !== undefined && user) {
-        const userUpdateData = getUserUpdateData(user, { phone: parsed.phone })
+      if (parsed.phone !== undefined && profil) {
+        const userUpdateData = getUserUpdateData(profil, { phone: parsed.phone })
         if (Object.keys(userUpdateData).length) {
           await prisma.user.update({
             where: { id: application.user.id },
@@ -172,7 +200,7 @@ export default wrapApiHandler(
 
       // Envoyer une notification au bénévole s'il y a des modifications ou une note
       // MAIS seulement si la modification n'est pas faite par le bénévole lui-même
-      const isOwnApplication = application.user.id === user.id
+      const isOwnApplication = estLaSienne
       if (!isOwnApplication && (changes.length > 0 || parsed.modificationNote?.trim())) {
         const displayName = application.event.name
         let message = `Votre candidature pour "${displayName}" a été modifiée par les organisateurs`
