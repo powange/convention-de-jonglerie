@@ -294,6 +294,7 @@
         :applying="volunteersApplying"
         :can-manage-edition="canManageEdition"
         :apercu="apercuFormulaire"
+        :server-errors="erreursServeur"
         @close="closeApplyModal"
         @submit="applyAsVolunteer"
       />
@@ -309,6 +310,7 @@
         :is-editing="true"
         :existing-application="myApplication"
         :can-manage-edition="canManageEdition"
+        :server-errors="erreursServeur"
         @close="closeEditApplicationModal"
         @update="updateVolunteerApplication"
       />
@@ -333,6 +335,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { requiresEmergencyContact } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { extraireErreursChamps, messageErreurValidation } from '~/utils/erreurs-validation'
 import { markdownToHtml } from '~/utils/markdown'
 import {
   updateVolunteerApplication as updateVolunteerApplicationAPI,
@@ -675,8 +678,20 @@ const mapFormDataToApplicationData = (formData: any) => {
   }
 }
 
+/**
+ * Erreurs de validation renvoyées par le serveur, par nom de champ.
+ *
+ * Le point d'API rend le détail dans `data.errors` depuis toujours ; il n'était simplement
+ * jamais lu. On se contentait de `e.message`, soit « Données invalides » — un toast qui
+ * s'efface sans dire quel champ reprendre, sur un formulaire qui en compte une trentaine.
+ */
+const erreursServeur = ref<Record<string, string> | null>(null)
+
 const applyAsVolunteer = async (formData?: any) => {
   volunteersApplying.value = true
+  // Une nouvelle tentative repart d'une page blanche : garder les marqueurs de la
+  // précédente désignerait des champs déjà corrigés.
+  erreursServeur.value = null
   try {
     // Transformer les données du formulaire selon la configuration de l'édition
     const applicationData = mapFormDataToApplicationData(formData)
@@ -699,7 +714,12 @@ const applyAsVolunteer = async (formData?: any) => {
 
     showApplyModal.value = false
   } catch (e: any) {
-    toast.add({ title: e?.message || t('common.error'), color: 'error' })
+    const champs = extraireErreursChamps(e)
+    erreursServeur.value = champs
+    toast.add({
+      title: messageErreurValidation(e, champs, t('common.error')),
+      color: 'error',
+    })
   } finally {
     volunteersApplying.value = false
   }
@@ -739,6 +759,7 @@ const closeEditApplicationModal = () => {
 
 // Fonction pour mettre à jour une candidature existante
 const updateVolunteerApplication = async (data: any) => {
+  erreursServeur.value = null
   try {
     // Le modal expose le régime alimentaire sous la clé `dietPreference`,
     // mais l'API (updateVolunteerApplicationAPI) attend `dietaryPreference`.
@@ -768,9 +789,11 @@ const updateVolunteerApplication = async (data: any) => {
       color: 'success',
     })
   } catch (error: any) {
+    const champs = extraireErreursChamps(error)
+    erreursServeur.value = champs
     toast.add({
       title: t('common.error'),
-      description: error?.message || t('volunteers.update_error'),
+      description: messageErreurValidation(error, champs, t('volunteers.update_error')),
       color: 'error',
     })
   }
