@@ -470,8 +470,10 @@
       "aucune_trouvee": "No convention taking place around you.",
       "proposition_action": "Check if I'm there",
       "proposition_description": "If you are there, the app can take you straight to its page.",
-      "proposition_titre": "A convention is taking place right now",
-      "recherche_en_cours": "Looking for the convention you are at…"
+      "proposition_titre": "You may be at a convention",
+      "recherche_en_cours": "Looking for the convention you are at…",
+      "description_demontage": "You were brought here because the takedown for this convention is taking place around you.",
+      "description_montage": "You were brought here because the setup for this convention is taking place around you."
     }
   },
   "errors": {

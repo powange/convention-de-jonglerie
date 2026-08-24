@@ -1,3 +1,5 @@
+import type { PeriodeEdition } from '~~/shared/utils/presence-edition'
+
 import { editionSurPlace, RAYON_SUR_PLACE_KM } from '~~/shared/utils/geolocalisation'
 
 interface EditionEnCours {
@@ -5,14 +7,24 @@ interface EditionEnCours {
   nom: string
   latitude: number
   longitude: number
-  estBenevole: boolean
+  /** Montage, événement ou démontage — sert à formuler le bandeau d'arrivée. */
+  periode: PeriodeEdition
+  /**
+   * Où emmener cette personne-là, décidé par le serveur : lui seul connaît son rôle sur cette
+   * édition. Le client n'a pas à le redevenir — deux jugements finiraient par différer.
+   */
+  destination: string
 }
 
 /** Marque de session : une seule redirection automatique, même si l'on revient à l'accueil. */
 const CLE_SESSION = 'edition-sur-place-proposee'
 
 /**
- * Emmène l'utilisateur sur l'édition où il se trouve, quand il en existe une en cours.
+ * Emmène l'utilisateur sur l'édition où il se trouve, quand il y en a une.
+ *
+ * La fenêtre déborde les dates publiques : le montage et le démontage en font partie. Pendant
+ * ces deux périodes, seuls sont concernés ceux qui ont une raison d'être là — organisateurs et
+ * bénévoles acceptés. Le serveur s'en charge et ne renvoie que ce qui les regarde.
  *
  * Trois précautions dictent la forme de ce composable :
  *
@@ -29,7 +41,12 @@ export function useEditionSurPlace() {
   const enCours = ref(false)
 
   /**
-   * Une édition se déroule-t-elle en ce moment ? Renseigné après consultation du serveur.
+   * Y a-t-il, en ce moment, une édition qui concerne cette personne ? Renseigné après
+   * consultation du serveur.
+   *
+   * « Qui la concerne » et non « qui se déroule » : pendant le montage et le démontage, le
+   * serveur n'annonce l'édition qu'aux organisateurs et aux bénévoles acceptés. Le bouton qui
+   * s'appuie sur ce drapeau ne promet donc jamais une recherche qui ne pourrait aboutir.
    *
    * Partagé par `useState` et non par un `ref` local : chaque appel du composable crée sinon sa
    * propre instance, et le drapeau renseigné par la page d'accueil n'atteindrait jamais le
@@ -133,12 +150,10 @@ export function useEditionSurPlace() {
 
       marquerPropose()
 
-      // Un bénévole accepté vient chercher son planning, pas la présentation de l'édition.
-      const destination = trouvee.estBenevole
-        ? `/editions/${trouvee.id}/volunteers`
-        : `/editions/${trouvee.id}`
-
-      await navigateTo({ path: destination, query: { surPlace: trouvee.nom } })
+      await navigateTo({
+        path: trouvee.destination,
+        query: { surPlace: trouvee.nom, periode: trouvee.periode },
+      })
     } catch {
       // Une détection qui échoue ne doit pas se voir : l'utilisateur n'a rien demandé.
     } finally {
@@ -214,10 +229,10 @@ export function useEditionSurPlace() {
       if (!trouvee) return { trouve: false }
 
       marquerPropose()
-      const destination = trouvee.estBenevole
-        ? `/editions/${trouvee.id}/volunteers`
-        : `/editions/${trouvee.id}`
-      await navigateTo({ path: destination, query: { surPlace: trouvee.nom } })
+      await navigateTo({
+        path: trouvee.destination,
+        query: { surPlace: trouvee.nom, periode: trouvee.periode },
+      })
       return { trouve: true }
     } catch {
       return { trouve: false }

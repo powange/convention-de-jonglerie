@@ -470,8 +470,10 @@
       "aucune_trouvee": "Brak konwencji w twojej okolicy.",
       "proposition_action": "Sprawdź, czy tam jestem",
       "proposition_description": "Jeśli tam jesteś, aplikacja przeniesie cię prosto na jej stronę.",
-      "proposition_titre": "Trwa właśnie konwencja",
-      "recherche_en_cours": "Szukanie konwencji, na której jesteś…"
+      "proposition_titre": "Być może jesteś na konwencji",
+      "recherche_en_cours": "Szukanie konwencji, na której jesteś…",
+      "description_demontage": "Trafiłeś tutaj, ponieważ w twojej okolicy trwa demontaż tej konwencji.",
+      "description_montage": "Trafiłeś tutaj, ponieważ w twojej okolicy trwa montaż tej konwencji."
     }
   },
   "errors": {

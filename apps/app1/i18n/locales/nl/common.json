@@ -470,8 +470,10 @@
       "aucune_trouvee": "Geen conventie in jouw omgeving.",
       "proposition_action": "Kijken of ik er ben",
       "proposition_description": "Als je daar bent, brengt de app je rechtstreeks naar de pagina.",
-      "proposition_titre": "Er is nu een conventie aan de gang",
-      "recherche_en_cours": "Zoeken naar de conventie waar je bent…"
+      "proposition_titre": "Je bent misschien op een conventie",
+      "recherche_en_cours": "Zoeken naar de conventie waar je bent…",
+      "description_demontage": "Je bent hierheen gebracht omdat de afbouw van deze conventie in jouw omgeving plaatsvindt.",
+      "description_montage": "Je bent hierheen gebracht omdat de opbouw van deze conventie in jouw omgeving plaatsvindt."
     }
   },
   "errors": {

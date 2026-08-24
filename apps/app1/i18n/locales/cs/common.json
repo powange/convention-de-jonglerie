@@ -470,8 +470,10 @@
       "aucune_trouvee": "Ve tvém okolí neprobíhá žádná konvence.",
       "proposition_action": "Zjistit, jestli tam jsem",
       "proposition_description": "Pokud jsi tam, aplikace tě přenese rovnou na její stránku.",
-      "proposition_titre": "Právě probíhá konvence",
-      "recherche_en_cours": "Hledám konvenci, na které se nacházíš…"
+      "proposition_titre": "Možná jsi na konvenci",
+      "recherche_en_cours": "Hledám konvenci, na které se nacházíš…",
+      "description_demontage": "Dostal ses sem, protože ve tvém okolí probíhá demontáž této konvence.",
+      "description_montage": "Dostal ses sem, protože ve tvém okolí probíhá montáž této konvence."
     }
   },
   "errors": {

@@ -466,9 +466,11 @@
     "sur_place": {
       "aucune_trouvee": "Aucune convention en cours autour de vous.",
       "description": "Vous avez été amené ici parce que cette convention se déroule autour de vous.",
+      "description_demontage": "Vous avez été amené ici parce que le démontage de cette convention se déroule autour de vous.",
+      "description_montage": "Vous avez été amené ici parce que le montage de cette convention se déroule autour de vous.",
       "proposition_action": "Voir si j’y suis",
       "proposition_description": "Si vous y êtes, l'application peut vous emmener directement sur sa page.",
-      "proposition_titre": "Une convention se déroule en ce moment",
+      "proposition_titre": "Vous êtes peut-être sur une convention",
       "recherche_en_cours": "Recherche de la convention où vous vous trouvez…",
       "retour_accueil": "Revenir à l'accueil",
       "titre": "Vous êtes à {nom}"
