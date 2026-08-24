@@ -121,6 +121,26 @@
     "welcome": "Welcome!",
     "pronouns": "Pronoun",
     "pronouns_help": "How you'd like to be addressed",
-    "pronouns_none": "Not specified"
+    "pronouns_none": "Not specified",
+    "health": {
+      "title": "Health and emergency contact",
+      "description": "Optional. This helps organisers plan meals and reach someone if needed.",
+      "diet": "Dietary preference",
+      "diet_options": {
+        "NONE": "No particular diet",
+        "VEGETARIAN": "Vegetarian",
+        "VEGAN": "Vegan"
+      },
+      "allergies": "Allergies or intolerances",
+      "allergies_help": "Describe what you are allergic to, and what must be avoided.",
+      "allergies_placeholder": "Peanuts, gluten, lactose…",
+      "allergy_severity": "Severity",
+      "severity_unset": "Not specified",
+      "emergency_contact_name": "Emergency contact",
+      "emergency_contact_help": "Let this person know you have listed them here: these are their details, not yours.",
+      "emergency_contact_name_placeholder": "First and last name",
+      "emergency_contact_phone": "Emergency contact phone",
+      "emergency_contact_phone_placeholder": "Their number"
+    }
   }
 }

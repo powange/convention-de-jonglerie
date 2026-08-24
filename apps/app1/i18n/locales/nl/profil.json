@@ -121,6 +121,26 @@
     "welcome": "Welkom!",
     "pronouns": "Voornaamwoord",
     "pronouns_help": "Hoe je aangesproken wilt worden",
-    "pronouns_none": "Niet opgegeven"
+    "pronouns_none": "Niet opgegeven",
+    "health": {
+      "title": "Gezondheid en noodcontact",
+      "description": "Optioneel. Deze gegevens helpen de organisatoren bij het plannen van maaltijden en om zo nodig iemand te bereiken.",
+      "diet": "Dieet",
+      "diet_options": {
+        "NONE": "Geen bijzonder dieet",
+        "VEGETARIAN": "Vegetarisch",
+        "VEGAN": "Veganistisch"
+      },
+      "allergies": "Allergieën of intoleranties",
+      "allergies_help": "Beschrijf waarvoor je allergisch bent en wat vermeden moet worden.",
+      "allergies_placeholder": "Pinda's, gluten, lactose…",
+      "allergy_severity": "Ernst",
+      "severity_unset": "Niet opgegeven",
+      "emergency_contact_name": "Noodcontact",
+      "emergency_contact_help": "Laat deze persoon weten dat je hem of haar hier opgeeft: het zijn hun gegevens, niet die van jou.",
+      "emergency_contact_name_placeholder": "Voor- en achternaam",
+      "emergency_contact_phone": "Telefoon van het noodcontact",
+      "emergency_contact_phone_placeholder": "Hun nummer"
+    }
   }
 }

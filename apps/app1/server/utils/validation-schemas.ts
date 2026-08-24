@@ -115,6 +115,21 @@ export const updateProfileSchema = z.object({
   email: emailSchema,
   telephone: phoneSchema.optional(),
   pronouns: z.string().refine(isValidPronoun, 'Pronom invalide').nullable().optional(),
+
+  // Informations personnelles facultatives : régime, allergies, contact d'urgence.
+  //
+  // Rien n'est imposé, pas même la gravité quand une allergie est décrite. Le formulaire de
+  // candidature bénévole, lui, l'exige — mais c'est sa règle à lui, dans son contexte. Un
+  // profil que l'on complète à son rythme n'a pas à réclamer la suite dès le premier mot.
+  dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).optional(),
+  allergies: z.string().max(1000, 'Description des allergies trop longue').nullable().optional(),
+  allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).nullable().optional(),
+  emergencyContactName: z
+    .string()
+    .max(100, "Nom du contact d'urgence trop long")
+    .nullable()
+    .optional(),
+  emergencyContactPhone: phoneSchema.optional(),
   profilePicture: z.string().nullable().optional(),
   preferredLanguage: z
     .string()

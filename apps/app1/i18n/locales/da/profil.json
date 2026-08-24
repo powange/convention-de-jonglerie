@@ -121,6 +121,26 @@
     "welcome": "Velkommen!",
     "pronouns": "Pronomen",
     "pronouns_help": "Hvordan du gerne vil tiltales",
-    "pronouns_none": "Ikke angivet"
+    "pronouns_none": "Ikke angivet",
+    "health": {
+      "title": "Helbred og nødkontakt",
+      "description": "Valgfrit. Oplysningerne hjælper arrangørerne med at planlægge måltider og med at nå nogen, hvis det bliver nødvendigt.",
+      "diet": "Kostform",
+      "diet_options": {
+        "NONE": "Ingen særlig kost",
+        "VEGETARIAN": "Vegetarisk",
+        "VEGAN": "Vegansk"
+      },
+      "allergies": "Allergier eller intolerancer",
+      "allergies_help": "Beskriv, hvad du er allergisk over for, og hvad der skal undgås.",
+      "allergies_placeholder": "Jordnødder, gluten, laktose…",
+      "allergy_severity": "Alvorlighed",
+      "severity_unset": "Ikke angivet",
+      "emergency_contact_name": "Nødkontakt",
+      "emergency_contact_help": "Sig til personen, at du angiver vedkommende her: det er deres oplysninger, ikke dine.",
+      "emergency_contact_name_placeholder": "For- og efternavn",
+      "emergency_contact_phone": "Nødkontaktens telefon",
+      "emergency_contact_phone_placeholder": "Deres nummer"
+    }
   }
 }

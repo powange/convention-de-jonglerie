@@ -121,6 +121,26 @@
     "welcome": "Bienvenue !",
     "pronouns": "Pronom",
     "pronouns_help": "Comment souhaitez-vous qu'on s'adresse à vous",
-    "pronouns_none": "Non renseigné"
+    "pronouns_none": "Non renseigné",
+    "health": {
+      "title": "Santé et contact d'urgence",
+      "description": "Facultatif. Ces informations aident les organisateurs à préparer les repas et à joindre quelqu'un en cas de besoin.",
+      "diet": "Régime alimentaire",
+      "diet_options": {
+        "NONE": "Aucun régime particulier",
+        "VEGETARIAN": "Végétarien",
+        "VEGAN": "Végétalien"
+      },
+      "allergies": "Allergies ou intolérances",
+      "allergies_help": "Décrivez ce à quoi vous êtes allergique, et ce qu'il faut éviter.",
+      "allergies_placeholder": "Arachides, gluten, lactose…",
+      "allergy_severity": "Gravité",
+      "severity_unset": "Non précisée",
+      "emergency_contact_name": "Contact d'urgence",
+      "emergency_contact_help": "Prévenez la personne que vous la renseignez ici : ce sont ses coordonnées, pas les vôtres.",
+      "emergency_contact_name_placeholder": "Prénom et nom",
+      "emergency_contact_phone": "Téléphone du contact d'urgence",
+      "emergency_contact_phone_placeholder": "Son numéro"
+    }
   }
 }

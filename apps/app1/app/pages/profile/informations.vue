@@ -120,6 +120,91 @@
             </div>
           </div>
 
+          <!-- Santé et contact d'urgence : facultatif, et proposé à tout le monde.
+               Ces informations servent aux organisateurs qui préparent les repas ou doivent
+               joindre quelqu'un en cas de pépin ; les renseigner ici évite de les ressaisir. -->
+          <USeparator class="my-8" />
+
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ t('profile.health.title') }}
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {{ t('profile.health.description') }}
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div class="space-y-6">
+                <UFormField :label="t('profile.health.diet')" name="dietaryPreference">
+                  <USelect
+                    v-model="state.dietaryPreference"
+                    :items="dietOptions"
+                    size="lg"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <UFormField
+                  :label="t('profile.health.allergies')"
+                  name="allergies"
+                  :help="t('profile.health.allergies_help')"
+                >
+                  <UTextarea
+                    v-model="state.allergies"
+                    :rows="3"
+                    :maxlength="1000"
+                    :placeholder="t('profile.health.allergies_placeholder')"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <!-- Proposée seulement quand une allergie est décrite : sans allergie, une
+                     gravité ne veut rien dire. Elle reste facultative — un profil se complète
+                     à son rythme, il n'a pas à réclamer la suite dès le premier mot. -->
+                <UFormField
+                  v-if="state.allergies.trim()"
+                  :label="t('profile.health.allergy_severity')"
+                  name="allergySeverity"
+                >
+                  <USelect
+                    v-model="state.allergySeverity"
+                    :items="severityOptions"
+                    size="lg"
+                    class="w-full"
+                  />
+                </UFormField>
+              </div>
+
+              <div class="space-y-6">
+                <UFormField
+                  :label="t('profile.health.emergency_contact_name')"
+                  name="emergencyContactName"
+                  :help="t('profile.health.emergency_contact_help')"
+                >
+                  <UInput
+                    v-model="state.emergencyContactName"
+                    :placeholder="t('profile.health.emergency_contact_name_placeholder')"
+                    size="lg"
+                    class="w-full"
+                  />
+                </UFormField>
+
+                <UFormField
+                  :label="t('profile.health.emergency_contact_phone')"
+                  name="emergencyContactPhone"
+                >
+                  <UiPhoneInput
+                    v-model="state.emergencyContactPhone"
+                    :placeholder="t('profile.health.emergency_contact_phone_placeholder')"
+                    size="lg"
+                  />
+                </UFormField>
+              </div>
+            </div>
+          </div>
+
           <!-- Actions avec indicateur de modifications -->
           <div class="mt-8">
             <div
@@ -171,6 +256,7 @@ import { z } from 'zod'
 
 import { useAuthStore } from '~/stores/auth'
 import type { User } from '~/types'
+import { getAllergySeveritySelectOptions } from '~/utils/allergy-severity'
 import { LOCALES_CONFIG } from '~/utils/locales'
 import { USER_PRONOUNS, PRONOUN_NONE } from '~/utils/pronouns'
 
@@ -186,6 +272,30 @@ const languageOptions = LOCALES_CONFIG.map((locale) => ({
   value: locale.code,
   label: locale.name,
 }))
+
+const DIETS = ['NONE', 'VEGETARIAN', 'VEGAN'] as const
+
+/**
+ * Marque « gravité non précisée ».
+ *
+ * Volontairement pas la chaîne vide : Nuxt UI la réserve à « aucune sélection » et refuse tout
+ * `SelectItem` qui la porte comme valeur. Une option visible et sélectionnable a besoin d'une
+ * valeur à elle ; la conversion vers `null` se fait au moment de l'envoi.
+ */
+const SEVERITE_AUCUNE = 'UNSET'
+
+const dietOptions = computed(() =>
+  DIETS.map((value) => ({ value, label: t(`profile.health.diet_options.${value}`) }))
+)
+
+// « Non précisée » d'abord : la gravité reste facultative, et il faut pouvoir revenir en
+// arrière après l'avoir renseignée une fois.
+const severityOptions = computed(() => [
+  { value: SEVERITE_AUCUNE, label: t('profile.health.severity_unset') },
+  // Les libellés du helper sont des CLÉS de traduction, pas du texte : les passer tels quels
+  // afficherait « edition.volunteers.allergy_severity_light_short » à l'écran.
+  ...getAllergySeveritySelectOptions().map((o) => ({ value: o.value, label: t(o.label) })),
+])
 
 const pronounsOptions = computed(() => [
   { value: PRONOUN_NONE, label: t('profile.pronouns_none') },
@@ -203,6 +313,14 @@ const schema = z.object({
     .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), t('errors.invalid_phone_number')),
   pronouns: z.string().optional(),
   preferredLanguage: z.string().optional(),
+  dietaryPreference: z.string().optional(),
+  allergies: z.string().max(1000).optional(),
+  allergySeverity: z.string().optional(),
+  emergencyContactName: z.string().max(100).optional(),
+  emergencyContactPhone: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^\+?[0-9\s\-()]+$/.test(val), t('errors.invalid_phone_number')),
 })
 
 const state = reactive({
@@ -215,6 +333,11 @@ const state = reactive({
   telephone: authStore.user?.phone || '',
   pronouns: (authStore.user as any)?.pronouns || PRONOUN_NONE,
   preferredLanguage: (authStore.user as any)?.preferredLanguage || 'fr',
+  dietaryPreference: (authStore.user as any)?.dietaryPreference || 'NONE',
+  allergies: (authStore.user as any)?.allergies || '',
+  allergySeverity: (authStore.user as any)?.allergySeverity || SEVERITE_AUCUNE,
+  emergencyContactName: (authStore.user as any)?.emergencyContactName || '',
+  emergencyContactPhone: (authStore.user as any)?.emergencyContactPhone || '',
 })
 
 const hasChanges = computed(() => {
@@ -226,7 +349,12 @@ const hasChanges = computed(() => {
     state.telephone !== (authStore.user?.phone || '') ||
     (state.pronouns === PRONOUN_NONE ? '' : state.pronouns) !==
       ((authStore.user as any)?.pronouns || '') ||
-    state.preferredLanguage !== ((authStore.user as any)?.preferredLanguage || 'fr')
+    state.preferredLanguage !== ((authStore.user as any)?.preferredLanguage || 'fr') ||
+    state.dietaryPreference !== ((authStore.user as any)?.dietaryPreference || 'NONE') ||
+    state.allergies !== ((authStore.user as any)?.allergies || '') ||
+    state.allergySeverity !== ((authStore.user as any)?.allergySeverity || SEVERITE_AUCUNE) ||
+    state.emergencyContactName !== ((authStore.user as any)?.emergencyContactName || '') ||
+    state.emergencyContactPhone !== ((authStore.user as any)?.emergencyContactPhone || '')
   )
 })
 
@@ -238,6 +366,11 @@ const resetForm = () => {
   state.telephone = (authStore.user as any)?.telephone || (authStore.user as any)?.phone || ''
   state.pronouns = (authStore.user as any)?.pronouns || PRONOUN_NONE
   state.preferredLanguage = (authStore.user as any)?.preferredLanguage || 'fr'
+  state.dietaryPreference = (authStore.user as any)?.dietaryPreference || 'NONE'
+  state.allergies = (authStore.user as any)?.allergies || ''
+  state.allergySeverity = (authStore.user as any)?.allergySeverity || SEVERITE_AUCUNE
+  state.emergencyContactName = (authStore.user as any)?.emergencyContactName || ''
+  state.emergencyContactPhone = (authStore.user as any)?.emergencyContactPhone || ''
 }
 
 const { execute: executeUpdateProfile, loading } = useApiAction<unknown, User>(
@@ -252,6 +385,16 @@ const { execute: executeUpdateProfile, loading } = useApiAction<unknown, User>(
       telephone: state.telephone || '',
       pronouns: state.pronouns === PRONOUN_NONE ? '' : state.pronouns,
       preferredLanguage: state.preferredLanguage || 'fr',
+      dietaryPreference: state.dietaryPreference || 'NONE',
+      allergies: state.allergies.trim() || null,
+      // Une gravité sans allergie décrite n'a pas de sens : on la remet à néant plutôt que de
+      // laisser traîner une valeur orpheline si la description est effacée.
+      allergySeverity:
+        state.allergies.trim() && state.allergySeverity !== SEVERITE_AUCUNE
+          ? state.allergySeverity
+          : null,
+      emergencyContactName: state.emergencyContactName.trim() || null,
+      emergencyContactPhone: state.emergencyContactPhone.trim() || null,
     }),
     successMessage: {
       title: t('profile.profile_updated'),

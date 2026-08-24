@@ -121,6 +121,26 @@
     "welcome": "Witamy!",
     "pronouns": "Zaimek",
     "pronouns_help": "Jak chcesz, aby się do Ciebie zwracano",
-    "pronouns_none": "Nie podano"
+    "pronouns_none": "Nie podano",
+    "health": {
+      "title": "Zdrowie i kontakt alarmowy",
+      "description": "Opcjonalne. Te informacje pomagają organizatorom przygotować posiłki i skontaktować się z kimś w razie potrzeby.",
+      "diet": "Dieta",
+      "diet_options": {
+        "NONE": "Brak szczególnej diety",
+        "VEGETARIAN": "Wegetariańska",
+        "VEGAN": "Wegańska"
+      },
+      "allergies": "Alergie lub nietolerancje",
+      "allergies_help": "Opisz, na co jesteś uczulony i czego należy unikać.",
+      "allergies_placeholder": "Orzeszki ziemne, gluten, laktoza…",
+      "allergy_severity": "Nasilenie",
+      "severity_unset": "Nie określono",
+      "emergency_contact_name": "Kontakt alarmowy",
+      "emergency_contact_help": "Uprzedź tę osobę, że ją tutaj podajesz: to jej dane, nie Twoje.",
+      "emergency_contact_name_placeholder": "Imię i nazwisko",
+      "emergency_contact_phone": "Telefon kontaktu alarmowego",
+      "emergency_contact_phone_placeholder": "Jej numer"
+    }
   }
 }

@@ -121,6 +121,26 @@
     "welcome": "Ласкаво просимо!",
     "pronouns": "Займенник",
     "pronouns_help": "Як до вас звертатися",
-    "pronouns_none": "Не вказано"
+    "pronouns_none": "Не вказано",
+    "health": {
+      "title": "Здоров'я та екстрений контакт",
+      "description": "Необов'язково. Ці відомості допомагають організаторам планувати харчування та зв'язатися з кимось за потреби.",
+      "diet": "Режим харчування",
+      "diet_options": {
+        "NONE": "Без особливого режиму",
+        "VEGETARIAN": "Вегетаріанське",
+        "VEGAN": "Веганське"
+      },
+      "allergies": "Алергії або непереносимість",
+      "allergies_help": "Опишіть, на що у вас алергія та чого слід уникати.",
+      "allergies_placeholder": "Арахіс, глютен, лактоза…",
+      "allergy_severity": "Тяжкість",
+      "severity_unset": "Не вказано",
+      "emergency_contact_name": "Екстрений контакт",
+      "emergency_contact_help": "Попередьте цю людину, що вказуєте її тут: це її дані, а не ваші.",
+      "emergency_contact_name_placeholder": "Ім'я та прізвище",
+      "emergency_contact_phone": "Телефон екстреного контакту",
+      "emergency_contact_phone_placeholder": "Її номер"
+    }
   }
 }

@@ -31,6 +31,18 @@ model User {
   phone                              String?
   pronouns                           String?
   preferredLanguage                  String                              @default("fr")
+
+  // Informations personnelles renseignables depuis le profil, toutes facultatives.
+  //
+  // Elles existent aussi, dupliquées, sur EditionVolunteerApplication, EditionArtist et
+  // EditionOrganizer : la même personne peut y avoir trois valeurs contradictoires. Le profil
+  // est destiné à faire foi et à les remplacer ; ces colonnes-ci sont la première étape, encore
+  // lue par personne d'autre que l'écran de profil.
+  dietaryPreference                  DietaryPreference                   @default(NONE)
+  allergies                          String?                             @db.Text
+  allergySeverity                    AllergySeverity?
+  emergencyContactName               String?
+  emergencyContactPhone              String?
   notificationPreferences            Json?
   isVolunteer                        Boolean                             @default(false)
   isArtist                           Boolean                             @default(false)

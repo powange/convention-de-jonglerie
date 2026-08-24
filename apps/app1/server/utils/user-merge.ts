@@ -72,6 +72,11 @@ export const MERGE_USER_SELECT = {
   pronouns: true,
   preferredLanguage: true,
   profilePicture: true,
+  dietaryPreference: true,
+  allergies: true,
+  allergySeverity: true,
+  emergencyContactName: true,
+  emergencyContactPhone: true,
   isEmailVerified: true,
   isGlobalAdmin: true,
   isVolunteer: true,
@@ -92,6 +97,11 @@ type MergeUser = {
   authProvider: string
   phone: string | null
   pronouns: string | null
+  dietaryPreference: string
+  allergies: string | null
+  allergySeverity: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
   preferredLanguage: string
   profilePicture: string | null
   isEmailVerified: boolean
@@ -243,8 +253,17 @@ export async function previewUserMerge(targetId: number, sourceId: number): Prom
   return toImpact(impacts)
 }
 
-/** Construit le patch de profil du compte conservé à partir des arbitrages de l'admin. */
-function buildProfilePatch(target: MergeUser, source: MergeUser, choices: MergeFieldChoices) {
+/**
+ * Construit le patch de profil du compte conservé à partir des arbitrages de l'admin.
+ *
+ * Exportée pour être éprouvée directement : c'est une fonction pure, et la faire passer par
+ * `mergeUsers` demanderait de simuler toute une transaction pour vérifier une règle d'arbitrage.
+ */
+export function buildProfilePatch(
+  target: MergeUser,
+  source: MergeUser,
+  choices: MergeFieldChoices
+) {
   const patch: Record<string, unknown> = {}
 
   if (choices.credentials === 'source') {
@@ -266,6 +285,22 @@ function buildProfilePatch(target: MergeUser, source: MergeUser, choices: MergeF
     'profilePicture',
   ] as const) {
     if (choices[field] === 'source') patch[field] = source[field]
+  }
+
+  // Régime, allergies et contact d'urgence ne sont pas arbitrés dans le modal : ils comblent
+  // les vides. Si le compte conservé n'a rien et que l'absorbé sait quelque chose, on le
+  // reprend — perdre en silence une allergie parce que l'autre fiche était vide serait bien
+  // pire qu'un choix par défaut discutable. À l'inverse, on n'écrase jamais une valeur déjà là.
+  if (target.dietaryPreference === 'NONE' && source.dietaryPreference !== 'NONE') {
+    patch.dietaryPreference = source.dietaryPreference as typeof target.dietaryPreference
+  }
+  for (const champ of [
+    'allergies',
+    'allergySeverity',
+    'emergencyContactName',
+    'emergencyContactPhone',
+  ] as const) {
+    if (!target[champ] && source[champ]) patch[champ] = source[champ] as never
   }
 
   // Les casquettes se cumulent : un compte fusionné est bénévole s'il l'était d'un côté.
