@@ -3,17 +3,21 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import {
+  handoutItemSelectionSchema,
+  normalizeHandoutItemSelections,
+} from '#server/utils/ticketing/handout-item-selection'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
-  handoutItemIds: z.array(z.number().int().positive()),
+  handoutItemIds: z.array(handoutItemSelectionSchema),
 })
 
 /**
  * PUT /api/editions/[id]/ticketing/tiers/[tierId]/handout-items
  *
- * Met à jour uniquement les articles à remettre associés à un tarif.
- * Remplace l'ensemble des associations existantes.
+ * Met à jour uniquement les articles à remettre associés à un tarif, avec le nombre
+ * d'exemplaires de chacun. Remplace l'ensemble des associations existantes.
  */
 export default wrapApiHandler(
   async (event) => {
@@ -34,7 +38,9 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Tarif introuvable' })
     }
 
-    const { handoutItemIds } = bodySchema.parse(await readBody(event))
+    const body = bodySchema.parse(await readBody(event))
+    const selections = normalizeHandoutItemSelections(body.handoutItemIds)
+    const handoutItemIds = selections.map((s) => s.handoutItemId)
 
     // Vérifier que tous les articles appartiennent à l'édition.
     if (handoutItemIds.length > 0) {
@@ -51,14 +57,18 @@ export default wrapApiHandler(
 
     await prisma.$transaction(async (tx) => {
       await tx.ticketingTierHandoutItem.deleteMany({ where: { tierId } })
-      if (handoutItemIds.length > 0) {
+      if (selections.length > 0) {
         await tx.ticketingTierHandoutItem.createMany({
-          data: handoutItemIds.map((handoutItemId) => ({ tierId, handoutItemId })),
+          data: selections.map(({ handoutItemId, quantity }) => ({
+            tierId,
+            handoutItemId,
+            quantity,
+          })),
         })
       }
     })
 
-    return createSuccessResponse({ tierId, handoutItemIds })
+    return createSuccessResponse({ tierId, handoutItems: selections })
   },
   { operationName: 'PUT ticketing tier handout-items' }
 )

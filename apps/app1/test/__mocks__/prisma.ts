@@ -73,6 +73,8 @@ export const prismaMock = {
   ticketingQuota: createModelMock(),
   ticketingOption: createModelMock(),
   ticketingHandoutItem: createModelMock(),
+  ticketingTierHandoutItem: createModelMock(),
+  ticketingOptionHandoutItem: createModelMock(),
   externalTicketing: createModelMock(),
 
   // Modèles messagerie
