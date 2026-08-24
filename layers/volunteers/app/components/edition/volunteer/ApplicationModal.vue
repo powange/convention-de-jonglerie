@@ -823,9 +823,41 @@ const markFieldTouched = (fieldName: string) => {
  * précis que « ce champ est requis » — un champ rempli mais mal formé n'aurait autrement
  * aucun marqueur.
  */
+/**
+ * Champs retouchés depuis le dernier refus du serveur.
+ *
+ * Sans cela, l'erreur renvoyée restait affichée quoi que l'on tape : le formulaire demeurait
+ * invalide et le bouton d'envoi grisé pour toujours, si bien qu'on ne pouvait plus corriger ce
+ * que le serveur venait justement de reprocher. Une correction efface le reproche ; c'est au
+ * prochain envoi de dire s'il tient encore.
+ */
+const champsRetouches = ref(new Set<string>())
+
+// Un nouveau verdict du serveur repart d'une ardoise vierge.
+watch(
+  () => props.serverErrors,
+  () => {
+    champsRetouches.value = new Set()
+  }
+)
+
+// Les champs sur lesquels le serveur peut se prononcer et que le formulaire sait marquer.
+for (const champ of ['phone', 'emergencyContactPhone', 'firstName', 'lastName'] as const) {
+  watch(
+    () => formData.value[champ],
+    () => {
+      if (!props.serverErrors) return
+      const suivant = new Set(champsRetouches.value)
+      suivant.add(champ)
+      champsRetouches.value = suivant
+    }
+  )
+}
+
 const erreurServeur = (champ: string) => {
   const erreurs = props.serverErrors
   if (!erreurs) return undefined
+  if (champsRetouches.value.has(champ)) return undefined
   // Le point d'API nomme deux champs autrement que le formulaire (`submitVolunteerApplication`
   // remappe `firstName → prenom` et `lastName → nom`). Sans ces alias, un refus sur le nom
   // reviendrait sans marqueur, exactement le défaut que l'on corrige.

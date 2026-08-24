@@ -1,5 +1,6 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { describe, expect, it } from 'vitest'
+import { nextTick } from 'vue'
 
 import ApplicationModal from '../../../../../../layers/volunteers/app/components/edition/volunteer/ApplicationModal.vue'
 
@@ -55,9 +56,9 @@ const utilisateur = {
  * `UModal` téléporte son contenu hors du composant : c'est le corps du document qu'il faut
  * lire, pas le HTML rendu par le composant lui-même.
  */
-const monter = async (serverErrors: Record<string, string> | null) => {
+const monterComposant = async (serverErrors: Record<string, string> | null) => {
   document.body.innerHTML = ''
-  await mountSuspended(ApplicationModal, {
+  return mountSuspended(ApplicationModal, {
     props: {
       modelValue: true,
       volunteersInfo,
@@ -67,6 +68,10 @@ const monter = async (serverErrors: Record<string, string> | null) => {
       serverErrors,
     } as never,
   })
+}
+
+const monter = async (serverErrors: Record<string, string> | null) => {
+  await monterComposant(serverErrors)
   return document.body.innerHTML
 }
 
@@ -89,6 +94,21 @@ describe('ApplicationModal — remontée des refus du serveur', () => {
     // le champ composé du simple champ de texte qu'il remplace — c'est ce remplacement qui
     // normalise la saisie en E.164 et met fin aux refus sur un numéro collé.
     expect(html).toContain('+33')
+  })
+
+  it('efface le refus dès que le champ est retouché', async () => {
+    // Sans cela, l'erreur restait affichée quoi que l'on tape : le formulaire demeurait
+    // invalide et le bouton d'envoi grisé, si bien qu'on ne pouvait plus corriger ce que le
+    // serveur venait de reprocher. Signalé depuis l'application.
+    const composant = await monterComposant({ phone: 'Numéro de téléphone invalide' })
+    expect(document.body.innerHTML).toContain('Numéro de téléphone invalide')
+
+    const vm = composant.vm as any
+    vm.formData.phone = '+33712345678'
+    await nextTick()
+    await nextTick()
+
+    expect(document.body.innerHTML).not.toContain('Numéro de téléphone invalide')
   })
 
   it("n'affiche rien quand le serveur n'a rien refusé", async () => {

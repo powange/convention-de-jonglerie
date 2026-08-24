@@ -335,6 +335,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { requiresEmergencyContact } from '~/utils/allergy-severity'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { extraireErreursChamps, messageErreurValidation } from '~/utils/erreurs-validation'
 import { markdownToHtml } from '~/utils/markdown'
 import {
   updateVolunteerApplication as updateVolunteerApplicationAPI,
@@ -686,18 +687,6 @@ const mapFormDataToApplicationData = (formData: any) => {
  */
 const erreursServeur = ref<Record<string, string> | null>(null)
 
-/** Le détail par champ d'un refus de validation, s'il y en a un. */
-const extraireErreursChamps = (e: any): Record<string, string> | null => {
-  const errors = e?.data?.errors
-  if (!errors || typeof errors !== 'object') return null
-  const utiles = Object.entries(errors).filter(([, v]) => typeof v === 'string')
-  return utiles.length ? (Object.fromEntries(utiles) as Record<string, string>) : null
-}
-
-/** Message de repli : le détail du serveur vaut mieux qu'un « Données invalides » nu. */
-const messageErreur = (e: any, champs: Record<string, string> | null) =>
-  champs ? Object.values(champs).join(' · ') : e?.message || t('common.error')
-
 const applyAsVolunteer = async (formData?: any) => {
   volunteersApplying.value = true
   // Une nouvelle tentative repart d'une page blanche : garder les marqueurs de la
@@ -727,7 +716,10 @@ const applyAsVolunteer = async (formData?: any) => {
   } catch (e: any) {
     const champs = extraireErreursChamps(e)
     erreursServeur.value = champs
-    toast.add({ title: messageErreur(e, champs), color: 'error' })
+    toast.add({
+      title: messageErreurValidation(e, champs, t('common.error')),
+      color: 'error',
+    })
   } finally {
     volunteersApplying.value = false
   }
@@ -801,9 +793,7 @@ const updateVolunteerApplication = async (data: any) => {
     erreursServeur.value = champs
     toast.add({
       title: t('common.error'),
-      description: champs
-        ? Object.values(champs).join(' · ')
-        : error?.message || t('volunteers.update_error'),
+      description: messageErreurValidation(error, champs, t('volunteers.update_error')),
       color: 'error',
     })
   }
