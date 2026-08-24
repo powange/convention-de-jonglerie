@@ -470,8 +470,10 @@
       "aucune_trouvee": "Inget konvent i din närhet.",
       "proposition_action": "Se om jag är där",
       "proposition_description": "Om du är där kan appen ta dig direkt till dess sida.",
-      "proposition_titre": "Ett konvent pågår just nu",
-      "recherche_en_cours": "Söker efter konventet du befinner dig på …"
+      "proposition_titre": "Du kanske är på ett konvent",
+      "recherche_en_cours": "Söker efter konventet du befinner dig på …",
+      "description_demontage": "Du fördes hit eftersom nedmonteringen av det här konventet pågår omkring dig.",
+      "description_montage": "Du fördes hit eftersom uppbyggnaden av det här konventet pågår omkring dig."
     }
   },
   "errors": {

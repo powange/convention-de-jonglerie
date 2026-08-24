@@ -16,6 +16,11 @@
       />
     </div>
     <div v-else>
+      <!-- Amené ici par la détection de position : le dire, et offrir d'en repartir. Sans ce
+           bandeau, un organisateur qui ouvre l'application sur le terrain se retrouverait sur
+           l'écran de gestion sans savoir pourquoi ni comment en sortir. -->
+      <EditionBandeauSurPlace />
+
       <!-- Contenu de gestion -->
       <div class="space-y-6">
         <!-- Statut de l'édition -->

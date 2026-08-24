@@ -470,8 +470,10 @@
       "aucune_trouvee": "Nenhuma convenção à sua volta.",
       "proposition_action": "Ver se estou lá",
       "proposition_description": "Se estiver lá, a aplicação pode levá-lo diretamente à sua página.",
-      "proposition_titre": "Uma convenção está a decorrer",
-      "recherche_en_cours": "A procurar a convenção onde se encontra…"
+      "proposition_titre": "Talvez você esteja em uma convenção",
+      "recherche_en_cours": "A procurar a convenção onde se encontra…",
+      "description_demontage": "Você foi trazido para cá porque a desmontagem desta convenção está acontecendo à sua volta.",
+      "description_montage": "Você foi trazido para cá porque a montagem desta convenção está acontecendo à sua volta."
     }
   },
   "errors": {

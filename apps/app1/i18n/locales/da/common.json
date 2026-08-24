@@ -470,8 +470,10 @@
       "aucune_trouvee": "Intet konvent i nærheden af dig.",
       "proposition_action": "Se, om jeg er der",
       "proposition_description": "Hvis du er der, kan appen tage dig direkte til siden.",
-      "proposition_titre": "Et konvent finder sted lige nu",
-      "recherche_en_cours": "Leder efter det konvent, du er på …"
+      "proposition_titre": "Du er måske til et konvent",
+      "recherche_en_cours": "Leder efter det konvent, du er på …",
+      "description_demontage": "Du er ført hertil, fordi nedtagningen af dette konvent foregår omkring dig.",
+      "description_montage": "Du er ført hertil, fordi opbygningen af dette konvent foregår omkring dig."
     }
   },
   "errors": {

@@ -470,8 +470,10 @@
       "aucune_trouvee": "No hay ninguna convención a tu alrededor.",
       "proposition_action": "Ver si estoy allí",
       "proposition_description": "Si estás allí, la aplicación puede llevarte directamente a su página.",
-      "proposition_titre": "Hay una convención en curso",
-      "recherche_en_cours": "Buscando la convención en la que te encuentras…"
+      "proposition_titre": "Puede que estés en una convención",
+      "recherche_en_cours": "Buscando la convención en la que te encuentras…",
+      "description_demontage": "Te hemos traído aquí porque el desmontaje de esta convención se realiza a tu alrededor.",
+      "description_montage": "Te hemos traído aquí porque el montaje de esta convención se realiza a tu alrededor."
     }
   },
   "errors": {

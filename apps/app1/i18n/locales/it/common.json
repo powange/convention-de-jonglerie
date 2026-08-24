@@ -470,8 +470,10 @@
       "aucune_trouvee": "Nessuna convention nei tuoi dintorni.",
       "proposition_action": "Vedere se sono lì",
       "proposition_description": "Se sei lì, l'applicazione può portarti direttamente alla sua pagina.",
-      "proposition_titre": "Una convention è in corso",
-      "recherche_en_cours": "Ricerca della convention in cui ti trovi…"
+      "proposition_titre": "Forse ti trovi a una convention",
+      "recherche_en_cours": "Ricerca della convention in cui ti trovi…",
+      "description_demontage": "Sei stato portato qui perché lo smontaggio di questa convention si sta svolgendo intorno a te.",
+      "description_montage": "Sei stato portato qui perché il montaggio di questa convention si sta svolgendo intorno a te."
     }
   },
   "errors": {

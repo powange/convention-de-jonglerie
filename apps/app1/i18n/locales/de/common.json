@@ -470,8 +470,10 @@
       "aucune_trouvee": "Keine Convention in deiner Umgebung.",
       "proposition_action": "Nachsehen, ob ich dort bin",
       "proposition_description": "Wenn du dort bist, bringt dich die App direkt auf ihre Seite.",
-      "proposition_titre": "Gerade findet eine Convention statt",
-      "recherche_en_cours": "Suche nach der Convention, auf der du bist …"
+      "proposition_titre": "Du bist vielleicht auf einer Convention",
+      "recherche_en_cours": "Suche nach der Convention, auf der du bist …",
+      "description_demontage": "Du wurdest hierher geführt, weil gerade der Abbau dieser Convention in deiner Umgebung stattfindet.",
+      "description_montage": "Du wurdest hierher geführt, weil gerade der Aufbau dieser Convention in deiner Umgebung stattfindet."
     }
   },
   "errors": {

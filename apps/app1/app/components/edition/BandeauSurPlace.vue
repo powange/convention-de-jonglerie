@@ -6,7 +6,7 @@
     variant="soft"
     class="mb-4"
     :title="$t('edition.sur_place.titre', { nom: nomEdition })"
-    :description="$t('edition.sur_place.description')"
+    :description="$t(cleDescription)"
     :actions="[
       {
         label: $t('edition.sur_place.retour_accueil'),
@@ -31,6 +31,18 @@ const router = useRouter()
 const nomEdition = computed(() => {
   const valeur = route.query.surPlace
   return typeof valeur === 'string' && valeur.trim() !== '' ? valeur : null
+})
+
+/**
+ * La formulation suit la période : « cette convention se déroule autour de vous » serait faux
+ * pendant le montage, où elle n'a pas encore ouvert. Sans période transmise — un lien recopié,
+ * une version antérieure — on retombe sur la phrase générale.
+ */
+const cleDescription = computed(() => {
+  const periode = route.query.periode
+  if (periode === 'montage') return 'edition.sur_place.description_montage'
+  if (periode === 'demontage') return 'edition.sur_place.description_demontage'
+  return 'edition.sur_place.description'
 })
 
 const retourAccueil = () => router.push('/')
