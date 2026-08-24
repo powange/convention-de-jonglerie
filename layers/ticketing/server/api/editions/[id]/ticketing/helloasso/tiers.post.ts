@@ -1,10 +1,10 @@
+import { decisionSuppression } from '../../../../../utils/synchronisation-helloasso'
 import { synchronisationUnique } from '../../../../../utils/synchronisation-unique'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { getHelloAssoTiersAndOptions } from '#server/utils/editions/ticketing/helloasso'
 import { decrypt } from '#server/utils/encryption'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
-
 
 export default wrapApiHandler(
   async (event) => {
@@ -83,10 +83,17 @@ export default wrapApiHandler(
 
           const fetchedTierIds = new Set((result.tiers || []).map((t) => t.id))
 
-          // Supprimer les tarifs qui n'existent plus dans HelloAsso
-          const tiersToDelete = existingTiers.filter(
-            (t) => t.helloAssoTierId !== null && !fetchedTierIds.has(t.helloAssoTierId)
+          // Supprimer les tarifs qui n'existent plus dans HelloAsso — sauf quand la réponse est
+          // vraisemblablement incomplète : la suppression emporte en cascade les associations de
+          // quotas, les articles à remettre et les liens de champs personnalisés, c'est-à-dire le
+          // travail saisi ici et que HelloAsso ne pourra jamais restituer.
+          const { aSupprimer: tiersToDelete, refus } = decisionSuppression(
+            existingTiers,
+            fetchedTierIds
           )
+          if (refus) {
+            console.warn(`⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${refus}`)
+          }
           if (tiersToDelete.length > 0) {
             console.log(
               `🗑️ Suppression de ${tiersToDelete.length} tarif(s) obsolète(s):`,
@@ -364,5 +371,5 @@ export default wrapApiHandler(
       }
     })
   },
-  { operationName: 'GET ticketing helloasso tiers' }
+  { operationName: 'POST ticketing helloasso tiers (synchronisation)' }
 )

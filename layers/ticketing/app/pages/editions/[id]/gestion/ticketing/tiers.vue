@@ -260,7 +260,7 @@ const loadCustomFields = async () => {
 const { execute: refreshData, loading: refreshing } = useApiAction(
   `/api/editions/${editionId}/ticketing/helloasso/tiers`,
   {
-    method: 'GET',
+    method: 'POST',
     successMessage: {
       title: 'Données actualisées',
       description: 'Les tarifs, options et champs personnalisés ont été synchronisés avec succès',
