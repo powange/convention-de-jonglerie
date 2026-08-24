@@ -3,17 +3,21 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import {
+  handoutItemSelectionSchema,
+  normalizeHandoutItemSelections,
+} from '#server/utils/ticketing/handout-item-selection'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
-  handoutItemIds: z.array(z.number().int().positive()),
+  handoutItemIds: z.array(handoutItemSelectionSchema),
 })
 
 /**
  * PUT /api/editions/[id]/ticketing/options/[optionId]/handout-items
  *
- * Met à jour uniquement les articles à remettre associés à une option.
- * Remplace l'ensemble des associations existantes.
+ * Met à jour uniquement les articles à remettre associés à une option, avec le nombre
+ * d'exemplaires de chacun. Remplace l'ensemble des associations existantes.
  */
 export default wrapApiHandler(
   async (event) => {
@@ -34,7 +38,9 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Option introuvable' })
     }
 
-    const { handoutItemIds } = bodySchema.parse(await readBody(event))
+    const body = bodySchema.parse(await readBody(event))
+    const selections = normalizeHandoutItemSelections(body.handoutItemIds)
+    const handoutItemIds = selections.map((s) => s.handoutItemId)
 
     if (handoutItemIds.length > 0) {
       const count = await prisma.ticketingHandoutItem.count({
@@ -50,14 +56,18 @@ export default wrapApiHandler(
 
     await prisma.$transaction(async (tx) => {
       await tx.ticketingOptionHandoutItem.deleteMany({ where: { optionId } })
-      if (handoutItemIds.length > 0) {
+      if (selections.length > 0) {
         await tx.ticketingOptionHandoutItem.createMany({
-          data: handoutItemIds.map((handoutItemId) => ({ optionId, handoutItemId })),
+          data: selections.map(({ handoutItemId, quantity }) => ({
+            optionId,
+            handoutItemId,
+            quantity,
+          })),
         })
       }
     })
 
-    return createSuccessResponse({ optionId, handoutItemIds })
+    return createSuccessResponse({ optionId, handoutItems: selections })
   },
   { operationName: 'PUT ticketing option handout-items' }
 )
