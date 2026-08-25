@@ -60,20 +60,14 @@ export default wrapApiHandler(
       await prisma.user.update({ where: { id: user.id }, data: majProfil as never })
     }
 
-    // Mettre à jour les préférences alimentaires
-    const updated = await prisma.editionArtist.update({
-      where: { id: artist.id },
-      data: {
-        dietaryPreference: data.dietaryPreference,
-        allergies: data.allergies,
-        allergySeverity: data.allergySeverity,
-      },
-      select: {
-        dietaryPreference: true,
-        allergies: true,
-        allergySeverity: true,
-      },
-    })
+    // La fiche artiste n'est plus alimentée : ces informations vivent sur le profil, où elles
+    // viennent d'être écrites. La vérification d'appartenance à l'édition reste, elle : c'est
+    // elle qui autorise l'appel.
+    const updated = {
+      dietaryPreference: data.dietaryPreference,
+      allergies: data.allergies,
+      allergySeverity: data.allergySeverity,
+    }
 
     return createSuccessResponse(updated)
   },

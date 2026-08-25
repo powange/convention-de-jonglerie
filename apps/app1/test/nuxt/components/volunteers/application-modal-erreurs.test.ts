@@ -21,6 +21,20 @@ import ApplicationModal from '../../../../../../layers/volunteers/app/components
 // échouer le fichier entier, sur un détail étranger à ce qu'on vérifie ici.
 registerEndpoint('/api/editions/21/volunteer-teams', () => ({ teams: [] }))
 
+const PROFIL_COMPLET = {
+  id: '1',
+  email: 'benevole@example.com',
+  pseudo: 'benevole',
+  nom: 'Nom',
+  prenom: 'Prenom',
+  phone: '+33711111111',
+  dietaryPreference: 'VEGAN',
+  allergies: 'Arachides',
+  allergySeverity: 'LIGHT',
+  emergencyContactName: 'Camille Dupont',
+  emergencyContactPhone: '+33612345678',
+}
+
 const volunteersInfo = {
   // La modale ne se rend qu'en mode interne (`v-if` sur la racine) : sans ce champ, on
   // n'assertait que sur un commentaire vide.
@@ -114,5 +128,43 @@ describe('ApplicationModal — remontée des refus du serveur', () => {
   it("n'affiche rien quand le serveur n'a rien refusé", async () => {
     const html = await monter(null)
     expect(html).not.toContain('Format de téléphone invalide')
+  })
+})
+
+/**
+ * Le formulaire se pré-remplit depuis le profil — TOUS les champs, pas seulement ceux qu'on a
+ * regardés.
+ *
+ * Le contact d'urgence restait vide alors que son nom, lui, se remplissait : la remise à zéro
+ * du formulaire réécrivait le téléphone à la chaîne vide, une ligne oubliée lors du
+ * branchement. Signalé depuis l'application, pas attrapé par les tests — ceux-ci vérifiaient
+ * l'affichage des erreurs, jamais le pré-remplissage.
+ *
+ * D'où un test qui les passe tous en revue, plutôt qu'un échantillon.
+ */
+describe('ApplicationModal — pré-remplissage depuis le profil', () => {
+  /** Les valeurs réellement portées par les champs, propriétés DOM et non attributs. */
+  const valeursDesChamps = () =>
+    [...document.querySelectorAll('input, textarea')].map((e) => (e as HTMLInputElement).value)
+
+  it('reprend chaque information personnelle du profil', async () => {
+    document.body.innerHTML = ''
+    await mountSuspended(ApplicationModal, {
+      props: {
+        modelValue: true,
+        // Toutes les questions activées : un champ non demandé n'est pas rendu, et son
+        // absence ne dirait rien du pré-remplissage.
+        volunteersInfo: { ...volunteersInfo, askAllergies: true, askEmergencyContact: true },
+        edition,
+        user: PROFIL_COMPLET,
+        applying: false,
+      } as never,
+    })
+
+    const valeurs = valeursDesChamps()
+    // Les numéros sont affichés au format national par le champ à indicatif.
+    for (const attendu of ['07 11 11 11 11', 'Camille Dupont', '06 12 34 56 78', 'Arachides']) {
+      expect(valeurs, `${attendu} devrait être pré-rempli`).toContain(attendu)
+    }
   })
 })

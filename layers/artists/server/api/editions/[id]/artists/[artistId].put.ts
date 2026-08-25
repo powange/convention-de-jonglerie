@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import {
   getEditionWithPermissions,
   canManageArtists,
@@ -254,11 +254,36 @@ export default wrapApiHandler(
       })
     }
 
+    // Régime et allergies vont au profil, qui fait foi. C'est un organisateur qui remplit :
+    // il complète ce qui manque et ne réécrit pas le profil de l'artiste.
+    const profilArtiste = await prisma.user.findUnique({
+      where: { id: existingArtist.user.id },
+      select: { dietaryPreference: true, allergies: true, allergySeverity: true },
+    })
+    const majProfil = misesAJourDuProfil(profilArtiste as never, validatedData as never, {
+      estLInteresse: false,
+    })
+    if (Object.keys(majProfil).length) {
+      await prisma.user.update({ where: { id: existingArtist.user.id }, data: majProfil as never })
+    }
+
     // Mettre à jour l'artiste
     const updatedArtist = await prisma.editionArtist.update({
       where: { id: artistId },
+      // `buildUpdateData` recopie tout ce qui n'est pas exclu : sans les trois exclusions
+      // ci-dessous, il continuerait d'alimenter les colonnes que l'on gèle. Écriture invisible
+      // au balayage, parce que dynamique — c'est elle qui a failli passer entre les mailles.
       data: buildUpdateData(validatedData, {
-        exclude: ['userEmail', 'userPrenom', 'userNom', 'userPhone', 'switchToUserId'],
+        exclude: [
+          'userEmail',
+          'userPrenom',
+          'userNom',
+          'userPhone',
+          'switchToUserId',
+          'dietaryPreference',
+          'allergies',
+          'allergySeverity',
+        ],
       }),
       include: {
         user: {

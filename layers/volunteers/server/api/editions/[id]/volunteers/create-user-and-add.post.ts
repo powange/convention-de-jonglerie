@@ -91,7 +91,7 @@ export default wrapApiHandler(async (event) => {
       status: 'ACCEPTED',
       motivation: 'Ajouté manuellement par un organisateur',
       userSnapshotPhone: null,
-      dietaryPreference: 'NONE',
+      // Le régime vit sur le profil ; la colonne garde sa valeur par défaut.
       setupAvailability: null,
       teardownAvailability: null,
       eventAvailability: null,

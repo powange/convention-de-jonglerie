@@ -138,6 +138,20 @@ describe('Candidature bénévole — remontée vers le profil', () => {
     expect(ecritureProfil()).toBeNull()
   })
 
+  it("n'enregistre pas ce que l'édition ne demande pas", async () => {
+    // L'ancienne écriture sur la candidature filtrait déjà par les questions activées. Perdre
+    // ce filtre en passant au profil aurait permis d'y déposer des informations qu'aucun
+    // formulaire n'avait montrées. Relevé en relecture, pas en production.
+    await postuler(
+      PROFIL_VIDE,
+      { dietaryPreference: 'VEGAN', emergencyContactName: 'Camille' },
+      { askDiet: false, askEmergencyContact: false }
+    )
+    const ecriture = ecritureProfil() ?? {}
+    expect(ecriture).not.toHaveProperty('dietaryPreference')
+    expect(ecriture).not.toHaveProperty('emergencyContactName')
+  })
+
   it('ne prend pas « aucun régime » pour une déclaration', async () => {
     await postuler(PROFIL_VIDE, { dietaryPreference: 'NONE' })
     expect(ecritureProfil() ?? {}).not.toHaveProperty('dietaryPreference')

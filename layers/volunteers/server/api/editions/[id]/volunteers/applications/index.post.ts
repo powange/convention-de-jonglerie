@@ -87,8 +87,24 @@ export default wrapApiHandler(
     // Traitement du téléphone
     const finalPhone = processPhoneLogic(user, parsed)
 
+    // Ce que l'édition ne demande pas n'est pas enregistré, pas même sur le profil. L'ancienne
+    // écriture sur la candidature appliquait déjà ce filtre ; le perdre en passant au profil
+    // aurait permis d'y déposer des informations qu'aucun formulaire n'avait montrées.
+    const contactUrgenceDemande = Boolean(
+      settings.askEmergencyContact ||
+      (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
+    )
+    const saisieRetenue = {
+      ...parsed,
+      dietaryPreference: settings.askDiet ? parsed.dietaryPreference : undefined,
+      allergies: settings.askAllergies ? parsed.allergies : undefined,
+      allergySeverity: settings.askAllergies ? parsed.allergySeverity : undefined,
+      emergencyContactName: contactUrgenceDemande ? parsed.emergencyContactName : undefined,
+      emergencyContactPhone: contactUrgenceDemande ? parsed.emergencyContactPhone : undefined,
+    }
+
     // Mettre à jour user si des données manquent
-    const updateData = getUserUpdateData(user, parsed)
+    const updateData = getUserUpdateData(user, saisieRetenue)
     if (Object.keys(updateData).length) {
       await prisma.user.update({ where: { id: authenticatedUser.id }, data: updateData })
     }
@@ -126,13 +142,10 @@ export default wrapApiHandler(
         motivation: parsed.motivation || null,
         userSnapshotPhone: finalPhone,
         qrCodeToken,
-        dietaryPreference:
-          settings.askDiet && parsed.dietaryPreference ? parsed.dietaryPreference : 'NONE',
-        allergies: settings.askAllergies ? sanitizeString(parsed.allergies) : null,
-        allergySeverity:
-          settings.askAllergies && sanitizeString(parsed.allergies) && parsed.allergySeverity
-            ? parsed.allergySeverity
-            : null,
+        // Régime, allergies et contact d'urgence ne sont plus écrits sur la candidature :
+        // ils vivent sur le profil, où `getUserUpdateData` les a portés juste au-dessus. Les
+        // colonnes subsistent le temps de vérifier en production que la reprise n'a rien laissé
+        // de côté, mais elles ne reçoivent plus rien.
         timePreferences:
           settings.askTimePreferences && parsed.timePreferences?.length
             ? parsed.timePreferences
@@ -165,16 +178,6 @@ export default wrapApiHandler(
         eventAvailability: parsed.eventAvailability ?? null,
         arrivalDateTime: sanitizeString(parsed.arrivalDateTime),
         departureDateTime: sanitizeString(parsed.departureDateTime),
-        emergencyContactName:
-          settings.askEmergencyContact ||
-          (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
-            ? sanitizeString(parsed.emergencyContactName)
-            : null,
-        emergencyContactPhone:
-          settings.askEmergencyContact ||
-          (parsed.allergySeverity && requiresEmergencyContact(parsed.allergySeverity))
-            ? sanitizeString(parsed.emergencyContactPhone)
-            : null,
       },
       select: {
         id: true,

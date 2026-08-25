@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 export default wrapApiHandler(
@@ -16,6 +17,10 @@ export default wrapApiHandler(
         status: true,
         motivation: true,
         createdAt: true,
+        // Le profil fait foi. Sans lui, cette page montrerait la copie figée de la candidature
+        // pendant que la page de l'édition montre le profil : deux valeurs pour la même
+        // information selon l'écran.
+        user: { select: infosPersonnellesSelect },
         dietaryPreference: true,
         allergies: true,
         allergySeverity: true,
@@ -147,10 +152,11 @@ export default wrapApiHandler(
       // Reconstituer la forme historique de la réponse : `edition` à plat. Métadonnées génériques
       // depuis Event, affichage propre au domaine depuis le port, config bénévole (askX) depuis
       // EventVolunteerSettings. Front inchangé.
-      const { event: _event, ...appRest } = app
+      const { event: _event, user: profil, ...appRest } = app
       const s = app.event.volunteerSettings
       return {
         ...appRest,
+        ...infosPersonnelles(profil as never, appRest as never),
         teamPreferences: teamPreferencesWithNames,
         assignedTeams: assignedTeamsWithNames,
         assignedTimeSlots: eventAssignments,

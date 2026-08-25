@@ -119,14 +119,8 @@ export default wrapApiHandler(
         })
       }
 
-      await prisma.editionOrganizer.update({
-        where: { id: editionOrganizerId },
-        data: {
-          dietaryPreference: body.dietaryPreference ?? undefined,
-          allergies: body.allergies === undefined ? undefined : body.allergies,
-          allergySeverity: body.allergySeverity === undefined ? undefined : body.allergySeverity,
-        },
-      })
+      // La ligne d'organisateur n'est plus alimentée : ces informations vivent sur le profil,
+      // où elles viennent d'être écrites.
     }
 
     const [meals, selections, organizer] = await Promise.all([

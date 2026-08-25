@@ -374,18 +374,10 @@ export function buildVolunteerApplicationUpdateData(
   if (parsed.avoidList !== undefined) updateData.avoidList = parsed.avoidList?.trim() || null
 
   // Régime et allergies
-  if (parsed.dietaryPreference !== undefined)
-    updateData.dietaryPreference = parsed.dietaryPreference
-  if (parsed.allergies !== undefined) updateData.allergies = parsed.allergies?.trim() || null
-  if (parsed.allergySeverity !== undefined) {
-    updateData.allergySeverity = parsed.allergies?.trim() ? parsed.allergySeverity : null
-  }
-  if (parsed.emergencyContactName !== undefined) {
-    updateData.emergencyContactName = parsed.emergencyContactName?.trim() || null
-  }
-  if (parsed.emergencyContactPhone !== undefined) {
-    updateData.emergencyContactPhone = parsed.emergencyContactPhone?.trim() || null
-  }
+  // Régime, allergies et contact d'urgence ne sont plus écrits sur la candidature : ils vivent
+  // sur le profil, où `getUserUpdateData` les porte. Les colonnes subsistent le temps de
+  // vérifier en production que la reprise n'a rien laissé de côté, mais elles ne reçoivent plus
+  // rien — les figer est la première étape avant de les supprimer.
 
   // Informations complémentaires
   if (parsed.hasPets !== undefined) updateData.hasPets = parsed.hasPets

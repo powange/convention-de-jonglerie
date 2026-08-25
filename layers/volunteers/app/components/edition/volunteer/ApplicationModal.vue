@@ -1516,7 +1516,7 @@ const remplirFormulaire = () => {
       allergies: (props.user as any)?.allergies || '',
       allergySeverity: (props.user as any)?.allergySeverity || undefined,
       emergencyContactName: (props.user as any)?.emergencyContactName || '',
-      emergencyContactPhone: '',
+      emergencyContactPhone: (props.user as any)?.emergencyContactPhone || '',
       hasPets: false,
       petsDetails: '',
       hasMinors: false,

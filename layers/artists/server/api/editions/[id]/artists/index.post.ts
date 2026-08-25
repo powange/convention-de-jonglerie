@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import { createPendingUserAndInvite } from '#server/utils/invitation'
 import {
   getEditionWithPermissions,
@@ -169,6 +169,19 @@ export default wrapApiHandler(
       })
     }
 
+    // Régime et allergies vont au profil, qui fait foi. C'est un organisateur qui remplit :
+    // il complète ce qui manque et ne réécrit pas le profil de l'artiste.
+    const profilArtiste = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: { dietaryPreference: true, allergies: true, allergySeverity: true },
+    })
+    const majProfil = misesAJourDuProfil(profilArtiste as never, validatedData as never, {
+      estLInteresse: false,
+    })
+    if (Object.keys(majProfil).length) {
+      await prisma.user.update({ where: { id: targetUserId }, data: majProfil as never })
+    }
+
     // Créer l'artiste
     const artist = await prisma.editionArtist.create({
       data: {
@@ -177,9 +190,7 @@ export default wrapApiHandler(
         qrCodeToken,
         arrivalDateTime: validatedData.arrivalDateTime,
         departureDateTime: validatedData.departureDateTime,
-        dietaryPreference: validatedData.dietaryPreference,
-        allergies: validatedData.allergies,
-        allergySeverity: validatedData.allergySeverity,
+        // Régime et allergies ne sont plus écrits sur la fiche : ils vivent sur le profil.
         // L'API parle en unité courante, la base en centimes entiers : la frontière est ici.
         payment: toCents(validatedData.payment),
         paymentPaid: validatedData.paymentPaid ?? false,
