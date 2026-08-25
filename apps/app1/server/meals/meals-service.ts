@@ -12,7 +12,11 @@ import type {
   MealVolunteerParticipant,
 } from './meals-types'
 
-import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
+import {
+  infosAlimentaires,
+  infosPersonnelles,
+  infosPersonnellesSelect,
+} from '#server/utils/infos-personnelles'
 import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
 import {
   isVolunteerEligibleForMeal,
@@ -487,7 +491,17 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
         select: { mealId: true },
       },
       organizer: {
-        select: { user: { select: { nom: true, prenom: true, email: true, phone: true } } },
+        select: {
+          user: {
+            select: {
+              nom: true,
+              prenom: true,
+              email: true,
+              phone: true,
+              ...infosPersonnellesSelect,
+            },
+          },
+        },
       },
     },
   })
@@ -515,9 +529,10 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
           prenom: eo.organizer.user.prenom,
           email: eo.organizer.user.email,
           phone: eo.organizer.user.phone,
-          dietaryPreference: eo.dietaryPreference,
-          allergies: eo.allergies,
-          allergySeverity: eo.allergySeverity,
+          // Le profil fait foi ; la ligne d'organisateur ne sert que de repli tant que ses
+          // colonnes existent (cf. `infos-personnelles`). Variante alimentaire : un
+          // organisateur ne déclare pas de contact d'urgence.
+          ...infosAlimentaires(eo.organizer.user as never, eo as never),
         })
       ),
   }))

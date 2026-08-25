@@ -1,6 +1,6 @@
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { fromCents } from '~~/shared/utils/money'
 
@@ -52,6 +52,7 @@ export default wrapApiHandler(
             prenom: true,
             nom: true,
             email: true,
+            ...infosPersonnellesSelect,
           },
         },
         // distinct : un artiste jouant dans plusieurs numéros d'un cabaret a autant de
@@ -170,9 +171,10 @@ export default wrapApiHandler(
         qrCode: `artist-${artist.id}`, // Format compatible avec le contrôle d'accès
         arrivalDateTime: artist.arrivalDateTime,
         departureDateTime: artist.departureDateTime,
-        dietaryPreference: artist.dietaryPreference,
-        allergies: artist.allergies,
-        allergySeverity: artist.allergySeverity,
+        // Le profil fait foi, ici comme dans les listes de repas. Sans cette résolution,
+        // l'artiste relirait la copie figée sur sa fiche pendant que les organisateurs
+        // verraient son profil — deux vérités pour la même personne.
+        ...infosAlimentaires(artist.user as never, artist as never),
         // La base est en centimes, l'API expose des unités courantes : `Number()` seul rendrait
         // désormais des centimes bruts, soit des montants multipliés par cent.
         payment: fromCents(artist.payment),

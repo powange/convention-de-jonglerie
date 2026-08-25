@@ -2,7 +2,7 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { z } from 'zod'
 
 import { requiresEmergencyContact } from '../../../utils/allergy-severity'
-import { complementsPourLeProfil } from '../../infos-personnelles'
+import { misesAJourDuProfil } from '../../infos-personnelles'
 
 // Créneaux horaires valides pour les préférences
 export const VALID_TIME_SLOTS = [
@@ -192,7 +192,9 @@ export function getUserUpdateData(
     allergySeverity?: string | null
     emergencyContactName?: string | null
     emergencyContactPhone?: string | null
-  }
+  },
+  /** Vrai quand la personne remplit son propre formulaire. */
+  estLInteresse = true
 ): Record<string, any> {
   const updateData: Record<string, any> = {}
 
@@ -203,10 +205,10 @@ export function getUserUpdateData(
   if (!user.nom && parsed.nom) updateData.nom = parsed.nom
   if (!user.prenom && parsed.prenom) updateData.prenom = parsed.prenom
 
-  // Régime, allergies et contact d'urgence : le profil fait foi, mais quelqu'un qui les
-  // renseigne depuis une candidature n'a pas à recommencer ailleurs. On ne remplit que les
-  // vides — une candidature ne doit jamais écraser ce que la personne a mis dans son profil.
-  Object.assign(updateData, complementsPourLeProfil(user as never, parsed as never))
+  // Régime, allergies et contact d'urgence remontent au profil, qui fait foi. L'intéressé y
+  // porte ses corrections ; un organisateur qui complète la candidature d'autrui ne fait que
+  // remplir les vides. Cf. `misesAJourDuProfil`.
+  Object.assign(updateData, misesAJourDuProfil(user as never, parsed as never, { estLInteresse }))
 
   return updateData
 }

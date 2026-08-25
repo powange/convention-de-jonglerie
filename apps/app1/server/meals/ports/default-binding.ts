@@ -10,6 +10,8 @@ import type {
   MealTicketValidationRow,
 } from './types'
 
+import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
+
 const artistUserSelect = {
   id: true,
   nom: true,
@@ -17,6 +19,8 @@ const artistUserSelect = {
   pseudo: true,
   email: true,
   phone: true,
+  // Régime et allergies sont lus sur le profil, qui fait foi.
+  ...infosPersonnellesSelect,
 } as const
 
 export function createDefaultMealsPorts(): MealsPorts {
@@ -49,9 +53,9 @@ export function createDefaultMealsPorts(): MealsPorts {
             pseudo: sel.artist.user.pseudo,
             email: sel.artist.user.email,
             phone: sel.artist.user.phone,
-            dietaryPreference: sel.artist.dietaryPreference,
-            allergies: sel.artist.allergies,
-            allergySeverity: sel.artist.allergySeverity,
+            // Le profil fait foi ; la fiche artiste ne sert que de repli tant que ses
+            // colonnes existent (cf. `infos-personnelles`).
+            ...infosAlimentaires(sel.artist.user as never, sel.artist as never),
             afterShow: sel.afterShow,
           })
         }

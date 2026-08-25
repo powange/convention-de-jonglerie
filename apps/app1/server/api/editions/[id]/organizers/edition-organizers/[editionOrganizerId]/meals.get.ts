@@ -1,4 +1,5 @@
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
 
 /**
@@ -30,6 +31,7 @@ export default wrapApiHandler(
         dietaryPreference: true,
         allergies: true,
         allergySeverity: true,
+        organizer: { select: { user: { select: infosPersonnellesSelect } } },
       },
     })
 
@@ -62,9 +64,8 @@ export default wrapApiHandler(
           consumedAt: selection?.consumedAt ?? null,
         }
       }),
-      dietaryPreference: editionOrganizer.dietaryPreference,
-      allergies: editionOrganizer.allergies,
-      allergySeverity: editionOrganizer.allergySeverity,
+      // Le profil fait foi ; la ligne d'organisateur ne sert que de repli.
+      ...infosAlimentaires(editionOrganizer.organizer?.user as never, editionOrganizer as never),
     })
   },
   { operationName: 'GetOrganizerMeals' }

@@ -188,6 +188,54 @@ describe('PATCH /api/editions/[id]/volunteers/applications/[applicationId]', () 
     )
   })
 
+  it('un organisateur ne réécrit pas le profil du bénévole, il le complète', async () => {
+    // L'organisateur corrige la candidature de quelqu'un d'autre : il n'a pas à écraser ce que
+    // cette personne a mis dans son propre profil. Il ne comble que les vides.
+    prismaMock.user.findUnique.mockResolvedValue({
+      phone: '+33612345678',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      dietaryPreference: 'VEGETARIAN',
+      allergies: 'Gluten',
+      allergySeverity: null,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+    })
+
+    await appeler(ORGANISATEUR, {
+      dietaryPreference: 'VEGAN',
+      // La gravité accompagne l'allergie : le point d'API l'exige dès qu'une allergie est
+      // décrite, indépendamment de ce qu'on éprouve ici.
+      allergies: 'Arachides',
+      allergySeverity: 'LIGHT',
+      emergencyContactName: 'Camille',
+    })
+
+    const ecriture = prismaMock.user.update.mock.calls.at(-1)?.[0]?.data ?? {}
+    expect(ecriture).not.toHaveProperty('dietaryPreference')
+    expect(ecriture).not.toHaveProperty('allergies')
+    expect(ecriture).toMatchObject({ emergencyContactName: 'Camille' })
+  })
+
+  it('le bénévole, lui, porte ses corrections à son profil', async () => {
+    prismaMock.user.findUnique.mockResolvedValue({
+      phone: '+33612345678',
+      nom: 'Nom',
+      prenom: 'Prenom',
+      dietaryPreference: 'VEGETARIAN',
+      allergies: 'Gluten',
+      allergySeverity: null,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+    })
+
+    await appeler(BENEVOLE, { allergies: 'Arachides', allergySeverity: 'LIGHT' })
+
+    expect(prismaMock.user.update.mock.calls.at(-1)?.[0]?.data).toMatchObject({
+      allergies: 'Arachides',
+    })
+  })
+
   it('rejette un numéro de téléphone qui ne correspond à aucun numéro réel', async () => {
     // Huit chiffres en France : la forme était acceptée, le numéro n'existe pas.
     await expect(appeler(BENEVOLE, { phone: '+3312345678' })).rejects.toMatchObject({

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   complementsPourLeProfil,
   infosPersonnelles,
+  misesAJourDuProfil,
 } from '../../../server/utils/infos-personnelles'
 
 /**
@@ -95,5 +96,66 @@ describe('complementsPourLeProfil', () => {
 
   it('ne prend pas « aucun régime » pour une déclaration', () => {
     expect(complementsPourLeProfil(VIDE, { ...VIDE, dietaryPreference: 'NONE' })).toEqual({})
+  })
+})
+
+describe('misesAJourDuProfil', () => {
+  /**
+   * Le scénario qui a révélé le défaut : quelqu'un corrige son allergie depuis le formulaire,
+   * le profil garde l'ancienne valeur, et comme il fait foi à la lecture, la correction
+   * n'apparaît nulle part. Silencieusement annulée.
+   */
+  it('porte au profil la correction de l’intéressé', () => {
+    const profil = { ...VIDE, allergies: 'Gluten' }
+    const patch = misesAJourDuProfil(
+      profil,
+      { ...profil, allergies: 'Arachides' },
+      {
+        estLInteresse: true,
+      }
+    )
+    expect(patch).toEqual({ allergies: 'Arachides' })
+
+    // Et la correction doit être visible ensuite.
+    expect(infosPersonnelles({ ...profil, ...patch }).allergies).toBe('Arachides')
+  })
+
+  it('accepte que l’intéressé efface une information', () => {
+    expect(
+      misesAJourDuProfil(
+        { ...VIDE, allergies: 'Gluten' },
+        { ...VIDE, allergies: '' },
+        {
+          estLInteresse: true,
+        }
+      )
+    ).toEqual({ allergies: null })
+  })
+
+  it('ne touche pas aux champs absents de la saisie', () => {
+    // Toutes les éditions ne demandent pas les mêmes informations : ce qui n'est pas demandé
+    // n'est pas envoyé, et ne doit rien effacer.
+    expect(
+      misesAJourDuProfil({ ...VIDE, allergies: 'Gluten' }, {}, { estLInteresse: true })
+    ).toEqual({})
+  })
+
+  it('n’écrit rien quand la saisie répète ce que le profil sait déjà', () => {
+    const profil = { ...VIDE, allergies: 'Gluten', dietaryPreference: 'VEGAN' as const }
+    expect(misesAJourDuProfil(profil, profil, { estLInteresse: true })).toEqual({})
+  })
+
+  it('se contente de combler les vides quand c’est quelqu’un d’autre qui remplit', () => {
+    // Un organisateur qui corrige la candidature d'un bénévole ne réécrit pas son profil.
+    const profil = { ...VIDE, allergies: 'Gluten' }
+    expect(
+      misesAJourDuProfil(
+        profil,
+        { ...VIDE, allergies: 'Arachides', emergencyContactName: 'Camille' },
+        {
+          estLInteresse: false,
+        }
+      )
+    ).toEqual({ emergencyContactName: 'Camille' })
   })
 })
