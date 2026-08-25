@@ -12,6 +12,7 @@ import type {
   MealVolunteerParticipant,
 } from './meals-types'
 
+import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
 import {
   isVolunteerEligibleForMeal,
@@ -461,7 +462,15 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
         include: {
           volunteer: {
             include: {
-              user: { select: { nom: true, prenom: true, email: true, phone: true } },
+              user: {
+                select: {
+                  nom: true,
+                  prenom: true,
+                  email: true,
+                  phone: true,
+                  ...infosPersonnellesSelect,
+                },
+              },
             },
           },
         },
@@ -493,11 +502,9 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
         prenom: selection.volunteer.user.prenom,
         email: selection.volunteer.user.email,
         phone: selection.volunteer.user.phone,
-        dietaryPreference: selection.volunteer.dietaryPreference,
-        allergies: selection.volunteer.allergies,
-        allergySeverity: selection.volunteer.allergySeverity,
-        emergencyContactName: selection.volunteer.emergencyContactName,
-        emergencyContactPhone: selection.volunteer.emergencyContactPhone,
+        // Le profil fait foi ; la candidature ne sert que de repli tant que ses colonnes
+        // existent (cf. `infos-personnelles`).
+        ...infosPersonnelles(selection.volunteer.user as never, selection.volunteer as never),
       })
     ),
     organizers: editionOrganizers

@@ -6,6 +6,7 @@ import {
   buildVolunteerApplicationUpdateData,
   getUserUpdateData,
 } from '#server/utils/editions/volunteers/applications'
+import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
@@ -133,11 +134,23 @@ export default wrapApiHandler(
       // début de la fonction. `isOwnApplication` comparait alors `application.user.id` à un
       // objet sans `id` — voire à `null` dès que le téléphone n'était pas touché, ce qui
       // faisait échouer la requête.
+      //
+      // Rechargé dès qu'une information destinée au profil est envoyée, et plus seulement sur
+      // le téléphone : régime, allergies et contact d'urgence y remontent aussi désormais. Se
+      // limiter au téléphone aurait rendu cette remontée inopérante dans tous les autres cas.
+      const champsDuProfil = [
+        'phone',
+        'dietaryPreference',
+        'allergies',
+        'allergySeverity',
+        'emergencyContactName',
+        'emergencyContactPhone',
+      ] as const
       let profil = null
-      if (parsed.phone !== undefined) {
+      if (champsDuProfil.some((champ) => parsed[champ] !== undefined)) {
         profil = await prisma.user.findUnique({
           where: { id: application.user.id },
-          select: { phone: true, nom: true, prenom: true },
+          select: { phone: true, nom: true, prenom: true, ...infosPersonnellesSelect },
         })
         if (!profil) throw createError({ status: 404, message: 'Utilisateur introuvable' })
       }
@@ -151,8 +164,8 @@ export default wrapApiHandler(
       const updateData = buildVolunteerApplicationUpdateData(parsed, profil || undefined)
 
       // Mettre à jour le profil utilisateur si le téléphone a changé
-      if (parsed.phone !== undefined && profil) {
-        const userUpdateData = getUserUpdateData(profil, { phone: parsed.phone })
+      if (profil) {
+        const userUpdateData = getUserUpdateData(profil, parsed as never)
         if (Object.keys(userUpdateData).length) {
           await prisma.user.update({
             where: { id: application.user.id },

@@ -9,6 +9,7 @@ import {
   validateAvailability,
   validateTeamPreferences,
 } from '#server/utils/editions/volunteers/applications'
+import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
 
@@ -50,7 +51,9 @@ export default wrapApiHandler(
     // Téléphone requis : si pas déjà défini dans user et pas fourni -> erreur
     const user = await prisma.user.findUnique({
       where: { id: authenticatedUser.id },
-      select: { phone: true, nom: true, prenom: true },
+      // Les infos personnelles sont chargées pour savoir lesquelles manquent au profil :
+      // `getUserUpdateData` n'y remonte que ce qui y fait défaut.
+      select: { phone: true, nom: true, prenom: true, ...infosPersonnellesSelect },
     })
     if (!user) throw createError({ status: 401, message: 'Non authentifié' })
 

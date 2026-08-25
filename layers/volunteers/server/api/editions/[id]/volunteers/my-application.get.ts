@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -54,6 +55,7 @@ export default wrapApiHandler(async (event) => {
       user: {
         select: {
           ...userWithNameSelect,
+          ...infosPersonnellesSelect,
           email: true,
           phone: true,
         },
@@ -124,6 +126,10 @@ export default wrapApiHandler(async (event) => {
 
   return {
     ...application,
+    // Le profil fait foi, ici comme dans la vue des organisateurs. Sans cette résolution,
+    // l'intéressé relirait la copie figée dans sa candidature pendant que les organisateurs,
+    // eux, verraient son profil à jour — deux vérités pour la même personne.
+    ...infosPersonnelles(application.user as never, application as never),
     assignedTimeSlots,
   }
 }, 'GetMyVolunteerApplication')

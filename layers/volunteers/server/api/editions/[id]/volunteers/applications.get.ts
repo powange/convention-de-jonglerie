@@ -3,6 +3,7 @@ import type { Prisma } from '@prisma/client'
 
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
@@ -198,7 +199,9 @@ export default wrapApiHandler(async (event) => {
     if (sortFieldRaw === 'pseudo') return { user: { pseudo: sortDirRaw } }
     if (sortFieldRaw === 'prenom') return { user: { prenom: sortDirRaw } }
     if (sortFieldRaw === 'nom') return { user: { nom: sortDirRaw } }
-    if (sortFieldRaw === 'allergies') return { allergies: sortDirRaw }
+    // Le tri porte sur le profil, comme l'affichage : trier sur la copie de la candidature
+    // classerait selon une valeur que plus personne ne voit.
+    if (sortFieldRaw === 'allergies') return { user: { allergies: sortDirRaw } }
     if (sortFieldRaw === 'status') return { status: sortDirRaw }
     if (sortFieldRaw === 'arrivalDateTime') return { arrivalDateTime: sortDirRaw }
     if (sortFieldRaw === 'departureDateTime') return { departureDateTime: sortDirRaw }
@@ -262,6 +265,7 @@ export default wrapApiHandler(async (event) => {
     user: {
       select: {
         ...userWithNameSelect,
+        ...infosPersonnellesSelect,
         email: true,
         phone: true,
         profilePicture: true,
@@ -332,6 +336,14 @@ export default wrapApiHandler(async (event) => {
     ...(isExport || needsCustomSort ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
     select: selectFields,
   })
+
+  // Le profil fait foi pour le régime, les allergies et le contact d'urgence. Résolu ici, en
+  // amont du tri et de l'export, pour que la liste affichée et le fichier exporté disent
+  // exactement la même chose.
+  applications = applications.map((app) => ({
+    ...app,
+    ...infosPersonnelles(app.user as never, app as never),
+  })) as typeof applications
 
   // Si tri par date avec granularité, trier en mémoire
   if (needsCustomSort) {
