@@ -5,11 +5,11 @@
  * sur `User`, et c'est là qu'il faut les lire — plutôt que sur la copie que chaque
  * `EditionVolunteerApplication` en conservait, qui pouvait diverger d'une édition à l'autre.
  *
- * Un repli sur la candidature reste en place pendant la transition. Il ne contredit jamais le
- * profil : il ne s'applique qu'aux champs que le profil laisse vides. Sans lui, une allergie
- * saisie il y a six mois dans une candidature disparaîtrait de la vue des organisateurs le jour
- * du déploiement, sans que personne ne l'ait décidé. Il disparaîtra avec les colonnes
- * dupliquées, une fois la reprise vérifiée en production.
+ * Un repli sur la fiche a accompagné la transition, le temps de vérifier que la reprise des
+ * données n'avait rien laissé de côté. Le contrôle a été fait sur les données de production —
+ * 63 valeurs portées par une fiche, toutes présentes sur le profil correspondant, zéro
+ * manquante — et les colonnes dupliquées ont été supprimées dans la foulée. Le repli n'a donc
+ * plus d'objet.
  */
 
 export type RegimeAlimentaire = 'NONE' | 'VEGETARIAN' | 'VEGAN'
@@ -34,26 +34,14 @@ export const infosPersonnellesSelect = {
 
 type Source = Partial<InfosPersonnelles> | null | undefined
 
-/**
- * Les informations à afficher : celles du profil, complétées par celles de la candidature là où
- * le profil ne dit rien.
- *
- * `NONE` vaut « rien dit » pour le régime : c'est la valeur par défaut de la colonne, on ne peut
- * pas la distinguer d'un choix délibéré. Pendant la transition, mieux vaut donc afficher le
- * régime déclaré dans la candidature que de le remplacer par un « aucun régime » qui ferait
- * servir de la viande à quelqu'un qui n'en mange pas.
- */
-export function infosPersonnelles(profil: Source, repli?: Source): InfosPersonnelles {
-  const regimeProfil = profil?.dietaryPreference
+/** Les informations à afficher : celles du profil, qui est désormais la seule source. */
+export function infosPersonnelles(profil: Source): InfosPersonnelles {
   return {
-    dietaryPreference:
-      regimeProfil && regimeProfil !== 'NONE'
-        ? regimeProfil
-        : (repli?.dietaryPreference ?? regimeProfil ?? 'NONE'),
-    allergies: profil?.allergies ?? repli?.allergies ?? null,
-    allergySeverity: profil?.allergySeverity ?? repli?.allergySeverity ?? null,
-    emergencyContactName: profil?.emergencyContactName ?? repli?.emergencyContactName ?? null,
-    emergencyContactPhone: profil?.emergencyContactPhone ?? repli?.emergencyContactPhone ?? null,
+    dietaryPreference: profil?.dietaryPreference ?? 'NONE',
+    allergies: profil?.allergies ?? null,
+    allergySeverity: profil?.allergySeverity ?? null,
+    emergencyContactName: profil?.emergencyContactName ?? null,
+    emergencyContactPhone: profil?.emergencyContactPhone ?? null,
   }
 }
 
@@ -147,7 +135,7 @@ export type InfosAlimentaires = Pick<
  * ferait échouer la compilation sur les propriétés en trop, et laisserait croire à une donnée
  * qui n'existe pas de leur côté.
  */
-export function infosAlimentaires(profil: Source, repli?: Source): InfosAlimentaires {
-  const { dietaryPreference, allergies, allergySeverity } = infosPersonnelles(profil, repli)
+export function infosAlimentaires(profil: Source): InfosAlimentaires {
+  const { dietaryPreference, allergies, allergySeverity } = infosPersonnelles(profil)
   return { dietaryPreference, allergies, allergySeverity }
 }

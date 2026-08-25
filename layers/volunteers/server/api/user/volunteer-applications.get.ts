@@ -21,11 +21,6 @@ export default wrapApiHandler(
         // pendant que la page de l'édition montre le profil : deux valeurs pour la même
         // information selon l'écran.
         user: { select: infosPersonnellesSelect },
-        dietaryPreference: true,
-        allergies: true,
-        allergySeverity: true,
-        emergencyContactName: true,
-        emergencyContactPhone: true,
         timePreferences: true,
         teamPreferences: true,
         acceptanceNote: true,
@@ -156,7 +151,7 @@ export default wrapApiHandler(
       const s = app.event.volunteerSettings
       return {
         ...appRest,
-        ...infosPersonnelles(profil as never, appRest as never),
+        ...infosPersonnelles(profil as never),
         teamPreferences: teamPreferencesWithNames,
         assignedTeams: assignedTeamsWithNames,
         assignedTimeSlots: eventAssignments,

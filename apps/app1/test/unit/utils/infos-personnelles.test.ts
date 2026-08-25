@@ -7,11 +7,16 @@ import {
 } from '../../../server/utils/infos-personnelles'
 
 /**
- * Le profil fait foi, la candidature ne sert que de repli.
+ * Le profil est la seule source.
+ *
+ * Un repli sur la fiche a accompagné la transition, le temps de vérifier que la reprise des
+ * données n'avait rien laissé de côté. Le contrôle a été fait sur les données de production —
+ * 63 valeurs portées par une fiche, toutes présentes sur le profil, aucune manquante — et les
+ * colonnes ont été supprimées. Les deux tests qui décrivaient ce repli ont donc disparu avec
+ * lui : ils affirmaient un comportement qui n'existe plus.
  *
  * L'enjeu n'est pas cosmétique : ces informations servent à préparer des repas et à joindre
- * quelqu'un en cas de pépin. Une allergie qui disparaît d'une liste parce qu'on a changé de
- * source de vérité, c'est une assiette servie à tort.
+ * quelqu'un en cas de pépin.
  */
 
 const VIDE = {
@@ -24,42 +29,13 @@ const VIDE = {
 
 describe('infosPersonnelles', () => {
   it('prend le profil quand il est renseigné', () => {
-    const vue = infosPersonnelles(
-      { ...VIDE, dietaryPreference: 'VEGAN', allergies: 'Arachides' },
-      { ...VIDE, dietaryPreference: 'VEGETARIAN', allergies: 'Gluten' }
-    )
+    const vue = infosPersonnelles({ ...VIDE, dietaryPreference: 'VEGAN', allergies: 'Arachides' })
     expect(vue.dietaryPreference).toBe('VEGAN')
     expect(vue.allergies).toBe('Arachides')
   })
 
-  it('se replie sur la candidature là où le profil ne dit rien', () => {
-    const vue = infosPersonnelles(VIDE, {
-      ...VIDE,
-      dietaryPreference: 'VEGETARIAN',
-      allergies: 'Gluten',
-      allergySeverity: 'SEVERE',
-      emergencyContactName: 'Camille',
-      emergencyContactPhone: '+33612345678',
-    })
-    expect(vue).toMatchObject({
-      dietaryPreference: 'VEGETARIAN',
-      allergies: 'Gluten',
-      allergySeverity: 'SEVERE',
-      emergencyContactName: 'Camille',
-      emergencyContactPhone: '+33612345678',
-    })
-  })
-
-  it('ne remplace jamais un régime déclaré par « aucun régime »', () => {
-    // Le cas qui compte : sans ce garde, quelqu'un de végétalien se verrait servir de la viande
-    // le jour où la lecture bascule sur un profil encore vide.
-    expect(infosPersonnelles(VIDE, { ...VIDE, dietaryPreference: 'VEGAN' }).dietaryPreference).toBe(
-      'VEGAN'
-    )
-  })
-
   it('rend des valeurs neutres quand rien n’est connu nulle part', () => {
-    expect(infosPersonnelles(null, null)).toEqual(VIDE)
+    expect(infosPersonnelles(null)).toEqual(VIDE)
     expect(infosPersonnelles(undefined)).toEqual(VIDE)
   })
 })

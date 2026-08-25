@@ -21,9 +21,6 @@ export default wrapApiHandler(
         id: true,
         arrivalDateTime: true,
         departureDateTime: true,
-        dietaryPreference: true,
-        allergies: true,
-        allergySeverity: true,
         payment: true,
         paymentPaid: true,
         reimbursementMax: true,
@@ -174,7 +171,7 @@ export default wrapApiHandler(
         // Le profil fait foi, ici comme dans les listes de repas. Sans cette résolution,
         // l'artiste relirait la copie figée sur sa fiche pendant que les organisateurs
         // verraient son profil — deux vérités pour la même personne.
-        ...infosAlimentaires(artist.user as never, artist as never),
+        ...infosAlimentaires(artist.user as never),
         // La base est en centimes, l'API expose des unités courantes : `Number()` seul rendrait
         // désormais des centimes bruts, soit des montants multipliés par cent.
         payment: fromCents(artist.payment),

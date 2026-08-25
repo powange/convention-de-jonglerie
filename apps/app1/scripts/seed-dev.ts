@@ -737,6 +737,22 @@ async function main() {
           timePreferencesArray = shuffledSlots.slice(0, numPreferences)
         }
 
+        // Régime et allergies décrivent la personne, pas sa candidature : ils vivent sur le
+        // profil depuis la suppression des colonnes dupliquées. Le seed les y pose, sans quoi
+        // les jeux de développement n'auraient plus aucune de ces informations.
+        await prisma.user.update({
+          where: { id: volunteer.id },
+          data: {
+            dietaryPreference: dietaryPreference as any,
+            allergies:
+              Math.random() > 0.8
+                ? ['Arachides', 'Gluten', 'Lactose', 'Fruits à coque'][
+                    Math.floor(Math.random() * 4)
+                  ]
+                : null,
+          },
+        })
+
         const application = await prisma.editionVolunteerApplication.create({
           data: {
             eventId: edition.id,
@@ -745,13 +761,6 @@ async function main() {
               Math.random() > 0.15 ? 'ACCEPTED' : Math.random() > 0.5 ? 'PENDING' : 'REJECTED', // 85% acceptées
             arrivalDateTime,
             departureDateTime,
-            dietaryPreference: dietaryPreference as any,
-            allergies:
-              Math.random() > 0.8
-                ? ['Arachides', 'Gluten', 'Lactose', 'Fruits à coque'][
-                    Math.floor(Math.random() * 4)
-                  ]
-                : null,
             timePreferences: timePreferencesArray || undefined,
             teamPreferences:
               teams.length > 0 && Math.random() > 0.6

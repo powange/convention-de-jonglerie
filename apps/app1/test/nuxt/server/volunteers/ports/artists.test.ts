@@ -55,10 +55,17 @@ describe('port artists (câblage jonglerie par défaut)', () => {
           mealId: 42,
           afterShow: true,
           artist: {
-            dietaryPreference: 'VEGAN',
-            allergies: 'arachides',
-            allergySeverity: 'HIGH',
-            user: { nom: 'Star', prenom: 'Jo', email: 'jo@x.fr', phone: '0600' },
+            // Régime et allergies vivent sur le PROFIL depuis la suppression des colonnes
+            // dupliquées : c'est le `user` de la fiche que le code lit.
+            user: {
+              nom: 'Star',
+              prenom: 'Jo',
+              email: 'jo@x.fr',
+              phone: '0600',
+              dietaryPreference: 'VEGAN',
+              allergies: 'arachides',
+              allergySeverity: 'HIGH',
+            },
           },
         },
       ])

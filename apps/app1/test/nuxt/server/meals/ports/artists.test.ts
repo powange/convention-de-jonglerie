@@ -12,6 +12,11 @@ const userOf = (id: number) => ({
   pseudo: `pseudo${id}`,
   email: `u${id}@x.fr`,
   phone: `060${id}`,
+  // Régime et allergies vivent sur le PROFIL depuis la suppression des colonnes dupliquées :
+  // c'est le `user` de la fiche que le code lit, plus la fiche elle-même.
+  dietaryPreference: 'VEGAN',
+  allergies: 'arachides',
+  allergySeverity: 'HIGH',
 })
 
 describe('port artists du module repas (câblage jonglerie)', () => {
@@ -26,9 +31,6 @@ describe('port artists du module repas (câblage jonglerie)', () => {
           mealId: 42,
           afterShow: true,
           artist: {
-            dietaryPreference: 'VEGAN',
-            allergies: 'arachides',
-            allergySeverity: 'HIGH',
             user: userOf(1),
           },
         },

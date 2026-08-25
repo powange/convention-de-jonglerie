@@ -235,11 +235,6 @@ export default wrapApiHandler(async (event) => {
     createdAt: true,
     motivation: true,
     userId: true,
-    dietaryPreference: true,
-    allergies: true,
-    allergySeverity: true,
-    emergencyContactName: true,
-    emergencyContactPhone: true,
     timePreferences: true,
     teamPreferences: true,
     acceptanceNote: true,
@@ -342,7 +337,7 @@ export default wrapApiHandler(async (event) => {
   // exactement la même chose.
   applications = applications.map((app) => ({
     ...app,
-    ...infosPersonnelles(app.user as never, app as never),
+    ...infosPersonnelles(app.user as never),
   })) as typeof applications
 
   // Si tri par date avec granularité, trier en mémoire

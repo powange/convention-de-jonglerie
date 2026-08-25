@@ -211,9 +211,6 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
             afterShow: true,
             artist: {
               select: {
-                dietaryPreference: true,
-                allergies: true,
-                allergySeverity: true,
                 user: {
                   select: {
                     ...infosPersonnellesSelect,
@@ -236,7 +233,7 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
             phone: sel.artist.user.phone,
             // Le profil fait foi ; la fiche artiste ne sert que de repli tant que ses
             // colonnes existent (cf. `infos-personnelles`).
-            ...infosAlimentaires(sel.artist.user as never, sel.artist as never),
+            ...infosAlimentaires(sel.artist.user as never),
             afterShow: sel.afterShow,
           })
         }

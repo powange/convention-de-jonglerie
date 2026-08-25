@@ -73,12 +73,19 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
         mealSelections: [
           {
             volunteer: {
-              dietaryPreference: 'VEGAN',
-              allergies: 'arachides',
-              allergySeverity: 'HIGH',
-              emergencyContactName: 'Maman',
-              emergencyContactPhone: '0600',
-              user: { nom: 'Doe', prenom: 'John', email: 'j@x.fr', phone: '0700' },
+              // Ces informations vivent sur le PROFIL depuis la suppression des colonnes
+              // dupliquées : c'est le `user` de la candidature que le code lit.
+              user: {
+                nom: 'Doe',
+                prenom: 'John',
+                email: 'j@x.fr',
+                phone: '0700',
+                dietaryPreference: 'VEGAN',
+                allergies: 'arachides',
+                allergySeverity: 'HIGH',
+                emergencyContactName: 'Maman',
+                emergencyContactPhone: '0600',
+              },
             },
           },
         ],
@@ -100,11 +107,18 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
     ]
 
     const dbOrganizer = {
-      dietaryPreference: 'VEGETARIAN',
-      allergies: null,
-      allergySeverity: null,
       mealSelections: [],
-      organizer: { user: { nom: 'Roe', prenom: 'Jane', email: 'jane@x.fr', phone: '0800' } },
+      organizer: {
+        user: {
+          nom: 'Roe',
+          prenom: 'Jane',
+          email: 'jane@x.fr',
+          phone: '0800',
+          dietaryPreference: 'VEGETARIAN',
+          allergies: null,
+          allergySeverity: null,
+        },
+      },
     }
 
     it('mappe les repas avec leurs participants bénévoles acceptés', async () => {

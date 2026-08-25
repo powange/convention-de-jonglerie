@@ -63,9 +63,10 @@ describe('repas par organisateur', () => {
     })
     prismaMock.editionOrganizer.findUnique.mockReset()
     prismaMock.editionOrganizer.findUnique.mockResolvedValue({
-      dietaryPreference: 'VEGAN',
-      allergies: null,
-      allergySeverity: null,
+      // La réponse lit le PROFIL depuis la suppression des colonnes dupliquées.
+      organizer: {
+        user: { dietaryPreference: 'VEGAN', allergies: null, allergySeverity: null },
+      },
     })
     prismaMock.editionOrganizer.update.mockReset()
     prismaMock.editionOrganizer.update.mockResolvedValue({})

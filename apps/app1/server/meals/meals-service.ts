@@ -518,7 +518,7 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
         phone: selection.volunteer.user.phone,
         // Le profil fait foi ; la candidature ne sert que de repli tant que ses colonnes
         // existent (cf. `infos-personnelles`).
-        ...infosPersonnelles(selection.volunteer.user as never, selection.volunteer as never),
+        ...infosPersonnelles(selection.volunteer.user as never),
       })
     ),
     organizers: editionOrganizers
@@ -532,7 +532,7 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
           // Le profil fait foi ; la ligne d'organisateur ne sert que de repli tant que ses
           // colonnes existent (cf. `infos-personnelles`). Variante alimentaire : un
           // organisateur ne déclare pas de contact d'urgence.
-          ...infosAlimentaires(eo.organizer.user as never, eo as never),
+          ...infosAlimentaires(eo.organizer.user as never),
         })
       ),
   }))
