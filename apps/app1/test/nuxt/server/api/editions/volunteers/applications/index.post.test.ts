@@ -106,7 +106,6 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           eventAvailability: true,
           arrivalDateTime: applicationData.arrivalDateTime,
           departureDateTime: applicationData.departureDateTime,
-          dietaryPreference: 'NONE',
         }),
         select: expect.objectContaining({
           id: true,
@@ -233,11 +232,6 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
           eventAvailability: false,
           arrivalDateTime: completeApplication.arrivalDateTime,
           departureDateTime: completeApplication.departureDateTime,
-          dietaryPreference: 'VEGETARIAN',
-          allergies: completeApplication.allergies,
-          allergySeverity: completeApplication.allergySeverity,
-          emergencyContactName: completeApplication.emergencyContactName,
-          emergencyContactPhone: completeApplication.emergencyContactPhone,
           timePreferences: completeApplication.timePreferences,
           teamPreferences: completeApplication.teamPreferences,
           hasPets: true,
@@ -299,10 +293,12 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       await handler(mockEvent as any)
 
       const createCall = prismaMock.editionVolunteerApplication.create.mock.calls[0][0]
-      expect(createCall.data.dietaryPreference).toBe('NONE') // Valeur par défaut
-      expect(createCall.data.allergies).toBeNull()
-      expect(createCall.data.emergencyContactName).toBeNull()
-      expect(createCall.data.emergencyContactPhone).toBeNull()
+      // Régime, allergies et contact d'urgence ne sont plus écrits sur la candidature : ils
+      // vivent sur le profil. Les colonnes subsistent mais ne reçoivent plus rien.
+      expect(createCall.data).not.toHaveProperty('dietaryPreference')
+      expect(createCall.data).not.toHaveProperty('allergies')
+      expect(createCall.data).not.toHaveProperty('emergencyContactName')
+      expect(createCall.data).not.toHaveProperty('emergencyContactPhone')
       expect(createCall.data.timePreferences).toBeNull()
       expect(createCall.data.teamPreferences).toBeNull()
       expect(createCall.data.skills).toBeNull()
@@ -815,13 +811,15 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          emergencyContactName: 'Marie Dupont',
-          emergencyContactPhone: '+33987654321',
-        }),
-        select: expect.any(Object),
-      })
+      // Le contact d'urgence va désormais au PROFIL, plus à la candidature.
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            emergencyContactName: 'Marie Dupont',
+            emergencyContactPhone: '+33987654321',
+          }),
+        })
+      )
     })
 
     it("devrait exiger le contact d'urgence si allergies renseignées", async () => {
@@ -881,15 +879,17 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          allergies: 'Allergie aux arachides',
-          allergySeverity: 'SEVERE',
-          emergencyContactName: 'Contact Urgence',
-          emergencyContactPhone: '+33123456789',
-        }),
-        select: expect.any(Object),
-      })
+      // Allergies et contact d'urgence vont désormais au PROFIL, plus à la candidature.
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            allergies: 'Allergie aux arachides',
+            allergySeverity: 'SEVERE',
+            emergencyContactName: 'Contact Urgence',
+            emergencyContactPhone: '+33123456789',
+          }),
+        })
+      )
     })
 
     it("devrait accepter une candidature sans allergies ni contact d'urgence", async () => {
@@ -920,14 +920,11 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(prismaMock.editionVolunteerApplication.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          allergies: null,
-          emergencyContactName: null,
-          emergencyContactPhone: null,
-        }),
-        select: expect.any(Object),
-      })
+      // Ces colonnes ne sont plus écrites du tout — ni valeur, ni `null`.
+      const donnees = prismaMock.editionVolunteerApplication.create.mock.calls.at(-1)[0].data
+      expect(donnees).not.toHaveProperty('allergies')
+      expect(donnees).not.toHaveProperty('emergencyContactName')
+      expect(donnees).not.toHaveProperty('emergencyContactPhone')
     })
 
     it("devrait valider le format du téléphone de contact d'urgence", async () => {

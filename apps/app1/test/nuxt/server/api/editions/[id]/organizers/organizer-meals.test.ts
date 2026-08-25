@@ -48,6 +48,18 @@ describe('repas par organisateur', () => {
       dietaryPreference: 'NONE',
       allergies: null,
       allergySeverity: null,
+      // L'identité derrière la ligne : le point d'API en a besoin pour porter le régime au
+      // profil, et pour savoir si c'est l'intéressé ou quelqu'un d'autre qui remplit.
+      organizer: {
+        userId: 42,
+        user: {
+          dietaryPreference: 'NONE',
+          allergies: null,
+          allergySeverity: null,
+          emergencyContactName: null,
+          emergencyContactPhone: null,
+        },
+      },
     })
     prismaMock.editionOrganizer.findUnique.mockReset()
     prismaMock.editionOrganizer.findUnique.mockResolvedValue({
@@ -168,14 +180,16 @@ describe('repas par organisateur', () => {
 
       const response: any = await putHandler(mockEvent as any)
 
-      expect(prismaMock.editionOrganizer.update).toHaveBeenCalledWith({
-        where: { id: 5 },
-        data: {
-          dietaryPreference: 'VEGAN',
-          allergies: 'Arachides',
-          allergySeverity: 'SEVERE',
-        },
-      })
+      // Le régime va désormais au PROFIL : la ligne d'organisateur n'est plus alimentée.
+      expect(prismaMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            dietaryPreference: 'VEGAN',
+            allergies: 'Arachides',
+            allergySeverity: 'SEVERE',
+          }),
+        })
+      )
       expect(response.data.dietaryPreference).toBe('VEGAN')
     })
   })
