@@ -89,6 +89,7 @@ export const prismaMock = {
   // Modèles spectacles
   show: createModelMock(),
   showAct: createModelMock(),
+  showPerformance: createModelMock(),
   showArtist: createModelMock(),
   showHandoutItem: createModelMock(),
 

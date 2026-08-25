@@ -332,7 +332,12 @@
       "company_name": "Трупа / сценічний псевдонім",
       "company_name_hint": "Назва трупи або сценічний псевдонім артиста, який представляє виставу",
       "company_name_placeholder": "Напр.: Жонглерська трупа",
-      "toggle_acts": "Показати або сховати номери"
+      "toggle_acts": "Показати або сховати номери",
+      "add_performance": "Додати показ",
+      "performance_number": "Показ {number}",
+      "performance_public": "Оголошено публічно",
+      "performances": "Покази",
+      "remove_performance": "Видалити цей показ"
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

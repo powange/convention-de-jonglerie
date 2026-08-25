@@ -332,7 +332,12 @@
       "company_name": "Gezelschap / artiestennaam",
       "company_name_hint": "Naam van het gezelschap of artiestennaam van de artiest die de voorstelling brengt",
       "company_name_placeholder": "Bijv. Jongleergezelschap",
-      "toggle_acts": "Acts tonen of verbergen"
+      "toggle_acts": "Acts tonen of verbergen",
+      "add_performance": "Voorstelling toevoegen",
+      "performance_number": "Voorstelling {number}",
+      "performance_public": "Openbaar aangekondigd",
+      "performances": "Voorstellingen",
+      "remove_performance": "Deze voorstelling verwijderen"
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",

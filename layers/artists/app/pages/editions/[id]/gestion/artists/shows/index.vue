@@ -130,11 +130,18 @@
                 </div>
               </template>
 
-              <!-- Un numéro n'a pas d'horaire propre : il se joue dans celui du cabaret -->
+              <!-- Un numéro n'a pas d'horaire propre : il se joue dans celui du cabaret.
+                   Un spectacle, lui, peut être joué plusieurs fois. -->
               <template #startDateTime-cell="{ row }">
-                <span v-if="row.original.kind === 'show'" class="text-gray-600 dark:text-gray-400">
-                  {{ formatDateTime(row.original.show.startDateTime) }}
-                </span>
+                <div v-if="row.original.kind === 'show'" class="text-gray-600 dark:text-gray-400">
+                  <div
+                    v-for="performance in row.original.show.performances"
+                    :key="performance.id"
+                    class="whitespace-nowrap"
+                  >
+                    {{ formatDateTime(performance.startDateTime) }}
+                  </div>
+                </div>
               </template>
 
               <template #duration-cell="{ row }">
@@ -143,50 +150,48 @@
                 </span>
               </template>
 
-              <!-- Idem pour le lieu : c'est celui du spectacle -->
+              <!-- Le lieu appartient à la représentation : un spectacle peut se jouer
+                   à deux endroits différents -->
               <template #location-cell="{ row }">
-                <div v-if="row.original.kind === 'show'" class="text-gray-600 dark:text-gray-400">
+                <div
+                  v-if="row.original.kind === 'show'"
+                  class="text-gray-600 dark:text-gray-400 space-y-1"
+                >
+                  <div v-for="performance in row.original.show.performances" :key="performance.id">
                   <UBadge
-                    v-if="row.original.show.zone"
+                    v-if="performance.zone"
                     :style="{
-                      backgroundColor: row.original.show.zone.color + '20',
-                      color: row.original.show.zone.color,
+                      backgroundColor: performance.zone.color + '20',
+                      color: performance.zone.color,
                     }"
                     variant="subtle"
                     size="sm"
                   >
                     <UIcon name="i-heroicons-map" class="mr-1" />
-                    {{ row.original.show.zone.name }}
+                    {{ performance.zone.name }}
                   </UBadge>
                   <UBadge
-                    v-else-if="row.original.show.marker"
+                    v-else-if="performance.marker"
                     :style="{
-                      backgroundColor: (row.original.show.marker.color || '#6b7280') + '20',
-                      color: row.original.show.marker.color || '#6b7280',
+                      backgroundColor: (performance.marker.color || '#6b7280') + '20',
+                      color: performance.marker.color || '#6b7280',
                     }"
                     variant="subtle"
                     size="sm"
                   >
                     <UIcon name="i-heroicons-map-pin" class="mr-1" />
-                    {{ row.original.show.marker.name }}
+                    {{ performance.marker.name }}
                   </UBadge>
                   <span
-                    v-if="row.original.show.location"
-                    :class="{
-                      'mt-1 block': row.original.show.zone || row.original.show.marker,
-                    }"
+                    v-if="performance.location"
+                    :class="{ 'mt-1 block': performance.zone || performance.marker }"
                   >
-                    {{ row.original.show.location }}
+                    {{ performance.location }}
                   </span>
-                  <span
-                    v-if="
-                      !row.original.show.zone &&
-                      !row.original.show.marker &&
-                      !row.original.show.location
-                    "
-                  >
+                  <span v-if="!performance.zone && !performance.marker && !performance.location">
                     -
                   </span>
+                  </div>
                 </div>
               </template>
 
@@ -207,16 +212,33 @@
                 </span>
               </template>
 
+              <!-- La publication se décide représentation par représentation : l'icône dit
+                   « toutes », « aucune », et le compte lève l'ambiguïté entre les deux -->
               <template #isPublic-cell="{ row }">
-                <UIcon
-                  v-if="row.original.kind === 'show'"
-                  :name="row.original.show.isPublic ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'"
-                  :class="
-                    row.original.show.isPublic
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-gray-400 dark:text-gray-500'
-                  "
-                />
+                <div v-if="row.original.kind === 'show'" class="flex items-center gap-1">
+                  <UIcon
+                    :name="
+                      nombrePubliees(row.original.show) > 0
+                        ? 'i-heroicons-eye'
+                        : 'i-heroicons-eye-slash'
+                    "
+                    :class="
+                      nombrePubliees(row.original.show) === row.original.show.performances.length
+                        ? 'text-green-600 dark:text-green-400'
+                        : nombrePubliees(row.original.show) > 0
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-gray-400 dark:text-gray-500'
+                    "
+                  />
+                  <span
+                    v-if="row.original.show.performances.length > 1"
+                    class="text-xs text-gray-500 dark:text-gray-400"
+                  >
+                    {{ nombrePubliees(row.original.show) }}/{{
+                      row.original.show.performances.length
+                    }}
+                  </span>
+                </div>
               </template>
 
               <template #actions-cell="{ row }">
@@ -336,14 +358,22 @@ const shows = ref<any[]>([])
 const showDeleteConfirm = ref(false)
 const showToDelete = ref<any>(null)
 
-// Nombre de spectacles publics
-const publicShowsCount = computed(() => shows.value.filter((s) => s.isPublic).length)
+/** Représentations publiées d'un spectacle : la publication se décide passage par passage. */
+const nombrePubliees = (show: { performances?: { isPublic: boolean }[] }) =>
+  (show.performances ?? []).filter((performance) => performance.isPublic).length
 
-// Spectacles triés par date
+// Un spectacle compte comme public dès qu'au moins une de ses représentations est annoncée
+const publicShowsCount = computed(() => shows.value.filter((s) => nombrePubliees(s) > 0).length)
+
+/** Date du premier passage : c'est elle qui situe un spectacle dans la programmation. */
+const premierPassage = (show: { performances?: { startDateTime: string }[] }) => {
+  const premiere = show.performances?.[0]?.startDateTime
+  return premiere ? new Date(premiere).getTime() : Number.POSITIVE_INFINITY
+}
+
+// Spectacles triés par leur première représentation
 const sortedShows = computed(() => {
-  return [...shows.value].sort((a, b) => {
-    return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
-  })
+  return [...shows.value].sort((a, b) => premierPassage(a) - premierPassage(b))
 })
 
 // Sur un cabaret, un artiste présent dans plusieurs numéros a autant de liens : on ne

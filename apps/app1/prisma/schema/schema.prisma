@@ -528,7 +528,7 @@ model EditionZone {
 
   // Marqueurs rattachés à cette zone : ses entrées, ses accès. Voir EditionMarker.zoneId.
   markers           EditionMarker[]
-  shows             Show[]
+  showPerformances  ShowPerformance[]
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
   stockReservations StockReservation[]
@@ -565,7 +565,7 @@ model EditionMarker {
   zone   EditionZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   zoneId Int?
 
-  shows             Show[]
+  showPerformances  ShowPerformance[]
   workshopLocations WorkshopLocation[]
   stockItems        StockItem[]
   stockReservations StockReservation[]

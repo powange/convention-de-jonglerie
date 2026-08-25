@@ -200,8 +200,8 @@
 interface ArtistShow {
   id: number
   title: string
-  startDateTime: string
-  location: string | null
+  /** Les passages du spectacle : chacun a sa date et son lieu. */
+  performances: { id: number; startDateTime: string; location: string | null }[]
 }
 
 interface HandoutItem {

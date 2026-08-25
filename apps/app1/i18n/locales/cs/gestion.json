@@ -332,7 +332,12 @@
       "company_name": "Soubor / umělecké jméno",
       "company_name_hint": "Název souboru nebo umělecké jméno umělce, který představení uvádí",
       "company_name_placeholder": "Např. Žonglérský soubor",
-      "toggle_acts": "Zobrazit nebo skrýt čísla"
+      "toggle_acts": "Zobrazit nebo skrýt čísla",
+      "add_performance": "Přidat představení",
+      "performance_number": "Představení {number}",
+      "performance_public": "Oznámeno veřejnosti",
+      "performances": "Představení",
+      "remove_performance": "Odebrat toto představení"
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",

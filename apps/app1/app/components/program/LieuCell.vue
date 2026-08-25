@@ -108,9 +108,10 @@ const apresEnregistrement = () => {
 }
 
 const { execute: enregistrerSpectacle, loading: chargeSpectacle } = useApiAction(
-  () => `/api/editions/${props.editionId}/shows/${props.entree.sourceId}`,
+  // `sourceId` désigne la représentation : c'est elle qui porte le lieu, pas le spectacle.
+  () => `/api/editions/${props.editionId}/shows/performances/${props.entree.sourceId}`,
   {
-    method: 'PUT',
+    method: 'PATCH',
     // Le spectacle nomme son texte libre `location`, l'élément `locationName` : deux tables, deux
     // colonnes, et rien qui justifie d'en renommer une pour l'autre.
     body: () => ({

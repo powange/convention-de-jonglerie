@@ -37,9 +37,12 @@ export default wrapApiHandler(
 
     const shows = await prisma.show.findMany({
       where: { editionId },
-      orderBy: [{ startDateTime: 'asc' }, { title: 'asc' }],
+      orderBy: { title: 'asc' },
       select: {
         title: true,
+        // Le déroulé des numéros ne change pas d'un passage à l'autre : la feuille technique
+        // décrit l'œuvre. Les dates sont rappelées pour situer les passages sur le terrain.
+        performances: { select: { startDateTime: true }, orderBy: { startDateTime: 'asc' } },
         type: true,
         technicalNeeds: true,
         // Artistes au niveau du spectacle (spectacle STANDARD ; un cabaret les porte dans ses numéros).
@@ -62,6 +65,7 @@ export default wrapApiHandler(
     const mappedShows = shows.map((s) => ({
       title: s.title,
       type: s.type,
+      performances: s.performances.map((p) => p.startDateTime),
       technicalNeeds: s.technicalNeeds,
       artists: s.artists.map((sa) => nameOf(sa.artist.user)),
       acts: s.acts.map((a) => ({
@@ -71,6 +75,14 @@ export default wrapApiHandler(
         artists: a.artists.map((sa) => nameOf(sa.artist.user)),
       })),
     }))
+
+    // Tri sur le premier passage : c'est l'ordre dans lequel la régie vit la soirée.
+    mappedShows.sort(
+      (a, b) =>
+        (a.performances[0]?.getTime() ?? Number.POSITIVE_INFINITY) -
+          (b.performances[0]?.getTime() ?? Number.POSITIVE_INFINITY) ||
+        a.title.localeCompare(b.title)
+    )
 
     return createSuccessResponse({
       editionName: edition.name ?? edition.convention?.name ?? '',

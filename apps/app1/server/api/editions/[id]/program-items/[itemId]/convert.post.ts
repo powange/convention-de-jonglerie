@@ -72,19 +72,26 @@ export default wrapApiHandler(
       let resultat: { id: number }
 
       if (cible === 'spectacle') {
+        // L'élément converti devient un spectacle et sa première représentation : le quand et
+        // le où appartiennent au passage, la durée à l'œuvre.
         resultat = await tx.show.create({
           data: {
             editionId,
             title: element.title,
             description: element.description,
-            startDateTime: element.startDateTime,
             // Un spectacle porte une durée, pas une heure de fin.
             duration: dureeEnMinutes(element.startDateTime, fin),
-            location: element.locationName,
-            zoneId: element.zoneId,
-            markerId: element.markerId,
-            // La visibilité suit : convertir ne doit ni publier ni dépublier à l'insu de qui le fait.
-            isPublic: element.isPublic,
+            performances: {
+              create: {
+                startDateTime: element.startDateTime,
+                location: element.locationName,
+                zoneId: element.zoneId,
+                markerId: element.markerId,
+                // La visibilité suit : convertir ne doit ni publier ni dépublier à l'insu de
+                // qui le fait.
+                isPublic: element.isPublic,
+              },
+            },
           },
           select: { id: true },
         })

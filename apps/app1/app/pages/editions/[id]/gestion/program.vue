@@ -700,14 +700,18 @@ const enregistrer = async () => {
  * numérique : celui-ci se répète d'une source à l'autre, et deux lignes tourneraient ensemble.
  */
 const { execute: executerVisibiliteSpectacle, isLoading: chargeVisibiliteSpectacle } =
-  useApiActionById((cle) => `/api/editions/${editionId.value}/shows/${String(cle).split('-')[1]}`, {
-    method: 'PUT',
-    body: () => ({ isPublic: visibiliteDemandee.value }),
-    silentSuccess: true,
-    errorMessages: { default: t('common.error') },
-    onSuccess: () => rechargerFrise(),
-    onError: () => rechargerFrise(),
-  })
+  useApiActionById(
+    // La clé porte l'identifiant de la représentation : elle seule est publiée ou non.
+    (cle) => `/api/editions/${editionId.value}/shows/performances/${String(cle).split('-')[1]}`,
+    {
+      method: 'PATCH',
+      body: () => ({ isPublic: visibiliteDemandee.value }),
+      silentSuccess: true,
+      errorMessages: { default: t('common.error') },
+      onSuccess: () => rechargerFrise(),
+      onError: () => rechargerFrise(),
+    }
+  )
 
 const { execute: executerVisibiliteElement, isLoading: chargeVisibiliteElement } = useApiActionById(
   (cle) => `/api/editions/${editionId.value}/program-items/${String(cle).split('-')[1]}/visibility`,

@@ -31,7 +31,16 @@ export interface EntreeProgramme {
    */
   cle: string
   source: SourceProgramme
+  /**
+   * Ce que désigne l'entrée : le workshop, l'élément libre, ou la **représentation** pour un
+   * spectacle — c'est elle qui porte la date, le lieu et la publication qu'on y modifie.
+   */
   sourceId: number
+  /**
+   * L'œuvre dont l'entrée est un passage. Renseigné pour les spectacles seulement, quand un lien
+   * doit mener au spectacle et non à l'une de ses représentations.
+   */
+  parentId?: number
   titre: string
   description: string | null
   /** Début, en ISO 8601. */
@@ -67,12 +76,21 @@ export interface WorkshopSource {
 }
 
 /** Un spectacle, tel que lu en base. */
+/**
+ * Une **représentation** de spectacle, et non le spectacle lui-même.
+ *
+ * Un spectacle joué deux fois occupe deux moments du programme : c'est le passage qui porte la
+ * date, le lieu et la publication. Le titre et la durée, eux, viennent de l'œuvre.
+ */
 export interface SpectacleSource {
+  /** Identifiant de la représentation : c'est elle que la frise modifie (lieu, visibilité). */
   id: number
+  /** Identifiant du spectacle, pour renvoyer vers l'œuvre plutôt que vers l'un de ses passages. */
+  showId: number
   title: string
   description?: string | null
   startDateTime: Date | string
-  /** Durée en minutes. Les spectacles n'ont pas d'heure de fin, mais une durée facultative. */
+  /** Durée en minutes, portée par le spectacle. Un passage n'a pas d'heure de fin propre. */
   duration?: number | null
   location?: string | null
   zone?: LieuCarteSource | null
@@ -194,6 +212,7 @@ export function construireFriseProgramme(
       cle: `spectacle-${s.id}`,
       source: 'spectacle',
       sourceId: s.id,
+      parentId: s.showId,
       titre: s.title,
       description: s.description ?? null,
       debut: enIso(s.startDateTime),

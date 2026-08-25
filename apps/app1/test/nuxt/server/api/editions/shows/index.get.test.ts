@@ -25,12 +25,17 @@ describe('/api/editions/[id]/shows GET', () => {
     editionId: 1,
     title: 'Spectacle Feu',
     description: 'Un spectacle de feu',
-    startDateTime: new Date('2024-06-15T14:30:00Z'),
     duration: 30,
-    location: 'Scène principale',
     imageUrl: 'show_image.jpg',
-    zoneId: 1,
-    markerId: null,
+    performances: [
+      {
+        id: 11,
+        startDateTime: new Date('2024-06-15T14:30:00Z'),
+        location: 'Scène principale',
+        zone: { id: 1, name: 'Scène A', color: '#ff0000' },
+        marker: null,
+      },
+    ],
     artists: [
       {
         artistId: 1,
@@ -54,16 +59,19 @@ describe('/api/editions/[id]/shows GET', () => {
     editionId: 1,
     title: 'Atelier Cirque',
     description: null,
-    startDateTime: new Date('2024-06-15T16:00:00Z'),
     duration: 60,
-    location: null,
     imageUrl: null,
-    zoneId: null,
-    markerId: 1,
     artists: [],
     handoutItems: [],
-    zone: null,
-    marker: { id: 1, name: 'Point Info', color: '#00ff00', markerTypes: ['INFO'] },
+    performances: [
+      {
+        id: 21,
+        startDateTime: new Date('2024-06-15T16:00:00Z'),
+        location: null,
+        zone: null,
+        marker: { id: 1, name: 'Point Info', color: '#00ff00', markerTypes: ['INFO'] },
+      },
+    ],
   }
 
   beforeEach(() => {
@@ -118,8 +126,10 @@ describe('/api/editions/[id]/shows GET', () => {
 
       expect(result.success).toBe(true)
       expect(result.data.shows).toHaveLength(2)
-      expect(result.data.shows[0].zone).toEqual(expect.objectContaining({ id: 1, name: 'Scène A' }))
-      expect(result.data.shows[1].marker).toEqual(
+      expect(result.data.shows[0].performances[0].zone).toEqual(
+        expect.objectContaining({ id: 1, name: 'Scène A' })
+      )
+      expect(result.data.shows[1].performances[0].marker).toEqual(
         expect.objectContaining({ id: 1, name: 'Point Info' })
       )
     })
@@ -146,17 +156,15 @@ describe('/api/editions/[id]/shows GET', () => {
       expect(result.data.shows).toHaveLength(0)
     })
 
-    it('devrait trier les spectacles par date de début', async () => {
-      prismaMock.show.findMany.mockResolvedValue([mockShowWithZone, mockShowWithMarker])
+    it('devrait trier les spectacles par leur première représentation', async () => {
+      // Prisma ne sait pas trier sur un champ d'une relation à plusieurs : le tri se fait
+      // après lecture. On fournit donc les spectacles à l'envers pour l'observer.
+      prismaMock.show.findMany.mockResolvedValue([mockShowWithMarker, mockShowWithZone])
 
       const mockEvent = { context: { user: mockUser } }
-      await handler(mockEvent as any)
+      const result = await handler(mockEvent as any)
 
-      expect(prismaMock.show.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          orderBy: { startDateTime: 'asc' },
-        })
-      )
+      expect(result.data.shows.map((show: any) => show.id)).toEqual([1, 2])
     })
   })
 

@@ -5,8 +5,12 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { canManageArtists } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
-import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import {
+  showCompositionInclude,
+  showPerformancesInclude,
+} from '#server/utils/prisma-select-helpers'
 import { replaceShowComposition, showActSchema } from '#server/utils/show-acts'
+import { replaceShowPerformances, showPerformancesSchema } from '#server/utils/show-performances'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const showSchema = z.object({
@@ -17,18 +21,15 @@ const showSchema = z.object({
   description: z.string().optional().nullable(),
   // Sans plafond (comme description) : agrège les besoins techniques importés des candidatures
   technicalNeeds: z.string().optional().nullable(),
-  startDateTime: z.string().datetime(),
+  // Le quand et le où : un spectacle peut être joué plusieurs fois, à des endroits différents
+  performances: showPerformancesSchema,
   duration: z.number().int().positive().optional().nullable(),
-  location: z.string().optional().nullable(),
   imageUrl: z.string().optional().nullable(),
-  zoneId: z.number().int().positive().optional().nullable(),
-  markerId: z.number().int().positive().optional().nullable(),
   // artistIds pour un spectacle STANDARD, acts pour un CABARET dont les artistes
   // sont portés par les numéros
   artistIds: z.array(z.number().int().positive()).optional().default([]),
   acts: z.array(showActSchema).optional().default([]),
   handoutItemIds: z.array(z.number().int().positive()).optional().default([]),
-  isPublic: z.boolean().optional().default(false),
 })
 
 export default wrapApiHandler(
@@ -76,12 +77,7 @@ export default wrapApiHandler(
           companyName: validatedData.type === 'STANDARD' ? validatedData.companyName : null,
           description: validatedData.description,
           technicalNeeds: validatedData.technicalNeeds,
-          startDateTime: new Date(validatedData.startDateTime),
           duration: validatedData.duration,
-          location: validatedData.location,
-          zoneId: validatedData.zoneId || null,
-          markerId: validatedData.markerId || null,
-          isPublic: validatedData.isPublic,
           handoutItems: {
             create: validatedData.handoutItemIds.map((handoutItemId) => ({
               handoutItemId,
@@ -90,7 +86,9 @@ export default wrapApiHandler(
         },
       })
 
-      // Les numéros ont besoin de l'id du spectacle, d'où cette seconde étape
+      // Représentations et numéros ont besoin de l'id du spectacle, d'où cette seconde étape
+      await replaceShowPerformances(tx, created.id, validatedData.performances)
+
       await replaceShowComposition(
         tx,
         created.id,
@@ -126,7 +124,7 @@ export default wrapApiHandler(
             },
           },
         },
-        ...showZoneMarkerInclude,
+        ...showPerformancesInclude,
       },
     })
 

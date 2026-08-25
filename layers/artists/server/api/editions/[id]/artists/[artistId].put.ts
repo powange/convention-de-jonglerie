@@ -305,8 +305,12 @@ export default wrapApiHandler(
               select: {
                 id: true,
                 title: true,
-                startDateTime: true,
-                location: true,
+                // Le quand et le où appartiennent aux représentations : un spectacle peut être
+                // joué plusieurs fois, à des endroits différents.
+                performances: {
+                  select: { id: true, startDateTime: true, location: true },
+                  orderBy: { startDateTime: 'asc' },
+                },
               },
             },
           },

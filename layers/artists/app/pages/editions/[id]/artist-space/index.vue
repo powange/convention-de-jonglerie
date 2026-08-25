@@ -121,17 +121,24 @@
             <div class="space-y-1">
               <p class="font-medium text-gray-900 dark:text-white">{{ show.title }}</p>
               <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                <span class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-calendar" class="w-4 h-4" />
-                  {{ formatDateTime(show.startDateTime) }}
-                </span>
                 <span v-if="show.duration" class="flex items-center gap-1">
                   <UIcon name="i-heroicons-clock" class="w-4 h-4" />
                   {{ $t('artists.show_duration_minutes', { duration: show.duration }) }}
                 </span>
-                <span v-if="show.location" class="flex items-center gap-1">
+              </div>
+              <!-- Un spectacle peut être joué plusieurs fois, à des endroits différents -->
+              <div
+                v-for="performance in show.performances"
+                :key="performance.id"
+                class="flex flex-wrap items-center gap-3 text-sm text-gray-500"
+              >
+                <span class="flex items-center gap-1">
+                  <UIcon name="i-heroicons-calendar" class="w-4 h-4" />
+                  {{ formatDateTime(performance.startDateTime) }}
+                </span>
+                <span v-if="performance.location" class="flex items-center gap-1">
                   <UIcon name="i-heroicons-map-pin" class="w-4 h-4" />
-                  {{ show.location }}
+                  {{ performance.location }}
                 </span>
               </div>
             </div>
@@ -691,9 +698,9 @@ interface ArtistShow {
   id: number
   title: string
   description: string | null
-  startDateTime: string
   duration: number | null
-  location: string | null
+  /** Les passages du spectacle : chacun a sa date et son lieu. */
+  performances: { id: number; startDateTime: string; location: string | null }[]
   type: string
   // Besoins techniques éditables par l'artiste (spectacle STANDARD uniquement).
   technicalNeeds: string | null
