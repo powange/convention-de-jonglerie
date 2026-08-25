@@ -633,6 +633,12 @@ interface User {
   nom?: string
   prenom?: string
   phone?: string
+  /** Informations personnelles portées par le profil, qui pré-remplissent le formulaire. */
+  dietaryPreference?: 'NONE' | 'VEGETARIAN' | 'VEGAN'
+  allergies?: string | null
+  allergySeverity?: 'LIGHT' | 'MODERATE' | 'SEVERE' | 'CRITICAL' | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
 }
 
 interface Props {
@@ -699,11 +705,18 @@ const formData = ref({
   timePreferences: [] as string[],
   companionName: '',
   avoidList: '',
-  dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
-  allergies: '',
-  allergySeverity: undefined as AllergySeverityLevel | undefined,
-  emergencyContactName: '',
-  emergencyContactPhone: '',
+  // Pré-remplis depuis le profil : ces informations décrivent la personne, pas la candidature.
+  // Les retaper à chaque édition était le travail en double que ce branchement supprime.
+  dietPreference: ((props.user as any)?.dietaryPreference || 'NONE') as
+    | 'NONE'
+    | 'VEGETARIAN'
+    | 'VEGAN',
+  allergies: (props.user as any)?.allergies || '',
+  allergySeverity: ((props.user as any)?.allergySeverity || undefined) as
+    | AllergySeverityLevel
+    | undefined,
+  emergencyContactName: (props.user as any)?.emergencyContactName || '',
+  emergencyContactPhone: (props.user as any)?.emergencyContactPhone || '',
   hasPets: false,
   petsDetails: '',
   hasMinors: false,
@@ -1455,11 +1468,15 @@ const remplirFormulaire = () => {
       timePreferences: (app.timePreferences as string[]) || [],
       companionName: app.companionName || '',
       avoidList: app.avoidList || '',
-      dietPreference: app.dietaryPreference || 'NONE',
-      allergies: app.allergies || '',
-      allergySeverity: app.allergySeverity || undefined,
-      emergencyContactName: app.emergencyContactName || '',
-      emergencyContactPhone: app.emergencyContactPhone || '',
+      // La candidature d'abord — le point d'API y a déjà résolu le profil — puis le profil en
+      // dernier recours, pour les candidatures antérieures au branchement.
+      dietPreference: app.dietaryPreference || (props.user as any)?.dietaryPreference || 'NONE',
+      allergies: app.allergies || (props.user as any)?.allergies || '',
+      allergySeverity: app.allergySeverity || (props.user as any)?.allergySeverity || undefined,
+      emergencyContactName:
+        app.emergencyContactName || (props.user as any)?.emergencyContactName || '',
+      emergencyContactPhone:
+        app.emergencyContactPhone || (props.user as any)?.emergencyContactPhone || '',
       hasPets: app.hasPets ?? false,
       petsDetails: app.petsDetails || '',
       hasMinors: app.hasMinors ?? false,
@@ -1492,10 +1509,13 @@ const remplirFormulaire = () => {
       timePreferences: [],
       companionName: '',
       avoidList: '',
-      dietPreference: 'NONE' as 'NONE' | 'VEGETARIAN' | 'VEGAN',
-      allergies: '',
-      allergySeverity: undefined,
-      emergencyContactName: '',
+      dietPreference: ((props.user as any)?.dietaryPreference || 'NONE') as
+        | 'NONE'
+        | 'VEGETARIAN'
+        | 'VEGAN',
+      allergies: (props.user as any)?.allergies || '',
+      allergySeverity: (props.user as any)?.allergySeverity || undefined,
+      emergencyContactName: (props.user as any)?.emergencyContactName || '',
       emergencyContactPhone: '',
       hasPets: false,
       petsDetails: '',

@@ -2,6 +2,7 @@ import { isValidPhoneNumber } from 'libphonenumber-js'
 import { z } from 'zod'
 
 import { requiresEmergencyContact } from '../../../utils/allergy-severity'
+import { complementsPourLeProfil } from '../../infos-personnelles'
 
 // Créneaux horaires valides pour les préférences
 export const VALID_TIME_SLOTS = [
@@ -172,8 +173,26 @@ export function processPhoneLogic(
  * @returns Objet contenant les champs à mettre à jour
  */
 export function getUserUpdateData(
-  user: { phone: string | null; nom: string | null; prenom: string | null },
-  parsed: { phone?: string; nom?: string; prenom?: string }
+  user: {
+    phone: string | null
+    nom: string | null
+    prenom: string | null
+    dietaryPreference?: string | null
+    allergies?: string | null
+    allergySeverity?: string | null
+    emergencyContactName?: string | null
+    emergencyContactPhone?: string | null
+  },
+  parsed: {
+    phone?: string
+    nom?: string
+    prenom?: string
+    dietaryPreference?: string | null
+    allergies?: string | null
+    allergySeverity?: string | null
+    emergencyContactName?: string | null
+    emergencyContactPhone?: string | null
+  }
 ): Record<string, any> {
   const updateData: Record<string, any> = {}
 
@@ -183,6 +202,11 @@ export function getUserUpdateData(
   // Mettre à jour nom/prénom seulement s'ils manquent
   if (!user.nom && parsed.nom) updateData.nom = parsed.nom
   if (!user.prenom && parsed.prenom) updateData.prenom = parsed.prenom
+
+  // Régime, allergies et contact d'urgence : le profil fait foi, mais quelqu'un qui les
+  // renseigne depuis une candidature n'a pas à recommencer ailleurs. On ne remplit que les
+  // vides — une candidature ne doit jamais écraser ce que la personne a mis dans son profil.
+  Object.assign(updateData, complementsPourLeProfil(user as never, parsed as never))
 
   return updateData
 }
