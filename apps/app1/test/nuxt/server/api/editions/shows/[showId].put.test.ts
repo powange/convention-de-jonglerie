@@ -41,12 +41,10 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
     editionId: 1,
     title: 'Ancien Titre',
     description: 'Ancienne description',
-    startDateTime: new Date('2024-06-15T14:30:00Z'),
+
     duration: 30,
     location: 'Scène A',
     imageUrl: 'old_image.jpg',
-    zoneId: null,
-    markerId: null,
   }
 
   const mockUpdatedShow = {
@@ -137,25 +135,36 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       )
     })
 
-    it('devrait mettre à jour zoneId et markerId', async () => {
-      prismaMock.show.update.mockResolvedValue({
-        ...mockUpdatedShow,
-        zoneId: 5,
-        markerId: null,
-        zone: { id: 5, name: 'Scène B', color: '#00ff00', zoneTypes: ['STAGE'] },
+    it('devrait remplacer les représentations quand elles sont fournies', async () => {
+      global.readBody.mockResolvedValue({
+        performances: [
+          { startDateTime: '2024-06-15T14:30:00Z', zoneId: 5 },
+          { startDateTime: '2024-06-16T14:30:00Z', location: 'Scène B' },
+        ],
       })
-
-      global.readBody.mockResolvedValue({ zoneId: 5, markerId: null })
       const mockEvent = { context: { user: mockUser } }
 
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
-      expect(prismaMock.show.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({ zoneId: 5, markerId: null }),
-        })
-      )
+      // Remplacement intégral : les anciennes disparaissent avant que les nouvelles arrivent
+      expect(prismaMock.showPerformance.deleteMany).toHaveBeenCalledWith({ where: { showId: 1 } })
+      expect(prismaMock.showPerformance.createMany).toHaveBeenCalledWith({
+        data: [
+          expect.objectContaining({ showId: 1, zoneId: 5 }),
+          expect.objectContaining({ showId: 1, location: 'Scène B' }),
+        ],
+      })
+    })
+
+    it('laisse les représentations intactes quand elles ne sont pas fournies', async () => {
+      // Le formulaire du lieu n'envoie que ce qu'il édite : ne rien dire ne doit rien effacer
+      global.readBody.mockResolvedValue({ title: 'Nouveau titre' })
+      const mockEvent = { context: { user: mockUser } }
+
+      await handler(mockEvent as any)
+
+      expect(prismaMock.showPerformance.deleteMany).not.toHaveBeenCalled()
     })
 
     it("devrait gérer le remplacement d'image via handleFileUpload", async () => {

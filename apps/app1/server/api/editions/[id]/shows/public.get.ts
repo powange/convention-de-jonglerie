@@ -6,24 +6,29 @@ export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    const shows = await prisma.show.findMany({
+    // La publication se décide représentation par représentation : une date peut être annoncée
+    // pendant qu'une autre reste en préparation. On part donc des représentations publiques,
+    // et non des spectacles — dont aucun n'est « public » en tant que tel.
+    const performances = await prisma.showPerformance.findMany({
       where: {
-        editionId,
         isPublic: true,
-      },
-      // technicalNeeds est une note d'organisation : on l'exclut de la réponse publique
-      omit: {
-        technicalNeeds: true,
+        show: { editionId },
       },
       include: {
         ...showZoneMarkerInclude,
+        show: {
+          // technicalNeeds est une note d'organisation : on l'exclut de la réponse publique
+          omit: {
+            technicalNeeds: true,
+          },
+        },
       },
       orderBy: {
         startDateTime: 'asc',
       },
     })
 
-    return createSuccessResponse({ shows })
+    return createSuccessResponse({ performances })
   },
   { operationName: 'GetPublicEditionShows' }
 )

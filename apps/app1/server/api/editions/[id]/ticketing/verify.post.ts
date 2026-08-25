@@ -292,6 +292,12 @@ export default wrapApiHandler(
                         handoutItem: true,
                       },
                     },
+                    // Le quand et le où vivent dans les représentations : un spectacle peut
+                    // être joué plusieurs fois, à des endroits différents.
+                    performances: {
+                      select: { id: true, startDateTime: true, location: true },
+                      orderBy: { startDateTime: 'asc' },
+                    },
                   },
                 },
               },
@@ -378,8 +384,7 @@ export default wrapApiHandler(
                   shows: artist.shows.map((showArtist) => ({
                     id: showArtist.show.id,
                     title: showArtist.show.title,
-                    startDateTime: showArtist.show.startDateTime,
-                    location: showArtist.show.location,
+                    performances: showArtist.show.performances,
                   })),
                   handoutItems: allHandoutItems.map((item) => ({
                     id: item.id,

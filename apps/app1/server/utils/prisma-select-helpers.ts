@@ -633,6 +633,19 @@ export const showZoneMarkerInclude = {
   marker: {
     select: showMarkerSelect,
   },
+} satisfies Prisma.ShowPerformanceInclude
+
+/**
+ * Include des représentations d'un spectacle, avec leur lieu.
+ *
+ * Elles sont rendues dans l'ordre chronologique : c'est celui dans lequel l'organisateur les
+ * saisit, celui du programme, et le seul qui ait un sens pour qui lit une affiche.
+ */
+export const showPerformancesInclude = {
+  performances: {
+    include: showZoneMarkerInclude,
+    orderBy: { startDateTime: 'asc' },
+  },
 } satisfies Prisma.ShowInclude
 
 /**

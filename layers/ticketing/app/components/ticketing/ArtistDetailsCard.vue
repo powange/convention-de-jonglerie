@@ -89,14 +89,19 @@
               </span>
             </div>
           </div>
-          <div class="text-xs text-gray-600 dark:text-gray-400 ml-6">
+          <!-- Un spectacle peut être joué plusieurs fois : l'accueil doit voir tous ses passages -->
+          <div
+            v-for="performance in show.performances"
+            :key="performance.id"
+            class="text-xs text-gray-600 dark:text-gray-400 ml-6"
+          >
             {{
-              new Date(show.startDateTime).toLocaleString('fr-FR', {
+              new Date(performance.startDateTime).toLocaleString('fr-FR', {
                 dateStyle: 'short',
                 timeStyle: 'short',
               })
             }}
-            <span v-if="show.location"> - {{ show.location }}</span>
+            <span v-if="performance.location"> - {{ performance.location }}</span>
           </div>
         </div>
       </div>
@@ -160,8 +165,8 @@ interface Artist {
   shows: Array<{
     id: number
     title: string
-    startDateTime: Date | string
-    location?: string
+    /** Les passages du spectacle : chacun a sa date et son lieu. */
+    performances: { id: number; startDateTime: Date | string; location: string | null }[]
   }>
   handoutItems?: Array<{
     id: number

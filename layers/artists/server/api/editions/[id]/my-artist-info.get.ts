@@ -64,11 +64,15 @@ export default wrapApiHandler(
                 id: true,
                 title: true,
                 description: true,
-                startDateTime: true,
                 duration: true,
-                location: true,
                 type: true,
                 technicalNeeds: true,
+                // Un spectacle peut être joué plusieurs fois : l'artiste doit voir tous ses
+                // passages, pas seulement le premier.
+                performances: {
+                  select: { id: true, startDateTime: true, location: true },
+                  orderBy: { startDateTime: 'asc' },
+                },
               },
             },
             act: {
@@ -122,11 +126,10 @@ export default wrapApiHandler(
         id: number
         title: string
         description: string | null
-        startDateTime: Date
         duration: number | null
-        location: string | null
         type: string
         technicalNeeds: string | null
+        performances: { id: number; startDateTime: Date; location: string | null }[]
         acts: EditableAct[]
       }
     >()
@@ -138,9 +141,8 @@ export default wrapApiHandler(
           id: s.id,
           title: s.title,
           description: s.description,
-          startDateTime: s.startDateTime,
           duration: s.duration,
-          location: s.location,
+          performances: s.performances,
           type: s.type,
           // Éditable par l'artiste seulement pour un STANDARD (un cabaret édite ses numéros).
           technicalNeeds: s.type === 'STANDARD' ? s.technicalNeeds : null,

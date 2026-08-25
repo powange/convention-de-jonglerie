@@ -41,28 +41,22 @@ describe('/api/editions/[id]/shows POST', () => {
     editionId: 1,
     title: 'Nouveau Spectacle',
     description: 'Description test',
-    startDateTime: new Date('2024-06-15T14:30:00Z'),
     duration: 45,
-    location: 'Scène B',
     imageUrl: null,
-    zoneId: null,
-    markerId: null,
   }
 
   const mockUpdatedShow = {
     ...mockCreatedShow,
     artists: [],
     handoutItems: [],
-    zone: null,
-    marker: null,
+    performances: [],
   }
 
   const validBody = {
     title: 'Nouveau Spectacle',
     description: 'Description test',
-    startDateTime: '2024-06-15T14:30:00Z',
     duration: 45,
-    location: 'Scène B',
+    performances: [{ startDateTime: '2024-06-15T14:30:00Z', location: 'Scène B' }],
     artistIds: [],
     handoutItemIds: [],
   }
@@ -162,38 +156,35 @@ describe('/api/editions/[id]/shows POST', () => {
       )
     })
 
-    it('devrait créer un spectacle avec zoneId', async () => {
-      const bodyWithZone = { ...validBody, zoneId: 5 }
+    it('devrait rattacher une représentation à une zone', async () => {
+      const bodyWithZone = {
+        ...validBody,
+        performances: [{ startDateTime: '2024-06-15T14:30:00Z', zoneId: 5 }],
+      }
       global.readBody.mockResolvedValue(bodyWithZone)
       const mockEvent = { context: { user: mockUser } }
 
       await handler(mockEvent as any)
 
-      expect(prismaMock.show.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            zoneId: 5,
-            markerId: null,
-          }),
-        })
-      )
+      // Le lieu appartient à la représentation, pas au spectacle
+      expect(prismaMock.showPerformance.createMany).toHaveBeenCalledWith({
+        data: [expect.objectContaining({ zoneId: 5, markerId: null })],
+      })
     })
 
-    it('devrait créer un spectacle avec markerId', async () => {
-      const bodyWithMarker = { ...validBody, markerId: 3 }
+    it('devrait rattacher une représentation à un marqueur', async () => {
+      const bodyWithMarker = {
+        ...validBody,
+        performances: [{ startDateTime: '2024-06-15T14:30:00Z', markerId: 3 }],
+      }
       global.readBody.mockResolvedValue(bodyWithMarker)
       const mockEvent = { context: { user: mockUser } }
 
       await handler(mockEvent as any)
 
-      expect(prismaMock.show.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            zoneId: null,
-            markerId: 3,
-          }),
-        })
-      )
+      expect(prismaMock.showPerformance.createMany).toHaveBeenCalledWith({
+        data: [expect.objectContaining({ zoneId: null, markerId: 3 })],
+      })
     })
 
     it("devrait gérer l'upload d'image via handleFileUpload", async () => {
@@ -299,8 +290,11 @@ describe('/api/editions/[id]/shows POST', () => {
       await expect(handler(mockEvent as any)).rejects.toThrow()
     })
 
-    it('devrait rejeter un startDateTime invalide', async () => {
-      global.readBody.mockResolvedValue({ ...validBody, startDateTime: 'not-a-date' })
+    it('devrait rejeter une représentation dont la date est invalide', async () => {
+      global.readBody.mockResolvedValue({
+        ...validBody,
+        performances: [{ startDateTime: 'not-a-date' }],
+      })
       const mockEvent = { context: { user: mockUser } }
 
       await expect(handler(mockEvent as any)).rejects.toThrow()

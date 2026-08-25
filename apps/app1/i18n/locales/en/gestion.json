@@ -332,7 +332,12 @@
       "company_name": "Company / stage name",
       "company_name_hint": "Name of the company or stage name of the artist behind the show",
       "company_name_placeholder": "E.g. The Juggling Club",
-      "toggle_acts": "Show or hide the acts"
+      "toggle_acts": "Show or hide the acts",
+      "add_performance": "Add a performance",
+      "performance_number": "Performance {number}",
+      "performance_public": "Announced publicly",
+      "performances": "Performances",
+      "remove_performance": "Remove this performance"
     },
     "stock": {
       "available_now": "{available}/{total} available",

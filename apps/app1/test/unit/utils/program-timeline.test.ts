@@ -14,6 +14,7 @@ describe('construireFriseProgramme', () => {
       workshops: [
         {
           id: 1,
+          showId: 1,
           title: 'Jonglerie à 3 balles',
           startDateTime: '2026-09-26T14:00:00.000Z',
           endDateTime: '2026-09-26T15:30:00.000Z',
@@ -22,6 +23,7 @@ describe('construireFriseProgramme', () => {
       spectacles: [
         {
           id: 1,
+          showId: 1,
           title: 'Gala',
           startDateTime: '2026-09-26T20:00:00.000Z',
           duration: 90,
@@ -31,6 +33,7 @@ describe('construireFriseProgramme', () => {
       elements: [
         {
           id: 1,
+          showId: 1,
           title: 'Repas du soir',
           startDateTime: '2026-09-26T18:30:00.000Z',
           endDateTime: '2026-09-26T19:30:00.000Z',
@@ -53,6 +56,7 @@ describe('construireFriseProgramme', () => {
       workshops: [
         {
           id: 7,
+          showId: 7,
           title: 'Workshop',
           startDateTime: '2026-09-26T10:00:00.000Z',
           endDateTime: '2026-09-26T11:00:00.000Z',
@@ -66,11 +70,18 @@ describe('construireFriseProgramme', () => {
   it('écarte les brouillons par défaut, spectacles comme éléments', () => {
     const sources = {
       spectacles: [
-        { id: 1, title: 'Gala secret', startDateTime: '2026-09-26T20:00:00.000Z', isPublic: false },
+        {
+          id: 1,
+          showId: 1,
+          title: 'Gala secret',
+          startDateTime: '2026-09-26T20:00:00.000Z',
+          isPublic: false,
+        },
       ],
       elements: [
         {
           id: 1,
+          showId: 1,
           title: 'Repas en préparation',
           startDateTime: '2026-09-26T18:00:00.000Z',
           endDateTime: '2026-09-26T19:00:00.000Z',
@@ -89,6 +100,7 @@ describe('construireFriseProgramme', () => {
         elements: [
           {
             id: 1,
+            showId: 1,
             title: 'Brouillon',
             startDateTime: '2026-09-26T18:00:00.000Z',
             endDateTime: '2026-09-26T19:00:00.000Z',
@@ -107,6 +119,7 @@ describe('construireFriseProgramme', () => {
       spectacles: [
         {
           id: 1,
+          showId: 1,
           title: 'Gala',
           startDateTime: '2026-09-26T20:00:00.000Z',
           duration: 90,
@@ -127,6 +140,7 @@ describe('construireFriseProgramme', () => {
         spectacles: [
           {
             id: 1,
+            showId: 1,
             title: 'Gala',
             startDateTime: '2026-09-26T20:00:00.000Z',
             duration,
@@ -144,17 +158,19 @@ describe('construireFriseProgramme', () => {
       workshops: [
         {
           id: 3,
+          showId: 3,
           title: 'A',
           startDateTime: '2026-09-26T10:00:00.000Z',
           endDateTime: '2026-09-26T11:00:00.000Z',
         },
       ],
       spectacles: [
-        { id: 3, title: 'B', startDateTime: '2026-09-26T11:00:00.000Z', isPublic: true },
+        { id: 3, showId: 3, title: 'B', startDateTime: '2026-09-26T11:00:00.000Z', isPublic: true },
       ],
       elements: [
         {
           id: 3,
+          showId: 3,
           title: 'C',
           startDateTime: '2026-09-26T12:00:00.000Z',
           endDateTime: '2026-09-26T13:00:00.000Z',
@@ -171,6 +187,7 @@ describe('construireFriseProgramme', () => {
       elements: [
         {
           id: 1,
+          showId: 1,
           title: 'Zumba',
           startDateTime: '2026-09-26T10:00:00.000Z',
           endDateTime: '2026-09-26T11:00:00.000Z',
@@ -178,6 +195,7 @@ describe('construireFriseProgramme', () => {
         },
         {
           id: 2,
+          showId: 2,
           title: 'Accueil',
           startDateTime: '2026-09-26T10:00:00.000Z',
           endDateTime: '2026-09-26T11:00:00.000Z',
@@ -193,6 +211,7 @@ describe('construireFriseProgramme', () => {
       workshops: [
         {
           id: 1,
+          showId: 1,
           title: 'A',
           startDateTime: '2026-09-26T10:00:00.000Z',
           endDateTime: '2026-09-26T11:00:00.000Z',
@@ -202,6 +221,7 @@ describe('construireFriseProgramme', () => {
       spectacles: [
         {
           id: 1,
+          showId: 1,
           title: 'B',
           startDateTime: '2026-09-26T12:00:00.000Z',
           location: 'Chapiteau',
@@ -212,6 +232,7 @@ describe('construireFriseProgramme', () => {
       elements: [
         {
           id: 1,
+          showId: 1,
           title: 'C',
           startDateTime: '2026-09-26T13:00:00.000Z',
           endDateTime: '2026-09-26T14:00:00.000Z',
@@ -239,6 +260,7 @@ describe('construireFriseProgramme', () => {
       elements: [
         {
           id: 1,
+          showId: 1,
           title: 'Apéro',
           startDateTime: '2026-10-02T18:00:00.000Z',
           locationName: 'côté buvette',
@@ -261,6 +283,7 @@ describe('construireFriseProgramme', () => {
         elements: [
           {
             id: 1,
+            showId: 1,
             title: 'Accueil ouvert',
             startDateTime: '2026-10-02T14:00:00.000Z',
             endDateTime,
@@ -322,6 +345,7 @@ describe('grouperParJournee', () => {
       elements: [
         {
           id: 1,
+          showId: 1,
           title: 'Dimanche',
           startDateTime: '2026-09-28T10:00:00.000Z',
           endDateTime: '2026-09-28T11:00:00.000Z',
@@ -329,6 +353,7 @@ describe('grouperParJournee', () => {
         },
         {
           id: 2,
+          showId: 2,
           title: 'Samedi',
           startDateTime: '2026-09-27T10:00:00.000Z',
           endDateTime: '2026-09-27T11:00:00.000Z',
@@ -452,5 +477,90 @@ describe('estTermine', () => {
     // Le même instant, jugé depuis un fuseau où la journée est déjà close.
     expect(estTermine(accueil, '2026-08-07T01:01:00.000Z', 'Europe/Paris')).toBe(true)
     expect(estTermine(accueil, '2026-08-07T01:01:00.000Z', 'UTC')).toBe(false)
+  })
+})
+
+describe('représentations multiples', () => {
+  it('donne au programme autant d’entrées que de passages', () => {
+    // Un même spectacle joué deux fois occupe deux moments de la frise : le public voit
+    // chaque passage, avec son horaire et son lieu.
+    const frise = construireFriseProgramme({
+      spectacles: [
+        {
+          id: 10,
+          showId: 3,
+          title: 'Cabaret',
+          startDateTime: '2026-09-26T20:00:00.000Z',
+          duration: 60,
+          location: 'Chapiteau',
+          isPublic: true,
+        },
+        {
+          id: 11,
+          showId: 3,
+          title: 'Cabaret',
+          startDateTime: '2026-09-27T18:00:00.000Z',
+          duration: 60,
+          location: 'Scène extérieure',
+          isPublic: true,
+        },
+      ],
+    })
+
+    expect(frise).toHaveLength(2)
+    expect(frise.map((e) => e.lieuTexte)).toEqual(['Chapiteau', 'Scène extérieure'])
+    // Les clés distinguent les passages, tandis que `parentId` ramène à l'œuvre commune
+    expect(frise.map((e) => e.cle)).toEqual(['spectacle-10', 'spectacle-11'])
+    expect(frise.every((e) => e.parentId === 3)).toBe(true)
+  })
+
+  it('publie un passage sans publier l’autre', () => {
+    const frise = construireFriseProgramme({
+      spectacles: [
+        {
+          id: 10,
+          showId: 3,
+          title: 'Cabaret',
+          startDateTime: '2026-09-26T20:00:00.000Z',
+          isPublic: true,
+        },
+        {
+          id: 11,
+          showId: 3,
+          title: 'Cabaret',
+          startDateTime: '2026-09-27T18:00:00.000Z',
+          isPublic: false,
+        },
+      ],
+    })
+
+    expect(frise).toHaveLength(1)
+    expect(frise[0]?.sourceId).toBe(10)
+  })
+
+  it('applique la durée de l’œuvre à chacun de ses passages', () => {
+    const frise = construireFriseProgramme({
+      spectacles: [
+        {
+          id: 10,
+          showId: 3,
+          title: 'Cabaret',
+          startDateTime: '2026-09-26T20:00:00.000Z',
+          duration: 90,
+          isPublic: true,
+        },
+        {
+          id: 11,
+          showId: 3,
+          title: 'Cabaret',
+          startDateTime: '2026-09-27T18:00:00.000Z',
+          duration: 90,
+          isPublic: true,
+        },
+      ],
+    })
+
+    expect(frise[0]?.fin).toBe('2026-09-26T21:30:00.000Z')
+    expect(frise[1]?.fin).toBe('2026-09-27T19:30:00.000Z')
   })
 })

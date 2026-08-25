@@ -514,9 +514,22 @@ export async function getEditionArtists(page: Page, editionId: string) {
 
 /**
  * Crée un spectacle (POST /shows). `type` peut valoir 'STANDARD' (défaut) ou 'CABARET'.
+ *
+ * Le quand et le où appartiennent aux représentations. Un `startDateTime` posé à la racine est
+ * accepté ici comme raccourci et devient l'unique représentation : la plupart des scénarios ne
+ * s'intéressent pas au calendrier du spectacle, et leur imposer la forme complète alourdirait
+ * leur lecture sans rien éprouver de plus.
  */
 export async function createShow(page: Page, editionId: string, data: Record<string, unknown>) {
-  const response = await apiPost(page, `${BASE_URL}/api/editions/${editionId}/shows`, { data })
+  const { startDateTime, location, ...reste } = data
+  const corps =
+    startDateTime !== undefined && reste.performances === undefined
+      ? { ...reste, performances: [{ startDateTime, ...(location ? { location } : {}) }] }
+      : data
+
+  const response = await apiPost(page, `${BASE_URL}/api/editions/${editionId}/shows`, {
+    data: corps,
+  })
   if (!response.ok()) {
     throw new Error(`POST show a échoué (${response.status()}): ${await response.text()}`)
   }

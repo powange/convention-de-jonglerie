@@ -82,20 +82,23 @@ export default wrapApiHandler(
           })
         : [],
       edition.artistsEnabled
-        ? prisma.show.findMany({
-            // Le filtre sur `isPublic` est posé ici plutôt qu'à la fusion : inutile de faire
-            // remonter des spectacles non publiés à un visiteur anonyme.
-            where: { editionId, ...(peutEditer ? {} : { isPublic: true }) },
+        ? // Le programme liste les représentations, pas les spectacles : un spectacle joué deux
+          // fois occupe deux moments de la frise. Le filtre sur `isPublic` est posé ici plutôt
+          // qu'à la fusion : inutile de faire remonter des passages non publiés à un visiteur.
+          prisma.showPerformance.findMany({
+            where: {
+              show: { editionId },
+              ...(peutEditer ? {} : { isPublic: true }),
+            },
             select: {
               id: true,
-              title: true,
-              description: true,
+              showId: true,
               startDateTime: true,
-              duration: true,
               location: true,
               zone: lieuDeCarte,
               marker: lieuDeCarte,
               isPublic: true,
+              show: { select: { title: true, description: true, duration: true } },
             },
           })
         : [],
@@ -115,8 +118,17 @@ export default wrapApiHandler(
       }),
     ])
 
+    // Le titre et la durée viennent de l'œuvre, le reste du passage : la frise attend les deux
+    // à plat.
+    const representations = spectacles.map(({ show, ...performance }) => ({
+      ...performance,
+      title: show.title,
+      description: show.description,
+      duration: show.duration,
+    }))
+
     const entrees = construireFriseProgramme(
-      { workshops, spectacles, elements },
+      { workshops, spectacles: representations, elements },
       { inclureBrouillons: peutEditer }
     )
 

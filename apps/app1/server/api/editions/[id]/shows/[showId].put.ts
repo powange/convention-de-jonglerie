@@ -5,8 +5,12 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { canManageArtists } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
-import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import {
+  showCompositionInclude,
+  showPerformancesInclude,
+} from '#server/utils/prisma-select-helpers'
 import { replaceShowComposition, showActSchema } from '#server/utils/show-acts'
+import { replaceShowPerformances, showPerformancesSchema } from '#server/utils/show-performances'
 import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
@@ -18,12 +22,10 @@ const updateShowSchema = z.object({
   description: z.string().optional().nullable(),
   // Sans plafond (comme description) : agrège les besoins techniques importés des candidatures
   technicalNeeds: z.string().optional().nullable(),
-  startDateTime: z.string().datetime().optional(),
+  // Omises = inchangées ; fournies = elles remplacent l'ensemble des représentations
+  performances: showPerformancesSchema.optional(),
   duration: z.number().int().positive().optional().nullable(),
-  location: z.string().optional().nullable(),
   imageUrl: z.string().optional().nullable(),
-  zoneId: z.number().int().positive().optional().nullable(),
-  markerId: z.number().int().positive().optional().nullable(),
   artistIds: z.array(z.number().int().positive()).optional(),
   acts: z.array(showActSchema).optional(),
   // Un identifiant nu (quantité 1) ou un couple identifiant + quantité.
@@ -38,7 +40,6 @@ const updateShowSchema = z.object({
       ])
     )
     .optional(),
-  isPublic: z.boolean().optional(),
 })
 
 export default wrapApiHandler(
@@ -103,13 +104,7 @@ export default wrapApiHandler(
     if (validatedData.description !== undefined) updateData.description = validatedData.description
     if (validatedData.technicalNeeds !== undefined)
       updateData.technicalNeeds = validatedData.technicalNeeds
-    if (validatedData.startDateTime !== undefined)
-      updateData.startDateTime = new Date(validatedData.startDateTime)
     if (validatedData.duration !== undefined) updateData.duration = validatedData.duration
-    if (validatedData.location !== undefined) updateData.location = validatedData.location
-    if (validatedData.zoneId !== undefined) updateData.zoneId = validatedData.zoneId || null
-    if (validatedData.markerId !== undefined) updateData.markerId = validatedData.markerId || null
-    if (validatedData.isPublic !== undefined) updateData.isPublic = validatedData.isPublic
 
     // Gérer l'image avec le helper centralisé
     if (validatedData.imageUrl !== undefined) {
@@ -150,6 +145,10 @@ export default wrapApiHandler(
         data: updateData,
       })
 
+      if (validatedData.performances !== undefined) {
+        await replaceShowPerformances(tx, showId, validatedData.performances)
+      }
+
       if (recompose) {
         await replaceShowComposition(
           tx,
@@ -188,7 +187,7 @@ export default wrapApiHandler(
               },
             },
           },
-          ...showZoneMarkerInclude,
+          ...showPerformancesInclude,
         },
       })
     })

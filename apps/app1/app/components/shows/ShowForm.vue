@@ -94,16 +94,7 @@
           </template>
 
           <div class="space-y-4">
-            <!-- Date et heure -->
-            <UiDateTimePicker
-              v-model="formData.startDateTime"
-              :date-label="$t('gestion.shows.start_date')"
-              :time-label="$t('gestion.shows.start_time')"
-              :placeholder="$t('gestion.shows.start_datetime')"
-              required
-            />
-
-            <!-- Durée -->
+            <!-- Durée : celle de l'œuvre, la même à chaque représentation -->
             <UFormField :label="$t('gestion.shows.duration')">
               <div class="flex items-center gap-2">
                 <!-- step-snapping désactivé : voir ShowActsEditor, une durée hors multiple de 5 doit
@@ -119,17 +110,14 @@
               </div>
             </UFormField>
 
-            <!-- Lieu -->
-            <EditionLocationPicker
-              v-model:location-name="formData.location"
-              v-model:zone-id="formData.zoneId"
-              v-model:marker-id="formData.markerId"
-              :edition-id="editionId"
-              :site-map-enabled="edition?.siteMapEnabled"
-              :label="$t('gestion.shows.location')"
-              :placeholder-carte="$t('gestion.shows.select_zone_or_marker')"
-              :placeholder-texte="$t('gestion.shows.free_text_placeholder')"
-            />
+            <!-- Représentations : un spectacle peut être joué plusieurs fois, ailleurs -->
+            <UFormField :label="$t('gestion.shows.performances')">
+              <ShowsShowPerformancesEditor
+                v-model="formData.performances"
+                :edition-id="editionId"
+                :site-map-enabled="edition?.siteMapEnabled"
+              />
+            </UFormField>
           </div>
         </UCard>
       </div>
@@ -254,6 +242,8 @@
 </template>
 
 <script setup lang="ts">
+import { performanceVierge, type PerformanceInput } from '~/utils/show-performances'
+
 import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 
 const props = defineProps<{
@@ -301,15 +291,11 @@ const formData = ref({
   companyName: '',
   description: '',
   technicalNeeds: '',
-  startDateTime: '',
   duration: null as number | null,
-  location: '',
+  performances: [performanceVierge()] as PerformanceInput[],
   imageUrl: null as string | null,
-  zoneId: null as number | null,
-  markerId: null as number | null,
   artistIds: [] as number[],
   acts: [] as ActInput[],
-  isPublic: false,
 })
 
 // Suivi des modifications, pour prévenir avant de quitter la page sans enregistrer.
@@ -419,15 +405,17 @@ const buildPayload = () => {
       formData.value.type === 'STANDARD' ? formData.value.companyName.trim() || null : null,
     description: formData.value.description || null,
     technicalNeeds: formData.value.technicalNeeds || null,
-    // Le champ `datetime-local` ne porte pas de fuseau : c'est celui de la convention qui l'ancre.
-    startDateTime: versInstant(formData.value.startDateTime, fuseau.value),
     duration: formData.value.duration,
-    location: formData.value.location || null,
+    // Le champ `datetime-local` ne porte pas de fuseau : c'est celui de la convention qui l'ancre.
+    performances: formData.value.performances.map((performance) => ({
+      startDateTime: versInstant(performance.startDateTime, fuseau.value),
+      location: performance.location || null,
+      zoneId: performance.zoneId,
+      markerId: performance.markerId,
+      isPublic: performance.isPublic,
+    })),
     imageUrl: formData.value.imageUrl,
-    zoneId: formData.value.zoneId,
-    markerId: formData.value.markerId,
     type: formData.value.type,
-    isPublic: formData.value.isPublic,
   }
   if (formData.value.type === 'STANDARD') {
     return { ...base, artistIds: formData.value.artistIds }
@@ -491,15 +479,12 @@ const resetForm = () => {
     companyName: '',
     description: '',
     technicalNeeds: '',
-    startDateTime: defaultStartDateTime.value,
     duration: null,
-    location: '',
+    // Un spectacle naît avec une représentation : sans date, il n'apparaîtrait nulle part.
+    performances: [{ ...performanceVierge(), startDateTime: defaultStartDateTime.value }],
     imageUrl: null,
-    zoneId: null,
-    markerId: null,
     artistIds: [],
     acts: [],
-    isPublic: false,
   }
 }
 
@@ -508,11 +493,19 @@ watch(
   () => props.show,
   (newShow) => {
     if (newShow) {
-      // Réaffiché dans le fuseau de la convention, celui-là même qui a servi à l'enregistrer :
-      // rouvrir le formulaire puis enregistrer ne doit pas déplacer l'horaire.
-      const formattedDateTime = newShow.startDateTime
-        ? versChampLocal(newShow.startDateTime, fuseau.value)
-        : ''
+      // Réaffichées dans le fuseau de la convention, celui-là même qui a servi à les
+      // enregistrer : rouvrir le formulaire puis enregistrer ne doit pas déplacer les horaires.
+      const representations: PerformanceInput[] = (newShow.performances ?? []).map(
+        (performance: any) => ({
+          startDateTime: performance.startDateTime
+            ? versChampLocal(performance.startDateTime, fuseau.value)
+            : '',
+          location: performance.location || '',
+          zoneId: performance.zoneId ?? null,
+          markerId: performance.markerId ?? null,
+          isPublic: performance.isPublic ?? false,
+        })
+      )
 
       formData.value = {
         title: newShow.title || '',
@@ -520,16 +513,16 @@ watch(
         companyName: newShow.companyName || '',
         description: newShow.description || '',
         technicalNeeds: newShow.technicalNeeds || '',
-        startDateTime: formattedDateTime,
         duration: newShow.duration || null,
-        location: newShow.location || '',
+        // Un spectacle enregistré sans représentation ne devrait pas exister ; s'il s'en
+        // présente un, le formulaire en propose une vierge plutôt qu'une liste vide qu'on ne
+        // pourrait pas enregistrer.
+        performances: representations.length > 0 ? representations : [performanceVierge()],
         // L'image est rangée sous le spectacle (`/uploads/shows/{showId}/…`) alors que
         // l'endpoint d'upload est celui de l'édition : on construit l'URL d'affichage ici,
         // sinon le composant la chercherait sous l'identifiant de l'édition. Le serveur ne
         // garde de toute façon que le nom de fichier.
         imageUrl: getImageUrl(newShow.imageUrl, 'show', newShow.id),
-        zoneId: newShow.zoneId || null,
-        markerId: newShow.markerId || null,
         // Sur un cabaret, les artistes du spectacle sont ceux des numéros : on ne garde ici
         // que les liens sans numéro, pour ne pas les dupliquer dans le sélecteur du haut.
         artistIds:
@@ -545,7 +538,6 @@ watch(
             stageSetup: act.stageSetup ?? null,
             artistIds: act.artists?.map((showArtist: any) => showArtist.artistId) || [],
           })) || [],
-        isPublic: newShow.isPublic || false,
       }
     } else {
       resetForm()
