@@ -65,7 +65,6 @@ export default wrapApiHandler(
           data: {
             userSnapshotPhone: null,
             motivation: 'Motivation anonymisée',
-            allergies: null,
             petsDetails: null,
             minorsDetails: null,
             vehicleDetails: null,
@@ -73,8 +72,8 @@ export default wrapApiHandler(
             avoidList: null,
             skills: null,
             experienceDetails: null,
-            emergencyContactName: null,
-            emergencyContactPhone: null,
+            // Régime, allergies et contact d'urgence ne vivent plus sur la candidature : ils
+            // sont effacés sur le profil, plus haut.
           },
         })
 

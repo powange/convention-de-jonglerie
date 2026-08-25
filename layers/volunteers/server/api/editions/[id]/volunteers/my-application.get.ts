@@ -27,11 +27,6 @@ export default wrapApiHandler(async (event) => {
       createdAt: true,
       updatedAt: true,
       decidedAt: true,
-      dietaryPreference: true,
-      allergies: true,
-      allergySeverity: true,
-      emergencyContactName: true,
-      emergencyContactPhone: true,
       timePreferences: true,
       teamPreferences: true,
       acceptanceNote: true,
@@ -129,7 +124,7 @@ export default wrapApiHandler(async (event) => {
     // Le profil fait foi, ici comme dans la vue des organisateurs. Sans cette résolution,
     // l'intéressé relirait la copie figée dans sa candidature pendant que les organisateurs,
     // eux, verraient son profil à jour — deux vérités pour la même personne.
-    ...infosPersonnelles(application.user as never, application as never),
+    ...infosPersonnelles(application.user as never),
     assignedTimeSlots,
   }
 }, 'GetMyVolunteerApplication')

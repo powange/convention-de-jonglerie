@@ -193,7 +193,7 @@ export default wrapApiHandler(
           mealType: meal.mealType,
           mealPhases: meal.phases,
           // Le profil fait foi ; la ligne d'organisateur ne sert que de repli.
-          ...infosAlimentaires(eo.organizer.user as never, eo as never),
+          ...infosAlimentaires(eo.organizer.user as never),
           afterShow: false,
         })
       })

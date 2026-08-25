@@ -38,9 +38,6 @@ model EditionArtist {
   userId                  Int
   arrivalDateTime         String?
   departureDateTime       String?
-  dietaryPreference       DietaryPreference  @default(NONE)
-  allergies               String?            @db.Text
-  allergySeverity         AllergySeverity?
   qrCodeToken             String?            @unique
   entryValidated          Boolean            @default(false)
   entryValidatedAt        DateTime?

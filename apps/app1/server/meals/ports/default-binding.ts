@@ -36,9 +36,6 @@ export function createDefaultMealsPorts(): MealsPorts {
             afterShow: true,
             artist: {
               select: {
-                dietaryPreference: true,
-                allergies: true,
-                allergySeverity: true,
                 user: { select: artistUserSelect },
               },
             },
@@ -55,7 +52,7 @@ export function createDefaultMealsPorts(): MealsPorts {
             phone: sel.artist.user.phone,
             // Le profil fait foi ; la fiche artiste ne sert que de repli tant que ses
             // colonnes existent (cf. `infos-personnelles`).
-            ...infosAlimentaires(sel.artist.user as never, sel.artist as never),
+            ...infosAlimentaires(sel.artist.user as never),
             afterShow: sel.afterShow,
           })
         }

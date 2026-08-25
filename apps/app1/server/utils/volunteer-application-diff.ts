@@ -10,6 +10,13 @@ export interface UpdatedApplicationData {
   // Données personnelles
   phone?: string
 
+  // Portés par le corps de la requête, écrits sur le PROFIL et non sur la candidature.
+  dietaryPreference?: 'NONE' | 'VEGETARIAN' | 'VEGAN'
+  allergies?: string
+  allergySeverity?: 'LIGHT' | 'MODERATE' | 'SEVERE' | 'CRITICAL'
+  emergencyContactName?: string
+  emergencyContactPhone?: string
+
   // Disponibilités
   setupAvailability?: boolean
   teardownAvailability?: boolean
@@ -22,13 +29,6 @@ export interface UpdatedApplicationData {
   timePreferences?: string[]
   companionName?: string
   avoidList?: string
-
-  // Régime et allergies
-  dietaryPreference?: 'NONE' | 'VEGETARIAN' | 'VEGAN'
-  allergies?: string
-  allergySeverity?: 'LIGHT' | 'MODERATE' | 'SEVERE' | 'CRITICAL'
-  emergencyContactName?: string
-  emergencyContactPhone?: string
 
   // Informations complémentaires
   hasPets?: boolean
@@ -107,61 +107,10 @@ export async function compareApplicationChanges(
     }
   }
 
-  // Comparer le régime alimentaire
-  if (
-    updatedData.dietaryPreference !== undefined &&
-    updatedData.dietaryPreference !== originalData.dietaryPreference
-  ) {
-    const dietLabels = {
-      NONE: 'Aucun régime spécial',
-      VEGETARIAN: 'Végétarien',
-      VEGAN: 'Végétalien',
-    }
-    const oldDiet =
-      dietLabels[originalData.dietaryPreference as keyof typeof dietLabels] ||
-      originalData.dietaryPreference
-    const newDiet =
-      dietLabels[updatedData.dietaryPreference as keyof typeof dietLabels] ||
-      updatedData.dietaryPreference
-    changes.push(`Régime alimentaire modifié : ${oldDiet} → ${newDiet}`)
-  }
-
-  // Comparer les allergies
-  if (
-    updatedData.allergies !== undefined &&
-    (updatedData.allergies || '').trim() !== (originalData.allergies || '').trim()
-  ) {
-    const oldAllergies = originalData.allergies?.trim() || ''
-    const newAllergies = updatedData.allergies?.trim() || ''
-
-    if (oldAllergies && newAllergies) {
-      changes.push(`Allergies modifiées : "${oldAllergies}" → "${newAllergies}"`)
-    } else if (newAllergies) {
-      changes.push(`Allergies ajoutées : "${newAllergies}"`)
-    } else {
-      changes.push(`Allergies supprimées : "${oldAllergies}"`)
-    }
-  }
-
-  // Comparer la sévérité des allergies
-  if (
-    updatedData.allergySeverity !== undefined &&
-    updatedData.allergySeverity !== originalData.allergySeverity
-  ) {
-    const severityLabels = {
-      LIGHT: 'Légère',
-      MODERATE: 'Modérée',
-      SEVERE: 'Sévère',
-      CRITICAL: 'Critique',
-    }
-    const oldSeverity = originalData.allergySeverity
-      ? severityLabels[originalData.allergySeverity as keyof typeof severityLabels]
-      : 'Non spécifiée'
-    const newSeverity = updatedData.allergySeverity
-      ? severityLabels[updatedData.allergySeverity as keyof typeof severityLabels]
-      : 'Non spécifiée'
-    changes.push(`Sévérité des allergies modifiée : ${oldSeverity} → ${newSeverity}`)
-  }
+  // Régime, allergies et gravité ne sont plus comparés ici : ils ne vivent plus sur la
+  // candidature mais sur le profil, qui n'appartient pas à l'édition. Annoncer à un bénévole
+  // qu'un organisateur a « modifié son régime » n'aurait plus de sens — l'organisateur ne peut
+  // plus écraser ce que la personne a mis dans son profil.
 
   // Comparer les disponibilités
   if (
@@ -273,26 +222,7 @@ export async function compareApplicationChanges(
     changes.push(`Liste d'évitement modifiée : ${oldAvoid} → ${newAvoid}`)
   }
 
-  // Comparer les contacts d'urgence
-  if (
-    updatedData.emergencyContactName !== undefined &&
-    (updatedData.emergencyContactName || '').trim() !==
-      (originalData.emergencyContactName || '').trim()
-  ) {
-    const oldContact = originalData.emergencyContactName?.trim() || 'Non renseigné'
-    const newContact = updatedData.emergencyContactName?.trim() || 'Non renseigné'
-    changes.push(`Nom du contact d'urgence modifié : ${oldContact} → ${newContact}`)
-  }
-
-  if (
-    updatedData.emergencyContactPhone !== undefined &&
-    (updatedData.emergencyContactPhone || '').trim() !==
-      (originalData.emergencyContactPhone || '').trim()
-  ) {
-    const oldPhone = originalData.emergencyContactPhone?.trim() || 'Non renseigné'
-    const newPhone = updatedData.emergencyContactPhone?.trim() || 'Non renseigné'
-    changes.push(`Téléphone du contact d'urgence modifié : ${oldPhone} → ${newPhone}`)
-  }
+  // Le contact d'urgence n'est plus comparé ici : il vit sur le profil, pas sur la candidature.
 
   // Comparer les informations complémentaires
   if (updatedData.hasPets !== undefined && updatedData.hasPets !== originalData.hasPets) {
@@ -396,7 +326,10 @@ export function hasApplicationDataChanges(updatedData: UpdatedApplicationData): 
     updatedData.timePreferences !== undefined ||
     updatedData.companionName !== undefined ||
     updatedData.avoidList !== undefined ||
-    // Régime et allergies
+    // Régime, allergies et contact d'urgence : ces champs ne sont plus stockés sur la
+    // candidature, mais ils arrivent toujours dans le corps de la requête — ils vont au profil.
+    // Les retirer d'ici ferait tomber une requête qui ne porte qu'eux dans la branche
+    // « changement de statut », qui la rejetterait faute de statut.
     updatedData.dietaryPreference !== undefined ||
     updatedData.allergies !== undefined ||
     updatedData.allergySeverity !== undefined ||

@@ -57,14 +57,6 @@ export default wrapApiHandler(
         timePreferences: true,
         companionName: true,
         avoidList: true,
-
-        // Régime et allergies
-        dietaryPreference: true,
-        allergies: true,
-        allergySeverity: true,
-        emergencyContactName: true,
-        emergencyContactPhone: true,
-
         // Informations complémentaires
         hasPets: true,
         petsDetails: true,
@@ -197,14 +189,6 @@ export default wrapApiHandler(
           timePreferences: true,
           companionName: true,
           avoidList: true,
-
-          // Régime et allergies
-          dietaryPreference: true,
-          allergies: true,
-          allergySeverity: true,
-          emergencyContactName: true,
-          emergencyContactPhone: true,
-
           // Informations complémentaires
           hasPets: true,
           petsDetails: true,

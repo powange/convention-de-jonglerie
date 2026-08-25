@@ -28,9 +28,6 @@ export default wrapApiHandler(
       where: { id: editionOrganizerId, editionId },
       select: {
         id: true,
-        dietaryPreference: true,
-        allergies: true,
-        allergySeverity: true,
         organizer: { select: { user: { select: infosPersonnellesSelect } } },
       },
     })
@@ -65,7 +62,7 @@ export default wrapApiHandler(
         }
       }),
       // Le profil fait foi ; la ligne d'organisateur ne sert que de repli.
-      ...infosAlimentaires(editionOrganizer.organizer?.user as never, editionOrganizer as never),
+      ...infosAlimentaires(editionOrganizer.organizer?.user as never),
     })
   },
   { operationName: 'GetOrganizerMeals' }

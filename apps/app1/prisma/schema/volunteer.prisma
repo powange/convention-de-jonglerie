@@ -70,13 +70,10 @@ model EditionVolunteerApplication {
   userId                Int
   status                VolunteerStatus             @default(PENDING)
   motivation            String?                     @db.Text
-  allergies             String?                     @db.Text
-  allergySeverity       AllergySeverity?
   createdAt             DateTime                    @default(now())
   updatedAt             DateTime                    @updatedAt
   decidedAt             DateTime?
   userSnapshotPhone     String?
-  dietaryPreference     DietaryPreference           @default(NONE)
   timePreferences       Json?
   teamPreferences       Json?
   acceptanceNote        String?                     @db.Text
@@ -96,8 +93,6 @@ model EditionVolunteerApplication {
   eventAvailability     Boolean?
   arrivalDateTime       String?
   departureDateTime     String?
-  emergencyContactName  String?
-  emergencyContactPhone String?
   qrCodeToken           String?                     @unique
   entryValidated        Boolean                     @default(false)
   entryValidatedAt      DateTime?

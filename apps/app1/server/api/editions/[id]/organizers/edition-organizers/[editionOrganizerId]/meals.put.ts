@@ -132,9 +132,6 @@ export default wrapApiHandler(
       prisma.editionOrganizer.findUnique({
         where: { id: editionOrganizerId },
         select: {
-          dietaryPreference: true,
-          allergies: true,
-          allergySeverity: true,
           organizer: { select: { user: { select: infosPersonnellesSelect } } },
         },
       }),
@@ -155,7 +152,7 @@ export default wrapApiHandler(
       }),
       // Le profil fait foi dans la réponse aussi : sans quoi l'écran afficherait la valeur de
       // la ligne juste après avoir enregistré, et divergerait au rechargement suivant.
-      ...infosAlimentaires(organizer?.organizer?.user as never, organizer as never),
+      ...infosAlimentaires(organizer?.organizer?.user as never),
     })
   },
   { operationName: 'UpdateOrganizerMeals' }

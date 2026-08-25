@@ -33,11 +33,6 @@ const candidature = (surcharges: Record<string, unknown> = {}) => ({
   status: 'ACCEPTED',
   motivation: null,
   createdAt: new Date(),
-  dietaryPreference: 'VEGETARIAN',
-  allergies: 'Gluten',
-  allergySeverity: 'LIGHT',
-  emergencyContactName: 'Ancien contact',
-  emergencyContactPhone: '+33611111111',
   timePreferences: [],
   teamPreferences: [],
   acceptanceNote: null,
@@ -66,7 +61,7 @@ describe('GET /api/user/volunteer-applications', () => {
     prismaMock.volunteerAssignment.findMany?.mockResolvedValue([])
   })
 
-  it('rend les informations du profil, pas la copie de la candidature', async () => {
+  it('rend les informations du profil', async () => {
     const [resultat] = await appeler([candidature()])
 
     expect(resultat).toMatchObject({
@@ -75,26 +70,6 @@ describe('GET /api/user/volunteer-applications', () => {
       allergySeverity: 'SEVERE',
       emergencyContactName: 'Camille',
       emergencyContactPhone: '+33622222222',
-    })
-  })
-
-  it('se replie sur la candidature là où le profil ne dit rien', async () => {
-    const [resultat] = await appeler([
-      candidature({
-        user: {
-          dietaryPreference: 'NONE',
-          allergies: null,
-          allergySeverity: null,
-          emergencyContactName: null,
-          emergencyContactPhone: null,
-        },
-      }),
-    ])
-
-    expect(resultat).toMatchObject({
-      dietaryPreference: 'VEGETARIAN',
-      allergies: 'Gluten',
-      emergencyContactName: 'Ancien contact',
     })
   })
 

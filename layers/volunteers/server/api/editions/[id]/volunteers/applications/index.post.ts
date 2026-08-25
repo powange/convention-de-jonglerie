@@ -142,10 +142,8 @@ export default wrapApiHandler(
         motivation: parsed.motivation || null,
         userSnapshotPhone: finalPhone,
         qrCodeToken,
-        // Régime, allergies et contact d'urgence ne sont plus écrits sur la candidature :
-        // ils vivent sur le profil, où `getUserUpdateData` les a portés juste au-dessus. Les
-        // colonnes subsistent le temps de vérifier en production que la reprise n'a rien laissé
-        // de côté, mais elles ne reçoivent plus rien.
+        // Régime, allergies et contact d'urgence ne sont pas écrits ici : ils vivent sur le
+        // profil, où `getUserUpdateData` les a portés juste au-dessus.
         timePreferences:
           settings.askTimePreferences && parsed.timePreferences?.length
             ? parsed.timePreferences
@@ -182,9 +180,6 @@ export default wrapApiHandler(
       select: {
         id: true,
         status: true,
-        dietaryPreference: true,
-        allergies: true,
-        allergySeverity: true,
         timePreferences: true,
         teamPreferences: true,
         hasPets: true,
