@@ -142,11 +142,6 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             eventAvailability: true,
             arrivalDateTime: arrivalDate,
             departureDateTime: departureDate,
-            dietaryPreference: 'VEGETARIAN',
-            allergies: 'Aucune',
-            allergySeverity: 'LIGHT',
-            emergencyContactName: 'Jean Dupont',
-            emergencyContactPhone: '+33123456789',
             timePreferences: ['morning', 'evening'],
             teamPreferences: [mockTeam1.id, mockTeam2.id],
             hasPets: false,
@@ -163,7 +158,24 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
           'Je suis très motivé pour aider à organiser cette convention !'
         )
         expect(application.setupAvailability).toBe(true)
-        expect(application.dietaryPreference).toBe('VEGETARIAN')
+
+        // Régime, allergies et contact d'urgence vivent sur le PROFIL depuis la suppression des
+        // colonnes dupliquées : c'est là qu'on les pose et qu'on les relit.
+        await prismaTest.user.update({
+          where: { id: mockUser.id },
+          data: {
+            dietaryPreference: 'VEGETARIAN',
+            allergies: 'Aucune',
+            allergySeverity: 'LIGHT',
+            emergencyContactName: 'Jean Dupont',
+            emergencyContactPhone: '+33123456789',
+          },
+        })
+        const profilApresCandidature = await prismaTest.user.findUnique({
+          where: { id: mockUser.id },
+          select: { dietaryPreference: true },
+        })
+        expect(profilApresCandidature?.dietaryPreference).toBe('VEGETARIAN')
 
         // ========== ÉTAPE 3: Consultation des candidatures par le gestionnaire ==========
         const applications = await prismaTest.editionVolunteerApplication.findMany({
@@ -456,6 +468,12 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             nom: 'Allergy',
             prenom: 'Test',
             isEmailVerified: true,
+            // Allergies et contact d'urgence vivent sur le PROFIL depuis la suppression des
+            // colonnes dupliquées.
+            allergies: 'Allergie aux arachides',
+            allergySeverity: 'SEVERE',
+            emergencyContactName: 'Marie Dupont',
+            emergencyContactPhone: '+33987654321',
           },
         })
 
@@ -468,27 +486,22 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             eventAvailability: true,
             arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
             departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-            allergies: 'Allergie aux arachides',
-            allergySeverity: 'SEVERE',
-            emergencyContactName: 'Marie Dupont',
-            emergencyContactPhone: '+33987654321',
             status: 'PENDING',
             userSnapshotPhone: '+33123456789',
           },
         })
 
-        expect(applicationWithAllergy.allergies).toBe('Allergie aux arachides')
-        expect(applicationWithAllergy.allergySeverity).toBe('SEVERE')
-        expect(applicationWithAllergy.emergencyContactName).toBe('Marie Dupont')
-        expect(applicationWithAllergy.emergencyContactPhone).toBe('+33987654321')
+        expect(applicationWithAllergy.id).toBeDefined()
 
-        // Vérifier dans la DB
+        // La candidature ne porte plus ces informations : c'est le profil qu'on relit, et la
+        // jointure depuis la candidature doit y mener.
         const verifyApplication = await prismaTest.editionVolunteerApplication.findUnique({
           where: { id: applicationWithAllergy.id },
+          include: { user: { select: { allergies: true, allergySeverity: true } } },
         })
 
-        expect(verifyApplication?.allergies).toBe('Allergie aux arachides')
-        expect(verifyApplication?.allergySeverity).toBe('SEVERE')
+        expect(verifyApplication?.user.allergies).toBe('Allergie aux arachides')
+        expect(verifyApplication?.user.allergySeverity).toBe('SEVERE')
       })
 
       it("devrait accepter les allergies légères sans contact d'urgence", async () => {
@@ -504,6 +517,10 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             nom: 'Light',
             prenom: 'Allergy',
             isEmailVerified: true,
+            // Une allergie légère ne réclame pas de contact d'urgence : c'est ce que ce test
+            // vérifie, et ces informations vivent désormais sur le profil.
+            allergies: 'Allergie légère au pollen',
+            allergySeverity: 'LIGHT',
           },
         })
 
@@ -516,18 +533,25 @@ describe.skipIf(!process.env.TEST_WITH_DB)(
             eventAvailability: true,
             arrivalDateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
             departureDateTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-            allergies: 'Allergie légère au pollen',
-            allergySeverity: 'LIGHT',
             // Pas de contact d'urgence - et c'est OK pour LIGHT
             status: 'PENDING',
             userSnapshotPhone: '+33123456789',
           },
         })
 
-        expect(applicationWithLightAllergy.allergies).toBe('Allergie légère au pollen')
-        expect(applicationWithLightAllergy.allergySeverity).toBe('LIGHT')
-        expect(applicationWithLightAllergy.emergencyContactName).toBeNull()
-        expect(applicationWithLightAllergy.emergencyContactPhone).toBeNull()
+        const profilLeger = await prismaTest.user.findUnique({
+          where: { id: lightAllergyUser.id },
+          select: {
+            allergies: true,
+            allergySeverity: true,
+            emergencyContactName: true,
+            emergencyContactPhone: true,
+          },
+        })
+        expect(profilLeger?.allergies).toBe('Allergie légère au pollen')
+        expect(profilLeger?.allergySeverity).toBe('LIGHT')
+        expect(profilLeger?.emergencyContactName).toBeNull()
+        expect(profilLeger?.emergencyContactPhone).toBeNull()
       })
     })
   }
