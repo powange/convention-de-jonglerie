@@ -1,7 +1,10 @@
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
-import { showCompositionInclude, showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
+import {
+  showCompositionInclude,
+  showPerformancesInclude,
+} from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 /**
@@ -38,7 +41,7 @@ export default wrapApiHandler(
             },
           },
         },
-        ...showZoneMarkerInclude,
+        ...showPerformancesInclude,
       },
     })
 
