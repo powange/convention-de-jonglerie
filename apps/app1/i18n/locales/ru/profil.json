@@ -121,6 +121,26 @@
     "welcome": "Добро пожаловать!",
     "pronouns": "Местоимение",
     "pronouns_help": "Как к вам обращаться",
-    "pronouns_none": "Не указано"
+    "pronouns_none": "Не указано",
+    "health": {
+      "title": "Здоровье и экстренный контакт",
+      "description": "Необязательно. Эти сведения помогают организаторам планировать питание и связаться с кем-то при необходимости.",
+      "diet": "Режим питания",
+      "diet_options": {
+        "NONE": "Без особого режима",
+        "VEGETARIAN": "Вегетарианское",
+        "VEGAN": "Веганское"
+      },
+      "allergies": "Аллергии или непереносимость",
+      "allergies_help": "Опишите, на что у вас аллергия и чего следует избегать.",
+      "allergies_placeholder": "Арахис, глютен, лактоза…",
+      "allergy_severity": "Тяжесть",
+      "severity_unset": "Не указано",
+      "emergency_contact_name": "Экстренный контакт",
+      "emergency_contact_help": "Предупредите этого человека, что указываете его здесь: это его данные, а не ваши.",
+      "emergency_contact_name_placeholder": "Имя и фамилия",
+      "emergency_contact_phone": "Телефон экстренного контакта",
+      "emergency_contact_phone_placeholder": "Его номер"
+    }
   }
 }

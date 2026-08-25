@@ -48,6 +48,13 @@ export default wrapApiHandler(
               password: commonPasswordHash,
               phone: null,
               profilePicture: null,
+              // Informations personnelles portées par le profil depuis leur ajout. Les omettre
+              // aurait laissé des allergies et un contact d'urgence en clair sur un compte
+              // par ailleurs anonymisé.
+              allergies: null,
+              allergySeverity: null,
+              emergencyContactName: null,
+              emergencyContactPhone: null,
             },
           })
         }

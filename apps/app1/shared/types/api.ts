@@ -47,6 +47,12 @@ export interface SessionMeUser {
   isVolunteer: boolean
   isArtist: boolean
   isOrganizer: boolean
+  /** Informations personnelles facultatives renseignées depuis le profil. */
+  dietaryPreference: 'NONE' | 'VEGETARIAN' | 'VEGAN'
+  allergies: string | null
+  allergySeverity: 'LIGHT' | 'MODERATE' | 'SEVERE' | 'CRITICAL' | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
   createdAt: Date
   updatedAt: Date
 }

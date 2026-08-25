@@ -121,6 +121,26 @@
     "welcome": "Willkommen!",
     "pronouns": "Pronomen",
     "pronouns_help": "Wie möchtest du angesprochen werden",
-    "pronouns_none": "Keine Angabe"
+    "pronouns_none": "Keine Angabe",
+    "health": {
+      "title": "Gesundheit und Notfallkontakt",
+      "description": "Optional. Diese Angaben helfen den Organisatoren bei der Essensplanung und um im Bedarfsfall jemanden zu erreichen.",
+      "diet": "Ernährungsweise",
+      "diet_options": {
+        "NONE": "Keine besondere Ernährung",
+        "VEGETARIAN": "Vegetarisch",
+        "VEGAN": "Vegan"
+      },
+      "allergies": "Allergien oder Unverträglichkeiten",
+      "allergies_help": "Beschreibe, wogegen du allergisch bist und was vermieden werden muss.",
+      "allergies_placeholder": "Erdnüsse, Gluten, Laktose…",
+      "allergy_severity": "Schweregrad",
+      "severity_unset": "Nicht angegeben",
+      "emergency_contact_name": "Notfallkontakt",
+      "emergency_contact_help": "Sag dieser Person Bescheid, dass du sie hier angibst: Es sind ihre Daten, nicht deine.",
+      "emergency_contact_name_placeholder": "Vor- und Nachname",
+      "emergency_contact_phone": "Telefon des Notfallkontakts",
+      "emergency_contact_phone_placeholder": "Ihre Nummer"
+    }
   }
 }

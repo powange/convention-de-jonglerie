@@ -39,6 +39,11 @@ export default wrapApiHandler(
       isVolunteer,
       isArtist,
       isOrganizer,
+      dietaryPreference,
+      allergies,
+      allergySeverity,
+      emergencyContactName,
+      emergencyContactPhone,
     } = validatedData
 
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
@@ -164,6 +169,17 @@ export default wrapApiHandler(
         ...(isVolunteer !== undefined && { isVolunteer }),
         ...(isArtist !== undefined && { isArtist }),
         ...(isOrganizer !== undefined && { isOrganizer }),
+        // Informations personnelles facultatives. Chacune n'est écrite que si elle figure dans
+        // la requête : sans ce garde, un écran qui ne les envoie pas les effacerait.
+        ...(dietaryPreference !== undefined && { dietaryPreference }),
+        ...(allergies !== undefined && { allergies: sanitizeString(allergies) || null }),
+        ...(allergySeverity !== undefined && { allergySeverity }),
+        ...(emergencyContactName !== undefined && {
+          emergencyContactName: sanitizeString(emergencyContactName) || null,
+        }),
+        ...(emergencyContactPhone !== undefined && {
+          emergencyContactPhone: sanitizeString(emergencyContactPhone) || null,
+        }),
         // Recalculer emailHash si l'email a changé
         ...(email !== user.email && { emailHash: getEmailHash(email) }),
       },
@@ -181,6 +197,11 @@ export default wrapApiHandler(
         isVolunteer: true,
         isArtist: true,
         isOrganizer: true,
+        dietaryPreference: true,
+        allergies: true,
+        allergySeverity: true,
+        emergencyContactName: true,
+        emergencyContactPhone: true,
         createdAt: true,
         updatedAt: true,
       },

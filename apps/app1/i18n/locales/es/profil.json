@@ -121,6 +121,26 @@
     "welcome": "¡Bienvenido!",
     "pronouns": "Pronombre",
     "pronouns_help": "Cómo prefieres que se dirijan a ti",
-    "pronouns_none": "Sin especificar"
+    "pronouns_none": "Sin especificar",
+    "health": {
+      "title": "Salud y contacto de emergencia",
+      "description": "Opcional. Esta información ayuda a los organizadores a preparar las comidas y a localizar a alguien si hace falta.",
+      "diet": "Régimen alimentario",
+      "diet_options": {
+        "NONE": "Sin régimen particular",
+        "VEGETARIAN": "Vegetariano",
+        "VEGAN": "Vegano"
+      },
+      "allergies": "Alergias o intolerancias",
+      "allergies_help": "Describe a qué eres alérgico y qué debe evitarse.",
+      "allergies_placeholder": "Cacahuetes, gluten, lactosa…",
+      "allergy_severity": "Gravedad",
+      "severity_unset": "Sin especificar",
+      "emergency_contact_name": "Contacto de emergencia",
+      "emergency_contact_help": "Avisa a esa persona de que la indicas aquí: son sus datos, no los tuyos.",
+      "emergency_contact_name_placeholder": "Nombre y apellidos",
+      "emergency_contact_phone": "Teléfono del contacto de emergencia",
+      "emergency_contact_phone_placeholder": "Su número"
+    }
   }
 }

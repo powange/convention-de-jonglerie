@@ -121,6 +121,26 @@
     "welcome": "Vítejte!",
     "pronouns": "Zájmeno",
     "pronouns_help": "Jak vás máme oslovovat",
-    "pronouns_none": "Neuvedeno"
+    "pronouns_none": "Neuvedeno",
+    "health": {
+      "title": "Zdraví a nouzový kontakt",
+      "description": "Nepovinné. Tyto údaje pomáhají organizátorům připravit jídlo a v případě potřeby někoho zastihnout.",
+      "diet": "Stravovací režim",
+      "diet_options": {
+        "NONE": "Bez zvláštního režimu",
+        "VEGETARIAN": "Vegetariánské",
+        "VEGAN": "Veganské"
+      },
+      "allergies": "Alergie nebo intolerance",
+      "allergies_help": "Popiš, na co jsi alergický a čemu je třeba se vyhnout.",
+      "allergies_placeholder": "Arašídy, lepek, laktóza…",
+      "allergy_severity": "Závažnost",
+      "severity_unset": "Neuvedeno",
+      "emergency_contact_name": "Nouzový kontakt",
+      "emergency_contact_help": "Dej té osobě vědět, že ji zde uvádíš: jsou to její údaje, ne tvoje.",
+      "emergency_contact_name_placeholder": "Jméno a příjmení",
+      "emergency_contact_phone": "Telefon nouzového kontaktu",
+      "emergency_contact_phone_placeholder": "Její číslo"
+    }
   }
 }
