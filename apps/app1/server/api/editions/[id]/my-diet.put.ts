@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const updateDietSchema = z.object({
@@ -41,6 +42,22 @@ export default wrapApiHandler(
         status: 404,
         message: "Vous n'êtes pas artiste pour cette édition",
       })
+    }
+
+    // La déclaration remonte au profil, qui fait foi. C'est l'intéressé qui remplit : ses
+    // corrections doivent y être portées, pas seulement combler des vides — sinon le profil
+    // garderait l'ancienne valeur et, faisant foi à la lecture, annulerait la modification.
+    const profil = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        dietaryPreference: true,
+        allergies: true,
+        allergySeverity: true,
+      },
+    })
+    const majProfil = misesAJourDuProfil(profil as never, data as never, { estLInteresse: true })
+    if (Object.keys(majProfil).length) {
+      await prisma.user.update({ where: { id: user.id }, data: majProfil as never })
     }
 
     // Mettre à jour les préférences alimentaires

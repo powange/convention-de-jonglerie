@@ -165,7 +165,8 @@ export default wrapApiHandler(
 
       // Mettre à jour le profil utilisateur si le téléphone a changé
       if (profil) {
-        const userUpdateData = getUserUpdateData(profil, parsed as never)
+        // `estLaSienne` décide : le bénévole corrige son profil, l'organisateur le complète.
+        const userUpdateData = getUserUpdateData(profil, parsed as never, estLaSienne)
         if (Object.keys(userUpdateData).length) {
           await prisma.user.update({
             where: { id: application.user.id },

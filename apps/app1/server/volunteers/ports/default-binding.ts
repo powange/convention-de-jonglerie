@@ -12,6 +12,7 @@ import type { NotificationType, VolunteerMealType } from '@prisma/client'
 
 import * as mealsService from '#server/meals/meals-service'
 import { sendEmail } from '#server/utils/emailService'
+import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import {
   ensureVolunteerConversations,
   removeVolunteerFromTeamConversations,
@@ -213,7 +214,15 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
                 dietaryPreference: true,
                 allergies: true,
                 allergySeverity: true,
-                user: { select: { nom: true, prenom: true, email: true, phone: true } },
+                user: {
+                  select: {
+                    ...infosPersonnellesSelect,
+                    nom: true,
+                    prenom: true,
+                    email: true,
+                    phone: true,
+                  },
+                },
               },
             },
           },
@@ -225,9 +234,9 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
             prenom: sel.artist.user.prenom,
             email: sel.artist.user.email,
             phone: sel.artist.user.phone,
-            dietaryPreference: sel.artist.dietaryPreference,
-            allergies: sel.artist.allergies,
-            allergySeverity: sel.artist.allergySeverity,
+            // Le profil fait foi ; la fiche artiste ne sert que de repli tant que ses
+            // colonnes existent (cf. `infos-personnelles`).
+            ...infosAlimentaires(sel.artist.user as never, sel.artist as never),
             afterShow: sel.afterShow,
           })
         }

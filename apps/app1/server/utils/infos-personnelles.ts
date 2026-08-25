@@ -88,3 +88,66 @@ export function complementsPourLeProfil(
 
   return patch
 }
+
+/**
+ * Ce qu'il faut écrire sur le profil quand quelqu'un soumet un formulaire qui porte ces champs.
+ *
+ * Deux régimes bien distincts, selon qui remplit :
+ *
+ * — **L'intéressé lui-même.** Son formulaire a été pré-rempli depuis son profil ; ce qu'il
+ *   renvoie EST sa déclaration, y compris quand il corrige ou efface. Se contenter de combler
+ *   les vides annulerait silencieusement toute correction : le profil garderait l'ancienne
+ *   valeur, et comme c'est lui qui fait foi à la lecture, la modification n'apparaîtrait nulle
+ *   part. Défaut constaté après coup, d'où ce traitement séparé.
+ * — **Quelqu'un d'autre** — un organisateur qui corrige la candidature d'un bénévole. Il
+ *   complète ce qui manque, il ne réécrit pas le profil d'autrui.
+ *
+ * Un champ absent de la saisie (`undefined`) n'est jamais touché : toutes les éditions ne
+ * demandent pas les mêmes informations, et ce qui n'est pas demandé ne doit rien effacer.
+ */
+export function misesAJourDuProfil(
+  profil: Source,
+  saisie: Source,
+  options: { estLInteresse: boolean }
+): Partial<InfosPersonnelles> {
+  if (!options.estLInteresse) return complementsPourLeProfil(profil, saisie)
+
+  const patch: Partial<InfosPersonnelles> = {}
+
+  const regimeSaisi = saisie?.dietaryPreference
+  if (regimeSaisi !== undefined && regimeSaisi !== profil?.dietaryPreference) {
+    patch.dietaryPreference = regimeSaisi
+  }
+
+  for (const champ of [
+    'allergies',
+    'allergySeverity',
+    'emergencyContactName',
+    'emergencyContactPhone',
+  ] as const) {
+    const valeur = saisie?.[champ]
+    if (valeur === undefined) continue
+    const normalisee = (valeur === '' ? null : valeur) as never
+    if (normalisee !== (profil?.[champ] ?? null)) patch[champ] = normalisee
+  }
+
+  return patch
+}
+
+/** Les seuls champs alimentaires, pour les porteurs qui n'ont pas de contact d'urgence. */
+export type InfosAlimentaires = Pick<
+  InfosPersonnelles,
+  'dietaryPreference' | 'allergies' | 'allergySeverity'
+>
+
+/**
+ * Variante restreinte au régime et aux allergies.
+ *
+ * Artistes et organisateurs ne déclarent pas de contact d'urgence : leur rendre les cinq champs
+ * ferait échouer la compilation sur les propriétés en trop, et laisserait croire à une donnée
+ * qui n'existe pas de leur côté.
+ */
+export function infosAlimentaires(profil: Source, repli?: Source): InfosAlimentaires {
+  const { dietaryPreference, allergies, allergySeverity } = infosPersonnelles(profil, repli)
+  return { dietaryPreference, allergies, allergySeverity }
+}

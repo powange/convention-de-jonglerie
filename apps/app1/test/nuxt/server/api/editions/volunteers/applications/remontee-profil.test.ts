@@ -92,35 +92,45 @@ describe('Candidature bénévole — remontée vers le profil', () => {
     })
   })
 
-  it('n’écrase jamais ce que la personne a mis dans son profil', async () => {
+  it('porte au profil la correction de l’intéressé', async () => {
+    // Le formulaire a été pré-rempli depuis le profil : ce qui revient EST sa déclaration.
+    // Se contenter de combler les vides annulait silencieusement toute correction — le profil
+    // gardait l'ancienne valeur et, faisant foi à la lecture, la modification n'apparaissait
+    // nulle part. Défaut livré puis corrigé.
     await postuler(
       {
         ...PROFIL_VIDE,
         dietaryPreference: 'VEGETARIAN',
         allergies: 'Gluten',
         allergySeverity: 'LIGHT',
-        emergencyContactName: 'Dominique',
-        emergencyContactPhone: '+33611111111',
       },
-      {
-        dietaryPreference: 'VEGAN',
-        allergies: 'Arachides',
-        allergySeverity: 'CRITICAL',
-        emergencyContactName: 'Camille',
-        emergencyContactPhone: '+33622222222',
-      }
+      // Gravité modérée : au-delà, le contact d'urgence devient obligatoire et la candidature
+      // serait rejetée pour une raison étrangère à ce qu'on éprouve ici.
+      { dietaryPreference: 'VEGAN', allergies: 'Arachides', allergySeverity: 'MODERATE' }
     )
 
-    const ecriture = ecritureProfil()
-    for (const champ of [
-      'dietaryPreference',
-      'allergies',
-      'allergySeverity',
-      'emergencyContactName',
-      'emergencyContactPhone',
-    ]) {
-      expect(ecriture ?? {}, `${champ} ne devrait pas être écrasé`).not.toHaveProperty(champ)
-    }
+    expect(ecritureProfil()).toMatchObject({
+      dietaryPreference: 'VEGAN',
+      allergies: 'Arachides',
+      allergySeverity: 'MODERATE',
+    })
+  })
+
+  it('n’écrit rien quand la saisie répète ce que le profil sait déjà', async () => {
+    await postuler(
+      {
+        ...PROFIL_VIDE,
+        dietaryPreference: 'VEGAN',
+        allergies: 'Arachides',
+        allergySeverity: 'LIGHT',
+      },
+      // La gravité accompagne l'allergie : le point d'API l'exige dès qu'une allergie est
+      // décrite, indépendamment de la remontée qu'on éprouve.
+      { dietaryPreference: 'VEGAN', allergies: 'Arachides', allergySeverity: 'LIGHT' }
+    )
+    const ecriture = ecritureProfil() ?? {}
+    expect(ecriture).not.toHaveProperty('dietaryPreference')
+    expect(ecriture).not.toHaveProperty('allergies')
   })
 
   it('ne touche pas au profil quand la candidature n’apporte rien', async () => {

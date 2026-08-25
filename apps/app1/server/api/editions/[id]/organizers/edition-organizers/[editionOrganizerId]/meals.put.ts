@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
+import {
+  infosAlimentaires,
+  infosPersonnellesSelect,
+  misesAJourDuProfil,
+} from '#server/utils/infos-personnelles'
 import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
 
 const updateOrganizerMealsSchema = z.object({
@@ -42,7 +47,13 @@ export default wrapApiHandler(
 
     const editionOrganizer = await prisma.editionOrganizer.findFirst({
       where: { id: editionOrganizerId, editionId },
-      select: { id: true },
+      // L'identité derrière la ligne est nécessaire : ce point d'API sert aussi bien à un
+      // organisateur pour lui-même que pour quelqu'un d'autre, et la remontée vers le profil
+      // n'obéit pas à la même règle dans les deux cas.
+      select: {
+        id: true,
+        organizer: { select: { userId: true, user: { select: infosPersonnellesSelect } } },
+      },
     })
 
     if (!editionOrganizer) {
@@ -93,6 +104,21 @@ export default wrapApiHandler(
       body.allergySeverity !== undefined
 
     if (hasDietaryUpdate) {
+      // Remontée vers le profil, qui fait foi. L'intéressé y porte ses corrections ; quelqu'un
+      // d'autre ne fait que combler les vides.
+      const estLInteresse = editionOrganizer.organizer?.userId === user.id
+      const majProfil = misesAJourDuProfil(
+        editionOrganizer.organizer?.user as never,
+        body as never,
+        { estLInteresse }
+      )
+      if (Object.keys(majProfil).length && editionOrganizer.organizer?.userId) {
+        await prisma.user.update({
+          where: { id: editionOrganizer.organizer.userId },
+          data: majProfil as never,
+        })
+      }
+
       await prisma.editionOrganizer.update({
         where: { id: editionOrganizerId },
         data: {
@@ -111,7 +137,12 @@ export default wrapApiHandler(
       prisma.organizerMealSelection.findMany({ where: { editionOrganizerId } }),
       prisma.editionOrganizer.findUnique({
         where: { id: editionOrganizerId },
-        select: { dietaryPreference: true, allergies: true, allergySeverity: true },
+        select: {
+          dietaryPreference: true,
+          allergies: true,
+          allergySeverity: true,
+          organizer: { select: { user: { select: infosPersonnellesSelect } } },
+        },
       }),
     ])
     const selectionsByMealId = new Map(selections.map((s) => [s.mealId, s]))
@@ -128,9 +159,9 @@ export default wrapApiHandler(
           consumedAt: selection?.consumedAt ?? null,
         }
       }),
-      dietaryPreference: organizer?.dietaryPreference ?? 'NONE',
-      allergies: organizer?.allergies ?? null,
-      allergySeverity: organizer?.allergySeverity ?? null,
+      // Le profil fait foi dans la réponse aussi : sans quoi l'écran afficherait la valeur de
+      // la ligne juste après avoir enregistré, et divergerait au rechargement suivant.
+      ...infosAlimentaires(organizer?.organizer?.user as never, organizer as never),
     })
   },
   { operationName: 'UpdateOrganizerMeals' }

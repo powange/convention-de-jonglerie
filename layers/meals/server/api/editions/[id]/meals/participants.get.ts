@@ -1,6 +1,7 @@
 import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { canManageMealsById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
 
@@ -82,7 +83,14 @@ export default wrapApiHandler(
         organizer: {
           select: {
             user: {
-              select: { id: true, nom: true, prenom: true, email: true, phone: true },
+              select: {
+                id: true,
+                nom: true,
+                prenom: true,
+                email: true,
+                phone: true,
+                ...infosPersonnellesSelect,
+              },
             },
           },
         },
@@ -184,9 +192,8 @@ export default wrapApiHandler(
           mealDate: meal.date,
           mealType: meal.mealType,
           mealPhases: meal.phases,
-          dietaryPreference: eo.dietaryPreference,
-          allergies: eo.allergies,
-          allergySeverity: eo.allergySeverity,
+          // Le profil fait foi ; la ligne d'organisateur ne sert que de repli.
+          ...infosAlimentaires(eo.organizer.user as never, eo as never),
           afterShow: false,
         })
       })
