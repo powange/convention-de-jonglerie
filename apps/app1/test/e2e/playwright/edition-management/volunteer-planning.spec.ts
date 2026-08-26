@@ -42,8 +42,10 @@ test.describe.serial('Bénévoles — planning et affectations', () => {
       },
     })
     expect(response.ok(), `POST time-slots a échoué: ${await response.text()}`).toBe(true)
+    // Le point d'API rend une liste : un créneau d'ordinaire, autant que de journées quand la
+    // création est récurrente.
     const body = await response.json()
-    slotId = (body?.data ?? body)?.id
+    slotId = (body?.data?.timeSlots ?? [])[0]?.id
     expect(slotId).toBeTruthy()
 
     const list = await page.request.get(`${BASE}/api/editions/${editionId}/volunteer-time-slots`)
