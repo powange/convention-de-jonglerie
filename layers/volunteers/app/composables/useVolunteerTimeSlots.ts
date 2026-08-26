@@ -37,6 +37,8 @@ export interface CreateTimeSlotData {
   startDateTime: string // ISO string ou format datetime-local
   endDateTime: string // ISO string ou format datetime-local
   maxVolunteers: number
+  /** Répète le créneau sur chaque journée de la période, aux mêmes heures. */
+  recurrence?: 'AUCUNE' | 'EVENEMENT' | 'AVEC_MONTAGE'
 }
 
 export type UpdateTimeSlotData = Partial<CreateTimeSlotData>
@@ -90,9 +92,11 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
         method: 'POST',
         body: processedData,
       })
-      const newSlot = response.data
-      timeSlots.value.push(newSlot)
-      return newSlot
+      // Le point d'API rend une liste : un seul créneau d'ordinaire, autant que de journées
+      // quand la création est récurrente.
+      const nouveaux: VolunteerTimeSlotAPI[] = response.data?.timeSlots ?? []
+      timeSlots.value.push(...nouveaux)
+      return nouveaux[0] as VolunteerTimeSlotAPI
     } catch (err: any) {
       error.value = err.data?.message || 'Erreur lors de la création du créneau'
       throw err
@@ -170,11 +174,18 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
     }
   }
 
-  // Auto-fetch au montage et quand editionId change
+  /**
+   * Auto-fetch au montage et quand editionId change.
+   *
+   * Le rejet est absorbé ici : personne n'attend cette promesse, et une erreur qui s'en échappe
+   * interrompt l'hydratation de Vue — la page se fige alors entièrement, menu compris, sur un
+   * simple 401. L'échec reste consigné dans `error`, et l'appelant qui attend explicitement
+   * `fetchTimeSlots` garde la main pour prévenir l'utilisateur.
+   */
   watch(
     () => toValue(editionId),
     (id) => {
-      if (id) fetchTimeSlots()
+      if (id) void fetchTimeSlots().catch(() => {})
     },
     { immediate: true }
   )
