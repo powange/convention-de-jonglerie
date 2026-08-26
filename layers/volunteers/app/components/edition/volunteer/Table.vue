@@ -1200,6 +1200,36 @@ const getColumnLabel = (columnId: string): string => {
 }
 
 // Définition des colonnes (reactive)
+/**
+ * Un texte saisi par le bénévole, révélé au clic.
+ *
+ * `UTooltip` ne s'ouvrait qu'au survol. Sur mobile, où le survol n'existe pas, le contenu était
+ * tout simplement inatteignable : le petit « i » ne réagissait à rien, et l'information restait
+ * invisible pour qui consulte les candidatures depuis un téléphone — c'est-à-dire souvent, sur
+ * un site de convention. `UPopover` s'ouvre au clic, donc aussi au toucher, et au clavier.
+ *
+ * Le déclencheur est un vrai `<button>` : il devient atteignable au clavier et annonce qu'on
+ * peut agir dessus, là où `cursor-help` promettait une simple aide au survol.
+ */
+const celluleTexteDetaille = (texte: string, apercu: unknown[]) =>
+  h(
+    resolveComponent('UPopover'),
+    {},
+    {
+      default: () =>
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'flex items-center gap-1 text-left cursor-pointer',
+            'aria-label': texte,
+          },
+          apercu
+        ),
+      content: () => h('div', { class: 'max-w-xs whitespace-pre-wrap p-3 text-sm' }, texte),
+    }
+  )
+
 const columns = computed((): TableColumn<any>[] => [
   // ID en tout premier
   {
@@ -1228,20 +1258,12 @@ const columns = computed((): TableColumn<any>[] => [
             },
             () => volunteerStatusLabel(status)
           ),
-          h(
-            resolveComponent('UTooltip'),
-            {
-              text: acceptanceNote,
-              openDelay: 200,
-            },
-            {
-              default: () =>
-                h(resolveComponent('UIcon'), {
-                  name: 'i-heroicons-information-circle',
-                  class: 'text-blue-500 cursor-help text-sm',
-                }),
-            }
-          ),
+          celluleTexteDetaille(acceptanceNote, [
+            h(resolveComponent('UIcon'), {
+              name: 'i-heroicons-information-circle',
+              class: 'text-blue-500 text-sm',
+            }),
+          ]),
         ])
       }
 
@@ -1583,21 +1605,9 @@ const columns = computed((): TableColumn<any>[] => [
 
             const displayText = [name, phone].filter(Boolean).join(' - ')
 
-            return h(
-              resolveComponent('UTooltip'),
-              { text: displayText, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'max-w-xs truncate cursor-help text-xs',
-                      title: displayText,
-                    },
-                    displayText
-                  ),
-              }
-            )
+            return celluleTexteDetaille(displayText, [
+              h('span', { class: 'max-w-xs truncate text-xs' }, displayText),
+            ])
           },
         } as TableColumn<any>,
       ]
@@ -1612,27 +1622,14 @@ const columns = computed((): TableColumn<any>[] => [
             if (!row.original.hasPets) return h('span', '—')
             const petsDetails = row.original.petsDetails
             if (!petsDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
-            return h(
-              resolveComponent('UTooltip'),
-              { text: petsDetails, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'flex items-center gap-1 cursor-help',
-                    },
-                    [
-                      h('span', { class: 'text-xs' }, t('common.yes')),
-                      h(resolveComponent('UIcon'), {
-                        name: 'i-heroicons-information-circle',
-                        class: 'text-gray-400',
-                        size: '14',
-                      }),
-                    ]
-                  ),
-              }
-            )
+            return celluleTexteDetaille(petsDetails, [
+              h('span', { class: 'text-xs' }, t('common.yes')),
+              h(resolveComponent('UIcon'), {
+                name: 'i-heroicons-information-circle',
+                class: 'text-gray-400',
+                size: '14',
+              }),
+            ])
           },
         } as TableColumn<any>,
       ]
@@ -1647,27 +1644,14 @@ const columns = computed((): TableColumn<any>[] => [
             if (!row.original.hasMinors) return h('span', '—')
             const minorsDetails = row.original.minorsDetails
             if (!minorsDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
-            return h(
-              resolveComponent('UTooltip'),
-              { text: minorsDetails, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'flex items-center gap-1 cursor-help',
-                    },
-                    [
-                      h('span', { class: 'text-xs' }, t('common.yes')),
-                      h(resolveComponent('UIcon'), {
-                        name: 'i-heroicons-information-circle',
-                        class: 'text-gray-400',
-                        size: '14',
-                      }),
-                    ]
-                  ),
-              }
-            )
+            return celluleTexteDetaille(minorsDetails, [
+              h('span', { class: 'text-xs' }, t('common.yes')),
+              h(resolveComponent('UIcon'), {
+                name: 'i-heroicons-information-circle',
+                class: 'text-gray-400',
+                size: '14',
+              }),
+            ])
           },
         } as TableColumn<any>,
       ]
@@ -1682,27 +1666,14 @@ const columns = computed((): TableColumn<any>[] => [
             if (!row.original.hasVehicle) return h('span', '—')
             const vehicleDetails = row.original.vehicleDetails
             if (!vehicleDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
-            return h(
-              resolveComponent('UTooltip'),
-              { text: vehicleDetails, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'flex items-center gap-1 cursor-help',
-                    },
-                    [
-                      h('span', { class: 'text-xs' }, t('common.yes')),
-                      h(resolveComponent('UIcon'), {
-                        name: 'i-heroicons-information-circle',
-                        class: 'text-gray-400',
-                        size: '14',
-                      }),
-                    ]
-                  ),
-              }
-            )
+            return celluleTexteDetaille(vehicleDetails, [
+              h('span', { class: 'text-xs' }, t('common.yes')),
+              h(resolveComponent('UIcon'), {
+                name: 'i-heroicons-information-circle',
+                class: 'text-gray-400',
+                size: '14',
+              }),
+            ])
           },
         } as TableColumn<any>,
       ]
@@ -1730,27 +1701,14 @@ const columns = computed((): TableColumn<any>[] => [
           cell: ({ row }: any) => {
             const avoidList = row.original.avoidList
             if (!avoidList) return h('span', '—')
-            return h(
-              resolveComponent('UTooltip'),
-              { text: avoidList, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'flex items-center gap-1 cursor-help',
-                    },
-                    [
-                      h('span', { class: 'text-xs max-w-[100px] truncate' }, avoidList),
-                      h(resolveComponent('UIcon'), {
-                        name: 'i-heroicons-information-circle',
-                        class: 'text-gray-400',
-                        size: '14',
-                      }),
-                    ]
-                  ),
-              }
-            )
+            return celluleTexteDetaille(avoidList, [
+              h('span', { class: 'text-xs max-w-[100px] truncate' }, avoidList),
+              h(resolveComponent('UIcon'), {
+                name: 'i-heroicons-information-circle',
+                class: 'text-gray-400',
+                size: '14',
+              }),
+            ])
           },
         } as TableColumn<any>,
       ]
@@ -1764,27 +1722,14 @@ const columns = computed((): TableColumn<any>[] => [
           cell: ({ row }: any) => {
             const skills = row.original.skills
             if (!skills) return h('span', '—')
-            return h(
-              resolveComponent('UTooltip'),
-              { text: skills, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'flex items-center gap-1 cursor-help',
-                    },
-                    [
-                      h('span', { class: 'text-xs max-w-[150px] truncate' }, skills),
-                      h(resolveComponent('UIcon'), {
-                        name: 'i-heroicons-information-circle',
-                        class: 'text-gray-400',
-                        size: '14',
-                      }),
-                    ]
-                  ),
-              }
-            )
+            return celluleTexteDetaille(skills, [
+              h('span', { class: 'text-xs max-w-[150px] truncate' }, skills),
+              h(resolveComponent('UIcon'), {
+                name: 'i-heroicons-information-circle',
+                class: 'text-gray-400',
+                size: '14',
+              }),
+            ])
           },
         } as TableColumn<any>,
       ]
@@ -1895,27 +1840,14 @@ const columns = computed((): TableColumn<any>[] => [
             if (!row.original.hasExperience) return h('span', '—')
             const experienceDetails = row.original.experienceDetails
             if (!experienceDetails) return h('span', { class: 'text-xs' }, t('common.yes'))
-            return h(
-              resolveComponent('UTooltip'),
-              { text: experienceDetails, openDelay: 200 },
-              {
-                default: () =>
-                  h(
-                    'div',
-                    {
-                      class: 'flex items-center gap-1 cursor-help',
-                    },
-                    [
-                      h('span', { class: 'text-xs' }, t('common.yes')),
-                      h(resolveComponent('UIcon'), {
-                        name: 'i-heroicons-information-circle',
-                        class: 'text-gray-400',
-                        size: '14',
-                      }),
-                    ]
-                  ),
-              }
-            )
+            return celluleTexteDetaille(experienceDetails, [
+              h('span', { class: 'text-xs' }, t('common.yes')),
+              h(resolveComponent('UIcon'), {
+                name: 'i-heroicons-information-circle',
+                class: 'text-gray-400',
+                size: '14',
+              }),
+            ])
           },
         } as TableColumn<any>,
       ]
@@ -1992,25 +1924,13 @@ const columns = computed((): TableColumn<any>[] => [
           date: addedAtFormatted,
         })
 
-        return h(
-          resolveComponent('UTooltip'),
-          {
-            text: tooltipText,
-            arrow: true,
-          },
-          {
-            default: () =>
-              h(
-                resolveComponent('UBadge'),
-                {
-                  color: 'primary',
-                  variant: 'soft',
-                  class: 'text-xs cursor-help',
-                },
-                () => t('volunteers.source_manual')
-              ),
-          }
-        )
+        return celluleTexteDetaille(tooltipText, [
+          h(
+            resolveComponent('UBadge'),
+            { color: 'primary', variant: 'soft', class: 'text-xs' },
+            () => t('volunteers.source_manual')
+          ),
+        ])
       }
 
       return h('span', '—')
