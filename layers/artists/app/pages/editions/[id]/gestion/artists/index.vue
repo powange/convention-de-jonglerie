@@ -586,7 +586,9 @@
       :title="$t('artists.delete_artist')"
       :message="$t('artists.delete_confirm')"
       confirm-color="error"
+      :loading="deletingArtist"
       @confirm="deleteArtist"
+      @cancel="showDeleteConfirm = false"
     />
   </div>
 </template>
@@ -1076,17 +1078,21 @@ const confirmDeleteArtist = (artist: any) => {
 }
 
 // Supprimer l'artiste
-const { execute: deleteArtist, loading: _deletingArtist } = useApiAction(
+// Même remarque que pour la suppression d'un spectacle : `UiConfirmModal` n'émet que
+// `confirm` et `cancel`, la refermer revient à l'appelant.
+const { execute: deleteArtist, loading: deletingArtist } = useApiAction(
   () => `/api/editions/${editionId.value}/artists/${artistToDelete.value?.id}`,
   {
     method: 'DELETE',
     successMessage: { title: t('artists.artist_deleted') },
     errorMessages: { default: t('artists.error_delete') },
     onSuccess: () => {
+      showDeleteConfirm.value = false
       artistToDelete.value = null
       fetchArtists()
     },
     onError: () => {
+      showDeleteConfirm.value = false
       artistToDelete.value = null
     },
   }

@@ -7,6 +7,7 @@ const CABARET_TITLE = `E2E Cabaret liste ${STAMP}`
 const ACT_1_TITLE = `E2E Numéro un ${STAMP}`
 const ACT_2_TITLE = `E2E Numéro deux ${STAMP}`
 const STANDARD_TITLE = `E2E Spectacle simple ${STAMP}`
+const JETABLE_TITLE = `E2E Spectacle jetable ${STAMP}`
 
 /**
  * Tableau des spectacles de la gestion : les numéros d'un cabaret y sont des sous-lignes.
@@ -111,6 +112,52 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
 
     await toggle.click()
     await expect(rowWith(page, ACT_1_TITLE).first()).toBeVisible()
+  })
+
+  test('la modale de suppression se referme après confirmation', async ({ page, goto }) => {
+    // `UiConfirmModal` n'émet que `confirm` et `cancel` : la refermer revient à l'appelant, qui
+    // l'oubliait. La modale restait ouverte, et reconfirmer envoyait un DELETE sur un
+    // identifiant déjà vidé — `/shows/undefined` dans les journaux de production. Les autres
+    // specs suppriment par l'API et ne pouvaient rien en voir.
+    await openShowsPage(page, goto)
+
+    const jetable = await createShow(page, editionId, {
+      title: JETABLE_TITLE,
+      startDateTime: new Date().toISOString(),
+    })
+
+    await goto(`/editions/${editionId}/gestion/artists/shows`, { waitUntil: 'hydration' })
+    const ligne = rowWith(page, JETABLE_TITLE).first()
+    await expect(ligne).toBeVisible({ timeout: 15000 })
+
+    // Le dernier bouton de la ligne — la corbeille — ouvre directement la confirmation :
+    // cette page n'a pas de menu d'actions.
+    await ligne.getByRole('button').last().click()
+
+    const confirmer = page.getByRole('button', { name: /^Confirmer$/i })
+    await expect(confirmer).toBeVisible()
+    await confirmer.click()
+
+    // Ce que l'utilisateur constatait : la modale restait à l'écran malgré la suppression
+    await expect(confirmer).toBeHidden({ timeout: 15000 })
+    await expect(rowWith(page, JETABLE_TITLE)).toHaveCount(0)
+
+    expect(jetable.id).toBeTruthy()
+  })
+
+  test('la modale de suppression se referme aussi à l’annulation', async ({ page, goto }) => {
+    await openShowsPage(page, goto)
+
+    const ligne = rowWith(page, STANDARD_TITLE).first()
+    await ligne.getByRole('button').last().click()
+
+    const annuler = page.getByRole('button', { name: /^Annuler$/i })
+    await expect(annuler).toBeVisible()
+    await annuler.click()
+
+    await expect(annuler).toBeHidden({ timeout: 10000 })
+    // Annuler ne supprime rien : le spectacle est toujours là
+    await expect(rowWith(page, STANDARD_TITLE).first()).toBeVisible()
   })
 
   test('nettoyage : supprimer les spectacles et désactiver les artistes', async ({ page }) => {

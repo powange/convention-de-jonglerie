@@ -318,7 +318,9 @@
       :title="$t('gestion.shows.delete_show')"
       :message="$t('gestion.shows.delete_confirm')"
       confirm-color="error"
+      :loading="deletingShow"
       @confirm="deleteShow"
+      @cancel="showDeleteConfirm = false"
     />
   </div>
 </template>
@@ -706,17 +708,28 @@ const confirmDeleteShow = (show: any) => {
 }
 
 // Supprimer le spectacle
-const { execute: deleteShow, loading: _deletingShow } = useApiAction(
+/**
+ * `UiConfirmModal` n'émet que `confirm` et `cancel` : la refermer revient à l'appelant.
+ *
+ * Elle restait donc ouverte après la suppression. Pire, ses rappels vidaient déjà
+ * `showToDelete` : reconfirmer sur la modale restée à l'écran envoyait un DELETE sur
+ * `/shows/undefined`, qu'on retrouve dans les journaux de production.
+ */
+const { execute: deleteShow, loading: deletingShow } = useApiAction(
   () => `/api/editions/${editionId.value}/shows/${showToDelete.value?.id}`,
   {
     method: 'DELETE',
     successMessage: { title: t('gestion.shows.show_deleted') },
     errorMessages: { default: t('gestion.shows.error_delete') },
     onSuccess: () => {
+      showDeleteConfirm.value = false
       showToDelete.value = null
       fetchShows()
     },
     onError: () => {
+      // Fermée aussi en échec : la garder ouverte inviterait à reconfirmer un spectacle
+      // que l'on vient d'oublier, et le toast d'erreur dit déjà ce qui s'est passé.
+      showDeleteConfirm.value = false
       showToDelete.value = null
     },
   }
