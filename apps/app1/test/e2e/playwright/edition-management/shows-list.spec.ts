@@ -130,10 +130,11 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
     const ligne = rowWith(page, JETABLE_TITLE).first()
     await expect(ligne).toBeVisible({ timeout: 15000 })
 
+    // Le dernier bouton de la ligne — la corbeille — ouvre directement la confirmation :
+    // cette page n'a pas de menu d'actions.
     await ligne.getByRole('button').last().click()
-    await page.getByText('Supprimer', { exact: true }).last().click()
 
-    const confirmer = page.getByRole('button', { name: /^(Supprimer|Confirmer)$/i }).last()
+    const confirmer = page.getByRole('button', { name: /^Confirmer$/i })
     await expect(confirmer).toBeVisible()
     await confirmer.click()
 
@@ -149,9 +150,8 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
 
     const ligne = rowWith(page, STANDARD_TITLE).first()
     await ligne.getByRole('button').last().click()
-    await page.getByText('Supprimer', { exact: true }).last().click()
 
-    const annuler = page.getByRole('button', { name: /^Annuler$/i }).last()
+    const annuler = page.getByRole('button', { name: /^Annuler$/i })
     await expect(annuler).toBeVisible()
     await annuler.click()
 
