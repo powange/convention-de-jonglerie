@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — reserveserver",
     "ai_lmstudio_primary_title": "LM Studio — hoofdserver",
     "ai_max_tokens_help": "Budget dat het model mag besteden aan het schrijven van zijn antwoord. Een model dat eerst redeneert, verbruikt dit budget aan denken: te laag ingesteld wordt het afgekapt voordat het iets heeft geschreven en komt het antwoord leeg terug.",
-    "ai_max_tokens_label": "Maximaal aantal tokens per antwoord"
+    "ai_max_tokens_label": "Maximaal aantal tokens per antwoord",
+    "backup_restore_background_hint": "Het herstel gaat op de server door, ook als je deze pagina sluit. Kom hier terug om de afloop te zien.",
+    "backup_restore_interrupted": "Herstel onderbroken",
+    "backup_restore_last_title": "Laatste herstel",
+    "backup_restore_progress_title": "Herstel bezig",
+    "backup_restore_started": "Herstel gestart",
+    "backup_restore_step_database": "Database wordt hersteld…",
+    "backup_restore_step_files": "Bestanden worden hersteld…",
+    "backup_restore_step_preparation": "Back-up voorbereiden…",
+    "backup_restore_tables_seen": "Verwerkte tabellen: {count}",
+    "backup_restore_interrupted_description": "De server is tijdens het herstel opnieuw opgestart: de database kan onvolledig zijn. Start het herstel opnieuw."
   }
 }

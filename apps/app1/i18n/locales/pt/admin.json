@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — servidor de reserva",
     "ai_lmstudio_primary_title": "LM Studio — servidor principal",
     "ai_max_tokens_help": "Orçamento que o modelo pode gastar para escrever a sua resposta. Um modelo que raciocina antes de responder consome esse orçamento a pensar: se for baixo demais, é cortado antes de escrever seja o que for e a resposta volta vazia.",
-    "ai_max_tokens_label": "Tokens máximos por resposta"
+    "ai_max_tokens_label": "Tokens máximos por resposta",
+    "backup_restore_background_hint": "O restauro continua no servidor mesmo que feches esta página. Volta aqui para saberes o resultado.",
+    "backup_restore_interrupted": "Restauro interrompido",
+    "backup_restore_last_title": "Último restauro",
+    "backup_restore_progress_title": "Restauro em curso",
+    "backup_restore_started": "Restauro iniciado",
+    "backup_restore_step_database": "A restaurar a base de dados…",
+    "backup_restore_step_files": "A restaurar os ficheiros…",
+    "backup_restore_step_preparation": "A preparar a cópia de segurança…",
+    "backup_restore_tables_seen": "Tabelas processadas: {count}",
+    "backup_restore_interrupted_description": "O servidor reiniciou durante o restauro: a base de dados pode estar incompleta. Volta a lançar o restauro."
   }
 }

@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — reservserver",
     "ai_lmstudio_primary_title": "LM Studio — huvudserver",
     "ai_max_tokens_help": "Den budget modellen får använda för att skriva sitt svar. En modell som resonerar innan den svarar gör av med budgeten på att tänka: satt för lågt avbryts den innan den hunnit skriva något, och svaret kommer tillbaka tomt.",
-    "ai_max_tokens_label": "Högsta antal tokens per svar"
+    "ai_max_tokens_label": "Högsta antal tokens per svar",
+    "backup_restore_background_hint": "Återställningen fortsätter på servern även om du stänger den här sidan. Kom tillbaka hit för att se resultatet.",
+    "backup_restore_interrupted": "Återställningen avbröts",
+    "backup_restore_last_title": "Senaste återställningen",
+    "backup_restore_progress_title": "Återställning pågår",
+    "backup_restore_started": "Återställning startad",
+    "backup_restore_step_database": "Återställer databasen…",
+    "backup_restore_step_files": "Återställer filerna…",
+    "backup_restore_step_preparation": "Förbereder säkerhetskopian…",
+    "backup_restore_tables_seen": "Behandlade tabeller: {count}",
+    "backup_restore_interrupted_description": "Servern startade om under återställningen: databasen kan vara ofullständig. Kör återställningen igen."
   }
 }

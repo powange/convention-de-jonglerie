@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — reserveserver",
     "ai_lmstudio_primary_title": "LM Studio — hovedserver",
     "ai_max_tokens_help": "Det budget, modellen må bruge på at skrive sit svar. En model, der ræsonnerer før den svarer, bruger budgettet på at tænke: sat for lavt bliver den afbrudt, før den har skrevet noget, og svaret kommer tomt tilbage.",
-    "ai_max_tokens_label": "Maksimalt antal tokens pr. svar"
+    "ai_max_tokens_label": "Maksimalt antal tokens pr. svar",
+    "backup_restore_background_hint": "Gendannelsen fortsætter på serveren, selv hvis du lukker denne side. Kom tilbage hertil for at se resultatet.",
+    "backup_restore_interrupted": "Gendannelse afbrudt",
+    "backup_restore_last_title": "Seneste gendannelse",
+    "backup_restore_progress_title": "Gendannelse i gang",
+    "backup_restore_started": "Gendannelse startet",
+    "backup_restore_step_database": "Gendanner databasen…",
+    "backup_restore_step_files": "Gendanner filerne…",
+    "backup_restore_step_preparation": "Forbereder sikkerhedskopien…",
+    "backup_restore_tables_seen": "Behandlede tabeller: {count}",
+    "backup_restore_interrupted_description": "Serveren genstartede under gendannelsen: databasen kan være ufuldstændig. Kør gendannelsen igen."
   }
 }

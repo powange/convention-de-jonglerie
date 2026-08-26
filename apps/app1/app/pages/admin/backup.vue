@@ -82,18 +82,22 @@
             <div class="flex flex-wrap gap-2">
               <UButton
                 color="info"
-                :loading="restoring"
-                :disabled="restoring || importing"
+                :loading="restaurationActive"
+                :disabled="restaurationActive || importing"
                 @click="openFileDialog('restore')"
               >
                 <UIcon name="i-heroicons-arrow-up-tray" class="h-4 w-4" />
-                {{ restoring ? $t('admin.backup_restoring') : $t('admin.backup_restore_button') }}
+                {{
+                  restaurationActive
+                    ? $t('admin.backup_restoring')
+                    : $t('admin.backup_restore_button')
+                }}
               </UButton>
               <UButton
                 color="neutral"
                 variant="outline"
                 :loading="importing"
-                :disabled="restoring || importing"
+                :disabled="restaurationActive || importing"
                 @click="openFileDialog('import')"
               >
                 <UIcon name="i-heroicons-inbox-arrow-down" class="h-4 w-4" />
@@ -107,6 +111,79 @@
         </div>
       </UCard>
     </div>
+
+    <!-- Avancement de la restauration -->
+    <UCard v-if="etatRestauration" class="mb-8">
+      <div class="flex items-start gap-4">
+        <div class="p-3 rounded-lg shrink-0" :class="restaurationVisuel.fond">
+          <UIcon
+            :name="restaurationVisuel.icone"
+            class="h-6 w-6"
+            :class="[restaurationVisuel.teinte, suiviEnCours ? 'animate-spin' : '']"
+          />
+        </div>
+        <div class="flex-1 min-w-0">
+          <h3 class="font-semibold text-lg mb-1">
+            {{ titreCarteRestauration }}
+          </h3>
+          <p class="text-sm text-gray-500 break-all mb-3">{{ etatRestauration.source }}</p>
+
+          <template v-if="suiviEnCours">
+            <!-- L'étape SQL est la seule mesurable : les autres n'ont pas de volume connu -->
+            <UProgress
+              v-if="etatRestauration.etape === 'BASE_DE_DONNEES'"
+              :model-value="etatRestauration.pourcentage"
+              :max="100"
+              class="mb-2"
+            />
+            <UProgress v-else class="mb-2" />
+
+            <div
+              class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 dark:text-gray-400"
+            >
+              <span>{{ libelleEtape }}</span>
+              <span v-if="etatRestauration.etape === 'BASE_DE_DONNEES'">
+                {{ etatRestauration.pourcentage }}% —
+                {{ formatFileSize(etatRestauration.octetsEnvoyes) }} /
+                {{ formatFileSize(etatRestauration.octetsTotal) }}
+              </span>
+              <span v-if="etatRestauration.tableEnCours" class="flex items-center gap-1">
+                <UIcon name="i-heroicons-table-cells" class="h-4 w-4" />
+                <code class="break-all">{{ etatRestauration.tableEnCours }}</code>
+              </span>
+              <span v-if="etatRestauration.tablesVues > 0">
+                {{ $t('admin.backup_restore_tables_seen', { count: etatRestauration.tablesVues }) }}
+              </span>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-2">
+              {{ $t('admin.backup_restore_background_hint') }}
+            </p>
+          </template>
+
+          <UAlert
+            v-else-if="etatRestauration.etape === 'TERMINEE'"
+            color="success"
+            variant="subtle"
+            icon="i-heroicons-check-circle"
+            :title="$t('admin.backup_restore_success')"
+            :description="$t('admin.backup_restore_success_description')"
+          />
+          <UAlert
+            v-else
+            :color="etatRestauration.etape === 'INTERROMPUE' ? 'warning' : 'error'"
+            variant="subtle"
+            icon="i-heroicons-exclamation-triangle"
+            :title="
+              etatRestauration.etape === 'INTERROMPUE'
+                ? $t('admin.backup_restore_interrupted')
+                : $t('admin.backup_restore_error')
+            "
+            :description="descriptionEchecRestauration"
+          />
+        </div>
+      </div>
+    </UCard>
 
     <!-- Recherche d'une valeur de champ dans les sauvegardes -->
     <div class="mb-8">
@@ -179,7 +256,7 @@
             <UButton
               variant="outline"
               size="xs"
-              :disabled="restoring"
+              :disabled="restaurationActive"
               @click="restoreBackup(backup.filename)"
             >
               <UIcon name="i-heroicons-arrow-up-tray" class="h-3 w-3" />
@@ -413,27 +490,115 @@ const buildRestoreBody = () => {
   return formData
 }
 
-const { execute: executeRestore, loading: restoring } = useApiAction('/api/admin/backup/restore', {
+// La restauration tourne côté serveur : la requête ne fait que la lancer, c'est le suivi
+// qui dira quand elle est terminée — et ce qu'elle a donné.
+const {
+  etat: etatRestauration,
+  enCours: suiviEnCours,
+  suivre,
+  reprendre,
+} = useBackupRestoreProgress(async (final) => {
+  if (final.etape === 'TERMINEE') {
+    toast.add({
+      color: 'success',
+      title: t('admin.backup_restore_success'),
+      description: t('admin.backup_restore_success_description'),
+    })
+  } else {
+    toast.add({
+      color: final.etape === 'INTERROMPUE' ? 'warning' : 'error',
+      title:
+        final.etape === 'INTERROMPUE'
+          ? t('admin.backup_restore_interrupted')
+          : t('admin.backup_restore_error'),
+      description:
+        final.etape === 'INTERROMPUE'
+          ? t('admin.backup_restore_interrupted_description')
+          : final.erreur || undefined,
+    })
+  }
+  // Un fichier restauré depuis l'ordinateur est conservé côté serveur, qu'elle ait
+  // réussi ou non : il apparaît désormais dans la liste des sauvegardes disponibles
+  await loadBackups()
+})
+
+const { execute: executeRestore, loading: restoring } = useApiAction<
+  unknown,
+  { etat: EtatRestauration }
+>('/api/admin/backup/restore', {
   method: 'POST',
   body: buildRestoreBody,
-  successMessage: {
-    title: t('admin.backup_restore_success'),
-    description: t('admin.backup_restore_success_description'),
-  },
+  successMessage: { title: t('admin.backup_restore_started') },
   errorMessages: { default: t('admin.backup_restore_error') },
-  onSuccess: async () => {
+  onSuccess: async (response: { etat: EtatRestauration }) => {
     showConfirmModal.value = false
     pendingRestore.value = null
-    // Un fichier restauré depuis l'ordinateur est conservé côté serveur : il apparaît
-    // désormais dans la liste des sauvegardes disponibles
+    suivre(response.etat)
     await loadBackups()
   },
   onError: async () => {
     showConfirmModal.value = false
     pendingRestore.value = null
-    // Le fichier uploadé est conservé même si la restauration a échoué
     await loadBackups()
   },
+})
+
+// Le lancement de la requête, puis la restauration elle-même : les deux bloquent les actions
+const restaurationActive = computed(() => restoring.value || suiviEnCours.value)
+
+// Une interruption n'a pas de message d'erreur : c'est le serveur qui s'est arrêté,
+// et son explication se traduit ici plutôt que d'être écrite en dur côté API
+const descriptionEchecRestauration = computed(() =>
+  etatRestauration.value?.etape === 'INTERROMPUE'
+    ? t('admin.backup_restore_interrupted_description')
+    : etatRestauration.value?.erreur || undefined
+)
+
+// Une fois la restauration finie, la carte ne raconte plus un événement en cours
+// mais le compte rendu du dernier passage
+const titreCarteRestauration = computed(() =>
+  suiviEnCours.value
+    ? t('admin.backup_restore_progress_title')
+    : t('admin.backup_restore_last_title')
+)
+
+// Libellé de l'étape : une correspondance explicite, pour que l'outillage i18n
+// voie ces clés utilisées
+const libelleEtape = computed(() => {
+  switch (etatRestauration.value?.etape) {
+    case 'PREPARATION':
+      return t('admin.backup_restore_step_preparation')
+    case 'BASE_DE_DONNEES':
+      return t('admin.backup_restore_step_database')
+    case 'FICHIERS':
+      return t('admin.backup_restore_step_files')
+    default:
+      return ''
+  }
+})
+
+// L'habillage de la carte d'avancement suit l'étape en cours
+const restaurationVisuel = computed(() => {
+  const etape = etatRestauration.value?.etape
+  if (etape === 'TERMINEE') {
+    return {
+      icone: 'i-heroicons-check-circle',
+      fond: 'bg-green-100 dark:bg-green-900/30',
+      teinte: 'text-green-600 dark:text-green-400',
+    }
+  }
+  if (etape === 'ECHOUEE' || etape === 'INTERROMPUE') {
+    return {
+      icone: 'i-heroicons-exclamation-triangle',
+      fond: 'bg-red-100 dark:bg-red-900/30',
+      teinte: 'text-red-600 dark:text-red-400',
+    }
+  }
+  return {
+    icone: 'i-heroicons-arrow-path',
+    fond: 'bg-orange-100 dark:bg-orange-900/30',
+    teinte: 'text-orange-600 dark:text-orange-400',
+  }
 })
 
 const confirmRestore = () => {
@@ -481,5 +646,7 @@ const deleteBackup = (filename: string) => {
 // Charger les données au montage
 onMounted(() => {
   loadBackups()
+  // Une restauration lancée avant l'ouverture de la page reprend son affichage ici
+  reprendre()
 })
 </script>

@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — serwer zapasowy",
     "ai_lmstudio_primary_title": "LM Studio — serwer główny",
     "ai_max_tokens_help": "Budżet, jaki model może przeznaczyć na napisanie odpowiedzi. Model, który rozumuje przed udzieleniem odpowiedzi, zużywa ten budżet na myślenie: przy zbyt niskiej wartości zostaje przerwany, zanim cokolwiek napisze, a odpowiedź wraca pusta.",
-    "ai_max_tokens_label": "Maksymalna liczba tokenów na odpowiedź"
+    "ai_max_tokens_label": "Maksymalna liczba tokenów na odpowiedź",
+    "backup_restore_background_hint": "Przywracanie jest kontynuowane na serwerze, nawet jeśli zamkniesz tę stronę. Wróć tutaj, aby poznać wynik.",
+    "backup_restore_interrupted": "Przywracanie przerwane",
+    "backup_restore_last_title": "Ostatnie przywracanie",
+    "backup_restore_progress_title": "Przywracanie w toku",
+    "backup_restore_started": "Przywracanie rozpoczęte",
+    "backup_restore_step_database": "Przywracanie bazy danych…",
+    "backup_restore_step_files": "Przywracanie plików…",
+    "backup_restore_step_preparation": "Przygotowywanie kopii zapasowej…",
+    "backup_restore_tables_seen": "Przetworzone tabele: {count}",
+    "backup_restore_interrupted_description": "Serwer uruchomił się ponownie podczas przywracania: baza danych może być niekompletna. Uruchom przywracanie ponownie."
   }
 }

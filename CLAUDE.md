@@ -236,6 +236,7 @@ Cette commande s'arrête si une étape échoue.
 - **UAlert** : Encart d'information (`title`, `description`, `icon`, `color`, `variant`)
 - **USeparator** : Séparateur horizontal/vertical, supporte un `label`
 - **USkeleton** : Placeholder de chargement (squelette)
+- **UProgress** : Barre de progression (`:model-value` + `:max`, indéterminée sans valeur)
 - **ULink** : Lien stylé (équivalent `NuxtLink` intégré au thème Nuxt UI)
 - **UIcon** : Icône (bibliothèque Nuxt Icon, ex. `i-heroicons-*`)
 
