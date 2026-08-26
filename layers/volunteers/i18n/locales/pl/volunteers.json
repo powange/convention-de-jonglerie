@@ -432,6 +432,12 @@
     "volunteers_short": "wol.",
     "volunteers_summary": "Podsumowanie wolontariuszy",
     "what_you_can_bring_title": "Co możesz nam przynieść",
-    "withdraw": "Wycofaj moje zgłoszenie"
+    "withdraw": "Wycofaj moje zgłoszenie",
+    "recurrence_event": "Każdego dnia wydarzenia",
+    "recurrence_hint": "Identyczny dyżur zostanie utworzony każdego dnia, o tych samych godzinach. Będą potem niezależne: zmiana lub usunięcie jednego nie wpływa na pozostałe.",
+    "recurrence_none": "Tylko raz",
+    "recurrence_title": "Powtórz ten dyżur",
+    "recurrence_with_setup": "Każdego dnia, łącznie z montażem i demontażem",
+    "slots_created": "Utworzono {count} dyżurów"
   }
 }

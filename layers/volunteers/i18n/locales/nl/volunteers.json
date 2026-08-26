@@ -432,6 +432,12 @@
     "volunteers_short": "vrijw.",
     "volunteers_summary": "Vrijwilligers samenvatting",
     "what_you_can_bring_title": "Wat u ons kunt brengen",
-    "withdraw": "Trek mijn aanmelding in"
+    "withdraw": "Trek mijn aanmelding in",
+    "recurrence_event": "Elke dag van het evenement",
+    "recurrence_hint": "Er wordt elke dag een identiek tijdvak aangemaakt, op dezelfde tijden. Daarna staan ze los van elkaar: één wijzigen of verwijderen raakt de andere niet.",
+    "recurrence_none": "Eenmalig",
+    "recurrence_title": "Dit tijdvak herhalen",
+    "recurrence_with_setup": "Elke dag, inclusief op- en afbouw",
+    "slots_created": "{count} tijdvakken aangemaakt"
   }
 }

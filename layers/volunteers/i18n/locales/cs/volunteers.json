@@ -432,6 +432,12 @@
     "volunteers_short": "dobrovolná práce.",
     "volunteers_summary": "Shrnutí dobrovolníků",
     "what_you_can_bring_title": "Co pro nás můžete udělat",
-    "withdraw": "Stáhnout svou žádost"
+    "withdraw": "Stáhnout svou žádost",
+    "recurrence_event": "Každý den akce",
+    "recurrence_hint": "Stejný úsek bude vytvořen na každý den, ve stejných časech. Poté jsou nezávislé: úprava nebo smazání jednoho se ostatních nedotkne.",
+    "recurrence_none": "Pouze jednou",
+    "recurrence_title": "Opakovat tento úsek",
+    "recurrence_with_setup": "Každý den, včetně stavby a bourání",
+    "slots_created": "Vytvořeno úseků: {count}"
   }
 }

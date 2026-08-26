@@ -432,6 +432,12 @@
     "volunteers_short": "vol.",
     "volunteers_summary": "Riepilogo volontari",
     "what_you_can_bring_title": "Cosa può portarci",
-    "withdraw": "Ritira la mia candidatura"
+    "withdraw": "Ritira la mia candidatura",
+    "recurrence_event": "Ogni giorno dell'evento",
+    "recurrence_hint": "Verrà creato un turno identico ogni giorno, alla stessa ora. Saranno poi indipendenti: modificarne o eliminarne uno non tocca gli altri.",
+    "recurrence_none": "Una sola volta",
+    "recurrence_title": "Ripeti questo turno",
+    "recurrence_with_setup": "Ogni giorno, montaggio e smontaggio compresi",
+    "slots_created": "{count} turni creati"
   }
 }

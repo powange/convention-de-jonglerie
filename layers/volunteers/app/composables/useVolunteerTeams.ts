@@ -127,11 +127,18 @@ export function useVolunteerTeams(
     }
   }
 
-  // Auto-fetch au montage et quand editionId change
+  /**
+   * Auto-fetch au montage et quand editionId change.
+   *
+   * Le rejet est absorbé ici : personne n'attend cette promesse, et une erreur qui s'en échappe
+   * interrompt l'hydratation de Vue — la page se fige alors entièrement, menu compris, sur un
+   * simple 401. L'échec reste consigné dans `error`, et l'appelant qui attend explicitement
+   * `fetchTeams` garde la main pour prévenir l'utilisateur.
+   */
   watch(
     () => toValue(editionId),
     (id) => {
-      if (id) fetchTeams()
+      if (id) void fetchTeams().catch(() => {})
     },
     { immediate: true }
   )

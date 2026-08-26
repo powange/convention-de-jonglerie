@@ -432,6 +432,12 @@
     "volunteers_short": "vol.",
     "volunteers_summary": "Volunteers Summary",
     "what_you_can_bring_title": "What you can bring to us",
-    "withdraw": "Withdraw my application"
+    "withdraw": "Withdraw my application",
+    "recurrence_event": "Every day of the event",
+    "recurrence_hint": "An identical slot will be created on each day, at the same times. They will then be independent: editing or deleting one does not affect the others.",
+    "recurrence_none": "Once only",
+    "recurrence_title": "Repeat this slot",
+    "recurrence_with_setup": "Every day, including setup and teardown",
+    "slots_created": "{count} slots created"
   }
 }
