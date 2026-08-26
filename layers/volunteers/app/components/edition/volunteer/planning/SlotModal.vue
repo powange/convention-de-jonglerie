@@ -199,6 +199,26 @@
             </template>
           </UFormField>
         </div>
+
+        <!-- Répétition : proposée à la création seulement, un créneau existant ne se duplique pas -->
+        <div
+          v-if="!readOnly && !formState.id"
+          class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800"
+        >
+          <div class="flex items-center gap-2 mb-3">
+            <UIcon name="i-heroicons-arrow-path" class="w-4 h-4 text-blue-600" />
+            <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+              {{ t('volunteers.recurrence_title') }}
+            </h4>
+          </div>
+          <URadioGroup v-model="formState.recurrence" :items="optionsRecurrence" />
+          <p
+            v-if="formState.recurrence !== 'AUCUNE'"
+            class="mt-3 text-xs text-blue-700 dark:text-blue-300"
+          >
+            {{ t('volunteers.recurrence_hint') }}
+          </p>
+        </div>
       </UForm>
     </template>
     <template #footer>
@@ -258,10 +278,17 @@ interface Props {
     endDateTime?: string
   }
   readOnly?: boolean
+  /**
+   * Vrai si l'édition déclare un montage ou un démontage. L'étendue correspondante n'est
+   * proposée que dans ce cas : sans ces dates, elle se confondrait avec la période de
+   * l'événement et n'offrirait qu'un choix sans effet.
+   */
+  aMontageOuDemontage?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   readOnly: false,
+  aMontageOuDemontage: false,
 })
 
 // Emits
@@ -377,6 +404,22 @@ const formState = ref({
   startDateTime: '',
   endDateTime: '',
   maxVolunteers: 3,
+  recurrence: 'AUCUNE' as 'AUCUNE' | 'EVENEMENT' | 'AVEC_MONTAGE',
+})
+
+/**
+ * Étendues proposées. Celle qui couvre montage et démontage est masquée quand l'édition n'en
+ * déclare aucun : elle se confondrait alors avec la période de l'événement.
+ */
+const optionsRecurrence = computed(() => {
+  const choix = [
+    { label: t('volunteers.recurrence_none'), value: 'AUCUNE' },
+    { label: t('volunteers.recurrence_event'), value: 'EVENEMENT' },
+  ]
+  if (props.aMontageOuDemontage) {
+    choix.push({ label: t('volunteers.recurrence_with_setup'), value: 'AVEC_MONTAGE' })
+  }
+  return choix
 })
 
 // Watchers
@@ -392,6 +435,8 @@ watch(
         startDateTime: newSlot.startDateTime || '',
         endDateTime: newSlot.endDateTime || '',
         maxVolunteers: newSlot.maxVolunteers || 3,
+        // Un créneau qu'on rouvre ne se duplique pas : la répétition ne vaut qu'à la création
+        recurrence: 'AUCUNE',
       }
     } else {
       // Réinitialiser le formulaire
@@ -403,6 +448,7 @@ watch(
         startDateTime: '',
         endDateTime: '',
         maxVolunteers: 3,
+        recurrence: 'AUCUNE',
       }
     }
 
@@ -485,6 +531,8 @@ const onSubmit = async () => {
       maxVolunteers: formState.value.maxVolunteers,
       assignedVolunteers: 0,
       color,
+      // Ne voyage qu'à la création : le serveur répète alors le créneau sur chaque journée.
+      recurrence: formState.value.id ? undefined : formState.value.recurrence,
     }
 
     emit('save', slotData)

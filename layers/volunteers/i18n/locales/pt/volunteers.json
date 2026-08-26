@@ -432,6 +432,12 @@
     "volunteers_short": "vol.",
     "volunteers_summary": "Resumo de voluntários",
     "what_you_can_bring_title": "O que você pode nos trazer",
-    "withdraw": "Retirar minha inscrição"
+    "withdraw": "Retirar minha inscrição",
+    "recurrence_event": "Todos os dias do evento",
+    "recurrence_hint": "Será criado um turno idêntico em cada dia, à mesma hora. Depois ficam independentes: alterar ou eliminar um não afeta os restantes.",
+    "recurrence_none": "Apenas uma vez",
+    "recurrence_title": "Repetir este turno",
+    "recurrence_with_setup": "Todos os dias, incluindo montagem e desmontagem",
+    "slots_created": "{count} turnos criados"
   }
 }

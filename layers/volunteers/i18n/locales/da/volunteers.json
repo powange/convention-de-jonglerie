@@ -432,6 +432,12 @@
     "volunteers_short": "friv.",
     "volunteers_summary": "Frivilligt resumé",
     "what_you_can_bring_title": "Hvad du kan bringe os",
-    "withdraw": "Træk min ansøgning tilbage"
+    "withdraw": "Træk min ansøgning tilbage",
+    "recurrence_event": "Hver dag under arrangementet",
+    "recurrence_hint": "Der oprettes en identisk vagt hver dag på samme tidspunkt. Derefter er de uafhængige: at ændre eller slette én påvirker ikke de øvrige.",
+    "recurrence_none": "Kun én gang",
+    "recurrence_title": "Gentag denne vagt",
+    "recurrence_with_setup": "Hver dag, inklusive opbygning og nedtagning",
+    "slots_created": "{count} vagter oprettet"
   }
 }

@@ -432,6 +432,12 @@
     "volunteers_short": "frivilligt arbete.",
     "volunteers_summary": "Sammanfattning av volontärerna",
     "what_you_can_bring_title": "Vad du kan göra för oss",
-    "withdraw": "Återkalla min ansökan"
+    "withdraw": "Återkalla min ansökan",
+    "recurrence_event": "Varje dag under evenemanget",
+    "recurrence_hint": "Ett identiskt pass skapas varje dag, vid samma tider. Därefter är de oberoende: att ändra eller ta bort ett påverkar inte de övriga.",
+    "recurrence_none": "Endast en gång",
+    "recurrence_title": "Upprepa detta pass",
+    "recurrence_with_setup": "Varje dag, inklusive upp- och nedmontering",
+    "slots_created": "{count} pass skapade"
   }
 }

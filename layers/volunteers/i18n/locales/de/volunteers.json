@@ -432,6 +432,12 @@
     "volunteers_short": "Freiw.",
     "volunteers_summary": "Freiwilligen-Zusammenfassung",
     "what_you_can_bring_title": "Was Sie uns bringen können",
-    "withdraw": "Meine Bewerbung zurückziehen"
+    "withdraw": "Meine Bewerbung zurückziehen",
+    "recurrence_event": "Jeden Tag der Veranstaltung",
+    "recurrence_hint": "Für jeden Tag wird ein identischer Zeitraum zur selben Uhrzeit angelegt. Sie sind danach unabhängig: Ändern oder Löschen eines Zeitraums wirkt sich nicht auf die anderen aus.",
+    "recurrence_none": "Nur einmal",
+    "recurrence_title": "Diesen Zeitraum wiederholen",
+    "recurrence_with_setup": "Jeden Tag, inklusive Auf- und Abbau",
+    "slots_created": "{count} Zeiträume angelegt"
   }
 }

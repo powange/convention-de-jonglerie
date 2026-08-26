@@ -113,6 +113,7 @@
         :teams="[...teams]"
         :edition-id="editionId"
         :initial-slot="slotModalData"
+        :a-montage-ou-demontage="aMontageOuDemontage"
         @save="handleSlotSave"
         @delete="handleSlotDelete"
       />
@@ -166,6 +167,14 @@ const slotModalData = ref<any>(null)
 
 // Utilisation des vraies APIs
 const { teams, fetchTeams } = useVolunteerTeams(editionId)
+
+// L'étendue « montage et démontage compris » n'a de sens que si l'édition en déclare au moins un
+const aMontageOuDemontage = computed(() =>
+  Boolean(
+    (edition.value as any)?.volunteersSetupStartDate ||
+      (edition.value as any)?.volunteersTeardownEndDate
+  )
+)
 const { timeSlots, createTimeSlot, updateTimeSlot, deleteTimeSlot, fetchTimeSlots } =
   useVolunteerTimeSlots(editionId)
 
@@ -324,7 +333,8 @@ const handleSlotSave = async (slotData: any) => {
         color: 'success',
       })
     } else {
-      // Création d'un nouveau créneau
+      // Création d'un nouveau créneau, éventuellement répété sur chaque journée
+      const avant = timeSlots.value.length
       await createTimeSlot({
         title: slotData.title,
         description: slotData.description,
@@ -332,9 +342,12 @@ const handleSlotSave = async (slotData: any) => {
         startDateTime: slotData.start,
         endDateTime: slotData.end,
         maxVolunteers: slotData.maxVolunteers,
+        recurrence: slotData.recurrence,
       })
+      const crees = timeSlots.value.length - avant
       toast.add({
-        title: t('volunteers.slot_created'),
+        // Une répétition crée plusieurs créneaux d'un coup : le dire évite d'avoir à les compter
+        title: crees > 1 ? t('volunteers.slots_created', { count: crees }) : t('volunteers.slot_created'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
