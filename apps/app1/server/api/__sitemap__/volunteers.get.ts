@@ -10,7 +10,10 @@ export default wrapApiHandler(
         },
         status: 'PUBLISHED', // Inclure uniquement les éditions publiées
         // Candidatures bénévoles ouvertes (config portée par EventVolunteerSettings — étape 0bis)
-        event: { volunteerSettings: { open: true } },
+        // ET page rendue publique : c'est ce que la page exige d'un visiteur anonyme, à qui
+        // elle renvoie un 404 sinon. Les candidatures peuvent être ouvertes sans que la page
+        // le soit — trois des URLs annoncées répondaient ainsi 404 en production.
+        event: { volunteerSettings: { open: true, pagePublic: true } },
       },
       select: {
         id: true,
