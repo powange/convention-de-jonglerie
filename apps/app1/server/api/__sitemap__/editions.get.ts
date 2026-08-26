@@ -1,5 +1,17 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 
+/**
+ * URLs des éditions pour le sitemap.
+ *
+ * Une page n'y figure que si un visiteur anonyme y verrait quelque chose. Les conditions
+ * reprennent celles qu'appliquent les points d'API correspondants plutôt que de les
+ * réinventer : le programme et la FAQ répondent 404 tant qu'ils ne sont pas publiés, et la
+ * carte affiche « Édition introuvable » module éteint — les annoncer sans vérifier
+ * reviendrait à déclarer des URLs mortes ou des pages d'erreur.
+ *
+ * Les pages sans contenu sont écartées de la même façon : une liste vide d'objets trouvés ou
+ * une page de publications sans publication n'apporte rien à l'indexation.
+ */
 export default wrapApiHandler(
   async () => {
     // Récupérer toutes les éditions publiques (convention non archivée, statuts visibles publiquement)
@@ -15,6 +27,19 @@ export default wrapApiHandler(
         updatedAt: true,
         startDate: true,
         endDate: true,
+        // Chaque module porte son activation, et pour certains une publication distincte :
+        // on compose un programme des semaines avant qu'il ne mérite d'être montré.
+        programEnabled: true,
+        programPagePublic: true,
+        faqEnabled: true,
+        faqPagePublic: true,
+        siteMapEnabled: true,
+        mapPublic: true,
+        workshopsEnabled: true,
+        // Ces deux pages répondent toujours 200 : c'est leur contenu qui décide.
+        _count: {
+          select: { lostFoundItems: true, editionPosts: true },
+        },
       },
     })
 
@@ -39,39 +64,53 @@ export default wrapApiHandler(
       const changefreq = isUpcoming ? ('weekly' as const) : ('monthly' as const)
       const lastmod = edition.updatedAt.toISOString()
 
-      // Page principale de l'édition
-      urls.push({
-        loc: `/editions/${edition.id}`,
-        lastmod,
-        changefreq,
-        priority,
-      })
-
-      // Page des commentaires
-      urls.push({
-        loc: `/editions/${edition.id}/comments`,
-        lastmod,
-        changefreq,
-        priority: priority * 0.8,
-      })
-
-      // Page du covoiturage
-      urls.push({
-        loc: `/editions/${edition.id}/carpool`,
-        lastmod,
-        changefreq,
-        priority: priority * 0.7,
-      })
-
-      // Page des objets trouvés (seulement si l'édition a commencé)
-      const hasStarted = new Date(edition.startDate) <= now
-      if (hasStarted) {
+      const ajouter = (chemin: string, facteur: number) =>
         urls.push({
-          loc: `/editions/${edition.id}/lost-found`,
+          loc: `/editions/${edition.id}${chemin}`,
           lastmod,
           changefreq,
-          priority: priority * 0.6,
+          priority: priority * facteur,
         })
+
+      // Page principale de l'édition : toujours accessible
+      ajouter('', 1)
+
+      // Programme : activé ET publié. Sans quoi l'API répond 404, sans distinguer les deux
+      // cas pour ne rien révéler d'un programme en préparation.
+      if (edition.programEnabled && edition.programPagePublic) {
+        ajouter('/program', 0.8)
+      }
+
+      // FAQ : même couple de drapeaux, même 404 quand il manque l'un des deux.
+      if (edition.faqEnabled && edition.faqPagePublic) {
+        ajouter('/faq', 0.6)
+      }
+
+      // Carte du site : la page répond 200 même module éteint, mais affiche « Édition
+      // introuvable » — une page d'erreur qu'un moteur indexerait comme du contenu.
+      if (edition.siteMapEnabled && edition.mapPublic) {
+        ajouter('/map', 0.6)
+      }
+
+      // Ateliers : la page existe toujours, mais reste vide sans le module.
+      if (edition.workshopsEnabled) {
+        ajouter('/workshops', 0.7)
+      }
+
+      // Publications : rien à indexer tant que personne n'a publié.
+      if (edition._count.editionPosts > 0) {
+        ajouter('/comments', 0.8)
+      }
+
+      // Covoiturage : ouvert en permanence, y compris avant l'édition — c'est là que les
+      // trajets se cherchent.
+      ajouter('/carpool', 0.7)
+
+      // Objets trouvés : après le début de l'édition, et seulement s'il y en a. Avant, la
+      // page annonce elle-même qu'elle se remplira une fois l'édition commencée.
+      const hasStarted = new Date(edition.startDate) <= now
+      if (hasStarted && edition._count.lostFoundItems > 0) {
+        ajouter('/lost-found', 0.6)
       }
     })
 
