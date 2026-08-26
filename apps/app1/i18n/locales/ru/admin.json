@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — резервный сервер",
     "ai_lmstudio_primary_title": "LM Studio — основной сервер",
     "ai_max_tokens_help": "Бюджет, который модель может потратить на написание ответа. Модель, рассуждающая перед ответом, расходует его на размышления: при слишком малом значении её обрывают, прежде чем она успеет что-либо написать, и ответ возвращается пустым.",
-    "ai_max_tokens_label": "Максимум токенов на ответ"
+    "ai_max_tokens_label": "Максимум токенов на ответ",
+    "backup_restore_background_hint": "Восстановление продолжается на сервере, даже если вы закроете эту страницу. Вернитесь сюда, чтобы узнать результат.",
+    "backup_restore_interrupted": "Восстановление прервано",
+    "backup_restore_last_title": "Последнее восстановление",
+    "backup_restore_progress_title": "Идёт восстановление",
+    "backup_restore_started": "Восстановление запущено",
+    "backup_restore_step_database": "Восстановление базы данных…",
+    "backup_restore_step_files": "Восстановление файлов…",
+    "backup_restore_step_preparation": "Подготовка резервной копии…",
+    "backup_restore_tables_seen": "Обработано таблиц: {count}",
+    "backup_restore_interrupted_description": "Сервер перезапустился во время восстановления: база данных может быть неполной. Запустите восстановление заново."
   }
 }

@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — záložní server",
     "ai_lmstudio_primary_title": "LM Studio — hlavní server",
     "ai_max_tokens_help": "Rozpočet, který model může vynaložit na napsání odpovědi. Model, který před odpovědí uvažuje, spotřebuje tento rozpočet přemýšlením: při příliš nízké hodnotě je přerušen dříve, než cokoli napíše, a odpověď se vrátí prázdná.",
-    "ai_max_tokens_label": "Maximální počet tokenů na odpověď"
+    "ai_max_tokens_label": "Maximální počet tokenů na odpověď",
+    "backup_restore_background_hint": "Obnovení pokračuje na serveru, i když tuto stránku zavřete. Vraťte se sem, abyste zjistili výsledek.",
+    "backup_restore_interrupted": "Obnovení přerušeno",
+    "backup_restore_last_title": "Poslední obnovení",
+    "backup_restore_progress_title": "Probíhá obnovení",
+    "backup_restore_started": "Obnovení zahájeno",
+    "backup_restore_step_database": "Obnovování databáze…",
+    "backup_restore_step_files": "Obnovování souborů…",
+    "backup_restore_step_preparation": "Příprava zálohy…",
+    "backup_restore_tables_seen": "Zpracované tabulky: {count}",
+    "backup_restore_interrupted_description": "Server se během obnovení restartoval: databáze může být neúplná. Spusťte obnovení znovu."
   }
 }

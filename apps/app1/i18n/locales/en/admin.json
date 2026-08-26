@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — backup server",
     "ai_lmstudio_primary_title": "LM Studio — primary server",
     "ai_max_tokens_help": "Budget the model may spend writing its answer. A model that reasons before answering spends this budget thinking: set too low, it gets cut off before writing anything and the answer comes back empty.",
-    "ai_max_tokens_label": "Maximum tokens per response"
+    "ai_max_tokens_label": "Maximum tokens per response",
+    "backup_restore_background_hint": "The restore continues on the server even if you close this page. Come back here to find out how it went.",
+    "backup_restore_interrupted": "Restore interrupted",
+    "backup_restore_last_title": "Last restore",
+    "backup_restore_progress_title": "Restore in progress",
+    "backup_restore_started": "Restore started",
+    "backup_restore_step_database": "Restoring the database…",
+    "backup_restore_step_files": "Restoring the files…",
+    "backup_restore_step_preparation": "Preparing the backup…",
+    "backup_restore_tables_seen": "Tables processed: {count}",
+    "backup_restore_interrupted_description": "The server restarted during the restore: the database may be incomplete. Run the restore again."
   }
 }

@@ -1,9 +1,6 @@
-import { execFile, spawn } from 'child_process'
-import { createReadStream } from 'fs'
-import { readFile, writeFile, mkdir, rm, readdir, unlink, cp } from 'fs/promises'
+import { writeFile, mkdir } from 'fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
-import { promisify } from 'util'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
@@ -11,27 +8,15 @@ import {
   buildStoredBackupFilename,
   isSupportedBackupName,
 } from '#server/utils/backup-files'
+import {
+  lancerRestauration,
+  restaurationEnCours,
+  type OptionsRestauration,
+  type SourceRestauration,
+} from '#server/utils/backup-restore-job'
 
-const execFileAsync = promisify(execFile)
-
-/**
- * Trouve récursivement le premier fichier .sql dans un dossier.
- * Remplace l'usage non-sécurisé de `find` via execSync.
- */
-async function findFirstSqlFile(dir: string): Promise<string | null> {
-  const entries = await readdir(dir, { withFileTypes: true })
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name)
-    if (entry.isFile() && entry.name.endsWith('.sql')) {
-      return fullPath
-    }
-    if (entry.isDirectory()) {
-      const found = await findFirstSqlFile(fullPath)
-      if (found) return found
-    }
-  }
-  return null
-}
+const typeSource = (filename: string): SourceRestauration['type'] =>
+  filename.endsWith('.tar.gz') ? 'archive' : 'sql'
 
 export default wrapApiHandler(
   async (event) => {
@@ -39,13 +24,17 @@ export default wrapApiHandler(
     const _user = await requireGlobalAdminWithDbCheck(event)
     const config = useRuntimeConfig()
     const uploadsMountPath = config.fileStorage?.mount || '/uploads'
-    let sqlContent: string
-    let tempExtractDir: string | null = null
-    // Nom sous lequel le fichier uploadé a été conservé dans `backups` (null si non conservé)
-    let storedFilename: string | null = null
+
+    if (restaurationEnCours()) {
+      throw createError({
+        status: 409,
+        statusText: 'Une restauration est déjà en cours',
+      })
+    }
 
     // Vérifier si c'est un upload de fichier ou une restauration depuis un fichier existant
     const contentType = getHeader(event, 'content-type') || ''
+    let options: OptionsRestauration
 
     if (contentType.includes('multipart/form-data')) {
       // Upload de fichier
@@ -77,50 +66,36 @@ export default wrapApiHandler(
 
       // Conserver le fichier uploadé dans `backups` AVANT la restauration : il apparaît
       // ainsi dans « Sauvegardes disponibles » même si la restauration échoue ensuite.
-      let uploadPath: string | null = null
+      let storedFilename: string | null = null
+      let cheminSource: string | null = null
       try {
         await mkdir(backupsDir(), { recursive: true })
         storedFilename = buildStoredBackupFilename(filename)
-        uploadPath = path.join(backupsDir(), storedFilename)
-        await writeFile(uploadPath, fileData.data)
+        cheminSource = path.join(backupsDir(), storedFilename)
+        await writeFile(cheminSource, fileData.data)
         console.log(`Sauvegarde uploadée conservée: ${storedFilename}`)
       } catch (storeError) {
         // L'archivage est un bonus : on ne bloque pas la restauration s'il échoue
         console.warn("Impossible de conserver la sauvegarde uploadée dans 'backups':", storeError)
         storedFilename = null
-        uploadPath = null
+        cheminSource = null
       }
 
-      // Gérer les archives tar.gz ou les fichiers SQL
-      if (filename.endsWith('.tar.gz')) {
-        // Extraire l'archive via execFile (pas d'injection shell)
-        tempExtractDir = path.join(tmpdir(), `restore-${Date.now()}`)
-        await mkdir(tempExtractDir, { recursive: true })
+      // La conservation a échoué : on écrit tout de même le dump quelque part pour
+      // pouvoir le diffuser à `mysql`, et on le supprimera à la fin.
+      const aNettoyer: string[] = []
+      if (!cheminSource) {
+        cheminSource = path.join(tmpdir(), `restore-${Date.now()}-${path.basename(filename)}`)
+        await writeFile(cheminSource, fileData.data)
+        aNettoyer.push(cheminSource)
+      }
 
-        // Extraire depuis la copie conservée si elle existe, sinon depuis un temporaire
-        let archivePath = uploadPath
-        if (!archivePath) {
-          archivePath = path.join(tempExtractDir, 'backup.tar.gz')
-          await writeFile(archivePath, fileData.data)
-        }
-
-        await execFileAsync('tar', ['-xzf', archivePath, '-C', tempExtractDir], {
-          maxBuffer: 1024 * 1024 * 100,
-        })
-
-        // Trouver le fichier SQL dans l'archive (recherche native, pas d'exec de find)
-        const sqlFile = await findFirstSqlFile(tempExtractDir)
-
-        if (!sqlFile) {
-          throw createError({
-            status: 400,
-            statusText: "Aucun fichier SQL trouvé dans l'archive",
-          })
-        }
-
-        sqlContent = await readFile(sqlFile, 'utf8')
-      } else {
-        sqlContent = fileData.data.toString('utf8')
+      options = {
+        source: { type: typeSource(filename), chemin: cheminSource },
+        libelle: storedFilename ?? filename,
+        storedFilename,
+        uploadsMountPath,
+        aNettoyer,
       }
     } else {
       // Restauration depuis un fichier existant
@@ -134,142 +109,41 @@ export default wrapApiHandler(
         })
       }
 
-      // Protection path traversal : ne garder que le nom de fichier
-      const safeFilename = path.basename(filename)
-      const backupPath = path.join(process.cwd(), 'backups', safeFilename)
-
-      // Gérer les archives tar.gz ou les fichiers SQL
-      if (filename.endsWith('.tar.gz')) {
-        // Extraire l'archive via execFile (pas d'injection shell)
-        tempExtractDir = path.join(tmpdir(), `restore-${Date.now()}`)
-        await mkdir(tempExtractDir, { recursive: true })
-
-        await execFileAsync('tar', ['-xzf', backupPath, '-C', tempExtractDir], {
-          maxBuffer: 1024 * 1024 * 100,
-        })
-
-        // Trouver le fichier SQL dans l'archive (recherche native)
-        const sqlFile = await findFirstSqlFile(tempExtractDir)
-
-        if (!sqlFile) {
-          throw createError({
-            status: 400,
-            statusText: "Aucun fichier SQL trouvé dans l'archive",
-          })
-        }
-
-        sqlContent = await readFile(sqlFile, 'utf8')
-      } else if (filename.endsWith('.sql')) {
-        sqlContent = await readFile(backupPath, 'utf8')
-      } else {
+      if (!isSupportedBackupName(filename)) {
         throw createError({
           status: 400,
           statusText: 'Format de fichier invalide. Utilisez .sql ou .tar.gz',
         })
       }
+
+      // Protection path traversal : ne garder que le nom de fichier
+      const safeFilename = path.basename(filename)
+
+      options = {
+        source: { type: typeSource(safeFilename), chemin: path.join(backupsDir(), safeFilename) },
+        libelle: safeFilename,
+        storedFilename: null,
+        uploadsMountPath,
+      }
     }
 
-    // Obtenir les informations de connexion à la base de données
-    const databaseUrl = process.env.DATABASE_URL
-    if (!databaseUrl) {
+    // Contrôle répété juste avant le lancement : entre le premier et ici, la lecture du
+    // fichier uploadé a rendu la main, une autre requête a pu démarrer entre-temps.
+    if (restaurationEnCours()) {
       throw createError({
-        status: 500,
-        statusText: 'Configuration de base de données manquante',
+        status: 409,
+        statusText: 'Une restauration est déjà en cours',
       })
     }
 
-    // Parser l'URL de connexion MySQL
-    const dbUrl = new URL(databaseUrl)
-    const dbHost = dbUrl.hostname
-    const dbPort = dbUrl.port || '3306'
-    const dbName = dbUrl.pathname.slice(1) // Enlever le '/' du début
-    const dbUser = dbUrl.username
-    const dbPassword = dbUrl.password
+    // La restauration se poursuit côté serveur même si le client ferme la fenêtre :
+    // son avancement se suit via `GET /api/admin/backup/restore-status`.
+    const etat = lancerRestauration(options)
 
-    // Créer un fichier temporaire pour le SQL
-    const tempFilePath = path.join(tmpdir(), `restore-${Date.now()}.sql`)
-    await writeFile(tempFilePath, sqlContent)
-
-    try {
-      // Exécuter la restauration via spawn avec pipe stdin
-      // - arguments en tableau (pas d'injection shell)
-      // - MYSQL_PWD évite d'exposer le mot de passe dans la liste des processus
-      console.log('Restauration de la base de données en cours...')
-      await new Promise<void>((resolve, reject) => {
-        const mysqlProcess = spawn('mysql', [`-h${dbHost}`, `-P${dbPort}`, `-u${dbUser}`, dbName], {
-          env: { ...process.env, MYSQL_PWD: dbPassword },
-        })
-
-        const sqlStream = createReadStream(tempFilePath)
-        sqlStream.pipe(mysqlProcess.stdin)
-
-        let stderr = ''
-        mysqlProcess.stderr.on('data', (chunk) => {
-          stderr += chunk.toString()
-        })
-
-        mysqlProcess.on('error', reject)
-        mysqlProcess.on('close', (code) => {
-          if (code === 0) {
-            resolve()
-          } else {
-            reject(new Error(`mysql restore failed (exit ${code}): ${stderr}`))
-          }
-        })
-      })
-
-      console.log('Base de données restaurée avec succès')
-
-      // Restaurer les fichiers uploads si présents dans l'archive
-      if (tempExtractDir) {
-        const extractedUploadsPath = path.join(tempExtractDir, uploadsMountPath.replace(/^\//, ''))
-        try {
-          await import('fs').then((fs) => fs.promises.access(extractedUploadsPath))
-
-          // Le dossier uploads existe dans l'archive, le restaurer
-          // Le chemin de destination dépend si uploadsMountPath est absolu ou relatif
-          const uploadsDestPath = path.isAbsolute(uploadsMountPath)
-            ? uploadsMountPath
-            : path.join(process.cwd(), uploadsMountPath)
-
-          // Supprimer l'ancien dossier uploads s'il existe
-          try {
-            await rm(uploadsDestPath, { recursive: true, force: true })
-          } catch {
-            // Le dossier n'existe pas, ce n'est pas grave
-          }
-
-          // Créer le dossier de destination
-          await mkdir(uploadsDestPath, { recursive: true })
-
-          // Copier le contenu via fs.cp natif (pas d'exec de cp -r)
-          await cp(extractedUploadsPath, uploadsDestPath, { recursive: true })
-
-          console.log('Fichiers uploads restaurés avec succès')
-        } catch (error) {
-          console.log('Aucun fichier uploads à restaurer dans cette archive', error)
-        }
-      }
-    } finally {
-      // Nettoyer les fichiers temporaires
-      try {
-        await unlink(tempFilePath)
-      } catch (cleanupError) {
-        console.warn('Impossible de supprimer le fichier SQL temporaire:', cleanupError)
-      }
-
-      if (tempExtractDir) {
-        try {
-          await rm(tempExtractDir, { recursive: true, force: true })
-        } catch (cleanupError) {
-          console.warn("Impossible de supprimer le dossier temporaire d'extraction:", cleanupError)
-        }
-      }
-    }
-
+    setResponseStatus(event, 202)
     return createSuccessResponse(
-      { storedFilename },
-      'Base de données et fichiers restaurés avec succès'
+      { jobId: etat.id, storedFilename: etat.storedFilename, etat },
+      'Restauration lancée'
     )
   },
   { operationName: 'RestoreBackup' }

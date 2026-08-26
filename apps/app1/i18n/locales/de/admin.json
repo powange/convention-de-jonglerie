@@ -791,6 +791,16 @@
     "ai_lmstudio_backup_title": "LM Studio — Ersatzserver",
     "ai_lmstudio_primary_title": "LM Studio — Hauptserver",
     "ai_max_tokens_help": "Budget, das dem Modell zum Verfassen seiner Antwort zur Verfügung steht. Ein Modell, das vor dem Antworten nachdenkt, verbraucht dieses Budget beim Überlegen: zu niedrig angesetzt, wird es abgeschnitten, bevor es etwas geschrieben hat, und die Antwort kommt leer zurück.",
-    "ai_max_tokens_label": "Maximale Token pro Antwort"
+    "ai_max_tokens_label": "Maximale Token pro Antwort",
+    "backup_restore_background_hint": "Die Wiederherstellung läuft auf dem Server weiter, auch wenn Sie diese Seite schließen. Kommen Sie hierher zurück, um das Ergebnis zu erfahren.",
+    "backup_restore_interrupted": "Wiederherstellung unterbrochen",
+    "backup_restore_last_title": "Letzte Wiederherstellung",
+    "backup_restore_progress_title": "Wiederherstellung läuft",
+    "backup_restore_started": "Wiederherstellung gestartet",
+    "backup_restore_step_database": "Datenbank wird wiederhergestellt…",
+    "backup_restore_step_files": "Dateien werden wiederhergestellt…",
+    "backup_restore_step_preparation": "Sicherung wird vorbereitet…",
+    "backup_restore_tables_seen": "Verarbeitete Tabellen: {count}",
+    "backup_restore_interrupted_description": "Der Server wurde während der Wiederherstellung neu gestartet: Die Datenbank ist möglicherweise unvollständig. Starten Sie die Wiederherstellung erneut."
   }
 }
