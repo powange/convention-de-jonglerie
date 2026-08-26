@@ -45,7 +45,8 @@
       "task_title_placeholder": "z. B.: Material reservieren...",
       "tasks_count": "{count} Aufgabe | {count} Aufgaben",
       "view_kanban": "Kanban",
-      "view_list": "Liste"
+      "view_list": "Liste",
+      "reorder_requires_manual_sort": "Wechseln Sie zu «Manuelle Reihenfolge», um die Aufgaben neu anzuordnen"
     }
   }
 }

@@ -45,7 +45,8 @@
       "task_title_placeholder": "Bijv.: Materiaal reserveren...",
       "tasks_count": "{count} taak | {count} taken",
       "view_kanban": "Kanban",
-      "view_list": "Lijst"
+      "view_list": "Lijst",
+      "reorder_requires_manual_sort": "Schakel terug naar «Handmatige volgorde» om taken te herschikken"
     }
   }
 }

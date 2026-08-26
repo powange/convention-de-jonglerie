@@ -25,7 +25,12 @@
       "status_placeholder": "Stato",
       "statuses_count": "{count} stati",
       "tag_placeholder": "Tag",
-      "tags_count": "{count} tag"
+      "tags_count": "{count} tag",
+      "sort": {
+        "manual": "Ordine manuale",
+        "deadline_asc": "Scadenza più vicina",
+        "deadline_desc": "Scadenza più lontana"
+      }
     },
     "my_tasks": {
       "description": "Le attività assegnate a te per questa edizione.",

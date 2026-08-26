@@ -136,6 +136,16 @@
           "action": "Voir mes tâches",
           "message": "La tâche « {taskTitle} » de l'édition {editionName} arrive à échéance demain.",
           "title": "Échéance demain 🔔"
+        },
+        "j_minus_3": {
+          "action": "Voir mes tâches",
+          "message": "La tâche « {taskTitle} » de l'édition {editionName} arrive à échéance dans 3 jours.",
+          "title": "Échéance dans 3 jours 🔔"
+        },
+        "j_minus_7": {
+          "action": "Voir mes tâches",
+          "message": "La tâche « {taskTitle} » de l'édition {editionName} arrive à échéance dans une semaine.",
+          "title": "Échéance dans 7 jours 🗓️"
         }
       }
     },

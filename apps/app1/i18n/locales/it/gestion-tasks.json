@@ -45,7 +45,8 @@
       "task_title_placeholder": "Es.: Prenotare il materiale...",
       "tasks_count": "{count} attività | {count} attività",
       "view_kanban": "Kanban",
-      "view_list": "Elenco"
+      "view_list": "Elenco",
+      "reorder_requires_manual_sort": "Torna all'«Ordine manuale» per riordinare le attività"
     }
   }
 }

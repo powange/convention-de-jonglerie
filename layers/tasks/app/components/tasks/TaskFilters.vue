@@ -98,6 +98,17 @@
         class="min-w-40"
       />
 
+      <!-- Masqué quand aucune tâche n'a d'échéance, comme le filtre : trier par une date que
+           personne n'a renseignée n'aurait aucun effet visible. -->
+      <USelect
+        v-if="hasDeadlines"
+        v-model="sort"
+        :items="sortItems"
+        size="sm"
+        class="min-w-44"
+        icon="i-heroicons-arrows-up-down"
+      />
+
       <div class="flex-1" />
 
       <div class="flex items-center gap-2 shrink-0">
@@ -141,12 +152,20 @@ interface TagOption {
 type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'CANCELLED'
 type DueFilter = 'all' | 'overdue' | 'today' | 'next7' | 'next30' | 'none'
 
+/**
+ * `manual` conserve l'ordre construit au glisser-déposer : c'est une intention, et elle reste
+ * le défaut. Les deux autres classent par échéance, les tâches sans date allant toujours à la
+ * fin — les intercaler laisserait croire à une urgence qu'elles n'ont pas.
+ */
+export type TaskSort = 'manual' | 'deadline_asc' | 'deadline_desc'
+
 export interface TaskFiltersValue {
   q: string
   assigneeIds: number[]
   statuses: TaskStatus[]
   due: DueFilter
   tagIds: number[]
+  sort: TaskSort
 }
 
 const props = defineProps<{
@@ -241,6 +260,13 @@ const dueItems = computed(() => [
 ])
 const dueFilter = ref<DueFilter>(props.modelValue.due)
 
+const sortItems = computed(() => [
+  { label: t('tasks.filters.sort.manual'), value: 'manual' as TaskSort },
+  { label: t('tasks.filters.sort.deadline_asc'), value: 'deadline_asc' as TaskSort },
+  { label: t('tasks.filters.sort.deadline_desc'), value: 'deadline_desc' as TaskSort },
+])
+const sort = ref<TaskSort>(props.modelValue.sort)
+
 const activeCount = computed(() => {
   let n = 0
   if (search.value.trim()) n++
@@ -248,6 +274,9 @@ const activeCount = computed(() => {
   if (selectedAssignees.value.length) n++
   if (selectedTags.value.length) n++
   if (dueFilter.value !== 'all') n++
+  // Le tri compte lui aussi : il ne masque rien, mais il change l'ordre affiché, et le bouton
+  // « réinitialiser » doit apparaître pour pouvoir revenir à l'ordre manuel.
+  if (sort.value !== 'manual') n++
   return n
 })
 
@@ -257,11 +286,12 @@ function reset() {
   selectedAssignees.value = []
   selectedTags.value = []
   dueFilter.value = 'all'
+  sort.value = 'manual'
 }
 
 // Synchronise la valeur émise dès qu'un filtre change (recherche debounced).
 watch(
-  [searchDebounced, selectedStatuses, selectedAssignees, selectedTags, dueFilter],
+  [searchDebounced, selectedStatuses, selectedAssignees, selectedTags, dueFilter, sort],
   () => {
     emit('update:modelValue', {
       q: searchDebounced.value.trim(),
@@ -269,6 +299,7 @@ watch(
       assigneeIds: selectedAssignees.value.map((it) => it.value),
       tagIds: selectedTags.value.map((it) => it.value),
       due: dueFilter.value,
+      sort: sort.value,
     })
   },
   { deep: true }
@@ -279,6 +310,7 @@ watch(
   () => props.modelValue,
   (next) => {
     if (next.q !== search.value) search.value = next.q
+    if (next.sort !== sort.value) sort.value = next.sort
     const nextStatusSet = new Set(next.statuses)
     if (
       nextStatusSet.size !== selectedStatuses.value.length ||

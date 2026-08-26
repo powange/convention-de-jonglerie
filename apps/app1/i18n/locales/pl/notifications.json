@@ -136,6 +136,16 @@
           "action": "Zobacz moje zadania",
           "message": "Termin zadania «{taskTitle}» z edycji {editionName} upływa jutro.",
           "title": "Termin jutro 🔔"
+        },
+        "j_minus_3": {
+          "action": "Zobacz moje zadania",
+          "message": "Termin zadania «{taskTitle}» z edycji {editionName} upływa za 3 dni.",
+          "title": "Termin za 3 dni 🔔"
+        },
+        "j_minus_7": {
+          "action": "Zobacz moje zadania",
+          "message": "Termin zadania «{taskTitle}» z edycji {editionName} upływa za tydzień.",
+          "title": "Termin za 7 dni 🗓️"
         }
       }
     },

@@ -120,7 +120,11 @@
                 {{ $t(`tasks.status.${task.status}`) }}
               </UBadge>
               <div class="flex-1 min-w-0">
-                <div class="font-medium text-sm truncate">{{ task.title }}</div>
+                <!-- Le titre revient à la ligne plutôt que d'être coupé : `truncate` masquait la
+                     fin des titres longs, et c'est souvent là qu'est le détail qui distingue deux
+                     tâches. `break-words` coupe aussi un mot unique interminable, qui déborderait
+                     sinon de la colonne. Signalé par un organisateur. -->
+                <div class="font-medium text-sm break-words">{{ task.title }}</div>
                 <div class="flex items-center gap-3 mt-0.5 flex-wrap">
                   <div
                     v-if="task.deadline"
@@ -301,7 +305,7 @@
 
 <script setup lang="ts">
 // Composant frère du même layer → import relatif (le type n'est pas exposé par #components).
-import type { TaskFiltersValue } from '../../../../../components/tasks/TaskFilters.vue'
+import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks/TaskFilters.vue'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -390,6 +394,7 @@ useSeoMeta({
 // --- Filtres & recherche (persistés en URL via query params) ---
 const VALID_STATUSES: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED']
 const VALID_DUE = ['overdue', 'today', 'next7', 'next30', 'none'] as const
+const VALID_SORTS = ['manual', 'deadline_asc', 'deadline_desc'] as const
 
 function parseInitialFilters(): TaskFiltersValue {
   // route.query.X peut être string | string[] | null — on coerce en string pour éviter
@@ -401,6 +406,7 @@ function parseInitialFilters(): TaskFiltersValue {
   const statusesRaw = queryParam(route.query.status)
   const assigneesRaw = queryParam(route.query.assignees)
   const tagsRaw = queryParam(route.query.tags)
+  const sort = queryParam(route.query.sort)
   return {
     q,
     statuses: statusesRaw
@@ -415,6 +421,7 @@ function parseInitialFilters(): TaskFiltersValue {
       .map((n) => parseInt(n, 10))
       .filter((n) => !isNaN(n)),
     due: (VALID_DUE as readonly string[]).includes(due) ? (due as TaskFiltersValue['due']) : 'all',
+    sort: (VALID_SORTS as readonly string[]).includes(sort) ? (sort as TaskSort) : 'manual',
   }
 }
 
@@ -488,6 +495,24 @@ const filteredTasks = computed<TaskItem[]>(() => {
     })
   }
 
+  // Le tri vient après le filtrage : on ordonne ce qui reste, pas ce qui a été écarté.
+  //
+  // Les tâches sans échéance vont toujours à la fin, dans les deux sens. Les remonter en tête
+  // du tri décroissant — ce que ferait un comparateur naïf sur `null` — laisserait croire
+  // qu'elles sont les plus lointaines, alors qu'elles n'ont simplement pas de date.
+  //
+  // `slice()` avant de trier : `sort` modifie le tableau en place, et celui-ci vient d'un
+  // computed dérivé des données du groupe.
+  if (filters.value.sort !== 'manual') {
+    const sens = filters.value.sort === 'deadline_asc' ? 1 : -1
+    list = list.slice().sort((a, b) => {
+      if (!a.deadline && !b.deadline) return 0
+      if (!a.deadline) return 1
+      if (!b.deadline) return -1
+      return (new Date(a.deadline).getTime() - new Date(b.deadline).getTime()) * sens
+    })
+  }
+
   return list
 })
 
@@ -509,6 +534,8 @@ watch(
     else delete query.tags
     if (f.due && f.due !== 'all') query.due = f.due
     else delete query.due
+    if (f.sort && f.sort !== 'manual') query.sort = f.sort
+    else delete query.sort
     router.replace({ query })
   },
   { deep: true }
@@ -653,6 +680,19 @@ function checklistDone(task: TaskItem): number {
 }
 
 // --- Drag & drop kanban (changement de status + réordonnancement) ---
+/**
+ * Réordonner suppose que ce qu'on voit EST l'ordre enregistré.
+ *
+ * Les colonnes du kanban affichent `filteredTasks`, tri compris. Sous un tri par échéance, le
+ * nouvel ordre envoyé à `/reorder` serait donc l'ordre des dates, et non l'ordre manuel avec une
+ * carte déplacée : le glisser-déposer écrasait silencieusement les positions enregistrées par
+ * celles du tri. Constaté sur un cas réel — l'ordre passait de `[Proche, Sans date, Moyenne,
+ * Lointaine]` à `[Moyenne, Lointaine, Proche, Sans date]` pour un simple déplacement.
+ *
+ * Le changement de STATUT reste possible : il ne touche pas aux positions.
+ */
+const triActif = computed(() => filters.value.sort !== 'manual')
+
 const draggedTaskId = ref<number | null>(null)
 const draggedFromStatus = ref<TaskStatus | null>(null)
 const dragOverStatus = ref<TaskStatus | null>(null)
@@ -740,6 +780,8 @@ async function onColumnDrop(status: TaskStatus) {
 function onCardDragOver(task: TaskItem, event: DragEvent) {
   // Uniquement pour le réordonnancement (même colonne).
   if (draggedFromStatus.value !== task.status) return
+  // Sous un tri, aucun trait d'insertion : il promettrait un déplacement qui n'aura pas lieu.
+  if (triActif.value) return
   if (draggedTaskId.value === task.id) return
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
   const midpoint = rect.top + rect.height / 2
@@ -776,7 +818,16 @@ async function onCardDrop(task: TaskItem) {
     return
   }
 
-  // Cas 2 : réordonnancement intra-colonne.
+  // Cas 2 : réordonnancement intra-colonne — impossible tant qu'un tri est actif.
+  if (triActif.value) {
+    useToast().add({
+      title: t('gestion.task.reorder_requires_manual_sort'),
+      icon: 'i-heroicons-arrows-up-down',
+      color: 'warning',
+    })
+    return
+  }
+
   const tasks = group.value.tasks
   const draggedIdx = tasks.findIndex((t) => t.id === draggedId)
   if (draggedIdx === -1) return

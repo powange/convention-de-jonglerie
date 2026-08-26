@@ -136,6 +136,16 @@
           "action": "View my tasks",
           "message": "The task «{taskTitle}» of the {editionName} edition is due tomorrow.",
           "title": "Due tomorrow 🔔"
+        },
+        "j_minus_3": {
+          "action": "View my tasks",
+          "message": "The task «{taskTitle}» of the {editionName} edition is due in 3 days.",
+          "title": "Due in 3 days 🔔"
+        },
+        "j_minus_7": {
+          "action": "View my tasks",
+          "message": "The task «{taskTitle}» of the {editionName} edition is due in a week.",
+          "title": "Due in 7 days 🗓️"
         }
       }
     },

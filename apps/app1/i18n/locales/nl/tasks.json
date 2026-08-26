@@ -25,7 +25,12 @@
       "status_placeholder": "Status",
       "statuses_count": "{count} statussen",
       "tag_placeholder": "Tags",
-      "tags_count": "{count} tags"
+      "tags_count": "{count} tags",
+      "sort": {
+        "manual": "Handmatige volgorde",
+        "deadline_asc": "Dichtstbijzijnde deadline",
+        "deadline_desc": "Verste deadline"
+      }
     },
     "my_tasks": {
       "description": "De taken die aan u zijn toegewezen voor deze editie.",

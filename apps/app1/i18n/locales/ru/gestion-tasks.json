@@ -45,7 +45,8 @@
       "task_title_placeholder": "Напр.: Забронировать оборудование...",
       "tasks_count": "{count} задача | {count} задачи | {count} задач",
       "view_kanban": "Канбан",
-      "view_list": "Список"
+      "view_list": "Список",
+      "reorder_requires_manual_sort": "Вернитесь к «Ручной порядок», чтобы изменить порядок задач"
     }
   }
 }

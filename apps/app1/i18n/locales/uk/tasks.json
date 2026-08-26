@@ -25,7 +25,12 @@
       "status_placeholder": "Статус",
       "statuses_count": "{count} статусів",
       "tag_placeholder": "Теги",
-      "tags_count": "{count} тегів"
+      "tags_count": "{count} тегів",
+      "sort": {
+        "manual": "Ручний порядок",
+        "deadline_asc": "Найближчий термін",
+        "deadline_desc": "Найдальший термін"
+      }
     },
     "my_tasks": {
       "description": "Завдання, призначені вам у цьому випуску.",

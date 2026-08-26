@@ -45,7 +45,8 @@
       "task_title_placeholder": "Np.: Zarezerwować sprzęt...",
       "tasks_count": "{count} zadanie | {count} zadania | {count} zadań",
       "view_kanban": "Kanban",
-      "view_list": "Lista"
+      "view_list": "Lista",
+      "reorder_requires_manual_sort": "Wróć do «Kolejność ręczna», aby zmienić kolejność zadań"
     }
   }
 }

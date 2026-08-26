@@ -136,6 +136,16 @@
           "action": "Visa mina uppgifter",
           "message": "Tidsfristen för uppgiften «{taskTitle}» i utgåvan {editionName} går ut imorgon.",
           "title": "Förfaller imorgon 🔔"
+        },
+        "j_minus_3": {
+          "action": "Visa mina uppgifter",
+          "message": "Tidsfristen för uppgiften «{taskTitle}» i utgåvan {editionName} går ut om 3 dagar.",
+          "title": "Förfaller om 3 dagar 🔔"
+        },
+        "j_minus_7": {
+          "action": "Visa mina uppgifter",
+          "message": "Tidsfristen för uppgiften «{taskTitle}» i utgåvan {editionName} går ut om en vecka.",
+          "title": "Förfaller om 7 dagar 🗓️"
         }
       }
     },

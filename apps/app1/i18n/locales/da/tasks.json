@@ -25,7 +25,12 @@
       "status_placeholder": "Status",
       "statuses_count": "{count} statusser",
       "tag_placeholder": "Tags",
-      "tags_count": "{count} tags"
+      "tags_count": "{count} tags",
+      "sort": {
+        "manual": "Manuel rækkefølge",
+        "deadline_asc": "Nærmeste frist",
+        "deadline_desc": "Fjerneste frist"
+      }
     },
     "my_tasks": {
       "description": "De opgaver, der er tildelt dig i denne udgave.",

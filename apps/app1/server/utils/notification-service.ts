@@ -6,6 +6,7 @@ import {
   type NotificationType as CustomNotificationType,
 } from './notification-preferences'
 import { notificationStreamManager } from './notification-stream-manager'
+import { typeDeNotification, type TaskDeadlineKind } from './rappels-echeance'
 import { translateServerSide } from './server-i18n'
 import { unifiedPushService, type PushNotificationData } from './unified-push-service'
 
@@ -420,6 +421,17 @@ export const NotificationService = {
 }
 
 // Helpers pour créer des notifications courantes
+/**
+ * Seul le jour même est un avertissement. Les trois préavis informent — les hausser tous en
+ * `WARNING` banaliserait l'alerte, et c'est justement le jour J qu'on veut voir ressortir.
+ */
+const GRAVITE_PAR_PALIER = {
+  J_MINUS_7: 'INFO',
+  J_MINUS_3: 'INFO',
+  J_MINUS_1: 'INFO',
+  J: 'WARNING',
+} as const satisfies Record<TaskDeadlineKind, 'INFO' | 'WARNING'>
+
 export const NotificationHelpers = {
   /**
    * Notification de bienvenue pour nouveaux utilisateurs
@@ -1019,36 +1031,21 @@ export const NotificationHelpers = {
     editionName: string,
     editionId: number,
     taskId: number,
-    kind: 'J_MINUS_1' | 'J'
+    kind: TaskDeadlineKind
   ) {
-    const config =
-      kind === 'J_MINUS_1'
-        ? {
-            type: 'INFO' as const,
-            titleKey: 'notifications.task.deadline_reminder.j_minus_1.title',
-            messageKey: 'notifications.task.deadline_reminder.j_minus_1.message',
-            actionTextKey: 'notifications.task.deadline_reminder.j_minus_1.action',
-            notificationType: 'task_deadline_reminder_j_minus_1',
-          }
-        : {
-            type: 'WARNING' as const,
-            titleKey: 'notifications.task.deadline_reminder.j.title',
-            messageKey: 'notifications.task.deadline_reminder.j.message',
-            actionTextKey: 'notifications.task.deadline_reminder.j.action',
-            notificationType: 'task_deadline_reminder_j',
-          }
+    const cle = kind.toLowerCase()
     return await NotificationService.create({
       userId,
-      type: config.type,
-      titleKey: config.titleKey,
-      messageKey: config.messageKey,
+      type: GRAVITE_PAR_PALIER[kind],
+      titleKey: `notifications.task.deadline_reminder.${cle}.title`,
+      messageKey: `notifications.task.deadline_reminder.${cle}.message`,
       translationParams: { taskTitle, editionName },
-      actionTextKey: config.actionTextKey,
+      actionTextKey: `notifications.task.deadline_reminder.${cle}.action`,
       category: 'task',
       entityType: 'Task',
       entityId: taskId.toString(),
       actionUrl: `/editions/${editionId}/my-tasks`,
-      notificationType: config.notificationType,
+      notificationType: typeDeNotification(kind),
     })
   },
 

@@ -45,7 +45,8 @@
       "task_title_placeholder": "E.g.: Book the equipment...",
       "tasks_count": "{count} task | {count} tasks",
       "view_kanban": "Kanban",
-      "view_list": "List"
+      "view_list": "List",
+      "reorder_requires_manual_sort": "Switch back to «Manual order» to reorder tasks"
     }
   }
 }

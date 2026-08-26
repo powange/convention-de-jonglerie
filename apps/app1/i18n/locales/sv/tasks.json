@@ -25,7 +25,12 @@
       "status_placeholder": "Status",
       "statuses_count": "{count} statusar",
       "tag_placeholder": "Taggar",
-      "tags_count": "{count} taggar"
+      "tags_count": "{count} taggar",
+      "sort": {
+        "manual": "Manuell ordning",
+        "deadline_asc": "Närmaste tidsfrist",
+        "deadline_desc": "Senaste tidsfrist"
+      }
     },
     "my_tasks": {
       "description": "Uppgifterna som tilldelats dig för denna utgåva.",

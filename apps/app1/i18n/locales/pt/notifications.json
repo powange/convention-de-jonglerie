@@ -136,6 +136,16 @@
           "action": "Ver minhas tarefas",
           "message": "A tarefa «{taskTitle}» da edição {editionName} vence amanhã.",
           "title": "Vence amanhã 🔔"
+        },
+        "j_minus_3": {
+          "action": "Ver minhas tarefas",
+          "message": "A tarefa «{taskTitle}» da edição {editionName} vence em 3 dias.",
+          "title": "Vence em 3 dias 🔔"
+        },
+        "j_minus_7": {
+          "action": "Ver minhas tarefas",
+          "message": "A tarefa «{taskTitle}» da edição {editionName} vence em uma semana.",
+          "title": "Vence em 7 dias 🗓️"
         }
       }
     },
