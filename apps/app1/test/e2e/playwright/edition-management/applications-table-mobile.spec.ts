@@ -3,6 +3,7 @@ import { expect, test } from '@nuxt/test-utils/playwright'
 import {
   apiDelete,
   apiPost,
+  disableVolunteers,
   enableVolunteers,
   loadState,
   updateVolunteerSettings,
@@ -84,11 +85,15 @@ test.describe.serial('Tableau des candidatures — détails accessibles au touch
     await expect(detail).toBeVisible({ timeout: 5000 })
   })
 
-  test('nettoyer : retirer la candidature et refermer le recrutement', async ({ page }) => {
+  test("nettoyer : rendre l'édition telle qu'on l'a trouvée", async ({ page }) => {
     const { editionId } = loadState()
     await apiDelete(page, `${BASE}/api/editions/${editionId}/volunteers/applications`).catch(
       () => {}
     )
     await updateVolunteerSettings(page, editionId, { open: false, askMinors: false })
+    // Le bénévolat AUSSI, pas seulement le recrutement : les specs de ce projet partagent une
+    // seule édition et se succèdent, et `features-toggle` vérifie ensuite que toutes les
+    // fonctionnalités sont désactivées. L'avoir oublié a fait tomber son test, pas le mien.
+    await disableVolunteers(page, editionId)
   })
 })
