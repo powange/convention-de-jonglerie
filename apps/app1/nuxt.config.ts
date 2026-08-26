@@ -603,6 +603,12 @@ export default defineNuxtConfig({
         '@fullcalendar/daygrid',
         '@fullcalendar/list',
         '@fullcalendar/interaction',
+        // Les vues timeline manquaient à cette liste : leurs classes n'étaient pas pré-bundlées
+        // comme celles dont elles héritent, et l'héritage cassait à l'exécution — « Class
+        // constructor ResourceTimelineView cannot be invoked without 'new' ». L'exception
+        // interrompait l'hydratation, figeant le planning des bénévoles et son menu.
+        '@fullcalendar/resource',
+        '@fullcalendar/resource-timeline',
         '@fullcalendar/core/locales-all',
         'rehype-sanitize',
         'rehype-stringify',
