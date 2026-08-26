@@ -521,16 +521,29 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     { deep: true, immediate: true }
   )
 
-  // Watcher pour les dates d'édition et les créneaux (pour le mode lecture seule)
+  /**
+   * Recale le calendrier sur la période à couvrir, et seulement quand elle change.
+   *
+   * `timeSlots` figurait aussi dans la liste surveillée, pour le mode lecture seule où les
+   * bornes se déduisent des créneaux. C'était superflu — `startDate` et `endDate` sont des
+   * `computed` qui en dépendent déjà — et cela coûtait cher en gestion : ajouter ou supprimer
+   * un créneau réécrivait `initialDate`, ce qui ramenait la frise à son premier jour. On
+   * remplissait un planning en refaisant défiler la timeline après chaque créneau.
+   *
+   * La comparaison sur les valeurs précédentes est nécessaire : `startDate` renvoie une chaîne
+   * recalculée à chaque évaluation, si bien qu'un simple déclenchement du watcher ne dit pas
+   * que la période a bougé.
+   */
   watch(
-    [startDate, endDate, timeSlots],
-    ([newStartDate, newEndDate]) => {
-      if (newStartDate && newEndDate) {
-        calendarOptions.initialDate = newStartDate
-        calendarOptions.validRange = {
-          start: newStartDate,
-          end: newEndDate,
-        }
+    [startDate, endDate],
+    ([newStartDate, newEndDate], [ancienStart, ancienEnd] = []) => {
+      if (!newStartDate || !newEndDate) return
+      if (newStartDate === ancienStart && newEndDate === ancienEnd) return
+
+      calendarOptions.initialDate = newStartDate
+      calendarOptions.validRange = {
+        start: newStartDate,
+        end: newEndDate,
       }
     },
     { immediate: true }
