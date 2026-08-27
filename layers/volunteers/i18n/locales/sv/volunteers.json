@@ -98,7 +98,14 @@
       "unassigned": "Ej tilldelad",
       "unassigned_slots": "Spelautomater omfattas inte",
       "unassigned_volunteers": "Volontärer som inte tilldelats",
-      "warnings": "Varningar"
+      "warnings": "Varningar",
+      "existing_mode": "Befintliga tilldelningar",
+      "existing_mode_help_keep_all": "Inget raderas: beräkningen fyller bara de platser som fortfarande är lediga.",
+      "existing_mode_help_keep_manual": "Volontärer som placerats för hand står kvar; bara tilldelningar från en tidigare beräkning görs om.",
+      "existing_mode_help_replace_all": "Alla tilldelningar för den här upplagan raderas före beräkningen, även de som gjorts för hand.",
+      "existing_mode_keep_all": "Behåll alla befintliga tilldelningar",
+      "existing_mode_keep_manual": "Gör om de automatiska, behåll de manuella",
+      "existing_mode_replace_all": "Radera allt och räkna om"
     },
     "average_per_volunteer": "Genomsnitt per volontär",
     "avoid_list_hint": "Denna information förblir konfidentiell och hjälper organisatörer att skapa harmoniska team.",
@@ -442,6 +449,7 @@
     "hours_per_day": "Timmar per dag",
     "hours_per_team": "Timmar per lag",
     "hours_per_volunteer": "Timmar per volontär",
-    "no_slot_assigned_yet": "Inget pass tilldelat ännu"
+    "no_slot_assigned_yet": "Inget pass tilldelat ännu",
+    "assigned_automatically": "Tilldelad automatiskt"
   }
 }

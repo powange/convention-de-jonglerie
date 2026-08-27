@@ -98,7 +98,14 @@
       "unassigned": "Unassigned",
       "unassigned_slots": "Uncovered slots",
       "unassigned_volunteers": "Unassigned volunteers",
-      "warnings": "Warnings"
+      "warnings": "Warnings",
+      "existing_mode": "Existing assignments",
+      "existing_mode_help_keep_all": "Nothing is cleared: the run only fills the places still open.",
+      "existing_mode_help_keep_manual": "Volunteers placed by hand stay put; only assignments from a previous run are redone.",
+      "existing_mode_help_replace_all": "All assignments for this edition are cleared before the run, including those made by hand.",
+      "existing_mode_keep_all": "Keep every existing assignment",
+      "existing_mode_keep_manual": "Redo the automatic ones, keep the manual ones",
+      "existing_mode_replace_all": "Clear everything and recalculate"
     },
     "average_per_volunteer": "Average per volunteer",
     "avoid_list_hint": "This information remains confidential and helps organizers create harmonious teams",
@@ -442,6 +449,7 @@
     "hours_per_day": "Hours per day",
     "hours_per_team": "Hours per team",
     "hours_per_volunteer": "Hours per volunteer",
-    "no_slot_assigned_yet": "No shift assigned yet"
+    "no_slot_assigned_yet": "No shift assigned yet",
+    "assigned_automatically": "Auto-assigned"
   }
 }

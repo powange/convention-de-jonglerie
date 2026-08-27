@@ -98,7 +98,14 @@
       "unassigned": "Niet toegewezen",
       "unassigned_slots": "Niet-gedekte slots",
       "unassigned_volunteers": "Niet-toegewezen vrijwilligers",
-      "warnings": "Waarschuwingen"
+      "warnings": "Waarschuwingen",
+      "existing_mode": "Bestaande toewijzingen",
+      "existing_mode_help_keep_all": "Er wordt niets gewist: de berekening vult alleen de nog vrije plaatsen.",
+      "existing_mode_help_keep_manual": "Met de hand ingedeelde vrijwilligers blijven staan; alleen toewijzingen van een eerdere berekening worden opnieuw gedaan.",
+      "existing_mode_help_replace_all": "Alle toewijzingen van deze editie worden vóór de berekening gewist, ook die met de hand zijn gemaakt.",
+      "existing_mode_keep_all": "Alle bestaande toewijzingen behouden",
+      "existing_mode_keep_manual": "Automatische opnieuw doen, handmatige behouden",
+      "existing_mode_replace_all": "Alles wissen en opnieuw berekenen"
     },
     "average_per_volunteer": "Gemiddelde per vrijwilliger",
     "avoid_list_hint": "Deze informatie blijft vertrouwelijk en helpt organisatoren harmonieuze teams te creëren",
@@ -442,6 +449,7 @@
     "hours_per_day": "Uren per dag",
     "hours_per_team": "Uren per team",
     "hours_per_volunteer": "Uren per vrijwilliger",
-    "no_slot_assigned_yet": "Nog geen dienst toegewezen"
+    "no_slot_assigned_yet": "Nog geen dienst toegewezen",
+    "assigned_automatically": "Automatisch toegewezen"
   }
 }

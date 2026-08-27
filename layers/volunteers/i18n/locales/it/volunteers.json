@@ -98,7 +98,14 @@
       "unassigned": "Non assegnati",
       "unassigned_slots": "Fasce non coperte",
       "unassigned_volunteers": "Volontari non assegnati",
-      "warnings": "Avvisi"
+      "warnings": "Avvisi",
+      "existing_mode": "Assegnazioni già presenti",
+      "existing_mode_help_keep_all": "Non si cancella nulla: il calcolo riempie solo i posti ancora liberi.",
+      "existing_mode_help_keep_manual": "I volontari inseriti a mano restano; si rifanno solo le assegnazioni di un calcolo precedente.",
+      "existing_mode_help_replace_all": "Tutte le assegnazioni dell'edizione vengono cancellate prima del calcolo, comprese quelle fatte a mano.",
+      "existing_mode_keep_all": "Conservare tutte le assegnazioni esistenti",
+      "existing_mode_keep_manual": "Rifare le automatiche, conservare le manuali",
+      "existing_mode_replace_all": "Cancellare tutto e ricalcolare"
     },
     "average_per_volunteer": "Media per volontario",
     "avoid_list_hint": "Queste informazioni rimangono riservate e aiutano gli organizzatori a creare squadre armoniose",
@@ -442,6 +449,7 @@
     "hours_per_day": "Ore per giorno",
     "hours_per_team": "Ore per squadra",
     "hours_per_volunteer": "Ore per volontario",
-    "no_slot_assigned_yet": "Nessun turno assegnato per ora"
+    "no_slot_assigned_yet": "Nessun turno assegnato per ora",
+    "assigned_automatically": "Assegnato automaticamente"
   }
 }

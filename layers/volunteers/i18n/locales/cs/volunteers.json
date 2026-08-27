@@ -98,7 +98,14 @@
       "unassigned": "Nepřidělené",
       "unassigned_slots": "Nezahrnuté sloty",
       "unassigned_volunteers": "Nezařazení dobrovolníci",
-      "warnings": "Varování"
+      "warnings": "Varování",
+      "existing_mode": "Stávající přiřazení",
+      "existing_mode_help_keep_all": "Nic se nemaže: výpočet pouze doplní dosud volná místa.",
+      "existing_mode_help_keep_manual": "Ručně zařazení dobrovolníci zůstávají; znovu se dělají jen přiřazení z předchozího výpočtu.",
+      "existing_mode_help_replace_all": "Všechna přiřazení tohoto ročníku se před výpočtem smažou, včetně ručních.",
+      "existing_mode_keep_all": "Zachovat všechna stávající přiřazení",
+      "existing_mode_keep_manual": "Přepočítat automatická, zachovat ruční",
+      "existing_mode_replace_all": "Vše smazat a přepočítat"
     },
     "average_per_volunteer": "Průměr na dobrovolníka",
     "avoid_list_hint": "Tyto informace zůstávají důvěrné a pomáhají organizátorům vytvářet harmonické týmy.",
@@ -442,6 +449,7 @@
     "hours_per_day": "Hodiny za den",
     "hours_per_team": "Hodiny na tým",
     "hours_per_volunteer": "Hodiny na dobrovolníka",
-    "no_slot_assigned_yet": "Zatím nepřidělena žádná směna"
+    "no_slot_assigned_yet": "Zatím nepřidělena žádná směna",
+    "assigned_automatically": "Přiřazeno automaticky"
   }
 }

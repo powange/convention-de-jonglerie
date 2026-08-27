@@ -40,6 +40,16 @@ const constraintsSchema = z.object({
   allowOvertime: z.boolean().optional(),
   maxOvertimeHours: z.number().min(0).max(6).optional(),
   keepExistingAssignments: z.boolean().optional(),
+  /**
+   * Sort réservé aux affectations déjà en place :
+   * - `replace-all`  : tout effacer avant de recalculer (comportement historique)
+   * - `keep-all`     : ne rien effacer, ne combler que les places libres
+   * - `keep-manual`  : effacer ce que l'algorithme avait posé, garder les choix humains
+   *
+   * L'ancien booléen reste accepté et se traduit dans ces modes, pour qu'un appel écrit
+   * avant cette évolution continue de fonctionner.
+   */
+  existingAssignmentsMode: z.enum(['replace-all', 'keep-all', 'keep-manual']).optional(),
 })
 
 export default wrapApiHandler(async (event) => {
@@ -111,16 +121,23 @@ export default wrapApiHandler(async (event) => {
     }),
   ])
 
-  // Si on garde les assignations existantes, filtrer les bénévoles déjà assignés
+  const mode =
+    constraints.existingAssignmentsMode ??
+    (constraints.keepExistingAssignments ? 'keep-all' : 'replace-all')
+
+  /** Une affectation survit-elle au recalcul ? */
+  const conservee = (assignment: { source?: string }) =>
+    mode === 'keep-all' || (mode === 'keep-manual' && assignment.source !== 'AUTO')
+
+  // Les bénévoles dont une affectation subsiste occupent déjà leur place : les proposer à
+  // nouveau les ferait compter deux fois.
   let availableVolunteers = volunteers
-  if (constraints.keepExistingAssignments) {
-    // Récupérer les IDs des bénévoles déjà assignés
+  if (mode !== 'replace-all') {
     const assignedVolunteerIds = new Set(
       timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
-        slot.assignments.map((assignment) => assignment.user.id)
+        slot.assignments.filter(conservee).map((assignment) => assignment.user.id)
       )
     )
-    // Filtrer uniquement les bénévoles non assignés
     availableVolunteers = volunteers.filter(
       (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
     )
@@ -157,8 +174,8 @@ export default wrapApiHandler(async (event) => {
     end: slot.endDateTime.toISOString(),
     teamId: slot.teamId?.toString() || undefined,
     maxVolunteers: slot.maxVolunteers,
-    // Si on garde les existantes, les comptabiliser dans les places déjà prises
-    assignedVolunteers: constraints.keepExistingAssignments ? slot.assignments.length : 0,
+    // Seules les affectations qui survivent occupent une place
+    assignedVolunteers: slot.assignments.filter(conservee).length,
     description: slot.description || undefined,
   }))
 
@@ -184,12 +201,7 @@ export default wrapApiHandler(async (event) => {
 
   // Application des assignations en base de données si demandé
   if (body.applyAssignments === true) {
-    await applyAssignments(
-      editionId,
-      result.assignments,
-      user.id,
-      constraints.keepExistingAssignments
-    )
+    await applyAssignments(editionId, result.assignments, user.id, mode)
   }
 
   return createSuccessResponse({
@@ -205,24 +217,24 @@ async function applyAssignments(
   editionId: number,
   assignments: AutoAssignmentResult[],
   userId: number,
-  keepExisting?: boolean
+  mode: 'replace-all' | 'keep-all' | 'keep-manual'
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
-    // 1. Si on ne garde pas les existantes, les supprimer
-    if (!keepExisting) {
+    // 1. Effacer ce que le mode ne conserve pas. En `keep-manual`, seules les affectations
+    //    posées par un précédent calcul disparaissent : les choix humains restent.
+    if (mode !== 'keep-all') {
       await tx.volunteerAssignment.deleteMany({
         where: {
-          timeSlot: {
-            eventId: editionId,
-          },
+          timeSlot: { eventId: editionId },
+          ...(mode === 'keep-manual' ? { source: 'AUTO' } : {}),
         },
       })
     }
 
     // 2. Créer les nouvelles assignations aux créneaux
     for (const assignment of assignments) {
-      // Si on garde les existantes, vérifier qu'elle n'existe pas déjà
-      if (keepExisting) {
+      // Une affectation conservée peut déjà exister : la recréer violerait l'unicité
+      if (mode !== 'replace-all') {
         const existing = await tx.volunteerAssignment.findFirst({
           where: {
             timeSlotId: assignment.slotId,
@@ -238,12 +250,13 @@ async function applyAssignments(
           userId: assignment.volunteerId,
           assignedById: userId,
           assignedAt: new Date(),
+          source: 'AUTO',
         },
       })
     }
 
     // 3. Assigner les bénévoles aux équipes correspondantes
-    await assignVolunteersToTeams(tx, editionId, assignments, keepExisting)
+    await assignVolunteersToTeams(tx, editionId, assignments, mode)
 
     // 4. Log de l'action
     console.log(
@@ -260,7 +273,7 @@ async function assignVolunteersToTeams(
   tx: PrismaTransaction,
   editionId: number,
   assignments: AutoAssignmentResult[],
-  keepExisting?: boolean
+  mode: 'replace-all' | 'keep-all' | 'keep-manual'
 ): Promise<void> {
   // Grouper les assignations par bénévole
   const volunteerTeams = new Map<number, Set<string>>()
@@ -295,8 +308,11 @@ async function assignVolunteersToTeams(
 
     if (!application) continue
 
-    // Si on ne garde pas les existantes, supprimer les anciennes assignations d'équipes
-    if (!keepExisting) {
+    // L'appartenance à une équipe n'a pas d'origine enregistrée, contrairement à
+    // l'affectation à un créneau : on ne l'efface donc qu'en mode « tout effacer ».
+    // La supprimer en mode « garder le manuel » détruirait des choix humains, ce que ce
+    // mode existe précisément pour éviter.
+    if (mode === 'replace-all') {
       await tx.applicationTeamAssignment.deleteMany({
         where: {
           applicationId: application.id,

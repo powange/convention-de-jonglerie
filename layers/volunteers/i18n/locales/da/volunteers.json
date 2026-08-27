@@ -98,7 +98,14 @@
       "unassigned": "Ikke tildelt",
       "unassigned_slots": "Ikke-dækkede tidslukker",
       "unassigned_volunteers": "Ikke-tildelte frivillige",
-      "warnings": "Advarsler"
+      "warnings": "Advarsler",
+      "existing_mode": "Eksisterende tildelinger",
+      "existing_mode_help_keep_all": "Intet slettes: beregningen udfylder kun de pladser, der stadig er ledige.",
+      "existing_mode_help_keep_manual": "Frivillige placeret i hånden bliver stående; kun tildelinger fra en tidligere beregning laves om.",
+      "existing_mode_help_replace_all": "Alle tildelinger for denne udgave slettes før beregningen, også dem lavet i hånden.",
+      "existing_mode_keep_all": "Behold alle eksisterende tildelinger",
+      "existing_mode_keep_manual": "Lav de automatiske om, behold de manuelle",
+      "existing_mode_replace_all": "Slet alt og beregn på ny"
     },
     "average_per_volunteer": "Gennemsnit pr. frivillig",
     "avoid_list_hint": "Denne information forbliver fortrolig og hjælper arrangørerne med at skabe harmoniske hold",
@@ -442,6 +449,7 @@
     "hours_per_day": "Timer pr. dag",
     "hours_per_team": "Timer pr. hold",
     "hours_per_volunteer": "Timer pr. frivillig",
-    "no_slot_assigned_yet": "Ingen vagt tildelt endnu"
+    "no_slot_assigned_yet": "Ingen vagt tildelt endnu",
+    "assigned_automatically": "Tildelt automatisk"
   }
 }

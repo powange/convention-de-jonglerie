@@ -197,12 +197,23 @@ model VolunteerTimeSlot {
   @@index([teamId])
 }
 
+/// D'où vient une affectation : posée à la main, ou produite par l'assignation automatique.
+/// `assignedById` ne peut pas en tenir lieu — l'organisateur qui lance le calcul y figure
+/// comme s'il avait tout posé lui-même.
+enum VolunteerAssignmentSource {
+  MANUAL
+  AUTO
+}
+
 model VolunteerAssignment {
   id           String   @id @default(cuid())
   timeSlotId   String
   userId       Int
   assignedAt   DateTime @default(now())
   assignedById Int
+  // Par défaut manuelle : c'est le choix prudent pour les lignes déjà en base, dont l'origine
+  // est perdue, et une relance ne doit pas les balayer par surprise.
+  source       VolunteerAssignmentSource @default(MANUAL)
 
   timeSlot   VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
   user       User              @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
@@ -212,6 +223,9 @@ model VolunteerAssignment {
   @@index([timeSlotId])
   @@index([userId])
   @@index([assignedById])
+  // La relance efface les affectations automatiques d'une édition : cet index évite un
+  // balayage complet de la table pour les retrouver.
+  @@index([source])
 }
 
 // ========== ASSIGNATION ÉQUIPES BÉNÉVOLES ==========
