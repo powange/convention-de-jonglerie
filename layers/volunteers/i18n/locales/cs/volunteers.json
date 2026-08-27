@@ -450,6 +450,7 @@
     "hours_per_team": "Hodiny na tým",
     "hours_per_volunteer": "Hodiny na dobrovolníka",
     "no_slot_assigned_yet": "Zatím nepřidělena žádná směna",
-    "assigned_automatically": "Přiřazeno automaticky"
+    "assigned_automatically": "Přiřazeno automaticky",
+    "hours_covered_of_needed": "Pokryté hodiny z hodin k pokrytí"
   }
 }

@@ -450,6 +450,7 @@
     "hours_per_team": "Stunden pro Team",
     "hours_per_volunteer": "Stunden pro Helfer",
     "no_slot_assigned_yet": "Noch keine Schicht zugewiesen",
-    "assigned_automatically": "Automatisch zugewiesen"
+    "assigned_automatically": "Automatisch zugewiesen",
+    "hours_covered_of_needed": "Besetzte von zu besetzenden Stunden"
   }
 }

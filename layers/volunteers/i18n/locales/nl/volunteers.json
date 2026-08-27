@@ -450,6 +450,7 @@
     "hours_per_team": "Uren per team",
     "hours_per_volunteer": "Uren per vrijwilliger",
     "no_slot_assigned_yet": "Nog geen dienst toegewezen",
-    "assigned_automatically": "Automatisch toegewezen"
+    "assigned_automatically": "Automatisch toegewezen",
+    "hours_covered_of_needed": "Ingevulde uren van de in te vullen uren"
   }
 }

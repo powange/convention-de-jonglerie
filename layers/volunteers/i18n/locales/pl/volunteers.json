@@ -450,6 +450,7 @@
     "hours_per_team": "Godziny na zespół",
     "hours_per_volunteer": "Godziny na wolontariusza",
     "no_slot_assigned_yet": "Nie przypisano jeszcze żadnej zmiany",
-    "assigned_automatically": "Przydzielony automatycznie"
+    "assigned_automatically": "Przydzielony automatycznie",
+    "hours_covered_of_needed": "Godziny obsadzone z godzin do obsadzenia"
   }
 }

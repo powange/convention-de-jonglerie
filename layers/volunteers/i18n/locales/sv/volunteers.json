@@ -450,6 +450,7 @@
     "hours_per_team": "Timmar per lag",
     "hours_per_volunteer": "Timmar per volontär",
     "no_slot_assigned_yet": "Inget pass tilldelat ännu",
-    "assigned_automatically": "Tilldelad automatiskt"
+    "assigned_automatically": "Tilldelad automatiskt",
+    "hours_covered_of_needed": "Täckta timmar av timmar att täcka"
   }
 }

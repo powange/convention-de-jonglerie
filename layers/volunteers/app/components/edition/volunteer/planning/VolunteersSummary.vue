@@ -19,11 +19,17 @@
     <div class="space-y-4">
       <!-- Résumé global -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <!-- Deux mesures distinctes : ce qui est pourvu, et ce qu'il y a à pourvoir. Les
+             afficher côte à côte évite qu'on s'étonne de voir un total plus élevé dans
+             l'onglet par équipe. -->
         <div class="text-center">
           <div class="text-2xl font-bold text-primary-600">
             {{ volunteersStats.totalHours.toFixed(1) }}h
+            <span class="text-base font-normal text-gray-400">
+              / {{ heuresAPourvoir.toFixed(1) }}h
+            </span>
           </div>
-          <div class="text-sm text-gray-500">{{ t('volunteers.total_hours') }}</div>
+          <div class="text-sm text-gray-500">{{ t('volunteers.hours_covered_of_needed') }}</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-green-600">
@@ -307,6 +313,12 @@ const props = defineProps<Props>()
 const { t } = useI18n()
 
 const ongletActif = ref(props.activeStatsTab || 'hours-per-volunteer')
+
+// Repris des mêmes données que l'onglet par équipe : les deux chiffres ne peuvent donc pas
+// diverger, quelle que soit l'évolution du calcul.
+const heuresAPourvoir = computed(() =>
+  props.volunteersStatsByTeam.reduce((total, equipe) => total + equipe.totalHours, 0)
+)
 
 const onglets = computed(() => [
   {
