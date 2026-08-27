@@ -179,6 +179,11 @@
         "action": "View my application",
         "message": "Your volunteer application for \"{editionName}\" has been put back to pending by the organizers.",
         "title": "Application back to pending"
+      },
+      "application_received": {
+        "action": "View applications",
+        "message": "{applicantName} has just applied to volunteer for “{editionName}”.",
+        "title": "New volunteer application"
       }
     },
     "welcome": {

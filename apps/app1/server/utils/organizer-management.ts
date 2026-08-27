@@ -172,6 +172,47 @@ export async function canManageEditionVolunteers(
   return !!perEdition?.canManageVolunteers
 }
 
+/**
+ * Les utilisateurs habilités à gérer les bénévoles d'une édition.
+ *
+ * Même règle que {@link canManageEditionVolunteers}, mais énumérée : créateur de l'édition,
+ * auteur de la convention, organisateurs ayant le droit au niveau convention, et ceux qui
+ * l'ont au seul niveau de cette édition. Interroger la fonction utilisateur par utilisateur
+ * supposerait de connaître la liste au préalable — c'est justement ce qu'on cherche.
+ *
+ * Les administrateurs en mode admin ne sont pas inclus : ils peuvent tout gérer, mais n'ont
+ * pas à recevoir les notifications de chaque édition du site.
+ */
+export async function listerGestionnairesBenevoles(editionId: number): Promise<number[]> {
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: {
+      creatorId: true,
+      convention: {
+        select: {
+          authorId: true,
+          organizers: { where: { canManageVolunteers: true }, select: { userId: true } },
+        },
+      },
+      organizerPermissions: {
+        where: { canManageVolunteers: true },
+        select: { organizer: { select: { userId: true } } },
+      },
+    },
+  })
+
+  if (!edition) return []
+
+  return [
+    ...new Set([
+      edition.creatorId,
+      edition.convention.authorId,
+      ...edition.convention.organizers.map((organisateur) => organisateur.userId),
+      ...edition.organizerPermissions.map((permission) => permission.organizer.userId),
+    ]),
+  ]
+}
+
 // canEditConvention déplacé vers convention-permissions.ts
 
 // canEditEdition déplacé vers edition-permissions.ts

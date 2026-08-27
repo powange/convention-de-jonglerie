@@ -179,6 +179,11 @@
         "action": "Zobacz moje zgłoszenie",
         "message": "Twoje zgłoszenie wolontariusza do \"{editionName}\" zostało z powrotem ustawione w oczekiwaniu przez organizatorów.",
         "title": "Zgłoszenie z powrotem w oczekiwaniu"
+      },
+      "application_received": {
+        "action": "Zobacz zgłoszenia",
+        "message": "{applicantName} właśnie zgłosił(a) się jako wolontariusz na „{editionName}”.",
+        "title": "Nowe zgłoszenie wolontariusza"
       }
     },
     "welcome": {

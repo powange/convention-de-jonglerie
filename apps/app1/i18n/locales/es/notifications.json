@@ -179,6 +179,11 @@
         "action": "Ver mi solicitud",
         "message": "Tu solicitud de voluntariado para \"{editionName}\" ha sido puesta en espera nuevamente por los organizadores.",
         "title": "Solicitud en espera nuevamente"
+      },
+      "application_received": {
+        "action": "Ver las candidaturas",
+        "message": "{applicantName} acaba de presentar su candidatura como voluntario para «{editionName}».",
+        "title": "Nueva candidatura de voluntario"
       }
     },
     "welcome": {

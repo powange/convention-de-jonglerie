@@ -203,14 +203,39 @@ export default wrapApiHandler(
       },
     })
 
-    // Envoyer une notification de confirmation de candidature
+    // Prévenir le candidat, puis les organisateurs qui gèrent les bénévoles.
+    // Une candidature nouvelle n'étant rattachée à aucune équipe, les responsables d'équipe
+    // n'ont pas de lien avec elle : ce sont les organisateurs habilités qui la traiteront.
     try {
       const editionName = application.event.name ?? ''
       const { NotificationHelpers } = await import('#server/utils/notification-service')
+      const { listerGestionnairesBenevoles } = await import('#server/utils/organizer-management')
+
       await NotificationHelpers.volunteerApplicationSubmitted(
         authenticatedUser.id,
         editionName,
         editionId
+      )
+
+      const gestionnaires = await listerGestionnairesBenevoles(editionId)
+      // `authenticatedUser` ne porte que l'identité de session (id, email, pseudo) ;
+      // le nom et le prénom viennent de l'utilisateur chargé plus haut.
+      const candidat =
+        authenticatedUser.pseudo || [user.prenom, user.nom].filter(Boolean).join(' ') || ''
+
+      await Promise.all(
+        gestionnaires
+          // Un organisateur qui postule comme bénévole a déjà sa confirmation d'envoi :
+          // lui annoncer sa propre candidature n'apprendrait rien.
+          .filter((userId) => userId !== authenticatedUser.id)
+          .map((userId) =>
+            NotificationHelpers.volunteerApplicationReceived(
+              userId,
+              editionName,
+              editionId,
+              candidat
+            )
+          )
       )
     } catch (notificationError) {
       // Ne pas faire échouer l'application si la notification échoue

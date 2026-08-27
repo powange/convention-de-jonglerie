@@ -179,6 +179,11 @@
         "action": "Meine Bewerbung ansehen",
         "message": "Ihre Freiwilligenbewerbung für \"{editionName}\" wurde von den Organisatoren zurück auf ausstehend gesetzt.",
         "title": "Bewerbung zurück auf ausstehend"
+      },
+      "application_received": {
+        "action": "Bewerbungen ansehen",
+        "message": "{applicantName} hat sich soeben als Helfer für „{editionName}“ beworben.",
+        "title": "Neue Helferbewerbung"
       }
     },
     "welcome": {

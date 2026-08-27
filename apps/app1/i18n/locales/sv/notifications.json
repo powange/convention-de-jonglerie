@@ -179,6 +179,11 @@
         "action": "Se min ansökan",
         "message": "Din ansökan om att arbeta som volontär för \"{editionName}\" har lagts på is av arrangörerna.",
         "title": "Ansökan läggs på is"
+      },
+      "application_received": {
+        "action": "Visa ansökningarna",
+        "message": "{applicantName} har just anmält sig som volontär till ”{editionName}”.",
+        "title": "Ny volontäransökan"
       }
     },
     "welcome": {

@@ -488,6 +488,33 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Prévient un organisateur qu'une candidature de bénévole vient d'arriver.
+   *
+   * Le lien mène à la liste des candidatures de l'édition, où elle se traite — plutôt qu'à
+   * la candidature seule, un organisateur en traitant rarement une à la fois.
+   */
+  async volunteerApplicationReceived(
+    userId: number,
+    editionName: string,
+    editionId: number,
+    applicantName: string
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.volunteer.application_received.title',
+      messageKey: 'notifications.volunteer.application_received.message',
+      translationParams: { editionName, applicantName },
+      actionTextKey: 'notifications.volunteer.application_received.action',
+      category: 'volunteer',
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}/gestion/volunteers/applications`,
+      notificationType: 'volunteer_application_received',
+    })
+  },
+
+  /**
    * Notification de candidature de bénévolat acceptée
    */
   async volunteerAccepted(

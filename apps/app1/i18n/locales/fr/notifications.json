@@ -160,6 +160,11 @@
         "message_with_teams": "Votre candidature pour \"{editionName}\" a été acceptée.\n\nVous avez été assigné aux équipes suivantes :\n• {teams}",
         "title": "Candidature bénévole acceptée ! ✅"
       },
+      "application_received": {
+        "action": "Voir les candidatures",
+        "message": "{applicantName} vient de postuler comme bénévole pour « {editionName} ».",
+        "title": "Nouvelle candidature bénévole"
+      },
       "application_rejected": {
         "action": "Voir l'édition",
         "message": "Votre candidature de bénévole pour \"{editionName}\" n'a pas été acceptée cette fois.",
