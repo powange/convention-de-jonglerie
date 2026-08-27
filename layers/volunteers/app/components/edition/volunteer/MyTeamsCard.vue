@@ -194,7 +194,7 @@ const { execute: executeSendMessage } = useApiAction<unknown, { conversationId: 
     }),
     silentSuccess: true,
     onSuccess: (response) => {
-      navigateTo(`/messenger?conversation=${response.conversationId}`)
+      navigateTo(`/messenger?conversationId=${response.conversationId}`)
     },
   }
 )
