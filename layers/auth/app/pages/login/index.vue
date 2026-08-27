@@ -357,20 +357,7 @@
                     />
                   </template>
                 </UInput>
-                <!-- Indicateur de force du mot de passe (style register.vue) -->
-                <div v-if="registerState.password" class="mt-2">
-                  <div class="flex gap-1 mb-1">
-                    <div
-                      v-for="i in 4"
-                      :key="i"
-                      class="h-1 flex-1 rounded"
-                      :class="getPasswordStrengthBarColor(i)"
-                    />
-                  </div>
-                  <p class="text-xs" :class="passwordStrengthTextColor">
-                    {{ passwordStrengthText }}
-                  </p>
-                </div>
+                <AuthPasswordRequirements :password="registerState.password" />
               </UFormField>
               <UFormField :label="t('auth.confirm_password')" name="confirm">
                 <UInput
@@ -426,9 +413,10 @@
 import { z } from 'zod'
 
 import { useDebounce } from '~/composables/useDebounce'
-import { usePasswordStrength } from '~/composables/usePasswordStrength'
 import { useAuthStore } from '~/stores/auth'
 import type { HttpError } from '~/types'
+
+import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
 
 const onGoogleLogin = async () => {
   // Détecter si on est en mode PWA et stocker l'info dans un cookie
@@ -504,11 +492,7 @@ const registerSchema = z
     prenom: z.string().optional(),
     nom: z.string().optional(),
     pseudo: z.string().min(3, t('errors.username_min_3_chars')),
-    password: z
-      .string()
-      .min(8, t('errors.password_too_short'))
-      .regex(/(?=.*[A-Z])/, t('errors.password_uppercase_required'))
-      .regex(/(?=.*\d)/, t('errors.password_digit_required')),
+    password: schemaMotDePasse(t),
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
@@ -518,13 +502,6 @@ const registerSchema = z
 const registerState = reactive({ prenom: '', nom: '', pseudo: '', password: '', confirm: '' })
 
 // Utiliser le composable pour la force du mot de passe
-const passwordRef = computed(() => registerState.password)
-const {
-  strengthText: passwordStrengthText,
-  strengthTextColor: passwordStrengthTextColor,
-  getStrengthBarColor: getPasswordStrengthBarColor,
-} = usePasswordStrength(passwordRef)
-
 // UI state
 const showPassword = ref(false)
 const showRegisterPassword = ref(false)

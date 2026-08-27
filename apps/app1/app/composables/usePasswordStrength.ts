@@ -1,77 +1,46 @@
 import { computed, type Ref } from 'vue'
 
+import {
+  evaluerReglesMotDePasse,
+  forceMotDePasse,
+  motDePasseValide,
+} from '~~/shared/utils/regles-mot-de-passe'
+
 export const usePasswordStrength = (password: Ref<string>) => {
   const { t } = useI18n()
 
-  const strength = computed(() => {
-    const pwd = password.value
-    if (!pwd) return 0
+  const strength = computed(() => forceMotDePasse(password.value))
 
-    let score = 0
+  /** Les exigences obligatoires et leur état, à afficher pendant la saisie. */
+  const regles = computed(() =>
+    evaluerReglesMotDePasse(password.value).map((regle) => ({
+      ...regle,
+      libelle: t(regle.cleLibelle),
+    }))
+  )
 
-    // Longueur minimale
-    if (pwd.length >= 8) score++
-
-    // Contient une majuscule
-    if (/[A-Z]/.test(pwd)) score++
-
-    // Contient un chiffre
-    if (/\d/.test(pwd)) score++
-
-    // Contient un caractère spécial ou longueur > 12
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd) || pwd.length > 12) score++
-
-    return score
-  })
+  /** Le mot de passe serait-il accepté à la validation ? */
+  const valide = computed(() => motDePasseValide(password.value))
 
   const strengthText = computed(() => {
-    switch (strength.value) {
-      case 0:
-      case 1:
-        return t('auth.password_weak')
-      case 2:
-        return t('auth.password_medium')
-      case 3:
-        return t('auth.password_strong')
-      case 4:
-        return t('auth.password_very_strong')
-      default:
-        return ''
-    }
+    // Un mot de passe auquel il manque une exigence est refusé quel que soit son score :
+    // l'annoncer « fort » revenait à promettre une inscription qui échouait ensuite.
+    if (!valide.value) return t('auth.password_incomplete')
+
+    // Valide implique les trois exigences satisfaites, donc un score d'au moins 3 :
+    // il ne reste qu'à distinguer « fort » de « très fort ».
+    return strength.value === 4 ? t('auth.password_very_strong') : t('auth.password_strong')
   })
 
   const strengthTextColor = computed(() => {
-    switch (strength.value) {
-      case 0:
-      case 1:
-        return 'text-red-500'
-      case 2:
-        return 'text-orange-500'
-      case 3:
-        return 'text-green-500'
-      case 4:
-        return 'text-emerald-500'
-      default:
-        return 'text-gray-500'
-    }
+    if (!valide.value) return 'text-red-500'
+    return strength.value === 4 ? 'text-emerald-500' : 'text-green-500'
   })
 
   const getStrengthBarColor = (barIndex: number) => {
-    if (barIndex <= strength.value) {
-      switch (strength.value) {
-        case 1:
-          return 'bg-red-500'
-        case 2:
-          return 'bg-orange-500'
-        case 3:
-          return 'bg-green-500'
-        case 4:
-          return 'bg-emerald-500'
-        default:
-          return 'bg-gray-200 dark:bg-gray-700'
-      }
-    }
-    return 'bg-gray-200 dark:bg-gray-700'
+    if (barIndex > strength.value) return 'bg-gray-200 dark:bg-gray-700'
+    if (!valide.value) return 'bg-red-500'
+    return strength.value === 4 ? 'bg-emerald-500' : 'bg-green-500'
   }
 
   return {
@@ -79,5 +48,7 @@ export const usePasswordStrength = (password: Ref<string>) => {
     strengthText,
     strengthTextColor,
     getStrengthBarColor,
+    regles,
+    valide,
   }
 }

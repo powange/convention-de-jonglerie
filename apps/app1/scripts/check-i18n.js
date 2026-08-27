@@ -621,6 +621,9 @@ async function getAllRelevantFiles() {
     'middleware/**/*.ts',
     'utils/**/*.ts',
     'server/**/*.ts',
+    // `shared/` est lu par le client comme par le serveur : les clés qu'il référence
+    // sont bien utilisées, et les omettre les faisait passer pour mortes.
+    'shared/**/*.ts',
     // Fichiers JavaScript
     'app/**/*.js',
     'composables/**/*.js',
