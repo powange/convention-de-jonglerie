@@ -145,50 +145,52 @@
     </div>
 
     <!-- Modal de création -->
+    <!-- Structure native plutôt qu'un #content enveloppant une UCard : #content remplace
+         toute la structure interne de UModal, dont le `flex-1 overflow-y-auto` du corps.
+         La boîte portant `max-h-[calc(100dvh-2rem)] overflow-hidden`, un contenu trop haut
+         se retrouvait coupé sans défilement possible. -->
     <UModal v-model:open="createModalOpen">
-      <template #content>
-        <UCard>
-          <template #header>
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-plus-circle" class="text-amber-500" />
-              <h3 class="text-lg font-semibold">{{ $t('gestion.shows_call.create') }}</h3>
-            </div>
-          </template>
+      <template #header>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-heroicons-plus-circle" class="text-amber-500" />
+          <h3 class="text-lg font-semibold">{{ $t('gestion.shows_call.create') }}</h3>
+        </div>
+      </template>
 
-          <div class="space-y-4">
-            <UFormField
-              :label="$t('gestion.shows_call.name_label')"
-              :error="createErrors.name"
-              required
-            >
-              <UInput
-                v-model="createForm.name"
-                :placeholder="$t('gestion.shows_call.name_placeholder')"
-                class="w-full"
-              />
-            </UFormField>
+      <template #body>
+        <div class="space-y-4">
+          <UFormField
+            :label="$t('gestion.shows_call.name_label')"
+            :error="createErrors.name"
+            required
+          >
+            <UInput
+              v-model="createForm.name"
+              :placeholder="$t('gestion.shows_call.name_placeholder')"
+              class="w-full"
+            />
+          </UFormField>
 
-            <UFormField :label="$t('gestion.shows_call.description_label')">
-              <UTextarea
-                v-model="createForm.description"
-                :placeholder="$t('gestion.shows_call.description_placeholder')"
-                :rows="3"
-                class="w-full"
-              />
-            </UFormField>
-          </div>
+          <UFormField :label="$t('gestion.shows_call.description_label')">
+            <UTextarea
+              v-model="createForm.description"
+              :placeholder="$t('gestion.shows_call.description_placeholder')"
+              :rows="3"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+      </template>
 
-          <template #footer>
-            <div class="flex justify-end gap-2">
-              <UButton variant="ghost" color="neutral" @click="createModalOpen = false">
-                {{ $t('common.cancel') }}
-              </UButton>
-              <UButton color="primary" :loading="creating" @click="createShowCall">
-                {{ $t('common.create') }}
-              </UButton>
-            </div>
-          </template>
-        </UCard>
+      <template #footer>
+        <div class="flex justify-end gap-2 w-full">
+          <UButton variant="ghost" color="neutral" @click="createModalOpen = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :loading="creating" @click="createShowCall">
+            {{ $t('common.create') }}
+          </UButton>
+        </div>
       </template>
     </UModal>
 

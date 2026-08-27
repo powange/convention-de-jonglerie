@@ -259,69 +259,74 @@
     </UCard>
 
     <!-- Modal de traitement -->
+    <!-- Structure native (#body / #footer) plutôt qu'un #content : celui-ci remplace toute
+         la structure interne de UModal, dont le `flex-1 overflow-y-auto` du corps. Sans lui,
+         la boîte — qui porte `max-h-[calc(100dvh-2rem)] overflow-hidden` — coupait le contenu
+         trop haut sans permettre de le faire défiler, et le bouton d'enregistrement devenait
+         inatteignable sur un écran court. Le pied reste en outre épinglé. -->
     <UModal v-model:open="resolveModal.isOpen" :title="t('admin.feedback.process')">
-      <template #content>
-        <UCard>
-          <div class="space-y-4 p-4">
-            <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <h4 class="font-medium mb-2">{{ resolveModal.feedback?.subject }}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400 break-words">
-                {{ resolveModal.feedback?.message }}
-              </p>
-            </div>
-
-            <UFormField :label="t('admin.feedback.status')">
-              <USelect
-                v-model="resolveModal.status"
-                :items="statusChoices"
-                value-key="value"
-                class="w-full"
-              />
-            </UFormField>
-
-            <UFormField
-              :label="t('admin.feedback.admin_reply')"
-              :description="t('admin.feedback.admin_reply_hint')"
-            >
-              <UTextarea
-                v-model="resolveModal.adminReply"
-                :placeholder="t('admin.feedback.admin_reply_placeholder')"
-                :rows="4"
-                class="w-full"
-              />
-            </UFormField>
-
-            <UFormField
-              :label="t('admin.feedback.admin_notes')"
-              :description="t('admin.feedback.admin_notes_hint')"
-            >
-              <UTextarea
-                v-model="resolveModal.adminNotes"
-                :placeholder="t('admin.feedback.admin_notes_placeholder')"
-                :rows="3"
-                class="w-full"
-              />
-            </UFormField>
-
-            <!-- Un retour de visiteur n'a pas de page de suivi où lire la réponse -->
-            <UAlert
-              v-if="resolveModal.adminReply && !resolveModal.feedback?.user"
-              icon="i-heroicons-exclamation-triangle"
-              color="warning"
-              variant="subtle"
-              :title="t('admin.feedback.reply_guest_warning')"
-            />
-
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <UButton color="neutral" variant="outline" @click="resolveModal.isOpen = false">
-                {{ t('common.cancel') }}
-              </UButton>
-              <UButton :loading="resolveLoading" @click="resolveFeedback">
-                {{ t('common.save') }}
-              </UButton>
-            </div>
+      <template #body>
+        <div class="space-y-4">
+          <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <h4 class="font-medium mb-2">{{ resolveModal.feedback?.subject }}</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 break-words">
+              {{ resolveModal.feedback?.message }}
+            </p>
           </div>
-        </UCard>
+
+          <UFormField :label="t('admin.feedback.status')">
+            <USelect
+              v-model="resolveModal.status"
+              :items="statusChoices"
+              value-key="value"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField
+            :label="t('admin.feedback.admin_reply')"
+            :description="t('admin.feedback.admin_reply_hint')"
+          >
+            <UTextarea
+              v-model="resolveModal.adminReply"
+              :placeholder="t('admin.feedback.admin_reply_placeholder')"
+              :rows="4"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField
+            :label="t('admin.feedback.admin_notes')"
+            :description="t('admin.feedback.admin_notes_hint')"
+          >
+            <UTextarea
+              v-model="resolveModal.adminNotes"
+              :placeholder="t('admin.feedback.admin_notes_placeholder')"
+              :rows="3"
+              class="w-full"
+            />
+          </UFormField>
+
+          <!-- Un retour de visiteur n'a pas de page de suivi où lire la réponse -->
+          <UAlert
+            v-if="resolveModal.adminReply && !resolveModal.feedback?.user"
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="subtle"
+            :title="t('admin.feedback.reply_guest_warning')"
+          />
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3 w-full">
+          <UButton color="neutral" variant="outline" @click="resolveModal.isOpen = false">
+            {{ t('common.cancel') }}
+          </UButton>
+          <UButton :loading="resolveLoading" @click="resolveFeedback">
+            {{ t('common.save') }}
+          </UButton>
+        </div>
       </template>
     </UModal>
 
