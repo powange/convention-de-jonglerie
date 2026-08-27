@@ -256,3 +256,94 @@ export function calculateVolunteersStatsIndividual(
       return (a.user.pseudo || '').localeCompare(b.user.pseudo || '')
     })
 }
+
+export interface TeamStats {
+  teamId: string | null
+  teamName: string
+  color?: string
+  totalHours: number
+  totalSlots: number
+  totalVolunteers: number
+  dayDetails: Array<{
+    date: string
+    hours: number
+    slots: number
+  }>
+}
+
+/**
+ * Heures par équipe, au total et jour par jour.
+ *
+ * Les heures comptées sont des **heures-bénévole** — la durée d'un créneau multipliée par le
+ * nombre de personnes affectées —, comme dans les autres statistiques de cette page. Un
+ * créneau de deux heures tenu par trois bénévoles pèse donc six heures, ce qui est la mesure
+ * utile pour dimensionner une équipe.
+ *
+ * Les créneaux sans équipe sont regroupés à part plutôt qu'ignorés : les passer sous silence
+ * ferait mentir le total.
+ *
+ * @param timeSlots - Créneaux, avec leurs affectations
+ * @param teams - Équipes de l'édition, pour nommer et colorer les lignes
+ */
+export function calculateVolunteersStatsByTeam(
+  timeSlots: TimeSlotWithAssignments[],
+  teams: Array<{ id: string; name: string; color?: string }> = [],
+  libelleSansEquipe = 'Sans équipe'
+): TeamStats[] {
+  const parEquipe = new Map<string, any>()
+  const nomDe = new Map(teams.map((equipe) => [equipe.id, equipe]))
+
+  timeSlots.forEach((slot) => {
+    const affectes = slot.assignedVolunteersList ?? []
+    if (affectes.length === 0) return
+
+    const debut = new Date(slot.start)
+    const fin = new Date(slot.end)
+    const dureeCreneau = (fin.getTime() - debut.getTime()) / (1000 * 60 * 60)
+    if (!Number.isFinite(dureeCreneau) || dureeCreneau <= 0) return
+
+    const jour = debut.toISOString().split('T')[0] as string
+    const cle = (slot.teamId as string | null) ?? '__sans_equipe__'
+
+    if (!parEquipe.has(cle)) {
+      const equipe = slot.teamId ? nomDe.get(slot.teamId as string) : undefined
+      parEquipe.set(cle, {
+        teamId: (slot.teamId as string | null) ?? null,
+        teamName: equipe?.name ?? (slot.teamName as string | undefined) ?? libelleSansEquipe,
+        color: equipe?.color,
+        totalHours: 0,
+        totalSlots: 0,
+        benevoles: new Set<number>(),
+        jours: new Map<string, { date: string; hours: number; slots: number }>(),
+      })
+    }
+
+    const equipe = parEquipe.get(cle)
+    const heuresBenevole = dureeCreneau * affectes.length
+
+    equipe.totalHours += heuresBenevole
+    equipe.totalSlots += 1
+    affectes.forEach((affectation) => equipe.benevoles.add(affectation.user.id))
+
+    if (!equipe.jours.has(jour)) {
+      equipe.jours.set(jour, { date: jour, hours: 0, slots: 0 })
+    }
+    const detailDuJour = equipe.jours.get(jour)!
+    detailDuJour.hours += heuresBenevole
+    detailDuJour.slots += 1
+  })
+
+  return Array.from(parEquipe.values())
+    .map((equipe) => ({
+      teamId: equipe.teamId,
+      teamName: equipe.teamName,
+      color: equipe.color,
+      totalHours: equipe.totalHours,
+      totalSlots: equipe.totalSlots,
+      totalVolunteers: equipe.benevoles.size,
+      dayDetails: Array.from(equipe.jours.values()).sort((a: any, b: any) =>
+        a.date.localeCompare(b.date)
+      ),
+    }))
+    .sort((a, b) => b.totalHours - a.totalHours)
+}

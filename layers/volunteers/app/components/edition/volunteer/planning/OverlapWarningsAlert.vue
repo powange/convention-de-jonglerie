@@ -104,42 +104,60 @@
         {{ t('volunteers.meal_time_conflicts') || 'Conflits avec les horaires de repas' }}
       </template>
       <template #description>
-        <div class="space-y-2">
-          <p class="text-sm">
-            {{ mealTimeWarnings.length }} bénévole(s) ont des créneaux qui couvrent entièrement une
-            période de repas :
-          </p>
-          <div class="space-y-1">
-            <div
-              v-for="warning in mealTimeWarnings"
-              :key="`${warning.volunteerId}-${warning.slot.id}-${warning.mealPeriod}`"
-              class="text-sm bg-orange-50 dark:bg-orange-900/20 p-2 rounded border-l-2 border-orange-400"
-            >
-              <div class="flex items-center gap-2 font-medium text-orange-800 dark:text-orange-200">
-                <UiUserAvatar :user="warning.volunteer" size="xs" />
-                {{ warning.volunteer.pseudo }}
-              </div>
-              <div class="text-xs text-orange-700 dark:text-orange-300 mt-1">
-                <strong>{{ warning.slot.title }}</strong>
-                <span v-if="warning.slot.teamName" class="text-orange-600 dark:text-orange-400">
-                  - {{ warning.slot.teamName }}</span
+        <!-- Repliable : la liste peut compter des dizaines de lignes et repousser hors de
+             l'écran ce qui la suit. Le décompte reste visible une fois repliée, c'est lui
+             qui dit s'il y a lieu de la dérouler. -->
+        <UCollapsible v-model:open="conflitsDeplies" class="space-y-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            class="group w-full justify-between p-0 hover:bg-transparent"
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
+            }"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            <span class="text-sm text-left">
+              {{ mealTimeWarnings.length }} bénévole(s) ont des créneaux qui couvrent entièrement
+              une période de repas
+            </span>
+          </UButton>
+
+          <template #content>
+            <div class="space-y-1">
+              <div
+                v-for="warning in mealTimeWarnings"
+                :key="`${warning.volunteerId}-${warning.slot.id}-${warning.mealPeriod}`"
+                class="text-sm bg-orange-50 dark:bg-orange-900/20 p-2 rounded border-l-2 border-orange-400"
+              >
+                <div
+                  class="flex items-center gap-2 font-medium text-orange-800 dark:text-orange-200"
                 >
-                <br />
-                ({{ formatDateTimeRange(warning.slot.start, warning.slot.end) }})
-                <br />
-                <span class="text-orange-600 dark:text-orange-400">
-                  {{
-                    warning.mealPeriod === 'lunch'
-                      ? t('volunteers.covers_lunch_period') ||
-                        'Couvre toute la période du déjeuner (11h30-14h)'
-                      : t('volunteers.covers_dinner_period') ||
-                        'Couvre toute la période du dîner (19h30-22h)'
-                  }}
-                </span>
+                  <UiUserAvatar :user="warning.volunteer" size="xs" />
+                  {{ warning.volunteer.pseudo }}
+                </div>
+                <div class="text-xs text-orange-700 dark:text-orange-300 mt-1">
+                  <strong>{{ warning.slot.title }}</strong>
+                  <span v-if="warning.slot.teamName" class="text-orange-600 dark:text-orange-400">
+                    - {{ warning.slot.teamName }}</span
+                  >
+                  <br />
+                  ({{ formatDateTimeRange(warning.slot.start, warning.slot.end) }})
+                  <br />
+                  <span class="text-orange-600 dark:text-orange-400">
+                    {{
+                      warning.mealPeriod === 'lunch'
+                        ? t('volunteers.covers_lunch_period') ||
+                          'Couvre toute la période du déjeuner (11h30-14h)'
+                        : t('volunteers.covers_dinner_period') ||
+                          'Couvre toute la période du dîner (19h30-22h)'
+                    }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </UCollapsible>
       </template>
     </UAlert>
   </div>
@@ -212,4 +230,8 @@ defineProps<Props>()
 
 // Utilise le hook d'internationalisation
 const { t } = useI18n()
+
+// Repliée par défaut : le décompte suffit à savoir s'il y a lieu de la dérouler, et la liste
+// entière repoussait hors de l'écran le résumé des bénévoles qui la suit.
+const conflitsDeplies = ref(false)
 </script>

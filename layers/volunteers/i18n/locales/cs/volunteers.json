@@ -438,6 +438,10 @@
     "recurrence_none": "Pouze jednou",
     "recurrence_title": "Opakovat tento úsek",
     "recurrence_with_setup": "Každý den, včetně stavby a bourání",
-    "slots_created": "Vytvořeno úseků: {count}"
+    "slots_created": "Vytvořeno úseků: {count}",
+    "hours_per_day": "Hodiny za den",
+    "hours_per_team": "Hodiny na tým",
+    "hours_per_volunteer": "Hodiny na dobrovolníka",
+    "no_slot_assigned_yet": "Zatím nepřidělena žádná směna"
   }
 }

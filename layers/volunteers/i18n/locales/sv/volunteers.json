@@ -438,6 +438,10 @@
     "recurrence_none": "Endast en gång",
     "recurrence_title": "Upprepa detta pass",
     "recurrence_with_setup": "Varje dag, inklusive upp- och nedmontering",
-    "slots_created": "{count} pass skapade"
+    "slots_created": "{count} pass skapade",
+    "hours_per_day": "Timmar per dag",
+    "hours_per_team": "Timmar per lag",
+    "hours_per_volunteer": "Timmar per volontär",
+    "no_slot_assigned_yet": "Inget pass tilldelat ännu"
   }
 }

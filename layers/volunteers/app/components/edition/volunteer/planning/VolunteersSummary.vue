@@ -41,146 +41,198 @@
         </div>
       </div>
 
-      <!-- Onglets pour les statistiques -->
-      <UTabs
-        :v-model="activeStatsTab"
-        :items="[
-          {
-            key: 'hours-per-volunteer',
-            label: 'Heures par bénévoles',
-            icon: 'i-heroicons-user-group',
-          },
-          {
-            key: 'hours-per-day',
-            label: 'Heures par jour',
-            icon: 'i-heroicons-calendar-days',
-          },
-        ]"
-        class="w-full"
-      >
-        <template #content="{ item }">
-          <div v-if="item.key === 'hours-per-day'" class="space-y-3 mt-4">
-            <!-- Détail par jour -->
-            <div class="space-y-2">
-              <div
-                v-for="dayStats in volunteersStatsByDay"
-                :key="dayStats.date"
-                class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
-              >
-                <div class="flex items-center justify-between mb-3">
-                  <h5 class="font-medium text-gray-900 dark:text-white">
-                    {{ formatDate(dayStats.date) }}
-                  </h5>
-                  <div class="flex items-center gap-2">
-                    <UBadge color="neutral" variant="soft" size="sm">
-                      {{ dayStats.totalVolunteers }}
-                      {{ t('volunteers.volunteers_short') }}
-                    </UBadge>
-                    <UBadge color="primary" variant="soft" size="sm">
-                      {{ dayStats.totalHours.toFixed(1) }}h
-                    </UBadge>
-                  </div>
-                </div>
+      <!-- Sur un écran étroit, les onglets ne tiennent pas côte à côte : un select prend
+           le relais. Les deux pilotent le même état, si bien qu'un changement de largeur
+           ne fait pas perdre l'onglet en cours. -->
+      <USelect
+        v-model="ongletActif"
+        :items="ongletsPourSelect"
+        value-key="value"
+        class="w-full sm:hidden"
+        :icon="ongletCourant?.icon"
+      />
 
-                <div class="space-y-1">
-                  <div
-                    v-for="volunteerStat in dayStats.volunteers"
-                    :key="`${dayStats.date}-${volunteerStat.user.id}`"
-                    class="flex items-center justify-between text-sm"
-                  >
-                    <div class="flex items-center gap-2">
-                      <UiUserAvatar :user="volunteerStat.user" size="xs" />
-                      <span class="text-gray-700 dark:text-gray-300">{{
-                        volunteerStat.user.pseudo
-                      }}</span>
-                      <span
-                        v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
-                        class="text-gray-500 text-xs"
-                      >
-                        (<UiUserName :user="volunteerStat.user" />)
-                      </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="text-gray-600 dark:text-gray-400"
-                        >{{ volunteerStat.hours.toFixed(1) }}h</span
-                      >
-                      <UBadge color="neutral" variant="soft" size="xs">
-                        {{ volunteerStat.slots }} {{ t('volunteers.slots_short') }}
-                      </UBadge>
-                    </div>
-                  </div>
+      <UTabs v-model="ongletActif" :items="onglets" class="w-full hidden sm:block" />
+
+      <div>
+        <div v-if="ongletActif === 'hours-per-day'" class="space-y-3 mt-4">
+          <!-- Détail par jour -->
+          <div class="space-y-2">
+            <div
+              v-for="dayStats in volunteersStatsByDay"
+              :key="dayStats.date"
+              class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <h5 class="font-medium text-gray-900 dark:text-white">
+                  {{ formatDate(dayStats.date) }}
+                </h5>
+                <div class="flex items-center gap-2">
+                  <UBadge color="neutral" variant="soft" size="sm">
+                    {{ dayStats.totalVolunteers }}
+                    {{ t('volunteers.volunteers_short') }}
+                  </UBadge>
+                  <UBadge color="primary" variant="soft" size="sm">
+                    {{ dayStats.totalHours.toFixed(1) }}h
+                  </UBadge>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div v-else-if="item.key === 'hours-per-volunteer'" class="space-y-3 mt-4">
-            <!-- Statistiques par bénévole -->
-            <div class="space-y-2">
-              <div
-                v-for="volunteerStat in volunteersStatsIndividual"
-                :key="volunteerStat.user.id"
-                class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
-              >
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center gap-3">
-                    <UiUserAvatar :user="volunteerStat.user" />
-                    <div>
-                      <h5 class="font-medium text-gray-900 dark:text-white">
-                        {{ volunteerStat.user.pseudo }}
-                      </h5>
-                      <p
-                        v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
-                        class="text-sm text-gray-500"
-                      >
-                        <UiUserName :user="volunteerStat.user" />
-                      </p>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <UBadge color="primary" variant="soft">
-                      {{ volunteerStat.totalHours.toFixed(1) }}h
-                    </UBadge>
-                    <UBadge color="neutral" variant="soft">
-                      {{ volunteerStat.totalSlots }} {{ t('volunteers.slots_short') }}
-                    </UBadge>
-                  </div>
-                </div>
-
-                <!-- Détail par jour pour ce bénévole -->
+              <div class="space-y-1">
                 <div
-                  v-if="volunteerStat.dayDetails && volunteerStat.dayDetails.length > 0"
-                  class="space-y-1"
+                  v-for="volunteerStat in dayStats.volunteers"
+                  :key="`${dayStats.date}-${volunteerStat.user.id}`"
+                  class="flex items-center justify-between text-sm"
                 >
-                  <div
-                    v-for="dayDetail in volunteerStat.dayDetails"
-                    :key="dayDetail.date"
-                    class="flex items-center justify-between text-sm"
-                  >
-                    <div class="flex items-center gap-2">
-                      <UIcon name="i-heroicons-calendar" class="text-gray-400" size="14" />
-                      <span class="text-gray-700 dark:text-gray-300">
-                        {{ formatDate(dayDetail.date) }}
-                      </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="text-gray-600 dark:text-gray-400">
-                        {{ dayDetail.hours.toFixed(1) }}h
-                      </span>
-                      <UBadge color="neutral" variant="soft">
-                        {{ dayDetail.slots }} {{ t('volunteers.slots_short') }}
-                      </UBadge>
-                    </div>
+                  <div class="flex items-center gap-2">
+                    <UiUserAvatar :user="volunteerStat.user" size="xs" />
+                    <span class="text-gray-700 dark:text-gray-300">{{
+                      volunteerStat.user.pseudo
+                    }}</span>
+                    <span
+                      v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
+                      class="text-gray-500 text-xs"
+                    >
+                      (<UiUserName :user="volunteerStat.user" />)
+                    </span>
                   </div>
-                </div>
-                <div v-else class="text-sm text-gray-500 italic">
-                  Aucun créneau assigné pour le moment
+                  <div class="flex items-center gap-2">
+                    <span class="text-gray-600 dark:text-gray-400"
+                      >{{ volunteerStat.hours.toFixed(1) }}h</span
+                    >
+                    <UBadge color="neutral" variant="soft" size="xs">
+                      {{ volunteerStat.slots }} {{ t('volunteers.slots_short') }}
+                    </UBadge>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </template>
-      </UTabs>
+        </div>
+
+        <div v-else-if="ongletActif === 'hours-per-volunteer'" class="space-y-3 mt-4">
+          <!-- Statistiques par bénévole -->
+          <div class="space-y-2">
+            <div
+              v-for="volunteerStat in volunteersStatsIndividual"
+              :key="volunteerStat.user.id"
+              class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <UiUserAvatar :user="volunteerStat.user" />
+                  <div>
+                    <h5 class="font-medium text-gray-900 dark:text-white">
+                      {{ volunteerStat.user.pseudo }}
+                    </h5>
+                    <p
+                      v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
+                      class="text-sm text-gray-500"
+                    >
+                      <UiUserName :user="volunteerStat.user" />
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UBadge color="primary" variant="soft">
+                    {{ volunteerStat.totalHours.toFixed(1) }}h
+                  </UBadge>
+                  <UBadge color="neutral" variant="soft">
+                    {{ volunteerStat.totalSlots }} {{ t('volunteers.slots_short') }}
+                  </UBadge>
+                </div>
+              </div>
+
+              <!-- Détail par jour pour ce bénévole -->
+              <div
+                v-if="volunteerStat.dayDetails && volunteerStat.dayDetails.length > 0"
+                class="space-y-1"
+              >
+                <div
+                  v-for="dayDetail in volunteerStat.dayDetails"
+                  :key="dayDetail.date"
+                  class="flex items-center justify-between text-sm"
+                >
+                  <div class="flex items-center gap-2">
+                    <UIcon name="i-heroicons-calendar" class="text-gray-400" size="14" />
+                    <span class="text-gray-700 dark:text-gray-300">
+                      {{ formatDate(dayDetail.date) }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-gray-600 dark:text-gray-400">
+                      {{ dayDetail.hours.toFixed(1) }}h
+                    </span>
+                    <UBadge color="neutral" variant="soft">
+                      {{ dayDetail.slots }} {{ t('volunteers.slots_short') }}
+                    </UBadge>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="text-sm text-gray-500 italic">
+                {{ t('volunteers.no_slot_assigned_yet') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Heures par équipe -->
+        <div v-else-if="ongletActif === 'hours-per-team'" class="space-y-3 mt-4">
+          <p v-if="volunteersStatsByTeam.length === 0" class="text-sm text-gray-500 italic">
+            {{ t('volunteers.no_slot_assigned_yet') }}
+          </p>
+          <div
+            v-for="equipe in volunteersStatsByTeam"
+            :key="equipe.teamId ?? 'sans-equipe'"
+            class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+          >
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h5 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                <span
+                  v-if="equipe.color"
+                  class="inline-block w-3 h-3 rounded-full shrink-0"
+                  :style="{ backgroundColor: equipe.color }"
+                />
+                {{ equipe.teamName }}
+              </h5>
+              <div class="flex items-center gap-2">
+                <UBadge color="primary" variant="soft">
+                  {{ equipe.totalHours.toFixed(1) }}h
+                </UBadge>
+                <UBadge color="neutral" variant="soft">
+                  {{ equipe.totalVolunteers }} {{ t('volunteers.volunteers') }}
+                </UBadge>
+                <UBadge color="neutral" variant="soft">
+                  {{ equipe.totalSlots }} {{ t('volunteers.slots_short') }}
+                </UBadge>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <div
+                v-for="detailJour in equipe.dayDetails"
+                :key="detailJour.date"
+                class="flex items-center justify-between text-sm"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-calendar" class="text-gray-400 size-3.5" />
+                  <span class="text-gray-700 dark:text-gray-300">
+                    {{ formatDate(detailJour.date) }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-gray-600 dark:text-gray-400">
+                    {{ detailJour.hours.toFixed(1) }}h
+                  </span>
+                  <UBadge color="neutral" variant="soft">
+                    {{ detailJour.slots }} {{ t('volunteers.slots_short') }}
+                  </UBadge>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </UCard>
 </template>
@@ -229,17 +281,55 @@ interface VolunteerStatsIndividual {
   }>
 }
 
+interface TeamStats {
+  teamId: string | null
+  teamName: string
+  color?: string
+  totalHours: number
+  totalSlots: number
+  totalVolunteers: number
+  dayDetails: Array<{ date: string; hours: number; slots: number }>
+}
+
 interface Props {
   canManageVolunteers: boolean
   volunteersStats: VolunteerStats
   volunteersStatsByDay: DayStats[]
   volunteersStatsIndividual: VolunteerStatsIndividual[]
-  activeStatsTab: string
+  volunteersStatsByTeam: TeamStats[]
+  activeStatsTab?: string
   formatDate: (date: string) => string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 // Utilise le hook d'internationalisation
 const { t } = useI18n()
+
+const ongletActif = ref(props.activeStatsTab || 'hours-per-volunteer')
+
+const onglets = computed(() => [
+  {
+    value: 'hours-per-volunteer',
+    label: t('volunteers.hours_per_volunteer'),
+    icon: 'i-heroicons-user-group',
+  },
+  {
+    value: 'hours-per-day',
+    label: t('volunteers.hours_per_day'),
+    icon: 'i-heroicons-calendar-days',
+  },
+  {
+    value: 'hours-per-team',
+    label: t('volunteers.hours_per_team'),
+    icon: 'i-heroicons-rectangle-group',
+  },
+])
+
+// `USelect` n'affiche pas d'icône par option : on ne garde que le libellé
+const ongletsPourSelect = computed(() =>
+  onglets.value.map(({ value, label }) => ({ value, label }))
+)
+
+const ongletCourant = computed(() => onglets.value.find((o) => o.value === ongletActif.value))
 </script>

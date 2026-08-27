@@ -438,6 +438,10 @@
     "recurrence_none": "Tylko raz",
     "recurrence_title": "Powtórz ten dyżur",
     "recurrence_with_setup": "Każdego dnia, łącznie z montażem i demontażem",
-    "slots_created": "Utworzono {count} dyżurów"
+    "slots_created": "Utworzono {count} dyżurów",
+    "hours_per_day": "Godziny dziennie",
+    "hours_per_team": "Godziny na zespół",
+    "hours_per_volunteer": "Godziny na wolontariusza",
+    "no_slot_assigned_yet": "Nie przypisano jeszcze żadnej zmiany"
   }
 }

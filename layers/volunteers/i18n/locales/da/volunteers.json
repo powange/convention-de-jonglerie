@@ -438,6 +438,10 @@
     "recurrence_none": "Kun én gang",
     "recurrence_title": "Gentag denne vagt",
     "recurrence_with_setup": "Hver dag, inklusive opbygning og nedtagning",
-    "slots_created": "{count} vagter oprettet"
+    "slots_created": "{count} vagter oprettet",
+    "hours_per_day": "Timer pr. dag",
+    "hours_per_team": "Timer pr. hold",
+    "hours_per_volunteer": "Timer pr. frivillig",
+    "no_slot_assigned_yet": "Ingen vagt tildelt endnu"
   }
 }

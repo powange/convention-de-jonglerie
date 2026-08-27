@@ -438,6 +438,10 @@
     "recurrence_none": "Eenmalig",
     "recurrence_title": "Dit tijdvak herhalen",
     "recurrence_with_setup": "Elke dag, inclusief op- en afbouw",
-    "slots_created": "{count} tijdvakken aangemaakt"
+    "slots_created": "{count} tijdvakken aangemaakt",
+    "hours_per_day": "Uren per dag",
+    "hours_per_team": "Uren per team",
+    "hours_per_volunteer": "Uren per vrijwilliger",
+    "no_slot_assigned_yet": "Nog geen dienst toegewezen"
   }
 }
