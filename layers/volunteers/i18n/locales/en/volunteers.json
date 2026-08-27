@@ -438,6 +438,10 @@
     "recurrence_none": "Once only",
     "recurrence_title": "Repeat this slot",
     "recurrence_with_setup": "Every day, including setup and teardown",
-    "slots_created": "{count} slots created"
+    "slots_created": "{count} slots created",
+    "hours_per_day": "Hours per day",
+    "hours_per_team": "Hours per team",
+    "hours_per_volunteer": "Hours per volunteer",
+    "no_slot_assigned_yet": "No shift assigned yet"
   }
 }

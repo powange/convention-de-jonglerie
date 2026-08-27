@@ -438,6 +438,10 @@
     "recurrence_none": "Nur einmal",
     "recurrence_title": "Diesen Zeitraum wiederholen",
     "recurrence_with_setup": "Jeden Tag, inklusive Auf- und Abbau",
-    "slots_created": "{count} Zeiträume angelegt"
+    "slots_created": "{count} Zeiträume angelegt",
+    "hours_per_day": "Stunden pro Tag",
+    "hours_per_team": "Stunden pro Team",
+    "hours_per_volunteer": "Stunden pro Helfer",
+    "no_slot_assigned_yet": "Noch keine Schicht zugewiesen"
   }
 }

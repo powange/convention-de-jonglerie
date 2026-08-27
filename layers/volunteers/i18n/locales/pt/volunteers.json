@@ -438,6 +438,10 @@
     "recurrence_none": "Apenas uma vez",
     "recurrence_title": "Repetir este turno",
     "recurrence_with_setup": "Todos os dias, incluindo montagem e desmontagem",
-    "slots_created": "{count} turnos criados"
+    "slots_created": "{count} turnos criados",
+    "hours_per_day": "Horas por dia",
+    "hours_per_team": "Horas por equipa",
+    "hours_per_volunteer": "Horas por voluntário",
+    "no_slot_assigned_yet": "Nenhum turno atribuído por agora"
   }
 }

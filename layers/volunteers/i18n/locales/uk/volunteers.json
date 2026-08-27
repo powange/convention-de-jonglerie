@@ -438,6 +438,10 @@
     "recurrence_none": "Лише один раз",
     "recurrence_title": "Повторити цей слот",
     "recurrence_with_setup": "Щодня, включно з монтажем і демонтажем",
-    "slots_created": "Створено слотів: {count}"
+    "slots_created": "Створено слотів: {count}",
+    "hours_per_day": "Години за днями",
+    "hours_per_team": "Години за командами",
+    "hours_per_volunteer": "Години за волонтерами",
+    "no_slot_assigned_yet": "Зміни ще не призначено"
   }
 }

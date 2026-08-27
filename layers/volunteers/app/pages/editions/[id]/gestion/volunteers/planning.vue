@@ -75,6 +75,7 @@
           :volunteers-stats="volunteersStats"
           :volunteers-stats-by-day="volunteersStatsByDay"
           :volunteers-stats-individual="volunteersStatsIndividual"
+          :volunteers-stats-by-team="volunteersStatsByTeam"
           :active-stats-tab="activeStatsTab"
           :format-date="formatDate"
         />
@@ -129,6 +130,7 @@ import {
   calculateVolunteersStats,
   calculateVolunteersStatsByDay,
   calculateVolunteersStatsIndividual,
+  calculateVolunteersStatsByTeam,
 } from '~/utils/volunteer-stats'
 
 import {
@@ -172,7 +174,7 @@ const { teams, fetchTeams } = useVolunteerTeams(editionId)
 const aMontageOuDemontage = computed(() =>
   Boolean(
     (edition.value as any)?.volunteersSetupStartDate ||
-      (edition.value as any)?.volunteersTeardownEndDate
+    (edition.value as any)?.volunteersTeardownEndDate
   )
 )
 const { timeSlots, createTimeSlot, updateTimeSlot, deleteTimeSlot, fetchTimeSlots } =
@@ -347,7 +349,10 @@ const handleSlotSave = async (slotData: any) => {
       const crees = timeSlots.value.length - avant
       toast.add({
         // Une répétition crée plusieurs créneaux d'un coup : le dire évite d'avoir à les compter
-        title: crees > 1 ? t('volunteers.slots_created', { count: crees }) : t('volunteers.slot_created'),
+        title:
+          crees > 1
+            ? t('volunteers.slots_created', { count: crees })
+            : t('volunteers.slot_created'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -703,6 +708,16 @@ const volunteersStats = computed(() =>
 )
 
 const volunteersStatsByDay = computed(() => calculateVolunteersStatsByDay(convertedTimeSlots.value))
+
+// Les équipes servent à nommer et colorer les lignes ; le libellé de repli est traduit ici,
+// l'utilitaire de calcul ne connaissant pas l'i18n.
+const volunteersStatsByTeam = computed(() =>
+  calculateVolunteersStatsByTeam(
+    convertedTimeSlots.value,
+    teams.value ?? [],
+    t('volunteers.no_team')
+  )
+)
 
 const volunteersStatsIndividual = computed(() =>
   calculateVolunteersStatsIndividual(convertedTimeSlots.value, acceptedVolunteers.value)
