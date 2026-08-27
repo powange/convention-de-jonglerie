@@ -61,14 +61,10 @@
       "manage_artists_description": "Správa umělců pozvaných do tohoto vydání",
       "title": "Správa umělců",
       "notifications": {
-        "already_confirmed": "Přečtení jste už potvrdili",
-        "channels_hint": "Každý umělec bude upozorněn na webu, push oznámením a e-mailem, podle svých předvoleb. Odkaz mu umožní potvrdit přečtení.",
+        "channels_hint": "Každý umělec bude upozorněn na webu a push oznámením, podle svých předvoleb. Odkaz mu umožní potvrdit přečtení.",
         "confirm_message": "Zpráva bude odeslána vybraným umělcům.",
-        "confirm_page_error": "Potvrzení se nezdařilo",
-        "confirm_page_title": "Potvrzení o přečtení",
         "confirm_title": "Potvrdit odeslání",
         "confirm_warning": "Odeslanou zprávu nelze vzít zpět.",
-        "confirmed_now": "Přečtení potvrzeno, děkujeme",
         "confirmed_ratio": "Potvrdilo {confirmes} / {total}",
         "description": "Informujte umělce tohoto ročníku jedním odesláním",
         "history": "Předchozí odeslání",
@@ -92,7 +88,14 @@
         "target_by_show": "Podle představení",
         "target_shows": "Představení: {count}",
         "title": "Oznámení umělcům",
-        "who_read": "Kdo si přečetl"
+        "who_read": "Kdo si přečetl",
+        "copy_phone_numbers": "Zkopírovat čísla",
+        "pending_with_phone": "{count} umělců nepotvrdilo a má telefonní číslo",
+        "phone_numbers_copied": "Zkopírovaná čísla: {count}",
+        "send_group_sms": "Připomenout SMS",
+        "sms_app_opened": "Aplikace SMS otevřena",
+        "sms_confirm_link": "Potvrdit zde:",
+        "sms_intro": "Připomínka: potvrďte prosím, že jste si zprávu přečetli."
       }
     },
     "confirm_delete_edition": "Jste si jistí, že chcete toto vydání vyřadit?",

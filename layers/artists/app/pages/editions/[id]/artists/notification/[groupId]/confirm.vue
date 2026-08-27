@@ -1,64 +1,50 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-    <div class="max-w-md w-full">
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-primary-100 dark:bg-primary-900 rounded-full">
-              <UIcon
-                name="i-heroicons-bell"
-                class="text-primary-600 dark:text-primary-400 h-6 w-6"
-              />
-            </div>
-            <div class="min-w-0">
-              <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ $t('gestion.artists.notifications.confirm_page_title') }}
-              </h1>
-              <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ envoi?.title }}</p>
-            </div>
-          </div>
-        </template>
-
-        <div v-if="chargement" class="flex items-center justify-center py-8">
-          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-gray-400 h-5 w-5" />
-          <span class="ml-2 text-gray-500">{{ $t('common.loading') }}</span>
-        </div>
-
-        <UAlert
-          v-else-if="erreur"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="subtle"
-          :title="$t('gestion.artists.notifications.confirm_page_error')"
-          :description="erreur"
-        />
-
-        <div v-else-if="envoi" class="space-y-4">
-          <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
-              {{ envoi.message }}
-            </p>
-          </div>
-
-          <p class="text-xs text-gray-500 dark:text-gray-400">
-            {{ formatDate(envoi.sentAt) }}
-          </p>
-
-          <UAlert
-            icon="i-heroicons-check-circle"
-            color="success"
-            variant="subtle"
-            :title="
-              envoi.alreadyConfirmed
-                ? $t('gestion.artists.notifications.already_confirmed')
-                : $t('gestion.artists.notifications.confirmed_now')
-            "
-            :description="formatDate(envoi.confirmedAt)"
-          />
-        </div>
-      </UCard>
+  <!-- Aucune mise en page maison ici : la disposition par défaut encadre déjà le contenu dans
+       UMain > UPage > UPageBody > UContainer, dont les marges suivent la largeur de l'écran.
+       La version précédente ajoutait par-dessus une hauteur d'écran entière et ses propres
+       marges, ce qui imposait de faire défiler sur un téléphone pour un contenu qui tient. -->
+  <UPageCard
+    icon="i-heroicons-bell"
+    :title="$t('artists.notification_confirm.confirm_page_title')"
+    :description="envoi?.title"
+    class="max-w-xl mx-auto"
+  >
+    <div v-if="chargement" class="flex items-center gap-2 text-gray-500">
+      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-5" />
+      {{ $t('common.loading') }}
     </div>
-  </div>
+
+    <UAlert
+      v-else-if="erreur"
+      icon="i-heroicons-exclamation-triangle"
+      color="error"
+      variant="subtle"
+      :title="$t('artists.notification_confirm.confirm_page_error')"
+      :description="erreur"
+    />
+
+    <div v-else-if="envoi" class="space-y-3">
+      <UAlert color="info" variant="subtle" :description="envoi.message" />
+
+      <!-- Deux dates coexistent : celle de l'envoi et celle de la confirmation. La mention
+           lève l'ambiguïté. -->
+      <p class="text-xs text-muted">
+        {{ $t('artists.notification_confirm.sent_on', { date: formatDate(envoi.sentAt) }) }}
+      </p>
+
+      <UAlert
+        icon="i-heroicons-check-circle"
+        color="success"
+        variant="subtle"
+        :title="
+          envoi.alreadyConfirmed
+            ? $t('artists.notification_confirm.already_confirmed')
+            : $t('artists.notification_confirm.confirmed_now')
+        "
+        :description="formatDate(envoi.confirmedAt)"
+      />
+    </div>
+  </UPageCard>
 </template>
 
 <script setup lang="ts">

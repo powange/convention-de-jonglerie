@@ -116,6 +116,13 @@
     "notes_label": "Notes",
     "notes_placeholder": "Notes privées de l'organisateur...",
     "notes_saved": "Notes sauvegardées",
+    "notification_confirm": {
+      "already_confirmed": "Vous aviez déjà confirmé la lecture",
+      "confirm_page_error": "Confirmation impossible",
+      "confirm_page_title": "Confirmation de lecture",
+      "confirmed_now": "Lecture confirmée, merci",
+      "sent_on": "Envoyé le {date}"
+    },
     "or_create_new": "ou créer un nouvel utilisateur",
     "organizer_notes": "Notes de l'organisateur",
     "payment_amount": "Montant du paiement",

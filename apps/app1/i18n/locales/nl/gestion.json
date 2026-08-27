@@ -61,14 +61,10 @@
       "manage_artists_description": "Beheer de kunstenaars die zijn uitgenodigd voor deze editie",
       "title": "Artiestenmanagement",
       "notifications": {
-        "already_confirmed": "Je had de ontvangst al bevestigd",
-        "channels_hint": "Elke artiest wordt op de site, via pushmelding en per e-mail gewaarschuwd, afhankelijk van zijn voorkeuren. Via een link kan hij bevestigen dat hij het heeft gelezen.",
+        "channels_hint": "Elke artiest wordt op de site en via pushmelding gewaarschuwd, afhankelijk van zijn voorkeuren. Via een link kan hij bevestigen dat hij het heeft gelezen.",
         "confirm_message": "Het bericht wordt naar de geselecteerde artiesten gestuurd.",
-        "confirm_page_error": "Bevestiging mislukt",
-        "confirm_page_title": "Leesbevestiging",
         "confirm_title": "Verzending bevestigen",
         "confirm_warning": "Een verzonden bericht kan niet worden teruggenomen.",
-        "confirmed_now": "Ontvangst bevestigd, bedankt",
         "confirmed_ratio": "{confirmes} / {total} hebben bevestigd",
         "description": "De artiesten van deze editie in één verzending waarschuwen",
         "history": "Eerdere verzendingen",
@@ -92,7 +88,14 @@
         "target_by_show": "Per voorstelling",
         "target_shows": "{count} voorstelling(en)",
         "title": "Meldingen aan artiesten",
-        "who_read": "Wie heeft gelezen"
+        "who_read": "Wie heeft gelezen",
+        "copy_phone_numbers": "Nummers kopiëren",
+        "pending_with_phone": "{count} artiest(en) hebben niet bevestigd en hebben een telefoonnummer",
+        "phone_numbers_copied": "{count} nummer(s) gekopieerd",
+        "send_group_sms": "Herinneren via sms",
+        "sms_app_opened": "Berichten-app geopend",
+        "sms_confirm_link": "Bevestig hier:",
+        "sms_intro": "Herinnering: bevestig dat je dit bericht hebt gelezen."
       }
     },
     "confirm_delete_edition": "Weet je zeker dat je deze editie wilt schrappen?",

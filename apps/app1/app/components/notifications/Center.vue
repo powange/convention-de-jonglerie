@@ -171,12 +171,15 @@
                   </span>
 
                   <!-- Bouton d'action si présent -->
+                  <!-- `.stop` empêche le clic d'atteindre la ligne, qui referme et marque
+                       comme lu : ce bouton doit donc s'en charger lui-même, sinon le panneau
+                       reste ouvert par-dessus la page où l'on vient d'arriver. -->
                   <UButton
                     v-if="getNotificationActionText(notification) && notification.actionUrl"
                     variant="ghost"
                     size="xs"
                     :to="notification.actionUrl"
-                    @click.stop
+                    @click.stop="handleActionClick(notification)"
                   >
                     {{ getNotificationActionText(notification) }}
                   </UButton>
@@ -343,21 +346,35 @@ const markAllAsRead = async () => {
   }
 }
 
-const handleNotificationClick = async (notification: Notification) => {
-  // Marquer comme lue si pas encore lue
-  if (!notification.isRead) {
-    try {
-      await notificationsStore.markAsRead(notification.id)
-    } catch (error) {
-      console.error('Erreur lors du marquage comme lu:', error)
-    }
+/** Marque la notification comme lue, sans laisser un échec bloquer la navigation. */
+const marquerCommeLue = async (notification: Notification) => {
+  if (notification.isRead) return
+  try {
+    await notificationsStore.markAsRead(notification.id)
+  } catch (error) {
+    console.error('Erreur lors du marquage comme lu:', error)
   }
+}
 
-  // Rediriger si URL d'action
-  if (notification.actionUrl) {
-    await navigateTo(notification.actionUrl)
-    isOpen.value = false
-  }
+const handleNotificationClick = async (notification: Notification) => {
+  await marquerCommeLue(notification)
+
+  if (!notification.actionUrl) return
+
+  // Refermer AVANT de naviguer : la fermeture était placée après l'await, si bien qu'une
+  // navigation qui n'aboutit pas — redirection, route identique, garde de route — laissait
+  // le panneau ouvert par-dessus la page d'arrivée.
+  isOpen.value = false
+  await navigateTo(notification.actionUrl)
+}
+
+/**
+ * Clic sur le bouton d'action : la navigation est assurée par le `to` du bouton, il reste
+ * à refermer le panneau et à marquer la notification comme lue.
+ */
+const handleActionClick = (notification: Notification) => {
+  isOpen.value = false
+  void marquerCommeLue(notification)
 }
 
 // Modal de confirmation pour suppression

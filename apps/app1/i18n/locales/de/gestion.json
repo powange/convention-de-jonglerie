@@ -61,14 +61,10 @@
       "manage_artists_description": "Verwalten Sie die zu dieser Ausgabe eingeladenen Künstler",
       "title": "Verwaltung von Künstlern",
       "notifications": {
-        "already_confirmed": "Sie hatten den Erhalt bereits bestätigt",
-        "channels_hint": "Jeder Künstler wird auf der Website, per Push-Benachrichtigung und per E-Mail benachrichtigt, je nach seinen Einstellungen. Über einen Link kann er den Erhalt bestätigen.",
+        "channels_hint": "Jeder Künstler wird auf der Website und per Push-Benachrichtigung informiert, je nach seinen Einstellungen. Über einen Link kann er den Erhalt bestätigen.",
         "confirm_message": "Die Nachricht wird an die ausgewählten Künstler gesendet.",
-        "confirm_page_error": "Bestätigung fehlgeschlagen",
-        "confirm_page_title": "Lesebestätigung",
         "confirm_title": "Senden bestätigen",
         "confirm_warning": "Eine gesendete Nachricht kann nicht zurückgenommen werden.",
-        "confirmed_now": "Erhalt bestätigt, danke",
         "confirmed_ratio": "{confirmes} / {total} haben bestätigt",
         "description": "Die Künstler dieser Ausgabe mit einer einzigen Nachricht informieren",
         "history": "Frühere Sendungen",
@@ -92,7 +88,14 @@
         "target_by_show": "Nach Show",
         "target_shows": "{count} Show(s)",
         "title": "Benachrichtigungen an Künstler",
-        "who_read": "Wer hat gelesen"
+        "who_read": "Wer hat gelesen",
+        "copy_phone_numbers": "Nummern kopieren",
+        "pending_with_phone": "{count} Künstler haben nicht bestätigt und haben eine Telefonnummer",
+        "phone_numbers_copied": "{count} Nummer(n) kopiert",
+        "send_group_sms": "Per SMS nachfassen",
+        "sms_app_opened": "Nachrichten-App geöffnet",
+        "sms_confirm_link": "Hier bestätigen:",
+        "sms_intro": "Erinnerung: Bitte bestätigen Sie, dass Sie diese Nachricht gelesen haben."
       }
     },
     "confirm_delete_edition": "Sind Sie sicher, dass Sie diese Ausgabe löschen möchten?",

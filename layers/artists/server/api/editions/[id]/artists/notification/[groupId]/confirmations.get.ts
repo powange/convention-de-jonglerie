@@ -1,7 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
-import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
@@ -37,7 +36,18 @@ export default wrapApiHandler(async (event) => {
     select: {
       id: true,
       confirmedAt: true,
-      user: { select: userBasicSelect },
+      // Le téléphone sert à relancer par SMS ceux qui n'ont pas confirmé ; le reste
+      // identifie la personne dans la liste.
+      user: {
+        select: {
+          id: true,
+          pseudo: true,
+          prenom: true,
+          nom: true,
+          phone: true,
+          profilePicture: true,
+        },
+      },
     },
   })
 
