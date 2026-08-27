@@ -332,6 +332,15 @@
                 :description="$t('gestion.shows_call.list_description')"
                 color="amber"
               />
+
+              <!-- Notifications aux artistes -->
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/artists/notifications`"
+                icon="i-heroicons-bell"
+                :title="$t('gestion.artists.notifications.title')"
+                :description="$t('gestion.artists.notifications.description')"
+                color="yellow"
+              />
             </div>
           </div>
         </UCard>

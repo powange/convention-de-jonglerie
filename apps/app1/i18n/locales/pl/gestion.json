@@ -61,14 +61,10 @@
       "manage_artists_description": "Zarządzaj artystami zaproszonymi do tej edycji",
       "title": "Zarządzanie artystami",
       "notifications": {
-        "already_confirmed": "Potwierdzenie przeczytania zostało już wysłane",
-        "channels_hint": "Każdy artysta zostanie powiadomiony na stronie, powiadomieniem push oraz e-mailem, zgodnie ze swoimi preferencjami. Link pozwoli mu potwierdzić przeczytanie.",
+        "channels_hint": "Każdy artysta zostanie powiadomiony na stronie oraz powiadomieniem push, zgodnie ze swoimi preferencjami. Link pozwoli mu potwierdzić przeczytanie.",
         "confirm_message": "Wiadomość zostanie wysłana do wybranych artystów.",
-        "confirm_page_error": "Potwierdzenie niemożliwe",
-        "confirm_page_title": "Potwierdzenie przeczytania",
         "confirm_title": "Potwierdź wysyłkę",
         "confirm_warning": "Wysłanej wiadomości nie można wycofać.",
-        "confirmed_now": "Przeczytanie potwierdzone, dziękujemy",
         "confirmed_ratio": "{confirmes} / {total} potwierdziło",
         "description": "Powiadom artystów tej edycji jedną wysyłką",
         "history": "Poprzednie wysyłki",
@@ -92,7 +88,14 @@
         "target_by_show": "Według spektaklu",
         "target_shows": "{count} spektakl(i)",
         "title": "Powiadomienia dla artystów",
-        "who_read": "Kto przeczytał"
+        "who_read": "Kto przeczytał",
+        "copy_phone_numbers": "Skopiuj numery",
+        "pending_with_phone": "{count} artystów nie potwierdziło i ma numer telefonu",
+        "phone_numbers_copied": "Skopiowano numery: {count}",
+        "send_group_sms": "Przypomnij SMS-em",
+        "sms_app_opened": "Otwarto aplikację SMS",
+        "sms_confirm_link": "Potwierdź tutaj:",
+        "sms_intro": "Przypomnienie: potwierdź, że przeczytałeś tę wiadomość."
       }
     },
     "confirm_delete_edition": "Jesteś pewien, że chcesz wyrzucić tę edycję?",

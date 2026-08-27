@@ -95,6 +95,12 @@ export function getTranslationsToLoad(path: string): string[] {
       translations: ['survey', 'shows-call', 'gestion-shows-call'],
     },
     // Routes hors /gestion
+    // Confirmation de lecture d'une notification aux artistes : page vue par l'artiste,
+    // ses clés vivent donc dans le domaine partagé `artists`, pas dans `gestion`.
+    {
+      pattern: /^\/editions\/\d+\/artists/,
+      translations: ['artists'],
+    },
     // Page « Mes tâches » (utilisateur) : réutilise le module de tâches
     {
       pattern: /^\/editions\/\d+\/my-tasks/,

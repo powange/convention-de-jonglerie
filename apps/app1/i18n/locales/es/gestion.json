@@ -61,14 +61,10 @@
       "manage_artists_description": "Gestione los artistas invitados a esta edición",
       "title": "Gestión de artistas",
       "notifications": {
-        "already_confirmed": "Ya habías confirmado la lectura",
-        "channels_hint": "Cada artista será avisado en el sitio, por notificación push y por correo electrónico, según sus preferencias. Un enlace le permitirá confirmar la lectura.",
+        "channels_hint": "Cada artista será avisado en el sitio y por notificación push, según sus preferencias. Un enlace le permitirá confirmar la lectura.",
         "confirm_message": "El mensaje se va a enviar a los artistas seleccionados.",
-        "confirm_page_error": "Confirmación imposible",
-        "confirm_page_title": "Confirmación de lectura",
         "confirm_title": "Confirmar el envío",
         "confirm_warning": "Un mensaje enviado no se puede retirar.",
-        "confirmed_now": "Lectura confirmada, gracias",
         "confirmed_ratio": "{confirmes} / {total} han confirmado",
         "description": "Avisar a los artistas de esta edición en un solo envío",
         "history": "Envíos anteriores",
@@ -92,7 +88,14 @@
         "target_by_show": "Por espectáculo",
         "target_shows": "{count} espectáculo(s)",
         "title": "Notificaciones a los artistas",
-        "who_read": "Quién ha leído"
+        "who_read": "Quién ha leído",
+        "copy_phone_numbers": "Copiar los números",
+        "pending_with_phone": "{count} artista(s) no han confirmado y tienen número de teléfono",
+        "phone_numbers_copied": "{count} número(s) copiado(s)",
+        "send_group_sms": "Recordar por SMS",
+        "sms_app_opened": "Aplicación de mensajes abierta",
+        "sms_confirm_link": "Confirma aquí:",
+        "sms_intro": "Recordatorio: confirma que has leído este mensaje."
       }
     },
     "confirm_delete_edition": "¿Estás seguro de que quieres desechar esta edición?",

@@ -61,14 +61,10 @@
       "manage_artists_description": "Administrer de kunstnere, der er inviteret til denne udgave",
       "title": "Management af kunstnere",
       "notifications": {
-        "already_confirmed": "Du havde allerede bekræftet læsningen",
-        "channels_hint": "Hver artist får besked på siden, via push-notifikation og e-mail, alt efter deres indstillinger. Et link giver dem mulighed for at bekræfte læsningen.",
+        "channels_hint": "Hver artist får besked på siden og via push-notifikation, alt efter deres indstillinger. Et link giver dem mulighed for at bekræfte læsningen.",
         "confirm_message": "Beskeden sendes til de valgte artister.",
-        "confirm_page_error": "Bekræftelse mislykkedes",
-        "confirm_page_title": "Læsebekræftelse",
         "confirm_title": "Bekræft afsendelse",
         "confirm_warning": "En sendt besked kan ikke trækkes tilbage.",
-        "confirmed_now": "Læsning bekræftet, tak",
         "confirmed_ratio": "{confirmes} / {total} har bekræftet",
         "description": "Giv denne udgaves artister besked med én afsendelse",
         "history": "Tidligere afsendelser",
@@ -92,7 +88,14 @@
         "target_by_show": "Efter forestilling",
         "target_shows": "{count} forestilling(er)",
         "title": "Notifikationer til artister",
-        "who_read": "Hvem har læst"
+        "who_read": "Hvem har læst",
+        "copy_phone_numbers": "Kopiér numrene",
+        "pending_with_phone": "{count} artist(er) har ikke bekræftet og har et telefonnummer",
+        "phone_numbers_copied": "{count} nummer/numre kopieret",
+        "send_group_sms": "Ryk med sms",
+        "sms_app_opened": "Beskedapp åbnet",
+        "sms_confirm_link": "Bekræft her:",
+        "sms_intro": "Påmindelse: bekræft venligst, at du har læst denne besked."
       }
     },
     "confirm_delete_edition": "Er du sikker på, at du vil slette denne udgave?",

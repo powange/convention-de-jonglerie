@@ -61,14 +61,10 @@
       "manage_artists_description": "Manage the artists invited to this edition",
       "title": "Artist management",
       "notifications": {
-        "already_confirmed": "You had already confirmed reading this",
-        "channels_hint": "Each artist will be notified on the site, by push notification and by email, according to their preferences. A link will let them confirm they have read it.",
+        "channels_hint": "Each artist will be notified on the site and by push notification, according to their preferences. A link will let them confirm they have read it.",
         "confirm_message": "The message is about to be sent to the selected artists.",
-        "confirm_page_error": "Confirmation failed",
-        "confirm_page_title": "Read confirmation",
         "confirm_title": "Confirm sending",
         "confirm_warning": "A message that has been sent cannot be taken back.",
-        "confirmed_now": "Reading confirmed, thank you",
         "confirmed_ratio": "{confirmes} / {total} have confirmed",
         "description": "Notify this edition's artists in a single send",
         "history": "Previous sends",
@@ -92,7 +88,14 @@
         "target_by_show": "By show",
         "target_shows": "{count} show(s)",
         "title": "Notifications to artists",
-        "who_read": "Who has read"
+        "who_read": "Who has read",
+        "copy_phone_numbers": "Copy the numbers",
+        "pending_with_phone": "{count} artist(s) have not confirmed and have a phone number",
+        "phone_numbers_copied": "{count} number(s) copied",
+        "send_group_sms": "Follow up by SMS",
+        "sms_app_opened": "Messaging app opened",
+        "sms_confirm_link": "Confirm here:",
+        "sms_intro": "Reminder: please confirm you have read this message."
       }
     },
     "confirm_delete_edition": "Are you sure you want to scrap this edition?",

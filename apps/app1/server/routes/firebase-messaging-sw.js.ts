@@ -312,38 +312,64 @@ if (messaging) messaging.onBackgroundMessage((payload) => {
 })
 
 // Gérer le clic sur la notification
+//
+// Le point délicat est client.navigate() : il lève une exception sur une fenêtre que ce
+// Service Worker ne contrôle pas — cas courant sur mobile, la recherche se faisant avec
+// includeUncontrolled. L'ancienne version laissait alors l'exception remonter :
+// la fenêtre passait au premier plan sans bouger, restant sur la page déjà affichée. Un
+// artiste cliquant sur « Confirmer la lecture » retombait ainsi sur l'édition en cours.
+//
+// D'où l'ordre suivi ici : une fenêtre déjà sur la bonne page est simplement mise au
+// premier plan ; sinon on tente de la faire naviguer ; et tout échec retombe sur
+// l'ouverture d'une fenêtre neuve, qui elle aboutit toujours.
 self.addEventListener('notificationclick', (event) => {
   console.log('[firebase-messaging-sw.js] Notification cliquée:', event)
 
   event.notification.close()
 
-  // Ouvrir ou focus l'application
   const urlToOpen = event.notification.data?.url || '/'
+  const urlAbsolue = new URL(urlToOpen, self.location.origin).href
+
+  const ouvrirNouvelleFenetre = () =>
+    clients.openWindow ? clients.openWindow(urlAbsolue) : undefined
 
   event.waitUntil(
     clients
-      .matchAll({
-        type: 'window',
-        includeUncontrolled: true,
-      })
+      .matchAll({ type: 'window', includeUncontrolled: true })
       .then((windowClients) => {
-        // Vérifier si une fenêtre est déjà ouverte
-        for (let i = 0; i < windowClients.length; i++) {
-          const client = windowClients[i]
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            return client.focus().then((client) => {
-              // Naviguer vers l'URL si nécessaire
-              if (urlToOpen && 'navigate' in client) {
-                return client.navigate(urlToOpen)
-              }
-              return client
+        const fenetres = windowClients.filter(
+          (client) => client.url.startsWith(self.location.origin) && 'focus' in client
+        )
+
+        // Déjà au bon endroit : inutile de renaviguer, on remet au premier plan
+        const dejaSurLaPage = fenetres.find((client) => client.url === urlAbsolue)
+        if (dejaSurLaPage) {
+          return dejaSurLaPage.focus()
+        }
+
+        const fenetre = fenetres[0]
+        if (!fenetre) {
+          return ouvrirNouvelleFenetre()
+        }
+
+        return fenetre
+          .focus()
+          .then((client) => {
+            if (!client || typeof client.navigate !== 'function') {
+              return ouvrirNouvelleFenetre()
+            }
+            // navigate() échoue sur une fenêtre non contrôlée : dans ce cas, mieux vaut
+            // une fenêtre neuve qu'une fenêtre au premier plan restée sur sa page.
+            return client.navigate(urlAbsolue).catch((erreur) => {
+              console.warn('[firebase-messaging-sw.js] navigate() a échoué, ouverture directe:', erreur)
+              return ouvrirNouvelleFenetre()
             })
-          }
-        }
-        // Si aucune fenêtre n'est ouverte, en ouvrir une nouvelle
-        if (clients.openWindow) {
-          return clients.openWindow(urlToOpen)
-        }
+          })
+          .catch(() => ouvrirNouvelleFenetre())
+      })
+      .catch((erreur) => {
+        console.warn('[firebase-messaging-sw.js] matchAll() a échoué, ouverture directe:', erreur)
+        return ouvrirNouvelleFenetre()
       })
   )
 })
