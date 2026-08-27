@@ -5,6 +5,7 @@ import { getSupportedLocalesCodes } from '~/utils/locales'
 import { isValidPronoun } from '~/utils/pronouns'
 
 import { SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
+import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
 
 /**
  * Validation d'un numéro de téléphone international.
@@ -30,11 +31,9 @@ export function normalizePhoneE164(value: string | null | undefined): string {
 
 // Schémas de base réutilisables
 export const emailSchema = z.string().email('Email invalide').min(1, 'Email requis')
-export const passwordSchema = z
-  .string()
-  .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-  .regex(/(?=.*[A-Z])/, 'Le mot de passe doit contenir au moins une majuscule')
-  .regex(/(?=.*\d)/, 'Le mot de passe doit contenir au moins un chiffre')
+// Les règles vivent dans `shared/utils/regles-mot-de-passe` : l'interface affiche exactement
+// celles que ce schéma applique.
+export const passwordSchema = schemaMotDePasse()
 export const pseudoSchema = z
   .string()
   .min(3, 'Le pseudo doit contenir au moins 3 caractères')

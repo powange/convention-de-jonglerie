@@ -65,6 +65,19 @@ describe('Validation Schemas', () => {
         // mais uniquement majuscules + chiffres, donc PASSWORD1 peut être valide selon le schema actuel
         expect(() => schemas.passwordSchema.parse('PASSWORD1')).not.toThrow()
       })
+
+      it('accepte exactement ce que l’interface annonce comme valide', async () => {
+        // Le formulaire affiche les exigences de `motDePasseValide` ; si ce schéma s'en
+        // écartait, l'utilisateur se verrait de nouveau refuser un mot de passe présenté
+        // comme conforme — le défaut qu'avait signalé un utilisateur.
+        const { motDePasseValide } = await import('../../../../shared/utils/regles-mot-de-passe')
+
+        for (const motDePasse of ['Abcdefg1', 'Abcdefgh', 'abcdefg1', 'Court1A', 'Bonjour!']) {
+          expect(schemas.passwordSchema.safeParse(motDePasse).success, motDePasse).toBe(
+            motDePasseValide(motDePasse)
+          )
+        }
+      })
     })
 
     describe('pseudoSchema', () => {

@@ -178,20 +178,7 @@
                   />
                 </template>
               </UInput>
-              <!-- Indicateur de force du mot de passe -->
-              <div v-if="state.password" class="mt-2">
-                <div class="flex gap-1 mb-1">
-                  <div
-                    v-for="i in 4"
-                    :key="i"
-                    class="h-1 flex-1 rounded"
-                    :class="getPasswordStrengthBarColor(i)"
-                  />
-                </div>
-                <p class="text-xs" :class="passwordStrengthTextColor">
-                  {{ passwordStrengthText }}
-                </p>
-              </div>
+              <AuthPasswordRequirements :password="state.password" />
             </UFormField>
 
             <UFormField :label="$t('auth.confirm_password')" name="confirmPassword">
@@ -305,7 +292,7 @@
 import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
-import { usePasswordStrength } from '~/composables/usePasswordStrength'
+import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
 
 const { t } = useI18n()
 
@@ -320,11 +307,7 @@ const schema = z
     pseudo: z.string().min(3, t('errors.username_min_3_chars')),
     nom: z.string().optional().or(z.literal('')),
     prenom: z.string().optional().or(z.literal('')),
-    password: z
-      .string()
-      .min(8, t('errors.password_too_short'))
-      .regex(/(?=.*[A-Z])/, t('errors.password_uppercase_required'))
-      .regex(/(?=.*\d)/, t('errors.password_digit_required')),
+    password: schemaMotDePasse(t),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -349,13 +332,6 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
 // Utiliser le composable pour la force du mot de passe
-const passwordRef = computed(() => state.password)
-const {
-  strengthText: passwordStrengthText,
-  strengthTextColor: passwordStrengthTextColor,
-  getStrengthBarColor: getPasswordStrengthBarColor,
-} = usePasswordStrength(passwordRef)
-
 // Gestion des catégories utilisateur
 const categoryItems = computed(() => [
   {

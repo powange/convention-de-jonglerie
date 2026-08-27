@@ -106,98 +106,69 @@ describe('usePasswordStrength', () => {
     })
   })
 
-  describe('strengthText (libellé i18n)', () => {
-    it('retourne la clé « faible » pour un score de 0', () => {
-      const { strengthText } = usePasswordStrength(ref(''))
-      expect(strengthText.value).toBe('auth.password_weak')
+  describe('libellé et couleurs : ce que voit l’utilisateur', () => {
+    // Le défaut rapporté : 15 caractères, une majuscule, un caractère spécial, aucun chiffre.
+    // Le compteur annonçait « Mot de passe fort » en vert, puis la validation le refusait.
+    const SANS_CHIFFRE = 'Bonjourlemonde!'
+
+    it('n’annonce pas « fort » un mot de passe auquel il manque un chiffre', () => {
+      const { strength, strengthText, valide } = usePasswordStrength(ref(SANS_CHIFFRE))
+
+      // Il marque pourtant des points : longueur, majuscule, et le bonus de robustesse
+      expect(strength.value).toBe(3)
+      expect(valide.value).toBe(false)
+      expect(strengthText.value).toBe('auth.password_incomplete')
     })
 
-    it('retourne la clé « faible » pour un score de 1', () => {
-      const { strengthText } = usePasswordStrength(ref('abcdefgh'))
-      expect(strengthText.value).toBe('auth.password_weak')
-    })
+    it('signale en rouge, texte comme barres, tant qu’une exigence manque', () => {
+      const { strengthTextColor, getStrengthBarColor } = usePasswordStrength(ref(SANS_CHIFFRE))
 
-    it('retourne la clé « moyen » pour un score de 2', () => {
-      const { strengthText } = usePasswordStrength(ref('Abcdefgh'))
-      expect(strengthText.value).toBe('auth.password_medium')
-    })
-
-    it('retourne la clé « fort » pour un score de 3', () => {
-      const { strengthText } = usePasswordStrength(ref('Abcdefg1'))
-      expect(strengthText.value).toBe('auth.password_strong')
-    })
-
-    it('retourne la clé « très fort » pour un score de 4', () => {
-      const { strengthText } = usePasswordStrength(ref('Abcdefg1!'))
-      expect(strengthText.value).toBe('auth.password_very_strong')
-    })
-  })
-
-  describe('strengthTextColor (couleur du texte)', () => {
-    it('retourne rouge pour un score de 0', () => {
-      const { strengthTextColor } = usePasswordStrength(ref(''))
       expect(strengthTextColor.value).toBe('text-red-500')
-    })
-
-    it('retourne rouge pour un score de 1', () => {
-      const { strengthTextColor } = usePasswordStrength(ref('abcdefgh'))
-      expect(strengthTextColor.value).toBe('text-red-500')
-    })
-
-    it('retourne orange pour un score de 2', () => {
-      const { strengthTextColor } = usePasswordStrength(ref('Abcdefgh'))
-      expect(strengthTextColor.value).toBe('text-orange-500')
-    })
-
-    it('retourne vert pour un score de 3', () => {
-      const { strengthTextColor } = usePasswordStrength(ref('Abcdefg1'))
-      expect(strengthTextColor.value).toBe('text-green-500')
-    })
-
-    it('retourne émeraude pour un score de 4', () => {
-      const { strengthTextColor } = usePasswordStrength(ref('Abcdefg1!'))
-      expect(strengthTextColor.value).toBe('text-emerald-500')
-    })
-  })
-
-  describe('getStrengthBarColor (couleur des barres)', () => {
-    it('colore les barres jusqu’au niveau atteint et laisse les autres en gris', () => {
-      // score = 3 (Abcdefg1)
-      const { getStrengthBarColor } = usePasswordStrength(ref('Abcdefg1'))
-      expect(getStrengthBarColor(1)).toBe('bg-green-500')
-      expect(getStrengthBarColor(2)).toBe('bg-green-500')
-      expect(getStrengthBarColor(3)).toBe('bg-green-500')
-      // barre au-delà du score : grise
+      expect(getStrengthBarColor(1)).toBe('bg-red-500')
+      expect(getStrengthBarColor(3)).toBe('bg-red-500')
       expect(getStrengthBarColor(4)).toBe('bg-gray-200 dark:bg-gray-700')
     })
 
-    it('retourne le gris par défaut pour un score de 0 quelle que soit la barre', () => {
-      const { getStrengthBarColor } = usePasswordStrength(ref(''))
-      // barIndex 0 <= strength 0 : entre dans le switch, mais score 0 => default gris
-      expect(getStrengthBarColor(0)).toBe('bg-gray-200 dark:bg-gray-700')
-      // barIndex 1 > strength 0 : gris
-      expect(getStrengthBarColor(1)).toBe('bg-gray-200 dark:bg-gray-700')
+    it('annonce « fort » dès que les trois exigences sont satisfaites', () => {
+      const { strengthText, strengthTextColor, valide } = usePasswordStrength(ref('Abcdefg1'))
+
+      expect(valide.value).toBe(true)
+      expect(strengthText.value).toBe('auth.password_strong')
+      expect(strengthTextColor.value).toBe('text-green-500')
     })
 
-    it('retourne rouge pour les barres actives au score 1', () => {
-      const { getStrengthBarColor } = usePasswordStrength(ref('abcdefgh'))
-      expect(getStrengthBarColor(1)).toBe('bg-red-500')
-      expect(getStrengthBarColor(2)).toBe('bg-gray-200 dark:bg-gray-700')
-    })
+    it('réserve « très fort » au mot de passe valide qui décroche le bonus', () => {
+      const { strengthText, strengthTextColor, getStrengthBarColor } = usePasswordStrength(
+        ref('Abcdefg1!')
+      )
 
-    it('retourne orange pour les barres actives au score 2', () => {
-      const { getStrengthBarColor } = usePasswordStrength(ref('Abcdefgh'))
-      expect(getStrengthBarColor(1)).toBe('bg-orange-500')
-      expect(getStrengthBarColor(2)).toBe('bg-orange-500')
-      expect(getStrengthBarColor(3)).toBe('bg-gray-200 dark:bg-gray-700')
-    })
-
-    it('retourne émeraude pour toutes les barres actives au score 4', () => {
-      const { getStrengthBarColor } = usePasswordStrength(ref('Abcdefg1!'))
-      expect(getStrengthBarColor(1)).toBe('bg-emerald-500')
-      expect(getStrengthBarColor(2)).toBe('bg-emerald-500')
-      expect(getStrengthBarColor(3)).toBe('bg-emerald-500')
+      expect(strengthText.value).toBe('auth.password_very_strong')
+      expect(strengthTextColor.value).toBe('text-emerald-500')
       expect(getStrengthBarColor(4)).toBe('bg-emerald-500')
+    })
+  })
+
+  describe('regles : les exigences affichées pendant la saisie', () => {
+    it('les décrit toutes, satisfaites ou non, dans un ordre stable', () => {
+      const { regles } = usePasswordStrength(ref('Bonjourlemonde!'))
+
+      expect(regles.value.map((r) => r.cle)).toEqual(['longueur', 'majuscule', 'chiffre'])
+      expect(regles.value.map((r) => r.satisfaite)).toEqual([true, true, false])
+      expect(regles.value.map((r) => r.libelle)).toEqual([
+        'auth.password_rule_length',
+        'auth.password_rule_uppercase',
+        'auth.password_rule_digit',
+      ])
+    })
+
+    it('coche l’exigence manquante dès qu’elle est remplie', () => {
+      const motDePasse = ref('Bonjourlemonde!')
+      const { regles, valide } = usePasswordStrength(motDePasse)
+      expect(valide.value).toBe(false)
+
+      motDePasse.value = 'Bonjourlemonde1!'
+      expect(regles.value.every((r) => r.satisfaite)).toBe(true)
+      expect(valide.value).toBe(true)
     })
   })
 })

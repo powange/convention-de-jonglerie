@@ -87,23 +87,7 @@
             </UFormField>
           </div>
 
-          <!-- Indicateur de force du mot de passe -->
-          <div v-if="state.newPassword" class="space-y-2">
-            <div class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('auth.password_strength') }}
-            </div>
-            <div class="flex space-x-1">
-              <div
-                v-for="i in 4"
-                :key="i"
-                class="h-2 flex-1 rounded-full"
-                :class="getPasswordStrengthColor(i, passwordStrength)"
-              />
-            </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400">
-              {{ getPasswordStrengthText(passwordStrength) }}
-            </div>
-          </div>
+          <AuthPasswordRequirements :password="state.newPassword" />
 
           <!-- Bouton de réinitialisation -->
           <UButton
@@ -179,6 +163,8 @@
 import { reactive, ref, computed } from 'vue'
 import { z } from 'zod'
 
+import { schemaMotDePasse } from '~~/shared/utils/regles-mot-de-passe'
+
 const route = useRoute()
 const toast = useToast()
 const { t } = useI18n()
@@ -190,11 +176,7 @@ definePageMeta({
 
 const schema = z
   .object({
-    newPassword: z
-      .string()
-      .min(8, t('errors.password_too_short'))
-      .regex(/(?=.*[A-Z])/, t('errors.password_uppercase_required'))
-      .regex(/(?=.*\d)/, t('errors.password_digit_required')),
+    newPassword: schemaMotDePasse(t),
     confirmPassword: z.string().min(1, t('errors.required_field')),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -215,55 +197,6 @@ const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
 
 const token = computed(() => route.query.token as string)
-
-// Calcul de la force du mot de passe
-const passwordStrength = computed(() => {
-  const password = state.newPassword
-  if (!password) return 0
-
-  let strength = 0
-  if (password.length >= 8) strength++
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++
-  if (/\d/.test(password)) strength++
-  if (/[^a-zA-Z0-9]/.test(password)) strength++
-
-  return strength
-})
-
-const getPasswordStrengthColor = (index: number, strength: number) => {
-  if (index <= strength) {
-    switch (strength) {
-      case 1:
-        return 'bg-red-500'
-      case 2:
-        return 'bg-yellow-500'
-      case 3:
-        return 'bg-blue-500'
-      case 4:
-        return 'bg-green-500'
-      default:
-        return 'bg-gray-200 dark:bg-gray-700'
-    }
-  }
-  return 'bg-gray-200 dark:bg-gray-700'
-}
-
-const getPasswordStrengthText = (strength: number) => {
-  switch (strength) {
-    case 0:
-      return t('auth.strength_very_weak')
-    case 1:
-      return t('auth.strength_weak')
-    case 2:
-      return t('auth.strength_medium')
-    case 3:
-      return t('auth.strength_good')
-    case 4:
-      return t('auth.strength_excellent')
-    default:
-      return ''
-  }
-}
 
 // Vérifier la présence et la validité du token
 onMounted(async () => {
