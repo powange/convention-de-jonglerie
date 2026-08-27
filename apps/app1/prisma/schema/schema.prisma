@@ -74,6 +74,8 @@ model User {
   fcmTokens                          FcmToken[]
   volunteerNotificationGroups        VolunteerNotificationGroup[]
   volunteerNotificationConfirmations VolunteerNotificationConfirmation[]
+  artistNotificationGroups           ArtistNotificationGroup[]
+  artistNotificationConfirmations    ArtistNotificationConfirmation[]
   volunteerAssignments               VolunteerAssignment[]               @relation("VolunteerAssignment_user")
   assignedVolunteerSlots             VolunteerAssignment[]               @relation("VolunteerAssignment_assignedBy")
   claimRequests                      ConventionClaimRequest[]
@@ -258,6 +260,7 @@ model Edition {
   workshopLocations                WorkshopLocation[]
   artists                          EditionArtist[]
   shows                            Show[]
+  artistNotificationGroups         ArtistNotificationGroup[]
   volunteerMeals                   VolunteerMeal[]
   ticketingCounters                TicketingCounter[]
   editionOrganizers                EditionOrganizer[]

@@ -460,6 +460,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         icon: 'i-heroicons-megaphone',
         to: `/editions/${editionId.value}/gestion/shows-call`,
       },
+      {
+        label: t('gestion.artists.notifications.title'),
+        icon: 'i-heroicons-bell',
+        to: `/editions/${editionId.value}/gestion/artists/notifications`,
+      },
     ]
 
     managementSection.push({

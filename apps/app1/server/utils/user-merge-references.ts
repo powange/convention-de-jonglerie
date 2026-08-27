@@ -106,6 +106,13 @@ export const USER_REFERENCES: UserReference[] = [
   },
 
   // --- Artistes et spectacles ---
+  { model: 'artistNotificationGroup', field: 'senderId', group: 'artists' },
+  {
+    model: 'artistNotificationConfirmation',
+    field: 'userId',
+    uniqueWith: ['artistNotificationGroupId'],
+    group: 'artists',
+  },
   { model: 'editionArtist', field: 'userId', uniqueWith: ['editionId'], group: 'artists' },
   { model: 'editionArtist', field: 'entryValidatedBy', group: 'artists' },
   { model: 'editionArtist', field: 'pickupResponsibleId', group: 'artists' },
