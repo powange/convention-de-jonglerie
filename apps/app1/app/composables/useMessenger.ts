@@ -66,12 +66,17 @@ export interface Conversation {
     | 'ORGANIZERS_GROUP'
     | 'PRIVATE'
     | 'ARTIST_APPLICATION'
+    | 'SHOW_GROUP'
   createdAt: Date
   updatedAt: Date
   team: {
     id: string
     name: string
     color: string
+  } | null
+  show: {
+    id: number
+    title: string
   } | null
   showApplication: {
     id: number

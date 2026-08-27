@@ -337,7 +337,10 @@
       "performance_number": "Przedstawienie {number}",
       "performance_public": "Ogłoszone publicznie",
       "performances": "Przedstawienia",
-      "remove_performance": "Usuń to przedstawienie"
+      "remove_performance": "Usuń to przedstawienie",
+      "message_group": "Napisz do obsady",
+      "message_group_error": "Nie udało się otworzyć grupy wiadomości spektaklu",
+      "message_group_no_artists": "Brak artystów w tym spektaklu"
     },
     "stock": {
       "available_now": "{available}/{total} dostępnych",

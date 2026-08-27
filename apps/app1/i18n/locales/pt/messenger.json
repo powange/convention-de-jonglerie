@@ -6,7 +6,8 @@
       "group": "Conversa em grupo",
       "organizers": "Conversa com organizadores",
       "organizers_group": "Discussão entre organizadores",
-      "private": "Conversa privada"
+      "private": "Conversa privada",
+      "show_group": "Elenco do espetáculo"
     },
     "conversations": "Conversas",
     "delete": "Excluir",
@@ -36,7 +37,8 @@
       "organizers_group": "Grupo de organizadores",
       "private": "Privado",
       "private_leader": "Privado com o responsável",
-      "private_leaders": "Privado com os responsáveis"
+      "private_leaders": "Privado com os responsáveis",
+      "show_group": "Artistas e organizadores"
     },
     "volunteer_managers": "Gestores de voluntários",
     "seen_by": "Lido por {name}"

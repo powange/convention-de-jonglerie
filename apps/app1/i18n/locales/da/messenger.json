@@ -6,7 +6,8 @@
       "group": "Gruppechat",
       "organizers": "Samtale med arrangører",
       "organizers_group": "Diskussion mellem arrangører",
-      "private": "Privat samtale"
+      "private": "Privat samtale",
+      "show_group": "Forestillingens medvirkende"
     },
     "conversations": "Samtaler",
     "delete": "Slet",
@@ -36,7 +37,8 @@
       "organizers_group": "Arrangørgruppe",
       "private": "Privat",
       "private_leader": "Privat med leder",
-      "private_leaders": "Privat med ledere"
+      "private_leaders": "Privat med ledere",
+      "show_group": "Artister og arrangører"
     },
     "volunteer_managers": "Frivilligledere",
     "seen_by": "Læst af {name}"

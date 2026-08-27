@@ -846,6 +846,8 @@ function getConversationIcon(conversation: Conversation): string {
       return 'i-heroicons-chat-bubble-left-right'
     case 'ARTIST_APPLICATION':
       return 'i-heroicons-sparkles'
+    case 'SHOW_GROUP':
+      return 'i-heroicons-ticket'
     default:
       return 'i-heroicons-user'
   }
@@ -862,6 +864,8 @@ function getConversationTypeLabel(conversation: Conversation): string {
       return t('messenger.conversation_types.organizers')
     case 'ORGANIZERS_GROUP':
       return t('messenger.conversation_types.organizers_group')
+    case 'SHOW_GROUP':
+      return t('messenger.conversation_types.show_group')
     default:
       return t('messenger.conversation_types.private')
   }
@@ -881,6 +885,12 @@ function getConversationDisplayName(conversation: Conversation): string {
 
   if (conversation.type === 'TEAM_GROUP') {
     return conversation.team?.name || 'Conversation'
+  }
+
+  // Le groupe d'un spectacle porte le titre de celui-ci : c'est ce qui le distingue des
+  // autres groupes de l'édition dans la liste
+  if (conversation.type === 'SHOW_GROUP') {
+    return conversation.show?.title || t('messenger.conversation_types.show_group')
   }
 
   // Pour les conversations de candidature artiste
@@ -961,6 +971,10 @@ function getConversationSubtitle(conversation: Conversation): string {
 
   if (conversation.type === 'ARTIST_APPLICATION') {
     return t('messenger.subtitles.artist_application')
+  }
+
+  if (conversation.type === 'SHOW_GROUP') {
+    return t('messenger.subtitles.show_group')
   }
 
   // Pour les conversations privées (TEAM_LEADER_PRIVATE)

@@ -337,7 +337,10 @@
       "performance_number": "Replica {number}",
       "performance_public": "Annunciata al pubblico",
       "performances": "Repliche",
-      "remove_performance": "Rimuovi questa replica"
+      "remove_performance": "Rimuovi questa replica",
+      "message_group": "Scrivere al cast",
+      "message_group_error": "Impossibile aprire il gruppo di messaggistica dello spettacolo",
+      "message_group_no_artists": "Nessun artista in questo spettacolo"
     },
     "stock": {
       "available_now": "{available}/{total} disponibile/i",

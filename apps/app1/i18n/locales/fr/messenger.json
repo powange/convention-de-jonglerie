@@ -6,7 +6,8 @@
       "group": "Discussion de groupe",
       "organizers": "Conversation avec les organisateurs",
       "organizers_group": "Discussion entre organisateurs",
-      "private": "Conversation privée"
+      "private": "Conversation privée",
+      "show_group": "Distribution du spectacle"
     },
     "conversations": "Conversations",
     "delete": "Supprimer",
@@ -37,7 +38,8 @@
       "organizers_group": "Groupe organisateurs",
       "private": "Privé",
       "private_leader": "Privé avec le responsable",
-      "private_leaders": "Privé avec les responsables"
+      "private_leaders": "Privé avec les responsables",
+      "show_group": "Artistes et organisateurs"
     },
     "volunteer_managers": "Responsables bénévoles"
   }

@@ -6,7 +6,8 @@
       "group": "Czat grupowy",
       "organizers": "Rozmowa z organizatorami",
       "organizers_group": "Dyskusja między organizatorami",
-      "private": "Prywatna rozmowa"
+      "private": "Prywatna rozmowa",
+      "show_group": "Obsada spektaklu"
     },
     "conversations": "Rozmowy",
     "delete": "Usuń",
@@ -36,7 +37,8 @@
       "organizers_group": "Grupa organizatorów",
       "private": "Prywatne",
       "private_leader": "Prywatne z liderem",
-      "private_leaders": "Prywatne z liderami"
+      "private_leaders": "Prywatne z liderami",
+      "show_group": "Artyści i organizatorzy"
     },
     "volunteer_managers": "Kierownicy wolontariuszy",
     "seen_by": "Przeczytane przez {name}"

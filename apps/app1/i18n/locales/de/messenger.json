@@ -6,7 +6,8 @@
       "group": "Gruppenchat",
       "organizers": "Konversation mit Organisatoren",
       "organizers_group": "Diskussion zwischen Organisatoren",
-      "private": "Private Konversation"
+      "private": "Private Konversation",
+      "show_group": "Besetzung der Show"
     },
     "conversations": "Konversationen",
     "delete": "Löschen",
@@ -36,7 +37,8 @@
       "organizers_group": "Organisatorengruppe",
       "private": "Privat",
       "private_leader": "Privat mit Leiter",
-      "private_leaders": "Privat mit Leitern"
+      "private_leaders": "Privat mit Leitern",
+      "show_group": "Künstler und Organisatoren"
     },
     "volunteer_managers": "Freiwilligenleiter",
     "seen_by": "Gelesen von {name}"

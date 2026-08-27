@@ -6,7 +6,8 @@
       "group": "Груповий чат",
       "organizers": "Розмова з організаторами",
       "organizers_group": "Обговорення між організаторами",
-      "private": "Приватна розмова"
+      "private": "Приватна розмова",
+      "show_group": "Склад вистави"
     },
     "conversations": "Розмови",
     "delete": "Видалити",
@@ -36,7 +37,8 @@
       "organizers_group": "Група організаторів",
       "private": "Приватне",
       "private_leader": "Приватно з керівником",
-      "private_leaders": "Приватно з керівниками"
+      "private_leaders": "Приватно з керівниками",
+      "show_group": "Артисти й організатори"
     },
     "volunteer_managers": "Керівники волонтерів",
     "seen_by": "Прочитано {name}"

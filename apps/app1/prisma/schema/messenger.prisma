@@ -9,6 +9,7 @@ enum ConversationType {
   ORGANIZERS_GROUP // Discussion de groupe entre tous les organisateurs de l'édition
   PRIVATE // Conversation privée 1-à-1 entre deux utilisateurs (non liée à une édition)
   ARTIST_APPLICATION // Conversation entre un artiste candidat et les organisateurs
+  SHOW_GROUP // Discussion de groupe autour d'un spectacle : sa distribution et les organisateurs habilités
 }
 
 model Conversation {
@@ -16,6 +17,9 @@ model Conversation {
   editionId         Int? // Optionnel : NULL pour les conversations privées 1-à-1
   teamId            String? // Optionnel : uniquement pour les conversations liées à une équipe
   showApplicationId Int?             @unique // Optionnel : uniquement pour les conversations de candidature artiste
+  // Optionnel : uniquement pour les groupes de spectacle. Unique, car un spectacle n'a qu'un
+  // groupe — on le retrouve plutôt que d'en créer un second à chaque ouverture.
+  showId            Int?             @unique
   type              ConversationType
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
@@ -23,12 +27,14 @@ model Conversation {
   edition         Edition?                  @relation(fields: [editionId], references: [id], onDelete: Cascade)
   team            VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: Cascade)
   showApplication ShowApplication?          @relation(fields: [showApplicationId], references: [id], onDelete: Cascade)
+  show            Show?                     @relation(fields: [showId], references: [id], onDelete: Cascade)
   participants    ConversationParticipant[]
   messages        Message[]
 
   @@index([editionId])
   @@index([teamId])
   @@index([showApplicationId])
+  @@index([showId])
   @@index([type])
 }
 

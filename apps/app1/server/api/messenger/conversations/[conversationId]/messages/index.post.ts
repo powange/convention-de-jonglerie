@@ -71,6 +71,12 @@ export default wrapApiHandler(
                 },
               },
             },
+            // Le titre du spectacle nomme la notification d'un groupe SHOW_GROUP
+            show: {
+              select: {
+                title: true,
+              },
+            },
             participants: {
               where: {
                 leftAt: null,
@@ -174,6 +180,7 @@ export default wrapApiHandler(
     const conventionName =
       participant.conversation.edition?.convention?.name ??
       editionFromShowApplication?.convention?.name
+    const showTitle = participant.conversation.show?.title
 
     const truncatedContent = content.length > 100 ? content.substring(0, 97) + '...' : content
 
@@ -297,6 +304,10 @@ export default wrapApiHandler(
             } else if (conversationType === 'ARTIST_APPLICATION') {
               // Pour une conversation liée à une candidature artiste
               notificationTitle = `Nouveau message - Candidature spectacle ${conventionName ?? ''}`
+            } else if (conversationType === 'SHOW_GROUP') {
+              // Pour le groupe d'un spectacle, son titre situe la conversation mieux que
+              // le nom de l'édition, un artiste pouvant jouer dans plusieurs spectacles
+              notificationTitle = `Nouveau message - ${showTitle ?? editionName}`
             } else {
               // Fallback
               notificationTitle = `Nouveau message - ${editionName}`

@@ -122,6 +122,13 @@ export default wrapApiHandler(
             color: true,
           },
         },
+        // Le titre du spectacle nomme le groupe SHOW_GROUP dans la liste
+        show: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
         // Inclure les infos de la candidature pour les conversations ARTIST_APPLICATION
         showApplication: {
           select: {

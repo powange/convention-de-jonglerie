@@ -6,7 +6,8 @@
       "group": "Chat di gruppo",
       "organizers": "Conversazione con organizzatori",
       "organizers_group": "Discussione tra organizzatori",
-      "private": "Conversazione privata"
+      "private": "Conversazione privata",
+      "show_group": "Cast dello spettacolo"
     },
     "conversations": "Conversazioni",
     "delete": "Elimina",
@@ -36,7 +37,8 @@
       "organizers_group": "Gruppo organizzatori",
       "private": "Privato",
       "private_leader": "Privato con il responsabile",
-      "private_leaders": "Privato con i responsabili"
+      "private_leaders": "Privato con i responsabili",
+      "show_group": "Artisti e organizzatori"
     },
     "volunteer_managers": "Responsabili volontari",
     "seen_by": "Letto da {name}"

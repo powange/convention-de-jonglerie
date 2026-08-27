@@ -337,7 +337,10 @@
       "performance_number": "Función {number}",
       "performance_public": "Anunciada al público",
       "performances": "Funciones",
-      "remove_performance": "Quitar esta función"
+      "remove_performance": "Quitar esta función",
+      "message_group": "Escribir al reparto",
+      "message_group_error": "No se ha podido abrir el grupo de mensajería del espectáculo",
+      "message_group_no_artists": "Este espectáculo no tiene artistas"
     },
     "stock": {
       "available_now": "{available}/{total} disponible(s)",

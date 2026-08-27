@@ -562,3 +562,147 @@ export async function addShowApplicationParticipantIfNeeded(
     })
   }
 }
+
+/**
+ * Les utilisateurs qui composent le groupe d'un spectacle : sa distribution, et les
+ * organisateurs habilités sur les artistes.
+ *
+ * La distribution passe par `ShowArtist.showId`, renseigné y compris pour un cabaret dont les
+ * artistes sont rattachés à un numéro : « les artistes du spectacle » a donc un sens dans les
+ * deux cas. Les organisateurs sont ceux que `canManageArtistsById` accepterait — même règle,
+ * mais énumérée plutôt qu'interrogée un par un.
+ */
+async function participantsDuGroupeSpectacle(
+  showId: number,
+  client: PrismaTransaction | typeof prisma
+): Promise<{ editionId: number; userIds: number[] }> {
+  const show = await client.show.findUnique({
+    where: { id: showId },
+    select: {
+      editionId: true,
+      artists: { select: { artist: { select: { userId: true } } } },
+    },
+  })
+
+  if (!show) {
+    throw new Error('Spectacle introuvable')
+  }
+
+  const edition = await client.edition.findUnique({
+    where: { id: show.editionId },
+    select: {
+      creatorId: true,
+      convention: {
+        select: {
+          authorId: true,
+          organizers: { where: { canManageArtists: true }, select: { userId: true } },
+        },
+      },
+      organizerPermissions: {
+        where: { canManageArtists: true },
+        select: { organizer: { select: { userId: true } } },
+      },
+    },
+  })
+
+  if (!edition) {
+    throw new Error('Édition introuvable')
+  }
+
+  const userIds = new Set<number>([
+    ...show.artists.map((lien) => lien.artist.userId),
+    edition.creatorId,
+    edition.convention.authorId,
+    ...edition.convention.organizers.map((o) => o.userId),
+    ...edition.organizerPermissions.map((p) => p.organizer.userId),
+  ])
+
+  return { editionId: show.editionId, userIds: [...userIds] }
+}
+
+/**
+ * Crée ou récupère le groupe de messagerie d'un spectacle, et aligne ses participants sur la
+ * distribution du moment.
+ *
+ * Un artiste retiré du spectacle est marqué comme parti (`leftAt`) plutôt que supprimé : il
+ * garde l'accès aux échanges auxquels il a pris part, mais ne reçoit plus la suite. C'est le
+ * traitement déjà appliqué aux organisateurs qui perdent leurs droits.
+ *
+ * @param showId - ID du spectacle
+ * @param tx - Transaction Prisma optionnelle
+ * @returns L'ID de la conversation
+ */
+export async function ensureShowGroupConversation(
+  showId: number,
+  tx?: PrismaTransaction
+): Promise<string> {
+  const client = tx || prisma
+  const { editionId, userIds } = await participantsDuGroupeSpectacle(showId, client)
+
+  const existante = await client.conversation.findUnique({
+    where: { showId },
+    include: { participants: true },
+  })
+
+  if (!existante) {
+    const conversation = await client.conversation.create({
+      data: {
+        editionId,
+        showId,
+        type: 'SHOW_GROUP',
+        participants: { create: userIds.map((userId) => ({ userId })) },
+      },
+    })
+    return conversation.id
+  }
+
+  for (const userId of userIds) {
+    const participant = existante.participants.find((p) => p.userId === userId)
+    if (!participant) {
+      await client.conversationParticipant.create({
+        data: { conversationId: existante.id, userId },
+      })
+    } else if (participant.leftAt) {
+      await client.conversationParticipant.update({
+        where: { id: participant.id },
+        data: { leftAt: null },
+      })
+    }
+  }
+
+  for (const participant of existante.participants) {
+    if (!userIds.includes(participant.userId) && !participant.leftAt) {
+      await client.conversationParticipant.update({
+        where: { id: participant.id },
+        data: { leftAt: new Date() },
+      })
+    }
+  }
+
+  return existante.id
+}
+
+/**
+ * Aligne les participants du groupe d'un spectacle après un changement de distribution.
+ *
+ * Ne crée rien si le groupe n'existe pas encore : tant que personne n'a écrit au spectacle,
+ * il n'y a pas de conversation à tenir à jour.
+ *
+ * @param showId - ID du spectacle
+ * @param tx - Transaction Prisma optionnelle
+ */
+export async function syncShowGroupParticipants(
+  showId: number,
+  tx?: PrismaTransaction
+): Promise<void> {
+  const client = tx || prisma
+
+  const existante = await client.conversation.findUnique({
+    where: { showId },
+    select: { id: true },
+  })
+
+  if (!existante) return
+
+  await ensureShowGroupConversation(showId, tx)
+}

@@ -158,39 +158,39 @@
                   class="text-gray-600 dark:text-gray-400 space-y-1"
                 >
                   <div v-for="performance in row.original.show.performances" :key="performance.id">
-                  <UBadge
-                    v-if="performance.zone"
-                    :style="{
-                      backgroundColor: performance.zone.color + '20',
-                      color: performance.zone.color,
-                    }"
-                    variant="subtle"
-                    size="sm"
-                  >
-                    <UIcon name="i-heroicons-map" class="mr-1" />
-                    {{ performance.zone.name }}
-                  </UBadge>
-                  <UBadge
-                    v-else-if="performance.marker"
-                    :style="{
-                      backgroundColor: (performance.marker.color || '#6b7280') + '20',
-                      color: performance.marker.color || '#6b7280',
-                    }"
-                    variant="subtle"
-                    size="sm"
-                  >
-                    <UIcon name="i-heroicons-map-pin" class="mr-1" />
-                    {{ performance.marker.name }}
-                  </UBadge>
-                  <span
-                    v-if="performance.location"
-                    :class="{ 'mt-1 block': performance.zone || performance.marker }"
-                  >
-                    {{ performance.location }}
-                  </span>
-                  <span v-if="!performance.zone && !performance.marker && !performance.location">
-                    -
-                  </span>
+                    <UBadge
+                      v-if="performance.zone"
+                      :style="{
+                        backgroundColor: performance.zone.color + '20',
+                        color: performance.zone.color,
+                      }"
+                      variant="subtle"
+                      size="sm"
+                    >
+                      <UIcon name="i-heroicons-map" class="mr-1" />
+                      {{ performance.zone.name }}
+                    </UBadge>
+                    <UBadge
+                      v-else-if="performance.marker"
+                      :style="{
+                        backgroundColor: (performance.marker.color || '#6b7280') + '20',
+                        color: performance.marker.color || '#6b7280',
+                      }"
+                      variant="subtle"
+                      size="sm"
+                    >
+                      <UIcon name="i-heroicons-map-pin" class="mr-1" />
+                      {{ performance.marker.name }}
+                    </UBadge>
+                    <span
+                      v-if="performance.location"
+                      :class="{ 'mt-1 block': performance.zone || performance.marker }"
+                    >
+                      {{ performance.location }}
+                    </span>
+                    <span v-if="!performance.zone && !performance.marker && !performance.location">
+                      -
+                    </span>
                   </div>
                 </div>
               </template>
@@ -254,6 +254,21 @@
                     @click="goToEditActs(row.original.show)"
                   />
                   <template v-else>
+                    <!-- Écrire à toute la distribution d'un coup, plutôt qu'artiste par artiste -->
+                    <UButton
+                      icon="i-heroicons-chat-bubble-left-right"
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      :loading="ouvertureGroupeId === row.original.show.id"
+                      :disabled="uniqueArtists(row.original.show).length === 0"
+                      :title="
+                        uniqueArtists(row.original.show).length === 0
+                          ? $t('gestion.shows.message_group_no_artists')
+                          : $t('gestion.shows.message_group')
+                      "
+                      @click="ouvrirGroupeSpectacle(row.original.show)"
+                    />
                     <UButton
                       v-if="row.original.show.type === 'CABARET'"
                       icon="i-heroicons-queue-list"
@@ -715,6 +730,37 @@ const confirmDeleteShow = (show: any) => {
  * `showToDelete` : reconfirmer sur la modale restée à l'écran envoyait un DELETE sur
  * `/shows/undefined`, qu'on retrouve dans les journaux de production.
  */
+/**
+ * Ouvre le groupe de messagerie du spectacle et y emmène l'organisateur.
+ *
+ * Le groupe est créé au premier appel puis retrouvé ensuite : rouvrir ne duplique rien, et la
+ * conversation garde son historique. Ses participants sont la distribution du spectacle et les
+ * organisateurs habilités sur les artistes.
+ */
+const ouvertureGroupeId = ref<number | null>(null)
+
+const { execute: ouvrirGroupe } = useApiAction<unknown, { conversationId: string }>(
+  '/api/messenger/show-group',
+  {
+    method: 'POST',
+    body: () => ({ showId: ouvertureGroupeId.value }),
+    silentSuccess: true,
+    errorMessages: { default: t('gestion.shows.message_group_error') },
+    onSuccess: async (reponse: { conversationId: string }) => {
+      ouvertureGroupeId.value = null
+      await navigateTo(`/messenger?conversationId=${reponse.conversationId}`)
+    },
+    onError: () => {
+      ouvertureGroupeId.value = null
+    },
+  }
+)
+
+const ouvrirGroupeSpectacle = (show: { id: number }) => {
+  ouvertureGroupeId.value = show.id
+  ouvrirGroupe()
+}
+
 const { execute: deleteShow, loading: deletingShow } = useApiAction(
   () => `/api/editions/${editionId.value}/shows/${showToDelete.value?.id}`,
   {

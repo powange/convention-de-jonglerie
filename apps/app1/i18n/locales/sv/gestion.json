@@ -337,7 +337,10 @@
       "performance_number": "Föreställning {number}",
       "performance_public": "Offentligt annonserad",
       "performances": "Föreställningar",
-      "remove_performance": "Ta bort denna föreställning"
+      "remove_performance": "Ta bort denna föreställning",
+      "message_group": "Skriv till ensemblen",
+      "message_group_error": "Det gick inte att öppna föreställningens gruppkonversation",
+      "message_group_no_artists": "Inga artister i den här föreställningen"
     },
     "stock": {
       "available_now": "{available}/{total} tillgängliga",

@@ -337,7 +337,10 @@
       "performance_number": "Voorstelling {number}",
       "performance_public": "Openbaar aangekondigd",
       "performances": "Voorstellingen",
-      "remove_performance": "Deze voorstelling verwijderen"
+      "remove_performance": "Deze voorstelling verwijderen",
+      "message_group": "De cast berichten",
+      "message_group_error": "Kan de groepsconversatie van de voorstelling niet openen",
+      "message_group_no_artists": "Geen artiesten bij deze voorstelling"
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",

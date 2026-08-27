@@ -337,7 +337,10 @@
       "performance_number": "Performance {number}",
       "performance_public": "Announced publicly",
       "performances": "Performances",
-      "remove_performance": "Remove this performance"
+      "remove_performance": "Remove this performance",
+      "message_group": "Message the cast",
+      "message_group_error": "Could not open the show's group conversation",
+      "message_group_no_artists": "No artists on this show"
     },
     "stock": {
       "available_now": "{available}/{total} available",
