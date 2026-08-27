@@ -450,6 +450,7 @@
     "hours_per_team": "Hours per team",
     "hours_per_volunteer": "Hours per volunteer",
     "no_slot_assigned_yet": "No shift assigned yet",
-    "assigned_automatically": "Auto-assigned"
+    "assigned_automatically": "Auto-assigned",
+    "hours_covered_of_needed": "Hours covered of hours to cover"
   }
 }

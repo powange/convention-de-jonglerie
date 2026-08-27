@@ -450,6 +450,7 @@
     "hours_per_team": "Часы по командам",
     "hours_per_volunteer": "Часы по волонтёрам",
     "no_slot_assigned_yet": "Смены пока не назначены",
-    "assigned_automatically": "Назначено автоматически"
+    "assigned_automatically": "Назначено автоматически",
+    "hours_covered_of_needed": "Закрытые часы из часов к закрытию"
   }
 }

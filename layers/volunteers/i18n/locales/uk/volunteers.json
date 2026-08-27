@@ -450,6 +450,7 @@
     "hours_per_team": "Години за командами",
     "hours_per_volunteer": "Години за волонтерами",
     "no_slot_assigned_yet": "Зміни ще не призначено",
-    "assigned_automatically": "Призначено автоматично"
+    "assigned_automatically": "Призначено автоматично",
+    "hours_covered_of_needed": "Закриті години з годин до закриття"
   }
 }

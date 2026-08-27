@@ -450,6 +450,7 @@
     "hours_per_team": "Timer pr. hold",
     "hours_per_volunteer": "Timer pr. frivillig",
     "no_slot_assigned_yet": "Ingen vagt tildelt endnu",
-    "assigned_automatically": "Tildelt automatisk"
+    "assigned_automatically": "Tildelt automatisk",
+    "hours_covered_of_needed": "Dækkede timer af timer at dække"
   }
 }

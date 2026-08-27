@@ -200,6 +200,7 @@
     "filter_presence": "Filtrer par présence",
     "filter_status": "Filtrer par statut",
     "filtered_count": "{filtered} sur {total} candidatures",
+    "hours_covered_of_needed": "Heures pourvues sur heures à pourvoir",
     "hours_per_day": "Heures par jour",
     "hours_per_team": "Heures par équipe",
     "hours_per_volunteer": "Heures par bénévole",

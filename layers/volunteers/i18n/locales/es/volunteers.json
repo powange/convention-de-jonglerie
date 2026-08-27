@@ -450,6 +450,7 @@
     "hours_per_team": "Horas por equipo",
     "hours_per_volunteer": "Horas por voluntario",
     "no_slot_assigned_yet": "Ningún turno asignado por ahora",
-    "assigned_automatically": "Asignado automáticamente"
+    "assigned_automatically": "Asignado automáticamente",
+    "hours_covered_of_needed": "Horas cubiertas de horas por cubrir"
   }
 }
