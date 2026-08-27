@@ -6,7 +6,8 @@
       "group": "Group chat",
       "organizers": "Conversation with organizers",
       "organizers_group": "Discussion between organizers",
-      "private": "Private conversation"
+      "private": "Private conversation",
+      "show_group": "Show cast"
     },
     "conversations": "Conversations",
     "delete": "Delete",
@@ -36,7 +37,8 @@
       "organizers_group": "Organizers group",
       "private": "Private",
       "private_leader": "Private with leader",
-      "private_leaders": "Private with leaders"
+      "private_leaders": "Private with leaders",
+      "show_group": "Artists and organisers"
     },
     "volunteer_managers": "Volunteer Managers",
     "seen_by": "Read by {name}"

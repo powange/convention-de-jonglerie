@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { handleFileUpload } from '#server/utils/file-helpers'
+import { syncShowGroupParticipants } from '#server/utils/messenger-helpers'
 import { canManageArtists } from '#server/utils/permissions/edition-permissions'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import {
@@ -157,6 +158,11 @@ export default wrapApiHandler(
           validatedData.artistIds ?? [],
           validatedData.acts ?? []
         )
+
+        // Le groupe de messagerie du spectacle suit sa distribution : un artiste ajouté le
+        // rejoint, un artiste retiré cesse d'en recevoir la suite. Sans effet tant que
+        // personne n'a ouvert ce groupe.
+        await syncShowGroupParticipants(showId, tx)
       }
 
       if (validatedData.handoutItemIds !== undefined) {

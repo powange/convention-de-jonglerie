@@ -337,7 +337,10 @@
       "performance_number": "Představení {number}",
       "performance_public": "Oznámeno veřejnosti",
       "performances": "Představení",
-      "remove_performance": "Odebrat toto představení"
+      "remove_performance": "Odebrat toto představení",
+      "message_group": "Napsat obsazení",
+      "message_group_error": "Skupinovou konverzaci představení se nepodařilo otevřít",
+      "message_group_no_artists": "V tomto představení nejsou žádní umělci"
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",

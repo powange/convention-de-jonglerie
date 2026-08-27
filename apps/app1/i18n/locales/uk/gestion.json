@@ -337,7 +337,10 @@
       "performance_number": "Показ {number}",
       "performance_public": "Оголошено публічно",
       "performances": "Покази",
-      "remove_performance": "Видалити цей показ"
+      "remove_performance": "Видалити цей показ",
+      "message_group": "Написати складу",
+      "message_group_error": "Не вдалося відкрити груповий чат вистави",
+      "message_group_no_artists": "У цій виставі немає артистів"
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

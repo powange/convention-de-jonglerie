@@ -113,6 +113,8 @@ model Show {
   handoutItems ShowHandoutItem[]
   applications ShowApplication[]
   performances ShowPerformance[]
+  // Le groupe de messagerie dédié au spectacle, créé à la première utilisation
+  conversation Conversation?
 
   @@index([editionId])
 }

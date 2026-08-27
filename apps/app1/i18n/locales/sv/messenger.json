@@ -6,7 +6,8 @@
       "group": "Gruppchatt",
       "organizers": "Konversation med arrangörer",
       "organizers_group": "Diskussion mellan arrangörer",
-      "private": "Privat konversation"
+      "private": "Privat konversation",
+      "show_group": "Föreställningens ensemble"
     },
     "conversations": "Konversationer",
     "delete": "Ta bort",
@@ -36,7 +37,8 @@
       "organizers_group": "Arrangörsgrupp",
       "private": "Privat",
       "private_leader": "Privat med ledare",
-      "private_leaders": "Privat med ledare"
+      "private_leaders": "Privat med ledare",
+      "show_group": "Artister och arrangörer"
     },
     "volunteer_managers": "Volontärledare",
     "seen_by": "Läst av {name}"

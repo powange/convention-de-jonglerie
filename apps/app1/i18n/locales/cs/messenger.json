@@ -6,7 +6,8 @@
       "group": "Skupinový chat",
       "organizers": "Konverzace s organizátory",
       "organizers_group": "Diskuse mezi organizátory",
-      "private": "Soukromá konverzace"
+      "private": "Soukromá konverzace",
+      "show_group": "Obsazení představení"
     },
     "conversations": "Konverzace",
     "delete": "Smazat",
@@ -36,7 +37,8 @@
       "organizers_group": "Skupina organizátorů",
       "private": "Soukromé",
       "private_leader": "Soukromé s vedoucím",
-      "private_leaders": "Soukromé s vedoucími"
+      "private_leaders": "Soukromé s vedoucími",
+      "show_group": "Umělci a organizátoři"
     },
     "volunteer_managers": "Vedoucí dobrovolníků",
     "seen_by": "Přečetl(a) {name}"

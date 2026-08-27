@@ -6,7 +6,8 @@
       "group": "Groepschat",
       "organizers": "Gesprek met organisatoren",
       "organizers_group": "Discussie tussen organisatoren",
-      "private": "Privégesprek"
+      "private": "Privégesprek",
+      "show_group": "Cast van de voorstelling"
     },
     "conversations": "Gesprekken",
     "delete": "Verwijderen",
@@ -36,7 +37,8 @@
       "organizers_group": "Organisatorengroep",
       "private": "Privé",
       "private_leader": "Privé met leider",
-      "private_leaders": "Privé met leiders"
+      "private_leaders": "Privé met leiders",
+      "show_group": "Artiesten en organisatoren"
     },
     "volunteer_managers": "Vrijwilligersleiders",
     "seen_by": "Gelezen door {name}"

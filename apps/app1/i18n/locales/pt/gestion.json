@@ -337,7 +337,10 @@
       "performance_number": "Sessão {number}",
       "performance_public": "Anunciada ao público",
       "performances": "Sessões",
-      "remove_performance": "Remover esta sessão"
+      "remove_performance": "Remover esta sessão",
+      "message_group": "Escrever ao elenco",
+      "message_group_error": "Não foi possível abrir o grupo de mensagens do espetáculo",
+      "message_group_no_artists": "Nenhum artista neste espetáculo"
     },
     "stock": {
       "available_now": "{available}/{total} disponível(eis)",

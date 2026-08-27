@@ -337,7 +337,10 @@
       "performance_number": "Forestilling {number}",
       "performance_public": "Annonceret offentligt",
       "performances": "Forestillinger",
-      "remove_performance": "Fjern denne forestilling"
+      "remove_performance": "Fjern denne forestilling",
+      "message_group": "Skriv til medvirkende",
+      "message_group_error": "Forestillingens gruppesamtale kunne ikke åbnes",
+      "message_group_no_artists": "Ingen artister på denne forestilling"
     },
     "stock": {
       "available_now": "{available}/{total} tilgængelige",

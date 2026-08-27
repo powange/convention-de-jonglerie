@@ -337,7 +337,10 @@
       "performance_number": "Vorstellung {number}",
       "performance_public": "Öffentlich angekündigt",
       "performances": "Vorstellungen",
-      "remove_performance": "Diese Vorstellung entfernen"
+      "remove_performance": "Diese Vorstellung entfernen",
+      "message_group": "An die Besetzung schreiben",
+      "message_group_error": "Die Gruppenunterhaltung der Show konnte nicht geöffnet werden",
+      "message_group_no_artists": "Keine Künstler in dieser Show"
     },
     "stock": {
       "available_now": "{available}/{total} verfügbar",
