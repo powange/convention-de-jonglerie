@@ -45,7 +45,8 @@
       "task_title_placeholder": "T.ex.: Boka materialet...",
       "tasks_count": "{count} uppgift | {count} uppgifter",
       "view_kanban": "Kanban",
-      "view_list": "Lista"
+      "view_list": "Lista",
+      "reorder_requires_manual_sort": "Byt tillbaka till «Manuell ordning» för att ordna om uppgifterna"
     }
   }
 }

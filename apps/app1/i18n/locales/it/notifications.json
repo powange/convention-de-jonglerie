@@ -136,6 +136,16 @@
           "action": "Vedi le mie attività",
           "message": "L'attività «{taskTitle}» dell'edizione {editionName} scade domani.",
           "title": "Scade domani 🔔"
+        },
+        "j_minus_3": {
+          "action": "Vedi le mie attività",
+          "message": "L'attività «{taskTitle}» dell'edizione {editionName} scade tra 3 giorni.",
+          "title": "Scade tra 3 giorni 🔔"
+        },
+        "j_minus_7": {
+          "action": "Vedi le mie attività",
+          "message": "L'attività «{taskTitle}» dell'edizione {editionName} scade tra una settimana.",
+          "title": "Scade tra 7 giorni 🗓️"
         }
       }
     },

@@ -25,7 +25,12 @@
       "status_placeholder": "Status",
       "statuses_count": "{count} Status",
       "tag_placeholder": "Tags",
-      "tags_count": "{count} Tags"
+      "tags_count": "{count} Tags",
+      "sort": {
+        "manual": "Manuelle Reihenfolge",
+        "deadline_asc": "Nächste Frist",
+        "deadline_desc": "Späteste Frist"
+      }
     },
     "my_tasks": {
       "description": "Die Aufgaben, die Ihnen für diese Edition zugewiesen sind.",

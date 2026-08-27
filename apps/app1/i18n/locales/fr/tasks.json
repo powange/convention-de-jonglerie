@@ -22,6 +22,11 @@
       },
       "no_match": "Aucune tâche ne correspond aux filtres",
       "search_placeholder": "Rechercher une tâche...",
+      "sort": {
+        "manual": "Ordre manuel",
+        "deadline_asc": "Échéance la plus proche",
+        "deadline_desc": "Échéance la plus lointaine"
+      },
       "status_placeholder": "Statut",
       "statuses_count": "{count} statuts",
       "tag_placeholder": "Tags",

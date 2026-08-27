@@ -136,6 +136,16 @@
           "action": "Meine Aufgaben anzeigen",
           "message": "Die Aufgabe «{taskTitle}» der Edition {editionName} ist morgen fällig.",
           "title": "Morgen fällig 🔔"
+        },
+        "j_minus_3": {
+          "action": "Meine Aufgaben anzeigen",
+          "message": "Die Aufgabe «{taskTitle}» der Edition {editionName} ist in 3 Tagen fällig.",
+          "title": "In 3 Tagen fällig 🔔"
+        },
+        "j_minus_7": {
+          "action": "Meine Aufgaben anzeigen",
+          "message": "Die Aufgabe «{taskTitle}» der Edition {editionName} ist in einer Woche fällig.",
+          "title": "In 7 Tagen fällig 🗓️"
         }
       }
     },

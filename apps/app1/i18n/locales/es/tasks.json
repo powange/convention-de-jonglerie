@@ -25,7 +25,12 @@
       "status_placeholder": "Estado",
       "statuses_count": "{count} estados",
       "tag_placeholder": "Etiquetas",
-      "tags_count": "{count} etiquetas"
+      "tags_count": "{count} etiquetas",
+      "sort": {
+        "manual": "Orden manual",
+        "deadline_asc": "Fecha límite más próxima",
+        "deadline_desc": "Fecha límite más lejana"
+      }
     },
     "my_tasks": {
       "description": "Las tareas que se le han asignado en esta edición.",

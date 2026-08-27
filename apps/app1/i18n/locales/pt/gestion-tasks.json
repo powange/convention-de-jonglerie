@@ -45,7 +45,8 @@
       "task_title_placeholder": "Ex.: Reservar o material...",
       "tasks_count": "{count} tarefa | {count} tarefas",
       "view_kanban": "Kanban",
-      "view_list": "Lista"
+      "view_list": "Lista",
+      "reorder_requires_manual_sort": "Volte para «Ordem manual» para reordenar as tarefas"
     }
   }
 }

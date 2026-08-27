@@ -45,7 +45,8 @@
       "task_title_placeholder": "Např.: Rezervovat vybavení...",
       "tasks_count": "{count} úkol | {count} úkoly | {count} úkolů",
       "view_kanban": "Kanban",
-      "view_list": "Seznam"
+      "view_list": "Seznam",
+      "reorder_requires_manual_sort": "Pro změnu pořadí úkolů přepněte na «Ruční pořadí»"
     }
   }
 }

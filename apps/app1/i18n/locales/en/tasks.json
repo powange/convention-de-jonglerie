@@ -25,7 +25,12 @@
       "status_placeholder": "Status",
       "statuses_count": "{count} statuses",
       "tag_placeholder": "Tags",
-      "tags_count": "{count} tags"
+      "tags_count": "{count} tags",
+      "sort": {
+        "manual": "Manual order",
+        "deadline_asc": "Soonest deadline",
+        "deadline_desc": "Latest deadline"
+      }
     },
     "my_tasks": {
       "description": "The tasks assigned to you for this edition.",

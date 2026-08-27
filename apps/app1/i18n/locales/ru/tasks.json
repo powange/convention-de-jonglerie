@@ -25,7 +25,12 @@
       "status_placeholder": "Статус",
       "statuses_count": "{count} статусов",
       "tag_placeholder": "Теги",
-      "tags_count": "{count} тегов"
+      "tags_count": "{count} тегов",
+      "sort": {
+        "manual": "Ручной порядок",
+        "deadline_asc": "Ближайший срок",
+        "deadline_desc": "Самый дальний срок"
+      }
     },
     "my_tasks": {
       "description": "Задачи, назначенные вам в этом выпуске.",

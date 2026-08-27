@@ -25,7 +25,12 @@
       "status_placeholder": "Stav",
       "statuses_count": "{count} stavů",
       "tag_placeholder": "Štítky",
-      "tags_count": "{count} štítků"
+      "tags_count": "{count} štítků",
+      "sort": {
+        "manual": "Ruční pořadí",
+        "deadline_asc": "Nejbližší termín",
+        "deadline_desc": "Nejvzdálenější termín"
+      }
     },
     "my_tasks": {
       "description": "Úkoly, které vám byly přiřazeny v této edici.",

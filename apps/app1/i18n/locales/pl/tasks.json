@@ -25,7 +25,12 @@
       "status_placeholder": "Status",
       "statuses_count": "{count} statusów",
       "tag_placeholder": "Tagi",
-      "tags_count": "{count} tagów"
+      "tags_count": "{count} tagów",
+      "sort": {
+        "manual": "Kolejność ręczna",
+        "deadline_asc": "Najbliższy termin",
+        "deadline_desc": "Najdalszy termin"
+      }
     },
     "my_tasks": {
       "description": "Zadania przypisane do Ciebie w tej edycji.",

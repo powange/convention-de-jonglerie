@@ -27,6 +27,7 @@
       "new_group": "Nouveau groupe",
       "new_task": "Nouvelle tâche",
       "no_assignable_users": "Aucun organisateur ni bénévole accepté n'est disponible",
+      "reorder_requires_manual_sort": "Repassez en « Ordre manuel » pour réordonner les tâches",
       "tags": {
         "confirm_delete": "Supprimer le tag « {name} » ? Il sera retiré de toutes les tâches du groupe qui le portent.",
         "description": "Les tags permettent de catégoriser les tâches de ce groupe (ex: urgent, matériel, à valider RH).",

@@ -45,7 +45,8 @@
       "task_title_placeholder": "F.eks.: Reserver materiale...",
       "tasks_count": "{count} opgave | {count} opgaver",
       "view_kanban": "Kanban",
-      "view_list": "Liste"
+      "view_list": "Liste",
+      "reorder_requires_manual_sort": "Skift til «Manuel rækkefølge» for at omarrangere opgaverne"
     }
   }
 }

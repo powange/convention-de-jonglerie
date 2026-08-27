@@ -136,6 +136,16 @@
           "action": "Se mine opgaver",
           "message": "Fristen for opgaven «{taskTitle}» i udgaven {editionName} udløber i morgen.",
           "title": "Forfalder i morgen 🔔"
+        },
+        "j_minus_3": {
+          "action": "Se mine opgaver",
+          "message": "Fristen for opgaven «{taskTitle}» i udgaven {editionName} udløber om 3 dage.",
+          "title": "Forfalder om 3 dage 🔔"
+        },
+        "j_minus_7": {
+          "action": "Se mine opgaver",
+          "message": "Fristen for opgaven «{taskTitle}» i udgaven {editionName} udløber om en uge.",
+          "title": "Forfalder om 7 dage 🗓️"
         }
       }
     },
