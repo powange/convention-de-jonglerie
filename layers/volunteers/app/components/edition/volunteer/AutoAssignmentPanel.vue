@@ -141,11 +141,20 @@
               <USwitch v-model="constraints.allowOvertime" />
             </UFormField>
 
+            <!-- Trois sorts possibles plutôt qu'un interrupteur : le mode intermédiaire est
+                 celui qui manquait, effacer ce que l'algorithme avait posé sans toucher aux
+                 décisions humaines. -->
             <UFormField
-              :label="t('volunteers.auto_assignment.keep_existing')"
-              :help="t('volunteers.auto_assignment.keep_existing_help')"
+              :label="t('volunteers.auto_assignment.existing_mode')"
+              :help="aideModeAffectations"
+              class="sm:col-span-2"
             >
-              <USwitch v-model="constraints.keepExistingAssignments" />
+              <USelect
+                v-model="constraints.existingAssignmentsMode"
+                :items="modesAffectationsExistantes"
+                value-key="value"
+                class="w-full"
+              />
             </UFormField>
           </div>
 
@@ -415,6 +424,7 @@ interface Constraints {
   allowOvertime: boolean
   maxOvertimeHours: number
   keepExistingAssignments: boolean
+  existingAssignmentsMode: 'replace-all' | 'keep-all' | 'keep-manual'
 }
 
 const props = defineProps<Props>()
@@ -434,6 +444,37 @@ const constraints = ref<Constraints>({
   allowOvertime: false,
   maxOvertimeHours: 2,
   keepExistingAssignments: false,
+  // Conserver les choix humains par défaut : effacer le travail d'un organisateur doit être
+  // un geste délibéré, pas le comportement par défaut d'un bouton qu'on relance.
+  existingAssignmentsMode: 'keep-manual',
+})
+
+const modesAffectationsExistantes = computed(() => [
+  {
+    value: 'keep-manual',
+    label: t('volunteers.auto_assignment.existing_mode_keep_manual'),
+  },
+  {
+    value: 'keep-all',
+    label: t('volunteers.auto_assignment.existing_mode_keep_all'),
+  },
+  {
+    value: 'replace-all',
+    label: t('volunteers.auto_assignment.existing_mode_replace_all'),
+  },
+])
+
+// Correspondance explicite plutôt qu'une clé composée : l'outillage i18n ne repère pas les
+// clés construites à l'exécution et les croirait inutilisées.
+const aideModeAffectations = computed(() => {
+  switch (constraints.value.existingAssignmentsMode) {
+    case 'keep-all':
+      return t('volunteers.auto_assignment.existing_mode_help_keep_all')
+    case 'replace-all':
+      return t('volunteers.auto_assignment.existing_mode_help_replace_all')
+    default:
+      return t('volunteers.auto_assignment.existing_mode_help_keep_manual')
+  }
 })
 
 const previewResult = ref<any>(null)

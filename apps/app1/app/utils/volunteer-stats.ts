@@ -274,15 +274,19 @@ export interface TeamStats {
 /**
  * Heures par équipe, au total et jour par jour.
  *
- * Les heures comptées sont des **heures-bénévole** — la durée d'un créneau multipliée par le
- * nombre de personnes affectées —, comme dans les autres statistiques de cette page. Un
- * créneau de deux heures tenu par trois bénévoles pèse donc six heures, ce qui est la mesure
- * utile pour dimensionner une équipe.
+ * Les heures comptées sont celles **à couvrir** : la durée d'un créneau multipliée par le
+ * nombre de bénévoles qu'il demande (`maxVolunteers`), et non par le nombre de personnes déjà
+ * affectées. Un créneau de deux heures demandant trois bénévoles pèse donc six heures dès sa
+ * création, avant toute affectation — c'est la charge à pourvoir qui permet de dimensionner
+ * une équipe, et elle ne doit pas grandir au fil des affectations.
  *
- * Les créneaux sans équipe sont regroupés à part plutôt qu'ignorés : les passer sous silence
- * ferait mentir le total.
+ * Les créneaux sans personne affectée comptent donc pleinement, et ceux sans équipe sont
+ * regroupés à part plutôt qu'ignorés : les passer sous silence ferait mentir le total.
  *
- * @param timeSlots - Créneaux, avec leurs affectations
+ * `totalVolunteers` reste, lui, le nombre de personnes réellement affectées : il dit où en
+ * est le remplissage face à cette charge.
+ *
+ * @param timeSlots - Créneaux de l'édition
  * @param teams - Équipes de l'édition, pour nommer et colorer les lignes
  */
 export function calculateVolunteersStatsByTeam(
@@ -295,7 +299,6 @@ export function calculateVolunteersStatsByTeam(
 
   timeSlots.forEach((slot) => {
     const affectes = slot.assignedVolunteersList ?? []
-    if (affectes.length === 0) return
 
     const debut = new Date(slot.start)
     const fin = new Date(slot.end)
@@ -319,7 +322,10 @@ export function calculateVolunteersStatsByTeam(
     }
 
     const equipe = parEquipe.get(cle)
-    const heuresBenevole = dureeCreneau * affectes.length
+    // Le besoin du créneau, pas son remplissage. `maxVolunteers` vaut 1 par défaut en base ;
+    // le repli protège d'un créneau mal formé plutôt que de compter zéro heure.
+    const besoin = Math.max(1, Number(slot.maxVolunteers) || 1)
+    const heuresBenevole = dureeCreneau * besoin
 
     equipe.totalHours += heuresBenevole
     equipe.totalSlots += 1

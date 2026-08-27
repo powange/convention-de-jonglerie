@@ -98,7 +98,14 @@
       "unassigned": "Nicht zugewiesen",
       "unassigned_slots": "Nicht abgedeckte Zeitfenster",
       "unassigned_volunteers": "Nicht zugewiesene Freiwillige",
-      "warnings": "Warnungen"
+      "warnings": "Warnungen",
+      "existing_mode": "Bestehende Zuweisungen",
+      "existing_mode_help_keep_all": "Nichts wird gelöscht: der Lauf füllt nur die noch freien Plätze.",
+      "existing_mode_help_keep_manual": "Von Hand eingeteilte Helfer bleiben; nur Zuweisungen aus einem früheren Lauf werden neu berechnet.",
+      "existing_mode_help_replace_all": "Alle Zuweisungen dieser Ausgabe werden vor dem Lauf gelöscht, auch die von Hand erstellten.",
+      "existing_mode_keep_all": "Alle bestehenden Zuweisungen behalten",
+      "existing_mode_keep_manual": "Automatische neu berechnen, manuelle behalten",
+      "existing_mode_replace_all": "Alles löschen und neu berechnen"
     },
     "average_per_volunteer": "Durchschnitt pro Freiwilliger",
     "avoid_list_hint": "Diese Informationen bleiben vertraulich und helfen den Organisatoren, harmonische Teams zu bilden",
@@ -442,6 +449,7 @@
     "hours_per_day": "Stunden pro Tag",
     "hours_per_team": "Stunden pro Team",
     "hours_per_volunteer": "Stunden pro Helfer",
-    "no_slot_assigned_yet": "Noch keine Schicht zugewiesen"
+    "no_slot_assigned_yet": "Noch keine Schicht zugewiesen",
+    "assigned_automatically": "Automatisch zugewiesen"
   }
 }

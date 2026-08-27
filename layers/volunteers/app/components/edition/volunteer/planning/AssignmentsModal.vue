@@ -56,9 +56,22 @@
               <div class="flex items-center gap-2">
                 <UiUserAvatar :user="assignment.user" size="sm" />
                 <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ assignment.user.pseudo }}
-                  </p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ assignment.user.pseudo }}
+                    </p>
+                    <!-- Utile ici surtout : c'est l'écran où l'on décide qui garder -->
+                    <UBadge
+                      v-if="assignment.source === 'AUTO'"
+                      color="neutral"
+                      variant="subtle"
+                      size="sm"
+                      icon="i-heroicons-sparkles"
+                      class="shrink-0"
+                    >
+                      {{ t('volunteers.assigned_automatically') }}
+                    </UBadge>
+                  </div>
                   <p class="text-xs text-gray-500 dark:text-gray-400">
                     <UiUserName :user="assignment.user" />
                   </p>
@@ -205,6 +218,8 @@ const showVolunteerSelector = ref(false)
 
 interface Assignment {
   id: string
+  /** Origine de l'affectation : posée à la main, ou produite par l'assignation automatique. */
+  source?: 'MANUAL' | 'AUTO'
   user: {
     id: number
     pseudo: string

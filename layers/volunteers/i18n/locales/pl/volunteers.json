@@ -98,7 +98,14 @@
       "unassigned": "Nieprzydzieleni",
       "unassigned_slots": "Nieobsłużone przedziały",
       "unassigned_volunteers": "Nieprzydzieleni wolontariusze",
-      "warnings": "Ostrzeżenia"
+      "warnings": "Ostrzeżenia",
+      "existing_mode": "Istniejące przydziały",
+      "existing_mode_help_keep_all": "Nic nie jest usuwane: obliczenie uzupełnia tylko wolne miejsca.",
+      "existing_mode_help_keep_manual": "Wolontariusze przydzieleni ręcznie zostają; ponawiane są tylko przydziały z poprzedniego obliczenia.",
+      "existing_mode_help_replace_all": "Wszystkie przydziały tej edycji są usuwane przed obliczeniem, także te wykonane ręcznie.",
+      "existing_mode_keep_all": "Zachowaj wszystkie istniejące przydziały",
+      "existing_mode_keep_manual": "Ponów automatyczne, zachowaj ręczne",
+      "existing_mode_replace_all": "Usuń wszystko i przelicz ponownie"
     },
     "average_per_volunteer": "Średnia na wolontariusza",
     "avoid_list_hint": "Te informacje pozostają poufne i pomagają organizatorom tworzyć harmonijne zespoły",
@@ -442,6 +449,7 @@
     "hours_per_day": "Godziny dziennie",
     "hours_per_team": "Godziny na zespół",
     "hours_per_volunteer": "Godziny na wolontariusza",
-    "no_slot_assigned_yet": "Nie przypisano jeszcze żadnej zmiany"
+    "no_slot_assigned_yet": "Nie przypisano jeszcze żadnej zmiany",
+    "assigned_automatically": "Przydzielony automatycznie"
   }
 }

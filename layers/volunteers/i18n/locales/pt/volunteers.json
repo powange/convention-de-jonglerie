@@ -98,7 +98,14 @@
       "unassigned": "Não atribuídos",
       "unassigned_slots": "Horários não cobertos",
       "unassigned_volunteers": "Voluntários não atribuídos",
-      "warnings": "Avisos"
+      "warnings": "Avisos",
+      "existing_mode": "Atribuições já existentes",
+      "existing_mode_help_keep_all": "Nada é apagado: o cálculo apenas preenche os lugares ainda livres.",
+      "existing_mode_help_keep_manual": "Os voluntários colocados à mão mantêm-se; só as atribuições de um cálculo anterior são refeitas.",
+      "existing_mode_help_replace_all": "Todas as atribuições da edição são apagadas antes do cálculo, incluindo as feitas à mão.",
+      "existing_mode_keep_all": "Conservar todas as atribuições existentes",
+      "existing_mode_keep_manual": "Refazer as automáticas, conservar as manuais",
+      "existing_mode_replace_all": "Apagar tudo e recalcular"
     },
     "average_per_volunteer": "Média por voluntário",
     "avoid_list_hint": "Esta informação permanece confidencial e ajuda os organizadores a criar equipas harmoniosas",
@@ -442,6 +449,7 @@
     "hours_per_day": "Horas por dia",
     "hours_per_team": "Horas por equipa",
     "hours_per_volunteer": "Horas por voluntário",
-    "no_slot_assigned_yet": "Nenhum turno atribuído por agora"
+    "no_slot_assigned_yet": "Nenhum turno atribuído por agora",
+    "assigned_automatically": "Atribuído automaticamente"
   }
 }

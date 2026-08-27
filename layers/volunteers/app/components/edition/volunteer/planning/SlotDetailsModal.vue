@@ -139,9 +139,24 @@
                 {{ assignment.user.pseudo.charAt(0).toUpperCase() }}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {{ assignment.user.pseudo }}
-                </p>
+                <div class="flex items-center gap-2 min-w-0">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {{ assignment.user.pseudo }}
+                  </p>
+                  <!-- Seule l'origine automatique est signalée : marquer aussi les
+                       affectations manuelles alourdirait la liste sans rien apprendre,
+                       la main de l'organisateur étant le cas ordinaire. -->
+                  <UBadge
+                    v-if="assignment.source === 'AUTO'"
+                    color="neutral"
+                    variant="subtle"
+                    size="sm"
+                    icon="i-heroicons-sparkles"
+                    class="shrink-0"
+                  >
+                    {{ t('volunteers.assigned_automatically') }}
+                  </UBadge>
+                </div>
                 <p
                   v-if="assignment.user.nom || assignment.user.prenom"
                   class="text-xs text-gray-500 dark:text-gray-400 truncate"
@@ -170,6 +185,8 @@ import type { VolunteerTimeSlot, VolunteerTeam } from '~/types/volunteer'
 
 interface Assignment {
   id: string
+  /** Origine de l'affectation : posée à la main, ou produite par l'assignation automatique. */
+  source?: 'MANUAL' | 'AUTO'
   user: {
     id: number
     pseudo: string
