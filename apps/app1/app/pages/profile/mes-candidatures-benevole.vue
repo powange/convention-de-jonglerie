@@ -797,7 +797,7 @@ const { execute: executeContactOrganizer } = useApiAction<
   body: () => ({ editionId: contactOrganizerEditionId.value! }),
   silent: true,
   onSuccess: (result: ContactOrganizerResponse) => {
-    navigateTo(`/messenger?conversation=${result.conversationId}`)
+    navigateTo(`/messenger?conversationId=${result.conversationId}`)
   },
   onError: () => {
     toast.add({

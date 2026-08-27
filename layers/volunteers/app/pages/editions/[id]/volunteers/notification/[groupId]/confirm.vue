@@ -1,103 +1,102 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-    <div class="max-w-md w-full">
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-primary-100 dark:bg-primary-900 rounded-full">
-              <UIcon
-                name="i-heroicons-check-circle"
-                class="text-primary-600 dark:text-primary-400"
-                size="24"
-              />
-            </div>
-            <div>
-              <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ t('volunteers.confirm_notification_title') }}
-              </h1>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ notification?.title }}
-              </p>
-            </div>
+  <!-- Pas de `min-h-screen` ni de fond propre : la page s'affiche dans la mise en page du
+       site, qui encadre déjà le contenu. Forcer une hauteur d'écran supplémentaire ajoutait
+       un grand vide au-dessus de l'encart et du défilement sur un téléphone, pour un contenu
+       qui tient pourtant à l'écran. -->
+  <div class="max-w-xl mx-auto">
+    <UCard>
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-primary-100 dark:bg-primary-900 rounded-full">
+            <UIcon
+              name="i-heroicons-check-circle"
+              class="text-primary-600 dark:text-primary-400"
+              size="24"
+            />
           </div>
-        </template>
-
-        <div v-if="notification" class="space-y-4">
-          <!-- Message de notification -->
-          <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-              {{ notification.message }}
+          <div>
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+              {{ t('volunteers.confirm_notification_title') }}
+            </h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ notification?.title }}
             </p>
           </div>
-
-          <!-- Informations sur l'envoyeur -->
-          <div class="text-xs text-gray-500 dark:text-gray-400">
-            {{ t('volunteers.notification_sent_by', { sender: notification.senderName }) }}
-            • {{ formatDate(notification.sentAt) }}
-          </div>
-
-          <!-- Statut de confirmation -->
-          <div
-            v-if="confirmationStatus === 'confirmed'"
-            class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
-          >
-            <div class="flex items-center gap-2 text-green-700 dark:text-green-400">
-              <UIcon name="i-heroicons-check" size="16" />
-              <span class="text-sm font-medium">
-                {{ t('volunteers.notification_already_confirmed') }}
-              </span>
-            </div>
-            <p v-if="confirmationDate" class="text-xs text-green-600 dark:text-green-500 mt-1">
-              {{ t('volunteers.confirmed_at', { date: formatDate(confirmationDate) }) }}
-            </p>
-          </div>
-
-          <!-- Bouton de confirmation -->
-          <div v-else class="pt-2">
-            <UButton
-              :loading="confirming"
-              size="lg"
-              block
-              icon="i-heroicons-check-circle"
-              @click="confirmReading"
-            >
-              {{ t('volunteers.confirm_reading') }}
-            </UButton>
-          </div>
         </div>
+      </template>
 
-        <!-- État de chargement -->
-        <div v-else-if="loading" class="flex justify-center py-8">
-          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-gray-400" />
-        </div>
-
-        <!-- Erreur -->
-        <div v-else-if="error" class="text-center py-8">
-          <UIcon
-            name="i-heroicons-exclamation-triangle"
-            class="text-red-500 text-4xl mx-auto mb-4"
-          />
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            {{ t('common.error') }}
-          </h3>
-          <p class="text-gray-600 dark:text-gray-400 text-sm">
-            {{ error }}
+      <div v-if="notification" class="space-y-4">
+        <!-- Message de notification -->
+        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
+            {{ notification.message }}
           </p>
         </div>
 
-        <template v-if="notification" #footer>
-          <div class="flex justify-between items-center text-xs text-gray-500">
-            <span>{{ notification.editionName }}</span>
-            <NuxtLink
-              to="/profile/mes-candidatures-benevole"
-              class="text-primary-600 hover:text-primary-700"
-            >
-              {{ t('volunteers.back_to_my_applications') }}
-            </NuxtLink>
+        <!-- Informations sur l'envoyeur -->
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          {{ t('volunteers.notification_sent_by', { sender: notification.senderName }) }}
+          • {{ formatDate(notification.sentAt) }}
+        </div>
+
+        <!-- Statut de confirmation -->
+        <div
+          v-if="confirmationStatus === 'confirmed'"
+          class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+        >
+          <div class="flex items-center gap-2 text-green-700 dark:text-green-400">
+            <UIcon name="i-heroicons-check" size="16" />
+            <span class="text-sm font-medium">
+              {{ t('volunteers.notification_already_confirmed') }}
+            </span>
           </div>
-        </template>
-      </UCard>
-    </div>
+          <p v-if="confirmationDate" class="text-xs text-green-600 dark:text-green-500 mt-1">
+            {{ t('volunteers.confirmed_at', { date: formatDate(confirmationDate) }) }}
+          </p>
+        </div>
+
+        <!-- Bouton de confirmation -->
+        <div v-else class="pt-2">
+          <UButton
+            :loading="confirming"
+            size="lg"
+            block
+            icon="i-heroicons-check-circle"
+            @click="confirmReading"
+          >
+            {{ t('volunteers.confirm_reading') }}
+          </UButton>
+        </div>
+      </div>
+
+      <!-- État de chargement -->
+      <div v-else-if="loading" class="flex justify-center py-8">
+        <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-gray-400" />
+      </div>
+
+      <!-- Erreur -->
+      <div v-else-if="error" class="text-center py-8">
+        <UIcon name="i-heroicons-exclamation-triangle" class="text-red-500 text-4xl mx-auto mb-4" />
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          {{ t('common.error') }}
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">
+          {{ error }}
+        </p>
+      </div>
+
+      <template v-if="notification" #footer>
+        <div class="flex justify-between items-center text-xs text-gray-500">
+          <span>{{ notification.editionName }}</span>
+          <NuxtLink
+            to="/profile/mes-candidatures-benevole"
+            class="text-primary-600 hover:text-primary-700"
+          >
+            {{ t('volunteers.back_to_my_applications') }}
+          </NuxtLink>
+        </div>
+      </template>
+    </UCard>
   </div>
 </template>
 
