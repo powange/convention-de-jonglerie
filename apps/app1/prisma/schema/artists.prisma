@@ -356,3 +356,45 @@ model ShowCallSurveyVote {
   @@index([applicationId])
   @@index([userId])
 }
+
+// =============================================================================
+// Notifications aux artistes
+// =============================================================================
+
+/// Un envoi groupé aux artistes d'une édition, conservé pour savoir ce qui a été annoncé.
+/// Décalque de `VolunteerNotificationGroup`, le périmètre portant sur des spectacles
+/// plutôt que sur des équipes.
+model ArtistNotificationGroup {
+  id             String   @id @default(cuid())
+  editionId      Int
+  senderId       Int
+  title          String
+  message        String   @db.Text
+  targetType     String // 'all' ou 'shows'
+  selectedShows  Json? // Identifiants des spectacles visés si targetType = 'shows'
+  recipientCount Int
+  sentAt         DateTime @default(now())
+
+  edition       Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  sender        User                             @relation(fields: [senderId], references: [id])
+  confirmations ArtistNotificationConfirmation[]
+
+  @@index([editionId])
+  @@index([senderId])
+}
+
+/// Accusé de lecture d'un artiste pour un envoi donné. `confirmedAt` reste nul tant que
+/// l'artiste n'a pas confirmé : la ligne existe dès l'envoi, ce qui permet de distinguer
+/// « pas encore lu » de « jamais destinataire ».
+model ArtistNotificationConfirmation {
+  id                        String    @id @default(cuid())
+  artistNotificationGroupId String
+  userId                    Int
+  confirmedAt               DateTime?
+
+  notificationGroup ArtistNotificationGroup @relation(fields: [artistNotificationGroupId], references: [id], onDelete: Cascade)
+  user              User                    @relation(fields: [userId], references: [id])
+
+  @@unique([artistNotificationGroupId, userId])
+  @@index([userId])
+}
