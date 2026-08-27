@@ -179,6 +179,11 @@
         "action": "Viz moje žádost",
         "message": "Organizátoři pozastavili vaši přihlášku jako dobrovolníka na \"{editionName}\".",
         "title": "Pozastavení žádosti"
+      },
+      "application_received": {
+        "action": "Zobrazit přihlášky",
+        "message": "{applicantName} se právě přihlásil(a) jako dobrovolník na „{editionName}“.",
+        "title": "Nová přihláška dobrovolníka"
       }
     },
     "welcome": {

@@ -179,6 +179,11 @@
         "action": "Bekijk mijn aanmelding",
         "message": "Je vrijwilligersaanmelding voor \"{editionName}\" is door de organisatoren terug in afwachting gezet.",
         "title": "Aanmelding terug in afwachting"
+      },
+      "application_received": {
+        "action": "Aanmeldingen bekijken",
+        "message": "{applicantName} heeft zich zojuist aangemeld als vrijwilliger voor “{editionName}”.",
+        "title": "Nieuwe vrijwilligersaanmelding"
       }
     },
     "welcome": {

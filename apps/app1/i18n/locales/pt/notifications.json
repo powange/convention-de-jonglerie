@@ -179,6 +179,11 @@
         "action": "Ver a minha candidatura",
         "message": "A sua candidatura de voluntário para \"{editionName}\" foi colocada de volta a pendente pelos organizadores.",
         "title": "Candidatura de volta a pendente"
+      },
+      "application_received": {
+        "action": "Ver as candidaturas",
+        "message": "{applicantName} acabou de se candidatar como voluntário para «{editionName}».",
+        "title": "Nova candidatura de voluntário"
       }
     },
     "welcome": {

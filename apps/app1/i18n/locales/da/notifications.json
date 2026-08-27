@@ -179,6 +179,11 @@
         "action": "Se min ansøgning",
         "message": "Din frivillig-ansøgning til \"{editionName}\" er sat i venteposition af arrangørerne.",
         "title": "Ansøgning sat i venteposition"
+      },
+      "application_received": {
+        "action": "Se ansøgningerne",
+        "message": "{applicantName} har netop meldt sig som frivillig til “{editionName}”.",
+        "title": "Ny frivilligansøgning"
       }
     },
     "welcome": {

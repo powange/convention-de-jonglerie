@@ -93,6 +93,8 @@ export const NotificationTypeMapping = {
 
   // Candidatures bénévoles
   volunteer_application_submitted: 'applicationUpdates' as const,
+  // Reçue par les organisateurs qui gèrent les bénévoles, pas par le candidat
+  volunteer_application_received: 'applicationUpdates' as const,
   volunteer_application_accepted: 'applicationUpdates' as const,
   volunteer_application_rejected: 'applicationUpdates' as const,
   volunteer_application_modified: 'applicationUpdates' as const,

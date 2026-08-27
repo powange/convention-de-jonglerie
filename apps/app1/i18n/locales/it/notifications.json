@@ -179,6 +179,11 @@
         "action": "Vedi la mia candidatura",
         "message": "La tua candidatura da volontario per \"{editionName}\" è stata rimessa in attesa dagli organizzatori.",
         "title": "Candidatura tornata in attesa"
+      },
+      "application_received": {
+        "action": "Vedere le candidature",
+        "message": "{applicantName} si è appena candidato come volontario per «{editionName}».",
+        "title": "Nuova candidatura volontario"
       }
     },
     "welcome": {
