@@ -333,119 +333,119 @@
     <!-- Modal de détails -->
     <!-- Pas de prop `size` sur UModal : elle était passée en pur attribut HTML, sans effet. La
          largeur vient du thème — w-[calc(100vw-2rem)] max-w-lg — et suit donc déjà l'écran ;
-         c'était le contenu qui la débordait. -->
+         c'était le contenu qui la débordait.
+         Structure native aussi ici : le corps hérite du `flex-1 overflow-y-auto` de UModal, ce
+         qui remplace le `overflow-y-auto max-h-…` posé à la main, et le titre cesse d'être
+         masqué par un #content. -->
     <UModal v-model:open="detailsModal.isOpen" :title="t('admin.feedback.details')">
-      <template #content>
-        <UCard>
-          <div
-            v-if="detailsModal.feedback"
-            class="space-y-6 p-4 overflow-y-auto max-h-[calc(100dvh-6rem)]"
-          >
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {{ t('admin.feedback.type.label') }}
-                </label>
-                <UBadge
-                  :color="getTypeColor(detailsModal.feedback.type)"
-                  :label="t(`admin.feedback.types.${detailsModal.feedback.type.toLowerCase()}`)"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {{ t('admin.feedback.status') }}
-                </label>
-                <UBadge
-                  :color="getStatusColor(detailsModal.feedback.status)"
-                  :label="t(`feedback.status.${detailsModal.feedback.status}`)"
-                />
-              </div>
-            </div>
-
+      <template #body>
+        <div v-if="detailsModal.feedback" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {{ t('admin.feedback.subject.label') }}
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('admin.feedback.type.label') }}
               </label>
-              <p class="text-gray-900 dark:text-white break-words">
-                {{ detailsModal.feedback.subject }}
-              </p>
+              <UBadge
+                :color="getTypeColor(detailsModal.feedback.type)"
+                :label="t(`admin.feedback.types.${detailsModal.feedback.type.toLowerCase()}`)"
+              />
             </div>
-
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {{ t('admin.feedback.message.label') }}
-              </label>
-              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                <p class="text-gray-900 dark:text-white whitespace-pre-wrap break-words">
-                  {{ detailsModal.feedback.message }}
-                </p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {{ t('admin.feedback.user') }}
-                </label>
-                <p class="text-gray-900 dark:text-white break-words">
-                  <span v-if="detailsModal.feedback.user">
-                    {{ detailsModal.feedback.user.pseudo }} ({{ detailsModal.feedback.user.email }})
-                  </span>
-                  <span v-else>
-                    {{ detailsModal.feedback.name }} ({{ detailsModal.feedback.email }})
-                  </span>
-                </p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {{ t('admin.feedback.created_at') }}
-                </label>
-                <p class="text-gray-900 dark:text-white">
-                  {{ formatDateWithTime(detailsModal.feedback.createdAt) }}
-                </p>
-              </div>
-            </div>
-
-            <div v-if="detailsModal.feedback.url">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {{ t('admin.feedback.url') }}
+                {{ t('admin.feedback.status') }}
               </label>
-              <a
-                :href="detailsModal.feedback.url"
-                target="_blank"
-                class="text-blue-600 hover:underline break-all"
-              >
-                {{ detailsModal.feedback.url }}
-              </a>
-            </div>
-
-            <div v-if="detailsModal.feedback.userAgent">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {{ t('admin.feedback.user_agent') }}
-              </label>
-              <p class="text-sm text-gray-600 dark:text-gray-400 break-all">
-                {{ detailsModal.feedback.userAgent }}
-              </p>
-            </div>
-
-            <div v-if="detailsModal.feedback.adminNotes">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {{ t('admin.feedback.admin_notes') }}
-              </label>
-              <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p class="text-blue-900 dark:text-blue-100 whitespace-pre-wrap break-words">
-                  {{ detailsModal.feedback.adminNotes }}
-                </p>
-              </div>
-            </div>
-
-            <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
-              <UButton color="neutral" variant="outline" @click="detailsModal.isOpen = false">
-                {{ t('common.close') }}
-              </UButton>
+              <UBadge
+                :color="getStatusColor(detailsModal.feedback.status)"
+                :label="t(`feedback.status.${detailsModal.feedback.status}`)"
+              />
             </div>
           </div>
-        </UCard>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ t('admin.feedback.subject.label') }}
+            </label>
+            <p class="text-gray-900 dark:text-white break-words">
+              {{ detailsModal.feedback.subject }}
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ t('admin.feedback.message.label') }}
+            </label>
+            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <p class="text-gray-900 dark:text-white whitespace-pre-wrap break-words">
+                {{ detailsModal.feedback.message }}
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('admin.feedback.user') }}
+              </label>
+              <p class="text-gray-900 dark:text-white break-words">
+                <span v-if="detailsModal.feedback.user">
+                  {{ detailsModal.feedback.user.pseudo }} ({{ detailsModal.feedback.user.email }})
+                </span>
+                <span v-else>
+                  {{ detailsModal.feedback.name }} ({{ detailsModal.feedback.email }})
+                </span>
+              </p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('admin.feedback.created_at') }}
+              </label>
+              <p class="text-gray-900 dark:text-white">
+                {{ formatDateWithTime(detailsModal.feedback.createdAt) }}
+              </p>
+            </div>
+          </div>
+
+          <div v-if="detailsModal.feedback.url">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {{ t('admin.feedback.url') }}
+            </label>
+            <a
+              :href="detailsModal.feedback.url"
+              target="_blank"
+              class="text-blue-600 hover:underline break-all"
+            >
+              {{ detailsModal.feedback.url }}
+            </a>
+          </div>
+
+          <div v-if="detailsModal.feedback.userAgent">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {{ t('admin.feedback.user_agent') }}
+            </label>
+            <p class="text-sm text-gray-600 dark:text-gray-400 break-all">
+              {{ detailsModal.feedback.userAgent }}
+            </p>
+          </div>
+
+          <div v-if="detailsModal.feedback.adminNotes">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {{ t('admin.feedback.admin_notes') }}
+            </label>
+            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <p class="text-blue-900 dark:text-blue-100 whitespace-pre-wrap break-words">
+                {{ detailsModal.feedback.adminNotes }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end w-full">
+          <UButton color="neutral" variant="outline" @click="detailsModal.isOpen = false">
+            {{ t('common.close') }}
+          </UButton>
+        </div>
       </template>
     </UModal>
   </div>
