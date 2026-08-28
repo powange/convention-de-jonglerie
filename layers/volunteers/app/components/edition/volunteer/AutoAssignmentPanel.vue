@@ -418,6 +418,8 @@
 </template>
 
 <script setup lang="ts">
+import { useLocalStorage } from '@vueuse/core'
+
 interface Props {
   editionId: number
   volunteers: any[]
@@ -446,8 +448,7 @@ interface Constraints {
 const props = defineProps<Props>()
 const { t } = useI18n()
 
-// État réactif
-const constraints = ref<Constraints>({
+const REGLAGES_PAR_DEFAUT: Constraints = {
   maxHoursPerVolunteer: 8,
   minHoursPerVolunteer: 2,
   maxHoursPerDay: 6,
@@ -467,7 +468,23 @@ const constraints = ref<Constraints>({
   // Conserver les choix humains par défaut : effacer le travail d'un organisateur doit être
   // un geste délibéré, pas le comportement par défaut d'un bouton qu'on relance.
   existingAssignmentsMode: 'keep-manual',
-})
+}
+
+/**
+ * Les réglages survivent au rechargement de la page, édition par édition.
+ *
+ * Il y a une dizaine de curseurs à poser, et on relance rarement l'assignation du premier coup :
+ * tout ressaisir à chaque passage décourageait d'ajuster. Chaque édition garde les siens — les
+ * contraintes d'un festival de trois jours ne sont pas celles d'une rencontre d'un week-end.
+ *
+ * `mergeDefaults` protège les réglages enregistrés avant l'ajout d'une option : la valeur par
+ * défaut de la nouvelle complète l'objet stocké au lieu de le rendre inutilisable.
+ */
+const constraints = useLocalStorage<Constraints>(
+  `assignation-auto:${props.editionId}`,
+  REGLAGES_PAR_DEFAUT,
+  { mergeDefaults: true }
+)
 
 const modesAffectationsExistantes = computed(() => [
   {
