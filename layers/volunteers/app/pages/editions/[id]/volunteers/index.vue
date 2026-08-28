@@ -18,6 +18,20 @@
       </ClientOnly>
 
       <ClientOnly>
+        <!-- Ses propres créneaux d'abord : c'est ce que le bénévole vient chercher.
+             Le planning de toute l'édition, plus large, vient ensuite. -->
+        <EditionVolunteerMySlotsCard
+          v-if="
+            authStore.isAuthenticated &&
+            myApplication?.status === 'ACCEPTED' &&
+            volunteersMode === 'INTERNAL'
+          "
+          :edition-id="editionId"
+          :user-id="authStore.user?.id"
+          repliable-sur-mobile
+          deplie-par-defaut
+        />
+
         <!-- Planning Card - Visible seulement pour les bénévoles acceptés -->
         <EditionVolunteerPlanningCard
           v-if="
@@ -28,20 +42,10 @@
           :edition="edition"
           :can-manage-volunteers="false"
           :current-user-id="authStore.user?.id"
+          repliable-sur-mobile
           :format-date="formatDate"
           :format-date-time-range="formatDateTimeRange"
           @slot-click="openSlotDetailsModal"
-        />
-
-        <!-- Carte "Mes créneaux" - Visible pour les bénévoles acceptés -->
-        <EditionVolunteerMySlotsCard
-          v-if="
-            authStore.isAuthenticated &&
-            myApplication?.status === 'ACCEPTED' &&
-            volunteersMode === 'INTERNAL'
-          "
-          :edition-id="editionId"
-          :user-id="authStore.user?.id"
         />
 
         <!-- Carte "Mes équipes" - Visible pour les leaders d'équipes -->
@@ -54,6 +58,7 @@
           "
           :edition-id="editionId"
           :team-assignments="myApplication.teamAssignments"
+          repliable-sur-mobile
         />
 
         <!-- Carte "Mes repas" - Visible pour les bénévoles acceptés -->
@@ -65,27 +70,27 @@
             volunteersMode === 'INTERNAL'
           "
           :edition-id="editionId"
+          repliable-sur-mobile
         />
       </ClientOnly>
 
-      <UCard variant="soft" class="mb-6">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold flex items-center gap-2">
-              <UIcon name="i-heroicons-hand-raised" class="text-primary-500" />
-              {{ t('edition.volunteers.title') }}
-            </h3>
-            <div v-if="canManageEdition" class="flex items-center gap-2">
-              <UButton
-                size="xs"
-                color="primary"
-                variant="soft"
-                icon="i-heroicons-cog-6-tooth"
-                :to="`/editions/${edition?.id}/gestion`"
-              >
-                {{ t('common.manage') || 'Gérer' }}
-              </UButton>
-            </div>
+      <EditionVolunteerCarteRepliable
+        :titre="t('edition.volunteers.title')"
+        icone="i-heroicons-hand-raised"
+        repliable-sur-mobile
+        class="mb-6"
+      >
+        <template #actions>
+          <div v-if="canManageEdition" class="flex items-center gap-2">
+            <UButton
+              size="xs"
+              color="primary"
+              variant="soft"
+              icon="i-heroicons-cog-6-tooth"
+              :to="`/editions/${edition?.id}/gestion`"
+            >
+              {{ t('common.manage') || 'Gérer' }}
+            </UButton>
           </div>
         </template>
 
@@ -282,7 +287,7 @@
             </div>
           </ClientOnly>
         </div>
-      </UCard>
+      </EditionVolunteerCarteRepliable>
 
       <!-- Modal candidature bénévole -->
       <EditionVolunteerApplicationModal

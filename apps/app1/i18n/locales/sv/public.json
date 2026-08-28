@@ -213,7 +213,9 @@
       "withdraw": "Ta bort",
       "withdrawal_error": "Fel vid återkallande av ansökan",
       "withdrawal_success": "Ansökan framgångsrikt återkallad",
-      "with_you_on_slot": "Tillsammans med dig på detta pass: | Tillsammans med dig på detta pass ({count}):"
+      "with_you_on_slot": "Tillsammans med dig på detta pass: | Tillsammans med dig på detta pass ({count}):",
+      "show_past_slots": "Visa det passerade passet | Visa de {count} passerade passen",
+      "no_upcoming_slots": "Inga kommande pass."
     }
   },
   "seo": {

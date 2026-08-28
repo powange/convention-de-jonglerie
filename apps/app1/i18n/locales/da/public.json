@@ -213,7 +213,9 @@
       "withdraw": "Trække tilbage",
       "withdrawal_error": "Fejl ved at trække ansøgning tilbage",
       "withdrawal_success": "Ansøgning trukket tilbage succesfuldt",
-      "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):"
+      "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):",
+      "show_past_slots": "Vis den forgangne vagt | Vis de {count} forgangne vagter",
+      "no_upcoming_slots": "Ingen kommende vagter."
     }
   },
   "seo": {

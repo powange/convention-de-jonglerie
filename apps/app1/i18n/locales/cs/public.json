@@ -213,7 +213,9 @@
       "withdraw": "Odstranění stránky",
       "withdrawal_error": "Chyba při stažení žádosti",
       "withdrawal_success": "Úspěšné stažení žádosti",
-      "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):"
+      "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):",
+      "show_past_slots": "Zobrazit uplynulou směnu | Zobrazit {count} uplynulých směn",
+      "no_upcoming_slots": "Žádné nadcházející směny."
     }
   },
   "seo": {

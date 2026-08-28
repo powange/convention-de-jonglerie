@@ -213,7 +213,9 @@
       "withdraw": "Withdraw",
       "withdrawal_error": "Error withdrawing application",
       "withdrawal_success": "Application withdrawn successfully",
-      "with_you_on_slot": "With you on this shift: | With you on this shift ({count}):"
+      "with_you_on_slot": "With you on this shift: | With you on this shift ({count}):",
+      "show_past_slots": "Show the past shift | Show the {count} past shifts",
+      "no_upcoming_slots": "No upcoming shifts."
     }
   },
   "seo": {

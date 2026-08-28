@@ -213,7 +213,9 @@
       "withdraw": "Retirar",
       "withdrawal_error": "Erro ao retirar candidatura",
       "withdrawal_success": "Candidatura retirada com sucesso",
-      "with_you_on_slot": "Consigo neste turno: | Consigo neste turno ({count}):"
+      "with_you_on_slot": "Consigo neste turno: | Consigo neste turno ({count}):",
+      "show_past_slots": "Mostrar o turno passado | Mostrar os {count} turnos passados",
+      "no_upcoming_slots": "Nenhum turno próximo."
     }
   },
   "seo": {

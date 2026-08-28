@@ -456,6 +456,7 @@
     "hours_covered_of_needed": "Hours covered of hours to cover",
     "show_conflicts": "Shows a volunteer will not be able to watch",
     "show_conflicts_count": "{count} volunteer will not be able to attend any performance of a show | {count} volunteers will not be able to attend any performance of a show",
-    "show_conflicts_detail": "Its only performance falls during a shift: | None of its {count} performances is free:"
+    "show_conflicts_detail": "Its only performance falls during a shift: | None of its {count} performances is free:",
+    "schedule_view": "Volunteer schedule"
   }
 }

@@ -456,6 +456,7 @@
     "hours_covered_of_needed": "Ingevulde uren van de in te vullen uren",
     "show_conflicts": "Voorstellingen die een vrijwilliger niet kan zien",
     "show_conflicts_count": "{count} vrijwilliger kan geen enkele uitvoering van een voorstelling bijwonen | {count} vrijwilligers kunnen geen enkele uitvoering van een voorstelling bijwonen",
-    "show_conflicts_detail": "De enige uitvoering valt tijdens een dienst: | Geen van de {count} uitvoeringen is vrij:"
+    "show_conflicts_detail": "De enige uitvoering valt tijdens een dienst: | Geen van de {count} uitvoeringen is vrij:",
+    "schedule_view": "Vrijwilligersplanning"
   }
 }

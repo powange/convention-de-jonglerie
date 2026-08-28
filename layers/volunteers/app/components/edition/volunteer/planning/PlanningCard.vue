@@ -1,13 +1,9 @@
 <template>
-  <UCard variant="soft">
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold flex items-center gap-2">
-          <UIcon name="i-heroicons-calendar-days" class="text-primary-500" />
-          {{ t('volunteers.schedule_management') }}
-        </h3>
-      </div>
-    </template>
+  <EditionVolunteerCarteRepliable
+    :titre="titreCarte"
+    icone="i-heroicons-calendar-days"
+    :repliable-sur-mobile="repliableSurMobile"
+  >
 
     <div class="space-y-6">
       <!-- Barre d'outils -->
@@ -90,7 +86,7 @@
         </div>
       </div>
     </div>
-  </UCard>
+  </EditionVolunteerCarteRepliable>
 </template>
 
 <script setup lang="ts">
@@ -113,6 +109,8 @@ interface Props {
   formatDate: (date: string) => string
   formatDateTimeRange: (start: string, end: string) => string
   currentUserId?: number // Pour filtrer les stats si c'est un bénévole
+  /** Repli proposé sur mobile — la page bénévole s'en sert, pas celle de gestion. */
+  repliableSurMobile?: boolean
 }
 
 interface SlotCreateData {
@@ -139,7 +137,7 @@ interface Emits {
   (e: 'slot-delete', slotId: string): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), { repliableSurMobile: false })
 const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
@@ -196,6 +194,12 @@ const convertedTimeSlots = computed(() => {
     })
   )
 })
+
+// Sans droits de gestion, la carte ne permet rien d'autre que consulter : annoncer « Gérer le
+// planning » promettait une action qui n'existe pas. Le titre dit alors ce qu'on regarde.
+const titreCarte = computed(() =>
+  props.canManageVolunteers ? t('volunteers.schedule_management') : t('volunteers.schedule_view')
+)
 
 // Calcul automatique des stats individuelles si non fournies (pour les bénévoles)
 const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {

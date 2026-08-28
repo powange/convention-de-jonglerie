@@ -202,6 +202,8 @@
       "time_preferences": "Préférences horaires",
       "unnamed_slot": "Créneau sans titre",
       "with_you_on_slot": "Avec vous sur ce créneau : | Avec vous sur ce créneau ({count}) :",
+      "show_past_slots": "Afficher le créneau passé | Afficher les {count} créneaux passés",
+      "no_upcoming_slots": "Aucun créneau à venir.",
       "vehicle": "Véhicule",
       "vehicle_details": "Détails du véhicule",
       "view_compact": "Vue compacte",

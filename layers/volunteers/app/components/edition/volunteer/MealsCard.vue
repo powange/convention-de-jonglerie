@@ -1,13 +1,9 @@
 <template>
-  <UCard variant="soft">
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold flex items-center gap-2">
-          <UIcon name="i-heroicons-cake" class="text-primary-500" />
-          Mes repas
-        </h3>
-      </div>
-    </template>
+  <EditionVolunteerCarteRepliable
+    titre="Mes repas"
+    icone="i-heroicons-cake"
+    :repliable-sur-mobile="repliableSurMobile"
+  >
 
     <div v-if="loadingMeals" class="flex items-center justify-center py-8">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 text-primary-500" />
@@ -72,7 +68,7 @@
         </UButton>
       </div>
     </div>
-  </UCard>
+  </EditionVolunteerCarteRepliable>
 </template>
 
 <script setup lang="ts">
@@ -82,9 +78,13 @@ import { computed, onMounted, ref } from 'vue'
 const { getMealTypeLabel } = useMealTypeLabel()
 const { getPhasesLabel } = useMealPhaseLabel()
 
-const props = defineProps<{
-  editionId: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    editionId: number
+    repliableSurMobile?: boolean
+  }>(),
+  { repliableSurMobile: false }
+)
 
 // État
 const meals = ref<any[]>([])

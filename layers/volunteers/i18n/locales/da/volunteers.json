@@ -456,6 +456,7 @@
     "hours_covered_of_needed": "Dækkede timer af timer at dække",
     "show_conflicts": "Forestillinger, en frivillig ikke vil kunne se",
     "show_conflicts_count": "{count} frivillig vil ikke kunne overvære nogen opførelse af en forestilling | {count} frivillige vil ikke kunne overvære nogen opførelse af en forestilling",
-    "show_conflicts_detail": "Dens eneste opførelse falder i en vagt: | Ingen af dens {count} opførelser er fri:"
+    "show_conflicts_detail": "Dens eneste opførelse falder i en vagt: | Ingen af dens {count} opførelser er fri:",
+    "schedule_view": "Frivilligplan"
   }
 }
