@@ -160,6 +160,80 @@
         </UCollapsible>
       </template>
     </UAlert>
+    <!-- Spectacles qu'un bénévole ne pourra voir sous aucune de leurs représentations -->
+    <UAlert
+      v-if="showConflictWarnings.length > 0"
+      color="secondary"
+      variant="soft"
+      icon="i-heroicons-sparkles"
+    >
+      <template #title>
+        {{ t('volunteers.show_conflicts') }}
+      </template>
+      <template #description>
+        <!-- Repliable comme les conflits de repas : le décompte dit s'il y a lieu de dérouler. -->
+        <UCollapsible v-model:open="spectaclesDeplies" class="space-y-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            class="group w-full justify-between p-0 hover:bg-transparent"
+            :ui="{
+              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
+            }"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            <span class="text-sm text-left">
+              {{ t('volunteers.show_conflicts_count', { count: showConflictWarnings.length }) }}
+            </span>
+          </UButton>
+
+          <template #content>
+            <div class="space-y-1">
+              <div
+                v-for="warning in showConflictWarnings"
+                :key="`${warning.volunteerId}-${warning.show.id}`"
+                class="text-sm bg-purple-50 dark:bg-purple-900/20 p-2 rounded border-l-2 border-purple-400"
+              >
+                <div
+                  class="flex items-center gap-2 font-medium text-purple-800 dark:text-purple-200"
+                >
+                  <UiUserAvatar :user="warning.volunteer" size="xs" />
+                  {{ warning.volunteer.pseudo }}
+                </div>
+                <div class="text-xs text-purple-700 dark:text-purple-300 mt-1">
+                  <strong>{{ warning.show.title }}</strong>
+                  <br />
+                  <span class="text-purple-600 dark:text-purple-400">
+                    {{
+                      t('volunteers.show_conflicts_detail', {
+                        count: warning.representations.length,
+                      })
+                    }}
+                  </span>
+                  <!-- Le détail par représentation : sans le créneau qui bloque, l'organisateur
+                       ne sait pas quoi déplacer. -->
+                  <div
+                    v-for="representation in warning.representations"
+                    :key="`${representation.startDateTime}-${representation.slot.id}`"
+                    class="mt-1"
+                  >
+                    {{ formatDateTime(representation.startDateTime) }}
+                    — <strong>{{ representation.slot.title }}</strong>
+                    <span
+                      v-if="representation.slot.teamName"
+                      class="text-purple-600 dark:text-purple-400"
+                    >
+                      - {{ representation.slot.teamName }}</span
+                    >
+                    ({{ formatDateTimeRange(representation.slot.start, representation.slot.end) }})
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </UCollapsible>
+      </template>
+    </UAlert>
   </div>
 </template>
 
@@ -218,12 +292,36 @@ interface MealTimeWarning {
   mealPeriod: 'lunch' | 'dinner'
 }
 
+interface ShowConflictWarning {
+  volunteerId: number
+  volunteer: {
+    pseudo: string
+    [key: string]: any
+  }
+  show: {
+    id: number
+    title: string
+  }
+  representations: Array<{
+    startDateTime: string
+    slot: {
+      id: string | number
+      title: string
+      start: string
+      end: string
+      teamName: string | null
+    }
+  }>
+}
+
 interface Props {
   overlapWarnings: OverlapWarning[]
   preferenceWarnings: PreferenceWarning[]
   mealTimeWarnings: MealTimeWarning[]
+  showConflictWarnings: ShowConflictWarning[]
   canManageVolunteers: boolean
   formatDateTimeRange: (start: string, end: string) => string
+  formatDateTime: (value: string) => string
 }
 
 defineProps<Props>()
@@ -234,4 +332,5 @@ const { t } = useI18n()
 // Repliée par défaut : le décompte suffit à savoir s'il y a lieu de la dérouler, et la liste
 // entière repoussait hors de l'écran le résumé des bénévoles qui la suit.
 const conflitsDeplies = ref(false)
+const spectaclesDeplies = ref(false)
 </script>

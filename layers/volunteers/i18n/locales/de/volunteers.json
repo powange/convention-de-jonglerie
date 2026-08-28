@@ -453,6 +453,9 @@
     "hours_per_volunteer": "Stunden pro Helfer",
     "no_slot_assigned_yet": "Noch keine Schicht zugewiesen",
     "assigned_automatically": "Automatisch zugewiesen",
-    "hours_covered_of_needed": "Besetzte von zu besetzenden Stunden"
+    "hours_covered_of_needed": "Besetzte von zu besetzenden Stunden",
+    "show_conflicts": "Aufführungen, die ein Freiwilliger nicht sehen kann",
+    "show_conflicts_count": "{count} Freiwilliger kann keine Vorstellung einer Aufführung besuchen | {count} Freiwillige können keine Vorstellung einer Aufführung besuchen",
+    "show_conflicts_detail": "Die einzige Vorstellung fällt in eine Schicht: | Keine der {count} Vorstellungen ist frei:"
   }
 }

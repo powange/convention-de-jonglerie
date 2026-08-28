@@ -99,4 +99,60 @@ describe('port artists (câblage jonglerie par défaut)', () => {
       expect(prismaMock.artistMealSelection.findMany).not.toHaveBeenCalled()
     })
   })
+  describe('getShowSchedule', () => {
+    it('ne remonte que les spectacles ayant au moins une représentation', async () => {
+      prismaMock.show.findMany.mockResolvedValue([])
+
+      await createDefaultVolunteerPorts().artists.getShowSchedule(7)
+
+      // Un spectacle sans représentation n'offre rien à manquer : l'écarter en base évite de
+      // le transporter jusqu'au front pour l'ignorer là-bas.
+      expect(prismaMock.show.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { editionId: 7, performances: { some: {} } } })
+      )
+    })
+
+    it('rend la durée du spectacle et les instants de ses représentations', async () => {
+      prismaMock.show.findMany.mockResolvedValue([
+        {
+          id: 3,
+          title: 'Cabaret',
+          duration: 90,
+          performances: [
+            { startDateTime: new Date('2026-08-01T20:00:00.000Z') },
+            { startDateTime: new Date('2026-08-02T20:00:00.000Z') },
+          ],
+        },
+      ])
+
+      const programme = await createDefaultVolunteerPorts().artists.getShowSchedule(7)
+
+      expect(programme).toEqual([
+        {
+          id: 3,
+          title: 'Cabaret',
+          durationMinutes: 90,
+          performances: [
+            { startDateTime: '2026-08-01T20:00:00.000Z' },
+            { startDateTime: '2026-08-02T20:00:00.000Z' },
+          ],
+        },
+      ])
+    })
+
+    it('transmet une durée absente telle quelle, sans en inventer une', async () => {
+      prismaMock.show.findMany.mockResolvedValue([
+        {
+          id: 4,
+          title: 'Scène ouverte',
+          duration: null,
+          performances: [{ startDateTime: new Date('2026-08-01T20:00:00.000Z') }],
+        },
+      ])
+
+      const programme = await createDefaultVolunteerPorts().artists.getShowSchedule(7)
+
+      expect(programme[0]?.durationMinutes).toBeNull()
+    })
+  })
 })

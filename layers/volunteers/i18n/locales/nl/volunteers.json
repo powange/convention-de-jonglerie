@@ -453,6 +453,9 @@
     "hours_per_volunteer": "Uren per vrijwilliger",
     "no_slot_assigned_yet": "Nog geen dienst toegewezen",
     "assigned_automatically": "Automatisch toegewezen",
-    "hours_covered_of_needed": "Ingevulde uren van de in te vullen uren"
+    "hours_covered_of_needed": "Ingevulde uren van de in te vullen uren",
+    "show_conflicts": "Voorstellingen die een vrijwilliger niet kan zien",
+    "show_conflicts_count": "{count} vrijwilliger kan geen enkele uitvoering van een voorstelling bijwonen | {count} vrijwilligers kunnen geen enkele uitvoering van een voorstelling bijwonen",
+    "show_conflicts_detail": "De enige uitvoering valt tijdens een dienst: | Geen van de {count} uitvoeringen is vrij:"
   }
 }

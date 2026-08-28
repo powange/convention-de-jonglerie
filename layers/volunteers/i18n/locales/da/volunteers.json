@@ -453,6 +453,9 @@
     "hours_per_volunteer": "Timer pr. frivillig",
     "no_slot_assigned_yet": "Ingen vagt tildelt endnu",
     "assigned_automatically": "Tildelt automatisk",
-    "hours_covered_of_needed": "Dækkede timer af timer at dække"
+    "hours_covered_of_needed": "Dækkede timer af timer at dække",
+    "show_conflicts": "Forestillinger, en frivillig ikke vil kunne se",
+    "show_conflicts_count": "{count} frivillig vil ikke kunne overvære nogen opførelse af en forestilling | {count} frivillige vil ikke kunne overvære nogen opførelse af en forestilling",
+    "show_conflicts_detail": "Dens eneste opførelse falder i en vagt: | Ingen af dens {count} opførelser er fri:"
   }
 }

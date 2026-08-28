@@ -144,10 +144,24 @@ export interface ArtistMealParticipant {
 }
 
 /**
- * Accès au module artistes depuis le module bénévole (repas / catering). Le module bénévole ne
- * connaît pas la notion d'« artiste » : il délègue la synchronisation et la lecture des repas
- * artistes. Jonglerie : modèles `EditionArtist` + `ArtistMealSelection`. Domaine sans artistes :
- * `addEligibleMealSelections`/`removeMealSelections` no-op et `getMealArtistParticipants` → `{}`.
+ * Un spectacle et ses représentations, réduits à ce qu'il faut pour savoir si un bénévole
+ * pourra le voir. La durée appartient à l'œuvre : une représentation en hérite.
+ */
+export interface ShowScheduleEntry {
+  id: number
+  title: string
+  /** Durée en minutes, si elle a été renseignée. Sans elle, une représentation est un instant. */
+  durationMinutes: number | null
+  performances: { startDateTime: string }[]
+}
+
+/**
+ * Accès au module artistes depuis le module bénévole (repas / catering, programmation des
+ * spectacles). Le module bénévole ne connaît pas la notion d'« artiste » : il délègue la
+ * synchronisation et la lecture des repas artistes, ainsi que les horaires des spectacles.
+ * Jonglerie : modèles `EditionArtist`, `ArtistMealSelection` et `Show`. Domaine sans artistes :
+ * `addEligibleMealSelections`/`removeMealSelections` no-op, `getMealArtistParticipants` → `{}`
+ * et `getShowSchedule` → `[]`.
  */
 export interface ArtistsPort {
   /** Crée (upsert) les sélections de repas des artistes éligibles quand un repas est activé. */
@@ -164,6 +178,12 @@ export interface ArtistsPort {
    * sans artiste est absent ou associé à un tableau vide.
    */
   getMealArtistParticipants(mealIds: number[]): Promise<Record<number, ArtistMealParticipant[]>>
+  /**
+   * Programmation des spectacles d'une édition, pour confronter les créneaux des bénévoles aux
+   * horaires des représentations. Un spectacle sans représentation est omis : il n'y a rien à
+   * manquer. Domaine sans artistes : tableau vide.
+   */
+  getShowSchedule(editionId: number): Promise<ShowScheduleEntry[]>
 }
 
 /**
