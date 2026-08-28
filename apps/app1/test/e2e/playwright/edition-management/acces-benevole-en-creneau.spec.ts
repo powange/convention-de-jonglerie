@@ -138,6 +138,16 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
       .click()
     await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 30000 })
 
+    // Aucun appel ne doit être refusé : la page interroge une douzaine d'endpoints, et ceux
+    // qu'un bénévole ne peut pas atteindre échouaient sans rien afficher — visibles seulement
+    // dans les journaux d'erreur de production.
+    const refuses: string[] = []
+    page.on('response', (reponse) => {
+      if (reponse.url().includes('/api/') && reponse.status() === 403) {
+        refuses.push(`${reponse.status()} ${reponse.url().replace(BASE, '')}`)
+      }
+    })
+
     await page.goto(`${BASE}/editions/${editionId}/gestion`, { waitUntil: 'domcontentloaded' })
 
     // Une seule destination lui est offerte : la page d'accueil doit y mener directement.
@@ -146,6 +156,10 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
       { timeout: 30000 }
     )
     await expect(page.getByText(/Accès refusé/i)).toHaveCount(0)
+
+    // Laisser la page finir de charger ses données avant de juger
+    await page.waitForTimeout(3000)
+    expect(refuses, `appels refusés : ${refuses.join(', ')}`).toEqual([])
 
     await context.close()
   })

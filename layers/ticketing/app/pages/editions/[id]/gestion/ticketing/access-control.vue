@@ -738,8 +738,18 @@ onMounted(async () => {
     await fetchSumupConfig()
   }
 
-  // Charger les statistiques et les dernières validations
-  await Promise.all([loadStats(), loadRecentValidations(), checkHelloAssoConfig(), checkHasTiers()])
+  // Charger les statistiques et les dernières validations.
+  //
+  // La configuration HelloAsso n'est demandée qu'à qui gère la billetterie : elle ne sert qu'à
+  // décider d'afficher le bouton de synchronisation, lui-même réservé aux gestionnaires. Un
+  // bénévole en créneau la demandait pour rien et récoltait un 403 à chaque ouverture de la
+  // page — invisible à l'écran, mais consigné dans les journaux d'erreur de production.
+  await Promise.all([
+    loadStats(),
+    loadRecentValidations(),
+    ...(canManageTicketing.value ? [checkHelloAssoConfig()] : []),
+    checkHasTiers(),
+  ])
 })
 
 // Permissions calculées
@@ -751,6 +761,11 @@ const canEdit = computed(() => {
 const canManageVolunteers = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageVolunteers(edition.value, authStore.user.id)
+})
+
+const canManageTicketing = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
 // Vérifier l'accès à cette page
