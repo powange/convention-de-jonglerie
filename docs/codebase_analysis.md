@@ -1,9 +1,10 @@
 # Analyse complète de la base de code — Convention de Jonglerie
 
-> Rapport de la skill `/analyze-codebase`, mis à jour le **2026-08-14**.
-> Remplace la version du 2026-05-24, antérieure à la migration monorepo — celle-ci ne
-> mentionnait ni `apps/`, ni `layers/`, ni le découplage par ports, qui structurent
-> aujourd'hui l'essentiel du dépôt.
+> Rapport de la skill `/analyze-codebase`, mis à jour le **2026-08-28**.
+> Actualise la version du 2026-08-14 : volumétrie remesurée, et deux enseignements nouveaux
+> tirés d'une série de corrections sur le contrôle d'accès (§9). Les grandes lignes de
+> l'architecture — monorepo, layers, ports — n'ont pas bougé ; ce sont les chiffres et les
+> pièges connus qui évoluent.
 
 ---
 
@@ -18,6 +19,8 @@
 7. [Stack technique](#7-stack-technique)
 8. [Diagrammes](#8-diagrammes)
 9. [Constats et recommandations](#9-constats-et-recommandations)
+10. [Ce qui a bougé depuis le 14 août](#10-ce-qui-a-bougé-depuis-le-14-août)
+11. [Par où commencer, pour qui arrive](#11-par-où-commencer-pour-qui-arrive)
 
 ---
 
@@ -41,23 +44,29 @@ Trois traits la distinguent d'un monolithe Nuxt ordinaire :
 
 ### Volumétrie
 
-| Élément                | Nombre                                                |
-| ---------------------- | ----------------------------------------------------- |
-| Endpoints API (app1)   | 275                                                   |
-| Endpoints API (layers) | 215                                                   |
-| Pages Vue (app1)       | 77                                                    |
-| Composants (app1)      | 92                                                    |
-| Composables            | 46                                                    |
-| Utilitaires serveur    | 105                                                   |
-| Modèles Prisma         | 105, répartis sur 15 fichiers de schéma               |
-| Migrations             | 51                                                    |
-| Langues                | 13                                                    |
-| Fichiers de test       | 341 (65 unit, 221 Nuxt, 8 intégration, 47 Playwright) |
-| Documentation          | 90 fichiers Markdown                                  |
+| Élément                | Nombre                                                | Δ depuis le 14 août |
+| ---------------------- | ----------------------------------------------------- | ------------------- |
+| Endpoints API (app1)   | 281                                                   | +6                  |
+| Endpoints API (layers) | 220                                                   | +5                  |
+| Pages Vue (app1)       | 79                                                    | +2                  |
+| Pages Vue (layers)     | 51                                                    | —                   |
+| Composants (app1)      | 98                                                    | +6                  |
+| Composants (layers)    | 101                                                   | —                   |
+| Composables            | 49                                                    | +3                  |
+| Utilitaires serveur    | 90                                                    | —                   |
+| Modèles Prisma         | 108, répartis sur 15 fichiers de schéma               | +3                  |
+| Migrations             | 66                                                    | **+15**             |
+| Langues                | 13                                                    | —                   |
+| Fichiers de test       | 394 (87 unit, 248 Nuxt, 8 intégration, 51 Playwright) | **+53**             |
+| Documentation          | 91 fichiers Markdown                                  | +1                  |
+
+Quinze migrations et cinquante-trois fichiers de test en deux semaines : le dépôt est en
+phase d'ajout soutenu, et les tests suivent le rythme des fonctionnalités.
 
 ### Langages et versions
 
-TypeScript 5.9, Node 24 en CI, Nuxt 4.5 avec `compatibilityVersion: 5` (préparation à Nuxt 5), Prisma 7.9, Vue 3.
+TypeScript 5.9, Node contraint à `>=22 <26`, Nuxt 4.5 avec `compatibilityVersion: 5`
+(préparation à Nuxt 5), Prisma 7.9, Vue 3.
 
 ---
 
@@ -69,7 +78,7 @@ convention-de-jonglerie/
 │   ├── app1/          ← l'application jonglerie (le cœur historique)
 │   └── app2/          ← seconde application, événements génériques
 ├── layers/            ← 11 layers Nuxt partagés entre les apps
-├── docs/              ← 90 documents techniques, indexés par docs/README.md
+├── docs/              ← 91 documents techniques, indexés par docs/README.md
 ├── .claude/skills/    ← skills d'automatisation (pipeline, déploiement, i18n…)
 └── .github/workflows/ ← CI : tests.yml et playwright.yml
 ```
@@ -79,8 +88,8 @@ convention-de-jonglerie/
 | Dossier                  | Rôle                                                                                                                |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
 | `app/`                   | Frontend : `pages/`, `components/`, `composables/`, `stores/` (5 stores Pinia), `middleware/`, `layouts/`, `utils/` |
-| `server/api/`            | 275 endpoints REST, organisés par ressource                                                                         |
-| `server/utils/`          | 105 helpers : permissions, Prisma, notifications, emails, validation                                                |
+| `server/api/`            | 281 endpoints REST, organisés par ressource                                                                         |
+| `server/utils/`          | 90 helpers : permissions, Prisma, notifications, emails, validation                                                 |
 | `server/<module>/ports/` | Interfaces de découplage pour 9 modules                                                                             |
 | `server/middleware/`     | CSRF (`00.csrf.ts`), auth, entêtes de cache, `noindex`                                                              |
 | `shared/`                | Code partagé client/serveur — c'est là que vivent les règles testables sans base                                    |
@@ -90,19 +99,19 @@ convention-de-jonglerie/
 
 ### `layers/` — les modules extraits
 
-| Layer        | Endpoints | Composants Vue | Particularité                                              |
-| ------------ | --------- | -------------- | ---------------------------------------------------------- |
-| `ticketing`  | 66        | 43             | Le plus gros : tarifs, quotas, commandes, HelloAsso/SumUp  |
-| `volunteers` | 46        | 37             | Le seul à porter ses **propres traductions** (26 fichiers) |
-| `tasks`      | 21        | 10             | Kanban et listes                                           |
-| `carpool`    | 19        | 14             | Offres, demandes, réservations                             |
-| `stock`      | 14        | 10             | Inventaire et réservations                                 |
-| `artists`    | 11        | 13             | Spectacles, cabarets, numéros                              |
-| `auth`       | 11        | 7              | Sessions, OAuth Google/Facebook                            |
-| `workshops`  | 11        | 3              | Ateliers participants                                      |
-| `meals`      | 7         | 4              | Repas bénévoles et artistes                                |
-| `faq`        | 5         | 3              | Questions/réponses publiques                               |
-| `lost-found` | 4         | 2              | Objets trouvés                                             |
+| Layer        | Endpoints | Composants | Pages | Particularité                                              |
+| ------------ | --------- | ---------- | ----- | ---------------------------------------------------------- |
+| `ticketing`  | 66        | 34         | 9     | Le plus gros : tarifs, quotas, commandes, HelloAsso/SumUp  |
+| `volunteers` | 47        | 29         | 9     | Le seul à porter ses **propres traductions** (26 fichiers) |
+| `tasks`      | 21        | 8          | 2     | Kanban et listes                                           |
+| `carpool`    | 19        | 11         | 3     | Offres, demandes, réservations                             |
+| `artists`    | 15        | 8          | 9     | Spectacles, représentations, numéros de cabaret            |
+| `stock`      | 14        | 7          | 3     | Inventaire et réservations                                 |
+| `auth`       | 11        | 1          | 7     | Sessions, OAuth Google/Facebook                            |
+| `workshops`  | 11        | 1          | 2     | Ateliers participants                                      |
+| `meals`      | 7         | 1          | 3     | Repas bénévoles et artistes                                |
+| `faq`        | 5         | 1          | 2     | Questions/réponses publiques                               |
+| `lost-found` | 4         | 0          | 2     | Objets trouvés                                             |
 
 **Point d'attention** : seul le layer `volunteers` possède un dossier `i18n/`. Les dix autres déposent leurs clés dans `apps/app1/i18n/`. Cette asymétrie a un coût concret, documenté au §9.
 
@@ -126,20 +135,20 @@ convention-de-jonglerie/
 ### Données
 
 - 15 fichiers de schéma Prisma, du plus gros au plus petit : `ticketing` (24 modèles), `schema` (14), `artists`/`volunteers`/`misc` (9), `meals` (8), `tasks` (7), `carpool` (6), `project-costs` (5), `stock`/`messenger`/`workshops`/`treasury` (3), `faq`/`program` (1).
-- 51 migrations, dont plusieurs **écrites à la main** avec leur justification en commentaire — la convention du dépôt quand une opération est destructive ou qu'un `MODIFY` naïf fausserait les données.
+- 66 migrations, dont plusieurs **écrites à la main** avec leur justification en commentaire — la convention du dépôt quand une opération est destructive ou qu'un `MODIFY` naïf fausserait les données.
 
 ### Frontend
 
-77 pages, 92 composants, 46 composables. Le composable `useApiAction` est la voie normale pour tout appel API : il gère l'état de chargement, les toasts et les redirections. Les composants Nuxt UI sont la règle ; les icônes viennent de Nuxt Icon.
+79 pages, 98 composants, 49 composables (côté app1 ; les layers en ajoutent 51 et 101). Le composable `useApiAction` est la voie normale pour tout appel API : il gère l'état de chargement, les toasts et les redirections. Les composants Nuxt UI sont la règle ; les icônes viennent de Nuxt Icon.
 
 ### Tests
 
 | Projet Vitest      | Fichiers | Ce qu'il couvre                                    |
 | ------------------ | -------- | -------------------------------------------------- |
-| `unit`             | 65       | Utilitaires purs, `shared/`, validation            |
-| `nuxt`             | 221      | Endpoints et composants dans un environnement Nuxt |
+| `unit`             | 87       | Utilitaires purs, `shared/`, validation            |
+| `nuxt`             | 248      | Endpoints et composants dans un environnement Nuxt |
 | `integration`      | 8        | Parcours avec base de données réelle               |
-| `e2e` (Playwright) | 47       | Parcours navigateur                                |
+| `e2e` (Playwright) | 51       | Parcours navigateur                                |
 
 ### DevOps
 
@@ -155,16 +164,16 @@ convention-de-jonglerie/
 
 | Domaine                                                | Endpoints |
 | ------------------------------------------------------ | --------- |
-| `editions`                                             | 106       |
-| `admin`                                                | 78        |
+| `editions`                                             | 108       |
+| `admin`                                                | 80        |
 | `conventions`                                          | 21        |
-| `messenger`                                            | 15        |
+| `messenger`                                            | 16        |
 | `profile`                                              | 14        |
 | `notifications`                                        | 12        |
 | `files`                                                | 6         |
-| autres (`project-costs`, `survey`, `public`, `users`…) | 23        |
+| autres (`project-costs`, `survey`, `public`, `users`…) | 24        |
 
-À quoi s'ajoutent les **215 endpoints des layers**, montés dans le même espace de routes.
+À quoi s'ajoutent les **220 endpoints des layers**, montés dans le même espace de routes.
 
 ### Authentification et autorisation
 
@@ -236,7 +245,8 @@ Traitement récemment unifié dans `shared/utils/fuseau-edition.ts` : les horair
 Tout tourne dans Docker (`npm run app1:docker:dev`). Deux règles de terrain, apprises à l'usage :
 
 - **Les tests Nuxt doivent être lancés dans le conteneur.** Sur l'hôte, une vingtaine de tests d'endpoints échouent parce que `.nuxt` appartient à root via le bind-mount.
-- **Les tests d'intégration ne doivent jamais y être lancés** : `TEST_WITH_DB` y vise `DATABASE_URL` et viderait la base de développement.
+- **Les tests d'intégration ne doivent jamais y être lancés** : `TEST_WITH_DB` y vise `DATABASE_URL` et viderait la base de développement. La prudence vaut aussi **sur l'hôte** : `scripts/migrate-test.js` retombe sur `DATABASE_URL` quand la variable est déjà définie, et le `.env` du dépôt pointe vers la base de développement. Le conteneur de test porte de surcroît le même nom que celui de dev. **En pratique : écrire les tests d'intégration, laisser la CI les jouer.**
+- **Ne pas lancer deux tâches lourdes à la fois dans le conteneur** (typecheck + suite Nuxt) : la mémoire est saturée, les deux processus sont tués et le serveur de développement tombe avec eux.
 
 ### Migrations
 
@@ -346,38 +356,137 @@ commit ─▶ PR ─▶ CI (9 jobs : setup, lint, typecheck, build,
 - **La modularisation par ports puis layers** est aboutie et documentée étape par étape (`docs/etape-0` à `etape-4`). Elle a permis une seconde application sans duplication.
 - **Le code partagé (`shared/`) est testable sans base ni réseau**, et c'est le mieux couvert du dépôt. Les règles délicates — fuseaux, appariement d'import, frise — y vivent avec leurs tests.
 - **Les commentaires expliquent le pourquoi**, y compris dans les migrations SQL écrites à la main. C'est rare et précieux.
-- **La CI est complète** : neuf jobs dont typecheck, base de données réelle et Playwright.
+- **La CI est complète** : neuf jobs dont typecheck, base de données réelle et Playwright. Le
+  job `database` joue les tests d'intégration sur sa propre base — ce qui compte, car ils ne
+  peuvent pas être lancés en local sans risque (§6).
+- **Les décisions de conception sont consignées dans les commits et les commentaires**, pas
+  seulement le « quoi ». Un lecteur qui tombe sur `spectacles-visibles.ts` apprend en trois
+  lignes pourquoi la règle est partagée : l'avertissement du planning et l'assignation
+  automatique doivent dire la même chose, faute de quoi l'algorithme jugerait acceptable ce que
+  la page dénonce.
 
 ### Points d'attention, par ordre d'importance
 
-**1. L'outillage i18n ne voyait pas les layers — corrigé, mais l'asymétrie demeure.**
+**1. Les échecs silencieux d'autorisation sont le défaut structurel le plus coûteux du dépôt.**
+Une page appelle une douzaine d'endpoints ; quand l'un est fermé au profil qui la consulte,
+l'appel échoue dans un `try/catch` muet. **Rien ne se voit à l'écran** : un compteur reste à
+zéro, une liste reste vide, et personne ne signale rien. Sur la page de contrôle d'accès, cinq
+endpoints étaient dans ce cas — un seul affichait une erreur, et c'est le seul qui a été
+remonté par un utilisateur ; les quatre autres n'ont été trouvés qu'en auditant la liste
+complète des appels, puis un cinquième par les journaux d'erreur de production.
+
+Deux parades, toutes deux en place :
+
+- **une assertion générale en e2e** — « aucun appel refusé pendant le chargement de la page » —
+  plutôt qu'un test par endpoint. C'est la classe d'oubli qu'il faut attraper, pas l'exemplaire
+  du jour ; les endpoints ajoutés demain sont couverts sans rien écrire ;
+- **la surveillance des journaux de production** (`/check-error-logs`), qui a détecté le
+  cinquième cas quelques heures après sa mise en ligne.
+
+À retenir avant d'ouvrir une page à un nouveau profil : **auditer tous les endpoints qu'elle
+appelle**, pas seulement celui qui motive l'ouverture.
+
+**2. Un test qui simule une dépendance par son nom peut verdir sur du code cassé.**
+Deux tests d'endpoints simulaient `canManageTicketingById`. Le jour où les handlers sont passés
+à `canAccessEditionDataOrAccessControl`, les mocks ont continué de rendre un verdict — sur une
+fonction que le code n'appelait plus. Ils seraient restés verts quelle que soit la régression.
+Quand un mock porte le nom d'une règle, **ce nom fait partie de l'assertion** : le renommer est
+une modification du test, pas un détail de forme.
+
+**3. L'outillage i18n ne voyait pas les layers — corrigé, mais l'asymétrie demeure.**
 Seul `volunteers` porte ses traductions ; les dix autres layers déposent leurs clés dans `apps/app1/i18n/`. Cette incohérence rend le placement d'une nouvelle clé arbitraire. À trancher : soit chaque layer porte ses traductions, soit aucun.
 
-**2. `check-i18n` produit des faux positifs massifs.**
+**4. `check-i18n` produit des faux positifs massifs.**
 529 clés « manquantes » viennent des blocs `<i18n>` locaux des pages guide, et la détection des clés « inutilisées » ignore les clés construites dynamiquement (`$t(\`prefix\_${x}\`)`). Lancer `--delete-unused` sans vérifier casserait des écrans. Un mécanisme d'annotation (`// i18n-dynamic`) fiabiliserait l'outil.
 
-**3. Le typecheck est inexploitable dans le conteneur de développement.**
-2 316 erreurs, dont `@prisma/client has no exported member 'Prisma'` et des références de projet tsconfig — d'origine environnementale. La CI reste le seul juge, ce qui allonge la boucle de retour. Purger `.nuxt` et régénérer le client localement mériterait d'être documenté comme procédure.
+**5. Le typecheck local est bruyant, mais exploitable — à condition de savoir ce que la CI juge.**
+Le conteneur remonte des milliers d'erreurs d'origine environnementale (références de projet
+tsconfig, `@prisma/client has no exported member 'Prisma'`). Longtemps considéré comme
+inutilisable, il l'est pourtant : **la CI ne bloque que sur `TS2304`/`TS2552`**, les noms non
+définis. La commande suivante reproduit exactement sa porte, et rend un verdict en local :
 
-**4. `npm run format` ne couvre pas les `.cjs`.**
+```bash
+docker compose -f apps/app1/docker-compose.dev.yml exec -T app \
+  sh -c "cd /app/apps/app1 && npm run typecheck 2>&1 | grep -E 'error TS(2304|2552)'"
+# code 1 = aucun nom non défini = la CI passera
+```
+
+Ce détour a une valeur concrète : un import de type oublié n'est vu **ni par le lint, ni par les
+tests** — vitest efface les types — et n'apparaît qu'au typecheck. C'est exactement ce qui a
+rendu une CI rouge le 28 août.
+
+⚠️ Ne pas lancer le typecheck **en même temps** que la suite Nuxt dans le conteneur : les deux
+saturent la mémoire et sont tués (`code 137`), emportant le serveur de développement avec eux.
+
+**6. `npm run format` ne couvre pas les `.cjs`.**
 `scripts/check-i18n-variables.cjs` est hors format depuis longtemps. Ajouter l'extension au motif éviterait la dérive.
 
-**5. `format:check` n'est pas dans la CI.**
+**7. `format:check` n'est pas dans la CI.**
 Seul ESLint y tourne. Des lignes non formatées ont déjà été mergées. Un job supplémentaire coûterait quelques secondes.
 
-**6. Les parcours de modale ne sont pas testés.**
+**8. Les parcours de modale ne sont pas testés.**
 Le formulaire de candidature bénévole — l'un des plus complexes, avec ses watchers et son hydratation — n'a aucun test automatisé. Trois défauts d'affichage y ont été trouvés récemment par lecture et simulation, non par la suite de tests. Un test de composant sur l'hydratation serait le meilleur rapport valeur/effort du dépôt.
 
-**7. Du travail mort subsiste après les suppressions récentes.**
+**9. Du travail mort subsiste après les suppressions récentes.**
 Les invites du modèle et l'import d'édition ont été nettoyés, mais ce type de résidu réapparaît à chaque retrait de fonctionnalité. Une recherche systématique des écritures sans lecture, à chaque suppression, l'éviterait.
 
 ### Sécurité
 
-Le socle est correct : CSRF en double soumission, sessions scellées, `nuxt-security`, routes publiques déclarées explicitement, vérification que zones et repères appartiennent bien à l'édition visée. Deux vigilances :
+Le socle est correct : CSRF en double soumission, sessions scellées, `nuxt-security`, routes publiques déclarées explicitement, vérification que zones et repères appartiennent bien à l'édition visée. Quatre vigilances :
 
 - la liste `public-routes.ts` est une **liste blanche manuelle** : un oubli fait échouer un endpoint public en 401, et l'inverse — une entrée trop large — exposerait des données ;
-- les tests d'endpoints contournent le middleware, donc ne détectent ni l'un ni l'autre.
+- les tests d'endpoints contournent le middleware, donc ne détectent ni l'un ni l'autre ;
+- **les accès temporaires se lisent dans le temps.** `isActiveInTeamSlot` ouvre un droit
+  pendant un créneau, à quinze minutes près et retard déclaré compris. La fenêtre ne dépend
+  jamais des dates de l'édition — un créneau de montage ou de démontage ouvre le même accès —
+  et un droit ainsi accordé se referme tout seul. C'est le bon patron pour tout accès de
+  terrain : il est borné par construction, pas par la vigilance d'un organisateur ;
+- **certaines restrictions sont des mitigations écrites**, pas des oublis. `sumup/config.get`
+  renvoie une clé d'affiliation déchiffrée au navigateur, et documente comme première parade
+  son accès réservé aux organisateurs. Élargir un tel endpoint demande une décision explicite,
+  jamais un alignement mécanique sur ses voisins.
+
+**Un helper unique pour les accès de terrain.** `canAccessEditionDataOrAccessControl` admet les
+gestionnaires **ou** les bénévoles en créneau actif. Son existence n'a de valeur que s'il est
+appliqué partout où la page l'exige : cinq endpoints de la billetterie étaient restés sur
+`canManageTicketingById` alors que la page qui les appelle était ouverte aux bénévoles. Quand
+un helper de ce genre apparaît, **la question n'est pas « où l'utiliser » mais « où manque-t-il »**.
 
 ### Performance
 
 Le chargement paresseux de l'i18n par route est bien pensé. La duplication `apps/app1/.nuxt` et `.nuxt` racine gonfle le dépôt (220 Mo, 115 000 fichiers) sans nuire à l'exécution. Les requêtes Prisma passent par des helpers de sélection standardisés (`prisma-select-helpers.ts`) — bonne pratique déjà en place, à maintenir.
+
+---
+
+## 10. Ce qui a bougé depuis le 14 août
+
+Deux semaines, quinze migrations. Les ajouts qui changent quelque chose à la lecture du dépôt :
+
+| Domaine        | Évolution                                                                                                                                                         |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Spectacles     | Un spectacle porte désormais des **représentations** (`ShowPerformance`) : l'œuvre et ses passages sont séparés, une même affiche peut être jouée plusieurs soirs |
+| Bénévoles      | Origine des affectations (`MANUAL` / `AUTO`), relance qui préserve le travail humain, heures comptées en charge à couvrir                                         |
+| Bénévoles      | L'assignation automatique refuse de priver quelqu'un du **dernier passage** d'un spectacle — règle partagée avec l'avertissement du planning                      |
+| Billetterie    | Le contrôle d'accès est utilisable de bout en bout par un bénévole **pendant son créneau** : recherche, validation, quotas, inscription sur place                 |
+| Artistes       | Notifications aux artistes avec accusés de lecture et relance SMS, groupes de messagerie par spectacle                                                            |
+| Administration | Restauration de sauvegarde suivie en arrière-plan, avec progression par table                                                                                     |
+| Interface      | Page bénévole repliable sur mobile ; les QR codes forcent le mode clair le temps d'être scannés                                                                   |
+
+**Deux règles nouvelles vivent dans `shared/`** — `spectacles-visibles.ts` et
+`regles-mot-de-passe.ts` — et confirment le principe énoncé au §9 : ce qui doit être dit d'une
+seule voix par le client et le serveur se place là, avec ses tests.
+
+---
+
+## 11. Par où commencer, pour qui arrive
+
+1. **`README.md` puis `CLAUDE.md`** — le second contient les règles de terrain qui évitent les
+   dégâts (ne jamais lancer le serveur de dev, ne jamais appliquer une migration soi-même).
+2. **`docs/README.md`** — index des 91 documents ; les étapes `etape-0` à `etape-4` racontent la
+   modularisation dans l'ordre où elle a été faite, c'est la meilleure entrée en matière.
+3. **Un module de bout en bout** — le layer `faq` est le plus petit (5 endpoints, 1 composant,
+   2 pages) : il montre le patron complet sans noyer le lecteur.
+4. **`shared/utils/`** — les règles métier pures, avec leurs tests. On y comprend ce que le
+   projet considère comme délicat : fuseaux horaires, visibilité des spectacles, mots de passe.
+5. **`server/volunteers/ports/types.ts`** — le port le plus riche (15 interfaces). Il dit
+   exactement ce qu'un module attend de son hôte, et donc où passent les frontières.
