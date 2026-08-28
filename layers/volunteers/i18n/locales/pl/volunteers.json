@@ -105,7 +105,9 @@
       "existing_mode_help_replace_all": "Wszystkie przydziały tej edycji są usuwane przed obliczeniem, także te wykonane ręcznie.",
       "existing_mode_keep_all": "Zachowaj wszystkie istniejące przydziały",
       "existing_mode_keep_manual": "Ponów automatyczne, zachowaj ręczne",
-      "existing_mode_replace_all": "Usuń wszystko i przelicz ponownie"
+      "existing_mode_replace_all": "Usuń wszystko i przelicz ponownie",
+      "respect_assigned_teams": "Ściśle przestrzegać przydzielonych zespołów",
+      "respect_assigned_teams_help": "Przypisuje wolontariuszy tylko do zespołów, do których organizatorzy już ich przydzielili"
     },
     "average_per_volunteer": "Średnia na wolontariusza",
     "avoid_list_hint": "Te informacje pozostają poufne i pomagają organizatorom tworzyć harmonijne zespoły",

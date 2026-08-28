@@ -15,6 +15,7 @@ const benevole = (options: {
   event?: boolean
   teardown?: boolean
   teamPreferences?: string[]
+  assignedTeams?: string[]
 }) => ({
   id: options.id ?? 1,
   user: { id: options.id ?? 1, pseudo: `benevole-${options.id ?? 1}` },
@@ -27,6 +28,7 @@ const benevole = (options: {
   experience: '',
   motivation: '',
   teamPreferences: options.teamPreferences ?? [],
+  assignedTeams: options.assignedTeams ?? [],
 })
 
 const creneau = (options: {
@@ -100,6 +102,101 @@ describe('VolunteerScheduler', () => {
       ).assignVolunteers()
 
       expect(r.assignments).toHaveLength(0)
+    })
+  })
+
+  describe('équipes assignées', () => {
+    // Le pendant des préférences, du côté de la décision : ce que les organisateurs ont
+    // déjà tranché en plaçant le bénévole dans une équipe.
+    const creneauEquipe = creneau({
+      start: '2026-08-01T16:00:00.000Z',
+      end: '2026-08-01T18:00:00.000Z',
+      teamId: 'equipe-A',
+    })
+
+    it('accorde le bonus quand le créneau relève d’une équipe assignée', () => {
+      const avec = new VolunteerScheduler(
+        [benevole({ event: true, assignedTeams: ['equipe-A'] })],
+        [{ ...creneauEquipe }],
+        EQUIPES,
+        {},
+        BORNES
+      ).assignVolunteers()
+
+      const sans = new VolunteerScheduler(
+        [benevole({ event: true, assignedTeams: [] })],
+        [{ ...creneauEquipe }],
+        EQUIPES,
+        {},
+        BORNES
+      ).assignVolunteers()
+
+      expect(avec.assignments[0]!.score).toBe(sans.assignments[0]!.score + 15)
+    })
+
+    it('garde le bénévole sur l’équipe où il a été placé, en mode strict', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true, assignedTeams: ['equipe-A'] })],
+        [{ ...creneauEquipe }],
+        EQUIPES,
+        { respectStrictAssignedTeams: true },
+        BORNES
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+
+    it('écarte en mode strict le créneau d’une équipe où il n’est pas placé', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true, assignedTeams: ['equipe-B'] })],
+        [{ ...creneauEquipe }],
+        EQUIPES,
+        { respectStrictAssignedTeams: true },
+        BORNES
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(0)
+    })
+
+    // Sans quoi personne ne serait assignable tant que les organisateurs n'ont pas réparti
+    // tout le monde à la main — l'assignation automatique ne servirait plus à rien.
+    it('laisse assignable un bénévole qu’aucune équipe n’a encore accueilli', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true, assignedTeams: [] })],
+        [{ ...creneauEquipe }],
+        EQUIPES,
+        { respectStrictAssignedTeams: true },
+        BORNES
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+
+    // Les deux réglages sont indépendants : un bénévole placé dans une équipe qu'il n'avait
+    // pas demandée y reste, tant qu'on n'a pas aussi exigé le respect strict des souhaits.
+    it('n’écarte pas sur les souhaits quand seul le strict des équipes assignées est demandé', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true, teamPreferences: ['equipe-B'], assignedTeams: ['equipe-A'] })],
+        [{ ...creneauEquipe }],
+        EQUIPES,
+        { respectStrictAssignedTeams: true },
+        BORNES
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+
+    // Un créneau sans équipe n'a rien à respecter : le filtre ne doit pas le faire disparaître.
+    it('n’écarte pas un créneau sans équipe', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true, assignedTeams: ['equipe-A'] })],
+        [creneau({ start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' })],
+        EQUIPES,
+        { respectStrictAssignedTeams: true },
+        BORNES
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
     })
   })
 

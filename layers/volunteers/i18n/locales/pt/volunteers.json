@@ -105,7 +105,9 @@
       "existing_mode_help_replace_all": "Todas as atribuições da edição são apagadas antes do cálculo, incluindo as feitas à mão.",
       "existing_mode_keep_all": "Conservar todas as atribuições existentes",
       "existing_mode_keep_manual": "Refazer as automáticas, conservar as manuais",
-      "existing_mode_replace_all": "Apagar tudo e recalcular"
+      "existing_mode_replace_all": "Apagar tudo e recalcular",
+      "respect_assigned_teams": "Respeitar estritamente as equipas atribuídas",
+      "respect_assigned_teams_help": "Atribui voluntários apenas às equipas em que os organizadores já os colocaram"
     },
     "average_per_volunteer": "Média por voluntário",
     "avoid_list_hint": "Esta informação permanece confidencial e ajuda os organizadores a criar equipas harmoniosas",

@@ -105,7 +105,9 @@
       "existing_mode_help_replace_all": "All assignments for this edition are cleared before the run, including those made by hand.",
       "existing_mode_keep_all": "Keep every existing assignment",
       "existing_mode_keep_manual": "Redo the automatic ones, keep the manual ones",
-      "existing_mode_replace_all": "Clear everything and recalculate"
+      "existing_mode_replace_all": "Clear everything and recalculate",
+      "respect_assigned_teams": "Strictly respect assigned teams",
+      "respect_assigned_teams_help": "Only assigns volunteers to the teams organisers have already placed them in"
     },
     "average_per_volunteer": "Average per volunteer",
     "avoid_list_hint": "This information remains confidential and helps organizers create harmonious teams",

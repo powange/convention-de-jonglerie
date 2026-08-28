@@ -98,6 +98,8 @@
       "respect_availability_help": "N'assigne jamais un bénévole sur un créneau où il n'est pas disponible",
       "respect_team_preferences": "Respecter strictement les préférences d'équipe",
       "respect_team_preferences_help": "N'assigne les bénévoles qu'aux équipes qu'ils ont sélectionnées dans leurs préférences",
+      "respect_assigned_teams": "Respecter strictement les équipes assignées",
+      "respect_assigned_teams_help": "N'assigne les bénévoles qu'aux équipes dans lesquelles les organisateurs les ont déjà placés",
       "respect_time_preferences": "Respecter strictement les préférences horaires",
       "respect_time_preferences_help": "N'assigne les bénévoles qu'aux créneaux correspondant à leurs préférences horaires",
       "satisfaction_rate": "Taux satisfaction",

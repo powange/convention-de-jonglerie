@@ -105,7 +105,9 @@
       "existing_mode_help_replace_all": "Všechna přiřazení tohoto ročníku se před výpočtem smažou, včetně ručních.",
       "existing_mode_keep_all": "Zachovat všechna stávající přiřazení",
       "existing_mode_keep_manual": "Přepočítat automatická, zachovat ruční",
-      "existing_mode_replace_all": "Vše smazat a přepočítat"
+      "existing_mode_replace_all": "Vše smazat a přepočítat",
+      "respect_assigned_teams": "Přísné dodržování přidělených týmů",
+      "respect_assigned_teams_help": "Přiřazuje dobrovolníky pouze do týmů, do kterých je organizátoři již zařadili"
     },
     "average_per_volunteer": "Průměr na dobrovolníka",
     "avoid_list_hint": "Tyto informace zůstávají důvěrné a pomáhají organizátorům vytvářet harmonické týmy.",
