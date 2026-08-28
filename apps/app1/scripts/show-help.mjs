@@ -274,14 +274,10 @@ const sections = [
 
 // Mode liste statique (ancien comportement)
 function showStaticHelp() {
-  console.log(
-    `${colors.bold}${colors.blue}📦 Scripts disponibles${colors.reset}\n`
-  )
+  console.log(`${colors.bold}${colors.blue}📦 Scripts disponibles${colors.reset}\n`)
 
   sections.forEach((section) => {
-    console.log(
-      `${colors.bold}${section.color}${section.icon} ${section.title}${colors.reset}`
-    )
+    console.log(`${colors.bold}${section.color}${section.icon} ${section.title}${colors.reset}`)
     section.scripts.forEach((script) => {
       const arg = script.requiresArg ? ` ${colors.yellow}${script.requiresArg}${colors.reset}` : ''
       console.log(
@@ -291,14 +287,14 @@ function showStaticHelp() {
     console.log()
   })
 
-  console.log(`${colors.dim}💡 Utilisez ${colors.green}npm run help${colors.dim} sans arguments pour le mode interactif${colors.reset}\n`)
+  console.log(
+    `${colors.dim}💡 Utilisez ${colors.green}npm run help${colors.dim} sans arguments pour le mode interactif${colors.reset}\n`
+  )
 }
 
 // Exécute un script npm
 function runScript(scriptName) {
-  console.log(
-    `\n${colors.bold}${colors.cyan}▶ Exécution: npm run ${scriptName}${colors.reset}\n`
-  )
+  console.log(`\n${colors.bold}${colors.cyan}▶ Exécution: npm run ${scriptName}${colors.reset}\n`)
 
   // Construire la commande complète
   const command = `npm run ${scriptName}`
@@ -310,13 +306,9 @@ function runScript(scriptName) {
 
   child.on('close', (code) => {
     if (code === 0) {
-      console.log(
-        `\n${colors.green}✓ Script terminé avec succès${colors.reset}`
-      )
+      console.log(`\n${colors.green}✓ Script terminé avec succès${colors.reset}`)
     } else {
-      console.log(
-        `\n${colors.red}✗ Script terminé avec le code ${code}${colors.reset}`
-      )
+      console.log(`\n${colors.red}✗ Script terminé avec le code ${code}${colors.reset}`)
     }
   })
 }
@@ -324,9 +316,7 @@ function runScript(scriptName) {
 // Menu interactif principal
 async function interactiveMenu() {
   console.clear()
-  console.log(
-    `${colors.bold}${colors.blue}📦 Scripts NPM - Menu interactif${colors.reset}\n`
-  )
+  console.log(`${colors.bold}${colors.blue}📦 Scripts NPM - Menu interactif${colors.reset}\n`)
 
   // Sélection de la catégorie
   let category
@@ -363,9 +353,7 @@ async function interactiveMenu() {
 
   // Sélection du script dans la catégorie
   console.clear()
-  console.log(
-    `${colors.bold}${category.color}${category.icon} ${category.title}${colors.reset}\n`
-  )
+  console.log(`${colors.bold}${category.color}${category.icon} ${category.title}${colors.reset}\n`)
 
   let script
   try {
@@ -457,8 +445,12 @@ async function directMode(categoryShortcut, scriptShortcut) {
     }
 
     if (script.requiresArg) {
-      console.log(`\n${colors.yellow}⚠️  Ce script nécessite un argument : ${script.requiresArg}${colors.reset}`)
-      console.log(`${colors.dim}Exécutez : ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}\n`)
+      console.log(
+        `\n${colors.yellow}⚠️  Ce script nécessite un argument : ${script.requiresArg}${colors.reset}`
+      )
+      console.log(
+        `${colors.dim}Exécutez : ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}\n`
+      )
       process.exit(1)
     }
 
@@ -468,7 +460,9 @@ async function directMode(categoryShortcut, scriptShortcut) {
 
   const scriptIndex = resolveShortcutIndex(scriptShortcut)
   if (scriptIndex < 0 || scriptIndex >= section.scripts.length) {
-    console.log(`${colors.red}❌ Script "${scriptShortcut}" invalide dans ${section.title}${colors.reset}`)
+    console.log(
+      `${colors.red}❌ Script "${scriptShortcut}" invalide dans ${section.title}${colors.reset}`
+    )
     console.log(`${colors.dim}Scripts disponibles : 1-${section.scripts.length}${colors.reset}`)
     process.exit(1)
   }
@@ -476,8 +470,12 @@ async function directMode(categoryShortcut, scriptShortcut) {
   const script = section.scripts[scriptIndex]
 
   if (script.requiresArg) {
-    console.log(`${colors.yellow}⚠️  Ce script nécessite un argument : ${script.requiresArg}${colors.reset}`)
-    console.log(`${colors.dim}Exécutez : ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}`)
+    console.log(
+      `${colors.yellow}⚠️  Ce script nécessite un argument : ${script.requiresArg}${colors.reset}`
+    )
+    console.log(
+      `${colors.dim}Exécutez : ${colors.green}npm run ${script.name} ${script.requiresArg}${colors.reset}`
+    )
     process.exit(1)
   }
 

@@ -185,9 +185,13 @@ test.describe.serial('Tâches — tri par échéance', () => {
       'Réserver la grande salle polyvalente auprès de la mairie et confirmer les horaires ' +
       'de montage avec le gardien avant la fin du mois'
 
-    const r = await apiPost(page, `${BASE}/api/editions/${editionId}/task-groups/${groupId}/tasks`, {
-      data: { title: TITRE_LONG, description: '' },
-    })
+    const r = await apiPost(
+      page,
+      `${BASE}/api/editions/${editionId}/task-groups/${groupId}/tasks`,
+      {
+        data: { title: TITRE_LONG, description: '' },
+      }
+    )
     expect(r.ok(), await r.text()).toBe(true)
 
     await goto(`/editions/${editionId}/gestion/tasks/${groupId}`, { waitUntil: 'hydration' })

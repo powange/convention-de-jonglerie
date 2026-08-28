@@ -21,27 +21,27 @@ const LOCALES_ROOTS = [
     if (!fs.existsSync(layersDir)) return []
     return fs
       .readdirSync(layersDir)
-      .map(layer => path.join(layersDir, layer, 'i18n', 'locales'))
-      .filter(dir => fs.existsSync(dir))
+      .map((layer) => path.join(layersDir, layer, 'i18n', 'locales'))
+      .filter((dir) => fs.existsSync(dir))
   })(),
 ]
 
 // Détection automatique de toutes les langues disponibles
 const SUPPORTED_LANGS = [
   ...new Set(
-    LOCALES_ROOTS.flatMap(racine =>
-      fs.readdirSync(racine).filter(file => fs.statSync(path.join(racine, file)).isDirectory())
+    LOCALES_ROOTS.flatMap((racine) =>
+      fs.readdirSync(racine).filter((file) => fs.statSync(path.join(racine, file)).isDirectory())
     )
   ),
 ]
-  .filter(lang => lang !== REFERENCE_LANG)
+  .filter((lang) => lang !== REFERENCE_LANG)
   .sort()
 
 // Extrait toutes les variables {xxx} d'une chaîne
 function extractVariables(text) {
   if (typeof text !== 'string') return []
   const matches = text.match(/\{([^}]+)\}/g)
-  return matches ? matches.map(m => m.slice(1, -1)).sort() : []
+  return matches ? matches.map((m) => m.slice(1, -1)).sort() : []
 }
 
 // Parcourt récursivement un objet JSON et collecte les clés avec variables
@@ -72,7 +72,7 @@ function loadLanguageKeysWithVariables(lang) {
     const langDir = path.join(racine, lang)
     if (!fs.existsSync(langDir)) continue
 
-    const files = fs.readdirSync(langDir).filter(f => f.endsWith('.json'))
+    const files = fs.readdirSync(langDir).filter((f) => f.endsWith('.json'))
 
     for (const file of files) {
       const filePath = path.join(langDir, file)
@@ -132,7 +132,7 @@ function checkI18nVariables() {
           key,
           issue: 'missing_key',
           frenchVars: frData.variables,
-          frenchText: frData.text
+          frenchText: frData.text,
         })
         langErrors++
       } else {
@@ -160,7 +160,7 @@ function checkI18nVariables() {
             frenchVars: frData.variables,
             langVars: langData.variables,
             frenchText: frData.text,
-            langText: langData.text
+            langText: langData.text,
           })
           langErrors++
         }
@@ -183,8 +183,8 @@ function checkI18nVariables() {
   }
 
   // Grouper les erreurs par type
-  const missingKeys = errors.filter(e => e.issue === 'missing_key')
-  const mismatchVars = errors.filter(e => e.issue === 'variables_mismatch')
+  const missingKeys = errors.filter((e) => e.issue === 'missing_key')
+  const mismatchVars = errors.filter((e) => e.issue === 'variables_mismatch')
 
   if (missingKeys.length > 0) {
     console.log('❌ CLÉS MANQUANTES')
