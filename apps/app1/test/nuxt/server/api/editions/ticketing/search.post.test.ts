@@ -12,10 +12,12 @@ vi.hoisted(() => {
   }
 })
 
-// Mock de canManageTicketingById pour contrôler l'accès
+// Mock du contrôle d'accès. Le nom compte : la recherche s'appuie sur le helper qui admet
+// AUSSI les bénévoles en créneau actif de contrôle d'accès. Avec l'ancien helper, réservé aux
+// gestionnaires de la billetterie, la personne qui tient l'entrée ne pouvait chercher personne.
 const mockCanAccessEditionData = vi.hoisted(() => vi.fn())
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canManageTicketingById: mockCanAccessEditionData,
+  canAccessEditionDataOrAccessControl: mockCanAccessEditionData,
 }))
 
 // Mock de requireAuth pour simuler un utilisateur authentifié

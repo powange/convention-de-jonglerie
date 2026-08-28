@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { applyCustomName } from '#server/utils/editions/ticketing/tiers'
-import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 
 const itemSchema = z.object({
   tierId: z.number(),
@@ -49,8 +49,9 @@ export default wrapApiHandler(
 
     const editionId = validateEditionId(event)
 
-    // Vérifier les permissions
-    const allowed = await canManageTicketingById(editionId, user.id, event)
+    // Vérifier les permissions (gestionnaires OU bénévoles en créneau actif de contrôle d'accès :
+    // c'est à l'entrée qu'on inscrit un arrivant et qu'on regarde si un tarif est complet)
+    const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 import {
   aggregateHandoutItems,
   calculateHandoutItemsForTicket,
@@ -19,8 +19,8 @@ export default wrapApiHandler(
 
     const editionId = validateEditionId(event)
 
-    // Vérifier les permissions
-    const allowed = await canManageTicketingById(editionId, user.id, event)
+    // Vérifier les permissions (gestionnaires OU bénévoles en créneau actif de contrôle d'accès)
+    const allowed = await canAccessEditionDataOrAccessControl(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,
