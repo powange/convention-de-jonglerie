@@ -1,19 +1,32 @@
 <template>
-  <UCard v-if="hasAssignedSlots" variant="soft">
-    <template #header>
-      <h3 class="text-lg font-semibold flex items-center gap-2">
-        <UIcon name="i-heroicons-clock" class="text-blue-600 dark:text-blue-400" />
-        {{ t('pages.volunteers.my_slots_title') }}
-      </h3>
-    </template>
+  <EditionVolunteerCarteRepliable
+    v-if="hasAssignedSlots"
+    :titre="t('pages.volunteers.my_slots_title')"
+    icone="i-heroicons-clock"
+    classe-icone="text-blue-600 dark:text-blue-400"
+    :repliable-sur-mobile="repliableSurMobile"
+    :deplie-par-defaut="deplieParDefaut"
+  >
+    <!-- Proposé seulement quand il y a quelque chose à révéler : un interrupteur sans effet
+         est une question posée pour rien. -->
+    <USwitch
+      v-if="creneauxPasses > 0"
+      v-model="afficherPasses"
+      :label="t('pages.volunteers.show_past_slots', { count: creneauxPasses })"
+      class="mb-4"
+    />
 
     <VolunteersTimeSlotsList
-      v-if="timeSlots.length > 0"
-      :time-slots="timeSlots"
+      v-if="creneauxAffiches.length > 0"
+      :time-slots="creneauxAffiches"
       :volunteer-name="volunteerFullName"
       show-stats
     />
-  </UCard>
+
+    <p v-else class="text-sm text-gray-500 dark:text-gray-400">
+      {{ t('pages.volunteers.no_upcoming_slots') }}
+    </p>
+  </EditionVolunteerCarteRepliable>
 </template>
 
 <script setup lang="ts">
@@ -36,10 +49,15 @@ interface TimeSlotAssignment {
   timeSlot: TimeSlot
 }
 
-const props = defineProps<{
-  editionId: number
-  userId: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    editionId: number
+    userId: number
+    repliableSurMobile?: boolean
+    deplieParDefaut?: boolean
+  }>(),
+  { repliableSurMobile: false, deplieParDefaut: false }
+)
 
 const { t } = useI18n()
 const { user } = useUserSession()
@@ -62,6 +80,23 @@ const hasAssignedSlots = computed(() => {
 const timeSlots = computed(() => {
   return assignedTimeSlots.value.map((assignment) => assignment.timeSlot)
 })
+
+// Les créneaux déjà terminés encombrent la liste sans rien apprendre : masqués par défaut,
+// consultables d'un geste. Le retard éventuel repousse la fin d'autant — un créneau décalé
+// n'est pas passé tant qu'il ne l'est vraiment.
+const afficherPasses = ref(false)
+
+const estPasse = (creneau: TimeSlot) => {
+  const fin = new Date(creneau.endDateTime).getTime()
+  if (Number.isNaN(fin)) return false
+  return fin + (creneau.delayMinutes || 0) * 60_000 < Date.now()
+}
+
+const creneauxPasses = computed(() => timeSlots.value.filter(estPasse).length)
+
+const creneauxAffiches = computed(() =>
+  afficherPasses.value ? timeSlots.value : timeSlots.value.filter((creneau) => !estPasse(creneau))
+)
 
 // Charger les créneaux assignés
 const fetchAssignedSlots = async () => {

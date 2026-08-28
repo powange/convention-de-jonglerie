@@ -213,7 +213,9 @@
       "withdraw": "Wycofaj",
       "withdrawal_error": "Błąd podczas wycofywania zgłoszenia",
       "withdrawal_success": "Zgłoszenie wycofane pomyślnie",
-      "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):"
+      "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):",
+      "show_past_slots": "Pokaż miniony dyżur | Pokaż {count} minionych dyżurów",
+      "no_upcoming_slots": "Brak nadchodzących dyżurów."
     }
   },
   "seo": {

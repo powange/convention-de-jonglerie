@@ -213,7 +213,9 @@
       "withdraw": "Retirar",
       "withdrawal_error": "Error al retirar la solicitud",
       "withdrawal_success": "Solicitud retirada con éxito",
-      "with_you_on_slot": "Contigo en este turno: | Contigo en este turno ({count}):"
+      "with_you_on_slot": "Contigo en este turno: | Contigo en este turno ({count}):",
+      "show_past_slots": "Mostrar el turno pasado | Mostrar los {count} turnos pasados",
+      "no_upcoming_slots": "Ningún turno próximo."
     }
   },
   "seo": {

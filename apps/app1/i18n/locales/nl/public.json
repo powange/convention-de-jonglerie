@@ -213,7 +213,9 @@
       "withdraw": "Intrekken",
       "withdrawal_error": "Fout bij intrekken aanmelding",
       "withdrawal_success": "Aanmelding succesvol ingetrokken",
-      "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):"
+      "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):",
+      "show_past_slots": "Toon de voorbije dienst | Toon de {count} voorbije diensten",
+      "no_upcoming_slots": "Geen komende diensten."
     }
   },
   "seo": {

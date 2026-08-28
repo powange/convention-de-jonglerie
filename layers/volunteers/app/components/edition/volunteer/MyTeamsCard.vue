@@ -1,11 +1,10 @@
 <template>
-  <UCard v-if="leaderTeams.length > 0" variant="soft">
-    <template #header>
-      <h3 class="text-lg font-semibold flex items-center gap-2">
-        <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-        {{ t('volunteers.my_teams_title') }}
-      </h3>
-    </template>
+  <EditionVolunteerCarteRepliable
+    v-if="leaderTeams.length > 0"
+    :titre="t('volunteers.my_teams_title')"
+    icone="i-heroicons-user-group"
+    :repliable-sur-mobile="repliableSurMobile"
+  >
 
     <div class="space-y-4">
       <div
@@ -109,7 +108,7 @@
         </div>
       </div>
     </div>
-  </UCard>
+  </EditionVolunteerCarteRepliable>
 </template>
 
 <script setup lang="ts">
@@ -138,10 +137,14 @@ interface TeamAssignment {
   }
 }
 
-const props = defineProps<{
-  editionId: number
-  teamAssignments: TeamAssignment[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    editionId: number
+    teamAssignments: TeamAssignment[]
+    repliableSurMobile?: boolean
+  }>(),
+  { repliableSurMobile: false }
+)
 
 const { t } = useI18n()
 

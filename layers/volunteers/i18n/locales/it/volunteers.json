@@ -456,6 +456,7 @@
     "hours_covered_of_needed": "Ore coperte sulle ore da coprire",
     "show_conflicts": "Spettacoli che un volontario non potrà vedere",
     "show_conflicts_count": "{count} volontario non potrà assistere a nessuna replica di uno spettacolo | {count} volontari non potranno assistere a nessuna replica di uno spettacolo",
-    "show_conflicts_detail": "La sua unica replica cade durante un turno: | Nessuna delle sue {count} repliche è libera:"
+    "show_conflicts_detail": "La sua unica replica cade durante un turno: | Nessuna delle sue {count} repliche è libera:",
+    "schedule_view": "Pianificazione dei volontari"
   }
 }

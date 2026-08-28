@@ -456,6 +456,7 @@
     "hours_covered_of_needed": "Horas preenchidas das horas a preencher",
     "show_conflicts": "Espetáculos que um voluntário não poderá ver",
     "show_conflicts_count": "{count} voluntário não poderá assistir a nenhuma sessão de um espetáculo | {count} voluntários não poderão assistir a nenhuma sessão de um espetáculo",
-    "show_conflicts_detail": "A sua única sessão cai durante um turno: | Nenhuma das suas {count} sessões está livre:"
+    "show_conflicts_detail": "A sua única sessão cai durante um turno: | Nenhuma das suas {count} sessões está livre:",
+    "schedule_view": "Planeamento dos voluntários"
   }
 }
