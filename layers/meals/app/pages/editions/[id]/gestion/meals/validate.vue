@@ -509,12 +509,21 @@ const canAccess = computed(() => {
   return false
 })
 
-// Vérifier les permissions de validation des repas au montage
+/**
+ * Permissions de validation, recalculées dès que l'un des deux ingrédients arrive.
+ *
+ * N'observer que l'authentification ouvrait une course : arrivé par une URL directe ou après
+ * un rechargement, l'utilisateur atteignait cette page avant que l'édition ne soit chargée.
+ * La permission tombait alors à faux et n'était plus jamais reprise — le bénévole voyait
+ * « Accès refusé » sur la page même que la carte et le menu lui proposaient. En passant par
+ * un lien depuis la gestion, où l'édition était déjà en cache, tout marchait : c'est ce qui
+ * rendait le défaut si difficile à voir.
+ */
 watch(
-  () => authStore.isAuthenticated,
-  async (isAuthenticated) => {
-    if (isAuthenticated && authStore.user?.id && edition.value?.id) {
-      canAccessMealValidation.value = await editionStore.canAccessMealValidation(edition.value.id)
+  () => [authStore.isAuthenticated, edition.value?.id] as const,
+  async ([isAuthenticated, id]) => {
+    if (isAuthenticated && authStore.user?.id && id) {
+      canAccessMealValidation.value = await editionStore.canAccessMealValidation(id)
     } else {
       canAccessMealValidation.value = false
     }
