@@ -212,7 +212,8 @@
       "view_planning": "Переглянути планування",
       "withdraw": "Відкликати",
       "withdrawal_error": "Помилка при відкликанні заявки",
-      "withdrawal_success": "Заявка успішно відкликана"
+      "withdrawal_success": "Заявка успішно відкликана",
+      "with_you_on_slot": "З вами на цій зміні: | З вами на цій зміні ({count}):"
     }
   },
   "seo": {

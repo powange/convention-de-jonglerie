@@ -212,7 +212,8 @@
       "view_planning": "Planning bekijken",
       "withdraw": "Intrekken",
       "withdrawal_error": "Fout bij intrekken aanmelding",
-      "withdrawal_success": "Aanmelding succesvol ingetrokken"
+      "withdrawal_success": "Aanmelding succesvol ingetrokken",
+      "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):"
     }
   },
   "seo": {

@@ -49,6 +49,22 @@
         <p v-if="timeSlot.description" class="text-xs text-gray-500 mt-2">
           {{ timeSlot.description }}
         </p>
+
+        <!-- Avec qui l'on tient ce poste : un créneau partagé se prépare autrement qu'un
+             créneau tenu seul. -->
+        <div v-if="timeSlot.coVolunteers?.length" class="mt-2">
+          <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">
+            {{ t('pages.volunteers.with_you_on_slot', { count: timeSlot.coVolunteers.length }) }}
+          </p>
+          <div class="flex flex-wrap gap-x-3 gap-y-1">
+            <UiUserDisplay
+              v-for="coequipier in timeSlot.coVolunteers"
+              :key="coequipier.id"
+              :user="coequipier"
+              size="xs"
+            />
+          </div>
+        </div>
       </div>
       <div v-if="showDuration" class="text-right text-xs text-gray-500">
         {{ formatSlotDuration(timeSlot.startDateTime, timeSlot.endDateTime) }}
@@ -70,6 +86,14 @@ interface TimeSlot {
     name: string
     color?: string
   }
+  /** Les autres bénévoles affectés au même créneau. Absente là où l'API ne la fournit pas. */
+  coVolunteers?: Array<{
+    id: number
+    pseudo: string
+    emailHash: string
+    profilePicture?: string | null
+    updatedAt?: string
+  }>
 }
 
 withDefaults(

@@ -212,7 +212,8 @@
       "view_planning": "Viz plánování",
       "withdraw": "Odstranění stránky",
       "withdrawal_error": "Chyba při stažení žádosti",
-      "withdrawal_success": "Úspěšné stažení žádosti"
+      "withdrawal_success": "Úspěšné stažení žádosti",
+      "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):"
     }
   },
   "seo": {

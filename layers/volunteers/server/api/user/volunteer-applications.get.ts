@@ -1,3 +1,5 @@
+import { avecCoequipiers, coequipiersSelect } from '../../utils/coequipiers-creneau'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
@@ -114,6 +116,7 @@ export default wrapApiHandler(
                   color: true,
                 },
               },
+              assignments: coequipiersSelect(user.id),
             },
           },
         },
@@ -154,7 +157,10 @@ export default wrapApiHandler(
         ...infosPersonnelles(profil as never),
         teamPreferences: teamPreferencesWithNames,
         assignedTeams: assignedTeamsWithNames,
-        assignedTimeSlots: eventAssignments,
+        assignedTimeSlots: eventAssignments.map((assignation) => ({
+          ...assignation,
+          timeSlot: avecCoequipiers(assignation.timeSlot),
+        })),
         edition: {
           // Affichage propre au domaine (port) en premier : les champs génériques (id/name/dates)
           // et la config bénévole ci-dessous priment sur d'éventuelles clés homonymes du port.

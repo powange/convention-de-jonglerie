@@ -94,6 +94,13 @@ interface TimeSlot {
     name: string
     color?: string
   }
+  coVolunteers?: Array<{
+    id: number
+    pseudo: string
+    emailHash: string
+    profilePicture?: string | null
+    updatedAt?: string
+  }>
 }
 
 const props = withDefaults(
