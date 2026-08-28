@@ -202,6 +202,25 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
       async removeMealSelections(mealId) {
         await prisma.artistMealSelection.deleteMany({ where: { mealId } })
       },
+      async getShowSchedule(editionId) {
+        const spectacles = await prisma.show.findMany({
+          where: { editionId, performances: { some: {} } },
+          select: {
+            id: true,
+            title: true,
+            duration: true,
+            performances: { select: { startDateTime: true }, orderBy: { startDateTime: 'asc' } },
+          },
+        })
+        return spectacles.map((spectacle) => ({
+          id: spectacle.id,
+          title: spectacle.title,
+          durationMinutes: spectacle.duration,
+          performances: spectacle.performances.map((passage) => ({
+            startDateTime: passage.startDateTime.toISOString(),
+          })),
+        }))
+      },
       async getMealArtistParticipants(mealIds) {
         if (mealIds.length === 0) return {}
         const selections = await prisma.artistMealSelection.findMany({

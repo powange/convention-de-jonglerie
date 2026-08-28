@@ -453,6 +453,9 @@
     "hours_per_volunteer": "Timmar per volontär",
     "no_slot_assigned_yet": "Inget pass tilldelat ännu",
     "assigned_automatically": "Tilldelad automatiskt",
-    "hours_covered_of_needed": "Täckta timmar av timmar att täcka"
+    "hours_covered_of_needed": "Täckta timmar av timmar att täcka",
+    "show_conflicts": "Föreställningar som en volontär inte kommer att kunna se",
+    "show_conflicts_count": "{count} volontär kommer inte att kunna se någon föreställning av en show | {count} volontärer kommer inte att kunna se någon föreställning av en show",
+    "show_conflicts_detail": "Dess enda föreställning infaller under ett pass: | Ingen av dess {count} föreställningar är ledig:"
   }
 }

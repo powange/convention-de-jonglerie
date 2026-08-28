@@ -453,6 +453,9 @@
     "hours_per_volunteer": "Hodiny na dobrovolníka",
     "no_slot_assigned_yet": "Zatím nepřidělena žádná směna",
     "assigned_automatically": "Přiřazeno automaticky",
-    "hours_covered_of_needed": "Pokryté hodiny z hodin k pokrytí"
+    "hours_covered_of_needed": "Pokryté hodiny z hodin k pokrytí",
+    "show_conflicts": "Představení, která dobrovolník nebude moci vidět",
+    "show_conflicts_count": "{count} dobrovolník se nebude moci zúčastnit žádné reprízy představení | {count} dobrovolníků se nebude moci zúčastnit žádné reprízy představení",
+    "show_conflicts_detail": "Jeho jediná repríza připadá na směnu: | Žádná z jeho {count} repríz není volná:"
   }
 }

@@ -453,6 +453,9 @@
     "hours_per_volunteer": "Godziny na wolontariusza",
     "no_slot_assigned_yet": "Nie przypisano jeszcze żadnej zmiany",
     "assigned_automatically": "Przydzielony automatycznie",
-    "hours_covered_of_needed": "Godziny obsadzone z godzin do obsadzenia"
+    "hours_covered_of_needed": "Godziny obsadzone z godzin do obsadzenia",
+    "show_conflicts": "Spektakle, których wolontariusz nie będzie mógł zobaczyć",
+    "show_conflicts_count": "{count} wolontariusz nie będzie mógł obejrzeć żadnego przedstawienia spektaklu | {count} wolontariuszy nie będzie mogło obejrzeć żadnego przedstawienia spektaklu",
+    "show_conflicts_detail": "Jego jedyne przedstawienie wypada podczas dyżuru: | Żadne z {count} przedstawień nie jest wolne:"
   }
 }

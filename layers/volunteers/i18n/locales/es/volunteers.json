@@ -453,6 +453,9 @@
     "hours_per_volunteer": "Horas por voluntario",
     "no_slot_assigned_yet": "Ningún turno asignado por ahora",
     "assigned_automatically": "Asignado automáticamente",
-    "hours_covered_of_needed": "Horas cubiertas de horas por cubrir"
+    "hours_covered_of_needed": "Horas cubiertas de horas por cubrir",
+    "show_conflicts": "Espectáculos que un voluntario no podrá ver",
+    "show_conflicts_count": "{count} voluntario no podrá asistir a ninguna representación de un espectáculo | {count} voluntarios no podrán asistir a ninguna representación de un espectáculo",
+    "show_conflicts_detail": "Su única representación cae durante un turno: | Ninguna de sus {count} representaciones está libre:"
   }
 }

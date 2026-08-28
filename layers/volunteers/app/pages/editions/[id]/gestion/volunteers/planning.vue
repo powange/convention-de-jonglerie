@@ -54,8 +54,10 @@
           :overlap-warnings="overlapWarnings"
           :preference-warnings="preferenceWarnings"
           :meal-time-warnings="mealTimeWarnings"
+          :show-conflict-warnings="showConflictWarnings"
           :can-manage-volunteers="canManageVolunteers"
           :format-date-time-range="formatDateTimeRange"
+          :format-date-time="formatDateTime"
         />
 
         <!-- Panneau d'auto-assignation -->
@@ -126,6 +128,7 @@
 import { useDatetime } from '~/composables/useDatetime'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { detecterSpectaclesManques } from '~/utils/spectacles-manques'
 import {
   calculateVolunteersStats,
   calculateVolunteersStatsByDay,
@@ -158,6 +161,10 @@ const activeStatsTab = ref('hours-per-volunteer') // heures par bénévole par d
 
 // Données des bénévoles
 const volunteers = ref<any[]>([]) // Applications de bénévoles
+
+// Programmation des spectacles, pour repérer ceux qu'un bénévole ne pourra voir sous aucune
+// de leurs représentations
+const spectacles = ref<any[]>([])
 
 // État des modals
 const slotDetailsModalOpen = ref(false)
@@ -374,7 +381,12 @@ const refreshData = async () => {
   refreshing.value = true
   try {
     // Recharger les données depuis l'API en utilisant les fonctions déjà définies
-    await Promise.all([fetchTeams(), fetchTimeSlots(), fetchAcceptedVolunteers()])
+    await Promise.all([
+      fetchTeams(),
+      fetchTimeSlots(),
+      fetchAcceptedVolunteers(),
+      fetchSpectacles(),
+    ])
   } catch {
     toast.add({
       title: t('errors.error_occurred'),
@@ -461,6 +473,23 @@ const formatDateTimeRange = (start: string, end: string) => {
     const endDay = dayFormat.format(endDateLocal)
     return `${startDay} ${startTimeStr} - ${endDay} ${endTimeStr}`
   }
+}
+
+/**
+ * Un instant seul, sans plage. Une représentation dont la durée n'est pas renseignée n'a pas de
+ * fin connue : afficher « 20:00 - 20:00 » laisserait croire à un spectacle de durée nulle.
+ * Même lecture locale des composants que ci-dessus, pour ne pas décaler d'un fuseau.
+ */
+const formatDateTime = (value: string) => {
+  const instant = new Date(value.includes('T') ? value : value + 'T00:00:00')
+  const jour = new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  }).format(new Date(instant.getFullYear(), instant.getMonth(), instant.getDate()))
+  const heures = instant.getHours().toString().padStart(2, '0')
+  const minutes = instant.getMinutes().toString().padStart(2, '0')
+  return `${jour} ${heures}:${minutes}`
 }
 
 // Détection des chevauchements de créneaux
@@ -702,6 +731,27 @@ const fetchAcceptedVolunteers = async () => {
   }
 }
 
+// Les spectacles ne sont pas indispensables au planning : s'ils manquent, l'avertissement
+// correspondant se tait plutôt que de faire échouer la page entière.
+const fetchSpectacles = async () => {
+  try {
+    const response: any = await $fetch(`/api/editions/${editionId}/volunteers/shows-schedule`)
+    const liste = response?.data ?? response
+    spectacles.value = Array.isArray(liste) ? liste : []
+  } catch {
+    spectacles.value = []
+  }
+}
+
+// Bénévoles dont les créneaux couvrent toutes les représentations d'un même spectacle
+const showConflictWarnings = computed(() =>
+  detecterSpectaclesManques(
+    spectacles.value,
+    convertedTimeSlots.value,
+    (teamId) => convertedTeams.value.find((team) => team.id === teamId)?.name || null
+  )
+)
+
 // Calcul des statistiques des bénévoles en utilisant les utilitaires
 const volunteersStats = computed(() =>
   calculateVolunteersStats(convertedTimeSlots.value, acceptedVolunteers.value)
@@ -732,6 +782,7 @@ onMounted(async () => {
       fetchAcceptedVolunteers(),
       fetchTeams(),
       fetchTimeSlots(),
+      fetchSpectacles(),
     ])
   } catch {
     toast.add({
