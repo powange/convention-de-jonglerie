@@ -84,6 +84,10 @@ const isOpen = computed({
   set: (value) => emit('update:open', value),
 })
 
+// Un QR code se lit mal en mode sombre : le thème passe au clair le temps de l'afficher,
+// puis revient à celui que l'utilisateur avait choisi.
+useModeClairTemporaire(isOpen)
+
 const editionOrganizerId = computed(() => props.editionOrganizer?.id)
 
 const qrCodeValue = computed(() => {
