@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Gör om de automatiska, behåll de manuella",
       "existing_mode_replace_all": "Radera allt och räkna om",
       "respect_assigned_teams": "Strikt efterlevnad av tilldelade team",
-      "respect_assigned_teams_help": "Tilldelar endast volontärer till de team som arrangörerna redan har placerat dem i"
+      "respect_assigned_teams_help": "Tilldelar endast volontärer till de team som arrangörerna redan har placerat dem i",
+      "preserve_show_access": "Bevara tillgången till föreställningarna",
+      "preserve_show_access_help": "Tilldelar inte en volontär ett pass som skulle hindra hen från att se en enda föreställning av en show. Passet förblir då obemannat."
     },
     "average_per_volunteer": "Genomsnitt per volontär",
     "avoid_list_hint": "Denna information förblir konfidentiell och hjälper organisatörer att skapa harmoniska team.",

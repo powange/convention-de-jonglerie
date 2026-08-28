@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Ponów automatyczne, zachowaj ręczne",
       "existing_mode_replace_all": "Usuń wszystko i przelicz ponownie",
       "respect_assigned_teams": "Ściśle przestrzegać przydzielonych zespołów",
-      "respect_assigned_teams_help": "Przypisuje wolontariuszy tylko do zespołów, do których organizatorzy już ich przydzielili"
+      "respect_assigned_teams_help": "Przypisuje wolontariuszy tylko do zespołów, do których organizatorzy już ich przydzielili",
+      "preserve_show_access": "Zachować dostęp do spektakli",
+      "preserve_show_access_help": "Nie przydziela wolontariusza do dyżuru, który uniemożliwiłby mu obejrzenie choćby jednego przedstawienia spektaklu. Dyżur pozostaje wtedy nieobsadzony."
     },
     "average_per_volunteer": "Średnia na wolontariusza",
     "avoid_list_hint": "Te informacje pozostają poufne i pomagają organizatorom tworzyć harmonijne zespoły",

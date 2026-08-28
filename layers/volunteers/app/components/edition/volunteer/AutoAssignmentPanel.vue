@@ -142,6 +142,13 @@
             </UFormField>
 
             <UFormField
+              :label="t('volunteers.auto_assignment.preserve_show_access')"
+              :help="t('volunteers.auto_assignment.preserve_show_access_help')"
+            >
+              <USwitch v-model="constraints.preserverAccesSpectacles" />
+            </UFormField>
+
+            <UFormField
               :label="t('volunteers.auto_assignment.allow_overtime')"
               :help="t('volunteers.auto_assignment.allow_overtime_help')"
             >
@@ -429,6 +436,7 @@ interface Constraints {
   respectStrictTeamPreferences: boolean
   respectStrictAssignedTeams: boolean
   respectStrictTimePreferences: boolean
+  preserverAccesSpectacles: boolean
   allowOvertime: boolean
   maxOvertimeHours: number
   keepExistingAssignments: boolean
@@ -450,6 +458,9 @@ const constraints = ref<Constraints>({
   respectStrictTeamPreferences: false,
   respectStrictAssignedTeams: false,
   respectStrictTimePreferences: false,
+  // Activée d'emblée : priver quelqu'un du seul spectacle qu'il voulait voir doit être un
+  // choix délibéré de l'organisateur, pas le comportement par défaut.
+  preserverAccesSpectacles: true,
   allowOvertime: false,
   maxOvertimeHours: 2,
   keepExistingAssignments: false,

@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Redo the automatic ones, keep the manual ones",
       "existing_mode_replace_all": "Clear everything and recalculate",
       "respect_assigned_teams": "Strictly respect assigned teams",
-      "respect_assigned_teams_help": "Only assigns volunteers to the teams organisers have already placed them in"
+      "respect_assigned_teams_help": "Only assigns volunteers to the teams organisers have already placed them in",
+      "preserve_show_access": "Preserve access to shows",
+      "preserve_show_access_help": "Never assigns a volunteer to a shift that would keep them from attending a single performance of a show. The shift is then left unfilled."
     },
     "average_per_volunteer": "Average per volunteer",
     "avoid_list_hint": "This information remains confidential and helps organizers create harmonious teams",

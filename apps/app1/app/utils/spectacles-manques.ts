@@ -5,16 +5,16 @@
  * représentation reste libre, le bénévole n'a rien manqué et n'a donc pas à être signalé.
  * L'avertissement ne se déclenche que lorsque *toutes* les représentations tombent pendant
  * ses créneaux.
+ *
+ * La règle qui décide si un créneau empêche d'assister à une représentation est partagée avec
+ * l'assignation automatique : l'algorithme ne doit pas juger acceptable ce que cette page
+ * dénonce.
  */
+import type { SpectacleProgramme } from '~~/shared/utils/spectacles-visibles'
 
-/** Un spectacle et ses représentations, tels que les expose l'API. */
-export interface SpectacleProgramme {
-  id: number
-  title: string
-  /** Durée en minutes. Absente, la représentation est traitée comme un instant. */
-  durationMinutes?: number | null
-  performances: { startDateTime: string }[]
-}
+import { empeche, representationsDe } from '~~/shared/utils/spectacles-visibles'
+
+export type { SpectacleProgramme }
 
 /** Un créneau du planning, avec les bénévoles qui y sont affectés. */
 export interface CreneauAvecBenevoles {
@@ -43,26 +43,6 @@ export interface AvertissementSpectacleManque {
 }
 
 const enMillisecondes = (iso: string): number => new Date(iso).getTime()
-
-/**
- * Le créneau empêche-t-il d'assister à cette représentation ?
- *
- * Le moindre chevauchement suffit : arriver au milieu, ce n'est pas voir le spectacle. Un
- * créneau qui s'achève à l'heure pile du lever de rideau ne bloque donc pas, mais un créneau
- * qui mord dix minutes sur la fin, si.
- *
- * Faute de durée connue, la représentation est réduite à son instant de début : seul un
- * créneau déjà en cours à cette heure-là la bloque.
- */
-const empeche = (
-  creneauDebut: number,
-  creneauFin: number,
-  representationDebut: number,
-  representationFin: number
-): boolean =>
-  representationFin > representationDebut
-    ? creneauDebut < representationFin && creneauFin > representationDebut
-    : creneauDebut <= representationDebut && creneauFin > representationDebut
 
 export function detecterSpectaclesManques(
   spectacles: SpectacleProgramme[],
@@ -93,18 +73,10 @@ export function detecterSpectaclesManques(
   const avertissements: AvertissementSpectacleManque[] = []
 
   for (const spectacle of spectacles) {
-    const representations = (spectacle.performances || [])
-      .map((passage) => ({
-        iso: passage.startDateTime,
-        debut: enMillisecondes(passage.startDateTime),
-      }))
-      .filter((representation) => !Number.isNaN(representation.debut))
+    const representations = representationsDe(spectacle)
 
     // Un spectacle sans représentation lisible n'offre rien à manquer.
     if (representations.length === 0) continue
-
-    const duree = spectacle.durationMinutes
-    const dureeMs = duree && duree > 0 ? duree * 60_000 : 0
 
     for (const [volunteerId, creneauxDuBenevole] of creneauxParBenevole) {
       const bloquants: AvertissementSpectacleManque['representations'] = []
@@ -112,7 +84,7 @@ export function detecterSpectaclesManques(
 
       for (const representation of representations) {
         const bloquant = creneauxDuBenevole.find((creneau) =>
-          empeche(creneau.debut, creneau.fin, representation.debut, representation.debut + dureeMs)
+          empeche(creneau.debut, creneau.fin, representation)
         )
 
         if (!bloquant) {

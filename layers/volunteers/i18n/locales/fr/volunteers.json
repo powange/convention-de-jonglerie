@@ -100,6 +100,8 @@
       "respect_team_preferences_help": "N'assigne les bénévoles qu'aux équipes qu'ils ont sélectionnées dans leurs préférences",
       "respect_assigned_teams": "Respecter strictement les équipes assignées",
       "respect_assigned_teams_help": "N'assigne les bénévoles qu'aux équipes dans lesquelles les organisateurs les ont déjà placés",
+      "preserve_show_access": "Préserver l'accès aux spectacles",
+      "preserve_show_access_help": "N'assigne pas un bénévole à un créneau qui l'empêcherait d'assister à la moindre représentation d'un spectacle. Le créneau reste alors à pourvoir.",
       "respect_time_preferences": "Respecter strictement les préférences horaires",
       "respect_time_preferences_help": "N'assigne les bénévoles qu'aux créneaux correspondant à leurs préférences horaires",
       "satisfaction_rate": "Taux satisfaction",

@@ -37,6 +37,7 @@ const constraintsSchema = z.object({
   respectStrictAvailability: z.boolean().optional(),
   respectStrictTeamPreferences: z.boolean().optional(),
   respectStrictAssignedTeams: z.boolean().optional(),
+  preserverAccesSpectacles: z.boolean().optional(),
   respectStrictTimePreferences: z.boolean().optional(),
   allowOvertime: z.boolean().optional(),
   maxOvertimeHours: z.number().min(0).max(6).optional(),
@@ -85,7 +86,7 @@ export default wrapApiHandler(async (event) => {
   const constraints = constraintsSchema.parse(body.constraints || {})
 
   // Récupération des données nécessaires
-  const [volunteers, timeSlots, teams] = await Promise.all([
+  const [volunteers, timeSlots, teams, spectacles] = await Promise.all([
     // Bénévoles acceptés
     prisma.editionVolunteerApplication.findMany({
       where: {
@@ -120,6 +121,10 @@ export default wrapApiHandler(async (event) => {
     prisma.volunteerTeam.findMany({
       where: { eventId: editionId },
     }),
+
+    // Programmation des spectacles : l'algorithme refuse de priver un bénévole du dernier
+    // passage de l'un d'eux. Le layer ne connaît pas la notion de spectacle, d'où le port.
+    useVolunteerPorts().artists.getShowSchedule(editionId),
   ])
 
   const mode =
@@ -198,7 +203,8 @@ export default wrapApiHandler(async (event) => {
     {
       debut: eventRecord.startDate?.toISOString() ?? null,
       fin: eventRecord.endDate?.toISOString() ?? null,
-    }
+    },
+    spectacles
   )
 
   const result = scheduler.assignVolunteers()

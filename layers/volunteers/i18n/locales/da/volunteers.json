@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Lav de automatiske om, behold de manuelle",
       "existing_mode_replace_all": "Slet alt og beregn på ny",
       "respect_assigned_teams": "Respektér strengt tildelte hold",
-      "respect_assigned_teams_help": "Tildeler kun frivillige til de hold, som arrangørerne allerede har placeret dem på"
+      "respect_assigned_teams_help": "Tildeler kun frivillige til de hold, som arrangørerne allerede har placeret dem på",
+      "preserve_show_access": "Bevar adgangen til forestillingerne",
+      "preserve_show_access_help": "Tildeler ikke en frivillig en vagt, der ville forhindre vedkommende i at overvære en eneste opførelse af en forestilling. Vagten forbliver da ubesat."
     },
     "average_per_volunteer": "Gennemsnit pr. frivillig",
     "avoid_list_hint": "Denne information forbliver fortrolig og hjælper arrangørerne med at skabe harmoniske hold",

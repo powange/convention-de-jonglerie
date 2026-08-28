@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Rifare le automatiche, conservare le manuali",
       "existing_mode_replace_all": "Cancellare tutto e ricalcolare",
       "respect_assigned_teams": "Rispettare rigorosamente i team assegnati",
-      "respect_assigned_teams_help": "Assegna i volontari solo ai team in cui gli organizzatori li hanno già inseriti"
+      "respect_assigned_teams_help": "Assegna i volontari solo ai team in cui gli organizzatori li hanno già inseriti",
+      "preserve_show_access": "Preservare l'accesso agli spettacoli",
+      "preserve_show_access_help": "Non assegna un volontario a un turno che gli impedirebbe di assistere a una qualsiasi replica di uno spettacolo. Il turno resta allora scoperto."
     },
     "average_per_volunteer": "Media per volontario",
     "avoid_list_hint": "Queste informazioni rimangono riservate e aiutano gli organizzatori a creare squadre armoniose",
