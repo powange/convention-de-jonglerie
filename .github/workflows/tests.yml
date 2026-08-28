@@ -159,6 +159,13 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+      # Prettier n'a jamais tourné en CI : des lignes non formatées ont été mergées, et la
+      # dérive ne se voyait qu'au prochain `npm run format` de quelqu'un d'autre, noyée parmi
+      # ses propres modifications. Le contrôle coûte quelques secondes ici et rend le
+      # formatage vérifiable au lieu d'être une habitude.
+      - name: Check formatting
+        run: npm run format:check
+
   # Job de vérification de types (vue-tsc) : attrape les variables/références non définies que
   # le build (esbuild, sans typecheck) et ESLint ne voient pas — ex. `edition is not defined`.
   typecheck:

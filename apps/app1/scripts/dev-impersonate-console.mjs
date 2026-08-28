@@ -42,7 +42,9 @@ function fail(msg) {
 }
 if (!TARGET) fail('TARGET requis (ID numérique ou email de l’utilisateur cible).')
 if (!TARGET_PASSWORD && (!ADMIN_ID || !ADMIN_PW))
-  fail('ADMIN_IDENTIFIER + ADMIN_PASSWORD requis (mode impersonation), OU TARGET_PASSWORD (mode login direct).')
+  fail(
+    'ADMIN_IDENTIFIER + ADMIN_PASSWORD requis (mode impersonation), OU TARGET_PASSWORD (mode login direct).'
+  )
 
 const browser = await chromium.launch({ headless: true, executablePath: CHROME })
 const context = await browser.newContext({ ignoreHTTPSErrors: true, locale: `${LOCALE}-US` })
@@ -78,11 +80,16 @@ if (TARGET_PASSWORD) {
   let targetId = /^\d+$/.test(String(TARGET)) ? Number(TARGET) : null
   if (targetId === null) {
     console.log(`→ Résolution de l'utilisateur "${TARGET}" ...`)
-    const res = await api.get(`${BASE}/api/admin/users?search=${encodeURIComponent(TARGET)}&limit=10`)
+    const res = await api.get(
+      `${BASE}/api/admin/users?search=${encodeURIComponent(TARGET)}&limit=10`
+    )
     if (!res.ok())
-      fail(`Recherche utilisateur échouée (HTTP ${res.status()}). Le compte admin est-il bien global-admin ?`)
+      fail(
+        `Recherche utilisateur échouée (HTTP ${res.status()}). Le compte admin est-il bien global-admin ?`
+      )
     const json = await res.json()
-    const users = json?.data?.users || json?.users || json?.data || (Array.isArray(json) ? json : [])
+    const users =
+      json?.data?.users || json?.users || json?.data || (Array.isArray(json) ? json : [])
     const match =
       users.find((u) => u.email?.toLowerCase() === String(TARGET).toLowerCase()) || users[0]
     if (!match) fail(`Aucun utilisateur trouvé pour "${TARGET}".`)
