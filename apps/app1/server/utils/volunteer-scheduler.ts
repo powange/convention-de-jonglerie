@@ -1,7 +1,7 @@
 import { DateTime as dt } from 'luxon'
 
 import type { DateTime } from 'luxon'
-import type { SpectacleProgramme } from '~~/shared/utils/spectacles-visibles'
+import type { Representation, SpectacleProgramme } from '~~/shared/utils/spectacles-visibles'
 
 import { representationsDe, spectacleInaccessible } from '~~/shared/utils/spectacles-visibles'
 
