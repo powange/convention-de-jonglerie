@@ -212,7 +212,8 @@
       "view_planning": "Se planering",
       "withdraw": "Ta bort",
       "withdrawal_error": "Fel vid återkallande av ansökan",
-      "withdrawal_success": "Ansökan framgångsrikt återkallad"
+      "withdrawal_success": "Ansökan framgångsrikt återkallad",
+      "with_you_on_slot": "Tillsammans med dig på detta pass: | Tillsammans med dig på detta pass ({count}):"
     }
   },
   "seo": {

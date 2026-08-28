@@ -1,3 +1,5 @@
+import { avecCoequipiers, coequipiersSelect } from '../../../../utils/coequipiers-creneau'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
@@ -108,6 +110,7 @@ export default wrapApiHandler(async (event) => {
                 color: true,
               },
             },
+            assignments: coequipiersSelect(user.id),
           },
         },
       },
@@ -125,6 +128,9 @@ export default wrapApiHandler(async (event) => {
     // l'intéressé relirait la copie figée dans sa candidature pendant que les organisateurs,
     // eux, verraient son profil à jour — deux vérités pour la même personne.
     ...infosPersonnelles(application.user as never),
-    assignedTimeSlots,
+    assignedTimeSlots: assignedTimeSlots.map((assignation) => ({
+      ...assignation,
+      timeSlot: avecCoequipiers(assignation.timeSlot),
+    })),
   }
 }, 'GetMyVolunteerApplication')

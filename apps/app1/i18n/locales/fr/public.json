@@ -201,6 +201,7 @@
       "teardown": "Démontage",
       "time_preferences": "Préférences horaires",
       "unnamed_slot": "Créneau sans titre",
+      "with_you_on_slot": "Avec vous sur ce créneau : | Avec vous sur ce créneau ({count}) :",
       "vehicle": "Véhicule",
       "vehicle_details": "Détails du véhicule",
       "view_compact": "Vue compacte",

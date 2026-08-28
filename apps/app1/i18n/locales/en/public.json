@@ -212,7 +212,8 @@
       "view_planning": "View schedule",
       "withdraw": "Withdraw",
       "withdrawal_error": "Error withdrawing application",
-      "withdrawal_success": "Application withdrawn successfully"
+      "withdrawal_success": "Application withdrawn successfully",
+      "with_you_on_slot": "With you on this shift: | With you on this shift ({count}):"
     }
   },
   "seo": {

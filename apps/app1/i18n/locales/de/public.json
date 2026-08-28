@@ -212,7 +212,8 @@
       "view_planning": "Planung anzeigen",
       "withdraw": "Zurückziehen",
       "withdrawal_error": "Fehler beim Zurückziehen der Bewerbung",
-      "withdrawal_success": "Bewerbung erfolgreich zurückgezogen"
+      "withdrawal_success": "Bewerbung erfolgreich zurückgezogen",
+      "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):"
     }
   },
   "seo": {

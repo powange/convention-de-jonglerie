@@ -212,7 +212,8 @@
       "view_planning": "Ver planejamento",
       "withdraw": "Retirar",
       "withdrawal_error": "Erro ao retirar candidatura",
-      "withdrawal_success": "Candidatura retirada com sucesso"
+      "withdrawal_success": "Candidatura retirada com sucesso",
+      "with_you_on_slot": "Consigo neste turno: | Consigo neste turno ({count}):"
     }
   },
   "seo": {

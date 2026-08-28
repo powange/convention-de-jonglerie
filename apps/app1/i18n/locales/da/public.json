@@ -212,7 +212,8 @@
       "view_planning": "Se planlægning",
       "withdraw": "Trække tilbage",
       "withdrawal_error": "Fejl ved at trække ansøgning tilbage",
-      "withdrawal_success": "Ansøgning trukket tilbage succesfuldt"
+      "withdrawal_success": "Ansøgning trukket tilbage succesfuldt",
+      "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):"
     }
   },
   "seo": {

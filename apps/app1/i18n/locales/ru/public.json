@@ -212,7 +212,8 @@
       "view_planning": "Просмотреть расписание",
       "withdraw": "Отозвать",
       "withdrawal_error": "Ошибка при отзыве заявки",
-      "withdrawal_success": "Заявка успешно отозвана"
+      "withdrawal_success": "Заявка успешно отозвана",
+      "with_you_on_slot": "С вами на этой смене: | С вами на этой смене ({count}):"
     }
   },
   "seo": {
