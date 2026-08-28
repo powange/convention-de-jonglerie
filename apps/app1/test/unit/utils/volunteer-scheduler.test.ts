@@ -200,6 +200,111 @@ describe('VolunteerScheduler', () => {
     })
   })
 
+  describe('accès aux spectacles', () => {
+    // Le spectacle se joue de 20 h à 21 h 30 ; le créneau du soir le recouvre.
+    const spectacle = (passages: string[], duree: number | null = 90) => ({
+      id: 1,
+      title: 'Gala',
+      durationMinutes: duree,
+      performances: passages.map((startDateTime) => ({ startDateTime })),
+    })
+
+    const creneauDuSoir = (jour: string, id = '1') =>
+      creneau({
+        id,
+        start: `${jour}T19:00:00.000Z`,
+        end: `${jour}T22:00:00.000Z`,
+      })
+
+    it('refuse le créneau qui referme l’unique représentation', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true })],
+        [creneauDuSoir('2026-08-01')],
+        EQUIPES,
+        {},
+        BORNES,
+        [spectacle(['2026-08-01T20:00:00.000Z'])]
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(0)
+    })
+
+    // Tant qu'un passage reste libre, le bénévole verra le spectacle : rien ne s'oppose au créneau.
+    it('accepte le créneau quand une autre représentation reste libre', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true })],
+        [creneauDuSoir('2026-08-01')],
+        EQUIPES,
+        {},
+        BORNES,
+        [spectacle(['2026-08-01T20:00:00.000Z', '2026-08-02T20:00:00.000Z'])]
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+
+    it('refuse le créneau qui referme le dernier passage encore libre', () => {
+      // Deux soirées, deux créneaux : le premier est acceptable, le second priverait de tout.
+      // Le bénévole est disponible au démontage, sans quoi le second créneau — postérieur à la
+      // fin de l'événement — serait écarté pour une tout autre raison que le spectacle.
+      const r = new VolunteerScheduler(
+        [benevole({ event: true, teardown: true })],
+        [creneauDuSoir('2026-08-01', 'c1'), creneauDuSoir('2026-08-02', 'c2')],
+        EQUIPES,
+        {},
+        BORNES,
+        [spectacle(['2026-08-01T20:00:00.000Z', '2026-08-02T20:00:00.000Z'])]
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+
+    it('laisse faire quand l’organisateur lève la contrainte', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true })],
+        [creneauDuSoir('2026-08-01')],
+        EQUIPES,
+        { preserverAccesSpectacles: false },
+        BORNES,
+        [spectacle(['2026-08-01T20:00:00.000Z'])]
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+
+    it('ne s’oppose à rien quand l’édition ne programme aucun spectacle', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true })],
+        [creneauDuSoir('2026-08-01')],
+        EQUIPES,
+        {},
+        BORNES,
+        []
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+
+    // Un spectacle sans durée n'est bloqué que par un créneau en cours au lever de rideau.
+    it('laisse passer le créneau qui s’achève avant un spectacle sans durée', () => {
+      const r = new VolunteerScheduler(
+        [benevole({ event: true })],
+        [
+          creneau({
+            start: '2026-08-01T16:00:00.000Z',
+            end: '2026-08-01T20:00:00.000Z',
+          }),
+        ],
+        EQUIPES,
+        {},
+        BORNES,
+        [spectacle(['2026-08-01T20:00:00.000Z'], null)]
+      ).assignVolunteers()
+
+      expect(r.assignments).toHaveLength(1)
+    })
+  })
+
   describe('montage, événement et démontage', () => {
     // Un créneau le matin du jour d'ouverture, avant l'heure de début : c'est du montage,
     // quel que soit son titre. La comparaison porte sur l'instant, pas sur le jour.

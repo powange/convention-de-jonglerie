@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Přepočítat automatická, zachovat ruční",
       "existing_mode_replace_all": "Vše smazat a přepočítat",
       "respect_assigned_teams": "Přísné dodržování přidělených týmů",
-      "respect_assigned_teams_help": "Přiřazuje dobrovolníky pouze do týmů, do kterých je organizátoři již zařadili"
+      "respect_assigned_teams_help": "Přiřazuje dobrovolníky pouze do týmů, do kterých je organizátoři již zařadili",
+      "preserve_show_access": "Zachovat přístup k představením",
+      "preserve_show_access_help": "Nepřiřazuje dobrovolníka ke směně, která by mu znemožnila zhlédnout jedinou reprízu představení. Směna pak zůstane neobsazená."
     },
     "average_per_volunteer": "Průměr na dobrovolníka",
     "avoid_list_hint": "Tyto informace zůstávají důvěrné a pomáhají organizátorům vytvářet harmonické týmy.",

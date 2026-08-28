@@ -1,6 +1,9 @@
 import { DateTime as dt } from 'luxon'
 
 import type { DateTime } from 'luxon'
+import type { SpectacleProgramme } from '~~/shared/utils/spectacles-visibles'
+
+import { representationsDe, spectacleInaccessible } from '~~/shared/utils/spectacles-visibles'
 
 export interface VolunteerApplication {
   id: number
@@ -67,6 +70,12 @@ export interface SchedulingConstraints {
   respectStrictAvailability?: boolean
   respectStrictTeamPreferences?: boolean
   respectStrictAssignedTeams?: boolean
+  /**
+   * Refuse d'affecter un bénévole à un créneau qui refermerait le dernier passage d'un
+   * spectacle. Sans cela, l'algorithme prive tranquillement des gens de la seule chose qu'ils
+   * étaient peut-être venus voir.
+   */
+  preserverAccesSpectacles?: boolean
   respectStrictTimePreferences?: boolean
   allowOvertime?: boolean
   maxOvertimeHours?: number
@@ -95,18 +104,29 @@ export class VolunteerScheduler {
   private constraints: SchedulingConstraints = {}
   private assignments: Assignment[] = []
   private bornes: BornesEvenement = {}
+  /**
+   * Les représentations de chaque spectacle, bornées une fois pour toutes : la garde consulte
+   * cette liste à chaque affectation envisagée, et re-parser les dates à chaque fois n'y
+   * apprendrait rien de nouveau. Les spectacles sans représentation lisible sont écartés ici,
+   * puisqu'ils n'offrent rien à manquer.
+   */
+  private representationsParSpectacle: Representation[][] = []
 
   constructor(
     volunteers: VolunteerApplication[],
     timeSlots: TimeSlot[],
     teams: Team[],
     constraints: SchedulingConstraints = {},
-    bornes: BornesEvenement = {}
+    bornes: BornesEvenement = {},
+    spectacles: SpectacleProgramme[] = []
   ) {
     this.volunteers = volunteers
     this.timeSlots = timeSlots
     this.teams = teams
     this.bornes = bornes
+    this.representationsParSpectacle = spectacles
+      .map(representationsDe)
+      .filter((representations) => representations.length > 0)
     this.constraints = {
       maxHoursPerVolunteer: 12,
       minHoursPerVolunteer: 2,
@@ -117,6 +137,7 @@ export class VolunteerScheduler {
       respectStrictAvailability: true,
       allowOvertime: false,
       maxOvertimeHours: 2,
+      preserverAccesSpectacles: true,
       ...constraints,
     }
   }
@@ -567,6 +588,11 @@ export class VolunteerScheduler {
           continue // Passer au candidat suivant en cas de conflit
         }
 
+        // Le créneau ne doit pas refermer le dernier passage d'un spectacle
+        if (this.priveDuDernierPassage(candidate.volunteer.user.id, slot)) {
+          continue
+        }
+
         this.assignments.push({
           volunteerId: candidate.volunteer.user.id,
           slotId: slot.id,
@@ -608,6 +634,10 @@ export class VolunteerScheduler {
         // Vérifier les conflits temporels d'abord
         if (this.hasTimeConflict(candidate.volunteer.user.id, slot.id)) {
           continue // Passer au candidat suivant en cas de conflit
+        }
+
+        if (this.priveDuDernierPassage(candidate.volunteer.user.id, slot)) {
+          continue
         }
 
         // Vérification finale des heures max
@@ -672,6 +702,42 @@ export class VolunteerScheduler {
   }
 
   /**
+   * Ce créneau refermerait-il le dernier passage d'un spectacle pour ce bénévole ?
+   *
+   * La question ne se pose pas créneau par créneau : un créneau ne prive de rien tant qu'il
+   * reste une représentation libre. Elle se pose donc contre les affectations déjà posées,
+   * au moment de poser celle-ci.
+   *
+   * Un spectacle déjà hors d'atteinte avant ce créneau ne compte pas : l'affectation n'y
+   * changerait plus rien, et le refuser bloquerait le bénévole sans rien lui rendre.
+   */
+  private priveDuDernierPassage(volunteerId: number, slot: TimeSlot): boolean {
+    if (!this.constraints.preserverAccesSpectacles) return false
+    if (this.representationsParSpectacle.length === 0) return false
+
+    const bornesDe = (creneau: TimeSlot) => ({
+      debut: new Date(creneau.start).getTime(),
+      fin: new Date(creneau.end).getTime(),
+    })
+
+    const nouveau = bornesDe(slot)
+    // Des bornes illisibles ne prouvent rien : mieux vaut laisser passer que refuser à tort.
+    if (Number.isNaN(nouveau.debut) || Number.isNaN(nouveau.fin)) return false
+
+    const dejaPris = this.assignments
+      .filter((assignation) => assignation.volunteerId === volunteerId)
+      .map((assignation) => this.timeSlots.find((creneau) => creneau.id === assignation.slotId))
+      .filter((creneau): creneau is TimeSlot => Boolean(creneau))
+      .map(bornesDe)
+      .filter((creneau) => !Number.isNaN(creneau.debut) && !Number.isNaN(creneau.fin))
+
+    return this.representationsParSpectacle.some((representations) => {
+      if (spectacleInaccessible(representations, dejaPris)) return false
+      return spectacleInaccessible(representations, [...dejaPris, nouveau])
+    })
+  }
+
+  /**
    * Troisième passe : équilibrage des assignations
    */
   private balanceAssignments(): void {
@@ -728,6 +794,11 @@ export class VolunteerScheduler {
 
     // Vérifier les conflits temporels pour le nouveau bénévole
     if (this.hasTimeConflict(newVolunteer.user.id, assignment.slotId)) {
+      return false
+    }
+
+    // Rééquilibrer ne doit pas priver celui qu'on soulage
+    if (this.priveDuDernierPassage(newVolunteer.user.id, slot)) {
       return false
     }
 

@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Automatische opnieuw doen, handmatige behouden",
       "existing_mode_replace_all": "Alles wissen en opnieuw berekenen",
       "respect_assigned_teams": "Toegewezen teams strikt respecteren",
-      "respect_assigned_teams_help": "Wijst vrijwilligers alleen toe aan de teams waarin de organisatoren hen al hebben geplaatst"
+      "respect_assigned_teams_help": "Wijst vrijwilligers alleen toe aan de teams waarin de organisatoren hen al hebben geplaatst",
+      "preserve_show_access": "Toegang tot de voorstellingen behouden",
+      "preserve_show_access_help": "Wijst een vrijwilliger geen dienst toe die hem zou beletten ook maar één uitvoering van een voorstelling bij te wonen. De dienst blijft dan onbezet."
     },
     "average_per_volunteer": "Gemiddelde per vrijwilliger",
     "avoid_list_hint": "Deze informatie blijft vertrouwelijk en helpt organisatoren harmonieuze teams te creëren",

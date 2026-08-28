@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Automatische neu berechnen, manuelle behalten",
       "existing_mode_replace_all": "Alles löschen und neu berechnen",
       "respect_assigned_teams": "Zugewiesene Teams strikt beachten",
-      "respect_assigned_teams_help": "Weist Freiwillige nur den Teams zu, in die die Organisatoren sie bereits eingeteilt haben"
+      "respect_assigned_teams_help": "Weist Freiwillige nur den Teams zu, in die die Organisatoren sie bereits eingeteilt haben",
+      "preserve_show_access": "Zugang zu den Aufführungen wahren",
+      "preserve_show_access_help": "Weist Freiwillige keiner Schicht zu, die sie daran hindern würde, auch nur eine Vorstellung einer Aufführung zu besuchen. Die Schicht bleibt dann unbesetzt."
     },
     "average_per_volunteer": "Durchschnitt pro Freiwilliger",
     "avoid_list_hint": "Diese Informationen bleiben vertraulich und helfen den Organisatoren, harmonische Teams zu bilden",

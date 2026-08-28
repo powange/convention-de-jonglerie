@@ -107,7 +107,9 @@
       "existing_mode_keep_manual": "Rehacer las automáticas, conservar las manuales",
       "existing_mode_replace_all": "Borrar todo y recalcular",
       "respect_assigned_teams": "Respetar estrictamente los equipos asignados",
-      "respect_assigned_teams_help": "Solo asigna voluntarios a los equipos en los que los organizadores ya los han colocado"
+      "respect_assigned_teams_help": "Solo asigna voluntarios a los equipos en los que los organizadores ya los han colocado",
+      "preserve_show_access": "Preservar el acceso a los espectáculos",
+      "preserve_show_access_help": "No asigna a un voluntario a un turno que le impediría asistir a ninguna representación de un espectáculo. El turno queda entonces sin cubrir."
     },
     "average_per_volunteer": "Promedio por voluntario",
     "avoid_list_hint": "Esta información permanece confidencial y ayuda a los organizadores a crear equipos armoniosos",
