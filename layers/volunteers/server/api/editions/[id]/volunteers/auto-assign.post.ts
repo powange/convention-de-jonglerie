@@ -36,6 +36,7 @@ const constraintsSchema = z.object({
   prioritizeExperience: z.boolean().optional(),
   respectStrictAvailability: z.boolean().optional(),
   respectStrictTeamPreferences: z.boolean().optional(),
+  respectStrictAssignedTeams: z.boolean().optional(),
   respectStrictTimePreferences: z.boolean().optional(),
   allowOvertime: z.boolean().optional(),
   maxOvertimeHours: z.number().min(0).max(6).optional(),
@@ -164,6 +165,9 @@ export default wrapApiHandler(async (event) => {
           ? volunteer.teamPreferences
           : []
         : [],
+      // Les équipes où les organisateurs ont déjà placé ce bénévole, sous la même forme que
+      // les préférences : des identifiants d'équipe, comparables au `teamId` d'un créneau.
+      assignedTeams: volunteer.teamAssignments.map((assignation) => assignation.teamId),
     })
   )
 

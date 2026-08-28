@@ -105,7 +105,9 @@
       "existing_mode_help_replace_all": "Alla tilldelningar för den här upplagan raderas före beräkningen, även de som gjorts för hand.",
       "existing_mode_keep_all": "Behåll alla befintliga tilldelningar",
       "existing_mode_keep_manual": "Gör om de automatiska, behåll de manuella",
-      "existing_mode_replace_all": "Radera allt och räkna om"
+      "existing_mode_replace_all": "Radera allt och räkna om",
+      "respect_assigned_teams": "Strikt efterlevnad av tilldelade team",
+      "respect_assigned_teams_help": "Tilldelar endast volontärer till de team som arrangörerna redan har placerat dem i"
     },
     "average_per_volunteer": "Genomsnitt per volontär",
     "avoid_list_hint": "Denna information förblir konfidentiell och hjälper organisatörer att skapa harmoniska team.",

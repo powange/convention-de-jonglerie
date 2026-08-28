@@ -128,6 +128,13 @@
             </UFormField>
 
             <UFormField
+              :label="t('volunteers.auto_assignment.respect_assigned_teams')"
+              :help="t('volunteers.auto_assignment.respect_assigned_teams_help')"
+            >
+              <USwitch v-model="constraints.respectStrictAssignedTeams" />
+            </UFormField>
+
+            <UFormField
               :label="t('volunteers.auto_assignment.respect_time_preferences')"
               :help="t('volunteers.auto_assignment.respect_time_preferences_help')"
             >
@@ -420,6 +427,7 @@ interface Constraints {
   prioritizeExperience: boolean
   respectStrictAvailability: boolean
   respectStrictTeamPreferences: boolean
+  respectStrictAssignedTeams: boolean
   respectStrictTimePreferences: boolean
   allowOvertime: boolean
   maxOvertimeHours: number
@@ -440,6 +448,7 @@ const constraints = ref<Constraints>({
   prioritizeExperience: true,
   respectStrictAvailability: true,
   respectStrictTeamPreferences: false,
+  respectStrictAssignedTeams: false,
   respectStrictTimePreferences: false,
   allowOvertime: false,
   maxOvertimeHours: 2,

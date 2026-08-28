@@ -15,6 +15,11 @@ export interface VolunteerApplication {
   motivation: string
   phone?: string
   teamPreferences?: any[]
+  /**
+   * Équipes dans lesquelles les organisateurs ont déjà placé le bénévole. À distinguer des
+   * préférences, qui sont ce que le bénévole a demandé : ici, la décision est déjà prise.
+   */
+  assignedTeams?: string[]
 }
 
 export interface TimeSlot {
@@ -61,6 +66,7 @@ export interface SchedulingConstraints {
   prioritizeExperience?: boolean
   respectStrictAvailability?: boolean
   respectStrictTeamPreferences?: boolean
+  respectStrictAssignedTeams?: boolean
   respectStrictTimePreferences?: boolean
   allowOvertime?: boolean
   maxOvertimeHours?: number
@@ -177,6 +183,23 @@ export class VolunteerScheduler {
       ) {
         // Si on respecte strictement les préférences et que le bénévole a des préférences
         // mais que l'équipe du créneau n'en fait pas partie, c'est impossible
+        return -1000
+      }
+
+      // Équipe déjà assignée par les organisateurs. Le pendant des préférences, mais du côté
+      // de la décision plutôt que du souhait : un bénévole placé dans une équipe a vocation à
+      // y servir, et le mode strict interdit de l'en sortir.
+      const estDansEquipeAssignee = volunteer.assignedTeams?.some(
+        (teamId) => teamId === slot.teamId
+      )
+
+      if (estDansEquipeAssignee) {
+        score += 15
+      } else if (
+        this.constraints.respectStrictAssignedTeams &&
+        volunteer.assignedTeams &&
+        volunteer.assignedTeams.length > 0
+      ) {
         return -1000
       }
     }

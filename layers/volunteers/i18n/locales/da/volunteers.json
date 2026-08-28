@@ -105,7 +105,9 @@
       "existing_mode_help_replace_all": "Alle tildelinger for denne udgave slettes før beregningen, også dem lavet i hånden.",
       "existing_mode_keep_all": "Behold alle eksisterende tildelinger",
       "existing_mode_keep_manual": "Lav de automatiske om, behold de manuelle",
-      "existing_mode_replace_all": "Slet alt og beregn på ny"
+      "existing_mode_replace_all": "Slet alt og beregn på ny",
+      "respect_assigned_teams": "Respektér strengt tildelte hold",
+      "respect_assigned_teams_help": "Tildeler kun frivillige til de hold, som arrangørerne allerede har placeret dem på"
     },
     "average_per_volunteer": "Gennemsnit pr. frivillig",
     "avoid_list_hint": "Denne information forbliver fortrolig og hjælper arrangørerne med at skabe harmoniske hold",
