@@ -511,57 +511,68 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
-  // Billeterie
-  if (edition.value?.ticketingEnabled && canManageTicketing.value) {
+  // Billetterie — configuration et suivi réservés à canManageTicketing ; le contrôle d'accès
+  // reste accessible aux bénévoles en créneau d'une équipe habilitée, comme la validation des
+  // repas ci-dessus. Sans cela, ils n'avaient aucun chemin vers une page qui les acceptait.
+  if (
+    edition.value?.ticketingEnabled &&
+    (canManageTicketing.value || canAccessAccessControl.value)
+  ) {
+    const ticketingChildren: NavigationMenuItem[] = canManageTicketing.value
+      ? [
+          {
+            label: t('gestion.ticketing.config_title'),
+            icon: 'i-heroicons-cog-6-tooth',
+            to: `/editions/${editionId.value}/gestion/ticketing/config`,
+          },
+          {
+            label: t('gestion.ticketing.external_link_title'),
+            icon: 'i-heroicons-link',
+            to: `/editions/${editionId.value}/gestion/ticketing/external`,
+          },
+          {
+            label: t('gestion.ticketing.tiers_title'),
+            icon: 'i-heroicons-currency-euro',
+            to: `/editions/${editionId.value}/gestion/ticketing/tiers`,
+          },
+          ...(edition.value?.ticketingHandoutItemsEnabled
+            ? [
+                {
+                  label: t('gestion.ticketing.handout_items_title'),
+                  icon: 'i-heroicons-gift',
+                  to: `/editions/${editionId.value}/gestion/ticketing/handout-items`,
+                },
+              ]
+            : []),
+          {
+            label: t('gestion.ticketing.orders_title'),
+            icon: 'i-heroicons-shopping-cart',
+            to: `/editions/${editionId.value}/gestion/ticketing/orders`,
+          },
+          {
+            label: t('gestion.ticketing.counters_title'),
+            icon: 'i-heroicons-calculator',
+            to: `/editions/${editionId.value}/gestion/ticketing/counter`,
+          },
+          {
+            label: t('gestion.ticketing.stats_title'),
+            icon: 'i-heroicons-chart-bar',
+            to: `/editions/${editionId.value}/gestion/ticketing/stats`,
+          },
+        ]
+      : []
+
+    // Seule entrée qu'un bénévole en créneau doit voir : c'est celle qu'il vient utiliser.
+    ticketingChildren.push({
+      label: t('gestion.ticketing.access_control_title'),
+      icon: 'i-heroicons-shield-check',
+      to: `/editions/${editionId.value}/gestion/ticketing/access-control`,
+    })
+
     managementSection.push({
       label: t('gestion.ticketing.title'),
       icon: 'i-heroicons-ticket',
-      children: [
-        {
-          label: t('gestion.ticketing.config_title'),
-          icon: 'i-heroicons-cog-6-tooth',
-          to: `/editions/${editionId.value}/gestion/ticketing/config`,
-        },
-        {
-          label: t('gestion.ticketing.external_link_title'),
-          icon: 'i-heroicons-link',
-          to: `/editions/${editionId.value}/gestion/ticketing/external`,
-        },
-        {
-          label: t('gestion.ticketing.tiers_title'),
-          icon: 'i-heroicons-currency-euro',
-          to: `/editions/${editionId.value}/gestion/ticketing/tiers`,
-        },
-        ...(edition.value?.ticketingHandoutItemsEnabled
-          ? [
-              {
-                label: t('gestion.ticketing.handout_items_title'),
-                icon: 'i-heroicons-gift',
-                to: `/editions/${editionId.value}/gestion/ticketing/handout-items`,
-              },
-            ]
-          : []),
-        {
-          label: t('gestion.ticketing.orders_title'),
-          icon: 'i-heroicons-shopping-cart',
-          to: `/editions/${editionId.value}/gestion/ticketing/orders`,
-        },
-        {
-          label: t('gestion.ticketing.access_control_title'),
-          icon: 'i-heroicons-shield-check',
-          to: `/editions/${editionId.value}/gestion/ticketing/access-control`,
-        },
-        {
-          label: t('gestion.ticketing.counters_title'),
-          icon: 'i-heroicons-calculator',
-          to: `/editions/${editionId.value}/gestion/ticketing/counter`,
-        },
-        {
-          label: t('gestion.ticketing.stats_title'),
-          icon: 'i-heroicons-chart-bar',
-          to: `/editions/${editionId.value}/gestion/ticketing/stats`,
-        },
-      ],
+      children: ticketingChildren,
       value: 'ticketing',
       popover: {},
     })

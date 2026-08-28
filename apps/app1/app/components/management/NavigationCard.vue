@@ -2,6 +2,7 @@
   <component
     :is="to ? NuxtLink : 'button'"
     :to="to"
+    data-carte-gestion
     class="block w-full text-left"
     @click="handleClick"
   >

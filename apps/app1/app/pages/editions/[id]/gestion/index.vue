@@ -22,7 +22,7 @@
       <EditionBandeauSurPlace />
 
       <!-- Contenu de gestion -->
-      <div class="space-y-6">
+      <div ref="conteneurCartes" class="space-y-6">
         <!-- Statut de l'édition -->
         <UCard v-if="canEdit">
           <div class="space-y-4">
@@ -405,6 +405,26 @@
           </div>
         </UCard>
 
+        <!-- Contrôle d'accès seul : bénévole en créneau, sans droits sur la billetterie -->
+        <UCard v-if="edition.ticketingEnabled && !canManageTicketing && canAccessAccessControl">
+          <div class="space-y-4">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-ticket" class="text-blue-500" />
+              <h2 class="text-lg font-semibold">{{ $t('gestion.ticketing.title') }}</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              <ManagementNavigationCard
+                :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
+                icon="i-heroicons-shield-check"
+                :title="$t('gestion.ticketing.access_control_title')"
+                :description="$t('gestion.ticketing.access_control_description')"
+                color="blue"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <!-- Billeterie -->
         <UCard v-if="edition.ticketingEnabled && canManageTicketing">
           <div class="space-y-4">
@@ -591,8 +611,12 @@
           </div>
         </UCard>
 
-        <!-- Objets trouvés (pas visible pour les team leaders seuls) -->
-        <UCard v-if="!isTeamLeaderValue || canEdit || canManageVolunteers">
+        <!-- Objets trouvés. La condition énumère qui a le droit d'y entrer plutôt que d'exclure
+             un cas : écrite en négatif, elle montrait la carte à quiconque atteignait cette page
+             — y compris aux bénévoles en créneau, que la page des objets trouvés refuse. Un lien
+             vers une porte fermée vaut moins que pas de lien. Les responsables d'équipe seuls
+             restent exclus, comme auparavant. -->
+        <UCard v-if="canEdit || canManageVolunteers || isOrganizer">
           <div class="space-y-4">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
@@ -659,10 +683,39 @@ onMounted(async () => {
     const access = await editionStore.getManagementAccess(editionId)
     isTeamLeaderValue.value = access.isTeamLeader
     canAccessMealValidation.value = access.canAccessMealValidation
+    canAccessAccessControl.value = access.isAccessControlActive
   }
 
   initialLoading.value = false
+
+  await redirigerSiUneSeuleDestination()
 })
+
+const conteneurCartes = ref<HTMLElement | null>(null)
+
+/**
+ * Quand une seule destination est offerte, y aller directement.
+ *
+ * C'est le cas du bénévole en créneau, qui n'a accès qu'au contrôle d'accès ou à la validation
+ * des repas : lui présenter un sommaire d'un seul élément lui demande un clic pour rien, sur
+ * un téléphone, en plein service.
+ *
+ * Le décompte porte sur les liens réellement rendus plutôt que sur une liste de conditions
+ * tenue à part : celle-ci se serait désynchronisée du jour où l'on ajoute ou retire une carte.
+ */
+const redirigerSiUneSeuleDestination = async () => {
+  await nextTick()
+
+  const liens = conteneurCartes.value?.querySelectorAll<HTMLAnchorElement>(
+    'a[data-carte-gestion][href]'
+  )
+  if (liens?.length !== 1) return
+
+  const destination = liens[0]?.getAttribute('href')
+  // `replace` plutôt que `push` : le retour arrière doit ramener d'où l'on vient, pas rebondir
+  // sur un sommaire qui renvoie aussitôt ici.
+  if (destination) await navigateTo(destination, { replace: true })
+}
 
 // Vérifier l'accès à cette page
 const canAccess = computed(() => {
@@ -679,6 +732,10 @@ const canAccess = computed(() => {
 
   // Bénévoles avec accès à la validation des repas
   if (canAccessMealValidation.value) return true
+
+  // Bénévoles en créneau de contrôle d'accès : sans cette ligne, la porte de la gestion leur
+  // restait fermée alors même que la page de contrôle d'accès, elle, les acceptait.
+  if (canAccessAccessControl.value) return true
 
   // Tous les organisateurs de la convention (même sans droits)
   if (edition.value.convention?.organizers) {
@@ -779,6 +836,11 @@ const canAccessStock = computed(() => canManageStock.value || isTeamLeaderValue.
 // Vérifier si l'utilisateur peut accéder à la validation des repas
 // (bénévole d'équipe de validation des repas)
 const canAccessMealValidation = ref(false)
+/**
+ * Bénévole d'une équipe habilitée au contrôle d'accès, pendant son créneau (à quinze minutes
+ * près, retard compris). C'est le serveur qui tranche : la page ne fait que relayer.
+ */
+const canAccessAccessControl = ref(false)
 
 // État pour vérifier si l'utilisateur est team leader
 const isTeamLeaderValue = ref(false)
