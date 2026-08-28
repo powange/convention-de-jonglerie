@@ -12,10 +12,11 @@ vi.hoisted(() => {
   }
 })
 
-// Mock de canManageTicketingById pour contrôler l'accès
+// Mock du contrôle d'accès. Le nom compte : la vérification d'un QR code s'appuie sur le helper
+// qui admet AUSSI les bénévoles en créneau actif de contrôle d'accès.
 const mockCanAccessEditionData = vi.hoisted(() => vi.fn())
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canManageTicketingById: mockCanAccessEditionData,
+  canAccessEditionDataOrAccessControl: mockCanAccessEditionData,
 }))
 
 // Mock de requireAuth pour simuler un utilisateur authentifié

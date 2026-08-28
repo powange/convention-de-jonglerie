@@ -232,6 +232,76 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Access Control Permissions', () => {
       expect(result).toBe(false)
     })
 
+    // Un créneau de montage ou de démontage se tient hors des dates de l'édition — celle du test
+    // court du 1er au 3 juin 2025. La permission ne doit regarder que les horaires du créneau :
+    // celui qui tient l'entrée pendant le montage en a autant besoin que pendant l'événement.
+    it('devrait retourner true pour un créneau hors des dates de l’édition (montage/démontage)', async () => {
+      const now = new Date()
+      const timeSlot = await prismaTest.volunteerTimeSlot.create({
+        data: {
+          eventId: testEdition.id,
+          teamId: testAccessControlTeam.id,
+          title: 'Montage',
+          startDateTime: new Date(now.getTime() - 30 * 60 * 1000),
+          endDateTime: new Date(now.getTime() + 30 * 60 * 1000),
+          maxVolunteers: 5,
+        },
+      })
+
+      await prismaTest.volunteerAssignment.create({
+        data: { timeSlotId: timeSlot.id, userId: testUser.id, assignedById: testUser.id },
+      })
+
+      expect(await isActiveAccessControlVolunteer(testUser.id, testEdition.id)).toBe(true)
+    })
+
+    // Le retard décale le créneau réel : un créneau annoncé pour 20 h mais démarré avec deux
+    // heures de retard se tient à 22 h, et c'est à 22 h que le bénévole en a besoin. Sans cette
+    // prise en compte, l'accès se refermait pendant le service.
+    it('devrait retourner true si le retard ramène un créneau ancien dans la fenêtre', async () => {
+      const now = new Date()
+      const timeSlot = await prismaTest.volunteerTimeSlot.create({
+        data: {
+          eventId: testEdition.id,
+          teamId: testAccessControlTeam.id,
+          title: 'Créneau retardé',
+          startDateTime: new Date(now.getTime() - 3 * 60 * 60 * 1000), // il y a 3h
+          endDateTime: new Date(now.getTime() - 2 * 60 * 60 * 1000), // il y a 2h
+          delayMinutes: 150, // repoussé de 2h30 : il court donc encore une demi-heure
+          maxVolunteers: 5,
+        },
+      })
+
+      await prismaTest.volunteerAssignment.create({
+        data: { timeSlotId: timeSlot.id, userId: testUser.id, assignedById: testUser.id },
+      })
+
+      expect(await isActiveAccessControlVolunteer(testUser.id, testEdition.id)).toBe(true)
+    })
+
+    // Le retard décale les deux bornes, pas seulement la fin : un créneau repoussé au lendemain
+    // ne donne pas accès aujourd'hui.
+    it('devrait retourner false si le retard repousse le créneau hors de la fenêtre', async () => {
+      const now = new Date()
+      const timeSlot = await prismaTest.volunteerTimeSlot.create({
+        data: {
+          eventId: testEdition.id,
+          teamId: testAccessControlTeam.id,
+          title: 'Créneau reporté',
+          startDateTime: new Date(now.getTime() - 30 * 60 * 1000), // commencé il y a 30 min
+          endDateTime: new Date(now.getTime() + 30 * 60 * 1000), // et en cours
+          delayMinutes: 180, // mais repoussé de 3h : il n'a pas encore commencé
+          maxVolunteers: 5,
+        },
+      })
+
+      await prismaTest.volunteerAssignment.create({
+        data: { timeSlotId: timeSlot.id, userId: testUser.id, assignedById: testUser.id },
+      })
+
+      expect(await isActiveAccessControlVolunteer(testUser.id, testEdition.id)).toBe(false)
+    })
+
     it("devrait retourner false si créneau dans une équipe normale (non contrôle d'accès)", async () => {
       // Créer un créneau actif mais dans une équipe normale
       const now = new Date()
