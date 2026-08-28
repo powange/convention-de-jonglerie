@@ -152,6 +152,10 @@ const props = defineProps<{
 
 const tickets = ref<Ticket[]>([])
 const qrModalOpen = ref(false)
+
+// Un QR code se lit mal en mode sombre : le thème passe au clair le temps de l'afficher,
+// puis revient à celui que l'utilisateur avait choisi.
+useModeClairTemporaire(qrModalOpen)
 const selectedTicket = ref<Ticket | null>(null)
 
 // Charger les billets de l'utilisateur
