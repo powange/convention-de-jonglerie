@@ -320,30 +320,36 @@
                   <div
                     v-for="(performer, index) in application.additionalPerformers"
                     :key="index"
-                    class="flex items-center gap-3 text-sm bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700"
+                    class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-sm bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700"
                   >
-                    <UIcon name="i-heroicons-user" class="text-gray-400 shrink-0" />
-                    <div class="min-w-0 flex-1">
-                      <p class="font-medium">{{ performer.firstName }} {{ performer.lastName }}</p>
-                      <div class="flex flex-wrap gap-x-4 gap-y-1 text-gray-500 text-xs mt-0.5">
-                        <span v-if="performer.email" class="flex items-center gap-1">
-                          <UIcon name="i-heroicons-envelope" class="w-3 h-3" />
-                          {{ performer.email }}
-                        </span>
-                        <span v-if="performer.phone" class="flex items-center gap-1">
-                          <UIcon name="i-heroicons-phone" class="w-3 h-3" />
-                          {{ performer.phone }}
-                        </span>
+                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                      <UIcon name="i-heroicons-user" class="text-gray-400 shrink-0 mt-0.5" />
+                      <div class="min-w-0 flex-1">
+                        <p class="font-medium">
+                          {{ performer.firstName }} {{ performer.lastName }}
+                        </p>
+                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-gray-500 text-xs mt-0.5">
+                          <span v-if="performer.email" class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-envelope" class="w-3 h-3" />
+                            {{ performer.email }}
+                          </span>
+                          <span v-if="performer.phone" class="flex items-center gap-1">
+                            <UIcon name="i-heroicons-phone" class="w-3 h-3" />
+                            {{ performer.phone }}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <!-- Bouton/badge import : visible uniquement si la candidature est ACCEPTED -->
+                    <!-- Actions d'import. Côte à côte, le badge et son bouton réclamaient une
+                         largeur que le nom ne pouvait pas céder : les deux se chevauchaient.
+                         Ils passent donc sous l'identité tant que la ligne ne tient pas. -->
                     <template v-if="application.status === 'ACCEPTED'">
                       <div
                         v-if="
                           isPerformerImported(performer.email) &&
                           isPerformerLinkedToCurrentShow(performer.email)
                         "
-                        class="flex items-center gap-2"
+                        class="flex flex-wrap items-center gap-2 shrink-0"
                       >
                         <UBadge color="success" variant="soft" icon="i-heroicons-check-circle">
                           {{ $t('gestion.shows_call.performer_imported') }}
