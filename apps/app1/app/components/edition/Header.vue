@@ -129,31 +129,72 @@
 
     <!-- Navigation par onglets -->
     <div class="border-b border-gray-200">
-      <!-- Mobile : select navigation -->
-      <!-- En mode compact, le sélecteur passe de `xl` à `md` et perd son rembourrage : 64 px de
-           haut contre 40, tout en restant au-dessus des 40 px recommandés pour une cible tactile. -->
+      <!-- Mobile : navigation par panneau latéral -->
+      <!-- Le menu déroulant qui tenait ce rôle offrait des options de 40 px de haut, sous les
+           44 px recommandés pour une cible tactile : on visait à côté, sur une liste qu'on
+           parcourt en marchant. Le panneau donne des entrées deux fois plus hautes, prend
+           toute la hauteur de l'écran, et s'ouvre du côté du pouce. -->
       <nav
         :class="compactOnMobile ? 'md:hidden p-1' : 'md:hidden p-3'"
         :aria-label="$t('navigation.tabs')"
       >
         <ClientOnly>
-          <USelect
-            :model-value="props.currentPage"
-            :items="mobileTabItems"
-            :aria-label="$t('navigation.tabs')"
-            :size="compactOnMobile ? 'md' : 'xl'"
+          <UButton
             color="neutral"
-            class="w-full"
-            :ui="{ content: 'max-h-[70vh]', viewport: 'max-h-[70vh]' }"
-            @update:model-value="onMobileTabChange"
+            variant="outline"
+            :size="compactOnMobile ? 'md' : 'xl'"
+            class="w-full justify-between"
+            :aria-label="$t('navigation.tabs')"
+            trailing-icon="i-heroicons-chevron-down"
+            @click="menuMobileOuvert = true"
           >
-            <template #leading>
+            <span class="flex items-center gap-2 min-w-0">
               <UIcon v-if="currentTabIcon" :name="currentTabIcon" class="size-6 text-primary-500" />
+              <span class="truncate">{{ currentTabLabel }}</span>
+            </span>
+          </UButton>
+
+          <!-- Le panneau porte le nom de l'édition : il rappelle où l'on se trouve, alors même
+               qu'il recouvre la page. « Onglets de navigation » reste en description, pour les
+               lecteurs d'écran, où ce libellé a du sens mais ferait jargon à l'écran. -->
+          <USlideover
+            v-model:open="menuMobileOuvert"
+            side="left"
+            :description="$t('navigation.tabs')"
+            :ui="{ description: 'sr-only' }"
+          >
+            <!-- Titre par le slot : un nom de convention un peu long doit passer à la ligne
+                 plutôt que d'être coupé, et la marge à droite lui évite de courir sous la
+                 croix de fermeture. -->
+            <template #title>
+              <span class="block break-words pr-8">{{ getEditionDisplayName(edition) }}</span>
             </template>
-            <template #item-leading="{ item: opt }">
-              <UIcon :name="(opt as { icon: string }).icon" class="size-5" />
+            <template #body>
+              <nav class="flex flex-col">
+                <button
+                  v-for="onglet in mobileTabItems"
+                  :key="onglet.value"
+                  type="button"
+                  class="flex items-center gap-3 py-4 px-2 text-left rounded-lg transition-colors"
+                  :class="
+                    onglet.value === props.currentPage
+                      ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium'
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                  "
+                  :aria-current="onglet.value === props.currentPage ? 'page' : undefined"
+                  @click="allerVersOnglet(onglet.value)"
+                >
+                  <UIcon :name="onglet.icon" class="size-6 shrink-0" />
+                  <span class="truncate">{{ onglet.label }}</span>
+                  <UIcon
+                    v-if="onglet.value === props.currentPage"
+                    name="i-heroicons-check"
+                    class="size-5 ml-auto shrink-0"
+                  />
+                </button>
+              </nav>
             </template>
-          </USelect>
+          </USlideover>
         </ClientOnly>
       </nav>
 
@@ -683,7 +724,16 @@ const currentTabIcon = computed<string | null>(
   () => mobileTabItems.value.find((i) => i.value === props.currentPage)?.icon || null
 )
 
-function onMobileTabChange(value: string) {
+const menuMobileOuvert = ref(false)
+
+const currentTabLabel = computed<string>(
+  () => mobileTabItems.value.find((i) => i.value === props.currentPage)?.label || ''
+)
+
+function allerVersOnglet(value: string) {
+  // Refermer dans tous les cas, y compris quand on rouvre la page où l'on est déjà : sans quoi
+  // le panneau resterait ouvert par-dessus le contenu, sans que rien ne se passe.
+  menuMobileOuvert.value = false
   const target = mobileTabItems.value.find((i) => i.value === value)
   if (target && target.value !== props.currentPage) {
     navigateTo(target.path)
