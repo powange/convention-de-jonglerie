@@ -3,7 +3,7 @@
     <!-- En-tête -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
           {{ $t('pages.volunteers.my_applications') }}
         </h1>
         <p class="text-gray-600 dark:text-gray-400 mt-2">
@@ -41,7 +41,19 @@
     <div
       class="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 -mx-4 px-4 sm:-mx-6 sm:px-6"
     >
-      <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto pb-0 scrollbar-hide">
+      <!-- Sur un écran étroit, les cinq onglets ne tiennent pas : le dernier était coupé au
+           bord de l'écran, et rien n'indiquait qu'il fallait faire défiler. Un select prend
+           donc le relais. Les deux pilotent le même état : changer de largeur ne fait pas
+           perdre le filtre en cours. -->
+      <USelect
+        v-model="activeTab"
+        :items="tabsPourSelect"
+        value-key="value"
+        class="w-full my-2 sm:hidden"
+        :icon="ongletCourant?.icon"
+      />
+
+      <nav class="hidden sm:flex space-x-1 sm:space-x-4 overflow-x-auto pb-0 scrollbar-hide">
         <button
           v-for="tab in tabs"
           :key="tab.id"
@@ -98,8 +110,11 @@
           class="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out"
         >
           <template #header>
-            <div class="flex items-start justify-between">
-              <div class="flex items-center gap-4">
+            <!-- Empilé tant que la largeur ne permet pas deux colonnes : côte à côte, la
+                 colonne des badges prenait la place qu'il lui fallait et coupait le nom de la
+                 convention mot par mot. -->
+            <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
+              <div class="flex items-center gap-4 min-w-0">
                 <!-- Logo de la convention ou image de l'édition -->
                 <div class="flex-shrink-0">
                   <img
@@ -134,8 +149,8 @@
                   </div>
                 </div>
 
-                <div class="flex-1">
-                  <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                     {{ getEditionDisplayName(application.edition) }}
                   </h3>
                   <p class="text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-1">
@@ -151,7 +166,9 @@
                 </div>
               </div>
 
-              <div class="flex flex-col items-end gap-2">
+              <div
+                class="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:flex-nowrap"
+              >
                 <UBadge
                   :color="getStatusColor(application.status)"
                   :variant="getStatusVariant(application.status)"
@@ -170,7 +187,7 @@
                     Array.isArray(application.assignedTeams) &&
                     application.assignedTeams.length > 0
                   "
-                  class="flex flex-wrap gap-1 justify-end"
+                  class="flex flex-wrap gap-1 justify-start sm:justify-end"
                 >
                   <UBadge
                     v-for="team in application.assignedTeams"
@@ -672,6 +689,17 @@ const tabs = computed(() => [
     badgeColor: 'gray',
   },
 ])
+
+/** Les mêmes onglets, sous la forme qu'attend le select des écrans étroits. */
+const tabsPourSelect = computed(() =>
+  tabs.value.map((tab) => ({
+    label: tab.count > 0 ? `${tab.label} (${tab.count})` : tab.label,
+    value: tab.id,
+    icon: tab.icon,
+  }))
+)
+
+const ongletCourant = computed(() => tabs.value.find((tab) => tab.id === activeTab.value))
 
 // Fonctions utilitaires
 const getEditionDisplayName = (edition: any) => {
