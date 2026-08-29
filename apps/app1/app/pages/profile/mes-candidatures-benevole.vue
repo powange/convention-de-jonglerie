@@ -256,31 +256,19 @@
               class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0"
             >
               <div class="flex flex-wrap gap-2">
+                <!-- Depuis une liste de candidatures bénévoles, la destination attendue est la
+                     page bénévolat de l'édition, non sa présentation générale. Le bouton
+                     « Voir le planning » y menait déjà : les deux faisaient double emploi, il
+                     ne reste que celui-ci. -->
                 <UButton
-                  :to="`/editions/${application.edition.id}`"
+                  :to="`/editions/${application.edition.id}/volunteers`"
                   size="sm"
                   color="primary"
                   variant="solid"
                   icon="i-heroicons-eye"
                   class="flex-1 sm:flex-none"
                 >
-                  <span class="hidden sm:inline">{{ $t('pages.volunteers.view_edition') }}</span>
-                  <span class="sm:hidden">Voir</span>
-                </UButton>
-
-                <UButton
-                  v-if="
-                    application.status === 'ACCEPTED' && application.assignedTimeSlots?.length > 0
-                  "
-                  :to="`/editions/${application.edition.id}/volunteers`"
-                  size="sm"
-                  color="info"
-                  variant="outline"
-                  icon="i-heroicons-calendar-days"
-                  class="flex-1 sm:flex-none"
-                >
-                  <span class="hidden sm:inline">{{ $t('pages.volunteers.view_planning') }}</span>
-                  <span class="sm:hidden">Planning</span>
+                  {{ $t('edition.volunteers.title') }}
                 </UButton>
 
                 <UButton
@@ -401,26 +389,18 @@
 
             <!-- Actions rapides -->
             <div class="flex flex-wrap gap-1 sm:gap-1 justify-start sm:justify-end">
+              <!-- Le second bouton appelait `showPlanning`, une fonction qui n'existe nulle
+                   part : un clic levait une erreur. Il menait de toute façon au même endroit
+                   que celui-ci, qui pointe désormais sur la page bénévolat. -->
               <UButton
-                :to="`/editions/${application.edition.id}`"
+                :to="`/editions/${application.edition.id}/volunteers`"
+                :aria-label="$t('edition.volunteers.title')"
                 size="xs"
                 color="primary"
                 variant="ghost"
                 icon="i-heroicons-eye"
                 class="sm:w-auto w-8 h-8"
                 square
-              />
-              <UButton
-                v-if="
-                  application.status === 'ACCEPTED' && application.assignedTimeSlots?.length > 0
-                "
-                size="xs"
-                color="info"
-                variant="ghost"
-                icon="i-heroicons-calendar-days"
-                class="sm:w-auto w-8 h-8"
-                square
-                @click="showPlanning(application)"
               />
               <UButton
                 v-if="application.status === 'ACCEPTED'"
@@ -529,10 +509,6 @@ interface UserVolunteerApplication {
 interface ApplicationWithSettings {
   [key: string]: any
   volunteersSettings?: any
-}
-
-interface ContactOrganizerResponse {
-  conversationId: number
 }
 
 definePageMeta({
@@ -814,31 +790,12 @@ const showApplicationDetails = (application: any) => {
   detailsModalOpen.value = true
 }
 
-// Fonction pour contacter les responsables bénévoles
-const contactOrganizerEditionId = ref<number | null>(null)
-
-const { execute: executeContactOrganizer } = useApiAction<
-  { editionId: number },
-  ContactOrganizerResponse
->('/api/messenger/volunteer-to-organizers', {
-  method: 'POST',
-  body: () => ({ editionId: contactOrganizerEditionId.value! }),
-  silent: true,
-  onSuccess: (result: ContactOrganizerResponse) => {
-    navigateTo(`/messenger?conversationId=${result.conversationId}`)
-  },
-  onError: () => {
-    toast.add({
-      title: t('common.error'),
-      description: t('pages.volunteers.contact_organizer_error'),
-      color: 'error',
-    })
-  },
-})
+// Contacter les responsables bénévoles. La page bénévolat de l'édition propose le même bouton :
+// la logique vit donc dans un composable partagé plutôt qu'en double.
+const { contacter: contacterResponsables } = useContactResponsablesBenevoles()
 
 const contactOrganizer = (application: any) => {
-  contactOrganizerEditionId.value = application.edition.id
-  executeContactOrganizer()
+  contacterResponsables(application.edition.id)
 }
 
 // Fonction pour afficher le QR code
