@@ -192,6 +192,22 @@
                     class="size-5 ml-auto shrink-0"
                   />
                 </button>
+
+                <!-- La gestion n'est pas un onglet parmi d'autres : elle mène hors des pages
+                     publiques. D'où le trait qui l'en sépare, plutôt qu'une entrée noyée dans
+                     la liste. Le bouton de l'en-tête n'existe pas en mobile, où la barre est
+                     réduite : sans cette entrée, il n'y avait aucun chemin vers la gestion. -->
+                <template v-if="peutAccederGestion">
+                  <USeparator class="my-2" />
+                  <NuxtLink
+                    :to="`/editions/${edition.id}/gestion`"
+                    class="flex items-center gap-3 py-4 px-2 text-left rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                    @click="menuMobileOuvert = false"
+                  >
+                    <UIcon name="i-heroicons-cog-6-tooth" class="size-6 shrink-0" />
+                    <span class="truncate">{{ $t('edition.management') }}</span>
+                  </NuxtLink>
+                </template>
               </nav>
             </template>
           </USlideover>
@@ -725,6 +741,9 @@ const currentTabIcon = computed<string | null>(
 )
 
 const menuMobileOuvert = ref(false)
+
+// Même règle que le bouton « Gestion » de l'en-tête, qui n'est pas rendu en mobile.
+const { peutAcceder: peutAccederGestion } = useAccesGestionEdition(() => props.edition)
 
 const currentTabLabel = computed<string>(
   () => mobileTabItems.value.find((i) => i.value === props.currentPage)?.label || ''
