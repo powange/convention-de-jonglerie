@@ -37,51 +37,14 @@
           </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-          <!-- Toggle publication carte -->
-          <USwitch
-            v-model="mapPublic"
-            :label="$t('gestion.map.map_public')"
-            :loading="updatingMapPublic"
-            @update:model-value="handleMapPublicChange"
-          />
-
-          <div class="flex flex-col sm:flex-row gap-2">
-            <!-- Zone drawing buttons -->
-            <UButton
-              v-if="!isDrawing && !isPlacingMarker"
-              icon="i-lucide-pentagon"
-              :label="$t('gestion.map.draw_polygon')"
-              @click="startDrawingNewZone"
-            />
-            <UButton
-              v-else-if="isDrawing"
-              icon="i-lucide-x"
-              color="neutral"
-              variant="outline"
-              :label="$t('gestion.map.stop_drawing')"
-              @click="cancelDrawing"
-            />
-
-            <!-- Marker placement buttons -->
-            <UButton
-              v-if="!isDrawing && !isPlacingMarker"
-              icon="i-lucide-map-pin"
-              color="neutral"
-              variant="outline"
-              :label="$t('gestion.map.place_marker')"
-              @click="startPlacingNewMarker"
-            />
-            <UButton
-              v-else-if="isPlacingMarker"
-              icon="i-lucide-x"
-              color="neutral"
-              variant="outline"
-              :label="$t('gestion.map.stop_placing')"
-              @click="cancelPlacingMarker"
-            />
-          </div>
-        </div>
+        <!-- Les outils de dessin ne sont plus ici mais sur la carte, à portée du geste qu'ils
+             déclenchent. -->
+        <USwitch
+          v-model="mapPublic"
+          :label="$t('gestion.map.map_public')"
+          :loading="updatingMapPublic"
+          @update:model-value="handleMapPublicChange"
+        />
       </div>
 
       <!-- Carte externe : un organisateur ayant déjà cartographié son terrain sur Google My Maps
@@ -162,10 +125,61 @@
             :style="{ '--carte-hauteur': carteHauteur }"
             :ui="{ body: 'h-full p-0' }"
           >
-            <div
-              ref="mapContainerRef"
-              class="h-full w-full rounded-none lg:rounded-lg cursor-crosshair"
-            />
+            <div class="relative h-full w-full">
+              <div
+                ref="mapContainerRef"
+                class="h-full w-full rounded-none lg:rounded-lg cursor-crosshair"
+              />
+
+              <!-- Outils de dessin, posés sur la carte plutôt qu'au-dessus d'elle : ils agissent
+                   sur elle, et l'en-tête coûtait deux boutons pleine largeur avant de la voir.
+                   En haut à gauche, sous le zoom : le bas de la carte est recouvert par le panneau
+                   dès qu'on est en dessous de `lg`, et le coin haut droit porte le sélecteur de
+                   couches. Voisins des contrôles Leaflet, ils doivent en partager le plan.
+
+                   Le décalage vertical est mesuré, non deviné : le zoom de Leaflet s'arrête à
+                   74 px du haut de la carte — 10 de marge et deux boutons de 30 — et un premier
+                   essai à 4,5 rem le chevauchait de deux pixels.
+
+                   Frères du conteneur et non enfants : Leaflet dispose librement des siens. -->
+              <div class="absolute left-2 top-24 z-[1000] flex flex-col gap-2">
+                <!-- Tous en neutre, et à fond plein. Neutre parce que rien, sur une carte, ne
+                     doit attirer l'œil plus que ce qu'on y a dessiné : la couleur d'accent, portée
+                     par le bouton de dessin jusqu'ici, se disputait la vue avec les zones. Plein
+                     parce qu'un fond transparent laisse passer routes et bâtiments sous l'icône. -->
+                <template v-if="!isDrawing && !isPlacingMarker">
+                  <UTooltip :text="$t('gestion.map.draw_polygon')">
+                    <UButton
+                      icon="i-lucide-pentagon"
+                      color="neutral"
+                      size="xl"
+                      :aria-label="$t('gestion.map.draw_polygon')"
+                      @click="startDrawingNewZone"
+                    />
+                  </UTooltip>
+
+                  <UTooltip :text="$t('gestion.map.place_marker')">
+                    <UButton
+                      icon="i-lucide-map-pin"
+                      color="neutral"
+                      size="xl"
+                      :aria-label="$t('gestion.map.place_marker')"
+                      @click="startPlacingNewMarker"
+                    />
+                  </UTooltip>
+                </template>
+
+                <UTooltip v-else :text="etiquetteAnnulation">
+                  <UButton
+                    icon="i-lucide-x"
+                    color="neutral"
+                    size="xl"
+                    :aria-label="etiquetteAnnulation"
+                    @click="isDrawing ? cancelDrawing() : cancelPlacingMarker()"
+                  />
+                </UTooltip>
+              </div>
+            </div>
           </UCard>
         </div>
 
@@ -259,8 +273,10 @@
     />
 
     <!-- Modal confirmation suppression zone -->
+    <!-- Même règle d'empilement que les deux modales ci-dessus : voir ZoneModal. -->
     <UModal
       :open="deleteConfirmOpen"
+      :ui="{ overlay: 'z-50', content: 'z-50' }"
       :title="$t('common.confirm_delete')"
       @update:open="(v: boolean) => !v && (deleteConfirmOpen = false)"
     >
@@ -287,8 +303,10 @@
     </UModal>
 
     <!-- Modal confirmation suppression marker -->
+    <!-- Même règle d'empilement que les deux modales ci-dessus : voir ZoneModal. -->
     <UModal
       :open="deleteMarkerConfirmOpen"
+      :ui="{ overlay: 'z-50', content: 'z-50' }"
       :title="$t('common.confirm_delete')"
       @update:open="(v: boolean) => !v && (deleteMarkerConfirmOpen = false)"
     >
@@ -684,6 +702,15 @@ const cancelDrawing = () => {
   stopDrawing()
   pendingCoordinates.value = null
 }
+
+/**
+ * Un seul bouton d'annulation sert les deux modes — ils s'excluent —, mais il doit dire lequel il
+ * interrompt : réduit à une icône, il n'a plus que son infobulle et son étiquette d'accessibilité
+ * pour le faire.
+ */
+const etiquetteAnnulation = computed(() =>
+  isDrawing.value ? t('gestion.map.stop_drawing') : t('gestion.map.stop_placing')
+)
 
 const handleEditZone = (zone: EditionZone) => {
   openModal(zone)

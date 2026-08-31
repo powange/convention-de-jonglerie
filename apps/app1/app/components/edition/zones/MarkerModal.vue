@@ -113,8 +113,14 @@ const modalTitle = computed(() =>
 </script>
 
 <template>
+  <!-- Le panneau de la carte est une couche fixe non modale, laissée à `z-index: auto` : tout
+       `z-index` positif la ferait passer devant le reste. Une boîte de dialogue doit donc
+       s'élever pour la recouvrir, sans quoi c'est l'ordre du DOM qui tranche — et le panneau
+       gagne dès qu'il se remonte, masquant les boutons d'action sur un écran court. 50 laisse
+       les notifications, à 100, au-dessus de tout. -->
   <UModal
     :open="open"
+    :ui="{ overlay: 'z-50', content: 'z-50' }"
     :title="modalTitle"
     @update:open="(value: boolean) => !value && handleClose()"
   >
