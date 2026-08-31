@@ -85,66 +85,93 @@
       </div>
 
       <!-- Carte externe : un organisateur ayant déjà cartographié son terrain sur Google My Maps
-           colle son URL ici plutôt que de tout refaire. Elle remplace alors la carte interne. -->
-      <UCard>
-        <UFormField
+           colle son URL ici plutôt que de tout refaire. Elle remplace alors la carte interne.
+           Repliée sur mobile : c'est une configuration qu'on renseigne une fois, et déployée
+           elle prenait deux cent cinquante pixels sur la carte, qu'on regarde à chaque visite. -->
+      <UCard :ui="configExterneVisible ? undefined : { body: 'pb-0' }">
+        <!-- Sur mobile, un bouton remplace le formulaire tant qu'on ne le demande pas : déployé,
+             il prenait deux cent cinquante pixels sur la carte, alors qu'on renseigne cette
+             adresse une fois pour toutes. Au-delà de `lg`, rien ne change. -->
+        <UButton
+          class="lg:hidden group w-full justify-between p-0 mb-3 hover:bg-transparent"
+          variant="ghost"
+          color="neutral"
+          :ui="{
+            trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
+          }"
+          trailing-icon="i-heroicons-chevron-down"
+          :data-state="configExterneDepliee ? 'open' : 'closed'"
           :label="$t('gestion.map.external_map_label')"
-          :description="$t('gestion.map.external_map_help')"
-        >
-          <div class="flex flex-col gap-2 sm:flex-row">
-            <UInput
-              v-model="externalMapUrl"
-              :placeholder="$t('gestion.map.external_map_placeholder')"
-              class="flex-1"
-            />
-            <UButton :loading="savingExternalMap" @click="saveExternalMap">
-              {{ $t('common.save') }}
-            </UButton>
-          </div>
-        </UFormField>
-
-        <UAlert
-          v-if="edition?.externalMapRef"
-          icon="i-heroicons-information-circle"
-          color="info"
-          variant="subtle"
-          :description="$t('gestion.map.external_map_active')"
-          class="mt-3"
+          @click="configExterneDepliee = !configExterneDepliee"
         />
 
-        <!-- L'import reprend les objets de la carte externe pour en faire des zones du site :
-             il n'a de sens qu'une fois une carte renseignée. -->
-        <div
-          v-if="edition?.externalMapRef"
-          class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ $t('gestion.map.import_open_help') }}
-          </p>
-          <UButton
-            icon="i-lucide-download"
-            color="neutral"
-            variant="outline"
-            :to="`/editions/${editionId}/gestion/map-import`"
-            :label="$t('gestion.map.import_open')"
+        <div :class="configExterneDepliee ? '' : 'hidden lg:block'">
+          <UFormField
+            :label="$t('gestion.map.external_map_label')"
+            :description="$t('gestion.map.external_map_help')"
+          >
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <UInput
+                v-model="externalMapUrl"
+                :placeholder="$t('gestion.map.external_map_placeholder')"
+                class="flex-1"
+              />
+              <UButton :loading="savingExternalMap" @click="saveExternalMap">
+                {{ $t('common.save') }}
+              </UButton>
+            </div>
+          </UFormField>
+
+          <UAlert
+            v-if="edition?.externalMapRef"
+            icon="i-heroicons-information-circle"
+            color="info"
+            variant="subtle"
+            :description="$t('gestion.map.external_map_active')"
+            class="mt-3"
           />
+
+          <!-- L'import reprend les objets de la carte externe pour en faire des zones du site :
+             il n'a de sens qu'une fois une carte renseignée. -->
+          <div
+            v-if="edition?.externalMapRef"
+            class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ $t('gestion.map.import_open_help') }}
+            </p>
+            <UButton
+              icon="i-lucide-download"
+              color="neutral"
+              variant="outline"
+              :to="`/editions/${editionId}/gestion/map-import`"
+              :label="$t('gestion.map.import_open')"
+            />
+          </div>
         </div>
       </UCard>
 
       <!-- Contenu principal -->
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <!-- Carte -->
-        <div class="lg:col-span-2">
+        <!-- Carte. En mobile elle sort du cadre, comme sur la carte publique : les marges
+             négatives annulent le rembourrage latéral du gabarit et la carte perd bordure et
+             coins arrondis. Dessiner une zone sur un carré de 390 px tenait de l'exploit. -->
+        <div :ref="(el) => enregistrerSection(el)" class="lg:col-span-2 relative z-0">
           <UCard
-            class="w-full aspect-square lg:aspect-auto lg:h-[calc(100vh-var(--ui-header-height)-10rem)]"
+            class="w-auto -mx-4 sm:-mx-6 rounded-none ring-0 h-(--carte-hauteur) lg:mx-0 lg:w-full lg:rounded-lg lg:ring-1 lg:h-[calc(100vh-var(--ui-header-height)-10rem)]"
+            :style="{ '--carte-hauteur': carteHauteur }"
             :ui="{ body: 'h-full p-0' }"
           >
-            <div ref="mapContainerRef" class="h-full w-full rounded-lg cursor-crosshair" />
+            <div
+              ref="mapContainerRef"
+              class="h-full w-full rounded-none lg:rounded-lg cursor-crosshair"
+            />
           </UCard>
         </div>
 
-        <!-- Légende / Liste des zones -->
-        <div>
+        <!-- Légende. En dessous de `lg` elle vit dans le tiroir : la laisser aussi dans le flux
+             la ferait exister en double, avec deux états de visibilité divergents. -->
+        <div class="hidden lg:block">
           <UCard>
             <template #header>
               <div class="flex items-center gap-2">
@@ -169,6 +196,47 @@
           </UCard>
         </div>
       </div>
+
+      <!-- Panneau du bas, en mobile uniquement. Ni voile ni mode modal : on doit pouvoir dessiner
+           et déplacer la carte pendant qu'il reste ouvert. Non refermable non plus — le cran le
+           plus bas fait office de poignée. -->
+      <UDrawer
+        v-if="estMobile"
+        v-model:open="panneauOuvert"
+        :snap-points="CRANS_PANNEAU"
+        :active-snap-point="cranImpose"
+        :modal="false"
+        :overlay="false"
+        :dismissible="false"
+        :ui="UI_PANNEAU"
+        @drag="rendreLaMain"
+      >
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-layers" class="h-5 w-5" />
+            <h2 class="font-semibold">{{ $t('map.zones_list') }}</h2>
+            <UBadge color="neutral" variant="subtle" size="sm">
+              {{ zones.length + markers.length }}
+            </UBadge>
+          </div>
+        </template>
+
+        <template #body>
+          <ZonesLegend
+            :zones="zones"
+            :markers="markers"
+            :editable="true"
+            :loading="deleting || deletingMarker"
+            @edit="handleEditZone"
+            @delete="handleDeleteZone"
+            @focus="handleFocusZone"
+            @edit-marker="handleEditMarker"
+            @delete-marker="handleDeleteMarker"
+            @focus-marker="handleFocusMarker"
+            @toggle-visibility="handleToggleVisibility"
+          />
+        </template>
+      </UDrawer>
     </div>
 
     <!-- Modal création/édition zone -->
@@ -647,8 +715,29 @@ const confirmDelete = async () => {
   zoneToDelete.value = null
 }
 
+/**
+ * Carte plein écran et panneau du bas sur mobile — même mécanisme que la carte publique, dont
+ * cette page reprend la mise en page.
+ */
+const {
+  estMobile,
+  enregistrerSection,
+  carteHauteur,
+  CRANS_PANNEAU,
+  UI_PANNEAU,
+  panneauOuvert,
+  cranImpose,
+  rendreLaMain,
+  replierPanneau,
+} = useCartePleinEcranMobile(map)
+
+/** Repliée par défaut sur mobile ; toujours ouverte au-delà de `lg`, où la place ne manque pas. */
+const configExterneDepliee = ref(false)
+const configExterneVisible = computed(() => configExterneDepliee.value || !estMobile.value)
+
 const handleFocusZone = (zone: EditionZone) => {
   focusOnZone(zone.id)
+  replierPanneau()
 }
 
 // Marker actions
@@ -689,6 +778,7 @@ const confirmDeleteMarker = async () => {
 
 const handleFocusMarker = (marker: EditionMarker) => {
   focusOnMarker(marker.id)
+  replierPanneau()
 }
 
 const handleToggleVisibility = (item: {

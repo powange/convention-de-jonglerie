@@ -994,7 +994,18 @@ export const useLeafletEditable = (
   })
 
   return {
-    map: readonly(map),
+    /**
+     * `shallowReadonly` et non `readonly` : ce dernier enveloppe l'instance Leaflet dans un proxy
+     * profond, qui refuse les écritures que la bibliothèque fait sur ses propres champs internes.
+     * `invalidateSize` s'exécutait alors sans effet, en laissant seulement une trace en console —
+     * « Set operation on key "_sizeChanged" failed: target is readonly ». Résultat visible : une
+     * carte redimensionnée après coup ne dessinait qu'une tuile, et seul un redimensionnement de
+     * la fenêtre la réparait.
+     *
+     * La protection utile est conservée : la référence reste en lecture seule, on ne peut pas la
+     * réaffecter depuis l'extérieur. Seul l'objet cesse d'être emprisonné.
+     */
+    map: shallowReadonly(map),
     isLoading: readonly(isLoading),
     error: readonly(error),
     isDrawing: readonly(isDrawing),

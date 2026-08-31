@@ -584,148 +584,20 @@ watch(
 )
 
 /**
- * En dessous de `lg`, la carte occupe tout ce qui reste sous elle jusqu'au bas de l'écran.
- *
- * La hauteur est **mesurée** et non calculée : ce qui la surplombe — barre d'onglets de l'édition,
- * sélecteur de vue, encart hors ligne — change de hauteur selon l'édition et la largeur de
- * l'écran. Une formule en dur se décalerait au premier onglet ajouté.
- *
- * `dvh` et non `vh` : sur mobile, la barre d'URL se rétracte au défilement, et `vh` fige la
- * hauteur d'avant rétractation — la carte dépasserait alors du bas.
+ * Carte plein écran et panneau du bas, partagés avec la page de gestion de la carte.
+ * Le détail — hauteur mesurée, crans de vaul, avertissement à Leaflet — vit dans le composable.
  */
-const mapSectionRef = ref<HTMLElement | null>(null)
-const estMobile = useMediaQuery('(max-width: 1023px)')
-
-/**
- * Une ref de fonction plutôt qu'un `ref="…"` nommé : la section n'existe qu'une fois zones et
- * marqueurs chargés, donc bien après `onMounted`, et deux branches d'affichage se la partagent.
- */
-const enregistrerSection = (el: unknown) => {
-  if (el) {
-    mapSectionRef.value = el as HTMLElement
-    return
-  }
-  // Vue passe `null` au démontage. Ne pas effacer aveuglément : en basculant d'une vue à l'autre,
-  // la nouvelle section s'enregistre parfois avant que l'ancienne ne se retire, et l'effacement
-  // emporterait alors la référence qu'on vient d'obtenir. On ne libère que si l'élément retenu a
-  // réellement quitté le document.
-  if (mapSectionRef.value && !mapSectionRef.value.isConnected) mapSectionRef.value = null
-}
-
-/**
- * Position de la section, suivie en continu.
- *
- * Observée plutôt que mesurée à la main : au moment où l'élément entre dans le DOM, il n'est pas
- * encore positionné et toute mesure immédiate vaut zéro. `useElementBounding` s'appuie sur un
- * ResizeObserver et se remet à jour quand la géométrie change pour de bon — rotation de l'écran,
- * barre d'onglets qui passe sur deux lignes, encart hors ligne qui apparaît.
- */
-const { top: hautSection } = useElementBounding(mapSectionRef)
-
-const carteHauteur = computed(() => {
-  // `hautSection` est relatif à la fenêtre : le défilement s'y ajoute pour obtenir une distance
-  // au haut du document, qui elle ne bouge pas quand on fait défiler la page.
-  const haut = Math.round(hautSection.value + (import.meta.client ? window.scrollY : 0))
-  // Zéro signale une mise en page pas encore faite : s'y fier donnerait une carte haute d'un écran
-  // entier, débordant largement par le bas.
-  if (haut <= 0) return '24rem'
-  // Un plancher évite une carte inutilisable sur un écran très court ou en paysage.
-  return `max(20rem, calc(100dvh - ${haut}px))`
-})
-
-/**
- * Crans du panneau, du plus discret au plein écran.
- *
- * Le premier est en pixels : une poignée doit garder la même hauteur quel que soit le téléphone,
- * là où un pourcentage la ferait maigrir sur les petits écrans — précisément ceux où elle doit
- * rester saisissable.
- *
- * La valeur est calée sur le contenu : le bandeau de poignée occupe les 28 premiers pixels, le
- * titre s'arrête vers 80, et le premier filtre commence juste après. Le cran s'arrête avant lui —
- * au repos on voit la poignée et le titre, rien de tronqué. Vaul retranche 27 px entre la valeur
- * donnée et la hauteur réellement visible, d'où 111 pour 84 à l'écran.
- *
- * Cela suppose un titre sur une seule ligne. S'il venait à passer sur deux — traduction plus
- * longue, écran très étroit — il faudrait mesurer l'en-tête à l'exécution plutôt que de figer.
- *
- * Le cran actif n'est volontairement pas piloté depuis ici : lier `activeSnapPoint` figeait le
- * panneau entre deux crans dès qu'on le tirait ailleurs que par la poignée, et il y restait.
- * Mesuré : arrêt à 486 px, sans retour, là où vaul laissé libre revient proprement à 511.
- */
-const CRANS_PANNEAU = ['111px', 0.5, 0.92]
-const panneauOuvert = ref(true)
-
-/**
- * Habillage du panneau.
- *
- * La poignée est étendue à toute la largeur : vaul cale sa zone de préhension dessus, et celle
- * d'origine — 48 px au centre — obligeait à viser une bande étroite juste au-dessus de la carte.
- * Un doigt qui la manquait tombait sur Leaflet, qui faisait défiler le plan au lieu d'ouvrir le
- * panneau. Mesuré : de 48 px de large à 390, et le panneau s'ouvre désormais depuis n'importe quel
- * point de la largeur. La barre visible est redessinée en pseudo-élément — elle reste un indice
- * sans redevenir la seule prise.
- */
-const UI_PANNEAU = {
-  content: 'lg:hidden',
-  body: 'overflow-y-auto',
-  // Bandeau de poignée resserré : la marge du thème (16 px) et une hauteur de 32 laissaient
-  // 48 px de vide au-dessus du titre. Ramené à 28. La zone de préhension de vaul reste haute de
-  // 44 px indépendamment de ce bandeau — on gagne du blanc sans rétrécir la cible tactile.
-  //
-  // Centrage par marge automatique et non par `flex` : le thème impose son propre mode d'affichage
-  // à la poignée, et la barre visible se retrouvait plaquée contre le bord gauche.
-  handle:
-    "!mt-2 !w-full !h-5 !bg-transparent !rounded-none pt-2 before:content-[''] before:block " +
-    'before:mx-auto before:w-12 before:h-1.5 before:rounded-full before:bg-accented',
-}
-
-/**
- * Leaflet garde en mémoire la taille de son conteneur : sans cet avertissement, il continue de
- * dessiner pour l'ancienne — tuiles manquantes en bas et clics décalés par rapport à ce qu'on voit.
- */
-watch(carteHauteur, () =>
-  nextTick(() => {
-    // Le composable expose la carte en `readonly()`, ce qui efface le type de ses méthodes. Le
-    // transtypage ne contourne pas une protection : il rend seulement visible une méthode que
-    // l'instance possède bel et bien à l'exécution.
-    const carte = map.value as { invalidateSize?: () => void } | null
-    carte?.invalidateSize?.()
-  })
-)
-
-/**
- * Cran imposé de l'extérieur, le temps d'un repli.
- *
- * `undefined` la plupart du temps : la propriété est alors absente et vaul gère seul ses crans.
- * La lier en permanence le fige entre deux positions dès qu'on tire le panneau ailleurs que par la
- * poignée — vaul n'émet alors aucun changement, la valeur imposée reste la même, et plus rien ne
- * remet la feuille en place. Mesuré : arrêt définitif à 555 px, entre le repos et la moitié.
- *
- * On ne prend donc la main que pour redescendre le panneau, et on la rend juste après.
- */
-const cranImpose = ref<string | number | undefined>(undefined)
-let minuterieRepli: ReturnType<typeof setTimeout> | undefined
-
-/** Rend la main à vaul, qu'on la lui ait reprise par minuterie ou par un geste de l'utilisateur. */
-const rendreLaMain = () => {
-  clearTimeout(minuterieRepli)
-  cranImpose.value = undefined
-}
-
-/**
- * Redescend le panneau au repos après un choix : sans cela, il masque le point qu'on vient de
- * demander à voir.
- */
-const replierPanneau = () => {
-  clearTimeout(minuterieRepli)
-  cranImpose.value = CRANS_PANNEAU[0]
-  // Rendre la main une fois l'animation finie. Trop tôt, la feuille repartirait d'où elle venait.
-  // Un geste de l'utilisateur pendant ce délai la rend aussitôt, via `@drag` : sans cela, une main
-  // posée sur le panneau dans cette fenêtre retomberait sur le blocage décrit plus haut.
-  minuterieRepli = setTimeout(rendreLaMain, 600)
-}
-
-onBeforeUnmount(() => clearTimeout(minuterieRepli))
+const {
+  estMobile,
+  enregistrerSection,
+  carteHauteur,
+  CRANS_PANNEAU,
+  UI_PANNEAU,
+  panneauOuvert,
+  cranImpose,
+  rendreLaMain,
+  replierPanneau,
+} = useCartePleinEcranMobile(map)
 
 const handleFocusZone = (zone: EditionZone) => {
   focusOnZone(zone.id)
