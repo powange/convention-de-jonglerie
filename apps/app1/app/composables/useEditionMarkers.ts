@@ -163,8 +163,18 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
     return executeUpdateMarker(markerId)
   }
 
+  /**
+   * Rend un vrai booléen, là où `execute` ne le peut pas : il rend `null` aussi bien sur un échec
+   * que sur un succès dont le corps est vide — et c'est le cas ici, l'API répondant
+   * `createSuccessResponse(null, …)`. L'appelant qui se fiait à sa valeur croyait donc à un échec
+   * après chaque suppression réussie, et n'en tirait aucune conséquence : le toast annonçait la
+   * suppression, mais le calque restait sur la carte.
+   *
+   * La disparition de la liste est le signal fiable : seul le succès l'y retire.
+   */
   const deleteExistingMarker = async (markerId: number) => {
-    return deleteMarker(markerId)
+    await deleteMarker(markerId)
+    return !markers.value.some((m) => m.id === markerId)
   }
 
   const reorderExistingMarkers = async (markerIds: number[]) => {

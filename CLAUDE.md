@@ -239,5 +239,6 @@ Cette commande s'arrête si une étape échoue.
 - **UProgress** : Barre de progression (`:model-value` + `:max`, indéterminée sans valeur)
 - **ULink** : Lien stylé (équivalent `NuxtLink` intégré au thème Nuxt UI)
 - **UIcon** : Icône (bibliothèque Nuxt Icon, ex. `i-heroicons-*`)
+- **UTooltip** : Infobulle au survol (`text`), utile pour nommer un bouton réduit à son icône
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.
