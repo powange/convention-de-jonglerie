@@ -164,17 +164,12 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
   }
 
   /**
-   * Rend un vrai booléen, là où `execute` ne le peut pas : il rend `null` aussi bien sur un échec
-   * que sur un succès dont le corps est vide — et c'est le cas ici, l'API répondant
-   * `createSuccessResponse(null, …)`. L'appelant qui se fiait à sa valeur croyait donc à un échec
-   * après chaque suppression réussie, et n'en tirait aucune conséquence : le toast annonçait la
-   * suppression, mais le calque restait sur la carte.
-   *
-   * La disparition de la liste est le signal fiable : seul le succès l'y retire.
+   * `execute` rend `null` pour un échec, et seulement pour un échec : `SUCCES_SANS_CONTENU` couvre
+   * le cas de cette API, qui répond `createSuccessResponse(null, …)`. Un simple `Boolean` suffit
+   * donc à en tirer le verdict que l'appelant attend pour retirer l'objet de la carte.
    */
   const deleteExistingMarker = async (markerId: number) => {
-    await deleteMarker(markerId)
-    return !markers.value.some((m) => m.id === markerId)
+    return Boolean(await deleteMarker(markerId))
   }
 
   const reorderExistingMarkers = async (markerIds: number[]) => {
