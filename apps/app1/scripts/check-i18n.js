@@ -58,6 +58,26 @@ function usesLocalScope(content) {
   return /useI18n\(\s*\{\s*useScope:\s*['"]local['"]\s*\}/.test(content)
 }
 
+/**
+ * Le fichier définit-il sa propre fonction `t` ?
+ *
+ * Les pages du guide en ont une : rédigées en français seulement, elles lisent un objet de
+ * libellés local plutôt que l'i18n, pour ne pas s'afficher en clés brutes chez un visiteur dont
+ * l'interface est dans une autre langue. Leurs appels `t('sections.…')` ne visent donc aucune clé
+ * globale — et les prendre pour telles produisait 523 des 531 « clés manquantes » du rapport.
+ *
+ * La destructuration `const { t } = useI18n()` ne compte pas : là, `t` est bien celui de l'i18n.
+ * Seule une liaison à une fonction écrite sur place est retenue.
+ *
+ * À la différence de `usesLocalScope`, réservée aux fichiers Vue, cette règle vaut pour tous : un
+ * module TypeScript qui se donne un `t` maison pose exactement le même problème.
+ */
+function definitSonPropreT(content) {
+  return /(?:^|\n)\s*(?:const|let)\s+t\s*=\s*(?:\(|function\b)|(?:^|\n)\s*function\s+t\s*\(/.test(
+    content
+  )
+}
+
 // Dossiers à exclure de l'analyse (patterns)
 const EXCLUDED_DIRS = [
   'server/generated/', // Fichiers générés par Prisma
@@ -109,6 +129,15 @@ const IGNORED_MISSING_KEYS = [
   // Propriétés JS détectées par erreur (accès objet, pas des clés i18n)
   'data.message',
   'c.renderedHtml',
+  'data.data',
+  'data.errors',
+  'data.value',
+  'e.message',
+  'deleteAction.loading',
+  // Noms d'hôte et de fichier, pas des clés i18n
+  'tile.openstreetmap.org',
+  'server.arcgisonline.com',
+  'fetch.mjs',
   // Path d'erreur Zod (locations.{index}.location) — pas une clé i18n
   'locations.0.location',
 ]
@@ -354,6 +383,11 @@ function extractI18nKeysFromFile(filePath) {
   // Ignorer les fichiers Vue qui utilisent useI18n({ useScope: 'local' })
   // Leurs appels t() référencent des traductions locales (<i18n> bloc), pas des clés globales
   if (filePath.endsWith('.vue') && usesLocalScope(originalContent)) {
+    return keys
+  }
+
+  // Même raison, autre forme : le fichier apporte sa propre fonction `t`.
+  if (definitSonPropreT(originalContent)) {
     return keys
   }
 
