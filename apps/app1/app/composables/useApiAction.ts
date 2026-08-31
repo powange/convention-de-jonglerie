@@ -80,6 +80,19 @@ export interface ApiActionOptions<TData = unknown, TResult = unknown> {
 }
 
 /**
+ * Valeur rendue par `execute` quand l'appel a réussi mais que le serveur n'a rien renvoyé d'utile.
+ *
+ * Sans elle, un succès au corps vide et un échec se ressemblaient : tous deux rendaient `null`.
+ * Aucun appelant ne pouvait donc les distinguer, et 46 endpoints répondent aujourd'hui
+ * `createSuccessResponse(null, …)`. Le défaut s'est vu sur la carte du site : le toast annonçait la
+ * suppression d'un point de repère, mais l'appelant, croyant à un échec, ne retirait jamais le
+ * calque.
+ *
+ * La règle est désormais sans exception : **`null` signifie l'échec, et lui seul**.
+ */
+export const SUCCES_SANS_CONTENU = true as const
+
+/**
  * Retour de useApiAction pour une action simple
  */
 export interface ApiActionReturn<TResult = unknown> {
@@ -89,11 +102,14 @@ export interface ApiActionReturn<TResult = unknown> {
   /** Dernière erreur survenue */
   error: Readonly<Ref<ApiError | null>>
 
-  /** Dernier résultat de l'appel */
+  /**
+   * Charge utile du dernier appel — `null` quand le serveur n'a rien renvoyé, y compris sur un
+   * succès. C'est la valeur rendue par `execute`, et non celle-ci, qui dit si l'appel a abouti.
+   */
   data: Readonly<Ref<TResult | null>>
 
-  /** Exécuter l'action */
-  execute: () => Promise<TResult | null>
+  /** Exécuter l'action. Rend `null` — et uniquement `null` — en cas d'échec. */
+  execute: () => Promise<TResult | typeof SUCCES_SANS_CONTENU | null>
 
   /** Réinitialiser l'état */
   reset: () => void
@@ -115,8 +131,8 @@ export interface ApiActionByIdReturn<TResult = unknown> {
   /** Dernière erreur survenue */
   error: Readonly<Ref<ApiError | null>>
 
-  /** Exécuter l'action pour un ID spécifique */
-  execute: (id: string | number) => Promise<TResult | null>
+  /** Exécuter l'action pour un ID. Rend `null` — et uniquement `null` — en cas d'échec. */
+  execute: (id: string | number) => Promise<TResult | typeof SUCCES_SANS_CONTENU | null>
 
   /** Réinitialiser l'état */
   reset: () => void
@@ -270,7 +286,7 @@ export function useApiAction<TData = unknown, TResult = unknown>(
   /**
    * Exécute l'appel API
    */
-  const execute = async (): Promise<TResult | null> => {
+  const execute = async (): Promise<TResult | typeof SUCCES_SANS_CONTENU | null> => {
     loading.value = true
     error.value = null
 
@@ -311,7 +327,8 @@ export function useApiAction<TData = unknown, TResult = unknown>(
         await navigateTo(destination)
       }
 
-      return unwrapped
+      // Jamais `null` sur un succès : voir `SUCCES_SANS_CONTENU`.
+      return unwrapped ?? SUCCES_SANS_CONTENU
     } catch (e: unknown) {
       const apiError = normalizeError(e)
       error.value = apiError
@@ -436,7 +453,9 @@ export function useApiActionById<TResult = unknown>(
   /**
    * Exécute l'action pour un ID spécifique
    */
-  const execute = async (id: string | number): Promise<TResult | null> => {
+  const execute = async (
+    id: string | number
+  ): Promise<TResult | typeof SUCCES_SANS_CONTENU | null> => {
     loadingId.value = id
     error.value = null
 
@@ -477,7 +496,8 @@ export function useApiActionById<TResult = unknown>(
         await navigateTo(destination)
       }
 
-      return unwrapped
+      // Jamais `null` sur un succès : voir `SUCCES_SANS_CONTENU`.
+      return unwrapped ?? SUCCES_SANS_CONTENU
     } catch (e: unknown) {
       const apiError = normalizeError(e)
       error.value = apiError
