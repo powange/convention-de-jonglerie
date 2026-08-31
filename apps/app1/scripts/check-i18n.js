@@ -388,6 +388,17 @@ function extractI18nKeysFromFile(filePath) {
     addKey(match[1], match.index)
   }
 
+  /**
+   * Un préfixe statique de clé composée est-il exploitable ?
+   *
+   * Il doit contenir un point — sans quoi n'importe quel gabarit d'URL passerait pour une clé — et
+   * s'arrêter sur une frontière de segment. Le point n'est pas la seule : ce projet compose aussi
+   * ses clés au tiret bas (`admin.merge_field_${field.key}`), et n'accepter que le point faisait
+   * passer vingt-cinq clés bien vivantes pour mortes.
+   */
+  const estPrefixeDynamique = (prefixe) =>
+    Boolean(prefixe) && prefixe.includes('.') && (prefixe.endsWith('.') || prefixe.endsWith('_'))
+
   // t(`key`) avec template littéraux (backticks)
   const tTemplateRegex = /\bt\(\s*`([^`]+)`\s*\)/g
   while ((match = tTemplateRegex.exec(content)) !== null) {
@@ -399,7 +410,7 @@ function extractI18nKeysFromFile(filePath) {
 
       // Pour les clés dynamiques comme admin.feedback.types.${...},
       // on va chercher les clés possibles dans le fichier de traduction
-      if (staticParts[0] && staticParts[0].endsWith('.')) {
+      if (estPrefixeDynamique(staticParts[0])) {
         const prefix = staticParts[0]
         // Marquer le préfixe comme utilisé pour les clés dynamiques
         addKey('__DYNAMIC_PREFIX__' + prefix, match.index)
@@ -416,11 +427,26 @@ function extractI18nKeysFromFile(filePath) {
     const template = match[1]
     if (template.includes('${')) {
       const staticParts = template.split(/\$\{[^}]+\}/)
-      if (staticParts[0] && staticParts[0].endsWith('.')) {
+      if (estPrefixeDynamique(staticParts[0])) {
         addKey('__DYNAMIC_PREFIX__' + staticParts[0], match.index)
       }
     } else {
       addKey(template, match.index)
+    }
+  }
+
+  // Clés composées hors d'un appel t(). Le service de notifications, par exemple, ne traduit pas
+  // lui-même : il enregistre la clé dans la notification (`titleKey`, `messageKey`, `actionTextKey`)
+  // et la traduction a lieu plus tard, côté client. Ces clés-là sont bien utilisées, mais aucun
+  // `t()` ne les entoure — les douze rappels d'échéance passaient ainsi pour morts.
+  //
+  // Les deux blocs ci-dessus gardent leur raison d'être : eux seuls enregistrent comme clé entière
+  // un gabarit *sans* interpolation, que celui-ci ne saurait traiter.
+  const gabaritLibreRegex = /`([^`]*\$\{[^`]*)`/g
+  while ((match = gabaritLibreRegex.exec(content)) !== null) {
+    const prefixe = match[1].split(/\$\{[^}]+\}/)[0]
+    if (estPrefixeDynamique(prefixe)) {
+      addKey('__DYNAMIC_PREFIX__' + prefixe, match.index)
     }
   }
 
