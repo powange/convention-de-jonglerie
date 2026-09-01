@@ -801,6 +801,8 @@
     "backup_restore_step_files": "Восстановление файлов…",
     "backup_restore_step_preparation": "Подготовка резервной копии…",
     "backup_restore_tables_seen": "Обработано таблиц: {count}",
-    "backup_restore_interrupted_description": "Сервер перезапустился во время восстановления: база данных может быть неполной. Запустите восстановление заново."
+    "backup_restore_interrupted_description": "Сервер перезапустился во время восстановления: база данных может быть неполной. Запустите восстановление заново.",
+    "backup_import_resumed": "Загрузка возобновлена",
+    "backup_import_resumed_description": "Эта резервная копия уже была загружена на {percent} %. Сейчас отправляется только остаток."
   }
 }

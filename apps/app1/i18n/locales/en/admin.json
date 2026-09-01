@@ -801,6 +801,8 @@
     "backup_restore_step_files": "Restoring the files…",
     "backup_restore_step_preparation": "Preparing the backup…",
     "backup_restore_tables_seen": "Tables processed: {count}",
-    "backup_restore_interrupted_description": "The server restarted during the restore: the database may be incomplete. Run the restore again."
+    "backup_restore_interrupted_description": "The server restarted during the restore: the database may be incomplete. Run the restore again.",
+    "backup_import_resumed": "Upload resumed",
+    "backup_import_resumed_description": "This backup was already {percent}% uploaded. Only the rest is being sent now."
   }
 }

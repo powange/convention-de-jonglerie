@@ -801,6 +801,8 @@
     "backup_restore_step_files": "Obnovování souborů…",
     "backup_restore_step_preparation": "Příprava zálohy…",
     "backup_restore_tables_seen": "Zpracované tabulky: {count}",
-    "backup_restore_interrupted_description": "Server se během obnovení restartoval: databáze může být neúplná. Spusťte obnovení znovu."
+    "backup_restore_interrupted_description": "Server se během obnovení restartoval: databáze může být neúplná. Spusťte obnovení znovu.",
+    "backup_import_resumed": "Nahrávání obnoveno",
+    "backup_import_resumed_description": "Tato záloha už byla nahrána z {percent} %. Nyní se odesílá jen zbytek."
   }
 }

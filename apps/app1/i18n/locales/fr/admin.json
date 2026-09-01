@@ -144,6 +144,8 @@
     "backup_import_button": "Importer sans restaurer",
     "backup_import_error": "Erreur lors de l'import de la sauvegarde",
     "backup_import_hint": "L'import ajoute le fichier à la liste ci-dessous sans toucher à la base de données.",
+    "backup_import_resumed": "Reprise de l'envoi",
+    "backup_import_resumed_description": "Cette sauvegarde était déjà envoyée à {percent} %. Seul le reste part maintenant.",
     "backup_import_success": "Sauvegarde importée",
     "backup_import_success_description": "Le fichier {filename} a été ajouté aux sauvegardes disponibles",
     "backup_importing": "Import en cours...",

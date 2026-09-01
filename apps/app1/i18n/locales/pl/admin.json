@@ -801,6 +801,8 @@
     "backup_restore_step_files": "Przywracanie plików…",
     "backup_restore_step_preparation": "Przygotowywanie kopii zapasowej…",
     "backup_restore_tables_seen": "Przetworzone tabele: {count}",
-    "backup_restore_interrupted_description": "Serwer uruchomił się ponownie podczas przywracania: baza danych może być niekompletna. Uruchom przywracanie ponownie."
+    "backup_restore_interrupted_description": "Serwer uruchomił się ponownie podczas przywracania: baza danych może być niekompletna. Uruchom przywracanie ponownie.",
+    "backup_import_resumed": "Wznowiono wysyłanie",
+    "backup_import_resumed_description": "Ta kopia zapasowa była już wysłana w {percent} %. Teraz wysyłana jest tylko reszta."
   }
 }
