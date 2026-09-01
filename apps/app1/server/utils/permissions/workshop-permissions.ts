@@ -27,9 +27,19 @@ export async function canManageWorkshopLocations(
  * Vérifie si un utilisateur peut créer un workshop pour une édition donnée
  * Un utilisateur peut créer un workshop s'il est :
  * - Bénévole accepté de l'édition
+ * - Artiste de l'édition
  * - Organisateur de l'édition
  * - Organisateur de la convention
  * - Participant à l'édition (a un billet valide)
+ *
+ * Les artistes ont été ajoutés après coup : proposer un atelier fait partie ordinaire de leur
+ * venue, et rien ne justifiait qu'un artiste programmé ait moins de droits qu'un participant
+ * muni d'un billet.
+ *
+ * Le critère est l'inscription à la programmation (`EditionArtist`), et non une candidature
+ * acceptée : cette ligne n'existe qu'une fois l'artiste importé ou ajouté par un organisateur,
+ * geste qui l'engage réellement. Une candidature acceptée mais pas encore importée ne donne
+ * donc pas ce droit.
  */
 export async function canCreateWorkshop(userId: number, editionId: number): Promise<boolean> {
   // Vérifier si l'utilisateur est admin global et récupérer son email
@@ -92,6 +102,16 @@ export async function canCreateWorkshop(userId: number, editionId: number): Prom
   })
 
   if (volunteerApplication) {
+    return true
+  }
+
+  // Vérifier si l'utilisateur est artiste de l'édition
+  const artiste = await prisma.editionArtist.findFirst({
+    where: { editionId, userId },
+    select: { id: true },
+  })
+
+  if (artiste) {
     return true
   }
 

@@ -29,7 +29,7 @@ export default wrapApiHandler(
       throw createError({
         status: 403,
         message:
-          'Vous devez être bénévole accepté, organisateur ou participant pour créer un workshop',
+          'Vous devez être bénévole accepté, artiste, organisateur ou participant pour créer un workshop',
       })
     }
 
