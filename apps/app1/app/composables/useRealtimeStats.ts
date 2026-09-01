@@ -10,7 +10,23 @@ const sseConnections = new Map<
   }
 >()
 
-export function useRealtimeStats(editionId: Ref<number> | number) {
+/**
+ * Flux temps réel des statistiques de billetterie.
+ *
+ * @param actif Faut-il ouvrir le flux ? Par défaut oui, ce qui préserve les appelants existants.
+ *   La page de contrôle d'accès, elle, n'est ouverte aux bénévoles que **pendant** leur créneau :
+ *   hors créneau, le serveur refuse le flux, et le client réessayait cinq fois à trois secondes.
+ *   Chaque visite laissait ainsi six 403 dans les journaux de production — trente-sept en quatre
+ *   jours — pour une porte qu'on savait fermée avant de frapper.
+ *
+ *   Un refus d'autorisation ne se rattrape pas en attendant : mieux vaut ne pas ouvrir le flux que
+ *   réessayer. Et `EventSource` n'expose pas le code HTTP à `onerror`, donc le client ne peut pas
+ *   distinguer un refus d'une coupure réseau — la décision doit se prendre ici, où on la connaît.
+ */
+export function useRealtimeStats(
+  editionId: Ref<number> | number,
+  actif: Ref<boolean> | (() => boolean) = () => true
+) {
   // Ne rien faire côté serveur
   if (import.meta.server) {
     return {
@@ -23,7 +39,11 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
   const editionIdRef = ref(editionId)
   const editionIdValue = editionIdRef.value
 
-  // Vérifier si une connexion existe déjà pour cette édition
+  // Vérifier si une connexion existe déjà pour cette édition.
+  //
+  // On rend alors les mêmes refs sans rien ouvrir : le premier appelant s'en est chargé. Cela
+  // suppose qu'il était autorisé — ce que garantit l'usage actuel, les composants qui partagent
+  // ce flux n'étant montés que dans une page déjà accessible.
   if (sseConnections.has(editionIdValue)) {
     const existing = sseConnections.get(editionIdValue)!
     if (import.meta.dev) {
@@ -180,9 +200,16 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
       }
     })
 
-    onMounted(() => {
-      connect(editionIdValue)
-    })
+    // La condition d'activation devient vraie plus tard qu'au montage : elle dépend de l'édition
+    // chargée et des droits, tous deux obtenus de façon asynchrone.
+    watch(
+      () => toValue(actif),
+      (autorise) => {
+        if (autorise) connect(editionIdValue)
+        else disconnect(editionIdValue)
+      },
+      { immediate: true }
+    )
 
     onUnmounted(() => {
       cleanup(editionIdValue)
@@ -192,6 +219,8 @@ export function useRealtimeStats(editionId: Ref<number> | number) {
   return {
     isConnected,
     lastUpdate,
-    reconnect: () => connect(editionIdValue),
+    reconnect: () => {
+      if (toValue(actif)) connect(editionIdValue)
+    },
   }
 }
