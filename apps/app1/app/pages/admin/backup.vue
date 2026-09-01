@@ -317,12 +317,22 @@
 
       <template #footer>
         <div class="flex justify-end gap-3">
-          <UButton variant="outline" :disabled="restoring" @click="showConfirmModal = false">
+          <UButton
+            variant="outline"
+            :disabled="restoring || importing"
+            @click="showConfirmModal = false"
+          >
             {{ $t('common.cancel') }}
           </UButton>
-          <UButton color="error" :loading="restoring" @click="confirmRestore">
+          <!-- Un fichier local est d'abord envoyé en tranches : cette phase peut durer plusieurs
+               minutes, et le bouton doit la montrer plutôt que de paraître inactif. -->
+          <UButton color="error" :loading="restoring || importing" @click="confirmRestore">
             <UIcon name="i-heroicons-arrow-up-tray" class="h-4 w-4" />
-            {{ $t('admin.backup_restore_confirm') }}
+            {{
+              importing
+                ? `${$t('admin.backup_importing')} ${progressionImport}%`
+                : $t('admin.backup_restore_confirm')
+            }}
           </UButton>
         </div>
       </template>
@@ -446,7 +456,7 @@ const handleFileUpload = (event: Event) => {
   target.value = ''
 }
 
-// Importer une sauvegarde sans la restaurer
+// Envoi d'un fichier de sauvegarde, partagé par l'import seul et par la restauration
 const pendingImport = ref<File | null>(null)
 
 /**
@@ -463,10 +473,53 @@ const pendingImport = ref<File | null>(null)
  */
 const TAILLE_TRANCHE = 5 * 1024 * 1024
 
+/**
+ * Envoi en cours, retenu d'une visite à l'autre.
+ *
+ * Une coupure survient précisément quand l'onglet se ferme ou que l'application est mise en
+ * veille : sans trace persistante, l'utilisateur devrait tout recommencer. Ne sont retenus que
+ * l'identifiant et de quoi reconnaître le fichier — jamais son contenu, que le navigateur ne
+ * saurait de toute façon pas conserver.
+ *
+ * Un seul envoi est retenu à la fois : en commencer un autre oublie le précédent, dont le fichier
+ * partiel sera nettoyé côté serveur au bout d'un jour. Retenir plusieurs reprises simultanées
+ * compliquerait la mémoire pour un cas qui ne se présente pas — on n'envoie pas deux sauvegardes
+ * de front.
+ */
+const CLE_ENVOI_EN_COURS = 'admin-backup-envoi-en-cours'
+
+interface EnvoiMemorise {
+  id: string
+  nom: string
+  taille: number
+}
+
+const lireEnvoiMemorise = (): EnvoiMemorise | null => {
+  try {
+    const brut = localStorage.getItem(CLE_ENVOI_EN_COURS)
+    return brut ? (JSON.parse(brut) as EnvoiMemorise) : null
+  } catch {
+    return null
+  }
+}
+
+const ecrireEnvoiMemorise = (envoi: EnvoiMemorise | null) => {
+  try {
+    if (envoi) localStorage.setItem(CLE_ENVOI_EN_COURS, JSON.stringify(envoi))
+    else localStorage.removeItem(CLE_ENVOI_EN_COURS)
+  } catch {
+    // Un navigateur qui refuse le stockage local ne doit pas empêcher un envoi, seulement sa reprise.
+  }
+}
+
 /** Tranche en cours, lue par `body` et `headers` à chaque appel. */
-const trancheEnCours = ref<{ contenu: Blob; offset: number; total: number; id: string } | null>(
-  null
-)
+const trancheEnCours = ref<{
+  contenu: Blob
+  offset: number
+  total: number
+  id: string
+  nom: string
+} | null>(null)
 
 /** Progression de l'envoi, en pourcentage, affichée sur le bouton. */
 const progressionImport = ref(0)
@@ -482,7 +535,7 @@ const { execute: envoyerTranche } = useApiAction<
   headers: () => ({
     'content-type': 'application/octet-stream',
     // encodeURIComponent : un en-tête HTTP n'accepte pas les accents ni les emojis
-    'x-backup-filename': encodeURIComponent(pendingImport.value?.name ?? ''),
+    'x-backup-filename': encodeURIComponent(trancheEnCours.value!.nom),
     'x-backup-upload-id': trancheEnCours.value!.id,
     'x-backup-offset': String(trancheEnCours.value!.offset),
     'x-backup-total': String(trancheEnCours.value!.total),
@@ -491,37 +544,76 @@ const { execute: envoyerTranche } = useApiAction<
   errorMessages: { default: t('admin.backup_import_error') },
 })
 
+const idAvancement = ref('')
+const { execute: demanderAvancement } = useApiAction<never, { recu: number }>(
+  () => `/api/admin/backup/upload-status?uploadId=${encodeURIComponent(idAvancement.value)}`,
+  { method: 'GET', silent: true }
+)
+
 const importing = ref(false)
 
 /**
- * Envoie le fichier tranche par tranche, dans l'ordre.
+ * Où reprendre un envoi ?
+ *
+ * Le client sait quelles tranches il a envoyées, mais pas lesquelles sont réellement arrivées, et
+ * sa mémoire peut être périmée — le fichier partiel est effacé au bout d'un jour. C'est donc le
+ * serveur qui tranche. Le fichier est reconnu à son nom et à sa taille : deux archives distinctes
+ * ne se confondront pas, et une même archive resélectionnée sera bien reconnue.
+ */
+const determinerDepart = async (fichier: File): Promise<{ id: string; depart: number }> => {
+  const memorise = lireEnvoiMemorise()
+  if (memorise?.nom === fichier.name && memorise.taille === fichier.size) {
+    idAvancement.value = memorise.id
+    const etat = await demanderAvancement()
+    const recu = etat && typeof etat === 'object' ? etat.recu : 0
+    // Un envoi déjà complet côté serveur n'aurait pas de tranche à envoyer : on repart de zéro
+    // plutôt que de boucler dans le vide.
+    if (recu > 0 && recu < fichier.size) return { id: memorise.id, depart: recu }
+  }
+  return { id: crypto.randomUUID(), depart: 0 }
+}
+
+/**
+ * Envoie le fichier tranche par tranche et rend le nom sous lequel le serveur l'a rangé.
  *
  * Séquentiel et non parallèle : le serveur refuse une tranche dont la position ne correspond pas
  * à ce qu'il a déjà reçu, ce qui garantit qu'une archive reconstituée est exacte — une tranche
  * rejouée ou arrivée dans le désordre produirait un fichier corrompu, qui ne se verrait qu'au
  * moment d'une restauration.
+ *
+ * Rend `null` si l'envoi n'a pas abouti ; la mémoire de reprise est alors conservée.
  */
-const executeImport = async () => {
-  const fichier = pendingImport.value
-  if (!fichier) return
+const envoyerFichierEnTranches = async (fichier: File): Promise<string | null> => {
+  const { id, depart } = await determinerDepart(fichier)
+  ecrireEnvoiMemorise({ id, nom: fichier.name, taille: fichier.size })
 
-  const id = crypto.randomUUID()
+  if (depart > 0) {
+    toast.add({
+      color: 'info',
+      title: t('admin.backup_import_resumed'),
+      description: t('admin.backup_import_resumed_description', {
+        percent: Math.round((depart / fichier.size) * 100),
+      }),
+    })
+  }
+
   importing.value = true
-  progressionImport.value = 0
+  progressionImport.value = Math.round((depart / fichier.size) * 100)
 
   try {
-    for (let offset = 0; offset < fichier.size; offset += TAILLE_TRANCHE) {
+    for (let offset = depart; offset < fichier.size; offset += TAILLE_TRANCHE) {
       trancheEnCours.value = {
         contenu: fichier.slice(offset, Math.min(offset + TAILLE_TRANCHE, fichier.size)),
         offset,
         total: fichier.size,
         id,
+        nom: fichier.name,
       }
       const reponse = await envoyerTranche()
       // `useApiAction` ne rend `null` que sur un échec, et le toast d'erreur a déjà été montré :
-      // on s'arrête là. Le fichier partiel reste côté serveur, ce qui permettrait une reprise.
+      // on s'arrête là. Le fichier partiel reste côté serveur, et la mémoire de reprise avec lui.
       // Le contrôle de forme couvre le cas où l'API cesserait un jour de renvoyer un corps.
-      if (!reponse || typeof reponse !== 'object') return
+      if (!reponse || typeof reponse !== 'object') return null
 
       // Borné à la taille du fichier : la dernière tranche est plus courte que les autres, et
       // compter une tranche pleine afficherait « 103 % ».
@@ -529,22 +621,35 @@ const executeImport = async () => {
       progressionImport.value = Math.round((envoye / fichier.size) * 100)
 
       if (reponse.termine) {
-        toast.add({
-          color: 'success',
-          title: t('admin.backup_import_success'),
-          description: t('admin.backup_import_success_description', {
-            filename: reponse.storedFilename ?? fichier.name,
-          }),
-        })
-        await loadBackups()
-        return
+        ecrireEnvoiMemorise(null)
+        return reponse.storedFilename ?? null
       }
     }
+    return null
   } finally {
     importing.value = false
     trancheEnCours.value = null
-    pendingImport.value = null
     progressionImport.value = 0
+  }
+}
+
+/** Import seul : le fichier est déposé côté serveur, rien n'est restauré. */
+const executeImport = async () => {
+  const fichier = pendingImport.value
+  if (!fichier) return
+
+  try {
+    const storedFilename = await envoyerFichierEnTranches(fichier)
+    if (!storedFilename) return
+
+    toast.add({
+      color: 'success',
+      title: t('admin.backup_import_success'),
+      description: t('admin.backup_import_success_description', { filename: storedFilename }),
+    })
+    await loadBackups()
+  } finally {
+    pendingImport.value = null
   }
 }
 
@@ -555,14 +660,15 @@ const restoreBackup = (filename: string) => {
 }
 
 // Confirmer la restauration
-const buildRestoreBody = () => {
-  if (typeof pendingRestore.value === 'string') {
-    return { filename: pendingRestore.value }
-  }
-  const formData = new FormData()
-  formData.append('file', pendingRestore.value as File)
-  return formData
-}
+/**
+ * La requête ne transporte plus que le nom d'une sauvegarde déjà présente côté serveur.
+ *
+ * Un fichier choisi sur l'appareil est envoyé au préalable, en tranches (voir `confirmRestore`) :
+ * l'ancien envoi d'un seul tenant chargeait l'archive entière en mémoire côté serveur et
+ * n'aboutissait pas depuis un téléphone, où quelques minutes suffisent à faire suspendre la
+ * requête.
+ */
+const buildRestoreBody = () => ({ filename: pendingRestore.value as string })
 
 // La restauration tourne côté serveur : la requête ne fait que la lancer, c'est le suivi
 // qui dira quand elle est terminée — et ce qu'elle a donné.
@@ -675,8 +781,18 @@ const restaurationVisuel = computed(() => {
   }
 })
 
-const confirmRestore = () => {
+const confirmRestore = async () => {
   if (!pendingRestore.value) return
+
+  // Un fichier local devient d'abord une sauvegarde déposée côté serveur, puis la restauration
+  // se déclenche par son nom — le chemin que la page emprunte déjà pour les sauvegardes listées.
+  if (typeof pendingRestore.value !== 'string') {
+    const storedFilename = await envoyerFichierEnTranches(pendingRestore.value)
+    if (!storedFilename) return
+    pendingRestore.value = storedFilename
+    await loadBackups()
+  }
+
   executeRestore()
 }
 

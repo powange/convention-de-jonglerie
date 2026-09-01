@@ -801,6 +801,8 @@
     "backup_restore_step_files": "A restaurar os ficheiros…",
     "backup_restore_step_preparation": "A preparar a cópia de segurança…",
     "backup_restore_tables_seen": "Tabelas processadas: {count}",
-    "backup_restore_interrupted_description": "O servidor reiniciou durante o restauro: a base de dados pode estar incompleta. Volta a lançar o restauro."
+    "backup_restore_interrupted_description": "O servidor reiniciou durante o restauro: a base de dados pode estar incompleta. Volta a lançar o restauro.",
+    "backup_import_resumed": "Envio retomado",
+    "backup_import_resumed_description": "Esta cópia de segurança já tinha sido enviada a {percent} %. Agora só é enviado o resto."
   }
 }

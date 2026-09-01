@@ -801,6 +801,8 @@
     "backup_restore_step_files": "Återställer filerna…",
     "backup_restore_step_preparation": "Förbereder säkerhetskopian…",
     "backup_restore_tables_seen": "Behandlade tabeller: {count}",
-    "backup_restore_interrupted_description": "Servern startade om under återställningen: databasen kan vara ofullständig. Kör återställningen igen."
+    "backup_restore_interrupted_description": "Servern startade om under återställningen: databasen kan vara ofullständig. Kör återställningen igen.",
+    "backup_import_resumed": "Uppladdningen återupptogs",
+    "backup_import_resumed_description": "Den här säkerhetskopian var redan uppladdad till {percent} %. Endast resten skickas nu."
   }
 }
