@@ -666,9 +666,6 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 // Vérifier les permissions de contrôle d'accès pour les bénévoles en créneau
 const { canAccessAccessControl } = useAccessControlPermissions(editionId)
 
-// SSE pour rafraîchissement automatique
-const { lastUpdate } = useRealtimeStats(editionId)
-
 // Paramètres de billetterie
 const { settings: ticketingSettings, fetchSettings: fetchTicketingSettings } =
   useTicketingSettings(editionId)
@@ -790,6 +787,14 @@ const canAccess = computed(() => {
 
   return false
 })
+
+// SSE pour rafraîchissement automatique, ouvert seulement si la page est accessible.
+//
+// Déclaré ici, et non plus au début : le flux dépend de `canAccess`, qui n'est connu qu'une fois
+// l'édition chargée et les droits résolus. Un bénévole hors de son créneau voyait autrement le
+// client réessayer cinq fois un refus d'autorisation — six 403 dans les journaux par visite, pour
+// une porte qu'on savait fermée.
+const { lastUpdate } = useRealtimeStats(editionId, canAccess)
 
 const startScanner = () => {
   scannerOpen.value = true
