@@ -101,7 +101,13 @@
                 @click="openFileDialog('import')"
               >
                 <UIcon name="i-heroicons-inbox-arrow-down" class="h-4 w-4" />
-                {{ importing ? $t('admin.backup_importing') : $t('admin.backup_import_button') }}
+                <!-- L'envoi se compte en minutes depuis un téléphone : sans le pourcentage, rien
+                     ne distingue une progression normale d'un blocage. -->
+                {{
+                  importing
+                    ? `${$t('admin.backup_importing')} ${progressionImport}%`
+                    : $t('admin.backup_import_button')
+                }}
               </UButton>
             </div>
             <p class="text-xs text-gray-500 mt-2">
@@ -443,36 +449,104 @@ const handleFileUpload = (event: Event) => {
 // Importer une sauvegarde sans la restaurer
 const pendingImport = ref<File | null>(null)
 
-const { execute: executeImport, loading: importing } = useApiAction<
-  File,
-  { storedFilename: string }
+/**
+ * Taille d'une tranche.
+ *
+ * Un envoi d'un seul tenant suppose que la connexion tienne du début à la fin. Depuis un
+ * téléphone, une archive de 80 Mo met plusieurs minutes : l'écran s'éteint, l'application passe
+ * en arrière-plan, et la requête reste suspendue sans jamais aboutir — le rond tourne
+ * indéfiniment. Découpé, chaque envoi ne dure que quelques secondes.
+ *
+ * 5 Mo est un compromis : assez grand pour que le coût par requête reste négligeable sur une
+ * archive de plusieurs dizaines de mégaoctets, assez petit pour qu'une tranche passe même sur
+ * une liaison médiocre.
+ */
+const TAILLE_TRANCHE = 5 * 1024 * 1024
+
+/** Tranche en cours, lue par `body` et `headers` à chaque appel. */
+const trancheEnCours = ref<{ contenu: Blob; offset: number; total: number; id: string } | null>(
+  null
+)
+
+/** Progression de l'envoi, en pourcentage, affichée sur le bouton. */
+const progressionImport = ref(0)
+
+const { execute: envoyerTranche } = useApiAction<
+  Blob,
+  { storedFilename?: string; termine: boolean; recu: number }
 >('/api/admin/backup/upload', {
   method: 'POST',
-  // Fichier brut plutôt que multipart : le serveur l'écrit en flux sur le disque,
+  // Contenu brut plutôt que multipart : le serveur l'écrit en flux sur le disque,
   // ce qui permet d'importer une archive de plusieurs centaines de Mo
-  body: () => pendingImport.value as File,
+  body: () => trancheEnCours.value!.contenu,
   headers: () => ({
     'content-type': 'application/octet-stream',
     // encodeURIComponent : un en-tête HTTP n'accepte pas les accents ni les emojis
     'x-backup-filename': encodeURIComponent(pendingImport.value?.name ?? ''),
+    'x-backup-upload-id': trancheEnCours.value!.id,
+    'x-backup-offset': String(trancheEnCours.value!.offset),
+    'x-backup-total': String(trancheEnCours.value!.total),
   }),
   silentSuccess: true,
   errorMessages: { default: t('admin.backup_import_error') },
-  onSuccess: async (response: { storedFilename: string }) => {
-    pendingImport.value = null
-    toast.add({
-      color: 'success',
-      title: t('admin.backup_import_success'),
-      description: t('admin.backup_import_success_description', {
-        filename: response.storedFilename,
-      }),
-    })
-    await loadBackups()
-  },
-  onError: () => {
-    pendingImport.value = null
-  },
 })
+
+const importing = ref(false)
+
+/**
+ * Envoie le fichier tranche par tranche, dans l'ordre.
+ *
+ * Séquentiel et non parallèle : le serveur refuse une tranche dont la position ne correspond pas
+ * à ce qu'il a déjà reçu, ce qui garantit qu'une archive reconstituée est exacte — une tranche
+ * rejouée ou arrivée dans le désordre produirait un fichier corrompu, qui ne se verrait qu'au
+ * moment d'une restauration.
+ */
+const executeImport = async () => {
+  const fichier = pendingImport.value
+  if (!fichier) return
+
+  const id = crypto.randomUUID()
+  importing.value = true
+  progressionImport.value = 0
+
+  try {
+    for (let offset = 0; offset < fichier.size; offset += TAILLE_TRANCHE) {
+      trancheEnCours.value = {
+        contenu: fichier.slice(offset, Math.min(offset + TAILLE_TRANCHE, fichier.size)),
+        offset,
+        total: fichier.size,
+        id,
+      }
+      const reponse = await envoyerTranche()
+      // `useApiAction` ne rend `null` que sur un échec, et le toast d'erreur a déjà été montré :
+      // on s'arrête là. Le fichier partiel reste côté serveur, ce qui permettrait une reprise.
+      // Le contrôle de forme couvre le cas où l'API cesserait un jour de renvoyer un corps.
+      if (!reponse || typeof reponse !== 'object') return
+
+      // Borné à la taille du fichier : la dernière tranche est plus courte que les autres, et
+      // compter une tranche pleine afficherait « 103 % ».
+      const envoye = Math.min(offset + TAILLE_TRANCHE, fichier.size)
+      progressionImport.value = Math.round((envoye / fichier.size) * 100)
+
+      if (reponse.termine) {
+        toast.add({
+          color: 'success',
+          title: t('admin.backup_import_success'),
+          description: t('admin.backup_import_success_description', {
+            filename: reponse.storedFilename ?? fichier.name,
+          }),
+        })
+        await loadBackups()
+        return
+      }
+    }
+  } finally {
+    importing.value = false
+    trancheEnCours.value = null
+    pendingImport.value = null
+    progressionImport.value = 0
+  }
+}
 
 // Restaurer une sauvegarde existante
 const restoreBackup = (filename: string) => {

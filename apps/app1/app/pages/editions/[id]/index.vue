@@ -59,7 +59,11 @@
       <!-- Contenu des détails en grille responsive -->
       <main class="grid xl:grid-cols-5 2xl:grid-cols-5 gap-6" role="main">
         <!-- Contenu principal "A propos de cette édition" -->
-        <div class="xl:col-span-4 2xl:col-span-4 flex flex-col space-y-6">
+        <!-- `min-w-0` : un fils de grille ne descend pas, par défaut, sous la largeur de son
+             contenu le plus large. Une adresse insécable dans la description imposait donc 407 px
+             à une colonne de 358, et la page débordait de l'écran — l'affiche voisine paraissant
+             mal dimensionnée. -->
+        <div class="xl:col-span-4 2xl:col-span-4 min-w-0 flex flex-col space-y-6">
           <UCard variant="subtle">
             <!-- Affiche de l'édition et description -->
             <div class="flex flex-col sm:flex-row gap-6">
@@ -76,13 +80,18 @@
                   @keydown.space.prevent="showImageOverlay = true"
                 />
               </div>
-              <div class="flex-1">
+              <!-- `min-w-0` : sans lui, un fils de boîte flexible ne descend pas sous la largeur
+                   de son plus long mot. Une adresse insécable dans la description imposait donc
+                   sa largeur à toute la colonne — 423 px pour une fenêtre de 390 — et l'affiche
+                   voisine s'en trouvait décalée. `break-words` seul n'y suffit pas : il autorise
+                   la coupure au rendu, mais ne change pas la largeur minimale intrinsèque. -->
+              <div class="min-w-0 flex-1">
                 <h3 id="about-heading" class="text-lg font-semibold mb-2">
                   {{ $t('edition.about_this_edition') }}
                 </h3>
                 <div
                   v-if="edition.description && descriptionHtml"
-                  class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+                  class="prose prose-sm max-w-none break-words text-gray-700 dark:text-gray-300"
                   aria-labelledby="about-heading"
                 >
                   <!-- Contenu HTML déjà nettoyé via markdownToHtml (rehype-sanitize) -->
