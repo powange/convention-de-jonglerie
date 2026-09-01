@@ -24,7 +24,8 @@
           >
             <UIcon name="i-heroicons-building-library" class="text-gray-400" size="24" />
           </div>
-          <div class="flex-1">
+          <!-- `min-w-0` : voir la page de l’édition, même piège d’adresse insécable. -->
+          <div class="min-w-0 flex-1">
             <div class="flex items-start justify-between gap-1">
               <!-- En mode compact, l'interligne compte autant que la taille : c'est lui qui fixe
                    la hauteur de la ligne, pas la police. -->
@@ -464,7 +465,7 @@
           <!-- Description de la convention -->
           <div
             v-if="edition.convention?.description && conventionDescriptionHtml"
-            class="prose prose-sm max-w-none text-gray-700 dark:text-gray-300"
+            class="prose prose-sm max-w-none break-words text-gray-700 dark:text-gray-300"
           >
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div v-html="conventionDescriptionHtml" />
