@@ -158,11 +158,26 @@
           <!-- Le panneau porte le nom de l'édition : il rappelle où l'on se trouve, alors même
                qu'il recouvre la page. « Onglets de navigation » reste en description, pour les
                lecteurs d'écran, où ce libellé a du sens mais ferait jargon à l'écran. -->
+          <!-- `z-50` explicite, à titre PRÉVENTIF.
+
+               Nuxt UI ne pose aucun `z-index` : ses surcouches s'empilent par ordre du DOM. Le
+               tiroir des zones de la carte du site reste monté en permanence, et selon l'ordre
+               où il atterrit il peut se retrouver dessiné par-dessus un menu ouvert. C'est ce
+               qui arrivait à la barre latérale de gestion, où le défaut a été mesuré et corrigé
+               de la même façon.
+
+               Ici, le défaut a été signalé mais n'a PAS pu être reproduit : à la mesure, le
+               tiroir s'insère avant ce panneau, qui est donc déjà au-dessus. Ce `z-50` ne
+               corrige donc rien de démontré — il remplace un ordre heureux par une règle.
+
+               À savoir si l'on revient là-dessus : ce tiroir est en `pointer-events: none`, donc
+               transparent au survol tout en restant opaque à l'œil. Mesurer avec
+               `elementFromPoint` conclut à tort que tout va bien. -->
           <USlideover
             v-model:open="menuMobileOuvert"
             side="left"
             :description="$t('navigation.tabs')"
-            :ui="{ description: 'sr-only' }"
+            :ui="{ description: 'sr-only', overlay: 'z-50', content: 'z-50' }"
           >
             <!-- Titre par le slot : un nom de convention un peu long doit passer à la ligne
                  plutôt que d'être coupé, et la marge à droite lui évite de courir sous la
