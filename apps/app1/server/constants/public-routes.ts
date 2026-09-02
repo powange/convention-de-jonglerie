@@ -136,3 +136,27 @@ export const publicRoutes: PublicRoute[] = [
   { path: '/api/project-costs/checkout', methods: ['POST'] },
   { path: '/api/project-costs/webhook', methods: ['POST'] },
 ]
+
+/**
+ * Cette route est-elle publique pour cette méthode ?
+ *
+ * Extraite du middleware pour être vérifiable : la règle qui décide, pour chaque requête, entre
+ * « ouvert à tous » et « 401 » ne pouvait pas être éprouvée tant qu'elle vivait dans un
+ * `defineEventHandler`. Or elle porte deux risques opposés — un oubli ferme un endpoint public,
+ * une entrée trop large en ouvre d'autres —, et les tests d'endpoints, qui appellent les
+ * handlers directement, ne franchissent jamais ce middleware.
+ *
+ * @param path Chemin sans la chaîne de requête.
+ * @param method Méthode HTTP, telle que reçue.
+ */
+export function trouverRoutePublique(
+  path: string,
+  method: string | undefined
+): PublicRoute | undefined {
+  return publicRoutes.find((route) => {
+    if (!method || !route.methods.includes(method)) return false
+    if ('prefix' in route) return path.startsWith(route.prefix)
+    if ('pattern' in route) return route.pattern.test(path)
+    return route.path === path
+  })
+}

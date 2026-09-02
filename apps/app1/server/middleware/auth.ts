@@ -1,6 +1,6 @@
 // La session passe par server/utils/session-helpers (enveloppes des auto-imports nuxt-auth-utils),
 // et NON par `await import('#imports')` qui plante en dev (cf. session-helpers.ts).
-import { publicRoutes } from '../constants/public-routes'
+import { trouverRoutePublique } from '../constants/public-routes'
 import { getAuthSession, clearAuthSession } from '../utils/session-helpers'
 
 export default defineEventHandler(async (event) => {
@@ -15,13 +15,9 @@ export default defineEventHandler(async (event) => {
     return found != null
   }
 
-  // Chercher une route publique correspondante
-  const matchedRoute = publicRoutes.find((route) => {
-    if (!method || !route.methods.includes(method)) return false
-    if ('prefix' in route) return path.startsWith(route.prefix)
-    if ('pattern' in route) return route.pattern.test(path)
-    return route.path === path
-  })
+  // Chercher une route publique correspondante. La règle vit dans `public-routes.ts`, où elle
+  // est testable — ici, elle serait hors de portée d'un test.
+  const matchedRoute = trouverRoutePublique(path, method)
 
   if (matchedRoute) {
     // Hydrater la session si demandé (routes publiques avec contenu conditionnel)
