@@ -3,7 +3,20 @@
     <UPage>
       <UDashboardGroup storage-key="edition-dashboard">
         <!-- Sidebar de navigation -->
-        <UDashboardSidebar collapsible resizable>
+        <!--
+          Le panneau mobile de navigation reçoit un `z-index` explicite.
+
+          Nuxt UI ne pose aucun `z-index` : ses surcouches s'empilent par ordre du DOM. Le tiroir
+          des zones de la carte du site, lui, reste monté en permanence et s'insère APRÈS le
+          menu — il se retrouvait donc dessiné par-dessus. Le défaut passait inaperçu à
+          l'inspection : le tiroir est en `pointer-events: none`, donc transparent au survol tout
+          en étant opaque à l'œil.
+
+          Une règle explicite plutôt qu'un ordre heureux : la navigation de l'application passe
+          devant le mobilier d'une page. Contrepartie assumée — un toast, lui aussi sans
+          `z-index`, passerait désormais derrière le menu ouvert.
+        -->
+        <UDashboardSidebar collapsible resizable :ui="{ overlay: 'z-50', content: 'z-50' }">
           <template #header="{ collapsed }">
             <div class="flex items-center justify-between w-full">
               <div v-if="!collapsed" class="flex items-center gap-2">
