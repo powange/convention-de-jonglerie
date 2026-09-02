@@ -235,6 +235,7 @@
     "success_message": "Obrázek byl úspěšně nahrán!",
     "upload": "Nahrát",
     "upload_error": "Chyba při nahrávání",
-    "uploading": "Nahrávání probíhá..."
+    "uploading": "Nahrávání probíhá...",
+    "take_photo": "Vyfotit"
   }
 }

@@ -209,6 +209,7 @@
     "cannot_add_comment": "Impossible d'ajouter le commentaire",
     "cannot_add_item": "Impossible d'ajouter l'objet",
     "cannot_change_status": "Impossible de modifier le statut",
+    "cannot_delete_lost_found_item": "Impossible de supprimer cet objet",
     "cannot_load_lost_items": "Impossible de charger les objets trouvés",
     "cannot_upload_photo": "Impossible d'uploader la photo",
     "carpool": "Covoiturage",
@@ -216,6 +217,8 @@
     "click_to_enlarge_poster": "Cliquer pour agrandir l'affiche de",
     "comment_added": "Commentaire ajouté",
     "convention_editions_title": "Éditions de {name}",
+    "delete_lost_found_item": "Supprimer cet objet",
+    "delete_lost_found_item_confirm": "Cet objet et ses commentaires seront définitivement supprimés.",
     "describe_lost_item": "Décrivez l'objet trouvé...",
     "edit": "Modifier l'édition",
     "edition_published": "L'édition a été publiée avec succès",
@@ -231,6 +234,7 @@
     "lost": "🔍 Perdu",
     "lost_found": "Objets trouvés",
     "lost_found_before_start": "Les objets trouvés seront disponibles au début de l'édition.",
+    "lost_found_item_deleted": "Objet supprimé",
     "lost_item_added": "Objet trouvé ajouté",
     "management": "Gestion",
     "map": "Carte",
@@ -261,6 +265,7 @@
         "organizers": "Repas organisateurs"
       }
     },
+    "my_tasks": "Mes tâches",
     "no_description_available": "Aucune description disponible",
     "no_items_reported": "Aucun objet n'a été signalé pour cette édition.",
     "no_lost_items": "Aucun objet trouvé",
@@ -286,6 +291,7 @@
     "returned": "✅ Restitué",
     "services_offered": "Services proposés",
     "show_returned_items": "Afficher les objets restitués",
+    "site_map": "Carte du site",
     "status": {
       "cancelled": "Annulé",
       "offline": "Hors ligne",
@@ -306,6 +312,19 @@
     },
     "status_label": "Statut",
     "status_updated": "Statut de l'édition mis à jour",
+    "sur_place": {
+      "aucune_trouvee": "Aucune convention en cours autour de vous.",
+      "description": "Vous avez été amené ici parce que cette convention se déroule autour de vous.",
+      "description_demontage": "Vous avez été amené ici parce que le démontage de cette convention se déroule autour de vous.",
+      "description_montage": "Vous avez été amené ici parce que le montage de cette convention se déroule autour de vous.",
+      "proposition_action": "Voir si j’y suis",
+      "proposition_description": "Si vous y êtes, l'application peut vous emmener directement sur sa page.",
+      "proposition_titre": "Vous êtes peut-être sur une convention",
+      "recherche_en_cours": "Recherche de la convention où vous vous trouvez…",
+      "retour_accueil": "Revenir à l'accueil",
+      "titre": "Vous êtes à {nom}"
+    },
+    "tasks": "Tâches",
     "ticketing": {
       "access_type": "Type d'accès",
       "add_error": "Erreur lors de l'ajout du participant",
@@ -459,21 +478,6 @@
       "volunteer_notifications": "Notifications bénévoles",
       "volunteer_page": "Page bénévolat",
       "week_view": "Semaine"
-    },
-    "my_tasks": "Mes tâches",
-    "tasks": "Tâches",
-    "site_map": "Carte du site",
-    "sur_place": {
-      "aucune_trouvee": "Aucune convention en cours autour de vous.",
-      "description": "Vous avez été amené ici parce que cette convention se déroule autour de vous.",
-      "description_demontage": "Vous avez été amené ici parce que le démontage de cette convention se déroule autour de vous.",
-      "description_montage": "Vous avez été amené ici parce que le montage de cette convention se déroule autour de vous.",
-      "proposition_action": "Voir si j’y suis",
-      "proposition_description": "Si vous y êtes, l'application peut vous emmener directement sur sa page.",
-      "proposition_titre": "Vous êtes peut-être sur une convention",
-      "recherche_en_cours": "Recherche de la convention où vous vous trouvez…",
-      "retour_accueil": "Revenir à l'accueil",
-      "titre": "Vous êtes à {nom}"
     }
   },
   "errors": {

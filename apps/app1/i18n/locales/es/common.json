@@ -474,7 +474,11 @@
       "recherche_en_cours": "Buscando la convención en la que te encuentras…",
       "description_demontage": "Te hemos traído aquí porque el desmontaje de esta convención se realiza a tu alrededor.",
       "description_montage": "Te hemos traído aquí porque el montaje de esta convención se realiza a tu alrededor."
-    }
+    },
+    "cannot_delete_lost_found_item": "No se ha podido eliminar este objeto",
+    "delete_lost_found_item": "Eliminar este objeto",
+    "delete_lost_found_item_confirm": "Este objeto y sus comentarios se eliminarán definitivamente.",
+    "lost_found_item_deleted": "Objeto eliminado"
   },
   "errors": {
     "access_denied": "Acceso denegado",

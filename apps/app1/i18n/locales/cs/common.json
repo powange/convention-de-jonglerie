@@ -474,7 +474,11 @@
       "recherche_en_cours": "Hledám konvenci, na které se nacházíš…",
       "description_demontage": "Dostal ses sem, protože ve tvém okolí probíhá demontáž této konvence.",
       "description_montage": "Dostal ses sem, protože ve tvém okolí probíhá montáž této konvence."
-    }
+    },
+    "cannot_delete_lost_found_item": "Tento předmět nelze smazat",
+    "delete_lost_found_item": "Smazat tento předmět",
+    "delete_lost_found_item_confirm": "Tento předmět a jeho komentáře budou trvale smazány.",
+    "lost_found_item_deleted": "Předmět smazán"
   },
   "errors": {
     "access_denied": "Neoprávněný přístup",

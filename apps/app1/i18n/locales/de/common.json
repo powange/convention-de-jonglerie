@@ -474,7 +474,11 @@
       "recherche_en_cours": "Suche nach der Convention, auf der du bist …",
       "description_demontage": "Du wurdest hierher geführt, weil gerade der Abbau dieser Convention in deiner Umgebung stattfindet.",
       "description_montage": "Du wurdest hierher geführt, weil gerade der Aufbau dieser Convention in deiner Umgebung stattfindet."
-    }
+    },
+    "cannot_delete_lost_found_item": "Der Gegenstand konnte nicht gelöscht werden",
+    "delete_lost_found_item": "Diesen Gegenstand löschen",
+    "delete_lost_found_item_confirm": "Dieser Gegenstand und seine Kommentare werden endgültig gelöscht.",
+    "lost_found_item_deleted": "Gegenstand gelöscht"
   },
   "errors": {
     "access_denied": "Zugang verweigert",

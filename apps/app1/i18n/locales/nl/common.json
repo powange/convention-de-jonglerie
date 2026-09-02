@@ -474,7 +474,11 @@
       "recherche_en_cours": "Zoeken naar de conventie waar je bent…",
       "description_demontage": "Je bent hierheen gebracht omdat de afbouw van deze conventie in jouw omgeving plaatsvindt.",
       "description_montage": "Je bent hierheen gebracht omdat de opbouw van deze conventie in jouw omgeving plaatsvindt."
-    }
+    },
+    "cannot_delete_lost_found_item": "Kan dit voorwerp niet verwijderen",
+    "delete_lost_found_item": "Dit voorwerp verwijderen",
+    "delete_lost_found_item_confirm": "Dit voorwerp en de bijbehorende reacties worden definitief verwijderd.",
+    "lost_found_item_deleted": "Voorwerp verwijderd"
   },
   "errors": {
     "access_denied": "Toegang geweigerd",

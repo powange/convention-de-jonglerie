@@ -474,7 +474,11 @@
       "recherche_en_cours": "Шукаємо конвенцію, на якій ви перебуваєте…",
       "description_demontage": "Ви потрапили сюди, бо поруч із вами триває демонтаж цієї конвенції.",
       "description_montage": "Ви потрапили сюди, бо поруч із вами триває монтаж цієї конвенції."
-    }
+    },
+    "cannot_delete_lost_found_item": "Не вдалося видалити цю річ",
+    "delete_lost_found_item": "Видалити цю річ",
+    "delete_lost_found_item_confirm": "Цю річ та коментарі до неї буде видалено назавжди.",
+    "lost_found_item_deleted": "Річ видалено"
   },
   "errors": {
     "access_denied": "Доступ заборонено",

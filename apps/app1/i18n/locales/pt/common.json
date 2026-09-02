@@ -474,7 +474,11 @@
       "recherche_en_cours": "A procurar a convenção onde se encontra…",
       "description_demontage": "Você foi trazido para cá porque a desmontagem desta convenção está acontecendo à sua volta.",
       "description_montage": "Você foi trazido para cá porque a montagem desta convenção está acontecendo à sua volta."
-    }
+    },
+    "cannot_delete_lost_found_item": "Não foi possível eliminar este objeto",
+    "delete_lost_found_item": "Eliminar este objeto",
+    "delete_lost_found_item_confirm": "Este objeto e os seus comentários serão eliminados definitivamente.",
+    "lost_found_item_deleted": "Objeto eliminado"
   },
   "errors": {
     "access_denied": "Acesso negado",

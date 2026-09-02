@@ -474,7 +474,11 @@
       "recherche_en_cours": "Söker efter konventet du befinner dig på …",
       "description_demontage": "Du fördes hit eftersom nedmonteringen av det här konventet pågår omkring dig.",
       "description_montage": "Du fördes hit eftersom uppbyggnaden av det här konventet pågår omkring dig."
-    }
+    },
+    "cannot_delete_lost_found_item": "Det gick inte att ta bort föremålet",
+    "delete_lost_found_item": "Ta bort detta föremål",
+    "delete_lost_found_item_confirm": "Detta föremål och dess kommentarer tas bort permanent.",
+    "lost_found_item_deleted": "Föremålet togs bort"
   },
   "errors": {
     "access_denied": "Obehörig åtkomst",

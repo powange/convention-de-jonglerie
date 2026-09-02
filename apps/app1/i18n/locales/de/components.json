@@ -235,6 +235,7 @@
     "success_message": "Bild erfolgreich hochgeladen!",
     "upload": "Hochladen",
     "upload_error": "Upload-Fehler",
-    "uploading": "Wird hochgeladen..."
+    "uploading": "Wird hochgeladen...",
+    "take_photo": "Foto aufnehmen"
   }
 }

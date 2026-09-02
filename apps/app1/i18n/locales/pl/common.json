@@ -474,7 +474,11 @@
       "recherche_en_cours": "Szukanie konwencji, na której jesteś…",
       "description_demontage": "Trafiłeś tutaj, ponieważ w twojej okolicy trwa demontaż tej konwencji.",
       "description_montage": "Trafiłeś tutaj, ponieważ w twojej okolicy trwa montaż tej konwencji."
-    }
+    },
+    "cannot_delete_lost_found_item": "Nie można usunąć tego przedmiotu",
+    "delete_lost_found_item": "Usuń ten przedmiot",
+    "delete_lost_found_item_confirm": "Ten przedmiot i jego komentarze zostaną trwale usunięte.",
+    "lost_found_item_deleted": "Przedmiot usunięty"
   },
   "errors": {
     "access_denied": "Dostęp odrzucony",
