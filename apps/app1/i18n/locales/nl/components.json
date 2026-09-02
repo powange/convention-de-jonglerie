@@ -235,6 +235,7 @@
     "success_message": "Afbeelding succesvol geüpload!",
     "upload": "Uploaden",
     "upload_error": "Upload fout",
-    "uploading": "Upload bezig..."
+    "uploading": "Upload bezig...",
+    "take_photo": "Foto maken"
   }
 }

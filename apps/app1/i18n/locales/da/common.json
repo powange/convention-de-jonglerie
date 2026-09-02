@@ -474,7 +474,11 @@
       "recherche_en_cours": "Leder efter det konvent, du er på …",
       "description_demontage": "Du er ført hertil, fordi nedtagningen af dette konvent foregår omkring dig.",
       "description_montage": "Du er ført hertil, fordi opbygningen af dette konvent foregår omkring dig."
-    }
+    },
+    "cannot_delete_lost_found_item": "Genstanden kunne ikke slettes",
+    "delete_lost_found_item": "Slet denne genstand",
+    "delete_lost_found_item_confirm": "Denne genstand og dens kommentarer slettes permanent.",
+    "lost_found_item_deleted": "Genstand slettet"
   },
   "errors": {
     "access_denied": "Adgang nægtet",

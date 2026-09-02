@@ -50,14 +50,17 @@
           :class="{ 'opacity-75': item.status === 'RETURNED' }"
         >
           <template #header>
-            <div class="flex items-start justify-between">
+            <!-- Les deux groupes s'empilent tant que la largeur ne suffit pas. Sur une seule
+                 ligne, le bouton « Marquer comme restitué » porte son libellé entier et prend
+                 la place : c'est le nom de l'auteur qui se réduisait à trois lettres. -->
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <UiUserDisplayForAdmin
                 :user="item.user"
                 :datetime="item.createdAt"
                 size="lg"
                 :show-email="false"
               />
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <UBadge
                   :color="item.status === 'RETURNED' ? 'success' : 'warning'"
                   :variant="item.status === 'RETURNED' ? 'soft' : 'solid'"
@@ -89,6 +92,19 @@
                       : t('edition.mark_as_returned')
                   }}
                 </UButton>
+                <!-- Réduit à son icône : l'action est rare et destructrice, elle n'a pas à
+                     disputer la place au bouton courant. L'infobulle et l'aria-label la nomment. -->
+                <UTooltip v-if="peutSupprimer(item)" :text="t('edition.delete_lost_found_item')">
+                  <UButton
+                    size="xs"
+                    color="error"
+                    variant="ghost"
+                    icon="i-heroicons-trash"
+                    :aria-label="t('edition.delete_lost_found_item')"
+                    :loading="isDeletingItem(item.id)"
+                    @click="demanderSuppression(item)"
+                  />
+                </UTooltip>
               </div>
             </div>
           </template>
@@ -192,6 +208,7 @@
             <UFormField :label="t('edition.photo_optional')">
               <UiImageUpload
                 v-model="newItem.imageUrl"
+                allow-camera
                 :endpoint="{ type: 'lost-found', id: editionId }"
                 :options="{
                   validation: {
@@ -227,6 +244,16 @@
           </div>
         </template>
       </UModal>
+
+      <!-- Confirmation de suppression : l'objet et ses commentaires partent ensemble. -->
+      <UiConfirmModal
+        v-model="confirmationSuppression"
+        :title="t('edition.delete_lost_found_item')"
+        :description="t('edition.delete_lost_found_item_confirm')"
+        :confirm-label="t('common.delete')"
+        confirm-color="error"
+        @confirm="confirmerSuppression"
+      />
 
       <!-- Modal d'affichage d'image -->
       <UModal v-model:open="showImageModalState" size="xl">
@@ -391,6 +418,44 @@ const { execute: toggleStatus, isLoading: isTogglingStatus } = useApiActionById<
     },
   }
 )
+
+/**
+ * Qui peut supprimer : l'auteur, et tout organisateur de l'édition.
+ *
+ * Le second n'est pas redondant : l'auteur peut avoir quitté l'équipe, et son objet deviendrait
+ * alors indélébile. `canEditLostFound` porte déjà le droit d'organisateur.
+ */
+const peutSupprimer = (item: LostFoundItem) =>
+  canEditLostFound.value || item.user?.id === authStore.user?.id
+
+const confirmationSuppression = ref(false)
+const itemASupprimer = ref<LostFoundItem | null>(null)
+
+const demanderSuppression = (item: LostFoundItem) => {
+  itemASupprimer.value = item
+  confirmationSuppression.value = true
+}
+
+const { execute: supprimerItem, isLoading: isDeletingItem } = useApiActionById(
+  (id) => `/api/editions/${editionId.value}/lost-found/${id}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('edition.lost_found_item_deleted') },
+    errorMessages: { default: t('edition.cannot_delete_lost_found_item') },
+    onSuccess: (_resultat, id) => {
+      // Retiré de la liste sur place : recharger la page entière pour une suppression ferait
+      // clignoter toutes les cartes.
+      lostFoundItems.value = lostFoundItems.value.filter((i) => i.id !== id)
+    },
+  }
+)
+
+const confirmerSuppression = async () => {
+  const item = itemASupprimer.value
+  if (!item) return
+  itemASupprimer.value = null
+  await supprimerItem(item.id)
+}
 
 // Gestionnaires d'événements pour ImageUpload
 const onImageUploaded = (result: { imageUrl?: string }) => {

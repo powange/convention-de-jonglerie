@@ -64,10 +64,41 @@
         @change="handleFileSelect"
       />
 
+      <!--
+        Input distinct pour l'appareil photo : `capture` REMPLACE le sélecteur au lieu de s'y
+        ajouter sur la plupart des navigateurs mobiles. Le poser sur l'input existant retirerait
+        donc l'accès à la galerie, alors que les deux gestes sont légitimes.
+
+        `accept="image/*"` plutôt que la liste des types : un appareil photo ne produit pas de
+        webp, et une énumération de types MIME est traitée de façon inégale selon les navigateurs
+        au moment d'ouvrir la caméra. Le fichier reçu passe de toute façon par `validateFile`,
+        qui est le vrai filtre.
+      -->
+      <input
+        v-if="allowCamera"
+        ref="cameraInput"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        class="hidden"
+        @change="handleFileSelect"
+      />
+
       <!-- Boutons d'action -->
       <div v-if="!uploading" class="flex justify-center space-x-2">
         <UButton variant="outline" icon="i-heroicons-photo" @click="triggerFileInput">
           {{ t('upload.select_file') }}
+        </UButton>
+
+        <!-- Réservé aux appareils tactiles : sur un ordinateur, `capture` est ignoré et ce bouton
+             ouvrirait un banal sélecteur de fichiers, faisant une promesse qu'il ne tient pas. -->
+        <UButton
+          v-if="allowCamera && appareilTactile"
+          variant="outline"
+          icon="i-heroicons-camera"
+          @click="triggerCamera"
+        >
+          {{ t('upload.take_photo') }}
         </UButton>
 
         <UButton
@@ -109,6 +140,8 @@
 </template>
 
 <script setup lang="ts">
+import { useMediaQuery } from '@vueuse/core'
+
 import type { UploadEndpoint, UploadOptions } from '~/types/upload'
 
 interface Props {
@@ -126,6 +159,13 @@ interface Props {
   autoUpload?: boolean
   /** Autoriser la suppression de l'image actuelle */
   allowDelete?: boolean
+  /**
+   * Proposer « Prendre une photo » sur les appareils tactiles.
+   *
+   * Optionnel plutôt que systématique : le composant sert aussi aux logos et aux images
+   * d'édition, qu'on ne photographie pas sur place.
+   */
+  allowCamera?: boolean
 }
 
 interface Emits {
@@ -139,6 +179,7 @@ const props = withDefaults(defineProps<Props>(), {
   alt: 'Uploaded image',
   autoUpload: true,
   allowDelete: true,
+  allowCamera: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -195,6 +236,7 @@ const validation = {
 
 // États réactifs
 const fileInput = ref<HTMLInputElement>()
+const cameraInput = ref<HTMLInputElement>()
 const isDragOver = ref(false)
 
 // Méthodes utilitaires
@@ -208,6 +250,16 @@ const formatFileSize = (bytes: number): string => {
 
 const triggerFileInput = () => {
   fileInput.value?.click()
+}
+
+/**
+ * Un pointeur grossier signale un doigt, donc un appareil susceptible d'avoir une caméra.
+ * Préféré à une largeur d'écran, qu'une fenêtre étroite sur un ordinateur ferait mentir.
+ */
+const appareilTactile = useMediaQuery('(pointer: coarse)')
+
+const triggerCamera = () => {
+  cameraInput.value?.click()
 }
 
 // Validation des fichiers
@@ -440,9 +492,12 @@ const reset = () => {
     previewUrl.value = null
   }
 
-  // Réinitialiser l'input file pour permettre de sélectionner à nouveau le même fichier
+  // Réinitialiser les inputs file pour permettre de sélectionner à nouveau le même fichier
   if (fileInput.value) {
     fileInput.value.value = ''
+  }
+  if (cameraInput.value) {
+    cameraInput.value.value = ''
   }
 }
 

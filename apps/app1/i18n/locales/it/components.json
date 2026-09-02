@@ -235,6 +235,7 @@
     "success_message": "Immagine caricata con successo!",
     "upload": "Carica",
     "upload_error": "Errore di caricamento",
-    "uploading": "Caricamento..."
+    "uploading": "Caricamento...",
+    "take_photo": "Scatta una foto"
   }
 }

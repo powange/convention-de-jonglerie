@@ -474,7 +474,11 @@
       "recherche_en_cours": "Ricerca della convention in cui ti trovi…",
       "description_demontage": "Sei stato portato qui perché lo smontaggio di questa convention si sta svolgendo intorno a te.",
       "description_montage": "Sei stato portato qui perché il montaggio di questa convention si sta svolgendo intorno a te."
-    }
+    },
+    "cannot_delete_lost_found_item": "Impossibile eliminare questo oggetto",
+    "delete_lost_found_item": "Elimina questo oggetto",
+    "delete_lost_found_item_confirm": "Questo oggetto e i suoi commenti saranno eliminati definitivamente.",
+    "lost_found_item_deleted": "Oggetto eliminato"
   },
   "errors": {
     "access_denied": "Accesso non autorizzato",

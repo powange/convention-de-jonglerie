@@ -235,6 +235,7 @@
     "success_message": "¡Imagen subida con éxito!",
     "upload": "Subir",
     "upload_error": "Error de subida",
-    "uploading": "Subiendo..."
+    "uploading": "Subiendo...",
+    "take_photo": "Hacer una foto"
   }
 }

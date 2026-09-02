@@ -235,6 +235,7 @@
     "success_message": "Obraz przesłany pomyślnie!",
     "upload": "Prześlij",
     "upload_error": "Błąd przesyłania",
-    "uploading": "Przesyłanie..."
+    "uploading": "Przesyłanie...",
+    "take_photo": "Zrób zdjęcie"
   }
 }

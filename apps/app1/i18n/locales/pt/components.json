@@ -235,6 +235,7 @@
     "success_message": "Imagem enviada com sucesso!",
     "upload": "Enviar",
     "upload_error": "Erro de upload",
-    "uploading": "Enviando..."
+    "uploading": "Enviando...",
+    "take_photo": "Tirar uma foto"
   }
 }

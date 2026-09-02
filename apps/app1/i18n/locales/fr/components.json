@@ -233,6 +233,7 @@
     "max_size": "Taille maximale",
     "select_file": "Sélectionner un fichier",
     "success_message": "Image uploadée avec succès !",
+    "take_photo": "Prendre une photo",
     "upload": "Upload",
     "upload_error": "Erreur d'upload",
     "uploading": "Upload en cours..."

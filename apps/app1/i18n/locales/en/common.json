@@ -474,7 +474,11 @@
       "recherche_en_cours": "Looking for the convention you are at…",
       "description_demontage": "You were brought here because the takedown for this convention is taking place around you.",
       "description_montage": "You were brought here because the setup for this convention is taking place around you."
-    }
+    },
+    "cannot_delete_lost_found_item": "Could not delete this item",
+    "delete_lost_found_item": "Delete this item",
+    "delete_lost_found_item_confirm": "This item and its comments will be permanently deleted.",
+    "lost_found_item_deleted": "Item deleted"
   },
   "errors": {
     "access_denied": "Access denied",

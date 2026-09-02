@@ -474,7 +474,11 @@
       "recherche_en_cours": "Ищем конвенцию, на которой вы находитесь…",
       "description_demontage": "Вы попали сюда, потому что рядом с вами идёт демонтаж этой конвенции.",
       "description_montage": "Вы попали сюда, потому что рядом с вами идёт монтаж этой конвенции."
-    }
+    },
+    "cannot_delete_lost_found_item": "Не удалось удалить эту вещь",
+    "delete_lost_found_item": "Удалить эту вещь",
+    "delete_lost_found_item_confirm": "Эта вещь и комментарии к ней будут удалены безвозвратно.",
+    "lost_found_item_deleted": "Вещь удалена"
   },
   "errors": {
     "access_denied": "Доступ запрещен",

@@ -235,6 +235,7 @@
     "success_message": "Bilden har laddats upp framgångsrikt!",
     "upload": "Ladda upp",
     "upload_error": "Fel vid uppladdning",
-    "uploading": "Uppladdning pågår..."
+    "uploading": "Uppladdning pågår...",
+    "take_photo": "Ta ett foto"
   }
 }

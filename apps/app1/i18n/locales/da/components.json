@@ -235,6 +235,7 @@
     "success_message": "Billede uploadet med succes!",
     "upload": "Upload",
     "upload_error": "Upload fejl",
-    "uploading": "Uploader..."
+    "uploading": "Uploader...",
+    "take_photo": "Tag et billede"
   }
 }
