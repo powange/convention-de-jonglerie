@@ -28,20 +28,20 @@ type Page = import('@playwright/test').Page
 /** Rend le tiroir sensible au pointeur le temps de la mesure : voir l'en-tête. */
 const mesurerEmpilement = (page: Page) =>
   page.evaluate(({ x, y }) => {
-      const dialogues = [...document.querySelectorAll('[role="dialog"]')]
-      const tiroir = dialogues.find((d) => /zones|repère/i.test(d.textContent || '')) as
-        | HTMLElement
-        | undefined
-      const menu = dialogues.find((d) => !/zones|repère/i.test(d.textContent || ''))
-      if (!tiroir || !menu) return { trouves: false, tiroirAuDessus: true, zMenu: '-' }
+    const dialogues = [...document.querySelectorAll('[role="dialog"]')]
+    const tiroir = dialogues.find((d) => /zones|repère/i.test(d.textContent || '')) as
+      | HTMLElement
+      | undefined
+    const menu = dialogues.find((d) => !/zones|repère/i.test(d.textContent || ''))
+    if (!tiroir || !menu) return { trouves: false, tiroirAuDessus: true, zMenu: '-' }
 
-      const ancien = tiroir.style.pointerEvents
-      tiroir.style.pointerEvents = 'auto'
-      const el = document.elementFromPoint(x, y)
-      const tiroirAuDessus = !!(el && tiroir.contains(el))
-      tiroir.style.pointerEvents = ancien
+    const ancien = tiroir.style.pointerEvents
+    tiroir.style.pointerEvents = 'auto'
+    const el = document.elementFromPoint(x, y)
+    const tiroirAuDessus = !!(el && tiroir.contains(el))
+    tiroir.style.pointerEvents = ancien
 
-      return { trouves: true, tiroirAuDessus, zMenu: getComputedStyle(menu).zIndex }
+    return { trouves: true, tiroirAuDessus, zMenu: getComputedStyle(menu).zIndex }
   }, POINT_MESURE)
 
 const verifier = (mesure: { trouves: boolean; tiroirAuDessus: boolean; zMenu: string }) => {
