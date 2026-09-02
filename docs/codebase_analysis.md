@@ -1,10 +1,11 @@
 # Analyse complète de la base de code — Convention de Jonglerie
 
-> Rapport de la skill `/analyze-codebase`, mis à jour le **2026-08-28**.
-> Actualise la version du 2026-08-14 : volumétrie remesurée, et deux enseignements nouveaux
-> tirés d'une série de corrections sur le contrôle d'accès (§9). Les grandes lignes de
-> l'architecture — monorepo, layers, ports — n'ont pas bougé ; ce sont les chiffres et les
-> pièges connus qui évoluent.
+> Rapport de la skill `/analyze-codebase`, mis à jour le **2026-09-02**.
+> Actualise la version du 2026-08-28 : volumétrie remesurée après vingt-cinq lots livrés, deux
+> constats **résolus** (§9) et trois enseignements nouveaux, tous tirés de défauts réels — un
+> contrat d'API ambigu, une stratégie « supprimer puis recréer » qui invalidait des
+> identifiants, et un client qui réessayait un refus d'autorisation. L'architecture — monorepo,
+> layers, ports — n'a pas bougé.
 
 ---
 
@@ -19,7 +20,7 @@
 7. [Stack technique](#7-stack-technique)
 8. [Diagrammes](#8-diagrammes)
 9. [Constats et recommandations](#9-constats-et-recommandations)
-10. [Ce qui a bougé depuis le 14 août](#10-ce-qui-a-bougé-depuis-le-14-août)
+10. [Ce qui a bougé](#10-ce-qui-a-bougé)
 11. [Par où commencer, pour qui arrive](#11-par-où-commencer-pour-qui-arrive)
 
 ---
@@ -44,24 +45,32 @@ Trois traits la distinguent d'un monolithe Nuxt ordinaire :
 
 ### Volumétrie
 
-| Élément                | Nombre                                                | Δ depuis le 14 août |
+| Élément                | Nombre                                                | Δ depuis le 28 août |
 | ---------------------- | ----------------------------------------------------- | ------------------- |
-| Endpoints API (app1)   | 281                                                   | +6                  |
-| Endpoints API (layers) | 220                                                   | +5                  |
-| Pages Vue (app1)       | 79                                                    | +2                  |
+| Endpoints API (app1)   | 282                                                   | +1                  |
+| Endpoints API (layers) | 220                                                   | —                   |
+| Pages Vue (app1)       | 79                                                    | —                   |
 | Pages Vue (layers)     | 51                                                    | —                   |
-| Composants (app1)      | 98                                                    | +6                  |
+| Composants (app1)      | 98                                                    | —                   |
 | Composants (layers)    | 101                                                   | —                   |
-| Composables            | 49                                                    | +3                  |
-| Utilitaires serveur    | 90                                                    | —                   |
-| Modèles Prisma         | 108, répartis sur 15 fichiers de schéma               | +3                  |
-| Migrations             | 66                                                    | **+15**             |
+| Composables            | 60                                                    | **+11**             |
+| Utilitaires serveur    | 112                                                   | **+22**             |
+| Modèles Prisma         | 108, répartis sur 15 fichiers de schéma               | —                   |
+| Migrations             | 64                                                    | —                   |
 | Langues                | 13                                                    | —                   |
-| Fichiers de test       | 394 (87 unit, 248 Nuxt, 8 intégration, 51 Playwright) | **+53**             |
-| Documentation          | 91 fichiers Markdown                                  | +1                  |
+| Fichiers de test       | 400 (88 unit, 252 Nuxt, 8 intégration, 51 Playwright) | +6                  |
+| Tests exécutés         | 3 601 (1 380 unitaires, 2 221 Nuxt)                   | **+83**             |
+| Clés i18n (fr)         | 4 630 — **0 manquante, 0 inutilisée**                 | −3 clés mortes      |
+| Documentation          | 91 fichiers Markdown                                  | —                   |
+| Dépôt (hors artefacts) | 131 Mo                                                | —                   |
 
-Quinze migrations et cinquante-trois fichiers de test en deux semaines : le dépôt est en
-phase d'ajout soutenu, et les tests suivent le rythme des fonctionnalités.
+Vingt-cinq lots livrés en cinq jours, mais la volumétrie bouge peu : l'essentiel du travail a
+porté sur des **corrections** et sur l'outillage, non sur de nouvelles surfaces. Les onze
+composables et vingt-deux utilitaires serveur supplémentaires viennent surtout d'extractions —
+du code déplacé pour être partagé, pas ajouté.
+
+Le chiffre le plus parlant est ailleurs : **0 clé i18n manquante et 0 inutilisée**, là où le
+rapport en annonçait 529 et 44 il y a cinq jours (§9).
 
 ### Langages et versions
 
@@ -88,7 +97,7 @@ convention-de-jonglerie/
 | Dossier                  | Rôle                                                                                                                |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
 | `app/`                   | Frontend : `pages/`, `components/`, `composables/`, `stores/` (5 stores Pinia), `middleware/`, `layouts/`, `utils/` |
-| `server/api/`            | 281 endpoints REST, organisés par ressource                                                                         |
+| `server/api/`            | 282 endpoints REST, organisés par ressource                                                                         |
 | `server/utils/`          | 90 helpers : permissions, Prisma, notifications, emails, validation                                                 |
 | `server/<module>/ports/` | Interfaces de découplage pour 9 modules                                                                             |
 | `server/middleware/`     | CSRF (`00.csrf.ts`), auth, entêtes de cache, `noindex`                                                              |
@@ -135,7 +144,7 @@ convention-de-jonglerie/
 ### Données
 
 - 15 fichiers de schéma Prisma, du plus gros au plus petit : `ticketing` (24 modèles), `schema` (14), `artists`/`volunteers`/`misc` (9), `meals` (8), `tasks` (7), `carpool` (6), `project-costs` (5), `stock`/`messenger`/`workshops`/`treasury` (3), `faq`/`program` (1).
-- 66 migrations, dont plusieurs **écrites à la main** avec leur justification en commentaire — la convention du dépôt quand une opération est destructive ou qu'un `MODIFY` naïf fausserait les données.
+- 64 migrations, dont plusieurs **écrites à la main** avec leur justification en commentaire — la convention du dépôt quand une opération est destructive ou qu'un `MODIFY` naïf fausserait les données.
 
 ### Frontend
 
@@ -393,11 +402,26 @@ fonction que le code n'appelait plus. Ils seraient restés verts quelle que soit
 Quand un mock porte le nom d'une règle, **ce nom fait partie de l'assertion** : le renommer est
 une modification du test, pas un détail de forme.
 
-**3. L'outillage i18n ne voyait pas les layers — corrigé, mais l'asymétrie demeure.**
+**3. L'asymétrie i18n entre layers demeure.**
 Seul `volunteers` porte ses traductions ; les dix autres layers déposent leurs clés dans `apps/app1/i18n/`. Cette incohérence rend le placement d'une nouvelle clé arbitraire. À trancher : soit chaque layer porte ses traductions, soit aucun.
 
-**4. `check-i18n` produit des faux positifs massifs.**
-529 clés « manquantes » viennent des blocs `<i18n>` locaux des pages guide, et la détection des clés « inutilisées » ignore les clés construites dynamiquement (`$t(\`prefix\_${x}\`)`). Lancer `--delete-unused` sans vérifier casserait des écrans. Un mécanisme d'annotation (`// i18n-dynamic`) fiabiliserait l'outil.
+**4. `check-i18n` produisait des faux positifs massifs — résolu, et l'histoire mérite d'être retenue.**
+Le rapport annonçait **529 clés manquantes et 44 inutilisées**. À l'examen : **zéro** manquante, et **3** réellement mortes sur 44. Les 573 autres étaient des angles morts du détecteur, tous corrigés :
+
+| angle mort                            | signalements | correctif                                                                          |
+| ------------------------------------- | ------------ | ---------------------------------------------------------------------------------- |
+| préfixe dynamique refusé au tiret bas | 25           | `admin.merge_field_${…}` compose au `_`, pas seulement au `.`                      |
+| clé composée hors d'un `t()`          | 16           | le service de notifications _enregistre_ la clé ; `organizer-rights` la _retourne_ |
+| fichier avec sa propre fonction `t`   | 523          | les pages du guide, rédigées en français seul, lisent un objet local               |
+| accès de propriété et noms d'hôte     | 8            | `data.value`, `tile.openstreetmap.org` — liste d'exceptions                        |
+
+L'enseignement dépasse l'i18n : **un outil qui crie trop ne sert plus à rien**. Personne ne lit
+575 lignes de bruit, et le vrai orphelin s'y noyait. Pire, la commande proposait spontanément
+`--delete-unused` en fin de rapport — l'exécuter aurait vidé les libellés de droits des
+organisateurs et les rappels d'échéance des tâches, tous deux composés à l'exécution.
+
+À retenir avant de faire confiance à un rapport d'outillage : **vérifier un échantillon à la
+main**. Ici, quatre familles sur cinq étaient des faux positifs.
 
 **5. Le typecheck local est bruyant, mais exploitable — à condition de savoir ce que la CI juge.**
 Le conteneur remonte des milliers d'erreurs d'origine environnementale (références de projet
@@ -418,24 +442,90 @@ rendu une CI rouge le 28 août.
 ⚠️ Ne pas lancer le typecheck **en même temps** que la suite Nuxt dans le conteneur : les deux
 saturent la mémoire et sont tués (`code 137`), emportant le serveur de développement avec eux.
 
-**6. `npm run format` ne couvre pas les `.cjs`.**
-`scripts/check-i18n-variables.cjs` est hors format depuis longtemps. Ajouter l'extension au motif éviterait la dérive.
+**6 et 7. Le formatage — résolu.**
+`npm run format` couvre désormais les `.cjs` et `.mjs`, et `format:check` tourne en CI. Le garde
+a servi immédiatement : un fichier que je croyais victime d'un formateur capricieux — et que
+j'avais « corrigé » une dizaine de fois — était en réalité non formaté dans le dépôt. C'est
+exactement la dérive que ce contrôle existe pour arrêter.
 
-**7. `format:check` n'est pas dans la CI.**
-Seul ESLint y tourne. Des lignes non formatées ont déjà été mergées. Un job supplémentaire coûterait quelques secondes.
+**8. Les parcours de modale — largement couverts depuis.**
+Le formulaire de candidature bénévole, l'un des plus complexes du produit, porte désormais
+**vingt-six assertions** réparties sur deux fichiers : remontée des refus du serveur et
+pré-remplissage depuis le profil d'un côté ; questions conditionnelles, reprise d'une
+candidature enregistrée et garde de l'aperçu de l'autre.
 
-**8. Les parcours de modale ne sont pas testés.**
-Le formulaire de candidature bénévole — l'un des plus complexes, avec ses watchers et son hydratation — n'a aucun test automatisé. Trois défauts d'affichage y ont été trouvés récemment par lecture et simulation, non par la suite de tests. Un test de composant sur l'hydratation serait le meilleur rapport valeur/effort du dépôt.
+Les questions conditionnelles méritaient particulièrement d'être verrouillées : une quinzaine
+de drapeaux décident de ce qui est demandé, et une erreur n'échoue pas — elle pose la mauvaise
+question, ou tait celle qu'on voulait poser, sans que personne le signale. Chaque drapeau est
+donc éprouvé seul, dans les deux sens.
+
+Deux traits du banc de test, découverts en écrivant ces tests et qui valent pour tout test de
+composant ici :
+
+- **certaines clés i18n s'y affichent brutes** — tous les domaines de traduction ne sont pas
+  chargés. S'ancrer sur le libellé français seul rend un test dépendant d'un détail
+  d'environnement ;
+- **la valeur d'un `textarea` ne figure pas dans `innerHTML`**. Vérifier une hydratation en
+  lisant le HTML sérialisé ne prouve rien : il faut lire la propriété DOM.
 
 **9. Du travail mort subsiste après les suppressions récentes.**
 Les invites du modèle et l'import d'édition ont été nettoyés, mais ce type de résidu réapparaît à chaque retrait de fonctionnalité. Une recherche systématique des écritures sans lecture, à chaque suppression, l'éviterait.
+
+**10. Un contrat de retour ambigu se paie en bugs silencieux, partout à la fois.**
+`useApiAction` déballait les réponses `{ success, data, message }` et rendait `data`. Les
+**46 endpoints** répondant `createSuccessResponse(null, …)` faisaient donc rendre `null` à un
+appel parfaitement réussi — la même valeur que sur un échec. Aucun appelant ne pouvait
+distinguer les deux.
+
+Le défaut s'est vu sur la carte du site : le toast annonçait la suppression d'un point de
+repère, mais l'appelant, croyant à un échec, ne retirait jamais le calque. Il a d'abord été
+traité là où il se voyait, puis à sa source — `null` signifie désormais l'échec, et lui seul.
+
+À retenir : **quand une valeur de retour sert de verdict, elle doit être non ambiguë par
+construction**. Un contrat qui confond « réussi sans contenu » et « échoué » ne produit pas une
+erreur mais un comportement faux, silencieux, et reproduit à chaque appelant.
+
+**11. « Supprimer puis recréer » invalide les identifiants — et perd le travail des autres.**
+La composition d'un spectacle cabaret supprimait tous ses numéros avant de les recréer. Deux
+conséquences, dont une seule apparaissait dans les journaux :
+
+- le `deleteMany` verrouillait toutes les lignes du spectacle le temps de la transaction, d'où
+  des `Lock wait timeout exceeded` (erreur 500) chez un artiste qui enregistrait au même moment ;
+- **et les identifiants changeaient**, si bien que la saisie de cet artiste était perdue de
+  toute façon — verrou ou pas.
+
+Corriger le seul symptôme visible aurait laissé la perte de données intacte et silencieuse. Le
+correctif conserve les identifiants, ce qui supprime les deux problèmes d'un coup.
+
+À retenir : **la table rase est commode côté serveur, coûteuse côté concurrence.** Dès qu'une
+autre partie du produit référence une ligne par son identifiant, la recréer revient à la lui
+retirer sous les pieds.
+
+**12. Réessayer un refus d'autorisation n'a pas de sens.**
+Un flux temps réel se reconnectait cinq fois à trois secondes après chaque échec — y compris sur
+un 403. Chaque visite d'un bénévole hors créneau laissait six rejets dans les journaux, pour une
+porte qu'on savait fermée avant de frapper. `EventSource` n'exposant pas le code HTTP à
+`onerror`, la décision ne pouvait pas se prendre au moment de l'erreur : elle se prend en amont,
+là où le droit d'accès est déjà connu.
+
+Cas particulier d'une règle plus large : **une politique de réessai doit distinguer ce qui peut
+changer de ce qui ne changera pas.** Une coupure réseau se rattrape ; un refus, non.
 
 ### Sécurité
 
 Le socle est correct : CSRF en double soumission, sessions scellées, `nuxt-security`, routes publiques déclarées explicitement, vérification que zones et repères appartiennent bien à l'édition visée. Quatre vigilances :
 
-- la liste `public-routes.ts` est une **liste blanche manuelle** : un oubli fait échouer un endpoint public en 401, et l'inverse — une entrée trop large — exposerait des données ;
-- les tests d'endpoints contournent le middleware, donc ne détectent ni l'un ni l'autre ;
+- la liste `public-routes.ts` est une **liste blanche manuelle** : un oubli fait échouer un endpoint public en 401, et l'inverse — une entrée trop large — exposerait des données. La règle
+  d'appariement a été extraite du middleware pour devenir vérifiable, et **quarante assertions**
+  la couvrent : une vingtaine de chemins sensibles qui ne doivent jamais être publics, une
+  quinzaine réellement ouverts, plus les propriétés de la liste elle-même — ancrage des motifs,
+  profondeur minimale des préfixes, méthode respectée. Une entrée trop large fait tomber six
+  d'entre elles, dont les candidatures bénévoles et les commandes de billetterie ;
+- le second risque, l'**oubli**, reste hors de portée d'un test : rien ne permet de deviner
+  qu'un endpoint _devrait_ être public. Quelques routes ouvertes sont vérifiées pour qu'un
+  remaniement ne les referme pas en silence, mais une nouvelle route publique oubliée ne se
+  verra qu'à l'usage ;
+- les tests d'endpoints contournent le middleware, et ne verraient donc rien de tout cela ;
 - **les accès temporaires se lisent dans le temps.** `isActiveInTeamSlot` ouvre un droit
   pendant un créneau, à quinze minutes près et retard déclaré compris. La fenêtre ne dépend
   jamais des dates de l'édition — un créneau de montage ou de démontage ouvre le même accès —
@@ -454,13 +544,35 @@ un helper de ce genre apparaît, **la question n'est pas « où l'utiliser » ma
 
 ### Performance
 
-Le chargement paresseux de l'i18n par route est bien pensé. La duplication `apps/app1/.nuxt` et `.nuxt` racine gonfle le dépôt (220 Mo, 115 000 fichiers) sans nuire à l'exécution. Les requêtes Prisma passent par des helpers de sélection standardisés (`prisma-select-helpers.ts`) — bonne pratique déjà en place, à maintenir.
+Le chargement paresseux de l'i18n par route est bien pensé. La duplication `apps/app1/.nuxt` et `.nuxt` racine reste (27 Mo à elles deux) sans nuire à l'exécution — le poids réel du dossier de travail, 3,7 Go pour 190 000 fichiers, vient d'ailleurs : `node_modules` dupliqué entre la racine, `apps/app1` et `apps/app2`. Les requêtes Prisma passent par des helpers de sélection standardisés (`prisma-select-helpers.ts`) — bonne pratique déjà en place, à maintenir.
 
 ---
 
-## 10. Ce qui a bougé depuis le 14 août
+## 10. Ce qui a bougé
 
-Deux semaines, quinze migrations. Les ajouts qui changent quelque chose à la lecture du dépôt :
+### Du 28 août au 2 septembre — vingt-cinq lots, presque tous correctifs
+
+Cinq jours sans une seule migration : le dépôt a passé la semaine à réparer et à outiller.
+
+| Domaine        | Évolution                                                                                                                                                |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Carte du site  | Gestion en plein écran mobile, panneau déroulable, outils de dessin posés sur la carte ; suppression qui retire enfin l'objet                            |
+| Sauvegardes    | Envoi découpé en tranches — un fichier de 80 Mo ne passait pas depuis un téléphone —, reprise automatique après coupure, restauration par le même chemin |
+| Contrat d'API  | `useApiAction` : `null` signifie l'échec, et lui seul (§9.10)                                                                                            |
+| Spectacles     | Les numéros gardent leur identifiant d'un enregistrement à l'autre (§9.11)                                                                               |
+| Outillage i18n | Détecteur réparé : de 529 manquantes et 44 inutilisées à **zéro et zéro** (§9.4)                                                                         |
+| Qualité        | `format:check` en CI, `.cjs` et `.mjs` couverts (§9.6)                                                                                                   |
+| Mobile         | Navigation par panneau latéral, pages bénévoles et candidatures rendues lisibles                                                                         |
+
+Trois de ces lots sont nés de la **surveillance des journaux de production**, pas d'un
+signalement utilisateur : le flux temps réel qui réessayait un refus, le verrou sur les numéros
+de spectacle, et — la semaine précédente — le cinquième endpoint fermé du contrôle d'accès.
+C'est l'argument le plus concret en faveur de cette surveillance : elle trouve ce que personne
+ne remonte.
+
+### Du 14 au 28 août — quinze migrations
+
+Les ajouts qui changent quelque chose à la lecture du dépôt :
 
 | Domaine        | Évolution                                                                                                                                                         |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
