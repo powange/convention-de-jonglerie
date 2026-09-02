@@ -89,8 +89,8 @@
             icon="i-heroicons-magnifying-glass"
           />
         </div>
-        <USelect v-model="sortBy" :items="sortOptions" class="w-56" />
-        <USelect v-model="archivedFilter" :items="archivedFilterOptions" class="w-48" />
+        <USelect v-model="sortBy" :items="sortOptions" class="w-full sm:w-56" />
+        <USelect v-model="archivedFilter" :items="archivedFilterOptions" class="w-full sm:w-48" />
       </div>
     </div>
 
@@ -117,11 +117,16 @@
         :ui="{ root: 'overflow-hidden hover:shadow-md transition-shadow', body: 'p-0' }"
       >
         <div
-          class="px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
+          class="px-4 py-3 sm:px-6 sm:py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
           @click="toggleConvention(convention.id)"
         >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4 flex-1 min-w-0">
+          <!-- Les deux groupes s'empilent, et ne reviennent côte à côte qu'à partir de `sm`.
+               Ils étaient auparavant sur une seule ligne à toute largeur, celui de droite étant
+               insécable pour garder ses badges lisibles : sur un téléphone il consommait la ligne
+               entière, si bien que le nom de la convention se réduisait à une lettre et que le
+               logo passait sous les badges. -->
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
               <UIcon
                 :name="
                   expandedConventions.includes(convention.id)
@@ -160,7 +165,7 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-3 ml-4 shrink-0">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 sm:ml-4 sm:shrink-0">
               <UBadge color="primary" variant="soft" size="md">
                 {{ (convention as any)._count?.editions || 0 }}
                 {{ $t('admin.editions').toLowerCase() }}
@@ -234,7 +239,7 @@
 
         <!-- Contenu développé -->
         <div v-if="expandedConventions.includes(convention.id)" class="border-t">
-          <div class="p-6 bg-gray-50 dark:bg-gray-800/50">
+          <div class="p-4 sm:p-6 bg-gray-50 dark:bg-gray-800/50">
             <div v-if="convention.description" class="mb-4">
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ convention.description }}
