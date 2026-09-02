@@ -86,6 +86,10 @@ const acts = ref<ActInput[]>([])
 
 const mapActsFromShow = (s: any): ActInput[] =>
   (s.acts || []).map((act: any) => ({
+    // Renvoyé tel quel à l'enregistrement : c'est lui qui permet au serveur de mettre le numéro
+    // à jour plutôt que de le remplacer, et donc de ne pas le faire disparaître sous un artiste
+    // en train d'y saisir ses besoins techniques.
+    id: act.id,
     title: act.title || '',
     duration: act.duration ?? null,
     description: act.description ?? null,
@@ -128,6 +132,7 @@ const { execute: save, loading: saving } = useApiAction(
       acts: acts.value
         .filter((a) => a.title.trim().length > 0)
         .map((a) => ({
+          id: a.id,
           title: a.title.trim(),
           duration: a.duration ? Number(a.duration) : null,
           description: a.description || null,

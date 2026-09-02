@@ -162,6 +162,12 @@
 
 <script setup lang="ts">
 interface ActInput {
+  /**
+   * Identifiant d'un numéro déjà enregistré, à renvoyer tel quel : c'est lui qui permet au
+   * serveur de mettre à jour la ligne plutôt que de la remplacer. Absent pour un numéro ajouté
+   * dans le formulaire.
+   */
+  id?: number
   title: string
   duration: number | string | null
   description: string | null
