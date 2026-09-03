@@ -773,6 +773,7 @@
       "shared_notice": "Tyto údaje patří konvenci „{name}“: platí pro všechny její edice, nejen pro tuto.",
       "submit": "Uložit konvenci",
       "title": "Konvence"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }

@@ -59,112 +59,142 @@
 
         <!-- Convention. Avant « Informations de l'édition », comme dans le panneau latéral : on va
              du plus englobant (la convention, donc toutes ses éditions) au particulier. -->
-        <UCard v-if="canEditConvention">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-building-library" class="text-blue-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.convention.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/convention`"
-                icon="i-heroicons-building-library"
-                :title="$t('gestion.convention.title')"
-                :description="$t('gestion.convention.card_description')"
-                color="blue"
-              />
-            </div>
+        <!-- Sur mobile, le sommaire des catégories remplace la longue page de liens ; ouvrir
+             une catégorie n'affiche qu'elle, avec le retour ci-dessous. Au-delà de `md`, ces
+             deux blocs disparaissent et tout reste déplié. Le sommaire se construit à partir des
+             sections réellement montées, d'où le rendu côté navigateur seulement. -->
+        <ClientOnly>
+          <div v-if="!categorieOuverte" class="space-y-2 md:hidden">
+            <UButton
+              v-for="categorie in categories"
+              :key="categorie.id"
+              block
+              size="lg"
+              color="neutral"
+              variant="outline"
+              :icon="categorie.icone"
+              trailing-icon="i-heroicons-chevron-right"
+              :ui="{ base: 'justify-between' }"
+              @click="ouvrir(categorie.id)"
+            >
+              {{ categorie.titre }}
+            </UButton>
           </div>
-        </UCard>
+          <UButton
+            v-else
+            class="md:hidden"
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-arrow-left"
+            :label="$t('gestion.back_to_categories')"
+            @click="fermer()"
+          />
+        </ClientOnly>
+
+        <ManagementCategorySection
+          v-if="canEditConvention"
+          id="convention"
+          icon="i-heroicons-building-library"
+          icon-class="text-blue-500"
+          :title="$t('gestion.convention.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/convention`"
+              icon="i-heroicons-building-library"
+              :title="$t('gestion.convention.title')"
+              :description="$t('gestion.convention.card_description')"
+              color="blue"
+            />
+          </div>
+        </ManagementCategorySection>
 
         <!-- Informations -->
-        <UCard v-if="canEdit">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-info" class="text-blue-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.infos.title') }}</h2>
-            </div>
+        <ManagementCategorySection
+          v-if="canEdit"
+          id="infos"
+          icon="i-lucide-info"
+          icon-class="text-blue-500"
+          :title="$t('gestion.infos.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Informations générales -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/general-info`"
+              icon="i-lucide-settings"
+              :title="$t('gestion.general_info.title')"
+              :description="$t('gestion.infos.general_info_description')"
+              color="cyan"
+            />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Informations générales -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/general-info`"
-                icon="i-lucide-settings"
-                :title="$t('gestion.general_info.title')"
-                :description="$t('gestion.infos.general_info_description')"
-                color="cyan"
-              />
+            <!-- À propos -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/about`"
+              icon="i-lucide-file-text"
+              :title="$t('gestion.about.title')"
+              :description="$t('gestion.infos.about_description')"
+              color="indigo"
+            />
 
-              <!-- À propos -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/about`"
-                icon="i-lucide-file-text"
-                :title="$t('gestion.about.title')"
-                :description="$t('gestion.infos.about_description')"
-                color="indigo"
-              />
+            <!-- Services -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/services`"
+              icon="i-lucide-wrench"
+              :title="$t('gestion.services.title')"
+              :description="$t('gestion.infos.services_description')"
+              color="teal"
+            />
 
-              <!-- Services -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/services`"
-                icon="i-lucide-wrench"
-                :title="$t('gestion.services.title')"
-                :description="$t('gestion.infos.services_description')"
-                color="teal"
-              />
+            <!-- Liens externes -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/external-links`"
+              icon="i-lucide-link"
+              :title="$t('gestion.external_links.title')"
+              :description="$t('gestion.infos.external_links_description')"
+              color="violet"
+            />
 
-              <!-- Liens externes -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/external-links`"
-                icon="i-lucide-link"
-                :title="$t('gestion.external_links.title')"
-                :description="$t('gestion.infos.external_links_description')"
-                color="violet"
-              />
-
-              <!-- Programme. Même rang que dans le panneau latéral, juste avant la carte du
+            <!-- Programme. Même rang que dans le panneau latéral, juste avant la carte du
                    site : les deux décrivent ce qui se passe et où. -->
-              <ManagementNavigationCard
-                v-if="edition.programEnabled"
-                :to="`/editions/${edition.id}/gestion/program`"
-                icon="i-heroicons-calendar-days"
-                :title="$t('edition.program')"
-                :description="$t('gestion.infos.program_description')"
-                color="amber"
-              />
+            <ManagementNavigationCard
+              v-if="edition.programEnabled"
+              :to="`/editions/${edition.id}/gestion/program`"
+              icon="i-heroicons-calendar-days"
+              :title="$t('edition.program')"
+              :description="$t('gestion.infos.program_description')"
+              color="amber"
+            />
 
-              <!-- Carte du site -->
-              <ManagementNavigationCard
-                v-if="edition.siteMapEnabled"
-                :to="`/editions/${edition.id}/gestion/map`"
-                icon="i-lucide-map"
-                :title="$t('edition.site_map')"
-                :description="$t('gestion.infos.map_description')"
-                color="blue"
-              />
+            <!-- Carte du site -->
+            <ManagementNavigationCard
+              v-if="edition.siteMapEnabled"
+              :to="`/editions/${edition.id}/gestion/map`"
+              icon="i-lucide-map"
+              :title="$t('edition.site_map')"
+              :description="$t('gestion.infos.map_description')"
+              color="blue"
+            />
 
-              <!-- Mise à jour IA (conventions non revendiquées ou admin) -->
-              <ManagementNavigationCard
-                v-if="isUnclaimedConvention || authStore.isAdminModeActive"
-                :to="`/editions/${edition.id}/gestion/ai-update`"
-                icon="i-lucide-sparkles"
-                :title="$t('gestion.ai_update.title')"
-                :description="$t('gestion.ai_update.description')"
-                color="yellow"
-              />
+            <!-- Mise à jour IA (conventions non revendiquées ou admin) -->
+            <ManagementNavigationCard
+              v-if="isUnclaimedConvention || authStore.isAdminModeActive"
+              :to="`/editions/${edition.id}/gestion/ai-update`"
+              icon="i-lucide-sparkles"
+              :title="$t('gestion.ai_update.title')"
+              :description="$t('gestion.ai_update.description')"
+              color="yellow"
+            />
 
-              <!-- Fonctionnalités -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/features`"
-                icon="i-lucide-toggle-right"
-                :title="$t('gestion.features.title')"
-                :description="$t('gestion.infos.features_description')"
-                color="emerald"
-              />
-            </div>
+            <!-- Fonctionnalités -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/features`"
+              icon="i-lucide-toggle-right"
+              :title="$t('gestion.features.title')"
+              :description="$t('gestion.infos.features_description')"
+              color="emerald"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Modal de confirmation de suppression -->
         <UiConfirmModal
@@ -183,468 +213,453 @@
         />
 
         <!-- Organisateurs -->
-        <UCard v-if="canManageOrganizers">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-user-group" class="text-purple-500" />
-              <h2 class="text-lg font-semibold">{{ $t('organizers.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Gérer les organisateurs -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/organizers`"
-                icon="i-heroicons-user-group"
-                :title="$t('organizers.manage')"
-                :description="$t('organizers.manage_description')"
-                color="purple"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="canManageOrganizers"
+          id="organisateurs"
+          icon="i-heroicons-user-group"
+          icon-class="text-purple-500"
+          :title="$t('organizers.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Gérer les organisateurs -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/organizers`"
+              icon="i-heroicons-user-group"
+              :title="$t('organizers.manage')"
+              :description="$t('organizers.manage_description')"
+              color="purple"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Gestion bénévole -->
-        <UCard v-if="edition.volunteersEnabled && (isOrganizer || isTeamLeaderValue)">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-user-group" class="text-primary-500" />
-              <h2 class="text-lg font-semibold">
-                {{ $t('edition.ticketing.volunteer_management') }}
-              </h2>
-            </div>
+        <ManagementCategorySection
+          v-if="edition.volunteersEnabled && (isOrganizer || isTeamLeaderValue)"
+          id="benevoles"
+          icon="i-heroicons-user-group"
+          icon-class="text-primary-500"
+          :title="$t('edition.ticketing.volunteer_management')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Configuration bénévolat -->
+            <ManagementNavigationCard
+              v-if="canManageVolunteers"
+              :to="`/editions/${edition.id}/gestion/volunteers/config`"
+              icon="i-heroicons-cog-6-tooth"
+              :title="$t('gestion.volunteers.config_title')"
+              :description="$t('gestion.volunteers.config_description')"
+              color="gray"
+            />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Configuration bénévolat -->
+            <!-- Page bénévoles -->
+            <ManagementNavigationCard
+              v-if="canManageVolunteers"
+              :to="`/editions/${edition.id}/gestion/volunteers/page`"
+              icon="i-heroicons-clipboard-document-list"
+              :title="$t('edition.volunteers.volunteer_page')"
+              :description="$t('edition.volunteers.page_description')"
+              color="indigo"
+            />
+
+            <!-- Liens visibles uniquement en mode interne -->
+            <template v-if="edition.volunteersMode === 'INTERNAL'">
+              <!-- Formulaire d'appel à bénévole -->
               <ManagementNavigationCard
                 v-if="canManageVolunteers"
-                :to="`/editions/${edition.id}/gestion/volunteers/config`"
-                icon="i-heroicons-cog-6-tooth"
-                :title="$t('gestion.volunteers.config_title')"
-                :description="$t('gestion.volunteers.config_description')"
-                color="gray"
+                :to="`/editions/${edition.id}/gestion/volunteers/form`"
+                icon="i-heroicons-megaphone"
+                :title="$t('edition.volunteers.volunteer_form')"
+                :description="$t('edition.volunteers.form_description')"
+                color="blue"
               />
 
-              <!-- Page bénévoles -->
+              <!-- Gestion des candidatures -->
               <ManagementNavigationCard
                 v-if="canManageVolunteers"
-                :to="`/editions/${edition.id}/gestion/volunteers/page`"
-                icon="i-heroicons-clipboard-document-list"
-                :title="$t('edition.volunteers.volunteer_page')"
-                :description="$t('edition.volunteers.page_description')"
-                color="indigo"
+                :to="`/editions/${edition.id}/gestion/volunteers/applications`"
+                icon="i-heroicons-document-text"
+                :title="$t('edition.volunteers.application_management')"
+                :description="$t('gestion.volunteers.applications_description')"
+                color="green"
               />
 
-              <!-- Liens visibles uniquement en mode interne -->
-              <template v-if="edition.volunteersMode === 'INTERNAL'">
-                <!-- Formulaire d'appel à bénévole -->
-                <ManagementNavigationCard
-                  v-if="canManageVolunteers"
-                  :to="`/editions/${edition.id}/gestion/volunteers/form`"
-                  icon="i-heroicons-megaphone"
-                  :title="$t('edition.volunteers.volunteer_form')"
-                  :description="$t('edition.volunteers.form_description')"
-                  color="blue"
-                />
+              <!-- Les équipes -->
+              <ManagementNavigationCard
+                v-if="canManageVolunteers"
+                :to="`/editions/${edition.id}/gestion/volunteers/teams`"
+                icon="i-heroicons-user-group"
+                :title="$t('edition.volunteers.teams')"
+                :description="$t('gestion.volunteers.teams_description')"
+                color="purple"
+              />
 
-                <!-- Gestion des candidatures -->
-                <ManagementNavigationCard
-                  v-if="canManageVolunteers"
-                  :to="`/editions/${edition.id}/gestion/volunteers/applications`"
-                  icon="i-heroicons-document-text"
-                  :title="$t('edition.volunteers.application_management')"
-                  :description="$t('gestion.volunteers.applications_description')"
-                  color="green"
-                />
+              <!-- Planning (pas visible pour les team leaders seuls) -->
+              <ManagementNavigationCard
+                v-if="canManageVolunteers"
+                :to="`/editions/${edition.id}/gestion/volunteers/planning`"
+                icon="i-heroicons-calendar-days"
+                :title="$t('edition.volunteers.planning')"
+                :description="$t('gestion.volunteers.planning_description')"
+                color="orange"
+              />
 
-                <!-- Les équipes -->
-                <ManagementNavigationCard
-                  v-if="canManageVolunteers"
-                  :to="`/editions/${edition.id}/gestion/volunteers/teams`"
-                  icon="i-heroicons-user-group"
-                  :title="$t('edition.volunteers.teams')"
-                  :description="$t('gestion.volunteers.teams_description')"
-                  color="purple"
-                />
+              <!-- Échanges de créneaux : à la suite du planning, que l'échange modifie -->
+              <ManagementNavigationCard
+                v-if="canManageVolunteers"
+                :to="`/editions/${edition.id}/gestion/volunteers/swaps`"
+                icon="i-lucide-arrow-left-right"
+                :title="$t('edition.volunteers.swaps')"
+                :description="$t('gestion.volunteers.swaps_description')"
+                color="blue"
+              />
 
-                <!-- Planning (pas visible pour les team leaders seuls) -->
-                <ManagementNavigationCard
-                  v-if="canManageVolunteers"
-                  :to="`/editions/${edition.id}/gestion/volunteers/planning`"
-                  icon="i-heroicons-calendar-days"
-                  :title="$t('edition.volunteers.planning')"
-                  :description="$t('gestion.volunteers.planning_description')"
-                  color="orange"
-                />
-
-                <!-- Échanges de créneaux : à la suite du planning, que l'échange modifie -->
-                <ManagementNavigationCard
-                  v-if="canManageVolunteers"
-                  :to="`/editions/${edition.id}/gestion/volunteers/swaps`"
-                  icon="i-lucide-arrow-left-right"
-                  :title="$t('edition.volunteers.swaps')"
-                  :description="$t('gestion.volunteers.swaps_description')"
-                  color="blue"
-                />
-
-                <!-- Notifications bénévoles (visible pour les team leaders) -->
-                <ManagementNavigationCard
-                  v-if="canManageVolunteers || isTeamLeaderValue"
-                  :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
-                  icon="i-heroicons-bell"
-                  :title="$t('edition.volunteers.volunteer_notifications')"
-                  :description="$t('gestion.volunteers.notifications_description')"
-                  color="yellow"
-                />
-              </template>
-            </div>
+              <!-- Notifications bénévoles (visible pour les team leaders) -->
+              <ManagementNavigationCard
+                v-if="canManageVolunteers || isTeamLeaderValue"
+                :to="`/editions/${edition.id}/gestion/volunteers/notifications`"
+                icon="i-heroicons-bell"
+                :title="$t('edition.volunteers.volunteer_notifications')"
+                :description="$t('gestion.volunteers.notifications_description')"
+                color="yellow"
+              />
+            </template>
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Gestion des artistes -->
-        <UCard v-if="edition.artistsEnabled && canManageArtists">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-star" class="text-yellow-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.artists.title') }}</h2>
-            </div>
+        <ManagementCategorySection
+          v-if="edition.artistsEnabled && canManageArtists"
+          id="artistes"
+          icon="i-heroicons-star"
+          icon-class="text-yellow-500"
+          :title="$t('gestion.artists.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Liste des artistes -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/artists`"
+              icon="i-heroicons-users"
+              :title="$t('gestion.artists.list_title')"
+              :description="
+                $t(
+                  'gestion.artists.manage_artists_description',
+                  'Gérer les artistes et leurs informations'
+                )
+              "
+              color="yellow"
+            />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Liste des artistes -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/artists`"
-                icon="i-heroicons-users"
-                :title="$t('gestion.artists.list_title')"
-                :description="
-                  $t(
-                    'gestion.artists.manage_artists_description',
-                    'Gérer les artistes et leurs informations'
-                  )
-                "
-                color="yellow"
-              />
+            <!-- Gestion des spectacles -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/artists/shows`"
+              icon="i-heroicons-sparkles"
+              :title="$t('gestion.shows.list_title')"
+              :description="
+                $t('gestion.shows.manage_shows_description', 'Créer et organiser les spectacles')
+              "
+              color="purple"
+            />
 
-              <!-- Gestion des spectacles -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/artists/shows`"
-                icon="i-heroicons-sparkles"
-                :title="$t('gestion.shows.list_title')"
-                :description="
-                  $t('gestion.shows.manage_shows_description', 'Créer et organiser les spectacles')
-                "
-                color="purple"
-              />
+            <!-- Appels à spectacles -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/shows-call`"
+              icon="i-heroicons-megaphone"
+              :title="$t('gestion.shows_call.title')"
+              :description="$t('gestion.shows_call.list_description')"
+              color="amber"
+            />
 
-              <!-- Appels à spectacles -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/shows-call`"
-                icon="i-heroicons-megaphone"
-                :title="$t('gestion.shows_call.title')"
-                :description="$t('gestion.shows_call.list_description')"
-                color="amber"
-              />
-
-              <!-- Notifications aux artistes -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/artists/notifications`"
-                icon="i-heroicons-bell"
-                :title="$t('gestion.artists.notifications.title')"
-                :description="$t('gestion.artists.notifications.description')"
-                color="yellow"
-              />
-            </div>
+            <!-- Notifications aux artistes -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/artists/notifications`"
+              icon="i-heroicons-bell"
+              :title="$t('gestion.artists.notifications.title')"
+              :description="$t('gestion.artists.notifications.description')"
+              color="yellow"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Repas (accès complet pour organisateurs) -->
-        <UCard v-if="edition.mealsEnabled && canManageMeals">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="cbi:mealie" class="text-orange-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.meals.title') }}</h2>
-            </div>
+        <ManagementCategorySection
+          v-if="edition.mealsEnabled && canManageMeals"
+          id="repas"
+          icon="cbi:mealie"
+          icon-class="text-orange-500"
+          :title="$t('gestion.meals.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Configuration des repas -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/meals`"
+              icon="cbi:mealie"
+              :title="$t('gestion.meals.configuration_title')"
+              :description="$t('gestion.meals.configuration_description')"
+              color="orange"
+            />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Configuration des repas -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/meals`"
-                icon="cbi:mealie"
-                :title="$t('gestion.meals.configuration_title')"
-                :description="$t('gestion.meals.configuration_description')"
-                color="orange"
-              />
+            <!-- Liste des repas -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/meals/list`"
+              icon="i-heroicons-list-bullet"
+              :title="$t('gestion.meals.list_title')"
+              :description="$t('gestion.meals.list_description')"
+              color="purple"
+            />
 
-              <!-- Liste des repas -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/meals/list`"
-                icon="i-heroicons-list-bullet"
-                :title="$t('gestion.meals.list_title')"
-                :description="$t('gestion.meals.list_description')"
-                color="purple"
-              />
-
-              <!-- Validation des repas -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/meals/validate`"
-                icon="i-heroicons-check-badge"
-                :title="$t('gestion.meals.validation_title')"
-                :description="$t('gestion.meals.validation_description')"
-                color="green"
-              />
-            </div>
+            <!-- Validation des repas -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/meals/validate`"
+              icon="i-heroicons-check-badge"
+              :title="$t('gestion.meals.validation_title')"
+              :description="$t('gestion.meals.validation_description')"
+              color="green"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Validation des repas (accès pour bénévoles d'équipes de validation) -->
-        <UCard v-else-if="edition.mealsEnabled && canAccessMealValidation">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="cbi:mealie" class="text-orange-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.meals.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Validation des repas uniquement -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/meals/validate`"
-                icon="i-heroicons-check-badge"
-                :title="$t('gestion.meals.validation_title')"
-                :description="$t('gestion.meals.validation_description')"
-                color="green"
-              />
-            </div>
+        <ManagementCategorySection
+          v-else-if="edition.mealsEnabled && canAccessMealValidation"
+          id="repas"
+          icon="cbi:mealie"
+          icon-class="text-orange-500"
+          :title="$t('gestion.meals.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Validation des repas uniquement -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/meals/validate`"
+              icon="i-heroicons-check-badge"
+              :title="$t('gestion.meals.validation_title')"
+              :description="$t('gestion.meals.validation_description')"
+              color="green"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Contrôle d'accès seul : bénévole en créneau, sans droits sur la billetterie -->
-        <UCard v-if="edition.ticketingEnabled && !canManageTicketing && canAccessAccessControl">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-ticket" class="text-blue-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.ticketing.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
-                icon="i-heroicons-shield-check"
-                :title="$t('gestion.ticketing.access_control_title')"
-                :description="$t('gestion.ticketing.access_control_description')"
-                color="blue"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="edition.ticketingEnabled && !canManageTicketing && canAccessAccessControl"
+          id="billetterie"
+          icon="i-heroicons-ticket"
+          icon-class="text-blue-500"
+          :title="$t('gestion.ticketing.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
+              icon="i-heroicons-shield-check"
+              :title="$t('gestion.ticketing.access_control_title')"
+              :description="$t('gestion.ticketing.access_control_description')"
+              color="blue"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Billeterie -->
-        <UCard v-if="edition.ticketingEnabled && canManageTicketing">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-ticket" class="text-blue-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.ticketing.title') }}</h2>
-            </div>
+        <ManagementCategorySection
+          v-if="edition.ticketingEnabled && canManageTicketing"
+          id="billetterie"
+          icon="i-heroicons-ticket"
+          icon-class="text-blue-500"
+          :title="$t('gestion.ticketing.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Configuration billetterie -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/config`"
+              icon="i-heroicons-cog-6-tooth"
+              :title="$t('gestion.ticketing.config_title')"
+              :description="$t('gestion.ticketing.config_description')"
+              color="blue"
+            />
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Configuration billetterie -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/config`"
-                icon="i-heroicons-cog-6-tooth"
-                :title="$t('gestion.ticketing.config_title')"
-                :description="$t('gestion.ticketing.config_description')"
-                color="blue"
-              />
+            <!-- Lier une billeterie externe -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/external`"
+              icon="i-heroicons-link"
+              :title="$t('gestion.ticketing.external_link_title')"
+              :description="$t('gestion.ticketing.external_link_description')"
+              color="purple"
+            />
 
-              <!-- Lier une billeterie externe -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/external`"
-                icon="i-heroicons-link"
-                :title="$t('gestion.ticketing.external_link_title')"
-                :description="$t('gestion.ticketing.external_link_description')"
-                color="purple"
-              />
+            <!-- Gérer les tarifs et options -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/tiers`"
+              icon="i-heroicons-currency-euro"
+              :title="$t('gestion.ticketing.tiers_title')"
+              :description="$t('gestion.ticketing.tiers_description')"
+              color="orange"
+            />
 
-              <!-- Gérer les tarifs et options -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/tiers`"
-                icon="i-heroicons-currency-euro"
-                :title="$t('gestion.ticketing.tiers_title')"
-                :description="$t('gestion.ticketing.tiers_description')"
-                color="orange"
-              />
+            <!-- Articles à remettre -->
+            <ManagementNavigationCard
+              v-if="edition.ticketingHandoutItemsEnabled"
+              :to="`/editions/${edition.id}/gestion/ticketing/handout-items`"
+              icon="i-heroicons-gift"
+              :title="$t('gestion.ticketing.handout_items_title')"
+              :description="$t('gestion.ticketing.handout_items_card_description')"
+              color="orange"
+            />
 
-              <!-- Articles à remettre -->
-              <ManagementNavigationCard
-                v-if="edition.ticketingHandoutItemsEnabled"
-                :to="`/editions/${edition.id}/gestion/ticketing/handout-items`"
-                icon="i-heroicons-gift"
-                :title="$t('gestion.ticketing.handout_items_title')"
-                :description="$t('gestion.ticketing.handout_items_card_description')"
-                color="orange"
-              />
+            <!-- Gérer les commandes -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/orders`"
+              icon="i-heroicons-shopping-cart"
+              :title="$t('gestion.ticketing.orders_title')"
+              :description="$t('gestion.ticketing.orders_description')"
+              color="green"
+            />
 
-              <!-- Gérer les commandes -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/orders`"
-                icon="i-heroicons-shopping-cart"
-                :title="$t('gestion.ticketing.orders_title')"
-                :description="$t('gestion.ticketing.orders_description')"
-                color="green"
-              />
+            <!-- Contrôle d'accès -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
+              icon="i-heroicons-shield-check"
+              :title="$t('gestion.ticketing.access_control_title')"
+              :description="$t('gestion.ticketing.access_control_description')"
+              color="blue"
+            />
 
-              <!-- Contrôle d'accès -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/access-control`"
-                icon="i-heroicons-shield-check"
-                :title="$t('gestion.ticketing.access_control_title')"
-                :description="$t('gestion.ticketing.access_control_description')"
-                color="blue"
-              />
+            <!-- Compteurs -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/counter`"
+              icon="i-heroicons-calculator"
+              :title="$t('gestion.ticketing.counters_title')"
+              :description="$t('gestion.ticketing.counters_description')"
+              color="teal"
+            />
 
-              <!-- Compteurs -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/counter`"
-                icon="i-heroicons-calculator"
-                :title="$t('gestion.ticketing.counters_title')"
-                :description="$t('gestion.ticketing.counters_description')"
-                color="teal"
-              />
-
-              <!-- Statistiques -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/ticketing/stats`"
-                icon="i-heroicons-chart-bar"
-                :title="$t('gestion.ticketing.stats_title')"
-                :description="$t('gestion.ticketing.stats_description')"
-                color="indigo"
-              />
-            </div>
+            <!-- Statistiques -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/stats`"
+              icon="i-heroicons-chart-bar"
+              :title="$t('gestion.ticketing.stats_title')"
+              :description="$t('gestion.ticketing.stats_description')"
+              color="indigo"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Workshops -->
-        <UCard v-if="canManageWorkshops && edition.workshopsEnabled">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-academic-cap" class="text-indigo-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.workshops.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Gestion des workshops -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/workshops`"
-                icon="i-heroicons-academic-cap"
-                :title="$t('gestion.workshops.manage_title')"
-                :description="$t('gestion.workshops.manage_description')"
-                color="indigo"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="canManageWorkshops && edition.workshopsEnabled"
+          id="ateliers"
+          icon="i-heroicons-academic-cap"
+          icon-class="text-indigo-500"
+          :title="$t('gestion.workshops.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Gestion des workshops -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/workshops`"
+              icon="i-heroicons-academic-cap"
+              :title="$t('gestion.workshops.manage_title')"
+              :description="$t('gestion.workshops.manage_description')"
+              color="indigo"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Tâches -->
-        <UCard v-if="edition.tasksEnabled && canManageTasks">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-clipboard-document-check" class="text-rose-500" />
-              <h2 class="text-lg font-semibold">{{ $t('edition.tasks') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/tasks`"
-                icon="i-heroicons-clipboard-document-check"
-                :title="$t('gestion.task.manage_title')"
-                :description="$t('gestion.task.manage_description')"
-                color="rose"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="edition.tasksEnabled && canManageTasks"
+          id="taches"
+          icon="i-heroicons-clipboard-document-check"
+          icon-class="text-rose-500"
+          :title="$t('edition.tasks')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/tasks`"
+              icon="i-heroicons-clipboard-document-check"
+              :title="$t('gestion.task.manage_title')"
+              :description="$t('gestion.task.manage_description')"
+              color="rose"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Stock matériel -->
-        <UCard v-if="edition.stockEnabled && canAccessStock">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-archive-box" class="text-amber-600" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.stock.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/stock`"
-                icon="i-heroicons-archive-box"
-                :title="$t('gestion.stock.manage_title')"
-                :description="$t('gestion.stock.manage_description')"
-                color="amber"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="edition.stockEnabled && canAccessStock"
+          id="stock"
+          icon="i-heroicons-archive-box"
+          icon-class="text-amber-600"
+          :title="$t('gestion.stock.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/stock`"
+              icon="i-heroicons-archive-box"
+              :title="$t('gestion.stock.manage_title')"
+              :description="$t('gestion.stock.manage_description')"
+              color="amber"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- FAQ -->
-        <UCard v-if="edition.faqEnabled && canManageFAQ">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-question-mark-circle" class="text-indigo-500" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.faq.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/faq`"
-                icon="i-heroicons-question-mark-circle"
-                :title="$t('gestion.faq.title')"
-                :description="$t('gestion.faq.description')"
-                color="indigo"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="edition.faqEnabled && canManageFAQ"
+          id="faq"
+          icon="i-heroicons-question-mark-circle"
+          icon-class="text-indigo-500"
+          :title="$t('gestion.faq.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/faq`"
+              icon="i-heroicons-question-mark-circle"
+              :title="$t('gestion.faq.title')"
+              :description="$t('gestion.faq.description')"
+              color="indigo"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Trésorerie -->
-        <UCard v-if="edition.treasuryEnabled && canManageTreasury">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-calculator" class="text-sky-600" />
-              <h2 class="text-lg font-semibold">{{ $t('gestion.treasury.title') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/treasury`"
-                icon="i-heroicons-calculator"
-                :title="$t('gestion.treasury.title')"
-                :description="$t('gestion.treasury.subtitle')"
-                color="sky"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="edition.treasuryEnabled && canManageTreasury"
+          id="tresorerie"
+          icon="i-heroicons-calculator"
+          icon-class="text-sky-600"
+          :title="$t('gestion.treasury.title')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/treasury`"
+              icon="i-heroicons-calculator"
+              :title="$t('gestion.treasury.title')"
+              :description="$t('gestion.treasury.subtitle')"
+              color="sky"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Objets trouvés. La condition énumère qui a le droit d'y entrer plutôt que d'exclure
              un cas : écrite en négatif, elle montrait la carte à quiconque atteignait cette page
              — y compris aux bénévoles en créneau, que la page des objets trouvés refuse. Un lien
              vers une porte fermée vaut moins que pas de lien. Les responsables d'équipe seuls
              restent exclus, comme auparavant. -->
-        <UCard v-if="canEdit || canManageVolunteers || isOrganizer">
-          <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-magnifying-glass" class="text-amber-500" />
-              <h2 class="text-lg font-semibold">{{ $t('edition.lost_found') }}</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              <!-- Gestion des objets trouvés -->
-              <ManagementNavigationCard
-                :to="`/editions/${edition.id}/gestion/lost-found`"
-                icon="i-heroicons-magnifying-glass"
-                :title="$t('gestion.manage_lost_found')"
-                :description="$t('gestion.lost_found_description')"
-                color="yellow"
-              />
-            </div>
+        <ManagementCategorySection
+          v-if="canEdit || canManageVolunteers || isOrganizer"
+          id="objets-trouves"
+          icon="i-heroicons-magnifying-glass"
+          icon-class="text-amber-500"
+          :title="$t('edition.lost_found')"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- Gestion des objets trouvés -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/lost-found`"
+              icon="i-heroicons-magnifying-glass"
+              :title="$t('gestion.manage_lost_found')"
+              :description="$t('gestion.lost_found_description')"
+              color="yellow"
+            />
           </div>
-        </UCard>
+        </ManagementCategorySection>
 
         <!-- Supprimer l'édition -->
         <div v-if="canDelete" class="flex justify-end">
@@ -702,6 +717,9 @@ onMounted(async () => {
 })
 
 const conteneurCartes = ref<HTMLElement | null>(null)
+
+// Le repli par catégorie, sur mobile seulement : voir `useManagementCategories`.
+const { categories, categorieOuverte, ouvrir, fermer } = fournirCategoriesGestion()
 
 /**
  * Quand une seule destination est offerte, y aller directement.

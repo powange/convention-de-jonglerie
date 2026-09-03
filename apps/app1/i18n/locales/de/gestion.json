@@ -773,6 +773,7 @@
       "shared_notice": "Diese Angaben gehören zur Convention „{name}“: Sie gelten für alle ihre Ausgaben, nicht nur für diese.",
       "submit": "Convention speichern",
       "title": "Convention"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }

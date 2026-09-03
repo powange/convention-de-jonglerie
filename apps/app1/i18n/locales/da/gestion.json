@@ -773,6 +773,7 @@
       "shared_notice": "Disse oplysninger tilhører konventet “{name}”: de gælder for alle dets udgaver, ikke kun denne.",
       "submit": "Gem konvent",
       "title": "Konvent"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }

@@ -773,6 +773,7 @@
       "shared_notice": "Esta información pertenece a la convención «{name}»: se aplica a todas sus ediciones, no solo a esta.",
       "submit": "Guardar la convención",
       "title": "Convención"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }

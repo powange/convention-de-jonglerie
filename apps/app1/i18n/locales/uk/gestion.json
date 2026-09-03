@@ -773,6 +773,7 @@
       "shared_notice": "Ці дані належать конвенції «{name}»: вони стосуються всіх її видань, а не лише цього.",
       "submit": "Зберегти конвенцію",
       "title": "Конвенція"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }

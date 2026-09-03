@@ -773,6 +773,7 @@
       "shared_notice": "This information belongs to the convention “{name}”: it applies to all of its editions, not only this one.",
       "submit": "Save convention",
       "title": "Convention"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }

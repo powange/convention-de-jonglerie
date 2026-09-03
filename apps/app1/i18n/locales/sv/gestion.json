@@ -773,6 +773,7 @@
       "shared_notice": "De här uppgifterna tillhör konventet ”{name}”: de gäller för alla dess utgåvor, inte bara den här.",
       "submit": "Spara konvent",
       "title": "Konvent"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }
