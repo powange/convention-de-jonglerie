@@ -663,7 +663,8 @@
       "config_description": "Konfigurera volontärsystem",
       "notifications_description": "Skicka meddelanden till volontärer",
       "planning_description": "Planering av slots och uppdrag",
-      "teams_description": "Organisera team av volontärer"
+      "teams_description": "Organisera team av volontärer",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Föreställningsutlysning",

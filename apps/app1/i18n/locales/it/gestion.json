@@ -663,7 +663,8 @@
       "config_description": "Configura sistema volontariato",
       "notifications_description": "Inviare notifiche ai volontari",
       "planning_description": "Pianificazione di slot e missioni",
-      "teams_description": "Organizzare squadre di volontari"
+      "teams_description": "Organizzare squadre di volontari",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Bando per spettacoli",

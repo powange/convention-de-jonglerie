@@ -663,7 +663,8 @@
       "config_description": "Freiwilligensystem konfigurieren",
       "notifications_description": "Benachrichtigungen an Freiwillige senden",
       "planning_description": "Zeitnischen und Missionen planen",
-      "teams_description": "Organisation von Freiwilligenteams"
+      "teams_description": "Organisation von Freiwilligenteams",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Show-Aufruf",

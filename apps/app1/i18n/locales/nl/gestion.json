@@ -663,7 +663,8 @@
       "config_description": "Vrijwilligerssysteem configureren",
       "notifications_description": "Meldingen naar vrijwilligers sturen",
       "planning_description": "Planningsslots en missies",
-      "teams_description": "Vrijwilligersteams organiseren"
+      "teams_description": "Vrijwilligersteams organiseren",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Show-oproep",

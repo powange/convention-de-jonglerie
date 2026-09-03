@@ -663,7 +663,8 @@
       "config_description": "Skonfiguruj system wolontariatu",
       "notifications_description": "Wysyłanie powiadomień do wolontariuszy",
       "planning_description": "Planowanie przydziałów czasu i misji",
-      "teams_description": "Organizowanie zespołów wolontariuszy"
+      "teams_description": "Organizowanie zespołów wolontariuszy",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Nabór spektakli",

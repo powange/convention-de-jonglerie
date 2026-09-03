@@ -663,7 +663,8 @@
       "config_description": "Konfigurer frivilligsystem",
       "notifications_description": "Send meddelelser til frivillige",
       "planning_description": "Planlægning af slots og missioner",
-      "teams_description": "Organisering af hold af frivillige"
+      "teams_description": "Organisering af hold af frivillige",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Forestillingsopkald",
