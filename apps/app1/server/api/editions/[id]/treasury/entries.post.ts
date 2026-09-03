@@ -3,7 +3,8 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
-import { assertCodeBelongsToEdition } from '#server/utils/treasury-guards'
+import { assertCodeBelongsToEdition, avanceNormalisee } from '#server/utils/treasury-guards'
+import { deplacerJustificatif } from '#server/utils/treasury-receipt-files'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { toCents } from '~~/shared/utils/money'
 
@@ -17,6 +18,11 @@ const bodySchema = z.object({
   description: z.string().max(2000).nullable().optional(),
   amount: z.number().positive().max(10_000_000),
   codeId: z.number().int().positive().nullable().optional(),
+  /** Chemin rendu par `/api/files/treasury`, jamais une URL choisie par le client. */
+  imageUrl: z.string().max(500).nullable().optional(),
+  isForecast: z.boolean().optional(),
+  advancedById: z.number().int().positive().nullable().optional(),
+  reimbursed: z.boolean().optional(),
 })
 
 /** POST /api/editions/:id/treasury/entries — ajoute une ligne saisie à la main. */
@@ -33,6 +39,18 @@ export default wrapApiHandler(
     const data = bodySchema.parse(await readBody(event))
     await assertCodeBelongsToEdition(editionId, data.codeId)
 
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      select: { id: true, conventionId: true },
+    })
+    if (!edition) {
+      throw createError({ status: 404, message: 'Édition introuvable' })
+    }
+
+    const imageUrl = await deplacerJustificatif(data.imageUrl, edition)
+
+    const avance = avanceNormalisee(data)
+
     const entry = await prisma.treasuryEntry.create({
       data: {
         editionId,
@@ -41,6 +59,9 @@ export default wrapApiHandler(
         description: data.description ?? null,
         amount: toCents(data.amount)!,
         codeId: data.codeId ?? null,
+        imageUrl,
+        isForecast: data.isForecast ?? false,
+        ...avance,
       },
       select: { id: true },
     })

@@ -803,6 +803,7 @@
     "backup_restore_tables_seen": "Verarbeitete Tabellen: {count}",
     "backup_restore_interrupted_description": "Der Server wurde während der Wiederherstellung neu gestartet: Die Datenbank ist möglicherweise unvollständig. Starten Sie die Wiederherstellung erneut.",
     "backup_import_resumed": "Upload fortgesetzt",
-    "backup_import_resumed_description": "Diese Sicherung war bereits zu {percent} % hochgeladen. Es wird nur noch der Rest gesendet."
+    "backup_import_resumed_description": "Diese Sicherung war bereits zu {percent} % hochgeladen. Es wird nur noch der Rest gesendet.",
+    "merge_group_treasury": "Finanzen"
   }
 }

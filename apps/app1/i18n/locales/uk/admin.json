@@ -803,6 +803,7 @@
     "backup_restore_tables_seen": "Оброблено таблиць: {count}",
     "backup_restore_interrupted_description": "Сервер перезапустився під час відновлення: база даних може бути неповною. Запустіть відновлення ще раз.",
     "backup_import_resumed": "Завантаження відновлено",
-    "backup_import_resumed_description": "Цю резервну копію вже завантажено на {percent} %. Зараз надсилається лише решта."
+    "backup_import_resumed_description": "Цю резервну копію вже завантажено на {percent} %. Зараз надсилається лише решта.",
+    "merge_group_treasury": "Фінанси"
   }
 }

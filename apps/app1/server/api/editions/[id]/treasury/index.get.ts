@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
+import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import {
   computeTreasury,
   aggregateTicketingItems,
@@ -76,6 +77,10 @@ export default wrapApiHandler(
           title: true,
           description: true,
           amount: true,
+          imageUrl: true,
+          isForecast: true,
+          reimbursed: true,
+          advancedBy: { select: userWithProfileAndGravatarSelect },
           code: { select: codeSelect },
         },
       }),

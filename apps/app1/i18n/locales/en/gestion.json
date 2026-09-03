@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Donations",
         "TICKETING_OTHER": "Ticketing — other income"
       },
-      "settled_amount": "including {amount} settled"
+      "settled_amount": "including {amount} settled",
+      "advanced_by_name": "Paid for by {name}",
+      "entry_advanced_by": "Paid for by",
+      "entry_advanced_by_placeholder": "Search for someone from the edition",
+      "entry_forecast": "Forecast",
+      "entry_forecast_hint": "Expected amount, not yet paid",
+      "entry_receipt": "Receipt",
+      "entry_receipt_placeholder": "Photograph the receipt or invoice",
+      "entry_reimbursed": "Already reimbursed",
+      "mark_reimbursed": "Reimbursed",
+      "reimbursed_done": "Advances marked as reimbursed",
+      "reimbursed_error": "Could not mark the advances as reimbursed",
+      "to_reimburse": "To reimburse",
+      "to_reimburse_hint": "{count} person(s) — click for the breakdown"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

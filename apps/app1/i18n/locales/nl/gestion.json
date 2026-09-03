@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Donaties",
         "TICKETING_OTHER": "Ticketing — overige inkomsten"
       },
-      "settled_amount": "waarvan {amount} voldaan"
+      "settled_amount": "waarvan {amount} voldaan",
+      "advanced_by_name": "Voorgeschoten door {name}",
+      "entry_advanced_by": "Voorgeschoten door",
+      "entry_advanced_by_placeholder": "Zoek iemand van de editie",
+      "entry_forecast": "Prognose",
+      "entry_forecast_hint": "Verwacht bedrag, nog niet betaald",
+      "entry_receipt": "Bewijsstuk",
+      "entry_receipt_placeholder": "Fotografeer de bon of factuur",
+      "entry_reimbursed": "Al terugbetaald",
+      "mark_reimbursed": "Terugbetaald",
+      "reimbursed_done": "Voorschotten gemarkeerd als terugbetaald",
+      "reimbursed_error": "Kan de voorschotten niet als terugbetaald markeren",
+      "to_reimburse": "Terug te betalen",
+      "to_reimburse_hint": "{count} perso(o)n(en) — klik voor het overzicht"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",

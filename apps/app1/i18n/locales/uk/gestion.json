@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Пожертви",
         "TICKETING_OTHER": "Квитки — інші доходи"
       },
-      "settled_amount": "з них {amount} сплачено"
+      "settled_amount": "з них {amount} сплачено",
+      "advanced_by_name": "Оплатив(ла) {name}",
+      "entry_advanced_by": "Оплатив(ла)",
+      "entry_advanced_by_placeholder": "Знайти людину з цього випуску",
+      "entry_forecast": "Планове",
+      "entry_forecast_hint": "Очікувана сума, ще не сплачена",
+      "entry_receipt": "Підтвердження",
+      "entry_receipt_placeholder": "Сфотографуйте чек або рахунок",
+      "entry_reimbursed": "Уже відшкодовано",
+      "mark_reimbursed": "Відшкодовано",
+      "reimbursed_done": "Аванси позначено як відшкодовані",
+      "reimbursed_error": "Не вдалося позначити аванси як відшкодовані",
+      "to_reimburse": "До відшкодування",
+      "to_reimburse_hint": "{count} осіб — натисніть, щоб побачити деталі"
     },
     "program": {
       "description": "Складіть розклад фестивалю: воркшопи, виступи та інші події.",

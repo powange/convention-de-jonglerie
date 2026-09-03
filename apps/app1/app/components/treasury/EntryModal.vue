@@ -47,6 +47,46 @@
             />
           </UFormField>
         </div>
+
+        <!-- Prévisionnel : bascule le montant du réglé vers l'engagé. Le solde ne change pas,
+             mais le réglé cesse de compter ce qui n'a pas été payé. -->
+        <UCheckbox
+          v-model="form.isForecast"
+          :label="$t('gestion.treasury.entry_forecast')"
+          :description="$t('gestion.treasury.entry_forecast_hint')"
+        />
+
+        <!-- L'avance ne concerne que les dépenses : une recette n'est avancée par personne. -->
+        <template v-if="form.kind === 'EXPENSE'">
+          <UFormField :label="$t('gestion.treasury.entry_advanced_by')">
+            <UserSelector
+              v-model="personneAvance"
+              v-model:search-term="rechercheAvance"
+              :searched-users="candidatsAvance"
+              :searching-users="rechercheEnCours"
+              :placeholder="$t('gestion.treasury.entry_advanced_by_placeholder')"
+            />
+          </UFormField>
+
+          <!-- Sans personne désignée, il n'y a rien à rembourser : la case n'aurait aucun sens. -->
+          <UCheckbox
+            v-if="personneAvance"
+            v-model="form.reimbursed"
+            :label="$t('gestion.treasury.entry_reimbursed')"
+          />
+        </template>
+
+        <!-- Le justificatif ferme le formulaire : c'est la dernière chose qu'on fait, souvent
+             en photographiant le ticket qu'on a encore en main. -->
+        <UFormField :label="$t('gestion.treasury.entry_receipt')">
+          <UiImageUpload
+            v-model="form.imageUrl"
+            allow-camera
+            :endpoint="{ type: 'treasury', id: editionId }"
+            :alt="$t('gestion.treasury.entry_receipt')"
+            :placeholder="$t('gestion.treasury.entry_receipt_placeholder')"
+          />
+        </UFormField>
       </div>
     </template>
 
@@ -65,6 +105,18 @@
 </template>
 
 <script setup lang="ts">
+import { useDebounce } from '@vueuse/core'
+
+import type { UserSelectItem } from '~/components/UserSelector.vue'
+
+/** Ce que l'API rend d'une personne ayant avancé — de quoi l'afficher, rien de plus. */
+interface CandidatAvance {
+  id: number
+  pseudo: string
+  profilePicture?: string | null
+  emailHash?: string | null
+}
+
 const props = defineProps<{
   open: boolean
   /** Ligne existante à modifier, ou `null` pour une création. */
@@ -75,6 +127,10 @@ const props = defineProps<{
     description?: string | null
     settled: number
     code?: { id: number } | null
+    imageUrl?: string | null
+    isForecast?: boolean
+    reimbursed?: boolean
+    advancedBy?: CandidatAvance | null
   } | null
   codes: { id: number; code: string; label: string }[]
   currency: string
@@ -99,7 +155,52 @@ const form = reactive<{
   description: string
   amount: number
   codeId: number | null
-}>({ kind: 'EXPENSE', title: '', description: '', amount: 0, codeId: null })
+  imageUrl: string | null
+  isForecast: boolean
+  reimbursed: boolean
+}>({
+  kind: 'EXPENSE',
+  title: '',
+  description: '',
+  amount: 0,
+  codeId: null,
+  imageUrl: null,
+  isForecast: false,
+  reimbursed: false,
+})
+
+/**
+ * La personne qui a avancé, telle que `UserSelector` la manipule. Séparée de `form` parce que le
+ * composant travaille sur un objet complet là où l'API n'attend qu'un identifiant.
+ */
+const personneAvance = ref<UserSelectItem | null>(null)
+const rechercheAvance = ref('')
+const rechercheDebouncee = useDebounce(rechercheAvance, 300)
+const candidatsAvance = ref<UserSelectItem[]>([])
+const rechercheEnCours = ref(false)
+
+watch(rechercheDebouncee, async (terme) => {
+  rechercheEnCours.value = true
+  try {
+    const reponse = await $fetch<{ data: { users: CandidatAvance[] } }>(
+      `/api/editions/${props.editionId}/treasury/advance-candidates`,
+      { params: terme ? { search: terme } : {} }
+    )
+    candidatsAvance.value = (reponse?.data?.users ?? []).map((u) => ({
+      id: u.id,
+      label: u.pseudo,
+      pseudo: u.pseudo,
+      email: '',
+      emailHash: u.emailHash ?? '',
+      profilePicture: u.profilePicture,
+      isRealUser: true,
+    }))
+  } catch {
+    candidatsAvance.value = []
+  } finally {
+    rechercheEnCours.value = false
+  }
+})
 
 const kindOptions = computed(() => [
   {
@@ -138,6 +239,21 @@ watch(
     form.description = entry?.description ?? ''
     form.amount = entry ? entry.settled / 100 : 0
     form.codeId = entry?.code?.id ?? null
+    form.imageUrl = entry?.imageUrl ?? null
+    form.isForecast = entry?.isForecast ?? false
+    form.reimbursed = entry?.reimbursed ?? false
+    personneAvance.value = entry?.advancedBy
+      ? {
+          id: entry.advancedBy.id,
+          label: entry.advancedBy.pseudo,
+          pseudo: entry.advancedBy.pseudo,
+          email: '',
+          emailHash: entry.advancedBy.emailHash ?? '',
+          profilePicture: entry.advancedBy.profilePicture,
+          isRealUser: true,
+        }
+      : null
+    rechercheAvance.value = ''
   },
   { immediate: true }
 )
@@ -148,6 +264,11 @@ const body = () => ({
   description: form.description.trim() || null,
   amount: form.amount,
   codeId: form.codeId,
+  imageUrl: form.imageUrl,
+  isForecast: form.isForecast,
+  // Le serveur remet ces deux champs à zéro sur une recette : inutile de filtrer ici aussi.
+  advancedById: personneAvance.value?.id ?? null,
+  reimbursed: form.reimbursed,
 })
 
 const { execute: createEntry, loading: creating } = useApiAction(

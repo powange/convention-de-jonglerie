@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Donationer",
         "TICKETING_OTHER": "Billetsalg — andre indtægter"
       },
-      "settled_amount": "heraf {amount} betalt"
+      "settled_amount": "heraf {amount} betalt",
+      "advanced_by_name": "Lagt ud af {name}",
+      "entry_advanced_by": "Lagt ud af",
+      "entry_advanced_by_placeholder": "Find en person fra udgaven",
+      "entry_forecast": "Forventet",
+      "entry_forecast_hint": "Forventet beløb, endnu ikke betalt",
+      "entry_receipt": "Bilag",
+      "entry_receipt_placeholder": "Tag et billede af bonen eller fakturaen",
+      "entry_reimbursed": "Allerede refunderet",
+      "mark_reimbursed": "Refunderet",
+      "reimbursed_done": "Udlæg markeret som refunderet",
+      "reimbursed_error": "Kunne ikke markere udlæggene som refunderet",
+      "to_reimburse": "Til refusion",
+      "to_reimburse_hint": "{count} person(er) – klik for detaljer"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

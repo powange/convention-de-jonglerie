@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Donationer",
         "TICKETING_OTHER": "Biljettförsäljning — övriga intäkter"
       },
-      "settled_amount": "varav {amount} betalt"
+      "settled_amount": "varav {amount} betalt",
+      "advanced_by_name": "Utlagt av {name}",
+      "entry_advanced_by": "Utlagt av",
+      "entry_advanced_by_placeholder": "Sök en person från utgåvan",
+      "entry_forecast": "Prognos",
+      "entry_forecast_hint": "Förväntat belopp, ännu inte betalt",
+      "entry_receipt": "Underlag",
+      "entry_receipt_placeholder": "Fotografera kvittot eller fakturan",
+      "entry_reimbursed": "Redan återbetalt",
+      "mark_reimbursed": "Återbetalt",
+      "reimbursed_done": "Utlägg markerade som återbetalda",
+      "reimbursed_error": "Det gick inte att markera utläggen som återbetalda",
+      "to_reimburse": "Att återbetala",
+      "to_reimburse_hint": "{count} person(er) — klicka för fördelningen"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

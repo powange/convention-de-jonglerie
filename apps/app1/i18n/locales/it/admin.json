@@ -803,6 +803,7 @@
     "backup_restore_tables_seen": "Tabelle elaborate: {count}",
     "backup_restore_interrupted_description": "Il server si è riavviato durante il ripristino: il database potrebbe essere incompleto. Riavvia il ripristino.",
     "backup_import_resumed": "Caricamento ripreso",
-    "backup_import_resumed_description": "Questo backup era già stato caricato al {percent} %. Ora viene inviato solo il resto."
+    "backup_import_resumed_description": "Questo backup era già stato caricato al {percent} %. Ora viene inviato solo il resto.",
+    "merge_group_treasury": "Tesoreria"
   }
 }
