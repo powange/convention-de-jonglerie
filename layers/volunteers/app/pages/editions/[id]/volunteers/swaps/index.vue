@@ -35,7 +35,9 @@
               :placeholder="
                 chargementCandidats ? t('common.loading') : t('volunteers.swap_pick_placeholder')
               "
-              :message-vide="t('volunteers.swap_no_candidate')"
+              :message-vide="
+                erreurCandidats ? t('errors.loading_error') : t('volunteers.swap_no_candidate')
+              "
             />
           </UFormField>
 
@@ -172,23 +174,34 @@ const mesChoix = computed(() =>
  */
 const chargementCandidats = ref(false)
 const candidats = ref<any[]>([])
+const erreurCandidats = ref(false)
 
 // `immediate` : la présélection ci-dessus s'applique dès la construction, avant que cet
 // observateur existe. Sans cela, la page s'ouvrait avec un créneau choisi et une liste de
 // candidats vide — donc sur un message d'absence trompeur. Vu à l'inspection visuelle, pas par
 // les tests, qui interrogeaient l'API directement.
+//
+// Côté serveur en revanche, on ne charge rien : `$fetch` n'y porte pas le cookie de session,
+// l'API répondait 401 et Nuxt remplaçait la page entière par son écran d'erreur — au premier
+// affichage comme à chaque rafraîchissement. L'observateur se rejoue à l'hydratation : c'est de
+// là que part la requête, avec la session du navigateur.
 watch(
   creneauCede,
   async (id) => {
     creneauVoulu.value = null
     candidats.value = []
-    if (!id) return
+    erreurCandidats.value = false
+    if (!id || import.meta.server) return
     chargementCandidats.value = true
     try {
       const r = await $fetch<any>(`/api/editions/${editionId.value}/volunteers/swaps/candidates`, {
         params: { assignmentId: id },
       })
       candidats.value = (r?.data ?? r)?.candidates ?? []
+    } catch {
+      // Un échec doit se voir : sans ce drapeau, le sélecteur annoncerait « aucun créneau
+      // échangeable », qui se lit comme une absence de candidat et non comme une panne.
+      erreurCandidats.value = true
     } finally {
       chargementCandidats.value = false
     }
