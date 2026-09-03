@@ -1,5 +1,6 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { TACHES_PLANIFIEES } from '#server/utils/scheduled-tasks'
 
 export default wrapApiHandler(
   async (event) => {
@@ -8,15 +9,8 @@ export default wrapApiHandler(
 
     const taskName = getRouterParam(event, 'taskName')
 
-    // Liste des tâches disponibles
-    const availableTasks = [
-      'volunteer-reminders',
-      'convention-favorites-reminders',
-      'cleanup-expired-tokens',
-      'cleanup-temp-uploads',
-      'cleanup-resolved-error-logs',
-      'cleanup-inactive-subscriptions',
-    ]
+    // Tirée du catalogue : une tâche affichée doit pouvoir être lancée, et l'inverse.
+    const availableTasks = TACHES_PLANIFIEES.map((tache) => tache.name)
 
     if (!taskName || !availableTasks.includes(taskName)) {
       throw createError({

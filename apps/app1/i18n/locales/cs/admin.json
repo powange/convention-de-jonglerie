@@ -805,6 +805,9 @@
     "backup_import_resumed": "Nahrávání obnoveno",
     "backup_import_resumed_description": "Tato záloha už byla nahrána z {percent} %. Nyní se odesílá jen zbytek.",
     "merge_group_treasury": "Pokladna",
-    "cleanup_temp_uploads": "Úklid dočasných nahrávek"
+    "cleanup_temp_uploads": "Úklid dočasných nahrávek",
+    "cleanup_empty_conversations": "Úklid prázdných konverzací",
+    "cleanup_inactive_subscriptions": "Úklid neaktivních push odběrů",
+    "task_deadlines_reminders": "Připomínky termínů úkolů"
   }
 }

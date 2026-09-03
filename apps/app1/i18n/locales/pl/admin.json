@@ -805,6 +805,9 @@
     "backup_import_resumed": "Wznowiono wysyłanie",
     "backup_import_resumed_description": "Ta kopia zapasowa była już wysłana w {percent} %. Teraz wysyłana jest tylko reszta.",
     "merge_group_treasury": "Finanse",
-    "cleanup_temp_uploads": "Czyszczenie plików tymczasowych"
+    "cleanup_temp_uploads": "Czyszczenie plików tymczasowych",
+    "cleanup_empty_conversations": "Czyszczenie pustych rozmów",
+    "cleanup_inactive_subscriptions": "Czyszczenie nieaktywnych subskrypcji push",
+    "task_deadlines_reminders": "Przypomnienia o terminach zadań"
   }
 }

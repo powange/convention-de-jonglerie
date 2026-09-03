@@ -805,6 +805,9 @@
     "backup_import_resumed": "Caricamento ripreso",
     "backup_import_resumed_description": "Questo backup era già stato caricato al {percent} %. Ora viene inviato solo il resto.",
     "merge_group_treasury": "Tesoreria",
-    "cleanup_temp_uploads": "Pulizia dei caricamenti temporanei"
+    "cleanup_temp_uploads": "Pulizia dei caricamenti temporanei",
+    "cleanup_empty_conversations": "Pulizia delle conversazioni vuote",
+    "cleanup_inactive_subscriptions": "Pulizia delle iscrizioni push inattive",
+    "task_deadlines_reminders": "Promemoria delle scadenze delle attività"
   }
 }

@@ -805,6 +805,9 @@
     "backup_import_resumed": "Upload fortgesetzt",
     "backup_import_resumed_description": "Diese Sicherung war bereits zu {percent} % hochgeladen. Es wird nur noch der Rest gesendet.",
     "merge_group_treasury": "Finanzen",
-    "cleanup_temp_uploads": "Aufräumen temporärer Uploads"
+    "cleanup_temp_uploads": "Aufräumen temporärer Uploads",
+    "cleanup_empty_conversations": "Aufräumen leerer Unterhaltungen",
+    "cleanup_inactive_subscriptions": "Aufräumen inaktiver Push-Abos",
+    "task_deadlines_reminders": "Erinnerungen an Aufgabenfristen"
   }
 }

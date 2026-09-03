@@ -1,65 +1,13 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { TACHES_PLANIFIEES } from '#server/utils/scheduled-tasks'
 
 export default wrapApiHandler(
   async (event) => {
     // Vérifier l'authentification et les droits admin (mutualisé)
     await requireGlobalAdminWithDbCheck(event)
 
-    // Liste des tâches disponibles avec leurs descriptions et planifications
-    const tasks = [
-      {
-        name: 'volunteer-reminders',
-        description: 'Envoie des rappels aux bénévoles 30 minutes avant leurs créneaux',
-        schedule: 'Chaque minute (vérifie les créneaux dans 30 min)',
-        cronExpression: '* * * * *',
-        category: 'Notifications',
-      },
-      {
-        name: 'convention-favorites-reminders',
-        description:
-          'Notifie les utilisateurs des conventions favorites qui commencent dans 3 jours',
-        schedule: 'Quotidien à 10h',
-        cronExpression: '0 10 * * *',
-        category: 'Notifications',
-      },
-      {
-        name: 'cleanup-expired-tokens',
-        description: 'Nettoie les tokens de réinitialisation de mot de passe expirés',
-        schedule: 'Quotidien à 2h',
-        cronExpression: '0 2 * * *',
-        category: 'Maintenance',
-      },
-      {
-        name: 'cleanup-temp-uploads',
-        description:
-          "Supprime les images abandonnées dans le dossier temporaire (plus d'une heure)",
-        schedule: 'Toutes les heures (à la 15e minute)',
-        cronExpression: '15 * * * *',
-        category: 'Maintenance',
-      },
-      {
-        name: 'cleanup-resolved-error-logs',
-        description: "Supprime les logs d'erreur résolus de plus d'un mois",
-        schedule: 'Mensuel (1er du mois à 3h)',
-        cronExpression: '0 3 1 * *',
-        category: 'Maintenance',
-      },
-      {
-        name: 'cleanup-inactive-subscriptions',
-        description: 'Nettoie les subscriptions push inactives',
-        schedule: 'Quotidien à 4h',
-        cronExpression: '0 4 * * *',
-        category: 'Maintenance',
-      },
-      {
-        name: 'cleanup-empty-conversations',
-        description: 'Supprime les conversations sans messages créées il y a plus de 7 jours',
-        schedule: 'Quotidien à 5h',
-        cronExpression: '0 5 * * *',
-        category: 'Maintenance',
-      },
-    ]
+    const tasks = TACHES_PLANIFIEES
 
     return createSuccessResponse({
       tasks,

@@ -208,7 +208,9 @@
     "change_profile_picture": "Modifier la photo de profil",
     "change_profile_picture_description": "Téléchargez ou modifiez la photo de profil de cet utilisateur",
     "claim_requests": "Demandes de revendication",
+    "cleanup_empty_conversations": "Nettoyage des conversations vides",
     "cleanup_expired_tokens": "Nettoyage tokens expirés",
+    "cleanup_inactive_subscriptions": "Nettoyage des abonnements push inactifs",
     "cleanup_resolved_error_logs": "Nettoyage logs d'erreur",
     "cleanup_temp_uploads": "Purge des envois temporaires",
     "config": {
@@ -764,6 +766,7 @@
     "super_admin": "Super Admin",
     "super_administrators": "Super administrateurs",
     "super_admins": "Super admins",
+    "task_deadlines_reminders": "Rappels d'échéance des tâches",
     "task_executed_details": "La tâche {taskName} a été exécutée en {time}",
     "task_executed_successfully": "Tâche exécutée avec succès",
     "task_execution_error": "Une erreur s'est produite lors de l'exécution",

@@ -805,6 +805,9 @@
     "backup_import_resumed": "Upload resumed",
     "backup_import_resumed_description": "This backup was already {percent}% uploaded. Only the rest is being sent now.",
     "merge_group_treasury": "Treasury",
-    "cleanup_temp_uploads": "Temporary uploads cleanup"
+    "cleanup_temp_uploads": "Temporary uploads cleanup",
+    "cleanup_empty_conversations": "Empty conversations cleanup",
+    "cleanup_inactive_subscriptions": "Inactive push subscriptions cleanup",
+    "task_deadlines_reminders": "Task deadline reminders"
   }
 }

@@ -805,6 +805,9 @@
     "backup_import_resumed": "Envío reanudado",
     "backup_import_resumed_description": "Esta copia de seguridad ya se había enviado al {percent} %. Ahora solo se envía el resto.",
     "merge_group_treasury": "Tesorería",
-    "cleanup_temp_uploads": "Limpieza de subidas temporales"
+    "cleanup_temp_uploads": "Limpieza de subidas temporales",
+    "cleanup_empty_conversations": "Limpieza de conversaciones vacías",
+    "cleanup_inactive_subscriptions": "Limpieza de suscripciones push inactivas",
+    "task_deadlines_reminders": "Recordatorios de vencimiento de tareas"
   }
 }

@@ -805,6 +805,9 @@
     "backup_import_resumed": "Завантаження відновлено",
     "backup_import_resumed_description": "Цю резервну копію вже завантажено на {percent} %. Зараз надсилається лише решта.",
     "merge_group_treasury": "Фінанси",
-    "cleanup_temp_uploads": "Очищення тимчасових завантажень"
+    "cleanup_temp_uploads": "Очищення тимчасових завантажень",
+    "cleanup_empty_conversations": "Очищення порожніх бесід",
+    "cleanup_inactive_subscriptions": "Очищення неактивних push-підписок",
+    "task_deadlines_reminders": "Нагадування про терміни завдань"
   }
 }
