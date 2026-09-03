@@ -225,13 +225,13 @@ model AiConfig {
   provider String @default("lmstudio") // "lmstudio", "anthropic", "ollama"
 
   // LM Studio
-  lmstudioBaseUrl       String  @default("http://host.docker.internal:1234")
+  lmstudioBaseUrl           String  @default("http://host.docker.internal:1234")
   /// Adresse de secours, essayée quand la première est injoignable — machine éteinte, port fermé,
   /// service redémarré. Elle ne prend pas le relais sur une expiration : dans ce cas la première
   /// répond, elle est seulement lente, et basculer ne ferait que doubler l'attente.
-  lmstudioBackupBaseUrl String?
-  lmstudioModelId       String? // ID du modèle vision sélectionné (référence AiModel.modelId)
-  lmstudioTextModelId   String? // ID du modèle texte sélectionné
+  lmstudioBackupBaseUrl     String?
+  lmstudioModelId           String? // ID du modèle vision sélectionné (référence AiModel.modelId)
+  lmstudioTextModelId       String? // ID du modèle texte sélectionné
   /// Modèles de la machine de secours. Deux serveurs n'hébergent pas forcément les mêmes
   /// modèles : demander à la seconde un modèle qu'elle n'a pas, c'est la faire échouer alors
   /// qu'elle répondait. Laissés vides, ceux du serveur principal s'appliquent, ce qui laisse
@@ -264,8 +264,8 @@ model AiConfig {
 }
 
 model AiModel {
-  id       Int    @id @default(autoincrement())
-  provider String // "lmstudio" (extensible à "ollama" plus tard)
+  id        Int      @id @default(autoincrement())
+  provider  String // "lmstudio" (extensible à "ollama" plus tard)
   /// Le serveur qui héberge ce modèle : "principal" ou "secours". Deux machines LM Studio
   /// distinctes n'ont pas le même contenu ; un catalogue commun proposerait pour l'une des
   /// modèles que seule l'autre possède, et l'appel échouerait au moment de basculer.

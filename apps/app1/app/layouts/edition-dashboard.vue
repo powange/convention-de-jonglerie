@@ -431,6 +431,13 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           label: t('edition.volunteers.planning'),
           icon: 'i-heroicons-calendar-days',
           to: `/editions/${editionId.value}/gestion/volunteers/planning`,
+        },
+        {
+          // À la suite du planning : c'est lui qu'un échange modifie, et c'est là qu'on vient
+          // quand on se demande qui tient quoi.
+          label: t('edition.volunteers.swaps'),
+          icon: 'i-lucide-arrow-left-right',
+          to: `/editions/${editionId.value}/gestion/volunteers/swaps`,
         }
       )
     }

@@ -12,25 +12,25 @@ datasource db {
 // =============================================================================
 
 model User {
-  id                                 Int                                 @id @default(autoincrement())
-  email                              String                              @unique
-  emailHash                          String
-  pseudo                             String                              @unique
-  nom                                String?
-  prenom                             String?
-  password                           String?
-  authProvider                       String                              @default("email") // "email", "google", "facebook"
-  createdAt                          DateTime                            @default(now())
-  updatedAt                          DateTime                            @updatedAt
-  lastLoginAt                        DateTime?
-  profilePicture                     String?
-  emailVerificationCode              String?
-  isEmailVerified                    Boolean                             @default(false)
-  verificationCodeExpiry             DateTime?
-  isGlobalAdmin                      Boolean                             @default(false)
-  phone                              String?
-  pronouns                           String?
-  preferredLanguage                  String                              @default("fr")
+  id                     Int       @id @default(autoincrement())
+  email                  String    @unique
+  emailHash              String
+  pseudo                 String    @unique
+  nom                    String?
+  prenom                 String?
+  password               String?
+  authProvider           String    @default("email") // "email", "google", "facebook"
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  lastLoginAt            DateTime?
+  profilePicture         String?
+  emailVerificationCode  String?
+  isEmailVerified        Boolean   @default(false)
+  verificationCodeExpiry DateTime?
+  isGlobalAdmin          Boolean   @default(false)
+  phone                  String?
+  pronouns               String?
+  preferredLanguage      String    @default("fr")
 
   // Informations personnelles renseignables depuis le profil, toutes facultatives.
   //
@@ -77,6 +77,10 @@ model User {
   artistNotificationGroups           ArtistNotificationGroup[]
   artistNotificationConfirmations    ArtistNotificationConfirmation[]
   volunteerAssignments               VolunteerAssignment[]               @relation("VolunteerAssignment_user")
+  /// Échanges de créneaux : demandés, reçus, ou tranchés en tant qu'organisateur.
+  volunteerSwapsRequested            VolunteerSwapRequest[]              @relation("VolunteerSwap_requester")
+  volunteerSwapsReceived             VolunteerSwapRequest[]              @relation("VolunteerSwap_target")
+  volunteerSwapsDecided              VolunteerSwapRequest[]              @relation("VolunteerSwap_decidedBy")
   assignedVolunteerSlots             VolunteerAssignment[]               @relation("VolunteerAssignment_assignedBy")
   claimRequests                      ConventionClaimRequest[]
   workshops                          Workshop[]
@@ -136,6 +140,7 @@ model Event {
   volunteerTimeSlots          VolunteerTimeSlot[]
   volunteerNotificationGroups VolunteerNotificationGroup[]
   volunteerComments           VolunteerComment[]
+  volunteerSwapRequests       VolunteerSwapRequest[]
   volunteerSettings           EventVolunteerSettings? // config bénévole (étape 0bis)
 }
 
@@ -391,19 +396,19 @@ model EditionOrganizerPermission {
 }
 
 model EditionOrganizer {
-  id                Int                           @id @default(autoincrement())
-  editionId         Int
-  organizerId       Int
-  qrCodeToken       String?                       @unique
-  entryValidated    Boolean                       @default(false)
-  entryValidatedAt  DateTime?
-  entryValidatedBy  Int?
-  createdAt         DateTime                      @default(now())
-  updatedAt         DateTime                      @updatedAt
-  edition           Edition                       @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  organizer         ConventionOrganizer           @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-  handoutItems      EditionOrganizerHandoutItem[]
-  mealSelections    OrganizerMealSelection[]
+  id               Int                           @id @default(autoincrement())
+  editionId        Int
+  organizerId      Int
+  qrCodeToken      String?                       @unique
+  entryValidated   Boolean                       @default(false)
+  entryValidatedAt DateTime?
+  entryValidatedBy Int?
+  createdAt        DateTime                      @default(now())
+  updatedAt        DateTime                      @updatedAt
+  edition          Edition                       @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  organizer        ConventionOrganizer           @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  handoutItems     EditionOrganizerHandoutItem[]
+  mealSelections   OrganizerMealSelection[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])

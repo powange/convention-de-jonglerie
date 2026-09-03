@@ -172,6 +172,11 @@ export const USER_REFERENCES: UserReference[] = [
   // Une avance de trésorerie porte de l'argent dû à la personne : elle doit suivre le compte
   // conservé, pas disparaître dans le fourre-tout.
   { model: 'treasuryEntry', field: 'advancedById', group: 'treasury' },
+  // Échanges de créneaux. Les trois rôles suivent le compte conservé : sans quoi la fusion
+  // buterait sur les clés étrangères, et l'historique d'un échange perdrait qui l'a demandé.
+  { model: 'volunteerSwapRequest', field: 'requesterId', group: 'volunteers' },
+  { model: 'volunteerSwapRequest', field: 'targetId', group: 'volunteers' },
+  { model: 'volunteerSwapRequest', field: 'decidedById', group: 'volunteers' },
   { model: 'feedback', field: 'userId', group: 'misc' },
   { model: 'apiErrorLog', field: 'userId', group: 'misc' },
   { model: 'apiErrorLog', field: 'resolvedBy', group: 'misc', soft: true },

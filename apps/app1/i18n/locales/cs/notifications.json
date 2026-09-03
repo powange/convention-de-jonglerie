@@ -184,6 +184,28 @@
         "action": "Zobrazit přihlášky",
         "message": "{applicantName} se právě přihlásil(a) jako dobrovolník na „{editionName}“.",
         "title": "Nová přihláška dobrovolníka"
+      },
+      "swap": {
+        "requested": {
+          "action": "Zobrazit žádost",
+          "message": "{name} ti navrhuje výměnu směny na {editionName}.",
+          "title": "Návrh na výměnu směny 🔁"
+        },
+        "peer_accepted": {
+          "action": "Zobrazit žádost",
+          "message": "Výměna navržená {name} na {editionName} čeká na schválení organizátorem.",
+          "title": "Výměna čeká na schválení ⏳"
+        },
+        "decided": {
+          "action": "Zobrazit mé směny",
+          "message": "Tvá výměna směny na {editionName} byla schválena.",
+          "title": "Výměna směny schválena ✅"
+        },
+        "refused": {
+          "action": "Zobrazit mé směny",
+          "message": "Navržená výměna směny na {editionName} se neuskutečnila.",
+          "title": "Výměna směny odmítnuta"
+        }
       }
     },
     "welcome": {

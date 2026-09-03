@@ -184,6 +184,28 @@
         "action": "Se ansøgningerne",
         "message": "{applicantName} har netop meldt sig som frivillig til “{editionName}”.",
         "title": "Ny frivilligansøgning"
+      },
+      "swap": {
+        "requested": {
+          "action": "Se anmodningen",
+          "message": "{name} foreslår at bytte en vagt med dig på {editionName}.",
+          "title": "Forslag om vagtbytte 🔁"
+        },
+        "peer_accepted": {
+          "action": "Se anmodningen",
+          "message": "Byttet foreslået til {name} på {editionName} afventer en arrangørs godkendelse.",
+          "title": "Bytte afventer godkendelse ⏳"
+        },
+        "decided": {
+          "action": "Se mine vagter",
+          "message": "Dit vagtbytte på {editionName} er godkendt.",
+          "title": "Vagtbytte godkendt ✅"
+        },
+        "refused": {
+          "action": "Se mine vagter",
+          "message": "Det foreslåede vagtbytte på {editionName} blev ikke til noget.",
+          "title": "Vagtbytte afvist"
+        }
       }
     },
     "welcome": {

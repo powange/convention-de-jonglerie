@@ -184,6 +184,28 @@
         "action": "Vedere le candidature",
         "message": "{applicantName} si è appena candidato come volontario per «{editionName}».",
         "title": "Nuova candidatura volontario"
+      },
+      "swap": {
+        "requested": {
+          "action": "Vedi la richiesta",
+          "message": "{name} ti propone di scambiare un turno a {editionName}.",
+          "title": "Proposta di scambio di turno 🔁"
+        },
+        "peer_accepted": {
+          "action": "Vedi la richiesta",
+          "message": "Lo scambio proposto a {name} a {editionName} attende l'approvazione di un organizzatore.",
+          "title": "Scambio in attesa di approvazione ⏳"
+        },
+        "decided": {
+          "action": "Vedi i miei turni",
+          "message": "Il tuo scambio di turno a {editionName} è stato approvato.",
+          "title": "Scambio di turno approvato ✅"
+        },
+        "refused": {
+          "action": "Vedi i miei turni",
+          "message": "Lo scambio di turno proposto a {editionName} non è andato a buon fine.",
+          "title": "Scambio di turno rifiutato"
+        }
       }
     },
     "welcome": {

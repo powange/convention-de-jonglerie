@@ -184,6 +184,28 @@
         "action": "Voir ma candidature",
         "message": "Votre candidature de bénévole pour \"{editionName}\" a été remise en attente par les organisateurs.",
         "title": "Candidature remise en attente"
+      },
+      "swap": {
+        "requested": {
+          "action": "Voir la demande",
+          "message": "{name} vous propose d'échanger un créneau sur {editionName}.",
+          "title": "Proposition d'échange de créneau 🔁"
+        },
+        "peer_accepted": {
+          "action": "Voir la demande",
+          "message": "L'échange proposé à {name} sur {editionName} attend la validation d'un organisateur.",
+          "title": "Échange en attente de validation ⏳"
+        },
+        "decided": {
+          "action": "Voir mes créneaux",
+          "message": "Votre échange de créneau sur {editionName} a été validé.",
+          "title": "Échange de créneau validé ✅"
+        },
+        "refused": {
+          "action": "Voir mes créneaux",
+          "message": "L'échange de créneau proposé sur {editionName} n'a pas abouti.",
+          "title": "Échange de créneau refusé"
+        }
       }
     },
     "welcome": {

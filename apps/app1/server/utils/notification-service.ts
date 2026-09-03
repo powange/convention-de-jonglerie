@@ -1052,6 +1052,41 @@ export const NotificationHelpers = {
    * inclut le kind (suffixe `_j_minus_1` ou `_j`) pour permettre la dédup
    * indépendante de chaque rappel via la table Notification existante.
    */
+  /**
+   * Échange de créneaux entre bénévoles : les quatre moments où quelqu'un doit être prévenu.
+   *
+   * Un seul helper plutôt que quatre : même destinataire potentiel, même entité, mêmes paramètres.
+   * Ce qui change est le palier — et c'est lui qui porte le `notificationType`, donc la
+   * déduplication et les préférences.
+   */
+  async volunteerSwap(
+    userId: number,
+    kind: 'REQUESTED' | 'PEER_ACCEPTED' | 'DECIDED' | 'REFUSED',
+    params: {
+      editionId: number
+      editionName: string
+      swapId: string
+      otherName: string
+    }
+  ) {
+    const cle = kind.toLowerCase()
+    return await NotificationService.create({
+      userId,
+      // Seule la décision finale change réellement le planning de quelqu'un : c'est elle qu'on
+      // veut voir ressortir. Les étapes intermédiaires informent.
+      type: kind === 'DECIDED' ? 'SUCCESS' : kind === 'REFUSED' ? 'WARNING' : 'INFO',
+      titleKey: `notifications.volunteer.swap.${cle}.title`,
+      messageKey: `notifications.volunteer.swap.${cle}.message`,
+      translationParams: { name: params.otherName, editionName: params.editionName },
+      actionTextKey: `notifications.volunteer.swap.${cle}.action`,
+      category: 'volunteer',
+      entityType: 'VolunteerSwapRequest',
+      entityId: params.swapId,
+      actionUrl: `/editions/${params.editionId}/volunteers/swaps`,
+      notificationType: `volunteer_swap_${cle}`,
+    })
+  },
+
   async taskDeadlineReminder(
     userId: number,
     taskTitle: string,
