@@ -119,11 +119,16 @@ const modalTitle = computed(() => (props.zone ? t('map.edit_zone') : t('gestion.
         </UFormField>
 
         <UFormField :label="t('gestion.map.zone_types')">
+          <!-- `content: z-[60]` : le menu d'un select est téléporté dans `body`, hors du
+               dialogue, et sans z-index. Il perdait donc contre l'overlay de la modale, monté à
+               `z-50` pour passer devant le panneau de la carte : la liste s'ouvrait bel et bien,
+               mais derrière — ce qui se voit comme un select qui refuse de s'ouvrir. -->
           <USelect
             v-model="form.zoneTypes"
             multiple
             :items="zoneTypes"
             :icon="form.zoneTypes.length > 0 ? getZoneTypeIcon(form.zoneTypes[0]) : undefined"
+            :ui="{ content: 'z-[60]' }"
             class="w-full"
           />
         </UFormField>
