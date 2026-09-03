@@ -78,6 +78,15 @@
       "Bash(bash scripts/update-error-logs-state.sh:*)",
       "Bash(scripts/update-error-logs-state.sh:*)",
       "Bash(./scripts/update-error-logs-state.sh:*)",
+      "Bash(bash apps/app1/scripts/check-error-logs.sh:*)",
+      "Bash(apps/app1/scripts/check-error-logs.sh:*)",
+      "Bash(./apps/app1/scripts/check-error-logs.sh:*)",
+      "Bash(bash apps/app1/scripts/trigger-prod-deploy.sh:*)",
+      "Bash(apps/app1/scripts/trigger-prod-deploy.sh:*)",
+      "Bash(./apps/app1/scripts/trigger-prod-deploy.sh:*)",
+      "Bash(bash apps/app1/scripts/update-error-logs-state.sh:*)",
+      "Bash(apps/app1/scripts/update-error-logs-state.sh:*)",
+      "Bash(./apps/app1/scripts/update-error-logs-state.sh:*)",
       "Skill(check-error-logs)",
       "Skill(check-error-logs:*)",
       "SlashCommand(/lint-fix)",
@@ -118,5 +127,10 @@
     "defaultMode": "acceptEdits"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["nuxt", "nuxt-ui", "vitest-runner", "Prisma-Remote"]
+  "enabledMcpjsonServers": [
+    "nuxt",
+    "nuxt-ui",
+    "vitest-runner",
+    "Prisma-Remote"
+  ]
 }

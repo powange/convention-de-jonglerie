@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Met à jour l'état du monitoring des logs d'erreur (.claude/error-logs-monitor.json).
-# Usage : scripts/update-error-logs-state.sh <lastCheckedAt-ISO8601|now> [empreinte_dismissed...]
+# Usage : bash apps/app1/scripts/update-error-logs-state.sh <lastCheckedAt-ISO8601|now> [empreintes...]
+# Lançable depuis n'importe quel dossier.
 #   - lastCheckedAt : nouvelle borne `since`. Utiliser le littéral "now" (ou omettre)
 #     pour que le script calcule lui-même l'instant courant (évite toute substitution
 #     de commande $(date …) au point d'appel, qui casserait l'autorisation par préfixe).
@@ -8,7 +9,15 @@
 #     (ignorées si déjà présentes). Aucune n'est jamais retirée par ce script.
 set -euo pipefail
 
-STATE_FILE=".claude/error-logs-monitor.json"
+# Chemins résolus depuis l'emplacement du script, et non depuis le dossier courant : ce script
+# vit dans apps/app1/scripts/ tandis que `.env` est dans apps/app1/ et `.claude/` à la racine du
+# dépôt. Se fier au dossier courant obligeait à le lancer depuis un endroit précis — et différent
+# selon le script, ce qui a déjà coûté deux appels en échec.
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+APP_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
+REPO_ROOT=$(cd "$APP_DIR/../.." && pwd)
+
+STATE_FILE="$REPO_ROOT/.claude/error-logs-monitor.json"
 # Défaut : "now" -> le timestamp est calculé dans node (pas de $(date) au point d'appel).
 LAST_CHECKED="${1:-now}"
 shift || true

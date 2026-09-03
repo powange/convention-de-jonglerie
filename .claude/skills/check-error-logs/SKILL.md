@@ -23,11 +23,20 @@ Deux variables dans `.env` (jamais committé) :
 Si l'une des deux est absente ou vide : **arrêter immédiatement** et demander à l'utilisateur de
 les renseigner (sans jamais afficher le token en clair).
 
+## Où vivent les scripts
+
+Les trois scripts de cette commande sont dans **`apps/app1/scripts/`** — et non à la racine,
+depuis le passage en monorepo. Ils résolvent leurs chemins depuis leur propre emplacement
+(`apps/app1/.env` pour la configuration, `.claude/` à la racine pour l'état) : **ils s'exécutent
+donc depuis n'importe quel dossier**. Ce n'était pas le cas avant, et deux appels ont échoué pour
+cette seule raison — l'un attendait d'être lancé depuis `apps/app1/`, l'autre depuis la racine.
+
 ## Étapes à suivre
 
 ### 1. Charger la configuration
 
-Le chargement de la config et la requête sont encapsulés dans `scripts/check-error-logs.sh`
+Le chargement de la config et la requête sont encapsulés dans
+`apps/app1/scripts/check-error-logs.sh`
 (autorisé sans prompt). Le script lit `MONITORING_PROD_URL` et `MONITORING_ERROR_LOGS_TOKEN`
 dans `.env`, valide leur présence, et n'affiche jamais le token. S'il sort avec
 `MISSING_PROD_URL` / `MISSING_TOKEN` (code 3) → stop + instructions ci-dessus.
@@ -51,8 +60,8 @@ Appeler le script dédié en lui passant la borne `since` (et éventuellement un
 affiche le corps JSON puis une ligne `HTTP_CODE=<code>`, sans jamais exposer le token :
 
 ```bash
-bash scripts/check-error-logs.sh "<lastCheckedAt ou maintenant-24h>"
-# limite personnalisée : bash scripts/check-error-logs.sh "<since>" 500
+bash apps/app1/scripts/check-error-logs.sh "<lastCheckedAt ou maintenant-24h>"
+# limite personnalisée : bash apps/app1/scripts/check-error-logs.sh "<since>" 500
 ```
 
 Gestion des réponses :
@@ -134,10 +143,10 @@ Uniquement si au moins une correction (cause certaine) a été appliquée :
    sans afficher l'URL (qui contient un secret), en n'affichant que le code HTTP :
 
    ```bash
-   bash scripts/trigger-prod-deploy.sh
+   bash apps/app1/scripts/trigger-prod-deploy.sh
    ```
 
-   (le script lit `PORTAINER_PROD_WEBHOOK_URL` dans `.env`, n'affiche que le code HTTP, et sort
+   (le script lit `PORTAINER_PROD_WEBHOOK_URL` dans `apps/app1/.env`, n'affiche que le code HTTP, et sort
    avec `MISSING_WEBHOOK_URL` / code 3 si la variable est absente.)
    - `200`/`204` → redéploiement déclenché.
    - `404` → webhook introuvable/désactivé ; `409` → déploiement déjà en cours ; autre → échec.
@@ -169,7 +178,7 @@ déclenche une demande de validation. De même, ne pas éditer le JSON à la mai
 ```bash
 # lastCheckedAt : "now" -> instant courant calculé par le script (autonome, sans $(date)).
 # Empreintes optionnelles à ajouter à `dismissed` (jamais retirées) :
-bash scripts/update-error-logs-state.sh now \
+bash apps/app1/scripts/update-error-logs-state.sh now \
   "errorType|method|path|message"
 ```
 
