@@ -189,11 +189,38 @@ definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
 })
 
+interface TaskInfo {
+  name: string
+  description: string
+  schedule: string
+  cronExpression: string
+  category: string
+}
+
+interface TasksResponse {
+  tasks: TaskInfo[]
+  totalTasks: number
+  cronEnabled: boolean
+  timestamp: string
+}
+
 const { t } = useI18n()
 const toast = useToast()
 
-// Récupération des tâches
-const { data: tasksData, pending, error, refresh } = await useFetch('/api/admin/tasks')
+/**
+ * Les points d'API du dépôt répondent `{ success, data }` via `createSuccessResponse`. Sans ce
+ * `transform`, `tasksData.value.cronEnabled` valait `undefined` et la page annonçait le système
+ * de tâches « inactif » en permanence, y compris en production où il tourne. La liste des tâches
+ * était vide pour la même raison.
+ */
+const {
+  data: tasksData,
+  pending,
+  error,
+  refresh,
+} = await useFetch('/api/admin/tasks', {
+  transform: (payload: { data?: unknown }) => (payload?.data ?? payload) as TasksResponse,
+})
 
 const tasks = computed(() => tasksData.value?.tasks || [])
 const systemStatus = computed(() => ({
