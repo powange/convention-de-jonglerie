@@ -804,6 +804,7 @@
     "backup_restore_interrupted_description": "O servidor reiniciou durante o restauro: a base de dados pode estar incompleta. Volta a lançar o restauro.",
     "backup_import_resumed": "Envio retomado",
     "backup_import_resumed_description": "Esta cópia de segurança já tinha sido enviada a {percent} %. Agora só é enviado o resto.",
-    "merge_group_treasury": "Tesouraria"
+    "merge_group_treasury": "Tesouraria",
+    "cleanup_temp_uploads": "Limpeza dos envios temporários"
   }
 }

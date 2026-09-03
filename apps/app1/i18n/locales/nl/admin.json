@@ -804,6 +804,7 @@
     "backup_restore_interrupted_description": "De server is tijdens het herstel opnieuw opgestart: de database kan onvolledig zijn. Start het herstel opnieuw.",
     "backup_import_resumed": "Uploaden hervat",
     "backup_import_resumed_description": "Deze back-up was al voor {percent} % geüpload. Alleen de rest wordt nu verzonden.",
-    "merge_group_treasury": "Financiën"
+    "merge_group_treasury": "Financiën",
+    "cleanup_temp_uploads": "Opschonen van tijdelijke uploads"
   }
 }

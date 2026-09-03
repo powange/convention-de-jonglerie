@@ -290,6 +290,7 @@ const getTaskDisplayName = (taskName: string) => {
     'volunteer-reminders': t('admin.volunteer_reminders'),
     'convention-favorites-reminders': t('admin.convention_favorites_reminders'),
     'cleanup-expired-tokens': t('admin.cleanup_expired_tokens'),
+    'cleanup-temp-uploads': t('admin.cleanup_temp_uploads'),
     'cleanup-resolved-error-logs': t('admin.cleanup_resolved_error_logs'),
   }
   return names[taskName] || taskName

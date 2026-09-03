@@ -13,6 +13,7 @@ export default wrapApiHandler(
       'volunteer-reminders',
       'convention-favorites-reminders',
       'cleanup-expired-tokens',
+      'cleanup-temp-uploads',
       'cleanup-resolved-error-logs',
       'cleanup-inactive-subscriptions',
     ]
