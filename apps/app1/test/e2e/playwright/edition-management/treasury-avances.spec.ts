@@ -63,7 +63,10 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
     await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
 
     // 42 + 18 = 60 € dus à la même personne.
-    const carte = page.locator('div').filter({ hasText: /^À rembourser/ }).last()
+    const carte = page
+      .locator('div')
+      .filter({ hasText: /^À rembourser/ })
+      .last()
     await expect(carte).toContainText('60', { timeout: 15000 })
 
     await carte.click()
@@ -81,7 +84,10 @@ test.describe.serial('Trésorerie — avances à rembourser', () => {
     await page.goto(`${BASE}/editions/${editionId}/gestion/treasury`)
     await expect(page.getByRole('heading', { name: 'Trésorerie' })).toBeVisible({ timeout: 20000 })
 
-    const carte = page.locator('div').filter({ hasText: /^À rembourser/ }).last()
+    const carte = page
+      .locator('div')
+      .filter({ hasText: /^À rembourser/ })
+      .last()
     await expect(carte).toContainText('60', { timeout: 15000 })
     await carte.click()
 
