@@ -805,6 +805,9 @@
     "backup_import_resumed": "Uploaden hervat",
     "backup_import_resumed_description": "Deze back-up was al voor {percent} % geüpload. Alleen de rest wordt nu verzonden.",
     "merge_group_treasury": "Financiën",
-    "cleanup_temp_uploads": "Opschonen van tijdelijke uploads"
+    "cleanup_temp_uploads": "Opschonen van tijdelijke uploads",
+    "cleanup_empty_conversations": "Opschonen van lege gesprekken",
+    "cleanup_inactive_subscriptions": "Opschonen van inactieve push-abonnementen",
+    "task_deadlines_reminders": "Herinneringen voor taakdeadlines"
   }
 }

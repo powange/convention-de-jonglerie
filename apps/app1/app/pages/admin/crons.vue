@@ -319,7 +319,12 @@ const getTaskDisplayName = (taskName: string) => {
     'cleanup-expired-tokens': t('admin.cleanup_expired_tokens'),
     'cleanup-temp-uploads': t('admin.cleanup_temp_uploads'),
     'cleanup-resolved-error-logs': t('admin.cleanup_resolved_error_logs'),
+    'cleanup-inactive-subscriptions': t('admin.cleanup_inactive_subscriptions'),
+    'cleanup-empty-conversations': t('admin.cleanup_empty_conversations'),
+    'task-deadlines-reminders': t('admin.task_deadlines_reminders'),
   }
+  // Le repli sur le nom technique évite qu'une tâche nouvelle disparaisse de l'écran ; il reste
+  // un pis-aller, la description du catalogue portant le sens.
   return names[taskName] || taskName
 }
 

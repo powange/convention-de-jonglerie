@@ -805,6 +805,9 @@
     "backup_import_resumed": "Загрузка возобновлена",
     "backup_import_resumed_description": "Эта резервная копия уже была загружена на {percent} %. Сейчас отправляется только остаток.",
     "merge_group_treasury": "Финансы",
-    "cleanup_temp_uploads": "Очистка временных загрузок"
+    "cleanup_temp_uploads": "Очистка временных загрузок",
+    "cleanup_empty_conversations": "Очистка пустых бесед",
+    "cleanup_inactive_subscriptions": "Очистка неактивных push-подписок",
+    "task_deadlines_reminders": "Напоминания о сроках задач"
   }
 }

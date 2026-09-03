@@ -805,6 +805,9 @@
     "backup_import_resumed": "Uppladdningen återupptogs",
     "backup_import_resumed_description": "Den här säkerhetskopian var redan uppladdad till {percent} %. Endast resten skickas nu.",
     "merge_group_treasury": "Ekonomi",
-    "cleanup_temp_uploads": "Rensning av tillfälliga uppladdningar"
+    "cleanup_temp_uploads": "Rensning av tillfälliga uppladdningar",
+    "cleanup_empty_conversations": "Rensning av tomma konversationer",
+    "cleanup_inactive_subscriptions": "Rensning av inaktiva push-prenumerationer",
+    "task_deadlines_reminders": "Påminnelser om uppgifters tidsfrister"
   }
 }
