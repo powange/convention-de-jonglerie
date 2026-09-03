@@ -663,7 +663,8 @@
       "config_description": "Налаштувати систему волонтерів",
       "notifications_description": "Надсилайте сповіщення волонтерам",
       "planning_description": "Планування слотів і місій",
-      "teams_description": "Організація команд волонтерів"
+      "teams_description": "Організація команд волонтерів",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Набір виступів",

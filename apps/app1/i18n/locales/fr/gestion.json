@@ -672,6 +672,7 @@
       "config_description": "Paramétrer le système de bénévolat",
       "notifications_description": "Envoyer des notifications aux bénévoles",
       "planning_description": "Planifier les créneaux et missions",
+      "swaps_description": "Valider les échanges de créneaux entre bénévoles",
       "teams_description": "Organiser les équipes de bénévoles"
     },
     "shows_call": {

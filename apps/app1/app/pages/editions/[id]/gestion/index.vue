@@ -276,6 +276,16 @@
                   color="orange"
                 />
 
+                <!-- Échanges de créneaux : à la suite du planning, que l'échange modifie -->
+                <ManagementNavigationCard
+                  v-if="canManageVolunteers"
+                  :to="`/editions/${edition.id}/gestion/volunteers/swaps`"
+                  icon="i-lucide-arrow-left-right"
+                  :title="$t('edition.volunteers.swaps')"
+                  :description="$t('gestion.volunteers.swaps_description')"
+                  color="blue"
+                />
+
                 <!-- Notifications bénévoles (visible pour les team leaders) -->
                 <ManagementNavigationCard
                   v-if="canManageVolunteers || isTeamLeaderValue"

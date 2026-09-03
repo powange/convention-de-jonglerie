@@ -663,7 +663,8 @@
       "config_description": "Nastavit systém dobrovolnictví",
       "notifications_description": "Zasílání oznámení dobrovolníkům",
       "planning_description": "Plánování slotů a misí",
-      "teams_description": "Organizování týmů dobrovolníků"
+      "teams_description": "Organizování týmů dobrovolníků",
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
     },
     "shows_call": {
       "title": "Výzva k přihláškám představení",
