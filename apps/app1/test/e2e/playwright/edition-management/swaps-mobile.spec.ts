@@ -247,12 +247,27 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
     await page.getByRole('button', { name: /activer mon compte/i }).click()
     await expect(page.getByText(/compte activé/i).first()).toBeVisible({ timeout: 15000 })
 
-    // L'activation ouvre déjà la session : ne se connecter que si on retombe sur le formulaire.
-    await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' })
-    const champEmail = page.locator('input[type="email"]')
-    if (await champEmail.isVisible({ timeout: 3000 }).catch(() => false)) {
+    /**
+     * L'activation ouvre normalement la session, mais pas toujours assez vite : se fier à la
+     * présence du formulaire de connexion rendait l'étape dépendante d'un timing, et la CI
+     * arrivait sur une page protégée en anonyme — donc redirigée, sans le titre attendu.
+     *
+     * On vise donc directement la page protégée : si elle nous renvoie vers la connexion, on se
+     * connecte et on y revient. Le test qui suit peut alors compter sur une session ouverte.
+     */
+    const { editionId } = loadState()
+    const cible = `${BASE}/editions/${editionId}/volunteers/swaps`
+
+    await page.goto(cible, { waitUntil: 'domcontentloaded' })
+    if (page.url().includes('/login')) {
       await loginWith(page, email, MDP)
+      await page.goto(cible, { waitUntil: 'domcontentloaded' })
     }
+
+    // Une redirection persistante signifie que la session n'est pas ouverte : le dire ici plutôt
+    // que de laisser échouer une assertion d'affichage sur un symptôme lointain.
+    expect(page.url(), `session non ouverte pour ${email}`).not.toContain('/login')
+
     return { context, page }
   }
 
@@ -260,10 +275,10 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
     const { editionId } = loadState()
     const { context, page } = await sessionBenevole(browser, EMAIL_A)
 
-    await page.goto(`${BASE}/editions/${editionId}/volunteers/swaps`, { waitUntil: 'load' })
-    await expect(page.getByRole('heading', { name: /échanger un créneau/i })).toBeVisible({
-      timeout: 20000,
-    })
+    await expect(
+      page.getByRole('heading', { name: /échanger un créneau/i }),
+      `page inattendue : ${page.url()}`
+    ).toBeVisible({ timeout: 30000 })
     // Preuve que la page n'est pas vide : son créneau est bien proposé au choix.
     // Le sélecteur doit porter un créneau, pas son texte d'invite : sans quoi la page est
     // ouverte mais inutilisable, ce qui est exactement le défaut trouvé à l'inspection visuelle.
