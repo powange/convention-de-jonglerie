@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Пожертвования",
         "TICKETING_OTHER": "Билеты — прочие доходы"
       },
-      "settled_amount": "из них {amount} оплачено"
+      "settled_amount": "из них {amount} оплачено",
+      "advanced_by_name": "Оплатил(а) {name}",
+      "entry_advanced_by": "Оплатил(а)",
+      "entry_advanced_by_placeholder": "Найти человека из этого выпуска",
+      "entry_forecast": "Планируемое",
+      "entry_forecast_hint": "Ожидаемая сумма, ещё не оплачена",
+      "entry_receipt": "Подтверждение",
+      "entry_receipt_placeholder": "Сфотографируйте чек или счёт",
+      "entry_reimbursed": "Уже возмещено",
+      "mark_reimbursed": "Возмещено",
+      "reimbursed_done": "Авансы отмечены как возмещённые",
+      "reimbursed_error": "Не удалось отметить авансы как возмещённые",
+      "to_reimburse": "К возмещению",
+      "to_reimburse_hint": "{count} чел. — нажмите, чтобы увидеть детали"
     },
     "program": {
       "description": "Составьте расписание фестиваля: воркшопы, выступления и другие события.",

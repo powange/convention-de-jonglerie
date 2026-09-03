@@ -297,6 +297,8 @@ describe('computeTreasury — totaux', () => {
       expense: { settled: 0, pending: 0 },
       income: { settled: 0, pending: 0 },
       balance: 0,
+      // Rien d'avancé, donc rien à rembourser — mais la clé existe, et `toEqual` la veut.
+      toReimburse: { total: 0, detail: [] },
     })
     // Trois origines côté artistes, trois côté billetterie depuis son partage.
     expect(report.lines).toHaveLength(6)
@@ -409,5 +411,104 @@ describe('aggregateTicketingItems', () => {
       .reduce((sum, l) => sum + l.settled + l.pending, 0)
 
     expect(ticketingIncome).toBe(1229462)
+  })
+})
+
+/**
+ * Prévisionnel et avances — deux ajouts demandés par les organisateurs.
+ *
+ * Une ligne saisie à la main était réputée réglée faute de pouvoir dire le contraire : une dépense
+ * seulement prévue gonflait le réglé au même titre qu'une facture payée.
+ *
+ * L'avance est un axe distinct : la dépense est réglée du point de vue du fournisseur, mais
+ * l'association doit le montant à la personne qui l'a sortie de sa poche. Cette dette
+ * n'apparaissait dans aucun total.
+ */
+const ALICE = { id: 1, pseudo: 'alice' }
+const BOB = { id: 2, pseudo: 'bob' }
+
+const depense = (over: Record<string, unknown> = {}) => ({
+  id: 1,
+  kind: 'EXPENSE' as const,
+  title: 'Courses',
+  description: null,
+  amount: 5000,
+  code: null,
+  ...over,
+})
+
+describe('computeTreasury — prévisionnel', () => {
+  it('bascule une ligne prévisionnelle du réglé vers l’engagé', () => {
+    const report = computeTreasury(input({ manualEntries: [depense({ isForecast: true })] }))
+
+    expect(report.totals.expense).toEqual({ settled: 0, pending: 5000 })
+    // Le solde compte l'engagé : il ne bouge pas, c'est bien le réglé que le drapeau corrige.
+    expect(report.totals.balance).toBe(-5000)
+  })
+
+  it('laisse une ligne ordinaire réglée', () => {
+    const report = computeTreasury(input({ manualEntries: [depense()] }))
+
+    expect(report.totals.expense).toEqual({ settled: 5000, pending: 0 })
+    expect(report.totals.balance).toBe(-5000)
+  })
+})
+
+describe('computeTreasury — avances à rembourser', () => {
+  it('additionne les avances non remboursées, par personne', () => {
+    const report = computeTreasury(
+      input({
+        manualEntries: [
+          depense({ id: 1, amount: 5000, advancedBy: ALICE }),
+          depense({ id: 2, amount: 3000, advancedBy: ALICE }),
+          depense({ id: 3, amount: 9000, advancedBy: BOB }),
+        ],
+      })
+    )
+
+    expect(report.totals.toReimburse.total).toBe(17000)
+    // Trié du plus gros au plus petit : c'est l'ordre dans lequel on rembourse.
+    expect(report.totals.toReimburse.detail.map((d) => [d.personne.pseudo, d.montant])).toEqual([
+      ['bob', 9000],
+      ['alice', 8000],
+    ])
+  })
+
+  it('exclut ce qui est déjà remboursé', () => {
+    const report = computeTreasury(
+      input({
+        manualEntries: [
+          depense({ id: 1, amount: 5000, advancedBy: ALICE, reimbursed: true }),
+          depense({ id: 2, amount: 3000, advancedBy: ALICE }),
+        ],
+      })
+    )
+
+    expect(report.totals.toReimburse.total).toBe(3000)
+  })
+
+  it('exclut une avance seulement prévisionnelle', () => {
+    // Rien n'est encore sorti de la poche de personne : il n'y a rien à rembourser.
+    const report = computeTreasury(
+      input({
+        manualEntries: [depense({ amount: 5000, advancedBy: ALICE, isForecast: true })],
+      })
+    )
+
+    expect(report.totals.toReimburse.total).toBe(0)
+    expect(report.totals.toReimburse.detail).toEqual([])
+  })
+
+  it('ignore une recette et une dépense sans avance', () => {
+    const report = computeTreasury(
+      input({
+        manualEntries: [
+          depense({ id: 1, kind: 'INCOME', amount: 5000, advancedBy: ALICE }),
+          depense({ id: 2, amount: 4000 }),
+        ],
+      })
+    )
+
+    expect(report.totals.toReimburse.total).toBe(0)
   })
 })

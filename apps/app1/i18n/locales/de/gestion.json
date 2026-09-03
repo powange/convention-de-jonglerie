@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Spenden",
         "TICKETING_OTHER": "Ticketing — sonstige Erlöse"
       },
-      "settled_amount": "davon {amount} beglichen"
+      "settled_amount": "davon {amount} beglichen",
+      "advanced_by_name": "Verauslagt von {name}",
+      "entry_advanced_by": "Verauslagt von",
+      "entry_advanced_by_placeholder": "Eine Person der Edition suchen",
+      "entry_forecast": "Geplant",
+      "entry_forecast_hint": "Erwarteter Betrag, noch nicht bezahlt",
+      "entry_receipt": "Beleg",
+      "entry_receipt_placeholder": "Kassenbon oder Rechnung fotografieren",
+      "entry_reimbursed": "Bereits erstattet",
+      "mark_reimbursed": "Erstattet",
+      "reimbursed_done": "Auslagen als erstattet markiert",
+      "reimbursed_error": "Auslagen konnten nicht als erstattet markiert werden",
+      "to_reimburse": "Zu erstatten",
+      "to_reimburse_hint": "{count} Person(en) – zum Aufschlüsseln klicken"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

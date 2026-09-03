@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Donaciones",
         "TICKETING_OTHER": "Entradas — otros ingresos"
       },
-      "settled_amount": "de los cuales {amount} abonados"
+      "settled_amount": "de los cuales {amount} abonados",
+      "advanced_by_name": "Adelantado por {name}",
+      "entry_advanced_by": "Adelantado por",
+      "entry_advanced_by_placeholder": "Buscar a alguien de la edición",
+      "entry_forecast": "Previsto",
+      "entry_forecast_hint": "Importe previsto, aún no pagado",
+      "entry_receipt": "Justificante",
+      "entry_receipt_placeholder": "Fotografiar el tique o la factura",
+      "entry_reimbursed": "Ya reembolsado",
+      "mark_reimbursed": "Reembolsado",
+      "reimbursed_done": "Adelantos marcados como reembolsados",
+      "reimbursed_error": "No se han podido marcar los adelantos como reembolsados",
+      "to_reimburse": "Por reembolsar",
+      "to_reimburse_hint": "{count} persona(s) — haz clic para ver el detalle"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

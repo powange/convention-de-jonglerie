@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Dary",
         "TICKETING_OTHER": "Vstupenky — ostatní výnosy"
       },
-      "settled_amount": "z toho {amount} uhrazeno"
+      "settled_amount": "z toho {amount} uhrazeno",
+      "advanced_by_name": "Zálohu složil(a) {name}",
+      "entry_advanced_by": "Zálohu složil(a)",
+      "entry_advanced_by_placeholder": "Najít osobu z této akce",
+      "entry_forecast": "Předběžné",
+      "entry_forecast_hint": "Očekávaná částka, dosud neuhrazená",
+      "entry_receipt": "Doklad",
+      "entry_receipt_placeholder": "Vyfotit účtenku nebo fakturu",
+      "entry_reimbursed": "Již proplaceno",
+      "mark_reimbursed": "Proplaceno",
+      "reimbursed_done": "Zálohy označeny jako proplacené",
+      "reimbursed_error": "Zálohy se nepodařilo označit jako proplacené",
+      "to_reimburse": "K proplacení",
+      "to_reimburse_hint": "{count} osob – klepnutím zobrazíte podrobnosti"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

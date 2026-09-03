@@ -40,8 +40,13 @@
 
       <!-- Totaux : le solde ne retient que ce qui est réglé, l'engagé est annoncé à part pour ne
            pas laisser croire qu'il est encaissé ou décaissé. -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <UCard v-for="card in totalCards" :key="card.key">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <UCard
+          v-for="card in totalCards"
+          :key="card.key"
+          :class="card.onClick ? 'cursor-pointer transition-shadow hover:shadow-md' : ''"
+          @click="card.onClick?.()"
+        >
           <div class="flex items-center gap-3">
             <div class="rounded-full p-2" :class="card.iconBg">
               <UIcon :name="card.icon" class="h-5 w-5" :class="card.iconColor" />
@@ -74,7 +79,35 @@
             class="flex flex-col gap-3 py-3 lg:flex-row lg:items-center"
           >
             <div class="min-w-0 flex-1">
-              <p class="truncate font-medium">{{ lineTitle(line) }}</p>
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="truncate font-medium">{{ lineTitle(line) }}</p>
+                <!-- Simple marque de présence : la liste reste dense, et le ticket s'ouvre en
+                     grand d'un clic quand on veut vraiment le relire. -->
+                <UTooltip v-if="line.imageUrl" :text="$t('gestion.treasury.entry_receipt')">
+                  <UButton
+                    size="xs"
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-lucide-receipt"
+                    :aria-label="$t('gestion.treasury.entry_receipt')"
+                    @click="justificatifOuvert = line.imageUrl"
+                  />
+                </UTooltip>
+                <!-- Deux états qui changent la lecture du montant : l'un dit qu'il n'est pas
+                     encore payé, l'autre qu'il est dû à quelqu'un. -->
+                <UBadge v-if="line.isForecast" color="neutral" variant="subtle" size="sm">
+                  {{ $t('gestion.treasury.entry_forecast') }}
+                </UBadge>
+                <UBadge
+                  v-if="line.advancedBy && !line.reimbursed"
+                  color="warning"
+                  variant="subtle"
+                  size="sm"
+                  :title="$t('gestion.treasury.advanced_by_name', { name: line.advancedBy.pseudo })"
+                >
+                  {{ $t('gestion.treasury.advanced_by_name', { name: line.advancedBy.pseudo }) }}
+                </UBadge>
+              </div>
               <p v-if="line.description" class="truncate text-xs text-gray-500 dark:text-gray-400">
                 {{ line.description }}
               </p>
@@ -140,6 +173,52 @@
       </UCard>
     </div>
 
+    <!-- Détail des avances : c'est au moment de rembourser qu'on veut savoir qui attend combien,
+         et le total seul ne le dit pas. -->
+    <UModal v-model:open="detailRemboursements" :title="$t('gestion.treasury.to_reimburse')">
+      <template #body>
+        <ul class="divide-y divide-gray-100 dark:divide-gray-800">
+          <li
+            v-for="ligne in data?.totals?.toReimburse?.detail ?? []"
+            :key="ligne.personne.id"
+            class="flex flex-wrap items-center justify-between gap-3 py-2"
+          >
+            <UiUserDisplay :user="ligne.personne" size="sm" />
+            <div class="flex items-center gap-3">
+              <span class="font-semibold">{{ money(ligne.montant) }}</span>
+              <!-- On rembourse en un versement : pointer les lignes une par une était le geste
+                   le plus fastidieux de la page, et le plus facile à laisser à moitié fait. -->
+              <UButton
+                size="xs"
+                color="success"
+                variant="soft"
+                icon="i-lucide-check"
+                :loading="rembourser.isLoading(ligne.personne.id)"
+                :label="$t('gestion.treasury.mark_reimbursed')"
+                @click="rembourser.execute(ligne.personne.id)"
+              />
+            </div>
+          </li>
+        </ul>
+      </template>
+    </UModal>
+
+    <UModal
+      :open="!!justificatifOuvert"
+      size="xl"
+      :title="$t('gestion.treasury.entry_receipt')"
+      @update:open="(v: boolean) => !v && (justificatifOuvert = null)"
+    >
+      <template #body>
+        <img
+          v-if="justificatifOuvert"
+          :src="justificatifOuvert"
+          :alt="$t('gestion.treasury.entry_receipt')"
+          class="w-full"
+        />
+      </template>
+    </UModal>
+
     <TreasuryEntryModal
       v-model:open="entryModalOpen"
       :entry="editedLine"
@@ -176,6 +255,15 @@ interface TreasuryCodeRef {
   label: string
 }
 
+/** Qui a avancé une dépense — de quoi l'afficher, rien de plus. */
+interface PersonneAvance {
+  id: number
+  pseudo: string
+  profilePicture?: string | null
+  emailHash?: string | null
+  updatedAt?: string | null
+}
+
 interface TreasuryLine {
   key: string
   origin: 'source' | 'manual'
@@ -185,6 +273,10 @@ interface TreasuryLine {
   title: string
   description?: string | null
   code?: TreasuryCodeRef | null
+  imageUrl?: string | null
+  isForecast?: boolean
+  advancedBy?: PersonneAvance | null
+  reimbursed?: boolean
   readOnly: boolean
   settled: number
   pending: number
@@ -198,6 +290,10 @@ const { data, pending, error, refresh } = await useFetch<{
     expense: { settled: number; pending: number }
     income: { settled: number; pending: number }
     balance: number
+    toReimburse: {
+      total: number
+      detail: { personne: PersonneAvance; montant: number }[]
+    }
   }
 }>(() => `/api/editions/${editionId.value}/treasury`, {
   transform: (payload: any) => payload?.data ?? payload,
@@ -273,6 +369,21 @@ const totalCards = computed(() => {
       valueClass: '',
     },
     {
+      key: 'to_reimburse',
+      label: t('gestion.treasury.to_reimburse'),
+      value: money(totals?.toReimburse?.total ?? 0),
+      hint: totals?.toReimburse?.total
+        ? t('gestion.treasury.to_reimburse_hint', { count: totals.toReimburse.detail.length })
+        : '',
+      icon: 'i-lucide-hand-coins',
+      iconBg: 'bg-amber-100 dark:bg-amber-900/40',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+      valueClass: totals?.toReimburse?.total ? 'text-amber-600 dark:text-amber-400' : '',
+      // Cliquable seulement s'il y a un détail à montrer : une carte à zéro qui s'ouvre sur une
+      // liste vide promet quelque chose qu'elle n'a pas.
+      onClick: totals?.toReimburse?.total ? () => (detailRemboursements.value = true) : undefined,
+    },
+    {
       key: 'balance',
       label: t('gestion.treasury.balance'),
       value: money(totals?.balance ?? 0),
@@ -287,6 +398,32 @@ const totalCards = computed(() => {
     },
   ]
 })
+
+/** Détail des avances par personne, ouvert depuis la carte « à rembourser ». */
+const detailRemboursements = ref(false)
+
+/**
+ * Solde en une fois toutes les avances d'une personne.
+ *
+ * La modale se referme quand il ne reste plus rien à rembourser : la laisser ouverte sur une liste
+ * vide donnerait l'impression que l'action a échoué.
+ */
+const rembourser = useApiActionById<{ count: number }>(
+  () => `/api/editions/${editionId.value}/treasury/entries/reimburse`,
+  {
+    method: 'POST',
+    body: (personneId) => ({ advancedById: personneId }),
+    successMessage: { title: t('gestion.treasury.reimbursed_done') },
+    errorMessages: { default: t('gestion.treasury.reimbursed_error') },
+    onSuccess: async () => {
+      await refresh()
+      if (!data.value?.totals?.toReimburse?.total) detailRemboursements.value = false
+    },
+  }
+)
+
+/** Justificatif affiché en grand, ou `null`. */
+const justificatifOuvert = ref<string | null>(null)
 
 const entryModalOpen = ref(false)
 const codesModalOpen = ref(false)

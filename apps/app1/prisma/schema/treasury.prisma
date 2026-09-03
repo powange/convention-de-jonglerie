@@ -59,14 +59,29 @@ model TreasuryEntry {
   /// Montant en centimes, toujours positif : c'est `kind` qui porte le sens.
   amount      Int
   codeId      Int?
+  /// Justificatif : photo d'un ticket de caisse ou d'une facture, saisie depuis le téléphone.
+  /// Chemin public sous `/uploads/`, comme les autres images envoyées par les organisateurs.
+  imageUrl    String?
+  /// Montant attendu et non encore réglé. Bascule la ligne de « réglé » vers « engagé » : le
+  /// solde ne change pas, mais le réglé cesse de compter ce qui n'a pas été payé.
+  isForecast  Boolean           @default(false)
+  /// Dépense avancée de sa poche par quelqu'un — l'association lui doit ce montant.
+  /// Sans objet sur une recette, où le serveur le force à `null`.
+  advancedById Int?
+  /// L'avance a-t-elle été remboursée à la personne ? Sans objet sans `advancedById`.
+  reimbursed  Boolean           @default(false)
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
-  edition Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  code    TreasuryCode? @relation(fields: [codeId], references: [id], onDelete: SetNull)
+  edition    Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  code       TreasuryCode? @relation(fields: [codeId], references: [id], onDelete: SetNull)
+  /// `SetNull` et non `Cascade` : un compte supprimé ne doit pas emporter la ligne comptable.
+  /// L'avance devient anonyme, la dépense reste.
+  advancedBy User?         @relation("TreasuryAdvances", fields: [advancedById], references: [id], onDelete: SetNull)
 
   @@index([editionId])
   @@index([codeId])
+  @@index([advancedById])
 }
 
 /// Code d'imputation choisi pour une origine calculée.

@@ -26,6 +26,7 @@ export type MergeGroup =
   | 'posts'
   | 'lostFound'
   | 'notifications'
+  | 'treasury'
   | 'misc'
 
 export interface UserReference {
@@ -168,6 +169,9 @@ export const USER_REFERENCES: UserReference[] = [
   { model: 'fcmToken', field: 'userId', uniqueWith: ['token'], group: 'notifications' },
 
   // --- Divers ---
+  // Une avance de trésorerie porte de l'argent dû à la personne : elle doit suivre le compte
+  // conservé, pas disparaître dans le fourre-tout.
+  { model: 'treasuryEntry', field: 'advancedById', group: 'treasury' },
   { model: 'feedback', field: 'userId', group: 'misc' },
   { model: 'apiErrorLog', field: 'userId', group: 'misc' },
   { model: 'apiErrorLog', field: 'resolvedBy', group: 'misc', soft: true },

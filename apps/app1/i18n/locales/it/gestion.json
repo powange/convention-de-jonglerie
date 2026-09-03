@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Donazioni",
         "TICKETING_OTHER": "Biglietteria — altri ricavi"
       },
-      "settled_amount": "di cui {amount} saldati"
+      "settled_amount": "di cui {amount} saldati",
+      "advanced_by_name": "Anticipato da {name}",
+      "entry_advanced_by": "Anticipato da",
+      "entry_advanced_by_placeholder": "Cerca una persona dell'edizione",
+      "entry_forecast": "Previsionale",
+      "entry_forecast_hint": "Importo previsto, non ancora pagato",
+      "entry_receipt": "Giustificativo",
+      "entry_receipt_placeholder": "Fotografa lo scontrino o la fattura",
+      "entry_reimbursed": "Già rimborsato",
+      "mark_reimbursed": "Rimborsato",
+      "reimbursed_done": "Anticipi contrassegnati come rimborsati",
+      "reimbursed_error": "Impossibile contrassegnare gli anticipi come rimborsati",
+      "to_reimburse": "Da rimborsare",
+      "to_reimburse_hint": "{count} persona/e — clicca per il dettaglio"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

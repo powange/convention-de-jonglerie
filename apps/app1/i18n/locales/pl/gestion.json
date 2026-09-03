@@ -707,7 +707,20 @@
         "TICKETING_DONATIONS": "Darowizny",
         "TICKETING_OTHER": "Bilety — pozostałe przychody"
       },
-      "settled_amount": "w tym {amount} opłacone"
+      "settled_amount": "w tym {amount} opłacone",
+      "advanced_by_name": "Zapłacone przez {name}",
+      "entry_advanced_by": "Zapłacone przez",
+      "entry_advanced_by_placeholder": "Znajdź osobę z tej edycji",
+      "entry_forecast": "Planowane",
+      "entry_forecast_hint": "Kwota oczekiwana, jeszcze nieopłacona",
+      "entry_receipt": "Dowód",
+      "entry_receipt_placeholder": "Zrób zdjęcie paragonu lub faktury",
+      "entry_reimbursed": "Już zwrócone",
+      "mark_reimbursed": "Zwrócone",
+      "reimbursed_done": "Zaliczki oznaczone jako zwrócone",
+      "reimbursed_error": "Nie udało się oznaczyć zaliczek jako zwróconych",
+      "to_reimburse": "Do zwrotu",
+      "to_reimburse_hint": "{count} osob(y) — kliknij, aby zobaczyć szczegóły"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

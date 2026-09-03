@@ -34,6 +34,13 @@ export interface TreasuryLine extends TreasuryAmounts {
   title: string
   description?: string | null
   code?: { id: number; code: string; label: string } | null
+  /** Justificatif d'une ligne saisie à la main ; les lignes calculées n'en portent pas. */
+  imageUrl?: string | null
+  /** Montant attendu, pas encore réglé. */
+  isForecast?: boolean
+  /** Dépense avancée de sa poche, et son état de remboursement. */
+  advancedBy?: PersonneAvance | null
+  reimbursed?: boolean
   /** Vrai pour les lignes calculées : elles se corrigent à la source, pas ici. */
   readOnly: boolean
 }
@@ -85,6 +92,21 @@ export interface ManualEntryRow {
   description: string | null
   amount: number
   code: { id: number; code: string; label: string } | null
+  imageUrl?: string | null
+  isForecast?: boolean
+  reimbursed?: boolean
+  advancedBy?: PersonneAvance | null
+}
+
+/** Qui a avancé une dépense — juste de quoi l'afficher et la totaliser. */
+export interface PersonneAvance {
+  id: number
+  pseudo: string
+  prenom?: string | null
+  nom?: string | null
+  profilePicture?: string | null
+  emailHash?: string | null
+  updatedAt?: Date | string | null
 }
 
 /**
@@ -153,6 +175,8 @@ export interface TreasuryReport {
   totals: {
     expense: TreasuryAmounts
     income: TreasuryAmounts
+    /** Avances non remboursées, total et répartition par personne. */
+    toReimburse: AvancesARembourser
     /**
      * Résultat de l'édition : produits moins charges, **réglés ou non**.
      *
@@ -302,11 +326,16 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
       title: entry.title,
       description: entry.description,
       code: entry.code,
+      imageUrl: entry.imageUrl,
+      isForecast: entry.isForecast ?? false,
+      advancedBy: entry.advancedBy ?? null,
+      reimbursed: entry.reimbursed ?? false,
       readOnly: false,
-      // Une ligne saisie à la main est réputée réglée : rien ne permettrait d'en décider
-      // autrement, et laisser le montant hors du solde le rendrait faux.
-      settled: entry.amount,
-      pending: 0,
+      // Une ligne saisie à la main est réglée par défaut. Marquée prévisionnelle, elle passe en
+      // engagé : le solde ne bouge pas — il additionne les deux — mais le réglé cesse de compter
+      // un montant qui n'a pas été payé.
+      settled: entry.isForecast ? 0 : entry.amount,
+      pending: entry.isForecast ? entry.amount : 0,
     })
   }
 
@@ -328,6 +357,43 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
 
   return {
     lines,
-    totals: { expense, income, balance: engaged(income) - engaged(expense) },
+    totals: {
+      expense,
+      income,
+      balance: engaged(income) - engaged(expense),
+      toReimburse: avancesARembourser(lines),
+    },
   }
+}
+
+/**
+ * Ce que l'association doit à ceux qui ont avancé de leur poche.
+ *
+ * Dette distincte de celle des factures à payer : le fournisseur est réglé, c'est la personne qui
+ * attend. Elle n'apparaît donc dans aucun des totaux existants, et sans agrégat le montant global
+ * ne se lit nulle part.
+ *
+ * Une avance PRÉVISIONNELLE est exclue : rien n'a encore été sorti de la poche de personne, il n'y
+ * a donc rien à rembourser. Le montant retenu est celui réglé de la ligne, pas son montant brut.
+ */
+export function avancesARembourser(lines: TreasuryLine[]): AvancesARembourser {
+  const parPersonne = new Map<number, { personne: PersonneAvance; montant: number }>()
+
+  for (const line of lines) {
+    if (line.kind !== 'EXPENSE' || line.reimbursed || !line.advancedBy || !line.settled) continue
+
+    const deja = parPersonne.get(line.advancedBy.id)
+    if (deja) deja.montant += line.settled
+    else parPersonne.set(line.advancedBy.id, { personne: line.advancedBy, montant: line.settled })
+  }
+
+  const detail = [...parPersonne.values()].sort((a, b) => b.montant - a.montant)
+  return { total: detail.reduce((somme, d) => somme + d.montant, 0), detail }
+}
+
+export interface AvancesARembourser {
+  /** Somme due, en centimes. */
+  total: number
+  /** Une entrée par personne, de la plus grosse avance à la plus petite. */
+  detail: { personne: PersonneAvance; montant: number }[]
 }

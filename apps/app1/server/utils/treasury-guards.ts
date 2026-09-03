@@ -26,3 +26,19 @@ export async function assertCodeBelongsToEdition(
     })
   }
 }
+
+/**
+ * L'avance et son remboursement n'ont de sens que sur une DÉPENSE avancée par quelqu'un.
+ *
+ * Normalisé plutôt que refusé : un formulaire qui bascule de dépense à recette laisse traîner les
+ * champs qu'il affichait, et rejeter la saisie pour cela serait incompréhensible. Ce qui n'a pas
+ * de sens est effacé, pas signalé.
+ */
+export function avanceNormalisee(saisie: {
+  kind: 'EXPENSE' | 'INCOME'
+  advancedById?: number | null
+  reimbursed?: boolean
+}) {
+  const advancedById = saisie.kind === 'EXPENSE' ? (saisie.advancedById ?? null) : null
+  return { advancedById, reimbursed: advancedById ? (saisie.reimbursed ?? false) : false }
+}
