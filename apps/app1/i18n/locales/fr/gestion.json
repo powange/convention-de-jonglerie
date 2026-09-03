@@ -1,5 +1,6 @@
 {
   "gestion": {
+    "back_to_categories": "Toutes les catégories",
     "about": {
       "description": "Modifiez l'affiche, la description et le programme de votre événement.",
       "save": "Enregistrer",

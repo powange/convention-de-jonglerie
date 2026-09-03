@@ -773,6 +773,7 @@
       "shared_notice": "Deze gegevens horen bij de conventie “{name}”: ze gelden voor al haar edities, niet alleen voor deze.",
       "submit": "Conventie opslaan",
       "title": "Conventie"
-    }
+    },
+    "back_to_categories": "[TODO] Toutes les catégories"
   }
 }
