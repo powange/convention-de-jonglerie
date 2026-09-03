@@ -184,6 +184,28 @@
         "action": "Ver las candidaturas",
         "message": "{applicantName} acaba de presentar su candidatura como voluntario para «{editionName}».",
         "title": "Nueva candidatura de voluntario"
+      },
+      "swap": {
+        "requested": {
+          "action": "Ver la solicitud",
+          "message": "{name} te propone intercambiar un turno en {editionName}.",
+          "title": "Propuesta de intercambio de turno 🔁"
+        },
+        "peer_accepted": {
+          "action": "Ver la solicitud",
+          "message": "El intercambio propuesto a {name} en {editionName} espera la validación de un organizador.",
+          "title": "Intercambio pendiente de validación ⏳"
+        },
+        "decided": {
+          "action": "Ver mis turnos",
+          "message": "Tu intercambio de turno en {editionName} ha sido validado.",
+          "title": "Intercambio de turno validado ✅"
+        },
+        "refused": {
+          "action": "Ver mis turnos",
+          "message": "El intercambio de turno propuesto en {editionName} no ha prosperado.",
+          "title": "Intercambio de turno rechazado"
+        }
       }
     },
     "welcome": {

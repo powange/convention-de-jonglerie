@@ -184,6 +184,28 @@
         "action": "Zobacz zgłoszenia",
         "message": "{applicantName} właśnie zgłosił(a) się jako wolontariusz na „{editionName}”.",
         "title": "Nowe zgłoszenie wolontariusza"
+      },
+      "swap": {
+        "requested": {
+          "action": "Zobacz prośbę",
+          "message": "{name} proponuje Ci wymianę dyżuru na {editionName}.",
+          "title": "Propozycja wymiany dyżuru 🔁"
+        },
+        "peer_accepted": {
+          "action": "Zobacz prośbę",
+          "message": "Wymiana zaproponowana {name} na {editionName} oczekuje na zatwierdzenie przez organizatora.",
+          "title": "Wymiana oczekuje na zatwierdzenie ⏳"
+        },
+        "decided": {
+          "action": "Zobacz moje dyżury",
+          "message": "Twoja wymiana dyżuru na {editionName} została zatwierdzona.",
+          "title": "Wymiana dyżuru zatwierdzona ✅"
+        },
+        "refused": {
+          "action": "Zobacz moje dyżury",
+          "message": "Zaproponowana wymiana dyżuru na {editionName} nie doszła do skutku.",
+          "title": "Wymiana dyżuru odrzucona"
+        }
       }
     },
     "welcome": {

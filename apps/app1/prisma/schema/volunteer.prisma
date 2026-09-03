@@ -65,46 +65,46 @@ model EventVolunteerSettings {
 }
 
 model EditionVolunteerApplication {
-  id                    Int                         @id @default(autoincrement())
-  eventId               Int
-  userId                Int
-  status                VolunteerStatus             @default(PENDING)
-  motivation            String?                     @db.Text
-  createdAt             DateTime                    @default(now())
-  updatedAt             DateTime                    @updatedAt
-  decidedAt             DateTime?
-  userSnapshotPhone     String?
-  timePreferences       Json?
-  teamPreferences       Json?
-  acceptanceNote        String?                     @db.Text
-  hasPets               Boolean?
-  petsDetails           String?                     @db.Text
-  hasMinors             Boolean?
-  minorsDetails         String?                     @db.Text
-  hasVehicle            Boolean?
-  vehicleDetails        String?                     @db.Text
-  companionName         String?                     @db.Text
-  avoidList             String?                     @db.Text
-  skills                String?                     @db.Text
-  hasExperience         Boolean?
-  experienceDetails     String?                     @db.Text
-  setupAvailability     Boolean?
-  teardownAvailability  Boolean?
-  eventAvailability     Boolean?
-  arrivalDateTime       String?
-  departureDateTime     String?
-  qrCodeToken           String?                     @unique
-  entryValidated        Boolean                     @default(false)
-  entryValidatedAt      DateTime?
-  entryValidatedBy      Int?
-  source                VolunteerApplicationSource  @default(APPLICATION)
-  addedById             Int?
-  addedAt               DateTime?
-  event                 Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user                  User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  addedBy               User?                       @relation("ManuallyAddedVolunteers", fields: [addedById], references: [id], onDelete: SetNull)
-  teamAssignments       ApplicationTeamAssignment[]
-  mealSelections        VolunteerMealSelection[]
+  id                   Int                         @id @default(autoincrement())
+  eventId              Int
+  userId               Int
+  status               VolunteerStatus             @default(PENDING)
+  motivation           String?                     @db.Text
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
+  decidedAt            DateTime?
+  userSnapshotPhone    String?
+  timePreferences      Json?
+  teamPreferences      Json?
+  acceptanceNote       String?                     @db.Text
+  hasPets              Boolean?
+  petsDetails          String?                     @db.Text
+  hasMinors            Boolean?
+  minorsDetails        String?                     @db.Text
+  hasVehicle           Boolean?
+  vehicleDetails       String?                     @db.Text
+  companionName        String?                     @db.Text
+  avoidList            String?                     @db.Text
+  skills               String?                     @db.Text
+  hasExperience        Boolean?
+  experienceDetails    String?                     @db.Text
+  setupAvailability    Boolean?
+  teardownAvailability Boolean?
+  eventAvailability    Boolean?
+  arrivalDateTime      String?
+  departureDateTime    String?
+  qrCodeToken          String?                     @unique
+  entryValidated       Boolean                     @default(false)
+  entryValidatedAt     DateTime?
+  entryValidatedBy     Int?
+  source               VolunteerApplicationSource  @default(APPLICATION)
+  addedById            Int?
+  addedAt              DateTime?
+  event                Event                       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user                 User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedBy              User?                       @relation("ManuallyAddedVolunteers", fields: [addedById], references: [id], onDelete: SetNull)
+  teamAssignments      ApplicationTeamAssignment[]
+  mealSelections       VolunteerMealSelection[]
 
   @@unique([eventId, userId])
   @@index([eventId])
@@ -206,18 +206,20 @@ enum VolunteerAssignmentSource {
 }
 
 model VolunteerAssignment {
-  id           String   @id @default(cuid())
+  id           String                    @id @default(cuid())
   timeSlotId   String
   userId       Int
-  assignedAt   DateTime @default(now())
+  assignedAt   DateTime                  @default(now())
   assignedById Int
   // Par défaut manuelle : c'est le choix prudent pour les lignes déjà en base, dont l'origine
   // est perdue, et une relance ne doit pas les balayer par surprise.
   source       VolunteerAssignmentSource @default(MANUAL)
 
-  timeSlot   VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
-  user       User              @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
-  assignedBy User              @relation("VolunteerAssignment_assignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
+  timeSlot       VolunteerTimeSlot      @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  user           User                   @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy     User                   @relation("VolunteerAssignment_assignedBy", fields: [assignedById], references: [id], onDelete: Cascade)
+  swapsOffered   VolunteerSwapRequest[] @relation("VolunteerSwap_requesterAssignment")
+  swapsRequested VolunteerSwapRequest[] @relation("VolunteerSwap_targetAssignment")
 
   @@unique([timeSlotId, userId])
   @@index([timeSlotId])
@@ -258,4 +260,66 @@ model VolunteerComment {
   @@unique([userId, eventId])
   @@index([userId])
   @@index([eventId])
+}
+
+// ========== ÉCHANGE DE CRÉNEAUX ENTRE BÉNÉVOLES ==========
+
+/// Où en est une demande d'échange.
+///
+/// Deux accords sont nécessaires avant d'y toucher : celui du bénévole visé, puis celui d'un
+/// organisateur. Un planning se déséquilibre vite, et l'échange qui arrange deux personnes peut
+/// dégarnir un poste que ni l'une ni l'autre ne voit.
+enum VolunteerSwapStatus {
+  /// En attente de la réponse du bénévole visé.
+  PENDING_PEER
+  /// Les deux bénévoles sont d'accord ; un organisateur doit trancher.
+  PENDING_MANAGER
+  ACCEPTED
+  /// Refusée par le bénévole visé ou par l'organisateur.
+  REFUSED
+  /// Retirée par le demandeur.
+  CANCELLED
+  /// L'un des deux créneaux est passé : l'échange n'a plus d'objet.
+  EXPIRED
+}
+
+/// Demande d'échange d'un créneau contre un autre, entre deux bénévoles.
+///
+/// Un pour un : le demandeur offre l'une de ses affectations et en convoite une autre. Prendre un
+/// créneau libre ou abandonner le sien sans contrepartie ne passe pas par ici.
+///
+/// Les deux affectations sont référencées par leur identifiant, en `Cascade` : si l'une disparaît
+/// — désaffectation manuelle, relance de l'assignation automatique — la demande s'efface avec
+/// elle. C'est le comportement voulu : elle porterait sur un créneau que plus personne ne tient.
+model VolunteerSwapRequest {
+  id                    String              @id @default(cuid())
+  eventId               Int
+  requesterId           Int
+  targetId              Int
+  /// Affectation offerte par le demandeur.
+  requesterAssignmentId String
+  /// Affectation convoitée, tenue par la cible.
+  targetAssignmentId    String
+  status                VolunteerSwapStatus @default(PENDING_PEER)
+  /// Quand la cible a répondu, quel que soit son sens.
+  peerRespondedAt       DateTime?
+  /// L'organisateur qui a tranché, et quand.
+  decidedById           Int?
+  decidedAt             DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  event               Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  requester           User                @relation("VolunteerSwap_requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  target              User                @relation("VolunteerSwap_target", fields: [targetId], references: [id], onDelete: Cascade)
+  decidedBy           User?               @relation("VolunteerSwap_decidedBy", fields: [decidedById], references: [id], onDelete: SetNull)
+  requesterAssignment VolunteerAssignment @relation("VolunteerSwap_requesterAssignment", fields: [requesterAssignmentId], references: [id], onDelete: Cascade)
+  targetAssignment    VolunteerAssignment @relation("VolunteerSwap_targetAssignment", fields: [targetAssignmentId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, status])
+  @@index([requesterId])
+  @@index([targetId])
+  @@index([requesterAssignmentId])
+  @@index([targetAssignmentId])
+  @@index([decidedById])
 }

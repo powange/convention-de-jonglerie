@@ -184,6 +184,28 @@
         "action": "Aanmeldingen bekijken",
         "message": "{applicantName} heeft zich zojuist aangemeld als vrijwilliger voor “{editionName}”.",
         "title": "Nieuwe vrijwilligersaanmelding"
+      },
+      "swap": {
+        "requested": {
+          "action": "Verzoek bekijken",
+          "message": "{name} stelt voor een dienst met je te ruilen bij {editionName}.",
+          "title": "Voorstel voor dienstruil 🔁"
+        },
+        "peer_accepted": {
+          "action": "Verzoek bekijken",
+          "message": "De aan {name} voorgestelde ruil bij {editionName} wacht op goedkeuring van een organisator.",
+          "title": "Ruil wacht op goedkeuring ⏳"
+        },
+        "decided": {
+          "action": "Mijn diensten bekijken",
+          "message": "Je dienstruil bij {editionName} is goedgekeurd.",
+          "title": "Dienstruil goedgekeurd ✅"
+        },
+        "refused": {
+          "action": "Mijn diensten bekijken",
+          "message": "De voorgestelde dienstruil bij {editionName} is niet doorgegaan.",
+          "title": "Dienstruil geweigerd"
+        }
       }
     },
     "welcome": {

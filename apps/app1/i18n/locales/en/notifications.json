@@ -184,6 +184,28 @@
         "action": "View applications",
         "message": "{applicantName} has just applied to volunteer for “{editionName}”.",
         "title": "New volunteer application"
+      },
+      "swap": {
+        "requested": {
+          "action": "View the request",
+          "message": "{name} offers to swap a shift with you at {editionName}.",
+          "title": "Shift swap proposal 🔁"
+        },
+        "peer_accepted": {
+          "action": "View the request",
+          "message": "The swap proposed to {name} at {editionName} is awaiting an organiser's approval.",
+          "title": "Swap awaiting approval ⏳"
+        },
+        "decided": {
+          "action": "View my shifts",
+          "message": "Your shift swap at {editionName} has been approved.",
+          "title": "Shift swap approved ✅"
+        },
+        "refused": {
+          "action": "View my shifts",
+          "message": "The shift swap proposed at {editionName} did not go through.",
+          "title": "Shift swap declined"
+        }
       }
     },
     "welcome": {

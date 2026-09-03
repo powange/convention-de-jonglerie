@@ -31,6 +31,19 @@ export default defineNitroPlugin(async (_nitroApp) => {
       start: true,
     })
 
+    // Fermeture des demandes d'échange de créneau devenues sans objet (toutes les heures)
+    CronJob.from({
+      cronTime: '30 * * * *',
+      onTick: async () => {
+        try {
+          await runTask('cleanup-expired-swaps')
+        } catch (error) {
+          console.error("Erreur lors de l'exécution de cleanup-expired-swaps:", error)
+        }
+      },
+      start: true,
+    })
+
     // Purge des envois temporaires abandonnés (toutes les heures)
     CronJob.from({
       cronTime: '15 * * * *',

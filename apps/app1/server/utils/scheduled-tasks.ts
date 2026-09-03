@@ -50,6 +50,14 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
     category: 'Maintenance',
   },
   {
+    name: 'cleanup-expired-swaps',
+    description:
+      "Ferme les demandes d'échange de créneau dont l'un des deux créneaux est déjà passé",
+    schedule: 'Toutes les heures (à la 30e minute)',
+    cronExpression: '30 * * * *',
+    category: 'Maintenance',
+  },
+  {
     name: 'cleanup-temp-uploads',
     description: "Supprime les images abandonnées dans le dossier temporaire (plus d'une heure)",
     schedule: 'Toutes les heures (à la 15e minute)',

@@ -184,6 +184,28 @@
         "action": "Visa ansökningarna",
         "message": "{applicantName} har just anmält sig som volontär till ”{editionName}”.",
         "title": "Ny volontäransökan"
+      },
+      "swap": {
+        "requested": {
+          "action": "Visa förfrågan",
+          "message": "{name} föreslår ett passbyte med dig på {editionName}.",
+          "title": "Förslag om passbyte 🔁"
+        },
+        "peer_accepted": {
+          "action": "Visa förfrågan",
+          "message": "Bytet som föreslagits till {name} på {editionName} väntar på en arrangörs godkännande.",
+          "title": "Byte väntar på godkännande ⏳"
+        },
+        "decided": {
+          "action": "Visa mina pass",
+          "message": "Ditt passbyte på {editionName} har godkänts.",
+          "title": "Passbyte godkänt ✅"
+        },
+        "refused": {
+          "action": "Visa mina pass",
+          "message": "Det föreslagna passbytet på {editionName} blev inte av.",
+          "title": "Passbyte avböjt"
+        }
       }
     },
     "welcome": {

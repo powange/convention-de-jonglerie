@@ -184,6 +184,28 @@
         "action": "Bewerbungen ansehen",
         "message": "{applicantName} hat sich soeben als Helfer für „{editionName}“ beworben.",
         "title": "Neue Helferbewerbung"
+      },
+      "swap": {
+        "requested": {
+          "action": "Anfrage ansehen",
+          "message": "{name} schlägt dir einen Schichttausch bei {editionName} vor.",
+          "title": "Vorschlag für einen Schichttausch 🔁"
+        },
+        "peer_accepted": {
+          "action": "Anfrage ansehen",
+          "message": "Der {name} vorgeschlagene Tausch bei {editionName} wartet auf die Genehmigung eines Organisators.",
+          "title": "Tausch wartet auf Genehmigung ⏳"
+        },
+        "decided": {
+          "action": "Meine Schichten ansehen",
+          "message": "Dein Schichttausch bei {editionName} wurde genehmigt.",
+          "title": "Schichttausch genehmigt ✅"
+        },
+        "refused": {
+          "action": "Meine Schichten ansehen",
+          "message": "Der bei {editionName} vorgeschlagene Schichttausch kam nicht zustande.",
+          "title": "Schichttausch abgelehnt"
+        }
       }
     },
     "welcome": {

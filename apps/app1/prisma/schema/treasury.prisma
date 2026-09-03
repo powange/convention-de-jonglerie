@@ -51,27 +51,27 @@ model TreasuryCode {
 
 /// Ligne saisie à la main, en charge ou en produit.
 model TreasuryEntry {
-  id          Int               @id @default(autoincrement())
-  editionId   Int
-  kind        TreasuryEntryKind
-  title       String            @db.VarChar(150)
-  description String?           @db.Text
+  id           Int               @id @default(autoincrement())
+  editionId    Int
+  kind         TreasuryEntryKind
+  title        String            @db.VarChar(150)
+  description  String?           @db.Text
   /// Montant en centimes, toujours positif : c'est `kind` qui porte le sens.
-  amount      Int
-  codeId      Int?
+  amount       Int
+  codeId       Int?
   /// Justificatif : photo d'un ticket de caisse ou d'une facture, saisie depuis le téléphone.
   /// Chemin public sous `/uploads/`, comme les autres images envoyées par les organisateurs.
-  imageUrl    String?
+  imageUrl     String?
   /// Montant attendu et non encore réglé. Bascule la ligne de « réglé » vers « engagé » : le
   /// solde ne change pas, mais le réglé cesse de compter ce qui n'a pas été payé.
-  isForecast  Boolean           @default(false)
+  isForecast   Boolean           @default(false)
   /// Dépense avancée de sa poche par quelqu'un — l'association lui doit ce montant.
   /// Sans objet sur une recette, où le serveur le force à `null`.
   advancedById Int?
   /// L'avance a-t-elle été remboursée à la personne ? Sans objet sans `advancedById`.
-  reimbursed  Boolean           @default(false)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  reimbursed   Boolean           @default(false)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   edition    Edition       @relation(fields: [editionId], references: [id], onDelete: Cascade)
   code       TreasuryCode? @relation(fields: [codeId], references: [id], onDelete: SetNull)
