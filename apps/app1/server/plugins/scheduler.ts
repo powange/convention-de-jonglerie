@@ -31,6 +31,19 @@ export default defineNitroPlugin(async (_nitroApp) => {
       start: true,
     })
 
+    // Purge des envois temporaires abandonnés (toutes les heures)
+    CronJob.from({
+      cronTime: '15 * * * *',
+      onTick: async () => {
+        try {
+          await runTask('cleanup-temp-uploads')
+        } catch (error) {
+          console.error("Erreur lors de l'exécution de cleanup-temp-uploads:", error)
+        }
+      },
+      start: true,
+    })
+
     // Rappels d'échéance sur les tâches d'édition (quotidien à 9h)
     CronJob.from({
       cronTime: '0 9 * * *',

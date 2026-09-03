@@ -31,6 +31,14 @@ export default wrapApiHandler(
         category: 'Maintenance',
       },
       {
+        name: 'cleanup-temp-uploads',
+        description:
+          "Supprime les images abandonnées dans le dossier temporaire (plus d'une heure)",
+        schedule: 'Toutes les heures (à la 15e minute)',
+        cronExpression: '15 * * * *',
+        category: 'Maintenance',
+      },
+      {
         name: 'cleanup-resolved-error-logs',
         description: "Supprime les logs d'erreur résolus de plus d'un mois",
         schedule: 'Mensuel (1er du mois à 3h)',

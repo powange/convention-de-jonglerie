@@ -804,6 +804,7 @@
     "backup_restore_interrupted_description": "Servern startade om under återställningen: databasen kan vara ofullständig. Kör återställningen igen.",
     "backup_import_resumed": "Uppladdningen återupptogs",
     "backup_import_resumed_description": "Den här säkerhetskopian var redan uppladdad till {percent} %. Endast resten skickas nu.",
-    "merge_group_treasury": "Ekonomi"
+    "merge_group_treasury": "Ekonomi",
+    "cleanup_temp_uploads": "Rensning av tillfälliga uppladdningar"
   }
 }

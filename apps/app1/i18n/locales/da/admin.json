@@ -804,6 +804,7 @@
     "backup_restore_interrupted_description": "Serveren genstartede under gendannelsen: databasen kan være ufuldstændig. Kør gendannelsen igen.",
     "backup_import_resumed": "Upload genoptaget",
     "backup_import_resumed_description": "Denne sikkerhedskopi var allerede uploadet {percent} %. Kun resten sendes nu.",
-    "merge_group_treasury": "Økonomi"
+    "merge_group_treasury": "Økonomi",
+    "cleanup_temp_uploads": "Oprydning af midlertidige uploads"
   }
 }
