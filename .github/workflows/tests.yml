@@ -239,6 +239,20 @@ jobs:
           fi
           echo "✅ Aucune référence non définie (TS2304/TS2552)."
 
+      # Le journal est conservé : sans lui, la dette de typage n'est mesurable que sur un poste
+      # de développement, dont l'environnement diffère de celui-ci. Un `node_modules` à la racine
+      # y existe par accident d'une installation ancienne — le `package.json` racine ne déclare
+      # aucune dépendance — et les fichiers de `layers/` y résolvent leurs paquets, alors qu'ici
+      # ils ne le peuvent pas. Deux comptages faits sur ces bases donnaient des ordres de grandeur
+      # différents ; celui-ci fait foi.
+      - name: Conserver le journal de typage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typecheck-log
+          path: apps/app1/typecheck.log
+          retention-days: 14
+
       - name: Typecheck — échoue sur les erreurs de type des fichiers modifiés (TS2345)
         if: github.event_name == 'pull_request'
         run: |
