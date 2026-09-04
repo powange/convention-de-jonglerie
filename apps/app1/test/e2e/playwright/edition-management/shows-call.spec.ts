@@ -13,6 +13,7 @@ import {
   updateShowCallApplicationStatus,
 } from '../helpers'
 
+const BASE = 'http://localhost:3000'
 const SHOW_CALL_NAME = 'E2E Appel à spectacles'
 const SHOW_CALL_DESCRIPTION = 'Description de test pour appel à spectacles E2E'
 
@@ -74,6 +75,39 @@ test.describe
       await page.waitForSelector('main', { timeout: 10000 })
       await expect(page.getByText(SHOW_CALL_NAME).first()).toBeVisible({ timeout: 3000 })
     }).toPass({ timeout: 30000, intervals: [3000] })
+  })
+
+  /**
+   * L'en-tête restait en ligne sur mobile : le bouton « Créer un appel » gardait sa largeur
+   * propre et écrasait le titre comme la description en colonnes de deux ou trois mots.
+   *
+   * On mesure des positions rendues, pas des classes : c'est la mise en page à l'écran qui était
+   * en cause, et elle dépend du thème autant que de nos réglages.
+   */
+  test('en mobile, le bouton de création passe sous le titre', async ({ browser }) => {
+    const { editionId } = loadState()
+    const context = await browser.newContext({
+      storageState: new URL('../../../../test-results/.auth/user.json', import.meta.url).pathname,
+      viewport: { width: 390, height: 844 },
+      locale: 'fr-FR',
+    })
+    const page = await context.newPage()
+    await page.goto(`${BASE}/editions/${editionId}/gestion/shows-call`, {
+      waitUntil: 'domcontentloaded',
+    })
+
+    const titre = page.getByRole('heading', { level: 1 }).first()
+    const bouton = page.getByRole('button', { name: /créer un appel/i }).first()
+    await expect(bouton).toBeVisible({ timeout: 30000 })
+
+    const t = (await titre.boundingBox())!
+    const b = (await bouton.boundingBox())!
+
+    expect(b.y, 'le bouton devrait être sous le titre, pas à côté').toBeGreaterThan(t.y + t.height)
+    // Le titre récupère alors toute la largeur, au lieu d'une colonne étroite.
+    expect(t.width).toBeGreaterThan(250)
+
+    await context.close()
   })
 
   test("la page de configuration de l'appel est accessible", async ({ page, goto }) => {
