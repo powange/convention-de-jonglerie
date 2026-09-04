@@ -176,18 +176,17 @@ model VolunteerTeam {
 }
 
 model VolunteerTimeSlot {
-  id                 String   @id @default(cuid())
-  eventId            Int
-  teamId             String?
-  title              String?
-  description        String?  @db.Text
-  startDateTime      DateTime
-  endDateTime        DateTime
-  maxVolunteers      Int      @default(1)
-  assignedVolunteers Int      @default(0)
-  delayMinutes       Int?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id            String   @id @default(cuid())
+  eventId       Int
+  teamId        String?
+  title         String?
+  description   String?  @db.Text
+  startDateTime DateTime
+  endDateTime   DateTime
+  maxVolunteers Int      @default(1)
+  delayMinutes  Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   event       Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
   team        VolunteerTeam?        @relation(fields: [teamId], references: [id], onDelete: SetNull)

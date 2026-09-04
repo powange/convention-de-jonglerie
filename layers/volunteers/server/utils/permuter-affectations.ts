@@ -4,8 +4,8 @@
  * Les deux lignes échangent leur `userId`. En transaction, parce qu'une permutation à moitié
  * appliquée laisserait deux créneaux faux — l'un sans personne, l'autre avec deux fois la même.
  *
- * Le compteur `assignedVolunteers` du créneau ne bouge pas : un entrant pour un sortant de chaque
- * côté.
+ * Rien d'autre à mettre à jour : l'occupation d'un créneau se compte sur ses affectations, et une
+ * permutation en conserve le nombre — un entrant pour un sortant de chaque côté.
  */
 export interface AffectationAPermuter {
   id: string

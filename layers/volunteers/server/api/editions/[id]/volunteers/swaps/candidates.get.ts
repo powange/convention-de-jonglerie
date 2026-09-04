@@ -61,9 +61,7 @@ export default wrapApiHandler(async (event) => {
           teamId: true,
           startDateTime: true,
           endDateTime: true,
-          // Compté sur les affectations réelles, comme partout ailleurs dans le dépôt : la
-          // colonne `assignedVolunteers` du créneau n'est mise à jour par aucun écrivain et
-          // rendait « 0 bénévole » sur un créneau visiblement tenu.
+          // L'occupation se compte sur les affectations réelles, comme partout dans le dépôt.
           maxVolunteers: true,
           _count: { select: { assignments: true } },
           team: { select: { id: true, name: true, color: true } },
