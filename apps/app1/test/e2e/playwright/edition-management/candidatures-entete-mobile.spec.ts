@@ -1,6 +1,6 @@
 import { expect, test, type Browser } from '@nuxt/test-utils/playwright'
 
-import { enableVolunteers, loadState, updateVolunteerSettings } from '../helpers'
+import { activerBenevolatTemporairement, loadState } from '../helpers'
 
 const BASE = 'http://localhost:3000'
 const AUTH = new URL('../../../../test-results/.auth/user.json', import.meta.url).pathname
@@ -14,6 +14,17 @@ const AUTH = new URL('../../../../test-results/.auth/user.json', import.meta.url
  * même que le rendu resterait écrasé.
  */
 test.describe('Gestion des candidatures — en-tête', () => {
+  // L'édition est partagée entre toutes les specs : ce qu'on y allume, on l'éteint.
+  let restaurer: (() => Promise<void>) | null = null
+
+  test.beforeAll(async ({ browser }) => {
+    restaurer = await activerBenevolatTemporairement(browser, loadState().editionId)
+  })
+
+  test.afterAll(async () => {
+    await restaurer?.()
+  })
+
   async function ouvrir(browser: Browser, largeur: number) {
     const { editionId } = loadState()
     const ctx = await browser.newContext({
@@ -22,8 +33,6 @@ test.describe('Gestion des candidatures — en-tête', () => {
       locale: 'fr-FR',
     })
     const page = await ctx.newPage()
-    await enableVolunteers(page, editionId)
-    await updateVolunteerSettings(page, editionId, { mode: 'INTERNAL' })
     await page.goto(`${BASE}/editions/${editionId}/gestion/volunteers/applications`, {
       waitUntil: 'domcontentloaded',
     })

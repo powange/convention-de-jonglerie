@@ -3,7 +3,7 @@ import fs from 'node:fs'
 
 import { expect } from '@nuxt/test-utils/playwright'
 
-import { conventionStateFile, credentialsFile } from '../../../playwright.config'
+import { authFile, conventionStateFile, credentialsFile } from '../../../playwright.config'
 
 const BASE_URL = 'http://localhost:3000'
 
@@ -12,6 +12,7 @@ const BASE_URL = 'http://localhost:3000'
 // ──────────────────────────────────────────────
 
 type Page = import('@playwright/test').Page
+type Browser = import('@playwright/test').Browser
 type RequestOptions = Parameters<Page['request']['post']>[1]
 
 /**
@@ -589,6 +590,41 @@ export async function linkApplicationToShow(
  */
 export async function enableVolunteers(page: Page, editionId: string) {
   return updateEdition(page, editionId, { volunteersEnabled: true })
+}
+
+/**
+ * Active le bénévolat en mode interne le temps d'une spec, et rend de quoi restaurer l'état
+ * d'origine.
+ *
+ * L'édition est partagée par toutes les specs : ce qu'on y allume doit être éteint, sans quoi
+ * `features-toggle`, qui vérifie que toutes les fonctionnalités sont éteintes par défaut, tombe
+ * sur un interrupteur laissé actif — c'est exactement ce qui est arrivé.
+ *
+ * L'état de départ est relevé plutôt que supposé : si une autre spec avait légitimement laissé
+ * le bénévolat actif, l'éteindre d'office déplacerait simplement le problème.
+ */
+export async function activerBenevolatTemporairement(
+  browser: Browser,
+  editionId: string | number
+): Promise<() => Promise<void>> {
+  const context = await browser.newContext({ storageState: authFile })
+  const page = await context.newPage()
+
+  const reponse = await page.request.get(`${BASE_URL}/api/editions/${editionId}`)
+  const corps = reponse.ok() ? await reponse.json() : {}
+  const etaitActif = Boolean((corps.data ?? corps)?.volunteersEnabled)
+
+  await enableVolunteers(page, String(editionId))
+  await updateVolunteerSettings(page, String(editionId), { mode: 'INTERNAL' })
+  await context.close()
+
+  return async () => {
+    if (etaitActif) return
+    const menage = await browser.newContext({ storageState: authFile })
+    const p = await menage.newPage()
+    await disableVolunteers(p, String(editionId))
+    await menage.close()
+  }
 }
 
 /**
