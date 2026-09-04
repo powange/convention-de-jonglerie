@@ -173,7 +173,9 @@ export function validateImportData(input: unknown): ValidationResult {
   }
 
   // Formater les erreurs Zod de manière lisible
-  const errors = result.error.errors.map((err) => {
+  // `issues` et non `errors` : depuis Zod 4, `errors` n'existe plus, et `.map` sur
+  // `undefined` faisait échouer l'import au lieu d'en lister les défauts.
+  const errors = result.error.issues.map((err) => {
     const path = err.path.join('.')
     return `${path}: ${err.message}`
   })

@@ -187,8 +187,11 @@ const startScanning = async () => {
     } catch (envErr: any) {
       console.warn('Caméra arrière indisponible, tentative avec la première caméra dispo', envErr)
       const cameras = await Html5Qrcode.getCameras()
-      if (!cameras.length) throw envErr
-      await html5QrCode.start(cameras[0].id, config, onScanSuccess, onScanError)
+      // On garde la caméra plutôt que de la relire par son index : tester la longueur ne dit
+      // rien au compilateur sur `cameras[0]`, et l'appel se faisait sur une valeur non vérifiée.
+      const premiere = cameras[0]
+      if (!premiere) throw envErr
+      await html5QrCode.start(premiere.id, config, onScanSuccess, onScanError)
     }
 
     // Caméra activée avec succès

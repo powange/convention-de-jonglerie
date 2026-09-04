@@ -99,7 +99,7 @@
                   />
                   <img
                     v-if="row.original.show.imageUrl"
-                    :src="getShowImageUrl(row.original.show)"
+                    :src="getShowImageUrl(row.original.show) ?? undefined"
                     :alt="row.original.show.title"
                     class="w-12 h-12 object-cover rounded-lg shrink-0"
                   />

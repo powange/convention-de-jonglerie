@@ -160,7 +160,8 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => ({
       callbacks: {
         label: (context) => {
           const label = context.dataset.label || ''
-          const value = context.parsed.y
+          // `?? 0` : un point sans valeur affichait « null » dans l'infobulle.
+          const value = context.parsed.y ?? 0
           return `${label}: ${value} ${value > 1 ? t('gestion.ticketing.stats_purchases') : t('gestion.ticketing.stats_purchase')}`
         },
       },
