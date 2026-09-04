@@ -17,7 +17,9 @@
     </div>
     <div v-else>
       <!-- Titre de la page -->
-      <div class="mb-6 flex items-center justify-between">
+      <!-- Empilé sur mobile : côte à côte, le bouton gardait sa largeur propre et écrasait le
+           titre comme la description en colonnes de deux ou trois mots. -->
+      <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
@@ -27,7 +29,12 @@
             {{ $t('gestion.shows_call.list_description') }}
           </p>
         </div>
-        <UButton icon="i-heroicons-plus" color="primary" @click="openCreateModal">
+        <UButton
+          icon="i-heroicons-plus"
+          color="primary"
+          class="w-full justify-center sm:w-auto"
+          @click="openCreateModal"
+        >
           {{ $t('gestion.shows_call.create') }}
         </UButton>
       </div>
