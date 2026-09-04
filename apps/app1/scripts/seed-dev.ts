@@ -940,11 +940,6 @@ async function main() {
                       },
                     })
 
-                    // Mettre à jour le compteur d'assignés
-                    await prisma.volunteerTimeSlot.update({
-                      where: { id: timeSlot.id },
-                      data: { assignedVolunteers: { increment: 1 } },
-                    })
                     totalAssignments++
                   }
                 }
