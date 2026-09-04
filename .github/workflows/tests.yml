@@ -219,6 +219,13 @@ jobs:
         if: steps.cache-nuxt.outputs.cache-hit != 'true'
         run: npx nuxi prepare
 
+      # Les jobs restaurent `apps/app1/node_modules` depuis le cache sans rejouer `npm ci` : le
+      # `postinstall` qui relie les dépendances aux layers ne s'exécute donc pas ici. Sans ce
+      # rappel, les fichiers de `layers/` ne résoudraient aucun paquet et le compilateur y
+      # dégraderait tous les types en `any` — un pan entier du code cesserait d'être vérifié.
+      - name: Relier les dépendances aux layers
+        run: node scripts/lier-layers-node-modules.mjs
+
       # Deux filets, et un seul journal.
       #
       # 1. Sur TOUT le dépôt : les "Cannot find name" (TS2304/TS2552), la classe des bugs

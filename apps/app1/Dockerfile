@@ -20,7 +20,11 @@ FROM base AS builder
 
 # Manifests SEULS d'abord : la couche d'install ne dépend que d'eux, donc modifier prisma/
 # (nouvelle migration, édition de schéma) ne l'invalide plus.
+# Le script du `postinstall` doit exister avant `npm ci` : il relie les dépendances aux layers.
+# Copié à part et avant les sources, pour que le cache d'installation ne soit invalidé que
+# lorsqu'un script change — et non à chaque modification du code applicatif.
 COPY apps/app1/package*.json ./
+COPY apps/app1/scripts ./scripts
 
 # Installer dépendances complètes (ci si lock, sinon install)
 # --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
@@ -87,7 +91,11 @@ FROM base AS dev
 # Le code (app + layers) est monté en volume pour le hot-reload, node_modules reste dans un volume Docker
 # Manifests SEULS d'abord : ni l'install npm ni Playwright ne dépendent de prisma/,
 # donc une migration ne relance plus aucune des deux couches.
+# Le script du `postinstall` doit exister avant `npm ci` : il relie les dépendances aux layers.
+# Copié à part et avant les sources, pour que le cache d'installation ne soit invalidé que
+# lorsqu'un script change — et non à chaque modification du code applicatif.
 COPY apps/app1/package*.json ./
+COPY apps/app1/scripts ./scripts
 
 # Installer les dépendances dans l'image pour un démarrage rapide
 # --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
