@@ -34,19 +34,21 @@
         <!-- Gestion des candidatures -->
         <UCard v-if="canViewVolunteersTable" variant="soft">
           <template #header>
-            <div class="flex items-start justify-between gap-4">
-              <div class="space-y-2 flex-1">
+            <!-- Empilé sur mobile : côte à côte, le bouton gardait sa largeur propre et
+                 réduisait le titre et la note à des colonnes de deux ou trois mots. -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div class="space-y-2 sm:flex-1">
                 <h3 class="text-lg font-semibold flex items-center gap-2">
                   <UIcon name="i-heroicons-clipboard-document-list" class="text-primary-500" />
                   {{ t('volunteers.management_title') }}
                 </h3>
                 <p
                   v-if="volunteersMode === 'INTERNAL'"
-                  :class="`text-sm ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass} flex items-center gap-2`"
+                  :class="`text-sm ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass} flex items-start gap-2`"
                 >
                   <UIcon
                     name="i-heroicons-information-circle"
-                    :class="volunteerConfig.iconColorClass"
+                    :class="`${volunteerConfig.iconColorClass} mt-0.5 shrink-0`"
                     size="16"
                   />
                   {{
@@ -60,6 +62,7 @@
                 v-if="canManageVolunteers && volunteersMode === 'INTERNAL'"
                 color="primary"
                 icon="i-heroicons-user-plus"
+                class="w-full justify-center sm:w-auto"
                 @click="showAddVolunteerModal = true"
               >
                 {{ t('edition.volunteers.add_volunteer') }}
@@ -131,7 +134,8 @@
           variant="soft"
         >
           <template #header>
-            <div class="flex items-center justify-between">
+            <!-- Même empilement que l'en-tête ci-dessus, pour la même raison. -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div class="space-y-2">
                 <h3 class="text-lg font-semibold flex items-center gap-2">
                   <UIcon :name="volunteerConfig.icon" :class="volunteerConfig.iconColorClass" />
@@ -147,6 +151,7 @@
                 variant="soft"
                 size="sm"
                 icon="i-heroicons-cog-6-tooth"
+                class="w-full justify-center sm:w-auto"
               >
                 {{ $t('pages.volunteers.team_distribution.manage_teams') }}
               </UButton>

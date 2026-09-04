@@ -35,6 +35,11 @@
 
           <!-- Navigation -->
           <template #default="{ collapsed }">
+            <!-- Cibles tactiles : le panneau devient un tiroir sous `lg`, et ses entrées y
+                 faisaient 36 px de haut — sous le seuil confortable, et deux fois moins que
+                 celles du menu des onglets d'une édition (56 px), mesurées côte à côte. Les
+                 valeurs mobiles reprennent donc les siennes ; au-delà de `lg`, la barre latérale
+                 reste une colonne permanente, où l'on préfère la compacité. -->
             <UNavigationMenu
               v-model="openSections"
               :collapsed="collapsed"
@@ -45,11 +50,11 @@
               highlight
               :collapsible="true"
               :ui="{
-                link: 'text-base items-start',
-                linkLeadingIcon: 'size-5',
+                link: 'text-base items-start gap-3 py-4 lg:gap-1.5 lg:py-1.5',
+                linkLeadingIcon: 'size-6 lg:size-5',
                 linkLabel: 'whitespace-normal',
-                childLink: 'text-base items-start',
-                childLinkIcon: 'size-5',
+                childLink: 'text-base items-start gap-3 py-4 lg:gap-1.5 lg:py-1.5',
+                childLinkIcon: 'size-6 lg:size-5',
                 childLinkLabel: 'whitespace-normal',
               }"
             />
