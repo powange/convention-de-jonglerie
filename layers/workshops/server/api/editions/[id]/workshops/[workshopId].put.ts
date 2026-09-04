@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canEditWorkshop } from '#server/utils/permissions/workshop-permissions'
-import { buildUpdateData, fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { updateWorkshopSchema, validateAndSanitize } from '#server/utils/validation-schemas'
 import { useWorkshopsPorts } from '#server/workshops/ports/registry'
@@ -12,12 +12,20 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const workshopId = validateResourceId(event, 'workshopId', 'atelier')
 
-    // Vérifier que le workshop existe et appartient à l'édition (modèle propre du layer)
-    await fetchResourceOrFail(
-      prisma.workshop,
-      { id: workshopId, editionId },
-      { select: { id: true }, errorMessage: 'Workshop non trouvé' }
-    )
+    // Vérifier que le workshop existe et appartient à l'édition (modèle propre du layer).
+    //
+    // `findFirst` et non `fetchResourceOrFail` : ce helper attend un identifiant scalaire et
+    // construit `where: { id }`. En lui passant `{ id, editionId }`, la requête devenait
+    // `where: { id: { id, editionId } }` — Prisma refusait un objet là où il attend un entier, et
+    // toute modification d'atelier répondait 500. `findUnique` ne conviendrait pas davantage :
+    // le couple (id, editionId) n'est pas une clé unique déclarée.
+    const atelier = await prisma.workshop.findFirst({
+      where: { id: workshopId, editionId },
+      select: { id: true },
+    })
+    if (!atelier) {
+      throw createError({ statusCode: 404, message: 'Workshop non trouvé' })
+    }
 
     // Vérifier les permissions pour modifier le workshop
     const hasPermission = await canEditWorkshop(user.id, workshopId)
@@ -48,7 +56,11 @@ export default wrapApiHandler(
         // `null` explicite : c'est ainsi qu'on retire une heure de fin déjà enregistrée.
         endDateTime: (val) => (val ? new Date(val as string) : null),
       },
-      exclude: ['locationName'], // Géré séparément
+      // `editionStartDate` et `editionEndDate` sont injectées plus haut pour que le schéma
+      // vérifie que l'atelier tient dans les dates de l'édition. Ce ne sont pas des colonnes de
+      // l'atelier : laissées ici, Prisma refusait la mise à jour entière. La création, elle,
+      // construit ses données champ par champ et n'a jamais été touchée.
+      exclude: ['locationName', 'editionStartDate', 'editionEndDate'],
     })
 
     // Gérer le lieu du workshop

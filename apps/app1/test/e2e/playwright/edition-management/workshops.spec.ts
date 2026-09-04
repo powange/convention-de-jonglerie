@@ -1,6 +1,6 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
-import { apiDelete, apiPost, loadState, updateEdition } from '../helpers'
+import { apiDelete, apiPost, apiPut, loadState, updateEdition } from '../helpers'
 
 const BASE = 'http://localhost:3000'
 
@@ -68,6 +68,50 @@ test.describe.serial('Module Ateliers', () => {
    * D'où le retard imposé ici, qui reproduit le timing de production. Même défaut que sur la
    * page bénévolat, où il avait été signalé et mesuré.
    */
+  /**
+   * Modifier un atelier renvoyait 500 en production.
+   *
+   * Le contrôle « l'atelier appartient-il bien à cette édition ? » passait `{ id, editionId }` à
+   * un helper qui attend un identifiant scalaire : la requête devenait `where: { id: { id,
+   * editionId } }`, que Prisma refuse. Sept tentatives sont remontées des journaux avant que le
+   * défaut soit vu — aucune n'avait abouti.
+   */
+  test('modifier un atelier aboutit, et un atelier d’une autre édition reste introuvable', async ({
+    page,
+  }) => {
+    const { editionId } = loadState()
+    if (!workshopId) throw new Error('workshopId manquant')
+
+    const start = new Date(Date.now() + 7.5 * 24 * 3600_000)
+    const end = new Date(start.getTime() + 2 * 3600_000)
+    const corps = {
+      title: 'Atelier diabolo E2E modifié',
+      description: 'Description mise à jour',
+      startDateTime: start.toISOString(),
+      endDateTime: end.toISOString(),
+    }
+
+    const modification = await apiPut(
+      page,
+      `${BASE}/api/editions/${editionId}/workshops/${workshopId}`,
+      { data: corps }
+    )
+    expect(modification.status(), await modification.text()).toBe(200)
+
+    // Et le garde d'appartenance tient toujours : le même atelier vu depuis une autre édition
+    // n'existe pas.
+    const autreEdition = Number(editionId) + 100000
+    const usurpation = await apiPut(
+      page,
+      `${BASE}/api/editions/${autreEdition}/workshops/${workshopId}`,
+      { data: corps }
+    )
+    expect(
+      [403, 404],
+      `un atelier d'une autre édition ne devrait pas être modifiable (${usurpation.status()})`
+    ).toContain(usurpation.status())
+  })
+
   test('le bouton de proposition résiste à une session tardive', async ({ page }) => {
     const { editionId } = loadState()
 
