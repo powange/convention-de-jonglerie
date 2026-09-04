@@ -32,7 +32,10 @@ export default wrapApiHandler(
       display: 'standalone',
       scope: '/',
       start_url: '/',
-      orientation: 'portrait-primary',
+      // `any` et non `portrait-primary` : verrouiller l'orientation empêchait de tourner le
+      // téléphone une fois l'application installée, alors que plusieurs pages — planning des
+      // bénévoles, tableaux de gestion, carte du site — gagnent à être vues en paysage.
+      orientation: 'any',
       icons: [
         {
           src: `/favicons/android-chrome-192x192.png?v=${iconVersion}`,
