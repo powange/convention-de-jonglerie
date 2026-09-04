@@ -128,16 +128,14 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
   /**
    * Ses blocs de bénévole doivent tenir au rechargement.
    *
-   * Test de garde, pas de reproduction : un défaut a été signalé — planning visible en arrivant,
-   * disparu après un F5 — que ce parcours ne reproduit pas. Ici, tout revient après le
-   * rechargement ; simplement pas tout de suite. Ces blocs sont conditionnés au store
-   * d'authentification, qui n'est pas peuplé pendant le rendu serveur : ils n'apparaissent donc
-   * qu'une fois la page hydratée et la session relue, soit près de trois secondes en
-   * développement. Deux tentatives de correctif — transmettre le cookie au rendu serveur, puis
-   * retirer le court-circuit sur le store — n'ont rien changé à cette mesure, et n'ont donc pas
-   * été retenues.
+   * Le défaut : après un rechargement, la page perdait pour de bon les blocs du bénévole — ses
+   * créneaux, ses repas, l'échange —, alors qu'en y arrivant par un onglet tout s'affichait.
    *
-   * Ce test verrouille au moins qu'après un rechargement, les blocs reviennent.
+   * La cause est une course. Le plugin client lance `/api/session/me` sans l'attendre, et la page
+   * échantillonnait l'authentification une seule fois : arrivée trop tôt, elle renonçait à
+   * charger la candidature et plus rien ne relançait la requête. En développement la page est
+   * plus lente que la session et gagne toujours, ce qui masquait entièrement le défaut — d'où le
+   * retard imposé ci-dessous, qui reproduit le timing de production.
    */
   test('ses créneaux survivent à un rechargement de la page bénévolat', async ({
     browser,
@@ -169,6 +167,17 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
     await page.goto(`${BASE}/editions/${editionId}/volunteers`, { waitUntil: 'domcontentloaded' })
     await expect(marqueur, 'le planning devrait s’afficher en arrivant sur la page').toBeVisible({
       timeout: 30000,
+    })
+
+    // On retarde la session pour rendre la course déterministe.
+    //
+    // Le plugin client lance `/api/session/me` sans l'attendre : selon lequel des deux arrive en
+    // premier, la page voit un store rempli ou vide. En développement la page est la plus lente,
+    // le défaut ne se montre donc jamais ; en production c'est l'inverse, et les blocs du
+    // bénévole ne s'affichaient plus du tout. Ce délai reproduit le timing de production.
+    await page.route('**/api/session/me', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await route.continue()
     })
 
     await page.reload({ waitUntil: 'domcontentloaded' })
