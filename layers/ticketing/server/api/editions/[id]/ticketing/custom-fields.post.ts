@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { Prisma } from '#server/utils/prisma'
 
 const bodySchema = z.object({
   label: z.string().min(1),
@@ -51,7 +52,9 @@ export default wrapApiHandler(
           label: body.label,
           type: body.type,
           isRequired: body.isRequired,
-          values: body.values ? body.values : null,
+          // `Prisma.DbNull` et non `null` : Prisma refuse un null brut sur un champ `Json?`,
+          // et la création d'un champ personnalisé sans valeurs échouait donc.
+          values: body.values ?? Prisma.DbNull,
         },
       })
 

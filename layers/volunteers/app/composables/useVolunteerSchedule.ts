@@ -1,4 +1,7 @@
-import type { CalendarOptions, EventInput, ResourceInput } from '@fullcalendar/core'
+import type { CalendarOptions, EventInput } from '@fullcalendar/core'
+// `ResourceInput` vit dans le paquet `resource`, pas dans `core` : l'importer de `core`
+// ne résolvait rien, et le type des ressources était silencieusement perdu.
+import type { ResourceInput } from '@fullcalendar/resource'
 import type { ComputedRef, Ref } from 'vue'
 
 // Type simplifié pour FullCalendar (compatible avec VolunteerTeam)
@@ -441,7 +444,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           teamId: event.extendedProps.teamId,
           maxVolunteers: event.extendedProps.maxVolunteers,
           assignedVolunteers: event.extendedProps.assignedVolunteers,
-          color: event.backgroundColor || event.color,
+          color: event.backgroundColor,
           description: event.extendedProps.description,
           assignedVolunteersList: event.extendedProps.assignedVolunteersList,
         }
@@ -463,7 +466,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           event.getResources()[0]?.id === 'unassigned' ? undefined : event.getResources()[0]?.id,
         maxVolunteers: event.extendedProps.maxVolunteers,
         assignedVolunteers: event.extendedProps.assignedVolunteers,
-        color: event.color,
+        // `backgroundColor` : `color` n'existe pas sur un événement FullCalendar rendu, la
+        // couleur valait donc toujours `undefined` ici.
+        color: event.backgroundColor,
         description: event.extendedProps.description,
         assignedVolunteersList: event.extendedProps.assignedVolunteersList,
       }
@@ -487,7 +492,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           event.getResources()[0]?.id === 'unassigned' ? undefined : event.getResources()[0]?.id,
         maxVolunteers: event.extendedProps.maxVolunteers,
         assignedVolunteers: event.extendedProps.assignedVolunteers,
-        color: event.color,
+        // `backgroundColor` : `color` n'existe pas sur un événement FullCalendar rendu, la
+        // couleur valait donc toujours `undefined` ici.
+        color: event.backgroundColor,
         description: event.extendedProps.description,
         assignedVolunteersList: event.extendedProps.assignedVolunteersList,
       }

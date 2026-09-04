@@ -742,7 +742,9 @@ const showDeleteConfirm = ref(false)
 const artistToDelete = ref<any>(null)
 
 // Table ref pour accès API TanStack
-const tableRef = ref<InstanceType<typeof import('@nuxt/ui').UTable> | null>(null)
+// `ref()` simple, comme ailleurs dans le dépôt : `@nuxt/ui` n'expose pas `UTable` comme type
+// dans cette version, et l'annotation ne résolvait rien.
+const tableRef = ref()
 
 // État du tri
 const sorting = ref<{ id: string; desc: boolean }[]>([])

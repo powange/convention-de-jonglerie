@@ -46,7 +46,10 @@ export default wrapApiHandler(
     if (!validation.success) {
       throw createError({
         status: 400,
-        message: validation.error.errors[0].message,
+        // `issues` et non `errors` : depuis Zod 4, `errors` n'existe plus. On lisait donc
+        // `undefined[0]`, et une saisie invalide levait une TypeError — l'utilisateur
+        // recevait un 500 au lieu du message qui lui disait quoi corriger.
+        message: validation.error.issues[0]?.message ?? 'Données invalides',
       })
     }
 

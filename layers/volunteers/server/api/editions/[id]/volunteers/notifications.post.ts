@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { Prisma } from '#server/utils/prisma'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -129,7 +130,9 @@ export default wrapApiHandler(async (event) => {
       title,
       message,
       targetType,
-      selectedTeams: targetType === 'teams' ? selectedTeams : null,
+      // `Prisma.DbNull` : un envoi qui ne vise pas des équipes passait un null brut sur un
+      // champ `Json?`, que Prisma refuse.
+      selectedTeams: targetType === 'teams' ? selectedTeams : Prisma.DbNull,
       recipientCount: volunteers.length,
       sentAt: new Date(),
     },
