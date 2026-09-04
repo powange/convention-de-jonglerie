@@ -621,6 +621,25 @@ const fetchVolunteersInfo = async () => {
 }
 await fetchVolunteersInfo()
 
+/**
+ * La session arrive après coup, et il faut donc la guetter.
+ *
+ * Le plugin client lance `/api/session/me` sans l'attendre. Au premier rendu qui suit un
+ * rechargement, le store peut donc être encore vide : `fetchMyApplication` renonçait alors —
+ * `if (!authStore.isAuthenticated) return` — et plus rien ne relançait la requête. Les blocs du
+ * bénévole (ses créneaux, ses repas, l'échange) restaient absents pour de bon, alors qu'une
+ * navigation interne, exécutée plus tard, les affichait normalement.
+ *
+ * Échantillonner l'authentification une seule fois en faisait une course : gagnée en
+ * développement, où la page est plus lente que la requête de session, perdue en production.
+ */
+watch(
+  () => authStore.isAuthenticated,
+  (connecte) => {
+    if (connecte) fetchMyApplication()
+  }
+)
+
 // Fonctions d'édition/gestion supprimées de la page publique
 
 // Fonction helper pour transformer les données du formulaire selon la configuration de l'édition

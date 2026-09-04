@@ -496,6 +496,8 @@
     "swap_status_pending_manager": "Väntar på en arrangör",
     "swap_status_pending_peer": "Väntar på den andra volontären",
     "swap_status_refused": "Avböjt",
-    "swap_title": "Byta pass"
+    "swap_title": "Byta pass",
+    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
+    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
   }
 }

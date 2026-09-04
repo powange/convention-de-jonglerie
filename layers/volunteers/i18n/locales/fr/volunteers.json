@@ -394,6 +394,8 @@
     "swap_answered": "Réponse enregistrée",
     "swap_approve": "Valider l'échange",
     "swap_cancel": "Retirer",
+    "swap_cancel_confirm_title": "Retirer cette demande ?",
+    "swap_cancel_confirm_description": "L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau.",
     "swap_cancel_error": "Impossible de retirer la demande",
     "swap_cancelled": "Demande retirée",
     "swap_choose_mine": "Le créneau que vous cédez",

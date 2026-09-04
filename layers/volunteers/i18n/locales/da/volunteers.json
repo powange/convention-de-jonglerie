@@ -496,6 +496,8 @@
     "swap_status_pending_manager": "Afventer en arrangør",
     "swap_status_pending_peer": "Afventer den anden frivillige",
     "swap_status_refused": "Afvist",
-    "swap_title": "Byt en vagt"
+    "swap_title": "Byt en vagt",
+    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
+    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
   }
 }

@@ -496,6 +496,8 @@
     "swap_status_pending_manager": "Awaiting an organiser",
     "swap_status_pending_peer": "Awaiting the other volunteer",
     "swap_status_refused": "Declined",
-    "swap_title": "Swap a shift"
+    "swap_title": "Swap a shift",
+    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
+    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
   }
 }

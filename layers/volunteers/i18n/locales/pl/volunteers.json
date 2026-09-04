@@ -496,6 +496,8 @@
     "swap_status_pending_manager": "Oczekuje na organizatora",
     "swap_status_pending_peer": "Oczekuje na drugiego wolontariusza",
     "swap_status_refused": "Odrzucona",
-    "swap_title": "Wymień dyżur"
+    "swap_title": "Wymień dyżur",
+    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
+    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
   }
 }

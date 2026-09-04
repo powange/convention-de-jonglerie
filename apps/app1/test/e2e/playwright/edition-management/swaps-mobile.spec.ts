@@ -291,6 +291,7 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
     // Capture de la modale de choix, pour l'inspection visuelle.
     await page.getByRole('button', { name: /le créneau que vous souhaitez/i }).click()
     await page.waitForTimeout(1200)
+    await page.waitForTimeout(900)
     await page.screenshot({
       path: '/tmp/claude-1000/-home-powange-projects-convention-de-jonglerie/ec64cc3e-3602-4801-a44c-3d566d88eedf/scratchpad/captures/modale.png',
       fullPage: true,
@@ -319,10 +320,8 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
       timeout: 15000,
     })
     // L'équipe doit se lire sur chaque créneau : « Toilettes sèches » seul ne dit pas de quelle
-    // équipe il s'agit, et un même intitulé peut exister dans plusieurs. C'est ce qui manquait
-    // dans « Mes propositions », alors que le sélecteur, lui, l'affichait déjà.
-    // La ligne de la proposition, repérée par son statut : c'est elle qui doit porter l'équipe,
-    // et non le sélecteur au-dessus, qui l'affichait déjà.
+    // équipe il s'agit, et un même intitulé peut exister dans plusieurs. On vise la ligne de la
+    // proposition, repérée par son statut, et non le sélecteur au-dessus, qui l'affichait déjà.
     const proposition = page
       .locator('li')
       .filter({ has: page.getByText(/en attente de l.autre bénévole/i) })
@@ -331,6 +330,31 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
       proposition.getByText(`Échanges ${SUFFIXE}`).first(),
       'le nom de l’équipe devrait apparaître sur les créneaux proposés'
     ).toBeVisible()
+
+    // « Retirer » doit se voir comme un bouton : c'était un libellé fantôme, sans fond, sur une
+    // action qui annule un accord en cours. On mesure ce qui est rendu, pas la classe demandée.
+    const retirer = proposition.getByRole('button', { name: /retirer/i }).first()
+    const fond = await retirer.evaluate((el) => getComputedStyle(el).backgroundColor)
+    expect(fond, 'le bouton « Retirer » devrait avoir un fond visible').not.toMatch(
+      /rgba\(0, 0, 0, 0\)|transparent/
+    )
+
+    // Et il demande confirmation avant d'agir.
+    await retirer.click()
+    const confirmation = page.getByRole('dialog').filter({ hasText: /retirer cette demande/i })
+    await expect(
+      confirmation,
+      'un clic sur « Retirer » devrait demander confirmation'
+    ).toBeVisible()
+
+    // Renoncer ne retire rien : la proposition doit survivre, les tests suivants s'appuient
+    // dessus — et un utilisateur qui ferme la modale s'attend au même résultat.
+    await confirmation
+      .getByRole('button', { name: /annuler/i })
+      .first()
+      .click()
+    await expect(confirmation).toBeHidden()
+    await expect(page.getByText(/en attente de l.autre bénévole/i).first()).toBeVisible()
 
     await verifier(page, 'La page d’échange avec une proposition envoyée')
 
