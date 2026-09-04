@@ -3,6 +3,11 @@ import type { H3Event, EventHandlerRequest } from 'h3'
 /**
  * Type pour les noms de ressources
  */
+/**
+ * Les libellés reconnus. Un libellé absent d'ici rendait `RESOURCE_MESSAGES[type]`
+ * indéfini : l'erreur partait alors sans message, et l'utilisateur ne savait pas quel
+ * identifiant était en cause. Trente-six appels du dépôt étaient dans ce cas.
+ */
 export type ResourceType =
   | 'convention'
   | 'édition'
@@ -27,6 +32,19 @@ export type ResourceType =
   | 'dépense'
   | 'tarif'
   | 'token'
+  | 'compteur'
+  | 'item'
+  | 'candidature'
+  | 'post'
+  | 'custom field'
+  | 'marker'
+  | 'zone'
+  | 'ligne'
+  | 'quota'
+  | 'commentaire'
+  | 'performance'
+  | 'code'
+  | 'feedback'
 
 /**
  * Messages d'erreur pour les ressources
@@ -55,6 +73,19 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   dépense: 'ID de dépense invalide',
   tarif: 'ID de tarif invalide',
   token: 'ID de token invalide',
+  compteur: 'ID de compteur invalide',
+  item: "ID d'objet remis invalide",
+  candidature: 'ID de candidature invalide',
+  post: 'ID de publication invalide',
+  'custom field': 'ID de champ personnalisé invalide',
+  marker: 'ID de point de repère invalide',
+  zone: 'ID de zone invalide',
+  ligne: 'ID de ligne invalide',
+  quota: 'ID de quota invalide',
+  commentaire: 'ID de commentaire invalide',
+  performance: 'ID de performance invalide',
+  code: 'ID de code invalide',
+  feedback: 'ID de retour invalide',
 }
 
 /**
