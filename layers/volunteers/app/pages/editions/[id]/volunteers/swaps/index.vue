@@ -160,10 +160,7 @@ const occupation = (creneau: { _count?: { assignments: number }; maxVolunteers?:
 const mesChoix = computed(() =>
   mesCreneaux.value.map((a: any) => ({
     id: a.id,
-    titre: a.timeSlot.title,
-    debut: a.timeSlot.startDateTime,
-    fin: a.timeSlot.endDateTime,
-    equipe: a.timeSlot.team,
+    creneau: a.timeSlot,
     places: occupation(a.timeSlot),
   }))
 )
@@ -213,10 +210,7 @@ watch(
 const choixCandidats = computed(() =>
   candidats.value.map((c: any) => ({
     id: c.assignmentId,
-    titre: c.timeSlot.title,
-    debut: c.timeSlot.startDateTime,
-    fin: c.timeSlot.endDateTime,
-    equipe: c.timeSlot.team,
+    creneau: c.timeSlot,
     benevole: c.volunteer,
     places: occupation(c.timeSlot),
   }))

@@ -318,6 +318,20 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
     await expect(page.getByText(/en attente de l.autre bénévole/i).first()).toBeVisible({
       timeout: 15000,
     })
+    // L'équipe doit se lire sur chaque créneau : « Toilettes sèches » seul ne dit pas de quelle
+    // équipe il s'agit, et un même intitulé peut exister dans plusieurs. C'est ce qui manquait
+    // dans « Mes propositions », alors que le sélecteur, lui, l'affichait déjà.
+    // La ligne de la proposition, repérée par son statut : c'est elle qui doit porter l'équipe,
+    // et non le sélecteur au-dessus, qui l'affichait déjà.
+    const proposition = page
+      .locator('li')
+      .filter({ has: page.getByText(/en attente de l.autre bénévole/i) })
+      .first()
+    await expect(
+      proposition.getByText(`Échanges ${SUFFIXE}`).first(),
+      'le nom de l’équipe devrait apparaître sur les créneaux proposés'
+    ).toBeVisible()
+
     await verifier(page, 'La page d’échange avec une proposition envoyée')
 
     await context.close()

@@ -71,12 +71,15 @@
 </template>
 
 <script setup lang="ts">
+import type { CreneauLisible } from '../../../../../composables/useCreneauLisible'
+
 definePageMeta({
   layout: 'edition-dashboard',
   middleware: ['auth-protected'],
 })
 
 const { t } = useI18n()
+
 const route = useRoute()
 const editionId = computed(() => Number(route.params.id))
 
@@ -86,16 +89,10 @@ const { data, refresh } = await useFetch(
 )
 const demandes = computed(() => data.value?.requests ?? [])
 
-const creneau = (affectation: {
-  timeSlot: { startDateTime: string; endDateTime: string; title?: string | null }
-}) => {
-  const c = affectation.timeSlot
-  const d = new Date(c.startDateTime)
-  const f = new Date(c.endDateTime)
-  const jour = d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' })
-  const heure = (x: Date) => x.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  return `${jour} ${heure(d)}–${heure(f)}${c.title ? ` · ${c.title}` : ''}`
-}
+// Le titre d'un effectif est du texte : d'où la forme condensée du rendu partagé, qui porte
+// désormais l'équipe elle aussi.
+const { resume } = useCreneauLisible()
+const creneau = (affectation: { timeSlot: CreneauLisible }) => resume(affectation.timeSlot)
 
 // Deux actions, comme côté bénévole : le corps est fixé à la construction du composable.
 const options = (approve: boolean) => ({

@@ -7,26 +7,22 @@
 
     <!-- Toujours formulé du point de vue de qui lit : « vous cédez / vous recevez ». Nommer les
          deux personnes obligerait à relire deux fois pour savoir de quel côté on est. -->
-    <p class="text-gray-600 dark:text-gray-400">
-      <span class="font-medium">{{ t('volunteers.swap_gives') }}</span>
-      {{ formatCreneau(creneauCede) }}
-    </p>
-    <p class="text-gray-600 dark:text-gray-400">
-      <span class="font-medium">{{ t('volunteers.swap_receives') }}</span>
-      {{ formatCreneau(creneauRecu) }}
-    </p>
+    <div class="flex gap-2 text-gray-600 dark:text-gray-400">
+      <span class="shrink-0 font-medium">{{ t('volunteers.swap_gives') }}</span>
+      <VolunteersCreneauLigne :creneau="creneauCede" />
+    </div>
+    <div class="flex gap-2 text-gray-600 dark:text-gray-400">
+      <span class="shrink-0 font-medium">{{ t('volunteers.swap_receives') }}</span>
+      <VolunteersCreneauLigne :creneau="creneauRecu" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-interface Creneau {
-  startDateTime: string
-  endDateTime: string
-  title?: string | null
-}
+import type { CreneauLisible } from '../../composables/useCreneauLisible'
 
 interface Affectation {
-  timeSlot: Creneau
+  timeSlot: CreneauLisible
   user?: { id: number; pseudo: string }
 }
 
@@ -61,14 +57,6 @@ const creneauRecu = computed(() =>
     ? props.demande.targetAssignment.timeSlot
     : props.demande.requesterAssignment.timeSlot
 )
-
-const formatCreneau = (c: Creneau) => {
-  const d = new Date(c.startDateTime)
-  const f = new Date(c.endDateTime)
-  const jour = d.toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' })
-  const heure = (x: Date) => x.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  return `${jour} ${heure(d)}–${heure(f)}${c.title ? ` · ${c.title}` : ''}`
-}
 
 const libelleStatut = computed(() =>
   t(`volunteers.swap_status_${props.demande.status.toLowerCase()}`)
