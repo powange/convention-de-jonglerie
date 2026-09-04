@@ -237,6 +237,51 @@
               </div>
             </div>
 
+            <!-- Échanges de créneaux entre bénévoles. Réservé au mode interne : en externe,
+                 le planning ne vit pas ici, il n'y a rien à échanger. -->
+            <div
+              v-if="volunteersModeLocal === 'INTERNAL'"
+              class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.volunteers.swaps_enabled') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('gestion.volunteers.swaps_enabled_description') }}
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UBadge :color="volunteersSwapsLocal ? 'success' : 'neutral'" variant="soft">
+                    {{ volunteersSwapsLocal ? $t('common.active') : $t('common.inactive') }}
+                  </UBadge>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <USwitch
+                  v-model="volunteersSwapsLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  @update:model-value="handleToggleSwaps"
+                />
+                <span
+                  :class="
+                    volunteersSwapsLocal
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  "
+                >
+                  {{
+                    volunteersSwapsLocal
+                      ? $t('gestion.volunteers.swaps_open')
+                      : $t('gestion.volunteers.swaps_closed')
+                  }}
+                </span>
+              </div>
+            </div>
+
             <!-- Ouverture des candidatures -->
             <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div class="flex items-center justify-between">
@@ -324,6 +369,7 @@ const {
 const volunteersPagePublicLocal = ref(false)
 const volunteersOpenLocal = ref(false)
 const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
+const volunteersSwapsLocal = ref(true)
 const volunteersExternalUrlLocal = ref('')
 const volunteersUpdatedAt = ref<Date | null>(null)
 const volunteersInitialized = ref(false)
@@ -353,6 +399,7 @@ const applyVolunteerSettings = () => {
     volunteersPagePublicLocal.value = !!(volunteersSettings.value as any).pagePublic
     volunteersOpenLocal.value = !!volunteersSettings.value.open
     volunteersModeLocal.value = volunteersSettings.value.mode || 'INTERNAL'
+    volunteersSwapsLocal.value = (volunteersSettings.value as any).swapsEnabled !== false
     volunteersExternalUrlLocal.value = volunteersSettings.value.externalUrl || ''
     volunteersUpdatedAt.value = new Date()
     volunteersInitialized.value = true
@@ -464,6 +511,36 @@ const handleTogglePagePublic = async (val: boolean) => {
     }
   } catch (e: any) {
     volunteersPagePublicLocal.value = previous
+    toast.add({
+      title: e?.data?.message || e?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
+
+/**
+ * Le serveur refuse la fermeture tant qu'il reste des demandes en attente : sans quoi deux
+ * bénévoles resteraient devant une demande que plus personne ne peut trancher, la page du
+ * responsable ayant disparu. Le message d'erreur dit combien il en reste ; on le laisse passer
+ * tel quel et on remet l'interrupteur là où il était.
+ */
+const handleToggleSwaps = async (val: boolean) => {
+  if (!volunteersInitialized.value) return
+  const previous = !val
+  try {
+    const updatedSettings = await updateSettings({ swapsEnabled: val } as any)
+    if (updatedSettings) {
+      volunteersUpdatedAt.value = new Date()
+      await editionStore.fetchEditionById(editionId, { force: true })
+      toast.add({
+        title: t('common.saved'),
+        color: 'success',
+        icon: 'i-heroicons-check-circle',
+      })
+    }
+  } catch (e: any) {
+    volunteersSwapsLocal.value = previous
     toast.add({
       title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',

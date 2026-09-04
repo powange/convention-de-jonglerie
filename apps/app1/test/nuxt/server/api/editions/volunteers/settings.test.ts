@@ -67,6 +67,9 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         open: true,
         description: 'Rejoignez notre équipe de bénévoles !',
         mode: 'INTERNAL',
+        // Les échanges de créneaux sont ouverts par défaut : une édition qui n'a jamais touché
+        // au réglage se comporte comme avant son arrivée.
+        swapsEnabled: true,
         externalUrl: null,
         askDiet: true,
         askAllergies: true,
@@ -209,6 +212,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         'pagePublic',
         'description',
         'mode',
+        'swapsEnabled',
         'externalUrl',
         'askDiet',
         'askAllergies',

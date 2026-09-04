@@ -673,6 +673,10 @@
       "config_description": "Paramétrer le système de bénévolat",
       "notifications_description": "Envoyer des notifications aux bénévoles",
       "planning_description": "Planifier les créneaux et missions",
+      "swaps_enabled": "Échanges de créneaux",
+      "swaps_enabled_description": "Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
+      "swaps_open": "Les bénévoles peuvent proposer un échange",
+      "swaps_closed": "Les échanges sont fermés",
       "swaps_description": "Valider les échanges de créneaux entre bénévoles",
       "teams_description": "Organiser les équipes de bénévoles"
     },

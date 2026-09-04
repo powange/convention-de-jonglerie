@@ -303,9 +303,10 @@
                 color="orange"
               />
 
-              <!-- Échanges de créneaux : à la suite du planning, que l'échange modifie -->
+              <!-- Échanges de créneaux : à la suite du planning, que l'échange modifie. La
+                   carte disparaît si l'organisateur a fermé les échanges. -->
               <ManagementNavigationCard
-                v-if="canManageVolunteers"
+                v-if="canManageVolunteers && edition.volunteersSwapsEnabled !== false"
                 :to="`/editions/${edition.id}/gestion/volunteers/swaps`"
                 icon="i-lucide-arrow-left-right"
                 :title="$t('edition.volunteers.swaps')"

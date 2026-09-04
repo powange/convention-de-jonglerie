@@ -83,6 +83,17 @@ const { t } = useI18n()
 const route = useRoute()
 const editionId = computed(() => Number(route.params.id))
 
+/**
+ * Les échanges peuvent être fermés par l'organisateur : la page n'existe alors plus, y compris
+ * pour qui en connaîtrait l'adresse. Le contrôle passe avant la requête à la file d'attente, que
+ * le serveur refuserait de toute façon — mais avec un écran d'erreur au lieu d'un 404 franc.
+ */
+const editionStore = useEditionStore()
+await editionStore.fetchEditionById(editionId.value)
+if ((editionStore.getEditionById(editionId.value) as any)?.volunteersSwapsEnabled === false) {
+  throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
+}
+
 const { data, refresh } = await useFetch(
   () => `/api/editions/${editionId.value}/volunteers/swaps/pending`,
   { transform: (p: any) => p?.data ?? p }

@@ -273,6 +273,9 @@ const canAccessAccessControl = ref(false)
 const volunteersMode = computed(() => edition.value?.volunteersMode || 'INTERNAL')
 const isVolunteersModeInternal = computed(() => volunteersMode.value === 'INTERNAL')
 
+/** Les échanges de créneaux peuvent être fermés par l'organisateur ; ouverts par défaut. */
+const echangesOuverts = computed(() => (edition.value as any)?.volunteersSwapsEnabled !== false)
+
 // Charger les données au montage
 onMounted(async () => {
   // Recharger l'édition complète si elle est absente OU si la version en cache est
@@ -436,15 +439,19 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           label: t('edition.volunteers.planning'),
           icon: 'i-heroicons-calendar-days',
           to: `/editions/${editionId.value}/gestion/volunteers/planning`,
-        },
-        {
-          // À la suite du planning : c'est lui qu'un échange modifie, et c'est là qu'on vient
-          // quand on se demande qui tient quoi.
+        }
+      )
+
+      // Les échanges peuvent être fermés par l'organisateur : l'entrée disparaît avec eux.
+      // À la suite du planning : c'est lui qu'un échange modifie, et c'est là qu'on vient
+      // quand on se demande qui tient quoi.
+      if (echangesOuverts.value) {
+        volunteersChildren.push({
           label: t('edition.volunteers.swaps'),
           icon: 'i-lucide-arrow-left-right',
           to: `/editions/${editionId.value}/gestion/volunteers/swaps`,
-        }
-      )
+        })
+      }
     }
 
     if ((canManageVolunteers.value || isTeamLeader.value) && isVolunteersModeInternal.value) {
