@@ -1,6 +1,13 @@
 import { expect, test, type Browser } from '@nuxt/test-utils/playwright'
 
-import { apiDelete, apiPost, loadState, setEditionStatus, updateEdition } from '../helpers'
+import {
+  apiDelete,
+  apiPost,
+  getEditionStatus,
+  loadState,
+  setEditionStatus,
+  updateEdition,
+} from '../helpers'
 
 const BASE = 'http://localhost:3000'
 const AUTH = new URL('../../../../test-results/.auth/user.json', import.meta.url).pathname
@@ -19,11 +26,16 @@ const TITRE = 'Portés acrobatiques E2E'
  */
 test.describe.serial('Ateliers — la fiche sur un téléphone', () => {
   let atelierId: number | null = null
+  // L'édition est partagée : son statut est relevé pour être rendu tel quel. Publier sans
+  // restaurer faisait échouer `general-info`, qui vérifie qu'un changement de statut fait
+  // apparaître le bouton d'enregistrement — inutile si l'édition est déjà publiée.
+  let statutInitial: string | null = null
 
   test.beforeAll(async ({ browser }) => {
     const { editionId } = loadState()
     const context = await browser.newContext({ storageState: AUTH })
     const page = await context.newPage()
+    statutInitial = await getEditionStatus(page, String(editionId))
     await setEditionStatus(page, String(editionId), 'PUBLISHED')
     await updateEdition(page, String(editionId), { workshopsEnabled: true })
 
@@ -52,6 +64,9 @@ test.describe.serial('Ateliers — la fiche sur un téléphone', () => {
       if (!r.ok()) console.error('[nettoyage] atelier non supprimé', await r.text())
     }
     await updateEdition(page, String(editionId), { workshopsEnabled: false })
+    if (statutInitial && statutInitial !== 'PUBLISHED') {
+      await setEditionStatus(page, String(editionId), statutInitial as 'OFFLINE')
+    }
     await context.close()
   })
 
