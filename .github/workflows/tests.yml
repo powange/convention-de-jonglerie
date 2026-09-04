@@ -176,6 +176,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          # Historique complet : le filet sur les fichiers modifiés compare la branche à sa base,
+          # ce qu'une copie superficielle ne permet pas.
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -215,10 +219,16 @@ jobs:
         if: steps.cache-nuxt.outputs.cache-hit != 'true'
         run: npx nuxi prepare
 
-      # On ne gate que sur les "Cannot find name" (TS2304/TS2552) — la classe des bugs
-      # `edition is not defined` (variable/import manquant). Le typecheck complet remonte beaucoup
-      # d'erreurs de types pré-existantes (correction de types) qu'on ne traite pas ici ; on les
-      # ignore volontairement pour que ce gate reste actionnable.
+      # Deux filets, et un seul journal.
+      #
+      # 1. Sur TOUT le dépôt : les "Cannot find name" (TS2304/TS2552), la classe des bugs
+      #    `edition is not defined`. Le typecheck complet remonte des milliers d'erreurs
+      #    préexistantes qu'on ne traite pas ici ; les gater toutes rendrait la CI rouge en
+      #    permanence.
+      # 2. Sur les SEULS fichiers que la branche modifie : les TS2345 (argument du mauvais type).
+      #    La dette existante est ainsi gelée plutôt que soldée. Sans ce second filet, un objet
+      #    passé là où un entier était attendu a atteint la production et renvoyé sept erreurs 500
+      #    à un utilisateur — alors que `nuxt typecheck` le signalait déjà.
       - name: Typecheck — échoue sur les noms non définis (TS2304/TS2552)
         run: |
           npm run typecheck > typecheck.log 2>&1 || true
@@ -228,6 +238,15 @@ jobs:
             exit 1
           fi
           echo "✅ Aucune référence non définie (TS2304/TS2552)."
+
+      - name: Typecheck — échoue sur les erreurs de type des fichiers modifiés (TS2345)
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          git diff --name-only "origin/${{ github.base_ref }}...HEAD" > fichiers-modifies.txt
+          echo "Fichiers modifiés par la branche :"
+          cat fichiers-modifies.txt
+          node scripts/typecheck-gate.mjs typecheck.log fichiers-modifies.txt 2345
 
   # Job pour valider que le build fonctionne
   build:
