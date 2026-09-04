@@ -16,7 +16,11 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app/apps/app1
 
 # Copier les fichiers de configuration
+# Le script du `postinstall` doit exister avant `npm ci` : il relie les dépendances aux layers.
+# Copié à part et avant les sources, pour que le cache d'installation ne soit invalidé que
+# lorsqu'un script change — et non à chaque modification du code applicatif.
 COPY apps/app1/package*.json ./
+COPY apps/app1/scripts ./scripts
 COPY apps/app1/prisma.config.ts ./
 COPY apps/app1/prisma ./prisma/
 
