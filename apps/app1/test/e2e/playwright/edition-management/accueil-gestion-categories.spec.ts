@@ -1,6 +1,6 @@
 import { expect, test, type Browser } from '@nuxt/test-utils/playwright'
 
-import { enableVolunteers, loadState, updateVolunteerSettings } from '../helpers'
+import { activerBenevolatTemporairement, loadState } from '../helpers'
 
 const BASE = 'http://localhost:3000'
 const AUTH = new URL('../../../../test-results/.auth/user.json', import.meta.url).pathname
@@ -14,6 +14,17 @@ const AUTH = new URL('../../../../test-results/.auth/user.json', import.meta.url
  * pourquoi ces tests changent la taille de la fenêtre plutôt que de simuler un appareil.
  */
 test.describe('Accueil de gestion — repli par catégories sur mobile', () => {
+  // L'édition est partagée entre toutes les specs : ce qu'on y allume, on l'éteint.
+  let restaurer: (() => Promise<void>) | null = null
+
+  test.beforeAll(async ({ browser }) => {
+    restaurer = await activerBenevolatTemporairement(browser, loadState().editionId)
+  })
+
+  test.afterAll(async () => {
+    await restaurer?.()
+  })
+
   async function ouvrirAccueil(browser: Browser, largeur: number, requete = '') {
     const { editionId } = loadState()
     const context = await browser.newContext({
@@ -22,10 +33,6 @@ test.describe('Accueil de gestion — repli par catégories sur mobile', () => {
       locale: 'fr-FR',
     })
     const page = await context.newPage()
-
-    // Le bloc bénévoles n'apparaît qu'avec le bénévolat activé, en mode interne.
-    await enableVolunteers(page, editionId)
-    await updateVolunteerSettings(page, editionId, { mode: 'INTERNAL' })
 
     await page.goto(`${BASE}/editions/${editionId}/gestion${requete}`, {
       waitUntil: 'domcontentloaded',
