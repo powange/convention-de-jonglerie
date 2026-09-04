@@ -54,8 +54,11 @@
           <div class="space-y-4">
             <UCard v-for="workshop in dayGroup.workshops" :key="workshop.id">
               <template #header>
-                <div class="flex items-start justify-between">
-                  <div class="flex-1">
+                <!-- Empilé sur mobile : à côté d'un titre qui passe à la ligne, les actions
+                     serraient le texte contre le bord. Elles reprennent leur place à droite dès
+                     qu'il y a de la largeur. -->
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="min-w-0 sm:flex-1">
                     <h3 class="text-xl font-semibold">{{ workshop.title }}</h3>
                     <!-- `flex-wrap` : sans lui, les trois informations se serraient sur une
                          seule ligne et cassaient en plein milieu — « 11:00 - » puis « 12:00 » —

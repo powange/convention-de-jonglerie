@@ -88,6 +88,35 @@ test.describe.serial('Ateliers — la fiche sur un téléphone', () => {
     await context.close()
   })
 
+  test('mobile : les actions passent sous le titre', async ({ browser }) => {
+    const { page, context } = await ouvrir(browser, 390)
+
+    const titre = page.getByRole('heading', { name: TITRE }).first()
+    const actions = page.getByRole('button', { name: /supprimer le workshop/i }).first()
+    await expect(actions).toBeVisible()
+
+    const t = (await titre.boundingBox())!
+    const a = (await actions.boundingBox())!
+    // Sous le titre, et non à côté : collées au titre, les actions serraient le texte contre le
+    // bord dès qu'il passait à la ligne.
+    expect(a.y, 'les actions devraient être sous le titre').toBeGreaterThan(t.y + t.height)
+
+    await context.close()
+  })
+
+  test('grand écran : les actions restent à droite du titre', async ({ browser }) => {
+    const { page, context } = await ouvrir(browser, 1280)
+
+    const titre = page.getByRole('heading', { name: TITRE }).first()
+    const actions = page.getByRole('button', { name: /supprimer le workshop/i }).first()
+    const t = (await titre.boundingBox())!
+    const a = (await actions.boundingBox())!
+    expect(a.x, 'les actions devraient rester à droite').toBeGreaterThan(t.x + t.width)
+    expect(a.y).toBeLessThan(t.y + t.height)
+
+    await context.close()
+  })
+
   test('la fiche porte le jour, pas seulement l’horaire', async ({ browser }) => {
     const { page, context } = await ouvrir(browser, 390)
 
