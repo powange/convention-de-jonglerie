@@ -178,6 +178,7 @@ export default wrapApiHandler(
       volunteersPagePublic: vs?.pagePublic ?? false,
       volunteersDescription: vs?.description ?? null,
       volunteersMode: vs?.mode ?? 'INTERNAL',
+      volunteersSwapsEnabled: vs?.swapsEnabled ?? true,
       volunteersExternalUrl: vs?.externalUrl ?? null,
       volunteersUpdatedAt: vs?.updatedAt ?? null,
       volunteersSetupStartDate: vs?.setupStartDate ?? null,

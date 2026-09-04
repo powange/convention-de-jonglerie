@@ -5,7 +5,7 @@ import {
   echangePossiblePourLaCible,
   type AffectationCandidate,
 } from '../../../../../../utils/echange-creneaux'
-
+import { exigerEchangesOuverts } from '../../../../../../utils/echanges-ouverts'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -24,6 +24,7 @@ const bodySchema = z.object({ accept: z.boolean() })
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = validateEditionId(event)
+  await exigerEchangesOuverts(editionId)
   const swapId = String(getRouterParam(event, 'swapId') || '')
   if (!swapId) throw createError({ status: 400, message: 'Demande invalide' })
 

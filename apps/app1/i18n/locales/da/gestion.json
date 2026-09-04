@@ -664,7 +664,11 @@
       "notifications_description": "Send meddelelser til frivillige",
       "planning_description": "Planlægning af slots og missioner",
       "teams_description": "Organisering af hold af frivillige",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles"
+      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
+      "swaps_enabled": "[TODO] Échanges de créneaux",
+      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
+      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
+      "swaps_closed": "[TODO] Les échanges sont fermés"
     },
     "shows_call": {
       "title": "Forestillingsopkald",

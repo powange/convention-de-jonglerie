@@ -41,6 +41,9 @@ model EventVolunteerSettings {
   open            Boolean       @default(false)
   pagePublic      Boolean       @default(false)
   mode            VolunteerMode @default(INTERNAL)
+  // Les échanges de créneaux entre bénévoles, ouverts par défaut : les éditions existantes
+  // gardent le comportement qu'elles avaient avant l'arrivée de ce réglage.
+  swapsEnabled    Boolean       @default(true)
   description     String?       @db.Text
   externalUrl     String?
   setupStartDate  DateTime?

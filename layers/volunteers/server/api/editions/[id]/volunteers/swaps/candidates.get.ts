@@ -4,6 +4,7 @@ import {
   creneauxProposables,
   type AffectationCandidate,
 } from '../../../../../utils/echange-creneaux'
+import { exigerEchangesOuverts } from '../../../../../utils/echanges-ouverts'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -23,6 +24,7 @@ import { validateEditionId } from '#server/utils/validation-helpers'
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = validateEditionId(event)
+  await exigerEchangesOuverts(editionId)
 
   const { assignmentId } = z.object({ assignmentId: z.string().min(1) }).parse(getQuery(event))
 

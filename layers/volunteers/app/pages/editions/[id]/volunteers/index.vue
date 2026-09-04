@@ -39,7 +39,8 @@
           v-if="
             authStore.isAuthenticated &&
             myApplication?.status === 'ACCEPTED' &&
-            volunteersMode === 'INTERNAL'
+            volunteersMode === 'INTERNAL' &&
+            echangesOuverts
           "
           class="flex justify-end"
         >
@@ -462,6 +463,11 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 }
 
 // Métadonnées SEO avec le nom de l'édition
+/** Les échanges peuvent être fermés par l'organisateur ; ouverts par défaut. */
+const echangesOuverts = computed(
+  () => (edition.value as any)?.volunteersSwapsEnabled !== false
+)
+
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
 
 const editionDateRange = computed(() =>

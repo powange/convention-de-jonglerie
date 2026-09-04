@@ -1,3 +1,5 @@
+import { exigerEchangesOuverts } from '../../../../../utils/echanges-ouverts'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
@@ -12,6 +14,7 @@ import { validateEditionId } from '#server/utils/validation-helpers'
 export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = validateEditionId(event)
+  await exigerEchangesOuverts(editionId)
 
   const affectation = {
     select: {

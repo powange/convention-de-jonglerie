@@ -412,6 +412,25 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
     await expect(page.getByText(A_EVITER, { exact: false })).toBeVisible({ timeout: 15000 })
 
     await verifier(page, 'La file de validation des échanges')
+
+    // Une demande est en attente : fermer les échanges doit être refusé. Sans cette règle, deux
+    // bénévoles resteraient devant une demande que plus personne ne peut trancher, la page du
+    // responsable ayant disparu avec l'option.
+    const fermeture = await apiPatch(
+      page,
+      `${BASE}/api/editions/${editionId}/volunteers/settings`,
+      {
+        data: { swapsEnabled: false },
+      }
+    )
+    expect(fermeture.status(), 'la fermeture devrait être refusée').toBe(409)
+    const corps = await fermeture.json()
+    expect(JSON.stringify(corps)).toContain('en attente')
+
+    // Et l'option reste ouverte : un refus ne doit rien avoir changé.
+    const reglages = await page.request.get(`${BASE}/api/editions/${editionId}/volunteers/settings`)
+    const lus = await reglages.json()
+    expect((lus.data ?? lus).swapsEnabled, 'le réglage ne doit pas avoir bougé').toBe(true)
   })
 
   /**
@@ -436,6 +455,19 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
       const reponse = await apiDelete(page, url)
       if (!reponse.ok()) console.warn('[nettoyage] échec sur', url, await reponse.text())
     }
+
+    // Les échanges sont rouverts quoi qu'il arrive : le test du refus tente de les fermer, et si
+    // son assertion tombe, l'édition partagée resterait fermée pour les specs suivantes. Vu à la
+    // sonde de mutation, pas en écrivant le test.
+    const reouverture = await apiPatch(
+      page,
+      `${BASE}/api/editions/${editionId}/volunteers/settings`,
+      {
+        data: { swapsEnabled: true },
+      }
+    )
+    if (!reouverture.ok())
+      console.warn('[nettoyage] échanges non rouverts', await reouverture.text())
 
     for (const id of creneaux) {
       if (id) await supprimer(`${BASE}/api/editions/${editionId}/volunteer-time-slots/${id}`)

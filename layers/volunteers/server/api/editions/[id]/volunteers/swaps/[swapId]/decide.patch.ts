@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { demandeExpiree } from '../../../../../../utils/echange-creneaux'
+import { exigerEchangesOuverts } from '../../../../../../utils/echanges-ouverts'
 import {
   permutationPossible,
   permuterAffectations,
@@ -21,6 +22,7 @@ const bodySchema = z.object({ approve: z.boolean() })
  */
 export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
+  await exigerEchangesOuverts(editionId)
   const user = await requireVolunteerManagementAccess(event, editionId)
 
   const swapId = String(getRouterParam(event, 'swapId') || '')

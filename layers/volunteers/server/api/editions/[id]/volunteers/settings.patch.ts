@@ -17,6 +17,7 @@ const bodySchema = z
       .optional()
       .nullable(),
     mode: z.enum(['INTERNAL', 'EXTERNAL']).optional(),
+    swapsEnabled: z.boolean().optional(),
     externalUrl: z
       .string()
       .url('URL externe invalide')
@@ -156,6 +157,23 @@ export default wrapApiHandler(
       }
     }
 
+    // Fermer les échanges laisserait deux bénévoles devant une demande que plus personne ne
+    // peut trancher : ni eux, ni le responsable, la page ayant disparu. On refuse donc tant
+    // qu'il en reste, en disant combien — l'organisateur sait alors quoi faire avant de
+    // recommencer.
+    if (parsed.swapsEnabled === false) {
+      const enAttente = await prisma.volunteerSwapRequest.count({
+        where: { eventId: editionId, status: { in: ['PENDING_PEER', 'PENDING_MANAGER'] } },
+      })
+      if (enAttente > 0) {
+        throw createError({
+          status: 409,
+          message: `Il reste ${enAttente} demande(s) d'échange en attente : traitez-les avant de fermer les échanges.`,
+          data: { code: 'SWAPS_PENDING', pending: enAttente },
+        })
+      }
+    }
+
     // Champs EventVolunteerSettings (mêmes noms que l'API, sans préfixe volunteers)
     const mappedData = {
       pagePublic: parsed.pagePublic,
@@ -164,6 +182,7 @@ export default wrapApiHandler(
       // `null` ou chaîne vide = effacement explicite demandé par l'utilisateur.
       description: parsed.description === undefined ? undefined : parsed.description || null,
       mode: parsed.mode,
+      swapsEnabled: parsed.swapsEnabled,
       externalUrl: parsed.externalUrl === undefined ? undefined : parsed.externalUrl || null,
       askDiet: parsed.askDiet,
       askAllergies: parsed.askAllergies,

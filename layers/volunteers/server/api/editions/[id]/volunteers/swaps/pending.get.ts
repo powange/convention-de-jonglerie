@@ -1,4 +1,5 @@
 import { effectifApresEchange } from '../../../../../utils/echange-creneaux'
+import { exigerEchangesOuverts } from '../../../../../utils/echanges-ouverts'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
@@ -14,6 +15,7 @@ import { validateEditionId } from '#server/utils/validation-helpers'
  */
 export default wrapApiHandler(async (event) => {
   const editionId = validateEditionId(event)
+  await exigerEchangesOuverts(editionId)
   await requireVolunteerManagementAccess(event, editionId)
 
   const affectation = {

@@ -139,8 +139,16 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const editionId = computed(() => Number(route.params.id))
 
+// L'édition est attendue plutôt que chargée au montage : le garde ci-dessous a besoin de son
+// réglage, et le lire sur un objet pas encore arrivé laisserait la page s'ouvrir malgré tout.
+await editionStore.fetchEditionById(editionId.value)
 const edition = computed(() => editionStore.getEditionById(editionId.value))
-onMounted(() => editionStore.fetchEditionById(editionId.value))
+
+// Fermés par l'organisateur, les échanges font disparaître la page — y compris pour qui en
+// connaîtrait l'adresse. Avant les requêtes, que le serveur refuserait de toute façon.
+if ((edition.value as any)?.volunteersSwapsEnabled === false) {
+  throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
+}
 
 /** Mes affectations sur cette édition : c'est parmi elles que se choisit le créneau cédé. */
 const { data: planning } = await useFetch(
