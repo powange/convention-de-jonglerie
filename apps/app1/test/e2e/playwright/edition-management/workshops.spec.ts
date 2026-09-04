@@ -57,6 +57,33 @@ test.describe.serial('Module Ateliers', () => {
     expect(items.some((w: { id: number }) => w.id === workshopId)).toBe(true)
   })
 
+  /**
+   * Le droit de proposer un atelier ne doit pas dépendre d'une course.
+   *
+   * `checkCanCreate` s'exécute au montage et, si le store d'authentification est encore vide,
+   * renonce en masquant le bouton — sans que rien ne relance la vérification. Le plugin client
+   * lançant `/api/session/me` sans l'attendre, l'issue dépendait de qui arrivait le premier :
+   * en développement la page est la plus lente et gagne toujours, ce qui masquait le défaut.
+   *
+   * D'où le retard imposé ici, qui reproduit le timing de production. Même défaut que sur la
+   * page bénévolat, où il avait été signalé et mesuré.
+   */
+  test('le bouton de proposition résiste à une session tardive', async ({ page }) => {
+    const { editionId } = loadState()
+
+    await page.route('**/api/session/me', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await route.continue()
+    })
+
+    await page.goto(`${BASE}/editions/${editionId}/workshops`, { waitUntil: 'domcontentloaded' })
+
+    await expect(
+      page.getByRole('button', { name: /ajouter un workshop/i }).first(),
+      'le bouton de proposition devrait apparaître une fois la session arrivée'
+    ).toBeVisible({ timeout: 30000 })
+  })
+
   test('nettoyage : supprimer l’atelier et désactiver les ateliers', async ({ page }) => {
     const { editionId } = loadState()
     if (workshopId) {

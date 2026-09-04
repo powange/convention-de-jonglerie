@@ -711,6 +711,23 @@ const checkCanCreate = async () => {
   }
 }
 
+/**
+ * La session arrive après coup, et il faut donc la guetter.
+ *
+ * Le plugin client lance `/api/session/me` sans l'attendre. `checkCanCreate` s'exécute au montage
+ * et, si le store est encore vide, renonce en masquant le bouton — sans que rien ne relance la
+ * vérification. Le droit de proposer un atelier disparaissait alors jusqu'au prochain
+ * rechargement, au hasard de la course.
+ *
+ * Même défaut que sur la page bénévolat, corrigé de la même façon.
+ */
+watch(
+  () => authStore.isAuthenticated,
+  (connecte) => {
+    if (connecte) checkCanCreate()
+  }
+)
+
 const editWorkshop = (workshop: any) => {
   editingWorkshop.value = workshop
   formData.value = {
