@@ -3,6 +3,7 @@ import { expect, test } from '@nuxt/test-utils/playwright'
 import {
   apiPost,
   apiPut,
+  updateVolunteerSettings,
   enableVolunteers,
   getInvitationTokenFromLogs,
   loadState,
@@ -23,6 +24,7 @@ const BASE = 'http://localhost:3000'
 test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
   const ts = Date.now()
   const EMAIL = `e2e-controle-acces-${ts}@example.com`
+  const NOM_EQUIPE = `Accueil ${ts}`
   const PASSWORD = 'ControleAccesPass123!'
 
   let editionId = ''
@@ -61,7 +63,7 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
     await updateEdition(page, editionId, { ticketingEnabled: true })
 
     const equipe = await apiPost(page, `${BASE}/api/editions/${editionId}/volunteer-teams`, {
-      data: { name: `Accueil ${ts}`, color: '#3b82f6', isAccessControlTeam: true },
+      data: { name: NOM_EQUIPE, color: '#3b82f6', isAccessControlTeam: true },
     })
     expect(equipe.ok(), `création d'équipe : ${await equipe.text()}`).toBe(true)
     const corpsEquipe = await equipe.json()
@@ -119,6 +121,60 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
     if ((await motsDePasse.count()) >= 2) await motsDePasse.nth(1).fill(PASSWORD)
     await page.getByRole('button', { name: /activer mon compte/i }).click()
     await expect(page.getByText(/compte activé/i).first()).toBeVisible({ timeout: 10000 })
+
+    await context.close()
+  })
+
+  /**
+   * Ses blocs de bénévole doivent tenir au rechargement.
+   *
+   * Test de garde, pas de reproduction : un défaut a été signalé — planning visible en arrivant,
+   * disparu après un F5 — que ce parcours ne reproduit pas. Ici, tout revient après le
+   * rechargement ; simplement pas tout de suite. Ces blocs sont conditionnés au store
+   * d'authentification, qui n'est pas peuplé pendant le rendu serveur : ils n'apparaissent donc
+   * qu'une fois la page hydratée et la session relue, soit près de trois secondes en
+   * développement. Deux tentatives de correctif — transmettre le cookie au rendu serveur, puis
+   * retirer le court-circuit sur le store — n'ont rien changé à cette mesure, et n'ont donc pas
+   * été retenues.
+   *
+   * Ce test verrouille au moins qu'après un rechargement, les blocs reviennent.
+   */
+  test('ses créneaux survivent à un rechargement de la page bénévolat', async ({
+    browser,
+    page: pageOrga,
+  }) => {
+    // Page publique, pour que le garde d'accès ne renvoie pas un 404 ; mode interne, sans quoi
+    // les blocs réservés au bénévole accepté ne sont pas rendus du tout.
+    await updateVolunteerSettings(pageOrga, editionId, { pagePublic: true, mode: 'INTERNAL' })
+
+    const context = await browser.newContext({ storageState: { cookies: [], origins: [] } })
+    const page = await context.newPage()
+
+    await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' })
+    await page.fill('input[type="email"]', EMAIL)
+    await page.getByRole('button', { name: /confirmer/i }).click()
+    await page.waitForSelector('input[type="password"]')
+    await page.fill('input[type="password"]', PASSWORD)
+    await page
+      .getByRole('button', { name: /se connecter|connexion|valider/i })
+      .first()
+      .click()
+    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 30000 })
+
+    // Ce bouton n'apparaît que pour un bénévole dont la candidature est chargée et acceptée :
+    // c'est donc lui qui dit si `my-application` a répondu. Le nom de l'équipe, lui, vient aussi
+    // du planning public de l'édition et ne prouverait rien — vérifié par sonde.
+    const marqueur = page.getByRole('link', { name: /échanger un créneau/i }).first()
+
+    await page.goto(`${BASE}/editions/${editionId}/volunteers`, { waitUntil: 'domcontentloaded' })
+    await expect(marqueur, 'le planning devrait s’afficher en arrivant sur la page').toBeVisible({
+      timeout: 30000,
+    })
+
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await expect(marqueur, 'le planning devrait survivre au rechargement').toBeVisible({
+      timeout: 30000,
+    })
 
     await context.close()
   })

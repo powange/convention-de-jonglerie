@@ -11,8 +11,7 @@
       @click="ouvert = true"
     >
       <span v-if="choisi" class="min-w-0 text-left">
-        <span class="block truncate">{{ intitule(choisi) }}</span>
-        <span class="block truncate text-xs text-gray-500">{{ horaire(choisi) }}</span>
+        <VolunteersCreneauLigne :creneau="choisi.creneau" />
       </span>
       <span v-else class="text-gray-500">{{ placeholder }}</span>
       <UIcon name="i-lucide-chevron-down" class="size-4 shrink-0" />
@@ -30,24 +29,7 @@
               :class="{ 'bg-primary-50 dark:bg-primary-950/30': option.id === modelValue }"
               @click="choisir(option.id)"
             >
-              <span class="flex flex-wrap items-center gap-2">
-                <UBadge
-                  v-if="option.equipe"
-                  :style="
-                    option.equipe.color ? { backgroundColor: option.equipe.color } : undefined
-                  "
-                  :color="option.equipe.color ? undefined : 'neutral'"
-                  variant="solid"
-                  size="xs"
-                >
-                  {{ option.equipe.name }}
-                </UBadge>
-                <span class="font-medium">{{
-                  option.titre || t('volunteers.swap_slot_untitled')
-                }}</span>
-              </span>
-
-              <span class="text-sm text-gray-600 dark:text-gray-400">{{ horaire(option) }}</span>
+              <VolunteersCreneauLigne :creneau="option.creneau" />
 
               <!-- Qui tient le créneau : l'information décisive pour choisir avec qui échanger. -->
               <span v-if="option.benevole" class="flex items-center gap-2 text-sm">
@@ -66,12 +48,12 @@
 </template>
 
 <script setup lang="ts">
+import type { CreneauLisible } from '../../composables/useCreneauLisible'
+
 export interface ChoixCreneau {
   id: string
-  titre?: string | null
-  debut: string
-  fin: string
-  equipe?: { name: string; color?: string | null } | null
+  /** Le créneau lui-même : c'est le composant partagé qui sait le dire. */
+  creneau: CreneauLisible
   benevole?: { id: number; pseudo: string; profilePicture?: string | null } | null
   /** Occupation du créneau, quand elle est connue — « 2 / 3 bénévoles ». */
   places?: string | null
@@ -91,17 +73,6 @@ const { t } = useI18n()
 const ouvert = ref(false)
 
 const choisi = computed(() => props.choix.find((c) => c.id === props.modelValue) ?? null)
-
-const intitule = (c: ChoixCreneau) =>
-  [c.equipe?.name, c.titre || t('volunteers.swap_slot_untitled')].filter(Boolean).join(' · ')
-
-const horaire = (c: ChoixCreneau) => {
-  const d = new Date(c.debut)
-  const f = new Date(c.fin)
-  const jour = d.toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: '2-digit' })
-  const heure = (x: Date) => x.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  return `${jour} · ${heure(d)} – ${heure(f)}`
-}
 
 function choisir(id: string) {
   emit('update:modelValue', id)
