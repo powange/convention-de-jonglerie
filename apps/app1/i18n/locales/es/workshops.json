@@ -77,6 +77,7 @@
     "extraction_ignored_description": "{count} taller(es) detectado(s) pero descartado(s), por falta de horarios utilizables. Elige un día de la edición y vuelve a lanzar la extracción.",
     "import_forced_day": "Día de la edición",
     "import_forced_day_description": "Si la foto no indica una fecha, elige el día en el que colocar los talleres. Se conservan sus horarios.",
-    "import_forced_day_none": "Usar las fechas leídas en la foto"
+    "import_forced_day_none": "Usar las fechas leídas en la foto",
+    "max_people": "[TODO] Max {count} personnes"
   }
 }

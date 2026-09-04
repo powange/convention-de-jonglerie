@@ -77,6 +77,7 @@
     "extraction_ignored_description": "{count} workshop(s) fundet, men frasorteret på grund af manglende brugbare tidspunkter. Vælg en dag i udgaven, og kør udtrækket igen.",
     "import_forced_day": "Dag i udgaven",
     "import_forced_day_description": "Hvis billedet ikke angiver en dato, så vælg den dag, workshoppene skal placeres på. Deres klokkeslæt bevares.",
-    "import_forced_day_none": "Brug datoerne læst på billedet"
+    "import_forced_day_none": "Brug datoerne læst på billedet",
+    "max_people": "[TODO] Max {count} personnes"
   }
 }

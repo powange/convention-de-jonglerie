@@ -57,18 +57,25 @@
                 <div class="flex items-start justify-between">
                   <div class="flex-1">
                     <h3 class="text-xl font-semibold">{{ workshop.title }}</h3>
+                    <!-- `flex-wrap` : sans lui, les trois informations se serraient sur une
+                         seule ligne et cassaient en plein milieu — « 11:00 - » puis « 12:00 » —
+                         dès qu'un téléphone les affichait. -->
                     <div
-                      class="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400"
+                      class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-gray-600 dark:text-gray-400"
                     >
-                      <div class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-clock" />
+                      <div class="flex items-center gap-1 whitespace-nowrap">
+                        <UIcon name="i-heroicons-clock" class="shrink-0" />
                         <!-- Sans heure de fin annoncée, on n'affiche que le début plutôt que
                              de laisser un tiret suspendu. -->
                         <span v-if="workshop.endDateTime"
-                          >{{ formatTime(workshop.startDateTime) }} -
+                          >{{ formatJourCourt(workshop.startDateTime) }} ·
+                          {{ formatTime(workshop.startDateTime) }} -
                           {{ formatTime(workshop.endDateTime) }}</span
                         >
-                        <span v-else>{{ formatTime(workshop.startDateTime) }}</span>
+                        <span v-else
+                          >{{ formatJourCourt(workshop.startDateTime) }} ·
+                          {{ formatTime(workshop.startDateTime) }}</span
+                        >
                       </div>
                       <div v-if="workshop.location" class="flex items-center gap-1">
                         <NuxtLink
@@ -88,13 +95,20 @@
                           }}
                         </span>
                       </div>
-                      <div v-if="workshop.maxParticipants" class="flex items-center gap-1">
-                        <UIcon name="i-heroicons-users" />
-                        <span>Max {{ workshop.maxParticipants }} personnes</span>
+                      <div
+                        v-if="workshop.maxParticipants"
+                        class="flex items-center gap-1 whitespace-nowrap"
+                      >
+                        <UIcon name="i-heroicons-users" class="shrink-0" />
+                        <span>{{
+                          $t('workshops.max_people', { count: workshop.maxParticipants })
+                        }}</span>
                       </div>
                     </div>
                   </div>
-                  <div class="flex items-center gap-2">
+                  <!-- `shrink-0` : sans lui, les actions se faisaient comprimer par un titre
+                       long au lieu de garder leur place. -->
+                  <div class="flex shrink-0 items-center gap-2">
                     <!-- Bouton favori -->
                     <UButton
                       v-if="authStore.isAuthenticated"
@@ -115,9 +129,10 @@
                       color="warning"
                       variant="soft"
                       icon="i-heroicons-pencil"
+                      :title="$t('workshops.edit_workshop')"
                       @click="editWorkshop(workshop)"
                     >
-                      {{ $t('workshops.edit_workshop') }}
+                      <span class="hidden sm:inline">{{ $t('workshops.edit_workshop') }}</span>
                     </UButton>
                     <UButton
                       v-if="canEdit(workshop)"
@@ -125,9 +140,10 @@
                       color="error"
                       variant="soft"
                       icon="i-heroicons-trash"
+                      :title="$t('workshops.delete_workshop')"
                       @click="deleteWorkshop(workshop.id)"
                     >
-                      {{ $t('workshops.delete_workshop') }}
+                      <span class="hidden sm:inline">{{ $t('workshops.delete_workshop') }}</span>
                     </UButton>
                   </div>
                 </div>
@@ -682,6 +698,19 @@ const workshopsByDay = computed(() => {
 const formatDate = (dateStr: string) => formaterJournee(dateStr, fuseau.value, 'fr-FR')
 
 const formatTime = (dateTimeStr: string) => formaterHeure(dateTimeStr, fuseau.value, 'fr-FR')
+
+/**
+ * « sam. 26/09 » — le jour porté par la fiche elle-même.
+ *
+ * Il n'existait que dans l'entête de groupe : dès qu'on faisait défiler, ou dans l'onglet des
+ * favoris, une fiche n'annonçait plus que son horaire, sans dire quel jour.
+ */
+const formatJourCourt = (dateTimeStr: string) =>
+  formaterJournee(dateTimeStr, fuseau.value, 'fr-FR', {
+    weekday: 'short',
+    day: '2-digit',
+    month: '2-digit',
+  })
 
 const { execute: fetchWorkshops, loading } = useApiAction(
   () => `/api/editions/${editionId}/workshops`,
