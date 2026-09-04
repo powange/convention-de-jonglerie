@@ -49,6 +49,7 @@
     "locations_description": "Gérer les lieux où se dérouleront les workshops",
     "max_file_size": "La taille maximale du fichier est de 10 Mo",
     "max_participants": "Nombre max de participants",
+    "max_people": "Max {count} personnes",
     "no_favorites": "Vous n'avez pas encore de workshops favoris",
     "no_locations": "Aucun lieu configuré",
     "no_workshops": "Aucun workshop pour le moment",

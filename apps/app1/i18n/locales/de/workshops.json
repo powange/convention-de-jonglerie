@@ -77,6 +77,7 @@
     "extraction_ignored_description": "{count} Workshop(s) erkannt, aber mangels brauchbarer Zeiten verworfen. Wählen Sie einen Tag der Ausgabe und starten Sie die Extraktion erneut.",
     "import_forced_day": "Tag der Ausgabe",
     "import_forced_day_description": "Wenn das Foto kein Datum nennt, wählen Sie den Tag, auf den die Workshops gelegt werden. Ihre Uhrzeiten bleiben erhalten.",
-    "import_forced_day_none": "Die auf dem Foto gelesenen Daten verwenden"
+    "import_forced_day_none": "Die auf dem Foto gelesenen Daten verwenden",
+    "max_people": "[TODO] Max {count} personnes"
   }
 }
