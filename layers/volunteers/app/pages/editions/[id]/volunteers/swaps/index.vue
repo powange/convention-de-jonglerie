@@ -96,20 +96,38 @@
           <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
             <li v-for="demande in envoyees" :key="demande.id" class="space-y-2 py-3">
               <VolunteersSwapResume :demande="demande" :point-de-vue="'sent'" />
+              <!-- Un bouton franc, et non un libellé fantôme : retirer sa demande annule un
+                   accord en cours de route, ce n'est pas une action qu'on effleure. D'où la
+                   confirmation qui suit, aussi. -->
               <UButton
                 v-if="['PENDING_PEER', 'PENDING_MANAGER'].includes(demande.status)"
-                size="xs"
-                color="neutral"
-                variant="ghost"
+                size="sm"
+                color="error"
+                variant="soft"
+                icon="i-heroicons-x-mark"
                 :loading="annulation.isLoading(demande.id)"
                 :label="t('volunteers.swap_cancel')"
-                @click="annulation.execute(demande.id)"
+                @click="demandeARetirer = demande.id"
               />
             </li>
           </ul>
         </UCard>
       </div>
     </div>
+
+    <UiConfirmModal
+      v-model="confirmationRetrait"
+      :title="t('volunteers.swap_cancel_confirm_title')"
+      :description="t('volunteers.swap_cancel_confirm_description')"
+      :confirm-label="t('volunteers.swap_cancel')"
+      :cancel-label="t('common.cancel')"
+      confirm-color="error"
+      icon-name="i-heroicons-x-mark"
+      icon-color="text-red-500"
+      :loading="demandeARetirer ? annulation.isLoading(demandeARetirer) : false"
+      @confirm="confirmerRetrait"
+      @cancel="demandeARetirer = null"
+    />
   </div>
 </template>
 
@@ -268,6 +286,23 @@ const refus = useApiActionById(
 )
 
 const reponseEnCours = (id: string) => acceptation.isLoading(id) || refus.isLoading(id)
+
+/** La demande dont on s'apprête à se retirer ; `null` quand la confirmation est fermée. */
+const demandeARetirer = ref<string | null>(null)
+
+const confirmationRetrait = computed({
+  get: () => demandeARetirer.value !== null,
+  set: (ouverte: boolean) => {
+    if (!ouverte) demandeARetirer.value = null
+  },
+})
+
+const confirmerRetrait = async () => {
+  const id = demandeARetirer.value
+  if (!id) return
+  await annulation.execute(id)
+  demandeARetirer.value = null
+}
 
 const annulation = useApiActionById(
   (id) => `/api/editions/${editionId.value}/volunteers/swaps/${id}`,

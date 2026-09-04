@@ -496,6 +496,8 @@
     "swap_status_pending_manager": "Ожидает организатора",
     "swap_status_pending_peer": "Ожидает другого волонтёра",
     "swap_status_refused": "Отклонена",
-    "swap_title": "Обменять смену"
+    "swap_title": "Обменять смену",
+    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
+    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
   }
 }

@@ -496,6 +496,8 @@
     "swap_status_pending_manager": "In afwachting van een organisator",
     "swap_status_pending_peer": "In afwachting van de andere vrijwilliger",
     "swap_status_refused": "Geweigerd",
-    "swap_title": "Een dienst ruilen"
+    "swap_title": "Een dienst ruilen",
+    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
+    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
   }
 }

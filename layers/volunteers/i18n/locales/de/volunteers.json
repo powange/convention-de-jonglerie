@@ -496,6 +496,8 @@
     "swap_status_pending_manager": "Wartet auf einen Organisator",
     "swap_status_pending_peer": "Wartet auf die andere Person",
     "swap_status_refused": "Abgelehnt",
-    "swap_title": "Schicht tauschen"
+    "swap_title": "Schicht tauschen",
+    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
+    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
   }
 }
