@@ -196,4 +196,4 @@ export default wrapApiHandler(async (event) => {
   )
 
   return notificationsWithVolunteers
-}, 'GetVolunteerNotifications')
+}, { operationName: 'GetVolunteerNotifications' })

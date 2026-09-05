@@ -195,4 +195,4 @@ export default wrapApiHandler(async (event) => {
     },
     `Notifications envoyées à ${successCount} bénévole(s)`
   )
-}, 'NotifyVolunteerSchedules')
+}, { operationName: 'NotifyVolunteerSchedules' })

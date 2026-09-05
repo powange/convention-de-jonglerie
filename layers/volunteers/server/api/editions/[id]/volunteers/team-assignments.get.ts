@@ -97,4 +97,4 @@ export default wrapApiHandler(async (event) => {
   })
 
   return applications
-}, 'GetVolunteerTeamAssignments')
+}, { operationName: 'GetVolunteerTeamAssignments' })

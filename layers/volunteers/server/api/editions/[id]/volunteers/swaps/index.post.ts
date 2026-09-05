@@ -132,4 +132,4 @@ export default wrapApiHandler(async (event) => {
   )
 
   return createSuccessResponse({ id: demande.id })
-}, 'CreateVolunteerSwapRequest')
+}, { operationName: 'CreateVolunteerSwapRequest' })

@@ -482,4 +482,4 @@ export default wrapApiHandler(async (event) => {
   }
 
   return createPaginatedResponse(applications, total, page, pageSize)
-}, 'GetVolunteerApplications')
+}, { operationName: 'GetVolunteerApplications' })

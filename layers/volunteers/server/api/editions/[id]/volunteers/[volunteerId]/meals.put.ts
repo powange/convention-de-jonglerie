@@ -34,4 +34,4 @@ export default wrapApiHandler(async (event) => {
   )
 
   return createSuccessResponse({ meals })
-}, 'UpdateVolunteerMealsByVolunteerId')
+}, { operationName: 'UpdateVolunteerMealsByVolunteerId' })

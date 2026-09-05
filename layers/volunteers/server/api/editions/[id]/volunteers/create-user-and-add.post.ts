@@ -115,4 +115,4 @@ export default wrapApiHandler(async (event) => {
   }
 
   return createSuccessResponse({ user: newUser, application })
-}, 'CreateUserAndAddVolunteer')
+}, { operationName: 'CreateUserAndAddVolunteer' })

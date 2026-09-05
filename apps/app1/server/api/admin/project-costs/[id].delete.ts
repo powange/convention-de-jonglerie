@@ -5,7 +5,7 @@ export default wrapApiHandler(
     await requireGlobalAdminWithDbCheck(event)
 
     const id = validateResourceId(event, 'id', 'dépense')
-    await fetchResourceOrFail(prisma.projectExpense, id, 'dépense')
+    await fetchResourceOrFail(prisma.projectExpense, id, { errorMessage: 'Dépense introuvable' })
 
     await prisma.projectExpense.delete({ where: { id } })
 

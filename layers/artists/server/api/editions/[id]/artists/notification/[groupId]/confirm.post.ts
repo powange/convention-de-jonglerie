@@ -57,4 +57,4 @@ export default wrapApiHandler(async (event) => {
     title: groupe.title,
     sentAt: groupe.sentAt,
   })
-}, 'ConfirmArtistNotification')
+}, { operationName: 'ConfirmArtistNotification' })

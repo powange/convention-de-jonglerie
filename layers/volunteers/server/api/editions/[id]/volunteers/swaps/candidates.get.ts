@@ -93,4 +93,4 @@ export default wrapApiHandler(async (event) => {
       }
     }),
   })
-}, 'ListVolunteerSwapCandidates')
+}, { operationName: 'ListVolunteerSwapCandidates' })

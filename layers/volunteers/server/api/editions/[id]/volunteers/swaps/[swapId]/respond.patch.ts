@@ -165,4 +165,4 @@ export default wrapApiHandler(async (event) => {
       )
     }
   }
-}, 'RespondToVolunteerSwapRequest')
+}, { operationName: 'RespondToVolunteerSwapRequest' })

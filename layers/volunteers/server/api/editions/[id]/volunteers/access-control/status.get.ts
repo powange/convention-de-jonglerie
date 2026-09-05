@@ -21,4 +21,4 @@ export default wrapApiHandler(async (event) => {
     isActive,
     activeSlot,
   })
-}, 'GetVolunteerAccessControlStatus')
+}, { operationName: 'GetVolunteerAccessControlStatus' })

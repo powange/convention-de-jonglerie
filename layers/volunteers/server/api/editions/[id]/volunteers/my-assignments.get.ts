@@ -36,4 +36,4 @@ export default wrapApiHandler(async (event) => {
   })
 
   return createSuccessResponse({ assignments })
-}, 'ListMyVolunteerAssignments')
+}, { operationName: 'ListMyVolunteerAssignments' })

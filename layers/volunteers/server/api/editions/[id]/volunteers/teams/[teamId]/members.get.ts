@@ -88,4 +88,4 @@ export default wrapApiHandler(async (event) => {
     isLeader: assignment.isLeader,
     assignedAt: assignment.assignedAt,
   }))
-}, 'GetVolunteerTeamMembers')
+}, { operationName: 'GetVolunteerTeamMembers' })

@@ -154,4 +154,4 @@ export default wrapApiHandler(async (event) => {
     summary,
     meals: mealDetails,
   }
-}, 'GetVolunteerCateringByDate')
+}, { operationName: 'GetVolunteerCateringByDate' })

@@ -39,4 +39,4 @@ export default wrapApiHandler(async (event) => {
       confirmedCount: _count.confirmations,
     })),
   })
-}, 'ListArtistNotifications')
+}, { operationName: 'ListArtistNotifications' })

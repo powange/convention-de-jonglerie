@@ -56,4 +56,4 @@ export default wrapApiHandler(async (event) => {
     confirmations,
     confirmedCount: confirmations.filter((c) => c.confirmedAt).length,
   })
-}, 'ListArtistNotificationConfirmations')
+}, { operationName: 'ListArtistNotificationConfirmations' })

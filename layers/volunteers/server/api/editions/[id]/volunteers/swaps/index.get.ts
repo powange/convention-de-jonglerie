@@ -52,4 +52,4 @@ export default wrapApiHandler(async (event) => {
     sent: demandes.filter((d) => d.requesterId === user.id),
     received: demandes.filter((d) => d.targetId === user.id),
   })
-}, 'ListMyVolunteerSwapRequests')
+}, { operationName: 'ListMyVolunteerSwapRequests' })
