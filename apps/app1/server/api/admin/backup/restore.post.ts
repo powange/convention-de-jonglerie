@@ -39,14 +39,13 @@ export default wrapApiHandler(
     if (contentType.includes('multipart/form-data')) {
       // Upload de fichier
       const form = await readMultipartFormData(event)
-      if (!form || form.length === 0) {
+      const fileData = form?.[0]
+      if (!fileData) {
         throw createError({
           status: 400,
           statusText: 'Aucun fichier fourni',
         })
       }
-
-      const fileData = form[0]
       const filename = fileData.filename || ''
 
       if (!fileData.data) {

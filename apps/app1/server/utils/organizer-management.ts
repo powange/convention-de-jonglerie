@@ -210,7 +210,9 @@ export async function listerGestionnairesBenevoles(editionId: number): Promise<n
       ...edition.convention.organizers.map((organisateur) => organisateur.userId),
       ...edition.organizerPermissions.map((permission) => permission.organizer.userId),
     ]),
-  ]
+    // Une convention peut avoir perdu son auteur : le `null` qui en résulte n'est
+    // l'identifiant de personne, et les appelants s'en servent pour notifier.
+  ].filter((identifiant): identifiant is number => identifiant !== null)
 }
 
 // canEditConvention déplacé vers convention-permissions.ts
@@ -372,36 +374,45 @@ export async function addConventionOrganizer(input: AddConventionOrganizerInput)
       include: { user: { select: { id: true, pseudo: true } }, perEditionPermissions: true },
     })
 
-    // Historique CREATED
-    if (withPerEdition) {
-      const snapshot: OrganizerPermissionSnapshot = {
-        title: withPerEdition.title,
-        rights: {
-          canEditConvention: withPerEdition.canEditConvention,
-          canDeleteConvention: withPerEdition.canDeleteConvention,
-          canManageOrganizers: withPerEdition.canManageOrganizers,
-          canAddEdition: withPerEdition.canAddEdition,
-          canEditAllEditions: withPerEdition.canEditAllEditions,
-          canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
-          canManageVolunteers: withPerEdition.canManageVolunteers,
-        },
-        perEdition: (withPerEdition.perEditionPermissions || []).map((p) => ({
-          editionId: p.editionId,
-          canEdit: p.canEdit,
-          canDelete: p.canDelete,
-          canManageVolunteers: p.canManageVolunteers,
-        })),
-      }
-      await tx.organizerPermissionHistory.create({
-        data: {
-          conventionId,
-          targetUserId: withPerEdition.userId,
-          actorId: addedById,
-          changeType: 'CREATED',
-          after: snapshot,
-        },
+    // La ligne vient d'être créée dans cette même transaction : son absence signalerait une
+    // incohérence, pas un cas fonctionnel. Échouer ici vaut mieux que rendre un organisateur
+    // nul, que l'appelant lit ensuite champ par champ — et que l'historique CREATED soit
+    // silencieusement sauté.
+    if (!withPerEdition) {
+      throw createError({
+        status: 500,
+        message: "L'organisateur est introuvable juste après sa création",
       })
     }
+
+    // Historique CREATED
+    const snapshot: OrganizerPermissionSnapshot = {
+      title: withPerEdition.title,
+      rights: {
+        canEditConvention: withPerEdition.canEditConvention,
+        canDeleteConvention: withPerEdition.canDeleteConvention,
+        canManageOrganizers: withPerEdition.canManageOrganizers,
+        canAddEdition: withPerEdition.canAddEdition,
+        canEditAllEditions: withPerEdition.canEditAllEditions,
+        canDeleteAllEditions: withPerEdition.canDeleteAllEditions,
+        canManageVolunteers: withPerEdition.canManageVolunteers,
+      },
+      perEdition: (withPerEdition.perEditionPermissions || []).map((p) => ({
+        editionId: p.editionId,
+        canEdit: p.canEdit,
+        canDelete: p.canDelete,
+        canManageVolunteers: p.canManageVolunteers,
+      })),
+    }
+    await tx.organizerPermissionHistory.create({
+      data: {
+        conventionId,
+        targetUserId: withPerEdition.userId,
+        actorId: addedById,
+        changeType: 'CREATED',
+        after: snapshot,
+      },
+    })
     return withPerEdition
   })
 

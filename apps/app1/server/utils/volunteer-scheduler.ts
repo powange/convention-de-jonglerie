@@ -582,8 +582,8 @@ export class VolunteerScheduler {
       const spotsToFill = slot.maxVolunteers - slot.assignedVolunteers
       let filled = 0
 
-      for (let i = 0; i < candidates.length && filled < spotsToFill; i++) {
-        const candidate = candidates[i]
+      for (const candidate of candidates) {
+        if (filled >= spotsToFill) break
 
         // Vérifier les conflits temporels
         if (this.hasTimeConflict(candidate.volunteer.user.id, slot.id)) {
@@ -630,8 +630,8 @@ export class VolunteerScheduler {
       const spotsToFill = slot.maxVolunteers - slot.assignedVolunteers
       let filled = 0
 
-      for (let i = 0; i < candidates.length && filled < spotsToFill; i++) {
-        const candidate = candidates[i]
+      for (const candidate of candidates) {
+        if (filled >= spotsToFill) break
 
         // Vérifier les conflits temporels d'abord
         if (this.hasTimeConflict(candidate.volunteer.user.id, slot.id)) {
