@@ -115,7 +115,8 @@
 </template>
 
 <script setup lang="ts">
-import type { CarpoolRequest } from '#imports'
+import type { CarpoolRequest } from '~/types/carpool'
+
 import { useAuthStore, formatDate } from '#imports'
 
 interface Props {

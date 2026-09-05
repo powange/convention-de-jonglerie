@@ -678,7 +678,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Edition, AllergySeverityLevel } from '#imports'
+import type { Edition } from '~/types'
+
+import type { AllergySeverityLevel } from '#imports'
 import {
   useEditionStore,
   getAccommodationTypeLabel,
