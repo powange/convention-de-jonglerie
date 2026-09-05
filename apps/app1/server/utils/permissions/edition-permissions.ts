@@ -1,6 +1,5 @@
 import type { OrganizerRight } from '#server/constants/permissions'
 import type {
-  User,
   Edition,
   Convention,
   ConventionOrganizer,
@@ -226,7 +225,7 @@ export function canViewEdition(edition: EditionWithPermissions, user: UserForPer
  */
 export async function getEditionForEdit(
   editionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,
@@ -255,7 +254,7 @@ export async function getEditionForEdit(
  */
 export async function getEditionForDelete(
   editionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,
@@ -284,7 +283,7 @@ export async function getEditionForDelete(
  */
 export async function getEditionForStatusManagement(
   editionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<EditionWithPermissions> {
   const edition = await getEditionWithPermissions(editionId, {
     userId: user.id,

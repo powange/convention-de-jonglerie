@@ -10,7 +10,20 @@ import { typeDeNotification, type TaskDeadlineKind } from './rappels-echeance'
 import { translateServerSide } from './server-i18n'
 import { unifiedPushService, type PushNotificationData } from './unified-push-service'
 
-import type { NotificationType } from '@prisma/client'
+import type { NotificationType } from '#server/types/prisma'
+
+/**
+ * Les paramètres de traduction d'une notification, ramenés à ce que la traduction sait lire.
+ *
+ * C'est un champ JSON : rien n'empêche d'y trouver une chaîne, un nombre ou un tableau. Le
+ * `|| {}` d'origine ne couvrait que le cas nul et laissait passer les autres — la traduction
+ * recevait alors une valeur dont elle ne pouvait rien faire.
+ */
+function parametresDeTraduction(valeur: unknown): Record<string, unknown> {
+  return valeur && typeof valeur === 'object' && !Array.isArray(valeur)
+    ? (valeur as Record<string, unknown>)
+    : {}
+}
 
 /**
  * Helper pour exécuter une notification sans faire échouer l'opération principale
@@ -160,14 +173,14 @@ export const NotificationService = {
         title: notification.titleKey
           ? translateServerSide(
               notification.titleKey,
-              notification.translationParams || {},
+              parametresDeTraduction(notification.translationParams),
               userLang
             )
           : notification.titleText || '',
         message: notification.messageKey
           ? translateServerSide(
               notification.messageKey,
-              notification.translationParams || {},
+              parametresDeTraduction(notification.translationParams),
               userLang
             )
           : notification.messageText || '',
@@ -204,7 +217,7 @@ export const NotificationService = {
             const emailTitle = notification.titleKey
               ? translateServerSide(
                   notification.titleKey,
-                  notification.translationParams || {},
+                  parametresDeTraduction(notification.translationParams),
                   preferredLanguage
                 )
               : notification.titleText || ''
@@ -212,7 +225,7 @@ export const NotificationService = {
             const emailMessage = notification.messageKey
               ? translateServerSide(
                   notification.messageKey,
-                  notification.translationParams || {},
+                  parametresDeTraduction(notification.translationParams),
                   preferredLanguage
                 )
               : notification.messageText || ''
@@ -220,16 +233,19 @@ export const NotificationService = {
             const emailActionText = notification.actionTextKey
               ? translateServerSide(
                   notification.actionTextKey,
-                  notification.translationParams || {},
+                  parametresDeTraduction(notification.translationParams),
                   preferredLanguage
                 )
-              : notification.actionText
+              : // Même raison qu'au-dessus : la colonne est nullable, le générateur attend une
+                // absence plutôt qu'un `null`.
+                (notification.actionText ?? undefined)
 
             const emailHtml = await generateNotificationEmailHtml(
               prenom,
               emailTitle,
               emailMessage,
-              notification.actionUrl,
+              // `?? undefined` : la colonne est nullable, le générateur attend une absence.
+              notification.actionUrl ?? undefined,
               emailActionText
             )
 

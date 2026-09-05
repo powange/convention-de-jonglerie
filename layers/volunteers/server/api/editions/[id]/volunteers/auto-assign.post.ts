@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-import type { PrismaTransaction, AutoAssignmentResult } from '#server/types/prisma-helpers'
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '#server/types/prisma'
+import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { VolunteerScheduler } from '#server/utils/volunteer-scheduler'
+import { VolunteerScheduler, type Assignment } from '#server/utils/volunteer-scheduler'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 // Types pour les données récupérées de la base de données
@@ -225,7 +225,10 @@ export default wrapApiHandler(async (event) => {
  */
 async function applyAssignments(
   editionId: number,
-  assignments: AutoAssignmentResult[],
+  // `Assignment[]`, la forme que produit le planificateur et que ces deux fonctions lisent
+  // réellement (`slotId`, `volunteerId`). La déclaration annonçait `{ timeSlotId, userId }`,
+  // des champs absents ici — le code fonctionnait, c'est le type qui décrivait autre chose.
+  assignments: Assignment[],
   userId: number,
   mode: 'replace-all' | 'keep-all' | 'keep-manual'
 ): Promise<void> {
@@ -282,7 +285,10 @@ async function applyAssignments(
 async function assignVolunteersToTeams(
   tx: PrismaTransaction,
   editionId: number,
-  assignments: AutoAssignmentResult[],
+  // `Assignment[]`, la forme que produit le planificateur et que ces deux fonctions lisent
+  // réellement (`slotId`, `volunteerId`). La déclaration annonçait `{ timeSlotId, userId }`,
+  // des champs absents ici — le code fonctionnait, c'est le type qui décrivait autre chose.
+  assignments: Assignment[],
   mode: 'replace-all' | 'keep-all' | 'keep-manual'
 ): Promise<void> {
   // Grouper les assignations par bénévole
