@@ -1,11 +1,4 @@
-import type {
-  Map as LeafletMap,
-  Polygon,
-  LatLng,
-  DivIcon,
-  TileLayer,
-  LatLngExpression,
-} from 'leaflet'
+import type { Map as LeafletMap, Polygon, LatLng, DivIcon } from 'leaflet'
 
 /**
  * Types pour Leaflet.Editable
@@ -13,11 +6,6 @@ import type {
  */
 
 // Options pour le plugin Editable
-interface EditableMapOptions {
-  editable?: boolean
-  editOptions?: EditOptions
-}
-
 interface EditOptions {
   drawingCSSClass?: string
   skipMiddleMarkers?: boolean
@@ -57,20 +45,18 @@ interface CircleOptions extends PolygonOptions {
   radius?: number
 }
 
-// Interface pour un polygone éditable
+/**
+ * Un polygone auquel Leaflet.Editable a ajouté ses méthodes d'édition.
+ *
+ * Pas de surcharge de `on` ici : la restreindre aux seuls événements d'édition rendait le
+ * polygone inassignable partout où Leaflet attend une `Layer` — `removeLayer` en tête. La
+ * signature de `Evented.on` accepte déjà ces noms d'événements.
+ */
 interface EditablePolygon extends Polygon {
   enableEdit(): void
   disableEdit(): void
   toggleEdit(): void
   editEnabled(): boolean
-  on(
-    event:
-      | 'editable:drawing:end'
-      | 'editable:vertex:dragend'
-      | 'editable:vertex:deleted'
-      | 'editable:editing',
-    callback: () => void
-  ): this
 }
 
 // Extension de l'interface Map de Leaflet pour inclure editTools
@@ -78,26 +64,27 @@ interface EditableMap extends LeafletMap {
   editTools?: EditTools
 }
 
+/**
+ * Ce que le greffon Leaflet.Editable ajoute aux types de Leaflet lui-même : l'option
+ * `editable` à la création de la carte, et les outils d'édition sur l'instance.
+ */
+declare module 'leaflet' {
+  interface MapOptions {
+    editable?: boolean
+    editOptions?: EditOptions
+  }
+  interface Map {
+    editTools?: EditTools
+  }
+}
+
 // Déclaration globale pour window.L
 declare global {
   interface Window {
+    // Leaflet est chargé par CDN : seul l'ajout du greffon Editable est décrit ici, le reste
+    // vient de `@types/leaflet`.
     L: typeof import('leaflet') & {
       Editable?: new (map: LeafletMap, options?: EditOptions) => EditTools
-      map(
-        element: HTMLElement | string,
-        options?: import('leaflet').MapOptions & EditableMapOptions
-      ): EditableMap
-      tileLayer(urlTemplate: string, options?: import('leaflet').TileLayerOptions): TileLayer
-      polygon(
-        latlngs: LatLngExpression[] | LatLngExpression[][],
-        options?: PolygonOptions
-      ): EditablePolygon
-      marker(
-        latlng: LatLngExpression,
-        options?: import('leaflet').MarkerOptions
-      ): import('leaflet').Marker
-      divIcon(options?: import('leaflet').DivIconOptions): DivIcon
-      latLngBounds(latlngs: LatLngExpression[]): import('leaflet').LatLngBounds
     }
   }
 }
