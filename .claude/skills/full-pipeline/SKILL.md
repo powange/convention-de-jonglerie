@@ -59,8 +59,17 @@ de plus et terminer.
    plan bloquerait la session pour rien.
 
    ```bash
-   until OUT=$(gh pr checks <numéro> 2>&1) \
-      && ! echo "$OUT" | grep -qE "pending|skipping|HTTP 5[0-9][0-9]"; do
+   while :; do
+     OUT=$(gh pr checks <numéro> 2>&1); CODE=$?
+     # Codes de `gh pr checks` : 0 = tout est vert, 8 = des jobs tournent encore,
+     # 1 = au moins un job est rouge — mais 1 sert aussi aux vraies erreurs (auth, réseau).
+     # D'où la double condition : un code concluant ET une sortie qui ressemble au tableau
+     # des contrôles. Tout le reste est une panne d'API, et on réessaie.
+     if { [ $CODE -eq 0 ] || [ $CODE -eq 1 ]; } \
+        && echo "$OUT" | grep -qE "\b(pass|fail)\b" \
+        && ! echo "$OUT" | grep -qE "pending|skipping"; then
+       break
+     fi
      sleep 30
    done
    echo "$OUT"
@@ -71,12 +80,19 @@ de plus et terminer.
    l'utilisateur en indiquant le numéro de PR et que le merge suivra si la CI passe. Le harness
    réveille la session à la fin. Ne pas relancer un second `--watch` en parallèle.
 
-   **Pourquoi cette boucle plutôt que `gh pr checks --watch --fail-fast`** : `--watch` s'interrompt
+   **Pourquoi une boucle plutôt que `gh pr checks --watch --fail-fast`** : `--watch` s'interrompt
    et rend le code **0** dès que l'API GitHub renvoie une erreur — un 503 en pleine surveillance
    devient alors indiscernable d'une CI verte. Constaté trois fois en une seule session, sur des
    PR dont des jobs étaient encore en cours. La boucle ci-dessus ne sort que sur un état
-   _observé_ : la commande a réussi, et plus aucun job n'est `pending` ni `skipping`. Une erreur
-   d'API remet simplement en attente au lieu de conclure.
+   _observé_ : la sortie porte le tableau des contrôles, et plus aucun job n'est `pending` ni
+   `skipping`. Une erreur d'API remet simplement en attente au lieu de conclure.
+
+   **Et pourquoi le code de sortie est capturé, jamais testé** : la forme précédente
+   (`until OUT=$(gh pr checks <n> 2>&1) && …`) ne se terminait **jamais quand un job échouait**.
+   `gh pr checks` rend un code non nul dès qu'un contrôle est rouge : la première moitié du `&&`
+   restait fausse et la boucle repartait indéfiniment. Constaté le 2026-09-05 — la CI était finie
+   depuis vingt minutes quand l'utilisateur a demandé où elle en était. Une condition d'attente
+   ne doit donc jamais dépendre du succès de la commande d'observation.
 
    `skipping` compte comme une attente : un job sauté l'est parce qu'un autre a échoué, et la
    sortie porte alors un `fail` que la ligne de verdict relèvera.
