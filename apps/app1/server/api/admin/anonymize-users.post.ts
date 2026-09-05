@@ -83,9 +83,9 @@ export default wrapApiHandler(
           select: { id: true },
         })
 
-        for (let i = 0; i < showApplications.length; i++) {
+        for (const [i, candidature] of showApplications.entries()) {
           await tx.showApplication.update({
-            where: { id: showApplications[i].id },
+            where: { id: candidature.id },
             data: {
               artistName: `Artiste_${i + 1}`,
               artistBio: null,

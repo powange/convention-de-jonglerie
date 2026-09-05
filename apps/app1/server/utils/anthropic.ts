@@ -109,7 +109,7 @@ export async function askClaude(prompt: string, options: ClaudeOptions = {}): Pr
   const message = await anthropic.messages.create(messageParams)
 
   const content = message.content[0]
-  if (content.type !== 'text') {
+  if (!content || content.type !== 'text') {
     throw new Error('Unexpected response type from Claude')
   }
 
@@ -158,7 +158,7 @@ export async function conversationWithClaude(
   const message = await anthropic.messages.create(messageParams)
 
   const content = message.content[0]
-  if (content.type !== 'text') {
+  if (!content || content.type !== 'text') {
     throw new Error('Unexpected response type from Claude')
   }
 
@@ -229,7 +229,7 @@ export async function analyzeImage(
   const message = await anthropic.messages.create(messageParams)
 
   const content = message.content[0]
-  if (content.type !== 'text') {
+  if (!content || content.type !== 'text') {
     throw new Error('Unexpected response type from Claude')
   }
 
@@ -310,7 +310,7 @@ export async function analyzeMultipleImages(
   const message = await anthropic.messages.create(messageParams)
 
   const responseContent = message.content[0]
-  if (responseContent.type !== 'text') {
+  if (!responseContent || responseContent.type !== 'text') {
     throw new Error('Unexpected response type from Claude')
   }
 

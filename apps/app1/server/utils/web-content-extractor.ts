@@ -99,7 +99,7 @@ const TICKETING_DOMAINS = [
  */
 function extractTitle(html: string): string {
   const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i)
-  return titleMatch ? titleMatch[1].trim() : ''
+  return titleMatch?.[1]?.trim() ?? ''
 }
 
 /**
@@ -110,13 +110,13 @@ function extractMetaDescription(html: string): string {
   const match1 = html.match(
     /<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i
   )
-  if (match1) return match1[1].trim()
+  if (match1?.[1]) return match1[1].trim()
 
   // Format 2: content="..." name="description"
   const match2 = html.match(
     /<meta[^>]*content=["']([^"']*)["'][^>]*name=["']description["'][^>]*>/i
   )
-  if (match2) return match2[1].trim()
+  if (match2?.[1]) return match2[1].trim()
 
   return ''
 }
@@ -130,14 +130,14 @@ function extractOpenGraph(html: string): OpenGraphData {
   // Trouver toutes les balises meta
   const metaTags = html.matchAll(/<meta\s+([^>]+)>/gi)
   for (const metaMatch of metaTags) {
-    const attributes = metaMatch[1]
+    const attributes = metaMatch[1] ?? ''
 
     // Vérifier si c'est une balise OG
     const propertyMatch = attributes.match(/property=["'](og:[^"']+)["']/i)
     if (propertyMatch) {
       const property = propertyMatch[1]
       const contentMatch = attributes.match(/content=["']([^"']*)["']/i)
-      if (contentMatch) {
+      if (property && contentMatch?.[1]) {
         const key = property.replace('og:', '')
         ogData[key] = contentMatch[1]
       }
@@ -159,7 +159,7 @@ function extractJsonLdEvents(html: string): JsonLdEventData[] {
 
   for (const match of jsonLdMatches) {
     try {
-      const parsed = JSON.parse(match[1])
+      const parsed = JSON.parse(match[1] ?? 'null')
 
       // Gérer le cas d'un Event direct
       if (parsed['@type'] === 'Event') {
@@ -279,7 +279,7 @@ function extractNavigation(html: string, baseUrl: string): NavLink[] {
   const navMatches = html.matchAll(/<nav[^>]*>([\s\S]*?)<\/nav>/gi)
 
   for (const navMatch of navMatches) {
-    const navContent = navMatch[1]
+    const navContent = navMatch[1] ?? ''
     const navLinks = parseNavLinks(navContent, parsedBase)
     navigation.push(...navLinks)
   }
@@ -320,7 +320,7 @@ function parseNavLinks(html: string, baseUrl: URL, depth: number = 0): NavLink[]
 
     if (linkMatch) {
       const href = linkMatch[1]
-      text = linkMatch[2].replace(/<[^>]+>/g, '').trim()
+      text = (linkMatch[2] ?? '').replace(/<[^>]+>/g, '').trim()
 
       // Ignorer les liens "#" ou "javascript:" - ce sont des titres de sous-menus
       if (href && href !== '#' && !href.startsWith('javascript:')) {
@@ -336,7 +336,7 @@ function parseNavLinks(html: string, baseUrl: URL, depth: number = 0): NavLink[]
     if (!text) {
       const labelMatch = liContent.match(/<label[^>]*>([\s\S]*?)<\/label>/i)
       if (labelMatch) {
-        text = labelMatch[1].replace(/<[^>]+>/g, '').trim()
+        text = (labelMatch[1] ?? '').replace(/<[^>]+>/g, '').trim()
       }
     }
 
@@ -344,13 +344,13 @@ function parseNavLinks(html: string, baseUrl: URL, depth: number = 0): NavLink[]
     if (!text) {
       const spanMatch = liContent.match(/<span[^>]*>([\s\S]*?)<\/span>/i)
       if (spanMatch) {
-        text = spanMatch[1].replace(/<[^>]+>/g, '').trim()
+        text = (spanMatch[1] ?? '').replace(/<[^>]+>/g, '').trim()
       }
     }
 
     // Si toujours pas de texte, chercher le texte du lien même s'il pointe vers #
     if (!text && linkMatch) {
-      text = linkMatch[2].replace(/<[^>]+>/g, '').trim()
+      text = (linkMatch[2] ?? '').replace(/<[^>]+>/g, '').trim()
     }
 
     if (!text) continue
@@ -381,9 +381,9 @@ function parseNavLinks(html: string, baseUrl: URL, depth: number = 0): NavLink[]
     const directLinks = html.matchAll(/<a[^>]*href=["']([^"'#]+)["'][^>]*>([\s\S]*?)<\/a>/gi)
     for (const linkMatch of directLinks) {
       const href = linkMatch[1]
-      if (href.startsWith('javascript:')) continue
+      if (!href || href.startsWith('javascript:')) continue
 
-      const text = linkMatch[2].replace(/<[^>]+>/g, '').trim()
+      const text = (linkMatch[2] ?? '').replace(/<[^>]+>/g, '').trim()
 
       if (text && href) {
         try {
@@ -566,8 +566,9 @@ function extractUsefulLinks(html: string, baseUrl: string): string[] {
 
   for (const match of linkMatches) {
     try {
-      const linkText = match[2].toLowerCase()
+      const linkText = (match[2] ?? '').toLowerCase()
       const href = match[1]
+      if (!href) continue
 
       // Vérifier si le texte du lien contient des mots-clés utiles
       if (usefulKeywords.some((keyword) => linkText.includes(keyword))) {

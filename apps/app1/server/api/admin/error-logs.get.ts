@@ -277,7 +277,7 @@ export default wrapApiHandler(
     })
 
     // Calculer le curseur pour la page suivante (si pagination par curseur)
-    const nextCursor = errorLogs.length > 0 ? errorLogs[errorLogs.length - 1].id : null
+    const nextCursor = errorLogs[errorLogs.length - 1]?.id ?? null
     const hasMore = errorLogs.length === pageSize // Il y a potentiellement plus de résultats
 
     // Préparer les stats
