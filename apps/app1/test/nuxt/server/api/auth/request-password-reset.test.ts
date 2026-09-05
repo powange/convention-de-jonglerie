@@ -8,6 +8,8 @@ vi.mock('../../../../../server/utils/emailService', () => ({
 
 import { sendEmail, generatePasswordResetEmailHtml } from '../../../../../server/utils/emailService'
 import requestPasswordResetHandler from '../../../../../../../layers/auth/server/api/auth/request-password-reset.post'
+import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -47,7 +49,7 @@ describe('API Request Password Reset', () => {
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset',
       },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await requestPasswordResetHandler(mockEvent)
@@ -82,7 +84,7 @@ describe('API Request Password Reset', () => {
       email: 'nonexistent@example.com',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await requestPasswordResetHandler(mockEvent)
@@ -103,7 +105,7 @@ describe('API Request Password Reset', () => {
       email: 'invalid-email',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(requestPasswordResetHandler(mockEvent)).rejects.toThrow()
@@ -126,7 +128,7 @@ describe('API Request Password Reset', () => {
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset',
       },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await requestPasswordResetHandler(mockEvent)
@@ -156,7 +158,7 @@ describe('API Request Password Reset', () => {
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset',
       },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await requestPasswordResetHandler(mockEvent)
@@ -182,7 +184,7 @@ describe('API Request Password Reset', () => {
       request: {
         url: 'http://localhost:3000/api/auth/request-password-reset',
       },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(requestPasswordResetHandler(mockEvent)).rejects.toThrow('Erreur serveur interne')

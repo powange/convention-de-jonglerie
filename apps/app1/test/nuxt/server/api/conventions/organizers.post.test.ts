@@ -13,6 +13,7 @@ import {
   findUserByPseudoOrEmail,
 } from '#server/utils/organizer-management'
 import handler from '../../../../../server/api/conventions/[id]/organizers.post'
+import { global } from '../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

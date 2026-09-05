@@ -7,6 +7,7 @@ vi.mock('../../../../../../server/utils/image-deletion', () => ({
 
 import { deleteEditionImage } from '../../../../../../server/utils/image-deletion'
 import handler from '../../../../../../server/api/editions/[id]/delete-image.delete'
+import { global } from '../../../../globales-nitro'
 
 const mockDeleteEditionImage = deleteEditionImage as ReturnType<typeof vi.fn>
 

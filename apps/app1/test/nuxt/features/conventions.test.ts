@@ -4,6 +4,7 @@ import deleteConventionHandler from '../../../server/api/conventions/[id]/index.
 import getConventionHandler from '../../../server/api/conventions/[id]/index.get'
 import updateConventionHandler from '../../../server/api/conventions/[id]/index.put'
 import createConventionHandler from '../../../server/api/conventions/index.post'
+import { global } from '../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

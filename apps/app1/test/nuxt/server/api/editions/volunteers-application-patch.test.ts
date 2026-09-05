@@ -15,6 +15,7 @@ vi.mock('#server/volunteers/ports/registry', () => ({
 }))
 
 import handler from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/applications/[applicationId].patch'
+import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
 

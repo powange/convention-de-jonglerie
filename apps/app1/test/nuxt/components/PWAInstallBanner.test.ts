@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import PWAInstallBanner from '../../../app/components/PWAInstallBanner.vue'
+import { global } from '../globales-nitro'
 
 // Mock useI18n pour éviter les problèmes d'initialisation
 mockNuxtImport('useI18n', () => () => ({

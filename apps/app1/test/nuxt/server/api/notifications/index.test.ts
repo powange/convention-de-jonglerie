@@ -11,6 +11,7 @@ vi.mock('../../../../../server/utils/notification-service', () => ({
 }))
 
 import { NotificationService } from '../../../../../server/utils/notification-service'
+import { global } from '../../../globales-nitro'
 
 const mockNotificationService = NotificationService as {
   getForUser: ReturnType<typeof vi.fn>

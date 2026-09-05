@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import handler from '../../../../../../../layers/auth/server/api/auth/verify-email.post'
+import { global } from '../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

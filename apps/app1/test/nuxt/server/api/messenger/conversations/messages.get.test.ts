@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import messagesGetHandler from '../../../../../../server/api/messenger/conversations/[conversationId]/messages/index.get'
+import { global } from '../../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -79,7 +81,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(2)
     prismaMock.message.findMany.mockResolvedValueOnce(mockMessages)
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
     expect(result.success).toBe(true)
@@ -109,7 +111,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(2)
     prismaMock.message.findMany.mockResolvedValueOnce(mockMessages)
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
     const messageWithReply = result.data.find((m: any) => m.id === 'msg-2')
@@ -138,7 +140,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(1)
     prismaMock.message.findMany.mockResolvedValueOnce(messagesWithDeleted)
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
     expect(result.data[0].content).toBe('Message supprimé')
@@ -159,7 +161,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(1)
     prismaMock.message.findMany.mockResolvedValueOnce(messagesWithDeletedReply)
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
     expect(result.data[0].replyTo.content).toBe('Message supprimé')
@@ -168,7 +170,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
   it("devrait rejeter si l'utilisateur n'est pas participant", async () => {
     prismaMock.conversationParticipant.findFirst.mockResolvedValueOnce(null)
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
 
     await expect(messagesGetHandler(mockEvent)).rejects.toThrow(
       "Vous n'avez pas accès à cette conversation"
@@ -182,7 +184,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(25)
     prismaMock.message.findMany.mockResolvedValueOnce([])
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
     expect(result.pagination.totalCount).toBe(25)
@@ -201,7 +203,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(0)
     prismaMock.message.findMany.mockResolvedValueOnce([])
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
     expect(result.pagination.page).toBe(1)
@@ -213,7 +215,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(2)
     prismaMock.message.findMany.mockResolvedValueOnce(mockMessages)
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     await messagesGetHandler(mockEvent)
 
     expect(prismaMock.message.findMany).toHaveBeenCalledWith(
@@ -230,7 +232,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     prismaMock.message.count.mockResolvedValueOnce(2)
     prismaMock.message.findMany.mockResolvedValueOnce(mockMessages)
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
     result.data.forEach((message: any) => {

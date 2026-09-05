@@ -6,6 +6,7 @@ import getEditionHandler from '../../../server/api/editions/[id]/index.get'
 import updateEditionHandler from '../../../server/api/editions/[id]/index.put'
 import getEditionsHandler from '../../../server/api/editions/index.get'
 import createEditionHandler from '../../../server/api/editions/index.post'
+import { global } from '../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

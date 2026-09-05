@@ -26,6 +26,8 @@ import {
 } from '../../../../../server/utils/emailService'
 import bcrypt from 'bcryptjs'
 import registerHandler from '../../../../../../../layers/auth/server/api/auth/register.post'
+import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -66,7 +68,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await registerHandler(mockEvent)
@@ -117,7 +119,7 @@ describe('API Register', () => {
       pseudo: 'testuser',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await registerHandler(mockEvent)
@@ -161,7 +163,7 @@ describe('API Register', () => {
       pseudo: 'testuser',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
@@ -184,7 +186,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(registerHandler(mockEvent)).rejects.toThrow()
@@ -199,7 +201,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(registerHandler(mockEvent)).rejects.toThrow()
@@ -219,7 +221,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')
@@ -244,7 +246,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
@@ -279,7 +281,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
@@ -311,7 +313,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await registerHandler(mockEvent)
@@ -346,7 +348,7 @@ describe('API Register', () => {
       prenom: 'Prenom',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
@@ -383,7 +385,7 @@ describe('API Register', () => {
       isOrganizer: true,
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
@@ -420,7 +422,7 @@ describe('API Register', () => {
       isOrganizer: true,
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await registerHandler(mockEvent)
@@ -446,7 +448,7 @@ describe('API Register', () => {
       isOrganizer: false,
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(registerHandler(mockEvent)).rejects.toThrow()
@@ -479,7 +481,7 @@ describe('API Register', () => {
         isArtist: true,
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       const result = await registerHandler(mockEvent)
@@ -539,7 +541,7 @@ describe('API Register', () => {
         prenom: 'PrenomReel',
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       await registerHandler(mockEvent)
@@ -573,7 +575,7 @@ describe('API Register', () => {
         pseudo: 'artisteuser',
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')
@@ -599,7 +601,7 @@ describe('API Register', () => {
         pseudo: 'artisteuser',
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')
@@ -622,7 +624,7 @@ describe('API Register', () => {
         pseudo: 'artisteuser',
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       const before = Date.now()
@@ -655,7 +657,7 @@ describe('API Register', () => {
         pseudo: 'artisteuser',
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       await registerHandler(mockEvent)
@@ -682,7 +684,7 @@ describe('API Register', () => {
         pseudo: 'vraiowner',
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       await registerHandler(mockEvent)
@@ -718,7 +720,7 @@ describe('API Register', () => {
         pseudo: 'pseudo_pris',
       }
 
-      const mockEvent = {}
+      const mockEvent = {} as unknown as H3Event
       global.readBody.mockResolvedValue(requestBody)
 
       await expect(registerHandler(mockEvent)).rejects.toThrow('Email ou pseudo déjà utilisé')

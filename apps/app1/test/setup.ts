@@ -50,6 +50,10 @@ vi.mock('h3', async () => {
 // Fournir les globals Nitro nécessaires à l'évaluation des fichiers server/*
 // (les routes exportent directement defineEventHandler(...))
 // Nuxt devrait les injecter, mais on ajoute une sauvegarde ici pour les imports directs.
+//
+// Ce bloc ne type que ce fichier : aucun programme TypeScript généré ne l'inclut, et les
+// helpers h3 sont de toute façon déjà déclarés en `const` par Nitro — ce qui les rend
+// invisibles depuis `globalThis`. Les tests passent donc par test/nuxt/globales-nitro.ts.
 declare global {
   var defineEventHandler: <T>(fn: T) => T
   // optional helpers that some tests set on global

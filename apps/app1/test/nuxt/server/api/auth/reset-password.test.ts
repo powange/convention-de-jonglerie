@@ -6,6 +6,8 @@ vi.mock('nuxt-auth-utils', () => ({
 }))
 
 import resetPasswordHandler from '../../../../../../../layers/auth/server/api/auth/reset-password.post'
+import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -38,7 +40,7 @@ describe('API Reset Password', () => {
       newPassword: 'NewPassword123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await resetPasswordHandler(mockEvent)
@@ -68,7 +70,7 @@ describe('API Reset Password', () => {
       newPassword: 'NewPassword123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow(
@@ -88,7 +90,7 @@ describe('API Reset Password', () => {
       newPassword: 'NewPassword123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow(
@@ -108,7 +110,7 @@ describe('API Reset Password', () => {
       newPassword: 'NewPassword123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Ce token a déjà été utilisé')
@@ -122,7 +124,7 @@ describe('API Reset Password', () => {
       newPassword: 'weak',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow()
@@ -137,7 +139,7 @@ describe('API Reset Password', () => {
       newPassword: 'NewPassword123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await resetPasswordHandler(mockEvent)
@@ -161,7 +163,7 @@ describe('API Reset Password', () => {
       newPassword: 'NewPassword123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await resetPasswordHandler(mockEvent)
@@ -182,7 +184,7 @@ describe('API Reset Password', () => {
       newPassword: 'NewPassword123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(resetPasswordHandler(mockEvent)).rejects.toThrow('Erreur serveur interne')

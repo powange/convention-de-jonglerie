@@ -13,6 +13,7 @@ import {
   validateDateRange,
   validatePagination,
 } from '../../../../server/utils/validation-helpers'
+import { global } from '../../globales-nitro'
 
 describe('validation-helpers', () => {
   beforeEach(() => {

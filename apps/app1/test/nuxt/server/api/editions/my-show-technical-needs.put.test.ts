@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import handler from '../../../../../../../layers/artists/server/api/editions/[id]/my-show-technical-needs.put'
+import { global } from '../../../globales-nitro'
 
 // Mock global de Prisma (test/setup-common.ts)
 const prismaMock = (globalThis as any).prisma

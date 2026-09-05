@@ -13,6 +13,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 }))
 
 import markersPutHandler from '../../../../../../server/api/editions/[id]/markers/[markerId].put'
+import { global } from '../../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

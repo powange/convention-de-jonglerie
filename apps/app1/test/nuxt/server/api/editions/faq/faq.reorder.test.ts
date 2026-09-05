@@ -13,6 +13,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 }))
 
 import handler from '../../../../../../../../layers/faq/server/api/editions/[id]/faq/reorder.put'
+import { global } from '../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
 

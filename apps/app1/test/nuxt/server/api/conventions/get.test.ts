@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import getConventionHandler from '../../../../../server/api/conventions/[id]/index.get'
+import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -84,7 +86,7 @@ describe('API Convention - Récupération', () => {
     const mockEvent = {
       context: {},
       params: { id: '1' },
-    }
+    } as unknown as H3Event
 
     // Mock de getRouterParam
     global.getRouterParam = vi.fn((event, param) => event.params?.[param])
@@ -123,7 +125,7 @@ describe('API Convention - Récupération', () => {
     const mockEvent = {
       context: {},
       params: { id: '999' },
-    }
+    } as unknown as H3Event
 
     global.getRouterParam = vi.fn((event, param) => event.params?.[param])
 
@@ -134,7 +136,7 @@ describe('API Convention - Récupération', () => {
     const mockEvent = {
       context: {},
       params: { id: 'invalid' },
-    }
+    } as unknown as H3Event
 
     global.getRouterParam = vi.fn((event, param) => event.params?.[param])
 
@@ -147,7 +149,7 @@ describe('API Convention - Récupération', () => {
     const mockEvent = {
       context: { user: null }, // Pas d'utilisateur connecté
       params: { id: '1' },
-    }
+    } as unknown as H3Event
 
     global.getRouterParam = vi.fn((event, param) => event.params?.[param])
 
@@ -162,7 +164,7 @@ describe('API Convention - Récupération', () => {
     const mockEvent = {
       context: {},
       params: { id: '1' },
-    }
+    } as unknown as H3Event
 
     global.getRouterParam = vi.fn((event, param) => event.params?.[param])
 

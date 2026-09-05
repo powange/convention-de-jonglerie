@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import * as validationSchemas from '../../../../../server/utils/validation-schemas'
+import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -85,6 +87,8 @@ describe('API Profile Change Password', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // `as never` sur les valeurs simulées plus bas : bcryptjs déclare `compare` et `hash` en
+    // surcharges, et `vi.mocked` retient la dernière — la forme à callback, qui ne rend rien.
     vi.spyOn(bcrypt, 'compare')
     vi.spyOn(bcrypt, 'hash')
   })
@@ -94,14 +98,14 @@ describe('API Profile Change Password', () => {
       currentPassword: 'oldPassword123',
       newPassword: 'newPassword123!',
     })
-    vi.mocked(bcrypt.compare).mockResolvedValue(true)
-    vi.mocked(bcrypt.hash).mockResolvedValue('$2a$10$newhashedpassword')
+    vi.mocked(bcrypt.compare).mockResolvedValue(true as never)
+    vi.mocked(bcrypt.hash).mockResolvedValue('$2a$10$newhashedpassword' as never)
     prismaMock.user.findUnique.mockResolvedValue(mockUserWithPassword)
     prismaMock.user.update.mockResolvedValue({ id: 1 } as any)
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
 
     const result = await mockHandler(mockEvent)
 
@@ -120,7 +124,7 @@ describe('API Profile Change Password', () => {
   it('devrait rejeter si utilisateur non authentifié', async () => {
     const mockEvent = {
       context: { user: null },
-    }
+    } as unknown as H3Event
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 401,
@@ -137,7 +141,7 @@ describe('API Profile Change Password', () => {
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 404,
@@ -150,12 +154,12 @@ describe('API Profile Change Password', () => {
       currentPassword: 'wrongPassword',
       newPassword: 'newPassword123!',
     })
-    vi.mocked(bcrypt.compare).mockResolvedValue(false)
+    vi.mocked(bcrypt.compare).mockResolvedValue(false as never)
     prismaMock.user.findUnique.mockResolvedValue(mockUserWithPassword)
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 400,
@@ -171,7 +175,7 @@ describe('API Profile Change Password', () => {
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
 
     await expect(mockHandler(mockEvent)).rejects.toMatchObject({
       statusCode: 400,

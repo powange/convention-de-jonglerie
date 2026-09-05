@@ -8,6 +8,7 @@ vi.mock('#server/lost-found/ports/registry', () => ({
 }))
 
 import handler from '../../../../../../../../layers/lost-found/server/api/editions/[id]/lost-found/index.get'
+import { global } from '../../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import handler from '../../../../../../../layers/carpool/server/api/editions/[id]/carpool-offers/index.get'
+import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -14,7 +16,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
       query: {},
       user: undefined,
     },
-  }
+  } as unknown as H3Event
 
   beforeEach(() => {
     prismaMock.carpoolOffer.findMany.mockReset()
@@ -149,7 +151,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         query: {},
         user: undefined,
       },
-    }
+    } as unknown as H3Event
 
     await expect(handler(eventWithInvalidId)).rejects.toThrow("ID d'édition invalide")
   })
@@ -161,7 +163,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         query: {},
         user: undefined,
       },
-    }
+    } as unknown as H3Event
 
     await expect(handler(eventWithoutId)).rejects.toThrow("ID d'édition invalide")
   })
@@ -307,7 +309,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         query: {},
         user: undefined,
       },
-    }
+    } as unknown as H3Event
 
     prismaMock.carpoolOffer.findMany.mockResolvedValue([])
 

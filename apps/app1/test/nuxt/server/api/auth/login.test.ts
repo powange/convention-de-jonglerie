@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import loginHandler from '../../../../../../../layers/auth/server/api/auth/login.post'
+import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -42,7 +44,7 @@ describe('API Login', () => {
       password: 'Password123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await loginHandler(mockEvent)
@@ -80,7 +82,7 @@ describe('API Login', () => {
       password: 'Password123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await loginHandler(mockEvent)
@@ -99,7 +101,7 @@ describe('API Login', () => {
       password: 'Password123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow('Identifiants invalides')
@@ -113,7 +115,7 @@ describe('API Login', () => {
       password: 'WrongPassword',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow('Identifiants invalides')
@@ -133,8 +135,8 @@ describe('API Login', () => {
       password: 'Password123!',
     })
 
-    await expect(loginHandler({})).rejects.toThrow('Google')
-    await expect(loginHandler({})).rejects.toMatchObject({
+    await expect(loginHandler({} as unknown as H3Event)).rejects.toThrow('Google')
+    await expect(loginHandler({} as unknown as H3Event)).rejects.toMatchObject({
       data: { requiresOAuth: true, provider: 'google' },
     })
     expect(bcrypt.compare).not.toHaveBeenCalled()
@@ -149,10 +151,10 @@ describe('API Login', () => {
       password: 'Password123!',
     })
 
-    await expect(loginHandler({})).rejects.toThrow('Mot de passe oublié')
+    await expect(loginHandler({} as unknown as H3Event)).rejects.toThrow('Mot de passe oublié')
     // Pas de requiresOAuth ici : ces 35 comptes de production n'ont aucun fournisseur externe,
     // et l'annoncer enverrait le client afficher un bouton qui n'existe pas.
-    await expect(loginHandler({})).rejects.toMatchObject({
+    await expect(loginHandler({} as unknown as H3Event)).rejects.toMatchObject({
       data: { requiresPasswordReset: true },
     })
     expect(bcrypt.compare).not.toHaveBeenCalled()
@@ -167,7 +169,7 @@ describe('API Login', () => {
       password: 'Password123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow('Email non vérifié')
@@ -179,7 +181,7 @@ describe('API Login', () => {
       password: '',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(loginHandler(mockEvent)).rejects.toThrow()
@@ -193,7 +195,7 @@ describe('API Login', () => {
       password: '  Password123!  ',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await loginHandler(mockEvent)
@@ -214,7 +216,7 @@ describe('API Login', () => {
       password: 'Password123!',
     }
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await loginHandler(mockEvent)
