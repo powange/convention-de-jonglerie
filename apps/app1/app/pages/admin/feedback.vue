@@ -467,9 +467,38 @@ await useLazyI18n('feedback')
 const { t } = useI18n()
 const toast = useToast()
 
+/**
+ * Ce que rend `/api/admin/feedback` — décrit ici parce que la page en lit chaque champ.
+ * Sans cette forme, les deux références étaient inférées à `never[]` et `null`, et la
+ * quarantaine d'accès du gabarit passait sans contrôle : renommer un champ côté serveur
+ * n'aurait rien signalé.
+ */
+interface RetourAdmin {
+  id: number
+  type: string
+  status: string
+  subject: string
+  message: string
+  email: string | null
+  name: string | null
+  url: string | null
+  userAgent: string | null
+  adminNotes: string | null
+  adminReply: string | null
+  repliedAt: string | null
+  createdAt: string
+  user: { id: number; pseudo: string; email: string } | null
+}
+
+interface StatistiquesRetours {
+  total: number
+  byType: Record<string, number>
+  byStatus: Record<string, number>
+}
+
 // État
-const feedbacks = shallowRef([])
-const stats = shallowRef(null)
+const feedbacks = shallowRef<RetourAdmin[]>([])
+const stats = shallowRef<StatistiquesRetours | null>(null)
 const pagination = ref({
   page: 1,
   limit: 20,
@@ -504,7 +533,7 @@ const statusOptions = computed(() => [
 // Modals
 const resolveModal = reactive({
   isOpen: false,
-  feedback: null as any,
+  feedback: null as RetourAdmin | null,
   status: 'IN_PROGRESS',
   adminNotes: '',
   adminReply: '',
@@ -512,7 +541,7 @@ const resolveModal = reactive({
 
 const detailsModal = reactive({
   isOpen: false,
-  feedback: null,
+  feedback: null as RetourAdmin | null,
 })
 
 // Fonctions
@@ -618,13 +647,14 @@ function getStatusColor(status: string) {
 }
 
 function getTypeColor(type: string) {
+  // Même forme que `getStatusColor` ci-dessus, et pour la même raison.
   const colors = {
     BUG: 'error',
     SUGGESTION: 'info',
     GENERAL: 'neutral',
     COMPLAINT: 'warning',
-  }
-  return colors[type] || 'neutral'
+  } as const
+  return colors[type as keyof typeof colors] || 'neutral'
 }
 
 // Utilise la fonction importée formatDate avec les options appropriées
