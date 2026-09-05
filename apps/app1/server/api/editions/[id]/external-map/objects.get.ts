@@ -17,7 +17,16 @@ const importedSelect = {
   externalMapImportedAt: true,
   updatedAt: true,
   _count: {
-    select: { shows: true, workshopLocations: true, stockItems: true, stockReservations: true },
+    // `showPerformances` et non `shows` : aucun des deux modèles n'a jamais porté de relation
+    // `shows`. La sélection étant partagée par les zones et les points, les DEUX requêtes
+    // échouaient — l'écran d'import ne pouvait donc pas charger l'existant, et l'avertissement
+    // sur les dépendances qu'il devait offrir n'a jamais fonctionné.
+    select: {
+      showPerformances: true,
+      workshopLocations: true,
+      stockItems: true,
+      stockReservations: true,
+    },
   },
 } as const
 
@@ -41,7 +50,7 @@ function toRecord(row: {
   externalMapImportedAt: Date | null
   updatedAt: Date
   _count: {
-    shows: number
+    showPerformances: number
     workshopLocations: number
     stockItems: number
     stockReservations: number
@@ -59,7 +68,7 @@ function toRecord(row: {
     externalMapImportedAt: row.externalMapImportedAt,
     updatedAt: row.updatedAt,
     dependencies: {
-      shows: row._count.shows,
+      shows: row._count.showPerformances,
       workshops: row._count.workshopLocations,
       stockItems: row._count.stockItems,
       stockReservations: row._count.stockReservations,
