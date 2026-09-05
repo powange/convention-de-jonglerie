@@ -1,4 +1,4 @@
-import type { TicketingCounter } from '@prisma/client'
+import type { TicketingCounter } from '#server/types/prisma'
 
 /**
  * Interface pour les connexions SSE des compteurs

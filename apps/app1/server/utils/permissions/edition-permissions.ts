@@ -1,12 +1,12 @@
 import type { OrganizerRight } from '#server/constants/permissions'
-import type { UserForPermissions } from './types'
 import type {
   User,
   Edition,
   Convention,
   ConventionOrganizer,
   EditionOrganizerPermission,
-} from '@prisma/client'
+} from '#server/types/prisma'
+import type { UserForPermissions } from './types'
 
 import { ORGANIZER_RIGHTS } from '#server/constants/permissions'
 import { checkAdminMode } from '#server/utils/organizer-management'

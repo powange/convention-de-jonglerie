@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '#server/types/prisma'
 
 /**
  * Marge de tolérance (±15 minutes) pour les créneaux actifs

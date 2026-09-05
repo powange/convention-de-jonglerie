@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client'
+import type { User } from '#server/types/prisma'
 
 /**
  * Type minimaliste pour l'utilisateur dans les vérifications de permissions

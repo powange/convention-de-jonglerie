@@ -1,5 +1,5 @@
+import type { Prisma } from '#server/types/prisma'
 import type { VolunteerApplicationWhereInput } from '#server/types/prisma-helpers'
-import type { Prisma } from '@prisma/client'
 
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'

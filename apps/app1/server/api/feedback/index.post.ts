@@ -1,7 +1,7 @@
 import { getRequestIP } from 'h3'
 import { z } from 'zod'
 
-import type { FeedbackType } from '@prisma/client'
+import type { FeedbackType } from '#server/types/prisma'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 

@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client'
+import type { User } from '#server/types/prisma'
 
 /**
  * Type pour l'utilisateur dans le contexte des événements

@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '#server/types/prisma'
 
 import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 
