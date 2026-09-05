@@ -156,6 +156,7 @@
     "@testing-library/vue": "^8.1.0",
     "@types/leaflet": "^1.9.22",
     "@types/luxon": "^3.7.1",
+    "@types/md5": "^2.3.6",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitest/ui": "^4.1.0",
     "@vue/test-utils": "^2.4.6",
