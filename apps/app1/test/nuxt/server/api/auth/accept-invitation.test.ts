@@ -10,6 +10,7 @@ vi.mock('#server/utils/notification-service', () => ({
 }))
 
 import acceptInvitationHandler from '../../../../../../../layers/auth/server/api/auth/accept-invitation.post'
+import { global } from '../../../globales-nitro'
 
 // Mock global de Prisma (test/setup-common.ts)
 const prismaMock = (globalThis as any).prisma

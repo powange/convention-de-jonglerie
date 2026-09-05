@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Import du handler après les mocks
 import updateConventionHandler from '../../../../../server/api/conventions/[id]/index.put'
+import { global } from '../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

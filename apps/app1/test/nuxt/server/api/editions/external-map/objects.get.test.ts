@@ -16,6 +16,7 @@ vi.mock('#server/utils/external-map-fetch', () => ({
 }))
 
 import handler from '../../../../../../server/api/editions/[id]/external-map/objects.get'
+import { global } from '../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
 

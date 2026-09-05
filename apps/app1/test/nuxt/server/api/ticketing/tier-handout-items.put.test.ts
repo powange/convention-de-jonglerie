@@ -7,6 +7,7 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
 }))
 
 import handler from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/tiers/[tierId]/handout-items.put'
+import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
 

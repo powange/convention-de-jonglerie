@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import * as validationSchemas from '../../../../../server/utils/validation-schemas'
+import { global } from '../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

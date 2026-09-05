@@ -21,7 +21,7 @@ vi.mock('fs/promises', () => {
 })
 
 vi.mock('h3', () => {
-  const g = global as unknown as { createError?: (...args: unknown[]) => unknown }
+  const g = globalThis as unknown as { createError?: (...args: unknown[]) => unknown }
   return {
     sendStream: vi.fn(),
     setHeader: vi.fn(),
@@ -38,9 +38,13 @@ const mockEvent = {
   },
 }
 
-// Alias typé pour accéder aux mocks globaux
-const g = global as unknown as {
+// Alias typé pour accéder aux mocks globaux.
+// Ce fichier n'utilise pas test/nuxt/globales-nitro.ts, contrairement aux autres : la fabrique
+// de `vi.mock('h3')` ci-dessus est hissée avant les imports, et lire un `global` importé y
+// déclencherait une erreur d'initialisation. On passe donc par `globalThis` directement.
+const g = globalThis as unknown as {
   getRouterParam: ReturnType<typeof vi.fn>
+  createError: ReturnType<typeof vi.fn>
 }
 
 const mockCreateReadStream = createReadStream as ReturnType<typeof vi.fn>
@@ -55,7 +59,7 @@ describe('/api/uploads/[...path] GET - Security Tests', () => {
     mockSendStream.mockReset()
     mockSetHeader.mockReset()
     g.getRouterParam = vi.fn()
-    global.createError = vi.fn(
+    g.createError = vi.fn(
       (options: {
         message?: string
         statusMessage?: string

@@ -11,6 +11,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 }))
 
 import handler from '../../../../../../server/api/notifications/fcm/unsubscribe.post'
+import { global } from '../../../../globales-nitro'
 
 // Utiliser le mock global de Prisma
 const prismaMock = (globalThis as any).prisma

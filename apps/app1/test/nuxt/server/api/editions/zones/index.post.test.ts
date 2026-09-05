@@ -13,6 +13,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 }))
 
 import zonesPostHandler from '../../../../../../server/api/editions/[id]/zones/index.post'
+import { global } from '../../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

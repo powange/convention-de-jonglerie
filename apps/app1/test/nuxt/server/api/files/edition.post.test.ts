@@ -20,6 +20,7 @@ import {
   getEditionWithPermissions,
 } from '../../../../../server/utils/permissions/edition-permissions'
 import handler from '../../../../../server/api/files/edition.post'
+import { global } from '../../../globales-nitro'
 
 const mockCanEditEdition = canEditEdition as ReturnType<typeof vi.fn>
 const mockGetEdition = getEditionWithPermissions as ReturnType<typeof vi.fn>

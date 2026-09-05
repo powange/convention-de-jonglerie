@@ -7,6 +7,7 @@ vi.mock('../../../../../server/utils/geocoding', () => ({
 
 import { geocodeEdition } from '../../../../../server/utils/geocoding'
 import handler from '../../../../../server/api/editions/[id]/index.put'
+import { global } from '../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

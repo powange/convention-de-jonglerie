@@ -10,6 +10,7 @@ vi.mock('../../../../../server/utils/notification-stream-manager', () => ({
 
 import handler from '../../../../../server/api/notifications/stream.get'
 import { notificationStreamManager } from '../../../../../server/utils/notification-stream-manager'
+import { global } from '../../../globales-nitro'
 
 const mockStreamManager = notificationStreamManager as {
   addConnection: ReturnType<typeof vi.fn>

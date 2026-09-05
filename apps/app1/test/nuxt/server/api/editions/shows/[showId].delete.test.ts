@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import handler from '../../../../../../server/api/editions/[id]/shows/[showId].delete'
+import { global } from '../../../../globales-nitro'
 
 const mockDeleteOldFile = vi.hoisted(() => vi.fn())
 

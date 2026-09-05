@@ -16,6 +16,7 @@ vi.mock('#imports', async () => {
 
 import { canEditEdition } from '../../../../../server/utils/permissions/edition-permissions'
 import handler from '../../../../../server/api/files/lost-found.post'
+import { global } from '../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

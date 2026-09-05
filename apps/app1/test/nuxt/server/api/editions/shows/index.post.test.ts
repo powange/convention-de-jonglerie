@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import handler from '../../../../../../server/api/editions/[id]/shows/index.post'
+import { global } from '../../../../globales-nitro'
 
 const mockHandleFileUpload = vi.hoisted(() => vi.fn())
 

@@ -15,6 +15,7 @@ vi.mock('../../../../server/utils/session-helpers', () => ({
 }))
 
 import authMiddleware from '../../../../server/middleware/auth'
+import { global } from '../../globales-nitro'
 
 // Mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

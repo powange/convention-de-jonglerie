@@ -7,6 +7,7 @@ vi.mock('../../../../../../server/utils/permissions/edition-permissions', () => 
 
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import handler from '../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/orders.get'
+import { global } from '../../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

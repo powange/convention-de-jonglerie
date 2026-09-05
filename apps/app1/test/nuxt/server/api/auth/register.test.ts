@@ -26,6 +26,7 @@ import {
 } from '../../../../../server/utils/emailService'
 import bcrypt from 'bcryptjs'
 import registerHandler from '../../../../../../../layers/auth/server/api/auth/register.post'
+import { global } from '../../../globales-nitro'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma

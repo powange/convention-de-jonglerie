@@ -28,6 +28,7 @@ vi.mock('#server/utils/notification-service', () => ({
 }))
 
 import handler from '../../../../../../../../../layers/tasks/server/api/editions/[id]/tasks/[taskId]/comments/index.post'
+import { global } from '../../../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
 

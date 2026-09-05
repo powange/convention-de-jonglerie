@@ -7,6 +7,7 @@ vi.mock('#server/utils/admin-auth', () => ({
 }))
 
 import handler from '../../../../../server/api/admin/feedback/[id]/resolve.put'
+import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
 
