@@ -123,7 +123,7 @@ export const useLeafletEditable = (
       }
 
       // Charger dynamiquement Leaflet JS
-      return new Promise((resolve, reject) => {
+      return new Promise<typeof window.L>((resolve, reject) => {
         if (window.L) {
           resolve(window.L)
           return
@@ -246,7 +246,7 @@ export const useLeafletEditable = (
           const key = target.dataset.key
           if (!key) return
           const [type, idStr] = key.split(':')
-          const id = parseInt(idStr)
+          const id = parseInt(idStr ?? '')
           if ((type !== 'zone' && type !== 'marker') || isNaN(id)) return
           if (target.classList.contains('leaflet-popup-edit-btn') && onEditRequest) {
             onEditRequest(type as 'zone' | 'marker', id)
@@ -341,12 +341,14 @@ export const useLeafletEditable = (
     // Les coordonnées sont déjà stockées en [lat, lng] (format Leaflet natif)
     const latLngs = zone.coordinates
 
+    // Leaflet.Editable greffe ses méthodes sur l'instance à l'exécution : le type le dit ici,
+    // faute de quoi `enableEdit` reste invisible sur un polygone pourtant éditable.
     const polygon = window.L.polygon(latLngs, {
       color: zone.color,
       fillColor: zone.color,
       fillOpacity: 0.3,
       weight: 2,
-    })
+    }) as EditablePolygon
 
     // Calculer le centroïde de la zone pour le lien de navigation
     const centroidLat = zone.coordinates.reduce((sum, c) => sum + c[0], 0) / zone.coordinates.length
@@ -640,7 +642,7 @@ export const useLeafletEditable = (
     if (!L || markerTypes.length === 0) return null
 
     // Utiliser la couleur personnalisée si définie, sinon la couleur du premier type
-    const color = sanitizeColor(customColor || getZoneTypeColor(markerTypes[0]))
+    const color = sanitizeColor(customColor || getZoneTypeColor(markerTypes[0] ?? ''))
     const iconsHtml = markerTypes.map((type) => getZoneTypeSvgIcon(type)).join('')
     const iconCount = markerTypes.length
     const width = iconCount === 1 ? 32 : 22 * iconCount + 10
@@ -662,7 +664,9 @@ export const useLeafletEditable = (
       return
     }
 
-    const icon = getMarkerIcon(marker.markerTypes, marker.color)
+    // `getMarkerIcon` rend `null` quand le repère n'a aucun type : Leaflet attend alors
+    // qu'on ne lui passe pas d'icône du tout, et non `null`.
+    const icon = getMarkerIcon(marker.markerTypes, marker.color) ?? undefined
 
     const leafletMarker = window.L.marker([marker.latitude, marker.longitude], {
       icon,

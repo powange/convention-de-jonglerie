@@ -505,7 +505,8 @@ const {
   setPopupExtra,
   setZoneNavigationTarget,
 } = useLeafletEditable(mapContainerRef, {
-  center: computed(() => {
+  // Un couple, pas un tableau de nombres : Leaflet distingue les deux.
+  center: computed<[number, number]>(() => {
     if (edition.value?.latitude && edition.value?.longitude) {
       return [edition.value.latitude, edition.value.longitude]
     }

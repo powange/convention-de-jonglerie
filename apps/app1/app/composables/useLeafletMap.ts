@@ -21,8 +21,12 @@ export const useLeafletMap = (
 ) => {
   const { center = [46.603354, 1.888334], zoom = 6, markers = [], onMarkerClick } = options
 
-  const map = ref<LeafletMap | null>(null)
-  const leafletMarkers = ref<Map<string | number, Marker>>(new Map())
+  // `shallowRef` et non `ref` : une instance Leaflet est une classe, et la réactivité
+  // profonde de Vue la recopie en objet plat — elle y perd ses membres privés, au point que
+  // `map.value` n'est plus reconnu comme une `Map` par ses propres méthodes. C'est aussi
+  // inutilement coûteux : rien ici n'a besoin d'observer l'intérieur de la carte.
+  const map = shallowRef<LeafletMap | null>(null)
+  const leafletMarkers = shallowRef<Map<string | number, Marker>>(new Map())
   const isLoading = ref(true)
   const error = ref<string | null>(null)
 
@@ -71,7 +75,7 @@ export const useLeafletMap = (
       }
 
       // Charger dynamiquement Leaflet JS
-      return new Promise((resolve, reject) => {
+      return new Promise<typeof window.L>((resolve, reject) => {
         if (window.L) {
           resolve(window.L)
           return
