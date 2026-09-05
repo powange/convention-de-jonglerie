@@ -111,7 +111,7 @@ export const useVolunteerSettings = (editionId: number) => {
   }
 
   return {
-    settings: readonly(settings),
+    settings: shallowReadonly(settings),
     loading: readonly(loading),
     updating: readonly(updating),
     error: readonly(error),

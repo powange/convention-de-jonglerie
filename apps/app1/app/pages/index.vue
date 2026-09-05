@@ -427,8 +427,11 @@ useIntersectionObserver(infiniteScrollSentinel, ([entry]) => {
 })
 
 // CalendarDate objects pour les sélecteurs de date
-const calendarStartDate = ref<CalendarDate | null>(null)
-const calendarEndDate = ref<CalendarDate | null>(null)
+// `shallowRef` : `CalendarDate` est une classe, et la réactivité profonde de Vue la recopie
+// en objet plat — elle y perd ses champs privés, si bien que le calendrier de Nuxt UI ne
+// reconnaît plus sa propre valeur. Rien ici n'observe l'intérieur d'une date.
+const calendarStartDate = shallowRef<CalendarDate | null>(null)
+const calendarEndDate = shallowRef<CalendarDate | null>(null)
 
 // Memoisation du compteur de filtres actifs avec shallowRef pour la performance
 const activeFiltersCount = computed(() => {

@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { ref, nextTick, watch, readonly, computed } from 'vue'
+import { ref, nextTick, watch, readonly, shallowReadonly, computed } from 'vue'
 
 // Mock Vue functions (auto-imported by Nuxt)
 vi.stubGlobal('ref', ref)
 vi.stubGlobal('watch', watch)
 vi.stubGlobal('readonly', readonly)
+vi.stubGlobal('shallowReadonly', shallowReadonly)
 vi.stubGlobal('computed', computed)
 
 // Mock $fetch

@@ -275,14 +275,14 @@
                 variant="outline"
                 class="w-full justify-start text-left font-normal"
                 :label="
-                  timeEstimateForm.referenceDate
-                    ? formatCalendarDate(timeEstimateForm.referenceDate)
+                  referenceDate
+                    ? formatCalendarDate(referenceDate)
                     : t('admin.project_costs.rates.select_date')
                 "
                 block
               />
               <template #content>
-                <UCalendar v-model="timeEstimateForm.referenceDate" class="p-2" />
+                <UCalendar v-model="referenceDate" class="p-2" />
               </template>
             </UPopover>
           </UFormField>
@@ -314,7 +314,7 @@
               :loading="savingTimeEstimate"
               :disabled="
                 (!timeEstimateForm.fixedHours && timeEstimateForm.fixedHours !== 0) ||
-                !timeEstimateForm.referenceDate
+                !referenceDate
               "
               @click="saveTimeEstimate"
             >
@@ -598,14 +598,14 @@
                 variant="outline"
                 class="w-full justify-start text-left font-normal"
                 :label="
-                  rateForm.startDate
-                    ? formatCalendarDate(rateForm.startDate)
+                  rateStartDate
+                    ? formatCalendarDate(rateStartDate)
                     : t('admin.project_costs.rates.select_date')
                 "
                 block
               />
               <template #content>
-                <UCalendar v-model="rateForm.startDate" class="p-2" />
+                <UCalendar v-model="rateStartDate" class="p-2" />
               </template>
             </UPopover>
           </UFormField>
@@ -621,11 +621,11 @@
                 color="neutral"
                 variant="outline"
                 class="w-full justify-start text-left font-normal"
-                :label="rateForm.endDate ? formatCalendarDate(rateForm.endDate) : '—'"
+                :label="rateEndDate ? formatCalendarDate(rateEndDate) : '—'"
                 block
               />
               <template #content>
-                <UCalendar v-model="rateForm.endDate" class="p-2" />
+                <UCalendar v-model="rateEndDate" class="p-2" />
               </template>
             </UPopover>
           </UFormField>
@@ -644,7 +644,7 @@
           <UButton
             color="primary"
             :loading="savingRate"
-            :disabled="!rateForm.amount || !rateForm.startDate"
+            :disabled="!rateForm.amount || !rateStartDate"
             @click="saveRate"
           >
             {{ $t('common.save') }}
@@ -731,13 +731,23 @@ interface TimeEstimateData {
 const timeEstimate = ref<TimeEstimateData | null>(null)
 const editingTimeEstimate = ref(false)
 const savingTimeEstimate = ref(false)
+/**
+ * Les dates de calendrier vivent hors des objets de formulaire, dans des `shallowRef`.
+ *
+ * `CalendarDate` est une classe : placée dans un `ref` d'objet, la réactivité profonde de Vue
+ * la recopie en objet plat et lui retire ses champs privés — `UCalendar` ne reconnaît alors
+ * plus sa propre valeur. Les autres champs, eux, restent dans le formulaire : ils sont édités
+ * un par un et ont besoin de la réactivité profonde.
+ */
+const referenceDate = shallowRef<CalendarDate | null>(null)
+const rateStartDate = shallowRef<CalendarDate | null>(null)
+const rateEndDate = shallowRef<CalendarDate | null>(null)
+
 const timeEstimateForm = ref<{
   fixedHours: number
-  referenceDate: CalendarDate | null
   weeklyHours: number
 }>({
   fixedHours: 0,
-  referenceDate: null,
   weeklyHours: 0,
 })
 
@@ -756,9 +766,9 @@ const startEditTimeEstimate = () => {
   if (timeEstimate.value) {
     timeEstimateForm.value = {
       fixedHours: parseFloat(timeEstimate.value.fixedHours),
-      referenceDate: dateToCalendarDate(timeEstimate.value.referenceDate),
       weeklyHours: parseFloat(timeEstimate.value.weeklyHours),
     }
+    referenceDate.value = dateToCalendarDate(timeEstimate.value.referenceDate)
   }
   editingTimeEstimate.value = true
 }
@@ -777,14 +787,14 @@ const loadTimeEstimate = async () => {
 }
 
 const saveTimeEstimate = async () => {
-  if (!timeEstimateForm.value.referenceDate) return
+  if (!referenceDate.value) return
   savingTimeEstimate.value = true
   try {
     await $fetch('/api/admin/project-costs/time-estimate', {
       method: 'POST',
       body: {
         fixedHours: timeEstimateForm.value.fixedHours,
-        referenceDate: timeEstimateForm.value.referenceDate.toString(),
+        referenceDate: referenceDate.value.toString(),
         weeklyHours: timeEstimateForm.value.weeklyHours,
       },
     })
@@ -982,15 +992,11 @@ const rateForm = ref<{
   amount: number
   currency: string
   period: string
-  startDate: CalendarDate | null
-  endDate: CalendarDate | null
   note: string
 }>({
   amount: 0,
   currency: 'EUR',
   period: 'MONTHLY',
-  startDate: null,
-  endDate: null,
   note: '',
 })
 
@@ -1002,10 +1008,10 @@ const openRateModal = (expense: Expense) => {
     amount: 0,
     currency: 'EUR',
     period: 'MONTHLY',
-    startDate: new CalendarDate(now.getFullYear(), now.getMonth() + 1, now.getDate()),
-    endDate: null,
     note: '',
   }
+  rateStartDate.value = new CalendarDate(now.getFullYear(), now.getMonth() + 1, now.getDate())
+  rateEndDate.value = null
   showRateModal.value = true
 }
 
@@ -1021,10 +1027,10 @@ const openEditRateModal = (expenseId: number, rate: Rate) => {
     amount: parseFloat(rate.amount),
     currency: rate.currency,
     period: rate.period,
-    startDate: dateToCalendarDate(rate.startDate),
-    endDate: rate.endDate ? dateToCalendarDate(rate.endDate) : null,
     note: rate.note || '',
   }
+  rateStartDate.value = dateToCalendarDate(rate.startDate)
+  rateEndDate.value = rate.endDate ? dateToCalendarDate(rate.endDate) : null
   showRateModal.value = true
 }
 
@@ -1036,8 +1042,8 @@ const saveRate = async () => {
       amount: rateForm.value.amount,
       currency: rateForm.value.currency,
       period: rateForm.value.period,
-      startDate: rateForm.value.startDate?.toString(),
-      endDate: rateForm.value.endDate?.toString() || null,
+      startDate: rateStartDate.value?.toString(),
+      endDate: rateEndDate.value?.toString() || null,
       note: rateForm.value.note || null,
     }
 

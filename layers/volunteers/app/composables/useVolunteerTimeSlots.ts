@@ -192,7 +192,7 @@ export function useVolunteerTimeSlots(editionId: MaybeRefOrGetter<number | undef
 
   return {
     // État
-    timeSlots: readonly(timeSlots),
+    timeSlots: shallowReadonly(timeSlots),
     loading: readonly(loading),
     error: readonly(error),
 
