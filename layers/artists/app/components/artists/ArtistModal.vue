@@ -193,7 +193,7 @@
 
           <UFormField v-if="formData.allergies" :label="$t('artists.allergy_severity')">
             <USelect
-              v-model="formData.allergySeverity"
+              v-model="modeleGraviteAllergie"
               :items="allergySeverityOptions"
               value-key="value"
               class="w-full"
@@ -326,7 +326,7 @@
 
           <UFormField :label="$t('artists.accommodation_type')">
             <USelect
-              v-model="formData.accommodationType"
+              v-model="modeleTypeHebergement"
               :items="accommodationTypeOptions"
               value-key="value"
               :placeholder="$t('artists.accommodation_not_specified')"
@@ -493,6 +493,8 @@
 
 import { z } from 'zod'
 
+import type { AllergySeverityLevel } from '~/utils/allergy-severity'
+
 import {
   getAccommodationTypeSelectOptions,
   getAllergySeveritySelectOptions,
@@ -561,7 +563,7 @@ const formData = ref({
   departureDateTime: '',
   dietaryPreference: 'NONE',
   allergies: '',
-  allergySeverity: null as string | null,
+  allergySeverity: null as AllergySeverityLevel | null,
   payment: '',
   paymentPaid: false,
   reimbursementMax: '',
@@ -762,6 +764,25 @@ const dietaryOptions = computed(() => [
 ])
 
 const accommodationTypeOptions = computed(() => getAccommodationTypeSelectOptions(t))
+
+/**
+ * `USelect` veut `undefined` quand rien n'est choisi, l'API veut `null` pour effacer la valeur
+ * — un champ absent du corps JSON laisse Prisma inchangé. Ces relais tiennent les deux : la
+ * donnée reste nullable, seul le composant voit `undefined`.
+ */
+const modeleGraviteAllergie = computed({
+  get: () => formData.value.allergySeverity ?? undefined,
+  set: (valeur: AllergySeverityLevel | undefined) => {
+    formData.value.allergySeverity = valeur ?? null
+  },
+})
+
+const modeleTypeHebergement = computed({
+  get: () => formData.value.accommodationType ?? undefined,
+  set: (valeur: string | undefined) => {
+    formData.value.accommodationType = valeur ?? null
+  },
+})
 
 const allergySeverityOptions = computed(() =>
   getAllergySeveritySelectOptions().map((option) => ({

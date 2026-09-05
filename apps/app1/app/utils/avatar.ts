@@ -141,7 +141,9 @@ export const useAvatar = () => {
   const getUserAvatar = (
     user: {
       id?: number
-      emailHash: string
+      // Nullable : plusieurs appelants tiennent l'empreinte d'un utilisateur qui n'en a pas
+      // encore. L'URL Gravatar rend alors 404, ce que les appelants traitent déjà par un repli.
+      emailHash?: string | null
       profilePicture?: string | null
       updatedAt?: string
       pseudo?: string
@@ -170,7 +172,7 @@ export const useAvatar = () => {
       const imageUrl = getImageUrl(user.profilePicture, 'profile', user.id)
       if (!imageUrl) {
         // Si échec du chargement, utiliser Gravatar
-        return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=404`
+        return `https://www.gravatar.com/avatar/${user.emailHash || 'inconnu'}?s=${size}&d=404`
       }
 
       // Convertir l'URL relative en URL absolue pour éviter l'optimisation _ipx de Nuxt Image
@@ -185,7 +187,7 @@ export const useAvatar = () => {
 
     // Sinon, utiliser Gravatar avec d=404 pour détecter l'absence d'avatar
     // Le fallback vers les initiales est géré par getUserAvatarWithCache
-    return `https://www.gravatar.com/avatar/${user.emailHash}?s=${size}&d=404`
+    return `https://www.gravatar.com/avatar/${user.emailHash || 'inconnu'}?s=${size}&d=404`
   }
 
   /**
@@ -195,7 +197,7 @@ export const useAvatar = () => {
   const getUserAvatarWithCache = (
     user: {
       id?: number
-      emailHash: string
+      emailHash?: string | null
       profilePicture?: string | null
       updatedAt?: string
       pseudo?: string

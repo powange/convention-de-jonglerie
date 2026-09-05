@@ -294,7 +294,15 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
-  save: [slot: Omit<VolunteerTimeSlot, 'id'> & { id?: string }]
+  // `recurrence` ne fait pas partie d'un créneau : c'est une consigne de création, que le
+  // serveur applique pour répéter le créneau sur chaque journée. Elle voyage avec, et la
+  // page de planning la relit — autant que la signature le dise.
+  save: [
+    slot: Omit<VolunteerTimeSlot, 'id'> & {
+      id?: string
+      recurrence?: 'AUCUNE' | 'EVENEMENT' | 'AVEC_MONTAGE'
+    },
+  ]
   delete: [slotId: string]
 }>()
 
@@ -520,14 +528,20 @@ const onSubmit = async () => {
     // Convertir les dates en format ISO pour l'API
     const startDate = fromDatetimeLocal(formState.value.startDateTime)
     const endDate = fromDatetimeLocal(formState.value.endDateTime)
+    const start = toApiFormat(startDate)
+    const end = toApiFormat(endDate)
+
+    // Une date illisible rendait `null`, et le créneau partait quand même : le serveur
+    // recevait un créneau sans début ni fin. On s'arrête là plutôt que de l'envoyer.
+    if (!start || !end) return
 
     const slotData = {
       id: formState.value.id || undefined,
       title: formState.value.title?.trim() || null,
       description: formState.value.description || '',
       teamId: formState.value.teamId === 'unassigned' ? undefined : formState.value.teamId,
-      start: toApiFormat(startDate),
-      end: toApiFormat(endDate),
+      start,
+      end,
       maxVolunteers: formState.value.maxVolunteers,
       assignedVolunteers: 0,
       color,

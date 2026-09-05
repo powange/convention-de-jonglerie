@@ -10,7 +10,9 @@ import { useAvatar } from '~/utils/avatar'
 interface User {
   id?: number
   email?: string
-  emailHash: string
+  // Facultative : plusieurs vues affichent un utilisateur dont on n'a pas l'empreinte
+  // d'e-mail (statistiques de bénévolat, réservations). L'avatar sait déjà s'en passer.
+  emailHash?: string | null
   profilePicture?: string | null
   updatedAt?: string
   pseudo?: string

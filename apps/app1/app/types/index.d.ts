@@ -98,6 +98,8 @@ export interface Edition {
   artistsEnabled?: boolean
   ticketingEnabled?: boolean
   workshopsEnabled?: boolean
+  /** Saisie libre des lieux d'atelier, plutôt qu'un choix parmi les lieux déclarés. */
+  workshopLocationsFreeInput?: boolean
   programEnabled?: boolean
   /** Visibilité publique de la frise, distincte de l'activation du module. */
   programPagePublic?: boolean
@@ -112,6 +114,8 @@ export interface Edition {
   externalMapProvider?: string | null
   /** Identifiant de cette carte chez le service (le `mid` chez Google My Maps). */
   externalMapRef?: string | null
+  /** Informations que l'organisateur adresse aux artistes, affichées sur leur espace. */
+  artistInfo?: string | null
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
   hasAfjTokenPayment: boolean
