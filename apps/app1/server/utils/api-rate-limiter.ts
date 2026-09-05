@@ -52,9 +52,7 @@ export const checkoutRateLimiter = createRateLimiter({
   message: 'Trop de tentatives de paiement, veuillez réessayer plus tard',
   keyGenerator: (event) => {
     const ip =
-      String(event.node.req.headers['x-forwarded-for'] || '')
-        .split(',')[0]
-        .trim() ||
+      (String(event.node.req.headers['x-forwarded-for'] || '').split(',')[0] ?? '').trim() ||
       event.node.req.socket.remoteAddress ||
       'unknown'
     return `checkout:${ip}`
@@ -71,9 +69,7 @@ export const searchRateLimiter = createRateLimiter({
   message: 'Trop de recherches, veuillez réessayer dans une minute',
   keyGenerator: (event) => {
     const ip =
-      String(event.node.req.headers['x-forwarded-for'] || '')
-        .split(',')[0]
-        .trim() ||
+      (String(event.node.req.headers['x-forwarded-for'] || '').split(',')[0] ?? '').trim() ||
       event.node.req.socket.remoteAddress ||
       'unknown'
     return `search:${ip}`

@@ -169,8 +169,9 @@ export function buildUpdateData<T extends Record<string, any>>(
     }
 
     // Appliquer la transformation si définie
-    if (key in transform) {
-      updateData[key as keyof T] = transform[key](value)
+    const transformation = transform[key]
+    if (transformation) {
+      updateData[key as keyof T] = transformation(value)
       continue
     }
 

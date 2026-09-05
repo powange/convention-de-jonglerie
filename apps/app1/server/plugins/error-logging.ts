@@ -7,6 +7,11 @@ import { logApiError } from '#server/utils/error-logger'
 export default async function errorLoggingPlugin(nitroApp: NitroApp) {
   // Intercepter toutes les erreurs non gérées dans les routes API
   nitroApp.hooks.hook('error', async (error, { event }) => {
+    // Nitro déclenche aussi ce hook hors d'une requête — au démarrage, ou depuis une tâche de
+    // fond. `event` est alors absent, et tout ce qui suit le lit sans détour : le journaliseur
+    // d'erreurs planterait lui-même, en avalant l'erreur d'origine.
+    if (!event) return
+
     // Ne pas logger si c'est déjà loggé ou si ce n'est pas une route API
     if (!event.node.req.url?.startsWith('/api/')) {
       return
@@ -77,16 +82,16 @@ export default async function errorLoggingPlugin(nitroApp: NitroApp) {
 
   // Hook pour capturer les erreurs lors du rendu (optionnel)
   nitroApp.hooks.hook('render:response', async (response, { event }) => {
+    // `statusCode` est facultatif dans une réponse de rendu : sans code, rien à journaliser.
+    const statusCode = response.statusCode
     // Capturer les réponses d'erreur HTTP même si elles n'ont pas levé d'exception
-    if (response.statusCode >= 400 && event.node.req.url?.startsWith('/api/')) {
-      const error = new Error(
-        `HTTP ${response.statusCode}: ${response.statusMessage || 'Unknown error'}`
-      )
+    if (statusCode !== undefined && statusCode >= 400 && event.node.req.url?.startsWith('/api/')) {
+      const error = new Error(`HTTP ${statusCode}: ${response.statusMessage || 'Unknown error'}`)
 
       try {
         await logApiError({
           error,
-          statusCode: response.statusCode,
+          statusCode,
           event,
         })
       } catch (loggingError) {

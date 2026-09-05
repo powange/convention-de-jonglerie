@@ -52,7 +52,7 @@ export function hasIssues(error: unknown): error is { issues: unknown[] } {
  * Type pour les snapshots de permissions dans l'historique
  * Utilise PartialOrganizerPermissions pour garantir la cohérence avec les constantes
  */
-export interface OrganizerPermissionSnapshot {
+export type OrganizerPermissionSnapshot = {
   title?: string | null
   rights: PartialOrganizerPermissions
   perEdition?: Array<{
@@ -70,7 +70,7 @@ export interface OrganizerPermissionSnapshot {
 /**
  * Type pour les snapshots de suppression de organisateur
  */
-export interface OrganizerRemovalSnapshot {
+export type OrganizerRemovalSnapshot = {
   removed: boolean
   removedAt: string
   removedOrganizerId: number
