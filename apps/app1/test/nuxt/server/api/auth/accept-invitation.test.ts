@@ -11,6 +11,7 @@ vi.mock('#server/utils/notification-service', () => ({
 
 import acceptInvitationHandler from '../../../../../../../layers/auth/server/api/auth/accept-invitation.post'
 import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Mock global de Prisma (test/setup-common.ts)
 const prismaMock = (globalThis as any).prisma
@@ -42,7 +43,7 @@ describe('API Accept Invitation', () => {
     isEmailVerified: true,
   }
 
-  const mockEvent = {}
+  const mockEvent = {} as unknown as H3Event
 
   beforeEach(() => {
     vi.clearAllMocks()

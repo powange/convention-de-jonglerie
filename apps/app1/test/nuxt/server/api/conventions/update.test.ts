@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Import du handler après les mocks
 import updateConventionHandler from '../../../../../server/api/conventions/[id]/index.put'
 import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -66,7 +67,7 @@ describe('API Convention - Mise à jour', () => {
     const mockEvent = {
       context: { user: mockUser },
       params: { id: '1' },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await updateConventionHandler(mockEvent)
@@ -111,7 +112,7 @@ describe('API Convention - Mise à jour', () => {
     const mockEvent = {
       context: { user: mockUser },
       params: { id: '1' },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await updateConventionHandler(mockEvent)
@@ -126,7 +127,7 @@ describe('API Convention - Mise à jour', () => {
       body: {
         name: 'Test',
       },
-    }
+    } as unknown as H3Event
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })
@@ -144,7 +145,7 @@ describe('API Convention - Mise à jour', () => {
       body: {
         name: 'Test',
       },
-    }
+    } as unknown as H3Event
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })
@@ -158,7 +159,7 @@ describe('API Convention - Mise à jour', () => {
       body: {
         name: 'Test',
       },
-    }
+    } as unknown as H3Event
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })
@@ -177,7 +178,7 @@ describe('API Convention - Mise à jour', () => {
     const mockEvent = {
       context: { user: mockUser },
       params: { id: '1' },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
@@ -190,7 +191,7 @@ describe('API Convention - Mise à jour', () => {
       body: {
         name: 'Test',
       },
-    }
+    } as unknown as H3Event
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })
@@ -205,7 +206,7 @@ describe('API Convention - Mise à jour', () => {
         name: 'Test',
         description: 'Test',
       },
-    }
+    } as unknown as H3Event
 
     await expect(updateConventionHandler(mockEvent)).rejects.toThrow()
   })

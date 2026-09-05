@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Import du handler après les mocks
 import createConventionHandler from '../../../../../server/api/conventions/index.post'
 import { global } from '../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -103,7 +104,7 @@ describe('API Convention - Création', () => {
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     const result = await createConventionHandler(mockEvent)
@@ -151,7 +152,7 @@ describe('API Convention - Création', () => {
 
     const mockEvent = {
       context: { user: null },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(createConventionHandler(mockEvent)).rejects.toThrow()
@@ -165,7 +166,7 @@ describe('API Convention - Création', () => {
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(createConventionHandler(mockEvent)).rejects.toThrow()
@@ -194,7 +195,7 @@ describe('API Convention - Création', () => {
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await createConventionHandler(mockEvent)
@@ -212,7 +213,7 @@ describe('API Convention - Création', () => {
 
     const mockEvent = {
       context: { user: mockUser },
-    }
+    } as unknown as H3Event
     global.readBody.mockResolvedValue(requestBody)
 
     await expect(createConventionHandler(mockEvent)).rejects.toThrow()

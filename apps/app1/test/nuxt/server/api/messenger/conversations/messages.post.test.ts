@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import messagesPostHandler from '../../../../../../server/api/messenger/conversations/[conversationId]/messages/index.post'
 import { global } from '../../../../globales-nitro'
+import type { H3Event } from 'h3'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -89,7 +90,7 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
       content: 'Test message',
     })
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesPostHandler(mockEvent)
 
     expect(result.success).toBe(true)
@@ -153,7 +154,7 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
       replyToId: 'msg-original',
     })
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     const result = await messagesPostHandler(mockEvent)
 
     expect(result.success).toBe(true)
@@ -182,7 +183,7 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
       replyToId: 'msg-inexistant',
     })
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
 
     await expect(messagesPostHandler(mockEvent)).rejects.toThrow(
       "Le message auquel vous tentez de répondre n'existe pas dans cette conversation"
@@ -196,7 +197,7 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
       content: 'Test message',
     })
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
 
     await expect(messagesPostHandler(mockEvent)).rejects.toThrow(
       "Vous n'avez pas accès à cette conversation"
@@ -208,7 +209,7 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
       content: '',
     })
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
 
     await expect(messagesPostHandler(mockEvent)).rejects.toThrow()
   })
@@ -218,7 +219,7 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
       content: 'a'.repeat(10001),
     })
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
 
     await expect(messagesPostHandler(mockEvent)).rejects.toThrow()
   })
@@ -234,7 +235,7 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
       content: 'Test message',
     })
 
-    const mockEvent = {}
+    const mockEvent = {} as unknown as H3Event
     await messagesPostHandler(mockEvent)
 
     expect(prismaMock.conversation.update).toHaveBeenCalledWith({
