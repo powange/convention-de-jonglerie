@@ -136,6 +136,8 @@
                         icon="i-heroicons-x-mark"
                         color="neutral"
                         variant="outline"
+                        :title="$t('common.clear')"
+                        :aria-label="$t('common.clear')"
                         :disabled="savingVolunteers || !canAccess"
                         @click="handleClearSetupStartDate"
                       />
@@ -175,6 +177,8 @@
                         icon="i-heroicons-x-mark"
                         color="neutral"
                         variant="outline"
+                        :title="$t('common.clear')"
+                        :aria-label="$t('common.clear')"
                         :disabled="savingVolunteers || !canAccess"
                         @click="handleClearTeardownEndDate"
                       />

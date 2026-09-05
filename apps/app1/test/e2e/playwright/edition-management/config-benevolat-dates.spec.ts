@@ -39,6 +39,15 @@ test('les dates de montage se choisissent et s’effacent', async ({ browser }) 
   await expect(invites, 'la date de montage devrait être renseignée').toHaveCount(1)
   await expect(page.getByRole('button', { name: /2026-09-10/ }).first()).toBeVisible()
 
+  // Puis on l'efface — et pas seulement pour couvrir ce chemin. Une date de montage restreint
+  // la période où un créneau bénévole peut être créé : la laisser en place sur l'édition
+  // partagée faisait échouer les specs suivantes, qui n'arrivaient plus à poser leurs créneaux.
+  await page
+    .getByRole('button', { name: /effacer|clear/i })
+    .first()
+    .click()
+  await expect(invites, 'la date devrait être effaçable').toHaveCount(2)
+
   await context.close()
   await restaurer()
 })
