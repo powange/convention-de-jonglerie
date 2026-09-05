@@ -88,4 +88,4 @@ export default wrapApiHandler(async (event) => {
   }))
 
   return formattedVolunteers
-}, 'GetAvailableVolunteers')
+}, { operationName: 'GetAvailableVolunteers' })

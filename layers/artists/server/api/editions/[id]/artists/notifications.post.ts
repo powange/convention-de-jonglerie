@@ -109,4 +109,4 @@ export default wrapApiHandler(async (event) => {
     notificationGroupId: groupe.id,
     confirmationUrl,
   })
-}, 'CreateArtistNotification')
+}, { operationName: 'CreateArtistNotification' })

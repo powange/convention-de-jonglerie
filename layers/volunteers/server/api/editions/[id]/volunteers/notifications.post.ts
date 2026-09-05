@@ -173,4 +173,4 @@ export default wrapApiHandler(async (event) => {
     notificationGroupId: notificationGroup.id,
     confirmationUrl,
   })
-}, 'CreateVolunteerNotification')
+}, { operationName: 'CreateVolunteerNotification' })

@@ -63,4 +63,4 @@ export default wrapApiHandler(async (event) => {
   }
 
   return Array.from(uniqueTeams.values())
-}, 'GetMyLeaderTeams')
+}, { operationName: 'GetMyLeaderTeams' })

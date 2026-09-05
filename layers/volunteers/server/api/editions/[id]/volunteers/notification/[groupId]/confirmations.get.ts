@@ -168,4 +168,4 @@ export default wrapApiHandler(async (event) => {
       pendingCount: pendingVolunteers.length,
     },
   }
-}, 'GetVolunteerNotificationConfirmations')
+}, { operationName: 'GetVolunteerNotificationConfirmations' })

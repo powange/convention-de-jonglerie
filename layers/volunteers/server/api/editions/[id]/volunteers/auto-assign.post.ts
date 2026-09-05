@@ -218,7 +218,7 @@ export default wrapApiHandler(async (event) => {
     result,
     preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
   })
-}, 'AutoAssignVolunteers')
+}, { operationName: 'AutoAssignVolunteers' })
 
 /**
  * Applique les assignations en base de données

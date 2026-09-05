@@ -95,4 +95,4 @@ export default wrapApiHandler(async (event) => {
     alreadyConfirmed: false,
     confirmedAt: confirmation.confirmedAt,
   })
-}, 'ConfirmVolunteerNotification')
+}, { operationName: 'ConfirmVolunteerNotification' })

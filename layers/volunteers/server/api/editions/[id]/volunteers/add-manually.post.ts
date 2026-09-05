@@ -144,4 +144,4 @@ export default wrapApiHandler(async (event) => {
   }
 
   return createSuccessResponse({ application })
-}, 'AddVolunteerManually')
+}, { operationName: 'AddVolunteerManually' })

@@ -126,4 +126,4 @@ export default wrapApiHandler(async (event) => {
       },
     })),
   })
-}, 'ListPendingVolunteerSwapRequests')
+}, { operationName: 'ListPendingVolunteerSwapRequests' })

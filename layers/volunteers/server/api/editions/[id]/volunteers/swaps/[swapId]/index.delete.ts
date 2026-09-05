@@ -34,4 +34,4 @@ export default wrapApiHandler(async (event) => {
   })
 
   return createSuccessResponse({ status: 'CANCELLED' })
-}, 'CancelVolunteerSwapRequest')
+}, { operationName: 'CancelVolunteerSwapRequest' })

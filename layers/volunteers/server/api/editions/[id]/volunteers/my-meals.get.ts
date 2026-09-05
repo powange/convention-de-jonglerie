@@ -11,4 +11,4 @@ export default wrapApiHandler(async (event) => {
   const meals = await useVolunteerPorts().meals.getVolunteerSelfMeals(editionId, user.id)
 
   return createSuccessResponse({ meals })
-}, 'GetMyVolunteerMeals')
+}, { operationName: 'GetMyVolunteerMeals' })

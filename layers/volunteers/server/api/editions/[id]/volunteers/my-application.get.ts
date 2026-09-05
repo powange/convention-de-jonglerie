@@ -133,4 +133,4 @@ export default wrapApiHandler(async (event) => {
       timeSlot: avecCoequipiers(assignation.timeSlot),
     })),
   }
-}, 'GetMyVolunteerApplication')
+}, { operationName: 'GetMyVolunteerApplication' })

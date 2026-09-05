@@ -16,7 +16,9 @@ export default wrapApiHandler(
     await requireGlobalAdminWithDbCheck(event)
 
     const expenseId = validateResourceId(event, 'id', 'dépense')
-    await fetchResourceOrFail(prisma.projectExpense, expenseId, 'dépense')
+    await fetchResourceOrFail(prisma.projectExpense, expenseId, {
+      errorMessage: 'Dépense introuvable',
+    })
 
     const body = bodySchema.parse(await readBody(event))
 

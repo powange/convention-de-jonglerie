@@ -116,4 +116,4 @@ export default wrapApiHandler(async (event) => {
       )
     }
   }
-}, 'DecideVolunteerSwapRequest')
+}, { operationName: 'DecideVolunteerSwapRequest' })
