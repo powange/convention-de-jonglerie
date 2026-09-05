@@ -41,7 +41,9 @@ function dbRow(id: number, externalMapObjectId: string | null) {
     externalMapObjectId,
     externalMapImportedAt: externalMapObjectId ? new Date('2026-07-01T10:00:00Z') : null,
     updatedAt: new Date('2026-07-01T10:00:00Z'),
-    _count: { shows: 0, workshopLocations: 0, stockItems: 0, stockReservations: 0 },
+    // `showPerformances` : c'est le nom de la relation réelle. Le mock disait `shows`, ce que
+    // le code demandait alors — et ce test passait donc sur une requête que Prisma refusait.
+    _count: { showPerformances: 0, workshopLocations: 0, stockItems: 0, stockReservations: 0 },
   }
 }
 
@@ -122,7 +124,7 @@ describe('GET /api/editions/[id]/external-map/objects', () => {
 
   it('remonte les dépendances qui perdraient leur lieu', async () => {
     const row = dbRow(7, 'AAA1')
-    row._count = { shows: 3, workshopLocations: 2, stockItems: 1, stockReservations: 0 }
+    row._count = { showPerformances: 3, workshopLocations: 2, stockItems: 1, stockReservations: 0 }
     prismaMock.editionZone.findMany.mockResolvedValue([row])
 
     const result: any = await handler(baseEvent as any)
