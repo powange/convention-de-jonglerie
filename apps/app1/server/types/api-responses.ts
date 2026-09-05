@@ -13,12 +13,12 @@
  */
 
 import type { ApiPaginatedResponse, ApiSuccessResponse } from '#server/types/api'
+import type { Prisma } from '#server/types/prisma'
 import type {
   conventionBasicSelect,
   editionListSelect,
   userBasicSelect,
 } from '#server/utils/prisma-select-helpers'
-import type { Prisma } from '@prisma/client'
 
 // Réexporter les types partagés pour que le serveur puisse tout importer
 // depuis un seul endroit
