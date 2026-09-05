@@ -375,8 +375,19 @@ const volunteersUpdatedAt = ref<Date | null>(null)
 const volunteersInitialized = ref(false)
 
 // Variables pour les dates de montage/démontage
-const setupStartDateLocal = ref<DateValue | null>(null)
-const teardownEndDateLocal = ref<DateValue | null>(null)
+/**
+ * `shallowRef` et non `ref` : `DateValue` est une classe portant un champ privé, et `ref()`
+ * déballe en profondeur ce qu'on lui donne — il en réécrit le type en objet structurel, qui perd
+ * ce champ privé et cesse donc d'être reconnu comme la classe. Le calendrier refusait la valeur
+ * pour cette seule raison, alors qu'elle était juste.
+ *
+ * La profondeur ne manque pas ici : une date est une valeur immuable, remplacée et jamais
+ * modifiée en place.
+ *
+ * `undefined` plutôt que `null` au passage : c'est ce que `UCalendar` attend.
+ */
+const setupStartDateLocal = shallowRef<DateValue | undefined>(undefined)
+const teardownEndDateLocal = shallowRef<DateValue | undefined>(undefined)
 
 const volunteerModeItems = computed(() => [
   { value: 'INTERNAL', label: t('gestion.volunteers.mode_internal') || 'Interne' },
@@ -407,10 +418,10 @@ const applyVolunteerSettings = () => {
     // Appliquer les dates de montage/démontage
     setupStartDateLocal.value = volunteersSettings.value.setupStartDate
       ? fromDate(new Date(volunteersSettings.value.setupStartDate), 'UTC')
-      : null
+      : undefined
     teardownEndDateLocal.value = volunteersSettings.value.teardownEndDate
       ? fromDate(new Date(volunteersSettings.value.teardownEndDate), 'UTC')
-      : null
+      : undefined
   }
 }
 
@@ -451,7 +462,7 @@ const handleSetupStartDateChange = async () => {
 }
 
 const handleClearSetupStartDate = async () => {
-  setupStartDateLocal.value = null
+  setupStartDateLocal.value = undefined
   await persistDateSettings({
     setupStartDate: null,
     askSetup: false,
@@ -467,7 +478,7 @@ const handleTeardownEndDateChange = async () => {
 }
 
 const handleClearTeardownEndDate = async () => {
-  teardownEndDateLocal.value = null
+  teardownEndDateLocal.value = undefined
   await persistDateSettings({
     setupEndDate: null,
     askTeardown: false,
