@@ -1,5 +1,5 @@
 import type { OrganizerRight } from '#server/constants/permissions'
-import type { User, Convention, ConventionOrganizer } from '#server/types/prisma'
+import type { Convention, ConventionOrganizer } from '#server/types/prisma'
 import type { UserForPermissions } from './types'
 
 import { ORGANIZER_RIGHTS } from '#server/constants/permissions'
@@ -140,7 +140,7 @@ export function canViewConvention(
  */
 export async function getConventionForEdit(
   conventionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
@@ -169,7 +169,7 @@ export async function getConventionForEdit(
  */
 export async function getConventionForDelete(
   conventionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<ConventionWithEditions> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
@@ -199,7 +199,7 @@ export async function getConventionForDelete(
  */
 export async function getConventionForArchive(
   conventionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<ConventionWithEditions> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
@@ -229,7 +229,7 @@ export async function getConventionForArchive(
  */
 export async function getConventionForOrganizerManagement(
   conventionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,
@@ -264,7 +264,10 @@ export function shouldArchiveInsteadOfDelete(convention: ConventionWithEditions)
 /**
  * Vérifie si un utilisateur peut créer une édition dans une convention
  */
-export function canCreateEdition(convention: ConventionWithOrganizers, user: User): boolean {
+export function canCreateEdition(
+  convention: ConventionWithOrganizers,
+  user: UserForPermissions
+): boolean {
   const isConventionAuthor = convention.authorId === user.id
   const isGlobalAdmin = user.isGlobalAdmin || false
 
@@ -281,7 +284,7 @@ export function canCreateEdition(convention: ConventionWithOrganizers, user: Use
  */
 export async function getConventionForEditionCreation(
   conventionId: number,
-  user: User
+  user: UserForPermissions
 ): Promise<ConventionWithOrganizers> {
   const convention = (await getConventionWithPermissions(conventionId, {
     userId: user.id,

@@ -10,13 +10,15 @@ export interface VolunteerApplication {
   user: {
     id: number
     pseudo: string
-    nom?: string
-    prenom?: string
+    // `| null` : ce sont des colonnes nullables. Les déclarer seulement optionnelles obligeait
+    // l'appelant à convertir ce que la base lui donne, ou — comme ici — à ne pas être vérifié.
+    nom?: string | null
+    prenom?: string | null
   }
   availability: string // JSON string avec les préférences
   experience: string
   motivation: string
-  phone?: string
+  phone?: string | null
   teamPreferences?: any[]
   /**
    * Équipes dans lesquelles les organisateurs ont déjà placé le bénévole. À distinguer des

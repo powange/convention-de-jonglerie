@@ -1,4 +1,4 @@
-import type { VolunteerMealType } from '@prisma/client'
+import type { VolunteerMealType } from '#server/types/prisma'
 
 /**
  * Détermine quels types de repas sont disponibles selon l'heure d'arrivée
@@ -8,7 +8,9 @@ import type { VolunteerMealType } from '@prisma/client'
  * - Arrivée après-midi (afternoon) → dîner seulement
  * - Arrivée soir (evening) → dîner seulement
  */
-export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType[] {
+// `string | undefined` : le moment vient d'un `split('_')`, qui ne garantit rien.
+// Le `default` ci-dessous traite déjà toute valeur inconnue — l'absence en fait partie.
+export function getAvailableMealsOnArrival(timeOfDay: string | undefined): VolunteerMealType[] {
   switch (timeOfDay) {
     case 'morning':
       return ['BREAKFAST', 'LUNCH', 'DINNER']
@@ -30,7 +32,9 @@ export function getAvailableMealsOnArrival(timeOfDay: string): VolunteerMealType
  * - Départ après-midi (afternoon) → petit-déj + déjeuner
  * - Départ soir (evening) → petit-déj + déjeuner + dîner
  */
-export function getAvailableMealsOnDeparture(timeOfDay: string): VolunteerMealType[] {
+// `string | undefined` : le moment vient d'un `split('_')`, qui ne garantit rien.
+// Le `default` ci-dessous traite déjà toute valeur inconnue — l'absence en fait partie.
+export function getAvailableMealsOnDeparture(timeOfDay: string | undefined): VolunteerMealType[] {
   switch (timeOfDay) {
     case 'morning':
       return ['BREAKFAST']

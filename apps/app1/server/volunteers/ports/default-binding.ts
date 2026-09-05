@@ -1,6 +1,7 @@
 // Implémentation par défaut des ports du module bénévole (câblage app jonglerie).
 // Délègue aux services concrets (cœur). À l'extraction en layer (étape 2), ce fichier
 // reste côté app ; le layer ne garde que les interfaces (types.ts) et le registre.
+import type { NotificationType, VolunteerMealType } from '#server/types/prisma'
 import type {
   ArtistMealParticipant,
   HandoutItemInfo,
@@ -8,7 +9,6 @@ import type {
   TicketMealParticipant,
   VolunteerPorts,
 } from './types'
-import type { NotificationType, VolunteerMealType } from '@prisma/client'
 
 import * as mealsService from '#server/meals/meals-service'
 import { sendEmail } from '#server/utils/emailService'

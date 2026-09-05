@@ -38,7 +38,10 @@ export interface NotificationPort {
 export interface SendEmailInput {
   to: string
   subject: string
-  html?: string
+  // `html` est requis, comme l'exige l'envoi lui-même. Le rendre facultatif ici laissait passer
+  // un courriel sans corps — l'unique appelant en fournit toujours un, la souplesse ne servait
+  // qu'à masquer l'écart entre les deux contrats.
+  html: string
   text?: string
 }
 

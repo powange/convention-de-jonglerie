@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '#server/types/prisma'
 
 /**
  * Un numéro de spectacle cabaret, tel qu'envoyé par le client.
@@ -114,9 +114,10 @@ export async function replaceShowComposition(
     }
 
     // Ce que le client n'a pas renvoyé a été supprimé de son côté.
-    await client.showAct.deleteMany(
-      conserves.length > 0 ? { where: { showId, id: { notIn: conserves } } } : { where: { showId } }
-    )
+    // La condition est construite d'abord : donner deux formes d'argument différentes selon le
+    // cas empêchait Prisma d'en déduire une seule.
+    const aSupprimer = conserves.length > 0 ? { showId, id: { notIn: conserves } } : { showId }
+    await client.showAct.deleteMany({ where: aSupprimer })
     return
   }
 
