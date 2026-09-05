@@ -37,8 +37,20 @@ export interface PopupLabels {
   delete?: string
 }
 
+/** Ramène un centre à ce que Leaflet sait lire. */
+function enCouple(centre: LatLngExpression | number[]): LatLngExpression {
+  return Array.isArray(centre) && centre.length === 2 && typeof centre[0] === 'number'
+    ? [centre[0], centre[1] as number]
+    : (centre as LatLngExpression)
+}
+
 export interface UseLeafletEditableOptions {
-  center?: LatLngExpression
+  /**
+   * `number[]` en plus de `LatLngExpression` : un `computed(() => [lat, lng])` produit un
+   * tableau de nombres, pas le couple qu'attend Leaflet. Plutôt que d'imposer l'annotation à
+   * chaque appelant, on l'accepte ici et on le ramène à un couple avant de s'en servir.
+   */
+  center?: LatLngExpression | number[]
   zoom?: number
   editable?: boolean
   typeLabel?: (type: string) => string
@@ -198,7 +210,7 @@ export const useLeafletEditable = (
       // Initialiser la carte avec l'option editable
       leafletMapInstance = L.map(mapContainer.value, {
         editable: editable,
-      }).setView(center, zoom)
+      }).setView(enCouple(center), zoom)
 
       // Couches de tuiles
       const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
