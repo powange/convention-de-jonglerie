@@ -20,7 +20,9 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-import type { Edition } from '#imports'
+import type { Edition } from '~/types'
+
+
 import { useEditionStore, getEditionDisplayName } from '#imports'
 
 const route = useRoute()

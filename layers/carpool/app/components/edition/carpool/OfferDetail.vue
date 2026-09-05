@@ -265,8 +265,10 @@
 </template>
 
 <script setup lang="ts">
+import type { CarpoolOffer } from '~/types/carpool'
+
 import { useAuthStore } from '#imports'
-import type { CarpoolOffer } from '#imports'
+
 
 interface Props {
   offer: CarpoolOffer

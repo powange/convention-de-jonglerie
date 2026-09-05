@@ -233,22 +233,17 @@ const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
         const startTime = new Date(slot.start)
         const endTime = new Date(slot.end)
         const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-        const dayKey = startTime.toISOString().split('T')[0]
+        const dayKey = startTime.toISOString().split('T')[0] ?? ''
 
         myStats.totalHours += hours
         myStats.totalSlots += 1
 
-        if (!myStats.dayDetails.has(dayKey)) {
-          myStats.dayDetails.set(dayKey, {
-            date: dayKey,
-            hours: 0,
-            slots: 0,
-          })
-        }
-
-        const dayDetail = myStats.dayDetails.get(dayKey)
+        // Un seul chemin plutôt que has/set/get : la valeur manquante est créée sur place,
+        // ce qui évite de relire une entrée que rien ne garantissait present.
+        const dayDetail = myStats.dayDetails.get(dayKey) ?? { date: dayKey, hours: 0, slots: 0 }
         dayDetail.hours += hours
         dayDetail.slots += 1
+        myStats.dayDetails.set(dayKey, dayDetail)
       }
     })
 
@@ -548,7 +543,8 @@ const exportToPdf = async () => {
             doc.setFont('helvetica', 'normal')
             doc.setTextColor(17, 24, 39) // Gris foncé
 
-            slot.assignedVolunteersList.forEach((assignment: any) => {
+            // Un créneau sans affectation n'a pas de liste : l'export PDF tombait dessus.
+            ;(slot.assignedVolunteersList ?? []).forEach((assignment: any) => {
               const pseudo = assignment.user.pseudo || ''
               const firstName = assignment.user.prenom || ''
               const lastName = assignment.user.nom || ''

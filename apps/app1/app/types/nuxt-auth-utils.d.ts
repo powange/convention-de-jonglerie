@@ -42,24 +42,8 @@ declare module '#auth-utils' {
   }): any
 }
 
-// Augmentation de '#imports' pour la complétion/typage côté serveur
-declare module '#imports' {
-  import type { UserSession, ImpersonationData } from '#auth-utils'
-
-  import type { H3Event } from 'h3'
-
-  export function requireUserSession(event: H3Event): Promise<UserSession & { user: any }>
-  export function getUserSession(event: H3Event): Promise<Partial<UserSession> & { user?: any }>
-  export function setUserSession(event: H3Event, data: Partial<UserSession>): Promise<void>
-  export function replaceUserSession(event: H3Event, data: Partial<UserSession>): Promise<void>
-  export function clearUserSession(event: H3Event): Promise<void>
-  export const defineOAuthGoogleEventHandler: (handler: {
-    config?: Record<string, any>
-    onSuccess: (
-      event: H3Event,
-      payload: { user?: { id?: string; email?: string; name?: string; image?: string } }
-    ) => any | Promise<any>
-    onError?: (event: H3Event, error: any) => any | Promise<any>
-  }) => any
-  export type { UserSession, ImpersonationData }
-}
+// Pas d'augmentation de '#imports' ici : une déclaration de module ambiante prend le pas
+// sur la résolution par `paths`, et masquait donc tout ce que Nuxt y expose réellement —
+// stores, composables, utilitaires. Quatre-vingt-treize erreurs TS2305 dans les layers, qui
+// importent explicitement depuis '#imports', là où le code d'app1 s'en remet aux imports
+// automatiques. Les helpers de session sont déjà déclarés par Nuxt et Nitro.
