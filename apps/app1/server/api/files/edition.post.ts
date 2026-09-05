@@ -106,10 +106,9 @@ export default wrapApiHandler(
 
     // Si au moins un fichier a été uploadé avec succès
     const successfulUploads = results.filter((r) => r.success)
-    if (successfulUploads.length > 0) {
-      // Pour l'instant, retourner l'URL du premier fichier (éditions ont une seule image)
-      const firstUpload = successfulUploads[0]
-
+    // Pour l'instant, retourner l'URL du premier fichier (éditions ont une seule image)
+    const firstUpload = successfulUploads[0]
+    if (firstUpload) {
       return createSuccessResponse({
         imageUrl: firstUpload.temporaryUrl,
         results,

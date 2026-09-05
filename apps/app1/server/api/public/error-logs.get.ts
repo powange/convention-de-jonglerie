@@ -56,7 +56,7 @@ export default wrapApiHandler(
       },
     })
 
-    const nextCursor = logs.length === limit ? logs[logs.length - 1].id : null
+    const nextCursor = logs.length === limit ? (logs[logs.length - 1]?.id ?? null) : null
 
     return {
       logs,

@@ -192,8 +192,9 @@ async function parseAddressWithNominatim(
     }
 
     const data = (await response.json()) as NominatimResult[]
+    const premierResultat = data?.[0]
 
-    if (!data || data.length === 0) {
+    if (!premierResultat) {
       console.warn('[JUGGLINGEDGE] Nominatim: aucun résultat')
       return {
         addressLine1: null,
@@ -207,7 +208,11 @@ async function parseAddressWithNominatim(
       }
     }
 
-    return extractAddressFromNominatim(data[0], parseFloat(data[0].lat), parseFloat(data[0].lon))
+    return extractAddressFromNominatim(
+      premierResultat,
+      parseFloat(premierResultat.lat),
+      parseFloat(premierResultat.lon)
+    )
   } catch (error: any) {
     console.error(`[JUGGLINGEDGE] Erreur Nominatim: ${error.message}`)
     return {
@@ -302,6 +307,8 @@ function extractExternalLinks(html: string): {
 
   for (const match of matches) {
     const href = match[1]
+    // Le HTML vient du dehors : un `href` vide n'a rien à faire dans la suite du traitement.
+    if (!href) continue
 
     // Ignorer les liens JugglingEdge, Google Maps, et les ancres
     if (
@@ -375,7 +382,7 @@ export async function scrapeJugglingEdgeEvent(
 
     for (const match of matches) {
       try {
-        const jsonStr = match[1].trim()
+        const jsonStr = (match[1] ?? '').trim()
         const parsed = JSON.parse(jsonStr)
 
         // Chercher un Event dans le JSON-LD
