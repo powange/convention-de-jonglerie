@@ -270,7 +270,7 @@
 
                 <UFormField v-if="dietForm.allergies" :label="$t('artists.allergy_severity')">
                   <USelect
-                    v-model="dietForm.allergySeverity"
+                    v-model="modeleGraviteAllergie"
                     :items="allergySeverityOptions"
                     value-key="value"
                     class="w-full"
@@ -403,7 +403,7 @@
               <template v-if="accommodationForm.accommodationAutonomous">
                 <UFormField :label="$t('artists.accommodation_type')">
                   <USelect
-                    v-model="accommodationForm.accommodationType"
+                    v-model="modeleTypeHebergement"
                     :items="accommodationTypeOptions"
                     value-key="value"
                     :placeholder="$t('artists.accommodation_not_specified')"
@@ -843,6 +843,18 @@ const accommodationForm = reactive({
 
 const accommodationTypeOptions = computed(() => getAccommodationTypeSelectOptions(t))
 
+/**
+ * `USelect` veut `undefined` quand rien n'est choisi, l'API veut `null` pour effacer : ce
+ * relais tient les deux, sans changer ce qui part sur le réseau.
+ */
+const modeleTypeHebergement = computed({
+  get: () => accommodationForm.accommodationType ?? undefined,
+  set: (valeur: string | undefined) => {
+    accommodationForm.accommodationType = valeur ?? null
+  },
+})
+
+
 watch(artist, (newArtist) => {
   if (newArtist && !editingAccommodation.value) {
     accommodationForm.accommodationAutonomous = newArtist.accommodationAutonomous
@@ -914,7 +926,15 @@ const editingDiet = ref(false)
 const dietForm = reactive({
   dietaryPreference: artist.value?.dietaryPreference ?? 'NONE',
   allergies: artist.value?.allergies ?? '',
-  allergySeverity: artist.value?.allergySeverity ?? (null as string | null),
+  allergySeverity: (artist.value?.allergySeverity ?? null) as AllergySeverityLevel | null,
+})
+
+/** Même relais que pour l'hébergement : voir plus haut. */
+const modeleGraviteAllergie = computed({
+  get: () => dietForm.allergySeverity ?? undefined,
+  set: (valeur: AllergySeverityLevel | undefined) => {
+    dietForm.allergySeverity = valeur ?? null
+  },
 })
 
 // Synchroniser le formulaire quand les données artiste changent (chargement initial)
@@ -922,7 +942,9 @@ watch(artist, (newArtist) => {
   if (newArtist && !editingDiet.value) {
     dietForm.dietaryPreference = newArtist.dietaryPreference
     dietForm.allergies = newArtist.allergies ?? ''
-    dietForm.allergySeverity = newArtist.allergySeverity
+    // La colonne est une énumération Prisma (`AllergySeverity?`) : la réponse d'API la
+    // dégrade en `string | null` au passage par JSON, mais ses valeurs sont contraintes.
+    dietForm.allergySeverity = newArtist.allergySeverity as AllergySeverityLevel | null
   }
 })
 
@@ -984,7 +1006,7 @@ const cancelDietEdit = () => {
   if (artist.value) {
     dietForm.dietaryPreference = artist.value.dietaryPreference
     dietForm.allergies = artist.value.allergies ?? ''
-    dietForm.allergySeverity = artist.value.allergySeverity
+    dietForm.allergySeverity = artist.value.allergySeverity as AllergySeverityLevel | null
   }
   editingDiet.value = false
 }

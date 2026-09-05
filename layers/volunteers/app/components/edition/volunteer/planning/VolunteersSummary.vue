@@ -244,6 +244,12 @@
 </template>
 
 <script setup lang="ts">
+import type {
+  DayStats,
+  VolunteerStatsIndividual,
+  TeamStats,
+} from '~/utils/volunteer-stats'
+
 interface VolunteerStats {
   totalVolunteers: number
   totalHours: number
@@ -251,51 +257,9 @@ interface VolunteerStats {
   totalSlots: number
 }
 
-interface VolunteerStat {
-  user: {
-    id: number
-    pseudo: string
-    prenom?: string
-    nom?: string
-    [key: string]: any
-  }
-  hours: number
-  slots: number
-}
 
-interface DayStats {
-  date: string
-  volunteers: VolunteerStat[]
-  totalVolunteers: number
-  totalHours: number
-}
 
-interface VolunteerStatsIndividual {
-  user: {
-    id: number
-    pseudo: string
-    prenom?: string
-    nom?: string
-    [key: string]: any
-  }
-  totalHours: number
-  totalSlots: number
-  dayDetails?: Array<{
-    date: string
-    hours: number
-    slots: number
-  }>
-}
 
-interface TeamStats {
-  teamId: string | null
-  teamName: string
-  color?: string
-  totalHours: number
-  totalSlots: number
-  totalVolunteers: number
-  dayDetails: Array<{ date: string; hours: number; slots: number }>
-}
 
 interface Props {
   canManageVolunteers: boolean

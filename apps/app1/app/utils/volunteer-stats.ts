@@ -13,8 +13,8 @@ export interface VolunteerStat {
   user: {
     id: number
     pseudo: string
-    prenom?: string
-    nom?: string
+    prenom?: string | null
+    nom?: string | null
     [key: string]: any
   }
   hours: number
@@ -32,8 +32,8 @@ export interface VolunteerStatsIndividual {
   user: {
     id: number
     pseudo: string
-    prenom?: string
-    nom?: string
+    prenom?: string | null
+    nom?: string | null
     [key: string]: any
   }
   totalHours: number
@@ -53,8 +53,8 @@ export interface TimeSlotWithAssignments {
     user: {
       id: number
       pseudo: string
-      prenom?: string
-      nom?: string
+      prenom?: string | null
+      nom?: string | null
       [key: string]: any
     }
     [key: string]: any
@@ -66,8 +66,8 @@ export interface AcceptedVolunteer {
   user: {
     id: number
     pseudo: string
-    prenom?: string
-    nom?: string
+    prenom?: string | null
+    nom?: string | null
     [key: string]: any
   }
   status: string
@@ -137,18 +137,17 @@ export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments
     const startTime = new Date(slot.start)
     const endTime = new Date(slot.end)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-    const dayKey = startTime.toISOString().split('T')[0] // YYYY-MM-DD
+    const dayKey = startTime.toISOString().split('T')[0] ?? '' // YYYY-MM-DD
 
-    if (!dayStats.has(dayKey)) {
-      dayStats.set(dayKey, {
-        date: dayKey,
-        volunteers: new Map<number, any>(),
-        totalHours: 0,
-        totalVolunteers: 0,
-      })
+    // Un seul chemin plutôt que has/set/get : la valeur manquante est créée sur place, et
+    // l'on ne relit plus une entrée dont rien ne garantissait la présence.
+    const day = dayStats.get(dayKey) ?? {
+      date: dayKey,
+      volunteers: new Map<number, any>(),
+      totalHours: 0,
+      totalVolunteers: 0,
     }
-
-    const day = dayStats.get(dayKey)!
+    dayStats.set(dayKey, day)
 
     slot.assignedVolunteersList.forEach((assignment) => {
       const userId = assignment.user.id
