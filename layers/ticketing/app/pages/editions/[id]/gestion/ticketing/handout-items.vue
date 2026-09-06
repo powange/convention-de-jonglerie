@@ -40,7 +40,22 @@
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {{ $t('gestion.ticketing.assign_handout_items_title') }}
           </h2>
-          <UTabs v-model="activeAudienceTab" :items="audienceTabs" variant="link">
+          <!-- Jusqu'à sept cibles : sur mobile elles ne tiennent pas sur une ligne, et les
+               libellés comptent ici (« Champs personnalisés » ne se devine pas à son icône).
+               D'où un sélecteur en dessous de `sm`, qui pilote la même valeur que les onglets. -->
+          <USelect
+            v-model="activeAudienceTab"
+            :items="audienceTabs"
+            value-key="value"
+            size="lg"
+            class="w-full sm:hidden mb-4"
+          />
+          <UTabs
+            v-model="activeAudienceTab"
+            :items="audienceTabs"
+            variant="link"
+            :ui="{ list: 'hidden sm:flex' }"
+          >
             <template #tiers>
               <div v-if="loadingTiers" class="text-center py-6">
                 <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
