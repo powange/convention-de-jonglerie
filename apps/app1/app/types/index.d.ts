@@ -97,6 +97,8 @@ export interface Edition {
   volunteersEnabled?: boolean
   artistsEnabled?: boolean
   ticketingEnabled?: boolean
+  /** Le module des articles à remettre, actif par défaut sur une édition. */
+  ticketingHandoutItemsEnabled?: boolean
   workshopsEnabled?: boolean
   /** Saisie libre des lieux d'atelier, plutôt qu'un choix parmi les lieux déclarés. */
   workshopLocationsFreeInput?: boolean
