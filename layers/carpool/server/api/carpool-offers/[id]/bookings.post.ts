@@ -23,13 +23,16 @@ export default wrapApiHandler(
     const message = rawMessage ? sanitizeUserContent(rawMessage) : undefined
 
     // Récupérer l'offre et vérifier droits/capacité
-    const offer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
       include: {
         user: true,
         bookings: true,
-      },
-      errorMessage: 'Offre de covoiturage introuvable',
+      }
     })
+    if (!offer) {
+      throw createError({ status: 404, message: 'Offre de covoiturage introuvable' })
+    }
 
     // Le créateur ne peut pas réserver sur sa propre offre
     if (offer.userId === user.id) {

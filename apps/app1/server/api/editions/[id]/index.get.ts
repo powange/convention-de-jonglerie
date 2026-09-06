@@ -1,14 +1,14 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import { checkAdminMode } from '#server/utils/organizer-management'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
     const editionId = validateEditionId(event)
 
-    const edition = await fetchResourceOrFail(prisma.edition, editionId, {
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
       include: {
         creator: {
           select: {
@@ -85,8 +85,11 @@ export default wrapApiHandler(
           },
         },
       },
-      errorMessage: 'Edition not found',
     })
+
+    if (!edition) {
+      throw createError({ status: 404, message: 'Edition not found' })
+    }
 
     // Check access based on edition status
     // PUBLISHED, PLANNED, and CANCELLED are publicly accessible

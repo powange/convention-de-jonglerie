@@ -19,10 +19,13 @@ export default wrapApiHandler(
     }
 
     // Récupérer l'offre et la réservation
-    const offer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
-      include: { user: true, bookings: true },
-      errorMessage: 'Offre introuvable',
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
+      include: { user: true, bookings: true }
     })
+    if (!offer) {
+      throw createError({ status: 404, message: 'Offre introuvable' })
+    }
 
     const booking = await fetchResourceOrFail(prisma.carpoolBooking, bookingId, {
       errorMessage: 'Réservation introuvable',

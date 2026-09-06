@@ -1,5 +1,4 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateConventionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -10,7 +9,8 @@ export default wrapApiHandler(
     const conventionId = validateConventionId(event)
 
     // Récupérer la convention
-    const convention = await fetchResourceOrFail(prisma.convention, conventionId, {
+    const convention = await prisma.convention.findUnique({
+      where: { id: conventionId },
       include: {
         author: {
           select: {
@@ -31,8 +31,10 @@ export default wrapApiHandler(
           },
         },
       },
-      errorMessage: 'Convention introuvable',
     })
+    if (!convention) {
+      throw createError({ status: 404, message: 'Convention introuvable' })
+    }
 
     // Transformer organisateurs avec nouveaux droits
     const transformed = {
