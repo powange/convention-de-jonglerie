@@ -125,6 +125,11 @@
                   <!-- Sélecteur de langue (masqué sur mobile, déjà dans le menu) -->
                   <UiSelectLanguage class="hidden sm:block" />
 
+                  <!-- Même centre de notifications que l'en-tête du site : la gestion d'une
+                       édition a sa propre barre, et un organisateur y passe l'essentiel de son
+                       temps — sans cela, il ne voit rien arriver. -->
+                  <NotificationsCenter v-if="authStore.isAuthenticated" />
+
                   <UserAuthSection />
                 </ClientOnly>
               </template>
