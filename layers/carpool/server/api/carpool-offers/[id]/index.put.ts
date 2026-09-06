@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth, requireResourceOwner } from '#server/utils/auth-utils'
-import { fetchResourceOrFail, buildUpdateData } from '#server/utils/prisma-helpers'
+import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { carpoolOfferInclude } from '#server/utils/prisma-select-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
 import { updateCarpoolOfferSchema } from '#server/utils/validation-schemas'
@@ -16,14 +16,17 @@ export default wrapApiHandler(
     const validatedData = updateCarpoolOfferSchema.parse(body)
 
     // Vérifier que l'offre existe
-    const existingOffer = await fetchResourceOrFail(prisma.carpoolOffer, offerId, {
+    const existingOffer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
       include: {
         user: {
           select: { id: true, pseudo: true },
         },
-      },
-      errorMessage: 'Offre de covoiturage introuvable',
+      }
     })
+    if (!existingOffer) {
+      throw createError({ status: 404, message: 'Offre de covoiturage introuvable' })
+    }
 
     // Seul le créateur peut modifier son offre
     requireResourceOwner(event, existingOffer, {
