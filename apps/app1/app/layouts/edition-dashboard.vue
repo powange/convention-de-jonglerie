@@ -114,7 +114,12 @@
                   <!-- Les dates sur leur propre ligne : accolées au nom de l'édition, elles
                        allongeaient la barre au point de pousser le reste hors de l'écran. -->
                   <div class="flex flex-col">
-                    <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
+                    <!-- Le nom de la convention disparaît sous `sm` : une ligne de moins, et
+                         `getEditionDisplayName` retombe dessus quand l'édition n'a pas de nom
+                         propre — rien ne se perd. -->
+                    <span class="hidden sm:block text-sm font-semibold">
+                      {{ edition.convention?.name }}
+                    </span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">
                       {{ getEditionDisplayName(edition) }}
                     </span>
@@ -122,7 +127,7 @@
                       v-if="edition.startDate && edition.endDate"
                       class="text-xs text-gray-500 dark:text-gray-400"
                     >
-                      {{ formatDateRange(edition.startDate, edition.endDate) }}
+                      {{ formatDateRangeCompact(edition.startDate, edition.endDate) }}
                     </span>
                   </div>
                 </div>
@@ -166,7 +171,7 @@ const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
-const { formatDateRange } = useDateFormat()
+const { formatDateRangeCompact } = useDateFormat()
 
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))

@@ -193,6 +193,7 @@
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",
+    "date_range_compact": "{startDate} → {endDate}",
     "date_range_with_time": "Del {startDate} al {endDate}",
     "same_day_with_time": "El {date} de {startTime} a {endTime}"
   },

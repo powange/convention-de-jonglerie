@@ -193,6 +193,7 @@
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",
+    "date_range_compact": "{startDate} → {endDate}",
     "date_range_with_time": "Från {startDate} till {endDate}",
     "same_day_with_time": "På {date} från {startTime} till {endTime}"
   },
