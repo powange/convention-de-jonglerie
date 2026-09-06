@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Správa umělců",
       "manage_artists_description": "Správa umělců pozvaných do tohoto vydání",
+      "no_artists": "Zatím žádní umělci",
       "title": "Správa umělců",
       "notifications": {
         "channels_hint": "Každý umělec bude upozorněn na webu a push oznámením, podle svých předvoleb. Odkaz mu umožní potvrdit přečtení.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Umožňuje organizátorům manuálně přidávat účastníky během akce",
       "anonymous_orders_disabled": "Anonymní objednávky jsou zakázány",
       "anonymous_orders_enabled": "Anonymní objednávky jsou povoleny",
+      "artist_handout_items_help": "Vyberte předměty určené právě tomuto umělci. Přidávají se k těm, které dostávají všichni umělci, i k předmětům jeho představení.",
+      "artist_handout_items_manage_for": "Předměty k vydání — {name}",
       "assign_handout_items_title": "Přiřadit předměty k vydání",
       "audience_artists": "Umělci",
       "audience_custom_fields": "Vlastní pole",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Vyberte přijímané platební metody při přidávání účastníků na místě",
       "payment_methods_note": "Možnost 'Neurčeno' je vždy k dispozici pro případy, kdy platba ještě nebyla přijata",
       "payment_methods_title": "Přijímané platební metody",
+      "per_artist_handout_items_help": "Tyto předměty se přidávají k těm, které dostávají všichni umělci, i k předmětům spojeným s jeho představeními.",
+      "per_artist_handout_items_title": "Předměty specifické pro umělce",
       "per_organizer_handout_items_title": "Konkrétní předměty podle organizátora",
       "select_handout_items_placeholder": "Vybrat předměty",
       "settings_title": "Nastavení",

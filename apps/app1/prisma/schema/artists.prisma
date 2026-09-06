@@ -79,6 +79,7 @@ model EditionArtist {
   dropoffResponsible   User?                 @relation("ArtistDropoffResponsible", fields: [dropoffResponsibleId], references: [id], onDelete: SetNull)
   shows                ShowArtist[]
   mealSelections       ArtistMealSelection[]
+  handoutItems         ArtistHandoutItem[]
 
   @@unique([editionId, userId])
   @@index([editionId])
@@ -192,6 +193,27 @@ model ShowArtist {
   @@index([showId])
   @@index([actId])
   @@index([artistId])
+}
+
+/// Articles à remettre à UN artiste précis, en complément de ceux remis à tous les artistes
+/// (EditionArtistHandoutItem) et de ceux attachés à ses spectacles (ShowHandoutItem). Les trois
+/// sources s'additionnent au moment de la remise : un article demandé pour un artiste donné ne
+/// remplace pas ce que son spectacle lui vaut déjà.
+model ArtistHandoutItem {
+  id            Int      @id @default(autoincrement())
+  artistId      Int
+  handoutItemId Int
+  /// Nombre d'exemplaires remis pour cette association (ex. 3 tickets boisson).
+  quantity      Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  artist      EditionArtist        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  handoutItem TicketingHandoutItem @relation(fields: [handoutItemId], references: [id], onDelete: Cascade)
+
+  @@unique([artistId, handoutItemId])
+  @@index([artistId])
+  @@index([handoutItemId])
 }
 
 model ShowHandoutItem {

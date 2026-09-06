@@ -110,3 +110,70 @@ describe('POST /api/editions/[id]/ticketing/verify (bénévole)', () => {
     expect(whereArg).not.toHaveProperty('editionId')
   })
 })
+
+describe('POST /api/editions/[id]/ticketing/verify (artiste)', () => {
+  const mockEvent = {
+    context: { params: { id: '1' }, user: { id: 1, pseudo: 'orga' } },
+  }
+
+  const artiste = {
+    id: 9,
+    userId: 42,
+    entryValidated: false,
+    entryValidatedAt: null,
+    entryValidatedBy: null,
+    user: { id: 42, prenom: 'Léa', nom: 'Martin', email: 'lea@example.com', phone: null },
+    shows: [
+      {
+        show: {
+          id: 3,
+          title: 'Cabaret',
+          performances: [],
+          handoutItems: [
+            { quantity: 1, handoutItem: { id: 20, name: 'Repas spectacle', cumulative: true } },
+          ],
+        },
+      },
+    ],
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'artist-9' })
+    mockCanAccessEditionData.mockResolvedValue(true)
+    prismaMock.editionArtist.findFirst.mockResolvedValue(artiste)
+    prismaMock.artistMealSelection.findMany.mockResolvedValue([])
+    // Articles remis à TOUS les artistes de l'édition
+    prismaMock.editionArtistHandoutItem.findMany.mockResolvedValue([
+      { quantity: 1, handoutItem: { id: 10, name: 'Bracelet', cumulative: false } },
+    ])
+    // Articles demandés pour CET artiste en particulier
+    prismaMock.artistHandoutItem.findMany.mockResolvedValue([
+      { quantity: 2, handoutItem: { id: 30, name: 'Ticket boisson', cumulative: true } },
+    ])
+  })
+
+  it('remet les articles des trois sources : tous les artistes, cet artiste, ses spectacles', async () => {
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.found).toBe(true)
+    expect(result.data.type).toBe('artist')
+    const noms = result.data.participant.artist.handoutItems.map((i: any) => i.name).sort()
+    expect(noms).toEqual(['Bracelet', 'Repas spectacle', 'Ticket boisson'])
+  })
+
+  it("remet le nombre d'exemplaires demandé pour cet artiste", async () => {
+    const result = await verifyHandler(mockEvent as any)
+
+    const ticket = result.data.participant.artist.handoutItems.find((i: any) => i.id === 30)
+    expect(ticket.quantity).toBe(2)
+  })
+
+  it("n'interroge les articles de cet artiste que pour lui", async () => {
+    await verifyHandler(mockEvent as any)
+
+    expect(prismaMock.artistHandoutItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { artistId: 9 } })
+    )
+  })
+})

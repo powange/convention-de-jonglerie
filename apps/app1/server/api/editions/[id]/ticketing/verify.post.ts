@@ -34,7 +34,7 @@ export default wrapApiHandler(
         // Recherche d'un bénévole
         // Format: volunteer-{id}-{token} ou volunteer-{id} (ancien format)
         const parts = body.qrCode.replace('volunteer-', '').split('-')
-        const applicationId = parseInt(parts[0])
+        const applicationId = parseInt(parts[0] ?? '')
 
         if (isNaN(applicationId)) {
           return createSuccessResponse({ found: false }, 'QR code bénévole invalide')
@@ -253,7 +253,7 @@ export default wrapApiHandler(
         // Recherche d'un artiste
         // Format: artist-{id}-{token} ou artist-{id} (ancien format)
         const parts = body.qrCode.replace('artist-', '').split('-')
-        const artistId = parseInt(parts[0])
+        const artistId = parseInt(parts[0] ?? '')
 
         if (isNaN(artistId)) {
           return createSuccessResponse({ found: false }, 'QR code artiste invalide')
@@ -325,7 +325,13 @@ export default wrapApiHandler(
             where: { editionId },
             include: { handoutItem: true },
           })
-          const artistItemEntries: any[] = [...editionArtistHandoutItems]
+          // Trois sources s'additionnent : tous les artistes, cet artiste en particulier,
+          // et chacun de ses spectacles.
+          const artistOwnHandoutItems = await prisma.artistHandoutItem.findMany({
+            where: { artistId: artist.id },
+            include: { handoutItem: true },
+          })
+          const artistItemEntries: any[] = [...editionArtistHandoutItems, ...artistOwnHandoutItems]
           artist.shows.forEach((showArtist) => {
             showArtist.show.handoutItems.forEach((item) => {
               artistItemEntries.push(item)
@@ -417,7 +423,7 @@ export default wrapApiHandler(
         // Recherche d'un organisateur
         // Format: organizer-{id}-{token} ou organizer-{id} (ancien format)
         const parts = body.qrCode.replace('organizer-', '').split('-')
-        const editionOrganizerId = parseInt(parts[0])
+        const editionOrganizerId = parseInt(parts[0] ?? '')
         const token = parts[1] || null
 
         if (isNaN(editionOrganizerId)) {

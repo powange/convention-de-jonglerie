@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Artisthantering",
       "manage_artists_description": "Hantera de inbjudna konstnärerna till denna utgåva",
+      "no_artists": "Inga artister ännu",
       "title": "Artisthantering",
       "notifications": {
         "channels_hint": "Varje artist meddelas på webbplatsen och via push-avisering, beroende på sina inställningar. En länk låter dem bekräfta att de läst.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Tillåter arrangörer att manuellt lägga till deltagare under evenemanget",
       "anonymous_orders_disabled": "Anonyma beställningar är inaktiverade",
       "anonymous_orders_enabled": "Anonyma beställningar är tillåtna",
+      "artist_handout_items_help": "Välj de artiklar som ska lämnas ut till just den här artisten. De läggs till dem som delas ut till alla artister och till artistens föreställningar.",
+      "artist_handout_items_manage_for": "Objekt att lämna ut — {name}",
       "assign_handout_items_title": "Tilldela objekt att lämna ut",
       "audience_artists": "Artister",
       "audience_custom_fields": "Anpassade fält",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Välj de accepterade betalningsmetoderna vid tillägg av deltagare på plats",
       "payment_methods_note": "Alternativet 'Ej angivet' är alltid tillgängligt för fall där betalningen ännu inte har mottagits",
       "payment_methods_title": "Accepterade betalningsmetoder",
+      "per_artist_handout_items_help": "Dessa artiklar läggs till dem som delas ut till alla artister och till dem som hör till artistens föreställningar.",
+      "per_artist_handout_items_title": "Artistspecifika artiklar",
       "per_organizer_handout_items_title": "Specifika föremål per arrangör",
       "select_handout_items_placeholder": "Välj objekt",
       "settings_title": "Inställningar",

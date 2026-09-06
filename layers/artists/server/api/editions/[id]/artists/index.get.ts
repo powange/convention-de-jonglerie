@@ -74,6 +74,11 @@ export default wrapApiHandler(
             },
           },
         },
+        // Articles à remettre à cet artiste en particulier, pour les afficher en gestion
+        // à côté de ceux de ses spectacles.
+        handoutItems: {
+          include: { handoutItem: { select: { id: true, name: true } } },
+        },
         mealSelections: {
           include: {
             meal: {

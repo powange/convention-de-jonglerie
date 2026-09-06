@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Gestión de artistas",
       "manage_artists_description": "Gestione los artistas invitados a esta edición",
+      "no_artists": "Aún no hay artistas",
       "title": "Gestión de artistas",
       "notifications": {
         "channels_hint": "Cada artista será avisado en el sitio y por notificación push, según sus preferencias. Un enlace le permitirá confirmar la lectura.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Permite a los organizadores añadir participantes manualmente durante el evento",
       "anonymous_orders_disabled": "Los pedidos anónimos están desactivados",
       "anonymous_orders_enabled": "Los pedidos anónimos están autorizados",
+      "artist_handout_items_help": "Seleccione los artículos a entregar a este artista en particular. Se suman a los entregados a todos los artistas y a los de sus espectáculos.",
+      "artist_handout_items_manage_for": "Artículos a entregar — {name}",
       "assign_handout_items_title": "Asignar artículos a entregar",
       "audience_artists": "Artistas",
       "audience_custom_fields": "Campos personalizados",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Elija los métodos de pago aceptados al agregar participantes en el lugar",
       "payment_methods_note": "La opción 'No especificado' siempre está disponible para los casos en que el pago aún no se ha cobrado",
       "payment_methods_title": "Métodos de pago aceptados",
+      "per_artist_handout_items_help": "Estos artículos se suman a los entregados a todos los artistas y a los asociados a sus espectáculos.",
+      "per_artist_handout_items_title": "Artículos específicos por artista",
       "per_organizer_handout_items_title": "Artículos específicos por organizador",
       "select_handout_items_placeholder": "Seleccionar artículos",
       "settings_title": "Ajustes",

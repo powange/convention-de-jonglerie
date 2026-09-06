@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Management af kunstnere",
       "manage_artists_description": "Administrer de kunstnere, der er inviteret til denne udgave",
+      "no_artists": "Ingen artister endnu",
       "title": "Management af kunstnere",
       "notifications": {
         "channels_hint": "Hver artist får besked på siden og via push-notifikation, alt efter deres indstillinger. Et link giver dem mulighed for at bekræfte læsningen.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Giver arrangører mulighed for manuelt at tilføje deltagere under begivenheden",
       "anonymous_orders_disabled": "Anonyme ordrer er deaktiveret",
       "anonymous_orders_enabled": "Anonyme ordrer er tilladt",
+      "artist_handout_items_help": "Vælg de effekter, der skal udleveres til netop denne artist. De lægges oven i dem, alle artister får, og dem fra artistens shows.",
+      "artist_handout_items_manage_for": "Genstande til udlevering — {name}",
       "assign_handout_items_title": "Tildel genstande til udlevering",
       "audience_artists": "Kunstnere",
       "audience_custom_fields": "Brugerdefinerede felter",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Vælg de accepterede betalingsmetoder ved tilføjelse af deltagere på stedet",
       "payment_methods_note": "Muligheden 'Ikke angivet' er altid tilgængelig i tilfælde, hvor betalingen endnu ikke er modtaget",
       "payment_methods_title": "Accepterede betalingsmetoder",
+      "per_artist_handout_items_help": "Disse effekter lægges oven i dem, alle artister får, og dem, der er knyttet til artistens shows.",
+      "per_artist_handout_items_title": "Effekter specifikke for hver artist",
       "per_organizer_handout_items_title": "Specifikke genstande pr. arrangør",
       "select_handout_items_placeholder": "Vælg genstande",
       "settings_title": "Indstillinger",
