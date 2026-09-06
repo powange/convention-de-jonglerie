@@ -136,6 +136,24 @@ export const useDateFormat = () => {
   }
 
   /**
+   * Même intervalle, en plus court : les deux dates séparées d'une flèche, sans « du » ni
+   * « au ». Destiné aux endroits où la largeur manque — la barre de gestion, par exemple.
+   */
+  const formatDateRangeCompact = (startString: string, endString: string) => {
+    const startDate = new Date(startString)
+    const endDate = new Date(endString)
+
+    if (startDate.toDateString() === endDate.toDateString()) {
+      return formatDate(startString)
+    }
+
+    return t('dates.date_range_compact', {
+      startDate: formatDate(startString),
+      endDate: formatDate(endString),
+    })
+  }
+
+  /**
    * Formate une date avec granularité temporelle (format: date_granularity)
    * Exemple: "2024-01-15_morning" -> "15 janv. matin"
    */
@@ -177,6 +195,7 @@ export const useDateFormat = () => {
     formatDateTimeWithWeekday,
     formatDateTimeRange,
     formatDateRange,
+    formatDateRangeCompact,
     formatDateTimeWithGranularity,
   }
 }

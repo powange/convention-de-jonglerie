@@ -193,6 +193,7 @@
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",
+    "date_range_compact": "{startDate} → {endDate}",
     "date_range_with_time": "З {startDate} до {endDate}",
     "same_day_with_time": "{date} з {startTime} до {endTime}"
   },
