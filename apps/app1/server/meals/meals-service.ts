@@ -25,9 +25,9 @@ import {
 } from '#server/utils/volunteer-meals'
 
 interface VolunteerAvailability {
-  setupAvailability: boolean
-  eventAvailability: boolean
-  teardownAvailability: boolean
+  setupAvailability: boolean | null
+  eventAvailability: boolean | null
+  teardownAvailability: boolean | null
   arrivalDateTime: string | null
   departureDateTime: string | null
 }
@@ -70,7 +70,7 @@ export async function getEditionMealSchedule(editionId: number) {
   const expectedDates = new Set<string>()
   const cursor = new Date(periodStart)
   while (cursor <= periodEnd) {
-    expectedDates.add(cursor.toISOString().split('T')[0])
+    expectedDates.add(cursor.toISOString().split('T')[0] ?? '')
     cursor.setDate(cursor.getDate() + 1)
   }
 
@@ -85,7 +85,7 @@ export async function getEditionMealSchedule(editionId: number) {
   const mealsToDeleteIds: number[] = []
 
   for (const meal of existingMeals) {
-    const mealDateStr = new Date(meal.date).toISOString().split('T')[0]
+    const mealDateStr = new Date(meal.date).toISOString().split('T')[0] ?? ''
     if (expectedDates.has(mealDateStr)) {
       existingDates.add(mealDateStr)
     } else {
@@ -282,7 +282,14 @@ export async function getVolunteerSelfMeals(editionId: number, userId: number) {
     orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
   })
 
-  const filteredMeals = allMeals.filter((meal) => isEligibleByPhaseAndDates(meal, volunteer))
+  // `phases` est une colonne JSON : Prisma la rend en `JsonValue`, et la fonction attend la
+  // liste de phases. Même normalisation qu'ailleurs dans ce fichier.
+  const filteredMeals = allMeals.filter((meal) =>
+    isEligibleByPhaseAndDates(
+      { ...meal, phases: Array.isArray(meal.phases) ? (meal.phases as string[]) : [] },
+      volunteer
+    )
+  )
 
   const existingSelections = await prisma.volunteerMealSelection.findMany({
     where: { volunteerId: volunteer.id, mealId: { in: filteredMeals.map((m) => m.id) } },
