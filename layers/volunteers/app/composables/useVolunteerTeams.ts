@@ -145,7 +145,7 @@ export function useVolunteerTeams(
 
   return {
     // État
-    teams: readonly(teams),
+    teams: shallowReadonly(teams),
     loading: readonly(loading),
     error: readonly(error),
 

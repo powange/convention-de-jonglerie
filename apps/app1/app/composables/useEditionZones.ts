@@ -185,7 +185,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
   )
 
   return {
-    zones: readonly(zones),
+    zones: shallowReadonly(zones),
     loading: readonly(loading),
     creating: readonly(creating),
     updating: readonly(updating),

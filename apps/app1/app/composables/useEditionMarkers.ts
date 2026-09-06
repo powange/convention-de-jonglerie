@@ -193,7 +193,7 @@ export const useEditionMarkers = (editionId: Ref<number | undefined>) => {
   )
 
   return {
-    markers: readonly(markers),
+    markers: shallowReadonly(markers),
     loading: readonly(loading),
     creating: readonly(creating),
     updating: readonly(updating),
