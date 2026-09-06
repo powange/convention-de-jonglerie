@@ -157,7 +157,17 @@ test.describe.serial('Rendu mobile des pages de gestion', () => {
       await attendreContenu(page)
 
       // La liste des quotas vit dans un onglet de la page des tarifs, pas à l'ouverture.
-      await page.getByRole('tab', { name: /quotas/i }).click()
+      // Sous 640 px la barre d'onglets cède la place à un select — quatre onglets dont
+      // « Champs personnalisés » ne tiennent pas sur 375 px. C'est donc lui qu'il faut
+      // piloter ici, comme le ferait quelqu'un sur son téléphone.
+      // Le select se repère à son texte — le libellé de l'onglet courant — et non à sa
+      // position : la page en compte d'autres.
+      await page
+        .getByRole('combobox')
+        .filter({ hasText: /tarifs|options|champs personnalisés|quotas/i })
+        .first()
+        .click()
+      await page.getByRole('option', { name: /quotas/i }).click()
 
       // `.last()` : le quota vient d'être créé, il est en fin de liste. L'édition est
       // partagée avec les autres specs, qui y laissent leurs propres quotas — viser le
