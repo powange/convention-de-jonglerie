@@ -354,11 +354,24 @@
                 </div>
               </div>
 
+              <!-- Sur un écran étroit, quatre onglets ne tiennent pas côte à côte — « Champs
+                   personnalisés » à lui seul occupe la moitié de la largeur. Un select prend le
+                   relais et pilote le même état. Seule la barre est masquée, pas le composant :
+                   ce sont ses panneaux qui portent le contenu. -->
+              <USelect
+                v-if="tiersLoaded || ordersLoaded"
+                v-model="ongletActif"
+                :items="itemsPourSelect"
+                value-key="value"
+                :icon="ongletCourant?.icon"
+                class="w-full sm:hidden mb-4"
+              />
               <UTabs
                 v-if="tiersLoaded || ordersLoaded"
+                v-model="ongletActif"
                 :items="items"
                 variant="link"
-                :ui="{ trigger: 'grow' }"
+                :ui="{ trigger: 'grow', list: 'hidden sm:flex' }"
                 class="gap-4 w-full"
               >
                 <template #tarifs>
@@ -1492,6 +1505,9 @@ const loadRawHelloAssoJson = () => {
   executeLoadRawJson()
 }
 
+// Onglet courant : partagé avec le select qui prend le relais sur écran étroit.
+const ongletActif = ref('tarifs')
+
 const items = computed(
   () =>
     [
@@ -1500,6 +1516,7 @@ const items = computed(
         description: 'Modifiez les tarifs disponibles pour cet événement.',
         icon: 'i-heroicons-ticket',
         slot: 'tarifs' as const,
+        value: 'tarifs',
         badge: loadedTiers.value.length,
       },
       {
@@ -1507,6 +1524,7 @@ const items = computed(
         description: 'Modifiez les options disponibles pour cet événement.',
         icon: 'i-heroicons-adjustments-horizontal',
         slot: 'options' as const,
+        value: 'options',
         badge: loadedOptions.value.length,
       },
       {
@@ -1514,6 +1532,7 @@ const items = computed(
         description: 'Consultez les champs personnalisés des tarifs.',
         icon: 'i-heroicons-pencil-square',
         slot: 'customFields' as const,
+        value: 'customFields',
         badge: loadedCustomFields.value.length,
       },
       {
@@ -1521,8 +1540,14 @@ const items = computed(
         description: 'Consultez la liste des participants.',
         icon: 'i-heroicons-users',
         slot: 'participants' as const,
+        value: 'participants',
         badge: ordersStats.value.totalItems,
       },
     ] satisfies TabsItem[]
 )
+
+// Le select ne reprend que ce qu'il affiche ; l'icône est celle de l'onglet courant.
+const itemsPourSelect = computed(() => items.value.map(({ value, label }) => ({ value, label })))
+const ongletCourant = computed(() => items.value.find((item) => item.value === ongletActif.value))
+
 </script>

@@ -56,8 +56,23 @@
           </UCard>
         </div>
 
-        <!-- Tabs pour tarifs et options -->
-        <UTabs v-model="activeTab" :items="tabs" variant="link">
+        <!-- Sur un écran étroit, quatre onglets ne tiennent pas côte à côte — « Champs
+             personnalisés » à lui seul occupe la moitié de la largeur. Un select prend le
+             relais et pilote le même état. Seule la barre est masquée, pas le composant :
+             ce sont ses panneaux qui portent le contenu. -->
+        <USelect
+          v-model="activeTab"
+          :items="tabsPourSelect"
+          value-key="value"
+          :icon="tabCourant?.icon"
+          class="w-full sm:hidden mb-4"
+        />
+        <UTabs
+          v-model="activeTab"
+          :items="tabs"
+          variant="link"
+          :ui="{ list: 'hidden sm:flex' }"
+        >
           <template #tarifs>
             <TicketingTiersList
               :tiers="tiers"
@@ -188,6 +203,10 @@ const tabs = computed(() => [
     badge: quotas.value.length,
   },
 ])
+
+// Le select ne reprend que ce qu'il affiche ; l'icône est celle de l'onglet courant.
+const tabsPourSelect = computed(() => tabs.value.map(({ value, label }) => ({ value, label })))
+const tabCourant = computed(() => tabs.value.find((tab) => tab.value === activeTab.value))
 
 onMounted(async () => {
   if (!edition.value) {
