@@ -159,6 +159,7 @@ model TicketingHandoutItem {
   artistTicketingHandoutItems    EditionArtistHandoutItem[]
   customFields                   TicketingTierCustomFieldHandoutItem[]
   shows                          ShowHandoutItem[]
+  artists                        ArtistHandoutItem[]
   meals                          VolunteerMealHandoutItem[]
 
   @@index([editionId])

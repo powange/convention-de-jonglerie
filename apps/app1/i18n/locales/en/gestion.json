@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Artist management",
       "manage_artists_description": "Manage the artists invited to this edition",
+      "no_artists": "No artists yet",
       "title": "Artist management",
       "notifications": {
         "channels_hint": "Each artist will be notified on the site and by push notification, according to their preferences. A link will let them confirm they have read it.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Allows organizers to manually add participants during the event",
       "anonymous_orders_disabled": "Anonymous orders are disabled",
       "anonymous_orders_enabled": "Anonymous orders are enabled",
+      "artist_handout_items_help": "Select the items to hand out to this artist in particular. They add to those handed out to all artists and to those of their shows.",
+      "artist_handout_items_manage_for": "Items to hand out — {name}",
       "assign_handout_items_title": "Assign items to hand out",
       "audience_artists": "Artists",
       "audience_custom_fields": "Custom fields",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Choose the accepted payment methods when adding participants on site",
       "payment_methods_note": "The 'Unspecified' option is always available for cases where payment has not yet been collected",
       "payment_methods_title": "Accepted payment methods",
+      "per_artist_handout_items_help": "These items add to those handed out to all artists and to those attached to the artist's shows.",
+      "per_artist_handout_items_title": "Artist-specific items",
       "per_organizer_handout_items_title": "Specific items per organizer",
       "select_handout_items_placeholder": "Select items",
       "settings_title": "Settings",

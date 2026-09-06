@@ -138,6 +138,9 @@ export default wrapApiHandler(
               phone: true,
             },
           },
+          // Articles demandés pour cet artiste en particulier : chargés avec lui plutôt que
+          // par une requête de plus dans la boucle qui suit.
+          handoutItems: { include: { handoutItem: true } },
           // distinct : un artiste jouant dans plusieurs numéros d'un cabaret a autant de
           // liens ShowArtist pour le même spectacle, qui apparaîtrait sinon en double
           shows: {
@@ -427,7 +430,7 @@ export default wrapApiHandler(
             id: selection.meal.id,
             date: selection.meal.date,
             mealType: selection.meal.mealType,
-            phases: selection.meal.phases,
+            phases: Array.isArray(selection.meal.phases) ? (selection.meal.phases as string[]) : [],
           }))
         )
 
@@ -543,7 +546,9 @@ export default wrapApiHandler(
         // Collecter les articles de tous les spectacles ; l'agrégation a lieu
         // après les repas. Un artiste jouant dans deux spectacles reçoit deux
         // fois un article cumulable, une seule fois un article non cumulable.
-        const artistItemEntries: any[] = [...editionArtistHandoutItems]
+        // Trois sources s'additionnent : tous les artistes, cet artiste en particulier,
+        // et chacun de ses spectacles.
+        const artistItemEntries: any[] = [...editionArtistHandoutItems, ...artist.handoutItems]
         artist.shows.forEach((showArtist) => {
           showArtist.show.handoutItems.forEach((item) => {
             artistItemEntries.push(item)
@@ -583,7 +588,7 @@ export default wrapApiHandler(
             id: selection.meal.id,
             date: selection.meal.date,
             mealType: selection.meal.mealType,
-            phases: selection.meal.phases,
+            phases: Array.isArray(selection.meal.phases) ? (selection.meal.phases as string[]) : [],
           }))
         )
 

@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Zarządzanie artystami",
       "manage_artists_description": "Zarządzaj artystami zaproszonymi do tej edycji",
+      "no_artists": "Brak artystów",
       "title": "Zarządzanie artystami",
       "notifications": {
         "channels_hint": "Każdy artysta zostanie powiadomiony na stronie oraz powiadomieniem push, zgodnie ze swoimi preferencjami. Link pozwoli mu potwierdzić przeczytanie.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Umożliwia organizatorom ręczne dodawanie uczestników podczas wydarzenia",
       "anonymous_orders_disabled": "Anonimowe zamówienia są wyłączone",
       "anonymous_orders_enabled": "Anonimowe zamówienia są dozwolone",
+      "artist_handout_items_help": "Wybierz przedmioty do wydania temu konkretnemu artyście. Dodają się do tych wydawanych wszystkim artystom oraz do przedmiotów jego spektakli.",
+      "artist_handout_items_manage_for": "Przedmioty do wydania — {name}",
       "assign_handout_items_title": "Przypisać przedmioty do wydania",
       "audience_artists": "Artyści",
       "audience_custom_fields": "Pola niestandardowe",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Wybierz akceptowane metody płatności przy dodawaniu uczestników na miejscu",
       "payment_methods_note": "Opcja 'Nieokreślone' jest zawsze dostępna w przypadkach, gdy płatność nie została jeszcze pobrana",
       "payment_methods_title": "Akceptowane metody płatności",
+      "per_artist_handout_items_help": "Te przedmioty dodają się do wydawanych wszystkim artystom oraz do przypisanych do jego spektakli.",
+      "per_artist_handout_items_title": "Przedmioty przypisane do artysty",
       "per_organizer_handout_items_title": "Konkretne przedmioty wg organizatora",
       "select_handout_items_placeholder": "Wybierz przedmioty",
       "settings_title": "Ustawienia",

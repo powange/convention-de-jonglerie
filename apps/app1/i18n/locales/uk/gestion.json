@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Менеджмент артистів",
       "manage_artists_description": "Керуйте художниками, запрошеними до цього видання",
+      "no_artists": "Поки немає артистів",
       "title": "Менеджмент артистів",
       "notifications": {
         "channels_hint": "Кожен артист отримає сповіщення на сайті та push-сповіщення — залежно від його налаштувань. За посиланням він зможе підтвердити прочитання.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Дозволяє організаторам вручну додавати учасників під час заходу",
       "anonymous_orders_disabled": "Анонімні замовлення вимкнено",
       "anonymous_orders_enabled": "Анонімні замовлення дозволено",
+      "artist_handout_items_help": "Виберіть предмети для видачі саме цьому артистові. Вони додаються до тих, що видаються всім артистам, і до предметів його вистав.",
+      "artist_handout_items_manage_for": "Предмети до видачі — {name}",
       "assign_handout_items_title": "Призначити предмети до видачі",
       "audience_artists": "Митці",
       "audience_custom_fields": "Кастомні поля",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Оберіть прийняті способи оплати при додаванні учасників на місці",
       "payment_methods_note": "Опція 'Не вказано' завжди доступна для випадків, коли оплата ще не отримана",
       "payment_methods_title": "Прийняті способи оплати",
+      "per_artist_handout_items_help": "Ці предмети додаються до тих, що видаються всім артистам, і до прив'язаних до його вистав.",
+      "per_artist_handout_items_title": "Предмети для конкретного артиста",
       "per_organizer_handout_items_title": "Конкретні предмети за організатором",
       "select_handout_items_placeholder": "Вибрати предмети",
       "settings_title": "Налаштування",

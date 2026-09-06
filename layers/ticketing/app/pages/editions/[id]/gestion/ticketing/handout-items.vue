@@ -424,6 +424,65 @@
                   </li>
                 </ul>
               </div>
+
+              <!-- Bloc 3 : articles demandés pour un artiste en particulier -->
+              <div class="mt-8 space-y-3">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+                  {{ $t('gestion.ticketing.per_artist_handout_items_title') }}
+                </h3>
+                <p class="text-sm text-gray-500">
+                  {{ $t('gestion.ticketing.per_artist_handout_items_help') }}
+                </p>
+                <div v-if="loadingArtists" class="text-center py-6">
+                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
+                </div>
+                <div
+                  v-else-if="artists.length === 0"
+                  class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                >
+                  <UIcon name="i-heroicons-user-group" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                  <p class="text-sm text-gray-500">{{ $t('gestion.artists.no_artists') }}</p>
+                </div>
+                <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
+                  <li
+                    v-for="artist in artists"
+                    :key="artist.id"
+                    class="py-3 flex items-center gap-3 flex-wrap"
+                  >
+                    <UiUserAvatar :user="artist.user" size="xs" />
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium text-sm">{{ formatArtistName(artist) }}</div>
+                      <div
+                        v-if="artist.handoutItems && artist.handoutItems.length > 0"
+                        class="flex flex-wrap gap-1.5 mt-1"
+                      >
+                        <UBadge
+                          v-for="item in artist.handoutItems"
+                          :key="item.handoutItem.id"
+                          color="warning"
+                          variant="soft"
+                          size="md"
+                        >
+                          {{ item.handoutItem.name
+                          }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
+                        </UBadge>
+                      </div>
+                      <p v-else class="text-xs text-gray-400 italic mt-1">
+                        {{ $t('gestion.ticketing.no_specific_items_assigned') }}
+                      </p>
+                    </div>
+                    <UButton
+                      icon="i-heroicons-gift"
+                      color="primary"
+                      variant="ghost"
+                      size="sm"
+                      @click="openPerArtistItemsModal(artist)"
+                    >
+                      {{ $t('gestion.organizers.manage_articles') }}
+                    </UButton>
+                  </li>
+                </ul>
+              </div>
             </template>
 
             <template #meals>
@@ -514,6 +573,16 @@
           v-model:open="artistItemsModalOpen"
           :edition-id="editionId"
           @items-updated="loadArtistItems"
+        />
+
+        <ArtistsManageHandoutItemsModal
+          v-model:open="perArtistItemsModalOpen"
+          :edition-id="editionId"
+          :artist="perArtistItemsModalTarget"
+          :artist-label="
+            perArtistItemsModalTarget ? formatArtistName(perArtistItemsModalTarget) : ''
+          "
+          @saved="loadArtists"
         />
 
         <MealsManageHandoutItemsModal
@@ -671,6 +740,12 @@ const showItemsModalTarget = ref<any>(null)
 const loadingArtistItems = ref(true)
 const allArtistItems = ref<any[]>([])
 const artistItemsModalOpen = ref(false)
+
+// Artistes de l'édition, pour les articles demandés à l'un d'eux en particulier.
+const loadingArtists = ref(true)
+const artists = ref<any[]>([])
+const perArtistItemsModalOpen = ref(false)
+const perArtistItemsModalTarget = ref<any>(null)
 
 // Repas de l'édition (pour l'onglet Repas). On n'affiche que les repas
 // activés (`enabled === true`) sur la page de gestion des repas.
@@ -837,6 +912,32 @@ const loadShows = async () => {
   }
 }
 
+// Charge les artistes de l'édition avec les articles qui leur sont propres.
+const loadArtists = async () => {
+  loadingArtists.value = true
+  try {
+    const response = await $fetch<{ data: { artists: any[] } }>(
+      `/api/editions/${editionId}/artists`
+    )
+    artists.value = response.data?.artists || []
+  } catch {
+    // Erreur silencieuse
+  } finally {
+    loadingArtists.value = false
+  }
+}
+
+// Nom affiché d'un artiste : son identité si elle est renseignée, son pseudo sinon.
+const formatArtistName = (artist: any) => {
+  const identite = [artist?.user?.prenom, artist?.user?.nom].filter(Boolean).join(' ')
+  return identite || artist?.user?.pseudo || ''
+}
+
+const openPerArtistItemsModal = (artist: any) => {
+  perArtistItemsModalTarget.value = artist
+  perArtistItemsModalOpen.value = true
+}
+
 const openShowItemsModal = (show: any) => {
   showItemsModalTarget.value = show
   showItemsModalOpen.value = true
@@ -938,6 +1039,7 @@ onMounted(async () => {
     if (edition.value?.artistsEnabled) {
       await loadArtistItems()
       await loadShows()
+      await loadArtists()
     }
     if (edition.value?.mealsEnabled) {
       await loadMeals()
@@ -958,6 +1060,7 @@ watch(canAccess, async (newValue, oldValue) => {
     if (edition.value?.artistsEnabled) {
       await loadArtistItems()
       await loadShows()
+      await loadArtists()
     }
     if (edition.value?.mealsEnabled) {
       await loadMeals()

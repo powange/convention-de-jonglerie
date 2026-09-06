@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Управление артистами",
       "manage_artists_description": "Управляйте художниками, приглашенными для участия в этом издании",
+      "no_artists": "Пока нет артистов",
       "title": "Управление артистами",
       "notifications": {
         "channels_hint": "Каждый артист получит уведомление на сайте и push-уведомление — в зависимости от его настроек. По ссылке он сможет подтвердить прочтение.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Позволяет организаторам вручную добавлять участников во время мероприятия",
       "anonymous_orders_disabled": "Анонимные заказы отключены",
       "anonymous_orders_enabled": "Анонимные заказы разрешены",
+      "artist_handout_items_help": "Выберите предметы для выдачи именно этому артисту. Они добавляются к тем, что выдаются всем артистам, и к предметам его выступлений.",
+      "artist_handout_items_manage_for": "Предметы к выдаче — {name}",
       "assign_handout_items_title": "Назначить предметы к выдаче",
       "audience_artists": "Артисты",
       "audience_custom_fields": "Кастомные поля",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Выберите принимаемые способы оплаты при добавлении участников на месте",
       "payment_methods_note": "Опция 'Не указано' всегда доступна для случаев, когда оплата ещё не получена",
       "payment_methods_title": "Принимаемые способы оплаты",
+      "per_artist_handout_items_help": "Эти предметы добавляются к тем, что выдаются всем артистам, и к привязанным к его выступлениям.",
+      "per_artist_handout_items_title": "Предметы для конкретного артиста",
       "per_organizer_handout_items_title": "Конкретные предметы по организатору",
       "select_handout_items_placeholder": "Выбрать предметы",
       "settings_title": "Настройки",

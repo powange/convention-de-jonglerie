@@ -59,6 +59,7 @@
     "artists": {
       "list_title": "Artiestenmanagement",
       "manage_artists_description": "Beheer de kunstenaars die zijn uitgenodigd voor deze editie",
+      "no_artists": "Nog geen artiesten",
       "title": "Artiestenmanagement",
       "notifications": {
         "channels_hint": "Elke artiest wordt op de site en via pushmelding gewaarschuwd, afhankelijk van zijn voorkeuren. Via een link kan hij bevestigen dat hij het heeft gelezen.",
@@ -478,6 +479,8 @@
       "allow_onsite_registration_description": "Stelt organisatoren in staat handmatig deelnemers toe te voegen tijdens het evenement",
       "anonymous_orders_disabled": "Anonieme bestellingen zijn uitgeschakeld",
       "anonymous_orders_enabled": "Anonieme bestellingen zijn toegestaan",
+      "artist_handout_items_help": "Selecteer de artikelen die specifiek aan deze artiest worden uitgereikt. Ze komen bovenop die voor alle artiesten en die van zijn of haar shows.",
+      "artist_handout_items_manage_for": "Uit te reiken artikelen — {name}",
       "assign_handout_items_title": "Uit te reiken artikelen toewijzen",
       "audience_artists": "Artiesten",
       "audience_custom_fields": "Aangepaste velden",
@@ -572,6 +575,8 @@
       "payment_methods_description": "Kies de geaccepteerde betaalmethoden bij het toevoegen van deelnemers ter plaatse",
       "payment_methods_note": "De optie 'Niet gespecificeerd' is altijd beschikbaar voor gevallen waarin de betaling nog niet is geïnd",
       "payment_methods_title": "Geaccepteerde betaalmethoden",
+      "per_artist_handout_items_help": "Deze artikelen komen bovenop die voor alle artiesten en die welke aan de shows van de artiest zijn gekoppeld.",
+      "per_artist_handout_items_title": "Artiestspecifieke artikelen",
       "per_organizer_handout_items_title": "Specifieke voorwerpen per organisator",
       "select_handout_items_placeholder": "Selecteer artikelen",
       "settings_title": "Instellingen",
