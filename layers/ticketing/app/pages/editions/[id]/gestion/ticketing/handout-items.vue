@@ -40,14 +40,16 @@
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {{ $t('gestion.ticketing.assign_handout_items_title') }}
           </h2>
-          <!-- Jusqu'à sept cibles : sur mobile elles ne tiennent pas sur une ligne, et les
-               libellés comptent ici (« Champs personnalisés » ne se devine pas à son icône).
-               D'où un sélecteur en dessous de `sm`, qui pilote la même valeur que les onglets. -->
+          <!-- Sur un écran étroit, sept cibles ne tiennent pas côte à côte : un select prend
+               le relais, comme sur le résumé des bénévoles. Les deux pilotent le même état, si
+               bien qu'un changement de largeur ne fait pas perdre la cible en cours.
+               Ici seule la barre d'onglets est masquée, pas le composant : ce sont ses propres
+               panneaux qui portent le contenu. -->
           <USelect
             v-model="activeAudienceTab"
-            :items="audienceTabs"
+            :items="audienceTabsPourSelect"
             value-key="value"
-            size="lg"
+            :icon="audienceTabCourant?.icon"
             class="w-full sm:hidden mb-4"
           />
           <UTabs
@@ -720,6 +722,14 @@ const activeAudienceTab = computed({
     router.replace({ hash: `#${tab}` })
   },
 })
+
+// Le select ne reprend que ce qu'il affiche ; l'icône est celle de la cible courante.
+const audienceTabsPourSelect = computed(() =>
+  audienceTabs.value.map(({ value, label }) => ({ value, label }))
+)
+const audienceTabCourant = computed(() =>
+  audienceTabs.value.find((tab) => tab.value === activeAudienceTab.value)
+)
 
 // Items à remettre
 const loadingHandoutItems = ref(true)
