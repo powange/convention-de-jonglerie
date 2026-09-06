@@ -111,13 +111,18 @@
                     :alt="edition.convention.name"
                     class="h-8 w-8 rounded object-cover"
                   />
+                  <!-- Les dates sur leur propre ligne : accolées au nom de l'édition, elles
+                       allongeaient la barre au point de pousser le reste hors de l'écran. -->
                   <div class="flex flex-col">
                     <span class="text-sm font-semibold">{{ edition.convention?.name }}</span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">
                       {{ getEditionDisplayName(edition) }}
-                      <template v-if="edition.startDate && edition.endDate">
-                        &mdash; {{ formatDateRange(edition.startDate, edition.endDate) }}
-                      </template>
+                    </span>
+                    <span
+                      v-if="edition.startDate && edition.endDate"
+                      class="text-xs text-gray-500 dark:text-gray-400"
+                    >
+                      {{ formatDateRange(edition.startDate, edition.endDate) }}
                     </span>
                   </div>
                 </div>
