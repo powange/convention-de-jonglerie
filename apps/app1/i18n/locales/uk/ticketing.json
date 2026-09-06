@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "Необроблені дані HelloAsso отримано",
       "tiers_load_error": "Не вдалося завантажити тарифи",
       "tiers_loaded": "Тарифи завантажено",
-      "tiers_loaded_description": "Знайдено {tiers} тарифів, {options} опцій та {fields} користувацьких полів"
+      "tiers_loaded_description": "Знайдено {tiers} тарифів, {options} опцій та {fields} користувацьких полів",
+      "view_loaded_data": "Переглянути завантажені дані"
     },
     "handout_items": {
       "list": {

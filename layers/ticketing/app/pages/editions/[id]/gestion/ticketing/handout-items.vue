@@ -40,7 +40,24 @@
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {{ $t('gestion.ticketing.assign_handout_items_title') }}
           </h2>
-          <UTabs v-model="activeAudienceTab" :items="audienceTabs" variant="link">
+          <!-- Sur un écran étroit, sept cibles ne tiennent pas côte à côte : un select prend
+               le relais, comme sur le résumé des bénévoles. Les deux pilotent le même état, si
+               bien qu'un changement de largeur ne fait pas perdre la cible en cours.
+               Ici seule la barre d'onglets est masquée, pas le composant : ce sont ses propres
+               panneaux qui portent le contenu. -->
+          <USelect
+            v-model="activeAudienceTab"
+            :items="audienceTabsPourSelect"
+            value-key="value"
+            :icon="audienceTabCourant?.icon"
+            class="w-full sm:hidden mb-4"
+          />
+          <UTabs
+            v-model="activeAudienceTab"
+            :items="audienceTabs"
+            variant="link"
+            :ui="{ list: 'hidden sm:flex' }"
+          >
             <template #tiers>
               <div v-if="loadingTiers" class="text-center py-6">
                 <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
@@ -705,6 +722,14 @@ const activeAudienceTab = computed({
     router.replace({ hash: `#${tab}` })
   },
 })
+
+// Le select ne reprend que ce qu'il affiche ; l'icône est celle de la cible courante.
+const audienceTabsPourSelect = computed(() =>
+  audienceTabs.value.map(({ value, label }) => ({ value, label }))
+)
+const audienceTabCourant = computed(() =>
+  audienceTabs.value.find((tab) => tab.value === activeAudienceTab.value)
+)
 
 // Items à remettre
 const loadingHandoutItems = ref(true)

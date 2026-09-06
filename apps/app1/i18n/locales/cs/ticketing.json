@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "Surová data HelloAsso byla načtena",
       "tiers_load_error": "Nelze načíst tarify",
       "tiers_loaded": "Tarify načteny",
-      "tiers_loaded_description": "Nalezeno {tiers} tarifů, {options} možností a {fields} vlastních polí"
+      "tiers_loaded_description": "Nalezeno {tiers} tarifů, {options} možností a {fields} vlastních polí",
+      "view_loaded_data": "Zobrazit načtená data"
     },
     "handout_items": {
       "list": {

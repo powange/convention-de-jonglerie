@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "HelloAsso-Rohdaten wurden abgerufen",
       "tiers_load_error": "Tarife konnten nicht geladen werden",
       "tiers_loaded": "Tarife geladen",
-      "tiers_loaded_description": "{tiers} Tarif(e), {options} Option(en) und {fields} benutzerdefinierte(s) Feld(er) gefunden"
+      "tiers_loaded_description": "{tiers} Tarif(e), {options} Option(en) und {fields} benutzerdefinierte(s) Feld(er) gefunden",
+      "view_loaded_data": "Geladene Daten ansehen"
     },
     "handout_items": {
       "list": {

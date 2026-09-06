@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "HelloAsso rådata har hämtats",
       "tiers_load_error": "Kan inte ladda priser",
       "tiers_loaded": "Priser laddade",
-      "tiers_loaded_description": "{tiers} pris(er), {options} alternativ och {fields} anpassade fält hittade"
+      "tiers_loaded_description": "{tiers} pris(er), {options} alternativ och {fields} anpassade fält hittade",
+      "view_loaded_data": "Visa inlästa data"
     },
     "handout_items": {
       "list": {

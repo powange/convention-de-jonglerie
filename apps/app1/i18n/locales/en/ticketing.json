@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "HelloAsso raw data has been retrieved",
       "tiers_load_error": "Unable to load tiers",
       "tiers_loaded": "Tiers loaded",
-      "tiers_loaded_description": "{tiers} tier(s), {options} option(s) and {fields} custom field(s) found"
+      "tiers_loaded_description": "{tiers} tier(s), {options} option(s) and {fields} custom field(s) found",
+      "view_loaded_data": "View loaded data"
     },
     "handout_items": {
       "list": {
