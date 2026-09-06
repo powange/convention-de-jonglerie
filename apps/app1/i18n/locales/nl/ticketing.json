@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "HelloAsso ruwe gegevens zijn opgehaald",
       "tiers_load_error": "Kan tarieven niet laden",
       "tiers_loaded": "Tarieven geladen",
-      "tiers_loaded_description": "{tiers} tarief(ven), {options} optie(s) en {fields} aangepast(e) veld(en) gevonden"
+      "tiers_loaded_description": "{tiers} tarief(ven), {options} optie(s) en {fields} aangepast(e) veld(en) gevonden",
+      "view_loaded_data": "Geladen gegevens bekijken"
     },
     "handout_items": {
       "list": {

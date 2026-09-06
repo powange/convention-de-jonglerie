@@ -354,333 +354,357 @@
                 </div>
               </div>
 
-              <!-- Sur un écran étroit, quatre onglets ne tiennent pas côte à côte — « Champs
-                   personnalisés » à lui seul occupe la moitié de la largeur. Un select prend le
-                   relais et pilote le même état. Seule la barre est masquée, pas le composant :
-                   ce sont ses panneaux qui portent le contenu. -->
-              <USelect
-                v-if="tiersLoaded || ordersLoaded"
-                v-model="ongletActif"
-                :items="itemsPourSelect"
-                value-key="value"
-                :icon="ongletCourant?.icon"
-                class="w-full sm:hidden mb-4"
-              />
-              <UTabs
-                v-if="tiersLoaded || ordersLoaded"
-                v-model="ongletActif"
-                :items="items"
-                variant="link"
-                :ui="{ trigger: 'grow', list: 'hidden sm:flex' }"
-                class="gap-4 w-full"
+              <!-- Les tarifs, options et participants chargés depuis HelloAsso tiennent mal
+                   dans cette carte : leurs tableaux ont besoin de toute la largeur. Ils
+                   s'affichent donc dans une modale plein écran, ouverte à la fin du chargement
+                   et rouvrable ensuite. -->
+              <div v-if="tiersLoaded || ordersLoaded" class="flex justify-end">
+                <UButton
+                  color="primary"
+                  variant="soft"
+                  icon="i-heroicons-arrows-pointing-out"
+                  size="lg"
+                  @click="resultatsOuverts = true"
+                >
+                  {{ $t('ticketing.external.view_loaded_data') }}
+                </UButton>
+              </div>
+
+              <UModal
+                v-model:open="resultatsOuverts"
+                fullscreen
+                :title="$t('edition.ticketing.tiers_options_participants')"
               >
-                <template #tarifs>
-                  <!-- Affichage des tarifs -->
-                  <div v-if="loadedTiers && loadedTiers.length > 0" class="space-y-3">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div
-                        v-for="tier in loadedTiers"
-                        :key="tier.id"
-                        class="group relative bg-white dark:bg-gray-800 rounded-lg border-2 p-4 transition-all"
-                        :class="
-                          tier.isActive
-                            ? 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
-                            : 'border-gray-100 dark:border-gray-800 opacity-60'
-                        "
-                      >
-                        <!-- Badge statut -->
-                        <UBadge
-                          v-if="!tier.isActive"
-                          color="neutral"
-                          variant="soft"
-                          size="xs"
-                          class="absolute top-3 right-3"
-                        >
-                          Inactif
-                        </UBadge>
-
-                        <div class="space-y-3">
-                          <!-- Nom et prix -->
-                          <div>
-                            <h5 class="font-semibold text-base text-gray-900 dark:text-white">
-                              {{ tier.name }}
-                            </h5>
-                            <div class="mt-1 flex items-baseline gap-1">
-                              <span
-                                class="text-2xl font-bold"
-                                :class="
-                                  tier.isActive
-                                    ? 'text-primary-600 dark:text-primary-400'
-                                    : 'text-gray-400 dark:text-gray-600'
-                                "
-                              >
-                                {{ (tier.price / 100).toFixed(2) }}
-                              </span>
-                              <span class="text-sm text-gray-500">{{ symbol }}</span>
-                            </div>
-                          </div>
-
-                          <!-- Description -->
-                          <p
-                            v-if="tier.description"
-                            class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2"
+                <template #body>
+                  <!-- Sur un écran étroit, quatre onglets ne tiennent pas côte à côte — « Champs
+                       personnalisés » à lui seul occupe la moitié de la largeur. Un select prend le
+                       relais et pilote le même état. Seule la barre est masquée, pas le composant :
+                       ce sont ses panneaux qui portent le contenu. -->
+                  <USelect
+                    v-if="tiersLoaded || ordersLoaded"
+                    v-model="ongletActif"
+                    :items="itemsPourSelect"
+                    value-key="value"
+                    :icon="ongletCourant?.icon"
+                    class="w-full sm:hidden mb-4"
+                  />
+                  <UTabs
+                    v-if="tiersLoaded || ordersLoaded"
+                    v-model="ongletActif"
+                    :items="items"
+                    variant="link"
+                    :ui="{ trigger: 'grow', list: 'hidden sm:flex' }"
+                    class="gap-4 w-full"
+                  >
+                    <template #tarifs>
+                      <!-- Affichage des tarifs -->
+                      <div v-if="loadedTiers && loadedTiers.length > 0" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div
+                            v-for="tier in loadedTiers"
+                            :key="tier.id"
+                            class="group relative bg-white dark:bg-gray-800 rounded-lg border-2 p-4 transition-all"
+                            :class="
+                              tier.isActive
+                                ? 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700'
+                                : 'border-gray-100 dark:border-gray-800 opacity-60'
+                            "
                           >
-                            {{ tier.description }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </template>
+                            <!-- Badge statut -->
+                            <UBadge
+                              v-if="!tier.isActive"
+                              color="neutral"
+                              variant="soft"
+                              size="xs"
+                              class="absolute top-3 right-3"
+                            >
+                              Inactif
+                            </UBadge>
 
-                <template #options>
-                  <!-- Affichage des options -->
-                  <div v-if="loadedOptions && loadedOptions.length > 0" class="space-y-3">
-                    <div class="space-y-2">
-                      <div
-                        v-for="option in loadedOptions"
-                        :key="option.id"
-                        class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
-                      >
-                        <div class="flex items-start justify-between gap-4">
-                          <!-- Contenu principal -->
-                          <div class="flex-1 min-w-0">
-                            <!-- En-tête -->
-                            <div class="flex items-start gap-2 mb-2">
-                              <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                  <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
-                                    {{ option.name }}
-                                  </h5>
+                            <div class="space-y-3">
+                              <!-- Nom et prix -->
+                              <div>
+                                <h5 class="font-semibold text-base text-gray-900 dark:text-white">
+                                  {{ tier.name }}
+                                </h5>
+                                <div class="mt-1 flex items-baseline gap-1">
                                   <span
-                                    v-if="option.price"
-                                    class="text-sm font-semibold text-primary-600 dark:text-primary-400"
+                                    class="text-2xl font-bold"
+                                    :class="
+                                      tier.isActive
+                                        ? 'text-primary-600 dark:text-primary-400'
+                                        : 'text-gray-400 dark:text-gray-600'
+                                    "
                                   >
-                                    + {{ money(option.price) }}
+                                    {{ (tier.price / 100).toFixed(2) }}
                                   </span>
+                                  <span class="text-sm text-gray-500">{{ symbol }}</span>
                                 </div>
-                                <p
-                                  v-if="option.description"
-                                  class="text-xs text-gray-600 dark:text-gray-400 mt-0.5"
-                                >
-                                  {{ option.description }}
-                                </p>
                               </div>
-                            </div>
 
-                            <!-- Choix disponibles -->
-                            <div
-                              v-if="option.choices && option.choices.length > 0"
-                              class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
-                            >
-                              <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                Choix disponibles :
-                              </div>
-                              <div class="flex flex-wrap gap-1.5">
-                                <UBadge
-                                  v-for="(choice, idx) in option.choices"
-                                  :key="idx"
-                                  color="neutral"
-                                  variant="subtle"
-                                  size="sm"
-                                >
-                                  {{ choice }}
-                                </UBadge>
-                              </div>
+                              <!-- Description -->
+                              <p
+                                v-if="tier.description"
+                                class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2"
+                              >
+                                {{ tier.description }}
+                              </p>
                             </div>
-                          </div>
-
-                          <!-- Badges latéraux -->
-                          <div class="flex flex-col gap-2 items-end flex-shrink-0">
-                            <UBadge color="primary" variant="soft" size="sm">
-                              {{ option.type }}
-                            </UBadge>
-                            <UBadge
-                              v-if="option.isRequired"
-                              color="warning"
-                              variant="soft"
-                              size="sm"
-                            >
-                              Obligatoire
-                            </UBadge>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </template>
+                    </template>
 
-                <template #customFields>
-                  <!-- Affichage des custom fields -->
-                  <div v-if="loadedCustomFields && loadedCustomFields.length > 0" class="space-y-3">
-                    <div class="space-y-2">
-                      <div
-                        v-for="customField in loadedCustomFields"
-                        :key="customField.id"
-                        class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-purple-300 dark:hover:border-purple-700 transition-colors"
-                      >
-                        <div class="flex items-start justify-between gap-4">
-                          <!-- Contenu principal -->
-                          <div class="flex-1 min-w-0">
-                            <!-- En-tête -->
-                            <div class="flex items-start gap-2 mb-2">
-                              <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                  <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
-                                    {{ customField.label }}
-                                  </h5>
-                                </div>
-                              </div>
-                            </div>
-
-                            <!-- Tarifs associés -->
-                            <div
-                              v-if="customField.tiers && customField.tiers.length > 0"
-                              class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
-                            >
-                              <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                Tarifs concernés :
-                              </div>
-                              <div class="flex flex-wrap gap-1.5">
-                                <UBadge
-                                  v-for="tier in customField.tiers"
-                                  :key="tier"
-                                  color="neutral"
-                                  variant="subtle"
-                                  size="sm"
-                                >
-                                  {{ tier }}
-                                </UBadge>
-                              </div>
-                            </div>
-
-                            <!-- Valeurs disponibles -->
-                            <div
-                              v-if="customField.values && customField.values.length > 0"
-                              class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
-                            >
-                              <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                Valeurs possibles :
-                              </div>
-                              <div class="flex flex-wrap gap-1.5">
-                                <UBadge
-                                  v-for="(value, idx) in customField.values"
-                                  :key="idx"
-                                  color="primary"
-                                  variant="subtle"
-                                  size="sm"
-                                >
-                                  {{ value }}
-                                </UBadge>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Badges latéraux -->
-                          <div class="flex flex-col gap-2 items-end flex-shrink-0">
-                            <UBadge color="purple" variant="soft" size="sm">
-                              {{ customField.type }}
-                            </UBadge>
-                            <UBadge
-                              v-if="customField.isRequired"
-                              color="warning"
-                              variant="soft"
-                              size="sm"
-                            >
-                              Obligatoire
-                            </UBadge>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </template>
-
-                <template #participants>
-                  <!-- Affichage des participants -->
-                  <div v-if="loadedOrders && loadedOrders.length > 0" class="space-y-3">
-                    <div class="space-y-4">
-                      <div
-                        v-for="order in loadedOrders"
-                        :key="order.id"
-                        class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
-                      >
-                        <!-- En-tête de la commande -->
-                        <div
-                          class="flex items-start justify-between mb-3 pb-3 border-b border-gray-200 dark:border-gray-700"
-                        >
-                          <div>
-                            <div class="flex items-center gap-2">
-                              <UIcon
-                                name="i-heroicons-shopping-cart"
-                                class="h-5 w-5 text-primary-600 dark:text-primary-400"
-                              />
-                              <h5 class="font-semibold text-base text-gray-900 dark:text-white">
-                                {{ order.payer.firstName }} {{ order.payer.lastName }}
-                              </h5>
-                            </div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                              {{ order.payer.email }}
-                            </p>
-                          </div>
-                          <UBadge color="success" variant="soft">
-                            {{ order.items.length }}
-                            {{ order.items.length > 1 ? 'billets' : 'billet' }}
-                          </UBadge>
-                        </div>
-
-                        <!-- Items de la commande -->
+                    <template #options>
+                      <!-- Affichage des options -->
+                      <div v-if="loadedOptions && loadedOptions.length > 0" class="space-y-3">
                         <div class="space-y-2">
                           <div
-                            v-for="item in order.items"
-                            :key="item.id"
-                            class="flex items-start justify-between gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50"
+                            v-for="option in loadedOptions"
+                            :key="option.id"
+                            class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
                           >
-                            <div class="flex-1 min-w-0">
-                              <div class="flex items-center gap-2 mb-1">
-                                <UIcon name="i-heroicons-ticket" class="h-4 w-4 text-gray-500" />
-                                <span class="font-medium text-sm text-gray-900 dark:text-white">
-                                  {{ item.name || item.type + ' - ' + item.priceCategory }}
-                                </span>
-                              </div>
-                              <div
-                                v-if="item.user"
-                                class="text-xs text-gray-600 dark:text-gray-400"
-                              >
-                                {{ item.user.firstName }} {{ item.user.lastName }}
-                                <span v-if="item.user.email" class="ml-1"
-                                  >({{ item.user.email }})</span
+                            <div class="flex items-start justify-between gap-4">
+                              <!-- Contenu principal -->
+                              <div class="flex-1 min-w-0">
+                                <!-- En-tête -->
+                                <div class="flex items-start gap-2 mb-2">
+                                  <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                      <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                                        {{ option.name }}
+                                      </h5>
+                                      <span
+                                        v-if="option.price"
+                                        class="text-sm font-semibold text-primary-600 dark:text-primary-400"
+                                      >
+                                        + {{ money(option.price) }}
+                                      </span>
+                                    </div>
+                                    <p
+                                      v-if="option.description"
+                                      class="text-xs text-gray-600 dark:text-gray-400 mt-0.5"
+                                    >
+                                      {{ option.description }}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <!-- Choix disponibles -->
+                                <div
+                                  v-if="option.choices && option.choices.length > 0"
+                                  class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
                                 >
+                                  <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                    Choix disponibles :
+                                  </div>
+                                  <div class="flex flex-wrap gap-1.5">
+                                    <UBadge
+                                      v-for="(choice, idx) in option.choices"
+                                      :key="idx"
+                                      color="neutral"
+                                      variant="subtle"
+                                      size="sm"
+                                    >
+                                      {{ choice }}
+                                    </UBadge>
+                                  </div>
+                                </div>
                               </div>
-                              <div
-                                v-if="item.qrCode"
-                                class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono"
-                              >
-                                QR: {{ item.qrCode }}
+
+                              <!-- Badges latéraux -->
+                              <div class="flex flex-col gap-2 items-end flex-shrink-0">
+                                <UBadge color="primary" variant="soft" size="sm">
+                                  {{ option.type }}
+                                </UBadge>
+                                <UBadge
+                                  v-if="option.isRequired"
+                                  color="warning"
+                                  variant="soft"
+                                  size="sm"
+                                >
+                                  Obligatoire
+                                </UBadge>
                               </div>
-                            </div>
-                            <div class="text-right flex-shrink-0">
-                              <div
-                                class="font-semibold text-sm text-primary-600 dark:text-primary-400"
-                              >
-                                {{ money(item.amount) }}
-                              </div>
-                              <UBadge
-                                :color="item.state === 'Processed' ? 'success' : 'neutral'"
-                                variant="subtle"
-                                size="xs"
-                                class="mt-1"
-                              >
-                                {{ item.state }}
-                              </UBadge>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </template>
+
+                    <template #customFields>
+                      <!-- Affichage des custom fields -->
+                      <div v-if="loadedCustomFields && loadedCustomFields.length > 0" class="space-y-3">
+                        <div class="space-y-2">
+                          <div
+                            v-for="customField in loadedCustomFields"
+                            :key="customField.id"
+                            class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:border-purple-300 dark:hover:border-purple-700 transition-colors"
+                          >
+                            <div class="flex items-start justify-between gap-4">
+                              <!-- Contenu principal -->
+                              <div class="flex-1 min-w-0">
+                                <!-- En-tête -->
+                                <div class="flex items-start gap-2 mb-2">
+                                  <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                      <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                                        {{ customField.label }}
+                                      </h5>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <!-- Tarifs associés -->
+                                <div
+                                  v-if="customField.tiers && customField.tiers.length > 0"
+                                  class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
+                                >
+                                  <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                    Tarifs concernés :
+                                  </div>
+                                  <div class="flex flex-wrap gap-1.5">
+                                    <UBadge
+                                      v-for="tier in customField.tiers"
+                                      :key="tier"
+                                      color="neutral"
+                                      variant="subtle"
+                                      size="sm"
+                                    >
+                                      {{ tier }}
+                                    </UBadge>
+                                  </div>
+                                </div>
+
+                                <!-- Valeurs disponibles -->
+                                <div
+                                  v-if="customField.values && customField.values.length > 0"
+                                  class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700"
+                                >
+                                  <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                    Valeurs possibles :
+                                  </div>
+                                  <div class="flex flex-wrap gap-1.5">
+                                    <UBadge
+                                      v-for="(value, idx) in customField.values"
+                                      :key="idx"
+                                      color="primary"
+                                      variant="subtle"
+                                      size="sm"
+                                    >
+                                      {{ value }}
+                                    </UBadge>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <!-- Badges latéraux -->
+                              <div class="flex flex-col gap-2 items-end flex-shrink-0">
+                                <UBadge color="purple" variant="soft" size="sm">
+                                  {{ customField.type }}
+                                </UBadge>
+                                <UBadge
+                                  v-if="customField.isRequired"
+                                  color="warning"
+                                  variant="soft"
+                                  size="sm"
+                                >
+                                  Obligatoire
+                                </UBadge>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+
+                    <template #participants>
+                      <!-- Affichage des participants -->
+                      <div v-if="loadedOrders && loadedOrders.length > 0" class="space-y-3">
+                        <div class="space-y-4">
+                          <div
+                            v-for="order in loadedOrders"
+                            :key="order.id"
+                            class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
+                          >
+                            <!-- En-tête de la commande -->
+                            <div
+                              class="flex items-start justify-between mb-3 pb-3 border-b border-gray-200 dark:border-gray-700"
+                            >
+                              <div>
+                                <div class="flex items-center gap-2">
+                                  <UIcon
+                                    name="i-heroicons-shopping-cart"
+                                    class="h-5 w-5 text-primary-600 dark:text-primary-400"
+                                  />
+                                  <h5 class="font-semibold text-base text-gray-900 dark:text-white">
+                                    {{ order.payer.firstName }} {{ order.payer.lastName }}
+                                  </h5>
+                                </div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                  {{ order.payer.email }}
+                                </p>
+                              </div>
+                              <UBadge color="success" variant="soft">
+                                {{ order.items.length }}
+                                {{ order.items.length > 1 ? 'billets' : 'billet' }}
+                              </UBadge>
+                            </div>
+
+                            <!-- Items de la commande -->
+                            <div class="space-y-2">
+                              <div
+                                v-for="item in order.items"
+                                :key="item.id"
+                                class="flex items-start justify-between gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50"
+                              >
+                                <div class="flex-1 min-w-0">
+                                  <div class="flex items-center gap-2 mb-1">
+                                    <UIcon name="i-heroicons-ticket" class="h-4 w-4 text-gray-500" />
+                                    <span class="font-medium text-sm text-gray-900 dark:text-white">
+                                      {{ item.name || item.type + ' - ' + item.priceCategory }}
+                                    </span>
+                                  </div>
+                                  <div
+                                    v-if="item.user"
+                                    class="text-xs text-gray-600 dark:text-gray-400"
+                                  >
+                                    {{ item.user.firstName }} {{ item.user.lastName }}
+                                    <span v-if="item.user.email" class="ml-1"
+                                      >({{ item.user.email }})</span
+                                    >
+                                  </div>
+                                  <div
+                                    v-if="item.qrCode"
+                                    class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono"
+                                  >
+                                    QR: {{ item.qrCode }}
+                                  </div>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                  <div
+                                    class="font-semibold text-sm text-primary-600 dark:text-primary-400"
+                                  >
+                                    {{ money(item.amount) }}
+                                  </div>
+                                  <UBadge
+                                    :color="item.state === 'Processed' ? 'success' : 'neutral'"
+                                    variant="subtle"
+                                    size="xs"
+                                    class="mt-1"
+                                  >
+                                    {{ item.state }}
+                                  </UBadge>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </UTabs>
                 </template>
-              </UTabs>
+              </UModal>
 
               <!-- Message si aucune donnée chargée -->
               <div
@@ -1008,6 +1032,8 @@ const { execute: executeLoadTiers, loading: loadingTiers } = useApiAction<
     }
     loadedCustomFields.value = Array.from(customFieldsMap.values())
     tiersLoaded.value = true
+    ongletActif.value = 'tarifs'
+    resultatsOuverts.value = true
 
     toast.add({
       title: $t('ticketing.external.tiers_loaded'),
@@ -1455,6 +1481,8 @@ const { execute: executeLoadOrders, loading: loadingOrders } = useApiAction<
     loadedOrders.value = response.orders || []
     ordersStats.value = response.stats || { totalOrders: 0, totalItems: 0 }
     ordersLoaded.value = true
+    ongletActif.value = 'participants'
+    resultatsOuverts.value = true
 
     toast.add({
       title: $t('ticketing.external.participants_loaded'),
@@ -1507,6 +1535,10 @@ const loadRawHelloAssoJson = () => {
 
 // Onglet courant : partagé avec le select qui prend le relais sur écran étroit.
 const ongletActif = ref('tarifs')
+
+// Les résultats chargés depuis HelloAsso s'affichent dans une modale plein écran : leurs
+// tableaux ne tiennent pas dans la carte dès que l'écran se réduit.
+const resultatsOuverts = ref(false)
 
 const items = computed(
   () =>

@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "Os dados brutos do HelloAsso foram recuperados",
       "tiers_load_error": "Não foi possível carregar as tarifas",
       "tiers_loaded": "Tarifas carregadas",
-      "tiers_loaded_description": "{tiers} tarifa(s), {options} opção(ões) e {fields} campo(s) personalizado(s) encontrado(s)"
+      "tiers_loaded_description": "{tiers} tarifa(s), {options} opção(ões) e {fields} campo(s) personalizado(s) encontrado(s)",
+      "view_loaded_data": "Ver os dados carregados"
     },
     "handout_items": {
       "list": {

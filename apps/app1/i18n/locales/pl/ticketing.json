@@ -92,7 +92,8 @@
       "raw_json_loaded_description": "Surowe dane HelloAsso zostały pobrane",
       "tiers_load_error": "Nie można załadować taryf",
       "tiers_loaded": "Taryfy załadowane",
-      "tiers_loaded_description": "Znaleziono {tiers} taryf, {options} opcji i {fields} pól niestandardowych"
+      "tiers_loaded_description": "Znaleziono {tiers} taryf, {options} opcji i {fields} pól niestandardowych",
+      "view_loaded_data": "Zobacz wczytane dane"
     },
     "handout_items": {
       "list": {
