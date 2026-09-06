@@ -98,13 +98,16 @@
                 <div v-if="edition" class="flex items-center gap-3">
                   <img
                     v-if="edition.imageUrl"
-                    :src="getImageUrl(edition.imageUrl, 'edition', edition.id)"
+                    :src="getImageUrl(edition.imageUrl, 'edition', edition.id) ?? undefined"
                     :alt="getEditionDisplayName(edition)"
                     class="h-10 w-auto rounded object-contain"
                   />
                   <img
                     v-else-if="edition.convention?.logo"
-                    :src="getImageUrl(edition.convention.logo, 'convention', edition.convention.id)"
+                    :src="
+                      getImageUrl(edition.convention.logo, 'convention', edition.convention.id) ??
+                      undefined
+                    "
                     :alt="edition.convention.name"
                     class="h-8 w-8 rounded object-cover"
                   />
@@ -311,7 +314,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.overview'),
       icon: 'i-heroicons-home',
       to: `/editions/${editionId.value}/gestion`,
-      tooltip: { content: t('gestion.overview') },
+      tooltip: { text: t('gestion.overview') },
     },
   ]
 
@@ -327,7 +330,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.convention.title'),
       icon: 'i-heroicons-building-library',
       to: `/editions/${editionId.value}/gestion/convention`,
-      tooltip: { content: t('gestion.convention.title') },
+      tooltip: { text: t('gestion.convention.title') },
     })
   }
 
@@ -401,7 +404,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('organizers.title'),
       icon: 'i-heroicons-user-group',
       to: `/editions/${editionId.value}/gestion/organizers`,
-      tooltip: { content: t('organizers.title') },
+      tooltip: { text: t('organizers.title') },
     })
   }
 
@@ -621,7 +624,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.workshops.title'),
       icon: 'i-heroicons-academic-cap',
       to: `/editions/${editionId.value}/gestion/workshops`,
-      tooltip: { content: t('gestion.workshops.title') },
+      tooltip: { text: t('gestion.workshops.title') },
     })
   }
 
@@ -631,7 +634,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('edition.tasks'),
       icon: 'i-heroicons-clipboard-document-check',
       to: `/editions/${editionId.value}/gestion/tasks`,
-      tooltip: { content: t('edition.tasks') },
+      tooltip: { text: t('edition.tasks') },
     })
   }
 
@@ -641,7 +644,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.stock.title'),
       icon: 'i-heroicons-archive-box',
       to: `/editions/${editionId.value}/gestion/stock`,
-      tooltip: { content: t('gestion.stock.title') },
+      tooltip: { text: t('gestion.stock.title') },
     })
   }
 
@@ -653,7 +656,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.treasury.title'),
       icon: 'i-heroicons-calculator',
       to: `/editions/${editionId.value}/gestion/treasury`,
-      tooltip: { content: t('gestion.treasury.title') },
+      tooltip: { text: t('gestion.treasury.title') },
     })
   }
 
@@ -674,7 +677,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('gestion.faq.title'),
       icon: 'i-heroicons-question-mark-circle',
       to: `/editions/${editionId.value}/gestion/faq`,
-      tooltip: { content: t('gestion.faq.title') },
+      tooltip: { text: t('gestion.faq.title') },
     })
   }
 
@@ -685,7 +688,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       label: t('edition.lost_found'),
       icon: 'i-heroicons-magnifying-glass',
       to: `/editions/${editionId.value}/gestion/lost-found`,
-      tooltip: { content: t('edition.lost_found') },
+      tooltip: { text: t('edition.lost_found') },
     })
   }
 
