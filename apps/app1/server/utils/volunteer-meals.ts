@@ -55,9 +55,11 @@ export function getAvailableMealsOnDeparture(timeOfDay: string | undefined): Vol
 export function isVolunteerEligibleForMeal(
   meal: { date: Date; mealType: VolunteerMealType; phases: string[] },
   volunteer: {
-    setupAvailability: boolean
-    teardownAvailability: boolean
-    eventAvailability: boolean
+    // Nullable en base : une disponibilité jamais renseignée vaut `null`, que les tests
+    // ci-dessous traitent déjà comme « non disponible ».
+    setupAvailability: boolean | null
+    teardownAvailability: boolean | null
+    eventAvailability: boolean | null
     arrivalDateTime: string | null
     departureDateTime: string | null
   }
@@ -85,7 +87,7 @@ export function isVolunteerEligibleForMeal(
   if (volunteer.arrivalDateTime) {
     // Format: YYYY-MM-DD_timeOfDay
     const [arrivalDatePart, arrivalTimeOfDay] = volunteer.arrivalDateTime.split('_')
-    const arrivalDate = new Date(arrivalDatePart)
+    const arrivalDate = new Date(arrivalDatePart ?? '')
     arrivalDate.setUTCHours(0, 0, 0, 0)
 
     if (mealDate < arrivalDate) return false
@@ -100,7 +102,7 @@ export function isVolunteerEligibleForMeal(
   if (volunteer.departureDateTime) {
     // Format: YYYY-MM-DD_timeOfDay
     const [departureDatePart, departureTimeOfDay] = volunteer.departureDateTime.split('_')
-    const departureDate = new Date(departureDatePart)
+    const departureDate = new Date(departureDatePart ?? '')
     departureDate.setUTCHours(0, 0, 0, 0)
 
     if (mealDate > departureDate) return false
@@ -133,7 +135,7 @@ export function isArtistEligibleForMeal(
   if (artist.arrivalDateTime) {
     // Format: YYYY-MM-DD_timeOfDay
     const [arrivalDatePart, arrivalTimeOfDay] = artist.arrivalDateTime.split('_')
-    const arrivalDate = new Date(arrivalDatePart)
+    const arrivalDate = new Date(arrivalDatePart ?? '')
     arrivalDate.setUTCHours(0, 0, 0, 0)
 
     if (mealDate < arrivalDate) return false
@@ -148,7 +150,7 @@ export function isArtistEligibleForMeal(
   if (artist.departureDateTime) {
     // Format: YYYY-MM-DD_timeOfDay
     const [departureDatePart, departureTimeOfDay] = artist.departureDateTime.split('_')
-    const departureDate = new Date(departureDatePart)
+    const departureDate = new Date(departureDatePart ?? '')
     departureDate.setUTCHours(0, 0, 0, 0)
 
     if (mealDate > departureDate) return false
