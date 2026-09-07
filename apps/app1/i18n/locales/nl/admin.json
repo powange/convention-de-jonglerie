@@ -643,7 +643,7 @@
     "role": "Rol",
     "search_conventions_placeholder": "Zoek op naam, beschrijving, maker...",
     "search_error_messages": "Zoeken in foutmeldingen...",
-    "search_users_placeholder": "Zoeken op e-mail, gebruikersnaam, voornaam of achternaam...",
+    "search_users_placeholder": "Zoeken op ID, e-mail, gebruikersnaam, voor- of achternaam...",
     "select_deletion_reason": "Selecteer een reden voor verwijdering",
     "show_applications": "Showaanvragen",
     "show_online_users_only": "Alleen online gebruikers tonen",

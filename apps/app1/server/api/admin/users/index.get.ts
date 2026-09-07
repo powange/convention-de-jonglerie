@@ -21,8 +21,17 @@ export default wrapApiHandler(
 
     // Filtrage par recherche textuelle
     if (search) {
+      // Une recherche entièrement numérique vise aussi l'identifiant : c'est ce dont on
+      // dispose quand on arrive depuis un journal d'erreurs ou une trace, et le chercher
+      // par pseudo demanderait de le connaître. Le champ reste inclus dans le `OR` : « 42 »
+      // trouve l'utilisateur 42 comme celui dont le pseudo contient 42.
+      const identifiant = /^\d+$/.test(search.trim()) ? Number(search.trim()) : null
+
       andConditions.push({
         OR: [
+          ...(identifiant !== null && Number.isSafeInteger(identifiant)
+            ? [{ id: identifiant }]
+            : []),
           { email: { contains: search } },
           { pseudo: { contains: search } },
           { nom: { contains: search } },

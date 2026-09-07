@@ -643,7 +643,7 @@
     "role": "Rolle",
     "search_conventions_placeholder": "Søg efter navn, beskrivelse, skaber...",
     "search_error_messages": "Søg i fejlmeddelelser...",
-    "search_users_placeholder": "Søg via email, brugernavn, fornavn eller efternavn...",
+    "search_users_placeholder": "Søg efter ID, e-mail, brugernavn, for- eller efternavn...",
     "select_deletion_reason": "Vælg en årsag til sletning",
     "show_applications": "Showansøgninger",
     "show_online_users_only": "Vis kun onlinebrugere",

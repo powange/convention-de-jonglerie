@@ -643,7 +643,7 @@
     "role": "Role",
     "search_conventions_placeholder": "Vyhledávání podle názvu, popisu, tvůrce...",
     "search_error_messages": "Vyhledávání chybových zpráv...",
-    "search_users_placeholder": "Vyhledávání podle e-mailu, uživatelského jména, jména nebo příjmení...",
+    "search_users_placeholder": "Hledat podle ID, e-mailu, přezdívky, jména nebo příjmení...",
     "select_deletion_reason": "Vyberte si důvod",
     "show_applications": "Přihlášky na vystoupení",
     "show_online_users_only": "Zobrazit pouze online uživatele",

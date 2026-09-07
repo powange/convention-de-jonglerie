@@ -333,7 +333,15 @@
 
             <!-- Utilisateur -->
             <template #user-cell="{ row }">
-              <span v-if="row.original.user" class="text-sm">{{ row.original.user.pseudo }}</span>
+              <!-- Lien vers la fiche : la recherche des utilisateurs accepte l'identifiant, ce
+                   qui évite d'avoir à retrouver quelqu'un par son pseudo depuis une erreur. -->
+              <ULink
+                v-if="row.original.user"
+                :to="`/admin/users?search=${row.original.user.id}`"
+                class="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+              >
+                {{ row.original.user.pseudo }}
+              </ULink>
               <span v-else class="text-sm italic text-gray-400">
                 {{ $t('admin.error_logs.anonymous') }}
               </span>

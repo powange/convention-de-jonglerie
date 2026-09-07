@@ -643,7 +643,7 @@
     "role": "Role",
     "search_conventions_placeholder": "Search by name, description, creator...",
     "search_error_messages": "Search in error messages...",
-    "search_users_placeholder": "Search by email, username, first name or last name...",
+    "search_users_placeholder": "Search by ID, email, username, first or last name...",
     "select_deletion_reason": "Choose a reason",
     "show_applications": "Show applications",
     "show_online_users_only": "Show online users only",
