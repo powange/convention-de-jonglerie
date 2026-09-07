@@ -71,3 +71,56 @@ describe('convertirRaccourcisEmoji', () => {
     expect(await convertirRaccourcisEmoji('')).toBe('')
   })
 })
+
+/**
+ * Markdown n'a pas de soulignement — ni CommonMark ni GFM —, mais l'éditeur en propose un et
+ * l'enregistre en `++texte++` : c'est ce qu'écrit l'extension Underline de Tiptap. Sans
+ * conversion au rendu, le lecteur voyait les `++` en toutes lettres, ce qui est arrivé : la
+ * description de plusieurs éditions en contient déjà.
+ */
+describe('soulignement', () => {
+  it('convertit `++texte++`', async () => {
+    expect(await markdownToHtml('++souligné++')).toContain('<u>souligné</u>')
+  })
+
+  it('en convertit plusieurs sur la même ligne', async () => {
+    const html = await markdownToHtml('a ++b++ c ++d++ e')
+    expect(html).toContain('a <u>b</u> c <u>d</u> e')
+  })
+
+  it('respecte le gras qui l’entoure', async () => {
+    // C'est l'ordre qu'écrit Tiptap quand les deux marques se cumulent : le souligné à
+    // l'intérieur. Le vérifier ici, c'est vérifier que le cas courant passe.
+    expect(await markdownToHtml('**++gras souligné++**')).toContain(
+      '<strong><u>gras souligné</u></strong>'
+    )
+  })
+
+  it('fonctionne dans un lien', async () => {
+    expect(await markdownToHtml('[++lien++](https://exemple.fr)')).toContain('<u>lien</u>')
+  })
+
+  it('laisse le code littéral', async () => {
+    // Une documentation qui montre `++x++` parle de la syntaxe elle-même.
+    expect(await markdownToHtml('Tapez `++x++`')).toContain('<code>++x++</code>')
+  })
+
+  it('ne touche pas à un `++` isolé', async () => {
+    // Sans marque fermante, il n'y a rien à souligner — et « 1 + 1 ++ 2 » doit rester lisible.
+    expect(await markdownToHtml('1 + 1 ++ 2')).toContain('1 + 1 ++ 2')
+  })
+
+  it('ne souligne pas un texte qui contient des `++` par hasard', async () => {
+    // « C++ et C++ » serait devenu « C<u> et C</u> ». L'éditeur ne colle jamais d'espace à ses
+    // marques, donc ce garde n'écarte que ce qu'il n'a pas écrit.
+    const html = await markdownToHtml('C++ et C++ sont deux langages')
+    expect(html).toContain('C++ et C++ sont deux langages')
+    expect(html).not.toContain('<u>')
+  })
+
+  it('laisse tel quel un soulignement enjambant une autre marque', async () => {
+    // Limite assumée : la conversion opère sur un nœud de texte, et `++**gras**++` en occupe
+    // trois. Le cas ne vient pas de l'éditeur, qui écrit l'ordre inverse.
+    expect(await markdownToHtml('++**gras**++')).toContain('++<strong>gras</strong>++')
+  })
+})

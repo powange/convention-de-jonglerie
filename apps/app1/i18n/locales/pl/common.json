@@ -88,7 +88,8 @@
       "link_tooltip": "Wstaw link (Ctrl+K)",
       "numbered_list_tooltip": "Lista numerowana",
       "quote_tooltip": "Cytat",
-      "strike_tooltip": "Tekst przekreślony"
+      "strike_tooltip": "Tekst przekreślony",
+      "underline_tooltip": "Podkreślenie"
     },
     "email": "E-mail",
     "end": "Koniec",

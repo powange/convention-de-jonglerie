@@ -91,6 +91,12 @@ const toolbarItems = computed<EditorToolbarItem[][]>(() => [
     },
     {
       kind: 'mark',
+      mark: 'underline',
+      icon: 'i-lucide-underline',
+      tooltip: { text: t('common.editor.underline_tooltip') },
+    },
+    {
+      kind: 'mark',
       mark: 'strike',
       icon: 'i-lucide-strikethrough',
       tooltip: { text: t('common.editor.strike_tooltip') },
@@ -153,6 +159,12 @@ const bubbleItems = computed<EditorToolbarItem[]>(() => [
     mark: 'italic',
     icon: 'i-lucide-italic',
     tooltip: { text: t('common.editor.italic_tooltip') },
+  },
+  {
+    kind: 'mark',
+    mark: 'underline',
+    icon: 'i-lucide-underline',
+    tooltip: { text: t('common.editor.underline_tooltip') },
   },
   {
     kind: 'mark',

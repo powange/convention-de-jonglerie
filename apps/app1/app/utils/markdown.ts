@@ -76,9 +76,67 @@ function remarkRaccourcisEmoji() {
   }
 }
 
-// Schéma de sanitisation étendu pour autoriser target et rel sur les liens
+/**
+ * Le soulignement, que markdown ne sait pas dire.
+ *
+ * Ni CommonMark ni GFM n'ont de syntaxe pour cela — sur le web, le souligné signale un lien.
+ * L'éditeur, lui, en propose un et l'enregistre en `++texte++` : c'est ce qu'écrit l'extension
+ * Underline de Tiptap, et ce qu'elle sait relire. Sans le greffon ci-dessous, le lecteur voyait
+ * les `++` en toutes lettres — ce qui est arrivé, la description de plusieurs éditions en
+ * contenant déjà.
+ *
+ * Limite assumée : la conversion opère sur un nœud de texte, donc `++**gras souligné**++` ne
+ * prend pas. Le cas est rare, et le traiter demanderait de re-analyser l'intérieur.
+ *
+ * Les deux gardes sur les espaces écartent un texte qui contient des `++` sans vouloir rien
+ * souligner : « C++ et C++ » deviendrait sinon « C<u> et C</u> ». L'éditeur, lui, ne produit
+ * jamais d'espace collé aux marques — il taille son contenu — donc ce qu'il écrit passe.
+ */
+const SOULIGNE = /\+\+(?!\s)([\s\S]+?)(?<!\s)\+\+/g
+
+function remarkSouligne() {
+  return (tree: RacineMdast) => {
+    visit(tree, 'text', (node: TexteMdast, index, parent) => {
+      if (index === null || index === undefined || !parent) return
+      if (!node.value.includes('++')) return
+
+      const morceaux: Array<TexteMdast | Record<string, unknown>> = []
+      let curseur = 0
+
+      for (const trouve of node.value.matchAll(SOULIGNE)) {
+        const debut = trouve.index ?? 0
+        if (debut > curseur) {
+          morceaux.push({ type: 'text', value: node.value.slice(curseur, debut) } as TexteMdast)
+        }
+        // `hName` impose la balise rendue : `<u>` dit l'intention de l'auteur, là où `<ins>`
+        // annoncerait un ajout au texte.
+        morceaux.push({
+          type: 'emphasis',
+          data: { hName: 'u' },
+          children: [{ type: 'text', value: trouve[1] }],
+        })
+        curseur = debut + trouve[0].length
+      }
+
+      if (morceaux.length === 0) return
+      if (curseur < node.value.length) {
+        morceaux.push({ type: 'text', value: node.value.slice(curseur) } as TexteMdast)
+      }
+
+      parent.children.splice(index, 1, ...(morceaux as never[]))
+      // Reprendre après les nœuds insérés : sans ça, la visite les repasserait en boucle.
+      return index + morceaux.length
+    })
+  }
+}
+
+// Schéma de sanitisation étendu pour autoriser target et rel sur les liens, et la balise du
+// soulignement. `u` ne figure pas dans le schéma par défaut ; on l'ajoute sans risque puisque
+// c'est le greffon ci-dessus qui la produit, jamais le HTML brut d'un auteur — celui-ci est de
+// toute façon écarté avant d'arriver ici.
 const sanitizeSchema = {
   ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames || []), 'u'],
   attributes: {
     ...defaultSchema.attributes,
     a: [...(defaultSchema.attributes?.a || ['href']), 'target', 'rel'],
@@ -89,6 +147,7 @@ const sanitizeSchema = {
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
+  .use(remarkSouligne)
   .use(remarkRaccourcisEmoji)
   .use(remarkRehype)
   .use(rehypeExternalLinks)
