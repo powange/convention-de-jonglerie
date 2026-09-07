@@ -30,22 +30,28 @@ const accepted = (id: number, pseudo: string, status = 'ACCEPTED'): AcceptedVolu
 
 describe('volunteer-stats — agrégation des statistiques bénévoles', () => {
   describe('calculateVolunteersStats', () => {
-    it('retourne des stats nulles si aucun bénévole accepté', () => {
+    it('retourne des stats nulles sans personne ni créneau', () => {
       const result = calculateVolunteersStats([], [])
       expect(result).toEqual({
         totalVolunteers: 0,
+        totalOrganizers: 0,
         totalHours: 0,
         averageHours: 0,
         totalSlots: 0,
       })
     })
 
-    it('retourne des stats nulles même avec des créneaux mais aucun bénévole accepté', () => {
+    /**
+     * Ce test disait l'inverse jusqu'ici : sans candidature acceptée, le relevé rendait zéro
+     * même sur des créneaux pourvus. La règle ne tient plus depuis qu'un organisateur peut
+     * tenir un poste sans être bénévole — le compte des candidatures ne dit plus qui travaille.
+     */
+    it('compte les heures tenues même sans candidature acceptée', () => {
       const slots = [slot(1, '2026-06-16T08:00:00Z', '2026-06-16T12:00:00Z', [user(1, 'alice')])]
       const result = calculateVolunteersStats(slots, [])
       expect(result.totalVolunteers).toBe(0)
-      expect(result.totalHours).toBe(0)
-      expect(result.totalSlots).toBe(0)
+      expect(result.totalHours).toBe(4)
+      expect(result.totalSlots).toBe(1)
     })
 
     it('calcule le total des heures et créneaux pour un seul bénévole', () => {
@@ -273,5 +279,101 @@ describe('volunteer-stats — agrégation des statistiques bénévoles', () => {
       expect(result).toHaveLength(1)
       expect(result[0].totalHours).toBe(4)
     })
+  })
+})
+
+/**
+ * Les organisateurs tiennent des créneaux comme les bénévoles : leurs heures entrent dans les
+ * relevés. Ils y restent comptés à part, « 8 bénévoles et 2 organisateurs » disant qui tient la
+ * journée là où « 10 personnes » le tairait.
+ */
+describe('statistiques avec organisateurs', () => {
+  /** Comme `slot`, mais avec les deux populations. `user` rend une fiche nue, à envelopper. */
+  const creneauMixte = (
+    id: number,
+    debut: string,
+    fin: string,
+    benevoles: Array<{ id: number; pseudo: string }>,
+    organisateurs: Array<{ id: number; pseudo: string }>
+  ): TimeSlotWithAssignments => ({
+    id,
+    start: debut,
+    end: fin,
+    assignedVolunteersList: benevoles.map((u) => ({ user: u })),
+    assignedOrganizersList: organisateurs.map((u) => ({ user: u })),
+  })
+
+  it("compte les heures d'un organisateur dans le total", () => {
+    const slots = [
+      creneauMixte(
+        1,
+        '2026-06-16T08:00:00Z',
+        '2026-06-16T12:00:00Z',
+        [user(1, 'alice')],
+        [user(50, 'orga')]
+      ),
+    ]
+
+    const result = calculateVolunteersStats(slots, [accepted(1, 'alice')])
+
+    expect(result.totalHours).toBe(8) // 4h × 2 personnes
+    expect(result.totalSlots).toBe(2)
+    expect(result.totalOrganizers).toBe(1)
+  })
+
+  it('ne compte un organisateur que s’il tient un créneau', () => {
+    // Rattaché à une équipe sans poste, il n'a rien à peser dans un relevé d'heures.
+    const slots = [
+      creneauMixte(1, '2026-06-16T08:00:00Z', '2026-06-16T12:00:00Z', [user(1, 'alice')], []),
+    ]
+
+    expect(calculateVolunteersStats(slots, [accepted(1, 'alice')]).totalOrganizers).toBe(0)
+  })
+
+  it('rapporte la moyenne à tous ceux qui tiennent un poste', () => {
+    // 4h tenues par un bénévole et 4h par un organisateur : 8h pour deux personnes, soit 4h.
+    // Diviser par le seul effectif bénévole aurait annoncé 8h de moyenne.
+    const slots = [
+      creneauMixte(
+        1,
+        '2026-06-16T08:00:00Z',
+        '2026-06-16T12:00:00Z',
+        [user(1, 'alice')],
+        [user(50, 'orga')]
+      ),
+    ]
+
+    expect(calculateVolunteersStats(slots, [accepted(1, 'alice')]).averageHours).toBe(4)
+  })
+
+  it('sépare les deux titres dans le relevé par jour', () => {
+    const slots = [
+      creneauMixte(
+        1,
+        '2026-06-16T08:00:00Z',
+        '2026-06-16T12:00:00Z',
+        [user(1, 'alice')],
+        [user(50, 'orga')]
+      ),
+    ]
+
+    const [jour] = calculateVolunteersStatsByDay(slots)
+
+    expect(jour?.totalVolunteers).toBe(1)
+    expect(jour?.totalOrganizers).toBe(1)
+    expect(jour?.totalHours).toBe(8)
+  })
+
+  it("fait entrer l'organisateur dans le relevé individuel", () => {
+    // Il n'a pas de candidature : sans cette entrée, ses heures ne figuraient nulle part.
+    const slots = [
+      creneauMixte(1, '2026-06-16T08:00:00Z', '2026-06-16T12:00:00Z', [], [user(50, 'orga')]),
+    ]
+
+    const individuel = calculateVolunteersStatsIndividual(slots, [])
+
+    expect(individuel).toHaveLength(1)
+    expect(individuel[0]!.user.id).toBe(50)
+    expect(individuel[0]!.totalHours).toBe(4)
   })
 })

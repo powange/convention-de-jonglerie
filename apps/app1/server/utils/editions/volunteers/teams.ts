@@ -340,9 +340,13 @@ export async function getTeamVolunteers(
  * @returns Le nombre de bénévoles assignés
  */
 export async function countTeamVolunteers(teamId: string): Promise<number> {
-  return await prisma.applicationTeamAssignment.count({
-    where: { teamId },
-  })
+  // Organisateurs compris : l'effectif d'une équipe, c'est le nombre de personnes qui la
+  // composent, quel que soit le titre auquel chacune y figure.
+  const [benevoles, organisateurs] = await Promise.all([
+    prisma.applicationTeamAssignment.count({ where: { teamId } }),
+    prisma.organizerTeamAssignment.count({ where: { teamId } }),
+  ])
+  return benevoles + organisateurs
 }
 
 /**
@@ -350,25 +354,26 @@ export async function countTeamVolunteers(teamId: string): Promise<number> {
  * @param teamId - ID de l'équipe
  */
 export async function getTeamStats(teamId: string) {
-  const [team, totalVolunteers, leadersCount] = await Promise.all([
-    prisma.volunteerTeam.findUnique({
-      where: { id: teamId },
-      select: {
-        id: true,
-        name: true,
-        maxVolunteers: true,
-      },
-    }),
-    prisma.applicationTeamAssignment.count({
-      where: { teamId },
-    }),
-    prisma.applicationTeamAssignment.count({
-      where: {
-        teamId,
-        isLeader: true,
-      },
-    }),
-  ])
+  // Organisateurs compris, pour l'effectif comme pour les responsables : un organisateur qui
+  // dirige une équipe en est bien le responsable, avec les droits que cela emporte.
+  const [team, benevoles, organisateurs, responsablesBenevoles, responsablesOrganisateurs] =
+    await Promise.all([
+      prisma.volunteerTeam.findUnique({
+        where: { id: teamId },
+        select: {
+          id: true,
+          name: true,
+          maxVolunteers: true,
+        },
+      }),
+      prisma.applicationTeamAssignment.count({ where: { teamId } }),
+      prisma.organizerTeamAssignment.count({ where: { teamId } }),
+      prisma.applicationTeamAssignment.count({ where: { teamId, isLeader: true } }),
+      prisma.organizerTeamAssignment.count({ where: { teamId, isLeader: true } }),
+    ])
+
+  const totalVolunteers = benevoles + organisateurs
+  const leadersCount = responsablesBenevoles + responsablesOrganisateurs
 
   if (!team) {
     return null

@@ -371,7 +371,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
    * la réponse doit les porter. C'est exactement le défaut qui avait vidé la colonne « Équipes »
    * de la page des organisateurs — une requête juste dont la projection laissait le champ de côté.
    */
-  it('expose les organisateurs affectés, hors du compteur de bénévoles', async () => {
+  it('expose les organisateurs affectés à côté du compte de bénévoles', async () => {
     mockRequirePlanningAccess.mockResolvedValue({ id: 10 })
     mockIsAcceptedVolunteer.mockResolvedValue(false)
 
@@ -405,7 +405,8 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     expect(res[0].organizerAssignments).toEqual([
       { editionOrganizerId: 7, user: { id: 70, pseudo: 'orga', nom: 'Dupont', prenom: 'Jean' } },
     ])
-    // Le cœur du parti pris : l'organisateur ne gonfle pas l'effectif du créneau.
+    // `assignedVolunteers` reste le seul compte des bénévoles ; c'est le client qui additionne
+    // les deux pour connaître les places occupées.
     expect(res[0].assignedVolunteers).toBe(0)
   })
 })

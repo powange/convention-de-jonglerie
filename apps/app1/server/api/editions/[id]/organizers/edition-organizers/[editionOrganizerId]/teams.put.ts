@@ -17,10 +17,10 @@ const bodySchema = z.object({
  * Rattache un organisateur présent sur l'édition à des équipes de bénévoles, et remplace
  * l'ensemble de ses rattachements existants.
  *
- * Ce rattachement est volontairement sans effet sur la mécanique du bénévolat : un
- * organisateur ne compte ni dans la capacité d'un créneau, ni dans les statistiques de
- * couverture, ni dans l'assignation automatique. Il apparaît dans l'équipe — et dans sa
- * conversation, la place valant accès quel que soit le titre auquel on l'occupe.
+ * Ce rattachement dit qui, dans l'organisation, tient tel poste. Un organisateur rattaché
+ * apparaît dans l'équipe et dans sa conversation — la place valant accès quel que soit le titre
+ * auquel on l'occupe. Ce qui le distingue d'un bénévole tient à ce qu'il n'a ni candidature, ni
+ * échange de créneau, ni part dans l'assignation automatique.
  *
  * La permission est celle des bénévoles, pas celle des organisateurs : ce qu'on modifie ici,
  * c'est la composition d'une équipe de bénévolat. Elle ne suffit pas : encore faut-il que

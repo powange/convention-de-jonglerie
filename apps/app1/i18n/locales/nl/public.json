@@ -188,6 +188,7 @@
         "select_team_instruction": "Selecteer het bestemmingsteam",
         "set_as_leader": "Instellen als leider",
         "stats": {
+          "attached_organizers": "Gekoppelde organisatoren",
           "assigned_volunteers": "Toegewezen vrijwilligers",
           "total_assignments": "Totale toewijzingen",
           "total_teams": "Totale teams",

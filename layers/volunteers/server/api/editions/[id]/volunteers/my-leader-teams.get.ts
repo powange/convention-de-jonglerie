@@ -43,10 +43,19 @@ export default wrapApiHandler(
       },
     })
 
-    // Le compte reste celui des bénévoles : un organisateur rattaché ne gonfle pas l'effectif.
+    // L'effectif d'une équipe, c'est le nombre de personnes qui la composent : les
+    // organisateurs rattachés s'ajoutent aux bénévoles acceptés.
+    const parEquipe = await prisma.organizerTeamAssignment.groupBy({
+      by: ['teamId'],
+      where: { teamId: { in: teamIds } },
+      _count: { teamId: true },
+    })
+    const organisateurs = new Map(parEquipe.map((ligne) => [ligne.teamId, ligne._count.teamId]))
+
     return equipes.map((equipe) => ({
       ...equipe,
       assignedVolunteersCount: equipe._count?.assignments || 0,
+      assignedOrganizersCount: organisateurs.get(equipe.id) ?? 0,
     }))
   },
   { operationName: 'GetMyLeaderTeams' }

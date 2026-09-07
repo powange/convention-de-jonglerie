@@ -32,7 +32,11 @@ describe('affectation d’un organisateur à un créneau', () => {
     vi.clearAllMocks()
     mockRequireManagement.mockResolvedValue({ id: 1 })
     prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue({ organizersInTeams: true })
-    prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue({ id: 'creneau-1' })
+    prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue({
+      id: 'creneau-1',
+      maxVolunteers: 2,
+      _count: { assignments: 0, organizerAssignments: 0 },
+    })
     prismaMock.editionOrganizer.findFirst.mockResolvedValue({ id: 7 })
     prismaMock.organizerSlotAssignment.findUnique.mockResolvedValue(null)
     prismaMock.organizerSlotAssignment.create.mockResolvedValue({})
@@ -55,12 +59,40 @@ describe('affectation d’un organisateur à un créneau', () => {
     })
 
     /**
-     * Le cœur du parti pris : `maxVolunteers` compte les bénévoles, et un organisateur n'en est
-     * pas un. Un créneau complet doit donc l'accepter — sans quoi la table séparée n'aurait
-     * servi à rien.
+     * Un organisateur occupe une place : `maxVolunteers` dit combien de personnes le créneau
+     * demande, sans distinguer les titres. Sur un créneau à deux places déjà pourvues, il n'y a
+     * plus de poste, pour personne.
      */
-    it('accepte un organisateur sur un créneau déjà complet', async () => {
-      prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue({ id: 'creneau-1' })
+    it('refuse un organisateur sur un créneau déjà complet', async () => {
+      prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue({
+        id: 'creneau-1',
+        maxVolunteers: 2,
+        _count: { assignments: 2, organizerAssignments: 0 },
+      })
+
+      await expect(poster({ editionOrganizerId: 7 })).rejects.toBeDefined()
+      expect(prismaMock.organizerSlotAssignment.create).not.toHaveBeenCalled()
+    })
+
+    it('compte les organisateurs déjà présents dans les places prises', async () => {
+      // Deux organisateurs sur un créneau à deux places le remplissent aussi bien que deux
+      // bénévoles : ne compter que ces derniers laisserait s'en ajouter un troisième.
+      prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue({
+        id: 'creneau-1',
+        maxVolunteers: 2,
+        _count: { assignments: 0, organizerAssignments: 2 },
+      })
+
+      await expect(poster({ editionOrganizerId: 7 })).rejects.toBeDefined()
+      expect(prismaMock.organizerSlotAssignment.create).not.toHaveBeenCalled()
+    })
+
+    it('accepte tant qu’il reste une place', async () => {
+      prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue({
+        id: 'creneau-1',
+        maxVolunteers: 2,
+        _count: { assignments: 1, organizerAssignments: 0 },
+      })
 
       await poster({ editionOrganizerId: 7 })
 

@@ -1,6 +1,6 @@
 <template>
   <UCard
-    v-if="canManageVolunteers && volunteersStats.totalVolunteers > 0"
+    v-if="canManageVolunteers && effectifTotal > 0"
     variant="soft"
     class="mt-6"
   >
@@ -10,9 +10,16 @@
           <UIcon name="i-heroicons-user-group" class="text-primary-500" />
           {{ t('volunteers.volunteers_summary') }}
         </h3>
-        <UBadge color="primary" variant="soft">
-          {{ volunteersStats.totalVolunteers }} {{ t('volunteers.volunteers') }}
-        </UBadge>
+        <div class="flex items-center gap-2">
+          <UBadge color="primary" variant="soft">
+            {{ volunteersStats.totalVolunteers }} {{ t('volunteers.volunteers') }}
+          </UBadge>
+          <!-- Comptés à part, mais comptés : leurs heures et leurs créneaux entrent dans les
+               chiffres ci-dessous comme ceux des bénévoles. -->
+          <UBadge v-if="volunteersStats.totalOrganizers > 0" color="info" variant="soft">
+            {{ volunteersStats.totalOrganizers }} {{ t('volunteers.organizers') }}
+          </UBadge>
+        </div>
       </div>
     </template>
 
@@ -36,7 +43,7 @@
             {{ volunteersStats.averageHours.toFixed(1) }}h
           </div>
           <div class="text-sm text-gray-500">
-            {{ t('volunteers.average_per_volunteer') }}
+            {{ t('volunteers.average_per_person') }}
           </div>
         </div>
         <div class="text-center">
@@ -73,12 +80,17 @@
                 <h5 class="font-medium text-gray-900 dark:text-white">
                   {{ formatDate(dayStats.date) }}
                 </h5>
+                <!-- Sans `size`, les badges reprennent la taille par défaut : en `sm` puis
+                     `xs` plus bas, les chiffres devenaient illisibles. -->
                 <div class="flex items-center gap-2">
-                  <UBadge color="neutral" variant="soft" size="sm">
+                  <UBadge color="neutral" variant="soft">
                     {{ dayStats.totalVolunteers }}
                     {{ t('volunteers.volunteers_short') }}
                   </UBadge>
-                  <UBadge color="primary" variant="soft" size="sm">
+                  <UBadge v-if="dayStats.totalOrganizers > 0" color="info" variant="soft">
+                    {{ dayStats.totalOrganizers }} {{ t('volunteers.organizers') }}
+                  </UBadge>
+                  <UBadge color="primary" variant="soft">
                     {{ dayStats.totalHours.toFixed(1) }}h
                   </UBadge>
                 </div>
@@ -88,7 +100,7 @@
                 <div
                   v-for="volunteerStat in dayStats.volunteers"
                   :key="`${dayStats.date}-${volunteerStat.user.id}`"
-                  class="flex items-center justify-between text-sm"
+                  class="flex items-center justify-between"
                 >
                   <div class="flex items-center gap-2">
                     <UiUserAvatar :user="volunteerStat.user" size="xs" />
@@ -97,16 +109,19 @@
                     }}</span>
                     <span
                       v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
-                      class="text-gray-500 text-xs"
+                      class="text-gray-500 text-sm"
                     >
                       (<UiUserName :user="volunteerStat.user" />)
                     </span>
+                    <UBadge v-if="volunteerStat.estOrganisateur" color="info" variant="soft">
+                      {{ t('volunteers.organizer') }}
+                    </UBadge>
                   </div>
                   <div class="flex items-center gap-2">
                     <span class="text-gray-600 dark:text-gray-400"
                       >{{ volunteerStat.hours.toFixed(1) }}h</span
                     >
-                    <UBadge color="neutral" variant="soft" size="xs">
+                    <UBadge color="neutral" variant="soft">
                       {{ volunteerStat.slots }} {{ t('volunteers.slots_short') }}
                     </UBadge>
                   </div>
@@ -202,11 +217,18 @@
                 {{ equipe.teamName }}
               </h5>
               <div class="flex items-center gap-2">
+                <!-- Pourvu sur à pourvoir, comme le résumé global : le seul besoin ne disait
+                     pas où l'équipe en est. -->
                 <UBadge color="primary" variant="soft">
-                  {{ equipe.totalHours.toFixed(1) }}h
+                  {{ equipe.coveredHours.toFixed(1) }}h / {{ equipe.totalHours.toFixed(1) }}h
                 </UBadge>
                 <UBadge color="neutral" variant="soft">
                   {{ equipe.totalVolunteers }} {{ t('volunteers.volunteers') }}
+                </UBadge>
+                <!-- Comptés à part : « 3 bénévoles et 1 organisateur » dit qui l'on peut encore
+                     solliciter, là où « 4 personnes » le tairait. -->
+                <UBadge v-if="equipe.totalOrganizers > 0" color="info" variant="soft">
+                  {{ equipe.totalOrganizers }} {{ t('volunteers.organizers') }}
                 </UBadge>
                 <UBadge color="neutral" variant="soft">
                   {{ equipe.totalSlots }} {{ t('volunteers.slots_short') }}
@@ -226,10 +248,18 @@
                     {{ formatDate(detailJour.date) }}
                   </span>
                 </div>
+                <!-- Même lecture que la ligne de l'équipe : pourvu sur à pourvoir, puis qui
+                     le tient, puis combien de créneaux. -->
                 <div class="flex items-center gap-2">
                   <span class="text-gray-600 dark:text-gray-400">
-                    {{ detailJour.hours.toFixed(1) }}h
+                    {{ detailJour.coveredHours.toFixed(1) }}h / {{ detailJour.hours.toFixed(1) }}h
                   </span>
+                  <UBadge v-if="detailJour.volunteers > 0" color="neutral" variant="soft">
+                    {{ detailJour.volunteers }} {{ t('volunteers.volunteers') }}
+                  </UBadge>
+                  <UBadge v-if="detailJour.organizers > 0" color="info" variant="soft">
+                    {{ detailJour.organizers }} {{ t('volunteers.organizers') }}
+                  </UBadge>
                   <UBadge color="neutral" variant="soft">
                     {{ detailJour.slots }} {{ t('volunteers.slots_short') }}
                   </UBadge>
@@ -244,21 +274,15 @@
 </template>
 
 <script setup lang="ts">
+// `VolunteerStats` était redéclaré ici, à l'identique de celui d'où viennent les données. La
+// copie a cessé de suivre l'original dès qu'un champ y est apparu, et le composant lisait un
+// type qui ne décrivait plus ce qu'il recevait.
 import type {
   DayStats,
+  VolunteerStats,
   VolunteerStatsIndividual,
   TeamStats,
 } from '~/utils/volunteer-stats'
-
-interface VolunteerStats {
-  totalVolunteers: number
-  totalHours: number
-  averageHours: number
-  totalSlots: number
-}
-
-
-
 
 
 interface Props {
@@ -277,6 +301,14 @@ const props = defineProps<Props>()
 const { t } = useI18n()
 
 const ongletActif = ref(props.activeStatsTab || 'hours-per-volunteer')
+
+/**
+ * Tout le monde compte : la carte doit paraître même sur une édition tenue par les seuls
+ * organisateurs, où l'effectif bénévole vaut zéro.
+ */
+const effectifTotal = computed(
+  () => props.volunteersStats.totalVolunteers + props.volunteersStats.totalOrganizers
+)
 
 // Repris des mêmes données que l'onglet par équipe : les deux chiffres ne peuvent donc pas
 // diverger, quelle que soit l'évolution du calcul.

@@ -35,7 +35,7 @@ export interface VolunteerTimeSlot {
       email: string
     }
   }>
-  /** Organisateurs affectés. Hors du compteur : ils ne prennent la place de personne. */
+  /** Organisateurs affectés. Ils occupent une place, et entrent donc dans le compteur. */
   assignedOrganizersList?: Array<{
     editionOrganizerId: number
     user: {
@@ -227,7 +227,11 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   const events = computed((): EventInput[] => {
     return unref(timeSlots).map((slot) => {
       const slotTitle = slot.title || t('edition.volunteers.untitled_slot')
-      const counterInfo = `(${slot.assignedVolunteers}/${slot.maxVolunteers})`
+      // Les places se comptent toutes ensemble : un organisateur en occupe une, le compteur
+      // doit donc l'inclure, sans quoi un créneau plein paraîtrait encore libre.
+      const placesOccupees =
+        (slot.assignedVolunteers ?? 0) + (slot.assignedOrganizersList?.length ?? 0)
+      const counterInfo = `(${placesOccupees}/${slot.maxVolunteers})`
 
       // Calculer les heures décalées si delayMinutes est présent
       let adjustedStart = slot.start
@@ -494,7 +498,10 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
       const event = arg.event
       const slotTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
-      const counterInfo = `(${event.extendedProps.assignedVolunteers}/${event.extendedProps.maxVolunteers})`
+      const placesOccupees =
+        (event.extendedProps.assignedVolunteers ?? 0) +
+        (event.extendedProps.assignedOrganizersList?.length ?? 0)
+      const counterInfo = `(${placesOccupees}/${event.extendedProps.maxVolunteers})`
       const assignedVolunteersList = event.extendedProps.assignedVolunteersList || []
       const delayMinutes = event.extendedProps.delayMinutes
 
@@ -553,7 +560,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       }
 
       // Organisateurs affectés : mêmes lignes, mais après les bénévoles et distingués par leur
-      // style — ils ne comptent pas dans le compteur du titre, et rien ne doit le laisser croire.
+      // style. Leurs places entrent bien dans le compteur du titre.
       const assignedOrganizersList = event.extendedProps.assignedOrganizersList || []
       if (assignedOrganizersList.length > 0) {
         const organisateursDiv = document.createElement('div')

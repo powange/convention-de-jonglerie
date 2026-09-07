@@ -52,6 +52,9 @@
     "assigned_to_teams": "Tildelt til {count} hold | Tildelt til {count} hold",
     "assigned_volunteers": "Tildelte frivillige",
     "assigned_organizers": "Tilknyttede arrangører",
+    "organizer": "arrangør",
+    "organizers": "arrangører",
+    "average_per_person": "Gennemsnit pr. person",
     "no_assigned_organizers": "Ingen arrangør tilknyttet",
     "add_organizer": "Tilføj en arrangør",
     "select_organizer": "Vælg en arrangør",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "Ingen arrangør er tilknyttet dette hold",
     "organizer_assigned": "Arrangør tilknyttet vagten",
     "organizer_unassigned": "Arrangør fjernet fra vagten",
-    "organizers_not_counted": "Arrangører tæller ikke med i vagtens kapacitet.",
     "auto_assignment": {
       "allow_overtime": "Tillad overarbejde",
       "allow_overtime_help": "Tillader lidt at overskride maksimumstimer hvis nødvendigt",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Bevar adgangen til forestillingerne",
       "preserve_show_access_help": "Tildeler ikke en frivillig en vagt, der ville forhindre vedkommende i at overvære en eneste opførelse af en forestilling. Vagten forbliver da ubesat."
     },
-    "average_per_volunteer": "Gennemsnit pr. frivillig",
     "avoid_list_hint": "Denne information forbliver fortrolig og hjælper arrangørerne med at skabe harmoniske hold",
     "avoid_list_label": "Frivillige jeg helst ikke vil arbejde vagter med (valgfrit)",
     "avoid_list_placeholder": "Navne på andre frivillige at undgå til vagter...",

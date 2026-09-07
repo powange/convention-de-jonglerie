@@ -188,6 +188,7 @@
         "select_team_instruction": "Vælg destinationsteamet",
         "set_as_leader": "Angiv som leder",
         "stats": {
+          "attached_organizers": "Tilknyttede arrangører",
           "assigned_volunteers": "Tildelte frivillige",
           "total_assignments": "Samlede tildelinger",
           "total_teams": "Samlede hold",

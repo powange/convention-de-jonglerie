@@ -53,6 +53,9 @@
     "assigned_to_teams": "Assigné à {count} équipe | Assigné à {count} équipes",
     "assigned_volunteers": "Bénévoles assignés",
     "assigned_organizers": "Organisateurs affectés",
+    "organizer": "organisateur",
+    "organizers": "organisateurs",
+    "average_per_person": "Moyenne par personne",
     "no_assigned_organizers": "Aucun organisateur affecté",
     "add_organizer": "Ajouter un organisateur",
     "select_organizer": "Sélectionner un organisateur",
@@ -60,7 +63,6 @@
     "no_organizers_for_team": "Aucun organisateur rattaché à cette équipe",
     "organizer_assigned": "Organisateur affecté au créneau",
     "organizer_unassigned": "Organisateur retiré du créneau",
-    "organizers_not_counted": "Les organisateurs ne comptent pas dans la capacité du créneau.",
     "auto_assignment": {
       "allow_overtime": "Autoriser les heures supplémentaires",
       "allow_overtime_help": "Permet de dépasser légèrement les heures maximum si nécessaire",
@@ -119,7 +121,6 @@
       "unassigned_volunteers": "Bénévoles non assignés",
       "warnings": "Avertissements"
     },
-    "average_per_volunteer": "Moyenne par bénévole",
     "avoid_list_hint": "Cette information reste confidentielle et aide les organisateurs à créer des équipes harmonieuses",
     "avoid_list_label": "Bénévoles avec qui je préfère ne pas faire de créneaux (optionnel)",
     "avoid_list_placeholder": "Noms des autres bénévoles à éviter pour les créneaux...",

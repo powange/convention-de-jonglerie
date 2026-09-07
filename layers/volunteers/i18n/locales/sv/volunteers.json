@@ -52,6 +52,9 @@
     "assigned_to_teams": "Tilldelad till {count} team | Tilldelad till {count} team",
     "assigned_volunteers": "Tilldelade volontärer",
     "assigned_organizers": "Tilldelade arrangörer",
+    "organizer": "arrangör",
+    "organizers": "arrangörer",
+    "average_per_person": "Snitt per person",
     "no_assigned_organizers": "Ingen arrangör tilldelad",
     "add_organizer": "Lägg till en arrangör",
     "select_organizer": "Välj en arrangör",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "Ingen arrangör är kopplad till detta lag",
     "organizer_assigned": "Arrangör tilldelad passet",
     "organizer_unassigned": "Arrangör borttagen från passet",
-    "organizers_not_counted": "Arrangörer räknas inte in i passets kapacitet.",
     "auto_assignment": {
       "allow_overtime": "Godkännande av övertid",
       "allow_overtime_help": "Tillåter att de maximala timmarna överskrids något om det behövs",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Bevara tillgången till föreställningarna",
       "preserve_show_access_help": "Tilldelar inte en volontär ett pass som skulle hindra hen från att se en enda föreställning av en show. Passet förblir då obemannat."
     },
-    "average_per_volunteer": "Genomsnitt per volontär",
     "avoid_list_hint": "Denna information förblir konfidentiell och hjälper organisatörer att skapa harmoniska team.",
     "avoid_list_label": "Volontärer som jag helst inte vill ha en slot med (valfritt)",
     "avoid_list_placeholder": "Namn på andra volontärer att undvika för slots...",

@@ -52,6 +52,9 @@
     "assigned_to_teams": "Assegnato a {count} team | Assegnato a {count} team",
     "assigned_volunteers": "Volontari assegnati",
     "assigned_organizers": "Organizzatori assegnati",
+    "organizer": "organizzatore",
+    "organizers": "organizzatori",
+    "average_per_person": "Media per persona",
     "no_assigned_organizers": "Nessun organizzatore assegnato",
     "add_organizer": "Aggiungi un organizzatore",
     "select_organizer": "Seleziona un organizzatore",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "Nessun organizzatore assegnato a questa squadra",
     "organizer_assigned": "Organizzatore assegnato al turno",
     "organizer_unassigned": "Organizzatore rimosso dal turno",
-    "organizers_not_counted": "Gli organizzatori non contano nella capienza del turno.",
     "auto_assignment": {
       "allow_overtime": "Consenti straordinari",
       "allow_overtime_help": "Consente di superare leggermente le ore massime se necessario",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Preservare l'accesso agli spettacoli",
       "preserve_show_access_help": "Non assegna un volontario a un turno che gli impedirebbe di assistere a una qualsiasi replica di uno spettacolo. Il turno resta allora scoperto."
     },
-    "average_per_volunteer": "Media per volontario",
     "avoid_list_hint": "Queste informazioni rimangono riservate e aiutano gli organizzatori a creare squadre armoniose",
     "avoid_list_label": "Volontari con cui preferisco non fare turni (opzionale)",
     "avoid_list_placeholder": "Nomi di altri volontari da evitare per i turni...",

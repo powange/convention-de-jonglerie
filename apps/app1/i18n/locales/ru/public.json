@@ -188,6 +188,7 @@
         "select_team_instruction": "Выберите команду назначения",
         "set_as_leader": "Назначить руководителем",
         "stats": {
+          "attached_organizers": "Прикреплённые организаторы",
           "assigned_volunteers": "Назначенные волонтёры",
           "total_assignments": "Всего назначений",
           "total_teams": "Всего команд",

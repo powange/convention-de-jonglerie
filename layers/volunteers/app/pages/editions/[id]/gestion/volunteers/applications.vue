@@ -160,7 +160,7 @@
 
           <div class="space-y-4">
             <!-- Statistiques générales -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
               <div
                 :class="`${volunteerConfig.bgClass} ${volunteerConfig.darkBgClass} rounded-lg p-4`"
               >
@@ -204,6 +204,25 @@
                     </p>
                     <p class="text-xl font-semibold text-orange-600">
                       {{ unassignedVolunteers.length }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <!-- Les organisateurs rattachés, comptés à part : ils composent les équipes sans
+                   avoir déposé de candidature, et n'apparaissent donc dans aucun des chiffres
+                   voisins. -->
+              <div
+                v-if="rattachementEquipesOuvert"
+                class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4"
+              >
+                <div class="flex items-center gap-3">
+                  <UIcon name="i-heroicons-briefcase" class="text-blue-600" size="24" />
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ $t('pages.volunteers.team_distribution.stats.attached_organizers') }}
+                    </p>
+                    <p class="text-xl font-semibold text-blue-600">
+                      {{ organisateursRattachesCount }}
                     </p>
                   </div>
                 </div>
@@ -396,8 +415,8 @@
                 </div>
 
                 <!-- Organisateurs rattachés à l'équipe. Présentés à part des bénévoles, et sans
-                     poignée de déplacement : ils ne comptent pas dans l'effectif, ne se glissent
-                     pas d'une équipe à l'autre et n'ont pas de rôle de responsable. -->
+                     poignée de déplacement : leur rattachement se règle depuis la page des
+                     organisateurs, pas en les glissant d'une équipe à l'autre. -->
                 <div
                   v-if="organisateursParEquipe[team.id]?.length"
                   class="px-4 py-3 border-t border-gray-200 dark:border-gray-700"
@@ -816,6 +835,19 @@ interface OrganisateurBenevolat {
 
 const organisateurs = ref<OrganisateurBenevolat[]>([])
 
+/**
+ * Le module des organisateurs dans les équipes est-il ouvert sur cette édition ? La carte de
+ * statistiques n'a pas à figurer si le rattachement n'existe pas.
+ */
+const rattachementEquipesOuvert = computed(
+  () => !!edition.value?.volunteersOrganizersInTeams && organisateurs.value.length > 0
+)
+
+/** Ceux qui appartiennent à au moins une équipe — les autres ne composent rien. */
+const organisateursRattachesCount = computed(
+  () => organisateurs.value.filter((organisateur) => organisateur.teamIds.length > 0).length
+)
+
 const organisateursParEquipe = computed(() => {
   const parEquipe: Record<string, OrganisateurBenevolat[]> = {}
   for (const organisateur of organisateurs.value) {
@@ -906,12 +938,16 @@ const teamDistribution = computed(() => {
         return aName.localeCompare(bName, 'fr')
       })
 
+      // L'effectif compte tout le monde : un organisateur rattaché occupe une place dans
+      // l'équipe comme un bénévole, et le taux de remplissage doit le dire.
+      const effectif = assignedVolunteers.length + (organisateursParEquipe.value[team.id]?.length ?? 0)
+
       return {
         ...team,
         volunteers: sortedVolunteers,
-        count: assignedVolunteers.length,
+        count: effectif,
         utilizationRate: team.maxVolunteers
-          ? Math.round((assignedVolunteers.length / team.maxVolunteers) * 100)
+          ? Math.round((effectif / team.maxVolunteers) * 100)
           : null,
       }
     })

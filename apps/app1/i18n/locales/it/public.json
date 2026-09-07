@@ -188,6 +188,7 @@
         "select_team_instruction": "Seleziona la squadra di destinazione",
         "set_as_leader": "Imposta come responsabile",
         "stats": {
+          "attached_organizers": "Organizzatori assegnati",
           "assigned_volunteers": "Volontari assegnati",
           "total_assignments": "Assegnazioni totali",
           "total_teams": "Squadre totali",
