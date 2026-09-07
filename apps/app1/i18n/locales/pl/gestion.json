@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Pozwól wolontariuszom wymieniać się zmianami między sobą, za zgodą osoby odpowiedzialnej",
       "swaps_open": "Wolontariusze mogą zaproponować wymianę",
       "swaps_closed": "Wymiany są zamknięte",
-      "organizers_in_teams": "Organizatorzy w zespołach",
-      "organizers_in_teams_description": "Pozwala przypisywać organizatorów edycji do zespołów wolontariuszy. Pojawiają się w nich, nie licząc się do stanu osobowego ani do automatycznego przydziału.",
-      "organizers_in_teams_open": "Organizatorzy mogą być przypisani do zespołów",
-      "organizers_in_teams_closed": "Organizatorzy nie są przypisani do zespołów"
+      "organizers_in_teams": "Organizatorzy w wolontariacie",
+      "organizers_in_teams_description": "Pozwala przypisywać organizatorów edycji do zespołów wolontariuszy i do zmian. Zajmują miejsce i liczą się w statystykach, a także mogą kierować zespołem. Pozostają poza automatycznym przydziałem i wymianami zmian.",
+      "organizers_in_teams_open": "Organizatorzy mogą dołączać do zespołów i zmian",
+      "organizers_in_teams_closed": "Organizatorzy nie uczestniczą w wolontariacie"
     },
     "shows_call": {
       "title": "Nabór spektakli",

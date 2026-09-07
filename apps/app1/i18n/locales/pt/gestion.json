@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Permitir que os voluntários troquem um turno entre si, com validação de um responsável",
       "swaps_open": "Os voluntários podem propor uma troca",
       "swaps_closed": "As trocas estão fechadas",
-      "organizers_in_teams": "Organizadores nas equipas",
-      "organizers_in_teams_description": "Permite associar os organizadores da edição às equipas de voluntários. Aparecem nelas sem contar para o efetivo nem para a atribuição automática.",
-      "organizers_in_teams_open": "Os organizadores podem ser associados a equipas",
-      "organizers_in_teams_closed": "Os organizadores não estão associados a equipas"
+      "organizers_in_teams": "Organizadores no voluntariado",
+      "organizers_in_teams_description": "Permite associar os organizadores da edição às equipas de voluntários e atribuí-los a turnos. Ocupam um lugar e contam nas estatísticas, e podem ser responsáveis por uma equipa. Ficam fora da atribuição automática e das trocas de turnos.",
+      "organizers_in_teams_open": "Os organizadores podem juntar-se a equipas e turnos",
+      "organizers_in_teams_closed": "Os organizadores não participam no voluntariado"
     },
     "shows_call": {
       "title": "Convocatória de espetáculos",

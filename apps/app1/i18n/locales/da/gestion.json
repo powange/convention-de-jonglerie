@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Tillad frivillige at bytte en vagt indbyrdes, med godkendelse fra en ansvarlig",
       "swaps_open": "Frivillige kan foreslå et bytte",
       "swaps_closed": "Bytning er lukket",
-      "organizers_in_teams": "Arrangører i hold",
-      "organizers_in_teams_description": "Tillad at arrangører for udgaven tilknyttes de frivilliges hold. De vises der uden at tælle med i bemandingen eller i den automatiske fordeling.",
-      "organizers_in_teams_open": "Arrangører kan tilknyttes hold",
-      "organizers_in_teams_closed": "Arrangører er ikke tilknyttet hold"
+      "organizers_in_teams": "Arrangører i frivilligarbejdet",
+      "organizers_in_teams_description": "Tillad at arrangører for udgaven tilknyttes de frivilliges hold og tildeles vagter. De optager en plads og tæller med i statistikken, og de kan lede et hold. De holdes uden for den automatiske fordeling og bytning af vagter.",
+      "organizers_in_teams_open": "Arrangører kan indgå i hold og vagter",
+      "organizers_in_teams_closed": "Arrangører deltager ikke i frivilligarbejdet"
     },
     "shows_call": {
       "title": "Forestillingsopkald",

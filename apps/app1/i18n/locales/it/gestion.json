@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Consentire ai volontari di scambiarsi un turno tra loro, con la convalida di un responsabile",
       "swaps_open": "I volontari possono proporre uno scambio",
       "swaps_closed": "Gli scambi sono chiusi",
-      "organizers_in_teams": "Organizzatori nelle squadre",
-      "organizers_in_teams_description": "Consente di assegnare gli organizzatori dell'edizione alle squadre di volontari. Vi compaiono senza contare nell'organico né nell'assegnazione automatica.",
-      "organizers_in_teams_open": "Gli organizzatori possono essere assegnati alle squadre",
-      "organizers_in_teams_closed": "Gli organizzatori non sono assegnati alle squadre"
+      "organizers_in_teams": "Organizzatori nel volontariato",
+      "organizers_in_teams_description": "Consente di assegnare gli organizzatori dell'edizione alle squadre di volontari e ai turni. Occupano un posto e contano nelle statistiche, e possono essere responsabili di una squadra. Restano esclusi dall'assegnazione automatica e dagli scambi di turni.",
+      "organizers_in_teams_open": "Gli organizzatori possono unirsi alle squadre e ai turni",
+      "organizers_in_teams_closed": "Gli organizzatori non partecipano al volontariato"
     },
     "shows_call": {
       "title": "Bando per spettacoli",

@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Låt volontärer byta ett pass sinsemellan, med godkännande av en ansvarig",
       "swaps_open": "Volontärer kan föreslå ett byte",
       "swaps_closed": "Bytena är stängda",
-      "organizers_in_teams": "Arrangörer i lagen",
-      "organizers_in_teams_description": "Tillåt att arrangörer för upplagan kopplas till volontärlagen. De visas där utan att räknas in i bemanningen eller i den automatiska fördelningen.",
-      "organizers_in_teams_open": "Arrangörer kan kopplas till lag",
-      "organizers_in_teams_closed": "Arrangörer är inte kopplade till lag"
+      "organizers_in_teams": "Arrangörer i volontärarbetet",
+      "organizers_in_teams_description": "Tillåt att arrangörer för upplagan kopplas till volontärlagen och tilldelas pass. De upptar en plats och räknas in i statistiken, och de kan leda ett lag. De står utanför den automatiska fördelningen och byten av pass.",
+      "organizers_in_teams_open": "Arrangörer kan ingå i lag och pass",
+      "organizers_in_teams_closed": "Arrangörer deltar inte i volontärarbetet"
     },
     "shows_call": {
       "title": "Föreställningsutlysning",

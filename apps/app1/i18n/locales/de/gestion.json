@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Helfern erlauben, ein Zeitfenster untereinander zu tauschen, mit Bestätigung durch eine verantwortliche Person",
       "swaps_open": "Helfer können einen Tausch vorschlagen",
       "swaps_closed": "Der Tausch ist geschlossen",
-      "organizers_in_teams": "Organisatoren in Teams",
-      "organizers_in_teams_description": "Erlaubt es, Organisatoren der Ausgabe den Helferteams zuzuordnen. Sie erscheinen dort, ohne in die Personalstärke oder die automatische Zuweisung einzugehen.",
-      "organizers_in_teams_open": "Organisatoren können Teams zugeordnet werden",
-      "organizers_in_teams_closed": "Organisatoren sind keinen Teams zugeordnet"
+      "organizers_in_teams": "Organisatoren im Helferbereich",
+      "organizers_in_teams_description": "Erlaubt es, Organisatoren der Ausgabe den Helferteams zuzuordnen und Zeitfenstern zuzuweisen. Sie belegen einen Platz und zählen in den Statistiken und können ein Team leiten. Von der automatischen Zuweisung und vom Tausch von Zeitfenstern bleiben sie ausgenommen.",
+      "organizers_in_teams_open": "Organisatoren können Teams und Zeitfenstern beitreten",
+      "organizers_in_teams_closed": "Organisatoren nehmen nicht am Helferbereich teil"
     },
     "shows_call": {
       "title": "Show-Aufruf",

@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Allow volunteers to swap a time slot with each other, subject to a team leader's approval",
       "swaps_open": "Volunteers can propose a swap",
       "swaps_closed": "Swaps are closed",
-      "organizers_in_teams": "Organizers in teams",
-      "organizers_in_teams_description": "Allow edition organizers to be attached to volunteer teams. They appear there without counting towards headcount or automatic assignment.",
-      "organizers_in_teams_open": "Organizers can be attached to teams",
-      "organizers_in_teams_closed": "Organizers are not attached to teams"
+      "organizers_in_teams": "Organizers in volunteering",
+      "organizers_in_teams_description": "Allow edition organizers to be attached to volunteer teams and assigned to time slots. They take up a place and count towards the statistics, and can lead a team. They remain outside automatic assignment and time slot swaps.",
+      "organizers_in_teams_open": "Organizers can join teams and time slots",
+      "organizers_in_teams_closed": "Organizers do not take part in volunteering"
     },
     "shows_call": {
       "title": "Call for shows",

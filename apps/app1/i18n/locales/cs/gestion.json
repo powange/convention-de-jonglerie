@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Umožnit dobrovolníkům vyměnit si směnu mezi sebou, se schválením vedoucího",
       "swaps_open": "Dobrovolníci mohou navrhnout výměnu",
       "swaps_closed": "Výměny jsou uzavřeny",
-      "organizers_in_teams": "Organizátoři v týmech",
-      "organizers_in_teams_description": "Umožňuje přiřazovat organizátory ročníku k týmům dobrovolníků. Objeví se v nich, aniž by se započítávali do stavu nebo do automatického přidělování.",
-      "organizers_in_teams_open": "Organizátory lze přiřadit k týmům",
-      "organizers_in_teams_closed": "Organizátoři nejsou přiřazeni k týmům"
+      "organizers_in_teams": "Organizátoři v dobrovolnictví",
+      "organizers_in_teams_description": "Umožňuje přiřazovat organizátory ročníku k týmům dobrovolníků a ke směnám. Zabírají místo a započítávají se do statistik a mohou tým vést. Zůstávají mimo automatické přidělování a výměny směn.",
+      "organizers_in_teams_open": "Organizátoři se mohou zapojit do týmů a směn",
+      "organizers_in_teams_closed": "Organizátoři se dobrovolnictví neúčastní"
     },
     "shows_call": {
       "title": "Výzva k přihláškám představení",

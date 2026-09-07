@@ -682,10 +682,10 @@
       "swaps_enabled_description": "Vrijwilligers toestaan onderling een tijdslot te ruilen, met goedkeuring van een verantwoordelijke",
       "swaps_open": "Vrijwilligers kunnen een ruil voorstellen",
       "swaps_closed": "Ruilen is gesloten",
-      "organizers_in_teams": "Organisatoren in teams",
-      "organizers_in_teams_description": "Sta toe om organisatoren van de editie aan vrijwilligersteams te koppelen. Ze verschijnen daar zonder mee te tellen in de bezetting of in de automatische toewijzing.",
-      "organizers_in_teams_open": "Organisatoren kunnen aan teams worden gekoppeld",
-      "organizers_in_teams_closed": "Organisatoren zijn niet aan teams gekoppeld"
+      "organizers_in_teams": "Organisatoren in het vrijwilligerswerk",
+      "organizers_in_teams_description": "Sta toe om organisatoren van de editie aan vrijwilligersteams te koppelen en aan tijdslots toe te wijzen. Ze nemen een plaats in en tellen mee in de statistieken, en kunnen een team leiden. Ze blijven buiten de automatische toewijzing en het ruilen van tijdsloten.",
+      "organizers_in_teams_open": "Organisatoren kunnen zich bij teams en tijdsloten voegen",
+      "organizers_in_teams_closed": "Organisatoren nemen niet deel aan het vrijwilligerswerk"
     },
     "shows_call": {
       "title": "Show-oproep",
