@@ -75,6 +75,10 @@ describe('API POST /messenger/conversations/[conversationId]/messages', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Le titre de la notification dépend des responsables de l'équipe : le handler les
+    // interroge, et un mock non configuré rendrait `undefined` là où Prisma rend un tableau.
+    prismaMock.applicationTeamAssignment.findMany.mockResolvedValue([])
+    prismaMock.organizerTeamAssignment.findMany.mockResolvedValue([])
     global.getRouterParam = vi.fn(() => 'conv-1')
     global.readBody = vi.fn()
   })

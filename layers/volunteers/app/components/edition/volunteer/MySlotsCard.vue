@@ -98,14 +98,19 @@ const creneauxAffiches = computed(() =>
   afficherPasses.value ? timeSlots.value : timeSlots.value.filter((creneau) => !estPasse(creneau))
 )
 
-// Charger les créneaux assignés
+/**
+ * Charger les créneaux assignés.
+ *
+ * Endpoint dédié plutôt que `my-application` : celle-ci part d'une candidature, et un
+ * organisateur rattaché n'en a pas — il ne voyait donc jamais les créneaux qu'on lui confie.
+ */
 const fetchAssignedSlots = async () => {
   loading.value = true
   try {
-    const application = await $fetch(`/api/editions/${props.editionId}/volunteers/my-application`)
-    if (application && application.assignedTimeSlots) {
-      assignedTimeSlots.value = application.assignedTimeSlots
-    }
+    const reponse = await $fetch<{ data?: { slots?: unknown[] } }>(
+      `/api/editions/${props.editionId}/volunteers/my-slots`
+    )
+    assignedTimeSlots.value = (reponse?.data?.slots ?? []) as typeof assignedTimeSlots.value
   } catch (error) {
     console.error('Erreur lors du chargement des créneaux:', error)
     assignedTimeSlots.value = []

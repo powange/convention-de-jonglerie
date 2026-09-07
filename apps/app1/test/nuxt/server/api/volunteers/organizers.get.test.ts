@@ -21,9 +21,13 @@ const prismaMock = (globalThis as any).prisma
 
 const evenement = { context: { params: { id: '22' }, user: { id: 1 } } }
 
-const ligne = (id: number, pseudo: string, teamIds: string[]) => ({
+/** `equipesDirigees` : parmi ses équipes, celles dont il est responsable. */
+const ligne = (id: number, pseudo: string, teamIds: string[], equipesDirigees: string[] = []) => ({
   id,
-  teamAssignments: teamIds.map((teamId) => ({ teamId })),
+  teamAssignments: teamIds.map((teamId) => ({
+    teamId,
+    isLeader: equipesDirigees.includes(teamId),
+  })),
   organizer: { user: { id: id * 10, pseudo } },
 })
 
@@ -32,7 +36,7 @@ describe('GET /api/editions/[id]/volunteers/organizers', () => {
     vi.clearAllMocks()
     mockCanManage.mockResolvedValue(true)
     prismaMock.editionOrganizer.findMany.mockResolvedValue([
-      ligne(7, 'orga', ['accueil', 'bar']),
+      ligne(7, 'orga', ['accueil', 'bar'], ['bar']),
       ligne(8, 'autre', []),
     ])
   })
@@ -41,8 +45,13 @@ describe('GET /api/editions/[id]/volunteers/organizers', () => {
     const res = await handler(evenement as any)
 
     expect(res.data.organizers).toEqual([
-      { editionOrganizerId: 7, user: { id: 70, pseudo: 'orga' }, teamIds: ['accueil', 'bar'] },
-      { editionOrganizerId: 8, user: { id: 80, pseudo: 'autre' }, teamIds: [] },
+      {
+        editionOrganizerId: 7,
+        user: { id: 70, pseudo: 'orga' },
+        teamIds: ['accueil', 'bar'],
+        leaderTeamIds: ['bar'],
+      },
+      { editionOrganizerId: 8, user: { id: 80, pseudo: 'autre' }, teamIds: [], leaderTeamIds: [] },
     ])
   })
 
@@ -71,5 +80,16 @@ describe('GET /api/editions/[id]/volunteers/organizers', () => {
 
     await expect(handler(evenement as any)).rejects.toBeDefined()
     expect(prismaMock.editionOrganizer.findMany).not.toHaveBeenCalled()
+  })
+
+  it('distingue les équipes dirigées de celles où il ne fait que figurer', async () => {
+    // L'étoile de responsable se pose par équipe : confondre les deux listes la ferait
+    // apparaître sur toutes celles de la personne.
+    const res = await handler(evenement as any)
+    const orga = res.data.organizers[0]
+
+    expect(orga.teamIds).toContain('accueil')
+    expect(orga.leaderTeamIds).not.toContain('accueil')
+    expect(orga.leaderTeamIds).toEqual(['bar'])
   })
 })

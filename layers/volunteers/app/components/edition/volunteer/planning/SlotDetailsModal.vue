@@ -175,6 +175,38 @@
             <span>{{ t('volunteers.no_volunteers_assigned') }}</span>
           </div>
         </div>
+
+        <!-- Organisateurs affectés. Bloc distinct, et sans compteur sur la capacité : ils n'y
+             entrent pas. -->
+        <div v-if="organisateurs.length > 0" class="space-y-3">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-briefcase" class="w-4 h-4 text-blue-500" />
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {{ t('volunteers.assigned_organizers') }}
+            </h4>
+          </div>
+
+          <div class="space-y-2 pl-6">
+            <div
+              v-for="organisateur in organisateurs"
+              :key="organisateur.editionOrganizerId"
+              class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-md"
+            >
+              <UiUserAvatar :user="organisateur.user" size="sm" />
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {{ organisateur.user.pseudo }}
+                </p>
+                <p
+                  v-if="organisateur.user.nom || organisateur.user.prenom"
+                  class="text-xs text-gray-500 dark:text-gray-400 truncate"
+                >
+                  {{ [organisateur.user.prenom, organisateur.user.nom].filter(Boolean).join(' ') }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </template>
   </UModal>
@@ -227,6 +259,19 @@ const isOpen = computed({
 
 // Assignations
 const assignments = ref<Assignment[]>([])
+
+/**
+ * Les organisateurs affectés au créneau, tels que le planning les transporte déjà. Aucun appel
+ * réseau ici : le créneau les porte, comme il porte ses bénévoles.
+ */
+const organisateurs = computed(
+  () =>
+    ((props.timeSlot as { assignedOrganizersList?: unknown[] } | null)?.assignedOrganizersList ??
+      []) as Array<{
+      editionOrganizerId: number
+      user: { pseudo: string; prenom?: string | null; nom?: string | null }
+    }>
+)
 
 // Titre et description de la modal
 const modalTitle = computed(() => {

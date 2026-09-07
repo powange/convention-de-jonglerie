@@ -96,7 +96,10 @@ export default wrapApiHandler(
           // Équipes de bénévolat auxquelles l'organisateur est rattaché, pour les afficher
           // sur sa ligne comme les repas.
           teamAssignments: {
-            select: { team: { select: { id: true, name: true, color: true } } },
+            select: {
+              isLeader: true,
+              team: { select: { id: true, name: true, color: true } },
+            },
           },
           organizer: {
             select: {
@@ -135,8 +138,12 @@ export default wrapApiHandler(
             accepted: enabledMealIds.length - eo.mealSelections.length,
             total: enabledMealIds.length,
           },
-          // Aplati : la ligne du tableau affiche des équipes, pas des rattachements.
-          teams: eo.teamAssignments.map((rattachement) => rattachement.team),
+          // Aplati : la ligne du tableau affiche des équipes, pas des rattachements. Le statut
+          // de responsable voyage avec l'équipe, c'est de celle-ci qu'on est responsable.
+          teams: eo.teamAssignments.map((rattachement) => ({
+            ...rattachement.team,
+            isLeader: rattachement.isLeader,
+          })),
           user: {
             id: eo.organizer.user.id,
             pseudo: eo.organizer.user.pseudo,

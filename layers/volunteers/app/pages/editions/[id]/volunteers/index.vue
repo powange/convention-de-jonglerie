@@ -20,11 +20,13 @@
       <ClientOnly>
         <!-- Ses propres créneaux d'abord : c'est ce que le bénévole vient chercher.
              Le planning de toute l'édition, plus large, vient ensuite. -->
+        <!-- Aussi pour un organisateur rattaché à une équipe : il tient des créneaux sans avoir
+             de candidature, et ne les voyait donc nulle part. -->
         <EditionVolunteerMySlotsCard
           v-if="
             authStore.isAuthenticated &&
-            myApplication?.status === 'ACCEPTED' &&
-            volunteersMode === 'INTERNAL'
+            volunteersMode === 'INTERNAL' &&
+            (myApplication?.status === 'ACCEPTED' || mesEquipesOrganisateur.length > 0)
           "
           :edition-id="editionId"
           :user-id="authStore.user?.id"
@@ -407,6 +409,29 @@ const { teams: fetchedTeams } = useVolunteerTeams(editionIdComputed)
 // Candidature de l'utilisateur
 const myApplication = ref<any>(null)
 
+/**
+ * Les équipes auxquelles l'utilisateur est rattaché comme organisateur. Liste vide dans
+ * l'immense majorité des cas — c'est ce qui distingue un organisateur du bénévolat du reste
+ * des visiteurs de cette page.
+ */
+const mesEquipesOrganisateur = ref<Array<{ id: string; name: string; isLeader: boolean }>>([])
+
+const chargerMesEquipesOrganisateur = async () => {
+  if (!authStore.isAuthenticated) {
+    mesEquipesOrganisateur.value = []
+    return
+  }
+  try {
+    const reponse = await $fetch<{
+      data?: { teams?: Array<{ id: string; name: string; isLeader: boolean }> }
+    }>(`/api/editions/${editionId}/volunteers/my-organizer-teams`)
+    mesEquipesOrganisateur.value = reponse?.data?.teams ?? []
+  } catch {
+    // Un échec ne doit pas priver la page du reste : on retombe sur « pas concerné ».
+    mesEquipesOrganisateur.value = []
+  }
+}
+
 // Modal de détails de créneau
 const showSlotDetailsModal = ref(false)
 const selectedSlot = ref<any>(null)
@@ -431,10 +456,12 @@ const edition = computed(() => editionStore.getEditionById(editionId))
   const e = edition.value as { volunteersPagePublic?: boolean } | undefined
   const isPagePublic = e?.volunteersPagePublic === true
   if (!isPagePublic) {
-    const canEditEdition = e ? editionStore.canEditEdition(e as any, authStore.user?.id) : false
-    const canManageVolunteers = e
-      ? editionStore.canManageVolunteers(e as any, authStore.user?.id)
-      : false
+    // Relevé une fois : les deux droits demandent un identifiant, et un visiteur non connecté
+    // n'en a pas. Sans utilisateur, aucun des deux ne peut être accordé.
+    const userId = authStore.user?.id
+    const canEditEdition = e && userId ? editionStore.canEditEdition(e as any, userId) : false
+    const canManageVolunteers =
+      e && userId ? editionStore.canManageVolunteers(e as any, userId) : false
 
     let estBenevoleAccepte = false
     if (!canEditEdition && !canManageVolunteers && authStore.user?.id) {
@@ -617,7 +644,11 @@ const fetchMyApplication = async () => {
 
 const fetchVolunteersInfo = async () => {
   try {
-    await Promise.all([fetchVolunteersSettings(), fetchMyApplication()])
+    await Promise.all([
+      fetchVolunteersSettings(),
+      fetchMyApplication(),
+      chargerMesEquipesOrganisateur(),
+    ])
     if (volunteersInfo.value?.description) {
       volunteersDescriptionHtml.value = await markdownToHtml(volunteersInfo.value.description)
     }
@@ -642,7 +673,10 @@ await fetchVolunteersInfo()
 watch(
   () => authStore.isAuthenticated,
   (connecte) => {
-    if (connecte) fetchMyApplication()
+    if (connecte) {
+      fetchMyApplication()
+      chargerMesEquipesOrganisateur()
+    }
   }
 )
 

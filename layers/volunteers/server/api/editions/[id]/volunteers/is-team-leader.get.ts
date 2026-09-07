@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
@@ -10,19 +11,10 @@ export default wrapApiHandler(async (event) => {
   const user = requireAuth(event)
   const editionId = validateEditionId(event)
 
-  // Vérifier s'il existe au moins une assignation d'équipe où l'utilisateur est leader
-  const leaderAssignment = await prisma.applicationTeamAssignment.findFirst({
-    where: {
-      isLeader: true,
-      application: {
-        userId: user.id,
-        eventId: editionId,
-        status: 'ACCEPTED',
-      },
-    },
-  })
+  // Bénévole responsable ou organisateur responsable : les deux titres se valent ici.
+  const teamIds = await equipesDontIlEstResponsable(editionId, user.id)
 
   return createSuccessResponse({
-    isTeamLeader: !!leaderAssignment,
+    isTeamLeader: teamIds.length > 0,
   })
 }, { operationName: 'IsVolunteerTeamLeader' })

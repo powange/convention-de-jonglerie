@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getUserAvatarUrl } from '#server/utils/avatar-url'
+import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
 import {
   messengerStreamService,
   messengerUnreadService,
@@ -218,34 +219,19 @@ export default wrapApiHandler(
                       id: true,
                     },
                   },
-                  // Uniquement si la conversation a une équipe associée
-                  ...(teamId
-                    ? {
-                        volunteerApplications: {
-                          where: {
-                            eventId: editionId,
-                            status: 'ACCEPTED',
-                          },
-                          select: {
-                            teamAssignments: {
-                              where: {
-                                teamId: teamId,
-                                isLeader: true,
-                              },
-                              select: {
-                                isLeader: true,
-                              },
-                            },
-                          },
-                        },
-                      }
-                    : {}),
                 }
               : {}),
           },
         },
       },
     })
+
+    // Responsables de l'équipe, bénévoles comme organisateurs : le titre de la notification
+    // s'en déduit, et l'annoncer de travers désigne la mauvaise personne.
+    const responsablesEquipe =
+      teamId && editionId
+        ? new Set(await utilisateursResponsablesDeLEquipe(editionId, teamId))
+        : new Set<number>()
 
     await Promise.all(
       participantsWithReadStatus.map(async (p) => {
@@ -267,15 +253,10 @@ export default wrapApiHandler(
             const userWithOrgs = p.user as {
               pseudo: string
               organizations?: { id: number }[]
-              volunteerApplications?: { teamAssignments: { isLeader: boolean }[] }[]
             }
             const isOrganizer = userWithOrgs.organizations?.length ?? 0 > 0
 
-            // Vérifier si l'utilisateur est responsable d'équipe pour cette conversation
-            const isTeamLeader =
-              userWithOrgs.volunteerApplications?.some((app) =>
-                app.teamAssignments.some((assignment) => assignment.isLeader)
-              ) ?? false
+            const isTeamLeader = responsablesEquipe.has(p.userId)
 
             if (conversationType === 'TEAM_GROUP') {
               // Pour un groupe d'équipe, même titre pour tout le monde

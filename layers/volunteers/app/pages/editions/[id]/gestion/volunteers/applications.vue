@@ -413,6 +413,38 @@
                     >
                       <UiUserAvatar :user="organisateur.user" size="xs" />
                       <UiUserName :user="organisateur.user" />
+                      <UBadge
+                        v-if="organisateur.leaderTeamIds.includes(team.id)"
+                        color="warning"
+                        size="sm"
+                        variant="soft"
+                      >
+                        <UIcon name="i-heroicons-star-solid" size="12" />
+                        {{ $t('pages.volunteers.team_distribution.leader_badge') }}
+                      </UBadge>
+                      <!-- Même geste que sur la carte d'un bénévole : l'étoile nomme ou destitue. -->
+                      <UTooltip
+                        v-if="canManageVolunteers"
+                        :text="
+                          organisateur.leaderTeamIds.includes(team.id)
+                            ? $t('pages.volunteers.team_distribution.remove_as_leader')
+                            : $t('pages.volunteers.team_distribution.set_as_leader')
+                        "
+                      >
+                        <UButton
+                          :icon="
+                            organisateur.leaderTeamIds.includes(team.id)
+                              ? 'i-heroicons-star-solid'
+                              : 'i-heroicons-star'
+                          "
+                          :color="
+                            organisateur.leaderTeamIds.includes(team.id) ? 'warning' : 'neutral'
+                          "
+                          variant="ghost"
+                          size="xs"
+                          @click="basculerResponsableOrganisateur(organisateur, team.id)"
+                        />
+                      </UTooltip>
                     </div>
                   </div>
                 </div>
@@ -777,6 +809,8 @@ const unassignedVolunteers = computed(() => {
 interface OrganisateurBenevolat {
   editionOrganizerId: number
   teamIds: string[]
+  /** Parmi ses équipes, celles qu'il dirige. */
+  leaderTeamIds: string[]
   user: { id: number; pseudo: string; prenom?: string | null; nom?: string | null }
 }
 
@@ -791,6 +825,39 @@ const organisateursParEquipe = computed(() => {
   }
   return parEquipe
 })
+
+/**
+ * Nomme ou destitue un organisateur responsable d'une équipe.
+ *
+ * Ce n'est pas qu'une étiquette : le statut tient lieu du droit « gestion des bénévoles » sur
+ * le périmètre de l'équipe. D'où le rechargement derrière, pour que l'écran dise la vérité.
+ */
+const basculerResponsableOrganisateur = async (
+  organisateur: OrganisateurBenevolat,
+  teamId: string
+) => {
+  const devientResponsable = !organisateur.leaderTeamIds.includes(teamId)
+  try {
+    await $fetch(
+      `/api/editions/${editionId}/organizers/edition-organizers/${organisateur.editionOrganizerId}/teams/${teamId}/leader`,
+      { method: 'PATCH', body: { isLeader: devientResponsable } }
+    )
+    await chargerOrganisateursEquipes()
+    toast.add({
+      title: devientResponsable
+        ? t('pages.volunteers.team_distribution.leader_added')
+        : t('pages.volunteers.team_distribution.leader_removed'),
+      color: 'success',
+      icon: 'i-heroicons-check-circle',
+    })
+  } catch (error: any) {
+    toast.add({
+      title: error?.data?.message || t('errors.error_occurred'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
 
 const chargerOrganisateursEquipes = async () => {
   if (!edition.value?.volunteersOrganizersInTeams) {
