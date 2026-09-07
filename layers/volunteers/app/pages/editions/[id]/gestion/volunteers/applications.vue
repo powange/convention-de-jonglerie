@@ -770,40 +770,43 @@ const unassignedVolunteers = computed(() => {
 
 // Computed pour la répartition par équipes
 /**
- * Organisateurs rattachés aux équipes. Endpoint dédié : celui des organisateurs exige un droit
- * que le responsable du bénévolat n'a pas, et celui des équipes est ouvert en lecture publique.
+ * Organisateurs de l'édition et leurs équipes. Endpoint dédié : celui des organisateurs exige un
+ * droit que le responsable du bénévolat n'a pas, et celui des équipes est ouvert en lecture
+ * publique.
  */
-interface RattachementOrganisateur {
-  teamId: string
+interface OrganisateurBenevolat {
   editionOrganizerId: number
+  teamIds: string[]
   user: { id: number; pseudo: string; prenom?: string | null; nom?: string | null }
 }
 
-const rattachementsOrganisateurs = ref<RattachementOrganisateur[]>([])
+const organisateurs = ref<OrganisateurBenevolat[]>([])
 
 const organisateursParEquipe = computed(() => {
-  const parEquipe: Record<string, RattachementOrganisateur[]> = {}
-  for (const rattachement of rattachementsOrganisateurs.value) {
-    ;(parEquipe[rattachement.teamId] ??= []).push(rattachement)
+  const parEquipe: Record<string, OrganisateurBenevolat[]> = {}
+  for (const organisateur of organisateurs.value) {
+    for (const teamId of organisateur.teamIds) {
+      ;(parEquipe[teamId] ??= []).push(organisateur)
+    }
   }
   return parEquipe
 })
 
 const chargerOrganisateursEquipes = async () => {
   if (!edition.value?.volunteersOrganizersInTeams) {
-    rattachementsOrganisateurs.value = []
+    organisateurs.value = []
     return
   }
   try {
-    const reponse = await $fetch<{ data?: { assignments?: RattachementOrganisateur[] } }>(
-      `/api/editions/${editionId}/volunteers/team-organizers`
+    const reponse = await $fetch<{ data?: { organizers?: OrganisateurBenevolat[] } }>(
+      `/api/editions/${editionId}/volunteers/organizers`
     )
-    rattachementsOrganisateurs.value = reponse?.data?.assignments ?? []
+    organisateurs.value = reponse?.data?.organizers ?? []
   } catch (error) {
     // Un échec ici ne doit pas priver la page de sa répartition : on la laisse sans les
     // organisateurs plutôt que de la faire tomber.
-    console.error('Failed to fetch team organizers:', error)
-    rattachementsOrganisateurs.value = []
+    console.error('Failed to fetch volunteer organizers:', error)
+    organisateurs.value = []
   }
 }
 

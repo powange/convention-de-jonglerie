@@ -107,6 +107,136 @@
             </UButton>
           </div>
         </div>
+
+        <!-- Organisateurs affectés. Bloc séparé de celui des bénévoles, et sans compteur sur
+             `maxVolunteers` : un organisateur ne prend la place de personne. -->
+        <div
+          v-if="organisateursOuverts"
+          class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 space-y-4"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-heroicons-briefcase" class="w-4 h-4 text-blue-600" />
+              <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                {{ t('volunteers.assigned_organizers') }}
+              </h4>
+            </div>
+            <UBadge color="info" variant="soft" size="sm">
+              {{ organizerAssignments.length }}
+            </UBadge>
+          </div>
+
+          <p class="text-xs text-blue-700 dark:text-blue-300">
+            {{ t('volunteers.organizers_not_counted') }}
+          </p>
+
+          <div v-if="organizerAssignments.length > 0" class="space-y-2">
+            <div
+              v-for="affectation in organizerAssignments"
+              :key="affectation.editionOrganizerId"
+              class="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-md border"
+            >
+              <div class="flex items-center gap-2">
+                <UiUserAvatar :user="affectation.user" size="sm" />
+                <div>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">
+                    {{ affectation.user.pseudo }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <UiUserName :user="affectation.user" />
+                  </p>
+                </div>
+              </div>
+              <UButton
+                color="error"
+                variant="ghost"
+                size="xs"
+                icon="i-heroicons-x-mark"
+                :loading="isUnassigningOrganizer(affectation.editionOrganizerId)"
+                @click="unassignOrganizer(affectation.editionOrganizerId)"
+              >
+                {{ t('common.remove') }}
+              </UButton>
+            </div>
+          </div>
+
+          <div v-else class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+            {{ t('volunteers.no_assigned_organizers') }}
+          </div>
+
+          <div class="border-t pt-3">
+            <UButton
+              color="info"
+              variant="soft"
+              size="sm"
+              icon="i-heroicons-plus"
+              @click="showOrganizerSelector = true"
+            >
+              {{ t('volunteers.add_organizer') }}
+            </UButton>
+          </div>
+        </div>
+      </div>
+    </template>
+  </UModal>
+
+  <!-- Modal de sélection des organisateurs -->
+  <UModal v-model:open="showOrganizerSelector" size="md">
+    <template #header>
+      <div class="flex items-center gap-3">
+        <UIcon name="i-heroicons-briefcase" class="w-5 h-5 text-primary-600" />
+        <h3 class="text-lg font-semibold">{{ t('volunteers.select_organizer') }}</h3>
+      </div>
+    </template>
+
+    <template #body>
+      <div v-if="organizerAssignLoading" class="flex justify-center py-8">
+        <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-primary-500" />
+      </div>
+
+      <div v-else-if="availableOrganizers.length === 0" class="text-center py-8">
+        <UIcon name="i-heroicons-briefcase" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+        <p class="text-gray-500 dark:text-gray-400">
+          {{
+            timeSlot?.teamId && timeSlot.teamId !== 'unassigned'
+              ? t('volunteers.no_organizers_for_team')
+              : t('volunteers.no_available_organizers')
+          }}
+        </p>
+      </div>
+
+      <div v-else class="space-y-3 max-h-96 overflow-y-auto">
+        <div
+          v-for="candidat in availableOrganizers"
+          :key="candidat.editionOrganizerId"
+          class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        >
+          <div class="flex items-center gap-3">
+            <UiUserAvatar :user="candidat.user" size="sm" />
+            <div>
+              <p class="font-medium text-gray-900 dark:text-white">{{ candidat.user.pseudo }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                <UiUserName :user="candidat.user" />
+              </p>
+            </div>
+          </div>
+          <UButton
+            color="primary"
+            variant="soft"
+            size="sm"
+            @click="assignOrganizer(candidat.editionOrganizerId)"
+          >
+            {{ t('volunteers.assign') }}
+          </UButton>
+        </div>
+      </div>
+    </template>
+
+    <template #footer>
+      <div class="flex justify-end">
+        <UButton variant="ghost" @click="showOrganizerSelector = false">
+          {{ t('common.cancel') }}
+        </UButton>
       </div>
     </template>
   </UModal>
@@ -194,6 +324,9 @@ import { computed, ref, watch } from 'vue'
 
 import type { VolunteerTimeSlot } from '#imports'
 
+import { organisateursAffectables } from '../../../../utils/organisateurs-affectables'
+
+
 // Props
 interface Props {
   modelValue: boolean
@@ -215,6 +348,7 @@ const { formatForDisplay } = useDatetime()
 
 // État
 const showVolunteerSelector = ref(false)
+const showOrganizerSelector = ref(false)
 
 interface Assignment {
   id: string
@@ -255,8 +389,18 @@ interface AvailableVolunteer {
   assignmentsCount: number
 }
 
+/** Un organisateur affecté ou affectable. Sa fiche est celle de l'utilisateur, comme un bénévole. */
+interface OrganizerEntry {
+  editionOrganizerId: number
+  user: Assignment['user']
+  /** Ses équipes ; absent des affectations, où seul le créneau compte. */
+  teamIds?: string[]
+}
+
 const assignments = ref<Assignment[]>([])
 const availableVolunteers = ref<AvailableVolunteer[]>([])
+const organizerAssignments = ref<OrganizerEntry[]>([])
+const organizerCandidates = ref<Array<OrganizerEntry & { teamIds: string[] }>>([])
 
 // Computed
 const isOpen = computed({
@@ -272,6 +416,26 @@ const modalTitle = computed(() => {
 const effectiveEditionId = computed(() => {
   return props.editionId || props.timeSlot?.editionId
 })
+
+const editionStore = useEditionStore()
+
+/** L'option d'édition qui commande tout ce qui touche aux organisateurs dans le bénévolat. */
+const organisateursOuverts = computed(
+  () =>
+    !!editionStore.getEditionById(Number(effectiveEditionId.value))?.volunteersOrganizersInTeams
+)
+
+/**
+ * Les organisateurs proposés : ceux de l'équipe du créneau, moins ceux déjà posés dessus. Un
+ * créneau sans équipe les propose tous, comme il propose tous les bénévoles.
+ */
+const availableOrganizers = computed(() =>
+  organisateursAffectables(
+    organizerCandidates.value,
+    organizerAssignments.value,
+    props.timeSlot?.teamId
+  )
+)
 
 // Durée
 const duration = computed(() => {
@@ -349,6 +513,43 @@ const fetchAvailableVolunteers = async () => {
   }
 }
 
+const fetchOrganizerAssignments = async () => {
+  if (!props.timeSlot?.id || !effectiveEditionId.value || !organisateursOuverts.value) {
+    organizerAssignments.value = []
+    return
+  }
+
+  try {
+    const response = await $fetch<{ data?: { assignments?: OrganizerEntry[] } }>(
+      `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot.id}/organizer-assignments`
+    )
+    organizerAssignments.value = response?.data?.assignments ?? []
+  } catch (error) {
+    // La modale doit rester utilisable pour les bénévoles même si cette partie échoue.
+    console.error('Erreur lors de la récupération des organisateurs du créneau:', error)
+    organizerAssignments.value = []
+  }
+}
+
+const fetchOrganizerCandidates = async () => {
+  if (!effectiveEditionId.value || !organisateursOuverts.value) {
+    organizerCandidates.value = []
+    return
+  }
+
+  try {
+    const response = await $fetch<{
+      data?: { organizers?: Array<OrganizerEntry & { teamIds: string[] }> }
+    }>(
+      `/api/editions/${effectiveEditionId.value}/volunteers/organizers`
+    )
+    organizerCandidates.value = response?.data?.organizers ?? []
+  } catch (error) {
+    console.error('Erreur lors de la récupération des organisateurs:', error)
+    organizerCandidates.value = []
+  }
+}
+
 const currentUserId = ref<number>()
 
 const { execute: executeAssign, loading: assignmentLoading } = useApiAction(
@@ -387,6 +588,44 @@ const { execute: unassignVolunteer, isLoading: isUnassigning } = useApiActionByI
   }
 )
 
+const currentOrganizerId = ref<number>()
+
+const { execute: executeAssignOrganizer, loading: organizerAssignLoading } = useApiAction(
+  () =>
+    `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot?.id}/organizer-assignments`,
+  {
+    method: 'POST',
+    body: () => ({ editionOrganizerId: currentOrganizerId.value }),
+    successMessage: { title: t('volunteers.organizer_assigned') },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess: async () => {
+      await fetchOrganizerAssignments()
+      showOrganizerSelector.value = false
+      emit('refresh')
+    },
+  }
+)
+
+const assignOrganizer = (editionOrganizerId: number) => {
+  if (!props.timeSlot?.id || !effectiveEditionId.value) return
+  currentOrganizerId.value = editionOrganizerId
+  executeAssignOrganizer()
+}
+
+const { execute: unassignOrganizer, isLoading: isUnassigningOrganizer } = useApiActionById(
+  (editionOrganizerId) =>
+    `/api/editions/${effectiveEditionId.value}/volunteer-time-slots/${props.timeSlot?.id}/organizer-assignments/${editionOrganizerId}`,
+  {
+    method: 'DELETE',
+    successMessage: { title: t('volunteers.organizer_unassigned') },
+    errorMessages: { default: t('errors.error_occurred') },
+    onSuccess: async () => {
+      await fetchOrganizerAssignments()
+      emit('refresh')
+    },
+  }
+)
+
 // Charger les assignations à l'ouverture
 watch(
   [isOpen, () => props.timeSlot?.id],
@@ -394,6 +633,8 @@ watch(
     if (isOpenValue && slotId) {
       fetchAssignments()
       fetchAvailableVolunteers()
+      fetchOrganizerAssignments()
+      fetchOrganizerCandidates()
     }
   },
   { immediate: true }

@@ -26,6 +26,19 @@ export interface VolunteerTimeSlotAPI {
       updatedAt: string
     }
   }>
+  /** Organisateurs affectés au créneau. Hors de `assignedVolunteers` : ils ne comptent pas. */
+  organizerAssignments: Array<{
+    editionOrganizerId: number
+    user: {
+      id: number
+      pseudo: string
+      nom?: string | null
+      prenom?: string | null
+      emailHash?: string
+      profilePicture?: string | null
+      updatedAt?: string
+    }
+  }>
   color: string
   resourceId: string
 }

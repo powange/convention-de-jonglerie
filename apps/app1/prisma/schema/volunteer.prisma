@@ -195,9 +195,10 @@ model VolunteerTimeSlot {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  event       Event                 @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  team        VolunteerTeam?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  assignments VolunteerAssignment[]
+  event                Event                     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  team                 VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  assignments          VolunteerAssignment[]
+  organizerAssignments OrganizerSlotAssignment[]
 
   @@index([eventId])
   @@index([teamId])
@@ -269,6 +270,28 @@ model OrganizerTeamAssignment {
 
   @@id([editionOrganizerId, teamId])
   @@index([teamId])
+}
+
+/// Affectation d'un organisateur d'édition à un créneau de bénévolat.
+///
+/// Table distincte de `VolunteerAssignment` pour la même raison que le rattachement aux
+/// équipes : un organisateur ne compte pas dans `maxVolunteers`, ne figure ni dans la
+/// couverture ni dans l'assignation automatique, et ne peut pas échanger son créneau. Rien de
+/// ce qui compte les bénévoles ne connaît cette table.
+///
+/// Sans `assignedById`, contrairement à `VolunteerAssignment` : cette traçabilité y sert aux
+/// échanges et à distinguer les affectations automatiques, deux mécaniques dont les
+/// organisateurs sont hors de portée.
+model OrganizerSlotAssignment {
+  editionOrganizerId Int
+  timeSlotId         String
+  assignedAt         DateTime @default(now())
+
+  editionOrganizer EditionOrganizer  @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
+  timeSlot         VolunteerTimeSlot @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+
+  @@id([editionOrganizerId, timeSlotId])
+  @@index([timeSlotId])
 }
 
 model VolunteerComment {

@@ -46,6 +46,33 @@ export default wrapApiHandler(
             },
           },
         },
+        // Organisateurs affectés au créneau. Hors du `_count` : ils ne comptent pas dans
+        // l'effectif, c'est tout l'intérêt de la table séparée.
+        organizerAssignments: {
+          select: {
+            editionOrganizer: {
+              select: {
+                id: true,
+                organizer: {
+                  select: {
+                    user: {
+                      select: {
+                        id: true,
+                        pseudo: true,
+                        nom: true,
+                        prenom: true,
+                        pronouns: true,
+                        emailHash: true,
+                        profilePicture: true,
+                        updatedAt: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         _count: {
           select: {
             assignments: true,
@@ -83,6 +110,10 @@ export default wrapApiHandler(
           profilePicture: assignment.user.profilePicture,
           updatedAt: assignment.user.updatedAt,
         },
+      })),
+      organizerAssignments: slot.organizerAssignments.map((affectation) => ({
+        editionOrganizerId: affectation.editionOrganizer.id,
+        user: affectation.editionOrganizer.organizer.user,
       })),
       color: slot.team?.color || '#6b7280',
       resourceId: slot.teamId || 'unassigned',
