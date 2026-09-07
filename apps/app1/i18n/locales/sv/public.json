@@ -188,6 +188,7 @@
         "select_team_instruction": "Välj destinationsteam",
         "set_as_leader": "Definiera ansvarig",
         "stats": {
+          "attached_organizers": "Kopplade arrangörer",
           "assigned_volunteers": "Tilldelade volontärer",
           "total_assignments": "Totalt antal uppdrag",
           "total_teams": "Totalt antal lag",

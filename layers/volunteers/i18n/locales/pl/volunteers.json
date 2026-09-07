@@ -52,6 +52,9 @@
     "assigned_to_teams": "Przypisany do {count} zespołu | Przypisany do {count} zespołów",
     "assigned_volunteers": "Przypisani wolontariusze",
     "assigned_organizers": "Przypisani organizatorzy",
+    "organizer": "organizator",
+    "organizers": "organizatorzy",
+    "average_per_person": "Średnia na osobę",
     "no_assigned_organizers": "Nie przypisano organizatora",
     "add_organizer": "Dodaj organizatora",
     "select_organizer": "Wybierz organizatora",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "Do tego zespołu nie przypisano organizatora",
     "organizer_assigned": "Organizator przypisany do zmiany",
     "organizer_unassigned": "Organizator usunięty ze zmiany",
-    "organizers_not_counted": "Organizatorzy nie liczą się do liczby miejsc na zmianie.",
     "auto_assignment": {
       "allow_overtime": "Pozwól na nadgodziny",
       "allow_overtime_help": "Pozwala na lekkie przekroczenie maksymalnych godzin w razie potrzeby",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Zachować dostęp do spektakli",
       "preserve_show_access_help": "Nie przydziela wolontariusza do dyżuru, który uniemożliwiłby mu obejrzenie choćby jednego przedstawienia spektaklu. Dyżur pozostaje wtedy nieobsadzony."
     },
-    "average_per_volunteer": "Średnia na wolontariusza",
     "avoid_list_hint": "Te informacje pozostają poufne i pomagają organizatorom tworzyć harmonijne zespoły",
     "avoid_list_label": "Wolontariusze, z którymi wolałbym nie pracować na zmianach (opcjonalne)",
     "avoid_list_placeholder": "Imiona innych wolontariuszy do unikania na zmianach...",

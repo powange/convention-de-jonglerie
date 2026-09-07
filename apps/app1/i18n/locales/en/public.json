@@ -188,6 +188,7 @@
         "select_team_instruction": "Select the destination team",
         "set_as_leader": "Set as leader",
         "stats": {
+          "attached_organizers": "Attached organizers",
           "assigned_volunteers": "Assigned volunteers",
           "total_assignments": "Total assignments",
           "total_teams": "Total teams",

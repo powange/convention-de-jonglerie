@@ -52,6 +52,9 @@
     "assigned_to_teams": "Toegewezen aan {count} team | Toegewezen aan {count} teams",
     "assigned_volunteers": "Toegewezen vrijwilligers",
     "assigned_organizers": "Toegewezen organisatoren",
+    "organizer": "organisator",
+    "organizers": "organisatoren",
+    "average_per_person": "Gemiddelde per persoon",
     "no_assigned_organizers": "Geen organisator toegewezen",
     "add_organizer": "Een organisator toevoegen",
     "select_organizer": "Een organisator selecteren",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "Geen organisator gekoppeld aan dit team",
     "organizer_assigned": "Organisator toegewezen aan het tijdslot",
     "organizer_unassigned": "Organisator verwijderd uit het tijdslot",
-    "organizers_not_counted": "Organisatoren tellen niet mee voor de capaciteit van het tijdslot.",
     "auto_assignment": {
       "allow_overtime": "Overuren toestaan",
       "allow_overtime_help": "Staat toe om de maximale uren licht te overschrijden indien nodig",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Toegang tot de voorstellingen behouden",
       "preserve_show_access_help": "Wijst een vrijwilliger geen dienst toe die hem zou beletten ook maar één uitvoering van een voorstelling bij te wonen. De dienst blijft dan onbezet."
     },
-    "average_per_volunteer": "Gemiddelde per vrijwilliger",
     "avoid_list_hint": "Deze informatie blijft vertrouwelijk en helpt organisatoren harmonieuze teams te creëren",
     "avoid_list_label": "Vrijwilligers waarmee ik liever geen diensten zou willen draaien (optioneel)",
     "avoid_list_placeholder": "Namen van andere vrijwilligers te vermijden voor diensten...",

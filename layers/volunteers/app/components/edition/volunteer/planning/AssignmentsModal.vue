@@ -42,7 +42,7 @@
               </h4>
             </div>
             <UBadge color="warning" variant="soft" size="sm">
-              {{ assignments.length }}/{{ timeSlot?.maxVolunteers || 0 }}
+              {{ placesOccupees }}/{{ timeSlot?.maxVolunteers || 0 }}
             </UBadge>
           </div>
 
@@ -95,7 +95,7 @@
           </div>
 
           <!-- Ajouter un bénévole -->
-          <div v-if="assignments.length < (timeSlot?.maxVolunteers || 0)" class="border-t pt-3">
+          <div v-if="resteUnePlace" class="border-t pt-3">
             <UButton
               color="warning"
               variant="soft"
@@ -108,8 +108,8 @@
           </div>
         </div>
 
-        <!-- Organisateurs affectés. Bloc séparé de celui des bénévoles, et sans compteur sur
-             `maxVolunteers` : un organisateur ne prend la place de personne. -->
+        <!-- Organisateurs affectés. Bloc séparé pour qu'on distingue les deux titres, mais
+             leurs places se comptent ensemble dans le badge ci-dessus. -->
         <div
           v-if="organisateursOuverts"
           class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 space-y-4"
@@ -125,10 +125,6 @@
               {{ organizerAssignments.length }}
             </UBadge>
           </div>
-
-          <p class="text-xs text-blue-700 dark:text-blue-300">
-            {{ t('volunteers.organizers_not_counted') }}
-          </p>
 
           <div v-if="organizerAssignments.length > 0" class="space-y-2">
             <div
@@ -164,7 +160,7 @@
             {{ t('volunteers.no_assigned_organizers') }}
           </div>
 
-          <div class="border-t pt-3">
+          <div v-if="resteUnePlace" class="border-t pt-3">
             <UButton
               color="info"
               variant="soft"
@@ -425,6 +421,14 @@ const organisateursOuverts = computed(
   () =>
     !!editionStore.getEditionById(Number(effectiveEditionId.value))?.volunteersOrganizersInTeams
 )
+
+/**
+ * Les places occupées, bénévoles et organisateurs confondus : un organisateur en prend une,
+ * exactement comme un bénévole. Sur un créneau à deux places, en poser un n'en laisse qu'une.
+ */
+const placesOccupees = computed(() => assignments.value.length + organizerAssignments.value.length)
+
+const resteUnePlace = computed(() => placesOccupees.value < (props.timeSlot?.maxVolunteers || 0))
 
 /**
  * Les organisateurs proposés : ceux de l'équipe du créneau, moins ceux déjà posés dessus. Un

@@ -52,6 +52,9 @@
     "assigned_to_teams": "Assigned to {count} team | Assigned to {count} teams",
     "assigned_volunteers": "Assigned volunteers",
     "assigned_organizers": "Assigned organizers",
+    "organizer": "organizer",
+    "organizers": "organizers",
+    "average_per_person": "Average per person",
     "no_assigned_organizers": "No organizer assigned",
     "add_organizer": "Add an organizer",
     "select_organizer": "Select an organizer",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "No organizer attached to this team",
     "organizer_assigned": "Organizer assigned to the time slot",
     "organizer_unassigned": "Organizer removed from the time slot",
-    "organizers_not_counted": "Organizers do not count towards the time slot's capacity.",
     "auto_assignment": {
       "allow_overtime": "Allow overtime",
       "allow_overtime_help": "Allows slightly exceeding maximum hours if necessary",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Preserve access to shows",
       "preserve_show_access_help": "Never assigns a volunteer to a shift that would keep them from attending a single performance of a show. The shift is then left unfilled."
     },
-    "average_per_volunteer": "Average per volunteer",
     "avoid_list_hint": "This information remains confidential and helps organizers create harmonious teams",
     "avoid_list_label": "Volunteers I prefer not to work shifts with (optional)",
     "avoid_list_placeholder": "Names of other volunteers to avoid for shifts...",

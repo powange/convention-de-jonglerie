@@ -52,6 +52,9 @@
     "assigned_to_teams": "Asignado a {count} equipo | Asignado a {count} equipos",
     "assigned_volunteers": "Voluntarios asignados",
     "assigned_organizers": "Organizadores asignados",
+    "organizer": "organizador",
+    "organizers": "organizadores",
+    "average_per_person": "Media por persona",
     "no_assigned_organizers": "Ningún organizador asignado",
     "add_organizer": "Añadir un organizador",
     "select_organizer": "Seleccionar un organizador",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "Ningún organizador asignado a este equipo",
     "organizer_assigned": "Organizador asignado al turno",
     "organizer_unassigned": "Organizador retirado del turno",
-    "organizers_not_counted": "Los organizadores no cuentan para la capacidad del turno.",
     "auto_assignment": {
       "allow_overtime": "Permitir horas extra",
       "allow_overtime_help": "Permite superar ligeramente las horas máximas si es necesario",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Preservar el acceso a los espectáculos",
       "preserve_show_access_help": "No asigna a un voluntario a un turno que le impediría asistir a ninguna representación de un espectáculo. El turno queda entonces sin cubrir."
     },
-    "average_per_volunteer": "Promedio por voluntario",
     "avoid_list_hint": "Esta información permanece confidencial y ayuda a los organizadores a crear equipos armoniosos",
     "avoid_list_label": "Voluntarios con los que prefiero no trabajar turnos (opcional)",
     "avoid_list_placeholder": "Nombres de otros voluntarios a evitar para turnos...",

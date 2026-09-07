@@ -52,6 +52,9 @@
     "assigned_to_teams": "Zu {count} Team zugewiesen | Zu {count} Teams zugewiesen",
     "assigned_volunteers": "Zugewiesene Freiwillige",
     "assigned_organizers": "Zugewiesene Organisatoren",
+    "organizer": "Organisator",
+    "organizers": "Organisatoren",
+    "average_per_person": "Durchschnitt pro Person",
     "no_assigned_organizers": "Kein Organisator zugewiesen",
     "add_organizer": "Organisator hinzufügen",
     "select_organizer": "Organisator auswählen",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "Diesem Team ist kein Organisator zugeordnet",
     "organizer_assigned": "Organisator dem Zeitfenster zugewiesen",
     "organizer_unassigned": "Organisator aus dem Zeitfenster entfernt",
-    "organizers_not_counted": "Organisatoren zählen nicht zur Kapazität des Zeitfensters.",
     "auto_assignment": {
       "allow_overtime": "Überstunden erlauben",
       "allow_overtime_help": "Ermöglicht bei Bedarf ein leichtes Überschreiten der maximalen Stunden",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Zugang zu den Aufführungen wahren",
       "preserve_show_access_help": "Weist Freiwillige keiner Schicht zu, die sie daran hindern würde, auch nur eine Vorstellung einer Aufführung zu besuchen. Die Schicht bleibt dann unbesetzt."
     },
-    "average_per_volunteer": "Durchschnitt pro Freiwilliger",
     "avoid_list_hint": "Diese Informationen bleiben vertraulich und helfen den Organisatoren, harmonische Teams zu bilden",
     "avoid_list_label": "Freiwillige, mit denen ich nicht arbeiten möchte (optional)",
     "avoid_list_placeholder": "Namen anderer Freiwilliger, die für Schichten zu vermeiden sind...",

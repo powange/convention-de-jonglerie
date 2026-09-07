@@ -188,6 +188,7 @@
         "select_team_instruction": "Wybierz zespół docelowy",
         "set_as_leader": "Ustaw jako lidera",
         "stats": {
+          "attached_organizers": "Przypisani organizatorzy",
           "assigned_volunteers": "Przypisani wolontariusze",
           "total_assignments": "Łączne przypisania",
           "total_teams": "Łączne zespoły",

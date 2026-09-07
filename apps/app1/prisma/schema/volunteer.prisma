@@ -256,10 +256,9 @@ model ApplicationTeamAssignment {
 /// Rattachement d'un organisateur d'édition à une équipe de bénévoles.
 ///
 /// Table distincte de `ApplicationTeamAssignment`, et non un champ ajouté à celle-ci : un
-/// organisateur ne compte ni dans la capacité d'un créneau, ni dans les statistiques de
-/// couverture, ni dans l'assignation automatique. Séparer les deux tient cet invariant par
-/// construction — rien de ce qui compte des bénévoles ne connaît celle-ci — plutôt que par un
-/// filtre à ne pas oublier dans chaque requête.
+/// organisateur n'a pas de candidature, et la table des candidatures ne saurait donc pas le
+/// porter. Séparer les deux évite d'inventer des candidatures fantômes pour des gens qui n'en
+/// ont jamais déposé.
 model OrganizerTeamAssignment {
   editionOrganizerId Int
   teamId             String
@@ -278,10 +277,10 @@ model OrganizerTeamAssignment {
 
 /// Affectation d'un organisateur d'édition à un créneau de bénévolat.
 ///
-/// Table distincte de `VolunteerAssignment` pour la même raison que le rattachement aux
-/// équipes : un organisateur ne compte pas dans `maxVolunteers`, ne figure ni dans la
-/// couverture ni dans l'assignation automatique, et ne peut pas échanger son créneau. Rien de
-/// ce qui compte les bénévoles ne connaît cette table.
+/// Table distincte de `VolunteerAssignment`, mais pas parce qu'un organisateur pèserait moins :
+/// il occupe une place comme un bénévole, et `maxVolunteers` les compte ensemble. Ce qui le
+/// distingue est ailleurs — il n'a ni candidature, ni échange de créneau, ni part dans
+/// l'assignation automatique.
 ///
 /// Sans `assignedById`, contrairement à `VolunteerAssignment` : cette traçabilité y sert aux
 /// échanges et à distinguer les affectations automatiques, deux mécaniques dont les

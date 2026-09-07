@@ -188,6 +188,7 @@
         "select_team_instruction": "Výběr cílového týmu",
         "set_as_leader": "Definice odpovědnosti",
         "stats": {
+          "attached_organizers": "Přiřazení organizátoři",
           "assigned_volunteers": "Přidělení dobrovolníci",
           "total_assignments": "Celkový počet úkolů",
           "total_teams": "Týmy celkem",

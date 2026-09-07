@@ -14,9 +14,13 @@ const bodySchema = z.object({
  *
  * Affecte un organisateur de l'édition à un créneau de bénévolat.
  *
- * **Aucun contrôle de capacité, volontairement** : `maxVolunteers` compte les bénévoles, et un
- * organisateur n'en est pas un. Un créneau complet accepte donc un organisateur, et l'y placer
- * ne prend la place de personne. C'est le pendant du choix de table séparée.
+ * Un organisateur **occupe une place** : `maxVolunteers` dit combien de personnes le créneau
+ * demande, et il ne distingue pas les titres. Sur un créneau à deux places, un organisateur en
+ * prend une, et il ne reste qu'un poste — pour un bénévole ou pour un autre organisateur.
+ *
+ * La table reste séparée pour autant : ce qui distingue un organisateur, c'est de n'avoir ni
+ * candidature, ni échange de créneau, ni part dans l'assignation automatique. Pas la place
+ * qu'il occupe.
  */
 export default wrapApiHandler(
   async (event) => {
@@ -46,7 +50,11 @@ export default wrapApiHandler(
     // celle-ci.
     const timeSlot = await prisma.volunteerTimeSlot.findFirst({
       where: { id: slotId, eventId: editionId },
-      select: { id: true },
+      select: {
+        id: true,
+        maxVolunteers: true,
+        _count: { select: { assignments: true, organizerAssignments: true } },
+      },
     })
     if (!timeSlot) {
       throw createError({
@@ -72,6 +80,14 @@ export default wrapApiHandler(
         status: 400,
         message: 'Cet organisateur est déjà affecté à ce créneau',
       })
+    }
+
+    // Les places se comptent toutes ensemble, bénévoles et organisateurs. Ce contrôle vient
+    // après celui du doublon : réaffecter quelqu'un déjà présent sur un créneau plein doit se
+    // voir dire « déjà affecté », pas « complet ».
+    const placesOccupees = timeSlot._count.assignments + timeSlot._count.organizerAssignments
+    if (placesOccupees >= timeSlot.maxVolunteers) {
+      throw createError({ status: 400, message: 'Ce créneau est déjà complet' })
     }
 
     await prisma.organizerSlotAssignment.create({

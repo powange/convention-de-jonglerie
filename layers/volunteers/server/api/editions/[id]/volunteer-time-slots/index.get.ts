@@ -46,8 +46,8 @@ export default wrapApiHandler(
             },
           },
         },
-        // Organisateurs affectés au créneau. Hors du `_count` : ils ne comptent pas dans
-        // l'effectif, c'est tout l'intérêt de la table séparée.
+        // Organisateurs affectés au créneau. Le `_count` ne porte que les bénévoles ; le
+        // client additionne les deux pour connaître les places occupées.
         organizerAssignments: {
           select: {
             editionOrganizer: {

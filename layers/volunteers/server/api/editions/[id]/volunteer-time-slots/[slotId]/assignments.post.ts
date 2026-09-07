@@ -35,6 +35,9 @@ export default wrapApiHandler(
         _count: {
           select: {
             assignments: true,
+            // Un organisateur occupe une place comme un bénévole : l'ignorer ici laisserait
+            // s'ajouter un bénévole de trop sur un créneau déjà pourvu.
+            organizerAssignments: true,
           },
         },
       },
@@ -63,8 +66,9 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que le créneau n'est pas déjà complet
-    if (timeSlot._count.assignments >= timeSlot.maxVolunteers) {
+    // Vérifier que le créneau n'est pas déjà complet, organisateurs compris
+    const placesOccupees = timeSlot._count.assignments + timeSlot._count.organizerAssignments
+    if (placesOccupees >= timeSlot.maxVolunteers) {
       throw createError({
         status: 400,
         message: 'Ce créneau est déjà complet',

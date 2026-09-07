@@ -4,6 +4,8 @@
 
 export interface VolunteerStats {
   totalVolunteers: number
+  /** Organisateurs tenant au moins un créneau. Distingués des bénévoles, mais comptés comme eux. */
+  totalOrganizers: number
   totalHours: number
   averageHours: number
   totalSlots: number
@@ -17,11 +19,15 @@ export interface VolunteerStat {
     nom?: string | null
     [key: string]: any
   }
+  /** Vrai pour un organisateur : l'affichage le signale, sans le sortir du relevé. */
+  estOrganisateur?: boolean
   hours: number
   slots: number
 }
 
 export interface DayStats {
+  /** Organisateurs présents ce jour-là. Comptés à part des bénévoles, pas fondus. */
+  totalOrganizers: number
   date: string
   volunteers: VolunteerStat[]
   totalVolunteers: number
@@ -59,7 +65,41 @@ export interface TimeSlotWithAssignments {
     }
     [key: string]: any
   }>
+  /** Organisateurs affectés au créneau. Ils y tiennent un poste comme les bénévoles. */
+  assignedOrganizersList?: Array<{
+    user: {
+      id: number
+      pseudo: string
+      prenom?: string | null
+      nom?: string | null
+      [key: string]: any
+    }
+    [key: string]: any
+  }>
   [key: string]: any
+}
+
+/**
+ * Tout le monde sur un créneau : bénévoles affectés et organisateurs rattachés.
+ *
+ * Les statistiques mesurent le travail réellement tenu, et un organisateur qui tient un poste
+ * le tient autant qu'un bénévole. C'est cohérent avec la capacité d'un créneau, où il occupe
+ * une place comme les autres.
+ */
+export function personnesDuCreneau(slot: TimeSlotWithAssignments): Array<{
+  user: { id: number; pseudo: string; prenom?: string | null; nom?: string | null }
+  estOrganisateur: boolean
+}> {
+  return [
+    ...(slot.assignedVolunteersList ?? []).map((affectation) => ({
+      user: affectation.user,
+      estOrganisateur: false,
+    })),
+    ...(slot.assignedOrganizersList ?? []).map((affectation) => ({
+      user: affectation.user,
+      estOrganisateur: true,
+    })),
+  ]
 }
 
 export interface AcceptedVolunteer {
@@ -83,42 +123,36 @@ export function calculateVolunteersStats(
 ): VolunteerStats {
   const totalVolunteers = acceptedVolunteers.length || 0
 
-  if (totalVolunteers === 0) {
-    return {
-      totalVolunteers: 0,
-      totalHours: 0,
-      averageHours: 0,
-      totalSlots: 0,
-    }
-  }
-
-  const volunteerHours = new Map<number, number>()
-  const volunteerSlots = new Map<number, number>()
   let totalHours = 0
   let totalSlots = 0
+  // Un organisateur ne compte que s'il tient un créneau : rattaché à une équipe sans poste, il
+  // n'a rien à peser dans un relevé d'heures.
+  const organisateursAvecCreneau = new Set<number>()
 
-  const slotsWithAssignments = timeSlots.filter(
-    (slot) => slot.assignedVolunteersList && slot.assignedVolunteersList.length > 0
-  )
+  timeSlots.forEach((slot) => {
+    const personnes = personnesDuCreneau(slot)
+    if (personnes.length === 0) return
 
-  slotsWithAssignments.forEach((slot) => {
     const startTime = new Date(slot.start)
     const endTime = new Date(slot.end)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
 
-    slot.assignedVolunteersList?.forEach((assignment) => {
-      const userId = assignment.user.id
-      volunteerHours.set(userId, (volunteerHours.get(userId) || 0) + hours)
-      volunteerSlots.set(userId, (volunteerSlots.get(userId) || 0) + 1)
+    personnes.forEach((personne) => {
+      if (personne.estOrganisateur) organisateursAvecCreneau.add(personne.user.id)
       totalHours += hours
       totalSlots += 1
     })
   })
 
-  const averageHours = totalVolunteers > 0 ? totalHours / totalVolunteers : 0
+  const totalOrganizers = organisateursAvecCreneau.size
+  // La moyenne se rapporte à tous ceux qui tiennent un poste : diviser les heures des uns par
+  // le seul effectif des autres donnerait une moyenne gonflée.
+  const effectif = totalVolunteers + totalOrganizers
+  const averageHours = effectif > 0 ? totalHours / effectif : 0
 
   return {
     totalVolunteers,
+    totalOrganizers,
     totalHours,
     averageHours,
     totalSlots,
@@ -132,7 +166,10 @@ export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments
   const dayStats = new Map<string, any>()
 
   timeSlots.forEach((slot) => {
-    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
+    // Organisateurs compris : un jour de convention se mesure à qui l'a tenu, pas au titre
+    // sous lequel chacun l'a fait.
+    const personnes = personnesDuCreneau(slot)
+    if (personnes.length === 0) return
 
     const startTime = new Date(slot.start)
     const endTime = new Date(slot.end)
@@ -146,15 +183,17 @@ export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments
       volunteers: new Map<number, any>(),
       totalHours: 0,
       totalVolunteers: 0,
+      totalOrganizers: 0,
     }
     dayStats.set(dayKey, day)
 
-    slot.assignedVolunteersList.forEach((assignment) => {
-      const userId = assignment.user.id
+    personnes.forEach((personne) => {
+      const userId = personne.user.id
 
       if (!day.volunteers.has(userId)) {
         day.volunteers.set(userId, {
-          user: assignment.user,
+          user: personne.user,
+          estOrganisateur: personne.estOrganisateur,
           hours: 0,
           slots: 0,
         })
@@ -166,7 +205,11 @@ export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments
       day.totalHours += hours
     })
 
-    day.totalVolunteers = day.volunteers.size
+    // Les deux titres se comptent séparément : « 8 bénévoles et 2 organisateurs » dit qui
+    // tient la journée, là où « 10 personnes » le tairait.
+    const parTitre = [...day.volunteers.values()]
+    day.totalVolunteers = parTitre.filter((personne) => !personne.estOrganisateur).length
+    day.totalOrganizers = parTitre.filter((personne) => personne.estOrganisateur).length
   })
 
   // Convertir en array et trier par date
@@ -201,19 +244,23 @@ export function calculateVolunteersStatsIndividual(
 
   // Ensuite, calculer les heures pour ceux qui ont des cr�neaux
   timeSlots.forEach((slot) => {
-    if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
+    const personnes = personnesDuCreneau(slot)
+    if (personnes.length === 0) return
 
     const startTime = new Date(slot.start)
     const endTime = new Date(slot.end)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
     const dayKey = startTime.toISOString().split('T')[0] // YYYY-MM-DD
 
-    slot.assignedVolunteersList.forEach((assignment) => {
-      const userId = assignment.user.id
+    personnes.forEach((personne) => {
+      const userId = personne.user.id
 
+      // Un organisateur n'a pas de candidature : il n'est pas dans la liste de départ, et
+      // c'est ici qu'il entre — le relevé serait muet sur les heures qu'il tient.
       if (!volunteerStats.has(userId)) {
         volunteerStats.set(userId, {
-          user: assignment.user,
+          user: personne.user,
+          estOrganisateur: personne.estOrganisateur,
           totalHours: 0,
           totalSlots: 0,
           dayDetails: new Map<string, any>(),
@@ -260,12 +307,21 @@ export interface TeamStats {
   teamId: string | null
   teamName: string
   color?: string
+  /** Les heures **à pourvoir** : durée du créneau × nombre de places demandées. */
   totalHours: number
+  /** Les heures **réellement tenues** : durée du créneau × personnes affectées dessus. */
+  coveredHours: number
   totalSlots: number
   totalVolunteers: number
+  /** Organisateurs tenant un créneau de l'équipe. Comptés à part des bénévoles, pas fondus. */
+  totalOrganizers: number
+  /** Chaque jour porte les mêmes mesures que l'équipe entière. */
   dayDetails: Array<{
     date: string
     hours: number
+    coveredHours: number
+    volunteers: number
+    organizers: number
     slots: number
   }>
 }
@@ -282,8 +338,8 @@ export interface TeamStats {
  * Les créneaux sans personne affectée comptent donc pleinement, et ceux sans équipe sont
  * regroupés à part plutôt qu'ignorés : les passer sous silence ferait mentir le total.
  *
- * `totalVolunteers` reste, lui, le nombre de personnes réellement affectées : il dit où en
- * est le remplissage face à cette charge.
+ * `totalVolunteers` et `totalOrganizers` disent, eux, qui est réellement affecté — où en est
+ * le remplissage face à cette charge, et sous quel titre.
  *
  * @param timeSlots - Créneaux de l'édition
  * @param teams - Équipes de l'édition, pour nommer et colorer les lignes
@@ -297,7 +353,9 @@ export function calculateVolunteersStatsByTeam(
   const nomDe = new Map(teams.map((equipe) => [equipe.id, equipe]))
 
   timeSlots.forEach((slot) => {
-    const affectes = slot.assignedVolunteersList ?? []
+    // Organisateurs compris : « qui tient cette équipe » se lit sur les personnes présentes,
+    // quel que soit leur titre.
+    const affectes = personnesDuCreneau(slot)
 
     const debut = new Date(slot.start)
     const fin = new Date(slot.end)
@@ -314,9 +372,11 @@ export function calculateVolunteersStatsByTeam(
         teamName: equipe?.name ?? (slot.teamName as string | undefined) ?? libelleSansEquipe,
         color: equipe?.color,
         totalHours: 0,
+        coveredHours: 0,
         totalSlots: 0,
         benevoles: new Set<number>(),
-        jours: new Map<string, { date: string; hours: number; slots: number }>(),
+        organisateurs: new Set<number>(),
+        jours: new Map<string, any>(),
       })
     }
 
@@ -327,15 +387,37 @@ export function calculateVolunteersStatsByTeam(
     const heuresBenevole = dureeCreneau * besoin
 
     equipe.totalHours += heuresBenevole
+    // Ce qui est effectivement tenu, en regard de ce qu'il y a à tenir : une équipe à 4h sur
+    // 31h se voit tout de suite, là où le seul besoin ne disait pas où elle en était.
+    equipe.coveredHours += dureeCreneau * affectes.length
     equipe.totalSlots += 1
-    affectes.forEach((affectation) => equipe.benevoles.add(affectation.user.id))
+    affectes.forEach((personne) => {
+      // Deux ensembles distincts : « 3 bénévoles et 1 organisateur » se lit mieux que « 4
+      // personnes », et dit qui l'on peut encore solliciter.
+      const ou = personne.estOrganisateur ? equipe.organisateurs : equipe.benevoles
+      ou.add(personne.user.id)
+    })
 
     if (!equipe.jours.has(jour)) {
-      equipe.jours.set(jour, { date: jour, hours: 0, slots: 0 })
+      // Les personnes sont comptées par jour dans leurs propres ensembles : quelqu'un présent
+      // sur deux créneaux du même jour ne doit compter qu'une fois pour ce jour-là.
+      equipe.jours.set(jour, {
+        date: jour,
+        hours: 0,
+        coveredHours: 0,
+        benevoles: new Set<number>(),
+        organisateurs: new Set<number>(),
+        slots: 0,
+      })
     }
     const detailDuJour = equipe.jours.get(jour)!
     detailDuJour.hours += heuresBenevole
+    detailDuJour.coveredHours += dureeCreneau * affectes.length
     detailDuJour.slots += 1
+    affectes.forEach((personne) => {
+      const ou = personne.estOrganisateur ? detailDuJour.organisateurs : detailDuJour.benevoles
+      ou.add(personne.user.id)
+    })
   })
 
   return Array.from(parEquipe.values())
@@ -344,11 +426,20 @@ export function calculateVolunteersStatsByTeam(
       teamName: equipe.teamName,
       color: equipe.color,
       totalHours: equipe.totalHours,
+      coveredHours: equipe.coveredHours,
       totalSlots: equipe.totalSlots,
       totalVolunteers: equipe.benevoles.size,
-      dayDetails: Array.from(equipe.jours.values()).sort((a: any, b: any) =>
-        a.date.localeCompare(b.date)
-      ),
+      totalOrganizers: equipe.organisateurs.size,
+      dayDetails: Array.from(equipe.jours.values())
+        .map((jour: any) => ({
+          date: jour.date,
+          hours: jour.hours,
+          coveredHours: jour.coveredHours,
+          volunteers: jour.benevoles.size,
+          organizers: jour.organisateurs.size,
+          slots: jour.slots,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date)),
     }))
     .sort((a, b) => b.totalHours - a.totalHours)
 }

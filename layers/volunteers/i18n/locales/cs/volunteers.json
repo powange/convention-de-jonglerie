@@ -52,6 +52,9 @@
     "assigned_to_teams": "Přiřazeno k {count} týmu | Přiřazeno k {count} týmům",
     "assigned_volunteers": "Přidělení dobrovolníci",
     "assigned_organizers": "Přiřazení organizátoři",
+    "organizer": "organizátor",
+    "organizers": "organizátoři",
+    "average_per_person": "Průměr na osobu",
     "no_assigned_organizers": "Žádný organizátor není přiřazen",
     "add_organizer": "Přidat organizátora",
     "select_organizer": "Vybrat organizátora",
@@ -59,7 +62,6 @@
     "no_organizers_for_team": "K tomuto týmu není přiřazen žádný organizátor",
     "organizer_assigned": "Organizátor přiřazen ke směně",
     "organizer_unassigned": "Organizátor odebrán ze směny",
-    "organizers_not_counted": "Organizátoři se nezapočítávají do kapacity směny.",
     "auto_assignment": {
       "allow_overtime": "Povolování přesčasů",
       "allow_overtime_help": "Umožňuje v případě potřeby mírně překročit maximální počet hodin.",
@@ -118,7 +120,6 @@
       "preserve_show_access": "Zachovat přístup k představením",
       "preserve_show_access_help": "Nepřiřazuje dobrovolníka ke směně, která by mu znemožnila zhlédnout jedinou reprízu představení. Směna pak zůstane neobsazená."
     },
-    "average_per_volunteer": "Průměr na dobrovolníka",
     "avoid_list_hint": "Tyto informace zůstávají důvěrné a pomáhají organizátorům vytvářet harmonické týmy.",
     "avoid_list_label": "Dobrovolníci, se kterými se raději nechci spojovat (nepovinné)",
     "avoid_list_placeholder": "Jména dalších dobrovolníků, kterým je třeba se vyhnout v případě slotů...",

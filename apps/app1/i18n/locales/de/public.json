@@ -188,6 +188,7 @@
         "select_team_instruction": "Wählen Sie das Zielteam aus",
         "set_as_leader": "Als Leiter festlegen",
         "stats": {
+          "attached_organizers": "Zugeordnete Organisatoren",
           "assigned_volunteers": "Zugewiesene Freiwillige",
           "total_assignments": "Gesamtzuweisungen",
           "total_teams": "Teams insgesamt",
