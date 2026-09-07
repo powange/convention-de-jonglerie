@@ -643,7 +643,7 @@
     "role": "Roll",
     "search_conventions_placeholder": "Sök efter namn, beskrivning, skapare...",
     "search_error_messages": "Sök efter felmeddelanden...",
-    "search_users_placeholder": "Sök efter e-post, användarnamn, för- eller efternamn...",
+    "search_users_placeholder": "Sök efter ID, e-post, användarnamn, för- eller efternamn...",
     "select_deletion_reason": "Välj en anledning",
     "show_applications": "Showansökningar",
     "show_online_users_only": "Visa endast online-användare",

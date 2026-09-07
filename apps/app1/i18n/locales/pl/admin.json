@@ -643,7 +643,7 @@
     "role": "Rola",
     "search_conventions_placeholder": "Szukaj po nazwie, opisie, twórcy...",
     "search_error_messages": "Szukaj w komunikatach błędów...",
-    "search_users_placeholder": "Szukaj po email, pseudonimie, imieniu lub nazwisku...",
+    "search_users_placeholder": "Szukaj po ID, e-mailu, nazwie użytkownika, imieniu lub nazwisku...",
     "select_deletion_reason": "Wybierz powód usunięcia",
     "show_applications": "Kandydatury na występy",
     "show_online_users_only": "Pokaż tylko użytkowników online",

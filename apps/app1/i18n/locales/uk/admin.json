@@ -643,7 +643,7 @@
     "role": "Роль",
     "search_conventions_placeholder": "Пошук за назвою, описом, творцем...",
     "search_error_messages": "Пошук в повідомленнях про помилки...",
-    "search_users_placeholder": "Пошук за електронною поштою, ім'ям користувача, ім'ям або прізвищем...",
+    "search_users_placeholder": "Пошук за ID, електронною поштою, ім'ям користувача, ім'ям або прізвищем...",
     "select_deletion_reason": "Виберіть причину видалення",
     "show_applications": "Заявки на виступи",
     "show_online_users_only": "Показати лише користувачів онлайн",

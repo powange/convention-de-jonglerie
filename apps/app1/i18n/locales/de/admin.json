@@ -643,7 +643,7 @@
     "role": "Rolle",
     "search_conventions_placeholder": "Nach Name, Beschreibung, Ersteller suchen...",
     "search_error_messages": "In Fehlermeldungen suchen...",
-    "search_users_placeholder": "Nach E-Mail, Benutzername, Vorname oder Nachname suchen...",
+    "search_users_placeholder": "Suche nach ID, E-Mail, Benutzername, Vor- oder Nachname...",
     "select_deletion_reason": "Wählen Sie einen Löschungsgrund",
     "show_applications": "Showbewerbungen",
     "show_online_users_only": "Nur Online-Benutzer anzeigen",

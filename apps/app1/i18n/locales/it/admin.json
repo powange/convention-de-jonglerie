@@ -643,7 +643,7 @@
     "role": "Ruolo",
     "search_conventions_placeholder": "Cerca per nome, descrizione, creatore...",
     "search_error_messages": "Cerca nei messaggi di errore...",
-    "search_users_placeholder": "Cerca per email, nome utente, nome o cognome...",
+    "search_users_placeholder": "Cerca per ID, email, nome utente, nome o cognome...",
     "select_deletion_reason": "Seleziona un motivo per la eliminazione",
     "show_applications": "Candidature spettacolo",
     "show_online_users_only": "Mostra solo utenti online",

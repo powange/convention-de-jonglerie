@@ -744,7 +744,7 @@
     "role": "Rôle",
     "search_conventions_placeholder": "Rechercher par nom, description, créateur...",
     "search_error_messages": "Rechercher dans les messages d'erreur...",
-    "search_users_placeholder": "Rechercher par email, pseudo, prénom ou nom...",
+    "search_users_placeholder": "Rechercher par identifiant, email, pseudo, prénom ou nom...",
     "select_deletion_reason": "Choisissez une raison",
     "show_applications": "Candidatures spectacle",
     "show_online_users_only": "Afficher seulement les utilisateurs en ligne",
