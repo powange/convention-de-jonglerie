@@ -252,6 +252,14 @@
       "select_handout_item": "Seleziona articolo",
       "select_to_add": "Seleziona un organizzatore da aggiungere",
       "status": "Stato del biglietto",
+      "teams": {
+        "column": "Squadre",
+        "description": "Collega questo organizzatore a squadre di volontari. Vi apparirà, senza contare negli organici né nell'assegnazione automatica.",
+        "load_error": "Impossibile caricare le squadre",
+        "manage": "Gestisci le squadre",
+        "no_teams": "Nessuna squadra di volontari in questa edizione",
+        "title_for": "Squadre — {name}"
+      },
       "title": "Organizzatori",
       "title_required": "Il titolo dell'organizzatore è obbligatorio",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Inviare notifiche ai volontari",
       "planning_description": "Pianificazione di slot e missioni",
       "teams_description": "Organizzare squadre di volontari",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Convalidare gli scambi di turni tra volontari",
+      "swaps_enabled": "Scambi di turni",
+      "swaps_enabled_description": "Consentire ai volontari di scambiarsi un turno tra loro, con la convalida di un responsabile",
+      "swaps_open": "I volontari possono proporre uno scambio",
+      "swaps_closed": "Gli scambi sono chiusi",
+      "organizers_in_teams": "Organizzatori nelle squadre",
+      "organizers_in_teams_description": "Consente di assegnare gli organizzatori dell'edizione alle squadre di volontari. Vi compaiono senza contare nell'organico né nell'assegnazione automatica.",
+      "organizers_in_teams_open": "Gli organizzatori possono essere assegnati alle squadre",
+      "organizers_in_teams_closed": "Gli organizzatori non sono assegnati alle squadre"
     },
     "shows_call": {
       "title": "Bando per spettacoli",
@@ -783,6 +795,6 @@
       "submit": "Salva la convention",
       "title": "Convention"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Tutte le categorie"
   }
 }

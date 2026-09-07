@@ -252,6 +252,14 @@
       "select_handout_item": "Выбрать предмет",
       "select_to_add": "Выберите организатора для добавления",
       "status": "Статус билета",
+      "teams": {
+        "column": "Команды",
+        "description": "Прикрепите этого организатора к командам волонтёров. Он появится в них, не учитываясь в численности и в автоматическом распределении.",
+        "load_error": "Не удалось загрузить команды",
+        "manage": "Управление командами",
+        "no_teams": "В этом выпуске нет команд волонтёров",
+        "title_for": "Команды — {name}"
+      },
       "title": "Организаторы",
       "title_required": "Должность организатора обязательна",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Рассылка уведомлений волонтерам",
       "planning_description": "Планирование слотов и миссий",
       "teams_description": "Организация команд добровольцев",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Подтверждать обмены сменами между волонтёрами",
+      "swaps_enabled": "Обмены сменами",
+      "swaps_enabled_description": "Разрешить волонтёрам обмениваться сменами между собой с подтверждением ответственного",
+      "swaps_open": "Волонтёры могут предложить обмен",
+      "swaps_closed": "Обмены закрыты",
+      "organizers_in_teams": "Организаторы в командах",
+      "organizers_in_teams_description": "Разрешить прикреплять организаторов выпуска к командам волонтёров. Они отображаются в них, не учитываясь ни в численности, ни в автоматическом распределении.",
+      "organizers_in_teams_open": "Организаторов можно прикреплять к командам",
+      "organizers_in_teams_closed": "Организаторы не прикреплены к командам"
     },
     "shows_call": {
       "title": "Набор выступлений",
@@ -783,6 +795,6 @@
       "submit": "Сохранить конвенцию",
       "title": "Конвенция"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Все категории"
   }
 }

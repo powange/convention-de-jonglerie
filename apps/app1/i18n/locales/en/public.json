@@ -172,6 +172,7 @@
         "leader_removed": "Leader removed",
         "manage_teams": "Manage teams",
         "max_label": "Max:",
+        "organizers_label": "Attached organizers",
         "modal": {
           "add": "Add",
           "add_description_multiple": "Keep the volunteer in their current teams and also add them to \"{targetTeam}\"",

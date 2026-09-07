@@ -123,6 +123,8 @@ export interface Edition {
   hasAfjTokenPayment: boolean
   volunteersOpen?: boolean
   volunteersMode?: 'INTERNAL' | 'EXTERNAL'
+  /** Rattacher des organisateurs aux équipes de bénévoles. Fermé par défaut. */
+  volunteersOrganizersInTeams?: boolean
   volunteersSetupStartDate?: string | null
   volunteersTeardownEndDate?: string | null
 }

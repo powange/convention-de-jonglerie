@@ -18,6 +18,7 @@ const bodySchema = z
       .nullable(),
     mode: z.enum(['INTERNAL', 'EXTERNAL']).optional(),
     swapsEnabled: z.boolean().optional(),
+    organizersInTeams: z.boolean().optional(),
     externalUrl: z
       .string()
       .url('URL externe invalide')
@@ -183,6 +184,7 @@ export default wrapApiHandler(
       description: parsed.description === undefined ? undefined : parsed.description || null,
       mode: parsed.mode,
       swapsEnabled: parsed.swapsEnabled,
+      organizersInTeams: parsed.organizersInTeams,
       externalUrl: parsed.externalUrl === undefined ? undefined : parsed.externalUrl || null,
       askDiet: parsed.askDiet,
       askAllergies: parsed.askAllergies,

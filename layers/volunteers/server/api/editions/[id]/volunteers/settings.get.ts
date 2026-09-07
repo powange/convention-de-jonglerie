@@ -32,6 +32,7 @@ export default wrapApiHandler(
       description: s?.description ?? null,
       mode: s?.mode ?? 'INTERNAL',
       swapsEnabled: s?.swapsEnabled ?? true,
+      organizersInTeams: s?.organizersInTeams ?? false,
       externalUrl: s?.externalUrl ?? null,
       askDiet: s?.askDiet ?? false,
       askAllergies: s?.askAllergies ?? false,

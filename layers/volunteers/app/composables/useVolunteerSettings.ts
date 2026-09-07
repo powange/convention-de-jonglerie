@@ -55,7 +55,11 @@ export const useVolunteerSettings = (editionId: number) => {
     fieldErrors.value = {}
 
     try {
-      const response = await $fetch<{ settings: VolunteerSettings }>(
+      // L'endpoint répond `{ success, data: { settings } }` : lire `response.settings` rendait
+      // toujours `undefined`, et les appelants gardent tous ce retour derrière un `if`. Ni les
+      // toasts ni les rafraîchissements qui en dépendent ne se déclenchaient — c'est ainsi que
+      // la page des organisateurs continuait d'afficher une colonne pour une option refermée.
+      const response = await $fetch<{ data?: { settings?: VolunteerSettings } }>(
         `/api/editions/${editionId}/volunteers/settings`,
         {
           method: 'PATCH',
@@ -63,11 +67,13 @@ export const useVolunteerSettings = (editionId: number) => {
         }
       )
 
-      if (response?.settings) {
-        settings.value = response.settings
+      // Absent quand le PATCH n'avait rien à changer : le serveur répond alors `{ unchanged }`.
+      const updated = response?.data?.settings
+      if (updated) {
+        settings.value = updated
       }
 
-      return response?.settings
+      return updated
     } catch (e: any) {
       // Gérer les erreurs de validation par champ
       if (e?.data?.data?.errors) {

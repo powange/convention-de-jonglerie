@@ -252,6 +252,14 @@
       "select_handout_item": "Вибрати предмет",
       "select_to_add": "Виберіть організатора для додавання",
       "status": "Статус квитка",
+      "teams": {
+        "column": "Команди",
+        "description": "Прикріпіть цього організатора до команд волонтерів. Він з'явиться в них, не враховуючись у чисельності та в автоматичному розподілі.",
+        "load_error": "Не вдалося завантажити команди",
+        "manage": "Керувати командами",
+        "no_teams": "У цьому випуску немає команд волонтерів",
+        "title_for": "Команди — {name}"
+      },
       "title": "Організатори",
       "title_required": "Посада організатора є обов'язковою",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Надсилайте сповіщення волонтерам",
       "planning_description": "Планування слотів і місій",
       "teams_description": "Організація команд волонтерів",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Підтверджувати обміни змінами між волонтерами",
+      "swaps_enabled": "Обміни змінами",
+      "swaps_enabled_description": "Дозволити волонтерам обмінюватися змінами між собою за підтвердженням відповідального",
+      "swaps_open": "Волонтери можуть запропонувати обмін",
+      "swaps_closed": "Обміни закриті",
+      "organizers_in_teams": "Організатори в командах",
+      "organizers_in_teams_description": "Дозволити прикріплювати організаторів випуску до команд волонтерів. Вони відображаються в них, не враховуючись ані в чисельності, ані в автоматичному розподілі.",
+      "organizers_in_teams_open": "Організаторів можна прикріплювати до команд",
+      "organizers_in_teams_closed": "Організатори не прикріплені до команд"
     },
     "shows_call": {
       "title": "Набір виступів",
@@ -783,6 +795,6 @@
       "submit": "Зберегти конвенцію",
       "title": "Конвенція"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Усі категорії"
   }
 }

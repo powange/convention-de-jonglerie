@@ -172,6 +172,7 @@
         "leader_removed": "Odstranění manažera",
         "manage_teams": "Řízení týmů",
         "max_label": "Max:",
+        "organizers_label": "Přiřazení organizátoři",
         "modal": {
           "add": "Přidat",
           "add_description_multiple": "Dobrovolníka ponechte v jeho současném týmu a přidejte ho také do \"{targetTeam}\".",

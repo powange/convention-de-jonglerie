@@ -92,6 +92,8 @@ const EXCLUDED_DIRS = [
  *   'example.*'           → ignore 'example.com', 'example.fr', etc.
  */
 const IGNORED_MISSING_KEYS = [
+  // Expression JavaScript citée dans un commentaire de crons.vue, pas une clé
+  'tasksData.value.cronEnabled',
   // Noms de domaine détectés comme clés i18n (dans useUrlValidation.ts et emailService.ts)
   'facebook.com',
   'youtu.be',
@@ -699,15 +701,30 @@ async function getAllRelevantFiles() {
   // Monorepo : les layers sont partagés à la racine du repo (hors projectRoot) → scannés à part.
   const layerPatterns = ['**/*.vue', '**/*.ts', '**/*.js']
 
+  // `nodir` : sans lui, un dossier dont le nom porte une extension entre dans la liste et la
+  // lecture échoue sur EISDIR. `layers/node_modules` en contient plusieurs (`chart.js`,
+  // `fuse.js`…), et le script s'arrêtait là dès que ce dossier existait.
+  //
+  // `ignore` sur les layers : le filtre EXCLUDED_DIRS raisonne en chemin relatif à `projectRoot`,
+  // qui vaut `../../layers/...` ici — aucune de ses entrées ne pouvait donc s'y appliquer.
+  const optionsGlob = { nodir: true }
+  const optionsGlobLayers = {
+    nodir: true,
+    ignore: ['**/node_modules/**', '**/.nuxt/**', '**/dist/**'],
+  }
+
   let files = []
   for (const pattern of patterns) {
-    const found = await glob(path.join(projectRoot, pattern).replace(/\\/g, '/'))
+    const found = await glob(path.join(projectRoot, pattern).replace(/\\/g, '/'), optionsGlob)
     // glob v10+ retourne un itérable, il faut le convertir en tableau
     files = files.concat([...found])
   }
   if (fs.existsSync(layersRoot)) {
     for (const pattern of layerPatterns) {
-      const found = await glob(path.join(layersRoot, pattern).replace(/\\/g, '/'))
+      const found = await glob(
+        path.join(layersRoot, pattern).replace(/\\/g, '/'),
+        optionsGlobLayers
+      )
       files = files.concat([...found])
     }
   }

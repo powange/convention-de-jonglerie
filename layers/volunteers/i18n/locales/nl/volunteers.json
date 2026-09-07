@@ -497,7 +497,7 @@
     "swap_status_pending_peer": "In afwachting van de andere vrijwilliger",
     "swap_status_refused": "Geweigerd",
     "swap_title": "Een dienst ruilen",
-    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
-    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
+    "swap_cancel_confirm_title": "Dit verzoek intrekken?",
+    "swap_cancel_confirm_description": "De voorgestelde ruil wordt geannuleerd. De andere vrijwilliger wordt op de hoogte gebracht en u behoudt uw tijdslot."
   }
 }

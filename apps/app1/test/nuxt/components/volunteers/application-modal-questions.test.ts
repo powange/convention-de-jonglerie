@@ -14,7 +14,9 @@ import ApplicationModal from '../../../../../../layers/volunteers/app/components
  * l'aperçu.
  */
 
-registerEndpoint('/api/editions/21/volunteer-teams', () => ({ teams: [] }))
+// L'endpoint rend un tableau nu : le simuler en `{ teams: [] }` décrivait une forme qui
+// n'existe pas, et c'est ce leurre qui a fait écrire une lecture fausse ailleurs.
+registerEndpoint('/api/editions/21/volunteer-teams', () => [])
 
 const TOUT_FERME = {
   mode: 'INTERNAL',

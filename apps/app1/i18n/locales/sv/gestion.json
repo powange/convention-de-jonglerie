@@ -252,6 +252,14 @@
       "select_handout_item": "Välj artikel",
       "select_to_add": "Välj en arrangör att lägga till",
       "status": "Biljettstatus",
+      "teams": {
+        "column": "Team",
+        "description": "Koppla den här arrangören till volontärteam. Hen visas där utan att räknas in i bemanningen eller den automatiska tilldelningen.",
+        "load_error": "Det gick inte att läsa in teamen",
+        "manage": "Hantera team",
+        "no_teams": "Inget volontärteam i den här upplagan",
+        "title_for": "Team — {name}"
+      },
       "title": "Arrangörer",
       "title_required": "Arrangörens titel är obligatorisk",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Skicka meddelanden till volontärer",
       "planning_description": "Planering av slots och uppdrag",
       "teams_description": "Organisera team av volontärer",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Godkänn byten av pass mellan volontärer",
+      "swaps_enabled": "Byten av pass",
+      "swaps_enabled_description": "Låt volontärer byta ett pass sinsemellan, med godkännande av en ansvarig",
+      "swaps_open": "Volontärer kan föreslå ett byte",
+      "swaps_closed": "Bytena är stängda",
+      "organizers_in_teams": "Arrangörer i lagen",
+      "organizers_in_teams_description": "Tillåt att arrangörer för upplagan kopplas till volontärlagen. De visas där utan att räknas in i bemanningen eller i den automatiska fördelningen.",
+      "organizers_in_teams_open": "Arrangörer kan kopplas till lag",
+      "organizers_in_teams_closed": "Arrangörer är inte kopplade till lag"
     },
     "shows_call": {
       "title": "Föreställningsutlysning",
@@ -783,6 +795,6 @@
       "submit": "Spara konvent",
       "title": "Konvent"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Alla kategorier"
   }
 }

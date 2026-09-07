@@ -71,6 +71,9 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         // Les échanges de créneaux sont ouverts par défaut : une édition qui n'a jamais touché
         // au réglage se comporte comme avant son arrivée.
         swapsEnabled: true,
+        // À l'inverse, rattacher des organisateurs aux équipes est fermé par défaut : c'est
+        // une possibilité qu'on ouvre, pas un comportement que les éditions attendaient.
+        organizersInTeams: false,
         externalUrl: null,
         askDiet: true,
         askAllergies: true,
@@ -214,6 +217,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         'description',
         'mode',
         'swapsEnabled',
+        'organizersInTeams',
         'externalUrl',
         'askDiet',
         'askAllergies',

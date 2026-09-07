@@ -172,6 +172,7 @@
         "leader_removed": "Керівника видалено",
         "manage_teams": "Керувати командами",
         "max_label": "Макс:",
+        "organizers_label": "Прикріплені організатори",
         "modal": {
           "add": "Додати",
           "add_description_multiple": "Залишити волонтера в поточних командах і також додати до \"{targetTeam}\"",

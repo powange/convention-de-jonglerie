@@ -78,6 +78,6 @@
     "import_forced_day": "Den ročníku",
     "import_forced_day_description": "Pokud fotografie neuvádí datum, zvolte den, na který se workshopy umístí. Jejich časy zůstanou zachovány.",
     "import_forced_day_none": "Použít data přečtená z fotografie",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Max. {count} osob"
   }
 }

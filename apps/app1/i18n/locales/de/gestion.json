@@ -252,6 +252,14 @@
       "select_handout_item": "Artikel auswählen",
       "select_to_add": "Wählen Sie einen Organisator zum Hinzufügen aus",
       "status": "Ticketstatus",
+      "teams": {
+        "column": "Teams",
+        "description": "Ordnen Sie diesen Organisator Helferteams zu. Er erscheint dort, ohne in die Personalstärke oder die automatische Zuweisung einzugehen.",
+        "load_error": "Teams können nicht geladen werden",
+        "manage": "Teams verwalten",
+        "no_teams": "Kein Helferteam für diese Ausgabe",
+        "title_for": "Teams — {name}"
+      },
       "title": "Organisatoren",
       "title_required": "Der Titel des Organisators ist erforderlich",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Benachrichtigungen an Freiwillige senden",
       "planning_description": "Zeitnischen und Missionen planen",
       "teams_description": "Organisation von Freiwilligenteams",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Tausch von Zeitfenstern zwischen Helfern bestätigen",
+      "swaps_enabled": "Tausch von Zeitfenstern",
+      "swaps_enabled_description": "Helfern erlauben, ein Zeitfenster untereinander zu tauschen, mit Bestätigung durch eine verantwortliche Person",
+      "swaps_open": "Helfer können einen Tausch vorschlagen",
+      "swaps_closed": "Der Tausch ist geschlossen",
+      "organizers_in_teams": "Organisatoren in Teams",
+      "organizers_in_teams_description": "Erlaubt es, Organisatoren der Ausgabe den Helferteams zuzuordnen. Sie erscheinen dort, ohne in die Personalstärke oder die automatische Zuweisung einzugehen.",
+      "organizers_in_teams_open": "Organisatoren können Teams zugeordnet werden",
+      "organizers_in_teams_closed": "Organisatoren sind keinen Teams zugeordnet"
     },
     "shows_call": {
       "title": "Show-Aufruf",
@@ -783,6 +795,6 @@
       "submit": "Convention speichern",
       "title": "Convention"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Alle Kategorien"
   }
 }

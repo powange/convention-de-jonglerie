@@ -172,6 +172,7 @@
         "leader_removed": "Leder fjernet",
         "manage_teams": "Administrer hold",
         "max_label": "Maks:",
+        "organizers_label": "Tilknyttede arrangører",
         "modal": {
           "add": "Tilføj",
           "add_description_multiple": "Behold frivillig i deres nuværende hold og tilføj dem også til \"{targetTeam}\"",

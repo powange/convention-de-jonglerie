@@ -78,6 +78,6 @@
     "import_forced_day": "Giornata dell'edizione",
     "import_forced_day_description": "Se la foto non indica una data, scegli la giornata su cui collocare i laboratori. I loro orari vengono conservati.",
     "import_forced_day_none": "Usare le date lette sulla foto",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Max {count} persone"
   }
 }

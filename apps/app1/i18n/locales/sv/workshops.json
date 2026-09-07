@@ -78,6 +78,6 @@
     "import_forced_day": "Dag i upplagan",
     "import_forced_day_description": "Om fotot inte anger något datum, välj den dag som workshopparna ska placeras på. Deras tider behålls.",
     "import_forced_day_none": "Använd datumen som lästs på fotot",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Max {count} personer"
   }
 }

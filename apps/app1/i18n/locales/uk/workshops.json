@@ -78,6 +78,6 @@
     "import_forced_day": "День випуску",
     "import_forced_day_description": "Якщо на фотографії немає дати, виберіть день, на який розмістити майстер-класи. Їхній час зберігається.",
     "import_forced_day_none": "Використовувати дати, прочитані на фотографії",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Макс. {count} осіб"
   }
 }

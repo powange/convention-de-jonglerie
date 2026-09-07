@@ -497,7 +497,7 @@
     "swap_status_pending_peer": "Wartet auf die andere Person",
     "swap_status_refused": "Abgelehnt",
     "swap_title": "Schicht tauschen",
-    "swap_cancel_confirm_title": "[TODO] Retirer cette demande ?",
-    "swap_cancel_confirm_description": "[TODO] L'échange proposé sera annulé. L'autre bénévole en sera informé, et vous garderez votre créneau."
+    "swap_cancel_confirm_title": "Diese Anfrage zurückziehen?",
+    "swap_cancel_confirm_description": "Der vorgeschlagene Tausch wird abgebrochen. Der andere Helfer wird benachrichtigt, und Sie behalten Ihr Zeitfenster."
   }
 }

@@ -172,6 +172,7 @@
         "leader_removed": "Responsable retiré",
         "manage_teams": "Gérer les équipes",
         "max_label": "Max:",
+        "organizers_label": "Organisateurs rattachés",
         "modal": {
           "add": "Ajouter",
           "add_description_multiple": "Garder le bénévole dans ses équipes actuelles et l'ajouter aussi à \"{targetTeam}\"",
