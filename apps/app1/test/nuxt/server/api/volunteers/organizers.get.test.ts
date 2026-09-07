@@ -1,11 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-// Auto-imports Nitro que le handler emploie sans les importer.
-vi.hoisted(() => {
-  const g = globalThis as any
-  g.createSuccessResponse ??= (data: unknown) => ({ success: true, data })
-})
-
 const mockCanManage = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/utils/api-helpers', () => ({
@@ -21,42 +15,49 @@ vi.mock('#server/volunteers/ports/registry', () => ({
   useVolunteerPorts: () => ({ organizers: { canManage: mockCanManage } }),
 }))
 
-import handler from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/team-organizers.get'
+import handler from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/organizers.get'
 
 const prismaMock = (globalThis as any).prisma
 
 const evenement = { context: { params: { id: '22' }, user: { id: 1 } } }
 
-const ligne = (teamId: string, id: number, pseudo: string) => ({
-  teamId,
-  editionOrganizer: { id, organizer: { user: { id: id * 10, pseudo } } },
+const ligne = (id: number, pseudo: string, teamIds: string[]) => ({
+  id,
+  teamAssignments: teamIds.map((teamId) => ({ teamId })),
+  organizer: { user: { id: id * 10, pseudo } },
 })
 
-describe('GET /api/editions/[id]/volunteers/team-organizers', () => {
+describe('GET /api/editions/[id]/volunteers/organizers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockCanManage.mockResolvedValue(true)
-    prismaMock.organizerTeamAssignment.findMany.mockResolvedValue([
-      ligne('accueil', 7, 'orga'),
-      ligne('bar', 8, 'autre'),
+    prismaMock.editionOrganizer.findMany.mockResolvedValue([
+      ligne(7, 'orga', ['accueil', 'bar']),
+      ligne(8, 'autre', []),
     ])
   })
 
-  it('rend les rattachements avec leur équipe et leur utilisateur', async () => {
+  it('rend les organisateurs avec leurs équipes', async () => {
     const res = await handler(evenement as any)
 
-    expect(res.data.assignments).toEqual([
-      { teamId: 'accueil', editionOrganizerId: 7, user: { id: 70, pseudo: 'orga' } },
-      { teamId: 'bar', editionOrganizerId: 8, user: { id: 80, pseudo: 'autre' } },
+    expect(res.data.organizers).toEqual([
+      { editionOrganizerId: 7, user: { id: 70, pseudo: 'orga' }, teamIds: ['accueil', 'bar'] },
+      { editionOrganizerId: 8, user: { id: 80, pseudo: 'autre' }, teamIds: [] },
     ])
   })
 
-  it("ne lit que les équipes de l'édition demandée", async () => {
-    // Sans ce filtre, la répartition d'une édition afficherait les organisateurs d'une autre.
+  it("rend aussi ceux qui n'ont aucune équipe", async () => {
+    // Ils sont candidats à un créneau même sans rattachement : la liste ne doit pas les écarter.
+    const res = await handler(evenement as any)
+
+    expect(res.data.organizers.map((o: any) => o.editionOrganizerId)).toContain(8)
+  })
+
+  it("ne lit que les organisateurs de l'édition demandée", async () => {
     await handler(evenement as any)
 
-    expect(prismaMock.organizerTeamAssignment.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { team: { eventId: 22 } } })
+    expect(prismaMock.editionOrganizer.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { editionId: 22 } })
     )
   })
 
@@ -69,6 +70,6 @@ describe('GET /api/editions/[id]/volunteers/team-organizers', () => {
     mockCanManage.mockResolvedValue(false)
 
     await expect(handler(evenement as any)).rejects.toBeDefined()
-    expect(prismaMock.organizerTeamAssignment.findMany).not.toHaveBeenCalled()
+    expect(prismaMock.editionOrganizer.findMany).not.toHaveBeenCalled()
   })
 })

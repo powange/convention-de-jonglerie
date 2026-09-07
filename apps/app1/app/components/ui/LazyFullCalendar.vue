@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="conteneurRef">
     <div v-if="loading" class="flex items-center gap-2 text-sm text-gray-500 p-4">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
       <span>{{ t('common.loading') }}...</span>
@@ -33,6 +33,7 @@ const FullCalendarComponent = shallowRef<any>(null)
 const loading = ref(true)
 const error = ref(false)
 const calendarRef = ref<any>(null)
+const conteneurRef = ref<HTMLElement | null>(null)
 
 const calendarClass = computed(() => props.class || '')
 
@@ -47,6 +48,40 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+})
+
+/**
+ * FullCalendar mesure ses colonnes une fois et ne les recalcule que sur redimensionnement de la
+ * fenêtre. Replier le menu latéral élargit le conteneur sans qu'aucun `resize` ne parte : le
+ * planning gardait alors sa largeur d'avant, en-tête et corps désalignés.
+ *
+ * Un `ResizeObserver` sur le conteneur couvre toutes les causes — menu, panneau, changement de
+ * mise en page — là où écouter le repli du menu n'en couvrirait qu'une.
+ */
+let observateur: ResizeObserver | null = null
+
+watch(
+  [conteneurRef, FullCalendarComponent],
+  ([conteneur, composant]) => {
+    observateur?.disconnect()
+    observateur = null
+    if (!conteneur || !composant || !import.meta.client) return
+    if (typeof ResizeObserver === 'undefined') return
+
+    let attente: ReturnType<typeof setTimeout> | null = null
+    observateur = new ResizeObserver(() => {
+      // Groupé : le repli du menu est animé, et l'observateur tire une fois par image.
+      if (attente) clearTimeout(attente)
+      attente = setTimeout(() => calendarRef.value?.getApi()?.updateSize(), 120)
+    })
+    observateur.observe(conteneur)
+  },
+  { immediate: true }
+)
+
+onBeforeUnmount(() => {
+  observateur?.disconnect()
+  observateur = null
 })
 
 // Exposer la référence et l'API pour permettre l'accès depuis le parent

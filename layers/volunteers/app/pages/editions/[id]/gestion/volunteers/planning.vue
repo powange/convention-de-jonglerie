@@ -202,6 +202,7 @@ const convertedTimeSlots = computed(() => {
       description: slot.description,
       delayMinutes: slot.delayMinutes,
       assignedVolunteersList: [...(slot.assignments || [])], // Copie directe des assignments
+      assignedOrganizersList: [...(slot.organizerAssignments || [])],
       editionId, // Ajouter l'editionId au slot
     })
   )
@@ -593,6 +594,10 @@ const preferenceWarnings = computed(() => {
     if (!slot || !slot.id || !slot.teamId) return
     if (!slot.assignedVolunteersList || slot.assignedVolunteersList.length === 0) return
 
+    // Relevé ici plutôt que relu dans la boucle : le rétrécissement de type opéré par le garde
+    // ci-dessus ne franchit pas la fonction imbriquée, et `teamId` y redevenait optionnel.
+    const teamId = slot.teamId
+
     slot.assignedVolunteersList.forEach((assignment) => {
       if (!assignment || !assignment.user || !assignment.user.id) return
 
@@ -600,8 +605,8 @@ const preferenceWarnings = computed(() => {
       const preferences = volunteerTeamPreferences.get(userId)
 
       // Si le bénévole a des préférences d'équipe et que l'équipe du créneau n'en fait pas partie
-      if (preferences && preferences.length > 0 && !preferences.includes(slot.teamId)) {
-        const team = convertedTeams.value.find((t) => t.id === slot.teamId)
+      if (preferences && preferences.length > 0 && !preferences.includes(teamId)) {
+        const team = convertedTeams.value.find((t) => t.id === teamId)
 
         warnings.push({
           volunteerId: userId,

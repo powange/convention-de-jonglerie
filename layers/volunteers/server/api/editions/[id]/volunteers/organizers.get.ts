@@ -4,15 +4,16 @@ import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 /**
- * GET /api/editions/[id]/volunteers/team-organizers
+ * GET /api/editions/[id]/volunteers/organizers
  *
- * Les organisateurs rattachés aux équipes de bénévoles, pour les afficher dans la répartition
- * par équipe aux côtés des bénévoles.
+ * Les organisateurs de l'édition, avec les équipes de bénévoles auxquelles ils sont rattachés.
+ * Sert à deux écrans : la répartition par équipe, qui les affiche aux côtés des bénévoles, et
+ * l'affectation à un créneau, qui a besoin de la liste des candidats.
  *
  * Endpoint distinct de `/organizers/edition-organizers`, qui exige le droit sur les
  * organisateurs ou sur la billetterie : un responsable du bénévolat n'a ni l'un ni l'autre, et
- * n'aurait donc rien vu. Ce qu'on lit ici est la composition d'une équipe de bénévolat, la
- * permission qui la commande est celle des bénévoles.
+ * n'aurait donc rien vu. Ce qu'on lit ici relève du bénévolat, et c'est sa permission qui
+ * commande.
  *
  * Distinct aussi de `/volunteer-teams`, ouvert en lecture publique pour le formulaire de
  * candidature : les noms des organisateurs n'ont rien à y faire.
@@ -33,27 +34,24 @@ export default wrapApiHandler(
       })
     }
 
-    const rattachements = await prisma.organizerTeamAssignment.findMany({
-      where: { team: { eventId: editionId } },
+    const organisateurs = await prisma.editionOrganizer.findMany({
+      where: { editionId },
       // Ordre stable : sans tri, l'affichage change d'une requête à l'autre.
-      orderBy: { editionOrganizer: { organizer: { user: { nom: 'asc' } } } },
+      orderBy: { organizer: { user: { nom: 'asc' } } },
       select: {
-        teamId: true,
-        editionOrganizer: {
+        id: true,
+        teamAssignments: { select: { teamId: true } },
+        organizer: {
           select: {
-            id: true,
-            organizer: {
+            user: {
               select: {
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                    prenom: true,
-                    nom: true,
-                    emailHash: true,
-                    profilePicture: true,
-                  },
-                },
+                id: true,
+                pseudo: true,
+                prenom: true,
+                nom: true,
+                emailHash: true,
+                profilePicture: true,
+                updatedAt: true,
               },
             },
           },
@@ -62,12 +60,12 @@ export default wrapApiHandler(
     })
 
     return createSuccessResponse({
-      assignments: rattachements.map((rattachement) => ({
-        teamId: rattachement.teamId,
-        editionOrganizerId: rattachement.editionOrganizer.id,
-        user: rattachement.editionOrganizer.organizer.user,
+      organizers: organisateurs.map((organisateur) => ({
+        editionOrganizerId: organisateur.id,
+        user: organisateur.organizer.user,
+        teamIds: organisateur.teamAssignments.map((rattachement) => rattachement.teamId),
       })),
     })
   },
-  { operationName: 'GetVolunteerTeamOrganizers' }
+  { operationName: 'GetVolunteerOrganizers' }
 )

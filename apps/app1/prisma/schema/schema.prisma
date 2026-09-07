@@ -410,6 +410,7 @@ model EditionOrganizer {
   handoutItems     EditionOrganizerHandoutItem[]
   mealSelections   OrganizerMealSelection[]
   teamAssignments  OrganizerTeamAssignment[]
+  slotAssignments  OrganizerSlotAssignment[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])

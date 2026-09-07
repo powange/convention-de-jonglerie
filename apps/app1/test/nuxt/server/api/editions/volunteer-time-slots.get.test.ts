@@ -67,6 +67,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
             },
           },
         ],
+        organizerAssignments: [],
         _count: {
           assignments: 1,
         },
@@ -87,6 +88,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
           color: '#ef4444',
         },
         assignments: [],
+        organizerAssignments: [],
         _count: {
           assignments: 0,
         },
@@ -141,6 +143,31 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
             },
           },
         },
+        organizerAssignments: {
+          select: {
+            editionOrganizer: {
+              select: {
+                id: true,
+                organizer: {
+                  select: {
+                    user: {
+                      select: {
+                        id: true,
+                        pseudo: true,
+                        nom: true,
+                        prenom: true,
+                        pronouns: true,
+                        emailHash: true,
+                        profilePicture: true,
+                        updatedAt: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         _count: {
           select: {
             assignments: true,
@@ -188,6 +215,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
             },
           },
         ],
+        organizerAssignments: [],
         _count: {
           assignments: 1,
         },
@@ -243,6 +271,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
             },
           },
         ],
+        organizerAssignments: [],
         _count: {
           assignments: 1,
         },
@@ -306,6 +335,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
         delayMinutes: 5,
         team: null,
         assignments: [],
+        organizerAssignments: [],
         _count: { assignments: 0 },
       },
       {
@@ -320,6 +350,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
         delayMinutes: 10,
         team: null,
         assignments: [],
+        organizerAssignments: [],
         _count: { assignments: 0 },
       },
     ]
@@ -333,5 +364,48 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     expect(res[1].start).toBe('2024-06-02T14:00:00.000Z')
     expect(res[0].delayMinutes).toBe(5)
     expect(res[1].delayMinutes).toBe(10)
+  })
+
+  /**
+   * Le planning affiche les organisateurs affectés à même le créneau : la requête les lit, et
+   * la réponse doit les porter. C'est exactement le défaut qui avait vidé la colonne « Équipes »
+   * de la page des organisateurs — une requête juste dont la projection laissait le champ de côté.
+   */
+  it('expose les organisateurs affectés, hors du compteur de bénévoles', async () => {
+    mockRequirePlanningAccess.mockResolvedValue({ id: 10 })
+    mockIsAcceptedVolunteer.mockResolvedValue(false)
+
+    prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
+      {
+        id: 'slot1',
+        eventId: 1,
+        teamId: 'team1',
+        title: 'Accueil',
+        description: null,
+        startDateTime: new Date('2024-06-01T09:00:00Z'),
+        endDateTime: new Date('2024-06-01T12:00:00Z'),
+        maxVolunteers: 2,
+        delayMinutes: null,
+        team: { id: 'team1', name: 'Accueil', color: '#3b82f6' },
+        assignments: [],
+        organizerAssignments: [
+          {
+            editionOrganizer: {
+              id: 7,
+              organizer: { user: { id: 70, pseudo: 'orga', nom: 'Dupont', prenom: 'Jean' } },
+            },
+          },
+        ],
+        _count: { assignments: 0 },
+      },
+    ] as any)
+
+    const res = await handler(baseEvent as any)
+
+    expect(res[0].organizerAssignments).toEqual([
+      { editionOrganizerId: 7, user: { id: 70, pseudo: 'orga', nom: 'Dupont', prenom: 'Jean' } },
+    ])
+    // Le cœur du parti pris : l'organisateur ne gonfle pas l'effectif du créneau.
+    expect(res[0].assignedVolunteers).toBe(0)
   })
 })

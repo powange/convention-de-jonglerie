@@ -92,10 +92,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
+
 import type { Edition } from '~/types'
 import type { VolunteerStats, DayStats, VolunteerStatsIndividual } from '~/utils/volunteer-stats'
 
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
+
+import {
+  equipesConnues,
+  equipesDepuisUrl,
+  granulariteDepuisUrl,
+  requeteFiltres,
+} from '../../../../utils/filtres-planning'
 
 interface Props {
   edition: Edition | undefined
@@ -154,10 +162,31 @@ const { timeSlots: fetchedTimeSlots } = useVolunteerTimeSlots(editionId)
 const internalTeams = computed(() => props.teams ?? fetchedTeams.value)
 const internalTimeSlots = computed(() => props.timeSlots ?? fetchedTimeSlots.value)
 
-// État local pour les filtres et l'export
-const selectedTeams = ref<string[]>([])
-const selectedGranularity = ref(30)
+// Filtres du planning, conservés dans l'URL — cf. `filtres-planning.ts` pour le pourquoi.
+const route = useRoute()
+const router = useRouter()
+
+const selectedTeams = ref<string[]>(equipesDepuisUrl(route.query.teams))
+const selectedGranularity = ref(granulariteDepuisUrl(route.query.granularity))
 const exportingPdf = ref(false)
+
+/**
+ * Une équipe citée par l'URL mais supprimée depuis laissait le planning vide, sans explication.
+ * On attend que les équipes soient chargées pour trancher : les effacer plus tôt perdrait le
+ * filtre avant même de pouvoir le valider.
+ */
+watch(internalTeams, (equipes) => {
+  if (!equipes?.length) return
+  const retenues = equipesConnues(selectedTeams.value, equipes)
+  if (retenues.length !== selectedTeams.value.length) selectedTeams.value = retenues
+})
+
+// `replace` et non `push` : un clic de filtre n'est pas un pas de navigation à revenir en arrière.
+watch([selectedTeams, selectedGranularity], () => {
+  router.replace({
+    query: requeteFiltres(route.query, selectedTeams.value, selectedGranularity.value),
+  })
+})
 
 // Options de granularité
 const granularityOptions = [
@@ -191,6 +220,7 @@ const convertedTimeSlots = computed(() => {
       description: slot.description,
       delayMinutes: slot.delayMinutes, // Retard du créneau
       assignedVolunteersList: [...(slot.assignments || [])], // Copie directe des assignments
+      assignedOrganizersList: [...(slot.organizerAssignments || [])],
     })
   )
 })
@@ -706,6 +736,18 @@ defineExpose({
   flex-shrink: 0;
 }
 
+/* Organisateurs affectés : distingués des bénévoles sans changer la lecture de la ligne. */
+.volunteer-planning-calendar .slot-organizers {
+  margin-top: 3px;
+  padding-top: 3px;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.volunteer-planning-calendar .organizer-item {
+  font-style: italic;
+  opacity: 0.92;
+}
+
 .volunteer-planning-calendar .volunteer-text {
   color: inherit;
   overflow: hidden;
@@ -716,6 +758,50 @@ defineExpose({
 
 .volunteer-planning-calendar .user-avatar-1 {
   background-color: rgb(34 197 94); /* green-500 */
+}
+
+/* Infobulle de survol d'un créneau. Posée à la racine de la page pour ne pas être coupée par le
+   défilement des colonnes du calendrier : sa règle ne peut donc pas être imbriquée sous
+   `.volunteer-planning-calendar`. */
+.slot-tooltip {
+  position: fixed;
+  z-index: 60;
+  max-width: 20rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.5rem;
+  background-color: rgb(17 24 39);
+  color: rgb(243 244 246);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.slot-tooltip .slot-tooltip-title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.slot-tooltip .slot-tooltip-team {
+  color: rgb(147 197 253);
+  margin-bottom: 4px;
+}
+
+.slot-tooltip .slot-tooltip-section {
+  margin-top: 4px;
+}
+
+.slot-tooltip .slot-tooltip-label {
+  color: rgb(156 163 175);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.slot-tooltip .slot-tooltip-person {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .volunteer-planning-calendar .user-avatar-2 {

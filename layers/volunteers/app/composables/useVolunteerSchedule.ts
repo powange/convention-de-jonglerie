@@ -33,6 +33,16 @@ export interface VolunteerTimeSlot {
       email: string
     }
   }>
+  /** Organisateurs affectés. Hors du compteur : ils ne prennent la place de personne. */
+  assignedOrganizersList?: Array<{
+    editionOrganizerId: number
+    user: {
+      id: number
+      pseudo: string
+      nom: string | null
+      prenom: string | null
+    }
+  }>
 }
 
 // VolunteerTeam est importé depuis useVolunteerTeams.ts
@@ -48,6 +58,48 @@ export interface UseVolunteerScheduleOptions {
   onTimeSlotUpdate?: (timeSlot: VolunteerTimeSlot) => void
   onTimeSlotClick?: (timeSlot: VolunteerTimeSlot) => void
   onTimeSlotDelete?: (timeSlotId: string) => void
+}
+
+/**
+ * Le nom affiché d'une personne : pseudo, nom complet, ou les deux.
+ * Même règle pour un bénévole et pour un organisateur — c'est la même fiche utilisateur.
+ */
+function nomAffichePersonne(user: {
+  id: number
+  pseudo?: string | null
+  prenom?: string | null
+  nom?: string | null
+}): string {
+  const nomComplet = `${user.prenom || ''} ${user.nom || ''}`.trim()
+  if (user.pseudo && nomComplet) return `${user.pseudo} (${nomComplet})`
+  return user.pseudo || nomComplet || `Utilisateur ${user.id}`
+}
+
+/** L'élément d'infobulle, unique et partagé : un par créneau en laisserait des centaines. */
+let infobulleCreneau: HTMLElement | null = null
+
+function obtenirInfobulle(): HTMLElement {
+  if (infobulleCreneau?.isConnected) return infobulleCreneau
+
+  const element = document.createElement('div')
+  element.className = 'slot-tooltip'
+  element.style.display = 'none'
+  document.body.appendChild(element)
+  infobulleCreneau = element
+  return element
+}
+
+/** Près du curseur, mais jamais au-delà du bord de la fenêtre. */
+function positionnerInfobulle(infobulle: HTMLElement, evenement: MouseEvent) {
+  if (infobulle.style.display === 'none') return
+
+  const marge = 12
+  const rect = infobulle.getBoundingClientRect()
+  const x = Math.min(evenement.clientX + marge, window.innerWidth - rect.width - marge)
+  const y = Math.min(evenement.clientY + marge, window.innerHeight - rect.height - marge)
+
+  infobulle.style.left = `${Math.max(marge, x)}px`
+  infobulle.style.top = `${Math.max(marge, y)}px`
 }
 
 export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
@@ -204,6 +256,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           assignedVolunteers: slot.assignedVolunteers,
           teamId: slot.teamId,
           assignedVolunteersList: slot.assignedVolunteersList,
+          assignedOrganizersList: slot.assignedOrganizersList,
+          teamName: unref(teams).find((equipe) => equipe.id === slot.teamId)?.name ?? null,
           slotTitle, // Titre original pour eventContent
           delayMinutes: slot.delayMinutes, // Retard du créneau
           originalStart: slot.start, // Heure de début originale
@@ -315,8 +369,116 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       },
     },
 
+    /**
+     * Infobulle au survol d'un créneau : son nom, son équipe, et qui y est affecté.
+     *
+     * Le contenu du créneau lui-même est tronqué — quatre bénévoles au plus, trois
+     * organisateurs, et des noms coupés par la largeur de la colonne. L'infobulle donne la
+     * liste entière, seul endroit où on peut la lire sans ouvrir le créneau.
+     *
+     * Un seul élément réutilisé, posé à la racine de la page : à l'intérieur du calendrier, il
+     * serait coupé par le défilement des colonnes.
+     */
+    eventDidMount: (arg) => {
+      if (!import.meta.client) return
+
+      const infobulle = obtenirInfobulle()
+      const donnees = arg.event.extendedProps
+
+      const afficher = (evenement: MouseEvent) => {
+        infobulle.innerHTML = ''
+
+        const titre = document.createElement('div')
+        titre.className = 'slot-tooltip-title'
+        titre.textContent = donnees.slotTitle || arg.event.title
+        infobulle.appendChild(titre)
+
+        if (donnees.teamName) {
+          const equipe = document.createElement('div')
+          equipe.className = 'slot-tooltip-team'
+          equipe.textContent = donnees.teamName
+          infobulle.appendChild(equipe)
+        }
+
+        const benevoles = donnees.assignedVolunteersList || []
+        const organisateurs = donnees.assignedOrganizersList || []
+
+        const section = (libelle: string, personnes: any[], cle: string) => {
+          if (personnes.length === 0) return
+          const bloc = document.createElement('div')
+          bloc.className = 'slot-tooltip-section'
+          const entete = document.createElement('div')
+          entete.className = 'slot-tooltip-label'
+          entete.textContent = `${libelle} (${personnes.length})`
+          bloc.appendChild(entete)
+          for (const personne of personnes) {
+            const ligne = document.createElement('div')
+            ligne.className = 'slot-tooltip-person'
+            ligne.textContent = nomAffichePersonne(personne[cle])
+            bloc.appendChild(ligne)
+          }
+          infobulle.appendChild(bloc)
+        }
+
+        section(t('volunteers.assigned_volunteers'), benevoles, 'user')
+        section(t('volunteers.assigned_organizers'), organisateurs, 'user')
+
+        if (benevoles.length === 0 && organisateurs.length === 0) {
+          const vide = document.createElement('div')
+          vide.className = 'slot-tooltip-person'
+          vide.textContent = t('volunteers.no_assigned_volunteers')
+          infobulle.appendChild(vide)
+        }
+
+        infobulle.style.display = 'block'
+        positionnerInfobulle(infobulle, evenement)
+      }
+
+      const masquer = () => {
+        infobulle.style.display = 'none'
+      }
+
+      arg.el.addEventListener('mouseenter', afficher)
+      arg.el.addEventListener('mousemove', (evenement) =>
+        positionnerInfobulle(infobulle, evenement as MouseEvent)
+      )
+      arg.el.addEventListener('mouseleave', masquer)
+      // Sans ça, l'infobulle reste suspendue au-dessus d'un créneau qui n'existe plus.
+      ;(arg.el as any).__masquerInfobulle = masquer
+    },
+
+    eventWillUnmount: (arg) => {
+      ;(arg.el as any).__masquerInfobulle?.()
+    },
+
     // Rendu HTML personnalisé pour les événements
     eventContent: (arg) => {
+      /** Une ligne « avatar + nom » telle qu'elle apparaît dans le créneau. */
+      const lignePersonne = (user: any, organisateur = false): HTMLElement => {
+        const ligne = document.createElement('div')
+        ligne.className = organisateur ? 'volunteer-item organizer-item' : 'volunteer-item'
+
+        const avatar = document.createElement('img')
+        avatar.setAttribute('src', getUserAvatar(user, 14))
+        avatar.setAttribute('alt', user.pseudo || 'Avatar')
+        avatar.className = 'user-avatar'
+        avatar.style.width = '14px'
+        avatar.style.height = '14px'
+        avatar.style.borderRadius = '50%'
+        avatar.style.objectFit = 'cover'
+        avatar.style.border = '1px solid rgba(255, 255, 255, 0.8)'
+        avatar.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.1)'
+        avatar.style.flexShrink = '0'
+
+        const texte = document.createElement('span')
+        texte.className = 'volunteer-text'
+        texte.textContent = nomAffichePersonne(user)
+
+        ligne.appendChild(avatar)
+        ligne.appendChild(texte)
+        return ligne
+      }
+
       const event = arg.event
       const slotTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
       const counterInfo = `(${event.extendedProps.assignedVolunteers}/${event.extendedProps.maxVolunteers})`
@@ -356,40 +518,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         const remainingCount = assignedVolunteersList.length - maxDisplay
 
         volunteersToDisplay.forEach((assignment: any) => {
-          const user = assignment.user
-          const volunteerContainer = document.createElement('div')
-          volunteerContainer.className = 'volunteer-item'
-
-          // Créer l'avatar avec getUserAvatar (gère profilePicture, Gravatar et initiales)
-          const avatar = document.createElement('img')
-          avatar.setAttribute('src', getUserAvatar(user, 14))
-          avatar.setAttribute('alt', user.pseudo || 'Avatar')
-          avatar.className = 'user-avatar'
-          avatar.style.width = '14px'
-          avatar.style.height = '14px'
-          avatar.style.borderRadius = '50%'
-          avatar.style.objectFit = 'cover'
-          avatar.style.border = '1px solid rgba(255, 255, 255, 0.8)'
-          avatar.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.1)'
-          avatar.style.flexShrink = '0'
-
-          // Créer le texte d'affichage
-          const textSpan = document.createElement('span')
-          textSpan.className = 'volunteer-text'
-
-          const fullName = `${user.prenom || ''} ${user.nom || ''}`.trim()
-          let displayText = user.pseudo || fullName || `Utilisateur ${user.id}`
-
-          // Ajouter nom et prénom entre parenthèses si ils existent et si on a déjà un pseudo
-          if (user.pseudo && fullName) {
-            displayText = `${user.pseudo} (${fullName})`
-          }
-
-          textSpan.textContent = displayText
-
-          volunteerContainer.appendChild(avatar)
-          volunteerContainer.appendChild(textSpan)
-          avatarsDiv.appendChild(volunteerContainer)
+          avatarsDiv.appendChild(lignePersonne(assignment.user))
         })
 
         // Si il y a plus de bénévoles que le maximum affiché, ajouter une ligne "+X bénévoles"
@@ -408,6 +537,34 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         }
 
         container.appendChild(avatarsDiv)
+      }
+
+      // Organisateurs affectés : mêmes lignes, mais après les bénévoles et distingués par leur
+      // style — ils ne comptent pas dans le compteur du titre, et rien ne doit le laisser croire.
+      const assignedOrganizersList = event.extendedProps.assignedOrganizersList || []
+      if (assignedOrganizersList.length > 0) {
+        const organisateursDiv = document.createElement('div')
+        organisateursDiv.className = 'slot-avatars slot-organizers'
+
+        const maxOrganisateurs = 3
+        assignedOrganizersList
+          .slice(0, maxOrganisateurs)
+          .forEach((affectation: any) => organisateursDiv.appendChild(lignePersonne(affectation.user, true)))
+
+        const restants = assignedOrganizersList.length - maxOrganisateurs
+        if (restants > 0) {
+          const plus = document.createElement('div')
+          plus.className = 'volunteer-item organizer-item volunteer-more'
+          plus.style.fontStyle = 'italic'
+          plus.style.fontSize = '0.65rem'
+          const texte = document.createElement('span')
+          texte.className = 'volunteer-text'
+          texte.textContent = `+${restants} ${restants === 1 ? 'organisateur' : 'organisateurs'}`
+          plus.appendChild(texte)
+          organisateursDiv.appendChild(plus)
+        }
+
+        container.appendChild(organisateursDiv)
       }
 
       return { domNodes: [container] }

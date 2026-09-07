@@ -1,0 +1,65 @@
+/**
+ * Lecture et écriture des filtres du planning dans l'URL.
+ *
+ * Sans ça, un rechargement — ou un lien envoyé à quelqu'un d'autre — repartait de « toutes les
+ * équipes », alors que c'est précisément la vue filtrée qu'on voulait montrer.
+ *
+ * Comme ailleurs dans le dépôt (journal d'erreurs, administration des comptes) : seules les
+ * valeurs qui s'écartent du défaut figurent dans l'URL.
+ *
+ * Fonctions pures et non lecture directe de la route dans le composant : ce sont ces règles-là
+ * qui peuvent se tromper, et les vérifier ici évite de monter un routeur.
+ */
+
+export const GRANULARITE_PAR_DEFAUT = 30
+export const GRANULARITES_ADMISES = [15, 30, 60] as const
+
+/** Les identifiants d'équipe portés par l'URL, séparés par des virgules. */
+export function equipesDepuisUrl(brut: unknown): string[] {
+  if (typeof brut !== 'string' || !brut) return []
+  return brut.split(',').filter(Boolean)
+}
+
+/**
+ * La granularité portée par l'URL. Une valeur inventée casserait l'affichage du calendrier sans
+ * rien signaler : on retombe alors sur le défaut.
+ */
+export function granulariteDepuisUrl(brut: unknown): number {
+  const valeur = parseInt(String(brut), 10)
+  return (GRANULARITES_ADMISES as readonly number[]).includes(valeur)
+    ? valeur
+    : GRANULARITE_PAR_DEFAUT
+}
+
+/**
+ * Écarte les équipes que l'URL cite mais qui n'existent plus — un lien ancien, une équipe
+ * supprimée. Sans ce filtre, le planning s'affichait vide sans rien expliquer.
+ *
+ * Tant que les équipes ne sont pas chargées, on garde la sélection telle quelle : les effacer
+ * ici perdrait le filtre de l'URL avant même de pouvoir le valider.
+ */
+export function equipesConnues(selection: string[], equipes: Array<{ id: string }>): string[] {
+  if (equipes.length === 0) return selection
+  const existantes = new Set(equipes.map((equipe) => equipe.id))
+  return selection.filter((id) => existantes.has(id))
+}
+
+/**
+ * La query d'URL reflétant les filtres, en préservant les autres paramètres déjà présents.
+ * Une valeur au défaut est retirée plutôt qu'écrite : l'URL reste courte et lisible.
+ */
+export function requeteFiltres(
+  queryActuelle: Record<string, unknown>,
+  equipes: string[],
+  granularite: number
+): Record<string, string> {
+  const query = { ...queryActuelle } as Record<string, string>
+
+  if (equipes.length > 0) query.teams = equipes.join(',')
+  else delete query.teams
+
+  if (granularite !== GRANULARITE_PAR_DEFAUT) query.granularity = String(granularite)
+  else delete query.granularity
+
+  return query
+}
