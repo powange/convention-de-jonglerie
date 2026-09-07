@@ -194,7 +194,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { Edition, EditionShowCallPublic } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
-import { markdownToHtml } from '~/utils/markdown'
+import { convertirRaccourcisEmoji, markdownToHtml } from '~/utils/markdown'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -304,13 +304,24 @@ const shareShowCall = async () => {
 
 // SEO
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
+
+// La description part telle quelle dans la balise `<meta>` : sans conversion, les aperçus de
+// partage annoncent `:performing_arts:` là où la page affiche 🎭.
+//
+// `useAsyncData` et non un `watch` : le rendu serveur l'attend, et la balise part complète même
+// pour un lecteur qui n'exécute pas de JavaScript.
+const { data: descriptionSeo } = await useAsyncData(
+  `shows-call-seo-${editionId}-${showCallId}`,
+  () => convertirRaccourcisEmoji(showCall.value?.description ?? ''),
+  { watch: [showCall] }
+)
+
 useSeoMeta({
   title: computed(() =>
     showCall.value ? `${showCall.value.name} - ${editionName.value}` : t('shows_call.title')
   ),
   description: computed(
-    () =>
-      showCall.value?.description || t('shows_call.seo_description', { name: editionName.value })
+    () => descriptionSeo.value || t('shows_call.seo_description', { name: editionName.value })
   ),
 })
 </script>
