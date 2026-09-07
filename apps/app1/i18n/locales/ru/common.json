@@ -88,7 +88,8 @@
       "link_tooltip": "Вставить ссылку (Ctrl+K)",
       "numbered_list_tooltip": "Нумерованный список",
       "quote_tooltip": "Цитата",
-      "strike_tooltip": "Зачёркнутый текст"
+      "strike_tooltip": "Зачёркнутый текст",
+      "underline_tooltip": "Подчёркнутый"
     },
     "email": "Email",
     "end": "Конец",

@@ -88,7 +88,8 @@
       "link_tooltip": "Vložení odkazu (Ctrl+K)",
       "numbered_list_tooltip": "Číslovaný seznam",
       "quote_tooltip": "Citace",
-      "strike_tooltip": "Přeškrtnutý text"
+      "strike_tooltip": "Přeškrtnutý text",
+      "underline_tooltip": "Podtržení"
     },
     "email": "E-mail",
     "end": "Konec",

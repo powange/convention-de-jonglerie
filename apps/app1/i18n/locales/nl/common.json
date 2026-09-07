@@ -88,7 +88,8 @@
       "link_tooltip": "Link invoegen (Ctrl+K)",
       "numbered_list_tooltip": "Genummerde lijst",
       "quote_tooltip": "Citaat",
-      "strike_tooltip": "Doorgestreepte tekst"
+      "strike_tooltip": "Doorgestreepte tekst",
+      "underline_tooltip": "Onderstrepen"
     },
     "email": "E-mail",
     "end": "Einde",

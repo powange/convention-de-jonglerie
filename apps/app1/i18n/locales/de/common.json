@@ -88,7 +88,8 @@
       "link_tooltip": "Link einfügen (Strg+K)",
       "numbered_list_tooltip": "Nummerierte Liste",
       "quote_tooltip": "Zitat",
-      "strike_tooltip": "Durchgestrichener Text"
+      "strike_tooltip": "Durchgestrichener Text",
+      "underline_tooltip": "Unterstreichen"
     },
     "email": "E-Mail",
     "end": "Ende",

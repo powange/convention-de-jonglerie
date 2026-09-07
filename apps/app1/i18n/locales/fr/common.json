@@ -88,7 +88,8 @@
       "link_tooltip": "Insérer un lien (Ctrl+K)",
       "numbered_list_tooltip": "Liste numérotée",
       "quote_tooltip": "Citation",
-      "strike_tooltip": "Texte barré"
+      "strike_tooltip": "Texte barré",
+      "underline_tooltip": "Souligner"
     },
     "email": "E-mail",
     "end": "Fin",
