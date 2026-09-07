@@ -468,6 +468,16 @@ const exportToPdf = async () => {
       }
     }
 
+    /** Pseudo, nom complet, ou les deux — même règle pour un bénévole et un organisateur. */
+    const nomPersonnePdf = (
+      user: { pseudo?: string | null; prenom?: string | null; nom?: string | null },
+      defaut = 'Personne'
+    ): string => {
+      const nomComplet = `${user.prenom || ''} ${user.nom || ''}`.trim()
+      if (user.pseudo && nomComplet) return `${user.pseudo} (${nomComplet})`
+      return user.pseudo || nomComplet || defaut
+    }
+
     // Fonction helper pour tronquer le texte si trop long
     const truncateText = (text: string, maxWidth: number): string => {
       const textWidth = doc.getTextWidth(text)
@@ -517,7 +527,10 @@ const exportToPdf = async () => {
         filteredSlots.forEach((slot) => {
           // Calculer la hauteur nécessaire pour ce créneau
           const volunteersCount = slot.assignedVolunteersList?.length || 0
-          const slotHeight = 20 + volunteersCount * 5
+          const organisateurs = slot.assignedOrganizersList ?? []
+          // Les organisateurs prennent des lignes eux aussi : les oublier ici ferait déborder
+          // le créneau sur le suivant.
+          const slotHeight = 20 + (volunteersCount + organisateurs.length) * 5
           checkNewPage(slotHeight)
 
           // Trouver le nom de l'équipe
@@ -575,24 +588,7 @@ const exportToPdf = async () => {
 
             // Un créneau sans affectation n'a pas de liste : l'export PDF tombait dessus.
             ;(slot.assignedVolunteersList ?? []).forEach((assignment: any) => {
-              const pseudo = assignment.user.pseudo || ''
-              const firstName = assignment.user.prenom || ''
-              const lastName = assignment.user.nom || ''
-              const fullName = `${firstName} ${lastName}`.trim()
-
-              // Afficher pseudo (nom prénom) ou juste le nom si pas de pseudo
-              let volunteerName = ''
-              if (pseudo && fullName) {
-                volunteerName = `${pseudo} (${fullName})`
-              } else if (pseudo) {
-                volunteerName = pseudo
-              } else if (fullName) {
-                volunteerName = fullName
-              } else {
-                volunteerName = 'Bénévole'
-              }
-
-              const volunteerText = `  • ${volunteerName}`
+              const volunteerText = `  • ${nomPersonnePdf(assignment.user, 'Bénévole')}`
               doc.text(
                 truncateText(volunteerText, pageWidth - margin * 2 - 10),
                 margin + 10,
@@ -606,6 +602,19 @@ const exportToPdf = async () => {
             doc.setTextColor(156, 163, 175) // Gris clair
             doc.text('  Aucun bénévole assigné', margin + 10, currentY)
             currentY += 5
+          }
+
+          // Organisateurs affectés, listés après les bénévoles et signalés comme tels : ils ne
+          // comptent pas dans l'effectif annoncé plus haut.
+          if (organisateurs.length > 0) {
+            doc.setFontSize(9)
+            doc.setFont('helvetica', 'italic')
+            doc.setTextColor(37, 99, 235) // Bleu, pour les distinguer des bénévoles
+            for (const affectation of organisateurs) {
+              const ligne = `  • ${nomPersonnePdf(affectation.user)} (organisateur)`
+              doc.text(truncateText(ligne, pageWidth - margin * 2 - 10), margin + 10, currentY)
+              currentY += 5
+            }
           }
 
           doc.setTextColor(0, 0, 0) // Réinitialiser en noir

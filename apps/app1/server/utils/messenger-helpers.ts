@@ -1,10 +1,16 @@
 import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
+import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
+
 /**
- * Crée ou récupère les conversations pour un bénévole assigné à une équipe
+ * Crée ou récupère les conversations pour une personne rattachée à une équipe.
+ *
+ * Sert aussi bien à un bénévole assigné qu'à un organisateur rattaché : c'est la place dans
+ * l'équipe qui donne accès à sa conversation, pas le titre auquel on l'occupe.
+ *
  * @param editionId - ID de l'édition
  * @param teamId - ID de l'équipe
- * @param userId - ID de l'utilisateur (bénévole)
+ * @param userId - ID de l'utilisateur concerné
  * @param tx - Transaction Prisma optionnelle
  */
 export async function ensureVolunteerConversations(
@@ -57,28 +63,12 @@ export async function ensureVolunteerConversations(
     })
   }
 
-  // 2. Trouver tous les responsables de l'équipe
-  const teamLeaders = await client.applicationTeamAssignment.findMany({
-    where: {
-      teamId,
-      isLeader: true,
-      application: {
-        eventId: editionId,
-      },
-    },
-    include: {
-      application: {
-        select: {
-          userId: true,
-        },
-      },
-    },
-  })
+  // 2. Trouver tous les responsables de l'équipe — bénévoles acceptés comme organisateurs
+  // rattachés, les deux titres se valent.
+  const responsables = await utilisateursResponsablesDeLEquipe(editionId, teamId, tx)
 
   // Filtrer pour exclure l'utilisateur actuel s'il est lui-même responsable
-  const leaderUserIds = teamLeaders
-    .map((leader) => leader.application.userId)
-    .filter((leaderId) => leaderId !== userId)
+  const leaderUserIds = responsables.filter((leaderId) => leaderId !== userId)
 
   // Si il y a au moins un responsable différent de l'utilisateur
   if (leaderUserIds.length > 0) {

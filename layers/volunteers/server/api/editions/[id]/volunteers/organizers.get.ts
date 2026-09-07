@@ -40,7 +40,7 @@ export default wrapApiHandler(
       orderBy: { organizer: { user: { nom: 'asc' } } },
       select: {
         id: true,
-        teamAssignments: { select: { teamId: true } },
+        teamAssignments: { select: { teamId: true, isLeader: true } },
         organizer: {
           select: {
             user: {
@@ -64,6 +64,9 @@ export default wrapApiHandler(
         editionOrganizerId: organisateur.id,
         user: organisateur.organizer.user,
         teamIds: organisateur.teamAssignments.map((rattachement) => rattachement.teamId),
+        leaderTeamIds: organisateur.teamAssignments
+          .filter((rattachement) => rattachement.isLeader)
+          .map((rattachement) => rattachement.teamId),
       })),
     })
   },

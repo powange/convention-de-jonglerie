@@ -12,9 +12,16 @@ vi.hoisted(() => {
 })
 
 const mockCanManage = vi.hoisted(() => vi.fn())
+const mockRejoindre = vi.hoisted(() => vi.fn())
+const mockQuitter = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/utils/organizer-management', () => ({
   canManageEditionVolunteers: mockCanManage,
+}))
+
+vi.mock('#server/utils/messenger-helpers', () => ({
+  ensureVolunteerConversations: mockRejoindre,
+  removeVolunteerFromTeamConversations: mockQuitter,
 }))
 
 import handler from '../../../../../server/api/editions/[id]/organizers/edition-organizers/[editionOrganizerId]/teams.put'
@@ -35,7 +42,11 @@ describe('PUT /api/editions/[id]/organizers/edition-organizers/[id]/teams', () =
     vi.clearAllMocks()
     mockCanManage.mockResolvedValue(true)
     prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue({ organizersInTeams: true })
-    prismaMock.editionOrganizer.findFirst.mockResolvedValue({ id: 7 })
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue({
+      id: 7,
+      organizer: { userId: 42 },
+    })
+    prismaMock.organizerTeamAssignment.findMany.mockResolvedValue([])
     // Par défaut, toutes les équipes demandées appartiennent à l'édition
     prismaMock.volunteerTeam.count.mockImplementation(async ({ where }: any) => where.id.in.length)
     prismaMock.organizerTeamAssignment.deleteMany.mockResolvedValue({ count: 0 })
@@ -53,8 +64,8 @@ describe('PUT /api/editions/[id]/organizers/edition-organizers/[id]/teams', () =
 
     expect(result.success).toBe(true)
     expect(lignesEcrites()).toEqual([
-      { editionOrganizerId: 7, teamId: 'equipe-accueil' },
-      { editionOrganizerId: 7, teamId: 'equipe-bar' },
+      { editionOrganizerId: 7, teamId: 'equipe-accueil', isLeader: false },
+      { editionOrganizerId: 7, teamId: 'equipe-bar', isLeader: false },
     ])
   })
 
@@ -113,5 +124,50 @@ describe('PUT /api/editions/[id]/organizers/edition-organizers/[id]/teams', () =
 
     await expect(envoyer({ teamIds: ['equipe-accueil'] })).rejects.toBeDefined()
     expect(prismaMock.organizerTeamAssignment.createMany).not.toHaveBeenCalled()
+  })
+
+  /**
+   * La route remplace la liste des équipes : elle ne destitue personne. Sans cette précaution,
+   * cocher une équipe de plus effacerait la responsabilité de toutes les autres — une
+   * disparition qu'aucun écran n'annoncerait.
+   */
+  it('conserve la responsabilité des équipes gardées', async () => {
+    prismaMock.organizerTeamAssignment.findMany.mockResolvedValue([
+      { teamId: 'equipe-accueil', isLeader: true },
+      { teamId: 'equipe-cuisine', isLeader: false },
+    ])
+
+    await envoyer({ teamIds: ['equipe-accueil', 'equipe-bar'] })
+
+    expect(lignesEcrites()).toEqual([
+      { editionOrganizerId: 7, teamId: 'equipe-accueil', isLeader: true },
+      { editionOrganizerId: 7, teamId: 'equipe-bar', isLeader: false },
+    ])
+  })
+
+  it("inscrit l'organisateur dans la conversation de chaque équipe", async () => {
+    await envoyer({ teamIds: ['equipe-accueil'] })
+
+    expect(mockRejoindre).toHaveBeenCalledWith(22, 'equipe-accueil', 42, expect.anything())
+  })
+
+  it('le retire de la conversation des équipes quittées', async () => {
+    prismaMock.organizerTeamAssignment.findMany.mockResolvedValue([
+      { teamId: 'equipe-cuisine', isLeader: false },
+    ])
+
+    await envoyer({ teamIds: ['equipe-accueil'] })
+
+    expect(mockQuitter).toHaveBeenCalledWith(22, 'equipe-cuisine', 42, expect.anything())
+  })
+
+  it('ne le retire pas des équipes conservées', async () => {
+    prismaMock.organizerTeamAssignment.findMany.mockResolvedValue([
+      { teamId: 'equipe-accueil', isLeader: false },
+    ])
+
+    await envoyer({ teamIds: ['equipe-accueil'] })
+
+    expect(mockQuitter).not.toHaveBeenCalled()
   })
 })

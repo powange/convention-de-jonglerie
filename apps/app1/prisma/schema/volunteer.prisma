@@ -263,6 +263,9 @@ model ApplicationTeamAssignment {
 model OrganizerTeamAssignment {
   editionOrganizerId Int
   teamId             String
+  /// Un organisateur peut piloter une équipe, au même titre qu'un bénévole responsable — et
+  /// avec les mêmes droits, qui ne dépendent donc plus d'une candidature acceptée.
+  isLeader           Boolean  @default(false)
   assignedAt         DateTime @default(now())
 
   editionOrganizer EditionOrganizer @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
@@ -270,6 +273,7 @@ model OrganizerTeamAssignment {
 
   @@id([editionOrganizerId, teamId])
   @@index([teamId])
+  @@index([isLeader])
 }
 
 /// Affectation d'un organisateur d'édition à un créneau de bénévolat.

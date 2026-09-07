@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -19,22 +20,11 @@ export default wrapApiHandler(async (event) => {
   let leaderTeamIds: string[] = []
 
   if (!allowed) {
-    // Vérifier si l'utilisateur est team leader
-    const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
-      where: {
-        isLeader: true,
-        application: {
-          userId: user.id,
-          eventId: editionId,
-          status: 'ACCEPTED',
-        },
-      },
-      select: {
-        teamId: true,
-      },
-    })
+    // À défaut du droit de gestion, être responsable d'équipe suffit — qu'on le soit comme
+    // bénévole accepté ou comme organisateur rattaché.
+    leaderTeamIds = await equipesDontIlEstResponsable(editionId, user.id)
 
-    if (leaderAssignments.length === 0) {
+    if (leaderTeamIds.length === 0) {
       throw createError({
         status: 403,
         message: 'Droits insuffisants pour accéder à ces données',
@@ -42,7 +32,6 @@ export default wrapApiHandler(async (event) => {
     }
 
     isTeamLeader = true
-    leaderTeamIds = leaderAssignments.map((a) => a.teamId)
   }
 
   // Récupérer tous les bénévoles acceptés avec leurs équipes

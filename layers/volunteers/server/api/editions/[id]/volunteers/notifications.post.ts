@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { Prisma } from '#server/utils/prisma'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
@@ -29,31 +30,22 @@ export default wrapApiHandler(async (event) => {
   let leaderTeamNames: string[] = []
 
   if (!canManage) {
-    // Vérifier si l'utilisateur est team leader
-    const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
-      where: {
-        isLeader: true,
-        application: {
-          userId: user.id,
-          eventId: editionId,
-          status: 'ACCEPTED',
-        },
-      },
-      select: {
-        team: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    })
+    // À défaut du droit de gestion, être responsable d'équipe suffit — qu'on le soit comme
+    // bénévole accepté ou comme organisateur rattaché.
+    const teamIds = await equipesDontIlEstResponsable(editionId, user.id)
 
-    if (leaderAssignments.length === 0) {
+    if (teamIds.length === 0) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }
 
+    // La suite raisonne sur des noms d'équipe, pas des identifiants.
+    const equipes = await prisma.volunteerTeam.findMany({
+      where: { id: { in: teamIds } },
+      select: { name: true },
+    })
+
     isTeamLeader = true
-    leaderTeamNames = leaderAssignments.map((a) => a.team.name)
+    leaderTeamNames = equipes.map((equipe) => equipe.name)
   }
 
   // Valider les données

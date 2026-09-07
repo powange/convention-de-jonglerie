@@ -226,37 +226,16 @@ export default wrapApiHandler(
         let participantsWithLeaderInfo = conversation.participants
 
         if (conversation.teamId) {
-          // Récupérer les informations isLeader pour tous les participants de cette équipe
-          const leaderAssignments = await prisma.applicationTeamAssignment.findMany({
-            where: {
-              teamId: conversation.teamId,
-              application: {
-                userId: {
-                  in: conversation.participants.map((p) => p.userId),
-                },
-                eventId: editionId,
-              },
-            },
-            select: {
-              isLeader: true,
-              application: {
-                select: {
-                  userId: true,
-                },
-              },
-            },
-          })
+          // Responsables de l'équipe, bénévoles comme organisateurs : le badge doit paraître
+          // sur l'un comme sur l'autre.
+          const responsables = new Set(
+            await utilisateursResponsablesDeLEquipe(editionId, conversation.teamId)
+          )
 
-          // Mapper les participants avec leur statut isLeader
-          participantsWithLeaderInfo = conversation.participants.map((participant) => {
-            const assignment = leaderAssignments.find(
-              (a) => a.application.userId === participant.userId
-            )
-            return {
-              ...participant,
-              isLeader: assignment?.isLeader || false,
-            }
-          })
+          participantsWithLeaderInfo = conversation.participants.map((participant) => ({
+            ...participant,
+            isLeader: responsables.has(participant.userId),
+          }))
         }
 
         return {

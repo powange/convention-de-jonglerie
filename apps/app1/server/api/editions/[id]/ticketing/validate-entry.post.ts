@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { updateUserInfo } from '#server/utils/editions/ticketing/user-info-update'
+import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 
@@ -125,23 +126,15 @@ export default wrapApiHandler(
 
               // Pour chaque équipe du bénévole
               for (const teamAssignment of application.teamAssignments) {
-                // Trouver les leaders de cette équipe
-                const teamLeaders = await prisma.applicationTeamAssignment.findMany({
-                  where: {
-                    teamId: teamAssignment.teamId,
-                    isLeader: true,
-                  },
-                  include: {
-                    application: {
-                      select: {
-                        userId: true,
-                      },
-                    },
-                  },
-                })
+                // Les responsables de cette équipe : bénévoles acceptés comme organisateurs
+                // rattachés, les deux titres se valent pour être prévenu.
+                const leaderUserIds = await utilisateursResponsablesDeLEquipe(
+                  editionId,
+                  teamAssignment.teamId
+                )
 
                 // Envoyer une notification à chaque leader
-                for (const leader of teamLeaders) {
+                for (const leaderUserId of leaderUserIds) {
                   const volunteerName =
                     `${application.user.prenom || ''} ${application.user.nom || ''}`.trim() ||
                     application.user.pseudo
@@ -149,7 +142,7 @@ export default wrapApiHandler(
                   await safeNotify(
                     () =>
                       NotificationHelpers.volunteerArrival(
-                        leader.application.userId,
+                        leaderUserId,
                         volunteerName,
                         application.user.pseudo,
                         teamAssignment.team.name,

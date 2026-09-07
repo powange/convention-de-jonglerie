@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
 
@@ -22,20 +23,10 @@ export default wrapApiHandler(async (event) => {
     })
   }
 
-  // Vérifier que l'utilisateur est leader de cette équipe
-  const leaderAssignment = await prisma.applicationTeamAssignment.findFirst({
-    where: {
-      teamId,
-      isLeader: true,
-      application: {
-        userId: user.id,
-        eventId: editionId,
-        status: 'ACCEPTED',
-      },
-    },
-  })
+  // Responsable de cette équipe — comme bénévole accepté ou comme organisateur rattaché.
+  const equipesDirigees = await equipesDontIlEstResponsable(editionId, user.id)
 
-  if (!leaderAssignment) {
+  if (!equipesDirigees.includes(teamId)) {
     throw createError({
       status: 403,
       message: 'Vous devez être leader de cette équipe pour voir ses membres',

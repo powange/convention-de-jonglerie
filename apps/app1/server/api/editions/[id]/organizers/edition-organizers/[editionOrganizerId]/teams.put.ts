@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
+import {
+  ensureVolunteerConversations,
+  removeVolunteerFromTeamConversations,
+} from '#server/utils/messenger-helpers'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 
 const bodySchema = z.object({
@@ -15,7 +19,8 @@ const bodySchema = z.object({
  *
  * Ce rattachement est volontairement sans effet sur la mécanique du bénévolat : un
  * organisateur ne compte ni dans la capacité d'un créneau, ni dans les statistiques de
- * couverture, ni dans l'assignation automatique. Il apparaît dans l'équipe, rien de plus.
+ * couverture, ni dans l'assignation automatique. Il apparaît dans l'équipe — et dans sa
+ * conversation, la place valant accès quel que soit le titre auquel on l'occupe.
  *
  * La permission est celle des bénévoles, pas celle des organisateurs : ce qu'on modifie ici,
  * c'est la composition d'une équipe de bénévolat. Elle ne suffit pas : encore faut-il que
@@ -53,7 +58,7 @@ export default wrapApiHandler(
     // d'un organisateur d'une autre édition passerait la permission de celle-ci.
     const editionOrganizer = await prisma.editionOrganizer.findFirst({
       where: { id: editionOrganizerId, editionId },
-      select: { id: true },
+      select: { id: true, organizer: { select: { userId: true } } },
     })
     if (!editionOrganizer) {
       throw createError({ status: 404, message: 'Organisateur introuvable sur cette édition' })
@@ -74,12 +79,45 @@ export default wrapApiHandler(
       }
     }
 
+    const userId = editionOrganizer.organizer.userId
+    const equipesDemandees = [...new Set(teamIds)]
+
     await prisma.$transaction(async (tx) => {
+      const rattachementsActuels = await tx.organizerTeamAssignment.findMany({
+        where: { editionOrganizerId },
+        select: { teamId: true, isLeader: true },
+      })
+
+      // La responsabilité survit au ré-enregistrement : cette route remplace la liste des
+      // équipes, elle ne destitue personne. La perdre en cochant une case de plus serait une
+      // disparition silencieuse.
+      const responsableDe = new Map(
+        rattachementsActuels.map((rattachement) => [rattachement.teamId, rattachement.isLeader])
+      )
+
       await tx.organizerTeamAssignment.deleteMany({ where: { editionOrganizerId } })
-      if (teamIds.length > 0) {
+
+      if (equipesDemandees.length > 0) {
         await tx.organizerTeamAssignment.createMany({
-          data: teamIds.map((teamId) => ({ editionOrganizerId, teamId })),
+          data: equipesDemandees.map((teamId) => ({
+            editionOrganizerId,
+            teamId,
+            isLeader: responsableDe.get(teamId) ?? false,
+          })),
         })
+      }
+
+      // Les conversations d'équipe suivent le rattachement : on y entre en la rejoignant, on en
+      // sort en la quittant. Même mécanique que pour un bénévole assigné.
+      const equipesQuittees = rattachementsActuels
+        .map((rattachement) => rattachement.teamId)
+        .filter((teamId) => !equipesDemandees.includes(teamId))
+
+      for (const teamId of equipesQuittees) {
+        await removeVolunteerFromTeamConversations(editionId, teamId, userId, tx)
+      }
+      for (const teamId of equipesDemandees) {
+        await ensureVolunteerConversations(editionId, teamId, userId, tx)
       }
     })
 
