@@ -791,6 +791,11 @@ defineExpose({
   margin-bottom: 2px;
 }
 
+.slot-tooltip .slot-tooltip-horaire {
+  color: rgb(209 213 219);
+  margin-bottom: 2px;
+}
+
 .slot-tooltip .slot-tooltip-team {
   color: rgb(147 197 253);
   margin-bottom: 4px;
