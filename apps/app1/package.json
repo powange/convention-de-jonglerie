@@ -19,6 +19,7 @@
     "admin:list": "npx tsx scripts/manage-admin.ts list",
     "help": "node scripts/show-help.mjs",
     "check-i18n": "node scripts/check-i18n.js",
+    "emoji:generate": "node scripts/generate-emoji-shortcodes.mjs",
     "check-translations": "node scripts/check-i18n-translations.js",
     "check-i18n-vars": "node scripts/check-i18n-variables.cjs",
     "i18n:add": "node scripts/add-translation.js",
