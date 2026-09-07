@@ -1,3 +1,5 @@
+import { dureeTraduisible, formatPlage } from '../utils/plage-horaire'
+
 import type { CalendarOptions, EventInput } from '@fullcalendar/core'
 // `ResourceInput` vit dans le paquet `resource`, pas dans `core` : l'importer de `core`
 // ne résolvait rien, et le type des ressources était silencieusement perdu.
@@ -392,6 +394,17 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         titre.className = 'slot-tooltip-title'
         titre.textContent = donnees.slotTitle || arg.event.title
         infobulle.appendChild(titre)
+
+        // « 15h - 16h (1h) ». Les bornes de l'événement, donc décalées si le créneau a du
+        // retard : c'est l'heure à laquelle on se présente, pas celle prévue à l'origine.
+        const plage = formatPlage(arg.event.start, arg.event.end)
+        if (plage) {
+          const duree = dureeTraduisible(arg.event.start, arg.event.end)
+          const horaire = document.createElement('div')
+          horaire.className = 'slot-tooltip-horaire'
+          horaire.textContent = duree ? `${plage} (${t(duree.cle, duree.valeurs)})` : plage
+          infobulle.appendChild(horaire)
+        }
 
         if (donnees.teamName) {
           const equipe = document.createElement('div')

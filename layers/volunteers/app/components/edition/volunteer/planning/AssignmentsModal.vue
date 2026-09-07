@@ -325,6 +325,7 @@ import { computed, ref, watch } from 'vue'
 import type { VolunteerTimeSlot } from '#imports'
 
 import { organisateursAffectables } from '../../../../utils/organisateurs-affectables'
+import { dureeTraduisible } from '../../../../utils/plage-horaire'
 
 
 // Props
@@ -437,23 +438,10 @@ const availableOrganizers = computed(() =>
   )
 )
 
-// Durée
+// Durée — le calcul vit dans `plage-horaire.ts`, partagé avec l'infobulle du planning.
 const duration = computed(() => {
-  if (!props.timeSlot?.start || !props.timeSlot?.end) return null
-  const start = new Date(props.timeSlot.start)
-  const end = new Date(props.timeSlot.end)
-  const diffMs = end.getTime() - start.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const hours = Math.floor(diffMins / 60)
-  const mins = diffMins % 60
-
-  if (hours > 0 && mins > 0) {
-    return t('volunteers.duration_hours_minutes', { hours, minutes: mins })
-  } else if (hours > 0) {
-    return t('volunteers.duration_hours', { hours })
-  } else {
-    return t('volunteers.duration_minutes', { minutes: mins })
-  }
+  const duree = dureeTraduisible(props.timeSlot?.start, props.timeSlot?.end)
+  return duree ? t(duree.cle, duree.valeurs) : null
 })
 
 // Formatage de la date/heure
