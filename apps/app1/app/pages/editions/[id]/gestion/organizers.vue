@@ -179,6 +179,33 @@
                   </UBadge>
                 </template>
 
+                <!-- Colonne Équipes de bénévolat. Mêmes pastilles colorées que les colonnes
+                     d'équipes de la gestion des candidatures : la couleur porte l'identité de
+                     l'équipe, et c'est elle qu'on reconnaît d'une page à l'autre. -->
+                <template #teams-cell="{ row }">
+                  <div v-if="row.original.teams?.length" class="flex flex-wrap gap-1">
+                    <UBadge
+                      v-for="equipe in row.original.teams"
+                      :key="equipe.id"
+                      color="primary"
+                      variant="soft"
+                      size="sm"
+                      :style="
+                        equipe.color
+                          ? {
+                              backgroundColor: equipe.color + '20',
+                              borderColor: equipe.color,
+                              color: equipe.color,
+                            }
+                          : undefined
+                      "
+                    >
+                      {{ equipe.name }}
+                    </UBadge>
+                  </div>
+                  <span v-else class="text-gray-500">—</span>
+                </template>
+
                 <!-- Colonne Repas -->
                 <template #meals-cell="{ row }">
                   <UButton
@@ -197,7 +224,19 @@
 
                 <!-- Colonne Actions -->
                 <template #actions-cell="{ row }">
-                  <div class="flex items-center justify-end">
+                  <div class="flex items-center justify-end gap-1">
+                    <UTooltip
+                      v-if="rattachementEquipesOuvert"
+                      :text="$t('gestion.organizers.teams.manage')"
+                    >
+                      <UButton
+                        icon="i-heroicons-user-group"
+                        color="neutral"
+                        variant="ghost"
+                        size="xs"
+                        @click="openTeamsModal(row.original)"
+                      />
+                    </UTooltip>
                     <UButton
                       icon="i-heroicons-trash"
                       color="error"
@@ -323,6 +362,15 @@
       </template>
     </UModal>
 
+    <!-- Modal des équipes de bénévolat d'un organisateur présent sur l'édition -->
+    <OrganizersTeamsModal
+      v-if="rattachementEquipesOuvert"
+      v-model="teamsModalOpen"
+      :organizer="organizerForTeams"
+      :edition-id="editionId"
+      @teams-saved="loadEditionOrganizers"
+    />
+
     <!-- Modal des repas d'un organisateur présent sur l'édition -->
     <OrganizersMealsModal
       v-model="mealsModalOpen"
@@ -410,6 +458,32 @@ const canManageMeals = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageMeals(edition.value, authStore.user.id)
 })
+
+// Rattacher un organisateur à une équipe relève du bénévolat : c'est cette permission-là qui
+// commande, pas celle des organisateurs.
+const canManageVolunteers = computed(() => {
+  if (!edition.value || !authStore.user?.id) return false
+  return editionStore.canManageVolunteers(edition.value, authStore.user.id)
+})
+
+/**
+ * L'option est fermée par défaut sur une édition : sans elle, ni la colonne ni la modale
+ * n'apparaissent, et le serveur refuse de toute façon l'enregistrement.
+ */
+const rattachementEquipesOuvert = computed(
+  () =>
+    !!edition.value?.volunteersEnabled &&
+    !!edition.value?.volunteersOrganizersInTeams &&
+    canManageVolunteers.value
+)
+
+const teamsModalOpen = ref(false)
+const organizerForTeams = ref<any>(null)
+
+const openTeamsModal = (organizer: any) => {
+  organizerForTeams.value = organizer
+  teamsModalOpen.value = true
+}
 
 const openMealsModal = (organizer: any) => {
   organizerForMeals.value = organizer
@@ -645,6 +719,15 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
           id: 'status',
           header: t('gestion.organizers.status'),
           size: 150,
+        },
+      ]
+    : []),
+  ...(rattachementEquipesOuvert.value
+    ? [
+        {
+          id: 'teams',
+          header: t('gestion.organizers.teams.column'),
+          size: 200,
         },
       ]
     : []),

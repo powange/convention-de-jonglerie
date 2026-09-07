@@ -78,6 +78,6 @@
     "import_forced_day": "Tag der Ausgabe",
     "import_forced_day_description": "Wenn das Foto kein Datum nennt, wählen Sie den Tag, auf den die Workshops gelegt werden. Ihre Uhrzeiten bleiben erhalten.",
     "import_forced_day_none": "Die auf dem Foto gelesenen Daten verwenden",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Max. {count} Personen"
   }
 }

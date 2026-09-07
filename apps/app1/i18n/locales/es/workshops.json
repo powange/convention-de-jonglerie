@@ -78,6 +78,6 @@
     "import_forced_day": "Día de la edición",
     "import_forced_day_description": "Si la foto no indica una fecha, elige el día en el que colocar los talleres. Se conservan sus horarios.",
     "import_forced_day_none": "Usar las fechas leídas en la foto",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Máx. {count} personas"
   }
 }

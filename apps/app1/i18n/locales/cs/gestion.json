@@ -252,6 +252,14 @@
       "select_handout_item": "Vybrat položku",
       "select_to_add": "Vyberte organizátora k přidání",
       "status": "Stav vstupenky",
+      "teams": {
+        "column": "Týmy",
+        "description": "Přiřaďte tohoto organizátora k týmům dobrovolníků. Objeví se v nich, aniž by se počítal do stavů nebo automatického přiřazení.",
+        "load_error": "Týmy nelze načíst",
+        "manage": "Spravovat týmy",
+        "no_teams": "Žádný tým dobrovolníků v tomto ročníku",
+        "title_for": "Týmy — {name}"
+      },
       "title": "Organizátoři",
       "title_required": "Titul organizátora je povinný",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Zasílání oznámení dobrovolníkům",
       "planning_description": "Plánování slotů a misí",
       "teams_description": "Organizování týmů dobrovolníků",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Schvalovat výměny směn mezi dobrovolníky",
+      "swaps_enabled": "Výměny směn",
+      "swaps_enabled_description": "Umožnit dobrovolníkům vyměnit si směnu mezi sebou, se schválením vedoucího",
+      "swaps_open": "Dobrovolníci mohou navrhnout výměnu",
+      "swaps_closed": "Výměny jsou uzavřeny",
+      "organizers_in_teams": "Organizátoři v týmech",
+      "organizers_in_teams_description": "Umožňuje přiřazovat organizátory ročníku k týmům dobrovolníků. Objeví se v nich, aniž by se započítávali do stavu nebo do automatického přidělování.",
+      "organizers_in_teams_open": "Organizátory lze přiřadit k týmům",
+      "organizers_in_teams_closed": "Organizátoři nejsou přiřazeni k týmům"
     },
     "shows_call": {
       "title": "Výzva k přihláškám představení",
@@ -783,6 +795,6 @@
       "submit": "Uložit konvenci",
       "title": "Konvence"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Všechny kategorie"
   }
 }

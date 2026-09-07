@@ -262,6 +262,14 @@
       "select_handout_item": "Sélectionner un article",
       "select_to_add": "Sélectionner un organisateur à ajouter",
       "status": "Statut du billet",
+      "teams": {
+        "column": "Équipes",
+        "description": "Rattachez cet organisateur à des équipes de bénévolat. Il y apparaîtra, sans compter dans les effectifs ni dans l'assignation automatique.",
+        "load_error": "Impossible de charger les équipes",
+        "manage": "Gérer les équipes",
+        "no_teams": "Aucune équipe de bénévoles sur cette édition",
+        "title_for": "Équipes — {name}"
+      },
       "title": "Organisateurs",
       "title_required": "Le titre de l'organisateur est requis",
       "meals": {
@@ -682,6 +690,10 @@
       "swaps_enabled_description": "Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
       "swaps_open": "Les bénévoles peuvent proposer un échange",
       "swaps_closed": "Les échanges sont fermés",
+      "organizers_in_teams": "Organisateurs dans les équipes",
+      "organizers_in_teams_description": "Autoriser le rattachement d'organisateurs de l'édition aux équipes de bénévoles. Ils y apparaissent sans compter dans les effectifs ni dans l'assignation automatique.",
+      "organizers_in_teams_open": "Les organisateurs peuvent être rattachés aux équipes",
+      "organizers_in_teams_closed": "Les organisateurs ne sont pas rattachés aux équipes",
       "swaps_description": "Valider les échanges de créneaux entre bénévoles",
       "teams_description": "Organiser les équipes de bénévoles"
     },

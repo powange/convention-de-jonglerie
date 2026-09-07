@@ -37,18 +37,21 @@ model EventVolunteerSettings {
   eventId Int   @id
   event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  enabled         Boolean       @default(false)
-  open            Boolean       @default(false)
-  pagePublic      Boolean       @default(false)
-  mode            VolunteerMode @default(INTERNAL)
+  enabled           Boolean       @default(false)
+  open              Boolean       @default(false)
+  pagePublic        Boolean       @default(false)
+  mode              VolunteerMode @default(INTERNAL)
   // Les échanges de créneaux entre bénévoles, ouverts par défaut : les éditions existantes
   // gardent le comportement qu'elles avaient avant l'arrivée de ce réglage.
-  swapsEnabled    Boolean       @default(true)
-  description     String?       @db.Text
-  externalUrl     String?
-  setupStartDate  DateTime?
-  teardownEndDate DateTime?
-  updatedAt       DateTime?
+  swapsEnabled      Boolean       @default(true)
+  // Rattacher des organisateurs aux équipes et créneaux. Fermé par défaut : c'est une
+  // possibilité qu'on ouvre, pas un comportement que les éditions existantes attendaient.
+  organizersInTeams Boolean       @default(false)
+  description       String?       @db.Text
+  externalUrl       String?
+  setupStartDate    DateTime?
+  teardownEndDate   DateTime?
+  updatedAt         DateTime?
 
   // Questions du formulaire de candidature
   askDiet             Boolean @default(false)
@@ -172,6 +175,7 @@ model VolunteerTeam {
   event                Event                         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   timeSlots            VolunteerTimeSlot[]
   assignedApplications ApplicationTeamAssignment[]
+  assignedOrganizers   OrganizerTeamAssignment[]
   handoutItems         EditionVolunteerHandoutItem[]
   conversations        Conversation[]
 
@@ -246,6 +250,25 @@ model ApplicationTeamAssignment {
   @@id([applicationId, teamId])
   @@index([teamId])
   @@index([isLeader])
+}
+
+/// Rattachement d'un organisateur d'édition à une équipe de bénévoles.
+///
+/// Table distincte de `ApplicationTeamAssignment`, et non un champ ajouté à celle-ci : un
+/// organisateur ne compte ni dans la capacité d'un créneau, ni dans les statistiques de
+/// couverture, ni dans l'assignation automatique. Séparer les deux tient cet invariant par
+/// construction — rien de ce qui compte des bénévoles ne connaît celle-ci — plutôt que par un
+/// filtre à ne pas oublier dans chaque requête.
+model OrganizerTeamAssignment {
+  editionOrganizerId Int
+  teamId             String
+  assignedAt         DateTime @default(now())
+
+  editionOrganizer EditionOrganizer @relation(fields: [editionOrganizerId], references: [id], onDelete: Cascade)
+  team             VolunteerTeam    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@id([editionOrganizerId, teamId])
+  @@index([teamId])
 }
 
 model VolunteerComment {

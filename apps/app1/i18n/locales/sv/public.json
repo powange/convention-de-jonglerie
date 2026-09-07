@@ -172,6 +172,7 @@
         "leader_removed": "Chef borttagen",
         "manage_teams": "Leda team",
         "max_label": "Max:",
+        "organizers_label": "Kopplade arrangörer",
         "modal": {
           "add": "Lägg till",
           "add_description_multiple": "Behåll volontärerna i deras nuvarande team och lägg även till dem i \"{targetTeam}\".",

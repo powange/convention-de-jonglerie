@@ -252,6 +252,14 @@
       "select_handout_item": "Wybierz przedmiot",
       "select_to_add": "Wybierz organizatora do dodania",
       "status": "Status biletu",
+      "teams": {
+        "column": "Zespoły",
+        "description": "Przypisz tego organizatora do zespołów wolontariuszy. Pojawi się w nich, nie licząc się do obsady ani do automatycznego przydziału.",
+        "load_error": "Nie można wczytać zespołów",
+        "manage": "Zarządzaj zespołami",
+        "no_teams": "Brak zespołu wolontariuszy w tej edycji",
+        "title_for": "Zespoły — {name}"
+      },
       "title": "Organizatorzy",
       "title_required": "Tytuł organizatora jest wymagany",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Wysyłanie powiadomień do wolontariuszy",
       "planning_description": "Planowanie przydziałów czasu i misji",
       "teams_description": "Organizowanie zespołów wolontariuszy",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Zatwierdzanie wymian zmian między wolontariuszami",
+      "swaps_enabled": "Wymiany zmian",
+      "swaps_enabled_description": "Pozwól wolontariuszom wymieniać się zmianami między sobą, za zgodą osoby odpowiedzialnej",
+      "swaps_open": "Wolontariusze mogą zaproponować wymianę",
+      "swaps_closed": "Wymiany są zamknięte",
+      "organizers_in_teams": "Organizatorzy w zespołach",
+      "organizers_in_teams_description": "Pozwala przypisywać organizatorów edycji do zespołów wolontariuszy. Pojawiają się w nich, nie licząc się do stanu osobowego ani do automatycznego przydziału.",
+      "organizers_in_teams_open": "Organizatorzy mogą być przypisani do zespołów",
+      "organizers_in_teams_closed": "Organizatorzy nie są przypisani do zespołów"
     },
     "shows_call": {
       "title": "Nabór spektakli",
@@ -783,6 +795,6 @@
       "submit": "Zapisz konwencję",
       "title": "Konwencja"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Wszystkie kategorie"
   }
 }

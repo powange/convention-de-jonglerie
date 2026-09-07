@@ -252,6 +252,14 @@
       "select_handout_item": "Selecionar artigo",
       "select_to_add": "Selecione um organizador para adicionar",
       "status": "Estado do bilhete",
+      "teams": {
+        "column": "Equipas",
+        "description": "Associe este organizador a equipas de voluntários. Aparecerá nelas, sem contar nos efetivos nem na atribuição automática.",
+        "load_error": "Não é possível carregar as equipas",
+        "manage": "Gerir as equipas",
+        "no_teams": "Nenhuma equipa de voluntários nesta edição",
+        "title_for": "Equipas — {name}"
+      },
       "title": "Organizadores",
       "title_required": "O título do organizador é obrigatório",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Enviar notificações aos voluntários",
       "planning_description": "Planeamento de faixas horárias e missões",
       "teams_description": "Organizar equipas de voluntários",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Validar as trocas de turnos entre voluntários",
+      "swaps_enabled": "Trocas de turnos",
+      "swaps_enabled_description": "Permitir que os voluntários troquem um turno entre si, com validação de um responsável",
+      "swaps_open": "Os voluntários podem propor uma troca",
+      "swaps_closed": "As trocas estão fechadas",
+      "organizers_in_teams": "Organizadores nas equipas",
+      "organizers_in_teams_description": "Permite associar os organizadores da edição às equipas de voluntários. Aparecem nelas sem contar para o efetivo nem para a atribuição automática.",
+      "organizers_in_teams_open": "Os organizadores podem ser associados a equipas",
+      "organizers_in_teams_closed": "Os organizadores não estão associados a equipas"
     },
     "shows_call": {
       "title": "Convocatória de espetáculos",
@@ -783,6 +795,6 @@
       "submit": "Salvar convenção",
       "title": "Convenção"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Todas as categorias"
   }
 }

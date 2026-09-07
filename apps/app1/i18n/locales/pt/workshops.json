@@ -78,6 +78,6 @@
     "import_forced_day": "Dia da edição",
     "import_forced_day_description": "Se a foto não indicar uma data, escolha o dia em que colocar os ateliês. Os seus horários são conservados.",
     "import_forced_day_none": "Usar as datas lidas na foto",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Máx. {count} pessoas"
   }
 }

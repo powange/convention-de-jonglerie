@@ -394,6 +394,28 @@
                     {{ $t('pages.volunteers.team_distribution.drop_volunteers_here') }}
                   </p>
                 </div>
+
+                <!-- Organisateurs rattachés à l'équipe. Présentés à part des bénévoles, et sans
+                     poignée de déplacement : ils ne comptent pas dans l'effectif, ne se glissent
+                     pas d'une équipe à l'autre et n'ont pas de rôle de responsable. -->
+                <div
+                  v-if="organisateursParEquipe[team.id]?.length"
+                  class="px-4 py-3 border-t border-gray-200 dark:border-gray-700"
+                >
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                    {{ $t('pages.volunteers.team_distribution.organizers_label') }}
+                  </p>
+                  <div class="flex flex-wrap gap-2">
+                    <div
+                      v-for="organisateur in organisateursParEquipe[team.id]"
+                      :key="organisateur.editionOrganizerId"
+                      class="flex items-center gap-2 text-sm px-2 py-1 rounded bg-gray-100 dark:bg-gray-800"
+                    >
+                      <UiUserAvatar :user="organisateur.user" size="xs" />
+                      <UiUserName :user="organisateur.user" />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -747,6 +769,47 @@ const unassignedVolunteers = computed(() => {
 })
 
 // Computed pour la répartition par équipes
+/**
+ * Organisateurs rattachés aux équipes. Endpoint dédié : celui des organisateurs exige un droit
+ * que le responsable du bénévolat n'a pas, et celui des équipes est ouvert en lecture publique.
+ */
+interface RattachementOrganisateur {
+  teamId: string
+  editionOrganizerId: number
+  user: { id: number; pseudo: string; prenom?: string | null; nom?: string | null }
+}
+
+const rattachementsOrganisateurs = ref<RattachementOrganisateur[]>([])
+
+const organisateursParEquipe = computed(() => {
+  const parEquipe: Record<string, RattachementOrganisateur[]> = {}
+  for (const rattachement of rattachementsOrganisateurs.value) {
+    ;(parEquipe[rattachement.teamId] ??= []).push(rattachement)
+  }
+  return parEquipe
+})
+
+const chargerOrganisateursEquipes = async () => {
+  if (!edition.value?.volunteersOrganizersInTeams) {
+    rattachementsOrganisateurs.value = []
+    return
+  }
+  try {
+    const reponse = await $fetch<{ data?: { assignments?: RattachementOrganisateur[] } }>(
+      `/api/editions/${editionId}/volunteers/team-organizers`
+    )
+    rattachementsOrganisateurs.value = reponse?.data?.assignments ?? []
+  } catch (error) {
+    // Un échec ici ne doit pas priver la page de sa répartition : on la laisse sans les
+    // organisateurs plutôt que de la faire tomber.
+    console.error('Failed to fetch team organizers:', error)
+    rattachementsOrganisateurs.value = []
+  }
+}
+
+// L'option se ferme depuis une autre page : la répartition doit suivre sans rechargement.
+watch(() => edition.value?.volunteersOrganizersInTeams, chargerOrganisateursEquipes)
+
 const teamDistribution = computed(() => {
   if (!volunteerTeams.value.length) {
     return []
@@ -1300,7 +1363,7 @@ onMounted(async () => {
     }
   }
   // Charger les informations des bénévoles et les équipes en parallèle
-  await Promise.all([fetchVolunteersInfo(), fetchVolunteerTeams()])
+  await Promise.all([fetchVolunteersInfo(), fetchVolunteerTeams(), chargerOrganisateursEquipes()])
   // Charger les assignations d'équipes (nécessite les équipes)
   await fetchTeamAssignments()
 })

@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockRequireUserSession = vi.hoisted(() => vi.fn())
-
 // wrapApiHandler et validateEditionId sont auto-importés (Nitro) dans le handler.
 vi.hoisted(() => {
   if (!(globalThis as any).wrapApiHandler) {
@@ -12,13 +10,6 @@ vi.hoisted(() => {
       parseInt(event?.context?.params?.id, 10)
   }
 })
-
-vi.mock('nuxt-auth-utils', () => ({
-  getUserSession: vi.fn(),
-  requireUserSession: mockRequireUserSession,
-  setUserSession: vi.fn(),
-  clearUserSession: vi.fn(),
-}))
 
 vi.mock('../../../../../../../server/utils/permissions/edition-permissions', () => ({
   canManageEditionOrganizers: vi.fn(),
@@ -35,7 +26,9 @@ const prismaMock = (globalThis as any).prisma
 const mockCanManageOrganizers = canManageEditionOrganizers as ReturnType<typeof vi.fn>
 const mockCanManageTicketing = canManageTicketing as ReturnType<typeof vi.fn>
 
-const mockEvent = { context: { params: { id: '17' } } }
+// `requireAuth` lit l'utilisateur posé sur le contexte par le middleware, il n'interroge pas
+// la session : c'est donc le contexte qui porte l'authentification ici.
+const mockEvent = { context: { params: { id: '17' }, user: { id: 1, isGlobalAdmin: false } } }
 
 const dbOrganizers = [
   {
@@ -46,6 +39,7 @@ const dbOrganizers = [
     createdAt: new Date('2026-06-01'),
     // Exceptions repas (accepted = false) ; vide = tous les repas de l'édition
     mealSelections: [],
+    teamAssignments: [{ team: { id: 'bar', name: 'Bar', color: '#10b981' } }],
     organizer: {
       id: 10,
       title: 'Trésorier',
@@ -67,7 +61,6 @@ const dbOrganizers = [
 describe('GET /api/editions/[id]/organizers/edition-organizers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockRequireUserSession.mockResolvedValue({ user: { id: 1, isGlobalAdmin: false } })
     prismaMock.edition.findUnique.mockReset()
     prismaMock.edition.findUnique.mockResolvedValue({
       id: 17,
@@ -117,6 +110,20 @@ describe('GET /api/editions/[id]/organizers/edition-organizers', () => {
     expect(res.data.organizers[0].user.nom).toBe('Dupont') // noms/avatars OK
     expect(res.data.organizers[0].user).not.toHaveProperty('email')
     expect(res.data.organizers[0].user).not.toHaveProperty('phone')
+  })
+
+  /**
+   * L'endpoint lisait bien les rattachements en base, mais sa projection les laissait de côté :
+   * la colonne « Équipes » affichait « Aucune » quoi qu'on enregistre, et rouvrir la modale ne
+   * recochait rien. Une requête juste ne suffit pas, encore faut-il que la réponse la porte.
+   */
+  it("expose les équipes de l'organisateur", async () => {
+    mockCanManageOrganizers.mockReturnValue(true)
+    mockCanManageTicketing.mockReturnValue(false)
+
+    const res = await handler(mockEvent as any)
+
+    expect(res.data.organizers[0].teams).toEqual([{ id: 'bar', name: 'Bar', color: '#10b981' }])
   })
 
   describe('compteur de repas', () => {

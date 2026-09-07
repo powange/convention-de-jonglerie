@@ -78,6 +78,6 @@
     "import_forced_day": "Dzień edycji",
     "import_forced_day_description": "Jeśli zdjęcie nie podaje daty, wybierz dzień, na którym umieścić warsztaty. Ich godziny zostaną zachowane.",
     "import_forced_day_none": "Użyj dat odczytanych ze zdjęcia",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Maks. {count} osób"
   }
 }

@@ -172,6 +172,7 @@
         "leader_removed": "Leiter entfernt",
         "manage_teams": "Teams verwalten",
         "max_label": "Max:",
+        "organizers_label": "Zugeordnete Organisatoren",
         "modal": {
           "add": "Hinzufügen",
           "add_description_multiple": "Freiwilligen in ihren aktuellen Teams behalten und auch zu \"{targetTeam}\" hinzufügen",

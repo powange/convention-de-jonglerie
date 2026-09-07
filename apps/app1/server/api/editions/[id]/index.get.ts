@@ -182,6 +182,7 @@ export default wrapApiHandler(
       volunteersDescription: vs?.description ?? null,
       volunteersMode: vs?.mode ?? 'INTERNAL',
       volunteersSwapsEnabled: vs?.swapsEnabled ?? true,
+      volunteersOrganizersInTeams: vs?.organizersInTeams ?? false,
       volunteersExternalUrl: vs?.externalUrl ?? null,
       volunteersUpdatedAt: vs?.updatedAt ?? null,
       volunteersSetupStartDate: vs?.setupStartDate ?? null,

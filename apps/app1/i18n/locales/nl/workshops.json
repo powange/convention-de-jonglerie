@@ -78,6 +78,6 @@
     "import_forced_day": "Dag van de editie",
     "import_forced_day_description": "Als de foto geen datum vermeldt, kies dan de dag waarop de workshops geplaatst worden. Hun tijden blijven behouden.",
     "import_forced_day_none": "De op de foto gelezen data gebruiken",
-    "max_people": "[TODO] Max {count} personnes"
+    "max_people": "Max. {count} personen"
   }
 }

@@ -172,6 +172,7 @@
         "leader_removed": "Leider verwijderd",
         "manage_teams": "Teams beheren",
         "max_label": "Max:",
+        "organizers_label": "Gekoppelde organisatoren",
         "modal": {
           "add": "Toevoegen",
           "add_description_multiple": "Houd de vrijwilliger in hun huidige teams en voeg ze ook toe aan \"{targetTeam}\"",

@@ -1,3 +1,4 @@
+import { requireAuth } from '#server/utils/auth-utils'
 import {
   canManageEditionOrganizers,
   canManageTicketing,
@@ -6,8 +7,10 @@ import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 
 export default wrapApiHandler(
   async (event) => {
-    const session = await requireUserSession(event)
-    const user = session.user
+    // `requireAuth` plutôt que `requireUserSession` : l'utilisateur de session n'est pas typé
+    // avec `id` ni `isGlobalAdmin`, que les contrôles de permission attendent. C'est déjà ce
+    // qu'emploie le POST voisin.
+    const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
     // Récupérer l'édition avec permissions
@@ -90,6 +93,11 @@ export default wrapApiHandler(
             where: { accepted: false, mealId: { in: enabledMealIds } },
             select: { mealId: true },
           },
+          // Équipes de bénévolat auxquelles l'organisateur est rattaché, pour les afficher
+          // sur sa ligne comme les repas.
+          teamAssignments: {
+            select: { team: { select: { id: true, name: true, color: true } } },
+          },
           organizer: {
             select: {
               id: true,
@@ -127,6 +135,8 @@ export default wrapApiHandler(
             accepted: enabledMealIds.length - eo.mealSelections.length,
             total: enabledMealIds.length,
           },
+          // Aplati : la ligne du tableau affiche des équipes, pas des rattachements.
+          teams: eo.teamAssignments.map((rattachement) => rattachement.team),
           user: {
             id: eo.organizer.user.id,
             pseudo: eo.organizer.user.pseudo,

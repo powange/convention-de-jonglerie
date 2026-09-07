@@ -328,6 +328,56 @@
                 </span>
               </div>
             </div>
+
+            <!-- Organisateurs dans les équipes. Même réserve que les échanges : hors du mode
+                 interne, il n'y a ni équipe ni créneau ici à quoi les rattacher. -->
+            <div
+              v-if="volunteersModeLocal === 'INTERNAL'"
+              class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.volunteers.organizers_in_teams') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('gestion.volunteers.organizers_in_teams_description') }}
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UBadge
+                    :color="volunteersOrganizersInTeamsLocal ? 'success' : 'neutral'"
+                    variant="soft"
+                  >
+                    {{
+                      volunteersOrganizersInTeamsLocal ? $t('common.active') : $t('common.inactive')
+                    }}
+                  </UBadge>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <USwitch
+                  v-model="volunteersOrganizersInTeamsLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  @update:model-value="handleToggleOrganizersInTeams"
+                />
+                <span
+                  :class="
+                    volunteersOrganizersInTeamsLocal
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  "
+                >
+                  {{
+                    volunteersOrganizersInTeamsLocal
+                      ? $t('gestion.volunteers.organizers_in_teams_open')
+                      : $t('gestion.volunteers.organizers_in_teams_closed')
+                  }}
+                </span>
+              </div>
+            </div>
           </div>
         </UCard>
       </div>
@@ -374,6 +424,7 @@ const volunteersPagePublicLocal = ref(false)
 const volunteersOpenLocal = ref(false)
 const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const volunteersSwapsLocal = ref(true)
+const volunteersOrganizersInTeamsLocal = ref(false)
 const volunteersExternalUrlLocal = ref('')
 const volunteersUpdatedAt = ref<Date | null>(null)
 const volunteersInitialized = ref(false)
@@ -415,6 +466,8 @@ const applyVolunteerSettings = () => {
     volunteersOpenLocal.value = !!volunteersSettings.value.open
     volunteersModeLocal.value = volunteersSettings.value.mode || 'INTERNAL'
     volunteersSwapsLocal.value = (volunteersSettings.value as any).swapsEnabled !== false
+    volunteersOrganizersInTeamsLocal.value = !!(volunteersSettings.value as any)
+      .organizersInTeams
     volunteersExternalUrlLocal.value = volunteersSettings.value.externalUrl || ''
     volunteersUpdatedAt.value = new Date()
     volunteersInitialized.value = true
@@ -556,6 +609,34 @@ const handleToggleSwaps = async (val: boolean) => {
     }
   } catch (e: any) {
     volunteersSwapsLocal.value = previous
+    toast.add({
+      title: e?.data?.message || e?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
+
+/**
+ * Refermer l'option ne supprime rien : les rattachements déjà posés sont masqués, pas effacés.
+ * La rouvrir les fait réapparaître tels quels.
+ */
+const handleToggleOrganizersInTeams = async (val: boolean) => {
+  if (!volunteersInitialized.value) return
+  const previous = !val
+  try {
+    const updatedSettings = await updateSettings({ organizersInTeams: val } as any)
+    if (updatedSettings) {
+      volunteersUpdatedAt.value = new Date()
+      await editionStore.fetchEditionById(editionId, { force: true })
+      toast.add({
+        title: t('common.saved'),
+        color: 'success',
+        icon: 'i-heroicons-check-circle',
+      })
+    }
+  } catch (e: any) {
+    volunteersOrganizersInTeamsLocal.value = previous
     toast.add({
       title: e?.data?.message || e?.message || t('common.error'),
       color: 'error',

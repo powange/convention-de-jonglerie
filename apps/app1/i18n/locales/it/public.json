@@ -172,6 +172,7 @@
         "leader_removed": "Responsabile rimosso",
         "manage_teams": "Gestisci squadre",
         "max_label": "Max:",
+        "organizers_label": "Organizzatori assegnati",
         "modal": {
           "add": "Aggiungi",
           "add_description_multiple": "Mantieni il volontario nelle sue squadre attuali e aggiungilo anche a \"{targetTeam}\"",

@@ -252,6 +252,14 @@
       "select_handout_item": "Vælg genstand",
       "select_to_add": "Vælg en organisator at tilføje",
       "status": "Billetstatus",
+      "teams": {
+        "column": "Hold",
+        "description": "Tilknyt denne arrangør til frivilligehold. Han vises der uden at tælle med i bemandingen eller den automatiske tildeling.",
+        "load_error": "Kan ikke indlæse hold",
+        "manage": "Administrer hold",
+        "no_teams": "Ingen frivillighold i denne udgave",
+        "title_for": "Hold — {name}"
+      },
       "title": "Organisatorer",
       "title_required": "Arrangørens titel er påkrævet",
       "meals": {
@@ -669,11 +677,15 @@
       "notifications_description": "Send meddelelser til frivillige",
       "planning_description": "Planlægning af slots og missioner",
       "teams_description": "Organisering af hold af frivillige",
-      "swaps_description": "[TODO] Valider les échanges de créneaux entre bénévoles",
-      "swaps_enabled": "[TODO] Échanges de créneaux",
-      "swaps_enabled_description": "[TODO] Autoriser les bénévoles à échanger un créneau entre eux, avec validation d'un responsable",
-      "swaps_open": "[TODO] Les bénévoles peuvent proposer un échange",
-      "swaps_closed": "[TODO] Les échanges sont fermés"
+      "swaps_description": "Godkend bytning af vagter mellem frivillige",
+      "swaps_enabled": "Bytning af vagter",
+      "swaps_enabled_description": "Tillad frivillige at bytte en vagt indbyrdes, med godkendelse fra en ansvarlig",
+      "swaps_open": "Frivillige kan foreslå et bytte",
+      "swaps_closed": "Bytning er lukket",
+      "organizers_in_teams": "Arrangører i hold",
+      "organizers_in_teams_description": "Tillad at arrangører for udgaven tilknyttes de frivilliges hold. De vises der uden at tælle med i bemandingen eller i den automatiske fordeling.",
+      "organizers_in_teams_open": "Arrangører kan tilknyttes hold",
+      "organizers_in_teams_closed": "Arrangører er ikke tilknyttet hold"
     },
     "shows_call": {
       "title": "Forestillingsopkald",
@@ -783,6 +795,6 @@
       "submit": "Gem konvent",
       "title": "Konvent"
     },
-    "back_to_categories": "[TODO] Toutes les catégories"
+    "back_to_categories": "Alle kategorier"
   }
 }

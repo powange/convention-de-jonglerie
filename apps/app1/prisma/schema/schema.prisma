@@ -409,6 +409,7 @@ model EditionOrganizer {
   organizer        ConventionOrganizer           @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   handoutItems     EditionOrganizerHandoutItem[]
   mealSelections   OrganizerMealSelection[]
+  teamAssignments  OrganizerTeamAssignment[]
 
   @@unique([editionId, organizerId])
   @@index([editionId])
