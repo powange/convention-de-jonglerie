@@ -241,6 +241,49 @@
               </div>
             </div>
 
+            <!-- Ouverture des candidatures -->
+            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-medium text-gray-900 dark:text-white">
+                    {{ $t('gestion.volunteers.applications_open') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $t('gestion.volunteers.applications_open_description') }}
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
+                    {{
+                      volunteersOpenLocal
+                        ? $t('common.active') || 'Actif'
+                        : $t('common.inactive') || 'Inactif'
+                    }}
+                  </UBadge>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <USwitch
+                  v-model="volunteersOpenLocal"
+                  :disabled="savingVolunteers"
+                  color="primary"
+                  @update:model-value="handleToggleOpen"
+                />
+                <span
+                  :class="
+                    volunteersOpenLocal
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  "
+                >
+                  {{
+                    volunteersOpenLocal ? $t('volunteers.open') : $t('volunteers.closed_message')
+                  }}
+                </span>
+              </div>
+            </div>
+
             <!-- Échanges de créneaux entre bénévoles. Réservé au mode interne : en externe,
                  le planning ne vit pas ici, il n'y a rien à échanger. -->
             <div
@@ -281,49 +324,6 @@
                     volunteersSwapsLocal
                       ? $t('gestion.volunteers.swaps_open')
                       : $t('gestion.volunteers.swaps_closed')
-                  }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Ouverture des candidatures -->
-            <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium text-gray-900 dark:text-white">
-                    {{ $t('gestion.volunteers.applications_open') }}
-                  </h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ $t('gestion.volunteers.applications_open_description') }}
-                  </p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <UBadge :color="volunteersOpenLocal ? 'success' : 'neutral'" variant="soft">
-                    {{
-                      volunteersOpenLocal
-                        ? $t('common.active') || 'Actif'
-                        : $t('common.inactive') || 'Inactif'
-                    }}
-                  </UBadge>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3">
-                <USwitch
-                  v-model="volunteersOpenLocal"
-                  :disabled="savingVolunteers"
-                  color="primary"
-                  @update:model-value="handleToggleOpen"
-                />
-                <span
-                  :class="
-                    volunteersOpenLocal
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-gray-600 dark:text-gray-400'
-                  "
-                >
-                  {{
-                    volunteersOpenLocal ? $t('volunteers.open') : $t('volunteers.closed_message')
                   }}
                 </span>
               </div>

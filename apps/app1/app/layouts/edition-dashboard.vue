@@ -59,29 +59,6 @@
               }"
             />
           </template>
-
-          <template #footer="{ collapsed }">
-            <UButton
-              v-if="!collapsed"
-              icon="i-heroicons-arrow-left"
-              variant="ghost"
-              color="neutral"
-              block
-              size="sm"
-              :to="`/editions/${editionId}`"
-            >
-              {{ $t('gestion.view_edition') }}
-            </UButton>
-            <UButton
-              v-else
-              icon="i-heroicons-arrow-left"
-              variant="ghost"
-              color="neutral"
-              square
-              size="sm"
-              :to="`/editions/${editionId}`"
-            />
-          </template>
         </UDashboardSidebar>
 
         <!-- Contenu principal -->
@@ -317,6 +294,17 @@ onMounted(async () => {
 // Structure de navigation
 const navigationItems = computed<NavigationMenuItem[][]>(() => {
   const items: NavigationMenuItem[][] = []
+
+  // Retour à l'édition, dans sa propre section : c'est la sortie de la gestion, pas une
+  // destination de gestion. Le tableau de sections fait apparaître le trait qui l'en sépare.
+  items.push([
+    {
+      label: t('gestion.view_edition'),
+      icon: 'i-heroicons-arrow-left',
+      to: `/editions/${editionId.value}`,
+      tooltip: { text: t('gestion.view_edition') },
+    },
+  ])
 
   // Première section : Vue d'ensemble
   const mainSection: NavigationMenuItem[] = [
