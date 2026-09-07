@@ -135,6 +135,7 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
         data: {
           exists: false,
           conversationId: null,
+          isParticipant: false,
         },
       })
 
@@ -155,6 +156,8 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
       prismaMock.conversation.findUnique.mockResolvedValue({
         id: 'conv-uuid-123',
       })
+      // L'artiste est participant de sa propre conversation.
+      prismaMock.conversationParticipant.count.mockResolvedValue(1)
 
       const result = await handler(mockEvent as any)
 
@@ -163,6 +166,7 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
         data: {
           exists: true,
           conversationId: 'conv-uuid-123',
+          isParticipant: true,
         },
       })
     })
@@ -203,6 +207,46 @@ describe('/api/show-applications/[applicationId]/conversation GET', () => {
 
       expect(result.success).toBe(true)
       expect(result.data.exists).toBe(true)
+    })
+  })
+
+  describe('participation à la conversation', () => {
+    const mockEvent = {
+      context: { user: mockArtist, params: { applicationId: '1' } },
+    }
+
+    beforeEach(() => {
+      prismaMock.conversation.findUnique.mockResolvedValue({ id: 'conv-uuid-456' })
+    })
+
+    it('annonce la participation de celui qui est inscrit à la conversation', async () => {
+      prismaMock.conversationParticipant.count.mockResolvedValue(1)
+
+      const result = await handler(mockEvent as any)
+
+      expect(result.data.isParticipant).toBe(true)
+      expect(prismaMock.conversationParticipant.count).toHaveBeenCalledWith({
+        where: { conversationId: 'conv-uuid-456', userId: mockArtist.id, leftAt: null },
+      })
+    })
+
+    it("annonce l'absence de participation de celui qui ne fait que consulter", async () => {
+      // Un organisateur voit la conversation sans y être inscrit : sans cette information, le
+      // client appelait `mark-read` et récoltait un 403 à chaque ouverture.
+      prismaMock.conversationParticipant.count.mockResolvedValue(0)
+
+      const result = await handler(mockEvent as any)
+
+      expect(result.data.isParticipant).toBe(false)
+    })
+
+    it('ne cherche aucune participation quand la conversation n’existe pas', async () => {
+      prismaMock.conversation.findUnique.mockResolvedValue(null)
+
+      const result = await handler(mockEvent as any)
+
+      expect(result.data.isParticipant).toBe(false)
+      expect(prismaMock.conversationParticipant.count).not.toHaveBeenCalled()
     })
   })
 })

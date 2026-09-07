@@ -17,6 +17,9 @@ const conversationId = ref<string | null>(null)
 const isLoadingMore = ref(false)
 const isSending = ref(false)
 const hasConversation = ref(false)
+// Participant ou simple lecteur : un organisateur consulte la conversation sans y être
+// inscrit, et n'a alors aucune position de lecture à enregistrer.
+const isParticipant = ref(false)
 const messageInput = ref('')
 const messagesContainerRef = ref<HTMLElement | null>(null)
 
@@ -38,6 +41,7 @@ const { execute: checkConversation, loading: checkLoading } = useApiAction(
       if (response.exists && response.conversationId) {
         conversationId.value = response.conversationId
         hasConversation.value = true
+        isParticipant.value = !!response.isParticipant
         await loadMessages()
       } else {
         hasConversation.value = false
@@ -55,13 +59,12 @@ const loadMessages = async () => {
   messages.value = result.data.reverse()
   pagination.value = result.pagination
 
-  // Marquer le dernier message comme lu (seulement si on est participant)
-  if (messages.value.length > 0) {
+  // Marquer le dernier message comme lu, si l'on est participant : sans cela l'appel part
+  // quand même et le serveur répond 403, ce qui remplit le journal d'erreurs de production.
+  if (isParticipant.value && messages.value.length > 0) {
     const lastMessage = messages.value[messages.value.length - 1]
-    try {
+    if (lastMessage) {
       await messenger.markMessageAsRead(conversationId.value, lastMessage.id)
-    } catch {
-      // Ignorer l'erreur si l'utilisateur n'est pas participant (il peut quand même voir la conversation)
     }
   }
 
@@ -170,9 +173,10 @@ const formatMessageDate = (date: Date) => {
 // Vérifier si on doit afficher un séparateur de date
 const shouldShowDateSeparator = (index: number) => {
   if (index === 0) return true
-  const current = new Date(allMessages.value[index].createdAt)
-  const previous = new Date(allMessages.value[index - 1].createdAt)
-  return current.toDateString() !== previous.toDateString()
+  const current = allMessages.value[index]
+  const previous = allMessages.value[index - 1]
+  if (!current || !previous) return true
+  return new Date(current.createdAt).toDateString() !== new Date(previous.createdAt).toDateString()
 }
 
 // Combiner messages chargés et messages temps réel
@@ -189,13 +193,11 @@ watch(
     await nextTick()
     scrollToBottom()
 
-    // Marquer les nouveaux messages comme lus (seulement si on est participant)
-    if (conversationId.value && realtimeMessages.value.length > 0) {
+    // Même règle pour les messages reçus en direct.
+    if (isParticipant.value && conversationId.value && realtimeMessages.value.length > 0) {
       const lastMessage = realtimeMessages.value[realtimeMessages.value.length - 1]
-      try {
+      if (lastMessage) {
         await messenger.markMessageAsRead(conversationId.value, lastMessage.id)
-      } catch {
-        // Ignorer l'erreur si l'utilisateur n'est pas participant
       }
     }
   },

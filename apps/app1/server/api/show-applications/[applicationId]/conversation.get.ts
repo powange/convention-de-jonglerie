@@ -22,9 +22,20 @@ export default wrapApiHandler(
       select: { id: true },
     })
 
+    // Voir une conversation et y participer sont deux choses distinctes : un organisateur la
+    // consulte sans y être inscrit. Sans cette information, le client appelait `mark-read`
+    // pour tout le monde et récoltait un 403 à chaque ouverture — une erreur de production
+    // par consultation, pour un cas que le code considère comme normal.
+    const isParticipant = conversation
+      ? (await prisma.conversationParticipant.count({
+          where: { conversationId: conversation.id, userId: user.id, leftAt: null },
+        })) > 0
+      : false
+
     return createSuccessResponse({
       exists: !!conversation,
       conversationId: conversation?.id || null,
+      isParticipant,
     })
   },
   { operationName: 'CheckShowApplicationConversation' }
