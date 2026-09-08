@@ -164,9 +164,13 @@
       "skills": "Dovednosti",
       "team_distribution": {
         "all_teams": "Všechny týmy",
-        "description": "Rozdělení dobrovolníků do týmů. Na počítači přesouvejte přetažením myší. Na mobilním telefonu vyberte tým kliknutím.",
-        "drop_volunteers_here": "Přetáhněte dobrovolníky sem",
+        "description": "Rozdělení přijatých dobrovolníků do týmů. Kliknutím na dobrovolníka vyberete jeho týmy.",
         "empty_team": "Prázdný tým",
+        "no_teams": "V tomto ročníku není žádný tým dobrovolníků",
+        "no_preferred_teams": "Tento dobrovolník neuvedl žádné preferované týmy.",
+        "other_teams": "Ostatní týmy",
+        "preferred_teams": "Preferované týmy",
+        "select_teams_instruction": "Zaškrtněte týmy tohoto dobrovolníka",
         "leader_added": "Přidána odpovědná osoba",
         "leader_badge": "Manažer",
         "leader_removed": "Odstranění manažera",
@@ -174,18 +178,11 @@
         "max_label": "Max:",
         "organizers_label": "Přiřazení organizátoři",
         "modal": {
-          "add": "Přidat",
-          "add_description_multiple": "Dobrovolníka ponechte v jeho současném týmu a přidejte ho také do \"{targetTeam}\".",
-          "add_description_single": "Dobrovolníka ponechte v \"{sourceTeam}\" a přiřaďte ho také do \"{targetTeam}\".",
-          "cancel": "Zrušit",
-          "move": "Přesun",
-          "move_description_multiple": "Odeberte dobrovolníka ze všech jeho současných týmů a umístěte ho do \"{targetTeam}\".",
-          "move_description_single": "Odeberte dobrovolníka z \"{sourceTeam}\" a umístěte ho do \"{targetTeam}\".",
-          "question": "Co byste chtěli dělat?"
+          "assign_title": "Přiřadit: {name}",
+          "assign_title_generic": "Vyberte tým"
         },
         "preferences_label": "Pref:",
         "remove_as_leader": "Odstranění role manažera",
-        "select_team_instruction": "Výběr cílového týmu",
         "set_as_leader": "Definice odpovědnosti",
         "stats": {
           "attached_organizers": "Přiřazení organizátoři",
@@ -195,7 +192,7 @@
           "unassigned": "Nepřidělené"
         },
         "title": "Rozdělení podle týmů",
-        "unassigned_description": "Tito přijatí dobrovolníci zatím nebyli přiřazeni k žádnému týmu. V počítači: přetáhněte a pusťte. Na mobilním telefonu: kliknutím vyberte tým.",
+        "unassigned_description": "Tito přijatí dobrovolníci ještě nebyli přiřazeni k týmu. Kliknutím na jednoho z nich vyberete jeho tým.",
         "unassigned_volunteers": "Nezařazení dobrovolníci",
         "volunteers_count": "{count} dobrovolníků"
       },

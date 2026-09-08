@@ -164,9 +164,13 @@
       "skills": "Competenze",
       "team_distribution": {
         "all_teams": "Tutte le squadre",
-        "description": "Distribuzione dei volontari accettati nei team. Trascina e rilascia per spostare o aggiungere a una squadra.",
-        "drop_volunteers_here": "Trascina e rilascia i volontari qui",
+        "description": "Distribuzione dei volontari accettati nelle squadre. Clicca su un volontario per scegliere le sue squadre.",
         "empty_team": "Team vuoto",
+        "no_teams": "Nessuna squadra di volontari in questa edizione",
+        "no_preferred_teams": "Questo volontario non ha espresso alcuna preferenza di squadra.",
+        "other_teams": "Altre squadre",
+        "preferred_teams": "Squadre desiderate",
+        "select_teams_instruction": "Seleziona le squadre di questo volontario",
         "leader_added": "Responsabile aggiunto",
         "leader_badge": "Responsabile",
         "leader_removed": "Responsabile rimosso",
@@ -174,18 +178,11 @@
         "max_label": "Max:",
         "organizers_label": "Organizzatori assegnati",
         "modal": {
-          "add": "Aggiungi",
-          "add_description_multiple": "Mantieni il volontario nelle sue squadre attuali e aggiungilo anche a \"{targetTeam}\"",
-          "add_description_single": "Mantieni il volontario in \"{sourceTeam}\" e assegnalo anche a \"{targetTeam}\"",
-          "cancel": "Annulla",
-          "move": "Sposta",
-          "move_description_multiple": "Rimuovi il volontario da tutte le sue squadre attuali e posizionalo in \"{targetTeam}\"",
-          "move_description_single": "Rimuovi il volontario da \"{sourceTeam}\" e posizionalo in \"{targetTeam}\"",
-          "question": "Cosa vorresti fare?"
+          "assign_title": "Assegna {name}",
+          "assign_title_generic": "Seleziona una squadra"
         },
         "preferences_label": "Pref:",
         "remove_as_leader": "Rimuovi ruolo di responsabile",
-        "select_team_instruction": "Seleziona la squadra di destinazione",
         "set_as_leader": "Imposta come responsabile",
         "stats": {
           "attached_organizers": "Organizzatori assegnati",
@@ -195,7 +192,7 @@
           "unassigned": "Non assegnati"
         },
         "title": "Distribuzione per squadre",
-        "unassigned_description": "Questi volontari accettati non sono ancora stati assegnati a una squadra. Puoi trascinarli e rilasciarli in una squadra qui sotto.",
+        "unassigned_description": "Questi volontari accettati non sono ancora stati assegnati a una squadra. Clicca su uno di loro per scegliere la sua.",
         "unassigned_volunteers": "Volontari non assegnati",
         "volunteers_count": "{count} volontario/i"
       },

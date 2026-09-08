@@ -164,9 +164,13 @@
       "skills": "Habilidades",
       "team_distribution": {
         "all_teams": "Todos los equipos",
-        "description": "Distribución de voluntarios aceptados en equipos. Arrastra y suelta para mover o agregar a un equipo.",
-        "drop_volunteers_here": "Arrastra y suelta voluntarios aquí",
+        "description": "Distribución de los voluntarios aceptados en los equipos. Haz clic en un voluntario para elegir sus equipos.",
         "empty_team": "Equipo vacío",
+        "no_teams": "Ningún equipo de voluntarios en esta edición",
+        "no_preferred_teams": "Este voluntario no ha expresado ninguna preferencia de equipo.",
+        "other_teams": "Otros equipos",
+        "preferred_teams": "Equipos deseados",
+        "select_teams_instruction": "Marca los equipos de este voluntario",
         "leader_added": "Responsable añadido",
         "leader_badge": "Responsable",
         "leader_removed": "Responsable retirado",
@@ -174,18 +178,11 @@
         "max_label": "Máx:",
         "organizers_label": "Organizadores asignados",
         "modal": {
-          "add": "Agregar",
-          "add_description_multiple": "Mantener el voluntario en sus equipos actuales y agregarlo también a \"{targetTeam}\"",
-          "add_description_single": "Mantener el voluntario en \"{sourceTeam}\" y asignarlo también a \"{targetTeam}\"",
-          "cancel": "Cancelar",
-          "move": "Mover",
-          "move_description_multiple": "Remover el voluntario de todos sus equipos actuales y colocarlo en \"{targetTeam}\"",
-          "move_description_single": "Remover el voluntario de \"{sourceTeam}\" y colocarlo en \"{targetTeam}\"",
-          "question": "¿Qué te gustaría hacer?"
+          "assign_title": "Asignar a {name}",
+          "assign_title_generic": "Seleccionar un equipo"
         },
         "preferences_label": "Pref:",
         "remove_as_leader": "Retirar rol de responsable",
-        "select_team_instruction": "Seleccione el equipo de destino",
         "set_as_leader": "Establecer como responsable",
         "stats": {
           "attached_organizers": "Organizadores asignados",
@@ -195,7 +192,7 @@
           "unassigned": "Sin asignar"
         },
         "title": "Distribución por equipos",
-        "unassigned_description": "Estos voluntarios aceptados aún no han sido asignados a un equipo. Puedes arrastrarlos y soltarlos en un equipo a continuación.",
+        "unassigned_description": "Estos voluntarios aceptados aún no han sido asignados a un equipo. Haz clic en uno de ellos para elegir el suyo.",
         "unassigned_volunteers": "Voluntarios sin asignar",
         "volunteers_count": "{count} voluntario(s)"
       },

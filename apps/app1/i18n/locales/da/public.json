@@ -164,9 +164,13 @@
       "skills": "Færdigheder",
       "team_distribution": {
         "all_teams": "Alle hold",
-        "description": "Fordeling af accepterede frivillige i hold. Træk og slip for at flytte eller tilføje til et hold.",
-        "drop_volunteers_here": "Træk og slip frivillige her",
+        "description": "Fordeling af de accepterede frivillige på holdene. Klik på en frivillig for at vælge hans hold.",
         "empty_team": "Tom gruppe",
+        "no_teams": "Intet frivillighold i denne udgave",
+        "no_preferred_teams": "Denne frivillige har ikke udtrykt nogen holdønsker.",
+        "other_teams": "Andre hold",
+        "preferred_teams": "Ønskede hold",
+        "select_teams_instruction": "Kryds denne frivilliges hold af",
         "leader_added": "Leder tilføjet",
         "leader_badge": "Leder",
         "leader_removed": "Leder fjernet",
@@ -174,18 +178,11 @@
         "max_label": "Maks:",
         "organizers_label": "Tilknyttede arrangører",
         "modal": {
-          "add": "Tilføj",
-          "add_description_multiple": "Behold frivillig i deres nuværende hold og tilføj dem også til \"{targetTeam}\"",
-          "add_description_single": "Behold frivillig i \"{sourceTeam}\" og tildel dem også til \"{targetTeam}\"",
-          "cancel": "Annuller",
-          "move": "Flyt",
-          "move_description_multiple": "Fjern frivillig fra alle deres nuværende hold og placer dem i \"{targetTeam}\"",
-          "move_description_single": "Fjern frivillig fra \"{sourceTeam}\" og placer dem i \"{targetTeam}\"",
-          "question": "Hvad vil du gerne gøre?"
+          "assign_title": "Tildel {name}",
+          "assign_title_generic": "Vælg et hold"
         },
         "preferences_label": "Præf:",
         "remove_as_leader": "Fjern lederrollen",
-        "select_team_instruction": "Vælg destinationsteamet",
         "set_as_leader": "Angiv som leder",
         "stats": {
           "attached_organizers": "Tilknyttede arrangører",
@@ -195,7 +192,7 @@
           "unassigned": "Ikke tildelt"
         },
         "title": "Fordeling efter hold",
-        "unassigned_description": "Disse accepterede frivillige er endnu ikke blevet tildelt til et hold. Du kan trække og slippe dem til et hold nedenfor.",
+        "unassigned_description": "Disse accepterede frivillige er endnu ikke tildelt et hold. Klik på en af dem for at vælge hans hold.",
         "unassigned_volunteers": "Ikke-tildelte frivillige",
         "volunteers_count": "{count} frivillig(e)"
       },

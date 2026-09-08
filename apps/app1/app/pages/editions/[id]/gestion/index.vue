@@ -293,6 +293,17 @@
                 color="purple"
               />
 
+              <!-- Répartition par équipes, à la suite des équipes : on vient y placer les
+                   bénévoles dans celles qu'on vient de définir. -->
+              <ManagementNavigationCard
+                v-if="canManageVolunteers"
+                :to="`/editions/${edition.id}/gestion/volunteers/team-distribution`"
+                icon="i-heroicons-rectangle-group"
+                :title="$t('pages.volunteers.team_distribution.title')"
+                :description="$t('pages.volunteers.team_distribution.description')"
+                color="purple"
+              />
+
               <!-- Planning (pas visible pour les team leaders seuls) -->
               <ManagementNavigationCard
                 v-if="canManageVolunteers"

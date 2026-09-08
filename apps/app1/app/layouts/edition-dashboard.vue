@@ -441,6 +441,13 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           icon: 'i-heroicons-user-group',
           to: `/editions/${editionId.value}/gestion/volunteers/teams`,
         },
+        // À la suite des équipes : on vient y répartir les bénévoles dans celles qu'on
+        // vient de définir.
+        {
+          label: t('pages.volunteers.team_distribution.title'),
+          icon: 'i-heroicons-rectangle-group',
+          to: `/editions/${editionId.value}/gestion/volunteers/team-distribution`,
+        },
         {
           label: t('edition.volunteers.planning'),
           icon: 'i-heroicons-calendar-days',

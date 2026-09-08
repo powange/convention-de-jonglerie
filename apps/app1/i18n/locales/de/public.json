@@ -164,9 +164,13 @@
       "skills": "Fähigkeiten",
       "team_distribution": {
         "all_teams": "Alle Teams",
-        "description": "Verteilung der akzeptierten Freiwilligen in Teams. Ziehen und ablegen, um zu verschieben oder zu einem Team hinzuzufügen.",
-        "drop_volunteers_here": "Freiwillige hier ablegen",
+        "description": "Verteilung der angenommenen Helfer auf die Teams. Klicken Sie auf einen Helfer, um seine Teams zu wählen.",
         "empty_team": "Leeres Team",
+        "no_teams": "Kein Helferteam für diese Ausgabe",
+        "no_preferred_teams": "Dieser Helfer hat keinen Teamwunsch geäußert.",
+        "other_teams": "Weitere Teams",
+        "preferred_teams": "Gewünschte Teams",
+        "select_teams_instruction": "Teams dieses Helfers ankreuzen",
         "leader_added": "Leiter hinzugefügt",
         "leader_badge": "Leiter",
         "leader_removed": "Leiter entfernt",
@@ -174,18 +178,11 @@
         "max_label": "Max:",
         "organizers_label": "Zugeordnete Organisatoren",
         "modal": {
-          "add": "Hinzufügen",
-          "add_description_multiple": "Freiwilligen in ihren aktuellen Teams behalten und auch zu \"{targetTeam}\" hinzufügen",
-          "add_description_single": "Freiwilligen in \"{sourceTeam}\" behalten und auch zu \"{targetTeam}\" zuweisen",
-          "cancel": "Abbrechen",
-          "move": "Verschieben",
-          "move_description_multiple": "Freiwilligen aus allen aktuellen Teams entfernen und in \"{targetTeam}\" platzieren",
-          "move_description_single": "Freiwilligen aus \"{sourceTeam}\" entfernen und in \"{targetTeam}\" platzieren",
-          "question": "Was möchten Sie tun?"
+          "assign_title": "{name} zuweisen",
+          "assign_title_generic": "Team auswählen"
         },
         "preferences_label": "Präf:",
         "remove_as_leader": "Leiterrolle entfernen",
-        "select_team_instruction": "Wählen Sie das Zielteam aus",
         "set_as_leader": "Als Leiter festlegen",
         "stats": {
           "attached_organizers": "Zugeordnete Organisatoren",
@@ -195,7 +192,7 @@
           "unassigned": "Nicht zugewiesen"
         },
         "title": "Teamverteilung",
-        "unassigned_description": "Diese akzeptierten Freiwilligen wurden noch keinem Team zugewiesen. Sie können sie per Drag & Drop zu einem Team unten hinzufügen.",
+        "unassigned_description": "Diese angenommenen Helfer sind noch keinem Team zugeordnet. Klicken Sie auf einen von ihnen, um sein Team zu wählen.",
         "unassigned_volunteers": "Nicht zugewiesene Freiwillige",
         "volunteers_count": "{count} Freiwillige(r)"
       },

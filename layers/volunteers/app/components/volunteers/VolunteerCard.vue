@@ -1,13 +1,10 @@
 <template>
+  <!-- Le clic ouvre le choix d'équipe, sur ordinateur comme sur mobile. Le glisser-déposer a
+       été retiré : avec beaucoup d'équipes, viser la bonne zone devenait pénible. -->
   <div
-    :draggable="!isMobile"
-    class="relative flex items-center gap-3 text-sm p-2 rounded group hover:bg-gray-100 dark:hover:bg-gray-700"
-    :class="isMobile ? 'cursor-pointer' : 'cursor-move'"
+    class="relative flex items-center gap-3 text-sm p-2 rounded group cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
     @click="handleClick"
-    @dragstart="handleDragStart"
-    @dragend="handleDragEnd"
   >
-    <UIcon name="i-heroicons-bars-3" class="text-gray-400" size="16" />
     <UiUserAvatar :user="volunteer.user" size="lg" class="flex-shrink-0" />
     <div class="min-w-0 flex-1">
       <p class="text-gray-700 dark:text-gray-300 font-medium truncate">
@@ -83,19 +80,15 @@ interface Props {
   volunteer: any
   teamId?: string
   teamPreferencesText?: string
-  isMobile?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   teamId: undefined,
   teamPreferencesText: '',
-  isMobile: false,
 })
 
 const emit = defineEmits<{
   click: [volunteer: any, teamId?: string]
-  dragstart: [volunteer: any, teamId?: string]
-  dragend: []
   'toggle-leader': [volunteer: any, teamId: string]
   unassign: [volunteer: any, teamId: string]
 }>()
@@ -109,13 +102,5 @@ const isLeader = computed(() => {
 
 const handleClick = () => {
   emit('click', props.volunteer, props.teamId)
-}
-
-const handleDragStart = () => {
-  emit('dragstart', props.volunteer, props.teamId)
-}
-
-const handleDragEnd = () => {
-  emit('dragend')
 }
 </script>

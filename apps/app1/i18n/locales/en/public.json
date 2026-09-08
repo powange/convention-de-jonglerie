@@ -164,9 +164,13 @@
       "skills": "Skills",
       "team_distribution": {
         "all_teams": "All teams",
-        "description": "Distribution of accepted volunteers in teams. On desktop: drag and drop. On mobile: click to select a team.",
-        "drop_volunteers_here": "Drag and drop volunteers here",
+        "description": "Distribution of accepted volunteers across teams. Click a volunteer to choose their teams.",
         "empty_team": "Empty team",
+        "no_teams": "No volunteer team on this edition",
+        "no_preferred_teams": "This volunteer has not expressed any team preference.",
+        "other_teams": "Other teams",
+        "preferred_teams": "Preferred teams",
+        "select_teams_instruction": "Tick this volunteer's teams",
         "leader_added": "Leader added",
         "leader_badge": "Leader",
         "leader_removed": "Leader removed",
@@ -174,18 +178,11 @@
         "max_label": "Max:",
         "organizers_label": "Attached organizers",
         "modal": {
-          "add": "Add",
-          "add_description_multiple": "Keep the volunteer in their current teams and also add them to \"{targetTeam}\"",
-          "add_description_single": "Keep the volunteer in \"{sourceTeam}\" and also assign them to \"{targetTeam}\"",
-          "cancel": "Cancel",
-          "move": "Move",
-          "move_description_multiple": "Remove the volunteer from all their current teams and place them in \"{targetTeam}\"",
-          "move_description_single": "Remove the volunteer from \"{sourceTeam}\" and place them in \"{targetTeam}\"",
-          "question": "What would you like to do?"
+          "assign_title": "Assign {name}",
+          "assign_title_generic": "Select a team"
         },
         "preferences_label": "Pref:",
         "remove_as_leader": "Remove leader role",
-        "select_team_instruction": "Select the destination team",
         "set_as_leader": "Set as leader",
         "stats": {
           "attached_organizers": "Attached organizers",
@@ -195,7 +192,7 @@
           "unassigned": "Unassigned"
         },
         "title": "Team Distribution",
-        "unassigned_description": "These accepted volunteers have not yet been assigned to a team. On desktop: drag and drop. On mobile: click to select a team.",
+        "unassigned_description": "These accepted volunteers have not been assigned to a team yet. Click one of them to choose theirs.",
         "unassigned_volunteers": "Unassigned volunteers",
         "volunteers_count": "{count} volunteer(s)"
       },

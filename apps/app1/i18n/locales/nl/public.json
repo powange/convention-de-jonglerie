@@ -164,9 +164,13 @@
       "skills": "Vaardigheden",
       "team_distribution": {
         "all_teams": "Alle teams",
-        "description": "Verdeling van geaccepteerde vrijwilligers in teams. Sleep en zet neer om te verplaatsen of toe te voegen aan een team.",
-        "drop_volunteers_here": "Sleep vrijwilligers hier naartoe",
+        "description": "Verdeling van de aangenomen vrijwilligers over de teams. Klik op een vrijwilliger om zijn teams te kiezen.",
         "empty_team": "Leeg team",
+        "no_teams": "Geen vrijwilligersteam voor deze editie",
+        "no_preferred_teams": "Deze vrijwilliger heeft geen teamvoorkeur opgegeven.",
+        "other_teams": "Andere teams",
+        "preferred_teams": "Gewenste teams",
+        "select_teams_instruction": "Vink de teams van deze vrijwilliger aan",
         "leader_added": "Leider toegevoegd",
         "leader_badge": "Leider",
         "leader_removed": "Leider verwijderd",
@@ -174,18 +178,11 @@
         "max_label": "Max:",
         "organizers_label": "Gekoppelde organisatoren",
         "modal": {
-          "add": "Toevoegen",
-          "add_description_multiple": "Houd de vrijwilliger in hun huidige teams en voeg ze ook toe aan \"{targetTeam}\"",
-          "add_description_single": "Houd de vrijwilliger in \"{sourceTeam}\" en wijs ze ook toe aan \"{targetTeam}\"",
-          "cancel": "Annuleren",
-          "move": "Verplaatsen",
-          "move_description_multiple": "Verwijder de vrijwilliger uit al hun huidige teams en plaats ze in \"{targetTeam}\"",
-          "move_description_single": "Verwijder de vrijwilliger uit \"{sourceTeam}\" en plaats ze in \"{targetTeam}\"",
-          "question": "Wat wil je doen?"
+          "assign_title": "{name} toewijzen",
+          "assign_title_generic": "Een team selecteren"
         },
         "preferences_label": "Voork:",
         "remove_as_leader": "Verwijder leiderrol",
-        "select_team_instruction": "Selecteer het bestemmingsteam",
         "set_as_leader": "Instellen als leider",
         "stats": {
           "attached_organizers": "Gekoppelde organisatoren",
@@ -195,7 +192,7 @@
           "unassigned": "Niet toegewezen"
         },
         "title": "Teamverdeling",
-        "unassigned_description": "Deze geaccepteerde vrijwilligers zijn nog niet toegewezen aan een team. Je kunt ze slepen en neerzetten bij een team hieronder.",
+        "unassigned_description": "Deze aangenomen vrijwilligers zijn nog niet aan een team toegewezen. Klik op een van hen om zijn team te kiezen.",
         "unassigned_volunteers": "Niet-toegewezen vrijwilligers",
         "volunteers_count": "{count} vrijwilliger(s)"
       },
