@@ -133,7 +133,9 @@
                   <UCheckbox
                     :model-value="selectedItemIds.has(item.id)"
                     :aria-label="$t('common.select')"
-                    @update:model-value="toggleItem(item.id, $event)"
+                    @update:model-value="
+                      (coche: boolean | 'indeterminate') => toggleItem(item.id, coche === true)
+                    "
                   />
                 </td>
                 <td class="px-4 py-3 align-top">
@@ -142,6 +144,17 @@
                 </td>
                 <td class="px-4 py-3 align-top text-right whitespace-nowrap">
                   <span class="font-medium tabular-nums">×{{ item.quantity }}</span>
+                  <!-- Ce qui manque au rangement, repérable sans ouvrir chaque fiche : c'est
+                       tout l'intérêt du comptage de fin d'édition. -->
+                  <UBadge
+                    v-if="manquants(item) > 0"
+                    color="warning"
+                    variant="soft"
+                    size="lg"
+                    class="ml-1.5"
+                  >
+                    -{{ manquants(item) }}
+                  </UBadge>
                 </td>
                 <td class="px-4 py-3 align-top">
                   <div
@@ -330,6 +343,17 @@ const { t, locale } = useI18n()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const editionId = parseInt(route.params.id as string)
+
+/**
+ * Ce qui manque au rangement, pour un objet donné.
+ *
+ * Rend zéro tant que le comptage n'a pas eu lieu : `finalQuantity` à `null` veut dire « pas
+ * encore compté », et afficher un manque sur cette base serait faux.
+ */
+function manquants(item: { quantity: number; finalQuantity?: number | null }): number {
+  if (item.finalQuantity === null || item.finalQuantity === undefined) return 0
+  return Math.max(0, item.quantity - item.finalQuantity)
+}
 const groupId = computed(() => parseInt(route.params.groupId as string))
 
 type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED'

@@ -25,37 +25,59 @@ model StockGroup {
 }
 
 model StockItem {
-  id             Int       @id @default(autoincrement())
-  stockGroupId   Int
-  name           String
-  description    String?   @db.Text
-  quantity       Int       @default(1) // Nombre d'exemplaires identiques
-  notes          String?   @db.Text
-  displayOrder   Int       @default(0)
+  id                  Int       @id @default(autoincrement())
+  stockGroupId        Int
+  name                String
+  description         String?   @db.Text
+  quantity            Int       @default(1) // Nombre d'exemplaires identiques
+  notes               String?   @db.Text
+  displayOrder        Int       @default(0)
   // Emprunt externe : matériel prêté par quelqu'un d'extérieur à la convention.
   // Si `isExternalLoan` est false, les 3 champs suivants sont ignorés.
-  isExternalLoan Boolean   @default(false)
-  ownerContact   String?   @db.Text // Texte libre (ex: "Jean Dupont — 06 12 34 56 78")
-  returnDueAt    DateTime? // Date prévue de retour au propriétaire
-  returnedAt     DateTime? // Date effective du retour. null = pas encore rendu
+  isExternalLoan      Boolean   @default(false)
+  ownerContact        String?   @db.Text // Texte libre (ex: "Jean Dupont — 06 12 34 56 78")
+  returnDueAt         DateTime? // Date prévue de retour au propriétaire
+  // Un emprunt a deux bouts : aller le chercher, puis le rapporter. Sans `pickedUpAt`, rien ne
+  // distinguait un emprunt convenu mais pas encore récupéré d'un emprunt déjà sur place.
+  pickedUpAt          DateTime? // Date effective de récupération. null = pas encore récupéré
+  returnedAt          DateTime? // Date effective du retour. null = pas encore rendu
+  // Où récupérer le matériel et où le rendre, et qui s'en charge. Les deux lieux sont distincts :
+  // on emprunte souvent chez quelqu'un et on rend ailleurs. Texte libre, car ces lieux sont
+  // généralement hors du site, où la carte de l'édition n'a rien à dire.
+  // Le responsable est un utilisateur quand il en est un ; le champ texte prend le relais pour
+  // quelqu'un qui n'a pas de compte.
+  pickupLocation      String?   @db.Text
+  pickupResponsibleId Int?
+  pickupContact       String?   @db.Text
+  returnLocation      String?   @db.Text
+  returnResponsibleId Int?
+  returnContact       String?   @db.Text
+  // Quantité constatée au rangement, en fin d'édition. L'écart avec `quantity` dit ce qui manque.
+  // `null` = pas encore compté, ce qui n'est pas la même chose que zéro.
+  finalQuantity       Int?
   // Emplacement de rangement par défaut : où ranger le matériel quand il
   // n'est pas réservé. Au moins l'un des trois doit être renseigné si l'on
   // veut afficher un emplacement (validé côté API, tous peuvent rester null).
-  location       String? // Texte libre (ex: "Tente technique B")
-  zoneId         Int? // Lien optionnel vers une zone de la carte
-  markerId       Int? // Lien optionnel vers un marqueur de la carte
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  location            String? // Texte libre (ex: "Tente technique B")
+  zoneId              Int? // Lien optionnel vers une zone de la carte
+  markerId            Int? // Lien optionnel vers un marqueur de la carte
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   group        StockGroup         @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
   zone         EditionZone?       @relation(fields: [zoneId], references: [id], onDelete: SetNull)
   marker       EditionMarker?     @relation(fields: [markerId], references: [id], onDelete: SetNull)
   reservations StockReservation[]
 
+  pickupResponsible User? @relation("StockPickupResponsible", fields: [pickupResponsibleId], references: [id], onDelete: SetNull)
+  returnResponsible User? @relation("StockReturnResponsible", fields: [returnResponsibleId], references: [id], onDelete: SetNull)
+
   @@index([stockGroupId])
   @@index([stockGroupId, displayOrder])
   @@index([zoneId])
   @@index([markerId])
+  @@index([pickupResponsibleId])
+  @@index([returnResponsibleId])
 }
 
 model StockReservation {

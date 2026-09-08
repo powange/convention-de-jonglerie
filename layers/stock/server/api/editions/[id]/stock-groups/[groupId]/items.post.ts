@@ -25,6 +25,14 @@ const bodySchema = z.object({
   isExternalLoan: z.boolean().optional(),
   ownerContact: z.string().trim().max(500).nullable().optional(),
   returnDueAt: z.string().datetime().nullable().optional(),
+  pickupLocation: z.string().trim().max(500).nullable().optional(),
+  pickupResponsibleId: z.number().int().positive().nullable().optional(),
+  pickupContact: z.string().trim().max(500).nullable().optional(),
+  returnLocation: z.string().trim().max(500).nullable().optional(),
+  returnResponsibleId: z.number().int().positive().nullable().optional(),
+  returnContact: z.string().trim().max(500).nullable().optional(),
+  // Zéro accepté, contrairement à `quantity` : tout perdre est un constat possible.
+  finalQuantity: z.number().int().min(0).nullable().optional(),
   returnedAt: z.string().datetime().nullable().optional(),
 })
 
@@ -100,6 +108,15 @@ export default wrapApiHandler(
         ownerContact: isExternalLoan ? data.ownerContact?.trim() || null : null,
         returnDueAt: isExternalLoan && data.returnDueAt ? new Date(data.returnDueAt) : null,
         returnedAt: isExternalLoan && data.returnedAt ? new Date(data.returnedAt) : null,
+        // La logistique n'a de sens que pour un emprunt : sans la case, rien n'est retenu.
+        pickupLocation: isExternalLoan ? data.pickupLocation?.trim() || null : null,
+        pickupResponsibleId: isExternalLoan ? (data.pickupResponsibleId ?? null) : null,
+        pickupContact: isExternalLoan ? data.pickupContact?.trim() || null : null,
+        returnLocation: isExternalLoan ? data.returnLocation?.trim() || null : null,
+        returnResponsibleId: isExternalLoan ? (data.returnResponsibleId ?? null) : null,
+        returnContact: isExternalLoan ? data.returnContact?.trim() || null : null,
+        // Le comptage de fin vaut pour tout le matériel, emprunté ou non.
+        finalQuantity: data.finalQuantity ?? null,
       },
       include: stockItemLocationInclude,
     })

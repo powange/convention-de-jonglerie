@@ -43,8 +43,22 @@
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
                 <h1 class="text-xl font-semibold">{{ item.name }}</h1>
-                <UBadge color="neutral" variant="soft" size="sm">×{{ item.quantity }}</UBadge>
-                <UBadge :color="availabilityColor" variant="soft" size="sm">
+                <UBadge color="neutral" variant="soft" size="lg">×{{ item.quantity }}</UBadge>
+                <!-- Deux constats distincts, donc deux étiquettes : ce qui a été recompté, et
+                     ce qui manque. Les fondre en une seule faisait lire « 3 au rangement — 2
+                     manquants » comme une phrase, là où ce sont deux chiffres à lire séparément. -->
+                <UBadge
+                  v-if="item.finalQuantity !== null && item.finalQuantity !== undefined"
+                  :color="ecartQuantite > 0 ? 'neutral' : 'success'"
+                  variant="soft"
+                  size="lg"
+                >
+                  {{ $t('gestion.stock.final_quantity_short', { count: item.finalQuantity }) }}
+                </UBadge>
+                <UBadge v-if="ecartQuantite > 0" color="warning" variant="soft" size="lg">
+                  {{ $t('gestion.stock.missing_count', { count: ecartQuantite }) }}
+                </UBadge>
+                <UBadge :color="availabilityColor" variant="soft" size="lg">
                   {{ availabilityLabel }}
                 </UBadge>
               </div>
@@ -111,30 +125,109 @@
             <h2 class="font-semibold">{{ $t('gestion.stock.external_loan') }}</h2>
           </div>
         </template>
-        <dl class="space-y-2 text-sm">
-          <div v-if="item.ownerContact" class="flex flex-col sm:flex-row sm:gap-3">
-            <dt class="text-gray-500 sm:w-40 shrink-0">{{ $t('gestion.stock.owner_contact') }}</dt>
-            <dd class="whitespace-pre-wrap wrap-break-word">{{ item.ownerContact }}</dd>
-          </div>
-          <div v-if="item.returnDueAt" class="flex flex-col sm:flex-row sm:gap-3">
-            <dt class="text-gray-500 sm:w-40 shrink-0">{{ $t('gestion.stock.return_due_at') }}</dt>
-            <dd :class="loanIsOverdue ? 'text-error-600 font-medium' : ''">
-              {{ formatDate(item.returnDueAt) }}
-              <span v-if="loanIsOverdue" class="text-xs ml-1">
-                ({{ $t('gestion.stock.overdue') }})
-              </span>
-            </dd>
-          </div>
-          <div v-if="item.returnedAt" class="flex flex-col sm:flex-row sm:gap-3">
-            <dt class="text-gray-500 sm:w-40 shrink-0">{{ $t('gestion.stock.returned_at') }}</dt>
-            <dd class="text-success-600 dark:text-success-400">
-              {{ formatDate(item.returnedAt) }}
-            </dd>
-          </div>
-        </dl>
+        <!-- Trois colonnes, une par moment du prêt : ce qu'on emprunte et à qui, comment on
+             va le chercher, comment on le rapporte. Une colonne sans rien à dire disparaît
+             plutôt que de laisser un vide.
+             Le passage se fait en deux temps — une colonne, puis deux, puis trois — parce que
+             sauter de une à trois d'un coup les rendait étroites bien avant qu'elles ne soient
+             lisibles, notamment sur une fenêtre à demi réduite. -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 text-sm">
+          <dl v-if="item.ownerContact || item.returnDueAt || item.returnedAt" class="space-y-3">
+            <div v-if="item.ownerContact">
+              <dt class="text-gray-500">{{ $t('gestion.stock.owner_contact') }}</dt>
+              <dd class="whitespace-pre-wrap wrap-break-word">{{ item.ownerContact }}</dd>
+            </div>
+            <div v-if="item.returnDueAt">
+              <dt class="text-gray-500">{{ $t('gestion.stock.return_due_at') }}</dt>
+              <dd :class="loanIsOverdue ? 'text-error-600 font-medium' : ''">
+                {{ formatDate(item.returnDueAt) }}
+                <span v-if="loanIsOverdue" class="text-xs ml-1">
+                  ({{ $t('gestion.stock.overdue') }})
+                </span>
+              </dd>
+            </div>
+            <div v-if="item.returnedAt">
+              <dt class="text-gray-500">{{ $t('gestion.stock.returned_at') }}</dt>
+              <dd class="text-success-600 dark:text-success-400">
+                {{ formatDate(item.returnedAt) }}
+              </dd>
+            </div>
+          </dl>
+
+          <dl
+            v-if="item.pickupLocation || responsableRecuperation || item.pickedUpAt"
+            class="space-y-3"
+          >
+            <div v-if="item.pickedUpAt">
+              <dt class="text-gray-500">{{ $t('gestion.stock.picked_up_at') }}</dt>
+              <dd class="text-success-600 dark:text-success-400">
+                {{ formatDate(item.pickedUpAt) }}
+              </dd>
+            </div>
+            <div v-if="item.pickupLocation">
+              <dt class="text-gray-500">{{ $t('gestion.stock.pickup_location') }}</dt>
+              <dd class="whitespace-pre-wrap wrap-break-word">{{ item.pickupLocation }}</dd>
+            </div>
+            <div v-if="responsableRecuperation">
+              <dt class="text-gray-500">{{ $t('gestion.stock.pickup_responsible') }}</dt>
+              <dd class="flex items-center gap-2 flex-wrap">
+                <template v-if="item.pickupResponsible">
+                  <UiUserAvatar :user="item.pickupResponsible" size="xs" />
+                  {{ item.pickupResponsible.pseudo }}
+                </template>
+                <span v-if="item.pickupContact" class="text-gray-600 dark:text-gray-400">
+                  {{ item.pickupContact }}
+                </span>
+              </dd>
+            </div>
+          </dl>
+
+          <dl v-if="item.returnLocation || responsableRetour" class="space-y-3">
+            <div v-if="item.returnLocation">
+              <dt class="text-gray-500">{{ $t('gestion.stock.return_location') }}</dt>
+              <dd class="whitespace-pre-wrap wrap-break-word">{{ item.returnLocation }}</dd>
+            </div>
+            <div v-if="responsableRetour">
+              <dt class="text-gray-500">{{ $t('gestion.stock.return_responsible') }}</dt>
+              <dd class="flex items-center gap-2 flex-wrap">
+                <template v-if="item.returnResponsible">
+                  <UiUserAvatar :user="item.returnResponsible" size="xs" />
+                  {{ item.returnResponsible.pseudo }}
+                </template>
+                <span v-if="item.returnContact" class="text-gray-600 dark:text-gray-400">
+                  {{ item.returnContact }}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </div>
         <template v-if="canManage" #footer>
+          <!-- Les deux jalons dans l'ordre : on ne peut rendre que ce qu'on est allé chercher.
+               Le bouton du retour n'apparaît donc qu'une fois la récupération marquée. -->
           <UButton
-            v-if="!item.returnedAt"
+            v-if="!item.pickedUpAt"
+            icon="i-heroicons-arrow-down-tray"
+            color="primary"
+            size="sm"
+            :loading="loanActionLoading"
+            @click="marquerRecupere(true)"
+          >
+            {{ $t('gestion.stock.mark_loan_picked_up') }}
+          </UButton>
+          <UButton
+            v-else-if="!item.returnedAt"
+            icon="i-heroicons-arrow-uturn-left"
+            color="neutral"
+            variant="soft"
+            size="sm"
+            class="mr-2"
+            :loading="loanActionLoading"
+            @click="marquerRecupere(false)"
+          >
+            {{ $t('gestion.stock.mark_loan_not_picked_up') }}
+          </UButton>
+          <UButton
+            v-if="item.pickedUpAt && !item.returnedAt"
             icon="i-heroicons-check-circle"
             color="success"
             size="sm"
@@ -143,8 +236,10 @@
           >
             {{ $t('gestion.stock.mark_loan_returned') }}
           </UButton>
+          <!-- `v-else-if` et non `v-else` : sans récupération marquée, il n'y a pas de retour à
+               annuler, et le bouton se serait affiché à tort. -->
           <UButton
-            v-else
+            v-else-if="item.returnedAt"
             icon="i-heroicons-arrow-uturn-left"
             color="neutral"
             variant="soft"
@@ -308,10 +403,18 @@ interface StockItemFull {
   description: string | null
   quantity: number
   notes: string | null
+  finalQuantity: number | null
   isExternalLoan: boolean
   ownerContact: string | null
   returnDueAt: string | null
+  pickedUpAt: string | null
   returnedAt: string | null
+  pickupLocation: string | null
+  pickupResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
+  pickupContact: string | null
+  returnLocation: string | null
+  returnResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
+  returnContact: string | null
   group: { id: number; name: string }
   location: string | null
   zone: { id: number; name: string; color: string } | null
@@ -362,16 +465,40 @@ const availabilityColor = computed<'success' | 'warning' | 'error' | 'neutral'>(
   return 'success'
 })
 
+/**
+ * Ce qui manque au rangement.
+ *
+ * `null` veut dire « pas encore compté », et n'est pas un écart : afficher « 10 manquants » sur
+ * un matériel qu'on n'a pas encore recompté serait un mensonge.
+ */
+const ecartQuantite = computed(() => {
+  const it = item.value
+  if (!it || it.finalQuantity === null || it.finalQuantity === undefined) return 0
+  return Math.max(0, it.quantity - it.finalQuantity)
+})
+
+/** Un responsable est désigné dès qu'on a un compte ou un contact écrit. */
+const responsableRecuperation = computed(
+  () => !!(item.value?.pickupResponsible || item.value?.pickupContact)
+)
+const responsableRetour = computed(
+  () => !!(item.value?.returnResponsible || item.value?.returnContact)
+)
+
 // --- Emprunt externe ---
 const loanIsOverdue = computed(() => {
   const it = item.value
-  if (!it?.isExternalLoan || it.returnedAt || !it.returnDueAt) return false
+  if (!it?.isExternalLoan || it.returnedAt || !it.pickedUpAt || !it.returnDueAt) return false
   return new Date(it.returnDueAt).getTime() < Date.now()
 })
-const loanBadgeColor = computed<'success' | 'error' | 'warning' | 'info'>(() => {
+// Trois temps : convenu mais pas encore récupéré, récupéré, rendu. Le retard ne concerne que
+// la période où le matériel est chez nous — un emprunt qu'on n'est pas allé chercher n'est pas
+// « en retard de retour ».
+const loanBadgeColor = computed<'success' | 'error' | 'warning' | 'info' | 'neutral'>(() => {
   const it = item.value
   if (!it?.isExternalLoan) return 'info'
   if (it.returnedAt) return 'success'
+  if (!it.pickedUpAt) return 'neutral'
   if (loanIsOverdue.value) return 'error'
   return 'warning'
 })
@@ -379,10 +506,33 @@ const loanBadgeLabel = computed(() => {
   const it = item.value
   if (!it?.isExternalLoan) return ''
   if (it.returnedAt) return t('gestion.stock.loan_returned')
+  if (!it.pickedUpAt) return t('gestion.stock.loan_to_pick_up')
   if (loanIsOverdue.value) return t('gestion.stock.loan_overdue')
   return t('gestion.stock.loan_to_return')
 })
 const loanActionLoading = ref(false)
+
+/** Pose ou retire la date de récupération. */
+async function marquerRecupere(recupere: boolean) {
+  if (!item.value) return
+  loanActionLoading.value = true
+  try {
+    await $fetch(`/api/editions/${editionId}/stock-items/${item.value.id}`, {
+      method: 'PUT',
+      body: { pickedUpAt: recupere ? new Date().toISOString() : null },
+    })
+    useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
+    await fetchItem()
+  } catch (e: any) {
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    loanActionLoading.value = false
+  }
+}
 
 async function markLoanReturned() {
   if (!item.value) return

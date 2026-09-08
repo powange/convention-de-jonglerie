@@ -46,6 +46,27 @@
           </div>
         </UFormField>
 
+        <!-- Comptage du rangement. Laissé vide tant qu'il n'a pas eu lieu : un zéro dirait que
+             tout a disparu, ce qui n'est pas la même chose que « pas encore compté ». -->
+        <UFormField
+          :label="$t('gestion.stock.final_quantity')"
+          :description="$t('gestion.stock.final_quantity_help')"
+          :error="fieldErrors.finalQuantity"
+        >
+          <div class="flex items-center gap-2">
+            <UInput
+              v-model="formData.finalQuantity"
+              type="number"
+              min="0"
+              class="w-28"
+              :placeholder="$t('gestion.stock.final_quantity_placeholder')"
+            />
+            <UBadge v-if="ecartQuantite > 0" color="warning" variant="soft">
+              {{ $t('gestion.stock.missing_count', { count: ecartQuantite }) }}
+            </UBadge>
+          </div>
+        </UFormField>
+
         <UFormField :label="$t('gestion.stock.item_notes')" :error="fieldErrors.notes">
           <UTextarea
             v-model="formData.notes"
@@ -135,6 +156,62 @@
             <UFormField :label="$t('gestion.stock.return_due_at')">
               <UiDateField v-model="formData.returnDueAt" />
             </UFormField>
+
+            <!-- Deux lieux distincts : on emprunte souvent chez quelqu'un et l'on rend ailleurs.
+                 Le responsable est un utilisateur quand il en est un, du texte sinon. -->
+            <div class="space-y-3 pt-1 border-t border-gray-200 dark:border-gray-700">
+              <UFormField :label="$t('gestion.stock.pickup_location')">
+                <UInput
+                  v-model="formData.pickupLocation"
+                  :placeholder="$t('gestion.stock.pickup_location_placeholder')"
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField
+                :label="$t('gestion.stock.pickup_responsible')"
+                :description="$t('gestion.stock.responsible_help')"
+              >
+                <UserSelector
+                  v-model="formData.pickupResponsible"
+                  v-model:search-term="pickupSearchTerm"
+                  :searched-users="pickupSearchedUsers"
+                  :searching-users="searchingPickupUsers"
+                  :placeholder="$t('gestion.stock.responsible_placeholder')"
+                />
+                <UInput
+                  v-model="formData.pickupContact"
+                  :placeholder="$t('gestion.stock.responsible_contact_placeholder')"
+                  class="w-full mt-2"
+                />
+              </UFormField>
+            </div>
+
+            <div class="space-y-3 pt-1 border-t border-gray-200 dark:border-gray-700">
+              <UFormField :label="$t('gestion.stock.return_location')">
+                <UInput
+                  v-model="formData.returnLocation"
+                  :placeholder="$t('gestion.stock.return_location_placeholder')"
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField
+                :label="$t('gestion.stock.return_responsible')"
+                :description="$t('gestion.stock.responsible_help')"
+              >
+                <UserSelector
+                  v-model="formData.returnResponsible"
+                  v-model:search-term="returnSearchTerm"
+                  :searched-users="returnSearchedUsers"
+                  :searching-users="searchingReturnUsers"
+                  :placeholder="$t('gestion.stock.responsible_placeholder')"
+                />
+                <UInput
+                  v-model="formData.returnContact"
+                  :placeholder="$t('gestion.stock.responsible_contact_placeholder')"
+                  class="w-full mt-2"
+                />
+              </UFormField>
+            </div>
           </div>
         </div>
       </form>
@@ -153,20 +230,58 @@
 </template>
 
 <script setup lang="ts">
+import type { UserSelectItem } from '~/components/UserSelector.vue'
+
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
+
+/** Un responsable tel que la fiche le rend : à retraduire pour le sélecteur. */
+interface ResponsableFiche {
+  id: number
+  pseudo: string
+  emailHash?: string | null
+  profilePicture?: string | null
+}
 
 interface StockItemLite {
   id: number
   name: string
   description: string | null
   quantity: number
+  finalQuantity?: number | null
   notes: string | null
   isExternalLoan?: boolean
   ownerContact?: string | null
   returnDueAt?: string | null
+  pickupLocation?: string | null
+  pickupResponsible?: ResponsableFiche | null
+  pickupContact?: string | null
+  returnLocation?: string | null
+  returnResponsible?: ResponsableFiche | null
+  returnContact?: string | null
   location?: string | null
   zone?: { id: number; name: string; color: string } | null
   marker?: { id: number; name: string } | null
+}
+
+/**
+ * Le sélecteur veut un libellé et une adresse ; la fiche ne rend que l'identité.
+ *
+ * L'adresse n'est volontairement pas exposée par l'API : la recherche se fait par e-mail exact,
+ * mais l'afficher ensuite reviendrait à la divulguer à qui ouvre la fiche. Le pseudo suffit à
+ * reconnaître la personne déjà désignée.
+ */
+function utilisateurDepuisFiche(
+  responsable: ResponsableFiche | null | undefined
+): UserSelectItem | null {
+  if (!responsable) return null
+  return {
+    id: responsable.id,
+    label: responsable.pseudo,
+    pseudo: responsable.pseudo,
+    email: '',
+    emailHash: responsable.emailHash || '',
+    profilePicture: responsable.profilePicture,
+  }
 }
 
 const props = defineProps<{
@@ -230,12 +345,77 @@ const formData = reactive({
   name: '',
   description: '',
   quantity: 1,
+  // Chaîne et non nombre : le champ doit pouvoir rester vide, et `null` se distingue de zéro.
+  finalQuantity: '',
   notes: '',
   isExternalLoan: false,
   ownerContact: '',
   returnDueAt: '',
+  pickupLocation: '',
+  pickupResponsible: null as UserSelectItem | null,
+  pickupContact: '',
+  returnLocation: '',
+  returnResponsible: null as UserSelectItem | null,
+  returnContact: '',
   location: '',
   mapPin: NONE_PIN,
+})
+
+/** Ce qui manque au rangement, quand le comptage a eu lieu. */
+const ecartQuantite = computed(() => {
+  const compte = Number(formData.finalQuantity)
+  if (formData.finalQuantity === '' || !Number.isFinite(compte)) return 0
+  return Math.max(0, formData.quantity - compte)
+})
+
+// La recherche se fait par adresse e-mail exacte, comme pour les responsables d'accueil des
+// artistes : on ne parcourt pas l'annuaire des comptes, on désigne quelqu'un qu'on connaît.
+const pickupSearchTerm = ref('')
+const pickupSearchedUsers = ref<UserSelectItem[]>([])
+const searchingPickupUsers = ref(false)
+const returnSearchTerm = ref('')
+const returnSearchedUsers = ref<UserSelectItem[]>([])
+const searchingReturnUsers = ref(false)
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+async function chercherUtilisateurs(email: string): Promise<UserSelectItem[]> {
+  if (!EMAIL.test(email)) return []
+  try {
+    const reponse = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
+      params: { emailExact: email },
+    })
+    return (reponse.data.users || []).map((u) => ({
+      id: u.id,
+      label: `${u.pseudo} (${u.email})`,
+      pseudo: u.pseudo,
+      email: u.email,
+      emailHash: u.emailHash,
+      profilePicture: u.profilePicture,
+    }))
+  } catch {
+    return []
+  }
+}
+
+watch(pickupSearchTerm, async (terme) => {
+  if (!EMAIL.test(terme)) {
+    pickupSearchedUsers.value = []
+    return
+  }
+  searchingPickupUsers.value = true
+  pickupSearchedUsers.value = await chercherUtilisateurs(terme)
+  searchingPickupUsers.value = false
+})
+
+watch(returnSearchTerm, async (terme) => {
+  if (!EMAIL.test(terme)) {
+    returnSearchedUsers.value = []
+    return
+  }
+  searchingReturnUsers.value = true
+  returnSearchedUsers.value = await chercherUtilisateurs(terme)
+  searchingReturnUsers.value = false
 })
 
 const fieldErrors = ref<Record<string, string>>({})
@@ -258,6 +438,16 @@ watch(
       formData.returnDueAt = props.item?.returnDueAt
         ? String(props.item.returnDueAt).slice(0, 10)
         : ''
+      formData.finalQuantity =
+        props.item?.finalQuantity === null || props.item?.finalQuantity === undefined
+          ? ''
+          : String(props.item.finalQuantity)
+      formData.pickupLocation = props.item?.pickupLocation || ''
+      formData.pickupResponsible = utilisateurDepuisFiche(props.item?.pickupResponsible)
+      formData.pickupContact = props.item?.pickupContact || ''
+      formData.returnLocation = props.item?.returnLocation || ''
+      formData.returnResponsible = utilisateurDepuisFiche(props.item?.returnResponsible)
+      formData.returnContact = props.item?.returnContact || ''
       formData.location = props.item?.location || ''
       formData.mapPin = pinFromItem(props.item)
       resetFieldErrors()
@@ -296,12 +486,23 @@ async function handleSubmit() {
       description: formData.description.trim() || null,
       quantity: formData.quantity,
       notes: formData.notes.trim() || null,
+      finalQuantity: formData.finalQuantity === '' ? null : Number(formData.finalQuantity),
       isExternalLoan: formData.isExternalLoan,
       ownerContact: formData.isExternalLoan ? formData.ownerContact.trim() || null : null,
       returnDueAt:
         formData.isExternalLoan && formData.returnDueAt
           ? new Date(formData.returnDueAt).toISOString()
           : null,
+      pickupLocation: formData.isExternalLoan ? formData.pickupLocation.trim() || null : null,
+      pickupResponsibleId: formData.isExternalLoan
+        ? (formData.pickupResponsible?.id ?? null)
+        : null,
+      pickupContact: formData.isExternalLoan ? formData.pickupContact.trim() || null : null,
+      returnLocation: formData.isExternalLoan ? formData.returnLocation.trim() || null : null,
+      returnResponsibleId: formData.isExternalLoan
+        ? (formData.returnResponsible?.id ?? null)
+        : null,
+      returnContact: formData.isExternalLoan ? formData.returnContact.trim() || null : null,
       location: formData.location.trim() || null,
       zoneId,
       markerId,
