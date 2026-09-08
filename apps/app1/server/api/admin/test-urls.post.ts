@@ -1,12 +1,18 @@
 import { z } from 'zod'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
+import { getEffectiveAIConfigAsync } from '#server/utils/ai-config'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   scrapeFacebookEvent,
   type FacebookScraperResult,
 } from '#server/utils/facebook-event-scraper'
-import { BROWSER_HEADERS, fetchWithTimeout } from '#server/utils/fetch-helpers'
+import {
+  BROWSER_HEADERS,
+  fetchWithBrowserless,
+  fetchWithTimeout,
+  isBrowserlessAvailable,
+} from '#server/utils/fetch-helpers'
 import { extractWebContent, type WebContentExtraction } from '#server/utils/web-content-extractor'
 
 const requestSchema = z.object({
@@ -37,8 +43,10 @@ function isFacebookEventUrl(url: string): boolean {
 
 /**
  * Teste une URL et retourne les données extraites
+ *
+ * @param browserlessUrl - service de navigateur sans interface, ou `null` s'il est indisponible
  */
-async function testUrl(url: string): Promise<UrlTestResult> {
+async function testUrl(url: string, browserlessUrl: string | null): Promise<UrlTestResult> {
   try {
     // Utiliser le scraper Facebook pour les événements Facebook
     if (isFacebookEventUrl(url)) {
@@ -59,16 +67,29 @@ async function testUrl(url: string): Promise<UrlTestResult> {
       }
     }
 
-    // Fetch classique pour les autres URLs ou si le scraper Facebook a échoué
-    console.log(`[TEST-URLS] Fetching URL: ${url}`)
+    // Le navigateur d'abord, quand il est là. Ce test partageait le bouton avec une génération
+    // qui, elle, passait par browserless : les deux ne lisaient donc pas la même page, et un
+    // site rendu côté client — ou gardé par un anti-robot — échouait ici tout en réussissant là.
+    let html: string
 
-    const response = await fetchWithTimeout(url, { headers: BROWSER_HEADERS }, URL_FETCH_TIMEOUT)
+    if (browserlessUrl) {
+      console.log(`[TEST-URLS] Fetching URL via browserless: ${url}`)
+      html = await fetchWithBrowserless(browserlessUrl, url, {
+        timeout: URL_FETCH_TIMEOUT,
+        waitForNetworkIdle: true,
+      })
+    } else {
+      console.log(`[TEST-URLS] Fetching URL: ${url}`)
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} ${response.statusText}`)
+      const response = await fetchWithTimeout(url, { headers: BROWSER_HEADERS }, URL_FETCH_TIMEOUT)
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText}`)
+      }
+
+      html = await response.text()
     }
 
-    const html = await response.text()
     // Ne pas tronquer le contenu textuel pour le test (limite très grande)
     const webContent = extractWebContent(html, url, 500000)
 
@@ -104,8 +125,20 @@ export default wrapApiHandler(
 
     console.log(`[TEST-URLS] Test de ${urls.length} URL(s)`)
 
+    // La disponibilité se vérifie une fois pour toutes les URLs, et non par URL : le service
+    // est le même, et l'interroger cinq fois ne dirait rien de plus.
+    const configuredUrl = (await getEffectiveAIConfigAsync()).browserlessUrl
+    const browserlessUrl =
+      configuredUrl && (await isBrowserlessAvailable(configuredUrl)) ? configuredUrl : null
+
+    console.log(
+      browserlessUrl
+        ? `[TEST-URLS] Utilisation de browserless: ${browserlessUrl}`
+        : '[TEST-URLS] Browserless non disponible, utilisation de fetch simple'
+    )
+
     // Tester chaque URL en parallèle
-    const results = await Promise.all(urls.map(testUrl))
+    const results = await Promise.all(urls.map((url) => testUrl(url, browserlessUrl)))
 
     return createSuccessResponse({ results })
   },

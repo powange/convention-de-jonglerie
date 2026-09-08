@@ -3,6 +3,8 @@
  * Extrait les métadonnées, données structurées, et informations utiles
  */
 
+import { extractHelloAssoTiers, type TarifBilletterie } from './helloasso-tiers-extractor'
+
 /**
  * Métadonnées Open Graph extraites
  */
@@ -76,6 +78,11 @@ export interface WebContentExtraction {
   navigation: NavLink[]
   textContent: string
   links: string[]
+  /**
+   * Tarifs de billetterie relevés dans la page, avec ce que chacun comprend. Vide hors des
+   * pages qui en affichent.
+   */
+  ticketTiers: TarifBilletterie[]
 }
 
 /**
@@ -680,6 +687,7 @@ export function extractWebContent(
     navigation: extractNavigation(html, url),
     textContent,
     links: extractUsefulLinks(html, url),
+    ticketTiers: extractHelloAssoTiers(html),
   }
 }
 
@@ -756,6 +764,32 @@ export function formatExtractionForAI(
         text += `Image: ${img}\n`
       }
     }
+  }
+
+  // Tarifs de billetterie, avec ce que chacun comprend. Placés avant le texte libre : ce sont
+  // eux qui nomment les services rendus — gymnase, douches, camping, ateliers, petits déjeuners
+  // —, et le texte libre est ce qui se fait couper en premier quand le budget se resserre.
+  if (extraction.ticketTiers.length > 0) {
+    // Bornée à la moitié du budget : une billetterie à trente tarifs affamerait sinon tout le
+    // reste, description de la page comprise. Les premiers tarifs sont les plus parlants — les
+    // passes avant les billets à l'unité — et le compte des suivants évite de laisser croire
+    // que la liste est complète.
+    const budgetTarifs = Math.floor(maxContentLength / 2)
+    let section = '\n=== Tarifs de la billetterie ===\n'
+    let retenus = 0
+
+    for (const tarif of extraction.ticketTiers) {
+      const ligne =
+        `- ${tarif.nom}${tarif.prix ? ` (${tarif.prix})` : ''}\n` +
+        (tarif.description ? `${tarif.description.replace(/\n/g, ' ')}\n` : '')
+      if (retenus > 0 && section.length + ligne.length > budgetTarifs) break
+      section += ligne
+      retenus++
+    }
+
+    const omis = extraction.ticketTiers.length - retenus
+    if (omis > 0) section += `(+ ${omis} autre(s) tarif(s) non détaillé(s))\n`
+    text += section
   }
 
   // Navigation du site (en JSON pour l'IA)

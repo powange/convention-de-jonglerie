@@ -257,6 +257,11 @@ export async function fetchWithBrowserless(
   // Documentation: https://www.browserless.io/docs/content
   const requestBody: Record<string, unknown> = {
     url: targetUrl,
+    // Sans cela, browserless s'annonce « HeadlessChrome/121 » et les protections anti-robot le
+    // referment aussitôt : HelloAsso rendait une page de défi Cloudflare (« Just a moment… »)
+    // au lieu de l'événement. Le même User-Agent que le fetch direct suffit — attendre vingt
+    // secondes de plus ne changeait rien, c'est bien le nom du navigateur qui était lu.
+    userAgent: BROWSER_HEADERS['User-Agent'],
     // Attendre que le réseau soit inactif pour s'assurer que le JS est chargé
     gotoOptions: {
       waitUntil: waitForNetworkIdle ? 'networkidle2' : 'domcontentloaded',

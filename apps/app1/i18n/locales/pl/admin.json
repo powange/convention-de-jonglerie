@@ -474,7 +474,8 @@
         "volunteers_open": "Nabór wolontariuszy otwarty"
       },
       "view_mode_form": "Formularz",
-      "view_mode_raw": "Surowy JSON"
+      "view_mode_raw": "Surowy JSON",
+      "ticket_tiers": "Cennik biletów"
     },
     "inactive": "Nieaktywny",
     "invalidate_email": "Unieważnij e-mail",

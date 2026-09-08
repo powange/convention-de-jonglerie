@@ -474,7 +474,8 @@
         "volunteers_open": "Volontärrekrytering öppen"
       },
       "view_mode_form": "Formulär",
-      "view_mode_raw": "Rå JSON"
+      "view_mode_raw": "Rå JSON",
+      "ticket_tiers": "Biljettpriser"
     },
     "inactive": "Inaktiv",
     "invalidate_email": "Ogiltigförklara e-post",

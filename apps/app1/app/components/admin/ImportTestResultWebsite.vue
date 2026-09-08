@@ -144,6 +144,29 @@
       </div>
     </div>
 
+    <!-- Tarifs de la billetterie -->
+    <div v-if="webContent.ticketTiers?.length" class="space-y-2">
+      <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
+        {{ $t('admin.import.ticket_tiers') }}
+      </h4>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-3 max-h-96 overflow-y-auto">
+        <div v-for="(tarif, idx) in webContent.ticketTiers" :key="idx" class="text-sm">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="font-medium">{{ tarif.nom }}</span>
+            <span v-if="tarif.prix" class="shrink-0 text-gray-600 dark:text-gray-400">
+              {{ tarif.prix }}
+            </span>
+          </div>
+          <p
+            v-if="tarif.description"
+            class="text-gray-600 dark:text-gray-400 whitespace-pre-wrap mt-0.5"
+          >
+            {{ tarif.description }}
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Contenu textuel -->
     <div v-if="webContent.textContent" class="space-y-2">
       <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300">
@@ -174,6 +197,7 @@ interface WebContent {
   navigation?: any[]
   links: string[]
   textContent?: string
+  ticketTiers?: { nom: string; description: string; prix: string }[]
 }
 
 const props = defineProps<{

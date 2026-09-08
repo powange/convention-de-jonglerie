@@ -474,7 +474,8 @@
         "volunteers_open": "Volunteer recruitment open"
       },
       "view_mode_form": "Form",
-      "view_mode_raw": "Raw JSON"
+      "view_mode_raw": "Raw JSON",
+      "ticket_tiers": "Ticket prices"
     },
     "inactive": "Inactive",
     "invalidate_email": "Invalidate email",

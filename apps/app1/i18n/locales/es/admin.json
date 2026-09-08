@@ -474,7 +474,8 @@
         "volunteers_open": "Búsqueda de voluntarios abierta"
       },
       "view_mode_form": "Formulario",
-      "view_mode_raw": "JSON sin procesar"
+      "view_mode_raw": "JSON sin procesar",
+      "ticket_tiers": "Tarifas de entradas"
     },
     "inactive": "Inactivo",
     "invalidate_email": "Invalidar correo electrónico",
