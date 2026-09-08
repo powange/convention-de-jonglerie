@@ -498,7 +498,20 @@
       "responsible_placeholder": "Szukaj po dokładnym adresie e-mail",
       "return_location": "Miejsce zwrotu",
       "return_location_placeholder": "Np. odnieść do siedziby stowarzyszenia",
-      "return_responsible": "Kto zwraca"
+      "return_responsible": "Kto zwraca",
+      "tags": {
+        "modal_title": "Tagi sprzętu",
+        "description": "Tagi przecinają grupy magazynowe: ten sam sprzęt może mieć ich kilka.",
+        "empty": "Brak tagów",
+        "new_tag": "Nowy tag",
+        "name_placeholder": "Np. kruche",
+        "confirm_delete": "Usunąć tag „{name}”? Zostanie zdjęty z całego sprzętu, który go nosi.",
+        "manage": "Tagi",
+        "field_label": "Tagi",
+        "field_placeholder": "Brak tagów",
+        "filter_label": "Filtruj po tagach",
+        "filter_placeholder": "Bez filtra"
+      }
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

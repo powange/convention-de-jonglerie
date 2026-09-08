@@ -64,10 +64,11 @@ model StockItem {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  group        StockGroup         @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
-  zone         EditionZone?       @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-  marker       EditionMarker?     @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  group        StockGroup           @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
+  zone         EditionZone?         @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker       EditionMarker?       @relation(fields: [markerId], references: [id], onDelete: SetNull)
   reservations StockReservation[]
+  tags         StockTagAssignment[]
 
   pickupResponsible User? @relation("StockPickupResponsible", fields: [pickupResponsibleId], references: [id], onDelete: SetNull)
   returnResponsible User? @relation("StockReturnResponsible", fields: [returnResponsibleId], references: [id], onDelete: SetNull)
@@ -111,4 +112,44 @@ model StockReservation {
   @@index([markerId])
   @@index([stockItemId, startsAt, endsAt])
   @@index([status])
+}
+
+/**
+ * Étiquette transversale posée sur du matériel.
+ * Le groupe dit où l'objet est rangé — une seule place, une seule façon de classer. Le tag dit
+ * autre chose : une enceinte rangée en « Sonorisation » peut être à la fois fragile, lourde et
+ * prêtée, sans que rien de cela ne commande son rangement.
+ * Rattaché à l'ÉDITION et non au groupe, contrairement à `TaskTag` : c'est la seule façon de
+ * retrouver le même « fragile » d'un groupe à l'autre sans le recréer partout.
+ */
+model StockTag {
+  id           Int      @id @default(autoincrement())
+  editionId    Int
+  name         String
+  color        String
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  edition     Edition              @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  assignments StockTagAssignment[]
+
+  @@unique([editionId, name])
+  @@index([editionId])
+  @@index([editionId, displayOrder])
+}
+
+// Liaison many-to-many entre StockItem et StockTag. Un objet porte 0..N tags.
+model StockTagAssignment {
+  id          Int      @id @default(autoincrement())
+  stockItemId Int
+  tagId       Int
+  createdAt   DateTime @default(now())
+
+  item StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  tag  StockTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([stockItemId, tagId])
+  @@index([stockItemId])
+  @@index([tagId])
 }

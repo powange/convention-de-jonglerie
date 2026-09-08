@@ -34,6 +34,10 @@ export default wrapApiHandler(
         ...stockItemLocationInclude,
         // Les responsables de la récupération et du retour : la fiche les affiche avec leur
         // avatar, comme partout ailleurs.
+        // Les pastilles suivent le matériel partout où il est listé.
+        tags: {
+          include: { tag: { select: { id: true, name: true, color: true, displayOrder: true } } },
+        },
         pickupResponsible: { select: userWithProfileAndGravatarSelect },
         returnResponsible: { select: userWithProfileAndGravatarSelect },
         reservations: {

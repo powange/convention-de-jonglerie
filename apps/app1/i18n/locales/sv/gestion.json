@@ -498,7 +498,20 @@
       "responsible_placeholder": "Sök på exakt e-postadress",
       "return_location": "Återlämningsplats",
       "return_location_placeholder": "T.ex. lämnas tillbaka till föreningens lokal",
-      "return_responsible": "Vem lämnar tillbaka"
+      "return_responsible": "Vem lämnar tillbaka",
+      "tags": {
+        "modal_title": "Taggar för utrustning",
+        "description": "Taggar går tvärs över förvaringsgrupperna: samma utrustning kan bära flera.",
+        "empty": "Inga taggar än",
+        "new_tag": "Ny tagg",
+        "name_placeholder": "T.ex. ömtåligt",
+        "confirm_delete": "Ta bort taggen ”{name}”? Den tas bort från all utrustning som bär den.",
+        "manage": "Taggar",
+        "field_label": "Taggar",
+        "field_placeholder": "Inga taggar",
+        "filter_label": "Filtrera på taggar",
+        "filter_placeholder": "Inget filter"
+      }
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

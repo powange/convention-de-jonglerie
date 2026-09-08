@@ -62,6 +62,13 @@
                   {{ availabilityLabel }}
                 </UBadge>
               </div>
+              <div v-if="item.tags?.length" class="flex flex-wrap gap-1 mt-2">
+                <StockTagBadge
+                  v-for="rattachement in item.tags"
+                  :key="rattachement.tag.id"
+                  :tag="rattachement.tag"
+                />
+              </div>
               <p v-if="item.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {{ item.description }}
               </p>
@@ -337,6 +344,7 @@
       :zones="zones"
       :markers="markers"
       :site-map-enabled="!!edition?.siteMapEnabled"
+      :available-tags="tags"
       @saved="fetchItem"
     />
     <StockReservationModal
@@ -404,6 +412,7 @@ interface StockItemFull {
   quantity: number
   notes: string | null
   finalQuantity: number | null
+  tags: Array<{ tag: { id: number; name: string; color: string } }>
   isExternalLoan: boolean
   ownerContact: string | null
   returnDueAt: string | null
@@ -484,6 +493,20 @@ const responsableRecuperation = computed(
 const responsableRetour = computed(
   () => !!(item.value?.returnResponsible || item.value?.returnContact)
 )
+
+// Les tags de l'édition, pour que la modale d'édition puisse les proposer.
+const tags = ref<{ id: number; name: string; color: string }[]>([])
+
+async function fetchTags() {
+  try {
+    const res = await $fetch<{ data: { tags: typeof tags.value } }>(
+      `/api/editions/${editionId}/stock-tags`
+    )
+    tags.value = res?.data?.tags ?? []
+  } catch {
+    tags.value = []
+  }
+}
 
 // --- Emprunt externe ---
 const loanIsOverdue = computed(() => {
@@ -646,7 +669,7 @@ onMounted(async () => {
   }
 })
 
-await Promise.all([fetchItem(), fetchMapData()])
+await Promise.all([fetchItem(), fetchMapData(), fetchTags()])
 
 const itemModalOpen = ref(false)
 const reservationModalOpen = ref(false)

@@ -498,7 +498,20 @@
       "responsible_placeholder": "Cerca per indirizzo e-mail esatto",
       "return_location": "Luogo di restituzione",
       "return_location_placeholder": "Es.: riportare nella sede dell'associazione",
-      "return_responsible": "Chi restituisce"
+      "return_responsible": "Chi restituisce",
+      "tags": {
+        "modal_title": "Tag del materiale",
+        "description": "I tag attraversano i gruppi di stoccaggio: uno stesso materiale può portarne diversi.",
+        "empty": "Ancora nessun tag",
+        "new_tag": "Nuovo tag",
+        "name_placeholder": "Es.: fragile",
+        "confirm_delete": "Eliminare il tag «{name}»? Verrà rimosso da tutto il materiale che lo porta.",
+        "manage": "Tag",
+        "field_label": "Tag",
+        "field_placeholder": "Nessun tag",
+        "filter_label": "Filtra per tag",
+        "filter_placeholder": "Nessun filtro"
+      }
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

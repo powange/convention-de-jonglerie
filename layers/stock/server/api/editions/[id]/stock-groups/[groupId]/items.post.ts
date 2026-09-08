@@ -7,6 +7,7 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { stockItemLocationInclude, validateReservationLocation } from '#server/utils/stock-helpers'
+import { assertTagsBelongToEdition } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -33,6 +34,7 @@ const bodySchema = z.object({
   returnContact: z.string().trim().max(500).nullable().optional(),
   // Zéro accepté, contrairement à `quantity` : tout perdre est un constat possible.
   finalQuantity: z.number().int().min(0).nullable().optional(),
+  tagIds: z.array(z.number().int().positive()).optional(),
   returnedAt: z.string().datetime().nullable().optional(),
 })
 
@@ -92,6 +94,11 @@ export default wrapApiHandler(
     }
 
     // Emprunt externe : si le flag est false, on ignore les autres champs
+    // Les tags doivent être ceux de cette édition : un identifiant emprunté ailleurs passerait
+    // sinon la permission d'ici.
+    const tagIds = Array.from(new Set(data.tagIds ?? []))
+    await assertTagsBelongToEdition(editionId, tagIds)
+
     const isExternalLoan = data.isExternalLoan === true
     const item = await prisma.stockItem.create({
       data: {
@@ -117,6 +124,9 @@ export default wrapApiHandler(
         returnContact: isExternalLoan ? data.returnContact?.trim() || null : null,
         // Le comptage de fin vaut pour tout le matériel, emprunté ou non.
         finalQuantity: data.finalQuantity ?? null,
+        ...(tagIds.length > 0
+          ? { tags: { create: tagIds.map((tagId) => ({ tagId })) } }
+          : {}),
       },
       include: stockItemLocationInclude,
     })

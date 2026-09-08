@@ -33,6 +33,7 @@ export type ResourceType =
   | 'tarif'
   | 'token'
   | 'compteur'
+  | 'tag'
   | 'item'
   | 'candidature'
   | 'post'
@@ -74,6 +75,7 @@ const RESOURCE_MESSAGES: Record<ResourceType, string> = {
   tarif: 'ID de tarif invalide',
   token: 'ID de token invalide',
   compteur: 'ID de compteur invalide',
+  tag: 'ID de tag invalide',
   item: "ID d'objet remis invalide",
   candidature: 'ID de candidature invalide',
   post: 'ID de publication invalide',

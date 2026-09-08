@@ -498,7 +498,20 @@
       "responsible_placeholder": "Hledat podle přesné e-mailové adresy",
       "return_location": "Místo vrácení",
       "return_location_placeholder": "Např. vrátit do sídla spolku",
-      "return_responsible": "Kdo vrací"
+      "return_responsible": "Kdo vrací",
+      "tags": {
+        "modal_title": "Štítky skladu",
+        "description": "Štítky procházejí napříč skupinami uskladnění: jedna věc jich může nést několik.",
+        "empty": "Zatím žádné štítky",
+        "new_tag": "Nový štítek",
+        "name_placeholder": "Např. křehké",
+        "confirm_delete": "Smazat štítek „{name}“? Bude odebrán ze všech věcí, které jej nesou.",
+        "manage": "Štítky",
+        "field_label": "Štítky",
+        "field_placeholder": "Žádné štítky",
+        "filter_label": "Filtrovat podle štítků",
+        "filter_placeholder": "Bez filtru"
+      }
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

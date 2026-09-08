@@ -498,7 +498,20 @@
       "responsible_placeholder": "Suche nach genauer E-Mail-Adresse",
       "return_location": "Rückgabeort",
       "return_location_placeholder": "Z. B. zurück in die Räume des Vereins",
-      "return_responsible": "Wer bringt zurück"
+      "return_responsible": "Wer bringt zurück",
+      "tags": {
+        "modal_title": "Lager-Tags",
+        "description": "Tags gehen quer durch die Lagergruppen: ein Gegenstand kann mehrere tragen.",
+        "empty": "Noch keine Tags",
+        "new_tag": "Neuer Tag",
+        "name_placeholder": "Z. B. zerbrechlich",
+        "confirm_delete": "Tag „{name}“ löschen? Er wird von allen Gegenständen entfernt, die ihn tragen.",
+        "manage": "Tags",
+        "field_label": "Tags",
+        "field_placeholder": "Keine Tags",
+        "filter_label": "Nach Tags filtern",
+        "filter_placeholder": "Kein Filter"
+      }
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

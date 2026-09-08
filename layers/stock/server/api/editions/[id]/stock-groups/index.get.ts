@@ -32,6 +32,12 @@ export default wrapApiHandler(
           orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
           include: {
             ...stockItemLocationInclude,
+            // Les pastilles suivent le matériel jusque dans la liste : c'est là qu'on filtre.
+            tags: {
+              include: {
+                tag: { select: { id: true, name: true, color: true, displayOrder: true } },
+              },
+            },
             _count: { select: { reservations: true } },
             // Réservations à exposer pour les colonnes "Prochaine réservation"
             // et "Emplacement actuel". On retourne :
