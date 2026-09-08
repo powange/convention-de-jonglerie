@@ -125,7 +125,11 @@
       "question": "Frage",
       "question_placeholder": "Z.B.: Wann öffnen die Türen?",
       "search_placeholder": "In den FAQ suchen…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Als PDF exportieren",
+      "export_pdf_all": "Alles, mit Status",
+      "export_pdf_empty": "Kein Eintrag zum Exportieren",
+      "export_pdf_public": "Öffentliche FAQ"
     },
     "features": {
       "artists_description": "Verwaltung von Künstlern und Shows für diese Ausgabe aktivieren",

@@ -125,7 +125,11 @@
       "question": "Pytanie",
       "question_placeholder": "Np.: O której godzinie otwierają się drzwi?",
       "search_placeholder": "Szukaj w FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Eksportuj do PDF",
+      "export_pdf_all": "Wszystko, ze statusem",
+      "export_pdf_empty": "Brak wpisów do wyeksportowania",
+      "export_pdf_public": "Publiczne FAQ"
     },
     "features": {
       "artists_description": "Włącz zarządzanie artystami i spektaklami dla tej edycji",

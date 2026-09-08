@@ -125,7 +125,11 @@
       "question": "Vraag",
       "question_placeholder": "Bijv.: Hoe laat gaan de deuren open?",
       "search_placeholder": "Zoeken in de FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Exporteren als pdf",
+      "export_pdf_all": "Alles, met status",
+      "export_pdf_empty": "Geen item om te exporteren",
+      "export_pdf_public": "Openbare FAQ"
     },
     "features": {
       "artists_description": "Beheer van artiesten en shows voor deze editie inschakelen",

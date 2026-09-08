@@ -125,7 +125,11 @@
       "question": "Otázka",
       "question_placeholder": "Např.: V kolik hodin se otevírají dveře?",
       "search_placeholder": "Hledat v FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Exportovat do PDF",
+      "export_pdf_all": "Vše, včetně stavu",
+      "export_pdf_empty": "Žádná položka k exportu",
+      "export_pdf_public": "Veřejné FAQ"
     },
     "features": {
       "artists_description": "Povolit správu umělců a představení pro tuto edici",

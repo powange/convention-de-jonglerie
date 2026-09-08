@@ -125,7 +125,11 @@
       "question": "Spørgsmål",
       "question_placeholder": "F.eks.: Hvornår åbner dørene?",
       "search_placeholder": "Søg i FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Eksportér som PDF",
+      "export_pdf_all": "Alt, med status",
+      "export_pdf_empty": "Ingen poster at eksportere",
+      "export_pdf_public": "Offentlig FAQ"
     },
     "features": {
       "artists_description": "Aktivér administration af kunstnere og shows for denne udgave",

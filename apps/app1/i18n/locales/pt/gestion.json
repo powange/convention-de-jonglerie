@@ -125,7 +125,11 @@
       "question": "Pergunta",
       "question_placeholder": "Ex: A que horas abrem as portas?",
       "search_placeholder": "Pesquisar nas perguntas frequentes…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Exportar em PDF",
+      "export_pdf_all": "Tudo, com o estado",
+      "export_pdf_empty": "Nenhuma entrada para exportar",
+      "export_pdf_public": "FAQ pública"
     },
     "features": {
       "artists_description": "Permitir a gestão de artistas e espetáculos para esta edição",
