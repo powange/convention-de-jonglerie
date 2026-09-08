@@ -508,6 +508,17 @@
     "swap_status_refused": "Odmítnuta",
     "swap_title": "Vyměnit směnu",
     "swap_cancel_confirm_title": "Stáhnout tento požadavek?",
-    "swap_cancel_confirm_description": "Navržená výměna bude zrušena. Druhý dobrovolník o tom bude informován a vy si ponecháte svou směnu."
+    "swap_cancel_confirm_description": "Navržená výměna bude zrušena. Druhý dobrovolník o tom bude informován a vy si ponecháte svou směnu.",
+    "accepted_volunteers": "Přijatí dobrovolníci",
+    "hours_covered_by_organizers": "Hodiny pokryté organizátory",
+    "hours_per_volunteer_expected": "Hodin na dobrovolníka",
+    "hours_to_cover": "Hodiny k pokrytí",
+    "staffing_calculator": "Kalkulačka obsazení",
+    "staffing_calculator_awaiting_input": "Zadejte počet hodin a získáte výsledek.",
+    "staffing_calculator_intro": "Zadejte, kolik hodin má odpracovat jeden dobrovolník: výpočet určí potřebný počet a porovná ho s přijatými dobrovolníky.",
+    "staffing_exact": "Počet přesně odpovídá potřebě",
+    "staffing_missing": "Chybí {count} dobrovolníků",
+    "staffing_need": "Potřebný počet: {count} dobrovolníků",
+    "staffing_surplus": "{count} dobrovolníků nad rámec potřeby"
   }
 }

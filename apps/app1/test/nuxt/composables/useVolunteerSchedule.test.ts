@@ -93,3 +93,53 @@ describe('useVolunteerSchedule — position de la frise', () => {
     expect(calendarOptions.initialDate).toBe('2026-10-02')
   })
 })
+
+/**
+ * La frise s'ouvre sur le premier créneau plutôt que sur un premier jour de montage souvent vide.
+ * La position est posée une fois, au premier chargement qui rapporte des créneaux : la reposer à
+ * chaque ajout ramènerait le défaut que les tests ci-dessus verrouillent.
+ */
+describe('useVolunteerSchedule — position de départ sur le premier créneau', () => {
+  it('se pose sur le premier créneau dès le premier chargement', async () => {
+    const timeSlots = ref([creneau('1', '2026-09-26T10:00:00', '2026-09-26T12:00:00')])
+    const { calendarOptions } = monter(timeSlots)
+    await nextTick()
+
+    expect(calendarOptions.scrollTime).toBe('34:00:00')
+  })
+
+  it('ne pose rien tant qu’aucun créneau n’existe', async () => {
+    const { calendarOptions } = monter(ref([]))
+    await nextTick()
+
+    expect(calendarOptions.scrollTime).toBeUndefined()
+  })
+
+  it('ne repose pas la frise quand un créneau est ajouté ensuite', async () => {
+    const timeSlots = ref([creneau('1', '2026-09-26T10:00:00', '2026-09-26T12:00:00')])
+    const { calendarOptions } = monter(timeSlots)
+    await nextTick()
+
+    // L'organisateur a fait défiler, puis ajoute un créneau plus tôt dans la période
+    calendarOptions.scrollTime = '48:00:00'
+    timeSlots.value = [
+      ...timeSlots.value,
+      creneau('2', '2026-09-25T08:00:00', '2026-09-25T09:00:00'),
+    ]
+    await nextTick()
+
+    expect(calendarOptions.scrollTime).toBe('48:00:00')
+  })
+
+  it('se pose au premier chargement, même si les créneaux arrivent après le montage', async () => {
+    // Le cas réel : la page monte, puis l'appel réseau rapporte les créneaux.
+    const timeSlots = ref<any[]>([])
+    const { calendarOptions } = monter(timeSlots)
+    await nextTick()
+
+    timeSlots.value = [creneau('1', '2026-09-27T09:30:00', '2026-09-27T11:00:00')]
+    await nextTick()
+
+    expect(calendarOptions.scrollTime).toBe('57:30:00')
+  })
+})

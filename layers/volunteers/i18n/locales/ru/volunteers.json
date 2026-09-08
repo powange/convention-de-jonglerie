@@ -508,6 +508,17 @@
     "swap_status_refused": "Отклонена",
     "swap_title": "Обменять смену",
     "swap_cancel_confirm_title": "Отозвать эту заявку?",
-    "swap_cancel_confirm_description": "Предложенный обмен будет отменён. Другой волонтёр получит уведомление, а вы сохраните свою смену."
+    "swap_cancel_confirm_description": "Предложенный обмен будет отменён. Другой волонтёр получит уведомление, а вы сохраните свою смену.",
+    "accepted_volunteers": "Принятые волонтёры",
+    "hours_covered_by_organizers": "Часы, закрытые организаторами",
+    "hours_per_volunteer_expected": "Часов на волонтёра",
+    "hours_to_cover": "Часы к покрытию",
+    "staffing_calculator": "Калькулятор состава",
+    "staffing_calculator_awaiting_input": "Введите количество часов, чтобы получить результат.",
+    "staffing_calculator_intro": "Укажите, сколько часов должен отработать волонтёр: расчёт выведет нужное число людей и сравнит его с принятыми волонтёрами.",
+    "staffing_exact": "Состав точно соответствует потребности",
+    "staffing_missing": "Не хватает {count} волонтёров",
+    "staffing_need": "Требуется: {count} волонтёров",
+    "staffing_surplus": "{count} волонтёров сверх необходимого"
   }
 }

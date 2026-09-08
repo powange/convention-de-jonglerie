@@ -508,6 +508,17 @@
     "swap_status_refused": "Odrzucona",
     "swap_title": "Wymień dyżur",
     "swap_cancel_confirm_title": "Wycofać tę prośbę?",
-    "swap_cancel_confirm_description": "Proponowana wymiana zostanie anulowana. Drugi wolontariusz zostanie o tym powiadomiony, a Ty zachowasz swoją zmianę."
+    "swap_cancel_confirm_description": "Proponowana wymiana zostanie anulowana. Drugi wolontariusz zostanie o tym powiadomiony, a Ty zachowasz swoją zmianę.",
+    "accepted_volunteers": "Zaakceptowani wolontariusze",
+    "hours_covered_by_organizers": "Godziny pokryte przez organizatorów",
+    "hours_per_volunteer_expected": "Godziny na wolontariusza",
+    "hours_to_cover": "Godziny do obsadzenia",
+    "staffing_calculator": "Kalkulator obsady",
+    "staffing_calculator_awaiting_input": "Wpisz liczbę godzin, aby zobaczyć wynik.",
+    "staffing_calculator_intro": "Podaj, ile godzin ma przepracować jeden wolontariusz: obliczenie wskaże potrzebną obsadę i porówna ją z zaakceptowanymi wolontariuszami.",
+    "staffing_exact": "Obsada dokładnie odpowiada potrzebom",
+    "staffing_missing": "Brakuje {count} wolontariuszy",
+    "staffing_need": "Potrzebna obsada: {count} wolontariuszy",
+    "staffing_surplus": "{count} wolontariuszy ponad potrzeby"
   }
 }

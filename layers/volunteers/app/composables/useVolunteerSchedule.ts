@@ -1,4 +1,5 @@
 import { dureeTraduisible, formatPlage } from '../utils/plage-horaire'
+import { positionInitialeDuPlanning } from '../utils/position-initiale-planning'
 
 import type { CalendarOptions, EventInput } from '@fullcalendar/core'
 // `ResourceInput` vit dans le paquet `resource`, pas dans `core` : l'importer de `core`
@@ -718,6 +719,33 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
    * recalculée à chaque évaluation, si bien qu'un simple déclenchement du watcher ne dit pas
    * que la période a bougé.
    */
+  /**
+   * Pose la frise sur le premier créneau, une seule fois.
+   *
+   * Les créneaux arrivent après le premier rendu : la position ne peut donc pas être calculée
+   * à la construction des options. Elle est appliquée au premier chargement qui en rapporte au
+   * moins un, puis plus jamais — la replacer à chaque ajout ramènerait le défaut que les tests
+   * de position verrouillent déjà, où remplir un planning obligeait à refaire défiler la frise
+   * après chaque geste.
+   */
+  const positionPosee = ref(false)
+
+  watch(
+    [startDate, () => unref(timeSlots)],
+    ([debut, creneaux]) => {
+      if (positionPosee.value || !creneaux || creneaux.length === 0) return
+
+      const position = positionInitialeDuPlanning(debut, creneaux)
+      positionPosee.value = true
+      if (!position) return
+
+      calendarOptions.scrollTime = position
+      // Les options sont lues au rendu ; le calendrier déjà monté ne les relit pas de lui-même.
+      calendarRef.value?.getApi?.()?.scrollToTime?.(position)
+    },
+    { immediate: true }
+  )
+
   watch(
     [startDate, endDate],
     ([newStartDate, newEndDate], [ancienStart, ancienEnd] = []) => {

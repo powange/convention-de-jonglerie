@@ -508,6 +508,17 @@
     "swap_status_refused": "Geweigerd",
     "swap_title": "Een dienst ruilen",
     "swap_cancel_confirm_title": "Dit verzoek intrekken?",
-    "swap_cancel_confirm_description": "De voorgestelde ruil wordt geannuleerd. De andere vrijwilliger wordt op de hoogte gebracht en u behoudt uw tijdslot."
+    "swap_cancel_confirm_description": "De voorgestelde ruil wordt geannuleerd. De andere vrijwilliger wordt op de hoogte gebracht en u behoudt uw tijdslot.",
+    "accepted_volunteers": "Geaccepteerde vrijwilligers",
+    "hours_covered_by_organizers": "Uren gedekt door organisatoren",
+    "hours_per_volunteer_expected": "Uren per vrijwilliger",
+    "hours_to_cover": "Te dekken uren",
+    "staffing_calculator": "Bezettingscalculator",
+    "staffing_calculator_awaiting_input": "Voer een aantal uren in om het resultaat te zien.",
+    "staffing_calculator_intro": "Geef aan hoeveel uur een vrijwilliger moet doen: de berekening leidt de benodigde bezetting af en vergelijkt die met de geaccepteerde vrijwilligers.",
+    "staffing_exact": "De bezetting komt precies overeen met de behoefte",
+    "staffing_missing": "Er ontbreken {count} vrijwilliger(s)",
+    "staffing_need": "Benodigde bezetting: {count} vrijwilliger(s)",
+    "staffing_surplus": "{count} vrijwilliger(s) meer dan nodig"
   }
 }
