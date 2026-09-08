@@ -42,6 +42,12 @@ export interface VolunteerStatsIndividual {
     nom?: string | null
     [key: string]: any
   }
+  /**
+   * Vrai pour un organisateur tenant des créneaux sans candidature de bénévole. Absent pour un
+   * bénévole accepté, y compris s'il est par ailleurs organisateur de l'édition : c'est bien sa
+   * candidature qui le fait figurer ici.
+   */
+  estOrganisateur?: boolean
   totalHours: number
   totalSlots: number
   dayDetails?: Array<{

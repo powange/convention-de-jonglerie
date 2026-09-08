@@ -376,4 +376,37 @@ describe('statistiques avec organisateurs', () => {
     expect(individuel[0]!.user.id).toBe(50)
     expect(individuel[0]!.totalHours).toBe(4)
   })
+
+  it("signale l'organisateur comme tel dans le relevé individuel", () => {
+    // L'écran affiche un libellé d'après ce drapeau : sans lui, un organisateur passe pour un
+    // bénévole dont on chercherait la candidature en vain.
+    const slots = [
+      creneauMixte(
+        1,
+        '2026-06-16T08:00:00Z',
+        '2026-06-16T12:00:00Z',
+        [user(1, 'alice')],
+        [user(50, 'orga')]
+      ),
+    ]
+
+    const individuel = calculateVolunteersStatsIndividual(slots, [accepted(1, 'alice')])
+    const parId = new Map(individuel.map((ligne) => [ligne.user.id, ligne]))
+
+    expect(parId.get(50)?.estOrganisateur).toBe(true)
+    // Une bénévole reste une bénévole : le drapeau ne doit pas déborder sur sa ligne.
+    expect(parId.get(1)?.estOrganisateur).toBeFalsy()
+  })
+
+  it('ne signale pas un organisateur qui a par ailleurs une candidature acceptée', () => {
+    // C'est sa candidature qui le fait figurer ici, et le relevé doit le dire comme tel.
+    const slots = [
+      creneauMixte(1, '2026-06-16T08:00:00Z', '2026-06-16T12:00:00Z', [], [user(1, 'alice')]),
+    ]
+
+    const individuel = calculateVolunteersStatsIndividual(slots, [accepted(1, 'alice')])
+
+    expect(individuel).toHaveLength(1)
+    expect(individuel[0]!.estOrganisateur).toBeFalsy()
+  })
 })
