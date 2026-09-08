@@ -1,9 +1,5 @@
 <template>
-  <UCard
-    v-if="canManageVolunteers && effectifTotal > 0"
-    variant="soft"
-    class="mt-6"
-  >
+  <UCard v-if="canManageVolunteers && effectifTotal > 0" variant="soft" class="mt-6">
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold flex items-center gap-2">
@@ -153,8 +149,13 @@
                 <div class="flex items-center gap-3">
                   <UiUserAvatar :user="volunteerStat.user" />
                   <div>
-                    <h5 class="font-medium text-gray-900 dark:text-white">
+                    <h5 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
                       {{ volunteerStat.user.pseudo }}
+                      <!-- Même repère que dans l'onglet par jour : sans lui, un organisateur
+                           passe pour un bénévole dont on chercherait la candidature en vain. -->
+                      <UBadge v-if="volunteerStat.estOrganisateur" color="info" variant="soft">
+                        {{ t('volunteers.organizer') }}
+                      </UBadge>
                     </h5>
                     <p
                       v-if="volunteerStat.user.prenom || volunteerStat.user.nom"
@@ -300,7 +301,6 @@ import type {
   VolunteerStatsIndividual,
   TeamStats,
 } from '~/utils/volunteer-stats'
-
 
 interface Props {
   canManageVolunteers: boolean
