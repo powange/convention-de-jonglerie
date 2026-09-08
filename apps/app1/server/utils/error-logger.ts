@@ -119,6 +119,11 @@ function sanitizeBody(body: any): any {
     return body
   }
 
+  // Comparés en minuscules, comme les clés du corps : la liste était écrite en casse mixte et
+  // confrontée à `key.toLowerCase()`, si bien que `currentPassword`, `newPassword`, `apiKey`,
+  // `accessToken`, `refreshToken` et `privateKey` n'ont jamais rien masqué — un mot de passe
+  // courant et une clé d'API partaient en clair dans le journal. Seules les entrées déjà en
+  // minuscules faisaient leur travail.
   const sensitiveFields = [
     'password',
     'newPassword',
@@ -130,9 +135,12 @@ function sanitizeBody(body: any): any {
     'apiKey',
     'secret',
     'privateKey',
-    'phone', // Numéros de téléphone sensibles
+    // Le téléphone reste lisible : masqué, il rendait indiagnosticables les refus de
+    // validation portant précisément sur lui — on lisait « Numéro de téléphone invalide » sans
+    // jamais pouvoir dire lequel. Le corps du journal n'est visible que par un administrateur,
+    // et l'endpoint public de supervision ne l'expose pas.
     'email', // Emails pour RGPD (on garde que le domaine)
-  ]
+  ].map((champ) => champ.toLowerCase())
 
   const sanitized: any = {}
 
