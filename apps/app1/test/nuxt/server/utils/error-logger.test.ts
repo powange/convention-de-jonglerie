@@ -5,17 +5,21 @@ import { logApiError } from '../../../../server/utils/error-logger'
 // Mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
-const makeEvent = (userId?: number) => ({
+const makeEvent = (userId?: number, body?: Record<string, unknown>) => ({
   node: {
     req: {
       url: '/api/test',
-      method: 'GET',
+      // Le corps n'est relevé que hors GET : une requête qui en porte un est donc un POST.
+      method: body ? 'POST' : 'GET',
       headers: {},
       socket: { remoteAddress: '127.0.0.1' },
     },
   },
-  context: { user: userId ? { id: userId } : undefined },
+  context: { user: userId ? { id: userId } : undefined, _body: body },
 })
+
+/** Le corps tel qu'il est finalement écrit dans le journal. */
+const corpsEnregistre = () => prismaMock.apiErrorLog.create.mock.calls[0][0].data.body
 
 describe('error-logger – logApiError', () => {
   beforeEach(() => {
@@ -63,6 +67,63 @@ describe('error-logger – logApiError', () => {
   // Une erreur de validation porte le détail des champs refusés dans `data.errors`, mais seul le
   // message était journalisé : « Données invalides » revenait passage après passage sans qu'on
   // sache quel champ était en cause.
+  /**
+   * Ce que le corps de la requête garde, et ce qu'il perd.
+   *
+   * Le téléphone était masqué comme un mot de passe. Un refus de validation portant précisément
+   * sur lui devenait alors indiagnosticable : le journal disait « Numéro de téléphone invalide »
+   * sans jamais dire lequel. Il reste lisible ; les secrets, eux, ne le sont jamais.
+   */
+  describe('champs du corps conservés ou masqués', () => {
+    beforeEach(() => {
+      prismaMock.apiErrorLog.create.mockResolvedValue({})
+    })
+
+    it('garde le numéro de téléphone lisible', async () => {
+      await logApiError({
+        error: new Error('boom'),
+        statusCode: 400,
+        event: makeEvent(7, { phone: '0612345678', nom: 'Dupont' }) as any,
+      })
+
+      expect(corpsEnregistre()).toMatchObject({ phone: '0612345678', nom: 'Dupont' })
+    })
+
+    it('masque toujours les secrets, quelle que soit la casse du champ', async () => {
+      // `currentPassword` et `apiKey` ne l'étaient pas : la liste des champs sensibles était
+      // écrite en casse mixte et confrontée à une clé mise en minuscules, si bien qu'un mot de
+      // passe courant partait en clair dans le journal.
+
+      await logApiError({
+        error: new Error('boom'),
+        statusCode: 400,
+        event: makeEvent(7, {
+          password: 'hunter2',
+          currentPassword: 'hunter1',
+          token: 'abc',
+          apiKey: 'xyz',
+        }) as any,
+      })
+
+      expect(corpsEnregistre()).toEqual({
+        password: '***REDACTED***',
+        currentPassword: '***REDACTED***',
+        token: '***REDACTED***',
+        apiKey: '***REDACTED***',
+      })
+    })
+
+    it("ne garde que le domaine d'une adresse e-mail", async () => {
+      await logApiError({
+        error: new Error('boom'),
+        statusCode: 400,
+        event: makeEvent(7, { email: 'quelquun@exemple.fr' }) as any,
+      })
+
+      expect(corpsEnregistre()).toEqual({ email: '***@exemple.fr' })
+    })
+  })
+
   describe('détail des champs refusés par la validation', () => {
     const erreurValidation = (errors: Record<string, string>) =>
       Object.assign(new Error('Données invalides'), {

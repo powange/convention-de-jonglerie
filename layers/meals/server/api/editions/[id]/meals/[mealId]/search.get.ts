@@ -2,6 +2,7 @@ import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageMealsOrValidation } from '#server/utils/permissions/edition-permissions'
+import { correspondAuxMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -26,7 +27,13 @@ export default wrapApiHandler(
       return { results: [] }
     }
 
-    const searchLower = searchTerm.toLowerCase()
+    // Découpée en mots plutôt que comparée d'un bloc : « omer emma » doit trouver la personne
+    // dont le nom et le prénom portent chacun un des deux mots, et un espace en trop ne doit
+    // plus rien changer.
+    const motsCles = motsClesDeLaRequete(searchTerm)
+    if (motsCles.length === 0) {
+      return { results: [] }
+    }
 
     // Vérifier que le repas existe et appartient à cette édition
     const meal = await prisma.volunteerMeal.findFirst({ where: { id: mealId, editionId } })
@@ -69,11 +76,10 @@ export default wrapApiHandler(
 
     for (const selection of volunteerMealSelections) {
       const volunteer = selection.volunteer
-      const matchesSearch =
-        volunteer.user.nom?.toLowerCase().includes(searchLower) ||
-        volunteer.user.prenom?.toLowerCase().includes(searchLower) ||
-        volunteer.user.pseudo?.toLowerCase().includes(searchLower) ||
-        volunteer.user.email?.toLowerCase().includes(searchLower)
+      const matchesSearch = correspondAuxMotsCles(
+        [volunteer.user.nom, volunteer.user.prenom, volunteer.user.pseudo, volunteer.user.email],
+        motsCles
+      )
 
       if (matchesSearch) {
         results.push({
@@ -94,11 +100,10 @@ export default wrapApiHandler(
     const artistSelections = await ports.artists.listMealSelections(editionId, mealId)
 
     for (const row of artistSelections) {
-      const matchesSearch =
-        row.nom?.toLowerCase().includes(searchLower) ||
-        row.prenom?.toLowerCase().includes(searchLower) ||
-        row.pseudo?.toLowerCase().includes(searchLower) ||
-        row.email?.toLowerCase().includes(searchLower)
+      const matchesSearch = correspondAuxMotsCles(
+        [row.nom, row.prenom, row.pseudo, row.email],
+        motsCles
+      )
 
       if (matchesSearch) {
         results.push({
@@ -119,10 +124,10 @@ export default wrapApiHandler(
     const ticketRows = await ports.ticketing.listMealTicketParticipants(mealId)
 
     for (const row of ticketRows) {
-      const matchesSearch =
-        row.lastName?.toLowerCase().includes(searchLower) ||
-        row.firstName?.toLowerCase().includes(searchLower) ||
-        row.email?.toLowerCase().includes(searchLower)
+      const matchesSearch = correspondAuxMotsCles(
+        [row.lastName, row.firstName, row.email],
+        motsCles
+      )
 
       if (matchesSearch) {
         results.push({
@@ -159,11 +164,10 @@ export default wrapApiHandler(
 
     for (const eo of editionOrganizers) {
       const organizerUser = eo.organizer.user
-      const matchesSearch =
-        organizerUser.nom?.toLowerCase().includes(searchLower) ||
-        organizerUser.prenom?.toLowerCase().includes(searchLower) ||
-        organizerUser.pseudo?.toLowerCase().includes(searchLower) ||
-        organizerUser.email?.toLowerCase().includes(searchLower)
+      const matchesSearch = correspondAuxMotsCles(
+        [organizerUser.nom, organizerUser.prenom, organizerUser.pseudo, organizerUser.email],
+        motsCles
+      )
 
       if (matchesSearch) {
         results.push({
