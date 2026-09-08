@@ -10,15 +10,31 @@
           {{ $t('gestion.faq.description') }}
         </p>
       </div>
-      <UButton
-        v-if="canManage"
-        icon="i-heroicons-plus"
-        size="sm"
-        color="primary"
-        @click="openEntryModal(null)"
-      >
-        {{ $t('gestion.faq.new_entry') }}
-      </UButton>
+      <div class="flex items-center gap-2">
+        <!-- Deux documents pour deux usages : celui qu'on laisse à l'accueil, et celui qui sert
+             en interne. Le choix se fait au moment de générer plutôt que par une option cachée
+             ailleurs, parce qu'il change ce qui sort du site. -->
+        <UDropdownMenu v-if="entries.length" :items="elementsPdf">
+          <UButton
+            icon="i-heroicons-document-arrow-down"
+            size="sm"
+            color="neutral"
+            variant="outline"
+            :loading="generationPdf"
+          >
+            {{ $t('gestion.faq.export_pdf') }}
+          </UButton>
+        </UDropdownMenu>
+        <UButton
+          v-if="canManage"
+          icon="i-heroicons-plus"
+          size="sm"
+          color="primary"
+          @click="openEntryModal(null)"
+        >
+          {{ $t('gestion.faq.new_entry') }}
+        </UButton>
+      </div>
     </div>
 
     <!-- Visibilité de la page publique (réservé aux éditeurs) -->
@@ -197,7 +213,6 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 
-// Layer faq : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
 import {
   countMatches,
   highlightHtml,
@@ -207,6 +222,12 @@ import {
   useAuthStore,
   useEditionStore,
 } from '#imports'
+
+import { nomFichierFaq, preparerFaqPourPdf } from '../../../../../utils/faq-pdf'
+
+import { htmlVersTexte } from '~~/shared/utils/html-to-text'
+
+// Layer faq : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -325,6 +346,122 @@ async function renderAnswer(entry: FaqEntry) {
   answerHtmlCache.value[entry.id] = await markdownToHtml(entry.answer)
 }
 
+/**
+ * Le document imprimable de la FAQ.
+ *
+ * Les réponses sont écrites en markdown : on les passe par le rendu de la page puis on retire le
+ * balisage, plutôt que d'écrire une seconde interprétation du markdown qui divergerait de ce que
+ * l'écran affiche.
+ */
+const generationPdf = ref(false)
+
+const elementsPdf = computed(() => [
+  [
+    {
+      label: t('gestion.faq.export_pdf_public'),
+      icon: 'i-heroicons-eye',
+      onSelect: () => genererPdf(false),
+    },
+    {
+      label: t('gestion.faq.export_pdf_all'),
+      icon: 'i-heroicons-eye-slash',
+      onSelect: () => genererPdf(true),
+    },
+  ],
+])
+
+async function genererPdf(inclurePrivees: boolean) {
+  generationPdf.value = true
+  try {
+    const sources = await Promise.all(
+      entries.value.map(async (entree) => ({
+        question: entree.question,
+        reponseTexte: htmlVersTexte(await markdownToHtml(entree.answer)),
+        isPublic: entree.isPublic,
+      }))
+    )
+
+    const aImprimer = preparerFaqPourPdf(sources, { inclurePrivees })
+    if (!aImprimer.length) {
+      useToast().add({
+        title: t('gestion.faq.export_pdf_empty'),
+        icon: 'i-heroicons-exclamation-circle',
+        color: 'warning',
+      })
+      return
+    }
+
+    const { jsPDF } = await import('jspdf')
+    const doc = new jsPDF()
+
+    const MARGE = 20
+    const LARGEUR = doc.internal.pageSize.getWidth() - MARGE * 2
+    const BAS_DE_PAGE = doc.internal.pageSize.getHeight() - MARGE
+    let y = MARGE
+
+    /** Passe à la page suivante quand la hauteur demandée ne tient plus. */
+    const reserver = (hauteur: number) => {
+      if (y + hauteur > BAS_DE_PAGE) {
+        doc.addPage()
+        y = MARGE
+      }
+    }
+
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text(t('gestion.faq.title'), MARGE, y)
+    y += 8
+
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    const sousTitre = [edition.value?.convention?.name, edition.value?.name]
+      .filter(Boolean)
+      .join(' - ')
+    if (sousTitre) {
+      doc.text(sousTitre, MARGE, y)
+      y += 8
+    }
+    y += 4
+
+    for (const entree of aImprimer) {
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      const question = doc.splitTextToSize(
+        entree.prive ? `${entree.question}  [${t('common.private')}]` : entree.question,
+        LARGEUR
+      )
+      reserver(question.length * 6 + 8)
+      doc.text(question, MARGE, y)
+      y += question.length * 6 + 2
+
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'normal')
+      // Les paragraphes sont rendus un a un : `splitTextToSize` ne coupe que sur la largeur, et
+      // une reponse en plusieurs paragraphes deviendrait sinon un pave continu.
+      for (const paragraphe of entree.reponse.split('\n\n')) {
+        const lignes = doc.splitTextToSize(paragraphe, LARGEUR)
+        for (const ligne of lignes) {
+          reserver(6)
+          doc.text(ligne, MARGE, y)
+          y += 6
+        }
+        y += 2
+      }
+      y += 6
+    }
+
+    doc.save(nomFichierFaq(edition.value?.name))
+  } catch (e: any) {
+    useToast().add({
+      title: e?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    generationPdf.value = false
+  }
+}
+
 await fetchEntries()
 
 const entryModalOpen = ref(false)
@@ -409,6 +546,9 @@ async function onDrop(target: FaqEntry, e: DragEvent) {
   if (fromIdx === -1 || targetIdx === -1) return
   const next = [...entries.value]
   const [moved] = next.splice(fromIdx, 1)
+  // L'indice vient d'être trouvé dans ce même tableau : ce garde-fou ne se déclenche pas, il dit
+  // au compilateur ce que la recherche ci-dessus garantit déjà.
+  if (!moved) return
   next.splice(targetIdx, 0, moved)
   entries.value = next
   try {

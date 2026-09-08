@@ -125,7 +125,11 @@
       "question": "Питання",
       "question_placeholder": "Напр.: О котрій годині відчиняються двері?",
       "search_placeholder": "Пошук у FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Експорт у PDF",
+      "export_pdf_all": "Усе, зі статусами",
+      "export_pdf_empty": "Немає записів для експорту",
+      "export_pdf_public": "Публічний FAQ"
     },
     "features": {
       "artists_description": "Увімкнути управління артистами та шоу для цього випуску",

@@ -125,7 +125,11 @@
       "question": "Domanda",
       "question_placeholder": "Es.: A che ora aprono le porte?",
       "search_placeholder": "Cerca nelle FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Esporta in PDF",
+      "export_pdf_all": "Tutto, con lo stato",
+      "export_pdf_empty": "Nessuna voce da esportare",
+      "export_pdf_public": "FAQ pubbliche"
     },
     "features": {
       "artists_description": "Abilitare la gestione degli artisti e degli spettacoli per questa edizione",

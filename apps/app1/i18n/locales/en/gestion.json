@@ -125,7 +125,11 @@
       "question": "Question",
       "question_placeholder": "E.g.: What time do the doors open?",
       "search_placeholder": "Search in FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Export as PDF",
+      "export_pdf_all": "Everything, with status",
+      "export_pdf_empty": "No entry to export",
+      "export_pdf_public": "Public FAQ"
     },
     "features": {
       "artists_description": "Enable artist and show management for this edition",

@@ -125,7 +125,11 @@
       "question": "Fråga",
       "question_placeholder": "T.ex.: När öppnar dörrarna?",
       "search_placeholder": "Sök i FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Exportera som PDF",
+      "export_pdf_all": "Allt, med status",
+      "export_pdf_empty": "Inga poster att exportera",
+      "export_pdf_public": "Offentlig FAQ"
     },
     "features": {
       "artists_description": "Aktivera hantering av artister och föreställningar för denna upplaga",

@@ -125,7 +125,11 @@
       "question": "Вопрос",
       "question_placeholder": "Напр.: Во сколько открываются двери?",
       "search_placeholder": "Поиск в FAQ…",
-      "title": "FAQ"
+      "title": "FAQ",
+      "export_pdf": "Экспорт в PDF",
+      "export_pdf_all": "Всё, со статусами",
+      "export_pdf_empty": "Нет записей для экспорта",
+      "export_pdf_public": "Публичный FAQ"
     },
     "features": {
       "artists_description": "Включить управление артистами и шоу для этого выпуска",
