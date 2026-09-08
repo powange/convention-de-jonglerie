@@ -12,7 +12,12 @@ import { requireApiToken } from '#server/utils/public-api-auth'
  *   ou en-tête `Authorization: Bearer <token>`
  *
  * ⚠️ Seuls des champs NON sensibles sont exposés (pas d'IP, user-agent,
- * utilisateur, body, headers, stack, referer…), car l'endpoint est public.
+ * utilisateur, body, headers, stack…), car l'endpoint est public.
+ *
+ * `referer` fait exception depuis qu'il a manqué : des `/api/editions/NaN` revenaient sans qu'on
+ * puisse dire quelle page construisait cette URL, et le diagnostic s'arrêtait là. C'est une
+ * adresse de notre propre site, sans donnée personnelle ; elle révèle en revanche quelles pages
+ * existent à qui détient le token, ce qui a été jugé acceptable pour ce que le champ fait gagner.
  *
  * Paramètres :
  *   - `limit`  : nombre maximum d'entrées (défaut 100, max 500)
@@ -52,6 +57,9 @@ export default wrapApiHandler(
         errorType: true,
         method: true,
         path: true,
+        // La page d'où venait la requête : sans elle, une erreur due à un lien mal construit ne
+        // se remonte pas jusqu'à la page fautive.
+        referer: true,
         createdAt: true,
       },
     })
