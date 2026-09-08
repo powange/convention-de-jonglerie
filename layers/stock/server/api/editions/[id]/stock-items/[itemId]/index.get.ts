@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
+import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { canAccessStock, stockItemLocationInclude } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -31,6 +32,10 @@ export default wrapApiHandler(
       include: {
         group: { select: { id: true, name: true } },
         ...stockItemLocationInclude,
+        // Les responsables de la récupération et du retour : la fiche les affiche avec leur
+        // avatar, comme partout ailleurs.
+        pickupResponsible: { select: userWithProfileAndGravatarSelect },
+        returnResponsible: { select: userWithProfileAndGravatarSelect },
         reservations: {
           orderBy: { startsAt: 'asc' },
           include: {

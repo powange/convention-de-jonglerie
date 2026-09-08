@@ -155,6 +155,8 @@ export const USER_REFERENCES: UserReference[] = [
 
   // --- Stock ---
   { model: 'stockReservation', field: 'userId', group: 'stock' },
+  { model: 'stockItem', field: 'pickupResponsibleId', group: 'stock' },
+  { model: 'stockItem', field: 'returnResponsibleId', group: 'stock' },
 
   // --- Publications d'édition ---
   { model: 'editionPost', field: 'userId', group: 'posts' },

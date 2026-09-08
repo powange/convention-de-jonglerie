@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { erreurOrdreEmprunt } from '#server/utils/emprunt-stock'
 import {
   canManageStock,
   getEditionWithPermissions,
@@ -26,7 +27,17 @@ const bodySchema = z.object({
   isExternalLoan: z.boolean().optional(),
   ownerContact: z.string().trim().max(500).nullable().optional(),
   returnDueAt: z.string().datetime().nullable().optional(),
+  pickedUpAt: z.string().datetime().nullable().optional(),
   returnedAt: z.string().datetime().nullable().optional(),
+  pickupLocation: z.string().trim().max(500).nullable().optional(),
+  pickupResponsibleId: z.number().int().positive().nullable().optional(),
+  pickupContact: z.string().trim().max(500).nullable().optional(),
+  returnLocation: z.string().trim().max(500).nullable().optional(),
+  returnResponsibleId: z.number().int().positive().nullable().optional(),
+  returnContact: z.string().trim().max(500).nullable().optional(),
+  // Zéro accepté, contrairement à `quantity` : tout perdre est un constat possible. `null`
+  // remet le compteur à « pas encore compté ».
+  finalQuantity: z.number().int().min(0).nullable().optional(),
 })
 
 export default wrapApiHandler(
@@ -107,23 +118,64 @@ export default wrapApiHandler(
     if (data.markerId !== undefined) updateData.markerId = data.markerId
     // Emprunt externe : si on désactive le flag, on nettoie les autres champs
     // pour éviter de garder des données fantômes en base. Si on désactive
-    // explicitement, on ignore aussi les valeurs envoyées sur les 3 champs
-    // (ownerContact / returnDueAt / returnedAt) pour ne pas les ré-écraser.
+    // explicitement, on ignore aussi les valeurs envoyées sur ces champs
+    // pour ne pas les ré-écraser.
     const disablingLoan = data.isExternalLoan === false
     if (data.isExternalLoan !== undefined) {
       updateData.isExternalLoan = data.isExternalLoan
       if (disablingLoan) {
         updateData.ownerContact = null
         updateData.returnDueAt = null
+        updateData.pickedUpAt = null
         updateData.returnedAt = null
+        // La logistique de récupération et de retour n'a plus d'objet sans emprunt : la laisser
+        // en base ressusciterait des indications périmées si la case était recochée plus tard.
+        updateData.pickupLocation = null
+        updateData.pickupResponsibleId = null
+        updateData.pickupContact = null
+        updateData.returnLocation = null
+        updateData.returnResponsibleId = null
+        updateData.returnContact = null
       }
     }
     if (data.ownerContact !== undefined && !disablingLoan)
       updateData.ownerContact = data.ownerContact?.trim() || null
     if (data.returnDueAt !== undefined && !disablingLoan)
       updateData.returnDueAt = data.returnDueAt ? new Date(data.returnDueAt) : null
+    if (data.pickedUpAt !== undefined && !disablingLoan)
+      updateData.pickedUpAt = data.pickedUpAt ? new Date(data.pickedUpAt) : null
     if (data.returnedAt !== undefined && !disablingLoan)
       updateData.returnedAt = data.returnedAt ? new Date(data.returnedAt) : null
+
+    // L'emprunt se déroule dans l'ordre : récupéré, puis rendu. C'est l'état après écriture qui
+    // est jugé, de sorte qu'une requête posant les deux dates d'un coup reste acceptée.
+    if (!disablingLoan) {
+      const erreur = erreurOrdreEmprunt(existing, {
+        ...(updateData.pickedUpAt !== undefined
+          ? { pickedUpAt: updateData.pickedUpAt as Date | null }
+          : {}),
+        ...(updateData.returnedAt !== undefined
+          ? { returnedAt: updateData.returnedAt as Date | null }
+          : {}),
+      })
+      if (erreur) throw createError({ status: 400, message: erreur })
+    }
+    if (data.pickupLocation !== undefined && !disablingLoan)
+      updateData.pickupLocation = data.pickupLocation?.trim() || null
+    if (data.pickupResponsibleId !== undefined && !disablingLoan)
+      updateData.pickupResponsibleId = data.pickupResponsibleId
+    if (data.pickupContact !== undefined && !disablingLoan)
+      updateData.pickupContact = data.pickupContact?.trim() || null
+    if (data.returnLocation !== undefined && !disablingLoan)
+      updateData.returnLocation = data.returnLocation?.trim() || null
+    if (data.returnResponsibleId !== undefined && !disablingLoan)
+      updateData.returnResponsibleId = data.returnResponsibleId
+    if (data.returnContact !== undefined && !disablingLoan)
+      updateData.returnContact = data.returnContact?.trim() || null
+
+    // Le comptage de fin vaut pour tout le matériel, emprunté ou non : c'est là que les pertes
+    // se constatent.
+    if (data.finalQuantity !== undefined) updateData.finalQuantity = data.finalQuantity
 
     // Si la quantité diminue, vérifier qu'aucune réservation active/future ne
     // dépasse la nouvelle quantité sur sa période. Sinon des réservations

@@ -91,6 +91,8 @@ model User {
   treasuryAdvances                   TreasuryEntry[]                     @relation("TreasuryAdvances")
   artistPickupResponsibilities       EditionArtist[]                     @relation("ArtistPickupResponsible")
   artistDropoffResponsibilities      EditionArtist[]                     @relation("ArtistDropoffResponsible")
+  stockPickupResponsibilities        StockItem[]                         @relation("StockPickupResponsible")
+  stockReturnResponsibilities        StockItem[]                         @relation("StockReturnResponsible")
   volunteerComments                  VolunteerComment[]
   conversationParticipants           ConversationParticipant[]
   showApplications                   ShowApplication[]
