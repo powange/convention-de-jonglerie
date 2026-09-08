@@ -508,6 +508,17 @@
     "swap_status_refused": "Avböjt",
     "swap_title": "Byta pass",
     "swap_cancel_confirm_title": "Dra tillbaka denna begäran?",
-    "swap_cancel_confirm_description": "Det föreslagna bytet avbryts. Den andra volontären meddelas och du behåller ditt pass."
+    "swap_cancel_confirm_description": "Det föreslagna bytet avbryts. Den andra volontären meddelas och du behåller ditt pass.",
+    "accepted_volunteers": "Godkända volontärer",
+    "hours_covered_by_organizers": "Timmar som täcks av arrangörerna",
+    "hours_per_volunteer_expected": "Timmar per volontär",
+    "hours_to_cover": "Timmar att täcka",
+    "staffing_calculator": "Bemanningskalkylator",
+    "staffing_calculator_awaiting_input": "Ange ett antal timmar för att få resultatet.",
+    "staffing_calculator_intro": "Ange hur många timmar en volontär förväntas göra: beräkningen tar fram den bemanning som behövs och jämför den med de godkända volontärerna.",
+    "staffing_exact": "Bemanningen motsvarar behovet exakt",
+    "staffing_missing": "Det saknas {count} volontärer",
+    "staffing_need": "Bemanning som behövs: {count} volontärer",
+    "staffing_surplus": "{count} volontärer utöver behovet"
   }
 }

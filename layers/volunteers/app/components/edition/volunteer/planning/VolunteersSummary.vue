@@ -29,15 +29,25 @@
         <!-- Deux mesures distinctes : ce qui est pourvu, et ce qu'il y a à pourvoir. Les
              afficher côte à côte évite qu'on s'étonne de voir un total plus élevé dans
              l'onglet par équipe. -->
-        <div class="text-center">
+        <!-- Cliquable : c'est en regardant ce rapport qu'on se demande combien de bénévoles il
+             manque, et la modale répond sans quitter la page. -->
+        <button
+          type="button"
+          class="text-center rounded-lg p-1 -m-1 transition hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+          :title="t('volunteers.staffing_calculator')"
+          @click="calculateurOuvert = true"
+        >
           <div class="text-2xl font-bold text-primary-600">
             {{ volunteersStats.totalHours.toFixed(1) }}h
             <span class="text-base font-normal text-gray-400">
               / {{ heuresAPourvoir.toFixed(1) }}h
             </span>
           </div>
-          <div class="text-sm text-gray-500">{{ t('volunteers.hours_covered_of_needed') }}</div>
-        </div>
+          <div class="text-sm text-gray-500 flex items-center justify-center gap-1">
+            {{ t('volunteers.hours_covered_of_needed') }}
+            <UIcon name="i-heroicons-calculator" class="w-4 h-4 shrink-0" />
+          </div>
+        </button>
         <div class="text-center">
           <div class="text-2xl font-bold text-green-600">
             {{ volunteersStats.averageHours.toFixed(1) }}h
@@ -270,6 +280,13 @@
         </div>
       </div>
     </div>
+
+    <EditionVolunteerPlanningStaffingCalculatorModal
+      v-model="calculateurOuvert"
+      :heures-a-pourvoir="heuresAPourvoir"
+      :heures-des-organisateurs="heuresDesOrganisateurs"
+      :benevoles-acceptes="volunteersStats.totalVolunteers"
+    />
   </UCard>
 </template>
 
@@ -293,6 +310,8 @@ interface Props {
   volunteersStatsByTeam: TeamStats[]
   activeStatsTab?: string
   formatDate: (date: string) => string
+  /** Heures déjà tenues par des organisateurs : elles se retranchent du besoin en bénévoles. */
+  heuresDesOrganisateurs?: number
 }
 
 const props = defineProps<Props>()
@@ -301,6 +320,9 @@ const props = defineProps<Props>()
 const { t } = useI18n()
 
 const ongletActif = ref(props.activeStatsTab || 'hours-per-volunteer')
+
+const calculateurOuvert = ref(false)
+const heuresDesOrganisateurs = computed(() => props.heuresDesOrganisateurs ?? 0)
 
 /**
  * Tout le monde compte : la carte doit paraître même sur une édition tenue par les seuls

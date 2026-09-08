@@ -78,6 +78,7 @@
           :volunteers-stats-by-day="volunteersStatsByDay"
           :volunteers-stats-individual="volunteersStatsIndividual"
           :volunteers-stats-by-team="volunteersStatsByTeam"
+          :heures-des-organisateurs="heuresDesOrganisateurs"
           :active-stats-tab="activeStatsTab"
           :format-date="formatDate"
         />
@@ -128,6 +129,7 @@
 import { useDatetime } from '~/composables/useDatetime'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { heuresDesOrganisateurs as heuresOrganisateurs } from '~/utils/besoin-benevoles'
 import { detecterSpectaclesManques } from '~/utils/spectacles-manques'
 import {
   calculateVolunteersStats,
@@ -777,6 +779,10 @@ const volunteersStatsByTeam = computed(() =>
 const volunteersStatsIndividual = computed(() =>
   calculateVolunteersStatsIndividual(convertedTimeSlots.value, acceptedVolunteers.value)
 )
+
+// Les heures des organisateurs, à part : le calculateur d'effectif les retranche de ce qu'il y a
+// à pourvoir, un organisateur couvrant un poste sans avoir d'heures à faire.
+const heuresDesOrganisateurs = computed(() => heuresOrganisateurs(convertedTimeSlots.value))
 
 // Permissions calculées
 // Charger l'édition si nécessaire

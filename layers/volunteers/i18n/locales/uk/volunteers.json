@@ -508,6 +508,17 @@
     "swap_status_refused": "Відхилено",
     "swap_title": "Обміняти зміну",
     "swap_cancel_confirm_title": "Відкликати цей запит?",
-    "swap_cancel_confirm_description": "Запропонований обмін буде скасовано. Інший волонтер отримає сповіщення, а ви збережете свою зміну."
+    "swap_cancel_confirm_description": "Запропонований обмін буде скасовано. Інший волонтер отримає сповіщення, а ви збережете свою зміну.",
+    "accepted_volunteers": "Прийняті волонтери",
+    "hours_covered_by_organizers": "Години, покриті організаторами",
+    "hours_per_volunteer_expected": "Годин на волонтера",
+    "hours_to_cover": "Години до покриття",
+    "staffing_calculator": "Калькулятор складу",
+    "staffing_calculator_awaiting_input": "Введіть кількість годин, щоб отримати результат.",
+    "staffing_calculator_intro": "Вкажіть, скільки годин має відпрацювати волонтер: розрахунок визначить потрібну кількість людей і порівняє її з прийнятими волонтерами.",
+    "staffing_exact": "Склад точно відповідає потребі",
+    "staffing_missing": "Бракує {count} волонтерів",
+    "staffing_need": "Потрібно: {count} волонтерів",
+    "staffing_surplus": "{count} волонтерів понад потребу"
   }
 }

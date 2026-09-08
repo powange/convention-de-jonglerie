@@ -508,6 +508,17 @@
     "swap_status_refused": "Declined",
     "swap_title": "Swap a shift",
     "swap_cancel_confirm_title": "Withdraw this request?",
-    "swap_cancel_confirm_description": "The proposed swap will be cancelled. The other volunteer will be notified, and you will keep your time slot."
+    "swap_cancel_confirm_description": "The proposed swap will be cancelled. The other volunteer will be notified, and you will keep your time slot.",
+    "accepted_volunteers": "Accepted volunteers",
+    "hours_covered_by_organizers": "Hours covered by organisers",
+    "hours_per_volunteer_expected": "Hours per volunteer",
+    "hours_to_cover": "Hours to cover",
+    "staffing_calculator": "Staffing calculator",
+    "staffing_calculator_awaiting_input": "Enter a number of hours to get the result.",
+    "staffing_calculator_intro": "Enter the number of hours each volunteer is expected to do: the calculation works out the headcount needed and compares it with the accepted volunteers.",
+    "staffing_exact": "The headcount matches the need exactly",
+    "staffing_missing": "{count} volunteer(s) short",
+    "staffing_need": "Headcount needed: {count} volunteer(s)",
+    "staffing_surplus": "{count} volunteer(s) beyond what is needed"
   }
 }

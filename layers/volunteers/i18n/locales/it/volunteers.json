@@ -508,6 +508,17 @@
     "swap_status_refused": "Rifiutata",
     "swap_title": "Scambiare un turno",
     "swap_cancel_confirm_title": "Ritirare questa richiesta?",
-    "swap_cancel_confirm_description": "Lo scambio proposto sarà annullato. L'altro volontario ne sarà informato e tu manterrai il tuo turno."
+    "swap_cancel_confirm_description": "Lo scambio proposto sarà annullato. L'altro volontario ne sarà informato e tu manterrai il tuo turno.",
+    "accepted_volunteers": "Volontari accettati",
+    "hours_covered_by_organizers": "Ore coperte dagli organizzatori",
+    "hours_per_volunteer_expected": "Ore per volontario",
+    "hours_to_cover": "Ore da coprire",
+    "staffing_calculator": "Calcolatore di organico",
+    "staffing_calculator_awaiting_input": "Inserisci un numero di ore per ottenere il risultato.",
+    "staffing_calculator_intro": "Indica quante ore deve fare ogni volontario: il calcolo ricava l'organico necessario e lo confronta con i volontari accettati.",
+    "staffing_exact": "L'organico corrisponde esattamente al fabbisogno",
+    "staffing_missing": "Mancano {count} volontari",
+    "staffing_need": "Organico necessario: {count} volontari",
+    "staffing_surplus": "{count} volontari oltre il necessario"
   }
 }

@@ -508,6 +508,17 @@
     "swap_status_refused": "Abgelehnt",
     "swap_title": "Schicht tauschen",
     "swap_cancel_confirm_title": "Diese Anfrage zurückziehen?",
-    "swap_cancel_confirm_description": "Der vorgeschlagene Tausch wird abgebrochen. Der andere Helfer wird benachrichtigt, und Sie behalten Ihr Zeitfenster."
+    "swap_cancel_confirm_description": "Der vorgeschlagene Tausch wird abgebrochen. Der andere Helfer wird benachrichtigt, und Sie behalten Ihr Zeitfenster.",
+    "accepted_volunteers": "Angenommene Freiwillige",
+    "hours_covered_by_organizers": "Von Organisatoren übernommene Stunden",
+    "hours_per_volunteer_expected": "Stunden pro Freiwilligem",
+    "hours_to_cover": "Zu besetzende Stunden",
+    "staffing_calculator": "Personalrechner",
+    "staffing_calculator_awaiting_input": "Geben Sie eine Stundenzahl ein, um das Ergebnis zu erhalten.",
+    "staffing_calculator_intro": "Geben Sie an, wie viele Stunden ein Freiwilliger leisten soll: Die Berechnung ermittelt den nötigen Personalbedarf und vergleicht ihn mit den angenommenen Freiwilligen.",
+    "staffing_exact": "Der Personalbestand entspricht genau dem Bedarf",
+    "staffing_missing": "Es fehlen {count} Freiwillige",
+    "staffing_need": "Benötigt: {count} Freiwillige",
+    "staffing_surplus": "{count} Freiwillige über dem Bedarf"
   }
 }

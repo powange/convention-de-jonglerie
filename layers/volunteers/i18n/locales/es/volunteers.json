@@ -508,6 +508,17 @@
     "swap_status_refused": "Rechazada",
     "swap_title": "Intercambiar un turno",
     "swap_cancel_confirm_title": "¿Retirar esta solicitud?",
-    "swap_cancel_confirm_description": "El intercambio propuesto se cancelará. Se informará al otro voluntario y usted conservará su turno."
+    "swap_cancel_confirm_description": "El intercambio propuesto se cancelará. Se informará al otro voluntario y usted conservará su turno.",
+    "accepted_volunteers": "Voluntarios aceptados",
+    "hours_covered_by_organizers": "Horas cubiertas por los organizadores",
+    "hours_per_volunteer_expected": "Horas por voluntario",
+    "hours_to_cover": "Horas por cubrir",
+    "staffing_calculator": "Calculadora de personal",
+    "staffing_calculator_awaiting_input": "Introduce un número de horas para obtener el resultado.",
+    "staffing_calculator_intro": "Indica cuántas horas debe hacer cada voluntario: el cálculo deduce el personal necesario y lo compara con los voluntarios aceptados.",
+    "staffing_exact": "El personal coincide exactamente con la necesidad",
+    "staffing_missing": "Faltan {count} voluntario(s)",
+    "staffing_need": "Personal necesario: {count} voluntario(s)",
+    "staffing_surplus": "{count} voluntario(s) por encima de lo necesario"
   }
 }

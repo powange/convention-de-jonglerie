@@ -508,6 +508,17 @@
     "swap_status_refused": "Afvist",
     "swap_title": "Byt en vagt",
     "swap_cancel_confirm_title": "Træk denne anmodning tilbage?",
-    "swap_cancel_confirm_description": "Det foreslåede bytte annulleres. Den anden frivillige får besked, og du beholder din vagt."
+    "swap_cancel_confirm_description": "Det foreslåede bytte annulleres. Den anden frivillige får besked, og du beholder din vagt.",
+    "accepted_volunteers": "Accepterede frivillige",
+    "hours_covered_by_organizers": "Timer dækket af arrangørerne",
+    "hours_per_volunteer_expected": "Timer pr. frivillig",
+    "hours_to_cover": "Timer der skal dækkes",
+    "staffing_calculator": "Bemandingsberegner",
+    "staffing_calculator_awaiting_input": "Indtast et antal timer for at få resultatet.",
+    "staffing_calculator_intro": "Angiv hvor mange timer en frivillig skal tage: beregningen udleder den nødvendige bemanding og sammenligner den med de accepterede frivillige.",
+    "staffing_exact": "Bemandingen svarer nøjagtigt til behovet",
+    "staffing_missing": "Der mangler {count} frivillige",
+    "staffing_need": "Nødvendig bemanding: {count} frivillige",
+    "staffing_surplus": "{count} frivillige ud over det nødvendige"
   }
 }
