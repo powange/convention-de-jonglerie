@@ -164,9 +164,13 @@
       "skills": "Compétences",
       "team_distribution": {
         "all_teams": "Toutes équipes",
-        "description": "Répartition des bénévoles acceptés dans les équipes. Sur ordinateur, glissez-déposez pour déplacer. Sur mobile, cliquez pour sélectionner l'équipe.",
-        "drop_volunteers_here": "Glissez-déposez des bénévoles ici",
+        "description": "Répartition des bénévoles acceptés dans les équipes. Cliquez sur un bénévole pour choisir son équipe.",
         "empty_team": "Équipe vide",
+        "no_teams": "Aucune équipe de bénévoles sur cette édition",
+        "no_preferred_teams": "Ce bénévole n'a exprimé aucun souhait d'équipe.",
+        "other_teams": "Autres équipes",
+        "preferred_teams": "Équipes souhaitées",
+        "select_teams_instruction": "Cochez les équipes de ce bénévole",
         "leader_added": "Responsable ajouté",
         "leader_badge": "Responsable",
         "leader_removed": "Responsable retiré",
@@ -174,18 +178,11 @@
         "max_label": "Max:",
         "organizers_label": "Organisateurs rattachés",
         "modal": {
-          "add": "Ajouter",
-          "add_description_multiple": "Garder le bénévole dans ses équipes actuelles et l'ajouter aussi à \"{targetTeam}\"",
-          "add_description_single": "Garder le bénévole dans \"{sourceTeam}\" et l'assigner aussi à \"{targetTeam}\"",
-          "cancel": "Annuler",
-          "move": "Déplacer",
-          "move_description_multiple": "Retirer le bénévole de toutes ses équipes actuelles et le placer dans \"{targetTeam}\"",
-          "move_description_single": "Retirer le bénévole de \"{sourceTeam}\" et le placer dans \"{targetTeam}\"",
-          "question": "Que souhaitez-vous faire ?"
+          "assign_title": "Assigner {name}",
+          "assign_title_generic": "Sélectionner une équipe"
         },
         "preferences_label": "Préf:",
         "remove_as_leader": "Retirer le rôle de responsable",
-        "select_team_instruction": "Sélectionnez l'équipe de destination",
         "set_as_leader": "Définir comme responsable",
         "stats": {
           "attached_organizers": "Organisateurs rattachés",
@@ -195,7 +192,7 @@
           "unassigned": "Sans assignation"
         },
         "title": "Répartition par équipes",
-        "unassigned_description": "Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Sur ordinateur : glissez-déposez. Sur mobile : cliquez pour sélectionner l'équipe.",
+        "unassigned_description": "Ces bénévoles acceptés n'ont pas encore été assignés à une équipe. Cliquez sur l'un d'eux pour choisir la sienne.",
         "unassigned_volunteers": "Bénévoles non assignés",
         "volunteers_count": "{count} bénévole(s)"
       },

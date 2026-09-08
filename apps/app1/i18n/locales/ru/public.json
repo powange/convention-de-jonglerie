@@ -164,9 +164,13 @@
       "skills": "Навыки",
       "team_distribution": {
         "all_teams": "Все команды",
-        "description": "Распределение принятых волонтёров по командам. Перетащите, чтобы переместить или добавить в команду.",
-        "drop_volunteers_here": "Перетащите волонтёров сюда",
+        "description": "Распределение принятых волонтёров по командам. Нажмите на волонтёра, чтобы выбрать его команды.",
         "empty_team": "Пустая команда",
+        "no_teams": "В этом выпуске нет команд волонтёров",
+        "no_preferred_teams": "Этот волонтёр не указал предпочтений по командам.",
+        "other_teams": "Другие команды",
+        "preferred_teams": "Желаемые команды",
+        "select_teams_instruction": "Отметьте команды этого волонтёра",
         "leader_added": "Руководитель добавлен",
         "leader_badge": "Руководитель",
         "leader_removed": "Руководитель удалён",
@@ -174,18 +178,11 @@
         "max_label": "Макс:",
         "organizers_label": "Прикреплённые организаторы",
         "modal": {
-          "add": "Добавить",
-          "add_description_multiple": "Оставить волонтёра в текущих командах и также добавить в \"{targetTeam}\"",
-          "add_description_single": "Оставить волонтёра в \"{sourceTeam}\" и назначить также в \"{targetTeam}\"",
-          "cancel": "Отменить",
-          "move": "Переместить",
-          "move_description_multiple": "Удалить волонтёра из всех текущих команд и поместить в \"{targetTeam}\"",
-          "move_description_single": "Удалить волонтёра из \"{sourceTeam}\" и поместить в \"{targetTeam}\"",
-          "question": "Что вы хотите сделать?"
+          "assign_title": "Назначить: {name}",
+          "assign_title_generic": "Выберите команду"
         },
         "preferences_label": "Пред:",
         "remove_as_leader": "Убрать роль руководителя",
-        "select_team_instruction": "Выберите команду назначения",
         "set_as_leader": "Назначить руководителем",
         "stats": {
           "attached_organizers": "Прикреплённые организаторы",
@@ -195,7 +192,7 @@
           "unassigned": "Не назначены"
         },
         "title": "Распределение по командам",
-        "unassigned_description": "Эти принятые волонтёры ещё не назначены в команду. Вы можете перетащить их в команду ниже.",
+        "unassigned_description": "Эти принятые волонтёры ещё не назначены в команду. Нажмите на одного из них, чтобы выбрать команду.",
         "unassigned_volunteers": "Неназначенные волонтёры",
         "volunteers_count": "{count} волонтёр(ов)"
       },

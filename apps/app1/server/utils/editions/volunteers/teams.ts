@@ -84,8 +84,16 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
     // Récupérer les anciennes assignations avant de les supprimer
     const oldAssignments = await tx.applicationTeamAssignment.findMany({
       where: { applicationId },
-      select: { teamId: true },
+      select: { teamId: true, isLeader: true },
     })
+
+    // La responsabilité survit au ré-enregistrement : cette fonction remplace la liste des
+    // équipes, elle ne destitue personne. Depuis que l'écran de répartition enregistre toute
+    // la liste d'un coup, ajuster une équipe aurait sinon retiré son rôle au responsable sur
+    // toutes les autres, sans qu'aucun écran ne le dise.
+    const responsableDe = new Map(
+      oldAssignments.map((assignation) => [assignation.teamId, assignation.isLeader])
+    )
 
     // Supprimer toutes les assignations existantes
     await tx.applicationTeamAssignment.deleteMany({
@@ -111,7 +119,7 @@ export async function assignVolunteerToTeams(applicationId: number, teamIds: str
         data: uniqueTeamIds.map((teamId) => ({
           applicationId,
           teamId,
-          isLeader: false,
+          isLeader: responsableDe.get(teamId) ?? false,
         })),
       })
 

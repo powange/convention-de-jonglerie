@@ -164,9 +164,13 @@
       "skills": "Competências",
       "team_distribution": {
         "all_teams": "Todas as equipes",
-        "description": "Distribuição de voluntários aceitos em equipes. Arraste e solte para mover ou adicionar a uma equipe.",
-        "drop_volunteers_here": "Arraste e solte voluntários aqui",
+        "description": "Distribuição dos voluntários aceites pelas equipas. Clique num voluntário para escolher as suas equipas.",
         "empty_team": "Equipe vazia",
+        "no_teams": "Nenhuma equipa de voluntários nesta edição",
+        "no_preferred_teams": "Este voluntário não manifestou qualquer preferência de equipa.",
+        "other_teams": "Outras equipas",
+        "preferred_teams": "Equipas pretendidas",
+        "select_teams_instruction": "Marque as equipas deste voluntário",
         "leader_added": "Responsável adicionado",
         "leader_badge": "Responsável",
         "leader_removed": "Responsável removido",
@@ -174,18 +178,11 @@
         "max_label": "Máx:",
         "organizers_label": "Organizadores associados",
         "modal": {
-          "add": "Adicionar",
-          "add_description_multiple": "Manter o voluntário em suas equipes atuais e adicioná-lo também a \"{targetTeam}\"",
-          "add_description_single": "Manter o voluntário em \"{sourceTeam}\" e atribuí-lo também a \"{targetTeam}\"",
-          "cancel": "Cancelar",
-          "move": "Mover",
-          "move_description_multiple": "Remover o voluntário de todas as suas equipes atuais e colocá-lo em \"{targetTeam}\"",
-          "move_description_single": "Remover o voluntário de \"{sourceTeam}\" e colocá-lo em \"{targetTeam}\"",
-          "question": "O que você gostaria de fazer?"
+          "assign_title": "Atribuir {name}",
+          "assign_title_generic": "Selecionar uma equipa"
         },
         "preferences_label": "Pref:",
         "remove_as_leader": "Remover papel de responsável",
-        "select_team_instruction": "Selecione a equipe de destino",
         "set_as_leader": "Definir como responsável",
         "stats": {
           "attached_organizers": "Organizadores associados",
@@ -195,7 +192,7 @@
           "unassigned": "Não atribuídos"
         },
         "title": "Distribuição por equipes",
-        "unassigned_description": "Estes voluntários aceitos ainda não foram atribuídos a uma equipe. Você pode arrastá-los e soltá-los em uma equipe abaixo.",
+        "unassigned_description": "Estes voluntários aceites ainda não foram associados a uma equipa. Clique num deles para escolher a sua.",
         "unassigned_volunteers": "Voluntários não atribuídos",
         "volunteers_count": "{count} voluntário(s)"
       },

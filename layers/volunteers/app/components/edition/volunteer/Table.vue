@@ -437,7 +437,15 @@
     />
   </div>
 
-  <!-- Modal unifiée pour acceptation et modification des équipes -->
+  <!-- Choix des équipes d'un bénévole accepté, partagé avec la répartition par équipes. -->
+  <VolunteersAssignTeamsModal
+    v-model="assignTeamsModalOpen"
+    :edition-id="props.editionId"
+    :volunteer="benevolePourEquipes"
+    @saved="handleTeamsAssigned"
+  />
+
+  <!-- Modal d'acceptation d'une candidature, où l'on choisit ses premières équipes -->
   <UModal v-model:open="teamsModalOpen">
     <template #header>
       <div class="flex items-center gap-2">
@@ -987,32 +995,24 @@ const openAcceptModal = (app: any) => {
   })
 }
 
-// Ouvrir la modal en mode édition
+/**
+ * Ouvrir le choix des équipes d'un bénévole.
+ *
+ * La même modale qu'à la répartition par équipes : toutes les équipes cochables, rangées en
+ * souhaitées et autres, avec leur effectif. Celle d'ici ne montrait que les équipes souhaitées,
+ * ce qui empêchait de répondre à un besoin réel.
+ */
+const benevolePourEquipes = ref<any>(null)
+const assignTeamsModalOpen = ref(false)
+
 const openEditTeamsModal = (app: any) => {
-  modalMode.value = 'edit'
-  currentApplication.value = app
+  benevolePourEquipes.value = app
+  assignTeamsModalOpen.value = true
+}
 
-  // Si l'application a des équipes dans le nouveau système, les utiliser
-  if (app.teamAssignments && app.teamAssignments.length > 0) {
-    selectedTeams.value = app.teamAssignments.map((ta: any) => ta.teamId)
-  } else {
-    // Par défaut, aucune équipe sélectionnée
-    selectedTeams.value = []
-  }
-
-  acceptNote.value = ''
-  teamsModalOpen.value = true
-
-  // Si une seule équipe disponible et aucune sélectionnée, la cocher par défaut
-  nextTick(() => {
-    if (
-      availableTeamsForModal.value.length === 1 &&
-      selectedTeams.value.length === 0 &&
-      availableTeamsForModal.value[0]
-    ) {
-      selectedTeams.value = [availableTeamsForModal.value[0].id]
-    }
-  })
+const handleTeamsAssigned = async () => {
+  await refreshApplications()
+  emit('refreshTeamAssignments')
 }
 
 // Ouvrir la modal de commentaire

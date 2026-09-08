@@ -164,9 +164,13 @@
       "skills": "Färdigheter",
       "team_distribution": {
         "all_teams": "Alla lag",
-        "description": "Fördelning av volontärer till team. På en dator drar du och släpper för att flytta. På mobilen klickar du för att välja team.",
-        "drop_volunteers_here": "Dra och släpp volontärer här",
+        "description": "Fördelning av de antagna volontärerna på lagen. Klicka på en volontär för att välja hans lag.",
         "empty_team": "Tomt lag",
+        "no_teams": "Inget volontärlag i den här upplagan",
+        "no_preferred_teams": "Den här volontären har inte angett några lagönskemål.",
+        "other_teams": "Övriga lag",
+        "preferred_teams": "Önskade lag",
+        "select_teams_instruction": "Kryssa i den här volontärens lag",
         "leader_added": "Ansvarig person tillagd",
         "leader_badge": "Chef",
         "leader_removed": "Chef borttagen",
@@ -174,18 +178,11 @@
         "max_label": "Max:",
         "organizers_label": "Kopplade arrangörer",
         "modal": {
-          "add": "Lägg till",
-          "add_description_multiple": "Behåll volontärerna i deras nuvarande team och lägg även till dem i \"{targetTeam}\".",
-          "add_description_single": "Behåll volontären i \"{sourceTeam}\" och tilldela honom också till \"{targetTeam}\".",
-          "cancel": "Avbryt",
-          "move": "Flytta",
-          "move_description_multiple": "Ta bort volontären från alla hans nuvarande lag och placera honom i \"{targetTeam}\".",
-          "move_description_single": "Ta bort volontären från \"{sourceTeam}\" och placera den i \"{targetTeam}\".",
-          "question": "Vad skulle du vilja göra?"
+          "assign_title": "Tilldela {name}",
+          "assign_title_generic": "Välj ett lag"
         },
         "preferences_label": "Pref:",
         "remove_as_leader": "Ta bort rollen som chef",
-        "select_team_instruction": "Välj destinationsteam",
         "set_as_leader": "Definiera ansvarig",
         "stats": {
           "attached_organizers": "Kopplade arrangörer",
@@ -195,7 +192,7 @@
           "unassigned": "Ej tilldelad"
         },
         "title": "Fördelning per lag",
-        "unassigned_description": "Dessa accepterade volontärer har ännu inte tilldelats något team. På en dator: dra och släpp. På mobilen: klicka för att välja team.",
+        "unassigned_description": "De här antagna volontärerna har ännu inte tilldelats ett lag. Klicka på en av dem för att välja hans lag.",
         "unassigned_volunteers": "Volontärer som inte tilldelats",
         "volunteers_count": "{count} volontär(er)"
       },
