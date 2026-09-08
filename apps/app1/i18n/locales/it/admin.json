@@ -474,7 +474,8 @@
         "volunteers_open": "Ricerca di volontari aperta"
       },
       "view_mode_form": "Modulo",
-      "view_mode_raw": "JSON grezzo"
+      "view_mode_raw": "JSON grezzo",
+      "ticket_tiers": "Tariffe della biglietteria"
     },
     "inactive": "Inattivo",
     "invalidate_email": "Invalida email",

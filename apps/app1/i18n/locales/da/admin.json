@@ -474,7 +474,8 @@
         "volunteers_open": "Rekruttering af frivillige åben"
       },
       "view_mode_form": "Formular",
-      "view_mode_raw": "Rå JSON"
+      "view_mode_raw": "Rå JSON",
+      "ticket_tiers": "Billetpriser"
     },
     "inactive": "Inaktiv",
     "invalidate_email": "Ugyldiggør e-mail",

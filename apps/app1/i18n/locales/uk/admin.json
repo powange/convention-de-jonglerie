@@ -474,7 +474,8 @@
         "volunteers_open": "Набір волонтерів відкритий"
       },
       "view_mode_form": "Форма",
-      "view_mode_raw": "Необроблений JSON"
+      "view_mode_raw": "Необроблений JSON",
+      "ticket_tiers": "Ціни на квитки"
     },
     "inactive": "Неактивний",
     "invalidate_email": "Анулювати електронну пошту",

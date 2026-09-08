@@ -474,7 +474,8 @@
         "volunteers_open": "Freiwilligensuche geöffnet"
       },
       "view_mode_form": "Formular",
-      "view_mode_raw": "Rohes JSON"
+      "view_mode_raw": "Rohes JSON",
+      "ticket_tiers": "Ticketpreise"
     },
     "inactive": "Inaktiv",
     "invalidate_email": "E-Mail ungültig machen",

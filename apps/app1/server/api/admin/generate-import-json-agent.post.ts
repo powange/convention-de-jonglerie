@@ -34,7 +34,9 @@ import {
 import {
   BROWSER_HEADERS,
   fetchLocalModelWithTimeout,
+  fetchWithBrowserless,
   fetchWithTimeout,
+  isBrowserlessAvailable,
 } from '#server/utils/fetch-helpers'
 import {
   type ProgressCallback,
@@ -145,7 +147,7 @@ function extractAndApplyTimeFromContent(parsedJson: any, collectedContent: strin
 
   // Fonction pour extraire une heure depuis un match
   const extractTime = (match: RegExpExecArray): string | null => {
-    const hours = parseInt(match[1], 10)
+    const hours = parseInt(match[1] ?? '', 10)
     const minutes = match[2] ? parseInt(match[2], 10) : 0
 
     // Valider l'heure (entre 6h et 23h pour une convention)
@@ -210,7 +212,7 @@ function extractAndApplyTimeFromContent(parsedJson: any, collectedContent: strin
       if (!foundStartTime && !startHasTime) {
         // Prendre une heure raisonnable pour un début (entre 8h et 14h de préférence)
         const earlyTimes = allTimes.filter((t) => {
-          const h = parseInt(t.split(':')[0], 10)
+          const h = parseInt(t.split(':')[0] ?? '', 10)
           return h >= 8 && h <= 14
         })
         foundStartTime = earlyTimes[0] || allTimes[0]
@@ -221,7 +223,7 @@ function extractAndApplyTimeFromContent(parsedJson: any, collectedContent: strin
       if (!foundEndTime && !endHasTime) {
         // Prendre une heure raisonnable pour une fin (entre 16h et 22h de préférence)
         const lateTimes = allTimes.filter((t) => {
-          const h = parseInt(t.split(':')[0], 10)
+          const h = parseInt(t.split(':')[0] ?? '', 10)
           return h >= 16 && h <= 22
         })
         foundEndTime = lateTimes[lateTimes.length - 1] || allTimes[allTimes.length - 1]
@@ -360,7 +362,7 @@ async function callAgentLLM(
 
   if (responseText.includes('GENERATE_JSON')) {
     const jsonMatch = responseText.match(/GENERATE_JSON[\s\S]*?(\{[\s\S]*\})/)
-    if (jsonMatch) {
+    if (jsonMatch?.[1]) {
       const cleanedJson = cleanAndParseJson(jsonMatch[1])
       if (cleanedJson) {
         return { action: 'generate', json: cleanedJson }
@@ -515,6 +517,8 @@ async function fetchAndExtractContent(
   visitedUrls: string[],
   logs: AgentLog[],
   maxPageContentSize: number,
+  /** Service de navigateur sans interface, ou `null` s'il est indisponible. */
+  browserlessUrl: string | null,
   facebookData?: { event: FacebookScraperResult | null; prefilledJson: any | null }
 ): Promise<{
   success: boolean
@@ -600,18 +604,29 @@ async function fetchAndExtractContent(
       }
     }
 
-    // Fetch classique pour les autres URLs ou si les scrapers ont échoué
-    const response = await fetchWithTimeout(
-      url,
-      { headers: BROWSER_HEADERS },
-      AI_TIMEOUTS.URL_FETCH
-    )
+    // Le navigateur d'abord quand il est là, comme dans les deux autres chemins de génération :
+    // sans lui, une page rendue côté client ou gardée par un anti-robot est perdue pour l'agent.
+    let html: string
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
+    if (browserlessUrl) {
+      html = await fetchWithBrowserless(browserlessUrl, url, {
+        timeout: AI_TIMEOUTS.URL_FETCH,
+        waitForNetworkIdle: true,
+      })
+    } else {
+      // Fetch classique pour les autres URLs ou si les scrapers ont échoué
+      const response = await fetchWithTimeout(
+        url,
+        { headers: BROWSER_HEADERS },
+        AI_TIMEOUTS.URL_FETCH
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+
+      html = await response.text()
     }
-
-    const html = await response.text()
 
     // Extraire le contenu structuré pour avoir accès à l'image OG
     const extraction = extractWebContent(html, url)
@@ -700,6 +715,19 @@ export async function runAgentExploration(
   // Récupérer la config IA effective (BDD en priorité, fallback env)
   const effectiveConfig = await getEffectiveAIConfigAsync()
 
+  // Le navigateur sans interface, vérifié une seule fois : l'agent visite plusieurs pages, et
+  // interroger le service avant chacune ne dirait rien de plus.
+  const configuredBrowserless = effectiveConfig.browserlessUrl
+  const browserlessUrl =
+    configuredBrowserless && (await isBrowserlessAvailable(configuredBrowserless))
+      ? configuredBrowserless
+      : null
+  console.log(
+    browserlessUrl
+      ? `[AGENT] Utilisation de browserless: ${browserlessUrl}`
+      : '[AGENT] Browserless non disponible, utilisation de fetch simple'
+  )
+
   // Provider IA à utiliser (paramètre > config serveur > défaut)
   const aiProvider = provider || effectiveConfig.aiProvider || 'lmstudio'
   console.log(`[AGENT] Provider IA sélectionné: ${aiProvider}`)
@@ -768,6 +796,9 @@ export async function runAgentExploration(
 
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i]
+    // L'indice vient de la longueur du tableau : ce garde-fou ne se déclenche pas, il dit au
+    // compilateur ce que la boucle garantit déjà.
+    if (!url) continue
     const progressPercent = Math.round(((i + 1) / urls.length) * 20) // Phase 1 = 0-20%
     if (taskId) {
       updateTaskStatus(taskId, 'processing', progressPercent)
@@ -784,6 +815,7 @@ export async function runAgentExploration(
       visitedUrls,
       logs,
       maxPageContentSize,
+      browserlessUrl,
       facebookData
     )
     if (result.success && result.content) {
@@ -846,6 +878,7 @@ export async function runAgentExploration(
 
     for (let i = 0; i < externalLinksToExplore.length; i++) {
       const extUrl = externalLinksToExplore[i]
+      if (!extUrl) continue
 
       // Vérifier si déjà visité
       if (visitedUrls.includes(extUrl)) {
@@ -876,6 +909,7 @@ export async function runAgentExploration(
         visitedUrls,
         logs,
         maxPageContentSize,
+        browserlessUrl,
         facebookData
       )
 
@@ -1014,7 +1048,8 @@ INSTRUCTIONS:
         taskId,
         visitedUrls,
         logs,
-        maxPageContentSize
+        maxPageContentSize,
+        browserlessUrl
       )
 
       if (result.success && result.content) {

@@ -474,7 +474,8 @@
         "volunteers_open": "Vrijwilligerswerving open"
       },
       "view_mode_form": "Formulier",
-      "view_mode_raw": "Ruwe JSON"
+      "view_mode_raw": "Ruwe JSON",
+      "ticket_tiers": "Ticketprijzen"
     },
     "inactive": "Inactief",
     "invalidate_email": "E-mail ongeldig maken",

@@ -474,7 +474,8 @@
         "volunteers_open": "Nábor dobrovolníků otevřen"
       },
       "view_mode_form": "Formulář",
-      "view_mode_raw": "Surové JSON"
+      "view_mode_raw": "Surové JSON",
+      "ticket_tiers": "Ceny vstupenek"
     },
     "inactive": "Neaktivní",
     "invalidate_email": "Zneplatnit e-mail",
