@@ -516,7 +516,9 @@
       "loan_place_filter": "Abhol- oder Rückgabeort",
       "loan_place_filter_placeholder": "Ort suchen",
       "filters": "Filter",
-      "name_filter_placeholder": "Gegenstand suchen"
+      "name_filter_placeholder": "Gegenstand suchen",
+      "loan_place": "Ort",
+      "loan_responsible": "Wer kümmert sich"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

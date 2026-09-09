@@ -516,7 +516,9 @@
       "loan_place_filter": "Место получения или возврата",
       "loan_place_filter_placeholder": "Искать место",
       "filters": "Фильтры",
-      "name_filter_placeholder": "Найти предмет"
+      "name_filter_placeholder": "Найти предмет",
+      "loan_place": "Место",
+      "loan_responsible": "Кто занимается"
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

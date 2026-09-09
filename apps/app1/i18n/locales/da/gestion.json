@@ -516,7 +516,9 @@
       "loan_place_filter": "Afhentnings- eller afleveringssted",
       "loan_place_filter_placeholder": "Søg et sted",
       "filters": "Filtre",
-      "name_filter_placeholder": "Søg en genstand"
+      "name_filter_placeholder": "Søg en genstand",
+      "loan_place": "Sted",
+      "loan_responsible": "Hvem står for det"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

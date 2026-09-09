@@ -516,7 +516,9 @@
       "loan_place_filter": "Miejsce odbioru lub zwrotu",
       "loan_place_filter_placeholder": "Szukaj miejsca",
       "filters": "Filtry",
-      "name_filter_placeholder": "Szukaj przedmiotu"
+      "name_filter_placeholder": "Szukaj przedmiotu",
+      "loan_place": "Miejsce",
+      "loan_responsible": "Kto się tym zajmuje"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

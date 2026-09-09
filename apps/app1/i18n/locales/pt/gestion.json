@@ -516,7 +516,9 @@
       "loan_place_filter": "Local de levantamento ou devolução",
       "loan_place_filter_placeholder": "Procurar um local",
       "filters": "Filtros",
-      "name_filter_placeholder": "Procurar um objeto"
+      "name_filter_placeholder": "Procurar um objeto",
+      "loan_place": "Local",
+      "loan_responsible": "Quem trata disso"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

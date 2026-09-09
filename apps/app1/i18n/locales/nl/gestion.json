@@ -516,7 +516,9 @@
       "loan_place_filter": "Ophaal- of retourlocatie",
       "loan_place_filter_placeholder": "Zoek een locatie",
       "filters": "Filters",
-      "name_filter_placeholder": "Zoek een item"
+      "name_filter_placeholder": "Zoek een item",
+      "loan_place": "Locatie",
+      "loan_responsible": "Wie regelt het"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",
