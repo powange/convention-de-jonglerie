@@ -498,7 +498,20 @@
       "responsible_placeholder": "Buscar por dirección de correo exacta",
       "return_location": "Lugar de devolución",
       "return_location_placeholder": "Ej.: devolver al local de la asociación",
-      "return_responsible": "Quién lo devuelve"
+      "return_responsible": "Quién lo devuelve",
+      "tags": {
+        "modal_title": "Etiquetas del material",
+        "description": "Las etiquetas atraviesan los grupos de almacenamiento: un mismo material puede llevar varias.",
+        "empty": "Todavía no hay etiquetas",
+        "new_tag": "Nueva etiqueta",
+        "name_placeholder": "Ej.: frágil",
+        "confirm_delete": "¿Eliminar la etiqueta «{name}»? Se quitará de todo el material que la lleve.",
+        "manage": "Etiquetas",
+        "field_label": "Etiquetas",
+        "field_placeholder": "Sin etiquetas",
+        "filter_label": "Filtrar por etiquetas",
+        "filter_placeholder": "Sin filtro"
+      }
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

@@ -498,7 +498,20 @@
       "responsible_placeholder": "Search by exact email address",
       "return_location": "Return place",
       "return_location_placeholder": "E.g. bring back to the association's premises",
-      "return_responsible": "Who returns"
+      "return_responsible": "Who returns",
+      "tags": {
+        "modal_title": "Stock tags",
+        "description": "Tags cut across storage groups: one item can carry several.",
+        "empty": "No tags yet",
+        "new_tag": "New tag",
+        "name_placeholder": "E.g. fragile",
+        "confirm_delete": "Delete the tag “{name}”? It will be removed from every item carrying it.",
+        "manage": "Tags",
+        "field_label": "Tags",
+        "field_placeholder": "No tags",
+        "filter_label": "Filter by tags",
+        "filter_placeholder": "No filter"
+      }
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

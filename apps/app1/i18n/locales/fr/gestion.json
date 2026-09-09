@@ -505,6 +505,19 @@
         "RETURNED": "Rendue"
       },
       "status_label": "Statut",
+      "tags": {
+        "modal_title": "Tags du stock",
+        "description": "Les tags traversent les groupes de rangement : un même matériel peut en porter plusieurs.",
+        "empty": "Aucun tag pour le moment",
+        "new_tag": "Nouveau tag",
+        "name_placeholder": "Ex. : fragile",
+        "confirm_delete": "Supprimer le tag « {name} » ? Il sera retiré de tout le matériel qui le porte.",
+        "manage": "Tags",
+        "field_label": "Tags",
+        "field_placeholder": "Aucun tag",
+        "filter_label": "Filtrer par tags",
+        "filter_placeholder": "Aucun filtre"
+      },
       "title": "Stock matériel",
       "upcoming": "Prochaine",
       "usage": "Utilisation",

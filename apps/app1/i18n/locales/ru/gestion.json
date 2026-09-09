@@ -498,7 +498,20 @@
       "responsible_placeholder": "Поиск по точному адресу эл. почты",
       "return_location": "Место возврата",
       "return_location_placeholder": "Напр.: вернуть в помещение ассоциации",
-      "return_responsible": "Кто возвращает"
+      "return_responsible": "Кто возвращает",
+      "tags": {
+        "modal_title": "Метки склада",
+        "description": "Метки проходят сквозь группы хранения: одна вещь может нести несколько.",
+        "empty": "Меток пока нет",
+        "new_tag": "Новая метка",
+        "name_placeholder": "Напр.: хрупкое",
+        "confirm_delete": "Удалить метку «{name}»? Она будет снята со всех вещей, которые её несут.",
+        "manage": "Метки",
+        "field_label": "Метки",
+        "field_placeholder": "Без меток",
+        "filter_label": "Фильтр по меткам",
+        "filter_placeholder": "Без фильтра"
+      }
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

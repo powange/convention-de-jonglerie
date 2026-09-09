@@ -8,6 +8,7 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { stockItemLocationInclude, validateReservationLocation } from '#server/utils/stock-helpers'
+import { assertTagsBelongToEdition } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -38,6 +39,8 @@ const bodySchema = z.object({
   // Zéro accepté, contrairement à `quantity` : tout perdre est un constat possible. `null`
   // remet le compteur à « pas encore compté ».
   finalQuantity: z.number().int().min(0).nullable().optional(),
+  // La liste complète des tags de l'objet : ce qui n'y figure pas est retiré.
+  tagIds: z.array(z.number().int().positive()).optional(),
 })
 
 export default wrapApiHandler(
@@ -176,6 +179,21 @@ export default wrapApiHandler(
     // Le comptage de fin vaut pour tout le matériel, emprunté ou non : c'est là que les pertes
     // se constatent.
     if (data.finalQuantity !== undefined) updateData.finalQuantity = data.finalQuantity
+
+    // Les tags sont remplacés en bloc plutôt que par différence : l'écran envoie la liste
+    // complète, et raisonner en ajouts/retraits laisserait passer une suppression silencieuse.
+    if (data.tagIds !== undefined) {
+      await assertTagsBelongToEdition(editionId, data.tagIds)
+      const voulus = Array.from(new Set(data.tagIds))
+      updateData.tags = {
+        deleteMany: { tagId: { notIn: voulus.length > 0 ? voulus : [0] } },
+        upsert: voulus.map((tagId) => ({
+          where: { stockItemId_tagId: { stockItemId: itemId, tagId } },
+          create: { tagId },
+          update: {},
+        })),
+      }
+    }
 
     // Si la quantité diminue, vérifier qu'aucune réservation active/future ne
     // dépasse la nouvelle quantité sur sa période. Sinon des réservations

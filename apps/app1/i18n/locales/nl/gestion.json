@@ -498,7 +498,20 @@
       "responsible_placeholder": "Zoeken op exact e-mailadres",
       "return_location": "Retourlocatie",
       "return_location_placeholder": "Bijv. terugbrengen naar het pand van de vereniging",
-      "return_responsible": "Wie brengt terug"
+      "return_responsible": "Wie brengt terug",
+      "tags": {
+        "modal_title": "Voorraadtags",
+        "description": "Tags lopen dwars door de opslaggroepen heen: één stuk materiaal kan er meerdere dragen.",
+        "empty": "Nog geen tags",
+        "new_tag": "Nieuwe tag",
+        "name_placeholder": "Bijv. breekbaar",
+        "confirm_delete": "Tag “{name}” verwijderen? Hij wordt weggehaald bij al het materiaal dat hem draagt.",
+        "manage": "Tags",
+        "field_label": "Tags",
+        "field_placeholder": "Geen tags",
+        "filter_label": "Filteren op tags",
+        "filter_placeholder": "Geen filter"
+      }
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

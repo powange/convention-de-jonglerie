@@ -280,6 +280,7 @@ model Edition {
   programItems                     EditionProgramItem[]
   taskGroups                       TaskGroup[]
   stockGroups                      StockGroup[]
+  stockTags                        StockTag[]
   faqEntries                       FaqEntry[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")

@@ -69,6 +69,48 @@
         </div>
       </UCard>
 
+      <!-- Filtre par tags : c'est ce qui rend les étiquettes utiles sur un stock fourni. Le
+           bouton de gestion est à côté, là où l'on constate qu'il manque un tag. -->
+      <div v-if="group.items.length" class="flex items-end gap-2">
+        <UFormField :label="$t('gestion.stock.tags.filter_label')" class="flex-1">
+          <USelectMenu
+            v-model="tagsFiltres"
+            :items="tagItems"
+            multiple
+            :placeholder="$t('gestion.stock.tags.filter_placeholder')"
+            searchable
+            :searchable-placeholder="$t('common.search')"
+            class="w-full"
+            :ui="{ content: 'min-w-fit' }"
+          >
+            <template #default="{ modelValue: selected }">
+              <span v-if="!selected?.length" class="text-gray-400">
+                {{ $t('gestion.stock.tags.filter_placeholder') }}
+              </span>
+              <div v-else class="flex flex-wrap gap-1">
+                <StockTagBadge
+                  v-for="tg in selected"
+                  :key="tg.value"
+                  :tag="{ name: tg.label, color: tg.color }"
+                />
+              </div>
+            </template>
+            <template #item-leading="{ item: option }">
+              <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: option.color }" />
+            </template>
+          </USelectMenu>
+        </UFormField>
+        <UButton
+          v-if="canManage"
+          icon="i-heroicons-tag"
+          color="neutral"
+          variant="outline"
+          @click="tagsModalOpen = true"
+        >
+          {{ $t('gestion.stock.tags.manage') }}
+        </UButton>
+      </div>
+
       <div
         v-if="!group.items.length"
         class="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
@@ -108,6 +150,9 @@
                   {{ $t('common.quantity') }}
                 </th>
                 <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
+                  {{ $t('gestion.stock.tags.field_label') }}
+                </th>
+                <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
                   {{ $t('gestion.stock.item_storage_location') }}
                 </th>
                 <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
@@ -121,7 +166,7 @@
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
               <tr
-                v-for="item in group.items"
+                v-for="item in objetsAffiches"
                 :key="item.id"
                 :class="[
                   'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
@@ -155,6 +200,18 @@
                   >
                     -{{ manquants(item) }}
                   </UBadge>
+                </td>
+                <!-- Les tags dans leur propre colonne : sous le nom, ils se mêlaient à la
+                     description et l'on ne pouvait pas balayer la colonne du regard. -->
+                <td class="px-4 py-3 align-top">
+                  <div v-if="item.tags?.length" class="flex flex-wrap gap-1">
+                    <StockTagBadge
+                      v-for="rattachement in item.tags"
+                      :key="rattachement.tag.id"
+                      :tag="rattachement.tag"
+                    />
+                  </div>
+                  <span v-else class="text-gray-400">—</span>
                 </td>
                 <td class="px-4 py-3 align-top">
                   <div
@@ -274,7 +331,15 @@
       :zones="zones"
       :markers="markers"
       :site-map-enabled="!!edition?.siteMapEnabled"
+      :available-tags="tags"
       @saved="handleItemSaved"
+    />
+
+    <StockTagsModal
+      v-model:open="tagsModalOpen"
+      :edition-id="editionId"
+      :tags="tags"
+      @saved="fetchTags"
     />
 
     <StockBulkReservationModal
@@ -332,6 +397,12 @@
 <script setup lang="ts">
 import { useAuthStore, useEditionStore } from '#imports'
 
+import {
+  filtrerParTags,
+  tagsDepuisUrl,
+  urlDepuisTags,
+} from '../../../../../utils/filtre-tags-stock'
+
 definePageMeta({
   layout: 'edition-dashboard',
   middleware: ['auth-protected'],
@@ -350,6 +421,67 @@ const editionId = parseInt(route.params.id as string)
  * Rend zéro tant que le comptage n'a pas eu lieu : `finalQuantity` à `null` veut dire « pas
  * encore compté », et afficher un manque sur cette base serait faux.
  */
+interface StockTag {
+  id: number
+  name: string
+  color: string
+  displayOrder: number
+}
+
+const tags = ref<StockTag[]>([])
+const tagsModalOpen = ref(false)
+const tagsFiltres = ref<{ label: string; value: number; color: string }[]>([])
+
+const tagItems = computed(() =>
+  tags.value.map((tag) => ({ label: tag.name, value: tag.id, color: tag.color }))
+)
+
+/**
+ * Les objets réellement affichés : la liste du groupe, resserrée par les tags choisis.
+ *
+ * La règle de filtrage vit dans un utilitaire à part, éprouvé hors du navigateur — cet écran
+ * demande une session, et la règle du cumul ne s'y vérifie pas d'un coup d'œil.
+ */
+const objetsAffiches = computed(() =>
+  filtrerParTags(
+    group.value?.items ?? [],
+    tagsFiltres.value.map((tg) => tg.value)
+  )
+)
+
+async function fetchTags() {
+  try {
+    const res = await $fetch<{ data: { tags: StockTag[] } }>(
+      `/api/editions/${editionId}/stock-tags`
+    )
+    tags.value = res?.data?.tags ?? []
+  } catch {
+    tags.value = []
+  }
+  appliquerFiltreDeLUrl()
+}
+
+/**
+ * Reprend le filtre porté par l'adresse.
+ *
+ * Appelé une fois les tags chargés : le sélecteur travaille sur des objets `{ label, value,
+ * color }`, qu'on ne peut composer qu'à partir de la liste. Un identifiant qui ne correspond à
+ * aucun tag — supprimé depuis, ou lien d'une autre édition — est simplement ignoré.
+ */
+function appliquerFiltreDeLUrl() {
+  const voulus = tagsDepuisUrl(route.query.tags)
+  tagsFiltres.value = tagItems.value.filter((tg) => voulus.includes(tg.value))
+}
+
+// L'adresse suit le filtre : un lien se partage, et un rechargement ne perd plus la sélection.
+// `replace` plutôt que `push`, sans quoi chaque case cochée s'empilerait dans l'historique et le
+// bouton « précédent » deviendrait inutilisable.
+watch(tagsFiltres, (choisis) => {
+  const valeur = urlDepuisTags(choisis.map((tg) => tg.value))
+  const { tags: _actuel, ...reste } = route.query
+  router.replace({ query: valeur ? { ...reste, tags: valeur } : reste })
+})
+
 function manquants(item: { quantity: number; finalQuantity?: number | null }): number {
   if (item.finalQuantity === null || item.finalQuantity === undefined) return 0
   return Math.max(0, item.quantity - item.finalQuantity)
@@ -372,6 +504,8 @@ interface StockItem {
   name: string
   description: string | null
   quantity: number
+  finalQuantity?: number | null
+  tags?: Array<{ tag: { id: number; name: string; color: string } }>
   location: string | null
   zone: { id: number; name: string; color: string } | null
   marker: { id: number; name: string } | null
@@ -515,6 +649,7 @@ onMounted(async () => {
 })
 
 await fetchAll()
+await fetchTags()
 
 const groupModalOpen = ref(false)
 const itemModalOpen = ref(false)

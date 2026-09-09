@@ -498,7 +498,20 @@
       "responsible_placeholder": "Пошук за точною адресою електронної пошти",
       "return_location": "Місце повернення",
       "return_location_placeholder": "Напр.: повернути до приміщення асоціації",
-      "return_responsible": "Хто повертає"
+      "return_responsible": "Хто повертає",
+      "tags": {
+        "modal_title": "Мітки складу",
+        "description": "Мітки проходять крізь групи зберігання: одна річ може нести кілька.",
+        "empty": "Міток поки немає",
+        "new_tag": "Нова мітка",
+        "name_placeholder": "Напр.: крихке",
+        "confirm_delete": "Видалити мітку «{name}»? Її буде знято з усіх речей, які її несуть.",
+        "manage": "Мітки",
+        "field_label": "Мітки",
+        "field_placeholder": "Без міток",
+        "filter_label": "Фільтр за мітками",
+        "filter_placeholder": "Без фільтра"
+      }
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

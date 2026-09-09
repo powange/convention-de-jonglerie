@@ -498,7 +498,20 @@
       "responsible_placeholder": "Søg på præcis e-mailadresse",
       "return_location": "Afleveringssted",
       "return_location_placeholder": "F.eks. bringes tilbage til foreningens lokaler",
-      "return_responsible": "Hvem afleverer"
+      "return_responsible": "Hvem afleverer",
+      "tags": {
+        "modal_title": "Lagertags",
+        "description": "Tags går på tværs af opbevaringsgrupperne: det samme udstyr kan bære flere.",
+        "empty": "Ingen tags endnu",
+        "new_tag": "Nyt tag",
+        "name_placeholder": "F.eks. skrøbeligt",
+        "confirm_delete": "Slet tagget “{name}”? Det fjernes fra alt udstyr, der bærer det.",
+        "manage": "Tags",
+        "field_label": "Tags",
+        "field_placeholder": "Ingen tags",
+        "filter_label": "Filtrér efter tags",
+        "filter_placeholder": "Intet filter"
+      }
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",
