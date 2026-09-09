@@ -518,7 +518,22 @@
       "filters": "Filtros",
       "name_filter_placeholder": "Procurar um objeto",
       "loan_place": "Local",
-      "loan_responsible": "Quem trata disso"
+      "loan_responsible": "Quem trata disso",
+      "bulk_edit": "Editar os objetos selecionados",
+      "bulk_edit_add_tags": "Etiquetas a adicionar",
+      "bulk_edit_apply": "Aplicar a {count} objeto | Aplicar a {count} objetos",
+      "bulk_edit_intro": "Só os campos assinalados serão aplicados aos {count} objetos selecionados. Um campo assinalado mas vazio apaga o valor.",
+      "bulk_edit_loan_scope": "Nenhum objeto emprestado na seleção: os campos abaixo não terão efeito. | Os campos abaixo só se aplicarão a {count} objeto emprestado. | Os campos abaixo só se aplicarão a {count} objetos emprestados.",
+      "bulk_edit_remove_tags": "Etiquetas a retirar",
+      "bulk_move": "Mover",
+      "bulk_move_apply": "Mover {count} objeto | Mover {count} objetos",
+      "bulk_move_choose_group": "Escolher um grupo",
+      "bulk_move_intro": "Escolha o grupo para onde mover os {count} objetos selecionados.",
+      "bulk_move_leaves_page": "Os objetos sairão desta página para o grupo escolhido.",
+      "bulk_move_no_other_group": "Não há outro grupo para onde mover.",
+      "item_group": "Grupo",
+      "item_location_placeholder": "Detalhe escrito à mão (opcional)",
+      "tab_general": "Geral"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

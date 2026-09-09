@@ -518,7 +518,22 @@
       "filters": "Filter",
       "name_filter_placeholder": "Sök ett föremål",
       "loan_place": "Plats",
-      "loan_responsible": "Vem sköter det"
+      "loan_responsible": "Vem sköter det",
+      "bulk_edit": "Redigera valda föremål",
+      "bulk_edit_add_tags": "Taggar att lägga till",
+      "bulk_edit_apply": "Tillämpa på {count} föremål | Tillämpa på {count} föremål",
+      "bulk_edit_intro": "Endast ikryssade fält tillämpas på de {count} valda föremålen. Ett ikryssat men tomt fält rensar värdet.",
+      "bulk_edit_loan_scope": "Inget lånat föremål i urvalet: fälten nedan får ingen effekt. | Fälten nedan gäller endast {count} lånat föremål. | Fälten nedan gäller endast {count} lånade föremål.",
+      "bulk_edit_remove_tags": "Taggar att ta bort",
+      "bulk_move": "Flytta",
+      "bulk_move_apply": "Flytta {count} föremål | Flytta {count} föremål",
+      "bulk_move_choose_group": "Välj en grupp",
+      "bulk_move_intro": "Välj gruppen dit de {count} valda föremålen ska flyttas.",
+      "bulk_move_leaves_page": "Föremålen lämnar denna sida och hamnar i den valda gruppen.",
+      "bulk_move_no_other_group": "Det finns ingen annan grupp att flytta till.",
+      "item_group": "Grupp",
+      "item_location_placeholder": "Handskriven precisering (valfritt)",
+      "tab_general": "Allmänt"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

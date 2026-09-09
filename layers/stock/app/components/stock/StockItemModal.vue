@@ -5,215 +5,231 @@
     :ui="{ content: 'sm:max-w-2xl' }"
   >
     <template #body>
-      <form class="space-y-4" @submit.prevent="handleSubmit">
-        <UFormField :label="$t('gestion.stock.item_name')" required :error="fieldErrors.name">
-          <UInput
-            v-model="formData.name"
-            :placeholder="$t('gestion.stock.item_name_placeholder')"
-            class="w-full"
-          />
-        </UFormField>
-
-        <UFormField :label="$t('gestion.stock.item_description')" :error="fieldErrors.description">
-          <UTextarea
-            v-model="formData.description"
-            :placeholder="$t('gestion.stock.item_description_placeholder')"
-            :rows="2"
-            class="w-full"
-          />
-        </UFormField>
-
-        <UFormField :label="$t('gestion.stock.item_quantity')" :error="fieldErrors.quantity">
-          <div class="flex flex-wrap items-center gap-1">
-            <UButton
-              v-for="n in 10"
-              :key="n"
-              :variant="formData.quantity === n ? 'solid' : 'soft'"
-              :color="formData.quantity === n ? 'primary' : 'neutral'"
-              size="sm"
-              :ui="{ base: 'min-w-9 justify-center' }"
-              @click="formData.quantity = n"
-            >
-              {{ n }}
-            </UButton>
-            <UInputNumber
-              v-model="formData.quantity"
-              :min="1"
-              :step="1"
-              class="w-28 ml-1"
-              :ui="{ base: 'text-center' }"
-            />
-          </div>
-        </UFormField>
-
-        <!-- Comptage du rangement. Laissé vide tant qu'il n'a pas eu lieu : un zéro dirait que
-             tout a disparu, ce qui n'est pas la même chose que « pas encore compté ». -->
-        <UFormField
-          :label="$t('gestion.stock.final_quantity')"
-          :description="$t('gestion.stock.final_quantity_help')"
-          :error="fieldErrors.finalQuantity"
-        >
-          <div class="flex items-center gap-2">
-            <UInput
-              v-model="formData.finalQuantity"
-              type="number"
-              min="0"
-              class="w-28"
-              :placeholder="$t('gestion.stock.final_quantity_placeholder')"
-            />
-            <UBadge v-if="ecartQuantite > 0" color="warning" variant="soft">
-              {{ $t('gestion.stock.missing_count', { count: ecartQuantite }) }}
-            </UBadge>
-          </div>
-        </UFormField>
-
-        <UFormField :label="$t('gestion.stock.item_notes')" :error="fieldErrors.notes">
-          <UTextarea
-            v-model="formData.notes"
-            :placeholder="$t('gestion.stock.item_notes_placeholder')"
-            :rows="2"
-            class="w-full"
-          />
-        </UFormField>
-
-        <!-- Emplacement de rangement (par défaut, hors réservation) -->
-        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-2">
-          <div class="flex items-center gap-2 text-sm font-medium">
-            <UIcon name="i-heroicons-map-pin" class="size-4 text-primary-500" />
-            <span>{{ $t('gestion.stock.item_storage_location') }}</span>
-          </div>
-          <p class="text-xs text-gray-500">
-            {{ $t('gestion.stock.item_storage_location_help') }}
-          </p>
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-            <UFormField
-              :label="$t('gestion.stock.item_location')"
-              :class="siteMapEnabled ? 'sm:col-span-7' : 'sm:col-span-12'"
-              :error="fieldErrors.location"
-            >
-              <UInput
-                v-model="formData.location"
-                :placeholder="$t('gestion.stock.item_storage_location_placeholder')"
-                class="w-full"
-              />
-            </UFormField>
-            <UFormField
-              v-if="siteMapEnabled"
-              :label="$t('gestion.stock.item_map_pin')"
-              class="sm:col-span-5"
-            >
-              <USelect
-                v-model="formData.mapPin"
-                :items="mapPinItems"
-                :placeholder="$t('gestion.stock.no_map_pin')"
-                class="w-full"
-              >
-                <template #leading>
-                  <UIcon
-                    v-if="getPinMeta(formData.mapPin)?.icon"
-                    :name="getPinMeta(formData.mapPin)!.icon"
-                    :style="
-                      getPinMeta(formData.mapPin)?.color
-                        ? { color: getPinMeta(formData.mapPin)!.color! }
-                        : undefined
-                    "
-                    class="size-5"
-                  />
-                </template>
-                <template #item-leading="{ item: opt }">
-                  <UIcon
-                    :name="(opt as { icon: string }).icon"
-                    :style="
-                      (opt as { color: string | null }).color
-                        ? { color: (opt as { color: string }).color }
-                        : undefined
-                    "
-                    class="size-5"
-                  />
-                </template>
-              </USelect>
-            </UFormField>
-          </div>
-        </div>
-
-        <!-- Bloc Emprunt externe -->
-        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-3">
-          <USwitch
-            v-model="formData.isExternalLoan"
-            :label="$t('gestion.stock.external_loan')"
-            :description="$t('gestion.stock.external_loan_help')"
-          />
-
-          <div v-if="formData.isExternalLoan" class="space-y-3 pt-1">
-            <UFormField :label="$t('gestion.stock.owner_contact')">
-              <UTextarea
-                v-model="formData.ownerContact"
-                :placeholder="$t('gestion.stock.owner_contact_placeholder')"
-                :rows="2"
-                class="w-full"
-              />
-            </UFormField>
-            <UFormField :label="$t('gestion.stock.return_due_at')">
-              <UiDateField v-model="formData.returnDueAt" />
-            </UFormField>
-
-            <!-- Deux lieux distincts : on emprunte souvent chez quelqu'un et l'on rend ailleurs.
-                 Le responsable est un utilisateur quand il en est un, du texte sinon. -->
-            <div class="space-y-3 pt-1 border-t border-gray-200 dark:border-gray-700">
-              <UFormField :label="$t('gestion.stock.pickup_location')">
+      <!-- Deux onglets : ce qui décrit l'objet, et ce qui décrit son emprunt. Les champs
+           de prêt n'ont d'objet que pour du matériel prêté, et les laisser dans le même
+           défilement obligeait à les traverser à chaque modification ordinaire. -->
+      <form @submit.prevent="handleSubmit">
+        <UTabs v-model="ongletActif" :items="onglets">
+          <template #general>
+            <div class="space-y-4 pt-2">
+              <UFormField :label="$t('gestion.stock.item_name')" required :error="fieldErrors.name">
                 <UInput
-                  v-model="formData.pickupLocation"
-                  :placeholder="$t('gestion.stock.pickup_location_placeholder')"
+                  v-model="formData.name"
+                  :placeholder="$t('gestion.stock.item_name_placeholder')"
                   class="w-full"
                 />
               </UFormField>
-              <UFormField
-                :label="$t('gestion.stock.pickup_responsible')"
-                :description="$t('gestion.stock.responsible_help')"
-              >
-                <UserSelector
-                  v-model="formData.pickupResponsible"
-                  v-model:search-term="pickupSearchTerm"
-                  :searched-users="pickupSearchedUsers"
-                  :searching-users="searchingPickupUsers"
-                  :placeholder="$t('gestion.stock.responsible_placeholder')"
-                />
-                <UInput
-                  v-model="formData.pickupContact"
-                  :placeholder="$t('gestion.stock.responsible_contact_placeholder')"
-                  class="w-full mt-2"
-                />
-              </UFormField>
-            </div>
 
-            <div class="space-y-3 pt-1 border-t border-gray-200 dark:border-gray-700">
-              <UFormField :label="$t('gestion.stock.return_location')">
-                <UInput
-                  v-model="formData.returnLocation"
-                  :placeholder="$t('gestion.stock.return_location_placeholder')"
+              <UFormField
+                :label="$t('gestion.stock.item_description')"
+                :error="fieldErrors.description"
+              >
+                <UTextarea
+                  v-model="formData.description"
+                  :placeholder="$t('gestion.stock.item_description_placeholder')"
+                  :rows="2"
                   class="w-full"
                 />
               </UFormField>
+
+              <UFormField :label="$t('gestion.stock.item_quantity')" :error="fieldErrors.quantity">
+                <div class="flex flex-wrap items-center gap-1">
+                  <UButton
+                    v-for="n in 10"
+                    :key="n"
+                    :variant="formData.quantity === n ? 'solid' : 'soft'"
+                    :color="formData.quantity === n ? 'primary' : 'neutral'"
+                    size="sm"
+                    :ui="{ base: 'min-w-9 justify-center' }"
+                    @click="formData.quantity = n"
+                  >
+                    {{ n }}
+                  </UButton>
+                  <UInputNumber
+                    v-model="formData.quantity"
+                    :min="1"
+                    :step="1"
+                    class="w-28 ml-1"
+                    :ui="{ base: 'text-center' }"
+                  />
+                </div>
+              </UFormField>
+
+              <!-- Comptage du rangement. Laissé vide tant qu'il n'a pas eu lieu : un zéro dirait que
+                 tout a disparu, ce qui n'est pas la même chose que « pas encore compté ». -->
               <UFormField
-                :label="$t('gestion.stock.return_responsible')"
-                :description="$t('gestion.stock.responsible_help')"
+                :label="$t('gestion.stock.final_quantity')"
+                :description="$t('gestion.stock.final_quantity_help')"
+                :error="fieldErrors.finalQuantity"
               >
-                <UserSelector
-                  v-model="formData.returnResponsible"
-                  v-model:search-term="returnSearchTerm"
-                  :searched-users="returnSearchedUsers"
-                  :searching-users="searchingReturnUsers"
-                  :placeholder="$t('gestion.stock.responsible_placeholder')"
-                />
-                <UInput
-                  v-model="formData.returnContact"
-                  :placeholder="$t('gestion.stock.responsible_contact_placeholder')"
-                  class="w-full mt-2"
+                <div class="flex items-center gap-2">
+                  <UInput
+                    v-model="formData.finalQuantity"
+                    type="number"
+                    min="0"
+                    class="w-28"
+                    :placeholder="$t('gestion.stock.final_quantity_placeholder')"
+                  />
+                  <UBadge v-if="ecartQuantite > 0" color="warning" variant="soft">
+                    {{ $t('gestion.stock.missing_count', { count: ecartQuantite }) }}
+                  </UBadge>
+                </div>
+              </UFormField>
+
+              <UFormField :label="$t('gestion.stock.item_notes')" :error="fieldErrors.notes">
+                <UTextarea
+                  v-model="formData.notes"
+                  :placeholder="$t('gestion.stock.item_notes_placeholder')"
+                  :rows="2"
+                  class="w-full"
                 />
               </UFormField>
+
+              <!-- Emplacement de rangement (par défaut, hors réservation) -->
+              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-2">
+                <div class="flex items-center gap-2 text-sm font-medium">
+                  <UIcon name="i-heroicons-map-pin" class="size-4 text-primary-500" />
+                  <span>{{ $t('gestion.stock.item_storage_location') }}</span>
+                </div>
+                <p class="text-xs text-gray-500">
+                  {{ $t('gestion.stock.item_storage_location_help') }}
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                  <UFormField
+                    :label="$t('gestion.stock.item_location')"
+                    :class="siteMapEnabled ? 'sm:col-span-7' : 'sm:col-span-12'"
+                    :error="fieldErrors.location"
+                  >
+                    <UInput
+                      v-model="formData.location"
+                      :placeholder="$t('gestion.stock.item_storage_location_placeholder')"
+                      class="w-full"
+                    />
+                  </UFormField>
+                  <UFormField
+                    v-if="siteMapEnabled"
+                    :label="$t('gestion.stock.item_map_pin')"
+                    class="sm:col-span-5"
+                  >
+                    <USelect
+                      v-model="formData.mapPin"
+                      :items="mapPinItems"
+                      :placeholder="$t('gestion.stock.no_map_pin')"
+                      class="w-full"
+                    >
+                      <template #leading>
+                        <UIcon
+                          v-if="getPinMeta(formData.mapPin)?.icon"
+                          :name="getPinMeta(formData.mapPin)!.icon"
+                          :style="
+                            getPinMeta(formData.mapPin)?.color
+                              ? { color: getPinMeta(formData.mapPin)!.color! }
+                              : undefined
+                          "
+                          class="size-5"
+                        />
+                      </template>
+                      <template #item-leading="{ item: opt }">
+                        <UIcon
+                          :name="(opt as { icon: string }).icon"
+                          :style="
+                            (opt as { color: string | null }).color
+                              ? { color: (opt as { color: string }).color }
+                              : undefined
+                          "
+                          class="size-5"
+                        />
+                      </template>
+                    </USelect>
+                  </UFormField>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </template>
+
+          <template #emprunt>
+            <div class="space-y-4 pt-2">
+              <!-- Bloc Emprunt externe -->
+              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-3">
+                <USwitch
+                  v-model="formData.isExternalLoan"
+                  :label="$t('gestion.stock.external_loan')"
+                  :description="$t('gestion.stock.external_loan_help')"
+                />
+
+                <div v-if="formData.isExternalLoan" class="space-y-3 pt-1">
+                  <UFormField :label="$t('gestion.stock.owner_contact')">
+                    <UTextarea
+                      v-model="formData.ownerContact"
+                      :placeholder="$t('gestion.stock.owner_contact_placeholder')"
+                      :rows="2"
+                      class="w-full"
+                    />
+                  </UFormField>
+                  <UFormField :label="$t('gestion.stock.return_due_at')">
+                    <UiDateField v-model="formData.returnDueAt" />
+                  </UFormField>
+
+                  <!-- Deux lieux distincts : on emprunte souvent chez quelqu'un et l'on rend ailleurs.
+                     Le responsable est un utilisateur quand il en est un, du texte sinon. -->
+                  <div class="space-y-3 pt-1 border-t border-gray-200 dark:border-gray-700">
+                    <UFormField :label="$t('gestion.stock.pickup_location')">
+                      <UInput
+                        v-model="formData.pickupLocation"
+                        :placeholder="$t('gestion.stock.pickup_location_placeholder')"
+                        class="w-full"
+                      />
+                    </UFormField>
+                    <UFormField
+                      :label="$t('gestion.stock.pickup_responsible')"
+                      :description="$t('gestion.stock.responsible_help')"
+                    >
+                      <UserSelector
+                        v-model="formData.pickupResponsible"
+                        v-model:search-term="pickupSearchTerm"
+                        :searched-users="pickupSearchedUsers"
+                        :searching-users="searchingPickupUsers"
+                        :placeholder="$t('gestion.stock.responsible_placeholder')"
+                      />
+                      <UInput
+                        v-model="formData.pickupContact"
+                        :placeholder="$t('gestion.stock.responsible_contact_placeholder')"
+                        class="w-full mt-2"
+                      />
+                    </UFormField>
+                  </div>
+
+                  <div class="space-y-3 pt-1 border-t border-gray-200 dark:border-gray-700">
+                    <UFormField :label="$t('gestion.stock.return_location')">
+                      <UInput
+                        v-model="formData.returnLocation"
+                        :placeholder="$t('gestion.stock.return_location_placeholder')"
+                        class="w-full"
+                      />
+                    </UFormField>
+                    <UFormField
+                      :label="$t('gestion.stock.return_responsible')"
+                      :description="$t('gestion.stock.responsible_help')"
+                    >
+                      <UserSelector
+                        v-model="formData.returnResponsible"
+                        v-model:search-term="returnSearchTerm"
+                        :searched-users="returnSearchedUsers"
+                        :searching-users="searchingReturnUsers"
+                        :placeholder="$t('gestion.stock.responsible_placeholder')"
+                      />
+                      <UInput
+                        v-model="formData.returnContact"
+                        :placeholder="$t('gestion.stock.responsible_contact_placeholder')"
+                        class="w-full mt-2"
+                      />
+                    </UFormField>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </UTabs>
       </form>
     </template>
     <template #footer>
@@ -303,6 +319,24 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const ongletActif = ref('general')
+
+/**
+ * L'onglet du prêt porte un point quand la case est cochée : sans lui, rien ne dirait depuis
+ * l'onglet général qu'un matériel est emprunté, ni qu'il y a des champs remplis à côté.
+ */
+const onglets = computed(() => [
+  // `value` et non `key` : c'est la propriété que `UTabs` lie à son `v-model`. Avec `key`, la
+  // sélection retombait sur l'index et l'onglet par défaut ne s'appliquait pas.
+  { value: 'general', slot: 'general', label: t('gestion.stock.tab_general') },
+  {
+    value: 'emprunt',
+    slot: 'emprunt',
+    label: t('gestion.stock.external_loan'),
+    icon: formData.isExternalLoan ? 'i-heroicons-hand-raised' : undefined,
+  },
+])
+
 const isOpen = computed({
   get: () => props.open,
   set: (v) => emit('update:open', v),
@@ -429,6 +463,7 @@ watch(
   () => [props.open, props.item],
   ([open]) => {
     if (open) {
+      ongletActif.value = 'general'
       formData.name = props.item?.name || ''
       formData.description = props.item?.description || ''
       formData.quantity = props.item?.quantity ?? 1
@@ -461,7 +496,9 @@ function applyApiErrors(e: any): boolean {
   if (!errors || typeof errors !== 'object') return false
   const next: Record<string, string> = {}
   for (const [path, message] of Object.entries(errors as Record<string, string>)) {
-    const fieldName = path.split('.')[0]
+    // `split` rend toujours au moins un morceau, mais le typage ne le sait pas : le repli garde le
+    // chemin entier plutôt que de laisser une clé indéfinie.
+    const fieldName = path.split('.')[0] ?? path
     if (!next[fieldName]) next[fieldName] = message
   }
   fieldErrors.value = next

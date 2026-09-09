@@ -194,7 +194,6 @@
           :data="objetsAffiches"
           :columns="colonnes"
           class="w-full"
-          @select="(_evenement: Event, ligne: any) => goToItem(ligne.original.id)"
         >
           <template #select-header="{ table }">
             <UCheckbox
@@ -204,6 +203,7 @@
                   : table.getIsAllPageRowsSelected()
               "
               :aria-label="$t('common.select_all')"
+              :ui="{ base: 'cursor-pointer' }"
               @update:model-value="
                 (coche: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!coche)
               "
@@ -212,9 +212,12 @@
           <template #select-cell="{ row }">
             <!-- La case ne doit pas emmener sur la fiche : cocher et ouvrir sont deux gestes. -->
             <span @click.stop>
+              <!-- Le curseur dit que c'est cliquable : sans lui, la case passait pour un simple
+                   indicateur d'état. -->
               <UCheckbox
                 :model-value="row.getIsSelected()"
                 :aria-label="$t('common.select')"
+                :ui="{ base: 'cursor-pointer' }"
                 @update:model-value="
                   (coche: boolean | 'indeterminate') => row.toggleSelected(!!coche)
                 "
@@ -321,6 +324,32 @@
               {{ prochaineEtape(row.original)!.qui }}
             </span>
             <span v-else class="text-gray-400">—</span>
+          </template>
+
+          <template #actions-cell="{ row }">
+            <!-- Consulter et modifier, chacun son bouton : la ligne entière servait de lien, et
+                 l'on atterrissait sur la fiche en voulant simplement cocher une case. -->
+            <div class="flex items-center justify-end gap-0.5">
+              <UButton
+                icon="i-heroicons-eye"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :aria-label="$t('common.view')"
+                @click="goToItem(row.original.id)"
+              />
+              <!-- La même modale que sur la fiche du matériel : un seul formulaire d'édition,
+                   qu'on l'ouvre d'ici ou de là-bas. -->
+              <UButton
+                v-if="canManage"
+                icon="i-heroicons-pencil-square"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :aria-label="$t('common.edit')"
+                @click="openItemModal(row.original)"
+              />
+            </div>
           </template>
 
           <template #storage-cell="{ row }">
@@ -457,6 +486,27 @@
       @saved="fetchTags"
     />
 
+    <StockBulkEditModal
+      v-model="bulkEditModalOpen"
+      :edition-id="editionId"
+      :item-ids="identifiantsSelectionnes"
+      :nb-empruntes="nbEmpruntesSelectionnes"
+      :tags="tags"
+      :zones="zones"
+      :markers="markers"
+      @saved="apresModificationParLot"
+    />
+
+    <StockBulkMoveModal
+      v-if="group"
+      v-model="bulkMoveModalOpen"
+      :edition-id="editionId"
+      :item-ids="identifiantsSelectionnes"
+      :groupe-courant-id="group.id"
+      :groups="allGroups"
+      @saved="apresModificationParLot"
+    />
+
     <StockBulkReservationModal
       v-if="group && bulkModalItems.length"
       v-model:open="bulkModalOpen"
@@ -482,7 +532,7 @@
       >
         <div
           v-if="someSelected"
-          class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-full px-4 py-2 flex items-center gap-3"
+          class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] bg-default ring ring-accented shadow-xl rounded-full px-4 py-2 flex items-center gap-3"
         >
           <span class="text-sm text-gray-700 dark:text-gray-300">
             {{ $t('gestion.stock.selected_count', { count: identifiantsSelectionnes.length }) }}
@@ -494,6 +544,29 @@
             @click="openBulkReservationModal"
           >
             {{ $t('gestion.stock.bulk_reserve', { count: identifiantsSelectionnes.length }) }}
+          </UButton>
+          <!-- Deux gestes distincts : corriger des champs, et changer de rangement. Déplacer n'a
+               qu'une question à poser, il mérite son propre bouton plutôt qu'une ligne perdue au
+               milieu de dix champs facultatifs. -->
+          <UButton
+            v-if="canManage"
+            color="neutral"
+            variant="soft"
+            size="sm"
+            icon="i-heroicons-pencil-square"
+            @click="bulkEditModalOpen = true"
+          >
+            {{ $t('common.edit') }}
+          </UButton>
+          <UButton
+            v-if="canManage"
+            color="neutral"
+            variant="soft"
+            size="sm"
+            icon="i-heroicons-arrow-right-circle"
+            @click="bulkMoveModalOpen = true"
+          >
+            {{ $t('gestion.stock.bulk_move') }}
           </UButton>
           <UButton
             color="neutral"
@@ -684,6 +757,14 @@ const colonnes = computed((): TableColumn<any>[] => [
     accessorFn: (item: any) => item._count.reservations,
     header: ({ column }) => enTeteTriable(column, t('gestion.stock.reservations_title')),
   },
+  // Ouvrir la fiche devient un geste explicite : la ligne entière servait de lien, et l'on
+  // atterrissait sur la fiche en voulant cocher une case ou poser un tag.
+  {
+    id: 'actions',
+    enableSorting: false,
+    enableHiding: false,
+    size: 100,
+  },
 ])
 
 const tags = ref<StockTag[]>([])
@@ -835,22 +916,39 @@ interface StockItemUpcomingReservation {
   zone: { id: number; name: string; color: string } | null
   marker: { id: number; name: string } | null
 }
+/**
+ * Le responsable tel que la liste le reçoit.
+ *
+ * L'avatar n'a d'intérêt que pour la modale d'édition, qui affiche la personne dans un sélecteur :
+ * la liste, elle, n'en montre que le pseudo. Il est là parce que la modale s'ouvre désormais aussi
+ * depuis cette page, et qu'elle doit y montrer la même chose qu'ailleurs.
+ */
+interface StockItemResponsable {
+  id: number
+  pseudo: string
+  profilePicture?: string | null
+  emailHash?: string | null
+}
 interface StockItem {
   id: number
   name: string
   description: string | null
   quantity: number
   finalQuantity?: number | null
+  // La modale d'édition écrit ces deux champs : la liste doit les porter, sans quoi elle rouvrirait
+  // la fiche avec des champs vides et les enregistrerait tels quels.
+  notes: string | null
+  ownerContact?: string | null
   tags?: Array<{ tag: { id: number; name: string; color: string } }>
   isExternalLoan?: boolean
   pickedUpAt?: string | null
   returnedAt?: string | null
   returnDueAt?: string | null
   pickupLocation?: string | null
-  pickupResponsible?: { id: number; pseudo: string } | null
+  pickupResponsible?: StockItemResponsable | null
   pickupContact?: string | null
   returnLocation?: string | null
-  returnResponsible?: { id: number; pseudo: string } | null
+  returnResponsible?: StockItemResponsable | null
   returnContact?: string | null
   location: string | null
   zone: { id: number; name: string; color: string } | null
@@ -1025,6 +1123,26 @@ const someSelected = computed(() => identifiantsSelectionnes.value.length > 0)
 
 function clearSelection() {
   selectionLignes.value = {}
+}
+
+const bulkEditModalOpen = ref(false)
+const bulkMoveModalOpen = ref(false)
+
+/**
+ * Combien d'objets cochés sont des emprunts.
+ *
+ * La modale l'annonce : les champs de prêt ne toucheront que ceux-là, et poser un lieu de
+ * récupération sur du matériel de la convention créerait des données que rien n'affiche.
+ */
+const nbEmpruntesSelectionnes = computed(() => {
+  const choisis = new Set(identifiantsSelectionnes.value)
+  return (group.value?.items ?? []).filter((it) => choisis.has(it.id) && it.isExternalLoan).length
+})
+
+async function apresModificationParLot() {
+  clearSelection()
+  await fetchAll()
+  await refreshPlanning()
 }
 
 function openBulkReservationModal() {

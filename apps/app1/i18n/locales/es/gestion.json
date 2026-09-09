@@ -518,7 +518,22 @@
       "filters": "Filtros",
       "name_filter_placeholder": "Buscar un objeto",
       "loan_place": "Lugar",
-      "loan_responsible": "Quién se encarga"
+      "loan_responsible": "Quién se encarga",
+      "bulk_edit": "Editar los objetos seleccionados",
+      "bulk_edit_add_tags": "Etiquetas a añadir",
+      "bulk_edit_apply": "Aplicar a {count} objeto | Aplicar a {count} objetos",
+      "bulk_edit_intro": "Solo se aplicarán los campos marcados a los {count} objetos seleccionados. Un campo marcado pero vacío borra el valor.",
+      "bulk_edit_loan_scope": "Ningún objeto prestado en la selección: los campos siguientes no tendrán efecto. | Los campos siguientes solo se aplicarán a {count} objeto prestado. | Los campos siguientes solo se aplicarán a {count} objetos prestados.",
+      "bulk_edit_remove_tags": "Etiquetas a quitar",
+      "bulk_move": "Mover",
+      "bulk_move_apply": "Mover {count} objeto | Mover {count} objetos",
+      "bulk_move_choose_group": "Elegir un grupo",
+      "bulk_move_intro": "Elige el grupo al que mover los {count} objetos seleccionados.",
+      "bulk_move_leaves_page": "Los objetos saldrán de esta página para unirse al grupo elegido.",
+      "bulk_move_no_other_group": "No hay otro grupo al que mover.",
+      "item_group": "Grupo",
+      "item_location_placeholder": "Detalle escrito a mano (opcional)",
+      "tab_general": "General"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

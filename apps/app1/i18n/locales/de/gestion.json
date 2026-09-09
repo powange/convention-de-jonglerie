@@ -518,7 +518,22 @@
       "filters": "Filter",
       "name_filter_placeholder": "Gegenstand suchen",
       "loan_place": "Ort",
-      "loan_responsible": "Wer kümmert sich"
+      "loan_responsible": "Wer kümmert sich",
+      "bulk_edit": "Ausgewählte Gegenstände bearbeiten",
+      "bulk_edit_add_tags": "Hinzuzufügende Tags",
+      "bulk_edit_apply": "Auf {count} Gegenstand anwenden | Auf {count} Gegenstände anwenden",
+      "bulk_edit_intro": "Nur angehakte Felder werden auf die {count} ausgewählten Gegenstände angewendet. Ein angehaktes, aber leeres Feld löscht den Wert.",
+      "bulk_edit_loan_scope": "Keine Leihgabe in der Auswahl: die Felder unten bleiben wirkungslos. | Die Felder unten gelten nur für {count} Leihgabe. | Die Felder unten gelten nur für {count} Leihgaben.",
+      "bulk_edit_remove_tags": "Zu entfernende Tags",
+      "bulk_move": "Verschieben",
+      "bulk_move_apply": "{count} Gegenstand verschieben | {count} Gegenstände verschieben",
+      "bulk_move_choose_group": "Gruppe wählen",
+      "bulk_move_intro": "Wählen Sie die Gruppe, in die die {count} ausgewählten Gegenstände verschoben werden sollen.",
+      "bulk_move_leaves_page": "Die Gegenstände verlassen diese Seite und wechseln in die gewählte Gruppe.",
+      "bulk_move_no_other_group": "Es gibt keine andere Gruppe zum Verschieben.",
+      "item_group": "Gruppe",
+      "item_location_placeholder": "Handschriftliche Angabe (optional)",
+      "tab_general": "Allgemein"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",
