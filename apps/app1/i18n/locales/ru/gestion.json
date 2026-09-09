@@ -514,7 +514,9 @@
       "columns": "Столбцы",
       "loan_none": "Не в аренде",
       "loan_place_filter": "Место получения или возврата",
-      "loan_place_filter_placeholder": "Искать место"
+      "loan_place_filter_placeholder": "Искать место",
+      "filters": "Фильтры",
+      "name_filter_placeholder": "Найти предмет"
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

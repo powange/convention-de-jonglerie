@@ -514,7 +514,9 @@
       "columns": "Sloupce",
       "loan_none": "Není zápůjčka",
       "loan_place_filter": "Místo vyzvednutí nebo vrácení",
-      "loan_place_filter_placeholder": "Hledat místo"
+      "loan_place_filter_placeholder": "Hledat místo",
+      "filters": "Filtry",
+      "name_filter_placeholder": "Hledat předmět"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

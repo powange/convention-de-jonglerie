@@ -514,7 +514,9 @@
       "columns": "Columns",
       "loan_none": "Not a loan",
       "loan_place_filter": "Collection or return place",
-      "loan_place_filter_placeholder": "Search a place"
+      "loan_place_filter_placeholder": "Search a place",
+      "filters": "Filters",
+      "name_filter_placeholder": "Search an item"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

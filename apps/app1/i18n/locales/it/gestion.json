@@ -514,7 +514,9 @@
       "columns": "Colonne",
       "loan_none": "Non è un prestito",
       "loan_place_filter": "Luogo di ritiro o restituzione",
-      "loan_place_filter_placeholder": "Cerca un luogo"
+      "loan_place_filter_placeholder": "Cerca un luogo",
+      "filters": "Filtri",
+      "name_filter_placeholder": "Cerca un oggetto"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

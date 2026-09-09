@@ -514,7 +514,9 @@
       "columns": "Spalten",
       "loan_none": "Keine Leihgabe",
       "loan_place_filter": "Abhol- oder Rückgabeort",
-      "loan_place_filter_placeholder": "Ort suchen"
+      "loan_place_filter_placeholder": "Ort suchen",
+      "filters": "Filter",
+      "name_filter_placeholder": "Gegenstand suchen"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

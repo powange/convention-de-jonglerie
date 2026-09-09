@@ -514,7 +514,9 @@
       "columns": "Colunas",
       "loan_none": "Não é um empréstimo",
       "loan_place_filter": "Local de levantamento ou devolução",
-      "loan_place_filter_placeholder": "Procurar um local"
+      "loan_place_filter_placeholder": "Procurar um local",
+      "filters": "Filtros",
+      "name_filter_placeholder": "Procurar um objeto"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

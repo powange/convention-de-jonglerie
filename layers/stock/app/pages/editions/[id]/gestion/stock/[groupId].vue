@@ -69,66 +69,35 @@
         </div>
       </UCard>
 
-      <!-- Filtre par tags : c'est ce qui rend les étiquettes utiles sur un stock fourni. Le
-           bouton de gestion est à côté, là où l'on constate qu'il manque un tag. -->
+      <!-- Les filtres, et à côté ce qui les alimente : les tags de l'édition et les colonnes
+           affichées. Sur écran étroit ils passent dans une modale — trois champs côte à côte n'y
+           tiennent pas, et les empiler pousserait le tableau hors de vue. -->
       <div v-if="group.items.length" class="flex items-end gap-2">
-        <UFormField :label="$t('gestion.stock.tags.filter_label')" class="flex-1">
-          <USelectMenu
-            v-model="tagsFiltres"
-            :items="tagItems"
-            multiple
-            :placeholder="$t('gestion.stock.tags.filter_placeholder')"
-            searchable
-            :searchable-placeholder="$t('common.search')"
-            class="w-full"
-            :ui="{ content: 'min-w-fit' }"
-          >
-            <template #default="{ modelValue: selected }">
-              <span v-if="!selected?.length" class="text-gray-400">
-                {{ $t('gestion.stock.tags.filter_placeholder') }}
-              </span>
-              <div v-else class="flex flex-wrap gap-1">
-                <StockTagBadge
-                  v-for="tg in selected"
-                  :key="tg.value"
-                  :tag="{ name: tg.label, color: tg.color }"
-                />
-              </div>
-            </template>
-            <template #item-leading="{ item: option }">
-              <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: option.color }" />
-            </template>
-          </USelectMenu>
-        </UFormField>
-        <UFormField :label="$t('gestion.stock.external_loan')" class="flex-1">
-          <USelectMenu
-            v-model="etatsFiltres"
-            :items="etatsItems"
-            multiple
-            :placeholder="$t('gestion.stock.tags.filter_placeholder')"
-            class="w-full"
-            :ui="{ content: 'min-w-fit' }"
-          />
-        </UFormField>
-        <UFormField :label="$t('gestion.stock.loan_place_filter')" class="flex-1">
-          <UInput
-            v-model="lieuFiltre"
-            icon="i-heroicons-magnifying-glass"
-            :placeholder="$t('gestion.stock.loan_place_filter_placeholder')"
-            class="w-full"
-          >
-            <template v-if="lieuFiltre" #trailing>
-              <UButton
-                color="neutral"
-                variant="link"
-                size="sm"
-                icon="i-heroicons-x-mark"
-                :aria-label="$t('common.clear')"
-                @click="lieuFiltre = ''"
-              />
-            </template>
-          </UInput>
-        </UFormField>
+        <StockItemFilters
+          v-model:nom="nomFiltre"
+          v-model:tags="tagsFiltres"
+          v-model:etats="etatsFiltres"
+          v-model:lieu="lieuFiltre"
+          :tag-items="tagItems"
+          :etats-items="etatsItems"
+          class="hidden lg:flex flex-1 items-end gap-2 min-w-0"
+        />
+
+        <UButton
+          class="lg:hidden"
+          icon="i-heroicons-funnel"
+          color="neutral"
+          variant="outline"
+          @click="filtresModalOpen = true"
+        >
+          {{ $t('gestion.stock.filters') }}
+          <UBadge v-if="nombreFiltresActifs" color="primary" variant="solid" size="sm">
+            {{ nombreFiltresActifs }}
+          </UBadge>
+        </UButton>
+
+        <div class="flex-1 lg:hidden" />
+
         <UButton
           v-if="canManage"
           icon="i-heroicons-tag"
@@ -136,7 +105,7 @@
           variant="outline"
           @click="tagsModalOpen = true"
         >
-          {{ $t('gestion.stock.tags.manage') }}
+          <span class="hidden sm:inline">{{ $t('gestion.stock.tags.manage') }}</span>
         </UButton>
         <!-- Choix des colonnes affichées, servi par l'API du tableau. -->
         <UDropdownMenu
@@ -158,16 +127,40 @@
               }))
           "
         >
-          <UButton
-            icon="i-heroicons-view-columns"
-            color="neutral"
-            variant="outline"
-            trailing-icon="i-heroicons-chevron-down"
-          >
-            {{ $t('gestion.stock.columns') }}
+          <UButton icon="i-heroicons-view-columns" color="neutral" variant="outline">
+            <span class="hidden sm:inline">{{ $t('gestion.stock.columns') }}</span>
           </UButton>
         </UDropdownMenu>
       </div>
+
+      <UModal v-model:open="filtresModalOpen" :title="$t('gestion.stock.filters')">
+        <template #body>
+          <StockItemFilters
+            v-model:nom="nomFiltre"
+            v-model:tags="tagsFiltres"
+            v-model:etats="etatsFiltres"
+            v-model:lieu="lieuFiltre"
+            :tag-items="tagItems"
+            :etats-items="etatsItems"
+            class="space-y-4"
+          />
+        </template>
+        <template #footer>
+          <div class="flex w-full justify-between gap-2">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :disabled="!nombreFiltresActifs"
+              @click="reinitialiserFiltres"
+            >
+              {{ $t('common.reset') }}
+            </UButton>
+            <UButton color="primary" @click="filtresModalOpen = false">
+              {{ $t('common.close') }}
+            </UButton>
+          </div>
+        </template>
+      </UModal>
 
       <div
         v-if="!group.items.length"
@@ -500,12 +493,12 @@ import {
   prochaineEtapeEmprunt,
   urlDepuisEtats,
 } from '../../../../../utils/etat-emprunt'
-import { filtrerParLieuEmprunt } from '../../../../../utils/filtre-lieu-emprunt'
 import {
   filtrerParTags,
   tagsDepuisUrl,
   urlDepuisTags,
 } from '../../../../../utils/filtre-tags-stock'
+import { filtrerParLieuEmprunt, filtrerParNom } from '../../../../../utils/recherche-materiel'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
@@ -678,16 +671,42 @@ const etatsItems = computed(() =>
  * Les règles vivent dans des utilitaires à part, éprouvés hors du navigateur : cet écran demande
  * une session, et l'on n'y vérifie rien d'un coup d'œil.
  */
+const nomFiltre = ref('')
 const lieuFiltre = ref('')
+const filtresModalOpen = ref(false)
+
+/**
+ * Combien de filtres sont posés.
+ *
+ * Sert la pastille du bouton sur écran étroit : les filtres y sont cachés dans une modale, et
+ * sans ce compte on chercherait longtemps pourquoi la liste paraît incomplète.
+ */
+const nombreFiltresActifs = computed(
+  () =>
+    (nomFiltre.value.trim() ? 1 : 0) +
+    (tagsFiltres.value.length > 0 ? 1 : 0) +
+    (etatsFiltres.value.length > 0 ? 1 : 0) +
+    (lieuFiltre.value.trim() ? 1 : 0)
+)
+
+function reinitialiserFiltres() {
+  nomFiltre.value = ''
+  tagsFiltres.value = []
+  etatsFiltres.value = []
+  lieuFiltre.value = ''
+}
 
 const objetsAffiches = computed(() =>
   filtrerParLieuEmprunt(
-    filtrerParEtatEmprunt(
-      filtrerParTags(
-        group.value?.items ?? [],
-        tagsFiltres.value.map((tg) => tg.value)
+    filtrerParNom(
+      filtrerParEtatEmprunt(
+        filtrerParTags(
+          group.value?.items ?? [],
+          tagsFiltres.value.map((tg) => tg.value)
+        ),
+        etatsFiltres.value.map((e) => e.value)
       ),
-      etatsFiltres.value.map((e) => e.value)
+      nomFiltre.value
     ),
     lieuFiltre.value
   )
@@ -719,20 +738,23 @@ function appliquerFiltreDeLUrl() {
   const etats = etatsDepuisUrl(route.query.emprunt)
   etatsFiltres.value = etatsItems.value.filter((e) => etats.includes(e.value as never))
 
+  nomFiltre.value = typeof route.query.nom === 'string' ? route.query.nom : ''
   lieuFiltre.value = typeof route.query.lieu === 'string' ? route.query.lieu : ''
 }
 
 // L'adresse suit le filtre : un lien se partage, et un rechargement ne perd plus la sélection.
 // `replace` plutôt que `push`, sans quoi chaque case cochée s'empilerait dans l'historique et le
 // bouton « précédent » deviendrait inutilisable.
-watch([tagsFiltres, etatsFiltres, lieuFiltre], () => {
+watch([nomFiltre, tagsFiltres, etatsFiltres, lieuFiltre], () => {
+  const parNom = nomFiltre.value.trim() || undefined
   const parTags = urlDepuisTags(tagsFiltres.value.map((tg) => tg.value))
   const parEtat = urlDepuisEtats(etatsFiltres.value.map((e) => e.value))
   const parLieu = lieuFiltre.value.trim() || undefined
-  const { tags: _tags, emprunt: _emprunt, lieu: _lieu, ...reste } = route.query
+  const { nom: _nom, tags: _tags, emprunt: _emprunt, lieu: _lieu, ...reste } = route.query
   router.replace({
     query: {
       ...reste,
+      ...(parNom ? { nom: parNom } : {}),
       ...(parTags ? { tags: parTags } : {}),
       ...(parEtat ? { emprunt: parEtat } : {}),
       ...(parLieu ? { lieu: parLieu } : {}),
