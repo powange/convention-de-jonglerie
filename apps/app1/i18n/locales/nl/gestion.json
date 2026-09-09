@@ -514,7 +514,9 @@
       "columns": "Kolommen",
       "loan_none": "Geen bruikleen",
       "loan_place_filter": "Ophaal- of retourlocatie",
-      "loan_place_filter_placeholder": "Zoek een locatie"
+      "loan_place_filter_placeholder": "Zoek een locatie",
+      "filters": "Filters",
+      "name_filter_placeholder": "Zoek een item"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

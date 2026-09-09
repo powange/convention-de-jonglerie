@@ -514,7 +514,9 @@
       "columns": "Kolumner",
       "loan_none": "Inte ett lån",
       "loan_place_filter": "Hämt- eller återlämningsplats",
-      "loan_place_filter_placeholder": "Sök en plats"
+      "loan_place_filter_placeholder": "Sök en plats",
+      "filters": "Filter",
+      "name_filter_placeholder": "Sök ett föremål"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

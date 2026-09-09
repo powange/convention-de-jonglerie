@@ -514,7 +514,9 @@
       "columns": "Стовпці",
       "loan_none": "Не в оренді",
       "loan_place_filter": "Місце отримання або повернення",
-      "loan_place_filter_placeholder": "Шукати місце"
+      "loan_place_filter_placeholder": "Шукати місце",
+      "filters": "Фільтри",
+      "name_filter_placeholder": "Знайти предмет"
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

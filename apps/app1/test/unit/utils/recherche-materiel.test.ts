@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { filtrerParLieuEmprunt } from '../../../../../layers/stock/app/utils/filtre-lieu-emprunt'
+import {
+  filtrerParLieuEmprunt,
+  filtrerParNom,
+} from '../../../../../layers/stock/app/utils/recherche-materiel'
 
 /**
  * Les lieux d'emprunt sont saisis à la main : « Chez Marie » et « chez Marie, 12 rue des Lilas »
@@ -41,5 +44,47 @@ describe('filtrerParLieuEmprunt', () => {
 
   it('écarte le matériel sans aucun lieu dès qu’on cherche', () => {
     expect(filtrerParLieuEmprunt(STOCK, 'marie').map((o) => o.nom)).not.toContain('Rallonge')
+  })
+})
+
+/**
+ * La recherche par nom : la première chose qu'on tente quand on cherche un objet dans un stock
+ * fourni, avant même de savoir dans quel groupe il est rangé.
+ */
+describe('filtrerParNom', () => {
+  const STOCK = [
+    { name: 'Rallonge 25 m' },
+    { name: 'Rallonge 10 m' },
+    { name: 'Enceinte amplifiée' },
+    { name: 'Chapiteau', description: 'avec sa rallonge' },
+  ]
+
+  it('rend tout sans recherche', () => {
+    expect(filtrerParNom(STOCK, '')).toHaveLength(4)
+    expect(filtrerParNom(STOCK, '  ')).toHaveLength(4)
+  })
+
+  it('trouve sur un mot du nom', () => {
+    expect(filtrerParNom(STOCK, 'rallonge').map((o) => o.name)).toEqual([
+      'Rallonge 25 m',
+      'Rallonge 10 m',
+    ])
+  })
+
+  it('exige tous les mots, dans un ordre quelconque', () => {
+    expect(filtrerParNom(STOCK, '25 rallonge').map((o) => o.name)).toEqual(['Rallonge 25 m'])
+  })
+
+  it('ignore les accents et la casse', () => {
+    expect(filtrerParNom(STOCK, 'AMPLIFIEE').map((o) => o.name)).toEqual(['Enceinte amplifiée'])
+  })
+
+  it('ne cherche pas dans la description', () => {
+    // Remonter un chapiteau parce que sa fiche mentionne une rallonge brouillerait le résultat.
+    expect(filtrerParNom(STOCK, 'rallonge').map((o) => o.name)).not.toContain('Chapiteau')
+  })
+
+  it('tolère un objet sans nom', () => {
+    expect(filtrerParNom([{ name: null }], 'rallonge')).toEqual([])
   })
 })

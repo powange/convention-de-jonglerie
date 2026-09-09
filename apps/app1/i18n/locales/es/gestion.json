@@ -514,7 +514,9 @@
       "columns": "Columnas",
       "loan_none": "No es un préstamo",
       "loan_place_filter": "Lugar de recogida o devolución",
-      "loan_place_filter_placeholder": "Buscar un lugar"
+      "loan_place_filter_placeholder": "Buscar un lugar",
+      "filters": "Filtros",
+      "name_filter_placeholder": "Buscar un objeto"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

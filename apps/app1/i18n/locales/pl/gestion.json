@@ -514,7 +514,9 @@
       "columns": "Kolumny",
       "loan_none": "Nie jest wypożyczone",
       "loan_place_filter": "Miejsce odbioru lub zwrotu",
-      "loan_place_filter_placeholder": "Szukaj miejsca"
+      "loan_place_filter_placeholder": "Szukaj miejsca",
+      "filters": "Filtry",
+      "name_filter_placeholder": "Szukaj przedmiotu"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",
