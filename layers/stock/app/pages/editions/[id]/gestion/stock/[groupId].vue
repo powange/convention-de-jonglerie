@@ -309,21 +309,48 @@
             <span v-else class="text-gray-400">—</span>
           </template>
 
+          <template #lieuEmprunt-cell="{ row }">
+            <span v-if="prochaineEtape(row.original)?.lieu" class="text-sm">
+              {{ prochaineEtape(row.original)!.lieu }}
+            </span>
+            <span v-else class="text-gray-400">—</span>
+          </template>
+
+          <template #responsableEmprunt-cell="{ row }">
+            <span v-if="prochaineEtape(row.original)?.qui" class="text-sm">
+              {{ prochaineEtape(row.original)!.qui }}
+            </span>
+            <span v-else class="text-gray-400">—</span>
+          </template>
+
           <template #storage-cell="{ row }">
-            <div
-              v-if="row.original.location || row.original.zone || row.original.marker"
-              class="flex items-center flex-wrap gap-1.5 text-sm"
-            >
-              <span
-                v-if="row.original.zone"
-                class="size-3 rounded-full border border-gray-300"
-                :style="{ backgroundColor: row.original.zone.color }"
-              />
-              <UIcon v-else-if="row.original.marker" name="i-heroicons-flag" class="size-4" />
-              <UIcon v-else name="i-heroicons-map-pin" class="size-4 text-gray-400" />
-              <span>
-                {{ row.original.zone?.name || row.original.marker?.name || row.original.location }}
-              </span>
+            <!-- Deux lignes quand les deux existent : le lieu de la carte situe, la précision
+                 écrite à la main retrouve. Un lieu posé sur la carte porte la couleur et l'icône
+                 de son type, comme sur la carte elle-même. -->
+            <div v-if="emplacementDe(row.original)" class="text-sm">
+              <div
+                v-if="emplacementDe(row.original)!.carte"
+                class="flex items-center flex-wrap gap-1.5"
+              >
+                <UIcon
+                  :name="emplacementDe(row.original)!.carte!.icone"
+                  class="size-4 shrink-0"
+                  :style="{ color: emplacementDe(row.original)!.carte!.couleur }"
+                />
+                <span>{{ emplacementDe(row.original)!.carte!.nom }}</span>
+              </div>
+              <div
+                v-if="emplacementDe(row.original)!.texte"
+                class="flex items-center flex-wrap gap-1.5"
+                :class="emplacementDe(row.original)!.carte ? 'text-gray-500 text-xs mt-0.5' : ''"
+              >
+                <UIcon
+                  v-if="!emplacementDe(row.original)!.carte"
+                  name="i-heroicons-map-pin"
+                  class="size-4 shrink-0 text-gray-400"
+                />
+                <span>{{ emplacementDe(row.original)!.texte }}</span>
+              </div>
             </div>
             <span v-else class="text-sm text-gray-400 italic">
               {{ $t('gestion.stock.no_location') }}
@@ -486,6 +513,10 @@
 import { useAuthStore, useEditionStore } from '#imports'
 
 import {
+  apparenceEmplacement,
+  libelleEmplacement,
+} from '../../../../../utils/apparence-emplacement'
+import {
   ETATS_EMPRUNT,
   etatEmprunt,
   etatsDepuisUrl,
@@ -531,7 +562,12 @@ interface StockTag {
 const tableRef = ref()
 // Le nom d'abord : c'est l'ordre dans lequel on cherche un objet quand on ne sait plus où il est.
 const tri = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
-const colonnesVisibles = ref<Record<string, boolean>>({})
+// Masquées d'entrée : elles ne servent qu'à préparer une tournée, et le menu « Colonnes » les
+// ramène quand on en a besoin.
+const colonnesVisibles = ref<Record<string, boolean>>({
+  lieuEmprunt: false,
+  responsableEmprunt: false,
+})
 
 /**
  * Remplace les tags d'une seule ligne, après enregistrement.
@@ -542,6 +578,11 @@ const colonnesVisibles = ref<Record<string, boolean>>({})
 function majTagsLigne(itemId: number, tags: Array<{ tag: { id: number } }>) {
   const objet = group.value?.items.find((it) => it.id === itemId)
   if (objet) objet.tags = tags as any
+}
+
+/** L'emplacement de rangement, avec sa couleur et son icône. */
+function emplacementDe(materiel: any) {
+  return apparenceEmplacement(materiel.zone, materiel.marker, materiel.location)
 }
 
 /** L'étape en cours d'un emprunt : où aller et qui s'en charge, ou `null` s'il n'y a rien à dire. */
@@ -556,6 +597,8 @@ function libelleColonne(id: string): string {
     quantity: t('common.quantity'),
     tags: t('gestion.stock.tags.field_label'),
     loan: t('gestion.stock.external_loan'),
+    lieuEmprunt: t('gestion.stock.loan_place'),
+    responsableEmprunt: t('gestion.stock.loan_responsible'),
     storage: t('gestion.stock.item_storage_location'),
     current: t('gestion.stock.item_current_location'),
     reservations: t('gestion.stock.reservations_title'),
@@ -613,9 +656,22 @@ const colonnes = computed((): TableColumn<any>[] => [
     accessorFn: (item: any) => etatEmprunt(item)?.cle ?? '',
     header: ({ column }) => enTeteTriable(column, t('gestion.stock.external_loan')),
   },
+  // Le lieu et la personne de l'étape en cours, masqués par défaut : ils ne servent qu'au moment
+  // de préparer une tournée de récupération ou de retour, et encombreraient la liste le reste du
+  // temps. La même logique que l'infobulle les alimente — pas de seconde règle qui divergerait.
+  {
+    id: 'lieuEmprunt',
+    accessorFn: (item: any) => prochaineEtapeEmprunt(item)?.lieu ?? '',
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.loan_place')),
+  },
+  {
+    id: 'responsableEmprunt',
+    accessorFn: (item: any) => prochaineEtapeEmprunt(item)?.qui ?? '',
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.loan_responsible')),
+  },
   {
     id: 'storage',
-    accessorFn: (item: any) => item.zone?.name || item.marker?.name || item.location || '',
+    accessorFn: (item: any) => libelleEmplacement(emplacementDe(item)),
     header: ({ column }) => enTeteTriable(column, t('gestion.stock.item_storage_location')),
   },
   {

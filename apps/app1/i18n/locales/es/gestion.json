@@ -516,7 +516,9 @@
       "loan_place_filter": "Lugar de recogida o devolución",
       "loan_place_filter_placeholder": "Buscar un lugar",
       "filters": "Filtros",
-      "name_filter_placeholder": "Buscar un objeto"
+      "name_filter_placeholder": "Buscar un objeto",
+      "loan_place": "Lugar",
+      "loan_responsible": "Quién se encarga"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

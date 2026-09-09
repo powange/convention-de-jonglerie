@@ -41,8 +41,11 @@ export async function validateReservationLocation(
  * de stock avec les infos zone/marker nécessaires pour l'affichage.
  */
 export const stockItemLocationInclude = {
-  zone: { select: { id: true, name: true, color: true } },
-  marker: { select: { id: true, name: true } },
+  // Les types viennent avec : l'écran affiche l'icône du type de zone ou de marqueur, comme la
+  // carte du site. Sans eux, tous les emplacements se ressemblaient — un point coloré pour une
+  // zone, un drapeau générique pour un marqueur.
+  zone: { select: { id: true, name: true, color: true, zoneTypes: true } },
+  marker: { select: { id: true, name: true, color: true, markerTypes: true } },
 } as const
 
 /**

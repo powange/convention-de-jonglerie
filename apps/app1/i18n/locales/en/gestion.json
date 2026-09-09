@@ -516,7 +516,9 @@
       "loan_place_filter": "Collection or return place",
       "loan_place_filter_placeholder": "Search a place",
       "filters": "Filters",
-      "name_filter_placeholder": "Search an item"
+      "name_filter_placeholder": "Search an item",
+      "loan_place": "Place",
+      "loan_responsible": "Who handles it"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

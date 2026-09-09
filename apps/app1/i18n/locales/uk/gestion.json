@@ -516,7 +516,9 @@
       "loan_place_filter": "Місце отримання або повернення",
       "loan_place_filter_placeholder": "Шукати місце",
       "filters": "Фільтри",
-      "name_filter_placeholder": "Знайти предмет"
+      "name_filter_placeholder": "Знайти предмет",
+      "loan_place": "Місце",
+      "loan_responsible": "Хто займається"
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

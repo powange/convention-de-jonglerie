@@ -79,24 +79,29 @@
               <p v-if="item.notes" class="text-xs text-gray-500 mt-2 italic whitespace-pre-wrap">
                 {{ item.notes }}
               </p>
-              <!-- Emplacement de rangement par défaut -->
+              <!-- Emplacement de rangement par défaut. Un lieu posé sur la carte porte la
+                   couleur et l'icône de son type, comme sur la carte elle-même ; un emplacement
+                   écrit à la main garde une épingle grise. -->
               <div
-                v-if="item.location || item.zone || item.marker"
+                v-if="emplacement"
                 class="mt-2 text-xs text-gray-600 dark:text-gray-400 flex items-center flex-wrap gap-x-2 gap-y-1"
               >
-                <UIcon name="i-heroicons-map-pin" class="size-3.5 text-gray-400" />
                 <span class="font-medium">{{ $t('gestion.stock.item_storage_location') }} :</span>
-                <span v-if="item.location">{{ item.location }}</span>
-                <span v-if="item.zone" class="flex items-center gap-1">
-                  <span
-                    class="size-2.5 rounded-full border border-gray-300"
-                    :style="{ backgroundColor: item.zone.color }"
+                <span v-if="emplacement.carte" class="flex items-center gap-1">
+                  <UIcon
+                    :name="emplacement.carte.icone"
+                    class="size-3.5 shrink-0"
+                    :style="{ color: emplacement.carte.couleur }"
                   />
-                  {{ item.zone.name }}
+                  {{ emplacement.carte.nom }}
                 </span>
-                <span v-if="item.marker" class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-flag" class="size-3.5" />
-                  {{ item.marker.name }}
+                <span v-if="emplacement.texte" class="flex items-center gap-1">
+                  <UIcon
+                    v-if="!emplacement.carte"
+                    name="i-heroicons-map-pin"
+                    class="size-3.5 shrink-0 text-gray-400"
+                  />
+                  {{ emplacement.texte }}
                 </span>
               </div>
               <div v-if="item.isExternalLoan" class="mt-2 flex items-center gap-2 flex-wrap">
@@ -371,6 +376,8 @@
 <script setup lang="ts">
 import { useAuthStore, useEditionStore } from '#imports'
 
+import { apparenceEmplacement } from '../../../../../../utils/apparence-emplacement'
+
 definePageMeta({
   layout: 'edition-dashboard',
   middleware: ['auth-protected'],
@@ -495,6 +502,11 @@ const responsableRecuperation = computed(
 )
 const responsableRetour = computed(
   () => !!(item.value?.returnResponsible || item.value?.returnContact)
+)
+
+/** L'emplacement de rangement, avec sa couleur et son icône. */
+const emplacement = computed(() =>
+  item.value ? apparenceEmplacement(item.value.zone, item.value.marker, item.value.location) : null
 )
 
 // Les tags de l'édition, pour que la modale d'édition puisse les proposer.
