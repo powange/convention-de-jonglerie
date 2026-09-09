@@ -518,7 +518,22 @@
       "filters": "Filtry",
       "name_filter_placeholder": "Hledat předmět",
       "loan_place": "Místo",
-      "loan_responsible": "Kdo to zařizuje"
+      "loan_responsible": "Kdo to zařizuje",
+      "bulk_edit": "Upravit vybrané předměty",
+      "bulk_edit_add_tags": "Štítky k přidání",
+      "bulk_edit_apply": "Použít na {count} předmět | Použít na {count} předmětů",
+      "bulk_edit_intro": "Použijí se pouze zaškrtnutá pole na {count} vybraných předmětů. Zaškrtnuté, ale prázdné pole hodnotu smaže.",
+      "bulk_edit_loan_scope": "Ve výběru není žádná zápůjčka: pole níže nebudou mít účinek. | Pole níže se použijí jen na {count} zapůjčený předmět. | Pole níže se použijí jen na {count} zapůjčených předmětů.",
+      "bulk_edit_remove_tags": "Štítky k odebrání",
+      "bulk_move": "Přesunout",
+      "bulk_move_apply": "Přesunout {count} předmět | Přesunout {count} předmětů",
+      "bulk_move_choose_group": "Vyberte skupinu",
+      "bulk_move_intro": "Vyberte skupinu, do které přesunout {count} vybraných předmětů.",
+      "bulk_move_leaves_page": "Předměty opustí tuto stránku a přejdou do zvolené skupiny.",
+      "bulk_move_no_other_group": "Není žádná jiná skupina, kam přesunout.",
+      "item_group": "Skupina",
+      "item_location_placeholder": "Ručně psané upřesnění (nepovinné)",
+      "tab_general": "Obecné"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

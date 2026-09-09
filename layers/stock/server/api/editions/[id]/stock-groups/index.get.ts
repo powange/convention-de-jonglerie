@@ -1,6 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
+import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { canAccessStock, stockItemLocationInclude } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -33,9 +34,11 @@ export default wrapApiHandler(
           include: {
             ...stockItemLocationInclude,
             // La liste annonce l'étape en cours d'un emprunt — où aller, et qui s'en charge —,
-            // ce qui demande les responsables et non seulement les dates.
-            pickupResponsible: { select: { id: true, pseudo: true } },
-            returnResponsible: { select: { id: true, pseudo: true } },
+            // ce qui demande les responsables et non seulement les dates. La même sélection que la
+            // fiche : la modale d'édition s'ouvre désormais depuis cette page, et son sélecteur de
+            // personne montrerait un rond vide sans l'avatar.
+            pickupResponsible: { select: userWithProfileAndGravatarSelect },
+            returnResponsible: { select: userWithProfileAndGravatarSelect },
             // Les pastilles suivent le matériel jusque dans la liste : c'est là qu'on filtre.
             tags: {
               include: {

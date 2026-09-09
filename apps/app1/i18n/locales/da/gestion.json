@@ -518,7 +518,22 @@
       "filters": "Filtre",
       "name_filter_placeholder": "Søg en genstand",
       "loan_place": "Sted",
-      "loan_responsible": "Hvem står for det"
+      "loan_responsible": "Hvem står for det",
+      "bulk_edit": "Rediger de valgte genstande",
+      "bulk_edit_add_tags": "Tags der skal tilføjes",
+      "bulk_edit_apply": "Anvend på {count} genstand | Anvend på {count} genstande",
+      "bulk_edit_intro": "Kun afkrydsede felter anvendes på de {count} valgte genstande. Et afkrydset, men tomt felt rydder værdien.",
+      "bulk_edit_loan_scope": "Ingen lånt genstand i udvalget: felterne nedenfor har ingen virkning. | Felterne nedenfor gælder kun {count} lånt genstand. | Felterne nedenfor gælder kun {count} lånte genstande.",
+      "bulk_edit_remove_tags": "Tags der skal fjernes",
+      "bulk_move": "Flyt",
+      "bulk_move_apply": "Flyt {count} genstand | Flyt {count} genstande",
+      "bulk_move_choose_group": "Vælg en gruppe",
+      "bulk_move_intro": "Vælg den gruppe, de {count} valgte genstande skal flyttes til.",
+      "bulk_move_leaves_page": "Genstandene forlader denne side og går til den valgte gruppe.",
+      "bulk_move_no_other_group": "Der er ingen anden gruppe at flytte til.",
+      "item_group": "Gruppe",
+      "item_location_placeholder": "Håndskrevet præcisering (valgfri)",
+      "tab_general": "Generelt"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

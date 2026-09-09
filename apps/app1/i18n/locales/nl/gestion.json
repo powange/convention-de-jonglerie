@@ -518,7 +518,22 @@
       "filters": "Filters",
       "name_filter_placeholder": "Zoek een item",
       "loan_place": "Locatie",
-      "loan_responsible": "Wie regelt het"
+      "loan_responsible": "Wie regelt het",
+      "bulk_edit": "Geselecteerde items bewerken",
+      "bulk_edit_add_tags": "Toe te voegen tags",
+      "bulk_edit_apply": "Toepassen op {count} item | Toepassen op {count} items",
+      "bulk_edit_intro": "Alleen aangevinkte velden worden toegepast op de {count} geselecteerde items. Een aangevinkt maar leeg veld wist de waarde.",
+      "bulk_edit_loan_scope": "Geen bruikleen in de selectie: onderstaande velden hebben geen effect. | Onderstaande velden gelden alleen voor {count} bruikleen. | Onderstaande velden gelden alleen voor {count} bruiklenen.",
+      "bulk_edit_remove_tags": "Te verwijderen tags",
+      "bulk_move": "Verplaatsen",
+      "bulk_move_apply": "{count} item verplaatsen | {count} items verplaatsen",
+      "bulk_move_choose_group": "Kies een groep",
+      "bulk_move_intro": "Kies de groep waarheen de {count} geselecteerde items verplaatst worden.",
+      "bulk_move_leaves_page": "De items verlaten deze pagina en gaan naar de gekozen groep.",
+      "bulk_move_no_other_group": "Er is geen andere groep om naartoe te verplaatsen.",
+      "item_group": "Groep",
+      "item_location_placeholder": "Handgeschreven detail (optioneel)",
+      "tab_general": "Algemeen"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

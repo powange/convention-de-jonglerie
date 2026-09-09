@@ -518,7 +518,22 @@
       "filters": "Filtry",
       "name_filter_placeholder": "Szukaj przedmiotu",
       "loan_place": "Miejsce",
-      "loan_responsible": "Kto się tym zajmuje"
+      "loan_responsible": "Kto się tym zajmuje",
+      "bulk_edit": "Edytuj wybrane przedmioty",
+      "bulk_edit_add_tags": "Tagi do dodania",
+      "bulk_edit_apply": "Zastosuj do {count} przedmiotu | Zastosuj do {count} przedmiotów",
+      "bulk_edit_intro": "Tylko zaznaczone pola zostaną zastosowane do {count} wybranych przedmiotów. Zaznaczone, ale puste pole czyści wartość.",
+      "bulk_edit_loan_scope": "Brak wypożyczonych przedmiotów w zaznaczeniu: poniższe pola nie odniosą skutku. | Poniższe pola dotyczą tylko {count} wypożyczonego przedmiotu. | Poniższe pola dotyczą tylko {count} wypożyczonych przedmiotów.",
+      "bulk_edit_remove_tags": "Tagi do usunięcia",
+      "bulk_move": "Przenieś",
+      "bulk_move_apply": "Przenieś {count} przedmiot | Przenieś {count} przedmiotów",
+      "bulk_move_choose_group": "Wybierz grupę",
+      "bulk_move_intro": "Wybierz grupę, do której przenieść {count} wybranych przedmiotów.",
+      "bulk_move_leaves_page": "Przedmioty opuszczą tę stronę i trafią do wybranej grupy.",
+      "bulk_move_no_other_group": "Nie ma innej grupy, do której można przenieść.",
+      "item_group": "Grupa",
+      "item_location_placeholder": "Odręczne uszczegółowienie (opcjonalne)",
+      "tab_general": "Ogólne"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

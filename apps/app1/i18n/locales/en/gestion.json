@@ -518,7 +518,22 @@
       "filters": "Filters",
       "name_filter_placeholder": "Search an item",
       "loan_place": "Place",
-      "loan_responsible": "Who handles it"
+      "loan_responsible": "Who handles it",
+      "bulk_edit": "Edit selected items",
+      "bulk_edit_add_tags": "Tags to add",
+      "bulk_edit_apply": "Apply to {count} item | Apply to {count} items",
+      "bulk_edit_intro": "Only ticked fields will be applied to the {count} selected items. A ticked field left empty clears the value.",
+      "bulk_edit_loan_scope": "No loaned item in the selection: the fields below will have no effect. | The fields below will only apply to {count} loaned item. | The fields below will only apply to {count} loaned items.",
+      "bulk_edit_remove_tags": "Tags to remove",
+      "bulk_move": "Move",
+      "bulk_move_apply": "Move {count} item | Move {count} items",
+      "bulk_move_choose_group": "Choose a group",
+      "bulk_move_intro": "Choose the group to move the {count} selected items to.",
+      "bulk_move_leaves_page": "The items will leave this page to join the chosen group.",
+      "bulk_move_no_other_group": "There is no other group to move to.",
+      "item_group": "Group",
+      "item_location_placeholder": "Handwritten detail (optional)",
+      "tab_general": "General"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

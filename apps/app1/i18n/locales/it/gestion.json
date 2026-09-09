@@ -518,7 +518,22 @@
       "filters": "Filtri",
       "name_filter_placeholder": "Cerca un oggetto",
       "loan_place": "Luogo",
-      "loan_responsible": "Chi se ne occupa"
+      "loan_responsible": "Chi se ne occupa",
+      "bulk_edit": "Modifica gli oggetti selezionati",
+      "bulk_edit_add_tags": "Tag da aggiungere",
+      "bulk_edit_apply": "Applica a {count} oggetto | Applica a {count} oggetti",
+      "bulk_edit_intro": "Solo i campi spuntati saranno applicati ai {count} oggetti selezionati. Un campo spuntato ma lasciato vuoto cancella il valore.",
+      "bulk_edit_loan_scope": "Nessun oggetto in prestito nella selezione: i campi sotto non avranno effetto. | I campi sotto si applicheranno solo a {count} oggetto in prestito. | I campi sotto si applicheranno solo a {count} oggetti in prestito.",
+      "bulk_edit_remove_tags": "Tag da rimuovere",
+      "bulk_move": "Sposta",
+      "bulk_move_apply": "Sposta {count} oggetto | Sposta {count} oggetti",
+      "bulk_move_choose_group": "Scegli un gruppo",
+      "bulk_move_intro": "Scegli il gruppo verso cui spostare i {count} oggetti selezionati.",
+      "bulk_move_leaves_page": "Gli oggetti lasceranno questa pagina per raggiungere il gruppo scelto.",
+      "bulk_move_no_other_group": "Non c'è un altro gruppo verso cui spostare.",
+      "item_group": "Gruppo",
+      "item_location_placeholder": "Precisazione scritta a mano (facoltativa)",
+      "tab_general": "Generale"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",
