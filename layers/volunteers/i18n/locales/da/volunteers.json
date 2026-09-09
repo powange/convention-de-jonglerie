@@ -519,6 +519,11 @@
     "staffing_exact": "Bemandingen svarer nøjagtigt til behovet",
     "staffing_missing": "Der mangler {count} frivillige",
     "staffing_need": "Nødvendig bemanding: {count} frivillige",
-    "staffing_surplus": "{count} frivillige ud over det nødvendige"
+    "staffing_surplus": "{count} frivillige ud over det nødvendige",
+    "see_slots": "Se vedkommendes vagter",
+    "slots_back_to_back": "Direkte efter hinanden",
+    "slots_break_of": "{duration} pause",
+    "slots_count": "{count} vagt | {count} vagter",
+    "slots_overlap_by": "Overlap på {duration}"
   }
 }

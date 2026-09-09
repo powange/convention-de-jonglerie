@@ -519,6 +519,11 @@
     "staffing_exact": "L'organico corrisponde esattamente al fabbisogno",
     "staffing_missing": "Mancano {count} volontari",
     "staffing_need": "Organico necessario: {count} volontari",
-    "staffing_surplus": "{count} volontari oltre il necessario"
+    "staffing_surplus": "{count} volontari oltre il necessario",
+    "see_slots": "Vedi i suoi turni",
+    "slots_back_to_back": "Uno di seguito all'altro",
+    "slots_break_of": "{duration} di pausa",
+    "slots_count": "{count} turno | {count} turni",
+    "slots_overlap_by": "Sovrapposizione di {duration}"
   }
 }

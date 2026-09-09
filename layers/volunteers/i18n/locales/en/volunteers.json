@@ -519,6 +519,11 @@
     "staffing_exact": "The headcount matches the need exactly",
     "staffing_missing": "{count} volunteer(s) short",
     "staffing_need": "Headcount needed: {count} volunteer(s)",
-    "staffing_surplus": "{count} volunteer(s) beyond what is needed"
+    "staffing_surplus": "{count} volunteer(s) beyond what is needed",
+    "see_slots": "See their slots",
+    "slots_back_to_back": "Back to back",
+    "slots_break_of": "{duration} break",
+    "slots_count": "{count} slot | {count} slots",
+    "slots_overlap_by": "Overlaps by {duration}"
   }
 }

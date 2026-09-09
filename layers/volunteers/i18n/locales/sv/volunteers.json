@@ -519,6 +519,11 @@
     "staffing_exact": "Bemanningen motsvarar behovet exakt",
     "staffing_missing": "Det saknas {count} volontärer",
     "staffing_need": "Bemanning som behövs: {count} volontärer",
-    "staffing_surplus": "{count} volontärer utöver behovet"
+    "staffing_surplus": "{count} volontärer utöver behovet",
+    "see_slots": "Se hens pass",
+    "slots_back_to_back": "Direkt efter varandra",
+    "slots_break_of": "{duration} paus",
+    "slots_count": "{count} pass | {count} pass",
+    "slots_overlap_by": "Överlapp på {duration}"
   }
 }
