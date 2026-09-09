@@ -508,10 +508,13 @@
         "confirm_delete": "¿Eliminar la etiqueta «{name}»? Se quitará de todo el material que la lleve.",
         "manage": "Etiquetas",
         "field_label": "Etiquetas",
-        "field_placeholder": "Sin etiquetas",
         "filter_label": "Filtrar por etiquetas",
         "filter_placeholder": "Sin filtro"
-      }
+      },
+      "columns": "Columnas",
+      "loan_none": "No es un préstamo",
+      "loan_place_filter": "Lugar de recogida o devolución",
+      "loan_place_filter_placeholder": "Buscar un lugar"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

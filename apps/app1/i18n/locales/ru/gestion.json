@@ -508,10 +508,13 @@
         "confirm_delete": "Удалить метку «{name}»? Она будет снята со всех вещей, которые её несут.",
         "manage": "Метки",
         "field_label": "Метки",
-        "field_placeholder": "Без меток",
         "filter_label": "Фильтр по меткам",
         "filter_placeholder": "Без фильтра"
-      }
+      },
+      "columns": "Столбцы",
+      "loan_none": "Не в аренде",
+      "loan_place_filter": "Место получения или возврата",
+      "loan_place_filter_placeholder": "Искать место"
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

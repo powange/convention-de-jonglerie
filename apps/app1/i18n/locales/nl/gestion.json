@@ -508,10 +508,13 @@
         "confirm_delete": "Tag “{name}” verwijderen? Hij wordt weggehaald bij al het materiaal dat hem draagt.",
         "manage": "Tags",
         "field_label": "Tags",
-        "field_placeholder": "Geen tags",
         "filter_label": "Filteren op tags",
         "filter_placeholder": "Geen filter"
-      }
+      },
+      "columns": "Kolommen",
+      "loan_none": "Geen bruikleen",
+      "loan_place_filter": "Ophaal- of retourlocatie",
+      "loan_place_filter_placeholder": "Zoek een locatie"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

@@ -508,10 +508,13 @@
         "confirm_delete": "Usunąć tag „{name}”? Zostanie zdjęty z całego sprzętu, który go nosi.",
         "manage": "Tagi",
         "field_label": "Tagi",
-        "field_placeholder": "Brak tagów",
         "filter_label": "Filtruj po tagach",
         "filter_placeholder": "Bez filtra"
-      }
+      },
+      "columns": "Kolumny",
+      "loan_none": "Nie jest wypożyczone",
+      "loan_place_filter": "Miejsce odbioru lub zwrotu",
+      "loan_place_filter_placeholder": "Szukaj miejsca"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

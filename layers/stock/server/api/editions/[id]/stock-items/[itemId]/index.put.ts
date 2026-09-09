@@ -232,7 +232,14 @@ export default wrapApiHandler(
     const item = await prisma.stockItem.update({
       where: { id: itemId },
       data: updateData,
-      include: stockItemLocationInclude,
+      include: {
+        ...stockItemLocationInclude,
+        // Les tags reviennent avec l'objet : l'écran met alors à jour la seule ligne concernée,
+        // au lieu de recharger toute la liste pour une case cochée.
+        tags: {
+          include: { tag: { select: { id: true, name: true, color: true, displayOrder: true } } },
+        },
+      },
     })
 
     return createSuccessResponse({ item })

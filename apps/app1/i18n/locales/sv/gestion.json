@@ -508,10 +508,13 @@
         "confirm_delete": "Ta bort taggen ”{name}”? Den tas bort från all utrustning som bär den.",
         "manage": "Taggar",
         "field_label": "Taggar",
-        "field_placeholder": "Inga taggar",
         "filter_label": "Filtrera på taggar",
         "filter_placeholder": "Inget filter"
-      }
+      },
+      "columns": "Kolumner",
+      "loan_none": "Inte ett lån",
+      "loan_place_filter": "Hämt- eller återlämningsplats",
+      "loan_place_filter_placeholder": "Sök en plats"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

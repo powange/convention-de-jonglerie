@@ -32,6 +32,10 @@ export default wrapApiHandler(
           orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
           include: {
             ...stockItemLocationInclude,
+            // La liste annonce l'étape en cours d'un emprunt — où aller, et qui s'en charge —,
+            // ce qui demande les responsables et non seulement les dates.
+            pickupResponsible: { select: { id: true, pseudo: true } },
+            returnResponsible: { select: { id: true, pseudo: true } },
             // Les pastilles suivent le matériel jusque dans la liste : c'est là qu'on filtre.
             tags: {
               include: {

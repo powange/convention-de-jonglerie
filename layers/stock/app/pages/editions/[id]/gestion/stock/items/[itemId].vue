@@ -62,11 +62,15 @@
                   {{ availabilityLabel }}
                 </UBadge>
               </div>
-              <div v-if="item.tags?.length" class="flex flex-wrap gap-1 mt-2">
-                <StockTagBadge
-                  v-for="rattachement in item.tags"
-                  :key="rattachement.tag.id"
-                  :tag="rattachement.tag"
+              <!-- Même geste que dans la liste : les tags se posent ici, sans passer par la
+                   modale d'édition. -->
+              <div class="mt-2">
+                <StockItemTagsPicker
+                  :edition-id="editionId"
+                  :item="item"
+                  :tags="tags"
+                  :can-manage="canManage"
+                  @updated="(tags: any) => item && (item.tags = tags)"
                 />
               </div>
               <p v-if="item.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -344,7 +348,6 @@
       :zones="zones"
       :markers="markers"
       :site-map-enabled="!!edition?.siteMapEnabled"
-      :available-tags="tags"
       @saved="fetchItem"
     />
     <StockReservationModal
