@@ -519,6 +519,11 @@
     "staffing_exact": "Склад точно відповідає потребі",
     "staffing_missing": "Бракує {count} волонтерів",
     "staffing_need": "Потрібно: {count} волонтерів",
-    "staffing_surplus": "{count} волонтерів понад потребу"
+    "staffing_surplus": "{count} волонтерів понад потребу",
+    "see_slots": "Переглянути його зміни",
+    "slots_back_to_back": "Поспіль, без перерви",
+    "slots_break_of": "перерва {duration}",
+    "slots_count": "{count} зміна | {count} змін",
+    "slots_overlap_by": "Накладання на {duration}"
   }
 }

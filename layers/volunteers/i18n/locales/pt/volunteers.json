@@ -519,6 +519,11 @@
     "staffing_exact": "Os efetivos correspondem exatamente à necessidade",
     "staffing_missing": "Faltam {count} voluntário(s)",
     "staffing_need": "Efetivos necessários: {count} voluntário(s)",
-    "staffing_surplus": "{count} voluntário(s) além do necessário"
+    "staffing_surplus": "{count} voluntário(s) além do necessário",
+    "see_slots": "Ver os seus turnos",
+    "slots_back_to_back": "Seguidos",
+    "slots_break_of": "{duration} de pausa",
+    "slots_count": "{count} turno | {count} turnos",
+    "slots_overlap_by": "Sobreposição de {duration}"
   }
 }

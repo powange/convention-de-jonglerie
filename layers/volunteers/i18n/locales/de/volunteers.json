@@ -519,6 +519,11 @@
     "staffing_exact": "Der Personalbestand entspricht genau dem Bedarf",
     "staffing_missing": "Es fehlen {count} Freiwillige",
     "staffing_need": "Benötigt: {count} Freiwillige",
-    "staffing_surplus": "{count} Freiwillige über dem Bedarf"
+    "staffing_surplus": "{count} Freiwillige über dem Bedarf",
+    "see_slots": "Zeitfenster ansehen",
+    "slots_back_to_back": "Direkt hintereinander",
+    "slots_break_of": "{duration} Pause",
+    "slots_count": "{count} Zeitfenster | {count} Zeitfenster",
+    "slots_overlap_by": "Überschneidung von {duration}"
   }
 }

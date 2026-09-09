@@ -519,6 +519,11 @@
     "staffing_exact": "Počet přesně odpovídá potřebě",
     "staffing_missing": "Chybí {count} dobrovolníků",
     "staffing_need": "Potřebný počet: {count} dobrovolníků",
-    "staffing_surplus": "{count} dobrovolníků nad rámec potřeby"
+    "staffing_surplus": "{count} dobrovolníků nad rámec potřeby",
+    "see_slots": "Zobrazit jeho směny",
+    "slots_back_to_back": "Bezprostředně po sobě",
+    "slots_break_of": "{duration} pauzy",
+    "slots_count": "{count} směna | {count} směn",
+    "slots_overlap_by": "Překryv o {duration}"
   }
 }

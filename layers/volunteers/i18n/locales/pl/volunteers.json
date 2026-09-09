@@ -519,6 +519,11 @@
     "staffing_exact": "Obsada dokładnie odpowiada potrzebom",
     "staffing_missing": "Brakuje {count} wolontariuszy",
     "staffing_need": "Potrzebna obsada: {count} wolontariuszy",
-    "staffing_surplus": "{count} wolontariuszy ponad potrzeby"
+    "staffing_surplus": "{count} wolontariuszy ponad potrzeby",
+    "see_slots": "Zobacz jego zmiany",
+    "slots_back_to_back": "Jedna po drugiej",
+    "slots_break_of": "{duration} przerwy",
+    "slots_count": "{count} zmiana | {count} zmiany",
+    "slots_overlap_by": "Nakładanie się o {duration}"
   }
 }

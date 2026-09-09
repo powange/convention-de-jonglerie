@@ -519,6 +519,11 @@
     "staffing_exact": "Состав точно соответствует потребности",
     "staffing_missing": "Не хватает {count} волонтёров",
     "staffing_need": "Требуется: {count} волонтёров",
-    "staffing_surplus": "{count} волонтёров сверх необходимого"
+    "staffing_surplus": "{count} волонтёров сверх необходимого",
+    "see_slots": "Посмотреть его смены",
+    "slots_back_to_back": "Подряд, без перерыва",
+    "slots_break_of": "перерыв {duration}",
+    "slots_count": "{count} смена | {count} смен",
+    "slots_overlap_by": "Наложение на {duration}"
   }
 }

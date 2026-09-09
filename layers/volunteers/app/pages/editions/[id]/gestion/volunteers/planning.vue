@@ -81,10 +81,21 @@
           :heures-des-organisateurs="heuresDesOrganisateurs"
           :active-stats-tab="activeStatsTab"
           :format-date="formatDate"
+          @volunteer-click="ouvrirCreneauxDuBenevole"
         />
       </div>
 
       <!-- Modal de détails du créneau (point d'entrée) -->
+      <!-- Le détail des créneaux d'une personne, ouvert depuis le relevé par bénévole. -->
+      <EditionVolunteerPlanningVolunteerSlotsModal
+        v-model="creneauxBenevoleModalOpen"
+        :user="benevoleObserve"
+        :time-slots="convertedTimeSlots"
+        :teams="convertedTeams"
+        :format-date="formatDate"
+        @slot-click="handleSlotClick"
+      />
+
       <EditionVolunteerPlanningSlotDetailsModal
         v-model="slotDetailsModalOpen"
         :time-slot="selectedTimeSlot"
@@ -237,6 +248,16 @@ const handleCreateSlot = (data: { start: string; end: string; teamId: string }) 
     maxVolunteers: 3,
   }
   slotModalOpen.value = true
+}
+
+// Le relevé par bénévole ouvre le détail de ses créneaux ; un clic sur l'un d'eux revient à
+// l'avoir cliqué dans le planning.
+const creneauxBenevoleModalOpen = ref(false)
+const benevoleObserve = ref<any>(null)
+
+const ouvrirCreneauxDuBenevole = (user: any) => {
+  benevoleObserve.value = user
+  creneauxBenevoleModalOpen.value = true
 }
 
 const handleSlotClick = (slot: any) => {

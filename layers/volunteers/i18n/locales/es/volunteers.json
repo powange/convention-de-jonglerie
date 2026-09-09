@@ -519,6 +519,11 @@
     "staffing_exact": "El personal coincide exactamente con la necesidad",
     "staffing_missing": "Faltan {count} voluntario(s)",
     "staffing_need": "Personal necesario: {count} voluntario(s)",
-    "staffing_surplus": "{count} voluntario(s) por encima de lo necesario"
+    "staffing_surplus": "{count} voluntario(s) por encima de lo necesario",
+    "see_slots": "Ver sus turnos",
+    "slots_back_to_back": "Seguidos",
+    "slots_break_of": "{duration} de descanso",
+    "slots_count": "{count} turno | {count} turnos",
+    "slots_overlap_by": "Solapamiento de {duration}"
   }
 }

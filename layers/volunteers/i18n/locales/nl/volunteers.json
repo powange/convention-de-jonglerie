@@ -519,6 +519,11 @@
     "staffing_exact": "De bezetting komt precies overeen met de behoefte",
     "staffing_missing": "Er ontbreken {count} vrijwilliger(s)",
     "staffing_need": "Benodigde bezetting: {count} vrijwilliger(s)",
-    "staffing_surplus": "{count} vrijwilliger(s) meer dan nodig"
+    "staffing_surplus": "{count} vrijwilliger(s) meer dan nodig",
+    "see_slots": "Bekijk zijn diensten",
+    "slots_back_to_back": "Direct aansluitend",
+    "slots_break_of": "{duration} pauze",
+    "slots_count": "{count} dienst | {count} diensten",
+    "slots_overlap_by": "Overlap van {duration}"
   }
 }

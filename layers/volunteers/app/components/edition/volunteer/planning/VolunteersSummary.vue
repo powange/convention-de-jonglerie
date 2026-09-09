@@ -146,7 +146,12 @@
               class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
             >
               <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
+                <button
+                  type="button"
+                  class="flex items-center gap-3 text-left rounded hover:bg-gray-100 dark:hover:bg-gray-600 px-1 -mx-1 transition-colors"
+                  :title="t('volunteers.see_slots')"
+                  @click="emit('volunteer-click', volunteerStat.user)"
+                >
                   <UiUserAvatar :user="volunteerStat.user" />
                   <div>
                     <h5 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
@@ -164,7 +169,7 @@
                       <UiUserName :user="volunteerStat.user" />
                     </p>
                   </div>
-                </div>
+                </button>
                 <div class="flex items-center gap-2">
                   <UBadge color="primary" variant="soft">
                     {{ volunteerStat.totalHours.toFixed(1) }}h
@@ -315,6 +320,11 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  /** La personne dont on veut voir le détail des créneaux. */
+  'volunteer-click': [user: { id: number; pseudo: string; [key: string]: any }]
+}>()
 
 // Utilise le hook d'internationalisation
 const { t } = useI18n()
