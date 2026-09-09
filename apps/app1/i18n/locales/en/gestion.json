@@ -508,10 +508,13 @@
         "confirm_delete": "Delete the tag “{name}”? It will be removed from every item carrying it.",
         "manage": "Tags",
         "field_label": "Tags",
-        "field_placeholder": "No tags",
         "filter_label": "Filter by tags",
         "filter_placeholder": "No filter"
-      }
+      },
+      "columns": "Columns",
+      "loan_none": "Not a loan",
+      "loan_place_filter": "Collection or return place",
+      "loan_place_filter_placeholder": "Search a place"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

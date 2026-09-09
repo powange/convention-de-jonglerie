@@ -100,6 +100,35 @@
             </template>
           </USelectMenu>
         </UFormField>
+        <UFormField :label="$t('gestion.stock.external_loan')" class="flex-1">
+          <USelectMenu
+            v-model="etatsFiltres"
+            :items="etatsItems"
+            multiple
+            :placeholder="$t('gestion.stock.tags.filter_placeholder')"
+            class="w-full"
+            :ui="{ content: 'min-w-fit' }"
+          />
+        </UFormField>
+        <UFormField :label="$t('gestion.stock.loan_place_filter')" class="flex-1">
+          <UInput
+            v-model="lieuFiltre"
+            icon="i-heroicons-magnifying-glass"
+            :placeholder="$t('gestion.stock.loan_place_filter_placeholder')"
+            class="w-full"
+          >
+            <template v-if="lieuFiltre" #trailing>
+              <UButton
+                color="neutral"
+                variant="link"
+                size="sm"
+                icon="i-heroicons-x-mark"
+                :aria-label="$t('common.clear')"
+                @click="lieuFiltre = ''"
+              />
+            </template>
+          </UInput>
+        </UFormField>
         <UButton
           v-if="canManage"
           icon="i-heroicons-tag"
@@ -109,6 +138,35 @@
         >
           {{ $t('gestion.stock.tags.manage') }}
         </UButton>
+        <!-- Choix des colonnes affichées, servi par l'API du tableau. -->
+        <UDropdownMenu
+          v-if="viewMode === 'list'"
+          :items="
+            tableRef?.tableApi
+              ?.getAllColumns()
+              .filter((colonne: any) => colonne.getCanHide())
+              .map((colonne: any) => ({
+                label: libelleColonne(colonne.id),
+                type: 'checkbox' as const,
+                checked: colonne.getIsVisible(),
+                onUpdateChecked(coche: boolean) {
+                  tableRef?.tableApi?.getColumn(colonne.id)?.toggleVisibility(!!coche)
+                },
+                onSelect(e?: Event) {
+                  e?.preventDefault()
+                },
+              }))
+          "
+        >
+          <UButton
+            icon="i-heroicons-view-columns"
+            color="neutral"
+            variant="outline"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            {{ $t('gestion.stock.columns') }}
+          </UButton>
+        </UDropdownMenu>
       </div>
 
       <div
@@ -131,163 +189,201 @@
       </div>
 
       <UCard v-else-if="viewMode === 'list'" :ui="{ body: 'p-0 sm:p-0' }">
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead
-              class="bg-gray-50 dark:bg-gray-800/50 text-xs uppercase text-gray-600 dark:text-gray-400"
-            >
-              <tr>
-                <th class="px-2 py-2 w-10 text-center">
-                  <UCheckbox
-                    :model-value="allSelectedState"
-                    :indeterminate="someSelected && !allSelected"
-                    :aria-label="$t('common.select_all')"
-                    @update:model-value="toggleSelectAll"
-                  />
-                </th>
-                <th class="px-4 py-2 text-left font-medium">{{ $t('gestion.stock.item_name') }}</th>
-                <th class="px-4 py-2 text-right font-medium whitespace-nowrap">
-                  {{ $t('common.quantity') }}
-                </th>
-                <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
-                  {{ $t('gestion.stock.tags.field_label') }}
-                </th>
-                <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
-                  {{ $t('gestion.stock.item_storage_location') }}
-                </th>
-                <th class="px-4 py-2 text-left font-medium whitespace-nowrap">
-                  {{ $t('gestion.stock.item_current_location') }}
-                </th>
-                <th class="px-4 py-2 text-right font-medium whitespace-nowrap">
-                  {{ $t('gestion.stock.reservations_title') }}
-                </th>
-                <th class="px-2 py-2" />
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-              <tr
-                v-for="item in objetsAffiches"
-                :key="item.id"
-                :class="[
-                  'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors',
-                  selectedItemIds.has(item.id) ? 'bg-primary-50/40 dark:bg-primary-950/30' : '',
-                ]"
-                @click="goToItem(item.id)"
+        <!-- `UTable` plutôt qu'un tableau écrit à la main : le tri par colonne et le choix des
+             colonnes visibles viennent avec, au lieu d'être à réécrire ici. Le clic sur une ligne
+             mène à la fiche, comme avant. -->
+        <UTable
+          ref="tableRef"
+          v-model:sorting="tri"
+          v-model:column-visibility="colonnesVisibles"
+          v-model:row-selection="selectionLignes"
+          :get-row-id="(objet: any) => String(objet.id)"
+          :data="objetsAffiches"
+          :columns="colonnes"
+          class="w-full"
+          @select="(_evenement: Event, ligne: any) => goToItem(ligne.original.id)"
+        >
+          <template #select-header="{ table }">
+            <UCheckbox
+              :model-value="
+                table.getIsSomePageRowsSelected()
+                  ? 'indeterminate'
+                  : table.getIsAllPageRowsSelected()
+              "
+              :aria-label="$t('common.select_all')"
+              @update:model-value="
+                (coche: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!coche)
+              "
+            />
+          </template>
+          <template #select-cell="{ row }">
+            <!-- La case ne doit pas emmener sur la fiche : cocher et ouvrir sont deux gestes. -->
+            <span @click.stop>
+              <UCheckbox
+                :model-value="row.getIsSelected()"
+                :aria-label="$t('common.select')"
+                @update:model-value="
+                  (coche: boolean | 'indeterminate') => row.toggleSelected(!!coche)
+                "
+              />
+            </span>
+          </template>
+
+          <template #name-cell="{ row }">
+            <div class="flex items-center gap-1.5">
+              <span class="font-medium">{{ row.original.name }}</span>
+              <!-- La description tient rarement sur une ligne de tableau : elle passe dans une
+                   infobulle, signalée par une icône, plutôt que d'écraser la colonne. -->
+              <UPopover
+                v-if="row.original.description?.trim()"
+                mode="hover"
+                :content="{ side: 'top' }"
               >
-                <td class="px-2 py-3 align-top text-center" @click.stop>
-                  <UCheckbox
-                    :model-value="selectedItemIds.has(item.id)"
-                    :aria-label="$t('common.select')"
-                    @update:model-value="
-                      (coche: boolean | 'indeterminate') => toggleItem(item.id, coche === true)
-                    "
-                  />
-                </td>
-                <td class="px-4 py-3 align-top">
-                  <div class="font-medium">{{ item.name }}</div>
-                  <StockItemDescription :text="item.description" />
-                </td>
-                <td class="px-4 py-3 align-top text-right whitespace-nowrap">
-                  <span class="font-medium tabular-nums">×{{ item.quantity }}</span>
-                  <!-- Ce qui manque au rangement, repérable sans ouvrir chaque fiche : c'est
-                       tout l'intérêt du comptage de fin d'édition. -->
-                  <UBadge
-                    v-if="manquants(item) > 0"
-                    color="warning"
-                    variant="soft"
-                    size="lg"
-                    class="ml-1.5"
-                  >
-                    -{{ manquants(item) }}
-                  </UBadge>
-                </td>
-                <!-- Les tags dans leur propre colonne : sous le nom, ils se mêlaient à la
-                     description et l'on ne pouvait pas balayer la colonne du regard. -->
-                <td class="px-4 py-3 align-top">
-                  <div v-if="item.tags?.length" class="flex flex-wrap gap-1">
-                    <StockTagBadge
-                      v-for="rattachement in item.tags"
-                      :key="rattachement.tag.id"
-                      :tag="rattachement.tag"
-                    />
+                <UIcon
+                  name="i-heroicons-information-circle"
+                  class="size-4 text-gray-400 shrink-0"
+                />
+                <template #content>
+                  <p class="p-3 text-sm max-w-xs whitespace-pre-wrap">
+                    {{ row.original.description }}
+                  </p>
+                </template>
+              </UPopover>
+            </div>
+          </template>
+
+          <template #quantity-cell="{ row }">
+            <span class="font-medium tabular-nums">×{{ row.original.quantity }}</span>
+            <!-- Ce qui manque au rangement, repérable sans ouvrir chaque fiche. -->
+            <UBadge
+              v-if="manquants(row.original) > 0"
+              color="warning"
+              variant="soft"
+              size="lg"
+              class="ml-1.5"
+            >
+              -{{ manquants(row.original) }}
+            </UBadge>
+          </template>
+
+          <template #tags-cell="{ row }">
+            <!-- Les tags se posent et se retirent ici même : c'est en balayant l'inventaire qu'on
+                 trie, pas en ouvrant chaque fiche. -->
+            <StockItemTagsPicker
+              :edition-id="editionId"
+              :item="row.original"
+              :tags="tags"
+              :can-manage="canManage"
+              @updated="(tags: any) => majTagsLigne(row.original.id, tags)"
+            />
+          </template>
+
+          <template #loan-cell="{ row }">
+            <!-- Trois temps du prêt, comme sur la fiche : la règle est partagée pour que les deux
+                 écrans ne puissent pas diverger. Un tiret pour le matériel de la convention. -->
+            <template v-if="etatEmprunt(row.original)">
+              <!-- Le lieu et la personne passent dans une infobulle plutôt que sous l'étiquette :
+                   sur une liste entière, ces deux lignes par ligne noyaient le tableau. Seule
+                   l'étape en cours y figure — rappeler la récupération d'un matériel déjà chez
+                   nous n'apprendrait rien. -->
+              <UPopover v-if="prochaineEtape(row.original)" mode="hover" :content="{ side: 'top' }">
+                <UBadge
+                  :color="etatEmprunt(row.original)!.couleur"
+                  variant="soft"
+                  class="cursor-help"
+                >
+                  {{ $t(etatEmprunt(row.original)!.libelle) }}
+                </UBadge>
+                <template #content>
+                  <div class="p-3 text-sm space-y-1 max-w-xs">
+                    <div v-if="prochaineEtape(row.original)!.lieu" class="flex items-start gap-1.5">
+                      <UIcon name="i-heroicons-map-pin" class="size-4 shrink-0 mt-0.5" />
+                      <span>{{ prochaineEtape(row.original)!.lieu }}</span>
+                    </div>
+                    <div v-if="prochaineEtape(row.original)!.qui" class="flex items-start gap-1.5">
+                      <UIcon name="i-heroicons-user" class="size-4 shrink-0 mt-0.5" />
+                      <span>{{ prochaineEtape(row.original)!.qui }}</span>
+                    </div>
                   </div>
-                  <span v-else class="text-gray-400">—</span>
-                </td>
-                <td class="px-4 py-3 align-top">
-                  <div
-                    v-if="item.location || item.zone || item.marker"
-                    class="flex items-center flex-wrap gap-1.5 text-sm"
-                  >
-                    <span
-                      v-if="item.zone"
-                      class="size-3 rounded-full border border-gray-300"
-                      :style="{ backgroundColor: item.zone.color }"
-                    />
-                    <UIcon v-else-if="item.marker" name="i-heroicons-flag" class="size-4" />
-                    <UIcon v-else name="i-heroicons-map-pin" class="size-4 text-gray-400" />
-                    <span>{{ item.zone?.name || item.marker?.name || item.location }}</span>
-                  </div>
-                  <span v-else class="text-sm text-gray-400 italic">
-                    {{ $t('gestion.stock.no_location') }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 align-top">
-                  <ul v-if="currentLocations(item).length" class="space-y-1 text-sm">
-                    <li
-                      v-for="r in currentLocations(item)"
-                      :key="r.id"
-                      class="flex items-center flex-wrap gap-1.5"
-                    >
-                      <UBadge
-                        color="neutral"
-                        variant="soft"
-                        size="xs"
-                        class="tabular-nums shrink-0"
-                      >
-                        ×{{ r.quantityReserved }}
-                      </UBadge>
-                      <span
-                        v-if="r.zone"
-                        class="size-3 rounded-full border border-gray-300"
-                        :style="{ backgroundColor: r.zone.color }"
-                      />
-                      <UIcon v-else-if="r.marker" name="i-heroicons-flag" class="size-4" />
-                      <UIcon v-else name="i-heroicons-map-pin" class="size-4 text-gray-400" />
-                      <span>{{ r.zone?.name || r.marker?.name || r.location }}</span>
-                    </li>
-                  </ul>
-                  <span v-else class="text-sm text-gray-400 italic">—</span>
-                </td>
-                <td class="px-4 py-3 align-top text-right whitespace-nowrap">
-                  <div
-                    :class="item._count.reservations ? '' : 'text-gray-400'"
-                    class="tabular-nums"
-                  >
-                    {{ item._count.reservations }}
-                  </div>
-                  <div
-                    v-if="nextReservation(item)"
-                    class="text-xs text-gray-500 mt-0.5 flex items-center justify-end gap-1"
-                  >
-                    <UBadge
-                      :color="reservationBadgeColor(nextReservation(item)!)"
-                      variant="soft"
-                      size="xs"
-                    >
-                      {{ reservationBadgeLabel(nextReservation(item)!) }}
-                    </UBadge>
-                    <span class="whitespace-nowrap">{{
-                      formatNextDate(nextReservation(item)!)
-                    }}</span>
-                  </div>
-                </td>
-                <td class="px-2 py-3 align-top text-right">
-                  <UIcon name="i-heroicons-chevron-right" class="size-4 text-gray-400" />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                </template>
+              </UPopover>
+              <!-- Sans indication saisie, l'étiquette seule : une infobulle vide se survolerait
+                   pour rien. -->
+              <UBadge v-else :color="etatEmprunt(row.original)!.couleur" variant="soft">
+                {{ $t(etatEmprunt(row.original)!.libelle) }}
+              </UBadge>
+            </template>
+            <span v-else class="text-gray-400">—</span>
+          </template>
+
+          <template #storage-cell="{ row }">
+            <div
+              v-if="row.original.location || row.original.zone || row.original.marker"
+              class="flex items-center flex-wrap gap-1.5 text-sm"
+            >
+              <span
+                v-if="row.original.zone"
+                class="size-3 rounded-full border border-gray-300"
+                :style="{ backgroundColor: row.original.zone.color }"
+              />
+              <UIcon v-else-if="row.original.marker" name="i-heroicons-flag" class="size-4" />
+              <UIcon v-else name="i-heroicons-map-pin" class="size-4 text-gray-400" />
+              <span>
+                {{ row.original.zone?.name || row.original.marker?.name || row.original.location }}
+              </span>
+            </div>
+            <span v-else class="text-sm text-gray-400 italic">
+              {{ $t('gestion.stock.no_location') }}
+            </span>
+          </template>
+
+          <template #current-cell="{ row }">
+            <ul v-if="currentLocations(row.original).length" class="space-y-1 text-sm">
+              <li
+                v-for="r in currentLocations(row.original)"
+                :key="r.id"
+                class="flex items-center flex-wrap gap-1.5"
+              >
+                <UBadge color="neutral" variant="soft" size="xs" class="tabular-nums shrink-0">
+                  ×{{ r.quantityReserved }}
+                </UBadge>
+                <span
+                  v-if="r.zone"
+                  class="size-3 rounded-full border border-gray-300"
+                  :style="{ backgroundColor: r.zone.color }"
+                />
+                <UIcon v-else-if="r.marker" name="i-heroicons-flag" class="size-4" />
+                <UIcon v-else name="i-heroicons-map-pin" class="size-4 text-gray-400" />
+                <span>{{ r.zone?.name || r.marker?.name || r.location }}</span>
+              </li>
+            </ul>
+            <span v-else class="text-sm text-gray-400 italic">—</span>
+          </template>
+
+          <template #reservations-cell="{ row }">
+            <div
+              :class="row.original._count.reservations ? '' : 'text-gray-400'"
+              class="tabular-nums text-right"
+            >
+              {{ row.original._count.reservations }}
+            </div>
+            <div
+              v-if="nextReservation(row.original)"
+              class="text-xs text-gray-500 mt-0.5 flex items-center justify-end gap-1"
+            >
+              <UBadge
+                :color="reservationBadgeColor(nextReservation(row.original)!)"
+                variant="soft"
+                size="xs"
+              >
+                {{ reservationBadgeLabel(nextReservation(row.original)!) }}
+              </UBadge>
+              <span class="whitespace-nowrap">
+                {{ formatNextDate(nextReservation(row.original)!) }}
+              </span>
+            </div>
+          </template>
+        </UTable>
       </UCard>
 
       <StockPlanning
@@ -331,7 +427,6 @@
       :zones="zones"
       :markers="markers"
       :site-map-enabled="!!edition?.siteMapEnabled"
-      :available-tags="tags"
       @saved="handleItemSaved"
     />
 
@@ -370,7 +465,7 @@
           class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-full px-4 py-2 flex items-center gap-3"
         >
           <span class="text-sm text-gray-700 dark:text-gray-300">
-            {{ $t('gestion.stock.selected_count', { count: selectedItemIds.size }) }}
+            {{ $t('gestion.stock.selected_count', { count: identifiantsSelectionnes.length }) }}
           </span>
           <UButton
             color="primary"
@@ -378,7 +473,7 @@
             icon="i-heroicons-plus"
             @click="openBulkReservationModal"
           >
-            {{ $t('gestion.stock.bulk_reserve', { count: selectedItemIds.size }) }}
+            {{ $t('gestion.stock.bulk_reserve', { count: identifiantsSelectionnes.length }) }}
           </UButton>
           <UButton
             color="neutral"
@@ -398,10 +493,22 @@
 import { useAuthStore, useEditionStore } from '#imports'
 
 import {
+  ETATS_EMPRUNT,
+  etatEmprunt,
+  etatsDepuisUrl,
+  filtrerParEtatEmprunt,
+  prochaineEtapeEmprunt,
+  urlDepuisEtats,
+} from '../../../../../utils/etat-emprunt'
+import { filtrerParLieuEmprunt } from '../../../../../utils/filtre-lieu-emprunt'
+import {
   filtrerParTags,
   tagsDepuisUrl,
   urlDepuisTags,
 } from '../../../../../utils/filtre-tags-stock'
+
+import type { TableColumn } from '@nuxt/ui'
+import type { Column } from '@tanstack/vue-table'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -428,6 +535,108 @@ interface StockTag {
   displayOrder: number
 }
 
+const tableRef = ref()
+// Le nom d'abord : c'est l'ordre dans lequel on cherche un objet quand on ne sait plus où il est.
+const tri = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
+const colonnesVisibles = ref<Record<string, boolean>>({})
+
+/**
+ * Remplace les tags d'une seule ligne, après enregistrement.
+ *
+ * Recharger tout le groupe pour une case cochée faisait clignoter le tableau et lui faisait
+ * perdre sa position de défilement — désagréable quand on tague une liste de haut en bas.
+ */
+function majTagsLigne(itemId: number, tags: Array<{ tag: { id: number } }>) {
+  const objet = group.value?.items.find((it) => it.id === itemId)
+  if (objet) objet.tags = tags as any
+}
+
+/** L'étape en cours d'un emprunt : où aller et qui s'en charge, ou `null` s'il n'y a rien à dire. */
+function prochaineEtape(materiel: any) {
+  return prochaineEtapeEmprunt(materiel)
+}
+
+/** Le libellé d'une colonne dans le menu de visibilité, d'après son identifiant. */
+function libelleColonne(id: string): string {
+  const libelles: Record<string, string> = {
+    name: t('gestion.stock.item_name'),
+    quantity: t('common.quantity'),
+    tags: t('gestion.stock.tags.field_label'),
+    loan: t('gestion.stock.external_loan'),
+    storage: t('gestion.stock.item_storage_location'),
+    current: t('gestion.stock.item_current_location'),
+    reservations: t('gestion.stock.reservations_title'),
+  }
+  return libelles[id] ?? id
+}
+
+/** En-tête cliquable, avec la flèche qui dit le sens du tri en cours. */
+function enTeteTriable(column: Column<any>, libelle: string) {
+  const trie = column.getIsSorted()
+  return h(resolveComponent('UButton'), {
+    color: 'neutral',
+    variant: 'ghost',
+    label: libelle,
+    icon: trie
+      ? trie === 'asc'
+        ? 'i-lucide-arrow-up-narrow-wide'
+        : 'i-lucide-arrow-down-wide-narrow'
+      : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => column.toggleSorting(trie === 'asc'),
+  })
+}
+
+/**
+ * Les colonnes du tableau.
+ *
+ * Les emplacements sont triés sur le libellé réellement affiché — zone, marqueur ou texte libre —
+ * plutôt que sur un champ : trier sur `location` seul aurait mis ensemble tout ce qui est rangé
+ * dans une zone, sous une valeur vide.
+ */
+const colonnes = computed((): TableColumn<any>[] => [
+  {
+    id: 'select',
+    enableSorting: false,
+    enableHiding: false,
+    size: 40,
+  },
+  {
+    accessorKey: 'name',
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.item_name')),
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'quantity',
+    header: ({ column }) => enTeteTriable(column, t('common.quantity')),
+  },
+  {
+    id: 'tags',
+    accessorFn: (item: any) => (item.tags ?? []).map((r: any) => r.tag.name).join(', '),
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.tags.field_label')),
+  },
+  {
+    id: 'loan',
+    accessorFn: (item: any) => etatEmprunt(item)?.cle ?? '',
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.external_loan')),
+  },
+  {
+    id: 'storage',
+    accessorFn: (item: any) => item.zone?.name || item.marker?.name || item.location || '',
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.item_storage_location')),
+  },
+  {
+    id: 'current',
+    enableSorting: false,
+    header: () => t('gestion.stock.item_current_location'),
+  },
+  {
+    id: 'reservations',
+    accessorFn: (item: any) => item._count.reservations,
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.reservations_title')),
+  },
+])
+
 const tags = ref<StockTag[]>([])
 const tagsModalOpen = ref(false)
 const tagsFiltres = ref<{ label: string; value: number; color: string }[]>([])
@@ -442,10 +651,45 @@ const tagItems = computed(() =>
  * La règle de filtrage vit dans un utilitaire à part, éprouvé hors du navigateur — cet écran
  * demande une session, et la règle du cumul ne s'y vérifie pas d'un coup d'œil.
  */
+const etatsFiltres = ref<{ label: string; value: string }[]>([])
+
+const etatsItems = computed(() =>
+  ETATS_EMPRUNT.map((cle) => ({
+    value: cle,
+    label:
+      cle === 'aucun'
+        ? t('gestion.stock.loan_none')
+        : t(
+            {
+              a_recuperer: 'gestion.stock.loan_to_pick_up',
+              a_rendre: 'gestion.stock.loan_to_return',
+              en_retard: 'gestion.stock.loan_overdue',
+              rendu: 'gestion.stock.loan_returned',
+            }[cle]!
+          ),
+  }))
+)
+
+/**
+ * Les objets réellement affichés : la liste du groupe, resserrée par les tags puis par l'état de
+ * l'emprunt. Les deux filtres se cumulent entre eux — « fragile » **et** « à récupérer » — même
+ * si chacun pris isolément est une union.
+ *
+ * Les règles vivent dans des utilitaires à part, éprouvés hors du navigateur : cet écran demande
+ * une session, et l'on n'y vérifie rien d'un coup d'œil.
+ */
+const lieuFiltre = ref('')
+
 const objetsAffiches = computed(() =>
-  filtrerParTags(
-    group.value?.items ?? [],
-    tagsFiltres.value.map((tg) => tg.value)
+  filtrerParLieuEmprunt(
+    filtrerParEtatEmprunt(
+      filtrerParTags(
+        group.value?.items ?? [],
+        tagsFiltres.value.map((tg) => tg.value)
+      ),
+      etatsFiltres.value.map((e) => e.value)
+    ),
+    lieuFiltre.value
   )
 )
 
@@ -471,15 +715,29 @@ async function fetchTags() {
 function appliquerFiltreDeLUrl() {
   const voulus = tagsDepuisUrl(route.query.tags)
   tagsFiltres.value = tagItems.value.filter((tg) => voulus.includes(tg.value))
+
+  const etats = etatsDepuisUrl(route.query.emprunt)
+  etatsFiltres.value = etatsItems.value.filter((e) => etats.includes(e.value as never))
+
+  lieuFiltre.value = typeof route.query.lieu === 'string' ? route.query.lieu : ''
 }
 
 // L'adresse suit le filtre : un lien se partage, et un rechargement ne perd plus la sélection.
 // `replace` plutôt que `push`, sans quoi chaque case cochée s'empilerait dans l'historique et le
 // bouton « précédent » deviendrait inutilisable.
-watch(tagsFiltres, (choisis) => {
-  const valeur = urlDepuisTags(choisis.map((tg) => tg.value))
-  const { tags: _actuel, ...reste } = route.query
-  router.replace({ query: valeur ? { ...reste, tags: valeur } : reste })
+watch([tagsFiltres, etatsFiltres, lieuFiltre], () => {
+  const parTags = urlDepuisTags(tagsFiltres.value.map((tg) => tg.value))
+  const parEtat = urlDepuisEtats(etatsFiltres.value.map((e) => e.value))
+  const parLieu = lieuFiltre.value.trim() || undefined
+  const { tags: _tags, emprunt: _emprunt, lieu: _lieu, ...reste } = route.query
+  router.replace({
+    query: {
+      ...reste,
+      ...(parTags ? { tags: parTags } : {}),
+      ...(parEtat ? { emprunt: parEtat } : {}),
+      ...(parLieu ? { lieu: parLieu } : {}),
+    },
+  })
 })
 
 function manquants(item: { quantity: number; finalQuantity?: number | null }): number {
@@ -506,6 +764,16 @@ interface StockItem {
   quantity: number
   finalQuantity?: number | null
   tags?: Array<{ tag: { id: number; name: string; color: string } }>
+  isExternalLoan?: boolean
+  pickedUpAt?: string | null
+  returnedAt?: string | null
+  returnDueAt?: string | null
+  pickupLocation?: string | null
+  pickupResponsible?: { id: number; pseudo: string } | null
+  pickupContact?: string | null
+  returnLocation?: string | null
+  returnResponsible?: { id: number; pseudo: string } | null
+  returnContact?: string | null
   location: string | null
   zone: { id: number; name: string; color: string } | null
   marker: { id: number; name: string } | null
@@ -657,37 +925,35 @@ const editingItem = ref<StockItem | null>(null)
 const reservationModalOpen = ref(false)
 
 // --- Sélection multi-items pour la réservation groupée ---
-const selectedItemIds = ref<Set<number>>(new Set())
+/**
+ * La sélection est celle du tableau, pas une liste tenue à part.
+ *
+ * `get-row-id` fait porter les clés par l'identifiant de l'objet et non par son rang : sans cela,
+ * trier ou filtrer déplacerait les lignes et la sélection suivrait les positions, désignant
+ * d'autres objets que ceux cochés.
+ */
+const selectionLignes = ref<Record<string, boolean>>({})
 const bulkModalOpen = ref(false)
 const bulkModalItems = ref<{ id: number; name: string; maxQuantity: number }[]>([])
 
-const someSelected = computed(() => selectedItemIds.value.size > 0)
-const allSelected = computed(() => {
-  const items = group.value?.items || []
-  return items.length > 0 && items.every((it) => selectedItemIds.value.has(it.id))
-})
-const allSelectedState = computed(() => allSelected.value)
+/** Les identifiants cochés, dans l'ordre où le tableau les porte. */
+const identifiantsSelectionnes = computed(() =>
+  Object.entries(selectionLignes.value)
+    .filter(([, coche]) => coche)
+    .map(([id]) => Number(id))
+)
 
-function toggleItem(id: number, checked: boolean) {
-  const next = new Set(selectedItemIds.value)
-  if (checked) next.add(id)
-  else next.delete(id)
-  selectedItemIds.value = next
-}
-
-function toggleSelectAll(checked: boolean) {
-  const items = group.value?.items || []
-  selectedItemIds.value = checked ? new Set(items.map((it) => it.id)) : new Set()
-}
+const someSelected = computed(() => identifiantsSelectionnes.value.length > 0)
 
 function clearSelection() {
-  selectedItemIds.value = new Set()
+  selectionLignes.value = {}
 }
 
 function openBulkReservationModal() {
   const items = group.value?.items || []
+  const choisis = new Set(identifiantsSelectionnes.value)
   bulkModalItems.value = items
-    .filter((it) => selectedItemIds.value.has(it.id))
+    .filter((it) => choisis.has(it.id))
     .map((it) => ({ id: it.id, name: it.name, maxQuantity: it.quantity }))
   if (bulkModalItems.value.length === 0) return
   bulkModalOpen.value = true
@@ -698,26 +964,25 @@ async function handleBulkSaved() {
   await refreshPlanning()
 }
 
-// Quand le groupe change (navigation entre groupes), on vide la sélection
-// pour ne pas garder des IDs d'un autre contexte.
+// Changer de groupe vide la sélection : garder des identifiants d'un autre contexte afficherait
+// une barre flottante sur des objets qu'on ne voit plus.
 watch(groupId, () => {
   clearSelection()
 })
 
-// Quand les items du groupe changent (refetch, suppression, etc.), on retire
-// de la sélection les IDs qui n'existent plus pour éviter une barre flottante
-// avec un compteur faussé.
+// Un objet supprimé ou disparu d'un rechargement quitte aussi la sélection, sans quoi le
+// compteur de la barre flottante annoncerait plus d'objets qu'il n'en existe.
 watch(
   () => group.value?.items.map((it) => it.id) || [],
   (ids) => {
-    if (!selectedItemIds.value.size) return
-    const present = new Set(ids)
-    const next = new Set<number>()
-    for (const id of selectedItemIds.value) {
-      if (present.has(id)) next.add(id)
+    if (!someSelected.value) return
+    const presents = new Set(ids.map(String))
+    const suivant: Record<string, boolean> = {}
+    for (const [id, coche] of Object.entries(selectionLignes.value)) {
+      if (coche && presents.has(id)) suivant[id] = true
     }
-    if (next.size !== selectedItemIds.value.size) {
-      selectedItemIds.value = next
+    if (Object.keys(suivant).length !== identifiantsSelectionnes.value.length) {
+      selectionLignes.value = suivant
     }
   }
 )

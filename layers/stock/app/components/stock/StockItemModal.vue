@@ -67,39 +67,6 @@
           </div>
         </UFormField>
 
-        <!-- Les tags traversent les groupes : une enceinte rangée en « Sonorisation » peut être
-             fragile et prêtée sans que cela ne commande son rangement. -->
-        <UFormField v-if="tagItems.length" :label="$t('gestion.stock.tags.field_label')">
-          <USelectMenu
-            v-model="selectedTags"
-            :items="tagItems"
-            multiple
-            :placeholder="$t('gestion.stock.tags.field_placeholder')"
-            searchable
-            :searchable-placeholder="$t('common.search')"
-            class="w-full"
-            :ui="{ content: 'min-w-fit' }"
-          >
-            <template #default="{ modelValue: selected }">
-              <span v-if="!selected?.length" class="text-gray-400">
-                {{ $t('gestion.stock.tags.field_placeholder') }}
-              </span>
-              <div v-else class="flex flex-wrap gap-1">
-                <StockTagBadge
-                  v-for="tg in selected"
-                  :key="tg.value"
-                  :tag="{ name: tg.label, color: tg.color }"
-                />
-              </div>
-            </template>
-            <!-- `option` et non `item` : la prop du composant s'appelle déjà `item`, et le
-                 masquer rendrait la lecture douteuse. -->
-            <template #item-leading="{ item: option }">
-              <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: option.color }" />
-            </template>
-          </USelectMenu>
-        </UFormField>
-
         <UFormField :label="$t('gestion.stock.item_notes')" :error="fieldErrors.notes">
           <UTextarea
             v-model="formData.notes"
@@ -281,7 +248,6 @@ interface StockItemLite {
   description: string | null
   quantity: number
   finalQuantity?: number | null
-  tags?: Array<{ tag: { id: number; name: string; color: string } }>
   notes: string | null
   isExternalLoan?: boolean
   ownerContact?: string | null
@@ -329,8 +295,6 @@ const props = defineProps<{
   markers?: { id: number; name: string; color?: string | null; types?: string[] }[]
   /** Si la fonctionnalité « Carte du site » est activée sur l'édition. */
   siteMapEnabled?: boolean
-  /** Tags de l'édition, proposés au choix. Le champ disparaît s'il n'y en a aucun. */
-  availableTags?: { id: number; name: string; color: string }[]
 }>()
 
 const emit = defineEmits<{
@@ -396,16 +360,6 @@ const formData = reactive({
   location: '',
   mapPin: NONE_PIN,
 })
-
-interface TagSelectItem {
-  label: string
-  value: number
-  color: string
-}
-const tagItems = computed<TagSelectItem[]>(() =>
-  (props.availableTags || []).map((t) => ({ label: t.name, value: t.id, color: t.color }))
-)
-const selectedTags = ref<TagSelectItem[]>([])
 
 /** Ce qui manque au rangement, quand le comptage a eu lieu. */
 const ecartQuantite = computed(() => {
@@ -496,8 +450,6 @@ watch(
       formData.returnContact = props.item?.returnContact || ''
       formData.location = props.item?.location || ''
       formData.mapPin = pinFromItem(props.item)
-      const tagIds = props.item?.tags?.map((rattachement) => rattachement.tag.id) || []
-      selectedTags.value = tagItems.value.filter((tg) => tagIds.includes(tg.value))
       resetFieldErrors()
     }
   },
@@ -554,8 +506,6 @@ async function handleSubmit() {
       location: formData.location.trim() || null,
       zoneId,
       markerId,
-      // La liste complète : ce qui n'y figure pas est retiré côté serveur.
-      tagIds: selectedTags.value.map((tg) => tg.value),
     }
     if (props.item) {
       await $fetch(`/api/editions/${props.editionId}/stock-items/${props.item.id}`, {

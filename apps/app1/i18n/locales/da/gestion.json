@@ -508,10 +508,13 @@
         "confirm_delete": "Slet tagget “{name}”? Det fjernes fra alt udstyr, der bærer det.",
         "manage": "Tags",
         "field_label": "Tags",
-        "field_placeholder": "Ingen tags",
         "filter_label": "Filtrér efter tags",
         "filter_placeholder": "Intet filter"
-      }
+      },
+      "columns": "Kolonner",
+      "loan_none": "Ikke et lån",
+      "loan_place_filter": "Afhentnings- eller afleveringssted",
+      "loan_place_filter_placeholder": "Søg et sted"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

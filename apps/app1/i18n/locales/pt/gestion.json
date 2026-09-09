@@ -508,10 +508,13 @@
         "confirm_delete": "Eliminar a etiqueta «{name}»? Será retirada de todo o material que a tenha.",
         "manage": "Etiquetas",
         "field_label": "Etiquetas",
-        "field_placeholder": "Sem etiquetas",
         "filter_label": "Filtrar por etiquetas",
         "filter_placeholder": "Sem filtro"
-      }
+      },
+      "columns": "Colunas",
+      "loan_none": "Não é um empréstimo",
+      "loan_place_filter": "Local de levantamento ou devolução",
+      "loan_place_filter_placeholder": "Procurar um local"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",
