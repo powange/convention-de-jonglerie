@@ -37,6 +37,37 @@ export function erreursBloquantes(journal, fichiersModifies, codes) {
   return [...new Set(trouvees)]
 }
 
+/**
+ * Développe les répertoires de la liste en les fichiers qu'ils contiennent.
+ *
+ * `git status --short` réduit un répertoire entièrement nouveau à une seule entrée — le chemin du
+ * dossier, pas les fichiers. La porte, qui compare des chemins de fichiers, n'en reconnaissait
+ * alors aucun et rendait un vert sur du code jamais examiné. Le cas s'est produit : deux `TS2345`
+ * sont passées, et seule une comparaison de dette les a vues.
+ *
+ * La CI donne bien des fichiers (`git diff --name-only`), mais un garde-fou qui dépend de la façon
+ * dont on l'appelle n'en est pas un.
+ *
+ * @param {string[]} chemins - chemins de fichiers ou de répertoires, depuis la racine du dépôt
+ * @param {{ existe: (c: string) => boolean, estRepertoire: (c: string) => boolean,
+ *           lister: (c: string) => string[] }} fs - accès disque, injecté pour les tests
+ */
+export function developperRepertoires(chemins, fs) {
+  const resultat = []
+
+  for (const chemin of chemins) {
+    if (!fs.existe(chemin) || !fs.estRepertoire(chemin)) {
+      resultat.push(chemin)
+      continue
+    }
+    // Un répertoire supprimé ou renommé n'existe plus : il reste tel quel, et ne correspondra à
+    // aucune erreur — ce qui est le comportement voulu.
+    for (const fichier of fs.lister(chemin)) resultat.push(fichier)
+  }
+
+  return resultat
+}
+
 // ── Ligne de commande ──────────────────────────────────────────────────────────
 if (import.meta.url === `file://${process.argv[1]}`) {
   const [journalPath, fichiersPath, codesArg] = process.argv.slice(2)
@@ -45,12 +76,27 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(2)
   }
 
-  const { readFileSync } = await import('node:fs')
+  const { readFileSync, existsSync, statSync, readdirSync } = await import('node:fs')
+  const { join } = await import('node:path')
+
+  const listerRecursivement = (dossier) =>
+    readdirSync(dossier, { withFileTypes: true }).flatMap((entree) => {
+      const chemin = join(dossier, entree.name)
+      return entree.isDirectory() ? listerRecursivement(chemin) : [chemin]
+    })
+
   const journal = readFileSync(journalPath, 'utf8')
-  const fichiers = readFileSync(fichiersPath, 'utf8')
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
+  const fichiers = developperRepertoires(
+    readFileSync(fichiersPath, 'utf8')
+      .split('\n')
+      .map((l) => l.trim().replace(/\/$/, ''))
+      .filter(Boolean),
+    {
+      existe: existsSync,
+      estRepertoire: (c) => statSync(c).isDirectory(),
+      lister: listerRecursivement,
+    }
+  )
   const codes = (codesArg || '2345')
     .split(',')
     .map((c) => c.trim())
