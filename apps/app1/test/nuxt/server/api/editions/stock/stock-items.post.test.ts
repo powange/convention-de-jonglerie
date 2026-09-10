@@ -133,6 +133,31 @@ describe('POST /api/editions/[id]/stock-groups/[groupId]/items', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow()
   })
 
+  it('rejette une quantité au-delà de la borne', async () => {
+    // Personne n'entrepose dix mille et un exemplaires : c'est un nombre collé par mégarde, un
+    // numéro de téléphone dans le mauvais champ. Sans borne, il se propageait dans les calculs
+    // de disponibilité et dans l'affichage.
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, quantity: 10001 })
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+  })
+
+  it('accepte la quantité exactement à la borne', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, quantity: 10000 })
+    await expect(handler(baseEvent as any)).resolves.toBeDefined()
+  })
+
+  it('rejette une quantité constatée au-delà de la borne', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, finalQuantity: 10001 })
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+  })
+
+  it('accepte une quantité constatée nulle', async () => {
+    // Zéro n'est pas la même chose que « pas encore compté » : tout a disparu, et il faut
+    // pouvoir l'écrire.
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, finalQuantity: 0 })
+    await expect(handler(baseEvent as any)).resolves.toBeDefined()
+  })
+
   it('utilise max+1 pour displayOrder si items existants dans le groupe', async () => {
     prismaMock.stockItem.findFirst.mockResolvedValue({ displayOrder: 3 })
     await handler(baseEvent as any)

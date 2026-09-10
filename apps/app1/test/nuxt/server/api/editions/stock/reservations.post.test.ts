@@ -97,6 +97,25 @@ describe('POST /api/editions/[id]/stock-items/[itemId]/reservations', () => {
     expect(prismaMock.stockReservation.create).not.toHaveBeenCalled()
   })
 
+  it('rejette une quantité réservée au-delà de la borne', async () => {
+    // L'objet a de quoi servir la demande, et la disponibilité suit : seule la borne du schéma
+    // peut refuser. Sans cette précaution le test passerait pour la mauvaise raison — la demande
+    // dépasserait le stock simulé, et la borne pourrait disparaître sans qu'on le voie.
+    prismaMock.stockItem.findFirst.mockResolvedValue({ id: 5, quantity: 20000 })
+    mockGetReservedQty.mockResolvedValue(0)
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, quantityReserved: 10001 })
+
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+  })
+
+  it('accepte la quantité réservée exactement à la borne', async () => {
+    prismaMock.stockItem.findFirst.mockResolvedValue({ id: 5, quantity: 20000 })
+    mockGetReservedQty.mockResolvedValue(0)
+    global.readBody = vi.fn().mockResolvedValue({ ...validBody, quantityReserved: 10000 })
+
+    await expect(handler(baseEvent as any)).resolves.toBeDefined()
+  })
+
   it('refuse si endsAt <= startsAt', async () => {
     global.readBody = vi.fn().mockResolvedValue({
       ...validBody,

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
 import {
   canAccessStock,
   getReservedQuantityOnPeriod,
@@ -17,7 +18,7 @@ const bodySchema = z
       .array(
         z.object({
           id: z.number().int().positive(),
-          quantity: z.number().int().positive(),
+          quantity: z.number().int().positive().max(QUANTITE_MAX_STOCK, MESSAGE_QUANTITE_MAX),
         })
       )
       .min(1)

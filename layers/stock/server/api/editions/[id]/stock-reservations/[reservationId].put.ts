@@ -6,6 +6,7 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
 import {
   canAccessStock,
   getReservedQuantityOnPeriod,
@@ -20,7 +21,12 @@ const bodySchema = z.object({
   startsAt: z.string().datetime().optional(),
   endsAt: z.string().datetime().optional(),
   usage: z.string().trim().min(1).max(500).optional(),
-  quantityReserved: z.number().int().positive().optional(),
+  quantityReserved: z
+    .number()
+    .int()
+    .positive()
+    .max(QUANTITE_MAX_STOCK, MESSAGE_QUANTITE_MAX)
+    .optional(),
   status: z.enum(RESERVATION_STATUSES).optional(),
   location: z.string().trim().max(200).nullable().optional(),
   zoneId: z.number().int().positive().nullable().optional(),
