@@ -89,48 +89,67 @@ export default wrapApiHandler(
       })
     }
 
-    const alreadyReserved = await getReservedQuantityOnPeriod(itemId, startsAt, endsAt)
-    const available = item.quantity - alreadyReserved
-    if (data.quantityReserved > available) {
-      throw createError({
-        status: 409,
-        message: `Quantité indisponible : seulement ${available} sur ${item.quantity} sur la période demandée`,
-      })
-    }
-
-    // Vérifier que zone/marker, si fournis, appartiennent à l'édition.
+    // Vérifier que zone/marker, si fournis, appartiennent à l'édition. Avant la transaction :
+    // peu coûteux, et l'échec est immédiat.
     await validateReservationLocation(
       { zoneId: data.zoneId ?? null, markerId: data.markerId ?? null },
       editionId
     )
 
-    const reservation = await prisma.stockReservation.create({
-      data: {
-        stockItemId: itemId,
-        userId: user.id,
+    /*
+     * Le relevé de disponibilité et la création tiennent dans la même transaction, comme dans la
+     * réservation en lot.
+     *
+     * Ce que cela apporte, et rien de plus : la fenêtre entre « il reste un exemplaire » et
+     * « il est à moi » se resserre. Elle ne se ferme pas. Aucun verrou n'est posé sur l'objet, si
+     * bien que deux transactions concurrentes peuvent encore lire le même total et accorder toutes
+     * deux le dernier exemplaire. Fermer vraiment demanderait un verrou de ligne au moment du
+     * relevé — un `SELECT … FOR UPDATE` sur l'objet —, ce que Prisma n'exprime qu'en SQL brut.
+     */
+    const reservation = await prisma.$transaction(async (tx) => {
+      const alreadyReserved = await getReservedQuantityOnPeriod(
+        itemId,
         startsAt,
         endsAt,
-        usage: data.usage,
-        quantityReserved: data.quantityReserved,
-        location: data.location?.trim() || null,
-        zoneId: data.zoneId ?? null,
-        markerId: data.markerId ?? null,
-      },
-      include: {
-        zone: { select: { id: true, name: true, color: true } },
-        marker: { select: { id: true, name: true } },
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-            email: true,
-            emailHash: true,
-            profilePicture: true,
+        undefined,
+        tx
+      )
+      const available = item.quantity - alreadyReserved
+      if (data.quantityReserved > available) {
+        throw createError({
+          status: 409,
+          message: `Quantité indisponible : seulement ${available} sur ${item.quantity} sur la période demandée`,
+        })
+      }
+
+      return tx.stockReservation.create({
+        data: {
+          stockItemId: itemId,
+          userId: user.id,
+          startsAt,
+          endsAt,
+          usage: data.usage,
+          quantityReserved: data.quantityReserved,
+          location: data.location?.trim() || null,
+          zoneId: data.zoneId ?? null,
+          markerId: data.markerId ?? null,
+        },
+        include: {
+          zone: { select: { id: true, name: true, color: true } },
+          marker: { select: { id: true, name: true } },
+          user: {
+            select: {
+              id: true,
+              pseudo: true,
+              prenom: true,
+              nom: true,
+              email: true,
+              emailHash: true,
+              profilePicture: true,
+            },
           },
         },
-      },
+      })
     })
 
     return createSuccessResponse({ reservation })
