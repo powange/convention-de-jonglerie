@@ -543,7 +543,18 @@
       "loan_responsible_all": "Všechny osoby",
       "loan_state": "Stav",
       "loans_none": "Žádné zvenčí zapůjčené vybavení pro tento ročník",
-      "loans_title": "Zápůjčky"
+      "loans_title": "Zápůjčky",
+      "count_counted": "Spočítáno",
+      "count_expected": "Teoreticky",
+      "count_extra": "{count} navíc | {count} navíc",
+      "count_gap": "Rozdíl",
+      "count_leave_warning": "Některá spočítání nejsou uložena. Opuštění stránky je ztratí.",
+      "count_missing": "chybí {count} | chybí {count}",
+      "count_not_counted": "Nespočítáno",
+      "count_pending": "{count} neuložené spočítání | {count} neuložených spočítání",
+      "count_progress": "spočítáno {comptes} z {total} předmětu | spočítáno {comptes} z {total} předmětů",
+      "count_save": "Uložit spočítání",
+      "count_view": "Inventura"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

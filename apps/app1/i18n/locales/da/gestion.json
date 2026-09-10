@@ -543,7 +543,18 @@
       "loan_responsible_all": "Alle personer",
       "loan_state": "Status",
       "loans_none": "Intet udefra lånt udstyr til denne udgave",
-      "loans_title": "Lån"
+      "loans_title": "Lån",
+      "count_counted": "Talt",
+      "count_expected": "Forventet",
+      "count_extra": "{count} for meget | {count} for meget",
+      "count_gap": "Forskel",
+      "count_leave_warning": "Nogle optællinger er ikke gemt. At forlade siden vil miste dem.",
+      "count_missing": "{count} mangler | {count} mangler",
+      "count_not_counted": "Ikke talt",
+      "count_pending": "{count} ugemt optælling | {count} ugemte optællinger",
+      "count_progress": "{comptes} af {total} genstand talt | {comptes} af {total} genstande talt",
+      "count_save": "Gem optællingen",
+      "count_view": "Optælling"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

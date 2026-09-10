@@ -543,7 +543,18 @@
       "loan_responsible_all": "Wszystkie osoby",
       "loan_state": "Stan",
       "loans_none": "Brak sprzętu wypożyczonego z zewnątrz w tej edycji",
-      "loans_title": "Wypożyczenia"
+      "loans_title": "Wypożyczenia",
+      "count_counted": "Policzone",
+      "count_expected": "Teoretycznie",
+      "count_extra": "{count} nadwyżki | {count} nadwyżki",
+      "count_gap": "Różnica",
+      "count_leave_warning": "Część zliczeń nie została zapisana. Opuszczenie strony je utraci.",
+      "count_missing": "brakuje {count} | brakuje {count}",
+      "count_not_counted": "Niepoliczone",
+      "count_pending": "{count} niezapisane zliczenie | {count} niezapisanych zliczeń",
+      "count_progress": "policzono {comptes} z {total} przedmiotu | policzono {comptes} z {total} przedmiotów",
+      "count_save": "Zapisz zliczenie",
+      "count_view": "Inwentaryzacja"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

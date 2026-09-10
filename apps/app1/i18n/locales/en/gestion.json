@@ -543,7 +543,18 @@
       "loan_responsible_all": "Everyone",
       "loan_state": "Status",
       "loans_none": "No equipment borrowed from outside for this edition",
-      "loans_title": "Loans"
+      "loans_title": "Loans",
+      "count_counted": "Counted",
+      "count_expected": "Expected",
+      "count_extra": "{count} extra | {count} extra",
+      "count_gap": "Difference",
+      "count_leave_warning": "Some counts are not saved. Leaving the page will lose them.",
+      "count_missing": "{count} missing | {count} missing",
+      "count_not_counted": "Not counted",
+      "count_pending": "{count} unsaved count | {count} unsaved counts",
+      "count_progress": "{comptes} of {total} item counted | {comptes} of {total} items counted",
+      "count_save": "Save the count",
+      "count_view": "Stocktake"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

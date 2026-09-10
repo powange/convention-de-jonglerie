@@ -543,7 +543,18 @@
       "loan_responsible_all": "Alle Personen",
       "loan_state": "Status",
       "loans_none": "Kein von außen geliehenes Material für diese Ausgabe",
-      "loans_title": "Leihgaben"
+      "loans_title": "Leihgaben",
+      "count_counted": "Gezählt",
+      "count_expected": "Soll",
+      "count_extra": "{count} zu viel | {count} zu viel",
+      "count_gap": "Abweichung",
+      "count_leave_warning": "Einige Zählungen sind nicht gespeichert. Beim Verlassen der Seite gehen sie verloren.",
+      "count_missing": "{count} fehlt | {count} fehlen",
+      "count_not_counted": "Nicht gezählt",
+      "count_pending": "{count} ungespeicherte Zählung | {count} ungespeicherte Zählungen",
+      "count_progress": "{comptes} von {total} Gegenstand gezählt | {comptes} von {total} Gegenständen gezählt",
+      "count_save": "Zählung speichern",
+      "count_view": "Inventur"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

@@ -9,6 +9,7 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { assertResponsablesDeLEdition } from '#server/utils/personnes-edition'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
 import { validateReservationLocation } from '#server/utils/stock-helpers'
 import { assertTagsBelongToEdition } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -39,6 +40,30 @@ const bodySchema = z.object({
   // camion revient d'un bloc, et qu'ouvrir quinze fiches pour cocher quinze cases n'a pas de sens.
   pickedUpAt: z.string().datetime().nullable().optional(),
   returnedAt: z.string().datetime().nullable().optional(),
+  /**
+   * Le comptage d'inventaire : une valeur par objet, et non la même pour tous.
+   *
+   * C'est ce qui distingue ce champ de tous les autres du lot. Une séance de comptage écrit
+   * trente valeurs différentes en une fois, et les écrire une par une laisserait un inventaire à
+   * moitié saisi si le réseau lâche au milieu — ce qui arrive, on compte dans un hangar.
+   *
+   * `null` efface le comptage : la ligne redevient « jamais comptée », qui n'est pas « comptée à
+   * zéro ».
+   */
+  comptage: z
+    .array(
+      z.object({
+        id: z.number().int().positive(),
+        finalQuantity: z
+          .number()
+          .int()
+          .min(0)
+          .max(QUANTITE_MAX_STOCK, MESSAGE_QUANTITE_MAX)
+          .nullable(),
+      })
+    )
+    .max(200)
+    .optional(),
   // Ajouts et retraits séparés : remplacer la liste ferait perdre les tags que chaque objet porte
   // déjà et qu'on ne voulait pas toucher.
   addTagIds: z.array(z.number().int().positive()).optional(),
@@ -161,6 +186,17 @@ export default wrapApiHandler(
     const aAjouter = Array.from(new Set(data.addTagIds ?? []))
     const aRetirer = Array.from(new Set(data.removeTagIds ?? []))
 
+    // Les objets comptés doivent eux aussi appartenir à l'édition. Ils viennent de la même page
+    // que `itemIds`, mais rien ne l'impose au point d'API — et une vérification qui repose sur
+    // les bonnes manières de l'appelant n'en est pas une.
+    const idsComptes = (data.comptage ?? []).map((entree) => entree.id)
+    if (idsComptes.length > 0 && !idsComptes.every((id) => itemIds.includes(id))) {
+      throw createError({
+        status: 400,
+        message: 'Certains objets comptés ne font pas partie de la sélection',
+      })
+    }
+
     await prisma.$transaction(async (tx) => {
       if (Object.keys(communs).length > 0) {
         await tx.stockItem.updateMany({ where: { id: { in: itemIds } }, data: communs })
@@ -168,6 +204,16 @@ export default wrapApiHandler(
 
       if (Object.keys(emprunt).length > 0 && idsEmpruntes.length > 0) {
         await tx.stockItem.updateMany({ where: { id: { in: idsEmpruntes } }, data: emprunt })
+      }
+
+      // Une écriture par objet, mais dans la même transaction : tout le comptage passe, ou rien.
+      // Un inventaire à moitié écrit serait pire que pas d'inventaire du tout — on ne saurait pas
+      // quelles caisses ont été comptées.
+      for (const entree of data.comptage ?? []) {
+        await tx.stockItem.update({
+          where: { id: entree.id },
+          data: { finalQuantity: entree.finalQuantity },
+        })
       }
 
       if (aRetirer.length > 0) {
@@ -190,6 +236,8 @@ export default wrapApiHandler(
       modifies: itemIds.length,
       /** Combien d'objets étaient concernés par les champs d'emprunt : l'écran peut le rappeler. */
       empruntsModifies: Object.keys(emprunt).length > 0 ? idsEmpruntes.length : 0,
+      /** Combien de comptages ont été écrits : l'écran peut le confirmer. */
+      comptages: idsComptes.length,
     })
   },
   { operationName: 'BulkUpdateStockItems' }

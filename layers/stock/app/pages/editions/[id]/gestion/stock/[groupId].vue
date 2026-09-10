@@ -459,6 +459,93 @@
         :end-date="planningEndDate"
         @reservation-click="openReservationFromPlanning"
       />
+
+      <!--
+        Le comptage d'inventaire : une séance, pas une fiche.
+
+        On ouvre les caisses les unes après les autres et l'on note. La vue est donc resserrée à
+        ce qui sert à compter — le nom, le théorique, la case, l'écart —, et rien ne part au
+        serveur avant qu'on le demande : on compte souvent sans réseau, et une sauvegarde
+        silencieuse qui échoue une ligne sur deux laisse un inventaire à moitié écrit.
+      -->
+      <UCard v-else-if="viewMode === 'comptage'" :ui="{ body: 'p-0 sm:p-0' }">
+        <div
+          class="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 border-b border-gray-200 dark:border-gray-700"
+        >
+          <span class="text-sm">
+            {{
+              t(
+                'gestion.stock.count_progress',
+                { comptes: resume.comptes, total: resume.total },
+                resume.total
+              )
+            }}
+          </span>
+          <!-- Manquants et surplus ne se compensent pas : deux enceintes perdues et trois
+               praticables en trop ne font pas « +1 ». Deux nouvelles différentes. -->
+          <span v-if="resume.manquants > 0" class="text-sm font-medium text-error">
+            {{ t('gestion.stock.count_missing', { count: resume.manquants }, resume.manquants) }}
+          </span>
+          <span v-if="resume.surplus > 0" class="text-sm font-medium text-warning">
+            {{ t('gestion.stock.count_extra', { count: resume.surplus }, resume.surplus) }}
+          </span>
+        </div>
+
+        <UTable :data="lignesComptage" :columns="colonnesComptage" class="w-full">
+          <template #compte-cell="{ row }">
+            <UInput
+              :model-value="saisieAffichee(row.original.id)"
+              type="number"
+              min="0"
+              class="w-24"
+              :placeholder="t('gestion.stock.count_not_counted')"
+              @update:model-value="(valeur: string | number) => saisir(row.original.id, valeur)"
+            />
+          </template>
+
+          <template #ecart-cell="{ row }">
+            <!-- Rien quand la ligne n'est pas comptée, rien non plus quand le compte tombe juste :
+                 un tableau constellé de « 0 » ne se lit plus. -->
+            <span
+              v-if="ecartDe(row.original)"
+              class="font-medium tabular-nums"
+              :class="ecartDe(row.original)! < 0 ? 'text-error' : 'text-warning'"
+            >
+              {{ ecartDe(row.original)! > 0 ? '+' : '' }}{{ ecartDe(row.original) }}
+            </span>
+            <span v-else-if="compteDe(row.original) === null" class="text-gray-400 text-sm italic">
+              {{ t('gestion.stock.count_not_counted') }}
+            </span>
+            <span v-else class="text-gray-400">—</span>
+          </template>
+        </UTable>
+      </UCard>
+    </div>
+
+    <!-- La barre n'apparaît qu'une fois quelque chose saisi, et dit combien attend : sans ce
+         nombre, on ne sait pas si l'on a oublié d'enregistrer. -->
+    <div
+      v-if="viewMode === 'comptage' && enAttente > 0"
+      class="fixed bottom-0 inset-x-0 z-[60] bg-default ring ring-accented shadow-xl px-4 py-3"
+    >
+      <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <span class="text-sm font-medium">
+          {{ t('gestion.stock.count_pending', { count: enAttente }, enAttente) }}
+        </span>
+        <div class="flex items-center gap-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            :disabled="comptageEnCours"
+            @click="annulerComptage"
+          >
+            {{ t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :loading="comptageEnCours" @click="enregistrerComptage">
+            {{ t('gestion.stock.count_save') }}
+          </UButton>
+        </div>
+      </div>
     </div>
 
     <StockReservationModal
@@ -606,6 +693,14 @@ import {
   apparenceEmplacement,
   libelleEmplacement,
 } from '../../../../../utils/apparence-emplacement'
+import {
+  comptagesAEnvoyer,
+  compteRetenu,
+  ecartComptage,
+  nombreEnAttente,
+  resumeComptage,
+  type LigneComptage,
+} from '../../../../../utils/comptage-stock'
 import {
   ETATS_EMPRUNT,
   etatEmprunt,
@@ -1029,7 +1124,7 @@ const allGroups = ref<StockGroupItem[]>([])
 const zones = ref<ZoneOption[]>([])
 const markers = ref<MarkerOption[]>([])
 const loading = ref(true)
-const viewMode = ref<'list' | 'planning'>('list')
+const viewMode = ref<'list' | 'planning' | 'comptage'>('list')
 const planningItems = ref<PlanningItem[]>([])
 const planningLoading = ref(false)
 
@@ -1205,8 +1300,123 @@ const planningReservationContext = ref<{
   reservation: PlanningReservation
 } | null>(null)
 
+/**
+ * La séance de comptage.
+ *
+ * Les saisies vivent à part de la liste chargée : tant qu'on n'a pas enregistré, elles n'ont
+ * d'existence qu'ici. `undefined` — la ligne n'a pas été touchée ; `null` — la case a été vidée,
+ * ce qui efface le comptage ; un nombre — le compte du jour.
+ */
+const saisies = ref<Record<number, number | null>>({})
+const comptageEnCours = ref(false)
+
+/** Les objets du groupe, augmentés de ce que la séance a saisi. */
+const lignesComptage = computed<LigneComptage[]>(() =>
+  (group.value?.items ?? []).map((objet: any) => ({
+    id: objet.id,
+    name: objet.name,
+    quantity: objet.quantity,
+    finalQuantity: objet.finalQuantity ?? null,
+    ...(objet.id in saisies.value ? { saisie: saisies.value[objet.id] } : {}),
+  }))
+)
+
+const resume = computed(() => resumeComptage(lignesComptage.value))
+const enAttente = computed(() => nombreEnAttente(lignesComptage.value))
+
+const colonnesComptage = computed((): TableColumn<any>[] => [
+  { id: 'name', accessorKey: 'name', header: t('gestion.stock.item_name') },
+  { id: 'quantity', accessorKey: 'quantity', header: t('gestion.stock.count_expected') },
+  { id: 'compte', header: t('gestion.stock.count_counted') },
+  { id: 'ecart', header: t('gestion.stock.count_gap') },
+])
+
+const compteDe = (ligne: LigneComptage) => compteRetenu(ligne)
+const ecartDe = (ligne: LigneComptage) => ecartComptage(ligne)
+
+/**
+ * Ce que la case affiche : la saisie du jour, sinon l'enregistré, sinon rien.
+ *
+ * Une chaîne, parce que c'est ce que le champ attend — et la chaîne vide est justement ce qui
+ * distingue « non compté » de « compté à zéro ».
+ */
+function saisieAffichee(id: number): string {
+  const ligne = lignesComptage.value.find((l) => l.id === id)
+  const compte = compteRetenu(ligne ?? { id, quantity: 0, finalQuantity: null })
+  return compte === null ? '' : String(compte)
+}
+
+/**
+ * Enregistre une frappe dans la séance, sans rien envoyer.
+ *
+ * Une case vidée vaut `null` et non zéro : c'est le geste qui efface un comptage écrit par
+ * erreur, et le confondre avec « zéro exemplaire » ferait disparaître du matériel sur le papier.
+ */
+function saisir(id: number, valeur: string | number) {
+  const texte = String(valeur).trim()
+  if (texte === '') {
+    saisies.value = { ...saisies.value, [id]: null }
+    return
+  }
+  const nombre = Number(texte)
+  if (!Number.isFinite(nombre) || nombre < 0) return
+  saisies.value = { ...saisies.value, [id]: Math.floor(nombre) }
+}
+
+function annulerComptage() {
+  // N'efface que la séance en cours. Les comptages déjà écrits se défont en vidant leur case et
+  // en enregistrant — un geste, pas deux.
+  saisies.value = {}
+}
+
+async function enregistrerComptage() {
+  const comptage = comptagesAEnvoyer(lignesComptage.value)
+  if (comptage.length === 0) return
+
+  comptageEnCours.value = true
+  try {
+    await $fetch(`/api/editions/${editionId}/stock-items/bulk`, {
+      method: 'PATCH',
+      body: { itemIds: comptage.map((entree) => entree.id), comptage },
+    })
+    useToast().add({
+      title: t('common.saved'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+    saisies.value = {}
+    await fetchAll()
+  } catch (e: any) {
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    comptageEnCours.value = false
+  }
+}
+
+// Quitter la page avec des saisies non enregistrées, c'est perdre une séance de comptage. On
+// prévient — le navigateur se charge du reste.
+onBeforeRouteLeave(() => {
+  if (enAttente.value === 0) return true
+  return window.confirm(t('gestion.stock.count_leave_warning'))
+})
+
 const viewModeItems = computed(() => [
   { label: t('gestion.stock.list_view'), value: 'list', icon: 'i-heroicons-list-bullet' },
+  // Le comptage n'est proposé qu'à qui peut écrire : une vue de saisie sans droit d'enregistrer
+  // serait une invitation à perdre son travail.
+  ...(canManage.value
+    ? [
+        {
+          label: t('gestion.stock.count_view'),
+          value: 'comptage',
+          icon: 'i-heroicons-clipboard-document-check',
+        },
+      ]
+    : []),
   {
     label: t('gestion.stock.planning_view'),
     value: 'planning',
