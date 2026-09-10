@@ -49,6 +49,20 @@ describe('GET /api/editions/[id]/stock-items/[itemId]', () => {
     expect(result.data.item.name).toBe('Rallonge')
   })
 
+  it("ne demande pas l'adresse e-mail des personnes qui ont réservé", async () => {
+    // Cette fiche est ouverte à qui peut consulter le stock, responsables d'équipe bénévole
+    // compris : ils n'ont pas à connaître l'adresse des autres participants. L'empreinte suffit
+    // à l'avatar, seul usage qu'en fasse l'écran.
+    await handler(baseEvent as any)
+
+    const appel = prismaMock.stockItem.findFirst.mock.calls[0][0]
+    const champsUtilisateur = appel.include.reservations.include.user.select
+
+    expect(champsUtilisateur.email).toBeUndefined()
+    expect(champsUtilisateur.emailHash).toBe(true)
+    expect(champsUtilisateur.pseudo).toBe(true)
+  })
+
   it('vérifie le scope édition via group.editionId', async () => {
     await handler(baseEvent as any)
     expect(prismaMock.stockItem.findFirst).toHaveBeenCalledWith(

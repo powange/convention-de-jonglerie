@@ -45,13 +45,17 @@ export default wrapApiHandler(
           include: {
             zone: { select: { id: true, name: true, color: true } },
             marker: { select: { id: true, name: true } },
+            // Pas l'adresse e-mail : cette fiche est ouverte à qui peut consulter le stock, ce
+            // qui inclut les responsables d'équipe bénévole — lesquels n'ont pas à connaître
+            // l'adresse des autres participants. Le planning, qui affiche pourtant les mêmes
+            // réservations, ne prenait déjà que l'empreinte ; c'est ce choix-là qui vaut.
+            // L'empreinte suffit à l'avatar, seul usage qu'en fait l'écran.
             user: {
               select: {
                 id: true,
                 pseudo: true,
                 prenom: true,
                 nom: true,
-                email: true,
                 emailHash: true,
                 profilePicture: true,
               },
