@@ -246,9 +246,13 @@
 </template>
 
 <script setup lang="ts">
+import { refDebounced } from '@vueuse/core'
+
 import type { UserSelectItem } from '~/components/UserSelector.vue'
 
-import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import type { Ref } from 'vue'
+
+import { rechercheResponsable } from '~~/shared/utils/recherche-responsable'
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 /** Un responsable tel que la fiche le rend : à retraduire pour le sélecteur. */
@@ -403,8 +407,10 @@ const ecartQuantite = computed(() => {
   return Math.max(0, formData.quantity - compte)
 })
 
-// La recherche se fait par adresse e-mail exacte, comme pour les responsables d'accueil des
-// artistes : on ne parcourt pas l'annuaire des comptes, on désigne quelqu'un qu'on connaît.
+// Deux recherches dans le même champ. Une adresse e-mail complète désigne quelqu'un qu'on connaît
+// déjà : elle trouve n'importe quel compte du site. Un pseudo ne cherche que parmi les gens de
+// l'édition — organisateurs et bénévoles acceptés —, sans quoi gérer un stock donnerait accès à
+// l'annuaire des comptes. La règle qui départage les deux est dans `recherche-responsable`.
 const pickupSearchTerm = ref('')
 const pickupSearchedUsers = ref<UserSelectItem[]>([])
 const searchingPickupUsers = ref(false)
@@ -412,18 +418,42 @@ const returnSearchTerm = ref('')
 const returnSearchedUsers = ref<UserSelectItem[]>([])
 const searchingReturnUsers = ref(false)
 
-async function chercherUtilisateurs(email: string): Promise<UserSelectItem[]> {
-  if (!estAdresseEmail(email)) return []
+// Une frappe ne vaut pas une requête : la recherche par pseudo part à chaque caractère, là où
+// l'adresse exacte n'aboutissait qu'une fois l'adresse entière écrite.
+const pickupSearchTermDifferee = refDebounced(pickupSearchTerm, 300)
+const returnSearchTermDifferee = refDebounced(returnSearchTerm, 300)
+
+async function chercherUtilisateurs(saisie: string): Promise<UserSelectItem[]> {
+  const recherche = rechercheResponsable(saisie)
+  if (!recherche) return []
+
   try {
-    const reponse = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
-      params: { emailExact: email },
-    })
+    if (recherche.type === 'email') {
+      const reponse = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
+        params: { emailExact: recherche.valeur },
+      })
+      return (reponse.data.users || []).map((u) => ({
+        id: u.id,
+        label: `${u.pseudo} (${u.email})`,
+        pseudo: u.pseudo,
+        email: u.email,
+        emailHash: u.emailHash,
+        profilePicture: u.profilePicture,
+      }))
+    }
+
+    const reponse = await $fetch<{ data: { users: any[] } }>(
+      `/api/editions/${props.editionId}/stock-responsables`,
+      { params: { pseudo: recherche.valeur } }
+    )
     return (reponse.data.users || []).map((u) => ({
       id: u.id,
-      label: `${u.pseudo} (${u.email})`,
+      // L'adresse n'est volontairement pas rendue par cette recherche-là : le pseudo et l'état
+      // civil suffisent à reconnaître quelqu'un de sa propre équipe.
+      label: nomComplet(u) ? `${u.pseudo} (${nomComplet(u)})` : u.pseudo,
       pseudo: u.pseudo,
-      email: u.email,
-      emailHash: u.emailHash,
+      email: '',
+      emailHash: u.emailHash || '',
       profilePicture: u.profilePicture,
     }))
   } catch {
@@ -431,25 +461,53 @@ async function chercherUtilisateurs(email: string): Promise<UserSelectItem[]> {
   }
 }
 
-watch(pickupSearchTerm, async (terme) => {
-  if (!estAdresseEmail(terme)) {
-    pickupSearchedUsers.value = []
-    return
-  }
-  searchingPickupUsers.value = true
-  pickupSearchedUsers.value = await chercherUtilisateurs(terme)
-  searchingPickupUsers.value = false
-})
+/** Prénom et nom quand ils sont renseignés — deux pseudos proches se distinguent ainsi. */
+function nomComplet(u: { prenom?: string | null; nom?: string | null }): string {
+  return [u.prenom, u.nom].filter(Boolean).join(' ').trim()
+}
 
-watch(returnSearchTerm, async (terme) => {
-  if (!estAdresseEmail(terme)) {
-    returnSearchedUsers.value = []
-    return
+/**
+ * Lance une recherche et n'en retient le résultat que s'il est encore d'actualité.
+ *
+ * La recherche par pseudo enchaîne les appels au fil de la frappe : sans ce jeton, une réponse
+ * lente à « jo » pouvait écraser celle, déjà arrivée, de « jonglerie ».
+ */
+function suivreRecherche(
+  resultats: Ref<UserSelectItem[]>,
+  enCours: Ref<boolean>,
+  termeCourant: () => string
+) {
+  let dernierJeton = 0
+
+  return async (terme: string) => {
+    if (!rechercheResponsable(terme)) {
+      resultats.value = []
+      enCours.value = false
+      return
+    }
+
+    const jeton = ++dernierJeton
+    enCours.value = true
+    const trouves = await chercherUtilisateurs(terme)
+    if (jeton !== dernierJeton || terme !== termeCourant()) return
+    resultats.value = trouves
+    enCours.value = false
   }
-  searchingReturnUsers.value = true
-  returnSearchedUsers.value = await chercherUtilisateurs(terme)
-  searchingReturnUsers.value = false
-})
+}
+
+const chercherPourRecuperation = suivreRecherche(
+  pickupSearchedUsers,
+  searchingPickupUsers,
+  () => pickupSearchTermDifferee.value
+)
+const chercherPourRetour = suivreRecherche(
+  returnSearchedUsers,
+  searchingReturnUsers,
+  () => returnSearchTermDifferee.value
+)
+
+watch(pickupSearchTermDifferee, chercherPourRecuperation)
+watch(returnSearchTermDifferee, chercherPourRetour)
 
 const fieldErrors = ref<Record<string, string>>({})
 const saving = ref(false)
