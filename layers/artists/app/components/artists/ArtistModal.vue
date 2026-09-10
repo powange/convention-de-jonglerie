@@ -501,6 +501,7 @@ import {
   formatDateTimeLocal,
 } from '#imports'
 
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 const props = defineProps<{
@@ -726,7 +727,7 @@ watch(
     if (emailCheckTimeout) clearTimeout(emailCheckTimeout)
     existingUserMatch.value = null
 
-    if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) return
+    if (!estAdresseEmail(newEmail)) return
 
     emailCheckTimeout = setTimeout(async () => {
       const results = await searchUsers(newEmail)
@@ -793,8 +794,8 @@ const allergySeverityOptions = computed(() =>
 
 // Fonction helper pour rechercher des utilisateurs par email exact
 const searchUsers = async (email: string) => {
-  // Validation basique d'email
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return []
+  // La même règle que le serveur : cf. `shared/utils/adresse-email`.
+  if (!estAdresseEmail(email)) return []
   try {
     const response = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
       params: { emailExact: email },
@@ -817,8 +818,7 @@ const searchUsers = async (email: string) => {
 
 // Recherche d'utilisateurs par email exact
 watch(searchTerm, async (newTerm) => {
-  // Validation basique d'email
-  if (!newTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newTerm)) {
+  if (!estAdresseEmail(newTerm)) {
     searchedUsers.value = []
     return
   }
@@ -829,8 +829,7 @@ watch(searchTerm, async (newTerm) => {
 
 // Recherche des responsables pickup par email exact
 watch(pickupSearchTerm, async (newTerm) => {
-  // Validation basique d'email
-  if (!newTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newTerm)) {
+  if (!estAdresseEmail(newTerm)) {
     pickupSearchedUsers.value = []
     return
   }
@@ -841,8 +840,7 @@ watch(pickupSearchTerm, async (newTerm) => {
 
 // Recherche des responsables dropoff par email exact
 watch(dropoffSearchTerm, async (newTerm) => {
-  // Validation basique d'email
-  if (!newTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newTerm)) {
+  if (!estAdresseEmail(newTerm)) {
     dropoffSearchedUsers.value = []
     return
   }

@@ -139,6 +139,8 @@ import { reactive, ref, onMounted } from 'vue'
 
 import type { Convention } from '~/types'
 
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+
 const { t } = useI18n()
 const { getImageUrl } = useImageUrl()
 
@@ -260,8 +262,7 @@ const validate = (state: typeof form) => {
 
   // Validation de l'email si fourni
   if (state.email && state.email.trim()) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(state.email.trim())) {
+    if (!estAdresseEmail(state.email)) {
       errors.push({ path: 'email', message: t('validation.email_format') })
     }
   }

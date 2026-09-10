@@ -248,6 +248,7 @@
 <script setup lang="ts">
 import type { UserSelectItem } from '~/components/UserSelector.vue'
 
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 /** Un responsable tel que la fiche le rend : à retraduire pour le sélecteur. */
@@ -411,10 +412,8 @@ const returnSearchTerm = ref('')
 const returnSearchedUsers = ref<UserSelectItem[]>([])
 const searchingReturnUsers = ref(false)
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 async function chercherUtilisateurs(email: string): Promise<UserSelectItem[]> {
-  if (!EMAIL.test(email)) return []
+  if (!estAdresseEmail(email)) return []
   try {
     const reponse = await $fetch<{ data: { users: any[] } }>('/api/users/search', {
       params: { emailExact: email },
@@ -433,7 +432,7 @@ async function chercherUtilisateurs(email: string): Promise<UserSelectItem[]> {
 }
 
 watch(pickupSearchTerm, async (terme) => {
-  if (!EMAIL.test(terme)) {
+  if (!estAdresseEmail(terme)) {
     pickupSearchedUsers.value = []
     return
   }
@@ -443,7 +442,7 @@ watch(pickupSearchTerm, async (terme) => {
 })
 
 watch(returnSearchTerm, async (terme) => {
-  if (!EMAIL.test(terme)) {
+  if (!estAdresseEmail(terme)) {
     returnSearchedUsers.value = []
     return
   }

@@ -734,6 +734,8 @@ import { ref, computed, watch } from 'vue'
 
 import { isFreePrice, isFixedPrice } from '../../utils/ticketing/tiers'
 
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+
 const { money, symbol } = useEditionCurrency()
 
 interface TicketingOption {
@@ -965,7 +967,7 @@ const canGoNext = computed(() => {
     return (
       form.value.payerFirstName.trim().length > 0 &&
       form.value.payerLastName.trim().length > 0 &&
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.payerEmail)
+      estAdresseEmail(form.value.payerEmail)
     )
   }
   if (currentStep.value === 1) {
@@ -1001,7 +1003,7 @@ const canGoNext = computed(() => {
         const validParticipant =
           item.firstName.trim().length > 0 &&
           item.lastName.trim().length > 0 &&
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.email)
+          estAdresseEmail(item.email)
         if (!validParticipant) return false
       }
 
@@ -1439,8 +1441,8 @@ const searchUserByEmail = async () => {
   errors.value.payerFirstName = ''
   errors.value.payerLastName = ''
 
-  // Vérifier que l'email est valide
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Vérifier que l'adresse est valide, au sens où le serveur l'entend.
+  if (!estAdresseEmail(email)) {
     // Si l'email n'est pas valide, afficher quand même les champs nom/prénom
     showNameFields.value = true
     return

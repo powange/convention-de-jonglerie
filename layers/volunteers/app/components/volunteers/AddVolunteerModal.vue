@@ -182,6 +182,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+
 interface User {
   id: number
   pseudo: string | null
@@ -239,15 +241,10 @@ const isNewUserValid = computed(() => {
   )
 })
 
-// Computed pour vérifier si l'email de recherche est valide (pour le template)
-const isValidEmailInput = computed(() => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(searchEmail.value.trim())
-})
+// La même règle que le serveur, des deux côtés : cf. `shared/utils/adresse-email`.
+const isValidEmailInput = computed(() => estAdresseEmail(searchEmail.value))
 
-// Validation email simple
-const isValidEmail = (email: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
+const isValidEmail = (email: string) => estAdresseEmail(email)
 
 // Fonction de recherche (correspondance exacte par email)
 const performSearch = async (email: string) => {

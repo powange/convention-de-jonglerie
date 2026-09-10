@@ -411,6 +411,8 @@ import { summarizeRights } from '~/utils/organizerRights'
 
 import type { TableColumn } from '@nuxt/ui'
 
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -513,8 +515,8 @@ const debouncedSearchTerm = useDebounce(newOrganizersearchTerm, 300)
 
 // Watchers pour la recherche d'utilisateurs par email exact
 watch(debouncedSearchTerm, async (searchTerm) => {
-  // Validation basique d'email
-  if (!searchTerm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(searchTerm)) {
+  // La même règle que le serveur : cf. `shared/utils/adresse-email`.
+  if (!estAdresseEmail(searchTerm)) {
     searchedUsers.value = []
     return
   }
