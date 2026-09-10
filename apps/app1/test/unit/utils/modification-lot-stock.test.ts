@@ -89,3 +89,41 @@ describe('changementsEnLot', () => {
     })
   })
 })
+
+/**
+ * Les deux jalons d'un emprunt, posés en lot : le camion revient d'un bloc, et ouvrir quinze
+ * fiches pour cocher quinze cases n'a pas de sens.
+ */
+describe('changementsEnLot — jalons d’emprunt', () => {
+  it('convertit la récupération en date', () => {
+    const { emprunt } = changementsEnLot({ pickedUpAt: '2026-10-02T10:00:00.000Z' })
+
+    expect(emprunt.pickedUpAt).toBeInstanceOf(Date)
+    expect((emprunt.pickedUpAt as Date).toISOString()).toBe('2026-10-02T10:00:00.000Z')
+  })
+
+  it('convertit le retour en date', () => {
+    const { emprunt } = changementsEnLot({ returnedAt: '2026-10-05T18:00:00.000Z' })
+
+    expect((emprunt.returnedAt as Date).toISOString()).toBe('2026-10-05T18:00:00.000Z')
+  })
+
+  it('laisse annuler un jalon', () => {
+    // Sans ce cas, `new Date(null)` poserait le 1er janvier 1970 — une récupération qui n'a
+    // jamais eu lieu se lirait comme très ancienne au lieu de disparaître.
+    expect(changementsEnLot({ pickedUpAt: null }).emprunt).toEqual({ pickedUpAt: null })
+    expect(changementsEnLot({ returnedAt: null }).emprunt).toEqual({ returnedAt: null })
+  })
+
+  it('range les jalons avec les champs d’emprunt', () => {
+    // Ils ne concernent que le matériel prêté : posés ailleurs, ils dateraient une récupération
+    // qui n'a pas de sens sur du matériel qui nous appartient.
+    const { communs, emprunt } = changementsEnLot({
+      location: 'Local',
+      pickedUpAt: '2026-10-02T10:00:00.000Z',
+    })
+
+    expect(communs).toEqual({ location: 'Local' })
+    expect(Object.keys(emprunt)).toEqual(['pickedUpAt'])
+  })
+})

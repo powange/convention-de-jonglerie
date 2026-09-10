@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Nie ma innej grupy, do której można przenieść.",
       "item_group": "Grupa",
       "item_location_placeholder": "Odręczne uszczegółowienie (opcjonalne)",
-      "tab_general": "Ogólne"
+      "tab_general": "Ogólne",
+      "bulk_mark_picked_up": "Oznacz jako odebrany ({count}) | Oznacz jako odebrane ({count})",
+      "bulk_mark_returned": "Oznacz jako zwrócony ({count}) | Oznacz jako zwrócone ({count})",
+      "bulk_unmark_picked_up": "Cofnij odbiór ({count}) | Cofnij odbiory ({count})",
+      "bulk_unmark_returned": "Cofnij zwrot ({count}) | Cofnij zwroty ({count})",
+      "groups_title": "Grupy",
+      "loan_place_all": "Wszystkie miejsca",
+      "loan_responsible_all": "Wszystkie osoby",
+      "loan_state": "Stan",
+      "loans_none": "Brak sprzętu wypożyczonego z zewnątrz w tej edycji",
+      "loans_title": "Wypożyczenia"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

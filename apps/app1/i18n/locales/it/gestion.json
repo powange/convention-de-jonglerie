@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Non c'è un altro gruppo verso cui spostare.",
       "item_group": "Gruppo",
       "item_location_placeholder": "Precisazione scritta a mano (facoltativa)",
-      "tab_general": "Generale"
+      "tab_general": "Generale",
+      "bulk_mark_picked_up": "Segna come ritirato ({count}) | Segna come ritirati ({count})",
+      "bulk_mark_returned": "Segna come restituito ({count}) | Segna come restituiti ({count})",
+      "bulk_unmark_picked_up": "Annulla il ritiro ({count}) | Annulla i ritiri ({count})",
+      "bulk_unmark_returned": "Annulla la restituzione ({count}) | Annulla le restituzioni ({count})",
+      "groups_title": "Gruppi",
+      "loan_place_all": "Tutti i luoghi",
+      "loan_responsible_all": "Tutte le persone",
+      "loan_state": "Stato",
+      "loans_none": "Nessun materiale preso in prestito dall'esterno per questa edizione",
+      "loans_title": "Prestiti"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

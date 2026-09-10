@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Není žádná jiná skupina, kam přesunout.",
       "item_group": "Skupina",
       "item_location_placeholder": "Ručně psané upřesnění (nepovinné)",
-      "tab_general": "Obecné"
+      "tab_general": "Obecné",
+      "bulk_mark_picked_up": "Označit jako vyzvednuté ({count}) | Označit jako vyzvednuté ({count})",
+      "bulk_mark_returned": "Označit jako vrácené ({count}) | Označit jako vrácené ({count})",
+      "bulk_unmark_picked_up": "Zrušit vyzvednutí ({count}) | Zrušit vyzvednutí ({count})",
+      "bulk_unmark_returned": "Zrušit vrácení ({count}) | Zrušit vrácení ({count})",
+      "groups_title": "Skupiny",
+      "loan_place_all": "Všechna místa",
+      "loan_responsible_all": "Všechny osoby",
+      "loan_state": "Stav",
+      "loans_none": "Žádné zvenčí zapůjčené vybavení pro tento ročník",
+      "loans_title": "Zápůjčky"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

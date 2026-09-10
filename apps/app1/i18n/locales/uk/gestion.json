@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Немає іншої групи для переміщення.",
       "item_group": "Група",
       "item_location_placeholder": "Уточнення від руки (необов'язково)",
-      "tab_general": "Загальне"
+      "tab_general": "Загальне",
+      "bulk_mark_picked_up": "Позначити як забране ({count}) | Позначити як забрані ({count})",
+      "bulk_mark_returned": "Позначити як повернене ({count}) | Позначити як повернені ({count})",
+      "bulk_unmark_picked_up": "Скасувати отримання ({count}) | Скасувати отримання ({count})",
+      "bulk_unmark_returned": "Скасувати повернення ({count}) | Скасувати повернення ({count})",
+      "groups_title": "Групи",
+      "loan_place_all": "Усі місця",
+      "loan_responsible_all": "Усі люди",
+      "loan_state": "Стан",
+      "loans_none": "Немає обладнання, позиченого ззовні для цього випуску",
+      "loans_title": "Оренда"
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

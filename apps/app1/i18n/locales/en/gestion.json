@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "There is no other group to move to.",
       "item_group": "Group",
       "item_location_placeholder": "Handwritten detail (optional)",
-      "tab_general": "General"
+      "tab_general": "General",
+      "bulk_mark_picked_up": "Mark as picked up ({count}) | Mark as picked up ({count})",
+      "bulk_mark_returned": "Mark as returned ({count}) | Mark as returned ({count})",
+      "bulk_unmark_picked_up": "Undo pickup ({count}) | Undo pickups ({count})",
+      "bulk_unmark_returned": "Undo return ({count}) | Undo returns ({count})",
+      "groups_title": "Groups",
+      "loan_place_all": "All places",
+      "loan_responsible_all": "Everyone",
+      "loan_state": "Status",
+      "loans_none": "No equipment borrowed from outside for this edition",
+      "loans_title": "Loans"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

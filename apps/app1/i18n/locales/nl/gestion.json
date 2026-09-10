@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Er is geen andere groep om naartoe te verplaatsen.",
       "item_group": "Groep",
       "item_location_placeholder": "Handgeschreven detail (optioneel)",
-      "tab_general": "Algemeen"
+      "tab_general": "Algemeen",
+      "bulk_mark_picked_up": "Markeren als opgehaald ({count}) | Markeren als opgehaald ({count})",
+      "bulk_mark_returned": "Markeren als teruggebracht ({count}) | Markeren als teruggebracht ({count})",
+      "bulk_unmark_picked_up": "Ophalen ongedaan maken ({count}) | Ophalen ongedaan maken ({count})",
+      "bulk_unmark_returned": "Teruggave ongedaan maken ({count}) | Teruggaven ongedaan maken ({count})",
+      "groups_title": "Groepen",
+      "loan_place_all": "Alle plaatsen",
+      "loan_responsible_all": "Alle personen",
+      "loan_state": "Status",
+      "loans_none": "Geen van buitenaf geleend materiaal voor deze editie",
+      "loans_title": "Bruiklenen"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

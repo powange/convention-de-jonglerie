@@ -47,7 +47,9 @@ describe('GET /api/editions/[id]/stock-responsables', () => {
     mockRateLimiter.mockResolvedValue(undefined)
     prismaMock.user.findMany.mockReset()
     prismaMock.user.findMany.mockResolvedValue([{ id: 4, pseudo: 'jonglerie' }])
-    global.getQuery = vi.fn(() => ({ pseudo: 'jo' }))
+    // `globalThis as any`, comme les tests voisins : `getQuery` est injecté par H3 et n'existe
+    // pas sur le type global.
+    ;(globalThis as any).getQuery = vi.fn(() => ({ pseudo: 'jo' }))
   })
 
   it('rend les personnes trouvées', async () => {

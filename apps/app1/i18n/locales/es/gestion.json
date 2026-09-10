@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "No hay otro grupo al que mover.",
       "item_group": "Grupo",
       "item_location_placeholder": "Detalle escrito a mano (opcional)",
-      "tab_general": "General"
+      "tab_general": "General",
+      "bulk_mark_picked_up": "Marcar como recogido ({count}) | Marcar como recogidos ({count})",
+      "bulk_mark_returned": "Marcar como devuelto ({count}) | Marcar como devueltos ({count})",
+      "bulk_unmark_picked_up": "Anular la recogida ({count}) | Anular las recogidas ({count})",
+      "bulk_unmark_returned": "Anular la devolución ({count}) | Anular las devoluciones ({count})",
+      "groups_title": "Grupos",
+      "loan_place_all": "Todos los lugares",
+      "loan_responsible_all": "Todas las personas",
+      "loan_state": "Estado",
+      "loans_none": "Ningún material prestado desde fuera en esta edición",
+      "loans_title": "Préstamos"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",
