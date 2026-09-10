@@ -6,6 +6,17 @@ on:
   pull_request:
     branches: [main]
 
+# Chaque push sur une PR ouverte relançait les 9 checks en laissant les précédents aller au bout.
+# Les minutes sont gratuites sur un dépôt public, mais la limite de 20 jobs simultanés du compte
+# était occupée par des runs déjà périmés, et le dernier push — le seul qui compte — attendait
+# derrière eux.
+#
+# L'annulation est conditionnée à l'événement, et c'est délibéré : sur un push vers main, un run
+# interrompu laisserait un commit de la branche de référence sans vérification.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   NODE_ENV: test
   DATABASE_URL: mysql://root:rootpassword@localhost:3306/convention_db_test
@@ -33,7 +44,6 @@ jobs:
     outputs:
       deps-cache-key: ${{ steps.cache-keys.outputs.deps }}
       prisma-cache-key: ${{ steps.cache-keys.outputs.prisma }}
-      nuxt-cache-key: ${{ steps.cache-keys.outputs.nuxt }}
 
     steps:
       - name: Checkout code
@@ -61,7 +71,6 @@ jobs:
         run: |
           echo "deps=${{ runner.os }}-deps-v3-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
           echo "prisma=${{ runner.os }}-prisma-v3-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('apps/app1/nuxt.config.ts', 'apps/app1/tsconfig.json', 'apps/app1/app.config.ts') }}" >> $GITHUB_OUTPUT
 
       # `~/.npm` n'est volontairement pas listé ici : `actions/setup-node` le met déjà en cache via
       # `cache: 'npm'` + `cache-dependency-path`, et comme `node_modules` est restauré tel quel,
@@ -85,14 +94,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-prisma-v3-
 
-      - name: Cache Nuxt build
-        id: cache-nuxt
-        uses: actions/cache@v4
-        with:
-          path: apps/app1/.nuxt
-          key: ${{ steps.cache-keys.outputs.nuxt }}
-          restore-keys: |
-            ${{ runner.os }}-nuxt-
+      # `.nuxt` n'est délibérément PAS mis en cache, et aucun job ne le transmet aux autres.
+      #
+      # Son contenu — types et déclarations d'auto-import — dérive de TOUT le code : composants,
+      # composables, fichiers de `layers/`. La clé ne hachait que nuxt.config.ts, tsconfig.json et
+      # app.config.ts : un commit qui ajoute un composable n'en touche aucun, donc un `.nuxt`
+      # périmé était restauré et le `nuxi prepare` sauté. Le lint et les tests, qui lisent `.nuxt`
+      # tel quel (alias `#build` pour vitest), travaillaient alors sur des déclarations absentes —
+      # la même famille de panne que le bug des layers, et un échec d'autant plus déroutant qu'il
+      # dépendait de l'âge d'une entrée de cache. `nuxi prepare` coûte une quinzaine de secondes,
+      # soit à peu près ce que coûtaient la sauvegarde et la restauration de l'archive : on
+      # échangeait un risque de faux résultat contre rien. Chaque job qui en a besoin le régénère.
 
       - name: Install dependencies (if not cached)
         if: steps.cache-deps.outputs.cache-hit != 'true'
@@ -101,11 +113,6 @@ jobs:
       - name: Generate Prisma client
         if: steps.cache-prisma.outputs.cache-hit != 'true'
         run: npx prisma generate
-
-      # Générer les fichiers Nuxt nécessaires pour les tests (si pas en cache)
-      - name: Prepare Nuxt
-        if: steps.cache-nuxt.outputs.cache-hit != 'true'
-        run: npx nuxi prepare
 
   # Job pour le linting (rapide, pas besoin de DB)
   lint:
@@ -124,16 +131,33 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/app1/package-lock.json'
 
+      # `actions/cache/restore` et non `actions/cache` : seul `setup` a vocation à écrire dans le
+      # cache. `actions/cache` tente une sauvegarde en post-job dès que la clé a manqué, et depuis
+      # que la matrice de tests tourne en parallèle de lint/build, six jobs pouvaient viser la même
+      # clé en même temps — d'où les « Unable to reserve cache ». La variante `restore` ne
+      # sauvegarde jamais.
+      #
+      # Et plus de `fail-on-cache-miss` : le quota de 10 Go par dépôt s'évince en LRU, donc
+      # l'entrée peut disparaître entre la fin de `setup` et le démarrage de ce job. Ça rendait la
+      # CI rouge pour une raison étrangère à la PR. On réinstalle au lieu d'échouer — c'est plus
+      # lent ce jour-là, mais ça reste un résultat juste.
       - name: Restore Node dependencies
-        uses: actions/cache@v4
+        id: cache-deps
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
-          fail-on-cache-miss: true
 
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      # Même raison : ce job ne sauvegarde pas le client Prisma. Le step suivant est déjà le filet
+      # du cache manquant, et c'est lui qui produisait le plus de courses à la sauvegarde — il n'a
+      # jamais eu de `fail-on-cache-miss`, donc un miss laissait les six jobs réserver la clé.
       - name: Restore Prisma client
         id: cache-prisma
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
@@ -142,17 +166,10 @@ jobs:
         if: steps.cache-prisma.outputs.cache-hit != 'true'
         run: npx prisma generate
 
-      - name: Restore Nuxt build
-        id: cache-nuxt
-        uses: actions/cache@v4
-        with:
-          path: apps/app1/.nuxt
-          key: ${{ needs.setup.outputs.nuxt-cache-key }}
-
-      # Régénère .nuxt si le cache manque (clé nuxt-cache-key change quand nuxt.config.ts change ;
-      # le restore est alors parfois indisponible — on ne fait donc pas fail-on-cache-miss ici).
-      - name: Prepare Nuxt (if cache miss)
-        if: steps.cache-nuxt.outputs.cache-hit != 'true'
+      # Régénéré à chaque run plutôt que restauré : voir le job `setup`. Le script `lint` le
+      # ferait de lui-même (`[ -d .nuxt ] || npx nuxt prepare`), mais un step nommé rend un
+      # échec de prepare lisible au lieu de le noyer dans la sortie d'ESLint.
+      - name: Prepare Nuxt
         run: npx nuxi prepare
 
       - name: Run linting
@@ -187,16 +204,22 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/app1/package-lock.json'
 
+      # Restauration sans sauvegarde, et réinstallation plutôt qu'échec si l'entrée a été
+      # évincée : voir le job `lint`.
       - name: Restore Node dependencies
-        uses: actions/cache@v4
+        id: cache-deps
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
 
       - name: Restore Prisma client
         id: cache-prisma
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
@@ -205,21 +228,18 @@ jobs:
         if: steps.cache-prisma.outputs.cache-hit != 'true'
         run: npx prisma generate
 
-      - name: Restore Nuxt build
-        id: cache-nuxt
-        uses: actions/cache@v4
-        with:
-          path: apps/app1/.nuxt
-          key: ${{ needs.setup.outputs.nuxt-cache-key }}
+      # Pas de `nuxi prepare` ici : `nuxt typecheck` appelle lui-même `writeTypes` + `buildNuxt`
+      # sans condition avant de lancer vue-tsc (@nuxt/cli, commande `typecheck`), donc un prepare
+      # explicite refait exactement le même travail pour une quinzaine de secondes. Son prepare
+      # interne a en plus l'avantage de tourner APRÈS le lien des layers ci-dessous, donc avec
+      # leurs paquets résolus — ce qu'un prepare placé avant ne garantissait pas.
 
-      - name: Prepare Nuxt (if cache miss)
-        if: steps.cache-nuxt.outputs.cache-hit != 'true'
-        run: npx nuxi prepare
-
-      # Les jobs restaurent `apps/app1/node_modules` depuis le cache sans rejouer `npm ci` : le
-      # `postinstall` qui relie les dépendances aux layers ne s'exécute donc pas ici. Sans ce
-      # rappel, les fichiers de `layers/` ne résoudraient aucun paquet et le compilateur y
-      # dégraderait tous les types en `any` — un pan entier du code cesserait d'être vérifié.
+      # Dans le cas normal, ce job restaure `apps/app1/node_modules` depuis le cache sans rejouer
+      # `npm ci` : le `postinstall` qui relie les dépendances aux layers ne s'exécute donc pas.
+      # Sans ce rappel, les fichiers de `layers/` ne résoudraient aucun paquet et le compilateur y
+      # dégraderait tous les types en `any` — un pan entier du code cesserait d'être vérifié. Il
+      # reste utile même quand le filet de réinstallation ci-dessus a joué : l'appeler deux fois
+      # ne coûte rien, alors que l'oublier une fois fait passer la vérification à côté.
       - name: Relier les dépendances aux layers
         run: node scripts/lier-layers-node-modules.mjs
 
@@ -283,16 +303,22 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/app1/package-lock.json'
 
+      # Restauration sans sauvegarde, et réinstallation plutôt qu'échec si l'entrée a été
+      # évincée : voir le job `lint`.
       - name: Restore Node dependencies
-        uses: actions/cache@v4
+        id: cache-deps
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
 
       - name: Restore Prisma client
         id: cache-prisma
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
@@ -364,16 +390,22 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/app1/package-lock.json'
 
+      # Restauration sans sauvegarde, et réinstallation plutôt qu'échec si l'entrée a été
+      # évincée : voir le job `lint`.
       - name: Restore Node dependencies
-        uses: actions/cache@v4
+        id: cache-deps
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
-          fail-on-cache-miss: true
+
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
 
       - name: Restore Prisma client
         id: cache-prisma
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
@@ -382,19 +414,13 @@ jobs:
         if: steps.cache-prisma.outputs.cache-hit != 'true'
         run: npx prisma generate
 
-      - name: Restore Nuxt build
-        id: cache-nuxt
-        uses: actions/cache@v4
-        with:
-          path: apps/app1/.nuxt
-          key: ${{ needs.setup.outputs.nuxt-cache-key }}
-
-      - name: Prepare Nuxt (if cache miss)
-        if: steps.cache-nuxt.outputs.cache-hit != 'true'
+      # Régénéré à chaque run plutôt que restauré : voir le job `setup`. Indispensable ici, vitest
+      # résout l'alias `#build` vers `.nuxt` et ne le génère jamais lui-même.
+      - name: Prepare Nuxt
         run: npx nuxi prepare
 
-      # Même rappel que dans le job de typage, et pour la même cause : le cache restaure
-      # `node_modules` sans rejouer `npm ci`, donc sans le `postinstall` qui relie les layers.
+      # Même rappel que dans le job de typage, et pour la même cause : dans le cas normal le cache
+      # restaure `node_modules` sans rejouer `npm ci`, donc sans le `postinstall` qui lie les layers.
       # L'effet, ici, n'est pas la dégradation silencieuse des types mais un échec franc — un
       # fichier de `layers/` qui importe un paquet ne se résout pas du tout. Aucun util de layer
       # testé unitairement n'importait quoi que ce soit jusqu'au premier composable partagé.
