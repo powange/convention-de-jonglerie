@@ -117,46 +117,80 @@
             </UFormField>
           </div>
 
+          <!-- Le lieu et la personne ont chacun leur case : réunis sous une seule, changer qui
+               récupère forçait à retoucher le lieu, ou à l'effacer sans le vouloir. -->
           <div class="flex items-start gap-3">
-            <UCheckbox v-model="actifs.recuperation" class="mt-7" :disabled="!nbEmpruntes" />
-            <div class="flex-1 min-w-0 space-y-2">
-              <UFormField :label="t('gestion.stock.pickup_location')">
-                <UInput
-                  v-model="valeurs.pickupLocation"
-                  :disabled="!actifs.recuperation"
-                  class="w-full"
-                />
-              </UFormField>
-              <UFormField :label="t('gestion.stock.pickup_responsible')">
-                <UInput
-                  v-model="valeurs.pickupContact"
-                  :disabled="!actifs.recuperation"
-                  :placeholder="t('gestion.stock.responsible_contact_placeholder')"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
+            <UCheckbox v-model="actifs.lieuRecuperation" class="mt-7" :disabled="!nbEmpruntes" />
+            <UFormField :label="t('gestion.stock.pickup_location')" class="flex-1 min-w-0">
+              <UInput
+                v-model="valeurs.pickupLocation"
+                :disabled="!actifs.lieuRecuperation"
+                class="w-full"
+              />
+            </UFormField>
           </div>
 
           <div class="flex items-start gap-3">
-            <UCheckbox v-model="actifs.retour" class="mt-7" :disabled="!nbEmpruntes" />
-            <div class="flex-1 min-w-0 space-y-2">
-              <UFormField :label="t('gestion.stock.return_location')">
-                <UInput
-                  v-model="valeurs.returnLocation"
-                  :disabled="!actifs.retour"
-                  class="w-full"
-                />
-              </UFormField>
-              <UFormField :label="t('gestion.stock.return_responsible')">
-                <UInput
-                  v-model="valeurs.returnContact"
-                  :disabled="!actifs.retour"
-                  :placeholder="t('gestion.stock.responsible_contact_placeholder')"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
+            <UCheckbox
+              v-model="actifs.responsableRecuperation"
+              class="mt-7"
+              :disabled="!nbEmpruntes"
+            />
+            <UFormField
+              :label="t('gestion.stock.pickup_responsible')"
+              :description="t('gestion.stock.responsible_help')"
+              class="flex-1 min-w-0"
+            >
+              <UserSelector
+                v-model="valeurs.pickupResponsible"
+                v-model:search-term="rechercheRecuperation.terme.value"
+                :searched-users="rechercheRecuperation.resultats.value"
+                :searching-users="rechercheRecuperation.enCours.value"
+                :placeholder="t('gestion.stock.responsible_placeholder')"
+                :disabled="!actifs.responsableRecuperation"
+              />
+              <UInput
+                v-model="valeurs.pickupContact"
+                :disabled="!actifs.responsableRecuperation"
+                :placeholder="t('gestion.stock.responsible_contact_placeholder')"
+                class="w-full mt-2"
+              />
+            </UFormField>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <UCheckbox v-model="actifs.lieuRetour" class="mt-7" :disabled="!nbEmpruntes" />
+            <UFormField :label="t('gestion.stock.return_location')" class="flex-1 min-w-0">
+              <UInput
+                v-model="valeurs.returnLocation"
+                :disabled="!actifs.lieuRetour"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <UCheckbox v-model="actifs.responsableRetour" class="mt-7" :disabled="!nbEmpruntes" />
+            <UFormField
+              :label="t('gestion.stock.return_responsible')"
+              :description="t('gestion.stock.responsible_help')"
+              class="flex-1 min-w-0"
+            >
+              <UserSelector
+                v-model="valeurs.returnResponsible"
+                v-model:search-term="rechercheRetour.terme.value"
+                :searched-users="rechercheRetour.resultats.value"
+                :searching-users="rechercheRetour.enCours.value"
+                :placeholder="t('gestion.stock.responsible_placeholder')"
+                :disabled="!actifs.responsableRetour"
+              />
+              <UInput
+                v-model="valeurs.returnContact"
+                :disabled="!actifs.responsableRetour"
+                :placeholder="t('gestion.stock.responsible_contact_placeholder')"
+                class="w-full mt-2"
+              />
+            </UFormField>
           </div>
         </div>
       </div>
@@ -181,6 +215,8 @@
 </template>
 
 <script setup lang="ts">
+import type { UserSelectItem } from '~/components/UserSelector.vue'
+
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 interface TagLite {
@@ -217,13 +253,17 @@ const isOpen = computed({
 
 const AUCUN_PIN = 'none'
 
+// Une case par champ, et non par étape de l'emprunt : le lieu de récupération et la personne qui
+// s'en charge se changent séparément. Réunis, désigner quelqu'un obligeait à retoucher le lieu.
 const actifs = reactive({
   emplacement: false,
   tags: false,
   proprietaire: false,
   dateRetour: false,
-  recuperation: false,
-  retour: false,
+  lieuRecuperation: false,
+  responsableRecuperation: false,
+  lieuRetour: false,
+  responsableRetour: false,
 })
 
 const valeurs = reactive({
@@ -234,10 +274,17 @@ const valeurs = reactive({
   ownerContact: '',
   returnDueAt: '',
   pickupLocation: '',
+  pickupResponsible: null as UserSelectItem | null,
   pickupContact: '',
   returnLocation: '',
+  returnResponsible: null as UserSelectItem | null,
   returnContact: '',
 })
+
+// Le même champ que sur la fiche d'un objet, avec la même portée : adresse exacte pour n'importe
+// quel compte, pseudo pour les seuls gens de l'édition.
+const rechercheRecuperation = useRechercheResponsable(props.editionId)
+const rechercheRetour = useRechercheResponsable(props.editionId)
 
 const tagItems = computed(() => props.tags.map((tg) => ({ label: tg.name, value: tg.id })))
 
@@ -278,9 +325,13 @@ watch(
     valeurs.ownerContact = ''
     valeurs.returnDueAt = ''
     valeurs.pickupLocation = ''
+    valeurs.pickupResponsible = null
     valeurs.pickupContact = ''
     valeurs.returnLocation = ''
+    valeurs.returnResponsible = null
     valeurs.returnContact = ''
+    rechercheRecuperation.terme.value = ''
+    rechercheRetour.terme.value = ''
   }
 )
 
@@ -308,12 +359,17 @@ function corpsDeLaRequete(): Record<string, unknown> {
   if (actifs.dateRetour) {
     corps.returnDueAt = valeurs.returnDueAt ? new Date(valeurs.returnDueAt).toISOString() : null
   }
-  if (actifs.recuperation) {
-    corps.pickupLocation = valeurs.pickupLocation.trim() || null
+  if (actifs.lieuRecuperation) corps.pickupLocation = valeurs.pickupLocation.trim() || null
+  if (actifs.responsableRecuperation) {
+    // Aucune personne choisie vaut « plus personne » : la case cochée dit qu'on prend la main sur
+    // ce champ, et laisser l'ancien responsable en place le contredirait. Le compte et le contact
+    // écrit à la main partent ensemble parce qu'ils répondent à la même question.
+    corps.pickupResponsibleId = valeurs.pickupResponsible?.id ?? null
     corps.pickupContact = valeurs.pickupContact.trim() || null
   }
-  if (actifs.retour) {
-    corps.returnLocation = valeurs.returnLocation.trim() || null
+  if (actifs.lieuRetour) corps.returnLocation = valeurs.returnLocation.trim() || null
+  if (actifs.responsableRetour) {
+    corps.returnResponsibleId = valeurs.returnResponsible?.id ?? null
     corps.returnContact = valeurs.returnContact.trim() || null
   }
 

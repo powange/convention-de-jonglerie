@@ -34,3 +34,36 @@ export function attachesALEdition(
     { createdConventions: { some: { id: conventionId } } },
   ]
 }
+
+/**
+ * Vérifie que les responsables désignés sont bien des gens de cette édition.
+ *
+ * Sans ce contrôle, le champ acceptait n'importe quel identifiant de compte, et la fiche renvoyait
+ * ensuite le pseudo, le nom et l'avatar de la personne : de quoi parcourir l'annuaire des comptes
+ * en balayant les identifiants. Créer sa propre convention suffit à obtenir le droit de le faire,
+ * ce qui mettait ce parcours à la portée de tout inscrit.
+ *
+ * C'était la seule référence du module qui n'était pas confrontée à l'édition — les tags, les
+ * zones, les marqueurs et le groupe de destination l'étaient déjà.
+ */
+export async function assertResponsablesDeLEdition(
+  editionId: number,
+  conventionId: number,
+  responsableIds: Array<number | null | undefined>
+): Promise<void> {
+  const ids = Array.from(
+    new Set(responsableIds.filter((id): id is number => typeof id === 'number'))
+  )
+  if (ids.length === 0) return
+
+  const trouves = await prisma.user.findMany({
+    where: { id: { in: ids }, OR: attachesALEdition(editionId, conventionId) },
+    select: { id: true },
+  })
+  if (trouves.length !== ids.length) {
+    throw createError({
+      status: 400,
+      message: "Cette personne ne fait pas partie de l'édition",
+    })
+  }
+}

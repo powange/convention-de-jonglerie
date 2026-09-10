@@ -47,15 +47,33 @@ export function etatEmprunt(
   return { cle: 'a_rendre', couleur: 'warning', libelle: 'gestion.stock.loan_to_return' }
 }
 
-/** Un responsable, tel que l'API le rend : un compte, ou rien. */
-interface ResponsableEmprunt {
+/**
+ * Un responsable, tel que l'API le rend : un compte, ou rien.
+ *
+ * Les champs d'avatar suivent le pseudo parce que la liste montre le visage devant le nom — on
+ * reconnaît plus vite une tête qu'un pseudo, surtout au moment de charger un camion.
+ */
+export interface ResponsableEmprunt {
+  id?: number
   pseudo: string
+  profilePicture?: string | null
+  emailHash?: string | null
+  updatedAt?: string
 }
 
 /** Ce que l'emprunt attend de nous : le lieu où aller, et qui s'en charge. */
 export interface EtapeEmprunt {
   lieu: string | null
+  /** Le nom à afficher, quelle qu'en soit la source. C'est aussi ce sur quoi la colonne trie. */
   qui: string | null
+  /**
+   * Le compte, quand c'en est un.
+   *
+   * Distinct de `qui` parce qu'un responsable peut n'être qu'un texte libre — quelqu'un sans
+   * compte sur le site. L'écran a besoin de savoir lequel des deux il tient : on ne met pas
+   * d'avatar devant « Marc, le voisin ».
+   */
+  compte: ResponsableEmprunt | null
 }
 
 /**
@@ -86,10 +104,11 @@ export function prochaineEtapeEmprunt(
   const contact = versLaRecuperation ? materiel.pickupContact : materiel.returnContact
 
   // Le compte d'abord, le texte libre en repli : c'est la même règle qu'à la saisie.
-  const qui = responsable?.pseudo || contact || null
+  const compte = responsable?.pseudo ? responsable : null
+  const qui = compte?.pseudo || contact || null
 
   if (!lieu && !qui) return null
-  return { lieu: lieu || null, qui }
+  return { lieu: lieu || null, qui, compte }
 }
 
 /** Les états qu'un filtre peut retenir, « pas un emprunt » compris. */

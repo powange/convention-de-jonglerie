@@ -297,7 +297,15 @@
                       <span>{{ prochaineEtape(row.original)!.lieu }}</span>
                     </div>
                     <div v-if="prochaineEtape(row.original)!.qui" class="flex items-start gap-1.5">
-                      <UIcon name="i-heroicons-user" class="size-4 shrink-0 mt-0.5" />
+                      <!-- Le visage devant le nom quand la personne est inscrite ; l'icône
+                           générique quand ce n'est qu'un nom écrit à la main. -->
+                      <UiUserAvatar
+                        v-if="prochaineEtape(row.original)!.compte"
+                        :user="prochaineEtape(row.original)!.compte!"
+                        size="sm"
+                        class="shrink-0 mt-0.5"
+                      />
+                      <UIcon v-else name="i-heroicons-user" class="size-4 shrink-0 mt-0.5" />
                       <span>{{ prochaineEtape(row.original)!.qui }}</span>
                     </div>
                   </div>
@@ -320,9 +328,18 @@
           </template>
 
           <template #responsableEmprunt-cell="{ row }">
-            <span v-if="prochaineEtape(row.original)?.qui" class="text-sm">
-              {{ prochaineEtape(row.original)!.qui }}
-            </span>
+            <div v-if="prochaineEtape(row.original)?.qui" class="flex items-center gap-1.5">
+              <!-- On reconnaît une tête plus vite qu'un pseudo, et c'est cette colonne qu'on lit
+                   en cherchant à qui s'adresser. Rien devant un nom écrit à la main : la personne
+                   n'a pas de compte, et un avatar par défaut laisserait croire le contraire. -->
+              <UiUserAvatar
+                v-if="prochaineEtape(row.original)!.compte"
+                :user="prochaineEtape(row.original)!.compte!"
+                size="sm"
+                class="shrink-0"
+              />
+              <span class="text-sm truncate">{{ prochaineEtape(row.original)!.qui }}</span>
+            </div>
             <span v-else class="text-gray-400">—</span>
           </template>
 
