@@ -87,7 +87,7 @@
 
       <!-- Date limite dépassée -->
       <UAlert
-        v-else-if="showCall && isDeadlinePassed"
+        v-else-if="showCall?.deadline && isDeadlinePassed"
         icon="i-heroicons-clock"
         color="error"
         variant="soft"
@@ -782,6 +782,8 @@ import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
 import type { FormSubmitEvent } from '@nuxt/ui'
+
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -1485,7 +1487,7 @@ function validate(state: typeof formState) {
           message: t('shows_call.validation.performer_first_name_required'),
         })
       }
-      if (!performer.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(performer.email)) {
+      if (!estAdresseEmail(performer.email)) {
         errors.push({
           name: `additionalPerformers.${index}.email`,
           message: t('shows_call.validation.performer_email_required'),

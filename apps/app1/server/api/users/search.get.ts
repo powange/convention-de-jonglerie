@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireUserSession } from '#imports'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 // GET /api/users/search?emailExact=email (recherche exacte par email)
 // Auth requis. Retourne l'utilisateur correspondant (id, pseudo, profilePicture?, emailHash)
@@ -10,8 +11,11 @@ export default wrapApiHandler(
   async (event) => {
     await requireUserSession(event)
     const query = getQuery(event)
+    // Le même schéma que l'interface applique avant d'appeler : sans cela, elle émettait des
+    // requêtes qu'elle jugeait valables et que le serveur refusait, pour un résultat vide côté
+    // utilisateur et une erreur 400 au journal.
     const schema = z.object({
-      emailExact: z.string().email(),
+      emailExact: schemaAdresseEmail,
     })
     const parsed = schema.parse(query)
 

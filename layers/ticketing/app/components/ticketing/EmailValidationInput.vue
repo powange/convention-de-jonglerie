@@ -27,6 +27,8 @@
 </template>
 
 <script setup lang="ts">
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+
 const props = defineProps<{
   modelValue: string | null
   originalEmail?: string | null
@@ -76,9 +78,8 @@ watch(
       return
     }
 
-    // Vérifier le format de l'email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(newEmail)) {
+    // Le format de l'adresse, jugé comme le serveur le juge : cf. `shared/utils/adresse-email`.
+    if (!estAdresseEmail(newEmail)) {
       emailValidation.value = {
         checking: false,
         isValid: false,

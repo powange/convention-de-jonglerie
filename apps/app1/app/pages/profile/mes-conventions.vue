@@ -241,6 +241,8 @@ import type {
 import type { OrganizerRightsFormData } from '~/types/organizer'
 import { getEditionDisplayNameWithConvention } from '~/utils/editionName'
 
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+
 // Charger les traductions du fichier edition.json pour les clés edition.*
 await useLazyI18n('edition')
 
@@ -395,8 +397,8 @@ interface UserSearchResult {
 }
 
 const searchUsers = async (email: string) => {
-  // Validation basique d'email
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // La même règle que le serveur : cf. `shared/utils/adresse-email`.
+  if (!estAdresseEmail(email)) {
     searchedUsers.value = []
     return
   }

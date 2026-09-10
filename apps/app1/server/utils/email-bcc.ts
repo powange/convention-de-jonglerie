@@ -1,3 +1,5 @@
+import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+
 /**
  * Adresses en copie cachée de tous les envois réels (SMTP_BCC), pour archivage.
  *
@@ -22,7 +24,8 @@ export function getBccRecipients(
     .map((address) => address.trim())
     .filter(Boolean)
 
-  const isWellFormed = (address: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)
+  // La même règle que partout ailleurs : cf. `shared/utils/adresse-email`.
+  const isWellFormed = (address: string) => estAdresseEmail(address)
   const isBlocked = (address: string) =>
     blockedDomains.includes(address.split('@')[1]?.toLowerCase() ?? '')
 
