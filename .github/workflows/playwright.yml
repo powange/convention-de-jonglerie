@@ -10,6 +10,16 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Même raison que dans tests.yml : un push sur une PR ouverte laissait le run précédent occuper la
+# limite de 20 jobs simultanés alors que son résultat ne servait plus. Ce job-ci dure treize
+# minutes, c'est donc lui qui immobilisait le plus longtemps un créneau pour rien.
+#
+# Jamais d'annulation sur un push vers main : un run interrompu laisserait un commit de la branche
+# de référence sans vérification.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   E2E_TEST: true
   DATABASE_URL: mysql://root:rootpassword@localhost:3306/convention_db_test
