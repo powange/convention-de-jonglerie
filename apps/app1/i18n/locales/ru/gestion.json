@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Нет другой группы для перемещения.",
       "item_group": "Группа",
       "item_location_placeholder": "Уточнение от руки (необязательно)",
-      "tab_general": "Общее"
+      "tab_general": "Общее",
+      "bulk_mark_picked_up": "Отметить как забранное ({count}) | Отметить как забранные ({count})",
+      "bulk_mark_returned": "Отметить как возвращённое ({count}) | Отметить как возвращённые ({count})",
+      "bulk_unmark_picked_up": "Отменить получение ({count}) | Отменить получения ({count})",
+      "bulk_unmark_returned": "Отменить возврат ({count}) | Отменить возвраты ({count})",
+      "groups_title": "Группы",
+      "loan_place_all": "Все места",
+      "loan_responsible_all": "Все люди",
+      "loan_state": "Состояние",
+      "loans_none": "Нет оборудования, взятого со стороны для этого выпуска",
+      "loans_title": "Аренда"
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

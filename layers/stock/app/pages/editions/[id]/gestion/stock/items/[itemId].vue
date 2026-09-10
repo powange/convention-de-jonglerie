@@ -561,6 +561,9 @@ async function marquerRecupere(recupere: boolean) {
     })
     useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
     await fetchItem()
+    // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
+    // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
+    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),
@@ -582,6 +585,9 @@ async function markLoanReturned() {
     })
     useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
     await fetchItem()
+    // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
+    // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
+    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),
@@ -603,6 +609,9 @@ async function markLoanNotReturned() {
     })
     useToast().add({ title: t('common.saved'), icon: 'i-heroicons-check-circle', color: 'success' })
     await fetchItem()
+    // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
+    // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
+    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),
@@ -779,6 +788,8 @@ async function cancelReservation(r: StockReservation) {
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
+    // Pas de rafraîchissement du compteur ici : annuler une réservation ne touche pas à l'état
+    // d'un emprunt, et donc pas au nombre de retards.
     await fetchItem()
   } catch (e: any) {
     useToast().add({

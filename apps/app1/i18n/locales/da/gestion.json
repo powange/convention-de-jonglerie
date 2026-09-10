@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Der er ingen anden gruppe at flytte til.",
       "item_group": "Gruppe",
       "item_location_placeholder": "Håndskrevet præcisering (valgfri)",
-      "tab_general": "Generelt"
+      "tab_general": "Generelt",
+      "bulk_mark_picked_up": "Markér som afhentet ({count}) | Markér som afhentet ({count})",
+      "bulk_mark_returned": "Markér som afleveret ({count}) | Markér som afleveret ({count})",
+      "bulk_unmark_picked_up": "Fortryd afhentning ({count}) | Fortryd afhentninger ({count})",
+      "bulk_unmark_returned": "Fortryd aflevering ({count}) | Fortryd afleveringer ({count})",
+      "groups_title": "Grupper",
+      "loan_place_all": "Alle steder",
+      "loan_responsible_all": "Alle personer",
+      "loan_state": "Status",
+      "loans_none": "Intet udefra lånt udstyr til denne udgave",
+      "loans_title": "Lån"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

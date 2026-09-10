@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Es gibt keine andere Gruppe zum Verschieben.",
       "item_group": "Gruppe",
       "item_location_placeholder": "Handschriftliche Angabe (optional)",
-      "tab_general": "Allgemein"
+      "tab_general": "Allgemein",
+      "bulk_mark_picked_up": "Als abgeholt markieren ({count}) | Als abgeholt markieren ({count})",
+      "bulk_mark_returned": "Als zurückgegeben markieren ({count}) | Als zurückgegeben markieren ({count})",
+      "bulk_unmark_picked_up": "Abholung rückgängig ({count}) | Abholungen rückgängig ({count})",
+      "bulk_unmark_returned": "Rückgabe rückgängig ({count}) | Rückgaben rückgängig ({count})",
+      "groups_title": "Gruppen",
+      "loan_place_all": "Alle Orte",
+      "loan_responsible_all": "Alle Personen",
+      "loan_state": "Status",
+      "loans_none": "Kein von außen geliehenes Material für diese Ausgabe",
+      "loans_title": "Leihgaben"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

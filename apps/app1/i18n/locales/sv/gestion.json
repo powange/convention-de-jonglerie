@@ -533,7 +533,17 @@
       "bulk_move_no_other_group": "Det finns ingen annan grupp att flytta till.",
       "item_group": "Grupp",
       "item_location_placeholder": "Handskriven precisering (valfritt)",
-      "tab_general": "Allmänt"
+      "tab_general": "Allmänt",
+      "bulk_mark_picked_up": "Markera som hämtad ({count}) | Markera som hämtade ({count})",
+      "bulk_mark_returned": "Markera som återlämnad ({count}) | Markera som återlämnade ({count})",
+      "bulk_unmark_picked_up": "Ångra hämtningen ({count}) | Ångra hämtningarna ({count})",
+      "bulk_unmark_returned": "Ångra återlämningen ({count}) | Ångra återlämningarna ({count})",
+      "groups_title": "Grupper",
+      "loan_place_all": "Alla platser",
+      "loan_responsible_all": "Alla personer",
+      "loan_state": "Status",
+      "loans_none": "Ingen utifrån lånad utrustning för denna upplaga",
+      "loans_title": "Lån"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

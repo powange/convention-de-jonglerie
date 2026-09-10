@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { erreurOrdreEmprunt } from '#server/utils/emprunt-stock'
 import { changementsEnLot } from '#server/utils/modification-lot-stock'
 import {
   canManageStock,
@@ -34,6 +35,10 @@ const bodySchema = z.object({
   returnLocation: z.string().trim().max(500).nullable().optional(),
   returnResponsibleId: z.number().int().positive().nullable().optional(),
   returnContact: z.string().trim().max(500).nullable().optional(),
+  // Les deux jalons d'un emprunt : aller le chercher, puis le rapporter. En lot parce que le
+  // camion revient d'un bloc, et qu'ouvrir quinze fiches pour cocher quinze cases n'a pas de sens.
+  pickedUpAt: z.string().datetime().nullable().optional(),
+  returnedAt: z.string().datetime().nullable().optional(),
   // Ajouts et retraits séparés : remplacer la liste ferait perdre les tags que chaque objet porte
   // déjà et qu'on ne voulait pas toucher.
   addTagIds: z.array(z.number().int().positive()).optional(),
@@ -78,7 +83,9 @@ export default wrapApiHandler(
     // emprunté ailleurs se modifierait avec la permission d'ici.
     const objets = await prisma.stockItem.findMany({
       where: { id: { in: itemIds }, group: { editionId } },
-      select: { id: true, isExternalLoan: true },
+      // Les jalons de chaque objet : la règle d'ordre se juge sur l'état APRÈS écriture, il faut
+      // donc savoir où en est chacun.
+      select: { id: true, isExternalLoan: true, pickedUpAt: true, returnedAt: true },
     })
     if (objets.length !== itemIds.length) {
       throw createError({
@@ -130,6 +137,25 @@ export default wrapApiHandler(
     // Ce que la demande écrit vraiment — d'un côté les champs de tout le matériel, de l'autre ceux
     // du seul matériel emprunté. La règle est éprouvée à part : cf. `modification-lot-stock`.
     const { communs, emprunt } = changementsEnLot(data)
+
+    // L'emprunt se déroule dans l'ordre : récupéré, puis rendu. Chaque objet est jugé sur son
+    // propre état — une sélection mêle souvent du matériel déjà récupéré et du matériel qui ne
+    // l'est pas. Un seul refus arrête tout le lot : appliquer la moitié d'une demande laisserait
+    // une sélection dans deux états sans dire lequel est lequel.
+    if (data.pickedUpAt !== undefined || data.returnedAt !== undefined) {
+      for (const objet of objets) {
+        if (!objet.isExternalLoan) continue
+        const erreur = erreurOrdreEmprunt(objet, {
+          ...(data.pickedUpAt !== undefined
+            ? { pickedUpAt: data.pickedUpAt ? new Date(data.pickedUpAt) : null }
+            : {}),
+          ...(data.returnedAt !== undefined
+            ? { returnedAt: data.returnedAt ? new Date(data.returnedAt) : null }
+            : {}),
+        })
+        if (erreur) throw createError({ status: 400, message: erreur })
+      }
+    }
 
     const idsEmpruntes = objets.filter((o) => o.isExternalLoan).map((o) => o.id)
     const aAjouter = Array.from(new Set(data.addTagIds ?? []))

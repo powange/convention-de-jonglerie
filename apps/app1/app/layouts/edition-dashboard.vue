@@ -161,6 +161,7 @@ const getCurrentSection = (path: string): string | null => {
   if (path.includes('/gestion/volunteers')) return 'volunteers'
   if (path.includes('/gestion/artists') || path.includes('/gestion/shows-call')) return 'artists'
   if (path.includes('/gestion/meals')) return 'meals'
+  if (path.includes('/gestion/stock')) return 'stock'
   if (path.includes('/gestion/ticketing')) return 'ticketing'
   if (
     path.includes('/gestion/map') ||
@@ -256,6 +257,54 @@ const canManageTreasury = computed(() => {
 // Affichage du stock : organisateurs avec canManageStock OU team leaders bénévoles
 const canAccessStock = computed(() => canManageStock.value || isTeamLeader.value)
 
+/**
+ * La pastille d'une entrée de menu, prête à être étalée dans l'objet de navigation.
+ *
+ * Rend un objet vide quand il n'y a rien à signaler : `{ ...pastilleMenu(cle) }` n'ajoute alors
+ * aucune clé, et l'entrée reste ce qu'elle était. C'est plus sûr qu'un `badge: undefined`, que le
+ * composant pourrait rendre sous la forme d'un point sans texte.
+ *
+ * Le layout ne sait pas d'où vient le compte : chaque module le publie depuis son propre layer.
+ */
+function pastilleMenu(...cles: string[]) {
+  // Plusieurs clés pour une entrée parente : elle porte la somme de ce que ses enfants signalent.
+  // Repliée, elle les cache — sans cumul, on n'apprendrait qu'en dépliant qu'il y avait quelque
+  // chose à voir, ce qui vide la pastille de son intérêt.
+  const compte = cumulerCompteurs(cles.map((cle) => compteurNavigation(cle).value))
+  const pastille = pastilleNavigation(compte, { seuilUrgent: 1 })
+  if (!pastille) return {}
+
+  const couleur = couleurPastille(pastille.ton)
+  return {
+    badge: { label: pastille.texte, color: couleur },
+    // Le point sur l'icône double le nombre, et prend le relais quand la barre est repliée : le
+    // libellé disparaît alors, et la pastille chiffrée avec lui. Or c'est justement replié qu'on
+    // regarde le moins le menu — la laisser muette dans cet état la viderait de son intérêt.
+    chip: { color: couleur },
+  }
+}
+
+/** Les compteurs de chaque module, groupés par entrée de menu. La source du cumul des parents. */
+const COMPTEURS_PAR_ENTREE: Record<string, string[]> = {
+  stock: ['stock-emprunts'],
+}
+
+/**
+ * Les compteurs des entrées que cet utilisateur voit réellement.
+ *
+ * Interroger le compteur d'un module auquel il n'a pas droit lui vaudrait un refus du serveur :
+ * une barre de navigation ne doit pas produire d'erreur pour quelqu'un qui n'a rien demandé, et
+ * le journal se remplirait de 403 parfaitement légitimes. La condition est la même que celle qui
+ * décide d'afficher l'entrée — si elle diverge, le symptôme réapparaîtra.
+ */
+const compteursVisibles = computed(() => {
+  const cles: string[] = []
+  if (edition.value?.stockEnabled && canAccessStock.value) {
+    cles.push(...(COMPTEURS_PAR_ENTREE.stock ?? []))
+  }
+  return cles
+})
+
 // Accès « bénévole » à la gestion, récupérés en un seul appel (endpoint unifié) :
 // - isTeamLeader : responsable d'au moins une équipe de bénévoles
 // - canAccessMealValidation : bénévole d'équipe de validation des repas
@@ -289,6 +338,18 @@ onMounted(async () => {
     canAccessMealValidation.value = access.canAccessMealValidation
     canAccessAccessControl.value = access.isAccessControlActive
   }
+
+  // Les compteurs des pastilles, une fois les droits connus : les demander plus tôt les ferait
+  // partir pour une édition dont on n'a pas encore le droit de voir le contenu. Volontairement
+  // sans `await` — le menu s'affiche sans attendre, les pastilles arrivent après.
+  rafraichirCompteursNavigation({ editionId: editionId.value }, compteursVisibles.value)
+})
+
+// Changer d'édition sans recharger la page laisserait les pastilles de la précédente. On efface
+// avant de redemander, pour qu'un compteur périmé ne s'affiche jamais.
+watch(editionId, (nouvelle) => {
+  oublierCompteursNavigation()
+  rafraichirCompteursNavigation({ editionId: nouvelle }, compteursVisibles.value)
 })
 
 // Structure de navigation
@@ -643,13 +704,31 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     })
   }
 
-  // Stock matériel
+  // Stock matériel — deux destinations sous une entrée, comme les repas : les groupes disent où
+  // le matériel est rangé, les emprunts traversent les groupes. Deux entrées de premier niveau
+  // pour un même module ne diraient pas laquelle ouvrir.
   if (edition.value?.stockEnabled && canAccessStock.value) {
     managementSection.push({
       label: t('gestion.stock.title'),
       icon: 'i-heroicons-archive-box',
-      to: `/editions/${editionId.value}/gestion/stock`,
-      tooltip: { text: t('gestion.stock.title') },
+      value: 'stock',
+      popover: {},
+      ...pastilleMenu(...(COMPTEURS_PAR_ENTREE.stock ?? [])),
+      children: [
+        {
+          label: t('gestion.stock.groups_title'),
+          icon: 'i-heroicons-archive-box',
+          to: `/editions/${editionId.value}/gestion/stock`,
+        },
+        {
+          label: t('gestion.stock.loans_title'),
+          icon: 'i-heroicons-hand-raised',
+          to: `/editions/${editionId.value}/gestion/stock/loans`,
+          // La pastille ne s'allume que sur du retard : c'est la seule chose qui justifie
+          // d'interrompre ce qu'on fait. Voir `pastille-navigation` pour la règle.
+          ...pastilleMenu('stock-emprunts'),
+        },
+      ],
     })
   }
 

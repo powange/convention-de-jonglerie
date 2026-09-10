@@ -17,6 +17,11 @@ export const CHAMPS_EMPRUNT = [
   'returnLocation',
   'returnResponsibleId',
   'returnContact',
+  // Les deux jalons. Ils suivent la même règle que le reste : absents, ils ne sont pas touchés ;
+  // `null` annule le jalon. Leur cohérence mutuelle — on ne rend pas ce qu'on n'a pas récupéré —
+  // se vérifie ailleurs, objet par objet, parce qu'elle dépend de l'état de chacun.
+  'pickedUpAt',
+  'returnedAt',
 ] as const
 
 export type ChampEmprunt = (typeof CHAMPS_EMPRUNT)[number]
@@ -35,6 +40,8 @@ export interface DemandeModificationLot {
   returnLocation?: string | null
   returnResponsibleId?: number | null
   returnContact?: string | null
+  pickedUpAt?: string | null
+  returnedAt?: string | null
 }
 
 /** Les deux jeux de champs à écrire : ceux de tout le matériel, et ceux du seul matériel emprunté. */
@@ -71,9 +78,10 @@ export function changementsEnLot(demande: DemandeModificationLot): ChangementsEn
   for (const champ of CHAMPS_EMPRUNT) {
     const valeur = demande[champ]
     if (valeur === undefined) continue
-    // La date arrive en texte ISO et repart en `Date` ; le reste vaut sa valeur, ou `null` s'il
-    // est vide — une chaîne vide n'est pas un contact, c'est l'absence de contact.
-    emprunt[champ] = champ === 'returnDueAt' && valeur ? new Date(valeur as string) : valeur || null
+    // Les dates arrivent en texte ISO et repartent en `Date` ; le reste vaut sa valeur, ou `null`
+    // s'il est vide — une chaîne vide n'est pas un contact, c'est l'absence de contact.
+    const estUneDate = champ === 'returnDueAt' || champ === 'pickedUpAt' || champ === 'returnedAt'
+    emprunt[champ] = estUneDate && valeur ? new Date(valeur as string) : valeur || null
   }
 
   return { communs, emprunt }
