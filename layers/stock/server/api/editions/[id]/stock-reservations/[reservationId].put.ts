@@ -87,25 +87,9 @@ export default wrapApiHandler(
       })
     }
 
-    // Si on change quantité / période ET que ce n'est pas une annulation,
-    // vérifier la disponibilité (en excluant la réservation actuelle).
+    // Une annulation ne consomme rien : elle n'a pas de disponibilité à vérifier.
     const newStatus = data.status ?? reservation.status
     const isActiveStatus = newStatus === 'RESERVED' || newStatus === 'PICKED_UP'
-    if (isActiveStatus) {
-      const alreadyReserved = await getReservedQuantityOnPeriod(
-        reservation.stockItemId,
-        newStartsAt,
-        newEndsAt,
-        reservation.id
-      )
-      const available = reservation.stockItem.quantity - alreadyReserved
-      if (newQuantity > available) {
-        throw createError({
-          status: 409,
-          message: `Quantité indisponible : seulement ${available} sur ${reservation.stockItem.quantity} sur la période demandée`,
-        })
-      }
-    }
 
     // Validation cross-champ de l'emplacement : si l'un des 3 champs est
     // touché, on vérifie que la combinaison finale (merge avec l'existant)
@@ -151,24 +135,54 @@ export default wrapApiHandler(
     if (data.zoneId !== undefined) updateData.zoneId = data.zoneId
     if (data.markerId !== undefined) updateData.markerId = data.markerId
 
-    const updated = await prisma.stockReservation.update({
-      where: { id: reservationId },
-      data: updateData,
-      include: {
-        zone: { select: { id: true, name: true, color: true } },
-        marker: { select: { id: true, name: true } },
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-            email: true,
-            emailHash: true,
-            profilePicture: true,
+    /*
+     * Le relevé de disponibilité et l'écriture tiennent dans la même transaction, comme dans la
+     * réservation en lot. La réservation modifiée est exclue du relevé : elle libère ce qu'elle
+     * occupait déjà.
+     *
+     * Ce que cela apporte, et rien de plus : la fenêtre entre le relevé et l'écriture se resserre.
+     * Elle ne se ferme pas. Aucun verrou n'est posé sur l'objet, si bien que deux transactions
+     * concurrentes peuvent encore lire le même total et accorder toutes deux le dernier
+     * exemplaire. Fermer vraiment demanderait un verrou de ligne au moment du relevé — un
+     * `SELECT … FOR UPDATE` sur l'objet —, ce que Prisma n'exprime qu'en SQL brut.
+     */
+    const updated = await prisma.$transaction(async (tx) => {
+      if (isActiveStatus) {
+        const alreadyReserved = await getReservedQuantityOnPeriod(
+          reservation.stockItemId,
+          newStartsAt,
+          newEndsAt,
+          reservation.id,
+          tx
+        )
+        const available = reservation.stockItem.quantity - alreadyReserved
+        if (newQuantity > available) {
+          throw createError({
+            status: 409,
+            message: `Quantité indisponible : seulement ${available} sur ${reservation.stockItem.quantity} sur la période demandée`,
+          })
+        }
+      }
+
+      return tx.stockReservation.update({
+        where: { id: reservationId },
+        data: updateData,
+        include: {
+          zone: { select: { id: true, name: true, color: true } },
+          marker: { select: { id: true, name: true } },
+          user: {
+            select: {
+              id: true,
+              pseudo: true,
+              prenom: true,
+              nom: true,
+              email: true,
+              emailHash: true,
+              profilePicture: true,
+            },
           },
         },
-      },
+      })
     })
 
     return createSuccessResponse({ reservation: updated })

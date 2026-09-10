@@ -120,12 +120,26 @@ describe('POST /api/editions/[id]/stock-items/[itemId]/reservations', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
   })
 
+  it('relève la disponibilité et crée dans la même transaction', async () => {
+    // Séparés, deux demandes simultanées lisent le même total et s'accordent toutes deux le
+    // dernier exemplaire. La transaction resserre la fenêtre — elle ne la ferme pas, faute de
+    // verrou de ligne, ce que le commentaire du gestionnaire dit explicitement.
+    await handler(baseEvent as any)
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+    expect(typeof prismaMock.$transaction.mock.calls[0][0]).toBe('function')
+  })
+
   it('passe correctement la période à getReservedQuantityOnPeriod', async () => {
     await handler(baseEvent as any)
     expect(mockGetReservedQty).toHaveBeenCalledWith(
       5,
       new Date(validBody.startsAt),
-      new Date(validBody.endsAt)
+      new Date(validBody.endsAt),
+      undefined,
+      // Le client de transaction : le relevé et la création tiennent ensemble, sans quoi deux
+      // demandes simultanées s'accordent le même dernier exemplaire.
+      prismaMock
     )
   })
 

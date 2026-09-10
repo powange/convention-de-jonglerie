@@ -95,6 +95,15 @@ describe('PUT /api/editions/[id]/stock-reservations/[reservationId]', () => {
     expect(prismaMock.stockReservation.update).toHaveBeenCalled()
   })
 
+  it('relève la disponibilité et écrit dans la même transaction', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ quantityReserved: 5 })
+    mockGetReservedQty.mockResolvedValue(0)
+    await handler(baseEvent as any)
+
+    expect(prismaMock.$transaction).toHaveBeenCalledTimes(1)
+    expect(typeof prismaMock.$transaction.mock.calls[0][0]).toBe('function')
+  })
+
   it('exclut la réservation courante du calcul de dispo (excludeReservationId)', async () => {
     global.readBody = vi.fn().mockResolvedValue({ quantityReserved: 5 })
     mockGetReservedQty.mockResolvedValue(0)
@@ -103,7 +112,9 @@ describe('PUT /api/editions/[id]/stock-reservations/[reservationId]', () => {
       5,
       existingReservation.startsAt,
       existingReservation.endsAt,
-      100
+      100,
+      // Le client de transaction : le relevé et l'écriture tiennent ensemble.
+      prismaMock
     )
   })
 
