@@ -61,19 +61,25 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/app1/package-lock.json'
 
+      # Clés identiques à celles de tests.yml (même `node_modules`, même client Prisma) : les
+      # deux workflows partagent ainsi une seule entrée de cache au lieu d'en stocker deux copies.
+      # Voir le commentaire détaillé dans tests.yml ; toute modification ici doit y être reportée.
       - name: Generate cache keys
         id: cache-keys
         run: |
-          echo "deps=${{ runner.os }}-deps-v2-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "prisma=${{ runner.os }}-prisma-v2-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "deps=${{ runner.os }}-deps-v3-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "prisma=${{ runner.os }}-prisma-v3-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
 
+      # `~/.npm` n'est volontairement pas listé ici : `actions/setup-node` le met déjà en cache via
+      # `cache: 'npm'` + `cache-dependency-path`, et comme `node_modules` est restauré tel quel,
+      # npm ne relit jamais son cache. L'ajouter au chemin ne faisait que gonfler l'archive — donc
+      # son temps de compression, d'upload et de download — dans les cinq jobs qui la restaurent.
+      # Le cache de setup-node reste le filet des runs où `npm ci` doit réellement tourner.
       - name: Cache Node dependencies
         id: cache-deps
         uses: actions/cache@v4
         with:
-          path: |
-            apps/app1/node_modules
-            ~/.npm
+          path: apps/app1/node_modules
           key: ${{ steps.cache-keys.outputs.deps }}
 
       - name: Cache Prisma client
@@ -83,7 +89,7 @@ jobs:
           path: apps/app1/server/generated/prisma
           key: ${{ steps.cache-keys.outputs.prisma }}
           restore-keys: |
-            ${{ runner.os }}-prisma-v2-
+            ${{ runner.os }}-prisma-v3-
 
       - name: Install dependencies (if not cached)
         if: steps.cache-deps.outputs.cache-hit != 'true'
