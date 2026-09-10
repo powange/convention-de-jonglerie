@@ -75,3 +75,28 @@ export const searchRateLimiter = createRateLimiter({
     return `search:${ip}`
   },
 })
+
+/**
+ * Rate limiter pour les recherches de personnes
+ * 60 requêtes par minute par utilisateur
+ *
+ * Ces points d'API rendent des gens : on les protège d'un balayage méthodique — « aa », « ab »,
+ * « ac »… — qui reconstituerait un annuaire à petites doses.
+ *
+ * La clé est l'utilisateur et non l'IP, contrairement à `searchRateLimiter` : ces recherches
+ * exigent une session, la menace est donc un compte, pas une adresse. Compter par IP punirait au
+ * passage les organisateurs qui partagent le wifi d'un même lieu.
+ *
+ * Soixante par minute, calé sur deux repères : c'est le débit que le projet a déjà retenu pour la
+ * recherche, et c'est six à dix fois ce qu'une frappe humaine produit — le champ n'émet qu'après
+ * 300 ms de pause, et chercher une personne coûte trois à cinq requêtes.
+ */
+export const personSearchRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60,
+  message: 'Trop de recherches, veuillez réessayer dans une minute',
+  keyGenerator: (event) => {
+    const user = event.context.user
+    return user ? `person-search:${user.id}` : 'person-search:anonymous'
+  },
+})
