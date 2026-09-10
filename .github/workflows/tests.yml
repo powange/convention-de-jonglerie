@@ -148,19 +148,26 @@ jobs:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
 
-      - name: Réinstaller si le cache a disparu
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
-
-      # Même raison : ce job ne sauvegarde pas le client Prisma. Le step suivant est déjà le filet
-      # du cache manquant, et c'est lui qui produisait le plus de courses à la sauvegarde — il n'a
-      # jamais eu de `fail-on-cache-miss`, donc un miss laissait les six jobs réserver la clé.
+      # Même raison : ce job ne sauvegarde pas le client Prisma. C'est lui qui produisait le plus
+      # de courses à la sauvegarde — il n'a jamais eu de `fail-on-cache-miss`, donc un miss
+      # laissait les six jobs réserver la clé. Son filet, `Generate Prisma Client`, est plus bas.
       - name: Restore Prisma client
         id: cache-prisma
         uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
+
+      # Placé après la restauration du client Prisma, et dans le même ordre que `setup` : le
+      # `postinstall` du paquet enchaîne `lier-layers-node-modules.mjs` puis `nuxt prepare`, et
+      # autant que ce prepare trouve le client déjà en place. Il n'en a pas besoin aujourd'hui — le
+      # run qui a amorcé les clés `-v3-` a fait tourner ce postinstall avec le cache Prisma en
+      # miss, sans incident — mais l'ordre ne coûte rien et évite d'avoir à le redécouvrir le jour
+      # où un module importera le client au chargement.
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
 
       - name: Generate Prisma Client (if cache miss)
         if: steps.cache-prisma.outputs.cache-hit != 'true'
@@ -213,16 +220,19 @@ jobs:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
 
-      - name: Réinstaller si le cache a disparu
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
-
       - name: Restore Prisma client
         id: cache-prisma
         uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
+
+      # Après la restauration du client Prisma, comme dans `lint` : le `postinstall` lance un
+      # `nuxt prepare`.
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
 
       - name: Generate Prisma Client (if cache miss)
         if: steps.cache-prisma.outputs.cache-hit != 'true'
@@ -312,16 +322,19 @@ jobs:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
 
-      - name: Réinstaller si le cache a disparu
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
-
       - name: Restore Prisma client
         id: cache-prisma
         uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
+
+      # Après la restauration du client Prisma, comme dans `lint` : le `postinstall` lance un
+      # `nuxt prepare`.
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
 
       - name: Generate Prisma Client
         # Toujours régénérer pour éviter les incohérences avec le cache des node_modules
@@ -399,16 +412,19 @@ jobs:
           path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
 
-      - name: Réinstaller si le cache a disparu
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
-
       - name: Restore Prisma client
         id: cache-prisma
         uses: actions/cache/restore@v4
         with:
           path: apps/app1/server/generated/prisma
           key: ${{ needs.setup.outputs.prisma-cache-key }}
+
+      # Après la restauration du client Prisma, comme dans `lint` : le `postinstall` lance un
+      # `nuxt prepare`.
+      - name: Réinstaller si le cache a disparu
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
 
       - name: Generate Prisma Client (if cache miss)
         if: steps.cache-prisma.outputs.cache-hit != 'true'
