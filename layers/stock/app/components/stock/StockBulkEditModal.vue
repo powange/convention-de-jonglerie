@@ -127,12 +127,23 @@
                   class="w-full"
                 />
               </UFormField>
-              <UFormField :label="t('gestion.stock.pickup_responsible')">
+              <UFormField
+                :label="t('gestion.stock.pickup_responsible')"
+                :description="t('gestion.stock.responsible_help')"
+              >
+                <UserSelector
+                  v-model="valeurs.pickupResponsible"
+                  v-model:search-term="rechercheRecuperation.terme.value"
+                  :searched-users="rechercheRecuperation.resultats.value"
+                  :searching-users="rechercheRecuperation.enCours.value"
+                  :placeholder="t('gestion.stock.responsible_placeholder')"
+                  :disabled="!actifs.recuperation"
+                />
                 <UInput
                   v-model="valeurs.pickupContact"
                   :disabled="!actifs.recuperation"
                   :placeholder="t('gestion.stock.responsible_contact_placeholder')"
-                  class="w-full"
+                  class="w-full mt-2"
                 />
               </UFormField>
             </div>
@@ -148,12 +159,23 @@
                   class="w-full"
                 />
               </UFormField>
-              <UFormField :label="t('gestion.stock.return_responsible')">
+              <UFormField
+                :label="t('gestion.stock.return_responsible')"
+                :description="t('gestion.stock.responsible_help')"
+              >
+                <UserSelector
+                  v-model="valeurs.returnResponsible"
+                  v-model:search-term="rechercheRetour.terme.value"
+                  :searched-users="rechercheRetour.resultats.value"
+                  :searching-users="rechercheRetour.enCours.value"
+                  :placeholder="t('gestion.stock.responsible_placeholder')"
+                  :disabled="!actifs.retour"
+                />
                 <UInput
                   v-model="valeurs.returnContact"
                   :disabled="!actifs.retour"
                   :placeholder="t('gestion.stock.responsible_contact_placeholder')"
-                  class="w-full"
+                  class="w-full mt-2"
                 />
               </UFormField>
             </div>
@@ -181,6 +203,8 @@
 </template>
 
 <script setup lang="ts">
+import type { UserSelectItem } from '~/components/UserSelector.vue'
+
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 interface TagLite {
@@ -234,10 +258,17 @@ const valeurs = reactive({
   ownerContact: '',
   returnDueAt: '',
   pickupLocation: '',
+  pickupResponsible: null as UserSelectItem | null,
   pickupContact: '',
   returnLocation: '',
+  returnResponsible: null as UserSelectItem | null,
   returnContact: '',
 })
+
+// Le même champ que sur la fiche d'un objet, avec la même portée : adresse exacte pour n'importe
+// quel compte, pseudo pour les seuls gens de l'édition.
+const rechercheRecuperation = useRechercheResponsable(props.editionId)
+const rechercheRetour = useRechercheResponsable(props.editionId)
 
 const tagItems = computed(() => props.tags.map((tg) => ({ label: tg.name, value: tg.id })))
 
@@ -278,9 +309,13 @@ watch(
     valeurs.ownerContact = ''
     valeurs.returnDueAt = ''
     valeurs.pickupLocation = ''
+    valeurs.pickupResponsible = null
     valeurs.pickupContact = ''
     valeurs.returnLocation = ''
+    valeurs.returnResponsible = null
     valeurs.returnContact = ''
+    rechercheRecuperation.terme.value = ''
+    rechercheRetour.terme.value = ''
   }
 )
 
@@ -310,10 +345,14 @@ function corpsDeLaRequete(): Record<string, unknown> {
   }
   if (actifs.recuperation) {
     corps.pickupLocation = valeurs.pickupLocation.trim() || null
+    // Aucune personne choisie vaut « plus personne » : la case cochée dit qu'on prend la main sur
+    // ce champ, et laisser l'ancien responsable en place le contredirait.
+    corps.pickupResponsibleId = valeurs.pickupResponsible?.id ?? null
     corps.pickupContact = valeurs.pickupContact.trim() || null
   }
   if (actifs.retour) {
     corps.returnLocation = valeurs.returnLocation.trim() || null
+    corps.returnResponsibleId = valeurs.returnResponsible?.id ?? null
     corps.returnContact = valeurs.returnContact.trim() || null
   }
 

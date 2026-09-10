@@ -7,6 +7,7 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import { assertResponsablesDeLEdition } from '#server/utils/personnes-edition'
 import { validateReservationLocation } from '#server/utils/stock-helpers'
 import { assertTagsBelongToEdition } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -113,6 +114,13 @@ export default wrapApiHandler(
         editionId
       )
     }
+
+    // Un responsable désigné doit être de l'édition : c'était la seule référence du module
+    // qui n'était pas confrontée à elle. Voir `personnes-edition`.
+    await assertResponsablesDeLEdition(editionId, edition.conventionId, [
+      data.pickupResponsibleId,
+      data.returnResponsibleId,
+    ])
 
     await assertTagsBelongToEdition(editionId, [
       ...(data.addTagIds ?? []),

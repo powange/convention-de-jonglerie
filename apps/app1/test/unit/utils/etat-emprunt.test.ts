@@ -70,10 +70,11 @@ describe('etatEmprunt', () => {
  * récupérer un matériel déjà chez nous encombrerait la liste sans rien apprendre.
  */
 describe('prochaineEtapeEmprunt', () => {
+  const THOMAS = { id: 4, pseudo: 'thomas', profilePicture: 'thomas.jpg', emailHash: 'abc' }
   const EMPRUNT = {
     isExternalLoan: true,
     pickupLocation: 'Chez Marie, 12 rue des Lilas',
-    pickupResponsible: { pseudo: 'thomas' },
+    pickupResponsible: THOMAS,
     returnLocation: 'Local de l’association',
     returnContact: 'Julie — 06 12 34 56 78',
   }
@@ -82,13 +83,16 @@ describe('prochaineEtapeEmprunt', () => {
     expect(prochaineEtapeEmprunt(EMPRUNT)).toEqual({
       lieu: 'Chez Marie, 12 rue des Lilas',
       qui: 'thomas',
+      compte: THOMAS,
     })
   })
 
   it('bascule sur le retour une fois le matériel récupéré', () => {
+    // Le retour n'est confié à personne d'inscrit : pas de compte, donc pas d'avatar à afficher.
     expect(prochaineEtapeEmprunt({ ...EMPRUNT, pickedUpAt: LE_2 })).toEqual({
       lieu: 'Local de l’association',
       qui: 'Julie — 06 12 34 56 78',
+      compte: null,
     })
   })
 
@@ -99,6 +103,32 @@ describe('prochaineEtapeEmprunt', () => {
     })
 
     expect(etape?.qui).toBe('thomas')
+    expect(etape?.compte).toEqual(THOMAS)
+  })
+
+  it('sépare le compte du texte libre, pour que l’écran sache lequel il tient', () => {
+    // On ne met pas d'avatar devant « Marc, le voisin » : la liste doit pouvoir distinguer une
+    // personne inscrite d'un nom écrit à la main.
+    const libre = prochaineEtapeEmprunt({
+      isExternalLoan: true,
+      pickupContact: 'Marc, le voisin',
+    })
+
+    expect(libre?.qui).toBe('Marc, le voisin')
+    expect(libre?.compte).toBeNull()
+  })
+
+  it('ignore un compte sans pseudo', () => {
+    // Un responsable supprimé peut laisser une relation vidée : afficher un avatar sans nom
+    // donnerait une ligne muette.
+    const etape = prochaineEtapeEmprunt({
+      isExternalLoan: true,
+      pickupResponsible: { pseudo: '' },
+      pickupContact: 'Marc',
+    })
+
+    expect(etape?.qui).toBe('Marc')
+    expect(etape?.compte).toBeNull()
   })
 
   it('ne dit plus rien une fois le matériel rendu', () => {
@@ -118,6 +148,7 @@ describe('prochaineEtapeEmprunt', () => {
     expect(prochaineEtapeEmprunt({ isExternalLoan: true, pickupLocation: 'Gymnase' })).toEqual({
       lieu: 'Gymnase',
       qui: null,
+      compte: null,
     })
   })
 })

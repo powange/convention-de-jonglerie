@@ -6,6 +6,7 @@ import {
   canManageStock,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import { assertResponsablesDeLEdition } from '#server/utils/personnes-edition'
 import { stockItemLocationInclude, validateReservationLocation } from '#server/utils/stock-helpers'
 import { assertTagsBelongToEdition } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -97,6 +98,13 @@ export default wrapApiHandler(
     // Les tags doivent être ceux de cette édition : un identifiant emprunté ailleurs passerait
     // sinon la permission d'ici.
     const tagIds = Array.from(new Set(data.tagIds ?? []))
+    // Un responsable désigné doit être de l'édition : c'était la seule référence du module
+    // qui n'était pas confrontée à elle. Voir `personnes-edition`.
+    await assertResponsablesDeLEdition(editionId, edition.conventionId, [
+      data.pickupResponsibleId,
+      data.returnResponsibleId,
+    ])
+
     await assertTagsBelongToEdition(editionId, tagIds)
 
     const isExternalLoan = data.isExternalLoan === true
