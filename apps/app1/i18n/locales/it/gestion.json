@@ -543,7 +543,18 @@
       "loan_responsible_all": "Tutte le persone",
       "loan_state": "Stato",
       "loans_none": "Nessun materiale preso in prestito dall'esterno per questa edizione",
-      "loans_title": "Prestiti"
+      "loans_title": "Prestiti",
+      "count_counted": "Contato",
+      "count_expected": "Teorico",
+      "count_extra": "{count} in più | {count} in più",
+      "count_gap": "Scarto",
+      "count_leave_warning": "Alcuni conteggi non sono salvati. Lasciare la pagina li perderà.",
+      "count_missing": "{count} mancante | {count} mancanti",
+      "count_not_counted": "Non contato",
+      "count_pending": "{count} conteggio non salvato | {count} conteggi non salvati",
+      "count_progress": "{comptes} di {total} oggetto contato | {comptes} di {total} oggetti contati",
+      "count_save": "Salva il conteggio",
+      "count_view": "Inventario"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

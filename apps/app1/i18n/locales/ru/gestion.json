@@ -543,7 +543,18 @@
       "loan_responsible_all": "Все люди",
       "loan_state": "Состояние",
       "loans_none": "Нет оборудования, взятого со стороны для этого выпуска",
-      "loans_title": "Аренда"
+      "loans_title": "Аренда",
+      "count_counted": "Посчитано",
+      "count_expected": "По учёту",
+      "count_extra": "{count} лишний | {count} лишних",
+      "count_gap": "Расхождение",
+      "count_leave_warning": "Некоторые подсчёты не сохранены. Уход со страницы их потеряет.",
+      "count_missing": "не хватает {count} | не хватает {count}",
+      "count_not_counted": "Не посчитано",
+      "count_pending": "{count} несохранённый подсчёт | {count} несохранённых подсчётов",
+      "count_progress": "посчитано {comptes} из {total} предмета | посчитано {comptes} из {total} предметов",
+      "count_save": "Сохранить подсчёт",
+      "count_view": "Инвентаризация"
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

@@ -543,7 +543,18 @@
       "loan_responsible_all": "Alla personer",
       "loan_state": "Status",
       "loans_none": "Ingen utifrån lånad utrustning för denna upplaga",
-      "loans_title": "Lån"
+      "loans_title": "Lån",
+      "count_counted": "Räknat",
+      "count_expected": "Förväntat",
+      "count_extra": "{count} för mycket | {count} för mycket",
+      "count_gap": "Skillnad",
+      "count_leave_warning": "Vissa räkningar är inte sparade. Att lämna sidan förlorar dem.",
+      "count_missing": "{count} saknas | {count} saknas",
+      "count_not_counted": "Inte räknat",
+      "count_pending": "{count} osparad räkning | {count} osparade räkningar",
+      "count_progress": "{comptes} av {total} föremål räknat | {comptes} av {total} föremål räknade",
+      "count_save": "Spara räkningen",
+      "count_view": "Inventering"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

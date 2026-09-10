@@ -543,7 +543,18 @@
       "loan_responsible_all": "Todas las personas",
       "loan_state": "Estado",
       "loans_none": "Ningún material prestado desde fuera en esta edición",
-      "loans_title": "Préstamos"
+      "loans_title": "Préstamos",
+      "count_counted": "Contado",
+      "count_expected": "Teórico",
+      "count_extra": "{count} de más | {count} de más",
+      "count_gap": "Diferencia",
+      "count_leave_warning": "Algunos recuentos no están guardados. Salir de la página los perderá.",
+      "count_missing": "{count} falta | {count} faltan",
+      "count_not_counted": "Sin contar",
+      "count_pending": "{count} recuento sin guardar | {count} recuentos sin guardar",
+      "count_progress": "{comptes} de {total} objeto contado | {comptes} de {total} objetos contados",
+      "count_save": "Guardar el recuento",
+      "count_view": "Recuento"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

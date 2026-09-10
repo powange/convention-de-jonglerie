@@ -543,7 +543,18 @@
       "loan_responsible_all": "Alle personen",
       "loan_state": "Status",
       "loans_none": "Geen van buitenaf geleend materiaal voor deze editie",
-      "loans_title": "Bruiklenen"
+      "loans_title": "Bruiklenen",
+      "count_counted": "Geteld",
+      "count_expected": "Verwacht",
+      "count_extra": "{count} te veel | {count} te veel",
+      "count_gap": "Verschil",
+      "count_leave_warning": "Sommige tellingen zijn niet opgeslagen. De pagina verlaten doet ze verloren gaan.",
+      "count_missing": "{count} ontbreekt | {count} ontbreken",
+      "count_not_counted": "Niet geteld",
+      "count_pending": "{count} niet-opgeslagen telling | {count} niet-opgeslagen tellingen",
+      "count_progress": "{comptes} van {total} item geteld | {comptes} van {total} items geteld",
+      "count_save": "Telling opslaan",
+      "count_view": "Inventarisatie"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

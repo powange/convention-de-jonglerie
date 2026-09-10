@@ -543,7 +543,18 @@
       "loan_responsible_all": "Усі люди",
       "loan_state": "Стан",
       "loans_none": "Немає обладнання, позиченого ззовні для цього випуску",
-      "loans_title": "Оренда"
+      "loans_title": "Оренда",
+      "count_counted": "Пораховано",
+      "count_expected": "За обліком",
+      "count_extra": "{count} зайвий | {count} зайвих",
+      "count_gap": "Розбіжність",
+      "count_leave_warning": "Деякі підрахунки не збережені. Вихід зі сторінки їх втратить.",
+      "count_missing": "бракує {count} | бракує {count}",
+      "count_not_counted": "Не пораховано",
+      "count_pending": "{count} незбережений підрахунок | {count} незбережених підрахунків",
+      "count_progress": "пораховано {comptes} з {total} предмета | пораховано {comptes} з {total} предметів",
+      "count_save": "Зберегти підрахунок",
+      "count_view": "Інвентаризація"
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",
