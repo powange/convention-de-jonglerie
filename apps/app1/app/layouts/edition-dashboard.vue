@@ -289,6 +289,22 @@ const COMPTEURS_PAR_ENTREE: Record<string, string[]> = {
   stock: ['stock-emprunts'],
 }
 
+/**
+ * Les compteurs des entrées que cet utilisateur voit réellement.
+ *
+ * Interroger le compteur d'un module auquel il n'a pas droit lui vaudrait un refus du serveur :
+ * une barre de navigation ne doit pas produire d'erreur pour quelqu'un qui n'a rien demandé, et
+ * le journal se remplirait de 403 parfaitement légitimes. La condition est la même que celle qui
+ * décide d'afficher l'entrée — si elle diverge, le symptôme réapparaîtra.
+ */
+const compteursVisibles = computed(() => {
+  const cles: string[] = []
+  if (edition.value?.stockEnabled && canAccessStock.value) {
+    cles.push(...(COMPTEURS_PAR_ENTREE.stock ?? []))
+  }
+  return cles
+})
+
 // Accès « bénévole » à la gestion, récupérés en un seul appel (endpoint unifié) :
 // - isTeamLeader : responsable d'au moins une équipe de bénévoles
 // - canAccessMealValidation : bénévole d'équipe de validation des repas
@@ -326,14 +342,14 @@ onMounted(async () => {
   // Les compteurs des pastilles, une fois les droits connus : les demander plus tôt les ferait
   // partir pour une édition dont on n'a pas encore le droit de voir le contenu. Volontairement
   // sans `await` — le menu s'affiche sans attendre, les pastilles arrivent après.
-  rafraichirCompteursNavigation({ editionId: editionId.value })
+  rafraichirCompteursNavigation({ editionId: editionId.value }, compteursVisibles.value)
 })
 
 // Changer d'édition sans recharger la page laisserait les pastilles de la précédente. On efface
 // avant de redemander, pour qu'un compteur périmé ne s'affiche jamais.
 watch(editionId, (nouvelle) => {
   oublierCompteursNavigation()
-  rafraichirCompteursNavigation({ editionId: nouvelle })
+  rafraichirCompteursNavigation({ editionId: nouvelle }, compteursVisibles.value)
 })
 
 // Structure de navigation

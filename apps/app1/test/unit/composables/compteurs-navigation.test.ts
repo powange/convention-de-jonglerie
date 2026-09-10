@@ -118,3 +118,54 @@ describe('registre des compteurs de navigation', () => {
     expect(compteurNavigation('emprunts').value).toBe(9)
   })
 })
+
+/**
+ * Une barre de navigation ne devrait jamais produire d'erreur pour quelqu'un qui n'a rien demandé.
+ * Interroger le compteur d'un module auquel l'utilisateur n'a pas droit provoque un refus côté
+ * serveur — et remplit le journal d'erreurs de 403 parfaitement légitimes.
+ */
+describe('registre — entrées visibles seulement', () => {
+  const retraits: Array<() => void> = []
+
+  beforeEach(() => {
+    while (retraits.length) retraits.pop()!()
+    oublierCompteursNavigation()
+  })
+
+  const enregistrer = (cle: string, charger: (c: any) => Promise<number | null>) => {
+    retraits.push(enregistrerFournisseurCompteur({ cle, charger }))
+  }
+
+  it("n'interroge pas un module absent du menu", async () => {
+    const interdit = vi.fn(async () => 1)
+    enregistrer('interdit', interdit)
+    enregistrer('permis', async () => 4)
+
+    await rafraichirCompteursNavigation({}, ['permis'])
+
+    expect(interdit).not.toHaveBeenCalled()
+    expect(compteurNavigation('permis').value).toBe(4)
+  })
+
+  it('efface le compteur d’un module devenu invisible', async () => {
+    // Changement d'édition, droits révoqués : la pastille de la visite précédente ne doit pas
+    // survivre à la disparition de son entrée.
+    enregistrer('stock', async () => 3)
+    await rafraichirCompteursNavigation({}, ['stock'])
+    expect(compteurNavigation('stock').value).toBe(3)
+
+    await rafraichirCompteursNavigation({}, [])
+    expect(compteurNavigation('stock').value).toBeNull()
+  })
+
+  it('interroge tout le monde sans liste fournie', async () => {
+    // Une navigation qui ne filtre rien garde le comportement d'avant.
+    enregistrer('a', async () => 1)
+    enregistrer('b', async () => 2)
+
+    await rafraichirCompteursNavigation({})
+
+    expect(compteurNavigation('a').value).toBe(1)
+    expect(compteurNavigation('b').value).toBe(2)
+  })
+})

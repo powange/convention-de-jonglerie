@@ -51,16 +51,41 @@ export function enregistrerFournisseurCompteur(fournisseur: FournisseurCompteur)
 }
 
 /**
- * Recharge tous les compteurs pour ce contexte.
+ * Recharge les compteurs pour ce contexte.
+ *
+ * `clesActives` dit quelles entrées l'utilisateur voit réellement. Les autres ne sont pas
+ * interrogées, et leur compteur est effacé — un module absent du menu ne doit pas laisser sa
+ * pastille de la visite précédente.
+ *
+ * Ce n'est pas qu'une économie de requêtes : un compteur interrogé pour un module auquel
+ * l'utilisateur n'a pas droit provoque un refus côté serveur. Une barre de navigation ne devrait
+ * jamais produire d'erreur pour quelqu'un qui n'a rien demandé — et le journal d'erreurs se
+ * remplirait de 403 parfaitement légitimes.
+ *
+ * Sans `clesActives`, tous les fournisseurs sont interrogés : c'est le comportement d'une
+ * navigation qui ne filtre rien.
  *
  * Les fournisseurs sont interrogés en parallèle et **isolés** les uns des autres : celui qui
  * échoue efface son propre compteur et laisse les autres tranquilles. Une barre de navigation qui
  * disparaîtrait parce qu'un module a mal répondu serait une régression bien pire que la pastille
  * manquante.
  */
-export async function rafraichirCompteursNavigation(contexte: ContexteCompteur): Promise<void> {
+export async function rafraichirCompteursNavigation(
+  contexte: ContexteCompteur,
+  clesActives?: readonly string[]
+): Promise<void> {
+  const actives = clesActives ? new Set(clesActives) : null
+
+  for (const cle of [...comptes.keys()]) {
+    if (actives && !actives.has(cle)) comptes.delete(cle)
+  }
+
+  const aInterroger = [...fournisseurs.values()].filter(
+    (fournisseur) => !actives || actives.has(fournisseur.cle)
+  )
+
   await Promise.all(
-    [...fournisseurs.values()].map(async (fournisseur) => {
+    aInterroger.map(async (fournisseur) => {
       try {
         const compte = await fournisseur.charger(contexte)
         comptes.set(fournisseur.cle, typeof compte === 'number' ? compte : null)

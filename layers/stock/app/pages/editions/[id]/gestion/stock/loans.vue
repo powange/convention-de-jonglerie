@@ -424,7 +424,7 @@ async function appliquer(action: ActionEmprunt) {
     // La pastille du menu compte les retards : elle vient de changer. Le menu ne recalcule qu'au
     // montage — c'est à qui modifie les données de le signaler, sans quoi le compteur reste sur
     // sa valeur d'arrivée jusqu'au prochain chargement de page.
-    await rafraichirCompteursNavigation({ editionId })
+    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),

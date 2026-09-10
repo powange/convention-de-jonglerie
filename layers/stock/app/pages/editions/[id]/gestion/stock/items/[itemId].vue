@@ -563,7 +563,7 @@ async function marquerRecupere(recupere: boolean) {
     await fetchItem()
     // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
     // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
-    await rafraichirCompteursNavigation({ editionId })
+    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),
@@ -587,7 +587,7 @@ async function markLoanReturned() {
     await fetchItem()
     // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
     // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
-    await rafraichirCompteursNavigation({ editionId })
+    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),
@@ -611,7 +611,7 @@ async function markLoanNotReturned() {
     await fetchItem()
     // La pastille du menu compte les retards : marquer un emprunt récupéré ou rendu la change.
     // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
-    await rafraichirCompteursNavigation({ editionId })
+    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),
