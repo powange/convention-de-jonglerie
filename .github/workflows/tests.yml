@@ -46,20 +46,33 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/app1/package-lock.json'
 
+      # Les clés sont identiques à celles de playwright.yml : les deux workflows installent le
+      # même `node_modules` et génèrent le même client Prisma. Tant que chacun suivait sa propre
+      # convention (`-deps-` ici, `-deps-v2-` là), une PR stockait tout en double — deux `npm ci`
+      # complets au moindre changement de lockfile, et le quota de 10 Go par dépôt saturé deux
+      # fois plus vite, dont les évictions LRU se manifestaient en cache miss apparemment
+      # aléatoires. Toute modification de ces clés doit être répercutée dans l'autre fichier.
+      #
+      # Le marqueur passe à `-v3-` des deux côtés pour repartir d'entrées neuves : les anciennes
+      # archivent aussi `~/.npm`, retiré ci-dessous, et une clé inchangée aurait continué de les
+      # restaurer telles quelles — le gain de taille n'aurait pris effet qu'au prochain lockfile.
       - name: Generate cache keys
         id: cache-keys
         run: |
-          echo "deps=${{ runner.os }}-deps-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
-          echo "prisma=${{ runner.os }}-prisma-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "deps=${{ runner.os }}-deps-v3-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "prisma=${{ runner.os }}-prisma-v3-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
           echo "nuxt=${{ runner.os }}-nuxt-${{ hashFiles('apps/app1/nuxt.config.ts', 'apps/app1/tsconfig.json', 'apps/app1/app.config.ts') }}" >> $GITHUB_OUTPUT
 
+      # `~/.npm` n'est volontairement pas listé ici : `actions/setup-node` le met déjà en cache via
+      # `cache: 'npm'` + `cache-dependency-path`, et comme `node_modules` est restauré tel quel,
+      # npm ne relit jamais son cache. L'ajouter au chemin ne faisait que gonfler l'archive — donc
+      # son temps de compression, d'upload et de download — dans les cinq jobs qui la restaurent.
+      # Le cache de setup-node reste le filet des runs où `npm ci` doit réellement tourner.
       - name: Cache Node dependencies
         id: cache-deps
         uses: actions/cache@v4
         with:
-          path: |
-            apps/app1/node_modules
-            ~/.npm
+          path: apps/app1/node_modules
           key: ${{ steps.cache-keys.outputs.deps }}
           # Pas de restore-keys pour éviter les caches incompatibles avec le lockfile
 
@@ -70,7 +83,7 @@ jobs:
           path: apps/app1/server/generated/prisma
           key: ${{ steps.cache-keys.outputs.prisma }}
           restore-keys: |
-            ${{ runner.os }}-prisma-
+            ${{ runner.os }}-prisma-v3-
 
       - name: Cache Nuxt build
         id: cache-nuxt
@@ -94,18 +107,6 @@ jobs:
         if: steps.cache-nuxt.outputs.cache-hit != 'true'
         run: npx nuxi prepare
 
-      # Sauvegarder les dépendances comme artifact pour les autres jobs
-      - name: Upload dependencies
-        uses: actions/upload-artifact@v4
-        with:
-          name: deps-${{ github.run_id }}
-          path: |
-            apps/app1/node_modules
-            apps/app1/.nuxt
-            apps/app1/package.json
-            apps/app1/package-lock.json
-          retention-days: 1
-
   # Job pour le linting (rapide, pas besoin de DB)
   lint:
     runs-on: ubuntu-22.04
@@ -126,9 +127,7 @@ jobs:
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            apps/app1/node_modules
-            ~/.npm
+          path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
 
@@ -191,9 +190,7 @@ jobs:
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            apps/app1/node_modules
-            ~/.npm
+          path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
 
@@ -289,9 +286,7 @@ jobs:
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            apps/app1/node_modules
-            ~/.npm
+          path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
 
@@ -323,7 +318,15 @@ jobs:
   test:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
-    needs: [setup, lint, build] # Attendre setup, lint et build avant de lancer les tests
+    # Seul `setup` est nécessaire : il amorce les caches (node_modules, client Prisma, .nuxt) que
+    # les steps ci-dessous restaurent. Ni `lint` ni `build` ne produisent quoi que ce soit que les
+    # tests consomment — vitest lit `.nuxt` via l'alias `#build` et ne touche jamais à `.output/`,
+    # que seul le job `build` génère et qu'aucun cache ni artifact ne partage. Les attendre ne
+    # faisait donc que sérialiser la CI : la matrice démarre désormais en même temps que
+    # lint/typecheck/build, au lieu de leur ajouter leur durée en tête de chemin critique.
+    # Contrepartie assumée : sur une branche dont le lint ou le build échoue, les quatre jobs de
+    # tests tournent quand même — on paie quelques minutes de runner pour en gagner en attente.
+    needs: [setup]
 
     strategy:
       fail-fast: false # Continue même si un test échoue
@@ -364,9 +367,7 @@ jobs:
       - name: Restore Node dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            apps/app1/node_modules
-            ~/.npm
+          path: apps/app1/node_modules
           key: ${{ needs.setup.outputs.deps-cache-key }}
           fail-on-cache-miss: true
 
