@@ -391,12 +391,12 @@ const editionStore = useEditionStore()
 const editionId = parseInt(route.params.id as string)
 const itemId = computed(() => parseInt(route.params.itemId as string))
 
+/** Sans l'adresse e-mail : l'API ne la rend plus, et l'écran n'en affichait que le pseudo. */
 interface ReservationUser {
   id: number
   pseudo: string
   prenom: string | null
   nom: string | null
-  email: string
   emailHash: string | null
   profilePicture: string | null
 }
