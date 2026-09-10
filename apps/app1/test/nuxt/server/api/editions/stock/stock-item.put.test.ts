@@ -93,6 +93,18 @@ describe('PUT /api/editions/[id]/stock-items/[itemId]', () => {
     await expect(handler(baseEvent as any)).rejects.toThrow('Objet introuvable')
   })
 
+  it('rejette une quantité au-delà de la borne', async () => {
+    // La même borne qu'à la création : un seul point d'entrée qui laisserait passer ce que les
+    // autres refusent suffirait à ramener le problème.
+    global.readBody = vi.fn().mockResolvedValue({ quantity: 10001 })
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+  })
+
+  it('rejette une quantité constatée au-delà de la borne', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ finalQuantity: 10001 })
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+  })
+
   it('rejette 403 sans canManageStock', async () => {
     mockCanManageStock.mockReturnValue(false)
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')

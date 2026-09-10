@@ -118,6 +118,18 @@ describe('PUT /api/editions/[id]/stock-reservations/[reservationId]', () => {
     )
   })
 
+  it('rejette une quantité réservée au-delà de la borne', async () => {
+    // La réservation porte sur un objet largement pourvu : seule la borne du schéma peut refuser.
+    prismaMock.stockReservation.findFirst.mockResolvedValue({
+      ...existingReservation,
+      stockItem: { id: 5, quantity: 20000 },
+    })
+    mockGetReservedQty.mockResolvedValue(0)
+    global.readBody = vi.fn().mockResolvedValue({ quantityReserved: 10001 })
+
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+  })
+
   it('refuse 409 si la nouvelle quantité dépasse la dispo restante', async () => {
     global.readBody = vi.fn().mockResolvedValue({ quantityReserved: 8 })
     mockGetReservedQty.mockResolvedValue(5) // 10 - 5 = 5 disponibles, demande 8

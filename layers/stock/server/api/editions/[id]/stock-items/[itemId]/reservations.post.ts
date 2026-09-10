@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
 import {
   canAccessStock,
   getReservedQuantityOnPeriod,
@@ -16,7 +17,12 @@ const bodySchema = z
     startsAt: z.string().datetime(),
     endsAt: z.string().datetime(),
     usage: z.string().trim().min(1, "L'utilisation est requise").max(500),
-    quantityReserved: z.number().int().positive().default(1),
+    quantityReserved: z
+      .number()
+      .int()
+      .positive()
+      .max(QUANTITE_MAX_STOCK, MESSAGE_QUANTITE_MAX)
+      .default(1),
     // Emplacement d'utilisation : au moins l'un des trois est requis
     location: z.string().trim().max(200).nullable().optional(),
     zoneId: z.number().int().positive().nullable().optional(),

@@ -8,6 +8,7 @@ import {
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
 import { assertResponsablesDeLEdition } from '#server/utils/personnes-edition'
+import { MESSAGE_QUANTITE_MAX, QUANTITE_MAX_STOCK } from '#server/utils/quantite-stock'
 import { stockItemLocationInclude, validateReservationLocation } from '#server/utils/stock-helpers'
 import { assertTagsBelongToEdition } from '#server/utils/stock-tags-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -16,7 +17,7 @@ import { handleValidationError } from '#server/utils/validation-schemas'
 const bodySchema = z.object({
   name: z.string().trim().min(1).max(200).optional(),
   description: z.string().trim().max(2000).nullable().optional(),
-  quantity: z.number().int().positive().optional(),
+  quantity: z.number().int().positive().max(QUANTITE_MAX_STOCK, MESSAGE_QUANTITE_MAX).optional(),
   notes: z.string().trim().max(2000).nullable().optional(),
   displayOrder: z.number().int().optional(),
   stockGroupId: z.number().int().positive().optional(),
@@ -39,7 +40,13 @@ const bodySchema = z.object({
   returnContact: z.string().trim().max(500).nullable().optional(),
   // Zéro accepté, contrairement à `quantity` : tout perdre est un constat possible. `null`
   // remet le compteur à « pas encore compté ».
-  finalQuantity: z.number().int().min(0).nullable().optional(),
+  finalQuantity: z
+    .number()
+    .int()
+    .min(0)
+    .max(QUANTITE_MAX_STOCK, MESSAGE_QUANTITE_MAX)
+    .nullable()
+    .optional(),
   // La liste complète des tags de l'objet : ce qui n'y figure pas est retiré.
   tagIds: z.array(z.number().int().positive()).optional(),
 })

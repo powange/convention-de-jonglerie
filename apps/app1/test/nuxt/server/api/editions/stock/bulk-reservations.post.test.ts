@@ -84,6 +84,26 @@ describe('POST /api/editions/[id]/stock-reservations/bulk', () => {
     expect(byItem).toEqual({ 10: 2, 11: 1, 12: 3 })
   })
 
+  it('rejette une quantité au-delà de la borne, fût-ce sur un seul objet du lot', async () => {
+    // Le lot est refusé en entier : mieux vaut rien que la moitié d'une demande, sans savoir
+    // laquelle.
+    // Les objets ont de quoi servir la demande : seule la borne du schéma peut refuser.
+    prismaMock.stockItem.findMany.mockResolvedValue([
+      { id: 10, name: 'Rallonge', quantity: 20000 },
+      { id: 11, name: 'Projecteur', quantity: 20000 },
+    ])
+    mockGetReservedQuantityOnPeriod.mockResolvedValue(0)
+    global.readBody = vi.fn().mockResolvedValue({
+      ...validBody,
+      items: [
+        { id: 10, quantity: 2 },
+        { id: 11, quantity: 10001 },
+      ],
+    })
+
+    await expect(handler(baseEvent as any)).rejects.toThrow()
+  })
+
   it('rejette 404 si édition introuvable', async () => {
     mockGetEditionWithPermissions.mockResolvedValue(null)
     await expect(handler(baseEvent as any)).rejects.toThrow('Édition non trouvée')
