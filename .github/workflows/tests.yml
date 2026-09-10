@@ -393,6 +393,14 @@ jobs:
         if: steps.cache-nuxt.outputs.cache-hit != 'true'
         run: npx nuxi prepare
 
+      # Même rappel que dans le job de typage, et pour la même raison : le cache restaure
+      # `node_modules` sans rejouer `npm ci`, donc sans le `postinstall` qui relie les layers.
+      # Ici, l'effet n'est pas une dégradation silencieuse mais un échec franc — un fichier de
+      # `layers/` qui importe un paquet ne se résout pas du tout. Le premier à l'avoir fait n'est
+      # arrivé qu'en septembre 2026 : jusque-là, aucun util testé unitairement n'importait rien.
+      - name: Relier les dépendances aux layers
+        run: node scripts/lier-layers-node-modules.mjs
+
       - name: Setup database schema (DB tests only)
         if: matrix.test-group.db
         run: |
