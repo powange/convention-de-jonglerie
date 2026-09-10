@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { personSearchRateLimiter } from '#server/utils/api-rate-limiter'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
   canManageStock,
@@ -33,6 +34,10 @@ const querySchema = z.object({
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
+    // Avant tout le reste : un balayage méthodique reconstituerait la liste des gens de l'édition,
+    // et il n'a pas à consommer une requête de base pour se faire refouler.
+    await personSearchRateLimiter(event)
+
     const editionId = validateEditionId(event)
 
     const edition = await getEditionWithPermissions(editionId, { userId: user.id })
