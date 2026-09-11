@@ -554,7 +554,10 @@
       "count_pending": "{count} osparad räkning | {count} osparade räkningar",
       "count_progress": "{comptes} av {total} föremål räknat | {comptes} av {total} föremål räknade",
       "count_save": "Spara räkningen",
-      "count_view": "Inventering"
+      "count_view": "Inventering",
+      "export_pdf": "Inventarielista (PDF)",
+      "export_pdf_empty": "Inget föremål att exportera",
+      "export_pdf_summary": "{objets} föremål · {comptes} räknade · {empruntes} lånade"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

@@ -554,7 +554,10 @@
       "count_pending": "{count} незбережений підрахунок | {count} незбережених підрахунків",
       "count_progress": "пораховано {comptes} з {total} предмета | пораховано {comptes} з {total} предметів",
       "count_save": "Зберегти підрахунок",
-      "count_view": "Інвентаризація"
+      "count_view": "Інвентаризація",
+      "export_pdf": "Інвентарна відомість (PDF)",
+      "export_pdf_empty": "Немає предметів для експорту",
+      "export_pdf_summary": "{objets} предметів · {comptes} пораховано · {empruntes} позичено"
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

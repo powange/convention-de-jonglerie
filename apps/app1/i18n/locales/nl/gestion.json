@@ -554,7 +554,10 @@
       "count_pending": "{count} niet-opgeslagen telling | {count} niet-opgeslagen tellingen",
       "count_progress": "{comptes} van {total} item geteld | {comptes} van {total} items geteld",
       "count_save": "Telling opslaan",
-      "count_view": "Inventarisatie"
+      "count_view": "Inventarisatie",
+      "export_pdf": "Inventarislijst (PDF)",
+      "export_pdf_empty": "Geen item om te exporteren",
+      "export_pdf_summary": "{objets} items · {comptes} geteld · {empruntes} geleend"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",
