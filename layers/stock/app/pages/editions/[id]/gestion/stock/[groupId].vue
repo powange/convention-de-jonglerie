@@ -714,6 +714,11 @@ import {
   tagsDepuisUrl,
   urlDepuisTags,
 } from '../../../../../utils/filtre-tags-stock'
+import {
+  nomFichierInventaire,
+  preparerInventairePourPdf,
+  resumeInventaire,
+} from '../../../../../utils/inventaire-pdf'
 import { filtrerParLieuEmprunt, filtrerParNom } from '../../../../../utils/recherche-materiel'
 
 import type { TableColumn } from '@nuxt/ui'
@@ -1553,8 +1558,115 @@ function goToItem(itemId: number) {
   router.push(`/editions/${editionId}/gestion/stock/items/${itemId}`)
 }
 
+const exportEnCours = ref(false)
+
+/**
+ * La fiche d'inventaire à emporter.
+ *
+ * Elle sert là où l'application ne sert à rien : le hangar sans réseau, le camion qu'on charge.
+ * D'où une colonne « Compté » laissée vide pour écrire à la main — une fiche qu'on ne peut pas
+ * annoter ne vaut pas le papier.
+ *
+ * La préparation des données vit dans `inventaire-pdf`, éprouvée à part ; ici, il n'y a que de la
+ * mise en page. Même partage que la FAQ, qui a fait ce chemin avant.
+ */
+async function exporterInventaire() {
+  const lignes = preparerInventairePourPdf((group.value?.items ?? []) as any[])
+  if (lignes.length === 0) {
+    useToast().add({
+      title: t('gestion.stock.export_pdf_empty'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'warning',
+    })
+    return
+  }
+
+  exportEnCours.value = true
+  try {
+    const { jsPDF } = await import('jspdf')
+    const { applyPlugin } = await import('jspdf-autotable')
+    applyPlugin(jsPDF)
+
+    // Paysage : six colonnes dont deux de texte libre ne tiennent pas en portrait sans que les
+    // noms d'objets se coupent en trois.
+    const doc = new jsPDF({ orientation: 'landscape' })
+    const MARGE = 14
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(group.value?.name ?? t('gestion.stock.title'), MARGE, 16)
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    const sousTitre = [edition.value?.convention?.name, edition.value?.name]
+      .filter(Boolean)
+      .join(' - ')
+    if (sousTitre) doc.text(sousTitre, MARGE, 22)
+
+    // La date, parce qu'une fiche détachée de l'écran n'en a plus d'autre : deux inventaires
+    // d'années différentes se ressemblent trop pour qu'on les distingue sans elle.
+    const resume = resumeInventaire(lignes)
+    doc.setFontSize(9)
+    doc.text(
+      `${formatDate(new Date())} — ${t('gestion.stock.export_pdf_summary', {
+        objets: resume.objets,
+        comptes: resume.comptes,
+        empruntes: resume.empruntes,
+      })}`,
+      MARGE,
+      sousTitre ? 28 : 22
+    )
+
+    // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+    doc.autoTable({
+      startY: sousTitre ? 33 : 27,
+      margin: { left: MARGE, right: MARGE },
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: { fillColor: [27, 77, 92] },
+      head: [
+        [
+          t('gestion.stock.item_name'),
+          t('gestion.stock.count_expected'),
+          t('gestion.stock.count_counted'),
+          t('gestion.stock.item_storage_location'),
+          t('gestion.stock.tags.field_label'),
+          t('gestion.stock.loan_state'),
+        ],
+      ],
+      body: lignes.map((ligne) => [
+        ligne.nom,
+        ligne.quantite,
+        ligne.compte,
+        ligne.emplacement,
+        ligne.tags,
+        ligne.etatEmprunt ? t(ligne.etatEmprunt) : '',
+      ]),
+      // La colonne « Compté » reste large et vide : c'est là qu'on écrit au crayon.
+      columnStyles: {
+        1: { cellWidth: 22, halign: 'center' },
+        2: { cellWidth: 26, halign: 'center' },
+      },
+    })
+
+    doc.save(nomFichierInventaire(group.value?.name, edition.value?.name))
+  } catch (e: any) {
+    useToast().add({
+      title: e?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    exportEnCours.value = false
+  }
+}
+
 const groupActions = computed(() => [
   [
+    {
+      label: t('gestion.stock.export_pdf'),
+      icon: 'i-heroicons-document-arrow-down',
+      onSelect: () => exporterInventaire(),
+    },
     {
       label: t('common.edit'),
       icon: 'i-heroicons-pencil-square',

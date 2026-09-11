@@ -554,7 +554,10 @@
       "count_pending": "{count} recuento sin guardar | {count} recuentos sin guardar",
       "count_progress": "{comptes} de {total} objeto contado | {comptes} de {total} objetos contados",
       "count_save": "Guardar el recuento",
-      "count_view": "Recuento"
+      "count_view": "Recuento",
+      "export_pdf": "Ficha de inventario (PDF)",
+      "export_pdf_empty": "Ningún objeto que exportar",
+      "export_pdf_summary": "{objets} objetos · {comptes} contados · {empruntes} prestados"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

@@ -554,7 +554,10 @@
       "count_pending": "{count} niezapisane zliczenie | {count} niezapisanych zliczeń",
       "count_progress": "policzono {comptes} z {total} przedmiotu | policzono {comptes} z {total} przedmiotów",
       "count_save": "Zapisz zliczenie",
-      "count_view": "Inwentaryzacja"
+      "count_view": "Inwentaryzacja",
+      "export_pdf": "Arkusz inwentarza (PDF)",
+      "export_pdf_empty": "Brak przedmiotów do wyeksportowania",
+      "export_pdf_summary": "{objets} przedmiotów · {comptes} policzonych · {empruntes} wypożyczonych"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

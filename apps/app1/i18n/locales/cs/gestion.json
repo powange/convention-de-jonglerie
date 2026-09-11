@@ -554,7 +554,10 @@
       "count_pending": "{count} neuložené spočítání | {count} neuložených spočítání",
       "count_progress": "spočítáno {comptes} z {total} předmětu | spočítáno {comptes} z {total} předmětů",
       "count_save": "Uložit spočítání",
-      "count_view": "Inventura"
+      "count_view": "Inventura",
+      "export_pdf": "Inventární list (PDF)",
+      "export_pdf_empty": "Žádný předmět k exportu",
+      "export_pdf_summary": "{objets} předmětů · {comptes} spočítáno · {empruntes} zapůjčeno"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

@@ -554,7 +554,10 @@
       "count_pending": "{count} ugemt optælling | {count} ugemte optællinger",
       "count_progress": "{comptes} af {total} genstand talt | {comptes} af {total} genstande talt",
       "count_save": "Gem optællingen",
-      "count_view": "Optælling"
+      "count_view": "Optælling",
+      "export_pdf": "Inventarliste (PDF)",
+      "export_pdf_empty": "Ingen genstand at eksportere",
+      "export_pdf_summary": "{objets} genstande · {comptes} talt · {empruntes} lånt"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

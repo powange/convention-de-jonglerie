@@ -554,7 +554,10 @@
       "count_pending": "{count} conteggio non salvato | {count} conteggi non salvati",
       "count_progress": "{comptes} di {total} oggetto contato | {comptes} di {total} oggetti contati",
       "count_save": "Salva il conteggio",
-      "count_view": "Inventario"
+      "count_view": "Inventario",
+      "export_pdf": "Scheda d'inventario (PDF)",
+      "export_pdf_empty": "Nessun oggetto da esportare",
+      "export_pdf_summary": "{objets} oggetti · {comptes} contati · {empruntes} in prestito"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

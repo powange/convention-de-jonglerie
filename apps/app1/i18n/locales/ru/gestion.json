@@ -554,7 +554,10 @@
       "count_pending": "{count} несохранённый подсчёт | {count} несохранённых подсчётов",
       "count_progress": "посчитано {comptes} из {total} предмета | посчитано {comptes} из {total} предметов",
       "count_save": "Сохранить подсчёт",
-      "count_view": "Инвентаризация"
+      "count_view": "Инвентаризация",
+      "export_pdf": "Инвентарная ведомость (PDF)",
+      "export_pdf_empty": "Нет предметов для экспорта",
+      "export_pdf_summary": "{objets} предметов · {comptes} посчитано · {empruntes} арендовано"
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

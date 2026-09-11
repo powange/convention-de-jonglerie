@@ -554,7 +554,10 @@
       "count_pending": "{count} ungespeicherte Zählung | {count} ungespeicherte Zählungen",
       "count_progress": "{comptes} von {total} Gegenstand gezählt | {comptes} von {total} Gegenständen gezählt",
       "count_save": "Zählung speichern",
-      "count_view": "Inventur"
+      "count_view": "Inventur",
+      "export_pdf": "Inventarbogen (PDF)",
+      "export_pdf_empty": "Kein Gegenstand zum Exportieren",
+      "export_pdf_summary": "{objets} Gegenstände · {comptes} gezählt · {empruntes} geliehen"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",
