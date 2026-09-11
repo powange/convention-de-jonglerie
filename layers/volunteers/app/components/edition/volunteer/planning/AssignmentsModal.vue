@@ -323,7 +323,6 @@ import type { VolunteerTimeSlot } from '#imports'
 import { organisateursAffectables } from '../../../../utils/organisateurs-affectables'
 import { dureeTraduisible } from '../../../../utils/plage-horaire'
 
-
 // Props
 interface Props {
   modelValue: boolean
@@ -418,8 +417,7 @@ const editionStore = useEditionStore()
 
 /** L'option d'édition qui commande tout ce qui touche aux organisateurs dans le bénévolat. */
 const organisateursOuverts = computed(
-  () =>
-    !!editionStore.getEditionById(Number(effectiveEditionId.value))?.volunteersOrganizersInTeams
+  () => !!editionStore.getEditionById(Number(effectiveEditionId.value))?.volunteersOrganizersInTeams
 )
 
 /**
@@ -532,9 +530,7 @@ const fetchOrganizerCandidates = async () => {
   try {
     const response = await $fetch<{
       data?: { organizers?: Array<OrganizerEntry & { teamIds: string[] }> }
-    }>(
-      `/api/editions/${effectiveEditionId.value}/volunteers/organizers`
-    )
+    }>(`/api/editions/${effectiveEditionId.value}/volunteers/organizers`)
     organizerCandidates.value = response?.data?.organizers ?? []
   } catch (error) {
     console.error('Erreur lors de la récupération des organisateurs:', error)

@@ -67,12 +67,7 @@
           :icon="tabCourant?.icon"
           class="w-full sm:hidden mb-4"
         />
-        <UTabs
-          v-model="activeTab"
-          :items="tabs"
-          variant="link"
-          :ui="{ list: 'hidden sm:flex' }"
-        >
+        <UTabs v-model="activeTab" :items="tabs" variant="link" :ui="{ list: 'hidden sm:flex' }">
           <template #tarifs>
             <TicketingTiersList
               :tiers="tiers"

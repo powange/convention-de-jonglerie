@@ -269,7 +269,6 @@ import type { CarpoolOffer } from '~/types/carpool'
 
 import { useAuthStore } from '#imports'
 
-
 interface Props {
   offer: CarpoolOffer
   editionId: number

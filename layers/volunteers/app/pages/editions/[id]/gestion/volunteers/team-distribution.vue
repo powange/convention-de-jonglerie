@@ -353,7 +353,6 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -537,40 +536,40 @@ const teamDistribution = computed(() => {
     return []
   }
 
-  return volunteerTeams.value
-    .map((team) => {
-      const assignedVolunteers = teamAssignments.value.filter((app) =>
-        app.teamAssignments.some((t: any) => t.teamId === team.id)
-      )
+  return volunteerTeams.value.map((team) => {
+    const assignedVolunteers = teamAssignments.value.filter((app) =>
+      app.teamAssignments.some((t: any) => t.teamId === team.id)
+    )
 
-      // Trier les bénévoles : responsables en premier, puis par ordre alphabétique (prénom + nom)
-      const sortedVolunteers = assignedVolunteers.sort((a, b) => {
-        const aIsLeader = isTeamLeader(a, team.id)
-        const bIsLeader = isTeamLeader(b, team.id)
+    // Trier les bénévoles : responsables en premier, puis par ordre alphabétique (prénom + nom)
+    const sortedVolunteers = assignedVolunteers.sort((a, b) => {
+      const aIsLeader = isTeamLeader(a, team.id)
+      const bIsLeader = isTeamLeader(b, team.id)
 
-        // D'abord trier par statut de leader
-        if (aIsLeader && !bIsLeader) return -1
-        if (!aIsLeader && bIsLeader) return 1
+      // D'abord trier par statut de leader
+      if (aIsLeader && !bIsLeader) return -1
+      if (!aIsLeader && bIsLeader) return 1
 
-        // Ensuite trier alphabétiquement par prénom + nom
-        const aName = `${a.user.prenom || ''} ${a.user.nom || ''}`.trim().toLowerCase()
-        const bName = `${b.user.prenom || ''} ${b.user.nom || ''}`.trim().toLowerCase()
-        return aName.localeCompare(bName, 'fr')
-      })
-
-      // L'effectif compte tout le monde : un organisateur rattaché occupe une place dans
-      // l'équipe comme un bénévole, et le taux de remplissage doit le dire.
-      const effectif = assignedVolunteers.length + (organisateursParEquipe.value[team.id]?.length ?? 0)
-
-      return {
-        ...team,
-        volunteers: sortedVolunteers,
-        count: effectif,
-        utilizationRate: team.maxVolunteers
-          ? Math.round((effectif / team.maxVolunteers) * 100)
-          : null,
-      }
+      // Ensuite trier alphabétiquement par prénom + nom
+      const aName = `${a.user.prenom || ''} ${a.user.nom || ''}`.trim().toLowerCase()
+      const bName = `${b.user.prenom || ''} ${b.user.nom || ''}`.trim().toLowerCase()
+      return aName.localeCompare(bName, 'fr')
     })
+
+    // L'effectif compte tout le monde : un organisateur rattaché occupe une place dans
+    // l'équipe comme un bénévole, et le taux de remplissage doit le dire.
+    const effectif =
+      assignedVolunteers.length + (organisateursParEquipe.value[team.id]?.length ?? 0)
+
+    return {
+      ...team,
+      volunteers: sortedVolunteers,
+      count: effectif,
+      utilizationRate: team.maxVolunteers
+        ? Math.round((effectif / team.maxVolunteers) * 100)
+        : null,
+    }
+  })
   // Aucun tri ici : on garde l'ordre rendu par l'API, celui de la page des équipes. Trier par
   // effectif faisait sauter les équipes de place à chaque assignation, sous la main de celui
   // qui les remplissait.

@@ -18,151 +18,154 @@ const notificationSchema = z.object({
     .max(500, 'Le message ne peut pas dépasser 500 caractères'),
 })
 
-export default wrapApiHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = validateEditionId(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  // Vérifier les permissions
-  const canManage = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
+    // Vérifier les permissions
+    const canManage = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
 
-  // Si l'utilisateur ne peut pas gérer, vérifier s'il est team leader
-  let isTeamLeader = false
-  let leaderTeamNames: string[] = []
+    // Si l'utilisateur ne peut pas gérer, vérifier s'il est team leader
+    let isTeamLeader = false
+    let leaderTeamNames: string[] = []
 
-  if (!canManage) {
-    // À défaut du droit de gestion, être responsable d'équipe suffit — qu'on le soit comme
-    // bénévole accepté ou comme organisateur rattaché.
-    const teamIds = await equipesDontIlEstResponsable(editionId, user.id)
+    if (!canManage) {
+      // À défaut du droit de gestion, être responsable d'équipe suffit — qu'on le soit comme
+      // bénévole accepté ou comme organisateur rattaché.
+      const teamIds = await equipesDontIlEstResponsable(editionId, user.id)
 
-    if (teamIds.length === 0) {
-      throw createError({ status: 403, message: 'Droits insuffisants' })
+      if (teamIds.length === 0) {
+        throw createError({ status: 403, message: 'Droits insuffisants' })
+      }
+
+      // La suite raisonne sur des noms d'équipe, pas des identifiants.
+      const equipes = await prisma.volunteerTeam.findMany({
+        where: { id: { in: teamIds } },
+        select: { name: true },
+      })
+
+      isTeamLeader = true
+      leaderTeamNames = equipes.map((equipe) => equipe.name)
     }
 
-    // La suite raisonne sur des noms d'équipe, pas des identifiants.
-    const equipes = await prisma.volunteerTeam.findMany({
-      where: { id: { in: teamIds } },
+    // Valider les données
+    const body = await readBody(event)
+    const { targetType, selectedTeams, message } = notificationSchema.parse(body)
+
+    // Si team leader, forcer le targetType à 'teams' et valider les équipes
+    if (isTeamLeader) {
+      if (targetType !== 'teams' || !selectedTeams || selectedTeams.length === 0) {
+        throw createError({
+          status: 400,
+          message: "Les responsables d'équipe doivent cibler des équipes spécifiques",
+        })
+      }
+
+      // Vérifier que toutes les équipes sélectionnées sont bien celles dont l'utilisateur est responsable
+      const invalidTeams = selectedTeams.filter((team) => !leaderTeamNames.includes(team))
+      if (invalidTeams.length > 0) {
+        throw createError({
+          status: 403,
+          message: `Vous n'êtes pas responsable de ces équipes : ${invalidTeams.join(', ')}`,
+        })
+      }
+    }
+
+    // Récupérer le nom d'affichage générique depuis l'Event (étape 0bis)
+    const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
+      errorMessage: 'Événement introuvable',
       select: { name: true },
     })
 
-    isTeamLeader = true
-    leaderTeamNames = equipes.map((equipe) => equipe.name)
-  }
-
-  // Valider les données
-  const body = await readBody(event)
-  const { targetType, selectedTeams, message } = notificationSchema.parse(body)
-
-  // Si team leader, forcer le targetType à 'teams' et valider les équipes
-  if (isTeamLeader) {
-    if (targetType !== 'teams' || !selectedTeams || selectedTeams.length === 0) {
-      throw createError({
-        status: 400,
-        message: "Les responsables d'équipe doivent cibler des équipes spécifiques",
-      })
+    // Construire la requête pour récupérer les bénévoles
+    const whereClause: any = {
+      eventId: editionId,
+      status: 'ACCEPTED',
     }
 
-    // Vérifier que toutes les équipes sélectionnées sont bien celles dont l'utilisateur est responsable
-    const invalidTeams = selectedTeams.filter((team) => !leaderTeamNames.includes(team))
-    if (invalidTeams.length > 0) {
-      throw createError({
-        status: 403,
-        message: `Vous n'êtes pas responsable de ces équipes : ${invalidTeams.join(', ')}`,
-      })
-    }
-  }
-
-  // Récupérer le nom d'affichage générique depuis l'Event (étape 0bis)
-  const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
-    errorMessage: 'Événement introuvable',
-    select: { name: true },
-  })
-
-  // Construire la requête pour récupérer les bénévoles
-  const whereClause: any = {
-    eventId: editionId,
-    status: 'ACCEPTED',
-  }
-
-  // Si on cible des équipes spécifiques
-  if (targetType === 'teams' && selectedTeams && selectedTeams.length > 0) {
-    // Utiliser la relation teamAssignments au lieu du champ JSON assignedTeams
-    whereClause.teamAssignments = {
-      some: {
-        team: {
-          name: {
-            in: selectedTeams,
+    // Si on cible des équipes spécifiques
+    if (targetType === 'teams' && selectedTeams && selectedTeams.length > 0) {
+      // Utiliser la relation teamAssignments au lieu du champ JSON assignedTeams
+      whereClause.teamAssignments = {
+        some: {
+          team: {
+            name: {
+              in: selectedTeams,
+            },
           },
         },
-      },
+      }
     }
-  }
 
-  // Récupérer les bénévoles acceptés
-  const volunteers = await prisma.editionVolunteerApplication.findMany({
-    where: whereClause,
-    include: {
-      user: {
-        select: userBasicSelect,
+    // Récupérer les bénévoles acceptés
+    const volunteers = await prisma.editionVolunteerApplication.findMany({
+      where: whereClause,
+      include: {
+        user: {
+          select: userBasicSelect,
+        },
       },
-    },
-  })
+    })
 
-  if (volunteers.length === 0) {
-    throw createError({ status: 400, message: 'Aucun bénévole trouvé avec ces critères' })
-  }
+    if (volunteers.length === 0) {
+      throw createError({ status: 400, message: 'Aucun bénévole trouvé avec ces critères' })
+    }
 
-  const displayName = eventRecord.name || 'votre événement'
-  const title = `Bénévoles - ${displayName}`
+    const displayName = eventRecord.name || 'votre événement'
+    const title = `Bénévoles - ${displayName}`
 
-  // Enregistrer les métadonnées du groupe de notifications pour le suivi
-  const notificationGroup = await prisma.volunteerNotificationGroup.create({
-    data: {
-      eventId: editionId,
-      senderId: user.id,
-      title,
-      message,
-      targetType,
-      // `Prisma.DbNull` : un envoi qui ne vise pas des équipes passait un null brut sur un
-      // champ `Json?`, que Prisma refuse.
-      selectedTeams: targetType === 'teams' ? selectedTeams : Prisma.DbNull,
-      recipientCount: volunteers.length,
-      sentAt: new Date(),
-    },
-  })
+    // Enregistrer les métadonnées du groupe de notifications pour le suivi
+    const notificationGroup = await prisma.volunteerNotificationGroup.create({
+      data: {
+        eventId: editionId,
+        senderId: user.id,
+        title,
+        message,
+        targetType,
+        // `Prisma.DbNull` : un envoi qui ne vise pas des équipes passait un null brut sur un
+        // champ `Json?`, que Prisma refuse.
+        selectedTeams: targetType === 'teams' ? selectedTeams : Prisma.DbNull,
+        recipientCount: volunteers.length,
+        sentAt: new Date(),
+      },
+    })
 
-  // URL de confirmation de lecture avec l'ID généré automatiquement
-  const confirmationUrl = `/editions/${editionId}/volunteers/notification/${notificationGroup.id}/confirm`
+    // URL de confirmation de lecture avec l'ID généré automatiquement
+    const confirmationUrl = `/editions/${editionId}/volunteers/notification/${notificationGroup.id}/confirm`
 
-  // Créer les enregistrements de confirmation pour chaque bénévole (avec confirmedAt = null)
-  await prisma.volunteerNotificationConfirmation.createMany({
-    data: volunteers.map((volunteer) => ({
-      volunteerNotificationGroupId: notificationGroup.id,
-      userId: volunteer.user.id,
-      confirmedAt: null,
-    })),
-  })
-
-  // Créer les notifications pour chaque bénévole
-  const ports = useVolunteerPorts()
-  await Promise.all(
-    volunteers.map((volunteer) =>
-      ports.notifications.notify({
+    // Créer les enregistrements de confirmation pour chaque bénévole (avec confirmedAt = null)
+    await prisma.volunteerNotificationConfirmation.createMany({
+      data: volunteers.map((volunteer) => ({
+        volunteerNotificationGroupId: notificationGroup.id,
         userId: volunteer.user.id,
-        type: 'INFO',
-        titleText: title,
-        messageText: message,
-        category: 'volunteer',
-        entityType: 'Edition',
-        entityId: editionId.toString(),
-        actionUrl: confirmationUrl,
-        actionText: 'Confirmer la lecture',
-      })
-    )
-  )
+        confirmedAt: null,
+      })),
+    })
 
-  return createSuccessResponse({
-    recipientCount: volunteers.length,
-    notificationGroupId: notificationGroup.id,
-    confirmationUrl,
-  })
-}, { operationName: 'CreateVolunteerNotification' })
+    // Créer les notifications pour chaque bénévole
+    const ports = useVolunteerPorts()
+    await Promise.all(
+      volunteers.map((volunteer) =>
+        ports.notifications.notify({
+          userId: volunteer.user.id,
+          type: 'INFO',
+          titleText: title,
+          messageText: message,
+          category: 'volunteer',
+          entityType: 'Edition',
+          entityId: editionId.toString(),
+          actionUrl: confirmationUrl,
+          actionText: 'Confirmer la lecture',
+        })
+      )
+    )
+
+    return createSuccessResponse({
+      recipientCount: volunteers.length,
+      notificationGroupId: notificationGroup.id,
+      confirmationUrl,
+    })
+  },
+  { operationName: 'CreateVolunteerNotification' }
+)

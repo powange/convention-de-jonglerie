@@ -12,136 +12,139 @@ const bodySchema = z.object({
   userId: z.number(),
 })
 
-export default wrapApiHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = validateEditionId(event)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  // Vérifier les permissions
-  const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      status: 403,
-      message: 'Droits insuffisants pour gérer les bénévoles',
-    })
+    // Vérifier les permissions
+    const allowed = await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        status: 403,
+        message: 'Droits insuffisants pour gérer les bénévoles',
+      })
 
-  const body = bodySchema.parse(await readBody(event))
+    const body = bodySchema.parse(await readBody(event))
 
-  // Vérifier que l'utilisateur existe
-  const targetUser = await fetchResourceOrFail(prisma.user, body.userId, {
-    errorMessage: 'Utilisateur introuvable',
-    select: {
-      id: true,
-      nom: true,
-      prenom: true,
-      email: true,
-      phone: true,
-    },
-  })
-
-  // Vérifier que l'événement existe (nom d'affichage générique — étape 0bis)
-  const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
-    errorMessage: 'Événement introuvable',
-    select: { name: true },
-  })
-
-  // Vérifier qu'il n'y a pas déjà une candidature
-  const existing = await prisma.editionVolunteerApplication.findUnique({
-    where: {
-      eventId_userId: {
-        eventId: editionId,
-        userId: body.userId,
+    // Vérifier que l'utilisateur existe
+    const targetUser = await fetchResourceOrFail(prisma.user, body.userId, {
+      errorMessage: 'Utilisateur introuvable',
+      select: {
+        id: true,
+        nom: true,
+        prenom: true,
+        email: true,
+        phone: true,
       },
-    },
-  })
-
-  if (existing) {
-    throw createError({
-      status: 409,
-      message: 'Cet utilisateur a déjà une candidature pour cette édition',
-    })
-  }
-
-  // Générer un token unique
-  let qrCodeToken = generateVolunteerQrCodeToken()
-  let isUnique = false
-  let attempts = 0
-  const maxAttempts = 10
-
-  while (!isUnique && attempts < maxAttempts) {
-    const existingToken = await prisma.editionVolunteerApplication.findUnique({
-      where: { qrCodeToken },
     })
 
-    if (!existingToken) {
-      isUnique = true
-    } else {
-      qrCodeToken = generateVolunteerQrCodeToken()
-      attempts++
-    }
-  }
-
-  if (!isUnique) {
-    throw createError({
-      status: 500,
-      message: 'Impossible de générer un token unique',
+    // Vérifier que l'événement existe (nom d'affichage générique — étape 0bis)
+    const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
+      errorMessage: 'Événement introuvable',
+      select: { name: true },
     })
-  }
 
-  // Créer la candidature avec le statut ACCEPTED
-  const application = await prisma.editionVolunteerApplication.create({
-    data: {
-      eventId: editionId,
-      userId: body.userId,
-      status: 'ACCEPTED',
-      motivation: 'Ajouté manuellement par un organisateur',
-      userSnapshotPhone: targetUser.phone || null,
-      // Le régime vit sur le profil ; la colonne garde sa valeur par défaut.
-      setupAvailability: null,
-      teardownAvailability: null,
-      eventAvailability: null,
-      source: 'MANUAL',
-      addedById: user.id,
-      addedAt: new Date(),
-      qrCodeToken,
-    },
-    select: {
-      id: true,
-      status: true,
-      user: {
-        select: {
-          ...userWithNameSelect,
-          email: true,
+    // Vérifier qu'il n'y a pas déjà une candidature
+    const existing = await prisma.editionVolunteerApplication.findUnique({
+      where: {
+        eventId_userId: {
+          eventId: editionId,
+          userId: body.userId,
         },
       },
-    },
-  })
+    })
 
-  // Créer automatiquement les sélections de repas
-  try {
-    await useVolunteerPorts().meals.createVolunteerMealSelections(application.id, editionId)
-  } catch (mealError) {
-    console.error('Erreur lors de la création des repas du bénévole:', mealError)
-    // Ne pas faire échouer l'ajout si la création des repas échoue
-  }
+    if (existing) {
+      throw createError({
+        status: 409,
+        message: 'Cet utilisateur a déjà une candidature pour cette édition',
+      })
+    }
 
-  // Envoyer une notification à l'utilisateur ajouté
-  try {
-    await prisma.notification.create({
+    // Générer un token unique
+    let qrCodeToken = generateVolunteerQrCodeToken()
+    let isUnique = false
+    let attempts = 0
+    const maxAttempts = 10
+
+    while (!isUnique && attempts < maxAttempts) {
+      const existingToken = await prisma.editionVolunteerApplication.findUnique({
+        where: { qrCodeToken },
+      })
+
+      if (!existingToken) {
+        isUnique = true
+      } else {
+        qrCodeToken = generateVolunteerQrCodeToken()
+        attempts++
+      }
+    }
+
+    if (!isUnique) {
+      throw createError({
+        status: 500,
+        message: 'Impossible de générer un token unique',
+      })
+    }
+
+    // Créer la candidature avec le statut ACCEPTED
+    const application = await prisma.editionVolunteerApplication.create({
       data: {
+        eventId: editionId,
         userId: body.userId,
-        type: 'SUCCESS',
-        title: 'Vous avez été ajouté comme bénévole ! 🎉',
-        message: `Vous avez été ajouté comme bénévole pour "${eventRecord.name ?? 'votre événement'}". Votre candidature a été automatiquement acceptée.`,
-        category: 'volunteer',
-        entityType: 'Edition',
-        entityId: editionId.toString(),
-        actionUrl: `/editions/${editionId}/volunteers`,
-        actionText: 'Voir les détails',
+        status: 'ACCEPTED',
+        motivation: 'Ajouté manuellement par un organisateur',
+        userSnapshotPhone: targetUser.phone || null,
+        // Le régime vit sur le profil ; la colonne garde sa valeur par défaut.
+        setupAvailability: null,
+        teardownAvailability: null,
+        eventAvailability: null,
+        source: 'MANUAL',
+        addedById: user.id,
+        addedAt: new Date(),
+        qrCodeToken,
+      },
+      select: {
+        id: true,
+        status: true,
+        user: {
+          select: {
+            ...userWithNameSelect,
+            email: true,
+          },
+        },
       },
     })
-  } catch (notificationError) {
-    console.error("Erreur lors de l'envoi de la notification:", notificationError)
-  }
 
-  return createSuccessResponse({ application })
-}, { operationName: 'AddVolunteerManually' })
+    // Créer automatiquement les sélections de repas
+    try {
+      await useVolunteerPorts().meals.createVolunteerMealSelections(application.id, editionId)
+    } catch (mealError) {
+      console.error('Erreur lors de la création des repas du bénévole:', mealError)
+      // Ne pas faire échouer l'ajout si la création des repas échoue
+    }
+
+    // Envoyer une notification à l'utilisateur ajouté
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: body.userId,
+          type: 'SUCCESS',
+          title: 'Vous avez été ajouté comme bénévole ! 🎉',
+          message: `Vous avez été ajouté comme bénévole pour "${eventRecord.name ?? 'votre événement'}". Votre candidature a été automatiquement acceptée.`,
+          category: 'volunteer',
+          entityType: 'Edition',
+          entityId: editionId.toString(),
+          actionUrl: `/editions/${editionId}/volunteers`,
+          actionText: 'Voir les détails',
+        },
+      })
+    } catch (notificationError) {
+      console.error("Erreur lors de l'envoi de la notification:", notificationError)
+    }
+
+    return createSuccessResponse({ application })
+  },
+  { operationName: 'AddVolunteerManually' }
+)

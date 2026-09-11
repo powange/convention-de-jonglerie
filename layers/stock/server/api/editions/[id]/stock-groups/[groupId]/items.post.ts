@@ -139,9 +139,7 @@ export default wrapApiHandler(
         returnContact: isExternalLoan ? data.returnContact?.trim() || null : null,
         // Le comptage de fin vaut pour tout le matériel, emprunté ou non.
         finalQuantity: data.finalQuantity ?? null,
-        ...(tagIds.length > 0
-          ? { tags: { create: tagIds.map((tagId) => ({ tagId })) } }
-          : {}),
+        ...(tagIds.length > 0 ? { tags: { create: tagIds.map((tagId) => ({ tagId })) } } : {}),
       },
       include: stockItemLocationInclude,
     })

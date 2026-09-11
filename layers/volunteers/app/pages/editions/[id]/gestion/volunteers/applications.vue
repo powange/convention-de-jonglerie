@@ -107,7 +107,6 @@
           </div>
         </div>
 
-
         <!-- Message si pas les permissions -->
         <UCard v-if="!canViewVolunteersTable && !editionStore.loading && authStore.isAuthenticated">
           <div class="text-center py-12">
@@ -118,7 +117,6 @@
             </p>
           </div>
         </UCard>
-
       </div>
     </div>
 

@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto'
 
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'

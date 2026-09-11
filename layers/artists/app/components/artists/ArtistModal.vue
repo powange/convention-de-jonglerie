@@ -490,7 +490,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { z } from 'zod'
 
 import type { AllergySeverityLevel } from '~/utils/allergy-severity'
@@ -533,7 +532,6 @@ const currencySymbol = computed(() => {
     .format(0)
     .replace(/[\d\s.,\u00a0\u202f]/g, '')
 })
-
 
 const isOpen = computed({
   get: () => props.modelValue,

@@ -41,8 +41,7 @@ export function useCreneauLisible() {
       .join(' · ')
 
   /** Tout sur une ligne, là où un composant ne peut pas passer (un titre, une infobulle). */
-  const resume = (creneau: CreneauLisible) =>
-    `${intitule(creneau)} · ${horaire(creneau, 'court')}`
+  const resume = (creneau: CreneauLisible) => `${intitule(creneau)} · ${horaire(creneau, 'court')}`
 
   return { horaire, intitule, resume }
 }
