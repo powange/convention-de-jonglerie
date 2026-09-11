@@ -81,8 +81,8 @@ runs:
       id: cles
       shell: bash
       run: |
-        echo "deps=${{ runner.os }}-deps-v3-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
-        echo "prisma=${{ runner.os }}-prisma-v3-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+        echo "deps=${{ runner.os }}-deps-v3-VERIFSAVE-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+        echo "prisma=${{ runner.os }}-prisma-v3-VERIFSAVE-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
 
     - name: Restaurer node_modules (lecture seule)
       if: inputs.cache-mode == 'restaurer'
@@ -117,7 +117,7 @@ runs:
         path: apps/app1/server/generated/prisma
         key: ${{ steps.cles.outputs.prisma }}
         restore-keys: |
-          ${{ runner.os }}-prisma-v3-
+          ${{ runner.os }}-prisma-v3-VERIFSAVE-
 
     # Le filet du cache évincé. Le quota de 10 Go par dépôt s'évince en LRU : une entrée peut
     # disparaître entre le moment où `setup` la vérifie et celui où un job la lit. Échouer là-dessus
