@@ -681,7 +681,9 @@ const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
 const authStore = useAuthStore()
-const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id)
+// `pourCandidature` : le formulaire montre ce que le candidat verra, même ouvert en aperçu
+// par un organisateur — qui, lui, a le droit de voir les équipes cachées.
+const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id, { pourCandidature: true })
 
 const MOTIVATION_MAX = 2000
 
@@ -1053,7 +1055,10 @@ const showWhatYouCanBringSection = computed(() => {
 })
 
 // Fonction pour obtenir les repas disponibles selon le moment d'arrivée
-const getAvailableMealsOnArrival = (timeOfDay: string): string[] => {
+// `timeOfDay` peut manquer : il vient du découpage d'une chaîne « date_granularité », et une
+// valeur sans séparateur n'en produit pas. Le `switch` retombe alors sur son cas par défaut,
+// ce que la signature dit désormais au lieu de le laisser deviner.
+const getAvailableMealsOnArrival = (timeOfDay: string | undefined): string[] => {
   switch (timeOfDay) {
     case 'morning':
     case 'early_morning':
@@ -1073,7 +1078,10 @@ const getAvailableMealsOnArrival = (timeOfDay: string): string[] => {
 }
 
 // Fonction pour obtenir les repas disponibles selon le moment de départ
-const getAvailableMealsOnDeparture = (timeOfDay: string): string[] => {
+// `timeOfDay` peut manquer : il vient du découpage d'une chaîne « date_granularité », et une
+// valeur sans séparateur n'en produit pas. Le `switch` retombe alors sur son cas par défaut,
+// ce que la signature dit désormais au lieu de le laisser deviner.
+const getAvailableMealsOnDeparture = (timeOfDay: string | undefined): string[] => {
   switch (timeOfDay) {
     case 'morning':
     case 'early_morning':
@@ -1307,15 +1315,15 @@ const teamItems = computed(() => {
   if (!props.volunteersInfo?.askTeamPreferences || !volunteerTeams.value.length) {
     return []
   }
-  // Filtrer les équipes visibles aux bénévoles
-  return volunteerTeams.value
-    .filter((team) => team.isVisibleToVolunteers !== false)
-    .map((team) => ({
-      label: team.isRequired ? `${team.name} (${t('common.required')})` : team.name,
-      value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
-      // Désactiver les équipes obligatoires sauf si c'est un organisateur qui édite
-      disabled: team.isRequired && !isOrganizerEditingApplication.value,
-    }))
+  // Pas de filtre sur `isVisibleToVolunteers` ici : c'est l'API qui écarte désormais les équipes
+  // cachées. Le filtre vivait des deux côtés, et seul celui du navigateur agissait — c'est cette
+  // duplication qui a laissé le nom des équipes cachées sortir dans la réponse.
+  return volunteerTeams.value.map((team) => ({
+    label: team.isRequired ? `${team.name} (${t('common.required')})` : team.name,
+    value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
+    // Désactiver les équipes obligatoires sauf si c'est un organisateur qui édite
+    disabled: team.isRequired && !isOrganizerEditingApplication.value,
+  }))
 })
 
 // Items de créneaux horaires pour UCheckboxGroup
