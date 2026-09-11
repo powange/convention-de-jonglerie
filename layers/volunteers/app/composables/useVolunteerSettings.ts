@@ -6,7 +6,9 @@ export interface VolunteerSettings {
   description?: string | null
   mode: 'INTERNAL' | 'EXTERNAL'
   externalUrl?: string | null
-  counts: Record<string, number>
+  // Absent pour qui n'a pas le droit de gérer les bénévoles : le décompte des candidatures
+  // relève de la gestion, et une clé à zéro se lirait « personne n'a postulé ».
+  counts?: Record<string, number>
   myApplication?: any
   setupStartDate?: string
   teardownEndDate?: string

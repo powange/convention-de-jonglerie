@@ -56,8 +56,10 @@
         <div v-if="canViewVolunteersTable">
           <!-- Note visibilité + séparation avant statistiques & tableau organisateur -->
           <div v-if="volunteersMode === 'INTERNAL'">
-            <!-- Statistiques -->
-            <div v-if="volunteersInfo" class="mt-3 mb-3 flex flex-wrap gap-3">
+            <!-- Statistiques. Conditionnées aux compteurs eux-mêmes et non à la seule présence
+                 de la configuration : l'API ne les rend qu'à qui gère les bénévoles, et quatre
+                 pastilles à zéro se liraient « personne n'a postulé ». -->
+            <div v-if="volunteersInfo?.counts" class="mt-3 mb-3 flex flex-wrap gap-3">
               <UBadge color="neutral" variant="soft"
                 >{{ t('common.total') }}: {{ volunteersInfo.counts.total || 0 }}</UBadge
               >
