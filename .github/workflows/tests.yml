@@ -300,6 +300,12 @@ jobs:
           name: build-output-${{ github.run_id }}
           path: apps/app1/.output/
           retention-days: 1
+          # `actions/upload-artifact` exclut les fichiers et dossiers cachés par défaut depuis sa
+          # v4.4, et `.output` comme `.nuxt` commencent par un point : sans cette option, le step
+          # réussit en n'archivant RIEN — `if-no-files-found` valant `warn`, le job reste vert et
+          # l'artifact est simplement absent. Constaté ici : le premier run de cette fusion a fait
+          # échouer `playwright` sur « Artifact not found », alors que `build` était au vert.
+          include-hidden-files: true
 
       - name: Upload build artifacts
         if: failure()
@@ -310,6 +316,9 @@ jobs:
             apps/app1/.nuxt/
             apps/app1/.output/
           retention-days: 7
+          # Même raison que ci-dessus : ces deux chemins sont cachés, cet artifact de diagnostic
+          # était donc vide à chaque échec de build — sans que rien ne le signale.
+          include-hidden-files: true
 
   # Tests en parallèle avec matrice
   test:
@@ -386,6 +395,9 @@ jobs:
             apps/app1/coverage/
             apps/app1/.nuxt/
           retention-days: 7
+          # `.nuxt/` est caché : il était omis de cet artifact, qui ne contenait donc pas l'état
+          # Nuxt au moment de l'échec — précisément ce qu'on vient y chercher.
+          include-hidden-files: true
 
       - name: Upload coverage reports
         if: always() && (matrix.test-group.name == 'unit' || matrix.test-group.name == 'database')
