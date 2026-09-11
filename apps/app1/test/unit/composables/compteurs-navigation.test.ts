@@ -4,6 +4,7 @@ import {
   compteurNavigation,
   enregistrerFournisseurCompteur,
   oublierCompteursNavigation,
+  rafraichirCompteurs,
   rafraichirCompteursNavigation,
 } from '../../../../../layers/ui/app/composables/useCompteursNavigation'
 
@@ -167,5 +168,103 @@ describe('registre — entrées visibles seulement', () => {
 
     expect(compteurNavigation('a').value).toBe(1)
     expect(compteurNavigation('b').value).toBe(2)
+  })
+
+  describe('rafraîchissement ciblé', () => {
+    it('recharge la clé visée sans toucher aux autres', async () => {
+      // Le défaut que ce module referme : l'écran des emprunts se rafraîchissait en passant sa
+      // seule clé comme « liste des entrées visibles », ce qui effaçait toutes les autres. Sans
+      // conséquence tant qu'il n'y avait qu'un compteur, visible dès qu'il y en a eu trois.
+      let emprunts = 2
+      enregistrer('stock-emprunts', async () => emprunts)
+      enregistrer('benevoles-candidatures', async () => 5)
+
+      await rafraichirCompteursNavigation({ editionId: 1 }, [
+        'stock-emprunts',
+        'benevoles-candidatures',
+      ])
+      emprunts = 0
+
+      await rafraichirCompteurs('stock-emprunts')
+
+      expect(compteurNavigation('stock-emprunts').value).toBe(0)
+      expect(compteurNavigation('benevoles-candidatures').value).toBe(5)
+    })
+
+    it('réemploie le contexte du dernier rafraîchissement complet', async () => {
+      // L'écran qui appelle connaît son édition, mais pas ce que la navigation a résolu pour lui.
+      const vus: unknown[] = []
+      enregistrer('emprunts', async (contexte) => {
+        vus.push(contexte.editionId)
+        return 1
+      })
+
+      await rafraichirCompteursNavigation({ editionId: 22 }, ['emprunts'])
+      await rafraichirCompteurs('emprunts')
+
+      expect(vus).toEqual([22, 22])
+    })
+
+    it('ignore une clé que l’utilisateur ne voit pas', async () => {
+      // L'interroger lui vaudrait un refus du serveur, et le journal se remplirait de 403
+      // parfaitement légitimes.
+      const charger = vi.fn(async () => 3)
+      enregistrer('cachee', charger)
+      enregistrer('visible', async () => 1)
+
+      await rafraichirCompteursNavigation({ editionId: 1 }, ['visible'])
+      charger.mockClear()
+
+      await rafraichirCompteurs('cachee')
+
+      expect(charger).not.toHaveBeenCalled()
+      expect(compteurNavigation('cachee').value).toBeNull()
+    })
+
+    it('ignore une clé inconnue sans rien casser', async () => {
+      enregistrer('emprunts', async () => 4)
+      await rafraichirCompteursNavigation({ editionId: 1 }, ['emprunts'])
+
+      await rafraichirCompteurs('module-qui-n-existe-pas', 'emprunts')
+
+      expect(compteurNavigation('emprunts').value).toBe(4)
+    })
+
+    it('ne fait rien avant le premier rafraîchissement complet', async () => {
+      // Ni contexte, ni pastille affichée : il n'y a rien à mettre à jour, et deviner l'édition
+      // reviendrait à compter sur la mauvaise.
+      const charger = vi.fn(async () => 9)
+      enregistrer('emprunts', charger)
+
+      await rafraichirCompteurs('emprunts')
+
+      expect(charger).not.toHaveBeenCalled()
+      expect(compteurNavigation('emprunts').value).toBeNull()
+    })
+
+    it('oublie le contexte au changement d’édition', async () => {
+      // Sinon un rafraîchissement ciblé recompterait sur l'édition qu'on vient de quitter.
+      const charger = vi.fn(async () => 6)
+      enregistrer('emprunts', charger)
+      await rafraichirCompteursNavigation({ editionId: 1 }, ['emprunts'])
+
+      oublierCompteursNavigation()
+      charger.mockClear()
+      await rafraichirCompteurs('emprunts')
+
+      expect(charger).not.toHaveBeenCalled()
+    })
+
+    it('isole l’échec d’un compteur', async () => {
+      enregistrer('fautif', async () => {
+        throw new Error('500')
+      })
+      enregistrer('sain', async () => 7)
+      await rafraichirCompteursNavigation({ editionId: 1 }, ['fautif', 'sain'])
+
+      await expect(rafraichirCompteurs('fautif', 'sain')).resolves.toBeUndefined()
+      expect(compteurNavigation('fautif').value).toBeNull()
+      expect(compteurNavigation('sain').value).toBe(7)
+    })
   })
 })

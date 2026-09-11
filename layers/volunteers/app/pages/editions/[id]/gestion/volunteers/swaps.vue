@@ -111,7 +111,12 @@ const options = (approve: boolean) => ({
   body: () => ({ approve }),
   successMessage: { title: t('volunteers.swap_decided') },
   errorMessages: { default: t('volunteers.swap_decide_error') },
-  onSuccess: () => refresh(),
+  onSuccess: () => {
+    refresh()
+    // La pastille du menu compte les échanges qui attendent une décision : celui-ci vient d'être
+    // tranché, quel qu'en soit le sens.
+    rafraichirCompteurs('benevoles-echanges')
+  },
 })
 
 const validation = useApiActionById(
