@@ -97,6 +97,7 @@ import type { VolunteerStats, DayStats, VolunteerStatsIndividual } from '~/utils
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 
 import {
+  creneauxDesEquipes,
   equipesConnues,
   equipesDepuisUrl,
   granulariteDepuisUrl,
@@ -318,16 +319,12 @@ const filteredTeams = computed(() => {
   return teams
 })
 
-// Créneaux filtrés selon les équipes sélectionnées
-const filteredTimeSlots = computed(() => {
-  if (selectedTeams.value.length === 0) {
-    return convertedTimeSlots.value
-  }
-
-  return convertedTimeSlots.value.filter(
-    (slot) => !slot.teamId || selectedTeams.value.includes(slot.teamId)
-  )
-})
+// Créneaux filtrés selon les équipes sélectionnées. La règle vit dans un util : elle est lue ici
+// pour l'affichage et plus bas pour l'export, et c'est de leur divergence qu'est né le défaut où
+// l'export emportait tout le planning malgré le filtre.
+const filteredTimeSlots = computed(() =>
+  creneauxDesEquipes(convertedTimeSlots.value, selectedTeams.value)
+)
 
 // Computed pour les dates avec fallbacks
 // Utilise les dates de montage/démontage si définies, sinon les dates de l'édition
@@ -430,6 +427,19 @@ const exportToPdf = async () => {
     doc.setTextColor(107, 114, 128) // Gris
     const subtitle = `${props.edition?.convention?.name || ''} - ${props.formatDateTimeRange(props.edition?.startDate || '', props.edition?.endDate || '')}`
     doc.text(subtitle, margin, currentY)
+
+    // Une feuille filtrée doit le dire. Celui qui la relit le lendemain n'a aucun moyen de savoir
+    // qu'elle ne couvre qu'une partie du planning, et conclurait qu'il n'y a rien d'autre.
+    // Nommées depuis la liste complète et non depuis `filteredTeams` : cette dernière écarte, pour
+    // qui ne gère pas, les équipes sans créneau — et une équipe retenue dans le filtre doit être
+    // nommée même si elle n'a rien à montrer, sinon la feuille paraît couvrir moins qu'annoncé.
+    const equipesFiltrees = convertedTeams.value
+      .filter((equipe) => selectedTeams.value.includes(equipe.id))
+      .map((equipe) => equipe.name)
+    if (equipesFiltrees.length > 0) {
+      currentY += 5
+      doc.text(`Équipes : ${equipesFiltrees.join(', ')}`, margin, currentY)
+    }
     currentY += 15
     doc.setTextColor(0, 0, 0) // Réinitialiser en noir
 
@@ -448,7 +458,9 @@ const exportToPdf = async () => {
         `Nombre total de bénévoles : ${props.volunteersStats?.totalVolunteers || 0}`,
         `Heures totales de bénévolat : ${props.volunteersStats?.totalHours.toFixed(1) || '0.0'}h`,
         `Moyenne d'heures par bénévole : ${props.volunteersStats?.averageHours.toFixed(1) || '0.0'}h`,
-        `Nombre total de créneaux : ${props.timeSlots?.length || 0}`,
+        // Compté sur ce qui figure réellement sur la feuille : annoncer le total de l'édition
+        // au-dessus d'une liste filtrée ferait se contredire la page.
+        `Nombre de créneaux sur cette feuille : ${filteredTimeSlots.value.length}`,
       ]
 
       stats.forEach((stat) => {
@@ -488,9 +500,12 @@ const exportToPdf = async () => {
       return truncated + '...'
     }
 
-    // Liste chronologique des créneaux avec bénévoles
-    // Utiliser convertedTimeSlots qui contient assignedVolunteersList
-    const slotsToExport = convertedTimeSlots.value
+    // Liste chronologique des créneaux avec bénévoles.
+    //
+    // `filteredTimeSlots` et non `convertedTimeSlots` : la feuille doit porter ce que l'écran
+    // montre. Prendre la liste non filtrée exportait tout le planning de l'édition alors qu'on
+    // venait de le restreindre à une équipe — et rien sur la feuille ne le disait.
+    const slotsToExport = filteredTimeSlots.value
     if (slotsToExport && slotsToExport.length > 0) {
       checkNewPage(40)
       doc.setFontSize(14)

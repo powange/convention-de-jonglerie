@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 
 import {
+  creneauxDesEquipes,
   equipesConnues,
   equipesDepuisUrl,
   granulariteDepuisUrl,
@@ -87,5 +88,43 @@ describe('requeteFiltres', () => {
       teams: 'bar',
       granularity: '60',
     })
+  })
+})
+
+describe('creneauxDesEquipes', () => {
+  const creneau = (id: string, teamId: string | null) => ({ id, teamId })
+
+  it('ne filtre rien quand aucune équipe n’est retenue', () => {
+    // C'est l'état d'arrivée de l'écran : il montre tout.
+    const creneaux = [creneau('a', 'bar'), creneau('b', 'accueil')]
+
+    expect(creneauxDesEquipes(creneaux, [])).toEqual(creneaux)
+  })
+
+  it('ne garde que les créneaux des équipes retenues', () => {
+    const creneaux = [creneau('a', 'bar'), creneau('b', 'accueil'), creneau('c', 'cuisine')]
+
+    expect(creneauxDesEquipes(creneaux, ['bar', 'cuisine']).map((c) => c.id)).toEqual(['a', 'c'])
+  })
+
+  it('garde toujours un créneau sans équipe', () => {
+    // Il ne relève d'aucune équipe en particulier — accueil général, coup de main ponctuel — et
+    // l'écarter le rendrait invisible dès qu'on regarde une équipe, alors qu'il concerne tout
+    // le monde.
+    const creneaux = [creneau('a', 'bar'), creneau('libre', null), creneau('c', undefined as never)]
+
+    expect(creneauxDesEquipes(creneaux, ['accueil']).map((c) => c.id)).toEqual(['libre', 'c'])
+  })
+
+  it('rend une nouvelle liste plutôt que celle reçue', () => {
+    // Les appelants la trient sur place pour l'impression : trier la liste d'origine réordonnerait
+    // le calendrier par effet de bord.
+    const creneaux = [creneau('a', 'bar')]
+
+    expect(creneauxDesEquipes(creneaux, [])).not.toBe(creneaux)
+  })
+
+  it('rend une liste vide quand aucune équipe retenue n’a de créneau', () => {
+    expect(creneauxDesEquipes([creneau('a', 'bar')], ['cuisine'])).toEqual([])
   })
 })

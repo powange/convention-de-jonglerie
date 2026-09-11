@@ -63,3 +63,32 @@ export function requeteFiltres(
 
   return query
 }
+
+/** Un créneau, réduit à ce dont le filtre a besoin. */
+export interface CreneauFiltrable {
+  teamId?: string | null
+}
+
+/**
+ * Les créneaux que le filtre d'équipes laisse voir.
+ *
+ * Une sélection vide ne filtre rien : c'est l'état d'arrivée de l'écran, et il montre tout.
+ *
+ * Un créneau **sans équipe** passe toujours, même quand on filtre. Il ne relève d'aucune équipe en
+ * particulier — accueil général, coup de main ponctuel — et l'écarter le rendrait invisible dès
+ * qu'on regarde une équipe, alors qu'il concerne tout le monde.
+ *
+ * La règle vit ici parce qu'elle était lue à deux endroits : ce que le calendrier affiche, et ce
+ * que l'export PDF emporte. Le second ne l'appliquait pas — on filtrait sur une équipe, on
+ * exportait, et l'on obtenait le planning de toute l'édition. Une feuille imprimée ne se rattrape
+ * pas : celui qui la relit le lendemain n'a aucun moyen de savoir qu'elle dit autre chose que
+ * l'écran d'où elle sort.
+ */
+export function creneauxDesEquipes<T extends CreneauFiltrable>(
+  creneaux: readonly T[],
+  equipesRetenues: readonly string[]
+): T[] {
+  if (equipesRetenues.length === 0) return [...creneaux]
+
+  return creneaux.filter((creneau) => !creneau.teamId || equipesRetenues.includes(creneau.teamId))
+}
