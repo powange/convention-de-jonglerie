@@ -1,0 +1,169 @@
+name: Préparer l'environnement
+description: >-
+  Installe Node, calcule les clés de cache, restaure (ou amorce) node_modules et le client Prisma,
+  et remet en place ce qu'une restauration de cache ne reconstitue pas.
+
+# Pourquoi cette action existe
+#
+# Les six jobs de la CI répétaient la même séquence de cinq à huit steps. Deux incidents en sont
+# sortis, et c'était deux fois le MÊME oubli : le rappel `lier-layers-node-modules.mjs` présent dans
+# un job, absent d'un autre. La première fois, tous les types de `layers/` se sont dégradés en
+# `any` — un pan entier du code cessait d'être vérifié sans que rien ne devienne rouge. La seconde,
+# la CI a cassé sur « Failed to resolve import "vue" » dès qu'un util de layer a importé un paquet.
+#
+# Un bloc copié six fois rend cette classe d'erreur invisible à la relecture : rien ne signale
+# l'absence d'un step, il faut comparer les six copies pour la voir. Ici, ce qu'un job fait ou ne
+# fait pas tient dans les quelques lignes de son appel.
+#
+# Le calcul des clés de cache est également remonté ici. Il vivait en double, dans tests.yml et
+# playwright.yml, et leur égalité — qui conditionne le partage d'une seule entrée de cache entre les
+# deux workflows — ne reposait que sur un commentaire demandant de répercuter toute modification
+# dans l'autre fichier. Elle ne repose plus sur la vigilance de personne.
+
+inputs:
+  cache-mode:
+    description: >-
+      `restaurer` : lecture seule (`actions/cache/restore`), le job ne sauvegarde jamais — c'est au
+      job `setup` d'écrire. `lire-ecrire` : `actions/cache`, qui sauvegarde en post-job sur miss —
+      pour playwright.yml, qui n'a pas de job d'amorçage en amont. `cles-seules` : ne touche à aucun
+      cache et ne fait que poser Node et calculer les clés, pour un job qui gère lui-même son cache.
+    required: false
+    default: restaurer
+  prisma:
+    description: >-
+      `si-manquant` : le client n'est généré que si son cache a manqué. `toujours` : il est
+      régénéré dans tous les cas, ce dont le job `build` a besoin pour éviter les incohérences avec
+      le cache des node_modules.
+    required: false
+    default: si-manquant
+  preparer-nuxt:
+    description: >-
+      `true` pour exécuter `nuxi prepare`. Nécessaire à qui lit `.nuxt` sans le générer — vitest
+      résout l'alias `#build` vers lui. Inutile à `nuxt typecheck`, qui appelle lui-même
+      `writeTypes` + `buildNuxt`, et à `nuxt build`, qui le reconstruit.
+    required: false
+    default: 'false'
+  lier-layers:
+    description: >-
+      `true` pour rétablir `layers/node_modules`. Ne concerne que ce qui résout les paquets en
+      remontant l'arborescence depuis le fichier : le typage (vue-tsc) et vitest. Vite et Nitro
+      résolvent depuis le contexte de l'app, donc `build` et `playwright` n'en ont pas besoin.
+    required: false
+    default: 'false'
+
+outputs:
+  deps-cache-key:
+    description: Clé du cache de `apps/app1/node_modules`.
+    value: ${{ steps.cles.outputs.deps }}
+  prisma-cache-key:
+    description: Clé du cache du client Prisma généré.
+    value: ${{ steps.cles.outputs.prisma }}
+
+runs:
+  using: composite
+  steps:
+    # `actions/checkout` reste dans le job appelant : cette action vit dans le dépôt, elle n'existe
+    # pas tant que le code n'est pas là — elle ne peut donc pas faire le checkout elle-même.
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'
+        cache-dependency-path: 'apps/app1/package-lock.json'
+
+    # `~/.npm` n'est listé dans aucun `path:` ci-dessous : `setup-node` le met déjà en cache via
+    # `cache: 'npm'`, et comme `node_modules` est restauré tel quel, npm ne relit jamais son cache.
+    # L'y ajouter ne faisait que gonfler l'archive que six jobs téléchargent.
+    #
+    # Les chemins de `hashFiles()` restent relatifs à GITHUB_WORKSPACE, y compris depuis une action
+    # composite : ils ne sont pas relatifs au dossier de l'action.
+    - name: Calculer les clés de cache
+      id: cles
+      shell: bash
+      run: |
+        echo "deps=${{ runner.os }}-deps-v3-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+        echo "prisma=${{ runner.os }}-prisma-v3-${{ hashFiles('apps/app1/prisma/schema/**', 'apps/app1/prisma.config.ts') }}-${{ hashFiles('apps/app1/package-lock.json') }}" >> $GITHUB_OUTPUT
+
+    - name: Restaurer node_modules (lecture seule)
+      if: inputs.cache-mode == 'restaurer'
+      id: deps-lecture
+      uses: actions/cache/restore@v4
+      with:
+        path: apps/app1/node_modules
+        key: ${{ steps.cles.outputs.deps }}
+
+    - name: Restaurer le client Prisma (lecture seule)
+      if: inputs.cache-mode == 'restaurer'
+      id: prisma-lecture
+      uses: actions/cache/restore@v4
+      with:
+        path: apps/app1/server/generated/prisma
+        key: ${{ steps.cles.outputs.prisma }}
+
+    - name: Mettre node_modules en cache
+      if: inputs.cache-mode == 'lire-ecrire'
+      id: deps-ecriture
+      uses: actions/cache@v4
+      with:
+        path: apps/app1/node_modules
+        key: ${{ steps.cles.outputs.deps }}
+        # Pas de restore-keys : un cache construit sur un autre lockfile serait incompatible.
+
+    - name: Mettre le client Prisma en cache
+      if: inputs.cache-mode == 'lire-ecrire'
+      id: prisma-ecriture
+      uses: actions/cache@v4
+      with:
+        path: apps/app1/server/generated/prisma
+        key: ${{ steps.cles.outputs.prisma }}
+        restore-keys: |
+          ${{ runner.os }}-prisma-v3-
+
+    # Le filet du cache évincé. Le quota de 10 Go par dépôt s'évince en LRU : une entrée peut
+    # disparaître entre le moment où `setup` la vérifie et celui où un job la lit. Échouer là-dessus
+    # mettait la CI au rouge pour une raison étrangère à la PR ; on réinstalle, c'est plus lent ce
+    # jour-là mais le résultat reste juste.
+    #
+    # Les deux modes sont testés séparément plutôt que par `||` sur les outputs : une condition
+    # muette lorsqu'un step n'a pas tourné laisserait passer une installation inutile sans bruit.
+    - name: Réinstaller si le cache a disparu
+      if: >-
+        (inputs.cache-mode == 'restaurer' && steps.deps-lecture.outputs.cache-hit != 'true')
+        || (inputs.cache-mode == 'lire-ecrire' && steps.deps-ecriture.outputs.cache-hit != 'true')
+      shell: bash
+      working-directory: ${{ github.workspace }}/apps/app1
+      run: npm ci --prefer-offline --no-audit
+
+    - name: Générer le client Prisma
+      if: >-
+        (inputs.cache-mode != 'cles-seules' && inputs.prisma == 'toujours')
+        || (inputs.cache-mode == 'restaurer' && steps.prisma-lecture.outputs.cache-hit != 'true')
+        || (inputs.cache-mode == 'lire-ecrire' && steps.prisma-ecriture.outputs.cache-hit != 'true')
+      shell: bash
+      working-directory: ${{ github.workspace }}/apps/app1
+      run: npx prisma generate
+
+    # Avant `nuxi prepare`, et non après : le `postinstall` du paquet enchaîne ce script puis
+    # `nuxt prepare`, donc c'est l'ordre qu'une installation complète produit d'elle-même.
+    #
+    # Dans le cas courant, le cache restaure `node_modules` sans rejouer `npm ci`, donc sans ce
+    # `postinstall` — d'où ce rappel. Il reste utile quand le filet ci-dessus a joué : l'appeler deux
+    # fois ne coûte rien (le script sort sur `deja-lie`), alors que l'oublier une fois fait passer la
+    # vérification à côté.
+    - name: Relier les dépendances aux layers
+      if: inputs.lier-layers == 'true'
+      shell: bash
+      working-directory: ${{ github.workspace }}/apps/app1
+      run: node scripts/lier-layers-node-modules.mjs
+
+    # Régénéré à chaque run, jamais mis en cache : le contenu de `.nuxt` dérive de TOUT le code
+    # (composants, composables, fichiers de `layers/`), alors que la clé ne pouvait raisonnablement
+    # hacher que la configuration. Un commit ajoutant un composable ne la changeait pas, donc un
+    # `.nuxt` périmé était restauré et le prepare sauté — et le lint comme les tests travaillaient
+    # sur des déclarations absentes. `nuxi prepare` coûte à peu près ce que coûtaient la sauvegarde
+    # et la restauration de l'archive : on échangeait un risque de faux résultat contre rien.
+    - name: Préparer Nuxt
+      if: inputs.preparer-nuxt == 'true'
+      shell: bash
+      working-directory: ${{ github.workspace }}/apps/app1
+      run: npx nuxi prepare
