@@ -594,6 +594,12 @@ import {
   assignVolunteerTeams,
 } from '~/utils/volunteer-application-api'
 
+import {
+  chaineDeRequete,
+  parametresDesCandidatures,
+  type FiltresCandidatures,
+} from '../../../utils/parametres-candidatures'
+
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
@@ -791,42 +797,29 @@ const resetApplicationsFilters = () => {
   refreshApplications()
 }
 
+/**
+ * Les filtres de l'écran, rassemblés sous la forme que l'util attend.
+ *
+ * Un seul endroit à compléter quand un filtre s'ajoute : la liste et l'export le prendront tous
+ * deux, au lieu qu'on doive y penser deux fois.
+ */
+const filtresCourants = (): FiltresCandidatures => ({
+  statut: applicationsFilterStatus.value,
+  equipesSouhaitees: applicationsFilterTeams.value,
+  presence: applicationsFilterPresence.value,
+  equipesAssignees: applicationsFilterAssignedTeams.value,
+  recherche: globalFilter.value,
+})
+
 const refreshApplications = async () => {
   applicationsLoading.value = true
   try {
-    const primary = sorting.value[0]
-    const secondary = sorting.value.slice(1)
-    const sortField = primary?.id || 'createdAt'
-    const sortDir = primary?.desc ? 'desc' : 'asc'
-    const sortSecondary =
-      secondary.map((s) => `${s.id}:${s.desc ? 'desc' : 'asc'}`).join(',') || undefined
-
     const res: any = await $fetch(`/api/editions/${props.editionId}/volunteers/applications`, {
-      query: {
+      query: parametresDesCandidatures(filtresCourants(), sorting.value, {
+        usage: 'liste',
         page: serverPagination.value.page,
         pageSize: serverPagination.value.pageSize,
-        status:
-          applicationsFilterStatus.value && applicationsFilterStatus.value !== 'ALL'
-            ? applicationsFilterStatus.value
-            : undefined,
-        teams:
-          applicationsFilterTeams.value.length > 0
-            ? applicationsFilterTeams.value.join(',')
-            : undefined,
-        presence:
-          applicationsFilterPresence.value.length > 0
-            ? applicationsFilterPresence.value.join(',')
-            : undefined,
-        assignedTeams:
-          applicationsFilterAssignedTeams.value.length > 0
-            ? applicationsFilterAssignedTeams.value.join(',')
-            : undefined,
-        sortField,
-        sortDir,
-        sortSecondary,
-        search: globalFilter.value || undefined,
-        includeTeams: 'true', // Inclure les équipes du nouveau système
-      },
+      }),
     } as any)
     applications.value = res.data || []
     if (res.pagination) {
@@ -1108,42 +1101,11 @@ const confirmTeamsModal = async () => {
 const exportApplications = async () => {
   exportingApplications.value = true
   try {
-    // Convert sorting state en paramètres existants (compat backend)
-    const primary = sorting.value[0]
-    const secondary = sorting.value.slice(1)
-    const sortField = primary?.id || 'createdAt'
-    const sortDir = primary?.desc ? 'desc' : 'asc'
-    const sortSecondary =
-      secondary.map((s) => `${s.id}:${s.desc ? 'desc' : 'asc'}`).join(',') || undefined
-
-    const params = {
-      export: 'true', // Paramètre spécial pour l'export
-      status:
-        applicationsFilterStatus.value && applicationsFilterStatus.value !== 'ALL'
-          ? applicationsFilterStatus.value
-          : undefined,
-      teams:
-        applicationsFilterTeams.value.length > 0
-          ? applicationsFilterTeams.value.join(',')
-          : undefined,
-      presence:
-        applicationsFilterPresence.value.length > 0
-          ? applicationsFilterPresence.value.join(',')
-          : undefined,
-      assignedTeams:
-        applicationsFilterAssignedTeams.value.length > 0
-          ? applicationsFilterAssignedTeams.value.join(',')
-          : undefined,
-      sortField,
-      sortDir,
-      sortSecondary,
-      search: globalFilter.value || undefined,
-    }
-
-    // Créer l'URL avec les paramètres
-    const queryString = new URLSearchParams(
-      Object.entries(params).filter(([_, value]) => value !== undefined) as [string, string][]
-    ).toString()
+    // Mêmes filtres et même tri que la liste, par construction : ce qu'on exporte est ce qu'on
+    // voit. C'était déjà vrai, mais par recopie — et une recopie finit par diverger.
+    const queryString = chaineDeRequete(
+      parametresDesCandidatures(filtresCourants(), sorting.value, { usage: 'export' })
+    )
 
     const url = `/api/editions/${props.editionId}/volunteers/applications?${queryString}`
 
