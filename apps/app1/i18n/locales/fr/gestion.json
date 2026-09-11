@@ -432,7 +432,7 @@
       "clear_selection": "Effacer la sélection",
       "columns": "Colonnes",
       "confirm_cancel_reservation": "Annuler cette réservation ?",
-      "confirm_delete_group": "Supprimer le groupe « {name} » et ses {count} objet(s) ?",
+      "confirm_delete_group": "Supprimer le groupe « {name} » et ses {objets} objet(s) ? Cette action est irréversible. | Supprimer le groupe « {name} » ? Ses {objets} objet(s) et {count} réservation seront définitivement supprimés — elle a pu être posée par quelqu’un d’autre. | Supprimer le groupe « {name} » ? Ses {objets} objet(s) et {count} réservations seront définitivement supprimés — certaines ont pu être posées par d’autres personnes.",
       "confirm_delete_group_simple": "Supprimer le groupe « {name} » ?",
       "confirm_delete_item": "Supprimer l'objet « {name} » ?",
       "confirm_delete_reservation": "Supprimer cette réservation ?",
