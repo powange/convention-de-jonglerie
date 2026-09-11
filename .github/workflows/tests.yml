@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Reporté de playwright.yml lors de sa fusion ici : c'était le seul des deux workflows à offrir
+  # un déclenchement manuel, et la suite Playwright est justement celle qu'on veut parfois rejouer
+  # seule, sans pousser de commit.
+  workflow_dispatch:
 
 # Chaque push sur une PR ouverte relançait les 9 checks en laissant les précédents aller au bout.
 # Les minutes sont gratuites sur un dépôt public, mais la limite de 20 jobs simultanés du compte
@@ -17,9 +21,21 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Ici, le strict minimum réellement commun aux six jobs — un `env:` de workflow s'applique à tous,
+# sans possibilité de le retirer ensuite.
+#
+# `NODE_ENV` n'y est PLUS, et c'est le point délicat de la fusion de playwright.yml dans ce fichier.
+# Le serveur que Playwright démarre tournait jusqu'ici sans `NODE_ENV` du tout, playwright.yml ne le
+# déclarant pas. Le laisser à `test` au niveau workflow aurait changé le comportement du serveur
+# e2e : `cache-helpers.ts` teste `!== 'test'`, `prisma.ts` teste `'development'`, et surtout
+# `csrf.ts` comme `impersonation-helpers.ts` posent leurs cookies avec
+# `secure: NODE_ENV === 'production'` — un cookie `secure` ne serait pas renvoyé sur le HTTP de
+# localhost. Chaque job porte donc son propre `NODE_ENV`, et le job `playwright` n'en a aucun.
 env:
-  NODE_ENV: test
   DATABASE_URL: mysql://root:rootpassword@localhost:3306/convention_db_test
+  # playwright.yml en déclarait une autre valeur (`..._32_chars_minimum_here`). Les deux sont
+  # interchangeables : aucun code ne dépend du littéral, `server/plugins/validate-config.ts` exige
+  # seulement 32 caractères au démarrage, et celle-ci en fait 34.
   NUXT_SESSION_PASSWORD: test_session_password_32_chars_min
   NUXT_PUBLIC_SITE_URL: http://localhost:3000
   # Désactiver les emails en test
@@ -46,6 +62,8 @@ jobs:
   setup:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    env:
+      NODE_ENV: test
 
     steps:
       - name: Checkout code
@@ -128,6 +146,8 @@ jobs:
   lint:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
+    env:
+      NODE_ENV: test
     needs: setup
 
     steps:
@@ -157,6 +177,8 @@ jobs:
   typecheck:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    env:
+      NODE_ENV: test
     needs: setup
 
     steps:
@@ -227,6 +249,11 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    # `test` et non `production` ici : avec `NODE_ENV=production`, le `npm ci` du filet de cache
+    # sauterait les devDependencies, donc Nuxt lui-même. C'est le seul STEP de build qui passe en
+    # production — voir son commentaire.
+    env:
+      NODE_ENV: test
     needs: setup
 
     steps:
@@ -241,8 +268,44 @@ jobs:
           # Ni prepare ni lien des layers : `nuxt build` reconstruit `.nuxt`, et Vite comme Nitro
           # résolvent les paquets depuis le contexte de l'app, pas en remontant depuis `layers/`.
 
+      # NE PAS remettre ce build sur le `NODE_ENV=test` des autres jobs, même si l'incohérence
+      # apparente saute aux yeux.
+      #
+      # L'application était buildée DEUX FOIS par PR, et les deux builds différaient : celui-ci en
+      # `test`, celui de playwright.yml en `production`. `nuxt.config.ts` lit `process.env.NODE_ENV`
+      # au build à au moins six endroits — devtools, chargement de `@nuxt/test-utils/module`,
+      # sourcemaps client, linkChecker, sitemap, ogImage, plus la CSP. Le job censé prouver « que le
+      # build fonctionne » ne validait donc PAS la configuration qui part en production : une panne
+      # propre à celle-ci — sitemap, images OG — n'était vue que par Playwright, ou par personne.
+      #
+      # Depuis, ce build est le seul du run, en configuration production, et Playwright le consomme
+      # via l'artifact ci-dessous. Le repasser en `test` ferait silencieusement réapparaître l'angle
+      # mort, sans qu'aucun test ne devienne rouge.
       - name: Build application
         run: npm run build
+        env:
+          NODE_ENV: production
+
+      # Le seul build du run, transmis au job `playwright`. `retention-days: 1` parce que c'est un
+      # intermédiaire de run, pas un livrable : personne n'a de raison de le rouvrir le lendemain.
+      #
+      # `process.env.E2E_TEST` est lu à l'EXÉCUTION, pas inliné au build — vérifié dans un
+      # `.output/` produit en CI, où les sept occurrences survivent littéralement
+      # (`max: process.env.E2E_TEST === "true" ? 100 : 5`), alors que `import.meta.dev` a bien été
+      # substitué. Cet artifact est donc un vrai build production, et non un build « parfumé e2e » :
+      # c'est le job `playwright` qui porte `E2E_TEST`, au démarrage du serveur.
+      - name: Publier le build pour le job playwright
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output-${{ github.run_id }}
+          path: apps/app1/.output/
+          retention-days: 1
+          # `actions/upload-artifact` exclut les fichiers et dossiers cachés par défaut depuis sa
+          # v4.4, et `.output` comme `.nuxt` commencent par un point : sans cette option, le step
+          # réussit en n'archivant RIEN — `if-no-files-found` valant `warn`, le job reste vert et
+          # l'artifact est simplement absent. Constaté ici : le premier run de cette fusion a fait
+          # échouer `playwright` sur « Artifact not found », alors que `build` était au vert.
+          include-hidden-files: true
 
       - name: Upload build artifacts
         if: failure()
@@ -253,11 +316,16 @@ jobs:
             apps/app1/.nuxt/
             apps/app1/.output/
           retention-days: 7
+          # Même raison que ci-dessus : ces deux chemins sont cachés, cet artifact de diagnostic
+          # était donc vide à chaque échec de build — sans que rien ne le signale.
+          include-hidden-files: true
 
   # Tests en parallèle avec matrice
   test:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
+    env:
+      NODE_ENV: test
     # Seul `setup` est nécessaire : il amorce les caches (node_modules, client Prisma) que la
     # préparation ci-dessous restaure. Ni `lint` ni `build` ne produisent quoi que ce soit que les
     # tests consomment — vitest lit `.nuxt` via l'alias `#build` et ne touche jamais à `.output/`,
@@ -327,6 +395,9 @@ jobs:
             apps/app1/coverage/
             apps/app1/.nuxt/
           retention-days: 7
+          # `.nuxt/` est caché : il était omis de cet artifact, qui ne contenait donc pas l'état
+          # Nuxt au moment de l'échec — précisément ce qu'on vient y chercher.
+          include-hidden-files: true
 
       - name: Upload coverage reports
         if: always() && (matrix.test-group.name == 'unit' || matrix.test-group.name == 'database')
@@ -335,3 +406,131 @@ jobs:
           name: coverage-reports-${{ matrix.test-group.name }}-${{ github.run_id }}
           path: apps/app1/coverage/
           retention-days: 30
+
+  # Suite Playwright, rapatriée de playwright.yml — supprimé avec cette fusion. Elle couvre des
+  # parcours que rien d'autre ne vérifie : import de carte, trésorerie, droits d'organisateur.
+  #
+  # Le nom du job reste `playwright`, à l'identique : c'est le nom du check, et le renommer
+  # casserait silencieusement une règle de protection de branche qui l'exigerait.
+  playwright:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    # Ce job ne builde plus rien : il consomme le `.output/` du job `build`. Il démarre donc plus
+    # tard qu'avant, où il partait à t=0 en parallèle de tout — le gain est en compute et en
+    # justesse (un seul build, et c'est celui de production qui est testé), pas en horloge.
+    needs: build
+
+    # Ces trois variables n'existaient que dans playwright.yml et restent portées par ce seul job :
+    # au niveau workflow elles toucheraient lint, typecheck, build et test, qui n'en ont que faire.
+    #
+    # `E2E_TEST` relève les limites de débit à 100 (`rate-limiter.ts`) et court-circuite l'envoi
+    # d'invitations et d'emails. Elle doit être là au DÉMARRAGE du serveur, puisque le bundle la lit
+    # à l'exécution — et non plus au build, qui se fait maintenant ailleurs.
+    #
+    # Pas de `NODE_ENV` : le serveur e2e tournait déjà sans, et plusieurs fichiers serveur changent
+    # de comportement selon sa valeur. Voir le commentaire du bloc `env:` du workflow.
+    env:
+      E2E_TEST: true
+      # Secret de chiffrement (valeur de TEST uniquement) — requis par les endpoints qui chiffrent
+      # des secrets côté serveur (config SumUp, billetterie externe HelloAsso/Infomaniak). Lus à
+      # l'exécution seulement (`server/utils/encryption.ts`), donc inutiles au job `build`.
+      ENCRYPTION_SECRET: test_encryption_secret_for_ci_e2e_only
+      ENCRYPTION_SALT: test_encryption_salt_for_ci_e2e_only
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: convention_db_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Préparer l'environnement
+        uses: ./.github/actions/preparer-env
+        with:
+          # `restaurer` et non plus un mode écrivain : ce job dépend désormais de `build`, donc de
+          # `setup`, qui a déjà amorcé les deux entrées. Quand playwright.yml était autonome il
+          # devait les écrire lui-même ; le garder écrivain ici en ferait un second candidat à la
+          # réservation de la même clé, ce qu'on a précisément supprimé en #362.
+          #
+          # Ni prepare ni lien des layers : ce job ne compile rien, il exécute le bundle de
+          # `.output/`, où tout est déjà résolu.
+          cache-mode: restaurer
+
+      - name: Récupérer le build produit par le job build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output-${{ github.run_id }}
+          # Chemin relatif à la RACINE du dépôt, comme tous les chemins d'actions ici.
+          path: apps/app1/.output
+
+      # Les artifacts transitent par un zip, qui ne conserve ni les bits d'exécution ni les liens
+      # symboliques. Ça ne gêne pas `node .output/server/index.mjs` — node lit le fichier, il ne
+      # l'exécute pas — mais autant que l'absence du point d'entrée se voie ici plutôt que dans un
+      # timeout de `wait-on` soixante secondes plus loin.
+      - name: Vérifier le build téléchargé
+        run: |
+          ls -la .output/ || { echo "::error::.output/ absent après téléchargement"; exit 1; }
+          test -f .output/server/index.mjs || { echo "::error::.output/server/index.mjs manquant"; exit 1; }
+          echo "✅ point d'entrée présent : $(du -sh .output | cut -f1) de build récupéré"
+
+      - name: Apply migrations and seed
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed:dev
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('apps/app1/package-lock.json') }}
+
+      # `--with-deps` inconditionnel, et c'est volontaire : sur cache chaud, Playwright saute de
+      # lui-même le téléchargement (il teste `INSTALLATION_COMPLETE` dans le dossier du
+      # navigateur), si bien que scinder ce step selon le cache ne gagnerait rien — tout son temps
+      # part dans l'`apt-get` des dépendances système, que `install-deps` referait à l'identique —
+      # tout en perdant la réparation automatique d'un cache restauré mais incomplet.
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Start application
+        run: |
+          node .output/server/index.mjs > /tmp/nuxt-server.log 2>&1 &
+          echo $! > /tmp/server.pid
+          if ! npx wait-on http://localhost:3000 --timeout 60000; then
+            echo "::error::Le serveur de production n'a pas répondu sur http://localhost:3000 dans le délai imparti"
+            echo "===== Contenu de /tmp/nuxt-server.log ====="
+            cat /tmp/nuxt-server.log || echo "(log serveur vide ou absent)"
+            echo "===== Statut du process serveur ====="
+            ps -p "$(cat /tmp/server.pid)" || echo "Le process serveur est mort (crash au démarrage)"
+            exit 1
+          fi
+
+      - name: Run Playwright tests
+        run: NUXT_SERVER_LOG=/tmp/nuxt-server.log npx playwright test
+
+      - name: Dump server log on failure
+        if: failure()
+        run: |
+          echo "===== Contenu de /tmp/nuxt-server.log ====="
+          cat /tmp/nuxt-server.log || echo "(log serveur vide ou absent)"
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            apps/app1/playwright-report/
+            apps/app1/test-results/
+          retention-days: 7
