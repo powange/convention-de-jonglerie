@@ -4,34 +4,37 @@ import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
-export default wrapApiHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = validateEditionId(event)
-  const volunteerId = validateResourceId(event, 'volunteerId')
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    const volunteerId = validateResourceId(event, 'volunteerId')
 
-  // Vérifier les permissions
-  const allowed = await canManageEditionVolunteers(editionId, user.id, event)
-  if (!allowed)
-    throw createError({
-      status: 403,
-      message: 'Droits insuffisants pour modifier ces données',
-    })
+    // Vérifier les permissions
+    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    if (!allowed)
+      throw createError({
+        status: 403,
+        message: 'Droits insuffisants pour modifier ces données',
+      })
 
-  const body = await readBody(event)
+    const body = await readBody(event)
 
-  if (!body.selections || !Array.isArray(body.selections)) {
-    throw createError({
-      status: 400,
-      message: 'Sélections de repas invalides',
-    })
-  }
+    if (!body.selections || !Array.isArray(body.selections)) {
+      throw createError({
+        status: 400,
+        message: 'Sélections de repas invalides',
+      })
+    }
 
-  // Étape 1bis : création/MAJ des sélections du bénévole déléguée au module repas.
-  const meals = await useVolunteerPorts().meals.setVolunteerMeals(
-    editionId,
-    volunteerId,
-    body.selections
-  )
+    // Étape 1bis : création/MAJ des sélections du bénévole déléguée au module repas.
+    const meals = await useVolunteerPorts().meals.setVolunteerMeals(
+      editionId,
+      volunteerId,
+      body.selections
+    )
 
-  return createSuccessResponse({ meals })
-}, { operationName: 'UpdateVolunteerMealsByVolunteerId' })
+    return createSuccessResponse({ meals })
+  },
+  { operationName: 'UpdateVolunteerMealsByVolunteerId' }
+)

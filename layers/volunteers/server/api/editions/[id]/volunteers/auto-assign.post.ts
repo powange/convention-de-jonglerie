@@ -54,171 +54,174 @@ const constraintsSchema = z.object({
   existingAssignmentsMode: z.enum(['replace-all', 'keep-all', 'keep-manual']).optional(),
 })
 
-export default wrapApiHandler(async (event) => {
-  // Vérification de l'authentification
-  const user = requireAuth(event)
-  const editionId = validateEditionId(event)
+export default wrapApiHandler(
+  async (event) => {
+    // Vérification de l'authentification
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
 
-  // Étape 0bis : vérif d'existence sur l'Event (les permissions passent par le port organizer).
-  // Les dates de l'événement séparent le montage de l'événement et l'événement du démontage :
-  // le planificateur en a besoin pour classer chaque créneau sans se fier à son titre.
-  const eventRecord = await prisma.event.findUnique({
-    where: { id: editionId },
-    select: { id: true, startDate: true, endDate: true },
-  })
-
-  if (!eventRecord) {
-    throw createError({
-      status: 404,
-      statusText: 'Édition non trouvée',
+    // Étape 0bis : vérif d'existence sur l'Event (les permissions passent par le port organizer).
+    // Les dates de l'événement séparent le montage de l'événement et l'événement du démontage :
+    // le planificateur en a besoin pour classer chaque créneau sans se fier à son titre.
+    const eventRecord = await prisma.event.findUnique({
+      where: { id: editionId },
+      select: { id: true, startDate: true, endDate: true },
     })
-  }
 
-  if (!(await useVolunteerPorts().organizers.canManage(editionId, user.id, event))) {
-    throw createError({
-      status: 403,
-      statusText: 'Droits insuffisants pour gérer les bénévoles',
-    })
-  }
+    if (!eventRecord) {
+      throw createError({
+        status: 404,
+        statusText: 'Édition non trouvée',
+      })
+    }
 
-  // Lecture et validation du body
-  const body = await readBody(event)
-  const constraints = constraintsSchema.parse(body.constraints || {})
+    if (!(await useVolunteerPorts().organizers.canManage(editionId, user.id, event))) {
+      throw createError({
+        status: 403,
+        statusText: 'Droits insuffisants pour gérer les bénévoles',
+      })
+    }
 
-  // Récupération des données nécessaires
-  const [volunteers, timeSlots, teams, spectacles] = await Promise.all([
-    // Bénévoles acceptés
-    prisma.editionVolunteerApplication.findMany({
-      where: {
-        eventId: editionId,
-        status: 'ACCEPTED',
-      },
-      include: {
-        user: {
-          select: userWithNameSelect,
+    // Lecture et validation du body
+    const body = await readBody(event)
+    const constraints = constraintsSchema.parse(body.constraints || {})
+
+    // Récupération des données nécessaires
+    const [volunteers, timeSlots, teams, spectacles] = await Promise.all([
+      // Bénévoles acceptés
+      prisma.editionVolunteerApplication.findMany({
+        where: {
+          eventId: editionId,
+          status: 'ACCEPTED',
         },
-        teamAssignments: {
-          include: {
-            team: true,
+        include: {
+          user: {
+            select: userWithNameSelect,
+          },
+          teamAssignments: {
+            include: {
+              team: true,
+            },
           },
         },
-      },
-    }),
-
-    // Créneaux horaires
-    prisma.volunteerTimeSlot.findMany({
-      where: { eventId: editionId },
-      include: {
-        assignments: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    }),
-
-    // Équipes
-    prisma.volunteerTeam.findMany({
-      where: { eventId: editionId },
-    }),
-
-    // Programmation des spectacles : l'algorithme refuse de priver un bénévole du dernier
-    // passage de l'un d'eux. Le layer ne connaît pas la notion de spectacle, d'où le port.
-    useVolunteerPorts().artists.getShowSchedule(editionId),
-  ])
-
-  const mode =
-    constraints.existingAssignmentsMode ??
-    (constraints.keepExistingAssignments ? 'keep-all' : 'replace-all')
-
-  /** Une affectation survit-elle au recalcul ? */
-  const conservee = (assignment: { source?: string }) =>
-    mode === 'keep-all' || (mode === 'keep-manual' && assignment.source !== 'AUTO')
-
-  // Les bénévoles dont une affectation subsiste occupent déjà leur place : les proposer à
-  // nouveau les ferait compter deux fois.
-  let availableVolunteers = volunteers
-  if (mode !== 'replace-all') {
-    const assignedVolunteerIds = new Set(
-      timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
-        slot.assignments.filter(conservee).map((assignment) => assignment.user.id)
-      )
-    )
-    availableVolunteers = volunteers.filter(
-      (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
-    )
-  }
-
-  // Conversion des données pour l'algorithme
-  const schedulerVolunteers = availableVolunteers.map(
-    (volunteer: VolunteerWithTeamAssignments) => ({
-      id: volunteer.id,
-      user: volunteer.user,
-      availability: JSON.stringify({
-        setup: volunteer.setupAvailability || false,
-        teardown: volunteer.teardownAvailability || false,
-        event: volunteer.eventAvailability || false,
-        timePreferences: volunteer.timePreferences || null,
       }),
-      experience: volunteer.hasExperience
-        ? volunteer.experienceDetails || 'Expérience confirmée'
-        : '',
-      motivation: volunteer.motivation || '',
-      phone: volunteer.userSnapshotPhone,
-      teamPreferences: volunteer.teamPreferences
-        ? Array.isArray(volunteer.teamPreferences)
-          ? volunteer.teamPreferences
-          : []
-        : [],
-      // Les équipes où les organisateurs ont déjà placé ce bénévole, sous la même forme que
-      // les préférences : des identifiants d'équipe, comparables au `teamId` d'un créneau.
-      assignedTeams: volunteer.teamAssignments.map((assignation) => assignation.teamId),
+
+      // Créneaux horaires
+      prisma.volunteerTimeSlot.findMany({
+        where: { eventId: editionId },
+        include: {
+          assignments: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      }),
+
+      // Équipes
+      prisma.volunteerTeam.findMany({
+        where: { eventId: editionId },
+      }),
+
+      // Programmation des spectacles : l'algorithme refuse de priver un bénévole du dernier
+      // passage de l'un d'eux. Le layer ne connaît pas la notion de spectacle, d'où le port.
+      useVolunteerPorts().artists.getShowSchedule(editionId),
+    ])
+
+    const mode =
+      constraints.existingAssignmentsMode ??
+      (constraints.keepExistingAssignments ? 'keep-all' : 'replace-all')
+
+    /** Une affectation survit-elle au recalcul ? */
+    const conservee = (assignment: { source?: string }) =>
+      mode === 'keep-all' || (mode === 'keep-manual' && assignment.source !== 'AUTO')
+
+    // Les bénévoles dont une affectation subsiste occupent déjà leur place : les proposer à
+    // nouveau les ferait compter deux fois.
+    let availableVolunteers = volunteers
+    if (mode !== 'replace-all') {
+      const assignedVolunteerIds = new Set(
+        timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
+          slot.assignments.filter(conservee).map((assignment) => assignment.user.id)
+        )
+      )
+      availableVolunteers = volunteers.filter(
+        (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
+      )
+    }
+
+    // Conversion des données pour l'algorithme
+    const schedulerVolunteers = availableVolunteers.map(
+      (volunteer: VolunteerWithTeamAssignments) => ({
+        id: volunteer.id,
+        user: volunteer.user,
+        availability: JSON.stringify({
+          setup: volunteer.setupAvailability || false,
+          teardown: volunteer.teardownAvailability || false,
+          event: volunteer.eventAvailability || false,
+          timePreferences: volunteer.timePreferences || null,
+        }),
+        experience: volunteer.hasExperience
+          ? volunteer.experienceDetails || 'Expérience confirmée'
+          : '',
+        motivation: volunteer.motivation || '',
+        phone: volunteer.userSnapshotPhone,
+        teamPreferences: volunteer.teamPreferences
+          ? Array.isArray(volunteer.teamPreferences)
+            ? volunteer.teamPreferences
+            : []
+          : [],
+        // Les équipes où les organisateurs ont déjà placé ce bénévole, sous la même forme que
+        // les préférences : des identifiants d'équipe, comparables au `teamId` d'un créneau.
+        assignedTeams: volunteer.teamAssignments.map((assignation) => assignation.teamId),
+      })
+    )
+
+    const schedulerTimeSlots = timeSlots.map((slot: TimeSlotWithAssignments) => ({
+      id: slot.id.toString(),
+      title: slot.title || 'Créneau sans titre',
+      start: slot.startDateTime.toISOString(),
+      end: slot.endDateTime.toISOString(),
+      teamId: slot.teamId?.toString() || undefined,
+      maxVolunteers: slot.maxVolunteers,
+      // Seules les affectations qui survivent occupent une place
+      assignedVolunteers: slot.assignments.filter(conservee).length,
+      description: slot.description || undefined,
+    }))
+
+    const schedulerTeams = teams.map((team: Team) => ({
+      id: team.id,
+      name: team.name,
+      color: team.color,
+    }))
+
+    // Exécution de l'algorithme
+    const scheduler = new VolunteerScheduler(
+      schedulerVolunteers,
+      schedulerTimeSlots,
+      schedulerTeams,
+      constraints,
+      {
+        debut: eventRecord.startDate?.toISOString() ?? null,
+        fin: eventRecord.endDate?.toISOString() ?? null,
+      },
+      spectacles
+    )
+
+    const result = scheduler.assignVolunteers()
+
+    // Application des assignations en base de données si demandé
+    if (body.applyAssignments === true) {
+      await applyAssignments(editionId, result.assignments, user.id, mode)
+    }
+
+    return createSuccessResponse({
+      result,
+      preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
     })
-  )
-
-  const schedulerTimeSlots = timeSlots.map((slot: TimeSlotWithAssignments) => ({
-    id: slot.id.toString(),
-    title: slot.title || 'Créneau sans titre',
-    start: slot.startDateTime.toISOString(),
-    end: slot.endDateTime.toISOString(),
-    teamId: slot.teamId?.toString() || undefined,
-    maxVolunteers: slot.maxVolunteers,
-    // Seules les affectations qui survivent occupent une place
-    assignedVolunteers: slot.assignments.filter(conservee).length,
-    description: slot.description || undefined,
-  }))
-
-  const schedulerTeams = teams.map((team: Team) => ({
-    id: team.id,
-    name: team.name,
-    color: team.color,
-  }))
-
-  // Exécution de l'algorithme
-  const scheduler = new VolunteerScheduler(
-    schedulerVolunteers,
-    schedulerTimeSlots,
-    schedulerTeams,
-    constraints,
-    {
-      debut: eventRecord.startDate?.toISOString() ?? null,
-      fin: eventRecord.endDate?.toISOString() ?? null,
-    },
-    spectacles
-  )
-
-  const result = scheduler.assignVolunteers()
-
-  // Application des assignations en base de données si demandé
-  if (body.applyAssignments === true) {
-    await applyAssignments(editionId, result.assignments, user.id, mode)
-  }
-
-  return createSuccessResponse({
-    result,
-    preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
-  })
-}, { operationName: 'AutoAssignVolunteers' })
+  },
+  { operationName: 'AutoAssignVolunteers' }
+)
 
 /**
  * Applique les assignations en base de données

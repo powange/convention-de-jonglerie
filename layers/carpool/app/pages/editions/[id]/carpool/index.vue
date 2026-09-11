@@ -22,7 +22,6 @@ import { useRoute } from 'vue-router'
 
 import type { Edition } from '~/types'
 
-
 import { useEditionStore, getEditionDisplayName } from '#imports'
 
 const route = useRoute()

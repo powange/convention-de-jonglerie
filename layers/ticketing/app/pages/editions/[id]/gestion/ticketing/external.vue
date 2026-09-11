@@ -471,7 +471,9 @@
                                 <div class="flex items-start gap-2 mb-2">
                                   <div class="flex-1">
                                     <div class="flex items-center gap-2">
-                                      <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                                      <h5
+                                        class="font-semibold text-sm text-gray-900 dark:text-white"
+                                      >
                                         {{ option.name }}
                                       </h5>
                                       <span
@@ -534,7 +536,10 @@
 
                     <template #customFields>
                       <!-- Affichage des custom fields -->
-                      <div v-if="loadedCustomFields && loadedCustomFields.length > 0" class="space-y-3">
+                      <div
+                        v-if="loadedCustomFields && loadedCustomFields.length > 0"
+                        class="space-y-3"
+                      >
                         <div class="space-y-2">
                           <div
                             v-for="customField in loadedCustomFields"
@@ -548,7 +553,9 @@
                                 <div class="flex items-start gap-2 mb-2">
                                   <div class="flex-1">
                                     <div class="flex items-center gap-2">
-                                      <h5 class="font-semibold text-sm text-gray-900 dark:text-white">
+                                      <h5
+                                        class="font-semibold text-sm text-gray-900 dark:text-white"
+                                      >
                                         {{ customField.label }}
                                       </h5>
                                     </div>
@@ -660,7 +667,10 @@
                               >
                                 <div class="flex-1 min-w-0">
                                   <div class="flex items-center gap-2 mb-1">
-                                    <UIcon name="i-heroicons-ticket" class="h-4 w-4 text-gray-500" />
+                                    <UIcon
+                                      name="i-heroicons-ticket"
+                                      class="h-4 w-4 text-gray-500"
+                                    />
                                     <span class="font-medium text-sm text-gray-900 dark:text-white">
                                       {{ item.name || item.type + ' - ' + item.priceCategory }}
                                     </span>
@@ -1581,5 +1591,4 @@ const items = computed(
 // Le select ne reprend que ce qu'il affiche ; l'icône est celle de l'onglet courant.
 const itemsPourSelect = computed(() => items.value.map(({ value, label }) => ({ value, label })))
 const ongletCourant = computed(() => items.value.find((item) => item.value === ongletActif.value))
-
 </script>

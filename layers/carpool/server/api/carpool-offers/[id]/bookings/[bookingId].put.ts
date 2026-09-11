@@ -21,7 +21,7 @@ export default wrapApiHandler(
     // Récupérer l'offre et la réservation
     const offer = await prisma.carpoolOffer.findUnique({
       where: { id: offerId },
-      include: { user: true, bookings: true }
+      include: { user: true, bookings: true },
     })
     if (!offer) {
       throw createError({ status: 404, message: 'Offre introuvable' })

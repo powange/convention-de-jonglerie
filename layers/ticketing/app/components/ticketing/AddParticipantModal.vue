@@ -424,7 +424,10 @@
 
                 <!-- Champ de montant personnalisé pour les tarifs à prix libre -->
                 <div v-if="isFreePrice(item)">
-                  <UFormField :label="`${$t('common.amount')} (${symbol})`" :error="getItemAmountError(item)">
+                  <UFormField
+                    :label="`${$t('common.amount')} (${symbol})`"
+                    :error="getItemAmountError(item)"
+                  >
                     <UInput
                       :model-value="getFreePriceDisplay(item, index)"
                       inputmode="decimal"
@@ -645,7 +648,9 @@
             <div
               class="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4"
               :class="
-                isFreeOrder ? 'bg-green-100 dark:bg-green-900/30' : 'bg-blue-100 dark:bg-blue-900/30'
+                isFreeOrder
+                  ? 'bg-green-100 dark:bg-green-900/30'
+                  : 'bg-blue-100 dark:bg-blue-900/30'
               "
             >
               <UIcon

@@ -28,7 +28,7 @@ export default wrapApiHandler(
       include: {
         user: true,
         bookings: true,
-      }
+      },
     })
     if (!offer) {
       throw createError({ status: 404, message: 'Offre de covoiturage introuvable' })

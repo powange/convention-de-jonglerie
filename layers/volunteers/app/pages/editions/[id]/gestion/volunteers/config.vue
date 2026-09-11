@@ -86,9 +86,7 @@
                     :disabled="!canAccess"
                     class="w-full"
                     @blur="canAccess && persistVolunteerSettings()"
-                    @keydown.enter.prevent="
-                      canAccess && persistVolunteerSettings()
-                    "
+                    @keydown.enter.prevent="canAccess && persistVolunteerSettings()"
                   />
                 </UFormField>
                 <p class="text-xs text-gray-500 mt-1">
@@ -466,8 +464,7 @@ const applyVolunteerSettings = () => {
     volunteersOpenLocal.value = !!volunteersSettings.value.open
     volunteersModeLocal.value = volunteersSettings.value.mode || 'INTERNAL'
     volunteersSwapsLocal.value = (volunteersSettings.value as any).swapsEnabled !== false
-    volunteersOrganizersInTeamsLocal.value = !!(volunteersSettings.value as any)
-      .organizersInTeams
+    volunteersOrganizersInTeamsLocal.value = !!(volunteersSettings.value as any).organizersInTeams
     volunteersExternalUrlLocal.value = volunteersSettings.value.externalUrl || ''
     volunteersUpdatedAt.value = new Date()
     volunteersInitialized.value = true

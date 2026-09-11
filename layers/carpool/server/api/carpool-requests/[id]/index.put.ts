@@ -21,7 +21,7 @@ export default wrapApiHandler(
         user: {
           select: { id: true, pseudo: true },
         },
-      }
+      },
     })
     if (!existingRequest) {
       throw createError({ status: 404, message: 'Demande de covoiturage introuvable' })

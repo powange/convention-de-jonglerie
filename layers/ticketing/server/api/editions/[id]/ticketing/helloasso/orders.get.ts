@@ -10,7 +10,9 @@ import { canManageTicketingById } from '#server/utils/permissions/edition-permis
  * une édition, deux cent quatre-vingt-onze euros de bouteilles étaient ainsi encaissés sans
  * apparaître : ni dans le montant affiché de la commande, ni dans la trésorerie.
  */
-function orderTotal(order: { items: Array<{ amount: number; options?: Array<{ amount?: number }> }> }) {
+function orderTotal(order: {
+  items: Array<{ amount: number; options?: Array<{ amount?: number }> }>
+}) {
   return order.items.reduce(
     (sum, item) =>
       sum + item.amount + (item.options ?? []).reduce((s, option) => s + (option.amount || 0), 0),

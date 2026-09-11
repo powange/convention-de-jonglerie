@@ -11,45 +11,48 @@ import { validateEditionId } from '#server/utils/validation-helpers'
  * Les deux sens dans une seule réponse : un bénévole pense en « mes échanges », pas en deux
  * listes distinctes, et la page les affiche côte à côte.
  */
-export default wrapApiHandler(async (event) => {
-  const user = requireAuth(event)
-  const editionId = validateEditionId(event)
-  await exigerEchangesOuverts(editionId)
+export default wrapApiHandler(
+  async (event) => {
+    const user = requireAuth(event)
+    const editionId = validateEditionId(event)
+    await exigerEchangesOuverts(editionId)
 
-  const affectation = {
-    select: {
-      id: true,
-      user: { select: userWithProfileAndGravatarSelect },
-      timeSlot: {
-        select: {
-          id: true,
-          title: true,
-          startDateTime: true,
-          endDateTime: true,
-          team: { select: { id: true, name: true, color: true } },
+    const affectation = {
+      select: {
+        id: true,
+        user: { select: userWithProfileAndGravatarSelect },
+        timeSlot: {
+          select: {
+            id: true,
+            title: true,
+            startDateTime: true,
+            endDateTime: true,
+            team: { select: { id: true, name: true, color: true } },
+          },
         },
       },
-    },
-  }
+    }
 
-  const demandes = await prisma.volunteerSwapRequest.findMany({
-    where: { eventId: editionId, OR: [{ requesterId: user.id }, { targetId: user.id }] },
-    select: {
-      id: true,
-      status: true,
-      createdAt: true,
-      requesterId: true,
-      targetId: true,
-      requester: { select: userWithProfileAndGravatarSelect },
-      target: { select: userWithProfileAndGravatarSelect },
-      requesterAssignment: affectation,
-      targetAssignment: affectation,
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+    const demandes = await prisma.volunteerSwapRequest.findMany({
+      where: { eventId: editionId, OR: [{ requesterId: user.id }, { targetId: user.id }] },
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        requesterId: true,
+        targetId: true,
+        requester: { select: userWithProfileAndGravatarSelect },
+        target: { select: userWithProfileAndGravatarSelect },
+        requesterAssignment: affectation,
+        targetAssignment: affectation,
+      },
+      orderBy: { createdAt: 'desc' },
+    })
 
-  return createSuccessResponse({
-    sent: demandes.filter((d) => d.requesterId === user.id),
-    received: demandes.filter((d) => d.targetId === user.id),
-  })
-}, { operationName: 'ListMyVolunteerSwapRequests' })
+    return createSuccessResponse({
+      sent: demandes.filter((d) => d.requesterId === user.id),
+      received: demandes.filter((d) => d.targetId === user.id),
+    })
+  },
+  { operationName: 'ListMyVolunteerSwapRequests' }
+)

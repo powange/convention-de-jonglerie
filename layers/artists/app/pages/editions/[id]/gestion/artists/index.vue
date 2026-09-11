@@ -365,11 +365,15 @@
                 >
                   <div v-if="row.original.reimbursementMax" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Max:</span>
-                    <span class="font-medium">{{ formatAmount(Number(row.original.reimbursementMax)) }}</span>
+                    <span class="font-medium">{{
+                      formatAmount(Number(row.original.reimbursementMax))
+                    }}</span>
                   </div>
                   <div v-if="row.original.reimbursementActual" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Réel:</span>
-                    <span class="font-medium">{{ formatAmount(Number(row.original.reimbursementActual)) }}</span>
+                    <span class="font-medium">{{
+                      formatAmount(Number(row.original.reimbursementActual))
+                    }}</span>
                     <UBadge
                       :color="row.original.reimbursementActualPaid ? 'success' : 'warning'"
                       variant="soft"
@@ -390,11 +394,15 @@
                 >
                   <div v-if="row.original.consumablesMax" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Max:</span>
-                    <span class="font-medium">{{ formatAmount(Number(row.original.consumablesMax)) }}</span>
+                    <span class="font-medium">{{
+                      formatAmount(Number(row.original.consumablesMax))
+                    }}</span>
                   </div>
                   <div v-if="row.original.consumablesActual" class="flex items-center gap-2">
                     <span class="text-xs text-gray-500">Réel:</span>
-                    <span class="font-medium">{{ formatAmount(Number(row.original.consumablesActual)) }}</span>
+                    <span class="font-medium">{{
+                      formatAmount(Number(row.original.consumablesActual))
+                    }}</span>
                     <UBadge
                       :color="row.original.consumablesActualPaid ? 'success' : 'warning'"
                       variant="soft"
@@ -594,7 +602,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
 import type { TableColumn } from '@nuxt/ui'

@@ -4,7 +4,6 @@
     icone="i-heroicons-cake"
     :repliable-sur-mobile="repliableSurMobile"
   >
-
     <div v-if="loadingMeals" class="flex items-center justify-center py-8">
       <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 text-primary-500" />
     </div>

@@ -570,7 +570,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         const maxOrganisateurs = 3
         assignedOrganizersList
           .slice(0, maxOrganisateurs)
-          .forEach((affectation: any) => organisateursDiv.appendChild(lignePersonne(affectation.user, true)))
+          .forEach((affectation: any) =>
+            organisateursDiv.appendChild(lignePersonne(affectation.user, true))
+          )
 
         const restants = assignedOrganizersList.length - maxOrganisateurs
         if (restants > 0) {

@@ -4,7 +4,6 @@
     icone="i-heroicons-calendar-days"
     :repliable-sur-mobile="repliableSurMobile"
   >
-
     <div class="space-y-6">
       <!-- Barre d'outils -->
       <div class="flex flex-wrap items-center justify-between gap-4">
@@ -91,7 +90,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-
 
 import type { Edition } from '~/types'
 import type { VolunteerStats, DayStats, VolunteerStatsIndividual } from '~/utils/volunteer-stats'

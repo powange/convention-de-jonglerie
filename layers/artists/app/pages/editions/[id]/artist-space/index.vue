@@ -854,7 +854,6 @@ const modeleTypeHebergement = computed({
   },
 })
 
-
 watch(artist, (newArtist) => {
   if (newArtist && !editingAccommodation.value) {
     accommodationForm.accommodationAutonomous = newArtist.accommodationAutonomous

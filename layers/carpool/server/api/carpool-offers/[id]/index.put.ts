@@ -22,7 +22,7 @@ export default wrapApiHandler(
         user: {
           select: { id: true, pseudo: true },
         },
-      }
+      },
     })
     if (!existingOffer) {
       throw createError({ status: 404, message: 'Offre de covoiturage introuvable' })

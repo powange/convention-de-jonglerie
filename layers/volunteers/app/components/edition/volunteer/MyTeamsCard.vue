@@ -5,7 +5,6 @@
     icone="i-heroicons-user-group"
     :repliable-sur-mobile="repliableSurMobile"
   >
-
     <div class="space-y-4">
       <div
         v-for="team in leaderTeams"
