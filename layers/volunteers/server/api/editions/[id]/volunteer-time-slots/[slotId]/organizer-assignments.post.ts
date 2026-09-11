@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { CRENEAU_COMPLET, resteUnePlace } from '../../../../../utils/places-creneau'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
@@ -48,21 +50,6 @@ export default wrapApiHandler(
     // Créneau et organisateur doivent tous deux appartenir à CETTE édition : sans ces
     // contrôles, un identifiant emprunté à une édition voisine passerait la permission de
     // celle-ci.
-    const timeSlot = await prisma.volunteerTimeSlot.findFirst({
-      where: { id: slotId, eventId: editionId },
-      select: {
-        id: true,
-        maxVolunteers: true,
-        _count: { select: { assignments: true, organizerAssignments: true } },
-      },
-    })
-    if (!timeSlot) {
-      throw createError({
-        status: 404,
-        message: "Créneau non trouvé ou n'appartient pas à cette édition",
-      })
-    }
-
     const editionOrganizer = await prisma.editionOrganizer.findFirst({
       where: { id: editionOrganizerId, editionId },
       select: { id: true },
@@ -71,27 +58,54 @@ export default wrapApiHandler(
       throw createError({ status: 404, message: 'Organisateur introuvable sur cette édition' })
     }
 
-    const dejaAffecte = await prisma.organizerSlotAssignment.findUnique({
-      where: { editionOrganizerId_timeSlotId: { editionOrganizerId, timeSlotId: slotId } },
-      select: { timeSlotId: true },
-    })
-    if (dejaAffecte) {
-      throw createError({
-        status: 400,
-        message: 'Cet organisateur est déjà affecté à ce créneau',
+    /*
+     * Le relevé des places et la création tiennent dans la même transaction.
+     *
+     * Ce que cela apporte, et rien de plus : la fenêtre entre « il reste une place » et « elle est
+     * prise » se resserre. Elle ne se ferme pas — aucun verrou n'est posé sur le créneau, et deux
+     * transactions concurrentes peuvent encore accorder toutes deux la dernière place. Fermer
+     * vraiment demanderait un `SELECT … FOR UPDATE`, que Prisma n'exprime qu'en SQL brut.
+     *
+     * Les deux endpoints d'affectation se partagent ce plafond : n'en traiter qu'un laisserait la
+     * course ouverte entre un bénévole et un organisateur.
+     */
+    await prisma.$transaction(async (tx) => {
+      const timeSlot = await tx.volunteerTimeSlot.findFirst({
+        where: { id: slotId, eventId: editionId },
+        select: {
+          id: true,
+          maxVolunteers: true,
+          _count: { select: { assignments: true, organizerAssignments: true } },
+        },
       })
-    }
+      if (!timeSlot) {
+        throw createError({
+          status: 404,
+          message: "Créneau non trouvé ou n'appartient pas à cette édition",
+        })
+      }
 
-    // Les places se comptent toutes ensemble, bénévoles et organisateurs. Ce contrôle vient
-    // après celui du doublon : réaffecter quelqu'un déjà présent sur un créneau plein doit se
-    // voir dire « déjà affecté », pas « complet ».
-    const placesOccupees = timeSlot._count.assignments + timeSlot._count.organizerAssignments
-    if (placesOccupees >= timeSlot.maxVolunteers) {
-      throw createError({ status: 400, message: 'Ce créneau est déjà complet' })
-    }
+      const dejaAffecte = await tx.organizerSlotAssignment.findUnique({
+        where: { editionOrganizerId_timeSlotId: { editionOrganizerId, timeSlotId: slotId } },
+        select: { timeSlotId: true },
+      })
+      if (dejaAffecte) {
+        throw createError({
+          status: 400,
+          message: 'Cet organisateur est déjà affecté à ce créneau',
+        })
+      }
 
-    await prisma.organizerSlotAssignment.create({
-      data: { editionOrganizerId, timeSlotId: slotId },
+      // Les places se comptent toutes ensemble, bénévoles et organisateurs. Ce contrôle vient
+      // après celui du doublon : réaffecter quelqu'un déjà présent sur un créneau plein doit se
+      // voir dire « déjà affecté », pas « complet ».
+      if (!resteUnePlace(timeSlot)) {
+        throw createError({ status: 400, message: CRENEAU_COMPLET })
+      }
+
+      await tx.organizerSlotAssignment.create({
+        data: { editionOrganizerId, timeSlotId: slotId },
+      })
     })
 
     return createSuccessResponse({ editionOrganizerId, timeSlotId: slotId })

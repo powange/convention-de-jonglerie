@@ -63,6 +63,14 @@ describe('affectation d’un organisateur à un créneau', () => {
      * demande, sans distinguer les titres. Sur un créneau à deux places déjà pourvues, il n'y a
      * plus de poste, pour personne.
      */
+    it('relève les places et écrit dans la même transaction', async () => {
+      // C'est ce que le lot promet, et rien d'autre ne le dirait : sans cette assertion,
+      // remplacer la transaction par des appels directs repasserait au vert.
+      await poster({ editionOrganizerId: 7 })
+
+      expect(prismaMock.$transaction).toHaveBeenCalled()
+    })
+
     it('refuse un organisateur sur un créneau déjà complet', async () => {
       prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue({
         id: 'creneau-1',
