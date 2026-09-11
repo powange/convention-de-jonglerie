@@ -104,6 +104,8 @@
 <script setup lang="ts">
 import { useAuthStore, useEditionStore } from '#imports'
 
+import { resumeSuppressionGroupe } from '../../../../../utils/suppression-groupe'
+
 definePageMeta({
   layout: 'edition-dashboard',
   middleware: ['auth-protected'],
@@ -123,6 +125,8 @@ useSeoMeta({
 
 interface StockItemLite {
   id: number
+  /** Le nombre de réservations, que la cascade emportera avec l'objet. */
+  _count?: { reservations?: number } | null
 }
 interface StockGroupItem {
   id: number
@@ -204,12 +208,16 @@ const getGroupActions = (group: StockGroupItem) => [
 ]
 
 async function deleteGroup(group: StockGroupItem) {
-  if (
-    !confirm(
-      t('gestion.stock.confirm_delete_group', { name: group.name, count: group.items.length })
-    )
+  // La base est en cascade : le groupe emporte ses objets, et chaque objet ses réservations. La
+  // confirmation ne disait que les objets — or ce sont les réservations qui font mal, puisqu'elles
+  // ont été posées par d'autres. Le décompte se fait dans `suppression-groupe`, éprouvé à part.
+  const resume = resumeSuppressionGroupe(group.items)
+  const message = t(
+    'gestion.stock.confirm_delete_group',
+    { name: group.name, objets: resume.objets, count: resume.reservations },
+    resume.reservations
   )
-    return
+  if (!confirm(message)) return
   await $fetch(`/api/editions/${editionId}/stock-groups/${group.id}`, { method: 'DELETE' })
   await fetchGroups()
 }
