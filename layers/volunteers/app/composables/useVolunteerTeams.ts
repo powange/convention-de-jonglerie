@@ -31,7 +31,16 @@ export type UpdateTeamData = Partial<CreateTeamData>
 
 export function useVolunteerTeams(
   editionId: MaybeRefOrGetter<number | undefined>,
-  options?: { leaderOnly?: boolean }
+  options?: {
+    leaderOnly?: boolean
+    /**
+     * Demander la liste telle qu'un candidat la voit : sans les équipes marquées invisibles aux
+     * bénévoles, même si l'on a le droit de les voir. C'est ce qu'il faut au formulaire de
+     * candidature, y compris quand un organisateur l'ouvre en aperçu — sinon l'aperçu montrerait
+     * ce que le candidat ne verra pas.
+     */
+    pourCandidature?: boolean
+  }
 ) {
   // État réactif
   const teams = ref<VolunteerTeam[]>([])
@@ -47,9 +56,21 @@ export function useVolunteerTeams(
       loading.value = true
       error.value = null
 
-      // Ajouter le paramètre leaderOnly si nécessaire
-      const queryParams = options?.leaderOnly ? '?leaderOnly=true' : ''
-      teams.value = await $fetch(`/api/editions/${id}/volunteer-teams${queryParams}`)
+      // `$fetch` est retypé à la main : lui passer des paramètres de requête fait exploser son
+      // inférence sur la table des routes (TS2321, profondeur de pile dépassée). Le contournement
+      // est celui déjà employé ailleurs dans le dépôt — on perd la vérification de l'URL, qui de
+      // toute façon ne tenait plus dès que celle-ci cesse d'être un littéral connu.
+      const recuperer = $fetch as unknown as (
+        url: string,
+        options?: { query?: Record<string, string | undefined> }
+      ) => Promise<VolunteerTeam[]>
+
+      teams.value = await recuperer(`/api/editions/${id}/volunteer-teams`, {
+        query: {
+          leaderOnly: options?.leaderOnly ? 'true' : undefined,
+          pourCandidature: options?.pourCandidature ? 'true' : undefined,
+        },
+      })
     } catch (err: any) {
       error.value = err.data?.message || 'Erreur lors du chargement des équipes'
       throw err
