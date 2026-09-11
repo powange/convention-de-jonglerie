@@ -74,4 +74,33 @@ describe('POST …/volunteer-time-slots/[slotId]/assignments — capacité', () 
     await expect(handler(evenement as any)).rejects.toBeDefined()
     expect(prismaMock.volunteerAssignment.create).not.toHaveBeenCalled()
   })
+
+  it('relève les places et écrit dans la même transaction', async () => {
+    // C'est ce que le lot promet, et rien d'autre ne le dirait : sans cette assertion, remplacer
+    // la transaction par des appels directs repasserait au vert sans que personne le voie.
+    await handler(evenement as any)
+
+    expect(prismaMock.$transaction).toHaveBeenCalled()
+  })
+
+  it('n’écrit rien quand le créneau a disparu entre-temps', async () => {
+    // Le relevé est refait dans la transaction : un créneau supprimé pendant que l'organisateur
+    // remplissait son formulaire ne doit pas produire une affectation orpheline.
+    prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue(null)
+
+    await expect(handler(evenement as any)).rejects.toBeDefined()
+    expect(prismaMock.volunteerAssignment.create).not.toHaveBeenCalled()
+  })
+
+  it('dit « déjà assigné » plutôt que « complet » sur un créneau plein', async () => {
+    // Réaffecter par mégarde quelqu'un qui est déjà là doit s'entendre dire ce qui est vrai. Le
+    // contrôle du doublon passe donc avant celui de la capacité, comme du côté des organisateurs
+    // où cette règle était déjà écrite.
+    prismaMock.volunteerTimeSlot.findFirst.mockResolvedValue(creneau(2, 0))
+    prismaMock.volunteerAssignment.findUnique.mockResolvedValue({ id: 'aff-existante' })
+
+    await expect(handler(evenement as any)).rejects.toMatchObject({
+      message: expect.stringContaining('déjà assigné'),
+    })
+  })
 })
