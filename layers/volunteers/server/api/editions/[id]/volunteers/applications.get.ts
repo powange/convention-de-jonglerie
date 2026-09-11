@@ -1,3 +1,5 @@
+import { classementDesCandidatures, sensDeTri } from '../../../../utils/tri-candidatures'
+
 import type { Prisma } from '#server/types/prisma'
 import type { VolunteerApplicationWhereInput } from '#server/types/prisma-helpers'
 
@@ -75,7 +77,7 @@ export default wrapApiHandler(
       Math.max(1, parseInt((query.pageSize as string) || `${DEFAULT_PAGE_SIZE}`))
     )
     const sortFieldRaw = (query.sortField as string) || 'createdAt'
-    const sortDirRaw = (query.sortDir as string) === 'asc' ? 'asc' : 'desc'
+    const sortDirRaw = sensDeTri(query.sortDir)
     const sortSecondary = (query.sortSecondary as string) || '' // format "field:dir,field2:dir"
     const search = (query.search as string)?.trim()
     // Construction de la clause WHERE
@@ -197,37 +199,10 @@ export default wrapApiHandler(
     const needsCustomSort =
       sortFieldRaw === 'arrivalDateTime' || sortFieldRaw === 'departureDateTime'
 
-    const primary: Prisma.EditionVolunteerApplicationOrderByWithRelationInput = (() => {
-      if (sortFieldRaw === 'pseudo') return { user: { pseudo: sortDirRaw } }
-      if (sortFieldRaw === 'prenom') return { user: { prenom: sortDirRaw } }
-      if (sortFieldRaw === 'nom') return { user: { nom: sortDirRaw } }
-      // Le tri porte sur le profil, comme l'affichage : trier sur la copie de la candidature
-      // classerait selon une valeur que plus personne ne voit.
-      if (sortFieldRaw === 'allergies') return { user: { allergies: sortDirRaw } }
-      if (sortFieldRaw === 'status') return { status: sortDirRaw }
-      if (sortFieldRaw === 'arrivalDateTime') return { arrivalDateTime: sortDirRaw }
-      if (sortFieldRaw === 'departureDateTime') return { departureDateTime: sortDirRaw }
-      return { createdAt: sortDirRaw }
-    })()
-    const orderBy: Prisma.EditionVolunteerApplicationOrderByWithRelationInput[] = [primary]
-    if (sortSecondary) {
-      const parts = sortSecondary
-        .split(',')
-        .map((p) => p.trim())
-        .filter(Boolean)
-      for (const p of parts) {
-        const [f, d] = p.split(':')
-        const dir = d === 'asc' ? 'asc' : 'desc'
-        if (f === 'pseudo') orderBy.push({ user: { pseudo: dir } })
-        else if (f === 'prenom') orderBy.push({ user: { prenom: dir } })
-        else if (f === 'nom') orderBy.push({ user: { nom: dir } })
-        else if (f === 'allergies') orderBy.push({ allergies: dir })
-        else if (f === 'status') orderBy.push({ status: dir })
-        else if (f === 'createdAt') orderBy.push({ createdAt: dir })
-        else if (f === 'arrivalDateTime') orderBy.push({ arrivalDateTime: dir })
-        else if (f === 'departureDateTime') orderBy.push({ departureDateTime: dir })
-      }
-    }
+    // La colonne principale et les colonnes de départage consultent la même table de
+    // correspondance : c'est de leur duplication qu'était né le tri des allergies visant un champ
+    // inexistant, et avec lui une liste qui disparaissait entière.
+    const orderBy = classementDesCandidatures(sortFieldRaw, sortDirRaw, sortSecondary)
 
     const includeTeams = query.includeTeams === 'true'
 
