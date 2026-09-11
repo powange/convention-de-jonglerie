@@ -23,10 +23,14 @@ description: >-
 inputs:
   cache-mode:
     description: >-
-      `restaurer` : lecture seule (`actions/cache/restore`), le job ne sauvegarde jamais — c'est au
-      job `setup` d'écrire. `lire-ecrire` : `actions/cache`, qui sauvegarde en post-job sur miss —
-      pour playwright.yml, qui n'a pas de job d'amorçage en amont. `cles-seules` : ne touche à aucun
-      cache et ne fait que poser Node et calculer les clés, pour un job qui gère lui-même son cache.
+      `restaurer` : lecture seule (`actions/cache/restore`), le job ne sauvegarde jamais — `setup`
+      est le seul écrivain. `cles-seules` : ne touche à aucun cache et ne fait que poser Node et
+      calculer les clés, pour `setup` justement, qui gère les siens lui-même.
+
+      Un mode `lire-ecrire` a existé pour playwright.yml, seul workflow sans job d'amorçage en
+      amont. Ce workflow a été fusionné dans tests.yml pour ne plus builder l'application deux
+      fois : le mode n'a plus d'appelant, et le garder aurait laissé dans la CI un second écrivain
+      capable de réserver une clé en même temps que `setup`.
     required: false
     default: restaurer
   prisma:
@@ -100,45 +104,21 @@ runs:
         path: apps/app1/server/generated/prisma
         key: ${{ steps.cles.outputs.prisma }}
 
-    - name: Mettre node_modules en cache
-      if: inputs.cache-mode == 'lire-ecrire'
-      id: deps-ecriture
-      uses: actions/cache@v4
-      with:
-        path: apps/app1/node_modules
-        key: ${{ steps.cles.outputs.deps }}
-        # Pas de restore-keys : un cache construit sur un autre lockfile serait incompatible.
-
-    - name: Mettre le client Prisma en cache
-      if: inputs.cache-mode == 'lire-ecrire'
-      id: prisma-ecriture
-      uses: actions/cache@v4
-      with:
-        path: apps/app1/server/generated/prisma
-        key: ${{ steps.cles.outputs.prisma }}
-        restore-keys: |
-          ${{ runner.os }}-prisma-v3-
-
     # Le filet du cache évincé. Le quota de 10 Go par dépôt s'évince en LRU : une entrée peut
     # disparaître entre le moment où `setup` la vérifie et celui où un job la lit. Échouer là-dessus
     # mettait la CI au rouge pour une raison étrangère à la PR ; on réinstalle, c'est plus lent ce
     # jour-là mais le résultat reste juste.
     #
-    # Les deux modes sont testés séparément plutôt que par `||` sur les outputs : une condition
-    # muette lorsqu'un step n'a pas tourné laisserait passer une installation inutile sans bruit.
     - name: Réinstaller si le cache a disparu
-      if: >-
-        (inputs.cache-mode == 'restaurer' && steps.deps-lecture.outputs.cache-hit != 'true')
-        || (inputs.cache-mode == 'lire-ecrire' && steps.deps-ecriture.outputs.cache-hit != 'true')
+      if: inputs.cache-mode == 'restaurer' && steps.deps-lecture.outputs.cache-hit != 'true'
       shell: bash
       working-directory: ${{ github.workspace }}/apps/app1
       run: npm ci --prefer-offline --no-audit
 
     - name: Générer le client Prisma
       if: >-
-        (inputs.cache-mode != 'cles-seules' && inputs.prisma == 'toujours')
-        || (inputs.cache-mode == 'restaurer' && steps.prisma-lecture.outputs.cache-hit != 'true')
-        || (inputs.cache-mode == 'lire-ecrire' && steps.prisma-ecriture.outputs.cache-hit != 'true')
+        inputs.cache-mode == 'restaurer'
+        && (inputs.prisma == 'toujours' || steps.prisma-lecture.outputs.cache-hit != 'true')
       shell: bash
       working-directory: ${{ github.workspace }}/apps/app1
       run: npx prisma generate
