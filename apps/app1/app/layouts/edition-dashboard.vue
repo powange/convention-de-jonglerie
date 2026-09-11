@@ -287,6 +287,7 @@ function pastilleMenu(...cles: string[]) {
 /** Les compteurs de chaque module, groupés par entrée de menu. La source du cumul des parents. */
 const COMPTEURS_PAR_ENTREE: Record<string, string[]> = {
   stock: ['stock-emprunts'],
+  volunteers: ['benevoles-candidatures', 'benevoles-echanges'],
 }
 
 /**
@@ -302,6 +303,18 @@ const compteursVisibles = computed(() => {
   if (edition.value?.stockEnabled && canAccessStock.value) {
     cles.push(...(COMPTEURS_PAR_ENTREE.stock ?? []))
   }
+
+  // Les deux compteurs bénévoles exigent la gestion et le mode interne, comme les entrées
+  // auxquelles ils pendent. Un responsable d'équipe voit la catégorie sans avoir ces droits : lui
+  // demander ces comptes lui vaudrait deux 403 à chaque ouverture d'édition.
+  const gestionInterne =
+    edition.value?.volunteersEnabled && canManageVolunteers.value && isVolunteersModeInternal.value
+  if (gestionInterne) {
+    cles.push('benevoles-candidatures')
+    // Les échanges peuvent être fermés : l'entrée disparaît alors, et son compteur avec elle.
+    if (echangesOuverts.value) cles.push('benevoles-echanges')
+  }
+
   return cles
 })
 
@@ -496,6 +509,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           label: t('edition.volunteers.application_management'),
           icon: 'i-heroicons-document-text',
           to: `/editions/${editionId.value}/gestion/volunteers/applications`,
+          ...pastilleMenu('benevoles-candidatures'),
         },
         {
           label: t('edition.volunteers.teams'),
@@ -524,6 +538,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           label: t('edition.volunteers.swaps'),
           icon: 'i-lucide-arrow-left-right',
           to: `/editions/${editionId.value}/gestion/volunteers/swaps`,
+          ...pastilleMenu('benevoles-echanges'),
         })
       }
     }
@@ -543,6 +558,9 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         children: volunteersChildren,
         value: 'volunteers',
         popover: {},
+        // La somme de ce que ses enfants signalent : repliée, la catégorie les cache, et sans
+        // cumul on n'apprendrait qu'en dépliant qu'il y avait quelque chose à voir.
+        ...pastilleMenu(...(COMPTEURS_PAR_ENTREE.volunteers ?? [])),
       })
     }
   }
