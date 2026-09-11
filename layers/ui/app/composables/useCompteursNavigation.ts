@@ -38,6 +38,18 @@ const fournisseurs = new Map<string, FournisseurCompteur>()
 const comptes = reactive(new Map<string, number | null>())
 
 /**
+ * Ce que le dernier rafraîchissement complet savait : dans quel contexte on se trouve, et quelles
+ * entrées l'utilisateur voit.
+ *
+ * Retenu ici parce qu'un écran qui vient de modifier des données n'a aucun moyen de le savoir.
+ * Il connaît son édition, mais pas la liste des entrées visibles — laquelle dépend de droits que
+ * la barre de navigation a résolus pour lui. Sans cette mémoire, un rafraîchissement ciblé devrait
+ * réinventer ce calcul, et se tromperait.
+ */
+let dernierContexte: ContexteCompteur | null = null
+let dernieresClesActives: ReadonlySet<string> | null = null
+
+/**
  * Déclare comment obtenir un compte. À appeler depuis un plugin du layer concerné.
  *
  * Rend une fonction qui retire le fournisseur — utile aux tests, et à un module qu'on démonte.
@@ -76,6 +88,9 @@ export async function rafraichirCompteursNavigation(
 ): Promise<void> {
   const actives = clesActives ? new Set(clesActives) : null
 
+  dernierContexte = contexte
+  dernieresClesActives = actives
+
   for (const cle of [...comptes.keys()]) {
     if (actives && !actives.has(cle)) comptes.delete(cle)
   }
@@ -101,6 +116,54 @@ export async function rafraichirCompteursNavigation(
 /** Efface tous les comptes, en gardant les fournisseurs — au changement de contexte. */
 export function oublierCompteursNavigation(): void {
   comptes.clear()
+  // Le contexte retenu part avec les comptes : il désignait l'édition qu'on vient de quitter, et
+  // un rafraîchissement ciblé qui s'en servirait recompterait sur la mauvaise.
+  dernierContexte = null
+  dernieresClesActives = null
+}
+
+/**
+ * Recharge quelques compteurs, et rien d'autre.
+ *
+ * À appeler depuis un écran qui vient de modifier ce qu'un compteur compte — accepter une
+ * candidature, rendre un objet. Le menu ne recalcule qu'au montage : sans cela, la pastille reste
+ * sur sa valeur d'arrivée jusqu'au prochain chargement de page.
+ *
+ * La différence avec `rafraichirCompteursNavigation` n'est pas seulement le nombre de clés : cette
+ * dernière prend la liste de **tout** ce qui est visible et **efface** le reste. S'en servir pour
+ * viser un compteur effaçait donc tous les autres — sans conséquence tant qu'il n'y en avait qu'un,
+ * visible dès qu'il y en a eu trois.
+ *
+ * Une clé inconnue, ou qui n'est pas dans les entrées visibles, est ignorée en silence : l'écran
+ * qui appelle n'a pas à savoir ce que la navigation affiche, et interroger un module auquel
+ * l'utilisateur n'a pas droit lui vaudrait un refus du serveur.
+ *
+ * Sans rafraîchissement complet préalable, il n'y a rien à mettre à jour — ni contexte, ni
+ * pastille affichée : l'appel ne fait rien plutôt que de deviner.
+ */
+export async function rafraichirCompteurs(...cles: readonly string[]): Promise<void> {
+  if (!dernierContexte) return
+
+  const contexte = dernierContexte
+  const aInterroger = cles
+    .map((cle) => fournisseurs.get(cle))
+    .filter((fournisseur): fournisseur is FournisseurCompteur => {
+      if (!fournisseur) return false
+      return !dernieresClesActives || dernieresClesActives.has(fournisseur.cle)
+    })
+
+  await Promise.all(
+    aInterroger.map(async (fournisseur) => {
+      try {
+        const compte = await fournisseur.charger(contexte)
+        comptes.set(fournisseur.cle, typeof compte === 'number' ? compte : null)
+      } catch {
+        // Isolé comme dans le rafraîchissement complet : l'échec d'un compteur ne remonte pas à
+        // l'écran, et n'empêche pas les autres d'aboutir.
+        comptes.set(fournisseur.cle, null)
+      }
+    })
+  )
 }
 
 /** Le compte d'une entrée, réactif. `null` tant qu'il n'a pas été chargé. */

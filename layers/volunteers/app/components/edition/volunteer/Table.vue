@@ -896,6 +896,10 @@ const decideApplication = async (app: any, status: 'ACCEPTED' | 'REJECTED' | 'PE
 
       // Rafraîchir les données du tableau
       refreshApplications()
+
+      // Et la pastille du menu, qui compte les candidatures en attente : celle-ci vient d'en
+      // sortir — ou d'y revenir, si l'on a remis le dossier en attente.
+      rafraichirCompteurs('benevoles-candidatures')
     }
   } catch (e: any) {
     toast.add({ title: e?.message || t('common.error'), color: 'error' })
@@ -1006,6 +1010,11 @@ const openEditTeamsModal = (app: any) => {
 const handleTeamsAssigned = async () => {
   await refreshApplications()
   emit('refreshTeamAssignments')
+
+  // Ce même gestionnaire sert à l'acceptation avec équipes et à une simple réaffectation, qui ne
+  // change pas le nombre de candidatures en attente. On rafraîchit dans les deux cas : une requête
+  // inutile coûte peu, une pastille restée fausse trompe.
+  rafraichirCompteurs('benevoles-candidatures')
 }
 
 // Ouvrir la modal de commentaire

@@ -424,7 +424,12 @@ async function appliquer(action: ActionEmprunt) {
     // La pastille du menu compte les retards : elle vient de changer. Le menu ne recalcule qu'au
     // montage — c'est à qui modifie les données de le signaler, sans quoi le compteur reste sur
     // sa valeur d'arrivée jusqu'au prochain chargement de page.
-    await rafraichirCompteursNavigation({ editionId }, ['stock-emprunts'])
+    //
+    // `rafraichirCompteurs` et non `rafraichirCompteursNavigation` : la seconde prend la liste de
+    // tout ce qui est visible et efface le reste. Lui passer cette seule clé effaçait donc les
+    // pastilles des autres modules — sans conséquence tant que le stock était seul, visible dès
+    // qu'il y en a eu d'autres.
+    await rafraichirCompteurs('stock-emprunts')
   } catch (e: any) {
     useToast().add({
       title: e?.data?.message || t('common.error'),
