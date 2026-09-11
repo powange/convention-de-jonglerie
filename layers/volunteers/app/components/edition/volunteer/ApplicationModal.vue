@@ -600,6 +600,14 @@ import {
   type AllergySeverityLevel,
 } from '~/utils/allergy-severity'
 
+import {
+  contactDUrgenceExige,
+  manquementDuChamp,
+  manquementsDeLaCandidature,
+  MOTIVATION_MAX,
+  type ChampCandidature,
+} from '../../../utils/validation-candidature'
+
 interface VolunteerInfo {
   open: boolean
   description?: string
@@ -684,8 +692,6 @@ const authStore = useAuthStore()
 // `pourCandidature` : le formulaire montre ce que le candidat verra, même ouvert en aperçu
 // par un organisateur — qui, lui, a le droit de voir les équipes cachées.
 const { teams: volunteerTeams } = useVolunteerTeams(props.edition.id, { pourCandidature: true })
-
-const MOTIVATION_MAX = 2000
 
 // Modal visibility
 const showModal = computed({
@@ -881,63 +887,56 @@ const erreurServeur = (champ: string) => {
 }
 
 // Individual field validation computed properties
-const phoneError = computed(() => {
-  const serveur = erreurServeur('phone')
+/**
+ * Ce qui manque à la candidature, selon les règles du domaine seules.
+ *
+ * `manquementsDeLaCandidature` ne connaît ni le serveur, ni les champs déjà touchés : il dit ce qui
+ * est invalide, et c'est tout. Ce composant ajoute les deux couches qui relèvent de l'écran — une
+ * erreur renvoyée par le serveur prime, et un champ qu'on n'a pas encore touché ne se fait pas
+ * gronder avant l'heure.
+ */
+/**
+ * Ce qui, hors de la saisie, change les règles.
+ *
+ * La sévérité est résolue ici : quels niveaux exigent un contact d'urgence est décidé une seule
+ * fois, par `requiresEmergencyContact`, et l'util de validation ne redit pas cette liste.
+ */
+const reglagesDeValidation = computed(() => ({
+  askEmergencyContact: props.volunteersInfo?.askEmergencyContact,
+  severiteExigeUnContact:
+    !!formData.value.allergySeverity && requiresEmergencyContact(formData.value.allergySeverity),
+}))
+
+const manquements = computed(() =>
+  manquementsDeLaCandidature(formData.value, reglagesDeValidation.value)
+)
+
+/**
+ * Le message à afficher sous un champ, ou rien.
+ *
+ * L'ordre des trois sources est celui d'avant, et il compte : le serveur d'abord, parce qu'il sait
+ * des choses que le navigateur ignore ; puis le silence tant que le champ n'a pas été touché et
+ * qu'on n'a pas demandé à tout voir ; la règle ensuite.
+ */
+const erreurDuChamp = (champ: ChampCandidature) => {
+  const serveur = erreurServeur(champ)
   if (serveur) return serveur
-  if (!showAllErrors.value && !touchedFields.value.has('phone')) return undefined
-  if (!formData.value.phone?.trim()) {
-    return t('validation.phone_required')
-  }
-  return undefined
-})
+  if (!showAllErrors.value && !touchedFields.value.has(champ)) return undefined
 
-const firstNameError = computed(() => {
-  const serveur = erreurServeur('firstName')
-  if (serveur) return serveur
-  if (!showAllErrors.value && !touchedFields.value.has('firstName')) return undefined
-  if (!formData.value.firstName?.trim()) {
-    return t('validation.first_name_required')
-  }
-  return undefined
-})
+  const manquement = manquementDuChamp(manquements.value, champ)
+  return manquement ? t(manquement.cle, manquement.params ?? {}) : undefined
+}
 
-const lastNameError = computed(() => {
-  const serveur = erreurServeur('lastName')
-  if (serveur) return serveur
-  if (!showAllErrors.value && !touchedFields.value.has('lastName')) return undefined
-  if (!formData.value.lastName?.trim()) {
-    return t('validation.last_name_required')
-  }
-  return undefined
-})
-
-const motivationError = computed(() => {
-  if (!showAllErrors.value && !touchedFields.value.has('motivation')) return undefined
-  if (motivationTooLong.value) {
-    return t('validation.motivation_too_long', { max: MOTIVATION_MAX })
-  }
-  return undefined
-})
-
-const availabilityError = computed(() => {
-  if (!showAllErrors.value && !touchedFields.value.has('availability')) return undefined
-  if (
-    !formData.value.setupAvailability &&
-    !formData.value.teardownAvailability &&
-    !formData.value.eventAvailability
-  ) {
-    return t('validation.at_least_one_availability_required')
-  }
-  return undefined
-})
-
-const allergySeverityError = computed(() => {
-  if (!showAllErrors.value && !touchedFields.value.has('allergySeverity')) return undefined
-  if (formData.value.allergies?.trim() && !formData.value.allergySeverity) {
-    return t('validation.allergy_severity_required')
-  }
-  return undefined
-})
+const phoneError = computed(() => erreurDuChamp('phone'))
+const firstNameError = computed(() => erreurDuChamp('firstName'))
+const lastNameError = computed(() => erreurDuChamp('lastName'))
+const motivationError = computed(() => erreurDuChamp('motivation'))
+const availabilityError = computed(() => erreurDuChamp('availability'))
+const allergySeverityError = computed(() => erreurDuChamp('allergySeverity'))
+const arrivalDateError = computed(() => erreurDuChamp('arrivalDateTime'))
+const departureDateError = computed(() => erreurDuChamp('departureDateTime'))
+const emergencyContactNameError = computed(() => erreurDuChamp('emergencyContactName'))
+const emergencyContactPhoneError = computed(() => erreurDuChamp('emergencyContactPhone'))
 
 const allergySeverityOptions = computed(() =>
   getAllergySeverityOptions().map((option) => ({
@@ -952,68 +951,35 @@ const allergySeverityDescriptionClass = computed(() => {
   return getAllergySeverityBadgeClasses(formData.value.allergySeverity)
 })
 
-const arrivalDateError = computed(() => {
-  if (!showAllErrors.value && !touchedFields.value.has('arrivalDateTime')) return undefined
-  if (
-    (formData.value.setupAvailability ||
-      formData.value.eventAvailability ||
-      formData.value.teardownAvailability) &&
-    !formData.value.arrivalDateTime
-  ) {
-    return t('validation.arrival_date_required')
-  }
-  return undefined
-})
+/**
+ * Les messages actuellement affichés, pour le bandeau récapitulatif.
+ *
+ * Volontairement construit depuis les erreurs *affichées* et non depuis les manquements : le
+ * bandeau doit refléter ce que le candidat a sous les yeux, y compris les refus du serveur qui
+ * n'apparaissent nulle part ailleurs.
+ */
+const validationErrors = computed(
+  () =>
+    [
+      phoneError.value,
+      firstNameError.value,
+      lastNameError.value,
+      allergySeverityError.value,
+      emergencyContactNameError.value,
+      emergencyContactPhoneError.value,
+      motivationError.value,
+      availabilityError.value,
+      arrivalDateError.value,
+      departureDateError.value,
+    ].filter(Boolean) as string[]
+)
 
-const departureDateError = computed(() => {
-  if (!showAllErrors.value && !touchedFields.value.has('departureDateTime')) return undefined
-  if (
-    (formData.value.eventAvailability || formData.value.teardownAvailability) &&
-    !formData.value.departureDateTime
-  ) {
-    return t('validation.departure_date_required')
-  }
-  return undefined
-})
-
-const emergencyContactNameError = computed(() => {
-  if (!shouldAskEmergencyContact.value) return undefined
-  if (!showAllErrors.value && !touchedFields.value.has('emergencyContactName')) return undefined
-  if (!formData.value.emergencyContactName?.trim()) {
-    return t('validation.emergency_contact_name_required')
-  }
-  return undefined
-})
-
-const emergencyContactPhoneError = computed(() => {
-  if (!shouldAskEmergencyContact.value) return undefined
-  const serveur = erreurServeur('emergencyContactPhone')
-  if (serveur) return serveur
-  if (!showAllErrors.value && !touchedFields.value.has('emergencyContactPhone')) return undefined
-  if (!formData.value.emergencyContactPhone?.trim()) {
-    return t('validation.emergency_contact_phone_required')
-  }
-  return undefined
-})
-
-// Global validation computed properties
-const validationErrors = computed(() => {
-  const errors: (string | undefined)[] = [
-    phoneError.value,
-    firstNameError.value,
-    lastNameError.value,
-    allergySeverityError.value,
-    emergencyContactNameError.value,
-    emergencyContactPhoneError.value,
-    motivationError.value,
-    availabilityError.value,
-    arrivalDateError.value,
-    departureDateError.value,
-  ]
-  return errors.filter(Boolean) as string[]
-})
-
-const isFormValid = computed(() => validationErrors.value.length === 0)
+// La validité tient aux règles, pas à ce qui est affiché : un champ jamais touché n'affiche rien
+// mais peut très bien manquer. Auparavant les deux se confondaient, et seul `showAllErrors`
+// empêchait le formulaire de se croire valide.
+const isFormValid = computed(
+  () => manquements.value.length === 0 && validationErrors.value.length === 0
+)
 
 const showPreferencesSection = computed(() => {
   return (
@@ -1025,16 +991,9 @@ const showPreferencesSection = computed(() => {
 })
 
 // Computed pour savoir si on doit demander le contact d'urgence
-const shouldAskEmergencyContact = computed(() => {
-  // Demandé explicitement par l'organisateur
-  if (props.volunteersInfo?.askEmergencyContact) return true
-
-  // Ou si niveau de sévérité nécessite un contact d'urgence
-  if (formData.value.allergySeverity && requiresEmergencyContact(formData.value.allergySeverity))
-    return true
-
-  return false
-})
+// Affiché et exigé pour les mêmes raisons, et par le même code : montrer le champ sans le rendre
+// obligatoire — ou l'inverse — était le risque que cette double écriture portait.
+const shouldAskEmergencyContact = computed(() => contactDUrgenceExige(reglagesDeValidation.value))
 
 const showAboutYouSection = computed(() => {
   return (
