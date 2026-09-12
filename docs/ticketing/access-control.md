@@ -102,9 +102,10 @@ const bodySchema = z.object({
 
 ### Vérifier via QR Code
 
-**Route** : `POST /api/editions/:id/ticketing/verify-qrcode`
+**Route** : `POST /api/editions/:id/ticketing/verify`
 
-**Permission** : `canAccessEditionData`
+**Permission** : `canAccessEditionDataOrAccessControl` — gestionnaires, mais aussi bénévoles en
+créneau actif de contrôle d'accès.
 
 **Body** :
 
@@ -560,7 +561,7 @@ Les bénévoles qui ont explicitement indiqué être disponibles uniquement pour
 const onScan = async (qrCode: string) => {
   try {
     // Vérifier le QR code
-    const { participant } = await $fetch(`/api/editions/${editionId}/ticketing/verify-qrcode`, {
+    const { participant } = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
       method: 'POST',
       body: { qrCode },
     })
@@ -662,7 +663,7 @@ console.log(`${participants.length} adultes non validés`)
 ```
 1. Participant présente son QR code
 2. Bénévole scanne avec QrCodeScanner
-3. Système vérifie le QR code (verify-qrcode)
+3. Système vérifie le QR code (verify)
 4. Si trouvé et non validé :
    a. Affiche les détails (modal)
    b. Valide automatiquement (validate-entry)

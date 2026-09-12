@@ -79,8 +79,9 @@ Méthodes (chacune correspond à un endpoint actuel) : `listNotValidated`, `sear
 
 ## Déjà fait (réduction de la surface en cœur)
 
-- Endpoints **autonomes** déplacés dans le layer sans port : `verify-qrcode.post` (lookup QR HelloAsso),
-  `stats-sse.get` (flux SSE).
+- Endpoints **autonomes** déplacés dans le layer sans port : `stats-sse.get` (flux SSE).
+  `verify-qrcode.post` en faisait partie ; il a depuis été supprimé — sans appelant, et il relayait
+  des identifiants HelloAsso fournis dans le corps de la requête.
 - Les autres endpoints config (settings/sumup/external) sont déjà dans le layer via le port `event`
   (PR #37).
 
