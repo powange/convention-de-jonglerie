@@ -8,11 +8,18 @@ interface Counter {
   editionId: number
   createdAt: string
   updatedAt: string
+  /**
+   * Qui a modifié la valeur en dernier. `null` tant que personne n'y a touché depuis l'ajout du
+   * champ — les compteurs existants n'ont évidemment pas d'historique rétroactif.
+   */
+  lastActor?: { id?: number; pseudo: string } | null
 }
 
 interface CounterUpdate {
   counterId: number
   value: number
+  /** Qui vient de modifier. `null` si la diffusion ne le porte pas. */
+  lastActorPseudo?: string | null
   name: string
   updatedAt: string
 }
@@ -193,6 +200,11 @@ export function useTicketingCounter(editionId: number, token: string) {
       if (counter.value && update.counterId === counter.value.id) {
         counter.value.value = update.value
         counter.value.updatedAt = update.updatedAt
+        // Toujours réécrit, y compris à `null` : garder l'ancien nom à côté d'un nouveau total
+        // attribuerait le geste à la mauvaise personne.
+        // Pas d'identifiant ici : la diffusion ne porte que le pseudo, et en inventer un
+        // reviendrait à désigner un compte au hasard. L'écran n'affiche que le pseudo.
+        counter.value.lastActor = update.lastActorPseudo ? { pseudo: update.lastActorPseudo } : null
       }
     })
 

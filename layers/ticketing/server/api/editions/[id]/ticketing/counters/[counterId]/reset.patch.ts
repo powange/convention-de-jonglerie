@@ -39,11 +39,13 @@ export default wrapApiHandler(
       },
       data: {
         value: 0,
+        // Qui a modifié en dernier : `updatedAt` disait quand, pas qui.
+        lastActorId: user.id,
       },
     })
 
     // Diffuser la mise à jour via SSE
-    broadcastCounterUpdate(editionId, counterId, updatedCounter)
+    broadcastCounterUpdate(editionId, counterId, updatedCounter, user.pseudo)
 
     return createSuccessResponse({ counter: updatedCounter }, 'Compteur réinitialisé à 0')
   },

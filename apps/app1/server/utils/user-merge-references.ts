@@ -48,7 +48,7 @@ export interface UserReference {
 }
 
 /**
- * 48 colonnes : 44 relations Prisma + 4 références « molles ».
+ * 49 colonnes : 45 relations Prisma + 4 références « molles ».
  * Vérifié contre `prisma/schema/*.prisma`.
  */
 export const USER_REFERENCES: UserReference[] = [
@@ -174,6 +174,11 @@ export const USER_REFERENCES: UserReference[] = [
   // Une avance de trésorerie porte de l'argent dû à la personne : elle doit suivre le compte
   // conservé, pas disparaître dans le fourre-tout.
   { model: 'treasuryEntry', field: 'advancedById', group: 'treasury' },
+  // Dernier compte à avoir modifié un compteur de passage. Sans transfert, la fusion laisserait
+  // la trace pointer vers le compte écarté : l'écran n'afficherait plus personne, et la question
+  // à laquelle ce champ sert à répondre — qui appeler devant un total aberrant — resterait sans
+  // réponse. `onDelete: SetNull` protège de l'erreur de clé étrangère, pas de la perte.
+  { model: 'ticketingCounter', field: 'lastActorId', group: 'misc' },
   // Échanges de créneaux. Les trois rôles suivent le compte conservé : sans quoi la fusion
   // buterait sur les clés étrangères, et l'historique d'un échange perdrait qui l'a demandé.
   { model: 'volunteerSwapRequest', field: 'requesterId', group: 'volunteers' },

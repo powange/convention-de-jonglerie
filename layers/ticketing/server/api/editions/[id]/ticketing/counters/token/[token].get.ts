@@ -17,6 +17,13 @@ export default wrapApiHandler(
         token,
         editionId,
       },
+      // Le pseudo du dernier acteur, et rien d'autre de son compte : ces lectures sont ouvertes
+      // à qui détient le lien du compteur, un identifiant ou une adresse n'y a pas sa place.
+      include: {
+        lastActor: {
+          select: { id: true, pseudo: true },
+        },
+      },
     })
 
     if (!counter) {

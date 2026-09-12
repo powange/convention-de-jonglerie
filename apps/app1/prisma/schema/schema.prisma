@@ -65,6 +65,7 @@ model User {
   manuallyAddedVolunteers            EditionVolunteerApplication[]       @relation("ManuallyAddedVolunteers")
   feedbacks                          Feedback[]
   apiErrorLogs                       ApiErrorLog[]
+  ticketingCountersTouched           TicketingCounter[]                  @relation("TicketingCounterLastActor")
   notifications                      Notification[]
   lostFoundComments                  LostFoundComment[]
   lostFoundItems                     LostFoundItem[]

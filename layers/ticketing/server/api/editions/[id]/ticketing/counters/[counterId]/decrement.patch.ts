@@ -50,11 +50,13 @@ export default wrapApiHandler(
         value: {
           decrement: step,
         },
+        // Qui a modifié en dernier : `updatedAt` disait quand, pas qui.
+        lastActorId: user.id,
       },
     })
 
     // Diffuser la mise à jour via SSE
-    broadcastCounterUpdate(editionId, counterId, updatedCounter)
+    broadcastCounterUpdate(editionId, counterId, updatedCounter, user.pseudo)
 
     return createSuccessResponse({ counter: updatedCounter })
   },
