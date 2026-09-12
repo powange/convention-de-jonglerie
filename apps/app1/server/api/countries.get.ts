@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { deduplicateCountries } from '#server/utils/countries'
+import { filtreStatutEdition } from '#server/utils/visibilite-edition'
 
 export default wrapApiHandler(
   async (event) => {
@@ -43,11 +44,7 @@ export default wrapApiHandler(
     const where: Record<string, unknown> = {}
 
     // Statut des éditions
-    if (includeOffline !== 'true') {
-      where.status = { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] }
-    } else {
-      where.status = { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] }
-    }
+    where.status = filtreStatutEdition(includeOffline === 'true')
 
     // Filtre par nom
     if (name) {
