@@ -74,6 +74,21 @@ services:
     # Exécuter les migrations Prisma (idempotent) puis démarrer Nuxt en mode dev.
     # Optimisé pour réduire les temps de démarrage avec gestion des permissions
     command: sh -lc "/app/apps/app1/scripts/docker-start.sh"
+    # Terminal attaché au conteneur : sans lui, l'invite d'autorisation de @vitejs/devtools n'est
+    # ni affichée ni répondable. Elle est interactive — elle attend une frappe — et un conteneur
+    # sans TTY n'en offre aucune : l'interface DevTools réclamait un jeton que rien n'imprimait,
+    # ni dans les logs ni dans un fichier (cherché dans tout le conteneur, il n'est pas persisté).
+    #
+    # Pour répondre à l'invite : `docker attach convention-app-dev`, puis Ctrl-P Ctrl-Q pour se
+    # détacher sans arrêter le conteneur. À refaire à chaque redémarrage du serveur de dev, le
+    # jeton n'étant pas conservé.
+    #
+    # ⚠️ Ne pas « simplifier » en posant VITE_DEVTOOLS_DISABLE_CLIENT_AUTH : /__devtools/ répond
+    # publiquement sur dev.juggling-convention.com (vérifié, HTTP 200 sans session), et cet outil
+    # accède au système de fichiers et exécute des commandes. L'authentification est la seule
+    # barrière tant que le reverse proxy laisse passer ce chemin.
+    tty: true
+    stdin_open: true
     # Charger toutes les variables d'environnement depuis le fichier .env (apps/app1/.env)
     env_file:
       - .env
@@ -126,6 +141,14 @@ services:
     ports:
       - '3000:3000' # Application Nuxt
       - '24678:24678' # Vite HMR (Hot Module Replacement)
+      # Serveur RPC de Vite DevTools. Le navigateur s'y connecte en direct, sur un port distinct
+      # de l'application : sans publication, `ws://localhost:7812` n'aboutit pas et DevTools reste
+      # bloqué sur sa demande d'autorisation.
+      #
+      # À n'ouvrir qu'en local : DevTools accède au système de fichiers et exécute des commandes.
+      # Ce port n'a rien à faire derrière le reverse proxy — se connecter sur
+      # http://localhost:3000, pas sur l'URL publique.
+      - '7812:7812' # Vite DevTools (RPC websocket)
     depends_on:
       database:
         condition: service_healthy

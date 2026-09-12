@@ -232,6 +232,14 @@ export default defineNuxtConfig({
           // l'organisateur en a déjà réalisé une. Chemin restreint à My Maps : le reste de
           // google.com n'a pas à pouvoir être encadré dans le site.
           'https://www.google.com/maps/d/',
+          // L'interface de Nuxt DevTools est une iframe servie par l'application elle-même
+          // (/__nuxt_devtools__/client/). Sans `'self'`, la CSP du site bloque son propre outil
+          // de développement — constaté en console : « Framing … violates … frame-src ».
+          //
+          // En développement UNIQUEMENT : `'self'` en production autoriserait le site à
+          // s'encadrer lui-même, ce qui rouvre la porte au détournement de clic que
+          // `frame-ancestors` et X-Frame-Options ferment par ailleurs.
+          ...(process.env.NODE_ENV === 'production' ? [] : ["'self'"]),
         ],
         'base-uri': ["'none'"],
         'object-src': ["'none'"],
@@ -575,6 +583,18 @@ export default defineNuxtConfig({
     },
     // Configuration Vite pour le hot reload dans Docker sur Windows
     server: {
+      // Écouter sur toutes les adresses, et pas seulement la boucle locale.
+      //
+      // Ce n'est pas pour le serveur Nuxt — Nitro écoute déjà sur 0.0.0.0 via NUXT_HOST. C'est
+      // pour le serveur RPC de Vite DevTools, dont l'hôte est déduit de cette valeur :
+      //
+      //   const host = config.server.host === true ? "0.0.0.0" : config.server.host || "localhost"
+      //
+      // Sans cette ligne il retombait sur "localhost" et se liait à `::1` À L'INTÉRIEUR du
+      // conteneur, donc injoignable même depuis la machine hôte : le navigateur tentait
+      // `ws://localhost:7812` et échouait, l'autorisation n'était jamais demandée, et aucune
+      // invite n'apparaissait — d'où un jeton introuvable dans les logs comme sur le disque.
+      host: true,
       watch: {
         usePolling: true,
         interval: 1000,
