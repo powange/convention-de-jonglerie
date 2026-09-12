@@ -693,18 +693,37 @@ export default defineNuxtConfig({
 
   // Configuration des modules SEO
   robots: {
-    // Permettre l'indexation uniquement sur le domaine principal en production
-    disallow: process.env.NUXT_ENV === 'staging' || process.env.NUXT_ENV === 'release' ? ['/'] : [],
+    // Pas de `disallow` calculé ici, et c'est le correctif d'un bug silencieux.
+    //
+    // Cette ligne valait `process.env.NUXT_ENV === 'staging' || 'release' ? ['/'] : []`, avec
+    // l'intention de n'autoriser l'indexation que sur le domaine principal. Elle n'a jamais pu
+    // s'appliquer : `NUXT_ENV` est lu **au build**, or le build ne reçoit aucune variable
+    // — `docker-compose.prod.yml` ne déclare aucun `args:`, et Docker ne transmet pas
+    // l'environnement du conteneur à `docker build`. Constaté sur les environnements réels : les
+    // `robots.txt` de release et de production étaient identiques, `Allow: /` pour tous.
+    //
+    // `@nuxtjs/seo` sait le décider à l'exécution : il bloque l'indexation dès que l'environnement
+    // du site n'est pas `production`. Il suffit donc de poser `NUXT_SITE_ENV=staging` dans le
+    // `stack.env` de release — une variable d'exécution, que celle-ci reçoit bien.
+    //
+    // Un `disallow: []` explicite est d'ailleurs pire que rien : il affirme « tout est
+    // autorisé » là où le module aurait interdit.
     sitemap: '/sitemap.xml',
     debug: false,
   },
 
   sitemap: {
-    // Désactiver le sitemap sur les environnements non-production
-    enabled:
-      process.env.NODE_ENV === 'production' &&
-      process.env.NUXT_ENV !== 'staging' &&
-      process.env.NUXT_ENV !== 'release',
+    // `NUXT_ENV` était testé ici aussi, avec la même intention — désactiver le sitemap hors
+    // production — et la même inefficacité : la variable n'atteint jamais le build. Les deux
+    // conditions sont retirées plutôt que laissées à faire illusion ; le comportement ne change
+    // pas, puisqu'elles ne se déclenchaient pas.
+    //
+    // Le sitemap reste donc servi sur release. Ce n'est pas un oubli : `enabled` est une option de
+    // build, et rien ne permet de la décider à l'exécution. Le levier qui compte est le
+    // `robots.txt`, lui décidé à l'exécution — un moteur qui le respecte ne viendra pas lire ce
+    // sitemap. `nuxt build` fixant lui-même `NODE_ENV` à `production`, la condition restante est
+    // toujours vraie ; elle est gardée pour le cas d'un build lancé autrement.
+    enabled: process.env.NODE_ENV === 'production',
     // Exclure certaines routes du sitemap
     exclude: [
       '/admin/**',
