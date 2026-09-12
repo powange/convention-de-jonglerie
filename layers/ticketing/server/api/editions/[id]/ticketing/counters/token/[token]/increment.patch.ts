@@ -12,8 +12,10 @@ const incrementSchema = z.object({
 export default wrapApiHandler(
   async (event) => {
     // Authentification requise mais pas de vérification de permissions
-    // Les compteurs partagés via QR code sont accessibles à tous les utilisateurs authentifiés
-    requireAuth(event)
+    // Les compteurs partagés via QR code sont accessibles à tous les utilisateurs authentifiés.
+    // L'utilisateur est tout de même retenu : il n'ouvre aucun droit, il sert uniquement à
+    // savoir qui a touché le compteur en dernier.
+    const user = requireAuth(event)
     const editionId = validateEditionId(event)
     const token = z.string().min(1).parse(getRouterParam(event, 'token'))
 
@@ -42,11 +44,21 @@ export default wrapApiHandler(
         value: {
           increment: step,
         },
+        // Qui a modifié en dernier. Un compteur se partage par QR code : plusieurs personnes
+        // l'incrémentent, et `updatedAt` disait quand sans dire qui — de quoi constater un total
+        // aberrant sans pouvoir l'expliquer.
+        lastActorId: user.id,
       },
     })
 
     // Notifier les clients connectés
-    notifyCounterUpdate(editionId, counter.id, counter.value, counter.updatedAt.toISOString())
+    notifyCounterUpdate(
+      editionId,
+      counter.id,
+      counter.value,
+      counter.updatedAt.toISOString(),
+      user.pseudo
+    )
 
     return createSuccessResponse({ counter })
   },

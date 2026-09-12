@@ -45,6 +45,7 @@
       "description": "Gérez les compteurs synchronisés en temps réel pour compter les jauges",
       "disconnected": "Déconnecté",
       "info_title": "Informations",
+      "last_actor": "Modifié par",
       "last_update": "Dernière mise à jour",
       "loading": "Chargement des compteurs...",
       "loading_error": "Erreur lors du chargement des compteurs",

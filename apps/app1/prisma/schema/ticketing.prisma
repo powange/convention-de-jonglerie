@@ -490,8 +490,23 @@ model TicketingCounter {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  /// Dernier compte à avoir modifié la valeur.
+  ///
+  /// Un compteur se partage par QR code : plusieurs personnes l'incrémentent, et rien ne
+  /// permettait de comprendre un total aberrant après coup. `updatedAt` disait quand, pas qui.
+  ///
+  /// Volontairement le DERNIER acteur, et non un journal complet : une ligne par geste ferait du
+  /// volume à l'échelle d'une convention et demanderait une purge, alors que retrouver qui
+  /// appeler suffit presque toujours.
+  ///
+  /// `SetNull` plutôt que `Cascade` : supprimer ou anonymiser un compte ne doit pas emporter le
+  /// compteur d'une édition.
+  lastActorId Int?
+
+  edition   Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  lastActor User?   @relation("TicketingCounterLastActor", fields: [lastActorId], references: [id], onDelete: SetNull)
 
   @@index([editionId])
   @@index([token])
+  @@index([lastActorId])
 }

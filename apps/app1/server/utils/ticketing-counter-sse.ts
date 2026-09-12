@@ -137,7 +137,17 @@ class CounterStreamManager {
   /**
    * Diffuse une mise à jour de compteur à tous les clients connectés
    */
-  broadcastUpdate(editionId: number, counterId: number, counter: TicketingCounter): void {
+  /**
+   * `lastActorPseudo` accompagne la valeur, et ce n'est pas un ornement : l'écran affiche qui a
+   * modifié en dernier. Sans lui dans la diffusion, un appareil resté ouvert montrerait le
+   * nouveau total à côté du nom de la personne PRÉCÉDENTE — plus trompeur que de ne rien dire.
+   */
+  broadcastUpdate(
+    editionId: number,
+    counterId: number,
+    counter: TicketingCounter,
+    lastActorPseudo?: string | null
+  ): void {
     const editionCounters = this.connections.get(editionId)
     if (!editionCounters) return
 
@@ -151,6 +161,7 @@ class CounterStreamManager {
         value: counter.value,
         name: counter.name,
         updatedAt: counter.updatedAt.toISOString(),
+        lastActorPseudo: lastActorPseudo ?? null,
       }),
     }
 
@@ -239,9 +250,10 @@ export function getActiveCounterConnections(editionId: number, counterId: number
 export function broadcastCounterUpdate(
   editionId: number,
   counterId: number,
-  counter: TicketingCounter
+  counter: TicketingCounter,
+  lastActorPseudo?: string | null
 ): void {
-  counterStreamManager.broadcastUpdate(editionId, counterId, counter)
+  counterStreamManager.broadcastUpdate(editionId, counterId, counter, lastActorPseudo)
 }
 
 /**
@@ -251,7 +263,8 @@ export function notifyCounterUpdate(
   editionId: number,
   counterId: number,
   value: number,
-  updatedAt: string
+  updatedAt: string,
+  lastActorPseudo?: string | null
 ): void {
   // Créer un objet compteur minimal pour la diffusion
   const counter = {
@@ -260,5 +273,5 @@ export function notifyCounterUpdate(
     updatedAt: new Date(updatedAt),
   } as TicketingCounter
 
-  counterStreamManager.broadcastUpdate(editionId, counterId, counter)
+  counterStreamManager.broadcastUpdate(editionId, counterId, counter, lastActorPseudo)
 }

@@ -70,12 +70,15 @@ describe('PATCH /api/editions/[id]/ticketing/counters/[counterId]/reset', () => 
   })
 
   describe('ce qu’elle fait', () => {
-    it('remet la valeur à zéro, et rien d’autre', async () => {
+    it('remet la valeur à zéro, et n’écrit que ça et l’auteur', async () => {
       await appeler()
 
       const ecrit = prismaMock.ticketingCounter.update.mock.calls[0][0]
       expect(ecrit.where).toEqual({ id: 12 })
-      expect(ecrit.data).toEqual({ value: 0 })
+      // `toEqual` et non `toMatchObject`, délibérément : cette assertion est là pour faire
+      // échouer toute écriture supplémentaire non voulue sur le compteur. `lastActorId` y est
+      // entré sciemment — il répond à « qui a effacé le décompte ».
+      expect(ecrit.data).toEqual({ value: 0, lastActorId: 7 })
     })
 
     it('reste cantonnée à l’édition de l’URL', async () => {
@@ -100,7 +103,14 @@ describe('PATCH /api/editions/[id]/ticketing/counters/[counterId]/reset', () => 
       // ouvert continuerait d'afficher l'ancien total et le ferait repartir de là.
       await appeler()
 
-      expect(mockBroadcast).toHaveBeenCalledWith(22, 12, expect.objectContaining({ value: 0 }))
+      // Le pseudo accompagne la valeur : sans lui, un appareil resté ouvert afficherait le
+      // nouveau total à côté du nom de la personne précédente.
+      expect(mockBroadcast).toHaveBeenCalledWith(
+        22,
+        12,
+        expect.objectContaining({ value: 0 }),
+        'orga'
+      )
     })
   })
 })

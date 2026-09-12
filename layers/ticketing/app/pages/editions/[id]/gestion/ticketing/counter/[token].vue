@@ -268,6 +268,17 @@
                   formatDateTime(counter.updatedAt)
                 }}</span>
               </div>
+              <!-- Qui a modifié en dernier. Absent tant que personne n'y a touché depuis
+                   l'ajout du champ : les compteurs existants n'ont pas d'historique
+                   rétroactif, et afficher « inconnu » ferait croire à une anomalie. -->
+              <div v-if="counter.lastActor">
+                <span class="text-gray-500 dark:text-gray-400"
+                  >{{ $t('ticketing.counters.last_actor') }}:</span
+                >
+                <span class="ml-2 text-gray-900 dark:text-white">{{
+                  counter.lastActor.pseudo
+                }}</span>
+              </div>
             </div>
           </div>
         </UCard>
