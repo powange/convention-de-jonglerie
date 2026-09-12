@@ -40,7 +40,7 @@ Le projet est deja bien configure sur de nombreux aspects. Voici ce qui est en p
 | Authentification          | Sessions scellees (`nuxt-auth-utils`), middleware serveur obligatoire                                 | OK     |
 | Chiffrement donnees       | AES-256-GCM pour les donnees sensibles en base                                                        | OK     |
 | reCAPTCHA v3              | Validation serveur avec score minimum configurable                                                    | OK     |
-| Robots/SEO                | `X-Robots-Tag: noindex` hors production, sitemap dynamique                                            | OK     |
+| Robots/SEO                | `X-Robots-Tag: noindex` hors production via `NUXT_SITE_ENV` (@nuxtjs/seo), sitemap dynamique          | OK     |
 | Pre-bundling Vite         | 22 packages dans `optimizeDeps.include`                                                               | OK     |
 | Prisma externalise        | `@prisma/client` dans `serverExternals`                                                               | OK     |
 | Sourcemaps                | Desactives en prod serveur, actives en dev client                                                     | OK     |
@@ -56,7 +56,7 @@ Le projet est deja bien configure sur de nombreux aspects. Voici ce qui est en p
 - `tsconfig.json` - Configuration TypeScript
 - `eslint.config.mjs` - Regles ESLint
 - `vitest.config.ts` - Configuration tests multi-projets
-- `server/middleware/` - auth, cache-headers, noindex
+- `server/middleware/` - auth, cache-headers
 - `server/plugins/` - scheduler, error-logging, countries, recaptcha-debug
 - `server/utils/` - prisma, api-helpers, errors, auth-utils, rate-limiter, encryption
 - `app/middleware/` - auth-protected, guest-only, load-translations, super-admin, verify-email-access

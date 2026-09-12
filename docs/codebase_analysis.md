@@ -100,7 +100,7 @@ convention-de-jonglerie/
 | `server/api/`            | 282 endpoints REST, organisés par ressource                                                                         |
 | `server/utils/`          | 90 helpers : permissions, Prisma, notifications, emails, validation                                                 |
 | `server/<module>/ports/` | Interfaces de découplage pour 9 modules                                                                             |
-| `server/middleware/`     | CSRF (`00.csrf.ts`), auth, entêtes de cache, `noindex`                                                              |
+| `server/middleware/`     | CSRF (`00.csrf.ts`), auth, entêtes de cache                                                              |
 | `shared/`                | Code partagé client/serveur — c'est là que vivent les règles testables sans base                                    |
 | `prisma/schema/`         | Schéma découpé en 15 fichiers par domaine                                                                           |
 | `i18n/locales/`          | 13 langues × 26 domaines                                                                                            |
@@ -218,7 +218,7 @@ L'intention, lisible dans les commentaires : _« À l'extraction en layer, ce fi
 Navigateur
    │  (SSR ou fetch client)
    ▼
-Nitro ── 00.csrf.ts ── auth.ts ── cache-headers ── noindex
+Nitro ── 00.csrf.ts ── auth.ts ── cache-headers
    │
    ▼
 server/api/<ressource>/<verbe>.ts
