@@ -130,7 +130,10 @@ export function useTicketingCounter(editionId: number, token: string) {
             body: { step: op.step || 1 },
           })
         } else if (op.type === 'reset') {
-          await $fetch(`/api/editions/${editionId}/ticketing/counters/token/${token}/reset`, {
+          // Par IDENTIFIANT, pas par jeton : la remise à zéro est réservée aux gestionnaires
+          // (voir `reset` plus bas). Si le compteur n'a pas été chargé, on ne peut pas la rejouer.
+          if (!counter.value) throw new Error('Compteur inconnu : remise à zéro impossible')
+          await $fetch(`/api/editions/${editionId}/ticketing/counters/${counter.value.id}/reset`, {
             method: 'PATCH',
           })
         }
@@ -362,7 +365,16 @@ export function useTicketingCounter(editionId: number, token: string) {
   }
 
   /**
-   * Réinitialise le compteur à 0 (avec support hors-ligne)
+   * Réinitialise le compteur à 0 (avec support hors-ligne).
+   *
+   * Réservée aux **gestionnaires** de la billetterie, contrairement à l'incrément et au
+   * décrément : elle passe par la route par identifiant, qui exige `canManageTicketingById`.
+   * La route jumelle par jeton a été supprimée — la garder aurait laissé n'importe quel compte
+   * détenteur du lien remettre le compteur à zéro depuis l'API, bouton caché ou non.
+   *
+   * Le partage par QR code reste ce qu'il est : qui tient le lien compte les entrées. Mais
+   * remettre à zéro efface un décompte de soirée sans retour possible, et ce n'est pas le même
+   * geste que d'ajouter une entrée.
    */
   const reset = async () => {
     if (!counter.value) return
@@ -387,7 +399,7 @@ export function useTicketingCounter(editionId: number, token: string) {
     // Si en ligne, essayer d'envoyer directement
     isUpdating.value = true
     try {
-      await $fetch(`/api/editions/${editionId}/ticketing/counters/token/${token}/reset`, {
+      await $fetch(`/api/editions/${editionId}/ticketing/counters/${counter.value.id}/reset`, {
         method: 'PATCH',
       })
       // La mise à jour sera reçue via SSE

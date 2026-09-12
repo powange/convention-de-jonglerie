@@ -162,8 +162,15 @@
                 </UButton>
               </div>
 
-              <!-- Bouton de réinitialisation -->
-              <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <!-- Remise à zéro : réservée aux gestionnaires de la billetterie, alors que
+                   l'incrément et le décrément restent ouverts à qui détient le lien. Ce n'est pas
+                   le même geste : ajouter une entrée se corrige, effacer un décompte de soirée
+                   non. La route jumelle par jeton a été supprimée, donc masquer le bouton ne se
+                   contourne pas par l'API. -->
+              <div
+                v-if="canManageCounter"
+                class="pt-4 border-t border-gray-200 dark:border-gray-700"
+              >
                 <UButton
                   color="neutral"
                   variant="ghost"
@@ -266,7 +273,11 @@
         </UCard>
 
         <!-- Modal de confirmation de réinitialisation -->
-        <UModal v-model:open="showResetModal" :title="$t('ticketing.counters.reset_counter')">
+        <UModal
+          v-if="canManageCounter"
+          v-model:open="showResetModal"
+          :title="$t('ticketing.counters.reset_counter')"
+        >
           <template #body>
             <div class="space-y-4">
               <UAlert
