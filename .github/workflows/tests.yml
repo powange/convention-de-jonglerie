@@ -433,14 +433,30 @@ jobs:
     # son propre compte E2E et sa propre édition. L'isolement tient par construction, et non par une
     # discipline que les tests auraient à respecter.
     #
-    # `job-total` plutôt qu'un `2` écrit en dur : ajouter une valeur à la liste ci-dessous suffit à
-    # changer le découpage, sans qu'un second nombre reste à mettre à jour ailleurs.
+    # `job-total` plutôt qu'un nombre écrit en dur : ajouter une valeur à la liste ci-dessous suffit
+    # à changer le découpage, sans qu'un second nombre reste à mettre à jour ailleurs.
+    #
+    # Trois, et pas davantage. Les rapports des deux premiers shards donnent 628 s de tests et une
+    # préparation de 105 s par shard — mesurée, et remarquablement constante d'un shard à l'autre.
+    # C'est elle qui fixe le rendement décroissant :
+    #
+    #   2 shards → 419 s par shard au mieux    (838 s de compute)
+    #   3 shards → 314 s                       (943 s)
+    #   4 shards → 262 s, soit 52 s de mieux   (1048 s)
+    #
+    # Le quatrième coûterait donc 105 s de compute pour 52 s d'attente. Le troisième en coûte autant
+    # pour en gagner deux fois plus.
+    #
+    # Playwright répartit les fichiers par nombre de tests, pas par durée : l'équilibre parfait
+    # ci-dessus ne sera pas atteint. Le premier découpage en deux a donné 478 s contre 360. Aucun
+    # fichier ne domine cependant — le plus lourd pèse 38,6 s sur 628 —, donc l'écart reste du
+    # ressort du hasard de la répartition et non d'un plancher structurel.
     strategy:
       # Comme pour le job `test` : on veut voir tous les échecs, pas seulement celui du premier
       # shard qui tombe. Un shard rouge n'apprend rien sur l'autre.
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3]
 
     # Ces trois variables n'existaient que dans playwright.yml et restent portées par ce seul job :
     # au niveau workflow elles toucheraient lint, typecheck, build et test, qui n'en ont que faire.
