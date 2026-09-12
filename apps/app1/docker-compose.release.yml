@@ -45,6 +45,12 @@ services:
       NUXT_PORT: '3000'
       NODE_ENV: 'production'
       NUXT_ENV: 'release'
+      # Lu à l'exécution par @nuxtjs/seo : toute valeur autre que `production` rend le site non
+      # indexable — robots.txt en `Disallow: /`, X-Robots-Tag en `noindex`. Sans elle, release
+      # servait trois signaux contradictoires : un robots.txt permissif, un en-tête `index, follow`
+      # posé par le module, et une balise meta `noindex` posée par app.vue — seule la dernière
+      # protégeait réellement. Ne surtout pas reporter cette ligne sur la production.
+      NUXT_SITE_ENV: 'staging'
       # URL Ollama avec hostname Docker
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
     volumes:
