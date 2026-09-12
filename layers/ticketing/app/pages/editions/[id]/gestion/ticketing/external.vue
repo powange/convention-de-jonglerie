@@ -813,7 +813,7 @@
                   color="error"
                   size="sm"
                   icon="i-heroicons-trash"
-                  @click="disconnectInfomaniak"
+                  @click="showInfomaniakDisconnectModal = true"
                 >
                   {{ $t('common.dissociate') }}
                 </UButton>
@@ -899,6 +899,36 @@
       <EditionTicketingInfomaniakRawJsonModal
         v-model:open="showInfomaniakRawJsonModal"
         :data="infomaniakRawData"
+      />
+
+      <!-- Déconnexion des billetteries externes : le geste le plus destructeur du module, il
+           emporte en cascade les tarifs, options et commandes importés. Ces deux confirmations
+           passaient par `confirm()`, la boîte native du navigateur — impossible à styler, sans
+           libellé de bouton explicite, et étrangère au reste du projet. -->
+      <ConfirmModal
+        v-model="showInfomaniakDisconnectModal"
+        :title="$t('gestion.ticketing.infomaniak_disconnect_title')"
+        :description="questionDeconnexionInfomaniak"
+        :confirm-label="$t('common.dissociate')"
+        confirm-color="error"
+        icon-name="i-heroicons-exclamation-triangle"
+        icon-color="text-red-500"
+        :loading="disconnectingInfomaniak"
+        @confirm="disconnectInfomaniak"
+        @cancel="showInfomaniakDisconnectModal = false"
+      />
+
+      <ConfirmModal
+        v-model="showHelloAssoDisconnectModal"
+        :title="$t('gestion.ticketing.helloasso_disconnect_title')"
+        :description="$t('gestion.ticketing.helloasso_disconnect_confirm')"
+        :confirm-label="$t('common.dissociate')"
+        confirm-color="error"
+        icon-name="i-heroicons-exclamation-triangle"
+        icon-color="text-red-500"
+        :loading="disconnecting"
+        @confirm="executeDisconnect"
+        @cancel="showHelloAssoDisconnectModal = false"
       />
     </div>
   </div>
@@ -1299,23 +1329,27 @@ const handleInfomaniakConfigTest = async (config: { apiKey: string; currency: st
   }
 }
 
-const disconnectInfomaniak = async () => {
-  // La base est en cascade : la configuration emporte ses tarifs, ses options et ses commandes,
-  // et chaque commande ses billets. La confirmation ne disait rien de tout cela — elle laissait
-  // croire qu'on défait un branchement. Le décompte se fait dans `suppression-billetterie-externe`,
-  // éprouvé à part. Rien n'est annoncé quand rien n'a été importé : une mise en garde inventée
-  // ferait douter pour rien.
+// La base est en cascade : la configuration emporte ses tarifs, ses options et ses commandes, et
+// chaque commande ses billets. La confirmation ne disait rien de tout cela — elle laissait croire
+// qu'on défait un branchement. Le décompte se fait dans `suppression-billetterie-externe`, éprouvé
+// à part. Rien n'est annoncé quand rien n'a été importé : une mise en garde inventée ferait douter
+// pour rien.
+const questionDeconnexionInfomaniak = computed(() => {
   const resume = resumeDeconnexion.value
-  const question = resume.quelqueChoseDisparait
+  return resume.quelqueChoseDisparait
     ? t(
         'gestion.ticketing.infomaniak_disconnect_confirm_detail',
         { tarifs: resume.tarifs, options: resume.options, count: resume.commandes },
         resume.commandes
       )
     : t('gestion.ticketing.infomaniak_disconnect_confirm')
+})
 
-  if (!confirm(question)) return
+const showInfomaniakDisconnectModal = ref(false)
+const disconnectingInfomaniak = ref(false)
 
+const disconnectInfomaniak = async () => {
+  disconnectingInfomaniak.value = true
   try {
     await $fetch(`/api/editions/${editionId}/ticketing/external`, {
       method: 'DELETE',
@@ -1326,6 +1360,8 @@ const disconnectInfomaniak = async () => {
     infomaniakEventId.value = undefined
     infomaniakEventName.value = undefined
 
+    showInfomaniakDisconnectModal.value = false
+
     toast.add({
       title: t('common.saved'),
       description: t('gestion.ticketing.infomaniak_disconnected'),
@@ -1333,12 +1369,16 @@ const disconnectInfomaniak = async () => {
       color: 'success',
     })
   } catch (error: any) {
+    // La modale reste ouverte sur échec : la refermer laisserait croire que la déconnexion a eu
+    // lieu, alors que la configuration est toujours là.
     toast.add({
       title: t('common.error'),
       description: error.data?.message || t('common.error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
+  } finally {
+    disconnectingInfomaniak.value = false
   }
 }
 
@@ -1464,6 +1504,10 @@ const testConnection = () => {
 }
 
 // Action pour déconnecter HelloAsso
+// Le texte de cette confirmation était écrit EN DUR dans le composant, donc hors i18n — et avec
+// une coquille (« billeterie »). Il vit maintenant dans les traductions, comme celui d'Infomaniak.
+const showHelloAssoDisconnectModal = ref(false)
+
 const { execute: executeDisconnect, loading: disconnecting } = useApiAction(
   `/api/editions/${editionId}/ticketing/external`,
   {
@@ -1474,6 +1518,9 @@ const { execute: executeDisconnect, loading: disconnecting } = useApiAction(
     },
     errorMessages: { default: $t('ticketing.external.config_delete_error') },
     onSuccess: () => {
+      // Refermée ici et pas au clic : sur échec, la modale doit rester ouverte plutôt que de
+      // laisser croire que la déconnexion a eu lieu.
+      showHelloAssoDisconnectModal.value = false
       // Réinitialiser l'état
       hasExistingConfig.value = false
       tiersLoaded.value = false
@@ -1491,14 +1538,7 @@ const { execute: executeDisconnect, loading: disconnecting } = useApiAction(
 
 const confirmDisconnect = () => {
   if (disconnecting.value) return
-
-  const confirmed = confirm(
-    'Êtes-vous sûr de vouloir désassocier la billeterie HelloAsso ?\n\nCette action supprimera toutes les configurations et est irréversible.'
-  )
-
-  if (confirmed) {
-    executeDisconnect()
-  }
+  showHelloAssoDisconnectModal.value = true
 }
 
 const ordersLoaded = ref(false)
