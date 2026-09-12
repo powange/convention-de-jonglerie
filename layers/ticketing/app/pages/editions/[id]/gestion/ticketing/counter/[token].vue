@@ -222,7 +222,7 @@
                   </UButton>
                 </div>
                 <UButton
-                  v-if="canManageCounter"
+                  v-if="canManageCounter && counter"
                   variant="outline"
                   color="warning"
                   block
@@ -291,7 +291,7 @@
 
         <!-- Modal de confirmation de régénération du token -->
         <ConfirmModal
-          v-if="canManageCounter"
+          v-if="canManageCounter && counter"
           v-model="showRegenerateModal"
           :title="$t('ticketing.counters.regenerate_token')"
           :description="$t('ticketing.counters.regenerate_token_warning')"
@@ -323,7 +323,10 @@ const toast = useToast()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
-const token = route.params.counterId as string
+// Ce segment porte un **jeton**, pas un identifiant : c'est lui que contient le QR code affiché à
+// l'entrée, et c'est ce qui permet de partager un compteur sans partager de droits. Le paramètre
+// s'appelait `counterId`, ce qui avait fini par contaminer l'API — d'où le renommage.
+const token = route.params.token as string
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 const {
@@ -444,31 +447,36 @@ const shareUrl = async () => {
 const { execute: handleRegenerateToken, loading: isRegenerating } = useApiAction<
   undefined,
   { token: string; counter: unknown }
->(`/api/editions/${editionId}/ticketing/counters/${token}/regenerate-token`, {
-  method: 'PATCH',
-  silentSuccess: true,
-  errorMessages: {
-    default: t('ticketing.counters.regenerate_token_error'),
-  },
-  onSuccess: async (response) => {
-    if (response.token) {
-      // Déconnecter la connexion SSE actuelle avant de changer d'URL
-      disconnect()
+>(
+  // L'identifiant, pas le jeton : sous `counters/[counterId]`, c'est toujours un identifiant.
+  // Fabriquée à l'appel et non au montage, parce que le compteur n'est pas encore chargé ici.
+  () => `/api/editions/${editionId}/ticketing/counters/${counter.value?.id}/regenerate-token`,
+  {
+    method: 'PATCH',
+    silentSuccess: true,
+    errorMessages: {
+      default: t('ticketing.counters.regenerate_token_error'),
+    },
+    onSuccess: async (response) => {
+      if (response.token) {
+        // Déconnecter la connexion SSE actuelle avant de changer d'URL
+        disconnect()
 
-      toast.add({
-        title: t('common.success'),
-        description: t('ticketing.counters.token_regenerated'),
-        color: 'success',
-      })
+        toast.add({
+          title: t('common.success'),
+          description: t('ticketing.counters.token_regenerated'),
+          color: 'success',
+        })
 
-      showRegenerateModal.value = false
+        showRegenerateModal.value = false
 
-      // Utiliser nextTick pour s'assurer que la déconnexion SSE est complète
-      await nextTick()
-      window.location.href = `/editions/${editionId}/gestion/ticketing/counter/${response.token}`
-    }
-  },
-})
+        // Utiliser nextTick pour s'assurer que la déconnexion SSE est complète
+        await nextTick()
+        window.location.href = `/editions/${editionId}/gestion/ticketing/counter/${response.token}`
+      }
+    },
+  }
+)
 
 // Charger l'édition si nécessaire
 onMounted(async () => {
