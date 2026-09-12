@@ -15,13 +15,18 @@ const evenementAvec = (counterId: string) => ({
 })
 
 /**
- * Sous `counters/[counterId]`, six endpoints résolvent le compteur par son **identifiant**. Celui-ci
- * cherchait par **jeton**, dans une variable pourtant nommée `counterId`. Ça marchait — l'écran
- * l'appelait bien avec un jeton — mais rien dans la route ne le disait, et le prochain endpoint
- * ajouté là aurait eu une chance sur deux de se tromper, avec un 404 pour tout symptôme.
+ * Cet endpoint désigne le compteur par son **jeton**, alors que les six autres de
+ * `counters/[counterId]` le désignent par son identifiant. C'est l'incohérence P2 de l'audit, et
+ * elle est assumée : la corriger (#385) a cassé la production.
  *
- * La règle est désormais sans exception : `[counterId]` est un identifiant, `token/[token]` est un
- * jeton. Ce fichier de test existe pour qu'elle le reste.
+ * L'écran du compteur est adressé par jeton — c'est tout ce que portent son URL et son QR code. Le
+ * faire appeler par identifiant rendait l'API incompatible avec tout client encore sur le bundle
+ * précédent, et un écran laissé ouvert à une entrée de convention est exactement ce cas. Le
+ * déploiement a aggravé la chose en continuant de servir la page supprimée par #385, qui appelait
+ * donc toujours avec un jeton.
+ *
+ * Ces tests pinnent la résolution par jeton pour qu'un retour de P2 soit un choix conscient, pas
+ * une régression silencieuse.
  */
 describe('PATCH /api/editions/[id]/ticketing/counters/[counterId]/regenerate-token', () => {
   const compteur = { id: 88, name: 'Entrée principale', token: 'ancien-jeton', editionId: 22 }
@@ -39,27 +44,31 @@ describe('PATCH /api/editions/[id]/ticketing/counters/[counterId]/regenerate-tok
   const clauseRecherchee = () => prismaMock.ticketingCounter.findFirst.mock.calls[0][0].where
 
   describe('ce que le segment désigne', () => {
-    it('cherche le compteur par son identifiant, pas par son jeton', async () => {
-      await handler(evenementAvec('88') as any)
+    it('cherche le compteur par son jeton', async () => {
+      await handler(evenementAvec('ancien-jeton') as any)
 
-      expect(clauseRecherchee()).toEqual({ id: 88, editionId: 22 })
-      expect(clauseRecherchee()).not.toHaveProperty('token')
+      expect(clauseRecherchee()).toEqual({ token: 'ancien-jeton', editionId: 22 })
+      expect(clauseRecherchee()).not.toHaveProperty('id')
     })
 
-    it('refuse un jeton là où un identifiant est attendu', async () => {
-      // C'est le sens qui compte : avant, cette valeur était *la* clé de recherche. Elle doit
-      // maintenant être rejetée avant toute requête, et non chercher un compteur inexistant.
-      await expect(handler(evenementAvec('ancien-jeton') as any)).rejects.toMatchObject({
-        statusCode: 400,
-      })
+    it('accepte un jeton non numérique', async () => {
+      // Les jetons sont des cuid à la création (`@default(cuid())`) et des UUID après
+      // régénération. Les contraindre à un entier — ce qu'a fait #385 — refuse tout jeton réel :
+      // c'est exactement la panne qu'a subie la production.
+      for (const jeton of ['cmt7fitrc000701pety4i61nm', crypto.randomUUID()]) {
+        vi.clearAllMocks()
+        prismaMock.ticketingCounter.findFirst.mockResolvedValue(compteur)
+        prismaMock.ticketingCounter.update.mockResolvedValue(compteur)
 
-      expect(prismaMock.ticketingCounter.findFirst).not.toHaveBeenCalled()
+        await expect(handler(evenementAvec(jeton) as any)).resolves.toBeDefined()
+        expect(clauseRecherchee().token).toBe(jeton)
+      }
     })
 
     it('reste cantonné à l’édition de l’URL', async () => {
-      // Sans `editionId`, l'identifiant d'un compteur d'une autre édition suffirait à en
-      // régénérer le jeton — et à couper l'appareil qui l'utilise.
-      await handler(evenementAvec('88') as any)
+      // Sans `editionId`, le jeton d'un compteur d'une autre édition suffirait à le régénérer —
+      // et à couper l'appareil qui l'utilise.
+      await handler(evenementAvec('ancien-jeton') as any)
 
       expect(clauseRecherchee().editionId).toBe(22)
     })
@@ -67,7 +76,9 @@ describe('PATCH /api/editions/[id]/ticketing/counters/[counterId]/regenerate-tok
     it('répond 404 pour un compteur qui n’est pas de cette édition', async () => {
       prismaMock.ticketingCounter.findFirst.mockResolvedValue(null)
 
-      await expect(handler(evenementAvec('88') as any)).rejects.toMatchObject({ statusCode: 404 })
+      await expect(handler(evenementAvec('ancien-jeton') as any)).rejects.toMatchObject({
+        statusCode: 404,
+      })
     })
   })
 
@@ -75,13 +86,15 @@ describe('PATCH /api/editions/[id]/ticketing/counters/[counterId]/regenerate-tok
     it('refuse un compte sans droit sur la billetterie', async () => {
       mockCanManage.mockResolvedValue(false)
 
-      await expect(handler(evenementAvec('88') as any)).rejects.toMatchObject({ statusCode: 403 })
+      await expect(handler(evenementAvec('ancien-jeton') as any)).rejects.toMatchObject({
+        statusCode: 403,
+      })
     })
 
     it('ne cherche pas le compteur avant d’avoir vérifié le droit', async () => {
       mockCanManage.mockResolvedValue(false)
 
-      await expect(handler(evenementAvec('88') as any)).rejects.toBeDefined()
+      await expect(handler(evenementAvec('ancien-jeton') as any)).rejects.toBeDefined()
 
       expect(prismaMock.ticketingCounter.findFirst).not.toHaveBeenCalled()
       expect(prismaMock.ticketingCounter.update).not.toHaveBeenCalled()
@@ -90,7 +103,7 @@ describe('PATCH /api/editions/[id]/ticketing/counters/[counterId]/regenerate-tok
 
   describe('ce qu’elle écrit', () => {
     it('remplace le jeton par un autre, et rend le nouveau', async () => {
-      const reponse: any = await handler(evenementAvec('88') as any)
+      const reponse: any = await handler(evenementAvec('ancien-jeton') as any)
 
       const ecrit = prismaMock.ticketingCounter.update.mock.calls[0][0]
       expect(ecrit.where).toEqual({ id: 88 })

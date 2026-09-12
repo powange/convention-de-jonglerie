@@ -1,25 +1,37 @@
+import { z } from 'zod'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
-import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
  * Régénère le jeton d'un compteur — celui que porte le QR code affiché à l'entrée.
  *
- * Le compteur est désigné par son **identifiant**, comme partout sous `[counterId]`. Cet endpoint
- * faisait exception : il cherchait par `token`, dans une variable pourtant nommée `counterId`. Rien
- * dans la route ne le signalait, et six voisins immédiats résolvaient par id. Ce n'était pas un
- * bug — l'écran appelait bien avec un jeton — mais un piège posé pour le prochain endpoint ajouté
- * ici, dont le symptôme aurait été un 404 inexplicable.
+ * ⚠️ Le compteur est désigné ici par son **jeton**, alors que les six autres endpoints de
+ * `counters/[counterId]` le désignent par son identifiant. C'est l'incohérence relevée par l'audit
+ * (P2), et elle est assumée pour l'instant : la corriger (#385) a cassé la production.
  *
- * La règle est maintenant sans exception : sous `counters/[counterId]`, c'est un identifiant ;
- * sous `counters/token/[token]`, c'est un jeton.
+ * Pourquoi : l'écran du compteur est adressé par jeton — c'est tout ce que porte son URL et son QR
+ * code. Le faire appeler par identifiant l'obligeait à attendre le chargement du compteur, et
+ * surtout rendait l'API incompatible avec tout client encore sur le bundle précédent. Un écran
+ * laissé ouvert à une entrée de convention est exactement ce cas.
+ *
+ * Ce qui a rendu la panne durable est un autre problème, ouvert à ce jour : l'hôte de déploiement
+ * conserve les fichiers **supprimés** du dépôt. La page effacée par #385 était donc toujours servie,
+ * et appelait cette route avec un jeton. Tant que ce point n'est pas réglé, changer la façon dont
+ * une route est adressée n'est pas sûr.
+ *
+ * Si P2 est repris un jour, ce ne peut pas être par un simple changement de résolution : il faudra
+ * soit accepter les deux le temps d'une transition, soit s'assurer d'abord qu'aucun client ne peut
+ * rester sur un ancien bundle.
  */
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
-    const counterId = validateResourceId(event, 'counterId', 'compteur')
+    // Le segment s'appelle `counterId` mais porte un jeton : voir l'avertissement ci-dessus.
+    const token = z.string().min(1).parse(getRouterParam(event, 'counterId'))
 
     // Vérifier les permissions
     const allowed = await canManageTicketingById(editionId, user.id, event)
@@ -32,7 +44,7 @@ export default wrapApiHandler(
 
     const counter = await prisma.ticketingCounter.findFirst({
       where: {
-        id: counterId,
+        token,
         editionId,
       },
     })
