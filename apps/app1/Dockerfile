@@ -46,23 +46,9 @@ RUN DATABASE_URL="mysql://user:pass@localhost:3306/db" npx prisma generate
 COPY apps/app1/ ./
 COPY layers/ /app/layers/
 # Augmenter la limite de mémoire pour le build Docker (8GB)
-#
-# ⚠️ Pas de `--mount=type=cache` sur node_modules/.cache ici, et c'est délibéré.
-#
-# `nuxt.config.ts` active `experimental.buildCache`, qui restaure `.nuxt` depuis
-# `node_modules/.cache/nuxt`. Persister ce dossier entre les builds faisait survivre des pages
-# SUPPRIMÉES du dépôt : le 12/09/2026, la production a servi pendant une heure une table de
-# routes contenant à la fois `counter/:counterId()` (page effacée deux commits plus tôt) et
-# `counter/:token()`. vue-router enregistrant la première en tête, c'est l'ancien composant qui
-# s'affichait — et qui appelait une API que le serveur, lui bien à jour, refusait.
-#
-# Nitro rescanne les sources, donc le serveur était juste ; seul le client portait le fossile.
-# C'est ce décalage qui rend la panne difficile à lire, et qui justifie de payer la reconstruction
-# complète : du code supprimé ne doit pas pouvoir continuer à tourner en production.
-#
-# À ne pas « réparer » par un rebuild sans cache : `--no-cache` invalide les couches, pas les
-# montages `type=cache`, qui survivent. Il aurait fallu un `docker builder prune` sur l'hôte.
-RUN NODE_OPTIONS='--max-old-space-size=8192' npx nuxt build
+# --mount=type=cache : persiste le cache Nuxt/Vite entre les builds Docker (accélère les rebuilds via Portainer)
+RUN --mount=type=cache,target=/app/apps/app1/node_modules/.cache \
+    NODE_OPTIONS='--max-old-space-size=8192' npx nuxt build
 
 # Conserver uniquement les dépendances de prod
 RUN npm prune --omit=dev
