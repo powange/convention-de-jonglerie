@@ -464,7 +464,7 @@ function generateQRCode(orderId: number, itemId: number): string {
 
 Le QR code est scanné lors du contrôle d'accès via :
 
-- `POST /api/editions/:id/ticketing/verify-qrcode`
+- `POST /api/editions/:id/ticketing/verify`
 
 ---
 

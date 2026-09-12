@@ -65,7 +65,6 @@ Validation des entrées via QR codes ou recherche manuelle
 - **API** :
   - `server/api/editions/[id]/ticketing/verify.post.ts`
   - `server/api/editions/[id]/ticketing/validate-entry.post.ts`
-  - `server/api/editions/[id]/ticketing/verify-qrcode.post.ts`
 
 ### 7. Intégration Externe
 
@@ -171,7 +170,6 @@ Relations:
 │   ├── [itemId].put.ts   # Modifier un item
 │   └── [itemId].delete.ts # Supprimer un item
 ├── verify.post.ts        # Vérifier un participant
-├── verify-qrcode.post.ts # Vérifier un QR code
 ├── validate-entry.post.ts # Valider une entrée
 ├── invalidate-entry.post.ts # Invalider une entrée
 ├── search.post.ts        # Rechercher des participants
