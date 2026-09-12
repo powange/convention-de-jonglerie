@@ -2,6 +2,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import { checkAdminMode } from '#server/utils/organizer-management'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { editionVisiblePubliquement } from '#server/utils/visibilite-edition'
 
 export default wrapApiHandler(
   async (event) => {
@@ -94,7 +95,7 @@ export default wrapApiHandler(
     // Check access based on edition status
     // PUBLISHED, PLANNED, and CANCELLED are publicly accessible
     // OFFLINE editions are only accessible to organizers/creators/admins
-    if (edition.status === 'OFFLINE') {
+    if (!editionVisiblePubliquement(edition.status)) {
       // Check if user is authenticated
       const user = optionalAuth(event)
       if (!user) {

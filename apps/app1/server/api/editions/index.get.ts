@@ -3,6 +3,7 @@ import type { GetEditionsResponse } from '#server/types/api-responses'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { getCountryVariants } from '#server/utils/countries'
 import { editionListSelect } from '#server/utils/prisma-select-helpers'
+import { filtreStatutEdition, type StatutEdition } from '#server/utils/visibilite-edition'
 
 export default wrapApiHandler<GetEditionsResponse>(
   async (event) => {
@@ -53,7 +54,7 @@ export default wrapApiHandler<GetEditionsResponse>(
       startDate?: { gte: Date }
       endDate?: { lte: Date }
       country?: { in: string[] }
-      status?: 'PUBLISHED' | 'OFFLINE' | { in: ('PUBLISHED' | 'OFFLINE')[] }
+      status?: StatutEdition | { in: StatutEdition[] }
       hasFoodTrucks?: boolean
       hasKidsZone?: boolean
       acceptsPets?: boolean
@@ -83,12 +84,7 @@ export default wrapApiHandler<GetEditionsResponse>(
 
     // Par défaut, filtrer les éditions visibles publiquement
     // (PUBLISHED, PLANNED, CANCELLED) mais pas OFFLINE
-    if (includeOffline !== 'true') {
-      where.status = { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] }
-    } else {
-      // Inclure aussi OFFLINE
-      where.status = { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] }
-    }
+    where.status = filtreStatutEdition(includeOffline === 'true')
 
     if (name) {
       where.name = {

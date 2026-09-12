@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { filtreStatutEdition } from '#server/utils/visibilite-edition'
 
 /**
  * URLs des éditions pour le sitemap.
@@ -20,7 +21,7 @@ export default wrapApiHandler(
         convention: {
           isArchived: false,
         },
-        status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] },
+        status: filtreStatutEdition(),
       },
       select: {
         id: true,

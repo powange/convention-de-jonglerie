@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { validateConventionId } from '#server/utils/validation-helpers'
+import { filtreStatutEdition } from '#server/utils/visibilite-edition'
 
 export default wrapApiHandler(
   async (event) => {
@@ -8,7 +9,7 @@ export default wrapApiHandler(
     const editions = await prisma.edition.findMany({
       where: {
         conventionId,
-        status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] },
+        status: filtreStatutEdition(),
       },
       select: {
         id: true,
