@@ -16,7 +16,6 @@ export default wrapApiHandler<GetEditionsResponse>(
       showPast,
       showCurrent,
       showFuture,
-      includeOffline,
       hasFoodTrucks,
       hasKidsZone,
       acceptsPets,
@@ -82,9 +81,10 @@ export default wrapApiHandler<GetEditionsResponse>(
       hasATM?: boolean
     } = {}
 
-    // Par défaut, filtrer les éditions visibles publiquement
-    // (PUBLISHED, PLANNED, CANCELLED) mais pas OFFLINE
-    where.status = filtreStatutEdition(includeOffline === 'true')
+    // Cette route est publique : elle ne montre que les éditions visibles d'un visiteur.
+    // Il n'y a volontairement aucun moyen de lui faire rendre les éditions cachées — le
+    // paramètre `includeOffline` le permettait, sans le moindre contrôle.
+    where.status = filtreStatutEdition()
 
     if (name) {
       where.name = {

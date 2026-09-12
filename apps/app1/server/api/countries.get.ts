@@ -13,7 +13,6 @@ export default wrapApiHandler(
       showPast,
       showCurrent,
       showFuture,
-      includeOffline,
       hasFoodTrucks,
       hasKidsZone,
       acceptsPets,
@@ -43,8 +42,9 @@ export default wrapApiHandler(
     // Construire la clause where en fonction des filtres
     const where: Record<string, unknown> = {}
 
-    // Statut des éditions
-    where.status = filtreStatutEdition(includeOffline === 'true')
+    // Statut des éditions : uniquement celles qu'un visiteur peut voir. Comme pour
+    // /api/editions, aucun paramètre ne lève ce filtre.
+    where.status = filtreStatutEdition()
 
     // Filtre par nom
     if (name) {
