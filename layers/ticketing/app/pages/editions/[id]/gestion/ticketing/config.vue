@@ -298,7 +298,7 @@
                       size="sm"
                       icon="i-heroicons-trash"
                       :loading="sumupUpdating"
-                      @click="handleDeleteSumupConfig"
+                      @click="showSumupDeleteModal = true"
                     >
                       {{ $t('gestion.ticketing.sumup_delete_config') }}
                     </UButton>
@@ -353,6 +353,21 @@
         </UCard>
       </div>
     </div>
+
+    <!-- Confirmation de suppression de la configuration SumUp : elle passait par `confirm()`,
+         la boîte native du navigateur, alors que le projet emploie UModal partout ailleurs. -->
+    <ConfirmModal
+      v-model="showSumupDeleteModal"
+      :title="$t('gestion.ticketing.sumup_delete_config')"
+      :description="$t('gestion.ticketing.sumup_delete_confirm')"
+      :confirm-label="$t('common.delete')"
+      confirm-color="error"
+      icon-name="i-heroicons-exclamation-triangle"
+      icon-color="text-red-500"
+      :loading="deletingSumupConfig"
+      @confirm="handleDeleteSumupConfig"
+      @cancel="showSumupDeleteModal = false"
+    />
   </div>
 </template>
 
@@ -468,12 +483,16 @@ const handleSaveSumupConfig = async () => {
   }
 }
 
+const showSumupDeleteModal = ref(false)
+const deletingSumupConfig = ref(false)
+
 const handleDeleteSumupConfig = async () => {
-  if (!confirm(t('gestion.ticketing.sumup_delete_confirm'))) return
+  deletingSumupConfig.value = true
   try {
     await deleteSumupConfig()
     sumupAffiliateKey.value = ''
     sumupAppId.value = ''
+    showSumupDeleteModal.value = false
     toast.add({
       title: t('common.deleted'),
       description: t('gestion.ticketing.sumup_config_deleted'),
@@ -481,12 +500,16 @@ const handleDeleteSumupConfig = async () => {
       color: 'success',
     })
   } catch (e: any) {
+    // La modale reste ouverte sur échec : la refermer laisserait croire que la configuration
+    // a été supprimée alors qu'elle est toujours là.
     toast.add({
       title: t('common.error'),
       description: e?.data?.message || t('gestion.ticketing.sumup_config_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
+  } finally {
+    deletingSumupConfig.value = false
   }
 }
 
