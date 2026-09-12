@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 // État de chargement
 const isLoading = ref(true)
@@ -68,26 +68,18 @@ onMounted(async () => {
   }
 })
 
-// Configuration SEO conditionnelle pour empêcher l'indexation en staging/release
-const shouldDisallowIndexing = computed(() => {
-  // Vérifier si nous sommes côté serveur
-  if (import.meta.server) {
-    return (
-      process.env.NODE_ENV !== 'production' ||
-      process.env.NUXT_ENV === 'staging' ||
-      process.env.NUXT_ENV === 'release' ||
-      !process.env.NUXT_PUBLIC_SITE_URL?.includes('juggling-convention.com')
-    )
-  }
-  return false
-})
-
-// Ajouter meta robots si nécessaire
-if (shouldDisallowIndexing.value) {
-  useSeoMeta({
-    robots: 'noindex, nofollow, noarchive, nosnippet, noimageindex',
-  })
-}
+// Rien ici sur l'indexation, et c'est délibéré : @nuxtjs/seo s'en charge, à partir de
+// `NUXT_SITE_ENV` lu à l'exécution — `staging` sur release, absent en production.
+//
+// Ce bloc posait une balise `robots: noindex` quand `NUXT_ENV` valait `staging`/`release`. Il
+// fonctionnait, et c'était bien le problème : il était le SEUL des trois signaux à fonctionner.
+// L'en-tête X-Robots-Tag annonçait `index, follow` — celui du module, qui écrasait celui du
+// middleware `server/middleware/noindex.ts`, supprimé avec ce bloc. Une page qui dit `noindex`
+// dans sa balise et `index` dans son en-tête n'est pas une protection, c'est une coïncidence
+// favorable : la directive la plus restrictive l'emporte.
+//
+// Depuis #389, les signaux viennent d'une seule source et s'accordent. Vérifié sur les trois
+// environnements : dev et release servent `noindex, nofollow`, la production `index, follow`.
 </script>
 
 <style>
