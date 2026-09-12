@@ -232,6 +232,14 @@ export default defineNuxtConfig({
           // l'organisateur en a déjà réalisé une. Chemin restreint à My Maps : le reste de
           // google.com n'a pas à pouvoir être encadré dans le site.
           'https://www.google.com/maps/d/',
+          // L'interface de Nuxt DevTools est une iframe servie par l'application elle-même
+          // (/__nuxt_devtools__/client/). Sans `'self'`, la CSP du site bloque son propre outil
+          // de développement — constaté en console : « Framing … violates … frame-src ».
+          //
+          // En développement UNIQUEMENT : `'self'` en production autoriserait le site à
+          // s'encadrer lui-même, ce qui rouvre la porte au détournement de clic que
+          // `frame-ancestors` et X-Frame-Options ferment par ailleurs.
+          ...(process.env.NODE_ENV === 'production' ? [] : ["'self'"]),
         ],
         'base-uri': ["'none'"],
         'object-src': ["'none'"],
