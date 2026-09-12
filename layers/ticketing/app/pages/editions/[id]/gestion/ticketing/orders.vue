@@ -180,7 +180,7 @@
                     Filtrer par tarifs
                   </label>
                   <USelect
-                    v-model="selectedTierIds"
+                    v-model="filtres.tarifs"
                     :items="tierSelectItems"
                     multiple
                     placeholder="Sélectionner des tarifs"
@@ -219,7 +219,7 @@
                     Filtrer par options
                   </label>
                   <USelect
-                    v-model="selectedOptionIds"
+                    v-model="filtres.options"
                     :items="optionSelectItems"
                     multiple
                     placeholder="Sélectionner des options"
@@ -261,7 +261,7 @@
                     Statut d'entrée
                   </label>
                   <USelect
-                    v-model="entryStatusFilter"
+                    v-model="filtres.statutEntree"
                     :items="entryStatusOptions"
                     placeholder="Tous les billets"
                     value-key="value"
@@ -277,7 +277,7 @@
                     Méthode de paiement
                   </label>
                   <USelect
-                    v-model="paymentMethodFilter"
+                    v-model="filtres.moyensDePaiement"
                     :items="paymentMethodOptions"
                     placeholder="Toutes les méthodes"
                     value-key="value"
@@ -294,7 +294,7 @@
                     Type de billet
                   </label>
                   <USelect
-                    v-model="itemTypeFilter"
+                    v-model="filtres.typesDeLigne"
                     :items="itemTypeOptions"
                     placeholder="Tous les types"
                     value-key="value"
@@ -323,21 +323,24 @@
                 <div class="flex items-center justify-between">
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Champs personnalisés
-                    <span v-if="customFieldFilters.length > 0" class="text-gray-500 font-normal">
-                      ({{ customFieldFilters.length }} filtre{{
-                        customFieldFilters.length > 1 ? 's' : ''
+                    <span
+                      v-if="filtres.champsPersonnalises.length > 0"
+                      class="text-gray-500 font-normal"
+                    >
+                      ({{ filtres.champsPersonnalises.length }} filtre{{
+                        filtres.champsPersonnalises.length > 1 ? 's' : ''
                       }})
                     </span>
                   </label>
 
                   <!-- Switch ET/OU (visible quand il y a au moins 2 filtres) -->
                   <div
-                    v-if="customFieldFilters.length >= 2"
+                    v-if="filtres.champsPersonnalises.length >= 2"
                     class="flex items-center gap-2 text-sm"
                   >
                     <span
                       :class="
-                        customFieldFilterMode === 'and'
+                        filtres.modeChampsPersonnalises === 'and'
                           ? 'text-primary-600 dark:text-primary-400 font-medium'
                           : 'text-gray-500'
                       "
@@ -345,13 +348,13 @@
                       ET
                     </span>
                     <USwitch
-                      :model-value="customFieldFilterMode === 'or'"
+                      :model-value="filtres.modeChampsPersonnalises === 'or'"
                       color="primary"
-                      @update:model-value="customFieldFilterMode = $event ? 'or' : 'and'"
+                      @update:model-value="filtres.modeChampsPersonnalises = $event ? 'or' : 'and'"
                     />
                     <span
                       :class="
-                        customFieldFilterMode === 'or'
+                        filtres.modeChampsPersonnalises === 'or'
                           ? 'text-primary-600 dark:text-primary-400 font-medium'
                           : 'text-gray-500'
                       "
@@ -362,9 +365,9 @@
                 </div>
 
                 <!-- Filtres existants -->
-                <div v-if="customFieldFilters.length > 0" class="space-y-2">
+                <div v-if="filtres.champsPersonnalises.length > 0" class="space-y-2">
                   <div
-                    v-for="(filter, index) in customFieldFilters"
+                    v-for="(filter, index) in filtres.champsPersonnalises"
                     :key="index"
                     class="flex items-center gap-2 p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg"
                   >
@@ -447,12 +450,15 @@
           <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
           <p class="text-sm text-gray-500">
             {{
-              searchQuery || entryStatusFilter !== 'all'
+              searchQuery || filtres.statutEntree !== 'all'
                 ? 'Aucun résultat trouvé'
                 : 'Aucune commande trouvée'
             }}
           </p>
-          <p v-if="!searchQuery && entryStatusFilter === 'all'" class="text-xs text-gray-400 mt-1">
+          <p
+            v-if="!searchQuery && filtres.statutEntree === 'all'"
+            class="text-xs text-gray-400 mt-1"
+          >
             Importez les commandes depuis votre billeterie externe
           </p>
         </div>
@@ -1372,18 +1378,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref, watch } from 'vue'
+import { onMounted, computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 import {
-  fetchOrders,
-  type Order,
-  type CustomFieldFilter,
-  type ItemType,
-} from '../../../../../utils/ticketing/orders'
+  filtresVides,
+  nombreDeFiltresActifs,
+  requeteDesFiltres,
+} from '../../../../../utils/filtres-commandes'
+import { fetchOrders, type Order } from '../../../../../utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/tiers'
 
 const { money } = useEditionCurrency()
@@ -1422,16 +1428,15 @@ const totalOrders = ref(0)
 
 // Filtres
 const tiers = ref<TicketingTier[]>([])
-const selectedTierIds = ref<number[]>([])
-const selectedOptionIds = ref<number[]>([])
-const entryStatusFilter = ref<'all' | 'validated' | 'not_validated'>('all')
-const paymentMethodFilter = ref<Array<'cash' | 'card' | 'check' | 'pending' | 'unknown'>>([])
-const itemTypeFilter = ref<ItemType[]>([])
+
+// Un seul objet pour les six critères, et une seule description de ce qu'ils valent — dans
+// `filtres-commandes.ts`. Ils vivaient en refs séparées, et la liste en était énumérée à la main
+// à TROIS endroits : l'envoi à l'API, le décompte de la pastille, la réinitialisation. Ajouter un
+// filtre demandait de penser aux trois ; en oublier un ne cassait rien de visible.
+const filtres = reactive(filtresVides())
 const isFiltersOpen = ref(false)
 
 // Filtres par champs personnalisés (support de plusieurs filtres)
-const customFieldFilters = ref<CustomFieldFilter[]>([])
-const customFieldFilterMode = ref<'and' | 'or'>('and')
 const distinctCustomFields = ref<{ name: string; values: string[] }[]>([])
 // Refs pour le formulaire d'ajout d'un nouveau filtre
 const newFilterName = ref('')
@@ -1784,14 +1789,7 @@ const loadOrders = async () => {
       page: currentPage.value,
       limit: pageSize.value,
       search: debouncedSearchQuery.value,
-      tierIds: selectedTierIds.value.length > 0 ? selectedTierIds.value : undefined,
-      optionIds: selectedOptionIds.value.length > 0 ? selectedOptionIds.value : undefined,
-      entryStatus: entryStatusFilter.value,
-      paymentMethods: paymentMethodFilter.value.length > 0 ? paymentMethodFilter.value : undefined,
-      itemTypes: itemTypeFilter.value.length > 0 ? itemTypeFilter.value : undefined,
-      customFieldFilters:
-        customFieldFilters.value.length > 0 ? customFieldFilters.value : undefined,
-      customFieldFilterMode: customFieldFilterMode.value,
+      ...requeteDesFiltres(filtres),
     })
 
     orders.value = response.data || []
@@ -1851,11 +1849,11 @@ const newFilterValueItems = computed(() => {
 const addCustomFieldFilter = () => {
   if (!newFilterName.value || !newFilterValue.value) return
   // Éviter les doublons (même champ + même valeur)
-  const alreadyExists = customFieldFilters.value.some(
+  const alreadyExists = filtres.champsPersonnalises.some(
     (f) => f.name === newFilterName.value && f.value === newFilterValue.value
   )
   if (!alreadyExists) {
-    customFieldFilters.value.push({
+    filtres.champsPersonnalises.push({
       name: newFilterName.value,
       value: newFilterValue.value,
     })
@@ -1867,30 +1865,18 @@ const addCustomFieldFilter = () => {
 
 // Supprimer un filtre de champ personnalisé
 const removeCustomFieldFilter = (index: number) => {
-  customFieldFilters.value.splice(index, 1)
+  filtres.champsPersonnalises.splice(index, 1)
 }
 
 // Compter le nombre de filtres actifs
-const activeFiltersCount = computed(() => {
-  let count = 0
-  if (selectedTierIds.value.length > 0) count += selectedTierIds.value.length
-  if (selectedOptionIds.value.length > 0) count += selectedOptionIds.value.length
-  if (entryStatusFilter.value !== 'all') count += 1
-  if (paymentMethodFilter.value.length > 0) count += paymentMethodFilter.value.length
-  if (itemTypeFilter.value.length > 0) count += itemTypeFilter.value.length
-  count += customFieldFilters.value.length
-  return count
-})
+const activeFiltersCount = computed(() => nombreDeFiltresActifs(filtres))
 
 // Fonction pour réinitialiser tous les filtres
 const resetFilters = () => {
-  selectedTierIds.value = []
-  selectedOptionIds.value = []
-  entryStatusFilter.value = 'all'
-  paymentMethodFilter.value = []
-  itemTypeFilter.value = []
-  customFieldFilters.value = []
-  customFieldFilterMode.value = 'and'
+  // `Object.assign` et non une énumération : un critère ajouté à `FiltresCommandes` est remis à
+  // zéro sans qu'on ait à y penser. C'est l'oubli inverse — un filtre resté actif après un
+  // « effacer » — qui ne se voit sur aucun écran.
+  Object.assign(filtres, filtresVides())
   newFilterName.value = ''
   newFilterValue.value = ''
 }
@@ -1905,13 +1891,13 @@ const onPageChange = (page: number) => {
 watch(
   [
     debouncedSearchQuery,
-    selectedTierIds,
-    selectedOptionIds,
-    entryStatusFilter,
-    paymentMethodFilter,
-    itemTypeFilter,
-    customFieldFilters,
-    customFieldFilterMode,
+    filtres.tarifs,
+    filtres.options,
+    filtres.statutEntree,
+    filtres.moyensDePaiement,
+    filtres.typesDeLigne,
+    filtres.champsPersonnalises,
+    filtres.modeChampsPersonnalises,
   ],
   () => {
     currentPage.value = 1
