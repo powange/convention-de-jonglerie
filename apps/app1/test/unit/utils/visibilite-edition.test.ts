@@ -4,7 +4,6 @@ import {
   editionVisiblePubliquement,
   filtreStatutEdition,
   STATUTS_VISIBLES_PUBLIQUEMENT,
-  TOUS_LES_STATUTS_DEDITION,
   type StatutEdition,
 } from '../../../server/utils/visibilite-edition'
 
@@ -39,9 +38,16 @@ describe('filtreStatutEdition', () => {
     expect(filtreStatutEdition().in).toEqual([...STATUTS_VISIBLES_PUBLIQUEMENT])
   })
 
-  it('les inclut quand l’appelant dit en avoir le droit', () => {
-    expect(filtreStatutEdition(true).in).toEqual([...TOUS_LES_STATUTS_DEDITION])
-    expect([...filtreStatutEdition(true).in].sort()).toEqual([...TOUS].sort())
+  it('ne prend aucun argument qui pourrait les réintroduire', () => {
+    // C'est tout le propos : la fonction avait un booléen « voit aussi les éditions cachées »,
+    // alimenté sur deux routes publiques par un simple ?includeOffline=true. Le rappeler par un
+    // test, parce qu'un paramètre est vite rajouté « pour une vue interne » et vite oublié.
+    expect(filtreStatutEdition).toHaveLength(0)
+
+    // Et il ne suffit pas de le déclarer : lui passer quelque chose ne doit rien changer.
+    expect((filtreStatutEdition as (...args: unknown[]) => unknown)(true)).toEqual({
+      in: [...STATUTS_VISIBLES_PUBLIQUEMENT],
+    })
   })
 
   it('rend un tableau neuf à chaque appel', () => {

@@ -72,7 +72,7 @@ describe('/api/editions GET', () => {
   })
 
   it('devrait retourner toutes les éditions avec pagination', async () => {
-    global.getQuery.mockReturnValue({ includeOffline: 'true' })
+    global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockResolvedValue(25)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
     prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
@@ -90,7 +90,7 @@ describe('/api/editions GET', () => {
   })
 
   it('devrait supporter la pagination avec page et limit', async () => {
-    global.getQuery.mockReturnValue({ page: '2', limit: '10', includeOffline: 'true' })
+    global.getQuery.mockReturnValue({ page: '2', limit: '10' })
     prismaMock.edition.count.mockResolvedValue(50)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
     prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
@@ -103,7 +103,7 @@ describe('/api/editions GET', () => {
     expect(result.pagination.totalPages).toBe(5)
 
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
-      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
+      where: { status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] } },
       select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 10, // (page 2 - 1) * limit 10
@@ -112,7 +112,7 @@ describe('/api/editions GET', () => {
   })
 
   it('devrait filtrer par nom', async () => {
-    global.getQuery.mockReturnValue({ name: 'Test Convention', includeOffline: 'true' })
+    global.getQuery.mockReturnValue({ name: 'Test Convention' })
     prismaMock.edition.count.mockResolvedValue(5)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
     prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
@@ -123,13 +123,13 @@ describe('/api/editions GET', () => {
     expect(prismaMock.edition.count).toHaveBeenCalledWith({
       where: {
         name: { contains: 'Test Convention' },
-        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
+        status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] },
       },
     })
   })
 
   it('devrait filtrer par pays', async () => {
-    global.getQuery.mockReturnValue({ countries: '["France","Belgium"]', includeOffline: 'true' })
+    global.getQuery.mockReturnValue({ countries: '["France","Belgium"]' })
     prismaMock.edition.count.mockResolvedValue(10)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
     prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
@@ -146,13 +146,13 @@ describe('/api/editions GET', () => {
     expect(callArgs.where.country.in).toContain('Belgium')
     // Les variantes multilingues sont également incluses (ex: Frankreich, Belgique)
     expect(callArgs.where.country.in.length).toBeGreaterThan(2)
-    expect(callArgs.where.status).toEqual({ in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] })
+    expect(callArgs.where.status).toEqual({ in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] })
   })
 
   it('devrait filtrer par dates', async () => {
     const startDate = '2024-06-01'
     const endDate = '2024-06-30'
-    global.getQuery.mockReturnValue({ startDate, endDate, includeOffline: 'true' })
+    global.getQuery.mockReturnValue({ startDate, endDate })
     prismaMock.edition.count.mockResolvedValue(3)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
     prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
@@ -164,7 +164,7 @@ describe('/api/editions GET', () => {
       where: {
         startDate: { gte: new Date(startDate) },
         endDate: { lte: new Date(endDate) },
-        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
+        status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] },
       },
     })
   })
@@ -174,7 +174,6 @@ describe('/api/editions GET', () => {
       hasFoodTrucks: 'true',
       hasToilets: 'true',
       acceptsPets: 'true',
-      includeOffline: 'true',
     })
     prismaMock.edition.count.mockResolvedValue(2)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
@@ -188,7 +187,7 @@ describe('/api/editions GET', () => {
         hasFoodTrucks: true,
         hasToilets: true,
         acceptsPets: true,
-        status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] },
+        status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] },
       },
     })
   })
@@ -198,7 +197,6 @@ describe('/api/editions GET', () => {
       showPast: 'true',
       showCurrent: 'false',
       showFuture: 'true',
-      includeOffline: 'true',
     })
     prismaMock.edition.count.mockResolvedValue(15)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
@@ -209,7 +207,7 @@ describe('/api/editions GET', () => {
 
     const expectedWhere = expect.objectContaining({
       AND: expect.arrayContaining([
-        { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
+        { status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] } },
         expect.objectContaining({
           OR: expect.arrayContaining([
             { endDate: { lt: expect.any(Date) } }, // showPast
@@ -225,7 +223,7 @@ describe('/api/editions GET', () => {
   })
 
   it("devrait gérer les organisateurs d'édition si disponible", async () => {
-    global.getQuery.mockReturnValue({ includeOffline: 'true' })
+    global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockResolvedValue(1)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
     prismaMock.editionOrganizer.findFirst.mockResolvedValue({}) // Table existe
@@ -240,7 +238,7 @@ describe('/api/editions GET', () => {
   })
 
   it('devrait gérer les erreurs', async () => {
-    global.getQuery.mockReturnValue({ includeOffline: 'true' })
+    global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockRejectedValue(new Error('Database error'))
 
     const mockEvent = {}
@@ -249,7 +247,7 @@ describe('/api/editions GET', () => {
   })
 
   it('devrait trier par date de début croissante', async () => {
-    global.getQuery.mockReturnValue({ includeOffline: 'true' })
+    global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockResolvedValue(1)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
     prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
@@ -258,7 +256,7 @@ describe('/api/editions GET', () => {
     await handler(mockEvent as any)
 
     expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
-      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
+      where: { status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] } },
       select: expect.any(Object),
       orderBy: { startDate: 'asc' },
       skip: 0,
@@ -306,7 +304,16 @@ describe('/api/editions GET', () => {
     })
   })
 
-  it('devrait inclure les éditions hors ligne si includeOffline=true', async () => {
+  /**
+   * Ce test disait l'inverse jusqu'à la PR qui l'a retourné : il s'appelait « devrait inclure les
+   * éditions hors ligne si includeOffline=true » et vérifiait qu'un appel **sans session ni
+   * utilisateur** — `mockEvent = {}`, exactement comme ci-dessous — obtenait bien les éditions
+   * `OFFLINE`. Il ne constatait pas la faille, il l'entérinait.
+   *
+   * Une édition `OFFLINE` est « complète mais volontairement cachée ». La route est publique
+   * (`public-routes.ts`, sans session) : aucun paramètre ne doit pouvoir lever ce filtre.
+   */
+  it('ne montre pas les éditions cachées, même si l’URL le demande', async () => {
     global.getQuery.mockReturnValue({ includeOffline: 'true' })
     prismaMock.edition.count.mockResolvedValue(10)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
@@ -315,15 +322,31 @@ describe('/api/editions GET', () => {
     const mockEvent = {}
     await handler(mockEvent as any)
 
-    expect(prismaMock.edition.count).toHaveBeenCalledWith({
-      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
-    })
-    expect(prismaMock.edition.findMany).toHaveBeenCalledWith({
-      where: { status: { in: ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] } },
-      select: expect.any(Object),
-      orderBy: { startDate: 'asc' },
-      skip: 0,
-      take: 12,
-    })
+    for (const appel of [
+      prismaMock.edition.count.mock.calls[0][0],
+      prismaMock.edition.findMany.mock.calls[0][0],
+    ]) {
+      expect(appel.where.status.in).not.toContain('OFFLINE')
+      expect(appel.where.status).toEqual({ in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] })
+    }
+  })
+
+  it('rend exactement la même chose avec et sans le paramètre', async () => {
+    // Le contrôle qui compte : ce n'est pas seulement que OFFLINE a disparu, c'est que le
+    // paramètre ne change plus *rien*. Sans cette comparaison, une nouvelle branche pourrait
+    // réintroduire un traitement particulier sans faire tomber le test ci-dessus.
+    prismaMock.edition.count.mockResolvedValue(10)
+    prismaMock.edition.findMany.mockResolvedValue([mockEdition])
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
+
+    global.getQuery.mockReturnValue({})
+    await handler({} as any)
+    const sansParametre = prismaMock.edition.findMany.mock.calls[0][0]
+
+    global.getQuery.mockReturnValue({ includeOffline: 'true' })
+    await handler({} as any)
+    const avecParametre = prismaMock.edition.findMany.mock.calls[1][0]
+
+    expect(avecParametre).toEqual(sansParametre)
   })
 })

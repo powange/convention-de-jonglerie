@@ -26,9 +26,6 @@ export type StatutEdition = 'PLANNED' | 'PUBLISHED' | 'OFFLINE' | 'CANCELLED'
  */
 export const STATUTS_VISIBLES_PUBLIQUEMENT = ['PUBLISHED', 'PLANNED', 'CANCELLED'] as const
 
-/** Ce que voit qui a le droit de voir les éditions cachées : tout, `OFFLINE` compris. */
-export const TOUS_LES_STATUTS_DEDITION = ['PUBLISHED', 'OFFLINE', 'PLANNED', 'CANCELLED'] as const
-
 /**
  * Cette édition est-elle visible d'un visiteur ?
  *
@@ -42,11 +39,18 @@ export function editionVisiblePubliquement(statut: unknown): boolean {
 /**
  * Le fragment Prisma correspondant, à poser dans un `where`.
  *
- * `voitLesEditionsCachees` n'est pas « est connecté » : la connexion ne donne aucun droit ici.
- * C'est à l'appelant de dire s'il a vérifié quelque chose.
+ * Volontairement sans paramètre, et c'est le propos : il en avait un — un booléen « voit aussi les
+ * éditions cachées » — alimenté sur deux routes publiques par un simple `?includeOffline=true`,
+ * sans le moindre contrôle. Une liste ne sait pas qui la demande, et ce n'est pas à elle de le
+ * décider.
+ *
+ * Une vue « mes éditions hors ligne » ne peut donc pas revenir par ici : il lui faudrait
+ * `hydrateSession` sur sa route et un contrôle d'appartenance **par édition**, comme le fait
+ * `editions/[id]/index.get.ts` — pas un interrupteur global.
+ *
+ * Rend un tableau neuf à chaque appel : Prisma le reçoit, et un tableau partagé qu'un appelant
+ * trierait changerait ce que voient tous les autres.
  */
-export function filtreStatutEdition(voitLesEditionsCachees = false): { in: StatutEdition[] } {
-  return {
-    in: [...(voitLesEditionsCachees ? TOUS_LES_STATUTS_DEDITION : STATUTS_VISIBLES_PUBLIQUEMENT)],
-  }
+export function filtreStatutEdition(): { in: StatutEdition[] } {
+  return { in: [...STATUTS_VISIBLES_PUBLIQUEMENT] }
 }
