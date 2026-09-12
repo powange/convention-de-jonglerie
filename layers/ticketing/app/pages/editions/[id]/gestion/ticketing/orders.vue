@@ -493,12 +493,12 @@
                   </h3>
                   <!-- Badge Annulée (seulement si la commande est annulée) -->
                   <UBadge
-                    v-if="order.status === 'Refunded'"
+                    v-if="commandeEstAnnulee(order)"
                     color="error"
                     variant="soft"
                     class="flex-shrink-0"
                   >
-                    Annulée
+                    {{ $t('ticketing.orders.canceled_badge') }}
                   </UBadge>
                 </div>
                 <!-- Ligne 2 : badges origine et paiement -->
@@ -820,7 +820,7 @@
     <UModal
       v-model:open="isCancelModalOpen"
       :title="
-        orderToCancel?.status === 'Refunded'
+        commandeEstAnnulee(orderToCancel)
           ? $t('ticketing.orders.delete_order_confirm')
           : $t('ticketing.orders.cancel_order_confirm')
       "
@@ -832,7 +832,7 @@
             color="error"
             variant="soft"
             :description="
-              orderToCancel.status === 'Refunded'
+              commandeEstAnnulee(orderToCancel)
                 ? $t('ticketing.orders.delete_order_confirm_message')
                 : $t('ticketing.orders.cancel_order_confirm_message')
             "
@@ -841,7 +841,9 @@
           <!-- Informations de la commande -->
           <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Payeur :</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >{{ $t('ticketing.orders.payer_label') }} :</span
+              >
               <span class="font-medium text-gray-900 dark:text-white">
                 {{ orderToCancel.payerFirstName }} {{ orderToCancel.payerLastName }}
               </span>
@@ -887,10 +889,10 @@
           >
             {{
               isCanceling
-                ? orderToCancel?.status === 'Refunded'
+                ? commandeEstAnnulee(orderToCancel)
                   ? $t('ticketing.orders.deleting_order')
                   : $t('ticketing.orders.canceling_order')
-                : orderToCancel?.status === 'Refunded'
+                : commandeEstAnnulee(orderToCancel)
                   ? $t('ticketing.orders.delete_order')
                   : $t('ticketing.orders.cancel_order')
             }}
@@ -1384,11 +1386,13 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+import { commandeEstAnnulee, commandeModifiableIci } from '../../../../../utils/commande-annulee'
 import {
   filtresVides,
   nombreDeFiltresActifs,
   requeteDesFiltres,
 } from '../../../../../utils/filtres-commandes'
+import { montantTotalDeLaLigne } from '../../../../../utils/montant-ligne-commande'
 import { fetchOrders, type Order } from '../../../../../utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/tiers'
 
@@ -1517,8 +1521,8 @@ const getOrderMenuItems = (order: Order) => {
   }
 
   // Groupe 2 : Annuler/Supprimer (commandes manuelles uniquement)
-  if (!order.externalTicketing) {
-    const isRefunded = order.status === 'Refunded'
+  if (commandeModifiableIci(order)) {
+    const isRefunded = commandeEstAnnulee(order)
     items.push([
       {
         label: isRefunded
@@ -1535,7 +1539,7 @@ const getOrderMenuItems = (order: Order) => {
   if (items.length === 0) {
     items.push([
       {
-        label: 'Aucune action disponible',
+        label: $t('ticketing.orders.no_action_available'),
         disabled: true,
       },
     ])
@@ -1607,7 +1611,7 @@ const { execute: executeCancelOrder, loading: isCanceling } = useApiAction<
   silentSuccess: true, // Message conditionnel géré dans onSuccess
   errorMessages: { default: $t('ticketing.orders.cancel_order_error') },
   onSuccess: async (response) => {
-    const isDeleting = orderToCancel.value?.status === 'Refunded'
+    const isDeleting = commandeEstAnnulee(orderToCancel.value)
     // Fermer la modal
     isCancelModalOpen.value = false
     orderToCancel.value = null
@@ -1773,13 +1777,8 @@ const formatDate = (date: string | Date) => {
 }
 
 // Calculer le montant total d'un item (tarif + options)
-const getItemTotalAmount = (item: any) => {
-  const baseAmount = item.amount || 0
-  const optionsAmount =
-    item.selectedOptions?.reduce((sum: number, opt: any) => sum + (opt.amount || 0), 0) || 0
-  // Rend des centimes ; la mise en forme et la devise sont l’affaire de `money()`.
-  return baseAmount + optionsAmount
-}
+// Conservé comme point d'entrée du gabarit ; la règle, elle, vit dans `montant-ligne-commande`.
+const getItemTotalAmount = montantTotalDeLaLigne
 
 // Charger les commandes avec pagination
 const loadOrders = async () => {
