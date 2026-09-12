@@ -55,3 +55,8 @@ scripts/translation/todo-*.json
 /playwright/.cache/
 
 !.gitkeep
+
+# Variables de stack Portainer : écrites par Portainer sur l'hôte de déploiement, jamais dans le
+# dépôt. Ignorées ici pour qu'un fichier créé par mégarde en local (validation d'un compose, par
+# exemple) ne parte pas dans un commit avec les secrets de production.
+stack.env
