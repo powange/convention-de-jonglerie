@@ -420,6 +420,28 @@ jobs:
     # justesse (un seul build, et c'est celui de production qui est testé), pas en horloge.
     needs: build
 
+    # La suite Playwright portait à elle seule les deux tiers de l'attente de la CI : 713 s sur un
+    # run de 899, dont 618 s de tests. Tout le reste avait fini à t+313 s.
+    #
+    # Elle ne peut pas se paralléliser DANS un processus : le projet `edition-management`, qui pèse
+    # 327 des ~363 tests, est `fullyParallel: false` parce que tous ses tests se déroulent sur une
+    # seule convention et une seule édition. Deux d'entre eux qui tourneraient ensemble se
+    # disputeraient les réglages de cette édition.
+    #
+    # Elle se répartit en revanche sur plusieurs MACHINES. Les `services:` étant instanciés par job,
+    # chaque shard reçoit son propre conteneur MySQL, donc sa propre base, ses propres migrations,
+    # son propre compte E2E et sa propre édition. L'isolement tient par construction, et non par une
+    # discipline que les tests auraient à respecter.
+    #
+    # `job-total` plutôt qu'un `2` écrit en dur : ajouter une valeur à la liste ci-dessous suffit à
+    # changer le découpage, sans qu'un second nombre reste à mettre à jour ailleurs.
+    strategy:
+      # Comme pour le job `test` : on veut voir tous les échecs, pas seulement celui du premier
+      # shard qui tombe. Un shard rouge n'apprend rien sur l'autre.
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+
     # Ces trois variables n'existaient que dans playwright.yml et restent portées par ce seul job :
     # au niveau workflow elles toucheraient lint, typecheck, build et test, qui n'en ont que faire.
     #
@@ -517,7 +539,9 @@ jobs:
           fi
 
       - name: Run Playwright tests
-        run: NUXT_SERVER_LOG=/tmp/nuxt-server.log npx playwright test
+        run: >-
+          NUXT_SERVER_LOG=/tmp/nuxt-server.log
+          npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
       - name: Dump server log on failure
         if: failure()
@@ -525,11 +549,13 @@ jobs:
           echo "===== Contenu de /tmp/nuxt-server.log ====="
           cat /tmp/nuxt-server.log || echo "(log serveur vide ou absent)"
 
+      # Le nom porte le shard : `actions/upload-artifact` v4 refuse deux artifacts de même nom dans
+      # un run, et les shards se marcheraient dessus. Chacun garde donc son rapport.
       - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ github.run_id }}
+          name: playwright-report-${{ github.run_id }}-shard-${{ matrix.shard }}
           path: |
             apps/app1/playwright-report/
             apps/app1/test-results/
