@@ -42,6 +42,16 @@ export default wrapApiHandler(
             // Ne pas retourner apiKey, apiKeyGuichet, applicationPassword
           },
         },
+        // Ce que la déconnexion emporterait. La base est en cascade : effacer cette configuration
+        // efface ses tarifs, ses options et ses commandes — et chaque commande emporte ses billets.
+        // La confirmation n'annonçait rien de tout cela ; un décompte ne sert qu'à ça.
+        _count: {
+          select: {
+            tiers: true,
+            options: true,
+            orders: true,
+          },
+        },
       },
     })
 

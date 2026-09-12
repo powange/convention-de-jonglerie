@@ -1,5 +1,5 @@
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
   async (event) => {
@@ -7,8 +7,8 @@ export default wrapApiHandler(
 
     const editionId = validateEditionId(event)
 
-    // Vérifier les permissions (même logique que gestion bénévoles)
-    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    // Vérifier les permissions de gestion de la billetterie
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,

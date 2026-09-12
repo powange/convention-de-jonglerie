@@ -913,6 +913,7 @@ import { useEditionStore } from '~/stores/editions'
 
 import HelloAssoConfigModal from '../../../../../components/edition/ticketing/HelloAssoConfigModal.vue'
 import InfomaniakConfigModal from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
+import { resumeDeconnexionBilletterie } from '../../../../../utils/suppression-billetterie-externe'
 
 import type { InfomaniakConfig } from '../../../../../components/edition/ticketing/InfomaniakConfigModal.vue'
 import type { TabsItem } from '@nuxt/ui'
@@ -1002,6 +1003,8 @@ const loadExistingConfig = async () => {
       infomaniakHasApplicationPassword.value = !!ikConfig.hasApplicationPassword
       hasInfomaniakConfig.value = true
     }
+    // Ce que la déconnexion détruirait, pour que la confirmation puisse le dire.
+    resumeDeconnexion.value = resumeDeconnexionBilletterie(response.data.config)
   } catch (error) {
     console.error('Failed to load config:', error)
   }
@@ -1100,6 +1103,15 @@ const hasExistingConfig = ref(false)
 const showInfomaniakConfigModal = ref(false)
 const infomaniakConfigModalRef = ref<InstanceType<typeof InfomaniakConfigModal> | null>(null)
 const hasInfomaniakConfig = ref(false)
+
+/**
+ * Ce que la déconnexion emporterait : tarifs, options et commandes importés.
+ *
+ * La base est en cascade, et la confirmation ne disait rien de tout cela — elle laissait croire
+ * qu'on défait un branchement, alors qu'on détruit des enregistrements de vente. Ce qui a été saisi
+ * à la main survit, et le décompte le reflète.
+ */
+const resumeDeconnexion = ref(resumeDeconnexionBilletterie(null))
 const infomaniakCurrency = ref('2')
 const infomaniakEventId = ref<number | undefined>()
 const infomaniakEventName = ref<string | undefined>()
@@ -1288,7 +1300,21 @@ const handleInfomaniakConfigTest = async (config: { apiKey: string; currency: st
 }
 
 const disconnectInfomaniak = async () => {
-  if (!confirm(t('gestion.ticketing.infomaniak_disconnect_confirm'))) return
+  // La base est en cascade : la configuration emporte ses tarifs, ses options et ses commandes,
+  // et chaque commande ses billets. La confirmation ne disait rien de tout cela — elle laissait
+  // croire qu'on défait un branchement. Le décompte se fait dans `suppression-billetterie-externe`,
+  // éprouvé à part. Rien n'est annoncé quand rien n'a été importé : une mise en garde inventée
+  // ferait douter pour rien.
+  const resume = resumeDeconnexion.value
+  const question = resume.quelqueChoseDisparait
+    ? t(
+        'gestion.ticketing.infomaniak_disconnect_confirm_detail',
+        { tarifs: resume.tarifs, options: resume.options, count: resume.commandes },
+        resume.commandes
+      )
+    : t('gestion.ticketing.infomaniak_disconnect_confirm')
+
+  if (!confirm(question)) return
 
   try {
     await $fetch(`/api/editions/${editionId}/ticketing/external`, {

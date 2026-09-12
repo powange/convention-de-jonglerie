@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { testInfomaniakConnection } from '#server/utils/editions/ticketing/infomaniak'
 import { decrypt } from '#server/utils/encryption'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -16,7 +16,7 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed) {
       throw createError({
         status: 403,
