@@ -23,11 +23,27 @@ services:
 
   # Application Nuxt.js
   app-prod:
-    build:
-      # Monorepo : contexte = racine du repo (inclut layers/) ; layout /app/apps/app1
-      context: ../..
-      dockerfile: apps/app1/Dockerfile
-      target: runtime
+    # L'image est construite et publiée par la CI (job `publier-image` de tests.yml), plus par
+    # cette machine. Trois raisons, dont une payée cher le 12/09/2026 :
+    #
+    #   - Portainer met à jour le répertoire de la stack en EXTRAYANT une archive du dépôt. Une
+    #     extraction écrase ce qui a changé et n'efface jamais ce qui a disparu : une page supprimée
+    #     deux commits plus tôt était toujours construite et servie, et c'est l'ancien composant qui
+    #     s'affichait en production. En tirant une image, le contenu du répertoire ne décide plus de
+    #     rien — seul ce fichier compte.
+    #   - Le build réclamait 8 Go de tas Node sur la machine qui sert les utilisateurs, et son cache
+    #     a déjà rempli son disque.
+    #   - Ce qui tourne est désormais l'artefact issu du commit que la CI a testé, et non un second
+    #     build refait sur place et jamais exercé.
+    #
+    # `pull_policy: always` n'est pas décoratif : sans lui, `docker compose up` réutilise l'image
+    # locale déjà étiquetée `main` et le déploiement réussirait sans rien livrer — exactement le
+    # silence qu'on cherche à supprimer.
+    #
+    # Pour revenir à un build précis sans reconstruire, remplacer `:main` par l'étiquette
+    # `sha-<commit>` correspondante, que la CI publie aussi.
+    image: ghcr.io/powange/convention-de-jonglerie:main
+    pull_policy: always
     container_name: convention-app-prod
     restart: unless-stopped
     # Charger les variables d'env depuis stack.env. Portainer l'écrit à la RACINE de la stack
