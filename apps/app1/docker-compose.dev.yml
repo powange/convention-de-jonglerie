@@ -141,6 +141,14 @@ services:
     ports:
       - '3000:3000' # Application Nuxt
       - '24678:24678' # Vite HMR (Hot Module Replacement)
+      # Serveur RPC de Vite DevTools. Le navigateur s'y connecte en direct, sur un port distinct
+      # de l'application : sans publication, `ws://localhost:7812` n'aboutit pas et DevTools reste
+      # bloqué sur sa demande d'autorisation.
+      #
+      # À n'ouvrir qu'en local : DevTools accède au système de fichiers et exécute des commandes.
+      # Ce port n'a rien à faire derrière le reverse proxy — se connecter sur
+      # http://localhost:3000, pas sur l'URL publique.
+      - '7812:7812' # Vite DevTools (RPC websocket)
     depends_on:
       database:
         condition: service_healthy
