@@ -78,6 +78,11 @@ export const prismaMock = {
   ticketingTierHandoutItem: createModelMock(),
   ticketingOptionHandoutItem: createModelMock(),
   externalTicketing: createModelMock(),
+  // Configurations de prestataires : leurs secrets sont chiffrés en base, et les endpoints qui les
+  // lisent sont ceux qu'il faut le plus tester.
+  helloAssoConfig: createModelMock(),
+  infomaniakConfig: createModelMock(),
+  sumupConfig: createModelMock(),
 
   // Modèles messagerie
   conversation: createModelMock(),
