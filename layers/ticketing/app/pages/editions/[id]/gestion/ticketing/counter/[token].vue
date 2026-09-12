@@ -222,7 +222,7 @@
                   </UButton>
                 </div>
                 <UButton
-                  v-if="canManageCounter && counter"
+                  v-if="canManageCounter"
                   variant="outline"
                   color="warning"
                   block
@@ -291,7 +291,7 @@
 
         <!-- Modal de confirmation de régénération du token -->
         <ConfirmModal
-          v-if="canManageCounter && counter"
+          v-if="canManageCounter"
           v-model="showRegenerateModal"
           :title="$t('ticketing.counters.regenerate_token')"
           :description="$t('ticketing.counters.regenerate_token_warning')"
@@ -447,36 +447,31 @@ const shareUrl = async () => {
 const { execute: handleRegenerateToken, loading: isRegenerating } = useApiAction<
   undefined,
   { token: string; counter: unknown }
->(
-  // L'identifiant, pas le jeton : sous `counters/[counterId]`, c'est toujours un identifiant.
-  // Fabriquée à l'appel et non au montage, parce que le compteur n'est pas encore chargé ici.
-  () => `/api/editions/${editionId}/ticketing/counters/${counter.value?.id}/regenerate-token`,
-  {
-    method: 'PATCH',
-    silentSuccess: true,
-    errorMessages: {
-      default: t('ticketing.counters.regenerate_token_error'),
-    },
-    onSuccess: async (response) => {
-      if (response.token) {
-        // Déconnecter la connexion SSE actuelle avant de changer d'URL
-        disconnect()
+>(`/api/editions/${editionId}/ticketing/counters/${token}/regenerate-token`, {
+  method: 'PATCH',
+  silentSuccess: true,
+  errorMessages: {
+    default: t('ticketing.counters.regenerate_token_error'),
+  },
+  onSuccess: async (response) => {
+    if (response.token) {
+      // Déconnecter la connexion SSE actuelle avant de changer d'URL
+      disconnect()
 
-        toast.add({
-          title: t('common.success'),
-          description: t('ticketing.counters.token_regenerated'),
-          color: 'success',
-        })
+      toast.add({
+        title: t('common.success'),
+        description: t('ticketing.counters.token_regenerated'),
+        color: 'success',
+      })
 
-        showRegenerateModal.value = false
+      showRegenerateModal.value = false
 
-        // Utiliser nextTick pour s'assurer que la déconnexion SSE est complète
-        await nextTick()
-        window.location.href = `/editions/${editionId}/gestion/ticketing/counter/${response.token}`
-      }
-    },
-  }
-)
+      // Utiliser nextTick pour s'assurer que la déconnexion SSE est complète
+      await nextTick()
+      window.location.href = `/editions/${editionId}/gestion/ticketing/counter/${response.token}`
+    }
+  },
+})
 
 // Charger l'édition si nécessaire
 onMounted(async () => {
