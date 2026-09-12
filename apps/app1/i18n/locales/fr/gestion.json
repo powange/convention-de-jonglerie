@@ -632,8 +632,10 @@
       "infomaniak_currency": "Devise",
       "infomaniak_currency_hint": "Devise utilisée pour les tarifs",
       "infomaniak_currency_label": "Devise",
+      "infomaniak_currency_mismatch": "Infomaniak renverra les montants en {infomaniak}, alors que l'édition est réglée en {edition} : ils seraient affichés dans la mauvaise devise. Alignez les deux réglages.",
       "infomaniak_description": "Billetterie en ligne pour événements",
       "infomaniak_disconnect_confirm": "Êtes-vous sûr de vouloir déconnecter la billetterie Infomaniak ?",
+      "infomaniak_disconnect_confirm_detail": "Déconnecter la billetterie Infomaniak ? Ses {tarifs} tarif(s) et {options} option(s) importés seront définitivement supprimés. | Déconnecter la billetterie Infomaniak ? Ses {tarifs} tarif(s), {options} option(s) et {count} commande importée seront définitivement supprimés — ce qui a été saisi à la main est conservé. | Déconnecter la billetterie Infomaniak ? Ses {tarifs} tarif(s), {options} option(s) et {count} commandes importées seront définitivement supprimés — ce qui a été saisi à la main est conservé.",
       "infomaniak_disconnected": "Billetterie Infomaniak déconnectée",
       "infomaniak_event_label": "Événement",
       "infomaniak_event_placeholder": "Sélectionnez un événement (optionnel)",
@@ -747,8 +749,7 @@
       "tiers_description": "Gérer les tarifs, options et quotas",
       "tiers_handout_items_manage_for": "Articles à remettre — {name}",
       "tiers_title": "Tarifs, options & quotas",
-      "title": "Billetterie",
-      "infomaniak_currency_mismatch": "Infomaniak renverra les montants en {infomaniak}, alors que l'édition est réglée en {edition} : ils seraient affichés dans la mauvaise devise. Alignez les deux réglages."
+      "title": "Billetterie"
     },
     "title": "Gestion",
     "view_edition": "Voir l'édition",

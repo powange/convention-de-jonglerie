@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { useTicketingPorts } from '#server/ticketing/ports/registry'
 import { requireAuth } from '#server/utils/auth-utils'
 import { encrypt } from '#server/utils/encryption'
-import { canManageEditionVolunteers } from '#server/utils/organizer-management'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
   provider: z.enum(['HELLOASSO', 'INFOMANIAK', 'BILLETWEB', 'WEEZEVENT', 'OTHER']),
@@ -34,8 +34,8 @@ export default wrapApiHandler(
 
     const editionId = validateEditionId(event)
 
-    // Vérifier les permissions (même logique que gestion bénévoles)
-    const allowed = await canManageEditionVolunteers(editionId, user.id, event)
+    // Vérifier les permissions de gestion de la billetterie
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed)
       throw createError({
         status: 403,
