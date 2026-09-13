@@ -1,0 +1,14 @@
+-- Les éditions EXISTANTES passent à « planning publié ».
+--
+-- Le défaut du schéma est `false` : une édition neuve commence masquée, et le responsable publie
+-- quand il juge prêt. Mais appliquer ce défaut aux éditions déjà en base leur retirerait du jour
+-- au lendemain un affichage que leurs bénévoles ont déjà — y compris pendant une convention en
+-- cours, où des gens consultent leurs créneaux depuis leur téléphone.
+--
+-- Ces deux besoins sont contradictoires et c'est pourquoi il faut les deux temps : le défaut sert
+-- l'avenir, cet UPDATE protège le présent. C'est le même raisonnement que le commentaire de
+-- `swapsEnabled` applique déjà dans ce modèle.
+--
+-- Migration séparée de l'ALTER plutôt qu'ajoutée dedans : celle-ci était déjà appliquée, et
+-- Prisma en conserve l'empreinte — la modifier ferait échouer les vérifications d'intégrité.
+UPDATE `EventVolunteerSettings` SET `planningPublished` = true;

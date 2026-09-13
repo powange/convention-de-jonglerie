@@ -738,7 +738,11 @@
       "all_artists_handout_items": "Przedmioty do wydania wszystkim artystom",
       "all_artists_handout_items_help": "Te przedmioty są wydawane każdemu artyście edycji, oprócz tych powiązanych z jego spektaklami.",
       "per_show_handout_items_title": "Przedmioty przypisane do spektaklu",
-      "infomaniak_currency_mismatch": "Infomaniak zwróci kwoty w {infomaniak}, podczas gdy edycja jest ustawiona na {edition}: zostałyby wyświetlone w niewłaściwej walucie. Ujednolić oba ustawienia."
+      "infomaniak_currency_mismatch": "Infomaniak zwróci kwoty w {infomaniak}, podczas gdy edycja jest ustawiona na {edition}: zostałyby wyświetlone w niewłaściwej walucie. Ujednolić oba ustawienia.",
+      "helloasso_disconnect_confirm": "Cała konfiguracja HelloAsso zostanie usunięta, podobnie jak taryfy, opcje i zamówienia zaimportowane z tego systemu biletowego. To, co wprowadzono ręcznie, zostanie zachowane. Tej operacji nie można cofnąć.",
+      "helloasso_disconnect_title": "Odłącz system biletowy HelloAsso",
+      "infomaniak_disconnect_confirm_detail": "Jego {tarifs} taryf i {options} opcji zostanie trwale usuniętych. | Jego {tarifs} taryf, {options} opcji i {count} zaimportowane zamówienie zostaną trwale usunięte — to, co wprowadzono ręcznie, zostanie zachowane. | Jego {tarifs} taryf, {options} opcji i {count} zaimportowanych zamówień zostanie trwale usuniętych — to, co wprowadzono ręcznie, zostanie zachowane.",
+      "infomaniak_disconnect_title": "Odłącz system biletowy Infomaniak"
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

@@ -524,6 +524,13 @@
     "slots_back_to_back": "Direkte efter hinanden",
     "slots_break_of": "{duration} pause",
     "slots_count": "{count} vagt | {count} vagter",
-    "slots_overlap_by": "Overlap på {duration}"
+    "slots_overlap_by": "Overlap på {duration}",
+    "planning_not_published_description": "De ansvarlige er stadig i gang med at lave den. Dine vagter vises her, så snart den er offentliggjort — du får besked.",
+    "planning_not_published_title": "Vagtplanen er endnu ikke offentliggjort",
+    "planning_publish_label": "Offentliggør vagtplanen for de frivillige",
+    "planning_publish_off_hint": "De frivillige kan hverken se deres vagter eller vagtplanen endnu: du kan roligt bygge den færdig.",
+    "planning_publish_on_hint": "Accepterede frivillige kan se deres vagter og udgavens vagtplan.",
+    "planning_published_toast": "Vagtplanen er offentliggjort: de frivillige kan nu se deres vagter",
+    "planning_unpublished_toast": "Vagtplanen er skjult: de frivillige kan ikke længere se deres vagter"
   }
 }

@@ -63,7 +63,8 @@
       "step": "Increment",
       "syncing": "Syncing...",
       "title": "Counters",
-      "token_regenerated": "Link successfully regenerated"
+      "token_regenerated": "Link successfully regenerated",
+      "last_actor": "Changed by"
     },
     "custom_fields": {
       "created": "Custom field created successfully",
@@ -164,7 +165,10 @@
       "payment_method_error": "Error updating payment method",
       "payment_method_updated": "Payment method set",
       "payment_method_updated_description": "Payment method has been saved successfully",
-      "validate_entry_error": "Error validating entry"
+      "validate_entry_error": "Error validating entry",
+      "canceled_badge": "Cancelled",
+      "no_action_available": "No action available",
+      "payer_label": "Payer"
     },
     "participant": {
       "entry_validated": "Entry already validated",

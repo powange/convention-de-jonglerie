@@ -63,7 +63,8 @@
       "step": "Schritt",
       "syncing": "Synchronisierung läuft...",
       "title": "Zähler",
-      "token_regenerated": "Link erfolgreich regeneriert"
+      "token_regenerated": "Link erfolgreich regeneriert",
+      "last_actor": "Geändert von"
     },
     "custom_fields": {
       "created": "Benutzerdefiniertes Feld erfolgreich erstellt",
@@ -164,7 +165,10 @@
       "payment_method_error": "Fehler beim Aktualisieren der Zahlungsmethode",
       "payment_method_updated": "Zahlungsmethode festgelegt",
       "payment_method_updated_description": "Zahlungsmethode wurde erfolgreich gespeichert",
-      "validate_entry_error": "Fehler beim Validieren des Eintritts"
+      "validate_entry_error": "Fehler beim Validieren des Eintritts",
+      "canceled_badge": "Storniert",
+      "no_action_available": "Keine Aktion verfügbar",
+      "payer_label": "Zahler"
     },
     "participant": {
       "entry_validated": "Eintritt bereits validiert",

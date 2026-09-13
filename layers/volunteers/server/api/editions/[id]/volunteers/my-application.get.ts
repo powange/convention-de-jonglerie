@@ -1,4 +1,5 @@
 import { avecCoequipiers, coequipiersSelect } from '../../../../utils/coequipiers-creneau'
+import { planningVisibleSurLEdition } from '../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -84,9 +85,20 @@ export default wrapApiHandler(
       return null
     }
 
+    // Le planning doit être publié, en plus d'être accepté.
+    //
+    // `teamAssignments` est masqué avec les créneaux, et c'est délibéré : savoir qu'on est placé
+    // dans « Bar - nuit » est déjà un résultat du travail de planification, au même titre que
+    // l'horaire. Les montrer séparément laisserait deviner la moitié de ce qu'on cache.
+    //
+    // On ne demande pas ici si la personne est gestionnaire : cet endpoint rend SA candidature.
+    // Un gestionnaire qui consulte la sienne est d'abord un candidat ; s'il veut voir le planning
+    // en construction, c'est par son écran de gestion qu'il passe.
+    const planningVisible = await planningVisibleSurLEdition(editionId, false)
+
     // Récupérer les créneaux assignés si la candidature est acceptée
     let assignedTimeSlots = []
-    if (application.status === 'ACCEPTED') {
+    if (application.status === 'ACCEPTED' && planningVisible) {
       assignedTimeSlots = await prisma.volunteerAssignment.findMany({
         where: {
           userId: user.id,
@@ -129,10 +141,14 @@ export default wrapApiHandler(
       // l'intéressé relirait la copie figée dans sa candidature pendant que les organisateurs,
       // eux, verraient son profil à jour — deux vérités pour la même personne.
       ...infosPersonnelles(application.user as never),
+      teamAssignments: planningVisible ? application.teamAssignments : [],
       assignedTimeSlots: assignedTimeSlots.map((assignation) => ({
         ...assignation,
         timeSlot: avecCoequipiers(assignation.timeSlot),
       })),
+      // Dit à l'écran POURQUOI il n'a rien à afficher. Sans ce drapeau, un bénévole accepté
+      // arrive sur une page vide et conclut à une erreur — ou pire, qu'on l'a désaffecté.
+      planningPublished: planningVisible,
     }
   },
   { operationName: 'GetMyVolunteerApplication' }

@@ -17,6 +17,24 @@
         />
       </ClientOnly>
 
+      <!-- Le planning n'est pas encore publié : sans ce bandeau, un bénévole accepté arrive sur
+           une page sans créneau et conclut à une panne — ou pire, qu'on l'a désaffecté. -->
+      <ClientOnly>
+        <UAlert
+          v-if="
+            authStore.isAuthenticated &&
+            volunteersMode === 'INTERNAL' &&
+            !planningPublie &&
+            (myApplication?.status === 'ACCEPTED' || mesEquipesOrganisateur.length > 0)
+          "
+          color="info"
+          variant="subtle"
+          icon="i-heroicons-clock"
+          :title="t('volunteers.planning_not_published_title')"
+          :description="t('volunteers.planning_not_published_description')"
+        />
+      </ClientOnly>
+
       <ClientOnly>
         <!-- Ses propres créneaux d'abord : c'est ce que le bénévole vient chercher.
              Le planning de toute l'édition, plus large, vient ensuite. -->
@@ -26,6 +44,7 @@
           v-if="
             authStore.isAuthenticated &&
             volunteersMode === 'INTERNAL' &&
+            planningPublie &&
             (myApplication?.status === 'ACCEPTED' || mesEquipesOrganisateur.length > 0)
           "
           :edition-id="editionId"
@@ -42,7 +61,8 @@
             authStore.isAuthenticated &&
             myApplication?.status === 'ACCEPTED' &&
             volunteersMode === 'INTERNAL' &&
-            echangesOuverts
+            echangesOuverts &&
+            planningPublie
           "
           class="flex justify-end"
         >
@@ -55,12 +75,13 @@
           />
         </div>
 
-        <!-- Planning Card - Visible seulement pour les bénévoles acceptés -->
+        <!-- Planning Card - Visible seulement pour les bénévoles acceptés, planning publié -->
         <EditionVolunteerPlanningCard
           v-if="
             authStore.isAuthenticated &&
             myApplication?.status === 'ACCEPTED' &&
-            volunteersMode === 'INTERNAL'
+            volunteersMode === 'INTERNAL' &&
+            planningPublie
           "
           :edition="edition"
           :can-manage-volunteers="false"
@@ -492,6 +513,21 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 // Métadonnées SEO avec le nom de l'édition
 /** Les échanges peuvent être fermés par l'organisateur ; ouverts par défaut. */
 const echangesOuverts = computed(() => (edition.value as any)?.volunteersSwapsEnabled !== false)
+
+/**
+ * Le planning est-il publié pour cette édition ?
+ *
+ * Lu depuis les RÉGLAGES et non depuis la candidature : un organisateur rattaché à une équipe
+ * tient des créneaux sans avoir postulé, et il a besoin de la même explication. Passer par la
+ * candidature le laissait sans réponse.
+ *
+ * `=== true` et non `!== false` : l'absence vaut « non publié », le choix le plus prudent — mieux
+ * vaut un bandeau de trop qu'un planning montré alors qu'on le croyait caché.
+ *
+ * ⚠️ Ce calcul ne PROTÈGE rien : les endpoints filtrent déjà. Il sert à rendre l'écran cohérent
+ * avec ce que le serveur renvoie, et surtout à dire POURQUOI la page est vide.
+ */
+const planningPublie = computed(() => volunteersInfo.value?.planningPublished === true)
 
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))
 

@@ -524,6 +524,13 @@
     "slots_back_to_back": "Подряд, без перерыва",
     "slots_break_of": "перерыв {duration}",
     "slots_count": "{count} смена | {count} смен",
-    "slots_overlap_by": "Наложение на {duration}"
+    "slots_overlap_by": "Наложение на {duration}",
+    "planning_not_published_description": "Ответственные ещё готовят его. Ваши смены появятся здесь, как только он будет опубликован — вы получите уведомление.",
+    "planning_not_published_title": "Расписание ещё не опубликовано",
+    "planning_publish_label": "Опубликовать расписание для волонтёров",
+    "planning_publish_off_hint": "Волонтёры пока не видят ни своих смен, ни расписания: вы можете спокойно его составлять.",
+    "planning_publish_on_hint": "Принятые волонтёры видят свои смены и расписание выпуска.",
+    "planning_published_toast": "Расписание опубликовано: волонтёры теперь видят свои смены",
+    "planning_unpublished_toast": "Расписание скрыто: волонтёры больше не видят своих смен"
   }
 }

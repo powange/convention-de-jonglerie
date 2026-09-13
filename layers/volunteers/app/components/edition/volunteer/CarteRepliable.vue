@@ -1,5 +1,12 @@
 <template>
-  <UCard variant="soft" :ui="ouverte ? undefined : { body: 'p-0 sm:p-0' }">
+  <!-- Le corps de la carte n'a jamais de marge propre : elle est portée par l'enveloppe repliable
+       ci-dessous. Faire dépendre `ui` de `ouverte` semblait plus direct, mais `ouverte` se décide
+       sur une media query — donc `false` au rendu serveur, `true` au client sur un écran large.
+       Or Vue ne corrige pas les classes lors de l'hydratation (seuls les gestionnaires d'événements
+       et les directives le sont) : le `p-0` du serveur restait collé, et la description touchait
+       le bord de la carte. Une classe identique des deux côtés supprime la divergence ; `v-show`,
+       lui, est bien rétabli au montage par la directive. -->
+  <UCard variant="soft" :ui="{ body: 'p-0 sm:p-0' }">
     <template #header>
       <div class="flex items-center justify-between gap-2">
         <!-- Sur mobile, l'en-tête devient la commande de repli ; ailleurs il reste un titre,
@@ -34,7 +41,7 @@
 
     <!-- `v-show` plutôt qu'un démontage : les cartes chargent leurs données au montage, et les
          redemander à chaque dépliage rendrait le repli coûteux au lieu de le rendre pratique. -->
-    <div v-show="ouverte">
+    <div v-show="ouverte" class="p-4 sm:p-6">
       <slot />
     </div>
   </UCard>

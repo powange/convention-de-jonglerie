@@ -6,6 +6,14 @@ export interface VolunteerSettings {
   description?: string | null
   mode: 'INTERNAL' | 'EXTERNAL'
   externalUrl?: string | null
+  /**
+   * Le planning est-il montré aux bénévoles acceptés ?
+   *
+   * Optionnel parce qu'un appel antérieur à ce réglage n'en portera pas ; l'absence se lit comme
+   * « non publié », le choix le plus prudent : mieux vaut un bandeau de trop qu'un planning
+   * montré alors qu'on le croyait caché.
+   */
+  planningPublished?: boolean
   // Absent pour qui n'a pas le droit de gérer les bénévoles : le décompte des candidatures
   // relève de la gestion, et une clé à zéro se lirait « personne n'a postulé ».
   counts?: Record<string, number>

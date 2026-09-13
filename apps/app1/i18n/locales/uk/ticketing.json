@@ -63,7 +63,8 @@
       "step": "Крок",
       "syncing": "Синхронізація...",
       "title": "Лічильники",
-      "token_regenerated": "Посилання успішно регенеровано"
+      "token_regenerated": "Посилання успішно регенеровано",
+      "last_actor": "Змінив"
     },
     "custom_fields": {
       "created": "Користувацьке поле успішно створено",
@@ -164,7 +165,10 @@
       "payment_method_error": "Помилка при оновленні способу оплати",
       "payment_method_updated": "Спосіб оплати встановлено",
       "payment_method_updated_description": "Спосіб оплати успішно збережено",
-      "validate_entry_error": "Помилка при підтвердженні входу"
+      "validate_entry_error": "Помилка при підтвердженні входу",
+      "canceled_badge": "Скасовано",
+      "no_action_available": "Немає доступних дій",
+      "payer_label": "Платник"
     },
     "participant": {
       "entry_validated": "Вхід вже підтверджено",

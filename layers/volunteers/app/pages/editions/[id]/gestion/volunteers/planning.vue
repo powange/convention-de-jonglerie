@@ -30,6 +30,38 @@
       </div>
 
       <div class="space-y-6">
+        <!-- Publier le planning.
+             Tant qu'il ne l'est pas, les bénévoles ne voient ni leurs créneaux ni celui de
+             l'édition : un responsable construit ses plannings par itérations, et voir apparaître
+             puis disparaître des services donne des informations fausses qu'on note dans son
+             agenda. Le filtre est serveur ; cet interrupteur ne fait que le commander. -->
+        <UCard>
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                <UIcon
+                  :name="planningPublie ? 'i-heroicons-eye' : 'i-heroicons-eye-slash'"
+                  :class="planningPublie ? 'text-green-600' : 'text-gray-400'"
+                />
+                {{ t('volunteers.planning_publish_label') }}
+              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {{
+                  planningPublie
+                    ? t('volunteers.planning_publish_on_hint')
+                    : t('volunteers.planning_publish_off_hint')
+                }}
+              </p>
+            </div>
+            <USwitch
+              :model-value="planningPublie"
+              :loading="publicationEnCours"
+              :disabled="publicationEnCours"
+              @update:model-value="basculerPublication"
+            />
+          </div>
+        </UCard>
+
         <!-- Contenu du planning -->
         <EditionVolunteerPlanningCard
           :edition="edition"
@@ -163,6 +195,55 @@ const toast = useToast()
 const { toDatetimeLocal } = useDatetime()
 
 const editionId = parseInt(route.params.id as string)
+
+/**
+ * Publier ou masquer le planning aux bénévoles.
+ *
+ * Passe par `useVolunteerSettings`, comme les autres réglages bénévoles — le même PATCH, la même
+ * validation côté serveur. Rien de particulier ici : c'est un booléen de plus, et c'est
+ * volontairement le cas, parce que tout ce qui protège vit côté serveur.
+ */
+const {
+  settings: reglagesBenevoles,
+  updating: publicationEnCours,
+  fetchSettings: chargerReglagesBenevoles,
+  updateSettings: enregistrerReglagesBenevoles,
+} = useVolunteerSettings(editionId)
+
+const planningPublie = computed(() => reglagesBenevoles.value?.planningPublished === true)
+
+/**
+ * Même forme que `handleToggleSwaps` et `handleToggleOrganizersInTeams` dans `config.vue` :
+ * `updateSettings` relance l'erreur, et un échec avalé laisserait le responsable croire le
+ * planning publié alors qu'il ne l'est pas — la pire des issues pour un réglage dont tout
+ * l'intérêt est de savoir ce que les bénévoles voient.
+ *
+ * Pas de reprise de l'état à la main, en revanche : l'interrupteur lit `reglagesBenevoles`, que
+ * `updateSettings` ne touche qu'en cas de succès. Il revient donc seul à sa position.
+ */
+const basculerPublication = async (publier: boolean) => {
+  try {
+    const enregistre = await enregistrerReglagesBenevoles({ planningPublished: publier })
+    // Absent quand le serveur répond `{ unchanged }` : annoncer une publication qui n'a rien
+    // changé induirait en erreur.
+    if (!enregistre) return
+
+    toast.add({
+      title: publier
+        ? t('volunteers.planning_published_toast')
+        : t('volunteers.planning_unpublished_toast'),
+      color: publier ? 'success' : 'neutral',
+      icon: publier ? 'i-heroicons-eye' : 'i-heroicons-eye-slash',
+    })
+  } catch (e: any) {
+    toast.add({
+      title: e?.data?.message || e?.message || t('common.error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  }
+}
+
 const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État du composant
@@ -815,6 +896,9 @@ onMounted(async () => {
       fetchTeams(),
       fetchTimeSlots(),
       fetchSpectacles(),
+      // Sans ce chargement, l'interrupteur s'afficherait éteint sur une édition publiée : le
+      // réglage vient d'ici, pas de l'objet édition.
+      chargerReglagesBenevoles(),
     ])
   } catch {
     toast.add({

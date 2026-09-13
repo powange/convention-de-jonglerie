@@ -63,7 +63,8 @@
       "step": "Шаг",
       "syncing": "Синхронизация...",
       "title": "Счетчики",
-      "token_regenerated": "Ссылка успешно перегенерирована"
+      "token_regenerated": "Ссылка успешно перегенерирована",
+      "last_actor": "Изменил"
     },
     "custom_fields": {
       "created": "Пользовательское поле успешно создано",
@@ -164,7 +165,10 @@
       "payment_method_error": "Ошибка при обновлении способа оплаты",
       "payment_method_updated": "Способ оплаты установлен",
       "payment_method_updated_description": "Способ оплаты успешно сохранён",
-      "validate_entry_error": "Ошибка при подтверждении входа"
+      "validate_entry_error": "Ошибка при подтверждении входа",
+      "canceled_badge": "Отменён",
+      "no_action_available": "Нет доступных действий",
+      "payer_label": "Плательщик"
     },
     "participant": {
       "entry_validated": "Вход уже подтвержден",

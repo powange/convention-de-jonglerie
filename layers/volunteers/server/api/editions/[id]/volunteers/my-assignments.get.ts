@@ -1,3 +1,5 @@
+import { exigerPlanningPublie } from '../../../../utils/planning-publie'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -12,6 +14,12 @@ export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
+
+    // Refus franc plutôt que liste vide : cet endpoint sert à choisir le créneau qu'on cède dans
+    // un échange. Rendre une liste vide ferait croire qu'on n'a aucun créneau échangeable, alors
+    // que la vraie raison est que le planning n'est pas publié — et les échanges sont fermés tant
+    // qu'il ne l'est pas.
+    await exigerPlanningPublie(editionId, false)
 
     const assignments = await prisma.volunteerAssignment.findMany({
       where: {

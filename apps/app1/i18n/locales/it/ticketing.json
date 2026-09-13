@@ -63,7 +63,8 @@
       "step": "Incremento",
       "syncing": "Sincronizzazione in corso...",
       "title": "Contatori",
-      "token_regenerated": "Link rigenerato con successo"
+      "token_regenerated": "Link rigenerato con successo",
+      "last_actor": "Modificato da"
     },
     "custom_fields": {
       "created": "Campo personalizzato creato con successo",
@@ -164,7 +165,10 @@
       "payment_method_error": "Errore durante l'aggiornamento del metodo di pagamento",
       "payment_method_updated": "Metodo di pagamento impostato",
       "payment_method_updated_description": "Il metodo di pagamento è stato salvato con successo",
-      "validate_entry_error": "Errore durante la validazione dell'ingresso"
+      "validate_entry_error": "Errore durante la validazione dell'ingresso",
+      "canceled_badge": "Annullato",
+      "no_action_available": "Nessuna azione disponibile",
+      "payer_label": "Pagante"
     },
     "participant": {
       "entry_validated": "Ingresso già convalidato",

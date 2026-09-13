@@ -1,3 +1,5 @@
+import { exigerPlanningPublie } from '../../../../utils/planning-publie'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import {
   requireVolunteerPlanningAccess,
@@ -15,6 +17,17 @@ export default wrapApiHandler(
 
     // Vérifier si l'utilisateur est un bénévole accepté (pas un gestionnaire)
     const isVolunteer = await isAcceptedVolunteer(user.id, editionId)
+
+    // C'est LA surface la plus large du réglage « planning publié » : cet endpoint rend tout le
+    // planning de l'édition avec les affectations NOMINATIVES — pseudo, nom, prénom, courriel,
+    // photo. Un responsable qui construit ses plannings ne veut pas que ce travail en cours soit
+    // lisible, et surtout pas nommément.
+    //
+    // La garde vit ici et non dans `requireVolunteerPlanningAccess` : cette fonction-là est dans
+    // `apps/app1`, et la dépendance de ce dépôt va des layers vers l'app, jamais l'inverse. L'y
+    // mettre aurait demandé un import à contresens. Elle n'a aujourd'hui qu'un seul appelant —
+    // celui-ci — donc le risque de l'oublier ailleurs est nul tant que ça reste vrai.
+    await exigerPlanningPublie(editionId, !isVolunteer)
 
     // Récupérer les créneaux de bénévoles pour cette édition
     const timeSlots = await prisma.volunteerTimeSlot.findMany({

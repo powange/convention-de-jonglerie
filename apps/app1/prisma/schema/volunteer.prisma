@@ -47,6 +47,17 @@ model EventVolunteerSettings {
   // Rattacher des organisateurs aux équipes et créneaux. Fermé par défaut : c'est une
   // possibilité qu'on ouvre, pas un comportement que les éditions existantes attendaient.
   organizersInTeams Boolean       @default(false)
+  // Le planning est-il montré aux bénévoles acceptés ?
+  //
+  // Fermé par défaut, et c'est l'inverse du raisonnement de `swapsEnabled` : un responsable
+  // construit ses plannings par itérations, et voir apparaître puis disparaître ses créneaux au
+  // fil de la journée donne à un bénévole des informations fausses qu'il notera dans son agenda.
+  // Une édition neuve doit donc commencer masquée, et le responsable publier quand il juge prêt.
+  //
+  // ⚠️ La MIGRATION passe toutes les lignes EXISTANTES à `true`. Le défaut sert les éditions à
+  // venir ; sans cet UPDATE, les éditions en cours perdraient du jour au lendemain un affichage
+  // que leurs bénévoles ont déjà — y compris pendant une convention.
+  planningPublished Boolean       @default(false)
   description       String?       @db.Text
   externalUrl       String?
   setupStartDate    DateTime?
