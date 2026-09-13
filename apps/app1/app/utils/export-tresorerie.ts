@@ -33,12 +33,19 @@ export interface LigneTresorerie {
  */
 export const SANS_CODE = ''
 
-/** Les lignes d'un même code, et ce qu'elles totalisent. */
-export interface GroupeDeCode {
+/**
+ * Les lignes d'un même code, et ce qu'elles totalisent.
+ *
+ * Générique sur le type de ligne : l'appelant en sait plus que ce fichier — une ligne de la page
+ * porte son origine, sa source, son identifiant —, et ce savoir doit traverser le regroupement
+ * intact. Sans cela, la fonction qui compose les titres ne pourrait plus lire que ce que cet
+ * util-ci déclare, et le typage refuserait à juste titre de lui promettre le reste.
+ */
+export interface GroupeDeCode<L extends LigneTresorerie = LigneTresorerie> {
   code: string
   /** Vide quand les lignes n'ont pas de code : c'est à l'écran de dire « Sans code ». */
   libelle: string
-  lignes: LigneTresorerie[]
+  lignes: L[]
   /** Sous-total réglé, en centimes. */
   regle: number
   /** Sous-total engagé — réglé compris —, en centimes. */
@@ -72,11 +79,11 @@ function engageDe(ligne: LigneTresorerie): number {
  * réponse d'API plus ancienne pourrait porter — garde le premier libellé rencontré, pour ne pas
  * scinder le groupe en deux et fausser les sous-totaux.
  */
-export function regrouperParCode(
-  lignes: LigneTresorerie[],
+export function regrouperParCode<L extends LigneTresorerie>(
+  lignes: L[],
   nature: 'EXPENSE' | 'INCOME'
-): GroupeDeCode[] {
-  const groupes = new Map<string, GroupeDeCode>()
+): GroupeDeCode<L>[] {
+  const groupes = new Map<string, GroupeDeCode<L>>()
 
   for (const ligne of lignes) {
     if (ligne?.kind !== nature) continue
@@ -117,7 +124,9 @@ export interface TotalDeNature {
  * sous-totaux imprimés juste au-dessus, si le regroupement venait à en écarter une. Ici, le total
  * du bas est par construction la somme de ce que le lecteur a sous les yeux.
  */
-export function totalDesGroupes(groupes: GroupeDeCode[]): TotalDeNature {
+export function totalDesGroupes<L extends LigneTresorerie>(
+  groupes: GroupeDeCode<L>[]
+): TotalDeNature {
   return groupes.reduce(
     (total, groupe) => ({
       regle: total.regle + groupe.regle,
@@ -218,10 +227,10 @@ export interface TableauImprime {
  * billetterie portent une CLÉ (`ARTIST_PAYMENT`, `TICKETING_DONATIONS`) et non un libellé : écrire
  * `ligne.title` tel quel imprimait ces clés brutes dans un document destiné à un comptable.
  */
-export function preparerTableau(
-  groupes: GroupeDeCode[],
+export function preparerTableau<L extends LigneTresorerie>(
+  groupes: GroupeDeCode<L>[],
   formater: (centimes: number) => string,
-  titrer: (ligne: LigneTresorerie) => string,
+  titrer: (ligne: L) => string,
   libelleSansCode: string,
   libelleSousTotal: string
 ): TableauImprime {

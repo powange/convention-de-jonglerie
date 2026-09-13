@@ -266,6 +266,56 @@ describe('preparerTableau — repérage des sous-totaux', () => {
   })
 })
 
+describe('le type des lignes traverse le regroupement', () => {
+  /**
+   * ⚠️ Ce cas a fait échouer la CI, et il est ici pour ne pas la refaire échouer.
+   *
+   * L'écran en sait plus que cet util : ses lignes portent une origine et une source, dont dépend
+   * le titre des écritures calculées. Si le regroupement ramenait tout au type minimal, la
+   * fonction de titrage ne pourrait plus lire ces champs — et le typage aurait raison de refuser
+   * qu'on les lui promette.
+   */
+  interface LigneDeLaPage extends LigneTresorerie {
+    origin: 'source' | 'manual'
+    source?: string
+  }
+
+  it('laisse la fonction de titrage lire les champs de l’appelant', () => {
+    // Deux codes distincts : sous un seul, le groupe gagnerait un sous-total qui n'a rien à voir
+    // avec ce que ce test vérifie.
+    const lignes: LigneDeLaPage[] = [
+      {
+        origin: 'source',
+        source: 'ARTIST_PAYMENT',
+        kind: 'EXPENSE',
+        title: 'ARTIST_PAYMENT',
+        code: { code: '6226', label: 'Honoraires' },
+        settled: 100,
+        pending: 0,
+      },
+      {
+        origin: 'manual',
+        kind: 'EXPENSE',
+        title: 'Gobelets',
+        code: { code: '607', label: 'Achats' },
+        settled: 50,
+        pending: 0,
+      },
+    ]
+
+    const { lignes: corps } = preparerTableau(
+      regrouperParCode(lignes, 'EXPENSE'),
+      formater,
+      // `ligne.source` n'existe pas sur le type minimal : c'est tout l'enjeu.
+      (ligne) => (ligne.origin === 'source' ? `traduit:${ligne.source}` : ligne.title),
+      'Sans code',
+      'Sous-total'
+    )
+
+    expect(corps.map((l) => l[2])).toEqual(['Gobelets', 'traduit:ARTIST_PAYMENT'])
+  })
+})
+
 describe('nomFichierTresorerie', () => {
   const un_jour = new Date(2026, 8, 14)
 
