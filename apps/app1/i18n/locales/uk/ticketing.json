@@ -168,7 +168,14 @@
       "validate_entry_error": "Помилка при підтвердженні входу",
       "canceled_badge": "Скасовано",
       "no_action_available": "Немає доступних дій",
-      "payer_label": "Платник"
+      "payer_label": "Платник",
+      "status_filter_label": "Статус замовлення",
+      "status_filter_placeholder": "Усі статуси",
+      "status_onsite": "Оплачено на місці",
+      "status_pending": "Очікує оплати",
+      "status_processed": "Оплачено онлайн",
+      "tier_origin_external": "Синхронізовано з {fournisseur}",
+      "tier_origin_manual": "Створено на сайті"
     },
     "participant": {
       "entry_validated": "Вхід вже підтверджено",

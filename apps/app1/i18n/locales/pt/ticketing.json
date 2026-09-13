@@ -168,7 +168,14 @@
       "validate_entry_error": "Erro ao validar a entrada",
       "canceled_badge": "Cancelada",
       "no_action_available": "Nenhuma ação disponível",
-      "payer_label": "Pagador"
+      "payer_label": "Pagador",
+      "status_filter_label": "Estado da encomenda",
+      "status_filter_placeholder": "Todos os estados",
+      "status_onsite": "Pago no local",
+      "status_pending": "A aguardar pagamento",
+      "status_processed": "Pago online",
+      "tier_origin_external": "Sincronizado a partir de {fournisseur}",
+      "tier_origin_manual": "Criado no site"
     },
     "participant": {
       "entry_validated": "Entrada já validada",

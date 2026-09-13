@@ -168,7 +168,14 @@
       "validate_entry_error": "Fehler beim Validieren des Eintritts",
       "canceled_badge": "Storniert",
       "no_action_available": "Keine Aktion verfügbar",
-      "payer_label": "Zahler"
+      "payer_label": "Zahler",
+      "status_filter_label": "Bestellstatus",
+      "status_filter_placeholder": "Alle Status",
+      "status_onsite": "Vor Ort bezahlt",
+      "status_pending": "Zahlung ausstehend",
+      "status_processed": "Online bezahlt",
+      "tier_origin_external": "Synchronisiert von {fournisseur}",
+      "tier_origin_manual": "Auf der Website erstellt"
     },
     "participant": {
       "entry_validated": "Eintritt bereits validiert",

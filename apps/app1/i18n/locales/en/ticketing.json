@@ -168,7 +168,14 @@
       "validate_entry_error": "Error validating entry",
       "canceled_badge": "Cancelled",
       "no_action_available": "No action available",
-      "payer_label": "Payer"
+      "payer_label": "Payer",
+      "status_filter_label": "Order status",
+      "status_filter_placeholder": "All statuses",
+      "status_onsite": "Paid on site",
+      "status_pending": "Awaiting payment",
+      "status_processed": "Paid online",
+      "tier_origin_external": "Synced from {fournisseur}",
+      "tier_origin_manual": "Created on the site"
     },
     "participant": {
       "entry_validated": "Entry already validated",

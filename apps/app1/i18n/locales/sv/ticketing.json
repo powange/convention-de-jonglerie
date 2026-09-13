@@ -168,7 +168,14 @@
       "validate_entry_error": "Fel vid validering av inträde",
       "canceled_badge": "Avbruten",
       "no_action_available": "Ingen åtgärd tillgänglig",
-      "payer_label": "Betalare"
+      "payer_label": "Betalare",
+      "status_filter_label": "Orderstatus",
+      "status_filter_placeholder": "Alla statusar",
+      "status_onsite": "Betald på plats",
+      "status_pending": "Väntar på betalning",
+      "status_processed": "Betald online",
+      "tier_origin_external": "Synkroniserad från {fournisseur}",
+      "tier_origin_manual": "Skapad på webbplatsen"
     },
     "participant": {
       "entry_validated": "Posten är redan validerad",

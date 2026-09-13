@@ -168,7 +168,14 @@
       "validate_entry_error": "Ошибка при подтверждении входа",
       "canceled_badge": "Отменён",
       "no_action_available": "Нет доступных действий",
-      "payer_label": "Плательщик"
+      "payer_label": "Плательщик",
+      "status_filter_label": "Статус заказа",
+      "status_filter_placeholder": "Все статусы",
+      "status_onsite": "Оплачено на месте",
+      "status_pending": "Ожидает оплаты",
+      "status_processed": "Оплачено онлайн",
+      "tier_origin_external": "Синхронизировано из {fournisseur}",
+      "tier_origin_manual": "Создано на сайте"
     },
     "participant": {
       "entry_validated": "Вход уже подтвержден",

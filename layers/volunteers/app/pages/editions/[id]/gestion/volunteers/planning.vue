@@ -213,7 +213,7 @@ const {
 const planningPublie = computed(() => reglagesBenevoles.value?.planningPublished === true)
 
 /**
- * Même forme que `handleToggleSwaps` et `handleToggleOrganizersInTeams` dans `config.vue` :
+ * Même forme que les interrupteurs de l'écran de configuration des bénévoles :
  * `updateSettings` relance l'erreur, et un échec avalé laisserait le responsable croire le
  * planning publié alors qu'il ne l'est pas — la pire des issues pour un réglage dont tout
  * l'intérêt est de savoir ce que les bénévoles voient.

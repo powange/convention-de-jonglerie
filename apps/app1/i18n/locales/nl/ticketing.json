@@ -168,7 +168,14 @@
       "validate_entry_error": "Fout bij valideren van toegang",
       "canceled_badge": "Geannuleerd",
       "no_action_available": "Geen actie beschikbaar",
-      "payer_label": "Betaler"
+      "payer_label": "Betaler",
+      "status_filter_label": "Bestelstatus",
+      "status_filter_placeholder": "Alle statussen",
+      "status_onsite": "Ter plaatse betaald",
+      "status_pending": "Wacht op betaling",
+      "status_processed": "Online betaald",
+      "tier_origin_external": "Gesynchroniseerd vanaf {fournisseur}",
+      "tier_origin_manual": "Aangemaakt op de site"
     },
     "participant": {
       "entry_validated": "Toegang al gevalideerd",

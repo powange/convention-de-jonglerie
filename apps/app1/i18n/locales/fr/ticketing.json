@@ -168,6 +168,13 @@
       "payment_method_error": "Erreur lors de la mise à jour de la méthode de paiement",
       "payment_method_updated": "Méthode de paiement définie",
       "payment_method_updated_description": "La méthode de paiement a été enregistrée avec succès",
+      "status_filter_label": "Statut de la commande",
+      "status_filter_placeholder": "Tous les statuts",
+      "status_onsite": "Payée sur place",
+      "status_pending": "En attente de paiement",
+      "status_processed": "Payée en ligne",
+      "tier_origin_external": "Synchronisé depuis {fournisseur}",
+      "tier_origin_manual": "Créé sur le site",
       "validate_entry_error": "Erreur lors de la validation de l'entrée"
     },
     "participant": {

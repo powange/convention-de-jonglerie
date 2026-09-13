@@ -168,7 +168,14 @@
       "validate_entry_error": "Fejl ved validering af adgang",
       "canceled_badge": "Annulleret",
       "no_action_available": "Ingen handling tilgængelig",
-      "payer_label": "Betaler"
+      "payer_label": "Betaler",
+      "status_filter_label": "Ordrestatus",
+      "status_filter_placeholder": "Alle statusser",
+      "status_onsite": "Betalt på stedet",
+      "status_pending": "Afventer betaling",
+      "status_processed": "Betalt online",
+      "tier_origin_external": "Synkroniseret fra {fournisseur}",
+      "tier_origin_manual": "Oprettet på siden"
     },
     "participant": {
       "entry_validated": "Adgang allerede valideret",

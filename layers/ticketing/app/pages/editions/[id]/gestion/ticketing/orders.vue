@@ -203,9 +203,19 @@
                       </span>
                     </template>
                     <template #item-label="{ item }">
-                      <div class="flex items-center justify-between w-full">
-                        <span>{{ item.label }}</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                      <div class="flex items-center justify-between gap-2 w-full">
+                        <span class="flex items-center gap-2 min-w-0">
+                          <!-- Largeur fixe : sans elle, les logos n'ont pas la même emprise et les
+                               noms de tarifs ne s'alignent plus d'une ligne à l'autre. -->
+                          <img
+                            :src="item.logo"
+                            :alt="item.origine"
+                            :title="item.origine"
+                            class="h-4 w-4 shrink-0 object-contain"
+                          />
+                          <span class="truncate">{{ item.label }}</span>
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 shrink-0">
                           {{ money(item.price) }}
                         </span>
                       </div>
@@ -268,6 +278,25 @@
                     size="md"
                     class="w-full"
                     :ui="{ content: 'min-w-fit' }"
+                  />
+                </div>
+
+                <!-- Filtre par statut de commande.
+                     Placé avant le moyen de paiement, qui en dépend : une commande en attente n'a
+                     pas encore de moyen, et une commande annulée n'en a plus de pertinent. -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ $t('ticketing.orders.status_filter_label') }}
+                  </label>
+                  <USelect
+                    v-model="filtres.statuts"
+                    :items="statutOptions"
+                    :placeholder="$t('ticketing.orders.status_filter_placeholder')"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                    multiple
                   />
                 </div>
 
@@ -1381,15 +1410,19 @@
 
 <script setup lang="ts">
 import { onMounted, computed, reactive, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+import helloAssoLogo from '~/assets/img/helloasso/logo.svg'
+import infomaniakLogo from '~/assets/img/infomaniak/logo.svg'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 import { commandeEstAnnulee, commandeModifiableIci } from '../../../../../utils/commande-annulee'
 import {
+  filtresDepuisUrl,
   filtresVides,
   nombreDeFiltresActifs,
+  parametresDUrl,
   requeteDesFiltres,
 } from '../../../../../utils/filtres-commandes'
 import { montantTotalDeLaLigne } from '../../../../../utils/montant-ligne-commande'
@@ -1399,6 +1432,7 @@ import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/t
 const { money } = useEditionCurrency()
 
 const route = useRoute()
+const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { t: $t } = useI18n()
@@ -1423,9 +1457,12 @@ const stats = ref({
   totalDonationsAmount: 0,
 })
 
-const searchQuery = ref('')
+// Recherche et page sont relues de l'adresse au même titre que les filtres : sans elles, un lien
+// partagé rouvrirait l'écran sur une autre sélection que celle qu'on croyait transmettre.
+const searchQuery = ref(typeof route.query.search === 'string' ? route.query.search : '')
 const debouncedSearchQuery = refDebounced(searchQuery, 400) // Délai de 400ms avant recherche
-const currentPage = ref(1)
+const pageDeLUrl = Number(route.query.page)
+const currentPage = ref(Number.isInteger(pageDeLUrl) && pageDeLUrl > 0 ? pageDeLUrl : 1)
 const pageSize = ref(20)
 const totalPages = ref(0)
 const totalOrders = ref(0)
@@ -1437,7 +1474,7 @@ const tiers = ref<TicketingTier[]>([])
 // `filtres-commandes.ts`. Ils vivaient en refs séparées, et la liste en était énumérée à la main
 // à TROIS endroits : l'envoi à l'API, le décompte de la pastille, la réinitialisation. Ajouter un
 // filtre demandait de penser aux trois ; en oublier un ne cassait rien de visible.
-const filtres = reactive(filtresVides())
+const filtres = reactive(filtresDepuisUrl(route.query))
 const isFiltersOpen = ref(false)
 
 // Filtres par champs personnalisés (support de plusieurs filtres)
@@ -1461,12 +1498,29 @@ const entryStatusOptions = [
   { label: 'Entrée non validée', value: 'not_validated' },
 ]
 
-// Options pour le filtre de méthode de paiement
+/**
+ * Options du filtre par statut de commande.
+ *
+ * Les libellés disent ce que l'utilisateur voit, pas ce que la base contient : « Payée en ligne »
+ * pour `Processed`, et surtout « Annulée » pour `Refunded`, dont le nom vient des prestataires de
+ * paiement et parlerait de remboursement là où il s'agit d'une annulation.
+ */
+// `computed` et non une liste figée : construite une fois, elle garderait les libellés de la
+// langue active au montage. C'est la forme qu'emploient déjà les autres listes traduites du layer.
+const statutOptions = computed(() => [
+  { label: $t('ticketing.orders.status_pending'), value: 'Pending' },
+  { label: $t('ticketing.orders.status_onsite'), value: 'Onsite' },
+  { label: $t('ticketing.orders.status_processed'), value: 'Processed' },
+  { label: $t('ticketing.orders.canceled_badge'), value: 'Refunded' },
+])
+
+// Options pour le filtre de méthode de paiement.
+// « En attente » n'y est plus : c'est un statut, et il se filtre au-dessus. « Méthode non
+// renseignée » y reste, parce qu'une absence de moyen de paiement répond bien à la question posée.
 const paymentMethodOptions = [
   { label: 'Liquide', value: 'cash' },
   { label: 'Carte bancaire', value: 'card' },
   { label: 'Chèque', value: 'check' },
-  { label: 'En attente', value: 'pending' },
   { label: 'Méthode non renseignée', value: 'unknown' },
 ]
 
@@ -1808,11 +1862,53 @@ const loadOrders = async () => {
 }
 
 // Computed pour transformer les tarifs en items pour le select
+/**
+ * Le logo de chaque fournisseur de billetterie.
+ *
+ * Même convention que `TicketingTiersList.vue`, qui marque déjà les tarifs synchronisés — un
+ * deuxième dessin pour la même idée finirait par diverger du premier.
+ *
+ * Seul HelloAsso importe aujourd'hui des tarifs ; les autres entrées attendent que ce soit le cas,
+ * et un fournisseur sans logo retombera simplement sur l'icône « saisi à la main ».
+ */
+const logosParFournisseur: Record<string, string> = {
+  HELLOASSO: helloAssoLogo,
+  INFOMANIAK: infomaniakLogo,
+}
+
+/**
+ * Le logo du site, pour les tarifs qui n'ont pas d'origine extérieure.
+ *
+ * Même image que celle qui marque déjà une commande créée ici, sur la ligne des badges d'origine :
+ * un tarif saisi à la main et une commande saisie à la main viennent du même endroit, et rien ne
+ * gagnerait à ce que l'écran le dise de deux façons.
+ *
+ * Chemin public et non import : le fichier vit dans `public/`, il est servi tel quel.
+ */
+const LOGO_DU_SITE = '/logos/logo-jc.svg'
+
+/** Le nom du fournisseur tel qu'il s'écrit, plutôt que la constante de la base. */
+const nomsDeFournisseur: Record<string, string> = {
+  HELLOASSO: 'HelloAsso',
+  INFOMANIAK: 'Infomaniak',
+  BILLETWEB: 'Billetweb',
+  WEEZEVENT: 'Weezevent',
+}
+
 const tierSelectItems = computed(() => {
   return tiers.value.map((tier) => ({
     label: tier.name,
     value: tier.id,
     price: tier.price,
+    // Chaque tarif porte un logo, sans exception : celui de son fournisseur, ou celui du site
+    // quand il a été créé ici. Un libellé sans image romprait l'alignement de la liste, et
+    // l'absence d'origine se lirait comme une origine inconnue.
+    logo: (tier.provider && logosParFournisseur[tier.provider]) || LOGO_DU_SITE,
+    origine: tier.provider
+      ? $t('ticketing.orders.tier_origin_external', {
+          fournisseur: nomsDeFournisseur[tier.provider] ?? tier.provider,
+        })
+      : $t('ticketing.orders.tier_origin_manual'),
   }))
 })
 
@@ -1886,21 +1982,54 @@ const onPageChange = (page: number) => {
   loadOrders()
 }
 
-// Réinitialiser à la page 1 quand on effectue une recherche ou change les filtres
+/**
+ * Recharger à la page 1 dès qu'une recherche ou un filtre bouge.
+ *
+ * On surveille l'objet `filtres` ENTIER, et non ses champs un par un. C'était la quatrième liste
+ * de filtres tenue à la main — après celles que `filtres-commandes.ts` a réunies — et la seule que
+ * ce regroupement n'avait pas absorbée : en oublier un ici laisse le contrôle changer à l'écran
+ * sans que la liste se recharge.
+ *
+ * L'énumération était par ailleurs fautive. Deux des champs listés — le statut d'entrée et le mode
+ * de combinaison des champs personnalisés — sont des chaînes : passées ainsi, Vue reçoit leur
+ * VALEUR du moment, pas une source à observer. Ces deux-là n'étaient donc surveillés par personne.
+ * Un objet réactif, lui, est une source valide, et couvre tous les champs — présents et à venir.
+ */
 watch(
-  [
-    debouncedSearchQuery,
-    filtres.tarifs,
-    filtres.options,
-    filtres.statutEntree,
-    filtres.moyensDePaiement,
-    filtres.typesDeLigne,
-    filtres.champsPersonnalises,
-    filtres.modeChampsPersonnalises,
-  ],
+  [debouncedSearchQuery, filtres],
   () => {
     currentPage.value = 1
     loadOrders()
+  },
+  { deep: true }
+)
+
+/**
+ * L'adresse reflète ce qu'on regarde : filtres, recherche et page.
+ *
+ * Elle devient alors rafraîchissable et partageable — « regarde les commandes en attente de
+ * paiement » se transmet par un lien plutôt que par une suite d'instructions à refaire à la main.
+ *
+ * `replace` et non `push` : chaque caractère tapé dans la recherche créerait sinon une entrée
+ * d'historique, et le bouton « précédent » du navigateur remonterait la saisie lettre par lettre
+ * au lieu de ramener à l'écran précédent.
+ *
+ * La comparaison avant écriture évite une navigation inutile quand rien n'a bougé dans l'adresse —
+ * un changement de filtre qui n'en modifie pas la représentation, par exemple.
+ */
+watch(
+  [filtres, debouncedSearchQuery, currentPage],
+  () => {
+    const parametres: Record<string, string> = parametresDUrl(filtres)
+    if (debouncedSearchQuery.value) parametres.search = debouncedSearchQuery.value
+    // La page 1 est l'état par défaut : l'écrire n'apprendrait rien et allongerait l'adresse.
+    if (currentPage.value > 1) parametres.page = String(currentPage.value)
+
+    const actuelle = new URLSearchParams(route.query as Record<string, string>).toString()
+    const voulue = new URLSearchParams(parametres).toString()
+    if (actuelle === voulue) return
+
+    router.replace({ query: parametres })
   },
   { deep: true }
 )

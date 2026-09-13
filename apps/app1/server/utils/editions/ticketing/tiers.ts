@@ -100,8 +100,21 @@ export async function getEditionTiers(
           orderItems: true,
         },
       },
+      // D'où vient ce tarif. L'écran s'en sert pour en marquer l'origine d'un logo, et
+      // `helloAssoTierId` n'y suffit pas : c'est la colonne d'UN fournisseur, pas une réponse à
+      // « d'où vient-il ». Un tarif importé d'ailleurs l'aurait à `null` et passerait pour saisi
+      // à la main.
+      externalTicketing: {
+        select: {
+          provider: true,
+        },
+      },
     },
   })
+
+  /** Le fournisseur, remonté à plat ; `null` pour un tarif saisi à la main. */
+  const origine = (tier: { externalTicketing: { provider: string } | null }) =>
+    tier.externalTicketing?.provider ?? null
 
   // Si includeOriginalName est true, on retourne les deux noms (pour l'édition)
   if (options?.includeOriginalName) {
@@ -110,6 +123,7 @@ export async function getEditionTiers(
       originalName: tier.name,
       name: tier.customName || tier.name,
       soldCount: tier._count.orderItems,
+      provider: origine(tier),
     }))
   }
 
@@ -117,6 +131,7 @@ export async function getEditionTiers(
   return tiers.map((tier) => ({
     ...applyCustomName(tier),
     soldCount: tier._count.orderItems,
+    provider: origine(tier),
   }))
 }
 
