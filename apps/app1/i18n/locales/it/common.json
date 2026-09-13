@@ -425,7 +425,9 @@
         "not_eligible_reason": "Fuori dal periodo di presenza",
         "saved_success": "TODO: Registrazione riuscita",
         "title": "TODO: Pasti",
-        "unsaved_changes": "TODO: Modifiche non registrate"
+        "unsaved_changes": "TODO: Modifiche non registrate",
+        "check_all": "Seleziona tutti",
+        "uncheck_all": "Deseleziona tutti"
       },
       "no_account_link": "La persona non ha un account?",
       "no_user_found": "Nessun utente trovato",

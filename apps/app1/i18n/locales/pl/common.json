@@ -425,7 +425,9 @@
         "not_eligible_reason": "Poza okresem obecności",
         "saved_success": "TODO: Pomyślna rejestracja",
         "title": "TODO: Posiłki",
-        "unsaved_changes": "TODO: Zmiany nie zostały zarejestrowane"
+        "unsaved_changes": "TODO: Zmiany nie zostały zarejestrowane",
+        "check_all": "Zaznacz wszystkie",
+        "uncheck_all": "Odznacz wszystkie"
       },
       "no_account_link": "Osoba nie ma konta?",
       "no_user_found": "Nie znaleziono użytkownika",

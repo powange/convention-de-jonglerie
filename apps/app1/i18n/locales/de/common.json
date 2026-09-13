@@ -425,7 +425,9 @@
         "not_eligible_reason": "Außerhalb der Präsenzzeit",
         "saved_success": "TODO: Aufnahme erfolgreich",
         "title": "TODO: Mahlzeiten",
-        "unsaved_changes": "TODO: Nicht gespeicherte Änderungen"
+        "unsaved_changes": "TODO: Nicht gespeicherte Änderungen",
+        "check_all": "Alle auswählen",
+        "uncheck_all": "Alle abwählen"
       },
       "no_account_link": "Hat die Person kein Konto?",
       "no_user_found": "Kein Benutzer gefunden",

@@ -425,7 +425,9 @@
         "not_eligible_reason": "Вне периода посещения",
         "saved_success": "TODO: Успешная регистрация",
         "title": "TODO: Питание",
-        "unsaved_changes": "TODO: Изменения не зарегистрированы"
+        "unsaved_changes": "TODO: Изменения не зарегистрированы",
+        "check_all": "Выбрать все",
+        "uncheck_all": "Снять все"
       },
       "no_account_link": "У человека нет аккаунта?",
       "no_user_found": "Пользователь не найден",

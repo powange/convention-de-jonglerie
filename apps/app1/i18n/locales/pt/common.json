@@ -425,7 +425,9 @@
         "not_eligible_reason": "Fora do período de presença",
         "saved_success": "TODO: Registo bem sucedido",
         "title": "TODO: Refeições",
-        "unsaved_changes": "TODO: Alterações não registadas"
+        "unsaved_changes": "TODO: Alterações não registadas",
+        "check_all": "Marcar todos",
+        "uncheck_all": "Desmarcar todos"
       },
       "no_account_link": "A pessoa não tem conta?",
       "no_user_found": "Nenhum usuário encontrado",

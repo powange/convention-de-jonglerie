@@ -425,7 +425,9 @@
         "not_eligible_reason": "Mimo období docházky",
         "saved_success": "TODO: Úspěšná registrace",
         "title": "TODO: Stravování",
-        "unsaved_changes": "TODO: Změny nebyly zaregistrovány"
+        "unsaved_changes": "TODO: Změny nebyly zaregistrovány",
+        "check_all": "Zaškrtnout vše",
+        "uncheck_all": "Odškrtnout vše"
       },
       "no_account_link": "Osoba nemá účet?",
       "no_user_found": "Nebyli nalezeni žádní uživatelé",

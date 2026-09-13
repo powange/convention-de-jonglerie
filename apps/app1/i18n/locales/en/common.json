@@ -425,7 +425,9 @@
         "not_eligible_reason": "Outside attendance period",
         "saved_success": "TODO: Successful registration",
         "title": "TODO: Meals",
-        "unsaved_changes": "TODO: Changes not registered"
+        "unsaved_changes": "TODO: Changes not registered",
+        "check_all": "Check all",
+        "uncheck_all": "Uncheck all"
       },
       "no_account_link": "Person doesn't have an account?",
       "no_user_found": "No user found",
