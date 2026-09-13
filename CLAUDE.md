@@ -8,9 +8,17 @@
 
 - **NE JAMAIS lancer `npm run app1:dev`** - Le serveur de développement est déjà en cours d'exécution
 - **Pour lire les logs de l'application, utiliser `npm run app1:docker:dev:logs`**
-- **NE JAMAIS exécuter les migrations Prisma** - L'utilisateur s'occupe toujours de créer et d'appliquer les migrations. Fournir uniquement la commande de migration sans l'exécuter.
+- **Migrations Prisma : les créer et les appliquer directement**, sans demander la permission à chaque fois. Trois points à respecter :
+  - Les lancer **depuis l'hôte, dans `apps/app1/`** (`npx prisma migrate dev --name <nom>`). Le `.env` y est déjà orienté hôte et les deux bases sont publiées : `localhost:3306` pour la base de développement, `localhost:3308` pour la base miroir. C'est le chemin prévu par `docker-compose.dev.yml`. Le faire **depuis le conteneur** impose de réécrire les deux URL vers les noms de services (`database:3306`, `shadow-db:3306`) et de `chown` ensuite les fichiers créés, qui appartiennent à `root` — à éviter sans raison.
+  - **Ne jamais modifier une migration déjà appliquée** : Prisma en conserve l'empreinte et toute retouche fait échouer les vérifications d'intégrité. Ce qui manque fait l'objet d'une migration supplémentaire — c'est notamment ainsi qu'on sépare un `ALTER` (le défaut, pour les lignes à venir) d'un `UPDATE` (le rattrapage des lignes existantes).
+  - `npx prisma migrate status` dit en une commande où en est la base : s'en servir avant de conclure quoi que ce soit sur son état.
+- **Un déploiement applique les migrations en attente sans confirmation** (`apps/app1/docker/entrypoint.sh`, en `set -e`). Avant de déployer, vérifier si l'une d'elles détruit des données et le dire explicitement. Corollaire utile : une application qui répond après bascule prouve que les migrations sont passées.
 - **Niveau de log Prisma configurable** - Utiliser la variable d'environnement `PRISMA_LOG_LEVEL` dans `.env` pour ajuster les logs (valeurs: `error,warn` par défaut, `query,error,warn,info` pour verbose, `error` pour minimal)
 - L'url de l'application en développement est : http://localhost:3000
+- **Poser les questions de façon interactive** : dès qu'une décision revient à l'utilisateur — une ambiguïté que le code ne tranche pas, un choix qui change le travail produit, une étape à risque —, utiliser le **questionnaire interactif à options cliquables** plutôt que de glisser la question en texte libre au fil d'un message, où elle se perd et où il faut la retaper.
+  - Des options **concrètes et exclusives**, la recommandée en premier, chacune disant ce qu'elle implique — pas « oui / non » quand les conséquences diffèrent.
+  - **Ne pas s'en servir pour faire valider une étape** ni pour un choix qui a un défaut évident : dans ce cas, trancher, le dire en une phrase, et continuer.
+  - **Faire d'abord tout ce qui ne dépend pas de la réponse.** Ne bloquer sur une question que si aucune hypothèse ne permet d'avancer sans risque ; sinon, poser la question au moment où elle se joue réellement.
 - Avant de modifier un fichier, lis 3 autres fichiers pour comprendre le style de code et les conventions utilisées
 - Toujours utiliser les composants Nuxt UI pour les éléments d'interface utilisateur courants (boutons, modals, cartes, etc.) au lieu de créer des composants personnalisés.
 - Toujours utiliser les icônes de la bibliothèque Nuxt Icon pour les icônes (https://nuxt.com/modules/icon) et éviter d'importer des SVG ou d'utiliser des images pour les icônes.
