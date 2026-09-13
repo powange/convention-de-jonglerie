@@ -43,7 +43,14 @@ test.describe.serial('Module Stock matériel', () => {
       page,
       `http://localhost:3000/api/editions/${editionId}/stock-groups`,
       {
-        data: { name: 'Éclairage E2E', description: 'Groupe de test E2E' },
+        data: {
+          name: 'Éclairage E2E',
+          description: 'Groupe de test E2E',
+          // Le parcours réserve du matériel plus bas : sans ce réglage, le groupe est créé sans
+          // système de réservation — c'est désormais le défaut, tout le matériel ne se réservant
+          // pas — et l'API refuse, à juste titre.
+          reservationsEnabled: true,
+        },
       }
     )
     expect(response.ok()).toBe(true)
