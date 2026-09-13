@@ -142,8 +142,18 @@ test.describe.serial('Bénévole en créneau de contrôle d’accès', () => {
     page: pageOrga,
   }) => {
     // Page publique, pour que le garde d'accès ne renvoie pas un 404 ; mode interne, sans quoi
-    // les blocs réservés au bénévole accepté ne sont pas rendus du tout.
-    await updateVolunteerSettings(pageOrga, editionId, { pagePublic: true, mode: 'INTERNAL' })
+    // les blocs réservés au bénévole accepté ne sont pas rendus du tout ; planning publié, sans
+    // quoi ces mêmes blocs sont masqués et les endpoints refusent.
+    //
+    // Le marqueur de ce test — le lien « Échanger un créneau » — est conditionné à la
+    // publication. Ce qu'on mesure ici est une course d'hydratation, pas une règle de visibilité :
+    // il faut donc que la visibilité soit acquise, sinon l'absence du lien ne dit plus rien de la
+    // course.
+    await updateVolunteerSettings(pageOrga, editionId, {
+      pagePublic: true,
+      mode: 'INTERNAL',
+      planningPublished: true,
+    })
 
     const context = await browser.newContext({ storageState: { cookies: [], origins: [] } })
     const page = await context.newPage()
