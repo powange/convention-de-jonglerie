@@ -610,13 +610,27 @@ jobs:
     if: always()
     needs: [setup, lint, typecheck, build, test, playwright]
 
-    steps:
-      - name: Refuser si un job a échoué ou été annulé
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
-        run: |
-          echo "Résultats des jobs :"
-          echo '${{ toJSON(needs) }}'
-          exit 1
+    # Le `defaults` du workflow place tous les `run:` dans `apps/app1`. Ce job ne fait AUCUN
+    # checkout — il n'a rien à lire —, donc ce répertoire n'existe pas et bash refuse de démarrer :
+    # « An error occurred trying to start process '/usr/bin/bash' […] No such file or directory ».
+    # Le job échouait alors que les douze autres étaient verts. Déclaré requis dans cet état, il
+    # aurait bloqué toutes les PR sans qu'aucune ne soit en cause.
+    defaults:
+      run:
+        working-directory: .
 
-      - name: Tout est vert
-        run: echo "Les six jobs de la CI sont passés."
+    steps:
+      # Affiché systématiquement, y compris au vert : le jour où ce job rendra un verdict qui
+      # surprend, c'est la première chose qu'on voudra lire.
+      - name: Résultats des jobs surveillés
+        run: echo '${{ toJSON(needs) }}'
+
+      # `skipped` bloque au même titre que `failure`, et ce n'est pas de la paranoïa : aucun des
+      # six jobs n'a de condition, donc aucun ne peut être sauté légitimement. Un `skipped` ne peut
+      # signifier qu'une chose — un échec en amont l'a empêché de tourner.
+      - name: Refuser si un job n’est pas passé
+        if: >-
+          contains(needs.*.result, 'failure') ||
+          contains(needs.*.result, 'cancelled') ||
+          contains(needs.*.result, 'skipped')
+        run: exit 1
