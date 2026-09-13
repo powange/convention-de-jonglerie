@@ -435,6 +435,7 @@
       "last_name": "Nom",
       "last_name_placeholder": "Votre nom",
       "meals": {
+        "check_all": "Tout cocher",
         "confirm_close_unsaved": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?",
         "description": "Sélectionnez les repas que vous souhaitez prendre pendant votre bénévolat",
         "error_loading": "Erreur lors du chargement des repas",
@@ -444,6 +445,7 @@
         "not_eligible_reason": "Hors période de présence",
         "saved_success": "Vos choix de repas ont été sauvegardés",
         "title": "Choix de vos repas",
+        "uncheck_all": "Tout décocher",
         "unsaved_changes": "Modifications non sauvegardées"
       },
       "no_account_link": "La personne n'a pas de compte ?",

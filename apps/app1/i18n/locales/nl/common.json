@@ -425,7 +425,9 @@
         "not_eligible_reason": "Buiten aanwezigheidsperiode",
         "saved_success": "TODO: Succesvolle registratie",
         "title": "TODO: Maaltijden",
-        "unsaved_changes": "TODO: Wijzigingen niet geregistreerd"
+        "unsaved_changes": "TODO: Wijzigingen niet geregistreerd",
+        "check_all": "Alles aanvinken",
+        "uncheck_all": "Alles uitvinken"
       },
       "no_account_link": "Heeft de persoon geen account?",
       "no_user_found": "Geen gebruiker gevonden",

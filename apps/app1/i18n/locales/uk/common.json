@@ -425,7 +425,9 @@
         "not_eligible_reason": "Період відвідування поза межами школи",
         "saved_success": "TODO: Успішна реєстрація",
         "title": "СЛУХАЙТЕ: Харчування",
-        "unsaved_changes": "TODO: Зміни не зареєстровані"
+        "unsaved_changes": "TODO: Зміни не зареєстровані",
+        "check_all": "Вибрати всі",
+        "uncheck_all": "Зняти всі"
       },
       "no_account_link": "У особи немає облікового запису?",
       "no_user_found": "Користувача не знайдено",

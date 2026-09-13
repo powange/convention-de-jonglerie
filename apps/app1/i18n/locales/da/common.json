@@ -425,7 +425,9 @@
         "not_eligible_reason": "Uden for tilstedeværelsesperioden",
         "saved_success": "TODO: Vellykket registrering",
         "title": "TODO: Måltider",
-        "unsaved_changes": "TODO: Ændringer ikke registreret"
+        "unsaved_changes": "TODO: Ændringer ikke registreret",
+        "check_all": "Markér alle",
+        "uncheck_all": "Afmarkér alle"
       },
       "no_account_link": "Har personen ikke en konto?",
       "no_user_found": "Ingen bruger fundet",

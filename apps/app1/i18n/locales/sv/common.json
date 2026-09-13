@@ -425,7 +425,9 @@
         "not_eligible_reason": "Utanför närvarotiden",
         "saved_success": "TODO: Framgångsrik registrering",
         "title": "TODO: Måltider",
-        "unsaved_changes": "TODO: Ändringar som inte registrerats"
+        "unsaved_changes": "TODO: Ändringar som inte registrerats",
+        "check_all": "Markera alla",
+        "uncheck_all": "Avmarkera alla"
       },
       "no_account_link": "Har personen inget konto?",
       "no_user_found": "Inga användare hittades",

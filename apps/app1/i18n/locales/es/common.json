@@ -425,7 +425,9 @@
         "not_eligible_reason": "Fuera del periodo de asistencia",
         "saved_success": "TODO: Registro con éxito",
         "title": "TODO: Comidas",
-        "unsaved_changes": "TODO: Cambios no registrados"
+        "unsaved_changes": "TODO: Cambios no registrados",
+        "check_all": "Marcar todos",
+        "uncheck_all": "Desmarcar todos"
       },
       "no_account_link": "¿La persona no tiene cuenta?",
       "no_user_found": "No se encontró ningún usuario",

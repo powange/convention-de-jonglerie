@@ -13,8 +13,25 @@
       </div>
 
       <div v-else class="space-y-6">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('edition.volunteers.meals.description') }}
+        <div class="flex items-start justify-between gap-3">
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            {{ $t('edition.volunteers.meals.description') }}
+          </div>
+          <UButton
+            color="neutral"
+            variant="soft"
+            size="xs"
+            class="shrink-0"
+            :icon="tousLesRepasCoches ? 'i-heroicons-x-mark' : 'i-heroicons-check'"
+            :disabled="savingMeals || repasEligibles.length === 0"
+            @click="basculerTousLesRepas"
+          >
+            {{
+              tousLesRepasCoches
+                ? $t('edition.volunteers.meals.uncheck_all')
+                : $t('edition.volunteers.meals.check_all')
+            }}
+          </UButton>
         </div>
 
         <div class="space-y-4">
@@ -140,6 +157,32 @@ const initialMeals = ref<Meal[]>([])
 
 // Grouper les repas par date
 const groupedMeals = computed(() => groupMealsByDate(meals.value))
+
+/**
+ * Tout cocher / décocher, sur les seuls repas ÉLIGIBLES.
+ *
+ * Les autres ont leur case désactivée et sont décochés d'office au chargement : les inclure ferait
+ * un bouton qui promet plus qu'il ne peut tenir.
+ *
+ * C'est aussi pourquoi l'état du bouton se calcule sur `repasEligibles` et non sur toute la liste.
+ * La modale des organisateurs, qui a la même fonction avec une garde équivalente sur les repas déjà
+ * consommés, teste au contraire `every()` sur l'ensemble : chez elle, un repas consommé non accepté
+ * fait afficher « Tout cocher » à un bouton qui sautera précisément celui-là. Le libellé et l'effet
+ * y divergent ; ici ils disent la même chose.
+ */
+const repasEligibles = computed(() => meals.value.filter((meal) => meal.eligible))
+
+const tousLesRepasCoches = computed(
+  () => repasEligibles.value.length > 0 && repasEligibles.value.every((meal) => meal.accepted)
+)
+
+const basculerTousLesRepas = () => {
+  const cible = !tousLesRepasCoches.value
+  for (const meal of meals.value) {
+    if (!meal.eligible) continue
+    meal.accepted = cible
+  }
+}
 
 // Détection des modifications non sauvegardées pour les repas
 const hasUnsavedMealChanges = computed(() => {
