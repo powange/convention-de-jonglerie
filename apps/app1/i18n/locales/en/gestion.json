@@ -868,7 +868,15 @@
       "reimbursed_done": "Advances marked as reimbursed",
       "reimbursed_error": "Could not mark the advances as reimbursed",
       "to_reimburse": "To reimburse",
-      "to_reimburse_hint": "{count} person(s) — click for the breakdown"
+      "to_reimburse_hint": "{count} person(s) — click for the breakdown",
+      "export_code": "Code",
+      "export_code_label": "Code label",
+      "export_engaged": "Committed",
+      "export_pdf": "Export PDF",
+      "export_settled": "Settled",
+      "export_subtotal": "Subtotal",
+      "export_total": "Total",
+      "export_without_code": "No code"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

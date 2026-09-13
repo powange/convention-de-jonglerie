@@ -868,7 +868,15 @@
       "reimbursed_done": "Zálohy označeny jako proplacené",
       "reimbursed_error": "Zálohy se nepodařilo označit jako proplacené",
       "to_reimburse": "K proplacení",
-      "to_reimburse_hint": "{count} osob – klepnutím zobrazíte podrobnosti"
+      "to_reimburse_hint": "{count} osob – klepnutím zobrazíte podrobnosti",
+      "export_code": "Kód",
+      "export_code_label": "Název kódu",
+      "export_engaged": "Závazek",
+      "export_pdf": "Export do PDF",
+      "export_settled": "Zaplaceno",
+      "export_subtotal": "Mezisoučet",
+      "export_total": "Celkem",
+      "export_without_code": "Bez kódu"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

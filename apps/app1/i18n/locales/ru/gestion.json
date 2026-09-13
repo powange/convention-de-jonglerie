@@ -868,7 +868,15 @@
       "reimbursed_done": "Авансы отмечены как возмещённые",
       "reimbursed_error": "Не удалось отметить авансы как возмещённые",
       "to_reimburse": "К возмещению",
-      "to_reimburse_hint": "{count} чел. — нажмите, чтобы увидеть детали"
+      "to_reimburse_hint": "{count} чел. — нажмите, чтобы увидеть детали",
+      "export_code": "Код",
+      "export_code_label": "Название кода",
+      "export_engaged": "Обязательства",
+      "export_pdf": "Экспорт в PDF",
+      "export_settled": "Оплачено",
+      "export_subtotal": "Промежуточный итог",
+      "export_total": "Итого",
+      "export_without_code": "Без кода"
     },
     "program": {
       "description": "Составьте расписание фестиваля: воркшопы, выступления и другие события.",

@@ -868,7 +868,15 @@
       "reimbursed_done": "Voorschotten gemarkeerd als terugbetaald",
       "reimbursed_error": "Kan de voorschotten niet als terugbetaald markeren",
       "to_reimburse": "Terug te betalen",
-      "to_reimburse_hint": "{count} perso(o)n(en) — klik voor het overzicht"
+      "to_reimburse_hint": "{count} perso(o)n(en) — klik voor het overzicht",
+      "export_code": "Code",
+      "export_code_label": "Omschrijving van de code",
+      "export_engaged": "Vastgelegd",
+      "export_pdf": "PDF exporteren",
+      "export_settled": "Betaald",
+      "export_subtotal": "Subtotaal",
+      "export_total": "Totaal",
+      "export_without_code": "Zonder code"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",

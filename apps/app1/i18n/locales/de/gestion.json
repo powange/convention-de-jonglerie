@@ -868,7 +868,15 @@
       "reimbursed_done": "Auslagen als erstattet markiert",
       "reimbursed_error": "Auslagen konnten nicht als erstattet markiert werden",
       "to_reimburse": "Zu erstatten",
-      "to_reimburse_hint": "{count} Person(en) – zum Aufschlüsseln klicken"
+      "to_reimburse_hint": "{count} Person(en) – zum Aufschlüsseln klicken",
+      "export_code": "Konto",
+      "export_code_label": "Kontobezeichnung",
+      "export_engaged": "Verbindlich",
+      "export_pdf": "PDF-Export",
+      "export_settled": "Bezahlt",
+      "export_subtotal": "Zwischensumme",
+      "export_total": "Gesamt",
+      "export_without_code": "Ohne Konto"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",
