@@ -146,5 +146,35 @@ describe('utils billetterie - orders', () => {
       expect(params.get('tierIds')).toBe('1')
       expect(params.get('paymentMethods')).toBe('check')
     })
+    it('transmet le filtre par statut de commande', async () => {
+      // La régression que ce test verrouille : cette fonction énumérait ses paramètres à la main,
+      // et un filtre qui n'y figurait pas était JETÉ en silence. Le serveur rendait alors toutes
+      // les commandes, l'écran n'affichait aucune erreur, et le filtre semblait simplement ne
+      // rien faire.
+      vi.stubGlobal('$fetch', vi.fn().mockResolvedValue({}))
+
+      await fetchOrders(42, { statuses: ['Pending', 'Refunded'] })
+
+      const params = new URLSearchParams(lastCalledUrl().split('?')[1])
+      expect(params.get('statuses')).toBe('Pending,Refunded')
+    })
+
+    it('n’invente pas de paramètre pour un critère vide', async () => {
+      vi.stubGlobal('$fetch', vi.fn().mockResolvedValue({}))
+
+      await fetchOrders(42, { statuses: [], search: '', entryStatus: 'all' })
+
+      expect($fetch).toHaveBeenCalledWith('/api/editions/42/ticketing/orders')
+    })
+
+    it('n’écrit pas le mode de combinaison sans champ personnalisé', async () => {
+      // L'écran envoie toujours `customFieldFilterMode`, y compris à sa valeur par défaut. Seul,
+      // il ne restreint rien : le transmettre encombrerait l'URL d'un paramètre sans effet.
+      vi.stubGlobal('$fetch', vi.fn().mockResolvedValue({}))
+
+      await fetchOrders(42, { customFieldFilterMode: 'and' })
+
+      expect($fetch).toHaveBeenCalledWith('/api/editions/42/ticketing/orders')
+    })
   })
 })

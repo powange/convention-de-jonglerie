@@ -11,6 +11,13 @@ export interface TicketingTier {
   isActive: boolean
   countAsParticipant?: boolean
   helloAssoTierId: number | null
+  /**
+   * Le fournisseur d'où vient ce tarif, `null` s'il a été saisi à la main.
+   *
+   * Distinct de `helloAssoTierId`, qui est la colonne d'un seul fournisseur : un tarif importé
+   * d'ailleurs l'aurait à `null` et passerait à tort pour saisi à la main.
+   */
+  provider?: 'HELLOASSO' | 'INFOMANIAK' | 'BILLETWEB' | 'WEEZEVENT' | 'OTHER' | null
   validFrom?: string | null // Date de début de validité
   validUntil?: string | null // Date de fin de validité
   soldCount?: number // Nombre de billets vendus pour ce tarif

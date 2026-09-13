@@ -1,3 +1,5 @@
+import type { MoyenDePaiement, StatutCommande } from '../filtres-commandes'
+
 export interface OrderItem {
   id: number
   helloAssoItemId: number
@@ -96,36 +98,46 @@ export async function fetchOrders(
     tierIds?: number[]
     optionIds?: number[]
     entryStatus?: 'all' | 'validated' | 'not_validated'
-    paymentMethods?: Array<'cash' | 'card' | 'check' | 'pending' | 'unknown'>
+    statuses?: StatutCommande[]
+    paymentMethods?: MoyenDePaiement[]
     itemTypes?: ItemType[]
     customFieldFilters?: CustomFieldFilter[]
     customFieldFilterMode?: 'and' | 'or'
   }
 ): Promise<OrdersResponse> {
   const params = new URLSearchParams()
-  if (options?.page) params.append('page', options.page.toString())
-  if (options?.limit) params.append('limit', options.limit.toString())
-  if (options?.search) params.append('search', options.search)
-  if (options?.tierIds && options.tierIds.length > 0) {
-    params.append('tierIds', options.tierIds.join(','))
-  }
-  if (options?.optionIds && options.optionIds.length > 0) {
-    params.append('optionIds', options.optionIds.join(','))
-  }
-  if (options?.entryStatus && options.entryStatus !== 'all') {
-    params.append('entryStatus', options.entryStatus)
-  }
-  if (options?.paymentMethods && options.paymentMethods.length > 0) {
-    params.append('paymentMethods', options.paymentMethods.join(','))
-  }
-  if (options?.itemTypes && options.itemTypes.length > 0) {
-    params.append('itemTypes', options.itemTypes.join(','))
-  }
-  if (options?.customFieldFilters && options.customFieldFilters.length > 0) {
-    params.append('customFieldFilters', JSON.stringify(options.customFieldFilters))
-    if (options.customFieldFilterMode) {
-      params.append('customFieldFilterMode', options.customFieldFilterMode)
+
+  /*
+   * Sérialisation GÉNÉRIQUE, et c'est tout l'intérêt de ce code.
+   *
+   * Cette fonction énumérait ses paramètres un par un — `if (options?.tierIds) …`, quinze fois.
+   * C'était la cinquième liste de filtres tenue à la main, celle que le regroupement de
+   * `filtres-commandes.ts` n'avait pas atteinte, et de loin la plus traître : un filtre absent
+   * d'ici est simplement JETÉ. La requête part sans lui, le serveur rend TOUT, et l'écran a l'air
+   * de fonctionner — pas d'erreur, pas de message, juste un filtre qui ne filtre rien.
+   *
+   * C'est exactement ce qui est arrivé au filtre par statut de commande, ajouté partout ailleurs
+   * et oublié ici. Déduire les paramètres des options reçues fait disparaître le cas.
+   */
+  for (const [cle, valeur] of Object.entries(options ?? {})) {
+    if (valeur === undefined || valeur === null || valeur === '') continue
+
+    // `all` n'est pas un filtre : c'est l'absence de filtre sur ce critère.
+    if (cle === 'entryStatus' && valeur === 'all') continue
+
+    // Le mode de combinaison ne veut rien dire sans champ à combiner.
+    if (cle === 'customFieldFilterMode' && !options?.customFieldFilters?.length) continue
+
+    if (Array.isArray(valeur)) {
+      if (valeur.length === 0) continue
+
+      // Les listes d'OBJETS — les champs personnalisés — voyagent en JSON ; les listes de valeurs
+      // simples en énumération séparée par des virgules, comme le serveur les relit.
+      params.append(cle, typeof valeur[0] === 'object' ? JSON.stringify(valeur) : valeur.join(','))
+      continue
     }
+
+    params.append(cle, String(valeur))
   }
 
   const url = `/api/editions/${editionId}/ticketing/orders${params.toString() ? `?${params.toString()}` : ''}`

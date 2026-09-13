@@ -168,7 +168,14 @@
       "validate_entry_error": "Błąd podczas weryfikacji wejścia",
       "canceled_badge": "Anulowane",
       "no_action_available": "Brak dostępnych działań",
-      "payer_label": "Płatnik"
+      "payer_label": "Płatnik",
+      "status_filter_label": "Status zamówienia",
+      "status_filter_placeholder": "Wszystkie statusy",
+      "status_onsite": "Opłacone na miejscu",
+      "status_pending": "Oczekuje na płatność",
+      "status_processed": "Opłacone online",
+      "tier_origin_external": "Zsynchronizowano z {fournisseur}",
+      "tier_origin_manual": "Utworzone na stronie"
     },
     "participant": {
       "entry_validated": "Wejście już zwalidowane",

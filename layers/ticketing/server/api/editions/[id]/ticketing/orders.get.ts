@@ -59,7 +59,19 @@ export default wrapApiHandler(
     const paymentMethods = paymentMethodsParam
       ? paymentMethodsParam
           .split(',')
-          .filter((m) => ['cash', 'card', 'check', 'pending', 'unknown'].includes(m))
+          .filter((m) => ['cash', 'card', 'check', 'unknown'].includes(m))
+      : []
+
+    // Filtre par statut de commande. La liste blanche est la même que `StatutCommande` côté
+    // écran ; une valeur inconnue est ignorée plutôt que transmise, sans quoi un paramètre
+    // fabriqué à la main rendrait une liste vide sans rien expliquer.
+    //
+    // `Refunded` signifie « annulée », pas « remboursée » — cf. `commande-annulee.ts`.
+    const statusesParam = (query.statuses as string) || ''
+    const statuses = statusesParam
+      ? statusesParam
+          .split(',')
+          .filter((s) => ['Pending', 'Onsite', 'Processed', 'Refunded'].includes(s))
       : []
 
     // Parse le filtre par type d'item (Registration, Donation, Membership, Payment)
@@ -129,9 +141,9 @@ export default wrapApiHandler(
         paymentMethods.length > 0
           ? {
               OR: paymentMethods.map((method) => {
-                if (method === 'pending') {
-                  return { status: 'Pending' }
-                } else if (method === 'unknown') {
+                // `unknown` reste ici : c'est une commande payée dont le moyen n'a pas été
+                // renseigné, donc bien une réponse à « comment a-t-elle été réglée ».
+                if (method === 'unknown') {
                   return {
                     AND: [
                       { OR: [{ status: 'Processed' }, { status: 'Onsite' }] },
@@ -144,6 +156,9 @@ export default wrapApiHandler(
               }),
             }
           : {}
+
+      // Construire la condition de filtre par statut de commande
+      const statusCondition = statuses.length > 0 ? { status: { in: statuses } } : {}
 
       // Construire la condition de filtre combinée pour les items
       const itemsConditions: any[] = []
@@ -203,6 +218,36 @@ export default wrapApiHandler(
             }
           : {}
 
+      /**
+       * Les critères de filtrage, composés UNE seule fois et combinés par ET.
+       *
+       * Deux raisons à cette forme.
+       *
+       * La première : ils étaient recopiés à quatre endroits — la liste, son décompte, la variante
+       * qui filtre les champs personnalisés en mémoire, et les statistiques. Ajouter un critère
+       * demandait de penser aux quatre, et en oublier un ne casse rien de visible : la liste et son
+       * total se mettent simplement à décrire deux ensembles différents.
+       *
+       * La seconde est un défaut que cette réécriture corrige. La recherche et le filtre par moyen
+       * de paiement produisent TOUS DEUX une clé `OR`. Étalés dans un même objet littéral, le
+       * second écrasait le premier : chercher un nom en filtrant sur « Liquide » rendait TOUTES les
+       * commandes en liquide, la recherche passée à la trappe — sans message, sans indice à
+       * l'écran, et avec un total cohérent avec la mauvaise réponse. Chaque critère occupe
+       * désormais sa propre entrée du `AND`, où deux `OR` ne peuvent plus se recouvrir.
+       */
+      const criteres = [statusCondition, paymentMethodCondition, itemsCondition].filter(
+        (condition) => Object.keys(condition).length > 0
+      )
+
+      // `AND` n'apparaît que s'il porte quelque chose : sans filtre, la requête reste le simple
+      // `{ editionId }` qu'elle a toujours été, et qui se lit d'un coup d'œil dans un journal.
+      const avecCriteres = (conditions: any[]) =>
+        conditions.length > 0 ? { editionId, AND: conditions } : { editionId }
+
+      /** Les statistiques ne sont calculées qu'en l'absence de recherche : elles n'en ont pas. */
+      const filtresSansRecherche = avecCriteres(criteres)
+      const filtreDesCommandes = avecCriteres(search ? [...criteres, searchCondition] : criteres)
+
       // Vérifier si on doit filtrer par customFields (nécessite filtrage JS)
       const hasCustomFieldFilter = customFieldFilters.length > 0
 
@@ -234,12 +279,7 @@ export default wrapApiHandler(
       if (hasCustomFieldFilter) {
         // Récupérer TOUTES les commandes sans pagination pour filtrer par customFields
         const allOrders = await prisma.ticketingOrder.findMany({
-          where: {
-            editionId,
-            ...searchCondition,
-            ...paymentMethodCondition,
-            ...itemsCondition,
-          },
+          where: filtreDesCommandes,
           include: {
             externalTicketing: {
               select: {
@@ -264,22 +304,12 @@ export default wrapApiHandler(
       } else {
         // Compter le nombre total de commandes
         total = await prisma.ticketingOrder.count({
-          where: {
-            editionId,
-            ...searchCondition,
-            ...paymentMethodCondition,
-            ...itemsCondition,
-          },
+          where: filtreDesCommandes,
         })
 
         // Récupérer les commandes paginées
         orders = await prisma.ticketingOrder.findMany({
-          where: {
-            editionId,
-            ...searchCondition,
-            ...paymentMethodCondition,
-            ...itemsCondition,
-          },
+          where: filtreDesCommandes,
           include: {
             externalTicketing: {
               select: {
@@ -298,11 +328,7 @@ export default wrapApiHandler(
       let stats = null
       if (!search) {
         const allOrders = await prisma.ticketingOrder.findMany({
-          where: {
-            editionId,
-            ...paymentMethodCondition,
-            ...itemsCondition,
-          },
+          where: filtresSansRecherche,
           select: {
             amount: true,
             status: true,

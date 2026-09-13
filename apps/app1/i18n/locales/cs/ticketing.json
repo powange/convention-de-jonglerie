@@ -168,7 +168,14 @@
       "validate_entry_error": "Chyba při ověření vstupu",
       "canceled_badge": "Zrušena",
       "no_action_available": "Žádná akce není k dispozici",
-      "payer_label": "Plátce"
+      "payer_label": "Plátce",
+      "status_filter_label": "Stav objednávky",
+      "status_filter_placeholder": "Všechny stavy",
+      "status_onsite": "Zaplaceno na místě",
+      "status_pending": "Čeká na platbu",
+      "status_processed": "Zaplaceno online",
+      "tier_origin_external": "Synchronizováno z {fournisseur}",
+      "tier_origin_manual": "Vytvořeno na webu"
     },
     "participant": {
       "entry_validated": "Položka již byla ověřena",

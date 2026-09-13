@@ -168,7 +168,14 @@
       "validate_entry_error": "Errore durante la validazione dell'ingresso",
       "canceled_badge": "Annullato",
       "no_action_available": "Nessuna azione disponibile",
-      "payer_label": "Pagante"
+      "payer_label": "Pagante",
+      "status_filter_label": "Stato dell'ordine",
+      "status_filter_placeholder": "Tutti gli stati",
+      "status_onsite": "Pagato in loco",
+      "status_pending": "In attesa di pagamento",
+      "status_processed": "Pagato online",
+      "tier_origin_external": "Sincronizzato da {fournisseur}",
+      "tier_origin_manual": "Creato sul sito"
     },
     "participant": {
       "entry_validated": "Ingresso già convalidato",

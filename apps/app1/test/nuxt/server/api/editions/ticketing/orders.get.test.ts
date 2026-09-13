@@ -172,13 +172,17 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 1,
-          items: {
-            some: {
-              tierId: {
-                in: [1, 2],
+          AND: [
+            {
+              items: {
+                some: {
+                  tierId: {
+                    in: [1, 2],
+                  },
+                },
               },
             },
-          },
+          ],
         }),
         select: {
           amount: true,
@@ -251,11 +255,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 1,
-          items: {
-            some: {
-              entryValidated: true,
+          AND: [
+            {
+              items: {
+                some: {
+                  entryValidated: true,
+                },
+              },
             },
-          },
+          ],
         }),
         select: {
           amount: true,
@@ -312,11 +320,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 1,
-          OR: expect.arrayContaining([
-            { payerFirstName: { contains: 'John' } },
-            { payerLastName: { contains: 'John' } },
-            { payerEmail: { contains: 'John' } },
-          ]),
+          AND: [
+            {
+              OR: expect.arrayContaining([
+                { payerFirstName: { contains: 'John' } },
+                { payerLastName: { contains: 'John' } },
+                { payerEmail: { contains: 'John' } },
+              ]),
+            },
+          ],
         }),
       })
     )
@@ -335,10 +347,14 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 1,
-          OR: expect.arrayContaining([
-            { id: 123 }, // Recherche par ID de commande
-            { payerFirstName: { contains: '123' } },
-          ]),
+          AND: [
+            {
+              OR: expect.arrayContaining([
+                { id: 123 }, // Recherche par ID de commande
+                { payerFirstName: { contains: '123' } },
+              ]),
+            },
+          ],
         }),
       })
     )
@@ -357,17 +373,21 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 1,
-          OR: expect.arrayContaining([
+          AND: [
             {
-              items: {
-                some: {
-                  OR: expect.arrayContaining([
-                    { id: 456 }, // Recherche par ID de billet
-                  ]),
+              OR: expect.arrayContaining([
+                {
+                  items: {
+                    some: {
+                      OR: expect.arrayContaining([
+                        { id: 456 }, // Recherche par ID de billet
+                      ]),
+                    },
+                  },
                 },
-              },
+              ]),
             },
-          ]),
+          ],
         }),
       })
     )
@@ -431,22 +451,96 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 1,
-          items: {
-            some: {
-              AND: [
-                {
-                  tierId: {
-                    in: [1, 2],
-                  },
+          AND: [
+            {
+              items: {
+                some: {
+                  AND: [
+                    {
+                      tierId: {
+                        in: [1, 2],
+                      },
+                    },
+                    {
+                      entryValidated: true,
+                    },
+                  ],
                 },
-                {
-                  entryValidated: true,
-                },
-              ],
+              },
             },
-          },
+          ],
         }),
       })
     )
+  })
+
+  it('filtre par statut de commande', async () => {
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', statuses: 'Pending,Refunded' })
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(0)
+    prismaMock.ticketingOrder.findMany.mockResolvedValue([])
+
+    await handler(baseEvent as any)
+
+    expect(prismaMock.ticketingOrder.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          editionId: 1,
+          AND: [{ status: { in: ['Pending', 'Refunded'] } }],
+        }),
+      })
+    )
+  })
+
+  it('ignore un statut inconnu au lieu de le transmettre', async () => {
+    // Le champ est une chaîne libre en base : un paramètre fabriqué à la main pourrait y glisser
+    // n'importe quoi. Filtré ici, il ne restreint rien ; transmis, il rendrait une liste vide sans
+    // que rien n'explique pourquoi.
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', statuses: 'Pending,Inventé' })
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(0)
+    prismaMock.ticketingOrder.findMany.mockResolvedValue([])
+
+    await handler(baseEvent as any)
+
+    expect(prismaMock.ticketingOrder.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          AND: [{ status: { in: ['Pending'] } }],
+        }),
+      })
+    )
+  })
+
+  it('garde la recherche ET le moyen de paiement, qui produisent deux « OR »', async () => {
+    // La régression que ce test verrouille : les deux conditions rendaient chacune un objet
+    // `{ OR: [...] }`, et elles étaient étalées dans un même objet littéral. Le second écrasait
+    // le premier — chercher « John » en filtrant sur « Liquide » rendait TOUTES les commandes en
+    // liquide, la recherche passée à la trappe, sans message ni indice à l'écran.
+    //
+    // Chaque critère occupe désormais sa propre entrée du `AND`, où deux `OR` coexistent.
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({
+      page: '1',
+      limit: '20',
+      search: 'John',
+      paymentMethods: 'cash',
+    })
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(0)
+    prismaMock.ticketingOrder.findMany.mockResolvedValue([])
+
+    await handler(baseEvent as any)
+
+    const { where } = prismaMock.ticketingOrder.findMany.mock.calls.at(-1)![0]
+
+    expect(where.AND).toEqual([
+      { OR: [{ paymentMethod: 'cash' }] },
+      expect.objectContaining({
+        OR: expect.arrayContaining([{ payerFirstName: { contains: 'John' } }]),
+      }),
+    ])
   })
 })
