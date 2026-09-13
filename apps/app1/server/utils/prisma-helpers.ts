@@ -46,7 +46,11 @@ export interface FetchResourceOptions<T = any> {
  */
 export async function fetchResourceOrFail<T>(
   model: { findUnique: (args: any) => Promise<T | null> },
-  id: number,
+  // `string` autant que `number` : tous les modèles n'ont pas un identifiant auto-incrémenté.
+  // `ApiErrorLog` porte un `cuid`, et l'appel s'y faisait donc sous une erreur de typage TS2345
+  // que seule la porte de typage voyait. Élargir n'accepte que davantage : aucun des appelants
+  // existants n'en est affecté.
+  id: number | string,
   options: FetchResourceOptions = {}
 ): Promise<T> {
   const { include, select, errorMessage = 'Ressource introuvable', statusCode = 404 } = options
