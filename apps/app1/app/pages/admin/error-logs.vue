@@ -154,65 +154,6 @@
       </UButton>
     </div>
 
-    <!-- Confirmation des deux actions irréversibles de l'écran.
-         Elles passaient par un `confirm()` natif, qui ne sait afficher qu'une ligne de texte — or
-         ce que la résolution en masse devait montrer, c'est justement SUR QUOI elle porte. -->
-    <UModal v-model:open="confirmationOuverte" :title="confirmation?.titre">
-      <template #body>
-        <div class="space-y-4">
-          <p class="text-sm text-gray-700 dark:text-gray-300">
-            {{ confirmation?.description }}
-          </p>
-
-          <!-- Les quatre composantes de l'empreinte, quand l'action en vise une. C'est la portée
-               réelle de l'opération, et l'ancienne boîte ne citait que le message. -->
-          <dl
-            v-if="confirmation?.empreinte"
-            class="grid gap-x-4 gap-y-1 sm:grid-cols-[auto_1fr] rounded border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
-          >
-            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">
-              {{ $t('admin.error_logs.col_type') }}
-            </dt>
-            <dd class="font-mono text-xs break-all text-gray-900 dark:text-gray-100">
-              {{ confirmation.empreinte.errorType ?? '—' }}
-            </dd>
-
-            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">
-              {{ $t('admin.error_logs.col_endpoint') }}
-            </dt>
-            <dd class="font-mono text-xs break-all text-gray-900 dark:text-gray-100">
-              {{ confirmation.empreinte.method }} {{ confirmation.empreinte.path }}
-            </dd>
-
-            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">
-              {{ $t('admin.error_logs.col_message') }}
-            </dt>
-            <dd class="font-mono text-xs break-all text-gray-900 dark:text-gray-100">
-              {{ confirmation.empreinte.message }}
-            </dd>
-          </dl>
-
-          <UAlert
-            color="error"
-            variant="subtle"
-            icon="i-heroicons-exclamation-triangle"
-            :description="$t('admin.error_logs.irreversible')"
-          />
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex w-full justify-end gap-2">
-          <UButton color="neutral" variant="ghost" @click="confirmationOuverte = false">
-            {{ $t('common.cancel') }}
-          </UButton>
-          <UButton color="error" @click="confirmerLAction">
-            {{ confirmation?.libelleConfirmer }}
-          </UButton>
-        </div>
-      </template>
-    </UModal>
-
     <UModal v-model:open="showFilters" :title="$t('admin.error_logs.filters')">
       <template #body>
         <AdminErrorLogFilters
@@ -960,6 +901,70 @@
         </div>
       </template>
     </USlideover>
+
+    <!-- Confirmation des deux actions irréversibles de l'écran.
+         Elles passaient par un `confirm()` natif, qui ne sait afficher qu'une ligne de texte — or
+         ce que la résolution en masse devait montrer, c'est justement SUR QUOI elle porte.
+
+         Déclarée APRÈS le panneau latéral, et ce n'est pas cosmétique : ni `UModal` ni
+         `USlideover` ne fixent de `z-index`, et tous deux se téléportent dans le `body`.
+         L'empilement suit donc l'ordre du DOM, lui-même calqué sur celui du gabarit — placée
+         avant, cette modale s'ouvrait SOUS le panneau qui venait de la déclencher. -->
+    <UModal v-model:open="confirmationOuverte" :title="confirmation?.titre">
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-sm text-gray-700 dark:text-gray-300">
+            {{ confirmation?.description }}
+          </p>
+
+          <!-- Les quatre composantes de l'empreinte, quand l'action en vise une. C'est la portée
+               réelle de l'opération, et l'ancienne boîte ne citait que le message. -->
+          <dl
+            v-if="confirmation?.empreinte"
+            class="grid gap-x-4 gap-y-1 sm:grid-cols-[auto_1fr] rounded border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
+          >
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              {{ $t('admin.error_logs.col_type') }}
+            </dt>
+            <dd class="font-mono text-xs break-all text-gray-900 dark:text-gray-100">
+              {{ confirmation.empreinte.errorType ?? '—' }}
+            </dd>
+
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              {{ $t('admin.error_logs.col_endpoint') }}
+            </dt>
+            <dd class="font-mono text-xs break-all text-gray-900 dark:text-gray-100">
+              {{ confirmation.empreinte.method }} {{ confirmation.empreinte.path }}
+            </dd>
+
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              {{ $t('admin.error_logs.col_message') }}
+            </dt>
+            <dd class="font-mono text-xs break-all text-gray-900 dark:text-gray-100">
+              {{ confirmation.empreinte.message }}
+            </dd>
+          </dl>
+
+          <UAlert
+            color="error"
+            variant="subtle"
+            icon="i-heroicons-exclamation-triangle"
+            :description="$t('admin.error_logs.irreversible')"
+          />
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton color="neutral" variant="ghost" @click="confirmationOuverte = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="error" @click="confirmerLAction">
+            {{ confirmation?.libelleConfirmer }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
