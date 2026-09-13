@@ -868,7 +868,15 @@
       "reimbursed_done": "Adelantos marcados como reembolsados",
       "reimbursed_error": "No se han podido marcar los adelantos como reembolsados",
       "to_reimburse": "Por reembolsar",
-      "to_reimburse_hint": "{count} persona(s) — haz clic para ver el detalle"
+      "to_reimburse_hint": "{count} persona(s) — haz clic para ver el detalle",
+      "export_code": "Código",
+      "export_code_label": "Descripción del código",
+      "export_engaged": "Comprometido",
+      "export_pdf": "Exportar PDF",
+      "export_settled": "Pagado",
+      "export_subtotal": "Subtotal",
+      "export_total": "Total",
+      "export_without_code": "Sin código"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

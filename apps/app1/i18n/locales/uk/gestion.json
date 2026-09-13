@@ -868,7 +868,15 @@
       "reimbursed_done": "Аванси позначено як відшкодовані",
       "reimbursed_error": "Не вдалося позначити аванси як відшкодовані",
       "to_reimburse": "До відшкодування",
-      "to_reimburse_hint": "{count} осіб — натисніть, щоб побачити деталі"
+      "to_reimburse_hint": "{count} осіб — натисніть, щоб побачити деталі",
+      "export_code": "Код",
+      "export_code_label": "Назва коду",
+      "export_engaged": "Зобов'язання",
+      "export_pdf": "Експорт у PDF",
+      "export_settled": "Сплачено",
+      "export_subtotal": "Проміжний підсумок",
+      "export_total": "Разом",
+      "export_without_code": "Без коду"
     },
     "program": {
       "description": "Складіть розклад фестивалю: воркшопи, виступи та інші події.",

@@ -23,6 +23,17 @@
           </p>
         </div>
         <div class="flex flex-col gap-2 sm:flex-row">
+          <!-- L'export n'a rien à produire sur une trésorerie vide : un PDF de deux tableaux sans
+               lignes se lit comme un export raté, et l'on cherche l'erreur là où il n'y en a pas. -->
+          <UButton
+            icon="i-lucide-file-down"
+            color="neutral"
+            variant="outline"
+            :label="$t('gestion.treasury.export_pdf')"
+            :loading="exportEnCours"
+            :disabled="!(data?.lines?.length ?? 0)"
+            @click="exporterPdf"
+          />
           <UButton
             icon="i-lucide-tags"
             color="neutral"
@@ -238,6 +249,15 @@
 </template>
 
 <script setup lang="ts">
+import {
+  montantPourPdf,
+  nomFichierTresorerie,
+  preparerTableau,
+  regrouperParCode,
+  soldeDe,
+  totalDesGroupes,
+} from '~/utils/export-tresorerie'
+
 import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
 
 definePageMeta({
@@ -488,5 +508,200 @@ const deleteEntry = useApiActionById(
 
 async function removeEntry(line: TreasuryLine) {
   if (line.entryId) await deleteEntry.execute(line.entryId)
+}
+
+// --- Export PDF ---
+/**
+ * L'édition, pour l'en-tête du document.
+ *
+ * Un PDF détaché de l'écran n'a plus rien pour se situer : deux exercices d'années différentes se
+ * ressemblent trop pour qu'on les distingue sans le nom de la convention et celui de l'édition.
+ */
+const editionStore = useEditionStore()
+const edition = computed(() => editionStore.getEditionById(editionId.value))
+const exportEnCours = ref(false)
+
+onMounted(() => {
+  // Sans `force` : la page ne l'affiche pas, elle ne s'en sert que pour titrer l'export, et la
+  // valeur déjà en cache fait l'affaire.
+  editionStore.fetchEditionById(editionId.value).catch(() => {
+    // Un en-tête sans nom d'édition vaut mieux qu'une page qui refuse de s'afficher : l'export
+    // retombe sur le titre générique.
+  })
+})
+
+/**
+ * Le document que l'on envoie au trésorier, au comptable ou à l'assemblée générale.
+ *
+ * Ce qui en sort est décidé dans `export-tresorerie`, éprouvé par des tests : un PDF ne se
+ * rattrape pas une fois envoyé, et un sous-total faux ne se voit qu'à la lecture.
+ *
+ * `jspdf` est importé à la demande — quelques centaines de kilo-octets qui n'ont rien à faire dans
+ * le chargement d'une page que l'on n'exporte pas à chaque visite.
+ */
+async function exporterPdf() {
+  const lignes = (data.value?.lines ?? []) as TreasuryLine[]
+  if (lignes.length === 0) return
+
+  exportEnCours.value = true
+  try {
+    const { jsPDF } = await import('jspdf')
+    const { applyPlugin } = await import('jspdf-autotable')
+    applyPlugin(jsPDF)
+
+    // Portrait : cinq colonnes dont une seule de texte libre y tiennent, et un document comptable
+    // se range et s'imprime plus volontiers dans ce sens.
+    const doc = new jsPDF()
+    const MARGE = 14
+    const maintenant = new Date()
+
+    // Le montant tel que jsPDF sait l'imprimer : sans les espaces insécables que ses polices
+    // standard ne connaissent pas. Voir `montantPourPdf`.
+    const montant = (centimes: number) => montantPourPdf(money(centimes))
+
+    const charges = regrouperParCode(lignes, 'EXPENSE')
+    const produits = regrouperParCode(lignes, 'INCOME')
+    const totalCharges = totalDesGroupes(charges)
+    const totalProduits = totalDesGroupes(produits)
+    const solde = soldeDe(totalCharges, totalProduits)
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(t('gestion.treasury.title'), MARGE, 16)
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    const sousTitre = [edition.value?.convention?.name, edition.value?.name]
+      .filter(Boolean)
+      .join(' - ')
+    if (sousTitre) doc.text(sousTitre, MARGE, 22)
+
+    doc.setFontSize(9)
+    doc.text(`${formatDate(maintenant)} - ${currency.value}`, MARGE, sousTitre ? 28 : 22)
+
+    // Les chiffres clés d'abord, comme à l'écran : c'est ce qu'on lit en premier, et souvent la
+    // seule chose que retiendra une assemblée.
+    // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+    doc.autoTable({
+      startY: sousTitre ? 33 : 27,
+      margin: { left: MARGE, right: MARGE },
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [14, 116, 144] },
+      head: [['', t('gestion.treasury.export_settled'), t('gestion.treasury.export_engaged')]],
+      body: [
+        [t('gestion.treasury.expenses'), montant(totalCharges.regle), montant(totalCharges.engage)],
+        [
+          t('gestion.treasury.incomes'),
+          montant(totalProduits.regle),
+          montant(totalProduits.engage),
+        ],
+        [t('gestion.treasury.balance'), montant(solde.regle), montant(solde.engage)],
+      ],
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
+      // Le solde est la ligne qu'on cherche du regard : elle se distingue des deux autres.
+      didParseCell: (donnees: any) => {
+        if (donnees.section === 'body' && donnees.row.index === 2) {
+          donnees.cell.styles.fontStyle = 'bold'
+        }
+      },
+    })
+
+    /**
+     * Les fonds des lignes de synthèse.
+     *
+     * Un gris neutre plutôt qu'une déclinaison du rouge ou du vert de l'en-tête : ces couleurs-là
+     * disent déjà la nature du tableau, et les réemployer ferait croire à une information de plus.
+     * Le total est le plus soutenu des deux, parce que c'est le chiffre qu'on cherche en dernier.
+     */
+    const TEINTE_SOUS_TOTAL: [number, number, number] = [237, 240, 243]
+    const TEINTE_TOTAL: [number, number, number] = [214, 220, 227]
+
+    const enTeteTableau = [
+      t('gestion.treasury.export_code'),
+      t('gestion.treasury.export_code_label'),
+      t('gestion.treasury.entry_title'),
+      t('gestion.treasury.export_settled'),
+      t('gestion.treasury.export_engaged'),
+    ]
+    const sansCode = t('gestion.treasury.export_without_code')
+    const sousTotal = t('gestion.treasury.export_subtotal')
+
+    /** Un tableau par nature, précédé de son titre et suivi de son total. */
+    const tableauDeNature = (
+      titre: string,
+      groupes: ReturnType<typeof regrouperParCode>,
+      total: ReturnType<typeof totalDesGroupes>,
+      teinte: [number, number, number]
+    ) => {
+      // @ts-expect-error - `lastAutoTable` est posé par le plugin après chaque tableau
+      const y = (doc.lastAutoTable?.finalY ?? 40) + 12
+      doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold')
+      doc.text(titre, MARGE, y)
+
+      const { lignes: corps, sousTotaux } = preparerTableau(
+        groupes,
+        montant,
+        lineTitle,
+        sansCode,
+        sousTotal
+      )
+      // Le total ferme le tableau : son rang est celui qui suit la dernière écriture.
+      const rangDuTotal = corps.length
+
+      // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+      doc.autoTable({
+        startY: y + 4,
+        margin: { left: MARGE, right: MARGE },
+        styles: { fontSize: 9, cellPadding: 2 },
+        headStyles: { fillColor: teinte },
+        head: [enTeteTableau],
+        body: [
+          ...corps,
+          [
+            {
+              content: t('gestion.treasury.export_total'),
+              colSpan: 3,
+              styles: { fontStyle: 'bold' },
+            },
+            { content: montant(total.regle), styles: { fontStyle: 'bold' } },
+            { content: montant(total.engage), styles: { fontStyle: 'bold' } },
+          ],
+        ],
+        columnStyles: {
+          0: { cellWidth: 20 },
+          1: { cellWidth: 38 },
+          3: { cellWidth: 26, halign: 'right' },
+          4: { cellWidth: 26, halign: 'right' },
+        },
+        // Les lignes de synthèse se détachent du fond, pour qu'on les repère sans les lire. Deux
+        // teintes et non une : un sous-total et un total ne se lisent pas au même niveau, et le
+        // zébrage du thème par défaut suffirait sinon à les confondre avec une écriture.
+        didParseCell: (donnees: any) => {
+          if (donnees.section !== 'body') return
+          if (donnees.row.index === rangDuTotal) {
+            donnees.cell.styles.fillColor = TEINTE_TOTAL
+            donnees.cell.styles.fontStyle = 'bold'
+          } else if (sousTotaux.includes(donnees.row.index)) {
+            donnees.cell.styles.fillColor = TEINTE_SOUS_TOTAL
+            donnees.cell.styles.fontStyle = 'bold'
+          }
+        },
+      })
+    }
+
+    tableauDeNature(t('gestion.treasury.expenses'), charges, totalCharges, [153, 27, 27])
+    tableauDeNature(t('gestion.treasury.incomes'), produits, totalProduits, [6, 95, 70])
+
+    doc.save(nomFichierTresorerie(edition.value?.name, maintenant))
+  } catch (e: any) {
+    useToast().add({
+      title: e?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    exportEnCours.value = false
+  }
 }
 </script>

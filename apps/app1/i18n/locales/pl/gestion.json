@@ -868,7 +868,15 @@
       "reimbursed_done": "Zaliczki oznaczone jako zwrócone",
       "reimbursed_error": "Nie udało się oznaczyć zaliczek jako zwróconych",
       "to_reimburse": "Do zwrotu",
-      "to_reimburse_hint": "{count} osob(y) — kliknij, aby zobaczyć szczegóły"
+      "to_reimburse_hint": "{count} osob(y) — kliknij, aby zobaczyć szczegóły",
+      "export_code": "Kod",
+      "export_code_label": "Nazwa kodu",
+      "export_engaged": "Zobowiązania",
+      "export_pdf": "Eksport PDF",
+      "export_settled": "Zapłacone",
+      "export_subtotal": "Suma częściowa",
+      "export_total": "Razem",
+      "export_without_code": "Bez kodu"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

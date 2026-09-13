@@ -868,7 +868,15 @@
       "reimbursed_done": "Anticipi contrassegnati come rimborsati",
       "reimbursed_error": "Impossibile contrassegnare gli anticipi come rimborsati",
       "to_reimburse": "Da rimborsare",
-      "to_reimburse_hint": "{count} persona/e — clicca per il dettaglio"
+      "to_reimburse_hint": "{count} persona/e — clicca per il dettaglio",
+      "export_code": "Codice",
+      "export_code_label": "Descrizione del codice",
+      "export_engaged": "Impegnato",
+      "export_pdf": "Esporta PDF",
+      "export_settled": "Pagato",
+      "export_subtotal": "Subtotale",
+      "export_total": "Totale",
+      "export_without_code": "Senza codice"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

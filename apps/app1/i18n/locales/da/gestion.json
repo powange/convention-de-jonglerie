@@ -868,7 +868,15 @@
       "reimbursed_done": "Udlæg markeret som refunderet",
       "reimbursed_error": "Kunne ikke markere udlæggene som refunderet",
       "to_reimburse": "Til refusion",
-      "to_reimburse_hint": "{count} person(er) – klik for detaljer"
+      "to_reimburse_hint": "{count} person(er) – klik for detaljer",
+      "export_code": "Kode",
+      "export_code_label": "Kodens betegnelse",
+      "export_engaged": "Forpligtet",
+      "export_pdf": "Eksportér PDF",
+      "export_settled": "Betalt",
+      "export_subtotal": "Subtotal",
+      "export_total": "I alt",
+      "export_without_code": "Uden kode"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

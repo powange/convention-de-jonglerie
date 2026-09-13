@@ -868,7 +868,15 @@
       "reimbursed_done": "Utlägg markerade som återbetalda",
       "reimbursed_error": "Det gick inte att markera utläggen som återbetalda",
       "to_reimburse": "Att återbetala",
-      "to_reimburse_hint": "{count} person(er) — klicka för fördelningen"
+      "to_reimburse_hint": "{count} person(er) — klicka för fördelningen",
+      "export_code": "Kod",
+      "export_code_label": "Kodens benämning",
+      "export_engaged": "Åtagande",
+      "export_pdf": "Exportera PDF",
+      "export_settled": "Betalt",
+      "export_subtotal": "Delsumma",
+      "export_total": "Totalt",
+      "export_without_code": "Utan kod"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",
