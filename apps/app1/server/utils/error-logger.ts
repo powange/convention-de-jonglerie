@@ -4,6 +4,9 @@ import { firebaseAdmin } from './firebase-admin'
 import { unifiedPushService } from './unified-push-service'
 
 import type { H3Event } from 'h3'
+import type { CodeTypeDErreur } from '~~/shared/utils/types-erreur'
+
+import { signatureDAlerte } from '~~/shared/utils/empreinte-erreur'
 
 interface ErrorInfo {
   error: Error
@@ -53,9 +56,13 @@ async function alertAdminsOfServerError(params: {
     // Pas de FCM configuré → rien à faire (évite des requêtes DB inutiles)
     if (!firebaseAdmin.isInitialized()) return
 
-    // Anti-spam: une alerte par (méthode + path + type d'erreur) toutes les N minutes
-    const signature = `${params.method} ${params.path} ${params.errorType}`
-    if (!shouldAlertAdmins(signature)) return
+    // Anti-spam : une alerte par signature toutes les N minutes.
+    //
+    // Cette signature est délibérément plus GROSSIÈRE que l'empreinte qui identifie un problème :
+    // elle ignore le message. Une panne qui produit vingt messages différents sur le même endpoint
+    // reste une seule panne pour qui reçoit les notifications. La différence est portée par
+    // `empreinte-erreur.ts`, à côté de l'empreinte complète, pour qu'elle se lise comme un choix.
+    if (!shouldAlertAdmins(signatureDAlerte(params))) return
 
     const admins = await prisma.user.findMany({
       where: { isGlobalAdmin: true },
@@ -232,7 +239,22 @@ function getRootError(error: any): any {
 /**
  * Détermine le type d'erreur pour classification
  */
-function getErrorType(error: Error): string {
+/**
+ * Classe une erreur selon ce qu'on peut en dire.
+ *
+ * Le type de retour n'est pas `string` mais `CodeTypeDErreur`, et ce n'est pas cosmétique : la
+ * liste des codes vit dans `~~/shared/utils/types-erreur.ts`, d'où l'écran tire aussi ses options
+ * de filtre. TypeScript refuse donc qu'on invente ici un code que le filtre ne proposerait pas.
+ *
+ * C'est la réponse à une divergence qui avait coûté cher : cette fonction produisait dix-sept
+ * types, le menu de l'écran en offrait huit, et « Base de données » filtrait sur le repli générique
+ * en excluant les interblocages et les contraintes d'unicité.
+ *
+ * ⚠️ Exportée pour les tests, qui relisent cette fonction pour vérifier qu'aucune branche n'échappe
+ * au filtre. Le typage garantit qu'un code inconnu ne compile pas ; le test garantit qu'un code
+ * ajouté à la liste sans option de filtre ne passe pas non plus.
+ */
+export function getErrorType(error: Error): CodeTypeDErreur {
   // Types d'erreur Zod
   if (error.name === 'ZodError') return 'ValidationError'
 
