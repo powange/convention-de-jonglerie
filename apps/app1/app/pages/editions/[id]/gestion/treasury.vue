@@ -256,6 +256,8 @@ import {
   regrouperParCode,
   soldeDe,
   totalDesGroupes,
+  type GroupeDeCode,
+  type TotalDeNature,
 } from '~/utils/export-tresorerie'
 
 import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
@@ -629,8 +631,13 @@ async function exporterPdf() {
     /** Un tableau par nature, précédé de son titre et suivi de son total. */
     const tableauDeNature = (
       titre: string,
-      groupes: ReturnType<typeof regrouperParCode>,
-      total: ReturnType<typeof totalDesGroupes>,
+      // ⚠️ Le type est nommé, et non déduit par `ReturnType<typeof regrouperParCode>` : la
+      // fonction étant générique, `ReturnType` l'instancie sur sa CONTRAINTE — donc sur le type
+      // minimal de l'util —, et la fonction de titrage ne pourrait plus lire `origin` ni
+      // `source`. C'est ainsi que l'erreur de typage s'était déplacée ici après un premier
+      // correctif.
+      groupes: GroupeDeCode<TreasuryLine>[],
+      total: TotalDeNature,
       teinte: [number, number, number]
     ) => {
       // @ts-expect-error - `lastAutoTable` est posé par le plugin après chaque tableau
