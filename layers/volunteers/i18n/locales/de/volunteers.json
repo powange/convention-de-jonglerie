@@ -524,6 +524,13 @@
     "slots_back_to_back": "Direkt hintereinander",
     "slots_break_of": "{duration} Pause",
     "slots_count": "{count} Zeitfenster | {count} Zeitfenster",
-    "slots_overlap_by": "Überschneidung von {duration}"
+    "slots_overlap_by": "Überschneidung von {duration}",
+    "planning_not_published_description": "Die Verantwortlichen erstellen ihn noch. Deine Schichten erscheinen hier, sobald er veröffentlicht ist — du wirst benachrichtigt.",
+    "planning_not_published_title": "Der Einsatzplan ist noch nicht veröffentlicht",
+    "planning_publish_label": "Einsatzplan für die Helfenden veröffentlichen",
+    "planning_publish_off_hint": "Die Helfenden sehen weder ihre Schichten noch den Einsatzplan: Du kannst ihn in Ruhe erstellen.",
+    "planning_publish_on_hint": "Angenommene Helfende sehen ihre Schichten und den Einsatzplan der Ausgabe.",
+    "planning_published_toast": "Einsatzplan veröffentlicht: Die Helfenden sehen jetzt ihre Schichten",
+    "planning_unpublished_toast": "Einsatzplan ausgeblendet: Die Helfenden sehen ihre Schichten nicht mehr"
   }
 }

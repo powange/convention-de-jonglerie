@@ -63,7 +63,8 @@
       "step": "Přírůstek",
       "syncing": "Probíhá synchronizace...",
       "title": "Čítače",
-      "token_regenerated": "Odkaz úspěšně regenerován"
+      "token_regenerated": "Odkaz úspěšně regenerován",
+      "last_actor": "Upravil(a)"
     },
     "custom_fields": {
       "created": "Vlastní pole úspěšně vytvořeno",
@@ -164,7 +165,10 @@
       "payment_method_error": "Chyba při aktualizaci platební metody",
       "payment_method_updated": "Platební metoda nastavena",
       "payment_method_updated_description": "Platební metoda byla úspěšně uložena",
-      "validate_entry_error": "Chyba při ověření vstupu"
+      "validate_entry_error": "Chyba při ověření vstupu",
+      "canceled_badge": "Zrušena",
+      "no_action_available": "Žádná akce není k dispozici",
+      "payer_label": "Plátce"
     },
     "participant": {
       "entry_validated": "Položka již byla ověřena",

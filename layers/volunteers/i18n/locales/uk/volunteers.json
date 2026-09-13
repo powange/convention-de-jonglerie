@@ -524,6 +524,13 @@
     "slots_back_to_back": "Поспіль, без перерви",
     "slots_break_of": "перерва {duration}",
     "slots_count": "{count} зміна | {count} змін",
-    "slots_overlap_by": "Накладання на {duration}"
+    "slots_overlap_by": "Накладання на {duration}",
+    "planning_not_published_description": "Відповідальні ще його готують. Ваші зміни з'являться тут, щойно його опублікують — вас сповістять.",
+    "planning_not_published_title": "Розклад ще не опубліковано",
+    "planning_publish_label": "Опублікувати розклад для волонтерів",
+    "planning_publish_off_hint": "Волонтери поки не бачать ні своїх змін, ні розкладу: ви можете спокійно його складати.",
+    "planning_publish_on_hint": "Прийняті волонтери бачать свої зміни та розклад видання.",
+    "planning_published_toast": "Розклад опубліковано: волонтери тепер бачать свої зміни",
+    "planning_unpublished_toast": "Розклад приховано: волонтери більше не бачать своїх змін"
   }
 }

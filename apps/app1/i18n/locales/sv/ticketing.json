@@ -63,7 +63,8 @@
       "step": "Steg",
       "syncing": "Synkroniserar...",
       "title": "Räknare",
-      "token_regenerated": "Länk framgångsrikt regenererad"
+      "token_regenerated": "Länk framgångsrikt regenererad",
+      "last_actor": "Ändrad av"
     },
     "custom_fields": {
       "created": "Anpassat fält skapat framgångsrikt",
@@ -164,7 +165,10 @@
       "payment_method_error": "Fel vid uppdatering av betalningsmetod",
       "payment_method_updated": "Betalningsmetod inställd",
       "payment_method_updated_description": "Betalningsmetod har sparats framgångsrikt",
-      "validate_entry_error": "Fel vid validering av inträde"
+      "validate_entry_error": "Fel vid validering av inträde",
+      "canceled_badge": "Avbruten",
+      "no_action_available": "Ingen åtgärd tillgänglig",
+      "payer_label": "Betalare"
     },
     "participant": {
       "entry_validated": "Posten är redan validerad",

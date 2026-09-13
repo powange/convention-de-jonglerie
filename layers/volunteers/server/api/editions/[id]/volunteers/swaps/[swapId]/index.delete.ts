@@ -1,4 +1,5 @@
 import { exigerEchangesOuverts } from '../../../../../../utils/echanges-ouverts'
+import { exigerPlanningPublie } from '../../../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -15,6 +16,11 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
     await exigerEchangesOuverts(editionId)
+    // Les échanges sont fermés tant que le planning n'est pas publié : un bénévole qui ne connaît
+    // pas son créneau n'a rien à échanger, et `candidates` divulguerait les créneaux des autres
+    // par la bande. Les deux endpoints réservés à la gestion (`pending`, `decide`) restent
+    // ouverts, pour qu'un responsable puisse solder un reliquat après avoir dépublié.
+    await exigerPlanningPublie(editionId, false)
     const swapId = String(getRouterParam(event, 'swapId') || '')
 
     const demande = await prisma.volunteerSwapRequest.findFirst({

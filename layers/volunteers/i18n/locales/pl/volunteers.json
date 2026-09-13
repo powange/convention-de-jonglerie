@@ -524,6 +524,13 @@
     "slots_back_to_back": "Jedna po drugiej",
     "slots_break_of": "{duration} przerwy",
     "slots_count": "{count} zmiana | {count} zmiany",
-    "slots_overlap_by": "Nakładanie się o {duration}"
+    "slots_overlap_by": "Nakładanie się o {duration}",
+    "planning_not_published_description": "Organizatorzy jeszcze go przygotowują. Twoje zmiany pojawią się tutaj, gdy tylko zostanie opublikowany — powiadomimy Cię.",
+    "planning_not_published_title": "Grafik nie został jeszcze opublikowany",
+    "planning_publish_label": "Opublikuj grafik wolontariuszom",
+    "planning_publish_off_hint": "Wolontariusze nie widzą jeszcze ani swoich zmian, ani grafiku: możesz go spokojnie budować.",
+    "planning_publish_on_hint": "Przyjęci wolontariusze widzą swoje zmiany i grafik edycji.",
+    "planning_published_toast": "Grafik opublikowany: wolontariusze widzą teraz swoje zmiany",
+    "planning_unpublished_toast": "Grafik ukryty: wolontariusze nie widzą już swoich zmian"
   }
 }

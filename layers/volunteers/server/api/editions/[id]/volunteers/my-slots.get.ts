@@ -1,4 +1,5 @@
 import { avecCoequipiers, coequipiersSelect } from '../../../../utils/coequipiers-creneau'
+import { planningVisibleSurLEdition } from '../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -45,6 +46,21 @@ export default wrapApiHandler(
         select: { assignedAt: true, timeSlot: { select: selectionCreneau } },
       }),
     ])
+
+    // Rien n'est montré tant que le planning n'est pas publié — ni les créneaux tenus comme
+    // bénévole, ni ceux tenus comme ORGANISATEUR.
+    //
+    // Un créneau d'organisateur est le résultat du même travail de planification : il se place,
+    // se déplace et se supprime au fil des itérations, exactement comme celui d'un bénévole. Le
+    // montrer pendant la construction donnerait des horaires qu'on note et qui changeront.
+    //
+    // Cet endpoint n'a aujourd'hui aucun appelant côté client, seul son test le référence. Il
+    // reste joignable, donc il est protégé : une porte ouverte qu'on croit condamnée est la
+    // manière la plus sûre d'annuler tout le reste du travail.
+    const planningVisible = await planningVisibleSurLEdition(editionId, false)
+    if (!planningVisible) {
+      return createSuccessResponse({ slots: [] })
+    }
 
     const creneaux = [
       ...commeBenevole.map((affectation) => ({

@@ -30,6 +30,9 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     mockRequirePlanningAccess.mockReset()
     mockIsAcceptedVolunteer.mockReset()
     prismaMock.volunteerTimeSlot.findMany.mockReset()
+    // Un bénévole accepté ne voit le planning que s'il est publié. Les éditions existantes le
+    // sont ; ces cas décrivent donc bien la situation courante.
+    prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue({ planningPublished: true })
   })
 
   it('retourne les créneaux avec delayMinutes', async () => {

@@ -31,6 +31,10 @@ const creneau = (id: string, debut: string) => ({
  */
 describe('GET /api/editions/[id]/volunteers/my-slots', () => {
   beforeEach(() => {
+    // Le planning doit être publié pour que les créneaux tenus comme BÉNÉVOLE remontent.
+    // Les éditions existantes le sont — la migration les y a passées —, donc c'est bien l'état
+    // courant qu'on reproduit ici, pas une commodité de test.
+    prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue({ planningPublished: true })
     vi.clearAllMocks()
     prismaMock.volunteerAssignment.findMany.mockResolvedValue([
       {

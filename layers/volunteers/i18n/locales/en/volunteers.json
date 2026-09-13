@@ -524,6 +524,13 @@
     "slots_back_to_back": "Back to back",
     "slots_break_of": "{duration} break",
     "slots_count": "{count} slot | {count} slots",
-    "slots_overlap_by": "Overlaps by {duration}"
+    "slots_overlap_by": "Overlaps by {duration}",
+    "planning_not_published_description": "The organisers are still preparing it. Your shifts will appear here as soon as it is published — you will be notified.",
+    "planning_not_published_title": "The schedule is not published yet",
+    "planning_publish_label": "Publish the schedule to volunteers",
+    "planning_publish_off_hint": "Volunteers can see neither their shifts nor the schedule yet: you can build it at your own pace.",
+    "planning_publish_on_hint": "Accepted volunteers can see their shifts and the edition's schedule.",
+    "planning_published_toast": "Schedule published: volunteers can now see their shifts",
+    "planning_unpublished_toast": "Schedule hidden: volunteers can no longer see their shifts"
   }
 }

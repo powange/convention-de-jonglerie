@@ -738,7 +738,11 @@
       "all_artists_handout_items": "Articoli da consegnare a tutti gli artisti",
       "all_artists_handout_items_help": "Questi articoli vengono consegnati a ogni artista dell'edizione, oltre a quelli associati ai suoi spettacoli.",
       "per_show_handout_items_title": "Articoli specifici per spettacolo",
-      "infomaniak_currency_mismatch": "Infomaniak restituirà gli importi in {infomaniak}, mentre l'edizione è impostata su {edition}: verrebbero mostrati nella valuta sbagliata. Allinea le due impostazioni."
+      "infomaniak_currency_mismatch": "Infomaniak restituirà gli importi in {infomaniak}, mentre l'edizione è impostata su {edition}: verrebbero mostrati nella valuta sbagliata. Allinea le due impostazioni.",
+      "helloasso_disconnect_confirm": "L'intera configurazione HelloAsso verrà eliminata, insieme alle tariffe, alle opzioni e agli ordini importati da questa biglietteria. Ciò che è stato inserito a mano viene conservato. L'azione è irreversibile.",
+      "helloasso_disconnect_title": "Scollega la biglietteria HelloAsso",
+      "infomaniak_disconnect_confirm_detail": "Le sue {tarifs} tariffe e {options} opzioni saranno eliminate definitivamente. | Le sue {tarifs} tariffe, {options} opzioni e {count} ordine importato saranno eliminati definitivamente — ciò che è stato inserito a mano viene conservato. | Le sue {tarifs} tariffe, {options} opzioni e {count} ordini importati saranno eliminati definitivamente — ciò che è stato inserito a mano viene conservato.",
+      "infomaniak_disconnect_title": "Disconnetti la biglietteria Infomaniak"
     },
     "title": "Gestione",
     "view_edition": "Vedi l'edizione",

@@ -524,6 +524,13 @@
     "slots_back_to_back": "Direct aansluitend",
     "slots_break_of": "{duration} pauze",
     "slots_count": "{count} dienst | {count} diensten",
-    "slots_overlap_by": "Overlap van {duration}"
+    "slots_overlap_by": "Overlap van {duration}",
+    "planning_not_published_description": "De verantwoordelijken zijn het nog aan het voorbereiden. Je diensten verschijnen hier zodra het is gepubliceerd — je krijgt bericht.",
+    "planning_not_published_title": "Het rooster is nog niet gepubliceerd",
+    "planning_publish_label": "Het rooster publiceren voor de vrijwilligers",
+    "planning_publish_off_hint": "De vrijwilligers zien nog niet hun diensten en ook niet het rooster: je kunt het rustig opbouwen.",
+    "planning_publish_on_hint": "Geaccepteerde vrijwilligers zien hun diensten en het rooster van de editie.",
+    "planning_published_toast": "Rooster gepubliceerd: de vrijwilligers zien nu hun diensten",
+    "planning_unpublished_toast": "Rooster verborgen: de vrijwilligers zien hun diensten niet meer"
   }
 }

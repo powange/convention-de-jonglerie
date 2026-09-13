@@ -63,7 +63,8 @@
       "step": "Stap",
       "syncing": "Synchroniseren...",
       "title": "Tellers",
-      "token_regenerated": "Link succesvol opnieuw gegenereerd"
+      "token_regenerated": "Link succesvol opnieuw gegenereerd",
+      "last_actor": "Gewijzigd door"
     },
     "custom_fields": {
       "created": "Aangepast veld succesvol aangemaakt",
@@ -164,7 +165,10 @@
       "payment_method_error": "Fout bij bijwerken van betaalmethode",
       "payment_method_updated": "Betaalmethode ingesteld",
       "payment_method_updated_description": "Betaalmethode is succesvol opgeslagen",
-      "validate_entry_error": "Fout bij valideren van toegang"
+      "validate_entry_error": "Fout bij valideren van toegang",
+      "canceled_badge": "Geannuleerd",
+      "no_action_available": "Geen actie beschikbaar",
+      "payer_label": "Betaler"
     },
     "participant": {
       "entry_validated": "Toegang al gevalideerd",

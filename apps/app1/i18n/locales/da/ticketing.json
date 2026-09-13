@@ -63,7 +63,8 @@
       "step": "Trin",
       "syncing": "Synkroniserer...",
       "title": "Tællere",
-      "token_regenerated": "Link regenereret med succes"
+      "token_regenerated": "Link regenereret med succes",
+      "last_actor": "Ændret af"
     },
     "custom_fields": {
       "created": "Brugerdefineret felt oprettet med succes",
@@ -164,7 +165,10 @@
       "payment_method_error": "Fejl ved opdatering af betalingsmetode",
       "payment_method_updated": "Betalingsmetode indstillet",
       "payment_method_updated_description": "Betalingsmetode er gemt med succes",
-      "validate_entry_error": "Fejl ved validering af adgang"
+      "validate_entry_error": "Fejl ved validering af adgang",
+      "canceled_badge": "Annulleret",
+      "no_action_available": "Ingen handling tilgængelig",
+      "payer_label": "Betaler"
     },
     "participant": {
       "entry_validated": "Adgang allerede valideret",

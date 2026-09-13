@@ -524,6 +524,13 @@
     "slots_back_to_back": "Bezprostředně po sobě",
     "slots_break_of": "{duration} pauzy",
     "slots_count": "{count} směna | {count} směn",
-    "slots_overlap_by": "Překryv o {duration}"
+    "slots_overlap_by": "Překryv o {duration}",
+    "planning_not_published_description": "Organizátoři jej ještě připravují. Vaše směny se zde zobrazí, jakmile bude zveřejněn — dáme vám vědět.",
+    "planning_not_published_title": "Rozpis ještě nebyl zveřejněn",
+    "planning_publish_label": "Zveřejnit rozpis dobrovolníkům",
+    "planning_publish_off_hint": "Dobrovolníci zatím nevidí ani své směny, ani rozpis: můžete jej v klidu sestavovat.",
+    "planning_publish_on_hint": "Přijatí dobrovolníci vidí své směny i rozpis ročníku.",
+    "planning_published_toast": "Rozpis zveřejněn: dobrovolníci nyní vidí své směny",
+    "planning_unpublished_toast": "Rozpis skryt: dobrovolníci již nevidí své směny"
   }
 }

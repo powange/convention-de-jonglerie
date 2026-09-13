@@ -738,7 +738,11 @@
       "all_artists_handout_items": "Artikel zur Ausgabe an alle Künstler",
       "all_artists_handout_items_help": "Diese Artikel werden jedem Künstler der Ausgabe ausgehändigt, zusätzlich zu denen, die mit seinen Shows verknüpft sind.",
       "per_show_handout_items_title": "Show-spezifische Artikel",
-      "infomaniak_currency_mismatch": "Infomaniak liefert die Beträge in {infomaniak}, während die Ausgabe auf {edition} eingestellt ist: Sie würden in der falschen Währung angezeigt. Gleichen Sie beide Einstellungen ab."
+      "infomaniak_currency_mismatch": "Infomaniak liefert die Beträge in {infomaniak}, während die Ausgabe auf {edition} eingestellt ist: Sie würden in der falschen Währung angezeigt. Gleichen Sie beide Einstellungen ab.",
+      "helloasso_disconnect_confirm": "Die gesamte HelloAsso-Konfiguration wird gelöscht, ebenso die aus diesem Ticketsystem importierten Tarife, Optionen und Bestellungen. Manuell Erfasstes bleibt erhalten. Diese Aktion ist unwiderruflich.",
+      "helloasso_disconnect_title": "HelloAsso-Ticketsystem trennen",
+      "infomaniak_disconnect_confirm_detail": "Seine {tarifs} Tarif(e) und {options} Option(en) werden endgültig gelöscht. | Seine {tarifs} Tarif(e), {options} Option(en) und {count} importierte Bestellung werden endgültig gelöscht — manuell Erfasstes bleibt erhalten. | Seine {tarifs} Tarif(e), {options} Option(en) und {count} importierte Bestellungen werden endgültig gelöscht — manuell Erfasstes bleibt erhalten.",
+      "infomaniak_disconnect_title": "Infomaniak-Ticketsystem trennen"
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

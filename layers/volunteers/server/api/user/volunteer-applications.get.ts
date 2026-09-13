@@ -137,15 +137,23 @@ export default wrapApiHandler(
           })
         : []
 
+      // Le réglage se lit par ÉDITION, et c'est tout l'intérêt de le faire ici : cette page liste
+      // les candidatures de toutes les éditions, dont certaines publiées et d'autres non. Un
+      // filtre global masquerait des plannings déjà publiés ailleurs.
+      //
+      // `volunteerSettings: true` charge déjà le réglage plus haut : aucune requête de plus.
+      const planningVisible = app.event.volunteerSettings?.planningPublished ?? false
+
       // Construire la liste des équipes assignées avec leurs noms depuis teamAssignments
-      const assignedTeamsWithNames = app.teamAssignments
-        ? app.teamAssignments.map((assignment) => assignment.team.name)
-        : []
+      const assignedTeamsWithNames =
+        planningVisible && app.teamAssignments
+          ? app.teamAssignments.map((assignment) => assignment.team.name)
+          : []
 
       // Filtrer les créneaux assignés pour cet événement
-      const eventAssignments = volunteerAssignments.filter(
-        (assignment) => assignment.timeSlot.eventId === app.eventId
-      )
+      const eventAssignments = planningVisible
+        ? volunteerAssignments.filter((assignment) => assignment.timeSlot.eventId === app.eventId)
+        : []
 
       // Reconstituer la forme historique de la réponse : `edition` à plat. Métadonnées génériques
       // depuis Event, affichage propre au domaine depuis le port, config bénévole (askX) depuis

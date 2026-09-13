@@ -524,6 +524,13 @@
     "slots_back_to_back": "Uno di seguito all'altro",
     "slots_break_of": "{duration} di pausa",
     "slots_count": "{count} turno | {count} turni",
-    "slots_overlap_by": "Sovrapposizione di {duration}"
+    "slots_overlap_by": "Sovrapposizione di {duration}",
+    "planning_not_published_description": "I responsabili lo stanno ancora preparando. I tuoi turni compariranno qui appena sarà pubblicato — riceverai una notifica.",
+    "planning_not_published_title": "Il planning non è ancora pubblicato",
+    "planning_publish_label": "Pubblica il planning ai volontari",
+    "planning_publish_off_hint": "I volontari non vedono ancora né i loro turni né il planning: puoi costruirlo con calma.",
+    "planning_publish_on_hint": "I volontari accettati vedono i loro turni e il planning dell'edizione.",
+    "planning_published_toast": "Planning pubblicato: i volontari ora vedono i loro turni",
+    "planning_unpublished_toast": "Planning nascosto: i volontari non vedono più i loro turni"
   }
 }

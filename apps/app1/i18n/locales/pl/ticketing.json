@@ -63,7 +63,8 @@
       "step": "Przyrost",
       "syncing": "Synchronizacja...",
       "title": "Liczniki",
-      "token_regenerated": "Link pomyślnie zregenerowany"
+      "token_regenerated": "Link pomyślnie zregenerowany",
+      "last_actor": "Zmienione przez"
     },
     "custom_fields": {
       "created": "Pole niestandardowe utworzone pomyślnie",
@@ -164,7 +165,10 @@
       "payment_method_error": "Błąd podczas aktualizacji metody płatności",
       "payment_method_updated": "Metoda płatności ustawiona",
       "payment_method_updated_description": "Metoda płatności została pomyślnie zapisana",
-      "validate_entry_error": "Błąd podczas weryfikacji wejścia"
+      "validate_entry_error": "Błąd podczas weryfikacji wejścia",
+      "canceled_badge": "Anulowane",
+      "no_action_available": "Brak dostępnych działań",
+      "payer_label": "Płatnik"
     },
     "participant": {
       "entry_validated": "Wejście już zwalidowane",

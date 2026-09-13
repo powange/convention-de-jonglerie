@@ -738,7 +738,11 @@
       "all_artists_handout_items": "Uit te reiken artikelen voor alle artiesten",
       "all_artists_handout_items_help": "Deze artikelen worden aan elke artiest van de editie uitgereikt, naast die welke aan hun shows zijn gekoppeld.",
       "per_show_handout_items_title": "Showspecifieke artikelen",
-      "infomaniak_currency_mismatch": "Infomaniak geeft de bedragen terug in {infomaniak}, terwijl de editie op {edition} staat: ze zouden in de verkeerde valuta worden getoond. Stem beide instellingen op elkaar af."
+      "infomaniak_currency_mismatch": "Infomaniak geeft de bedragen terug in {infomaniak}, terwijl de editie op {edition} staat: ze zouden in de verkeerde valuta worden getoond. Stem beide instellingen op elkaar af.",
+      "helloasso_disconnect_confirm": "De volledige HelloAsso-configuratie wordt verwijderd, evenals de tarieven, opties en bestellingen die uit deze ticketing zijn geïmporteerd. Wat handmatig is ingevoerd, blijft behouden. Deze actie is onomkeerbaar.",
+      "helloasso_disconnect_title": "HelloAsso-ticketing loskoppelen",
+      "infomaniak_disconnect_confirm_detail": "De {tarifs} tarieven en {options} opties worden definitief verwijderd. | De {tarifs} tarieven, {options} opties en {count} geïmporteerde bestelling worden definitief verwijderd — wat handmatig is ingevoerd, blijft behouden. | De {tarifs} tarieven, {options} opties en {count} geïmporteerde bestellingen worden definitief verwijderd — wat handmatig is ingevoerd, blijft behouden.",
+      "infomaniak_disconnect_title": "Infomaniak-ticketing loskoppelen"
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",

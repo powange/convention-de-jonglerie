@@ -21,6 +21,21 @@ export default wrapApiHandler(
       })
     }
 
+    // Notifier les plannings, c'est les publier.
+    //
+    // Ce sont le même geste métier : envoyer à chaque bénévole le détail de ses créneaux tout en
+    // laissant la page les masquer produirait exactement la situation que le réglage cherche à
+    // éviter — des horaires connus par courriel, introuvables à l'écran, et impossible de savoir
+    // lesquels font foi.
+    //
+    // `upsert` plutôt qu'`update` : une édition peut n'avoir jamais enregistré de configuration
+    // bénévole, auquel cas la ligne n'existe pas encore.
+    await prisma.eventVolunteerSettings.upsert({
+      where: { eventId: editionId },
+      update: { planningPublished: true },
+      create: { eventId: editionId, planningPublished: true },
+    })
+
     // Nom d'affichage générique porté par l'Event (étape 0bis)
     const eventRecord = await prisma.event.findUnique({
       where: { id: editionId },

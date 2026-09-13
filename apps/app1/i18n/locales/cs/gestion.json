@@ -738,7 +738,11 @@
       "all_artists_handout_items": "Předměty k předání všem umělcům",
       "all_artists_handout_items_help": "Tyto předměty se předávají každému umělci ročníku, navíc k předmětům spojeným s jeho představeními.",
       "per_show_handout_items_title": "Předměty specifické pro představení",
-      "infomaniak_currency_mismatch": "Infomaniak vrátí částky v {infomaniak}, zatímco ročník je nastaven na {edition}: zobrazily by se v nesprávné měně. Sjednoťte obě nastavení."
+      "infomaniak_currency_mismatch": "Infomaniak vrátí částky v {infomaniak}, zatímco ročník je nastaven na {edition}: zobrazily by se v nesprávné měně. Sjednoťte obě nastavení.",
+      "helloasso_disconnect_confirm": "Celá konfigurace HelloAsso bude smazána, včetně sazeb, možností a objednávek importovaných z této pokladny. Údaje zadané ručně zůstanou zachovány. Tuto akci nelze vrátit zpět.",
+      "helloasso_disconnect_title": "Odpojit pokladnu HelloAsso",
+      "infomaniak_disconnect_confirm_detail": "Jejích {tarifs} sazeb a {options} možností bude trvale smazáno. | Jejích {tarifs} sazeb, {options} možností a {count} importovaná objednávka budou trvale smazány — údaje zadané ručně zůstanou zachovány. | Jejích {tarifs} sazeb, {options} možností a {count} importovaných objednávek bude trvale smazáno — údaje zadané ručně zůstanou zachovány.",
+      "infomaniak_disconnect_title": "Odpojit pokladnu Infomaniak"
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",

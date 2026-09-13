@@ -524,6 +524,13 @@
     "slots_back_to_back": "Direkt efter varandra",
     "slots_break_of": "{duration} paus",
     "slots_count": "{count} pass | {count} pass",
-    "slots_overlap_by": "Överlapp på {duration}"
+    "slots_overlap_by": "Överlapp på {duration}",
+    "planning_not_published_description": "De ansvariga håller fortfarande på med det. Dina pass visas här så snart det är publicerat — du får ett meddelande.",
+    "planning_not_published_title": "Schemat är inte publicerat än",
+    "planning_publish_label": "Publicera schemat för volontärerna",
+    "planning_publish_off_hint": "Volontärerna ser varken sina pass eller schemat än: du kan bygga det i lugn och ro.",
+    "planning_publish_on_hint": "Antagna volontärer ser sina pass och upplagans schema.",
+    "planning_published_toast": "Schemat publicerat: volontärerna ser nu sina pass",
+    "planning_unpublished_toast": "Schemat dolt: volontärerna ser inte längre sina pass"
   }
 }

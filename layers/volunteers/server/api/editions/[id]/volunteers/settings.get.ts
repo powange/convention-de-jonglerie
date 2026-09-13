@@ -66,6 +66,9 @@ export default wrapApiHandler(
       mode: s?.mode ?? 'INTERNAL',
       swapsEnabled: s?.swapsEnabled ?? true,
       organizersInTeams: s?.organizersInTeams ?? false,
+      // Lisible par un bénévole ayant candidaté, et c'est voulu : la page publique en a besoin
+      // pour expliquer une absence de planning au lieu de la laisser passer pour un bug.
+      planningPublished: s?.planningPublished ?? false,
       externalUrl: s?.externalUrl ?? null,
       askDiet: s?.askDiet ?? false,
       askAllergies: s?.askAllergies ?? false,

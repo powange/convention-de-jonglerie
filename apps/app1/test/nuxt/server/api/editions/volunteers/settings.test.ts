@@ -190,6 +190,10 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         // À l'inverse, rattacher des organisateurs aux équipes est fermé par défaut : c'est
         // une possibilité qu'on ouvre, pas un comportement que les éditions attendaient.
         organizersInTeams: false,
+        // Fermé par défaut lui aussi : une édition neuve commence avec un planning masqué, le
+        // responsable le publie quand il le juge prêt. Les éditions EXISTANTES sont passées à
+        // `true` par la migration, pour ne pas leur retirer un affichage déjà en place.
+        planningPublished: false,
         externalUrl: null,
         askDiet: true,
         askAllergies: true,
@@ -311,6 +315,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         'mode',
         'swapsEnabled',
         'organizersInTeams',
+        'planningPublished',
         'externalUrl',
         'askDiet',
         'askAllergies',

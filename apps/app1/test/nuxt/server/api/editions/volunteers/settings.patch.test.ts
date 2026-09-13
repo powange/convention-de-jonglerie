@@ -78,6 +78,36 @@ describe('/api/editions/[id]/volunteers/settings PATCH', () => {
     })
   })
 
+  describe('Publication du planning', () => {
+    it('enregistre la publication demandée', async () => {
+      global.readBody = vi.fn().mockResolvedValue({ planningPublished: true })
+
+      await handler(baseEvent as any)
+
+      expect(updateData().planningPublished).toBe(true)
+    })
+
+    it('enregistre aussi le retrait', async () => {
+      // Dépublier doit rester possible : un responsable qui s'aperçoit d'une erreur après coup
+      // ne doit pas avoir à laisser un planning faux à l'affichage.
+      global.readBody = vi.fn().mockResolvedValue({ planningPublished: false })
+
+      await handler(baseEvent as any)
+
+      expect(updateData().planningPublished).toBe(false)
+    })
+
+    it('ne touche pas au réglage quand il est absent du corps', async () => {
+      // PATCH partiel : enregistrer les questions du formulaire ne doit pas republier un planning
+      // que le responsable avait masqué.
+      global.readBody = vi.fn().mockResolvedValue({ askDiet: true })
+
+      await handler(baseEvent as any)
+
+      expect(updateData()).not.toHaveProperty('planningPublished')
+    })
+  })
+
   describe('Description : écriture et effacement explicites', () => {
     it('enregistre la description envoyée', async () => {
       global.readBody = vi.fn().mockResolvedValue({ description: 'Rejoignez-nous !' })
