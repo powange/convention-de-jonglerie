@@ -44,20 +44,32 @@ describe('DELETE /api/editions/[id]/stock-reservations/[reservationId]', () => {
   })
 
   it("permet à l'auteur de supprimer sa réservation", async () => {
-    prismaMock.stockReservation.findFirst.mockResolvedValue({ userId: 1 })
+    prismaMock.stockReservation.findFirst.mockResolvedValue({
+      userId: 1,
+      // Lu par la garde « ce groupe gère les réservations ».
+      stockItem: { group: { id: 7, name: 'Sonorisation', reservationsEnabled: true } },
+    })
     await handler(baseEvent as any)
     expect(prismaMock.stockReservation.delete).toHaveBeenCalledWith({ where: { id: 100 } })
   })
 
   it("permet à un modérateur de supprimer une réservation d'autrui", async () => {
-    prismaMock.stockReservation.findFirst.mockResolvedValue({ userId: 999 })
+    prismaMock.stockReservation.findFirst.mockResolvedValue({
+      userId: 999,
+      // Lu par la garde « ce groupe gère les réservations ».
+      stockItem: { group: { id: 7, name: 'Sonorisation', reservationsEnabled: true } },
+    })
     mockCanManageStock.mockReturnValue(true)
     await handler(baseEvent as any)
     expect(prismaMock.stockReservation.delete).toHaveBeenCalled()
   })
 
   it('refuse si autre user et non modérateur', async () => {
-    prismaMock.stockReservation.findFirst.mockResolvedValue({ userId: 999 })
+    prismaMock.stockReservation.findFirst.mockResolvedValue({
+      userId: 999,
+      // Lu par la garde « ce groupe gère les réservations ».
+      stockItem: { group: { id: 7, name: 'Sonorisation', reservationsEnabled: true } },
+    })
     mockCanManageStock.mockReturnValue(false)
     await expect(handler(baseEvent as any)).rejects.toThrow('Droits insuffisants')
     expect(prismaMock.stockReservation.delete).not.toHaveBeenCalled()
@@ -69,7 +81,11 @@ describe('DELETE /api/editions/[id]/stock-reservations/[reservationId]', () => {
   })
 
   it('vérifie le scope édition via stockItem.group.editionId', async () => {
-    prismaMock.stockReservation.findFirst.mockResolvedValue({ userId: 1 })
+    prismaMock.stockReservation.findFirst.mockResolvedValue({
+      userId: 1,
+      // Lu par la garde « ce groupe gère les réservations ».
+      stockItem: { group: { id: 7, name: 'Sonorisation', reservationsEnabled: true } },
+    })
     await handler(baseEvent as any)
     expect(prismaMock.stockReservation.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({

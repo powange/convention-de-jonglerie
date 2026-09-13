@@ -41,7 +41,12 @@ const existingReservation = {
   usage: 'Old',
   quantityReserved: 2,
   status: 'RESERVED',
-  stockItem: { id: 5, quantity: 10 },
+  // Le groupe est désormais lu par la garde « ce groupe gère les réservations ».
+  stockItem: {
+    id: 5,
+    quantity: 10,
+    group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+  },
 }
 
 const baseEvent = {
@@ -122,7 +127,11 @@ describe('PUT /api/editions/[id]/stock-reservations/[reservationId]', () => {
     // La réservation porte sur un objet largement pourvu : seule la borne du schéma peut refuser.
     prismaMock.stockReservation.findFirst.mockResolvedValue({
       ...existingReservation,
-      stockItem: { id: 5, quantity: 20000 },
+      stockItem: {
+        id: 5,
+        quantity: 20000,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
     })
     mockGetReservedQty.mockResolvedValue(0)
     global.readBody = vi.fn().mockResolvedValue({ quantityReserved: 10001 })

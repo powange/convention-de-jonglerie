@@ -557,7 +557,10 @@
       "count_view": "Инвентаризация",
       "export_pdf": "Инвентарная ведомость (PDF)",
       "export_pdf_empty": "Нет предметов для экспорта",
-      "export_pdf_summary": "{objets} предметов · {comptes} посчитано · {empruntes} арендовано"
+      "export_pdf_summary": "{objets} предметов · {comptes} посчитано · {empruntes} арендовано",
+      "group_reservations_label": "Управлять бронированием",
+      "group_reservations_off_hint": "Оборудование этой группы считают и хранят, но не бронируют. Ни календаря, ни количеств по периодам.",
+      "group_reservations_on_hint": "Оборудование этой группы можно забронировать на период: календарь, доступные количества и массовое бронирование."
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

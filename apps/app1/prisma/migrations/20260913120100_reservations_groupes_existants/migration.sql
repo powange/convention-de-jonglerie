@@ -1,0 +1,13 @@
+-- Les groupes de stock EXISTANTS gardent leurs réservations.
+--
+-- Le défaut du schéma est `false` : tout le matériel ne se réserve pas, et un groupe neuf commence
+-- donc sans ce système. Mais appliquer ce défaut aux groupes déjà en base retirerait le calendrier
+-- et les réservations à des éditions qui s'en servent — y compris pendant une convention en cours,
+-- où quelqu'un compte sur du matériel réservé.
+--
+-- Ces deux besoins sont contradictoires, d'où les deux temps : le défaut sert l'avenir, cet UPDATE
+-- protège le présent. Même raisonnement que pour la publication du planning des bénévoles.
+--
+-- Migration séparée de l'ALTER plutôt qu'ajoutée dedans : celle-ci sera appliquée en production, et
+-- Prisma en conserve l'empreinte — la modifier ferait échouer les vérifications d'intégrité.
+UPDATE `StockGroup` SET `reservationsEnabled` = true;

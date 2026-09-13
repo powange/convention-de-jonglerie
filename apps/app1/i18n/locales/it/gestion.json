@@ -557,7 +557,10 @@
       "count_view": "Inventario",
       "export_pdf": "Scheda d'inventario (PDF)",
       "export_pdf_empty": "Nessun oggetto da esportare",
-      "export_pdf_summary": "{objets} oggetti · {comptes} contati · {empruntes} in prestito"
+      "export_pdf_summary": "{objets} oggetti · {comptes} contati · {empruntes} in prestito",
+      "group_reservations_label": "Gestire le prenotazioni",
+      "group_reservations_off_hint": "Il materiale di questo gruppo si conta e si ripone, ma non si prenota. Nessun calendario, nessuna quantità per periodo.",
+      "group_reservations_on_hint": "Il materiale di questo gruppo può essere prenotato per un periodo: calendario, quantità disponibili e prenotazione in blocco."
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

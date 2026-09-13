@@ -30,7 +30,10 @@ export default wrapApiHandler(
     const item = await prisma.stockItem.findFirst({
       where: { id: itemId, group: { editionId } },
       include: {
-        group: { select: { id: true, name: true } },
+        // `reservationsEnabled` : la fiche s'en sert pour ne pas proposer de réserver sur un
+        // groupe qui ne gère pas les réservations — un bouton qui rend un 403 est pire qu'aucun
+        // bouton.
+        group: { select: { id: true, name: true, reservationsEnabled: true } },
         ...stockItemLocationInclude,
         // Les responsables de la récupération et du retour : la fiche les affiche avec leur
         // avatar, comme partout ailleurs.

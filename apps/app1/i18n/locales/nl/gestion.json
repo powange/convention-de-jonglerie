@@ -557,7 +557,10 @@
       "count_view": "Inventarisatie",
       "export_pdf": "Inventarislijst (PDF)",
       "export_pdf_empty": "Geen item om te exporteren",
-      "export_pdf_summary": "{objets} items · {comptes} geteld · {empruntes} geleend"
+      "export_pdf_summary": "{objets} items · {comptes} geteld · {empruntes} geleend",
+      "group_reservations_label": "Reserveringen beheren",
+      "group_reservations_off_hint": "Het materiaal van deze groep wordt geteld en opgeborgen, maar niet gereserveerd. Geen kalender, geen aantallen per periode.",
+      "group_reservations_on_hint": "Het materiaal van deze groep kan voor een periode worden gereserveerd: kalender, beschikbare aantallen en groepsreservering."
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

@@ -557,7 +557,10 @@
       "count_view": "Inventura",
       "export_pdf": "Inventární list (PDF)",
       "export_pdf_empty": "Žádný předmět k exportu",
-      "export_pdf_summary": "{objets} předmětů · {comptes} spočítáno · {empruntes} zapůjčeno"
+      "export_pdf_summary": "{objets} předmětů · {comptes} spočítáno · {empruntes} zapůjčeno",
+      "group_reservations_label": "Spravovat rezervace",
+      "group_reservations_off_hint": "Vybavení této skupiny se počítá a ukládá, ale nerezervuje. Žádný kalendář, žádné množství podle období.",
+      "group_reservations_on_hint": "Vybavení této skupiny lze rezervovat na určité období: kalendář, dostupné množství a hromadná rezervace."
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",
