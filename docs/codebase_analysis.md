@@ -263,7 +263,7 @@ Le workflow habituel veut que l'utilisateur crée et applique les migrations. `p
 
 ### Déploiement
 
-Deux environnements, déclenchés par webhook Portainer : **release** (`test.juggling-convention.com`) et **production** (`juggling-convention.com`). Les piles sont adossées au dépôt Git : le webhook récupère puis **construit sur place** — aucune image n'est publiée dans un registre.
+Deux environnements, déclenchés par webhook Portainer : **release** (`test.juggling-convention.com`) et **production** (`juggling-convention.com`). Les piles **tirent une image** — `ghcr.io/powange/convention-de-jonglerie:main`, avec `pull_policy: always` — construite et publiée par la CI sur `main` (job `publier-image`, qui pousse aussi `:sha-<commit>` pour revenir en arrière sans reconstruire). Elles ne construisent plus rien sur place : les piles adossées au dépôt Git ont été abandonnées parce que leur extraction d'archive n'effaçait jamais les fichiers supprimés, et qu'un composant retiré deux commits plus tôt continuait d'être servi. Corollaire : **déclencher le webhook avant la fin de `publier-image` redéploie l'image précédente** sans que rien ne le signale.
 
 Le webhook renvoie 204 sans rien prouver. La vérification fiable est `/_nuxt/builds/latest.json` : l'identifiant de build est déterministe par commit, et les deux environnements sur le même commit affichent le même. `entrypoint.sh` appliquant les migrations avant de démarrer, **un déploiement migre la production sans confirmation**.
 

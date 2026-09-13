@@ -5,10 +5,23 @@ thinking: false
 
 # Redéploiement via webhook Portainer
 
-Déclenche le redéploiement d'une stack hébergée chez le partenaire. Les piles sont **adossées au
-dépôt Git** : le webhook récupère le dépôt puis **construit sur place**. Aucune image n'est
-publiée dans un registre, et aucun workflow GitHub n'en produit — inutile donc d'attendre quoi
-que ce soit avant de déclencher.
+Déclenche le redéploiement d'une stack hébergée chez le partenaire.
+
+⚠️ **Les piles TIRENT une image ; elles ne construisent plus rien.** Les deux composes déployés
+(`apps/app1/docker-compose.prod.yml` et `.release.yml`) portent
+`image: ghcr.io/powange/convention-de-jonglerie:main` avec `pull_policy: always`, et c'est la CI
+qui construit et publie cette image — sur `main` uniquement, par le workflow `publier-image.yml`, qui pousse
+`:main` et `:sha-<commit>`.
+
+Conséquence à ne jamais oublier : **déclencher le webhook avant la fin de ce job redéploie l'image
+PRÉCÉDENTE**. Le webhook répond 204, la pile redémarre, l'application répond — et rien de nouveau
+n'est livré. C'est exactement le genre de silence que ce dispositif cherchait à supprimer, déplacé
+d'un cran en amont. D'où l'attente ajoutée à l'étape 1.
+
+Une version antérieure de ce texte affirmait l'inverse — « aucune image n'est publiée », « inutile
+d'attendre quoi que ce soit avant de déclencher ». C'était vrai des piles adossées au dépôt Git,
+abandonnées depuis : leur extraction d'archive n'effaçait jamais les fichiers supprimés, et c'est
+un ancien composant qui s'est retrouvé servi en production.
 
 L'argument détermine la cible :
 
@@ -40,6 +53,27 @@ répond après bascule prouve donc que les migrations sont passées.
 
 - `git log origin/main -1` — est-ce bien le commit attendu ?
 - Une migration non appliquée en production ? Si oui, l'annoncer explicitement.
+- **L'image de ce commit est-elle publiée ?** C'est elle que les piles vont tirer :
+
+La publication a son propre workflow, `publier-image.yml` — la question est donc directe :
+
+```bash
+SHA=$(git rev-parse origin/main)
+until gh run list --workflow=publier-image.yml --limit 5 \
+    --json headSha,status,conclusion \
+    --jq ".[] | select(.headSha==\"$SHA\") | select(.status==\"completed\") | .conclusion" \
+    | grep -q .; do
+  sleep 30
+done
+gh run list --workflow=publier-image.yml --limit 5 --json headSha,conclusion \
+  --jq ".[] | select(.headSha==\"$SHA\") | .conclusion"
+```
+
+Filtrer sur `headSha` plutôt que prendre le dernier run : juste après un merge, la liste rend
+encore celui du commit précédent, et l'attente se terminerait aussitôt sur le mauvais. Si la
+conclusion n'est pas `success`, **ne pas déployer**.
+
+Lancer cette attente en tâche de fond : la construction dure plusieurs minutes.
 
 ### 2. Relever le build actuel
 
@@ -128,9 +162,15 @@ deux ensemble.
 À éviter quand une **migration** est en attente : release sert alors de galop d'essai, et la voir
 répondre prouve que la migration est passée avant d'y soumettre la production.
 
-Second effet, mineur : en séquence, la production profite du cache de couches Docker chauffé par
-release et bascule en quelques dizaines de secondes. En parallèle, les deux constructions se font
-concurrence et l'ensemble prend un peu plus longtemps.
+L'argument du cache de build, lui, ne vaut plus : rien n'est construit sur l'hôte, les deux piles
+ne font que tirer la même image déjà publiée. Le parallèle ne coûte donc plus de temps de calcul —
+il ne coûte que la répétition.
+
+## Revenir à un build précédent
+
+La CI publie aussi `:sha-<commit>`. Pour revenir en arrière sans reconstruire, remplacer `:main`
+par cette étiquette dans le compose de la pile concernée, puis redéployer. C'est plus sûr et plus
+rapide qu'un `git revert` suivi d'une nouvelle construction.
 
 ## Environnements
 
