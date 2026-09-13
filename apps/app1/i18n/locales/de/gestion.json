@@ -557,7 +557,10 @@
       "count_view": "Inventur",
       "export_pdf": "Inventarbogen (PDF)",
       "export_pdf_empty": "Kein Gegenstand zum Exportieren",
-      "export_pdf_summary": "{objets} Gegenstände · {comptes} gezählt · {empruntes} geliehen"
+      "export_pdf_summary": "{objets} Gegenstände · {comptes} gezählt · {empruntes} geliehen",
+      "group_reservations_label": "Reservierungen verwalten",
+      "group_reservations_off_hint": "Das Material dieser Gruppe wird gezählt und eingelagert, aber nicht reserviert. Kein Kalender, keine Mengen pro Zeitraum.",
+      "group_reservations_on_hint": "Das Material dieser Gruppe kann für einen Zeitraum reserviert werden: Kalender, verfügbare Mengen und Sammelreservierung."
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

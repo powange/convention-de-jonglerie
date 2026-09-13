@@ -114,6 +114,7 @@
           </div>
           <div class="flex items-center gap-2 shrink-0">
             <UButton
+              v-if="reservationsOuvertes"
               icon="i-heroicons-plus"
               size="sm"
               color="primary"
@@ -268,8 +269,9 @@
         </template>
       </UCard>
 
-      <!-- Réservations -->
-      <UCard>
+      <!-- Réservations. Absentes quand le groupe ne les gère pas : la carte n'aurait rien à dire,
+           et son titre laisserait croire qu'on a oublié d'en poser. -->
+      <UCard v-if="reservationsOuvertes">
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-heroicons-calendar-days" class="size-5 text-gray-500" />
@@ -356,7 +358,7 @@
       @saved="fetchItem"
     />
     <StockReservationModal
-      v-if="item"
+      v-if="item && reservationsOuvertes"
       v-model:open="reservationModalOpen"
       :edition-id="editionId"
       :item-id="item.id"
@@ -434,7 +436,7 @@ interface StockItemFull {
   returnLocation: string | null
   returnResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
   returnContact: string | null
-  group: { id: number; name: string }
+  group: { id: number; name: string; reservationsEnabled?: boolean | null }
   location: string | null
   zone: { id: number; name: string; color: string } | null
   marker: { id: number; name: string } | null
@@ -442,6 +444,14 @@ interface StockItemFull {
 }
 
 const item = ref<StockItemFull | null>(null)
+
+/**
+ * Le groupe de cet objet gère-t-il les réservations&nbsp;?
+ *
+ * ⚠️ Ne PROTÈGE rien : les endpoints refusent déjà. Sert à ne pas proposer un bouton qui rendrait
+ * un 403 — pire qu'aucun bouton, parce qu'on cherche ce qu'on a mal fait.
+ */
+const reservationsOuvertes = computed(() => item.value?.group?.reservationsEnabled === true)
 
 // Titre de l'onglet : « {nom de l'article} – Stock matériel », cohérent avec la section /stock.
 // Tant que l'article n'est pas chargé, on retombe sur le titre générique de la section.

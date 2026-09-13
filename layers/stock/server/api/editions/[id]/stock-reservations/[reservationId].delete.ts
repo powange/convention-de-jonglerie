@@ -1,3 +1,5 @@
+import { exigerReservationsOuvertesPourLaReservation } from '../../../../utils/reservations-ouvertes'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
@@ -47,6 +49,13 @@ export default wrapApiHandler(
     if (!isAuthor && !isModerator) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }
+
+    // Le groupe doit gérer les réservations. Le filtre est ici, et non seulement à l'écran : un
+    // réglage qui promet de cacher et ne cache qu'à l'affichage est pire qu'un réglage absent.
+    //
+    // Posé APRÈS le contrôle d'accès : rendre ce refus plus tôt révélerait l'existence de la
+    // réservation à quelqu'un qui n'a pas le droit de la voir.
+    await exigerReservationsOuvertesPourLaReservation(reservationId, editionId)
 
     await prisma.stockReservation.delete({ where: { id: reservationId } })
 

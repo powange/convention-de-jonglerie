@@ -1,5 +1,11 @@
 import { z } from 'zod'
 
+import {
+  fermetureBloqueePar,
+  FERMETURE_IMPOSSIBLE,
+} from '../../../../../../app/utils/reservations-du-groupe'
+import { reservationsActivesDuGroupe } from '../../../../../utils/reservations-ouvertes'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import {
@@ -13,6 +19,7 @@ const bodySchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   description: z.string().trim().max(2000).nullable().optional(),
   displayOrder: z.number().int().optional(),
+  reservationsEnabled: z.boolean().optional(),
 })
 
 export default wrapApiHandler(
@@ -48,6 +55,25 @@ export default wrapApiHandler(
       throw error
     }
 
+    // Fermer les réservations d'un groupe qui en a encore est refusé, et c'est délibéré.
+    //
+    // Les masquer en les gardant en base laisserait des gens compter sur du matériel réservé qui
+    // ne s'affiche plus nulle part, sans que rien ne le signale — le pire des deux mondes. Le
+    // refus, lui, se voit et se répare.
+    //
+    // Même règle que la fermeture des échanges de créneaux, et le message dit le nombre : sans
+    // lui, on ne saurait pas l'ampleur de ce qu'il reste à solder.
+    if (data.reservationsEnabled === false) {
+      const actives = await reservationsActivesDuGroupe(groupId)
+      if (fermetureBloqueePar(actives)) {
+        throw createError({
+          status: 409,
+          message: `Ce groupe a encore ${actives} réservation(s). Supprimez-les avant de désactiver les réservations.`,
+          data: { code: FERMETURE_IMPOSSIBLE, reservations: actives },
+        })
+      }
+    }
+
     const group = await prisma.stockGroup.update({
       where: { id: groupId },
       data: {
@@ -56,6 +82,9 @@ export default wrapApiHandler(
           description: data.description?.trim() || null,
         }),
         ...(data.displayOrder !== undefined && { displayOrder: data.displayOrder }),
+        ...(data.reservationsEnabled !== undefined && {
+          reservationsEnabled: data.reservationsEnabled,
+        }),
       },
     })
 

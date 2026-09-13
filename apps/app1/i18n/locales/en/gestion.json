@@ -557,7 +557,10 @@
       "count_view": "Stocktake",
       "export_pdf": "Inventory sheet (PDF)",
       "export_pdf_empty": "No item to export",
-      "export_pdf_summary": "{objets} items · {comptes} counted · {empruntes} borrowed"
+      "export_pdf_summary": "{objets} items · {comptes} counted · {empruntes} borrowed",
+      "group_reservations_label": "Handle reservations",
+      "group_reservations_off_hint": "Equipment in this group is counted and stored, but not reserved. No calendar, no per-period quantities.",
+      "group_reservations_on_hint": "Equipment in this group can be reserved for a period: calendar, available quantities and bulk reservation."
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

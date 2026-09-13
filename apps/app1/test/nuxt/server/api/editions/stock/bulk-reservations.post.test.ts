@@ -54,9 +54,24 @@ describe('POST /api/editions/[id]/stock-reservations/bulk', () => {
     mockValidateReservationLocation.mockResolvedValue(undefined)
     prismaMock.stockItem.findMany.mockReset()
     prismaMock.stockItem.findMany.mockResolvedValue([
-      { id: 10, name: 'Rallonge', quantity: 5 },
-      { id: 11, name: 'Projecteur', quantity: 2 },
-      { id: 12, name: 'Câble', quantity: 10 },
+      {
+        id: 10,
+        name: 'Rallonge',
+        quantity: 5,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
+      {
+        id: 11,
+        name: 'Projecteur',
+        quantity: 2,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
+      {
+        id: 12,
+        name: 'Câble',
+        quantity: 10,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
     ])
     prismaMock.stockReservation.create.mockReset()
     prismaMock.stockReservation.create.mockImplementation(async ({ data }: any) => ({
@@ -89,8 +104,18 @@ describe('POST /api/editions/[id]/stock-reservations/bulk', () => {
     // laquelle.
     // Les objets ont de quoi servir la demande : seule la borne du schéma peut refuser.
     prismaMock.stockItem.findMany.mockResolvedValue([
-      { id: 10, name: 'Rallonge', quantity: 20000 },
-      { id: 11, name: 'Projecteur', quantity: 20000 },
+      {
+        id: 10,
+        name: 'Rallonge',
+        quantity: 20000,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
+      {
+        id: 11,
+        name: 'Projecteur',
+        quantity: 20000,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
     ])
     mockGetReservedQuantityOnPeriod.mockResolvedValue(0)
     global.readBody = vi.fn().mockResolvedValue({
@@ -115,7 +140,14 @@ describe('POST /api/editions/[id]/stock-reservations/bulk', () => {
   })
 
   it("rejette si un item n'appartient pas à l'édition", async () => {
-    prismaMock.stockItem.findMany.mockResolvedValue([{ id: 10, name: 'Rallonge', quantity: 5 }])
+    prismaMock.stockItem.findMany.mockResolvedValue([
+      {
+        id: 10,
+        name: 'Rallonge',
+        quantity: 5,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
+    ])
     await expect(handler(baseEvent as any)).rejects.toThrow(/appartiennent/)
   })
 
@@ -143,7 +175,14 @@ describe('POST /api/editions/[id]/stock-reservations/bulk', () => {
       ...validBody,
       items: [{ id: 11, quantity: 99 }],
     })
-    prismaMock.stockItem.findMany.mockResolvedValue([{ id: 11, name: 'Projecteur', quantity: 2 }])
+    prismaMock.stockItem.findMany.mockResolvedValue([
+      {
+        id: 11,
+        name: 'Projecteur',
+        quantity: 2,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
+    ])
     await expect(handler(baseEvent as any)).rejects.toThrow(/disponibles/)
     expect(prismaMock.stockReservation.create).not.toHaveBeenCalled()
   })
@@ -179,8 +218,18 @@ describe('POST /api/editions/[id]/stock-reservations/bulk', () => {
       ],
     })
     prismaMock.stockItem.findMany.mockResolvedValue([
-      { id: 10, name: 'Rallonge', quantity: 5 },
-      { id: 11, name: 'Projecteur', quantity: 2 },
+      {
+        id: 10,
+        name: 'Rallonge',
+        quantity: 5,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
+      {
+        id: 11,
+        name: 'Projecteur',
+        quantity: 2,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
     ])
     await handler(baseEvent as any)
     expect(prismaMock.stockReservation.create).toHaveBeenCalledTimes(2)
@@ -229,7 +278,14 @@ describe('POST /api/editions/[id]/stock-reservations/bulk', () => {
         { id: 11, quantity: 2 }, // somme = 3 > 2
       ],
     })
-    prismaMock.stockItem.findMany.mockResolvedValue([{ id: 11, name: 'Projecteur', quantity: 2 }])
+    prismaMock.stockItem.findMany.mockResolvedValue([
+      {
+        id: 11,
+        name: 'Projecteur',
+        quantity: 2,
+        group: { id: 7, name: 'Sonorisation', reservationsEnabled: true },
+      },
+    ])
     await expect(handler(baseEvent as any)).rejects.toThrow(/disponibles/)
     expect(prismaMock.stockReservation.create).not.toHaveBeenCalled()
   })

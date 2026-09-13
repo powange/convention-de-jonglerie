@@ -557,7 +557,10 @@
       "count_view": "Optælling",
       "export_pdf": "Inventarliste (PDF)",
       "export_pdf_empty": "Ingen genstand at eksportere",
-      "export_pdf_summary": "{objets} genstande · {comptes} talt · {empruntes} lånt"
+      "export_pdf_summary": "{objets} genstande · {comptes} talt · {empruntes} lånt",
+      "group_reservations_label": "Håndtér reservationer",
+      "group_reservations_off_hint": "Udstyret i denne gruppe tælles og opbevares, men reserveres ikke. Ingen kalender, ingen antal pr. periode.",
+      "group_reservations_on_hint": "Udstyret i denne gruppe kan reserveres for en periode: kalender, ledige antal og masse­reservation."
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

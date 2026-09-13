@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { reservationsOuvertesSur } from '../../../../../app/utils/reservations-du-groupe'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
@@ -99,13 +101,37 @@ export default wrapApiHandler(
       const itemIds = Array.from(requestedByItem.keys())
       const items = await tx.stockItem.findMany({
         where: { id: { in: itemIds }, group: { editionId } },
-        select: { id: true, name: true, quantity: true },
+        // Le réglage du groupe est lu ICI, dans la même requête : un second aller-retour par objet
+        // coûterait autant que la réservation elle-même sur un lot d'une trentaine d'articles.
+        select: {
+          id: true,
+          name: true,
+          quantity: true,
+          group: { select: { name: true, reservationsEnabled: true } },
+        },
         orderBy: { id: 'asc' },
       })
       if (items.length !== itemIds.length) {
         throw createError({
           status: 400,
           message: "Certains objets n'existent pas ou n'appartiennent pas à cette édition",
+        })
+      }
+
+      // Un lot peut traverser plusieurs groupes. On refuse le lot ENTIER dès qu'un seul de ses
+      // groupes ne gère pas les réservations, plutôt que d'en réserver une partie : une réservation
+      // partielle passerait pour un succès, et personne ne saurait ce qui manque.
+      const groupesFermes = [
+        ...new Set(
+          items
+            .filter((item) => !reservationsOuvertesSur(item.group))
+            .map((item) => item.group.name)
+        ),
+      ]
+      if (groupesFermes.length > 0) {
+        throw createError({
+          status: 403,
+          message: `Ces groupes ne gèrent pas les réservations : ${groupesFermes.join(', ')}`,
         })
       }
 

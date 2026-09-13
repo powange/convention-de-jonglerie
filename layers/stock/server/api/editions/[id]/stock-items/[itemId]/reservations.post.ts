@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { exigerReservationsOuvertesPourLObjet } from '../../../../../utils/reservations-ouvertes'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
@@ -61,6 +63,10 @@ export default wrapApiHandler(
     if (!(await canAccessStock(edition, user))) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }
+
+    // Le groupe doit gérer les réservations. Le filtre est ici, et non seulement à l'écran : un
+    // réglage qui promet de cacher et ne cache qu'à l'affichage est pire qu'un réglage absent.
+    await exigerReservationsOuvertesPourLObjet(itemId, editionId)
 
     const item = await prisma.stockItem.findFirst({
       where: { id: itemId, group: { editionId } },

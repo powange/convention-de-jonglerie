@@ -13,6 +13,9 @@ const bodySchema = z.object({
   name: z.string().trim().min(1, 'Le nom est requis').max(120),
   description: z.string().trim().max(2000).nullable().optional(),
   displayOrder: z.number().int().optional(),
+  // Le défaut du schéma Prisma est `false` : un groupe créé sans rien dire ne gère pas les
+  // réservations. Le champ n'est là que pour l'écran, qui peut cocher la case dès la création.
+  reservationsEnabled: z.boolean().optional(),
 })
 
 /**
@@ -59,6 +62,10 @@ export default wrapApiHandler(
         name: data.name,
         description: data.description?.trim() || null,
         displayOrder,
+        // Absent du corps : la colonne retombe sur son défaut, `false`.
+        ...(data.reservationsEnabled !== undefined && {
+          reservationsEnabled: data.reservationsEnabled,
+        }),
       },
     })
 

@@ -453,7 +453,7 @@
       </UCard>
 
       <StockPlanning
-        v-else-if="viewMode === 'planning'"
+        v-else-if="viewMode === 'planning' && reservationsOuvertes"
         :items="planningItems"
         :start-date="planningStartDate"
         :end-date="planningEndDate"
@@ -612,7 +612,7 @@
     />
 
     <StockBulkReservationModal
-      v-if="group && bulkModalItems.length"
+      v-if="group && reservationsOuvertes && bulkModalItems.length"
       v-model:open="bulkModalOpen"
       :edition-id="editionId"
       :items="bulkModalItems"
@@ -642,6 +642,7 @@
             {{ $t('gestion.stock.selected_count', { count: identifiantsSelectionnes.length }) }}
           </span>
           <UButton
+            v-if="reservationsOuvertes"
             color="primary"
             size="sm"
             icon="i-heroicons-plus"
@@ -869,11 +870,17 @@ const colonnes = computed((): TableColumn<any>[] => [
     enableSorting: false,
     header: () => t('gestion.stock.item_current_location'),
   },
-  {
-    id: 'reservations',
-    accessorFn: (item: any) => item._count.reservations,
-    header: ({ column }) => enTeteTriable(column, t('gestion.stock.reservations_title')),
-  },
+  // La colonne des réservations n'a de sens que si le groupe en gère : ailleurs, elle afficherait
+  // une colonne de zéros, et le menu « Colonnes » la proposerait encore.
+  ...(reservationsOuvertes.value
+    ? [
+        {
+          id: 'reservations',
+          accessorFn: (item: any) => item._count.reservations,
+          header: ({ column }: any) => enTeteTriable(column, t('gestion.stock.reservations_title')),
+        },
+      ]
+    : []),
   // Ouvrir la fiche devient un geste explicite : la ligne entière servait de lien, et l'on
   // atterrissait sur la fiche en voulant cocher une case ou poser un tag.
   {
@@ -1078,6 +1085,8 @@ interface StockGroupItem {
   name: string
   description: string | null
   displayOrder: number
+  /** Ce groupe gère-t-il les réservations ? Absent sur une réponse antérieure au réglage. */
+  reservationsEnabled?: boolean | null
   items: StockItem[]
 }
 
@@ -1134,6 +1143,17 @@ const planningItems = ref<PlanningItem[]>([])
 const planningLoading = ref(false)
 
 const edition = computed(() => editionStore.getEditionById(editionId))
+/**
+ * Ce groupe gère-t-il les réservations&nbsp;?
+ *
+ * ⚠️ Ce calcul ne PROTÈGE rien : les endpoints refusent déjà. Il sert à rendre l'écran cohérent
+ * avec ce que le serveur a décidé — proposer un bouton qui rend un 403 est pire que ne rien
+ * proposer.
+ *
+ * `=== true` et non `!== false` : l'absence vaut « désactivé », le choix le plus prudent.
+ */
+const reservationsOuvertes = computed(() => group.value?.reservationsEnabled === true)
+
 const group = computed<StockGroupItem | null>(
   () => allGroups.value.find((g) => g.id === groupId.value) || null
 )
@@ -1422,12 +1442,24 @@ const viewModeItems = computed(() => [
         },
       ]
     : []),
-  {
-    label: t('gestion.stock.planning_view'),
-    value: 'planning',
-    icon: 'i-heroicons-calendar-days',
-  },
+  // Le planning ne montre que des réservations : sur un groupe qui n'en gère pas, il n'aurait
+  // rien à afficher. Le proposer quand même laisserait croire à un écran cassé.
+  ...(reservationsOuvertes.value
+    ? [
+        {
+          label: t('gestion.stock.planning_view'),
+          value: 'planning',
+          icon: 'i-heroicons-calendar-days',
+        },
+      ]
+    : []),
 ])
+
+// Un groupe dont on ferme les réservations pendant qu'on le regarde laisserait l'écran sur une vue
+// qui n'existe plus. On le ramène à la liste plutôt que de le laisser devant du vide.
+watch(reservationsOuvertes, (ouvertes) => {
+  if (!ouvertes && viewMode.value === 'planning') viewMode.value = 'list'
+})
 
 // Périmètre temporel : montage → démontage si défini, sinon édition seule
 const planningStartDate = computed<string | null>(() => {

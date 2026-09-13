@@ -20,6 +20,24 @@
             class="w-full"
           />
         </UFormField>
+
+        <!-- Tout le matériel ne se réserve pas : un groupe « consommables » ou « décoration » n'a
+             que faire d'un calendrier et de quantités disponibles par période. -->
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="font-medium text-gray-900 dark:text-white">
+              {{ $t('gestion.stock.group_reservations_label') }}
+            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {{
+                formData.reservationsEnabled
+                  ? $t('gestion.stock.group_reservations_on_hint')
+                  : $t('gestion.stock.group_reservations_off_hint')
+              }}
+            </p>
+          </div>
+          <USwitch v-model="formData.reservationsEnabled" :disabled="saving" />
+        </div>
       </form>
     </template>
     <template #footer>
@@ -53,6 +71,7 @@ interface StockGroupItem {
   id: number
   name: string
   description: string | null
+  reservationsEnabled?: boolean | null
 }
 
 const props = defineProps<{
@@ -73,7 +92,12 @@ const isOpen = computed({
   set: (v) => emit('update:open', v),
 })
 
-const formData = reactive<{ name: string; description: string }>({ name: '', description: '' })
+const formData = reactive<{ name: string; description: string; reservationsEnabled: boolean }>({
+  name: '',
+  description: '',
+  // Décoché pour un groupe neuf, comme le défaut du schéma : tout le matériel ne se réserve pas.
+  reservationsEnabled: false,
+})
 const fieldErrors = ref<Record<string, string>>({})
 const saving = ref(false)
 const deleting = ref(false)
@@ -88,6 +112,7 @@ watch(
     if (open) {
       formData.name = props.group?.name || ''
       formData.description = props.group?.description || ''
+      formData.reservationsEnabled = props.group?.reservationsEnabled === true
       resetFieldErrors()
     }
   },
@@ -117,6 +142,7 @@ async function handleSubmit() {
     const body = {
       name: formData.name.trim(),
       description: formData.description.trim() || null,
+      reservationsEnabled: formData.reservationsEnabled,
     }
     if (props.group) {
       await $fetch(`/api/editions/${props.editionId}/stock-groups/${props.group.id}`, {

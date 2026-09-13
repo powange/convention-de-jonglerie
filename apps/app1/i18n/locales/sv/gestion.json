@@ -557,7 +557,10 @@
       "count_view": "Inventering",
       "export_pdf": "Inventarielista (PDF)",
       "export_pdf_empty": "Inget föremål att exportera",
-      "export_pdf_summary": "{objets} föremål · {comptes} räknade · {empruntes} lånade"
+      "export_pdf_summary": "{objets} föremål · {comptes} räknade · {empruntes} lånade",
+      "group_reservations_label": "Hantera bokningar",
+      "group_reservations_off_hint": "Utrustningen i den här gruppen räknas och förvaras, men bokas inte. Ingen kalender, inga antal per period.",
+      "group_reservations_on_hint": "Utrustningen i den här gruppen kan bokas för en period: kalender, tillgängliga antal och massbokning."
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

@@ -557,7 +557,10 @@
       "count_view": "Recuento",
       "export_pdf": "Ficha de inventario (PDF)",
       "export_pdf_empty": "Ningún objeto que exportar",
-      "export_pdf_summary": "{objets} objetos · {comptes} contados · {empruntes} prestados"
+      "export_pdf_summary": "{objets} objetos · {comptes} contados · {empruntes} prestados",
+      "group_reservations_label": "Gestionar las reservas",
+      "group_reservations_off_hint": "El material de este grupo se cuenta y se guarda, pero no se reserva. Sin calendario, sin cantidades por periodo.",
+      "group_reservations_on_hint": "El material de este grupo puede reservarse por un periodo: calendario, cantidades disponibles y reserva en bloque."
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",
