@@ -125,6 +125,8 @@ export const prismaMock = {
   stockGroup: createModelMock(),
   stockItem: createModelMock(),
   stockReservation: createModelMock(),
+  stockShoppingList: createModelMock(),
+  stockShoppingListItem: createModelMock(),
 
   // Modèle FAQ
   faqEntry: createModelMock(),

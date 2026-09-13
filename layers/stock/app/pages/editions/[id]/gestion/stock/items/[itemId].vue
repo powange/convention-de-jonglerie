@@ -379,6 +379,7 @@
 import { useAuthStore, useEditionStore } from '#imports'
 
 import { apparenceEmplacement } from '../../../../../../utils/apparence-emplacement'
+import { peutGererLeStock } from '../../../../../../utils/droits-stock'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -469,23 +470,9 @@ const loading = ref(true)
 
 const edition = computed(() => editionStore.getEditionById(editionId))
 
-const canManage = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  const userId = authStore.user.id
-  if (authStore.isAdminModeActive) return true
-  if (edition.value.creatorId === userId) return true
-  if (edition.value.convention?.authorId === userId) return true
-  const organizers = edition.value.convention?.organizers || []
-  return organizers.some((collab: any) => {
-    if (collab.user?.id !== userId) return false
-    if (collab.rights?.manageStock || collab.rights?.editConvention) return true
-    if (collab.perEditionRights) {
-      const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
-      if (per?.canManageStock || per?.canEdit) return true
-    }
-    return false
-  })
-})
+const canManage = computed(() =>
+  peutGererLeStock(edition.value as any, authStore.user?.id, authStore.isAdminModeActive)
+)
 
 const availabilityColor = computed<'success' | 'warning' | 'error' | 'neutral'>(() => {
   if (!availability.value) return 'neutral'
