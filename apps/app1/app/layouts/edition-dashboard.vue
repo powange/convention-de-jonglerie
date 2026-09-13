@@ -286,7 +286,7 @@ function pastilleMenu(...cles: string[]) {
 
 /** Les compteurs de chaque module, groupés par entrée de menu. La source du cumul des parents. */
 const COMPTEURS_PAR_ENTREE: Record<string, string[]> = {
-  stock: ['stock-emprunts'],
+  stock: ['stock-emprunts', 'stock-courses'],
   volunteers: ['benevoles-candidatures', 'benevoles-echanges'],
   artists: ['appels-spectacles'],
 }
@@ -760,6 +760,17 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           // La pastille ne s'allume que sur du retard : c'est la seule chose qui justifie
           // d'interrompre ce qu'on fait. Voir `pastille-navigation` pour la règle.
           ...pastilleMenu('stock-emprunts'),
+        },
+        {
+          // Comme les emprunts, cette page traverse les groupes : ce qu'on rachète ne se décide
+          // pas caisse par caisse.
+          label: t('gestion.stock.missing_title'),
+          icon: 'i-heroicons-shopping-cart',
+          to: `/editions/${editionId.value}/gestion/stock/missing`,
+          // La pastille compte les listes de courses NON TERMINÉES, et non ce qui manque : un
+          // manque reste tant que personne n'a racheté, elle serait allumée toute l'année. Une
+          // liste qu'on a créée, en revanche, est un engagement qu'on a pris et qui se referme.
+          ...pastilleMenu('stock-courses'),
         },
       ],
     })

@@ -702,6 +702,7 @@ import {
   resumeComptage,
   type LigneComptage,
 } from '../../../../../utils/comptage-stock'
+import { peutGererLeStock } from '../../../../../utils/droits-stock'
 import {
   ETATS_EMPRUNT,
   etatEmprunt,
@@ -865,11 +866,18 @@ const colonnes = computed((): TableColumn<any>[] => [
     accessorFn: (item: any) => libelleEmplacement(emplacementDe(item)),
     header: ({ column }) => enTeteTriable(column, t('gestion.stock.item_storage_location')),
   },
-  {
-    id: 'current',
-    enableSorting: false,
-    header: () => t('gestion.stock.item_current_location'),
-  },
+  // « Emplacement actuel » ne dit qu'une chose : où le matériel se trouve PENDANT une réservation,
+  // avant de regagner son rangement. Sans réservations, la colonne est structurellement vide — et
+  // une colonne vide se lit comme une donnée manquante, pas comme une notion sans objet ici.
+  ...(reservationsOuvertes.value
+    ? [
+        {
+          id: 'current',
+          enableSorting: false,
+          header: () => t('gestion.stock.item_current_location'),
+        },
+      ]
+    : []),
   // La colonne des réservations n'a de sens que si le groupe en gère : ailleurs, elle afficherait
   // une colonne de zéros, et le menu « Colonnes » la proposerait encore.
   ...(reservationsOuvertes.value
@@ -1167,23 +1175,9 @@ useSeoMeta({
       : t('gestion.stock.title'),
 })
 
-const canManage = computed(() => {
-  if (!edition.value || !authStore.user?.id) return false
-  const userId = authStore.user.id
-  if (authStore.isAdminModeActive) return true
-  if (edition.value.creatorId === userId) return true
-  if (edition.value.convention?.authorId === userId) return true
-  const organizers = edition.value.convention?.organizers || []
-  return organizers.some((collab: any) => {
-    if (collab.user?.id !== userId) return false
-    if (collab.rights?.manageStock || collab.rights?.editConvention) return true
-    if (collab.perEditionRights) {
-      const per = collab.perEditionRights.find((r: any) => r.editionId === edition.value!.id)
-      if (per?.canManageStock || per?.canEdit) return true
-    }
-    return false
-  })
-})
+const canManage = computed(() =>
+  peutGererLeStock(edition.value as any, authStore.user?.id, authStore.isAdminModeActive)
+)
 
 async function fetchAll() {
   try {

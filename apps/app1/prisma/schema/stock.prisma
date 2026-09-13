@@ -76,11 +76,12 @@ model StockItem {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  group        StockGroup           @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
-  zone         EditionZone?         @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-  marker       EditionMarker?       @relation(fields: [markerId], references: [id], onDelete: SetNull)
-  reservations StockReservation[]
-  tags         StockTagAssignment[]
+  group         StockGroup              @relation(fields: [stockGroupId], references: [id], onDelete: Cascade)
+  zone          EditionZone?            @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  marker        EditionMarker?          @relation(fields: [markerId], references: [id], onDelete: SetNull)
+  reservations  StockReservation[]
+  tags          StockTagAssignment[]
+  shoppingLists StockShoppingListItem[]
 
   pickupResponsible User? @relation("StockPickupResponsible", fields: [pickupResponsibleId], references: [id], onDelete: SetNull)
   returnResponsible User? @relation("StockReturnResponsible", fields: [returnResponsibleId], references: [id], onDelete: SetNull)
@@ -164,4 +165,54 @@ model StockTagAssignment {
   @@unique([stockItemId, tagId])
   @@index([stockItemId])
   @@index([tagId])
+}
+
+/**
+ * Une liste de courses : ce qu'il faut racheter après une édition.
+ * Le recomptage de fin d'édition dit ce qui manque, mais ne dit pas quoi en faire. Racheter se
+ * décide en plusieurs fois et pour plusieurs endroits — la quincaillerie, le magasin de jonglerie,
+ * la commande en ligne —, d'où PLUSIEURS listes nommées par édition plutôt qu'un seul inventaire
+ * des manques, qui ne se découpe pas.
+ * Rattachée à l'ÉDITION, comme `StockTag` : le matériel l'est, et une liste qui traverserait les
+ * éditions mélangerait des inventaires sans rapport.
+ */
+model StockShoppingList {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition                 @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  items   StockShoppingListItem[]
+
+  @@index([editionId])
+}
+
+/**
+ * Un article d'une liste de courses, qui pointe vers du matériel du stock.
+ * ⚠️ Le lien est VIVANT, et c'est un choix : renommer l'objet met la liste à jour, et la quantité
+ * à racheter suit l'écart courant du recomptage plutôt que d'être figée à l'ajout. Deux
+ * conséquences assumées : supprimer l'objet du stock retire l'article des listes (cascade), et un
+ * recomptage postérieur modifie une liste déjà imprimée.
+ * Il n'y a donc pas de nom ni de quantité stockés ici : les dupliquer inviterait à les laisser
+ * diverger de la fiche, et c'est précisément ce que le lien vivant refuse.
+ * `purchased` est la seule chose que l'article porte en propre — ce qui distingue une liste de
+ * courses d'un simple export : on coche au fur et à mesure, et la liste montre ce qui reste.
+ */
+model StockShoppingListItem {
+  id          Int      @id @default(autoincrement())
+  listId      Int
+  stockItemId Int
+  purchased   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  list StockShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  item StockItem         @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+
+  // Un même objet ne s'ajoute pas deux fois à la même liste : deux lignes identiques se cocheraient
+  // séparément et feraient douter de ce qui reste à acheter.
+  @@unique([listId, stockItemId])
+  @@index([listId])
+  @@index([stockItemId])
 }

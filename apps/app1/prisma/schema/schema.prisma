@@ -282,6 +282,7 @@ model Edition {
   taskGroups                       TaskGroup[]
   stockGroups                      StockGroup[]
   stockTags                        StockTag[]
+  stockShoppingLists               StockShoppingList[]
   faqEntries                       FaqEntry[]
 
   @@index([creatorId], map: "Edition_creatorId_fkey")
