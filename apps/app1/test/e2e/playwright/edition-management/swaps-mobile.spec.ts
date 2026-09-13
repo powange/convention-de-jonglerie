@@ -133,6 +133,20 @@ test.describe.serial('Échange de créneaux — rendu mobile', () => {
     statutInitial = await getEditionStatus(page, String(editionId))
     await setEditionStatus(page, String(editionId), 'PUBLISHED')
 
+    // Le planning doit être PUBLIÉ, sans quoi les endpoints d'échange refusent : un bénévole qui
+    // ne connaît pas son créneau n'a rien à échanger. Le défaut d'une édition neuve est « non
+    // publié », et ce parcours part justement d'une édition neuve.
+    //
+    // Vérifié plutôt que supposé : sans cette assertion, l'oubli se manifesterait cent cinquante
+    // lignes plus bas par une page d'échange vide — exactement le symptôme lointain que l'en-tête
+    // de ce fichier reproche à sa première version.
+    const publication = await apiPatch(
+      page,
+      `${BASE}/api/editions/${editionId}/volunteers/settings`,
+      { data: { planningPublished: true } }
+    )
+    expect(publication.ok(), `publication du planning : ${await publication.text()}`).toBe(true)
+
     const equipe = await apiPost(page, `${BASE}/api/editions/${editionId}/volunteer-teams`, {
       data: { name: `Échanges ${SUFFIXE}`, color: '#8855FF' },
     })
