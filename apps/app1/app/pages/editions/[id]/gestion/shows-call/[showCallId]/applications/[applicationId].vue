@@ -1176,6 +1176,14 @@ const { execute: executeUpdateStatus, loading: updatingStatusFromAction } = useA
       } else if (application.value) {
         application.value = { ...application.value, status: pendingStatus.value }
       }
+
+      // Trancher une candidature change ce que la pastille du menu compte. Sans ce rappel, elle
+      // resterait sur sa valeur d'arrivée jusqu'au prochain chargement de page.
+      //
+      // `rafraichirCompteurs` et non le rafraîchissement complet : celui-ci prend la liste de tout
+      // ce qui est visible et EFFACE le reste, donc s'en servir pour viser un seul compteur
+      // éteindrait ceux des autres modules.
+      rafraichirCompteurs('appels-spectacles')
     },
   }
 )

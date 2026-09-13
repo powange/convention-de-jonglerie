@@ -288,6 +288,7 @@ function pastilleMenu(...cles: string[]) {
 const COMPTEURS_PAR_ENTREE: Record<string, string[]> = {
   stock: ['stock-emprunts'],
   volunteers: ['benevoles-candidatures', 'benevoles-echanges'],
+  artists: ['appels-spectacles'],
 }
 
 /**
@@ -302,6 +303,13 @@ const compteursVisibles = computed(() => {
   const cles: string[] = []
   if (edition.value?.stockEnabled && canAccessStock.value) {
     cles.push(...(COMPTEURS_PAR_ENTREE.stock ?? []))
+  }
+
+  // Le compteur des appels à spectacles exige le droit de gérer les artistes, exactement comme
+  // l'entrée à laquelle il pend. L'interroger sans ce droit vaudrait un 403 à chaque ouverture
+  // d'édition, pour quelqu'un qui n'a rien demandé.
+  if (edition.value?.artistsEnabled && canManageArtists.value) {
+    cles.push(...(COMPTEURS_PAR_ENTREE.artists ?? []))
   }
 
   // Les deux compteurs bénévoles exigent la gestion et le mode interne, comme les entrées
@@ -583,6 +591,10 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
         label: t('gestion.shows_call.title'),
         icon: 'i-heroicons-megaphone',
         to: `/editions/${editionId.value}/gestion/shows-call`,
+        // Les candidatures en attente, tous appels confondus : une édition en ouvre souvent
+        // plusieurs, et les parcourir un à un pour savoir s'il reste à trancher est justement le
+        // travail que cette pastille supprime.
+        ...pastilleMenu('appels-spectacles'),
       },
       {
         label: t('gestion.artists.notifications.title'),
@@ -597,6 +609,9 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       children: artistsChildren,
       value: 'artists',
       popover: {},
+      // Repliée, la catégorie cache ses entrées : sans cumul on n'apprendrait qu'en dépliant
+      // qu'il y avait quelque chose à voir.
+      ...pastilleMenu(...(COMPTEURS_PAR_ENTREE.artists ?? [])),
     })
   }
 
