@@ -67,8 +67,6 @@
       "balance_teams": "Vyrovnat zátěž mezi dobrovolníky",
       "balance_teams_help": "Přibližuje nejvytíženější dobrovolníky průměru tím, že část jejich směn převádí na méně vytížené",
       "beta_badge": "BETA",
-      "confirm_apply": "Jste si jisti, že chcete tyto úkoly použít? Nahradí to všechna stávající přiřazení.",
-      "confirm_apply_keep_existing": "Jste si jisti, že chcete tyto úkoly použít? Nová přiřazení se přidají ke stávajícím.",
       "confirm_details": "Tato akce vytvoří {count} nových přiřazení.",
       "description": "Algoritmus automatického přiřazování inteligentně rozděluje dobrovolníky do časových intervalů podle jejich preferencí, jejich dostupnosti a vašich organizačních omezení.",
       "hours_per_day": "Hodiny za den",
@@ -120,7 +118,47 @@
       "undo_outdated": "Mezitím byl použit jiný výpočet: vrací se už jiný. Načtěte stránku znovu.",
       "undo_nothing": "Žádný výpočet k vrácení",
       "preview_outdated": "Rozvrh se od tohoto náhledu změnil: před použitím spusťte výpočet znovu.",
-      "preview_gone": "Tento náhled už není k dispozici: spusťte výpočet znovu."
+      "preview_gone": "Tento náhled už není k dispozici: spusťte výpočet znovu.",
+      "confirm_title": "Použít tento výpočet?",
+      "confirm_apply_replace_all": "Všechna přiřazení ročníku budou před zapsáním tohoto plánu smazána, včetně těch zadaných ručně.",
+      "confirm_apply_keep_manual": "Dobrovolníci zadaní ručně zůstávají. Znovu se dělají jen přiřazení z předchozího výpočtu.",
+      "confirm_apply_keep_all": "Nic se nemaže: výpočet jen doplní dosud volná místa.",
+      "deletions_title": "Bude smazáno {count} přiřazení",
+      "deletions_manual_warning": "Z toho {count} zadaných ručně: nic je neobnoví.",
+      "deletion_manual": "zadáno ručně",
+      "warning": {
+        "unassigned_volunteers": "{count} dobrovolníků bez jediné směny",
+        "unassigned_slots": "{count} neúplných směn"
+      },
+      "recommendation": {
+        "adjust_constraints": "Nalezená přiřazení jsou slabá: uvolnění jednoho omezení by dalo lepší výsledky.",
+        "more_slots_or_fewer_volunteers": "Dobrovolníků je víc než hodin k obsazení: přidejte směny, nebo počítejte s tím, že někteří žádnou nedostanou."
+      },
+      "motif": {
+        "indisponible": "v této fázi nedostupný",
+        "absent": "ještě nedorazil nebo už odjel",
+        "equipe_non_souhaitee": "tým si nepřál",
+        "hors_equipe_assignee": "mimo své týmy",
+        "hors_plage_horaire": "mimo preferované hodiny",
+        "plafond_journalier": "den už plný",
+        "chevauchement": "v tu dobu už obsazen",
+        "acces_spectacle": "připravilo by ho o poslední představení",
+        "plafond_heures": "už dosáhl maxima hodin"
+      },
+      "motif_compte": {
+        "indisponible": "{count} vyřazeno: v této fázi nedostupní",
+        "absent": "{count} vyřazeno: v tento den nepřítomni",
+        "equipe_non_souhaitee": "{count} vyřazeno: tým si nepřáli",
+        "hors_equipe_assignee": "{count} vyřazeno: mimo své týmy",
+        "hors_plage_horaire": "{count} vyřazeno: mimo své hodiny",
+        "plafond_journalier": "{count} vyřazeno: den už plný",
+        "chevauchement": "{count} vyřazeno: v tu dobu obsazeni",
+        "acces_spectacle": "{count} vyřazeno: připravilo by je o představení",
+        "plafond_heures": "{count} vyřazeno: maximum hodin dosaženo"
+      },
+      "slot_not_found": "Směna {id} (nenalezena)",
+      "slot_without_title": "Směna bez názvu",
+      "team_fallback": "Tým {id}"
     },
     "autonomous_team": "Samostatný tým",
     "autonomous_team_badge": "Samostatný",

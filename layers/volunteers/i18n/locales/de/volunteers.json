@@ -67,8 +67,6 @@
       "balance_teams": "Arbeitslast unter Freiwilligen ausgleichen",
       "balance_teams_help": "Nähert die am stärksten belasteten Freiwilligen dem Durchschnitt an, indem einzelne Schichten an weniger ausgelastete abgegeben werden",
       "beta_badge": "BETA",
-      "confirm_apply": "Sind Sie sicher, dass Sie diese Zuweisungen anwenden möchten? Dies wird alle bestehenden Zuweisungen ersetzen.",
-      "confirm_apply_keep_existing": "Sind Sie sicher, dass Sie diese Zuweisungen anwenden möchten? Neue Zuweisungen werden zu bestehenden hinzugefügt.",
       "confirm_details": "Diese Aktion erstellt {count} neue Zuteilung(en).",
       "description": "Der automatische Zuweisungsalgorithmus verteilt Freiwillige intelligent auf Zeitfenster unter Berücksichtigung ihrer Präferenzen, Verfügbarkeit und Ihrer organisatorischen Einschränkungen.",
       "hours_per_day": "Stunden pro Tag",
@@ -120,7 +118,47 @@
       "undo_outdated": "Seitdem wurde eine andere Berechnung angewendet: Es ist nicht mehr diese, die rückgängig gemacht wird. Bitte lade die Seite neu.",
       "undo_nothing": "Keine Berechnung zum Rückgängigmachen",
       "preview_outdated": "Der Plan hat sich seit dieser Vorschau geändert: Führe die Berechnung erneut aus, bevor du sie anwendest.",
-      "preview_gone": "Diese Vorschau ist nicht mehr verfügbar: Führe die Berechnung erneut aus."
+      "preview_gone": "Diese Vorschau ist nicht mehr verfügbar: Führe die Berechnung erneut aus.",
+      "confirm_title": "Diese Berechnung anwenden?",
+      "confirm_apply_replace_all": "Alle Zuteilungen der Ausgabe werden vor dem Schreiben dieses Plans gelöscht, auch die von Hand gesetzten.",
+      "confirm_apply_keep_manual": "Die von Hand gesetzten Helfer bleiben. Nur Zuteilungen aus einer früheren Berechnung werden neu gemacht.",
+      "confirm_apply_keep_all": "Nichts wird gelöscht: die Berechnung füllt nur die noch freien Plätze.",
+      "deletions_title": "{count} Zuteilung(en) werden gelöscht",
+      "deletions_manual_warning": "Davon {count} von Hand gesetzt: nichts kann sie wiederherstellen.",
+      "deletion_manual": "von Hand gesetzt",
+      "warning": {
+        "unassigned_volunteers": "{count} Helfer ohne jeden Einsatz",
+        "unassigned_slots": "{count} unvollständige(r) Einsatz/Einsätze"
+      },
+      "recommendation": {
+        "adjust_constraints": "Die gefundenen Zuteilungen sind wenig befriedigend: eine gelockerte Vorgabe brächte bessere Ergebnisse.",
+        "more_slots_or_fewer_volunteers": "Es gibt mehr Helfer als zu besetzende Stunden: füge Einsätze hinzu, oder rechne damit, dass einige leer ausgehen."
+      },
+      "motif": {
+        "indisponible": "in dieser Phase nicht verfügbar",
+        "absent": "noch nicht da oder schon abgereist",
+        "equipe_non_souhaitee": "Team nicht gewünscht",
+        "hors_equipe_assignee": "außerhalb seiner Teams",
+        "hors_plage_horaire": "außerhalb der gewünschten Zeiten",
+        "plafond_journalier": "Tag bereits voll",
+        "chevauchement": "zur selben Zeit schon eingeteilt",
+        "acces_spectacle": "würde ihn die letzte Vorstellung kosten",
+        "plafond_heures": "Stundenmaximum bereits erreicht"
+      },
+      "motif_compte": {
+        "indisponible": "{count} ausgeschlossen: in dieser Phase nicht verfügbar",
+        "absent": "{count} ausgeschlossen: an diesem Datum abwesend",
+        "equipe_non_souhaitee": "{count} ausgeschlossen: Team nicht gewünscht",
+        "hors_equipe_assignee": "{count} ausgeschlossen: außerhalb ihrer Teams",
+        "hors_plage_horaire": "{count} ausgeschlossen: außerhalb ihrer Zeiten",
+        "plafond_journalier": "{count} ausgeschlossen: Tag bereits voll",
+        "chevauchement": "{count} ausgeschlossen: zur selben Zeit eingeteilt",
+        "acces_spectacle": "{count} ausgeschlossen: würde sie eine Show kosten",
+        "plafond_heures": "{count} ausgeschlossen: Stundenmaximum erreicht"
+      },
+      "slot_not_found": "Einsatz {id} (nicht gefunden)",
+      "slot_without_title": "Einsatz ohne Titel",
+      "team_fallback": "Team {id}"
     },
     "autonomous_team": "Eigenständiges Team",
     "autonomous_team_badge": "Eigenständig",

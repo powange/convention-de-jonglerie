@@ -67,8 +67,6 @@
       "balance_teams": "Fordel arbejdsbyrden mellem frivillige",
       "balance_teams_help": "Bringer de mest belastede frivillige tættere på gennemsnittet ved at flytte nogle af deres vagter til dem med færre timer",
       "beta_badge": "BETA",
-      "confirm_apply": "Er du sikker på, at du vil anvende disse opgaver? Dette vil erstatte alle eksisterende opgaver.",
-      "confirm_apply_keep_existing": "Er du sikker på, at du vil anvende disse tildelinger? Nye tildelinger vil blive tilføjet til eksisterende.",
       "confirm_details": "Denne handling vil oprette {count} ny(e) tildeling(er).",
       "description": "Den automatiske opgavealgoritme fordeler intelligent frivillige i tidslukker under respekt for deres præferencer, tilgængelighed og dine organisatoriske begrænsninger.",
       "hours_per_day": "Timer per dag",
@@ -120,7 +118,47 @@
       "undo_outdated": "Der er anvendt en anden beregning siden: det er ikke længere denne, der fortrydes. Genindlæs siden.",
       "undo_nothing": "Ingen beregning at fortryde",
       "preview_outdated": "Planen har ændret sig siden denne forhåndsvisning: kør beregningen igen, før du anvender den.",
-      "preview_gone": "Denne forhåndsvisning er ikke længere tilgængelig: kør beregningen igen."
+      "preview_gone": "Denne forhåndsvisning er ikke længere tilgængelig: kør beregningen igen.",
+      "confirm_title": "Anvend denne beregning?",
+      "confirm_apply_replace_all": "Alle tildelinger i udgaven slettes, før denne plan skrives — også dem, du har sat i hånden.",
+      "confirm_apply_keep_manual": "De frivillige, du har placeret i hånden, bliver stående. Kun tildelinger fra en tidligere beregning laves om.",
+      "confirm_apply_keep_all": "Intet slettes: beregningen udfylder kun de pladser, der stadig er ledige.",
+      "deletions_title": "{count} tildeling(er) bliver slettet",
+      "deletions_manual_warning": "Heraf {count} sat i hånden: intet kan genskabe dem.",
+      "deletion_manual": "sat i hånden",
+      "warning": {
+        "unassigned_volunteers": "{count} frivillig(e) uden nogen vagt",
+        "unassigned_slots": "{count} ufuldstændig(e) vagt(er)"
+      },
+      "recommendation": {
+        "adjust_constraints": "De fundne tildelinger er svage: at lempe en betingelse ville give bedre resultater.",
+        "more_slots_or_fewer_volunteers": "Der er flere frivillige end timer at dække: tilføj vagter, eller regn med at nogle ingen får."
+      },
+      "motif": {
+        "indisponible": "ikke til rådighed i denne fase",
+        "absent": "ikke ankommet endnu eller allerede rejst",
+        "equipe_non_souhaitee": "team ikke ønsket",
+        "hors_equipe_assignee": "uden for sine teams",
+        "hors_plage_horaire": "uden for de ønskede tider",
+        "plafond_journalier": "dagen er allerede fuld",
+        "chevauchement": "allerede optaget på det tidspunkt",
+        "acces_spectacle": "ville koste vedkommende den sidste forestilling",
+        "plafond_heures": "har allerede nået sit timemaksimum"
+      },
+      "motif_compte": {
+        "indisponible": "{count} valgt fra: ikke til rådighed i denne fase",
+        "absent": "{count} valgt fra: fraværende den dag",
+        "equipe_non_souhaitee": "{count} valgt fra: team ikke ønsket",
+        "hors_equipe_assignee": "{count} valgt fra: uden for deres teams",
+        "hors_plage_horaire": "{count} valgt fra: uden for deres tider",
+        "plafond_journalier": "{count} valgt fra: dagen er fuld",
+        "chevauchement": "{count} valgt fra: optaget på det tidspunkt",
+        "acces_spectacle": "{count} valgt fra: ville koste dem en forestilling",
+        "plafond_heures": "{count} valgt fra: timemaksimum nået"
+      },
+      "slot_not_found": "Vagt {id} (ikke fundet)",
+      "slot_without_title": "Vagt uden titel",
+      "team_fallback": "Team {id}"
     },
     "autonomous_team": "Selvstyrende hold",
     "autonomous_team_badge": "Selvstyrende",

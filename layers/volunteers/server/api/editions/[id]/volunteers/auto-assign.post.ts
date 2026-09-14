@@ -533,6 +533,45 @@ export default wrapApiHandler(
     }
 
     /**
+     * Ce que l'application effacerait, montré AVANT de le faire.
+     *
+     * L'aperçu listait ce qui serait créé, les statistiques et les non-assignés — jamais ce qui
+     * serait détruit. En mode « tout effacer », c'était pourtant l'information la plus importante
+     * de l'écran, et la seule absente.
+     *
+     * Relevé uniquement pour l'aperçu : l'application, elle, consigne déjà ce qu'elle efface dans
+     * son journal.
+     */
+    let suppressionsPrevues: {
+      timeSlotId: string
+      userId: number
+      source: string
+      pseudo: string | null
+    }[] = []
+
+    if (body.applyAssignments !== true && mode !== 'keep-all') {
+      const aEffacer = await prisma.volunteerAssignment.findMany({
+        where: {
+          timeSlotId: { in: perimetre.creneaux },
+          ...(mode === 'keep-manual' ? { source: 'AUTO' as const } : {}),
+        },
+        select: {
+          timeSlotId: true,
+          userId: true,
+          source: true,
+          user: { select: { pseudo: true } },
+        },
+      })
+
+      suppressionsPrevues = aEffacer.map((affectation) => ({
+        timeSlotId: affectation.timeSlotId,
+        userId: affectation.userId,
+        source: affectation.source,
+        pseudo: affectation.user?.pseudo ?? null,
+      }))
+    }
+
+    /**
      * Un aperçu se conserve, pour que l'application puisse écrire exactement ce qui a été montré.
      * L'identifiant revient au client, qui le renverra en appliquant.
      */
@@ -561,6 +600,8 @@ export default wrapApiHandler(
       journalId,
       // L'identifiant de l'aperçu : à renvoyer pour appliquer exactement ce plan-ci.
       planId,
+      // Ce que l'application effacerait : à montrer avant, pas à découvrir après.
+      suppressionsPrevues,
     })
   },
   { operationName: 'AutoAssignVolunteers' }

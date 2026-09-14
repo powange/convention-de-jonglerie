@@ -100,6 +100,32 @@ export interface Assignment {
   confidence: number
 }
 
+/**
+ * Pourquoi un bénévole ne peut pas tenir un créneau.
+ *
+ * Le moteur connaissait déjà chacune de ces raisons — il les traduisait en score −1000 et les
+ * jetait. L'organisateur se retrouvait devant une liste de bénévoles non assignés sans savoir quel
+ * réglage relâcher, ce qui est précisément la question qu'il se pose.
+ *
+ * Des codes, pas des phrases : c'est l'écran qui les traduit, dans la langue de qui regarde.
+ */
+export type MotifRefus =
+  | 'indisponible'
+  | 'absent'
+  | 'equipe-non-souhaitee'
+  | 'hors-equipe-assignee'
+  | 'hors-plage-horaire'
+  | 'plafond-journalier'
+  | 'chevauchement'
+  | 'acces-spectacle'
+  | 'plafond-heures'
+
+/** Un message destiné à l'organisateur, à traduire par l'écran. */
+export interface MessageResultat {
+  code: string
+  params?: Record<string, number | string>
+}
+
 export interface SchedulingConstraints {
   maxHoursPerVolunteer?: number
   minHoursPerVolunteer?: number
@@ -133,8 +159,19 @@ export interface SchedulingResult {
     satisfactionRate: number
     balanceScore: number
   }
-  warnings: string[]
-  recommendations: string[]
+  warnings: MessageResultat[]
+  recommendations: MessageResultat[]
+  /**
+   * Pourquoi ça n'a pas marché.
+   *
+   * Par bénévole : le motif qui l'a écarté le plus souvent — celui qu'il faut relâcher en premier
+   * pour lui trouver une place. Par créneau : combien de candidats chaque contrainte a écartés,
+   * ce qui dit à l'organisateur quel curseur bouger plutôt que de le laisser deviner.
+   */
+  refus: {
+    parBenevole: { volunteerId: number; motif: MotifRefus }[]
+    parCreneau: { slotId: string; motifs: { motif: MotifRefus; candidats: number }[] }[]
+  }
 }
 
 export class VolunteerScheduler {
@@ -261,6 +298,84 @@ export class VolunteerScheduler {
   }
 
   /**
+   * Ce qui rend un créneau impossible pour ce bénévole, ou `null` s'il est envisageable.
+   *
+   * **Écrit une fois, lu deux fois** : par le score, qui en fait un −1000, et par le diagnostic,
+   * qui l'explique à l'organisateur. Les faire diverger produirait un écran qui affirme une raison
+   * pendant que le moteur en applique une autre.
+   *
+   * L'ordre compte : on rend le PREMIER motif rencontré, et il est rangé du plus déterminant au
+   * plus circonstanciel. Qu'un bénévole soit absent prime sur le fait que le créneau relève d'une
+   * équipe qu'il n'a pas demandée.
+   */
+  private motifBloquant(
+    volunteer: VolunteerApplication,
+    slot: TimeSlot,
+    availability: any
+  ): MotifRefus | null {
+    if (
+      this.constraints.respectStrictAvailability &&
+      !this.isVolunteerAvailable(volunteer, slot, availability)
+    ) {
+      return 'indisponible'
+    }
+
+    const presence = this.presenceParBenevole.get(volunteer.user.id)
+    if (
+      presence &&
+      !estPresentPendant(presence, {
+        debut: new Date(slot.start).getTime(),
+        fin: new Date(slot.end).getTime(),
+      })
+    ) {
+      return 'absent'
+    }
+
+    if (slot.teamId) {
+      const souhaitee = volunteer.teamPreferences?.some((pref) => pref === slot.teamId)
+      if (
+        !souhaitee &&
+        this.constraints.respectStrictTeamPreferences &&
+        volunteer.teamPreferences &&
+        volunteer.teamPreferences.length > 0
+      ) {
+        return 'equipe-non-souhaitee'
+      }
+
+      const placeDedans = volunteer.assignedTeams?.some((teamId) => teamId === slot.teamId)
+      if (
+        !placeDedans &&
+        this.constraints.respectStrictAssignedTeams &&
+        volunteer.assignedTeams &&
+        volunteer.assignedTeams.length > 0
+      ) {
+        return 'hors-equipe-assignee'
+      }
+    }
+
+    if (
+      this.constraints.respectStrictTimePreferences &&
+      Array.isArray(availability.timePreferences) &&
+      availability.timePreferences.length > 0 &&
+      this.calculateTimePreferenceBonus(volunteer, slot, availability) === 0
+    ) {
+      return 'hors-plage-horaire'
+    }
+
+    if (!this.checkDailyHoursConstraints(volunteer.user.id, slot)) {
+      if (!this.constraints.allowOvertime) return 'plafond-journalier'
+      if (!this.checkDailyHoursConstraints(volunteer.user.id, slot, true)) {
+        return 'plafond-journalier'
+      }
+    }
+
+    if (this.hasTimeConflict(volunteer.user.id, slot.id)) return 'chevauchement'
+    if (this.priveDuDernierPassage(volunteer.user.id, slot)) return 'acces-spectacle'
+
+    return null
+  }
+
+  /**
    * Calcule le score d'assignation pour un bénévole et un créneau
    */
   private calculateAssignmentScore(volunteer: VolunteerApplication, slot: TimeSlot): number {
@@ -270,32 +385,15 @@ export class VolunteerScheduler {
     const availability = this.parseAvailability(volunteer.availability)
     const isAvailable = this.isVolunteerAvailable(volunteer, slot, availability)
 
-    if (!isAvailable) {
-      if (this.constraints.respectStrictAvailability) {
-        return -1000 // Impossible
-      } else {
-        score -= 50 // Pénalité forte
-      }
-    } else {
-      score += 20 // Bonus disponibilité
+    // Les impossibilités sont relevées ensemble, et nommées : le diagnostic lit la même méthode.
+    if (this.motifBloquant(volunteer, slot, availability)) {
+      return -1000
     }
 
-    /**
-     * Le bénévole est-il seulement là ?
-     *
-     * Posé comme une impossibilité, et non comme une pénalité : il ne s'agit pas d'un souhait
-     * mais d'un fait déclaré. La question porte sur le créneau entier — quelqu'un qui repart
-     * samedi midi ne tient pas un créneau de 10 h à 14 h, même s'il est là quand il commence.
-     */
-    const presence = this.presenceParBenevole.get(volunteer.user.id)
-    if (presence) {
-      const bornes = {
-        debut: new Date(slot.start).getTime(),
-        fin: new Date(slot.end).getTime(),
-      }
-      if (!estPresentPendant(presence, bornes)) {
-        return -1000
-      }
+    if (!isAvailable) {
+      score -= 50 // Pénalité forte, quand on ne respecte pas strictement les disponibilités
+    } else {
+      score += 20 // Bonus disponibilité
     }
 
     // Préférence d'équipe
@@ -308,14 +406,6 @@ export class VolunteerScheduler {
 
       if (hasTeamPreference) {
         score += 15 // Bonus si l'équipe correspond aux préférences
-      } else if (
-        this.constraints.respectStrictTeamPreferences &&
-        volunteer.teamPreferences &&
-        volunteer.teamPreferences.length > 0
-      ) {
-        // Si on respecte strictement les préférences et que le bénévole a des préférences
-        // mais que l'équipe du créneau n'en fait pas partie, c'est impossible
-        return -1000
       }
 
       // Équipe déjà assignée par les organisateurs. Le pendant des préférences, mais du côté
@@ -327,12 +417,6 @@ export class VolunteerScheduler {
 
       if (estDansEquipeAssignee) {
         score += 15
-      } else if (
-        this.constraints.respectStrictAssignedTeams &&
-        volunteer.assignedTeams &&
-        volunteer.assignedTeams.length > 0
-      ) {
-        return -1000
       }
     }
 
@@ -341,19 +425,6 @@ export class VolunteerScheduler {
 
     // Préférences horaires
     const timePreferenceBonus = this.calculateTimePreferenceBonus(volunteer, slot, availability)
-
-    // Si on respecte strictement les préférences horaires et que le bénévole en a
-    if (
-      this.constraints.respectStrictTimePreferences &&
-      availability.timePreferences &&
-      Array.isArray(availability.timePreferences) &&
-      availability.timePreferences.length > 0
-    ) {
-      // Si le créneau ne correspond pas aux préférences (bonus = 0), c'est impossible
-      if (timePreferenceBonus === 0) {
-        return -1000
-      }
-    }
 
     score += timePreferenceBonus
 
@@ -390,15 +461,9 @@ export class VolunteerScheduler {
      * n'était plus qu'une pénalité de 80 points, que quelques bonus suffisaient à effacer.
      */
     if (!this.checkDailyHoursConstraints(volunteer.user.id, slot)) {
-      if (!this.constraints.allowOvertime) {
-        return -1000 // Impossible si pas d'heures sup autorisées
-      }
-
-      if (!this.checkDailyHoursConstraints(volunteer.user.id, slot, true)) {
-        return -1000 // Le dépassement lui-même a une limite
-      }
-
-      score -= 80 // Forte pénalité si heures sup autorisées
+      // L'impossibilité est déjà traitée par `motifBloquant` ; reste la pénalité du dépassement
+      // autorisé.
+      score -= 80
     }
 
     // Vérification des heures minimum par jour
@@ -1042,21 +1107,29 @@ export class VolunteerScheduler {
       Math.max(this.assignments.length, 1) /
       100 // Convertir en ratio (0-1)
 
-    const warnings: string[] = []
-    const recommendations: string[] = []
+    const warnings: MessageResultat[] = []
+    const recommendations: MessageResultat[] = []
 
-    // Génère les avertissements et recommandations
+    /**
+     * Des codes, pas des phrases.
+     *
+     * Ces messages étaient écrits en français dans le moteur et affichés tels quels : sur une
+     * application qui gère treize langues, ils restaient français pour tout le monde.
+     */
     if (unassignedVolunteers.length > 0) {
-      warnings.push(`${unassignedVolunteers.length} bénévole(s) non assigné(s)`)
+      warnings.push({
+        code: 'unassigned_volunteers',
+        params: { count: unassignedVolunteers.length },
+      })
     }
     if (unassignedSlots.length > 0) {
-      warnings.push(`${unassignedSlots.length} créneau(x) non complété(s)`)
+      warnings.push({ code: 'unassigned_slots', params: { count: unassignedSlots.length } })
     }
     if (satisfactionRate < 0.7) {
-      recommendations.push("Considérez d'ajuster les contraintes pour améliorer la satisfaction")
+      recommendations.push({ code: 'adjust_constraints' })
     }
     if (averageHours < (this.constraints.minHoursPerVolunteer || 2)) {
-      recommendations.push('Augmentez le nombre de créneaux ou réduisez le nombre de bénévoles')
+      recommendations.push({ code: 'more_slots_or_fewer_volunteers' })
     }
 
     return {
@@ -1073,7 +1146,70 @@ export class VolunteerScheduler {
       },
       warnings,
       recommendations,
+      refus: this.diagnostiquerLesRefus(unassignedVolunteers, unassignedSlots),
     }
+  }
+
+  /**
+   * Pourquoi les bénévoles restés sur le carreau y sont restés.
+   *
+   * N'examine que ce qui a échoué — les bénévoles non assignés et les créneaux non complétés :
+   * expliquer une réussite n'apprendrait rien, et le coût d'un second balayage complet ne se
+   * justifierait pas.
+   *
+   * ⚠️ Ce diagnostic est établi APRÈS coup, sur l'état final. Un bénévole peut donc y apparaître
+   * comme « chevauchement » alors qu'il était libre au moment où le créneau a été distribué : ce
+   * qu'on lui a donné entre-temps le bloque désormais. C'est bien ce qu'il faut dire à
+   * l'organisateur — la question est « que relâcher pour lui trouver une place maintenant ».
+   */
+  private diagnostiquerLesRefus(
+    benevolesNonAssignes: number[],
+    creneauxNonCompletes: string[]
+  ): SchedulingResult['refus'] {
+    const creneaux = this.timeSlots.filter((slot) => creneauxNonCompletes.includes(slot.id))
+    const benevoles = this.volunteers.filter((v) => benevolesNonAssignes.includes(v.user.id))
+
+    const parCreneau: SchedulingResult['refus']['parCreneau'] = []
+    const comptesParBenevole = new Map<number, Map<MotifRefus, number>>()
+
+    for (const slot of creneaux) {
+      const comptes = new Map<MotifRefus, number>()
+
+      for (const volunteer of this.volunteers) {
+        const availability = this.parseAvailability(volunteer.availability)
+        const motif = this.motifBloquant(volunteer, slot, availability)
+        if (!motif) continue
+
+        comptes.set(motif, (comptes.get(motif) ?? 0) + 1)
+
+        const pourCeBenevole = comptesParBenevole.get(volunteer.user.id) ?? new Map()
+        pourCeBenevole.set(motif, (pourCeBenevole.get(motif) ?? 0) + 1)
+        comptesParBenevole.set(volunteer.user.id, pourCeBenevole)
+      }
+
+      if (comptes.size > 0) {
+        parCreneau.push({
+          slotId: slot.id,
+          motifs: [...comptes.entries()]
+            .map(([motif, candidats]) => ({ motif, candidats }))
+            .sort((a, b) => b.candidats - a.candidats),
+        })
+      }
+    }
+
+    // Le motif dominant d'un bénévole : celui qui l'a écarté le plus souvent, donc le premier à
+    // relâcher pour lui trouver une place.
+    const parBenevole: SchedulingResult['refus']['parBenevole'] = []
+
+    for (const volunteer of benevoles) {
+      const comptes = comptesParBenevole.get(volunteer.user.id)
+      if (!comptes || comptes.size === 0) continue
+
+      const [motif] = [...comptes.entries()].sort((a, b) => b[1] - a[1])[0]!
+      parBenevole.push({ volunteerId: volunteer.user.id, motif })
+    }
+
+    return { parBenevole, parCreneau }
   }
 
   /**

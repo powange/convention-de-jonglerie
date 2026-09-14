@@ -67,8 +67,6 @@
       "balance_teams": "Jämna ut arbetsbördan mellan volontärer",
       "balance_teams_help": "För de mest belastade volontärerna närmare genomsnittet genom att flytta några av deras pass till dem med färre timmar",
       "beta_badge": "BETA",
-      "confirm_apply": "Är du säker på att du vill använda dessa uppdrag? Detta kommer att ersätta alla befintliga uppdrag.",
-      "confirm_apply_keep_existing": "Är du säker på att du vill använda dessa uppdrag? De nya uppdragen kommer att läggas till de befintliga uppdragen.",
       "confirm_details": "Denna åtgärd kommer att skapa {count} nya uppdrag.",
       "description": "Den automatiska tilldelningsalgoritmen fördelar på ett intelligent sätt volontärer till tidsluckor enligt deras preferenser, deras tillgänglighet och dina organisatoriska begränsningar.",
       "hours_per_day": "Timmar per dag",
@@ -120,7 +118,47 @@
       "undo_outdated": "En annan beräkning har tillämpats sedan dess: det är inte längre den här som ångras. Ladda om sidan.",
       "undo_nothing": "Ingen beräkning att ångra",
       "preview_outdated": "Schemat har ändrats sedan den här förhandsvisningen: kör beräkningen igen innan du tillämpar den.",
-      "preview_gone": "Den här förhandsvisningen är inte längre tillgänglig: kör beräkningen igen."
+      "preview_gone": "Den här förhandsvisningen är inte längre tillgänglig: kör beräkningen igen.",
+      "confirm_title": "Tillämpa den här beräkningen?",
+      "confirm_apply_replace_all": "Alla tilldelningar i upplagan raderas innan planen skrivs — även de du satt för hand.",
+      "confirm_apply_keep_manual": "De volontärer du placerat för hand står kvar. Bara tilldelningar från en tidigare beräkning görs om.",
+      "confirm_apply_keep_all": "Inget raderas: beräkningen fyller bara de platser som fortfarande är lediga.",
+      "deletions_title": "{count} tilldelning(ar) kommer att raderas",
+      "deletions_manual_warning": "Varav {count} satta för hand: inget kan återskapa dem.",
+      "deletion_manual": "satt för hand",
+      "warning": {
+        "unassigned_volunteers": "{count} volontär(er) utan något pass alls",
+        "unassigned_slots": "{count} ofullständiga pass"
+      },
+      "recommendation": {
+        "adjust_constraints": "De tilldelningar som hittats är svaga: att lätta på ett villkor skulle ge bättre resultat.",
+        "more_slots_or_fewer_volunteers": "Det finns fler volontärer än timmar att fylla: lägg till pass, eller räkna med att några blir utan."
+      },
+      "motif": {
+        "indisponible": "inte tillgänglig i den här fasen",
+        "absent": "inte anlänt än eller redan avrest",
+        "equipe_non_souhaitee": "laget inte önskat",
+        "hors_equipe_assignee": "utanför sina lag",
+        "hors_plage_horaire": "utanför önskade tider",
+        "plafond_journalier": "dagen redan full",
+        "chevauchement": "redan upptagen vid den tiden",
+        "acces_spectacle": "skulle kosta hen sista föreställningen",
+        "plafond_heures": "har redan nått sitt timtak"
+      },
+      "motif_compte": {
+        "indisponible": "{count} bortvalda: inte tillgängliga i den här fasen",
+        "absent": "{count} bortvalda: frånvarande det datumet",
+        "equipe_non_souhaitee": "{count} bortvalda: laget inte önskat",
+        "hors_equipe_assignee": "{count} bortvalda: utanför sina lag",
+        "hors_plage_horaire": "{count} bortvalda: utanför sina tider",
+        "plafond_journalier": "{count} bortvalda: dagen redan full",
+        "chevauchement": "{count} bortvalda: upptagna vid den tiden",
+        "acces_spectacle": "{count} bortvalda: skulle kosta dem en föreställning",
+        "plafond_heures": "{count} bortvalda: timtaket nått"
+      },
+      "slot_not_found": "Pass {id} (hittades inte)",
+      "slot_without_title": "Pass utan titel",
+      "team_fallback": "Lag {id}"
     },
     "autonomous_team": "Självstyrande lag",
     "autonomous_team_badge": "Självstyrande",

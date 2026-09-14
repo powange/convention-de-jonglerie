@@ -67,8 +67,6 @@
       "balance_teams": "Wyrównaj obciążenie między wolontariuszami",
       "balance_teams_help": "Zbliża najbardziej obciążonych wolontariuszy do średniej, przenosząc część ich zmian do osób mniej obciążonych",
       "beta_badge": "BETA",
-      "confirm_apply": "Czy na pewno chcesz zastosować te przydziały? To zastąpi wszystkie istniejące przydziały.",
-      "confirm_apply_keep_existing": "Czy na pewno chcesz zastosować te przydziały? Nowe przydziały zostaną dodane do istniejących.",
       "confirm_details": "Ta akcja utworzy {count} nowe przydziały.",
       "description": "Algorytm automatycznego przydziału inteligentnie rozmieszcza wolontariuszy w przedziałach czasowych, respektując ich preferencje, dostępność i ograniczenia organizacyjne.",
       "hours_per_day": "Godziny dziennie",
@@ -120,7 +118,47 @@
       "undo_outdated": "Od tego czasu zastosowano inne obliczenie: to już nie ono jest cofane. Odśwież stronę.",
       "undo_nothing": "Brak obliczenia do cofnięcia",
       "preview_outdated": "Grafik zmienił się od czasu tego podglądu: uruchom obliczenie ponownie przed zastosowaniem.",
-      "preview_gone": "Ten podgląd nie jest już dostępny: uruchom obliczenie ponownie."
+      "preview_gone": "Ten podgląd nie jest już dostępny: uruchom obliczenie ponownie.",
+      "confirm_title": "Zastosować to obliczenie?",
+      "confirm_apply_replace_all": "Wszystkie przydziały edycji zostaną usunięte przed zapisaniem tego planu, łącznie z tymi ustawionymi ręcznie.",
+      "confirm_apply_keep_manual": "Wolontariusze przypisani ręcznie zostają. Ponawiane są tylko przydziały z poprzedniego obliczenia.",
+      "confirm_apply_keep_all": "Nic nie jest usuwane: obliczenie wypełnia tylko wolne miejsca.",
+      "deletions_title": "Zostanie usuniętych {count} przydziałów",
+      "deletions_manual_warning": "W tym {count} ustawionych ręcznie: nic ich nie odtworzy.",
+      "deletion_manual": "ustawiony ręcznie",
+      "warning": {
+        "unassigned_volunteers": "{count} wolontariuszy bez żadnej zmiany",
+        "unassigned_slots": "{count} niepełnych zmian"
+      },
+      "recommendation": {
+        "adjust_constraints": "Znalezione przydziały są słabe: poluzowanie jednego ograniczenia dałoby lepsze wyniki.",
+        "more_slots_or_fewer_volunteers": "Wolontariuszy jest więcej niż godzin do obsadzenia: dodaj zmiany albo licz się z tym, że część nie dostanie żadnej."
+      },
+      "motif": {
+        "indisponible": "niedostępny na tym etapie",
+        "absent": "jeszcze nie przyjechał lub już wyjechał",
+        "equipe_non_souhaitee": "zespół nieproszony",
+        "hors_equipe_assignee": "poza swoimi zespołami",
+        "hors_plage_horaire": "poza preferowanymi godzinami",
+        "plafond_journalier": "dzień już pełny",
+        "chevauchement": "w tym czasie już zajęty",
+        "acces_spectacle": "pozbawiłoby go ostatniego pokazu",
+        "plafond_heures": "osiągnął już maksimum godzin"
+      },
+      "motif_compte": {
+        "indisponible": "{count} odrzuconych: niedostępni na tym etapie",
+        "absent": "{count} odrzuconych: nieobecni tego dnia",
+        "equipe_non_souhaitee": "{count} odrzuconych: zespół nieproszony",
+        "hors_equipe_assignee": "{count} odrzuconych: poza swoimi zespołami",
+        "hors_plage_horaire": "{count} odrzuconych: poza swoimi godzinami",
+        "plafond_journalier": "{count} odrzuconych: dzień już pełny",
+        "chevauchement": "{count} odrzuconych: w tym czasie zajęci",
+        "acces_spectacle": "{count} odrzuconych: pozbawiłoby ich pokazu",
+        "plafond_heures": "{count} odrzuconych: maksimum godzin osiągnięte"
+      },
+      "slot_not_found": "Zmiana {id} (nie znaleziono)",
+      "slot_without_title": "Zmiana bez tytułu",
+      "team_fallback": "Zespół {id}"
     },
     "autonomous_team": "Zespół samodzielny",
     "autonomous_team_badge": "Samodzielny",

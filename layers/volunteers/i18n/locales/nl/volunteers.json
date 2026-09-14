@@ -67,8 +67,6 @@
       "balance_teams": "Werklast tussen vrijwilligers verdelen",
       "balance_teams_help": "Brengt de zwaarst belaste vrijwilligers dichter bij het gemiddelde door enkele van hun diensten over te dragen aan wie minder is ingeroosterd",
       "beta_badge": "BETA",
-      "confirm_apply": "Weet je zeker dat je deze toewijzingen wilt toepassen? Dit zal alle bestaande toewijzingen vervangen.",
-      "confirm_apply_keep_existing": "Weet je zeker dat je deze toewijzingen wilt toepassen? Nieuwe toewijzingen worden toegevoegd aan bestaande.",
       "confirm_details": "Deze actie zal {count} nieuwe toewijzing(en) maken.",
       "description": "Het automatische toewijzingsalgoritme verdeelt intelligent vrijwilligers over tijdslots met respect voor hun voorkeuren, beschikbaarheid en uw organisatorische beperkingen.",
       "hours_per_day": "Uren per dag",
@@ -120,7 +118,47 @@
       "undo_outdated": "Er is sindsdien een andere berekening toegepast: deze wordt niet langer ongedaan gemaakt. Herlaad de pagina.",
       "undo_nothing": "Geen berekening om ongedaan te maken",
       "preview_outdated": "De planning is sinds dit voorbeeld gewijzigd: voer de berekening opnieuw uit voordat je die toepast.",
-      "preview_gone": "Dit voorbeeld is niet meer beschikbaar: voer de berekening opnieuw uit."
+      "preview_gone": "Dit voorbeeld is niet meer beschikbaar: voer de berekening opnieuw uit.",
+      "confirm_title": "Deze berekening toepassen?",
+      "confirm_apply_replace_all": "Alle toewijzingen van de editie worden gewist voordat dit plan wordt geschreven, ook die je met de hand hebt gezet.",
+      "confirm_apply_keep_manual": "De vrijwilligers die je met de hand hebt geplaatst blijven staan. Alleen toewijzingen uit een eerdere berekening worden opnieuw gedaan.",
+      "confirm_apply_keep_all": "Er wordt niets gewist: de berekening vult alleen de nog vrije plaatsen.",
+      "deletions_title": "{count} toewijzing(en) worden gewist",
+      "deletions_manual_warning": "Waarvan {count} met de hand gezet: niets kan ze herstellen.",
+      "deletion_manual": "met de hand gezet",
+      "warning": {
+        "unassigned_volunteers": "{count} vrijwilliger(s) zonder enige dienst",
+        "unassigned_slots": "{count} onvolledige dienst(en)"
+      },
+      "recommendation": {
+        "adjust_constraints": "De gevonden toewijzingen zijn matig: een voorwaarde versoepelen zou betere resultaten geven.",
+        "more_slots_or_fewer_volunteers": "Er zijn meer vrijwilligers dan te vullen uren: voeg diensten toe, of houd er rekening mee dat sommigen er geen krijgen."
+      },
+      "motif": {
+        "indisponible": "niet beschikbaar in deze fase",
+        "absent": "nog niet aangekomen of al vertrokken",
+        "equipe_non_souhaitee": "team niet gevraagd",
+        "hors_equipe_assignee": "buiten zijn teams",
+        "hors_plage_horaire": "buiten de gewenste uren",
+        "plafond_journalier": "dag al vol",
+        "chevauchement": "op dat moment al bezet",
+        "acces_spectacle": "zou hem de laatste voorstelling kosten",
+        "plafond_heures": "heeft zijn maximum aan uren al bereikt"
+      },
+      "motif_compte": {
+        "indisponible": "{count} afgevallen: niet beschikbaar in deze fase",
+        "absent": "{count} afgevallen: afwezig op die datum",
+        "equipe_non_souhaitee": "{count} afgevallen: team niet gevraagd",
+        "hors_equipe_assignee": "{count} afgevallen: buiten hun teams",
+        "hors_plage_horaire": "{count} afgevallen: buiten hun uren",
+        "plafond_journalier": "{count} afgevallen: dag al vol",
+        "chevauchement": "{count} afgevallen: op dat moment al bezet",
+        "acces_spectacle": "{count} afgevallen: zou hun een voorstelling kosten",
+        "plafond_heures": "{count} afgevallen: maximum aan uren bereikt"
+      },
+      "slot_not_found": "Dienst {id} (niet gevonden)",
+      "slot_without_title": "Dienst zonder titel",
+      "team_fallback": "Team {id}"
     },
     "autonomous_team": "Zelfstandig team",
     "autonomous_team_badge": "Zelfstandig",

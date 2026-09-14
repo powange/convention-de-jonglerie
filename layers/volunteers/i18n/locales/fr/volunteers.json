@@ -67,8 +67,6 @@
       "balance_teams": "Équilibrer la charge entre bénévoles",
       "balance_teams_help": "Rapproche les bénévoles les plus chargés de la moyenne en transférant certains de leurs créneaux vers les moins sollicités",
       "beta_badge": "BETA",
-      "confirm_apply": "Êtes-vous sûr de vouloir appliquer ces assignations ? Cela remplacera toutes les assignations existantes.",
-      "confirm_apply_keep_existing": "Êtes-vous sûr de vouloir appliquer ces assignations ? Les nouvelles assignations seront ajoutées aux existantes.",
       "confirm_details": "Cette action va créer {count} nouvelle(s) assignation(s).",
       "description": "L'algorithme d'assignation automatique répartit intelligemment les bénévoles dans les créneaux horaires en respectant leurs préférences, leurs disponibilités et vos contraintes organisationnelles.",
       "existing_mode": "Affectations déjà en place",
@@ -120,7 +118,47 @@
       "undo_outdated": "Un autre calcul a été appliqué depuis : ce n'est plus celui-ci que l'annulation défait. Rechargez la page.",
       "undo_nothing": "Aucun calcul à annuler",
       "preview_outdated": "Le planning a changé depuis cet aperçu : relancez le calcul avant de l'appliquer.",
-      "preview_gone": "Cet aperçu n'est plus disponible : relancez le calcul."
+      "preview_gone": "Cet aperçu n'est plus disponible : relancez le calcul.",
+      "confirm_title": "Appliquer ce calcul ?",
+      "confirm_apply_replace_all": "Toutes les affectations de l'édition seront effacées avant d'écrire ce plan, y compris celles que vous avez posées à la main.",
+      "confirm_apply_keep_manual": "Les bénévoles que vous avez placés à la main restent en place. Seules les affectations issues d'un précédent calcul sont refaites.",
+      "confirm_apply_keep_all": "Rien n'est effacé : le calcul ne fait que combler les places encore libres.",
+      "deletions_title": "{count} affectation(s) seront effacées",
+      "deletions_manual_warning": "Dont {count} posée(s) à la main : rien ne permettra de les reconstruire.",
+      "deletion_manual": "posée à la main",
+      "warning": {
+        "unassigned_volunteers": "{count} bénévole(s) sans aucun créneau",
+        "unassigned_slots": "{count} créneau(x) incomplet(s)"
+      },
+      "recommendation": {
+        "adjust_constraints": "Les affectations trouvées sont peu satisfaisantes : relâcher une contrainte donnerait de meilleurs résultats.",
+        "more_slots_or_fewer_volunteers": "Il y a plus de bénévoles que d'heures à pourvoir : ajoutez des créneaux, ou attendez-vous à ce que certains n'en aient aucun."
+      },
+      "motif": {
+        "indisponible": "pas disponible sur cette phase",
+        "absent": "pas encore arrivé ou déjà reparti",
+        "equipe_non_souhaitee": "équipe non souhaitée",
+        "hors_equipe_assignee": "hors de ses équipes",
+        "hors_plage_horaire": "hors de ses horaires souhaités",
+        "plafond_journalier": "journée déjà pleine",
+        "chevauchement": "déjà pris au même moment",
+        "acces_spectacle": "le priverait du dernier passage d'un spectacle",
+        "plafond_heures": "a déjà atteint son maximum d'heures"
+      },
+      "motif_compte": {
+        "indisponible": "{count} écarté(s) : pas disponibles sur cette phase",
+        "absent": "{count} écarté(s) : absents à cette date",
+        "equipe_non_souhaitee": "{count} écarté(s) : équipe non souhaitée",
+        "hors_equipe_assignee": "{count} écarté(s) : hors de leurs équipes",
+        "hors_plage_horaire": "{count} écarté(s) : hors de leurs horaires souhaités",
+        "plafond_journalier": "{count} écarté(s) : journée déjà pleine",
+        "chevauchement": "{count} écarté(s) : déjà pris au même moment",
+        "acces_spectacle": "{count} écarté(s) : les priverait d'un spectacle",
+        "plafond_heures": "{count} écarté(s) : maximum d'heures atteint"
+      },
+      "slot_not_found": "Créneau {id} (introuvable)",
+      "slot_without_title": "Créneau sans titre",
+      "team_fallback": "Équipe {id}"
     },
     "autonomous_team": "Équipe autonome",
     "autonomous_team_badge": "Autonome",

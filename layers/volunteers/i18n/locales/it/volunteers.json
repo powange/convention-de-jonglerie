@@ -67,8 +67,6 @@
       "balance_teams": "Bilanciare il carico tra i volontari",
       "balance_teams_help": "Avvicina alla media i volontari più impegnati trasferendo alcuni dei loro turni a quelli meno sollecitati",
       "beta_badge": "BETA",
-      "confirm_apply": "Sei sicuro di voler applicare queste assegnazioni? Questo sostituirà tutte le assegnazioni esistenti.",
-      "confirm_apply_keep_existing": "Sei sicuro di voler applicare queste assegnazioni? Le nuove assegnazioni verranno aggiunte a quelle esistenti.",
       "confirm_details": "Questa azione creerà {count} nuova(e) assegnazione(i).",
       "description": "L'algoritmo di assegnazione automatica distribuisce intelligentemente i volontari nelle fasce orarie rispettando le loro preferenze, disponibilità e i vostri vincoli organizzativi.",
       "hours_per_day": "Ore al giorno",
@@ -120,7 +118,47 @@
       "undo_outdated": "Nel frattempo è stato applicato un altro calcolo: non è più questo a essere annullato. Ricarica la pagina.",
       "undo_nothing": "Nessun calcolo da annullare",
       "preview_outdated": "La pianificazione è cambiata dopo questa anteprima: rilancia il calcolo prima di applicarlo.",
-      "preview_gone": "Questa anteprima non è più disponibile: rilancia il calcolo."
+      "preview_gone": "Questa anteprima non è più disponibile: rilancia il calcolo.",
+      "confirm_title": "Applicare questo calcolo?",
+      "confirm_apply_replace_all": "Tutte le assegnazioni dell'edizione saranno cancellate prima di scrivere questo piano, comprese quelle inserite a mano.",
+      "confirm_apply_keep_manual": "I volontari inseriti a mano restano al loro posto. Solo le assegnazioni di un calcolo precedente vengono rifatte.",
+      "confirm_apply_keep_all": "Non viene cancellato nulla: il calcolo si limita a coprire i posti ancora liberi.",
+      "deletions_title": "{count} assegnazione/i saranno cancellate",
+      "deletions_manual_warning": "Di cui {count} inserite a mano: nulla permetterà di ricostruirle.",
+      "deletion_manual": "inserita a mano",
+      "warning": {
+        "unassigned_volunteers": "{count} volontario/i senza alcun turno",
+        "unassigned_slots": "{count} turno/i incompleto/i"
+      },
+      "recommendation": {
+        "adjust_constraints": "Le assegnazioni trovate sono poco soddisfacenti: allentare un vincolo darebbe risultati migliori.",
+        "more_slots_or_fewer_volunteers": "Ci sono più volontari che ore da coprire: aggiungi turni, o aspettati che alcuni restino senza."
+      },
+      "motif": {
+        "indisponible": "non disponibile in questa fase",
+        "absent": "non ancora arrivato o già ripartito",
+        "equipe_non_souhaitee": "squadra non richiesta",
+        "hors_equipe_assignee": "fuori dalle sue squadre",
+        "hors_plage_horaire": "fuori dai suoi orari preferiti",
+        "plafond_journalier": "giornata già piena",
+        "chevauchement": "già impegnato in quel momento",
+        "acces_spectacle": "lo priverebbe dell'ultima replica di uno spettacolo",
+        "plafond_heures": "ha già raggiunto il massimo di ore"
+      },
+      "motif_compte": {
+        "indisponible": "{count} esclusi: non disponibili in questa fase",
+        "absent": "{count} esclusi: assenti in questa data",
+        "equipe_non_souhaitee": "{count} esclusi: squadra non richiesta",
+        "hors_equipe_assignee": "{count} esclusi: fuori dalle loro squadre",
+        "hors_plage_horaire": "{count} esclusi: fuori dai loro orari",
+        "plafond_journalier": "{count} esclusi: giornata già piena",
+        "chevauchement": "{count} esclusi: già impegnati in quel momento",
+        "acces_spectacle": "{count} esclusi: li priverebbe di uno spettacolo",
+        "plafond_heures": "{count} esclusi: massimo di ore raggiunto"
+      },
+      "slot_not_found": "Turno {id} (non trovato)",
+      "slot_without_title": "Turno senza titolo",
+      "team_fallback": "Squadra {id}"
     },
     "autonomous_team": "Squadra autonoma",
     "autonomous_team_badge": "Autonoma",
