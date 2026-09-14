@@ -390,12 +390,9 @@ export default wrapApiHandler(
       }))
     )
 
-    const availableVolunteers = benevolesPlanifiables
-
     // Conversion des données pour l'algorithme
-    const schedulerVolunteers = availableVolunteers.map(
+    const schedulerVolunteers = benevolesPlanifiables.map(
       (volunteer: VolunteerWithTeamAssignments) => ({
-        id: volunteer.id,
         user: volunteer.user,
         availability: JSON.stringify({
           setup: volunteer.setupAvailability || false,
@@ -403,8 +400,6 @@ export default wrapApiHandler(
           event: volunteer.eventAvailability || false,
           timePreferences: volunteer.timePreferences || null,
         }),
-        motivation: volunteer.motivation || '',
-        phone: volunteer.userSnapshotPhone,
         teamPreferences: volunteer.teamPreferences
           ? Array.isArray(volunteer.teamPreferences)
             ? volunteer.teamPreferences
@@ -478,7 +473,7 @@ export default wrapApiHandler(
      */
     const perimetre = {
       creneaux: schedulerTimeSlots.map((slot) => slot.id),
-      candidatures: availableVolunteers.map((volunteer: VolunteerWithTeamAssignments) => ({
+      candidatures: benevolesPlanifiables.map((volunteer: VolunteerWithTeamAssignments) => ({
         applicationId: volunteer.id,
         userId: volunteer.user.id,
       })),
@@ -498,19 +493,19 @@ export default wrapApiHandler(
     }))
 
     // Exécution de l'algorithme
-    const scheduler = new VolunteerScheduler(
-      schedulerVolunteers,
-      schedulerTimeSlots,
-      schedulerTeams,
+    const scheduler = new VolunteerScheduler({
+      volunteers: schedulerVolunteers,
+      timeSlots: schedulerTimeSlots,
+      teams: schedulerTeams,
       constraints,
-      {
+      bornes: {
         debut: eventRecord.startDate?.toISOString() ?? null,
         fin: eventRecord.endDate?.toISOString() ?? null,
       },
       spectacles,
-      affectationsConservees,
-      eventRecord.edition?.timezone ?? null
-    )
+      affectationsExistantes: affectationsConservees,
+      fuseau: eventRecord.edition?.timezone ?? null,
+    })
 
     /**
      * Appliquer, c'est écrire le plan QU'ON A MONTRÉ — pas en recalculer un autre.
