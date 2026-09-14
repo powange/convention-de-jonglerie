@@ -496,6 +496,36 @@ describe('bénévoles volants', () => {
     expect(individuelles.find((s) => s.user.id === 3)?.estVolant).toBeUndefined()
   })
 
+  it('marque comme réservé un membre d’équipe autonome', () => {
+    // Le repère explique pourquoi l'assignation automatique ne lui a rien donné. Il n'est PAS
+    // volant pour autant : il reste tenu à son volume d'heures.
+    const autonome = { team: { isAutonomousTeam: true } }
+    const individuelles = calculateVolunteersStatsIndividual(
+      [slot(1, '2026-08-01T10:00:00Z', '2026-08-01T12:00:00Z', [user(4, 'reserve')])],
+      [{ user: user(4, 'reserve'), status: 'ACCEPTED', teamAssignments: [autonome] }]
+    )
+
+    const stat = individuelles.find((s) => s.user.id === 4)
+    expect(stat?.estReserve).toBe(true)
+    expect(stat?.estVolant).toBeUndefined()
+  })
+
+  it('ne marque pas réservé celui qu’on a rattaché ailleurs', () => {
+    // La double appartenance annule la réserve : il redevient assignable partout.
+    const individuelles = calculateVolunteersStatsIndividual(
+      [slot(1, '2026-08-01T10:00:00Z', '2026-08-01T12:00:00Z', [user(5, 'partage')])],
+      [
+        {
+          user: user(5, 'partage'),
+          status: 'ACCEPTED',
+          teamAssignments: [{ team: { isAutonomousTeam: true } }, equipe(false)],
+        },
+      ]
+    )
+
+    expect(individuelles.find((s) => s.user.id === 5)?.estReserve).toBeUndefined()
+  })
+
   it('compte quand même un volant qui a tenu un créneau', () => {
     // Un renfort de dernière minute est du travail fait : il doit se voir. Ce sont les heures
     // ATTENDUES dont il est dispensé, pas celles qu'il a réellement données.

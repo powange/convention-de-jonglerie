@@ -11,7 +11,15 @@
       <div class="flex items-center gap-3">
         <UiUserAvatar v-if="user" :user="user" size="sm" />
         <div>
-          <h3 class="font-semibold">{{ user?.pseudo }}</h3>
+          <h3 class="font-semibold">
+            {{ user?.pseudo }}
+            <!-- Le nom civil à côté du pseudo : cette modale s'ouvre depuis le relevé d'heures,
+                 et un responsable qui vérifie la charge de quelqu'un le connaît souvent par son
+                 nom, pas par le pseudo qu'il s'est choisi. -->
+            <span v-if="user?.prenom || user?.nom" class="font-normal text-gray-500">
+              (<UiUserName :user="user" />)
+            </span>
+          </h3>
           <p class="text-sm text-gray-500">
             {{ t('volunteers.slots_count', { count: lignes.length }) }}
           </p>
@@ -111,7 +119,13 @@ import { dureeTraduisible, formatHeure } from '../../../../utils/plage-horaire'
 const props = defineProps<{
   modelValue: boolean
   /** La personne dont on regarde les créneaux — bénévole ou organisateur. */
-  user: { id: number; pseudo: string; [key: string]: any } | null
+  user: {
+    id: number
+    pseudo: string
+    prenom?: string | null
+    nom?: string | null
+    [key: string]: any
+  } | null
   /** Tous les créneaux du planning : le tri et le filtrage se font ici. */
   timeSlots: Array<{ id: string | number; start: string; end: string; [key: string]: any }>
   /** Les équipes de l'édition, pour nommer et colorer chaque créneau. */

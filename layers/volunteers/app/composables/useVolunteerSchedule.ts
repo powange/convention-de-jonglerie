@@ -12,6 +12,10 @@ export interface VolunteerTeamCalendar {
   id: string
   name: string
   color: string
+  /** Volante : ses créneaux ne pèsent pas dans les heures à pourvoir. Marquée d'une pastille. */
+  isFloatingTeam?: boolean
+  /** Autonome : elle s'organise elle-même, et réserve ses membres. Marquée de même. */
+  isAutonomousTeam?: boolean
 }
 
 export interface VolunteerTimeSlot {
@@ -211,6 +215,12 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       id: team.id,
       title: team.name,
       eventColor: team.color || '#3788d8',
+      // Lus par `resourceLabelContent` : la nature d'une équipe change la lecture de toute sa
+      // ligne — ses créneaux ne pèsent pas dans les heures à pourvoir.
+      extendedProps: {
+        isFloatingTeam: team.isFloatingTeam === true,
+        isAutonomousTeam: team.isAutonomousTeam === true,
+      },
     }))
 
     // Ajouter une ressource "Non assigné" pour les créneaux sans équipe
@@ -315,6 +325,67 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Personnalisation de l'en-tête de la zone des ressources
     resourceAreaHeaderContent: t('edition.volunteers.teams'),
+
+    /**
+     * Le nom d'une équipe, suivi d'une icône quand elle n'est pas ordinaire.
+     *
+     * Une équipe volante ou autonome ne pèse pas dans les heures à pourvoir : sans repère, on lit
+     * sa ligne comme celle des autres et l'on s'étonne que ses créneaux ne comptent nulle part.
+     *
+     * ⚠️ Une ICÔNE et non le mot entier : cette colonne est étroite, et « Surveillance gymnase »
+     * suivi de « Volants » se tronquerait. Le sens passe par l'attribut `title`, donc par
+     * l'infobulle du navigateur — FullCalendar construit cette colonne en DOM natif, où les
+     * composants Nuxt UI ne peuvent pas être montés. Elle est plus lente et moins jolie qu'un
+     * `UTooltip`, mais elle fonctionne partout, y compris à l'appui long sur mobile, et ne
+     * demande aucun positionnement à entretenir dans une colonne qui défile.
+     */
+    resourceLabelContent: (arg) => {
+      const conteneur = document.createElement('div')
+      conteneur.className = 'flex items-center gap-1.5'
+
+      const nom = document.createElement('span')
+      nom.textContent = arg.resource.title
+      nom.style.minWidth = '0'
+      nom.style.overflow = 'hidden'
+      nom.style.textOverflow = 'ellipsis'
+      conteneur.appendChild(nom)
+
+      const proprietes = arg.resource.extendedProps as {
+        isFloatingTeam?: boolean
+        isAutonomousTeam?: boolean
+      }
+
+      /** Une pastille d'une seule lettre, dont le titre dit ce qu'elle signifie. */
+      const repere = (symbole: string, libelle: string, fond: string, encre: string) => {
+        const marque = document.createElement('span')
+        marque.textContent = symbole
+        // Le libellé complet reste accessible : au survol, et aux lecteurs d'écran.
+        marque.setAttribute('title', libelle)
+        marque.setAttribute('aria-label', libelle)
+        marque.style.display = 'inline-flex'
+        marque.style.alignItems = 'center'
+        marque.style.justifyContent = 'center'
+        marque.style.width = '18px'
+        marque.style.height = '18px'
+        marque.style.flexShrink = '0'
+        marque.style.fontSize = '0.7rem'
+        marque.style.lineHeight = '1'
+        marque.style.borderRadius = '9999px'
+        marque.style.backgroundColor = fond
+        marque.style.color = encre
+        marque.style.cursor = 'help'
+        conteneur.appendChild(marque)
+      }
+
+      if (proprietes?.isFloatingTeam) {
+        repere('⚡', t('volunteers.floating_team_badge'), 'rgba(56, 189, 248, 0.22)', '#0369a1')
+      }
+      if (proprietes?.isAutonomousTeam) {
+        repere('🔒', t('volunteers.autonomous_team_badge'), 'rgba(120, 120, 120, 0.22)', '#4b5563')
+      }
+
+      return { domNodes: [conteneur] }
+    },
 
     // Hauteur du calendrier
     height: 'auto',

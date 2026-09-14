@@ -122,6 +122,16 @@
                     <UBadge v-if="volunteerStat.estOrganisateur" color="info" variant="soft">
                       {{ t('volunteers.organizer') }}
                     </UBadge>
+                    <!-- Mêmes repères que dans le relevé individuel : un volant n'est pas tenu au
+                         même volume d'heures, un réservé voit les siennes décidées ailleurs. -->
+                    <UBadge v-if="volunteerStat.estVolant" color="info" variant="soft">
+                      <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 mr-1" />
+                      {{ t('volunteers.floating_team_badge') }}
+                    </UBadge>
+                    <UBadge v-if="volunteerStat.estReserve" color="neutral" variant="soft">
+                      <UIcon name="i-heroicons-lock-closed" class="w-3.5 h-3.5 mr-1" />
+                      {{ t('volunteers.autonomous_team_badge') }}
+                    </UBadge>
                   </div>
                   <div class="flex items-center gap-2">
                     <span class="text-gray-600 dark:text-gray-400"
@@ -167,6 +177,12 @@
                       <UBadge v-if="volunteerStat.estVolant" color="info" variant="soft">
                         <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 mr-1" />
                         {{ t('volunteers.floating_team_badge') }}
+                      </UBadge>
+                      <!-- Réservé à son équipe autonome : ses heures se décident là-bas, pas ici.
+                           Sans ce repère, on le croit oublié par l'assignation automatique. -->
+                      <UBadge v-if="volunteerStat.estReserve" color="neutral" variant="soft">
+                        <UIcon name="i-heroicons-lock-closed" class="w-3.5 h-3.5 mr-1" />
+                        {{ t('volunteers.autonomous_team_badge') }}
                       </UBadge>
                     </h5>
                     <p
@@ -238,6 +254,16 @@
                   :style="{ backgroundColor: equipe.color }"
                 />
                 {{ equipe.teamName }}
+                <!-- La nature de l'équipe explique un total à zéro heure à pourvoir : sans ce
+                     repère, on lit la ligne comme une équipe qu'on aurait oublié de doter. -->
+                <UBadge v-if="equipe.estVolante" color="info" variant="soft">
+                  <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 mr-1" />
+                  {{ t('volunteers.floating_team_badge') }}
+                </UBadge>
+                <UBadge v-if="equipe.estAutonome" color="neutral" variant="soft">
+                  <UIcon name="i-heroicons-lock-closed" class="w-3.5 h-3.5 mr-1" />
+                  {{ t('volunteers.autonomous_team_badge') }}
+                </UBadge>
               </h5>
               <div class="flex items-center gap-2">
                 <!-- Pourvu sur à pourvoir, comme le résumé global : le seul besoin ne disait
