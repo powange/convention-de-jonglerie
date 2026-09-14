@@ -16,6 +16,7 @@ const updateTeamSchema = z.object({
   isRequired: z.boolean().optional(),
   isAccessControlTeam: z.boolean().optional(),
   isFloatingTeam: z.boolean().optional(),
+  isAutonomousTeam: z.boolean().optional(),
   isMealValidationTeam: z.boolean().optional(),
   isVisibleToVolunteers: z.boolean().optional(),
 })
@@ -78,6 +79,7 @@ export default wrapApiHandler(
     if (body.isAccessControlTeam !== undefined)
       updateData.isAccessControlTeam = body.isAccessControlTeam
     if (body.isFloatingTeam !== undefined) updateData.isFloatingTeam = body.isFloatingTeam
+    if (body.isAutonomousTeam !== undefined) updateData.isAutonomousTeam = body.isAutonomousTeam
     if (body.isMealValidationTeam !== undefined)
       updateData.isMealValidationTeam = body.isMealValidationTeam
     if (body.isVisibleToVolunteers !== undefined)

@@ -552,11 +552,24 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     }
 
     if ((canManageVolunteers.value || isTeamLeader.value) && isVolunteersModeInternal.value) {
-      volunteersChildren.push({
-        label: t('edition.volunteers.volunteer_notifications'),
-        icon: 'i-heroicons-bell',
-        to: `/editions/${editionId.value}/gestion/volunteers/notifications`,
-      })
+      volunteersChildren.push(
+        {
+          label: t('edition.volunteers.volunteer_notifications'),
+          icon: 'i-heroicons-bell',
+          to: `/editions/${editionId.value}/gestion/volunteers/notifications`,
+        },
+        {
+          // Ouverte aux responsables d'équipe autant qu'aux gestionnaires : c'est le responsable
+          // débordé qui cherche du renfort, et l'envoyer demander ailleurs ferait perdre les
+          // minutes que cet écran existe pour gagner.
+          //
+          // Pas de pastille : le nombre de volants disponibles change à chaque minute et n'attend
+          // aucune décision. Elle serait allumée en permanence et ne voudrait plus rien dire.
+          label: t('volunteers.renforts_title'),
+          icon: 'i-heroicons-bolt',
+          to: `/editions/${editionId.value}/gestion/volunteers/renforts`,
+        }
+      )
     }
 
     if (volunteersChildren.length > 0) {

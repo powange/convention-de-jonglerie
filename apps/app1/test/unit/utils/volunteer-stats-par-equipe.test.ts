@@ -248,3 +248,52 @@ describe('calculateVolunteersStatsByTeam — organisateurs', () => {
     expect(stats[0]!.dayDetails[0]!.coveredHours).toBe(4)
   })
 })
+
+/**
+ * Les créneaux d'une équipe volante ne sont pas des heures à pourvoir.
+ *
+ * Un tel créneau ne s'adresse qu'aux volants — une permanence —, et les volants ne sont tenus à
+ * aucun volume d'heures. Le compter ferait paraître l'édition sous-dotée alors qu'il ne manque
+ * rien à personne.
+ */
+describe('équipes volantes', () => {
+  it('écarte les créneaux d’une équipe volante des heures à pourvoir', () => {
+    const stats = calculateVolunteersStatsByTeam(
+      [
+        creneau('c1', '2026-08-01', 4, 'cuisine', [1], 2),
+        creneau('c2', '2026-08-01', 4, 'volants', [2], 3),
+      ],
+      [
+        { id: 'cuisine', name: 'Cuisine' },
+        { id: 'volants', name: 'Volants', isFloatingTeam: true },
+      ]
+    )
+
+    expect(stats.map((e) => e.teamId)).toEqual(['cuisine'])
+    // 4 h × 2 places, et rien de l'équipe volante.
+    expect(stats[0]!.totalHours).toBe(8)
+  })
+
+  it('garde ce qui n’a pas d’équipe', () => {
+    const stats = calculateVolunteersStatsByTeam(
+      [
+        creneau('c1', '2026-08-01', 2, null, [1], 1),
+        creneau('c2', '2026-08-01', 2, 'volants', [2], 1),
+      ],
+      [{ id: 'volants', name: 'Volants', isFloatingTeam: true }]
+    )
+
+    expect(stats).toHaveLength(1)
+    expect(stats[0]!.teamId).toBeNull()
+  })
+
+  it('n’écarte rien quand aucune équipe n’est volante', () => {
+    const stats = calculateVolunteersStatsByTeam(
+      [creneau('c1', '2026-08-01', 2, 'cuisine', [1], 1)],
+      [{ id: 'cuisine', name: 'Cuisine' }]
+    )
+
+    expect(stats).toHaveLength(1)
+    expect(stats[0]!.totalHours).toBe(2)
+  })
+})

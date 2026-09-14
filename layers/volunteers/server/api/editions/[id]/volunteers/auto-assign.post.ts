@@ -9,7 +9,10 @@ import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { VolunteerScheduler, type Assignment } from '#server/utils/volunteer-scheduler'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
+import {
+  estEquipeHorsCharge,
+  estHorsAssignationAutomatique,
+} from '~~/shared/utils/benevoles-volants'
 
 // Types pour les données récupérées de la base de données
 type VolunteerWithTeamAssignments = Prisma.EditionVolunteerApplicationGetPayload<{
@@ -150,7 +153,9 @@ export default wrapApiHandler(
      */
     const benevolesPlanifiables = volunteers.filter(
       (volunteer: VolunteerWithTeamAssignments) =>
-        !estHorsDesComptes(volunteer.teamAssignments.map((assignation) => assignation.team))
+        !estHorsAssignationAutomatique(
+          volunteer.teamAssignments.map((assignation) => assignation.team)
+        )
     )
 
     // Les bénévoles dont une affectation subsiste occupent déjà leur place : les proposer à
@@ -194,17 +199,32 @@ export default wrapApiHandler(
       })
     )
 
-    const schedulerTimeSlots = timeSlots.map((slot: TimeSlotWithAssignments) => ({
-      id: slot.id.toString(),
-      title: slot.title || 'Créneau sans titre',
-      start: slot.startDateTime.toISOString(),
-      end: slot.endDateTime.toISOString(),
-      teamId: slot.teamId?.toString() || undefined,
-      maxVolunteers: slot.maxVolunteers,
-      // Seules les affectations qui survivent occupent une place
-      assignedVolunteers: slot.assignments.filter(conservee).length,
-      description: slot.description || undefined,
-    }))
+    /**
+     * Les créneaux d'une équipe volante ou autonome ne se remplissent pas tout seuls.
+     *
+     * L'une n'a personne à qui imposer des heures, l'autre s'organise elle-même : dans les deux
+     * cas, l'assignation automatique n'a rien à y décider, et y placer des gens leur retirerait
+     * la disponibilité ou l'autonomie qui justifie le réglage.
+     */
+    const equipesHorsCharge = new Set(
+      teams.filter((equipe: Team) => estEquipeHorsCharge(equipe)).map((equipe: Team) => equipe.id)
+    )
+
+    const schedulerTimeSlots = timeSlots
+      .filter(
+        (slot: TimeSlotWithAssignments) => !slot.teamId || !equipesHorsCharge.has(slot.teamId)
+      )
+      .map((slot: TimeSlotWithAssignments) => ({
+        id: slot.id.toString(),
+        title: slot.title || 'Créneau sans titre',
+        start: slot.startDateTime.toISOString(),
+        end: slot.endDateTime.toISOString(),
+        teamId: slot.teamId?.toString() || undefined,
+        maxVolunteers: slot.maxVolunteers,
+        // Seules les affectations qui survivent occupent une place
+        assignedVolunteers: slot.assignments.filter(conservee).length,
+        description: slot.description || undefined,
+      }))
 
     const schedulerTeams = teams.map((team: Team) => ({
       id: team.id,

@@ -192,6 +192,17 @@ model VolunteerTeam {
   /// bénévole ordinaire, et l'assignation automatique lui donne ses heures de cuisine. Voir
   /// `benevoles-volants.ts`, où la règle est écrite une fois.
   isFloatingTeam        Boolean  @default(false)
+  /// Équipe AUTONOME : elle se gère à part, et réserve ses membres.
+  ///
+  /// Ses créneaux ne comptent pas dans les heures à pourvoir et ne sont pas remplis par
+  /// l'assignation automatique — elle s'organise elle-même. Et les bénévoles qui n'appartiennent
+  /// qu'à des équipes autonomes ne reçoivent aucun créneau d'ailleurs : ils lui sont réservés.
+  ///
+  /// ⚠️ À ne pas confondre avec `isFloatingTeam`, dont l'effet sur l'ÉQUIPE est le même mais dont
+  /// l'effet sur les PERSONNES est inverse : la volante libère ses membres de leur volume
+  /// d'heures et les propose en renfort, l'autonome les garde tenus à leurs heures et les tient
+  /// hors de la page des renforts. Voir `benevoles-volants.ts`, où les deux règles cohabitent.
+  isAutonomousTeam      Boolean  @default(false)
   isVisibleToVolunteers Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

@@ -470,6 +470,32 @@ describe('bénévoles volants', () => {
     expect(individuelles.map((s) => s.user.id)).toEqual([1])
   })
 
+  it('marque comme volant celui qui a tenu un créneau', () => {
+    // Le repère explique pourquoi son total est plus bas que celui des autres : il n'était pas
+    // tenu au même volume d'heures. Sans lui, on le croirait sous-employé.
+    const individuelles = calculateVolunteersStatsIndividual(
+      [
+        slot(1, '2026-08-01T10:00:00Z', '2026-08-01T13:00:00Z', [
+          user(1, 'alice'),
+          user(2, 'volant'),
+        ]),
+      ],
+      [avecEquipes(1, 'alice', equipe(false)), avecEquipes(2, 'volant', equipe(true))]
+    )
+
+    expect(individuelles.find((s) => s.user.id === 2)?.estVolant).toBe(true)
+    expect(individuelles.find((s) => s.user.id === 1)?.estVolant).toBeUndefined()
+  })
+
+  it('ne marque pas volant celui qui a aussi une équipe ordinaire', () => {
+    const individuelles = calculateVolunteersStatsIndividual(
+      [slot(1, '2026-08-01T10:00:00Z', '2026-08-01T12:00:00Z', [user(3, 'polyvalent')])],
+      [avecEquipes(3, 'polyvalent', equipe(true), equipe(false))]
+    )
+
+    expect(individuelles.find((s) => s.user.id === 3)?.estVolant).toBeUndefined()
+  })
+
   it('compte quand même un volant qui a tenu un créneau', () => {
     // Un renfort de dernière minute est du travail fait : il doit se voir. Ce sont les heures
     // ATTENDUES dont il est dispensé, pas celles qu'il a réellement données.
