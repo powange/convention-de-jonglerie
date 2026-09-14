@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Detaljerad beskrivning av spelautomaten (valfritt)",
     "slot_title": "Titel på spelautomat",
     "slot_title_placeholder": "Ex: Välkomna besökare",
+    "slot_understaffed": "Det finns fortfarande platser att fylla på detta pass",
     "slot_updated": "Uppdaterad slot",
     "slots_back_to_back": "Direkt efter varandra",
     "slots_break_of": "{duration} paus",

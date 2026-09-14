@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Descripción detallada de la franja horaria (opcional)",
     "slot_title": "Título de franja horaria",
     "slot_title_placeholder": "Ej.: Recepción de visitantes",
+    "slot_understaffed": "Aún quedan plazas por cubrir en este turno",
     "slot_updated": "Franja horaria actualizada",
     "slots_back_to_back": "Seguidos",
     "slots_break_of": "{duration} de descanso",

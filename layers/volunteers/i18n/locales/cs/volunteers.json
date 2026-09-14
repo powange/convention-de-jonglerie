@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Podrobný popis slotu (nepovinné)",
     "slot_title": "Název slotu",
     "slot_title_placeholder": "Například: Vítání návštěvníků",
+    "slot_understaffed": "V této směně jsou stále volná místa",
     "slot_updated": "Aktualizovaný slot",
     "slots_back_to_back": "Bezprostředně po sobě",
     "slots_break_of": "{duration} pauzy",

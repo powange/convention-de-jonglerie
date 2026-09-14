@@ -831,9 +831,26 @@ defineExpose({
 }
 
 .slot-tooltip .slot-tooltip-person {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   white-space: nowrap;
   overflow: hidden;
+}
+
+/* Le nom, et lui seul, se tronque : l'avatar garde sa taille. */
+.slot-tooltip .slot-tooltip-person > span {
+  overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.slot-tooltip .slot-tooltip-avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgb(255 255 255 / 40%);
 }
 
 .volunteer-planning-calendar .user-avatar-2 {
@@ -846,6 +863,15 @@ defineExpose({
 
 .volunteer-planning-calendar .user-avatar-4 {
   background-color: rgb(236 72 153); /* pink-500 */
+}
+
+/* Le triangle d'alerte des créneaux qu'il reste à pourvoir, dans le créneau et dans l'infobulle. */
+.volunteer-planning-calendar .slot-alerte,
+.slot-tooltip .slot-alerte {
+  margin-right: 3px;
+  font-size: 0.85em;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .volunteer-planning-calendar .fc-event:hover {

@@ -44,6 +44,8 @@ const creneauCree = (i: number) => ({
   team: null,
   maxVolunteers: 2,
   assignments: [],
+  organizerAssignments: [],
+  delayMinutes: null,
   _count: { assignments: 0 },
 })
 

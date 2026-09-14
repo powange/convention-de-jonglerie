@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Descrição detalhada da faixa horária (opcional)",
     "slot_title": "Título da faixa horária",
     "slot_title_placeholder": "Ex.: Recepção de visitantes",
+    "slot_understaffed": "Ainda há vagas a preencher neste turno",
     "slot_updated": "Faixa horária atualizada",
     "slots_back_to_back": "Seguidos",
     "slots_break_of": "{duration} de pausa",

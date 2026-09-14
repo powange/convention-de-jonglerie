@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Szczegółowy opis przedziału czasowego (opcjonalne)",
     "slot_title": "Tytuł przedziału czasowego",
     "slot_title_placeholder": "Np.: Recepcja gości",
+    "slot_understaffed": "W tej zmianie są jeszcze miejsca do obsadzenia",
     "slot_updated": "Przedział czasowy zaktualizowany",
     "slots_back_to_back": "Jedna po drugiej",
     "slots_break_of": "{duration} przerwy",

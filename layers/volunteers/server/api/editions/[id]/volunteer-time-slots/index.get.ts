@@ -1,3 +1,4 @@
+import { formaterCreneau, inclusionCreneau } from '../../../../utils/creneau-formate'
 import { exigerPlanningPublie } from '../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -64,103 +65,16 @@ export default wrapApiHandler(
       where: {
         eventId: editionId,
       },
-      include: {
-        team: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-          },
-        },
-        assignments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                nom: true,
-                prenom: true,
-                pronouns: true,
-                email: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-        },
-        // Organisateurs affectés au créneau. Le `_count` ne porte que les bénévoles ; le
-        // client additionne les deux pour connaître les places occupées.
-        organizerAssignments: {
-          select: {
-            editionOrganizer: {
-              select: {
-                id: true,
-                organizer: {
-                  select: {
-                    user: {
-                      select: {
-                        id: true,
-                        pseudo: true,
-                        nom: true,
-                        prenom: true,
-                        pronouns: true,
-                        emailHash: true,
-                        profilePicture: true,
-                        updatedAt: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        _count: {
-          select: {
-            assignments: true,
-          },
-        },
-      },
+      include: inclusionCreneau,
       orderBy: {
         startDateTime: 'asc',
       },
     })
 
-    // Transformer les données pour être compatibles avec FullCalendar
-    const formattedTimeSlots = timeSlots.map((slot) => ({
-      id: slot.id,
-      title: slot.title,
-      description: slot.description,
-      start: slot.startDateTime.toISOString(),
-      end: slot.endDateTime.toISOString(),
-      teamId: slot.teamId,
-      team: slot.team,
-      maxVolunteers: slot.maxVolunteers,
-      assignedVolunteers: slot._count.assignments,
-      delayMinutes: slot.delayMinutes,
-      assignments: slot.assignments.map((assignment) => ({
-        ...assignment,
-        user: {
-          id: assignment.user.id,
-          pseudo: assignment.user.pseudo,
-          nom: assignment.user.nom,
-          prenom: assignment.user.prenom,
-          pronouns: assignment.user.pronouns,
-          emailHash: assignment.user.emailHash,
-          // Les gestionnaires ont aussi accès à l'email en clair
-          ...(voitLesEmails ? { email: assignment.user.email } : {}),
-          profilePicture: assignment.user.profilePicture,
-          updatedAt: assignment.user.updatedAt,
-        },
-      })),
-      organizerAssignments: slot.organizerAssignments.map((affectation) => ({
-        editionOrganizerId: affectation.editionOrganizer.id,
-        user: affectation.editionOrganizer.organizer.user,
-      })),
-      color: slot.team?.color || '#6b7280',
-      resourceId: slot.teamId || 'unassigned',
-    }))
+    // La forme est partagée avec la création et la modification : le client remplace en mémoire
+    // le créneau qu'il tient par celui que ces points d'API renvoient, et la moindre différence
+    // se voit à l'écran. Voir `creneau-formate`.
+    const formattedTimeSlots = timeSlots.map((slot) => formaterCreneau(slot, voitLesEmails))
 
     return formattedTimeSlots
   },

@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Детальний опис часового слоту (необов'язково)",
     "slot_title": "Назва часового слоту",
     "slot_title_placeholder": "Напр.: Прийом відвідувачів",
+    "slot_understaffed": "У цій зміні ще є вільні місця",
     "slot_updated": "Часовий слот оновлено",
     "slots_back_to_back": "Поспіль, без перерви",
     "slots_break_of": "перерва {duration}",

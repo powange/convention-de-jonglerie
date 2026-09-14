@@ -1,5 +1,6 @@
 import { dureeTraduisible, formatPlage } from '../utils/plage-horaire'
 import { positionInitialeDuPlanning } from '../utils/position-initiale-planning'
+import { creneauAPourvoir, placesOccupees } from '../utils/remplissage-creneau'
 
 import type { CalendarOptions, EventInput } from '@fullcalendar/core'
 // `ResourceInput` vit dans le paquet `resource`, pas dans `core` : l'importer de `core`
@@ -111,7 +112,48 @@ function positionnerInfobulle(infobulle: HTMLElement, evenement: MouseEvent) {
 
 export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   const { t, locale } = useI18n()
-  const { getUserAvatar } = useAvatar()
+  const { getUserAvatar, generateInitialsAvatar } = useAvatar()
+
+  /**
+   * Le triangle d'alerte des créneaux qu'il reste à pourvoir.
+   *
+   * Un emoji et non une icône Nuxt UI : FullCalendar construit ces nœuds en DOM natif, où aucun
+   * composant Vue ne peut être monté. Le fichier s'en sert déjà pour la mention de retard.
+   *
+   * Le libellé passe par `title` ET `aria-label` : une couleur seule ne dit rien à qui ne la
+   * distingue pas, et l'infobulle du navigateur ne s'ouvre pas sans souris.
+   */
+  const iconeAPourvoir = (): HTMLElement => {
+    const alerte = document.createElement('span')
+    alerte.className = 'slot-alerte'
+    alerte.textContent = '⚠️'
+    alerte.setAttribute('title', t('volunteers.slot_understaffed'))
+    alerte.setAttribute('aria-label', t('volunteers.slot_understaffed'))
+    return alerte
+  }
+
+  /**
+   * L'image d'une personne, prête à être posée devant son nom.
+   *
+   * Sans photo de profil, `getUserAvatar` rend une adresse Gravatar en `d=404` : le service
+   * répond 404 pour qui n'y a pas de compte, et l'image reste cassée. Le repli sur les initiales
+   * vit dans `getUserAvatarWithCache`, qu'un rendu en DOM natif ne peut pas utiliser — d'où ce
+   * `onerror`, calqué sur le planning du matériel.
+   *
+   * Écrit une fois pour les deux usages : le contenu du créneau et l'infobulle de survol.
+   */
+  const avatarDe = (personne: any, taille: number, classe: string): HTMLImageElement => {
+    const nom = nomAffichePersonne(personne)
+    const image = document.createElement('img')
+    image.src = getUserAvatar(personne, taille)
+    image.alt = ''
+    image.className = classe
+    image.onerror = () => {
+      image.onerror = null
+      image.src = generateInitialsAvatar(nom || '?', taille)
+    }
+    return image
+  }
 
   const {
     teams,
@@ -240,9 +282,13 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const slotTitle = slot.title || t('edition.volunteers.untitled_slot')
       // Les places se comptent toutes ensemble : un organisateur en occupe une, le compteur
       // doit donc l'inclure, sans quoi un créneau plein paraîtrait encore libre.
-      const placesOccupees =
-        (slot.assignedVolunteers ?? 0) + (slot.assignedOrganizersList?.length ?? 0)
-      const counterInfo = `(${placesOccupees}/${slot.maxVolunteers})`
+      const counterInfo = `(${placesOccupees(slot)}/${slot.maxVolunteers})`
+
+      // Les créneaux des équipes volantes et autonomes ne sont pas « à pourvoir » : personne
+      // d'autre ne viendra les couvrir. Les signaler ferait paraître l'édition sous-dotée, comme
+      // les compter le ferait dans les statistiques.
+      const equipe = unref(teams).find((candidate) => candidate.id === slot.teamId)
+      const horsCharge = equipe?.isFloatingTeam === true || equipe?.isAutonomousTeam === true
 
       // Calculer les heures décalées si delayMinutes est présent
       let adjustedStart = slot.start
@@ -268,6 +314,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         resourceId: slot.teamId || 'unassigned',
         color: slot.color,
         extendedProps: {
+          // Calculé ici plutôt qu'à l'affichage : l'équipe du créneau, dont dépend la règle,
+          // n'est pas accessible depuis le rendu d'un événement.
+          aPourvoir: creneauAPourvoir(slot, horsCharge),
           description: slot.description,
           maxVolunteers: slot.maxVolunteers,
           assignedVolunteers: slot.assignedVolunteers,
@@ -468,7 +517,10 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
         const titre = document.createElement('div')
         titre.className = 'slot-tooltip-title'
-        titre.textContent = donnees.slotTitle || arg.event.title
+        if (donnees.aPourvoir) titre.appendChild(iconeAPourvoir())
+        const texteTitre = document.createElement('span')
+        texteTitre.textContent = donnees.slotTitle || arg.event.title
+        titre.appendChild(texteTitre)
         infobulle.appendChild(titre)
 
         // « 15h - 16h (1h) ». Les bornes de l'événement, donc décalées si le créneau a du
@@ -492,24 +544,30 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         const benevoles = donnees.assignedVolunteersList || []
         const organisateurs = donnees.assignedOrganizersList || []
 
-        const section = (libelle: string, personnes: any[], cle: string) => {
+        const section = (libelle: string, personnes: any[], cle: string, maximum?: number) => {
           if (personnes.length === 0) return
           const bloc = document.createElement('div')
           bloc.className = 'slot-tooltip-section'
           const entete = document.createElement('div')
           entete.className = 'slot-tooltip-label'
-          entete.textContent = `${libelle} (${personnes.length})`
+          // « 2/3 » plutôt que « 2 » : le nombre seul ne dit pas s'il en manque. Réservé aux
+          // bénévoles — le maximum est celui du créneau, pas celui des organisateurs.
+          const compte = maximum ? `${personnes.length}/${maximum}` : `${personnes.length}`
+          entete.textContent = `${libelle} (${compte})`
           bloc.appendChild(entete)
           for (const personne of personnes) {
             const ligne = document.createElement('div')
             ligne.className = 'slot-tooltip-person'
-            ligne.textContent = nomAffichePersonne(personne[cle])
+            ligne.appendChild(avatarDe(personne[cle], 16, 'slot-tooltip-avatar'))
+            const nom = document.createElement('span')
+            nom.textContent = nomAffichePersonne(personne[cle])
+            ligne.appendChild(nom)
             bloc.appendChild(ligne)
           }
           infobulle.appendChild(bloc)
         }
 
-        section(t('volunteers.assigned_volunteers'), benevoles, 'user')
+        section(t('volunteers.assigned_volunteers'), benevoles, 'user', donnees.maxVolunteers)
         section(t('volunteers.assigned_organizers'), organisateurs, 'user')
 
         if (benevoles.length === 0 && organisateurs.length === 0) {
@@ -547,10 +605,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         const ligne = document.createElement('div')
         ligne.className = organisateur ? 'volunteer-item organizer-item' : 'volunteer-item'
 
-        const avatar = document.createElement('img')
-        avatar.setAttribute('src', getUserAvatar(user, 14))
-        avatar.setAttribute('alt', user.pseudo || 'Avatar')
-        avatar.className = 'user-avatar'
+        const nomAffiche = nomAffichePersonne(user)
+
+        const avatar = avatarDe(user, 14, 'user-avatar')
         avatar.style.width = '14px'
         avatar.style.height = '14px'
         avatar.style.borderRadius = '50%'
@@ -561,7 +618,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
         const texte = document.createElement('span')
         texte.className = 'volunteer-text'
-        texte.textContent = nomAffichePersonne(user)
+        texte.textContent = nomAffiche
 
         ligne.appendChild(avatar)
         ligne.appendChild(texte)
@@ -570,10 +627,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
       const event = arg.event
       const slotTitle = event.extendedProps.slotTitle || event.title.split(' (')[0]
-      const placesOccupees =
-        (event.extendedProps.assignedVolunteers ?? 0) +
-        (event.extendedProps.assignedOrganizersList?.length ?? 0)
-      const counterInfo = `(${placesOccupees}/${event.extendedProps.maxVolunteers})`
+      const counterInfo = `(${placesOccupees(event.extendedProps as any)}/${event.extendedProps.maxVolunteers})`
       const assignedVolunteersList = event.extendedProps.assignedVolunteersList || []
       const delayMinutes = event.extendedProps.delayMinutes
 
@@ -584,7 +638,10 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       // Titre du créneau avec compteur
       const titleDiv = document.createElement('div')
       titleDiv.className = 'slot-title'
-      titleDiv.textContent = `${slotTitle} ${counterInfo}`
+      if (event.extendedProps.aPourvoir) titleDiv.appendChild(iconeAPourvoir())
+      const texteTitre = document.createElement('span')
+      texteTitre.textContent = `${slotTitle} ${counterInfo}`
+      titleDiv.appendChild(texteTitre)
       container.appendChild(titleDiv)
 
       // Afficher le retard sur une ligne séparée si présent
