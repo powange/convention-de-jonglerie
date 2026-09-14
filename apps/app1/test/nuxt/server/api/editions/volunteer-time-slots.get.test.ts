@@ -6,10 +6,22 @@ vi.mock('../../../../../server/utils/permissions/volunteer-permissions', () => (
   isAcceptedVolunteer: vi.fn(),
 }))
 
+// L'endpoint demande désormais le droit de gestion explicitement, au lieu de le déduire de
+// « n'est pas bénévole accepté » — un raisonnement qui refusait son propre planning à un
+// administrateur inscrit comme bénévole.
+vi.mock('../../../../../server/utils/organizer-management', () => ({
+  canManageEditionVolunteers: vi.fn(async () => false),
+}))
+
+vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
+  equipesDontIlEstResponsable: vi.fn(async () => []),
+}))
+
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
 } from '#server/utils/permissions/volunteer-permissions'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import handler from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteer-time-slots/index.get'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
@@ -17,6 +29,7 @@ const prismaMock = (globalThis as any).prisma
 
 const mockRequirePlanningAccess = requireVolunteerPlanningAccess as ReturnType<typeof vi.fn>
 const mockIsAcceptedVolunteer = isAcceptedVolunteer as ReturnType<typeof vi.fn>
+const mockPeutGerer = canManageEditionVolunteers as ReturnType<typeof vi.fn>
 
 const baseEvent = {
   context: {
@@ -29,6 +42,8 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
   beforeEach(() => {
     mockRequirePlanningAccess.mockReset()
     mockIsAcceptedVolunteer.mockReset()
+    mockPeutGerer.mockReset()
+    mockPeutGerer.mockResolvedValue(false)
     prismaMock.volunteerTimeSlot.findMany.mockReset()
     // Un bénévole accepté ne voit le planning que s'il est publié. Les éditions existantes le
     // sont ; ces cas décrivent donc bien la situation courante.
@@ -290,6 +305,51 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     // Les bénévoles n'ont pas accès à l'email en clair mais ont le emailHash
     expect(res[0].assignments[0].user.email).toBeUndefined()
     expect(res[0].assignments[0].user.emailHash).toBe('hash-john')
+  })
+
+  it('donne les emails en clair à un gestionnaire QUI EST AUSSI bénévole accepté', async () => {
+    // ⚠️ Même défaut que sur la garde du planning : « n'est pas bénévole accepté » tenait lieu de
+    // « est gestionnaire ». Un administrateur inscrit comme bénévole sur son édition voyait les
+    // adresses masquées, alors qu'il y a accès partout ailleurs.
+    mockRequirePlanningAccess.mockResolvedValue({ id: 10 })
+    mockIsAcceptedVolunteer.mockResolvedValue(true)
+    mockPeutGerer.mockResolvedValue(true)
+
+    prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
+      {
+        id: 'slot1',
+        eventId: 1,
+        teamId: null,
+        title: 'Accueil',
+        description: null,
+        startDateTime: new Date('2024-06-01T09:00:00Z'),
+        endDateTime: new Date('2024-06-01T12:00:00Z'),
+        maxVolunteers: 2,
+        delayMinutes: null,
+        team: null,
+        assignments: [
+          {
+            id: 'a1',
+            user: {
+              id: 10,
+              pseudo: 'John',
+              nom: 'Doe',
+              prenom: 'John',
+              email: 'john@example.com',
+              emailHash: 'hash-john',
+              profilePicture: null,
+              updatedAt: new Date('2024-01-01'),
+            },
+          },
+        ],
+        organizerAssignments: [],
+        _count: { assignments: 1 },
+      },
+    ] as any)
+
+    const res = await handler(baseEvent as any)
+
+    expect(res[0].assignments[0].user.email).toBe('john@example.com')
   })
 
   it('rejette utilisateur non authentifié', async () => {
