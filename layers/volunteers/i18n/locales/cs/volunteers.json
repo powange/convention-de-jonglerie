@@ -164,7 +164,16 @@
       "history_description": "Výpočty automatického přiřazení již spuštěné v této edici.",
       "history_empty": "V této edici zatím nebyl spuštěn žádný výpočet.",
       "history_line": "Spustil {author} — vytvořeno {created} přiřazení, smazáno {deleted}.",
-      "history_undone": "Vráceno uživatelem {author} dne {date}."
+      "history_undone": "Vráceno uživatelem {author} dne {date}.",
+      "search_title": "Hledat lepší rozvrh",
+      "search_description": "Druhý algoritmus převezme tento rozvrh a pokusí se ho zlepšit, aniž by ho kdy zhoršil. Získává hlavně na požadovaných časech; prázdnou směnu neobsadí.",
+      "search_action": "Hledat lepší",
+      "search_done": "Hledání dokončeno",
+      "compare_title": "Oba rozvrhy",
+      "compare_greedy": "Původní rozvrh",
+      "compare_search": "Po hledání",
+      "compare_help": "Vyberte ten, který chcete použít: právě ten bude zapsán.",
+      "compare_no_gain": "Hledání nenašlo nic lepšího. Původní rozvrh zůstává nejlepší."
     },
     "autonomous_team": "Samostatný tým",
     "autonomous_team_badge": "Samostatný",

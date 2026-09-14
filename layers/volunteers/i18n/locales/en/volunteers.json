@@ -164,7 +164,16 @@
       "history_description": "The automatic assignment runs already launched on this edition.",
       "history_empty": "No run has been launched on this edition yet.",
       "history_line": "Launched by {author} — {created} assignment(s) created, {deleted} removed.",
-      "history_undone": "Undone by {author} on {date}."
+      "history_undone": "Undone by {author} on {date}.",
+      "search_title": "Look for a better schedule",
+      "search_description": "A second algorithm takes this schedule and tries to improve it, without ever degrading it. It mainly gains on preferred hours; it will not fill an empty slot.",
+      "search_action": "Look for better",
+      "search_done": "Search complete",
+      "compare_title": "The two schedules",
+      "compare_greedy": "Initial schedule",
+      "compare_search": "After search",
+      "compare_help": "Choose the one you want to apply: that is the schedule that will be written.",
+      "compare_no_gain": "The search found nothing better on this schedule. The initial one remains the best."
     },
     "autonomous_team": "Self-managed team",
     "autonomous_team_badge": "Self-managed",

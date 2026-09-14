@@ -164,7 +164,16 @@
       "history_description": "De automatische toewijzingen die al voor deze editie zijn uitgevoerd.",
       "history_empty": "Er is nog geen berekening uitgevoerd voor deze editie.",
       "history_line": "Uitgevoerd door {author} — {created} toewijzing(en) aangemaakt, {deleted} verwijderd.",
-      "history_undone": "Ongedaan gemaakt door {author} op {date}."
+      "history_undone": "Ongedaan gemaakt door {author} op {date}.",
+      "search_title": "Een beter rooster zoeken",
+      "search_description": "Een tweede algoritme neemt dit rooster over en probeert het te verbeteren, zonder het ooit te verslechteren. Het wint vooral op de gewenste tijden; het vult geen leeg tijdslot.",
+      "search_action": "Beter zoeken",
+      "search_done": "Zoeken voltooid",
+      "compare_title": "De twee roosters",
+      "compare_greedy": "Oorspronkelijk rooster",
+      "compare_search": "Na het zoeken",
+      "compare_help": "Kies welk rooster u wilt toepassen: dat rooster wordt weggeschreven.",
+      "compare_no_gain": "Het zoeken heeft niets beters gevonden. Het oorspronkelijke rooster blijft het beste."
     },
     "autonomous_team": "Zelfstandig team",
     "autonomous_team_badge": "Zelfstandig",

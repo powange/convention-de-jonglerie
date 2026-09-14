@@ -164,7 +164,16 @@
       "history_description": "De automatiske tildelinger, der allerede er kørt på denne udgave.",
       "history_empty": "Der er endnu ikke kørt nogen beregning på denne udgave.",
       "history_line": "Kørt af {author} — {created} tildeling(er) oprettet, {deleted} slettet.",
-      "history_undone": "Fortrudt af {author} den {date}."
+      "history_undone": "Fortrudt af {author} den {date}.",
+      "search_title": "Søg efter en bedre plan",
+      "search_description": "En anden algoritme tager denne plan og forsøger at forbedre den uden nogensinde at forringe den. Den vinder især på de ønskede tidspunkter; den udfylder ikke en tom vagt.",
+      "search_action": "Søg bedre",
+      "search_done": "Søgning afsluttet",
+      "compare_title": "De to planer",
+      "compare_greedy": "Oprindelig plan",
+      "compare_search": "Efter søgning",
+      "compare_help": "Vælg den, du vil anvende: det er den plan, der bliver gemt.",
+      "compare_no_gain": "Søgningen fandt intet bedre. Den oprindelige plan er fortsat den bedste."
     },
     "autonomous_team": "Selvstyrende hold",
     "autonomous_team_badge": "Selvstyrende",

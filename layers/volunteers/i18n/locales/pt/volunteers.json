@@ -164,7 +164,16 @@
       "history_description": "Os cálculos de atribuição automática já lançados nesta edição.",
       "history_empty": "Ainda não foi lançado nenhum cálculo nesta edição.",
       "history_line": "Lançado por {author} — {created} atribuição(ões) criada(s), {deleted} eliminada(s).",
-      "history_undone": "Anulado por {author} em {date}."
+      "history_undone": "Anulado por {author} em {date}.",
+      "search_title": "Procurar uma melhor escala",
+      "search_description": "Um segundo algoritmo retoma esta escala e tenta melhorá-la, sem nunca a degradar. Ganha sobretudo nos horários desejados; não preencherá nenhum turno vazio.",
+      "search_action": "Procurar melhor",
+      "search_done": "Pesquisa terminada",
+      "compare_title": "As duas escalas",
+      "compare_greedy": "Escala inicial",
+      "compare_search": "Após a pesquisa",
+      "compare_help": "Escolha a que quer aplicar: é essa escala que será gravada.",
+      "compare_no_gain": "A pesquisa não encontrou nada melhor. A escala inicial continua a ser a melhor."
     },
     "autonomous_team": "Equipa autónoma",
     "autonomous_team_badge": "Autónoma",

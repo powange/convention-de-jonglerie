@@ -202,6 +202,39 @@ export interface SchedulingResult {
     parBenevole: { volunteerId: number; motif: MotifRefus }[]
     parCreneau: { slotId: string; motifs: { motif: MotifRefus; candidats: number }[] }[]
   }
+  /**
+   * Ce que la recherche locale a fait, quand c'est elle qui a produit ce résultat.
+   *
+   * Absent d'un résultat du glouton seul : la clé dit donc aussi *quel moteur* a parlé, sans qu'on
+   * ait à le transporter à côté.
+   */
+  recherche?: {
+    iterations: number
+    mouvementsRetenus: number
+    valeurDeDepart: number
+    valeurFinale: number
+    /** Vrai si l'arrêt vient du temps imparti, faux s'il n'y avait plus rien à gagner. */
+    budgetEpuise: boolean
+  }
+}
+
+/**
+ * Un tirage pseudo-aléatoire reproductible (« mulberry32 »).
+ *
+ * `Math.random` rendrait la recherche non reproductible : deux clics sur le même aperçu
+ * donneraient deux plannings différents, un test ne pourrait rien affirmer, et l'organisateur ne
+ * saurait pas s'il compare deux algorithmes ou deux coups de dés. À graine égale, la suite est
+ * identique — le second moteur redevient aussi déterministe que le premier.
+ */
+function tirageReproductible(graine: number): () => number {
+  let etat = graine >>> 0
+  return () => {
+    etat = (etat + 0x6d2b79f5) >>> 0
+    let t = etat
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
 }
 
 /**
@@ -316,6 +349,77 @@ const LIMITES = {
    * vides faute de monde — cas où aucun déplacement n'y changerait rien.
    */
   CRENEAUX_A_DEBLOQUER: 50,
+} as const
+
+/**
+ * Ce qu'un planning vaut, en une seule note — et l'aveu que porte cette table.
+ *
+ * La recherche locale a besoin de comparer deux plannings, donc d'un nombre. Or le rapport d'audit
+ * écartait le solveur en nombres entiers pour cette raison précise : les cinq indicateurs ne se
+ * réduisent pas à un nombre sans qu'on tranche un arbitrage qui appartient à l'organisateur.
+ *
+ * Cette table est cet arbitrage, écrit noir sur blanc plutôt que caché dans un solveur. Deux
+ * choses la rendent acceptable là où une fonction objectif de solveur ne l'était pas :
+ *
+ * - **elle est lisible et ajustable**, comme `POIDS` l'est pour le glouton ;
+ * - **elle ne décide de rien d'irréversible** : la recherche locale ne fait que proposer un second
+ *   plan, à côté du premier. C'est l'organisateur qui choisit, en regardant les cinq indicateurs
+ *   séparément — pas cette note.
+ *
+ * La couverture écrase tout le reste, et c'est délibéré : un créneau non pourvu est un trou dans
+ * l'événement réel, là où une préférence d'équipe non honorée est un inconfort. Un échange qui
+ * gagne une place pourvue vaut donc toujours mieux qu'un échange qui gagne dix préférences.
+ */
+const VALEUR = {
+  /** Une place de créneau remplie. Domine, à dessein. */
+  PLACE_POURVUE: 1000,
+  /** Une affectation sur une équipe que le bénévole avait demandée. */
+  PREFERENCE_EQUIPE: 60,
+  /** Une affectation qui tombe dans une plage horaire souhaitée. */
+  HORAIRE_SOUHAITE: 40,
+  /** Un bénévole qui atteint le minimum d'heures qu'on lui promettait. */
+  BENEVOLE_AU_MINIMUM: 120,
+  /** Par heure d'écart-type des charges : négatif, l'inégalité coûte. */
+  ECART_TYPE: -25,
+} as const
+
+/** Ce qui borne la recherche locale : jusqu'où chercher, et à quel rythme regarder l'heure. */
+const RECHERCHE = {
+  /** Budget par défaut, en millisecondes. L'appelant peut le remplacer. */
+  BUDGET_MS: 5_000,
+  /**
+   * Tous les combien on regarde l'horloge.
+   *
+   * `Date.now()` à chaque itération coûterait plus que l'itération elle-même sur les mouvements
+   * rejetés d'emblée. Vérifier par paquets garde le budget tenu à quelques millisecondes près.
+   */
+  ITERATIONS_PAR_CONTROLE: 64,
+  /**
+   * Combien de mouvements stériles d'affilée avant d'arrêter, au minimum.
+   *
+   * Sans cela, une édition déjà optimale consommerait tout le budget pour rien — et l'organisateur
+   * attendrait dix secondes pour s'entendre dire qu'il n'y a rien à gagner.
+   */
+  STERILES_AVANT_ARRET: 4_000,
+  /**
+   * ...mais proportionnellement à la taille du problème.
+   *
+   * Une borne fixe coupait trop tôt sur une grosse édition : le tirage y a beaucoup plus de
+   * couples à essayer, donc beaucoup plus d'essais infructueux entre deux trouvailles. Mesuré sur
+   * 200 bénévoles × 300 créneaux : la borne fixe arrêtait à 93,5 % d'horaires souhaités en 1,5 s,
+   * là où laisser chercher atteignait 94,9 %. L'organisateur avait choisi dix secondes ; on les
+   * lui rendait sans lui demander son avis.
+   */
+  STERILES_PAR_AFFECTATION: 40,
+  /**
+   * Combien de mouvements à plat on accepte d'affilée.
+   *
+   * Un mouvement « à plat » ne change pas la note. Les accepter fait dériver la recherche le long
+   * d'un plateau au lieu de s'y arrêter, ce qui lui permet d'atteindre des configurations d'où un
+   * vrai gain devient possible. C'est ce qui remplace ici la dégradation occasionnelle du recuit
+   * simulé — voir `chercherUnMeilleurPlan`.
+   */
+  PLATS_CONSECUTIFS: 12,
 } as const
 
 /**
@@ -565,6 +669,343 @@ export class VolunteerScheduler {
 
     // 5. Génération des résultats
     return this.generateResults()
+  }
+
+  /**
+   * Un second moteur : la recherche locale, qui reprend le planning du glouton et l'améliore.
+   *
+   * **Elle ne remplace pas le glouton, elle le prolonge.** Il faut avoir appelé `assignVolunteers`
+   * avant : on part de son résultat, on applique des mouvements élémentaires, et on ne garde que
+   * ce qui améliore la note d'ensemble. Les contraintes dures restent celles de `motifBloquant` —
+   * la même méthode, pas une copie : deux implémentations des règles finiraient par diverger, et
+   * ce module a déjà payé ce prix plusieurs fois.
+   *
+   * ### Pourquoi pas le recuit simulé, que l'audit proposait
+   *
+   * Le recuit accepte occasionnellement une DÉGRADATION pour sortir d'un optimum local. Il faut
+   * alors mémoriser le meilleur plan rencontré et savoir y revenir à la fin — donc reconstruire
+   * les compteurs d'heures, les créneaux tenus et les remplissages exactement comme ils étaient.
+   *
+   * Ces compteurs mélangent les affectations posées ici et celles que le calcul conserve, semées
+   * au constructeur. Une restauration approximative les désynchroniserait, et les plafonds
+   * deviendraient aveugles — silencieusement. C'est très exactement la famille de panne qui a
+   * produit la moitié des constats de ce module.
+   *
+   * Cette version ne descend donc jamais : la première exigence de l'audit — « il ne peut pas
+   * rendre un plan pire que celui dont il part » — devient vraie *par construction*, et non par
+   * une mécanique de sauvegarde qu'il faudrait croire sur parole. Ce qu'on perd en échange est
+   * réel et mesuré plus bas : on reste dans un optimum local qu'un vrai recuit franchirait.
+   *
+   * Les mouvements à plat compensent en partie : ils ne changent pas la note, donc ne dégradent
+   * rien, mais ils font dériver la recherche le long d'un plateau jusqu'à un point d'où un gain
+   * redevient atteignable.
+   *
+   * ### Ce qu'elle rapporte, mesuré
+   *
+   * Sur 200 bénévoles et 300 créneaux, jeu réaliste (équipes, préférences horaires, plafonds) :
+   *
+   * | approche                        | horaires souhaités | préférences d'équipe |
+   * | ------------------------------- | ------------------ | -------------------- |
+   * | glouton seul                    | 90,3 %             | 67,3 %               |
+   * | glouton, `PLAGE_HORAIRE` à 20   | 93,7 %             | 63,9 %               |
+   * | glouton, `PLAGE_HORAIRE` à 30   | 96,7 %             | 61,0 %               |
+   * | **glouton + recherche locale**  | **94,9 %**         | **67,3 %**           |
+   *
+   * **C'est cette dernière ligne qui justifie la fonctionnalité.** On aurait pu croire qu'il
+   * suffisait de monter le poids des plages horaires dans le glouton : la mesure dit que non.
+   * Monter ce poids ÉCHANGE un indicateur contre l'autre — trois à six points de préférences
+   * d'équipe perdus pour en gagner autant sur les horaires. La recherche locale atteint le même
+   * niveau d'horaires sans rien céder ailleurs, parce qu'elle juge des plannings entiers là où un
+   * poids ne juge qu'une affectation isolée.
+   *
+   * C'est précisément ce que l'audit reprochait au solveur en nombres entiers — figer une
+   * pondération unique — et ce à quoi la recherche locale échappe.
+   *
+   * ### Ce qu'elle ne rapporte pas
+   *
+   * **Rien sur la couverture.** Sur tous les jeux essayés, y compris un piège construit exprès
+   * pour la prendre en défaut, le glouton pourvoit déjà 100 % des créneaux qu'il peut pourvoir, et
+   * la recherche n'en gagne aucun. Elle ne gagne rien non plus sur l'écart-type des charges ni sur
+   * le minimum d'heures. **Son apport est du confort, pas de la couverture** — il faut le dire à
+   * l'organisateur plutôt que de lui laisser croire qu'elle comblera des trous.
+   *
+   * Elle converge d'elle-même en une seconde et demie sur une grosse édition ; le budget n'est
+   * atteint que si on l'y force. À comparer aux quarante-huit secondes de la phase de permutations
+   * écartée lors du lot A, qui ne rapportait rien.
+   *
+   * @param budgetMs Temps maximum accordé. Le résultat est rendu quoi qu'il arrive.
+   * @param graine Graine du tirage : deux appels identiques rendent le même plan.
+   */
+  public chercherUnMeilleurPlan(
+    budgetMs: number = RECHERCHE.BUDGET_MS,
+    graine = 1
+  ): SchedulingResult {
+    const echeance = Date.now() + Math.max(0, budgetMs)
+    const tirage = tirageReproductible(graine)
+
+    let valeurCourante = this.valeurDuPlan()
+    const valeurDeDepart = valeurCourante
+    const placesDeDepart = this.placesPourvues()
+
+    let steriles = 0
+    let plats = 0
+    let iterations = 0
+    let retenus = 0
+
+    const sterilesTolerees = Math.max(
+      RECHERCHE.STERILES_AVANT_ARRET,
+      this.assignments.length * RECHERCHE.STERILES_PAR_AFFECTATION
+    )
+
+    while (steriles < sterilesTolerees) {
+      // L'horloge par paquets : la regarder à chaque tour coûterait plus cher que le tour.
+      if (iterations % RECHERCHE.ITERATIONS_PAR_CONTROLE === 0 && Date.now() >= echeance) break
+      iterations++
+
+      const applique =
+        tirage() < 0.5 ? this.tenterUnDeplacement(tirage) : this.tenterUnEchange(tirage)
+
+      if (!applique) {
+        steriles++
+        continue
+      }
+
+      const valeurObtenue = this.valeurDuPlan()
+
+      if (valeurObtenue > valeurCourante) {
+        valeurCourante = valeurObtenue
+        steriles = 0
+        plats = 0
+        retenus++
+        continue
+      }
+
+      // À plat : on garde, mais pas indéfiniment — sans quoi la recherche dérive sans fin sur un
+      // plateau au lieu d'aller voir ailleurs.
+      if (valeurObtenue === valeurCourante && plats < RECHERCHE.PLATS_CONSECUTIFS) {
+        plats++
+        steriles++
+        retenus++
+        continue
+      }
+
+      // Toute dégradation est défaite immédiatement. C'est ce qui rend la garantie structurelle.
+      applique.defaire()
+      steriles++
+    }
+
+    const resultat = this.generateResults()
+
+    /**
+     * Le garde-fou, et il n'est pas décoratif.
+     *
+     * La garantie tient par construction — aucun mouvement dégradant n'est conservé. Mais une
+     * garantie qu'on ne vérifie pas est une croyance : si un jour un mouvement mal défait faisait
+     * perdre une place pourvue, ce contrôle le dirait plutôt que de livrer un planning amputé.
+     */
+    if (this.placesPourvues() < placesDeDepart) {
+      throw new Error(
+        `Recherche locale incohérente : ${placesDeDepart} places pourvues au départ, ` +
+          `${this.placesPourvues()} à l'arrivée. Aucun plan n'est rendu.`
+      )
+    }
+
+    return {
+      ...resultat,
+      recherche: {
+        iterations,
+        mouvementsRetenus: retenus,
+        valeurDeDepart,
+        valeurFinale: valeurCourante,
+        budgetEpuise: Date.now() >= echeance,
+      },
+    }
+  }
+
+  /** Les places de créneau effectivement occupées — la quantité que la recherche protège. */
+  private placesPourvues(): number {
+    return this.timeSlots.reduce(
+      (total, slot) => total + Math.min(slot.assignedVolunteers, slot.maxVolunteers),
+      0
+    )
+  }
+
+  /**
+   * La note d'un planning, en quantités absolues et non en ratios.
+   *
+   * En ratios, ajouter une affectation sur une équipe non demandée ferait BAISSER la part des
+   * préférences honorées — la recherche refuserait donc de pourvoir un créneau. Les indicateurs
+   * de `mesurerLaQualite` sont faits pour être lus par un humain ; ceux-ci pour être comparés.
+   *
+   * Les prédicats, eux, sont les mêmes : « dans les horaires souhaités » se juge ici par
+   * `recouvrementDesPreferences` contre `SEUILS.RECOUVREMENT_MINIMAL`, exactement comme là-bas.
+   */
+  private valeurDuPlan(): number {
+    let note = this.placesPourvues() * VALEUR.PLACE_POURVUE
+
+    for (const assignment of this.assignments) {
+      const volunteer = this.benevoleParId.get(assignment.volunteerId)
+      if (!volunteer) continue
+
+      if (
+        assignment.teamId &&
+        volunteer.teamPreferences?.some((pref) => pref === assignment.teamId)
+      )
+        note += VALEUR.PREFERENCE_EQUIPE
+
+      const slot = this.creneauParId.get(assignment.slotId)
+      const availability = volunteer.availability
+      if (
+        slot &&
+        Array.isArray(availability.timePreferences) &&
+        availability.timePreferences.length > 0 &&
+        this.recouvrementDesPreferences(slot, availability) >= SEUILS.RECOUVREMENT_MINIMAL
+      ) {
+        note += VALEUR.HORAIRE_SOUHAITE
+      }
+    }
+
+    const minimum = this.constraints.minHoursPerVolunteer || 2
+    const heures = this.volunteers.map((v) => this.getCurrentVolunteerHours(v.user.id))
+    note += heures.filter((h) => h >= minimum).length * VALEUR.BENEVOLE_AU_MINIMUM
+
+    const moyenne = heures.reduce((somme, h) => somme + h, 0) / Math.max(heures.length, 1)
+    const variance =
+      heures.reduce((somme, h) => somme + (h - moyenne) ** 2, 0) / Math.max(heures.length, 1)
+    note += Math.sqrt(variance) * VALEUR.ECART_TYPE
+
+    return note
+  }
+
+  /**
+   * Déplacer une affectation vers un créneau qui manque de monde.
+   *
+   * Le mouvement qui a le plus de chances de payer : `comblerLesCreneauxVides` fait déjà quelque
+   * chose de comparable, mais il s'arrête aux cinquante premiers créneaux vides et ne tente qu'un
+   * déplacement par créneau. Au-delà, le glouton renonce. C'est là que se trouve la marge.
+   */
+  private tenterUnDeplacement(tirage: () => number): { defaire: () => void } | null {
+    if (this.assignments.length === 0) return null
+
+    const aPourvoir = this.timeSlots.filter((slot) => slot.assignedVolunteers < slot.maxVolunteers)
+    if (aPourvoir.length === 0) return null
+
+    const assignment = this.assignments[Math.floor(tirage() * this.assignments.length)]!
+    const cible = aPourvoir[Math.floor(tirage() * aPourvoir.length)]!
+    const source = this.creneauParId.get(assignment.slotId)
+    const benevole = this.benevoleParId.get(assignment.volunteerId)
+    if (!source || !benevole || source.id === cible.id) return null
+
+    const origine = {
+      slotId: assignment.slotId,
+      teamId: assignment.teamId,
+      score: assignment.score,
+    }
+
+    // On juge dans l'état où il aurait rendu son créneau : sans cela, ses propres heures et son
+    // propre créneau le bloqueraient lui-même (plafond, chevauchement).
+    this.retirerAffectation(assignment)
+    source.assignedVolunteers--
+
+    if (this.motifBloquant(benevole, cible, benevole.availability)) {
+      source.assignedVolunteers++
+      this.enregistrerAffectationSansAjout(assignment)
+      return null
+    }
+
+    const score = this.calculateAssignmentScore(benevole, cible)
+    assignment.slotId = cible.id
+    assignment.teamId = cible.teamId
+    assignment.score = score
+    assignment.confidence = this.calculateConfidence(score)
+    this.enregistrerAffectationSansAjout(assignment)
+    cible.assignedVolunteers++
+
+    return {
+      defaire: () => {
+        this.retirerAffectation(assignment)
+        cible.assignedVolunteers--
+        assignment.slotId = origine.slotId
+        assignment.teamId = origine.teamId
+        assignment.score = origine.score
+        assignment.confidence = this.calculateConfidence(origine.score)
+        this.enregistrerAffectationSansAjout(assignment)
+        source.assignedVolunteers++
+      },
+    }
+  }
+
+  /**
+   * Échanger leurs créneaux entre deux bénévoles.
+   *
+   * Ne change jamais le nombre de places pourvues : ce mouvement ne sert qu'au confort — mieux
+   * respecter les équipes demandées, les horaires souhaités, ou égaliser les charges. C'est
+   * précisément la famille de mouvements qu'une phase de permutations avait explorée sans rien
+   * gagner lors du lot A. Elle est reprise ici parce qu'elle ne coûte presque rien à côté des
+   * déplacements, et parce que la mesure tranchera.
+   */
+  private tenterUnEchange(tirage: () => number): { defaire: () => void } | null {
+    if (this.assignments.length < 2) return null
+
+    const premier = this.assignments[Math.floor(tirage() * this.assignments.length)]!
+    const second = this.assignments[Math.floor(tirage() * this.assignments.length)]!
+    if (premier === second || premier.volunteerId === second.volunteerId) return null
+
+    const creneauA = this.creneauParId.get(premier.slotId)
+    const creneauB = this.creneauParId.get(second.slotId)
+    const benevoleA = this.benevoleParId.get(premier.volunteerId)
+    const benevoleB = this.benevoleParId.get(second.volunteerId)
+    if (!creneauA || !creneauB || !benevoleA || !benevoleB || creneauA.id === creneauB.id)
+      return null
+
+    // Les deux se libèrent avant qu'on juge : chacun doit être évalué sur le créneau de l'autre
+    // sans que le sien propre compte encore dans ses heures.
+    this.retirerAffectation(premier)
+    this.retirerAffectation(second)
+
+    const possible =
+      !this.motifBloquant(benevoleA, creneauB, benevoleA.availability) &&
+      !this.motifBloquant(benevoleB, creneauA, benevoleB.availability)
+
+    if (!possible) {
+      this.enregistrerAffectationSansAjout(premier)
+      this.enregistrerAffectationSansAjout(second)
+      return null
+    }
+
+    const scoreA = this.calculateAssignmentScore(benevoleA, creneauB)
+    const scoreB = this.calculateAssignmentScore(benevoleB, creneauA)
+    const ancienA = { score: premier.score }
+    const ancienB = { score: second.score }
+
+    premier.slotId = creneauB.id
+    premier.teamId = creneauB.teamId
+    premier.score = scoreA
+    premier.confidence = this.calculateConfidence(scoreA)
+    second.slotId = creneauA.id
+    second.teamId = creneauA.teamId
+    second.score = scoreB
+    second.confidence = this.calculateConfidence(scoreB)
+
+    this.enregistrerAffectationSansAjout(premier)
+    this.enregistrerAffectationSansAjout(second)
+
+    return {
+      defaire: () => {
+        this.retirerAffectation(premier)
+        this.retirerAffectation(second)
+        premier.slotId = creneauA.id
+        premier.teamId = creneauA.teamId
+        premier.score = ancienA.score
+        premier.confidence = this.calculateConfidence(ancienA.score)
+        second.slotId = creneauB.id
+        second.teamId = creneauB.teamId
+        second.score = ancienB.score
+        second.confidence = this.calculateConfidence(ancienB.score)
+        this.enregistrerAffectationSansAjout(premier)
+        this.enregistrerAffectationSansAjout(second)
+      },
+    }
   }
 
   /**

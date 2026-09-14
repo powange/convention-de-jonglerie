@@ -203,7 +203,7 @@
               icon="i-heroicons-eye"
               :loading="previewLoading || !reglagesCharges"
               :disabled="!reglagesCharges"
-              @click="generatePreview"
+              @click="lancerLApercu"
             >
               {{ t('volunteers.auto_assignment.preview') }}
             </UButton>
@@ -256,6 +256,83 @@
               </UButton>
             </template>
           </UAlert>
+
+          <!-- Le second moteur : proposé à partir d'un aperçu, jamais à la place. -->
+          <UAlert
+            v-if="previewResult && !planAmeliore"
+            color="neutral"
+            variant="soft"
+            icon="i-heroicons-magnifying-glass"
+            :title="t('volunteers.auto_assignment.search_title')"
+            :description="t('volunteers.auto_assignment.search_description')"
+          >
+            <template #actions>
+              <UButton
+                color="primary"
+                variant="soft"
+                icon="i-heroicons-magnifying-glass"
+                :loading="rechercheLoading"
+                @click="lancerLaRecherche"
+              >
+                {{ t('volunteers.auto_assignment.search_action') }}
+              </UButton>
+            </template>
+          </UAlert>
+
+          <!-- Les deux plans côte à côte : c'est l'organisateur qui tranche, pas l'algorithme. -->
+          <div v-if="planGlouton && planAmeliore" class="space-y-3">
+            <USeparator :label="t('volunteers.auto_assignment.compare_title')" />
+
+            <UAlert
+              v-if="!laRechercheAApporteQuelqueChose"
+              color="neutral"
+              variant="soft"
+              icon="i-heroicons-information-circle"
+              :description="t('volunteers.auto_assignment.compare_no_gain')"
+            />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <button
+                v-for="colonne in colonnesDeComparaison"
+                :key="colonne.cle"
+                type="button"
+                class="text-left p-4 rounded-lg border-2 transition-colors"
+                :class="
+                  planChoisi === colonne.cle
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                    : 'border-default hover:border-primary-300'
+                "
+                :aria-pressed="planChoisi === colonne.cle"
+                @click="choisirLePlan(colonne.cle)"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <span class="font-semibold">{{ colonne.titre }}</span>
+                  <UIcon
+                    v-if="planChoisi === colonne.cle"
+                    name="i-heroicons-check-circle-solid"
+                    class="text-primary-500 text-xl"
+                  />
+                </div>
+
+                <dl class="space-y-1 text-sm">
+                  <div
+                    v-for="ligne in colonne.indicateurs"
+                    :key="ligne.libelle"
+                    class="flex justify-between gap-2"
+                  >
+                    <dt class="text-dimmed">{{ ligne.libelle }}</dt>
+                    <dd class="font-medium tabular-nums" :class="ligne.classe">
+                      {{ ligne.valeur }}
+                    </dd>
+                  </div>
+                </dl>
+              </button>
+            </div>
+
+            <p class="text-xs text-dimmed">
+              {{ t('volunteers.auto_assignment.compare_help') }}
+            </p>
+          </div>
 
           <!-- Résultats de l'aperçu -->
           <div v-if="previewResult" class="space-y-4">
@@ -865,6 +942,100 @@ const getConfidenceColor = (
 }
 
 // Actions
+/**
+ * Les deux plans, quand le second moteur a tourné.
+ *
+ * `previewResult` reste ce que l'écran affiche ET ce que « Appliquer » écrira : basculer de l'un
+ * à l'autre revient donc à le réaffecter, et tout le reste de l'écran suit sans rien savoir de la
+ * cohabitation. C'est aussi ce qui garantit qu'on applique bien le plan qu'on regarde.
+ */
+const planGlouton = ref<any>(null)
+const planAmeliore = ref<any>(null)
+const planChoisi = ref<'glouton' | 'ameliore'>('glouton')
+
+const choisirLePlan = (lequel: 'glouton' | 'ameliore') => {
+  planChoisi.value = lequel
+  previewResult.value = lequel === 'glouton' ? planGlouton.value : planAmeliore.value
+}
+
+/**
+ * Les deux colonnes de comparaison.
+ *
+ * Seuls les indicateurs que la recherche peut bouger sont montrés : en afficher cinq dont trois
+ * identiques ferait chercher la différence à l'œil. Celui qui change est mis en évidence.
+ */
+const colonnesDeComparaison = computed(() => {
+  const construire = (cle: 'glouton' | 'ameliore', titre: string, plan: any, autre: any) => ({
+    cle,
+    titre,
+    indicateurs: [
+      {
+        libelle: t('volunteers.auto_assignment.stat_creneaux_pourvus'),
+        valeur: pourcentage(plan.result.stats.creneauxComplets),
+        classe: ecart(plan.result.stats.creneauxComplets, autre.result.stats.creneauxComplets),
+      },
+      {
+        libelle: t('volunteers.auto_assignment.stat_horaires_souhaites'),
+        valeur: pourcentage(plan.result.stats.creneauxDansLesHorairesSouhaites),
+        classe: ecart(
+          plan.result.stats.creneauxDansLesHorairesSouhaites,
+          autre.result.stats.creneauxDansLesHorairesSouhaites
+        ),
+      },
+      {
+        libelle: t('volunteers.auto_assignment.stat_preferences_equipe'),
+        valeur: pourcentage(plan.result.stats.preferencesEquipeHonorees),
+        classe: ecart(
+          plan.result.stats.preferencesEquipeHonorees,
+          autre.result.stats.preferencesEquipeHonorees
+        ),
+      },
+      {
+        libelle: t('volunteers.auto_assignment.stat_ecart_type'),
+        valeur: heuresArrondies(plan.result.stats.ecartTypeDesHeures),
+        // L'écart-type est le seul indicateur où PLUS BAS vaut mieux : la comparaison s'inverse.
+        classe: ecart(
+          -plan.result.stats.ecartTypeDesHeures,
+          -autre.result.stats.ecartTypeDesHeures
+        ),
+      },
+    ],
+  })
+
+  if (!planGlouton.value || !planAmeliore.value) return []
+  return [
+    construire(
+      'glouton',
+      t('volunteers.auto_assignment.compare_greedy'),
+      planGlouton.value,
+      planAmeliore.value
+    ),
+    construire(
+      'ameliore',
+      t('volunteers.auto_assignment.compare_search'),
+      planAmeliore.value,
+      planGlouton.value
+    ),
+  ]
+})
+
+/** Vert si cette colonne fait mieux que l'autre, gris si elles sont à égalité. */
+const ecart = (valeur: number, reference: number) =>
+  valeur > reference ? 'text-success' : valeur < reference ? 'text-dimmed' : ''
+
+/** Les deux plans diffèrent-ils sur au moins un indicateur ? Sinon, inutile de faire choisir. */
+const laRechercheAApporteQuelqueChose = computed(() => {
+  if (!planGlouton.value || !planAmeliore.value) return false
+  const a = planGlouton.value.result.stats
+  const b = planAmeliore.value.result.stats
+  return (
+    a.creneauxDansLesHorairesSouhaites !== b.creneauxDansLesHorairesSouhaites ||
+    a.preferencesEquipeHonorees !== b.preferencesEquipeHonorees ||
+    a.creneauxComplets !== b.creneauxComplets ||
+    a.ecartTypeDesHeures !== b.ecartTypeDesHeures
+  )
+})
+
 const { execute: generatePreview, loading: previewLoading } = useApiAction(
   () => `/api/editions/${props.editionId}/volunteers/auto-assign`,
   {
@@ -877,6 +1048,39 @@ const { execute: generatePreview, loading: previewLoading } = useApiAction(
     errorMessages: { default: t('errors.error_occurred') },
     onSuccess: (response) => {
       previewResult.value = response
+      // Un nouvel aperçu repart de zéro : l'amélioration précédente portait sur un autre plan.
+      planGlouton.value = response
+      planAmeliore.value = null
+      planChoisi.value = 'glouton'
+    },
+  }
+)
+
+/**
+ * Le second moteur : la recherche locale.
+ *
+ * Elle ne remplace pas l'aperçu, elle en propose un second à côté. Mesuré : elle gagne quelques
+ * points sur les horaires souhaités SANS rien céder sur les préférences d'équipe — ce qu'un
+ * simple réglage de poids ne sait pas faire, puisqu'il échange l'un contre l'autre.
+ */
+const { execute: chercherUnMeilleurPlan, loading: rechercheLoading } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/auto-assign`,
+  {
+    method: 'POST',
+    body: () => ({
+      constraints: constraints.value,
+      ameliorerLePlan: true,
+      planId: planGlouton.value?.planId ?? undefined,
+    }),
+    successMessage: { title: t('volunteers.auto_assignment.search_done') },
+    errorMessages: {
+      409: t('volunteers.auto_assignment.preview_outdated'),
+      404: t('volunteers.auto_assignment.preview_gone'),
+      default: t('errors.error_occurred'),
+    },
+    onSuccess: (response) => {
+      planAmeliore.value = response
+      choisirLePlan('ameliore')
     },
   }
 )
@@ -903,6 +1107,9 @@ const { execute: executeApplyAssignments, loading: applyLoading } = useApiAction
     },
     onSuccess: (response) => {
       previewResult.value = null
+      planGlouton.value = null
+      planAmeliore.value = null
+      planChoisi.value = 'glouton'
       // Le calcul qu'on vient d'appliquer devient celui qu'on peut défaire.
       // Les deux chiffres viennent du serveur : `deletedCount` était codé à zéro faute d'être
       // renvoyé, si bien que l'encart annonçait « 0 affectation effacée » après en avoir effacé
@@ -1197,8 +1404,26 @@ const confirmerApplication = () => {
   executeApplyAssignments()
 }
 
+/**
+ * Deux enveloppes qui ne rendent rien.
+ *
+ * `useApiAction` rend une promesse, qu'un gestionnaire de clic Vue n'accepte pas : le brancher
+ * directement produit une erreur de typage. Celle du bouton « Aperçu » existait déjà ; autant la
+ * refermer en posant la seconde plutôt que d'en ajouter une deuxième du même tonneau.
+ */
+const lancerLApercu = () => {
+  void generatePreview()
+}
+
+const lancerLaRecherche = () => {
+  void chercherUnMeilleurPlan()
+}
+
 const clearPreview = () => {
   previewResult.value = null
+  planGlouton.value = null
+  planAmeliore.value = null
+  planChoisi.value = 'glouton'
 }
 
 // Émissions

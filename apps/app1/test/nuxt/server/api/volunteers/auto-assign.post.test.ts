@@ -941,3 +941,114 @@ describe('POST …/volunteers/auto-assign — ce que le calcul range derrière l
     expect(prismaMock.volunteerAutoAssignPlan.deleteMany).not.toHaveBeenCalled()
   })
 })
+
+/**
+ * Le second moteur : la recherche locale, proposée à partir d'un aperçu.
+ *
+ * Elle ne remplace pas le glouton — elle produit un SECOND plan, à côté du premier, et c'est
+ * l'organisateur qui tranche. Ces tests portent sur ce que l'endpoint garantit avant de la lancer.
+ */
+describe('POST …/volunteers/auto-assign — recherche d’un meilleur plan', () => {
+  beforeEach(preparerLesMocks)
+
+  /** L'aperçu conservé, tel que la base le rendra. Son empreinte est celle du calcul courant. */
+  const apercuConserve = (empreinte: string, surcharge: Record<string, unknown> = {}) => ({
+    id: 'plan-1',
+    eventId: 22,
+    appliedAt: null,
+    expiresAt: new Date(Date.now() + 60_000),
+    fingerprint: empreinte,
+    ...surcharge,
+  })
+
+  /** Un aperçu d'abord, pour connaître l'empreinte courante. */
+  const empreinteCourante = async () => {
+    global.readBody = vi.fn().mockResolvedValue({ constraints: {} })
+    await handler(evenement as any)
+    return prismaMock.volunteerAutoAssignPlan.create.mock.calls.at(-1)[0].data.fingerprint
+  }
+
+  const chercher = (planId = 'plan-1') => {
+    global.readBody = vi.fn().mockResolvedValue({ ameliorerLePlan: true, planId, constraints: {} })
+    return handler(evenement as any)
+  }
+
+  it('rend un second plan, sans toucher au premier', async () => {
+    const empreinte = await empreinteCourante()
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(apercuConserve(empreinte))
+    // Le plan amélioré est une NOUVELLE ligne : la base lui donnerait un autre identifiant, et
+    // c'est ce qui permet à l'écran de garder les deux. Le mock partagé rend toujours `plan-1`.
+    prismaMock.volunteerAutoAssignPlan.create.mockResolvedValue({ id: 'plan-2' })
+
+    const reponse: any = await chercher()
+
+    expect(reponse.data.preview).toBe(true)
+    // Les deux identifiants reviennent : l'écran peut mettre les plans côte à côte.
+    expect(reponse.data.planInitial).toBe('plan-1')
+    expect(reponse.data.planId).toBe('plan-2')
+    // Rien n'a été écrit dans le planning.
+    expect(prismaMock.volunteerAssignment.deleteMany).not.toHaveBeenCalled()
+    expect(prismaMock.volunteerAutoAssignRun.create).not.toHaveBeenCalled()
+  })
+
+  it('rend compte de ce que la recherche a fait', async () => {
+    const empreinte = await empreinteCourante()
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(apercuConserve(empreinte))
+
+    const reponse: any = await chercher()
+
+    expect(reponse.data.recherche).toMatchObject({
+      iterations: expect.any(Number),
+      mouvementsRetenus: expect.any(Number),
+      budgetEpuise: expect.any(Boolean),
+    })
+    // La note ne peut pas descendre : c'est la première exigence de l'audit.
+    expect(reponse.data.recherche.valeurFinale).toBeGreaterThanOrEqual(
+      reponse.data.recherche.valeurDeDepart
+    )
+  })
+
+  it('refuse de chercher à partir d’un aperçu qui n’existe plus', async () => {
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(null)
+
+    await expect(chercher('plan-inconnu')).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('refuse quand le planning a changé depuis l’aperçu', async () => {
+    // Même garde que pour l'application : chercher un meilleur plan à partir de données périmées
+    // produirait une proposition qui ne correspond plus à rien.
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(
+      apercuConserve('une-empreinte-qui-ne-correspond-pas')
+    )
+
+    await expect(chercher()).rejects.toMatchObject({ statusCode: 409 })
+  })
+
+  it('refuse quand l’aperçu a déjà été appliqué', async () => {
+    const empreinte = await empreinteCourante()
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(
+      apercuConserve(empreinte, { appliedAt: new Date() })
+    )
+
+    await expect(chercher()).rejects.toMatchObject({ statusCode: 409 })
+  })
+
+  it('refuse quand l’aperçu a trop vieilli', async () => {
+    const empreinte = await empreinteCourante()
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(
+      apercuConserve(empreinte, { expiresAt: new Date(Date.now() - 1_000) })
+    )
+
+    await expect(chercher()).rejects.toMatchObject({ statusCode: 409 })
+  })
+
+  it('ne cherche rien quand on ne le demande pas', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ constraints: {} })
+
+    const reponse: any = await handler(evenement as any)
+
+    // Un aperçu ordinaire ne porte pas de trace de recherche : la clé dit quel moteur a parlé.
+    expect(reponse.data.recherche).toBeNull()
+    expect(reponse.data.planInitial).toBeNull()
+  })
+})

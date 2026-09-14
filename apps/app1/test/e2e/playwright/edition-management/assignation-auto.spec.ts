@@ -53,6 +53,7 @@ test.describe.serial('Assignation automatique des bénévoles', () => {
   const creneaux: string[] = []
   const benevoles: number[] = []
   let planId = ''
+  let planAmeliore = ''
   let journalId = ''
 
   test('préparer une édition, une équipe, deux créneaux et trois bénévoles', async ({ page }) => {
@@ -192,6 +193,41 @@ test.describe.serial('Assignation automatique des bénévoles', () => {
     })
   })
 
+  /**
+   * Le second moteur, de bout en bout.
+   *
+   * Ce qui se teste ici et nulle part ailleurs : l'aperçu conservé sert de point de départ, la
+   * recherche en produit un SECOND qui vit à côté du premier, et les deux restent applicables.
+   * C'est le contrat de la cohabitation.
+   */
+  test('la recherche locale propose un second plan sans écraser le premier', async ({ page }) => {
+    const reponse = await apiPost(
+      page,
+      `${BASE}/api/editions/${editionId}/volunteers/auto-assign`,
+      { data: { ameliorerLePlan: true, planId, budgetMs: 2000, constraints: {} } }
+    )
+    expect(reponse.ok(), `recherche : ${await reponse.text()}`).toBe(true)
+
+    const corps = (await reponse.json()).data
+    expect(corps.preview).toBe(true)
+    expect(corps.planInitial, 'le plan de départ doit être désigné').toBe(planId)
+    expect(corps.planId, 'un second plan doit être conservé').toBeTruthy()
+    expect(corps.planId).not.toBe(planId)
+
+    // La première exigence de l'audit : jamais pire que ce dont on part.
+    expect(corps.recherche.valeurFinale).toBeGreaterThanOrEqual(corps.recherche.valeurDeDepart)
+    expect(corps.result.assignments.length).toBeGreaterThanOrEqual(0)
+
+    // Et rien n'a été écrit : le journal est toujours vide.
+    const historique = await page.request.get(
+      `${BASE}/api/editions/${editionId}/volunteers/auto-assign/history`
+    )
+    expect((await historique.json()).data).toHaveLength(0)
+
+    // Le plan d'origine reste applicable — c'est lui que la suite du fichier applique.
+    planAmeliore = corps.planId
+  })
+
   test('appliquer écrit le plan de l’aperçu et consigne de quoi le défaire', async ({ page }) => {
     const reponse = await apiPost(
       page,
@@ -215,6 +251,19 @@ test.describe.serial('Assignation automatique des bénévoles', () => {
 
     // Les affectations sont bien en base.
     expect((await affectationsDuCreneau(page, editionId, creneaux[0]!)).length).toBeGreaterThan(0)
+  })
+
+  test('le plan amélioré n’est plus applicable une fois l’autre écrit', async ({ page }) => {
+    // Les deux plans partent des mêmes données ; une fois l'un appliqué, le planning a changé et
+    // l'empreinte de l'autre ne correspond plus. Le refuser est ce qui protège l'organisateur
+    // d'écrire deux plannings l'un sur l'autre.
+    const reponse = await apiPost(
+      page,
+      `${BASE}/api/editions/${editionId}/volunteers/auto-assign`,
+      { data: { applyAssignments: true, planId: planAmeliore, constraints: {} } }
+    )
+
+    expect(reponse.status()).toBe(409)
   })
 
   test('le même aperçu ne s’applique pas deux fois', async ({ page }) => {
