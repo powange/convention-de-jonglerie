@@ -179,6 +179,19 @@ model VolunteerTeam {
   isRequired            Boolean  @default(false)
   isAccessControlTeam   Boolean  @default(false)
   isMealValidationTeam  Boolean  @default(false)
+  /// Équipe de bénévoles VOLANTS : des gens à disposition, sans créneau fixe, qu'on appelle en
+  /// renfort quand une équipe prend du retard ou qu'une tâche se révèle plus lourde que prévu.
+  ///
+  /// La notion vit sur l'ÉQUIPE et non sur le bénévole, et c'est ce qui la rend peu coûteuse :
+  /// être volant, c'est simplement appartenir à une telle équipe. Le rattachement existe déjà
+  /// (`ApplicationTeamAssignment`), les objets à remettre sont déjà portés par l'équipe, et la
+  /// conversation d'équipe permet déjà de joindre tout le monde pendant l'événement.
+  ///
+  /// ⚠️ Elle n'exempte de rien à elle seule. Un bénévole n'est « hors des comptes » que si TOUTES
+  /// ses équipes sont volantes : quelqu'un qui est à la fois en cuisine et volant reste un
+  /// bénévole ordinaire, et l'assignation automatique lui donne ses heures de cuisine. Voir
+  /// `benevoles-volants.ts`, où la règle est écrite une fois.
+  isFloatingTeam        Boolean  @default(false)
   isVisibleToVolunteers Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

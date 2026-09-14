@@ -410,3 +410,75 @@ describe('statistiques avec organisateurs', () => {
     expect(individuel[0]!.estOrganisateur).toBeFalsy()
   })
 })
+
+/**
+ * Les bénévoles volants dans les statistiques.
+ *
+ * Un volant n'a pas de créneau, par construction. Sans traitement, il apparaîtrait comme un
+ * bénévole à zéro heure — c'est-à-dire comme quelqu'un qu'on a oublié de placer — et ferait
+ * baisser la moyenne d'heures de tous les autres.
+ */
+describe('bénévoles volants', () => {
+  const equipe = (isFloatingTeam: boolean) => ({ team: { isFloatingTeam } })
+
+  const avecEquipes = (
+    id: number,
+    pseudo: string,
+    ...equipes: ReturnType<typeof equipe>[]
+  ): AcceptedVolunteer => ({
+    user: user(id, pseudo),
+    status: 'ACCEPTED',
+    teamAssignments: equipes,
+  })
+
+  it('sort les volants de l’effectif compté', () => {
+    const stats = calculateVolunteersStats(
+      [slot(1, '2026-08-01T10:00:00Z', '2026-08-01T12:00:00Z', [user(1, 'alice')])],
+      [avecEquipes(1, 'alice', equipe(false)), avecEquipes(2, 'volant', equipe(true))]
+    )
+
+    expect(stats.totalVolunteers).toBe(1)
+    // La moyenne se rapporte au seul bénévole compté : 2 h sur 1 personne, et non sur 2.
+    expect(stats.averageHours).toBe(2)
+  })
+
+  it('garde celui qui est volant ET dans une équipe ordinaire', () => {
+    // Le point à ne pas perdre : être volant n'exempte de rien, c'est n'être QUE volant qui
+    // exempte. Ce bénévole-là doit ses heures de cuisine.
+    const stats = calculateVolunteersStats(
+      [],
+      [avecEquipes(1, 'polyvalent', equipe(true), equipe(false))]
+    )
+
+    expect(stats.totalVolunteers).toBe(1)
+  })
+
+  it('garde un bénévole sans aucune équipe', () => {
+    // C'est un accepté pas encore placé, pas un volant — et c'est justement celui que
+    // l'assignation automatique doit traiter.
+    const stats = calculateVolunteersStats([], [accepted(1, 'enattente')])
+
+    expect(stats.totalVolunteers).toBe(1)
+  })
+
+  it('n’ajoute pas les volants à la liste des « 0 heure »', () => {
+    const individuelles = calculateVolunteersStatsIndividual(
+      [slot(1, '2026-08-01T10:00:00Z', '2026-08-01T12:00:00Z', [user(1, 'alice')])],
+      [avecEquipes(1, 'alice', equipe(false)), avecEquipes(2, 'volant', equipe(true))]
+    )
+
+    expect(individuelles.map((s) => s.user.id)).toEqual([1])
+  })
+
+  it('compte quand même un volant qui a tenu un créneau', () => {
+    // Un renfort de dernière minute est du travail fait : il doit se voir. Ce sont les heures
+    // ATTENDUES dont il est dispensé, pas celles qu'il a réellement données.
+    const individuelles = calculateVolunteersStatsIndividual(
+      [slot(1, '2026-08-01T10:00:00Z', '2026-08-01T13:00:00Z', [user(2, 'volant')])],
+      [avecEquipes(2, 'volant', equipe(true))]
+    )
+
+    const volant = individuelles.find((s) => s.user.id === 2)
+    expect(volant?.totalHours).toBe(3)
+  })
+})

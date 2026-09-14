@@ -1,6 +1,13 @@
 /**
- * Utilitaires pour le calcul des statistiques des b�n�voles
+ * Utilitaires pour le calcul des statistiques des bénévoles.
+ *
+ * ⚠️ Deux fonctions d'ici partent de la liste des ACCEPTÉS et non des créneaux : ce sont les
+ * seules que la notion de bénévole volant concerne. Celles qui partent des créneaux — par jour,
+ * par équipe — n'ont rien à filtrer : un volant sans créneau n'y figure déjà pas, et un volant
+ * venu renforcer une équipe doit au contraire y apparaître sous CETTE équipe.
  */
+
+import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
 
 export interface VolunteerStats {
   totalVolunteers: number
@@ -121,13 +128,39 @@ export interface AcceptedVolunteer {
 }
 
 /**
- * Calcule les statistiques globales des b�n�voles
+ * Les équipes d'une candidature, telles que l'API les rend.
+ *
+ * `teamAssignments[].team` est la forme que rend `applications.get` ; l'absence du champ — un
+ * appel qui n'a pas demandé les équipes — donne une liste vide, donc personne n'est dispensé.
+ * C'est le bon défaut : mieux vaut compter un volant que dispenser tout le monde.
+ */
+function equipesDe(candidature: AcceptedVolunteer): { isFloatingTeam?: boolean | null }[] {
+  const assignations = (candidature as { teamAssignments?: { team?: unknown }[] }).teamAssignments
+  if (!Array.isArray(assignations)) return []
+  return assignations
+    .map((assignation) => assignation?.team as { isFloatingTeam?: boolean | null } | undefined)
+    .filter((equipe): equipe is { isFloatingTeam?: boolean | null } => !!equipe)
+}
+
+/** Les candidatures qui entrent dans les décomptes. */
+function benevolesDesComptesSeuls(candidatures: AcceptedVolunteer[]): AcceptedVolunteer[] {
+  return candidatures.filter((candidature) => !estHorsDesComptes(equipesDe(candidature)))
+}
+
+/**
+ * Calcule les statistiques globales des bénévoles
  */
 export function calculateVolunteersStats(
   timeSlots: TimeSlotWithAssignments[],
   acceptedVolunteers: AcceptedVolunteer[]
 ): VolunteerStats {
-  const totalVolunteers = acceptedVolunteers.length || 0
+  // Les volants sortent de l'effectif : sans créneau par construction, ils feraient baisser la
+  // moyenne d'heures de tous les autres sans que rien n'explique pourquoi. Le fichier applique
+  // déjà le même raisonnement aux organisateurs, qui ne comptent que s'ils tiennent un créneau.
+  const benevolesComptes = acceptedVolunteers.filter(
+    (candidature) => !estHorsDesComptes(equipesDe(candidature))
+  )
+  const totalVolunteers = benevolesComptes.length || 0
 
   let totalHours = 0
   let totalSlots = 0
@@ -223,12 +256,12 @@ export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments
     .sort((a: any, b: any) => a.date.localeCompare(b.date))
     .map((day) => ({
       ...day,
-      volunteers: Array.from(day.volunteers.values()).sort((a: any, b: any) => b.hours - a.hours), // Trier par heures d�croissantes
+      volunteers: Array.from(day.volunteers.values()).sort((a: any, b: any) => b.hours - a.hours), // Trier par heures décroissantes
     }))
 }
 
 /**
- * Calcule les statistiques par b�n�vole individuel (incluant ceux sans cr�neaux)
+ * Calcule les statistiques par bénévole individuel (incluant ceux sans créneaux)
  */
 export function calculateVolunteersStatsIndividual(
   timeSlots: TimeSlotWithAssignments[],
@@ -236,8 +269,9 @@ export function calculateVolunteersStatsIndividual(
 ): VolunteerStatsIndividual[] {
   const volunteerStats = new Map<number, any>()
 
-  // D'abord, ajouter tous les b�n�voles accept�s avec 0 heures
-  acceptedVolunteers.forEach((application) => {
+  // D'abord, ajouter tous les bénévoles acceptés avec 0 heures — sauf les volants, dont le zéro
+  // se lirait comme un oubli d'affectation alors que c'est leur rôle même.
+  benevolesDesComptesSeuls(acceptedVolunteers).forEach((application) => {
     if (application.user && !volunteerStats.has(application.user.id)) {
       volunteerStats.set(application.user.id, {
         user: application.user,
@@ -248,7 +282,7 @@ export function calculateVolunteersStatsIndividual(
     }
   })
 
-  // Ensuite, calculer les heures pour ceux qui ont des cr�neaux
+  // Ensuite, calculer les heures pour ceux qui ont des créneaux
   timeSlots.forEach((slot) => {
     const personnes = personnesDuCreneau(slot)
     if (personnes.length === 0) return
@@ -277,7 +311,7 @@ export function calculateVolunteersStatsIndividual(
       volunteerStat.totalHours += hours
       volunteerStat.totalSlots += 1
 
-      // Ajouter les d�tails par jour
+      // Ajouter les détails par jour
       if (!volunteerStat.dayDetails.has(dayKey)) {
         volunteerStat.dayDetails.set(dayKey, {
           date: dayKey,
@@ -292,7 +326,7 @@ export function calculateVolunteersStatsIndividual(
     })
   })
 
-  // Convertir en array et trier par nombre d'heures total d�croissant
+  // Convertir en array et trier par nombre d'heures total décroissant
   return Array.from(volunteerStats.values())
     .map((volunteer) => ({
       ...volunteer,
@@ -301,7 +335,7 @@ export function calculateVolunteersStatsIndividual(
       ), // Trier par date
     }))
     .sort((a, b) => {
-      // Trier par heures d�croissantes, puis par nom
+      // Trier par heures décroissantes, puis par nom
       if (b.totalHours !== a.totalHours) {
         return b.totalHours - a.totalHours
       }

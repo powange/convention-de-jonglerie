@@ -15,6 +15,7 @@ const createTeamSchema = z.object({
   maxVolunteers: z.number().int().positive().optional(),
   isRequired: z.boolean().optional().default(false),
   isAccessControlTeam: z.boolean().optional().default(false),
+  isFloatingTeam: z.boolean().optional().default(false),
   isVisibleToVolunteers: z.boolean().optional().default(true),
 })
 
@@ -73,6 +74,7 @@ export default wrapApiHandler(
         maxVolunteers: body.maxVolunteers,
         isRequired,
         isAccessControlTeam: body.isAccessControlTeam,
+        isFloatingTeam: body.isFloatingTeam,
         isVisibleToVolunteers: body.isVisibleToVolunteers,
       },
       include: {

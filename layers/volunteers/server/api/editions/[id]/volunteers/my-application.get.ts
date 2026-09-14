@@ -6,6 +6,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
 
 /**
  * Récupère la candidature de bénévolat de l'utilisateur connecté pour une édition
@@ -70,6 +71,7 @@ export default wrapApiHandler(
                 name: true,
                 description: true,
                 color: true,
+                isFloatingTeam: true,
               },
             },
           },
@@ -142,6 +144,19 @@ export default wrapApiHandler(
       // eux, verraient son profil à jour — deux vérités pour la même personne.
       ...infosPersonnelles(application.user as never),
       teamAssignments: planningVisible ? application.teamAssignments : [],
+      /**
+       * Le rôle de volant, rendu MÊME quand le planning est masqué.
+       *
+       * Les équipes, elles, restent cachées jusqu'à publication : savoir qu'on est dans « Bar -
+       * nuit » est déjà un résultat de planification. Le rôle de volant n'en est pas un — c'est une
+       * décision prise en amont, et celui qui l'ignore attend des créneaux qui ne viendront jamais.
+       *
+       * Un booléen et non la liste des équipes : on dit le rôle sans dévoiler où la personne est
+       * placée, ce que le masquage protège.
+       */
+      estVolant: estHorsDesComptes(
+        application.teamAssignments.map((assignation) => assignation.team)
+      ),
       assignedTimeSlots: assignedTimeSlots.map((assignation) => ({
         ...assignation,
         timeSlot: avecCoequipiers(assignation.timeSlot),
