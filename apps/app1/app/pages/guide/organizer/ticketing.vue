@@ -19,6 +19,22 @@
               t('sections.config.anonymous')
             }}</span>
           </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.config.payments')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.config.sumup') }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-blue-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.config.handoutItems')
+            }}</span>
+          </li>
         </ul>
       </GuideSection>
 
@@ -207,6 +223,12 @@ const messages = {
         "Inscription sur place : autorisez ou non l'ajout manuel de participants le jour de l'événement.",
       anonymous:
         "Commandes anonymes : permettez aux visiteurs de s'inscrire sans créer de compte sur la plateforme.",
+      payments:
+        'Moyens de paiement acceptés : espèces, carte bancaire et chèque, à cocher indépendamment. Décocher un moyen le retire des encaissements au comptoir.',
+      sumup:
+        'SumUp : reliez un terminal de paiement SumUp pour encaisser les cartes depuis les comptoirs de vente.',
+      handoutItems:
+        "Articles à remettre : la section décrite plus bas peut être éteinte pour l'édition si vous ne remettez rien à l'accueil.",
     },
     external: {
       title: 'Billetterie externe',

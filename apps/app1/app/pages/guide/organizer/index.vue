@@ -74,6 +74,10 @@ const messages = {
       title: 'Billetterie',
       description: "Tarifs, commandes, contrôle d'accès et stats.",
     },
+    treasury: {
+      title: 'Trésorerie',
+      description: "Codes d'imputation, charges, produits et export PDF.",
+    },
     map: {
       title: 'Carte interactive',
       description: 'Zones, marqueurs et plan du site.',
@@ -166,6 +170,14 @@ const sections = computed(() => [
     title: t('sections.ticketing.title'),
     description: t('sections.ticketing.description'),
     icon: 'i-heroicons-ticket',
+    bgClass: 'bg-blue-100 dark:bg-blue-900/30',
+    iconClass: 'text-blue-600 dark:text-blue-400',
+  },
+  {
+    slug: 'treasury',
+    title: t('sections.treasury.title'),
+    description: t('sections.treasury.description'),
+    icon: 'i-heroicons-banknotes',
     bgClass: 'bg-blue-100 dark:bg-blue-900/30',
     iconClass: 'text-blue-600 dark:text-blue-400',
   },

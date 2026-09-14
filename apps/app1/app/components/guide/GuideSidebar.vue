@@ -43,6 +43,7 @@ const messages = {
     artists: 'Artistes & Spectacles',
     meals: 'Repas',
     ticketing: 'Billetterie',
+    treasury: 'Trésorerie',
     map: 'Carte interactive',
     other: 'Autres',
     volunteer: 'Bénévole',
@@ -121,6 +122,11 @@ const items = computed<NavigationMenuItem[][]>(() => [
         {
           label: t('nav.ticketing'),
           to: '/guide/organizer/ticketing',
+          onSelect: () => emit('navigate'),
+        },
+        {
+          label: t('nav.treasury'),
+          to: '/guide/organizer/treasury',
           onSelect: () => emit('navigate'),
         },
         {

@@ -248,6 +248,10 @@ const messages = {
         label: 'Carte du site',
         desc: 'le plan interactif du terrain : zones, scènes, camping, sanitaires, avec une légende cliquable.',
       },
+      program: {
+        label: 'Programme',
+        desc: "la frise horaire de l'édition, qui réunit les ateliers, les spectacles et les moments de la vie du lieu. Elle n'apparaît que lorsque les organisateurs la jugent prête à être montrée.",
+      },
       showsCall: {
         label: 'Appels à spectacles',
         desc: 'les appels ouverts aux artistes. Consultables par tous, la candidature demande un profil artiste.',
@@ -325,7 +329,7 @@ useHead({
 })
 
 // Modules qu'un organisateur peut activer sur son édition, vus côté participant.
-const MODULE_KEYS = ['faq', 'workshops', 'map', 'showsCall', 'lostFound']
+const MODULE_KEYS = ['faq', 'program', 'workshops', 'map', 'showsCall', 'lostFound']
 
 const moduleItems = computed(() =>
   MODULE_KEYS.map((key) => ({
