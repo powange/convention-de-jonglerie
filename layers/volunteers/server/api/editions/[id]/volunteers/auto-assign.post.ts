@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { placesOccupees } from '../../../../utils/places-creneau'
+
 import type { Prisma } from '#server/types/prisma'
 import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
@@ -25,7 +27,11 @@ type VolunteerWithTeamAssignments = Prisma.EditionVolunteerApplicationGetPayload
 
 type TimeSlotWithAssignments = Prisma.VolunteerTimeSlotGetPayload<{
   include: {
-    assignments: { include: { user: true } }
+    assignments: { select: { userId: true; source: true } }
+    // Un organisateur occupe une place comme un bénévole : le schéma le dit, et les deux
+    // endpoints d'affectation manuelle le respectent déjà. Sans ce décompte, l'assignation
+    // automatique était le seul chemin d'écriture à sur-remplir les créneaux qu'ils tiennent.
+    _count: { select: { organizerAssignments: true } }
   }
 }>
 
@@ -150,11 +156,10 @@ export default wrapApiHandler(
       prisma.volunteerTimeSlot.findMany({
         where: { eventId: editionId },
         include: {
-          assignments: {
-            include: {
-              user: true,
-            },
-          },
+          // Seuls `userId` et `source` sont lus ici : charger l'objet User entier pour chaque
+          // affectation de chaque créneau ne servait à rien.
+          assignments: { select: { userId: true, source: true } },
+          _count: { select: { organizerAssignments: true } },
         },
       }),
 
@@ -194,19 +199,28 @@ export default wrapApiHandler(
         )
     )
 
-    // Les bénévoles dont une affectation subsiste occupent déjà leur place : les proposer à
-    // nouveau les ferait compter deux fois.
-    let availableVolunteers = benevolesPlanifiables
-    if (mode !== 'replace-all') {
-      const assignedVolunteerIds = new Set(
-        timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
-          slot.assignments.filter(conservee).map((assignment) => assignment.user.id)
-        )
-      )
-      availableVolunteers = benevolesPlanifiables.filter(
-        (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
-      )
-    }
+    /**
+     * Les affectations que le calcul conserve, et qu'il doit donc prendre en compte.
+     *
+     * Elles étaient traitées par l'exclusion : tout bénévole ayant une affectation conservée
+     * sortait du calcul. Un bénévole placé à la main sur un seul créneau de deux heures ne
+     * recevait donc jamais les heures qui lui manquaient — et c'est précisément le cas courant,
+     * l'organisateur posant quelques affectations avant de lancer le calcul pour compléter.
+     *
+     * Le vrai besoin était de partir de leur charge existante, pas de les écarter : ces
+     * affectations pèsent dans leurs heures, occupent leur temps et ferment les spectacles
+     * qu'elles recouvrent, sans jamais être remises en cause.
+     */
+    const affectationsConservees = timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
+      slot.assignments.filter(conservee).map((assignment) => ({
+        volunteerId: assignment.userId,
+        slotId: slot.id,
+        start: slot.startDateTime.toISOString(),
+        end: slot.endDateTime.toISOString(),
+      }))
+    )
+
+    const availableVolunteers = benevolesPlanifiables
 
     // Conversion des données pour l'algorithme
     const schedulerVolunteers = availableVolunteers.map(
@@ -232,6 +246,9 @@ export default wrapApiHandler(
         // Les équipes où les organisateurs ont déjà placé ce bénévole, sous la même forme que
         // les préférences : des identifiants d'équipe, comparables au `teamId` d'un créneau.
         assignedTeams: volunteer.teamAssignments.map((assignation) => assignation.teamId),
+        // Quand il arrive et quand il repart : le calcul ne lui proposera rien en dehors.
+        arrivalDateTime: volunteer.arrivalDateTime,
+        departureDateTime: volunteer.departureDateTime,
       })
     )
 
@@ -257,8 +274,21 @@ export default wrapApiHandler(
         end: slot.endDateTime.toISOString(),
         teamId: slot.teamId?.toString() || undefined,
         maxVolunteers: slot.maxVolunteers,
-        // Seules les affectations qui survivent occupent une place
-        assignedVolunteers: slot.assignments.filter(conservee).length,
+        /**
+         * Les places occupées, tous titres confondus.
+         *
+         * Seules les affectations qui survivent comptent — et les organisateurs, qui occupent
+         * une place comme un bénévole. Le décompte passe par `placesOccupees`, la règle que les
+         * deux endpoints d'affectation manuelle appliquent déjà : la recopier ici une troisième
+         * fois est exactement ce qui avait produit l'écart.
+         */
+        assignedVolunteers: placesOccupees({
+          maxVolunteers: slot.maxVolunteers,
+          _count: {
+            assignments: slot.assignments.filter(conservee).length,
+            organizerAssignments: slot._count.organizerAssignments,
+          },
+        }),
         description: slot.description || undefined,
       }))
 
@@ -308,7 +338,8 @@ export default wrapApiHandler(
         debut: eventRecord.startDate?.toISOString() ?? null,
         fin: eventRecord.endDate?.toISOString() ?? null,
       },
-      spectacles
+      spectacles,
+      affectationsConservees
     )
 
     const result = scheduler.assignVolunteers()

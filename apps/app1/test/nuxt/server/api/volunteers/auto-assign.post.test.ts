@@ -40,32 +40,42 @@ const EQUIPES = [
   { id: 'volante', name: 'Volants', color: '#333333', isFloatingTeam: true },
 ]
 
-const creneau = (id: string, teamId: string | null, heureDebut: number) => ({
+const creneau = (
+  id: string,
+  teamId: string | null,
+  heureDebut: number,
+  options: { maxVolunteers?: number; organisateurs?: number; assignments?: unknown[] } = {}
+) => ({
   id,
   teamId,
   title: `Créneau ${id}`,
   description: null,
-  maxVolunteers: 2,
+  maxVolunteers: options.maxVolunteers ?? 2,
   startDateTime: new Date(Date.UTC(2026, 7, 1, heureDebut, 0, 0)),
   endDateTime: new Date(Date.UTC(2026, 7, 1, heureDebut + 2, 0, 0)),
-  assignments: [] as unknown[],
+  assignments: (options.assignments ?? []) as unknown[],
+  _count: { organizerAssignments: options.organisateurs ?? 0 },
 })
 
 const CRENEAUX = [
   creneau('creneau-cuisine', 'cuisine', 15),
   creneau('creneau-libre', null, 17),
   // Celui-ci porte déjà une affectation posée à la main : c'est elle que la relance effaçait.
-  {
-    ...creneau('creneau-autonome', 'autonome', 15),
-    assignments: [{ id: 'aff-autonome', source: 'MANUAL', user: { id: 42 } }],
-  },
+  creneau('creneau-autonome', 'autonome', 15, {
+    assignments: [{ userId: 42, source: 'MANUAL' }],
+  }),
   creneau('creneau-volant', 'volante', 17),
 ]
 
 const benevole = (
   applicationId: number,
   userId: number,
-  options: { disponible?: boolean; equipes?: string[] } = {}
+  options: {
+    disponible?: boolean
+    equipes?: string[]
+    arrivee?: string
+    depart?: string
+  } = {}
 ) => ({
   id: applicationId,
   user: { id: userId, pseudo: `benevole-${userId}`, nom: null, prenom: null },
@@ -73,6 +83,8 @@ const benevole = (
     teamId,
     team: EQUIPES.find((equipe) => equipe.id === teamId),
   })),
+  arrivalDateTime: options.arrivee ?? null,
+  departureDateTime: options.depart ?? null,
   setupAvailability: false,
   teardownAvailability: false,
   eventAvailability: options.disponible ?? true,
@@ -306,5 +318,149 @@ describe('POST …/volunteers/auto-assign — journal du calcul', () => {
 
     expect(prismaMock.volunteerAutoAssignRun.create).not.toHaveBeenCalled()
     expect(prismaMock.volunteerAssignment.deleteMany).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * Un créneau a des places, et un organisateur en occupe une comme un bénévole. Le schéma le dit,
+ * `places-creneau.ts` l'écrit, les deux endpoints manuels l'appliquent — l'assignation automatique
+ * était le seul chemin d'écriture à l'ignorer, et donc à sur-remplir.
+ */
+describe('POST …/volunteers/auto-assign — places occupées', () => {
+  beforeEach(preparerLesMocks)
+
+  const creneauxProposes = () => {
+    const { data } = prismaMock.volunteerAutoAssignRun.create.mock.calls.at(-1)[0]
+    return data.createdAssignments.map((a: { timeSlotId: string }) => a.timeSlotId)
+  }
+
+  it('ne remplit pas un créneau déjà pourvu par des organisateurs', async () => {
+    prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
+      creneau('creneau-plein', 'cuisine', 15, { maxVolunteers: 1, organisateurs: 1 }),
+    ])
+
+    await appliquer('replace-all')
+
+    expect(creneauxProposes()).not.toContain('creneau-plein')
+  })
+
+  it('remplit la place qui reste à côté d’un organisateur', async () => {
+    prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
+      creneau('creneau-mixte', 'cuisine', 15, { maxVolunteers: 2, organisateurs: 1 }),
+    ])
+
+    await appliquer('replace-all')
+
+    expect(creneauxProposes()).toContain('creneau-mixte')
+    expect(creneauxProposes().filter((id: string) => id === 'creneau-mixte')).toHaveLength(1)
+  })
+})
+
+/**
+ * Un bénévole placé à la main sur un créneau sortait entièrement du calcul : il ne recevait jamais
+ * les heures qui lui manquaient. C'est pourtant le cas courant — on pose quelques affectations,
+ * puis on lance le calcul pour compléter.
+ */
+describe('POST …/volunteers/auto-assign — charge déjà en place', () => {
+  beforeEach(preparerLesMocks)
+
+  const beneficiaires = () => {
+    const { data } = prismaMock.volunteerAutoAssignRun.create.mock.calls.at(-1)[0]
+    return data.createdAssignments.map((a: { userId: number }) => a.userId)
+  }
+
+  it('complète un bénévole déjà placé à la main', async () => {
+    prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
+      creneau('creneau-tenu', 'cuisine', 15, {
+        assignments: [{ userId: 10, source: 'MANUAL' }],
+      }),
+      creneau('creneau-libre', 'cuisine', 19),
+    ])
+
+    await appliquer('keep-manual')
+
+    // Sans cette prise en compte, le bénévole 10 était écarté et le second créneau restait vide.
+    expect(beneficiaires()).toContain(10)
+  })
+
+  it('ne lui redonne pas un créneau qui chevauche celui qu’il tient déjà', async () => {
+    prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
+      creneau('creneau-tenu', 'cuisine', 15, {
+        assignments: [{ userId: 10, source: 'MANUAL' }],
+      }),
+      creneau('creneau-chevauchant', 'cuisine', 16),
+    ])
+
+    await appliquer('keep-manual')
+
+    const { data } = prismaMock.volunteerAutoAssignRun.create.mock.calls.at(-1)[0]
+    expect(
+      data.createdAssignments.filter(
+        (a: { timeSlotId: string; userId: number }) =>
+          a.timeSlotId === 'creneau-chevauchant' && a.userId === 10
+      )
+    ).toHaveLength(0)
+  })
+})
+
+/**
+ * Les dates d'arrivée et de départ sont renseignées par le bénévole et lues par le module repas.
+ * Le planificateur, lui, les ignorait : il pouvait attribuer un créneau du vendredi à quelqu'un
+ * qui arrive le samedi.
+ */
+describe('POST …/volunteers/auto-assign — présence du bénévole', () => {
+  beforeEach(preparerLesMocks)
+
+  const beneficiaires = () => {
+    const { data } = prismaMock.volunteerAutoAssignRun.create.mock.calls.at(-1)[0]
+    return data.createdAssignments.map((a: { userId: number }) => a.userId)
+  }
+
+  it('n’affecte rien avant l’arrivée du bénévole', async () => {
+    // Les créneaux sont le 1er août ; celui-ci arrive le 2.
+    prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+      benevole(5, 10, { arrivee: '2026-08-02_morning' }),
+    ])
+
+    await appliquer('replace-all')
+
+    expect(beneficiaires()).not.toContain(10)
+  })
+
+  it('n’affecte rien après son départ', async () => {
+    prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+      benevole(5, 10, { depart: '2026-07-31_evening' }),
+    ])
+
+    await appliquer('replace-all')
+
+    expect(beneficiaires()).not.toContain(10)
+  })
+
+  it('affecte normalement quand le créneau tombe dans la fenêtre', async () => {
+    prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+      benevole(5, 10, { arrivee: '2026-08-01_morning', depart: '2026-08-02_evening' }),
+    ])
+
+    await appliquer('replace-all')
+
+    expect(beneficiaires()).toContain(10)
+  })
+
+  it('refuse un créneau que le bénévole ne peut pas tenir jusqu’au bout', async () => {
+    // Départ le 1er à midi ; le créneau de 15 h à 17 h UTC commence après son départ.
+    prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+      benevole(5, 10, { depart: '2026-08-01_noon' }),
+    ])
+
+    await appliquer('replace-all')
+
+    expect(beneficiaires()).not.toContain(10)
+  })
+
+  it('laisse tout ouvert quand rien n’est déclaré', async () => {
+    await appliquer('replace-all')
+
+    expect(beneficiaires()).toContain(10)
   })
 })
