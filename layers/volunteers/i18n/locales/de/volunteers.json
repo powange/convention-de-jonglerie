@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Detaillierte Beschreibung des Zeitschlitzes (optional)",
     "slot_title": "Zeitschlitz-Titel",
     "slot_title_placeholder": "Z.B.: Besucherempfang",
+    "slot_understaffed": "In dieser Schicht sind noch Plätze zu besetzen",
     "slot_updated": "Zeitschlitz aktualisiert",
     "slots_back_to_back": "Direkt hintereinander",
     "slots_break_of": "{duration} Pause",

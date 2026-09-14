@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { formaterCreneau, inclusionCreneau } from '../../../../utils/creneau-formate'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -29,43 +31,6 @@ const createTimeSlotSchema = z
     message: 'La date de fin doit être postérieure à la date de début',
     path: ['endDateTime'],
   })
-
-/** Ce que le calendrier attend d'un créneau : FullCalendar lit `start`, `end` et `resourceId`. */
-const formaterPourCalendrier = (slot: {
-  id: string
-  title: string | null
-  description: string | null
-  startDateTime: Date
-  endDateTime: Date
-  teamId: string | null
-  team: { id: string; name: string; color: string } | null
-  maxVolunteers: number
-  assignments: unknown[]
-  _count: { assignments: number }
-}) => ({
-  id: slot.id,
-  title: slot.title,
-  description: slot.description,
-  start: slot.startDateTime.toISOString(),
-  end: slot.endDateTime.toISOString(),
-  teamId: slot.teamId,
-  team: slot.team,
-  maxVolunteers: slot.maxVolunteers,
-  assignedVolunteers: slot._count.assignments,
-  assignments: slot.assignments,
-  color: slot.team?.color || '#6b7280',
-  resourceId: slot.teamId || 'unassigned',
-})
-
-const inclusionCreneau = {
-  team: { select: { id: true, name: true, color: true } },
-  assignments: {
-    include: {
-      user: { select: { id: true, pseudo: true, nom: true, prenom: true } },
-    },
-  },
-  _count: { select: { assignments: true } },
-} as const
 
 export default wrapApiHandler(
   async (event) => {
@@ -193,7 +158,7 @@ export default wrapApiHandler(
 
     setResponseStatus(event, 201)
     return createSuccessResponse({
-      timeSlots: timeSlots.map(formaterPourCalendrier),
+      timeSlots: timeSlots.map((slot) => formaterCreneau(slot, true)),
     })
   },
   { operationName: 'CreateVolunteerTimeSlot' }

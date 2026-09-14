@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Подробное описание временного слота (необязательно)",
     "slot_title": "Название временного слота",
     "slot_title_placeholder": "Напр.: Прием посетителей",
+    "slot_understaffed": "В этой смене ещё есть свободные места",
     "slot_updated": "Временной слот обновлен",
     "slots_back_to_back": "Подряд, без перерыва",
     "slots_break_of": "перерыв {duration}",

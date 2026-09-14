@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { formaterCreneau, inclusionCreneau } from '../../../../utils/creneau-formate'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
@@ -133,51 +135,15 @@ export default wrapApiHandler(
     const timeSlot = await prisma.volunteerTimeSlot.update({
       where: { id: slotId },
       data: updateData,
-      include: {
-        team: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-          },
-        },
-        assignments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                nom: true,
-                prenom: true,
-              },
-            },
-          },
-        },
-        _count: {
-          select: {
-            assignments: true,
-          },
-        },
-      },
+      include: inclusionCreneau,
     })
 
-    // Transformer les données pour être compatibles avec FullCalendar
-    const formattedTimeSlot = {
-      id: timeSlot.id,
-      title: timeSlot.title,
-      description: timeSlot.description,
-      start: timeSlot.startDateTime.toISOString(),
-      end: timeSlot.endDateTime.toISOString(),
-      teamId: timeSlot.teamId,
-      team: timeSlot.team,
-      maxVolunteers: timeSlot.maxVolunteers,
-      assignedVolunteers: timeSlot._count.assignments,
-      assignments: timeSlot.assignments,
-      color: timeSlot.team?.color || '#6b7280',
-      resourceId: timeSlot.teamId || 'unassigned',
-    }
-
-    return createSuccessResponse(formattedTimeSlot)
+    // Le client REMPLACE le créneau qu'il tient par celui-ci : il doit donc porter exactement ce
+    // que rend la liste, sans quoi le déplacement d'un créneau efface à l'écran ce que la réponse
+    // a laissé de côté. Voir `creneau-formate`.
+    //
+    // `true` : ce point d'API exige déjà le droit de gestion des bénévoles, ci-dessus.
+    return createSuccessResponse(formaterCreneau(timeSlot, true))
   },
   { operationName: 'UpdateVolunteerTimeSlot' }
 )

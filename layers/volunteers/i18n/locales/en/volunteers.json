@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Detailed description of the slot (optional)",
     "slot_title": "Slot title",
     "slot_title_placeholder": "E.g.: Visitor reception",
+    "slot_understaffed": "This slot still has places to fill",
     "slot_updated": "Slot updated",
     "slots_back_to_back": "Back to back",
     "slots_break_of": "{duration} break",

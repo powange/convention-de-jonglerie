@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Detaljeret beskrivelse af tidsrum (valgfrit)",
     "slot_title": "Titel på tidsrum",
     "slot_title_placeholder": "F.eks.: Besøgsmodtagelse",
+    "slot_understaffed": "Der er stadig pladser at besætte på denne vagt",
     "slot_updated": "Tidsrum opdateret",
     "slots_back_to_back": "Direkte efter hinanden",
     "slots_break_of": "{duration} pause",

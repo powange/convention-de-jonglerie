@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Gedetailleerde beschrijving van het tijdslot (optioneel)",
     "slot_title": "Tijdslot titel",
     "slot_title_placeholder": "Bijv.: Bezoekersreceptie",
+    "slot_understaffed": "Er zijn nog plaatsen te vullen in dit tijdslot",
     "slot_updated": "Tijdslot bijgewerkt",
     "slots_back_to_back": "Direct aansluitend",
     "slots_break_of": "{duration} pauze",

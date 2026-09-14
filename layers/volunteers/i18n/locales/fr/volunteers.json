@@ -466,6 +466,7 @@
     "slot_description_placeholder": "Description détaillée du créneau (optionnel)",
     "slot_title": "Titre du créneau",
     "slot_title_placeholder": "Ex: Accueil des visiteurs",
+    "slot_understaffed": "Il reste des places à pourvoir sur ce créneau",
     "slot_updated": "Créneau mis à jour",
     "slots_back_to_back": "Enchaînement direct",
     "slots_break_of": "{duration} de pause",
