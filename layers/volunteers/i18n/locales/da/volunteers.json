@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Respektér strengt tildelte hold",
       "respect_assigned_teams_help": "Tildeler kun frivillige til de hold, som arrangørerne allerede har placeret dem på",
       "preserve_show_access": "Bevar adgangen til forestillingerne",
-      "preserve_show_access_help": "Tildeler ikke en frivillig en vagt, der ville forhindre vedkommende i at overvære en eneste opførelse af en forestilling. Vagten forbliver da ubesat."
+      "preserve_show_access_help": "Tildeler ikke en frivillig en vagt, der ville forhindre vedkommende i at overvære en eneste opførelse af en forestilling. Vagten forbliver da ubesat.",
+      "undo_title": "Fortryd denne beregning",
+      "undo_description": "Den seneste beregning oprettede {created} tildeling(er) og slettede {deleted}. Fortryder du den, gendannes planen præcis som før.",
+      "undo_action": "Fortryd denne beregning",
+      "undo_confirm": "Fortryd den seneste beregning? De oprettede tildelinger fjernes, og de slettede gendannes.",
+      "undo_done": "Beregningen er fortrudt",
+      "undo_outdated": "Der er anvendt en anden beregning siden: det er ikke længere denne, der fortrydes. Genindlæs siden.",
+      "undo_nothing": "Ingen beregning at fortryde"
     },
     "autonomous_team": "Selvstyrende hold",
     "autonomous_team_badge": "Selvstyrende",

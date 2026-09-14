@@ -83,6 +83,9 @@ model User {
   volunteerSwapsReceived             VolunteerSwapRequest[]              @relation("VolunteerSwap_target")
   volunteerSwapsDecided              VolunteerSwapRequest[]              @relation("VolunteerSwap_decidedBy")
   assignedVolunteerSlots             VolunteerAssignment[]               @relation("VolunteerAssignment_assignedBy")
+  /// Calculs d'assignation automatique lancés, et ceux qu'il a annulés.
+  volunteerAutoAssignRuns            VolunteerAutoAssignRun[]            @relation("VolunteerAutoAssignRun_executedBy")
+  volunteerAutoAssignRunsUndone      VolunteerAutoAssignRun[]            @relation("VolunteerAutoAssignRun_undoneBy")
   claimRequests                      ConventionClaimRequest[]
   workshops                          Workshop[]
   workshopFavorites                  WorkshopFavorite[]
@@ -145,6 +148,7 @@ model Event {
   volunteerComments           VolunteerComment[]
   volunteerSwapRequests       VolunteerSwapRequest[]
   volunteerSettings           EventVolunteerSettings? // config bénévole (étape 0bis)
+  volunteerAutoAssignRuns     VolunteerAutoAssignRun[]
 }
 
 model Edition {

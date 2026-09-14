@@ -5,6 +5,7 @@ import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { createLogger } from '#server/utils/logger'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { VolunteerScheduler, type Assignment } from '#server/utils/volunteer-scheduler'
@@ -45,6 +46,25 @@ interface PerimetreDuCalcul {
   /** Les équipes que le calcul peut pourvoir — ni volantes, ni autonomes. */
   equipes: string[]
 }
+
+/** Une affectation telle qu'elle était avant d'être effacée — de quoi la recréer à l'identique. */
+interface EffacementAffectation {
+  timeSlotId: string
+  userId: number
+  source: 'MANUAL' | 'AUTO'
+  assignedById: number
+  assignedAt: Date
+}
+
+/** Un rattachement d'équipe, sur le même principe. */
+interface EffacementRattachement {
+  applicationId: number
+  teamId: string
+  isLeader: boolean
+  assignedAt: Date
+}
+
+const log = createLogger('ASSIGNATION-AUTO')
 
 // Schéma de validation pour les contraintes
 const constraintsSchema = z.object({
@@ -294,20 +314,32 @@ export default wrapApiHandler(
     const result = scheduler.assignVolunteers()
 
     // Application des assignations en base de données si demandé
+    let journalId: string | null = null
     if (body.applyAssignments === true) {
-      await applyAssignments(editionId, result.assignments, user.id, mode, perimetre)
+      journalId = await applyAssignments(
+        editionId,
+        result.assignments,
+        user.id,
+        mode,
+        perimetre,
+        constraints
+      )
     }
 
     return createSuccessResponse({
       result,
       preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
+      // L'identifiant du journal : c'est lui qui permet de proposer d'annuler ce calcul.
+      journalId,
     })
   },
   { operationName: 'AutoAssignVolunteers' }
 )
 
 /**
- * Applique les assignations en base de données
+ * Applique les assignations en base de données, et consigne de quoi les défaire.
+ *
+ * Rend l'identifiant du journal écrit : c'est lui que l'écran présentera pour proposer d'annuler.
  */
 async function applyAssignments(
   editionId: number,
@@ -318,22 +350,46 @@ async function applyAssignments(
   userId: number,
   mode: 'replace-all' | 'keep-all' | 'keep-manual',
   /** Ce que le calcul a examiné, et la borne de ce que les suppressions peuvent atteindre. */
-  perimetre: PerimetreDuCalcul
-): Promise<void> {
-  await prisma.$transaction(async (tx) => {
+  perimetre: PerimetreDuCalcul,
+  /** Les réglages employés, consignés tels quels : la question qu'on se pose toujours en second. */
+  contraintes: unknown
+): Promise<string> {
+  return await prisma.$transaction(async (tx) => {
+    /**
+     * Ce qui va disparaître est relevé AVANT de disparaître.
+     *
+     * C'est la seule fenêtre où l'état antérieur existe encore. Une fois le `deleteMany` passé,
+     * plus rien ne dit ce qu'il y avait — et c'est précisément ce qui rendait une relance
+     * malheureuse irrattrapable.
+     */
+    let affectationsEffacees: EffacementAffectation[] = []
+
     // 1. Effacer ce que le mode ne conserve pas, et seulement sur les créneaux que le calcul a
     //    examinés. En `keep-manual`, seules les affectations posées par un précédent calcul
     //    disparaissent : les choix humains restent.
     if (mode !== 'keep-all') {
-      await tx.volunteerAssignment.deleteMany({
-        where: {
-          timeSlotId: { in: perimetre.creneaux },
-          ...(mode === 'keep-manual' ? { source: 'AUTO' } : {}),
+      const cible = {
+        timeSlotId: { in: perimetre.creneaux },
+        ...(mode === 'keep-manual' ? { source: 'AUTO' as const } : {}),
+      }
+
+      affectationsEffacees = await tx.volunteerAssignment.findMany({
+        where: cible,
+        select: {
+          timeSlotId: true,
+          userId: true,
+          source: true,
+          assignedById: true,
+          assignedAt: true,
         },
       })
+
+      await tx.volunteerAssignment.deleteMany({ where: cible })
     }
 
     // 2. Créer les nouvelles assignations aux créneaux
+    const affectationsCreees: { timeSlotId: string; userId: number }[] = []
+
     for (const assignment of assignments) {
       // Une affectation conservée peut déjà exister : la recréer violerait l'unicité
       if (mode !== 'replace-all') {
@@ -355,16 +411,43 @@ async function applyAssignments(
           source: 'AUTO',
         },
       })
+
+      affectationsCreees.push({
+        timeSlotId: assignment.slotId,
+        userId: assignment.volunteerId,
+      })
     }
 
     // 3. Assigner les bénévoles aux équipes correspondantes
-    await assignVolunteersToTeams(tx, assignments, mode, perimetre)
+    const equipes = await assignVolunteersToTeams(tx, assignments, mode, perimetre)
 
-    // 4. Log de l'action
-    console.log(
-      `Auto-assignation appliquée pour l'édition ${editionId} par l'utilisateur ${userId}`
-    )
-    console.log(`${assignments.length} assignations créées`)
+    // 4. Consigner le calcul, et de quoi le défaire
+    const journal = await tx.volunteerAutoAssignRun.create({
+      data: {
+        eventId: editionId,
+        executedById: userId,
+        mode,
+        constraints: (contraintes ?? {}) as Prisma.InputJsonValue,
+        deletedAssignments: affectationsEffacees as unknown as Prisma.InputJsonValue,
+        createdAssignments: affectationsCreees as unknown as Prisma.InputJsonValue,
+        deletedTeamLinks: equipes.effaces as unknown as Prisma.InputJsonValue,
+        createdTeamLinks: equipes.crees as unknown as Prisma.InputJsonValue,
+        createdCount: affectationsCreees.length,
+        deletedCount: affectationsEffacees.length,
+      },
+      select: { id: true },
+    })
+
+    log.info('Assignation automatique appliquée', {
+      edition: editionId,
+      par: userId,
+      mode,
+      creees: affectationsCreees.length,
+      effacees: affectationsEffacees.length,
+      journal: journal.id,
+    })
+
+    return journal.id
   })
 }
 
@@ -383,7 +466,10 @@ async function assignVolunteersToTeams(
   assignments: Assignment[],
   mode: 'replace-all' | 'keep-all' | 'keep-manual',
   perimetre: PerimetreDuCalcul
-): Promise<void> {
+): Promise<{
+  effaces: EffacementRattachement[]
+  crees: { applicationId: number; teamId: string }[]
+}> {
   // `volunteerId` est un identifiant d'utilisateur ; la table des rattachements, elle, référence
   // la CANDIDATURE. La correspondance est déjà connue du périmètre : la redemander à la base
   // coûtait une requête par bénévole, dans une transaction qui en compte déjà beaucoup.
@@ -406,14 +492,22 @@ async function assignVolunteersToTeams(
    * que les bénévoles ayant reçu un créneau d'équipe : deux bénévoles dans la même situation
    * s'en tiraient différemment selon ce que le calcul leur avait donné.
    */
+  let effaces: EffacementRattachement[] = []
+
   if (mode === 'replace-all') {
-    await tx.applicationTeamAssignment.deleteMany({
-      where: {
-        applicationId: { in: perimetre.candidatures.map(({ applicationId }) => applicationId) },
-        teamId: { in: perimetre.equipes },
-        source: 'AUTO',
-      },
+    const cible = {
+      applicationId: { in: perimetre.candidatures.map(({ applicationId }) => applicationId) },
+      teamId: { in: perimetre.equipes },
+      source: 'AUTO' as const,
+    }
+
+    // Relevé avant suppression : sans lui, l'annulation ne saurait pas quoi recréer.
+    effaces = await tx.applicationTeamAssignment.findMany({
+      where: cible,
+      select: { applicationId: true, teamId: true, isLeader: true, assignedAt: true },
     })
+
+    await tx.applicationTeamAssignment.deleteMany({ where: cible })
   }
 
   // Grouper les équipes par bénévole, puis écrire d'un coup.
@@ -440,10 +534,34 @@ async function assignVolunteersToTeams(
     }
   }
 
-  if (aCreer.length > 0) {
-    // `skipDuplicates` remplace le relevé ligne à ligne qui précédait. Il a la même conséquence,
-    // et elle est voulue : un rattachement manuel que le calcul confirme n'est pas réécrit, donc
-    // il garde son origine MANUAL et reste protégé de la prochaine relance.
-    await tx.applicationTeamAssignment.createMany({ data: aCreer, skipDuplicates: true })
+  if (aCreer.length === 0) return { effaces, crees: [] }
+
+  /**
+   * Lesquels seront réellement créés ? `createMany` ne le dit pas, et l'annulation a besoin de
+   * le savoir : retirer un rattachement qui préexistait détruirait une décision qu'on n'a pas
+   * prise. D'où ce relevé — une requête, pas une par ligne.
+   */
+  const dejaLa = new Set(
+    (
+      await tx.applicationTeamAssignment.findMany({
+        where: {
+          applicationId: { in: aCreer.map((ligne) => ligne.applicationId) },
+          teamId: { in: aCreer.map((ligne) => ligne.teamId) },
+        },
+        select: { applicationId: true, teamId: true },
+      })
+    ).map((ligne) => `${ligne.applicationId}:${ligne.teamId}`)
+  )
+
+  // `skipDuplicates` remplace le relevé ligne à ligne qui précédait. Il a la même conséquence,
+  // et elle est voulue : un rattachement manuel que le calcul confirme n'est pas réécrit, donc
+  // il garde son origine MANUAL et reste protégé de la prochaine relance.
+  await tx.applicationTeamAssignment.createMany({ data: aCreer, skipDuplicates: true })
+
+  return {
+    effaces,
+    crees: aCreer
+      .filter((ligne) => !dejaLa.has(`${ligne.applicationId}:${ligne.teamId}`))
+      .map(({ applicationId, teamId }) => ({ applicationId, teamId })),
   }
 }

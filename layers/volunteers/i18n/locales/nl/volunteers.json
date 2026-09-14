@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Toegewezen teams strikt respecteren",
       "respect_assigned_teams_help": "Wijst vrijwilligers alleen toe aan de teams waarin de organisatoren hen al hebben geplaatst",
       "preserve_show_access": "Toegang tot de voorstellingen behouden",
-      "preserve_show_access_help": "Wijst een vrijwilliger geen dienst toe die hem zou beletten ook maar één uitvoering van een voorstelling bij te wonen. De dienst blijft dan onbezet."
+      "preserve_show_access_help": "Wijst een vrijwilliger geen dienst toe die hem zou beletten ook maar één uitvoering van een voorstelling bij te wonen. De dienst blijft dan onbezet.",
+      "undo_title": "Deze berekening ongedaan maken",
+      "undo_description": "De laatste berekening heeft {created} toewijzing(en) aangemaakt en er {deleted} verwijderd. Ongedaan maken herstelt de planning precies zoals die daarvoor was.",
+      "undo_action": "Berekening ongedaan maken",
+      "undo_confirm": "De laatste berekening ongedaan maken? De aangemaakte toewijzingen worden verwijderd en de verwijderde worden hersteld.",
+      "undo_done": "De berekening is ongedaan gemaakt",
+      "undo_outdated": "Er is sindsdien een andere berekening toegepast: deze wordt niet langer ongedaan gemaakt. Herlaad de pagina.",
+      "undo_nothing": "Geen berekening om ongedaan te maken"
     },
     "autonomous_team": "Zelfstandig team",
     "autonomous_team_badge": "Zelfstandig",

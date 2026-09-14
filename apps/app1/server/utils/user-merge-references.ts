@@ -48,7 +48,7 @@ export interface UserReference {
 }
 
 /**
- * 49 colonnes : 45 relations Prisma + 4 références « molles ».
+ * 51 colonnes : 47 relations Prisma + 4 références « molles ».
  * Vérifié contre `prisma/schema/*.prisma`.
  */
 export const USER_REFERENCES: UserReference[] = [
@@ -97,6 +97,10 @@ export const USER_REFERENCES: UserReference[] = [
     group: 'volunteers',
   },
   { model: 'volunteerAssignment', field: 'assignedById', group: 'volunteers' },
+  // Journal des calculs d'assignation automatique : qui les a lancés, qui les a annulés.
+  // Aucune contrainte d'unicité — le même compte peut en lancer autant qu'il veut.
+  { model: 'volunteerAutoAssignRun', field: 'executedById', group: 'volunteers' },
+  { model: 'volunteerAutoAssignRun', field: 'undoneById', group: 'volunteers' },
   { model: 'volunteerComment', field: 'userId', uniqueWith: ['eventId'], group: 'volunteers' },
   { model: 'volunteerNotificationGroup', field: 'senderId', group: 'volunteers' },
   {

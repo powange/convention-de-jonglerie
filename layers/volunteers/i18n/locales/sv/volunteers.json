@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Strikt efterlevnad av tilldelade team",
       "respect_assigned_teams_help": "Tilldelar endast volontärer till de team som arrangörerna redan har placerat dem i",
       "preserve_show_access": "Bevara tillgången till föreställningarna",
-      "preserve_show_access_help": "Tilldelar inte en volontär ett pass som skulle hindra hen från att se en enda föreställning av en show. Passet förblir då obemannat."
+      "preserve_show_access_help": "Tilldelar inte en volontär ett pass som skulle hindra hen från att se en enda föreställning av en show. Passet förblir då obemannat.",
+      "undo_title": "Ångra den här beräkningen",
+      "undo_description": "Den senaste beräkningen skapade {created} tilldelning(ar) och tog bort {deleted}. Om du ångrar den återställs schemat precis som det var innan.",
+      "undo_action": "Ångra den här beräkningen",
+      "undo_confirm": "Ångra den senaste beräkningen? Tilldelningarna den skapade tas bort och de som togs bort återställs.",
+      "undo_done": "Beräkningen har ångrats",
+      "undo_outdated": "En annan beräkning har tillämpats sedan dess: det är inte längre den här som ångras. Ladda om sidan.",
+      "undo_nothing": "Ingen beräkning att ångra"
     },
     "autonomous_team": "Självstyrande lag",
     "autonomous_team_badge": "Självstyrande",

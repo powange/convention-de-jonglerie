@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Zugewiesene Teams strikt beachten",
       "respect_assigned_teams_help": "Weist Freiwillige nur den Teams zu, in die die Organisatoren sie bereits eingeteilt haben",
       "preserve_show_access": "Zugang zu den Aufführungen wahren",
-      "preserve_show_access_help": "Weist Freiwillige keiner Schicht zu, die sie daran hindern würde, auch nur eine Vorstellung einer Aufführung zu besuchen. Die Schicht bleibt dann unbesetzt."
+      "preserve_show_access_help": "Weist Freiwillige keiner Schicht zu, die sie daran hindern würde, auch nur eine Vorstellung einer Aufführung zu besuchen. Die Schicht bleibt dann unbesetzt.",
+      "undo_title": "Diese Berechnung rückgängig machen",
+      "undo_description": "Die letzte Berechnung hat {created} Zuteilung(en) erstellt und {deleted} gelöscht. Beim Rückgängigmachen wird der Plan genau wie zuvor wiederhergestellt.",
+      "undo_action": "Berechnung rückgängig machen",
+      "undo_confirm": "Die letzte Berechnung rückgängig machen? Die erstellten Zuteilungen werden entfernt und die gelöschten wiederhergestellt.",
+      "undo_done": "Die Berechnung wurde rückgängig gemacht",
+      "undo_outdated": "Seitdem wurde eine andere Berechnung angewendet: Es ist nicht mehr diese, die rückgängig gemacht wird. Bitte lade die Seite neu.",
+      "undo_nothing": "Keine Berechnung zum Rückgängigmachen"
     },
     "autonomous_team": "Eigenständiges Team",
     "autonomous_team_badge": "Eigenständig",

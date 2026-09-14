@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Strictly respect assigned teams",
       "respect_assigned_teams_help": "Only assigns volunteers to the teams organisers have already placed them in",
       "preserve_show_access": "Preserve access to shows",
-      "preserve_show_access_help": "Never assigns a volunteer to a shift that would keep them from attending a single performance of a show. The shift is then left unfilled."
+      "preserve_show_access_help": "Never assigns a volunteer to a shift that would keep them from attending a single performance of a show. The shift is then left unfilled.",
+      "undo_title": "Undo this run",
+      "undo_description": "The last run created {created} assignment(s) and removed {deleted}. Undoing it restores the schedule exactly as it was just before.",
+      "undo_action": "Undo this run",
+      "undo_confirm": "Undo the last run? The assignments it created will be removed, and those it had deleted will be restored.",
+      "undo_done": "The run has been undone",
+      "undo_outdated": "Another run has been applied since: this is no longer the one being undone. Please reload the page.",
+      "undo_nothing": "No run to undo"
     },
     "autonomous_team": "Self-managed team",
     "autonomous_team_badge": "Self-managed",

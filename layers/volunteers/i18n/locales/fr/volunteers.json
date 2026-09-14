@@ -111,7 +111,14 @@
       "unassigned": "Non assignés",
       "unassigned_slots": "Créneaux non couverts",
       "unassigned_volunteers": "Bénévoles non assignés",
-      "warnings": "Avertissements"
+      "warnings": "Avertissements",
+      "undo_title": "Revenir sur ce calcul",
+      "undo_description": "Le dernier calcul a créé {created} affectation(s) et en a effacé {deleted}. L'annuler remet le planning tel qu'il était juste avant.",
+      "undo_action": "Annuler ce calcul",
+      "undo_confirm": "Annuler le dernier calcul ? Les affectations qu'il a créées seront retirées, et celles qu'il avait effacées seront remises.",
+      "undo_done": "Le calcul a été annulé",
+      "undo_outdated": "Un autre calcul a été appliqué depuis : ce n'est plus celui-ci que l'annulation défait. Rechargez la page.",
+      "undo_nothing": "Aucun calcul à annuler"
     },
     "autonomous_team": "Équipe autonome",
     "autonomous_team_badge": "Autonome",
