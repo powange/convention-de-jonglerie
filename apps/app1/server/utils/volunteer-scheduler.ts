@@ -1,8 +1,10 @@
 import { DateTime as dt } from 'luxon'
 
 import type { DateTime } from 'luxon'
+import type { FenetrePresence } from '~~/shared/utils/presence-benevole'
 import type { Representation, SpectacleProgramme } from '~~/shared/utils/spectacles-visibles'
 
+import { estPresentPendant, fenetreDe } from '~~/shared/utils/presence-benevole'
 import { representationsDe, spectacleInaccessible } from '~~/shared/utils/spectacles-visibles'
 
 export interface VolunteerApplication {
@@ -25,6 +27,32 @@ export interface VolunteerApplication {
    * préférences, qui sont ce que le bénévole a demandé : ici, la décision est déjà prise.
    */
   assignedTeams?: string[]
+  /**
+   * Quand le bénévole arrive et repart, au format `YYYY-MM-DD_moment` que porte sa candidature.
+   *
+   * Renseignés par le bénévole lui-même, et lus jusqu'ici par le seul module repas : le
+   * planificateur pouvait donc attribuer un créneau du vendredi à quelqu'un qui arrive le samedi.
+   */
+  arrivalDateTime?: string | null
+  departureDateTime?: string | null
+}
+
+/**
+ * Une affectation que le calcul ne remet pas en cause, mais dont il doit tenir compte.
+ *
+ * En mode « conserver », un bénévole déjà placé sur un créneau restait candidat à des heures
+ * supplémentaires sans que les siennes comptent — ou, pire, était écarté en bloc du calcul. Ces
+ * affectations pèsent donc dans ses heures, occupent son temps, et ferment l'accès aux spectacles
+ * qu'elles recouvrent, exactement comme celles que le calcul vient de poser.
+ *
+ * Elles portent leurs propres bornes : un créneau d'équipe autonome n'est pas dans `timeSlots`,
+ * puisque le calcul ne le remplit pas — il n'en occupe pas moins la soirée du bénévole.
+ */
+export interface AffectationExistante {
+  volunteerId: number
+  slotId: string
+  start: string
+  end: string
 }
 
 export interface TimeSlot {
@@ -113,6 +141,17 @@ export class VolunteerScheduler {
    * puisqu'ils n'offrent rien à manquer.
    */
   private representationsParSpectacle: Representation[][] = []
+  /**
+   * Les affectations déjà en place que le calcul conserve. Elles pèsent dans les heures et
+   * occupent le temps, mais ne figureront pas dans le résultat : ce sont des faits, pas des
+   * décisions à prendre.
+   */
+  private affectationsExistantes: AffectationExistante[] = []
+  /**
+   * La fenêtre de présence de chaque bénévole, calculée une fois. La garde la consulte à chaque
+   * affectation envisagée, et re-lire « 2026-08-01_morning » à chaque fois n'y apprendrait rien.
+   */
+  private presenceParBenevole = new Map<number, FenetrePresence>()
 
   constructor(
     volunteers: VolunteerApplication[],
@@ -120,12 +159,17 @@ export class VolunteerScheduler {
     teams: Team[],
     constraints: SchedulingConstraints = {},
     bornes: BornesEvenement = {},
-    spectacles: SpectacleProgramme[] = []
+    spectacles: SpectacleProgramme[] = [],
+    affectationsExistantes: AffectationExistante[] = []
   ) {
     this.volunteers = volunteers
     this.timeSlots = timeSlots
     this.teams = teams
     this.bornes = bornes
+    this.affectationsExistantes = affectationsExistantes
+    this.presenceParBenevole = new Map(
+      volunteers.map((volunteer) => [volunteer.user.id, fenetreDe(volunteer)])
+    )
     this.representationsParSpectacle = spectacles
       .map(representationsDe)
       .filter((representations) => representations.length > 0)
@@ -187,6 +231,24 @@ export class VolunteerScheduler {
       }
     } else {
       score += 20 // Bonus disponibilité
+    }
+
+    /**
+     * Le bénévole est-il seulement là ?
+     *
+     * Posé comme une impossibilité, et non comme une pénalité : il ne s'agit pas d'un souhait
+     * mais d'un fait déclaré. La question porte sur le créneau entier — quelqu'un qui repart
+     * samedi midi ne tient pas un créneau de 10 h à 14 h, même s'il est là quand il commence.
+     */
+    const presence = this.presenceParBenevole.get(volunteer.user.id)
+    if (presence) {
+      const bornes = {
+        debut: new Date(slot.start).getTime(),
+        fin: new Date(slot.end).getTime(),
+      }
+      if (!estPresentPendant(presence, bornes)) {
+        return -1000
+      }
     }
 
     // Préférence d'équipe
@@ -475,11 +537,26 @@ export class VolunteerScheduler {
    * Obtient les heures actuelles assignées à un bénévole
    */
   private getCurrentVolunteerHours(volunteerId: number): number {
-    return this.assignments
+    const posees = this.assignments
       .filter((assignment) => assignment.volunteerId === volunteerId)
       .reduce((total, assignment) => {
         const slot = this.timeSlots.find((s) => s.id === assignment.slotId)
         return total + (slot ? this.getSlotDuration(slot) : 0)
+      }, 0)
+
+    // Les heures déjà tenues comptent autant que celles qu'on vient d'attribuer. Les ignorer
+    // revenait à redonner un plafond entier à quelqu'un qui avait déjà fait sa journée.
+    return posees + this.heuresExistantes(volunteerId)
+  }
+
+  /** Les heures que le bénévole tient déjà, hors de ce calcul. */
+  private heuresExistantes(volunteerId: number, date?: string): number {
+    return this.affectationsExistantes
+      .filter((affectation) => affectation.volunteerId === volunteerId)
+      .filter((affectation) => !date || dt.fromISO(affectation.start).toISODate() === date)
+      .reduce((total, affectation) => {
+        const duree = dt.fromISO(affectation.end).diff(dt.fromISO(affectation.start), 'hours').hours
+        return total + (Number.isFinite(duree) ? duree : 0)
       }, 0)
   }
 
@@ -498,7 +575,7 @@ export class VolunteerScheduler {
   private getVolunteerHoursForDate(volunteerId: number, date: string): number {
     const targetDate = dt.fromISO(date).startOf('day')
 
-    return this.assignments
+    const posees = this.assignments
       .filter((assignment) => assignment.volunteerId === volunteerId)
       .reduce((total, assignment) => {
         const slot = this.timeSlots.find((s) => s.id === assignment.slotId)
@@ -511,6 +588,8 @@ export class VolunteerScheduler {
 
         return total
       }, 0)
+
+    return posees + this.heuresExistantes(volunteerId, targetDate.toISODate() ?? undefined)
   }
 
   /**
@@ -685,6 +764,18 @@ export class VolunteerScheduler {
     const targetStart = new Date(targetSlot.start)
     const targetEnd = new Date(targetSlot.end)
 
+    // Les créneaux déjà tenus comptent autant que ceux qu'on vient d'attribuer : un bénévole
+    // conservé sur un créneau ne peut pas en recevoir un second qui le chevauche.
+    const dejaTenus = this.affectationsExistantes
+      .filter((affectation) => affectation.volunteerId === volunteerId)
+      .map((affectation) => ({ start: affectation.start, end: affectation.end }))
+
+    const chevauche = (debut: Date, fin: Date) => targetStart < fin && targetEnd > debut
+
+    if (dejaTenus.some((creneau) => chevauche(new Date(creneau.start), new Date(creneau.end)))) {
+      return true
+    }
+
     // Vérifie tous les créneaux déjà assignés à ce bénévole
     return this.assignments
       .filter((assignment) => assignment.volunteerId === volunteerId)
@@ -726,10 +817,17 @@ export class VolunteerScheduler {
     // Des bornes illisibles ne prouvent rien : mieux vaut laisser passer que refuser à tort.
     if (Number.isNaN(nouveau.debut) || Number.isNaN(nouveau.fin)) return false
 
-    const dejaPris = this.assignments
-      .filter((assignation) => assignation.volunteerId === volunteerId)
-      .map((assignation) => this.timeSlots.find((creneau) => creneau.id === assignation.slotId))
-      .filter((creneau): creneau is TimeSlot => Boolean(creneau))
+    const dejaPris = [
+      ...this.assignments
+        .filter((assignation) => assignation.volunteerId === volunteerId)
+        .map((assignation) => this.timeSlots.find((creneau) => creneau.id === assignation.slotId))
+        .filter((creneau): creneau is TimeSlot => Boolean(creneau)),
+      // Un créneau déjà tenu ferme l'accès à un spectacle tout autant qu'un créneau qu'on vient
+      // d'attribuer. L'omettre laissait croire qu'une représentation restait libre.
+      ...this.affectationsExistantes
+        .filter((affectation) => affectation.volunteerId === volunteerId)
+        .map((affectation) => ({ start: affectation.start, end: affectation.end }) as TimeSlot),
+    ]
       .map(bornesDe)
       .filter((creneau) => !Number.isNaN(creneau.debut) && !Number.isNaN(creneau.fin))
 
@@ -812,8 +910,14 @@ export class VolunteerScheduler {
    * Génère les résultats finaux
    */
   private generateResults(): SchedulingResult {
+    // Un bénévole déjà placé sur un créneau conservé n'est pas « non assigné » : le signaler
+    // comme tel enverrait l'organisateur chercher un problème qui n'existe pas.
     const unassignedVolunteers = this.volunteers
-      .filter((volunteer) => !this.assignments.some((a) => a.volunteerId === volunteer.user.id))
+      .filter(
+        (volunteer) =>
+          !this.assignments.some((a) => a.volunteerId === volunteer.user.id) &&
+          !this.affectationsExistantes.some((a) => a.volunteerId === volunteer.user.id)
+      )
       .map((v) => v.user.id)
 
     const unassignedSlots = this.timeSlots
