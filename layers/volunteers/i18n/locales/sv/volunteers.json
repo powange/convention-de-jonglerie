@@ -113,6 +113,9 @@
       "preserve_show_access": "Bevara tillgången till föreställningarna",
       "preserve_show_access_help": "Tilldelar inte en volontär ett pass som skulle hindra hen från att se en enda föreställning av en show. Passet förblir då obemannat."
     },
+    "autonomous_team": "Självstyrande lag",
+    "autonomous_team_badge": "Självstyrande",
+    "autonomous_team_hint": "Det här laget organiserar sig självt: dess pass räknas inte in i timmarna som ska täckas och fylls inte av den automatiska fördelningen. Volontärer som bara tillhör självstyrande lag är reserverade för dem — de är fortfarande skyldiga sina timmar, men erbjuds inte som förstärkning.",
     "average_per_person": "Snitt per person",
     "avoid_list_hint": "Denna information förblir konfidentiell och hjälper organisatörer att skapa harmoniska team.",
     "avoid_list_label": "Volontärer som jag helst inte vill ha en slot med (valfritt)",

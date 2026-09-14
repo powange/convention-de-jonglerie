@@ -113,6 +113,9 @@
       "preserve_show_access": "Zugang zu den Aufführungen wahren",
       "preserve_show_access_help": "Weist Freiwillige keiner Schicht zu, die sie daran hindern würde, auch nur eine Vorstellung einer Aufführung zu besuchen. Die Schicht bleibt dann unbesetzt."
     },
+    "autonomous_team": "Eigenständiges Team",
+    "autonomous_team_badge": "Eigenständig",
+    "autonomous_team_hint": "Dieses Team organisiert sich selbst: Seine Einsätze zählen nicht zu den zu besetzenden Stunden und werden nicht automatisch zugeteilt. Helfende, die nur eigenständigen Teams angehören, sind ihnen vorbehalten — sie schulden weiterhin ihre Stunden, werden aber nicht als Verstärkung angeboten.",
     "average_per_person": "Durchschnitt pro Person",
     "avoid_list_hint": "Diese Informationen bleiben vertraulich und helfen den Organisatoren, harmonische Teams zu bilden",
     "avoid_list_label": "Freiwillige, mit denen ich nicht arbeiten möchte (optional)",

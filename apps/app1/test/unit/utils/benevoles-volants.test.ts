@@ -2,8 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import {
   benevolesDesComptes,
+  estEquipeAutonome,
+  estEquipeHorsCharge,
   estEquipeVolante,
+  estHorsAssignationAutomatique,
   estHorsDesComptes,
+  estReserve,
   estVolant,
 } from '../../../shared/utils/benevoles-volants'
 
@@ -100,5 +104,65 @@ describe('benevolesDesComptes', () => {
 
   it('rend une liste vide sans se plaindre', () => {
     expect(benevolesDesComptes([])).toEqual([])
+  })
+})
+
+/**
+ * Les équipes autonomes.
+ *
+ * Elles partagent avec les volantes tout leur effet sur l'ÉQUIPE, et rien de leur effet sur les
+ * PERSONNES : la volante libère ses membres de leur volume d'heures et les propose en renfort,
+ * l'autonome les garde tenus à leurs heures et hors de la page des renforts.
+ */
+describe('équipes autonomes', () => {
+  const autonome = { isAutonomousTeam: true }
+
+  it('reconnaît une équipe autonome', () => {
+    expect(estEquipeAutonome(autonome)).toBe(true)
+    expect(estEquipeAutonome(ordinaire)).toBe(false)
+    expect(estEquipeAutonome(volante)).toBe(false)
+    expect(estEquipeAutonome(null)).toBe(false)
+  })
+
+  it('range les deux réglages sous « hors charge »', () => {
+    // C'est ce qu'ils ont en commun : ni heures à pourvoir, ni assignation automatique.
+    expect(estEquipeHorsCharge(volante)).toBe(true)
+    expect(estEquipeHorsCharge(autonome)).toBe(true)
+    expect(estEquipeHorsCharge(ordinaire)).toBe(false)
+    expect(estEquipeHorsCharge({})).toBe(false)
+  })
+
+  it('réserve celui qui n’est QUE dans des équipes autonomes', () => {
+    expect(estReserve([autonome])).toBe(true)
+    expect(estReserve([autonome, { isAutonomousTeam: true }])).toBe(true)
+  })
+
+  it('libère celui qu’on a rattaché ailleurs', () => {
+    // Décidé : rattacher quelqu'un à une seconde équipe, c'est avoir décidé de le partager. La
+    // double appartenance annule donc la réserve.
+    expect(estReserve([autonome, ordinaire])).toBe(false)
+    expect(estReserve([autonome, volante])).toBe(false)
+  })
+
+  it('ne réserve pas un bénévole sans équipe', () => {
+    expect(estReserve([])).toBe(false)
+    expect(estReserve(null)).toBe(false)
+  })
+
+  it('ne rend PAS volant un membre d’équipe autonome', () => {
+    // Le point qui sépare les deux réglages : il garde ses heures, et n'est pas une ressource
+    // qu'on va chercher en renfort.
+    expect(estHorsDesComptes([autonome])).toBe(false)
+    expect(estVolant([autonome])).toBe(false)
+  })
+
+  it('écarte les deux de l’assignation automatique', () => {
+    // Pour des raisons opposées : le volant n'a pas d'heures à faire, le réservé ne les décide
+    // pas ici.
+    expect(estHorsAssignationAutomatique([volante])).toBe(true)
+    expect(estHorsAssignationAutomatique([autonome])).toBe(true)
+    expect(estHorsAssignationAutomatique([ordinaire])).toBe(false)
+    expect(estHorsAssignationAutomatique([autonome, ordinaire])).toBe(false)
+    expect(estHorsAssignationAutomatique([])).toBe(false)
   })
 })

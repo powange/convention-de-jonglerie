@@ -16,9 +16,18 @@
  * chargé tel quel par les tests unitaires, hors Nuxt.
  */
 
-/** Une équipe, réduite à ce que la règle en lit. */
+/** Une équipe, réduite à ce que les règles en lisent. */
 export interface EquipePourVolants {
   isFloatingTeam?: boolean | null
+  /**
+   * Équipe AUTONOME : elle se gère à part et réserve ses membres.
+   *
+   * Même effet que « volante » sur l'ÉQUIPE — créneaux hors des heures à pourvoir, non remplis
+   * automatiquement —, effet inverse sur les PERSONNES : la volante les libère de leur volume
+   * d'heures et les propose en renfort, l'autonome les garde tenues à leurs heures et hors de la
+   * page des renforts.
+   */
+  isAutonomousTeam?: boolean | null
 }
 
 /**
@@ -29,6 +38,50 @@ export interface EquipePourVolants {
  */
 export function estEquipeVolante(equipe: EquipePourVolants | null | undefined): boolean {
   return equipe?.isFloatingTeam === true
+}
+
+/** Cette équipe se gère-t-elle à part&nbsp;? */
+export function estEquipeAutonome(equipe: EquipePourVolants | null | undefined): boolean {
+  return equipe?.isAutonomousTeam === true
+}
+
+/**
+ * Cette équipe est-elle hors des décomptes de CHARGE&nbsp;?
+ *
+ * Ce que les deux réglages ont en commun, écrit une seule fois : ni les heures à pourvoir, ni
+ * l'assignation automatique ne s'occupent de ses créneaux. Les faire diverger produirait une
+ * édition dont les totaux dépendraient du réglage choisi plutôt que de ce qu'il y a à faire.
+ */
+export function estEquipeHorsCharge(equipe: EquipePourVolants | null | undefined): boolean {
+  return estEquipeVolante(equipe) || estEquipeAutonome(equipe)
+}
+
+/**
+ * Ce bénévole est-il RÉSERVÉ à ses équipes autonomes&nbsp;?
+ *
+ * Vrai quand il appartient à au moins une équipe et que toutes sont autonomes. L'assignation
+ * automatique ne lui donne alors aucun créneau : ni ailleurs, puisqu'il est réservé, ni chez lui,
+ * puisqu'une équipe autonome ne se remplit pas toute seule.
+ *
+ * La double appartenance ANNULE la réserve, et c'est un choix : rattacher quelqu'un à une seconde
+ * équipe, c'est avoir décidé de le partager. La règle reprend donc exactement la forme de
+ * `estHorsDesComptes` — « toutes ses équipes », jamais « au moins une ».
+ */
+export function estReserve(equipes: readonly EquipePourVolants[] | null | undefined): boolean {
+  if (!Array.isArray(equipes) || equipes.length === 0) return false
+  return equipes.every(estEquipeAutonome)
+}
+
+/**
+ * Ce bénévole doit-il être écarté de l'assignation automatique&nbsp;?
+ *
+ * Les deux cas s'y rejoignent, pour des raisons opposées : le volant parce qu'il n'a pas d'heures
+ * à faire, le réservé parce que ses heures ne se décident pas ici.
+ */
+export function estHorsAssignationAutomatique(
+  equipes: readonly EquipePourVolants[] | null | undefined
+): boolean {
+  return estHorsDesComptes(equipes) || estReserve(equipes)
 }
 
 /**

@@ -113,6 +113,9 @@
       "unassigned_volunteers": "Bénévoles non assignés",
       "warnings": "Avertissements"
     },
+    "autonomous_team": "Équipe autonome",
+    "autonomous_team_badge": "Autonome",
+    "autonomous_team_hint": "Cette équipe s'organise elle-même : ses créneaux ne comptent pas dans les heures à pourvoir et ne sont pas remplis par l'assignation automatique. Les bénévoles qui n'appartiennent qu'à des équipes autonomes lui sont réservés — ils restent tenus à leurs heures, mais ne sont pas proposés en renfort.",
     "average_per_person": "Moyenne par personne",
     "avoid_list_hint": "Cette information reste confidentielle et aide les organisateurs à créer des équipes harmonieuses",
     "avoid_list_label": "Bénévoles avec qui je préfère ne pas faire de créneaux (optionnel)",

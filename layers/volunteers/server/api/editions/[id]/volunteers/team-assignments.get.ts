@@ -78,6 +78,7 @@ export default wrapApiHandler(
                 // Sans ce champ, le repère des équipes volantes reste invisible dans la liste
                 // des bénévoles : l'écran ne peut pas distinguer ce que la base sait déjà.
                 isFloatingTeam: true,
+                isAutonomousTeam: true,
               },
             },
           },

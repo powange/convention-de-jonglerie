@@ -113,6 +113,9 @@
       "preserve_show_access": "Preservar o acesso aos espetáculos",
       "preserve_show_access_help": "Não atribui um voluntário a um turno que o impediria de assistir a qualquer sessão de um espetáculo. O turno fica então por preencher."
     },
+    "autonomous_team": "Equipa autónoma",
+    "autonomous_team_badge": "Autónoma",
+    "autonomous_team_hint": "Esta equipa organiza-se sozinha: os seus turnos não contam nas horas a cobrir nem são preenchidos pela atribuição automática. Os voluntários que pertencem apenas a equipas autónomas ficam reservados para elas — continuam a dever as suas horas, mas não são propostos como reforço.",
     "average_per_person": "Média por pessoa",
     "avoid_list_hint": "Esta informação permanece confidencial e ajuda os organizadores a criar equipas harmoniosas",
     "avoid_list_label": "Voluntários com quem prefiro não trabalhar turnos (opcional)",

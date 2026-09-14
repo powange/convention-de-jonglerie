@@ -113,6 +113,9 @@
       "preserve_show_access": "Toegang tot de voorstellingen behouden",
       "preserve_show_access_help": "Wijst een vrijwilliger geen dienst toe die hem zou beletten ook maar één uitvoering van een voorstelling bij te wonen. De dienst blijft dan onbezet."
     },
+    "autonomous_team": "Zelfstandig team",
+    "autonomous_team_badge": "Zelfstandig",
+    "autonomous_team_hint": "Dit team regelt zichzelf: de diensten tellen niet mee in de te dekken uren en worden niet automatisch ingevuld. Vrijwilligers die alleen bij zelfstandige teams horen, zijn daaraan voorbehouden — ze blijven hun uren verschuldigd, maar worden niet als versterking aangeboden.",
     "average_per_person": "Gemiddelde per persoon",
     "avoid_list_hint": "Deze informatie blijft vertrouwelijk en helpt organisatoren harmonieuze teams te creëren",
     "avoid_list_label": "Vrijwilligers waarmee ik liever geen diensten zou willen draaien (optioneel)",

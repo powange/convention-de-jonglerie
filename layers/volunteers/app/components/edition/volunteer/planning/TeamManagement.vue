@@ -43,6 +43,12 @@
                 <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 mr-1" />
                 {{ t('volunteers.floating_team_badge') }}
               </UBadge>
+              <!-- Une équipe autonome ne pèse pas non plus sur les chiffres, mais pour une raison
+                   opposée : elle s'organise elle-même. -->
+              <UBadge v-if="team.isAutonomousTeam" color="neutral" variant="soft" size="sm">
+                <UIcon name="i-heroicons-lock-closed" class="w-3.5 h-3.5 mr-1" />
+                {{ t('volunteers.autonomous_team_badge') }}
+              </UBadge>
             </div>
             <div @click.stop>
               <UDropdownMenu
@@ -254,6 +260,17 @@
               </USwitch>
             </UFormField>
 
+            <!-- Équipe autonome -->
+            <UFormField name="isAutonomousTeam" :label="t('volunteers.autonomous_team')">
+              <USwitch v-model="teamFormState.isAutonomousTeam">
+                <template #label>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('volunteers.autonomous_team_hint') }}
+                  </span>
+                </template>
+              </USwitch>
+            </UFormField>
+
             <!-- Équipe de bénévoles volants -->
             <UFormField name="isFloatingTeam" :label="t('volunteers.floating_team')">
               <USwitch v-model="teamFormState.isFloatingTeam">
@@ -347,6 +364,7 @@ const teamSchema = z.object({
   isAccessControlTeam: z.boolean().optional(),
   isMealValidationTeam: z.boolean().optional(),
   isFloatingTeam: z.boolean().optional(),
+  isAutonomousTeam: z.boolean().optional(),
   isVisibleToVolunteers: z.boolean().optional(),
 })
 
@@ -360,6 +378,7 @@ const teamFormState = ref({
   isAccessControlTeam: false,
   isMealValidationTeam: false,
   isFloatingTeam: false,
+  isAutonomousTeam: false,
   isVisibleToVolunteers: true,
 })
 
@@ -404,6 +423,7 @@ const openCreateTeamModal = () => {
     isAccessControlTeam: false,
     isMealValidationTeam: false,
     isFloatingTeam: false,
+    isAutonomousTeam: false,
     isVisibleToVolunteers: true,
   }
   teamModalOpen.value = true
@@ -420,6 +440,7 @@ const openEditTeamModal = (team: VolunteerTeam) => {
     isAccessControlTeam: team.isAccessControlTeam || false,
     isMealValidationTeam: team.isMealValidationTeam || false,
     isFloatingTeam: team.isFloatingTeam || false,
+    isAutonomousTeam: team.isAutonomousTeam || false,
     isVisibleToVolunteers: team.isVisibleToVolunteers ?? true,
   }
   teamModalOpen.value = true
@@ -443,6 +464,7 @@ const onTeamSubmit = async () => {
       isAccessControlTeam: teamFormState.value.isAccessControlTeam,
       isMealValidationTeam: teamFormState.value.isMealValidationTeam,
       isFloatingTeam: teamFormState.value.isFloatingTeam,
+      isAutonomousTeam: teamFormState.value.isAutonomousTeam,
       isVisibleToVolunteers: teamFormState.value.isVisibleToVolunteers,
     }
 

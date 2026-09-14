@@ -113,6 +113,9 @@
       "preserve_show_access": "Preserve access to shows",
       "preserve_show_access_help": "Never assigns a volunteer to a shift that would keep them from attending a single performance of a show. The shift is then left unfilled."
     },
+    "autonomous_team": "Self-managed team",
+    "autonomous_team_badge": "Self-managed",
+    "autonomous_team_hint": "This team organises itself: its shifts are not counted in the hours to cover and are not filled by automatic assignment. Volunteers who belong only to self-managed teams are reserved for them — they still owe their hours, but are not offered as reinforcements.",
     "average_per_person": "Average per person",
     "avoid_list_hint": "This information remains confidential and helps organizers create harmonious teams",
     "avoid_list_label": "Volunteers I prefer not to work shifts with (optional)",

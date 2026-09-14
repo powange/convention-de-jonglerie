@@ -7,7 +7,7 @@
  * venu renforcer une équipe doit au contraire y apparaître sous CETTE équipe.
  */
 
-import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
+import { estEquipeHorsCharge, estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
 
 export interface VolunteerStats {
   totalVolunteers: number
@@ -405,14 +405,20 @@ export interface TeamStats {
  */
 export function calculateVolunteersStatsByTeam(
   timeSlots: TimeSlotWithAssignments[],
-  teams: Array<{ id: string; name: string; color?: string; isFloatingTeam?: boolean }> = [],
+  teams: Array<{
+    id: string
+    name: string
+    color?: string
+    isFloatingTeam?: boolean
+    isAutonomousTeam?: boolean
+  }> = [],
   libelleSansEquipe = 'Sans équipe'
 ): TeamStats[] {
   const parEquipe = new Map<string, any>()
   const nomDe = new Map(teams.map((equipe) => [equipe.id, equipe]))
 
   /**
-   * Les créneaux d'une équipe VOLANTE ne sont pas des heures à pourvoir.
+   * Les créneaux d'une équipe VOLANTE ou AUTONOME ne sont pas des heures à pourvoir.
    *
    * Un créneau posé sur une telle équipe ne s'adresse qu'aux volants — une permanence, une plage
    * de disponibilité —, et les volants ne sont tenus à aucun volume d'heures. Le compter
@@ -421,9 +427,7 @@ export function calculateVolunteersStatsByTeam(
    *
    * C'est le pendant, côté CRÉNEAU, de ce que `benevoles-volants` fait côté personne.
    */
-  const equipesVolantes = new Set(
-    teams.filter((equipe) => equipe.isFloatingTeam).map((equipe) => equipe.id)
-  )
+  const equipesVolantes = new Set(teams.filter(estEquipeHorsCharge).map((equipe) => equipe.id))
 
   timeSlots.forEach((slot) => {
     if (slot.teamId && equipesVolantes.has(slot.teamId as string)) return
