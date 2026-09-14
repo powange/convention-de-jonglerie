@@ -242,6 +242,10 @@ model VolunteerTimeSlot {
 /// D'où vient une affectation : posée à la main, ou produite par l'assignation automatique.
 /// `assignedById` ne peut pas en tenir lieu — l'organisateur qui lance le calcul y figure
 /// comme s'il avait tout posé lui-même.
+///
+/// Sert aux deux choses que l'assignation automatique écrit, et qu'elle doit donc pouvoir
+/// reprendre sans écraser de décision humaine : l'affectation à un créneau
+/// (`VolunteerAssignment`) et le rattachement à une équipe (`ApplicationTeamAssignment`).
 enum VolunteerAssignmentSource {
   MANUAL
   AUTO
@@ -277,8 +281,17 @@ model VolunteerAssignment {
 model ApplicationTeamAssignment {
   applicationId Int
   teamId        String
-  isLeader      Boolean  @default(false)
-  assignedAt    DateTime @default(now())
+  isLeader      Boolean                   @default(false)
+  assignedAt    DateTime                  @default(now())
+  /// D'où vient ce rattachement : d'un organisateur, ou d'un calcul d'assignation automatique.
+  ///
+  /// Sans cette colonne, « tout effacer et recalculer » emportait les équipes attribuées à la
+  /// main — une décision que rien ne reconstruit, et dont le calcul se sert pourtant pour scorer
+  /// (`assignedTeams`, bonus d'équipe, mode strict). Le pendant exact de `VolunteerAssignment.source`.
+  ///
+  /// Par défaut manuelle, pour la même raison qu'elle : l'origine des lignes déjà en base est
+  /// perdue, et une relance ne doit pas les balayer par surprise.
+  source        VolunteerAssignmentSource @default(MANUAL)
 
   application EditionVolunteerApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   team        VolunteerTeam               @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -286,6 +299,8 @@ model ApplicationTeamAssignment {
   @@id([applicationId, teamId])
   @@index([teamId])
   @@index([isLeader])
+  /// La relance efface les rattachements automatiques : cet index évite un balayage complet.
+  @@index([source])
 }
 
 /// Rattachement d'un organisateur d'édition à une équipe de bénévoles.

@@ -30,6 +30,22 @@ type TimeSlotWithAssignments = Prisma.VolunteerTimeSlotGetPayload<{
 
 type Team = Prisma.VolunteerTeamGetPayload<object>
 
+/**
+ * Ce que le calcul a examiné, et donc ce qu'il saura reconstruire.
+ *
+ * Sert de borne à tout ce que l'application efface. Les filtres d'entrée écartent des créneaux,
+ * des bénévoles et des équipes ; sans ce périmètre, les suppressions, elles, portaient sur
+ * l'édition entière — elles détruisaient donc ce que le calcul ne repeuplerait jamais.
+ */
+interface PerimetreDuCalcul {
+  /** Les créneaux soumis au planificateur. */
+  creneaux: string[]
+  /** Les candidatures en lice, et l'utilisateur derrière chacune. */
+  candidatures: { applicationId: number; userId: number }[]
+  /** Les équipes que le calcul peut pourvoir — ni volantes, ni autonomes. */
+  equipes: string[]
+}
+
 // Schéma de validation pour les contraintes
 const constraintsSchema = z.object({
   maxHoursPerVolunteer: z.number().min(1).max(24).optional(),
@@ -227,19 +243,34 @@ export default wrapApiHandler(
       }))
 
     /**
-     * Les créneaux que le calcul a réellement examinés — et donc les seuls qu'il a le droit
-     * d'effacer.
+     * Ce que le calcul a réellement examiné — et donc, exactement, ce qu'il a le droit d'effacer.
      *
-     * Sans cette liste, la relance supprimait les affectations de TOUTE l'édition alors que le
-     * filtre ci-dessus venait d'écarter les créneaux des équipes volantes et autonomes : elles
-     * étaient effacées, puis jamais recréées, puisque le planificateur ne les voyait pas. Un
-     * « tout effacer et recalculer » vidait ainsi définitivement le planning d'une équipe
-     * autonome, qui s'organise pourtant à la main.
+     * **La règle du fichier**, et elle tient en une phrase : ce que l'algorithme ne sait pas
+     * reconstruire, il n'a pas à le détruire.
      *
-     * Ces identifiants viennent d'une requête déjà bornée à l'édition : inutile de redemander
-     * `timeSlot: { eventId }` à la suppression, qui n'y gagnerait qu'une jointure.
+     * Sans ces bornes, une relance en « tout effacer et recalculer » supprimait sur toute
+     * l'édition alors que les filtres ci-dessus venaient d'en écarter une partie :
+     *
+     * - les créneaux des équipes volantes et autonomes étaient vidés, puis jamais repeuplés —
+     *   le planificateur ne les avait pas vus ;
+     * - les rattachements d'équipe posés à la main disparaissaient, et rien ne les reconstruit :
+     *   ce sont des décisions humaines, dont le calcul se sert d'ailleurs pour scorer.
+     *
+     * Les identifiants viennent de requêtes déjà bornées à l'édition : inutile de redemander
+     * `timeSlot: { eventId }` aux suppressions, qui n'y gagneraient qu'une jointure.
      */
-    const creneauxSoumisAuCalcul = schedulerTimeSlots.map((slot) => slot.id)
+    const perimetre = {
+      creneaux: schedulerTimeSlots.map((slot) => slot.id),
+      candidatures: availableVolunteers.map((volunteer: VolunteerWithTeamAssignments) => ({
+        applicationId: volunteer.id,
+        userId: volunteer.user.id,
+      })),
+      // Les équipes que le calcul peut pourvoir. Une équipe volante ou autonome n'en est pas :
+      // ses créneaux sont écartés, donc aucun rattachement ne serait recréé chez elle.
+      equipes: teams
+        .filter((equipe: Team) => !equipesHorsCharge.has(equipe.id))
+        .map((equipe: Team) => equipe.id),
+    }
 
     const schedulerTeams = teams.map((team: Team) => ({
       id: team.id,
@@ -264,7 +295,7 @@ export default wrapApiHandler(
 
     // Application des assignations en base de données si demandé
     if (body.applyAssignments === true) {
-      await applyAssignments(editionId, result.assignments, user.id, mode, creneauxSoumisAuCalcul)
+      await applyAssignments(editionId, result.assignments, user.id, mode, perimetre)
     }
 
     return createSuccessResponse({
@@ -286,11 +317,8 @@ async function applyAssignments(
   assignments: Assignment[],
   userId: number,
   mode: 'replace-all' | 'keep-all' | 'keep-manual',
-  /**
-   * Les créneaux soumis au calcul, et la borne de ce que la suppression peut atteindre : ce que
-   * le planificateur n'a pas examiné, il ne le recréera pas, et n'a donc pas à l'effacer.
-   */
-  creneauxSoumisAuCalcul: string[]
+  /** Ce que le calcul a examiné, et la borne de ce que les suppressions peuvent atteindre. */
+  perimetre: PerimetreDuCalcul
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
     // 1. Effacer ce que le mode ne conserve pas, et seulement sur les créneaux que le calcul a
@@ -299,7 +327,7 @@ async function applyAssignments(
     if (mode !== 'keep-all') {
       await tx.volunteerAssignment.deleteMany({
         where: {
-          timeSlotId: { in: creneauxSoumisAuCalcul },
+          timeSlotId: { in: perimetre.creneaux },
           ...(mode === 'keep-manual' ? { source: 'AUTO' } : {}),
         },
       })
@@ -330,7 +358,7 @@ async function applyAssignments(
     }
 
     // 3. Assigner les bénévoles aux équipes correspondantes
-    await assignVolunteersToTeams(tx, editionId, assignments, mode)
+    await assignVolunteersToTeams(tx, assignments, mode, perimetre)
 
     // 4. Log de l'action
     console.log(
@@ -341,87 +369,81 @@ async function applyAssignments(
 }
 
 /**
- * Assigne les bénévoles aux équipes correspondantes à leurs créneaux
+ * Rattache les bénévoles aux équipes des créneaux qu'ils viennent de recevoir.
+ *
+ * Le rattachement à une équipe porte désormais son origine (`source`), comme l'affectation à un
+ * créneau. C'est ce qui manquait : faute de pouvoir distinguer « l'organisateur a mis Alice en
+ * cuisine » de « un calcul précédent l'y a mise », le mode « tout effacer » emportait les deux.
  */
 async function assignVolunteersToTeams(
   tx: PrismaTransaction,
-  editionId: number,
   // `Assignment[]`, la forme que produit le planificateur et que ces deux fonctions lisent
   // réellement (`slotId`, `volunteerId`). La déclaration annonçait `{ timeSlotId, userId }`,
   // des champs absents ici — le code fonctionnait, c'est le type qui décrivait autre chose.
   assignments: Assignment[],
-  mode: 'replace-all' | 'keep-all' | 'keep-manual'
+  mode: 'replace-all' | 'keep-all' | 'keep-manual',
+  perimetre: PerimetreDuCalcul
 ): Promise<void> {
-  // Grouper les assignations par bénévole
-  const volunteerTeams = new Map<number, Set<string>>()
+  // `volunteerId` est un identifiant d'utilisateur ; la table des rattachements, elle, référence
+  // la CANDIDATURE. La correspondance est déjà connue du périmètre : la redemander à la base
+  // coûtait une requête par bénévole, dans une transaction qui en compte déjà beaucoup.
+  const candidatureDe = new Map(
+    perimetre.candidatures.map(({ userId, applicationId }) => [userId, applicationId])
+  )
+
+  /**
+   * En « tout effacer », retirer les rattachements qu'un calcul précédent avait posés — et
+   * ceux-là seulement.
+   *
+   * Trois bornes, pour trois raisons distinctes :
+   * - `source: AUTO` épargne les décisions humaines, que rien ne reconstruirait ;
+   * - les candidatures soumises au calcul, car lui seul sait repeupler ce qu'il vide ;
+   * - les équipes qu'il peut pourvoir, ce qui exclut les volantes et les autonomes : leurs
+   *   créneaux sont écartés, donc aucun rattachement n'y serait recréé. Sortir un bénévole de
+   *   son équipe volante le rendrait planifiable, soit exactement l'inverse du réglage.
+   *
+   * Une seule requête là où il y en avait une par bénévole — et surtout, l'ancienne ne visait
+   * que les bénévoles ayant reçu un créneau d'équipe : deux bénévoles dans la même situation
+   * s'en tiraient différemment selon ce que le calcul leur avait donné.
+   */
+  if (mode === 'replace-all') {
+    await tx.applicationTeamAssignment.deleteMany({
+      where: {
+        applicationId: { in: perimetre.candidatures.map(({ applicationId }) => applicationId) },
+        teamId: { in: perimetre.equipes },
+        source: 'AUTO',
+      },
+    })
+  }
+
+  // Grouper les équipes par bénévole, puis écrire d'un coup.
+  const equipesParBenevole = new Map<number, Set<string>>()
 
   for (const assignment of assignments) {
-    if (assignment.teamId) {
-      if (!volunteerTeams.has(assignment.volunteerId)) {
-        volunteerTeams.set(assignment.volunteerId, new Set())
-      }
-      volunteerTeams.get(assignment.volunteerId)!.add(assignment.teamId)
+    if (!assignment.teamId) continue
+    if (!equipesParBenevole.has(assignment.volunteerId)) {
+      equipesParBenevole.set(assignment.volunteerId, new Set())
+    }
+    equipesParBenevole.get(assignment.volunteerId)!.add(assignment.teamId)
+  }
+
+  const aCreer: { applicationId: number; teamId: string; isLeader: boolean; source: 'AUTO' }[] = []
+
+  for (const [volunteerId, teamIds] of equipesParBenevole) {
+    const applicationId = candidatureDe.get(volunteerId)
+    // Un bénévole hors du périmètre n'a pas pu recevoir de créneau : le cas ne devrait pas se
+    // présenter, et on ne va certainement pas inventer un rattachement pour lui.
+    if (!applicationId) continue
+
+    for (const teamId of teamIds) {
+      aCreer.push({ applicationId, teamId, isLeader: false, source: 'AUTO' })
     }
   }
 
-  // Pour chaque bénévole, mettre à jour ses équipes assignées
-  for (const [volunteerId, teamIds] of volunteerTeams) {
-    // Récupérer l'application du bénévole
-    const application = await tx.editionVolunteerApplication.findUnique({
-      where: {
-        eventId_userId: {
-          eventId: editionId,
-          userId: volunteerId,
-        },
-      },
-      include: {
-        teamAssignments: {
-          include: {
-            team: true,
-          },
-        },
-      },
-    })
-
-    if (!application) continue
-
-    // L'appartenance à une équipe n'a pas d'origine enregistrée, contrairement à
-    // l'affectation à un créneau : on ne l'efface donc qu'en mode « tout effacer ».
-    // La supprimer en mode « garder le manuel » détruirait des choix humains, ce que ce
-    // mode existe précisément pour éviter.
-    if (mode === 'replace-all') {
-      await tx.applicationTeamAssignment.deleteMany({
-        where: {
-          applicationId: application.id,
-        },
-      })
-    }
-
-    // Ajouter les nouvelles assignations d'équipes
-    const teamIdsArray = Array.from(teamIds)
-    if (teamIdsArray.length > 0) {
-      // Créer les assignations d'équipes
-      for (const teamId of teamIdsArray) {
-        // Vérifier si l'assignation existe déjà
-        const existingAssignment = await tx.applicationTeamAssignment.findUnique({
-          where: {
-            applicationId_teamId: {
-              applicationId: application.id,
-              teamId: teamId,
-            },
-          },
-        })
-
-        if (!existingAssignment) {
-          await tx.applicationTeamAssignment.create({
-            data: {
-              applicationId: application.id,
-              teamId: teamId,
-              isLeader: false,
-            },
-          })
-        }
-      }
-    }
+  if (aCreer.length > 0) {
+    // `skipDuplicates` remplace le relevé ligne à ligne qui précédait. Il a la même conséquence,
+    // et elle est voulue : un rattachement manuel que le calcul confirme n'est pas réécrit, donc
+    // il garde son origine MANUAL et reste protégé de la prochaine relance.
+    await tx.applicationTeamAssignment.createMany({ data: aCreer, skipDuplicates: true })
   }
 }
