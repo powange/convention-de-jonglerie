@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Ściśle przestrzegać przydzielonych zespołów",
       "respect_assigned_teams_help": "Przypisuje wolontariuszy tylko do zespołów, do których organizatorzy już ich przydzielili",
       "preserve_show_access": "Zachować dostęp do spektakli",
-      "preserve_show_access_help": "Nie przydziela wolontariusza do dyżuru, który uniemożliwiłby mu obejrzenie choćby jednego przedstawienia spektaklu. Dyżur pozostaje wtedy nieobsadzony."
+      "preserve_show_access_help": "Nie przydziela wolontariusza do dyżuru, który uniemożliwiłby mu obejrzenie choćby jednego przedstawienia spektaklu. Dyżur pozostaje wtedy nieobsadzony.",
+      "undo_title": "Cofnij to obliczenie",
+      "undo_description": "Ostatnie obliczenie utworzyło {created} przydział(ów) i usunęło {deleted}. Cofnięcie przywraca grafik dokładnie taki, jaki był wcześniej.",
+      "undo_action": "Cofnij to obliczenie",
+      "undo_confirm": "Cofnąć ostatnie obliczenie? Utworzone przydziały zostaną usunięte, a usunięte — przywrócone.",
+      "undo_done": "Obliczenie zostało cofnięte",
+      "undo_outdated": "Od tego czasu zastosowano inne obliczenie: to już nie ono jest cofane. Odśwież stronę.",
+      "undo_nothing": "Brak obliczenia do cofnięcia"
     },
     "autonomous_team": "Zespół samodzielny",
     "autonomous_team_badge": "Samodzielny",

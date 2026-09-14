@@ -100,9 +100,12 @@ const preparerLesMocks = () => {
 
   prismaMock.volunteerAssignment.deleteMany.mockResolvedValue({ count: 0 })
   prismaMock.volunteerAssignment.findFirst.mockResolvedValue(null)
+  prismaMock.volunteerAssignment.findMany.mockResolvedValue([])
   prismaMock.volunteerAssignment.create.mockResolvedValue({})
   prismaMock.applicationTeamAssignment.deleteMany.mockResolvedValue({ count: 0 })
+  prismaMock.applicationTeamAssignment.findMany.mockResolvedValue([])
   prismaMock.applicationTeamAssignment.createMany.mockResolvedValue({ count: 0 })
+  prismaMock.volunteerAutoAssignRun.create.mockResolvedValue({ id: 'journal-1' })
 }
 
 const appliquer = (existingAssignmentsMode: string) => {
@@ -241,5 +244,67 @@ describe('POST …/volunteers/auto-assign — origine des rattachements d’équ
 
     await appliquer('keep-all')
     expect(prismaMock.applicationTeamAssignment.deleteMany).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * Le calcul écrivait des centaines de lignes sans rien laisser derrière lui : ni les réglages
+ * employés, ni ce qu'il avait effacé. Une relance malheureuse était irrattrapable.
+ */
+describe('POST …/volunteers/auto-assign — journal du calcul', () => {
+  beforeEach(preparerLesMocks)
+
+  const journalEcrit = () => prismaMock.volunteerAutoAssignRun.create.mock.calls.at(-1)[0].data
+
+  it('consigne le calcul appliqué', async () => {
+    const reponse = await appliquer('replace-all')
+
+    expect(prismaMock.volunteerAutoAssignRun.create).toHaveBeenCalled()
+    expect(reponse.data.journalId).toBe('journal-1')
+  })
+
+  it('garde les réglages employés, et le mode', async () => {
+    await appliquer('keep-manual')
+
+    const journal = journalEcrit()
+    expect(journal.mode).toBe('keep-manual')
+    expect(journal.constraints).toBeDefined()
+    expect(journal.executedById).toBe(1)
+    expect(journal.eventId).toBe(22)
+  })
+
+  it('relève les affectations AVANT de les effacer', async () => {
+    // C'est la seule fenêtre où l'état antérieur existe encore. Le relevé doit viser exactement
+    // la même cible que la suppression, sinon on restaurerait autre chose que ce qu'on a pris.
+    prismaMock.volunteerAssignment.findMany.mockResolvedValue([
+      {
+        timeSlotId: 'creneau-cuisine',
+        userId: 99,
+        source: 'MANUAL',
+        assignedById: 3,
+        assignedAt: new Date('2026-07-01T10:00:00.000Z'),
+      },
+    ])
+
+    await appliquer('replace-all')
+
+    const journal = journalEcrit()
+    expect(journal.deletedAssignments).toHaveLength(1)
+    expect(journal.deletedCount).toBe(1)
+    expect(prismaMock.volunteerAssignment.findMany.mock.calls.at(-1)[0].where).toEqual(
+      prismaMock.volunteerAssignment.deleteMany.mock.calls.at(-1)[0].where
+    )
+  })
+
+  it('n’écrit aucun journal quand ce n’est qu’un aperçu', async () => {
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: false,
+      constraints: { existingAssignmentsMode: 'replace-all' },
+    })
+
+    await handler(evenement as any)
+
+    expect(prismaMock.volunteerAutoAssignRun.create).not.toHaveBeenCalled()
+    expect(prismaMock.volunteerAssignment.deleteMany).not.toHaveBeenCalled()
   })
 })

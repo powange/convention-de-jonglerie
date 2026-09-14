@@ -276,6 +276,53 @@ model VolunteerAssignment {
   @@index([source])
 }
 
+/// Le journal d'une application de l'assignation automatique, et de quoi la défaire.
+///
+/// Le calcul écrit des centaines de lignes d'un coup et n'en gardait aucune trace : ni les
+/// réglages employés, ni ce qu'il avait effacé, ni qui l'avait lancé — deux `console.log` en tout.
+/// Un organisateur qui se trompait de mode n'avait aucun moyen de revenir en arrière.
+///
+/// L'état antérieur est conservé en JSON plutôt qu'en tables filles, et c'est délibéré : il est
+/// écrit d'un bloc, relu d'un bloc au moment d'annuler, et n'est jamais interrogé autrement. Deux
+/// tables de plus n'apporteraient que des jointures.
+///
+/// ⚠️ Seul le dernier journal d'une édition peut être annulé, et une seule fois. Défaire un calcul
+/// par-dessus un autre reviendrait à restaurer un état que le suivant a déjà modifié.
+model VolunteerAutoAssignRun {
+  id           String   @id @default(cuid())
+  eventId      Int
+  executedById Int
+  executedAt   DateTime @default(now())
+  /// `replace-all`, `keep-all` ou `keep-manual`.
+  mode         String
+  /// Les contraintes telles que l'organisateur les avait réglées, pour savoir ce qui a produit ce
+  /// planning — la question que l'on se pose toujours en second.
+  constraints  Json
+
+  /// Ce que le calcul a effacé, tel que c'était : de quoi le recréer à l'identique.
+  deletedAssignments Json
+  /// Ce qu'il a créé : de quoi le retirer.
+  createdAssignments Json
+  /// Les rattachements d'équipe, sur le même principe.
+  deletedTeamLinks   Json
+  createdTeamLinks   Json
+
+  createdCount Int
+  deletedCount Int
+
+  /// Renseignés quand le calcul a été annulé. Un journal annulé ne l'est pas deux fois.
+  undoneAt   DateTime?
+  undoneById Int?
+
+  event      Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  executedBy User  @relation("VolunteerAutoAssignRun_executedBy", fields: [executedById], references: [id], onDelete: Cascade)
+  undoneBy   User? @relation("VolunteerAutoAssignRun_undoneBy", fields: [undoneById], references: [id], onDelete: SetNull)
+
+  @@index([eventId, executedAt])
+  @@index([executedById])
+  @@index([undoneById])
+}
+
 // ========== ASSIGNATION ÉQUIPES BÉNÉVOLES ==========
 
 model ApplicationTeamAssignment {

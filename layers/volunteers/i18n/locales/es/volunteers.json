@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Respetar estrictamente los equipos asignados",
       "respect_assigned_teams_help": "Solo asigna voluntarios a los equipos en los que los organizadores ya los han colocado",
       "preserve_show_access": "Preservar el acceso a los espectáculos",
-      "preserve_show_access_help": "No asigna a un voluntario a un turno que le impediría asistir a ninguna representación de un espectáculo. El turno queda entonces sin cubrir."
+      "preserve_show_access_help": "No asigna a un voluntario a un turno que le impediría asistir a ninguna representación de un espectáculo. El turno queda entonces sin cubrir.",
+      "undo_title": "Deshacer este cálculo",
+      "undo_description": "El último cálculo creó {created} asignación(es) y eliminó {deleted}. Deshacerlo restaura la planificación tal como estaba justo antes.",
+      "undo_action": "Deshacer este cálculo",
+      "undo_confirm": "¿Deshacer el último cálculo? Se eliminarán las asignaciones que creó y se restaurarán las que había borrado.",
+      "undo_done": "El cálculo se ha deshecho",
+      "undo_outdated": "Se ha aplicado otro cálculo desde entonces: ya no es este el que se deshace. Recarga la página.",
+      "undo_nothing": "No hay ningún cálculo que deshacer"
     },
     "autonomous_team": "Equipo autónomo",
     "autonomous_team_badge": "Autónomo",

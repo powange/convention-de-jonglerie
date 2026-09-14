@@ -220,6 +220,34 @@
             </UButton>
           </div>
 
+          <!-- Revenir sur le dernier calcul appliqué. Séparé des actions ci-dessus : ce n'est pas
+               une étape du calcul, c'est le filet en dessous. -->
+          <UAlert
+            v-if="dernierCalcul"
+            color="neutral"
+            variant="soft"
+            icon="i-heroicons-arrow-uturn-left"
+            :title="t('volunteers.auto_assignment.undo_title')"
+            :description="
+              t('volunteers.auto_assignment.undo_description', {
+                created: dernierCalcul.createdCount,
+                deleted: dernierCalcul.deletedCount,
+              })
+            "
+          >
+            <template #actions>
+              <UButton
+                color="warning"
+                variant="soft"
+                icon="i-heroicons-arrow-uturn-left"
+                :loading="undoLoading"
+                @click="annulerLeCalcul"
+              >
+                {{ t('volunteers.auto_assignment.undo_action') }}
+              </UButton>
+            </template>
+          </UAlert>
+
           <!-- Résultats de l'aperçu -->
           <div v-if="previewResult" class="space-y-4">
             <USeparator :label="t('volunteers.auto_assignment.preview_results')" />
@@ -628,12 +656,75 @@ const { execute: executeApplyAssignments, loading: applyLoading } = useApiAction
       description: t('volunteers.auto_assignment.assignments_applied_description'),
     },
     errorMessages: { default: t('errors.error_occurred') },
-    onSuccess: () => {
+    onSuccess: (response) => {
       previewResult.value = null
+      // Le calcul qu'on vient d'appliquer devient celui qu'on peut défaire.
+      dernierCalcul.value = response?.journalId
+        ? {
+            id: response.journalId,
+            executedAt: new Date().toISOString(),
+            createdCount: response.result?.assignments?.length ?? 0,
+            deletedCount: 0,
+          }
+        : null
       emit('assignments-applied')
     },
   }
 )
+
+/**
+ * Le dernier calcul encore annulable.
+ *
+ * Relu au montage, et pas seulement mémorisé après une application : c'est le lendemain matin
+ * qu'on se rend compte qu'on s'est trompé de mode, page rechargée depuis longtemps.
+ */
+const dernierCalcul = ref<{
+  id: string
+  executedAt: string
+  createdCount: number
+  deletedCount: number
+} | null>(null)
+
+const chargerDernierCalcul = async () => {
+  try {
+    const reponse = await $fetch<{
+      data?: { lastRun?: typeof dernierCalcul.value }
+      lastRun?: typeof dernierCalcul.value
+    }>(`/api/editions/${props.editionId}/volunteers/auto-assign/last-run`)
+    dernierCalcul.value = reponse?.data?.lastRun ?? reponse?.lastRun ?? null
+  } catch {
+    // Le bouton d'annulation est un filet, pas une fonction vitale : s'il ne peut pas s'afficher,
+    // le reste du panneau doit fonctionner quand même. Un rejet non géré ici interromprait
+    // l'hydratation de la page entière.
+    dernierCalcul.value = null
+  }
+}
+
+onMounted(chargerDernierCalcul)
+
+const { execute: executeUndo, loading: undoLoading } = useApiAction(
+  () => `/api/editions/${props.editionId}/volunteers/auto-assign/undo`,
+  {
+    method: 'POST',
+    body: () => ({ journalId: dernierCalcul.value?.id }),
+    successMessage: { title: t('volunteers.auto_assignment.undo_done') },
+    errorMessages: {
+      409: t('volunteers.auto_assignment.undo_outdated'),
+      404: t('volunteers.auto_assignment.undo_nothing'),
+      default: t('errors.error_occurred'),
+    },
+    onSuccess: () => {
+      dernierCalcul.value = null
+      emit('assignments-applied')
+    },
+  }
+)
+
+const annulerLeCalcul = () => {
+  if (!dernierCalcul.value) return
+  if (!confirm(t('volunteers.auto_assignment.undo_confirm'))) return
+  executeUndo()
+}
 
 const applyAssignments = () => {
   if (!previewResult.value) return

@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Respeitar estritamente as equipas atribuídas",
       "respect_assigned_teams_help": "Atribui voluntários apenas às equipas em que os organizadores já os colocaram",
       "preserve_show_access": "Preservar o acesso aos espetáculos",
-      "preserve_show_access_help": "Não atribui um voluntário a um turno que o impediria de assistir a qualquer sessão de um espetáculo. O turno fica então por preencher."
+      "preserve_show_access_help": "Não atribui um voluntário a um turno que o impediria de assistir a qualquer sessão de um espetáculo. O turno fica então por preencher.",
+      "undo_title": "Anular este cálculo",
+      "undo_description": "O último cálculo criou {created} atribuição(ões) e apagou {deleted}. Anulá-lo repõe o planeamento tal como estava imediatamente antes.",
+      "undo_action": "Anular este cálculo",
+      "undo_confirm": "Anular o último cálculo? As atribuições que criou serão removidas e as que tinha apagado serão repostas.",
+      "undo_done": "O cálculo foi anulado",
+      "undo_outdated": "Foi aplicado outro cálculo entretanto: já não é este que é anulado. Recarregue a página.",
+      "undo_nothing": "Nenhum cálculo para anular"
     },
     "autonomous_team": "Equipa autónoma",
     "autonomous_team_badge": "Autónoma",

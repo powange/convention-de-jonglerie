@@ -111,7 +111,14 @@
       "respect_assigned_teams": "Přísné dodržování přidělených týmů",
       "respect_assigned_teams_help": "Přiřazuje dobrovolníky pouze do týmů, do kterých je organizátoři již zařadili",
       "preserve_show_access": "Zachovat přístup k představením",
-      "preserve_show_access_help": "Nepřiřazuje dobrovolníka ke směně, která by mu znemožnila zhlédnout jedinou reprízu představení. Směna pak zůstane neobsazená."
+      "preserve_show_access_help": "Nepřiřazuje dobrovolníka ke směně, která by mu znemožnila zhlédnout jedinou reprízu představení. Směna pak zůstane neobsazená.",
+      "undo_title": "Vrátit tento výpočet",
+      "undo_description": "Poslední výpočet vytvořil {created} přiřazení a {deleted} jich smazal. Jeho vrácení obnoví rozvrh přesně tak, jak vypadal těsně předtím.",
+      "undo_action": "Vrátit tento výpočet",
+      "undo_confirm": "Vrátit poslední výpočet? Vytvořená přiřazení budou odstraněna a smazaná obnovena.",
+      "undo_done": "Výpočet byl vrácen",
+      "undo_outdated": "Mezitím byl použit jiný výpočet: vrací se už jiný. Načtěte stránku znovu.",
+      "undo_nothing": "Žádný výpočet k vrácení"
     },
     "autonomous_team": "Samostatný tým",
     "autonomous_team_badge": "Samostatný",
