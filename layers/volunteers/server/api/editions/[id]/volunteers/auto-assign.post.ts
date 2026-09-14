@@ -13,7 +13,11 @@ import { createLogger } from '#server/utils/logger'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { createRateLimiter } from '#server/utils/rate-limiter'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { VolunteerScheduler, type Assignment } from '#server/utils/volunteer-scheduler'
+import {
+  VolunteerScheduler,
+  type Assignment,
+  type SchedulingResult,
+} from '#server/utils/volunteer-scheduler'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import {
   estEquipeHorsCharge,
@@ -264,6 +268,16 @@ export default wrapApiHandler(
 
     // Lecture et validation du body
     const body = await readBody(event)
+
+    /**
+     * Applique-t-on un plan déjà calculé ?
+     *
+     * Connu dès ici, et c'est utile : dans ce cas le planificateur ne tourne pas, donc ni les
+     * spectacles ni son indexation ne servent à quoi que ce soit. L'empreinte, elle, reste
+     * calculée dans les deux cas — c'est elle qui protège l'application.
+     */
+    const appliqueUnPlanConserve =
+      body.applyAssignments === true && typeof body.planId === 'string' && Boolean(body.planId)
     const constraints = constraintsSchema.parse(body.constraints || {})
 
     // Récupération des données nécessaires
@@ -304,7 +318,11 @@ export default wrapApiHandler(
 
       // Programmation des spectacles : l'algorithme refuse de priver un bénévole du dernier
       // passage de l'un d'eux. Le layer ne connaît pas la notion de spectacle, d'où le port.
-      useVolunteerPorts().artists.getShowSchedule(editionId),
+      // Le port n'est interrogé que si le calcul doit tourner : appliquer un plan conservé n'a
+      // que faire de la programmation des spectacles.
+      appliqueUnPlanConserve
+        ? Promise.resolve([])
+        : useVolunteerPorts().artists.getShowSchedule(editionId),
     ])
 
     /**
@@ -394,12 +412,17 @@ export default wrapApiHandler(
     const schedulerVolunteers = benevolesPlanifiables.map(
       (volunteer: VolunteerWithTeamAssignments) => ({
         user: volunteer.user,
-        availability: JSON.stringify({
+        // Un objet, et non plus une chaîne JSON que le moteur désérialisait à chaque évaluation
+        // de score. `timePreferences` est un `Json?` en base : on ne garde que ce qui est bien un
+        // tableau, plutôt que de laisser le moteur s'en méfier à chaque lecture.
+        availability: {
           setup: volunteer.setupAvailability || false,
           teardown: volunteer.teardownAvailability || false,
           event: volunteer.eventAvailability || false,
-          timePreferences: volunteer.timePreferences || null,
-        }),
+          timePreferences: Array.isArray(volunteer.timePreferences)
+            ? (volunteer.timePreferences as string[])
+            : null,
+        },
         teamPreferences: volunteer.teamPreferences
           ? Array.isArray(volunteer.teamPreferences)
             ? volunteer.teamPreferences
@@ -493,19 +516,23 @@ export default wrapApiHandler(
     }))
 
     // Exécution de l'algorithme
-    const scheduler = new VolunteerScheduler({
-      volunteers: schedulerVolunteers,
-      timeSlots: schedulerTimeSlots,
-      teams: schedulerTeams,
-      constraints,
-      bornes: {
-        debut: eventRecord.startDate?.toISOString() ?? null,
-        fin: eventRecord.endDate?.toISOString() ?? null,
-      },
-      spectacles,
-      affectationsExistantes: affectationsConservees,
-      fuseau: eventRecord.edition?.timezone ?? null,
-    })
+    // Construit seulement quand il sert : son constructeur indexe tous les créneaux, calcule
+    // toutes les durées, tous les jours locaux et toutes les fenêtres de présence.
+    const scheduler = appliqueUnPlanConserve
+      ? null
+      : new VolunteerScheduler({
+          volunteers: schedulerVolunteers,
+          timeSlots: schedulerTimeSlots,
+          teams: schedulerTeams,
+          constraints,
+          bornes: {
+            debut: eventRecord.startDate?.toISOString() ?? null,
+            fin: eventRecord.endDate?.toISOString() ?? null,
+          },
+          spectacles,
+          affectationsExistantes: affectationsConservees,
+          fuseau: eventRecord.edition?.timezone ?? null,
+        })
 
     /**
      * Appliquer, c'est écrire le plan QU'ON A MONTRÉ — pas en recalculer un autre.
@@ -520,17 +547,12 @@ export default wrapApiHandler(
      * deux cents bénévoles, cela faisait plusieurs secondes de calcul pour rien, à chaque
      * application.
      */
-    const avecPlanConserve =
-      body.applyAssignments === true && typeof body.planId === 'string' && Boolean(body.planId)
-
-    let result: ReturnType<typeof scheduler.assignVolunteers> | null = avecPlanConserve
-      ? null
-      : scheduler.assignVolunteers()
+    let result: SchedulingResult | null = scheduler ? scheduler.assignVolunteers() : null
 
     let planRetenu = result?.assignments ?? []
     let perimetreRetenu = perimetre
 
-    if (avecPlanConserve) {
+    if (appliqueUnPlanConserve) {
       const plan = await prisma.volunteerAutoAssignPlan.findFirst({
         where: { id: body.planId, eventId: editionId },
       })

@@ -7,6 +7,15 @@ import type { Representation, SpectacleProgramme } from '~~/shared/utils/spectac
 import { estPresentPendant, fenetreDe } from '~~/shared/utils/presence-benevole'
 import { representationsDe, spectacleInaccessible } from '~~/shared/utils/spectacles-visibles'
 
+/** Les disponibilités d'un bénévole, telles que le moteur les lit. */
+export interface DisponibiliteBenevole {
+  setup: boolean
+  teardown: boolean
+  event: boolean
+  /** Les plages horaires souhaitées. `null` ou vide : aucune préférence exprimée. */
+  timePreferences: string[] | null
+}
+
 export interface VolunteerApplication {
   user: {
     id: number
@@ -16,7 +25,15 @@ export interface VolunteerApplication {
     nom?: string | null
     prenom?: string | null
   }
-  availability: string // JSON string avec les préférences
+  /**
+   * Ce que le bénévole a déclaré pouvoir faire.
+   *
+   * C'était une CHAÎNE JSON, que le moteur désérialisait à chaque évaluation de score — environ
+   * soixante mille fois sur une grosse édition, pour un contenu qui ne change jamais. L'endpoint
+   * la sérialisait juste avant, spécialement pour cela : un aller-retour sans raison, hérité d'un
+   * temps où cette valeur venait telle quelle de la base.
+   */
+  availability: DisponibiliteBenevole
   teamPreferences?: any[]
   /**
    * Équipes dans lesquelles les organisateurs ont déjà placé le bénévole. À distinguer des
@@ -401,6 +418,22 @@ export class VolunteerScheduler {
    * changera rien, il manque des créneaux ou des heures.
    */
   private motifParPaire = new Map<string, MotifRefus>()
+  /**
+   * Le recouvrement horaire, par couple (créneau, jeu de préférences).
+   *
+   * Il était recalculé à chaque évaluation de score, et deux fois par évaluation — une fois par la
+   * garde stricte, une fois par le bonus. Or il ne dépend que du créneau et des plages cochées :
+   * tous les bénévoles ayant les mêmes préférences partagent le même résultat.
+   */
+  private recouvrementParCouple = new Map<string, number>()
+  /**
+   * Montage, événement ou démontage : cela ne dépend que du créneau et des bornes de l'édition.
+   * C'était pourtant reclassé à chaque évaluation, comparaisons de dates comprises — et deux fois
+   * par évaluation, `isVolunteerAvailable` étant appelé par le score puis par la garde.
+   */
+  private typeParCreneau = new Map<string, 'setup' | 'event' | 'teardown'>()
+  /** Les bénévoles par identifiant : les `.find` linéaires qu'il remplace étaient nombreux. */
+  private benevoleParId = new Map<number, VolunteerApplication>()
 
   constructor(entrees: EntreesDuPlanificateur) {
     const {
@@ -472,7 +505,10 @@ export class VolunteerScheduler {
         slot.id,
         (fuseau ? debut.setZone(fuseau) : debut.toUTC()).toISODate() ?? ''
       )
+      this.typeParCreneau.set(slot.id, this.getSlotType(slot, debut))
     }
+
+    this.benevoleParId = new Map(volunteers.map((volunteer) => [volunteer.user.id, volunteer]))
 
     /**
      * Les affectations déjà en place comptent dès le départ : ce sont des heures tenues.
@@ -728,14 +764,14 @@ export class VolunteerScheduler {
       // Qui pourrait tenir ce créneau s'il était libéré d'un autre ? On ne s'intéresse qu'à ceux
       // qui tiennent déjà quelque chose : les autres ont déjà été proposés et écartés.
       const aDeplacer = this.assignments.find((assignment) => {
-        const benevole = this.volunteers.find((v) => v.user.id === assignment.volunteerId)
+        const benevole = this.benevoleParId.get(assignment.volunteerId)
         const creneauTenu = this.creneauParId.get(assignment.slotId)
         if (!benevole || !creneauTenu || creneauTenu.id === vide.id) return false
 
         // On évalue dans l'état où il aurait rendu son créneau.
         this.retirerAffectation(assignment)
         const peutPrendreLeVide =
-          !this.motifBloquant(benevole, vide, this.parseAvailability(benevole.availability)) &&
+          !this.motifBloquant(benevole, vide, benevole.availability) &&
           this.calculateAssignmentScore(benevole, vide) > SEUILS.REMPLISSAGE
 
         // Et quelqu'un d'autre doit pouvoir reprendre ce qu'il rend, sinon on déshabille Pierre.
@@ -743,11 +779,7 @@ export class VolunteerScheduler {
           ? this.volunteers.find(
               (autre) =>
                 autre.user.id !== benevole.user.id &&
-                !this.motifBloquant(
-                  autre,
-                  creneauTenu,
-                  this.parseAvailability(autre.availability)
-                ) &&
+                !this.motifBloquant(autre, creneauTenu, autre.availability) &&
                 this.calculateAssignmentScore(autre, creneauTenu) > SEUILS.REMPLISSAGE
             )
           : undefined
@@ -807,7 +839,7 @@ export class VolunteerScheduler {
     let score = 0
 
     // Disponibilité du bénévole
-    const availability = this.parseAvailability(volunteer.availability)
+    const availability = volunteer.availability
     const isAvailable = this.isVolunteerAvailable(volunteer, slot, availability)
 
     // Les impossibilités sont relevées ensemble, et nommées : le diagnostic lit la même méthode.
@@ -976,21 +1008,6 @@ export class VolunteerScheduler {
   }
 
   /**
-   * Parse la disponibilité JSON du bénévole
-   */
-  private parseAvailability(availability: string): any {
-    try {
-      return JSON.parse(availability)
-    } catch {
-      return {
-        setup: true,
-        event: true,
-        teardown: true,
-      }
-    }
-  }
-
-  /**
    * Vérifie si un bénévole est disponible pour un créneau
    */
   private isVolunteerAvailable(
@@ -1003,9 +1020,10 @@ export class VolunteerScheduler {
     // voix au responsable, qui retirera les créneaux s'il le juge nécessaire (décision du
     // 14/09/2026). Elle est retirée plutôt que laissée à suggérer une capacité qui n'existe pas.
 
-    // Vérifier les disponibilités générales (montage, événement, démontage)
-    const slotDate = dt.fromISO(slot.start)
-    const slotType = this.getSlotType(slot, slotDate)
+    // Le type du créneau est classé une fois pour toutes à l'indexation : il ne dépend que du
+    // créneau et des bornes de l'édition, jamais du bénévole qu'on lui compare.
+    const slotType =
+      this.typeParCreneau.get(slot.id) ?? this.getSlotType(slot, dt.fromISO(slot.start))
 
     switch (slotType) {
       case 'setup':
@@ -1069,10 +1087,16 @@ export class VolunteerScheduler {
    * Une proportion règle les deux : elle vaut 1 pour un créneau entièrement dans les plages
    * souhaitées, et ne dépasse jamais 1 même si plusieurs plages se chevauchent.
    */
-  private recouvrementDesPreferences(slot: TimeSlot, availability: any): number {
-    if (!Array.isArray(availability.timePreferences) || availability.timePreferences.length === 0) {
-      return 0
-    }
+  private recouvrementDesPreferences(slot: TimeSlot, availability: DisponibiliteBenevole): number {
+    const preferences = availability.timePreferences
+    if (!Array.isArray(preferences) || preferences.length === 0) return 0
+
+    // Le résultat ne dépend que du créneau et du jeu de préférences : deux évaluations du même
+    // couple donnent le même nombre. Le calculer une fois évite de le refaire pour chaque
+    // bénévole partageant les mêmes plages — ils sont nombreux, les plages étant en nombre fini.
+    const cle = `${slot.id}|${preferences.join(',')}`
+    const connu = this.recouvrementParCouple.get(cle)
+    if (connu !== undefined) return connu
 
     const debut = this.local(slot.start)
     const fin = this.local(slot.end)
@@ -1080,27 +1104,59 @@ export class VolunteerScheduler {
     if (!Number.isFinite(dureeMinutes) || dureeMinutes <= 0) return 0
 
     // Les minutes du créneau, comptées depuis minuit du jour de son début : une plage qui franchit
-    // minuit se prolonge donc naturellement au-delà de 1440 plutôt que de repartir à zéro.
+    // minuit se prolonge donc au-delà de 1440 plutôt que de repartir à zéro.
     const debutMinutes = debut.hour * 60 + debut.minute
     const finMinutes = debutMinutes + dureeMinutes
 
-    const couvertes = new Set<number>()
+    /**
+     * Les intersections, en intervalles plutôt qu'en minutes.
+     *
+     * La version précédente insérait CHAQUE minute du créneau dans un `Set` — jusqu'à quatre mille
+     * itérations et autant d'allocations par appel, et l'appel était fait deux fois par évaluation
+     * de score. Ici, quelques opérations arithmétiques par préférence, sans allocation.
+     *
+     * Les intervalles sont ensuite fusionnés avant d'être sommés : deux plages qui se chevauchent
+     * ne doivent pas compter deux fois la même minute.
+     */
+    const morceaux: { debut: number; fin: number }[] = []
 
-    for (const preference of availability.timePreferences) {
+    for (const preference of preferences) {
       const plage = PLAGES_HORAIRES[preference as keyof typeof PLAGES_HORAIRES]
       if (!plage) continue
 
-      // Une plage qui franchit minuit (23 h → 2 h) se lit comme deux bornes croissantes, et on
-      // l'essaie aussi décalée d'un jour pour attraper un créneau qui déborde sur le lendemain.
       const finPlage = plage.fin <= plage.debut ? plage.fin + 24 : plage.fin
       for (const decalage of [0, 24, -24]) {
         const a = Math.max(debutMinutes, (plage.debut + decalage) * 60)
         const b = Math.min(finMinutes, (finPlage + decalage) * 60)
-        for (let minute = Math.ceil(a); minute < b; minute++) couvertes.add(minute)
+        if (b > a) morceaux.push({ debut: a, fin: b })
       }
     }
 
-    return Math.min(couvertes.size / dureeMinutes, 1)
+    if (morceaux.length === 0) {
+      this.recouvrementParCouple.set(cle, 0)
+      return 0
+    }
+
+    morceaux.sort((x, y) => x.debut - y.debut)
+
+    let couvert = 0
+    let courantDebut = morceaux[0]!.debut
+    let courantFin = morceaux[0]!.fin
+
+    for (const morceau of morceaux.slice(1)) {
+      if (morceau.debut > courantFin) {
+        couvert += courantFin - courantDebut
+        courantDebut = morceau.debut
+        courantFin = morceau.fin
+      } else if (morceau.fin > courantFin) {
+        courantFin = morceau.fin
+      }
+    }
+    couvert += courantFin - courantDebut
+
+    const recouvrement = Math.min(couvert / dureeMinutes, 1)
+    this.recouvrementParCouple.set(cle, recouvrement)
+    return recouvrement
   }
 
   /**
@@ -1668,16 +1724,16 @@ export class VolunteerScheduler {
 
     const avecEquipe = this.assignments.filter((assignment) => assignment.teamId)
     const souhaitees = avecEquipe.filter((assignment) => {
-      const volunteer = this.volunteers.find((v) => v.user.id === assignment.volunteerId)
+      const volunteer = this.benevoleParId.get(assignment.volunteerId)
       return volunteer?.teamPreferences?.some((pref) => pref === assignment.teamId)
     })
 
     const dansLesHoraires = this.assignments.filter((assignment) => {
       const slot = this.creneauParId.get(assignment.slotId)
-      const volunteer = this.volunteers.find((v) => v.user.id === assignment.volunteerId)
+      const volunteer = this.benevoleParId.get(assignment.volunteerId)
       if (!slot || !volunteer) return false
 
-      const availability = this.parseAvailability(volunteer.availability)
+      const availability = volunteer.availability
       if (!Array.isArray(availability.timePreferences) || availability.timePreferences.length === 0)
         return false
 
@@ -1687,7 +1743,7 @@ export class VolunteerScheduler {
     // Seuls les bénévoles qui ont exprimé des préférences entrent dans ce ratio : compter ceux
     // qui n'ont rien demandé comme « mal servis » dirait le contraire de la vérité.
     const avecPreferencesHoraires = this.volunteers.filter((volunteer) => {
-      const availability = this.parseAvailability(volunteer.availability)
+      const availability = volunteer.availability
       return Array.isArray(availability.timePreferences) && availability.timePreferences.length > 0
     })
     const affectationsDeCeuxLa = this.assignments.filter((assignment) =>

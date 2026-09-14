@@ -19,12 +19,12 @@ const benevole = (options: {
 }) => ({
   id: options.id ?? 1,
   user: { id: options.id ?? 1, pseudo: `benevole-${options.id ?? 1}` },
-  availability: JSON.stringify({
+  availability: {
     setup: options.setup ?? false,
     event: options.event ?? false,
     teardown: options.teardown ?? false,
     timePreferences: null,
-  }),
+  },
   motivation: '',
   teamPreferences: options.teamPreferences ?? [],
   assignedTeams: options.assignedTeams ?? [],
@@ -455,12 +455,12 @@ describe('fuseau horaire de l’événement', () => {
 
   const benevoleAvecPreference = (preferences: string[]) => ({
     ...benevole({ event: true }),
-    availability: JSON.stringify({
+    availability: {
       setup: false,
       event: true,
       teardown: false,
       timePreferences: preferences,
-    }),
+    },
   })
 
   it('lit l’heure d’un créneau dans le fuseau de l’événement', () => {
@@ -738,8 +738,10 @@ describe('coût du calcul', () => {
     const duree = Date.now() - depart
 
     expect(r.assignments.length).toBeGreaterThan(0)
-    // Large exprès : ce qui compte est l'ordre de grandeur, pas la milliseconde.
-    expect(duree).toBeLessThan(30_000)
+    // Large exprès : ce qui compte est l'ordre de grandeur, pas la milliseconde. Resserrée
+    // après le lot P : 120 × 180 tient désormais largement sous les deux secondes, contre une
+    // dizaine auparavant — laisser 30 s aurait laissé repasser une régression d'un facteur dix.
+    expect(duree).toBeLessThan(10_000)
   }, 120_000)
 })
 
@@ -750,12 +752,12 @@ describe('coût du calcul', () => {
 describe('préférences horaires au recouvrement', () => {
   const avecPreferences = (preferences: string[]) => ({
     ...benevole({ event: true }),
-    availability: JSON.stringify({
+    availability: {
       setup: false,
       event: true,
       teardown: false,
       timePreferences: preferences,
-    }),
+    },
   })
 
   const creneauLong = creneau({
@@ -1111,5 +1113,65 @@ describe('motifs relevés au moment du refus', () => {
     expect(r.assignments).toHaveLength(1)
     expect(r.unassigned.volunteers).toHaveLength(1)
     expect(r.refus.parBenevole).toEqual([])
+  })
+})
+
+/**
+ * Le recouvrement horaire ne dépend que du créneau et des plages cochées : deux bénévoles ayant
+ * les mêmes préférences doivent obtenir le même nombre, et le calcul ne doit se faire qu'une fois.
+ *
+ * Il était refait à chaque évaluation de score, et deux fois par évaluation — une fois par la
+ * garde stricte, une fois par le bonus — en insérant chaque MINUTE du créneau dans un Set.
+ */
+describe('recouvrement horaire par intervalles', () => {
+  const avecPlages = (id: number, plages: string[]) => ({
+    ...benevole({ id, event: true }),
+    availability: { setup: false, event: true, teardown: false, timePreferences: plages },
+  })
+
+  it('donne le même score à deux bénévoles aux mêmes préférences', () => {
+    const r = new VolunteerScheduler({
+      volunteers: [avecPlages(1, ['morning']), avecPlages(2, ['morning'])],
+      timeSlots: [
+        {
+          ...creneau({
+            id: '1',
+            start: '2026-08-01T09:00:00.000Z',
+            end: '2026-08-01T11:00:00.000Z',
+          }),
+          maxVolunteers: 2,
+        },
+      ],
+      teams: [],
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(2)
+    expect(r.assignments[0]!.score).toBe(r.assignments[1]!.score)
+  })
+
+  it('ne compte pas deux fois une minute couverte par deux plages', () => {
+    // « matin » (9-12) et « midi » (12-14) se touchent sans se chevaucher : le créneau 9 h - 13 h
+    // est entièrement couvert, donc recouvrement de 1 — pas davantage.
+    const contigues = new VolunteerScheduler({
+      volunteers: [avecPlages(1, ['morning', 'lunch'])],
+      timeSlots: [
+        creneau({ id: '1', start: '2026-08-01T09:00:00.000Z', end: '2026-08-01T13:00:00.000Z' }),
+      ],
+      teams: [],
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
+
+    const uneSeule = new VolunteerScheduler({
+      volunteers: [avecPlages(1, ['morning'])],
+      timeSlots: [
+        creneau({ id: '1', start: '2026-08-01T09:00:00.000Z', end: '2026-08-01T12:00:00.000Z' }),
+      ],
+      teams: [],
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
+
+    // Deux créneaux entièrement couverts : le bonus horaire est plafonné de la même façon.
+    expect(contigues.assignments[0]!.score).toBe(uneSeule.assignments[0]!.score)
   })
 })
