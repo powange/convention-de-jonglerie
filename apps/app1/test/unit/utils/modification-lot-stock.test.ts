@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { changementsEnLot } from '../../../server/utils/modification-lot-stock'
+import {
+  changementsEnLot,
+  destinatairesDesChampsDEmprunt,
+} from '../../../server/utils/modification-lot-stock'
 
 /**
  * Modifier vingt objets d'un coup ne se relit pas objet par objet : ce qui part est ce qui reste.
@@ -125,5 +128,54 @@ describe('changementsEnLot — jalons d’emprunt', () => {
 
     expect(communs).toEqual({ location: 'Local' })
     expect(Object.keys(emprunt)).toEqual(['pickedUpAt'])
+  })
+})
+
+/**
+ * Le statut de prêt lui-même se modifie désormais par lot.
+ *
+ * Les six champs qui en dépendent — propriétaire, dates, lieux, responsables — se modifiaient déjà
+ * par lot, mais pas l'interrupteur qui décide de leur existence : déclarer dix objets comme prêtés
+ * demandait d'ouvrir dix fiches, et tant que ce n'était pas fait, les champs de prêt restaient
+ * sans effet sur eux.
+ */
+describe('statut de prêt en lot', () => {
+  const objets = [
+    { id: 1, isExternalLoan: false },
+    { id: 2, isExternalLoan: false },
+    { id: 3, isExternalLoan: true },
+  ]
+
+  it('applique le statut à toute la sélection', () => {
+    expect(changementsEnLot({ isExternalLoan: true }).communs).toEqual({ isExternalLoan: true })
+    expect(changementsEnLot({ isExternalLoan: false }).communs).toEqual({ isExternalLoan: false })
+  })
+
+  it('ne touche pas au statut quand la case n’est pas cochée', () => {
+    // L'absence du champ vaut « laisser tel quel » : c'est toute la mécanique de cette modale.
+    expect(changementsEnLot({ location: 'Hangar' }).communs).not.toHaveProperty('isExternalLoan')
+  })
+
+  it('applique les champs de prêt à ceux qui le DEVIENNENT', () => {
+    // Le cas qui motive ce lot : on reçoit dix perches d'un prêteur, on les marque prêtées ET on
+    // renseigne le propriétaire dans la même requête. Sans cela, il faut s'y reprendre à deux fois.
+    expect(destinatairesDesChampsDEmprunt({ isExternalLoan: true }, objets)).toEqual([1, 2, 3])
+  })
+
+  it('n’applique les champs de prêt à personne quand la sélection cesse d’être prêtée', () => {
+    expect(destinatairesDesChampsDEmprunt({ isExternalLoan: false }, objets)).toEqual([])
+  })
+
+  it('s’en tient à ceux déjà prêtés quand le statut n’est pas touché', () => {
+    expect(destinatairesDesChampsDEmprunt({ ownerContact: 'Marie' }, objets)).toEqual([3])
+  })
+
+  it('n’efface aucun champ de prêt en retirant le statut', () => {
+    // Décocher « prêté » ne vide ni le propriétaire, ni les dates, ni les lieux : la fiche cesse
+    // de les montrer, et l'objet les retrouve s'il redevient un prêt.
+    const { communs, emprunt } = changementsEnLot({ isExternalLoan: false })
+
+    expect(communs).toEqual({ isExternalLoan: false })
+    expect(emprunt).toEqual({})
   })
 })

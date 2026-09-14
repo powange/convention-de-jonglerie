@@ -598,7 +598,9 @@
       "title": "Materiaalvoorraad",
       "upcoming": "Volgende",
       "usage": "Gebruik",
-      "usage_placeholder": "Bijv.: Vuurshow zaterdag 22:00"
+      "usage_placeholder": "Bijv.: Vuurshow zaterdag 22:00",
+      "bulk_edit_loan_scope_all": "De onderstaande velden gelden voor het geselecteerde object, dat een bruikleen wordt. | De onderstaande velden gelden voor het geselecteerde object, dat een bruikleen wordt. | De onderstaande velden gelden voor de {count} geselecteerde objecten, die bruiklenen worden.",
+      "bulk_edit_loan_scope_none": "De selectie is geen bruikleen meer: de onderstaande velden blijven zonder effect. Reeds opgeslagen waarden worden niet gewist."
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

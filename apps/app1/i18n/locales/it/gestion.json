@@ -598,7 +598,9 @@
       "title": "Magazzino materiale",
       "upcoming": "Prossima",
       "usage": "Utilizzo",
-      "usage_placeholder": "Es.: Spettacolo di fuoco sabato 22:00"
+      "usage_placeholder": "Es.: Spettacolo di fuoco sabato 22:00",
+      "bulk_edit_loan_scope_all": "I campi seguenti si applicheranno all'oggetto selezionato, che diventa un prestito. | I campi seguenti si applicheranno all'oggetto selezionato, che diventa un prestito. | I campi seguenti si applicheranno ai {count} oggetti selezionati, che diventano prestiti.",
+      "bulk_edit_loan_scope_none": "La selezione non sarà più in prestito: i campi seguenti resteranno senza effetto. I valori già registrati non vengono cancellati."
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

@@ -598,7 +598,9 @@
       "title": "Stock de material",
       "upcoming": "Próxima",
       "usage": "Uso",
-      "usage_placeholder": "Ej.: Espectáculo de fuego sábado 22 h"
+      "usage_placeholder": "Ej.: Espectáculo de fuego sábado 22 h",
+      "bulk_edit_loan_scope_all": "Los campos siguientes se aplicarán al objeto seleccionado, que pasa a estar prestado. | Los campos siguientes se aplicarán al objeto seleccionado, que pasa a estar prestado. | Los campos siguientes se aplicarán a los {count} objetos seleccionados, que pasan a estar prestados.",
+      "bulk_edit_loan_scope_none": "La selección dejará de estar prestada: los campos siguientes no tendrán efecto. Los valores ya guardados no se borran."
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",
