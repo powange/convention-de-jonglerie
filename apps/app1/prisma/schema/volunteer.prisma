@@ -323,6 +323,46 @@ model VolunteerAutoAssignRun {
   @@index([undoneById])
 }
 
+/// Un plan calculé, en attente d'être appliqué.
+///
+/// L'aperçu et l'application étaient deux calculs distincts : le bouton « Appliquer » relisait la
+/// base et relançait l'algorithme. Entre les deux clics, un créneau ajouté, une candidature
+/// acceptée ou une affectation posée par un collègue suffisaient à ce que le plan écrit ne soit
+/// pas celui que l'organisateur avait validé.
+///
+/// L'aperçu conserve donc son résultat ici, avec une EMPREINTE des données qui l'ont produit.
+/// L'application le relit, vérifie que l'empreinte tient toujours, et écrit exactement ce qui a
+/// été montré — ou refuse, en demandant un nouvel aperçu.
+///
+/// Les plans sont éphémères : `expiresAt` dit jusqu'à quand celui-ci vaut encore la peine d'être
+/// proposé. Un plan vieux d'une heure décrit une édition qui a probablement changé.
+model VolunteerAutoAssignPlan {
+  id          String   @id @default(cuid())
+  eventId     Int
+  createdById Int
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  /// Ce qui a produit ce plan, et qu'on revérifiera avant de l'appliquer.
+  fingerprint String
+  mode        String
+  constraints Json
+
+  /// Le plan lui-même, et le périmètre qui borne ce qu'il a le droit d'effacer.
+  assignments Json
+  perimetre   Json
+
+  /// Renseigné quand le plan a été appliqué : un plan ne s'applique pas deux fois.
+  appliedAt DateTime?
+
+  event     Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdBy User  @relation("VolunteerAutoAssignPlan_createdBy", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([eventId, createdAt])
+  @@index([createdById])
+  @@index([expiresAt])
+}
+
 // ========== ASSIGNATION ÉQUIPES BÉNÉVOLES ==========
 
 model ApplicationTeamAssignment {

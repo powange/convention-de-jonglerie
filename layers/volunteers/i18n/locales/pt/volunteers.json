@@ -118,7 +118,9 @@
       "undo_confirm": "Anular o último cálculo? As atribuições que criou serão removidas e as que tinha apagado serão repostas.",
       "undo_done": "O cálculo foi anulado",
       "undo_outdated": "Foi aplicado outro cálculo entretanto: já não é este que é anulado. Recarregue a página.",
-      "undo_nothing": "Nenhum cálculo para anular"
+      "undo_nothing": "Nenhum cálculo para anular",
+      "preview_outdated": "O planeamento mudou desde esta pré-visualização: volte a executar o cálculo antes de o aplicar.",
+      "preview_gone": "Esta pré-visualização já não está disponível: volte a executar o cálculo."
     },
     "autonomous_team": "Equipa autónoma",
     "autonomous_team_badge": "Autónoma",

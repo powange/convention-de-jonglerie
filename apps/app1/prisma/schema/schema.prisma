@@ -86,6 +86,8 @@ model User {
   /// Calculs d'assignation automatique lancés, et ceux qu'il a annulés.
   volunteerAutoAssignRuns            VolunteerAutoAssignRun[]            @relation("VolunteerAutoAssignRun_executedBy")
   volunteerAutoAssignRunsUndone      VolunteerAutoAssignRun[]            @relation("VolunteerAutoAssignRun_undoneBy")
+  /// Plans d'assignation calculés en aperçu, en attente d'être appliqués.
+  volunteerAutoAssignPlans           VolunteerAutoAssignPlan[]           @relation("VolunteerAutoAssignPlan_createdBy")
   claimRequests                      ConventionClaimRequest[]
   workshops                          Workshop[]
   workshopFavorites                  WorkshopFavorite[]
@@ -149,6 +151,7 @@ model Event {
   volunteerSwapRequests       VolunteerSwapRequest[]
   volunteerSettings           EventVolunteerSettings? // config bénévole (étape 0bis)
   volunteerAutoAssignRuns     VolunteerAutoAssignRun[]
+  volunteerAutoAssignPlans    VolunteerAutoAssignPlan[]
 }
 
 model Edition {

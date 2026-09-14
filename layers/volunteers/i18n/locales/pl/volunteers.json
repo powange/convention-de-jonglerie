@@ -118,7 +118,9 @@
       "undo_confirm": "Cofnąć ostatnie obliczenie? Utworzone przydziały zostaną usunięte, a usunięte — przywrócone.",
       "undo_done": "Obliczenie zostało cofnięte",
       "undo_outdated": "Od tego czasu zastosowano inne obliczenie: to już nie ono jest cofane. Odśwież stronę.",
-      "undo_nothing": "Brak obliczenia do cofnięcia"
+      "undo_nothing": "Brak obliczenia do cofnięcia",
+      "preview_outdated": "Grafik zmienił się od czasu tego podglądu: uruchom obliczenie ponownie przed zastosowaniem.",
+      "preview_gone": "Ten podgląd nie jest już dostępny: uruchom obliczenie ponownie."
     },
     "autonomous_team": "Zespół samodzielny",
     "autonomous_team_badge": "Samodzielny",
