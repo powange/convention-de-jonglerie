@@ -118,7 +118,9 @@
       "undo_confirm": "Annullare l'ultimo calcolo? Le assegnazioni create verranno rimosse e quelle eliminate saranno ripristinate.",
       "undo_done": "Il calcolo è stato annullato",
       "undo_outdated": "Nel frattempo è stato applicato un altro calcolo: non è più questo a essere annullato. Ricarica la pagina.",
-      "undo_nothing": "Nessun calcolo da annullare"
+      "undo_nothing": "Nessun calcolo da annullare",
+      "preview_outdated": "La pianificazione è cambiata dopo questa anteprima: rilancia il calcolo prima di applicarlo.",
+      "preview_gone": "Questa anteprima non è più disponibile: rilancia il calcolo."
     },
     "autonomous_team": "Squadra autonoma",
     "autonomous_team_badge": "Autonoma",

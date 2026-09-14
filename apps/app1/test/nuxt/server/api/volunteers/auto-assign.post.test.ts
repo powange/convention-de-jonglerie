@@ -118,6 +118,9 @@ const preparerLesMocks = () => {
   prismaMock.applicationTeamAssignment.findMany.mockResolvedValue([])
   prismaMock.applicationTeamAssignment.createMany.mockResolvedValue({ count: 0 })
   prismaMock.volunteerAutoAssignRun.create.mockResolvedValue({ id: 'journal-1' })
+  prismaMock.volunteerAutoAssignPlan.create.mockResolvedValue({ id: 'plan-1' })
+  prismaMock.volunteerAutoAssignPlan.update.mockResolvedValue({})
+  prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(null)
 }
 
 const appliquer = (existingAssignmentsMode: string) => {
@@ -462,5 +465,180 @@ describe('POST …/volunteers/auto-assign — présence du bénévole', () => {
     await appliquer('replace-all')
 
     expect(beneficiaires()).toContain(10)
+  })
+})
+
+/**
+ * Deux organisateurs qui appliquent en même temps lisaient chacun un état que l'autre venait de
+ * changer : A efface, B efface, A écrit, B écrit, et les deux plans se mélangent.
+ */
+describe('POST …/volunteers/auto-assign — applications concurrentes', () => {
+  beforeEach(preparerLesMocks)
+
+  it('refuse une seconde application pendant qu’une première écrit', async () => {
+    // On retient la transaction le temps de lancer le second appel : c'est exactement la fenêtre
+    // que le verrou doit fermer.
+    let libere: () => void = () => {}
+    const retenue = new Promise<void>((resolve) => {
+      libere = resolve
+    })
+
+    prismaMock.$transaction.mockImplementationOnce(async (operation: (tx: unknown) => unknown) => {
+      await retenue
+      return operation(prismaMock)
+    })
+
+    const premiere = appliquer('replace-all')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    await expect(appliquer('replace-all')).rejects.toBeDefined()
+
+    libere()
+    await premiere
+  })
+
+  it('rouvre l’édition après une transaction en échec', async () => {
+    // Sans `finally`, une transaction qui échoue laissait l'édition verrouillée jusqu'au
+    // redémarrage du serveur.
+    prismaMock.$transaction.mockRejectedValueOnce(new Error('base indisponible'))
+
+    await expect(appliquer('replace-all')).rejects.toBeDefined()
+
+    // La suivante doit pouvoir passer.
+    await expect(appliquer('replace-all')).resolves.toBeDefined()
+  })
+
+  it('laisse passer autant d’aperçus qu’on veut', async () => {
+    // L'aperçu n'écrit rien : il n'a aucune raison d'être verrouillé.
+    const apercu = () => {
+      global.readBody = vi.fn().mockResolvedValue({ applyAssignments: false, constraints: {} })
+      return handler(evenement as any)
+    }
+
+    await expect(Promise.all([apercu(), apercu(), apercu()])).resolves.toHaveLength(3)
+  })
+})
+
+/**
+ * L'aperçu et l'application étaient deux calculs distincts : « Appliquer » relisait la base et
+ * relançait l'algorithme. Entre les deux clics, un créneau ajouté ou une affectation posée par un
+ * collègue suffisaient à ce que le plan écrit ne soit pas celui qui avait été validé.
+ */
+describe('POST …/volunteers/auto-assign — le plan validé est celui qui est écrit', () => {
+  beforeEach(preparerLesMocks)
+
+  const appliquerLePlan = (planId: string) => {
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: true,
+      planId,
+      constraints: { existingAssignmentsMode: 'replace-all' },
+    })
+    return handler(evenement as any)
+  }
+
+  it('conserve le plan à l’aperçu et rend son identifiant', async () => {
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: false,
+      constraints: { existingAssignmentsMode: 'replace-all' },
+    })
+
+    const reponse = await handler(evenement as any)
+
+    expect(prismaMock.volunteerAutoAssignPlan.create).toHaveBeenCalled()
+    expect(reponse.data.planId).toBe('plan-1')
+  })
+
+  it('écrit le plan conservé, pas celui qu’il vient de recalculer', async () => {
+    // Le plan stocké désigne un créneau que le calcul du moment ne proposerait pas : s'il est
+    // écrit, c'est bien le plan validé qui fait foi.
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue({
+      id: 'plan-1',
+      eventId: 22,
+      appliedAt: null,
+      expiresAt: new Date(Date.now() + 60_000),
+      fingerprint: 'EMPREINTE',
+      assignments: [{ volunteerId: 10, slotId: 'creneau-du-plan', score: 1, confidence: 50 }],
+      perimetre: { creneaux: ['creneau-du-plan'], candidatures: [], equipes: [] },
+    })
+    // L'empreinte du moment doit correspondre : on la reprend telle que l'endpoint la calcule.
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockImplementation(async () => ({
+      id: 'plan-1',
+      eventId: 22,
+      appliedAt: null,
+      expiresAt: new Date(Date.now() + 60_000),
+      fingerprint: (prismaMock.volunteerAutoAssignPlan.create.mock.calls.at(-1)?.[0]?.data
+        ?.fingerprint ?? null) as string,
+      assignments: [{ volunteerId: 10, slotId: 'creneau-du-plan', score: 1, confidence: 50 }],
+      perimetre: { creneaux: ['creneau-du-plan'], candidatures: [], equipes: [] },
+    }))
+
+    // Un aperçu d'abord, pour disposer de l'empreinte du moment.
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: false,
+      constraints: { existingAssignmentsMode: 'replace-all' },
+    })
+    await handler(evenement as any)
+
+    await appliquerLePlan('plan-1')
+
+    const { data } = prismaMock.volunteerAutoAssignRun.create.mock.calls.at(-1)[0]
+    expect(data.createdAssignments).toEqual([{ timeSlotId: 'creneau-du-plan', userId: 10 }])
+  })
+
+  it('refuse d’appliquer quand le planning a changé depuis l’aperçu', async () => {
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue({
+      id: 'plan-1',
+      eventId: 22,
+      appliedAt: null,
+      expiresAt: new Date(Date.now() + 60_000),
+      fingerprint: 'une-empreinte-qui-ne-correspond-plus',
+      assignments: [],
+      perimetre: { creneaux: [], candidatures: [], equipes: [] },
+    })
+
+    await expect(appliquerLePlan('plan-1')).rejects.toBeDefined()
+    expect(prismaMock.volunteerAssignment.deleteMany).not.toHaveBeenCalled()
+  })
+
+  it('refuse un aperçu trop vieux', async () => {
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue({
+      id: 'plan-1',
+      eventId: 22,
+      appliedAt: null,
+      expiresAt: new Date(Date.now() - 1000),
+      fingerprint: 'peu importe',
+      assignments: [],
+      perimetre: { creneaux: [], candidatures: [], equipes: [] },
+    })
+
+    await expect(appliquerLePlan('plan-1')).rejects.toBeDefined()
+  })
+
+  it('refuse d’appliquer deux fois le même aperçu', async () => {
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue({
+      id: 'plan-1',
+      eventId: 22,
+      appliedAt: new Date(),
+      expiresAt: new Date(Date.now() + 60_000),
+      fingerprint: 'peu importe',
+      assignments: [],
+      perimetre: { creneaux: [], candidatures: [], equipes: [] },
+    })
+
+    await expect(appliquerLePlan('plan-1')).rejects.toBeDefined()
+  })
+
+  it('refuse un aperçu qui n’existe pas', async () => {
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(null)
+
+    await expect(appliquerLePlan('plan-inconnu')).rejects.toBeDefined()
+  })
+
+  it('applique encore sans identifiant d’aperçu', async () => {
+    // Compatibilité : un appel écrit avant cette évolution, ou un script qui applique
+    // directement, continue de fonctionner.
+    await appliquer('replace-all')
+
+    expect(prismaMock.volunteerAutoAssignRun.create).toHaveBeenCalled()
   })
 })

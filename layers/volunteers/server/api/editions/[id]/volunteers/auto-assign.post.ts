@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { z } from 'zod'
 
 import { placesOccupees } from '../../../../utils/places-creneau'
@@ -9,6 +11,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { createLogger } from '#server/utils/logger'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { createRateLimiter } from '#server/utils/rate-limiter'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { VolunteerScheduler, type Assignment } from '#server/utils/volunteer-scheduler'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
@@ -72,6 +75,36 @@ interface EffacementRattachement {
 
 const log = createLogger('ASSIGNATION-AUTO')
 
+/**
+ * Le calcul est cher : il lit toutes les données bénévoles de l'édition et fait tourner un
+ * algorithme dont le coût croît vite avec le nombre de créneaux. Un doigt resté sur le bouton
+ * « Aperçu » suffisait à occuper le serveur.
+ *
+ * La clé est l'utilisateur ET l'édition, pas l'adresse IP : deux organisateurs derrière le même
+ * réseau travaillent souvent ensemble, la veille de l'événement, et ne doivent pas se gêner.
+ */
+const limiteurCalcul = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 10,
+  message: 'Trop de calculs demandés coup sur coup, patientez une minute',
+  keyGenerator: (event) =>
+    `auto-assign:${event.context.user?.id ?? 'anonyme'}:${event.context.params?.id ?? '?'}`,
+})
+
+/**
+ * Les éditions dont un calcul est en cours d'application.
+ *
+ * Rien n'empêchait deux organisateurs d'appliquer en même temps : A efface, B efface, A écrit son
+ * plan, B écrit le sien, et les deux se mélangent — chacun ayant lu des places occupées que
+ * l'autre venait de changer.
+ *
+ * Un verrou en mémoire, et il faut savoir ce qu'il vaut : il protège un processus, pas une flotte.
+ * Fermer vraiment demanderait un verrou en base, que Prisma n'exprime qu'en SQL brut — c'est le
+ * même choix, et la même limite, que pour les affectations manuelles (`places-creneau.ts`). Le
+ * `skipDuplicates` de l'écriture reste donc le dernier filet.
+ */
+const applicationsEnCours = new Set<number>()
+
 // Schéma de validation pour les contraintes
 const constraintsSchema = z.object({
   maxHoursPerVolunteer: z.number().min(1).max(24).optional(),
@@ -99,6 +132,36 @@ const constraintsSchema = z.object({
    */
   existingAssignmentsMode: z.enum(['replace-all', 'keep-all', 'keep-manual']).optional(),
 })
+
+/** Combien de temps un plan calculé reste proposable. Au-delà, l'édition a probablement changé. */
+const DUREE_DE_VIE_DU_PLAN_MS = 30 * 60 * 1000
+
+/**
+ * L'empreinte des données qui ont produit un plan.
+ *
+ * Elle ne cherche pas à décrire l'édition, seulement à changer dès que quelque chose change : un
+ * créneau ajouté ou déplacé, une candidature acceptée, une affectation posée à la main. C'est
+ * exactement ce qui invaliderait le plan montré à l'organisateur.
+ */
+function empreinteDesDonnees(entrees: {
+  creneaux: { id: string; startDateTime: Date; endDateTime: Date; maxVolunteers: number }[]
+  candidatures: { id: number }[]
+  affectations: { timeSlotId: string; userId: number; source: string }[]
+  organisateurs: number
+}): string {
+  const matiere = JSON.stringify({
+    creneaux: entrees.creneaux
+      .map(
+        (c) => `${c.id}:${c.startDateTime.getTime()}:${c.endDateTime.getTime()}:${c.maxVolunteers}`
+      )
+      .sort(),
+    candidatures: entrees.candidatures.map((c) => c.id).sort(),
+    affectations: entrees.affectations.map((a) => `${a.timeSlotId}:${a.userId}:${a.source}`).sort(),
+    organisateurs: entrees.organisateurs,
+  })
+
+  return createHash('sha256').update(matiere).digest('hex')
+}
 
 export default wrapApiHandler(
   async (event) => {
@@ -135,6 +198,8 @@ export default wrapApiHandler(
         statusText: 'Droits insuffisants pour gérer les bénévoles',
       })
     }
+
+    await limiteurCalcul(event)
 
     // Lecture et validation du body
     const body = await readBody(event)
@@ -180,6 +245,35 @@ export default wrapApiHandler(
       // passage de l'un d'eux. Le layer ne connaît pas la notion de spectacle, d'où le port.
       useVolunteerPorts().artists.getShowSchedule(editionId),
     ])
+
+    /**
+     * L'état des données au moment du calcul, réduit à une empreinte.
+     *
+     * Elle sera revérifiée au moment d'appliquer : si elle a bougé, c'est que quelqu'un a touché
+     * au planning depuis l'aperçu, et le plan validé ne décrit plus l'édition.
+     */
+    const empreinte = empreinteDesDonnees({
+      creneaux: timeSlots.map((slot: TimeSlotWithAssignments) => ({
+        id: slot.id,
+        startDateTime: slot.startDateTime,
+        endDateTime: slot.endDateTime,
+        maxVolunteers: slot.maxVolunteers,
+      })),
+      candidatures: volunteers.map((volunteer: VolunteerWithTeamAssignments) => ({
+        id: volunteer.id,
+      })),
+      affectations: timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
+        slot.assignments.map((assignment) => ({
+          timeSlotId: slot.id,
+          userId: assignment.userId,
+          source: assignment.source,
+        }))
+      ),
+      organisateurs: timeSlots.reduce(
+        (total: number, slot: TimeSlotWithAssignments) => total + slot._count.organizerAssignments,
+        0
+      ),
+    })
 
     const mode =
       constraints.existingAssignmentsMode ??
@@ -355,17 +449,109 @@ export default wrapApiHandler(
 
     const result = scheduler.assignVolunteers()
 
+    /**
+     * Appliquer, c'est écrire le plan QU'ON A MONTRÉ — pas en recalculer un autre.
+     *
+     * Quand le client renvoie l'identifiant de l'aperçu qu'il a validé, c'est ce plan-là qui est
+     * relu et écrit, après vérification que les données n'ont pas bougé. Sans identifiant, on
+     * retombe sur l'ancien comportement : un appel écrit avant cette évolution continue de
+     * fonctionner, et un script qui applique directement reste possible.
+     */
+    let planRetenu = result.assignments
+    let perimetreRetenu = perimetre
+
+    if (body.applyAssignments === true && typeof body.planId === 'string' && body.planId) {
+      const plan = await prisma.volunteerAutoAssignPlan.findFirst({
+        where: { id: body.planId, eventId: editionId },
+      })
+
+      if (!plan) {
+        throw createError({
+          status: 404,
+          message: "Cet aperçu n'existe plus : relancez le calcul",
+        })
+      }
+
+      if (plan.appliedAt) {
+        throw createError({
+          status: 409,
+          message: 'Cet aperçu a déjà été appliqué',
+        })
+      }
+
+      if (plan.expiresAt.getTime() < Date.now()) {
+        throw createError({
+          status: 409,
+          message: 'Cet aperçu a trop vieilli : relancez le calcul pour voir l’état actuel',
+        })
+      }
+
+      if (plan.fingerprint !== empreinte) {
+        throw createError({
+          status: 409,
+          message:
+            'Le planning a changé depuis cet aperçu : relancez le calcul avant de l’appliquer',
+        })
+      }
+
+      planRetenu = plan.assignments as unknown as Assignment[]
+      perimetreRetenu = plan.perimetre as unknown as PerimetreDuCalcul
+    }
+
     // Application des assignations en base de données si demandé
     let journalId: string | null = null
     if (body.applyAssignments === true) {
-      journalId = await applyAssignments(
-        editionId,
-        result.assignments,
-        user.id,
-        mode,
-        perimetre,
-        constraints
-      )
+      if (applicationsEnCours.has(editionId)) {
+        throw createError({
+          status: 409,
+          message: "Un calcul est déjà en cours d'application sur cette édition",
+        })
+      }
+
+      applicationsEnCours.add(editionId)
+      try {
+        journalId = await applyAssignments(
+          editionId,
+          planRetenu,
+          user.id,
+          mode,
+          perimetreRetenu,
+          constraints
+        )
+
+        if (typeof body.planId === 'string' && body.planId) {
+          await prisma.volunteerAutoAssignPlan.update({
+            where: { id: body.planId },
+            data: { appliedAt: new Date() },
+          })
+        }
+      } finally {
+        // `finally` et non après l'appel : une transaction qui échoue ne doit pas laisser
+        // l'édition verrouillée jusqu'au prochain redémarrage.
+        applicationsEnCours.delete(editionId)
+      }
+    }
+
+    /**
+     * Un aperçu se conserve, pour que l'application puisse écrire exactement ce qui a été montré.
+     * L'identifiant revient au client, qui le renverra en appliquant.
+     */
+    let planId: string | null = null
+    if (body.applyAssignments !== true) {
+      const plan = await prisma.volunteerAutoAssignPlan.create({
+        data: {
+          eventId: editionId,
+          createdById: user.id,
+          expiresAt: new Date(Date.now() + DUREE_DE_VIE_DU_PLAN_MS),
+          fingerprint: empreinte,
+          mode,
+          constraints: constraints as Prisma.InputJsonValue,
+          assignments: result.assignments as unknown as Prisma.InputJsonValue,
+          perimetre: perimetre as unknown as Prisma.InputJsonValue,
+        },
+        select: { id: true },
+      })
+      planId = plan.id
     }
 
     return createSuccessResponse({
@@ -373,6 +559,8 @@ export default wrapApiHandler(
       preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
       // L'identifiant du journal : c'est lui qui permet de proposer d'annuler ce calcul.
       journalId,
+      // L'identifiant de l'aperçu : à renvoyer pour appliquer exactement ce plan-ci.
+      planId,
     })
   },
   { operationName: 'AutoAssignVolunteers' }
@@ -396,101 +584,126 @@ async function applyAssignments(
   /** Les réglages employés, consignés tels quels : la question qu'on se pose toujours en second. */
   contraintes: unknown
 ): Promise<string> {
-  return await prisma.$transaction(async (tx) => {
-    /**
-     * Ce qui va disparaître est relevé AVANT de disparaître.
-     *
-     * C'est la seule fenêtre où l'état antérieur existe encore. Une fois le `deleteMany` passé,
-     * plus rien ne dit ce qu'il y avait — et c'est précisément ce qui rendait une relance
-     * malheureuse irrattrapable.
-     */
-    let affectationsEffacees: EffacementAffectation[] = []
+  return await prisma.$transaction(
+    async (tx) => {
+      /**
+       * Ce qui va disparaître est relevé AVANT de disparaître.
+       *
+       * C'est la seule fenêtre où l'état antérieur existe encore. Une fois le `deleteMany` passé,
+       * plus rien ne dit ce qu'il y avait — et c'est précisément ce qui rendait une relance
+       * malheureuse irrattrapable.
+       */
+      let affectationsEffacees: EffacementAffectation[] = []
 
-    // 1. Effacer ce que le mode ne conserve pas, et seulement sur les créneaux que le calcul a
-    //    examinés. En `keep-manual`, seules les affectations posées par un précédent calcul
-    //    disparaissent : les choix humains restent.
-    if (mode !== 'keep-all') {
-      const cible = {
-        timeSlotId: { in: perimetre.creneaux },
-        ...(mode === 'keep-manual' ? { source: 'AUTO' as const } : {}),
-      }
+      // 1. Effacer ce que le mode ne conserve pas, et seulement sur les créneaux que le calcul a
+      //    examinés. En `keep-manual`, seules les affectations posées par un précédent calcul
+      //    disparaissent : les choix humains restent.
+      if (mode !== 'keep-all') {
+        const cible = {
+          timeSlotId: { in: perimetre.creneaux },
+          ...(mode === 'keep-manual' ? { source: 'AUTO' as const } : {}),
+        }
 
-      affectationsEffacees = await tx.volunteerAssignment.findMany({
-        where: cible,
-        select: {
-          timeSlotId: true,
-          userId: true,
-          source: true,
-          assignedById: true,
-          assignedAt: true,
-        },
-      })
-
-      await tx.volunteerAssignment.deleteMany({ where: cible })
-    }
-
-    // 2. Créer les nouvelles assignations aux créneaux
-    const affectationsCreees: { timeSlotId: string; userId: number }[] = []
-
-    for (const assignment of assignments) {
-      // Une affectation conservée peut déjà exister : la recréer violerait l'unicité
-      if (mode !== 'replace-all') {
-        const existing = await tx.volunteerAssignment.findFirst({
-          where: {
-            timeSlotId: assignment.slotId,
-            userId: assignment.volunteerId,
+        affectationsEffacees = await tx.volunteerAssignment.findMany({
+          where: cible,
+          select: {
+            timeSlotId: true,
+            userId: true,
+            source: true,
+            assignedById: true,
+            assignedAt: true,
           },
         })
-        if (existing) continue // Passer si l'assignation existe déjà
+
+        await tx.volunteerAssignment.deleteMany({ where: cible })
       }
 
-      await tx.volunteerAssignment.create({
-        data: {
+      /**
+       * 2. Créer les nouvelles affectations — en deux requêtes, pas en deux par affectation.
+       *
+       * Il y avait ici un `findFirst` puis un `create` PAR affectation. Sur une édition de deux
+       * cents bénévoles, cela faisait des milliers d'allers-retours dans une transaction dont le
+       * délai par défaut est de cinq secondes : l'échec était probable, et il survenait après la
+       * suppression, donc après que l'organisateur avait validé.
+       */
+      const dejaEnPlace = new Set(
+        mode === 'replace-all'
+          ? []
+          : (
+              await tx.volunteerAssignment.findMany({
+                where: {
+                  timeSlotId: { in: assignments.map((assignment) => assignment.slotId) },
+                  userId: { in: assignments.map((assignment) => assignment.volunteerId) },
+                },
+                select: { timeSlotId: true, userId: true },
+              })
+            ).map((ligne) => `${ligne.timeSlotId}:${ligne.userId}`)
+      )
+
+      const affectationsCreees = assignments
+        .map((assignment) => ({
           timeSlotId: assignment.slotId,
           userId: assignment.volunteerId,
-          assignedById: userId,
-          assignedAt: new Date(),
-          source: 'AUTO',
+        }))
+        .filter((ligne) => !dejaEnPlace.has(`${ligne.timeSlotId}:${ligne.userId}`))
+
+      if (affectationsCreees.length > 0) {
+        const pose = new Date()
+        await tx.volunteerAssignment.createMany({
+          data: affectationsCreees.map((ligne) => ({
+            ...ligne,
+            assignedById: userId,
+            assignedAt: pose,
+            source: 'AUTO' as const,
+          })),
+          // Un dernier filet : deux organisateurs qui appliquent en même temps liraient le même
+          // état. Le verrou d'édition rend le cas très improbable, l'unicité le rend impossible.
+          skipDuplicates: true,
+        })
+      }
+
+      // 3. Assigner les bénévoles aux équipes correspondantes
+      const equipes = await assignVolunteersToTeams(tx, assignments, mode, perimetre)
+
+      // 4. Consigner le calcul, et de quoi le défaire
+      const journal = await tx.volunteerAutoAssignRun.create({
+        data: {
+          eventId: editionId,
+          executedById: userId,
+          mode,
+          constraints: (contraintes ?? {}) as Prisma.InputJsonValue,
+          deletedAssignments: affectationsEffacees as unknown as Prisma.InputJsonValue,
+          createdAssignments: affectationsCreees as unknown as Prisma.InputJsonValue,
+          deletedTeamLinks: equipes.effaces as unknown as Prisma.InputJsonValue,
+          createdTeamLinks: equipes.crees as unknown as Prisma.InputJsonValue,
+          createdCount: affectationsCreees.length,
+          deletedCount: affectationsEffacees.length,
         },
+        select: { id: true },
       })
 
-      affectationsCreees.push({
-        timeSlotId: assignment.slotId,
-        userId: assignment.volunteerId,
-      })
-    }
-
-    // 3. Assigner les bénévoles aux équipes correspondantes
-    const equipes = await assignVolunteersToTeams(tx, assignments, mode, perimetre)
-
-    // 4. Consigner le calcul, et de quoi le défaire
-    const journal = await tx.volunteerAutoAssignRun.create({
-      data: {
-        eventId: editionId,
-        executedById: userId,
+      log.info('Assignation automatique appliquée', {
+        edition: editionId,
+        par: userId,
         mode,
-        constraints: (contraintes ?? {}) as Prisma.InputJsonValue,
-        deletedAssignments: affectationsEffacees as unknown as Prisma.InputJsonValue,
-        createdAssignments: affectationsCreees as unknown as Prisma.InputJsonValue,
-        deletedTeamLinks: equipes.effaces as unknown as Prisma.InputJsonValue,
-        createdTeamLinks: equipes.crees as unknown as Prisma.InputJsonValue,
-        createdCount: affectationsCreees.length,
-        deletedCount: affectationsEffacees.length,
-      },
-      select: { id: true },
-    })
+        creees: affectationsCreees.length,
+        effacees: affectationsEffacees.length,
+        journal: journal.id,
+      })
 
-    log.info('Assignation automatique appliquée', {
-      edition: editionId,
-      par: userId,
-      mode,
-      creees: affectationsCreees.length,
-      effacees: affectationsEffacees.length,
-      journal: journal.id,
-    })
-
-    return journal.id
-  })
+      return journal.id
+    },
+    /**
+     * Le délai par défaut de Prisma est de cinq secondes, et rien ne le disait ici.
+     *
+     * Une application sur une grosse édition écrit des centaines de lignes : le N+1 supprimé
+     * ci-dessus la ramène à une poignée de requêtes, mais une base chargée reste une base
+     * chargée. Une minute laisse la place nécessaire sans transformer un blocage en attente
+     * indéfinie — et l'échec, s'il survient, annule tout plutôt que de laisser un planning à
+     * moitié écrit.
+     */
+    { timeout: 60_000, maxWait: 10_000 }
+  )
 }
 
 /**

@@ -118,7 +118,9 @@
       "undo_confirm": "Vrátit poslední výpočet? Vytvořená přiřazení budou odstraněna a smazaná obnovena.",
       "undo_done": "Výpočet byl vrácen",
       "undo_outdated": "Mezitím byl použit jiný výpočet: vrací se už jiný. Načtěte stránku znovu.",
-      "undo_nothing": "Žádný výpočet k vrácení"
+      "undo_nothing": "Žádný výpočet k vrácení",
+      "preview_outdated": "Rozvrh se od tohoto náhledu změnil: před použitím spusťte výpočet znovu.",
+      "preview_gone": "Tento náhled už není k dispozici: spusťte výpočet znovu."
     },
     "autonomous_team": "Samostatný tým",
     "autonomous_team_badge": "Samostatný",

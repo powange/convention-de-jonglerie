@@ -650,12 +650,19 @@ const { execute: executeApplyAssignments, loading: applyLoading } = useApiAction
     body: () => ({
       constraints: constraints.value,
       applyAssignments: true,
+      // L'aperçu qu'on a sous les yeux : c'est ce plan-là qui doit être écrit, et aucun autre.
+      planId: previewResult.value?.planId ?? undefined,
     }),
     successMessage: {
       title: t('volunteers.auto_assignment.assignments_applied'),
       description: t('volunteers.auto_assignment.assignments_applied_description'),
     },
-    errorMessages: { default: t('errors.error_occurred') },
+    errorMessages: {
+      // Le planning a changé sous les pieds de l'organisateur, ou l'aperçu a trop vieilli.
+      409: t('volunteers.auto_assignment.preview_outdated'),
+      404: t('volunteers.auto_assignment.preview_gone'),
+      default: t('errors.error_occurred'),
+    },
     onSuccess: (response) => {
       previewResult.value = null
       // Le calcul qu'on vient d'appliquer devient celui qu'on peut défaire.

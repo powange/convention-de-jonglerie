@@ -118,7 +118,9 @@
       "undo_confirm": "¿Deshacer el último cálculo? Se eliminarán las asignaciones que creó y se restaurarán las que había borrado.",
       "undo_done": "El cálculo se ha deshecho",
       "undo_outdated": "Se ha aplicado otro cálculo desde entonces: ya no es este el que se deshace. Recarga la página.",
-      "undo_nothing": "No hay ningún cálculo que deshacer"
+      "undo_nothing": "No hay ningún cálculo que deshacer",
+      "preview_outdated": "La planificación ha cambiado desde esta vista previa: vuelve a ejecutar el cálculo antes de aplicarlo.",
+      "preview_gone": "Esta vista previa ya no está disponible: vuelve a ejecutar el cálculo."
     },
     "autonomous_team": "Equipo autónomo",
     "autonomous_team_badge": "Autónomo",

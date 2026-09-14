@@ -48,7 +48,7 @@ export interface UserReference {
 }
 
 /**
- * 51 colonnes : 47 relations Prisma + 4 références « molles ».
+ * 52 colonnes : 48 relations Prisma + 4 références « molles ».
  * Vérifié contre `prisma/schema/*.prisma`.
  */
 export const USER_REFERENCES: UserReference[] = [
@@ -101,6 +101,9 @@ export const USER_REFERENCES: UserReference[] = [
   // Aucune contrainte d'unicité — le même compte peut en lancer autant qu'il veut.
   { model: 'volunteerAutoAssignRun', field: 'executedById', group: 'volunteers' },
   { model: 'volunteerAutoAssignRun', field: 'undoneById', group: 'volunteers' },
+  // Plans d'assignation calculés en aperçu : éphémères, mais ils portent une clé étrangère, et
+  // une ligne restée rattachée au compte supprimé ferait échouer la suppression finale.
+  { model: 'volunteerAutoAssignPlan', field: 'createdById', group: 'volunteers' },
   { model: 'volunteerComment', field: 'userId', uniqueWith: ['eventId'], group: 'volunteers' },
   { model: 'volunteerNotificationGroup', field: 'senderId', group: 'volunteers' },
   {

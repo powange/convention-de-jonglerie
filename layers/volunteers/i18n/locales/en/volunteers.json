@@ -118,7 +118,9 @@
       "undo_confirm": "Undo the last run? The assignments it created will be removed, and those it had deleted will be restored.",
       "undo_done": "The run has been undone",
       "undo_outdated": "Another run has been applied since: this is no longer the one being undone. Please reload the page.",
-      "undo_nothing": "No run to undo"
+      "undo_nothing": "No run to undo",
+      "preview_outdated": "The schedule has changed since this preview: run the calculation again before applying it.",
+      "preview_gone": "This preview is no longer available: run the calculation again."
     },
     "autonomous_team": "Self-managed team",
     "autonomous_team_badge": "Self-managed",

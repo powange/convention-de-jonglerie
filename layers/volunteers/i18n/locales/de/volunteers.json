@@ -118,7 +118,9 @@
       "undo_confirm": "Die letzte Berechnung rückgängig machen? Die erstellten Zuteilungen werden entfernt und die gelöschten wiederhergestellt.",
       "undo_done": "Die Berechnung wurde rückgängig gemacht",
       "undo_outdated": "Seitdem wurde eine andere Berechnung angewendet: Es ist nicht mehr diese, die rückgängig gemacht wird. Bitte lade die Seite neu.",
-      "undo_nothing": "Keine Berechnung zum Rückgängigmachen"
+      "undo_nothing": "Keine Berechnung zum Rückgängigmachen",
+      "preview_outdated": "Der Plan hat sich seit dieser Vorschau geändert: Führe die Berechnung erneut aus, bevor du sie anwendest.",
+      "preview_gone": "Diese Vorschau ist nicht mehr verfügbar: Führe die Berechnung erneut aus."
     },
     "autonomous_team": "Eigenständiges Team",
     "autonomous_team_badge": "Eigenständig",

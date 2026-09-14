@@ -118,7 +118,9 @@
       "undo_confirm": "De laatste berekening ongedaan maken? De aangemaakte toewijzingen worden verwijderd en de verwijderde worden hersteld.",
       "undo_done": "De berekening is ongedaan gemaakt",
       "undo_outdated": "Er is sindsdien een andere berekening toegepast: deze wordt niet langer ongedaan gemaakt. Herlaad de pagina.",
-      "undo_nothing": "Geen berekening om ongedaan te maken"
+      "undo_nothing": "Geen berekening om ongedaan te maken",
+      "preview_outdated": "De planning is sinds dit voorbeeld gewijzigd: voer de berekening opnieuw uit voordat je die toepast.",
+      "preview_gone": "Dit voorbeeld is niet meer beschikbaar: voer de berekening opnieuw uit."
     },
     "autonomous_team": "Zelfstandig team",
     "autonomous_team_badge": "Zelfstandig",

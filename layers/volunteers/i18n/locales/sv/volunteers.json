@@ -118,7 +118,9 @@
       "undo_confirm": "Ångra den senaste beräkningen? Tilldelningarna den skapade tas bort och de som togs bort återställs.",
       "undo_done": "Beräkningen har ångrats",
       "undo_outdated": "En annan beräkning har tillämpats sedan dess: det är inte längre den här som ångras. Ladda om sidan.",
-      "undo_nothing": "Ingen beräkning att ångra"
+      "undo_nothing": "Ingen beräkning att ångra",
+      "preview_outdated": "Schemat har ändrats sedan den här förhandsvisningen: kör beräkningen igen innan du tillämpar den.",
+      "preview_gone": "Den här förhandsvisningen är inte längre tillgänglig: kör beräkningen igen."
     },
     "autonomous_team": "Självstyrande lag",
     "autonomous_team_badge": "Självstyrande",
