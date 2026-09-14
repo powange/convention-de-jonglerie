@@ -351,6 +351,12 @@ model VolunteerAutoAssignPlan {
   /// Le plan lui-même, et le périmètre qui borne ce qu'il a le droit d'effacer.
   assignments Json
   perimetre   Json
+  /// Le résultat complet montré à l'organisateur — statistiques, non-assignés, diagnostic.
+  ///
+  /// Conservé pour que l'application n'ait pas à relancer l'algorithme : elle le relançait
+  /// uniquement pour produire une réponse dont elle jetait ensuite le contenu, et ce calcul
+  /// coûte plusieurs secondes sur une grosse édition.
+  resultat    Json?
 
   /// Renseigné quand le plan a été appliqué : un plan ne s'applique pas deux fois.
   appliedAt DateTime?

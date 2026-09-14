@@ -699,3 +699,96 @@ describe('POST …/volunteers/auto-assign — ce que l’aperçu annonce détrui
     }
   })
 })
+
+/**
+ * L'application relançait l'algorithme pour produire une réponse dont elle remplaçait aussitôt le
+ * contenu par le plan conservé. Sur une édition de deux cents bénévoles, c'était plusieurs
+ * secondes de calcul pour rien, à chaque application.
+ */
+describe('POST …/volunteers/auto-assign — le calcul n’est pas refait pour rien', () => {
+  beforeEach(preparerLesMocks)
+
+  const planConserve = (resultat: unknown = null) => ({
+    id: 'plan-1',
+    eventId: 22,
+    appliedAt: null,
+    expiresAt: new Date(Date.now() + 60_000),
+    fingerprint: 'EMPREINTE',
+    assignments: [{ volunteerId: 10, slotId: 'creneau-cuisine', score: 1, confidence: 50 }],
+    perimetre: { creneaux: ['creneau-cuisine'], candidatures: [], equipes: [] },
+    resultat,
+  })
+
+  it('rend le résultat conservé plutôt que d’en recalculer un', async () => {
+    const resultatDApercu = {
+      assignments: [{ volunteerId: 10, slotId: 'creneau-cuisine', score: 1, confidence: 50 }],
+      unassigned: { volunteers: [99], slots: ['creneau-libre'] },
+      stats: {
+        totalAssignments: 1,
+        averageHoursPerVolunteer: 2,
+        satisfactionRate: 0.9,
+        balanceScore: 1,
+      },
+      warnings: [{ code: 'unassigned_slots', params: { count: 1 } }],
+      recommendations: [],
+      refus: { parBenevole: [{ volunteerId: 99, motif: 'indisponible' }], parCreneau: [] },
+    }
+
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockImplementation(async () => ({
+      ...planConserve(resultatDApercu),
+      fingerprint: (prismaMock.volunteerAutoAssignPlan.create.mock.calls.at(-1)?.[0]?.data
+        ?.fingerprint ?? null) as string,
+    }))
+
+    // Un aperçu d'abord, pour disposer de l'empreinte du moment.
+    global.readBody = vi.fn().mockResolvedValue({ applyAssignments: false, constraints: {} })
+    await handler(evenement as any)
+
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: true,
+      planId: 'plan-1',
+      constraints: {},
+    })
+    const reponse = await handler(evenement as any)
+
+    // Le diagnostic et les avertissements sont ceux de l'aperçu, pas d'un nouveau calcul.
+    expect(reponse.data.result.refus.parBenevole).toEqual([
+      { volunteerId: 99, motif: 'indisponible' },
+    ])
+    expect(reponse.data.result.warnings).toEqual([
+      { code: 'unassigned_slots', params: { count: 1 } },
+    ])
+  })
+
+  it('reste utilisable pour un plan conservé avant cette évolution', async () => {
+    // `resultat` est nul pour les plans écrits avant l'ajout de la colonne : on rend ce qui a été
+    // écrit plutôt que de relancer un calcul de plusieurs secondes pour l'affichage.
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockImplementation(async () => ({
+      ...planConserve(null),
+      fingerprint: (prismaMock.volunteerAutoAssignPlan.create.mock.calls.at(-1)?.[0]?.data
+        ?.fingerprint ?? null) as string,
+    }))
+
+    global.readBody = vi.fn().mockResolvedValue({ applyAssignments: false, constraints: {} })
+    await handler(evenement as any)
+
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: true,
+      planId: 'plan-1',
+      constraints: {},
+    })
+    const reponse = await handler(evenement as any)
+
+    expect(reponse.data.result.assignments).toHaveLength(1)
+    expect(prismaMock.volunteerAssignment.createMany).toHaveBeenCalled()
+  })
+
+  it('conserve le résultat complet au moment de l’aperçu', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ applyAssignments: false, constraints: {} })
+    await handler(evenement as any)
+
+    const { data } = prismaMock.volunteerAutoAssignPlan.create.mock.calls.at(-1)[0]
+    expect(data.resultat).toBeDefined()
+    expect(data.resultat.stats).toBeDefined()
+  })
+})
