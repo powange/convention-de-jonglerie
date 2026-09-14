@@ -251,7 +251,7 @@
         <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-primary-500" />
       </div>
 
-      <div v-else-if="filteredAvailableVolunteers.length === 0" class="text-center py-8">
+      <div v-else-if="aucuneProposition" class="text-center py-8">
         <UIcon name="i-heroicons-user-group" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
         <p class="text-gray-500 dark:text-gray-400">
           {{
@@ -262,45 +262,98 @@
         </p>
       </div>
 
-      <div v-else class="space-y-3 max-h-96 overflow-y-auto">
-        <div
-          v-for="volunteer in filteredAvailableVolunteers"
-          :key="volunteer.userId"
-          class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          <div class="flex items-center gap-3">
-            <UiUserAvatar
-              :user="{
-                id: volunteer.userId,
-                pseudo: volunteer.pseudo,
-                nom: volunteer.nom,
-                prenom: volunteer.prenom,
-                emailHash: volunteer.emailHash,
-                profilePicture: volunteer.profilePicture,
-                updatedAt: volunteer.updatedAt,
-              }"
-              size="sm"
-            />
-            <div>
-              <p class="font-medium text-gray-900 dark:text-white">
-                {{ volunteer.pseudo }}
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                <UiUserName :user="volunteer" />
-              </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500">
-                {{ volunteer.assignmentsCount }} {{ t('volunteers.current_assignments') }}
-              </p>
-            </div>
-          </div>
-          <UButton
-            color="primary"
-            variant="soft"
-            size="sm"
-            @click="assignVolunteer(volunteer.userId)"
+      <div v-else class="space-y-4 max-h-96 overflow-y-auto">
+        <div v-if="filteredAvailableVolunteers.length > 0" class="space-y-3">
+          <div
+            v-for="volunteer in filteredAvailableVolunteers"
+            :key="volunteer.userId"
+            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            {{ t('volunteers.assign') }}
-          </UButton>
+            <div class="flex items-center gap-3">
+              <UiUserAvatar
+                :user="{
+                  id: volunteer.userId,
+                  pseudo: volunteer.pseudo,
+                  nom: volunteer.nom,
+                  prenom: volunteer.prenom,
+                  emailHash: volunteer.emailHash,
+                  profilePicture: volunteer.profilePicture,
+                  updatedAt: volunteer.updatedAt,
+                }"
+                size="sm"
+              />
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  {{ volunteer.pseudo }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  <UiUserName :user="volunteer" />
+                </p>
+                <p class="text-xs text-gray-400 dark:text-gray-500">
+                  {{ volunteer.assignmentsCount }} {{ t('volunteers.current_assignments') }}
+                </p>
+              </div>
+            </div>
+            <UButton
+              color="primary"
+              variant="soft"
+              size="sm"
+              @click="assignVolunteer(volunteer.userId)"
+            >
+              {{ t('volunteers.assign') }}
+            </UButton>
+          </div>
+        </div>
+
+        <!-- Les volants à part, et nommés : appeler quelqu'un d'une autre équipe n'est pas
+             le geste anodin de remplir une case. Le titre du groupe le dit, plutôt que de les
+             fondre dans la liste où on les prendrait pour des membres de l'équipe. -->
+        <div v-if="renfortsDisponibles.length > 0" class="space-y-3">
+          <p
+            class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+          >
+            <UIcon name="i-heroicons-bolt" class="w-4 h-4 text-info-500" />
+            {{ t('volunteers.available_reinforcements') }}
+          </p>
+          <div
+            v-for="volunteer in renfortsDisponibles"
+            :key="volunteer.userId"
+            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <div class="flex items-center gap-3">
+              <UiUserAvatar
+                :user="{
+                  id: volunteer.userId,
+                  pseudo: volunteer.pseudo,
+                  nom: volunteer.nom,
+                  prenom: volunteer.prenom,
+                  emailHash: volunteer.emailHash,
+                  profilePicture: volunteer.profilePicture,
+                  updatedAt: volunteer.updatedAt,
+                }"
+                size="sm"
+              />
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  {{ volunteer.pseudo }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  <UiUserName :user="volunteer" />
+                </p>
+                <p class="text-xs text-gray-400 dark:text-gray-500">
+                  {{ volunteer.assignmentsCount }} {{ t('volunteers.current_assignments') }}
+                </p>
+              </div>
+            </div>
+            <UButton
+              color="primary"
+              variant="soft"
+              size="sm"
+              @click="assignVolunteer(volunteer.userId)"
+            >
+              {{ t('volunteers.assign') }}
+            </UButton>
+          </div>
         </div>
       </div>
     </template>
@@ -320,6 +373,7 @@ import { computed, ref, watch } from 'vue'
 
 import type { VolunteerTimeSlot } from '#imports'
 
+import { benevolesAffectables } from '../../../../utils/benevoles-affectables'
 import { organisateursAffectables } from '../../../../utils/organisateurs-affectables'
 import { dureeTraduisible } from '../../../../utils/plage-horaire'
 
@@ -452,27 +506,23 @@ const formatDateTime = (dateTime: string | undefined) => {
   return formatForDisplay(new Date(dateTime))
 }
 
-// Bénévoles filtrés selon l'équipe du créneau et excluant ceux déjà assignés
-const filteredAvailableVolunteers = computed(() => {
-  const currentTeamId = props.timeSlot?.teamId === 'unassigned' ? null : props.timeSlot?.teamId
-  const currentAssignmentIds = assignments.value.map((a) => a.user.id)
+/**
+ * Qui proposer, et sous quel titre.
+ *
+ * Deux listes : les membres de l'équipe du créneau, et les VOLANTS qu'on peut appeler en renfort
+ * sur n'importe quelle équipe. La seconde n'existait pas, ce qui rendait impossible le geste même
+ * pour lequel les volants ont été créés. La règle vit dans `benevoles-affectables`, éprouvée hors
+ * Nuxt — la modale ne fait que l'afficher.
+ */
+const propositions = computed(() =>
+  benevolesAffectables(availableVolunteers.value, assignments.value, props.timeSlot?.teamId)
+)
 
-  return availableVolunteers.value.filter((volunteer) => {
-    // Exclure les bénévoles déjà assignés à ce créneau
-    if (currentAssignmentIds.includes(volunteer.userId)) {
-      return false
-    }
-
-    // Si le créneau n'a pas d'équipe spécifique, montrer tous les bénévoles disponibles
-    if (!currentTeamId) {
-      return true
-    }
-
-    // Filtrer par équipe assignée
-    const assignedTeamIds = volunteer.assignedTeams || []
-    return assignedTeamIds.includes(currentTeamId)
-  })
-})
+const filteredAvailableVolunteers = computed(() => propositions.value.membres)
+const renfortsDisponibles = computed(() => propositions.value.renforts)
+const aucuneProposition = computed(
+  () => filteredAvailableVolunteers.value.length === 0 && renfortsDisponibles.value.length === 0
+)
 
 // Fonctions d'assignation
 const fetchAssignments = async () => {

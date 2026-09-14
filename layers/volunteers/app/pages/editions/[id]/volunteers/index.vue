@@ -62,7 +62,8 @@
             myApplication?.status === 'ACCEPTED' &&
             volunteersMode === 'INTERNAL' &&
             echangesOuverts &&
-            planningPublie
+            planningPublie &&
+            !myApplication?.estVolant
           "
           class="flex justify-end"
         >
@@ -90,6 +91,23 @@
           icon="i-heroicons-bolt"
           :title="t('volunteers.floating_volunteer_title')"
           :description="t('volunteers.floating_volunteer_hint')"
+        />
+
+        <!-- Réservé à une équipe autonome : ses créneaux se décident là-bas, hors de l'outil. Son
+             planning peut donc rester vide longtemps, et sans ce message il attendrait une
+             affectation qui ne viendra jamais d'ici. -->
+        <UAlert
+          v-if="
+            authStore.isAuthenticated &&
+            myApplication?.status === 'ACCEPTED' &&
+            volunteersMode === 'INTERNAL' &&
+            myApplication?.estReserve
+          "
+          color="neutral"
+          variant="soft"
+          icon="i-heroicons-lock-closed"
+          :title="t('volunteers.autonomous_volunteer_title')"
+          :description="t('volunteers.autonomous_volunteer_hint')"
         />
 
         <!-- Planning Card - Visible seulement pour les bénévoles acceptés, planning publié -->

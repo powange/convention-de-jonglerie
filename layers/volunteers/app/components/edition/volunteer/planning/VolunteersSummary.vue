@@ -377,8 +377,15 @@ const effectifTotal = computed(
 
 // Repris des mêmes données que l'onglet par équipe : les deux chiffres ne peuvent donc pas
 // diverger, quelle que soit l'évolution du calcul.
+//
+// Les équipes volantes et autonomes en sont écartées : leurs créneaux ne s'adressent qu'à des gens
+// déjà dispensés ou déjà réservés, et personne d'autre ne viendra les couvrir. Les additionner ici
+// ferait paraître l'édition sous-dotée alors qu'il ne manque rien. Leurs lignes, elles, gardent
+// leurs heures réelles — c'est une information utile, mais pas une charge à combler.
 const heuresAPourvoir = computed(() =>
-  props.volunteersStatsByTeam.reduce((total, equipe) => total + equipe.totalHours, 0)
+  props.volunteersStatsByTeam
+    .filter((equipe) => !equipe.horsCharge)
+    .reduce((total, equipe) => total + equipe.totalHours, 0)
 )
 
 const onglets = computed(() => [

@@ -250,59 +250,53 @@ describe('calculateVolunteersStatsByTeam — organisateurs', () => {
 })
 
 /**
- * Une équipe volante ou autonome n'a aucune heure à POURVOIR, mais reste affichée.
+ * Une équipe volante ou autonome garde ses heures réelles, mais ne pèse pas sur le total.
  *
- * Ses créneaux ne s'adressent qu'à des gens déjà dispensés ou déjà réservés : personne ne viendra
- * les couvrir, et les compter ferait paraître l'édition sous-dotée. Le travail réellement tenu,
- * lui, se voit — ce sont des gens qui ont travaillé.
+ * « 4 h tenues sur 12 h de permanence » reste une information utile pour qui regarde cette
+ * équipe. En revanche, personne d'autre ne viendra couvrir ces créneaux : les additionner au
+ * total de l'édition la ferait paraître sous-dotée alors qu'il ne manque rien. D'où le drapeau
+ * `horsCharge`, que l'écran lit pour exclure ces lignes de sa somme.
  */
 describe('équipes hors charge', () => {
-  it('annule les heures à pourvoir sans faire disparaître la ligne', () => {
+  it('garde les heures réelles de la ligne', () => {
+    const stats = calculateVolunteersStatsByTeam(
+      [creneau('c1', '2026-08-01', 4, 'volants', [1], 3)],
+      [{ id: 'volants', name: 'Volants', isFloatingTeam: true }]
+    )
+
+    // 4 h × 3 places : la ligne dit ce que l'équipe demande vraiment.
+    expect(stats[0]!.totalHours).toBe(12)
+    expect(stats[0]!.coveredHours).toBe(4)
+  })
+
+  it('marque la ligne comme hors charge', () => {
+    // C'est ce drapeau, et non un zéro, qui tient l'édition à l'écart de ces heures.
     const stats = calculateVolunteersStatsByTeam(
       [
-        creneau('c1', '2026-08-01', 4, 'cuisine', [1], 2),
-        creneau('c2', '2026-08-01', 4, 'volants', [2], 3),
+        creneau('c1', '2026-08-01', 2, 'volants', [1], 1),
+        creneau('c2', '2026-08-01', 2, 'serenite', [1], 1),
+        creneau('c3', '2026-08-01', 2, 'cuisine', [1], 1),
       ],
       [
-        { id: 'cuisine', name: 'Cuisine' },
         { id: 'volants', name: 'Volants', isFloatingTeam: true },
+        { id: 'serenite', name: 'Sérénité', isAutonomousTeam: true },
+        { id: 'cuisine', name: 'Cuisine' },
       ]
     )
 
-    const volants = stats.find((e) => e.teamId === 'volants')
-    expect(volants).toBeDefined()
-    expect(volants!.totalHours).toBe(0)
-    // Les heures tenues restent visibles : une personne y a bien travaillé 4 h.
-    expect(volants!.coveredHours).toBe(4)
-    expect(stats.find((e) => e.teamId === 'cuisine')!.totalHours).toBe(8)
+    const horsCharge = stats.filter((e) => e.horsCharge).map((e) => e.teamId)
+    expect(horsCharge.sort()).toEqual(['serenite', 'volants'])
+    expect(stats.find((e) => e.teamId === 'cuisine')!.horsCharge).toBe(false)
   })
 
-  it('traite l’équipe autonome de la même façon', () => {
-    const stats = calculateVolunteersStatsByTeam(
-      [creneau('c1', '2026-08-01', 3, 'serenite', [1], 2)],
-      [{ id: 'serenite', name: 'Sérénité', isAutonomousTeam: true }]
-    )
-
-    expect(stats[0]!.totalHours).toBe(0)
-    expect(stats[0]!.coveredHours).toBe(3)
-  })
-
-  it('laisse les équipes ordinaires intactes', () => {
-    const stats = calculateVolunteersStatsByTeam(
-      [creneau('c1', '2026-08-01', 2, 'cuisine', [1], 1)],
-      [{ id: 'cuisine', name: 'Cuisine' }]
-    )
-
-    expect(stats[0]!.totalHours).toBe(2)
-  })
-
-  it('n’annule rien pour les créneaux sans équipe', () => {
+  it('ne marque pas les créneaux sans équipe', () => {
     const stats = calculateVolunteersStatsByTeam(
       [creneau('c1', '2026-08-01', 2, null, [1], 1)],
       [{ id: 'volants', name: 'Volants', isFloatingTeam: true }]
     )
 
     expect(stats[0]!.teamId).toBeNull()
+    expect(stats[0]!.horsCharge).toBe(false)
     expect(stats[0]!.totalHours).toBe(2)
   })
 })

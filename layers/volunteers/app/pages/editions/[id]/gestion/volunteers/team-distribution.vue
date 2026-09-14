@@ -204,6 +204,17 @@
                   <div class="flex items-center gap-3">
                     <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: team.color }" />
                     <h4 class="font-medium text-gray-900 dark:text-white">{{ team.name }}</h4>
+                    <!-- C'est ici qu'on rattache quelqu'un à une équipe, donc ici qu'on décide de
+                         le rendre volant — un geste qui le dispense de ses heures et le retire de
+                         l'assignation automatique. Le repère évite de le faire à l'aveugle. -->
+                    <UBadge v-if="team.isFloatingTeam" color="info" variant="soft" size="sm">
+                      <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 mr-1" />
+                      {{ $t('volunteers.floating_team_badge') }}
+                    </UBadge>
+                    <UBadge v-if="team.isAutonomousTeam" color="neutral" variant="soft" size="sm">
+                      <UIcon name="i-heroicons-lock-closed" class="w-3.5 h-3.5 mr-1" />
+                      {{ $t('volunteers.autonomous_team_badge') }}
+                    </UBadge>
                   </div>
                   <div class="flex items-center gap-4">
                     <div class="text-right">

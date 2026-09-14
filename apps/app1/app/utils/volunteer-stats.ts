@@ -8,6 +8,7 @@
  */
 
 import {
+  benevolesDesComptes,
   estEquipeHorsCharge,
   estHorsDesComptes,
   estReserve,
@@ -163,11 +164,6 @@ function equipesDe(candidature: AcceptedVolunteer): { isFloatingTeam?: boolean |
     .filter((equipe): equipe is { isFloatingTeam?: boolean | null } => !!equipe)
 }
 
-/** Les candidatures qui entrent dans les décomptes. */
-function benevolesDesComptesSeuls(candidatures: AcceptedVolunteer[]): AcceptedVolunteer[] {
-  return candidatures.filter((candidature) => !estHorsDesComptes(equipesDe(candidature)))
-}
-
 /**
  * Calcule les statistiques globales des bénévoles
  */
@@ -315,7 +311,7 @@ export function calculateVolunteersStatsIndividual(
 
   // D'abord, ajouter tous les bénévoles acceptés avec 0 heures — sauf les volants, dont le zéro
   // se lirait comme un oubli d'affectation alors que c'est leur rôle même.
-  benevolesDesComptesSeuls(acceptedVolunteers).forEach((application) => {
+  benevolesDesComptes(acceptedVolunteers, equipesDe).forEach((application) => {
     if (application.user && !volunteerStats.has(application.user.id)) {
       volunteerStats.set(application.user.id, {
         user: application.user,
@@ -414,6 +410,8 @@ export interface TeamStats {
   estVolante?: boolean
   /** Équipe autonome : elle s'organise elle-même et réserve ses membres. */
   estAutonome?: boolean
+  /** Ses heures ne comptent pas dans le total à pourvoir de l'édition. */
+  horsCharge?: boolean
   /** Les heures **à pourvoir** : durée du créneau × nombre de places demandées. */
   totalHours: number
   /** Les heures **réellement tenues** : durée du créneau × personnes affectées dessus. */
@@ -513,18 +511,7 @@ export function calculateVolunteersStatsByTeam(
     // Le besoin du créneau, pas son remplissage. `maxVolunteers` vaut 1 par défaut en base ;
     // le repli protège d'un créneau mal formé plutôt que de compter zéro heure.
     const besoin = Math.max(1, Number(slot.maxVolunteers) || 1)
-    /**
-     * Une équipe volante ou autonome n'a AUCUNE heure à pourvoir.
-     *
-     * Elle reste affichée — c'est du travail réel, qu'on veut voir —, mais sa charge est nulle :
-     * ses créneaux ne s'adressent qu'à des gens déjà dispensés ou déjà réservés, et personne ne
-     * viendra les couvrir. Les compter ferait paraître l'édition sous-dotée alors qu'il ne manque
-     * rien, et fausserait le total général affiché sous le tableau.
-     *
-     * Les heures RÉELLEMENT tenues, elles, comptent normalement : ce sont des gens qui ont
-     * travaillé.
-     */
-    const heuresBenevole = equipe.horsCharge ? 0 : dureeCreneau * besoin
+    const heuresBenevole = dureeCreneau * besoin
 
     equipe.totalHours += heuresBenevole
     // Ce qui est effectivement tenu, en regard de ce qu'il y a à tenir : une équipe à 4h sur
@@ -569,6 +556,16 @@ export function calculateVolunteersStatsByTeam(
       // heure à pourvoir, et l'écran ne peut pas la deviner.
       estVolante: equipe.estVolante,
       estAutonome: equipe.estAutonome,
+      /**
+       * Cette équipe pèse-t-elle sur les heures à pourvoir de l'ÉDITION&nbsp;?
+       *
+       * Non pour une équipe volante ou autonome : ses créneaux ne s'adressent qu'à des gens déjà
+       * dispensés ou déjà réservés, et personne d'autre ne viendra les couvrir. Sa ligne garde
+       * pourtant ses heures réelles — « 4 h tenues sur 12 h de permanence » reste une information
+       * utile —, c'est seulement le TOTAL de l'édition qui l'écarte, sans quoi celle-ci
+       * paraîtrait sous-dotée alors qu'il ne manque rien.
+       */
+      horsCharge: equipe.horsCharge === true,
       totalHours: equipe.totalHours,
       coveredHours: equipe.coveredHours,
       totalSlots: equipe.totalSlots,
