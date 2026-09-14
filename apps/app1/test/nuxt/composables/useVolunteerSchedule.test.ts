@@ -143,3 +143,73 @@ describe('useVolunteerSchedule — position de départ sur le premier créneau',
     expect(calendarOptions.scrollTime).toBe('57:30:00')
   })
 })
+
+/**
+ * Les repères de la colonne des équipes.
+ *
+ * Une équipe volante ou autonome ne pèse pas dans les heures à pourvoir : sans repère, on lit sa
+ * ligne comme celle des autres. L'icône vit dans le DOM natif de FullCalendar, hors de portée des
+ * composants Nuxt UI — d'où l'infobulle par attribut `title`.
+ */
+describe('useVolunteerSchedule — repères des équipes', () => {
+  const avecEquipes = (teams: any[]) =>
+    useVolunteerSchedule({
+      teams: ref(teams),
+      timeSlots: ref([]),
+      editionStartDate: ref('2026-09-25'),
+      editionEndDate: ref('2026-09-27'),
+      onTimeSlotCreate: vi.fn(),
+      onTimeSlotUpdate: vi.fn(),
+      onTimeSlotClick: vi.fn(),
+      onTimeSlotDelete: vi.fn(),
+    } as any)
+
+  /** Le nœud que FullCalendar afficherait pour cette ressource. */
+  const libelleDe = (calendarOptions: any, ressource: any): HTMLElement =>
+    calendarOptions.resourceLabelContent({ resource: ressource }).domNodes[0]
+
+  it('transmet les réglages de l’équipe à la ressource', async () => {
+    const { calendarOptions } = avecEquipes([
+      { id: 'e1', name: 'Volants', color: '#000', isFloatingTeam: true },
+    ])
+    await nextTick()
+
+    const ressource = (calendarOptions.resources as any[]).find((r) => r.id === 'e1')
+    expect(ressource?.extendedProps).toMatchObject({ isFloatingTeam: true })
+  })
+
+  it('pose une pastille sur une équipe volante, avec son libellé au survol', () => {
+    const { calendarOptions } = avecEquipes([])
+    const noeud = libelleDe(calendarOptions, {
+      title: 'Volants',
+      extendedProps: { isFloatingTeam: true },
+    })
+
+    const pastille = noeud.querySelector('[title]')
+    expect(noeud.textContent).toContain('Volants')
+    // Le libellé est accessible au survol ET aux lecteurs d'écran : une infobulle ne dit rien à
+    // qui n'a pas de souris.
+    expect(pastille?.getAttribute('title')).toBe('volunteers.floating_team_badge')
+    expect(pastille?.getAttribute('aria-label')).toBe('volunteers.floating_team_badge')
+  })
+
+  it('pose une pastille distincte sur une équipe autonome', () => {
+    const { calendarOptions } = avecEquipes([])
+    const noeud = libelleDe(calendarOptions, {
+      title: 'Sérénité',
+      extendedProps: { isAutonomousTeam: true },
+    })
+
+    expect(noeud.querySelector('[title]')?.getAttribute('title')).toBe(
+      'volunteers.autonomous_team_badge'
+    )
+  })
+
+  it('ne pose aucune pastille sur une équipe ordinaire', () => {
+    const { calendarOptions } = avecEquipes([])
+    const noeud = libelleDe(calendarOptions, { title: 'Cuisine', extendedProps: {} })
+
+    expect(noeud.querySelector('[title]')).toBeNull()
+    expect(noeud.textContent).toBe('Cuisine')
+  })
+})

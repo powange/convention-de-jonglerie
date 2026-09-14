@@ -1,3 +1,5 @@
+import { peutEchangerSesCreneaux } from '~~/shared/utils/benevoles-volants'
+
 /**
  * Règles de l'échange de créneaux entre bénévoles.
  *
@@ -117,4 +119,30 @@ export function effectifApresEchange(
   const restants = presents.filter((m) => m.id !== sortantId)
   if (!entrant || restants.some((m) => m.id === entrant.id)) return restants
   return [...restants, { ...entrant, arrivant: true }]
+}
+
+/** Une affectation, réduite à qui la tient. */
+export interface AffectationDUnTitulaire {
+  userId: number
+}
+
+/**
+ * Les affectations qu'on peut proposer à l'échange, celles des VOLANTS retirées.
+ *
+ * C'est le second sens de la transparence : un volant ne propose pas les créneaux qu'on lui a
+ * confiés en renfort, et personne ne les lui demande. Sans ce filtre, un volant posé sur un
+ * créneau de la cuisine ressortirait parmi les candidats — la recherche porte sur l'équipe du
+ * CRÉNEAU, pas sur celles de son titulaire — et se verrait solliciter pour une charge qu'il ne
+ * doit pas.
+ *
+ * @param affectations     les affectations trouvées dans les équipes du demandeur
+ * @param equipesParPersonne les équipes de chaque titulaire, pour reconnaître les volants
+ */
+export function affectationsEchangeables<A extends AffectationDUnTitulaire>(
+  affectations: readonly A[],
+  equipesParPersonne: ReadonlyMap<number, readonly { isFloatingTeam?: boolean | null }[]>
+): A[] {
+  return affectations.filter((affectation) =>
+    peutEchangerSesCreneaux(equipesParPersonne.get(affectation.userId) ?? [])
+  )
 }

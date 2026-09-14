@@ -250,50 +250,53 @@ describe('calculateVolunteersStatsByTeam — organisateurs', () => {
 })
 
 /**
- * Les créneaux d'une équipe volante ne sont pas des heures à pourvoir.
+ * Une équipe volante ou autonome garde ses heures réelles, mais ne pèse pas sur le total.
  *
- * Un tel créneau ne s'adresse qu'aux volants — une permanence —, et les volants ne sont tenus à
- * aucun volume d'heures. Le compter ferait paraître l'édition sous-dotée alors qu'il ne manque
- * rien à personne.
+ * « 4 h tenues sur 12 h de permanence » reste une information utile pour qui regarde cette
+ * équipe. En revanche, personne d'autre ne viendra couvrir ces créneaux : les additionner au
+ * total de l'édition la ferait paraître sous-dotée alors qu'il ne manque rien. D'où le drapeau
+ * `horsCharge`, que l'écran lit pour exclure ces lignes de sa somme.
  */
-describe('équipes volantes', () => {
-  it('écarte les créneaux d’une équipe volante des heures à pourvoir', () => {
+describe('équipes hors charge', () => {
+  it('garde les heures réelles de la ligne', () => {
     const stats = calculateVolunteersStatsByTeam(
-      [
-        creneau('c1', '2026-08-01', 4, 'cuisine', [1], 2),
-        creneau('c2', '2026-08-01', 4, 'volants', [2], 3),
-      ],
-      [
-        { id: 'cuisine', name: 'Cuisine' },
-        { id: 'volants', name: 'Volants', isFloatingTeam: true },
-      ]
-    )
-
-    expect(stats.map((e) => e.teamId)).toEqual(['cuisine'])
-    // 4 h × 2 places, et rien de l'équipe volante.
-    expect(stats[0]!.totalHours).toBe(8)
-  })
-
-  it('garde ce qui n’a pas d’équipe', () => {
-    const stats = calculateVolunteersStatsByTeam(
-      [
-        creneau('c1', '2026-08-01', 2, null, [1], 1),
-        creneau('c2', '2026-08-01', 2, 'volants', [2], 1),
-      ],
+      [creneau('c1', '2026-08-01', 4, 'volants', [1], 3)],
       [{ id: 'volants', name: 'Volants', isFloatingTeam: true }]
     )
 
-    expect(stats).toHaveLength(1)
-    expect(stats[0]!.teamId).toBeNull()
+    // 4 h × 3 places : la ligne dit ce que l'équipe demande vraiment.
+    expect(stats[0]!.totalHours).toBe(12)
+    expect(stats[0]!.coveredHours).toBe(4)
   })
 
-  it('n’écarte rien quand aucune équipe n’est volante', () => {
+  it('marque la ligne comme hors charge', () => {
+    // C'est ce drapeau, et non un zéro, qui tient l'édition à l'écart de ces heures.
     const stats = calculateVolunteersStatsByTeam(
-      [creneau('c1', '2026-08-01', 2, 'cuisine', [1], 1)],
-      [{ id: 'cuisine', name: 'Cuisine' }]
+      [
+        creneau('c1', '2026-08-01', 2, 'volants', [1], 1),
+        creneau('c2', '2026-08-01', 2, 'serenite', [1], 1),
+        creneau('c3', '2026-08-01', 2, 'cuisine', [1], 1),
+      ],
+      [
+        { id: 'volants', name: 'Volants', isFloatingTeam: true },
+        { id: 'serenite', name: 'Sérénité', isAutonomousTeam: true },
+        { id: 'cuisine', name: 'Cuisine' },
+      ]
     )
 
-    expect(stats).toHaveLength(1)
+    const horsCharge = stats.filter((e) => e.horsCharge).map((e) => e.teamId)
+    expect(horsCharge.sort()).toEqual(['serenite', 'volants'])
+    expect(stats.find((e) => e.teamId === 'cuisine')!.horsCharge).toBe(false)
+  })
+
+  it('ne marque pas les créneaux sans équipe', () => {
+    const stats = calculateVolunteersStatsByTeam(
+      [creneau('c1', '2026-08-01', 2, null, [1], 1)],
+      [{ id: 'volants', name: 'Volants', isFloatingTeam: true }]
+    )
+
+    expect(stats[0]!.teamId).toBeNull()
+    expect(stats[0]!.horsCharge).toBe(false)
     expect(stats[0]!.totalHours).toBe(2)
   })
 })

@@ -1,10 +1,14 @@
 import { z } from 'zod'
 
 import {
+  affectationsEchangeables,
   creneauxProposables,
   type AffectationCandidate,
 } from '../../../../../utils/echange-creneaux'
-import { exigerEchangesOuverts } from '../../../../../utils/echanges-ouverts'
+import {
+  exigerEchangesOuverts,
+  exigerEchangesPourCettePersonne,
+} from '../../../../../utils/echanges-ouverts'
 import { exigerPlanningPublie } from '../../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
@@ -27,6 +31,8 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
     await exigerEchangesOuverts(editionId)
+    // Un volant ne propose pas ses créneaux de renfort, et n'en demande pas non plus.
+    await exigerEchangesPourCettePersonne(editionId, user.id)
     // Les échanges sont fermés tant que le planning n'est pas publié : un bénévole qui ne connaît
     // pas son créneau n'a rien à échanger, et `candidates` divulguerait les créneaux des autres
     // par la bande. Les deux endpoints réservés à la gestion (`pending`, `decide`) restent
@@ -80,9 +86,40 @@ export default wrapApiHandler(
       orderBy: { timeSlot: { startDateTime: 'asc' } },
     })
 
+    /**
+     * Les créneaux tenus par un VOLANT ne se proposent pas.
+     *
+     * C'est le second sens de la transparence : le volant ne propose pas ses renforts, et
+     * personne ne les lui demande. Sans ce filtre, un volant posé sur un créneau de la cuisine
+     * ressortirait ici — la requête porte sur l'équipe du créneau, pas sur celles de son
+     * titulaire — et se verrait solliciter pour une charge qu'il ne doit pas.
+     */
+    const titulaires = [...new Set(affectations.map((a) => a.userId))]
+    const equipesDesTitulaires = titulaires.length
+      ? await prisma.applicationTeamAssignment.findMany({
+          where: {
+            application: { userId: { in: titulaires }, eventId: editionId, status: 'ACCEPTED' },
+          },
+          select: {
+            application: { select: { userId: true } },
+            team: { select: { isFloatingTeam: true } },
+          },
+        })
+      : []
+
+    const equipesParPersonne = new Map<number, { isFloatingTeam: boolean }[]>()
+    for (const assignation of equipesDesTitulaires) {
+      const personne = assignation.application.userId
+      const liste = equipesParPersonne.get(personne) ?? []
+      liste.push(assignation.team)
+      equipesParPersonne.set(personne, liste)
+    }
+
+    const echangeables = affectationsEchangeables(affectations, equipesParPersonne)
+
     // Un créneau déjà passé ne s'échange pas : la demande expirerait aussitôt créée.
     const maintenant = Date.now()
-    const aVenir = affectations.filter((a) => a.timeSlot.endDateTime.getTime() > maintenant)
+    const aVenir = echangeables.filter((a) => a.timeSlot.endDateTime.getTime() > maintenant)
 
     const proposables = creneauxProposables(
       user.id,

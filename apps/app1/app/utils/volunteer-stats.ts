@@ -7,7 +7,12 @@
  * venu renforcer une équipe doit au contraire y apparaître sous CETTE équipe.
  */
 
-import { estEquipeHorsCharge, estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
+import {
+  benevolesDesComptes,
+  estEquipeHorsCharge,
+  estHorsDesComptes,
+  estReserve,
+} from '~~/shared/utils/benevoles-volants'
 
 export interface VolunteerStats {
   totalVolunteers: number
@@ -58,6 +63,14 @@ export interface VolunteerStatsIndividual {
    * même volume. Sans lui, on le croirait simplement sous-employé.
    */
   estVolant?: boolean
+  /**
+   * Vrai pour un bénévole RÉSERVÉ, c'est-à-dire dont toutes les équipes sont autonomes.
+   *
+   * Le repère explique pourquoi l'assignation automatique ne lui a rien donné : ses heures se
+   * décident dans son équipe, pas ici. À ne pas confondre avec `estVolant` — le réservé, lui,
+   * reste tenu à son volume d'heures.
+   */
+  estReserve?: boolean
   /**
    * Vrai pour un organisateur tenant des créneaux sans candidature de bénévole. Absent pour un
    * bénévole accepté, y compris s'il est par ailleurs organisateur de l'édition : c'est bien sa
@@ -151,11 +164,6 @@ function equipesDe(candidature: AcceptedVolunteer): { isFloatingTeam?: boolean |
     .filter((equipe): equipe is { isFloatingTeam?: boolean | null } => !!equipe)
 }
 
-/** Les candidatures qui entrent dans les décomptes. */
-function benevolesDesComptesSeuls(candidatures: AcceptedVolunteer[]): AcceptedVolunteer[] {
-  return candidatures.filter((candidature) => !estHorsDesComptes(equipesDe(candidature)))
-}
-
 /**
  * Calcule les statistiques globales des bénévoles
  */
@@ -210,8 +218,27 @@ export function calculateVolunteersStats(
 /**
  * Calcule les statistiques par jour
  */
-export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments[]): DayStats[] {
+export function calculateVolunteersStatsByDay(
+  timeSlots: TimeSlotWithAssignments[],
+  /**
+   * Les acceptés, pour reconnaître les volants et les réservés.
+   *
+   * Facultatif : cette fonction ne partait que des créneaux, et l'omettre laisse le comportement
+   * d'avant — les repères manquent, mais les heures restent justes.
+   */
+  acceptedVolunteers: AcceptedVolunteer[] = []
+): DayStats[] {
   const dayStats = new Map<string, any>()
+  const volants = new Set(
+    acceptedVolunteers
+      .filter((candidature) => estHorsDesComptes(equipesDe(candidature)))
+      .map((candidature) => candidature.user?.id)
+  )
+  const reserves = new Set(
+    acceptedVolunteers
+      .filter((candidature) => estReserve(equipesDe(candidature)))
+      .map((candidature) => candidature.user?.id)
+  )
 
   timeSlots.forEach((slot) => {
     // Organisateurs compris : un jour de convention se mesure à qui l'a tenu, pas au titre
@@ -242,6 +269,10 @@ export function calculateVolunteersStatsByDay(timeSlots: TimeSlotWithAssignments
         day.volunteers.set(userId, {
           user: personne.user,
           estOrganisateur: personne.estOrganisateur,
+          // Mêmes repères que dans le relevé individuel : sans eux, un volant passe pour
+          // quelqu'un qu'on aurait sous-employé ce jour-là.
+          ...(volants.has(userId) ? { estVolant: true } : {}),
+          ...(reserves.has(userId) ? { estReserve: true } : {}),
           hours: 0,
           slots: 0,
         })
@@ -280,7 +311,7 @@ export function calculateVolunteersStatsIndividual(
 
   // D'abord, ajouter tous les bénévoles acceptés avec 0 heures — sauf les volants, dont le zéro
   // se lirait comme un oubli d'affectation alors que c'est leur rôle même.
-  benevolesDesComptesSeuls(acceptedVolunteers).forEach((application) => {
+  benevolesDesComptes(acceptedVolunteers, equipesDe).forEach((application) => {
     if (application.user && !volunteerStats.has(application.user.id)) {
       volunteerStats.set(application.user.id, {
         user: application.user,
@@ -337,18 +368,27 @@ export function calculateVolunteersStatsIndividual(
 
   // Les volants qui ont tout de même tenu un créneau : ils figurent dans la liste, et le repère
   // dit pourquoi leur total est plus bas — ils n'étaient pas tenus au même volume d'heures.
-  const volants = new Set(
-    acceptedVolunteers
-      .filter((candidature) => estHorsDesComptes(equipesDe(candidature)))
-      .map((candidature) => candidature.user?.id)
-      .filter((id): id is number => typeof id === 'number')
-  )
+  const identifiantsDe = (
+    predicat: (candidature: AcceptedVolunteer) => boolean
+  ): Set<number | undefined> =>
+    new Set(
+      acceptedVolunteers
+        .filter(predicat)
+        .map((candidature) => candidature.user?.id)
+        .filter((id): id is number => typeof id === 'number')
+    )
+
+  const volants = identifiantsDe((candidature) => estHorsDesComptes(equipesDe(candidature)))
+  // Les réservés : leurs heures se décident dans leur équipe autonome, pas ici. Le repère évite
+  // qu'on les croie oubliés par l'assignation automatique.
+  const reserves = identifiantsDe((candidature) => estReserve(equipesDe(candidature)))
 
   // Convertir en array et trier par nombre d'heures total décroissant
   return Array.from(volunteerStats.values())
     .map((volunteer) => ({
       ...volunteer,
       ...(volants.has(volunteer.user?.id) ? { estVolant: true } : {}),
+      ...(reserves.has(volunteer.user?.id) ? { estReserve: true } : {}),
       dayDetails: Array.from(volunteer.dayDetails.values()).sort((a: any, b: any) =>
         a.date.localeCompare(b.date)
       ), // Trier par date
@@ -366,6 +406,12 @@ export interface TeamStats {
   teamId: string | null
   teamName: string
   color?: string
+  /** Équipe volante : ses membres sont dispensés de leur volume d'heures. */
+  estVolante?: boolean
+  /** Équipe autonome : elle s'organise elle-même et réserve ses membres. */
+  estAutonome?: boolean
+  /** Ses heures ne comptent pas dans le total à pourvoir de l'édition. */
+  horsCharge?: boolean
   /** Les heures **à pourvoir** : durée du créneau × nombre de places demandées. */
   totalHours: number
   /** Les heures **réellement tenues** : durée du créneau × personnes affectées dessus. */
@@ -427,11 +473,9 @@ export function calculateVolunteersStatsByTeam(
    *
    * C'est le pendant, côté CRÉNEAU, de ce que `benevoles-volants` fait côté personne.
    */
-  const equipesVolantes = new Set(teams.filter(estEquipeHorsCharge).map((equipe) => equipe.id))
+  const equipesHorsCharge = new Set(teams.filter(estEquipeHorsCharge).map((e) => e.id))
 
   timeSlots.forEach((slot) => {
-    if (slot.teamId && equipesVolantes.has(slot.teamId as string)) return
-
     // Organisateurs compris : « qui tient cette équipe » se lit sur les personnes présentes,
     // quel que soit leur titre.
     const affectes = personnesDuCreneau(slot)
@@ -453,6 +497,10 @@ export function calculateVolunteersStatsByTeam(
         totalHours: 0,
         coveredHours: 0,
         totalSlots: 0,
+        // Retenu à la création : le calcul le relit à chaque créneau de l'équipe.
+        horsCharge: slot.teamId ? equipesHorsCharge.has(slot.teamId as string) : false,
+        estVolante: equipe?.isFloatingTeam === true,
+        estAutonome: equipe?.isAutonomousTeam === true,
         benevoles: new Set<number>(),
         organisateurs: new Set<number>(),
         jours: new Map<string, any>(),
@@ -504,6 +552,20 @@ export function calculateVolunteersStatsByTeam(
       teamId: equipe.teamId,
       teamName: equipe.teamName,
       color: equipe.color,
+      // La nature de l'équipe voyage avec ses chiffres : c'est elle qui explique un total à zéro
+      // heure à pourvoir, et l'écran ne peut pas la deviner.
+      estVolante: equipe.estVolante,
+      estAutonome: equipe.estAutonome,
+      /**
+       * Cette équipe pèse-t-elle sur les heures à pourvoir de l'ÉDITION&nbsp;?
+       *
+       * Non pour une équipe volante ou autonome : ses créneaux ne s'adressent qu'à des gens déjà
+       * dispensés ou déjà réservés, et personne d'autre ne viendra les couvrir. Sa ligne garde
+       * pourtant ses heures réelles — « 4 h tenues sur 12 h de permanence » reste une information
+       * utile —, c'est seulement le TOTAL de l'édition qui l'écarte, sans quoi celle-ci
+       * paraîtrait sous-dotée alors qu'il ne manque rien.
+       */
+      horsCharge: equipe.horsCharge === true,
       totalHours: equipe.totalHours,
       coveredHours: equipe.coveredHours,
       totalSlots: equipe.totalSlots,

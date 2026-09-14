@@ -123,18 +123,42 @@ export function estHorsDesComptes(
   return equipes.every(estEquipeVolante)
 }
 
-/** Un bénévole, réduit à ses équipes. */
-export interface BenevolePourVolants {
-  equipes?: readonly EquipePourVolants[] | null
+/**
+ * Ce bénévole participe-t-il aux échanges de créneaux&nbsp;?
+ *
+ * Non s'il est volant, et dans les DEUX sens : il ne propose pas les créneaux qu'on lui a confiés
+ * en renfort, et les autres ne peuvent pas les lui demander. Vis-à-vis de l'échange, il est
+ * transparent.
+ *
+ * La raison est la même que pour le décompte des heures : l'échange est un mécanisme entre gens
+ * qui se doivent un volume de travail. Un volant n'en doit aucun — il n'a donc ni charge à céder,
+ * ni charge à reprendre. Un créneau de renfort n'est pas une obligation qu'il rend, c'est un
+ * service qu'il a accepté de rendre, et le reprendre se règle de vive voix.
+ *
+ * Sans exception, y compris entre volants sur les créneaux de leur propre équipe : une règle qui
+ * vaudrait ici et pas là demanderait d'expliquer lesquels de ses créneaux s'échangent.
+ */
+export function peutEchangerSesCreneaux(
+  equipes: readonly EquipePourVolants[] | null | undefined
+): boolean {
+  return !estHorsDesComptes(equipes)
 }
 
 /**
  * Les bénévoles qui entrent dans les décomptes.
  *
  * Écrit ici plutôt que répété en `filter` à chaque appel : la règle est lue par l'assignation
- * automatique et par deux calculs de statistiques, et l'expérience de ce dépôt est qu'une règle
+ * automatique et par les calculs de statistiques, et l'expérience de ce dépôt est qu'une règle
  * recopiée finit appliquée à un endroit de moins qu'annoncé.
+ *
+ * ⚠️ L'appelant fournit l'extracteur d'équipes, et ce n'est pas une commodité : selon l'API
+ * consultée, elles arrivent sous `teamAssignments[].team`, sous `equipes`, ou déjà aplaties.
+ * Figer une seule de ces formes aurait obligé le prochain appelant à recopier la règle plutôt
+ * qu'à l'appeler — ce que ce correctif défait précisément.
  */
-export function benevolesDesComptes<B extends BenevolePourVolants>(benevoles: readonly B[]): B[] {
-  return benevoles.filter((benevole) => !estHorsDesComptes(benevole?.equipes))
+export function benevolesDesComptes<B>(
+  benevoles: readonly B[],
+  equipesDe: (benevole: B) => readonly EquipePourVolants[] | null | undefined
+): B[] {
+  return benevoles.filter((benevole) => !estHorsDesComptes(equipesDe(benevole)))
 }

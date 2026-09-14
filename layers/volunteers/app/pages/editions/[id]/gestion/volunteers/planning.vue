@@ -870,7 +870,9 @@ const volunteersStats = computed(() =>
   calculateVolunteersStats(convertedTimeSlots.value, acceptedVolunteers.value)
 )
 
-const volunteersStatsByDay = computed(() => calculateVolunteersStatsByDay(convertedTimeSlots.value))
+const volunteersStatsByDay = computed(() =>
+  calculateVolunteersStatsByDay(convertedTimeSlots.value, acceptedVolunteers.value)
+)
 
 // Les équipes servent à nommer et colorer les lignes ; le libellé de repli est traduit ici,
 // l'utilitaire de calcul ne connaissant pas l'i18n.

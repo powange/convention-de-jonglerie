@@ -6,7 +6,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { infosPersonnelles, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
-import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
+import { estHorsDesComptes, estReserve } from '~~/shared/utils/benevoles-volants'
 
 /**
  * Récupère la candidature de bénévolat de l'utilisateur connecté pour une édition
@@ -72,6 +72,7 @@ export default wrapApiHandler(
                 description: true,
                 color: true,
                 isFloatingTeam: true,
+                isAutonomousTeam: true,
               },
             },
           },
@@ -157,6 +158,13 @@ export default wrapApiHandler(
       estVolant: estHorsDesComptes(
         application.teamAssignments.map((assignation) => assignation.team)
       ),
+      /**
+       * Réservé à une équipe autonome, rendu dans les mêmes conditions et pour la même raison.
+       *
+       * Son planning peut rester vide longtemps : ses créneaux se décident dans son équipe, hors
+       * de l'outil. Sans ce drapeau, il attendrait une affectation qui ne viendra pas d'ici.
+       */
+      estReserve: estReserve(application.teamAssignments.map((assignation) => assignation.team)),
       assignedTimeSlots: assignedTimeSlots.map((assignation) => ({
         ...assignation,
         timeSlot: avecCoequipiers(assignation.timeSlot),

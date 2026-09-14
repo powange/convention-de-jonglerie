@@ -291,10 +291,15 @@ const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
 
 const convertedTeams = computed(() => {
   return internalTeams.value.map(
+    // ⚠️ Cette conversion RECONSTRUIT l'équipe : tout champ oublié ici disparaît avant
+    // d'atteindre le calendrier. Les deux réglages en faisaient les frais, et les pastilles de la
+    // colonne des équipes n'avaient jamais la donnée pour s'afficher.
     (team): VolunteerTeamCalendar => ({
       id: team.id,
       name: team.name,
       color: team.color,
+      isFloatingTeam: team.isFloatingTeam === true,
+      isAutonomousTeam: team.isAutonomousTeam === true,
     })
   )
 })

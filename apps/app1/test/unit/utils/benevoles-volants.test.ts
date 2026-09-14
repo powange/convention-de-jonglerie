@@ -9,6 +9,7 @@ import {
   estHorsDesComptes,
   estReserve,
   estVolant,
+  peutEchangerSesCreneaux,
 } from '../../../shared/utils/benevoles-volants'
 
 /**
@@ -81,6 +82,9 @@ describe('estHorsDesComptes', () => {
 })
 
 describe('benevolesDesComptes', () => {
+  /** L'appelant dit où sont les équipes : leur forme change d'une API à l'autre. */
+  const parChamp = (b: { equipes?: { isFloatingTeam?: boolean }[] }) => b.equipes
+
   it('écarte ceux qui ne sont que volants', () => {
     const benevoles = [
       { id: 1, equipes: [volante] },
@@ -89,21 +93,34 @@ describe('benevolesDesComptes', () => {
       { id: 4, equipes: [] },
     ]
 
-    expect(benevolesDesComptes(benevoles).map((b) => b.id)).toEqual([2, 3, 4])
+    expect(benevolesDesComptes(benevoles, parChamp).map((b) => b.id)).toEqual([2, 3, 4])
+  })
+
+  it('s’accommode d’une autre forme de données', () => {
+    // Le cas réel : les statistiques lisent `teamAssignments[].team`, pas `equipes`. C'est ce qui
+    // avait conduit à recopier la règle au lieu de l'appeler.
+    const candidatures = [
+      { id: 1, teamAssignments: [{ team: volante }] },
+      { id: 2, teamAssignments: [{ team: ordinaire }] },
+    ]
+
+    const gardes = benevolesDesComptes(candidatures, (c) => c.teamAssignments.map((a) => a.team))
+
+    expect(gardes.map((c) => c.id)).toEqual([2])
   })
 
   it('garde tout le monde quand aucune équipe n’est volante', () => {
-    const benevoles = [{ equipes: [ordinaire] }, { equipes: [] }]
-
-    expect(benevolesDesComptes(benevoles)).toHaveLength(2)
+    expect(benevolesDesComptes([{ equipes: [ordinaire] }, { equipes: [] }], parChamp)).toHaveLength(
+      2
+    )
   })
 
-  it('survit à un bénévole sans champ d’équipes', () => {
-    expect(benevolesDesComptes([{} as { equipes?: never }])).toHaveLength(1)
+  it('survit à un extracteur qui ne rend rien', () => {
+    expect(benevolesDesComptes([{}], () => undefined)).toHaveLength(1)
   })
 
-  it('rend une liste vide sans se plaindre', () => {
-    expect(benevolesDesComptes([])).toEqual([])
+  it('rend une liste vide sans bénévoles', () => {
+    expect(benevolesDesComptes([], parChamp)).toEqual([])
   })
 })
 
@@ -164,5 +181,33 @@ describe('équipes autonomes', () => {
     expect(estHorsAssignationAutomatique([ordinaire])).toBe(false)
     expect(estHorsAssignationAutomatique([autonome, ordinaire])).toBe(false)
     expect(estHorsAssignationAutomatique([])).toBe(false)
+  })
+})
+
+/**
+ * Les échanges de créneaux.
+ *
+ * Un volant en est totalement exclu, dans les deux sens : il ne propose pas ses créneaux de
+ * renfort, et personne ne peut les lui demander.
+ */
+describe('peutEchangerSesCreneaux', () => {
+  it('exclut celui qui n’est que volant', () => {
+    expect(peutEchangerSesCreneaux([volante])).toBe(false)
+  })
+
+  it('laisse échanger un bénévole ordinaire', () => {
+    expect(peutEchangerSesCreneaux([ordinaire])).toBe(true)
+    expect(peutEchangerSesCreneaux([])).toBe(true)
+    expect(peutEchangerSesCreneaux(null)).toBe(true)
+  })
+
+  it('laisse échanger celui qui est volant ET dans une équipe ordinaire', () => {
+    // Il doit ses heures de cuisine : il a bien une charge à céder ou à reprendre.
+    expect(peutEchangerSesCreneaux([volante, ordinaire])).toBe(true)
+  })
+
+  it('laisse échanger un membre d’équipe autonome', () => {
+    // Réservé n'est pas dispensé : il garde son volume d'heures, donc ses échanges.
+    expect(peutEchangerSesCreneaux([{ isAutonomousTeam: true }])).toBe(true)
   })
 })
