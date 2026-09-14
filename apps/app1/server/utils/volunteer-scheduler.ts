@@ -80,6 +80,16 @@ export interface Team {
   id: string
   name: string
   color: string
+  /**
+   * L'effectif que l'équipe souhaite, quand elle en déclare un.
+   *
+   * ⚠️ C'est un INDICATEUR, pas un plafond — la décision a été prise pour les statistiques
+   * d'équipe et vaut ici : une équipe qui déclare huit personnes n'en refuse pas une neuvième,
+   * elle dit combien il lui en faudrait. Le moteur s'en sert donc comme d'une préférence, et non
+   * comme d'un refus : au-delà de l'effectif souhaité, l'équipe devient moins attirante que
+   * celles qui manquent encore de monde.
+   */
+  maxVolunteers?: number | null
 }
 
 export interface Assignment {
@@ -152,6 +162,18 @@ export class VolunteerScheduler {
    * affectation envisagée, et re-lire « 2026-08-01_morning » à chaque fois n'y apprendrait rien.
    */
   private presenceParBenevole = new Map<number, FenetrePresence>()
+  /**
+   * Le fuseau de l'événement, au format IANA.
+   *
+   * Toutes les heures et toutes les journées du moteur s'y lisent. Sans lui, « 23 h 30 » se
+   * comprenait dans le fuseau du processus — UTC en conteneur —, si bien qu'un créneau de soirée
+   * était vu comme un créneau d'après-midi, et rattaché au jour précédent pour le plafond
+   * journalier. Sur une convention à Paris en été, deux heures d'écart et un jour de décalage.
+   *
+   * `null` retombe sur UTC : c'est un repli pour les éditions qui n'ont pas renseigné leur
+   * fuseau, pas une intention.
+   */
+  private fuseau: string | null = null
 
   constructor(
     volunteers: VolunteerApplication[],
@@ -160,15 +182,17 @@ export class VolunteerScheduler {
     constraints: SchedulingConstraints = {},
     bornes: BornesEvenement = {},
     spectacles: SpectacleProgramme[] = [],
-    affectationsExistantes: AffectationExistante[] = []
+    affectationsExistantes: AffectationExistante[] = [],
+    fuseau: string | null = null
   ) {
     this.volunteers = volunteers
     this.timeSlots = timeSlots
     this.teams = teams
     this.bornes = bornes
     this.affectationsExistantes = affectationsExistantes
+    this.fuseau = fuseau
     this.presenceParBenevole = new Map(
-      volunteers.map((volunteer) => [volunteer.user.id, fenetreDe(volunteer)])
+      volunteers.map((volunteer) => [volunteer.user.id, fenetreDe(volunteer, fuseau)])
     )
     this.representationsParSpectacle = spectacles
       .map(representationsDe)
@@ -211,6 +235,29 @@ export class VolunteerScheduler {
 
     // 5. Génération des résultats
     return this.generateResults()
+  }
+
+  /**
+   * Un instant, lu dans le fuseau de l'événement.
+   *
+   * Le seul endroit du moteur qui convertit : toute heure et toute journée passent par ici, pour
+   * qu'aucun calcul ne puisse retomber par inadvertance sur le fuseau du processus.
+   */
+  private local(iso: string): DateTime {
+    const instant = dt.fromISO(iso)
+    return this.fuseau ? instant.setZone(this.fuseau) : instant.toUTC()
+  }
+
+  /**
+   * Le début d'une journée, à partir d'une date NUE (`2026-08-01`).
+   *
+   * Distinct de `local` et il faut qu'il le soit : une date nue n'est pas un instant. La passer à
+   * `local` la faisait interpréter dans le fuseau du processus avant d'être convertie, si bien que
+   * « le 1er août » devenait le 31 juillet à 22 h pour un processus à Paris — et plus aucune
+   * journée ne correspondait à elle-même. Le plafond quotidien ne mordait alors jamais.
+   */
+  private jourLocal(dateNue: string): DateTime {
+    return dt.fromISO(dateNue, { zone: this.fuseau ?? 'utc' }).startOf('day')
   }
 
   /**
@@ -289,6 +336,9 @@ export class VolunteerScheduler {
       }
     }
 
+    // L'équipe a-t-elle déjà l'effectif qu'elle demandait ?
+    score += this.ecartEffectifEquipe(volunteer, slot)
+
     // Préférences horaires
     const timePreferenceBonus = this.calculateTimePreferenceBonus(volunteer, slot, availability)
 
@@ -331,17 +381,28 @@ export class VolunteerScheduler {
       }
     }
 
-    // Contraintes d'heures par jour
+    /**
+     * Contraintes d'heures par jour.
+     *
+     * Les heures supplémentaires desserrent le plafond journalier, elles ne le suppriment pas :
+     * `maxOvertimeHours` borne le dépassement ici comme il borne le total. Sans cette borne, une
+     * journée pouvait s'allonger indéfiniment tant que le total tenait — le plafond quotidien
+     * n'était plus qu'une pénalité de 80 points, que quelques bonus suffisaient à effacer.
+     */
     if (!this.checkDailyHoursConstraints(volunteer.user.id, slot)) {
       if (!this.constraints.allowOvertime) {
         return -1000 // Impossible si pas d'heures sup autorisées
-      } else {
-        score -= 80 // Forte pénalité si heures sup autorisées
       }
+
+      if (!this.checkDailyHoursConstraints(volunteer.user.id, slot, true)) {
+        return -1000 // Le dépassement lui-même a une limite
+      }
+
+      score -= 80 // Forte pénalité si heures sup autorisées
     }
 
     // Vérification des heures minimum par jour
-    const slotDate = dt.fromISO(slot.start).toISODate()
+    const slotDate = this.local(slot.start).toISODate()
     const currentDailyHours = this.getVolunteerHoursForDate(volunteer.user.id, slotDate!)
     const minHoursPerDay = this.constraints.minHoursPerDay || 1
 
@@ -364,6 +425,42 @@ export class VolunteerScheduler {
     }
 
     return Math.max(score, -1000)
+  }
+
+  /**
+   * L'écart entre l'effectif souhaité par l'équipe du créneau et ceux qu'on y a déjà placés.
+   *
+   * Une pénalité, jamais un refus : `maxVolunteers` dit ce qu'il faudrait à l'équipe, pas ce
+   * qu'elle accepte. En faire une contrainte dure laisserait des créneaux vides à côté de gens
+   * disponibles, pour respecter un chiffre qui n'est qu'un objectif.
+   *
+   * Rend 0 dès que l'équipe ne déclare rien, ce qui est le cas le plus courant.
+   */
+  private ecartEffectifEquipe(volunteer: VolunteerApplication, slot: TimeSlot): number {
+    if (!slot.teamId) return 0
+
+    const equipe = this.teams.find((team) => team.id === slot.teamId)
+    const souhaite = equipe?.maxVolunteers
+    if (!souhaite || souhaite <= 0) return 0
+
+    // Les personnes distinctes déjà placées dans cette équipe par ce calcul, plus celles que
+    // les organisateurs y avaient mises. Un bénévole qui tient trois créneaux de la même équipe
+    // ne compte qu'une fois : c'est un effectif, pas un nombre d'affectations.
+    const membres = new Set<number>(
+      this.assignments
+        .filter((assignment) => assignment.teamId === slot.teamId)
+        .map((assignment) => assignment.volunteerId)
+    )
+
+    for (const candidat of this.volunteers) {
+      if (candidat.assignedTeams?.includes(slot.teamId)) membres.add(candidat.user.id)
+    }
+
+    // Celui qu'on envisage compte déjà : la question est « faut-il en ajouter un de plus ? »
+    if (membres.has(volunteer.user.id)) return 0
+
+    const depassement = membres.size + 1 - souhaite
+    return depassement > 0 ? -Math.min(depassement * 8, 40) : 0
   }
 
   /**
@@ -402,7 +499,6 @@ export class VolunteerScheduler {
         setup: true,
         event: true,
         teardown: true,
-        unavailableSlots: [],
       }
     }
   }
@@ -415,10 +511,10 @@ export class VolunteerScheduler {
     slot: TimeSlot,
     availability: any
   ): boolean {
-    // Vérifier les créneaux indisponibles spécifiques
-    if (availability.unavailableSlots?.includes(slot.id)) {
-      return false
-    }
+    // Une branche traitait ici des `unavailableSlots` — des indisponibilités ponctuelles que
+    // l'appelant n'a jamais fournies, et que le site ne gérera pas : un bénévole les dira de vive
+    // voix au responsable, qui retirera les créneaux s'il le juge nécessaire (décision du
+    // 14/09/2026). Elle est retirée plutôt que laissée à suggérer une capacité qui n'existe pas.
 
     // Vérifier les disponibilités générales (montage, événement, démontage)
     const slotDate = dt.fromISO(slot.start)
@@ -473,7 +569,7 @@ export class VolunteerScheduler {
       return 0 // Pas de préférences définies
     }
 
-    const slotStart = dt.fromISO(slot.start)
+    const slotStart = this.local(slot.start)
     const slotHour = slotStart.hour
 
     // Mappage des créneaux horaires vers les heures
@@ -553,7 +649,7 @@ export class VolunteerScheduler {
   private heuresExistantes(volunteerId: number, date?: string): number {
     return this.affectationsExistantes
       .filter((affectation) => affectation.volunteerId === volunteerId)
-      .filter((affectation) => !date || dt.fromISO(affectation.start).toISODate() === date)
+      .filter((affectation) => !date || this.local(affectation.start).toISODate() === date)
       .reduce((total, affectation) => {
         const duree = dt.fromISO(affectation.end).diff(dt.fromISO(affectation.start), 'hours').hours
         return total + (Number.isFinite(duree) ? duree : 0)
@@ -573,7 +669,7 @@ export class VolunteerScheduler {
    * Calcule les heures d'un bénévole pour une date donnée
    */
   private getVolunteerHoursForDate(volunteerId: number, date: string): number {
-    const targetDate = dt.fromISO(date).startOf('day')
+    const targetDate = this.jourLocal(date)
 
     const posees = this.assignments
       .filter((assignment) => assignment.volunteerId === volunteerId)
@@ -581,7 +677,7 @@ export class VolunteerScheduler {
         const slot = this.timeSlots.find((s) => s.id === assignment.slotId)
         if (!slot) return total
 
-        const slotDate = dt.fromISO(slot.start).startOf('day')
+        const slotDate = this.local(slot.start).startOf('day')
         if (slotDate.equals(targetDate)) {
           return total + this.getSlotDuration(slot)
         }
@@ -595,12 +691,19 @@ export class VolunteerScheduler {
   /**
    * Vérifie si l'ajout d'un créneau respecte les contraintes d'heures par jour
    */
-  private checkDailyHoursConstraints(volunteerId: number, slot: TimeSlot): boolean {
-    const slotDate = dt.fromISO(slot.start).toISODate()
+  private checkDailyHoursConstraints(
+    volunteerId: number,
+    slot: TimeSlot,
+    /** Compte les heures supplémentaires dans le plafond : la limite au-delà de la limite. */
+    avecHeuresSup = false
+  ): boolean {
+    const slotDate = this.local(slot.start).toISODate()
     const currentDailyHours = this.getVolunteerHoursForDate(volunteerId, slotDate!)
     const slotDuration = this.getSlotDuration(slot)
 
-    const maxHoursPerDay = this.constraints.maxHoursPerDay || 8
+    const maxHoursPerDay =
+      (this.constraints.maxHoursPerDay || 8) +
+      (avecHeuresSup ? this.constraints.maxOvertimeHours || 2 : 0)
 
     // Vérifie si l'ajout de ce créneau dépasserait la limite quotidienne
     return currentDailyHours + slotDuration <= maxHoursPerDay

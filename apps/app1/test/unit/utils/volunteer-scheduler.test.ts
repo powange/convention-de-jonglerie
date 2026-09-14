@@ -440,3 +440,170 @@ describe('VolunteerScheduler', () => {
     })
   })
 })
+
+/**
+ * Les heures et les journées du moteur se lisent dans le fuseau de l'ÉVÉNEMENT, pas dans celui du
+ * processus — UTC en conteneur. L'écart n'est pas théorique : sur une convention à Paris en été,
+ * deux heures de décalage suffisent à faire basculer un créneau de soirée dans l'après-midi, et à
+ * le rattacher au jour précédent pour le plafond journalier.
+ */
+describe('fuseau horaire de l’événement', () => {
+  const PARIS = 'Europe/Paris'
+
+  const benevoleAvecPreference = (preferences: string[]) => ({
+    ...benevole({ event: true }),
+    availability: JSON.stringify({
+      setup: false,
+      event: true,
+      teardown: false,
+      timePreferences: preferences,
+    }),
+  })
+
+  it('lit l’heure d’un créneau dans le fuseau de l’événement', () => {
+    // 20 h 30 UTC = 22 h 30 à Paris en août : c'est une soirée, pas une fin d'après-midi.
+    const creneauSoiree = creneau({
+      id: '1',
+      start: '2026-08-01T19:30:00.000Z',
+      end: '2026-08-01T21:00:00.000Z',
+    })
+
+    const avecFuseau = new VolunteerScheduler(
+      [benevoleAvecPreference(['evening'])],
+      [creneauSoiree],
+      [],
+      { respectStrictTimePreferences: true },
+      BORNES,
+      [],
+      [],
+      PARIS
+    ).assignVolunteers()
+
+    expect(avecFuseau.assignments).toHaveLength(1)
+  })
+
+  it('sans fuseau, le même créneau tombe dans la mauvaise plage', () => {
+    // Le comportement d'avant, conservé comme repli : 20 h 30 UTC est lu « late_afternoon ».
+    // C'est ce test qui dit ce que le fuseau change réellement.
+    const creneauSoiree = creneau({
+      id: '1',
+      start: '2026-08-01T19:30:00.000Z',
+      end: '2026-08-01T21:00:00.000Z',
+    })
+
+    const sansFuseau = new VolunteerScheduler(
+      [benevoleAvecPreference(['evening'])],
+      [creneauSoiree],
+      [],
+      { respectStrictTimePreferences: true },
+      BORNES
+    ).assignVolunteers()
+
+    expect(sansFuseau.assignments).toHaveLength(0)
+  })
+
+  it('rattache un créneau de nuit à la bonne journée pour le plafond quotidien', () => {
+    // 22 h 00 → 23 h 30 UTC le 1er, soit minuit → 1 h 30 le 2 à Paris. Avec un plafond de 2 h par
+    // jour, les deux créneaux tiennent : ils tombent des jours différents en heure locale.
+    const r = new VolunteerScheduler(
+      [benevole({ event: true })],
+      [
+        creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T17:30:00.000Z' }),
+        creneau({ id: '2', start: '2026-08-01T22:00:00.000Z', end: '2026-08-01T23:30:00.000Z' }),
+      ],
+      [],
+      { maxHoursPerDay: 2, maxHoursPerVolunteer: 12 },
+      { debut: '2026-08-01T14:00:00.000Z', fin: '2026-08-03T23:00:00.000Z' },
+      [],
+      [],
+      PARIS
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(2)
+  })
+})
+
+/**
+ * Les heures supplémentaires desserrent le plafond journalier ; elles ne le suppriment pas.
+ */
+describe('plafond journalier et heures supplémentaires', () => {
+  const troisCreneaux = [
+    creneau({ id: '1', start: '2026-08-01T14:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
+    creneau({ id: '2', start: '2026-08-01T17:00:00.000Z', end: '2026-08-01T20:00:00.000Z' }),
+    creneau({ id: '3', start: '2026-08-01T20:00:00.000Z', end: '2026-08-01T23:00:00.000Z' }),
+  ]
+
+  it('laisse dépasser le plafond du jour, mais pas au-delà des heures supplémentaires', () => {
+    // Le dépassement coûte 80 points, et le seuil de la seconde passe est à -50 : sans un peu de
+    // bonus, un créneau en heures supplémentaires n'est jamais retenu, borne ou pas. D'où ce
+    // bénévole expérimenté — la fragilité de ces seuils est le constat A1 de l'audit, pas celui-ci.
+    const experimente = {
+      ...benevole({ event: true }),
+      experience: 'bénévole en convention de jonglerie depuis dix ans',
+    }
+
+    const r = new VolunteerScheduler(
+      [experimente],
+      troisCreneaux,
+      [],
+      {
+        maxHoursPerDay: 3,
+        maxOvertimeHours: 3,
+        maxHoursPerVolunteer: 24,
+        allowOvertime: true,
+        prioritizeExperience: true,
+      },
+      BORNES
+    ).assignVolunteers()
+
+    // 3 h de plafond + 3 h d'heures sup : deux créneaux de 3 h tiennent, le troisième non.
+    expect(r.assignments).toHaveLength(2)
+  })
+
+  it('s’en tient au plafond quand les heures supplémentaires sont refusées', () => {
+    const r = new VolunteerScheduler(
+      [benevole({ event: true })],
+      troisCreneaux,
+      [],
+      { maxHoursPerDay: 3, maxHoursPerVolunteer: 24, allowOvertime: false },
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(1)
+  })
+})
+
+/**
+ * L'effectif déclaré par une équipe est un INDICATEUR, pas un plafond : la décision a été prise
+ * pour les statistiques d'équipe, et vaut ici. Le moteur en fait donc une préférence.
+ */
+describe('effectif souhaité d’une équipe', () => {
+  const EQUIPE_PETITE = [{ id: 'equipe-A', name: 'Équipe A', color: '#000', maxVolunteers: 1 }]
+
+  it('préfère pourvoir une équipe qui manque de monde', () => {
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      [
+        creneau({
+          id: '1',
+          start: '2026-08-01T15:00:00.000Z',
+          end: '2026-08-01T17:00:00.000Z',
+          teamId: 'equipe-A',
+        }),
+        creneau({
+          id: '2',
+          start: '2026-08-01T18:00:00.000Z',
+          end: '2026-08-01T20:00:00.000Z',
+          teamId: 'equipe-A',
+        }),
+      ],
+      EQUIPE_PETITE,
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    // Ne refuse pas : les deux créneaux restent pourvus, malgré un effectif souhaité de 1.
+    // Laisser un créneau vide à côté de gens disponibles pour respecter un objectif serait pire.
+    expect(r.assignments).toHaveLength(2)
+  })
+})

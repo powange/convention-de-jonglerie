@@ -7,8 +7,15 @@
  * manifestement faux, sur une donnée que le bénévole avait lui-même renseignée.
  *
  * ⚠️ Ce fichier est lu par le SERVEUR (le planificateur) et vit dans `shared/` pour cette raison.
- * Il ne doit rien importer : il est aussi chargé tel quel par les tests unitaires, hors Nuxt.
+ * Il n'importe que Luxon — une dépendance ordinaire, pas un auto-import Nuxt : les tests unitaires
+ * le chargent tel quel, hors Nuxt, et Luxon leur est disponible comme au serveur.
+ *
+ * Luxon plutôt qu'un calcul d'écart à la main, parce que ces instants sont LOCAUX à l'événement :
+ * « samedi matin » veut dire 8 h sur place, pas 8 h UTC. Les changements d'heure ne se rattrapent
+ * pas à coups de soustractions.
  */
+
+import { DateTime } from 'luxon'
 
 /**
  * Les moments de la journée que propose le formulaire, traduits en heures.
@@ -51,19 +58,26 @@ function instantDe(
   champ: string | null | undefined,
   heures: Record<string, number>,
   /** L'heure retenue quand le moment est absent ou inconnu : le bord le plus large de la journée. */
-  repli: number
+  repli: number,
+  /** Le fuseau de l'événement. Absent, on retombe sur UTC — un repli, pas une intention. */
+  fuseau: string | null | undefined
 ): number | null {
   if (!champ) return null
 
   const [partieDate, moment] = champ.split('_')
   if (!partieDate) return null
 
-  const base = new Date(`${partieDate}T00:00:00.000Z`).getTime()
-  if (Number.isNaN(base)) return null
+  const jour = DateTime.fromISO(partieDate, { zone: fuseau || 'utc' }).startOf('day')
+  if (!jour.isValid) return null
 
   const heure = moment && moment in heures ? heures[moment]! : repli
 
-  return base + heure * 3_600_000
+  // 24 h n'existe pas comme heure du jour : c'est minuit du lendemain. `set` plutôt que `plus`
+  // pour que l'heure reste celle qu'on lit sur une horloge, y compris un jour de changement
+  // d'heure.
+  const instant = heure >= 24 ? jour.plus({ days: 1 }).startOf('day') : jour.set({ hour: heure })
+
+  return instant.toMillis()
 }
 
 /**
@@ -71,15 +85,18 @@ function instantDe(
  *
  * Les deux bornes sont indépendantes : un bénévole peut n'avoir renseigné que son arrivée.
  */
-export function fenetreDe(volunteer: {
-  arrivalDateTime?: string | null
-  departureDateTime?: string | null
-}): FenetrePresence {
+export function fenetreDe(
+  volunteer: {
+    arrivalDateTime?: string | null
+    departureDateTime?: string | null
+  },
+  fuseau?: string | null
+): FenetrePresence {
   return {
     // Moment inconnu : on ouvre la journée en grand des deux côtés — minuit à l'arrivée, minuit
     // au départ. Une donnée qu'on ne comprend pas ne doit rien interdire.
-    arrivee: instantDe(volunteer.arrivalDateTime, HEURE_ARRIVEE, 0),
-    depart: instantDe(volunteer.departureDateTime, HEURE_DEPART, 24),
+    arrivee: instantDe(volunteer.arrivalDateTime, HEURE_ARRIVEE, 0, fuseau),
+    depart: instantDe(volunteer.departureDateTime, HEURE_DEPART, 24, fuseau),
   }
 }
 
