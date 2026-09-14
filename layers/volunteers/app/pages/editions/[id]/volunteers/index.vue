@@ -75,6 +75,23 @@
           />
         </div>
 
+        <!-- Bénévole volant : son planning est vide par construction, et un écran vide se lit
+             comme un oubli. Le message dit son rôle et reste affiché même quand on lui pose des
+             créneaux de renfort, qui apparaissent alors dans la carte du planning juste dessous. -->
+        <UAlert
+          v-if="
+            authStore.isAuthenticated &&
+            myApplication?.status === 'ACCEPTED' &&
+            volunteersMode === 'INTERNAL' &&
+            myApplication?.estVolant
+          "
+          color="info"
+          variant="soft"
+          icon="i-heroicons-bolt"
+          :title="t('volunteers.floating_volunteer_title')"
+          :description="t('volunteers.floating_volunteer_hint')"
+        />
+
         <!-- Planning Card - Visible seulement pour les bénévoles acceptés, planning publié -->
         <EditionVolunteerPlanningCard
           v-if="

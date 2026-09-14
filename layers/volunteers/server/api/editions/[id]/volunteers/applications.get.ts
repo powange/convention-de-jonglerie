@@ -295,6 +295,9 @@ export default wrapApiHandler(
               description: true,
               color: true,
               maxVolunteers: true,
+              // Sans ce champ, l'écran ne peut pas savoir qu'un bénévole n'est que volant — et
+              // les statistiques le compteraient comme un bénévole qu'on a oublié de placer.
+              isFloatingTeam: true,
             },
           },
         },

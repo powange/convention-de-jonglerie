@@ -1771,7 +1771,18 @@ const columns = computed((): TableColumn<any>[] => [
                     }
                   : undefined,
               },
-              () => assignment.team?.name || assignment.teamId
+              // Une équipe volante porte un éclair : ses membres ne sont pas tenus au volume
+              // d'heures des autres, et rien d'autre dans ce tableau ne le dirait.
+              () =>
+                assignment.team?.isFloatingTeam
+                  ? [
+                      h(resolveComponent('UIcon'), {
+                        name: 'i-heroicons-bolt',
+                        class: 'w-3 h-3 mr-1 inline',
+                      }),
+                      assignment.team?.name || assignment.teamId,
+                    ]
+                  : assignment.team?.name || assignment.teamId
             )
           )
         )

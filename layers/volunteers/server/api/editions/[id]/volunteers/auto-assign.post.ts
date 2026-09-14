@@ -9,6 +9,7 @@ import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { VolunteerScheduler, type Assignment } from '#server/utils/volunteer-scheduler'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
 
 // Types pour les données récupérées de la base de données
 type VolunteerWithTeamAssignments = Prisma.EditionVolunteerApplicationGetPayload<{
@@ -136,16 +137,32 @@ export default wrapApiHandler(
     const conservee = (assignment: { source?: string }) =>
       mode === 'keep-all' || (mode === 'keep-manual' && assignment.source !== 'AUTO')
 
+    /**
+     * Les volants ne sont pas planifiables, et c'est tout leur objet.
+     *
+     * Les laisser entrer ici leur attribuerait des créneaux pour atteindre le minimum d'heures
+     * demandé à chacun — exactement l'inverse de ce qu'on attend d'eux. Le filtre est posé AVANT
+     * tout le reste : un volant ne doit apparaître ni dans les candidats, ni dans les moyennes
+     * que l'algorithme calcule pour équilibrer les charges.
+     *
+     * ⚠️ Seuls ceux qui ne sont QUE volants sortent. Un bénévole à la fois en cuisine et volant
+     * reste à planifier pour sa cuisine. Voir `benevoles-volants`.
+     */
+    const benevolesPlanifiables = volunteers.filter(
+      (volunteer: VolunteerWithTeamAssignments) =>
+        !estHorsDesComptes(volunteer.teamAssignments.map((assignation) => assignation.team))
+    )
+
     // Les bénévoles dont une affectation subsiste occupent déjà leur place : les proposer à
     // nouveau les ferait compter deux fois.
-    let availableVolunteers = volunteers
+    let availableVolunteers = benevolesPlanifiables
     if (mode !== 'replace-all') {
       const assignedVolunteerIds = new Set(
         timeSlots.flatMap((slot: TimeSlotWithAssignments) =>
           slot.assignments.filter(conservee).map((assignment) => assignment.user.id)
         )
       )
-      availableVolunteers = volunteers.filter(
+      availableVolunteers = benevolesPlanifiables.filter(
         (volunteer: VolunteerWithTeamAssignments) => !assignedVolunteerIds.has(volunteer.user.id)
       )
     }

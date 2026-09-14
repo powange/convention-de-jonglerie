@@ -37,6 +37,12 @@
                 <UIcon name="i-heroicons-eye-slash" class="w-3.5 h-3.5 mr-1" />
                 {{ t('volunteers.team_hidden') }}
               </UBadge>
+              <!-- Une équipe volante dispense ses membres du décompte d'heures : c'est trop
+                   important pour n'être visible qu'en ouvrant le formulaire. -->
+              <UBadge v-if="team.isFloatingTeam" color="info" variant="soft" size="sm">
+                <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 mr-1" />
+                {{ t('volunteers.floating_team_badge') }}
+              </UBadge>
             </div>
             <div @click.stop>
               <UDropdownMenu
@@ -247,6 +253,17 @@
                 </template>
               </USwitch>
             </UFormField>
+
+            <!-- Équipe de bénévoles volants -->
+            <UFormField name="isFloatingTeam" :label="t('volunteers.floating_team')">
+              <USwitch v-model="teamFormState.isFloatingTeam">
+                <template #label>
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('volunteers.floating_team_hint') }}
+                  </span>
+                </template>
+              </USwitch>
+            </UFormField>
           </UForm>
         </div>
       </template>
@@ -329,6 +346,7 @@ const teamSchema = z.object({
   isRequired: z.boolean().optional(),
   isAccessControlTeam: z.boolean().optional(),
   isMealValidationTeam: z.boolean().optional(),
+  isFloatingTeam: z.boolean().optional(),
   isVisibleToVolunteers: z.boolean().optional(),
 })
 
@@ -341,6 +359,7 @@ const teamFormState = ref({
   isRequired: false,
   isAccessControlTeam: false,
   isMealValidationTeam: false,
+  isFloatingTeam: false,
   isVisibleToVolunteers: true,
 })
 
@@ -384,6 +403,7 @@ const openCreateTeamModal = () => {
     isRequired: false,
     isAccessControlTeam: false,
     isMealValidationTeam: false,
+    isFloatingTeam: false,
     isVisibleToVolunteers: true,
   }
   teamModalOpen.value = true
@@ -399,6 +419,7 @@ const openEditTeamModal = (team: VolunteerTeam) => {
     isRequired: team.isRequired || false,
     isAccessControlTeam: team.isAccessControlTeam || false,
     isMealValidationTeam: team.isMealValidationTeam || false,
+    isFloatingTeam: team.isFloatingTeam || false,
     isVisibleToVolunteers: team.isVisibleToVolunteers ?? true,
   }
   teamModalOpen.value = true
@@ -421,6 +442,7 @@ const onTeamSubmit = async () => {
       isRequired: teamFormState.value.isRequired,
       isAccessControlTeam: teamFormState.value.isAccessControlTeam,
       isMealValidationTeam: teamFormState.value.isMealValidationTeam,
+      isFloatingTeam: teamFormState.value.isFloatingTeam,
       isVisibleToVolunteers: teamFormState.value.isVisibleToVolunteers,
     }
 
