@@ -18,7 +18,6 @@ export interface VolunteerApplication {
     prenom?: string | null
   }
   availability: string // JSON string avec les préférences
-  experience: string
   motivation: string
   phone?: string | null
   teamPreferences?: any[]
@@ -132,7 +131,6 @@ export interface SchedulingConstraints {
   maxHoursPerDay?: number
   minHoursPerDay?: number
   balanceTeams?: boolean
-  prioritizeExperience?: boolean
   respectStrictAvailability?: boolean
   respectStrictTeamPreferences?: boolean
   respectStrictAssignedTeams?: boolean
@@ -156,8 +154,26 @@ export interface SchedulingResult {
   stats: {
     totalAssignments: number
     averageHoursPerVolunteer: number
+    /**
+     * ⚠️ Conservé pour ne pas casser un appel existant, mais il ne mesure rien d'observable :
+     * c'était la moyenne des `confidence`, elles-mêmes dérivées du score. La métrique disait à
+     * quel point l'algorithme était content de lui, pas à quel point les bénévoles étaient
+     * servis — « 78 % de satisfaction » ne correspondait à aucune quantité constatable.
+     *
+     * Les indicateurs ci-dessous le remplacent, et ils se vérifient un par un sur le planning.
+     */
     satisfactionRate: number
     balanceScore: number
+    /** Part des préférences d'équipe honorées, parmi les affectations à une équipe. */
+    preferencesEquipeHonorees: number
+    /** Part des affectations qui tombent dans une plage horaire souhaitée. */
+    creneauxDansLesHorairesSouhaites: number
+    /** Part des bénévoles qui atteignent le minimum d'heures demandé. */
+    benevolesAuMinimumDHeures: number
+    /** Part des créneaux entièrement pourvus. */
+    creneauxComplets: number
+    /** Écart-type des heures, en heures : zéro signifie que tout le monde en fait autant. */
+    ecartTypeDesHeures: number
   }
   warnings: MessageResultat[]
   recommendations: MessageResultat[]
@@ -173,6 +189,117 @@ export interface SchedulingResult {
     parCreneau: { slotId: string; motifs: { motif: MotifRefus; candidats: number }[] }[]
   }
 }
+
+/**
+ * Les poids et les seuils du calcul, rassemblés.
+ *
+ * Ils étaient une vingtaine, disséminés dans le corps de `calculateAssignmentScore` sous forme de
+ * nombres nus commentés « bonus urgence » ou « forte pénalité ». Impossible de savoir, en les
+ * lisant un par un, si l'ensemble était cohérent — et il ne l'était pas :
+ *
+ * ⚠️ **La pénalité de dépassement journalier valait −80 quand le seuil d'acceptation est à −50.**
+ * Un créneau en heures supplémentaires partait donc à −50 exactement (20 de disponibilité + 10
+ * d'urgence − 80), soit sous un seuil strict : il n'était JAMAIS retenu. Le réglage
+ * `allowOvertime` promettait un dépassement encadré et ne produisait rien. Il fallait qu'un
+ * bénévole cumule des bonus par ailleurs pour seulement atteindre le cas que le réglage prétend
+ * autoriser.
+ *
+ * La pénalité est ramenée à une valeur qui pèse sans interdire : une journée déjà pleine devient
+ * le dernier choix, pas un choix impossible. Les impossibilités, elles, sont traitées ailleurs —
+ * par `motifBloquant`, qui rend un motif nommé plutôt qu'un nombre.
+ */
+const POIDS = {
+  /** Le bénévole est disponible sur la phase du créneau. */
+  DISPONIBLE: 20,
+  /** Il ne l'est pas, mais le mode strict est désactivé : on peut, on préfère éviter. */
+  INDISPONIBLE_TOLERE: -50,
+  /** Le créneau relève d'une équipe qu'il a demandée. */
+  EQUIPE_SOUHAITEE: 15,
+  /** Le créneau relève d'une équipe où un organisateur l'a placé. */
+  EQUIPE_ASSIGNEE: 15,
+  /** Le créneau tombe dans une plage horaire souhaitée, au prorata du recouvrement. */
+  PLAGE_HORAIRE: 12,
+  /** Son total d'heures dépasserait le plafond, heures supplémentaires refusées. */
+  DEPASSEMENT_TOTAL: -100,
+  /** Il dépasserait même la limite des heures supplémentaires : hors de question. */
+  DEPASSEMENT_TOTAL_EXCESSIF: -200,
+  /** Dépassement du total, dans la limite des heures supplémentaires autorisées. */
+  DEPASSEMENT_TOTAL_TOLERE: -20,
+  /**
+   * Dépassement du plafond JOURNALIER, dans la limite autorisée.
+   *
+   * Valait −80, ce qui plaçait le créneau sous le seuil d'acceptation et rendait `allowOvertime`
+   * décoratif. À −25, une journée déjà pleine reste le dernier choix sans devenir impossible.
+   */
+  DEPASSEMENT_JOURNALIER_TOLERE: -25,
+  /** Première heure de la journée pour ce bénévole : elle vaut mieux qu'une de plus ailleurs. */
+  AMORCE_DE_JOURNEE: 5,
+  /** Le créneau touche à sa fin de remplissage : mieux vaut le pourvoir qu'en entamer un autre. */
+  URGENCE: 10,
+  /** Écart à la moyenne d'heures, par heure d'écart — en dessous, puis au-dessus. */
+  SOUS_LA_MOYENNE: 1.5,
+  AU_DESSUS_DE_LA_MOYENNE: -2,
+  /** Effectif d'équipe dépassé, par personne en trop, et le plafond de cette pénalité. */
+  EFFECTIF_DEPASSE: -8,
+  EFFECTIF_DEPASSE_MAX: -40,
+  /** Le plancher du score : au-delà, c'est une impossibilité, et elle porte un motif. */
+  IMPOSSIBLE: -1000,
+} as const
+
+/**
+ * À partir de quel score une affectation est retenue, et par quelle passe.
+ *
+ * La première ne prend que les évidences, la seconde remplit ce qui reste. L'écart entre les deux
+ * est ce qui fait qu'un bénévole idéal pour un créneau n'est pas consommé par un créneau
+ * quelconque rencontré plus tôt.
+ */
+/**
+ * Les plages horaires que le formulaire propose, en heures locales de l'événement.
+ *
+ * `late_evening` franchit minuit, et c'est la seule : son `fin` plus petit que son `debut` le dit,
+ * et le calcul de recouvrement le traite comme tel plutôt que par un cas particulier.
+ */
+const PLAGES_HORAIRES = {
+  early_morning: { debut: 6, fin: 9 },
+  morning: { debut: 9, fin: 12 },
+  lunch: { debut: 12, fin: 14 },
+  early_afternoon: { debut: 14, fin: 17 },
+  late_afternoon: { debut: 17, fin: 20 },
+  evening: { debut: 20, fin: 23 },
+  late_evening: { debut: 23, fin: 2 },
+  night: { debut: 2, fin: 6 },
+} as const
+
+const SEUILS = {
+  EVIDENCE: 50,
+  REMPLISSAGE: -50,
+  /**
+   * En mode strict, quelle part du créneau doit tomber dans les plages souhaitées.
+   *
+   * La moitié, et non la totalité : quelqu'un qui a coché « matin » n'a pas dit qu'il refusait un
+   * créneau de 10 h à 13 h. Exiger 100 % rendrait le mode strict inapplicable dès qu'un créneau
+   * chevauche deux plages, ce qui est le cas le plus courant.
+   */
+  RECOUVREMENT_MINIMAL: 0.5,
+} as const
+
+/** Ce qui borne le rééquilibrage : jusqu'où insister, et à partir de quand un écart mérite qu'on bouge. */
+const LIMITES = {
+  /** Assez pour converger sur une édition réelle, assez peu pour ne pas tourner en rond. */
+  PASSES_DE_REEQUILIBRAGE: 20,
+  /** L'écart à la moyenne au-delà duquel un bénévole est jugé sur- ou sous-chargé, en heures. */
+  ECART_DE_CHARGE: 2,
+  /** En deçà, transférer ne rééquilibre rien et risque d'osciller d'une passe à l'autre. */
+  ECART_UTILE: 3,
+  /**
+   * Combien de créneaux vides on tente de débloquer par déplacement.
+   *
+   * Chaque tentative parcourt les affectations et les bénévoles : la borne garde ce rattrapage
+   * proportionné au calcul qu'il complète, sur une édition où beaucoup de créneaux resteraient
+   * vides faute de monde — cas où aucun déplacement n'y changerait rien.
+   */
+  CRENEAUX_A_DEBLOQUER: 50,
+} as const
 
 export class VolunteerScheduler {
   private volunteers: VolunteerApplication[] = []
@@ -291,7 +418,6 @@ export class VolunteerScheduler {
       maxHoursPerDay: 8,
       minHoursPerDay: 1,
       balanceTeams: true,
-      prioritizeExperience: true,
       respectStrictAvailability: true,
       allowOvertime: false,
       maxOvertimeHours: 2,
@@ -320,6 +446,10 @@ export class VolunteerScheduler {
     if (this.constraints.balanceTeams) {
       this.balanceAssignments()
     }
+
+    // 5. Quatrième passe : débloquer les créneaux qu'un ordre de parcours malheureux a laissés
+    //    vides, en déplaçant quelqu'un d'autre.
+    this.comblerLesCreneauxVides()
 
     // 5. Génération des résultats
     return this.generateResults()
@@ -375,18 +505,7 @@ export class VolunteerScheduler {
    */
   private enregistrerAffectation(assignment: Assignment) {
     this.assignments.push(assignment)
-
-    const slot = this.creneauParId.get(assignment.slotId)
-    if (!slot) return
-
-    const duree = this.dureeParCreneau.get(slot.id) ?? 0
-    this.ajouterHeures(assignment.volunteerId, this.jourParCreneau.get(slot.id) ?? '', duree)
-    this.ajouterCreneauTenu(assignment.volunteerId, {
-      debut: new Date(slot.start).getTime(),
-      fin: new Date(slot.end).getTime(),
-      slotId: slot.id,
-    })
-    this.totalHeuresPosees += duree
+    this.enregistrerAffectationSansAjout(assignment)
   }
 
   /** Retire une affectation d'un bénévole — le pendant exact, pour le rééquilibrage. */
@@ -465,7 +584,7 @@ export class VolunteerScheduler {
       this.constraints.respectStrictTimePreferences &&
       Array.isArray(availability.timePreferences) &&
       availability.timePreferences.length > 0 &&
-      this.calculateTimePreferenceBonus(volunteer, slot, availability) === 0
+      this.recouvrementDesPreferences(slot, availability) < SEUILS.RECOUVREMENT_MINIMAL
     ) {
       return 'hors-plage-horaire'
     }
@@ -484,6 +603,106 @@ export class VolunteerScheduler {
   }
 
   /**
+   * Comble les créneaux restés vides en déplaçant quelqu'un d'autre.
+   *
+   * L'algorithme est glouton : il sert le meilleur candidat du moment, créneau après créneau, et
+   * ne revient jamais sur ce qu'il a posé. Le cas qui le piège est net, et il se reproduit :
+   *
+   * > Un bénévole accepte l'équipe « banale » et l'équipe « pointue ». Il est le SEUL à accepter
+   * > la pointue. Le créneau banal est rencontré en premier, il le prend, son plafond d'heures est
+   * > atteint — et le créneau pointu reste vide, alors qu'un autre bénévole aurait très bien pu
+   * > tenir le banal.
+   *
+   * Une permutation ne corrige pas cela : il n'y a qu'une affectation à échanger. Ce qu'il faut,
+   * c'est un DÉPLACEMENT — quelqu'un d'autre reprend le créneau banal, ce qui libère celui qui
+   * seul peut tenir le pointu.
+   *
+   * ⚠️ Mesuré : une phase de permutations classique n'apportait rien sur un jeu réaliste
+   * (mêmes préférences honorées, mêmes créneaux pourvus) tout en coûtant quarante-huit secondes
+   * sur une grosse édition. Elle a été écartée au profit de celle-ci, qui corrige un défaut
+   * constaté plutôt qu'un défaut supposé.
+   */
+  private comblerLesCreneauxVides(): void {
+    const vides = this.timeSlots.filter((slot) => slot.assignedVolunteers < slot.maxVolunteers)
+    if (vides.length === 0) return
+
+    for (const vide of vides.slice(0, LIMITES.CRENEAUX_A_DEBLOQUER)) {
+      // Qui pourrait tenir ce créneau s'il était libéré d'un autre ? On ne s'intéresse qu'à ceux
+      // qui tiennent déjà quelque chose : les autres ont déjà été proposés et écartés.
+      const aDeplacer = this.assignments.find((assignment) => {
+        const benevole = this.volunteers.find((v) => v.user.id === assignment.volunteerId)
+        const creneauTenu = this.creneauParId.get(assignment.slotId)
+        if (!benevole || !creneauTenu || creneauTenu.id === vide.id) return false
+
+        // On évalue dans l'état où il aurait rendu son créneau.
+        this.retirerAffectation(assignment)
+        const peutPrendreLeVide =
+          !this.motifBloquant(benevole, vide, this.parseAvailability(benevole.availability)) &&
+          this.calculateAssignmentScore(benevole, vide) > SEUILS.REMPLISSAGE
+
+        // Et quelqu'un d'autre doit pouvoir reprendre ce qu'il rend, sinon on déshabille Pierre.
+        const remplacant = peutPrendreLeVide
+          ? this.volunteers.find(
+              (autre) =>
+                autre.user.id !== benevole.user.id &&
+                !this.motifBloquant(
+                  autre,
+                  creneauTenu,
+                  this.parseAvailability(autre.availability)
+                ) &&
+                this.calculateAssignmentScore(autre, creneauTenu) > SEUILS.REMPLISSAGE
+            )
+          : undefined
+
+        this.enregistrerAffectationSansAjout(assignment)
+        if (!remplacant) return false
+
+        // Le déplacement vaut la peine : on le fait ici, et on arrête de chercher pour ce créneau.
+        this.retirerAffectation(assignment)
+        assignment.volunteerId = remplacant.user.id
+        const scoreRemplacant = this.calculateAssignmentScore(remplacant, creneauTenu)
+        assignment.score = scoreRemplacant
+        assignment.confidence = this.calculateConfidence(scoreRemplacant)
+        this.enregistrerAffectationSansAjout(assignment)
+
+        const scoreLibere = this.calculateAssignmentScore(benevole, vide)
+        this.enregistrerAffectation({
+          volunteerId: benevole.user.id,
+          slotId: vide.id,
+          teamId: vide.teamId,
+          score: scoreLibere,
+          confidence: this.calculateConfidence(scoreLibere),
+        })
+        vide.assignedVolunteers++
+
+        return true
+      })
+
+      if (!aDeplacer) continue
+    }
+  }
+
+  /**
+   * Remet une affectation dans les compteurs sans la rajouter à la liste — elle y est déjà.
+   *
+   * `retirerAffectation` ne retire que des compteurs, pas du tableau : c'est ce qui permet
+   * d'évaluer une permutation puis de revenir en arrière sans rien perdre.
+   */
+  private enregistrerAffectationSansAjout(assignment: Assignment) {
+    const slot = this.creneauParId.get(assignment.slotId)
+    if (!slot) return
+
+    const duree = this.dureeParCreneau.get(slot.id) ?? 0
+    this.ajouterHeures(assignment.volunteerId, this.jourParCreneau.get(slot.id) ?? '', duree)
+    this.ajouterCreneauTenu(assignment.volunteerId, {
+      debut: new Date(slot.start).getTime(),
+      fin: new Date(slot.end).getTime(),
+      slotId: slot.id,
+    })
+    this.totalHeuresPosees += duree
+  }
+
+  /**
    * Calcule le score d'assignation pour un bénévole et un créneau
    */
   private calculateAssignmentScore(volunteer: VolunteerApplication, slot: TimeSlot): number {
@@ -495,13 +714,13 @@ export class VolunteerScheduler {
 
     // Les impossibilités sont relevées ensemble, et nommées : le diagnostic lit la même méthode.
     if (this.motifBloquant(volunteer, slot, availability)) {
-      return -1000
+      return POIDS.IMPOSSIBLE
     }
 
     if (!isAvailable) {
-      score -= 50 // Pénalité forte, quand on ne respecte pas strictement les disponibilités
+      score += POIDS.INDISPONIBLE_TOLERE
     } else {
-      score += 20 // Bonus disponibilité
+      score += POIDS.DISPONIBLE
     }
 
     // Préférence d'équipe
@@ -513,7 +732,7 @@ export class VolunteerScheduler {
       const hasTeamPreference = volunteer.teamPreferences?.some((pref) => pref === slot.teamId)
 
       if (hasTeamPreference) {
-        score += 15 // Bonus si l'équipe correspond aux préférences
+        score += POIDS.EQUIPE_SOUHAITEE
       }
 
       // Équipe déjà assignée par les organisateurs. Le pendant des préférences, mais du côté
@@ -524,7 +743,7 @@ export class VolunteerScheduler {
       )
 
       if (estDansEquipeAssignee) {
-        score += 15
+        score += POIDS.EQUIPE_ASSIGNEE
       }
     }
 
@@ -536,12 +755,6 @@ export class VolunteerScheduler {
 
     score += timePreferenceBonus
 
-    // Expérience et compétences
-    if (this.constraints.prioritizeExperience) {
-      const experienceBonus = this.calculateExperienceBonus(volunteer)
-      score += experienceBonus
-    }
-
     // Charge de travail actuelle
     const currentHours = this.getCurrentVolunteerHours(volunteer.user.id)
     const slotDuration = this.getSlotDuration(slot)
@@ -549,14 +762,14 @@ export class VolunteerScheduler {
 
     if (currentHours + slotDuration > maxHours) {
       if (!this.constraints.allowOvertime) {
-        score -= 100 // Forte pénalité
+        score += POIDS.DEPASSEMENT_TOTAL
       } else if (
         currentHours + slotDuration >
         maxHours + (this.constraints.maxOvertimeHours || 2)
       ) {
-        score -= 200 // Impossible en overtime
+        score += POIDS.DEPASSEMENT_TOTAL_EXCESSIF
       } else {
-        score -= 20 // Pénalité overtime
+        score += POIDS.DEPASSEMENT_TOTAL_TOLERE
       }
     }
 
@@ -571,7 +784,7 @@ export class VolunteerScheduler {
     if (!this.checkDailyHoursConstraints(volunteer.user.id, slot)) {
       // L'impossibilité est déjà traitée par `motifBloquant` ; reste la pénalité du dépassement
       // autorisé.
-      score -= 80
+      score += POIDS.DEPASSEMENT_JOURNALIER_TOLERE
     }
 
     // Vérification des heures minimum par jour
@@ -580,24 +793,24 @@ export class VolunteerScheduler {
     const minHoursPerDay = this.constraints.minHoursPerDay || 1
 
     if (currentDailyHours === 0 && slotDuration >= minHoursPerDay) {
-      score += 5 // Petit bonus pour respecter le minimum quotidien
+      score += POIDS.AMORCE_DE_JOURNEE
     }
 
     // Équilibrage des heures
     const avgHours = this.getAverageHours()
     if (currentHours > avgHours) {
-      score -= Math.floor((currentHours - avgHours) * 2)
+      score += Math.floor((currentHours - avgHours) * POIDS.AU_DESSUS_DE_LA_MOYENNE)
     } else if (currentHours < avgHours) {
-      score += Math.floor((avgHours - currentHours) * 1.5)
+      score += Math.floor((avgHours - currentHours) * POIDS.SOUS_LA_MOYENNE)
     }
 
     // Bonus si le créneau n'est pas encore complet
     const remainingSpots = slot.maxVolunteers - slot.assignedVolunteers
     if (remainingSpots <= 2) {
-      score += 10 // Bonus urgence
+      score += POIDS.URGENCE
     }
 
-    return Math.max(score, -1000)
+    return Math.max(score, POIDS.IMPOSSIBLE)
   }
 
   /**
@@ -633,7 +846,9 @@ export class VolunteerScheduler {
     if (membres.has(volunteer.user.id)) return 0
 
     const depassement = membres.size + 1 - souhaite
-    return depassement > 0 ? -Math.min(depassement * 8, 40) : 0
+    return depassement > 0
+      ? Math.max(depassement * POIDS.EFFECTIF_DEPASSE, POIDS.EFFECTIF_DEPASSE_MAX)
+      : 0
   }
 
   /**
@@ -738,69 +953,72 @@ export class VolunteerScheduler {
     slot: TimeSlot,
     availability: any
   ): number {
-    if (!availability.timePreferences || !Array.isArray(availability.timePreferences)) {
-      return 0 // Pas de préférences définies
-    }
-
-    const slotStart = this.local(slot.start)
-    const slotHour = slotStart.hour
-
-    // Mappage des créneaux horaires vers les heures
-    const timeSlotMapping: Record<string, { start: number; end: number }> = {
-      early_morning: { start: 6, end: 9 },
-      morning: { start: 9, end: 12 },
-      lunch: { start: 12, end: 14 },
-      early_afternoon: { start: 14, end: 17 },
-      late_afternoon: { start: 17, end: 20 },
-      evening: { start: 20, end: 23 },
-      late_evening: { start: 23, end: 2 }, // Attention: chevauche minuit
-      night: { start: 2, end: 6 },
-    }
-
-    let bonus = 0
-
-    // Vérifier si l'heure du créneau correspond aux préférences
-    for (const preference of availability.timePreferences) {
-      const timeSlot = timeSlotMapping[preference]
-      if (!timeSlot) continue
-
-      // Gestion spéciale pour late_evening qui chevauche minuit
-      if (preference === 'late_evening') {
-        if (slotHour >= 23 || slotHour < 2) {
-          bonus += 12 // Bon bonus pour préférence horaire respectée
-        }
-      } else {
-        if (slotHour >= timeSlot.start && slotHour < timeSlot.end) {
-          bonus += 12 // Bon bonus pour préférence horaire respectée
-        }
-      }
-    }
-
-    return bonus
+    return Math.round(POIDS.PLAGE_HORAIRE * this.recouvrementDesPreferences(slot, availability))
   }
 
   /**
-   * Calcule le bonus d'expérience d'un bénévole, d'après le texte libre de sa candidature.
-   * Ne dépend plus du créneau depuis le retrait des compétences requises, qui n'étaient jamais
-   * renseignées.
+   * Quelle PROPORTION du créneau tombe dans les plages horaires souhaitées, entre 0 et 1.
+   *
+   * Le calcul ne regardait que l'heure de DÉBUT : un créneau de 11 h à 19 h était classé « matin »,
+   * et quelqu'un qui n'avait coché que « matin » le recevait en entier, huit heures comprises. En
+   * mode strict, la même grossièreté écartait des créneaux qui chevauchaient largement la plage
+   * demandée.
+   *
+   * Le bonus se cumulait par ailleurs sans plafond, 12 points par plage cochée : un créneau à
+   * l'intersection de trois préférences valait plus qu'une disponibilité déclarée.
+   *
+   * Une proportion règle les deux : elle vaut 1 pour un créneau entièrement dans les plages
+   * souhaitées, et ne dépasse jamais 1 même si plusieurs plages se chevauchent.
    */
-  private calculateExperienceBonus(volunteer: VolunteerApplication): number {
-    const experience = volunteer.experience.toLowerCase()
-    let bonus = 0
-
-    // Bonus expérience générale
-    if (experience.includes('bénévole') || experience.includes('volunteer')) {
-      bonus += 5
-    }
-    if (experience.includes('jonglerie') || experience.includes('juggling')) {
-      bonus += 5
-    }
-    if (experience.includes('convention') || experience.includes('festival')) {
-      bonus += 3
+  private recouvrementDesPreferences(slot: TimeSlot, availability: any): number {
+    if (!Array.isArray(availability.timePreferences) || availability.timePreferences.length === 0) {
+      return 0
     }
 
-    return bonus
+    const debut = this.local(slot.start)
+    const fin = this.local(slot.end)
+    const dureeMinutes = fin.diff(debut, 'minutes').minutes
+    if (!Number.isFinite(dureeMinutes) || dureeMinutes <= 0) return 0
+
+    // Les minutes du créneau, comptées depuis minuit du jour de son début : une plage qui franchit
+    // minuit se prolonge donc naturellement au-delà de 1440 plutôt que de repartir à zéro.
+    const debutMinutes = debut.hour * 60 + debut.minute
+    const finMinutes = debutMinutes + dureeMinutes
+
+    const couvertes = new Set<number>()
+
+    for (const preference of availability.timePreferences) {
+      const plage = PLAGES_HORAIRES[preference as keyof typeof PLAGES_HORAIRES]
+      if (!plage) continue
+
+      // Une plage qui franchit minuit (23 h → 2 h) se lit comme deux bornes croissantes, et on
+      // l'essaie aussi décalée d'un jour pour attraper un créneau qui déborde sur le lendemain.
+      const finPlage = plage.fin <= plage.debut ? plage.fin + 24 : plage.fin
+      for (const decalage of [0, 24, -24]) {
+        const a = Math.max(debutMinutes, (plage.debut + decalage) * 60)
+        const b = Math.min(finMinutes, (finPlage + decalage) * 60)
+        for (let minute = Math.ceil(a); minute < b; minute++) couvertes.add(minute)
+      }
+    }
+
+    return Math.min(couvertes.size / dureeMinutes, 1)
   }
+
+  /**
+   * L'expérience ne se juge plus ici.
+   *
+   * Un bonus était accordé en cherchant « bénévole », « jonglerie » et « convention » dans le
+   * texte libre de la candidature. Sur treize langues, un bénévole allemand décrivant dix ans de
+   * pratique obtenait zéro ; et « jamais fait de jonglerie, jamais été bénévole » obtenait le
+   * maximum, la négation n'étant pas détectée. Le champ est de surcroît sous le contrôle du
+   * candidat.
+   *
+   * Plutôt que de le rebrancher sur une donnée structurée, la décision du 14/09/2026 est de le
+   * RETIRER : l'expérience est un jugement humain — « je veux Alice à l'accueil, elle sait gérer
+   * les gens » — et le responsable place qui il veut avant de lancer le calcul. Le mode « garder
+   * les affectations manuelles » et la prise en compte de la charge existante rendent ce flux
+   * naturel : ce qui est posé à la main reste, et le calcul complète.
+   */
 
   /**
    * Obtient les heures actuelles assignées à un bénévole
@@ -904,7 +1122,7 @@ export class VolunteerScheduler {
           volunteer,
           score: this.calculateAssignmentScore(volunteer, slot),
         }))
-        .filter((candidate) => candidate.score > 50) // Seuil élevé pour première passe
+        .filter((candidate) => candidate.score > SEUILS.EVIDENCE)
         .sort((a, b) => b.score - a.score)
 
       // Assigne les meilleurs candidats
@@ -952,7 +1170,7 @@ export class VolunteerScheduler {
           volunteer,
           score: this.calculateAssignmentScore(volunteer, slot),
         }))
-        .filter((candidate) => candidate.score > -50) // Seuil plus bas
+        .filter((candidate) => candidate.score > SEUILS.REMPLISSAGE)
         .sort((a, b) => b.score - a.score)
 
       // Assigne jusqu'à remplir le créneau
@@ -1064,58 +1282,89 @@ export class VolunteerScheduler {
   /**
    * Troisième passe : équilibrage des assignations
    */
+  /**
+   * Rééquilibre les charges, en transférant des affectations des plus chargés vers les moins.
+   *
+   * Trois défauts corrigés ici, et le premier était le plus sournois :
+   *
+   * 1. Le transfert **réécrivait `volunteerId` sans recalculer `score` ni `confidence`** :
+   *    l'affectation conservait les valeurs de l'ancien titulaire. La confiance affichée à
+   *    l'organisateur était donc fausse pour toute affectation transférée, et elle contaminait
+   *    la satisfaction moyenne.
+   * 2. Les plafonds du receveur n'étaient pas revérifiés — seuls le chevauchement, l'accès aux
+   *    spectacles et un score positif l'étaient. On pouvait donc le pousser au-delà de son
+   *    maximum en croyant le soulager.
+   * 3. Un seul transfert par bénévole sur-utilisé, listes calculées une fois : le rééquilibrage
+   *    s'arrêtait avant d'avoir équilibré quoi que ce soit.
+   *
+   * Il itère désormais tant qu'un transfert améliore l'écart, borné pour ne pas tourner
+   * indéfiniment sur un cas pathologique.
+   */
   private balanceAssignments(): void {
-    // Trouve les bénévoles sous-utilisés et sur-utilisés
-    const volunteerHours = this.volunteers.map((volunteer) => ({
-      id: volunteer.user.id,
-      hours: this.getCurrentVolunteerHours(volunteer.user.id),
-      volunteer,
-    }))
+    if (this.volunteers.length === 0) return
 
-    const avgHours = volunteerHours.reduce((sum, v) => sum + v.hours, 0) / volunteerHours.length
-    const underUtilized = volunteerHours.filter((v) => v.hours < avgHours - 2)
-    const overUtilized = volunteerHours.filter((v) => v.hours > avgHours + 2)
+    for (let passe = 0; passe < LIMITES.PASSES_DE_REEQUILIBRAGE; passe++) {
+      const charges = this.volunteers.map((volunteer) => ({
+        id: volunteer.user.id,
+        hours: this.getCurrentVolunteerHours(volunteer.user.id),
+        volunteer,
+      }))
 
-    // Tente de rééquilibrer
-    for (const overUser of overUtilized) {
-      for (const underUser of underUtilized) {
-        if (Math.abs(overUser.hours - underUser.hours) < 3) continue
+      const moyenne = charges.reduce((somme, v) => somme + v.hours, 0) / charges.length
+      const surCharges = charges
+        .filter((v) => v.hours > moyenne + LIMITES.ECART_DE_CHARGE)
+        .sort((a, b) => b.hours - a.hours)
+      const sousCharges = charges
+        .filter((v) => v.hours < moyenne - LIMITES.ECART_DE_CHARGE)
+        .sort((a, b) => a.hours - b.hours)
 
-        // Trouve un créneau à transférer
-        const transferableAssignment = this.assignments.find(
-          (assignment) =>
-            assignment.volunteerId === overUser.id &&
-            this.canTransferAssignment(assignment, underUser.volunteer)
-        )
+      if (surCharges.length === 0 || sousCharges.length === 0) return
 
-        if (transferableAssignment) {
-          const slot = this.creneauParId.get(transferableAssignment.slotId)
-          const duree = slot ? this.getSlotDuration(slot) : 0
+      let transfertEffectue = false
 
-          // Le transfert passe par les compteurs : les mettre à jour à la main, comme avant,
-          // laissait les plafonds croire que l'ancien titulaire tenait encore ce créneau.
-          this.retirerAffectation(transferableAssignment)
-          transferableAssignment.volunteerId = underUser.id
-          if (slot) {
-            this.ajouterHeures(
-              underUser.id,
-              this.jourParCreneau.get(slot.id) ?? '',
-              this.getSlotDuration(slot)
-            )
-            this.ajouterCreneauTenu(underUser.id, {
-              debut: new Date(slot.start).getTime(),
-              fin: new Date(slot.end).getTime(),
-              slotId: slot.id,
-            })
-            this.totalHeuresPosees += duree
-          }
+      for (const charge of surCharges) {
+        for (const soulage of sousCharges) {
+          // Transférer entre deux bénévoles de charge voisine ne rééquilibre rien et risque
+          // d'osciller d'une passe à l'autre.
+          if (charge.hours - soulage.hours < LIMITES.ECART_UTILE) continue
 
-          overUser.hours -= duree
-          underUser.hours += duree
+          const aTransferer = this.assignments.find(
+            (assignment) =>
+              assignment.volunteerId === charge.id &&
+              this.canTransferAssignment(assignment, soulage.volunteer)
+          )
+          if (!aTransferer) continue
 
+          const slot = this.creneauParId.get(aTransferer.slotId)
+          if (!slot) continue
+
+          // Le score est recalculé pour le receveur AVANT le transfert — c'est-à-dire dans
+          // l'état où il ne tient pas encore ce créneau, comme pour n'importe quel candidat.
+          const score = this.calculateAssignmentScore(soulage.volunteer, slot)
+
+          this.retirerAffectation(aTransferer)
+          aTransferer.volunteerId = soulage.id
+          aTransferer.score = score
+          aTransferer.confidence = this.calculateConfidence(score)
+
+          const duree = this.getSlotDuration(slot)
+          this.ajouterHeures(soulage.id, this.jourParCreneau.get(slot.id) ?? '', duree)
+          this.ajouterCreneauTenu(soulage.id, {
+            debut: new Date(slot.start).getTime(),
+            fin: new Date(slot.end).getTime(),
+            slotId: slot.id,
+          })
+          this.totalHeuresPosees += duree
+
+          charge.hours -= duree
+          soulage.hours += duree
+          transfertEffectue = true
           break
         }
       }
+
+      // Plus rien à déplacer : insister ne ferait que repasser sur les mêmes refus.
+      if (!transfertEffectue) return
     }
   }
 
@@ -1138,6 +1387,21 @@ export class VolunteerScheduler {
     if (this.priveDuDernierPassage(newVolunteer.user.id, slot)) {
       return false
     }
+
+    /**
+     * Les plafonds du receveur, que le transfert ne vérifiait pas : on pouvait le pousser
+     * au-delà de son maximum en croyant le soulager.
+     */
+    const duree = this.getSlotDuration(slot)
+    const plafondTotal =
+      (this.constraints.maxHoursPerVolunteer || 12) +
+      (this.constraints.allowOvertime ? this.constraints.maxOvertimeHours || 2 : 0)
+
+    if (this.getCurrentVolunteerHours(newVolunteer.user.id) + duree > plafondTotal) return false
+    if (
+      !this.checkDailyHoursConstraints(newVolunteer.user.id, slot, this.constraints.allowOvertime)
+    )
+      return false
 
     const score = this.calculateAssignmentScore(newVolunteer, slot)
     return score > 0 // Score positif minimum
@@ -1212,6 +1476,7 @@ export class VolunteerScheduler {
         averageHoursPerVolunteer: averageHours,
         satisfactionRate,
         balanceScore: this.calculateBalanceScore(),
+        ...this.mesurerLaQualite(),
       },
       warnings,
       recommendations,
@@ -1279,6 +1544,67 @@ export class VolunteerScheduler {
     }
 
     return { parBenevole, parCreneau }
+  }
+
+  /**
+   * Ce que le planning vaut, mesuré sur des faits constatables.
+   *
+   * Chacun de ces chiffres se vérifie en regardant le planning : combien de bénévoles ont eu
+   * l'équipe qu'ils demandaient, combien de créneaux sont pourvus. C'est ce qui les distingue de
+   * la « satisfaction » qu'ils remplacent — elle était dérivée du score, donc de l'opinion que
+   * l'algorithme avait de son propre travail.
+   */
+  private mesurerLaQualite() {
+    const part = (numerateur: number, denominateur: number) =>
+      denominateur > 0 ? numerateur / denominateur : 1
+
+    const avecEquipe = this.assignments.filter((assignment) => assignment.teamId)
+    const souhaitees = avecEquipe.filter((assignment) => {
+      const volunteer = this.volunteers.find((v) => v.user.id === assignment.volunteerId)
+      return volunteer?.teamPreferences?.some((pref) => pref === assignment.teamId)
+    })
+
+    const dansLesHoraires = this.assignments.filter((assignment) => {
+      const slot = this.creneauParId.get(assignment.slotId)
+      const volunteer = this.volunteers.find((v) => v.user.id === assignment.volunteerId)
+      if (!slot || !volunteer) return false
+
+      const availability = this.parseAvailability(volunteer.availability)
+      if (!Array.isArray(availability.timePreferences) || availability.timePreferences.length === 0)
+        return false
+
+      return this.recouvrementDesPreferences(slot, availability) >= SEUILS.RECOUVREMENT_MINIMAL
+    })
+
+    // Seuls les bénévoles qui ont exprimé des préférences entrent dans ce ratio : compter ceux
+    // qui n'ont rien demandé comme « mal servis » dirait le contraire de la vérité.
+    const avecPreferencesHoraires = this.volunteers.filter((volunteer) => {
+      const availability = this.parseAvailability(volunteer.availability)
+      return Array.isArray(availability.timePreferences) && availability.timePreferences.length > 0
+    })
+    const affectationsDeCeuxLa = this.assignments.filter((assignment) =>
+      avecPreferencesHoraires.some((v) => v.user.id === assignment.volunteerId)
+    )
+
+    const minimum = this.constraints.minHoursPerVolunteer || 2
+    const auMinimum = this.volunteers.filter(
+      (volunteer) => this.getCurrentVolunteerHours(volunteer.user.id) >= minimum
+    )
+
+    const complets = this.timeSlots.filter((slot) => slot.assignedVolunteers >= slot.maxVolunteers)
+
+    const heures = this.volunteers.map((v) => this.getCurrentVolunteerHours(v.user.id))
+    const moyenne = heures.reduce((somme, h) => somme + h, 0) / Math.max(heures.length, 1)
+    const variance =
+      heures.reduce((somme, h) => somme + (h - moyenne) ** 2, 0) / Math.max(heures.length, 1)
+
+    return {
+      preferencesEquipeHonorees: part(souhaitees.length, avecEquipe.length),
+      creneauxDansLesHorairesSouhaites: part(dansLesHoraires.length, affectationsDeCeuxLa.length),
+      benevolesAuMinimumDHeures: part(auMinimum.length, this.volunteers.length),
+      creneauxComplets: part(complets.length, this.timeSlots.length),
+      ecartTypeDesHeures: Math.sqrt(variance),
+    }
   }
 
   /**

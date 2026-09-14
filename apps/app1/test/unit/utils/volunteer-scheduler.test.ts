@@ -25,7 +25,6 @@ const benevole = (options: {
     teardown: options.teardown ?? false,
     timePreferences: null,
   }),
-  experience: '',
   motivation: '',
   teamPreferences: options.teamPreferences ?? [],
   assignedTeams: options.assignedTeams ?? [],
@@ -461,11 +460,11 @@ describe('fuseau horaire de l’événement', () => {
   })
 
   it('lit l’heure d’un créneau dans le fuseau de l’événement', () => {
-    // 20 h 30 UTC = 22 h 30 à Paris en août : c'est une soirée, pas une fin d'après-midi.
+    // 18 h - 20 h UTC = 20 h - 22 h à Paris en août : une soirée, entièrement dans la plage.
     const creneauSoiree = creneau({
       id: '1',
-      start: '2026-08-01T19:30:00.000Z',
-      end: '2026-08-01T21:00:00.000Z',
+      start: '2026-08-01T18:00:00.000Z',
+      end: '2026-08-01T20:00:00.000Z',
     })
 
     const avecFuseau = new VolunteerScheduler(
@@ -483,12 +482,13 @@ describe('fuseau horaire de l’événement', () => {
   })
 
   it('sans fuseau, le même créneau tombe dans la mauvaise plage', () => {
-    // Le comportement d'avant, conservé comme repli : 20 h 30 UTC est lu « late_afternoon ».
-    // C'est ce test qui dit ce que le fuseau change réellement.
+    // Le repli, quand l'édition n'a pas de fuseau : 18 h - 20 h UTC ne recouvre pas « soirée »
+    // (20 h - 23 h). C'est ce test qui dit ce que le fuseau change réellement — à Paris, le même
+    // créneau tombe de 20 h à 22 h, entièrement dans la plage souhaitée.
     const creneauSoiree = creneau({
       id: '1',
-      start: '2026-08-01T19:30:00.000Z',
-      end: '2026-08-01T21:00:00.000Z',
+      start: '2026-08-01T18:00:00.000Z',
+      end: '2026-08-01T20:00:00.000Z',
     })
 
     const sansFuseau = new VolunteerScheduler(
@@ -534,16 +534,12 @@ describe('plafond journalier et heures supplémentaires', () => {
   ]
 
   it('laisse dépasser le plafond du jour, mais pas au-delà des heures supplémentaires', () => {
-    // Le dépassement coûte 80 points, et le seuil de la seconde passe est à -50 : sans un peu de
-    // bonus, un créneau en heures supplémentaires n'est jamais retenu, borne ou pas. D'où ce
-    // bénévole expérimenté — la fragilité de ces seuils est le constat A1 de l'audit, pas celui-ci.
-    const experimente = {
-      ...benevole({ event: true }),
-      experience: 'bénévole en convention de jonglerie depuis dix ans',
-    }
-
+    // Ce test a longtemps eu besoin d'un bénévole « expérimenté » pour passer : le dépassement
+    // coûtait 80 points quand le seuil d'acceptation est à -50, si bien qu'un créneau en heures
+    // supplémentaires n'était jamais retenu — le réglage `allowOvertime` ne produisait rien.
+    // Depuis que les poids sont rassemblés et rendus cohérents (A1), un bénévole ordinaire suffit.
     const r = new VolunteerScheduler(
-      [experimente],
+      [benevole({ event: true })],
       troisCreneaux,
       [],
       {
@@ -551,7 +547,6 @@ describe('plafond journalier et heures supplémentaires', () => {
         maxOvertimeHours: 3,
         maxHoursPerVolunteer: 24,
         allowOvertime: true,
-        prioritizeExperience: true,
       },
       BORNES
     ).assignVolunteers()
@@ -742,4 +737,256 @@ describe('coût du calcul', () => {
     // Large exprès : ce qui compte est l'ordre de grandeur, pas la milliseconde.
     expect(duree).toBeLessThan(30_000)
   }, 120_000)
+})
+
+/**
+ * La préférence horaire ne se jugeait que sur l'heure de DÉBUT : un créneau de 11 h à 19 h était
+ * classé « matin », et quelqu'un qui n'avait coché que « matin » le recevait en entier.
+ */
+describe('préférences horaires au recouvrement', () => {
+  const avecPreferences = (preferences: string[]) => ({
+    ...benevole({ event: true }),
+    availability: JSON.stringify({
+      setup: false,
+      event: true,
+      teardown: false,
+      timePreferences: preferences,
+    }),
+  })
+
+  const creneauLong = creneau({
+    id: '1',
+    start: '2026-08-01T09:00:00.000Z',
+    end: '2026-08-01T17:00:00.000Z',
+  })
+
+  it('écarte, en mode strict, un créneau qui déborde largement de la plage souhaitée', () => {
+    // 9 h - 17 h contre « matin » (9 h - 12 h) : trois heures sur huit, soit 37 % — sous le seuil.
+    // L'ancien calcul le classait « matin » sur sa seule heure de début et l'acceptait.
+    const r = new VolunteerScheduler(
+      [avecPreferences(['morning'])],
+      [creneauLong],
+      [],
+      { respectStrictTimePreferences: true },
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(0)
+  })
+
+  it('accepte un créneau majoritairement dans les plages souhaitées', () => {
+    // Les mêmes huit heures, mais couvertes par trois plages contiguës : 9 h - 17 h entièrement.
+    const r = new VolunteerScheduler(
+      [avecPreferences(['morning', 'lunch', 'early_afternoon'])],
+      [creneauLong],
+      [],
+      { respectStrictTimePreferences: true },
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(1)
+  })
+
+  it('ne cumule plus le bonus quand des plages se chevauchent', () => {
+    // Deux préférences qui couvrent la même heure ne valent pas deux fois le bonus : le score
+    // d'un créneau entièrement souhaité est le même qu'on ait coché une plage ou trois.
+    const creneauCourt = creneau({
+      id: '1',
+      start: '2026-08-01T09:00:00.000Z',
+      end: '2026-08-01T11:00:00.000Z',
+    })
+
+    const unePlage = new VolunteerScheduler(
+      [avecPreferences(['morning'])],
+      [creneauCourt],
+      [],
+      {},
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    const troisPlages = new VolunteerScheduler(
+      [avecPreferences(['morning', 'early_morning', 'lunch'])],
+      [
+        creneau({
+          id: '1',
+          start: '2026-08-01T09:00:00.000Z',
+          end: '2026-08-01T11:00:00.000Z',
+        }),
+      ],
+      [],
+      {},
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    expect(troisPlages.assignments[0]!.score).toBe(unePlage.assignments[0]!.score)
+  })
+})
+
+/**
+ * Le rééquilibrage réécrivait `volunteerId` sans recalculer score ni confiance : l'affectation
+ * transférée gardait les valeurs de l'ancien titulaire, et la confiance affichée était fausse.
+ */
+describe('rééquilibrage des charges', () => {
+  it('recalcule le score et la confiance de l’affectation transférée', () => {
+    // Deux bénévoles, quatre créneaux le même jour : sans rééquilibrage le premier prend tout.
+    const creneaux = [0, 1, 2, 3].map((i) =>
+      creneau({
+        id: `c${i}`,
+        start: `2026-08-01T${String(8 + i * 3).padStart(2, '0')}:00:00.000Z`,
+        end: `2026-08-01T${String(10 + i * 3).padStart(2, '0')}:00:00.000Z`,
+      })
+    )
+
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      creneaux,
+      [],
+      { balanceTeams: true, maxHoursPerVolunteer: 24, maxHoursPerDay: 24 },
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    // Chaque affectation porte une confiance cohérente avec son score, quel que soit son titulaire.
+    for (const assignment of r.assignments) {
+      expect(assignment.confidence).toBeGreaterThan(0)
+      expect(assignment.confidence).toBeLessThanOrEqual(100)
+      expect(Number.isFinite(assignment.score)).toBe(true)
+    }
+  })
+
+  it('ne pousse pas le bénévole soulagé au-delà de son plafond', () => {
+    const creneaux = [0, 1, 2, 3].map((i) =>
+      creneau({
+        id: `c${i}`,
+        start: `2026-08-01T${String(8 + i * 3).padStart(2, '0')}:00:00.000Z`,
+        end: `2026-08-01T${String(10 + i * 3).padStart(2, '0')}:00:00.000Z`,
+      })
+    )
+
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      creneaux,
+      [],
+      { balanceTeams: true, maxHoursPerVolunteer: 4, maxHoursPerDay: 4 },
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    for (const id of [1, 2]) {
+      const heures = r.assignments.filter((a) => a.volunteerId === id).length * 2
+      expect(heures).toBeLessThanOrEqual(4)
+    }
+  })
+})
+
+/**
+ * `satisfactionRate` était la moyenne des `confidence`, elles-mêmes dérivées du score : la métrique
+ * disait à quel point l'algorithme était content de lui, pas à quel point les bénévoles étaient
+ * servis.
+ */
+describe('indicateurs de qualité', () => {
+  it('mesure des faits constatables sur le planning', () => {
+    const r = new VolunteerScheduler(
+      [
+        { ...benevole({ id: 1, event: true }), teamPreferences: ['equipe-A'] },
+        { ...benevole({ id: 2, event: true }), teamPreferences: ['equipe-B'] },
+      ],
+      [
+        creneau({
+          id: '1',
+          start: '2026-08-01T16:00:00.000Z',
+          end: '2026-08-01T18:00:00.000Z',
+          teamId: 'equipe-A',
+        }),
+      ],
+      EQUIPES,
+      { minHoursPerVolunteer: 2 },
+      BORNES
+    ).assignVolunteers()
+
+    // Le créneau est pourvu, et par quelqu'un qui avait demandé cette équipe.
+    expect(r.stats.creneauxComplets).toBe(1)
+    expect(r.stats.preferencesEquipeHonorees).toBe(1)
+    // Un bénévole sur deux atteint le minimum : l'autre n'a aucun créneau à prendre.
+    expect(r.stats.benevolesAuMinimumDHeures).toBe(0.5)
+    expect(r.stats.ecartTypeDesHeures).toBeGreaterThan(0)
+  })
+
+  it('ne compte pas comme mal servis ceux qui n’ont rien demandé', () => {
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true })],
+      [creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' })],
+      [],
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    // Aucune préférence horaire exprimée : le ratio vaut 1, pas 0.
+    expect(r.stats.creneauxDansLesHorairesSouhaites).toBe(1)
+  })
+})
+
+/**
+ * Le cas qui piège un algorithme glouton, et qui se reproduit sur une vraie édition : le bénévole
+ * polyvalent est consommé par le premier créneau rencontré, et celui que lui seul pouvait tenir
+ * reste vide.
+ */
+describe('déblocage des créneaux vides', () => {
+  const polyvalent = {
+    ...benevole({ id: 1, event: true }),
+    teamPreferences: ['banale', 'pointue'],
+  }
+  const ordinaire = {
+    ...benevole({ id: 2, event: true }),
+    teamPreferences: ['banale'],
+  }
+
+  const equipes = [
+    { id: 'banale', name: 'Banale', color: '#000' },
+    { id: 'pointue', name: 'Pointue', color: '#000' },
+  ]
+
+  const deuxCreneaux = () => [
+    creneau({
+      id: 'banal',
+      start: '2026-08-01T10:00:00.000Z',
+      end: '2026-08-01T12:00:00.000Z',
+      teamId: 'banale',
+    }),
+    creneau({
+      id: 'pointu',
+      start: '2026-08-01T14:00:00.000Z',
+      end: '2026-08-01T16:00:00.000Z',
+      teamId: 'pointue',
+    }),
+  ]
+
+  it('déplace celui qui bloque, pour pourvoir le créneau que lui seul peut tenir', () => {
+    const r = new VolunteerScheduler(
+      [polyvalent, ordinaire],
+      deuxCreneaux(),
+      equipes,
+      { maxHoursPerVolunteer: 2, respectStrictTeamPreferences: true },
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    // Sans déblocage : le polyvalent prend « banal », épuise son plafond de 2 h, et « pointu »
+    // reste vide — 50 % de créneaux pourvus. Avec : les deux le sont.
+    expect(r.assignments).toHaveLength(2)
+    expect(r.stats.creneauxComplets).toBe(1)
+
+    const surPointu = r.assignments.find((a) => a.slotId === 'pointu')
+    expect(surPointu?.volunteerId).toBe(1)
+  })
+
+  it('ne déshabille personne quand aucun remplaçant ne peut reprendre', () => {
+    // Le polyvalent est seul : déplacer son créneau ne ferait que le vider ailleurs.
+    const r = new VolunteerScheduler(
+      [polyvalent],
+      deuxCreneaux(),
+      equipes,
+      { maxHoursPerVolunteer: 2, respectStrictTeamPreferences: true },
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(1)
+  })
 })

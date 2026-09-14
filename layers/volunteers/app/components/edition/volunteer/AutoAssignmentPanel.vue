@@ -107,13 +107,6 @@
             </UFormField>
 
             <UFormField
-              :label="t('volunteers.auto_assignment.prioritize_experience')"
-              :help="t('volunteers.auto_assignment.prioritize_experience_help')"
-            >
-              <USwitch v-model="constraints.prioritizeExperience" />
-            </UFormField>
-
-            <UFormField
               :label="t('volunteers.auto_assignment.respect_availability')"
               :help="t('volunteers.auto_assignment.respect_availability_help')"
             >
@@ -274,19 +267,51 @@
 
               <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
                 <div class="text-2xl font-bold text-purple-600">
-                  {{ Math.round(previewResult.result.stats.satisfactionRate * 100) }}%
+                  {{ pourcentage(previewResult.result.stats.creneauxComplets) }}
                 </div>
                 <div class="text-sm text-purple-700 dark:text-purple-300">
-                  {{ t('volunteers.auto_assignment.satisfaction_rate') }}
+                  {{ t('volunteers.auto_assignment.stat_creneaux_complets') }}
                 </div>
               </div>
 
               <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg text-center">
                 <div class="text-2xl font-bold text-orange-600">
-                  {{ Math.round(previewResult.result.stats.balanceScore * 100) }}%
+                  {{ pourcentage(previewResult.result.stats.benevolesAuMinimumDHeures) }}
                 </div>
                 <div class="text-sm text-orange-700 dark:text-orange-300">
-                  {{ t('volunteers.auto_assignment.balance_score') }}
+                  {{ t('volunteers.auto_assignment.stat_benevoles_au_minimum') }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Ce que les bénévoles ont obtenu de ce qu'ils demandaient. Des chiffres qui se
+                 vérifient sur le planning, là où la « satisfaction » qu'ils remplacent était
+                 dérivée du score — donc de l'opinion de l'algorithme sur son propre travail. -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="border border-default rounded-lg p-3 text-center">
+                <div class="text-lg font-semibold">
+                  {{ pourcentage(previewResult.result.stats.preferencesEquipeHonorees) }}
+                </div>
+                <div class="text-xs text-muted">
+                  {{ t('volunteers.auto_assignment.stat_preferences_equipe') }}
+                </div>
+              </div>
+
+              <div class="border border-default rounded-lg p-3 text-center">
+                <div class="text-lg font-semibold">
+                  {{ pourcentage(previewResult.result.stats.creneauxDansLesHorairesSouhaites) }}
+                </div>
+                <div class="text-xs text-muted">
+                  {{ t('volunteers.auto_assignment.stat_horaires_souhaites') }}
+                </div>
+              </div>
+
+              <div class="border border-default rounded-lg p-3 text-center">
+                <div class="text-lg font-semibold">
+                  {{ heuresArrondies(previewResult.result.stats.ecartTypeDesHeures) }}
+                </div>
+                <div class="text-xs text-muted">
+                  {{ t('volunteers.auto_assignment.stat_ecart_type') }}
                 </div>
               </div>
             </div>
@@ -567,7 +592,6 @@ interface Constraints {
   maxHoursPerDay: number
   minHoursPerDay: number
   balanceTeams: boolean
-  prioritizeExperience: boolean
   respectStrictAvailability: boolean
   respectStrictTeamPreferences: boolean
   respectStrictAssignedTeams: boolean
@@ -588,7 +612,6 @@ const REGLAGES_PAR_DEFAUT: Constraints = {
   maxHoursPerDay: 6,
   minHoursPerDay: 1,
   balanceTeams: true,
-  prioritizeExperience: true,
   respectStrictAvailability: true,
   respectStrictTeamPreferences: false,
   respectStrictAssignedTeams: false,
@@ -929,6 +952,13 @@ const libelleRecommandation = (recommandation: { code: string }) => {
       return ''
   }
 }
+
+/** Les indicateurs arrivent en proportions ; l'écran les montre en pourcentages. */
+const pourcentage = (valeur: number | undefined) =>
+  valeur === undefined ? '—' : `${Math.round(valeur * 100)} %`
+
+const heuresArrondies = (valeur: number | undefined) =>
+  valeur === undefined ? '—' : `${valeur.toFixed(1)} h`
 
 const confirmationOuverte = ref(false)
 

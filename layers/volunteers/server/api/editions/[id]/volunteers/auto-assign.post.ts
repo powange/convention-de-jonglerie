@@ -137,7 +137,6 @@ const constraintsSchema = z.object({
   maxHoursPerDay: z.number().min(1).max(12).optional(),
   minHoursPerDay: z.number().min(0).max(8).optional(),
   balanceTeams: z.boolean().optional(),
-  prioritizeExperience: z.boolean().optional(),
   respectStrictAvailability: z.boolean().optional(),
   respectStrictTeamPreferences: z.boolean().optional(),
   respectStrictAssignedTeams: z.boolean().optional(),
@@ -360,9 +359,6 @@ export default wrapApiHandler(
           event: volunteer.eventAvailability || false,
           timePreferences: volunteer.timePreferences || null,
         }),
-        experience: volunteer.hasExperience
-          ? volunteer.experienceDetails || 'Expérience confirmée'
-          : '',
         motivation: volunteer.motivation || '',
         phone: volunteer.userSnapshotPhone,
         teamPreferences: volunteer.teamPreferences
