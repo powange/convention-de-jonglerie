@@ -164,7 +164,16 @@
       "history_description": "De automatiska tilldelningar som redan körts på denna upplaga.",
       "history_empty": "Ingen beräkning har ännu körts på denna upplaga.",
       "history_line": "Körd av {author} — {created} tilldelning(ar) skapade, {deleted} raderade.",
-      "history_undone": "Ångrad av {author} den {date}."
+      "history_undone": "Ångrad av {author} den {date}.",
+      "search_title": "Sök ett bättre schema",
+      "search_description": "En andra algoritm tar detta schema och försöker förbättra det, utan att någonsin försämra det. Den vinner främst på önskade tider; den fyller inte ett tomt pass.",
+      "search_action": "Sök bättre",
+      "search_done": "Sökningen klar",
+      "compare_title": "De två schemana",
+      "compare_greedy": "Ursprungligt schema",
+      "compare_search": "Efter sökning",
+      "compare_help": "Välj det du vill tillämpa: det är det schemat som sparas.",
+      "compare_no_gain": "Sökningen hittade inget bättre. Det ursprungliga schemat är fortfarande bäst."
     },
     "autonomous_team": "Självstyrande lag",
     "autonomous_team_badge": "Självstyrande",

@@ -164,7 +164,16 @@
       "history_description": "Obliczenia automatycznego przydziału już uruchomione w tej edycji.",
       "history_empty": "W tej edycji nie uruchomiono jeszcze żadnego obliczenia.",
       "history_line": "Uruchomione przez {author} — utworzono {created} przydział(ów), usunięto {deleted}.",
-      "history_undone": "Cofnięte przez {author} dnia {date}."
+      "history_undone": "Cofnięte przez {author} dnia {date}.",
+      "search_title": "Poszukaj lepszego grafiku",
+      "search_description": "Drugi algorytm bierze ten grafik i próbuje go poprawić, nigdy go nie pogarszając. Zyskuje głównie na preferowanych godzinach; nie obsadzi pustej zmiany.",
+      "search_action": "Szukaj lepszego",
+      "search_done": "Wyszukiwanie zakończone",
+      "compare_title": "Dwa grafiki",
+      "compare_greedy": "Grafik początkowy",
+      "compare_search": "Po wyszukiwaniu",
+      "compare_help": "Wybierz ten, który chcesz zastosować: to on zostanie zapisany.",
+      "compare_no_gain": "Wyszukiwanie nie znalazło nic lepszego. Grafik początkowy pozostaje najlepszy."
     },
     "autonomous_team": "Zespół samodzielny",
     "autonomous_team_badge": "Samodzielny",

@@ -179,6 +179,17 @@ const constraintsSchema = z.object({
 const DUREE_DE_VIE_DU_PLAN_MS = 30 * 60 * 1000
 
 /**
+ * Le temps qu'on laisse au second moteur.
+ *
+ * Mesuré : la recherche converge d'elle-même en une seconde et demie sur une grosse édition, et
+ * n'atteint son budget que si on l'y force. Cinq secondes laissent donc de la marge sans faire
+ * attendre. Le plafond, lui, borne ce qu'un appel peut demander — le calcul reste synchrone, et
+ * une requête qui tiendrait une minute sortirait des délais de proxy usuels.
+ */
+const BUDGET_DE_RECHERCHE_PAR_DEFAUT_MS = 5_000
+const BUDGET_DE_RECHERCHE_MAXIMUM_MS = 20_000
+
+/**
  * L'empreinte des données qui ont produit un plan.
  *
  * Elle ne cherche pas à décrire l'édition, seulement à changer dès que quelque chose change : un
@@ -279,6 +290,22 @@ export default wrapApiHandler(
      */
     const appliqueUnPlanConserve =
       body.applyAssignments === true && typeof body.planId === 'string' && Boolean(body.planId)
+
+    /**
+     * Cherche-t-on un MEILLEUR plan à partir d'un aperçu existant ?
+     *
+     * Le second moteur — la recherche locale — ne part jamais de rien : il reprend le planning du
+     * glouton et l'améliore. Il lui faut donc un aperçu, et les mêmes données qu'à ce moment-là,
+     * ce que l'empreinte vérifie exactement comme pour l'application.
+     */
+    const chercheUnMeilleurPlan =
+      body.ameliorerLePlan === true && typeof body.planId === 'string' && Boolean(body.planId)
+
+    const budgetDeRecherche = Math.min(
+      Math.max(Number(body.budgetMs) || BUDGET_DE_RECHERCHE_PAR_DEFAUT_MS, 1_000),
+      BUDGET_DE_RECHERCHE_MAXIMUM_MS
+    )
+
     const constraints = constraintsSchema.parse(body.constraints || {})
 
     /**
@@ -566,6 +593,57 @@ export default wrapApiHandler(
      */
     let result: SchedulingResult | null = scheduler ? scheduler.assignVolunteers() : null
 
+    /**
+     * Le second moteur, quand on le demande.
+     *
+     * Il reprend le planning que le glouton vient de produire et le pousse plus loin. Le glouton
+     * est relancé plutôt que rejoué depuis l'aperçu conservé, et c'est voulu : il est
+     * déterministe, donc les mêmes données lui redonnent exactement le même plan — ce que
+     * l'empreinte vient de garantir. Le rejouer depuis la base demanderait d'ouvrir l'état interne
+     * du moteur, pour un gain d'une seconde et demie.
+     */
+    let planInitial: string | null = null
+
+    if (chercheUnMeilleurPlan && scheduler) {
+      const apercu = await prisma.volunteerAutoAssignPlan.findFirst({
+        where: { id: body.planId, eventId: editionId },
+        select: { id: true, appliedAt: true, expiresAt: true, fingerprint: true },
+      })
+
+      if (!apercu) {
+        throw createError({ status: 404, message: "Cet aperçu n'existe plus : relancez le calcul" })
+      }
+      if (apercu.appliedAt) {
+        throw createError({ status: 409, message: 'Cet aperçu a déjà été appliqué' })
+      }
+      if (apercu.expiresAt.getTime() < Date.now()) {
+        throw createError({
+          status: 409,
+          message: 'Cet aperçu a trop vieilli : relancez le calcul pour voir l’état actuel',
+        })
+      }
+      if (apercu.fingerprint !== empreinte) {
+        throw createError({
+          status: 409,
+          message: 'Le planning a changé depuis cet aperçu : relancez le calcul',
+        })
+      }
+
+      const avant = result
+      result = scheduler.chercherUnMeilleurPlan(budgetDeRecherche)
+      planInitial = apercu.id
+
+      log.info('Recherche locale terminée', {
+        edition: editionId,
+        par: user.id,
+        budget: budgetDeRecherche,
+        iterations: result.recherche?.iterations,
+        retenus: result.recherche?.mouvementsRetenus,
+        horairesAvant: avant?.stats.creneauxDansLesHorairesSouhaites,
+        horairesApres: result.stats.creneauxDansLesHorairesSouhaites,
+      })
+    }
+
     let planRetenu = result?.assignments ?? []
     let perimetreRetenu = perimetre
 
@@ -737,6 +815,15 @@ export default wrapApiHandler(
       effacees: bilan?.effacees ?? 0,
       // L'identifiant de l'aperçu : à renvoyer pour appliquer exactement ce plan-ci.
       planId,
+      /**
+       * L'aperçu dont celui-ci est l'amélioration, quand c'est le second moteur qui a répondu.
+       *
+       * Les DEUX plans restent applicables : l'écran les met côte à côte et l'organisateur choisit.
+       * C'est tout l'objet de la cohabitation — la recherche locale propose, elle ne remplace pas.
+       */
+      planInitial,
+      /** Ce que la recherche a fait. Absent quand c'est le glouton seul qui a répondu. */
+      recherche: result?.recherche ?? null,
       // Ce que l'application effacerait : à montrer avant, pas à découvrir après.
       suppressionsPrevues,
     })

@@ -164,7 +164,16 @@
       "history_description": "I calcoli di assegnazione automatica già lanciati su questa edizione.",
       "history_empty": "Nessun calcolo è ancora stato lanciato su questa edizione.",
       "history_line": "Lanciato da {author} — {created} assegnazione/i creata/e, {deleted} eliminata/e.",
-      "history_undone": "Annullato da {author} il {date}."
+      "history_undone": "Annullato da {author} il {date}.",
+      "search_title": "Cercare una pianificazione migliore",
+      "search_description": "Un secondo algoritmo riprende questa pianificazione e tenta di migliorarla, senza mai peggiorarla. Guadagna soprattutto sugli orari desiderati; non coprirà alcun turno vuoto.",
+      "search_action": "Cerca meglio",
+      "search_done": "Ricerca terminata",
+      "compare_title": "Le due pianificazioni",
+      "compare_greedy": "Pianificazione iniziale",
+      "compare_search": "Dopo la ricerca",
+      "compare_help": "Scegli quella da applicare: è questa che verrà scritta.",
+      "compare_no_gain": "La ricerca non ha trovato niente di meglio. La pianificazione iniziale resta la migliore."
     },
     "autonomous_team": "Squadra autonoma",
     "autonomous_team_badge": "Autonoma",

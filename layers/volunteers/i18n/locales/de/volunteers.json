@@ -164,7 +164,16 @@
       "history_description": "Die bereits für diese Ausgabe gestarteten automatischen Zuteilungen.",
       "history_empty": "Für diese Ausgabe wurde noch keine Berechnung gestartet.",
       "history_line": "Gestartet von {author} — {created} Zuteilung(en) erstellt, {deleted} gelöscht.",
-      "history_undone": "Von {author} am {date} rückgängig gemacht."
+      "history_undone": "Von {author} am {date} rückgängig gemacht.",
+      "search_title": "Einen besseren Plan suchen",
+      "search_description": "Ein zweiter Algorithmus nimmt diesen Plan und versucht ihn zu verbessern, ohne ihn je zu verschlechtern. Er gewinnt vor allem bei den gewünschten Zeiten; er füllt keinen leeren Einsatz.",
+      "search_action": "Besseren suchen",
+      "search_done": "Suche abgeschlossen",
+      "compare_title": "Die beiden Pläne",
+      "compare_greedy": "Ursprünglicher Plan",
+      "compare_search": "Nach der Suche",
+      "compare_help": "Wählen Sie den Plan, den Sie anwenden möchten: dieser wird geschrieben.",
+      "compare_no_gain": "Die Suche hat nichts Besseres gefunden. Der ursprüngliche Plan bleibt der beste."
     },
     "autonomous_team": "Eigenständiges Team",
     "autonomous_team_badge": "Eigenständig",

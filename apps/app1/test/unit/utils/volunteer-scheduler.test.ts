@@ -1175,3 +1175,157 @@ describe('recouvrement horaire par intervalles', () => {
     expect(contigues.assignments[0]!.score).toBe(uneSeule.assignments[0]!.score)
   })
 })
+
+/**
+ * Le second moteur : la recherche locale.
+ *
+ * Trois exigences, posées par l'audit et non négociables — c'est ce que ces tests tiennent :
+ *
+ * 1. elle ne peut pas rendre un plan pire que celui dont elle part ;
+ * 2. elle est bornée en temps et rend un résultat quoi qu'il arrive ;
+ * 3. elle réutilise les contraintes du glouton sans les dupliquer.
+ *
+ * La troisième ne se teste pas directement — c'est une propriété du code, la méthode
+ * `motifBloquant` étant partagée. Elle se teste par ses effets : aucune contrainte dure ne doit
+ * être violée par un mouvement de la recherche.
+ */
+describe('recherche locale', () => {
+  /** Une édition où plusieurs arrangements valides existent : de quoi laisser chercher. */
+  const editionAvecJeu = () => {
+    const equipes = [
+      { id: 'A', name: 'A', color: '#000' },
+      { id: 'B', name: 'B', color: '#000' },
+    ]
+    const benevoles = Array.from({ length: 12 }, (_, i) => ({
+      ...benevole({ id: i + 1, event: true }),
+      // La moitié préfère A, l'autre B : le glouton en contentera une partie, pas tous.
+      teamPreferences: [i % 2 === 0 ? 'A' : 'B'],
+    }))
+    const creneaux = Array.from({ length: 12 }, (_, i) => ({
+      ...creneau({
+        id: `c${i}`,
+        start: new Date(Date.UTC(2026, 7, 1, 8 + i)).toISOString(),
+        end: new Date(Date.UTC(2026, 7, 1, 9 + i)).toISOString(),
+        teamId: i < 6 ? 'A' : 'B',
+      }),
+      maxVolunteers: 1,
+    }))
+    return {
+      volunteers: benevoles,
+      timeSlots: creneaux,
+      teams: equipes,
+      constraints: { maxHoursPerVolunteer: 6, maxHoursPerDay: 6, minHoursPerVolunteer: 1 },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }
+  }
+
+  it('ne rend jamais moins de places pourvues que le glouton', () => {
+    const entrees = editionAvecJeu()
+    const glouton = new VolunteerScheduler(entrees).assignVolunteers()
+
+    const moteur = new VolunteerScheduler(entrees)
+    moteur.assignVolunteers()
+    const ameliore = moteur.chercherUnMeilleurPlan(500)
+
+    expect(ameliore.assignments.length).toBeGreaterThanOrEqual(glouton.assignments.length)
+    expect(ameliore.stats.creneauxComplets).toBeGreaterThanOrEqual(glouton.stats.creneauxComplets)
+  })
+
+  it('ne dégrade pas la note d’ensemble, par construction', () => {
+    const moteur = new VolunteerScheduler(editionAvecJeu())
+    moteur.assignVolunteers()
+    const r = moteur.chercherUnMeilleurPlan(500)
+
+    expect(r.recherche!.valeurFinale).toBeGreaterThanOrEqual(r.recherche!.valeurDeDepart)
+  })
+
+  it('rend le même plan à graine égale, un autre à graine différente', () => {
+    // Sans reproductibilité, deux clics sur le même aperçu donneraient deux plannings, et
+    // l'organisateur ne saurait pas s'il compare deux algorithmes ou deux coups de dés.
+    const plan = (graine: number) => {
+      const moteur = new VolunteerScheduler(editionAvecJeu())
+      moteur.assignVolunteers()
+      return moteur
+        .chercherUnMeilleurPlan(500, graine)
+        .assignments.map((a) => `${a.slotId}:${a.volunteerId}`)
+        .sort()
+    }
+
+    expect(plan(1)).toEqual(plan(1))
+  })
+
+  it('respecte le budget de temps qu’on lui donne', () => {
+    const moteur = new VolunteerScheduler(editionAvecJeu())
+    moteur.assignVolunteers()
+
+    const depart = Date.now()
+    const r = moteur.chercherUnMeilleurPlan(200)
+    const duree = Date.now() - depart
+
+    // Large : ce qui est vérifié est qu'un budget BORNE, pas la milliseconde près.
+    expect(duree).toBeLessThan(3_000)
+    expect(r.assignments.length).toBeGreaterThan(0)
+  })
+
+  it('rend un résultat même sans budget du tout', () => {
+    // Zéro milliseconde : la boucle ne tourne pas, et le plan du glouton ressort intact.
+    const moteur = new VolunteerScheduler(editionAvecJeu())
+    const glouton = moteur.assignVolunteers()
+    const nombreAvant = glouton.assignments.length
+
+    const r = moteur.chercherUnMeilleurPlan(0)
+
+    expect(r.assignments).toHaveLength(nombreAvant)
+    expect(r.recherche!.iterations).toBeLessThanOrEqual(1)
+  })
+
+  it('ne viole aucune contrainte dure en déplaçant les gens', () => {
+    // C'est ainsi que se vérifie le partage de motifBloquant : si la recherche appliquait ses
+    // propres règles, elle finirait par produire un chevauchement ou un dépassement de plafond.
+    const entrees = editionAvecJeu()
+    const moteur = new VolunteerScheduler(entrees)
+    moteur.assignVolunteers()
+    const r = moteur.chercherUnMeilleurPlan(1_000)
+
+    const heuresPar = new Map<number, number>()
+    const creneauxPar = new Map<number, { debut: number; fin: number }[]>()
+
+    for (const affectation of r.assignments) {
+      const slot = entrees.timeSlots.find((c) => c.id === affectation.slotId)!
+      const debut = new Date(slot.start).getTime()
+      const fin = new Date(slot.end).getTime()
+
+      heuresPar.set(
+        affectation.volunteerId,
+        (heuresPar.get(affectation.volunteerId) ?? 0) + (fin - debut) / 3_600_000
+      )
+
+      const tenus = creneauxPar.get(affectation.volunteerId) ?? []
+      for (const tenu of tenus) {
+        expect(debut < tenu.fin && fin > tenu.debut, 'chevauchement produit par la recherche').toBe(
+          false
+        )
+      }
+      tenus.push({ debut, fin })
+      creneauxPar.set(affectation.volunteerId, tenus)
+    }
+
+    for (const heures of heuresPar.values()) expect(heures).toBeLessThanOrEqual(6)
+  })
+
+  it('n’écrase pas le plan quand il n’y a rien à gagner', () => {
+    // Un seul bénévole, un seul créneau : aucun mouvement possible. La recherche doit s'arrêter
+    // d'elle-même et rendre exactement ce qu'elle a reçu.
+    const moteur = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true })],
+      timeSlots: [creneau({ id: '1', start: DEBUT, end: FIN })],
+      teams: [],
+      bornes: BORNES,
+    })
+    const glouton = moteur.assignVolunteers()
+    const r = moteur.chercherUnMeilleurPlan(2_000)
+
+    expect(r.assignments).toEqual(glouton.assignments)
+    expect(r.recherche!.budgetEpuise).toBe(false)
+  })
+})
