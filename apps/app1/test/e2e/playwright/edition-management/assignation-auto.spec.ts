@@ -3,6 +3,8 @@ import type { Page } from '@playwright/test'
 import { expect, test } from '@nuxt/test-utils/playwright'
 
 import {
+  apiDelete,
+  apiPatch,
   apiPost,
   enableVolunteers,
   getVolunteerSettings,
@@ -20,6 +22,7 @@ const affectationsDuCreneau = async (page: Page, editionId: string, creneauId: s
   expect(reponse.ok(), `lecture des affectations : ${await reponse.text()}`).toBe(true)
   const corps = await reponse.json()
   return (Array.isArray(corps) ? corps : (corps.data ?? [])) as {
+    id: string
     userId?: number
     user?: { id: number }
   }[]
@@ -119,7 +122,32 @@ test.describe.serial('Assignation automatique des bénévoles', () => {
         }
       )
       expect(creation.ok(), `create-user-and-add : ${await creation.text()}`).toBe(true)
-      benevoles.push((await creation.json()).data.user.id)
+      const cree = (await creation.json()).data
+      benevoles.push(cree.user.id)
+
+      /**
+       * Déclarer sa présence, comme le ferait un vrai candidat.
+       *
+       * Un bénévole ajouté à la main par un organisateur arrive sans aucune disponibilité :
+       * `eventAvailability` vaut `null`, et le planificateur le refuse alors pour « indisponible »
+       * — c'est le comportement voulu, pas un défaut. Sans cette étape, le calcul ne proposerait
+       * rien et ce fichier testerait un aperçu vide.
+       */
+      const jour = (decalage: number) =>
+        new Date(debut.getTime() + decalage * 86400000).toISOString().split('T')[0]
+
+      const disponibilite = await apiPatch(
+        page,
+        `${BASE}/api/editions/${editionId}/volunteers/applications/${cree.application.id}`,
+        {
+          data: {
+            eventAvailability: true,
+            arrivalDateTime: `${jour(0)}_morning`,
+            departureDateTime: `${jour(2)}_evening`,
+          },
+        }
+      )
+      expect(disponibilite.ok(), `disponibilité : ${await disponibilite.text()}`).toBe(true)
     }
   })
 
@@ -135,7 +163,12 @@ test.describe.serial('Assignation automatique des bénévoles', () => {
 
     const corps = (await reponse.json()).data
     expect(corps.preview).toBe(true)
-    expect(corps.result.assignments.length).toBeGreaterThan(0)
+    // Le motif de refus, s'il y en a un : sans lui, un aperçu vide n'apprend rien et se
+    // diagnostique à l'aveugle. L'endpoint le calcule déjà, autant le lire.
+    expect(
+      corps.result.assignments.length,
+      `aucune affectation proposée — refus : ${JSON.stringify(corps.result.refus)}`
+    ).toBeGreaterThan(0)
 
     // L'identifiant de l'aperçu : c'est lui qui permet d'appliquer exactement ce plan-ci.
     planId = corps.planId
@@ -258,13 +291,21 @@ test.describe.serial('Assignation automatique des bénévoles', () => {
     expect(applique.ok(), `seconde application : ${await applique.text()}`).toBe(true)
     const secondJournal = (await applique.json()).data.journalId
 
-    // Une main humaine passe par là : un bénévole ajouté sur un créneau que le calcul a touché.
-    const ajout = await apiPost(
+    /**
+     * Une main humaine passe par là : l'organisateur retire quelqu'un que le calcul avait placé.
+     *
+     * Retirer plutôt qu'ajouter, et c'est le cas qui compte : annuler recréerait l'affectation
+     * qu'il vient d'effacer, donc défairait précisément la correction qu'il venait d'apporter.
+     */
+    const avantRetouche = await affectationsDuCreneau(page, editionId, creneaux[1]!)
+    expect(avantRetouche.length, 'le calcul devrait avoir pourvu ce créneau').toBeGreaterThan(0)
+    const retiree = avantRetouche[0]!
+
+    const retrait = await apiDelete(
       page,
-      `${BASE}/api/editions/${editionId}/volunteer-time-slots/${creneaux[1]}/assignments`,
-      { data: { userId: benevoles[2] } }
+      `${BASE}/api/editions/${editionId}/volunteer-time-slots/${creneaux[1]}/assignments/${retiree.id}`
     )
-    expect(ajout.ok(), `affectation manuelle : ${await ajout.text()}`).toBe(true)
+    expect(retrait.ok(), `retrait manuel : ${await retrait.text()}`).toBe(true)
 
     const annulation = await apiPost(
       page,
@@ -273,8 +314,8 @@ test.describe.serial('Assignation automatique des bénévoles', () => {
     )
     expect(annulation.status(), 'annuler effacerait le travail fait entre-temps').toBe(409)
 
-    // Et surtout : rien n'a bougé. L'affectation manuelle est toujours là.
+    // Et surtout : rien n'a bougé. Le bénévole retiré n'a pas été remis.
     const affectations = await affectationsDuCreneau(page, editionId, creneaux[1]!)
-    expect(affectations.map((a) => a.userId ?? a.user?.id)).toContain(benevoles[2])
+    expect(affectations.map((a) => a.id)).not.toContain(retiree.id)
   })
 })
