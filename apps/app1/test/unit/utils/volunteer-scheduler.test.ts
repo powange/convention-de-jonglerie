@@ -701,3 +701,45 @@ describe('diagnostic des refus', () => {
     expect(r.warnings).toContainEqual({ code: 'unassigned_slots', params: { count: 1 } })
   })
 })
+
+/**
+ * Le calcul recalculait tout à chaque évaluation de score : les heures d'un bénévole par un
+ * balayage de toutes les affectations croisé avec tous les créneaux, la moyenne en refaisant cela
+ * pour chaque bénévole. Mesuré avant correction : 3 s pour 50 bénévoles et 60 créneaux, 33 s pour
+ * 100 × 150, **4 min 42 pour 200 × 300**.
+ *
+ * Ce test ne mesure pas une durée — une machine de CI n'est pas un chronomètre fiable — mais il
+ * échoue si la complexité revient : à cette taille, l'ancienne version dépassait largement la
+ * minute là où la nouvelle tient en quelques secondes.
+ */
+describe('coût du calcul', () => {
+  it('traite une grosse édition sans y passer la journée', () => {
+    const benevoles = Array.from({ length: 120 }, (_, i) => benevole({ id: i + 1, event: true }))
+    const creneaux = Array.from({ length: 180 }, (_, i) => {
+      const jour = 1 + Math.floor(i / 12)
+      const heure = 8 + (i % 12)
+      return {
+        ...creneau({
+          id: `c${i}`,
+          start: new Date(Date.UTC(2026, 7, jour, heure)).toISOString(),
+          end: new Date(Date.UTC(2026, 7, jour, heure + 2)).toISOString(),
+        }),
+        maxVolunteers: 3,
+      }
+    })
+
+    const depart = Date.now()
+    const r = new VolunteerScheduler(
+      benevoles,
+      creneaux,
+      [],
+      { maxHoursPerVolunteer: 24, maxHoursPerDay: 12 },
+      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-30T00:00:00.000Z' }
+    ).assignVolunteers()
+    const duree = Date.now() - depart
+
+    expect(r.assignments.length).toBeGreaterThan(0)
+    // Large exprès : ce qui compte est l'ordre de grandeur, pas la milliseconde.
+    expect(duree).toBeLessThan(30_000)
+  }, 120_000)
+})

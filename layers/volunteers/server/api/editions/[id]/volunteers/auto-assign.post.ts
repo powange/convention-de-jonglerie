@@ -76,6 +76,31 @@ interface EffacementRattachement {
 const log = createLogger('ASSIGNATION-AUTO')
 
 /**
+ * Pourquoi ce calcul reste SYNCHRONE, et ce qu'il faudrait pour en changer.
+ *
+ * La question s'est posée : fallait-il rendre un identifiant de tâche et faire interroger
+ * l'avancement par le client ? Les mesures disent non, et c'est sur elles qu'on tranche.
+ *
+ * Avant l'indexation du planificateur — 4 min 42 pour 200 bénévoles et 300 créneaux —, la réponse
+ * aurait été oui sans hésiter : aucun proxy ne laisse passer cela. Après :
+ *
+ * | Édition            | Durée du calcul |
+ * | ------------------ | --------------- |
+ * | 50 bénévoles × 60  | 0,5 s           |
+ * | 100 × 150          | 1,9 s           |
+ * | 200 × 300          | 7,8 s           |
+ *
+ * Sept secondes tiennent dans tous les délais de proxy usuels, et l'application ne recalcule plus
+ * rien depuis qu'elle relit le plan conservé. L'asynchrone coûterait un modèle de tâche, un
+ * endpoint d'avancement, une reprise après incident et un écran d'attente — pour un problème que
+ * les mesures ne montrent plus.
+ *
+ * **Ce qui ferait rouvrir la question** : une édition qui dépasserait nettement 300 créneaux, ou
+ * un ajout de contrainte qui remettrait du quadratique dans le score. Le test « coût du calcul »
+ * de `volunteer-scheduler.test.ts` est là pour prévenir du second cas.
+ */
+
+/**
  * Le calcul est cher : il lit toutes les données bénévoles de l'édition et fait tourner un
  * algorithme dont le coût croît vite avec le nombre de créneaux. Un doigt resté sur le bouton
  * « Aperçu » suffisait à occuper le serveur.
@@ -447,8 +472,6 @@ export default wrapApiHandler(
       eventRecord.edition?.timezone ?? null
     )
 
-    const result = scheduler.assignVolunteers()
-
     /**
      * Appliquer, c'est écrire le plan QU'ON A MONTRÉ — pas en recalculer un autre.
      *
@@ -456,11 +479,23 @@ export default wrapApiHandler(
      * relu et écrit, après vérification que les données n'ont pas bougé. Sans identifiant, on
      * retombe sur l'ancien comportement : un appel écrit avant cette évolution continue de
      * fonctionner, et un script qui applique directement reste possible.
+     *
+     * ⚠️ Et dans ce cas, **l'algorithme n'est pas relancé**. Il l'était, pour produire une
+     * réponse dont le contenu était aussitôt remplacé par le plan conservé : sur une édition de
+     * deux cents bénévoles, cela faisait plusieurs secondes de calcul pour rien, à chaque
+     * application.
      */
-    let planRetenu = result.assignments
+    const avecPlanConserve =
+      body.applyAssignments === true && typeof body.planId === 'string' && Boolean(body.planId)
+
+    let result: ReturnType<typeof scheduler.assignVolunteers> | null = avecPlanConserve
+      ? null
+      : scheduler.assignVolunteers()
+
+    let planRetenu = result?.assignments ?? []
     let perimetreRetenu = perimetre
 
-    if (body.applyAssignments === true && typeof body.planId === 'string' && body.planId) {
+    if (avecPlanConserve) {
       const plan = await prisma.volunteerAutoAssignPlan.findFirst({
         where: { id: body.planId, eventId: editionId },
       })
@@ -496,6 +531,27 @@ export default wrapApiHandler(
 
       planRetenu = plan.assignments as unknown as Assignment[]
       perimetreRetenu = plan.perimetre as unknown as PerimetreDuCalcul
+      // Le résultat montré à l'organisateur, conservé avec le plan : la réponse le rend tel quel
+      // plutôt que de le recalculer.
+      result = (plan.resultat as unknown as typeof result) ?? null
+    }
+
+    if (!result) {
+      // Un plan conservé avant l'ajout de `resultat`, ou une réponse vide : on rend au moins ce
+      // qui a été écrit, plutôt que de relancer un calcul de plusieurs secondes pour l'affichage.
+      result = {
+        assignments: planRetenu,
+        unassigned: { volunteers: [], slots: [] },
+        stats: {
+          totalAssignments: planRetenu.length,
+          averageHoursPerVolunteer: 0,
+          satisfactionRate: 0,
+          balanceScore: 0,
+        },
+        warnings: [],
+        recommendations: [],
+        refus: { parBenevole: [], parCreneau: [] },
+      }
     }
 
     // Application des assignations en base de données si demandé
@@ -587,6 +643,7 @@ export default wrapApiHandler(
           constraints: constraints as Prisma.InputJsonValue,
           assignments: result.assignments as unknown as Prisma.InputJsonValue,
           perimetre: perimetre as unknown as Prisma.InputJsonValue,
+          resultat: result as unknown as Prisma.InputJsonValue,
         },
         select: { id: true },
       })
