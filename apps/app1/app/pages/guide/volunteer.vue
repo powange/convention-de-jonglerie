@@ -106,6 +106,64 @@
           {{ t('sections.planning.export.title') }}
         </h3>
         <p class="text-gray-600 dark:text-gray-400">{{ t('sections.planning.export.content') }}</p>
+
+        <h3 class="text-base font-semibold text-gray-800 dark:text-gray-200 mt-5 mb-2">
+          {{ t('sections.planning.empty.title') }}
+        </h3>
+        <ul class="space-y-2">
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-eye-slash" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.planning.empty.notPublished')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-bolt" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.planning.empty.floating')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-lock-closed" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.planning.empty.autonomous')
+            }}</span>
+          </li>
+        </ul>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ t('sections.planning.empty.otherwise') }}
+        </p>
+      </GuideSection>
+
+      <GuideSection
+        icon="i-heroicons-arrows-right-left"
+        :title="t('sections.swaps.title')"
+        color="green"
+      >
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.swaps.intro') }}</p>
+        <ul class="space-y-2">
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.swaps.propose') }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.swaps.overlap') }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.swaps.accept') }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.swaps.approve') }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-green-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.swaps.closed') }}</span>
+          </li>
+        </ul>
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.swaps.floating') }}</p>
       </GuideSection>
 
       <GuideSection
@@ -207,6 +265,34 @@ const messages = {
         content:
           "Exportez votre planning personnel au format iCal (pour l'ajouter à votre agenda) ou en PDF (pour l'imprimer).",
       },
+      empty: {
+        title: 'Votre planning est vide ? Trois raisons possibles',
+        notPublished:
+          "Le planning n'est pas encore publié. Les organisateurs le construisent par itérations et ne le montrent qu'une fois stabilisé — mieux vaut ne rien voir que noter des horaires qui changeront le lendemain. Vous serez prévenu à sa publication.",
+        floating:
+          "Vous êtes bénévole volant. C'est normal et c'est le principe : vous êtes à disposition pendant l'événement pour renforcer les équipes qui en ont besoin, sans créneau fixe. Si on vous place sur un créneau, il apparaîtra ici. Un encart vous l'indique sur votre page bénévole.",
+        autonomous:
+          "Votre équipe est autonome : elle s'organise elle-même, en dehors de l'outil. Vos horaires se décident donc avec elle, et non dans le planning de l'édition.",
+        otherwise:
+          'Hors de ces trois cas, les affectations sont peut-être simplement encore à faire — demandez à votre responsable.',
+      },
+    },
+    swaps: {
+      title: 'Échanger un créneau',
+      intro:
+        "Un empêchement, un horaire qui ne vous arrange plus : vous pouvez proposer l'un de vos créneaux à un autre bénévole, sans passer par l'organisation pour trouver la personne.",
+      propose:
+        'Depuis votre espace bénévole, choisissez le créneau que vous cédez et celui que vous souhaitez en échange, parmi ceux de vos équipes.',
+      overlap:
+        'Les créneaux qui chevaucheraient un des vôtres ne vous sont pas proposés : un échange ne doit pas vous mettre à deux endroits à la fois.',
+      accept:
+        "L'autre bénévole reçoit votre proposition et l'accepte ou la refuse. Vous pouvez retirer votre demande tant qu'elle est en attente.",
+      approve:
+        "Un organisateur valide ensuite l'échange. Rien ne change au planning avant cette validation — c'est lui qui vérifie que le créneau reste correctement tenu.",
+      closed:
+        "Les organisateurs peuvent fermer les échanges pour leur édition ; l'option disparaît alors de votre espace.",
+      floating:
+        "Les bénévoles volants n'échangent pas : n'étant tenus à aucun volume d'heures, ils n'ont ni créneau à céder ni créneau à reprendre.",
     },
     communication: {
       title: 'Communication',

@@ -21,6 +21,38 @@
       </GuideSection>
 
       <GuideSection
+        icon="i-heroicons-calendar-days"
+        :title="t('sections.program.title')"
+        color="indigo"
+      >
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.program.intro') }}</p>
+        <ul class="space-y-2">
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{ t('sections.program.enable') }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.program.publish')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.program.sources')
+            }}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <UIcon name="i-heroicons-check-circle" class="size-5 text-indigo-500 mt-0.5 shrink-0" />
+            <span class="text-gray-600 dark:text-gray-400">{{
+              t('sections.program.external')
+            }}</span>
+          </li>
+        </ul>
+      </GuideSection>
+
+      <GuideSection
         icon="i-heroicons-academic-cap"
         :title="t('sections.workshops.title')"
         color="indigo"
@@ -140,7 +172,7 @@
 // les non-francophones à utiliser la traduction intégrée de leur navigateur.
 const messages = {
   title: 'Autres fonctionnalités',
-  subtitle: 'FAQ, workshops, objets trouvés, publications et covoiturage.',
+  subtitle: 'FAQ, programme, workshops, objets trouvés, publications et covoiturage.',
   sections: {
     faq: {
       title: 'FAQ',
@@ -162,12 +194,27 @@ const messages = {
     },
     lostFound: {
       title: 'Objets trouvés',
-      intro: "Activez le système d'objets trouvés pendant votre édition.",
-      activate: "Le module est disponible uniquement pendant la durée de l'édition.",
+      intro:
+        "Le registre des objets perdus et retrouvés de votre édition. Il n'y a rien à activer : l'onglet apparaît de lui-même le jour où l'édition commence.",
+      activate:
+        "Et il ne se referme pas à la fin. C'est voulu : on réclame un objet oublié dans les jours qui suivent la convention, rarement pendant.",
       report:
         'Les participants et bénévoles peuvent signaler un objet trouvé avec photo et description.',
       list: 'Consultez la liste de tous les objets signalés depuis le tableau de bord.',
       recover: 'Marquez un objet comme récupéré lorsque son propriétaire le réclame.',
+    },
+    program: {
+      title: 'Programme',
+      intro:
+        "La frise horaire de l'édition, qui réunit sur une même ligne de temps les ateliers, les spectacles et les éléments que vous ajoutez librement (repas, ouverture du camping, veillée…).",
+      enable:
+        "Activez le module « Programme » depuis les informations de l'édition. Comme les autres modules, il est éteint au départ : une édition qui n'a rien saisi ne doit pas exposer un onglet vide.",
+      publish:
+        "La visibilité publique de la frise est un réglage SÉPARÉ de l'activation — on compose un programme pendant des semaines avant qu'il ne mérite d'être montré. Tant qu'il est fermé, vous seuls le voyez.",
+      sources:
+        'Les ateliers et les spectacles y remontent tout seuls depuis leurs modules : vous ne les ressaisissez pas ici.',
+      external:
+        "Si vous tenez déjà votre programme sur votre propre site, renseignez-en simplement l'adresse dans les informations de l'édition.",
     },
     publications: {
       title: 'Publications',

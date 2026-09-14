@@ -11,6 +11,15 @@
       </GuideSection>
 
       <GuideSection
+        icon="i-heroicons-arrow-top-right-on-square"
+        :title="t('sections.external.title')"
+        color="amber"
+      >
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.external.content') }}</p>
+        <p class="text-gray-600 dark:text-gray-400">{{ t('sections.external.note') }}</p>
+      </GuideSection>
+
+      <GuideSection
         icon="i-heroicons-square-3-stack-3d"
         :title="t('sections.zones.title')"
         color="green"
@@ -96,6 +105,12 @@ const messages = {
       title: 'Publication de la carte',
       content:
         "Activez la carte interactive pour la rendre visible aux visiteurs de votre édition. Tant que la carte n'est pas publiée, seuls les organisateurs y ont accès pour la préparer.",
+    },
+    external: {
+      title: 'Vous avez déjà votre plan ailleurs ?',
+      content:
+        "Si votre plan du site existe déjà sur un service tiers, renseignez-le dans les informations de l'édition : il s'affichera À LA PLACE de la carte interne, et vous n'avez alors ni zones ni marqueurs à redessiner. Google My Maps est le seul service reconnu pour l'instant.",
+      note: "Le reste de cette page ne concerne que la carte interne. À noter tout de même : les zones et les marqueurs internes servent aussi ailleurs dans l'application — pour situer un spectacle, un créneau de bénévoles ou l'emplacement de rangement d'un objet du stock. Une carte externe ne rend pas ces services.",
     },
     zones: {
       title: 'Zones',

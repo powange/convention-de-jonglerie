@@ -60,6 +60,11 @@ const messages = {
       title: 'Bénévole',
       description: 'Postulez en tant que bénévole, consultez votre planning et gérez vos créneaux.',
     },
+    'regie-son': {
+      title: 'Régie Son',
+      description:
+        'Préparez la bande-son de votre numéro et transmettez-la prête à jouer au régisseur.',
+    },
   },
 }
 
@@ -114,6 +119,17 @@ const roles = computed(() => [
     icon: 'i-heroicons-hand-raised',
     bgClass: 'bg-green-100 dark:bg-green-900/30',
     iconClass: 'text-green-600 dark:text-green-400',
+  },
+  // Régie Son n'est pas un rôle mais un outil séparé. Elle figure ici quand même : elle n'était
+  // atteignable que par la barre latérale, donc invisible pour qui arrive sur cette page — et
+  // repliée sur mobile.
+  {
+    slug: 'regie-son',
+    title: t('roles.regie-son.title'),
+    description: t('roles.regie-son.description'),
+    icon: 'i-heroicons-speaker-wave',
+    bgClass: 'bg-indigo-100 dark:bg-indigo-900/30',
+    iconClass: 'text-indigo-600 dark:text-indigo-400',
   },
 ])
 </script>
