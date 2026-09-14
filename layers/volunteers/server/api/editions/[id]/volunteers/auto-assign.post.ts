@@ -226,6 +226,21 @@ export default wrapApiHandler(
         description: slot.description || undefined,
       }))
 
+    /**
+     * Les créneaux que le calcul a réellement examinés — et donc les seuls qu'il a le droit
+     * d'effacer.
+     *
+     * Sans cette liste, la relance supprimait les affectations de TOUTE l'édition alors que le
+     * filtre ci-dessus venait d'écarter les créneaux des équipes volantes et autonomes : elles
+     * étaient effacées, puis jamais recréées, puisque le planificateur ne les voyait pas. Un
+     * « tout effacer et recalculer » vidait ainsi définitivement le planning d'une équipe
+     * autonome, qui s'organise pourtant à la main.
+     *
+     * Ces identifiants viennent d'une requête déjà bornée à l'édition : inutile de redemander
+     * `timeSlot: { eventId }` à la suppression, qui n'y gagnerait qu'une jointure.
+     */
+    const creneauxSoumisAuCalcul = schedulerTimeSlots.map((slot) => slot.id)
+
     const schedulerTeams = teams.map((team: Team) => ({
       id: team.id,
       name: team.name,
@@ -249,7 +264,7 @@ export default wrapApiHandler(
 
     // Application des assignations en base de données si demandé
     if (body.applyAssignments === true) {
-      await applyAssignments(editionId, result.assignments, user.id, mode)
+      await applyAssignments(editionId, result.assignments, user.id, mode, creneauxSoumisAuCalcul)
     }
 
     return createSuccessResponse({
@@ -270,15 +285,21 @@ async function applyAssignments(
   // des champs absents ici — le code fonctionnait, c'est le type qui décrivait autre chose.
   assignments: Assignment[],
   userId: number,
-  mode: 'replace-all' | 'keep-all' | 'keep-manual'
+  mode: 'replace-all' | 'keep-all' | 'keep-manual',
+  /**
+   * Les créneaux soumis au calcul, et la borne de ce que la suppression peut atteindre : ce que
+   * le planificateur n'a pas examiné, il ne le recréera pas, et n'a donc pas à l'effacer.
+   */
+  creneauxSoumisAuCalcul: string[]
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
-    // 1. Effacer ce que le mode ne conserve pas. En `keep-manual`, seules les affectations
-    //    posées par un précédent calcul disparaissent : les choix humains restent.
+    // 1. Effacer ce que le mode ne conserve pas, et seulement sur les créneaux que le calcul a
+    //    examinés. En `keep-manual`, seules les affectations posées par un précédent calcul
+    //    disparaissent : les choix humains restent.
     if (mode !== 'keep-all') {
       await tx.volunteerAssignment.deleteMany({
         where: {
-          timeSlot: { eventId: editionId },
+          timeSlotId: { in: creneauxSoumisAuCalcul },
           ...(mode === 'keep-manual' ? { source: 'AUTO' } : {}),
         },
       })
