@@ -598,7 +598,9 @@
       "title": "Materiellager",
       "upcoming": "Næste",
       "usage": "Anvendelse",
-      "usage_placeholder": "F.eks.: Ildshow lørdag kl. 22"
+      "usage_placeholder": "F.eks.: Ildshow lørdag kl. 22",
+      "bulk_edit_loan_scope_all": "Felterne nedenfor gælder den valgte genstand, som bliver et lån. | Felterne nedenfor gælder den valgte genstand, som bliver et lån. | Felterne nedenfor gælder de {count} valgte genstande, som bliver lån.",
+      "bulk_edit_loan_scope_none": "Udvalget er ikke længere udlånt: felterne nedenfor har ingen virkning. Allerede gemte værdier slettes ikke."
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

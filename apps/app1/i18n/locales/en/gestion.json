@@ -598,7 +598,9 @@
       "title": "Equipment stock",
       "upcoming": "Upcoming",
       "usage": "Usage",
-      "usage_placeholder": "e.g.: Fire show Saturday 10 PM"
+      "usage_placeholder": "e.g.: Fire show Saturday 10 PM",
+      "bulk_edit_loan_scope_all": "The fields below will apply to the selected item, which becomes a loan. | The fields below will apply to the selected item, which becomes a loan. | The fields below will apply to the {count} selected items, which become loans.",
+      "bulk_edit_loan_scope_none": "The selection will no longer be on loan: the fields below will have no effect. Values already saved are not erased."
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

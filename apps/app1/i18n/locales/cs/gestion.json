@@ -598,7 +598,9 @@
       "title": "Sklad materiálu",
       "upcoming": "Nadcházející",
       "usage": "Použití",
-      "usage_placeholder": "Např.: Ohnivé představení v sobotu ve 22 h"
+      "usage_placeholder": "Např.: Ohnivé představení v sobotu ve 22 h",
+      "bulk_edit_loan_scope_all": "Následující pole se použijí na vybraný předmět, který se stává zapůjčeným. | Následující pole se použijí na vybraný předmět, který se stává zapůjčeným. | Následující pole se použijí na {count} vybraných předmětů, které se stávají zapůjčenými.",
+      "bulk_edit_loan_scope_none": "Výběr už nebude zapůjčený: následující pole zůstanou bez účinku. Již uložené hodnoty se nemažou."
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

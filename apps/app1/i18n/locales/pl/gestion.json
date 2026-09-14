@@ -598,7 +598,9 @@
       "title": "Magazyn sprzętu",
       "upcoming": "Nadchodząca",
       "usage": "Zastosowanie",
-      "usage_placeholder": "Np.: Pokaz ognia w sobotę o 22"
+      "usage_placeholder": "Np.: Pokaz ognia w sobotę o 22",
+      "bulk_edit_loan_scope_all": "Poniższe pola będą dotyczyć wybranego przedmiotu, który staje się wypożyczony. | Poniższe pola będą dotyczyć wybranego przedmiotu, który staje się wypożyczony. | Poniższe pola będą dotyczyć {count} wybranych przedmiotów, które stają się wypożyczone.",
+      "bulk_edit_loan_scope_none": "Zaznaczenie przestanie być wypożyczone: poniższe pola pozostaną bez efektu. Już zapisane wartości nie są usuwane."
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

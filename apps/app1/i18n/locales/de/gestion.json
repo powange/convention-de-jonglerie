@@ -598,7 +598,9 @@
       "title": "Materialbestand",
       "upcoming": "Nächste",
       "usage": "Verwendung",
-      "usage_placeholder": "z. B.: Feuershow Samstag 22 Uhr"
+      "usage_placeholder": "z. B.: Feuershow Samstag 22 Uhr",
+      "bulk_edit_loan_scope_all": "Die Felder unten gelten für das ausgewählte Objekt, das zur Leihgabe wird. | Die Felder unten gelten für das ausgewählte Objekt, das zur Leihgabe wird. | Die Felder unten gelten für die {count} ausgewählten Objekte, die zu Leihgaben werden.",
+      "bulk_edit_loan_scope_none": "Die Auswahl ist keine Leihgabe mehr: die Felder unten bleiben wirkungslos. Bereits gespeicherte Werte werden nicht gelöscht."
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

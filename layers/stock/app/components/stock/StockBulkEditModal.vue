@@ -92,15 +92,31 @@
 
         <!-- Emprunt : n'atteint que le matériel effectivement prêté -->
         <div class="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-4">
+          <!-- L'interrupteur qui décide du statut, et qui n'est JAMAIS désactivé : c'est lui qui
+               fait basculer la sélection, il ne peut pas dépendre de l'état qu'il change. Sans
+               lui, déclarer dix objets comme prêtés demandait d'ouvrir dix fiches. -->
+          <div class="flex items-start gap-3">
+            <UCheckbox v-model="actifs.pretExterne" class="mt-1" />
+            <UFormField :label="t('gestion.stock.external_loan')" class="flex-1 min-w-0">
+              <USwitch v-model="valeurs.isExternalLoan" :disabled="!actifs.pretExterne" />
+            </UFormField>
+          </div>
+
           <p
             class="text-sm"
-            :class="nbEmpruntes ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 italic'"
+            :class="
+              champsEmpruntActifs ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 italic'
+            "
           >
-            {{ t('gestion.stock.bulk_edit_loan_scope', { count: nbEmpruntes }) }}
+            {{ porteeDesChampsDEmprunt }}
           </p>
 
           <div class="flex items-start gap-3">
-            <UCheckbox v-model="actifs.proprietaire" class="mt-7" :disabled="!nbEmpruntes" />
+            <UCheckbox
+              v-model="actifs.proprietaire"
+              class="mt-7"
+              :disabled="!champsEmpruntActifs"
+            />
             <UFormField :label="t('gestion.stock.owner_contact')" class="flex-1 min-w-0">
               <UInput
                 v-model="valeurs.ownerContact"
@@ -111,7 +127,7 @@
           </div>
 
           <div class="flex items-start gap-3">
-            <UCheckbox v-model="actifs.dateRetour" class="mt-7" :disabled="!nbEmpruntes" />
+            <UCheckbox v-model="actifs.dateRetour" class="mt-7" :disabled="!champsEmpruntActifs" />
             <UFormField :label="t('gestion.stock.return_due_at')" class="flex-1 min-w-0">
               <UiDateField v-model="valeurs.returnDueAt" :disabled="!actifs.dateRetour" />
             </UFormField>
@@ -120,7 +136,11 @@
           <!-- Le lieu et la personne ont chacun leur case : réunis sous une seule, changer qui
                récupère forçait à retoucher le lieu, ou à l'effacer sans le vouloir. -->
           <div class="flex items-start gap-3">
-            <UCheckbox v-model="actifs.lieuRecuperation" class="mt-7" :disabled="!nbEmpruntes" />
+            <UCheckbox
+              v-model="actifs.lieuRecuperation"
+              class="mt-7"
+              :disabled="!champsEmpruntActifs"
+            />
             <UFormField :label="t('gestion.stock.pickup_location')" class="flex-1 min-w-0">
               <UInput
                 v-model="valeurs.pickupLocation"
@@ -134,7 +154,7 @@
             <UCheckbox
               v-model="actifs.responsableRecuperation"
               class="mt-7"
-              :disabled="!nbEmpruntes"
+              :disabled="!champsEmpruntActifs"
             />
             <UFormField
               :label="t('gestion.stock.pickup_responsible')"
@@ -159,7 +179,7 @@
           </div>
 
           <div class="flex items-start gap-3">
-            <UCheckbox v-model="actifs.lieuRetour" class="mt-7" :disabled="!nbEmpruntes" />
+            <UCheckbox v-model="actifs.lieuRetour" class="mt-7" :disabled="!champsEmpruntActifs" />
             <UFormField :label="t('gestion.stock.return_location')" class="flex-1 min-w-0">
               <UInput
                 v-model="valeurs.returnLocation"
@@ -170,7 +190,11 @@
           </div>
 
           <div class="flex items-start gap-3">
-            <UCheckbox v-model="actifs.responsableRetour" class="mt-7" :disabled="!nbEmpruntes" />
+            <UCheckbox
+              v-model="actifs.responsableRetour"
+              class="mt-7"
+              :disabled="!champsEmpruntActifs"
+            />
             <UFormField
               :label="t('gestion.stock.return_responsible')"
               :description="t('gestion.stock.responsible_help')"
@@ -257,6 +281,7 @@ const AUCUN_PIN = 'none'
 // s'en charge se changent séparément. Réunis, désigner quelqu'un obligeait à retoucher le lieu.
 const actifs = reactive({
   emplacement: false,
+  pretExterne: false,
   tags: false,
   proprietaire: false,
   dateRetour: false,
@@ -267,6 +292,7 @@ const actifs = reactive({
 })
 
 const valeurs = reactive({
+  isExternalLoan: false,
   mapPin: AUCUN_PIN,
   location: '',
   addTags: [] as Array<{ label: string; value: number }>,
@@ -308,6 +334,30 @@ const mapPinItems = computed(() => [
 
 const pinChoisi = computed(() => mapPinItems.value.find((i) => i.value === valeurs.mapPin) || null)
 
+/**
+ * Les six champs de prêt s'appliqueront-ils à quelque chose ?
+ *
+ * La question ne porte pas sur l'état actuel de la sélection mais sur celui qu'elle aura : cocher
+ * « prêté par un externe » les rend utiles immédiatement, même si aucun objet n'était prêté — ce
+ * qui est précisément le cas quand on vient de recevoir du matériel d'un prêteur. Les laisser
+ * grisés là aurait obligé à enregistrer une première fois, puis à rouvrir la modale.
+ */
+const champsEmpruntActifs = computed(() => {
+  if (actifs.pretExterne) return valeurs.isExternalLoan
+  return props.nbEmpruntes > 0
+})
+
+/** Ce que la phrase de portée annonce, selon ce que le lot va faire du statut de prêt. */
+const porteeDesChampsDEmprunt = computed(() => {
+  if (actifs.pretExterne && valeurs.isExternalLoan) {
+    return t('gestion.stock.bulk_edit_loan_scope_all', { count: props.itemIds.length })
+  }
+  if (actifs.pretExterne && !valeurs.isExternalLoan) {
+    return t('gestion.stock.bulk_edit_loan_scope_none')
+  }
+  return t('gestion.stock.bulk_edit_loan_scope', { count: props.nbEmpruntes })
+})
+
 /** Rien de coché : il n'y a rien à appliquer, et le bouton doit le dire. */
 const rienAChanger = computed(() => !Object.values(actifs).some(Boolean))
 
@@ -318,6 +368,7 @@ watch(
   (ouvert) => {
     if (!ouvert) return
     for (const cle of Object.keys(actifs) as Array<keyof typeof actifs>) actifs[cle] = false
+    valeurs.isExternalLoan = false
     valeurs.mapPin = AUCUN_PIN
     valeurs.location = ''
     valeurs.addTags = []
@@ -349,6 +400,8 @@ function corpsDeLaRequete(): Record<string, unknown> {
     corps.zoneId = valeurs.mapPin.startsWith('zone:') ? Number(valeurs.mapPin.slice(5)) : null
     corps.markerId = valeurs.mapPin.startsWith('marker:') ? Number(valeurs.mapPin.slice(7)) : null
   }
+
+  if (actifs.pretExterne) corps.isExternalLoan = valeurs.isExternalLoan
 
   if (actifs.tags) {
     corps.addTagIds = valeurs.addTags.map((tg) => tg.value)

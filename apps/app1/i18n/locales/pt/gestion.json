@@ -598,7 +598,9 @@
       "title": "Estoque de material",
       "upcoming": "Próxima",
       "usage": "Utilização",
-      "usage_placeholder": "Ex.: Espetáculo de fogo sábado 22 h"
+      "usage_placeholder": "Ex.: Espetáculo de fogo sábado 22 h",
+      "bulk_edit_loan_scope_all": "Os campos abaixo aplicar-se-ão ao objeto selecionado, que passa a ser emprestado. | Os campos abaixo aplicar-se-ão ao objeto selecionado, que passa a ser emprestado. | Os campos abaixo aplicar-se-ão aos {count} objetos selecionados, que passam a ser emprestados.",
+      "bulk_edit_loan_scope_none": "A seleção deixará de ser emprestada: os campos abaixo ficarão sem efeito. Os valores já guardados não são apagados."
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

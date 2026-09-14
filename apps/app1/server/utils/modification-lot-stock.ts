@@ -29,6 +29,15 @@ export type ChampEmprunt = (typeof CHAMPS_EMPRUNT)[number]
 /** La demande, telle que le schéma la valide : chaque champ facultatif, `null` valant « vider ». */
 export interface DemandeModificationLot {
   stockGroupId?: number
+  /**
+   * Le statut de prêt lui-même, modifiable en lot.
+   *
+   * Il ne l'était pas : les six champs qui en dépendent — propriétaire, dates, lieux,
+   * responsables — se modifiaient par lot, mais pas l'interrupteur qui décide de leur existence.
+   * Déclarer dix objets comme prêtés demandait donc d'ouvrir dix fiches, et tant que ce n'était
+   * pas fait, les champs de prêt restaient sans effet sur eux.
+   */
+  isExternalLoan?: boolean
   location?: string | null
   zoneId?: number | null
   markerId?: number | null
@@ -51,6 +60,26 @@ export interface ChangementsEnLot {
 }
 
 /**
+ * Qui, dans la sélection, portera les champs de prêt après cette modification.
+ *
+ * Pas « qui les portait avant » : marquer dix objets comme prêtés ET leur poser un propriétaire
+ * dans la même requête doit fonctionner, sinon il faut s'y reprendre à deux fois — d'abord cocher,
+ * puis rouvrir la modale pour remplir.
+ *
+ * Et l'inverse compte autant : décocher le prêt ne doit pas appliquer les champs de prêt à du
+ * matériel qui n'en est plus. ⚠️ Ceux qu'il portait déjà ne sont pas effacés pour autant — la
+ * fiche cesse simplement de les montrer, et l'objet les retrouve s'il redevient un prêt.
+ */
+export function destinatairesDesChampsDEmprunt(
+  demande: DemandeModificationLot,
+  objets: { id: number; isExternalLoan: boolean }[]
+): number[] {
+  if (demande.isExternalLoan === true) return objets.map((objet) => objet.id)
+  if (demande.isExternalLoan === false) return []
+  return objets.filter((objet) => objet.isExternalLoan).map((objet) => objet.id)
+}
+
+/**
  * Traduit la demande en champs à écrire.
  *
  * Un champ absent n'apparaît nulle part : il ne sera pas touché. C'est ce qui distingue « laisser
@@ -68,6 +97,9 @@ export function changementsEnLot(demande: DemandeModificationLot): ChangementsEn
   const communs: Record<string, unknown> = {}
 
   if (demande.stockGroupId !== undefined) communs.stockGroupId = demande.stockGroupId
+  // Le statut de prêt s'applique à TOUTE la sélection : c'est lui qui décide qui est emprunté,
+  // il ne peut donc pas dépendre de qui l'était déjà.
+  if (demande.isExternalLoan !== undefined) communs.isExternalLoan = demande.isExternalLoan
   if (demande.location !== undefined) communs.location = demande.location || null
   if (demande.zoneId !== undefined || demande.markerId !== undefined) {
     communs.zoneId = demande.zoneId ?? null

@@ -598,7 +598,9 @@
       "title": "Materiallager",
       "upcoming": "Nästa",
       "usage": "Användning",
-      "usage_placeholder": "T.ex.: Eldshow lördag kl. 22"
+      "usage_placeholder": "T.ex.: Eldshow lördag kl. 22",
+      "bulk_edit_loan_scope_all": "Fälten nedan gäller det valda föremålet, som blir ett lån. | Fälten nedan gäller det valda föremålet, som blir ett lån. | Fälten nedan gäller de {count} valda föremålen, som blir lån.",
+      "bulk_edit_loan_scope_none": "Urvalet är inte längre utlånat: fälten nedan får ingen effekt. Redan sparade värden raderas inte."
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

@@ -3,7 +3,10 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { erreurOrdreEmprunt } from '#server/utils/emprunt-stock'
-import { changementsEnLot } from '#server/utils/modification-lot-stock'
+import {
+  changementsEnLot,
+  destinatairesDesChampsDEmprunt,
+} from '#server/utils/modification-lot-stock'
 import {
   canManageStock,
   getEditionWithPermissions,
@@ -28,6 +31,8 @@ const bodySchema = z.object({
   location: z.string().trim().max(200).nullable().optional(),
   zoneId: z.number().int().positive().nullable().optional(),
   markerId: z.number().int().positive().nullable().optional(),
+  // Le statut de prêt : c'est lui qui décide si les champs ci-dessous ont un objet.
+  isExternalLoan: z.boolean().optional(),
   ownerContact: z.string().trim().max(500).nullable().optional(),
   returnDueAt: z.string().datetime().nullable().optional(),
   pickupLocation: z.string().trim().max(500).nullable().optional(),
@@ -163,13 +168,20 @@ export default wrapApiHandler(
     // du seul matériel emprunté. La règle est éprouvée à part : cf. `modification-lot-stock`.
     const { communs, emprunt } = changementsEnLot(data)
 
+    // Qui portera les champs de prêt APRÈS cette modification — pas qui les portait avant.
+    // Marquer dix objets comme prêtés et leur poser un propriétaire dans la même requête doit
+    // fonctionner, sinon il faut s'y reprendre à deux fois.
+    const idsEmpruntes = destinatairesDesChampsDEmprunt(data, objets)
+
     // L'emprunt se déroule dans l'ordre : récupéré, puis rendu. Chaque objet est jugé sur son
     // propre état — une sélection mêle souvent du matériel déjà récupéré et du matériel qui ne
     // l'est pas. Un seul refus arrête tout le lot : appliquer la moitié d'une demande laisserait
     // une sélection dans deux états sans dire lequel est lequel.
     if (data.pickedUpAt !== undefined || data.returnedAt !== undefined) {
       for (const objet of objets) {
-        if (!objet.isExternalLoan) continue
+        // Les objets qui deviennent empruntés dans cette même requête sont concernés eux aussi :
+        // leurs jalons doivent respecter le même ordre que les autres.
+        if (!idsEmpruntes.includes(objet.id)) continue
         const erreur = erreurOrdreEmprunt(objet, {
           ...(data.pickedUpAt !== undefined
             ? { pickedUpAt: data.pickedUpAt ? new Date(data.pickedUpAt) : null }
@@ -182,7 +194,6 @@ export default wrapApiHandler(
       }
     }
 
-    const idsEmpruntes = objets.filter((o) => o.isExternalLoan).map((o) => o.id)
     const aAjouter = Array.from(new Set(data.addTagIds ?? []))
     const aRetirer = Array.from(new Set(data.removeTagIds ?? []))
 
