@@ -67,8 +67,6 @@
       "balance_teams": "Balance the workload between volunteers",
       "balance_teams_help": "Brings the busiest volunteers closer to the average by moving some of their slots to those with fewer hours",
       "beta_badge": "BETA",
-      "confirm_apply": "Are you sure you want to apply these assignments? This will replace all existing assignments.",
-      "confirm_apply_keep_existing": "Are you sure you want to apply these assignments? New assignments will be added to existing ones.",
       "confirm_details": "This action will create {count} new assignment(s).",
       "description": "The automatic assignment algorithm intelligently distributes volunteers to time slots while respecting their preferences, availability, and your organizational constraints.",
       "hours_per_day": "Hours per day",
@@ -120,7 +118,47 @@
       "undo_outdated": "Another run has been applied since: this is no longer the one being undone. Please reload the page.",
       "undo_nothing": "No run to undo",
       "preview_outdated": "The schedule has changed since this preview: run the calculation again before applying it.",
-      "preview_gone": "This preview is no longer available: run the calculation again."
+      "preview_gone": "This preview is no longer available: run the calculation again.",
+      "confirm_title": "Apply this run?",
+      "confirm_apply_replace_all": "Every assignment in the edition will be erased before this plan is written, including the ones you placed by hand.",
+      "confirm_apply_keep_manual": "The volunteers you placed by hand stay put. Only assignments from a previous run are redone.",
+      "confirm_apply_keep_all": "Nothing is erased: the run only fills the places still open.",
+      "deletions_title": "{count} assignment(s) will be erased",
+      "deletions_manual_warning": "Including {count} placed by hand: nothing will be able to rebuild them.",
+      "deletion_manual": "placed by hand",
+      "warning": {
+        "unassigned_volunteers": "{count} volunteer(s) with no slot at all",
+        "unassigned_slots": "{count} incomplete slot(s)"
+      },
+      "recommendation": {
+        "adjust_constraints": "The assignments found are poor: relaxing a constraint would give better results.",
+        "more_slots_or_fewer_volunteers": "There are more volunteers than hours to fill: add slots, or expect some to get none."
+      },
+      "motif": {
+        "indisponible": "not available for this phase",
+        "absent": "not arrived yet or already gone",
+        "equipe_non_souhaitee": "team not requested",
+        "hors_equipe_assignee": "outside their teams",
+        "hors_plage_horaire": "outside their preferred hours",
+        "plafond_journalier": "day already full",
+        "chevauchement": "already busy at that time",
+        "acces_spectacle": "would cost them a show's last performance",
+        "plafond_heures": "already at their maximum hours"
+      },
+      "motif_compte": {
+        "indisponible": "{count} ruled out: not available for this phase",
+        "absent": "{count} ruled out: away on that date",
+        "equipe_non_souhaitee": "{count} ruled out: team not requested",
+        "hors_equipe_assignee": "{count} ruled out: outside their teams",
+        "hors_plage_horaire": "{count} ruled out: outside their preferred hours",
+        "plafond_journalier": "{count} ruled out: day already full",
+        "chevauchement": "{count} ruled out: already busy at that time",
+        "acces_spectacle": "{count} ruled out: would cost them a show",
+        "plafond_heures": "{count} ruled out: maximum hours reached"
+      },
+      "slot_not_found": "Slot {id} (not found)",
+      "slot_without_title": "Untitled slot",
+      "team_fallback": "Team {id}"
     },
     "autonomous_team": "Self-managed team",
     "autonomous_team_badge": "Self-managed",

@@ -299,8 +299,8 @@
                 :title="t('volunteers.auto_assignment.warnings')"
               >
                 <ul class="list-disc list-inside space-y-1">
-                  <li v-for="warning in previewResult.result.warnings" :key="warning">
-                    {{ warning }}
+                  <li v-for="warning in previewResult.result.warnings" :key="warning.code">
+                    {{ libelleAvertissement(warning) }}
                   </li>
                 </ul>
               </UAlert>
@@ -316,13 +316,58 @@
                 <ul class="list-disc list-inside space-y-1">
                   <li
                     v-for="recommendation in previewResult.result.recommendations"
-                    :key="recommendation"
+                    :key="recommendation.code"
                   >
-                    {{ recommendation }}
+                    {{ libelleRecommandation(recommendation) }}
                   </li>
                 </ul>
               </UAlert>
             </div>
+
+            <!-- Ce qui va être effacé. En mode « tout effacer », c'est l'information la plus
+                 importante de l'écran, et c'était la seule absente. -->
+            <UAlert
+              v-if="suppressionsPrevues.length > 0"
+              color="error"
+              variant="soft"
+              icon="i-heroicons-trash"
+              :title="
+                t('volunteers.auto_assignment.deletions_title', {
+                  count: suppressionsPrevues.length,
+                })
+              "
+            >
+              <template #description>
+                <p v-if="suppressionsManuelles > 0" class="font-medium mb-2">
+                  {{
+                    t('volunteers.auto_assignment.deletions_manual_warning', {
+                      count: suppressionsManuelles,
+                    })
+                  }}
+                </p>
+                <div class="space-y-1 max-h-40 overflow-y-auto">
+                  <div
+                    v-for="suppression in suppressionsPrevues"
+                    :key="`${suppression.timeSlotId}-${suppression.userId}`"
+                    class="text-xs flex flex-wrap items-center gap-x-2"
+                  >
+                    <span class="font-medium">{{ suppression.pseudo }}</span>
+                    <span class="opacity-80">
+                      {{ getSlotDisplayInfo(suppression.timeSlotId).title }} —
+                      {{ getSlotDisplayInfo(suppression.timeSlotId).timeRange }}
+                    </span>
+                    <UBadge
+                      v-if="suppression.source !== 'AUTO'"
+                      color="error"
+                      variant="solid"
+                      size="xs"
+                    >
+                      {{ t('volunteers.auto_assignment.deletion_manual') }}
+                    </UBadge>
+                  </div>
+                </div>
+              </template>
+            </UAlert>
 
             <!-- Détails des assignations -->
             <UCard>
@@ -399,6 +444,7 @@
                     <h5 class="text-sm font-medium mb-2">
                       {{ t('volunteers.auto_assignment.unassigned_volunteers') }}
                     </h5>
+                    <!-- La raison à côté du nom : c'est elle qui dit quel réglage relâcher. -->
                     <div class="flex flex-wrap gap-2">
                       <UBadge
                         v-for="volunteerId in previewResult.result.unassigned.volunteers"
@@ -406,7 +452,10 @@
                         color="warning"
                         variant="soft"
                       >
-                        {{ getVolunteerById(volunteerId)?.pseudo }}
+                        <span class="font-medium">{{ getVolunteerById(volunteerId)?.pseudo }}</span>
+                        <span v-if="motifDe(volunteerId)" class="opacity-80">
+                          — {{ libelleMotif(motifDe(volunteerId)) }}
+                        </span>
                       </UBadge>
                     </div>
                   </div>
@@ -431,6 +480,15 @@
                           >
                             {{ getSlotDisplayInfo(slotId).timeRange }}
                           </span>
+                          <!-- Combien de candidats chaque contrainte a écartés : la réponse à
+                               « pourquoi ce créneau est-il vide ? ». -->
+                          <span
+                            v-for="motif in motifsDuCreneau(slotId)"
+                            :key="motif.motif"
+                            class="text-xs opacity-70"
+                          >
+                            {{ libelleMotifCompte(motif.motif, motif.candidats) }}
+                          </span>
                         </div>
                       </UBadge>
                     </div>
@@ -442,6 +500,54 @@
         </div>
       </UCard>
     </template>
+
+    <!-- Confirmation. Un UModal plutôt qu'un confirm() natif, et surtout un message qui décrit le
+         mode réellement choisi. -->
+    <UModal
+      v-model:open="confirmationOuverte"
+      :title="t('volunteers.auto_assignment.confirm_title')"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-sm">{{ messageDeConfirmation }}</p>
+
+          <p class="text-sm font-medium">
+            {{
+              t('volunteers.auto_assignment.confirm_details', {
+                count: previewResult?.result.assignments.length || 0,
+              })
+            }}
+          </p>
+
+          <UAlert
+            v-if="suppressionsPrevues.length > 0"
+            color="error"
+            variant="soft"
+            icon="i-heroicons-exclamation-triangle"
+            :description="
+              suppressionsManuelles > 0
+                ? t('volunteers.auto_assignment.deletions_manual_warning', {
+                    count: suppressionsManuelles,
+                  })
+                : t('volunteers.auto_assignment.deletions_title', {
+                    count: suppressionsPrevues.length,
+                  })
+            "
+          />
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-2 w-full">
+          <UButton color="neutral" variant="ghost" @click="confirmationOuverte = false">
+            {{ t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :loading="applyLoading" @click="confirmerApplication">
+            {{ t('volunteers.auto_assignment.apply') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </UCollapsible>
 </template>
 
@@ -474,7 +580,7 @@ interface Constraints {
 }
 
 const props = defineProps<Props>()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const REGLAGES_PAR_DEFAUT: Constraints = {
   maxHoursPerVolunteer: 8,
@@ -556,55 +662,48 @@ const getSlotById = (id: string | number) => {
   )
 }
 
-const getSlotDisplayInfo = (slotId: string | number) => {
-  const slot = getSlotById(slotId)
-
-  if (!slot) {
-    return {
-      title: `Créneau ${slotId} (non trouvé)`,
-      timeRange: '',
-      team: '',
-    }
-  }
-
-  // Formatage de la date et de l'heure
-  const startDate = slot.start ? new Date(slot.start) : null
-  const endDate = slot.end ? new Date(slot.end) : null
-
-  const startTime = startDate
-    ? startDate.toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : ''
-  const endTime = endDate
-    ? endDate.toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+/**
+ * Les dates étaient formatées en `fr-FR` en dur, sur une application qui gère treize langues : un
+ * organisateur allemand lisait « samedi 1 août » au milieu d'une interface allemande.
+ *
+ * `locale` suit la langue choisie ; les libellés de repli passent par i18n comme le reste.
+ */
+const heure = (valeur: string | null | undefined) =>
+  valeur
+    ? new Date(valeur).toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
     : ''
 
-  // Formatage de la date avec jour de la semaine
-  const dateInfo = startDate
-    ? startDate.toLocaleDateString('fr-FR', {
+const jour = (valeur: string | null | undefined) =>
+  valeur
+    ? new Date(valeur).toLocaleDateString(locale.value, {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
       })
     : ''
 
-  const timeRange =
-    startTime && endTime
-      ? `${dateInfo} • ${startTime} - ${endTime}`
-      : dateInfo || (startTime && endTime ? `${startTime} - ${endTime}` : '')
+const getSlotDisplayInfo = (slotId: string | number) => {
+  const slot = getSlotById(slotId)
 
-  // Nom de l'équipe si disponible
-  const teamName = slot.teamId ? getTeamName(slot.teamId) : ''
+  if (!slot) {
+    return {
+      title: t('volunteers.auto_assignment.slot_not_found', { id: slotId }),
+      timeRange: '',
+      team: '',
+    }
+  }
+
+  const debut = heure(slot.start)
+  const fin = heure(slot.end)
+  const date = jour(slot.start)
+
+  const timeRange =
+    debut && fin ? `${date} • ${debut} - ${fin}` : date || (debut && fin ? `${debut} - ${fin}` : '')
 
   return {
-    title: slot.title || 'Créneau sans titre',
+    title: slot.title || t('volunteers.auto_assignment.slot_without_title'),
     timeRange,
-    team: teamName,
+    team: slot.teamId ? getTeamName(slot.teamId) : '',
   }
 }
 
@@ -614,7 +713,7 @@ const getTeamName = (teamId: string | number) => {
   const team = props.teams.find(
     (t) => t.id === teamId || t.id === String(teamId) || String(t.id) === String(teamId)
   )
-  return team?.name || `Équipe ${teamId}`
+  return team?.name || t('volunteers.auto_assignment.team_fallback', { id: teamId })
 }
 
 const getConfidenceColor = (
@@ -733,16 +832,142 @@ const annulerLeCalcul = () => {
   executeUndo()
 }
 
+/**
+ * Le motif dominant d'un bénévole non assigné, et les contraintes qui ont vidé un créneau.
+ *
+ * Le moteur connaissait ces raisons et les jetait ; l'organisateur devait deviner quel réglage
+ * relâcher, ce qui est précisément la question qu'il se pose devant un planning incomplet.
+ */
+const motifDe = (volunteerId: number) =>
+  previewResult.value?.result?.refus?.parBenevole?.find(
+    (refus: { volunteerId: number }) => refus.volunteerId === volunteerId
+  )?.motif ?? null
+
+const motifsDuCreneau = (slotId: string | number) =>
+  previewResult.value?.result?.refus?.parCreneau?.find(
+    (refus: { slotId: string }) => String(refus.slotId) === String(slotId)
+  )?.motifs ?? []
+
+/**
+ * Des correspondances explicites, et non des clés composées à l'exécution.
+ *
+ * C'est la convention du dépôt, et elle a une raison : l'outillage i18n ne repère pas une clé
+ * construite avec un gabarit, la croit inutilisée, et `--delete-unused` finirait par l'effacer.
+ * Verbeux ici, mais c'est le prix d'une clé qui survit au ménage.
+ */
+const libelleMotif = (motif: string | null) => {
+  switch (motif) {
+    case 'indisponible':
+      return t('volunteers.auto_assignment.motif.indisponible')
+    case 'absent':
+      return t('volunteers.auto_assignment.motif.absent')
+    case 'equipe-non-souhaitee':
+      return t('volunteers.auto_assignment.motif.equipe_non_souhaitee')
+    case 'hors-equipe-assignee':
+      return t('volunteers.auto_assignment.motif.hors_equipe_assignee')
+    case 'hors-plage-horaire':
+      return t('volunteers.auto_assignment.motif.hors_plage_horaire')
+    case 'plafond-journalier':
+      return t('volunteers.auto_assignment.motif.plafond_journalier')
+    case 'chevauchement':
+      return t('volunteers.auto_assignment.motif.chevauchement')
+    case 'acces-spectacle':
+      return t('volunteers.auto_assignment.motif.acces_spectacle')
+    case 'plafond-heures':
+      return t('volunteers.auto_assignment.motif.plafond_heures')
+    default:
+      return ''
+  }
+}
+
+const libelleMotifCompte = (motif: string, count: number) => {
+  switch (motif) {
+    case 'indisponible':
+      return t('volunteers.auto_assignment.motif_compte.indisponible', { count })
+    case 'absent':
+      return t('volunteers.auto_assignment.motif_compte.absent', { count })
+    case 'equipe-non-souhaitee':
+      return t('volunteers.auto_assignment.motif_compte.equipe_non_souhaitee', { count })
+    case 'hors-equipe-assignee':
+      return t('volunteers.auto_assignment.motif_compte.hors_equipe_assignee', { count })
+    case 'hors-plage-horaire':
+      return t('volunteers.auto_assignment.motif_compte.hors_plage_horaire', { count })
+    case 'plafond-journalier':
+      return t('volunteers.auto_assignment.motif_compte.plafond_journalier', { count })
+    case 'chevauchement':
+      return t('volunteers.auto_assignment.motif_compte.chevauchement', { count })
+    case 'acces-spectacle':
+      return t('volunteers.auto_assignment.motif_compte.acces_spectacle', { count })
+    case 'plafond-heures':
+      return t('volunteers.auto_assignment.motif_compte.plafond_heures', { count })
+    default:
+      return ''
+  }
+}
+
+const libelleAvertissement = (avertissement: { code: string; params?: Record<string, number> }) => {
+  switch (avertissement.code) {
+    case 'unassigned_volunteers':
+      return t(
+        'volunteers.auto_assignment.warning.unassigned_volunteers',
+        avertissement.params || {}
+      )
+    case 'unassigned_slots':
+      return t('volunteers.auto_assignment.warning.unassigned_slots', avertissement.params || {})
+    default:
+      return ''
+  }
+}
+
+const libelleRecommandation = (recommandation: { code: string }) => {
+  switch (recommandation.code) {
+    case 'adjust_constraints':
+      return t('volunteers.auto_assignment.recommendation.adjust_constraints')
+    case 'more_slots_or_fewer_volunteers':
+      return t('volunteers.auto_assignment.recommendation.more_slots_or_fewer_volunteers')
+    default:
+      return ''
+  }
+}
+
+const confirmationOuverte = ref(false)
+
+/**
+ * Ce que la confirmation annonce dépend du MODE réellement choisi.
+ *
+ * Elle se décidait sur `keepExistingAssignments`, l'ancien booléen resté à `false` et que plus
+ * aucun champ de l'écran ne pilote depuis le passage au sélecteur de mode. Le message annonçait
+ * donc toujours « cela remplacera toutes les assignations existantes », y compris dans le mode par
+ * défaut, qui n'efface précisément rien de manuel. L'organisateur était alarmé à tort, et le texte
+ * qu'il lisait ne décrivait pas l'action qu'il déclenchait.
+ */
+const messageDeConfirmation = computed(() => {
+  switch (constraints.value.existingAssignmentsMode) {
+    case 'keep-all':
+      return t('volunteers.auto_assignment.confirm_apply_keep_all')
+    case 'replace-all':
+      return t('volunteers.auto_assignment.confirm_apply_replace_all')
+    default:
+      return t('volunteers.auto_assignment.confirm_apply_keep_manual')
+  }
+})
+
+/** Ce que l'application effacerait, tel que l'aperçu l'a relevé. */
+const suppressionsPrevues = computed<
+  { timeSlotId: string; userId: number; source: string; pseudo: string | null }[]
+>(() => previewResult.value?.suppressionsPrevues ?? [])
+
+const suppressionsManuelles = computed(
+  () => suppressionsPrevues.value.filter((s) => s.source !== 'AUTO').length
+)
+
 const applyAssignments = () => {
   if (!previewResult.value) return
+  confirmationOuverte.value = true
+}
 
-  const assignmentsCount = previewResult.value?.result.assignments.length || 0
-  const confirmKey = constraints.value.keepExistingAssignments
-    ? 'volunteers.auto_assignment.confirm_apply_keep_existing'
-    : 'volunteers.auto_assignment.confirm_apply'
-  const message = `${t(confirmKey)}\n\n${t('volunteers.auto_assignment.confirm_details', { count: assignmentsCount })}`
-
-  if (!confirm(message)) return
+const confirmerApplication = () => {
+  confirmationOuverte.value = false
   executeApplyAssignments()
 }
 

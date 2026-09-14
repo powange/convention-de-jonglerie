@@ -642,3 +642,60 @@ describe('POST …/volunteers/auto-assign — le plan validé est celui qui est 
     expect(prismaMock.volunteerAutoAssignRun.create).toHaveBeenCalled()
   })
 })
+
+/**
+ * L'aperçu listait ce qui serait créé, jamais ce qui serait détruit. En mode « tout effacer »,
+ * c'était l'information la plus importante de l'écran, et la seule absente.
+ */
+describe('POST …/volunteers/auto-assign — ce que l’aperçu annonce détruire', () => {
+  beforeEach(preparerLesMocks)
+
+  const apercu = (existingAssignmentsMode: string) => {
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: false,
+      constraints: { existingAssignmentsMode },
+    })
+    return handler(evenement as any)
+  }
+
+  it('annonce les affectations qui seraient effacées, et leur origine', async () => {
+    prismaMock.volunteerAssignment.findMany.mockResolvedValue([
+      {
+        timeSlotId: 'creneau-cuisine',
+        userId: 42,
+        source: 'MANUAL',
+        user: { pseudo: 'bob' },
+      },
+    ])
+
+    const reponse = await apercu('replace-all')
+
+    expect(reponse.data.suppressionsPrevues).toEqual([
+      { timeSlotId: 'creneau-cuisine', userId: 42, source: 'MANUAL', pseudo: 'bob' },
+    ])
+  })
+
+  it('n’annonce rien à détruire en mode « conserver »', async () => {
+    const reponse = await apercu('keep-all')
+
+    expect(reponse.data.suppressionsPrevues).toEqual([])
+  })
+
+  it('borne l’annonce aux créneaux soumis au calcul', async () => {
+    // Même règle que la suppression elle-même : ce que le calcul n'examine pas, il ne l'efface
+    // pas — et n'a donc pas à l'annoncer.
+    await apercu('replace-all')
+
+    const where = prismaMock.volunteerAssignment.findMany.mock.calls.at(-1)[0].where
+    expect(where.timeSlotId.in).not.toContain('creneau-autonome')
+  })
+
+  it('rend des avertissements sous forme de codes traduisibles', async () => {
+    const reponse = await apercu('replace-all')
+
+    for (const avertissement of reponse.data.result.warnings) {
+      expect(typeof avertissement.code).toBe('string')
+      expect(avertissement.code).not.toMatch(/[éàè]/)
+    }
+  })
+})

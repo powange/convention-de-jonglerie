@@ -607,3 +607,97 @@ describe('effectif souhaité d’une équipe', () => {
     expect(r.assignments).toHaveLength(2)
   })
 })
+
+/**
+ * Le moteur connaissait la raison de chaque refus et la jetait : l'organisateur voyait une liste de
+ * bénévoles non assignés sans savoir quel réglage relâcher — précisément la question qu'il se pose.
+ */
+describe('diagnostic des refus', () => {
+  // Fabriqué à CHAQUE appel, et non partagé : le moteur incrémente `assignedVolunteers` sur
+  // l'objet qu'on lui passe, si bien qu'un créneau réutilisé arrive déjà complet au test suivant.
+  const creneauDuSoir = () =>
+    creneau({
+      id: '1',
+      start: '2026-08-01T16:00:00.000Z',
+      end: '2026-08-01T18:00:00.000Z',
+      teamId: 'equipe-A',
+    })
+
+  it('dit qu’un bénévole n’était pas disponible sur cette phase', () => {
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: false, setup: true })],
+      [creneauDuSoir()],
+      EQUIPES,
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.refus.parBenevole).toEqual([{ volunteerId: 1, motif: 'indisponible' }])
+  })
+
+  it('distingue l’absence de l’indisponibilité', () => {
+    const absent = {
+      ...benevole({ id: 2, event: true }),
+      arrivalDateTime: '2026-08-05_morning',
+    }
+
+    const r = new VolunteerScheduler(
+      [absent],
+      [creneauDuSoir()],
+      EQUIPES,
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.refus.parBenevole).toEqual([{ volunteerId: 2, motif: 'absent' }])
+  })
+
+  it('compte, par créneau, ce que chaque contrainte a écarté', () => {
+    const r = new VolunteerScheduler(
+      [
+        benevole({ id: 1, event: false }),
+        benevole({ id: 2, event: false }),
+        { ...benevole({ id: 3, event: true }), arrivalDateTime: '2026-08-05_morning' },
+      ],
+      [creneauDuSoir()],
+      EQUIPES,
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    const motifs = r.refus.parCreneau.find((c) => c.slotId === '1')?.motifs ?? []
+    expect(motifs).toEqual([
+      { motif: 'indisponible', candidats: 2 },
+      { motif: 'absent', candidats: 1 },
+    ])
+  })
+
+  it('n’explique rien quand tout s’est bien passé', () => {
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true })],
+      [creneauDuSoir()],
+      EQUIPES,
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(1)
+    expect(r.refus.parBenevole).toEqual([])
+    expect(r.refus.parCreneau).toEqual([])
+  })
+
+  it('rend des codes, pas des phrases', () => {
+    // Les avertissements étaient écrits en français dans le moteur et affichés tels quels : sur
+    // treize langues, ils restaient français pour tout le monde.
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: false })],
+      [creneauDuSoir()],
+      EQUIPES,
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.warnings).toContainEqual({ code: 'unassigned_volunteers', params: { count: 1 } })
+    expect(r.warnings).toContainEqual({ code: 'unassigned_slots', params: { count: 1 } })
+  })
+})
