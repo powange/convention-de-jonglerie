@@ -270,7 +270,7 @@
                   {{ pourcentage(previewResult.result.stats.creneauxComplets) }}
                 </div>
                 <div class="text-sm text-purple-700 dark:text-purple-300">
-                  {{ t('volunteers.auto_assignment.stat_creneaux_complets') }}
+                  {{ t('volunteers.auto_assignment.stat_creneaux_pourvus') }}
                 </div>
               </div>
 
@@ -788,12 +788,15 @@ const { execute: executeApplyAssignments, loading: applyLoading } = useApiAction
     onSuccess: (response) => {
       previewResult.value = null
       // Le calcul qu'on vient d'appliquer devient celui qu'on peut défaire.
+      // Les deux chiffres viennent du serveur : `deletedCount` était codé à zéro faute d'être
+      // renvoyé, si bien que l'encart annonçait « 0 affectation effacée » après en avoir effacé
+      // cinquante — sur le bouton même qui propose d'annuler.
       dernierCalcul.value = response?.journalId
         ? {
             id: response.journalId,
             executedAt: new Date().toISOString(),
-            createdCount: response.result?.assignments?.length ?? 0,
-            deletedCount: 0,
+            createdCount: response.creees ?? 0,
+            deletedCount: response.effacees ?? 0,
           }
         : null
       emit('assignments-applied')

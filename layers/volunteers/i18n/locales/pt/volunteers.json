@@ -155,11 +155,11 @@
       "slot_not_found": "Turno {id} (não encontrado)",
       "slot_without_title": "Turno sem título",
       "team_fallback": "Equipa {id}",
-      "stat_creneaux_complets": "Turnos completos",
       "stat_benevoles_au_minimum": "Voluntários no mínimo de horas",
       "stat_preferences_equipe": "Preferências de equipa respeitadas",
       "stat_horaires_souhaites": "Turnos nos horários desejados",
-      "stat_ecart_type": "Diferença entre as cargas"
+      "stat_ecart_type": "Diferença entre as cargas",
+      "stat_creneaux_pourvus": "Turnos preenchidos (exceto equipas autónomas)"
     },
     "autonomous_team": "Equipa autónoma",
     "autonomous_team_badge": "Autónoma",

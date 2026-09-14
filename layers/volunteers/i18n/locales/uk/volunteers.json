@@ -155,11 +155,11 @@
       "slot_not_found": "Зміна {id} (не знайдено)",
       "slot_without_title": "Зміна без назви",
       "team_fallback": "Команда {id}",
-      "stat_creneaux_complets": "Повністю укомплектовані зміни",
       "stat_benevoles_au_minimum": "Волонтери з мінімумом годин",
       "stat_preferences_equipe": "Враховані побажання щодо команд",
       "stat_horaires_souhaites": "Зміни в бажані години",
-      "stat_ecart_type": "Розкид навантажень"
+      "stat_ecart_type": "Розкид навантажень",
+      "stat_creneaux_pourvus": "Укомплектовані зміни (без автономних команд)"
     },
     "autonomous_team": "Самостійна команда",
     "autonomous_team_badge": "Самостійна",

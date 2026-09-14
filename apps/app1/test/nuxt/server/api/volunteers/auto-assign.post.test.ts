@@ -792,3 +792,93 @@ describe('POST …/volunteers/auto-assign — le calcul n’est pas refait pour 
     expect(data.resultat.stats).toBeDefined()
   })
 })
+
+/**
+ * L'empreinte qui protège l'application ne couvrait ni les équipes, ni le rattachement d'un
+ * créneau à une équipe. Or le PÉRIMÈTRE du calcul — ce qu'il a le droit d'effacer — en dépend :
+ * une équipe volante ou autonome voit ses créneaux écartés.
+ *
+ * Une équipe basculée en autonome entre l'aperçu et l'application ne changeait donc pas
+ * l'empreinte, le plan s'appliquait avec le périmètre de l'aperçu, et effaçait des créneaux que le
+ * calcul ne sait plus repeupler. C'est le tout premier bug corrigé sur ce module, rouvert par la
+ * garde censée protéger l'application.
+ */
+describe('POST …/volunteers/auto-assign — l’empreinte couvre les équipes', () => {
+  beforeEach(preparerLesMocks)
+
+  const empreinteDuDernierPlan = () =>
+    prismaMock.volunteerAutoAssignPlan.create.mock.calls.at(-1)?.[0]?.data?.fingerprint
+
+  const apercu = async () => {
+    global.readBody = vi.fn().mockResolvedValue({ applyAssignments: false, constraints: {} })
+    await handler(evenement as any)
+    return empreinteDuDernierPlan()
+  }
+
+  it('change d’empreinte quand une équipe devient autonome', async () => {
+    const avant = await apercu()
+
+    prismaMock.volunteerTeam.findMany.mockResolvedValue([
+      { id: 'cuisine', name: 'Cuisine', color: '#111111', isAutonomousTeam: true },
+      ...EQUIPES.slice(1),
+    ])
+    const apres = await apercu()
+
+    expect(apres).not.toBe(avant)
+  })
+
+  it('change d’empreinte quand une équipe devient volante', async () => {
+    const avant = await apercu()
+
+    prismaMock.volunteerTeam.findMany.mockResolvedValue([
+      { id: 'cuisine', name: 'Cuisine', color: '#111111', isFloatingTeam: true },
+      ...EQUIPES.slice(1),
+    ])
+    const apres = await apercu()
+
+    expect(apres).not.toBe(avant)
+  })
+
+  it('change d’empreinte quand un créneau change d’équipe', async () => {
+    const avant = await apercu()
+
+    prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([
+      { ...CRENEAUX[0]!, teamId: 'autonome' },
+      ...CRENEAUX.slice(1),
+    ])
+    const apres = await apercu()
+
+    expect(apres).not.toBe(avant)
+  })
+
+  it('refuse d’appliquer un plan dont l’équipe a basculé depuis', async () => {
+    // Le scénario complet : aperçu, bascule en autonome, puis application.
+    const empreinteDApercu = await apercu()
+
+    prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue({
+      id: 'plan-1',
+      eventId: 22,
+      appliedAt: null,
+      expiresAt: new Date(Date.now() + 60_000),
+      fingerprint: empreinteDApercu,
+      assignments: [],
+      perimetre: { creneaux: ['creneau-cuisine'], candidatures: [], equipes: ['cuisine'] },
+      resultat: null,
+    })
+
+    prismaMock.volunteerTeam.findMany.mockResolvedValue([
+      { id: 'cuisine', name: 'Cuisine', color: '#111111', isAutonomousTeam: true },
+      ...EQUIPES.slice(1),
+    ])
+
+    global.readBody = vi.fn().mockResolvedValue({
+      applyAssignments: true,
+      planId: 'plan-1',
+      constraints: {},
+    })
+
+    await expect(handler(evenement as any)).rejects.toBeDefined()
+    // Et surtout : rien n'a été effacé.
+    expect(prismaMock.volunteerAssignment.deleteMany).not.toHaveBeenCalled()
+  })
+})

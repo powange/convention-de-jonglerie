@@ -155,11 +155,11 @@
       "slot_not_found": "Zmiana {id} (nie znaleziono)",
       "slot_without_title": "Zmiana bez tytułu",
       "team_fallback": "Zespół {id}",
-      "stat_creneaux_complets": "Pełne zmiany",
       "stat_benevoles_au_minimum": "Wolontariusze z minimum godzin",
       "stat_preferences_equipe": "Uwzględnione preferencje zespołu",
       "stat_horaires_souhaites": "Zmiany w preferowanych godzinach",
-      "stat_ecart_type": "Rozrzut obciążeń"
+      "stat_ecart_type": "Rozrzut obciążeń",
+      "stat_creneaux_pourvus": "Obsadzone zmiany (bez zespołów autonomicznych)"
     },
     "autonomous_team": "Zespół samodzielny",
     "autonomous_team_badge": "Samodzielny",

@@ -219,11 +219,14 @@ const POIDS = {
   EQUIPE_ASSIGNEE: 15,
   /** Le créneau tombe dans une plage horaire souhaitée, au prorata du recouvrement. */
   PLAGE_HORAIRE: 12,
-  /** Son total d'heures dépasserait le plafond, heures supplémentaires refusées. */
-  DEPASSEMENT_TOTAL: -100,
-  /** Il dépasserait même la limite des heures supplémentaires : hors de question. */
-  DEPASSEMENT_TOTAL_EXCESSIF: -200,
-  /** Dépassement du total, dans la limite des heures supplémentaires autorisées. */
+  /**
+   * Dépassement du total, dans la limite des heures supplémentaires autorisées.
+   *
+   * Les deux autres cas — dépasser sans heures supplémentaires, ou dépasser au-delà de ce qu'elles
+   * permettent — valaient ici −100 et −200. Ce sont désormais des impossibilités nommées, rendues
+   * par `motifBloquant` : une pénalité de score, même forte, reste franchissable par accumulation
+   * de bonus, et ne dit rien à l'organisateur.
+   */
   DEPASSEMENT_TOTAL_TOLERE: -20,
   /**
    * Dépassement du plafond JOURNALIER, dans la limite autorisée.
@@ -361,6 +364,22 @@ export class VolunteerScheduler {
   private heuresParJour = new Map<number, Map<string, number>>()
   private creneauxParBenevole = new Map<number, { debut: number; fin: number; slotId: string }[]>()
   private totalHeuresPosees = 0
+  /**
+   * Le motif qui a écarté chaque paire (bénévole, créneau), relevé AU MOMENT du refus.
+   *
+   * Il était reconstitué après coup, en réévaluant tout sur l'état final — ce qui coûtait un second
+   * balayage complet et disait parfois autre chose que la vérité : un bénévole libre au moment où
+   * le créneau a été distribué pouvait y apparaître comme « déjà pris », parce qu'on lui avait
+   * donné autre chose entre-temps.
+   *
+   * Le relever ici ne coûte rien : le motif est déjà calculé par `calculateAssignmentScore`, qui
+   * se contentait de le jeter.
+   *
+   * ⚠️ Une paire sans entrée n'a été bloquée par AUCUNE contrainte — elle a simplement été moins
+   * bien classée. C'est une réponse différente pour l'organisateur : relâcher un réglage n'y
+   * changera rien, il manque des créneaux ou des heures.
+   */
+  private motifParPaire = new Map<string, MotifRefus>()
 
   constructor(
     volunteers: VolunteerApplication[],
@@ -373,7 +392,21 @@ export class VolunteerScheduler {
     fuseau: string | null = null
   ) {
     this.volunteers = volunteers
-    this.timeSlots = timeSlots
+    /**
+     * Une COPIE des créneaux, et c'est essentiel.
+     *
+     * Le moteur incrémente `assignedVolunteers` au fil des affectations. Tant qu'il le faisait sur
+     * les objets de l'appelant, deux conséquences : on ne pouvait pas relancer un calcul sur le
+     * même tableau — le second les voyait déjà remplis — et l'appelant perdait l'état d'avant, donc
+     * toute possibilité de comparer.
+     *
+     * Ce dernier point est le verrou qui empêchait de faire tourner deux algorithmes sur les mêmes
+     * données pour confronter leurs résultats.
+     *
+     * ⚠️ Copie de surface : elle suffit parce que seul `assignedVolunteers` est muté, et qu'il est
+     * un nombre. Muter autre chose demanderait de revoir cette ligne.
+     */
+    this.timeSlots = timeSlots.map((slot) => ({ ...slot }))
     this.teams = teams
     this.bornes = bornes
     this.affectationsExistantes = affectationsExistantes
@@ -387,7 +420,7 @@ export class VolunteerScheduler {
 
     // Les créneaux sont indexés une fois : le `find` linéaire qu'ils remplacent était exécuté
     // des millions de fois sur une grosse édition.
-    for (const slot of timeSlots) {
+    for (const slot of this.timeSlots) {
       this.creneauParId.set(slot.id, slot)
       const debut = dt.fromISO(slot.start)
       const fin = dt.fromISO(slot.end)
@@ -589,6 +622,28 @@ export class VolunteerScheduler {
       return 'hors-plage-horaire'
     }
 
+    /**
+     * Le plafond TOTAL d'heures, désormais nommé comme les autres impossibilités.
+     *
+     * Il n'était qu'une pénalité de score, avec deux conséquences : un bénévole écarté pour avoir
+     * atteint son maximum n'apparaissait avec AUCUN motif — sur un écran fait pour en donner un —
+     * et la première passe ne le vérifiait pas du tout, seule la seconde le faisait. Un bénévole
+     * cumulant assez de bonus pouvait donc dépasser son plafond en première passe.
+     *
+     * Même forme que le plafond journalier : les heures supplémentaires le desserrent quand elles
+     * sont autorisées, elles ne le suppriment pas.
+     */
+    const heuresTenues = this.getCurrentVolunteerHours(volunteer.user.id)
+    const dureeDuCreneau = this.getSlotDuration(slot)
+    const plafondTotal = this.constraints.maxHoursPerVolunteer || 12
+
+    if (heuresTenues + dureeDuCreneau > plafondTotal) {
+      if (!this.constraints.allowOvertime) return 'plafond-heures'
+      if (heuresTenues + dureeDuCreneau > plafondTotal + (this.constraints.maxOvertimeHours || 2)) {
+        return 'plafond-heures'
+      }
+    }
+
     if (!this.checkDailyHoursConstraints(volunteer.user.id, slot)) {
       if (!this.constraints.allowOvertime) return 'plafond-journalier'
       if (!this.checkDailyHoursConstraints(volunteer.user.id, slot, true)) {
@@ -713,7 +768,11 @@ export class VolunteerScheduler {
     const isAvailable = this.isVolunteerAvailable(volunteer, slot, availability)
 
     // Les impossibilités sont relevées ensemble, et nommées : le diagnostic lit la même méthode.
-    if (this.motifBloquant(volunteer, slot, availability)) {
+    const motif = this.motifBloquant(volunteer, slot, availability)
+    if (motif) {
+      // Relevé plutôt que jeté : c'est ce qui permet au diagnostic de dire pourquoi, sans
+      // reconstituer après coup un état qui n'est plus celui du refus.
+      this.motifParPaire.set(`${volunteer.user.id}:${slot.id}`, motif)
       return POIDS.IMPOSSIBLE
     }
 
@@ -755,22 +814,19 @@ export class VolunteerScheduler {
 
     score += timePreferenceBonus
 
-    // Charge de travail actuelle
+    /**
+     * Charge de travail actuelle.
+     *
+     * Les deux cas d'impossibilité — dépassement sans heures supplémentaires, et dépassement
+     * au-delà de ce qu'elles autorisent — sont traités par `motifBloquant`, qui les nomme. Ne
+     * reste ici que le dépassement TOLÉRÉ : autorisé, donc pénalisé plutôt que refusé.
+     */
     const currentHours = this.getCurrentVolunteerHours(volunteer.user.id)
     const slotDuration = this.getSlotDuration(slot)
     const maxHours = this.constraints.maxHoursPerVolunteer || 12
 
     if (currentHours + slotDuration > maxHours) {
-      if (!this.constraints.allowOvertime) {
-        score += POIDS.DEPASSEMENT_TOTAL
-      } else if (
-        currentHours + slotDuration >
-        maxHours + (this.constraints.maxOvertimeHours || 2)
-      ) {
-        score += POIDS.DEPASSEMENT_TOTAL_EXCESSIF
-      } else {
-        score += POIDS.DEPASSEMENT_TOTAL_TOLERE
-      }
+      score += POIDS.DEPASSEMENT_TOTAL_TOLERE
     }
 
     /**
@@ -1500,47 +1556,61 @@ export class VolunteerScheduler {
     benevolesNonAssignes: number[],
     creneauxNonCompletes: string[]
   ): SchedulingResult['refus'] {
-    const creneaux = this.timeSlots.filter((slot) => creneauxNonCompletes.includes(slot.id))
-    const benevoles = this.volunteers.filter((v) => benevolesNonAssignes.includes(v.user.id))
+    const creneauxVides = new Set(creneauxNonCompletes)
+    const benevolesSansRien = new Set(benevolesNonAssignes)
 
     const parCreneau: SchedulingResult['refus']['parCreneau'] = []
+    const comptesParCreneau = new Map<string, Map<MotifRefus, number>>()
     const comptesParBenevole = new Map<number, Map<MotifRefus, number>>()
 
-    for (const slot of creneaux) {
-      const comptes = new Map<MotifRefus, number>()
+    /**
+     * Le relevé pris pendant les passes, plutôt qu'une réévaluation complète après coup.
+     *
+     * L'ancienne version rejouait `motifBloquant` pour chaque paire (bénévole, créneau vide) une
+     * fois le calcul terminé : un second balayage presque aussi coûteux que le calcul, et qui
+     * jugeait sur l'état FINAL — un bénévole libre au moment du refus pouvait y apparaître comme
+     * « déjà pris », à cause de ce qu'on lui avait donné depuis.
+     */
+    for (const [paire, motif] of this.motifParPaire) {
+      const separateur = paire.indexOf(':')
+      const volunteerId = Number(paire.slice(0, separateur))
+      const slotId = paire.slice(separateur + 1)
 
-      for (const volunteer of this.volunteers) {
-        const availability = this.parseAvailability(volunteer.availability)
-        const motif = this.motifBloquant(volunteer, slot, availability)
-        if (!motif) continue
-
+      if (creneauxVides.has(slotId)) {
+        const comptes = comptesParCreneau.get(slotId) ?? new Map<MotifRefus, number>()
         comptes.set(motif, (comptes.get(motif) ?? 0) + 1)
-
-        const pourCeBenevole = comptesParBenevole.get(volunteer.user.id) ?? new Map()
-        pourCeBenevole.set(motif, (pourCeBenevole.get(motif) ?? 0) + 1)
-        comptesParBenevole.set(volunteer.user.id, pourCeBenevole)
+        comptesParCreneau.set(slotId, comptes)
       }
 
-      if (comptes.size > 0) {
-        parCreneau.push({
-          slotId: slot.id,
-          motifs: [...comptes.entries()]
-            .map(([motif, candidats]) => ({ motif, candidats }))
-            .sort((a, b) => b.candidats - a.candidats),
-        })
+      if (benevolesSansRien.has(volunteerId)) {
+        const comptes = comptesParBenevole.get(volunteerId) ?? new Map<MotifRefus, number>()
+        comptes.set(motif, (comptes.get(motif) ?? 0) + 1)
+        comptesParBenevole.set(volunteerId, comptes)
       }
+    }
+
+    for (const [slotId, comptes] of comptesParCreneau) {
+      parCreneau.push({
+        slotId,
+        motifs: [...comptes.entries()]
+          .map(([motif, candidats]) => ({ motif, candidats }))
+          .sort((a, b) => b.candidats - a.candidats),
+      })
     }
 
     // Le motif dominant d'un bénévole : celui qui l'a écarté le plus souvent, donc le premier à
     // relâcher pour lui trouver une place.
     const parBenevole: SchedulingResult['refus']['parBenevole'] = []
 
-    for (const volunteer of benevoles) {
-      const comptes = comptesParBenevole.get(volunteer.user.id)
+    for (const volunteerId of benevolesNonAssignes) {
+      const comptes = comptesParBenevole.get(volunteerId)
+      // Aucune entrée : ce bénévole n'a été bloqué par aucune contrainte, il a seulement été
+      // moins bien classé. Lui inventer un motif enverrait l'organisateur relâcher un réglage
+      // qui n'y changerait rien.
       if (!comptes || comptes.size === 0) continue
 
       const [motif] = [...comptes.entries()].sort((a, b) => b[1] - a[1])[0]!
-      parBenevole.push({ volunteerId: volunteer.user.id, motif })
+      parBenevole.push({ volunteerId, motif })
     }
 
     return { parBenevole, parCreneau }

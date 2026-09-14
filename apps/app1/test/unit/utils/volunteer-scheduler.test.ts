@@ -990,3 +990,101 @@ describe('déblocage des créneaux vides', () => {
     expect(r.assignments).toHaveLength(1)
   })
 })
+
+/**
+ * Le plafond total d'heures était une simple pénalité de score : un bénévole qui l'avait atteint
+ * était écarté sans motif, et la PREMIÈRE passe ne le vérifiait pas du tout — seule la seconde le
+ * faisait.
+ */
+describe('plafond total d’heures', () => {
+  const deuxCreneaux = () => [
+    creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
+    creneau({ id: '2', start: '2026-08-01T19:00:00.000Z', end: '2026-08-01T22:00:00.000Z' }),
+  ]
+
+  it('nomme le motif quand le maximum d’heures est atteint', () => {
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true })],
+      deuxCreneaux(),
+      [],
+      { maxHoursPerVolunteer: 3, maxHoursPerDay: 12 },
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(1)
+    // Le créneau restant porte la raison, là où il n'en portait aucune.
+    const motifs = r.refus.parCreneau.find((c) => c.slotId === '2')?.motifs ?? []
+    expect(motifs).toContainEqual({ motif: 'plafond-heures', candidats: 1 })
+  })
+
+  it('desserre le plafond quand les heures supplémentaires sont autorisées', () => {
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true })],
+      deuxCreneaux(),
+      [],
+      { maxHoursPerVolunteer: 3, maxOvertimeHours: 3, maxHoursPerDay: 12, allowOvertime: true },
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(2)
+  })
+})
+
+/**
+ * Le moteur incrémentait `assignedVolunteers` sur les objets de l'appelant : deux calculs sur le
+ * même tableau donnaient des résultats différents, et l'appelant perdait l'état d'avant.
+ */
+describe('le moteur ne modifie pas ses entrées', () => {
+  it('rend le même résultat deux fois de suite sur les mêmes objets', () => {
+    const creneaux = [
+      creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
+      creneau({ id: '2', start: '2026-08-01T18:00:00.000Z', end: '2026-08-01T20:00:00.000Z' }),
+    ]
+    const benevoles = [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })]
+
+    const premier = new VolunteerScheduler(benevoles, creneaux, [], {}, BORNES).assignVolunteers()
+    const second = new VolunteerScheduler(benevoles, creneaux, [], {}, BORNES).assignVolunteers()
+
+    expect(second.assignments).toHaveLength(premier.assignments.length)
+    expect(second.stats.creneauxComplets).toBe(premier.stats.creneauxComplets)
+  })
+
+  it('laisse le remplissage des créneaux d’entrée intact', () => {
+    const creneaux = [
+      creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
+    ]
+
+    new VolunteerScheduler(
+      [benevole({ id: 1, event: true })],
+      creneaux,
+      [],
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    expect(creneaux[0]!.assignedVolunteers).toBe(0)
+  })
+})
+
+/**
+ * Le diagnostic était reconstitué après coup, sur l'état final. Un bénévole qu'aucune contrainte
+ * n'a bloqué — seulement moins bien classé — ne doit porter aucun motif : lui en inventer un
+ * enverrait l'organisateur relâcher un réglage qui n'y changerait rien.
+ */
+describe('motifs relevés au moment du refus', () => {
+  it('n’attribue aucun motif à qui n’a été bloqué par rien', () => {
+    // Deux bénévoles identiques, un seul créneau d'une place : le second n'est pas « refusé »,
+    // il est second.
+    const r = new VolunteerScheduler(
+      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      [creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' })],
+      [],
+      {},
+      BORNES
+    ).assignVolunteers()
+
+    expect(r.assignments).toHaveLength(1)
+    expect(r.unassigned.volunteers).toHaveLength(1)
+    expect(r.refus.parBenevole).toEqual([])
+  })
+})

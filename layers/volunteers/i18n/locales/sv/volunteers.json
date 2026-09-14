@@ -155,11 +155,11 @@
       "slot_not_found": "Pass {id} (hittades inte)",
       "slot_without_title": "Pass utan titel",
       "team_fallback": "Lag {id}",
-      "stat_creneaux_complets": "Fullbemannade pass",
       "stat_benevoles_au_minimum": "Volontärer på minimitimmar",
       "stat_preferences_equipe": "Uppfyllda lagönskemål",
       "stat_horaires_souhaites": "Pass inom önskade tider",
-      "stat_ecart_type": "Spridning i arbetsbörda"
+      "stat_ecart_type": "Spridning i arbetsbörda",
+      "stat_creneaux_pourvus": "Bemannade pass (exkl. autonoma lag)"
     },
     "autonomous_team": "Självstyrande lag",
     "autonomous_team_badge": "Självstyrande",

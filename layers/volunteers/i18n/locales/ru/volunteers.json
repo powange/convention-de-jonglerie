@@ -155,11 +155,11 @@
       "slot_not_found": "Смена {id} (не найдена)",
       "slot_without_title": "Смена без названия",
       "team_fallback": "Команда {id}",
-      "stat_creneaux_complets": "Полностью укомплектованные смены",
       "stat_benevoles_au_minimum": "Волонтёры с минимумом часов",
       "stat_preferences_equipe": "Учтённые пожелания по командам",
       "stat_horaires_souhaites": "Смены в желаемые часы",
-      "stat_ecart_type": "Разброс нагрузок"
+      "stat_ecart_type": "Разброс нагрузок",
+      "stat_creneaux_pourvus": "Укомплектованные смены (без автономных команд)"
     },
     "autonomous_team": "Самостоятельная команда",
     "autonomous_team_badge": "Самостоятельная",
