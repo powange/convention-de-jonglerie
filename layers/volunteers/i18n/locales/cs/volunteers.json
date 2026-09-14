@@ -155,11 +155,11 @@
       "slot_not_found": "Směna {id} (nenalezena)",
       "slot_without_title": "Směna bez názvu",
       "team_fallback": "Tým {id}",
-      "stat_creneaux_complets": "Plně obsazené směny",
       "stat_benevoles_au_minimum": "Dobrovolníci s minimem hodin",
       "stat_preferences_equipe": "Zohledněná přání týmu",
       "stat_horaires_souhaites": "Směny v preferovaných hodinách",
-      "stat_ecart_type": "Rozptyl zátěže"
+      "stat_ecart_type": "Rozptyl zátěže",
+      "stat_creneaux_pourvus": "Obsazené směny (mimo autonomní týmy)"
     },
     "autonomous_team": "Samostatný tým",
     "autonomous_team_badge": "Samostatný",

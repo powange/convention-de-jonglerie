@@ -155,11 +155,11 @@
       "slot_not_found": "Créneau {id} (introuvable)",
       "slot_without_title": "Créneau sans titre",
       "team_fallback": "Équipe {id}",
-      "stat_creneaux_complets": "Créneaux complets",
       "stat_benevoles_au_minimum": "Bénévoles au minimum d'heures",
       "stat_preferences_equipe": "Préférences d'équipe honorées",
       "stat_horaires_souhaites": "Créneaux dans les horaires souhaités",
-      "stat_ecart_type": "Écart entre les charges"
+      "stat_ecart_type": "Écart entre les charges",
+      "stat_creneaux_pourvus": "Créneaux pourvus (hors équipes autonomes)"
     },
     "autonomous_team": "Équipe autonome",
     "autonomous_team_badge": "Autonome",

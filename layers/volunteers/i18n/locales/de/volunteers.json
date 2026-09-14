@@ -155,11 +155,11 @@
       "slot_not_found": "Einsatz {id} (nicht gefunden)",
       "slot_without_title": "Einsatz ohne Titel",
       "team_fallback": "Team {id}",
-      "stat_creneaux_complets": "Vollständig besetzte Einsätze",
       "stat_benevoles_au_minimum": "Helfer mit Mindeststunden",
       "stat_preferences_equipe": "Berücksichtigte Teamwünsche",
       "stat_horaires_souhaites": "Einsätze in gewünschten Zeiten",
-      "stat_ecart_type": "Streuung der Auslastung"
+      "stat_ecart_type": "Streuung der Auslastung",
+      "stat_creneaux_pourvus": "Besetzte Einsätze (ohne autonome Teams)"
     },
     "autonomous_team": "Eigenständiges Team",
     "autonomous_team_badge": "Eigenständig",

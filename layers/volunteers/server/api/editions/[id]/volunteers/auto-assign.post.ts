@@ -41,6 +41,19 @@ type TimeSlotWithAssignments = Prisma.VolunteerTimeSlotGetPayload<{
 type Team = Prisma.VolunteerTeamGetPayload<object>
 
 /**
+ * Ce qu'une application a réellement écrit.
+ *
+ * L'endpoint ne rendait que l'identifiant du journal, et l'écran affichait « 0 affectation
+ * effacée » — codé en dur, faute de connaître le chiffre. Un organisateur qui venait d'en effacer
+ * cinquante lisait donc zéro, sur l'encart même qui lui propose d'annuler.
+ */
+interface BilanApplication {
+  journalId: string
+  creees: number
+  effacees: number
+}
+
+/**
  * Ce que le calcul a examiné, et donc ce qu'il saura reconstruire.
  *
  * Sert de borne à tout ce que l'application efface. Les filtres d'entrée écartent des créneaux,
@@ -168,20 +181,44 @@ const DUREE_DE_VIE_DU_PLAN_MS = 30 * 60 * 1000
  * exactement ce qui invaliderait le plan montré à l'organisateur.
  */
 function empreinteDesDonnees(entrees: {
-  creneaux: { id: string; startDateTime: Date; endDateTime: Date; maxVolunteers: number }[]
+  creneaux: {
+    id: string
+    startDateTime: Date
+    endDateTime: Date
+    maxVolunteers: number
+    teamId: string | null
+  }[]
   candidatures: { id: number }[]
   affectations: { timeSlotId: string; userId: number; source: string }[]
   organisateurs: number
+  /**
+   * Les équipes et leur statut.
+   *
+   * ⚠️ Elles n'y figuraient pas, et c'était un trou béant : le PÉRIMÈTRE du calcul — ce qu'il a le
+   * droit d'effacer — dépend de ce statut, puisqu'une équipe volante ou autonome voit ses créneaux
+   * écartés. Une équipe basculée en autonome entre l'aperçu et l'application ne changeait donc pas
+   * l'empreinte ; le plan s'appliquait avec le périmètre de l'aperçu, et effaçait des créneaux que
+   * le calcul ne sait plus repeupler.
+   *
+   * Autrement dit, la garde posée pour que le plan validé soit celui qui est écrit rouvrait le
+   * tout premier bug corrigé sur ce module. Le `teamId` de chaque créneau est là pour la même
+   * raison : déplacer un créneau vers une équipe autonome a exactement le même effet.
+   */
+  equipes: { id: string; isFloatingTeam: boolean; isAutonomousTeam: boolean }[]
 }): string {
   const matiere = JSON.stringify({
     creneaux: entrees.creneaux
       .map(
-        (c) => `${c.id}:${c.startDateTime.getTime()}:${c.endDateTime.getTime()}:${c.maxVolunteers}`
+        (c) =>
+          `${c.id}:${c.startDateTime.getTime()}:${c.endDateTime.getTime()}:${c.maxVolunteers}:${c.teamId ?? ''}`
       )
       .sort(),
     candidatures: entrees.candidatures.map((c) => c.id).sort(),
     affectations: entrees.affectations.map((a) => `${a.timeSlotId}:${a.userId}:${a.source}`).sort(),
     organisateurs: entrees.organisateurs,
+    equipes: entrees.equipes
+      .map((e) => `${e.id}:${e.isFloatingTeam ? 1 : 0}:${e.isAutonomousTeam ? 1 : 0}`)
+      .sort(),
   })
 
   return createHash('sha256').update(matiere).digest('hex')
@@ -282,6 +319,7 @@ export default wrapApiHandler(
         startDateTime: slot.startDateTime,
         endDateTime: slot.endDateTime,
         maxVolunteers: slot.maxVolunteers,
+        teamId: slot.teamId,
       })),
       candidatures: volunteers.map((volunteer: VolunteerWithTeamAssignments) => ({
         id: volunteer.id,
@@ -297,6 +335,12 @@ export default wrapApiHandler(
         (total: number, slot: TimeSlotWithAssignments) => total + slot._count.organizerAssignments,
         0
       ),
+      // Le statut d'équipe décide du périmètre : il doit peser dans l'empreinte comme le reste.
+      equipes: teams.map((equipe: Team) => ({
+        id: equipe.id,
+        isFloatingTeam: equipe.isFloatingTeam,
+        isAutonomousTeam: equipe.isAutonomousTeam,
+      })),
     })
 
     const mode =
@@ -551,7 +595,7 @@ export default wrapApiHandler(
     }
 
     // Application des assignations en base de données si demandé
-    let journalId: string | null = null
+    let bilan: BilanApplication | null = null
     if (body.applyAssignments === true) {
       if (applicationsEnCours.has(editionId)) {
         throw createError({
@@ -562,7 +606,7 @@ export default wrapApiHandler(
 
       applicationsEnCours.add(editionId)
       try {
-        journalId = await applyAssignments(
+        bilan = await applyAssignments(
           editionId,
           planRetenu,
           user.id,
@@ -650,7 +694,11 @@ export default wrapApiHandler(
       result,
       preview: body.applyAssignments !== true, // Indique si c'est un aperçu ou une application
       // L'identifiant du journal : c'est lui qui permet de proposer d'annuler ce calcul.
-      journalId,
+      journalId: bilan?.journalId ?? null,
+      // Ce que l'application a réellement écrit — y compris ce qu'elle a effacé, que l'écran
+      // annonçait jusqu'ici toujours à zéro.
+      creees: bilan?.creees ?? 0,
+      effacees: bilan?.effacees ?? 0,
       // L'identifiant de l'aperçu : à renvoyer pour appliquer exactement ce plan-ci.
       planId,
       // Ce que l'application effacerait : à montrer avant, pas à découvrir après.
@@ -677,7 +725,7 @@ async function applyAssignments(
   perimetre: PerimetreDuCalcul,
   /** Les réglages employés, consignés tels quels : la question qu'on se pose toujours en second. */
   contraintes: unknown
-): Promise<string> {
+): Promise<BilanApplication> {
   return await prisma.$transaction(
     async (tx) => {
       /**
@@ -785,7 +833,11 @@ async function applyAssignments(
         journal: journal.id,
       })
 
-      return journal.id
+      return {
+        journalId: journal.id,
+        creees: affectationsCreees.length,
+        effacees: affectationsEffacees.length,
+      }
     },
     /**
      * Le délai par défaut de Prisma est de cinq secondes, et rien ne le disait ici.

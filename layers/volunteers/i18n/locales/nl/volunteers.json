@@ -155,11 +155,11 @@
       "slot_not_found": "Dienst {id} (niet gevonden)",
       "slot_without_title": "Dienst zonder titel",
       "team_fallback": "Team {id}",
-      "stat_creneaux_complets": "Volledig bezette diensten",
       "stat_benevoles_au_minimum": "Vrijwilligers op minimumuren",
       "stat_preferences_equipe": "Gehonoreerde teamvoorkeuren",
       "stat_horaires_souhaites": "Diensten binnen gewenste uren",
-      "stat_ecart_type": "Spreiding van de belasting"
+      "stat_ecart_type": "Spreiding van de belasting",
+      "stat_creneaux_pourvus": "Bezette diensten (excl. autonome teams)"
     },
     "autonomous_team": "Zelfstandig team",
     "autonomous_team_badge": "Zelfstandig",

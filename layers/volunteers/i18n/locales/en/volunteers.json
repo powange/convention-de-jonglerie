@@ -155,11 +155,11 @@
       "slot_not_found": "Slot {id} (not found)",
       "slot_without_title": "Untitled slot",
       "team_fallback": "Team {id}",
-      "stat_creneaux_complets": "Fully staffed slots",
       "stat_benevoles_au_minimum": "Volunteers at minimum hours",
       "stat_preferences_equipe": "Team preferences honoured",
       "stat_horaires_souhaites": "Slots within preferred hours",
-      "stat_ecart_type": "Spread of workloads"
+      "stat_ecart_type": "Spread of workloads",
+      "stat_creneaux_pourvus": "Slots filled (excl. autonomous teams)"
     },
     "autonomous_team": "Self-managed team",
     "autonomous_team_badge": "Self-managed",

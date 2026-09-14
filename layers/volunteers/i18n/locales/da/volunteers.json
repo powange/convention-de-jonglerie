@@ -155,11 +155,11 @@
       "slot_not_found": "Vagt {id} (ikke fundet)",
       "slot_without_title": "Vagt uden titel",
       "team_fallback": "Team {id}",
-      "stat_creneaux_complets": "Fuldt besatte vagter",
       "stat_benevoles_au_minimum": "Frivillige med minimumstimer",
       "stat_preferences_equipe": "Opfyldte teamønsker",
       "stat_horaires_souhaites": "Vagter i de ønskede tider",
-      "stat_ecart_type": "Spredning i arbejdsbyrden"
+      "stat_ecart_type": "Spredning i arbejdsbyrden",
+      "stat_creneaux_pourvus": "Besatte vagter (ekskl. autonome teams)"
     },
     "autonomous_team": "Selvstyrende hold",
     "autonomous_team_badge": "Selvstyrende",
