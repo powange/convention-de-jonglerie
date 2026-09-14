@@ -2,7 +2,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
-import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
 
@@ -53,7 +53,16 @@ export default wrapApiHandler(
         userId: true,
         entryValidated: true,
         userSnapshotPhone: true,
-        user: { select: { ...userWithNameSelect.select, phone: true } },
+        // ⚠️ Ces helpers sont DIRECTEMENT l'objet de sélection, pas un `{ select: ... }`.
+        // Écrire `.select` ici rendait `undefined`, et le spread ne laissait que `phone` : l'écran
+        // recevait des personnes sans pseudo, et le nom de leur équipe se lisait à la place du
+        // leur — tous les renforts s'appelaient « Volant ».
+        // Nom et prénom en plus du pseudo : cet écran s'adresse aux responsables, qui cherchent
+        // quelqu'un sur le site et l'appellent par son nom. Le pseudo seul ne suffit pas à
+        // reconnaître une personne qu'on croise.
+        user: {
+          select: { ...userWithProfileAndGravatarSelect, nom: true, prenom: true, phone: true },
+        },
         teamAssignments: {
           select: {
             team: { select: { id: true, name: true, color: true, isFloatingTeam: true } },

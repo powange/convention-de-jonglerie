@@ -50,6 +50,15 @@ export interface VolunteerStatsIndividual {
     [key: string]: any
   }
   /**
+   * Vrai pour un bénévole VOLANT, c'est-à-dire dont toutes les équipes sont volantes.
+   *
+   * Il n'apparaît dans cette liste que s'il a réellement tenu un créneau — les volants sans
+   * affectation en sont écartés, leur zéro heure se lisant comme un oubli. Quand il y figure, le
+   * repère explique pourquoi son total est plus bas que celui des autres : il n'était pas tenu au
+   * même volume. Sans lui, on le croirait simplement sous-employé.
+   */
+  estVolant?: boolean
+  /**
    * Vrai pour un organisateur tenant des créneaux sans candidature de bénévole. Absent pour un
    * bénévole accepté, y compris s'il est par ailleurs organisateur de l'édition : c'est bien sa
    * candidature qui le fait figurer ici.
@@ -326,10 +335,20 @@ export function calculateVolunteersStatsIndividual(
     })
   })
 
+  // Les volants qui ont tout de même tenu un créneau : ils figurent dans la liste, et le repère
+  // dit pourquoi leur total est plus bas — ils n'étaient pas tenus au même volume d'heures.
+  const volants = new Set(
+    acceptedVolunteers
+      .filter((candidature) => estHorsDesComptes(equipesDe(candidature)))
+      .map((candidature) => candidature.user?.id)
+      .filter((id): id is number => typeof id === 'number')
+  )
+
   // Convertir en array et trier par nombre d'heures total décroissant
   return Array.from(volunteerStats.values())
     .map((volunteer) => ({
       ...volunteer,
+      ...(volants.has(volunteer.user?.id) ? { estVolant: true } : {}),
       dayDetails: Array.from(volunteer.dayDetails.values()).sort((a: any, b: any) =>
         a.date.localeCompare(b.date)
       ), // Trier par date
@@ -386,13 +405,29 @@ export interface TeamStats {
  */
 export function calculateVolunteersStatsByTeam(
   timeSlots: TimeSlotWithAssignments[],
-  teams: Array<{ id: string; name: string; color?: string }> = [],
+  teams: Array<{ id: string; name: string; color?: string; isFloatingTeam?: boolean }> = [],
   libelleSansEquipe = 'Sans équipe'
 ): TeamStats[] {
   const parEquipe = new Map<string, any>()
   const nomDe = new Map(teams.map((equipe) => [equipe.id, equipe]))
 
+  /**
+   * Les créneaux d'une équipe VOLANTE ne sont pas des heures à pourvoir.
+   *
+   * Un créneau posé sur une telle équipe ne s'adresse qu'aux volants — une permanence, une plage
+   * de disponibilité —, et les volants ne sont tenus à aucun volume d'heures. Le compter
+   * afficherait une charge que personne d'autre ne viendra couvrir, et ferait paraître l'édition
+   * sous-dotée alors qu'il ne manque rien.
+   *
+   * C'est le pendant, côté CRÉNEAU, de ce que `benevoles-volants` fait côté personne.
+   */
+  const equipesVolantes = new Set(
+    teams.filter((equipe) => equipe.isFloatingTeam).map((equipe) => equipe.id)
+  )
+
   timeSlots.forEach((slot) => {
+    if (slot.teamId && equipesVolantes.has(slot.teamId as string)) return
+
     // Organisateurs compris : « qui tient cette équipe » se lit sur les personnes présentes,
     // quel que soit leur titre.
     const affectes = personnesDuCreneau(slot)

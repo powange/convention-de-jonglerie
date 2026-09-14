@@ -830,7 +830,11 @@ const acceptedVolunteers = computed(() => {
 const fetchAcceptedVolunteers = async () => {
   try {
     const response: any = await $fetch(`/api/editions/${editionId}/volunteers/applications`, {
-      query: { status: 'ACCEPTED' },
+      // ⚠️ Les équipes sont indispensables ici, alors que la page ne les affiche pas : ce sont
+      // elles qui disent qui est bénévole VOLANT. Sans elles, les volants restaient comptés dans
+      // l'effectif et dans la moyenne d'heures, et aucun repère ne les distinguait — le réglage
+      // paraissait sans effet.
+      query: { status: 'ACCEPTED', includeTeams: 'true' },
     })
     // L'API retourne { success: true, data: [...], pagination: {...} }
     const applications = response.data || response.applications || response

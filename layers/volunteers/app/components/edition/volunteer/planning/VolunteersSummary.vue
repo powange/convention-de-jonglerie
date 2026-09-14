@@ -161,6 +161,13 @@
                       <UBadge v-if="volunteerStat.estOrganisateur" color="info" variant="soft">
                         {{ t('volunteers.organizer') }}
                       </UBadge>
+                      <!-- Même raison que pour l'organisateur : sans ce repère, un volant passe
+                           pour un bénévole qu'on aurait sous-employé, alors qu'il n'est pas tenu
+                           au même volume d'heures. -->
+                      <UBadge v-if="volunteerStat.estVolant" color="info" variant="soft">
+                        <UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5 mr-1" />
+                        {{ t('volunteers.floating_team_badge') }}
+                      </UBadge>
                     </h5>
                     <p
                       v-if="volunteerStat.user.prenom || volunteerStat.user.nom"

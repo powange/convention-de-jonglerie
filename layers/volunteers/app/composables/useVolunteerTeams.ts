@@ -7,6 +7,7 @@ export interface VolunteerTeam {
   isRequired?: boolean
   isAccessControlTeam?: boolean
   isMealValidationTeam?: boolean
+  isFloatingTeam?: boolean
   isVisibleToVolunteers?: boolean
   createdAt: string
   updatedAt: string
@@ -24,6 +25,7 @@ export interface CreateTeamData {
   isRequired?: boolean
   isAccessControlTeam?: boolean
   isMealValidationTeam?: boolean
+  isFloatingTeam?: boolean
   isVisibleToVolunteers?: boolean
 }
 

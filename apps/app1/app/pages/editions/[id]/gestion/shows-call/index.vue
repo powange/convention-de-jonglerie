@@ -76,13 +76,13 @@
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
                 {{ showCall.name }}
               </h3>
-              <UBadge :color="getVisibilityColor(showCall.visibility)" variant="soft" size="sm">
+              <UBadge :color="getVisibilityColor(showCall.visibility)" variant="soft" size="lg">
                 {{ getVisibilityLabel(showCall.visibility) }}
               </UBadge>
               <UBadge
                 :color="showCall.mode === 'INTERNAL' ? 'primary' : 'warning'"
                 variant="subtle"
-                size="sm"
+                size="lg"
               >
                 {{
                   showCall.mode === 'INTERNAL'
@@ -101,7 +101,7 @@
                 >
               </div>
               <div v-if="showCall.stats?.pending" class="flex items-center gap-1">
-                <UBadge color="warning" variant="soft" size="xs">
+                <UBadge color="warning" variant="soft" size="lg">
                   {{ showCall.stats.pending }} {{ $t('gestion.shows_call.pending_short') }}
                 </UBadge>
               </div>

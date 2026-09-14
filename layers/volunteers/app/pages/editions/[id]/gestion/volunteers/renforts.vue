@@ -77,13 +77,21 @@
           <UiUserAvatar :user="renfort.user" size="md" />
 
           <div class="flex-1 min-w-0">
-            <p class="font-medium truncate">{{ renfort.user?.pseudo }}</p>
-            <p class="text-xs text-gray-500 truncate">
+            <p class="text-base font-medium truncate">
+              {{ renfort.user?.pseudo }}
+              <span
+                v-if="renfort.user?.prenom || renfort.user?.nom"
+                class="font-normal text-gray-500"
+              >
+                (<UiUserName :user="renfort.user" />)
+              </span>
+            </p>
+            <p class="text-sm text-gray-500 truncate">
               {{ renfort.equipes.map((e: Equipe) => e.name).join(', ') }}
             </p>
           </div>
 
-          <UBadge :color="couleurEtat(etatDe(renfort))" variant="subtle">
+          <UBadge :color="couleurEtat(etatDe(renfort))" variant="subtle" size="lg">
             {{ t(`volunteers.renforts_state_${etatDe(renfort)}`) }}
           </UBadge>
 
@@ -94,10 +102,10 @@
             icon="i-heroicons-phone"
             color="neutral"
             variant="outline"
-            size="sm"
+            size="lg"
             :label="renfort.phone"
           />
-          <UBadge v-else color="neutral" variant="subtle">
+          <UBadge v-else color="neutral" variant="subtle" size="lg">
             {{ t('volunteers.renforts_no_phone') }}
           </UBadge>
         </div>
@@ -165,7 +173,13 @@ interface CreneauDuRenfort {
 
 interface Renfort {
   id: number
-  user: { id: number; pseudo: string; [key: string]: unknown }
+  user: {
+    id: number
+    pseudo: string
+    prenom?: string | null
+    nom?: string | null
+    [key: string]: unknown
+  }
   phone: string | null
   entreeValidee: boolean
   equipes: Equipe[]
