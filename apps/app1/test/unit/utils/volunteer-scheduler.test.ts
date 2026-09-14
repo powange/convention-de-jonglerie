@@ -59,46 +59,46 @@ describe('VolunteerScheduler', () => {
     })
 
     it('accorde le bonus quand le créneau relève d’une équipe souhaitée', () => {
-      const avec = new VolunteerScheduler(
-        [benevole({ event: true, teamPreferences: ['equipe-A'] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        {},
-        BORNES
-      ).assignVolunteers()
+      const avec = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, teamPreferences: ['equipe-A'] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
 
-      const sans = new VolunteerScheduler(
-        [benevole({ event: true, teamPreferences: [] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        {},
-        BORNES
-      ).assignVolunteers()
+      const sans = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, teamPreferences: [] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(avec.assignments[0]!.score).toBe(sans.assignments[0]!.score + 15)
     })
 
     // RÉGRESSION : en mode strict, le bénévole était écarté du créneau qu'il avait demandé.
     it('assigne bien le bénévole à son équipe souhaitée en mode strict', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, teamPreferences: ['equipe-A'] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        { respectStrictTeamPreferences: true },
-        BORNES
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, teamPreferences: ['equipe-A'] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: { respectStrictTeamPreferences: true },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
 
     it('écarte en mode strict le créneau d’une équipe non souhaitée', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, teamPreferences: ['equipe-B'] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        { respectStrictTeamPreferences: true },
-        BORNES
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, teamPreferences: ['equipe-B'] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: { respectStrictTeamPreferences: true },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(0)
     })
@@ -114,45 +114,45 @@ describe('VolunteerScheduler', () => {
     })
 
     it('accorde le bonus quand le créneau relève d’une équipe assignée', () => {
-      const avec = new VolunteerScheduler(
-        [benevole({ event: true, assignedTeams: ['equipe-A'] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        {},
-        BORNES
-      ).assignVolunteers()
+      const avec = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, assignedTeams: ['equipe-A'] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
 
-      const sans = new VolunteerScheduler(
-        [benevole({ event: true, assignedTeams: [] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        {},
-        BORNES
-      ).assignVolunteers()
+      const sans = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, assignedTeams: [] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(avec.assignments[0]!.score).toBe(sans.assignments[0]!.score + 15)
     })
 
     it('garde le bénévole sur l’équipe où il a été placé, en mode strict', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, assignedTeams: ['equipe-A'] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        { respectStrictAssignedTeams: true },
-        BORNES
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, assignedTeams: ['equipe-A'] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: { respectStrictAssignedTeams: true },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
 
     it('écarte en mode strict le créneau d’une équipe où il n’est pas placé', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, assignedTeams: ['equipe-B'] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        { respectStrictAssignedTeams: true },
-        BORNES
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, assignedTeams: ['equipe-B'] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: { respectStrictAssignedTeams: true },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(0)
     })
@@ -160,13 +160,13 @@ describe('VolunteerScheduler', () => {
     // Sans quoi personne ne serait assignable tant que les organisateurs n'ont pas réparti
     // tout le monde à la main — l'assignation automatique ne servirait plus à rien.
     it('laisse assignable un bénévole qu’aucune équipe n’a encore accueilli', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, assignedTeams: [] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        { respectStrictAssignedTeams: true },
-        BORNES
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, assignedTeams: [] })],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: { respectStrictAssignedTeams: true },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
@@ -174,26 +174,30 @@ describe('VolunteerScheduler', () => {
     // Les deux réglages sont indépendants : un bénévole placé dans une équipe qu'il n'avait
     // pas demandée y reste, tant qu'on n'a pas aussi exigé le respect strict des souhaits.
     it('n’écarte pas sur les souhaits quand seul le strict des équipes assignées est demandé', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, teamPreferences: ['equipe-B'], assignedTeams: ['equipe-A'] })],
-        [{ ...creneauEquipe }],
-        EQUIPES,
-        { respectStrictAssignedTeams: true },
-        BORNES
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [
+          benevole({ event: true, teamPreferences: ['equipe-B'], assignedTeams: ['equipe-A'] }),
+        ],
+        timeSlots: [{ ...creneauEquipe }],
+        teams: EQUIPES,
+        constraints: { respectStrictAssignedTeams: true },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
 
     // Un créneau sans équipe n'a rien à respecter : le filtre ne doit pas le faire disparaître.
     it('n’écarte pas un créneau sans équipe', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, assignedTeams: ['equipe-A'] })],
-        [creneau({ start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' })],
-        EQUIPES,
-        { respectStrictAssignedTeams: true },
-        BORNES
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, assignedTeams: ['equipe-A'] })],
+        timeSlots: [
+          creneau({ start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
+        ],
+        teams: EQUIPES,
+        constraints: { respectStrictAssignedTeams: true },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
@@ -216,28 +220,28 @@ describe('VolunteerScheduler', () => {
       })
 
     it('refuse le créneau qui referme l’unique représentation', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [creneauDuSoir('2026-08-01')],
-        EQUIPES,
-        {},
-        BORNES,
-        [spectacle(['2026-08-01T20:00:00.000Z'])]
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [creneauDuSoir('2026-08-01')],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+        spectacles: [spectacle(['2026-08-01T20:00:00.000Z'])],
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(0)
     })
 
     // Tant qu'un passage reste libre, le bénévole verra le spectacle : rien ne s'oppose au créneau.
     it('accepte le créneau quand une autre représentation reste libre', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [creneauDuSoir('2026-08-01')],
-        EQUIPES,
-        {},
-        BORNES,
-        [spectacle(['2026-08-01T20:00:00.000Z', '2026-08-02T20:00:00.000Z'])]
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [creneauDuSoir('2026-08-01')],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+        spectacles: [spectacle(['2026-08-01T20:00:00.000Z', '2026-08-02T20:00:00.000Z'])],
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
@@ -246,59 +250,59 @@ describe('VolunteerScheduler', () => {
       // Deux soirées, deux créneaux : le premier est acceptable, le second priverait de tout.
       // Le bénévole est disponible au démontage, sans quoi le second créneau — postérieur à la
       // fin de l'événement — serait écarté pour une tout autre raison que le spectacle.
-      const r = new VolunteerScheduler(
-        [benevole({ event: true, teardown: true })],
-        [creneauDuSoir('2026-08-01', 'c1'), creneauDuSoir('2026-08-02', 'c2')],
-        EQUIPES,
-        {},
-        BORNES,
-        [spectacle(['2026-08-01T20:00:00.000Z', '2026-08-02T20:00:00.000Z'])]
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true, teardown: true })],
+        timeSlots: [creneauDuSoir('2026-08-01', 'c1'), creneauDuSoir('2026-08-02', 'c2')],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+        spectacles: [spectacle(['2026-08-01T20:00:00.000Z', '2026-08-02T20:00:00.000Z'])],
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
 
     it('laisse faire quand l’organisateur lève la contrainte', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [creneauDuSoir('2026-08-01')],
-        EQUIPES,
-        { preserverAccesSpectacles: false },
-        BORNES,
-        [spectacle(['2026-08-01T20:00:00.000Z'])]
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [creneauDuSoir('2026-08-01')],
+        teams: EQUIPES,
+        constraints: { preserverAccesSpectacles: false },
+        bornes: BORNES,
+        spectacles: [spectacle(['2026-08-01T20:00:00.000Z'])],
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
 
     it('ne s’oppose à rien quand l’édition ne programme aucun spectacle', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [creneauDuSoir('2026-08-01')],
-        EQUIPES,
-        {},
-        BORNES,
-        []
-      ).assignVolunteers()
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [creneauDuSoir('2026-08-01')],
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+        spectacles: [],
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
 
     // Un spectacle sans durée n'est bloqué que par un créneau en cours au lever de rideau.
     it('laisse passer le créneau qui s’achève avant un spectacle sans durée', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [
           creneau({
             start: '2026-08-01T16:00:00.000Z',
             end: '2026-08-01T20:00:00.000Z',
           }),
         ],
-        EQUIPES,
-        {},
-        BORNES,
-        [spectacle(['2026-08-01T20:00:00.000Z'], null)]
-      ).assignVolunteers()
+        teams: EQUIPES,
+        constraints: {},
+        bornes: BORNES,
+        spectacles: [spectacle(['2026-08-01T20:00:00.000Z'], null)],
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
     })
@@ -314,22 +318,22 @@ describe('VolunteerScheduler', () => {
     })
 
     it('classe en montage un créneau antérieur à l’heure d’ouverture, le jour même', () => {
-      const montage = new VolunteerScheduler(
-        [benevole({ setup: true })],
-        [{ ...avantOuverture }],
-        [],
-        {},
-        BORNES
-      ).assignVolunteers()
+      const montage = new VolunteerScheduler({
+        volunteers: [benevole({ setup: true })],
+        timeSlots: [{ ...avantOuverture }],
+        teams: [],
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
       expect(montage.assignments).toHaveLength(1)
 
-      const evenementSeul = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [{ ...avantOuverture }],
-        [],
-        {},
-        BORNES
-      ).assignVolunteers()
+      const evenementSeul = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [{ ...avantOuverture }],
+        teams: [],
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
       expect(evenementSeul.assignments).toHaveLength(0)
     })
 
@@ -340,22 +344,22 @@ describe('VolunteerScheduler', () => {
         end: '2026-08-02T12:00:00.000Z',
       })
 
-      const demontage = new VolunteerScheduler(
-        [benevole({ teardown: true })],
-        [{ ...apresFin }],
-        [],
-        {},
-        BORNES
-      ).assignVolunteers()
+      const demontage = new VolunteerScheduler({
+        volunteers: [benevole({ teardown: true })],
+        timeSlots: [{ ...apresFin }],
+        teams: [],
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
       expect(demontage.assignments).toHaveLength(1)
 
-      const montageSeul = new VolunteerScheduler(
-        [benevole({ setup: true })],
-        [{ ...apresFin }],
-        [],
-        {},
-        BORNES
-      ).assignVolunteers()
+      const montageSeul = new VolunteerScheduler({
+        volunteers: [benevole({ setup: true })],
+        timeSlots: [{ ...apresFin }],
+        teams: [],
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
       expect(montageSeul.assignments).toHaveLength(0)
     })
 
@@ -366,13 +370,13 @@ describe('VolunteerScheduler', () => {
         end: '2026-08-01T18:00:00.000Z',
       })
 
-      const evenement = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [{ ...pendant }],
-        [],
-        {},
-        BORNES
-      ).assignVolunteers()
+      const evenement = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [{ ...pendant }],
+        teams: [],
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
       expect(evenement.assignments).toHaveLength(1)
     })
 
@@ -385,54 +389,54 @@ describe('VolunteerScheduler', () => {
         end: '2026-08-03T12:00:00.000Z',
       })
 
-      const demontage = new VolunteerScheduler(
-        [benevole({ teardown: true })],
-        [{ ...sansBornes }],
-        [],
-        {},
-        {}
-      ).assignVolunteers()
+      const demontage = new VolunteerScheduler({
+        volunteers: [benevole({ teardown: true })],
+        timeSlots: [{ ...sansBornes }],
+        teams: [],
+        constraints: {},
+        bornes: {},
+      }).assignVolunteers()
       expect(demontage.assignments).toHaveLength(1)
 
-      const montageSeul = new VolunteerScheduler(
-        [benevole({ setup: true })],
-        [{ ...sansBornes }],
-        [],
-        {},
-        {}
-      ).assignVolunteers()
+      const montageSeul = new VolunteerScheduler({
+        volunteers: [benevole({ setup: true })],
+        timeSlots: [{ ...sansBornes }],
+        teams: [],
+        constraints: {},
+        bornes: {},
+      }).assignVolunteers()
       expect(montageSeul.assignments).toHaveLength(0)
     })
   })
 
   describe('contraintes de base', () => {
     it('n’assigne pas deux créneaux qui se chevauchent au même bénévole', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [
           creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
           creneau({ id: '2', start: '2026-08-01T17:00:00.000Z', end: '2026-08-01T19:00:00.000Z' }),
         ],
-        [],
-        {},
-        BORNES
-      ).assignVolunteers()
+        teams: [],
+        constraints: {},
+        bornes: BORNES,
+      }).assignVolunteers()
 
       expect(r.assignments).toHaveLength(1)
       expect(r.unassigned.slots).toHaveLength(1)
     })
 
     it('respecte le plafond d’heures par bénévole', () => {
-      const r = new VolunteerScheduler(
-        [benevole({ event: true })],
-        [
+      const r = new VolunteerScheduler({
+        volunteers: [benevole({ event: true })],
+        timeSlots: [
           creneau({ id: '1', start: '2026-08-01T14:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
           creneau({ id: '2', start: '2026-08-01T18:00:00.000Z', end: '2026-08-01T21:00:00.000Z' }),
         ],
-        [],
-        { maxHoursPerVolunteer: 4, maxHoursPerDay: 4 },
-        BORNES
-      ).assignVolunteers()
+        teams: [],
+        constraints: { maxHoursPerVolunteer: 4, maxHoursPerDay: 4 },
+        bornes: BORNES,
+      }).assignVolunteers()
 
       // Deux créneaux de 3 h, un plafond à 4 h : un seul peut être tenu.
       expect(r.assignments).toHaveLength(1)
@@ -467,16 +471,16 @@ describe('fuseau horaire de l’événement', () => {
       end: '2026-08-01T20:00:00.000Z',
     })
 
-    const avecFuseau = new VolunteerScheduler(
-      [benevoleAvecPreference(['evening'])],
-      [creneauSoiree],
-      [],
-      { respectStrictTimePreferences: true },
-      BORNES,
-      [],
-      [],
-      PARIS
-    ).assignVolunteers()
+    const avecFuseau = new VolunteerScheduler({
+      volunteers: [benevoleAvecPreference(['evening'])],
+      timeSlots: [creneauSoiree],
+      teams: [],
+      constraints: { respectStrictTimePreferences: true },
+      bornes: BORNES,
+      spectacles: [],
+      affectationsExistantes: [],
+      fuseau: PARIS,
+    }).assignVolunteers()
 
     expect(avecFuseau.assignments).toHaveLength(1)
   })
@@ -491,13 +495,13 @@ describe('fuseau horaire de l’événement', () => {
       end: '2026-08-01T20:00:00.000Z',
     })
 
-    const sansFuseau = new VolunteerScheduler(
-      [benevoleAvecPreference(['evening'])],
-      [creneauSoiree],
-      [],
-      { respectStrictTimePreferences: true },
-      BORNES
-    ).assignVolunteers()
+    const sansFuseau = new VolunteerScheduler({
+      volunteers: [benevoleAvecPreference(['evening'])],
+      timeSlots: [creneauSoiree],
+      teams: [],
+      constraints: { respectStrictTimePreferences: true },
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(sansFuseau.assignments).toHaveLength(0)
   })
@@ -505,19 +509,19 @@ describe('fuseau horaire de l’événement', () => {
   it('rattache un créneau de nuit à la bonne journée pour le plafond quotidien', () => {
     // 22 h 00 → 23 h 30 UTC le 1er, soit minuit → 1 h 30 le 2 à Paris. Avec un plafond de 2 h par
     // jour, les deux créneaux tiennent : ils tombent des jours différents en heure locale.
-    const r = new VolunteerScheduler(
-      [benevole({ event: true })],
-      [
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ event: true })],
+      timeSlots: [
         creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T17:30:00.000Z' }),
         creneau({ id: '2', start: '2026-08-01T22:00:00.000Z', end: '2026-08-01T23:30:00.000Z' }),
       ],
-      [],
-      { maxHoursPerDay: 2, maxHoursPerVolunteer: 12 },
-      { debut: '2026-08-01T14:00:00.000Z', fin: '2026-08-03T23:00:00.000Z' },
-      [],
-      [],
-      PARIS
-    ).assignVolunteers()
+      teams: [],
+      constraints: { maxHoursPerDay: 2, maxHoursPerVolunteer: 12 },
+      bornes: { debut: '2026-08-01T14:00:00.000Z', fin: '2026-08-03T23:00:00.000Z' },
+      spectacles: [],
+      affectationsExistantes: [],
+      fuseau: PARIS,
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(2)
   })
@@ -538,31 +542,31 @@ describe('plafond journalier et heures supplémentaires', () => {
     // coûtait 80 points quand le seuil d'acceptation est à -50, si bien qu'un créneau en heures
     // supplémentaires n'était jamais retenu — le réglage `allowOvertime` ne produisait rien.
     // Depuis que les poids sont rassemblés et rendus cohérents (A1), un bénévole ordinaire suffit.
-    const r = new VolunteerScheduler(
-      [benevole({ event: true })],
-      troisCreneaux,
-      [],
-      {
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ event: true })],
+      timeSlots: troisCreneaux,
+      teams: [],
+      constraints: {
         maxHoursPerDay: 3,
         maxOvertimeHours: 3,
         maxHoursPerVolunteer: 24,
         allowOvertime: true,
       },
-      BORNES
-    ).assignVolunteers()
+      bornes: BORNES,
+    }).assignVolunteers()
 
     // 3 h de plafond + 3 h d'heures sup : deux créneaux de 3 h tiennent, le troisième non.
     expect(r.assignments).toHaveLength(2)
   })
 
   it('s’en tient au plafond quand les heures supplémentaires sont refusées', () => {
-    const r = new VolunteerScheduler(
-      [benevole({ event: true })],
-      troisCreneaux,
-      [],
-      { maxHoursPerDay: 3, maxHoursPerVolunteer: 24, allowOvertime: false },
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ event: true })],
+      timeSlots: troisCreneaux,
+      teams: [],
+      constraints: { maxHoursPerDay: 3, maxHoursPerVolunteer: 24, allowOvertime: false },
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(1)
   })
@@ -576,9 +580,9 @@ describe('effectif souhaité d’une équipe', () => {
   const EQUIPE_PETITE = [{ id: 'equipe-A', name: 'Équipe A', color: '#000', maxVolunteers: 1 }]
 
   it('préfère pourvoir une équipe qui manque de monde', () => {
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
-      [
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      timeSlots: [
         creneau({
           id: '1',
           start: '2026-08-01T15:00:00.000Z',
@@ -592,10 +596,10 @@ describe('effectif souhaité d’une équipe', () => {
           teamId: 'equipe-A',
         }),
       ],
-      EQUIPE_PETITE,
-      {},
-      BORNES
-    ).assignVolunteers()
+      teams: EQUIPE_PETITE,
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     // Ne refuse pas : les deux créneaux restent pourvus, malgré un effectif souhaité de 1.
     // Laisser un créneau vide à côté de gens disponibles pour respecter un objectif serait pire.
@@ -619,13 +623,13 @@ describe('diagnostic des refus', () => {
     })
 
   it('dit qu’un bénévole n’était pas disponible sur cette phase', () => {
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: false, setup: true })],
-      [creneauDuSoir()],
-      EQUIPES,
-      {},
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: false, setup: true })],
+      timeSlots: [creneauDuSoir()],
+      teams: EQUIPES,
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.refus.parBenevole).toEqual([{ volunteerId: 1, motif: 'indisponible' }])
   })
@@ -636,29 +640,29 @@ describe('diagnostic des refus', () => {
       arrivalDateTime: '2026-08-05_morning',
     }
 
-    const r = new VolunteerScheduler(
-      [absent],
-      [creneauDuSoir()],
-      EQUIPES,
-      {},
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [absent],
+      timeSlots: [creneauDuSoir()],
+      teams: EQUIPES,
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.refus.parBenevole).toEqual([{ volunteerId: 2, motif: 'absent' }])
   })
 
   it('compte, par créneau, ce que chaque contrainte a écarté', () => {
-    const r = new VolunteerScheduler(
-      [
+    const r = new VolunteerScheduler({
+      volunteers: [
         benevole({ id: 1, event: false }),
         benevole({ id: 2, event: false }),
         { ...benevole({ id: 3, event: true }), arrivalDateTime: '2026-08-05_morning' },
       ],
-      [creneauDuSoir()],
-      EQUIPES,
-      {},
-      BORNES
-    ).assignVolunteers()
+      timeSlots: [creneauDuSoir()],
+      teams: EQUIPES,
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     const motifs = r.refus.parCreneau.find((c) => c.slotId === '1')?.motifs ?? []
     expect(motifs).toEqual([
@@ -668,13 +672,13 @@ describe('diagnostic des refus', () => {
   })
 
   it('n’explique rien quand tout s’est bien passé', () => {
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true })],
-      [creneauDuSoir()],
-      EQUIPES,
-      {},
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true })],
+      timeSlots: [creneauDuSoir()],
+      teams: EQUIPES,
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(1)
     expect(r.refus.parBenevole).toEqual([])
@@ -684,13 +688,13 @@ describe('diagnostic des refus', () => {
   it('rend des codes, pas des phrases', () => {
     // Les avertissements étaient écrits en français dans le moteur et affichés tels quels : sur
     // treize langues, ils restaient français pour tout le monde.
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: false })],
-      [creneauDuSoir()],
-      EQUIPES,
-      {},
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: false })],
+      timeSlots: [creneauDuSoir()],
+      teams: EQUIPES,
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.warnings).toContainEqual({ code: 'unassigned_volunteers', params: { count: 1 } })
     expect(r.warnings).toContainEqual({ code: 'unassigned_slots', params: { count: 1 } })
@@ -724,13 +728,13 @@ describe('coût du calcul', () => {
     })
 
     const depart = Date.now()
-    const r = new VolunteerScheduler(
-      benevoles,
-      creneaux,
-      [],
-      { maxHoursPerVolunteer: 24, maxHoursPerDay: 12 },
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-30T00:00:00.000Z' }
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: benevoles,
+      timeSlots: creneaux,
+      teams: [],
+      constraints: { maxHoursPerVolunteer: 24, maxHoursPerDay: 12 },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-30T00:00:00.000Z' },
+    }).assignVolunteers()
     const duree = Date.now() - depart
 
     expect(r.assignments.length).toBeGreaterThan(0)
@@ -763,26 +767,26 @@ describe('préférences horaires au recouvrement', () => {
   it('écarte, en mode strict, un créneau qui déborde largement de la plage souhaitée', () => {
     // 9 h - 17 h contre « matin » (9 h - 12 h) : trois heures sur huit, soit 37 % — sous le seuil.
     // L'ancien calcul le classait « matin » sur sa seule heure de début et l'acceptait.
-    const r = new VolunteerScheduler(
-      [avecPreferences(['morning'])],
-      [creneauLong],
-      [],
-      { respectStrictTimePreferences: true },
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [avecPreferences(['morning'])],
+      timeSlots: [creneauLong],
+      teams: [],
+      constraints: { respectStrictTimePreferences: true },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(0)
   })
 
   it('accepte un créneau majoritairement dans les plages souhaitées', () => {
     // Les mêmes huit heures, mais couvertes par trois plages contiguës : 9 h - 17 h entièrement.
-    const r = new VolunteerScheduler(
-      [avecPreferences(['morning', 'lunch', 'early_afternoon'])],
-      [creneauLong],
-      [],
-      { respectStrictTimePreferences: true },
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [avecPreferences(['morning', 'lunch', 'early_afternoon'])],
+      timeSlots: [creneauLong],
+      teams: [],
+      constraints: { respectStrictTimePreferences: true },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(1)
   })
@@ -796,27 +800,27 @@ describe('préférences horaires au recouvrement', () => {
       end: '2026-08-01T11:00:00.000Z',
     })
 
-    const unePlage = new VolunteerScheduler(
-      [avecPreferences(['morning'])],
-      [creneauCourt],
-      [],
-      {},
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+    const unePlage = new VolunteerScheduler({
+      volunteers: [avecPreferences(['morning'])],
+      timeSlots: [creneauCourt],
+      teams: [],
+      constraints: {},
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
-    const troisPlages = new VolunteerScheduler(
-      [avecPreferences(['morning', 'early_morning', 'lunch'])],
-      [
+    const troisPlages = new VolunteerScheduler({
+      volunteers: [avecPreferences(['morning', 'early_morning', 'lunch'])],
+      timeSlots: [
         creneau({
           id: '1',
           start: '2026-08-01T09:00:00.000Z',
           end: '2026-08-01T11:00:00.000Z',
         }),
       ],
-      [],
-      {},
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+      teams: [],
+      constraints: {},
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
     expect(troisPlages.assignments[0]!.score).toBe(unePlage.assignments[0]!.score)
   })
@@ -837,13 +841,13 @@ describe('rééquilibrage des charges', () => {
       })
     )
 
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
-      creneaux,
-      [],
-      { balanceTeams: true, maxHoursPerVolunteer: 24, maxHoursPerDay: 24 },
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      timeSlots: creneaux,
+      teams: [],
+      constraints: { balanceTeams: true, maxHoursPerVolunteer: 24, maxHoursPerDay: 24 },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
     // Chaque affectation porte une confiance cohérente avec son score, quel que soit son titulaire.
     for (const assignment of r.assignments) {
@@ -862,13 +866,13 @@ describe('rééquilibrage des charges', () => {
       })
     )
 
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
-      creneaux,
-      [],
-      { balanceTeams: true, maxHoursPerVolunteer: 4, maxHoursPerDay: 4 },
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      timeSlots: creneaux,
+      teams: [],
+      constraints: { balanceTeams: true, maxHoursPerVolunteer: 4, maxHoursPerDay: 4 },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
     for (const id of [1, 2]) {
       const heures = r.assignments.filter((a) => a.volunteerId === id).length * 2
@@ -884,12 +888,12 @@ describe('rééquilibrage des charges', () => {
  */
 describe('indicateurs de qualité', () => {
   it('mesure des faits constatables sur le planning', () => {
-    const r = new VolunteerScheduler(
-      [
+    const r = new VolunteerScheduler({
+      volunteers: [
         { ...benevole({ id: 1, event: true }), teamPreferences: ['equipe-A'] },
         { ...benevole({ id: 2, event: true }), teamPreferences: ['equipe-B'] },
       ],
-      [
+      timeSlots: [
         creneau({
           id: '1',
           start: '2026-08-01T16:00:00.000Z',
@@ -897,10 +901,10 @@ describe('indicateurs de qualité', () => {
           teamId: 'equipe-A',
         }),
       ],
-      EQUIPES,
-      { minHoursPerVolunteer: 2 },
-      BORNES
-    ).assignVolunteers()
+      teams: EQUIPES,
+      constraints: { minHoursPerVolunteer: 2 },
+      bornes: BORNES,
+    }).assignVolunteers()
 
     // Le créneau est pourvu, et par quelqu'un qui avait demandé cette équipe.
     expect(r.stats.creneauxComplets).toBe(1)
@@ -911,13 +915,15 @@ describe('indicateurs de qualité', () => {
   })
 
   it('ne compte pas comme mal servis ceux qui n’ont rien demandé', () => {
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true })],
-      [creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' })],
-      [],
-      {},
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true })],
+      timeSlots: [
+        creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
+      ],
+      teams: [],
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     // Aucune préférence horaire exprimée : le ratio vaut 1, pas 0.
     expect(r.stats.creneauxDansLesHorairesSouhaites).toBe(1)
@@ -960,13 +966,13 @@ describe('déblocage des créneaux vides', () => {
   ]
 
   it('déplace celui qui bloque, pour pourvoir le créneau que lui seul peut tenir', () => {
-    const r = new VolunteerScheduler(
-      [polyvalent, ordinaire],
-      deuxCreneaux(),
-      equipes,
-      { maxHoursPerVolunteer: 2, respectStrictTeamPreferences: true },
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [polyvalent, ordinaire],
+      timeSlots: deuxCreneaux(),
+      teams: equipes,
+      constraints: { maxHoursPerVolunteer: 2, respectStrictTeamPreferences: true },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
     // Sans déblocage : le polyvalent prend « banal », épuise son plafond de 2 h, et « pointu »
     // reste vide — 50 % de créneaux pourvus. Avec : les deux le sont.
@@ -979,13 +985,13 @@ describe('déblocage des créneaux vides', () => {
 
   it('ne déshabille personne quand aucun remplaçant ne peut reprendre', () => {
     // Le polyvalent est seul : déplacer son créneau ne ferait que le vider ailleurs.
-    const r = new VolunteerScheduler(
-      [polyvalent],
-      deuxCreneaux(),
-      equipes,
-      { maxHoursPerVolunteer: 2, respectStrictTeamPreferences: true },
-      { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' }
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [polyvalent],
+      timeSlots: deuxCreneaux(),
+      teams: equipes,
+      constraints: { maxHoursPerVolunteer: 2, respectStrictTeamPreferences: true },
+      bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(1)
   })
@@ -1003,13 +1009,13 @@ describe('plafond total d’heures', () => {
   ]
 
   it('nomme le motif quand le maximum d’heures est atteint', () => {
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true })],
-      deuxCreneaux(),
-      [],
-      { maxHoursPerVolunteer: 3, maxHoursPerDay: 12 },
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true })],
+      timeSlots: deuxCreneaux(),
+      teams: [],
+      constraints: { maxHoursPerVolunteer: 3, maxHoursPerDay: 12 },
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(1)
     // Le créneau restant porte la raison, là où il n'en portait aucune.
@@ -1018,13 +1024,18 @@ describe('plafond total d’heures', () => {
   })
 
   it('desserre le plafond quand les heures supplémentaires sont autorisées', () => {
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true })],
-      deuxCreneaux(),
-      [],
-      { maxHoursPerVolunteer: 3, maxOvertimeHours: 3, maxHoursPerDay: 12, allowOvertime: true },
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true })],
+      timeSlots: deuxCreneaux(),
+      teams: [],
+      constraints: {
+        maxHoursPerVolunteer: 3,
+        maxOvertimeHours: 3,
+        maxHoursPerDay: 12,
+        allowOvertime: true,
+      },
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(2)
   })
@@ -1042,8 +1053,20 @@ describe('le moteur ne modifie pas ses entrées', () => {
     ]
     const benevoles = [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })]
 
-    const premier = new VolunteerScheduler(benevoles, creneaux, [], {}, BORNES).assignVolunteers()
-    const second = new VolunteerScheduler(benevoles, creneaux, [], {}, BORNES).assignVolunteers()
+    const premier = new VolunteerScheduler({
+      volunteers: benevoles,
+      timeSlots: creneaux,
+      teams: [],
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
+    const second = new VolunteerScheduler({
+      volunteers: benevoles,
+      timeSlots: creneaux,
+      teams: [],
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(second.assignments).toHaveLength(premier.assignments.length)
     expect(second.stats.creneauxComplets).toBe(premier.stats.creneauxComplets)
@@ -1054,13 +1077,13 @@ describe('le moteur ne modifie pas ses entrées', () => {
       creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
     ]
 
-    new VolunteerScheduler(
-      [benevole({ id: 1, event: true })],
-      creneaux,
-      [],
-      {},
-      BORNES
-    ).assignVolunteers()
+    new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true })],
+      timeSlots: creneaux,
+      teams: [],
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(creneaux[0]!.assignedVolunteers).toBe(0)
   })
@@ -1075,13 +1098,15 @@ describe('motifs relevés au moment du refus', () => {
   it('n’attribue aucun motif à qui n’a été bloqué par rien', () => {
     // Deux bénévoles identiques, un seul créneau d'une place : le second n'est pas « refusé »,
     // il est second.
-    const r = new VolunteerScheduler(
-      [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
-      [creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' })],
-      [],
-      {},
-      BORNES
-    ).assignVolunteers()
+    const r = new VolunteerScheduler({
+      volunteers: [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
+      timeSlots: [
+        creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
+      ],
+      teams: [],
+      constraints: {},
+      bornes: BORNES,
+    }).assignVolunteers()
 
     expect(r.assignments).toHaveLength(1)
     expect(r.unassigned.volunteers).toHaveLength(1)

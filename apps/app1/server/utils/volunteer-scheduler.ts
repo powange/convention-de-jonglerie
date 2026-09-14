@@ -8,7 +8,6 @@ import { estPresentPendant, fenetreDe } from '~~/shared/utils/presence-benevole'
 import { representationsDe, spectacleInaccessible } from '~~/shared/utils/spectacles-visibles'
 
 export interface VolunteerApplication {
-  id: number
   user: {
     id: number
     pseudo: string
@@ -18,8 +17,6 @@ export interface VolunteerApplication {
     prenom?: string | null
   }
   availability: string // JSON string avec les préférences
-  motivation: string
-  phone?: string | null
   teamPreferences?: any[]
   /**
    * Équipes dans lesquelles les organisateurs ont déjà placé le bénévole. À distinguer des
@@ -304,6 +301,28 @@ const LIMITES = {
   CRENEAUX_A_DEBLOQUER: 50,
 } as const
 
+/**
+ * Tout ce dont le planificateur a besoin, nommé.
+ *
+ * Le constructeur prenait huit paramètres positionnels, dont cinq facultatifs. Chacun avait été
+ * ajouté par un correctif successif, et l'ensemble était devenu un piège : passer les spectacles
+ * à la place des affectations conservées compilait sans erreur, et décalait silencieusement tout
+ * ce qui suivait.
+ */
+export interface EntreesDuPlanificateur {
+  volunteers: VolunteerApplication[]
+  timeSlots: TimeSlot[]
+  teams: Team[]
+  constraints?: SchedulingConstraints
+  /** Les bornes de l'événement, qui séparent montage, événement et démontage. */
+  bornes?: BornesEvenement
+  spectacles?: SpectacleProgramme[]
+  /** Les affectations que le calcul conserve : elles pèsent, sans être remises en cause. */
+  affectationsExistantes?: AffectationExistante[]
+  /** Le fuseau de l'édition, au format IANA. Absent, tout se lit en UTC. */
+  fuseau?: string | null
+}
+
 export class VolunteerScheduler {
   private volunteers: VolunteerApplication[] = []
   private timeSlots: TimeSlot[] = []
@@ -319,11 +338,13 @@ export class VolunteerScheduler {
    */
   private representationsParSpectacle: Representation[][] = []
   /**
-   * Les affectations déjà en place que le calcul conserve. Elles pèsent dans les heures et
-   * occupent le temps, mais ne figureront pas dans le résultat : ce sont des faits, pas des
-   * décisions à prendre.
+   * Qui tient déjà un créneau que le calcul conserve.
+   *
+   * Le tableau complet des affectations conservées était gardé ici ET versé dans les compteurs :
+   * deux sources pour la même chose. Depuis que les gardes lisent l'index, il ne servait plus qu'à
+   * savoir qui n'est pas « non assigné » — ce qu'un ensemble d'identifiants dit aussi bien.
    */
-  private affectationsExistantes: AffectationExistante[] = []
+  private benevolesDejaPourvus = new Set<number>()
   /**
    * La fenêtre de présence de chaque bénévole, calculée une fois. La garde la consulte à chaque
    * affectation envisagée, et re-lire « 2026-08-01_morning » à chaque fois n'y apprendrait rien.
@@ -381,16 +402,39 @@ export class VolunteerScheduler {
    */
   private motifParPaire = new Map<string, MotifRefus>()
 
-  constructor(
-    volunteers: VolunteerApplication[],
-    timeSlots: TimeSlot[],
-    teams: Team[],
-    constraints: SchedulingConstraints = {},
-    bornes: BornesEvenement = {},
-    spectacles: SpectacleProgramme[] = [],
-    affectationsExistantes: AffectationExistante[] = [],
-    fuseau: string | null = null
-  ) {
+  constructor(entrees: EntreesDuPlanificateur) {
+    const {
+      volunteers,
+      timeSlots,
+      teams,
+      constraints = {},
+      bornes = {},
+      spectacles = [],
+      affectationsExistantes = [],
+      fuseau = null,
+    } = entrees
+
+    /**
+     * Les contraintes d'abord, avant toute indexation.
+     *
+     * Elles étaient affectées en DERNIER, après les boucles qui indexent les créneaux et versent
+     * les affectations conservées. Cela fonctionnait parce qu'aucune de ces boucles ne les lit —
+     * une dépendance d'ordre implicite, dont la panne aurait été silencieuse le jour où
+     * l'indexation devrait tenir compte d'un réglage.
+     */
+    this.constraints = {
+      maxHoursPerVolunteer: 12,
+      minHoursPerVolunteer: 2,
+      maxHoursPerDay: 8,
+      minHoursPerDay: 1,
+      balanceTeams: true,
+      respectStrictAvailability: true,
+      allowOvertime: false,
+      maxOvertimeHours: 2,
+      preserverAccesSpectacles: true,
+      ...constraints,
+    }
+
     this.volunteers = volunteers
     /**
      * Une COPIE des créneaux, et c'est essentiel.
@@ -409,7 +453,6 @@ export class VolunteerScheduler {
     this.timeSlots = timeSlots.map((slot) => ({ ...slot }))
     this.teams = teams
     this.bornes = bornes
-    this.affectationsExistantes = affectationsExistantes
     this.fuseau = fuseau
     this.presenceParBenevole = new Map(
       volunteers.map((volunteer) => [volunteer.user.id, fenetreDe(volunteer, fuseau)])
@@ -431,31 +474,31 @@ export class VolunteerScheduler {
       )
     }
 
-    // Les affectations déjà en place comptent dès le départ : ce sont des heures tenues.
+    /**
+     * Les affectations déjà en place comptent dès le départ : ce sont des heures tenues.
+     *
+     * Elles entrent aussi dans `totalHeuresPosees`, ce qui n'était pas le cas : `getAverageHours`
+     * les recalculait alors à la main en reparcourant le tableau d'origine. Deux chemins pour le
+     * même chiffre, qui restaient d'accord tant que personne ne touchait à l'un sans penser à
+     * l'autre.
+     */
     for (const affectation of affectationsExistantes) {
       const debut = dt.fromISO(affectation.start)
       const fin = dt.fromISO(affectation.end)
       const duree = fin.diff(debut, 'hours').hours
+      const heures = Number.isFinite(duree) ? duree : 0
       const jour = (fuseau ? debut.setZone(fuseau) : debut.toUTC()).toISODate() ?? ''
 
-      this.ajouterHeures(affectation.volunteerId, jour, Number.isFinite(duree) ? duree : 0)
+      this.ajouterHeures(affectation.volunteerId, jour, heures)
       this.ajouterCreneauTenu(affectation.volunteerId, {
         debut: debut.toMillis(),
         fin: fin.toMillis(),
         slotId: affectation.slotId,
       })
-    }
-    this.constraints = {
-      maxHoursPerVolunteer: 12,
-      minHoursPerVolunteer: 2,
-      maxHoursPerDay: 8,
-      minHoursPerDay: 1,
-      balanceTeams: true,
-      respectStrictAvailability: true,
-      allowOvertime: false,
-      maxOvertimeHours: 2,
-      preserverAccesSpectacles: true,
-      ...constraints,
+      this.totalHeuresPosees += heures
+      // Qui tient déjà quelque chose : la seule chose que le tableau d'origine servait encore à
+      // savoir, une fois les compteurs en place.
+      this.benevolesDejaPourvus.add(affectation.volunteerId)
     }
   }
 
@@ -1132,15 +1175,10 @@ export class VolunteerScheduler {
   private getAverageHours(): number {
     if (this.volunteers.length === 0) return 0
 
-    // Un total maintenu au fil des affectations, là où la moyenne était recalculée en refaisant
-    // le décompte complet de CHAQUE bénévole — à chaque évaluation de score.
-    let total = this.totalHeuresPosees
-    for (const affectation of this.affectationsExistantes) {
-      const duree = dt.fromISO(affectation.end).diff(dt.fromISO(affectation.start), 'hours').hours
-      if (Number.isFinite(duree)) total += duree
-    }
-
-    return total / this.volunteers.length
+    // Un total maintenu au fil des affectations, heures déjà tenues comprises depuis le
+    // constructeur — là où la moyenne était recalculée en refaisant le décompte complet de
+    // CHAQUE bénévole, à chaque évaluation de score.
+    return this.totalHeuresPosees / this.volunteers.length
   }
 
   /**
@@ -1473,7 +1511,7 @@ export class VolunteerScheduler {
       .filter(
         (volunteer) =>
           !this.assignments.some((a) => a.volunteerId === volunteer.user.id) &&
-          !this.affectationsExistantes.some((a) => a.volunteerId === volunteer.user.id)
+          !this.benevolesDejaPourvus.has(volunteer.user.id)
       )
       .map((v) => v.user.id)
 
