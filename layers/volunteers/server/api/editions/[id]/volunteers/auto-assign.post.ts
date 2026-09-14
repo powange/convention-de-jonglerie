@@ -111,7 +111,15 @@ export default wrapApiHandler(
     // le planificateur en a besoin pour classer chaque créneau sans se fier à son titre.
     const eventRecord = await prisma.event.findUnique({
       where: { id: editionId },
-      select: { id: true, startDate: true, endDate: true },
+      select: {
+        id: true,
+        startDate: true,
+        endDate: true,
+        // Le fuseau vit sur l'édition, pas sur l'événement. Toutes les heures du moteur s'y
+        // lisent : sans lui, « 23 h 30 » se comprend dans le fuseau du conteneur, c'est-à-dire
+        // UTC, et un créneau de soirée est compté sur le jour précédent.
+        edition: { select: { timezone: true } },
+      },
     })
 
     if (!eventRecord) {
@@ -326,6 +334,8 @@ export default wrapApiHandler(
       id: team.id,
       name: team.name,
       color: team.color,
+      // L'effectif souhaité : un indicateur pour le moteur, pas un plafond.
+      maxVolunteers: team.maxVolunteers,
     }))
 
     // Exécution de l'algorithme
@@ -339,7 +349,8 @@ export default wrapApiHandler(
         fin: eventRecord.endDate?.toISOString() ?? null,
       },
       spectacles,
-      affectationsConservees
+      affectationsConservees,
+      eventRecord.edition?.timezone ?? null
     )
 
     const result = scheduler.assignVolunteers()
