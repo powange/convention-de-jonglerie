@@ -111,7 +111,7 @@
       "undo_action": "Fortryd denne beregning",
       "undo_confirm": "Fortryd den seneste beregning? De oprettede tildelinger fjernes, og de slettede gendannes.",
       "undo_done": "Beregningen er fortrudt",
-      "undo_outdated": "Der er anvendt en anden beregning siden: det er ikke længere denne, der fortrydes. Genindlæs siden.",
+      "undo_outdated": "Planen er ændret siden denne beregning: at fortryde den ville slette de ændringer, der er lavet i mellemtiden. Genindlæs siden.",
       "undo_nothing": "Ingen beregning at fortryde",
       "preview_outdated": "Planen har ændret sig siden denne forhåndsvisning: kør beregningen igen, før du anvender den.",
       "preview_gone": "Denne forhåndsvisning er ikke længere tilgængelig: kør beregningen igen.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Opfyldte teamønsker",
       "stat_horaires_souhaites": "Vagter i de ønskede tider",
       "stat_ecart_type": "Spredning i arbejdsbyrden",
-      "stat_creneaux_pourvus": "Besatte vagter (ekskl. autonome teams)"
+      "stat_creneaux_pourvus": "Besatte vagter (ekskl. autonome teams)",
+      "history_title": "Historik over beregninger",
+      "history_description": "De automatiske tildelinger, der allerede er kørt på denne udgave.",
+      "history_empty": "Der er endnu ikke kørt nogen beregning på denne udgave.",
+      "history_line": "Kørt af {author} — {created} tildeling(er) oprettet, {deleted} slettet.",
+      "history_undone": "Fortrudt af {author} den {date}."
     },
     "autonomous_team": "Selvstyrende hold",
     "autonomous_team_badge": "Selvstyrende",

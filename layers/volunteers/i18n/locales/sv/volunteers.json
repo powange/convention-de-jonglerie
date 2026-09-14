@@ -111,7 +111,7 @@
       "undo_action": "Ångra den här beräkningen",
       "undo_confirm": "Ångra den senaste beräkningen? Tilldelningarna den skapade tas bort och de som togs bort återställs.",
       "undo_done": "Beräkningen har ångrats",
-      "undo_outdated": "En annan beräkning har tillämpats sedan dess: det är inte längre den här som ångras. Ladda om sidan.",
+      "undo_outdated": "Schemat har ändrats sedan denna beräkning: att ångra den skulle radera de ändringar som gjorts under tiden. Ladda om sidan.",
       "undo_nothing": "Ingen beräkning att ångra",
       "preview_outdated": "Schemat har ändrats sedan den här förhandsvisningen: kör beräkningen igen innan du tillämpar den.",
       "preview_gone": "Den här förhandsvisningen är inte längre tillgänglig: kör beräkningen igen.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Uppfyllda lagönskemål",
       "stat_horaires_souhaites": "Pass inom önskade tider",
       "stat_ecart_type": "Spridning i arbetsbörda",
-      "stat_creneaux_pourvus": "Bemannade pass (exkl. autonoma lag)"
+      "stat_creneaux_pourvus": "Bemannade pass (exkl. autonoma lag)",
+      "history_title": "Historik över beräkningar",
+      "history_description": "De automatiska tilldelningar som redan körts på denna upplaga.",
+      "history_empty": "Ingen beräkning har ännu körts på denna upplaga.",
+      "history_line": "Körd av {author} — {created} tilldelning(ar) skapade, {deleted} raderade.",
+      "history_undone": "Ångrad av {author} den {date}."
     },
     "autonomous_team": "Självstyrande lag",
     "autonomous_team_badge": "Självstyrande",

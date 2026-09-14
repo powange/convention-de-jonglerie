@@ -119,6 +119,33 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
       expect(result.mode).toBe('INTERNAL')
       expect(result).toHaveProperty('counts')
     })
+
+    /**
+     * Les réglages de l'assignation automatique disent quelles contraintes pèsent sur la
+     * répartition — combien d'heures, quelles préférences sont tenues pour fermes, ce qui sera
+     * effacé. Cet endpoint est aussi lisible par qui a simplement candidaté : la clé doit donc
+     * rester du côté de la gestion, comme les compteurs.
+     */
+    it('ne laisse pas voir les réglages d’assignation à qui a seulement candidaté', async () => {
+      prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue({ id: 7 })
+      prismaMock.event.findUnique.mockResolvedValue(
+        makeEvent({ autoAssignConstraints: { maxHoursPerVolunteer: 4 } })
+      )
+
+      const result = await handler({ context: { user: mockUser } } as any)
+
+      expect(result).not.toHaveProperty('autoAssignConstraints')
+    })
+
+    it('les rend au gestionnaire, tels qu’ils ont été employés', async () => {
+      prismaMock.event.findUnique.mockResolvedValue(
+        makeEvent({ autoAssignConstraints: { maxHoursPerVolunteer: 4 } })
+      )
+
+      const result = await appelGestionnaire()
+
+      expect(result.autoAssignConstraints).toEqual({ maxHoursPerVolunteer: 4 })
+    })
   })
 
   describe('Les compteurs relèvent de la gestion', () => {
@@ -213,6 +240,10 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         askTeardown: true,
         counts: { total: 0, PENDING: 0, ACCEPTED: 0, REJECTED: 0 },
         updatedAt: null,
+        // Les réglages de l'assignation automatique : `null` tant que l'édition n'a jamais
+        // lancé de calcul. Ils ne sortent que pour un gestionnaire — c'est l'objet du test
+        // « ne sortent pas pour un bénévole » plus bas.
+        autoAssignConstraints: null,
       })
     })
 
@@ -335,6 +366,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         'askTeardown',
         'counts',
         'updatedAt',
+        'autoAssignConstraints',
       ]
 
       expectedFields.forEach((field) => expect(result).toHaveProperty(field))

@@ -111,7 +111,7 @@
       "undo_action": "Vrátit tento výpočet",
       "undo_confirm": "Vrátit poslední výpočet? Vytvořená přiřazení budou odstraněna a smazaná obnovena.",
       "undo_done": "Výpočet byl vrácen",
-      "undo_outdated": "Mezitím byl použit jiný výpočet: vrací se už jiný. Načtěte stránku znovu.",
+      "undo_outdated": "Rozvrh se od tohoto výpočtu změnil: jeho vrácení by smazalo mezitím provedené změny. Načtěte stránku znovu.",
       "undo_nothing": "Žádný výpočet k vrácení",
       "preview_outdated": "Rozvrh se od tohoto náhledu změnil: před použitím spusťte výpočet znovu.",
       "preview_gone": "Tento náhled už není k dispozici: spusťte výpočet znovu.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Zohledněná přání týmu",
       "stat_horaires_souhaites": "Směny v preferovaných hodinách",
       "stat_ecart_type": "Rozptyl zátěže",
-      "stat_creneaux_pourvus": "Obsazené směny (mimo autonomní týmy)"
+      "stat_creneaux_pourvus": "Obsazené směny (mimo autonomní týmy)",
+      "history_title": "Historie výpočtů",
+      "history_description": "Výpočty automatického přiřazení již spuštěné v této edici.",
+      "history_empty": "V této edici zatím nebyl spuštěn žádný výpočet.",
+      "history_line": "Spustil {author} — vytvořeno {created} přiřazení, smazáno {deleted}.",
+      "history_undone": "Vráceno uživatelem {author} dne {date}."
     },
     "autonomous_team": "Samostatný tým",
     "autonomous_team_badge": "Samostatný",

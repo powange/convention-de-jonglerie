@@ -15,9 +15,21 @@
               <UIcon name="i-heroicons-sparkles" class="text-primary-500" />
               {{ t('volunteers.auto_assignment.title') }}
             </h3>
-            <UBadge color="warning" variant="soft" size="sm">
-              {{ t('volunteers.auto_assignment.beta_badge') }}
-            </UBadge>
+            <div class="flex items-center gap-2">
+              <UBadge color="warning" variant="soft" size="sm">
+                {{ t('volunteers.auto_assignment.beta_badge') }}
+              </UBadge>
+              <UTooltip :text="t('volunteers.auto_assignment.history_title')">
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-heroicons-clock"
+                  :aria-label="t('volunteers.auto_assignment.history_title')"
+                  @click="ouvrirLHistorique"
+                />
+              </UTooltip>
+            </div>
           </div>
         </template>
 
@@ -182,11 +194,15 @@
 
           <!-- Boutons d'action -->
           <div class="flex flex-wrap items-center gap-3">
+            <!-- Indisponible tant que les réglages de l'édition ne sont pas arrivés : lancer le
+                 calcul les enregistre, et ce seraient alors les valeurs par défaut affichées
+                 entre-temps qui écraseraient ceux du collègue. -->
             <UButton
               color="primary"
               variant="soft"
               icon="i-heroicons-eye"
-              :loading="previewLoading"
+              :loading="previewLoading || !reglagesCharges"
+              :disabled="!reglagesCharges"
               @click="generatePreview"
             >
               {{ t('volunteers.auto_assignment.preview') }}
@@ -573,12 +589,78 @@
         </div>
       </template>
     </UModal>
+
+    <!-- L'historique des calculs. Dans une modale et non dans le panneau : on l'ouvre pour
+         répondre à une question ponctuelle (« qui a lancé ça, et quand ? »), pas à chaque
+         passage. -->
+    <UModal
+      v-model:open="historiqueOuvert"
+      :title="t('volunteers.auto_assignment.history_title')"
+      :description="t('volunteers.auto_assignment.history_description')"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <div v-if="historiqueLoading" class="space-y-2">
+            <USkeleton v-for="n in 3" :key="n" class="h-16 w-full" />
+          </div>
+
+          <UAlert
+            v-else-if="historique.length === 0"
+            color="neutral"
+            variant="soft"
+            icon="i-heroicons-clock"
+            :description="t('volunteers.auto_assignment.history_empty')"
+          />
+
+          <ul v-else class="divide-y divide-default">
+            <li v-for="calcul in historique" :key="calcul.id" class="py-3 flex flex-col gap-1">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <span class="text-sm font-medium">
+                  {{ formaterDate(calcul.executedAt) }}
+                </span>
+                <UBadge
+                  :color="calcul.undoneAt ? 'neutral' : 'primary'"
+                  variant="soft"
+                  size="sm"
+                  :label="libelleMode(calcul.mode)"
+                />
+              </div>
+
+              <p class="text-sm text-dimmed">
+                {{
+                  t('volunteers.auto_assignment.history_line', {
+                    author: calcul.executedBy?.pseudo ?? t('common.unknown'),
+                    created: calcul.createdCount,
+                    deleted: calcul.deletedCount,
+                  })
+                }}
+              </p>
+
+              <p v-if="calcul.undoneAt" class="text-sm text-warning">
+                {{
+                  t('volunteers.auto_assignment.history_undone', {
+                    author: calcul.undoneBy?.pseudo ?? t('common.unknown'),
+                    date: formaterDate(calcul.undoneAt),
+                  })
+                }}
+              </p>
+            </li>
+          </ul>
+
+          <UPagination
+            v-if="historiqueTotalPages > 1"
+            v-model:page="historiquePage"
+            :total="historiqueTotal"
+            :items-per-page="TAILLE_PAGE_HISTORIQUE"
+            class="justify-center"
+          />
+        </div>
+      </template>
+    </UModal>
   </UCollapsible>
 </template>
 
 <script setup lang="ts">
-import { useLocalStorage } from '@vueuse/core'
-
 interface Props {
   editionId: number
   volunteers: any[]
@@ -628,20 +710,54 @@ const REGLAGES_PAR_DEFAUT: Constraints = {
 }
 
 /**
- * Les réglages survivent au rechargement de la page, édition par édition.
+ * Les réglages appartiennent à l'édition, pas au navigateur.
  *
  * Il y a une dizaine de curseurs à poser, et on relance rarement l'assignation du premier coup :
- * tout ressaisir à chaque passage décourageait d'ajuster. Chaque édition garde les siens — les
- * contraintes d'un festival de trois jours ne sont pas celles d'une rencontre d'un week-end.
+ * tout ressaisir à chaque passage décourageait d'ajuster. Ils vivaient donc dans le
+ * `localStorage` — ce qui les faisait repartir aux valeurs par défaut sur un autre poste, sans
+ * prévenir, y compris le mode de conservation qui décide de ce qui sera détruit. Et deux
+ * organisateurs pouvaient lancer le calcul avec des contraintes différentes sans le savoir.
  *
- * `mergeDefaults` protège les réglages enregistrés avant l'ajout d'une option : la valeur par
- * défaut de la nouvelle complète l'objet stocké au lieu de le rendre inutilisable.
+ * Ils sont désormais conservés sur l'édition, par le serveur, au moment où le calcul les
+ * utilise : rien à enregistrer, et ce qui est mémorisé est exactement ce qui a servi.
+ *
+ * L'étalement sur les valeurs par défaut protège les réglages enregistrés avant l'ajout d'une
+ * option : la valeur par défaut de la nouvelle complète l'objet stocké au lieu de le rendre
+ * inutilisable.
  */
-const constraints = useLocalStorage<Constraints>(
-  `assignation-auto:${props.editionId}`,
-  REGLAGES_PAR_DEFAUT,
-  { mergeDefaults: true }
-)
+const constraints = ref<Constraints>({ ...REGLAGES_PAR_DEFAUT })
+
+/**
+ * Les réglages de l'édition sont-ils arrivés ?
+ *
+ * Décide si le calcul peut être lancé : tant que la réponse n'est pas là, l'écran montre les
+ * valeurs par défaut, et les envoyer au serveur les ferait enregistrer à la place de celles que
+ * l'édition avait déjà.
+ */
+const reglagesCharges = ref(false)
+
+const chargerLesReglages = async () => {
+  try {
+    const reponse = await $fetch<{
+      autoAssignConstraints?: Partial<Constraints> | null
+    }>(`/api/editions/${props.editionId}/volunteers/settings`)
+    if (reponse?.autoAssignConstraints) {
+      constraints.value = {
+        ...REGLAGES_PAR_DEFAUT,
+        ...reponse.autoAssignConstraints,
+      }
+    }
+  } catch {
+    // Les valeurs par défaut font un point de départ valable ; un rejet non géré, lui,
+    // interromprait l'hydratation de la page entière.
+  } finally {
+    // `finally` : un échec de lecture ne doit pas condamner le bouton. L'organisateur repart
+    // alors des valeurs par défaut, ce qui reste préférable à un panneau définitivement inerte.
+    reglagesCharges.value = true
+  }
+}
+
+onMounted(chargerLesReglages)
 
 const modesAffectationsExistantes = computed(() => [
   {
@@ -856,6 +972,83 @@ const annulerLeCalcul = () => {
   if (!dernierCalcul.value) return
   if (!confirm(t('volunteers.auto_assignment.undo_confirm'))) return
   executeUndo()
+}
+
+/**
+ * L'historique des calculs déjà lancés sur cette édition.
+ *
+ * Le panneau ne montrait que le dernier calcul, et seulement pour proposer de l'annuler. Sur une
+ * édition à plusieurs organisateurs, la question « qui a relancé le calcul, quand, et avec quel
+ * mode ? » n'avait aucune réponse ailleurs que dans la base.
+ */
+const TAILLE_PAGE_HISTORIQUE = 10
+
+interface CalculConsigne {
+  id: string
+  executedAt: string
+  mode: string
+  createdCount: number
+  deletedCount: number
+  undoneAt: string | null
+  executedBy: { pseudo: string } | null
+  undoneBy: { pseudo: string } | null
+}
+
+const historiqueOuvert = ref(false)
+const historique = ref<CalculConsigne[]>([])
+const historiqueLoading = ref(false)
+const historiquePage = ref(1)
+const historiqueTotal = ref(0)
+const historiqueTotalPages = computed(() =>
+  Math.ceil(historiqueTotal.value / TAILLE_PAGE_HISTORIQUE)
+)
+
+const chargerLHistorique = async () => {
+  historiqueLoading.value = true
+  try {
+    const reponse = await $fetch<{
+      data: CalculConsigne[]
+      pagination: { totalCount: number }
+    }>(`/api/editions/${props.editionId}/volunteers/auto-assign/history`, {
+      query: { page: historiquePage.value, limit: TAILLE_PAGE_HISTORIQUE },
+    })
+    historique.value = reponse?.data ?? []
+    historiqueTotal.value = reponse?.pagination?.totalCount ?? 0
+  } catch {
+    // Même raison que pour le dernier calcul : un rejet non géré interromprait l'hydratation.
+    historique.value = []
+    historiqueTotal.value = 0
+  } finally {
+    historiqueLoading.value = false
+  }
+}
+
+const ouvrirLHistorique = () => {
+  historiqueOuvert.value = true
+  historiquePage.value = 1
+  chargerLHistorique()
+}
+
+// Changer de page recharge, mais seulement quand la modale est ouverte : la refermer remet la
+// page à 1 au prochain clic, sans déclencher de requête inutile entre-temps.
+watch(historiquePage, () => {
+  if (historiqueOuvert.value) chargerLHistorique()
+})
+
+const { formatDateTime } = useDateFormat()
+const formaterDate = (valeur: string) => formatDateTime(valeur)
+
+// Correspondance explicite, comme pour l'aide du mode : une clé composée à l'exécution passerait
+// pour inutilisée aux yeux de l'outillage i18n.
+const libelleMode = (mode: string) => {
+  switch (mode) {
+    case 'keep-all':
+      return t('volunteers.auto_assignment.existing_mode_keep_all')
+    case 'replace-all':
+      return t('volunteers.auto_assignment.existing_mode_replace_all')
+    default:
+      return t('volunteers.auto_assignment.existing_mode_keep_manual')
+  }
 }
 
 /**

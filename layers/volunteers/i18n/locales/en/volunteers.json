@@ -111,7 +111,7 @@
       "undo_action": "Undo this run",
       "undo_confirm": "Undo the last run? The assignments it created will be removed, and those it had deleted will be restored.",
       "undo_done": "The run has been undone",
-      "undo_outdated": "Another run has been applied since: this is no longer the one being undone. Please reload the page.",
+      "undo_outdated": "The schedule has changed since this run: undoing it would discard changes made in the meantime. Reload the page.",
       "undo_nothing": "No run to undo",
       "preview_outdated": "The schedule has changed since this preview: run the calculation again before applying it.",
       "preview_gone": "This preview is no longer available: run the calculation again.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Team preferences honoured",
       "stat_horaires_souhaites": "Slots within preferred hours",
       "stat_ecart_type": "Spread of workloads",
-      "stat_creneaux_pourvus": "Slots filled (excl. autonomous teams)"
+      "stat_creneaux_pourvus": "Slots filled (excl. autonomous teams)",
+      "history_title": "Run history",
+      "history_description": "The automatic assignment runs already launched on this edition.",
+      "history_empty": "No run has been launched on this edition yet.",
+      "history_line": "Launched by {author} — {created} assignment(s) created, {deleted} removed.",
+      "history_undone": "Undone by {author} on {date}."
     },
     "autonomous_team": "Self-managed team",
     "autonomous_team_badge": "Self-managed",

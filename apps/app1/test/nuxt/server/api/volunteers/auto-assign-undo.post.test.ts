@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 const mockCanManage = vi.hoisted(() => vi.fn())
@@ -134,6 +136,76 @@ describe('POST …/volunteers/auto-assign/undo', () => {
     expect(prismaMock.volunteerAutoAssignRun.findFirst.mock.calls.at(-1)[0].where).toEqual({
       eventId: 22,
       undoneAt: null,
+    })
+  })
+
+  /**
+   * La vérification du `journalId` n'attrape qu'un autre CALCUL appliqué depuis. Elle ne voit
+   * rien du travail fait à la main entre-temps : c'est ce que l'empreinte d'après-calcul ajoute.
+   */
+  describe('empreinte de l’état d’après-calcul', () => {
+    // Ce que le journal dit avoir laissé derrière lui : les deux créneaux qu'il a touchés.
+    const ETAT_LAISSE = [
+      { timeSlotId: 'creneau-a', userId: 10, source: 'AUTO' },
+      { timeSlotId: 'creneau-b', userId: 12, source: 'MANUAL' },
+    ]
+
+    const empreinteDe = (etat: typeof ETAT_LAISSE) =>
+      createHash('sha256')
+        .update(
+          etat
+            .map((a) => `${a.timeSlotId}:${a.userId}:${a.source}`)
+            .sort()
+            .join('|')
+        )
+        .digest('hex')
+
+    beforeEach(() => {
+      prismaMock.volunteerAutoAssignRun.findFirst.mockResolvedValue({
+        ...JOURNAL,
+        empreinteApres: empreinteDe(ETAT_LAISSE),
+      })
+      prismaMock.volunteerAssignment.findMany.mockResolvedValue(ETAT_LAISSE)
+    })
+
+    it('annule quand le planning est encore celui que le calcul a laissé', async () => {
+      await handler(evenement as any)
+
+      expect(prismaMock.volunteerAssignment.deleteMany).toHaveBeenCalled()
+    })
+
+    it('refuse, sans rien écrire, quand une affectation a été posée à la main depuis', async () => {
+      // Retirer les affectations créées effacerait ce travail, et recréer les anciennes
+      // remettrait un état que l'organisateur venait justement de corriger.
+      prismaMock.volunteerAssignment.findMany.mockResolvedValue([
+        ...ETAT_LAISSE,
+        { timeSlotId: 'creneau-a', userId: 99, source: 'MANUAL' },
+      ])
+
+      await expect(handler(evenement as any)).rejects.toBeDefined()
+      expect(prismaMock.volunteerAssignment.deleteMany).not.toHaveBeenCalled()
+      expect(prismaMock.volunteerAutoAssignRun.update).not.toHaveBeenCalled()
+    })
+
+    it('ne regarde que les créneaux que l’annulation toucherait', async () => {
+      // Surveiller l'édition entière ferait refuser une annulation légitime parce qu'un
+      // organisateur a ajouté quelqu'un à l'autre bout du planning.
+      await handler(evenement as any)
+
+      const [appel] = prismaMock.volunteerAssignment.findMany.mock.calls.at(-1)
+      expect(appel.where.timeSlotId.in.sort()).toEqual(['creneau-a', 'creneau-b'])
+    })
+
+    it('annule quand même un calcul consigné avant l’ajout de l’empreinte', async () => {
+      // Rien à comparer : on ne peut pas refuser une annulation faute de point de comparaison.
+      prismaMock.volunteerAutoAssignRun.findFirst.mockResolvedValue({
+        ...JOURNAL,
+        empreinteApres: null,
+      })
+
+      await handler(evenement as any)
+
+      expect(prismaMock.volunteerAssignment.deleteMany).toHaveBeenCalled()
     })
   })
 })

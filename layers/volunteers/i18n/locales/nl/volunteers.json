@@ -111,7 +111,7 @@
       "undo_action": "Berekening ongedaan maken",
       "undo_confirm": "De laatste berekening ongedaan maken? De aangemaakte toewijzingen worden verwijderd en de verwijderde worden hersteld.",
       "undo_done": "De berekening is ongedaan gemaakt",
-      "undo_outdated": "Er is sindsdien een andere berekening toegepast: deze wordt niet langer ongedaan gemaakt. Herlaad de pagina.",
+      "undo_outdated": "De planning is sinds deze berekening gewijzigd: ongedaan maken zou de tussentijdse wijzigingen wissen. Herlaad de pagina.",
       "undo_nothing": "Geen berekening om ongedaan te maken",
       "preview_outdated": "De planning is sinds dit voorbeeld gewijzigd: voer de berekening opnieuw uit voordat je die toepast.",
       "preview_gone": "Dit voorbeeld is niet meer beschikbaar: voer de berekening opnieuw uit.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Gehonoreerde teamvoorkeuren",
       "stat_horaires_souhaites": "Diensten binnen gewenste uren",
       "stat_ecart_type": "Spreiding van de belasting",
-      "stat_creneaux_pourvus": "Bezette diensten (excl. autonome teams)"
+      "stat_creneaux_pourvus": "Bezette diensten (excl. autonome teams)",
+      "history_title": "Geschiedenis van de berekeningen",
+      "history_description": "De automatische toewijzingen die al voor deze editie zijn uitgevoerd.",
+      "history_empty": "Er is nog geen berekening uitgevoerd voor deze editie.",
+      "history_line": "Uitgevoerd door {author} — {created} toewijzing(en) aangemaakt, {deleted} verwijderd.",
+      "history_undone": "Ongedaan gemaakt door {author} op {date}."
     },
     "autonomous_team": "Zelfstandig team",
     "autonomous_team_badge": "Zelfstandig",

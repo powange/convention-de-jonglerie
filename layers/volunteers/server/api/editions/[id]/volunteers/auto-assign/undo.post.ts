@@ -4,6 +4,7 @@ import type { Prisma } from '#server/types/prisma'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { creneauxConcernes, empreinteDesAffectations } from '#server/utils/empreinte-affectations'
 import { createLogger } from '#server/utils/logger'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
@@ -97,6 +98,36 @@ export default wrapApiHandler(
     const rattachementsEfface = dernier.deletedTeamLinks as unknown as RattachementConserve[]
 
     await prisma.$transaction(async (tx) => {
+      /**
+       * 0. Le planning est-il encore celui que ce calcul a laissé ?
+       *
+       * La vérification du `journalId` ci-dessus n'attrape qu'un autre CALCUL appliqué depuis.
+       * Elle ne voit rien du travail fait à la main entre-temps : retirer les affectations
+       * créées effacerait alors des modifications que personne n'a demandé de défaire, et
+       * recréer les anciennes remettrait un état que l'organisateur venait de corriger.
+       *
+       * Dans la transaction, et pas avant : c'est le seul endroit où la réponse reste vraie
+       * jusqu'à l'écriture.
+       *
+       * `empreinteApres` est vide pour les calculs consignés avant l'ajout de ce garde-fou.
+       * Rien à comparer : on ne peut pas refuser une annulation faute de point de comparaison.
+       */
+      if (dernier.empreinteApres) {
+        const creneauxTouches = creneauxConcernes(affectationsCreees, affectationsEffacees)
+        const etatActuel = await tx.volunteerAssignment.findMany({
+          where: { timeSlotId: { in: creneauxTouches } },
+          select: { timeSlotId: true, userId: true, source: true },
+        })
+
+        if (empreinteDesAffectations(etatActuel) !== dernier.empreinteApres) {
+          throw createError({
+            status: 409,
+            message:
+              'Le planning a été modifié depuis ce calcul : annuler effacerait ces modifications. Rafraîchissez la page pour repartir de l’état actuel.',
+          })
+        }
+      }
+
       // 1. Retirer ce que le calcul avait créé. Le couple (créneau, bénévole) est unique : c'est
       //    lui qui désigne la ligne, et rien d'autre ne doit être touché.
       if (affectationsCreees.length > 0) {
