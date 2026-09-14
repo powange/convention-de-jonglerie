@@ -111,7 +111,7 @@
       "undo_action": "Cofnij to obliczenie",
       "undo_confirm": "Cofnąć ostatnie obliczenie? Utworzone przydziały zostaną usunięte, a usunięte — przywrócone.",
       "undo_done": "Obliczenie zostało cofnięte",
-      "undo_outdated": "Od tego czasu zastosowano inne obliczenie: to już nie ono jest cofane. Odśwież stronę.",
+      "undo_outdated": "Harmonogram zmienił się od tego obliczenia: cofnięcie usunęłoby zmiany wprowadzone w międzyczasie. Odśwież stronę.",
       "undo_nothing": "Brak obliczenia do cofnięcia",
       "preview_outdated": "Grafik zmienił się od czasu tego podglądu: uruchom obliczenie ponownie przed zastosowaniem.",
       "preview_gone": "Ten podgląd nie jest już dostępny: uruchom obliczenie ponownie.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Uwzględnione preferencje zespołu",
       "stat_horaires_souhaites": "Zmiany w preferowanych godzinach",
       "stat_ecart_type": "Rozrzut obciążeń",
-      "stat_creneaux_pourvus": "Obsadzone zmiany (bez zespołów autonomicznych)"
+      "stat_creneaux_pourvus": "Obsadzone zmiany (bez zespołów autonomicznych)",
+      "history_title": "Historia obliczeń",
+      "history_description": "Obliczenia automatycznego przydziału już uruchomione w tej edycji.",
+      "history_empty": "W tej edycji nie uruchomiono jeszcze żadnego obliczenia.",
+      "history_line": "Uruchomione przez {author} — utworzono {created} przydział(ów), usunięto {deleted}.",
+      "history_undone": "Cofnięte przez {author} dnia {date}."
     },
     "autonomous_team": "Zespół samodzielny",
     "autonomous_team_badge": "Samodzielny",

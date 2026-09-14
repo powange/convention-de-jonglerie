@@ -79,6 +79,16 @@ model EventVolunteerSettings {
   askEmergencyContact Boolean @default(false)
   askSetup            Boolean @default(false)
   askTeardown         Boolean @default(false)
+
+  /// Les réglages de l'assignation automatique, partagés par les organisateurs de l'édition.
+  ///
+  /// Ils vivaient dans le `localStorage` du navigateur : changer de poste les faisait repartir
+  /// aux valeurs par défaut sans prévenir — y compris le mode de conservation, qui décide de ce
+  /// qui sera détruit. Et deux organisateurs pouvaient lancer le calcul avec des contraintes
+  /// différentes sans le savoir, le résultat dépendant alors de qui avait cliqué.
+  ///
+  /// `null` signifie « jamais réglé » : l'écran part de ses valeurs par défaut, comme avant.
+  autoAssignConstraints Json?
 }
 
 model EditionVolunteerApplication {
@@ -309,6 +319,17 @@ model VolunteerAutoAssignRun {
 
   createdCount Int
   deletedCount Int
+
+  /**
+   * L'état du planning tel que ce calcul l'a laissé.
+   *
+   * L'annulation ne refusait que si un AUTRE calcul avait été appliqué depuis. Elle ne voyait pas
+   * les affectations posées à la main entre-temps : les retirer aurait fait disparaître ce
+   * travail, et recréer les anciennes pouvait entrer en conflit avec lui.
+   *
+   * Même mécanique que l'empreinte qui protège l'application : on compare avant d'écrire.
+   */
+  empreinteApres String?
 
   /// Renseignés quand le calcul a été annulé. Un journal annulé ne l'est pas deux fois.
   undoneAt   DateTime?

@@ -111,7 +111,7 @@
       "undo_action": "Anular este cálculo",
       "undo_confirm": "Anular o último cálculo? As atribuições que criou serão removidas e as que tinha apagado serão repostas.",
       "undo_done": "O cálculo foi anulado",
-      "undo_outdated": "Foi aplicado outro cálculo entretanto: já não é este que é anulado. Recarregue a página.",
+      "undo_outdated": "A escala mudou desde este cálculo: anulá-lo apagaria as alterações feitas entretanto. Recarregue a página.",
       "undo_nothing": "Nenhum cálculo para anular",
       "preview_outdated": "O planeamento mudou desde esta pré-visualização: volte a executar o cálculo antes de o aplicar.",
       "preview_gone": "Esta pré-visualização já não está disponível: volte a executar o cálculo.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Preferências de equipa respeitadas",
       "stat_horaires_souhaites": "Turnos nos horários desejados",
       "stat_ecart_type": "Diferença entre as cargas",
-      "stat_creneaux_pourvus": "Turnos preenchidos (exceto equipas autónomas)"
+      "stat_creneaux_pourvus": "Turnos preenchidos (exceto equipas autónomas)",
+      "history_title": "Histórico dos cálculos",
+      "history_description": "Os cálculos de atribuição automática já lançados nesta edição.",
+      "history_empty": "Ainda não foi lançado nenhum cálculo nesta edição.",
+      "history_line": "Lançado por {author} — {created} atribuição(ões) criada(s), {deleted} eliminada(s).",
+      "history_undone": "Anulado por {author} em {date}."
     },
     "autonomous_team": "Equipa autónoma",
     "autonomous_team_badge": "Autónoma",

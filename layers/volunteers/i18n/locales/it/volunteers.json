@@ -111,7 +111,7 @@
       "undo_action": "Annulla questo calcolo",
       "undo_confirm": "Annullare l'ultimo calcolo? Le assegnazioni create verranno rimosse e quelle eliminate saranno ripristinate.",
       "undo_done": "Il calcolo è stato annullato",
-      "undo_outdated": "Nel frattempo è stato applicato un altro calcolo: non è più questo a essere annullato. Ricarica la pagina.",
+      "undo_outdated": "Il planning è cambiato da questo calcolo: annullarlo cancellerebbe le modifiche fatte nel frattempo. Ricarica la pagina.",
       "undo_nothing": "Nessun calcolo da annullare",
       "preview_outdated": "La pianificazione è cambiata dopo questa anteprima: rilancia il calcolo prima di applicarlo.",
       "preview_gone": "Questa anteprima non è più disponibile: rilancia il calcolo.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Preferenze di squadra rispettate",
       "stat_horaires_souhaites": "Turni negli orari desiderati",
       "stat_ecart_type": "Scarto tra i carichi",
-      "stat_creneaux_pourvus": "Turni coperti (escluse squadre autonome)"
+      "stat_creneaux_pourvus": "Turni coperti (escluse squadre autonome)",
+      "history_title": "Cronologia dei calcoli",
+      "history_description": "I calcoli di assegnazione automatica già lanciati su questa edizione.",
+      "history_empty": "Nessun calcolo è ancora stato lanciato su questa edizione.",
+      "history_line": "Lanciato da {author} — {created} assegnazione/i creata/e, {deleted} eliminata/e.",
+      "history_undone": "Annullato da {author} il {date}."
     },
     "autonomous_team": "Squadra autonoma",
     "autonomous_team_badge": "Autonoma",

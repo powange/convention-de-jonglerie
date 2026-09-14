@@ -121,6 +121,10 @@ const preparerLesMocks = () => {
   prismaMock.volunteerAutoAssignPlan.create.mockResolvedValue({ id: 'plan-1' })
   prismaMock.volunteerAutoAssignPlan.update.mockResolvedValue({})
   prismaMock.volunteerAutoAssignPlan.findFirst.mockResolvedValue(null)
+  prismaMock.volunteerAutoAssignPlan.deleteMany.mockResolvedValue({ count: 0 })
+  // Les réglages mémorisés au passage : l'écriture n'est pas attendue par l'endpoint, mais sans
+  // ce doublon le `.catch()` porterait sur `undefined` et ferait tomber la requête.
+  prismaMock.eventVolunteerSettings.upsert.mockResolvedValue({})
 }
 
 const appliquer = (existingAssignmentsMode: string) => {
@@ -880,5 +884,60 @@ describe('POST …/volunteers/auto-assign — l’empreinte couvre les équipes'
     await expect(handler(evenement as any)).rejects.toBeDefined()
     // Et surtout : rien n'a été effacé.
     expect(prismaMock.volunteerAssignment.deleteMany).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * Deux corvées que personne ne fait à la main : garder les réglages de l'édition à jour, et
+ * effacer les aperçus dont plus aucun code ne se servira.
+ */
+describe('POST …/volunteers/auto-assign — ce que le calcul range derrière lui', () => {
+  beforeEach(preparerLesMocks)
+
+  it('mémorise sur l’édition les réglages qui viennent de servir', async () => {
+    // Enregistrés par le serveur et non par un second appel du navigateur : c'est l'objet déjà
+    // validé qui part en base, donc exactement celui qui a produit le résultat.
+    global.readBody = vi.fn().mockResolvedValue({
+      constraints: { maxHoursPerVolunteer: 5, existingAssignmentsMode: 'keep-all' },
+    })
+
+    await handler(evenement as any)
+
+    const [appel] = prismaMock.eventVolunteerSettings.upsert.mock.calls.at(-1)
+    expect(appel.where).toEqual({ eventId: 22 })
+    expect(appel.update.autoAssignConstraints).toEqual({
+      maxHoursPerVolunteer: 5,
+      existingAssignmentsMode: 'keep-all',
+    })
+    // `upsert` et non `update` : une édition qui n'a jamais ouvert ses réglages bénévoles ne doit
+    // pas perdre ses contraintes en silence.
+    expect(appel.create.eventId).toBe(22)
+  })
+
+  it('ne fait pas échouer le calcul quand la mémorisation échoue', async () => {
+    // L'organisateur attend son planning, pas la confirmation que ses curseurs sont retenus.
+    prismaMock.eventVolunteerSettings.upsert.mockRejectedValue(new Error('base indisponible'))
+    global.readBody = vi.fn().mockResolvedValue({ constraints: {} })
+
+    await expect(handler(evenement as any)).resolves.toBeDefined()
+  })
+
+  it('efface les aperçus périmés en produisant le suivant', async () => {
+    // Chaque aperçu conserve le plan, le périmètre et le résultat complet ; rien ne les effaçait,
+    // et un organisateur qui règle ses contraintes en produit une dizaine avant d'en appliquer un.
+    global.readBody = vi.fn().mockResolvedValue({ constraints: {} })
+
+    await handler(evenement as any)
+
+    const [appel] = prismaMock.volunteerAutoAssignPlan.deleteMany.mock.calls.at(-1)
+    expect(appel.where.expiresAt.lt).toBeInstanceOf(Date)
+  })
+
+  it('n’efface rien quand on applique, seulement quand on prévisualise', async () => {
+    // Appliquer ne crée pas d'aperçu : il n'y a donc rien à ranger, et le ménage n'a pas à
+    // s'inviter dans le chemin qui écrit le planning.
+    await appliquer('keep-all')
+
+    expect(prismaMock.volunteerAutoAssignPlan.deleteMany).not.toHaveBeenCalled()
   })
 })

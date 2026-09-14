@@ -111,7 +111,7 @@
       "undo_action": "Berechnung rückgängig machen",
       "undo_confirm": "Die letzte Berechnung rückgängig machen? Die erstellten Zuteilungen werden entfernt und die gelöschten wiederhergestellt.",
       "undo_done": "Die Berechnung wurde rückgängig gemacht",
-      "undo_outdated": "Seitdem wurde eine andere Berechnung angewendet: Es ist nicht mehr diese, die rückgängig gemacht wird. Bitte lade die Seite neu.",
+      "undo_outdated": "Der Plan hat sich seit dieser Berechnung geändert: Ein Rückgängigmachen würde zwischenzeitliche Änderungen verwerfen. Laden Sie die Seite neu.",
       "undo_nothing": "Keine Berechnung zum Rückgängigmachen",
       "preview_outdated": "Der Plan hat sich seit dieser Vorschau geändert: Führe die Berechnung erneut aus, bevor du sie anwendest.",
       "preview_gone": "Diese Vorschau ist nicht mehr verfügbar: Führe die Berechnung erneut aus.",
@@ -159,7 +159,12 @@
       "stat_preferences_equipe": "Berücksichtigte Teamwünsche",
       "stat_horaires_souhaites": "Einsätze in gewünschten Zeiten",
       "stat_ecart_type": "Streuung der Auslastung",
-      "stat_creneaux_pourvus": "Besetzte Einsätze (ohne autonome Teams)"
+      "stat_creneaux_pourvus": "Besetzte Einsätze (ohne autonome Teams)",
+      "history_title": "Verlauf der Berechnungen",
+      "history_description": "Die bereits für diese Ausgabe gestarteten automatischen Zuteilungen.",
+      "history_empty": "Für diese Ausgabe wurde noch keine Berechnung gestartet.",
+      "history_line": "Gestartet von {author} — {created} Zuteilung(en) erstellt, {deleted} gelöscht.",
+      "history_undone": "Von {author} am {date} rückgängig gemacht."
     },
     "autonomous_team": "Eigenständiges Team",
     "autonomous_team_badge": "Eigenständig",

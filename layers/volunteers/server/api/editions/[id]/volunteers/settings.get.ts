@@ -89,6 +89,10 @@ export default wrapApiHandler(
       updatedAt: s?.updatedAt ?? null,
       // La clé est omise plutôt que remplie de zéros : un zéro se lirait « personne n'a postulé ».
       ...(counts ? { counts } : {}),
+      // Les réglages de l'assignation automatique ne sortent que pour un gestionnaire : ils
+      // disent quelles contraintes pèsent sur la répartition, ce qu'un bénévole n'a pas à
+      // connaître — et cet endpoint, lui, est aussi lisible par qui a simplement candidaté.
+      ...(estGestionnaire ? { autoAssignConstraints: s?.autoAssignConstraints ?? null } : {}),
     }
   },
   { operationName: 'GetVolunteerSettings' }

@@ -9,6 +9,7 @@ import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { creneauxConcernes, empreinteDesAffectations } from '#server/utils/empreinte-affectations'
 import { createLogger } from '#server/utils/logger'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { createRateLimiter } from '#server/utils/rate-limiter'
@@ -279,6 +280,22 @@ export default wrapApiHandler(
     const appliqueUnPlanConserve =
       body.applyAssignments === true && typeof body.planId === 'string' && Boolean(body.planId)
     const constraints = constraintsSchema.parse(body.constraints || {})
+
+    /**
+     * Les réglages retenus deviennent ceux de l'édition.
+     *
+     * Enregistrés ici, et non par un bouton « enregistrer » : personne ne règle des contraintes
+     * pour ensuite renoncer à les utiliser — lancer le calcul EST la validation. Un bouton de
+     * plus n'aurait fait qu'ajouter l'oubli de cliquer dessus.
+     *
+     * Et enregistrés côté serveur plutôt que par un second appel du navigateur : c'est l'objet
+     * déjà validé qui part en base, donc exactement celui qui a produit le résultat. Deux
+     * requêtes auraient permis qu'elles divergent.
+     *
+     * Un échec n'interrompt pas le calcul : l'organisateur attend son planning, pas la
+     * confirmation que ses curseurs ont été mémorisés.
+     */
+    memoriserLesReglages(editionId, constraints)
 
     // Récupération des données nécessaires
     const [volunteers, timeSlots, teams, spectacles] = await Promise.all([
@@ -690,6 +707,8 @@ export default wrapApiHandler(
      */
     let planId: string | null = null
     if (body.applyAssignments !== true) {
+      await purgerLesApercusPerimes()
+
       const plan = await prisma.volunteerAutoAssignPlan.create({
         data: {
           eventId: editionId,
@@ -730,6 +749,67 @@ export default wrapApiHandler(
  *
  * Rend l'identifiant du journal écrit : c'est lui que l'écran présentera pour proposer d'annuler.
  */
+/**
+ * Conserve sur l'édition les réglages qui viennent de servir.
+ *
+ * Volontairement non attendu par l'appelant : c'est une commodité, pas une étape du calcul. Le
+ * `catch` est donc obligatoire — une promesse rejetée sans gestionnaire fait tomber le processus
+ * Node entier, ce qui transformerait un échec d'écriture bénin en panne de l'application.
+ */
+function memoriserLesReglages(editionId: number, contraintes: unknown): void {
+  // `upsert` et non `update` : la ligne existe normalement, mais `update` lèverait une P2025 sur
+  // une édition qui n'a jamais ouvert ses réglages bénévoles — et les contraintes n'y seraient
+  // alors jamais conservées, silencieusement.
+  prisma.eventVolunteerSettings
+    .upsert({
+      where: { eventId: editionId },
+      update: {
+        autoAssignConstraints: contraintes as Prisma.InputJsonValue,
+        updatedAt: new Date(),
+      },
+      create: {
+        eventId: editionId,
+        autoAssignConstraints: contraintes as Prisma.InputJsonValue,
+      },
+    })
+    .catch((error) => {
+      log.warn('Réglages d’assignation non mémorisés', { edition: editionId, error })
+    })
+}
+
+/**
+ * Efface les aperçus qui ne servent plus à rien.
+ *
+ * Chaque aperçu conserve le plan, le périmètre et le résultat complet : sur une grosse édition,
+ * plusieurs centaines de kilo-octets de JSON. Rien ne les effaçait, et un organisateur qui règle
+ * ses contraintes en produit une dizaine avant d'en appliquer un seul. La table ne faisait que
+ * grossir, pour des lignes qu'aucun code ne relira jamais.
+ *
+ * Passé `expiresAt`, l'endpoint refuse d'appliquer le plan — c'est donc la borne de son utilité,
+ * appliqué ou non. Les lignes déjà appliquées sont emportées par la même vague trente minutes
+ * plus tard, ce qui laisse à l'organisateur qui reclique le message précis (« déjà appliqué »)
+ * plutôt qu'un « n'existe plus » approximatif.
+ *
+ * Toutes éditions confondues : l'index sur `expiresAt` rend la requête aussi peu coûteuse, et une
+ * édition peu active n'a pas à attendre qu'on y relance un calcul pour être nettoyée.
+ *
+ * Un échec ici ne doit pas faire échouer le calcul : l'organisateur attend son aperçu, pas notre
+ * ménage.
+ */
+async function purgerLesApercusPerimes(): Promise<void> {
+  try {
+    const { count } = await prisma.volunteerAutoAssignPlan.deleteMany({
+      where: { expiresAt: { lt: new Date() } },
+    })
+
+    if (count > 0) {
+      log.info('Aperçus d’assignation périmés effacés', { nombre: count })
+    }
+  } catch (error) {
+    log.warn('Purge des aperçus d’assignation impossible', { error })
+  }
+}
+
 async function applyAssignments(
   editionId: number,
   // `Assignment[]`, la forme que produit le planificateur et que ces deux fonctions lisent
@@ -824,7 +904,21 @@ async function applyAssignments(
       // 3. Assigner les bénévoles aux équipes correspondantes
       const equipes = await assignVolunteersToTeams(tx, assignments, mode, perimetre)
 
-      // 4. Consigner le calcul, et de quoi le défaire
+      /**
+       * 4. Relever l'état laissé derrière soi, sur les seuls créneaux touchés.
+       *
+       * C'est cette empreinte que l'annulation comparera avant de défaire quoi que ce soit. Elle
+       * est prise ici, dans la transaction, et pas après : entre le commit et une lecture
+       * ultérieure, un organisateur peut déjà avoir posé une affectation, qui serait alors
+       * consignée comme faisant partie du résultat du calcul.
+       */
+      const creneauxTouches = creneauxConcernes(affectationsCreees, affectationsEffacees)
+      const etatApres = await tx.volunteerAssignment.findMany({
+        where: { timeSlotId: { in: creneauxTouches } },
+        select: { timeSlotId: true, userId: true, source: true },
+      })
+
+      // 5. Consigner le calcul, et de quoi le défaire
       const journal = await tx.volunteerAutoAssignRun.create({
         data: {
           eventId: editionId,
@@ -837,6 +931,7 @@ async function applyAssignments(
           createdTeamLinks: equipes.crees as unknown as Prisma.InputJsonValue,
           createdCount: affectationsCreees.length,
           deletedCount: affectationsEffacees.length,
+          empreinteApres: empreinteDesAffectations(etatApres),
         },
         select: { id: true },
       })
