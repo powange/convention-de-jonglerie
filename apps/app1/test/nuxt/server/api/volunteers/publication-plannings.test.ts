@@ -5,10 +5,20 @@ vi.mock('../../../../../server/utils/permissions/volunteer-permissions', () => (
   isAcceptedVolunteer: vi.fn(),
 }))
 
+vi.mock('../../../../../server/utils/organizer-management', () => ({
+  canManageEditionVolunteers: vi.fn(),
+}))
+
+vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
+  equipesDontIlEstResponsable: vi.fn(async () => []),
+}))
+
 import {
   requireVolunteerPlanningAccess,
   isAcceptedVolunteer,
 } from '#server/utils/permissions/volunteer-permissions'
+import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
+import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import creneauxDeLEdition from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteer-time-slots/index.get'
 import mesCreneaux from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/my-slots.get'
 import maCandidature from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/my-application.get'
@@ -16,6 +26,8 @@ import maCandidature from '../../../../../../../layers/volunteers/server/api/edi
 const prismaMock = (globalThis as any).prisma
 const mockAccesPlanning = requireVolunteerPlanningAccess as ReturnType<typeof vi.fn>
 const mockEstBenevoleAccepte = isAcceptedVolunteer as ReturnType<typeof vi.fn>
+const mockPeutGerer = canManageEditionVolunteers as ReturnType<typeof vi.fn>
+const mockEquipesResponsable = equipesDontIlEstResponsable as ReturnType<typeof vi.fn>
 
 const evenement = { context: { params: { id: '1' }, user: { id: 10 } } }
 
@@ -39,6 +51,8 @@ describe('publication des plannings', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     prismaMock.eventVolunteerSettings.findUnique.mockResolvedValue({ planningPublished: true })
+    mockPeutGerer.mockResolvedValue(false)
+    mockEquipesResponsable.mockResolvedValue([])
   })
 
   describe('le planning complet de l’édition (affectations nominatives)', () => {
@@ -77,16 +91,50 @@ describe('publication des plannings', () => {
 
     it('laisse toujours passer un gestionnaire, publié ou non', async () => {
       // Sans cela, le réglage masquerait le planning à celui qui le construit.
-      mockEstBenevoleAccepte.mockResolvedValue(false)
+      mockPeutGerer.mockResolvedValue(true)
       planningPublie(false)
 
       await expect(creneauxDeLEdition(evenement as any)).resolves.toEqual([])
     })
 
+    it('laisse passer un gestionnaire QUI EST AUSSI bénévole accepté', async () => {
+      // ⚠️ Le défaut signalé en production : `!isAcceptedVolunteer(...)` servait de « est
+      // gestionnaire ». Un administrateur inscrit comme bénévole sur sa propre édition se voyait
+      // refuser son propre planning, avec un message lui expliquant qu'il n'était pas publié —
+      // alors que c'est lui qui le publie.
+      mockEstBenevoleAccepte.mockResolvedValue(true)
+      mockPeutGerer.mockResolvedValue(true)
+      planningPublie(false)
+
+      await expect(creneauxDeLEdition(evenement as any)).resolves.toEqual([])
+    })
+
+    it('laisse passer un responsable d’équipe, même bénévole accepté', async () => {
+      // Il est de ceux qui construisent le planning. Un responsable ORGANISATEUR passait déjà
+      // avant ce correctif — n'étant pas bénévole accepté, l'ancienne négation le laissait
+      // entrer ; ne garder que le droit de gestion le lui aurait retiré.
+      mockEstBenevoleAccepte.mockResolvedValue(true)
+      mockPeutGerer.mockResolvedValue(false)
+      mockEquipesResponsable.mockResolvedValue(['equipe-1'])
+      planningPublie(false)
+
+      await expect(creneauxDeLEdition(evenement as any)).resolves.toEqual([])
+    })
+
+    it('refuse un bénévole qui ne construit rien', async () => {
+      // La garde doit rester une garde : ni gestionnaire, ni responsable d'aucune équipe.
+      mockEstBenevoleAccepte.mockResolvedValue(true)
+      mockPeutGerer.mockResolvedValue(false)
+      mockEquipesResponsable.mockResolvedValue([])
+      planningPublie(false)
+
+      await expect(creneauxDeLEdition(evenement as any)).rejects.toMatchObject({ statusCode: 403 })
+    })
+
     it('n’interroge même pas le réglage pour un gestionnaire', async () => {
       // Son écran de planification appelle cet endpoint en boucle : la question est déjà
       // tranchée pour lui, inutile d'aller la reposer en base à chaque fois.
-      mockEstBenevoleAccepte.mockResolvedValue(false)
+      mockPeutGerer.mockResolvedValue(true)
 
       await creneauxDeLEdition(evenement as any)
 
