@@ -75,9 +75,15 @@
                   :key="tier.id"
                   class="py-3 flex items-center gap-3 flex-wrap"
                 >
-                  <UIcon
-                    name="i-heroicons-ticket"
-                    class="text-orange-600 dark:text-orange-400 size-5 shrink-0"
+                  <!-- La provenance du tarif plutôt qu'une icône générique : sur une liste de
+                       tarifs, « ceci est un tarif » n'apprend rien, tandis que savoir lequel vient
+                       d'une billetterie externe situe la ligne. Même forme que la page des
+                       quotas. -->
+                  <img
+                    :src="logoDuFournisseur(tier.provider)"
+                    :alt="nomDuFournisseur(tier.provider) ?? $t('gestion.ticketing.origin_site')"
+                    :title="nomDuFournisseur(tier.provider) ?? $t('gestion.ticketing.origin_site')"
+                    class="h-5 w-5 object-contain shrink-0"
                   />
                   <div class="flex-1 min-w-0">
                     <div class="font-medium text-sm">{{ tier.name }}</div>
@@ -132,9 +138,15 @@
                   :key="option.id"
                   class="py-3 flex items-center gap-3 flex-wrap"
                 >
-                  <UIcon
-                    name="i-heroicons-adjustments-horizontal"
-                    class="text-blue-600 dark:text-blue-400 size-5 shrink-0"
+                  <!-- La provenance plutôt qu'une icône générique, comme sur l'onglet des
+                       tarifs et sur la page des quotas. -->
+                  <img
+                    :src="logoDuFournisseur(option.provider)"
+                    :alt="nomDuFournisseur(option.provider) ?? $t('gestion.ticketing.origin_site')"
+                    :title="
+                      nomDuFournisseur(option.provider) ?? $t('gestion.ticketing.origin_site')
+                    "
+                    class="h-5 w-5 object-contain shrink-0"
                   />
                   <div class="flex-1 min-w-0">
                     <div class="font-medium text-sm">{{ option.name }}</div>
@@ -191,9 +203,13 @@
                   :key="cf.id"
                   class="py-3 flex items-center gap-3 flex-wrap"
                 >
-                  <UIcon
-                    name="i-heroicons-document-text"
-                    class="text-indigo-600 dark:text-indigo-400 size-5 shrink-0"
+                  <!-- La provenance plutôt qu'une icône générique, comme sur l'onglet des
+                       tarifs et sur la page des quotas. -->
+                  <img
+                    :src="logoDuFournisseur(cf.provider)"
+                    :alt="nomDuFournisseur(cf.provider) ?? $t('gestion.ticketing.origin_site')"
+                    :title="nomDuFournisseur(cf.provider) ?? $t('gestion.ticketing.origin_site')"
+                    class="h-5 w-5 object-contain shrink-0"
                   />
                   <div class="flex-1 min-w-0">
                     <div class="font-medium text-sm">{{ cf.label }}</div>
@@ -638,6 +654,8 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+
+import { logoDuFournisseur, nomDuFournisseur } from '../../../../../utils/ticketing/fournisseur'
 
 const route = useRoute()
 const router = useRouter()

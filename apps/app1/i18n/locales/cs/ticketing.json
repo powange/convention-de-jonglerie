@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "U vstupu předložte tento QR kód a ověřte si platnost vstupenky.",
-      "how_to_use_title": "Jak používat tento QR kód",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Jak používat tento QR kód"
     },
     "options": {
       "created": "Možnost úspěšně vytvořena",
@@ -177,7 +176,6 @@
       "entry_validated": "Položka již byla ověřena",
       "first_name": "Jméno",
       "last_name": "Příjmení",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Žádný přidělený slot",
       "phone": "Telefon",
       "ticket_type": "Typ letenky",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Přetáhněte pro změnu pořadí",
         "inactive": "Neaktivní",
         "loading": "Načítání...",
-        "logo_alt": "HelloAsso",
         "none_found": "Nebyly nalezeny žádné tarify"
       },
       "modal": {

@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Zeigen Sie diesen QR-Code am Eingang, um Ihr Ticket zu validieren.",
-      "how_to_use_title": "So verwenden Sie diesen QR-Code",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "So verwenden Sie diesen QR-Code"
     },
     "options": {
       "created": "Option erfolgreich erstellt",
@@ -177,7 +176,6 @@
       "entry_validated": "Eintritt bereits validiert",
       "first_name": "Vorname",
       "last_name": "Nachname",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Kein Zeitfenster zugewiesen",
       "phone": "Telefon",
       "ticket_type": "Ticketart",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Ziehen zum Neuordnen",
         "inactive": "Inaktiv",
         "loading": "Lädt...",
-        "logo_alt": "HelloAsso",
         "none_found": "Keine Tarife gefunden"
       },
       "modal": {

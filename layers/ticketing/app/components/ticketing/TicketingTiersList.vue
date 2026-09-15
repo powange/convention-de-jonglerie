@@ -58,11 +58,11 @@
                  inconnue. -->
             <img
               :src="logoDuFournisseur(row.original.provider)"
-              :alt="nomDuFournisseur(row.original.provider) ?? $t('ticketing.tiers.list.logo_alt')"
+              :alt="nomDuFournisseur(row.original.provider) ?? $t('gestion.ticketing.origin_site')"
               :title="
                 nomDuFournisseur(row.original.provider) ?? $t('gestion.ticketing.origin_site')
               "
-              class="h-4 w-4 object-contain flex-shrink-0"
+              class="h-5 w-5 object-contain flex-shrink-0"
             />
             <span class="font-semibold text-gray-900 dark:text-white">
               {{ row.original.name }}

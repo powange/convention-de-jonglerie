@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Mostra questo codice QR all'ingresso per convalidare il tuo biglietto.",
-      "how_to_use_title": "Come utilizzare questo codice QR",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Come utilizzare questo codice QR"
     },
     "options": {
       "created": "Opzione creata con successo",
@@ -177,7 +176,6 @@
       "entry_validated": "Ingresso già convalidato",
       "first_name": "Nome",
       "last_name": "Cognome",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Nessun orario assegnato",
       "phone": "Telefono",
       "ticket_type": "Tipo di biglietto",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Trascina per riordinare",
         "inactive": "Inattivo",
         "loading": "Caricamento...",
-        "logo_alt": "HelloAsso",
         "none_found": "Nessuna tariffa trovata"
       },
       "modal": {

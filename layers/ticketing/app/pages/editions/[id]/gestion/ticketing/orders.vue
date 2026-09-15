@@ -532,43 +532,36 @@
                 </div>
                 <!-- Ligne 2 : badges origine et paiement -->
                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                  <!-- Badge origine : En ligne vs Sur place -->
-                  <UPopover
-                    v-if="order.externalTicketing?.provider === 'HELLOASSO'"
-                    mode="hover"
-                    :open-delay="200"
-                  >
+                  <!-- Badge origine, par l'utilitaire partagé.
+
+                       Deux fenêtres codées en dur tenaient ce rôle : l'une testait
+                       `provider === 'HELLOASSO'`, l'autre l'absence de billetterie externe. Une
+                       commande Infomaniak ne tombait donc dans AUCUNE des deux et n'affichait
+                       rien. C'est exactement le défaut pour lequel l'utilitaire existe — et la
+                       colonne « tarif » de cette même page l'employait déjà. -->
+                  <UPopover mode="hover" :open-delay="200">
                     <img
-                      src="~/assets/img/helloasso/logo.svg"
-                      alt="HelloAsso"
-                      class="h-5 w-auto cursor-help"
+                      :src="logoDuFournisseur(order.externalTicketing?.provider)"
+                      :alt="nomDuFournisseur(order.externalTicketing?.provider) ?? 'Sur place'"
+                      class="h-5 w-5 object-contain cursor-help"
                     />
                     <template #content>
                       <div class="p-3 max-w-xs">
                         <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                          HelloAsso
+                          {{ nomDuFournisseur(order.externalTicketing?.provider) ?? 'Sur place' }}
                         </p>
                         <p class="text-xs text-gray-600 dark:text-gray-400">
-                          Commande importée depuis HelloAsso
+                          {{
+                            order.externalTicketing?.provider
+                              ? `Commande importée depuis ${nomDuFournisseur(order.externalTicketing.provider)}`
+                              : 'Commande créée manuellement sur place'
+                          }}
                         </p>
                         <p
                           v-if="order.helloAssoOrderId"
                           class="text-xs text-gray-500 dark:text-gray-500 mt-1 font-mono"
                         >
                           ID: {{ order.helloAssoOrderId }}
-                        </p>
-                      </div>
-                    </template>
-                  </UPopover>
-                  <UPopover v-else-if="!order.externalTicketing" mode="hover" :open-delay="200">
-                    <img src="/logos/logo-jc.svg" alt="Sur place" class="h-5 w-auto cursor-help" />
-                    <template #content>
-                      <div class="p-3 max-w-xs">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                          Sur place
-                        </p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">
-                          Commande créée manuellement sur place
                         </p>
                       </div>
                     </template>

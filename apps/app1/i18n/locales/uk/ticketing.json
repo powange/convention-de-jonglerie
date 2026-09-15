@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Покажіть цей QR-код на вході для валідації квитка.",
-      "how_to_use_title": "Як використовувати цей QR-код",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Як використовувати цей QR-код"
     },
     "options": {
       "created": "Опцію успішно створено",
@@ -177,7 +176,6 @@
       "entry_validated": "Вхід вже підтверджено",
       "first_name": "Ім'я",
       "last_name": "Прізвище",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Часовий проміжок не призначено",
       "phone": "Телефон",
       "ticket_type": "Тип квитка",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Перетягніть для зміни порядку",
         "inactive": "Неактивно",
         "loading": "Завантаження...",
-        "logo_alt": "HelloAsso",
         "none_found": "Тарифи не знайдено"
       },
       "modal": {
