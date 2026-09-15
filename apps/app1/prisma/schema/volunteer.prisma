@@ -222,6 +222,7 @@ model VolunteerTeam {
   assignedApplications ApplicationTeamAssignment[]
   assignedOrganizers   OrganizerTeamAssignment[]
   handoutItems         EditionVolunteerHandoutItem[]
+  ticketingQuotas      EditionVolunteerQuota[]
   conversations        Conversation[]
 
   @@index([eventId])

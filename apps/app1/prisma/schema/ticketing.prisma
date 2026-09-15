@@ -137,6 +137,9 @@ model TicketingQuota {
   tiers        TicketingTierQuota[]
   options      TicketingOptionQuota[]
   customFields TicketingTierCustomFieldQuota[]
+  organizers   EditionOrganizerQuota[]
+  volunteers   EditionVolunteerQuota[]
+  artists      EditionArtistQuota[]
 
   @@index([editionId])
 }
@@ -221,6 +224,93 @@ model EditionOrganizerHandoutItem {
   @@index([editionId])
   @@index([handoutItemId])
   @@index([organizerId])
+}
+
+/// Quotas dont un organisateur occupe une place.
+///
+/// Un organisateur est une personne présente sur l'édition au même titre qu'un porteur de billet,
+/// mais sans billet : rien ne le faisait entrer dans le décompte d'un quota. Cette table l'y fait
+/// entrer.
+///
+/// `organizerId` nul vaut « tous les organisateurs de l'édition », exactement comme sur
+/// `EditionOrganizerHandoutItem` dont ce modèle reprend la forme.
+///
+/// ⚠️ La contrainte d'unicité ci-dessous NE protège PAS la ligne globale : sous MySQL, deux NULL
+/// sont considérés comme distincts, donc `(edition, quota, NULL)` peut être inséré plusieurs fois.
+/// C'est l'écriture qui doit l'empêcher — d'où le PUT à sémantique de remplacement complet, qui
+/// efface avant de recréer.
+model EditionOrganizerQuota {
+  id          Int      @id @default(autoincrement())
+  editionId   Int
+  quotaId     Int
+  organizerId Int? // NULL = tous les organisateurs de l'édition
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  edition   Edition           @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quota     TicketingQuota    @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+  organizer EditionOrganizer? @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, quotaId, organizerId])
+  @@index([editionId])
+  @@index([quotaId])
+  @@index([organizerId])
+}
+
+/// Quotas dont les bénévoles d'une équipe — ou tous les bénévoles — occupent une place.
+///
+/// `teamId` nul vaut « tous les bénévoles acceptés de l'édition ».
+///
+/// ⚠️ Divergence ASSUMÉE avec `EditionVolunteerHandoutItem`, dont la forme est pourtant la même :
+/// là-bas, les articles d'une équipe REMPLACENT les articles globaux. Ici les associations
+/// s'additionnent. Un article est un colis qu'on reçoit — le remplacer a un sens ; un quota est
+/// une place qu'on occupe, et on l'occupe ou non. Un bénévole visé par les deux lignes ne compte
+/// donc qu'une seule place, jamais zéro ni deux.
+///
+/// ⚠️ Comme pour les organisateurs, l'unicité ne protège pas la ligne globale : sous MySQL deux
+/// NULL sont distincts. C'est l'écriture par remplacement complet qui la tient.
+model EditionVolunteerQuota {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  quotaId   Int
+  teamId    String? // NULL = tous les bénévoles acceptés
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition        @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quota   TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+  team    VolunteerTeam? @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, quotaId, teamId])
+  @@index([editionId])
+  @@index([quotaId])
+  @@index([teamId])
+}
+
+/// Quotas dont les artistes d'un spectacle — ou tous les artistes — occupent une place.
+///
+/// `showId` nul vaut « tous les artistes de l'édition ».
+///
+/// Le rattachement passe par le SPECTACLE et non par l'artiste, pour reprendre l'écran des
+/// articles à remettre, dont le second bloc liste les spectacles. Un artiste qui joue dans deux
+/// spectacles associés au même quota n'y occupe qu'une place : le dédoublonnage porte sur la
+/// personne, pas sur l'association.
+model EditionArtistQuota {
+  id        Int      @id @default(autoincrement())
+  editionId Int
+  quotaId   Int
+  showId    Int? // NULL = tous les artistes de l'édition
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  edition Edition        @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  quota   TicketingQuota @relation(fields: [quotaId], references: [id], onDelete: Cascade)
+  show    Show?          @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, quotaId, showId])
+  @@index([editionId])
+  @@index([quotaId])
+  @@index([showId])
 }
 
 model TicketingTierQuota {

@@ -80,6 +80,126 @@
               />
             </template>
 
+            <!-- Les organisateurs ne s'achètent pas : ce sont des personnes déjà présentes sur
+                 l'édition. D'où deux blocs, et non une simple liste — ce qui vaut pour TOUS se
+                 règle une fois, au lieu d'être répété sur chacun et de devenir faux dès qu'un
+                 organisateur s'ajoute. Même découpage que la page des articles à remettre. -->
+            <template #organizers>
+              <div class="pt-4 space-y-6">
+                <TicketingQuotaBlocGlobal
+                  :titre="$t('gestion.ticketing.assign_quotas_all_organizers')"
+                  :aide="$t('gestion.ticketing.assign_quotas_all_organizers_hint')"
+                  :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_organizers')"
+                  :quotas="quotasGlobauxOrganisateurs"
+                  :loading="loadingOrganisateurs"
+                  @editer="ouvrirQuotasGlobauxOrganisateurs"
+                />
+
+                <div>
+                  <h4 class="font-medium">
+                    {{ $t('gestion.ticketing.assign_quotas_per_organizer') }}
+                  </h4>
+                  <p class="text-sm text-dimmed">
+                    {{ $t('gestion.ticketing.assign_quotas_per_organizer_hint') }}
+                  </p>
+
+                  <TicketingQuotaAssociationList
+                    :elements="organisateursAssociables"
+                    :loading="loadingOrganisateurs"
+                    :message-vide="$t('gestion.organizers.no_organizers_on_edition')"
+                    :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_organizer')"
+                    @editer="ouvrirQuotasDeLOrganisateur"
+                  >
+                    <!-- Le nom d'une personne, rendu par le composant qui en porte la règle,
+                         plutôt que recomposé ici à partir du pseudo et de l'état civil. -->
+                    <template #nom="{ element }">
+                      <!-- `sm` (20 px) et pas une valeur inventée : le composant ne connaît que
+                           xs/sm/md/lg/xl, et une taille absente de sa table ne lui fait poser
+                           AUCUNE classe de dimension — l'image retombe alors sur sa taille
+                           native, différente pour une photo téléversée, un Gravatar ou un avatar
+                           généré. C'est aussi la taille des logos de provenance des autres
+                           onglets, donc les lignes s'alignent. -->
+                      <UiUserAvatar
+                        :user="organisateurParId.get(element.id)?.user"
+                        size="sm"
+                        class="shrink-0"
+                      />
+                      <span class="font-medium truncate">
+                        <UiUserName :user="organisateurParId.get(element.id)?.user" />
+                      </span>
+                    </template>
+                  </TicketingQuotaAssociationList>
+                </div>
+              </div>
+            </template>
+
+            <!-- Les bénévoles se rattachent par ÉQUIPE, comme les articles à remettre. La
+                 différence est ailleurs : là-bas les articles d'une équipe remplacent les
+                 articles globaux, ici les associations s'additionnent. Un article est un colis
+                 qu'on reçoit ; un quota est une place qu'on occupe, et on l'occupe une fois. -->
+            <template #volunteers>
+              <div class="pt-4 space-y-6">
+                <TicketingQuotaBlocGlobal
+                  :titre="$t('gestion.ticketing.assign_quotas_all_volunteers')"
+                  :aide="$t('gestion.ticketing.assign_quotas_all_volunteers_hint')"
+                  :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_volunteers')"
+                  :quotas="quotasGlobauxBenevoles"
+                  :loading="loadingBenevoles"
+                  @editer="ouvrirQuotasGlobauxBenevoles"
+                />
+
+                <div>
+                  <h4 class="font-medium">
+                    {{ $t('gestion.ticketing.assign_quotas_per_team') }}
+                  </h4>
+                  <p class="text-sm text-dimmed">
+                    {{ $t('gestion.ticketing.assign_quotas_per_team_hint') }}
+                  </p>
+
+                  <TicketingQuotaAssociationList
+                    :elements="equipesAssociables"
+                    :loading="loadingBenevoles"
+                    :message-vide="$t('gestion.ticketing.assign_quotas_no_team')"
+                    :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_team')"
+                    @editer="ouvrirQuotasDeLEquipe"
+                  />
+                </div>
+              </div>
+            </template>
+
+            <!-- Les artistes se rattachent par SPECTACLE, comme les articles à remettre. Un
+                 artiste qui joue dans deux spectacles associés au même quota n'y occupe qu'une
+                 place : le dédoublonnage porte sur la personne, pas sur l'association. -->
+            <template #artists>
+              <div class="pt-4 space-y-6">
+                <TicketingQuotaBlocGlobal
+                  :titre="$t('gestion.ticketing.assign_quotas_all_artists')"
+                  :aide="$t('gestion.ticketing.assign_quotas_all_artists_hint')"
+                  :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_artists')"
+                  :quotas="quotasGlobauxArtistes"
+                  :loading="loadingArtistes"
+                  @editer="ouvrirQuotasGlobauxArtistes"
+                />
+
+                <div>
+                  <h4 class="font-medium">
+                    {{ $t('gestion.ticketing.assign_quotas_per_show') }}
+                  </h4>
+                  <p class="text-sm text-dimmed">
+                    {{ $t('gestion.ticketing.assign_quotas_per_show_hint') }}
+                  </p>
+
+                  <TicketingQuotaAssociationList
+                    :elements="spectaclesAssociables"
+                    :loading="loadingArtistes"
+                    :message-vide="$t('gestion.shows.no_shows')"
+                    :libelle-edition="$t('gestion.ticketing.assign_quotas_edit_show')"
+                    @editer="ouvrirQuotasDuSpectacle"
+                  />
+                </div>
+              </div>
+            </template>
+
             <template #customfields>
               <TicketingQuotaAssociationList
                 :elements="champsAssociables"
@@ -378,9 +498,9 @@ const loadQuotas = async () => {
 /**
  * Les cibles auxquelles un quota peut se rattacher.
  *
- * Trois aujourd'hui, et c'est exactement ce que le modèle sait faire : `TicketingQuota` n'a que
- * `tiers`, `options` et `customFields`. Les bénévoles et les organisateurs viendront s'ajouter
- * ici — c'est la raison d'être de cette page.
+ * Quatre désormais. Les trois premières désignent ce qu'on achète ; la quatrième désigne des
+ * PERSONNES — un organisateur occupe une place sur l'édition sans passer par un billet. Restent
+ * les bénévoles, qui relèvent de la même idée.
  */
 const cibles = computed(() => [
   {
@@ -400,6 +520,24 @@ const cibles = computed(() => [
     icon: 'i-heroicons-document-text',
     slot: 'customfields',
     value: 'customfields',
+  },
+  {
+    label: t('gestion.ticketing.audience_organizers'),
+    icon: 'i-heroicons-user-group',
+    slot: 'organizers',
+    value: 'organizers',
+  },
+  {
+    label: t('gestion.ticketing.audience_artists'),
+    icon: 'i-heroicons-sparkles',
+    slot: 'artists',
+    value: 'artists',
+  },
+  {
+    label: t('gestion.ticketing.audience_volunteers'),
+    icon: 'i-heroicons-hand-raised',
+    slot: 'volunteers',
+    value: 'volunteers',
   },
 ])
 
@@ -475,13 +613,284 @@ const optionsAssociables = computed<ElementAssociable[]>(() =>
 )
 
 /** Ce qu'on est en train de modifier : un tarif ou une option, jamais les deux. */
-const cibleEnEdition = ref<{ type: 'tarif' | 'option'; id: number; nom: string } | null>(null)
+// --- Onglet « Organisateurs » : des personnes, pas des articles ---
+
+/**
+ * Un organisateur consomme une place dans un quota une fois son ENTRÉE VALIDÉE — décision prise
+ * avec l'utilisateur. La liste ci-dessous montre en revanche tous les organisateurs inscrits :
+ * on règle les associations à l'avance, elles ne comptent qu'à l'arrivée.
+ */
+interface AssociationOrganisateur {
+  id: number
+  quotaId: number
+  /** `null` = la ligne globale, valable pour tout organisateur de l'édition. */
+  organizerId: number | null
+  quota: { id: number; title: string }
+}
+
+const associationsOrganisateurs = ref<AssociationOrganisateur[]>([])
+const organisateurs = ref<any[]>([])
+const loadingOrganisateurs = ref(true)
+
+const loadOrganisateurs = async () => {
+  loadingOrganisateurs.value = true
+  try {
+    // Les deux listes ensemble : l'écran n'a de sens qu'une fois les deux là, et les enchaîner
+    // doublerait l'attente pour rien.
+    const [associations, inscrits] = await Promise.all([
+      $fetch<any>(`/api/editions/${editionId}/ticketing/organizers/quotas`),
+      $fetch<any>(`/api/editions/${editionId}/organizers/edition-organizers`),
+    ])
+    associationsOrganisateurs.value = associations?.data?.quotas ?? []
+    organisateurs.value = inscrits?.data?.organizers ?? []
+  } catch {
+    // Erreur silencieuse, même raison que pour les autres onglets.
+  } finally {
+    loadingOrganisateurs.value = false
+  }
+}
+
+/** Les quotas valables pour TOUS les organisateurs. */
+const quotasGlobauxOrganisateurs = computed(() =>
+  associationsOrganisateurs.value
+    .filter((association) => association.organizerId === null)
+    .map((association) => association.quota)
+)
+
+/**
+ * Les associations propres à chaque organisateur, groupées une seule fois.
+ *
+ * Une table plutôt qu'un filtre appelé depuis le gabarit : celui-ci interroge la liste une fois
+ * par ligne, et un filtre y refait le balayage complet des associations à chaque rendu.
+ */
+const quotasParOrganisateur = computed(() => {
+  const table = new Map<number | string, Array<{ id: number; title: string }>>()
+  for (const association of associationsOrganisateurs.value) {
+    if (association.organizerId === null) continue
+    const existants = table.get(association.organizerId)
+    if (existants) existants.push(association.quota)
+    else table.set(association.organizerId, [association.quota])
+  }
+  return table
+})
+
+const organisateursAssociables = computed<ElementAssociable[]>(() =>
+  organisateurs.value.map((organisateur) => ({
+    id: organisateur.id,
+    // Le nom réel est rendu par le créneau `#nom`, qui délègue à `UiUserName`. Cette valeur ne
+    // sert que d'infobulle de repli.
+    nom: organisateur.user?.pseudo ?? '',
+    quotas: quotasParOrganisateur.value.get(organisateur.id) ?? [],
+  }))
+)
+
+/** L'organisateur derrière une ligne, pour le créneau qui rend son nom et son portrait. */
+const organisateurParId = computed(
+  () =>
+    new Map<number | string, any>(
+      organisateurs.value.map((organisateur) => [organisateur.id, organisateur])
+    )
+)
+
+const ouvrirQuotasGlobauxOrganisateurs = () => {
+  cibleEnEdition.value = {
+    type: 'organisateurs',
+    id: null,
+    nom: t('gestion.ticketing.assign_quotas_all_organizers'),
+  }
+  quotasSelectionnes.value = quotasGlobauxOrganisateurs.value.map((quota) => quota.id)
+  editionQuotasOuverte.value = true
+}
+
+const ouvrirQuotasDeLOrganisateur = (id: number | string) => {
+  const organisateur = organisateurParId.value.get(id)
+  if (!organisateur) return
+  cibleEnEdition.value = {
+    type: 'organisateur',
+    id,
+    nom: organisateur.user?.pseudo ?? '',
+  }
+  quotasSelectionnes.value = (quotasParOrganisateur.value.get(id) ?? []).map((quota) => quota.id)
+  editionQuotasOuverte.value = true
+}
+
+// --- Onglets « Bénévoles » et « Artistes » : deux autres familles de personnes ---
+
+/**
+ * Les deux onglets partagent la forme des organisateurs : une ligne globale, puis des lignes par
+ * sous-ensemble — une équipe pour les bénévoles, un spectacle pour les artistes.
+ *
+ * Les quotas d'une équipe S'AJOUTENT à ceux de la ligne globale. C'est une divergence assumée
+ * avec les articles à remettre, où ceux d'une équipe REMPLACENT les articles globaux : un article
+ * est un colis qu'on reçoit, un quota est une place qu'on occupe, et on l'occupe une fois.
+ */
+interface AssociationParCle<C> {
+  id: number
+  quotaId: number
+  cle: C | null
+  quota: { id: number; title: string }
+}
+
+const grouperParCle = <C,>(associations: Array<AssociationParCle<C>>) => {
+  const table = new Map<C, Array<{ id: number; title: string }>>()
+  for (const association of associations) {
+    if (association.cle === null) continue
+    const existants = table.get(association.cle)
+    if (existants) existants.push(association.quota)
+    else table.set(association.cle, [association.quota])
+  }
+  return table
+}
+
+// --- Bénévoles ---
+
+const associationsBenevoles = ref<Array<AssociationParCle<string>>>([])
+const equipes = ref<any[]>([])
+const loadingBenevoles = ref(true)
+
+const loadBenevoles = async () => {
+  loadingBenevoles.value = true
+  try {
+    const [associations, listeEquipes] = await Promise.all([
+      $fetch<any>(`/api/editions/${editionId}/ticketing/volunteers/quotas`),
+      $fetch<any>(`/api/editions/${editionId}/volunteer-teams`),
+    ])
+    associationsBenevoles.value = (associations?.data?.quotas ?? []).map((association: any) => ({
+      ...association,
+      cle: association.teamId,
+    }))
+    equipes.value = listeEquipes?.data?.teams ?? listeEquipes?.teams ?? []
+  } catch {
+    // Erreur silencieuse, même raison que pour les autres onglets.
+  } finally {
+    loadingBenevoles.value = false
+  }
+}
+
+const quotasGlobauxBenevoles = computed(() =>
+  associationsBenevoles.value
+    .filter((association) => association.cle === null)
+    .map((association) => association.quota)
+)
+
+const quotasParEquipe = computed(() => grouperParCle(associationsBenevoles.value))
+
+const equipesAssociables = computed<ElementAssociable[]>(() =>
+  equipes.value.map((equipe) => ({
+    id: equipe.id,
+    nom: equipe.name,
+    quotas: quotasParEquipe.value.get(equipe.id) ?? [],
+  }))
+)
+
+const ouvrirQuotasGlobauxBenevoles = () => {
+  cibleEnEdition.value = {
+    type: 'benevoles',
+    id: null,
+    nom: t('gestion.ticketing.assign_quotas_all_volunteers'),
+  }
+  quotasSelectionnes.value = quotasGlobauxBenevoles.value.map((quota) => quota.id)
+  editionQuotasOuverte.value = true
+}
+
+const ouvrirQuotasDeLEquipe = (id: number | string) => {
+  const equipe = equipes.value.find((candidate) => candidate.id === id)
+  if (!equipe) return
+  cibleEnEdition.value = { type: 'equipe', id, nom: equipe.name }
+  quotasSelectionnes.value = (quotasParEquipe.value.get(String(id)) ?? []).map((quota) => quota.id)
+  editionQuotasOuverte.value = true
+}
+
+// --- Artistes ---
+
+const associationsArtistes = ref<Array<AssociationParCle<number>>>([])
+const spectacles = ref<any[]>([])
+const loadingArtistes = ref(true)
+
+const loadArtistes = async () => {
+  loadingArtistes.value = true
+  try {
+    const [associations, listeSpectacles] = await Promise.all([
+      $fetch<any>(`/api/editions/${editionId}/ticketing/artists/quotas`),
+      $fetch<any>(`/api/editions/${editionId}/shows`),
+    ])
+    associationsArtistes.value = (associations?.data?.quotas ?? []).map((association: any) => ({
+      ...association,
+      cle: association.showId,
+    }))
+    spectacles.value = listeSpectacles?.data?.shows ?? []
+  } catch {
+    // Erreur silencieuse, même raison que pour les autres onglets.
+  } finally {
+    loadingArtistes.value = false
+  }
+}
+
+const quotasGlobauxArtistes = computed(() =>
+  associationsArtistes.value
+    .filter((association) => association.cle === null)
+    .map((association) => association.quota)
+)
+
+const quotasParSpectacle = computed(() => grouperParCle(associationsArtistes.value))
+
+const spectaclesAssociables = computed<ElementAssociable[]>(() =>
+  spectacles.value.map((spectacle) => ({
+    id: spectacle.id,
+    nom: spectacle.title,
+    quotas: quotasParSpectacle.value.get(spectacle.id) ?? [],
+  }))
+)
+
+const ouvrirQuotasGlobauxArtistes = () => {
+  cibleEnEdition.value = {
+    type: 'artistes',
+    id: null,
+    nom: t('gestion.ticketing.assign_quotas_all_artists'),
+  }
+  quotasSelectionnes.value = quotasGlobauxArtistes.value.map((quota) => quota.id)
+  editionQuotasOuverte.value = true
+}
+
+const ouvrirQuotasDuSpectacle = (id: number | string) => {
+  const spectacle = spectacles.value.find((candidate) => candidate.id === id)
+  if (!spectacle) return
+  cibleEnEdition.value = { type: 'spectacle', id, nom: spectacle.title }
+  quotasSelectionnes.value = (quotasParSpectacle.value.get(Number(id)) ?? []).map(
+    (quota) => quota.id
+  )
+  editionQuotasOuverte.value = true
+}
+
+/**
+ * Ce que la fenêtre d'édition est en train de modifier.
+ *
+ * `organisateurs` (au pluriel) désigne la ligne GLOBALE : les quotas que consomme tout
+ * organisateur de l'édition. Elle n'a pas d'identifiant, d'où le `id` nul — c'est ce qui la
+ * distingue d'`organisateur`, qui en vise un seul.
+ */
+type CibleEnEdition = {
+  type:
+    | 'tarif'
+    | 'option'
+    | 'organisateur'
+    | 'organisateurs'
+    | 'equipe'
+    | 'benevoles'
+    | 'spectacle'
+    | 'artistes'
+  /** `string` pour une équipe, dont l'identifiant est un `cuid` et non un entier. */
+  id: number | string | null
+  nom: string
+}
+
+const cibleEnEdition = ref<CibleEnEdition | null>(null)
 const editionQuotasOuverte = ref(false)
 const quotasSelectionnes = ref<number[]>([])
 
 const nomEnEdition = computed(() => cibleEnEdition.value?.nom ?? '')
 
-const ouvrirQuotasDuTarif = (id: number) => {
+const ouvrirQuotasDuTarif = (id: number | string) => {
   const tarif = tiers.value.find((t) => t.id === id)
   if (!tarif) return
   cibleEnEdition.value = { type: 'tarif', id, nom: tarif.customName || tarif.name }
@@ -489,7 +898,7 @@ const ouvrirQuotasDuTarif = (id: number) => {
   editionQuotasOuverte.value = true
 }
 
-const ouvrirQuotasDeLOption = (id: number) => {
+const ouvrirQuotasDeLOption = (id: number | string) => {
   const option = options.value.find((o) => o.id === id)
   if (!option) return
   cibleEnEdition.value = { type: 'option', id, nom: option.name }
@@ -586,11 +995,12 @@ const construireLeDetail = (champ: ChampPersonnalise): LigneDeDetail[] => {
  * gabarit, la construction refaisait à chaque fois la recherche du champ et le filtrage de ses
  * associations, pour toutes les lignes, à chaque rendu.
  */
-const detailParChamp = computed<Map<number, LigneDeDetail[]>>(
+const detailParChamp = computed<Map<number | string, LigneDeDetail[]>>(
   () => new Map(champs.value.map((champ) => [champ.id, construireLeDetail(champ)]))
 )
 
-const detailDuChamp = (champId: number): LigneDeDetail[] => detailParChamp.value.get(champId) ?? []
+const detailDuChamp = (champId: number | string): LigneDeDetail[] =>
+  detailParChamp.value.get(champId) ?? []
 
 const editionChampOuverte = ref(false)
 const champEnEdition = ref<ChampPersonnalise | null>(null)
@@ -612,7 +1022,7 @@ const choixDuChamp = computed(() => {
   ]
 })
 
-const ouvrirQuotasDuChamp = (id: number) => {
+const ouvrirQuotasDuChamp = (id: number | string) => {
   const champ = champs.value.find((c) => c.id === id)
   if (!champ) return
   champEnEdition.value = champ
@@ -646,12 +1056,37 @@ const { execute: enregistrerQuotasDuChamp, loading: enregistrementChamp } = useA
   }
 )
 
+/**
+ * L'adresse d'écriture, par cible.
+ *
+ * Une correspondance explicite plutôt qu'une cascade de ternaires : chaque cible a son endpoint
+ * dédié, et il faut pouvoir lire d'un coup d'œil lequel. La ligne globale des organisateurs est
+ * la seule sans identifiant dans son chemin.
+ */
+const urlDesQuotas = (cible: CibleEnEdition | null) => {
+  const base = `/api/editions/${editionId}/ticketing`
+  switch (cible?.type) {
+    case 'option':
+      return `${base}/options/${cible.id}/quotas`
+    case 'organisateur':
+      return `${base}/organizers/${cible.id}/quotas`
+    case 'organisateurs':
+      return `${base}/organizers/quotas`
+    case 'equipe':
+      return `${base}/volunteers/teams/${cible.id}/quotas`
+    case 'benevoles':
+      return `${base}/volunteers/quotas`
+    case 'spectacle':
+      return `${base}/artists/shows/${cible.id}/quotas`
+    case 'artistes':
+      return `${base}/artists/quotas`
+    default:
+      return `${base}/tiers/${cible?.id}/quotas`
+  }
+}
+
 const { execute: enregistrerLesQuotas, loading: enregistrementQuotas } = useApiAction(
-  () => {
-    const cible = cibleEnEdition.value
-    const segment = cible?.type === 'option' ? 'options' : 'tiers'
-    return `/api/editions/${editionId}/ticketing/${segment}/${cible?.id}/quotas`
-  },
+  () => urlDesQuotas(cibleEnEdition.value),
   {
     method: 'PUT',
     body: () => ({ quotaIds: quotasSelectionnes.value }),
@@ -660,7 +1095,11 @@ const { execute: enregistrerLesQuotas, loading: enregistrementQuotas } = useApiA
     onSuccess: async () => {
       editionQuotasOuverte.value = false
       // Relire la liste concernée : la ligne doit afficher les quotas qu'on vient de poser.
-      if (cibleEnEdition.value?.type === 'option') await loadOptions()
+      const type = cibleEnEdition.value?.type
+      if (type === 'option') await loadOptions()
+      else if (type === 'organisateur' || type === 'organisateurs') await loadOrganisateurs()
+      else if (type === 'equipe' || type === 'benevoles') await loadBenevoles()
+      else if (type === 'spectacle' || type === 'artistes') await loadArtistes()
       else await loadTiers()
     },
   }
@@ -680,6 +1119,9 @@ onMounted(async () => {
     await loadTiers()
     await loadOptions()
     await loadChamps()
+    await loadOrganisateurs()
+    await loadBenevoles()
+    await loadArtistes()
   }
 })
 
@@ -690,6 +1132,9 @@ watch(canAccess, async (nouvelle, ancienne) => {
     await loadTiers()
     await loadOptions()
     await loadChamps()
+    await loadOrganisateurs()
+    await loadBenevoles()
+    await loadArtistes()
   }
 })
 </script>

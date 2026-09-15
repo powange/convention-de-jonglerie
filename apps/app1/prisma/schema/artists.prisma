@@ -112,6 +112,7 @@ model Show {
   artists      ShowArtist[]
   acts         ShowAct[]
   handoutItems ShowHandoutItem[]
+  ticketingQuotas EditionArtistQuota[]
   applications ShowApplication[]
   performances ShowPerformance[]
   // Le groupe de messagerie dédié au spectacle, créé à la première utilisation
