@@ -418,7 +418,10 @@ const handleDrop = async (targetQuota: Quota, event: DragEvent) => {
   // Réorganiser localement
   const newQuotas = [...sortedQuotas.value]
   const [draggedQuota] = newQuotas.splice(draggedIndex, 1)
-  newQuotas.splice(targetIndex, 0, draggedQuota)
+  // `splice` rend `T | undefined` : le compilateur ne peut pas savoir que l'élément
+  // existe forcément. Le garde-fou est au-dessus — `draggedIndex` a déjà été refusé
+  // s'il valait -1, donc le retrait porte toujours sur un élément réel.
+  newQuotas.splice(targetIndex, 0, draggedQuota!)
   sortedQuotas.value = newQuotas
 
   // Mettre à jour les positions en base de données

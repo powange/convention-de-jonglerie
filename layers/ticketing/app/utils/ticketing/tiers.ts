@@ -1,3 +1,5 @@
+import type { MealPhase } from '~/utils/meals'
+
 export interface TicketingTier {
   id: number
   name: string
@@ -42,7 +44,10 @@ export interface TicketingTier {
       date: string
       mealType: 'BREAKFAST' | 'LUNCH' | 'DINNER'
       enabled: boolean
-      phases: string[]
+      // Le type de domaine, et non `string[]` : en base la colonne est du JSON, mais les
+      // valeurs sont celles de `MealPhase`. `string[]` rendait ce repas inacceptable pour
+      // `formatMealDisplay`, qui attend un `Meal`.
+      phases: MealPhase[]
     }
   }>
 }

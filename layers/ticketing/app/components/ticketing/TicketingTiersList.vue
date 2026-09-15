@@ -426,7 +426,10 @@ const handleDrop = async (targetTier: TicketingTier, event: DragEvent) => {
   // Réorganiser localement
   const newTiers = [...sortedTiers.value]
   const [draggedTier] = newTiers.splice(draggedIndex, 1)
-  newTiers.splice(targetIndex, 0, draggedTier)
+  // `splice` rend `T | undefined` : le compilateur ne peut pas savoir que l'élément
+  // existe forcément. Le garde-fou est au-dessus — `draggedIndex` a déjà été refusé
+  // s'il valait -1, donc le retrait porte toujours sur un élément réel.
+  newTiers.splice(targetIndex, 0, draggedTier!)
   sortedTiers.value = newTiers
 
   // Mettre à jour les positions en base de données
