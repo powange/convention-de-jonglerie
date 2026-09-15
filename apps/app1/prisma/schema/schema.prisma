@@ -271,6 +271,9 @@ model Edition {
   orders                           TicketingOrder[]
   volunteerTicketingHandoutItems   EditionVolunteerHandoutItem[]
   organizerTicketingHandoutItems   EditionOrganizerHandoutItem[]
+  organizerTicketingQuotas         EditionOrganizerQuota[]
+  volunteerTicketingQuotas         EditionVolunteerQuota[]
+  artistTicketingQuotas            EditionArtistQuota[]
   artistTicketingHandoutItems      EditionArtistHandoutItem[]
   tierCustomFields                 TicketingTierCustomField[]
   workshops                        Workshop[]
@@ -420,6 +423,7 @@ model EditionOrganizer {
   edition          Edition                       @relation(fields: [editionId], references: [id], onDelete: Cascade)
   organizer        ConventionOrganizer           @relation(fields: [organizerId], references: [id], onDelete: Cascade)
   handoutItems     EditionOrganizerHandoutItem[]
+  quotas           EditionOrganizerQuota[]
   mealSelections   OrganizerMealSelection[]
   teamAssignments  OrganizerTeamAssignment[]
   slotAssignments  OrganizerSlotAssignment[]

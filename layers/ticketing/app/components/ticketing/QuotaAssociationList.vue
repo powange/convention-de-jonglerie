@@ -31,7 +31,13 @@
             :title="element.origine ?? ''"
             class="h-5 w-5 object-contain shrink-0"
           />
-          <span class="font-medium truncate" :title="element.nom">{{ element.nom }}</span>
+          <!-- Un créneau nommé pour le titre : tous les éléments ne se nomment pas par une
+               simple chaîne. Un organisateur est une PERSONNE, et son nom d'affichage est déjà
+               calculé par `UiUserName` — le recomposer ici en ferait une seconde source de
+               vérité, qui divergerait au premier changement de règle d'affichage. -->
+          <slot name="nom" :element="element">
+            <span class="font-medium truncate" :title="element.nom">{{ element.nom }}</span>
+          </slot>
         </div>
 
         <!-- Les quotas déjà rattachés, lisibles sans ouvrir la fenêtre : c'est la question qu'on
@@ -85,7 +91,13 @@
  * quotas, et une provenance quand il en connaît une.
  */
 export interface ElementAssociable {
-  id: number
+  /**
+   * `string` autant que `number` : une équipe de bénévoles est identifiée par un `cuid`, là où un
+   * tarif, une option, un organisateur ou un spectacle le sont par un entier. Restreindre ce type
+   * aux entiers aurait obligé à convertir de part et d'autre, et une conversion silencieuse est
+   * exactement ce qui fait rater une correspondance.
+   */
+  id: number | string
   nom: string
   quotas: Array<{ id: number; title: string }>
   /** Chemin du logo de provenance, quand l'écran sait la nommer. */
@@ -101,5 +113,5 @@ defineProps<{
   libelleEdition: string
 }>()
 
-const emit = defineEmits<{ editer: [id: number] }>()
+const emit = defineEmits<{ editer: [id: number | string] }>()
 </script>
