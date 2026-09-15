@@ -75,6 +75,17 @@ conclusion n'est pas `success`, **ne pas déployer**.
 
 Lancer cette attente en tâche de fond : la construction dure plusieurs minutes.
 
+⚠️ **Ne pas surveiller `tests.yml`.** Le dépôt a DEUX workflows, et c'est `publier-image.yml` qui
+publie l'image — le seul qui décide de ce que les piles vont tirer. Attendre `tests.yml` fait
+attendre la mauvaise chose : il peut être vert alors que l'image n'existe pas encore, et l'on
+déclenche à nouveau trop tôt. Erreur commise le 2026-09-15 sur #434, en plus de l'attente omise.
+
+Repère chiffré, pour savoir si l'on s'impatiente à tort : quand l'image est publiée AVANT le
+déclenchement, les deux piles basculent en **~75 secondes** (#435, les deux en parallèle). Une
+attente qui dépasse quelques minutes ne signale donc pas une pile lente — elle signale qu'on a
+déclenché trop tôt, ou que le webhook n'a rien déclenché du tout. Ne pas relancer en boucle :
+revenir à l'étape 1 et vérifier l'image.
+
 ### 2. Relever le build actuel
 
 C'est la seule référence qui permettra de constater la bascule :
