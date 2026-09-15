@@ -294,8 +294,13 @@ model TicketingOptionHandoutItem {
 
 model TicketingOption {
   id                  Int      @id @default(autoincrement())
-  externalTicketingId String? // Null si option manuelle (non HelloAsso)
-  helloAssoOptionId   String? // ID de l'option dans HelloAsso, null si option manuelle
+  /// ⚠️ Renseigné même pour une option créée À LA MAIN : `createOption` exige une configuration
+  /// de billetterie externe et y rattache l'option. Ce champ ne dit donc PAS d'où vient l'option
+  /// — contrairement au tarif, dont l'équivalent reste bien nul quand il est manuel.
+  externalTicketingId String?
+  /// ID de l'option chez HelloAsso, nul si l'option a été saisie ici. C'est LUI qui distingue une
+  /// option importée d'une option manuelle.
+  helloAssoOptionId   String?
   editionId           Int // Toujours associé à une édition
   name                String
   description         String?  @db.Text

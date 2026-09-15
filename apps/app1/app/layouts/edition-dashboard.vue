@@ -701,6 +701,13 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
             icon: 'i-heroicons-currency-euro',
             to: `/editions/${editionId.value}/gestion/ticketing/tiers`,
           },
+          {
+            // Les quotas avaient leur onglet dans la page des tarifs. Ils ont leur page : un
+            // quota n'est pas un attribut du catalogue de vente, c'est une capacité.
+            label: t('gestion.ticketing.quotas_title'),
+            icon: 'i-heroicons-chart-bar',
+            to: `/editions/${editionId.value}/gestion/ticketing/quotas`,
+          },
           ...(edition.value?.ticketingHandoutItemsEnabled
             ? [
                 {

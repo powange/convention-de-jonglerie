@@ -12,7 +12,6 @@ const bodySchema = z.object({
   choices: z.array(z.string()).nullable().optional(),
   price: z.number().int().nullable().optional(), // Prix en centimes
   position: z.number().int().min(0).default(0),
-  quotaIds: z.array(z.number().int()).optional().default([]),
   handoutItemIds: z.array(z.number().int()).optional().default([]),
   tierIds: z.array(z.number().int()).optional().default([]),
   mealIds: z.array(z.number().int()).optional().default([]),

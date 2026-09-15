@@ -1412,8 +1412,6 @@
 import { onMounted, computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import helloAssoLogo from '~/assets/img/helloasso/logo.svg'
-import infomaniakLogo from '~/assets/img/infomaniak/logo.svg'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -1426,6 +1424,7 @@ import {
   requeteDesFiltres,
 } from '../../../../../utils/filtres-commandes'
 import { montantTotalDeLaLigne } from '../../../../../utils/montant-ligne-commande'
+import { logoDuFournisseur, nomDuFournisseur } from '../../../../../utils/ticketing/fournisseur'
 import { fetchOrders, type Order } from '../../../../../utils/ticketing/orders'
 import { fetchTiers, type TicketingTier } from '../../../../../utils/ticketing/tiers'
 
@@ -1871,30 +1870,6 @@ const loadOrders = async () => {
  * Seul HelloAsso importe aujourd'hui des tarifs ; les autres entrées attendent que ce soit le cas,
  * et un fournisseur sans logo retombera simplement sur l'icône « saisi à la main ».
  */
-const logosParFournisseur: Record<string, string> = {
-  HELLOASSO: helloAssoLogo,
-  INFOMANIAK: infomaniakLogo,
-}
-
-/**
- * Le logo du site, pour les tarifs qui n'ont pas d'origine extérieure.
- *
- * Même image que celle qui marque déjà une commande créée ici, sur la ligne des badges d'origine :
- * un tarif saisi à la main et une commande saisie à la main viennent du même endroit, et rien ne
- * gagnerait à ce que l'écran le dise de deux façons.
- *
- * Chemin public et non import : le fichier vit dans `public/`, il est servi tel quel.
- */
-const LOGO_DU_SITE = '/logos/logo-jc.svg'
-
-/** Le nom du fournisseur tel qu'il s'écrit, plutôt que la constante de la base. */
-const nomsDeFournisseur: Record<string, string> = {
-  HELLOASSO: 'HelloAsso',
-  INFOMANIAK: 'Infomaniak',
-  BILLETWEB: 'Billetweb',
-  WEEZEVENT: 'Weezevent',
-}
-
 const tierSelectItems = computed(() => {
   return tiers.value.map((tier) => ({
     label: tier.name,
@@ -1903,10 +1878,10 @@ const tierSelectItems = computed(() => {
     // Chaque tarif porte un logo, sans exception : celui de son fournisseur, ou celui du site
     // quand il a été créé ici. Un libellé sans image romprait l'alignement de la liste, et
     // l'absence d'origine se lirait comme une origine inconnue.
-    logo: (tier.provider && logosParFournisseur[tier.provider]) || LOGO_DU_SITE,
-    origine: tier.provider
+    logo: logoDuFournisseur(tier.provider),
+    origine: nomDuFournisseur(tier.provider)
       ? $t('ticketing.orders.tier_origin_external', {
-          fournisseur: nomsDeFournisseur[tier.provider] ?? tier.provider,
+          fournisseur: nomDuFournisseur(tier.provider),
         })
       : $t('ticketing.orders.tier_origin_manual'),
   }))

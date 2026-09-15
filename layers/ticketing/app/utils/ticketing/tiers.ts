@@ -83,7 +83,6 @@ export interface TierFormData {
   countAsParticipant?: boolean
   validFrom?: string | null
   validUntil?: string | null
-  quotaIds: number[]
   handoutItemIds: number[]
   mealIds?: number[]
 }

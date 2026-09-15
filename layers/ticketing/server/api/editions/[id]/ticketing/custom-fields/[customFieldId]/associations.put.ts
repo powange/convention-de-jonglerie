@@ -5,14 +5,6 @@ import { canManageTicketingById } from '#server/utils/permissions/edition-permis
 
 const bodySchema = z.object({
   tierIds: z.array(z.number()).optional(),
-  quotas: z
-    .array(
-      z.object({
-        quotaId: z.number(),
-        choiceValue: z.string().optional(),
-      })
-    )
-    .optional(),
   handoutItems: z
     .array(
       z.object({
@@ -38,7 +30,7 @@ export default wrapApiHandler(
       })
 
     const body = bodySchema.parse(await readBody(event))
-    const { tierIds, quotas, handoutItems } = body
+    const { tierIds, handoutItems } = body
 
     // Vérifier que le custom field existe et appartient à l'édition
     const customField = await prisma.ticketingTierCustomField.findFirst({
@@ -92,46 +84,17 @@ export default wrapApiHandler(
         }
       }
 
-      // 3. Supprimer toutes les associations existantes pour les quotas
-      await tx.ticketingTierCustomFieldQuota.deleteMany({
-        where: { customFieldId },
-      })
+      // Les quotas n'apparaissent plus ici : leur seul chemin d'écriture est l'endpoint dédié
+      // /custom-fields/[id]/quotas. Tant que ce bloc les effaçait et les recréait, enregistrer
+      // les seuls tarifs associés détruisait les quotas du champ — silencieusement.
 
-      // 4. Supprimer toutes les associations existantes pour les articles
+      // 3. Supprimer toutes les associations existantes pour les articles
       // à remettre — uniquement si la clé est explicitement fournie
       // (édition désormais déléguée à un endpoint dédié).
       if (handoutItems !== undefined) {
         await tx.ticketingTierCustomFieldHandoutItem.deleteMany({
           where: { customFieldId },
         })
-      }
-
-      // 5. Créer les nouvelles associations de quotas
-      if (quotas && quotas.length > 0) {
-        for (const quota of quotas) {
-          // Vérifier que le quota existe et appartient à l'édition
-          const existingQuota = await tx.ticketingQuota.findFirst({
-            where: {
-              id: quota.quotaId,
-              editionId,
-            },
-          })
-
-          if (!existingQuota) {
-            throw createError({
-              status: 404,
-              message: `Quota ${quota.quotaId} introuvable`,
-            })
-          }
-
-          await tx.ticketingTierCustomFieldQuota.create({
-            data: {
-              customFieldId,
-              quotaId: quota.quotaId,
-              choiceValue: quota.choiceValue || null,
-            },
-          })
-        }
       }
 
       // 6. Créer les nouvelles associations d'articles à remettre

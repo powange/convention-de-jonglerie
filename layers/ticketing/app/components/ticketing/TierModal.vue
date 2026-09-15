@@ -12,7 +12,7 @@
           color="info"
           variant="soft"
           :title="$t('ticketing.tiers.modal.title')"
-          description="Ce tarif est synchronisé depuis HelloAsso. Seuls les quotas, articles à remettre et dates de validité peuvent être modifiés."
+          description="Ce tarif est synchronisé depuis HelloAsso. Seuls les articles à remettre et les dates de validité peuvent être modifiés."
         />
 
         <UFormField
@@ -225,29 +225,6 @@
         </div>
 
         <UFormField
-          v-if="quotas.length > 0"
-          :label="$t('ticketing.tiers.modal.quotas_label')"
-          name="quotas"
-        >
-          <USelectMenu
-            v-model="form.quotaIds"
-            :items="(quotas || []).map((q) => ({ label: q.title, value: q.id }))"
-            value-key="value"
-            multiple
-            searchable
-            :placeholder="$t('ticketing.tiers.modal.quotas_placeholder')"
-            class="w-full"
-          >
-            <template #label>
-              <span v-if="form.quotaIds.length === 0">{{
-                $t('ticketing.tiers.modal.no_quota_selected')
-              }}</span>
-              <span v-else>{{ form.quotaIds.length }} quota(s) sélectionné(s)</span>
-            </template>
-          </USelectMenu>
-        </UFormField>
-
-        <UFormField
           v-if="edition?.mealsEnabled"
           :label="$t('ticketing.tiers.modal.meals_label')"
           name="meals"
@@ -378,7 +355,7 @@ const setAllDayTimes = (dateFrom: string | null, dateUntil: string | null) => {
   }
 }
 
-// Vérifie si c'est un tarif HelloAsso (lecture seule sauf quotas et items)
+// Vérifie si c'est un tarif HelloAsso (lecture seule sauf articles à remettre et dates)
 const isHelloAssoTier = computed(
   () => props.tier?.helloAssoTierId !== null && props.tier?.helloAssoTierId !== undefined
 )
@@ -397,7 +374,6 @@ const form = ref({
   validFrom: null as string | null,
   validUntil: null as string | null,
   isAllDay: false,
-  quotaIds: [] as number[],
   mealIds: [] as number[],
 })
 
@@ -419,8 +395,7 @@ const validUntilForField = computed<string>({
 })
 const validUntilForDateTime = validUntilForField
 
-// Charger les quotas et repas disponibles
-const quotas = ref<any[]>([])
+// Charger les repas disponibles
 const meals = ref<any[]>([])
 
 // Utiliser les utilitaires meals pour formater les labels
@@ -446,19 +421,12 @@ const mealsOptions = computed(() => {
 })
 
 const loadQuotasAndItems = async () => {
+  if (!edition.value?.mealsEnabled) return
   try {
-    const promises: Promise<any>[] = [$fetch(`/api/editions/${props.editionId}/ticketing/quotas`)]
-    if (edition.value?.mealsEnabled) {
-      promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
-    }
-    const [quotasData, mealsResponse] = await Promise.all(promises)
-    quotas.value = Array.isArray(quotasData?.data?.quotas) ? quotasData.data.quotas : []
-    meals.value =
-      mealsResponse?.data?.meals && Array.isArray(mealsResponse.data.meals)
-        ? mealsResponse.data.meals
-        : []
+    const mealsResponse: any = await $fetch(`/api/editions/${props.editionId}/volunteers/meals`)
+    meals.value = Array.isArray(mealsResponse?.data?.meals) ? mealsResponse.data.meals : []
   } catch (error) {
-    console.error('Failed to load quotas and meals:', error)
+    console.error('Failed to load meals:', error)
   }
 }
 
@@ -493,7 +461,6 @@ watch(
           validFrom: validFromLocal,
           validUntil: validUntilLocal,
           isAllDay,
-          quotaIds: props.tier.quotas?.map((q: any) => q.quotaId) || [],
           mealIds: props.tier.meals?.map((m: any) => m.mealId) || [],
         }
       } else {
@@ -512,7 +479,6 @@ watch(
           validFrom: null,
           validUntil: null,
           isAllDay: false,
-          quotaIds: [],
           mealIds: [],
         }
       }
@@ -623,7 +589,8 @@ const buildFormData = () => {
     countAsParticipant: form.value.countAsParticipant,
     validFrom: finalValidFrom.value,
     validUntil: finalValidUntil.value,
-    quotaIds: form.value.quotaIds,
+    // Pas de `quotaIds` : les quotas se règlent sur la page dédiée, et l'endpoint ne les
+    // accepte plus du tout — il n'y a donc qu'un seul chemin pour les modifier.
     mealIds: form.value.mealIds,
   }
 }

@@ -14,7 +14,13 @@
       :description="$t('ticketing.quotas.list.description')"
     />
 
-    <div class="space-y-2">
+    <!-- Quatre colonnes au plus large, une seule sur mobile — mêmes paliers que les articles à
+         remettre, pour que les deux pages de la billetterie se ressemblent.
+
+         Les paliers comptent : une cellule doit rester assez large pour que le titre du quota se
+         lise. En dessous de `xl`, trois colonnes le réduiraient à quelques caractères suivis de
+         points de suspension. -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2">
       <!-- Liste des quotas existants.
            En lecture seule : le titre et la quantité s'y consultent, et se modifient dans la
            fenêtre d'édition. Les champs de saisie en ligne écrasaient le nom du quota sur un
@@ -23,10 +29,10 @@
       <div
         v-for="(quota, index) in sortedQuotas"
         :key="quota.id"
-        class="flex flex-col gap-2 py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors sm:flex-row sm:items-center"
+        class="flex items-center gap-2 py-2 px-3 rounded-lg border border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
         :class="[
           draggedQuotaId === quota.id && 'opacity-50',
-          dragOverQuotaId === quota.id && 'border-primary-500 border-2',
+          dragOverQuotaId === quota.id && 'border-primary-500',
         ]"
         draggable="true"
         @dragstart="handleDragStart(quota, $event)"
@@ -34,66 +40,67 @@
         @dragover.prevent="handleDragOver(quota, $event)"
         @drop="handleDrop(quota, $event)"
       >
-        <!-- Première ligne : ce qu'il faut lire -->
+        <div
+          class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0"
+          :title="$t('ticketing.quotas.list.drag_tooltip')"
+        >
+          <UIcon name="i-heroicons-bars-3" class="h-5 w-5" />
+        </div>
+
+        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-5 text-center shrink-0">
+          {{ index + 1 }}
+        </span>
+
+        <!-- `min-w-0` sur le conteneur ET `truncate` sur le titre : sans le premier, un titre long
+             pousse la cellule au lieu d'être coupé, et la grille perd son alignement. -->
         <div class="flex items-center gap-2 min-w-0 flex-1">
-          <div
-            class="cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors shrink-0"
-            :title="$t('ticketing.quotas.list.drag_tooltip')"
-          >
-            <UIcon name="i-heroicons-bars-3" class="h-5 w-5" />
-          </div>
-
-          <span
-            class="text-sm font-medium text-gray-500 dark:text-gray-400 w-6 text-center shrink-0"
-          >
-            {{ index + 1 }}
-          </span>
-
           <span class="font-medium truncate" :title="quota.title">{{ quota.title }}</span>
-
           <UBadge color="neutral" variant="subtle" class="shrink-0">
             {{ quota.quantity }}
           </UBadge>
         </div>
 
-        <!-- Seconde ligne sous sm : les actions -->
-        <div class="flex items-center gap-2 sm:shrink-0 pl-7 sm:pl-0">
+        <div class="flex items-center gap-1 shrink-0">
           <UButton
             icon="i-heroicons-pencil"
             color="neutral"
-            variant="outline"
+            variant="ghost"
             :title="$t('ticketing.quotas.list.edit_button')"
             @click="ouvrirEdition(quota)"
           />
           <UButton
             icon="i-heroicons-trash"
             color="error"
+            variant="ghost"
             :title="$t('ticketing.quotas.list.delete_button')"
             @click="confirmDeleteQuota(quota)"
           />
         </div>
       </div>
 
-      <!-- Ligne d'ajout -->
-      <div
-        class="flex flex-col gap-2 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 sm:flex-row sm:items-center"
-      >
+      <!-- Ligne d'ajout, dernière cellule de la grille : elle suit la liste au lieu d'occuper
+           toute la largeur sous elle, comme sur les articles à remettre. -->
+      <div class="flex items-center gap-2 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
         <UInput
           v-model="form.title"
           class="flex-1 min-w-0"
           :placeholder="$t('ticketing.quotas.list.name_placeholder')"
           @keydown.enter="handleSave"
         />
-        <div class="flex items-center gap-2 sm:shrink-0">
-          <UInputNumber v-model="form.quantity" :min="1" class="w-32" @keydown.enter="handleSave" />
-          <UButton
-            icon="i-heroicons-plus"
-            color="primary"
-            :loading="saving"
-            :title="$t('common.add')"
-            @click="handleSave"
-          />
-        </div>
+        <UInputNumber
+          v-model="form.quantity"
+          :min="1"
+          class="w-24 shrink-0"
+          @keydown.enter="handleSave"
+        />
+        <UButton
+          icon="i-heroicons-plus"
+          color="primary"
+          :loading="saving"
+          :title="$t('common.add')"
+          class="shrink-0"
+          @click="handleSave"
+        />
       </div>
     </div>
   </div>

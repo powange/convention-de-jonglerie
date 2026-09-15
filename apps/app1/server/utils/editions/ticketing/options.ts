@@ -11,7 +11,6 @@ export interface OptionData {
   choices?: string[] | null
   price?: number | null // Prix en centimes
   position: number
-  quotaIds?: number[]
   handoutItemIds?: HandoutItemAssociationInput[]
   tierIds?: number[] // Tarifs associés à cette option
   mealIds?: number[] // Repas associés à cette option
@@ -21,7 +20,7 @@ export interface OptionData {
  * Récupère toutes les options d'une édition (HelloAsso et manuelles)
  */
 export async function getEditionOptions(editionId: number) {
-  return await prisma.ticketingOption.findMany({
+  const options = await prisma.ticketingOption.findMany({
     where: { editionId },
     orderBy: [{ position: 'asc' }, { name: 'asc' }],
     include: {
@@ -29,8 +28,30 @@ export async function getEditionOptions(editionId: number) {
       handoutItems: { include: { handoutItem: true } },
       tiers: { include: { tier: true } },
       meals: { include: { meal: true } },
+      externalTicketing: { select: { provider: true } },
     },
   })
+
+  /**
+   * Le fournisseur, remonté à plat ; `null` pour une option saisie à la main.
+   *
+   * ⚠️ **Le rattachement à la billetterie externe ne dit RIEN de l'origine d'une option.**
+   * `createOption` exige une configuration externe et y rattache l'option, même créée à la main :
+   * `externalTicketingId` est donc renseigné dans tous les cas. S'y fier affichait le logo
+   * HelloAsso sur une option qu'on venait de saisir soi-même.
+   *
+   * Ce qui distingue vraiment, c'est l'identifiant chez le fournisseur. Les tarifs, eux, laissent
+   * bien `externalTicketingId` à `null` quand ils sont manuels — l'asymétrie est dans le code,
+   * pas dans le schéma.
+   *
+   * Limite assumée : `helloAssoOptionId` est la colonne d'UN fournisseur. Le jour où un autre
+   * importera des options, il lui faudra sa propre colonne, et cette ligne devra la lire aussi —
+   * sans quoi ses options passeront pour saisies à la main.
+   */
+  return options.map((option) => ({
+    ...option,
+    provider: option.helloAssoOptionId ? (option.externalTicketing?.provider ?? null) : null,
+  }))
 }
 
 /**
@@ -61,9 +82,6 @@ export async function createOption(editionId: number, data: OptionData) {
       price: data.price,
       position: data.position,
       // helloAssoOptionId reste null pour une option manuelle
-      quotas: {
-        create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
-      },
       handoutItems: {
         create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
           ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
@@ -102,25 +120,23 @@ export async function updateOption(optionId: number, editionId: number, data: Op
 
   // Mettre à jour l'option avec ses relations
   return await prisma.$transaction(async (tx) => {
-    // Supprimer les anciennes relations (sauf tiers pour HelloAsso)
-    await tx.ticketingOptionQuota.deleteMany({ where: { optionId } })
-    // handoutItems : on ne supprime/recrée que si la clé est explicitement
-    // fournie (édition désormais déléguée à un endpoint dédié).
+    // Supprimer les anciennes relations (sauf tiers pour HelloAsso).
+    //
+    // Les quotas n'apparaissent plus ici : leur seul chemin d'écriture est l'endpoint dédié
+    // /options/[id]/quotas. Tant que ce bloc les effaçait et les recréait, enregistrer un simple
+    // changement de libellé les détruisait — la fenêtre d'édition ne les envoyait plus.
     if (data.handoutItemIds !== undefined) {
       await tx.ticketingOptionHandoutItem.deleteMany({ where: { optionId } })
     }
     await tx.ticketingOptionMeal.deleteMany({ where: { optionId } })
 
-    // Pour les options HelloAsso, on met à jour uniquement les relations quotas, handoutItems et meals
+    // Pour les options HelloAsso, on met à jour uniquement les relations articles et repas
     // Les associations tarif-option sont gérées par la synchronisation HelloAsso
     // Pour les options manuelles, on met à jour tout
     if (isHelloAssoOption) {
       return await tx.ticketingOption.update({
         where: { id: optionId },
         data: {
-          quotas: {
-            create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
-          },
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
@@ -150,9 +166,6 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           choices: data.choices,
           price: data.price,
           position: data.position,
-          quotas: {
-            create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
-          },
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {

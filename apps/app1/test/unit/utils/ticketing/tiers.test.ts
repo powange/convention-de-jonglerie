@@ -101,7 +101,6 @@ describe('utils billetterie - tiers', () => {
       maxAmount: null,
       position: 0,
       isActive: true,
-      quotaIds: [],
       handoutItemIds: [],
     }
 

@@ -522,6 +522,15 @@
               color="orange"
             />
 
+            <!-- Quotas : des jauges de places, sorties de l'onglet des tarifs. -->
+            <ManagementNavigationCard
+              :to="`/editions/${edition.id}/gestion/ticketing/quotas`"
+              icon="i-heroicons-chart-bar"
+              :title="$t('gestion.ticketing.quotas_title')"
+              :description="$t('gestion.ticketing.quotas_card_description')"
+              color="orange"
+            />
+
             <!-- Articles à remettre -->
             <ManagementNavigationCard
               v-if="edition.ticketingHandoutItemsEnabled"

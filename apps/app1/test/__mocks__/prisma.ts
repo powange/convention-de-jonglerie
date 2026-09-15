@@ -79,6 +79,13 @@ export const prismaMock = {
   ticketingHandoutItem: createModelMock(),
   ticketingTierHandoutItem: createModelMock(),
   ticketingOptionHandoutItem: createModelMock(),
+  // Les tables de liaison des quotas : un quota se rattache à un tarif, à une option ou à un
+  // champ personnalisé, et chacune a son endpoint dédié — seule voie d'écriture depuis que les
+  // quotas ont leur propre page.
+  ticketingTierQuota: createModelMock(),
+  ticketingOptionQuota: createModelMock(),
+  ticketingTierCustomField: createModelMock(),
+  ticketingTierCustomFieldQuota: createModelMock(),
   ticketingCounter: createModelMock(),
   externalTicketing: createModelMock(),
   // Configurations de prestataires : leurs secrets sont chiffrés en base, et les endpoints qui les

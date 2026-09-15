@@ -10,13 +10,7 @@
         <UAlert icon="i-heroicons-information-circle" color="info" variant="soft">
           <template #title>Associations</template>
           <template #description>
-            <div class="space-y-1">
-              <p>Configurez les tarifs et quotas associés à ce champ personnalisé.</p>
-              <p class="text-xs">
-                Pour les champs de type "Liste de choix", vous pouvez associer par choix spécifique
-                ou pour tous les choix.
-              </p>
-            </div>
+            <p>Configurez les tarifs associés à ce champ personnalisé.</p>
           </template>
         </UAlert>
 
@@ -38,77 +32,6 @@
           />
 
           <p v-else class="text-sm text-gray-500">Aucun tarif disponible</p>
-        </div>
-
-        <USeparator />
-
-        <!-- Section Quotas -->
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h4 class="font-semibold text-gray-900 dark:text-white">Quotas</h4>
-            <UButton
-              icon="i-heroicons-plus"
-              color="primary"
-              variant="soft"
-              size="sm"
-              @click="addQuotaAssociation"
-            >
-              Ajouter un quota
-            </UButton>
-          </div>
-
-          <div v-if="loadingQuotas" class="flex justify-center py-4">
-            <UIcon name="i-heroicons-arrow-path" class="h-6 w-6 animate-spin text-primary-500" />
-          </div>
-
-          <div
-            v-else-if="quotaAssociations.length === 0"
-            class="text-center py-8 bg-gray-50 dark:bg-gray-900 rounded-lg"
-          >
-            <p class="text-sm text-gray-500 dark:text-gray-400">Aucun quota associé</p>
-          </div>
-
-          <div v-else class="space-y-3">
-            <UCard
-              v-for="(assoc, index) in quotaAssociations"
-              :key="index"
-              :ui="{ body: { padding: 'p-4' } }"
-            >
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <UFormField label="Quota" required>
-                  <USelect
-                    v-model="assoc.quotaId"
-                    :items="quotaItems"
-                    placeholder="Sélectionnez un quota"
-                    value-key="id"
-                    :ui="{ content: 'min-w-fit' }"
-                  />
-                </UFormField>
-
-                <UFormField label="Choix concerné">
-                  <USelect
-                    v-model="assoc.choiceValue"
-                    :items="choiceOptions"
-                    placeholder="Tous les choix"
-                    value-key="value"
-                    :ui="{ content: 'min-w-fit' }"
-                  />
-                </UFormField>
-              </div>
-
-              <div class="flex justify-end mt-3">
-                <UButton
-                  icon="i-heroicons-trash"
-                  color="error"
-                  variant="ghost"
-                  size="sm"
-                  @click="removeQuotaAssociation(index)"
-                >
-                  Supprimer
-                </UButton>
-              </div>
-            </UCard>
-          </div>
         </div>
       </div>
     </template>
@@ -145,19 +68,9 @@ interface CustomField {
   }>
 }
 
-interface Quota {
-  id: number
-  title: string
-}
-
 interface Tier {
   id: number
   name: string
-}
-
-interface QuotaAssociation {
-  quotaId: number | null
-  choiceValue: string | null
 }
 
 const props = defineProps<{
@@ -177,12 +90,9 @@ const isOpen = computed({
 })
 
 const loadingTiers = ref(false)
-const loadingQuotas = ref(false)
 const availableTiers = ref<Tier[]>([])
-const availableQuotas = ref<Quota[]>([])
 
 const selectedTierIds = ref<number[]>([])
-const quotaAssociations = ref<QuotaAssociation[]>([])
 
 // Items pour le UCheckboxGroup des tarifs
 const tierItems = computed(() =>
@@ -191,38 +101,6 @@ const tierItems = computed(() =>
     value: tier.id,
   }))
 )
-
-// Items pour les quotas (avec label au lieu de title)
-const quotaItems = computed(() => {
-  if (!Array.isArray(availableQuotas.value)) return []
-  return availableQuotas.value.map((quota) => ({
-    label: quota.title,
-    id: quota.id,
-  }))
-})
-
-// Options de choix pour les selects
-const choiceOptions = computed(() => {
-  if (!props.customField?.values || props.customField.type !== 'ChoiceList') {
-    return [{ label: 'Tous les choix', value: null }]
-  }
-
-  return [
-    { label: 'Tous les choix', value: null },
-    ...props.customField.values.map((v) => ({ label: v, value: v })),
-  ]
-})
-
-const addQuotaAssociation = () => {
-  quotaAssociations.value.push({
-    quotaId: null,
-    choiceValue: null,
-  })
-}
-
-const removeQuotaAssociation = (index: number) => {
-  quotaAssociations.value.splice(index, 1)
-}
 
 const loadTiers = async () => {
   loadingTiers.value = true
@@ -238,31 +116,9 @@ const loadTiers = async () => {
   }
 }
 
-const loadQuotas = async () => {
-  loadingQuotas.value = true
-  try {
-    const response = await $fetch<any>(`/api/editions/${props.editionId}/ticketing/quotas`)
-    availableQuotas.value = Array.isArray(response?.data?.quotas) ? response.data.quotas : []
-  } catch (error) {
-    console.error('Erreur lors du chargement des quotas:', error)
-  } finally {
-    loadingQuotas.value = false
-  }
-}
-
-const buildAssociationsBody = () => {
-  const validQuotas = quotaAssociations.value
-    .filter((a) => a.quotaId !== null)
-    .map((a) => ({
-      quotaId: a.quotaId!,
-      choiceValue: a.choiceValue || undefined,
-    }))
-
-  return {
-    tierIds: selectedTierIds.value,
-    quotas: validQuotas,
-  }
-}
+// Pas de `quotas` : ils se règlent sur la page dédiée, et l'endpoint ne les accepte plus du
+// tout — il n'y a donc qu'un seul chemin pour les modifier.
+const buildAssociationsBody = () => ({ tierIds: selectedTierIds.value })
 
 const { execute: save, loading: saving } = useApiAction(
   () =>
@@ -287,20 +143,10 @@ watch(
   () => props.open,
   async (newValue) => {
     if (newValue && props.customField) {
-      await Promise.all([loadTiers(), loadQuotas()])
+      await loadTiers()
 
       // Charger les associations de tarifs existantes
       selectedTierIds.value = props.customField.tiers?.map((t) => t.tier.id) || []
-
-      // Charger les associations existantes
-      if (props.customField.quotas && props.customField.quotas.length > 0) {
-        quotaAssociations.value = props.customField.quotas.map((q) => ({
-          quotaId: q.quota.id,
-          choiceValue: q.choiceValue || null,
-        }))
-      } else {
-        quotaAssociations.value = []
-      }
     }
   }
 )
