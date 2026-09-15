@@ -11,6 +11,9 @@
  * qui peuvent se tromper, et les vérifier ici évite de monter un routeur.
  */
 
+export const VUE_PAR_DEFAUT = 'resourceTimelineWeek'
+export const VUES_ADMISES = ['resourceTimelineDay', 'resourceTimelineWeek'] as const
+
 export const GRANULARITE_PAR_DEFAUT = 30
 export const GRANULARITES_ADMISES = [15, 30, 60] as const
 
@@ -29,6 +32,30 @@ export function granulariteDepuisUrl(brut: unknown): number {
   return (GRANULARITES_ADMISES as readonly number[]).includes(valeur)
     ? valeur
     : GRANULARITE_PAR_DEFAUT
+}
+
+/**
+ * La vue du calendrier portée par l'URL — jour ou semaine.
+ *
+ * Une valeur inventée ferait planter FullCalendar au démarrage : on retombe sur le défaut, comme
+ * pour la granularité.
+ */
+export function vueDepuisUrl(brut: unknown): string {
+  const valeur = String(brut)
+  return (VUES_ADMISES as readonly string[]).includes(valeur) ? valeur : VUE_PAR_DEFAUT
+}
+
+/**
+ * La date affichée, portée par l'URL au format `AAAA-MM-JJ`.
+ *
+ * Rend `null` quand elle est absente ou illisible : le calendrier reprend alors sa date d'arrivée,
+ * le premier jour de l'édition. Le format est vérifié plutôt que passé tel quel — une chaîne
+ * fantaisiste donnerait une `Invalid Date`, et le planning s'afficherait vide sans rien dire.
+ */
+export function dateDepuisUrl(brut: unknown): string | null {
+  if (typeof brut !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(brut)) return null
+  const date = new Date(`${brut}T00:00:00`)
+  return Number.isNaN(date.getTime()) ? null : brut
 }
 
 /**
@@ -51,9 +78,22 @@ export function equipesConnues(selection: string[], equipes: Array<{ id: string 
 export function requeteFiltres(
   queryActuelle: Record<string, unknown>,
   equipes: string[],
-  granularite: number
+  granularite: number,
+  /** Vue et date du calendrier. Omises, elles sont laissées telles quelles dans l'URL. */
+  vue?: string,
+  date?: string | null
 ): Record<string, string> {
   const query = { ...queryActuelle } as Record<string, string>
+
+  if (vue !== undefined) {
+    if (vue !== VUE_PAR_DEFAUT) query.view = vue
+    else delete query.view
+  }
+
+  if (date !== undefined) {
+    if (date) query.date = date
+    else delete query.date
+  }
 
   if (equipes.length > 0) query.teams = equipes.join(',')
   else delete query.teams

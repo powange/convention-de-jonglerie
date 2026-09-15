@@ -594,6 +594,7 @@ import {
   assignVolunteerTeams,
 } from '~/utils/volunteer-application-api'
 
+import { filtresDepuisUrl, requeteCandidatures } from '../../../utils/filtres-candidatures-url'
 import {
   chaineDeRequete,
   parametresDesCandidatures,
@@ -628,11 +629,38 @@ const applications = ref<any[]>([])
 const applicationsLoading = ref(false)
 const exportingApplications = ref(false)
 const serverPagination = ref({ page: 1, pageSize: 20, total: 0, totalPages: 1 })
-const applicationsFilterStatus = ref<string>('ALL')
-const applicationsFilterTeams = ref<string[]>([])
-const applicationsFilterPresence = ref<string[]>([])
-const applicationsFilterAssignedTeams = ref<string[]>([])
-const globalFilter = ref('')
+// Filtres conservés dans l'URL — même règle que le planning, cf. `filtres-candidatures-url.ts`.
+const route = useRoute()
+const router = useRouter()
+const filtresInitiaux = filtresDepuisUrl(route.query)
+
+const applicationsFilterStatus = ref<string>(filtresInitiaux.statut)
+const applicationsFilterTeams = ref<string[]>(filtresInitiaux.equipesSouhaitees)
+const applicationsFilterPresence = ref<string[]>(filtresInitiaux.presence)
+const applicationsFilterAssignedTeams = ref<string[]>(filtresInitiaux.equipesAssignees)
+const globalFilter = ref(filtresInitiaux.recherche)
+
+// `replace` et non `push` : cocher un filtre n'est pas un pas de navigation à revenir en arrière.
+watch(
+  [
+    applicationsFilterStatus,
+    applicationsFilterTeams,
+    applicationsFilterPresence,
+    applicationsFilterAssignedTeams,
+    globalFilter,
+  ],
+  () => {
+    router.replace({
+      query: requeteCandidatures(route.query, {
+        statut: applicationsFilterStatus.value,
+        equipesSouhaitees: applicationsFilterTeams.value,
+        presence: applicationsFilterPresence.value,
+        equipesAssignees: applicationsFilterAssignedTeams.value,
+        recherche: globalFilter.value,
+      }),
+    })
+  }
+)
 const sorting = ref<{ id: string; desc: boolean }[]>([{ id: 'createdAt', desc: true }])
 const columnVisibility = ref<Record<string, boolean>>({
   id: false,

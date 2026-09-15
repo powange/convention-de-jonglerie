@@ -433,6 +433,7 @@
     "renforts_away": "Ainda não chegaram",
     "renforts_busy": "Em turno",
     "renforts_busy_until": "Em {equipe} até às {heure}",
+    "renforts_description": "Os voluntários volantes, e quem está livre neste momento para dar uma mão.",
     "renforts_expected_at": "Esperado em {equipe} às {heure}",
     "renforts_no_phone": "Sem telefone",
     "renforts_no_team": "sem equipa",
@@ -499,6 +500,10 @@
     "staffing_exact": "Os efetivos correspondem exatamente à necessidade",
     "staffing_missing": "Faltam {count} voluntário(s)",
     "staffing_need": "Efetivos necessários: {count} voluntário(s)",
+    "staffing_period_undefined": "Este período não está definido na edição",
+    "staffing_period_undefined_hint": "Indique as datas de montagem e desmontagem nas definições de voluntários para dimensionar este período.",
+    "staffing_slots_outside_periods": "Alguns turnos ficam fora dos três períodos",
+    "staffing_slots_outside_periods_hint": "{count} turno(s), ou seja {hours}h a preencher, não pertencem à montagem, ao evento nem à desmontagem. Não são contados em nenhum separador.",
     "staffing_surplus": "{count} voluntário(s) além do necessário",
     "status": {
       "accepted": "Aceite",
@@ -619,7 +624,6 @@
     "volunteers_short": "vol.",
     "volunteers_summary": "Resumo de voluntários",
     "what_you_can_bring_title": "O que você pode nos trazer",
-    "withdraw": "Retirar minha inscrição",
-    "renforts_description": "Os voluntários volantes, e quem está livre neste momento para dar uma mão."
+    "withdraw": "Retirar minha inscrição"
   }
 }

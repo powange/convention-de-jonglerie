@@ -110,7 +110,8 @@
           :volunteers-stats-by-day="volunteersStatsByDay"
           :volunteers-stats-individual="volunteersStatsIndividual"
           :volunteers-stats-by-team="volunteersStatsByTeam"
-          :heures-des-organisateurs="heuresDesOrganisateurs"
+          :effectif-des-periodes="effectifDesPeriodes"
+          :periodes-declarees="periodesDeclarees"
           :active-stats-tab="activeStatsTab"
           :format-date="formatDate"
           @volunteer-click="ouvrirCreneauxDuBenevole"
@@ -172,7 +173,7 @@
 import { useDatetime } from '~/composables/useDatetime'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
-import { heuresDesOrganisateurs as heuresOrganisateurs } from '~/utils/besoin-benevoles'
+import { effectifParPeriode, PERIODES } from '~/utils/effectif-par-periode'
 import { detecterSpectaclesManques } from '~/utils/spectacles-manques'
 import {
   calculateVolunteersStats,
@@ -186,6 +187,8 @@ import {
   EditionVolunteerAutoAssignmentPanel as AutoAssignmentPanel,
 } from '#components'
 import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
+
+import { listeTronquee, pagesRestantes } from '../../../../../utils/pagination-complete'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -522,7 +525,10 @@ const canAccess = computed(() => {
 
 // Fonction utilitaire pour formater les dates
 const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
+  // `new Date('2026-09-25')` est lu comme MINUIT UTC, puis rendu dans le fuseau du navigateur :
+  // à l'ouest de Greenwich, l'étiquette affichait la veille. Ces clés sont des dates de calendrier
+  // sans heure — on les ancre donc à minuit LOCAL, comme le fait déjà `formatDateTimeRange`.
+  const date = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`)
   return new Intl.DateTimeFormat('fr-FR', {
     weekday: 'long',
     day: 'numeric',
@@ -827,18 +833,58 @@ const acceptedVolunteers = computed(() => {
 })
 
 // Fonction pour récupérer les bénévoles acceptés
+/** La plus grande page que le point d'API accepte. Au-delà, il la ramène à cette valeur. */
+const TAILLE_DE_PAGE = 100
+
+/**
+ * TOUTES les candidatures acceptées, et non la première page.
+ *
+ * ⚠️ Ce point d'API PAGINE — 20 par défaut. L'appel ne demandait rien : sur une édition de 42
+ * acceptés, la page n'en voyait que 20. Le calculateur d'effectif l'annonçait tel quel, la moyenne
+ * d'heures était calculée sur un effectif tronqué, et les acceptés au-delà du vingtième
+ * disparaissaient du relevé individuel dès lors qu'ils ne tenaient aucun créneau. Rien ne le
+ * signalait.
+ *
+ * ⚠️ Les équipes sont indispensables ici, alors que la page ne les affiche pas : ce sont elles qui
+ * disent qui est bénévole VOLANT. Sans elles, les volants restaient comptés dans l'effectif et
+ * dans la moyenne d'heures, et aucun repère ne les distinguait — le réglage paraissait sans effet.
+ */
 const fetchAcceptedVolunteers = async () => {
-  try {
-    const response: any = await $fetch(`/api/editions/${editionId}/volunteers/applications`, {
-      // ⚠️ Les équipes sont indispensables ici, alors que la page ne les affiche pas : ce sont
-      // elles qui disent qui est bénévole VOLANT. Sans elles, les volants restaient comptés dans
-      // l'effectif et dans la moyenne d'heures, et aucun repère ne les distinguait — le réglage
-      // paraissait sans effet.
-      query: { status: 'ACCEPTED', includeTeams: 'true' },
+  const demanderPage = async (page: number) => {
+    const reponse: any = await $fetch(`/api/editions/${editionId}/volunteers/applications`, {
+      query: {
+        status: 'ACCEPTED',
+        includeTeams: 'true',
+        page,
+        pageSize: TAILLE_DE_PAGE,
+      },
     })
-    // L'API retourne { success: true, data: [...], pagination: {...} }
-    const applications = response.data || response.applications || response
-    volunteers.value = Array.isArray(applications) ? applications : []
+    // L'API rend { success: true, data: [...], pagination: {...} }
+    const liste = reponse?.data ?? reponse?.applications ?? reponse
+    return {
+      candidatures: Array.isArray(liste) ? liste : [],
+      total: Number(reponse?.pagination?.total ?? NaN),
+    }
+  }
+
+  try {
+    const premiere = await demanderPage(1)
+    const toutes = [...premiere.candidatures]
+
+    for (const page of pagesRestantes(premiere.total, TAILLE_DE_PAGE)) {
+      const suivante = await demanderPage(page)
+      toutes.push(...suivante.candidatures)
+    }
+
+    // Se taire sur une liste incomplète, c'est afficher un effectif faux avec aplomb — le
+    // défaut même que ce chargement corrige.
+    if (listeTronquee(toutes.length, premiere.total)) {
+      console.warn(
+        `Candidatures acceptées : ${toutes.length} reçues sur ${premiere.total} annoncées.`
+      )
+    }
+
+    volunteers.value = toutes
   } catch {
     volunteers.value = []
   }
@@ -870,8 +916,54 @@ const volunteersStats = computed(() =>
   calculateVolunteersStats(convertedTimeSlots.value, acceptedVolunteers.value)
 )
 
+/**
+ * Le fuseau de l'édition, qui décide à quelle journée appartient chaque créneau.
+ *
+ * Sans lui, les relevés découpaient les jours en UTC quand le planning les affichait en heure
+ * locale : un créneau de 00h30 était compté la veille. Voir `jour-edition`.
+ */
+const fuseauEdition = computed(() => edition.value?.timezone ?? null)
+
+/**
+ * Les bornes des trois périodes : montage, événement, démontage.
+ *
+ * Le montage et le démontage sont facultatifs. Quand leurs dates manquent, la période n'existe
+ * pas — ce n'est pas la même chose qu'une période sans créneau, et la modale le dit.
+ */
+const bornesDesPeriodes = computed(() => ({
+  startDate: edition.value?.startDate ?? '',
+  endDate: edition.value?.endDate ?? '',
+  setupStartDate: reglagesBenevoles.value?.setupStartDate ?? null,
+  teardownEndDate: reglagesBenevoles.value?.teardownEndDate ?? null,
+}))
+
+const periodesDeclarees = computed(() =>
+  PERIODES.filter((periode) => {
+    if (periode === 'evenement') return true
+    const borne =
+      periode === 'montage'
+        ? bornesDesPeriodes.value.setupStartDate
+        : bornesDesPeriodes.value.teardownEndDate
+    return !!borne
+  })
+)
+
+/** Le dimensionnement de chaque période, pour le calculateur d'effectif. */
+const effectifDesPeriodes = computed(() =>
+  effectifParPeriode(
+    convertedTimeSlots.value,
+    teams.value ?? [],
+    bornesDesPeriodes.value,
+    acceptedVolunteers.value
+  )
+)
+
 const volunteersStatsByDay = computed(() =>
-  calculateVolunteersStatsByDay(convertedTimeSlots.value, acceptedVolunteers.value)
+  calculateVolunteersStatsByDay(
+    convertedTimeSlots.value,
+    acceptedVolunteers.value,
+    fuseauEdition.value
+  )
 )
 
 // Les équipes servent à nommer et colorer les lignes ; le libellé de repli est traduit ici,
@@ -880,17 +972,18 @@ const volunteersStatsByTeam = computed(() =>
   calculateVolunteersStatsByTeam(
     convertedTimeSlots.value,
     teams.value ?? [],
-    t('volunteers.no_team')
+    t('volunteers.no_team'),
+    fuseauEdition.value
   )
 )
 
 const volunteersStatsIndividual = computed(() =>
-  calculateVolunteersStatsIndividual(convertedTimeSlots.value, acceptedVolunteers.value)
+  calculateVolunteersStatsIndividual(
+    convertedTimeSlots.value,
+    acceptedVolunteers.value,
+    fuseauEdition.value
+  )
 )
-
-// Les heures des organisateurs, à part : le calculateur d'effectif les retranche de ce qu'il y a
-// à pourvoir, un organisateur couvrant un poste sans avoir d'heures à faire.
-const heuresDesOrganisateurs = computed(() => heuresOrganisateurs(convertedTimeSlots.value))
 
 // Permissions calculées
 // Charger l'édition si nécessaire

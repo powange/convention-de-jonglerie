@@ -62,6 +62,12 @@ export interface UseVolunteerScheduleOptions {
   timeSlots: Ref<VolunteerTimeSlot[]> | ComputedRef<VolunteerTimeSlot[]>
   readOnly?: boolean | Ref<boolean> | ComputedRef<boolean>
   slotDuration?: number | Ref<number> | ComputedRef<number> // en minutes (15, 30, 60)
+  /** Vue d'ouverture du calendrier — jour ou semaine. Reprise de l'URL. */
+  vueInitiale?: string
+  /** Date d'ouverture, `AAAA-MM-JJ`. Absente, le calendrier s'ouvre au premier jour de l'édition. */
+  dateInitiale?: string | null
+  /** Appelé quand l'utilisateur change de vue ou navigue : sert à tenir l'URL à jour. */
+  onVueChange?: (vue: string, date: string) => void
   onTimeSlotCreate?: (start: string, end: string, resourceId?: string) => void
   onTimeSlotUpdate?: (timeSlot: VolunteerTimeSlot) => void
   onTimeSlotClick?: (timeSlot: VolunteerTimeSlot) => void
@@ -108,6 +114,18 @@ function positionnerInfobulle(infobulle: HTMLElement, evenement: MouseEvent) {
 
   infobulle.style.left = `${Math.max(marge, x)}px`
   infobulle.style.top = `${Math.max(marge, y)}px`
+}
+
+/**
+ * Le jour d'une date, en heure LOCALE, au format `AAAA-MM-JJ`.
+ *
+ * `toISOString()` donnerait la date UTC : sur un calendrier ouvert au 25 à 00h30 en France, l'URL
+ * porterait le 24, et le rechargement n'afficherait pas la même chose. Le même piège que pour le
+ * découpage des statistiques par jour.
+ */
+function jourLocal(date: Date): string {
+  const deuxChiffres = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${deuxChiffres(date.getMonth() + 1)}-${deuxChiffres(date.getDate())}`
 }
 
 export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
@@ -162,6 +180,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     onTimeSlotUpdate,
     onTimeSlotClick,
     onTimeSlotDelete: _onTimeSlotDelete,
+    vueInitiale,
+    dateInitiale,
+    onVueChange,
   } = options
 
   // Computed pour les dates réactives
@@ -339,11 +360,12 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     locales: allLocales.value,
     locale: locale.value,
 
-    // Vue timeline par ressource
-    initialView: 'resourceTimelineWeek',
+    // Vue timeline par ressource. Reprise de l'URL quand elle en porte une : un rechargement,
+    // ou un lien envoyé à quelqu'un, doit rouvrir la vue qu'on regardait.
+    initialView: vueInitiale ?? 'resourceTimelineWeek',
 
-    // Date initiale (premier jour de l'événement)
-    initialDate: startDate.value,
+    // Date initiale : celle de l'URL, sinon le premier jour de l'événement.
+    initialDate: dateInitiale || startDate.value,
 
     // Période visible (limite la navigation)
     validRange: {
@@ -758,6 +780,19 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         }
         callback(slot)
       }
+    },
+
+    /**
+     * Vue ou date changée : FullCalendar appelle ce rappel dans les deux cas, y compris sur les
+     * flèches de navigation. C'est donc le seul point d'où l'URL peut suivre ce qu'on regarde.
+     *
+     * `activeStart` et non `currentStart` : sur la vue semaine, c'est la date réellement affichée
+     * à gauche, celle qu'il faut redonner au calendrier pour retrouver la même image.
+     */
+    datesSet: (info) => {
+      if (!onVueChange) return
+      const jour = info.view.currentStart ?? info.start
+      onVueChange(info.view.type, jourLocal(jour))
     },
 
     // Drag & drop des événements

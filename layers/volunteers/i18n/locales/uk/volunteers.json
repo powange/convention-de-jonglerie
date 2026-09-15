@@ -433,6 +433,7 @@
     "renforts_away": "Ще не прибули",
     "renforts_busy": "На зміні",
     "renforts_busy_until": "У «{equipe}» до {heure}",
+    "renforts_description": "Підмінні волонтери й ті, хто зараз вільний і може допомогти.",
     "renforts_expected_at": "Очікується у «{equipe}» о {heure}",
     "renforts_no_phone": "Немає телефону",
     "renforts_no_team": "без команди",
@@ -499,6 +500,10 @@
     "staffing_exact": "Склад точно відповідає потребі",
     "staffing_missing": "Бракує {count} волонтерів",
     "staffing_need": "Потрібно: {count} волонтерів",
+    "staffing_period_undefined": "Цей період не визначено для випуску",
+    "staffing_period_undefined_hint": "Вкажіть дати монтажу та демонтажу в налаштуваннях волонтерів, щоб розрахувати цей період.",
+    "staffing_slots_outside_periods": "Деякі зміни випадають поза трьома періодами",
+    "staffing_slots_outside_periods_hint": "{count} змін(и), тобто {hours} год до покриття, не належать ні до монтажу, ні до події, ні до демонтажу. Вони не враховані на жодній вкладці.",
     "staffing_surplus": "{count} волонтерів понад потребу",
     "status": {
       "accepted": "Прийнято",
@@ -619,7 +624,6 @@
     "volunteers_short": "вол.",
     "volunteers_summary": "Зведення волонтерів",
     "what_you_can_bring_title": "Що ви можете нам принести",
-    "withdraw": "Відкликати мою заявку",
-    "renforts_description": "Підмінні волонтери й ті, хто зараз вільний і може допомогти."
+    "withdraw": "Відкликати мою заявку"
   }
 }
