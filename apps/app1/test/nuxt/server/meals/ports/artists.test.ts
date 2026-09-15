@@ -65,7 +65,15 @@ describe('port artists du module repas (câblage jonglerie)', () => {
   })
 
   describe('listMealSelections', () => {
-    it('renvoie TOUTES les sélections du repas (sans filtre accepted) avec consumedAt', async () => {
+    /**
+     * Ce test verrouillait l'inverse : « TOUTES les sélections du repas (sans filtre accepted) ».
+     *
+     * Ce comportement s'est révélé être un défaut, signalé depuis l'écran de validation : une
+     * artiste n'ayant que le vendredi soir ressortait dans la recherche du samedi midi, et le
+     * repas lui était validé. Les ORGANISATEURS, eux, étaient déjà filtrés dans ces mêmes points
+     * d'API — c'était cette branche l'anomalie.
+     */
+    it('ne renvoie que les sélections ACCEPTÉES, avec consumedAt', async () => {
       const consumed = new Date('2026-06-16T12:00:00Z')
       prismaMock.artistMealSelection.findMany.mockResolvedValue([
         { id: 1, consumedAt: null, artist: { user: userOf(1) } },
@@ -75,7 +83,9 @@ describe('port artists du module repas (câblage jonglerie)', () => {
       const rows = await createDefaultMealsPorts().artists.listMealSelections(10, 42)
 
       expect(prismaMock.artistMealSelection.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { mealId: 42, artist: { editionId: 10 } } })
+        expect.objectContaining({
+          where: { mealId: 42, accepted: true, artist: { editionId: 10 } },
+        })
       )
       expect(rows).toEqual([
         {
@@ -116,6 +126,22 @@ describe('port artists du module repas (câblage jonglerie)', () => {
       expect(prismaMock.artistMealSelection.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: { id: 5, consumedAt: null } })
       )
+    })
+
+    it('REFUSE de valider une sélection déclinée', async () => {
+      // Le filtre de lecture ne suffit pas : une page restée ouverte peut encore poster cet
+      // identifiant. Sans cette garde, masquer la personne de la liste ne l'empêchait pas d'être
+      // validée — c'est-à-dire que le correctif n'aurait tenu qu'à l'affichage.
+      prismaMock.artistMealSelection.findUnique.mockResolvedValue({
+        artist: { editionId: 10 },
+        mealId: 42,
+        accepted: false,
+      })
+
+      const res = await createDefaultMealsPorts().artists.markConsumed(10, 42, 5, new Date())
+
+      expect(res).toEqual({ ok: false, reason: 'not_found' })
+      expect(prismaMock.artistMealSelection.updateMany).not.toHaveBeenCalled()
     })
 
     it('already quand déjà consommée (updateMany count 0)', async () => {

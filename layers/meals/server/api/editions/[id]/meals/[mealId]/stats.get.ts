@@ -33,6 +33,7 @@ export default wrapApiHandler(
     const volunteerCount = await prisma.volunteerMealSelection.count({
       where: {
         mealId,
+        accepted: true,
         volunteer: {
           eventId: editionId,
           status: 'ACCEPTED',
@@ -43,6 +44,7 @@ export default wrapApiHandler(
     const volunteerValidatedCount = await prisma.volunteerMealSelection.count({
       where: {
         mealId,
+        accepted: true,
         volunteer: {
           eventId: editionId,
           status: 'ACCEPTED',
