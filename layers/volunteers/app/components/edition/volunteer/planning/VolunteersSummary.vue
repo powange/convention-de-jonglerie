@@ -322,9 +322,8 @@
 
     <EditionVolunteerPlanningStaffingCalculatorModal
       v-model="calculateurOuvert"
-      :heures-a-pourvoir="heuresAPourvoir"
-      :heures-des-organisateurs="heuresDesOrganisateurs"
-      :benevoles-acceptes="volunteersStats.totalVolunteers"
+      :effectif="effectifDesPeriodes"
+      :periodes-declarees="periodesDeclarees"
     />
   </UCard>
 </template>
@@ -333,12 +332,15 @@
 // `VolunteerStats` était redéclaré ici, à l'identique de celui d'où viennent les données. La
 // copie a cessé de suivre l'original dès qu'un champ y est apparu, et le composant lisait un
 // type qui ne décrivait plus ce qu'il recevait.
+import type { EffectifParPeriode } from '~/utils/effectif-par-periode'
 import type {
   DayStats,
   VolunteerStats,
   VolunteerStatsIndividual,
   TeamStats,
 } from '~/utils/volunteer-stats'
+
+import type { PeriodeEdition } from '~~/shared/utils/presence-edition'
 
 interface Props {
   canManageVolunteers: boolean
@@ -348,8 +350,10 @@ interface Props {
   volunteersStatsByTeam: TeamStats[]
   activeStatsTab?: string
   formatDate: (date: string) => string
-  /** Heures déjà tenues par des organisateurs : elles se retranchent du besoin en bénévoles. */
-  heuresDesOrganisateurs?: number
+  /** Le dimensionnement de chaque période, calculé par la page. */
+  effectifDesPeriodes: EffectifParPeriode
+  /** Les périodes que l'édition déclare : les autres n'ont pas de bornes. */
+  periodesDeclarees: PeriodeEdition[]
 }
 
 const props = defineProps<Props>()
@@ -365,7 +369,6 @@ const { t } = useI18n()
 const ongletActif = ref(props.activeStatsTab || 'hours-per-volunteer')
 
 const calculateurOuvert = ref(false)
-const heuresDesOrganisateurs = computed(() => props.heuresDesOrganisateurs ?? 0)
 
 /**
  * Tout le monde compte : la carte doit paraître même sur une édition tenue par les seuls

@@ -433,6 +433,7 @@
     "renforts_away": "Ещё не пришли",
     "renforts_busy": "На смене",
     "renforts_busy_until": "В «{equipe}» до {heure}",
+    "renforts_description": "Подменные волонтёры и те, кто сейчас свободен и может помочь.",
     "renforts_expected_at": "Ожидается в «{equipe}» в {heure}",
     "renforts_no_phone": "Нет телефона",
     "renforts_no_team": "без команды",
@@ -499,6 +500,10 @@
     "staffing_exact": "Состав точно соответствует потребности",
     "staffing_missing": "Не хватает {count} волонтёров",
     "staffing_need": "Требуется: {count} волонтёров",
+    "staffing_period_undefined": "Этот период не задан для выпуска",
+    "staffing_period_undefined_hint": "Укажите даты монтажа и демонтажа в настройках волонтёров, чтобы рассчитать этот период.",
+    "staffing_slots_outside_periods": "Некоторые смены выходят за пределы трёх периодов",
+    "staffing_slots_outside_periods_hint": "{count} смен(ы), то есть {hours} ч к покрытию, не относятся ни к монтажу, ни к событию, ни к демонтажу. Они не учитываются ни на одной вкладке.",
     "staffing_surplus": "{count} волонтёров сверх необходимого",
     "status": {
       "accepted": "Принято",
@@ -619,7 +624,6 @@
     "volunteers_short": "вол.",
     "volunteers_summary": "Сводка волонтёров",
     "what_you_can_bring_title": "Что вы можете нам принести",
-    "withdraw": "Отозвать мою заявку",
-    "renforts_description": "Подменные волонтёры и те, кто сейчас свободен и может помочь."
+    "withdraw": "Отозвать мою заявку"
   }
 }

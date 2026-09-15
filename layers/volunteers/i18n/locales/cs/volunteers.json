@@ -433,6 +433,7 @@
     "renforts_away": "Zatím nedorazili",
     "renforts_busy": "Na směně",
     "renforts_busy_until": "V {equipe} do {heure}",
+    "renforts_description": "Záskokoví dobrovolníci a ti, kdo jsou právě volní a mohou přiložit ruku k dílu.",
     "renforts_expected_at": "Očekáván v {equipe} v {heure}",
     "renforts_no_phone": "Bez telefonu",
     "renforts_no_team": "bez týmu",
@@ -499,6 +500,10 @@
     "staffing_exact": "Počet přesně odpovídá potřebě",
     "staffing_missing": "Chybí {count} dobrovolníků",
     "staffing_need": "Potřebný počet: {count} dobrovolníků",
+    "staffing_period_undefined": "Toto období není pro ročník definováno",
+    "staffing_period_undefined_hint": "Zadejte data stavby a bourání v nastavení dobrovolníků, abyste toto období mohli nadimenzovat.",
+    "staffing_slots_outside_periods": "Některé směny spadají mimo tři období",
+    "staffing_slots_outside_periods_hint": "{count} směn(y), tedy {hours}h k pokrytí, nepatří ani ke stavbě, ani k akci, ani k bourání. Nejsou započítány v žádné záložce.",
     "staffing_surplus": "{count} dobrovolníků nad rámec potřeby",
     "status": {
       "accepted": "Přijato",
@@ -619,7 +624,6 @@
     "volunteers_short": "dobrovolná práce.",
     "volunteers_summary": "Shrnutí dobrovolníků",
     "what_you_can_bring_title": "Co pro nás můžete udělat",
-    "withdraw": "Stáhnout svou žádost",
-    "renforts_description": "Záskokoví dobrovolníci a ti, kdo jsou právě volní a mohou přiložit ruku k dílu."
+    "withdraw": "Stáhnout svou žádost"
   }
 }

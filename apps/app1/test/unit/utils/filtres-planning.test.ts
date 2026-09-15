@@ -1,11 +1,14 @@
 import { describe, it, expect } from 'vitest'
 
 import {
+  VUE_PAR_DEFAUT,
   creneauxDesEquipes,
+  dateDepuisUrl,
   equipesConnues,
   equipesDepuisUrl,
   granulariteDepuisUrl,
   requeteFiltres,
+  vueDepuisUrl,
 } from '../../../../../layers/volunteers/app/utils/filtres-planning'
 
 /**
@@ -126,5 +129,64 @@ describe('creneauxDesEquipes', () => {
 
   it('rend une liste vide quand aucune équipe retenue n’a de créneau', () => {
     expect(creneauxDesEquipes([creneau('a', 'bar')], ['cuisine'])).toEqual([])
+  })
+})
+
+/**
+ * La vue et la date du calendrier, elles aussi dans l'URL.
+ *
+ * Sans elles, passer en vue « jour » puis naviguer jusqu'au vendredi était perdu au moindre
+ * rechargement — et impossible à transmettre à quelqu'un d'autre, alors que c'est justement la
+ * vue qu'on veut montrer.
+ */
+describe('vue et date du calendrier', () => {
+  it('reprend une vue connue', () => {
+    expect(vueDepuisUrl('resourceTimelineDay')).toBe('resourceTimelineDay')
+  })
+
+  it('retombe sur la semaine devant une vue inventée', () => {
+    // Une vue inconnue ferait planter FullCalendar au démarrage, sans rien expliquer.
+    expect(vueDepuisUrl('resourceTimelineCentury')).toBe(VUE_PAR_DEFAUT)
+    expect(vueDepuisUrl(undefined)).toBe(VUE_PAR_DEFAUT)
+  })
+
+  it('reprend une date bien formée', () => {
+    expect(dateDepuisUrl('2026-09-25')).toBe('2026-09-25')
+  })
+
+  it('ignore une date illisible plutôt que d’ouvrir un planning vide', () => {
+    // `new Date('vendredi')` rend une date invalide, et le calendrier s'affichait vide sans rien
+    // dire. Sans date exploitable, on repart du premier jour de l'édition.
+    expect(dateDepuisUrl('vendredi')).toBeNull()
+    expect(dateDepuisUrl('2026-13-45')).toBeNull()
+    expect(dateDepuisUrl(undefined)).toBeNull()
+  })
+
+  it('écrit la vue et la date dans la query', () => {
+    expect(requeteFiltres({}, [], 30, 'resourceTimelineDay', '2026-09-25')).toEqual({
+      view: 'resourceTimelineDay',
+      date: '2026-09-25',
+    })
+  })
+
+  it('n’écrit pas la vue par défaut', () => {
+    // Même règle que pour les équipes et la granularité : l'URL ne porte que ce qui s'écarte de
+    // l'état d'arrivée, sans quoi elle devient illisible.
+    expect(requeteFiltres({}, [], 30, VUE_PAR_DEFAUT, null)).toEqual({})
+  })
+
+  it('retire une vue devenue le défaut', () => {
+    expect(requeteFiltres({ view: 'resourceTimelineDay' }, [], 30, VUE_PAR_DEFAUT, null)).toEqual(
+      {}
+    )
+  })
+
+  it('laisse la vue intacte quand on ne la précise pas', () => {
+    // Un changement de filtre d'équipe ne doit pas effacer la vue qu'on regardait.
+    expect(requeteFiltres({ view: 'resourceTimelineDay', date: '2026-09-25' }, ['a'], 30)).toEqual({
+      view: 'resourceTimelineDay',
+      date: '2026-09-25',
+      teams: 'a',
+    })
   })
 })

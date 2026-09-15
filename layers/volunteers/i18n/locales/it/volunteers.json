@@ -433,6 +433,7 @@
     "renforts_away": "Non ancora arrivati",
     "renforts_busy": "In turno",
     "renforts_busy_until": "In {equipe} fino alle {heure}",
+    "renforts_description": "I volontari jolly, e chi è libero in questo momento per dare una mano.",
     "renforts_expected_at": "Atteso in {equipe} alle {heure}",
     "renforts_no_phone": "Nessun telefono",
     "renforts_no_team": "senza squadra",
@@ -499,6 +500,10 @@
     "staffing_exact": "L'organico corrisponde esattamente al fabbisogno",
     "staffing_missing": "Mancano {count} volontari",
     "staffing_need": "Organico necessario: {count} volontari",
+    "staffing_period_undefined": "Questo periodo non è definito per l’edizione",
+    "staffing_period_undefined_hint": "Indica le date di montaggio e smontaggio nelle impostazioni dei volontari per dimensionare questo periodo.",
+    "staffing_slots_outside_periods": "Alcuni turni cadono fuori dai tre periodi",
+    "staffing_slots_outside_periods_hint": "{count} turno/i, ovvero {hours}h da coprire, non rientrano né nel montaggio, né nell’evento, né nello smontaggio. Non sono conteggiati in nessuna scheda.",
     "staffing_surplus": "{count} volontari oltre il necessario",
     "status": {
       "accepted": "Accettato",
@@ -619,7 +624,6 @@
     "volunteers_short": "vol.",
     "volunteers_summary": "Riepilogo volontari",
     "what_you_can_bring_title": "Cosa può portarci",
-    "withdraw": "Ritira la mia candidatura",
-    "renforts_description": "I volontari jolly, e chi è libero in questo momento per dare una mano."
+    "withdraw": "Ritira la mia candidatura"
   }
 }

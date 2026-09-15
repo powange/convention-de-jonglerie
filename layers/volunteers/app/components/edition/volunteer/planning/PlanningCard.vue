@@ -98,10 +98,12 @@ import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 
 import {
   creneauxDesEquipes,
+  dateDepuisUrl,
   equipesConnues,
   equipesDepuisUrl,
   granulariteDepuisUrl,
   requeteFiltres,
+  vueDepuisUrl,
 } from '../../../../utils/filtres-planning'
 
 interface Props {
@@ -167,6 +169,12 @@ const router = useRouter()
 
 const selectedTeams = ref<string[]>(equipesDepuisUrl(route.query.teams))
 const selectedGranularity = ref(granulariteDepuisUrl(route.query.granularity))
+// La vue et la date ne sont lues qu'au montage : ensuite c'est le calendrier qui les dicte, via
+// `onVueChange`. Les rendre réactives les ferait se battre avec lui à chaque navigation.
+const vueInitiale = vueDepuisUrl(route.query.view)
+const dateInitiale = dateDepuisUrl(route.query.date)
+const vueCourante = ref(vueInitiale)
+const dateCourante = ref<string | null>(dateInitiale)
 const exportingPdf = ref(false)
 
 /**
@@ -181,9 +189,15 @@ watch(internalTeams, (equipes) => {
 })
 
 // `replace` et non `push` : un clic de filtre n'est pas un pas de navigation à revenir en arrière.
-watch([selectedTeams, selectedGranularity], () => {
+watch([selectedTeams, selectedGranularity, vueCourante, dateCourante], () => {
   router.replace({
-    query: requeteFiltres(route.query, selectedTeams.value, selectedGranularity.value),
+    query: requeteFiltres(
+      route.query,
+      selectedTeams.value,
+      selectedGranularity.value,
+      vueCourante.value,
+      dateCourante.value
+    ),
   })
 })
 
@@ -340,6 +354,9 @@ const editionStartDate = computed(() => {
   return (props.edition?.startDate || new Date().toISOString().split('T')[0]) as string
 })
 
+/** Le jour où le calendrier s'ouvre de lui-même : le premier de l'édition. */
+const jourDeDepart = computed(() => String(editionStartDate.value).slice(0, 10))
+
 const editionEndDate = computed(() => {
   let endDate: string
   if (props.edition?.volunteersTeardownEndDate) {
@@ -362,6 +379,15 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   timeSlots: filteredTimeSlots,
   readOnly: computed(() => !props.canManageVolunteers),
   slotDuration: computed(() => selectedGranularity.value),
+  vueInitiale,
+  dateInitiale,
+  onVueChange: (vue: string, date: string) => {
+    vueCourante.value = vue
+    // FullCalendar signale aussi la date au MONTAGE : sans cette comparaison, ouvrir la page
+    // suffisait à lui coller un `?date=` qu'on n'avait pas demandé. L'URL ne porte que ce qui
+    // s'écarte de l'état d'arrivée — c'est la règle du fichier de filtres.
+    dateCourante.value = date === jourDeDepart.value ? null : date
+  },
   onTimeSlotCreate: (start, end, resourceId) => {
     emit('create-slot', {
       start,

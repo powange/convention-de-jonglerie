@@ -7,6 +7,8 @@
  * venu renforcer une équipe doit au contraire y apparaître sous CETTE équipe.
  */
 
+import { jourDeLEdition } from './jour-edition'
+
 import {
   benevolesDesComptes,
   estEquipeHorsCharge,
@@ -156,7 +158,7 @@ export interface AcceptedVolunteer {
  * appel qui n'a pas demandé les équipes — donne une liste vide, donc personne n'est dispensé.
  * C'est le bon défaut : mieux vaut compter un volant que dispenser tout le monde.
  */
-function equipesDe(candidature: AcceptedVolunteer): { isFloatingTeam?: boolean | null }[] {
+export function equipesDe(candidature: AcceptedVolunteer): { isFloatingTeam?: boolean | null }[] {
   const assignations = (candidature as { teamAssignments?: { team?: unknown }[] }).teamAssignments
   if (!Array.isArray(assignations)) return []
   return assignations
@@ -226,7 +228,14 @@ export function calculateVolunteersStatsByDay(
    * Facultatif : cette fonction ne partait que des créneaux, et l'omettre laisse le comportement
    * d'avant — les repères manquent, mais les heures restent justes.
    */
-  acceptedVolunteers: AcceptedVolunteer[] = []
+  acceptedVolunteers: AcceptedVolunteer[] = [],
+  /**
+   * Fuseau de l'édition, pour rattacher chaque créneau à la journée vécue SUR PLACE.
+   *
+   * Sans lui, le découpage retombe sur le fuseau de la machine — celui qu'emploie aussi le
+   * calendrier par défaut, donc les deux affichages restent d'accord. Voir `jour-edition`.
+   */
+  fuseau?: string | null
 ): DayStats[] {
   const dayStats = new Map<string, any>()
   const volants = new Set(
@@ -249,7 +258,7 @@ export function calculateVolunteersStatsByDay(
     const startTime = new Date(slot.start)
     const endTime = new Date(slot.end)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-    const dayKey = startTime.toISOString().split('T')[0] ?? '' // YYYY-MM-DD
+    const dayKey = jourDeLEdition(startTime, fuseau)
 
     // Un seul chemin plutôt que has/set/get : la valeur manquante est créée sur place, et
     // l'on ne relit plus une entrée dont rien ne garantissait la présence.
@@ -305,7 +314,14 @@ export function calculateVolunteersStatsByDay(
  */
 export function calculateVolunteersStatsIndividual(
   timeSlots: TimeSlotWithAssignments[],
-  acceptedVolunteers: AcceptedVolunteer[]
+  acceptedVolunteers: AcceptedVolunteer[],
+  /**
+   * Fuseau de l'édition, pour rattacher chaque créneau à la journée vécue SUR PLACE.
+   *
+   * Sans lui, le découpage retombe sur le fuseau de la machine — celui qu'emploie aussi le
+   * calendrier par défaut, donc les deux affichages restent d'accord. Voir `jour-edition`.
+   */
+  fuseau?: string | null
 ): VolunteerStatsIndividual[] {
   const volunteerStats = new Map<number, any>()
 
@@ -330,7 +346,7 @@ export function calculateVolunteersStatsIndividual(
     const startTime = new Date(slot.start)
     const endTime = new Date(slot.end)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
-    const dayKey = startTime.toISOString().split('T')[0] // YYYY-MM-DD
+    const dayKey = jourDeLEdition(startTime, fuseau)
 
     personnes.forEach((personne) => {
       const userId = personne.user.id
@@ -458,7 +474,14 @@ export function calculateVolunteersStatsByTeam(
     isFloatingTeam?: boolean
     isAutonomousTeam?: boolean
   }> = [],
-  libelleSansEquipe = 'Sans équipe'
+  libelleSansEquipe = 'Sans équipe',
+  /**
+   * Fuseau de l'édition, pour rattacher chaque créneau à la journée vécue SUR PLACE.
+   *
+   * Sans lui, le découpage retombe sur le fuseau de la machine — celui qu'emploie aussi le
+   * calendrier par défaut, donc les deux affichages restent d'accord. Voir `jour-edition`.
+   */
+  fuseau?: string | null
 ): TeamStats[] {
   const parEquipe = new Map<string, any>()
   const nomDe = new Map(teams.map((equipe) => [equipe.id, equipe]))
@@ -485,7 +508,7 @@ export function calculateVolunteersStatsByTeam(
     const dureeCreneau = (fin.getTime() - debut.getTime()) / (1000 * 60 * 60)
     if (!Number.isFinite(dureeCreneau) || dureeCreneau <= 0) return
 
-    const jour = debut.toISOString().split('T')[0] as string
+    const jour = jourDeLEdition(debut, fuseau)
     const cle = (slot.teamId as string | null) ?? '__sans_equipe__'
 
     if (!parEquipe.has(cle)) {

@@ -433,6 +433,7 @@
     "renforts_away": "Ikke ankommet endnu",
     "renforts_busy": "På vagt",
     "renforts_busy_until": "På {equipe} indtil {heure}",
+    "renforts_description": "De flyvende frivillige, og hvem der er ledig lige nu til at give en hånd.",
     "renforts_expected_at": "Ventes på {equipe} kl. {heure}",
     "renforts_no_phone": "Intet telefonnummer",
     "renforts_no_team": "uden hold",
@@ -499,6 +500,10 @@
     "staffing_exact": "Bemandingen svarer nøjagtigt til behovet",
     "staffing_missing": "Der mangler {count} frivillige",
     "staffing_need": "Nødvendig bemanding: {count} frivillige",
+    "staffing_period_undefined": "Denne periode er ikke defineret for udgaven",
+    "staffing_period_undefined_hint": "Angiv op- og nedtagningsdatoer i frivilligindstillingerne for at dimensionere denne periode.",
+    "staffing_slots_outside_periods": "Nogle vagter falder uden for de tre perioder",
+    "staffing_slots_outside_periods_hint": "{count} vagt(er), altså {hours}t at dække, hører hverken til opsætning, event eller nedtagning. De tælles ikke med i nogen fane.",
     "staffing_surplus": "{count} frivillige ud over det nødvendige",
     "status": {
       "accepted": "Accepteret",
@@ -619,7 +624,6 @@
     "volunteers_short": "friv.",
     "volunteers_summary": "Frivilligt resumé",
     "what_you_can_bring_title": "Hvad du kan bringe os",
-    "withdraw": "Træk min ansøgning tilbage",
-    "renforts_description": "De flyvende frivillige, og hvem der er ledig lige nu til at give en hånd."
+    "withdraw": "Træk min ansøgning tilbage"
   }
 }

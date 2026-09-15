@@ -433,6 +433,7 @@
     "renforts_away": "Noch nicht da",
     "renforts_busy": "Im Einsatz",
     "renforts_busy_until": "Bei {equipe} bis {heure}",
+    "renforts_description": "Die fliegenden Helfer, und wer gerade frei ist, um mit anzupacken.",
     "renforts_expected_at": "Erwartet bei {equipe} um {heure}",
     "renforts_no_phone": "Keine Telefonnummer",
     "renforts_no_team": "ohne Team",
@@ -499,6 +500,10 @@
     "staffing_exact": "Der Personalbestand entspricht genau dem Bedarf",
     "staffing_missing": "Es fehlen {count} Freiwillige",
     "staffing_need": "Benötigt: {count} Freiwillige",
+    "staffing_period_undefined": "Dieser Zeitraum ist für die Ausgabe nicht definiert",
+    "staffing_period_undefined_hint": "Tragen Sie Auf- und Abbaudaten in den Helfereinstellungen ein, um diesen Zeitraum zu bemessen.",
+    "staffing_slots_outside_periods": "Einige Schichten fallen außerhalb der drei Zeiträume",
+    "staffing_slots_outside_periods_hint": "{count} Schicht(en), also {hours}h zu besetzen, gehören weder zum Aufbau noch zur Veranstaltung noch zum Abbau. Sie werden in keinem Reiter gezählt.",
     "staffing_surplus": "{count} Freiwillige über dem Bedarf",
     "status": {
       "accepted": "Angenommen",
@@ -619,7 +624,6 @@
     "volunteers_short": "Freiw.",
     "volunteers_summary": "Freiwilligen-Zusammenfassung",
     "what_you_can_bring_title": "Was Sie uns bringen können",
-    "withdraw": "Meine Bewerbung zurückziehen",
-    "renforts_description": "Die fliegenden Helfer, und wer gerade frei ist, um mit anzupacken."
+    "withdraw": "Meine Bewerbung zurückziehen"
   }
 }

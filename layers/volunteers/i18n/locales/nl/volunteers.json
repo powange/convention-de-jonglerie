@@ -433,6 +433,7 @@
     "renforts_away": "Nog niet aangekomen",
     "renforts_busy": "In dienst",
     "renforts_busy_until": "Bij {equipe} tot {heure}",
+    "renforts_description": "De vliegende vrijwilligers, en wie er nu vrij is om bij te springen.",
     "renforts_expected_at": "Verwacht bij {equipe} om {heure}",
     "renforts_no_phone": "Geen telefoonnummer",
     "renforts_no_team": "zonder team",
@@ -499,6 +500,10 @@
     "staffing_exact": "De bezetting komt precies overeen met de behoefte",
     "staffing_missing": "Er ontbreken {count} vrijwilliger(s)",
     "staffing_need": "Benodigde bezetting: {count} vrijwilliger(s)",
+    "staffing_period_undefined": "Deze periode is niet ingesteld voor de editie",
+    "staffing_period_undefined_hint": "Vul de op- en afbouwdata in bij de vrijwilligersinstellingen om deze periode te bepalen.",
+    "staffing_slots_outside_periods": "Sommige diensten vallen buiten de drie periodes",
+    "staffing_slots_outside_periods_hint": "{count} dienst(en), oftewel {hours}u te vullen, horen niet bij opbouw, evenement of afbouw. Ze tellen in geen enkel tabblad mee.",
     "staffing_surplus": "{count} vrijwilliger(s) meer dan nodig",
     "status": {
       "accepted": "Geaccepteerd",
@@ -619,7 +624,6 @@
     "volunteers_short": "vrijw.",
     "volunteers_summary": "Vrijwilligers samenvatting",
     "what_you_can_bring_title": "Wat u ons kunt brengen",
-    "withdraw": "Trek mijn aanmelding in",
-    "renforts_description": "De vliegende vrijwilligers, en wie er nu vrij is om bij te springen."
+    "withdraw": "Trek mijn aanmelding in"
   }
 }

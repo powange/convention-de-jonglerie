@@ -433,6 +433,7 @@
     "renforts_away": "Har inte kommit än",
     "renforts_busy": "På pass",
     "renforts_busy_until": "På {equipe} till {heure}",
+    "renforts_description": "De flygande volontärerna, och vem som är ledig just nu för att hjälpa till.",
     "renforts_expected_at": "Väntas på {equipe} kl. {heure}",
     "renforts_no_phone": "Inget telefonnummer",
     "renforts_no_team": "utan lag",
@@ -499,6 +500,10 @@
     "staffing_exact": "Bemanningen motsvarar behovet exakt",
     "staffing_missing": "Det saknas {count} volontärer",
     "staffing_need": "Bemanning som behövs: {count} volontärer",
+    "staffing_period_undefined": "Denna period är inte definierad för upplagan",
+    "staffing_period_undefined_hint": "Ange datum för montering och nedmontering i volontärinställningarna för att dimensionera denna period.",
+    "staffing_slots_outside_periods": "Vissa pass hamnar utanför de tre perioderna",
+    "staffing_slots_outside_periods_hint": "{count} pass, alltså {hours}h att fylla, hör varken till montering, evenemang eller nedmontering. De räknas inte i någon flik.",
     "staffing_surplus": "{count} volontärer utöver behovet",
     "status": {
       "accepted": "Accepterad",
@@ -619,7 +624,6 @@
     "volunteers_short": "frivilligt arbete.",
     "volunteers_summary": "Sammanfattning av volontärerna",
     "what_you_can_bring_title": "Vad du kan göra för oss",
-    "withdraw": "Återkalla min ansökan",
-    "renforts_description": "De flygande volontärerna, och vem som är ledig just nu för att hjälpa till."
+    "withdraw": "Återkalla min ansökan"
   }
 }
