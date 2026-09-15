@@ -90,7 +90,7 @@ const setQuantity = (handoutItemId: number, quantity: number) => {
       :placeholder="$t('gestion.ticketing.select_handout_items_placeholder')"
       class="w-full"
     >
-      <template #label>
+      <template #default>
         <span v-if="selectedIds.length === 0">
           {{ $t('gestion.ticketing.no_items_selected') }}
         </span>

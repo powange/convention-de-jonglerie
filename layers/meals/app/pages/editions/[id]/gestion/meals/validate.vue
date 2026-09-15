@@ -62,7 +62,7 @@
                 base: 'text-base sm:text-lg',
               }"
             >
-              <template #label>
+              <template #default>
                 <span v-if="selectedMeal" class="text-base sm:text-lg font-medium">
                   {{ formatMealLabel(selectedMeal) }}
                 </span>

@@ -91,7 +91,7 @@
             :placeholder="$t('gestion.shows.select_artists')"
             class="w-full"
           >
-            <template #label>
+            <template #default>
               <span v-if="act.artistIds.length === 0">
                 {{ $t('gestion.shows.no_artists_selected') }}
               </span>

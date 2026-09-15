@@ -320,7 +320,7 @@
                       option-attribute="label"
                       @change="handleCountryChange"
                     >
-                      <template #label>
+                      <template #default>
                         <div v-if="selectedCountry" class="flex items-center gap-2">
                           <UIcon :name="selectedCountry.icon" class="w-4 h-4" />
                           <span>{{ selectedCountry.label }}</span>

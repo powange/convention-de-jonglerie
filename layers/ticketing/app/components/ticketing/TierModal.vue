@@ -238,7 +238,7 @@
             :placeholder="$t('ticketing.tiers.modal.meals_placeholder')"
             class="w-full"
           >
-            <template #label>
+            <template #default>
               <span v-if="form.mealIds.length === 0">{{
                 $t('ticketing.tiers.modal.no_meal_selected')
               }}</span>

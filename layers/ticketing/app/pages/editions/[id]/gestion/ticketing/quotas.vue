@@ -323,7 +323,7 @@
               :placeholder="$t('ticketing.tiers.modal.quotas_placeholder')"
               class="w-full"
             >
-              <template #label>
+              <template #default>
                 <span v-if="quotasSelectionnes.length === 0">
                   {{ $t('ticketing.tiers.modal.no_quota_selected') }}
                 </span>
