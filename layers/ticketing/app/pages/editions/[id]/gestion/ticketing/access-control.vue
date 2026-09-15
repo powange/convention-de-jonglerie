@@ -323,8 +323,13 @@
           />
         </div>
 
-        <!-- Statistiques des quotas (uniquement si des tarifs sont configurés) -->
-        <TicketingStatsQuotaStatsCard v-if="hasTiers" :edition-id="editionId" />
+        <!-- Statistiques des quotas.
+
+             Sans garde sur les tarifs : un quota peut ne viser que des bénévoles, des artistes
+             ou des organisateurs, et une édition sans billetterie payante avait donc des jauges
+             qu'elle ne voyait jamais. La carte se masque déjà d'elle-même quand il n'y a aucune
+             statistique à montrer, ce qui est la seule condition juste. -->
+        <TicketingStatsQuotaStatsCard :edition-id="editionId" />
 
         <!-- Dernières validations -->
         <UCard>

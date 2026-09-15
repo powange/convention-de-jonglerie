@@ -129,7 +129,7 @@
             placeholder="Sélectionner les tarifs..."
             class="w-full"
           >
-            <template #label>
+            <template #default>
               <span v-if="form.tierIds.length === 0">Tous les tarifs</span>
               <span v-else>{{ form.tierIds.length }} tarif(s) sélectionné(s)</span>
             </template>
@@ -151,7 +151,7 @@
             placeholder="Sélectionner les repas..."
             class="w-full"
           >
-            <template #label>
+            <template #default>
               <span v-if="form.mealIds.length === 0">Aucun repas sélectionné</span>
               <span v-else>{{ form.mealIds.length }} repas sélectionné(s)</span>
             </template>

@@ -1,9 +1,20 @@
 <template>
-  <UCard v-if="!pending && quotaStats.length > 0">
+  <!-- Pas de `!pending` ici : `refresh()` le repasse à vrai, et la carte se démontait donc à
+       chaque événement temps réel — un clignotement au moment précis où l'on scanne à l'entrée.
+       `useFetch` conserve `data` pendant un rafraîchissement : la seule condition d'affichage
+       utile est donc d'avoir quelque chose à montrer, ce qui masque aussi le premier
+       chargement. -->
+  <UCard v-if="quotaStats.length > 0">
     <div class="space-y-4">
       <div class="flex items-center gap-2">
         <UIcon name="i-heroicons-chart-bar-square" class="text-indigo-500" />
         <h2 class="text-lg font-semibold">{{ $t('ticketing.quotas.stats.title') }}</h2>
+        <!-- Le rafraîchissement reste perceptible, mais ne coûte plus la carte. -->
+        <UIcon
+          v-if="pending"
+          name="i-heroicons-arrow-path"
+          class="h-4 w-4 text-gray-400 animate-spin"
+        />
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
