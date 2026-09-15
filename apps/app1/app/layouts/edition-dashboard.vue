@@ -341,6 +341,16 @@ const isVolunteersModeInternal = computed(() => volunteersMode.value === 'INTERN
 /** Les échanges de créneaux peuvent être fermés par l'organisateur ; ouverts par défaut. */
 const echangesOuverts = computed(() => (edition.value as any)?.volunteersSwapsEnabled !== false)
 
+/**
+ * Y a-t-il des bénévoles volants à proposer en renfort ?
+ *
+ * La page des renforts ne liste que ceux-là. Sans équipe volante elle est vide par construction,
+ * et y mener envoie chercher une fonctionnalité qu'on n'a pas mise en place.
+ */
+const aDesEquipesVolantes = computed(
+  () => (edition.value as any)?.volunteersHasFloatingTeam === true
+)
+
 // Charger les données au montage
 onMounted(async () => {
   // Recharger l'édition complète si elle est absente OU si la version en cache est
@@ -552,24 +562,28 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     }
 
     if ((canManageVolunteers.value || isTeamLeader.value) && isVolunteersModeInternal.value) {
-      volunteersChildren.push(
-        {
-          label: t('edition.volunteers.volunteer_notifications'),
-          icon: 'i-heroicons-bell',
-          to: `/editions/${editionId.value}/gestion/volunteers/notifications`,
-        },
-        {
-          // Ouverte aux responsables d'équipe autant qu'aux gestionnaires : c'est le responsable
-          // débordé qui cherche du renfort, et l'envoyer demander ailleurs ferait perdre les
-          // minutes que cet écran existe pour gagner.
-          //
-          // Pas de pastille : le nombre de volants disponibles change à chaque minute et n'attend
-          // aucune décision. Elle serait allumée en permanence et ne voudrait plus rien dire.
+      volunteersChildren.push({
+        label: t('edition.volunteers.volunteer_notifications'),
+        icon: 'i-heroicons-bell',
+        to: `/editions/${editionId.value}/gestion/volunteers/notifications`,
+      })
+
+      // Ouverte aux responsables d'équipe autant qu'aux gestionnaires : c'est le responsable
+      // débordé qui cherche du renfort, et l'envoyer demander ailleurs ferait perdre les minutes
+      // que cet écran existe pour gagner.
+      //
+      // Conditionnée à l'existence d'une équipe volante : sans elle, la page est vide et n'a pas
+      // lieu d'être. La même condition porte la carte de l'accueil de la gestion.
+      //
+      // Pas de pastille : le nombre de volants disponibles change à chaque minute et n'attend
+      // aucune décision. Elle serait allumée en permanence et ne voudrait plus rien dire.
+      if (aDesEquipesVolantes.value) {
+        volunteersChildren.push({
           label: t('volunteers.renforts_title'),
           icon: 'i-heroicons-bolt',
           to: `/editions/${editionId.value}/gestion/volunteers/renforts`,
-        }
-      )
+        })
+      }
     }
 
     if (volunteersChildren.length > 0) {

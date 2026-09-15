@@ -257,7 +257,10 @@ describe('/api/editions/[id] GET', () => {
         event: {
           select: {
             _count: {
-              select: { volunteerApplications: true },
+              select: {
+                volunteerApplications: true,
+                volunteerTeams: { where: { isFloatingTeam: true } },
+              },
             },
             volunteerSettings: true,
           },
@@ -281,6 +284,41 @@ describe('/api/editions/[id] GET', () => {
           },
         },
       }),
+    })
+  })
+
+  /**
+   * Le lien vers la page des renforts n'a de sens que s'il existe une équipe VOLANTE : la page ne
+   * liste que ces bénévoles-là, et sans équipe volante elle est vide par construction.
+   *
+   * Le compte est filtré côté base plutôt que déduit d'une liste d'équipes rapatriée : l'écran
+   * n'a besoin que d'une réponse fermée.
+   */
+  describe('équipes volantes', () => {
+    const editionAvec = (nombreDEquipesVolantes: number) => ({
+      ...mockEdition,
+      event: {
+        _count: { volunteerApplications: 0, volunteerTeams: nombreDEquipesVolantes },
+        volunteerSettings: null,
+      },
+    })
+
+    it('annonce une équipe volante quand il y en a au moins une', async () => {
+      global.getRouterParam.mockReturnValue('1')
+      prismaMock.edition.findUnique.mockResolvedValue(editionAvec(1))
+
+      const result: any = await handler({ context: { params: { id: '1' } } } as any)
+
+      expect(result.volunteersHasFloatingTeam).toBe(true)
+    })
+
+    it('n’en annonce aucune quand il n’y en a pas', async () => {
+      global.getRouterParam.mockReturnValue('1')
+      prismaMock.edition.findUnique.mockResolvedValue(editionAvec(0))
+
+      const result: any = await handler({ context: { params: { id: '1' } } } as any)
+
+      expect(result.volunteersHasFloatingTeam).toBe(false)
     })
   })
 })

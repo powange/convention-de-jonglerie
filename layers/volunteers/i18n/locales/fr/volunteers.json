@@ -442,6 +442,7 @@
     "renforts_state_disponible": "Disponible",
     "renforts_state_occupe": "Sur un créneau",
     "renforts_title": "Renforts disponibles",
+    "renforts_description": "Les bénévoles volants, et qui est libre en ce moment pour prêter main-forte.",
     "required_team": "Rendre obligatoire",
     "required_team_hint": "Les bénévoles devront obligatoirement sélectionner cette équipe",
     "restricted_access": "Accès restreint",

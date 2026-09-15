@@ -334,6 +334,23 @@
                 :description="$t('gestion.volunteers.notifications_description')"
                 color="yellow"
               />
+
+              <!-- Renforts disponibles : ouverte aux responsables d'équipe autant qu'aux
+                   gestionnaires, c'est le responsable débordé qui cherche du renfort.
+
+                   Conditionnée à l'existence d'une équipe VOLANTE : la page ne liste que les
+                   bénévoles volants, donc sans elle elle est vide par construction. Le lien du
+                   panneau latéral porte exactement la même condition. -->
+              <ManagementNavigationCard
+                v-if="
+                  (canManageVolunteers || isTeamLeaderValue) && edition.volunteersHasFloatingTeam
+                "
+                :to="`/editions/${edition.id}/gestion/volunteers/renforts`"
+                icon="i-heroicons-bolt"
+                :title="$t('volunteers.renforts_title')"
+                :description="$t('volunteers.renforts_description')"
+                color="green"
+              />
             </template>
           </div>
         </ManagementCategorySection>
