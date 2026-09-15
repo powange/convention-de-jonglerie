@@ -9,6 +9,8 @@
 
 import { jourDeLEdition } from './jour-edition'
 
+import type { EquipePourVolants } from '~~/shared/utils/benevoles-volants'
+
 import {
   benevolesDesComptes,
   estEquipeHorsCharge,
@@ -158,12 +160,12 @@ export interface AcceptedVolunteer {
  * appel qui n'a pas demandé les équipes — donne une liste vide, donc personne n'est dispensé.
  * C'est le bon défaut : mieux vaut compter un volant que dispenser tout le monde.
  */
-export function equipesDe(candidature: AcceptedVolunteer): { isFloatingTeam?: boolean | null }[] {
+export function equipesDe(candidature: AcceptedVolunteer): EquipePourVolants[] {
   const assignations = (candidature as { teamAssignments?: { team?: unknown }[] }).teamAssignments
   if (!Array.isArray(assignations)) return []
   return assignations
-    .map((assignation) => assignation?.team as { isFloatingTeam?: boolean | null } | undefined)
-    .filter((equipe): equipe is { isFloatingTeam?: boolean | null } => !!equipe)
+    .map((assignation) => assignation?.team as EquipePourVolants | undefined)
+    .filter((equipe): equipe is EquipePourVolants => !!equipe)
 }
 
 /**

@@ -15,7 +15,10 @@ import {
   type TimeSlotWithAssignments,
 } from './volunteer-stats'
 
-import { estEquipeHorsCharge, estHorsDesComptes } from '~~/shared/utils/benevoles-volants'
+import {
+  estEquipeHorsCharge,
+  estHorsAssignationAutomatique,
+} from '~~/shared/utils/benevoles-volants'
 import {
   periodeEdition,
   type BornesEditionPresence,
@@ -141,8 +144,16 @@ export interface EffectifParPeriode extends Record<PeriodeEdition, EffectifDePer
 /**
  * Le dimensionnement de chaque période : ce qu'il y a à pourvoir, et qui peut le pourvoir.
  *
- * Les volants sont écartés de l'effectif comme partout ailleurs : sans créneau par construction,
- * les compter ferait croire à une réserve de bras qui n'en est pas une.
+ * Deux populations sortent de l'effectif, pour des raisons opposées mais avec le même effet :
+ *
+ * - les **volants**, qui n'ont pas de volume d'heures à faire ;
+ * - les **réservés**, dont toutes les équipes sont autonomes : leurs heures se décident dans leur
+ *   équipe, et l'assignation automatique ne leur donnera rien ailleurs.
+ *
+ * C'est exactement la règle `estHorsAssignationAutomatique`. La garder cohérente avec les heures
+ * importe : le besoin écarte DÉJÀ les créneaux de ces équipes, et garder leurs membres dans
+ * l'effectif reviendrait à compter des bras qui ne couvriront jamais ces heures-là — donc à
+ * sous-estimer le manque, ce qui est la pire erreur pour un outil de recrutement.
  */
 export function effectifParPeriode(
   creneaux: TimeSlotWithAssignments[],
@@ -151,7 +162,9 @@ export function effectifParPeriode(
   acceptes: AcceptedVolunteer[] = []
 ): EffectifParPeriode {
   const charge = chargeParPeriode(creneaux, equipes, bornes)
-  const comptes = acceptes.filter((candidature) => !estHorsDesComptes(equipesDe(candidature)))
+  const comptes = acceptes.filter(
+    (candidature) => !estHorsAssignationAutomatique(equipesDe(candidature))
+  )
 
   const pour = (periode: PeriodeEdition): EffectifDePeriode => ({
     ...charge[periode],

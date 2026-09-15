@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { chargeParPeriode, disponibleSurLaPeriode } from '../../../app/utils/effectif-par-periode'
+import {
+  chargeParPeriode,
+  disponibleSurLaPeriode,
+  effectifParPeriode,
+} from '../../../app/utils/effectif-par-periode'
 
 /**
  * Dimensionner l'effectif période par période.
@@ -152,5 +156,56 @@ describe('disponibleSurLaPeriode', () => {
 
   it('n’exclut que sur un refus explicite', () => {
     expect(disponibleSurLaPeriode({ teardownAvailability: false }, 'demontage')).toBe(false)
+  })
+})
+
+/**
+ * Qui compte dans l'effectif disponible d'une période.
+ *
+ * Le besoin écarte DÉJÀ les créneaux des équipes volantes et autonomes. Garder leurs membres dans
+ * l'effectif reviendrait à compter des bras qui ne couvriront jamais ces heures-là — et donc à
+ * sous-estimer le manque, ce qui est la pire erreur pour un outil de recrutement.
+ */
+const candidature = (id: number, equipes: Array<Record<string, boolean>>) => ({
+  id,
+  status: 'ACCEPTED',
+  eventAvailability: true,
+  teamAssignments: equipes.map((team) => ({ team })),
+})
+
+const effectifEvenement = (acceptes: unknown[]) =>
+  effectifParPeriode([], [], bornes, acceptes as never).evenement.benevolesAcceptes
+
+describe('effectifParPeriode — qui compte', () => {
+  it('compte un bénévole ordinaire', () => {
+    expect(effectifEvenement([candidature(1, [{}])])).toBe(1)
+  })
+
+  it('ÉCARTE un bénévole seulement volant', () => {
+    expect(effectifEvenement([candidature(1, [{ isFloatingTeam: true }])])).toBe(0)
+  })
+
+  it('ÉCARTE un bénévole seulement dans des équipes autonomes', () => {
+    // Le défaut corrigé : ses heures se décident dans son équipe, et l'assignation automatique ne
+    // lui donnera rien ailleurs. Le compter gonflait l'effectif disponible.
+    expect(effectifEvenement([candidature(1, [{ isAutonomousTeam: true }])])).toBe(0)
+  })
+
+  it('écarte celui dont TOUTES les équipes sont autonomes, même plusieurs', () => {
+    expect(
+      effectifEvenement([candidature(1, [{ isAutonomousTeam: true }, { isAutonomousTeam: true }])])
+    ).toBe(0)
+  })
+
+  it('COMPTE celui qui a aussi une équipe ordinaire', () => {
+    // La double appartenance annule la réserve : le rattacher à une seconde équipe, c'est avoir
+    // décidé de le partager.
+    expect(effectifEvenement([candidature(1, [{ isAutonomousTeam: true }, {}])])).toBe(1)
+    expect(effectifEvenement([candidature(1, [{ isFloatingTeam: true }, {}])])).toBe(1)
+  })
+
+  it('compte un accepté sans aucune équipe', () => {
+    // C'est précisément celui que l'assignation automatique doit placer.
+    expect(effectifEvenement([candidature(1, [])])).toBe(1)
   })
 })
