@@ -47,13 +47,28 @@ export default wrapApiHandler(
             },
           },
         },
+        // D'où vient ce champ. L'écran en marque l'origine d'un logo, comme pour les tarifs et
+        // les options.
+        externalTicketing: { select: { provider: true } },
       },
       orderBy: {
         createdAt: 'desc',
       },
     })
 
-    return createSuccessResponse({ customFields })
+    /**
+     * Le fournisseur, remonté à plat ; `null` pour un champ saisi à la main.
+     *
+     * Direct, contrairement aux options : `custom-fields.post.ts` ne renseigne PAS
+     * `externalTicketingId` pour un champ créé ici, si bien que le rattachement dit bien
+     * l'origine. C'est l'option qui est l'exception, pas la règle.
+     */
+    return createSuccessResponse({
+      customFields: customFields.map((champ) => ({
+        ...champ,
+        provider: champ.externalTicketing?.provider ?? null,
+      })),
+    })
   },
   { operationName: 'GET ticketing custom fields' }
 )

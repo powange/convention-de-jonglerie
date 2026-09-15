@@ -49,16 +49,24 @@
       <template #title-cell="{ row }">
         <div class="flex flex-col gap-1">
           <div class="flex items-center gap-2">
+            <!-- La provenance AVANT le nom : c'est elle qui situe le tarif, et la chercher après
+                 un intitulé de longueur variable obligeait à balayer la ligne.
+
+                 Par `provider` et non par `helloAssoTierId` : la colonne d'un seul fournisseur
+                 laissait un tarif Infomaniak sans logo. Et il y en a toujours un — celui du site
+                 quand le tarif a été saisi ici, sans quoi l'absence se lirait comme une origine
+                 inconnue. -->
+            <img
+              :src="logoDuFournisseur(row.original.provider)"
+              :alt="nomDuFournisseur(row.original.provider) ?? $t('ticketing.tiers.list.logo_alt')"
+              :title="
+                nomDuFournisseur(row.original.provider) ?? $t('gestion.ticketing.origin_site')
+              "
+              class="h-4 w-4 object-contain flex-shrink-0"
+            />
             <span class="font-semibold text-gray-900 dark:text-white">
               {{ row.original.name }}
             </span>
-            <img
-              v-if="row.original.helloAssoTierId"
-              src="~/assets/img/helloasso/logo.svg"
-              :alt="$t('ticketing.tiers.list.logo_alt')"
-              class="h-4 w-auto flex-shrink-0"
-              :title="`Synchronisé depuis HelloAsso (ID: ${row.original.helloAssoTierId})`"
-            />
             <UBadge v-if="!row.original.isActive" color="neutral" variant="soft" size="xs">
               {{ $t('ticketing.tiers.list.inactive') }}
             </UBadge>
@@ -180,17 +188,18 @@
           v-if="row.original.quotas && row.original.quotas.length > 0"
           class="flex flex-wrap gap-1"
         >
+          <!-- Taille par défaut, pas `xs` : en très petit, un titre de quota ne se lisait plus
+               — or c'est toute l'information de la colonne. -->
           <UBadge
             v-for="quotaRelation in row.original.quotas"
             :key="quotaRelation.quota.id"
             color="warning"
             variant="soft"
-            size="xs"
           >
             {{ quotaRelation.quota.title }}
           </UBadge>
         </div>
-        <span v-else class="text-xs text-gray-400">-</span>
+        <span v-else class="text-gray-400">-</span>
       </template>
 
       <!-- Colonne Articles à remettre -->
@@ -204,13 +213,12 @@
             :key="itemRelation.handoutItem.id"
             color="info"
             variant="soft"
-            size="xs"
           >
             {{ itemRelation.handoutItem.name
             }}{{ itemRelation.quantity > 1 ? ` ×${itemRelation.quantity}` : '' }}
           </UBadge>
         </div>
-        <span v-else class="text-xs text-gray-400">-</span>
+        <span v-else class="text-gray-400">-</span>
       </template>
 
       <!-- Colonne Repas -->
@@ -283,6 +291,7 @@
 import { useEditionStore } from '~/stores/editions'
 import { formatMealDisplay } from '~/utils/meals'
 
+import { logoDuFournisseur, nomDuFournisseur } from '../../utils/ticketing/fournisseur'
 import { isFixedPrice, type TicketingTier } from '../../utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
@@ -417,7 +426,10 @@ const handleDrop = async (targetTier: TicketingTier, event: DragEvent) => {
   // Réorganiser localement
   const newTiers = [...sortedTiers.value]
   const [draggedTier] = newTiers.splice(draggedIndex, 1)
-  newTiers.splice(targetIndex, 0, draggedTier)
+  // `splice` rend `T | undefined` : le compilateur ne peut pas savoir que l'élément
+  // existe forcément. Le garde-fou est au-dessus — `draggedIndex` a déjà été refusé
+  // s'il valait -1, donc le retrait porte toujours sur un élément réel.
+  newTiers.splice(targetIndex, 0, draggedTier!)
   sortedTiers.value = newTiers
 
   // Mettre à jour les positions en base de données

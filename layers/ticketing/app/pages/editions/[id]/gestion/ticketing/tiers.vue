@@ -56,7 +56,7 @@
           </UCard>
         </div>
 
-        <!-- Sur un écran étroit, quatre onglets ne tiennent pas côte à côte — « Champs
+        <!-- Sur un écran étroit, trois onglets ne tiennent pas côte à côte — « Champs
              personnalisés » à lui seul occupe la moitié de la largeur. Un select prend le
              relais et pilote le même état. Seule la barre est masquée, pas le composant :
              ce sont ses panneaux qui portent le contenu. -->
@@ -94,15 +94,6 @@
               @refresh="loadCustomFields"
             />
           </template>
-
-          <template #quotas>
-            <TicketingQuotasList
-              :quotas="quotas"
-              :loading="loadingQuotas"
-              :edition-id="editionId"
-              @refresh="loadQuotas"
-            />
-          </template>
         </UTabs>
       </div>
     </div>
@@ -123,7 +114,7 @@ const authStore = useAuthStore()
 const editionId = parseInt(route.params.id as string)
 const { t } = useI18n()
 
-// Titre de l'onglet : « Tarifs, options & quotas - Billetterie », cohérent avec la section.
+// Titre de l'onglet : « Tarifs & options - Billetterie », cohérent avec la section.
 useSeoMeta({
   title: () => `${t('gestion.ticketing.tiers_title')} - ${t('gestion.ticketing.title')}`,
 })
@@ -149,10 +140,6 @@ const options = ref<any[]>([])
 // Custom fields
 const loadingCustomFields = ref(true)
 const customFields = ref<any[]>([])
-
-// Quotas
-const loadingQuotas = ref(true)
-const quotas = ref<any[]>([])
 
 const lastSyncText = computed(() => {
   if (!lastSync.value) return 'Jamais'
@@ -190,13 +177,6 @@ const tabs = computed(() => [
     value: 'customfields',
     badge: customFields.value.length,
   },
-  {
-    label: 'Quotas',
-    icon: 'i-heroicons-chart-bar',
-    slot: 'quotas',
-    value: 'quotas',
-    badge: quotas.value.length,
-  },
 ])
 
 // Le select ne reprend que ce qu'il affiche ; l'icône est celle de l'onglet courant.
@@ -215,7 +195,6 @@ onMounted(async () => {
   if (canAccess.value) {
     await loadData()
     await loadCustomFields()
-    await loadQuotas()
   }
 })
 
@@ -296,25 +275,11 @@ const canAccess = computed(() => {
   return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
 
-// Fonctions pour les quotas
-const loadQuotas = async () => {
-  loadingQuotas.value = true
-  try {
-    const response = await $fetch<any>(`/api/editions/${editionId}/ticketing/quotas`)
-    quotas.value = Array.isArray(response?.data?.quotas) ? response.data.quotas : []
-  } catch {
-    // Erreur silencieuse
-  } finally {
-    loadingQuotas.value = false
-  }
-}
-
 // Recharger les données quand les permissions changent (mode super admin)
 watch(canAccess, async (newValue, oldValue) => {
   if (newValue && !oldValue) {
     await loadData()
     await loadCustomFields()
-    await loadQuotas()
   }
 })
 </script>

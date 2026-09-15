@@ -15,7 +15,6 @@ export interface TierData {
   countAsParticipant?: boolean
   validFrom?: string | null
   validUntil?: string | null
-  quotaIds?: number[]
   handoutItemIds?: HandoutItemAssociationInput[]
   mealIds?: number[]
 }
@@ -154,9 +153,6 @@ export async function createTier(editionId: number, data: TierData) {
       validFrom: data.validFrom ? new Date(data.validFrom) : null,
       validUntil: data.validUntil ? new Date(data.validUntil) : null,
       // externalTicketingId et helloAssoTierId restent null pour un tarif manuel
-      quotas: {
-        create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
-      },
       handoutItems: {
         create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
           ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
@@ -192,10 +188,14 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
 
   // Mettre à jour le tarif avec ses relations
   return await prisma.$transaction(async (tx) => {
-    // Supprimer les anciennes relations
-    await tx.ticketingTierQuota.deleteMany({ where: { tierId } })
-    // handoutItems : on ne supprime/recrée que si la clé est explicitement
-    // fournie (édition désormais déléguée à un endpoint dédié).
+    // Supprimer les anciennes relations.
+    //
+    // Les quotas n'apparaissent plus ici : leur seul chemin d'écriture est l'endpoint dédié
+    // /tiers/[id]/quotas. Tant que ce bloc les effaçait et les recréait, enregistrer un simple
+    // changement de prix les détruisait — la fenêtre d'édition ne les envoyait plus.
+    //
+    // `handoutItems` garde sa condition : la clé reste acceptée, elle n'est simplement pas
+    // toujours envoyée.
     if (data.handoutItemIds !== undefined) {
       await tx.ticketingTierHandoutItem.deleteMany({ where: { tierId } })
     }
@@ -211,9 +211,6 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           countAsParticipant: data.countAsParticipant ?? true,
           validFrom: data.validFrom ? new Date(data.validFrom) : null,
           validUntil: data.validUntil ? new Date(data.validUntil) : null,
-          quotas: {
-            create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
-          },
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
@@ -243,9 +240,6 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           countAsParticipant: data.countAsParticipant ?? true,
           validFrom: data.validFrom ? new Date(data.validFrom) : null,
           validUntil: data.validUntil ? new Date(data.validUntil) : null,
-          quotas: {
-            create: (data.quotaIds || []).map((quotaId) => ({ quotaId })),
-          },
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {

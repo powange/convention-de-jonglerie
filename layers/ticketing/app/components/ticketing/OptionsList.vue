@@ -26,6 +26,17 @@
         <div class="flex items-start justify-between gap-2">
           <div class="flex-1">
             <div class="flex items-center gap-2">
+              <!-- La provenance AVANT le titre : c'est elle qui situe l'option, et la chercher
+                   après un intitulé de longueur variable obligeait à balayer la ligne.
+
+                   Il y en a toujours une — le logo du site quand l'option a été saisie ici, sans
+                   quoi l'absence se lirait comme une origine inconnue. -->
+              <img
+                :src="logoDuFournisseur(option.provider)"
+                :alt="nomDuFournisseur(option.provider) ?? $t('gestion.ticketing.origin_site')"
+                :title="infobulleProvenance(option)"
+                class="h-4 w-4 object-contain flex-shrink-0"
+              />
               <h3 class="font-semibold text-gray-900 dark:text-white">
                 {{ option.name }}
               </h3>
@@ -45,13 +56,6 @@
               </UBadge>
             </div>
           </div>
-          <img
-            v-if="option.helloAssoOptionId"
-            src="~/assets/img/helloasso/logo.svg"
-            :alt="$t('ticketing.options.list.logo_alt')"
-            class="h-5 w-auto"
-            :title="`Synchronisé depuis HelloAsso (ID: ${option.helloAssoOptionId})`"
-          />
         </div>
       </template>
 
@@ -190,6 +194,7 @@ import { useMealTypeLabel } from '~/composables/useMeals'
 import { useEditionStore } from '~/stores/editions'
 import { formatMealDate } from '~/utils/meals'
 
+import { logoDuFournisseur, nomDuFournisseur } from '../../utils/ticketing/fournisseur'
 import { deleteOption, type TicketingOption } from '../../utils/ticketing/options'
 
 const props = defineProps<{
@@ -206,6 +211,32 @@ const emit = defineEmits<{
 }>()
 
 const { getMealTypeLabel } = useMealTypeLabel()
+
+/**
+ * Le gabarit appelait `money(...)` sans que rien ne le fournisse : `money` n'est pas un
+ * auto-import, c'est une fonction rendue par `useEditionCurrency`. Le prix d'une option faisait
+ * donc planter le rendu avec « _ctx.money is not a function ».
+ *
+ * L'identifiant est passé explicitement : le composable le lit sinon dans la route, ce qui vaut
+ * pour une page mais pas forcément pour un composant réutilisable.
+ */
+const { t } = useI18n()
+const { money } = useEditionCurrency(() => props.editionId)
+
+/**
+ * L'infobulle du logo de provenance.
+ *
+ * Reprend l'identifiant chez le fournisseur, que portait le second logo — celui du coin supérieur
+ * droit, retiré depuis qu'il faisait doublon. L'information est rare mais utile quand on compare
+ * avec la billetterie externe : elle change de place, elle ne disparaît pas.
+ */
+const infobulleProvenance = (option: TicketingOption) => {
+  const fournisseur = nomDuFournisseur(option.provider)
+  if (!fournisseur) return t('gestion.ticketing.origin_site')
+  return option.helloAssoOptionId
+    ? `${fournisseur} (ID : ${option.helloAssoOptionId})`
+    : fournisseur
+}
 
 const optionModalOpen = ref(false)
 const selectedOption = ref<TicketingOption | null>(null)

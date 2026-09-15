@@ -8,6 +8,13 @@ export interface TicketingOption {
   price: number | null
   position: number
   helloAssoOptionId: number | null
+  /**
+   * Le fournisseur d'où vient cette option, `null` si elle a été saisie à la main.
+   *
+   * Distinct de `helloAssoOptionId`, qui est la colonne d'un seul fournisseur : une option
+   * importée d'ailleurs l'aurait à `null` et passerait à tort pour saisie à la main.
+   */
+  provider?: 'HELLOASSO' | 'INFOMANIAK' | 'BILLETWEB' | 'WEEZEVENT' | 'OTHER' | null
   quotas?: Array<{
     quota: {
       id: number
@@ -48,7 +55,6 @@ export interface OptionFormData {
   choices: string[] | null
   price: number | null
   position: number
-  quotaIds: number[]
   handoutItemIds: number[]
   tierIds?: number[]
   mealIds?: number[]

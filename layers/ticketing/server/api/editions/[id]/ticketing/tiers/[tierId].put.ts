@@ -16,7 +16,6 @@ const bodySchema = z.object({
   countAsParticipant: z.boolean().default(true),
   validFrom: z.string().nullable().optional(),
   validUntil: z.string().nullable().optional(),
-  quotaIds: z.array(z.number().int()).optional().default([]),
   // `handoutItemIds` est optionnel SANS default : si la clé n'est pas
   // envoyée, `updateTier` ne touche pas aux associations existantes
   // (gérées désormais via /tiers/[id]/handout-items).

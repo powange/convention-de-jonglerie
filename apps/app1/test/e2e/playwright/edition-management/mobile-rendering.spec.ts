@@ -115,6 +115,7 @@ test.describe.serial('Rendu mobile des pages de gestion', () => {
     'gestion/general-info',
     'gestion/convention',
     'gestion/ticketing/tiers',
+    'gestion/ticketing/quotas',
   ]
 
   for (const chemin of PAGES) {
@@ -153,21 +154,10 @@ test.describe.serial('Rendu mobile des pages de gestion', () => {
     ).toBeTruthy()
 
     try {
-      await goto(`/editions/${editionId}/gestion/ticketing/tiers`, { waitUntil: 'hydration' })
+      // Les quotas ont leur propre page depuis qu'ils sont sortis de l'onglet des tarifs :
+      // plus de select à piloter, la liste s'affiche à l'ouverture.
+      await goto(`/editions/${editionId}/gestion/ticketing/quotas`, { waitUntil: 'hydration' })
       await attendreContenu(page)
-
-      // La liste des quotas vit dans un onglet de la page des tarifs, pas à l'ouverture.
-      // Sous 640 px la barre d'onglets cède la place à un select — quatre onglets dont
-      // « Champs personnalisés » ne tiennent pas sur 375 px. C'est donc lui qu'il faut
-      // piloter ici, comme le ferait quelqu'un sur son téléphone.
-      // Le select se repère à son texte — le libellé de l'onglet courant — et non à sa
-      // position : la page en compte d'autres.
-      await page
-        .getByRole('combobox')
-        .filter({ hasText: /tarifs|options|champs personnalisés|quotas/i })
-        .first()
-        .click()
-      await page.getByRole('option', { name: /quotas/i }).click()
 
       // `.last()` : le quota vient d'être créé, il est en fin de liste. L'édition est
       // partagée avec les autres specs, qui y laissent leurs propres quotas — viser le

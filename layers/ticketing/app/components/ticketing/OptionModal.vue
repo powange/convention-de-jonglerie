@@ -111,29 +111,6 @@
         </UFormField>
 
         <UFormField
-          v-if="quotas.length > 0"
-          :label="$t('ticketing.options.modal.quotas_label')"
-          name="quotas"
-        >
-          <USelectMenu
-            v-model="form.quotaIds"
-            :items="quotas.map((q) => ({ label: q.title, value: q.id }))"
-            value-key="value"
-            multiple
-            searchable
-            :placeholder="$t('ticketing.options.modal.quotas_placeholder')"
-            class="w-full"
-          >
-            <template #label>
-              <span v-if="form.quotaIds.length === 0">{{
-                $t('ticketing.options.modal.no_quota_selected')
-              }}</span>
-              <span v-else>{{ form.quotaIds.length }} quota(s) sélectionné(s)</span>
-            </template>
-          </USelectMenu>
-        </UFormField>
-
-        <UFormField
           label="Tarifs associés"
           name="tiers"
           :help="
@@ -260,7 +237,6 @@ const form = ref({
   type: 'TextInput',
   isRequired: false,
   position: 0,
-  quotaIds: [] as number[],
   tierIds: [] as number[],
   mealIds: [] as number[],
 })
@@ -268,8 +244,7 @@ const form = ref({
 const choicesText = ref('')
 const priceInEuros = ref<number | null>(null)
 
-// Charger les quotas, tarifs et repas disponibles
-const quotas = ref<any[]>([])
+// Charger les tarifs et repas disponibles
 const tiers = ref<any[]>([])
 const meals = ref<any[]>([])
 
@@ -298,19 +273,17 @@ const mealsOptions = computed(() => {
 const loadQuotasAndItems = async () => {
   try {
     const promises: Promise<any>[] = [
-      $fetch(`/api/editions/${props.editionId}/ticketing/quotas`),
       $fetch<any[]>(`/api/editions/${props.editionId}/ticketing/tiers`),
     ]
     if (edition.value?.mealsEnabled) {
       promises.push($fetch(`/api/editions/${props.editionId}/volunteers/meals`))
     }
-    const [quotasData, tiersData, mealsData] = await Promise.all(promises)
-    quotas.value = Array.isArray(quotasData?.data?.quotas) ? quotasData.data.quotas : []
+    const [tiersData, mealsData] = await Promise.all(promises)
     tiers.value = Array.isArray(tiersData?.data?.tiers) ? tiersData.data.tiers : []
     meals.value =
       mealsData?.data?.meals && Array.isArray(mealsData.data.meals) ? mealsData.data.meals : []
   } catch (error) {
-    console.error('Failed to load quotas, tiers and meals:', error)
+    console.error('Failed to load tiers and meals:', error)
   }
 }
 
@@ -329,7 +302,6 @@ watch(
           type: props.option.type,
           isRequired: props.option.isRequired,
           position: props.option.position,
-          quotaIds: props.option.quotas?.map((q: any) => q.quotaId) || [],
           tierIds: props.option.tiers?.map((t: any) => t.tierId) || [],
           mealIds: props.option.meals?.map((m: any) => m.mealId) || [],
         }
@@ -344,7 +316,6 @@ watch(
           type: 'TextInput',
           isRequired: false,
           position: 0,
-          quotaIds: [],
           tierIds: [],
           mealIds: [],
         }
@@ -367,7 +338,8 @@ const buildFormData = () => ({
       ? choicesText.value.split('\n').filter((c) => c.trim())
       : null,
   price: priceInEuros.value ? Math.round(priceInEuros.value * 100) : null,
-  quotaIds: form.value.quotaIds,
+  // Pas de `quotaIds` : les quotas se règlent sur la page dédiée, et l'endpoint ne les accepte
+  // plus du tout — il n'y a donc qu'un seul chemin pour les modifier.
   tierIds: form.value.tierIds,
   mealIds: form.value.mealIds,
 })

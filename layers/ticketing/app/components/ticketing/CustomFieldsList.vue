@@ -50,19 +50,22 @@
           <div class="flex-1 min-w-0">
             <!-- En-tête avec nom et icône HelloAsso -->
             <div class="flex items-center gap-2 mb-2">
+              <!-- La provenance AVANT le nom : c'est elle qui situe le champ, et la chercher
+                   après un intitulé de longueur variable obligeait à balayer la ligne.
+
+                   Par `provider` et non par `helloAssoCustomFieldId` : la colonne d'un seul
+                   fournisseur laissait un champ importé d'ailleurs sans logo. Et il y en a
+                   toujours un — celui du site quand le champ a été saisi ici. -->
+              <img
+                :src="logoDuFournisseur(field.provider)"
+                :alt="nomDuFournisseur(field.provider) ?? $t('gestion.ticketing.origin_site')"
+                :title="infobulleProvenance(field)"
+                class="h-5 w-5 object-contain flex-shrink-0"
+              />
               <h4 class="text-base font-semibold text-gray-900 dark:text-white truncate">
                 {{ field.label }}
               </h4>
-              <img
-                v-if="field.helloAssoCustomFieldId"
-                src="~/assets/img/helloasso/logo.svg"
-                alt="HelloAsso"
-                class="h-5 w-auto"
-                :title="`Synchronisé depuis HelloAsso (ID: ${field.helloAssoCustomFieldId})`"
-              />
-              <UBadge v-if="field.isRequired" color="orange" variant="subtle" size="xs">
-                Obligatoire
-              </UBadge>
+              <UBadge v-if="field.isRequired" color="orange" variant="subtle"> Obligatoire </UBadge>
             </div>
 
             <!-- Type et valeurs -->
@@ -86,7 +89,6 @@
                         :key="idx"
                         color="neutral"
                         variant="subtle"
-                        size="xs"
                       >
                         {{ value }}
                       </UBadge>
@@ -107,7 +109,6 @@
                         :key="tier.tier.id"
                         color="primary"
                         variant="subtle"
-                        size="xs"
                       >
                         {{ tier.tier.name }}
                       </UBadge>
@@ -126,9 +127,8 @@
                       <UBadge
                         v-for="quota in field.quotas"
                         :key="`${quota.quota.id}-${quota.choiceValue || 'all'}`"
-                        color="orange"
+                        color="warning"
                         variant="subtle"
-                        size="xs"
                       >
                         {{ quota.quota.title }}
                         <span v-if="quota.choiceValue"> ({{ quota.choiceValue }})</span>
@@ -148,9 +148,8 @@
                       <UBadge
                         v-for="item in field.handoutItems"
                         :key="`${item.handoutItem.id}-${item.choiceValue || 'all'}`"
-                        color="green"
+                        color="info"
                         variant="subtle"
-                        size="xs"
                       >
                         {{ item.handoutItem.name
                         }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
@@ -230,6 +229,10 @@
 </template>
 
 <script setup lang="ts">
+import { logoDuFournisseur, nomDuFournisseur } from '../../utils/ticketing/fournisseur'
+
+const { t } = useI18n()
+
 interface CustomField {
   id: number
   label: string
@@ -237,6 +240,8 @@ interface CustomField {
   isRequired: boolean
   values?: string[]
   helloAssoCustomFieldId?: number | null
+  /** Le fournisseur d'où vient ce champ, `null` s'il a été saisi sur le site. */
+  provider?: string | null
   tiers?: Array<{
     tier: {
       id: number
@@ -326,5 +331,20 @@ const { execute: executeDeleteCustomField, loading: deleting } = useApiAction(
 const deleteCustomField = () => {
   if (!customFieldToDelete.value) return
   executeDeleteCustomField()
+}
+
+/**
+ * L'infobulle du logo de provenance.
+ *
+ * Reprend l'identifiant chez le fournisseur, que portait l'ancien logo — celui qui suivait le nom
+ * et n'affichait que HelloAsso. L'information est rare mais utile quand on recoupe avec la
+ * billetterie externe : elle change de place, elle ne disparaît pas.
+ */
+const infobulleProvenance = (field: CustomField) => {
+  const fournisseur = nomDuFournisseur(field.provider)
+  if (!fournisseur) return t('gestion.ticketing.origin_site')
+  return field.helloAssoCustomFieldId
+    ? `${fournisseur} (ID : ${field.helloAssoCustomFieldId})`
+    : fournisseur
 }
 </script>
