@@ -54,10 +54,13 @@
             </div>
             <!-- La provenance de la commande, par l'utilitaire partagé.
 
-                 La condition portait auparavant sur `order.id`, qui vaut en réalité
-                 l'identifiant HelloAsso : elle marchait par accident pour ce fournisseur, et
+                 La condition portait auparavant sur l'identifiant de la commande, qui vaut en
+                 réalité celui d'HelloAsso : elle marchait par accident pour ce fournisseur, et
                  laissait une commande Infomaniak sans aucune origine. Le logo du site couvre
-                 désormais les commandes saisies sur place, comme dans les listes. -->
+                 désormais les commandes saisies sur place, comme dans les listes.
+
+                 (Le nom pointé de cette propriété est écrit en toutes lettres à dessein : dans un
+                 commentaire de gabarit, le détecteur i18n le prendrait pour une clé manquante.) -->
             <img
               v-if="participant.ticket.order"
               :src="logoDuFournisseur(participant.ticket.order.provider)"
