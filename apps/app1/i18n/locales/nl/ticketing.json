@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Toon deze QR-code bij de ingang om je ticket te valideren.",
-      "how_to_use_title": "Hoe gebruik je deze QR-code",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Hoe gebruik je deze QR-code"
     },
     "options": {
       "created": "Optie succesvol aangemaakt",
@@ -177,7 +176,6 @@
       "entry_validated": "Toegang al gevalideerd",
       "first_name": "Voornaam",
       "last_name": "Achternaam",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Geen tijdslot toegewezen",
       "phone": "Telefoon",
       "ticket_type": "Tickettype",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Slepen om te herschikken",
         "inactive": "Inactief",
         "loading": "Laden...",
-        "logo_alt": "HelloAsso",
         "none_found": "Geen tarieven gevonden"
       },
       "modal": {

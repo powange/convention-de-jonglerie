@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Visa upp denna QR-kod vid entrén för att validera din biljett.",
-      "how_to_use_title": "Så här använder du denna QR-kod",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Så här använder du denna QR-kod"
     },
     "options": {
       "created": "Alternativ skapat framgångsrikt",
@@ -177,7 +176,6 @@
       "entry_validated": "Posten är redan validerad",
       "first_name": "Förnamn",
       "last_name": "Efternamn",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Ingen slot tilldelad",
       "phone": "Telefon",
       "ticket_type": "Typ av biljett",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Dra för att ändra ordning",
         "inactive": "Inaktiv",
         "loading": "Laddar...",
-        "logo_alt": "HelloAsso",
         "none_found": "Inga tariffer hittades"
       },
       "modal": {

@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Покажите этот QR-код на входе для валидации билета.",
-      "how_to_use_title": "Как использовать этот QR-код",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Как использовать этот QR-код"
     },
     "options": {
       "created": "Опция успешно создана",
@@ -177,7 +176,6 @@
       "entry_validated": "Вход уже подтвержден",
       "first_name": "Имя",
       "last_name": "Фамилия",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Временной интервал не назначен",
       "phone": "Телефон",
       "ticket_type": "Тип билета",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Перетащите для изменения порядка",
         "inactive": "Неактивно",
         "loading": "Загрузка...",
-        "logo_alt": "HelloAsso",
         "none_found": "Тарифы не найдены"
       },
       "modal": {

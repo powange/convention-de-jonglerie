@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Show this QR code at the entrance to validate your ticket.",
-      "how_to_use_title": "How to use this QR code",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "How to use this QR code"
     },
     "options": {
       "created": "Option created successfully",
@@ -177,7 +176,6 @@
       "entry_validated": "Entry already validated",
       "first_name": "First Name",
       "last_name": "Last Name",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "No slot assigned",
       "phone": "Phone",
       "ticket_type": "Ticket type",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Drag to reorder",
         "inactive": "Inactive",
         "loading": "Loading...",
-        "logo_alt": "HelloAsso",
         "none_found": "No tiers found"
       },
       "modal": {

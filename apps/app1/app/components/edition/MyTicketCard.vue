@@ -56,12 +56,18 @@
 
             <!-- Actions -->
             <div class="flex flex-col items-end gap-2">
-              <!-- Logo HelloAsso -->
+              <!-- La provenance du billet, par l'utilitaire partagé.
+
+                   Uniquement pour un BILLET : le logo répond à « d'où vient-il », question qui
+                   n'a pas de sens pour un badge de bénévole ou d'artiste. Auparavant la
+                   condition ne retenait que HelloAsso, et un billet Infomaniak n'affichait
+                   rien. -->
               <img
-                v-if="ticket.isHelloAsso"
-                src="~/assets/img/helloasso/logo.svg"
-                :alt="$t('ticketing.my_ticket.logo_alt')"
-                class="h-4"
+                v-if="ticket.type === 'ticket'"
+                :src="logoDuFournisseur(ticket.provider)"
+                :alt="nomDuFournisseur(ticket.provider) ?? $t('gestion.ticketing.origin_site')"
+                :title="nomDuFournisseur(ticket.provider) ?? $t('gestion.ticketing.origin_site')"
+                class="h-4 w-4 object-contain"
               />
               <!-- Bouton QR Code -->
               <UButton
@@ -130,6 +136,17 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * L'utilitaire vit dans le layer `ticketing`, ce composant dans `apps/app1` : c'est le seul
+ * import du dépôt qui franchit cette frontière, et il doit être RELATIF. Ni `~/utils/...` ni
+ * l'auto-import de Nuxt ne portent jusqu'ici — l'alias `~` d'app1 ne voit pas les utilitaires des
+ * layers, et les deux échouent en développement sans le moindre message.
+ */
+import {
+  logoDuFournisseur,
+  nomDuFournisseur,
+} from '../../../../../layers/ticketing/app/utils/ticketing/fournisseur'
+
 // Charger les traductions ticketing pour ce composant
 await useLazyI18n('ticketing')
 
@@ -141,7 +158,10 @@ interface Ticket {
   qrCode: string
   tierName: string
   amount: number
-  isHelloAsso: boolean
+  /** `ticket`, `volunteer`, `artist` ou `organizer` — seul un billet a une provenance. */
+  type: string
+  /** D'où vient le billet ; `null` s'il a été créé sur place. */
+  provider?: string | null
   entryValidated: boolean
   entryValidatedAt: Date | null
 }

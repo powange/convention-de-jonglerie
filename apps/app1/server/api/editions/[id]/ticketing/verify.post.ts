@@ -587,6 +587,10 @@ export default wrapApiHandler(
           include: {
             order: {
               include: {
+                // La provenance de la commande, pour que la fiche affiche le bon logo. Sans
+                // elle, l'écran ne pouvait que déduire « HelloAsso ou rien » de la présence d'un
+                // `helloAssoOrderId` — et une commande Infomaniak restait sans origine.
+                externalTicketing: { select: { provider: true } },
                 items: {
                   include: {
                     tier: {
@@ -623,6 +627,8 @@ export default wrapApiHandler(
                   order: {
                     id: orderItem.order.helloAssoOrderId,
                     status: orderItem.order.status,
+                    /** `null` quand la commande a été saisie sur place. */
+                    provider: orderItem.order.externalTicketing?.provider ?? null,
                     payer: {
                       firstName: orderItem.order.payerFirstName,
                       lastName: orderItem.order.payerLastName,

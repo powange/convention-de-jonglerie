@@ -21,7 +21,9 @@ export default wrapApiHandler(
         },
       },
       include: {
-        order: true,
+        // La provenance, et non plus le seul identifiant HelloAsso : la carte ne savait afficher
+        // qu'un logo sur deux, et un billet Infomaniak restait sans origine.
+        order: { include: { externalTicketing: { select: { provider: true } } } },
         tier: true,
       },
       orderBy: {
@@ -39,7 +41,8 @@ export default wrapApiHandler(
         qrCode: ticket.qrCode,
         tierName: ticket.name,
         amount: ticket.amount,
-        isHelloAsso: !!ticket.order.helloAssoOrderId,
+        /** `null` quand le billet a été créé sur place ; absent pour ce qui n'est pas un billet. */
+        provider: ticket.order.externalTicketing?.provider ?? null,
         entryValidated: ticket.entryValidated,
         entryValidatedAt: ticket.entryValidatedAt,
       }))
@@ -72,7 +75,6 @@ export default wrapApiHandler(
         qrCode,
         tierName: 'Bénévole',
         amount: 0,
-        isHelloAsso: false,
         entryValidated: volunteerApplication.entryValidated,
         entryValidatedAt: volunteerApplication.entryValidatedAt,
       })
@@ -104,7 +106,6 @@ export default wrapApiHandler(
         qrCode,
         tierName: 'Artiste',
         amount: 0,
-        isHelloAsso: false,
         entryValidated: artist.entryValidated,
         entryValidatedAt: artist.entryValidatedAt,
       })
@@ -142,7 +143,6 @@ export default wrapApiHandler(
         qrCode,
         tierName: 'Organisateur',
         amount: 0,
-        isHelloAsso: false,
         entryValidated: editionOrganizer.entryValidated,
         entryValidatedAt: editionOrganizer.entryValidatedAt,
       })

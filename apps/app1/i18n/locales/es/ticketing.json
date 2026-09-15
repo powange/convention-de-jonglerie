@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Presente este código QR en la entrada para validar su entrada.",
-      "how_to_use_title": "Cómo usar este código QR",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Cómo usar este código QR"
     },
     "options": {
       "created": "Opción creada con éxito",
@@ -177,7 +176,6 @@
       "entry_validated": "Entrada ya validada",
       "first_name": "Nombre",
       "last_name": "Apellido",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "No se ha asignado ninguna franja",
       "phone": "Teléfono",
       "ticket_type": "Tipo de entrada",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Arrastrar para reordenar",
         "inactive": "Inactivo",
         "loading": "Cargando...",
-        "logo_alt": "HelloAsso",
         "none_found": "No se encontraron tarifas"
       },
       "modal": {

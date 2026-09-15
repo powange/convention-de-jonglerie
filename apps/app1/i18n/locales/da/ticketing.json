@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Vis denne QR-kode ved indgangen for at validere din billet.",
-      "how_to_use_title": "Sådan bruges denne QR-kode",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Sådan bruges denne QR-kode"
     },
     "options": {
       "created": "Valgmulighed oprettet med succes",
@@ -177,7 +176,6 @@
       "entry_validated": "Adgang allerede valideret",
       "first_name": "Fornavn",
       "last_name": "Efternavn",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Ingen tidsrum tildelt",
       "phone": "Telefon",
       "ticket_type": "Billettype",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Træk for at omorganisere",
         "inactive": "Inaktiv",
         "loading": "Indlæser...",
-        "logo_alt": "HelloAsso",
         "none_found": "Ingen priser fundet"
       },
       "modal": {

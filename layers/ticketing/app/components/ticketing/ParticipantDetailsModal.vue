@@ -52,12 +52,24 @@
                 {{ $t('edition.ticketing.order') }}
               </h4>
             </div>
-            <!-- Logo HelloAsso si c'est une commande HelloAsso -->
+            <!-- La provenance de la commande, par l'utilitaire partagé.
+
+                 La condition portait auparavant sur `order.id`, qui vaut en réalité
+                 l'identifiant HelloAsso : elle marchait par accident pour ce fournisseur, et
+                 laissait une commande Infomaniak sans aucune origine. Le logo du site couvre
+                 désormais les commandes saisies sur place, comme dans les listes. -->
             <img
-              v-if="participant.ticket.order.id"
-              src="~/assets/img/helloasso/logo.svg"
-              :alt="$t('ticketing.participant.logo_alt')"
-              class="h-5"
+              v-if="participant.ticket.order"
+              :src="logoDuFournisseur(participant.ticket.order.provider)"
+              :alt="
+                nomDuFournisseur(participant.ticket.order.provider) ??
+                $t('gestion.ticketing.origin_site')
+              "
+              :title="
+                nomDuFournisseur(participant.ticket.order.provider) ??
+                $t('gestion.ticketing.origin_site')
+              "
+              class="h-5 w-5 object-contain"
             />
           </div>
 
@@ -749,6 +761,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
+import { logoDuFournisseur, nomDuFournisseur } from '../../utils/ticketing/fournisseur'
+
 import ArtistDetailsCard from './ArtistDetailsCard.vue'
 import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
 import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
@@ -773,6 +787,8 @@ interface TicketData {
     order: {
       id: number
       status?: string
+      /** D'où vient la commande ; `null` si elle a été saisie sur place. */
+      provider?: string | null
       payer: {
         firstName: string
         lastName: string

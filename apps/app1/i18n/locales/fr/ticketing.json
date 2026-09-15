@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Présentez ce QR code à l'entrée pour valider votre billet.",
-      "how_to_use_title": "Comment utiliser ce QR code",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Comment utiliser ce QR code"
     },
     "options": {
       "created": "Option créée avec succès",
@@ -177,7 +176,6 @@
       "entry_validated": "Entrée déjà validée",
       "first_name": "Prénom",
       "last_name": "Nom",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Aucun créneau assigné",
       "phone": "Téléphone",
       "ticket_type": "Type de billet",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Glisser pour réordonner",
         "inactive": "Inactif",
         "loading": "Chargement...",
-        "logo_alt": "HelloAsso",
         "none_found": "Aucun tarif trouvé"
       },
       "modal": {

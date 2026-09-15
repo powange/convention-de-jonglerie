@@ -115,8 +115,7 @@
     },
     "my_ticket": {
       "how_to_use_description": "Pokaż ten kod QR przy wejściu, aby zwalidować swój bilet.",
-      "how_to_use_title": "Jak używać tego kodu QR",
-      "logo_alt": "HelloAsso"
+      "how_to_use_title": "Jak używać tego kodu QR"
     },
     "options": {
       "created": "Opcja utworzona pomyślnie",
@@ -177,7 +176,6 @@
       "entry_validated": "Wejście już zwalidowane",
       "first_name": "Imię",
       "last_name": "Nazwisko",
-      "logo_alt": "HelloAsso",
       "no_slot_assigned": "Nie przypisano przedziału czasowego",
       "phone": "Telefon",
       "ticket_type": "Typ biletu",
@@ -247,7 +245,6 @@
         "drag_to_reorder": "Przeciągnij, aby zmienić kolejność",
         "inactive": "Nieaktywny",
         "loading": "Ładowanie...",
-        "logo_alt": "HelloAsso",
         "none_found": "Nie znaleziono taryf"
       },
       "modal": {
