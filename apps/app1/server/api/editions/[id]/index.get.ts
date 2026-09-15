@@ -43,7 +43,18 @@ export default wrapApiHandler(
         event: {
           select: {
             _count: {
-              select: { volunteerApplications: true },
+              select: {
+                volunteerApplications: true,
+                /**
+                 * Y a-t-il au moins une équipe VOLANTE ?
+                 *
+                 * Un compte filtré plutôt que la liste des équipes : l'écran n'a besoin que de
+                 * savoir si la page des renforts a lieu d'être, et rapatrier toutes les équipes
+                 * sur chaque chargement d'édition pour en déduire un booléen serait payer cher
+                 * une question fermée.
+                 */
+                volunteerTeams: { where: { isFloatingTeam: true } },
+              },
             },
             volunteerSettings: true,
           },
@@ -188,6 +199,14 @@ export default wrapApiHandler(
       volunteersUpdatedAt: vs?.updatedAt ?? null,
       volunteersSetupStartDate: vs?.setupStartDate ?? null,
       volunteersTeardownEndDate: vs?.teardownEndDate ?? null,
+      /**
+       * Au moins une équipe volante existe-t-elle ?
+       *
+       * Ce que la page des renforts liste, ce sont les bénévoles volants. Sans équipe volante,
+       * elle est vide par construction — et un lien vers une page vide envoie chercher une
+       * fonctionnalité qui n'a pas été mise en place.
+       */
+      volunteersHasFloatingTeam: (editionEvent?._count?.volunteerTeams ?? 0) > 0,
     }
   },
   { operationName: 'GetEdition' }
