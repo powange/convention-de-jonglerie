@@ -1467,6 +1467,23 @@ const planningEndDate = computed<string | null>(() => {
 
 async function fetchPlanning() {
   if (!group.value) return
+
+  /**
+   * Un groupe qui ne gère pas les réservations n'a pas de planning — et l'endpoint le refuse.
+   *
+   * La garde est ici et non chez les appelants : `refreshPlanning` est déclenché par cinq actions
+   * qui n'ont rien à voir avec cette vue (sauvegarde d'un objet, d'un groupe, modification par
+   * lot, réservation groupée), et un sixième appelant serait ajouté un jour sans y penser.
+   *
+   * Mesuré en production : 424 réponses 403 en quatre jours, sur onze groupes, toutes émises par
+   * notre propre page de gestion. L'endpoint a raison de refuser — il porte le réglage, pas
+   * seulement l'écran ; c'est l'appel qui n'avait pas lieu d'être.
+   */
+  if (!reservationsOuvertes.value) {
+    planningItems.value = []
+    return
+  }
+
   try {
     planningLoading.value = true
     const res = await $fetch<{ success: boolean; data: { items: PlanningItem[] } }>(

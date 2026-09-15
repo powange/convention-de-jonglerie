@@ -206,6 +206,65 @@ test.describe.serial('Module Stock matériel', () => {
     await expect(page.getByText(/5\/5\s*disponible/i).first()).toBeVisible({ timeout: 10000 })
   })
 
+  /**
+   * Un groupe SANS réservations ne doit jamais appeler l'endpoint de planning.
+   *
+   * Constaté en production : 424 réponses 403 en quatre jours, sur onze groupes, toutes émises
+   * par cette page. `refreshPlanning` est déclenché par cinq actions sans rapport avec la vue
+   * planning — sauvegarde d'un objet, d'un groupe, modification par lot, réservation groupée —
+   * et appelait le planning sans vérifier le réglage du groupe.
+   *
+   * L'endpoint a raison de refuser : il porte le réglage, pas seulement l'écran. C'est l'appel
+   * côté client qui n'avait pas lieu d'être.
+   */
+  test('un groupe sans réservations n’appelle jamais le planning', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    const creation = await apiPost(
+      page,
+      `http://localhost:3000/api/editions/${editionId}/stock-groups`,
+      { data: { name: 'Sans réservation E2E', reservationsEnabled: false } }
+    )
+    expect(creation.ok(), `création du groupe : ${await creation.text()}`).toBe(true)
+    const groupeSansReservation = (await creation.json())?.data?.group?.id
+    expect(groupeSansReservation).toBeTruthy()
+
+    // Toute requête vers le planning est relevée, quelle qu'en soit l'issue.
+    const appelsAuPlanning: string[] = []
+    page.on('request', (requete) => {
+      if (requete.url().includes(`/stock-groups/${groupeSansReservation}/planning`)) {
+        appelsAuPlanning.push(requete.url())
+      }
+    })
+
+    await goto(`/editions/${editionId}/gestion/stock/${groupeSansReservation}`, {
+      waitUntil: 'hydration',
+    })
+
+    /**
+     * L'objet est créé DEPUIS L'INTERFACE, et c'est tout l'intérêt.
+     *
+     * Créé par l'API, aucun des cinq gestionnaires de sauvegarde de la page ne se déclenche — et
+     * le test passait alors aussi bien avec le correctif que sans lui. Vérifié : c'est
+     * `handleItemSaved`, branché sur la modale, qui appelle `refreshPlanning` et produisait le 403.
+     */
+    await page
+      .getByRole('button', { name: /nouvel objet/i })
+      .first()
+      .click()
+    await page.getByLabel(/nom de l’objet|nom de l'objet/i).fill('Objet sans réservation')
+    await page.getByRole('button', { name: /^enregistrer$/i }).click()
+
+    await expect(page.getByText(/objet sans réservation/i).first()).toBeVisible({ timeout: 15000 })
+
+    expect(appelsAuPlanning, 'la page ne doit pas interroger le planning de ce groupe').toEqual([])
+
+    await apiDelete(
+      page,
+      `http://localhost:3000/api/editions/${editionId}/stock-groups/${groupeSansReservation}`
+    )
+  })
+
   test('nettoyage : supprimer le groupe et désactiver le module', async ({ page }) => {
     const { editionId } = loadState()
     if (stockGroupId) {
