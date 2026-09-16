@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} piatto messo da parte | {count} piatti messi da parte",
       "meal_after_show": "Pasto consumato dopo lo spettacolo",
       "previous_day": "Giorno precedente",
-      "next_day": "Giorno successivo"
+      "next_day": "Giorno successivo",
+      "duplicates": {
+        "title": "Pasti in doppione",
+        "description": "Le persone che hanno diritto allo stesso pasto a più titoli",
+        "info": "Una stessa persona può essere volontaria, artista e organizzatrice: ogni titolo le apre i pasti separatamente, quindi conta più volte nel totale trasmesso alla cucina e richiede altrettante convalide all'ingresso. Non viene tolto nulla automaticamente: sta a te decidere, persona per persona, quali titoli conservano il pasto.",
+        "none": "Nessun doppione: nessuno ha diritto allo stesso pasto a più titoli.",
+        "meals_count": "{count} pasti in doppione",
+        "toggle_details": "Mostra il dettaglio dei pasti",
+        "remove_source": "Togliere come {source} ({count})",
+        "disable": "Disattiva",
+        "no_right": "Serve il permesso «{source}»: deve occuparsene la persona responsabile.",
+        "open_page": "Apri la pagina {source}",
+        "confirm_title": "Togliere i pasti come {source}?",
+        "confirm_description": "{name} non sarà più attesa né conteggiata per i suoi {count} pasti come {source}. Gli altri titoli restano invariati, e la rimozione si annulla dalla pagina interessata.",
+        "confirm_label": "Togli questi pasti",
+        "removed": "Diritto al pasto tolto",
+        "remove_error": "Impossibile togliere il diritto al pasto",
+        "remove_forbidden": "Permessi insufficienti per modificare questa fonte",
+        "load_error": "Errore durante il caricamento dei doppioni"
+      }
     },
     "organizers": {
       "access_rights": "Diritti di accesso",

@@ -2,6 +2,7 @@
 // ArtistMealSelection). Reste côté app ; le layer meals ne consomme que les interfaces (types.ts).
 import type {
   MealArtistParticipant,
+  MealArtistRight,
   MealArtistSelectionRow,
   MealConsumptionResult,
   MealsPorts,
@@ -86,6 +87,35 @@ export function createDefaultMealsPorts(): MealsPorts {
           phone: sel.artist.user.phone,
           consumedAt: sel.consumedAt,
           afterShow: sel.afterShow,
+        }))
+      },
+      // duplicates.get : les droits artistes de toute l'édition, en une requête.
+      async listEditionMealRights(editionId, mealIds): Promise<MealArtistRight[]> {
+        if (mealIds.length === 0) return []
+        const selections = await prisma.artistMealSelection.findMany({
+          where: { mealId: { in: mealIds }, accepted: true, artist: { editionId } },
+          select: {
+            id: true,
+            mealId: true,
+            artistId: true,
+            artist: {
+              select: {
+                user: {
+                  select: { id: true, nom: true, prenom: true, pseudo: true, email: true },
+                },
+              },
+            },
+          },
+        })
+        return selections.map((sel) => ({
+          mealId: sel.mealId,
+          selectionId: sel.id,
+          artistId: sel.artistId,
+          userId: sel.artist.user.id,
+          nom: sel.artist.user.nom,
+          prenom: sel.artist.user.prenom,
+          pseudo: sel.artist.user.pseudo,
+          email: sel.artist.user.email,
         }))
       },
       // validate.post : marque la consommation (atomique sur consumedAt null).

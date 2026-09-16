@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} plato reservado | {count} platos reservados",
       "meal_after_show": "Comida tomada después del espectáculo",
       "previous_day": "Día anterior",
-      "next_day": "Día siguiente"
+      "next_day": "Día siguiente",
+      "duplicates": {
+        "title": "Comidas duplicadas",
+        "description": "Personas con derecho a la misma comida por varios conceptos",
+        "info": "Una misma persona puede ser voluntaria, artista y organizadora a la vez: cada condición le abre las comidas por separado, por lo que cuenta varias veces en el total enviado a la cocina y exige otras tantas validaciones en el mostrador. No se retira nada automáticamente: usted decide, persona por persona, qué condiciones conservan la comida.",
+        "none": "Ningún duplicado: nadie tiene derecho a la misma comida por varios conceptos.",
+        "meals_count": "{count} comidas duplicadas",
+        "toggle_details": "Mostrar el detalle de las comidas",
+        "remove_source": "Retirar como {source} ({count})",
+        "disable": "Desactivar",
+        "no_right": "Se necesita el permiso «{source}»: debe encargarse la persona responsable.",
+        "open_page": "Abrir la página {source}",
+        "confirm_title": "¿Retirar las comidas como {source}?",
+        "confirm_description": "{name} ya no será esperada ni contabilizada para sus {count} comidas como {source}. Sus demás condiciones no cambian, y la retirada se deshace desde la página correspondiente.",
+        "confirm_label": "Retirar estas comidas",
+        "removed": "Derecho a la comida retirado",
+        "remove_error": "No se ha podido retirar el derecho a la comida",
+        "remove_forbidden": "Permisos insuficientes para modificar esta fuente",
+        "load_error": "Error al cargar los duplicados"
+      }
     },
     "organizers": {
       "access_rights": "Derechos de acceso",

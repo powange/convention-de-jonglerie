@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} talíř stranou | {count} talíře stranou",
       "meal_after_show": "Jídlo po vystoupení",
       "previous_day": "Předchozí den",
-      "next_day": "Další den"
+      "next_day": "Další den",
+      "duplicates": {
+        "title": "Duplicitní jídla",
+        "description": "Osoby, které mají nárok na stejné jídlo z více titulů",
+        "info": "Jedna osoba může být zároveň dobrovolnicí, umělkyní i organizátorkou: každý titul jí otevírá jídla zvlášť, takže se v součtu předávaném kuchyni počítá několikrát a vyžaduje stejný počet potvrzení u výdeje. Nic se neodebírá automaticky — sami rozhodnete, osobu po osobě, které tituly si jídlo ponechají.",
+        "none": "Žádné duplicity: nikdo nemá nárok na stejné jídlo z více titulů.",
+        "meals_count": "{count} duplicitních jídel",
+        "toggle_details": "Zobrazit podrobnosti o jídlech",
+        "remove_source": "Odebrat jako {source} ({count})",
+        "disable": "Deaktivovat",
+        "no_right": "Je potřeba oprávnění „{source}“: musí to vyřídit osoba, která to má na starosti.",
+        "open_page": "Otevřít stránku {source}",
+        "confirm_title": "Odebrat jídla z titulu {source}?",
+        "confirm_description": "{name} už nebude očekávána ani započítána u svých {count} jídel z titulu „{source}“. Ostatní tituly se nemění a odebrání lze vrátit na příslušné stránce.",
+        "confirm_label": "Odebrat tato jídla",
+        "removed": "Nárok na jídlo odebrán",
+        "remove_error": "Odebrání nároku na jídlo se nezdařilo",
+        "remove_forbidden": "Nedostatečná oprávnění ke změně tohoto zdroje",
+        "load_error": "Chyba při načítání duplicit"
+      }
     },
     "organizers": {
       "access_rights": "Přístupová práva",

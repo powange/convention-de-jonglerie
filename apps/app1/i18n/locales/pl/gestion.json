@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} talerz odłożony | {count} talerze odłożone",
       "meal_after_show": "Posiłek po spektaklu",
       "previous_day": "Poprzedni dzień",
-      "next_day": "Następny dzień"
+      "next_day": "Następny dzień",
+      "duplicates": {
+        "title": "Zdublowane posiłki",
+        "description": "Osoby uprawnione do tego samego posiłku z kilku tytułów",
+        "info": "Ta sama osoba może być wolontariuszką, artystką i organizatorką: każdy tytuł otwiera jej posiłki osobno, więc liczy się kilkakrotnie w sumie przekazywanej kuchni i wymaga tylu samo potwierdzeń przy wydawce. Nic nie jest usuwane automatycznie — to Ty decydujesz, osoba po osobie, które tytuły zachowują posiłek.",
+        "none": "Brak duplikatów: nikt nie jest uprawniony do tego samego posiłku z kilku tytułów.",
+        "meals_count": "{count} zdublowanych posiłków",
+        "toggle_details": "Pokaż szczegóły posiłków",
+        "remove_source": "Usuń jako {source} ({count})",
+        "disable": "Wyłącz",
+        "no_right": "Wymagane jest uprawnienie „{source}”: musi się tym zająć osoba za nie odpowiedzialna.",
+        "open_page": "Otwórz stronę {source}",
+        "confirm_title": "Usunąć posiłki z tytułu {source}?",
+        "confirm_description": "{name} nie będzie już oczekiwana ani liczona przy swoich {count} posiłkach z tytułu „{source}”. Pozostałe tytuły pozostają bez zmian, a usunięcie można cofnąć na odpowiedniej stronie.",
+        "confirm_label": "Usuń te posiłki",
+        "removed": "Uprawnienie do posiłku usunięte",
+        "remove_error": "Nie udało się usunąć uprawnienia do posiłku",
+        "remove_forbidden": "Niewystarczające uprawnienia, aby zmienić to źródło",
+        "load_error": "Błąd podczas wczytywania duplikatów"
+      }
     },
     "organizers": {
       "access_rights": "Prawa dostępu",

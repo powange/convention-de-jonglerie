@@ -658,6 +658,11 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
           label: t('gestion.meals.list_title'),
           icon: 'i-heroicons-list-bullet',
           to: `/editions/${editionId.value}/gestion/meals/list`,
+        },
+        {
+          label: t('gestion.meals.duplicates.title'),
+          icon: 'i-heroicons-document-duplicate',
+          to: `/editions/${editionId.value}/gestion/meals/duplicates`,
         }
       )
     }
