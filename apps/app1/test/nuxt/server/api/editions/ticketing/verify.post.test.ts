@@ -177,3 +177,101 @@ describe('POST /api/editions/[id]/ticketing/verify (artiste)', () => {
     )
   })
 })
+
+/**
+ * La branche organisateur.
+ *
+ * Elle était la seule à ne pas passer par l'agrégation commune : ses articles étaient rendus en
+ * deux listes juxtaposées, `handoutItems` et `globalHandoutItems`, sans dédoublonnage ni
+ * application du drapeau `cumulative`. Elle n'avait par ailleurs aucun test.
+ */
+describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
+  const mockUser = { id: 1, email: 'user@example.com', pseudo: 'testuser' }
+  const mockEvent = { context: { params: { id: '1' }, user: mockUser } }
+
+  const organisateur = {
+    id: 7,
+    entryValidated: false,
+    entryValidatedAt: null,
+    entryValidatedBy: null,
+    organizer: {
+      title: 'Responsable accueil',
+      user: { prenom: 'Claire', nom: 'Bernard', email: 'claire@example.com', phone: null },
+    },
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    mockCanAccessEditionData.mockResolvedValue(true)
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue(organisateur)
+  })
+
+  it('réunit les articles de TOUS les organisateurs et ceux de celui-ci', async () => {
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
+      { organizerId: null, quantity: 1, handoutItem: { id: 10, name: 'Bracelet' } },
+      { organizerId: 7, quantity: 2, handoutItem: { id: 30, name: 'Talkie', cumulative: false } },
+    ])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.type).toBe('organizer')
+    const noms = result.data.participant.organizer.handoutItems.map((i: any) => i.name).sort()
+    expect(noms).toEqual(['Bracelet', 'Talkie'])
+  })
+
+  it('demande les DEUX portées en une seule requête, sans `in` sur un NULL', async () => {
+    // C'est la requête qu'il faut vérifier, pas la réponse du mock : un `in: [id, null]`
+    // produirait `IN (…, NULL)`, et en SQL une comparaison avec NULL n'est jamais vraie — les
+    // articles globaux disparaîtraient sans la moindre erreur.
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([])
+
+    await verifyHandler(mockEvent as any)
+
+    expect(prismaMock.editionOrganizerHandoutItem.findMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.editionOrganizerHandoutItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          OR: [{ organizerId: 7 }, { organizerId: null }],
+        }),
+      })
+    )
+  })
+
+  it("ne remet QU'UNE FOIS un article non cumulable donné globalement ET nommément", async () => {
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
+      {
+        organizerId: null,
+        quantity: 1,
+        handoutItem: { id: 10, name: 'Bracelet', cumulative: false },
+      },
+      { organizerId: 7, quantity: 1, handoutItem: { id: 10, name: 'Bracelet', cumulative: false } },
+    ])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.participant.organizer.handoutItems).toHaveLength(1)
+    expect(result.data.participant.organizer.handoutItems[0].quantity).toBe(1)
+  })
+
+  it('ADDITIONNE un article cumulable donné par les deux portées', async () => {
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
+      { organizerId: null, quantity: 2, handoutItem: { id: 20, name: 'Ticket', cumulative: true } },
+      { organizerId: 7, quantity: 3, handoutItem: { id: 20, name: 'Ticket', cumulative: true } },
+    ])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.participant.organizer.handoutItems[0].quantity).toBe(5)
+  })
+
+  it('ne rend plus de liste globale séparée', async () => {
+    // Deux listes juxtaposées laissaient à l'écran le soin de les réunir — ce qu'il ne faisait
+    // pas, et ce qui aurait fait apparaître deux fois un même article.
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.participant.organizer.globalHandoutItems).toBeUndefined()
+  })
+})

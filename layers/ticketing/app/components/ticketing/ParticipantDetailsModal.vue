@@ -816,17 +816,23 @@ interface TicketData {
         tier?: {
           id: number
           name: string
-          handoutItems?: Array<{
-            handoutItem: {
-              id: number
-              name: string
-            }
-            source?: 'tier' | 'customField'
-            customFieldName?: string
-            /** Nombre d'exemplaires à remettre (articles cumulables) */
-            quantity?: number
-          }>
         }
+        /**
+         * Les articles à remettre pour CE billet, tarif, options et champs personnalisés déjà
+         * réunis et agrégés par le serveur. Portés par le billet et non par son tarif, puisque
+         * leurs sources le débordent.
+         */
+        handoutItems?: Array<{
+          handoutItem: {
+            id: number
+            name: string
+          }
+          source?: 'tier' | 'option' | 'customField'
+          customFieldName?: string
+          optionName?: string
+          /** Nombre d'exemplaires à remettre (articles cumulables) */
+          quantity?: number
+        }>
         selectedOptions?: Array<{
           id: number
           amount: number
@@ -835,12 +841,6 @@ interface TicketData {
             name: string
             type: string
             price: number | null
-            handoutItems?: Array<{
-              id: number
-              name: string
-              /** Nombre d'exemplaires à remettre (défini sur l'association) */
-              quantity?: number
-            }>
           }
         }>
       }>
@@ -940,6 +940,13 @@ interface OrganizerData {
       phone?: string | null
     }
     title?: string | null
+    /** Articles de cet organisateur et de tous les organisateurs, agrégés par le serveur. */
+    handoutItems?: Array<{
+      id: number
+      name: string
+      /** Nombre d'exemplaires à remettre (articles cumulables) */
+      quantity?: number
+    }>
     entryValidated?: boolean
     entryValidatedAt?: Date | string
     entryValidatedBy?: {
@@ -1032,40 +1039,28 @@ const handoutItemsToDistribute = computed(() => {
       const participantName =
         `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Participant'
 
-      // Articles du tarif
-      if (item.tier?.handoutItems) {
-        for (const tierItem of item.tier.handoutItems) {
-          // Construire le nom avec origine si disponible
-          let itemName = tierItem.handoutItem.name
-          if (tierItem.source === 'customField' && tierItem.customFieldName) {
-            itemName = `${tierItem.handoutItem.name} (${tierItem.customFieldName})`
-          }
-
-          // Créer un ID unique en utilisant un index global pour éviter les collisions
-          // même si plusieurs billets ont le même tarif et la même réponse au champ personnalisé
-          addItem(
-            `${item.id}-tier-${tierItem.handoutItem.id}-${itemName}`,
-            itemName,
-            tierItem.quantity ?? 1,
-            participantName
-          )
+      // La liste vient du serveur, tarif, options et champs personnalisés déjà réunis.
+      //
+      // L'écran la recomposait auparavant lui-même, en additionnant les quantités sans
+      // connaître le drapeau `cumulative` et en rangeant les articles du tarif et ceux des
+      // options sous des clés distinctes : un bracelet non cumulable attaché aux deux
+      // apparaissait en DEUX lignes à cocher. La règle n'a qu'un seul endroit où vivre.
+      for (const handout of item.handoutItems || []) {
+        // L'origine, quand elle éclaire ce qu'on remet : « (Taille du tee-shirt) » ou
+        // « (Camping) » dit d'où sort l'article mieux que son seul nom.
+        let itemName = handout.handoutItem.name
+        if (handout.source === 'customField' && handout.customFieldName) {
+          itemName = `${handout.handoutItem.name} (${handout.customFieldName})`
+        } else if (handout.source === 'option' && handout.optionName) {
+          itemName = `${handout.handoutItem.name} (${handout.optionName})`
         }
-      }
 
-      // Articles des options sélectionnées
-      if (item.selectedOptions) {
-        for (const selectedOption of item.selectedOptions) {
-          if (selectedOption.option.handoutItems) {
-            for (const optionItem of selectedOption.option.handoutItems) {
-              addItem(
-                `${item.id}-option-${optionItem.id}-${optionItem.name}`,
-                optionItem.name,
-                optionItem.quantity ?? 1,
-                participantName
-              )
-            }
-          }
-        }
+        addItem(
+          `${item.id}-${handout.handoutItem.id}`,
+          itemName,
+          handout.quantity ?? 1,
+          participantName
+        )
       }
     }
   }
@@ -1092,6 +1087,24 @@ const handoutItemsToDistribute = computed(() => {
     if (props.participant.artist.handoutItems) {
       for (const item of props.participant.artist.handoutItems) {
         addItem(`artist-${item.id}`, item.name, item.quantity ?? 1, artistName)
+      }
+    }
+  }
+
+  // Articles pour les organisateurs
+  //
+  // Cette branche manquait. Tout le reste de la chaîne existait pourtant — deux tables, un
+  // onglet de configuration, trois points d'API et un calcul serveur — mais la liste s'arrêtait
+  // ici : un organisateur se présentait au guichet et ne se voyait rien remettre, quoi qu'on
+  // eût paramétré.
+  if (props.participant && 'organizer' in props.participant) {
+    const organizerName =
+      `${props.participant.organizer.user.firstName} ${props.participant.organizer.user.lastName}`.trim() ||
+      'Organisateur'
+
+    if (props.participant.organizer.handoutItems) {
+      for (const item of props.participant.organizer.handoutItems) {
+        addItem(`organizer-${item.id}`, item.name, item.quantity ?? 1, organizerName)
       }
     }
   }

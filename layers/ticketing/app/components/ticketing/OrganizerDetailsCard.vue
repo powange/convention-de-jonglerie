@@ -100,14 +100,10 @@ interface Organizer {
     phone?: string | null
   }
   title?: string | null
-  handoutItems?: Array<{
-    id: number
-    name: string
-  }>
-  globalHandoutItems?: Array<{
-    id: number
-    name: string
-  }>
+  // Les articles à remettre ne figurent pas ici : cette carte ne les affiche pas, et n'a
+  // jamais eu à le faire. La liste à cocher de la modale de validation est la seule surface
+  // où on les remet — c'est vrai des quatre populations, la carte artiste porte la même
+  // déclaration morte.
   entryValidated?: boolean
   entryValidatedAt?: Date | string
   entryValidatedBy?: {
