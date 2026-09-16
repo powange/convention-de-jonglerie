@@ -466,6 +466,14 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+// Import explicite : plusieurs layers exportent un `requeteStats`-like et des constantes de même
+// famille, et l'auto-import ne saurait pas lequel prendre.
+import {
+  reglagesDepuisUrl,
+  requeteStats,
+  TYPES_DE_PRESENCE_STATS,
+} from '../../../../../utils/filtres-stats'
+
 const { money } = useEditionCurrency()
 
 const AccessValidationChart = defineAsyncComponent(
@@ -488,6 +496,7 @@ const artistConfig = getParticipantTypeConfig('artist')
 const organizerConfig = getParticipantTypeConfig('organizer')
 
 const route = useRoute()
+const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
@@ -609,18 +618,29 @@ const tierItems = computed(() =>
   }))
 )
 
-// Filtres sélectionnés pour les validations d'entrée
-const selectedTypes = ref<string[]>(
-  ['participants', 'volunteers', 'artists', 'organizers', 'others'].filter(
-    (type) => type !== 'artists' || edition.value?.artistsEnabled
-  )
+/**
+ * Les types cochés d'office, figés une fois pour toutes au montage.
+ *
+ * Ils dépendent de l'activation des artistes sur l'édition. Les recalculer plus tard ferait
+ * changer la référence à laquelle l'URL se compare : une sélection restée identique se mettrait
+ * soudain à s'écrire, ou l'inverse. Un défaut doit être stable pour que « s'écarte du défaut »
+ * veuille dire quelque chose.
+ */
+const typesParDefaut = TYPES_DE_PRESENCE_STATS.filter(
+  (type) => type !== 'artists' || edition.value?.artistsEnabled
 )
-const selectedPeriods = ref<string[]>(['setup', 'event', 'teardown'])
-const selectedGranularity = ref<number>(60) // Par défaut 1h
+
+// Réglages conservés dans l'URL — cf. `filtres-stats.ts` pour la règle.
+const reglagesInitiaux = reglagesDepuisUrl(route.query, typesParDefaut)
+
+// Filtres sélectionnés pour les validations d'entrée
+const selectedTypes = ref<string[]>(reglagesInitiaux.types)
+const selectedPeriods = ref<string[]>(reglagesInitiaux.periodes)
+const selectedGranularity = ref<number>(reglagesInitiaux.granularite)
 
 // Filtres sélectionnés pour les achats de billets
-const selectedPurchaseTypes = ref<string[]>(['participants', 'others'])
-const selectedPurchaseGranularity = ref<number>(1440) // Par défaut 1 jour
+const selectedPurchaseTypes = ref<string[]>(reglagesInitiaux.typesDachat)
+const selectedPurchaseGranularity = ref<number>(reglagesInitiaux.granulariteDesAchats)
 
 // Filtres du graphique des validations d'entrée (dérivés de selectedTypes)
 const filters = computed(() => ({
@@ -709,7 +729,7 @@ interface OrderSourcesData {
 const orderSourcesData = ref<OrderSourcesData | null>(null)
 const loadingOrderSources = ref(false)
 const orderSourcesError = ref(false)
-const viewMode = ref<'items' | 'orders'>('items')
+const viewMode = ref<'items' | 'orders'>(reglagesInitiaux.vue)
 
 // Données des tarifs
 interface Tier {
@@ -720,8 +740,44 @@ interface Tier {
 }
 
 const tiers = ref<Tier[]>([])
-const selectedTierIds = ref<number[]>([])
+const selectedTierIds = ref<number[]>(reglagesInitiaux.tarifs)
+
 const loadingTiers = ref(false)
+
+/**
+ * Report des réglages vers l'URL.
+ *
+ * `replace` et non `push` : régler un graphique n'est pas un pas de navigation sur lequel revenir,
+ * et sept réglages en feraient vite un historique inutilisable.
+ */
+watch(
+  [
+    selectedTypes,
+    selectedPeriods,
+    selectedGranularity,
+    selectedPurchaseTypes,
+    selectedPurchaseGranularity,
+    selectedTierIds,
+    viewMode,
+  ],
+  () => {
+    router.replace({
+      query: requeteStats(
+        route.query,
+        {
+          types: selectedTypes.value,
+          periodes: selectedPeriods.value,
+          granularite: selectedGranularity.value,
+          typesDachat: selectedPurchaseTypes.value,
+          granulariteDesAchats: selectedPurchaseGranularity.value,
+          tarifs: selectedTierIds.value,
+          vue: viewMode.value,
+        },
+        typesParDefaut
+      ),
+    })
+  }
+)
 
 // Filtrer les données selon les périodes sélectionnées
 const filteredData = computed(() => {

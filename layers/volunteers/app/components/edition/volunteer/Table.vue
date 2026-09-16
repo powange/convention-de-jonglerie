@@ -594,7 +594,11 @@ import {
   assignVolunteerTeams,
 } from '~/utils/volunteer-application-api'
 
-import { filtresDepuisUrl, requeteCandidatures } from '../../../utils/filtres-candidatures-url'
+import {
+  filtresDepuisUrl,
+  pageDepuisUrl,
+  requeteCandidatures,
+} from '../../../utils/filtres-candidatures-url'
 import {
   chaineDeRequete,
   parametresDesCandidatures,
@@ -628,10 +632,15 @@ const { teams: volunteerTeams } = useVolunteerTeams(props.editionId)
 const applications = ref<any[]>([])
 const applicationsLoading = ref(false)
 const exportingApplications = ref(false)
-const serverPagination = ref({ page: 1, pageSize: 20, total: 0, totalPages: 1 })
 // Filtres conservés dans l'URL — même règle que le planning, cf. `filtres-candidatures-url.ts`.
 const route = useRoute()
 const router = useRouter()
+const serverPagination = ref({
+  page: pageDepuisUrl(route.query.page),
+  pageSize: 20,
+  total: 0,
+  totalPages: 1,
+})
 const filtresInitiaux = filtresDepuisUrl(route.query)
 
 const applicationsFilterStatus = ref<string>(filtresInitiaux.statut)
@@ -648,16 +657,23 @@ watch(
     applicationsFilterPresence,
     applicationsFilterAssignedTeams,
     globalFilter,
+    // La page suit les filtres : un lien filtré qui ramène à la première page ne règle que la
+    // moitié du problème quand la liste en compte dix.
+    () => serverPagination.value.page,
   ],
   () => {
     router.replace({
-      query: requeteCandidatures(route.query, {
-        statut: applicationsFilterStatus.value,
-        equipesSouhaitees: applicationsFilterTeams.value,
-        presence: applicationsFilterPresence.value,
-        equipesAssignees: applicationsFilterAssignedTeams.value,
-        recherche: globalFilter.value,
-      }),
+      query: requeteCandidatures(
+        route.query,
+        {
+          statut: applicationsFilterStatus.value,
+          equipesSouhaitees: applicationsFilterTeams.value,
+          presence: applicationsFilterPresence.value,
+          equipesAssignees: applicationsFilterAssignedTeams.value,
+          recherche: globalFilter.value,
+        },
+        serverPagination.value.page
+      ),
     })
   }
 )

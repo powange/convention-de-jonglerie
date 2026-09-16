@@ -260,6 +260,8 @@ import {
 
 import type { TableColumn } from '@nuxt/ui'
 
+import { type ColonneTriee, triDepuisUrl, triVersUrl } from '~~/shared/utils/filtres-url'
+
 definePageMeta({
   layout: 'edition-dashboard',
   middleware: ['auth-protected'],
@@ -349,7 +351,9 @@ const onglets = computed(() =>
   }))
 )
 
-const tri = ref([])
+// Le tri fait partie de ce qu'on regarde, au même titre que l'onglet : trier par date de retour
+// pour traiter les retards, puis rafraîchir, ne doit pas ramener à l'ordre d'origine.
+const tri = ref<ColonneTriee[]>(triDepuisUrl(route.query.tri))
 const selection = ref<Record<string, boolean>>({})
 /** La clé de l'action en cours, pour n'animer que son bouton. */
 const enregistrement = ref<string | null>(null)
@@ -390,13 +394,15 @@ watch(ongletActif, () => {
  * sous les yeux, et le retour arrière ramène là où l'on était. `replace` et non `push` pour que
  * l'historique ne se remplisse pas d'un cran par onglet ouvert.
  */
-watch([ongletActif, lieuChoisi, personneChoisie], ([onglet, lieu, personne]) => {
+watch([ongletActif, lieuChoisi, personneChoisie, tri], ([onglet, lieu, personne]) => {
   router.replace({
     query: {
       ...route.query,
       onglet,
       lieu: lieu || undefined,
       qui: personne || undefined,
+      // `undefined` retire la clé : un tableau revenu à son ordre naturel n'a rien à dire.
+      tri: triVersUrl(tri.value) || undefined,
     },
   })
 })
@@ -518,6 +524,7 @@ async function charger() {
       ongletActif.value = ongletDepuisUrl(route.query.onglet) ?? ongletParDefaut(emprunts.value)
       lieuChoisi.value = typeof route.query.lieu === 'string' ? route.query.lieu : undefined
       personneChoisie.value = typeof route.query.qui === 'string' ? route.query.qui : undefined
+      tri.value = triDepuisUrl(route.query.tri)
       premierChargement = false
     }
   } catch {

@@ -269,6 +269,14 @@
 </template>
 
 <script setup lang="ts">
+// Import explicite : plusieurs layers exportent un `filtresDepuisUrl`, et l'auto-import ne
+// saurait pas lequel prendre.
+import {
+  dateConnue,
+  filtresDepuisUrl,
+  requeteListeDeRepas,
+} from '../../../../../utils/filtres-liste-repas'
+
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -292,20 +300,25 @@ const canAccess = computed(() => {
   return editionStore.canManageMeals(edition.value, authStore.user.id)
 })
 
+// Filtres conservés dans l'URL — cf. `filtres-liste-repas.ts` pour la règle.
+const router = useRouter()
+const filtresInitiaux = filtresDepuisUrl(route.query)
+
 // État
 const loading = ref(false)
 const participants = ref<any[]>([])
 const pagination = ref({
-  page: 1,
+  page: filtresInitiaux.page,
   pageSize: 20,
   total: 0,
   totalPages: 0,
 })
-const searchQuery = ref('')
-const selectedPhase = ref('all')
-const selectedType = ref('all')
-const selectedMealType = ref('all')
-const selectedDate = ref('all')
+
+const searchQuery = ref(filtresInitiaux.recherche)
+const selectedPhase = ref(filtresInitiaux.phase)
+const selectedType = ref(filtresInitiaux.typeDePersonne)
+const selectedMealType = ref(filtresInitiaux.typeDeRepas)
+const selectedDate = ref(filtresInitiaux.date)
 const availableDates = ref<string[]>([])
 
 // Variables pour la génération des PDFs de restauration
@@ -479,6 +492,11 @@ const fetchParticipants = async () => {
       pagination.value.total = response.pagination.totalCount
       pagination.value.totalPages = response.pagination.totalPages
       availableDates.value = response.availableDates || []
+      // Une date venue de l'URL mais absente de cette édition — lien gardé d'une édition
+      // précédente, jour retiré depuis — donnerait un tableau vide sans cause visible, le
+      // sélecteur ne pouvant même pas afficher la valeur qui filtre. On ne peut trancher qu'ici :
+      // les jours de l'édition n'arrivent qu'avec cette réponse.
+      selectedDate.value = dateConnue(selectedDate.value, availableDates.value)
       stats.value = response.stats || null
     }
   } catch (error: any) {
@@ -887,6 +905,38 @@ watch([selectedPhase, selectedType, selectedMealType, selectedDate], () => {
   pagination.value.page = 1
   fetchParticipants()
 })
+
+/**
+ * Report des filtres vers l'URL.
+ *
+ * Déclaré APRÈS la remise à zéro de la page ci-dessus : les observateurs se déclenchent dans leur
+ * ordre de création, et celui-ci doit voir la page déjà revenue à 1, sans quoi l'URL garderait la
+ * page d'avant le changement de filtre.
+ *
+ * `replace` et non `push` : choisir un filtre n'est pas un pas de navigation sur lequel revenir.
+ */
+watch(
+  [
+    selectedPhase,
+    selectedType,
+    selectedMealType,
+    selectedDate,
+    searchQuery,
+    () => pagination.value.page,
+  ],
+  () => {
+    router.replace({
+      query: requeteListeDeRepas(route.query, {
+        recherche: searchQuery.value,
+        phase: selectedPhase.value,
+        typeDePersonne: selectedType.value,
+        typeDeRepas: selectedMealType.value,
+        date: selectedDate.value,
+        page: pagination.value.page,
+      }),
+    })
+  }
+)
 
 onMounted(async () => {
   // Charger l'édition si nécessaire
