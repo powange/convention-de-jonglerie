@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
+import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 const createQuotaSchema = z.object({
   title: z.string().min(1, 'Le titre est obligatoire'),
