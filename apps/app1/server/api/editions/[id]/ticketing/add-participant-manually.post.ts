@@ -20,6 +20,15 @@ const itemSchema = z.object({
           .array(
             z.object({
               optionId: z.number().optional(), // ID de l'option (pour les billets créés manuellement)
+              /**
+               * L'identifiant interne du champ personnalisé.
+               *
+               * L'écran l'envoyait DÉJÀ ; ce schéma ne le déclarait pas, et zod retire en silence
+               * les clés inconnues. L'instantané du billet ne gardait donc que le libellé, et
+               * renommer le champ détachait le billet de ses quotas. Le déclarer suffit à le
+               * conserver — il part ensuite tel quel dans `customFields`.
+               */
+              customFieldId: z.number().optional(),
               name: z.string(),
               answer: z.string(),
             })
