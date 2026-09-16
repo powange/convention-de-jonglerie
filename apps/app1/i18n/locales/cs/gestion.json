@@ -288,6 +288,18 @@
         "saved_success": "Jídla tohoto organizátora byla uložena",
         "error_loading": "Jídla tohoto organizátora se nepodařilo načíst",
         "error_saving": "Jídla tohoto organizátora se nepodařilo uložit"
+      },
+      "roles_column": "Role",
+      "role": {
+        "manageVolunteers": "Dobrovolníci",
+        "manageArtists": "Umělci",
+        "manageMeals": "Jídlo",
+        "manageTicketing": "Vstupenky",
+        "manageTasks": "Úkoly",
+        "manageStock": "Materiál",
+        "manageWorkshops": "Workshopy",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Finance"
       }
     },
     "overview": "Přehled",

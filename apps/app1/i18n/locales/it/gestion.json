@@ -288,6 +288,18 @@
         "saved_success": "I pasti di questo organizzatore sono stati salvati",
         "error_loading": "Impossibile caricare i pasti di questo organizzatore",
         "error_saving": "Impossibile salvare i pasti di questo organizzatore"
+      },
+      "roles_column": "Ruoli",
+      "role": {
+        "manageVolunteers": "Volontari",
+        "manageArtists": "Artisti",
+        "manageMeals": "Pasti",
+        "manageTicketing": "Biglietteria",
+        "manageTasks": "Attività",
+        "manageStock": "Materiale",
+        "manageWorkshops": "Workshop",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Tesoreria"
       }
     },
     "overview": "Panoramica",

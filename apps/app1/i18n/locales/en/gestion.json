@@ -288,6 +288,18 @@
         "saved_success": "This organiser's meals have been saved",
         "error_loading": "Unable to load this organiser's meals",
         "error_saving": "Unable to save this organiser's meals"
+      },
+      "roles_column": "Roles",
+      "role": {
+        "manageVolunteers": "Volunteers",
+        "manageArtists": "Artists",
+        "manageMeals": "Meals",
+        "manageTicketing": "Ticketing",
+        "manageTasks": "Tasks",
+        "manageStock": "Equipment",
+        "manageWorkshops": "Workshops",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Treasury"
       }
     },
     "overview": "Overview",

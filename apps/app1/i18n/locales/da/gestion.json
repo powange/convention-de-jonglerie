@@ -288,6 +288,18 @@
         "saved_success": "Denne arrangørs måltider er gemt",
         "error_loading": "Kan ikke indlæse denne arrangørs måltider",
         "error_saving": "Kan ikke gemme denne arrangørs måltider"
+      },
+      "roles_column": "Roller",
+      "role": {
+        "manageVolunteers": "Frivillige",
+        "manageArtists": "Artister",
+        "manageMeals": "Måltider",
+        "manageTicketing": "Billetter",
+        "manageTasks": "Opgaver",
+        "manageStock": "Materiel",
+        "manageWorkshops": "Workshops",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Økonomi"
       }
     },
     "overview": "Oversigt",

@@ -4,6 +4,7 @@ import {
   canManageTicketing,
 } from '#server/utils/permissions/edition-permissions'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
+import { rolesDeLEdition } from '~~/shared/utils/roles-edition'
 
 export default wrapApiHandler(
   async (event) => {
@@ -105,6 +106,32 @@ export default wrapApiHandler(
             select: {
               id: true,
               title: true,
+              // Les droits de convention : ils valent sur toutes les éditions, et sans eux la
+              // colonne « Rôles » paraîtrait vide pour un membre permanent de l'équipe.
+              canManageVolunteers: true,
+              canManageArtists: true,
+              canManageMeals: true,
+              canManageTicketing: true,
+              canManageTasks: true,
+              canManageStock: true,
+              canManageWorkshops: true,
+              canManageFAQ: true,
+              canManageTreasury: true,
+              // Et ceux accordés sur CETTE édition seulement.
+              perEditionPermissions: {
+                where: { editionId },
+                select: {
+                  canManageVolunteers: true,
+                  canManageArtists: true,
+                  canManageMeals: true,
+                  canManageTicketing: true,
+                  canManageTasks: true,
+                  canManageStock: true,
+                  canManageWorkshops: true,
+                  canManageFAQ: true,
+                  canManageTreasury: true,
+                },
+              },
               user: {
                 select: {
                   ...userWithNameSelect,
@@ -130,6 +157,15 @@ export default wrapApiHandler(
         organizers: editionOrganizers.map((eo) => ({
           id: eo.id,
           organizerId: eo.organizerId,
+          // Ce que cette personne peut réellement gérer ici — voir `roles-edition`.
+          roles: rolesDeLEdition(
+            eo.organizer,
+            // `?.` délibéré : une relation absente ne doit pas faire tomber TOUTE la page des
+            // organisateurs en 500. Mieux vaut une colonne de rôles incomplète qu'un écran mort.
+            eo.organizer.perEditionPermissions?.[0] ?? null,
+            eo.organizer.user.id === edition.creatorId ||
+              eo.organizer.user.id === edition.convention.authorId
+          ),
           entryValidated: eo.entryValidated,
           entryValidatedAt: eo.entryValidatedAt,
           createdAt: eo.createdAt,

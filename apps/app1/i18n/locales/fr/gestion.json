@@ -298,6 +298,18 @@
         "saved_success": "Les repas de cet organisateur ont été enregistrés",
         "error_loading": "Impossible de charger les repas de cet organisateur",
         "error_saving": "Impossible d'enregistrer les repas de cet organisateur"
+      },
+      "roles_column": "Rôles",
+      "role": {
+        "manageVolunteers": "Bénévoles",
+        "manageArtists": "Artistes",
+        "manageMeals": "Repas",
+        "manageTicketing": "Billetterie",
+        "manageTasks": "Tâches",
+        "manageStock": "Matériel",
+        "manageWorkshops": "Workshops",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Trésorerie"
       }
     },
     "overview": "Vue d'ensemble",

@@ -288,6 +288,18 @@
         "saved_success": "Se han guardado las comidas de este organizador",
         "error_loading": "No se han podido cargar las comidas de este organizador",
         "error_saving": "No se han podido guardar las comidas de este organizador"
+      },
+      "roles_column": "Roles",
+      "role": {
+        "manageVolunteers": "Voluntarios",
+        "manageArtists": "Artistas",
+        "manageMeals": "Comidas",
+        "manageTicketing": "Entradas",
+        "manageTasks": "Tareas",
+        "manageStock": "Material",
+        "manageWorkshops": "Talleres",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Tesorería"
       }
     },
     "overview": "Vista general",

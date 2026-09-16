@@ -288,6 +288,18 @@
         "saved_success": "De maaltijden van deze organisator zijn opgeslagen",
         "error_loading": "Kan de maaltijden van deze organisator niet laden",
         "error_saving": "Kan de maaltijden van deze organisator niet opslaan"
+      },
+      "roles_column": "Rollen",
+      "role": {
+        "manageVolunteers": "Vrijwilligers",
+        "manageArtists": "Artiesten",
+        "manageMeals": "Maaltijden",
+        "manageTicketing": "Ticketing",
+        "manageTasks": "Taken",
+        "manageStock": "Materiaal",
+        "manageWorkshops": "Workshops",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Financiën"
       }
     },
     "overview": "Overzicht",
