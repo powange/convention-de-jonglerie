@@ -532,7 +532,7 @@
                     </UBadge>
                     <!-- Barre de progression -->
                     <UProgress
-                      v-model="assignment.confidence"
+                      :model-value="assignment.confidence"
                       :max="100"
                       :color="getConfidenceColor(assignment.confidence || 0)"
                       size="xs"

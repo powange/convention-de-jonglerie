@@ -1,6 +1,8 @@
+import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getQuotaStats } from '#server/utils/editions/ticketing/quota-stats'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
@@ -19,7 +21,7 @@ export default wrapApiHandler(
 
     try {
       const stats = await getQuotaStats(editionId)
-      return { stats }
+      return createSuccessResponse({ stats })
     } catch (error: unknown) {
       console.error('Failed to fetch quota stats:', error)
       throw createError({

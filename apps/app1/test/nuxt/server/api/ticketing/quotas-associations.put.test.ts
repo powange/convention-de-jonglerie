@@ -32,7 +32,11 @@ describe('association des quotas — les trois cibles', () => {
     mockCanManage.mockResolvedValue(true)
     prismaMock.$transaction.mockImplementation(async (fn: any) => fn(prismaMock))
     // Par défaut, tous les quotas demandés appartiennent bien à l'édition.
-    prismaMock.ticketingQuota.count.mockImplementation(async ({ where }: any) => where.id.in.length)
+    // `assertQuotasDeLEdition` lit les quotas au lieu de les compter : par défaut, tous
+    // ceux qu'on demande appartiennent bien à l'édition.
+    prismaMock.ticketingQuota.findMany.mockImplementation(async ({ where }: any) =>
+      where.id.in.map((id: number) => ({ id }))
+    )
   })
 
   describe('tarifs', () => {
@@ -82,7 +86,7 @@ describe('association des quotas — les trois cibles', () => {
     })
 
     it('refuse un quota d’une autre édition, sans rien écrire', async () => {
-      prismaMock.ticketingQuota.count.mockResolvedValue(1) // un seul des deux appartient à l'édition
+      prismaMock.ticketingQuota.findMany.mockResolvedValue([{ id: 5 }]) // un seul des deux appartient à l'édition
 
       await expect(envoyer({ quotaIds: [5, 999] })).rejects.toMatchObject({ statusCode: 400 })
       expect(prismaMock.ticketingTierQuota.deleteMany).not.toHaveBeenCalled()

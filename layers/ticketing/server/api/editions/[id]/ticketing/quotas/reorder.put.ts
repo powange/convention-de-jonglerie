@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { assertQuotasDeLEdition } from '../../../../../utils/quotas-appartenance'
+
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
@@ -27,6 +29,17 @@ export default wrapApiHandler(
       })
 
     const body = bodySchema.parse(await readBody(event))
+
+    /**
+     * Le garde manquait ici, et son absence se voyait mal : le filtre `editionId` glissé dans
+     * l'`update` protégeait bien contre l'écriture croisée, mais l'absence de correspondance
+     * levait une erreur Prisma que le `catch` transformait en 500. Une tentative d'écrire sur le
+     * quota d'une autre édition se présentait donc comme une panne du serveur.
+     */
+    await assertQuotasDeLEdition(
+      editionId,
+      body.positions.map((position) => position.id)
+    )
 
     try {
       // Mettre à jour les positions en utilisant une transaction
