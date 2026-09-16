@@ -34,6 +34,9 @@ describe('quotas — la place qu’occupent les personnes sans billet', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     prismaMock.ticketingOrderItem.findMany.mockResolvedValue([])
+    // Les options prises, désormais lues dans leur table de liaison (voir
+    // quota-stats-options.test.ts) : sans ce défaut, le calcul n'a rien à parcourir.
+    prismaMock.ticketingOrderItemOption.findMany.mockResolvedValue([])
     prismaMock.editionOrganizer.findMany.mockResolvedValue([])
     prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([])
     prismaMock.editionArtist.findMany.mockResolvedValue([])
