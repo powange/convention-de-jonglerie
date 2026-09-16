@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Stänga av föremål att dela ut?",
       "handout_items_off_action": "Öppna biljettinställningarna",
       "handout_items_off_description": "Den är avstängd för den här upplagan: entrékontrollen efterfrågar inga föremål. Dina befintliga inställningar sparas och kommer tillbaka om du slår på den igen.",
-      "handout_items_off_title": "Hanteringen av föremål att dela ut är avstängd"
+      "handout_items_off_title": "Hanteringen av föremål att dela ut är avstängd",
+      "handout_items_disable_confirm_unknown": "Vi kunde inte kontrollera om det finns föremål att dela ut konfigurerade för den här upplagan. Om du stänger av slutar entrékontrollen att efterfråga dem: inget delas ut. Dina inställningar sparas och kommer tillbaka om du slår på igen."
     },
     "title": "Hantering",
     "view_edition": "Visa upplagan",

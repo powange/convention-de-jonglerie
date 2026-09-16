@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Auszuhändigende Artikel deaktivieren?",
       "handout_items_off_action": "Ticketing-Einstellungen öffnen",
       "handout_items_off_description": "Sie ist für diese Ausgabe deaktiviert: Die Zugangskontrolle fragt keinen Artikel ab. Deine bestehenden Einstellungen bleiben erhalten und kommen zurück, sobald du wieder aktivierst.",
-      "handout_items_off_title": "Die Verwaltung auszuhändigender Artikel ist deaktiviert"
+      "handout_items_off_title": "Die Verwaltung auszuhändigender Artikel ist deaktiviert",
+      "handout_items_disable_confirm_unknown": "Es konnte nicht geprüft werden, ob für diese Ausgabe auszuhändigende Artikel eingerichtet sind. Wenn du sie deaktivierst, fragt die Zugangskontrolle nicht mehr danach: Es wird nichts mehr ausgehändigt. Deine Einstellungen bleiben erhalten und kommen zurück, sobald du wieder aktivierst."
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

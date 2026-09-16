@@ -668,6 +668,7 @@
       "handout_items_card_description": "Articles à remettre lors de la validation d'un billet (bracelets, pass camping, goodies, badges, etc.).",
       "handout_items_description": "Articles à remettre à l'accueil lors de la validation d'un billet ou de l'arrivée des participants, bénévoles, artistes et organisateurs (bracelets, pass camping, goodies, badges, etc.).",
       "handout_items_disable_confirm": "Cette édition a {count} article(s) à remettre paramétré(s). En désactivant, le contrôle d'accès cessera de les réclamer : plus rien ne sera remis aux participants, bénévoles, artistes ni organisateurs. Le paramétrage est conservé et reviendra si vous réactivez.",
+      "handout_items_disable_confirm_unknown": "Impossible de vérifier si des articles à remettre sont paramétrés sur cette édition. En désactivant, le contrôle d'accès cessera de les réclamer : plus rien ne sera remis. Le paramétrage est conservé et reviendra si vous réactivez.",
       "handout_items_disable_label": "Désactiver quand même",
       "handout_items_disable_title": "Désactiver les articles à remettre ?",
       "handout_items_disabled": "La gestion des articles à remettre est désactivée",
