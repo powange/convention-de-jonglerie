@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Desativar os artigos a entregar?",
       "handout_items_off_action": "Abrir a configuração da bilheteira",
       "handout_items_off_description": "Está desativada nesta edição: o controlo de acessos não pede nenhum artigo. As definições existentes são mantidas e voltarão se a reativares.",
-      "handout_items_off_title": "A gestão de artigos a entregar está desativada"
+      "handout_items_off_title": "A gestão de artigos a entregar está desativada",
+      "handout_items_disable_confirm_unknown": "Não foi possível verificar se existem artigos a entregar configurados nesta edição. Se desativares, o controlo de acessos deixará de os pedir: nada será entregue. As tuas definições são mantidas e voltarão se reativares."
     },
     "title": "Gestão",
     "view_edition": "Ver a edição",

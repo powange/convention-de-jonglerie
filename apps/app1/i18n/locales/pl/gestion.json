@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Wyłączyć przedmioty do wydania?",
       "handout_items_off_action": "Otwórz konfigurację biletów",
       "handout_items_off_description": "Jest wyłączona dla tej edycji: kontrola wejścia nie prosi o żaden przedmiot. Istniejące ustawienia są zachowane i wrócą po ponownym włączeniu.",
-      "handout_items_off_title": "Zarządzanie przedmiotami do wydania jest wyłączone"
+      "handout_items_off_title": "Zarządzanie przedmiotami do wydania jest wyłączone",
+      "handout_items_disable_confirm_unknown": "Nie udało się sprawdzić, czy w tej edycji skonfigurowano przedmioty do wydania. Po wyłączeniu kontrola wejścia przestanie o nie prosić: nic nie zostanie wydane. Ustawienia zostaną zachowane i wrócą po ponownym włączeniu."
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Disattivare gli articoli da consegnare?",
       "handout_items_off_action": "Apri la configurazione della biglietteria",
       "handout_items_off_description": "È disattivata per questa edizione: il controllo accessi non richiede alcun articolo. Le impostazioni esistenti vengono conservate e torneranno se la riattivi.",
-      "handout_items_off_title": "La gestione degli articoli da consegnare è disattivata"
+      "handout_items_off_title": "La gestione degli articoli da consegnare è disattivata",
+      "handout_items_disable_confirm_unknown": "Non è stato possibile verificare se per questa edizione sono configurati articoli da consegnare. Se la disattivi, il controllo accessi smetterà di richiederli: non verrà consegnato nulla. Le impostazioni vengono conservate e torneranno se la riattivi."
     },
     "title": "Gestione",
     "view_edition": "Vedi l'edizione",

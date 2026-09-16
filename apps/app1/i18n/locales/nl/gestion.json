@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Uit te reiken items uitschakelen?",
       "handout_items_off_action": "Ticketinginstellingen openen",
       "handout_items_off_description": "Het is uitgeschakeld voor deze editie: de toegangscontrole vraagt om geen enkel item. Je bestaande instellingen blijven bewaard en komen terug als je het weer inschakelt.",
-      "handout_items_off_title": "Het beheer van uit te reiken items is uitgeschakeld"
+      "handout_items_off_title": "Het beheer van uit te reiken items is uitgeschakeld",
+      "handout_items_disable_confirm_unknown": "We konden niet controleren of er voor deze editie uit te reiken items zijn ingesteld. Als je dit uitschakelt, vraagt de toegangscontrole er niet meer om: er wordt niets uitgereikt. Je instellingen blijven bewaard en komen terug als je het weer inschakelt."
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",

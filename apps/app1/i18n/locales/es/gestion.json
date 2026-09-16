@@ -845,7 +845,8 @@
       "handout_items_disable_title": "¿Desactivar los artículos para entregar?",
       "handout_items_off_action": "Abrir la configuración de entradas",
       "handout_items_off_description": "Está desactivada en esta edición: el control de acceso no pide ningún artículo. Tu configuración existente se conserva y volverá si la reactivas.",
-      "handout_items_off_title": "La gestión de artículos para entregar está desactivada"
+      "handout_items_off_title": "La gestión de artículos para entregar está desactivada",
+      "handout_items_disable_confirm_unknown": "No se ha podido comprobar si hay artículos para entregar configurados en esta edición. Si lo desactivas, el control de acceso dejará de pedirlos: no se entregará nada. Tu configuración se conserva y volverá si lo reactivas."
     },
     "title": "Gestión",
     "view_edition": "Ver la edición",

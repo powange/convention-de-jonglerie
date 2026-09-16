@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Vypnout předměty k předání?",
       "handout_items_off_action": "Otevřít nastavení vstupenek",
       "handout_items_off_description": "Pro tento ročník je vypnutá: kontrola vstupu si nežádá žádný předmět. Stávající nastavení zůstává zachováno a vrátí se, jakmile funkci znovu zapnete.",
-      "handout_items_off_title": "Správa předmětů k předání je vypnutá"
+      "handout_items_off_title": "Správa předmětů k předání je vypnutá",
+      "handout_items_disable_confirm_unknown": "Nepodařilo se ověřit, zda jsou pro tento ročník nastaveny předměty k předání. Pokud je vypnete, kontrola vstupu si o ně přestane říkat: nic se nepředá. Nastavení zůstane zachováno a vrátí se, jakmile funkci znovu zapnete."
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",

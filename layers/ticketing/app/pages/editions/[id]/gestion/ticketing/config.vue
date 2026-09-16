@@ -359,9 +359,7 @@
     <ConfirmModal
       v-model="confirmationExtinctionOuverte"
       :title="$t('gestion.ticketing.handout_items_disable_title')"
-      :description="
-        $t('gestion.ticketing.handout_items_disable_confirm', { count: nombreDArticles })
-      "
+      :description="messageDExtinction"
       :confirm-label="$t('gestion.ticketing.handout_items_disable_label')"
       confirm-color="error"
       icon-name="i-heroicons-exclamation-triangle"
@@ -573,35 +571,56 @@ const handleToggleAnonymousOrders = async (val: boolean) => {
   }
 }
 
-/**
- * Nombre d'articles déjà paramétrés sur l'édition.
- *
- * `null` tant qu'on ne l'a pas demandé : on n'interroge qu'au moment d'éteindre, la page n'ayant
- * aucune autre raison de connaître ce chiffre.
- */
+/** Nombre d'articles paramétrés, tel que la confirmation l'annonce. 0 quand on l'ignore. */
 const nombreDArticles = ref(0)
 const confirmationExtinctionOuverte = ref(false)
 
 /**
+ * Le message de la confirmation, selon qu'on sait compter ou non.
+ *
+ * Annoncer « 0 article » tout en demandant confirmation serait contradictoire : quand le compte
+ * n'a pas pu être établi, on dit qu'on ne sait pas plutôt que d'avancer un chiffre faux.
+ */
+const messageDExtinction = computed(() =>
+  nombreDArticles.value > 0
+    ? t('gestion.ticketing.handout_items_disable_confirm', { count: nombreDArticles.value })
+    : t('gestion.ticketing.handout_items_disable_confirm_unknown')
+)
+
+/**
+ * Combien d'articles sont paramétrés — ou `null` si on n'a pas pu l'établir.
+ *
+ * `null` et non `0` : ce sont deux réponses différentes, et les confondre revient à traiter
+ * « je ne sais pas » comme « il n'y en a pas ». C'est exactement ce que faisait la première
+ * version, dont le commentaire disait pourtant l'inverse de ce que le code faisait.
+ */
+const nombreDArticlesParametres = async (): Promise<number | null> => {
+  try {
+    const reponse = await $fetch<{ data?: { handoutItems?: unknown[] } }>(
+      `/api/editions/${editionId.value}/ticketing/handout-items`
+    )
+    const articles = reponse?.data?.handoutItems
+    // Une forme inattendue n'est pas un compte à zéro : elle est un compte inconnu.
+    return Array.isArray(articles) ? articles.length : null
+  } catch {
+    return null
+  }
+}
+
+/**
  * Éteindre coupe la remise au guichet, pas seulement le menu.
  *
- * On demande donc confirmation quand des articles existent — et seulement dans ce sens : rallumer
- * ne fait rien perdre, et une édition qui n'a rien paramétré n'a rien à perdre non plus.
+ * On demande donc confirmation dans ce sens uniquement — rallumer ne fait rien perdre — et on ne
+ * s'en dispense QUE si l'on sait de façon certaine qu'aucun article n'est paramétré. Dans le
+ * doute, on demande : une question de trop coûte un clic, une remise coupée en silence coûte une
+ * convention.
  */
 const handleToggleHandoutItems = async (val: boolean) => {
   if (!val) {
-    try {
-      const reponse = await $fetch<{ data?: { handoutItems?: unknown[] } }>(
-        `/api/editions/${editionId.value}/ticketing/handout-items`
-      )
-      nombreDArticles.value = reponse?.data?.handoutItems?.length ?? 0
-    } catch {
-      // Le compte n'a pas pu être établi. Demander confirmation quand même : mieux vaut une
-      // question de trop qu'une remise coupée sans prévenir.
-      nombreDArticles.value = 0
-    }
+    const compte = await nombreDArticlesParametres()
+    nombreDArticles.value = compte ?? 0
 
-    if (nombreDArticles.value > 0) {
+    if (compte !== 0) {
       // Le commutateur est déjà passé à « éteint » à l'écran : on le laisse tel quel le temps de
       // la question, et `annulerExtinction` le remet si l'on renonce.
       confirmationExtinctionOuverte.value = true

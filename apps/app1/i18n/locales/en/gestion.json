@@ -845,7 +845,8 @@
       "handout_items_disable_title": "Disable handout items?",
       "handout_items_off_action": "Open ticketing settings",
       "handout_items_off_description": "It is disabled for this edition: access control does not ask for any item. Your existing settings are kept and will come back if you enable it again.",
-      "handout_items_off_title": "Handout item management is disabled"
+      "handout_items_off_title": "Handout item management is disabled",
+      "handout_items_disable_confirm_unknown": "We could not check whether handout items are configured for this edition. If you disable them, access control will stop asking for them: nothing will be handed out. Your settings are kept and will come back if you enable it again."
     },
     "title": "Management",
     "view_edition": "View edition",

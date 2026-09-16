@@ -30,16 +30,6 @@ export const handoutItemSchema = z.object({
 export type HandoutItemData = z.infer<typeof handoutItemSchema>
 
 /**
- * Récupère tous les items à remettre d'une édition
- */
-export async function getHandoutItems(editionId: number) {
-  return await prisma.ticketingHandoutItem.findMany({
-    where: { editionId },
-    orderBy: { createdAt: 'asc' },
-  })
-}
-
-/**
  * Crée un nouvel item à remettre
  */
 export async function createHandoutItem(editionId: number, data: HandoutItemData) {
