@@ -1,3 +1,5 @@
+import { reponseDesigneLeChamp } from './rapprochement-champ'
+
 /**
  * Article à remettre tel que manipulé par l'agrégation.
  * `cumulative` vient de TicketingHandoutItem ; absent = non cumulable.
@@ -103,9 +105,16 @@ export function calculateHandoutItemsForTicket(item: any) {
   const customFieldItems: any[] = []
   if (item.customFields && Array.isArray(item.customFields)) {
     for (const answeredField of item.customFields as any[]) {
-      // Trouver le custom field correspondant dans le tarif
-      const customFieldAssociation = item.tier?.customFields?.find(
-        (cf: any) => cf.customField.label === answeredField.name
+      /**
+       * Trouver le champ que cette réponse désigne.
+       *
+       * Par `reponseDesigneLeChamp` et non par comparaison de libellés : renommer un champ
+       * détachait les billets déjà vendus, et l'article cessait d'être dû sans que rien ne le
+       * signale. Le décompte des quotas portait le même défaut, corrigé avant celui-ci — la règle
+       * est maintenant partagée plutôt que recopiée.
+       */
+      const customFieldAssociation = item.tier?.customFields?.find((cf: any) =>
+        reponseDesigneLeChamp(answeredField, cf.customField)
       )
 
       if (customFieldAssociation) {
