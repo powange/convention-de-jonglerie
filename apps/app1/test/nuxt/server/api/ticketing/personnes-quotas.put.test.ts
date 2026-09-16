@@ -28,7 +28,11 @@ describe('association des quotas aux personnes présentes', () => {
     vi.clearAllMocks()
     mockCanManage.mockResolvedValue(true)
     prismaMock.$transaction.mockImplementation(async (fn: any) => fn(prismaMock))
-    prismaMock.ticketingQuota.count.mockImplementation(async ({ where }: any) => where.id.in.length)
+    // `assertQuotasDeLEdition` lit les quotas au lieu de les compter : par défaut, tous
+    // ceux qu'on demande appartiennent bien à l'édition.
+    prismaMock.ticketingQuota.findMany.mockImplementation(async ({ where }: any) =>
+      where.id.in.map((id: number) => ({ id }))
+    )
     for (const table of [
       prismaMock.editionOrganizerQuota,
       prismaMock.editionVolunteerQuota,
@@ -83,7 +87,7 @@ describe('association des quotas aux personnes présentes', () => {
     })
 
     it('refuse un quota d’une autre édition, sans rien écrire', async () => {
-      prismaMock.ticketingQuota.count.mockResolvedValue(1)
+      prismaMock.ticketingQuota.findMany.mockResolvedValue([{ id: 5 }])
 
       await expect(envoyer({ quotaIds: [5, 999] })).rejects.toMatchObject({ statusCode: 400 })
       expect(prismaMock.editionOrganizerQuota.deleteMany).not.toHaveBeenCalled()

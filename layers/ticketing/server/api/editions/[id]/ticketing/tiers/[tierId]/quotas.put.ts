@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { assertQuotasDeLEdition } from '../../../../../../utils/quotas-appartenance'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
@@ -44,19 +46,7 @@ export default wrapApiHandler(
     // plutôt que de laisser la base refuser une saisie qui n'a rien d'aberrant côté écran.
     const quotaIds = [...new Set(body.quotaIds)]
 
-    // Les quotas doivent appartenir à cette édition — sans quoi on rattacherait un tarif à la
-    // jauge d'une autre convention.
-    if (quotaIds.length > 0) {
-      const nombre = await prisma.ticketingQuota.count({
-        where: { id: { in: quotaIds }, editionId },
-      })
-      if (nombre !== quotaIds.length) {
-        throw createError({
-          status: 400,
-          message: "Certains quotas n'appartiennent pas à cette édition",
-        })
-      }
-    }
+    await assertQuotasDeLEdition(editionId, quotaIds)
 
     await prisma.$transaction(async (tx) => {
       await tx.ticketingTierQuota.deleteMany({ where: { tierId } })

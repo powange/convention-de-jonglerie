@@ -60,8 +60,11 @@
               </div>
 
               <!-- Barre de progression -->
+              <!-- `:model-value` et non `v-model` : une barre de progression ne s'écrit pas, et
+                   `quota` vient d'un `computed` sur les données de `useFetch` — la lier en
+                   écriture ouvrait une voie de mutation vers ce qu'on vient de recevoir. -->
               <UProgress
-                v-model="quota.currentCount"
+                :model-value="quota.currentCount"
                 :max="quota.quantity < quota.currentCount ? quota.currentCount : quota.quantity"
                 :color="
                   quota.percentage >= 100 ? 'error' : quota.percentage >= 80 ? 'warning' : 'success'
@@ -99,7 +102,13 @@ const {
   pending,
   refresh,
 } = await useFetch(`/api/editions/${props.editionId}/ticketing/quotas/stats`)
-const quotaStats = computed(() => quotaStatsData.value?.stats || [])
+// Les statistiques sont désormais sous la clé `data` de l'enveloppe : l'endpoint passe par
+// `createSuccessResponse`, comme tous les autres du module. Il faisait exception, et c'est
+// l'exception qui aurait piégé le prochain appelant.
+//
+// (Le chemin pointé est écrit en toutes lettres à dessein : le détecteur i18n le prendrait pour
+// une clé de traduction manquante.)
+const quotaStats = computed(() => quotaStatsData.value?.data?.stats || [])
 
 // Rafraîchir quand une mise à jour SSE arrive
 watch(lastUpdate, () => {

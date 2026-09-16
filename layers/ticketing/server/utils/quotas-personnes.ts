@@ -1,3 +1,5 @@
+import { assertQuotasDeLEdition } from './quotas-appartenance'
+
 /**
  * L'écriture des quotas des personnes présentes sans billet — la seule.
  *
@@ -39,19 +41,7 @@ export async function remplacerLesQuotas({
   // plutôt que de laisser la base refuser une saisie qui n'a rien d'aberrant à l'écran.
   const ids = [...new Set(quotaIds)]
 
-  // Les quotas doivent appartenir à cette édition — sans quoi on rattacherait des personnes à la
-  // jauge d'une autre convention.
-  if (ids.length > 0) {
-    const nombre = await prisma.ticketingQuota.count({
-      where: { id: { in: ids }, editionId },
-    })
-    if (nombre !== ids.length) {
-      throw createError({
-        status: 400,
-        message: "Certains quotas n'appartiennent pas à cette édition",
-      })
-    }
-  }
+  await assertQuotasDeLEdition(editionId, ids)
 
   await prisma.$transaction(async (tx) => {
     /**
