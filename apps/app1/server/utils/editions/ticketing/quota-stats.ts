@@ -29,10 +29,9 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
           },
         },
       },
+      // L'identifiant suffit : le rapprochement se fait par clé étrangère, plus par le nom.
       options: {
-        include: {
-          option: true,
-        },
+        select: { optionId: true },
       },
       customFields: {
         include: {
@@ -70,6 +69,42 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
       entryValidated: true,
     },
   })
+
+  /**
+   * Les options réellement prises, par billet.
+   *
+   * Lues dans `TicketingOrderItemOption`, la table de liaison — et non dans l'instantané JSON du
+   * billet, où le calcul les cherchait autrefois et où elles ne sont JAMAIS : les deux chemins
+   * d'écriture les en excluent explicitement. Un quota posé sur une option comptait donc zéro,
+   * quel que soit le nombre de billets. Mesuré avant correction sur la base de développement :
+   * 149 options vendues, aucun billet trouvé.
+   *
+   * Le rapprochement se fait par `optionId`. Renommer une option ne détache donc plus rien,
+   * contrairement à la comparaison de noms qu'il remplace.
+   *
+   * Même filtre d'état que le reste du calcul : une option prise sur un billet annulé n'occupe
+   * pas de place.
+   */
+  const optionsPrises = await prisma.ticketingOrderItemOption.findMany({
+    where: {
+      orderItem: {
+        state: { in: ['Processed', 'Pending'] },
+        order: { editionId },
+      },
+    },
+    select: {
+      optionId: true,
+      orderItem: { select: { id: true, entryValidated: true } },
+    },
+  })
+
+  /** Les billets qui ont pris telle option. */
+  const billetsParOption = new Map<number, Array<{ id: number; entryValidated: boolean }>>()
+  for (const prise of optionsPrises) {
+    const existants = billetsParOption.get(prise.optionId)
+    if (existants) existants.push(prise.orderItem)
+    else billetsParOption.set(prise.optionId, [prise.orderItem])
+  }
 
   /**
    * Les personnes présentes sur l'édition sans passer par un billet.
@@ -199,23 +234,14 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
       }
     }
 
-    // 2. Compter les participants via les options (dans customFields)
+    // 2. Compter les billets via les options qu'ils ont prises.
     for (const optionQuota of quota.options) {
-      const optionName = optionQuota.option.name
-
-      for (const orderItem of allOrderItems) {
-        if (orderItem.customFields && Array.isArray(orderItem.customFields)) {
-          // Vérifier si cet orderItem a sélectionné cette option
-          const hasOption = (orderItem.customFields as any[]).some(
-            (field) => field.name === optionName && field.answer
-          )
-
-          if (hasOption) {
-            matchingOrderItemIds.add(orderItem.id)
-            if (orderItem.entryValidated) {
-              validatedOrderItemIds.add(orderItem.id)
-            }
-          }
+      for (const billet of billetsParOption.get(optionQuota.optionId) ?? []) {
+        // Le même ensemble que les tarifs : un billet est UNE place, qu'il soit retenu par son
+        // tarif, par une option, ou par les deux.
+        matchingOrderItemIds.add(billet.id)
+        if (billet.entryValidated) {
+          validatedOrderItemIds.add(billet.id)
         }
       }
     }
