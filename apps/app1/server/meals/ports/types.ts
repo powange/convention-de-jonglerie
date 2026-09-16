@@ -18,8 +18,12 @@ export interface MealArtistParticipant {
 }
 
 /**
- * Sélection de repas d'un artiste (vue recherche / pending / stats). Inclut **toutes** les
- * sélections du repas (pas seulement `accepted`), comportement des endpoints search/pending/stats.
+ * Sélection de repas d'un artiste (vue recherche / pending / stats).
+ *
+ * N'inclut que les sélections **acceptées** : `accepted = false` signifie que la personne ne prend
+ * pas ce repas. Ce fut longtemps l'inverse — et c'était un défaut, signalé depuis l'écran de
+ * validation, où une artiste n'ayant que le vendredi soir ressortait sur le samedi midi et se
+ * voyait valider le repas. Voir `droit-au-repas`.
  */
 export interface MealArtistSelectionRow {
   selectionId: number

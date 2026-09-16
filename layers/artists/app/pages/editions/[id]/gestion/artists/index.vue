@@ -604,6 +604,8 @@
 <script setup lang="ts">
 import { getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
+import { filtresDepuisUrl, requeteArtistes } from '../../../../../utils/filtres-artistes-url'
+
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
@@ -614,6 +616,7 @@ definePageMeta({
 })
 
 const route = useRoute()
+const router = useRouter()
 const { t, locale } = useI18n()
 const toast = useToast()
 const editionStore = useEditionStore()
@@ -759,9 +762,21 @@ const sorting = ref<{ id: string; desc: boolean }[]>([])
 // Visibilité des colonnes
 const columnVisibility = ref<Record<string, boolean>>({})
 
-// Filtres
-const globalFilter = ref('')
-const showFilter = ref('ALL')
+// Filtres, conservés dans l'URL — même règle que le planning et les candidatures de bénévoles,
+// cf. `filtres-artistes-url.ts`.
+const filtresInitiaux = filtresDepuisUrl(route.query)
+const globalFilter = ref(filtresInitiaux.recherche)
+const showFilter = ref(filtresInitiaux.spectacle)
+
+// `replace` et non `push` : choisir un filtre n'est pas un pas de navigation à revenir en arrière.
+watch([globalFilter, showFilter], () => {
+  router.replace({
+    query: requeteArtistes(route.query, {
+      spectacle: showFilter.value,
+      recherche: globalFilter.value,
+    }),
+  })
+})
 
 // Liste des spectacles pour le filtre
 const allShows = computed(() => {

@@ -11,6 +11,7 @@ import type {
 } from './types'
 
 import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
+import { donneDroitAuRepas } from '~~/shared/utils/droit-au-repas'
 
 const artistUserSelect = {
   id: true,
@@ -58,10 +59,14 @@ export function createDefaultMealsPorts(): MealsPorts {
         }
         return result
       },
-      // search / pending / stats : TOUTES les sélections du repas (pas seulement « accepted »).
+      // search / pending / stats : les sélections ACCEPTÉES du repas.
+      //
+      // Elles ne l'étaient pas : une artiste ayant décliné le samedi midi ressortait dans la
+      // recherche et pouvait y être validée. Les organisateurs étaient déjà filtrés dans ces
+      // mêmes points d'API — c'était cette branche l'anomalie.
       async listMealSelections(editionId, mealId): Promise<MealArtistSelectionRow[]> {
         const selections = await prisma.artistMealSelection.findMany({
-          where: { mealId, artist: { editionId } },
+          where: { mealId, accepted: true, artist: { editionId } },
           select: {
             id: true,
             consumedAt: true,
@@ -88,6 +93,9 @@ export function createDefaultMealsPorts(): MealsPorts {
         if (!selection || selection.artist.editionId !== editionId || selection.mealId !== mealId) {
           return { ok: false, reason: 'not_found' }
         }
+        // Le filtre de lecture ne suffit pas : une page restée ouverte peut encore poster cet
+        // identifiant. Le refus se joue donc ici aussi.
+        if (!donneDroitAuRepas(selection)) return { ok: false, reason: 'not_found' }
         const result = await prisma.artistMealSelection.updateMany({
           where: { id: selectionId, consumedAt: null },
           data: { consumedAt: at },

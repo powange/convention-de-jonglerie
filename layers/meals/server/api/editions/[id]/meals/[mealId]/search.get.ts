@@ -51,6 +51,9 @@ export default wrapApiHandler(
     const volunteerMealSelections = await prisma.volunteerMealSelection.findMany({
       where: {
         mealId,
+        // Une sélection déclinée ne donne pas droit au repas : la remonter ici permettait de
+        // valider quelqu'un qui avait dit ne pas le prendre. Voir `droit-au-repas`.
+        accepted: true,
         volunteer: {
           eventId: editionId,
           status: 'ACCEPTED',

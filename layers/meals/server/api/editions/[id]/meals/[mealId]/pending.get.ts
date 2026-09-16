@@ -39,6 +39,7 @@ export default wrapApiHandler(
       const volunteerMealSelections = await prisma.volunteerMealSelection.findMany({
         where: {
           mealId,
+          accepted: true,
           volunteer: {
             eventId: editionId,
             status: 'ACCEPTED',

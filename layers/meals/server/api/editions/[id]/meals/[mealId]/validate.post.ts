@@ -5,6 +5,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageMealsOrValidation } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { donneDroitAuRepas } from '~~/shared/utils/droit-au-repas'
 
 const validateMealSchema = z.object({
   type: z.enum(['volunteer', 'artist', 'participant', 'organizer']),
@@ -62,6 +63,15 @@ export default wrapApiHandler(
         throw createError({
           status: 404,
           message: 'Sélection de repas non trouvée',
+        })
+      }
+
+      // Le filtre de lecture ne suffit pas : une page restée ouverte peut encore poster cet
+      // identifiant. Le refus se joue donc ici aussi. Voir `droit-au-repas`.
+      if (!donneDroitAuRepas(selection)) {
+        throw createError({
+          status: 400,
+          message: 'Cette personne ne prend pas ce repas',
         })
       }
 
