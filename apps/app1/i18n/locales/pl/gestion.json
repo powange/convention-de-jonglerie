@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Edytuj limity wszystkich artystów",
       "assign_quotas_per_show": "Według spektaklu",
       "assign_quotas_per_show_hint": "Artyści spektaklu zajmują miejsce. Kto występuje w dwóch spektaklach powiązanych z tym samym limitem, zajmuje tylko jedno.",
-      "assign_quotas_edit_show": "Edytuj limity tego spektaklu"
+      "assign_quotas_edit_show": "Edytuj limity tego spektaklu",
+      "handout_items_disable_confirm": "Ta edycja ma skonfigurowane {count} przedmiot(ów) do wydania. Po wyłączeniu kontrola wejścia przestanie o nie prosić: uczestnicy, wolontariusze, artyści ani organizatorzy nic nie otrzymają. Ustawienia zostaną zachowane i wrócą po ponownym włączeniu.",
+      "handout_items_disable_label": "Wyłącz mimo to",
+      "handout_items_disable_title": "Wyłączyć przedmioty do wydania?",
+      "handout_items_off_action": "Otwórz konfigurację biletów",
+      "handout_items_off_description": "Jest wyłączona dla tej edycji: kontrola wejścia nie prosi o żaden przedmiot. Istniejące ustawienia są zachowane i wrócą po ponownym włączeniu.",
+      "handout_items_off_title": "Zarządzanie przedmiotami do wydania jest wyłączone"
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

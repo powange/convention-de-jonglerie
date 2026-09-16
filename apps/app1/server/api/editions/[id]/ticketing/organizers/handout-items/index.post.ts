@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { exigerArticlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 
 const bodySchema = z.object({
   handoutItemId: z.number(),
@@ -24,6 +25,10 @@ export default wrapApiHandler(
         status: 403,
         message: 'Droits insuffisants pour gérer les articles à remettre',
       })
+
+    // La fonctionnalité éteinte refuse les écritures. Après le contrôle des droits : qui n'a
+    // pas le droit d'être là ne doit pas apprendre au passage ce que l'édition a activé.
+    await exigerArticlesARemettreActifs(editionId)
 
     const body = bodySchema.parse(await readBody(event))
 
@@ -60,52 +65,68 @@ export default wrapApiHandler(
         }
       }
 
-      // Vérifier que l'association n'existe pas déjà (même article + même scope)
-      // Note: On utilise findFirst au lieu de findUnique car Prisma ne permet pas
-      // d'utiliser null dans une contrainte unique composite
-      const existing = await prisma.editionOrganizerHandoutItem.findFirst({
-        where: {
-          editionId,
-          handoutItemId: body.handoutItemId,
-          organizerId: body.organizerId ?? null,
-        },
-      })
+      /*
+       * Vérification puis création, dans une même transaction et derrière un verrou de ligne.
+       *
+       * L'index unique `(editionId, handoutItemId, organizerId)` NE PROTÈGE PAS la portée
+       * globale : sous MySQL, deux NULL sont considérés comme distincts. Le schéma le signale
+       * déjà pour les quotas — « c'est l'écriture qui doit l'empêcher ».
+       *
+       * Sans verrou, deux requêtes simultanées passaient ensemble la vérification et créaient un
+       * doublon, qui aurait doublé la quantité remise à TOUS les organisateurs. Le verrou porte
+       * sur la ligne de l'article : deux écritures sur des articles différents ne se gênent pas.
+       *
+       * Même motif que la messagerie, le covoiturage et le matériel ; Prisma ne l'exprime qu'en
+       * SQL brut.
+       */
+      const item = await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT id FROM TicketingHandoutItem WHERE id = ${body.handoutItemId} FOR UPDATE`
 
-      if (existing) {
-        const scope = body.organizerId ? 'cet organisateur' : 'tous les organisateurs'
-        throw createError({
-          status: 400,
-          message: `Cet article est déjà associé à ${scope}`,
+        // `findFirst` et non `findUnique` : Prisma n'accepte pas un NULL dans une contrainte
+        // unique composite.
+        const existing = await tx.editionOrganizerHandoutItem.findFirst({
+          where: {
+            editionId,
+            handoutItemId: body.handoutItemId,
+            organizerId: body.organizerId ?? null,
+          },
         })
-      }
 
-      // Créer l'association
-      const item = await prisma.editionOrganizerHandoutItem.create({
-        data: {
-          editionId,
-          handoutItemId: body.handoutItemId,
-          organizerId: body.organizerId ?? null,
-          quantity: body.quantity ?? 1,
-        },
-        include: {
-          organizer: {
-            select: {
-              id: true,
-              organizer: {
-                select: {
-                  user: {
-                    select: {
-                      id: true,
-                      pseudo: true,
-                      nom: true,
-                      prenom: true,
+        if (existing) {
+          const scope = body.organizerId ? 'cet organisateur' : 'tous les organisateurs'
+          throw createError({
+            status: 400,
+            message: `Cet article est déjà associé à ${scope}`,
+          })
+        }
+
+        return tx.editionOrganizerHandoutItem.create({
+          data: {
+            editionId,
+            handoutItemId: body.handoutItemId,
+            organizerId: body.organizerId ?? null,
+            quantity: body.quantity ?? 1,
+          },
+          include: {
+            organizer: {
+              select: {
+                id: true,
+                organizer: {
+                  select: {
+                    user: {
+                      select: {
+                        id: true,
+                        pseudo: true,
+                        nom: true,
+                        prenom: true,
+                      },
                     },
                   },
                 },
               },
             },
           },
-        },
+        })
       })
 
       return createSuccessResponse({

@@ -15,6 +15,28 @@
         :description="$t('pages.access_denied.description')"
       />
     </div>
+    <!-- Fonctionnalité éteinte : ce n'est pas un refus de droits, et le dire ainsi épargne de
+         chercher une permission qu'on a déjà. L'écart avec les autres modules est assumé — un
+         article non remis se constate au comptoir, trop tard. -->
+    <div v-else-if="!articlesActifs">
+      <UAlert
+        icon="i-heroicons-power"
+        color="neutral"
+        variant="soft"
+        :title="$t('gestion.ticketing.handout_items_off_title')"
+        :description="$t('gestion.ticketing.handout_items_off_description')"
+      >
+        <template #actions>
+          <UButton
+            color="primary"
+            variant="soft"
+            :to="`/editions/${editionId}/gestion/ticketing/config`"
+          >
+            {{ $t('gestion.ticketing.handout_items_off_action') }}
+          </UButton>
+        </template>
+      </UAlert>
+    </div>
     <div v-else>
       <!-- Titre de la page -->
       <div class="mb-6">
@@ -855,6 +877,9 @@ const canAccess = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
   return editionStore.canManageTicketing(edition.value, authStore.user.id)
 })
+
+/** L'interrupteur de l'édition. Absent — édition pas encore chargée — vaut le défaut du schéma. */
+const articlesActifs = computed(() => edition.value?.ticketingHandoutItemsEnabled !== false)
 
 const loadHandoutItems = async () => {
   loadingHandoutItems.value = true

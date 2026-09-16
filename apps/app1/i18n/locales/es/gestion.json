@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Editar las cuotas de todos los artistas",
       "assign_quotas_per_show": "Por espectáculo",
       "assign_quotas_per_show_hint": "Los artistas del espectáculo ocupan una plaza. Quien actúa en dos espectáculos asociados a la misma cuota solo ocupa una.",
-      "assign_quotas_edit_show": "Editar las cuotas de este espectáculo"
+      "assign_quotas_edit_show": "Editar las cuotas de este espectáculo",
+      "handout_items_disable_confirm": "Esta edición tiene {count} artículo(s) para entregar configurado(s). Si lo desactivas, el control de acceso dejará de pedirlos: no se entregará nada a participantes, voluntarios, artistas ni organizadores. Tu configuración se conserva y volverá si lo reactivas.",
+      "handout_items_disable_label": "Desactivar de todos modos",
+      "handout_items_disable_title": "¿Desactivar los artículos para entregar?",
+      "handout_items_off_action": "Abrir la configuración de entradas",
+      "handout_items_off_description": "Está desactivada en esta edición: el control de acceso no pide ningún artículo. Tu configuración existente se conserva y volverá si la reactivas.",
+      "handout_items_off_title": "La gestión de artículos para entregar está desactivada"
     },
     "title": "Gestión",
     "view_edition": "Ver la edición",

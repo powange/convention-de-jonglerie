@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Redigera kvoter för alla artister",
       "assign_quotas_per_show": "Per föreställning",
       "assign_quotas_per_show_hint": "Föreställningens artister tar en plats. Den som uppträder i två föreställningar kopplade till samma kvot tar bara en.",
-      "assign_quotas_edit_show": "Redigera denna föreställnings kvoter"
+      "assign_quotas_edit_show": "Redigera denna föreställnings kvoter",
+      "handout_items_disable_confirm": "Den här upplagan har {count} föremål att dela ut konfigurerade. Om du stänger av slutar entrékontrollen att efterfråga dem: inget delas ut till deltagare, volontärer, artister eller arrangörer. Dina inställningar sparas och kommer tillbaka om du slår på igen.",
+      "handout_items_disable_label": "Stäng av ändå",
+      "handout_items_disable_title": "Stänga av föremål att dela ut?",
+      "handout_items_off_action": "Öppna biljettinställningarna",
+      "handout_items_off_description": "Den är avstängd för den här upplagan: entrékontrollen efterfrågar inga föremål. Dina befintliga inställningar sparas och kommer tillbaka om du slår på den igen.",
+      "handout_items_off_title": "Hanteringen av föremål att dela ut är avstängd"
     },
     "title": "Hantering",
     "view_edition": "Visa upplagan",

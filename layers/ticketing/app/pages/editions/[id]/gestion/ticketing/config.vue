@@ -354,6 +354,23 @@
       </div>
     </div>
 
+    <!-- Éteindre les articles à remettre ne range plus seulement le menu : le guichet cesse d'en
+         réclamer. On ne le fait donc pas en silence quand il y en a de paramétrés. -->
+    <ConfirmModal
+      v-model="confirmationExtinctionOuverte"
+      :title="$t('gestion.ticketing.handout_items_disable_title')"
+      :description="
+        $t('gestion.ticketing.handout_items_disable_confirm', { count: nombreDArticles })
+      "
+      :confirm-label="$t('gestion.ticketing.handout_items_disable_label')"
+      confirm-color="error"
+      icon-name="i-heroicons-exclamation-triangle"
+      icon-color="text-red-500"
+      :loading="updating"
+      @confirm="confirmerExtinction"
+      @cancel="annulerExtinction"
+    />
+
     <!-- Confirmation de suppression de la configuration SumUp : elle passait par `confirm()`,
          la boîte native du navigateur, alors que le projet emploie UModal partout ailleurs. -->
     <ConfirmModal
@@ -556,7 +573,56 @@ const handleToggleAnonymousOrders = async (val: boolean) => {
   }
 }
 
+/**
+ * Nombre d'articles déjà paramétrés sur l'édition.
+ *
+ * `null` tant qu'on ne l'a pas demandé : on n'interroge qu'au moment d'éteindre, la page n'ayant
+ * aucune autre raison de connaître ce chiffre.
+ */
+const nombreDArticles = ref(0)
+const confirmationExtinctionOuverte = ref(false)
+
+/**
+ * Éteindre coupe la remise au guichet, pas seulement le menu.
+ *
+ * On demande donc confirmation quand des articles existent — et seulement dans ce sens : rallumer
+ * ne fait rien perdre, et une édition qui n'a rien paramétré n'a rien à perdre non plus.
+ */
 const handleToggleHandoutItems = async (val: boolean) => {
+  if (!val) {
+    try {
+      const reponse = await $fetch<{ data?: { handoutItems?: unknown[] } }>(
+        `/api/editions/${editionId.value}/ticketing/handout-items`
+      )
+      nombreDArticles.value = reponse?.data?.handoutItems?.length ?? 0
+    } catch {
+      // Le compte n'a pas pu être établi. Demander confirmation quand même : mieux vaut une
+      // question de trop qu'une remise coupée sans prévenir.
+      nombreDArticles.value = 0
+    }
+
+    if (nombreDArticles.value > 0) {
+      // Le commutateur est déjà passé à « éteint » à l'écran : on le laisse tel quel le temps de
+      // la question, et `annulerExtinction` le remet si l'on renonce.
+      confirmationExtinctionOuverte.value = true
+      return
+    }
+  }
+
+  await appliquerBasculeArticles(val)
+}
+
+const confirmerExtinction = async () => {
+  confirmationExtinctionOuverte.value = false
+  await appliquerBasculeArticles(false)
+}
+
+const annulerExtinction = () => {
+  confirmationExtinctionOuverte.value = false
+  handoutItemsEnabled.value = true
+}
+
+const appliquerBasculeArticles = async (val: boolean) => {
   const previous = !val
 
   try {

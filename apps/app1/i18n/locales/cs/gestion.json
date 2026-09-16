@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Upravit kvóty všech umělců",
       "assign_quotas_per_show": "Podle představení",
       "assign_quotas_per_show_hint": "Umělci představení zabírají místo. Kdo vystupuje ve dvou představeních se stejnou kvótou, zabírá pouze jedno.",
-      "assign_quotas_edit_show": "Upravit kvóty tohoto představení"
+      "assign_quotas_edit_show": "Upravit kvóty tohoto představení",
+      "handout_items_disable_confirm": "Tento ročník má nastaveno {count} předmětů k předání. Pokud je vypnete, kontrola vstupu si o ně přestane říkat: účastníkům, dobrovolníkům, umělcům ani organizátorům se nic nepředá. Nastavení zůstane zachováno a vrátí se, jakmile funkci znovu zapnete.",
+      "handout_items_disable_label": "Přesto vypnout",
+      "handout_items_disable_title": "Vypnout předměty k předání?",
+      "handout_items_off_action": "Otevřít nastavení vstupenek",
+      "handout_items_off_description": "Pro tento ročník je vypnutá: kontrola vstupu si nežádá žádný předmět. Stávající nastavení zůstává zachováno a vrátí se, jakmile funkci znovu zapnete.",
+      "handout_items_off_title": "Správa předmětů k předání je vypnutá"
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",

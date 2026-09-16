@@ -30,6 +30,10 @@ import { global } from '../../../../globales-nitro'
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
 
+/** Le drapeau « articles à remettre » de l'édition, lu par le point d'API avant tout calcul. */
+const articlesARemettre = (actifs: boolean) =>
+  prismaMock.edition.findUnique.mockResolvedValue({ ticketingHandoutItemsEnabled: actifs })
+
 describe('POST /api/editions/[id]/ticketing/verify (bénévole)', () => {
   const mockUser = { id: 1, email: 'user@example.com', pseudo: 'testuser' }
 
@@ -55,6 +59,7 @@ describe('POST /api/editions/[id]/ticketing/verify (bénévole)', () => {
     vi.clearAllMocks()
     global.readBody = vi.fn().mockResolvedValue({ qrCode: 'volunteer-5-tok123' })
     mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(true)
 
     // Requêtes secondaires de la branche bénévole : vides par défaut
     prismaMock.volunteerAssignment.findMany.mockResolvedValue([])
@@ -141,6 +146,7 @@ describe('POST /api/editions/[id]/ticketing/verify (artiste)', () => {
     vi.clearAllMocks()
     global.readBody = vi.fn().mockResolvedValue({ qrCode: 'artist-9' })
     mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(true)
     prismaMock.editionArtist.findFirst.mockResolvedValue(artiste)
     prismaMock.artistMealSelection.findMany.mockResolvedValue([])
     // Articles remis à TOUS les artistes de l'édition
@@ -218,6 +224,7 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
     vi.clearAllMocks()
     global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
     mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(true)
     prismaMock.editionOrganizer.findFirst.mockResolvedValue(organisateur)
     prismaMock.organizerMealSelection.findMany.mockResolvedValue([])
   })
@@ -324,6 +331,7 @@ describe('POST /api/editions/[id]/ticketing/verify (repas des organisateurs)', (
     vi.clearAllMocks()
     global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
     mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(true)
     prismaMock.editionOrganizer.findFirst.mockResolvedValue({
       id: 7,
       entryValidated: false,
@@ -390,5 +398,94 @@ describe('POST /api/editions/[id]/ticketing/verify (repas des organisateurs)', (
 
     expect(result.data.participant.organizer.meals).toHaveLength(1)
     expect(result.data.participant.organizer.meals[0].mealType).toBe('DINNER')
+  })
+})
+
+/**
+ * L'interrupteur de l'édition, au guichet.
+ *
+ * Il ne rangeait que l'entrée de menu : éteint, le contrôle d'accès continuait de réclamer des
+ * articles. C'est un écart assumé avec les autres modules, qui ne coupent que leur menu — un
+ * article non remis, lui, se constate au comptoir, trop tard.
+ */
+describe('POST /api/editions/[id]/ticketing/verify (articles désactivés)', () => {
+  const mockUser = { id: 1, email: 'user@example.com', pseudo: 'testuser' }
+  const mockEvent = { context: { params: { id: '1' }, user: mockUser } }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(false)
+  })
+
+  it('ne remet RIEN à un bénévole, même si des articles sont paramétrés', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'volunteer-5' })
+    prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue({
+      id: 5,
+      userId: 42,
+      entryValidated: false,
+      entryValidatedAt: null,
+      entryValidatedBy: null,
+      userSnapshotPhone: null,
+      user: { prenom: 'Marie', nom: 'Dupont', email: 'marie@example.com', phone: null },
+      teamAssignments: [],
+    })
+    prismaMock.volunteerAssignment.findMany.mockResolvedValue([])
+    prismaMock.editionVolunteerHandoutItem.findMany.mockResolvedValue([
+      { quantity: 1, handoutItem: { id: 10, name: 'Bracelet', cumulative: false } },
+    ])
+    prismaMock.volunteerMealSelection.findMany.mockResolvedValue([])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.participant.volunteer.handoutItems).toEqual([])
+  })
+
+  it('ne remet RIEN à un organisateur', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue({
+      id: 7,
+      entryValidated: false,
+      entryValidatedAt: null,
+      entryValidatedBy: null,
+      organizer: {
+        title: null,
+        user: { prenom: 'Claire', nom: 'Bernard', email: 'claire@example.com', phone: null },
+      },
+    })
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
+      { organizerId: null, handoutItemId: 10, quantity: 1 },
+    ])
+    prismaMock.ticketingHandoutItem.findMany.mockResolvedValue([
+      { id: 10, name: 'Bracelet', cumulative: false },
+    ])
+    prismaMock.organizerMealSelection.findMany.mockResolvedValue([])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.participant.organizer.handoutItems).toEqual([])
+  })
+
+  it('laisse tout le reste intact : la personne est toujours trouvée', async () => {
+    // Couper la remise ne doit pas couper le contrôle d'accès lui-même.
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue({
+      id: 7,
+      entryValidated: false,
+      entryValidatedAt: null,
+      entryValidatedBy: null,
+      organizer: {
+        title: 'Responsable accueil',
+        user: { prenom: 'Claire', nom: 'Bernard', email: 'claire@example.com', phone: null },
+      },
+    })
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([])
+    prismaMock.ticketingHandoutItem.findMany.mockResolvedValue([])
+    prismaMock.organizerMealSelection.findMany.mockResolvedValue([])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.found).toBe(true)
+    expect(result.data.participant.organizer.user.firstName).toBe('Claire')
   })
 })
