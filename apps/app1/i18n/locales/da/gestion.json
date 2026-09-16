@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} tallerken sat til side | {count} tallerkener sat til side",
       "meal_after_show": "Måltid efter showet",
       "previous_day": "Forrige dag",
-      "next_day": "Næste dag"
+      "next_day": "Næste dag",
+      "duplicates": {
+        "title": "Dobbelte måltider",
+        "description": "Personer med ret til samme måltid i flere roller",
+        "info": "Én person kan være frivillig, artist og arrangør på én gang: hver rolle giver adgang til måltiderne hver for sig, så personen tæller flere gange med i det samlede antal, der sendes til køkkenet, og kræver lige så mange godkendelser ved lugen. Intet fjernes automatisk — du bestemmer, person for person, hvilke roller der beholder måltidet.",
+        "none": "Ingen dubletter: ingen har ret til samme måltid i flere roller.",
+        "meals_count": "{count} dobbelte måltider",
+        "toggle_details": "Vis detaljer om måltiderne",
+        "remove_source": "Fjern som {source} ({count})",
+        "disable": "Deaktivér",
+        "no_right": "Rettigheden “{source}” er nødvendig: det skal håndteres af den ansvarlige person.",
+        "open_page": "Åbn siden {source}",
+        "confirm_title": "Fjern måltiderne som {source}?",
+        "confirm_description": "{name} vil ikke længere være forventet eller talt med i sine {count} måltider som {source}. De øvrige roller ændres ikke, og fjernelsen kan fortrydes fra den pågældende side.",
+        "confirm_label": "Fjern disse måltider",
+        "removed": "Retten til måltidet er fjernet",
+        "remove_error": "Retten til måltidet kunne ikke fjernes",
+        "remove_forbidden": "Utilstrækkelige rettigheder til at ændre denne kilde",
+        "load_error": "Fejl under indlæsning af dubletterne"
+      }
     },
     "organizers": {
       "access_rights": "Adgangsrettigheder",

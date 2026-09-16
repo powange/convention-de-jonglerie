@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} tallrik avsatt | {count} tallrikar avsatta",
       "meal_after_show": "Måltid efter föreställningen",
       "previous_day": "Föregående dag",
-      "next_day": "Nästa dag"
+      "next_day": "Nästa dag",
+      "duplicates": {
+        "title": "Dubblerade måltider",
+        "description": "Personer som har rätt till samma måltid på flera grunder",
+        "info": "En och samma person kan vara volontär, artist och arrangör: varje roll ger tillgång till måltiderna var för sig, så personen räknas flera gånger i totalen som skickas till köket och kräver lika många avprickningar i luckan. Ingenting tas bort automatiskt — du avgör, person för person, vilka roller som behåller måltiden.",
+        "none": "Inga dubbletter: ingen har rätt till samma måltid på flera grunder.",
+        "meals_count": "{count} dubblerade måltider",
+        "toggle_details": "Visa måltiderna i detalj",
+        "remove_source": "Ta bort som {source} ({count})",
+        "disable": "Inaktivera",
+        "no_right": "Behörigheten ”{source}” krävs: det ska hanteras av den som ansvarar för den.",
+        "open_page": "Öppna sidan {source}",
+        "confirm_title": "Ta bort måltiderna som {source}?",
+        "confirm_description": "{name} kommer inte längre att förväntas eller räknas för sina {count} måltider som {source}. Övriga roller ändras inte, och borttagningen kan ångras från den berörda sidan.",
+        "confirm_label": "Ta bort dessa måltider",
+        "removed": "Rätten till måltiden har tagits bort",
+        "remove_error": "Det gick inte att ta bort rätten till måltiden",
+        "remove_forbidden": "Otillräckliga behörigheter för att ändra denna källa",
+        "load_error": "Fel vid inläsning av dubbletterna"
+      }
     },
     "organizers": {
       "access_rights": "Åtkomsträttigheter",

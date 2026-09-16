@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} bord apart gezet | {count} borden apart gezet",
       "meal_after_show": "Maaltijd na de voorstelling",
       "previous_day": "Vorige dag",
-      "next_day": "Volgende dag"
+      "next_day": "Volgende dag",
+      "duplicates": {
+        "title": "Dubbele maaltijden",
+        "description": "Personen die op meerdere titels recht hebben op dezelfde maaltijd",
+        "info": "Eén persoon kan tegelijk vrijwilliger, artiest en organisator zijn: elke hoedanigheid geeft afzonderlijk recht op de maaltijden. Die persoon telt dus meerdere keren mee in het totaal voor de keuken en vraagt evenveel bevestigingen aan de balie. Er wordt niets automatisch verwijderd — u beslist, persoon per persoon, welke hoedanigheden de maaltijd behouden.",
+        "none": "Geen dubbele maaltijden: niemand heeft op meerdere titels recht op dezelfde maaltijd.",
+        "meals_count": "{count} dubbele maaltijden",
+        "toggle_details": "Details van de maaltijden tonen",
+        "remove_source": "Verwijderen als {source} ({count})",
+        "disable": "Uitschakelen",
+        "no_right": "Het recht “{source}” is vereist: dit moet worden afgehandeld door wie ervoor verantwoordelijk is.",
+        "open_page": "Pagina {source} openen",
+        "confirm_title": "De maaltijden als {source} verwijderen?",
+        "confirm_description": "{name} wordt niet langer verwacht of meegeteld voor de {count} maaltijden als {source}. De andere hoedanigheden blijven ongewijzigd, en het verwijderen kan op de betrokken pagina ongedaan worden gemaakt.",
+        "confirm_label": "Deze maaltijden verwijderen",
+        "removed": "Recht op maaltijd verwijderd",
+        "remove_error": "Het verwijderen van het recht op de maaltijd is mislukt",
+        "remove_forbidden": "Onvoldoende rechten om deze bron te wijzigen",
+        "load_error": "Fout bij het laden van de dubbele maaltijden"
+      }
     },
     "organizers": {
       "access_rights": "Toegangsrechten",

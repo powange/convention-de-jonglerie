@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} prato reservado | {count} pratos reservados",
       "meal_after_show": "Refeição após o espetáculo",
       "previous_day": "Dia anterior",
-      "next_day": "Dia seguinte"
+      "next_day": "Dia seguinte",
+      "duplicates": {
+        "title": "Refeições em duplicado",
+        "description": "As pessoas com direito à mesma refeição a vários títulos",
+        "info": "Uma mesma pessoa pode ser voluntária, artista e organizadora: cada título abre-lhe as refeições separadamente, pelo que conta várias vezes no total enviado para a cozinha e exige outras tantas validações à entrada. Nada é retirado automaticamente — cabe-lhe decidir, pessoa a pessoa, que títulos mantêm a refeição.",
+        "none": "Nenhum duplicado: ninguém tem direito à mesma refeição a vários títulos.",
+        "meals_count": "{count} refeições em duplicado",
+        "toggle_details": "Mostrar o detalhe das refeições",
+        "remove_source": "Retirar como {source} ({count})",
+        "disable": "Desativar",
+        "no_right": "É necessária a permissão «{source}»: deve ser tratado por quem tem essa responsabilidade.",
+        "open_page": "Abrir a página {source}",
+        "confirm_title": "Retirar as refeições como {source}?",
+        "confirm_description": "{name} deixará de ser esperada e contabilizada nas suas {count} refeições como {source}. Os restantes títulos não se alteram, e a remoção desfaz-se a partir da página correspondente.",
+        "confirm_label": "Retirar estas refeições",
+        "removed": "Direito à refeição retirado",
+        "remove_error": "Não foi possível retirar o direito à refeição",
+        "remove_forbidden": "Permissões insuficientes para alterar esta origem",
+        "load_error": "Erro ao carregar os duplicados"
+      }
     },
     "organizers": {
       "access_rights": "Direitos de acesso",

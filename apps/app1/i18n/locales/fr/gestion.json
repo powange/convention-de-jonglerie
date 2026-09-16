@@ -221,7 +221,26 @@
       "plates_set_aside": "{count} assiette mise de côté | {count} assiettes mises de côté",
       "meal_after_show": "Repas consommé après le spectacle",
       "previous_day": "Jour précédent",
-      "next_day": "Jour suivant"
+      "next_day": "Jour suivant",
+      "duplicates": {
+        "title": "Doublons de repas",
+        "description": "Les personnes qui ont droit au même repas à plusieurs titres",
+        "info": "Une même personne peut être bénévole, artiste et organisatrice : chaque titre lui ouvre les repas séparément, elle compte donc plusieurs fois dans le total transmis à la cuisine et demande autant de validations au guichet. Rien n'est retiré automatiquement — à vous de décider, personne par personne, quels titres gardent le repas.",
+        "none": "Aucun doublon : personne n'a droit au même repas à plusieurs titres.",
+        "meals_count": "{count} repas en doublon",
+        "toggle_details": "Afficher le détail des repas",
+        "remove_source": "Retirer côté {source} ({count})",
+        "disable": "Désactiver",
+        "no_right": "Le droit « {source} » est nécessaire : à traiter par la personne qui en a la charge.",
+        "open_page": "Ouvrir la page {source}",
+        "confirm_title": "Retirer les repas côté {source} ?",
+        "confirm_description": "{name} ne sera plus attendue ni comptée pour ses {count} repas au titre « {source} ». Ses autres titres ne changent pas, et le retrait se défait depuis la page concernée.",
+        "confirm_label": "Retirer ces repas",
+        "removed": "Droit au repas retiré",
+        "remove_error": "Le retrait du droit au repas a échoué",
+        "remove_forbidden": "Droits insuffisants pour modifier cette source",
+        "load_error": "Erreur lors du chargement des doublons"
+      }
     },
     "organizers": {
       "access_rights": "Droits d'accès",

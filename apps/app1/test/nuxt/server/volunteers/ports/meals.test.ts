@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { createDefaultVolunteerPorts } from '../../../../../server/volunteers/ports/default-binding'
+import { corpsDuRetrait } from '../../../../../../../layers/meals/app/utils/retrait-de-repas'
 
 // Mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -394,6 +395,42 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
         where: { id: 88, volunteerId: 5 },
         data: { accepted: false },
       })
+    })
+
+    /**
+     * Le corps que fabrique la page des doublons doit réellement écrire.
+     *
+     * `setVolunteerMeals` ouvre sur `if (!selection.mealId) return` : une sélection sans repas est
+     * ignorée **en silence**, et le point d'API répond quand même 200 avec la liste inchangée. La
+     * page envoyait `{ selectionId, accepted: false }` — « Désactiver » affichait son succès et ne
+     * retirait rien. Le cas au-dessus ne l'avait pas vu : il passe `mealId` partout.
+     *
+     * D'où ce test qui part du VRAI constructeur de corps plutôt que d'un littéral réécrit à la
+     * main : un littéral se contenterait de répéter l'hypothèse qu'on cherche à vérifier.
+     */
+    it('écrit bien à partir du corps fabriqué par la page des doublons', async () => {
+      prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue({
+        eventId: 10,
+        setupAvailability: true,
+        eventAvailability: true,
+        teardownAvailability: true,
+        arrivalDateTime: null,
+        departureDateTime: null,
+      })
+      prismaMock.volunteerMeal.findMany.mockResolvedValue([])
+
+      const corps = corpsDuRetrait([
+        { source: 'volunteer', mealId: 2, userId: 7, roleId: 5, selectionId: 88 },
+      ])
+
+      await createDefaultVolunteerPorts().meals.setVolunteerMeals(10, 5, corps.selections)
+
+      expect(prismaMock.volunteerMealSelection.update).toHaveBeenCalledWith({
+        where: { id: 88, volunteerId: 5 },
+        data: { accepted: false },
+      })
+      // Et surtout : il ne CRÉE pas une seconde ligne au passage.
+      expect(prismaMock.volunteerMealSelection.create).not.toHaveBeenCalled()
     })
   })
 })

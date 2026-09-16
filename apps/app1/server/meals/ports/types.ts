@@ -38,6 +38,27 @@ export interface MealArtistSelectionRow {
   consumedAt: Date | null
 }
 
+/**
+ * Droit d'un artiste à un repas, avec de quoi le retirer.
+ *
+ * `MealArtistSelectionRow` ne suffisait pas à la page des doublons : elle porte `selectionId` mais
+ * pas `artistId`, et se lit repas par repas. Retirer un droit passe par
+ * `PUT /api/editions/:id/artists/:artistId/meals`, qui réclame les deux — et une édition d'un
+ * week-end compte une douzaine de repas, donc autant d'allers-retours pour reconstituer ce qu'une
+ * seule requête rend ici.
+ */
+export interface MealArtistRight {
+  mealId: number
+  selectionId: number
+  /** `EditionArtist.id` : ce que l'URL d'écriture attend, pas l'identifiant du compte. */
+  artistId: number
+  userId: number | null
+  nom: string | null
+  prenom: string | null
+  pseudo: string | null
+  email: string | null
+}
+
 /** Résultat d'une (dé)validation de consommation. */
 export type MealConsumptionResult = { ok: true } | { ok: false; reason: 'not_found' | 'already' }
 
@@ -51,6 +72,13 @@ export interface MealsArtistsPort {
   getMealParticipants(mealIds: number[]): Promise<Record<number, MealArtistParticipant[]>>
   /** Sélections artistes acceptées d'un repas (recherche / pending / comptage). */
   listMealSelections(editionId: number, mealId: number): Promise<MealArtistSelectionRow[]>
+  /**
+   * Droits artistes **acceptés** de l'édition sur les repas donnés (page des doublons).
+   *
+   * Filtre sur `editionId` en plus des `mealIds` : un identifiant de repas suffirait, mais la
+   * contrainte dit l'intention et protège d'un appel qui mélangerait deux éditions.
+   */
+  listEditionMealRights(editionId: number, mealIds: number[]): Promise<MealArtistRight[]>
   /** Marque la consommation (atomique : ne valide que si non déjà consommé). */
   markConsumed(
     editionId: number,

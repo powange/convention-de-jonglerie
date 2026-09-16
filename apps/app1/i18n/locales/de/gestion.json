@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} Teller zurückgestellt | {count} Teller zurückgestellt",
       "meal_after_show": "Mahlzeit nach der Show",
       "previous_day": "Vorheriger Tag",
-      "next_day": "Nächster Tag"
+      "next_day": "Nächster Tag",
+      "duplicates": {
+        "title": "Doppelte Mahlzeiten",
+        "description": "Personen, die dieselbe Mahlzeit in mehreren Funktionen beanspruchen können",
+        "info": "Eine Person kann gleichzeitig Helferin, Künstlerin und Organisatorin sein: Jede Funktion gibt die Mahlzeiten getrennt frei. Sie zählt daher mehrfach in der an die Küche übermittelten Gesamtzahl und muss ebenso oft bestätigt werden. Es wird nichts automatisch entfernt – Sie entscheiden Person für Person, welche Funktionen die Mahlzeit behalten.",
+        "none": "Keine Doppelungen: Niemand hat in mehreren Funktionen Anspruch auf dieselbe Mahlzeit.",
+        "meals_count": "{count} doppelte Mahlzeiten",
+        "toggle_details": "Einzelheiten der Mahlzeiten anzeigen",
+        "remove_source": "Als {source} entfernen ({count})",
+        "disable": "Deaktivieren",
+        "no_right": "Die Berechtigung „{source}“ ist erforderlich: Das muss die zuständige Person übernehmen.",
+        "open_page": "Seite {source} öffnen",
+        "confirm_title": "Mahlzeiten als {source} entfernen?",
+        "confirm_description": "{name} wird für die {count} Mahlzeiten als {source} nicht mehr erwartet und nicht mehr mitgezählt. Die übrigen Funktionen bleiben unverändert, und die Entfernung lässt sich auf der betreffenden Seite rückgängig machen.",
+        "confirm_label": "Diese Mahlzeiten entfernen",
+        "removed": "Mahlzeitenanspruch entfernt",
+        "remove_error": "Der Mahlzeitenanspruch konnte nicht entfernt werden",
+        "remove_forbidden": "Unzureichende Rechte, um diese Quelle zu ändern",
+        "load_error": "Fehler beim Laden der Doppelungen"
+      }
     },
     "organizers": {
       "access_rights": "Zugriffsrechte",

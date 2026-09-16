@@ -211,7 +211,26 @@
       "plates_set_aside": "{count} plate set aside | {count} plates set aside",
       "meal_after_show": "Meal eaten after the show",
       "previous_day": "Previous day",
-      "next_day": "Next day"
+      "next_day": "Next day",
+      "duplicates": {
+        "title": "Duplicate meals",
+        "description": "People entitled to the same meal under more than one role",
+        "info": "One person can be a volunteer, an artist and an organiser at the same time: each role opens the meals separately, so they count several times in the total sent to the kitchen and require as many check-ins at the desk. Nothing is removed automatically — it is up to you to decide, person by person, which roles keep the meal.",
+        "none": "No duplicates: nobody is entitled to the same meal under more than one role.",
+        "meals_count": "{count} duplicate meals",
+        "toggle_details": "Show meal details",
+        "remove_source": "Remove as {source} ({count})",
+        "disable": "Disable",
+        "no_right": "The “{source}” permission is required: this must be handled by whoever is in charge of it.",
+        "open_page": "Open the {source} page",
+        "confirm_title": "Remove the meals held as {source}?",
+        "confirm_description": "{name} will no longer be expected or counted for their {count} meals as {source}. Their other roles are unchanged, and the removal can be undone from the relevant page.",
+        "confirm_label": "Remove these meals",
+        "removed": "Meal entitlement removed",
+        "remove_error": "Failed to remove the meal entitlement",
+        "remove_forbidden": "Insufficient permissions to change this source",
+        "load_error": "Error while loading the duplicates"
+      }
     },
     "organizers": {
       "access_rights": "Access rights",
