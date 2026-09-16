@@ -1,8 +1,9 @@
 import { assertQuotasDeLEdition } from '../../../../../utils/quotas-appartenance'
 
-import { createSuccessResponse } from '#server/utils/api-helpers'
+import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {

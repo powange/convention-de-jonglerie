@@ -2,8 +2,10 @@ import { z } from 'zod'
 
 import { assertQuotasDeLEdition } from '../../../../../utils/quotas-appartenance'
 
+import { createSuccessResponse, wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { validateEditionId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
   positions: z.array(
