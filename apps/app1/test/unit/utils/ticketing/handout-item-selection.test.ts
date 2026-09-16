@@ -56,4 +56,31 @@ describe('normalizeHandoutItemSelections', () => {
   it('rend une liste vide pour une sélection vide', () => {
     expect(normalizeHandoutItemSelections([])).toEqual([])
   })
+
+  /**
+   * Ce que la fonction a repris de sa jumelle, désormais supprimée.
+   *
+   * Il y avait deux normalisations : celle-ci dédoublonnait sans borner, l'autre bornait sans
+   * dédoublonner — et c'était l'autre qu'employaient la création et la mise à jour des tarifs,
+   * des options, des spectacles et des repas. Ces chemins n'ont pas tous un schéma zod devant
+   * eux : la borne doit donc vivre ici aussi.
+   */
+  it('accepte une sélection absente', () => {
+    // La jumelle l'acceptait, et ses appelants passent un champ facultatif.
+    expect(normalizeHandoutItemSelections(undefined)).toEqual([])
+    expect(normalizeHandoutItemSelections(null)).toEqual([])
+  })
+
+  it('BORNE une quantité nulle, négative ou fractionnaire à un exemplaire', () => {
+    // On ne remet pas « zéro bracelet », et une demi-unité n'a pas de sens non plus.
+    expect(normalizeHandoutItemSelections([{ handoutItemId: 1, quantity: 0 }])).toEqual([
+      { handoutItemId: 1, quantity: 1 },
+    ])
+    expect(normalizeHandoutItemSelections([{ handoutItemId: 2, quantity: -3 }])).toEqual([
+      { handoutItemId: 2, quantity: 1 },
+    ])
+    expect(normalizeHandoutItemSelections([{ handoutItemId: 3, quantity: 2.7 }])).toEqual([
+      { handoutItemId: 3, quantity: 2 },
+    ])
+  })
 })

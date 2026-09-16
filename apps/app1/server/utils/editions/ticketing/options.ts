@@ -1,7 +1,7 @@
 import {
-  normalizeHandoutItemAssociations,
-  type HandoutItemAssociationInput,
-} from '#server/utils/ticketing/handout-items'
+  normalizeHandoutItemSelections,
+  type HandoutItemSelection,
+} from '#server/utils/ticketing/handout-item-selection'
 
 export interface OptionData {
   name: string
@@ -11,7 +11,7 @@ export interface OptionData {
   choices?: string[] | null
   price?: number | null // Prix en centimes
   position: number
-  handoutItemIds?: HandoutItemAssociationInput[]
+  handoutItemIds?: HandoutItemSelection[]
   tierIds?: number[] // Tarifs associés à cette option
   mealIds?: number[] // Repas associés à cette option
 }
@@ -83,7 +83,7 @@ export async function createOption(editionId: number, data: OptionData) {
       position: data.position,
       // helloAssoOptionId reste null pour une option manuelle
       handoutItems: {
-        create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+        create: normalizeHandoutItemSelections(data.handoutItemIds).map(
           ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
         ),
       },
@@ -140,7 +140,7 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                  create: normalizeHandoutItemSelections(data.handoutItemIds).map(
                     ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
                   ),
                 },
@@ -169,7 +169,7 @@ export async function updateOption(optionId: number, editionId: number, data: Op
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                  create: normalizeHandoutItemSelections(data.handoutItemIds).map(
                     ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
                   ),
                 },

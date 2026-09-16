@@ -500,12 +500,36 @@ export default wrapApiHandler(
           parOrganisateur.set(association.organizerId, liste)
         }
 
+        // Les articles attachés aux repas auxquels chacun est inscrit. Un ticket de cantine est
+        // un article comme un autre : les bénévoles et les artistes le recevaient, pas les
+        // organisateurs, alors qu'ils s'inscrivent aux mêmes repas.
+        //
+        // Une requête pour toute la page, et non une par personne : c'est le travers dont cette
+        // boucle vient d'être débarrassée.
+        const selectionsDeRepas = await prisma.organizerMealSelection.findMany({
+          where: {
+            editionOrganizerId: { in: organizers.map((o) => o.id) },
+            accepted: true,
+            meal: { enabled: true },
+          },
+          include: { meal: { include: { handoutItems: { include: { handoutItem: true } } } } },
+        })
+        const repasParOrganisateur = new Map<number, typeof selectionsDeRepas>()
+        for (const selection of selectionsDeRepas) {
+          const liste = repasParOrganisateur.get(selection.editionOrganizerId) ?? []
+          liste.push(selection)
+          repasParOrganisateur.set(selection.editionOrganizerId, liste)
+        }
+
         for (const organizer of organizers) {
           // Même agrégation que pour les trois autres populations : un article donné à la fois
           // globalement et nommément n'est remis qu'une fois s'il n'est pas cumulable.
           const agreges = aggregateHandoutItems([
             ...globales,
             ...(parOrganisateur.get(organizer.id) ?? []),
+            ...(repasParOrganisateur.get(organizer.id) ?? []).flatMap(
+              (selection) => selection.meal.handoutItems
+            ),
           ])
           handoutItemsByOrganizerId.set(
             organizer.id,

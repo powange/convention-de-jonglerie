@@ -200,28 +200,3 @@ export const selectedOptionsIncludes = {
     },
   },
 }
-
-/**
- * Entrée acceptée par les endpoints qui associent des articles : soit un simple
- * identifiant (quantité implicite de 1), soit un couple identifiant + quantité.
- * Les deux formes coexistent pour ne pas casser les appels existants.
- */
-export type HandoutItemAssociationInput = number | { handoutItemId: number; quantity?: number }
-
-/**
- * Normalise ces entrées en couples { handoutItemId, quantity }, quantité bornée
- * à un minimum de 1.
- */
-export function normalizeHandoutItemAssociations(
-  input: HandoutItemAssociationInput[] | undefined | null
-): Array<{ handoutItemId: number; quantity: number }> {
-  if (!input) return []
-  return input.map((entry) =>
-    typeof entry === 'number'
-      ? { handoutItemId: entry, quantity: 1 }
-      : {
-          handoutItemId: entry.handoutItemId,
-          quantity: Math.max(1, Math.trunc(entry.quantity ?? 1) || 1),
-        }
-  )
-}

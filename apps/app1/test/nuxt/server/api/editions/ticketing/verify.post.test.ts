@@ -219,6 +219,7 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
     global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
     mockCanAccessEditionData.mockResolvedValue(true)
     prismaMock.editionOrganizer.findFirst.mockResolvedValue(organisateur)
+    prismaMock.organizerMealSelection.findMany.mockResolvedValue([])
   })
 
   it('réunit les articles de TOUS les organisateurs et ceux de celui-ci', async () => {
@@ -295,5 +296,99 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
     const result = await verifyHandler(mockEvent as any)
 
     expect(result.data.participant.organizer.globalHandoutItems).toBeUndefined()
+  })
+})
+
+/**
+ * Les repas d'un organisateur.
+ *
+ * Un ticket de cantine est un article comme un autre. Les bénévoles et les artistes le
+ * recevaient ; les organisateurs non, alors qu'ils s'inscrivent aux mêmes repas — pour la seule
+ * raison que cette branche ne lisait aucune sélection de repas.
+ */
+describe('POST /api/editions/[id]/ticketing/verify (repas des organisateurs)', () => {
+  const mockUser = { id: 1, email: 'user@example.com', pseudo: 'testuser' }
+  const mockEvent = { context: { params: { id: '1' }, user: mockUser } }
+
+  const repas = (handoutItems: Array<{ quantity: number; handoutItem: any }>) => ({
+    meal: {
+      id: 4,
+      date: new Date('2026-09-19'),
+      mealType: 'DINNER',
+      phases: ['EVENT'],
+      handoutItems,
+    },
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    mockCanAccessEditionData.mockResolvedValue(true)
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue({
+      id: 7,
+      entryValidated: false,
+      entryValidatedAt: null,
+      entryValidatedBy: null,
+      organizer: {
+        title: null,
+        user: { prenom: 'Claire', nom: 'Bernard', email: 'claire@example.com', phone: null },
+      },
+    })
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([])
+    prismaMock.ticketingHandoutItem.findMany.mockResolvedValue([])
+  })
+
+  it('remet les articles attachés à un repas auquel il est inscrit', async () => {
+    prismaMock.organizerMealSelection.findMany.mockResolvedValue([
+      repas([{ quantity: 1, handoutItem: { id: 40, name: 'Ticket cantine', cumulative: false } }]),
+    ])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    const noms = result.data.participant.organizer.handoutItems.map((i: any) => i.name)
+    expect(noms).toEqual(['Ticket cantine'])
+  })
+
+  it('ne lit QUE les sélections acceptées, sur les repas actifs, de CET organisateur', async () => {
+    // Assertion sur la requête : le mock rendrait de toute façon ce qu'on lui dit de rendre.
+    prismaMock.organizerMealSelection.findMany.mockResolvedValue([])
+
+    await verifyHandler(mockEvent as any)
+
+    expect(prismaMock.organizerMealSelection.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          editionOrganizerId: 7,
+          accepted: true,
+          meal: { enabled: true },
+        }),
+      })
+    )
+  })
+
+  it('réunit les articles des repas avec ceux des associations', async () => {
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
+      { organizerId: null, handoutItemId: 10, quantity: 1 },
+    ])
+    prismaMock.ticketingHandoutItem.findMany.mockResolvedValue([
+      { id: 10, name: 'Bracelet', cumulative: false },
+    ])
+    prismaMock.organizerMealSelection.findMany.mockResolvedValue([
+      repas([{ quantity: 2, handoutItem: { id: 40, name: 'Ticket cantine', cumulative: true } }]),
+    ])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    const noms = result.data.participant.organizer.handoutItems.map((i: any) => i.name).sort()
+    expect(noms).toEqual(['Bracelet', 'Ticket cantine'])
+  })
+
+  it('rend aussi la liste des repas, comme pour les bénévoles et les artistes', async () => {
+    prismaMock.organizerMealSelection.findMany.mockResolvedValue([repas([])])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.participant.organizer.meals).toHaveLength(1)
+    expect(result.data.participant.organizer.meals[0].mealType).toBe('DINNER')
   })
 })

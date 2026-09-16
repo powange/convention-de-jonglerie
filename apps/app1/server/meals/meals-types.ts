@@ -1,4 +1,4 @@
-import type { HandoutItemAssociationInput } from '#server/utils/ticketing/handout-items'
+import type { HandoutItemSelection } from '#server/utils/ticketing/handout-item-selection'
 
 // DTO du module repas. Partagés par le service (server/meals) et le contrat du port
 // (server/volunteers/ports/types.ts → MealsPort). `phases` est typé `unknown` car porté en `Json`
@@ -46,7 +46,7 @@ export interface MealUpdateInput {
   id: number
   enabled?: boolean
   phases?: string[]
-  handoutItemIds?: HandoutItemAssociationInput[]
+  handoutItemIds?: HandoutItemSelection[]
 }
 
 /** Participant bénévole d'un repas (catering). */

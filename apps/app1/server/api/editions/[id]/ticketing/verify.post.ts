@@ -496,15 +496,36 @@ export default wrapApiHandler(
           })
           const organizerItemById = new Map(organizerItems.map((item) => [item.id, item]))
 
+          // Les repas auxquels cet organisateur est inscrit, et les articles qui s'y attachent.
+          //
+          // Un ticket de cantine est un article comme un autre : les bénévoles et les artistes le
+          // recevaient, pas les organisateurs — alors qu'ils s'inscrivent aux mêmes repas. Ils
+          // repartaient donc sans leur ticket, pour la seule raison que cette branche-ci ne
+          // lisait aucune sélection.
+          const organizerMeals = await prisma.organizerMealSelection.findMany({
+            where: {
+              editionOrganizerId: editionOrganizer.id,
+              accepted: true,
+              meal: { enabled: true },
+            },
+            include: {
+              meal: {
+                include: { handoutItems: { include: { handoutItem: true } } },
+              },
+            },
+            orderBy: { meal: { date: 'asc' } },
+          })
+
           // Même agrégation que pour les trois autres populations. Sans elle, un article donné
           // à la fois globalement et nommément apparaîtrait deux fois, et `cumulative` ne
           // s'appliquerait jamais aux organisateurs.
-          const allHandoutItems = aggregateHandoutItems(
-            organizerAssociations.flatMap((association) => {
+          const allHandoutItems = aggregateHandoutItems([
+            ...organizerAssociations.flatMap((association) => {
               const handoutItem = organizerItemById.get(association.handoutItemId)
               return handoutItem ? [{ handoutItem, quantity: association.quantity }] : []
-            })
-          )
+            }),
+            ...organizerMeals.flatMap((selection) => selection.meal.handoutItems),
+          ])
 
           return createSuccessResponse(
             {
@@ -525,6 +546,12 @@ export default wrapApiHandler(
                     id: item.id,
                     name: item.name,
                     quantity: item.quantity,
+                  })),
+                  meals: organizerMeals.map((selection) => ({
+                    id: selection.meal.id,
+                    date: selection.meal.date,
+                    mealType: selection.meal.mealType,
+                    phases: selection.meal.phases,
                   })),
                   entryValidated: editionOrganizer.entryValidated,
                   entryValidatedAt: editionOrganizer.entryValidatedAt,

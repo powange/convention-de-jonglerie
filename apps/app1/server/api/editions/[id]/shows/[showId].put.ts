@@ -11,7 +11,7 @@ import {
 } from '#server/utils/prisma-select-helpers'
 import { replaceShowComposition, showActSchema } from '#server/utils/show-acts'
 import { replaceShowPerformances, showPerformancesSchema } from '#server/utils/show-performances'
-import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
+import { normalizeHandoutItemSelections } from '#server/utils/ticketing/handout-item-selection'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const updateShowSchema = z.object({
@@ -169,7 +169,7 @@ export default wrapApiHandler(
 
       if (validatedData.handoutItemIds !== undefined) {
         await tx.showHandoutItem.deleteMany({ where: { showId } })
-        const associations = normalizeHandoutItemAssociations(validatedData.handoutItemIds)
+        const associations = normalizeHandoutItemSelections(validatedData.handoutItemIds)
         if (associations.length > 0) {
           await tx.showHandoutItem.createMany({
             data: associations.map(({ handoutItemId, quantity }) => ({

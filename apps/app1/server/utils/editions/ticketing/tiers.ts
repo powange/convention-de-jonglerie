@@ -1,7 +1,7 @@
 import {
-  normalizeHandoutItemAssociations,
-  type HandoutItemAssociationInput,
-} from '#server/utils/ticketing/handout-items'
+  normalizeHandoutItemSelections,
+  type HandoutItemSelection,
+} from '#server/utils/ticketing/handout-item-selection'
 
 export interface TierData {
   name: string
@@ -15,7 +15,7 @@ export interface TierData {
   countAsParticipant?: boolean
   validFrom?: string | null
   validUntil?: string | null
-  handoutItemIds?: HandoutItemAssociationInput[]
+  handoutItemIds?: HandoutItemSelection[]
   mealIds?: number[]
 }
 
@@ -154,7 +154,7 @@ export async function createTier(editionId: number, data: TierData) {
       validUntil: data.validUntil ? new Date(data.validUntil) : null,
       // externalTicketingId et helloAssoTierId restent null pour un tarif manuel
       handoutItems: {
-        create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+        create: normalizeHandoutItemSelections(data.handoutItemIds).map(
           ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
         ),
       },
@@ -214,7 +214,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                  create: normalizeHandoutItemSelections(data.handoutItemIds).map(
                     ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
                   ),
                 },
@@ -243,7 +243,7 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
-                  create: normalizeHandoutItemAssociations(data.handoutItemIds).map(
+                  create: normalizeHandoutItemSelections(data.handoutItemIds).map(
                     ({ handoutItemId, quantity }) => ({ handoutItemId, quantity })
                   ),
                 },
