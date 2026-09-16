@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Editar as quotas de todos os artistas",
       "assign_quotas_per_show": "Por espetáculo",
       "assign_quotas_per_show_hint": "Os artistas do espetáculo ocupam um lugar. Quem atua em dois espetáculos associados à mesma quota ocupa apenas um.",
-      "assign_quotas_edit_show": "Editar as quotas deste espetáculo"
+      "assign_quotas_edit_show": "Editar as quotas deste espetáculo",
+      "handout_items_disable_confirm": "Esta edição tem {count} artigo(s) a entregar configurado(s). Se desativares, o controlo de acessos deixará de os pedir: nada será entregue a participantes, voluntários, artistas nem organizadores. As tuas definições são mantidas e voltarão se reativares.",
+      "handout_items_disable_label": "Desativar mesmo assim",
+      "handout_items_disable_title": "Desativar os artigos a entregar?",
+      "handout_items_off_action": "Abrir a configuração da bilheteira",
+      "handout_items_off_description": "Está desativada nesta edição: o controlo de acessos não pede nenhum artigo. As definições existentes são mantidas e voltarão se a reativares.",
+      "handout_items_off_title": "A gestão de artigos a entregar está desativada"
     },
     "title": "Gestão",
     "view_edition": "Ver a edição",

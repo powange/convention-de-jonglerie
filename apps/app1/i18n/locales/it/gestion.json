@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Modifica le quote di tutti gli artisti",
       "assign_quotas_per_show": "Per spettacolo",
       "assign_quotas_per_show_hint": "Gli artisti dello spettacolo occupano un posto. Chi si esibisce in due spettacoli associati alla stessa quota ne occupa solo uno.",
-      "assign_quotas_edit_show": "Modifica le quote di questo spettacolo"
+      "assign_quotas_edit_show": "Modifica le quote di questo spettacolo",
+      "handout_items_disable_confirm": "Questa edizione ha {count} articolo/i da consegnare configurato/i. Se la disattivi, il controllo accessi smetterà di richiederli: non verrà consegnato nulla a partecipanti, volontari, artisti né organizzatori. Le impostazioni vengono conservate e torneranno se la riattivi.",
+      "handout_items_disable_label": "Disattiva comunque",
+      "handout_items_disable_title": "Disattivare gli articoli da consegnare?",
+      "handout_items_off_action": "Apri la configurazione della biglietteria",
+      "handout_items_off_description": "È disattivata per questa edizione: il controllo accessi non richiede alcun articolo. Le impostazioni esistenti vengono conservate e torneranno se la riattivi.",
+      "handout_items_off_title": "La gestione degli articoli da consegnare è disattivata"
     },
     "title": "Gestione",
     "view_edition": "Vedi l'edizione",

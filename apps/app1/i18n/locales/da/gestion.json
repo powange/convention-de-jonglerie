@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Rediger kvoter for alle kunstnere",
       "assign_quotas_per_show": "Pr. forestilling",
       "assign_quotas_per_show_hint": "Forestillingens kunstnere optager en plads. Den, der optræder i to forestillinger med samme kvote, optager kun én.",
-      "assign_quotas_edit_show": "Rediger denne forestillings kvoter"
+      "assign_quotas_edit_show": "Rediger denne forestillings kvoter",
+      "handout_items_disable_confirm": "Denne udgave har {count} genstand(e) til udlevering opsat. Hvis du slår det fra, holder adgangskontrollen op med at bede om dem: der udleveres intet til deltagere, frivillige, artister eller arrangører. Dine indstillinger bevares og vender tilbage, hvis du slår det til igen.",
+      "handout_items_disable_label": "Slå fra alligevel",
+      "handout_items_disable_title": "Slå genstande til udlevering fra?",
+      "handout_items_off_action": "Åbn billetindstillinger",
+      "handout_items_off_description": "Den er slået fra for denne udgave: adgangskontrollen beder ikke om nogen genstand. Dine eksisterende indstillinger bevares og vender tilbage, hvis du slår den til igen.",
+      "handout_items_off_title": "Håndtering af genstande til udlevering er slået fra"
     },
     "title": "Administration",
     "view_edition": "Se udgaven",

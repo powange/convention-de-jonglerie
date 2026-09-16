@@ -8,6 +8,7 @@ import {
   handoutItemsIncludes,
   selectedOptionsIncludes,
 } from '#server/utils/ticketing/handout-items'
+import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 
 const bodySchema = z.object({
   qrCode: z.string().min(1),
@@ -28,6 +29,10 @@ export default wrapApiHandler(
       })
 
     const body = bodySchema.parse(await readBody(event))
+
+    // L'interrupteur de l'édition coupe la remise elle-même, et pas seulement l'entrée de menu :
+    // éteint, le guichet ne réclame plus rien à personne. Lu une fois pour les quatre branches.
+    const articlesActifs = await articlesARemettreActifs(editionId)
 
     try {
       // Détecter le type de QR code
@@ -192,7 +197,7 @@ export default wrapApiHandler(
               volunteerItemEntries.push(mealItem)
             })
           })
-          const allHandoutItems = aggregateHandoutItems(volunteerItemEntries)
+          const allHandoutItems = articlesActifs ? aggregateHandoutItems(volunteerItemEntries) : []
 
           return createSuccessResponse(
             {
@@ -372,7 +377,7 @@ export default wrapApiHandler(
               artistItemEntries.push(mealItem)
             })
           })
-          const allHandoutItems = aggregateHandoutItems(artistItemEntries)
+          const allHandoutItems = articlesActifs ? aggregateHandoutItems(artistItemEntries) : []
 
           return createSuccessResponse(
             {
@@ -519,13 +524,15 @@ export default wrapApiHandler(
           // Même agrégation que pour les trois autres populations. Sans elle, un article donné
           // à la fois globalement et nommément apparaîtrait deux fois, et `cumulative` ne
           // s'appliquerait jamais aux organisateurs.
-          const allHandoutItems = aggregateHandoutItems([
-            ...organizerAssociations.flatMap((association) => {
-              const handoutItem = organizerItemById.get(association.handoutItemId)
-              return handoutItem ? [{ handoutItem, quantity: association.quantity }] : []
-            }),
-            ...organizerMeals.flatMap((selection) => selection.meal.handoutItems),
-          ])
+          const allHandoutItems = !articlesActifs
+            ? []
+            : aggregateHandoutItems([
+                ...organizerAssociations.flatMap((association) => {
+                  const handoutItem = organizerItemById.get(association.handoutItemId)
+                  return handoutItem ? [{ handoutItem, quantity: association.quantity }] : []
+                }),
+                ...organizerMeals.flatMap((selection) => selection.meal.handoutItems),
+              ])
 
           return createSuccessResponse(
             {
@@ -673,7 +680,7 @@ export default wrapApiHandler(
                       // La liste complète, tarif + options + champs personnalisés déjà
                       // agrégés : elle est portée par le billet et non par son tarif, puisque
                       // ses sources le débordent.
-                      handoutItems: calculateHandoutItemsForTicket(item),
+                      handoutItems: articlesActifs ? calculateHandoutItemsForTicket(item) : [],
                       selectedOptions: item.selectedOptions.map((so) => ({
                         id: so.id,
                         amount: so.amount,

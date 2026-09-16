@@ -7,6 +7,7 @@ import {
   calculateHandoutItemsForTicket,
   handoutItemsIncludes,
 } from '#server/utils/ticketing/handout-items'
+import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -29,6 +30,10 @@ export default wrapApiHandler(
 
     const body = bodySchema.parse(await readBody(event))
     const searchTerm = sanitizeEmail(body.searchTerm)
+
+    // L'interrupteur de l'édition coupe la remise elle-même, et pas seulement l'entrée de menu :
+    // éteint, le guichet ne réclame plus rien à personne. Lu une fois pour les quatre populations.
+    const articlesActifs = await articlesARemettreActifs(editionId)
 
     try {
       // Rechercher dans tous les billets de l'édition (externes et manuels)
@@ -445,7 +450,7 @@ export default wrapApiHandler(
         // cumulable autant de fois qu'il est associé (équipes + repas).
         handoutItemsByVolunteerId.set(
           volunteer.id,
-          aggregateHandoutItems(volunteerItemEntries).map((item) => ({
+          (articlesActifs ? aggregateHandoutItems(volunteerItemEntries) : []).map((item) => ({
             id: item.id,
             name: item.name,
             quantity: item.quantity,
@@ -464,7 +469,7 @@ export default wrapApiHandler(
         Array<{ id: number; name: string; quantity: number }>
       >()
 
-      if (organizers.length > 0) {
+      if (organizers.length > 0 && articlesActifs) {
         const associations = await prisma.editionOrganizerHandoutItem.findMany({
           where: {
             editionId,
@@ -616,7 +621,7 @@ export default wrapApiHandler(
 
         handoutItemsByArtistId.set(
           artist.id,
-          aggregateHandoutItems(artistItemEntries).map((item) => ({
+          (articlesActifs ? aggregateHandoutItems(artistItemEntries) : []).map((item) => ({
             id: item.id,
             name: item.name,
             quantity: item.quantity,
@@ -673,7 +678,7 @@ export default wrapApiHandler(
                   // La liste complète, tarif + options + champs personnalisés déjà agrégés :
                   // elle est portée par le billet et non par son tarif, puisque ses sources le
                   // débordent.
-                  handoutItems: calculateHandoutItemsForTicket(orderItem),
+                  handoutItems: articlesActifs ? calculateHandoutItemsForTicket(orderItem) : [],
                   selectedOptions: orderItem.selectedOptions.map((so) => ({
                     id: so.id,
                     amount: so.amount,

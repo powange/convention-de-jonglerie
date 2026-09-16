@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { exigerArticlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -32,6 +33,10 @@ export default wrapApiHandler(
     const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
+
+      // La fonctionnalité éteinte refuse les écritures. Après le contrôle des droits : qui n'a
+      // pas le droit d'être là ne doit pas apprendre au passage ce que l'édition a activé.
+      await exigerArticlesARemettreActifs(editionId)
     }
 
     const customField = await prisma.ticketingTierCustomField.findFirst({

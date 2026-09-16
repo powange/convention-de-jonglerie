@@ -4,6 +4,7 @@ import {
   handoutItemSchema,
 } from '#server/utils/editions/ticketing/handout-items'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { exigerArticlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 
 export default wrapApiHandler(
   async (event) => {
@@ -18,6 +19,10 @@ export default wrapApiHandler(
         status: 403,
         message: 'Droits insuffisants pour modifier ces données',
       })
+
+    // La fonctionnalité éteinte refuse les écritures. Après le contrôle des droits : qui n'a
+    // pas le droit d'être là ne doit pas apprendre au passage ce que l'édition a activé.
+    await exigerArticlesARemettreActifs(editionId)
 
     const body = await readBody(event)
     const validation = handoutItemSchema.safeParse(body)

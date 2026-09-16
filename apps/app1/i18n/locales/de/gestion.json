@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Kontingente aller Künstler bearbeiten",
       "assign_quotas_per_show": "Pro Show",
       "assign_quotas_per_show_hint": "Die Künstler der Show belegen einen Platz. Wer in zwei Shows mit demselben Kontingent auftritt, belegt nur einen.",
-      "assign_quotas_edit_show": "Kontingente dieser Show bearbeiten"
+      "assign_quotas_edit_show": "Kontingente dieser Show bearbeiten",
+      "handout_items_disable_confirm": "Für diese Ausgabe sind {count} auszuhändigende Artikel eingerichtet. Wenn du sie deaktivierst, fragt die Zugangskontrolle nicht mehr danach: Teilnehmenden, Helfenden, Künstlerinnen und Künstlern sowie Organisierenden wird nichts mehr ausgehändigt. Deine Einstellungen bleiben erhalten und kommen zurück, sobald du wieder aktivierst.",
+      "handout_items_disable_label": "Trotzdem deaktivieren",
+      "handout_items_disable_title": "Auszuhändigende Artikel deaktivieren?",
+      "handout_items_off_action": "Ticketing-Einstellungen öffnen",
+      "handout_items_off_description": "Sie ist für diese Ausgabe deaktiviert: Die Zugangskontrolle fragt keinen Artikel ab. Deine bestehenden Einstellungen bleiben erhalten und kommen zurück, sobald du wieder aktivierst.",
+      "handout_items_off_title": "Die Verwaltung auszuhändigender Artikel ist deaktiviert"
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

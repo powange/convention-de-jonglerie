@@ -839,7 +839,13 @@
       "assign_quotas_edit_artists": "Quota van alle artiesten bewerken",
       "assign_quotas_per_show": "Per voorstelling",
       "assign_quotas_per_show_hint": "De artiesten van de voorstelling nemen een plaats in. Wie in twee voorstellingen met hetzelfde quotum optreedt, neemt er slechts één in.",
-      "assign_quotas_edit_show": "Quota van deze voorstelling bewerken"
+      "assign_quotas_edit_show": "Quota van deze voorstelling bewerken",
+      "handout_items_disable_confirm": "Deze editie heeft {count} uit te reiken item(s) ingesteld. Als je dit uitschakelt, vraagt de toegangscontrole er niet meer om: er wordt niets meer uitgereikt aan deelnemers, vrijwilligers, artiesten of organisatoren. Je instellingen blijven bewaard en komen terug als je het weer inschakelt.",
+      "handout_items_disable_label": "Toch uitschakelen",
+      "handout_items_disable_title": "Uit te reiken items uitschakelen?",
+      "handout_items_off_action": "Ticketinginstellingen openen",
+      "handout_items_off_description": "Het is uitgeschakeld voor deze editie: de toegangscontrole vraagt om geen enkel item. Je bestaande instellingen blijven bewaard en komen terug als je het weer inschakelt.",
+      "handout_items_off_title": "Het beheer van uit te reiken items is uitgeschakeld"
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",
