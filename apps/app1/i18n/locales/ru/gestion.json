@@ -207,7 +207,11 @@
         "participant": "Участник",
         "organizer": "Организатор"
       },
-      "organizers": "Организаторы"
+      "organizers": "Организаторы",
+      "plates_set_aside": "{count} порция отложена | {count} порции отложены",
+      "meal_after_show": "Еда после выступления",
+      "previous_day": "Предыдущий день",
+      "next_day": "Следующий день"
     },
     "organizers": {
       "access_rights": "Права доступа",

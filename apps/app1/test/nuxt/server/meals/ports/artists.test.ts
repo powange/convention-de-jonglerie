@@ -76,8 +76,8 @@ describe('port artists du module repas (câblage jonglerie)', () => {
     it('ne renvoie que les sélections ACCEPTÉES, avec consumedAt', async () => {
       const consumed = new Date('2026-06-16T12:00:00Z')
       prismaMock.artistMealSelection.findMany.mockResolvedValue([
-        { id: 1, consumedAt: null, artist: { user: userOf(1) } },
-        { id: 2, consumedAt: consumed, artist: { user: userOf(2) } },
+        { id: 1, consumedAt: null, afterShow: false, artist: { user: userOf(1) } },
+        { id: 2, consumedAt: consumed, afterShow: true, artist: { user: userOf(2) } },
       ])
 
       const rows = await createDefaultMealsPorts().artists.listMealSelections(10, 42)
@@ -85,6 +85,7 @@ describe('port artists du module repas (câblage jonglerie)', () => {
       expect(prismaMock.artistMealSelection.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { mealId: 42, accepted: true, artist: { editionId: 10 } },
+          select: expect.objectContaining({ afterShow: true }),
         })
       )
       expect(rows).toEqual([
@@ -97,6 +98,7 @@ describe('port artists du module repas (câblage jonglerie)', () => {
           email: 'u1@x.fr',
           phone: '0601',
           consumedAt: null,
+          afterShow: false,
         },
         {
           selectionId: 2,
@@ -107,6 +109,9 @@ describe('port artists du module repas (câblage jonglerie)', () => {
           email: 'u2@x.fr',
           phone: '0602',
           consumedAt: consumed,
+          // L'artiste qui mange après son spectacle : la cuisine met son assiette de côté, et
+          // l'écran de validation le signale devant la file.
+          afterShow: true,
         },
       ])
     })

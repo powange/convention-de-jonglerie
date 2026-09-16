@@ -89,6 +89,9 @@ export default wrapApiHandler(
         pending.push({
           uniqueId: `artist-${row.selectionId}`,
           id: row.selectionId,
+          // Porté jusqu'à l'écran : devant la file, savoir que cette part est mise de côté évite
+          // de chercher quelqu'un qui ne viendra que plus tard.
+          afterShow: row.afterShow,
           type: 'artist',
           firstName: row.prenom,
           lastName: row.nom,

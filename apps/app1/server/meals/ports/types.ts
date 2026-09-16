@@ -27,6 +27,8 @@ export interface MealArtistParticipant {
  */
 export interface MealArtistSelectionRow {
   selectionId: number
+  /** L'artiste mange après son spectacle : son assiette est mise de côté. */
+  afterShow: boolean
   userId: number | null
   nom: string | null
   prenom: string | null

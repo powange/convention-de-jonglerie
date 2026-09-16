@@ -207,7 +207,11 @@
         "participant": "Deltagare",
         "organizer": "Arrangör"
       },
-      "organizers": "Arrangörer"
+      "organizers": "Arrangörer",
+      "plates_set_aside": "{count} tallrik avsatt | {count} tallrikar avsatta",
+      "meal_after_show": "Måltid efter föreställningen",
+      "previous_day": "Föregående dag",
+      "next_day": "Nästa dag"
     },
     "organizers": {
       "access_rights": "Åtkomsträttigheter",
