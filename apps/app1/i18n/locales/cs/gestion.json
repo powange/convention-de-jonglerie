@@ -207,7 +207,11 @@
         "participant": "Účastník",
         "organizer": "Organizátor"
       },
-      "organizers": "Organizátoři"
+      "organizers": "Organizátoři",
+      "plates_set_aside": "{count} talíř stranou | {count} talíře stranou",
+      "meal_after_show": "Jídlo po vystoupení",
+      "previous_day": "Předchozí den",
+      "next_day": "Další den"
     },
     "organizers": {
       "access_rights": "Přístupová práva",

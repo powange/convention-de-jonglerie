@@ -70,6 +70,9 @@ export function createDefaultMealsPorts(): MealsPorts {
           select: {
             id: true,
             consumedAt: true,
+            // L'artiste qui mange après son spectacle : sa part est mise de côté, et la cuisine
+            // doit savoir combien d'assiettes garder.
+            afterShow: true,
             artist: { select: { user: { select: artistUserSelect } } },
           },
         })
@@ -82,6 +85,7 @@ export function createDefaultMealsPorts(): MealsPorts {
           email: sel.artist.user.email,
           phone: sel.artist.user.phone,
           consumedAt: sel.consumedAt,
+          afterShow: sel.afterShow,
         }))
       },
       // validate.post : marque la consommation (atomique sur consumedAt null).

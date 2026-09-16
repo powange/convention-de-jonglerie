@@ -207,7 +207,11 @@
         "participant": "Uczestnik",
         "organizer": "Organizator"
       },
-      "organizers": "Organizatorzy"
+      "organizers": "Organizatorzy",
+      "plates_set_aside": "{count} talerz odłożony | {count} talerze odłożone",
+      "meal_after_show": "Posiłek po spektaklu",
+      "previous_day": "Poprzedni dzień",
+      "next_day": "Następny dzień"
     },
     "organizers": {
       "access_rights": "Prawa dostępu",

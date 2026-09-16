@@ -207,7 +207,11 @@
         "participant": "Deltager",
         "organizer": "Arrangør"
       },
-      "organizers": "Arrangører"
+      "organizers": "Arrangører",
+      "plates_set_aside": "{count} tallerken sat til side | {count} tallerkener sat til side",
+      "meal_after_show": "Måltid efter showet",
+      "previous_day": "Forrige dag",
+      "next_day": "Næste dag"
     },
     "organizers": {
       "access_rights": "Adgangsrettigheder",

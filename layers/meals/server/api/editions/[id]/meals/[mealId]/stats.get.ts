@@ -57,6 +57,14 @@ export default wrapApiHandler(
     const artistSelections = await ports.artists.listMealSelections(editionId, mealId)
     const artistCount = artistSelections.length
     const artistValidatedCount = artistSelections.filter((s) => s.consumedAt !== null).length
+    // Les assiettes qu'il RESTE à garder : ces artistes passent après leur spectacle, et la
+    // cuisine doit savoir combien de parts réserver plutôt que de les servir au coup de feu.
+    //
+    // Les repas déjà consommés en sortent : une part servie n'est plus une part à mettre de côté,
+    // et la compter ferait garder des assiettes pour des gens déjà passés.
+    const artistAfterShowCount = artistSelections.filter(
+      (s) => s.afterShow && s.consumedAt === null
+    ).length
 
     // 3. Compter les participants billetterie (via le port ticketing, déjà dédupliqués)
     const ticketRows = await ports.ticketing.listMealTicketParticipants(mealId)
@@ -101,6 +109,7 @@ export default wrapApiHandler(
           artists: {
             total: artistCount,
             validated: artistValidatedCount,
+            afterShow: artistAfterShowCount,
           },
           participants: {
             total: participantCount,

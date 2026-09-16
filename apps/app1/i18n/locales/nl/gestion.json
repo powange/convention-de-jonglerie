@@ -207,7 +207,11 @@
         "participant": "Deelnemer",
         "organizer": "Organisator"
       },
-      "organizers": "Organisatoren"
+      "organizers": "Organisatoren",
+      "plates_set_aside": "{count} bord apart gezet | {count} borden apart gezet",
+      "meal_after_show": "Maaltijd na de voorstelling",
+      "previous_day": "Vorige dag",
+      "next_day": "Volgende dag"
     },
     "organizers": {
       "access_rights": "Toegangsrechten",

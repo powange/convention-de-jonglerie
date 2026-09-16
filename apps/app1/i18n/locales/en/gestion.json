@@ -207,7 +207,11 @@
         "participant": "Participant",
         "organizer": "Organiser"
       },
-      "organizers": "Organisers"
+      "organizers": "Organisers",
+      "plates_set_aside": "{count} plate set aside | {count} plates set aside",
+      "meal_after_show": "Meal eaten after the show",
+      "previous_day": "Previous day",
+      "next_day": "Next day"
     },
     "organizers": {
       "access_rights": "Access rights",

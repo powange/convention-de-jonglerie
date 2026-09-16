@@ -47,27 +47,51 @@
             >
               {{ $t('gestion.meals.select_meal') }}
             </label>
-            <USelectMenu
-              v-model="selectedMealId"
-              :items="mealsOptions"
-              :loading="loadingMeals"
-              :placeholder="$t('gestion.meals.select_meal_placeholder')"
-              size="xl"
-              value-key="id"
-              :popper="{ placement: 'bottom-start' }"
-              :ui="{
-                width: 'w-full',
-                height: 'max-h-96',
-                content: 'min-w-fit',
-                base: 'text-base sm:text-lg',
-              }"
-            >
-              <template #default>
-                <span v-if="selectedMeal" class="text-base sm:text-lg font-medium">
-                  {{ formatMealLabel(selectedMeal) }}
+            <!-- Le jour par des flèches, le type par trois boutons : une édition tient le
+                 plus souvent sur un week-end, et le mouvement réel est « le repas suivant » ou
+                 « le dîner du même jour » — pas « viser une ligne dans un menu ». -->
+            <div class="flex items-center gap-2 mb-3">
+              <UButton
+                icon="i-heroicons-chevron-left"
+                color="neutral"
+                variant="outline"
+                size="lg"
+                :disabled="loadingMeals || !journeePrecedente"
+                :aria-label="$t('gestion.meals.previous_day')"
+                @click="allerAuJour(journeePrecedente)"
+              />
+              <div class="flex-1 text-center text-base sm:text-lg font-medium truncate">
+                <span v-if="selectedMeal">{{ formatMealDate(selectedMeal.date) }}</span>
+                <span v-else class="text-gray-500">
+                  {{ $t('gestion.meals.select_meal_placeholder') }}
                 </span>
-              </template>
-            </USelectMenu>
+              </div>
+              <UButton
+                icon="i-heroicons-chevron-right"
+                color="neutral"
+                variant="outline"
+                size="lg"
+                :disabled="loadingMeals || !journeeSuivante"
+                :aria-label="$t('gestion.meals.next_day')"
+                @click="allerAuJour(journeeSuivante)"
+              />
+            </div>
+
+            <!-- Seuls les types configurés ce jour-là sont proposés : le jour de montage ne porte
+                 souvent que le dîner, et offrir les autres désignerait un repas inexistant. -->
+            <UFieldGroup class="w-full">
+              <UButton
+                v-for="type in typesDisponibles"
+                :key="type"
+                :color="selectedMeal?.mealType === type ? 'primary' : 'neutral'"
+                :variant="selectedMeal?.mealType === type ? 'solid' : 'outline'"
+                size="lg"
+                class="flex-1 justify-center"
+                @click="allerAuType(type)"
+              >
+                {{ getMealTypeLabel(type) }}
+              </UButton>
+            </UFieldGroup>
           </div>
 
           <!-- Statistiques du repas sélectionné -->
@@ -175,6 +199,18 @@
                       mealStats.breakdown.artists.total - mealStats.breakdown.artists.validated > 1
                         ? 's'
                         : ''
+                    }}
+                  </div>
+                  <!-- Toujours visible, contrairement au « restants » qui n'apparaît qu'au survol :
+                       c'est une consigne pour la cuisine, pas un détail de progression. -->
+                  <div
+                    v-if="mealStats.breakdown.artists.afterShow > 0"
+                    class="text-xs text-amber-600 dark:text-amber-400 mt-1"
+                  >
+                    {{
+                      $t('gestion.meals.plates_set_aside', {
+                        count: mealStats.breakdown.artists.afterShow,
+                      })
                     }}
                   </div>
                 </button>
@@ -413,6 +449,18 @@
                   <h3 class="font-semibold text-gray-900 dark:text-white text-lg mb-1">
                     {{ person.lastName }} {{ person.firstName }}
                   </h3>
+                  <!-- Devant la file, savoir que cette part est mise de côté évite de chercher
+                       quelqu'un qui ne passera qu'après son spectacle. -->
+                  <UBadge
+                    v-if="person.afterShow"
+                    color="warning"
+                    variant="subtle"
+                    size="sm"
+                    icon="i-heroicons-clock"
+                    class="mb-1"
+                  >
+                    {{ $t('gestion.meals.meal_after_show') }}
+                  </UBadge>
                   <p
                     v-if="person.pseudo && pendingType !== 'participant'"
                     class="text-sm text-gray-600 dark:text-gray-400"
@@ -448,7 +496,6 @@
 </template>
 
 <script setup lang="ts">
-// Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
 import {
   useDebounce,
   useMealTypeLabel,
@@ -456,6 +503,10 @@ import {
   useEditionStore,
   formatMealDate,
 } from '#imports'
+
+import { repasConnu, repasDepuisUrl, requeteRepas } from '../../../../../utils/repas-dans-url'
+
+// Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -469,7 +520,14 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État
 const meals = ref<any[]>([])
-const selectedMealId = ref<number | null>(null) // Stocker l'ID au lieu de l'objet
+// Le repas regardé est conservé dans l'URL — cf. `repas-dans-url.ts` pour le pourquoi.
+const router = useRouter()
+const selectedMealId = ref<number | null>(repasDepuisUrl(route.query.meal))
+
+// `replace` et non `push` : changer de repas n'est pas un pas de navigation à revenir en arrière.
+watch(selectedMealId, () => {
+  router.replace({ query: requeteRepas(route.query, selectedMealId.value) })
+})
 const searchQuery = ref('')
 const searchResults = ref<any[]>([])
 const validatingIds = ref<string[]>([])
@@ -482,16 +540,36 @@ const pendingList = ref<any[]>([])
 // Debounce pour la recherche
 const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
-// Options pour le select de repas
-const mealsOptions = computed(() => {
-  return meals.value.map((meal) => ({
-    label: formatMealLabel(meal),
-    value: meal.id,
-    ...meal,
-  }))
-})
-
 // Computed pour récupérer l'objet meal complet à partir de l'ID
+/** La journée du repas regardé, pivot de la navigation par flèches. */
+const journeeCourante = computed(() => (selectedMeal.value ? jourDuRepas(selectedMeal.value) : ''))
+
+const journees = computed(() => journeesDesRepas(meals.value))
+const journeePrecedente = computed(() => journeeVoisine(journees.value, journeeCourante.value, -1))
+const journeeSuivante = computed(() => journeeVoisine(journees.value, journeeCourante.value, 1))
+
+/** Les types configurés ce jour-là — les seuls à proposer. */
+const typesDisponibles = computed(() =>
+  journeeCourante.value ? typesDuJour(meals.value, journeeCourante.value) : []
+)
+
+/**
+ * Changer de journée en gardant le type quand elle le propose.
+ *
+ * Le repli sur le premier repas du jour évite qu'une flèche ne vide l'écran : sur le jour de
+ * montage, qui n'a souvent que le dîner, garder « petit-déjeuner » ne désignerait rien.
+ */
+const allerAuJour = (jour: string | null) => {
+  if (!jour) return
+  const cible = repasEnChangeantDeJour(meals.value, jour, selectedMeal.value?.mealType ?? null)
+  if (cible) selectedMealId.value = cible.id
+}
+
+const allerAuType = (type: string) => {
+  const cible = repasDuJour(meals.value, journeeCourante.value, type)
+  if (cible) selectedMealId.value = cible.id
+}
+
 const selectedMeal = computed(() => {
   if (!selectedMealId.value) return null
   return meals.value.find((meal) => meal.id === selectedMealId.value) || null
@@ -532,12 +610,6 @@ watch(
 )
 
 // Formater le label d'un repas
-const formatMealLabel = (meal: any) => {
-  const date = formatMealDate(meal.date)
-  const mealTypeLabel = getMealTypeLabel(meal.mealType)
-  return `${date} - ${mealTypeLabel}`
-}
-
 // Formater la date/heure
 const formatDateTime = (dateTime: string) => {
   return new Date(dateTime).toLocaleString('fr-FR', {
@@ -573,6 +645,11 @@ const { execute: fetchMeals, loading: loadingMeals } = useApiAction(
     errorMessages: { default: t('gestion.meals.error_loading_meals') },
     onSuccess: (response: any) => {
       meals.value = response?.meals || []
+
+      // Un lien peut citer un repas supprimé, ou celui d'une autre édition : on l'écarte avant
+      // la sélection automatique, qui ne se déclenche qu'en l'absence de choix. Sans cela,
+      // l'écran restait vide sans rien expliquer.
+      selectedMealId.value = repasConnu(selectedMealId.value, meals.value)
 
       // Sélectionner automatiquement le repas en cours ou à venir
       if (meals.value.length > 0 && !selectedMealId.value) {
