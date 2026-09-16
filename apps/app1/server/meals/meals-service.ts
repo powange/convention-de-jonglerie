@@ -17,7 +17,7 @@ import {
   infosPersonnelles,
   infosPersonnellesSelect,
 } from '#server/utils/infos-personnelles'
-import { normalizeHandoutItemAssociations } from '#server/utils/ticketing/handout-items'
+import { normalizeHandoutItemSelections } from '#server/utils/ticketing/handout-item-selection'
 import {
   isVolunteerEligibleForMeal,
   getAvailableMealsOnArrival,
@@ -235,7 +235,7 @@ export async function updateEditionMealsConfig(editionId: number, meals: MealUpd
       await prisma.volunteerMealHandoutItem.deleteMany({ where: { mealId: meal.id } })
       if (meal.handoutItemIds.length > 0) {
         await prisma.volunteerMealHandoutItem.createMany({
-          data: normalizeHandoutItemAssociations(meal.handoutItemIds).map(
+          data: normalizeHandoutItemSelections(meal.handoutItemIds).map(
             ({ handoutItemId, quantity }) => ({ mealId: meal.id, handoutItemId, quantity })
           ),
         })

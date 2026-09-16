@@ -1,8 +1,33 @@
-export interface HandoutItemData {
-  name: string
+import { z } from 'zod'
+
+/**
+ * La longueur de la colonne `name`, telle que la migration initiale la pose : `VARCHAR(191)`.
+ *
+ * Sans cette borne côté validation, un nom plus long remontait en erreur Prisma, que le `catch`
+ * du point d'API transformait en 500 « Erreur lors de la création ». L'utilisateur recevait une
+ * panne là où il devait recevoir la phrase qui lui dit quoi corriger.
+ */
+export const NOM_ARTICLE_MAX = 191
+
+/**
+ * Ce qu'un article à remettre exige, en un seul endroit.
+ *
+ * Le schéma était recopié à l'identique dans la création et la mise à jour — deux endroits où
+ * ajouter la même borne, donc un endroit où l'oublier. Le `trim` vit ici aussi : l'interface le
+ * fait déjà, mais l'interface n'est pas le contrat, et « Bracelet » avec une espace de trop est
+ * un autre article pour l'index d'unicité comme pour l'œil.
+ */
+export const handoutItemSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Le nom est obligatoire')
+    .max(NOM_ARTICLE_MAX, `Le nom ne peut pas dépasser ${NOM_ARTICLE_MAX} caractères`),
   /** Remis autant de fois qu'il est associé au participant (défaut : une seule fois) */
-  cumulative?: boolean
-}
+  cumulative: z.boolean().optional(),
+})
+
+export type HandoutItemData = z.infer<typeof handoutItemSchema>
 
 /**
  * Récupère tous les items à remettre d'une édition

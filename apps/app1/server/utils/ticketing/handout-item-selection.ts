@@ -23,23 +23,37 @@ export interface NormalizedHandoutItemSelection {
 }
 
 /**
- * Ramène les deux formes à `{ handoutItemId, quantity }` et écarte les doublons.
+ * Ramène les deux formes à `{ handoutItemId, quantity }`, borne la quantité et écarte les
+ * doublons.
  *
- * La déduplication n'est pas cosmétique : `TicketingTierHandoutItem` et son équivalent pour les
- * options portent un index unique `(tierId, handoutItemId)`, qu'un même article envoyé deux fois
- * ferait violer au `createMany`. Le dernier exemplaire l'emporte, comme le ferait une saisie
- * corrigée dans la modale.
+ * **La seule normalisation du système.** Il y en avait deux, de comportements différents : celle-ci
+ * dédoublonnait sans borner, sa jumelle bornait sans dédoublonner — et c'était la jumelle
+ * qu'employaient la création et la mise à jour des tarifs, des options, des spectacles et des
+ * repas. Un même article envoyé deux fois y violait l'index unique au `createMany`, soit un 500
+ * là où le résultat attendu était parfaitement calculable.
+ *
+ * La déduplication n'est donc pas cosmétique : `TicketingTierHandoutItem` et ses équivalents
+ * portent tous un index unique sur `(porteur, handoutItemId)`. Le dernier exemplaire l'emporte,
+ * comme le ferait une saisie corrigée dans la modale.
+ *
+ * La borne, elle, protège du chemin qui n'a pas de schéma zod : une quantité nulle, négative ou
+ * fractionnaire vaut un exemplaire, jamais zéro — on ne remet pas « zéro bracelet ».
  */
 export function normalizeHandoutItemSelections(
-  entries: HandoutItemSelection[]
+  entries: HandoutItemSelection[] | undefined | null
 ): NormalizedHandoutItemSelection[] {
+  if (!entries) return []
+
   const parEntree = new Map<number, NormalizedHandoutItemSelection>()
 
   for (const entry of entries) {
     const normalized =
       typeof entry === 'number'
         ? { handoutItemId: entry, quantity: 1 }
-        : { handoutItemId: entry.handoutItemId, quantity: entry.quantity ?? 1 }
+        : {
+            handoutItemId: entry.handoutItemId,
+            quantity: Math.max(1, Math.trunc(entry.quantity ?? 1) || 1),
+          }
     parEntree.set(normalized.handoutItemId, normalized)
   }
 

@@ -1,13 +1,9 @@
-import { z } from 'zod'
-
 import { requireAuth } from '#server/utils/auth-utils'
-import { createHandoutItem } from '#server/utils/editions/ticketing/handout-items'
+import {
+  createHandoutItem,
+  handoutItemSchema,
+} from '#server/utils/editions/ticketing/handout-items'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
-
-const createItemSchema = z.object({
-  name: z.string().min(1, 'Le nom est obligatoire'),
-  cumulative: z.boolean().optional(),
-})
 
 export default wrapApiHandler(
   async (event) => {
@@ -24,7 +20,7 @@ export default wrapApiHandler(
       })
 
     const body = await readBody(event)
-    const validation = createItemSchema.safeParse(body)
+    const validation = handoutItemSchema.safeParse(body)
 
     if (!validation.success) {
       throw createError({
