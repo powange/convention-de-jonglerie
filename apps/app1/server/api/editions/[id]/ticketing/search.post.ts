@@ -453,74 +453,65 @@ export default wrapApiHandler(
         )
       }
 
-      // Récupérer les articles à remettre pour chaque organisateur
+      // Récupérer les articles à remettre pour chaque organisateur.
+      //
+      // DEUX requêtes pour toute la page, au lieu de quatre PAR organisateur — dont celle des
+      // articles globaux, rigoureusement identique à chaque tour et pourtant rejouée. Trente
+      // organisateurs déclenchaient cent vingt requêtes, sur l'écran le plus sollicité de
+      // l'événement.
       const handoutItemsByOrganizerId = new Map<
         number,
-        {
-          specific: Array<{ id: number; name: string }>
-          global: Array<{ id: number; name: string }>
-        }
+        Array<{ id: number; name: string; quantity: number }>
       >()
 
-      for (const organizer of organizers) {
-        // Articles spécifiques à cet organisateur
-        const organizerSpecificItemIds = await prisma.editionOrganizerHandoutItem.findMany({
+      if (organizers.length > 0) {
+        const associations = await prisma.editionOrganizerHandoutItem.findMany({
           where: {
             editionId,
-            organizerId: organizer.id,
+            // ⚠️ Pas de `in: [...ids, null]` : il produit `IN (…, NULL)`, et en SQL une
+            // comparaison avec NULL n'est jamais vraie — les articles globaux disparaîtraient
+            // sans la moindre erreur.
+            OR: [{ organizerId: { in: organizers.map((o) => o.id) } }, { organizerId: null }],
           },
-          select: {
-            handoutItemId: true,
-            quantity: true,
-          },
+          select: { organizerId: true, handoutItemId: true, quantity: true },
         })
 
-        const specificItems = await prisma.ticketingHandoutItem.findMany({
-          where: {
-            id: {
-              in: organizerSpecificItemIds.map((item) => item.handoutItemId),
-            },
-          },
+        // Deux requêtes et non une : `EditionOrganizerHandoutItem` ne porte PAS de relation vers
+        // `TicketingHandoutItem`, seulement la colonne `handoutItemId` — contrairement à ses
+        // jumeaux bénévoles et artistes. Un `include` y est impossible sans toucher au schéma.
+        const items = await prisma.ticketingHandoutItem.findMany({
+          where: { editionId, id: { in: associations.map((a) => a.handoutItemId) } },
         })
+        const itemById = new Map(items.map((item) => [item.id, item]))
 
-        // Articles globaux (pour tous les organisateurs)
-        const globalItemIds = await prisma.editionOrganizerHandoutItem.findMany({
-          where: {
-            editionId,
-            organizerId: null,
-          },
-          select: {
-            handoutItemId: true,
-            quantity: true,
-          },
-        })
+        const enAssociation = (a: (typeof associations)[number]) => {
+          const handoutItem = itemById.get(a.handoutItemId)
+          return handoutItem ? [{ handoutItem, quantity: a.quantity }] : []
+        }
 
-        const globalItems = await prisma.ticketingHandoutItem.findMany({
-          where: {
-            id: {
-              in: globalItemIds.map((item) => item.handoutItemId),
-            },
-          },
-        })
+        // `organizerId` nul vaut « tous les organisateurs » : ces associations valent pour
+        // chacun, en plus de celles qui le nomment.
+        const globales = associations.filter((a) => a.organizerId === null).flatMap(enAssociation)
+        const parOrganisateur = new Map<number, ReturnType<typeof enAssociation>>()
+        for (const association of associations) {
+          if (association.organizerId === null) continue
+          const liste = parOrganisateur.get(association.organizerId) ?? []
+          liste.push(...enAssociation(association))
+          parOrganisateur.set(association.organizerId, liste)
+        }
 
-        // Quantité définie sur chaque association, reportée sur les articles chargés.
-        const specificQuantityById = new Map(
-          organizerSpecificItemIds.map((a) => [a.handoutItemId, a.quantity])
-        )
-        const globalQuantityById = new Map(globalItemIds.map((a) => [a.handoutItemId, a.quantity]))
-
-        handoutItemsByOrganizerId.set(organizer.id, {
-          specific: specificItems.map((item) => ({
-            id: item.id,
-            name: item.name,
-            quantity: specificQuantityById.get(item.id) ?? 1,
-          })),
-          global: globalItems.map((item) => ({
-            id: item.id,
-            name: item.name,
-            quantity: globalQuantityById.get(item.id) ?? 1,
-          })),
-        })
+        for (const organizer of organizers) {
+          // Même agrégation que pour les trois autres populations : un article donné à la fois
+          // globalement et nommément n'est remis qu'une fois s'il n'est pas cumulable.
+          const agreges = aggregateHandoutItems([
+            ...globales,
+            ...(parOrganisateur.get(organizer.id) ?? []),
+          ])
+          handoutItemsByOrganizerId.set(
+            organizer.id,
+            agreges.map((item) => ({ id: item.id, name: item.name, quantity: item.quantity }))
+          )
+        }
       }
 
       // Récupérer les articles à remettre pour chaque artiste
@@ -653,9 +644,12 @@ export default wrapApiHandler(
                     ? {
                         id: orderItem.tier.id,
                         name: orderItem.tier.name,
-                        handoutItems: calculateHandoutItemsForTicket(orderItem),
                       }
                     : null,
+                  // La liste complète, tarif + options + champs personnalisés déjà agrégés :
+                  // elle est portée par le billet et non par son tarif, puisque ses sources le
+                  // débordent.
+                  handoutItems: calculateHandoutItemsForTicket(orderItem),
                   selectedOptions: orderItem.selectedOptions.map((so) => ({
                     id: so.id,
                     amount: so.amount,
@@ -664,11 +658,6 @@ export default wrapApiHandler(
                       name: so.option.name,
                       type: so.option.type,
                       price: so.option.price,
-                      handoutItems: so.option.handoutItems.map((ri) => ({
-                        id: ri.handoutItem.id,
-                        name: ri.handoutItem.name,
-                        quantity: ri.quantity,
-                      })),
                     },
                   })),
                 })),
@@ -676,6 +665,10 @@ export default wrapApiHandler(
               customFields: item.customFields as any,
               entryValidated: item.entryValidated,
               entryValidatedAt: item.entryValidatedAt,
+              // Les articles de l'option ne sont plus recopiés ici : ils sont déjà dans la
+              // liste agrégée du billet. Les deux sérialisations divergeaient d'ailleurs —
+              // l'une portait la quantité, l'autre non — et le client honorait ou perdait la
+              // quantité selon celle qu'il lisait.
               selectedOptions: item.selectedOptions.map((so) => ({
                 id: so.id,
                 amount: so.amount,
@@ -684,10 +677,6 @@ export default wrapApiHandler(
                   name: so.option.name,
                   type: so.option.type,
                   price: so.option.price,
-                  handoutItems: so.option.handoutItems.map((ri) => ({
-                    id: ri.handoutItem.id,
-                    name: ri.handoutItem.name,
-                  })),
                 },
               })),
             },
@@ -779,10 +768,7 @@ export default wrapApiHandler(
           const validator = editionOrganizer.entryValidatedBy
             ? organizerValidatorMap.get(editionOrganizer.entryValidatedBy)
             : null
-          const handoutItems = handoutItemsByOrganizerId.get(editionOrganizer.id) || {
-            specific: [],
-            global: [],
-          }
+          const handoutItems = handoutItemsByOrganizerId.get(editionOrganizer.id) || []
           return {
             type: 'organizer',
             participant: {
@@ -796,8 +782,7 @@ export default wrapApiHandler(
                   phone: editionOrganizer.organizer.user.phone,
                 },
                 title: editionOrganizer.organizer.title,
-                handoutItems: handoutItems.specific,
-                globalHandoutItems: handoutItems.global,
+                handoutItems,
                 entryValidated: editionOrganizer.entryValidated,
                 entryValidatedAt: editionOrganizer.entryValidatedAt,
                 entryValidatedBy: validator

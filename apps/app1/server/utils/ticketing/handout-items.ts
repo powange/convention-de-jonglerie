@@ -55,19 +55,22 @@ export function aggregateHandoutItems(
 }
 
 /**
- * Calcule les articles à remettre pour un participant (billet)
- * en combinant les articles du tarif direct et ceux des custom fields
+ * Calcule les articles à remettre pour un participant (billet).
  *
- * @param item - L'item de commande avec tier et customFields
+ * TROIS sources s'y rejoignent, et c'est bien l'affaire de cette fonction de les réunir :
+ * le tarif acheté, les champs personnalisés renseignés, et les options souscrites.
+ *
+ * Les options ont longtemps manqué ici : l'écran de guichet les agrégeait lui-même, de son
+ * côté, en additionnant les quantités sans connaître le drapeau `cumulative` — un bracelet
+ * attaché au tarif ET à une option apparaissait donc deux fois dans la liste à remettre. La
+ * règle n'a qu'un seul endroit où vivre, et c'est celui-ci : l'écran se contente d'afficher.
+ *
+ * @param item - L'item de commande, avec `tier`, `customFields` et `selectedOptions`
  * @returns Liste agrégée des articles à remettre (avec quantité)
  */
 export function calculateHandoutItemsForTicket(item: any) {
-  if (!item.tier) {
-    return []
-  }
-
   // Articles à remettre directement associés au tarif
-  const directItems = (item.tier.handoutItems || []).map((ri: any) => ({
+  const directItems = (item.tier?.handoutItems || []).map((ri: any) => ({
     handoutItem: {
       id: ri.handoutItem.id,
       name: ri.handoutItem.name,
@@ -77,12 +80,31 @@ export function calculateHandoutItemsForTicket(item: any) {
     source: 'tier' as const,
   }))
 
+  // Articles à remettre des options souscrites. Une option s'achète indépendamment du tarif :
+  // elle est donc lue même quand le billet n'en porte pas, faute de quoi un billet sans tarif
+  // repartirait sans l'article qu'on lui a pourtant vendu.
+  const optionItems: any[] = []
+  for (const selectedOption of item.selectedOptions || []) {
+    for (const optionItem of selectedOption.option?.handoutItems || []) {
+      optionItems.push({
+        handoutItem: {
+          id: optionItem.handoutItem.id,
+          name: optionItem.handoutItem.name,
+          cumulative: optionItem.handoutItem.cumulative,
+        },
+        quantity: optionItem.quantity,
+        source: 'option' as const,
+        optionName: selectedOption.option?.name,
+      })
+    }
+  }
+
   // Articles à remettre des custom fields
   const customFieldItems: any[] = []
   if (item.customFields && Array.isArray(item.customFields)) {
     for (const answeredField of item.customFields as any[]) {
       // Trouver le custom field correspondant dans le tarif
-      const customFieldAssociation = item.tier.customFields?.find(
+      const customFieldAssociation = item.tier?.customFields?.find(
         (cf: any) => cf.customField.label === answeredField.name
       )
 
@@ -110,9 +132,9 @@ export function calculateHandoutItemsForTicket(item: any) {
   }
 
   // Agréger les articles par ID : un article non cumulable associé à la fois au
-  // tarif et à un champ personnalisé n'est remis qu'une fois ; un article
-  // cumulable l'est autant de fois qu'il est associé.
-  const allItems = [...directItems, ...customFieldItems]
+  // tarif, à une option et à un champ personnalisé n'est remis qu'une fois ; un
+  // article cumulable l'est autant de fois qu'il est associé.
+  const allItems = [...directItems, ...optionItems, ...customFieldItems]
   const quantities = aggregateHandoutItems(allItems)
   const quantityById = new Map(quantities.map((q) => [q.id, q.quantity]))
 
@@ -143,6 +165,30 @@ export const handoutItemsIncludes = {
   customFields: {
     include: {
       customField: {
+        include: {
+          handoutItems: {
+            include: {
+              handoutItem: true,
+            },
+          },
+        },
+      },
+    },
+  },
+}
+
+/**
+ * Inclusions Prisma des options souscrites par un billet, avec leurs articles.
+ *
+ * À employer partout où `calculateHandoutItemsForTicket` est appelée : sans elles, la fonction
+ * ne voit aucune option et rend une liste incomplète — silencieusement, puisqu'un billet sans
+ * option est parfaitement ordinaire. C'est exactement ce qui se produisait au scan d'un QR code,
+ * où seule la recherche par nom chargeait les options.
+ */
+export const selectedOptionsIncludes = {
+  selectedOptions: {
+    include: {
+      option: {
         include: {
           handoutItems: {
             include: {

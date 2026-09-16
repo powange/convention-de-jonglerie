@@ -6,6 +6,7 @@ import {
   aggregateHandoutItems,
   calculateHandoutItemsForTicket,
   handoutItemsIncludes,
+  selectedOptionsIncludes,
 } from '#server/utils/ticketing/handout-items'
 
 const bodySchema = z.object({
@@ -467,54 +468,42 @@ export default wrapApiHandler(
             })
           }
 
-          // Récupérer les articles à remettre pour cet organisateur
-          // Articles spécifiques à cet organisateur
-          const organizerSpecificItemIds = await prisma.editionOrganizerHandoutItem.findMany({
+          // Les articles de cet organisateur ET ceux de tous les organisateurs, en deux requêtes
+          // au lieu de quatre.
+          //
+          // Deux et non une : `EditionOrganizerHandoutItem` ne porte PAS de relation vers
+          // `TicketingHandoutItem`, seulement la colonne `handoutItemId` — contrairement à ses
+          // jumeaux bénévoles et artistes. Un `include` y est donc impossible sans toucher au
+          // schéma, et les deux lectures d'origine n'étaient pas une négligence.
+          const organizerAssociations = await prisma.editionOrganizerHandoutItem.findMany({
             where: {
               editionId,
-              organizerId: editionOrganizer.id,
+              // `null` vaut « tous les organisateurs » : les deux portées s'additionnent, à la
+              // différence des bénévoles où l'équipe remplace le global.
+              //
+              // ⚠️ Un `in: [id, null]` ne conviendrait PAS : il produit `IN (id, NULL)`, et en
+              // SQL une comparaison avec NULL n'est jamais vraie — les articles globaux
+              // disparaîtraient sans erreur.
+              OR: [{ organizerId: editionOrganizer.id }, { organizerId: null }],
             },
-            select: {
-              handoutItemId: true,
-              quantity: true,
-            },
+            select: { handoutItemId: true, quantity: true },
           })
 
-          const organizerSpecificItems = await prisma.ticketingHandoutItem.findMany({
-            where: {
-              id: {
-                in: organizerSpecificItemIds.map((item) => item.handoutItemId),
-              },
-            },
+          const organizerItems = await prisma.ticketingHandoutItem.findMany({
+            // Borné à l'édition : les identifiants en viennent déjà, mais une garde qui ne coûte
+            // rien vaut mieux qu'une confiance implicite.
+            where: { editionId, id: { in: organizerAssociations.map((a) => a.handoutItemId) } },
           })
+          const organizerItemById = new Map(organizerItems.map((item) => [item.id, item]))
 
-          // Quantité définie sur chaque association, reportée sur les articles chargés.
-          const organizerSpecificQuantityById = new Map(
-            organizerSpecificItemIds.map((a) => [a.handoutItemId, a.quantity])
-          )
-
-          // Articles globaux (pour tous les organisateurs)
-          const globalItemIds = await prisma.editionOrganizerHandoutItem.findMany({
-            where: {
-              editionId,
-              organizerId: null,
-            },
-            select: {
-              handoutItemId: true,
-              quantity: true,
-            },
-          })
-
-          const globalItems = await prisma.ticketingHandoutItem.findMany({
-            where: {
-              id: {
-                in: globalItemIds.map((item) => item.handoutItemId),
-              },
-            },
-          })
-
-          const globalQuantityById = new Map(
-            globalItemIds.map((a) => [a.handoutItemId, a.quantity])
+          // Même agrégation que pour les trois autres populations. Sans elle, un article donné
+          // à la fois globalement et nommément apparaîtrait deux fois, et `cumulative` ne
+          // s'appliquerait jamais aux organisateurs.
+          const allHandoutItems = aggregateHandoutItems(
+            organizerAssociations.flatMap((association) => {
+              const handoutItem = organizerItemById.get(association.handoutItemId)
+              return handoutItem ? [{ handoutItem, quantity: association.quantity }] : []
+            })
           )
 
           return createSuccessResponse(
@@ -532,15 +521,10 @@ export default wrapApiHandler(
                     phone: editionOrganizer.organizer.user.phone,
                   },
                   title: editionOrganizer.organizer.title,
-                  handoutItems: organizerSpecificItems.map((item) => ({
+                  handoutItems: allHandoutItems.map((item) => ({
                     id: item.id,
                     name: item.name,
-                    quantity: organizerSpecificQuantityById.get(item.id) ?? 1,
-                  })),
-                  globalHandoutItems: globalItems.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                    quantity: globalQuantityById.get(item.id) ?? 1,
+                    quantity: item.quantity,
                   })),
                   entryValidated: editionOrganizer.entryValidated,
                   entryValidatedAt: editionOrganizer.entryValidatedAt,
@@ -596,6 +580,11 @@ export default wrapApiHandler(
                     tier: {
                       include: handoutItemsIncludes,
                     },
+                    // Les options souscrites, sans quoi ni elles ni leurs articles n'existent
+                    // pour l'écran de guichet — alors que la recherche par nom, elle, les
+                    // remonte. Deux façons de trouver la même personne rendaient deux listes
+                    // différentes, et le scan est pourtant le geste normal à l'entrée.
+                    ...selectedOptionsIncludes,
                   },
                   orderBy: { id: 'asc' },
                 },
@@ -652,9 +641,22 @@ export default wrapApiHandler(
                         ? {
                             id: item.tier.id,
                             name: item.tier.name,
-                            handoutItems: calculateHandoutItemsForTicket(item),
                           }
                         : null,
+                      // La liste complète, tarif + options + champs personnalisés déjà
+                      // agrégés : elle est portée par le billet et non par son tarif, puisque
+                      // ses sources le débordent.
+                      handoutItems: calculateHandoutItemsForTicket(item),
+                      selectedOptions: item.selectedOptions.map((so) => ({
+                        id: so.id,
+                        amount: so.amount,
+                        option: {
+                          id: so.option.id,
+                          name: so.option.name,
+                          type: so.option.type,
+                          price: so.option.price,
+                        },
+                      })),
                     })),
                   },
                   customFields: orderItem.customFields as any,
