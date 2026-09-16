@@ -200,6 +200,20 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
     },
   }
 
+  /**
+   * Monte les deux lectures que fait le point d'API.
+   *
+   * Deux et non une : le modèle d'association ne porte pas de relation vers l'article, les
+   * identifiants sont donc relus à part.
+   */
+  const articlesAssocies = (
+    associations: Array<{ organizerId: number | null; handoutItemId: number; quantity: number }>,
+    articles: Array<{ id: number; name: string; cumulative: boolean }>
+  ) => {
+    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue(associations)
+    prismaMock.ticketingHandoutItem.findMany.mockResolvedValue(articles)
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
     global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
@@ -208,10 +222,16 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
   })
 
   it('réunit les articles de TOUS les organisateurs et ceux de celui-ci', async () => {
-    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
-      { organizerId: null, quantity: 1, handoutItem: { id: 10, name: 'Bracelet' } },
-      { organizerId: 7, quantity: 2, handoutItem: { id: 30, name: 'Talkie', cumulative: false } },
-    ])
+    articlesAssocies(
+      [
+        { organizerId: null, handoutItemId: 10, quantity: 1 },
+        { organizerId: 7, handoutItemId: 30, quantity: 2 },
+      ],
+      [
+        { id: 10, name: 'Bracelet', cumulative: false },
+        { id: 30, name: 'Talkie', cumulative: false },
+      ]
+    )
 
     const result = await verifyHandler(mockEvent as any)
 
@@ -224,7 +244,7 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
     // C'est la requête qu'il faut vérifier, pas la réponse du mock : un `in: [id, null]`
     // produirait `IN (…, NULL)`, et en SQL une comparaison avec NULL n'est jamais vraie — les
     // articles globaux disparaîtraient sans la moindre erreur.
-    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([])
+    articlesAssocies([], [])
 
     await verifyHandler(mockEvent as any)
 
@@ -239,14 +259,13 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
   })
 
   it("ne remet QU'UNE FOIS un article non cumulable donné globalement ET nommément", async () => {
-    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
-      {
-        organizerId: null,
-        quantity: 1,
-        handoutItem: { id: 10, name: 'Bracelet', cumulative: false },
-      },
-      { organizerId: 7, quantity: 1, handoutItem: { id: 10, name: 'Bracelet', cumulative: false } },
-    ])
+    articlesAssocies(
+      [
+        { organizerId: null, handoutItemId: 10, quantity: 1 },
+        { organizerId: 7, handoutItemId: 10, quantity: 1 },
+      ],
+      [{ id: 10, name: 'Bracelet', cumulative: false }]
+    )
 
     const result = await verifyHandler(mockEvent as any)
 
@@ -255,10 +274,13 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
   })
 
   it('ADDITIONNE un article cumulable donné par les deux portées', async () => {
-    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([
-      { organizerId: null, quantity: 2, handoutItem: { id: 20, name: 'Ticket', cumulative: true } },
-      { organizerId: 7, quantity: 3, handoutItem: { id: 20, name: 'Ticket', cumulative: true } },
-    ])
+    articlesAssocies(
+      [
+        { organizerId: null, handoutItemId: 20, quantity: 2 },
+        { organizerId: 7, handoutItemId: 20, quantity: 3 },
+      ],
+      [{ id: 20, name: 'Ticket', cumulative: true }]
+    )
 
     const result = await verifyHandler(mockEvent as any)
 
@@ -268,7 +290,7 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
   it('ne rend plus de liste globale séparée', async () => {
     // Deux listes juxtaposées laissaient à l'écran le soin de les réunir — ce qu'il ne faisait
     // pas, et ce qui aurait fait apparaître deux fois un même article.
-    prismaMock.editionOrganizerHandoutItem.findMany.mockResolvedValue([])
+    articlesAssocies([], [])
 
     const result = await verifyHandler(mockEvent as any)
 

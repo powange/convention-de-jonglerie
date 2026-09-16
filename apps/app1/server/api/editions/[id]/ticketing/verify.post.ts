@@ -468,10 +468,14 @@ export default wrapApiHandler(
             })
           }
 
-          // Les articles de cet organisateur ET ceux de tous les organisateurs, en une requête.
-          // Elles étaient quatre : deux lectures d'associations, puis deux relectures des
-          // articles par identifiants, là où une inclusion suffit.
-          const organizerHandoutItems = await prisma.editionOrganizerHandoutItem.findMany({
+          // Les articles de cet organisateur ET ceux de tous les organisateurs, en deux requêtes
+          // au lieu de quatre.
+          //
+          // Deux et non une : `EditionOrganizerHandoutItem` ne porte PAS de relation vers
+          // `TicketingHandoutItem`, seulement la colonne `handoutItemId` — contrairement à ses
+          // jumeaux bénévoles et artistes. Un `include` y est donc impossible sans toucher au
+          // schéma, et les deux lectures d'origine n'étaient pas une négligence.
+          const organizerAssociations = await prisma.editionOrganizerHandoutItem.findMany({
             where: {
               editionId,
               // `null` vaut « tous les organisateurs » : les deux portées s'additionnent, à la
@@ -482,13 +486,25 @@ export default wrapApiHandler(
               // disparaîtraient sans erreur.
               OR: [{ organizerId: editionOrganizer.id }, { organizerId: null }],
             },
-            include: { handoutItem: true },
+            select: { handoutItemId: true, quantity: true },
           })
+
+          const organizerItems = await prisma.ticketingHandoutItem.findMany({
+            // Borné à l'édition : les identifiants en viennent déjà, mais une garde qui ne coûte
+            // rien vaut mieux qu'une confiance implicite.
+            where: { editionId, id: { in: organizerAssociations.map((a) => a.handoutItemId) } },
+          })
+          const organizerItemById = new Map(organizerItems.map((item) => [item.id, item]))
 
           // Même agrégation que pour les trois autres populations. Sans elle, un article donné
           // à la fois globalement et nommément apparaîtrait deux fois, et `cumulative` ne
           // s'appliquerait jamais aux organisateurs.
-          const allHandoutItems = aggregateHandoutItems(organizerHandoutItems)
+          const allHandoutItems = aggregateHandoutItems(
+            organizerAssociations.flatMap((association) => {
+              const handoutItem = organizerItemById.get(association.handoutItemId)
+              return handoutItem ? [{ handoutItem, quantity: association.quantity }] : []
+            })
+          )
 
           return createSuccessResponse(
             {

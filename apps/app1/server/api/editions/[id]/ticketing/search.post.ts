@@ -455,7 +455,7 @@ export default wrapApiHandler(
 
       // Récupérer les articles à remettre pour chaque organisateur.
       //
-      // UNE requête pour toute la page, au lieu de quatre par organisateur — dont celle des
+      // DEUX requêtes pour toute la page, au lieu de quatre PAR organisateur — dont celle des
       // articles globaux, rigoureusement identique à chaque tour et pourtant rejouée. Trente
       // organisateurs déclenchaient cent vingt requêtes, sur l'écran le plus sollicité de
       // l'événement.
@@ -473,17 +473,30 @@ export default wrapApiHandler(
             // sans la moindre erreur.
             OR: [{ organizerId: { in: organizers.map((o) => o.id) } }, { organizerId: null }],
           },
-          include: { handoutItem: true },
+          select: { organizerId: true, handoutItemId: true, quantity: true },
         })
+
+        // Deux requêtes et non une : `EditionOrganizerHandoutItem` ne porte PAS de relation vers
+        // `TicketingHandoutItem`, seulement la colonne `handoutItemId` — contrairement à ses
+        // jumeaux bénévoles et artistes. Un `include` y est impossible sans toucher au schéma.
+        const items = await prisma.ticketingHandoutItem.findMany({
+          where: { editionId, id: { in: associations.map((a) => a.handoutItemId) } },
+        })
+        const itemById = new Map(items.map((item) => [item.id, item]))
+
+        const enAssociation = (a: (typeof associations)[number]) => {
+          const handoutItem = itemById.get(a.handoutItemId)
+          return handoutItem ? [{ handoutItem, quantity: a.quantity }] : []
+        }
 
         // `organizerId` nul vaut « tous les organisateurs » : ces associations valent pour
         // chacun, en plus de celles qui le nomment.
-        const globales = associations.filter((a) => a.organizerId === null)
-        const parOrganisateur = new Map<number, typeof associations>()
+        const globales = associations.filter((a) => a.organizerId === null).flatMap(enAssociation)
+        const parOrganisateur = new Map<number, ReturnType<typeof enAssociation>>()
         for (const association of associations) {
           if (association.organizerId === null) continue
           const liste = parOrganisateur.get(association.organizerId) ?? []
-          liste.push(association)
+          liste.push(...enAssociation(association))
           parOrganisateur.set(association.organizerId, liste)
         }
 
