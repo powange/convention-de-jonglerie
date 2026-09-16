@@ -225,6 +225,7 @@ import {
 
 import { nomFichierFaq, preparerFaqPourPdf } from '../../../../../utils/faq-pdf'
 
+import { requeteAvec, texteDepuisUrl } from '~~/shared/utils/filtres-url'
 import { htmlVersTexte } from '~~/shared/utils/html-to-text'
 
 // Layer faq : imports du cœur applicatif via #imports (auto-imports fusionnés entre layers).
@@ -271,12 +272,19 @@ const canManage = computed(() => {
 })
 
 // --- Recherche ---
-const searchQuery = ref('')
-const searchQueryDebounced = ref('')
+// Conservée dans l'URL : une recherche dans la FAQ sert à montrer une réponse précise à
+// quelqu'un, et le lien doit donc la porter. `replace` et non `push` : chaque lettre tapée
+// laisserait autrement un pas dans l'historique.
+const router = useRouter()
+const searchQuery = ref(texteDepuisUrl(route.query.search))
+const searchQueryDebounced = ref(searchQuery.value)
 const updateDebounced = useDebounceFn((v: string) => {
   searchQueryDebounced.value = v
 }, 150)
-watch(searchQuery, (v) => updateDebounced(v))
+watch(searchQuery, (v) => {
+  updateDebounced(v)
+  router.replace({ query: requeteAvec(route.query, { search: v }) })
+})
 
 const searchTerms = computed(() => parseSearchTerms(searchQueryDebounced.value))
 const searchActive = computed(() => searchTerms.value.length > 0)

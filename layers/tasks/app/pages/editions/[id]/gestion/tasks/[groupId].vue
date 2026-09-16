@@ -307,6 +307,8 @@
 // Composant frère du même layer → import relatif (le type n'est pas exposé par #components).
 import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks/TaskFilters.vue'
 
+import { valeurDepuisUrl } from '~~/shared/utils/filtres-url'
+
 definePageMeta({
   layout: 'edition-dashboard',
   middleware: ['auth-protected'],
@@ -371,7 +373,16 @@ const allGroups = ref<TaskGroupItem[]>([])
 const assignableUsers = ref<AssignableUser[]>([])
 const availableTags = ref<TagItem[]>([])
 const loading = ref(true)
-const viewMode = ref<'list' | 'kanban'>('list')
+/**
+ * Le mode d'affichage, conservé dans l'URL au même titre que les filtres.
+ *
+ * C'est un choix de lecture aussi durable qu'un filtre — on travaille en kanban, ou on ne le fait
+ * pas — et le seul réglage de cet écran qui ne survivait ni au rechargement ni au lien envoyé.
+ */
+const VUES_DES_TACHES = ['list', 'kanban'] as const
+const viewMode = ref<'list' | 'kanban'>(
+  valeurDepuisUrl(route.query.view, VUES_DES_TACHES, VUES_DES_TACHES[0])
+)
 
 const viewItems = computed(() => [
   { label: t('gestion.task.view_list'), value: 'list', icon: 'i-heroicons-list-bullet' },
@@ -518,12 +529,15 @@ const filteredTasks = computed<TaskItem[]>(() => {
 
 // Synchronise les filtres vers l'URL (replace pour ne pas polluer l'historique).
 watch(
-  filters,
-  (f) => {
+  [filters, viewMode],
+  ([f]) => {
     const query: Record<string, string> = {}
     for (const [k, v] of Object.entries(route.query)) {
       if (typeof v === 'string') query[k] = v
     }
+    // Le mode liste est l'état d'arrivée : l'écrire allongerait l'URL sans rien dire.
+    if (viewMode.value !== VUES_DES_TACHES[0]) query.view = viewMode.value
+    else delete query.view
     if (f.q) query.q = f.q
     else delete query.q
     if (f.statuses.length) query.status = f.statuses.join(',')

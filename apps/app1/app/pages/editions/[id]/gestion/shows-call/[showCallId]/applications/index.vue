@@ -191,7 +191,7 @@
               v-model="statusFilter"
               :items="statusOptions"
               class="w-40"
-              @change="fetchApplications()"
+              @change="filtrer()"
             />
           </UFormField>
 
@@ -202,7 +202,7 @@
               :placeholder="$t('gestion.shows_call.search_placeholder')"
               icon="i-heroicons-magnifying-glass"
               class="w-full max-w-md"
-              @keydown.enter="fetchApplications()"
+              @keydown.enter="filtrer()"
             />
           </UFormField>
 
@@ -211,7 +211,7 @@
             variant="soft"
             icon="i-heroicons-magnifying-glass"
             class="mt-5"
-            @click="fetchApplications()"
+            @click="filtrer()"
           >
             {{ $t('common.search') }}
           </UButton>
@@ -296,6 +296,12 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCallBasic, ShowApplication, ShowApplicationStatus } from '~/types'
+// Import explicite : d'autres écrans exportent des filtres d'URL de même famille, et l'auto-import
+// ne saurait pas lequel prendre.
+import {
+  filtresDeSpectaclesDepuisUrl,
+  requeteCandidaturesDeSpectacles,
+} from '~/utils/filtres-candidatures-spectacles'
 
 definePageMeta({
   middleware: ['auth-protected'],
@@ -320,10 +326,31 @@ const applications = ref<ShowApplication[]>([])
 const total = ref(0)
 const stats = ref<{ pending: number; accepted: number; rejected: number } | null>(null)
 const loadingApplications = ref(false)
-const currentPage = ref(1)
+// Filtres conservés dans l'URL — cf. `filtres-candidatures-spectacles.ts` pour la règle.
+const router = useRouter()
+const filtresInitiaux = filtresDeSpectaclesDepuisUrl(route.query)
+
+const currentPage = ref(filtresInitiaux.page)
 const pageSize = 20
-const statusFilter = ref<string | null>(null)
-const searchQuery = ref('')
+const statusFilter = ref<string | null>(filtresInitiaux.statut)
+const searchQuery = ref(filtresInitiaux.recherche)
+
+/**
+ * Report des filtres vers l'URL.
+ *
+ * `replace` et non `push` : filtrer n'est pas un pas de navigation sur lequel revenir — et sur cet
+ * écran, où l'on entre et sort sans cesse d'une candidature, l'historique en deviendrait
+ * inutilisable.
+ */
+watch([statusFilter, searchQuery, currentPage], () => {
+  router.replace({
+    query: requeteCandidaturesDeSpectacles(route.query, {
+      statut: statusFilter.value,
+      recherche: searchQuery.value,
+      page: currentPage.value,
+    }),
+  })
+})
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize))
 
@@ -418,6 +445,21 @@ const fetchApplications = async () => {
   } finally {
     loadingApplications.value = false
   }
+}
+
+/**
+ * Filtrer, c'est repartir de la première page.
+ *
+ * Sans cette remise à zéro, changer de statut depuis la page 3 demandait la page 3 du NOUVEAU
+ * filtre — souvent vide, alors que des candidatures correspondaient bien. Le tableau paraissait
+ * simplement ne rien trouver.
+ *
+ * La pagination, elle, appelle `fetchApplications` directement : c'est le seul endroit où changer
+ * de page doit être respecté plutôt que défait.
+ */
+const filtrer = () => {
+  currentPage.value = 1
+  fetchApplications()
 }
 
 // Naviguer vers la page dédiée d'une candidature

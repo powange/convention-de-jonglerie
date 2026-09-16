@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   filtresDepuisUrl,
+  pageDepuisUrl,
   requeteCandidatures,
   STATUT_PAR_DEFAUT,
 } from '../../../../../layers/volunteers/app/utils/filtres-candidatures-url'
@@ -85,5 +86,54 @@ describe('requeteCandidatures', () => {
     }
 
     expect(filtresDepuisUrl(requeteCandidatures({}, filtres))).toEqual(filtres)
+  })
+})
+
+/**
+ * La pagination, conservée au même titre que les filtres.
+ *
+ * Un lien filtré qui ramène à la première page ne règle que la moitié du problème quand la liste
+ * en compte dix — et c'est exactement ce qui se passait en revenant d'une candidature.
+ */
+describe('pageDepuisUrl', () => {
+  it('lit une page', () => {
+    expect(pageDepuisUrl('4')).toBe(4)
+  })
+
+  it('retombe sur la première page pour tout ce qui n’en est pas une', () => {
+    expect(pageDepuisUrl(undefined)).toBe(1)
+    expect(pageDepuisUrl('0')).toBe(1)
+    expect(pageDepuisUrl('-3')).toBe(1)
+    expect(pageDepuisUrl('deux')).toBe(1)
+  })
+})
+
+describe('requeteCandidatures et la page', () => {
+  const defauts = {
+    statut: STATUT_PAR_DEFAUT,
+    equipesSouhaitees: [],
+    presence: [],
+    equipesAssignees: [],
+    recherche: '',
+  }
+
+  it('n’écrit PAS la première page', () => {
+    expect(requeteCandidatures({}, defauts, 1)).toEqual({})
+  })
+
+  it('écrit la page dès qu’on quitte la première', () => {
+    expect(requeteCandidatures({}, defauts, 3)).toEqual({ page: '3' })
+  })
+
+  it('RETIRE la page de l’URL quand on revient à la première', () => {
+    // Sans la clé dans la déstructuration, la page d'avant resterait collée à l'URL.
+    expect(requeteCandidatures({ page: '3' }, defauts, 1)).toEqual({})
+  })
+
+  it('fait l’aller-retour avec les filtres', () => {
+    const query = requeteCandidatures({}, { ...defauts, statut: 'ACCEPTED' }, 2)
+
+    expect(pageDepuisUrl(query.page)).toBe(2)
+    expect(filtresDepuisUrl(query).statut).toBe('ACCEPTED')
   })
 })

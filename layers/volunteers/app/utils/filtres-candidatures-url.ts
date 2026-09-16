@@ -24,6 +24,18 @@ export interface FiltresDeCandidatures {
   recherche: string
 }
 
+/**
+ * La page de pagination portée par l'URL.
+ *
+ * Elle accompagne les filtres plutôt que de les laisser seuls : revenir sur un lien filtré mais
+ * ramené à la première page ne règle que la moitié du problème quand la liste en compte dix.
+ */
+export function pageDepuisUrl(brut: unknown): number {
+  if (typeof brut !== 'string' || !brut) return 1
+  const valeur = Number(brut)
+  return Number.isInteger(valeur) && valeur > 0 ? valeur : 1
+}
+
 /** Une liste d'identifiants portée par l'URL, séparée par des virgules. */
 function listeDepuisUrl(brut: unknown): string[] {
   if (typeof brut !== 'string' || !brut) return []
@@ -49,7 +61,8 @@ export function filtresDepuisUrl(query: Record<string, unknown>): FiltresDeCandi
  */
 export function requeteCandidatures(
   queryActuelle: Record<string, unknown>,
-  filtres: FiltresDeCandidatures
+  filtres: FiltresDeCandidatures,
+  page = 1
 ): Record<string, string> {
   // On reconstruit plutôt que de supprimer clé à clé : un `delete` sur une clé calculée est
   // refusé par le linter, et l'omission dit la même chose sans détour.
@@ -59,6 +72,7 @@ export function requeteCandidatures(
     presence: _p,
     assignedTeams: _a,
     search: _r,
+    page: _pg,
     ...autres
   } = queryActuelle as Record<string, string>
   const query = { ...autres } as Record<string, string>
@@ -74,6 +88,8 @@ export function requeteCandidatures(
   // La recherche est recopiée telle quelle, espaces compris : c'est ce que la personne a tapé,
   // et le serveur s'en charge déjà. La rogner ici ferait diverger l'URL de ce que montre le champ.
   poser('search', filtres.recherche)
+  // La première page est l'état d'arrivée : l'écrire allongerait l'URL sans rien dire.
+  poser('page', page > 1 ? String(page) : '')
 
   return query
 }
