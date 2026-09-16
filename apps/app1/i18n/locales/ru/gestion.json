@@ -288,6 +288,18 @@
         "saved_success": "Питание этого организатора сохранено",
         "error_loading": "Не удалось загрузить питание этого организатора",
         "error_saving": "Не удалось сохранить питание этого организатора"
+      },
+      "roles_column": "Роли",
+      "role": {
+        "manageVolunteers": "Волонтёры",
+        "manageArtists": "Артисты",
+        "manageMeals": "Питание",
+        "manageTicketing": "Билеты",
+        "manageTasks": "Задачи",
+        "manageStock": "Инвентарь",
+        "manageWorkshops": "Воркшопы",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Финансы"
       }
     },
     "overview": "Обзор",

@@ -288,6 +288,18 @@
         "saved_success": "Die Mahlzeiten dieses Organisators wurden gespeichert",
         "error_loading": "Die Mahlzeiten dieses Organisators können nicht geladen werden",
         "error_saving": "Die Mahlzeiten dieses Organisators können nicht gespeichert werden"
+      },
+      "roles_column": "Rollen",
+      "role": {
+        "manageVolunteers": "Helfer",
+        "manageArtists": "Künstler",
+        "manageMeals": "Mahlzeiten",
+        "manageTicketing": "Ticketing",
+        "manageTasks": "Aufgaben",
+        "manageStock": "Material",
+        "manageWorkshops": "Workshops",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Finanzen"
       }
     },
     "overview": "Übersicht",

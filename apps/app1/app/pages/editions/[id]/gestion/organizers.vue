@@ -206,6 +206,27 @@
                   <span v-else class="text-gray-500">—</span>
                 </template>
 
+                <!-- Colonne Rôles : les modules que la personne peut gérer sur CETTE édition,
+                     droits de convention compris. Voir `roles-edition`. -->
+                <template #roles-cell="{ row }">
+                  <div v-if="row.original.roles?.length" class="flex flex-wrap gap-1">
+                    <UBadge
+                      v-for="role in row.original.roles"
+                      :key="role"
+                      variant="subtle"
+                      size="sm"
+                      :style="{
+                        backgroundColor: couleurDuRole(role) + '20',
+                        borderColor: couleurDuRole(role),
+                        color: couleurDuRole(role),
+                      }"
+                    >
+                      {{ $t(`gestion.organizers.role.${role}`) }}
+                    </UBadge>
+                  </div>
+                  <span v-else class="text-gray-500">—</span>
+                </template>
+
                 <!-- Colonne Repas -->
                 <template #meals-cell="{ row }">
                   <UButton
@@ -412,6 +433,7 @@ import { summarizeRights } from '~/utils/organizerRights'
 import type { TableColumn } from '@nuxt/ui'
 
 import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { couleurDuRole } from '~~/shared/utils/roles-edition'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -733,6 +755,11 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
         },
       ]
     : []),
+  {
+    id: 'roles',
+    header: t('gestion.organizers.roles_column'),
+    size: 260,
+  },
   ...(edition.value?.mealsEnabled && canManageMeals.value
     ? [
         {

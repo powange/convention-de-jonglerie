@@ -288,6 +288,18 @@
         "saved_success": "Харчування цього організатора збережено",
         "error_loading": "Не вдалося завантажити харчування цього організатора",
         "error_saving": "Не вдалося зберегти харчування цього організатора"
+      },
+      "roles_column": "Ролі",
+      "role": {
+        "manageVolunteers": "Волонтери",
+        "manageArtists": "Артисти",
+        "manageMeals": "Харчування",
+        "manageTicketing": "Квитки",
+        "manageTasks": "Завдання",
+        "manageStock": "Інвентар",
+        "manageWorkshops": "Воркшопи",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Фінанси"
       }
     },
     "overview": "Огляд",

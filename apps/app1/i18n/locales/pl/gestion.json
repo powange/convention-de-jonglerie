@@ -288,6 +288,18 @@
         "saved_success": "Posiłki tego organizatora zostały zapisane",
         "error_loading": "Nie można wczytać posiłków tego organizatora",
         "error_saving": "Nie można zapisać posiłków tego organizatora"
+      },
+      "roles_column": "Role",
+      "role": {
+        "manageVolunteers": "Wolontariusze",
+        "manageArtists": "Artyści",
+        "manageMeals": "Posiłki",
+        "manageTicketing": "Bilety",
+        "manageTasks": "Zadania",
+        "manageStock": "Sprzęt",
+        "manageWorkshops": "Warsztaty",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Finanse"
       }
     },
     "overview": "Przegląd",

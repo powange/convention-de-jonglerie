@@ -288,6 +288,18 @@
         "saved_success": "As refeições deste organizador foram guardadas",
         "error_loading": "Não foi possível carregar as refeições deste organizador",
         "error_saving": "Não foi possível guardar as refeições deste organizador"
+      },
+      "roles_column": "Funções",
+      "role": {
+        "manageVolunteers": "Voluntários",
+        "manageArtists": "Artistas",
+        "manageMeals": "Refeições",
+        "manageTicketing": "Bilheteira",
+        "manageTasks": "Tarefas",
+        "manageStock": "Material",
+        "manageWorkshops": "Workshops",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Tesouraria"
       }
     },
     "overview": "Visão geral",

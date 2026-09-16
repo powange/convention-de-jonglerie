@@ -288,6 +288,18 @@
         "saved_success": "Den här arrangörens måltider har sparats",
         "error_loading": "Det gick inte att läsa in den här arrangörens måltider",
         "error_saving": "Det gick inte att spara den här arrangörens måltider"
+      },
+      "roles_column": "Roller",
+      "role": {
+        "manageVolunteers": "Volontärer",
+        "manageArtists": "Artister",
+        "manageMeals": "Måltider",
+        "manageTicketing": "Biljetter",
+        "manageTasks": "Uppgifter",
+        "manageStock": "Material",
+        "manageWorkshops": "Workshops",
+        "manageFAQ": "FAQ",
+        "manageTreasury": "Ekonomi"
       }
     },
     "overview": "Översikt",
