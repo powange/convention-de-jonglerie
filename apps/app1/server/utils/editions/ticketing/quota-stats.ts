@@ -35,7 +35,10 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
       },
       customFields: {
         include: {
-          customField: true,
+          // Les deux identifiants ET le libellé : le rapprochement les essaie dans cet ordre.
+          customField: {
+            select: { id: true, label: true, helloAssoCustomFieldId: true },
+          },
         },
       },
       // Dans les trois cas, une clé nulle vaut « tous », et une clé renseignée vise un
@@ -246,16 +249,37 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
       }
     }
 
-    // 3. Compter les participants via les custom fields (champs personnalisés de tarifs)
+    /**
+     * 3. Compter les billets via les champs personnalisés.
+     *
+     * L'instantané du billet peut désigner le champ de trois façons, essayées dans cet ordre :
+     *
+     * 1. `customFieldId` — l'identifiant INTERNE, écrit par les saisies faites ici ;
+     * 2. `id` — l'identifiant du champ CHEZ LE FOURNISSEUR, écrit par les imports ;
+     * 3. `name` — le libellé, seul repli pour les billets antérieurs qui ne portent ni l'un ni
+     *    l'autre. C'est lui qui rendait le décompte fragile : renommer un champ détachait tous
+     *    les billets déjà vendus.
+     *
+     * Les deux premiers vivent dans des espaces d'identifiants SANS RAPPORT : les confondre ferait
+     * correspondre des champs étrangers. D'où deux comparaisons distinctes, jamais une seule.
+     */
     for (const customFieldQuota of quota.customFields) {
-      const customFieldLabel = customFieldQuota.customField.label
+      const champ = customFieldQuota.customField
       const choiceValue = customFieldQuota.choiceValue
+
+      const designeLeChamp = (field: Record<string, unknown>) => {
+        if (typeof field.customFieldId === 'number') return field.customFieldId === champ.id
+        if (typeof field.id === 'number') {
+          return champ.helloAssoCustomFieldId !== null && field.id === champ.helloAssoCustomFieldId
+        }
+        return field.name === champ.label
+      }
 
       for (const orderItem of allOrderItems) {
         if (orderItem.customFields && Array.isArray(orderItem.customFields)) {
           // Vérifier si cet orderItem a ce custom field avec le bon choix
           const hasCustomField = (orderItem.customFields as any[]).some((field) => {
-            if (field.name !== customFieldLabel) {
+            if (!designeLeChamp(field)) {
               return false
             }
 
