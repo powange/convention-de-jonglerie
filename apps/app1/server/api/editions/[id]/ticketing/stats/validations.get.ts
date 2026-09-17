@@ -2,6 +2,11 @@ import { DateTime } from 'luxon'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import {
+  billetsQuiComptent,
+  estUnParticipant,
+  nEstPasUnParticipant,
+} from '#server/utils/ticketing/billets-qui-comptent'
 
 export default wrapApiHandler(
   async (event) => {
@@ -58,15 +63,11 @@ export default wrapApiHandler(
       artistsValidations,
       organizersValidations,
     ] = await Promise.all([
-      // Participants (billets avec countAsParticipant = true)
+      // Participants — même règle que stats.get.ts, qui filtrait et pas celui-ci.
       prisma.ticketingOrderItem.findMany({
         where: {
-          order: {
-            editionId,
-          },
-          tier: {
-            countAsParticipant: true,
-          },
+          ...billetsQuiComptent(editionId),
+          ...estUnParticipant,
           entryValidated: true,
           entryValidatedAt: {
             not: null,
@@ -79,15 +80,12 @@ export default wrapApiHandler(
         },
       }),
 
-      // Autres (billets avec countAsParticipant = false)
+      // Autres — y compris les billets SANS tarif, qui ne tombaient dans aucun des deux groupes
+      // et disparaissaient donc du graphique tout en étant validés au guichet.
       prisma.ticketingOrderItem.findMany({
         where: {
-          order: {
-            editionId,
-          },
-          tier: {
-            countAsParticipant: false,
-          },
+          ...billetsQuiComptent(editionId),
+          ...nEstPasUnParticipant,
           entryValidated: true,
           entryValidatedAt: {
             not: null,

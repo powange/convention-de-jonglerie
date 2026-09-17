@@ -102,13 +102,11 @@ const qrCodeToken = computed(() => props.application?.qrCodeToken)
 const qrCodeValue = computed(() => {
   if (!applicationId.value) return ''
 
-  // Nouveau format avec token si disponible
-  if (qrCodeToken.value) {
-    return `volunteer-${applicationId.value}-${qrCodeToken.value}`
-  }
+  // Le jeton n'est pas une option : sans lui, le contrôle d'accès refuse le code. Mieux vaut
+  // n'afficher aucun QR code qu'un code qui sera rejeté au guichet, devant tout le monde.
+  if (!qrCodeToken.value) return ''
 
-  // Ancien format sans token (rétrocompatibilité)
-  return `volunteer-${applicationId.value}`
+  return `volunteer-${applicationId.value}-${qrCodeToken.value}`
 })
 
 const getEditionDisplayName = (edition: any) => {

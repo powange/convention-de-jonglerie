@@ -1,373 +1,168 @@
-# Gestion des Quotas
+# Les quotas
 
-Les quotas permettent de limiter le nombre de participants par catégorie (places totales, repas végétariens, t-shirts, etc.).
+Un quota répond à une seule question : **combien de personnes sont concernées par tel ensemble de
+conditions ?** « Places totales », « repas végétariens », « t-shirts taille M ».
 
-## Modèle de Données
+> ⚠️ **Un quota ne plafonne rien.** Il compte, il affiche, il ne refuse jamais. Aucune écriture du
+> projet ne consulte un quota avant d'accepter : on peut vendre le cent unième billet d'un quota de
+> cent, et ajouter un participant au guichet alors que la jauge est à 140 %. C'est un **indicateur**,
+> au même titre que le maximum d'une équipe de bénévoles. Cette page dit ce que le code fait ; si le
+> comportement doit changer, c'est une décision, pas une correction.
 
-### Table `TicketingQuota`
+## Le quota lui-même
 
 ```prisma
 model TicketingQuota {
-  id          Int      @id @default(autoincrement())
+  id          Int
   editionId   Int
   title       String
-  description String?  @db.Text
-  quantity    Int      // Nombre total disponible
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  edition Edition       @relation(...)
-  tiers   TicketingTierQuota[]   // Tarifs qui consomment ce quota
-  options TicketingOptionQuota[] // Options qui consomment ce quota
-
-  @@index([editionId])
+  description String?
+  quantity    Int      // le repère, pas une limite
+  position    Int      @default(0)
 }
 ```
 
-### Propriétés
+`quantity` est validé `> 0` à la création. Rien n'impose que deux quotas d'une même édition portent
+des titres différents.
 
-```typescript
-interface QuotaData {
-  title: string // Nom du quota (ex: "Places totales")
-  description?: string // Description optionnelle
-  quantity: number // Nombre disponible (toujours positif)
-}
-```
+## Les sept façons d'occuper une place
 
-## API Routes
+Un quota se remplit par sept tables de liaison, et elles ne se ressemblent pas : trois passent par
+ce que le participant a **acheté**, quatre par **qui il est**.
 
-### Lister les Quotas
+| Table                           | Ce qui déclenche l'occupation                   |
+| ------------------------------- | ----------------------------------------------- |
+| `TicketingTierQuota`            | le tarif du billet                              |
+| `TicketingOptionQuota`          | une option prise sur le billet                  |
+| `TicketingTierCustomFieldQuota` | une réponse à un champ personnalisé             |
+| `EditionOrganizerQuota`         | être organisateur — tous, ou un nommé           |
+| `EditionVolunteerQuota`         | être bénévole accepté — tous, ou d'une équipe   |
+| `EditionArtistQuota`            | être artiste — tous, ou jouer dans un spectacle |
 
-**Route** : `GET /api/editions/:id/ticketing/quotas`
+Les quatre dernières existent parce qu'un organisateur, un bénévole et un artiste sont présents sur
+l'événement **sans billet** : rien ne les faisait entrer dans un décompte de places.
 
-**Permission** : `canAccessEditionData`
+### La clé nulle vaut « tout le monde »
 
-**Réponse** :
+`organizerId`, `teamId` et `showId` sont nullables : `NULL` désigne l'ensemble de la population,
+une valeur désigne un sous-ensemble.
 
-```typescript
-TicketingQuota[]
-```
+⚠️ **L'index unique ne protège pas la ligne globale.** Sous MySQL, deux `NULL` sont distincts :
+`(edition, quota, NULL)` peut donc être inséré plusieurs fois. C'est l'**écriture** qui l'empêche,
+par une sémantique de remplacement complet — `remplacerLesQuotas` efface la portée visée avant de
+la réécrire, dans une transaction.
 
----
+### Une divergence assumée avec les articles à remettre
 
-### Statistiques des Quotas
+Les articles d'une équipe **remplacent** les articles globaux. Les quotas, eux, **s'additionnent** —
+et un bénévole visé à la fois globalement et par son équipe n'occupe qu'**une** place, jamais deux
+ni zéro. La raison est dans le schéma : un article est un colis qu'on reçoit, le remplacer a un
+sens ; un quota est une place qu'on occupe, et on l'occupe ou non.
 
-**Route** : `GET /api/editions/:id/ticketing/quotas/stats`
+## Le calcul
 
-**Permission** : `canAccessEditionData`
+Tout vit dans `apps/app1/server/utils/editions/ticketing/quota-stats.ts`, et rend par quota :
+`currentCount`, `validatedCount`, `percentage`.
 
-**Réponse** :
+### Quels billets comptent
 
-```typescript
-{
-  stats: Array<{
-    quota: TicketingQuota
-    consumed: number // Nombre consommé
-    remaining: number // Nombre restant
-    percentage: number // % d'utilisation
-  }>
-}
-```
+`state ∈ { Processed, Pending }`. Les lignes `Canceled` sont écartées.
 
-**Logique de Calcul** :
+⚠️ `Onsite` est un statut de **commande**, jamais un état de ligne : une vente au guichet porte
+`status: 'Onsite'` et `state: 'Processed'`. Elle compte donc bien.
 
-Le calcul se fait en comptant les `TicketingOrderItem` qui ont :
+### Un billet est une place, quelle que soit la raison
 
-1. Un tarif (`tierId`) lié au quota via `TicketingTierQuota`
-2. OU une réponse à une option (`customFields`) liée au quota via `TicketingOptionQuota`
+Tarif, option et champ personnalisé versent dans le **même ensemble** d'identifiants de billets. Un
+billet retenu par son tarif *et* par une option ne compte qu'une fois. Le dédoublonnage se fait par
+`Set`, en mémoire — pas par un `DISTINCT` SQL.
 
-**Exemple** :
+### Les options se lisent dans leur table, pas dans l'instantané du billet
 
-```typescript
-// Quota "Repas végétariens" : 50
-// - 30 personnes avec tarif "Adulte + repas végétarien"
-// - 15 personnes qui ont répondu "Végétarien" à l'option "Régime"
-// Consumed: 45, Remaining: 5, Percentage: 90%
-```
+Le rapprochement passe par `TicketingOrderItemOption.optionId`. Il a longtemps cherché les options
+dans l'instantané JSON du billet, où elles ne sont **jamais** : un quota posé sur une option comptait
+zéro, quel que soit le nombre de billets vendus.
 
----
+### Les champs personnalisés se rapprochent par identifiant
 
-### Créer un Quota
+`reponseDesigneLeChamp` (`server/utils/ticketing/rapprochement-champ.ts`) essaie, dans l'ordre :
+l'identifiant interne, puis l'identifiant du fournisseur, puis le libellé en dernier repli. Renommer
+un champ ne détache donc pas les billets déjà vendus. La même fonction sert au calcul des articles à
+remettre — les deux copies avaient déjà divergé.
 
-**Route** : `POST /api/editions/:id/ticketing/quotas`
+`choiceValue` nul signifie « toute réponse non vide » ; renseigné, il vise une réponse précise.
 
-**Permission** : `canManageEditionVolunteers`
+### Les personnes présentes sans billet
 
-**Body** :
+Une personne **inscrite** occupe sa place immédiatement, comme un billet compte dès la vente. La
+validation de son entrée l'ajoute ensuite à `validatedCount`, sans rien changer à `currentCount`.
 
-```typescript
-{
-  title: string        // Obligatoire
-  description?: string
-  quantity: number     // >= 0, obligatoire
-}
-```
+Un ensemble **par famille** : les identifiants d'un bénévole, d'un organisateur et d'un artiste sont
+des entiers issus de tables différentes, et les mêler ferait disparaître des personnes.
 
-**Validation Zod** :
+⚠️ **Rien ne rapproche ces personnes d'un billet qu'elles auraient acheté par ailleurs**, ni une même
+personne d'une famille à l'autre : elle compte alors deux fois. C'est délibéré — un billet ne porte
+qu'une adresse de courriel, jamais un compte, et le rapprochement échouerait en silence dès qu'elle
+achèterait sous une autre adresse.
 
-```typescript
-const bodySchema = z.object({
-  title: z.string().min(1),
-  description: z.string().nullable().optional(),
-  quantity: z.number().int().min(0),
-})
-```
+## Les points d'API
 
-**Réponse** :
+Tous exigent `canManageTicketingById`, sauf `stats` qui admet aussi le guichet.
 
-```typescript
-{
-  success: true
-  quota: TicketingQuota
-}
-```
+### Le quota
 
----
+| Route                                | Rôle                                       |
+| ------------------------------------ | ------------------------------------------ |
+| `GET    …/ticketing/quotas`          | liste                                      |
+| `POST   …/ticketing/quotas`          | création (`title`, `description?`, `quantity > 0`) |
+| `PUT    …/ticketing/quotas/:id`      | modification                               |
+| `DELETE …/ticketing/quotas/:id`      | suppression, en cascade sur les sept liaisons |
+| `PUT    …/ticketing/quotas/reorder`  | ordre d'affichage                          |
+| `GET    …/ticketing/quotas/stats`    | les jauges — `canAccessEditionDataOrAccessControl` |
 
-### Modifier un Quota
+### Les associations
 
-**Route** : `PUT /api/editions/:id/ticketing/quotas/:quotaId`
-
-**Permission** : `canManageEditionVolunteers`
-
-**Body** : Identique à la création
-
-**Réponse** :
-
-```typescript
-{
-  success: true
-  quota: TicketingQuota
-}
-```
-
----
-
-### Supprimer un Quota
-
-**Route** : `DELETE /api/editions/:id/ticketing/quotas/:quotaId`
-
-**Permission** : `canManageEditionVolunteers`
-
-**Réponse** :
-
-```typescript
-{
-  success: true
-}
-```
-
-**Note** : La suppression supprime également les relations `TicketingTierQuota` et `TicketingOptionQuota` (cascade).
-
----
-
-## Utilitaire Serveur
-
-**Fichier** : `server/utils/editions/ticketing/quota-stats.ts`
-
-### Fonction `getQuotaStats(editionId: number)`
-
-Calcule les statistiques de consommation pour tous les quotas d'une édition.
-
-```typescript
-const stats = await getQuotaStats(editionId)
-// Retourne:
-[
-  {
-    quota: { id: 1, title: "Places totales", quantity: 200, ... },
-    consumed: 150,
-    remaining: 50,
-    percentage: 75
-  },
-  {
-    quota: { id: 2, title: "Repas végétariens", quantity: 50, ... },
-    consumed: 30,
-    remaining: 20,
-    percentage: 60
-  }
-]
-```
-
-**Algorithme** :
-
-1. Récupère tous les quotas de l'édition
-2. Pour chaque quota :
-   - Compte les items via `TicketingTierQuota` (items avec un `tierId` lié)
-   - Compte les items via `TicketingOptionQuota` (items avec réponse à option liée)
-   - Somme les deux (en évitant les doublons si un item consomme le même quota 2 fois)
-3. Calcule `remaining` et `percentage`
-
----
-
-## Composants Vue
-
-### `QuotasList.vue`
-
-**Localisation** : `app/components/ticketing/QuotasList.vue`
-
-**Fonctionnalités** :
-
-- Affiche la liste des quotas
-- Affiche la quantité totale
-- Boutons d'édition/suppression
-
-### `QuotaStatsCard.vue`
-
-**Localisation** : `app/components/ticketing/stats/QuotaStatsCard.vue`
-
-**Fonctionnalités** :
-
-- Affiche les statistiques en temps réel
-- Barre de progression visuelle
-- Code couleur selon le % d'utilisation :
-  - Vert : < 70%
-  - Orange : 70-90%
-  - Rouge : > 90%
-
-**Props** :
-
-```typescript
-{
-  editionId: number
-}
-```
-
-**Exemple** :
-
-```vue
-<QuotaStatsCard :edition-id="editionId" />
-```
-
----
-
-## Cas d'Usage
-
-### 1. Créer un Quota "Places Totales"
-
-```typescript
-const quota = await $fetch(`/api/editions/${editionId}/ticketing/quotas`, {
-  method: 'POST',
-  body: {
-    title: 'Places totales',
-    description: 'Nombre maximum de participants',
-    quantity: 200,
-  },
-})
-```
-
-### 2. Créer un Quota "Repas Végétariens"
-
-```typescript
-const quota = await $fetch(`/api/editions/${editionId}/ticketing/quotas`, {
-  method: 'POST',
-  body: {
-    title: 'Repas végétariens',
-    description: 'Nombre de repas végétariens disponibles',
-    quantity: 50,
-  },
-})
-```
-
-### 3. Augmenter un Quota
-
-```typescript
-// Récupérer le quota actuel
-const quota = await $fetch(`/api/editions/${editionId}/ticketing/quotas`).then((quotas) =>
-  quotas.find((q) => q.id === quotaId)
-)
-
-// Augmenter de 20
-await $fetch(`/api/editions/${editionId}/ticketing/quotas/${quotaId}`, {
-  method: 'PUT',
-  body: {
-    ...quota,
-    quantity: quota.quantity + 20,
-  },
-})
-```
-
-### 4. Vérifier si un Quota est Dépassé
-
-```typescript
-const { stats } = await $fetch(`/api/editions/${editionId}/ticketing/quotas/stats`)
-
-const quotasDepasses = stats.filter((s) => s.remaining < 0)
-if (quotasDepasses.length > 0) {
-  console.warn('Quotas dépassés:', quotasDepasses)
-}
-```
-
----
-
-## Bonnes Pratiques
-
-### 1. Quotas Généraux
-
-Créez toujours un quota "Places totales" :
-
-```typescript
-{
-  title: 'Places totales',
-  quantity: 200
-}
-```
-
-Associez-le à TOUS les tarifs.
-
-### 2. Quotas Spécifiques
-
-Créez des quotas pour chaque limitation :
-
-- Repas végétariens
-- T-shirts par taille
-- Places atelier jonglage
-- Chambres disponibles
-
-### 3. Nommage Clair
-
-Utilisez des titres explicites :
-
-- ✅ "Repas végétariens"
-- ❌ "Végé"
-
-### 4. Description Utile
-
-Ajoutez toujours une description :
-
-```typescript
-{
-  title: "T-shirts taille M",
-  description: "Nombre de t-shirts en taille M disponibles à la vente"
-}
-```
-
-### 5. Surveillance Active
-
-Utilisez `QuotaStatsCard` pour surveiller l'utilisation en temps réel et ajuster les quantités si nécessaire.
-
----
-
-## Dépannage
-
-### Les statistiques ne se mettent pas à jour
-
-**Cause** : Les relations `TicketingTierQuota` ou `TicketingOptionQuota` ne sont pas créées
-**Solution** : Associez les tarifs et options aux quotas correspondants.
-
-### Quota négatif (plus de consommés que disponibles)
-
-**Cause** : Augmentation du nombre de participants après définition du quota
-**Solution** : C'est normal, cela indique un dépassement. Augmentez la `quantity` si nécessaire.
-
-### Pourcentage incorrect
-
-**Cause** : Doublons dans le calcul (un item compte pour 2 quotas identiques)
-**Solution** : Le calcul utilise `DISTINCT` pour éviter les doublons, vérifiez la logique dans `quota-stats.ts`.
-
----
-
-## Voir Aussi
-
-- [Tarifs](./tiers.md) - Association tarifs ↔ quotas
-- [Options](./options.md) - Association options ↔ quotas
-- [Commandes](./orders.md) - Consommation des quotas
+Toutes en `PUT`, toutes à **sémantique de remplacement** : le corps porte la liste complète des
+quotas de la portée visée, et ce qui n'y est pas est retiré.
+
+| Route                                                  | Portée                     |
+| ------------------------------------------------------ | -------------------------- |
+| `…/ticketing/tiers/:tierId/quotas`                     | un tarif                   |
+| `…/ticketing/options/:optionId/quotas`                 | une option                 |
+| `…/ticketing/custom-fields/:customFieldId/quotas`      | un champ personnalisé      |
+| `…/ticketing/organizers/quotas`                        | tous les organisateurs     |
+| `…/ticketing/organizers/:editionOrganizerId/quotas`    | un organisateur            |
+| `…/ticketing/volunteers/quotas`                        | tous les bénévoles acceptés |
+| `…/ticketing/volunteers/teams/:teamId/quotas`          | une équipe                 |
+| `…/ticketing/artists/quotas`                           | tous les artistes          |
+| `…/ticketing/artists/shows/:showId/quotas`             | les artistes d'un spectacle |
+
+Trois `GET` rendent les associations existantes, ligne globale comprise :
+`organizers/quotas`, `volunteers/quotas`, `artists/quotas`.
+
+## Les écrans
+
+`gestion/ticketing/quotas.vue` — création, ordre, et les jauges. Les associations se posent depuis
+l'écran de l'objet concerné : la modale d'un tarif, celle d'une option, celle d'un champ
+personnalisé, et les listes des trois populations.
+
+## Ce que le système ne fait pas
+
+- **Il ne refuse rien.** Voir l'avertissement en tête.
+- **Il ne prévient pas** au franchissement d'un seuil : ni courriel, ni pastille.
+- **Il ne trace pas** l'historique d'une jauge : on lit l'état à l'instant de la requête, jamais son
+  évolution.
+- **Il ne rapproche pas** une même personne de ses différents rôles, ni d'un billet qu'elle aurait
+  acheté.
+
+## Coût
+
+`getQuotaStats` met environ **245 ms** sur une édition de 13 quotas et 271 billets, contre ~20 ms
+sur une édition sans quota (mesuré sur une copie des données de production). L'écran ne l'interroge
+pas en boucle : c'est un coût de chargement.
+
+## Voir aussi
+
+- [Les articles à remettre](handout-items.md) — même forme d'associations, règle de portée opposée
+- [Les tarifs](tiers.md) · [Les options](options.md) · [Les champs personnalisés](orders.md)
+- [Le contrôle d'accès](access-control.md) — d'où vient `validatedCount`

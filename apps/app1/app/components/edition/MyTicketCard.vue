@@ -107,7 +107,7 @@
         </div>
 
         <!-- QR Code -->
-        <div class="flex flex-col items-center justify-center p-6">
+        <div v-if="selectedTicket.qrCode" class="flex flex-col items-center justify-center p-6">
           <Qrcode :value="selectedTicket.qrCode" variant="default" />
           <p class="mt-3 text-xs text-gray-500 dark:text-gray-400 font-mono">
             {{ selectedTicket.qrCode }}
@@ -155,7 +155,8 @@ interface Ticket {
   firstName: string
   lastName: string
   email: string
-  qrCode: string
+  /** `null` pour un billet sans jeton : un code sans jeton est refusé au contrôle d'accès. */
+  qrCode: string | null
   tierName: string
   amount: number
   /** `ticket`, `volunteer`, `artist` ou `organizer` — seul un billet a une provenance. */

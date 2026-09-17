@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { designerLaPersonne } from '#server/utils/ticketing/designation-participant'
 import {
   aggregateHandoutItems,
   calculateHandoutItemsForTicket,
@@ -10,9 +11,18 @@ import {
 } from '#server/utils/ticketing/handout-items'
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 
-const bodySchema = z.object({
-  qrCode: z.string().min(1),
-})
+/**
+ * Deux demandes distinctes, et c'est volontaire : un QR code présenté au scan doit porter son
+ * jeton, une relecture demandée par l'écran de gestion n'a rien à prouver de plus que le droit
+ * de qui la demande. Voir `designation-participant.ts` pour le détail de cette séparation.
+ */
+const bodySchema = z.union([
+  z.object({ qrCode: z.string().min(1) }),
+  z.object({
+    type: z.enum(['volunteer', 'artist', 'organizer']),
+    id: z.number().int().positive(),
+  }),
+])
 
 export default wrapApiHandler(
   async (event) => {
@@ -34,30 +44,21 @@ export default wrapApiHandler(
     // éteint, le guichet ne réclame plus rien à personne. Lu une fois pour les quatre branches.
     const articlesActifs = await articlesARemettreActifs(editionId)
 
+    const demande = designerLaPersonne(body)
+    if (demande.genre === 'refus') {
+      return createSuccessResponse({ found: false }, demande.message)
+    }
+
     try {
-      // Détecter le type de QR code
-      if (body.qrCode.startsWith('volunteer-')) {
-        // Recherche d'un bénévole
-        // Format: volunteer-{id}-{token} ou volunteer-{id} (ancien format)
-        const parts = body.qrCode.replace('volunteer-', '').split('-')
-        const applicationId = parseInt(parts[0] ?? '')
-
-        if (isNaN(applicationId)) {
-          return createSuccessResponse({ found: false }, 'QR code bénévole invalide')
-        }
-
-        // Si un token est présent, on le vérifie
-        const token = parts[1] || null
+      if (demande.genre === 'volunteer') {
+        const applicationId = demande.id
 
         const application = await prisma.editionVolunteerApplication.findFirst({
           where: {
             id: applicationId,
             eventId: editionId,
             status: 'ACCEPTED',
-            // Vérifier le token seulement s'il est présent dans le QR code ET dans la base
-            ...(token && {
-              qrCodeToken: token,
-            }),
+            ...demande.preuve,
             // Filtrer les bénévoles disponibles pendant l'événement
             OR: [
               {
@@ -255,27 +256,14 @@ export default wrapApiHandler(
             'Aucun bénévole accepté trouvé avec ce QR code'
           )
         }
-      } else if (body.qrCode.startsWith('artist-')) {
-        // Recherche d'un artiste
-        // Format: artist-{id}-{token} ou artist-{id} (ancien format)
-        const parts = body.qrCode.replace('artist-', '').split('-')
-        const artistId = parseInt(parts[0] ?? '')
-
-        if (isNaN(artistId)) {
-          return createSuccessResponse({ found: false }, 'QR code artiste invalide')
-        }
-
-        // Si un token est présent, on le vérifie
-        const token = parts[1] || null
+      } else if (demande.genre === 'artist') {
+        const artistId = demande.id
 
         const artist = await prisma.editionArtist.findFirst({
           where: {
             id: artistId,
             editionId: editionId,
-            // Vérifier le token seulement s'il est présent dans le QR code ET dans la base
-            ...(token && {
-              qrCodeToken: token,
-            }),
+            ...demande.preuve,
           },
           include: {
             user: {
@@ -425,24 +413,14 @@ export default wrapApiHandler(
         } else {
           return createSuccessResponse({ found: false }, 'Aucun artiste trouvé avec ce QR code')
         }
-      } else if (body.qrCode.startsWith('organizer-')) {
-        // Recherche d'un organisateur
-        // Format: organizer-{id}-{token} ou organizer-{id} (ancien format)
-        const parts = body.qrCode.replace('organizer-', '').split('-')
-        const editionOrganizerId = parseInt(parts[0] ?? '')
-        const token = parts[1] || null
-
-        if (isNaN(editionOrganizerId)) {
-          return createSuccessResponse({ found: false }, 'QR code organisateur invalide')
-        }
+      } else if (demande.genre === 'organizer') {
+        const editionOrganizerId = demande.id
 
         const editionOrganizer = await prisma.editionOrganizer.findFirst({
           where: {
             id: editionOrganizerId,
             editionId: editionId,
-            ...(token && {
-              qrCodeToken: token,
-            }),
+            ...demande.preuve,
           },
           include: {
             organizer: {
@@ -580,24 +558,17 @@ export default wrapApiHandler(
           )
         }
       } else {
-        // Recherche d'un billet HelloAsso
-        const config = await prisma.externalTicketing.findUnique({
-          where: { editionId },
-          include: {
-            helloAssoConfig: true,
-          },
-        })
-
-        if (!config || !config.helloAssoConfig) {
-          throw createError({
-            status: 404,
-            message: 'Configuration HelloAsso introuvable',
-          })
-        }
-
+        // Recherche d'un billet.
+        //
+        // Ce bloc exigeait une configuration HelloAsso avant même de chercher, et rendait donc un
+        // 404 — que le `catch` final transformait en 500 — pour toute édition qui n'en a pas.
+        // Or un billet n'a besoin de rien d'autre que de son édition : 285 des billets en base
+        // portent un code `onsite-…` produit par la saisie au guichet, sans aucun fournisseur
+        // externe, et la réponse sait déjà rendre `provider: null` comme `provider: 'INFOMANIAK'`.
+        // Une édition vendant uniquement sur place voyait donc son guichet tomber en panne.
         const orderItem = await prisma.ticketingOrderItem.findFirst({
           where: {
-            qrCode: body.qrCode,
+            qrCode: demande.qrCode,
             order: {
               editionId: editionId,
             },

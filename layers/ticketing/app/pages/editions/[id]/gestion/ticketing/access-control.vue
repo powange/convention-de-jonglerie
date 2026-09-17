@@ -911,22 +911,16 @@ const reloadParticipant = async (
   type: 'ticket' | 'volunteer' | 'artist' | 'organizer'
 ) => {
   try {
-    let qrCode: string
-    if (type === 'volunteer') {
-      qrCode = `volunteer-${identifier}`
-    } else if (type === 'artist') {
-      qrCode = `artist-${identifier}`
-    } else if (type === 'organizer') {
-      qrCode = `organizer-${identifier}`
-    } else {
-      qrCode = identifier as string
-    }
+    // Une relecture, pas un scan : on rouvre une fiche déjà affichée, dont l'identifiant vient
+    // de la réponse précédente du serveur. On le dit tel quel plutôt que de refabriquer un faux
+    // QR code sans jeton — c'est cette contrefaçon qui obligeait le scan à accepter la forme
+    // `volunteer-{id}`, et donc à laisser entrer qui la tapait à la main.
+    const body =
+      type === 'ticket' ? { qrCode: identifier as string } : { type, id: identifier as number }
 
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
       method: 'POST',
-      body: {
-        qrCode,
-      },
+      body,
     })
 
     if (result.data.found) {

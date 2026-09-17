@@ -74,6 +74,38 @@ describe('GET /api/editions/[id]/ticketing/stats/validations', () => {
     expect(result.totals.participants).toBe(1)
   })
 
+  /**
+   * Les deux écrans de validations ne comptaient pas la même chose : `stats.get.ts` écartait les
+   * lignes annulées et les commandes remboursées, celui-ci ne filtrait rien. Deux validations
+   * d'écart sur l'édition 1, sans qu'aucun des deux ne dise sa règle.
+   */
+  describe('la règle « quels billets comptent »', () => {
+    it('écarte les lignes annulées et les commandes remboursées, dans les deux groupes', async () => {
+      await handler(mockEvent as any)
+
+      for (const appel of prismaMock.ticketingOrderItem.findMany.mock.calls) {
+        expect(appel[0].where).toMatchObject({
+          state: { in: ['Processed', 'Pending'] },
+          order: { editionId: 1, status: { not: 'Refunded' } },
+        })
+      }
+    })
+
+    it('range les billets SANS tarif avec les autres, au lieu de les perdre', async () => {
+      await handler(mockEvent as any)
+
+      const [participants, autres] = prismaMock.ticketingOrderItem.findMany.mock.calls
+
+      expect(participants[0].where).toMatchObject({ tier: { countAsParticipant: true } })
+      // Un billet sans tarif ne satisfaisait ni `true` ni `false` : il disparaissait du graphique
+      // tout en ayant été validé au guichet. 47 lignes sont dans ce cas en production.
+      expect(autres[0].where.OR).toEqual([
+        { tier: { countAsParticipant: false } },
+        { tierId: null },
+      ])
+    })
+  })
+
   it('rejette 404 si l’événement est introuvable', async () => {
     prismaMock.event.findUnique.mockResolvedValue(null)
     await expect(handler(mockEvent as any)).rejects.toThrow('Edition not found')

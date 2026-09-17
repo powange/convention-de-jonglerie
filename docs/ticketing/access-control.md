@@ -107,21 +107,63 @@ const bodySchema = z.object({
 **Permission** : `canAccessEditionDataOrAccessControl` — gestionnaires, mais aussi bénévoles en
 créneau actif de contrôle d'accès.
 
-**Body** :
+#### Le format des QR codes
+
+Trois populations portent un code construit ici ; les billets portent celui de leur billetterie.
+
+| Population    | Format                        | Émis par                              |
+| ------------- | ----------------------------- | ------------------------------------- |
+| Bénévole      | `volunteer-{id}-{jeton}`      | `my-tickets.get`, `VolunteersQrCodeModal` |
+| Artiste       | `artist-{id}-{jeton}`         | `my-tickets.get`, `my-artist-info.get` |
+| Organisateur  | `organizer-{id}-{jeton}`      | `my-tickets.get`                      |
+| Billet        | libre — `onsite-{empreinte}` pour une vente au guichet, sinon le code du fournisseur | `add-participant-manually`, import |
+
+Le `{jeton}` est `qrCodeToken` : 32 caractères hexadécimaux tirés au sort, uniques par personne.
+
+> ⚠️ **Le jeton est obligatoire.** Un code réduit à `genre-{id}` est refusé. Il a été accepté — un
+> repli « ancien format » — et comme les identifiants sont des entiers séquentiels, il suffisait de
+> les essayer un par un. Aucune ligne de la base n'en dépendait : les 306 personnes concernées
+> portaient toutes un jeton. Le refus renvoie `found: false` avec un message qui dit quoi faire au
+> guichet, et non « introuvable ».
+
+La règle vit dans `server/utils/ticketing/designation-participant.ts`, en un seul endroit pour les
+trois populations.
+
+#### Body
+
+Deux formes, et ce n'est pas un détail : elles n'ont pas le même degré de confiance.
 
 ```typescript
-{
-  qrCode: string // Code QR scanné
-}
+// 1. Un QR code présenté au scan. Le jeton est exigé.
+{ qrCode: string }
+
+// 2. Une relecture d'une fiche déjà affichée, par l'écran de gestion.
+//    L'identifiant vient de la réponse précédente du serveur, et la personne aux commandes a
+//    déjà prouvé son droit — le même qui lui permet de trouver n'importe qui par son nom.
+{ type: 'volunteer' | 'artist' | 'organizer', id: number }
 ```
 
 **Validation Zod** :
 
 ```typescript
-const bodySchema = z.object({
-  qrCode: z.string().min(1),
-})
+const bodySchema = z.union([
+  z.object({ qrCode: z.string().min(1) }),
+  z.object({
+    type: z.enum(['volunteer', 'artist', 'organizer']),
+    id: z.number().int().positive(),
+  }),
+])
 ```
+
+La seconde forme existe parce que l'écran de gestion fabriquait auparavant un faux QR code sans
+jeton pour se relire — et que c'est cette contrefaçon qui obligeait le scan à accepter cette forme.
+
+#### Un billet ne dépend que de son édition
+
+La branche « billet » exigeait une configuration **HelloAsso** avant même de chercher, et rendait
+donc une erreur pour toute édition qui n'en a pas — alors que la vente au guichet produit ses
+propres codes `onsite-…` sans aucun fournisseur externe. Cette exigence a été retirée : la réponse
+rend `provider: null` pour une saisie locale, et le nom du fournisseur sinon.
 
 **Réponse** :
 

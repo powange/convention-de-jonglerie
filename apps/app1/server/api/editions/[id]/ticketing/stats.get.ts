@@ -1,5 +1,6 @@
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { billetsQuiComptent, estUnParticipant } from '#server/utils/ticketing/billets-qui-comptent'
 
 export default wrapApiHandler(
   async (event) => {
@@ -22,14 +23,8 @@ export default wrapApiHandler(
       // Compter les validations de billets (uniquement les tarifs avec countAsParticipant = true)
       const ticketsValidatedToday = await prisma.ticketingOrderItem.count({
         where: {
-          state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
-          order: {
-            editionId: editionId,
-            status: { not: 'Refunded' },
-          },
-          tier: {
-            countAsParticipant: true,
-          },
+          ...billetsQuiComptent(editionId),
+          ...estUnParticipant,
           entryValidated: true,
           entryValidatedAt: {
             gte: today,
@@ -39,14 +34,8 @@ export default wrapApiHandler(
 
       const totalTicketsValidated = await prisma.ticketingOrderItem.count({
         where: {
-          state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
-          order: {
-            editionId: editionId,
-            status: { not: 'Refunded' },
-          },
-          tier: {
-            countAsParticipant: true,
-          },
+          ...billetsQuiComptent(editionId),
+          ...estUnParticipant,
           entryValidated: true,
         },
       })
@@ -126,14 +115,8 @@ export default wrapApiHandler(
       // Compter le nombre total de billets (uniquement les tarifs avec countAsParticipant = true)
       const totalTickets = await prisma.ticketingOrderItem.count({
         where: {
-          state: { in: ['Processed', 'Pending'] }, // Exclure les billets remboursés
-          order: {
-            editionId: editionId,
-            status: { not: 'Refunded' },
-          },
-          tier: {
-            countAsParticipant: true,
-          },
+          ...billetsQuiComptent(editionId),
+          ...estUnParticipant,
         },
       })
 
