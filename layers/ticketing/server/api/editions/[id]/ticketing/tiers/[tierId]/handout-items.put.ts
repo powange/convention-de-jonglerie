@@ -29,11 +29,14 @@ export default wrapApiHandler(
     const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
-
-      // La fonctionnalité éteinte refuse les écritures. Après le contrôle des droits : qui n'a
-      // pas le droit d'être là ne doit pas apprendre au passage ce que l'édition a activé.
-      await exigerArticlesARemettreActifs(editionId)
     }
+
+    // La fonctionnalité éteinte refuse les écritures. Après le contrôle des droits : qui n'a
+    // pas le droit d'être là ne doit pas apprendre au passage ce que l'édition a activé.
+    //
+    // Cet appel vivait À L'INTÉRIEUR du `if (!allowed)`, après le `throw` : il n'était donc
+    // jamais atteint, et l'interrupteur ne coupait pas ces quatre écritures.
+    await exigerArticlesARemettreActifs(editionId)
 
     const tier = await prisma.ticketingTier.findFirst({
       where: { id: tierId, editionId },

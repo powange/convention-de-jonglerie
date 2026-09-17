@@ -1,6 +1,11 @@
 <script setup lang="ts">
 // Modal de gestion des articles à remettre à TOUS les artistes de l'édition.
 // Les articles propres à un spectacle sont gérés séparément (ShowsManageHandoutItemsModal).
+//
+// L'écran suivait un modèle « ajouter / supprimer » qui rendait une quantité définitive : la
+// changer imposait de retirer l'article puis de le remettre. Il reprend désormais le sélecteur
+// partagé avec les tarifs, les options, les champs personnalisés, les spectacles et les repas,
+// et enregistre la portée entière en une fois.
 const props = defineProps({
   open: {
     type: Boolean,
@@ -17,13 +22,9 @@ const emit = defineEmits(['update:open', 'itemsUpdated'])
 const { t } = useI18n()
 
 const isLoadingData = ref(false)
-const availableItems = ref<any[]>([])
-const assignedItems = ref<any[]>([])
-const selectedItemId = ref<number | null>(null)
-// Nombre d'exemplaires remis à chaque artiste pour l'article ajouté
-const selectedQuantity = ref<number>(1)
-const deleteConfirmOpen = ref(false)
-const itemToDelete = ref<{ id: number; name: string } | null>(null)
+const availableItems = ref<Array<{ id: number; name: string }>>([])
+// Articles associés, avec le nombre d'exemplaires de chacun : la forme qu'attend le PUT.
+const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
 
 async function loadData() {
   if (!props.open) return
@@ -40,7 +41,10 @@ async function loadData() {
     const assignedResponse = await $fetch<any>(
       `/api/editions/${props.editionId}/ticketing/artists/handout-items`
     )
-    assignedItems.value = assignedResponse.items || []
+    selection.value = (assignedResponse.items || []).map((item: any) => ({
+      handoutItemId: item.handoutItemId,
+      quantity: item.quantity ?? 1,
+    }))
   } catch (error) {
     console.error('Erreur lors du chargement des articles:', error)
   } finally {
@@ -48,62 +52,19 @@ async function loadData() {
   }
 }
 
-const { execute: executeAddItem, loading: isAdding } = useApiAction(
+const { execute: save, loading: saving } = useApiAction(
   () => `/api/editions/${props.editionId}/ticketing/artists/handout-items`,
   {
-    method: 'POST',
-    body: () => ({ handoutItemId: selectedItemId.value, quantity: selectedQuantity.value }),
-    successMessage: { title: t('gestion.organizers.item_added_success') },
-    errorMessages: { default: t('gestion.organizers.error_adding_item') },
-    onSuccess: async () => {
-      selectedItemId.value = null
-      selectedQuantity.value = 1
-      await loadData()
+    method: 'PUT',
+    body: () => ({ handoutItemIds: selection.value }),
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
       emit('itemsUpdated')
+      emit('update:open', false)
     },
   }
 )
-
-function addItem() {
-  if (!selectedItemId.value) return
-  executeAddItem()
-}
-
-function confirmRemoveItem(item: any) {
-  itemToDelete.value = { id: item.id, name: item.handoutItemName }
-  deleteConfirmOpen.value = true
-}
-
-const { execute: executeRemoveItem, loading: isRemoving } = useApiAction(
-  () =>
-    `/api/editions/${props.editionId}/ticketing/artists/handout-items/${itemToDelete.value?.id}`,
-  {
-    method: 'DELETE',
-    successMessage: { title: t('gestion.organizers.item_removed_success') },
-    errorMessages: { default: t('gestion.organizers.error_removing_item') },
-    onSuccess: async () => {
-      deleteConfirmOpen.value = false
-      itemToDelete.value = null
-      await loadData()
-      emit('itemsUpdated')
-    },
-  }
-)
-
-function removeItem() {
-  if (!itemToDelete.value) return
-  executeRemoveItem()
-}
-
-const loading = computed(() => isLoadingData.value || isAdding.value || isRemoving.value)
-
-// Articles encore assignables (non déjà associés à tous les artistes)
-const availableForSelection = computed(() => {
-  const assignedIds = new Set(assignedItems.value.map((item) => item.handoutItemId))
-  return availableItems.value
-    .filter((item) => !assignedIds.has(item.id))
-    .map((item) => ({ label: item.name, value: item.id }))
-})
 
 watch(
   () => props.open,
@@ -111,8 +72,7 @@ watch(
     if (newValue) {
       loadData()
     } else {
-      selectedItemId.value = null
-      selectedQuantity.value = 1
+      selection.value = []
     }
   }
 )
@@ -122,119 +82,37 @@ watch(
   <UModal
     :open="open"
     :title="$t('gestion.ticketing.all_artists_handout_items')"
-    :ui="{ wrapper: 'sm:max-w-2xl' }"
+    :ui="{ content: 'sm:max-w-xl' }"
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <div v-if="loading" class="text-center py-8">
+      <div v-if="isLoadingData" class="text-center py-8">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto h-8 w-8" />
       </div>
 
-      <div v-else class="space-y-6">
+      <div v-else class="space-y-4">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           {{ $t('gestion.ticketing.all_artists_handout_items_help') }}
         </p>
 
-        <!-- Formulaire d'ajout -->
-        <div class="space-y-4">
-          <UFormField :label="$t('gestion.organizers.add_handout_item')">
-            <div class="flex gap-2">
-              <USelect
-                v-model="selectedItemId"
-                :items="availableForSelection"
-                :placeholder="$t('gestion.organizers.select_handout_item')"
-                class="flex-1"
-                :disabled="availableForSelection.length === 0"
-              />
-              <UInputNumber
-                v-model="selectedQuantity"
-                :min="1"
-                :max="999"
-                class="w-28 shrink-0"
-                :aria-label="$t('common.quantity')"
-              />
-              <UButton
-                color="primary"
-                icon="i-heroicons-plus"
-                :disabled="!selectedItemId || loading"
-                @click="addItem"
-              >
-                {{ $t('common.add') }}
-              </UButton>
-            </div>
-          </UFormField>
+        <UFormField :label="$t('gestion.organizers.assigned_items')">
+          <TicketingHandoutItemsQuantityPicker v-model="selection" :items="availableItems" />
+        </UFormField>
 
-          <p
-            v-if="availableForSelection.length === 0 && availableItems.length === 0"
-            class="text-sm text-gray-500 dark:text-gray-400"
-          >
-            {{ $t('gestion.organizers.no_handout_items_created') }}
-          </p>
-          <p
-            v-else-if="availableForSelection.length === 0"
-            class="text-sm text-gray-500 dark:text-gray-400"
-          >
-            {{ $t('gestion.organizers.no_items_available') }}
-          </p>
-        </div>
-
-        <!-- Liste des articles assignés -->
-        <div class="space-y-2">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {{ $t('gestion.organizers.assigned_items') }}
-          </h4>
-
-          <div v-if="assignedItems.length > 0" class="space-y-2">
-            <div
-              v-for="item in assignedItems"
-              :key="item.id"
-              class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            >
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-gift" class="text-orange-500" />
-                <span class="text-sm">{{ item.handoutItemName }}</span>
-                <UBadge v-if="item.quantity > 1" color="warning" variant="soft" size="sm">
-                  ×{{ item.quantity }}
-                </UBadge>
-              </div>
-              <UButton
-                color="error"
-                variant="ghost"
-                size="xs"
-                icon="i-heroicons-trash"
-                :disabled="loading"
-                @click="confirmRemoveItem(item)"
-              >
-                {{ $t('common.delete') }}
-              </UButton>
-            </div>
-          </div>
-
-          <div v-else class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UIcon name="i-heroicons-gift" class="mx-auto h-12 w-12 text-gray-400 mb-2" />
-            <p class="text-sm text-gray-500">
-              {{ $t('gestion.organizers.no_assigned_items') }}
-            </p>
-          </div>
-        </div>
+        <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">
+          {{ $t('gestion.ticketing.no_handout_items_created') }}
+        </p>
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex w-full justify-end gap-2">
+        <UButton variant="ghost" color="neutral" @click="emit('update:open', false)">
+          {{ $t('common.cancel') }}
+        </UButton>
+        <UButton color="primary" :loading="saving" :disabled="isLoadingData" @click="save">
+          {{ $t('common.save') }}
+        </UButton>
       </div>
     </template>
   </UModal>
-
-  <!-- Modal de confirmation de suppression -->
-  <UiConfirmModal
-    v-model="deleteConfirmOpen"
-    :title="$t('common.delete')"
-    :description="
-      itemToDelete ? `${$t('gestion.organizers.confirm_remove_item')}\n${itemToDelete.name}` : ''
-    "
-    :confirm-label="$t('common.delete')"
-    confirm-color="error"
-    confirm-icon="i-heroicons-trash"
-    icon-name="i-heroicons-exclamation-triangle"
-    icon-color="text-red-500"
-    :loading="loading"
-    @confirm="removeItem"
-    @cancel="deleteConfirmOpen = false"
-  />
 </template>

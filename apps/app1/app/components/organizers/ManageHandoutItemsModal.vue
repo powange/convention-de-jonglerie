@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 
+/**
+ * Articles à remettre d'une portée organisateur : tous les organisateurs (`organizer` absent),
+ * ou un organisateur précis.
+ *
+ * L'écran suivait un modèle « ajouter / supprimer » qui rendait une quantité définitive : la
+ * changer imposait de retirer l'article puis de le remettre. Il reprend désormais le sélecteur
+ * partagé avec les tarifs, les options et les spectacles, et enregistre la portée en une fois.
+ */
 const props = defineProps({
   open: {
     type: Boolean,
@@ -22,14 +30,11 @@ const { t } = useI18n()
 
 // État
 const isLoadingData = ref(false)
-const availableItems = ref<any[]>([])
-const assignedItems = ref<any[]>([])
-const globalItems = ref<any[]>([]) // Articles globaux (pour tous les organisateurs)
-const selectedItemId = ref<number | null>(null)
-// Nombre d'exemplaires remis pour l'article ajouté
-const selectedQuantity = ref<number>(1)
-const deleteConfirmOpen = ref(false)
-const itemToDelete = ref<{ id: number; name: string } | null>(null)
+const availableItems = ref<Array<{ id: number; name: string }>>([])
+// Articles associés à la portée affichée, avec leur quantité : la forme qu'attend le PUT.
+const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
+// Articles associés globalement, écartés du choix quand on règle un organisateur précis.
+const globalItemIds = ref<Set<number>>(new Set())
 
 // Titre du modal
 const modalTitle = computed(() => {
@@ -52,29 +57,29 @@ async function loadData() {
   isLoadingData.value = true
   try {
     // Charger tous les articles à remettre de l'édition
-    const itemsResponse = await $fetch(`/api/editions/${props.editionId}/ticketing/handout-items`)
+    const itemsResponse = await $fetch<any>(
+      `/api/editions/${props.editionId}/ticketing/handout-items`
+    )
     // L'API retourne { success: true, data: { handoutItems: [...] } }
     availableItems.value = itemsResponse.data?.handoutItems || []
 
     // Charger les articles déjà assignés
-    const assignedResponse = await $fetch(
+    const assignedResponse = await $fetch<any>(
       `/api/editions/${props.editionId}/ticketing/organizers/handout-items`
     )
 
     const allAssignedItems = assignedResponse.items || []
-
     const organizerId = props.organizer?.id ?? null
 
-    // Toujours stocker les articles globaux
-    globalItems.value = allAssignedItems.filter((item: any) => item.organizerId === null)
+    globalItemIds.value = new Set(
+      allAssignedItems
+        .filter((item: any) => item.organizerId === null)
+        .map((item: any) => item.handoutItemId)
+    )
 
-    if (organizerId === null) {
-      // Mode global : on affiche uniquement les articles globaux
-      assignedItems.value = globalItems.value
-    } else {
-      // Mode organisateur spécifique : on affiche les articles de cet organisateur
-      assignedItems.value = allAssignedItems.filter((item: any) => item.organizerId === organizerId)
-    }
+    selection.value = allAssignedItems
+      .filter((item: any) => item.organizerId === organizerId)
+      .map((item: any) => ({ handoutItemId: item.handoutItemId, quantity: item.quantity ?? 1 }))
   } catch (error) {
     console.error('Erreur lors du chargement des articles:', error)
   } finally {
@@ -82,92 +87,35 @@ async function loadData() {
   }
 }
 
-// Action pour ajouter un article
-const { execute: executeAddItem, loading: isAdding } = useApiAction(
+const { execute: save, loading: saving } = useApiAction(
   () => `/api/editions/${props.editionId}/ticketing/organizers/handout-items`,
   {
-    method: 'POST',
+    method: 'PUT',
     body: () => ({
-      handoutItemId: selectedItemId.value,
       organizerId: props.organizer?.id ?? null,
-      quantity: selectedQuantity.value,
+      handoutItemIds: selection.value,
     }),
-    successMessage: { title: t('gestion.organizers.item_added_success') },
-    errorMessages: { default: t('gestion.organizers.error_adding_item') },
-    onSuccess: async () => {
-      selectedItemId.value = null
-      selectedQuantity.value = 1
-      await loadData()
+    successMessage: { title: t('common.saved') },
+    errorMessages: { default: t('common.error') },
+    onSuccess: () => {
       emit('itemsUpdated')
+      emit('update:open', false)
     },
   }
 )
 
-function addItem() {
-  if (!selectedItemId.value) return
-  executeAddItem()
-}
-
-// Confirmation de suppression d'un article
-function confirmRemoveItem(item: any) {
-  itemToDelete.value = {
-    id: item.id,
-    name: item.handoutItemName,
-  }
-  deleteConfirmOpen.value = true
-}
-
-// Action pour retirer un article
-const { execute: executeRemoveItem, loading: isRemoving } = useApiAction(
-  () =>
-    `/api/editions/${props.editionId}/ticketing/organizers/handout-items/${itemToDelete.value?.id}`,
-  {
-    method: 'DELETE',
-    successMessage: { title: t('gestion.organizers.item_removed_success') },
-    errorMessages: { default: t('gestion.organizers.error_removing_item') },
-    onSuccess: async () => {
-      deleteConfirmOpen.value = false
-      itemToDelete.value = null
-      await loadData()
-      emit('itemsUpdated')
-    },
-  }
-)
-
-function removeItem() {
-  if (!itemToDelete.value) return
-  executeRemoveItem()
-}
-
-// État de chargement combiné
-const loading = computed(() => isLoadingData.value || isAdding.value || isRemoving.value)
-
-// Articles disponibles pour sélection (non encore assignés)
+/**
+ * Le choix offert pour un organisateur précis exclut ce qui lui est déjà remis globalement —
+ * l'associer deux fois ne lui en donnerait pas davantage, l'agrégation le dédoublonne.
+ * Les articles déjà retenus restent listés, faute de quoi ils disparaîtraient du sélecteur.
+ */
 const availableForSelection = computed(() => {
-  // IDs des articles déjà assignés à cet organisateur
-  const assignedIds = new Set(assignedItems.value.map((item) => item.handoutItemId))
+  const retenus = new Set(selection.value.map((entry) => entry.handoutItemId))
 
-  // IDs des articles globaux (à exclure pour les organisateurs spécifiques)
-  const globalIds = new Set(globalItems.value.map((item) => item.handoutItemId))
-
-  return availableItems.value
-    .filter((item) => {
-      // Exclure les articles déjà assignés à cet organisateur/global
-      if (assignedIds.has(item.id)) {
-        return false
-      }
-
-      // Si on est en mode organisateur spécifique, exclure aussi les articles globaux
-      if (props.organizer?.id && globalIds.has(item.id)) {
-        return false
-      }
-
-      return true
-    })
-    .map((item) => ({
-      label: item.name,
-      value: item.id,
-    }))
+  return availableItems.value.filter((item) => {
+    if (retenus.has(item.id)) return true
+    return !props.organizer?.id || !globalItemIds.value.has(item.id)
+  })
 })
 
 // Charger les données quand le modal s'ouvre
@@ -178,8 +126,7 @@ watch(
       loadData()
     } else {
       // Réinitialiser l'état quand le modal se ferme
-      selectedItemId.value = null
-      selectedQuantity.value = 1
+      selection.value = []
     }
   }
 )
@@ -189,115 +136,33 @@ watch(
   <UModal
     :open="open"
     :title="modalTitle"
-    :ui="{ wrapper: 'sm:max-w-2xl' }"
+    :ui="{ content: 'sm:max-w-xl' }"
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <div v-if="loading" class="text-center py-8">
+      <div v-if="isLoadingData" class="text-center py-8">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto h-8 w-8" />
       </div>
 
-      <div v-else class="space-y-6">
-        <!-- Formulaire d'ajout -->
-        <div class="space-y-4">
-          <UFormField :label="$t('gestion.organizers.add_handout_item')">
-            <div class="flex gap-2">
-              <USelect
-                v-model="selectedItemId"
-                :items="availableForSelection"
-                :placeholder="$t('gestion.organizers.select_handout_item')"
-                class="flex-1"
-                :disabled="availableForSelection.length === 0"
-              />
-              <UInputNumber
-                v-model="selectedQuantity"
-                :min="1"
-                :max="999"
-                class="w-28 shrink-0"
-                :aria-label="$t('common.quantity')"
-              />
-              <UButton
-                color="primary"
-                icon="i-heroicons-plus"
-                :disabled="!selectedItemId || loading"
-                @click="addItem"
-              >
-                {{ $t('common.add') }}
-              </UButton>
-            </div>
-          </UFormField>
+      <div v-else class="space-y-4">
+        <UFormField :label="$t('gestion.organizers.assigned_items')">
+          <TicketingHandoutItemsQuantityPicker v-model="selection" :items="availableForSelection" />
+        </UFormField>
 
-          <p
-            v-if="availableForSelection.length === 0 && availableItems.length === 0"
-            class="text-sm text-gray-500 dark:text-gray-400"
-          >
-            {{ $t('gestion.organizers.no_handout_items_created') }}
-          </p>
-          <p
-            v-else-if="availableForSelection.length === 0"
-            class="text-sm text-gray-500 dark:text-gray-400"
-          >
-            {{ $t('gestion.organizers.no_items_available') }}
-          </p>
-        </div>
-
-        <!-- Liste des articles assignés -->
-        <div class="space-y-2">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {{ $t('gestion.organizers.assigned_items') }}
-          </h4>
-
-          <div v-if="assignedItems.length > 0" class="space-y-2">
-            <div
-              v-for="item in assignedItems"
-              :key="item.id"
-              class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            >
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-gift" class="text-orange-500" />
-                <span class="text-sm">{{ item.handoutItemName }}</span>
-                <UBadge v-if="item.quantity > 1" color="warning" variant="soft" size="sm">
-                  ×{{ item.quantity }}
-                </UBadge>
-              </div>
-              <UButton
-                color="error"
-                variant="ghost"
-                size="xs"
-                icon="i-heroicons-trash"
-                :disabled="loading"
-                @click="confirmRemoveItem(item)"
-              >
-                {{ $t('common.delete') }}
-              </UButton>
-            </div>
-          </div>
-
-          <div v-else class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <UIcon name="i-heroicons-gift" class="mx-auto h-12 w-12 text-gray-400 mb-2" />
-            <p class="text-sm text-gray-500">
-              {{ $t('gestion.organizers.no_assigned_items') }}
-            </p>
-          </div>
-        </div>
+        <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">
+          {{ $t('gestion.organizers.no_handout_items_created') }}
+        </p>
+      </div>
+    </template>
+    <template #footer>
+      <div class="flex w-full justify-end gap-2">
+        <UButton variant="ghost" color="neutral" @click="emit('update:open', false)">
+          {{ $t('common.cancel') }}
+        </UButton>
+        <UButton color="primary" :loading="saving" :disabled="isLoadingData" @click="save">
+          {{ $t('common.save') }}
+        </UButton>
       </div>
     </template>
   </UModal>
-
-  <!-- Modal de confirmation de suppression -->
-  <UiConfirmModal
-    v-model="deleteConfirmOpen"
-    :title="$t('common.delete')"
-    :description="
-      itemToDelete ? `${$t('gestion.organizers.confirm_remove_item')}\n${itemToDelete.name}` : ''
-    "
-    :confirm-label="$t('common.delete')"
-    confirm-color="error"
-    confirm-icon="i-heroicons-trash"
-    icon-name="i-heroicons-exclamation-triangle"
-    icon-color="text-red-500"
-    :loading="loading"
-    @confirm="removeItem"
-    @cancel="deleteConfirmOpen = false"
-  />
 </template>

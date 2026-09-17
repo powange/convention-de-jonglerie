@@ -31,7 +31,9 @@
             }"
             @update:model-value="updateItemCumulative(item, $event === true)"
           />
-          <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
+          <UTooltip :text="resumeDesAssociations(item)">
+            <UButton icon="i-heroicons-trash" color="error" @click="confirmDeleteItem(item)" />
+          </UTooltip>
         </UFieldGroup>
       </div>
 
@@ -68,7 +70,7 @@
   <UiConfirmModal
     v-model="deleteConfirmOpen"
     :title="$t('ticketing.handout_items.list.delete_title')"
-    :description="`Êtes-vous sûr de vouloir supprimer l'item '${itemToDelete?.name}' ?`"
+    :description="descriptionDeSuppression"
     :confirm-label="$t('ticketing.handout_items.list.delete_label')"
     confirm-color="error"
     confirm-icon="i-heroicons-trash"
@@ -81,10 +83,17 @@
 </template>
 
 <script setup lang="ts">
+import {
+  enumererLesAssociations,
+  type AssociationsDunArticle,
+} from '../../utils/ticketing/associations-article'
+
 interface TicketingHandoutItem {
   id: number
   name: string
   cumulative?: boolean
+  /** Ce que sa suppression détacherait ; absent tant que la liste n'a pas été rechargée. */
+  associations?: AssociationsDunArticle
 }
 
 interface HandoutItemForm {
@@ -103,8 +112,48 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
+const { t } = useI18n()
 const deleteConfirmOpen = ref(false)
 const itemToDelete = ref<TicketingHandoutItem | null>(null)
+
+/**
+ * Énumère ce à quoi un article est associé.
+ *
+ * `t` est passé à l'utilitaire enveloppé pour que le troisième argument porte le pluriel : Vue
+ * i18n choisit la forme sur ce nombre, pas sur la clé `count` du message.
+ */
+const enumerer = (item: TicketingHandoutItem | null) =>
+  enumererLesAssociations(
+    item?.associations,
+    (cle, count) => t(cle, { count }, count),
+    t('ticketing.handout_items.associations.coordination')
+  )
+
+/** Infobulle du bouton de suppression : ce qui partira avec l'article, avant même de cliquer. */
+const resumeDesAssociations = (item: TicketingHandoutItem) => {
+  const details = enumerer(item)
+  return details
+    ? t('ticketing.handout_items.list.associations_summary', { details })
+    : t('ticketing.handout_items.list.associations_none')
+}
+
+/**
+ * La confirmation dit ce que la suppression détache.
+ *
+ * Un article peut être associé à des tarifs, des options, des champs personnalisés, des
+ * spectacles, des artistes, des équipes de bénévoles, des organisateurs et des repas. Tout cela
+ * disparaissait en cascade et en silence : on défaisait en un clic un paramétrage réparti sur
+ * huit écrans, sans que rien ne le laisse deviner.
+ */
+const descriptionDeSuppression = computed(() => {
+  const nom = itemToDelete.value?.name ?? ''
+  const question = t('ticketing.handout_items.list.delete_question', { name: nom })
+  const details = enumerer(itemToDelete.value)
+
+  return details
+    ? `${question}\n${t('ticketing.handout_items.list.delete_detaches', { details })}`
+    : `${question}\n${t('ticketing.handout_items.list.delete_no_association')}`
+})
 
 const form = ref<HandoutItemForm>({
   name: '',

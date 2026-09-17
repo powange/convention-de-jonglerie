@@ -97,20 +97,38 @@
       "view_loaded_data": "Voir les données chargées"
     },
     "handout_items": {
+      "associations": {
+        "tarifs": "{count} tarif | {count} tarifs",
+        "options": "{count} option | {count} options",
+        "champsPersonnalises": "{count} champ personnalisé | {count} champs personnalisés",
+        "spectacles": "{count} spectacle | {count} spectacles",
+        "artistes": "{count} artiste | {count} artistes",
+        "equipesBenevoles": "{count} équipe de bénévoles | {count} équipes de bénévoles",
+        "organisateurs": "{count} organisateur | {count} organisateurs",
+        "repas": "{count} repas | {count} repas",
+        "coordination": "et"
+      },
       "list": {
         "add_placeholder": "Nouvel item...",
+        "associations_none": "Associé à rien",
+        "associations_summary": "Associé à {details}",
         "cumulative_help": "Un article cumulable est remis autant de fois qu'il est associé au participant (par exemple un artiste jouant dans deux spectacles). Sinon il n'est remis qu'une seule fois.",
         "cumulative_short": "Cumulable",
+        "delete_detaches": "Il est associé à {details}. Le supprimer retirera aussi ces associations, et c'est sans retour.",
         "delete_label": "Supprimer",
+        "delete_no_association": "Il n'est associé à rien pour l'instant : le supprimer n'a pas d'autre effet.",
+        "delete_question": "Supprimer l'article « {name} » ?",
         "delete_title": "Supprimer l'item",
         "loading": "Chargement...",
         "name_placeholder": "Nom de l'item"
       },
       "volunteer": {
-        "choose_placeholder": "Choisir un article à remettre...",
-        "given_to_all": "Remis à tous les bénévoles",
-        "remove_label": "Retirer l'article",
-        "remove_title": "Retirer cet article ?"
+        "items_label": "Articles remis pour cette portée",
+        "save": "Enregistrer",
+        "saved": "Articles enregistrés",
+        "scope_global_hint": "Remis à tous les bénévoles, sauf à ceux dont l'équipe a son propre paramétrage.",
+        "scope_label": "Portée",
+        "scope_replaces_global_warning": "Les articles d'une équipe REMPLACENT les articles globaux : les bénévoles de cette équipe ne recevront que ce qui est associé ici, et plus le paramétrage « tous les bénévoles »."
       }
     },
     "my_ticket": {

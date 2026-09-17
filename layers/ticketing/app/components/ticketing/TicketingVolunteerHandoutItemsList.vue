@@ -16,25 +16,15 @@
         <UIcon name="i-heroicons-users" class="h-4 w-4" />
         Tous les bénévoles
       </h3>
-      <TransitionGroup
-        name="list"
-        tag="div"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition-all duration-200 ease-in absolute"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
           v-for="item in globalItems"
           :key="item.id"
-          class="group relative flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/10 border border-purple-200 dark:border-purple-800/30 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-700/50 transition-all duration-200"
+          class="group relative flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/10 border border-purple-200 dark:border-purple-800/30 transition-all duration-200"
         >
           <!-- Icône -->
           <div
-            class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/40 group-hover:bg-purple-200 dark:group-hover:bg-purple-900/60 transition-colors"
+            class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/40 transition-colors"
           >
             <UIcon name="i-heroicons-gift" class="h-5 w-5 text-purple-600 dark:text-purple-400" />
           </div>
@@ -45,22 +35,11 @@
               {{ item.name }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {{ $t('ticketing.handout_items.volunteer.given_to_all') }}
+              {{ $t('ticketing.handout_items.volunteer.scope_global_hint') }}
             </p>
           </div>
-
-          <!-- Bouton supprimer -->
-          <UButton
-            icon="i-heroicons-trash"
-            color="error"
-            variant="ghost"
-            size="xs"
-            square
-            :aria-label="$t('ticketing.handout_items.volunteer.remove_label')"
-            @click="confirmDeleteItem(item)"
-          />
         </div>
-      </TransitionGroup>
+      </div>
     </div>
 
     <!-- Articles par équipe -->
@@ -73,7 +52,7 @@
           />
           {{ teamGroup.teamName }}
         </h3>
-        <UBadge color="orange" variant="subtle" size="xs">
+        <UBadge color="warning" variant="subtle" size="xs">
           <UIcon name="i-heroicons-arrow-path" class="h-3 w-3 mr-1" />
           Remplace la config globale
         </UBadge>
@@ -81,25 +60,15 @@
       <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
         Ces articles remplacent complètement les articles globaux pour les bénévoles de cette équipe
       </p>
-      <TransitionGroup
-        name="list"
-        tag="div"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition-all duration-200 ease-in absolute"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
           v-for="item in teamGroup.items"
           :key="item.id"
-          class="group relative flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 border border-orange-200 dark:border-orange-800/30 hover:shadow-lg hover:border-orange-300 dark:hover:border-orange-700/50 transition-all duration-200"
+          class="group relative flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 border border-orange-200 dark:border-orange-800/30 transition-all duration-200"
         >
           <!-- Icône -->
           <div
-            class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/40 group-hover:bg-orange-200 dark:group-hover:bg-orange-900/60 transition-colors"
+            class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/40 transition-colors"
           >
             <UIcon name="i-heroicons-gift" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </div>
@@ -113,19 +82,8 @@
               Équipe uniquement
             </p>
           </div>
-
-          <!-- Bouton supprimer -->
-          <UButton
-            icon="i-heroicons-trash"
-            color="error"
-            variant="ghost"
-            size="xs"
-            square
-            :aria-label="$t('ticketing.handout_items.volunteer.remove_label')"
-            @click="confirmDeleteItem(item)"
-          />
         </div>
-      </TransitionGroup>
+      </div>
     </div>
 
     <!-- Message si aucun item -->
@@ -142,76 +100,58 @@
         Aucun article configuré
       </p>
       <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm">
-        Sélectionnez un article et une portée ci-dessous
+        Sélectionnez une portée ci-dessous pour commencer
       </p>
     </div>
 
-    <!-- Section d'ajout -->
-    <div class="pt-2 space-y-3">
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Ajouter un article pour les bénévoles
-      </label>
+    <!-- Section de réglage : une portée à la fois, enregistrée en bloc -->
+    <div class="pt-2 space-y-4 border-t border-gray-200 dark:border-gray-800">
+      <UFormField :label="$t('ticketing.handout_items.volunteer.scope_label')" class="pt-4">
+        <USelect v-model="selectedTeamId" :items="teamOptions" size="lg" class="w-full" />
+      </UFormField>
 
-      <!-- Sélecteur d'équipe ou global -->
-      <USelect
-        v-model="selectedTeamId"
-        :items="teamOptions"
-        placeholder="Sélectionner la portée"
-        size="lg"
+      <!--
+        F4 : la surcharge, dite AVANT qu'on la déclenche.
+
+        L'écran l'annonçait déjà, mais seulement sur une équipe qui avait DÉJÀ des articles —
+        donc après coup. Le moment où l'information compte est celui-ci : on s'apprête à retirer
+        silencieusement le bracelet global aux bénévoles de cette équipe.
+      -->
+      <UAlert
+        v-if="selectedTeamId !== null"
+        color="warning"
+        variant="subtle"
+        icon="i-heroicons-exclamation-triangle"
+        :description="$t('ticketing.handout_items.volunteer.scope_replaces_global_warning')"
       />
 
-      <!-- Sélecteur d'article + bouton ajouter -->
-      <UFieldGroup>
-        <USelect
-          v-model="selectedItemId"
-          :items="availableHandoutItems"
-          :placeholder="$t('ticketing.handout_items.volunteer.choose_placeholder')"
-          size="lg"
-          :disabled="availableHandoutItems.length === 0"
-        />
-        <UInputNumber
-          v-model="selectedQuantity"
-          :min="1"
-          :max="999"
-          size="lg"
-          class="w-28 shrink-0"
-          :aria-label="$t('common.quantity')"
-        />
+      <UFormField :label="$t('ticketing.handout_items.volunteer.items_label')">
+        <TicketingHandoutItemsQuantityPicker v-model="selection" :items="allHandoutItems" />
+      </UFormField>
+
+      <!-- Aperçu de ce que recevra réellement un bénévole de cette portée -->
+      <div class="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-3 space-y-1">
+        <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
+          {{ apercuTitre }}
+        </p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          {{ apercuDetail }}
+        </p>
+      </div>
+
+      <div class="flex justify-end">
         <UButton
-          icon="i-heroicons-plus"
+          icon="i-heroicons-check"
           color="primary"
           size="lg"
           :loading="saving"
-          :disabled="!selectedItemId || selectedTeamId === undefined"
-          @click="handleAdd"
+          @click="enregistrer"
         >
-          Ajouter
+          {{ $t('ticketing.handout_items.volunteer.save') }}
         </UButton>
-      </UFieldGroup>
-      <p
-        v-if="allHandoutItemsLoaded && availableHandoutItems.length === 0"
-        class="mt-2 text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1"
-      >
-        <UIcon name="i-heroicons-information-circle" class="h-4 w-4" />
-        Tous les articles disponibles sont déjà associés pour cette portée
-      </p>
+      </div>
     </div>
   </div>
-
-  <!-- Modal de confirmation de suppression -->
-  <UiConfirmModal
-    v-model="deleteConfirmOpen"
-    :title="$t('ticketing.handout_items.volunteer.remove_title')"
-    :description="`L'article '${itemToDelete?.name}' ne sera plus remis automatiquement aux bénévoles lors de leur validation d'accès.`"
-    :confirm-label="$t('ticketing.handout_items.volunteer.remove_label')"
-    confirm-color="error"
-    confirm-icon="i-heroicons-trash"
-    icon-name="i-heroicons-exclamation-triangle"
-    icon-color="text-red-500"
-    :loading="deleting"
-    @confirm="deleteItem"
-    @cancel="deleteConfirmOpen = false"
-  />
 </template>
 
 <script setup lang="ts">
@@ -220,6 +160,8 @@ interface VolunteerHandoutItem {
   handoutItemId: number
   teamId: string | null
   name: string
+  /** Nombre d'exemplaires remis pour cette association. */
+  quantity: number
   team?: {
     id: string
     name: string
@@ -248,31 +190,38 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-const toast = useToast()
-const deleteConfirmOpen = ref(false)
-const itemToDelete = ref<VolunteerHandoutItem | null>(null)
-const selectedItemId = ref<number | null>(null)
-// Nombre d'exemplaires remis pour l'article ajouté
-const selectedQuantity = ref<number>(1)
-const selectedTeamId = ref<string | null>(null) // null = global par défaut, string = équipe spécifique
+const { t } = useI18n()
+const selectedTeamId = ref<string | null>(null) // null = global, string = équipe spécifique
+// Articles de la portée sélectionnée, avec leur quantité : la forme qu'attend le PUT.
+const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
 const allHandoutItems = ref<TicketingHandoutItem[]>([])
-// Flag pour éviter d'afficher le message "tous associés" avant le premier
-// chargement (sinon flash visuel : 0 items → message → fetch → message disparait).
-const allHandoutItemsLoaded = ref(false)
 const teams = ref<VolunteerTeam[]>([])
 
-// Initialiser selectedTeamId à null (global) au montage
+// La portée démarre sur le global. Les articles disponibles, eux, sont chargés par la
+// surveillance ci-dessous, qui part en `immediate` : les demander ici aussi doublait la requête
+// au montage.
 onMounted(() => {
   selectedTeamId.value = null
-  loadAllHandoutItems()
   loadTeams()
 })
 
-// Recharger la liste complète des articles quand la portée change
-// Cela permet de récupérer les nouveaux articles créés entre-temps
-watch(selectedTeamId, () => {
-  loadAllHandoutItems()
-})
+/**
+ * Recharge le formulaire quand la portée change, ou quand la liste est rafraîchie.
+ *
+ * Deux sources sont surveillées ensemble : sans la liste reçue en propriété, un enregistrement
+ * réussi laissait le formulaire sur l'état d'avant, et un second clic aurait renvoyé la version
+ * périmée. (Ne pas nommer la propriété avec un point ici : le détecteur i18n y lirait une clé.)
+ */
+watch(
+  [selectedTeamId, () => props.items],
+  () => {
+    selection.value = props.items
+      .filter((item) => (item.teamId ?? null) === selectedTeamId.value)
+      .map((item) => ({ handoutItemId: item.handoutItemId, quantity: item.quantity ?? 1 }))
+    loadAllHandoutItems()
+  },
+  { immediate: true }
+)
 
 // Séparer les articles globaux des articles par équipe
 const globalItems = computed(() => props.items.filter((item) => !item.teamId))
@@ -317,105 +266,87 @@ const teamOptions = computed(() => {
   return options
 })
 
+/**
+ * Ce qu'un bénévole de la portée choisie recevra réellement, la surcharge appliquée.
+ *
+ * La règle du serveur est précise et c'est elle qui est reproduite ici : une équipe ne remplace
+ * le global que si elle porte AU MOINS UN article. Une équipe vide retombe donc sur le global —
+ * dire « rien » serait faux, et c'est la lecture qu'on fait spontanément d'un formulaire vide.
+ */
+const apercuTitre = computed(() => {
+  if (selectedTeamId.value === null) return 'Ce que recevra un bénévole sans équipe configurée'
+  const nom = teams.value.find((e) => e.id === selectedTeamId.value)?.name ?? 'cette équipe'
+  return `Ce que recevra un bénévole de ${nom}`
+})
+
+const apercuDetail = computed(() => {
+  const nomsDe = (entrees: Array<{ handoutItemId: number; quantity: number }>) =>
+    entrees
+      .map((entree) => {
+        const nom =
+          allHandoutItems.value.find((a) => a.id === entree.handoutItemId)?.name ??
+          `#${entree.handoutItemId}`
+        return entree.quantity > 1 ? `${nom} ×${entree.quantity}` : nom
+      })
+      .join(', ')
+
+  if (selection.value.length > 0) {
+    const liste = nomsDe(selection.value)
+    return selectedTeamId.value === null
+      ? liste
+      : `${liste} — et rien du paramétrage global, que cette équipe remplace.`
+  }
+
+  if (selectedTeamId.value === null) {
+    return 'Rien : aucun article global.'
+  }
+
+  const globaux = globalItems.value.map((item) => ({
+    handoutItemId: item.handoutItemId,
+    quantity: item.quantity ?? 1,
+  }))
+
+  return globaux.length > 0
+    ? `${nomsDe(globaux)} — l'équipe ne remplace rien tant qu'aucun article ne lui est associé.`
+    : 'Rien : ni article d’équipe, ni article global.'
+})
+
 // Charger tous les articles à remettre disponibles
 const loadAllHandoutItems = async () => {
   try {
-    const response = await $fetch(`/api/editions/${props.editionId}/ticketing/handout-items`)
+    const response = await $fetch<any>(`/api/editions/${props.editionId}/ticketing/handout-items`)
     allHandoutItems.value = response.data?.handoutItems || []
   } catch (error) {
     console.error('Failed to load all handout items:', error)
-  } finally {
-    allHandoutItemsLoaded.value = true
   }
 }
 
 // Charger les équipes de bénévoles
 const loadTeams = async () => {
   try {
-    const response = await $fetch(`/api/editions/${props.editionId}/volunteer-teams`)
+    const response = await $fetch<VolunteerTeam[]>(
+      `/api/editions/${props.editionId}/volunteer-teams`
+    )
     teams.value = response
   } catch (error) {
     console.error('Failed to load teams:', error)
   }
 }
 
-// Articles disponibles pour la portée sélectionnée
-const availableHandoutItems = computed(() => {
-  // Filtrer les articles déjà utilisés pour cette portée spécifique
-  const usedIdsForScope = props.items
-    .filter((item) => item.teamId === selectedTeamId.value)
-    .map((item) => item.handoutItemId)
-
-  return allHandoutItems.value
-    .filter((item) => !usedIdsForScope.includes(item.id))
-    .map((item) => ({
-      label: item.name,
-      value: item.id,
-    }))
-})
-
-const confirmDeleteItem = (item: VolunteerHandoutItem) => {
-  itemToDelete.value = item
-  deleteConfirmOpen.value = true
-}
-
-const { execute: executeDeleteItem, loading: deleting } = useApiAction(
-  () =>
-    `/api/editions/${props.editionId}/ticketing/volunteers/handout-items/${itemToDelete.value?.id}`,
-  {
-    method: 'DELETE',
-    successMessage: {
-      title: 'Article retiré',
-      description: "L'article a été retiré des articles à remettre pour les bénévoles",
-    },
-    errorMessages: { default: "Impossible de retirer l'article" },
-    onSuccess: () => {
-      deleteConfirmOpen.value = false
-      itemToDelete.value = null
-      emit('refresh')
-    },
-  }
-)
-
-const deleteItem = () => {
-  if (!itemToDelete.value) return
-  executeDeleteItem()
-}
-
-const { execute: executeHandleAdd, loading: saving } = useApiAction(
+const { execute: executeSave, loading: saving } = useApiAction(
   () => `/api/editions/${props.editionId}/ticketing/volunteers/handout-items`,
   {
-    method: 'POST',
-    body: () => ({
-      handoutItemId: selectedItemId.value,
-      teamId: selectedTeamId.value,
-      quantity: selectedQuantity.value,
-    }),
-    silentSuccess: true,
-    errorMessages: { default: "Impossible d'ajouter l'article" },
-    onSuccess: async () => {
-      const scope = selectedTeamId.value
-        ? teams.value.find((t) => t.id === selectedTeamId.value)?.name || 'cette équipe'
-        : 'tous les bénévoles'
-
-      toast.add({
-        title: 'Article ajouté',
-        description: `L'article a été ajouté pour ${scope}`,
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-
-      selectedItemId.value = null
+    method: 'PUT',
+    body: () => ({ teamId: selectedTeamId.value, handoutItemIds: selection.value }),
+    successMessage: { title: t('ticketing.handout_items.volunteer.saved') },
+    errorMessages: { default: "Impossible d'enregistrer les articles" },
+    onSuccess: () => {
       emit('refresh')
-      await nextTick()
     },
   }
 )
 
-const handleAdd = async () => {
-  if (!selectedItemId.value) return
-  // Recharger d'abord la liste complète au cas où de nouveaux articles auraient été créés
-  await loadAllHandoutItems()
-  executeHandleAdd()
+const enregistrer = () => {
+  executeSave()
 }
 </script>

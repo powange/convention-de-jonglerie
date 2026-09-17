@@ -104,13 +104,35 @@
         "loading": "Loading...",
         "name_placeholder": "Item name",
         "cumulative_help": "A cumulative item is handed out as many times as it is linked to the participant (for example an artist performing in two shows). Otherwise it is handed out only once.",
-        "cumulative_short": "Cumulative"
+        "cumulative_short": "Cumulative",
+        "associations_none": "Not linked to anything",
+        "associations_summary": "Linked to {details}",
+        "delete_detaches": "It is linked to {details}. Deleting it will also remove those links, and this cannot be undone.",
+        "delete_no_association": "It is not linked to anything yet: deleting it has no other effect.",
+        "delete_question": "Delete the item “{name}”?"
       },
       "volunteer": {
         "choose_placeholder": "Choose an item to hand out...",
         "given_to_all": "Given to all volunteers",
         "remove_label": "Remove item",
-        "remove_title": "Remove this item?"
+        "remove_title": "Remove this item?",
+        "items_label": "Items handed out for this scope",
+        "save": "Save",
+        "saved": "Items saved",
+        "scope_global_hint": "Handed out to every volunteer, except those whose team has its own settings.",
+        "scope_label": "Scope",
+        "scope_replaces_global_warning": "A team's items REPLACE the global items: volunteers in this team will only receive what is linked here, and no longer the “all volunteers” settings."
+      },
+      "associations": {
+        "tarifs": "{count} tier | {count} tiers",
+        "options": "{count} option | {count} options",
+        "champsPersonnalises": "{count} custom field | {count} custom fields",
+        "spectacles": "{count} show | {count} shows",
+        "artistes": "{count} artist | {count} artists",
+        "equipesBenevoles": "{count} volunteer team | {count} volunteer teams",
+        "organisateurs": "{count} organizer | {count} organizers",
+        "repas": "{count} meal | {count} meals",
+        "coordination": "and"
       }
     },
     "my_ticket": {

@@ -104,13 +104,35 @@
         "loading": "Carregando...",
         "name_placeholder": "Nome do artigo",
         "cumulative_help": "Um artigo acumulável é entregue tantas vezes quantas estiver associado ao participante (por exemplo, um artista que atua em dois espetáculos). Caso contrário, é entregue apenas uma vez.",
-        "cumulative_short": "Acumulável"
+        "cumulative_short": "Acumulável",
+        "associations_none": "Não está associado a nada",
+        "associations_summary": "Associado a {details}",
+        "delete_detaches": "Está associado a {details}. Ao eliminá-lo também serão removidas essas associações, e não há como voltar atrás.",
+        "delete_no_association": "Por enquanto não está associado a nada: eliminá-lo não tem qualquer outro efeito.",
+        "delete_question": "Eliminar o artigo «{name}»?"
       },
       "volunteer": {
         "choose_placeholder": "Escolher um artigo a entregar...",
         "given_to_all": "Entregue a todos os voluntários",
         "remove_label": "Remover artigo",
-        "remove_title": "Remover este artigo?"
+        "remove_title": "Remover este artigo?",
+        "items_label": "Artigos entregues neste âmbito",
+        "save": "Guardar",
+        "saved": "Artigos guardados",
+        "scope_global_hint": "Entregue a todos os voluntários, exceto àqueles cuja equipa tem a sua própria configuração.",
+        "scope_label": "Âmbito",
+        "scope_replaces_global_warning": "Os artigos de uma equipa SUBSTITUEM os artigos globais: os voluntários desta equipa receberão apenas o que estiver associado aqui, e já não a configuração «todos os voluntários»."
+      },
+      "associations": {
+        "tarifs": "{count} tarifa | {count} tarifas",
+        "options": "{count} opção | {count} opções",
+        "champsPersonnalises": "{count} campo personalizado | {count} campos personalizados",
+        "spectacles": "{count} espetáculo | {count} espetáculos",
+        "artistes": "{count} artista | {count} artistas",
+        "equipesBenevoles": "{count} equipa de voluntários | {count} equipas de voluntários",
+        "organisateurs": "{count} organizador | {count} organizadores",
+        "repas": "{count} refeição | {count} refeições",
+        "coordination": "e"
       }
     },
     "my_ticket": {
