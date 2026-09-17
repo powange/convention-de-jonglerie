@@ -477,21 +477,19 @@ export default wrapApiHandler(
             // sans la moindre erreur.
             OR: [{ organizerId: { in: organizers.map((o) => o.id) } }, { organizerId: null }],
           },
-          select: { organizerId: true, handoutItemId: true, quantity: true },
+          select: {
+            organizerId: true,
+            quantity: true,
+            // Une seule requête depuis que le modèle porte la relation. Il fallait auparavant
+            // relire les articles à part, faute de pouvoir écrire cet `include` — la table était
+            // la seule des neuf à n'avoir que la colonne `handoutItemId`.
+            handoutItem: true,
+          },
         })
 
-        // Deux requêtes et non une : `EditionOrganizerHandoutItem` ne porte PAS de relation vers
-        // `TicketingHandoutItem`, seulement la colonne `handoutItemId` — contrairement à ses
-        // jumeaux bénévoles et artistes. Un `include` y est impossible sans toucher au schéma.
-        const items = await prisma.ticketingHandoutItem.findMany({
-          where: { editionId, id: { in: associations.map((a) => a.handoutItemId) } },
-        })
-        const itemById = new Map(items.map((item) => [item.id, item]))
-
-        const enAssociation = (a: (typeof associations)[number]) => {
-          const handoutItem = itemById.get(a.handoutItemId)
-          return handoutItem ? [{ handoutItem, quantity: a.quantity }] : []
-        }
+        const enAssociation = (a: (typeof associations)[number]) => [
+          { handoutItem: a.handoutItem, quantity: a.quantity },
+        ]
 
         // `organizerId` nul vaut « tous les organisateurs » : ces associations valent pour
         // chacun, en plus de celles qui le nomment.

@@ -17,6 +17,7 @@ const compteursNuls = {
   artists: 0,
   volunteerTicketingHandoutItems: 0,
   artistTicketingHandoutItems: 0,
+  organizerTicketingHandoutItems: 0,
   meals: 0,
 }
 
@@ -97,17 +98,18 @@ describe('suppression d’un article à remettre', () => {
   })
 
   /*
-   * Huit tables partent en cascade par leur clé étrangère. `EditionOrganizerHandoutItem` n'en a
-   * pas : ses lignes SURVIVAIENT à la suppression en pointant vers un identifiant disparu, et
-   * l'écran des organisateurs les affichait « Article inconnu ».
+   * Les NEUF tables partent en cascade, tenues par la base.
+   *
+   * `EditionOrganizerHandoutItem` était l'exception : sans clé étrangère, ses lignes survivaient
+   * à la suppression en pointant vers un identifiant disparu, et l'écran les affichait « Article
+   * inconnu ». L'écriture le compensait à la main. La clé étrangère ajoutée, cette compensation
+   * a disparu — ce test vérifie qu'elle n'est pas revenue par habitude.
    */
-  it('retire aussi les associations organisateurs, qui ne partent pas en cascade', async () => {
+  it('laisse la base tenir la cascade, sans retrait à la main', async () => {
     await deleteHandoutItem(4, 22)
 
-    expect(prismaMock.editionOrganizerHandoutItem.deleteMany).toHaveBeenCalledWith({
-      where: { editionId: 22, handoutItemId: 4 },
-    })
-    expect(prismaMock.$transaction).toHaveBeenCalled()
+    expect(prismaMock.ticketingHandoutItem.delete).toHaveBeenCalledWith({ where: { id: 4 } })
+    expect(prismaMock.editionOrganizerHandoutItem.deleteMany).not.toHaveBeenCalled()
   })
 
   it('refuse de supprimer un article d’une autre édition', async () => {
@@ -127,7 +129,6 @@ describe('décompte des associations d’un article', () => {
         _count: { ...compteursNuls, tiers: 3, options: 1, meals: 2 },
       },
     ])
-    prismaMock.editionOrganizerHandoutItem.groupBy.mockResolvedValue([])
 
     const [article] = await listHandoutItemsWithAssociationCounts(22)
 
@@ -153,34 +154,37 @@ describe('décompte des associations d’un article', () => {
         _count: { ...compteursNuls, artists: 2, artistTicketingHandoutItems: 1 },
       },
     ])
-    prismaMock.editionOrganizerHandoutItem.groupBy.mockResolvedValue([])
 
     const [article] = await listHandoutItemsWithAssociationCounts(22)
 
     expect(article!.associations.artistes).toBe(3)
   })
 
-  // Les organisateurs sont comptés à part : aucune relation ne les relie à l'article.
-  it('compte les organisateurs par une requête séparée', async () => {
+  /*
+   * Les organisateurs étaient comptés par un `groupBy` séparé, faute de relation. Ils passent
+   * maintenant par le même `_count` que les huit autres — l'exception a disparu avec elle.
+   */
+  it('compte les organisateurs par le même _count que les autres', async () => {
     prismaMock.ticketingHandoutItem.findMany.mockResolvedValue([
       { id: 4, name: 'Bracelet', _count: { ...compteursNuls } },
-      { id: 5, name: 'Tee-shirt', _count: { ...compteursNuls } },
-    ])
-    prismaMock.editionOrganizerHandoutItem.groupBy.mockResolvedValue([
-      { handoutItemId: 5, _count: { _all: 6 } },
+      {
+        id: 5,
+        name: 'Tee-shirt',
+        _count: { ...compteursNuls, organizerTicketingHandoutItems: 6 },
+      },
     ])
 
     const articles = await listHandoutItemsWithAssociationCounts(22)
 
     expect(articles[0]!.associations.organisateurs).toBe(0)
     expect(articles[1]!.associations.organisateurs).toBe(6)
+    expect(prismaMock.editionOrganizerHandoutItem.groupBy).not.toHaveBeenCalled()
   })
 
   it('ne laisse pas fuiter le _count brut de Prisma dans la réponse', async () => {
     prismaMock.ticketingHandoutItem.findMany.mockResolvedValue([
       { id: 4, name: 'Bracelet', _count: { ...compteursNuls } },
     ])
-    prismaMock.editionOrganizerHandoutItem.groupBy.mockResolvedValue([])
 
     const [article] = await listHandoutItemsWithAssociationCounts(22)
 

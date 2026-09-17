@@ -132,40 +132,30 @@ export interface AssociationsDunArticle {
  * Le décompte voyage donc avec la liste, plutôt que dans un appel séparé au moment du clic —
  * l'utilisateur doit pouvoir le lire avant d'ouvrir la confirmation, et la liste est courte.
  *
- * Les organisateurs sont comptés à part : `EditionOrganizerHandoutItem` est la seule des neuf
- * tables à ne porter aucune relation vers l'article (constat ouvert de l'audit), `_count` ne
- * peut donc pas l'atteindre.
+ * Les neuf tables passent par `_count`, organisateurs compris. Ils étaient comptés à part par un
+ * `groupBy` : leur table était la seule à ne porter aucune relation vers l'article, et `_count`
+ * ne pouvait donc pas l'atteindre. La relation existe depuis, et l'exception avec elle.
  */
 export async function listHandoutItemsWithAssociationCounts(editionId: number) {
-  const [items, parOrganisateur] = await Promise.all([
-    prisma.ticketingHandoutItem.findMany({
-      where: { editionId },
-      orderBy: { name: 'asc' },
-      include: {
-        _count: {
-          select: {
-            tiers: true,
-            options: true,
-            customFields: true,
-            shows: true,
-            artists: true,
-            volunteerTicketingHandoutItems: true,
-            artistTicketingHandoutItems: true,
-            meals: true,
-          },
+  const items = await prisma.ticketingHandoutItem.findMany({
+    where: { editionId },
+    orderBy: { name: 'asc' },
+    include: {
+      _count: {
+        select: {
+          tiers: true,
+          options: true,
+          customFields: true,
+          shows: true,
+          artists: true,
+          volunteerTicketingHandoutItems: true,
+          artistTicketingHandoutItems: true,
+          organizerTicketingHandoutItems: true,
+          meals: true,
         },
       },
-    }),
-    prisma.editionOrganizerHandoutItem.groupBy({
-      by: ['handoutItemId'],
-      where: { editionId },
-      _count: { _all: true },
-    }),
-  ])
-
-  const organisateursParArticle = new Map(
-    parOrganisateur.map((ligne) => [ligne.handoutItemId, ligne._count._all])
-  )
+    },
+  })
 
   return items.map(({ _count, ...item }) => ({
     ...item,
@@ -178,7 +168,7 @@ export async function listHandoutItemsWithAssociationCounts(editionId: number) {
       // tous les artistes de l'édition. Les deux disparaissent, on les additionne.
       artistes: _count.artists + _count.artistTicketingHandoutItems,
       equipesBenevoles: _count.volunteerTicketingHandoutItems,
-      organisateurs: organisateursParArticle.get(item.id) ?? 0,
+      organisateurs: _count.organizerTicketingHandoutItems,
       repas: _count.meals,
     } satisfies AssociationsDunArticle,
   }))
@@ -205,23 +195,15 @@ export async function deleteHandoutItem(itemId: number, editionId: number) {
   }
 
   /*
-   * Les associations organisateurs sont retirées à la main, dans la même transaction.
+   * Les NEUF tables de liaison partent maintenant en cascade, tenues par la base.
    *
-   * Les huit autres tables portent une clé étrangère vers l'article et partent en cascade.
-   * `EditionOrganizerHandoutItem`, seule, ne déclare que la colonne `handoutItemId` — sans
-   * relation Prisma ni contrainte en base. Ses lignes SURVIVAIENT donc à la suppression de
-   * l'article, en pointant vers un identifiant disparu : l'écran des organisateurs les affichait
-   * « Article inconnu », et la confirmation qu'on vient d'écrire aurait annoncé un retrait qui
-   * n'avait pas lieu.
-   *
-   * La vraie correction est la relation manquante, qui demande une migration et reste un constat
-   * ouvert de l'audit. En attendant, c'est l'écriture qui tient la cascade — comme elle tient
-   * déjà l'unicité de la ligne globale, que MySQL ne protège pas non plus.
+   * Celle des organisateurs était l'exception : sans clé étrangère, ses lignes survivaient à la
+   * suppression en pointant vers un identifiant disparu — l'écran les affichait « Article
+   * inconnu ». L'écriture le compensait à la main, dans une transaction. La clé étrangère
+   * ajoutée, cette compensation n'a plus lieu d'être : un invariant que le code devait se
+   * rappeler de tenir est redevenu une propriété du schéma.
    */
-  await prisma.$transaction([
-    prisma.editionOrganizerHandoutItem.deleteMany({ where: { editionId, handoutItemId: itemId } }),
-    prisma.ticketingHandoutItem.delete({ where: { id: itemId } }),
-  ])
+  await prisma.ticketingHandoutItem.delete({ where: { id: itemId } })
 
   return { success: true }
 }

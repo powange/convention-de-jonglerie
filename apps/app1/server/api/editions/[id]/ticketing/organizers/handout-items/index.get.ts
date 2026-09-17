@@ -16,12 +16,10 @@ export default wrapApiHandler(
       })
 
     try {
-      // Malheureusement, on ne peut pas utiliser include car il n'y a pas de relation
-      // handoutItem dans EditionOrganizerHandoutItem
-      // On doit donc récupérer manuellement les données
       const rawItems = await prisma.editionOrganizerHandoutItem.findMany({
         where: { editionId },
         include: {
+          handoutItem: { select: { id: true, name: true } },
           organizer: {
             select: {
               id: true,
@@ -47,28 +45,11 @@ export default wrapApiHandler(
         ],
       })
 
-      // Récupérer les IDs uniques des articles
-      const handoutItemIds = [...new Set(rawItems.map((item) => item.handoutItemId))]
-
-      // Récupérer tous les articles en une seule requête
-      const handoutItems = await prisma.ticketingHandoutItem.findMany({
-        where: {
-          id: { in: handoutItemIds },
-        },
-        select: {
-          id: true,
-          name: true,
-        },
-      })
-
-      // Créer un map pour un accès rapide
-      const handoutItemsMap = new Map(handoutItems.map((item) => [item.id, item.name]))
-
       return {
         items: rawItems.map((item) => ({
           id: item.id,
           handoutItemId: item.handoutItemId,
-          handoutItemName: handoutItemsMap.get(item.handoutItemId) ?? 'Article inconnu',
+          handoutItemName: item.handoutItem.name,
           quantity: item.quantity,
           organizerId: item.organizerId,
           organizer: item.organizer
