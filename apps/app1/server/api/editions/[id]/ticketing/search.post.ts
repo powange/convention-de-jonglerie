@@ -366,68 +366,67 @@ export default wrapApiHandler(
         Array<{ id: number; date: Date; mealType: string; phases: string[] }>
       >()
 
+      /*
+       * DEUX requêtes pour toute la page, au lieu de deux ou trois PAR bénévole.
+       *
+       * Toutes les associations de l'édition tiennent dans une seule lecture — les globales
+       * (`teamId` nul) comme celles des équipes —, et le rapprochement se fait ensuite en
+       * mémoire. La règle de surcharge est inchangée : une équipe ne remplace le global que si
+       * elle porte au moins un article, une équipe vide y retombe.
+       *
+       * L'inclusion de `team` a disparu au passage : elle n'était lue nulle part en aval.
+       */
+      const associationsBenevoles = volunteers.length
+        ? await prisma.editionVolunteerHandoutItem.findMany({
+            where: { editionId },
+            include: { handoutItem: true },
+          })
+        : []
+
+      const articlesGlobauxBenevoles = associationsBenevoles.filter((a) => a.teamId === null)
+      const articlesParEquipe = new Map<string, typeof associationsBenevoles>()
+      for (const association of associationsBenevoles) {
+        if (association.teamId === null) continue
+        const liste = articlesParEquipe.get(association.teamId) ?? []
+        liste.push(association)
+        articlesParEquipe.set(association.teamId, liste)
+      }
+
+      const selectionsRepasBenevoles = volunteers.length
+        ? await prisma.volunteerMealSelection.findMany({
+            where: {
+              volunteerId: { in: volunteers.map((v) => v.id) },
+              accepted: true,
+              meal: { enabled: true },
+            },
+            include: {
+              meal: { include: { handoutItems: { include: { handoutItem: true } } } },
+            },
+            // `date` seule ne départage pas deux repas du même jour : l'ordre affiché dépendait
+            // alors du plan de requête. `mealType` le rend déterministe, et aligne cet écran sur
+            // les cinq autres lectures de repas du dépôt.
+            orderBy: [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }],
+          })
+        : []
+      const repasParBenevole = new Map<number, typeof selectionsRepasBenevoles>()
+      for (const selection of selectionsRepasBenevoles) {
+        const liste = repasParBenevole.get(selection.volunteerId) ?? []
+        liste.push(selection)
+        repasParBenevole.set(selection.volunteerId, liste)
+      }
+
       for (const volunteer of volunteers) {
         const teamIds = volunteer.teamAssignments.map((assignment) => assignment.team.id)
 
-        // Récupérer d'abord les articles spécifiques aux équipes du bénévole
-        const teamSpecificItems = await prisma.editionVolunteerHandoutItem.findMany({
-          where: {
-            editionId,
-            teamId: { in: teamIds },
-          },
-          include: {
-            handoutItem: true,
-            team: true,
-          },
-        })
-
-        let volunteerHandoutItems
-        if (teamSpecificItems.length > 0) {
-          // Le bénévole a au moins une équipe avec des articles spécifiques
-          // On utilise UNIQUEMENT ces articles (surcharge)
-          volunteerHandoutItems = teamSpecificItems
-        } else {
-          // Pas d'articles spécifiques, on utilise les articles globaux
-          volunteerHandoutItems = await prisma.editionVolunteerHandoutItem.findMany({
-            where: {
-              editionId,
-              teamId: null, // Articles globaux uniquement
-            },
-            include: {
-              handoutItem: true,
-            },
-          })
-        }
+        // Les articles des équipes du bénévole ; à défaut, les articles globaux (surcharge).
+        const teamSpecificItems = teamIds.flatMap((id) => articlesParEquipe.get(id) ?? [])
+        const volunteerHandoutItems =
+          teamSpecificItems.length > 0 ? teamSpecificItems : articlesGlobauxBenevoles
 
         // Collecter les articles (équipes) ; l'agrégation a lieu après les repas.
         const volunteerItemEntries: any[] = [...volunteerHandoutItems]
 
-        // Récupérer les repas associés au bénévole
-        const volunteerMeals = await prisma.volunteerMealSelection.findMany({
-          where: {
-            volunteerId: volunteer.id,
-            accepted: true,
-            meal: {
-              enabled: true,
-            },
-          },
-          include: {
-            meal: {
-              include: {
-                handoutItems: {
-                  include: {
-                    handoutItem: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            meal: {
-              date: 'asc',
-            },
-          },
-        })
+        const volunteerMeals = repasParBenevole.get(volunteer.id) ?? []
 
         mealsByVolunteerId.set(
           volunteer.id,
@@ -518,6 +517,10 @@ export default wrapApiHandler(
             meal: { enabled: true },
           },
           include: { meal: { include: { handoutItems: { include: { handoutItem: true } } } } },
+          // Cette lecture n'avait aucun ordre : les repas d'un organisateur sortaient dans
+          // celui que la base voulait bien rendre. Les quatre populations affichent désormais
+          // les leurs dans le même ordre.
+          orderBy: [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }],
         })
         const repasParOrganisateur = new Map<number, typeof selectionsDeRepas>()
         for (const selection of selectionsDeRepas) {
@@ -562,6 +565,27 @@ export default wrapApiHandler(
           })
         : []
 
+      // Les repas de tous les artistes affichés, en UNE requête au lieu d'une par personne.
+      const selectionsRepasArtistes = artists.length
+        ? await prisma.artistMealSelection.findMany({
+            where: {
+              artistId: { in: artists.map((a) => a.id) },
+              accepted: true,
+              meal: { enabled: true },
+            },
+            include: {
+              meal: { include: { handoutItems: { include: { handoutItem: true } } } },
+            },
+            orderBy: [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }],
+          })
+        : []
+      const repasParArtiste = new Map<number, typeof selectionsRepasArtistes>()
+      for (const selection of selectionsRepasArtistes) {
+        const liste = repasParArtiste.get(selection.artistId) ?? []
+        liste.push(selection)
+        repasParArtiste.set(selection.artistId, liste)
+      }
+
       for (const artist of artists) {
         // Collecter les articles de tous les spectacles ; l'agrégation a lieu
         // après les repas. Un artiste jouant dans deux spectacles reçoit deux
@@ -575,32 +599,7 @@ export default wrapApiHandler(
           })
         })
 
-        // Récupérer les repas associés à l'artiste
-        const artistMeals = await prisma.artistMealSelection.findMany({
-          where: {
-            artistId: artist.id,
-            accepted: true,
-            meal: {
-              enabled: true,
-            },
-          },
-          include: {
-            meal: {
-              include: {
-                handoutItems: {
-                  include: {
-                    handoutItem: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            meal: {
-              date: 'asc',
-            },
-          },
-        })
+        const artistMeals = repasParArtiste.get(artist.id) ?? []
 
         mealsByArtistId.set(
           artist.id,

@@ -87,4 +87,88 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
     const whereArg = prismaMock.editionVolunteerApplication.findMany.mock.calls[0][0].where
     expect(whereArg).not.toHaveProperty('editionId')
   })
+
+  /*
+   * O1 — le nombre de requêtes ne doit PAS croître avec le nombre de personnes affichées.
+   *
+   * Chaque boucle interrogeait la base par personne : deux à trois requêtes par bénévole, une
+   * par artiste. Sur l'écran le plus sollicité de l'événement, vingt bénévoles et vingt artistes
+   * déclenchaient 252 requêtes SQL, mesurées sur les données réelles.
+   *
+   * Ce test ne mesure pas le temps — il vérifie la propriété qui le gouverne : passer de une à
+   * vingt personnes ne change pas le nombre d'appels. C'est cela qui se casse silencieusement
+   * quand on remet une lecture dans une boucle.
+   */
+  const personnes = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      id: i + 1,
+      userId: i + 1,
+      user: { id: i + 1, pseudo: `p${i}`, prenom: 'A', nom: 'B', email: `p${i}@x.fr` },
+      teamAssignments: [],
+      handoutItems: [],
+      shows: [],
+      entryValidated: false,
+    }))
+
+  const compterLesAppels = () =>
+    prismaMock.editionVolunteerHandoutItem.findMany.mock.calls.length +
+    prismaMock.volunteerMealSelection.findMany.mock.calls.length +
+    prismaMock.artistMealSelection.findMany.mock.calls.length +
+    prismaMock.editionArtistHandoutItem.findMany.mock.calls.length
+
+  const chercherAvec = async (n: number) => {
+    vi.clearAllMocks()
+    mockCanAccessEditionData.mockResolvedValue(true)
+    global.readBody = vi.fn().mockResolvedValue({ searchTerm: 'dupont' })
+    for (const modele of [
+      'ticketingOrderItem',
+      'editionOrganizer',
+      'volunteerAssignment',
+      'user',
+      'editionVolunteerHandoutItem',
+      'volunteerMealSelection',
+      'artistMealSelection',
+      'editionArtistHandoutItem',
+    ]) {
+      prismaMock[modele].findMany.mockResolvedValue([])
+    }
+    prismaMock.editionVolunteerApplication.findMany.mockResolvedValue(personnes(n))
+    prismaMock.editionArtist.findMany.mockResolvedValue(personnes(n))
+    await searchHandler(mockEvent as any)
+    return compterLesAppels()
+  }
+
+  it('interroge la base autant de fois pour vingt personnes que pour une', async () => {
+    const pourUne = await chercherAvec(1)
+    const pourVingt = await chercherAvec(20)
+
+    expect(pourVingt).toBe(pourUne)
+  })
+
+  // Le détail, pour que l'échec dise QUELLE lecture est repartie dans la boucle.
+  it('ne lit qu’une fois chaque table, quel que soit le nombre de personnes', async () => {
+    await chercherAvec(20)
+
+    expect(prismaMock.editionVolunteerHandoutItem.findMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.volunteerMealSelection.findMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.artistMealSelection.findMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.editionArtistHandoutItem.findMany).toHaveBeenCalledTimes(1)
+  })
+
+  /*
+   * L'ordre des repas était rendu par `date` seule. Deux repas du même jour n'étaient donc pas
+   * départagés, et leur ordre d'affichage dépendait du plan de requête — il a effectivement
+   * changé en groupant les lectures. `mealType` le rend déterministe, comme dans les cinq autres
+   * lectures de repas du dépôt.
+   */
+  it('ordonne les repas par date PUIS par type, pour les trois populations', async () => {
+    await chercherAvec(5)
+
+    const ordreAttendu = [{ meal: { date: 'asc' } }, { meal: { mealType: 'asc' } }]
+    for (const modele of ['volunteerMealSelection', 'artistMealSelection']) {
+      expect(prismaMock[modele].findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ orderBy: ordreAttendu })
+      )
+    }
+  })
 })
