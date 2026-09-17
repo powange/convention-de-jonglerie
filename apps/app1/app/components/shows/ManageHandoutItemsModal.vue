@@ -1,12 +1,12 @@
 <script setup lang="ts">
+// Articles à remettre d'un spectacle. Le squelette vit dans TicketingHandoutItemsModal.
+//
+// L'écriture passe par le PUT du spectacle, qui met à jour l'objet entier : c'est la raison
+// pour laquelle ce point d'API garde le droit « artistes » et non le droit billetterie.
 interface Show {
   id: number
   title: string
-  handoutItems?: Array<{
-    handoutItemId: number
-    quantity?: number
-    handoutItem?: { id: number; name: string }
-  }>
+  handoutItems?: Array<{ handoutItemId: number; quantity?: number }>
 }
 
 const props = defineProps<{
@@ -22,92 +22,24 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const isOpen = computed({
-  get: () => props.open,
-  set: (v) => emit('update:open', v),
-})
-
-const availableItems = ref<Array<{ id: number; name: string }>>([])
-// Articles associés au spectacle, avec le nombre d'exemplaires de chacun
-const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
-
 const modalTitle = computed(() =>
   props.show
     ? t('gestion.ticketing.shows_handout_items_manage_for', { title: props.show.title })
     : ''
 )
-
-const { execute: loadAvailableItems, loading } = useApiAction<
-  unknown,
-  { handoutItems: Array<{ id: number; name: string }> }
->(() => `/api/editions/${props.editionId}/ticketing/handout-items`, {
-  method: 'GET',
-  silentSuccess: true,
-  errorMessages: { default: t('gestion.organizers.error_loading_items') },
-  onSuccess: (result) => {
-    availableItems.value = result?.handoutItems || []
-  },
-})
-
-watch(
-  () => props.open,
-  (open) => {
-    if (open) {
-      selection.value = (props.show?.handoutItems ?? []).map((ri) => ({
-        handoutItemId: ri.handoutItemId,
-        quantity: ri.quantity ?? 1,
-      }))
-      loadAvailableItems()
-    }
-  },
-  { immediate: true }
-)
-
-const { execute: save, loading: saving } = useApiAction(
-  () => `/api/editions/${props.editionId}/shows/${props.show?.id}`,
-  {
-    method: 'PUT',
-    body: () => ({ handoutItemIds: selection.value }),
-    successMessage: { title: t('common.saved') },
-    errorMessages: { default: t('common.error') },
-    onSuccess: () => {
-      emit('saved')
-      isOpen.value = false
-    },
-  }
-)
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :title="modalTitle" :ui="{ content: 'sm:max-w-xl' }">
-    <template #body>
-      <div v-if="loading" class="text-center py-8">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto h-8 w-8" />
-      </div>
-
-      <div v-else class="space-y-4">
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('gestion.ticketing.shows_handout_items_help') }}
-        </p>
-
-        <UFormField :label="$t('gestion.shows.handout_items')">
-          <TicketingHandoutItemsQuantityPicker v-model="selection" :items="availableItems" />
-        </UFormField>
-
-        <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">
-          {{ $t('gestion.ticketing.no_handout_items_created') }}
-        </p>
-      </div>
-    </template>
-    <template #footer>
-      <div class="flex w-full justify-end gap-2">
-        <UButton variant="ghost" color="neutral" @click="isOpen = false">
-          {{ $t('common.cancel') }}
-        </UButton>
-        <UButton color="primary" :loading="saving" :disabled="loading" @click="save">
-          {{ $t('common.save') }}
-        </UButton>
-      </div>
-    </template>
-  </UModal>
+  <TicketingHandoutItemsModal
+    :open="open"
+    :edition-id="editionId"
+    :title="modalTitle"
+    :help="$t('gestion.ticketing.shows_handout_items_help')"
+    :field-label="$t('ticketing.tiers.modal.handout_items_label')"
+    :initial-selection="show?.handoutItems ?? []"
+    :save-url="`/api/editions/${editionId}/shows/${show?.id}`"
+    :save-body="(selection) => ({ handoutItemIds: selection })"
+    @update:open="emit('update:open', $event)"
+    @saved="emit('saved')"
+  />
 </template>

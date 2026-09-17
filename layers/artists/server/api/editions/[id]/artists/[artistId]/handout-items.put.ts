@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
+import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import {
   handoutItemSelectionSchema,
   normalizeHandoutItemSelections,
@@ -29,7 +29,24 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const artistId = validateResourceId(event, 'artistId', 'artiste')
 
-    const allowed = await canManageArtistsById(editionId, user.id, event)
+    /*
+     * Droit BILLETTERIE, et non « artistes », bien que la route vive dans ce layer.
+     *
+     * Ce point d'API exigeait `canManageArtistsById` — le seul des huit points d'API dédiés aux
+     * articles à remettre à ne pas demander le droit billetterie. Ce n'était pas seulement une
+     * incohérence : la seule surface qui l'appelle est la page billetterie des articles à
+     * remettre, elle-même gardée par `canManageTicketing`. Les deux droits étant des colonnes
+     * indépendantes, un organisateur qui gère la billetterie sans gérer les artistes voyait donc
+     * le bouton et recevait un 403 en enregistrant.
+     *
+     * La règle retenue : « ce qu'on remet » est une compétence billetterie, sans exception.
+     *
+     * Elle ne vaut que pour les points d'API DÉDIÉS aux articles. `shows/[showId].put` et
+     * `volunteers/meals.put` gardent leur propre droit : les articles n'y sont qu'un champ parmi
+     * douze d'une mise à jour complète, et y exiger la billetterie casserait l'édition d'un
+     * spectacle ou d'un repas.
+     */
+    const allowed = await canManageTicketingById(editionId, user.id, event)
     if (!allowed) {
       throw createError({ status: 403, message: 'Droits insuffisants' })
     }

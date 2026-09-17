@@ -1,14 +1,13 @@
 <script setup lang="ts">
+// Articles à remettre d'un repas — le ticket de cantine, typiquement.
+// Le squelette vit dans TicketingHandoutItemsModal.
 interface Meal {
   id: number
   date: string
   type: string
   enabled: boolean
   phases: string[]
-  handoutItems?: Array<{
-    handoutItemId: number
-    handoutItem?: { id: number; name: string }
-  }>
+  handoutItems?: Array<{ handoutItemId: number; quantity?: number }>
 }
 
 const props = defineProps<{
@@ -26,105 +25,40 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const isOpen = computed({
-  get: () => props.open,
-  set: (v) => emit('update:open', v),
-})
-
-const availableItems = ref<Array<{ id: number; name: string }>>([])
-// Articles associés, avec le nombre d'exemplaires de chacun
-const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
-
 const modalTitle = computed(() =>
   props.mealLabel
     ? t('gestion.ticketing.meals_handout_items_manage_for', { meal: props.mealLabel })
     : t('gestion.ticketing.meals_handout_items_title')
 )
 
-const { execute: loadAvailableItems, loading } = useApiAction<
-  unknown,
-  { handoutItems: Array<{ id: number; name: string }> }
->(() => `/api/editions/${props.editionId}/ticketing/handout-items`, {
-  method: 'GET',
-  silentSuccess: true,
-  errorMessages: { default: t('gestion.organizers.error_loading_items') },
-  onSuccess: (result) => {
-    availableItems.value = result?.handoutItems || []
-  },
-})
-
-watch(
-  () => props.open,
-  (open) => {
-    if (open) {
-      selection.value = (props.meal?.handoutItems ?? []).map((ri: any) => ({
-        handoutItemId: ri.handoutItemId,
-        quantity: ri.quantity ?? 1,
-      }))
-      loadAvailableItems()
-    }
-  },
-  { immediate: true }
-)
-
-// L'API PUT /volunteers/meals attend l'objet complet — on renvoie
-// enabled/phases inchangés pour ne pas les écraser.
-const buildSaveBody = () => ({
+/**
+ * Le PUT des repas attend la configuration complète du repas, pas seulement ses articles :
+ * `enabled` et `phases` sont renvoyés inchangés, faute de quoi l'enregistrement des articles
+ * éteindrait le repas au passage.
+ */
+const corpsDeRequete = (selection: Array<{ handoutItemId: number; quantity: number }>) => ({
   meals: [
     {
       id: props.meal?.id,
       enabled: props.meal?.enabled,
       phases: props.meal?.phases,
-      handoutItemIds: selection.value,
+      handoutItemIds: selection,
     },
   ],
 })
-
-const { execute: save, loading: saving } = useApiAction(
-  () => `/api/editions/${props.editionId}/volunteers/meals`,
-  {
-    method: 'PUT',
-    body: buildSaveBody,
-    successMessage: { title: t('common.saved') },
-    errorMessages: { default: t('common.error') },
-    onSuccess: () => {
-      emit('saved')
-      isOpen.value = false
-    },
-  }
-)
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :title="modalTitle" :ui="{ content: 'sm:max-w-xl' }">
-    <template #body>
-      <div v-if="loading" class="text-center py-8">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto h-8 w-8" />
-      </div>
-
-      <div v-else class="space-y-4">
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{ $t('gestion.ticketing.meals_handout_items_help') }}
-        </p>
-
-        <UFormField :label="$t('gestion.meals.handout_items_label')">
-          <TicketingHandoutItemsQuantityPicker v-model="selection" :items="availableItems" />
-        </UFormField>
-
-        <p v-if="availableItems.length === 0" class="text-sm text-amber-600 dark:text-amber-400">
-          {{ $t('gestion.ticketing.no_handout_items_created') }}
-        </p>
-      </div>
-    </template>
-    <template #footer>
-      <div class="flex w-full justify-end gap-2">
-        <UButton variant="ghost" color="neutral" @click="isOpen = false">
-          {{ $t('common.cancel') }}
-        </UButton>
-        <UButton color="primary" :loading="saving" :disabled="loading" @click="save">
-          {{ $t('common.save') }}
-        </UButton>
-      </div>
-    </template>
-  </UModal>
+  <TicketingHandoutItemsModal
+    :open="open"
+    :edition-id="editionId"
+    :title="modalTitle"
+    :help="$t('gestion.ticketing.meals_handout_items_help')"
+    :field-label="$t('gestion.meals.handout_items_label')"
+    :initial-selection="meal?.handoutItems ?? []"
+    :save-url="`/api/editions/${editionId}/volunteers/meals`"
+    :save-body="corpsDeRequete"
+    @update:open="emit('update:open', $event)"
+    @saved="emit('saved')"
+  />
 </template>
