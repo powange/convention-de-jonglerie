@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Vad du kan göra för oss",
     "withdraw": "Återkalla min ansökan",
     "planning_preview_leader_description": "Du ser det i förväg för att du är lagansvarig och ska kunna lämna dina synpunkter. Det är inte publicerat än: sprid det inte till ditt lag, passen kan fortfarande ändras. I lag som du inte tillhör visas personer under sitt användarnamn, utan för- och efternamn.",
-    "planning_preview_leader_title": "Schemat byggs — för genomläsning"
+    "planning_preview_leader_title": "Schemat byggs — för genomläsning",
+    "organizers_in_teams": {
+      "description": "En arrangör som är kopplad till ett lag tar pass där precis som en volontär och kan vara lagansvarig.",
+      "empty": "Inga arrangörer i den här upplagan.",
+      "load_error": "Kunde inte ladda arrangörerna",
+      "manage": "Lag",
+      "none_yet": "Inte kopplad till något lag",
+      "title": "Arrangörer i lagen"
+    }
   }
 }

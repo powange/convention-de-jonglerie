@@ -1,7 +1,7 @@
 import { mountSuspended, registerEndpoint } from '@nuxt/test-utils/runtime'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import TeamsModal from '../../../../app/components/organizers/TeamsModal.vue'
+import TeamsModal from '../../../../../../layers/volunteers/app/components/volunteers/OrganizerTeamsModal.vue'
 
 /**
  * La modale affichait « Aucune équipe de bénévoles sur cette édition » sur une édition qui en
@@ -51,7 +51,7 @@ const attendreChargement = async (wrapper: Awaited<ReturnType<typeof monter>>) =
   return (wrapper.vm as unknown as { equipes: Array<{ name: string }> }).equipes
 }
 
-describe('OrganizersTeamsModal', () => {
+describe('VolunteersOrganizerTeamsModal', () => {
   it("charge les équipes de l'édition", async () => {
     const wrapper = await monter(22)
     expect((await attendreChargement(wrapper)).map((e) => e.name)).toEqual(['Accueil', 'Bar'])

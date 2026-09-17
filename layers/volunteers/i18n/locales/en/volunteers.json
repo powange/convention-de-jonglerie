@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "What you can bring to us",
     "withdraw": "Withdraw my application",
     "planning_preview_leader_description": "You are seeing it early because you lead a team, so that you can give your feedback. It is not published yet: do not pass it on to your team, shifts may still change. On teams you are not part of, people appear under their nickname, without first or last name.",
-    "planning_preview_leader_title": "Schedule under construction — review"
+    "planning_preview_leader_title": "Schedule under construction — review",
+    "organizers_in_teams": {
+      "description": "An organiser attached to a team takes shifts there just like a volunteer, and can lead it.",
+      "empty": "No organisers on this edition.",
+      "load_error": "Could not load the organisers",
+      "manage": "Teams",
+      "none_yet": "Not attached to any team",
+      "title": "Organisers in teams"
+    }
   }
 }

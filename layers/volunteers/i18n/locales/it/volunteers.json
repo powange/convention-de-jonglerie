@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Cosa può portarci",
     "withdraw": "Ritira la mia candidatura",
     "planning_preview_leader_description": "Lo vedi in anticipo perché sei responsabile di squadra, così puoi dare il tuo parere. Non è ancora pubblicato: non trasmetterlo alla tua squadra, i turni possono ancora cambiare. Nelle squadre di cui non fai parte, le persone compaiono con il loro pseudonimo, senza nome né cognome.",
-    "planning_preview_leader_title": "Programma in costruzione — revisione"
+    "planning_preview_leader_title": "Programma in costruzione — revisione",
+    "organizers_in_teams": {
+      "description": "Un organizzatore assegnato a una squadra vi copre turni come un volontario e può esserne responsabile.",
+      "empty": "Nessun organizzatore in questa edizione.",
+      "load_error": "Impossibile caricare gli organizzatori",
+      "manage": "Squadre",
+      "none_yet": "Non assegnato ad alcuna squadra",
+      "title": "Organizzatori nelle squadre"
+    }
   }
 }

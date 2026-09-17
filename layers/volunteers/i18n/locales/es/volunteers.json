@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Lo que puede aportarnos",
     "withdraw": "Retirar mi solicitud",
     "planning_preview_leader_description": "La ves por adelantado porque eres responsable de equipo, para que puedas dar tu opinión. Aún no está publicada: no se la pases a tu equipo, los turnos todavía pueden cambiar. En los equipos de los que no formas parte, las personas aparecen con su seudónimo, sin nombre ni apellidos.",
-    "planning_preview_leader_title": "Planificación en construcción — revisión"
+    "planning_preview_leader_title": "Planificación en construcción — revisión",
+    "organizers_in_teams": {
+      "description": "Un organizador asignado a un equipo cubre turnos como cualquier voluntario y puede ser su responsable.",
+      "empty": "No hay organizadores en esta edición.",
+      "load_error": "No se han podido cargar los organizadores",
+      "manage": "Equipos",
+      "none_yet": "Sin equipo asignado",
+      "title": "Organizadores en los equipos"
+    }
   }
 }

@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "O que você pode nos trazer",
     "withdraw": "Retirar minha inscrição",
     "planning_preview_leader_description": "Vês o planeamento antecipadamente porque és responsável de equipa, para poderes dar a tua opinião. Ainda não está publicado: não o transmitas à tua equipa, os turnos ainda podem mudar. Nas equipas de que não fazes parte, as pessoas aparecem com o seu pseudónimo, sem nome nem apelido.",
-    "planning_preview_leader_title": "Planeamento em construção — revisão"
+    "planning_preview_leader_title": "Planeamento em construção — revisão",
+    "organizers_in_teams": {
+      "description": "Um organizador associado a uma equipa faz turnos nela tal como um voluntário e pode ser o seu responsável.",
+      "empty": "Não há organizadores nesta edição.",
+      "load_error": "Não foi possível carregar os organizadores",
+      "manage": "Equipas",
+      "none_yet": "Sem equipa associada",
+      "title": "Organizadores nas equipas"
+    }
   }
 }

@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Co pro nás můžete udělat",
     "withdraw": "Stáhnout svou žádost",
     "planning_preview_leader_description": "Vidíte ho předem, protože jste vedoucí týmu a máte možnost se k němu vyjádřit. Zatím není zveřejněn: nepředávejte ho svému týmu, směny se ještě mohou změnit. V týmech, do kterých nepatříte, se osoby zobrazují pod přezdívkou, bez jména a příjmení.",
-    "planning_preview_leader_title": "Rozpis se připravuje — k připomínkám"
+    "planning_preview_leader_title": "Rozpis se připravuje — k připomínkám",
+    "organizers_in_teams": {
+      "description": "Organizátor přiřazený k týmu v něm drží směny stejně jako dobrovolník a může být jeho vedoucím.",
+      "empty": "V tomto ročníku nejsou žádní organizátoři.",
+      "load_error": "Organizátory se nepodařilo načíst",
+      "manage": "Týmy",
+      "none_yet": "Nepřiřazen k žádnému týmu",
+      "title": "Organizátoři v týmech"
+    }
   }
 }
