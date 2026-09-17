@@ -30,9 +30,42 @@ export const handoutItemSchema = z.object({
 export type HandoutItemData = z.infer<typeof handoutItemSchema>
 
 /**
+ * Refuse un nom déjà porté par un autre article de la même édition.
+ *
+ * L'index unique `(editionId, name)` tient la garantie ; ce contrôle tient le *message*. Sans lui,
+ * la violation d'index remonte en erreur Prisma que le `catch` du point d'API transforme en 500 —
+ * exactement le défaut corrigé pour la longueur du nom (B11), à l'autre bout de la même validation.
+ *
+ * La comparaison est confiée à MySQL, dont la colonne est en `utf8mb4_unicode_ci` : elle ignore
+ * donc la casse et les accents, au même titre que l'index. Un contrôle fait en JavaScript sur
+ * `===` serait plus strict que la base et laisserait passer ce qu'elle refuse ensuite.
+ *
+ * @param exclureId - L'article en cours de modification, qui ne se fait pas doublon de lui-même.
+ */
+async function exigerUnNomLibre(editionId: number, name: string, exclureId?: number) {
+  const homonyme = await prisma.ticketingHandoutItem.findFirst({
+    where: {
+      editionId,
+      name,
+      ...(exclureId !== undefined ? { id: { not: exclureId } } : {}),
+    },
+    select: { id: true },
+  })
+
+  if (homonyme) {
+    throw createError({
+      status: 400,
+      message: `Un article nommé « ${name} » existe déjà dans cette édition`,
+    })
+  }
+}
+
+/**
  * Crée un nouvel item à remettre
  */
 export async function createHandoutItem(editionId: number, data: HandoutItemData) {
+  await exigerUnNomLibre(editionId, data.name)
+
   return await prisma.ticketingHandoutItem.create({
     data: {
       editionId,
@@ -62,6 +95,8 @@ export async function updateHandoutItem(itemId: number, editionId: number, data:
     })
   }
 
+  await exigerUnNomLibre(editionId, data.name, itemId)
+
   return await prisma.ticketingHandoutItem.update({
     where: { id: itemId },
     data: {
@@ -69,6 +104,84 @@ export async function updateHandoutItem(itemId: number, editionId: number, data:
       ...(data.cumulative !== undefined ? { cumulative: data.cumulative } : {}),
     },
   })
+}
+
+/**
+ * Ce qu'une suppression d'article emporte avec elle, table par table.
+ *
+ * Les libellés sont ceux que voit l'utilisateur ; l'ordre est celui d'affichage. Un compteur à
+ * zéro n'est pas rendu à l'écran, mais il est calculé : c'est la même forme pour tous les
+ * articles, et l'absence de clé se lit mal.
+ */
+export interface AssociationsDunArticle {
+  tarifs: number
+  options: number
+  champsPersonnalises: number
+  spectacles: number
+  artistes: number
+  equipesBenevoles: number
+  organisateurs: number
+  repas: number
+}
+
+/**
+ * Les articles d'une édition, chacun avec le décompte de ce que sa suppression détacherait.
+ *
+ * Supprimer un article efface en cascade ses associations réparties sur huit écrans, et la
+ * confirmation n'en disait rien : on défaisait en un clic un paramétrage qu'on ne voyait pas.
+ * Le décompte voyage donc avec la liste, plutôt que dans un appel séparé au moment du clic —
+ * l'utilisateur doit pouvoir le lire avant d'ouvrir la confirmation, et la liste est courte.
+ *
+ * Les organisateurs sont comptés à part : `EditionOrganizerHandoutItem` est la seule des neuf
+ * tables à ne porter aucune relation vers l'article (constat ouvert de l'audit), `_count` ne
+ * peut donc pas l'atteindre.
+ */
+export async function listHandoutItemsWithAssociationCounts(editionId: number) {
+  const [items, parOrganisateur] = await Promise.all([
+    prisma.ticketingHandoutItem.findMany({
+      where: { editionId },
+      orderBy: { name: 'asc' },
+      include: {
+        _count: {
+          select: {
+            tiers: true,
+            options: true,
+            customFields: true,
+            shows: true,
+            artists: true,
+            volunteerTicketingHandoutItems: true,
+            artistTicketingHandoutItems: true,
+            meals: true,
+          },
+        },
+      },
+    }),
+    prisma.editionOrganizerHandoutItem.groupBy({
+      by: ['handoutItemId'],
+      where: { editionId },
+      _count: { _all: true },
+    }),
+  ])
+
+  const organisateursParArticle = new Map(
+    parOrganisateur.map((ligne) => [ligne.handoutItemId, ligne._count._all])
+  )
+
+  return items.map(({ _count, ...item }) => ({
+    ...item,
+    associations: {
+      tarifs: _count.tiers,
+      options: _count.options,
+      champsPersonnalises: _count.customFields,
+      spectacles: _count.shows,
+      // Deux tables distinctes pour les artistes : celle d'un artiste précis, et celle qui vise
+      // tous les artistes de l'édition. Les deux disparaissent, on les additionne.
+      artistes: _count.artists + _count.artistTicketingHandoutItems,
+      equipesBenevoles: _count.volunteerTicketingHandoutItems,
+      organisateurs: organisateursParArticle.get(item.id) ?? 0,
+      repas: _count.meals,
+    } satisfies AssociationsDunArticle,
+  }))
 }
 
 /**
@@ -91,9 +204,24 @@ export async function deleteHandoutItem(itemId: number, editionId: number) {
     })
   }
 
-  await prisma.ticketingHandoutItem.delete({
-    where: { id: itemId },
-  })
+  /*
+   * Les associations organisateurs sont retirées à la main, dans la même transaction.
+   *
+   * Les huit autres tables portent une clé étrangère vers l'article et partent en cascade.
+   * `EditionOrganizerHandoutItem`, seule, ne déclare que la colonne `handoutItemId` — sans
+   * relation Prisma ni contrainte en base. Ses lignes SURVIVAIENT donc à la suppression de
+   * l'article, en pointant vers un identifiant disparu : l'écran des organisateurs les affichait
+   * « Article inconnu », et la confirmation qu'on vient d'écrire aurait annoncé un retrait qui
+   * n'avait pas lieu.
+   *
+   * La vraie correction est la relation manquante, qui demande une migration et reste un constat
+   * ouvert de l'audit. En attendant, c'est l'écriture qui tient la cascade — comme elle tient
+   * déjà l'unicité de la ligne globale, que MySQL ne protège pas non plus.
+   */
+  await prisma.$transaction([
+    prisma.editionOrganizerHandoutItem.deleteMany({ where: { editionId, handoutItemId: itemId } }),
+    prisma.ticketingHandoutItem.delete({ where: { id: itemId } }),
+  ])
 
   return { success: true }
 }

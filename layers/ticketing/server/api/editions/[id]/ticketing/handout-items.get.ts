@@ -1,4 +1,5 @@
 import { requireAuth } from '#server/utils/auth-utils'
+import { listHandoutItemsWithAssociationCounts } from '#server/utils/editions/ticketing/handout-items'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 export default wrapApiHandler(
@@ -16,10 +17,9 @@ export default wrapApiHandler(
       })
 
     try {
-      const handoutItems = await prisma.ticketingHandoutItem.findMany({
-        where: { editionId },
-        orderBy: { name: 'asc' },
-      })
+      // Chaque article porte le décompte de ce que sa suppression détacherait : la confirmation
+      // en a besoin, et l'obtenir ici évite un aller-retour au moment du clic.
+      const handoutItems = await listHandoutItemsWithAssociationCounts(editionId)
 
       return createSuccessResponse({ handoutItems })
     } catch (error: unknown) {

@@ -138,7 +138,17 @@ TicketingHandoutItem
 }
 ```
 
-**Note** : La suppression supprime également les relations (cascade).
+**Note** : la suppression retire aussi toutes les associations de l'article — tarifs, options,
+champs personnalisés, spectacles, artistes, équipes de bénévoles, organisateurs et repas.
+
+Huit de ces neuf tables partent en **cascade**, par leur clé étrangère. La neuvième,
+`EditionOrganizerHandoutItem`, ne déclare que la colonne `handoutItemId` : sans relation ni
+contrainte, ses lignes survivaient à la suppression en pointant vers un identifiant disparu, et
+l'écran des organisateurs les affichait « Article inconnu ». C'est désormais **l'écriture** qui
+les retire, dans la même transaction que la suppression.
+
+Le `GET` de la liste renvoie, pour chaque article, le décompte de ce que sa suppression
+détacherait (champ `associations`) : la confirmation l'énonce avant d'agir.
 
 ---
 
@@ -219,56 +229,68 @@ model EditionVolunteerHandoutItem {
 }
 ```
 
-### API Routes Bénévoles
+### API Routes des populations présentes (bénévoles, artistes, organisateurs)
 
-#### Lister les Items Bénévoles
+Les trois populations suivent **le même contrat** : une lecture, et un remplacement complet par
+portée. Le couple `POST` + `DELETE` par association a été retiré.
 
-**Route** : `GET /api/editions/:id/ticketing/volunteers/handout-items`
+Deux raisons à ce choix, et la seconde n'est pas cosmétique.
 
-**Permission** : `canAccessEditionData`
+1. **Une quantité posée ne se modifiait plus.** Il fallait supprimer l'association puis la
+   recréer, la liste n'offrant qu'un bouton « Supprimer ».
+2. **Une écriture qui lit puis crée portait une course.** L'index unique
+   `(editionId, handoutItemId, teamId)` NE PROTÈGE PAS la portée globale : sous MySQL, deux
+   `NULL` sont considérés comme distincts, et `(edition, article, NULL)` pouvait donc être inséré
+   deux fois — ce qui aurait doublé la quantité remise à *tous* les bénévoles. Le `POST` s'en
+   défendait par un `SELECT … FOR UPDATE`, ce qui refermait la fenêtre sans supprimer la lecture
+   qui l'ouvrait. Un remplacement de portée n'a plus rien à vérifier : on efface, on réécrit.
 
-**Réponse** :
+#### Lire les associations
 
-```typescript
-Array<{
-  id: number
-  handoutItem: TicketingHandoutItem
-}>
-```
+| Population    | Route                                                  |
+| ------------- | ------------------------------------------------------ |
+| Bénévoles     | `GET /api/editions/:id/ticketing/volunteers/handout-items` |
+| Artistes      | `GET /api/editions/:id/ticketing/artists/handout-items`    |
+| Organisateurs | `GET /api/editions/:id/ticketing/organizers/handout-items` |
 
-#### Ajouter un Item aux Bénévoles
+**Permission** : `canManageTicketingById`
 
-**Route** : `POST /api/editions/:id/ticketing/volunteers/handout-items`
+La réponse rend **toutes les portées** de l'édition : chaque entrée porte sa portée
+(`teamId` / `organizerId`, `null` pour la portée globale) et sa `quantity`.
 
-**Permission** : `canManageEditionVolunteers`
+#### Remplacer une portée
+
+| Population    | Route                                                  | Portée              |
+| ------------- | ------------------------------------------------------ | ------------------- |
+| Bénévoles     | `PUT /api/editions/:id/ticketing/volunteers/handout-items` | `teamId` ou `null`  |
+| Artistes      | `PUT /api/editions/:id/ticketing/artists/handout-items`    | l'édition entière   |
+| Organisateurs | `PUT /api/editions/:id/ticketing/organizers/handout-items` | `organizerId` ou `null` |
+
+**Permission** : `canManageTicketingById`, puis `exigerArticlesARemettreActifs`.
 
 **Body** :
 
 ```typescript
 {
-  handoutItemId: number
+  teamId?: string | null       // bénévoles : null ou absent = tous les bénévoles
+  organizerId?: number | null  // organisateurs : null ou absent = tous les organisateurs
+  handoutItemIds: Array<number | { handoutItemId: number; quantity?: number }>
 }
 ```
 
-**Réponse** :
+La forme « nombre nu » reste acceptée et vaut un exemplaire, comme pour les tarifs et les options.
+Les doublons sont écartés et les quantités bornées par `normalizeHandoutItemSelections`.
 
-```typescript
-EditionVolunteerHandoutItem
-```
+**Ce que le remplacement touche, et ce qu'il ne touche pas** : seule la portée envoyée est
+réécrite. Régler la portée globale ne vide aucune équipe, et régler une équipe ne touche pas le
+global. C'est la faute que cette forme rend facile — un `deleteMany` qui oublierait `teamId`
+viderait tout — et un test la refuse explicitement.
 
-#### Retirer un Item des Bénévoles
+**Erreurs** :
 
-**Route** : `DELETE /api/editions/:id/ticketing/volunteers/handout-items/:itemId`
-
-**Permission** : `canManageEditionVolunteers`
-
-**Réponse** :
-
-```typescript
-{
-  success: true
-}
-```
+- `400` : un article n'appartient pas à cette édition
+- `403` : droits insuffisants, ou articles à remettre désactivés sur l'édition
+- `404` : équipe ou organisateur introuvable dans cette édition
 
 ---
 
@@ -349,14 +371,23 @@ await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
 })
 ```
 
-### 4. Ajouter un Item pour tous les Bénévoles
+### 4. Régler les Items remis à tous les Bénévoles
+
+Le `PUT` remplace la portée entière : la liste envoyée devient la liste des articles remis, avec
+leurs quantités. Envoyer un tableau vide vide la portée.
 
 ```typescript
 await $fetch(`/api/editions/${editionId}/ticketing/volunteers/handout-items`, {
-  method: 'POST',
-  body: { handoutItemId: cleLocalId },
+  method: 'PUT',
+  body: {
+    teamId: null, // tous les bénévoles ; un identifiant d'équipe pour une équipe précise
+    handoutItemIds: [{ handoutItemId: cleLocalId, quantity: 1 }],
+  },
 })
 ```
+
+⚠️ Les articles associés à une **équipe** REMPLACENT les articles globaux pour ses bénévoles —
+mais seulement si l'équipe en porte au moins un. Une équipe sans article retombe sur le global.
 
 ### 5. Renommer un Item
 

@@ -104,13 +104,35 @@
         "loading": "Ładowanie...",
         "name_placeholder": "Nazwa przedmiotu",
         "cumulative_help": "Przedmiot kumulatywny jest wydawany tyle razy, ile razy jest powiązany z uczestnikiem (na przykład artysta występujący w dwóch spektaklach). W przeciwnym razie jest wydawany tylko raz.",
-        "cumulative_short": "Kumulatywny"
+        "cumulative_short": "Kumulatywny",
+        "associations_none": "Nie jest z niczym powiązany",
+        "associations_summary": "Powiązany z {details}",
+        "delete_detaches": "Jest powiązany z {details}. Usunięcie go usunie również te powiązania i nie da się tego cofnąć.",
+        "delete_no_association": "Na razie nie jest z niczym powiązany: jego usunięcie nie ma żadnych innych skutków.",
+        "delete_question": "Usunąć przedmiot „{name}”?"
       },
       "volunteer": {
         "choose_placeholder": "Wybierz przedmiot do wydania...",
         "given_to_all": "Przekazano wszystkim wolontariuszom",
         "remove_label": "Usuń przedmiot",
-        "remove_title": "Usunąć ten przedmiot?"
+        "remove_title": "Usunąć ten przedmiot?",
+        "items_label": "Przedmioty wydawane w tym zakresie",
+        "save": "Zapisz",
+        "saved": "Przedmioty zapisane",
+        "scope_global_hint": "Wydawane wszystkim wolontariuszom z wyjątkiem tych, których zespół ma własne ustawienia.",
+        "scope_label": "Zakres",
+        "scope_replaces_global_warning": "Przedmioty zespołu ZASTĘPUJĄ przedmioty globalne: wolontariusze z tego zespołu otrzymają wyłącznie to, co przypisano tutaj, a nie ustawienie „wszyscy wolontariusze”."
+      },
+      "associations": {
+        "tarifs": "{count} taryfa | {count} taryf",
+        "options": "{count} opcja | {count} opcji",
+        "champsPersonnalises": "{count} pole niestandardowe | {count} pól niestandardowych",
+        "spectacles": "{count} spektakl | {count} spektakli",
+        "artistes": "{count} artysta | {count} artystów",
+        "equipesBenevoles": "{count} zespół wolontariuszy | {count} zespołów wolontariuszy",
+        "organisateurs": "{count} organizator | {count} organizatorów",
+        "repas": "{count} posiłek | {count} posiłków",
+        "coordination": "i"
       }
     },
     "my_ticket": {

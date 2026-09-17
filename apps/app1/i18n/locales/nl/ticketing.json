@@ -104,13 +104,35 @@
         "loading": "Laden...",
         "name_placeholder": "Naam van het artikel",
         "cumulative_help": "Een cumulatief artikel wordt net zo vaak uitgereikt als het aan de deelnemer is gekoppeld (bijvoorbeeld een artiest die in twee shows optreedt). Anders wordt het slechts één keer uitgereikt.",
-        "cumulative_short": "Cumulatief"
+        "cumulative_short": "Cumulatief",
+        "associations_none": "Aan niets gekoppeld",
+        "associations_summary": "Gekoppeld aan {details}",
+        "delete_detaches": "Het is gekoppeld aan {details}. Bij verwijderen vervallen ook die koppelingen, en dat kan niet ongedaan worden gemaakt.",
+        "delete_no_association": "Het is nog aan niets gekoppeld: verwijderen heeft verder geen gevolgen.",
+        "delete_question": "Artikel “{name}” verwijderen?"
       },
       "volunteer": {
         "choose_placeholder": "Kies een uit te reiken artikel...",
         "given_to_all": "Gegeven aan alle vrijwilligers",
         "remove_label": "Artikel verwijderen",
-        "remove_title": "Dit artikel verwijderen?"
+        "remove_title": "Dit artikel verwijderen?",
+        "items_label": "Artikelen die voor dit bereik worden uitgereikt",
+        "save": "Opslaan",
+        "saved": "Artikelen opgeslagen",
+        "scope_global_hint": "Wordt aan alle vrijwilligers uitgereikt, behalve aan wie in een team zit met eigen instellingen.",
+        "scope_label": "Bereik",
+        "scope_replaces_global_warning": "De artikelen van een team VERVANGEN de globale artikelen: vrijwilligers van dit team krijgen alleen wat hier gekoppeld is, en niet langer de instelling “alle vrijwilligers”."
+      },
+      "associations": {
+        "tarifs": "{count} tarief | {count} tarieven",
+        "options": "{count} optie | {count} opties",
+        "champsPersonnalises": "{count} aangepast veld | {count} aangepaste velden",
+        "spectacles": "{count} voorstelling | {count} voorstellingen",
+        "artistes": "{count} artiest | {count} artiesten",
+        "equipesBenevoles": "{count} vrijwilligersteam | {count} vrijwilligersteams",
+        "organisateurs": "{count} organisator | {count} organisatoren",
+        "repas": "{count} maaltijd | {count} maaltijden",
+        "coordination": "en"
       }
     },
     "my_ticket": {

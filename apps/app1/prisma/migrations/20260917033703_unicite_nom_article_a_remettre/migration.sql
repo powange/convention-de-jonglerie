@@ -1,0 +1,13 @@
+-- Deux articles à remettre de même nom dans une même édition sont indiscernables partout :
+-- dans les listes de sélection, et surtout au guichet, où la liste de remise affiche deux
+-- lignes identiques. L'agrégation se faisant par identifiant, la règle « non cumulable » ne
+-- les fusionne jamais.
+--
+-- La colonne `name` est en `utf8mb4_unicode_ci` : l'unicité posée ici est donc insensible à la
+-- casse et aux accents, ce qui est l'intention — « Bracelet » et « bracelet » ne se distinguent
+-- pas davantage à l'œil.
+--
+-- Vérifié avant écriture sur une copie des données de production (82 articles, 6 éditions) :
+-- aucun doublon, ni exact ni à la casse près. Cette migration ne peut donc pas échouer sur les
+-- lignes existantes, et aucun rattrapage n'est nécessaire.
+CREATE UNIQUE INDEX `TicketingHandoutItem_editionId_name_key` ON `TicketingHandoutItem`(`editionId`, `name`);

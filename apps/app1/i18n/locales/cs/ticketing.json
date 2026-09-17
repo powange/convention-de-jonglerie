@@ -104,13 +104,35 @@
         "loading": "Načítání...",
         "name_placeholder": "Název položky",
         "cumulative_help": "Kumulativní předmět se vydává tolikrát, kolikrát je k účastníkovi přiřazen (například umělec vystupující ve dvou představeních). Jinak se vydává pouze jednou.",
-        "cumulative_short": "Kumulativní"
+        "cumulative_short": "Kumulativní",
+        "associations_none": "Není k ničemu přiřazen",
+        "associations_summary": "Přiřazen k {details}",
+        "delete_detaches": "Je přiřazen k {details}. Smazáním zaniknou i tato přiřazení, a to nelze vrátit zpět.",
+        "delete_no_association": "Zatím není k ničemu přiřazen: jeho smazání nemá žádný další dopad.",
+        "delete_question": "Smazat předmět „{name}“?"
       },
       "volunteer": {
         "choose_placeholder": "Vyberte předmět k vydání...",
         "given_to_all": "Předáno všem dobrovolníkům",
         "remove_label": "Odebrat položku",
-        "remove_title": "Stáhnout tento článek?"
+        "remove_title": "Stáhnout tento článek?",
+        "items_label": "Předměty vydávané v tomto rozsahu",
+        "save": "Uložit",
+        "saved": "Předměty uloženy",
+        "scope_global_hint": "Vydává se všem dobrovolníkům kromě těch, jejichž tým má vlastní nastavení.",
+        "scope_label": "Rozsah",
+        "scope_replaces_global_warning": "Předměty týmu NAHRAZUJÍ globální předměty: dobrovolníci tohoto týmu dostanou pouze to, co je přiřazeno zde, a už ne nastavení „všichni dobrovolníci“."
+      },
+      "associations": {
+        "tarifs": "{count} tarif | {count} tarifů",
+        "options": "{count} volba | {count} voleb",
+        "champsPersonnalises": "{count} vlastní pole | {count} vlastních polí",
+        "spectacles": "{count} představení | {count} představení",
+        "artistes": "{count} umělec | {count} umělců",
+        "equipesBenevoles": "{count} tým dobrovolníků | {count} týmů dobrovolníků",
+        "organisateurs": "{count} organizátor | {count} organizátorů",
+        "repas": "{count} jídlo | {count} jídel",
+        "coordination": "a"
       }
     },
     "my_ticket": {

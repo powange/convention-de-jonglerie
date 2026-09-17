@@ -104,13 +104,35 @@
         "loading": "Lädt...",
         "name_placeholder": "Name des Artikels",
         "cumulative_help": "Ein kumulierbarer Artikel wird so oft ausgegeben, wie er dem Teilnehmer zugeordnet ist (zum Beispiel bei einem Künstler, der in zwei Shows auftritt). Andernfalls wird er nur einmal ausgegeben.",
-        "cumulative_short": "Kumulierbar"
+        "cumulative_short": "Kumulierbar",
+        "associations_none": "Mit nichts verknüpft",
+        "associations_summary": "Verknüpft mit {details}",
+        "delete_detaches": "Er ist mit {details} verknüpft. Beim Löschen werden auch diese Verknüpfungen entfernt – das lässt sich nicht rückgängig machen.",
+        "delete_no_association": "Er ist bisher mit nichts verknüpft: Das Löschen hat keine weiteren Folgen.",
+        "delete_question": "Artikel „{name}“ löschen?"
       },
       "volunteer": {
         "choose_placeholder": "Einen auszugebenden Artikel auswählen...",
         "given_to_all": "An alle Freiwilligen ausgehändigt",
         "remove_label": "Artikel entfernen",
-        "remove_title": "Diesen Artikel entfernen?"
+        "remove_title": "Diesen Artikel entfernen?",
+        "items_label": "Für diesen Geltungsbereich ausgegebene Artikel",
+        "save": "Speichern",
+        "saved": "Artikel gespeichert",
+        "scope_global_hint": "Wird an alle Helfer ausgegeben, außer an jene, deren Team eigene Einstellungen hat.",
+        "scope_label": "Geltungsbereich",
+        "scope_replaces_global_warning": "Die Artikel eines Teams ERSETZEN die globalen Artikel: Helfer dieses Teams erhalten nur, was hier verknüpft ist, und nicht mehr die Einstellung „alle Helfer“."
+      },
+      "associations": {
+        "tarifs": "{count} Tarif | {count} Tarife",
+        "options": "{count} Option | {count} Optionen",
+        "champsPersonnalises": "{count} benutzerdefiniertes Feld | {count} benutzerdefinierte Felder",
+        "spectacles": "{count} Aufführung | {count} Aufführungen",
+        "artistes": "{count} Künstler | {count} Künstler",
+        "equipesBenevoles": "{count} Helferteam | {count} Helferteams",
+        "organisateurs": "{count} Organisator | {count} Organisatoren",
+        "repas": "{count} Mahlzeit | {count} Mahlzeiten",
+        "coordination": "und"
       }
     },
     "my_ticket": {

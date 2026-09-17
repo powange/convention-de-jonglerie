@@ -104,13 +104,35 @@
         "loading": "Indlæser...",
         "name_placeholder": "Navn på varen",
         "cumulative_help": "En kumulativ effekt udleveres lige så mange gange, som den er knyttet til deltageren (f.eks. en artist der optræder i to shows). Ellers udleveres den kun én gang.",
-        "cumulative_short": "Kumulativ"
+        "cumulative_short": "Kumulativ",
+        "associations_none": "Ikke knyttet til noget",
+        "associations_summary": "Knyttet til {details}",
+        "delete_detaches": "Den er knyttet til {details}. Hvis du sletter den, fjernes disse tilknytninger også, og det kan ikke fortrydes.",
+        "delete_no_association": "Den er endnu ikke knyttet til noget: at slette den har ingen andre følger.",
+        "delete_question": "Slet genstanden „{name}“?"
       },
       "volunteer": {
         "choose_placeholder": "Vælg en genstand til udlevering...",
         "given_to_all": "Udleveret til alle frivillige",
         "remove_label": "Fjern varen",
-        "remove_title": "Fjern denne vare?"
+        "remove_title": "Fjern denne vare?",
+        "items_label": "Genstande der udleveres for dette omfang",
+        "save": "Gem",
+        "saved": "Genstande gemt",
+        "scope_global_hint": "Udleveres til alle frivillige, undtagen dem hvis team har sine egne indstillinger.",
+        "scope_label": "Omfang",
+        "scope_replaces_global_warning": "Et teams genstande ERSTATTER de globale genstande: frivillige i dette team får kun det, der er knyttet her, og ikke længere indstillingen „alle frivillige“."
+      },
+      "associations": {
+        "tarifs": "{count} pris | {count} priser",
+        "options": "{count} tilvalg | {count} tilvalg",
+        "champsPersonnalises": "{count} brugerdefineret felt | {count} brugerdefinerede felter",
+        "spectacles": "{count} forestilling | {count} forestillinger",
+        "artistes": "{count} artist | {count} artister",
+        "equipesBenevoles": "{count} frivilligteam | {count} frivilligteams",
+        "organisateurs": "{count} arrangør | {count} arrangører",
+        "repas": "{count} måltid | {count} måltider",
+        "coordination": "og"
       }
     },
     "my_ticket": {

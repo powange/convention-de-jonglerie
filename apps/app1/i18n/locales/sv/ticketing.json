@@ -104,13 +104,35 @@
         "loading": "Laddar...",
         "name_placeholder": "Artikelns namn",
         "cumulative_help": "En kumulativ artikel delas ut lika många gånger som den är kopplad till deltagaren (till exempel en artist som uppträder i två föreställningar). Annars delas den ut endast en gång.",
-        "cumulative_short": "Kumulativ"
+        "cumulative_short": "Kumulativ",
+        "associations_none": "Inte kopplad till något",
+        "associations_summary": "Kopplad till {details}",
+        "delete_detaches": "Den är kopplad till {details}. Om du tar bort den försvinner även dessa kopplingar, och det går inte att ångra.",
+        "delete_no_association": "Den är ännu inte kopplad till något: att ta bort den får inga andra följder.",
+        "delete_question": "Ta bort objektet ”{name}”?"
       },
       "volunteer": {
         "choose_placeholder": "Välj ett objekt att lämna ut...",
         "given_to_all": "Presenteras till alla volontärer",
         "remove_label": "Ta bort artikel",
-        "remove_title": "Dra tillbaka den här artikeln?"
+        "remove_title": "Dra tillbaka den här artikeln?",
+        "items_label": "Objekt som delas ut för detta omfång",
+        "save": "Spara",
+        "saved": "Objekten sparade",
+        "scope_global_hint": "Delas ut till alla volontärer, utom dem vars grupp har egna inställningar.",
+        "scope_label": "Omfång",
+        "scope_replaces_global_warning": "En grupps objekt ERSÄTTER de globala objekten: volontärer i denna grupp får bara det som kopplas här, och inte längre inställningen ”alla volontärer”."
+      },
+      "associations": {
+        "tarifs": "{count} pris | {count} priser",
+        "options": "{count} tillval | {count} tillval",
+        "champsPersonnalises": "{count} anpassat fält | {count} anpassade fält",
+        "spectacles": "{count} föreställning | {count} föreställningar",
+        "artistes": "{count} artist | {count} artister",
+        "equipesBenevoles": "{count} volontärgrupp | {count} volontärgrupper",
+        "organisateurs": "{count} arrangör | {count} arrangörer",
+        "repas": "{count} måltid | {count} måltider",
+        "coordination": "och"
       }
     },
     "my_ticket": {
