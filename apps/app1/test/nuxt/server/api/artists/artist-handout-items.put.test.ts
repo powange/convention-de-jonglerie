@@ -1,9 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-const mockCanManage = vi.hoisted(() => vi.fn())
+const mockCanManageTicketing = vi.hoisted(() => vi.fn())
+const mockCanManageArtists = vi.hoisted(() => vi.fn())
 
+/*
+ * Les DEUX droits sont mockés, alors que le point d'API n'en emploie qu'un.
+ *
+ * C'est délibéré : si quelqu'un rebasculait la route sur `canManageArtistsById`, le module
+ * exporterait toujours ce qu'il faut et rien ne planterait — c'est l'assertion explicite plus
+ * bas qui l'attraperait. Un mock qui n'expose qu'un seul droit ferait échouer le test pour la
+ * mauvaise raison (un import manquant) plutôt que pour la bonne.
+ */
 vi.mock('#server/utils/permissions/edition-permissions', () => ({
-  canManageArtistsById: mockCanManage,
+  canManageTicketingById: mockCanManageTicketing,
+  canManageArtistsById: mockCanManageArtists,
 }))
 
 import handler from '../../../../../../../layers/artists/server/api/editions/[id]/artists/[artistId]/handout-items.put'
@@ -21,7 +31,8 @@ const lignesEcrites = () => prismaMock.artistHandoutItem.createMany.mock.calls[0
 describe('PUT /api/editions/[id]/artists/[artistId]/handout-items', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockCanManage.mockResolvedValue(true)
+    mockCanManageTicketing.mockResolvedValue(true)
+    mockCanManageArtists.mockResolvedValue(false)
     prismaMock.editionArtist.findFirst.mockResolvedValue({ id: 77 })
     // Par défaut, tous les articles demandés appartiennent bien à l'édition
     prismaMock.ticketingHandoutItem.count.mockImplementation(
@@ -94,7 +105,31 @@ describe('PUT /api/editions/[id]/artists/[artistId]/handout-items', () => {
   })
 
   it('refuse un contributeur sans droit sur les artistes', async () => {
-    mockCanManage.mockResolvedValue(false)
+    mockCanManageTicketing.mockResolvedValue(false)
+
+    await expect(envoyer({ handoutItemIds: [{ handoutItemId: 5 }] })).rejects.toBeDefined()
+    expect(prismaMock.artistHandoutItem.createMany).not.toHaveBeenCalled()
+  })
+
+  /*
+   * F5 — le droit exigé, épinglé.
+   *
+   * Cette route était la SEULE des huit points d'API dédiés aux articles à remettre à demander
+   * `canManageArtists`. Ce n'était pas qu'une incohérence : la seule surface qui l'appelle est la
+   * page billetterie, gardée par `canManageTicketing`. Les deux droits étant des colonnes
+   * indépendantes, un organisateur qui gère la billetterie sans gérer les artistes voyait le
+   * bouton et recevait un 403 en enregistrant.
+   */
+  it('exige le droit billetterie, et non le droit artistes', async () => {
+    await envoyer({ handoutItemIds: [{ handoutItemId: 5 }] })
+
+    expect(mockCanManageTicketing).toHaveBeenCalledWith(22, 1, expect.anything())
+    expect(mockCanManageArtists).not.toHaveBeenCalled()
+  })
+
+  it('refuse celui qui ne gère que les artistes', async () => {
+    mockCanManageTicketing.mockResolvedValue(false)
+    mockCanManageArtists.mockResolvedValue(true)
 
     await expect(envoyer({ handoutItemIds: [{ handoutItemId: 5 }] })).rejects.toBeDefined()
     expect(prismaMock.artistHandoutItem.createMany).not.toHaveBeenCalled()

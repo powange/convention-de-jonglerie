@@ -1,521 +1,227 @@
-# Gestion des Items à Remettre
+# Les articles à remettre
 
-Les items à remettre sont des objets prêtés aux participants qui doivent être rendus en fin d'événement (badges, t-shirts, clés, etc.).
+Ce qu'une édition donne aux gens qui se présentent au guichet : un bracelet, un tee-shirt, un
+ticket de cantine, un badge. Le système répond à une seule question — **qu'est-ce qui est dû à
+cette personne ?** — et il y répond pour quatre populations : les porteurs de billet, les
+bénévoles, les artistes et les organisateurs.
 
-## Modèle de Données
+> **Ce qu'il ne fait pas.** Il ne trace **pas** ce qui a été réellement remis. La liste du guichet
+> est une liste à cocher qui ne survit pas à la fermeture de la modale, et aucune colonne du schéma
+> n'enregistre une remise. Deux bénévoles au même poste n'ont donc aucun moyen de savoir ce que
+> l'autre a distribué. C'est le manque le plus structurant du module, et il est connu.
 
-### Table `TicketingHandoutItem`
+## L'article, et son seul réglage
 
 ```prisma
 model TicketingHandoutItem {
-  id        Int      @id @default(autoincrement())
-  editionId Int
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  editionId  Int
+  name       String
+  cumulative Boolean  @default(false)
 
-  edition                   Edition                          @relation(...)
-  tiers                     TicketingTierHandoutItem[]             // Tarifs liés
-  options                   TicketingOptionHandoutItem[]           // Options liées
-  volunteerHandoutItems  EditionVolunteerHandoutItem[] // Bénévoles
-
-  @@index([editionId])
+  @@unique([editionId, name])
 }
 ```
 
-### Propriétés
+`cumulative` est le **seul** réglage porté par l'article, et il gouverne tout le calcul :
 
-```typescript
-interface HandoutItemData {
-  name: string // Nom de l'item (ex: "Badge réutilisable")
-}
+- **non cumulable** (le défaut) — remis **une seule fois**, quel que soit le nombre d'associations.
+  Un bracelet attaché au tarif ET à une option ne fait pas deux bracelets.
+- **cumulable** — les quantités **s'additionnent**. Un artiste jouant dans deux spectacles qui
+  donnent chacun 3 tickets boisson en reçoit six.
+
+`@@unique([editionId, name])` empêche deux articles de même nom dans une édition : ils seraient
+indiscernables au guichet, et l'agrégation se faisant par identifiant, ils ne fusionneraient
+jamais. La colonne étant en `utf8mb4_unicode_ci`, **l'unicité ignore la casse et les accents** —
+« Bracelet » et « bracelet » sont le même nom.
+
+## Les neuf tables de liaison
+
+Un article ne sert à rien tant qu'il n'est associé à rien. Neuf tables disent à qui il revient.
+**Toutes portent une `quantity`** (défaut 1) et un index unique sur (porteur, article).
+
+| Table                                 | Porteur                         | Écrit par                                     |
+| ------------------------------------- | ------------------------------- | --------------------------------------------- |
+| `TicketingTierHandoutItem`            | un tarif                        | `PUT ticketing/tiers/[tierId]/handout-items`   |
+| `TicketingOptionHandoutItem`          | une option                      | `PUT ticketing/options/[optionId]/handout-items` |
+| `TicketingTierCustomFieldHandoutItem` | un champ personnalisé           | `PUT ticketing/custom-fields/[id]/handout-items` |
+| `ShowHandoutItem`                     | un spectacle                    | `PUT shows/[showId]` (mise à jour complète)    |
+| `ArtistHandoutItem`                   | un artiste précis               | `PUT artists/[artistId]/handout-items`         |
+| `EditionArtistHandoutItem`            | **tous** les artistes           | `PUT ticketing/artists/handout-items`          |
+| `EditionVolunteerHandoutItem`         | tous les bénévoles, ou une équipe | `PUT ticketing/volunteers/handout-items`     |
+| `EditionOrganizerHandoutItem`         | tous les organisateurs, ou un seul | `PUT ticketing/organizers/handout-items`    |
+| `VolunteerMealHandoutItem`            | un repas                        | `PUT volunteers/meals` (mise à jour complète)  |
+
+`TicketingTierCustomFieldHandoutItem` est la seule à porter une **troisième dimension** :
+`choiceValue`. L'article n'est alors dû que si la réponse au champ vaut exactement cette valeur —
+`NULL` signifiant « quelle que soit la réponse ». C'est la raison pour laquelle son écran de
+configuration est le seul à ne pas partager la coquille commune des modales.
+
+### Deux colonnes nullables, et ce qu'elles ne protègent pas
+
+`EditionVolunteerHandoutItem.teamId` et `EditionOrganizerHandoutItem.organizerId` valent `NULL`
+pour dire « tout le monde ».
+
+⚠️ **Sous MySQL, deux `NULL` sont distincts dans un index unique.** `@@unique([editionId,
+handoutItemId, teamId])` ne protège donc **pas** la ligne globale : `(édition, article, NULL)`
+peut être inséré plusieurs fois, ce qui doublerait la quantité remise à *tous* les bénévoles.
+
+C'est l'**écriture** qui l'empêche, et c'est pour cela que ces points d'API ont une sémantique de
+**remplacement complet par portée** plutôt qu'un ajout : il n'y a plus de lecture-puis-écriture
+entre lesquelles une seconde requête pourrait se glisser.
+
+### L'exception qui reste
+
+`EditionOrganizerHandoutItem` **ne porte aucune clé étrangère vers l'article** — seulement la
+colonne `handoutItemId`. Ses lignes ne partent donc pas en cascade quand l'article est supprimé :
+elles survivraient en pointant vers un identifiant disparu, ce que l'écran afficherait « Article
+inconnu ». `deleteHandoutItem` les retire **explicitement**, dans la même transaction. La vraie
+correction est la relation manquante ; elle demande une migration et n'est pas faite.
+
+## La règle d'agrégation
+
+`aggregateHandoutItems` (`server/utils/ticketing/handout-items.ts`) est **l'unique endroit** où la
+règle vit. Les quatre populations y passent.
+
+```ts
+// non cumulable : on retient la plus grande quantité définie sur ses associations
+// cumulable     : on additionne
 ```
 
-## Types d'Items
+Une quantité absente, nulle, négative ou fractionnaire vaut **un** exemplaire — on ne remet pas
+« zéro bracelet ».
 
-### 1. Items Généraux (Tarifs)
+## Ce que reçoit chaque population
 
-Items associés à des tarifs via `TicketingTierHandoutItem`.
+### Un porteur de billet
 
-**Exemple** : Tous les participants avec le tarif "Pass Weekend" reçoivent un badge.
+Trois sources se rejoignent : **le tarif acheté**, **les options souscrites**, et **les champs
+personnalisés renseignés**.
 
-### 2. Items Conditionnels (Options)
+Deux pièges y sont documentés dans le code, parce qu'ils ont chacun coûté un défaut :
 
-Items associés à des options via `TicketingOptionHandoutItem`.
+- **Les options ne sont pas dans `orderItem.customFields`.** Les deux chemins d'écriture les en
+  excluent et les rangent dans `TicketingOrderItemOption`. Les chercher dans le JSON revient à
+  n'en trouver aucune.
+- **Un champ personnalisé se rapproche par identifiant, pas par libellé.** L'instantané figé à
+  l'achat porte deux identifiants possibles dans des espaces sans rapport : `customFieldId`
+  (interne) et `id` (celui du fournisseur). `reponseDesigneLeChamp`
+  (`server/utils/ticketing/rapprochement-champ.ts`) tient l'ordre — interne, puis fournisseur,
+  puis libellé en dernier repli. Comparer les libellés seuls faisait qu'**une faute de frappe
+  corrigée détachait tous les billets déjà vendus**.
 
-**Exemple** : Les participants qui répondent "Oui" à "T-shirt souven ir" reçoivent un badge textile.
+### Un bénévole
 
-### 3. Items Bénévoles
+⚠️ **Les articles d'une équipe REMPLACENT les articles globaux.** Dès qu'un bénévole appartient à
+une équipe portant **au moins un** article, il ne reçoit **que** ceux-là. Une équipe sans article
+retombe sur le global.
 
-Items spécifiques aux bénévoles via `EditionVolunteerHandoutItem`.
+C'est une divergence **assumée** avec les quotas, où les portées s'additionnent : un article est
+un colis qu'on reçoit, et le remplacer a un sens ; un quota est une place qu'on occupe. L'écran de
+configuration énonce la règle **avant** qu'on la déclenche, et affiche un aperçu de ce que le
+bénévole recevra réellement.
 
-**Exemple** : Tous les bénévoles reçoivent une clé de local.
+S'y ajoutent les articles des **repas** auxquels il est inscrit.
 
-## API Routes
+### Un artiste
 
-### Lister les Items
+Trois sources qui **s'additionnent**, sans surcharge : les articles de tous les artistes de
+l'édition, ceux de l'artiste précis, ceux de ses spectacles. Plus ses repas.
 
-**Route** : `GET /api/editions/:id/ticketing/handout-items`
+### Un organisateur
 
-**Permission** : `canAccessEditionData`
+Les articles globaux et ceux de l'organisateur précis, **agrégés en une seule liste**. Plus ses
+repas — au même titre que les bénévoles et les artistes.
 
-**Réponse** :
+## Les points d'API
 
-```typescript
-TicketingHandoutItem[]
-```
+### Les articles eux-mêmes
 
----
+| Route                                       | Effet                                      |
+| ------------------------------------------- | ------------------------------------------ |
+| `GET ticketing/handout-items`               | la liste, **avec le décompte d'associations** de chacun |
+| `POST ticketing/handout-items`              | création (400 si le nom est déjà pris)     |
+| `PUT ticketing/handout-items/[itemId]`      | renommage et bascule de `cumulative`       |
+| `DELETE ticketing/handout-items/[itemId]`   | suppression, cascade comprise              |
 
-### Créer un Item
+Le `GET` rend pour chaque article un objet `associations` (tarifs, options, champs personnalisés,
+spectacles, artistes, équipes de bénévoles, organisateurs, repas). La confirmation de suppression
+l'énonce : on ne défait pas en un clic un paramétrage réparti sur huit écrans sans le savoir.
 
-**Route** : `POST /api/editions/:id/ticketing/handout-items`
+### Les associations par portée
 
-**Permission** : `canManageEditionVolunteers`
-
-**Body** :
-
-```typescript
-{
-  name: string // Obligatoire
-}
-```
-
-**Validation Zod** :
-
-```typescript
-const createItemSchema = z.object({
-  name: z.string().min(1, 'Le nom est obligatoire'),
-})
-```
-
-**Réponse** :
-
-```typescript
-TicketingHandoutItem
-```
-
----
-
-### Modifier un Item
-
-**Route** : `PUT /api/editions/:id/ticketing/handout-items/:itemId`
-
-**Permission** : `canManageEditionVolunteers`
-
-**Body** :
+Les trois populations suivent le même contrat — une lecture, un **remplacement complet d'une
+portée** :
 
 ```typescript
-{
-  name: string // Obligatoire
-}
-```
-
-**Réponse** :
-
-```typescript
-TicketingHandoutItem
-```
-
-**Erreurs** :
-
-- `404` : Item introuvable
-- `403` : L'item n'appartient pas à cette édition
-
----
-
-### Supprimer un Item
-
-**Route** : `DELETE /api/editions/:id/ticketing/handout-items/:itemId`
-
-**Permission** : `canManageEditionVolunteers`
-
-**Réponse** :
-
-```typescript
-{
-  success: true
-}
-```
-
-**Note** : la suppression retire aussi toutes les associations de l'article — tarifs, options,
-champs personnalisés, spectacles, artistes, équipes de bénévoles, organisateurs et repas.
-
-Huit de ces neuf tables partent en **cascade**, par leur clé étrangère. La neuvième,
-`EditionOrganizerHandoutItem`, ne déclare que la colonne `handoutItemId` : sans relation ni
-contrainte, ses lignes survivaient à la suppression en pointant vers un identifiant disparu, et
-l'écran des organisateurs les affichait « Article inconnu ». C'est désormais **l'écriture** qui
-les retire, dans la même transaction que la suppression.
-
-Le `GET` de la liste renvoie, pour chaque article, le décompte de ce que sa suppression
-détacherait (champ `associations`) : la confirmation l'énonce avant d'agir.
-
----
-
-## Utilitaire Serveur
-
-**Fichier** : `server/utils/editions/ticketing/handout-items.ts`
-
-### Fonctions Disponibles
-
-#### `getHandoutItems(editionId: number)`
-
-Récupère tous les items d'une édition.
-
-```typescript
-const items = await getHandoutItems(editionId)
-// Retourne: TicketingHandoutItem[]
-```
-
-#### `createHandoutItem(editionId: number, data: HandoutItemData)`
-
-Crée un nouvel item.
-
-```typescript
-const item = await createHandoutItem(editionId, {
-  name: 'Badge réutilisable',
-})
-```
-
-#### `updateHandoutItem(itemId: number, editionId: number, data: HandoutItemData)`
-
-Met à jour un item existant.
-
-**Validations** :
-
-- L'item doit exister
-- L'item doit appartenir à l'édition
-
-```typescript
-const item = await updateHandoutItem(itemId, editionId, {
-  name: 'Badge réutilisable (modifié)',
-})
-```
-
-#### `deleteHandoutItem(itemId: number, editionId: number)`
-
-Supprime un item.
-
-**Validations** :
-
-- L'item doit exister
-- L'item doit appartenir à l'édition
-
-```typescript
-await deleteHandoutItem(itemId, editionId)
-// Retourne: { success: true }
-```
-
----
-
-## Items pour Bénévoles
-
-### Table `EditionVolunteerHandoutItem`
-
-```prisma
-model EditionVolunteerHandoutItem {
-  id               Int      @id @default(autoincrement())
-  editionId        Int
-  handoutItemId Int
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  edition        Edition        @relation(...)
-  handoutItem TicketingHandoutItem @relation(...)
-
-  @@unique([editionId, handoutItemId])
-  @@index([editionId])
-  @@index([handoutItemId])
-}
-```
-
-### API Routes des populations présentes (bénévoles, artistes, organisateurs)
-
-Les trois populations suivent **le même contrat** : une lecture, et un remplacement complet par
-portée. Le couple `POST` + `DELETE` par association a été retiré.
-
-Deux raisons à ce choix, et la seconde n'est pas cosmétique.
-
-1. **Une quantité posée ne se modifiait plus.** Il fallait supprimer l'association puis la
-   recréer, la liste n'offrant qu'un bouton « Supprimer ».
-2. **Une écriture qui lit puis crée portait une course.** L'index unique
-   `(editionId, handoutItemId, teamId)` NE PROTÈGE PAS la portée globale : sous MySQL, deux
-   `NULL` sont considérés comme distincts, et `(edition, article, NULL)` pouvait donc être inséré
-   deux fois — ce qui aurait doublé la quantité remise à *tous* les bénévoles. Le `POST` s'en
-   défendait par un `SELECT … FOR UPDATE`, ce qui refermait la fenêtre sans supprimer la lecture
-   qui l'ouvrait. Un remplacement de portée n'a plus rien à vérifier : on efface, on réécrit.
-
-#### Lire les associations
-
-| Population    | Route                                                  |
-| ------------- | ------------------------------------------------------ |
-| Bénévoles     | `GET /api/editions/:id/ticketing/volunteers/handout-items` |
-| Artistes      | `GET /api/editions/:id/ticketing/artists/handout-items`    |
-| Organisateurs | `GET /api/editions/:id/ticketing/organizers/handout-items` |
-
-**Permission** : `canManageTicketingById`
-
-La réponse rend **toutes les portées** de l'édition : chaque entrée porte sa portée
-(`teamId` / `organizerId`, `null` pour la portée globale) et sa `quantity`.
-
-#### Remplacer une portée
-
-| Population    | Route                                                  | Portée              |
-| ------------- | ------------------------------------------------------ | ------------------- |
-| Bénévoles     | `PUT /api/editions/:id/ticketing/volunteers/handout-items` | `teamId` ou `null`  |
-| Artistes      | `PUT /api/editions/:id/ticketing/artists/handout-items`    | l'édition entière   |
-| Organisateurs | `PUT /api/editions/:id/ticketing/organizers/handout-items` | `organizerId` ou `null` |
-
-**Permission** : `canManageTicketingById`, puis `exigerArticlesARemettreActifs`.
-
-**Body** :
-
-```typescript
-{
-  teamId?: string | null       // bénévoles : null ou absent = tous les bénévoles
-  organizerId?: number | null  // organisateurs : null ou absent = tous les organisateurs
-  handoutItemIds: Array<number | { handoutItemId: number; quantity?: number }>
-}
-```
-
-La forme « nombre nu » reste acceptée et vaut un exemplaire, comme pour les tarifs et les options.
-Les doublons sont écartés et les quantités bornées par `normalizeHandoutItemSelections`.
-
-**Ce que le remplacement touche, et ce qu'il ne touche pas** : seule la portée envoyée est
-réécrite. Régler la portée globale ne vide aucune équipe, et régler une équipe ne touche pas le
-global. C'est la faute que cette forme rend facile — un `deleteMany` qui oublierait `teamId`
-viderait tout — et un test la refuse explicitement.
-
-**Erreurs** :
-
-- `400` : un article n'appartient pas à cette édition
-- `403` : droits insuffisants, ou articles à remettre désactivés sur l'édition
-- `404` : équipe ou organisateur introuvable dans cette édition
-
----
-
-## Composants Vue
-
-### `HandoutItemsList.vue`
-
-**Localisation** : `app/components/ticketing/HandoutItemsList.vue`
-
-**Fonctionnalités** :
-
-- Affiche la liste des items
-- Boutons d'édition/suppression
-- Modal de création/modification
-
-**Props** :
-
-```typescript
-{
-  editionId: number
-}
-```
-
-### `TicketingVolunteerHandoutItemsList.vue`
-
-**Localisation** : `app/components/ticketing/TicketingVolunteerHandoutItemsList.vue`
-
-**Fonctionnalités** :
-
-- Affiche les items à remettre pour les bénévoles
-- Ajouter/retirer des items
-- Sélection parmi les items existants
-
-**Props** :
-
-```typescript
-{
-  editionId: number
-}
-```
-
----
-
-## Cas d'Usage
-
-### 1. Créer un Item "Badge Réutilisable"
-
-```typescript
-const item = await $fetch(`/api/editions/${editionId}/ticketing/handout-items`, {
-  method: 'POST',
-  body: { name: 'Badge réutilisable' },
-})
-```
-
-### 2. Associer un Item à un Tarif
-
-```typescript
-// Via la modification du tarif
-await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
-  method: 'PUT',
-  body: {
-    ...tier,
-    handoutItemIds: [badgeId, tshirtId],
-  },
-})
-```
-
-### 3. Associer un Item à une TicketingOption
-
-```typescript
-// Via la modification de l'option
-await $fetch(`/api/editions/${editionId}/ticketing/options/${optionId}`, {
-  method: 'PUT',
-  body: {
-    ...option,
-    handoutItemIds: [badgeTextileId],
-  },
-})
-```
-
-### 4. Régler les Items remis à tous les Bénévoles
-
-Le `PUT` remplace la portée entière : la liste envoyée devient la liste des articles remis, avec
-leurs quantités. Envoyer un tableau vide vide la portée.
-
-```typescript
+// Bénévoles : teamId = null ou absent → tous les bénévoles
 await $fetch(`/api/editions/${editionId}/ticketing/volunteers/handout-items`, {
   method: 'PUT',
-  body: {
-    teamId: null, // tous les bénévoles ; un identifiant d'équipe pour une équipe précise
-    handoutItemIds: [{ handoutItemId: cleLocalId, quantity: 1 }],
-  },
+  body: { teamId: null, handoutItemIds: [{ handoutItemId: 12, quantity: 3 }] },
 })
 ```
 
-⚠️ Les articles associés à une **équipe** REMPLACENT les articles globaux pour ses bénévoles —
-mais seulement si l'équipe en porte au moins un. Une équipe sans article retombe sur le global.
+**Seule la portée envoyée est réécrite.** Régler le global ne vide aucune équipe, et régler une
+équipe ne touche pas le global. Un tableau vide vide la portée.
 
-### 5. Renommer un Item
+La forme « nombre nu » (`handoutItemIds: [12, 13]`) reste acceptée et vaut un exemplaire.
+`normalizeHandoutItemSelections` borne les quantités et écarte les doublons — c'est la **seule**
+normalisation du système.
 
-```typescript
-await $fetch(`/api/editions/${editionId}/ticketing/handout-items/${itemId}`, {
-  method: 'PUT',
-  body: { name: 'Badge réutilisable (nouveau nom)' },
-})
-```
+### Les droits
 
----
+**Tous les points d'API dédiés aux articles exigent `canManageTicketing`**, sans exception : « ce
+qu'on remet » est une compétence billetterie.
 
-## Flux de Gestion
+Deux routes y échappent, et c'est voulu : `PUT shows/[showId]` et `PUT volunteers/meals` sont des
+**mises à jour complètes** d'un spectacle ou d'un repas, où les articles ne sont qu'un champ parmi
+douze. Elles gardent le droit de leur module — y exiger la billetterie casserait l'édition des
+spectacles et des repas.
 
-### À l'Arrivée du Participant
+### L'interrupteur
 
-1. **Scan du QR code** ou recherche manuelle
-2. **Affichage des items à remettre** dans `ParticipantDetailsModal`
-   - Items du tarif
-   - Items des options sélectionnées
-   - Items bénévole (si applicable)
-3. **Remise des items** au participant
+`Edition.ticketingHandoutItemsEnabled` éteint la fonctionnalité. Contrairement au reste du projet,
+il **coupe vraiment** : la page de configuration, les points d'écriture (403) et le calcul au
+guichet. L'écart avec les autres modules est délibéré — un article non remis se constate au
+comptoir, trop tard. `exigerArticlesARemettreActifs` s'appelle **après** le contrôle des droits,
+pour que qui n'a pas le droit d'être là n'apprenne pas au passage ce que l'édition a activé.
 
-### Au Départ du Participant
+## Les écrans
 
-1. **Scan du QR code** ou recherche manuelle
-2. **Affichage des items à remettre**
-3. **Vérification** que tous les items sont remiss
-4. **Validation** du départ (optionnel)
+Tout se configure depuis **`/editions/[id]/gestion/ticketing/handout-items`**, un onglet par
+cible.
 
-### Implémentation Recommandée
+- **`HandoutItemsList.vue`** — créer, renommer, basculer `cumulative`, supprimer.
+- **`TicketingHandoutItemsQuantityPicker.vue`** — le sélecteur commun : un multi-select, puis une
+  ligne de quantité par article retenu.
+- **`TicketingHandoutItemsModal.vue`** — la coquille commune des modales (charger, enregistrer,
+  pied). Sept écrans n'en sont plus que des enveloppes d'une quarantaine de lignes.
+- **`ManageCustomFieldHandoutItemsModal.vue`** — à part, pour `choiceValue`.
+- **`TicketingVolunteerHandoutItemsList.vue`** — la portée bénévole, avec l'avertissement de
+  surcharge et l'aperçu.
+- **`ParticipantDetailsModal.vue`** — **la seule surface où l'on remet quelque chose**. Aucune
+  carte de détail n'affiche les articles : ni celle des artistes, ni celle des bénévoles, ni celle
+  des organisateurs.
 
-```vue
-<!-- ParticipantDetailsModal.vue -->
-<template>
-  <div v-if="handoutItems.length > 0">
-    <h3>Items à remettre</h3>
-    <ul>
-      <li v-for="item in handoutItems" :key="item.id">
-        <UCheckbox v-model="returnedItems[item.id]" :label="item.name" />
-      </li>
-    </ul>
-  </div>
-</template>
+## Au guichet
 
-<script setup>
-const handoutItems = computed(() => {
-  const items = []
+Deux points d'API servent le contrôle d'accès, et ils doivent rendre **la même chose** :
 
-  // Items du tarif
-  if (participant.tier?.handoutItems) {
-    items.push(...participant.tier.handoutItems.map((r) => r.handoutItem))
-  }
+- `POST ticketing/verify` — le scan d'un QR code, le geste normal à l'entrée ;
+- `POST ticketing/search` — la recherche par nom.
 
-  // Items des options (à implémenter selon votre logique)
+Leur divergence est la faute historique du module : le scan ne chargeait pas les options, et une
+même personne obtenait **deux listes différentes selon la façon dont on la trouvait**. Toute
+modification de l'un doit être portée sur l'autre, et `selectedOptionsIncludes` existe pour que
+l'oubli soit moins facile.
 
-  // Items bénévole
-  if (participant.isVolunteer) {
-    items.push(...volunteerItems.value)
-  }
+Le serveur rend **une seule liste agrégée** par personne. L'écran se contente de l'afficher — il
+ne recalcule rien, sous peine de réintroduire une seconde règle d'agrégation qui divergera.
 
-  return items
-})
-</script>
-```
+## Voir aussi
 
----
-
-## Bonnes Pratiques
-
-### 1. Nommage Clair
-
-Soyez explicite sur le type d'item :
-
-- ✅ "Badge réutilisable avec clip"
-- ❌ "Badge"
-
-### 2. Items Réutilisables vs Consommables
-
-Seuls les items réutilisables doivent être dans cette liste :
-
-- ✅ Badge avec puce RFID (à remettre)
-- ❌ Bracelet jetable (ne pas créer d'item)
-
-### 3. Suivi des Items
-
-Pour un suivi précis, implémentez un système de numérotation :
-
-```typescript
-{
-  name: 'Badge réutilisable #001-100'
-}
-```
-
-### 4. Items Bénévoles Séparés
-
-Créez des items spécifiques pour les bénévoles :
-
-- "Clé du local bénévoles"
-- "Badge bénévole avec accès backstage"
-
-### 5. Validation au Départ
-
-Implementez une validation qui vérifie que tous les items sont remiss avant de valider le départ d'un participant.
-
----
-
-## Dépannage
-
-### Item n'apparaît pas dans la liste
-
-**Cause** : L'item n'est pas associé au tarif/option du participant
-**Solution** : Vérifiez les relations `TicketingTierHandoutItem` et `TicketingOptionHandoutItem`.
-
-### Impossible de supprimer un item
-
-**Cause** : L'item est utilisé dans des relations actives
-**Solution** : La suppression en cascade devrait fonctionner. Vérifiez les contraintes de la base de données.
-
-### Items en double dans l'affichage
-
-**Cause** : Un participant a plusieurs tarifs/options qui référencent le même item
-**Solution** : Utilisez `Set` ou `Array.from(new Map(...))` pour dédupliquer.
-
----
-
-## Voir Aussi
-
-- [Tarifs](./tiers.md) - Association tarifs ↔ items
-- [Options](./options.md) - Association options ↔ items
-- [Contrôle d'Accès](./access-control.md) - Remise et remise des items
+- [`docs/volunteers/volunteer-handout-items-by-team.md`](../volunteers/volunteer-handout-items-by-team.md)
+  — la surcharge par équipe en détail
+- `server/utils/ticketing/handout-items.ts` — l'agrégation et le calcul pour un billet
+- `server/utils/ticketing/rapprochement-champ.ts` — la règle de rapprochement des champs,
+  partagée avec le décompte des quotas

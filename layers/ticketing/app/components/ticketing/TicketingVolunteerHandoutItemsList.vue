@@ -3,7 +3,7 @@
   <div v-if="loading" class="flex flex-col items-center justify-center py-16">
     <UIcon name="i-heroicons-arrow-path" class="h-10 w-10 text-purple-500 animate-spin mb-3" />
     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-      Chargement des articles bénévoles...
+      {{ $t('ticketing.handout_items.volunteer.loading') }}
     </p>
   </div>
 
@@ -14,7 +14,7 @@
         class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2"
       >
         <UIcon name="i-heroicons-users" class="h-4 w-4" />
-        Tous les bénévoles
+        {{ $t('ticketing.handout_items.volunteer.all_volunteers') }}
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
@@ -54,11 +54,11 @@
         </h3>
         <UBadge color="warning" variant="subtle" size="xs">
           <UIcon name="i-heroicons-arrow-path" class="h-3 w-3 mr-1" />
-          Remplace la config globale
+          {{ $t('ticketing.handout_items.volunteer.replaces_global_badge') }}
         </UBadge>
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-        Ces articles remplacent complètement les articles globaux pour les bénévoles de cette équipe
+        {{ $t('ticketing.handout_items.volunteer.replaces_global_explanation') }}
       </p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
@@ -79,7 +79,7 @@
               {{ item.name }}{{ item.quantity > 1 ? ` ×${item.quantity}` : '' }}
             </p>
             <p class="text-xs text-orange-600 dark:text-orange-400 mt-1 font-medium">
-              Équipe uniquement
+              {{ $t('ticketing.handout_items.volunteer.team_only') }}
             </p>
           </div>
         </div>
@@ -97,10 +97,10 @@
         <UIcon name="i-heroicons-gift" class="h-8 w-8 text-purple-400 dark:text-purple-500" />
       </div>
       <p class="text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Aucun article configuré
+        {{ $t('ticketing.handout_items.volunteer.none_configured') }}
       </p>
       <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm">
-        Sélectionnez une portée ci-dessous pour commencer
+        {{ $t('ticketing.handout_items.volunteer.none_configured_hint') }}
       </p>
     </div>
 
@@ -241,7 +241,7 @@ const itemsByTeam = computed(() => {
 
   return Array.from(teamMap.entries()).map(([teamId, items]) => ({
     teamId,
-    teamName: items[0]?.team?.name || 'Équipe inconnue',
+    teamName: items[0]?.team?.name || t('ticketing.handout_items.volunteer.unknown_team'),
     teamColor: items[0]?.team?.color || '#6b7280',
     items,
   }))
@@ -251,7 +251,7 @@ const itemsByTeam = computed(() => {
 const teamOptions = computed(() => {
   const options = [
     {
-      label: '🌍 Tous les bénévoles (global)',
+      label: t('ticketing.handout_items.volunteer.scope_all_option'),
       value: null,
     },
   ]
@@ -274,9 +274,12 @@ const teamOptions = computed(() => {
  * dire « rien » serait faux, et c'est la lecture qu'on fait spontanément d'un formulaire vide.
  */
 const apercuTitre = computed(() => {
-  if (selectedTeamId.value === null) return 'Ce que recevra un bénévole sans équipe configurée'
-  const nom = teams.value.find((e) => e.id === selectedTeamId.value)?.name ?? 'cette équipe'
-  return `Ce que recevra un bénévole de ${nom}`
+  if (selectedTeamId.value === null)
+    return t('ticketing.handout_items.volunteer.preview_global_title')
+  const nom =
+    teams.value.find((e) => e.id === selectedTeamId.value)?.name ??
+    t('ticketing.handout_items.volunteer.preview_this_team')
+  return t('ticketing.handout_items.volunteer.preview_team_title', { team: nom })
 })
 
 const apercuDetail = computed(() => {
@@ -294,11 +297,11 @@ const apercuDetail = computed(() => {
     const liste = nomsDe(selection.value)
     return selectedTeamId.value === null
       ? liste
-      : `${liste} — et rien du paramétrage global, que cette équipe remplace.`
+      : t('ticketing.handout_items.volunteer.preview_team_replaces', { items: liste })
   }
 
   if (selectedTeamId.value === null) {
-    return 'Rien : aucun article global.'
+    return t('ticketing.handout_items.volunteer.preview_nothing_global')
   }
 
   const globaux = globalItems.value.map((item) => ({
@@ -307,8 +310,8 @@ const apercuDetail = computed(() => {
   }))
 
   return globaux.length > 0
-    ? `${nomsDe(globaux)} — l'équipe ne remplace rien tant qu'aucun article ne lui est associé.`
-    : 'Rien : ni article d’équipe, ni article global.'
+    ? t('ticketing.handout_items.volunteer.preview_falls_back', { items: nomsDe(globaux) })
+    : t('ticketing.handout_items.volunteer.preview_nothing_at_all')
 })
 
 // Charger tous les articles à remettre disponibles
@@ -339,7 +342,7 @@ const { execute: executeSave, loading: saving } = useApiAction(
     method: 'PUT',
     body: () => ({ teamId: selectedTeamId.value, handoutItemIds: selection.value }),
     successMessage: { title: t('ticketing.handout_items.volunteer.saved') },
-    errorMessages: { default: "Impossible d'enregistrer les articles" },
+    errorMessages: { default: t('ticketing.handout_items.volunteer.error_saving') },
     onSuccess: () => {
       emit('refresh')
     },

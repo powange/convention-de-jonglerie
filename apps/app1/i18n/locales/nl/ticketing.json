@@ -98,7 +98,7 @@
     },
     "handout_items": {
       "list": {
-        "add_placeholder": "Nieuw artikel...",
+        "add_placeholder": "Nieuw artikel…",
         "delete_label": "Verwijderen",
         "delete_title": "Artikel verwijderen",
         "loading": "Laden...",
@@ -109,7 +109,15 @@
         "associations_summary": "Gekoppeld aan {details}",
         "delete_detaches": "Het is gekoppeld aan {details}. Bij verwijderen vervallen ook die koppelingen, en dat kan niet ongedaan worden gemaakt.",
         "delete_no_association": "Het is nog aan niets gekoppeld: verwijderen heeft verder geen gevolgen.",
-        "delete_question": "Artikel “{name}” verwijderen?"
+        "delete_question": "Artikel “{name}” verwijderen?",
+        "created_description": "Het uit te reiken artikel is aangemaakt",
+        "created_title": "Artikel aangemaakt",
+        "deleted_description": "Het uit te reiken artikel is verwijderd",
+        "deleted_title": "Artikel verwijderd",
+        "error_create": "Kan het artikel niet opslaan",
+        "error_delete": "Kan het artikel niet verwijderen",
+        "error_update": "Kan het artikel niet bijwerken",
+        "name_required": "De naam is verplicht"
       },
       "volunteer": {
         "choose_placeholder": "Kies een uit te reiken artikel...",
@@ -121,7 +129,24 @@
         "saved": "Artikelen opgeslagen",
         "scope_global_hint": "Wordt aan alle vrijwilligers uitgereikt, behalve aan wie in een team zit met eigen instellingen.",
         "scope_label": "Bereik",
-        "scope_replaces_global_warning": "De artikelen van een team VERVANGEN de globale artikelen: vrijwilligers van dit team krijgen alleen wat hier gekoppeld is, en niet langer de instelling “alle vrijwilligers”."
+        "scope_replaces_global_warning": "De artikelen van een team VERVANGEN de globale artikelen: vrijwilligers van dit team krijgen alleen wat hier gekoppeld is, en niet langer de instelling “alle vrijwilligers”.",
+        "all_volunteers": "Alle vrijwilligers",
+        "error_saving": "Kan de artikelen niet opslaan",
+        "loading": "Vrijwilligersartikelen laden…",
+        "none_configured": "Geen artikel ingesteld",
+        "none_configured_hint": "Kies hieronder een bereik om te beginnen",
+        "preview_falls_back": "{items} — het team vervangt niets zolang er geen artikel aan gekoppeld is.",
+        "preview_global_title": "Wat een vrijwilliger zonder teaminstellingen krijgt",
+        "preview_nothing_at_all": "Niets: geen teamartikel en geen globaal artikel.",
+        "preview_nothing_global": "Niets: geen globaal artikel.",
+        "preview_team_replaces": "{items} — en niets uit de globale instelling, die dit team vervangt.",
+        "preview_team_title": "Wat een vrijwilliger van {team} krijgt",
+        "preview_this_team": "dit team",
+        "replaces_global_badge": "Vervangt de globale instelling",
+        "replaces_global_explanation": "Deze artikelen vervangen de globale artikelen volledig voor de vrijwilligers van dit team",
+        "scope_all_option": "🌍 Alle vrijwilligers (globaal)",
+        "team_only": "Alleen team",
+        "unknown_team": "Onbekend team"
       },
       "associations": {
         "tarifs": "{count} tarief | {count} tarieven",

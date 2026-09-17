@@ -98,9 +98,9 @@
     },
     "handout_items": {
       "list": {
-        "add_placeholder": "Nuevo artículo...",
+        "add_placeholder": "Nuevo artículo…",
         "delete_label": "Eliminar",
-        "delete_title": "Eliminar artículo",
+        "delete_title": "Eliminar el artículo",
         "loading": "Cargando...",
         "name_placeholder": "Nombre del artículo",
         "cumulative_help": "Un artículo acumulable se entrega tantas veces como esté asociado al participante (por ejemplo, un artista que actúa en dos espectáculos). En caso contrario, solo se entrega una vez.",
@@ -109,7 +109,15 @@
         "associations_summary": "Vinculado a {details}",
         "delete_detaches": "Está vinculado a {details}. Al eliminarlo también se quitarán esos vínculos, y no hay vuelta atrás.",
         "delete_no_association": "De momento no está vinculado a nada: eliminarlo no tiene ningún otro efecto.",
-        "delete_question": "¿Eliminar el artículo «{name}»?"
+        "delete_question": "¿Eliminar el artículo «{name}»?",
+        "created_description": "El artículo a entregar ha sido creado",
+        "created_title": "Artículo creado",
+        "deleted_description": "El artículo a entregar ha sido eliminado",
+        "deleted_title": "Artículo eliminado",
+        "error_create": "No se ha podido guardar el artículo",
+        "error_delete": "No se ha podido eliminar el artículo",
+        "error_update": "No se ha podido actualizar el artículo",
+        "name_required": "El nombre es obligatorio"
       },
       "volunteer": {
         "choose_placeholder": "Elegir un artículo a entregar...",
@@ -121,7 +129,24 @@
         "saved": "Artículos guardados",
         "scope_global_hint": "Se entrega a todos los voluntarios, salvo a aquellos cuyo equipo tiene su propia configuración.",
         "scope_label": "Ámbito",
-        "scope_replaces_global_warning": "Los artículos de un equipo SUSTITUYEN a los artículos globales: los voluntarios de este equipo solo recibirán lo que se vincule aquí, y ya no la configuración «todos los voluntarios»."
+        "scope_replaces_global_warning": "Los artículos de un equipo SUSTITUYEN a los artículos globales: los voluntarios de este equipo solo recibirán lo que se vincule aquí, y ya no la configuración «todos los voluntarios».",
+        "all_volunteers": "Todos los voluntarios",
+        "error_saving": "No se han podido guardar los artículos",
+        "loading": "Cargando los artículos de voluntarios…",
+        "none_configured": "Ningún artículo configurado",
+        "none_configured_hint": "Seleccione un ámbito abajo para empezar",
+        "preview_falls_back": "{items} — el equipo no sustituye nada mientras no se le asocie ningún artículo.",
+        "preview_global_title": "Lo que recibirá un voluntario sin equipo configurado",
+        "preview_nothing_at_all": "Nada: ni artículo de equipo, ni artículo global.",
+        "preview_nothing_global": "Nada: ningún artículo global.",
+        "preview_team_replaces": "{items} — y nada de la configuración global, que este equipo sustituye.",
+        "preview_team_title": "Lo que recibirá un voluntario de {team}",
+        "preview_this_team": "este equipo",
+        "replaces_global_badge": "Sustituye la configuración global",
+        "replaces_global_explanation": "Estos artículos sustituyen por completo a los artículos globales para los voluntarios de este equipo",
+        "scope_all_option": "🌍 Todos los voluntarios (global)",
+        "team_only": "Solo equipo",
+        "unknown_team": "Equipo desconocido"
       },
       "associations": {
         "tarifs": "{count} tarifa | {count} tarifas",

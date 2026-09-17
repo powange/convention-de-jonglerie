@@ -98,7 +98,7 @@
     },
     "handout_items": {
       "list": {
-        "add_placeholder": "Neuer Artikel...",
+        "add_placeholder": "Neuer Artikel…",
         "delete_label": "Löschen",
         "delete_title": "Artikel löschen",
         "loading": "Lädt...",
@@ -109,7 +109,15 @@
         "associations_summary": "Verknüpft mit {details}",
         "delete_detaches": "Er ist mit {details} verknüpft. Beim Löschen werden auch diese Verknüpfungen entfernt – das lässt sich nicht rückgängig machen.",
         "delete_no_association": "Er ist bisher mit nichts verknüpft: Das Löschen hat keine weiteren Folgen.",
-        "delete_question": "Artikel „{name}“ löschen?"
+        "delete_question": "Artikel „{name}“ löschen?",
+        "created_description": "Der auszugebende Artikel wurde erstellt",
+        "created_title": "Artikel erstellt",
+        "deleted_description": "Der auszugebende Artikel wurde gelöscht",
+        "deleted_title": "Artikel gelöscht",
+        "error_create": "Artikel konnte nicht gespeichert werden",
+        "error_delete": "Artikel konnte nicht gelöscht werden",
+        "error_update": "Artikel konnte nicht aktualisiert werden",
+        "name_required": "Der Name ist erforderlich"
       },
       "volunteer": {
         "choose_placeholder": "Einen auszugebenden Artikel auswählen...",
@@ -121,7 +129,24 @@
         "saved": "Artikel gespeichert",
         "scope_global_hint": "Wird an alle Helfer ausgegeben, außer an jene, deren Team eigene Einstellungen hat.",
         "scope_label": "Geltungsbereich",
-        "scope_replaces_global_warning": "Die Artikel eines Teams ERSETZEN die globalen Artikel: Helfer dieses Teams erhalten nur, was hier verknüpft ist, und nicht mehr die Einstellung „alle Helfer“."
+        "scope_replaces_global_warning": "Die Artikel eines Teams ERSETZEN die globalen Artikel: Helfer dieses Teams erhalten nur, was hier verknüpft ist, und nicht mehr die Einstellung „alle Helfer“.",
+        "all_volunteers": "Alle Helfer",
+        "error_saving": "Artikel konnten nicht gespeichert werden",
+        "loading": "Helfer-Artikel werden geladen…",
+        "none_configured": "Kein Artikel eingerichtet",
+        "none_configured_hint": "Wählen Sie unten einen Geltungsbereich, um zu beginnen",
+        "preview_falls_back": "{items} — das Team ersetzt nichts, solange ihm kein Artikel zugeordnet ist.",
+        "preview_global_title": "Was ein Helfer ohne Team-Einstellungen erhält",
+        "preview_nothing_at_all": "Nichts: weder Team-Artikel noch globaler Artikel.",
+        "preview_nothing_global": "Nichts: kein globaler Artikel.",
+        "preview_team_replaces": "{items} — und nichts aus der globalen Einstellung, die dieses Team ersetzt.",
+        "preview_team_title": "Was ein Helfer aus {team} erhält",
+        "preview_this_team": "dieses Team",
+        "replaces_global_badge": "Ersetzt die globale Einstellung",
+        "replaces_global_explanation": "Diese Artikel ersetzen die globalen Artikel für die Helfer dieses Teams vollständig",
+        "scope_all_option": "🌍 Alle Helfer (global)",
+        "team_only": "Nur Team",
+        "unknown_team": "Unbekanntes Team"
       },
       "associations": {
         "tarifs": "{count} Tarif | {count} Tarife",

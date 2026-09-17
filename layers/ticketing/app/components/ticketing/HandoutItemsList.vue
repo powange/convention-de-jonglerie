@@ -170,10 +170,10 @@ const { execute: executeDeleteItem, loading: deleting } = useApiAction(
   {
     method: 'DELETE',
     successMessage: {
-      title: 'Item supprimé',
-      description: "L'item à remettre a été supprimé avec succès",
+      title: t('ticketing.handout_items.list.deleted_title'),
+      description: t('ticketing.handout_items.list.deleted_description'),
     },
-    errorMessages: { default: "Impossible de supprimer l'item" },
+    errorMessages: { default: t('ticketing.handout_items.list.error_delete') },
     onSuccess: () => {
       deleteConfirmOpen.value = false
       itemToDelete.value = null
@@ -196,7 +196,7 @@ const { execute: executeUpdateItem } = useApiActionById(
     method: 'PUT',
     body: () => ({ ...pendingUpdate.value }),
     silentSuccess: true,
-    errorMessages: { default: "Impossible de mettre à jour l'item" },
+    errorMessages: { default: t('ticketing.handout_items.list.error_update') },
     onSuccess: () => {
       emit('refresh')
     },
@@ -206,8 +206,8 @@ const { execute: executeUpdateItem } = useApiActionById(
 const updateItem = (itemId: number, name: string) => {
   if (!name.trim()) {
     toast.add({
-      title: 'Erreur',
-      description: 'Le nom est obligatoire',
+      title: t('common.error'),
+      description: t('ticketing.handout_items.list.name_required'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -230,10 +230,10 @@ const { execute: executeHandleSave, loading: saving } = useApiAction(
     method: 'POST',
     body: () => ({ name: form.value.name.trim(), cumulative: form.value.cumulative }),
     successMessage: {
-      title: 'Item créé',
-      description: "L'item à remettre a été créé avec succès",
+      title: t('ticketing.handout_items.list.created_title'),
+      description: t('ticketing.handout_items.list.created_description'),
     },
-    errorMessages: { default: "Impossible d'enregistrer l'item" },
+    errorMessages: { default: t('ticketing.handout_items.list.error_create') },
     onSuccess: () => {
       form.value.name = ''
       form.value.cumulative = false
@@ -245,8 +245,8 @@ const { execute: executeHandleSave, loading: saving } = useApiAction(
 const handleSave = () => {
   if (!form.value.name.trim()) {
     toast.add({
-      title: 'Erreur',
-      description: 'Le nom est obligatoire',
+      title: t('common.error'),
+      description: t('ticketing.handout_items.list.name_required'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })

@@ -98,9 +98,9 @@
     },
     "handout_items": {
       "list": {
-        "add_placeholder": "New item...",
+        "add_placeholder": "New item…",
         "delete_label": "Delete",
-        "delete_title": "Delete item",
+        "delete_title": "Delete the item",
         "loading": "Loading...",
         "name_placeholder": "Item name",
         "cumulative_help": "A cumulative item is handed out as many times as it is linked to the participant (for example an artist performing in two shows). Otherwise it is handed out only once.",
@@ -109,7 +109,15 @@
         "associations_summary": "Linked to {details}",
         "delete_detaches": "It is linked to {details}. Deleting it will also remove those links, and this cannot be undone.",
         "delete_no_association": "It is not linked to anything yet: deleting it has no other effect.",
-        "delete_question": "Delete the item “{name}”?"
+        "delete_question": "Delete the item “{name}”?",
+        "created_description": "The handout item has been created",
+        "created_title": "Item created",
+        "deleted_description": "The handout item has been deleted",
+        "deleted_title": "Item deleted",
+        "error_create": "Could not save the item",
+        "error_delete": "Could not delete the item",
+        "error_update": "Could not update the item",
+        "name_required": "The name is required"
       },
       "volunteer": {
         "choose_placeholder": "Choose an item to hand out...",
@@ -121,7 +129,24 @@
         "saved": "Items saved",
         "scope_global_hint": "Handed out to every volunteer, except those whose team has its own settings.",
         "scope_label": "Scope",
-        "scope_replaces_global_warning": "A team's items REPLACE the global items: volunteers in this team will only receive what is linked here, and no longer the “all volunteers” settings."
+        "scope_replaces_global_warning": "A team's items REPLACE the global items: volunteers in this team will only receive what is linked here, and no longer the “all volunteers” settings.",
+        "all_volunteers": "All volunteers",
+        "error_saving": "Could not save the items",
+        "loading": "Loading volunteer items…",
+        "none_configured": "No item set up",
+        "none_configured_hint": "Pick a scope below to get started",
+        "preview_falls_back": "{items} — the team replaces nothing until an item is linked to it.",
+        "preview_global_title": "What a volunteer with no team settings will receive",
+        "preview_nothing_at_all": "Nothing: no team item, and no global item.",
+        "preview_nothing_global": "Nothing: no global item.",
+        "preview_team_replaces": "{items} — and nothing from the global settings, which this team replaces.",
+        "preview_team_title": "What a volunteer from {team} will receive",
+        "preview_this_team": "this team",
+        "replaces_global_badge": "Replaces the global settings",
+        "replaces_global_explanation": "These items completely replace the global items for the volunteers in this team",
+        "scope_all_option": "🌍 All volunteers (global)",
+        "team_only": "Team only",
+        "unknown_team": "Unknown team"
       },
       "associations": {
         "tarifs": "{count} tier | {count} tiers",
