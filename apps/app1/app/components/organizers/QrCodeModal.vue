@@ -89,9 +89,15 @@ const isOpen = computed({
 useModeClairTemporaire(isOpen)
 
 const editionOrganizerId = computed(() => props.editionOrganizer?.id)
+const qrCodeToken = computed(() => props.editionOrganizer?.qrCodeToken)
 
 const qrCodeValue = computed(() => {
-  return editionOrganizerId.value ? `organizer-${editionOrganizerId.value}` : ''
+  // Même règle que la modale des bénévoles : le jeton fait partie du code, ou il n'y a pas de
+  // code. Ce composant n'est monté nulle part aujourd'hui — raison de plus pour qu'il ne porte
+  // pas une forme que le contrôle d'accès refuse.
+  if (!editionOrganizerId.value || !qrCodeToken.value) return ''
+
+  return `organizer-${editionOrganizerId.value}-${qrCodeToken.value}`
 })
 
 const getEditionDisplayName = (edition: any) => {

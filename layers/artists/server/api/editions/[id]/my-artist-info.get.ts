@@ -19,6 +19,9 @@ export default wrapApiHandler(
       },
       select: {
         id: true,
+        // Sans lui, le QR code rendu plus bas n'était qu'un `artist-{id}` que le contrôle
+        // d'accès ne peut plus accepter : le jeton est ce qui distingue cet artiste du voisin.
+        qrCodeToken: true,
         arrivalDateTime: true,
         departureDateTime: true,
         payment: true,
@@ -167,7 +170,9 @@ export default wrapApiHandler(
         firstName: artist.user.prenom,
         lastName: artist.user.nom,
         email: artist.user.email,
-        qrCode: `artist-${artist.id}`, // Format compatible avec le contrôle d'accès
+        // Le même format que « mes billets » : `artist-{id}-{jeton}`. Cet écran émettait un
+        // `artist-{id}` sans jeton, et c'est lui qui obligeait le scan à accepter cette forme.
+        qrCode: artist.qrCodeToken ? `artist-${artist.id}-${artist.qrCodeToken}` : null,
         arrivalDateTime: artist.arrivalDateTime,
         departureDateTime: artist.departureDateTime,
         // Le profil fait foi, ici comme dans les listes de repas. Sans cette résolution,

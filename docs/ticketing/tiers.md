@@ -1,513 +1,152 @@
-# Gestion des Tarifs (TicketingTiers)
+# Les tarifs
 
-Les tarifs définissent les différents types de billets disponibles pour une édition (adulte, enfant, pass weekend, etc.).
+Un tarif, c'est ce qu'on achète : un nom, un prix, une période de validité, et tout ce qui en
+découle — des quotas occupés, des articles à remettre, des repas, des champs personnalisés à
+renseigner, des options proposées.
 
-## Caractéristiques
+Un tarif vient de deux endroits : **saisi ici**, ou **importé d'une billetterie externe**. La
+différence tient à une seule colonne, et elle n'est pas celle qu'on croit.
 
-### Types de Tarifs
-
-1. **Tarifs HelloAsso** (synchronisés)
-   - Importés automatiquement depuis HelloAsso
-   - Champ `helloAssoTierId` non null
-   - Informations non modifiables (sauf relations)
-   - Suppression impossible
-
-2. **Tarifs Manuels**
-   - Créés manuellement par l'organisateur
-   - Champ `helloAssoTierId` null
-   - Entièrement modifiables
-   - Supprimables
-
-### Propriétés d'un Tarif
-
-```typescript
-interface TierData {
-  name: string // Nom du tarif (ex: "Adulte", "Enfant")
-  description?: string | null // Description optionnelle
-  price: number // Prix en centimes
-  minAmount?: number | null // Montant minimum (tarifs libres)
-  maxAmount?: number | null // Montant maximum (tarifs libres)
-  position: number // Ordre d'affichage
-  isActive: boolean // Tarif actif ou non
-  quotaIds?: number[] // Quotas associés
-  handoutItemIds?: number[] // Items à remettre associés
-}
-```
-
-## Modèle de Données
-
-### Table `TicketingTier`
+## Le modèle
 
 ```prisma
 model TicketingTier {
-  id                  Int      @id @default(autoincrement())
-  externalTicketingId String?  // Null si tarif manuel
-  helloAssoTierId     Int?     // ID HelloAsso, null si manuel
-  editionId           Int      // Lien vers l'édition
+  id                  Int
+  editionId           Int       // toujours renseigné
+  externalTicketingId String?   // nul si le tarif est manuel
+  helloAssoTierId     Int?      // nul si le tarif est manuel
   name                String
-  description         String?  @db.Text
-  price               Int      // Prix en centimes
-  minAmount           Int?     // Pour tarifs libres
-  maxAmount           Int?     // Pour tarifs libres
-  isActive            Boolean  @default(true)
-  position            Int      @default(0)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  externalTicketing ExternalTicketing?     @relation(...)
-  edition           Edition                 @relation(...)
-  quotas            TicketingTierQuota[]            // Relations quotas
-  handoutItems   TicketingTierHandoutItem[]   // Relations items
-  orderItems        TicketingOrderItem[]   // Billets vendus
+  customName          String?   // prioritaire sur `name` à l'affichage
+  description         String?
+  price               Int       // en CENTIMES
+  minAmount           Int?      // tarifs libres
+  maxAmount           Int?
+  isActive            Boolean   @default(true)
+  position            Int       @default(0)
+  countAsParticipant  Boolean   @default(true)
+  validFrom           DateTime?
+  validUntil          DateTime?
 
   @@unique([externalTicketingId, helloAssoTierId])
-  @@index([externalTicketingId])
-  @@index([editionId])
 }
 ```
 
-### Relations
+### `customName` : renommer sans casser la synchronisation
 
-#### TicketingTierQuota
+`name` porte le libellé du fournisseur et la synchronisation le réécrit à chaque passage.
+`customName` est le nom qu'on choisit ici, et il survit. `applyCustomName` (dans
+`server/utils/editions/ticketing/tiers.ts`) rabat simplement l'un sur l'autre à la lecture :
 
-Associe un tarif à un ou plusieurs quotas.
-
-```prisma
-model TicketingTierQuota {
-  id      Int @id @default(autoincrement())
-  tierId  Int
-  quotaId Int
-
-  tier  TicketingTier  @relation(...)
-  quota TicketingQuota @relation(...)
-
-  @@unique([tierId, quotaId])
-}
+```ts
+name: tier.customName || tier.name
 ```
 
-**Exemple** : Le tarif "Adulte avec repas" consomme le quota "Places totales" ET le quota "Repas".
+Les écrans ne voient donc qu'un `name`. Le rapprochement avec la billetterie externe, lui,
+continue de se faire sur `helloAssoTierId`.
 
-#### TicketingTierHandoutItem
+### `countAsParticipant` : ce qui est une entrée, et ce qui est autre chose
 
-Associe un tarif à un ou plusieurs items à remettre.
+Vrai par défaut. À faux pour ce qui se vend sans être une venue — un tee-shirt, une adhésion, un
+don. Ce drapeau sépare les deux séries des statistiques de validation.
 
-```prisma
-model TicketingTierHandoutItem {
-  id               Int @id @default(autoincrement())
-  tierId           Int
-  handoutItemId Int
+⚠️ Il vit sur le **tarif**. Un billet sans tarif n'est donc ni « participant » ni « autre » — voir
+plus bas.
 
-  tier           TicketingTier  @relation(...)
-  handoutItem TicketingHandoutItem @relation(...)
+### `validFrom` / `validUntil` : une disponibilité, pas une activation
 
-  @@unique([tierId, handoutItemId])
-}
-```
+`isActive` est un interrupteur manuel. Les deux dates sont une fenêtre, évaluée **à la lecture** par
+`tiers/available.get` et non par une tâche de fond : un tarif hors fenêtre existe toujours, il n'est
+simplement plus proposé. Le paramètre `?showAll=true` le rend quand même.
 
-**Exemple** : Le tarif "Pass Weekend" nécessite de remettre un "Badge" et un "T-shirt".
+### L'unicité, et ce qu'elle ne couvre pas
 
-## API Routes
+`@@unique([externalTicketingId, helloAssoTierId])` empêche d'importer deux fois le même tarif
+fournisseur. Sous MySQL, deux `NULL` étant distincts, elle n'entrave pas les tarifs manuels.
 
-### Récupérer les Tarifs
+**Rien n'impose que deux tarifs d'une même édition portent des noms différents** — contrairement aux
+articles à remettre, qui ont reçu cette contrainte.
 
-**Route** : `GET /api/editions/:id/ticketing/tiers`
+## Ce qu'un tarif porte
 
-**Permission** : `canAccessEditionData`
+| Table                                 | Ce qu'elle attache            |
+| ------------------------------------- | ----------------------------- |
+| `TicketingTierQuota`                  | les quotas occupés            |
+| `TicketingTierHandoutItem`            | les articles à remettre, avec quantité |
+| `TicketingTierMeal`                   | les repas ouverts             |
+| `TicketingTierOption`                 | les options proposées         |
+| `TicketingTierCustomFieldAssociation` | les champs personnalisés demandés |
+| `TicketingOrderItem`                  | les billets vendus            |
 
-**Réponse** :
+## Supprimer un tarif
 
-```typescript
-TicketingTier[] // Avec relations quotas et handoutItems
-```
+Deux chemins, et ils n'ont pas les mêmes gardes.
 
-**Utilisation** : Liste complète des tarifs pour la gestion
+**À la main** (`DELETE …/tiers/:tierId`) : refusé avec un **403** si le tarif vient de HelloAsso
+(`helloAssoTierId` non nul). Un tarif synchronisé ne se supprime pas ici, il se supprime chez le
+fournisseur.
 
----
+**Par la synchronisation** (`POST …/helloasso/tiers`) : les tarifs absents de la réponse sont
+supprimés. `decisionSuppression` écarte la suppression quand la réponse ne contient **aucun** tarif —
+une réponse vraisemblablement incomplète. Aucun seuil de proportion au-delà : passer de dix tarifs à
+deux est un geste d'organisateur banal.
 
-### Récupérer les Tarifs Disponibles
+> ⚠️ **Dans les deux cas, les billets déjà vendus survivent — détachés.** La clé étrangère
+> `TicketingOrderItem.tierId` est en `ON DELETE SET NULL`. Le billet perd alors ses quotas, ses
+> articles à remettre, ses repas, ses champs personnalisés et son `countAsParticipant`, et
+> **disparaît des statistiques de validation par tarif** sans que rien ne le signale. Sur une copie
+> des données de production, 47 lignes sont déjà dans cet état — dont 35 billets importés qu'aucun
+> tarif n'a rapprochés.
 
-**Route** : `GET /api/editions/:id/ticketing/tiers/available`
+## Le rapprochement à l'import
 
-**Permission** : Publique (si édition accessible)
+Pour chaque ligne de commande reçue, la synchronisation cherche son tarif dans cet ordre :
 
-**Réponse** :
+1. `item.tierId === tier.helloAssoTierId` — l'identifiant du fournisseur ;
+2. à défaut, **le nom** : `tier.name === item.name || tier.name === item.priceCategory`.
 
-```typescript
-{
-  tiers: TicketingTier[] // Seulement les tarifs actifs
-}
-```
+Le second niveau est un repli par libellé, avec le défaut que cela suppose : renommer un tarif chez
+le fournisseur détache les lignes à importer. Les lignes qu'aucun tarif ne rapproche sont créées
+avec `tierId: null` et un message dans les journaux.
 
-**Utilisation** : Affichage public des tarifs disponibles (ex: formulaire d'inscription)
+## Les points d'API
 
----
+Tous exigent `canManageTicketingById`, sauf mention contraire.
 
-### Créer un Tarif Manuel
+| Route                                      | Rôle                                                  |
+| ------------------------------------------ | ----------------------------------------------------- |
+| `GET    …/ticketing/tiers`                  | liste complète — **admet aussi le guichet**           |
+| `GET    …/ticketing/tiers/available`        | ceux dans leur fenêtre de validité (`?showAll=true` pour tous) — **admet aussi le guichet** |
+| `GET    …/ticketing/tiers/public`           | **route publique** : tarifs actifs, pour le SEO. Rend 404 si l'édition n'est pas visible publiquement |
+| `POST   …/ticketing/tiers`                  | création d'un tarif manuel                            |
+| `PUT    …/ticketing/tiers/:tierId`          | modification                                          |
+| `DELETE …/ticketing/tiers/:tierId`          | suppression — 403 sur un tarif HelloAsso              |
+| `PUT    …/ticketing/tiers/reorder`          | ordre d'affichage                                     |
+| `PUT    …/ticketing/tiers/:tierId/quotas`   | remplace les quotas du tarif                          |
+| `PUT    …/ticketing/tiers/:tierId/handout-items` | remplace les articles du tarif                   |
+| `POST   …/ticketing/helloasso/tiers`        | synchronise tarifs, options et champs personnalisés   |
 
-**Route** : `POST /api/editions/:id/ticketing/tiers`
+Le corps de création : `name` (obligatoire), `price` en centimes (≥ 0), et en option `customName`,
+`description`, `minAmount`, `maxAmount`, `position`, `isActive`, `countAsParticipant`, `validFrom`,
+`validUntil`, `handoutItemIds`, `mealIds`.
 
-**Permission** : `canManageEditionVolunteers`
+## Les écrans
 
-**Body** :
+- `gestion/ticketing/tiers.vue` — la page, et la synchronisation
+- `TicketingTiersList.vue` — la liste, l'ordre, les actions
+- `TierModal.vue` — création et modification, 650 lignes : c'est là que se posent quotas, articles,
+  repas et champs personnalisés
 
-```typescript
-{
-  name: string              // Obligatoire
-  description?: string
-  price: number            // En centimes, >= 0
-  minAmount?: number       // En centimes, >= 0
-  maxAmount?: number       // En centimes, >= 0
-  position?: number        // Défaut: 0
-  isActive?: boolean       // Défaut: true
-  quotaIds?: number[]      // Défaut: []
-  handoutItemIds?: number[] // Défaut: []
-}
-```
+## Ce que le système ne fait pas
 
-**Réponse** :
-
-```typescript
-{
-  success: true
-  tier: TicketingTier
-}
-```
-
-**Validation Zod** :
-
-```typescript
-const bodySchema = z.object({
-  name: z.string().min(1),
-  description: z.string().nullable().optional(),
-  price: z.number().int().min(0),
-  minAmount: z.number().int().min(0).nullable().optional(),
-  maxAmount: z.number().int().min(0).nullable().optional(),
-  position: z.number().int().min(0).default(0),
-  isActive: z.boolean().default(true),
-  quotaIds: z.array(z.number().int()).optional().default([]),
-  handoutItemIds: z.array(z.number().int()).optional().default([]),
-})
-```
-
----
-
-### Modifier un Tarif
-
-**Route** : `PUT /api/editions/:id/ticketing/tiers/:tierId`
-
-**Permission** : `canManageEditionVolunteers`
-
-**Body** : Identique à la création
-
-**Comportement** :
-
-- **Tarif HelloAsso** : Seules les relations (quotas, handoutItems) sont modifiables
-- **Tarif manuel** : Tous les champs sont modifiables
-
-**Réponse** :
-
-```typescript
-{
-  success: true
-  tier: TicketingTier
-}
-```
-
-**Erreurs** :
-
-- `404` : Tarif introuvable
-- `403` : Tarif n'appartient pas à cette édition
-
----
-
-### Supprimer un Tarif Manuel
-
-**Route** : `DELETE /api/editions/:id/ticketing/tiers/:tierId`
-
-**Permission** : `canManageEditionVolunteers`
-
-**Réponse** :
-
-```typescript
-{
-  success: true
-  message: 'Tarif supprimé avec succès'
-}
-```
-
-**Erreurs** :
-
-- `404` : Tarif introuvable
-- `403` : Impossible de supprimer un tarif HelloAsso (synchronisé)
-
----
-
-## Utilitaire Serveur
-
-**Fichier** : `server/utils/editions/ticketing/tiers.ts`
-
-### Fonctions Disponibles
-
-#### `getEditionTiers(editionId: number)`
-
-Récupère tous les tarifs d'une édition avec leurs relations.
-
-```typescript
-const tiers = await getEditionTiers(editionId)
-// Retourne: TicketingTier[] avec quotas et handoutItems
-```
-
-#### `createTier(editionId: number, data: TierData)`
-
-Crée un nouveau tarif manuel.
-
-```typescript
-const tier = await createTier(editionId, {
-  name: 'Tarif Étudiant',
-  price: 1500, // 15€
-  position: 2,
-  isActive: true,
-  quotaIds: [1, 3],
-  handoutItemIds: [2],
-})
-```
-
-#### `updateTier(tierId: number, editionId: number, data: TierData)`
-
-Met à jour un tarif existant.
-
-**Logique** :
-
-1. Vérifie que le tarif existe et appartient à l'édition
-2. Détermine si c'est un tarif HelloAsso ou manuel
-3. Supprime les anciennes relations
-4. Met à jour les champs (tous si manuel, seulement relations si HelloAsso)
-5. Recrée les nouvelles relations
-
-```typescript
-const tier = await updateTier(5, editionId, {
-  name: 'Tarif Étudiant - Modifié',
-  price: 1200, // 12€
-  quotaIds: [1], // Supprime le quota 3
-  handoutItemIds: [],
-})
-```
-
-#### `deleteTier(tierId: number, editionId: number)`
-
-Supprime un tarif manuel.
-
-**Validations** :
-
-- Le tarif doit exister et appartenir à l'édition
-- Le tarif ne doit pas être un tarif HelloAsso (`helloAssoTierId` doit être null)
-
-```typescript
-await deleteTier(5, editionId)
-// Retourne: { success: true, message: "..." }
-```
-
----
-
-## Composants Vue
-
-### `TiersList.vue`
-
-**Localisation** : `app/components/ticketing/TiersList.vue`
-
-**Fonctionnalités** :
-
-- Affiche la liste des tarifs
-- Indique les tarifs HelloAsso (badge)
-- Affiche le prix formaté
-- Affiche les quotas et items associés
-- Boutons d'édition/suppression (si manuel)
-
-**Props** :
-
-```typescript
-{
-  editionId: number
-}
-```
-
-### `TierModal.vue`
-
-**Localisation** : `app/components/ticketing/TierModal.vue`
-
-**Fonctionnalités** :
-
-- Formulaire de création/modification
-- Sélection multiple de quotas
-- Sélection multiple d'items à remettre
-- Validation côté client
-- Champs désactivés pour tarifs HelloAsso (sauf relations)
-
-**Props** :
-
-```typescript
-{
-  editionId: number
-  tier?: TicketingTier | null // Si modification
-  quotas: TicketingQuota[]
-  handoutItems: TicketingHandoutItem[]
-}
-```
-
----
-
-## Utilitaires Client
-
-**Fichier** : `app/utils/ticketing/tiers.ts`
-
-### Fonctions Helper
-
-```typescript
-// Formater le prix en euros
-export function formatTierPrice(priceInCents: number): string {
-  return `${(priceInCents / 100).toFixed(2)}€`
-}
-
-// Déterminer si un tarif est HelloAsso
-export function isHelloAssoTier(tier: TicketingTier): boolean {
-  return tier.helloAssoTierId !== null
-}
-
-// Vérifier si un tarif est un tarif libre
-export function isFreePriceTier(tier: TicketingTier): boolean {
-  return tier.minAmount !== null || tier.maxAmount !== null
-}
-```
-
----
-
-## Cas d'Usage
-
-### 1. Créer un Tarif "Étudiant"
-
-```typescript
-const tier = await $fetch(`/api/editions/${editionId}/ticketing/tiers`, {
-  method: 'POST',
-  body: {
-    name: 'Étudiant',
-    description: 'Tarif réduit pour les étudiants',
-    price: 1000, // 10€
-    position: 3,
-    isActive: true,
-    quotaIds: [quotaPlacesId],
-    handoutItemIds: [badgeId],
-  },
-})
-```
-
-### 2. Modifier les Quotas d'un Tarif HelloAsso
-
-```typescript
-// Seules les relations peuvent être modifiées
-await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
-  method: 'PUT',
-  body: {
-    name: tier.name, // Obligatoire mais ignoré
-    price: tier.price, // Obligatoire mais ignoré
-    quotaIds: [1, 2, 5], // Nouvelle liste de quotas
-    handoutItemIds: tier.handoutItems.map((i) => i.id),
-  },
-})
-```
-
-### 3. Désactiver un Tarif Manuel
-
-```typescript
-await $fetch(`/api/editions/${editionId}/ticketing/tiers/${tierId}`, {
-  method: 'PUT',
-  body: {
-    ...tier,
-    isActive: false, // Le tarif n'apparaîtra plus dans "available"
-  },
-})
-```
-
-### 4. Afficher les Tarifs Disponibles (Public)
-
-```typescript
-const { tiers } = await $fetch(`/api/editions/${editionId}/ticketing/tiers/available`)
-
-// Trie par position puis par prix
-const sortedTiers = tiers.sort((a, b) => {
-  if (a.position !== b.position) return a.position - b.position
-  return b.price - a.price
-})
-```
-
----
-
-## Bonnes Pratiques
-
-### 1. Position des Tarifs
-
-Utilisez `position` pour contrôler l'ordre d'affichage :
-
-- Position 0 : Tarifs principaux (Adulte, Enfant)
-- Position 1 : Tarifs secondaires (Étudiant, Senior)
-- Position 2 : Tarifs spéciaux (Bénévole, Organisateur)
-
-### 2. Tarifs Libres
-
-Pour les tarifs à prix libre, définissez `minAmount` et/ou `maxAmount` :
-
-```typescript
-{
-  name: "Don libre",
-  price: 500, // Prix suggéré: 5€
-  minAmount: 100, // Minimum: 1€
-  maxAmount: 10000 // Maximum: 100€
-}
-```
-
-### 3. Relations Quotas
-
-Associez systématiquement les tarifs aux quotas pertinents :
-
-- Quota "Places totales" → Tous les tarifs
-- Quota "Repas végétarien" → Tarifs avec repas végétarien
-- Quota "Pass 2 jours" → Tarifs multi-jours
-
-### 4. Items à Remettre
-
-N'associez des items que si nécessaire :
-
-- Badge réutilisable → À remettre
-- T-shirt offert → Pas à remettre
-- Clé de casier → À remettre
-
-### 5. Synchronisation HelloAsso
-
-Après modification de la configuration HelloAsso, rechargez les tarifs pour synchroniser les changements.
-
----
-
-## Dépannage
-
-### Erreur : "Impossible de supprimer un tarif synchronisé depuis HelloAsso"
-
-**Cause** : Tentative de suppression d'un tarif HelloAsso
-**Solution** : Les tarifs HelloAsso ne peuvent pas être supprimés. Désactivez-les via HelloAsso ou désactivez la synchronisation.
-
-### Erreur : "Tarif introuvable"
-
-**Cause** : Le `tierId` est invalide ou le tarif n'appartient pas à cette édition
-**Solution** : Vérifiez que le tarif existe et appartient bien à l'édition.
-
-### Les quotas ne se décomptent pas
-
-**Cause** : Les relations `TicketingTierQuota` ne sont pas créées
-**Solution** : Associez les tarifs aux quotas via l'interface ou l'API.
-
----
-
-## Voir Aussi
-
-- [Quotas](./quotas.md) - Gestion des quotas
-- [Items à Remettre](./handout-items.md) - Gestion des items
-- [Commandes](./orders.md) - Utilisation des tarifs dans les commandes
-- [Intégration HelloAsso](./external-integration.md) - Synchronisation des tarifs
+- **Il ne limite pas les ventes.** Le quota d'un tarif compte, il ne refuse pas — voir
+  [les quotas](quotas.md).
+- **Il ne gère pas de stock par tarif** : `minAmount` / `maxAmount` sont des bornes de *prix* pour
+  les tarifs libres, pas des quantités.
+- **Il n'historise pas les changements de prix** : un billet porte le montant payé, le tarif porte
+  le prix courant, et rien ne relie les deux dans le temps.
+
+## Voir aussi
+
+- [Les options](options.md) · [Les quotas](quotas.md) · [Les articles à remettre](handout-items.md)
+- [L'intégration externe](external-integration.md) — ce que la synchronisation écrase
+- [Les commandes](orders.md) — ce que devient un tarif une fois vendu

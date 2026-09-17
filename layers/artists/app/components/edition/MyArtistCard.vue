@@ -135,7 +135,7 @@
         </div>
 
         <!-- QR Code -->
-        <div class="flex flex-col items-center justify-center p-6">
+        <div v-if="artist.qrCode" class="flex flex-col items-center justify-center p-6">
           <Qrcode :value="artist.qrCode" variant="default" />
           <p class="mt-3 text-xs text-gray-500 dark:text-gray-400 font-mono">
             {{ artist.qrCode }}
@@ -214,7 +214,8 @@ interface Artist {
   firstName: string
   lastName: string
   email: string
-  qrCode: string
+  /** `null` tant que l'artiste n'a pas de jeton : mieux vaut aucun code qu'un code refusé. */
+  qrCode: string | null
   arrivalDateTime: string | null
   departureDateTime: string | null
   dietaryPreference: string

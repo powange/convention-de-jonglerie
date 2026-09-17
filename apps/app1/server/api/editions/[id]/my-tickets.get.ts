@@ -61,10 +61,13 @@ export default wrapApiHandler(
     })
 
     if (volunteerApplication) {
-      // Format du QR code: volunteer-{id}-{token} ou volunteer-{id} (ancien format)
+      // Format du QR code : `volunteer-{id}-{jeton}`. Le repli sans jeton qui vivait ici est
+      // parti avec celui du contrôle d'accès : un code sans jeton n'est plus accepté au guichet,
+      // et l'émettre ne ferait qu'envoyer la personne au comptoir avec un billet refusé. Même
+      // règle pour les artistes et les organisateurs, plus bas.
       const qrCode = volunteerApplication.qrCodeToken
         ? `volunteer-${volunteerApplication.id}-${volunteerApplication.qrCodeToken}`
-        : `volunteer-${volunteerApplication.id}`
+        : null
 
       allTickets.push({
         id: volunteerApplication.id,
@@ -92,10 +95,8 @@ export default wrapApiHandler(
     })
 
     if (artist) {
-      // Format du QR code: artist-{id}-{token} ou artist-{id} (ancien format)
-      const qrCode = artist.qrCodeToken
-        ? `artist-${artist.id}-${artist.qrCodeToken}`
-        : `artist-${artist.id}`
+      // Même règle que pour les bénévoles : pas de jeton, pas de code.
+      const qrCode = artist.qrCodeToken ? `artist-${artist.id}-${artist.qrCodeToken}` : null
 
       allTickets.push({
         id: artist.id,
@@ -129,10 +130,10 @@ export default wrapApiHandler(
     })
 
     if (editionOrganizer) {
-      // Format du QR code: organizer-{id}-{token} ou organizer-{id} (ancien format)
+      // Même règle que pour les bénévoles : pas de jeton, pas de code.
       const qrCode = editionOrganizer.qrCodeToken
         ? `organizer-${editionOrganizer.id}-${editionOrganizer.qrCodeToken}`
-        : `organizer-${editionOrganizer.id}`
+        : null
 
       allTickets.push({
         id: editionOrganizer.id,

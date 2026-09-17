@@ -144,7 +144,7 @@ describe('POST /api/editions/[id]/ticketing/verify (artiste)', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'artist-9' })
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'artist-9-tok9' })
     mockCanAccessEditionData.mockResolvedValue(true)
     articlesARemettre(true)
     prismaMock.editionArtist.findFirst.mockResolvedValue(artiste)
@@ -222,7 +222,7 @@ describe('POST /api/editions/[id]/ticketing/verify (organisateur)', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7-tok7' })
     mockCanAccessEditionData.mockResolvedValue(true)
     articlesARemettre(true)
     prismaMock.editionOrganizer.findFirst.mockResolvedValue(organisateur)
@@ -329,7 +329,7 @@ describe('POST /api/editions/[id]/ticketing/verify (repas des organisateurs)', (
 
   beforeEach(() => {
     vi.clearAllMocks()
-    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7-tok7' })
     mockCanAccessEditionData.mockResolvedValue(true)
     articlesARemettre(true)
     prismaMock.editionOrganizer.findFirst.mockResolvedValue({
@@ -419,7 +419,7 @@ describe('POST /api/editions/[id]/ticketing/verify (articles désactivés)', () 
   })
 
   it('ne remet RIEN à un bénévole, même si des articles sont paramétrés', async () => {
-    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'volunteer-5' })
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'volunteer-5-tok5' })
     prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue({
       id: 5,
       userId: 42,
@@ -442,7 +442,7 @@ describe('POST /api/editions/[id]/ticketing/verify (articles désactivés)', () 
   })
 
   it('ne remet RIEN à un organisateur', async () => {
-    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7-tok7' })
     prismaMock.editionOrganizer.findFirst.mockResolvedValue({
       id: 7,
       entryValidated: false,
@@ -468,7 +468,7 @@ describe('POST /api/editions/[id]/ticketing/verify (articles désactivés)', () 
 
   it('laisse tout le reste intact : la personne est toujours trouvée', async () => {
     // Couper la remise ne doit pas couper le contrôle d'accès lui-même.
-    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7' })
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'organizer-7-tok7' })
     prismaMock.editionOrganizer.findFirst.mockResolvedValue({
       id: 7,
       entryValidated: false,
@@ -487,5 +487,163 @@ describe('POST /api/editions/[id]/ticketing/verify (articles désactivés)', () 
 
     expect(result.data.found).toBe(true)
     expect(result.data.participant.organizer.user.firstName).toBe('Claire')
+  })
+})
+
+/**
+ * Le jeton n'est plus une option.
+ *
+ * Le scan acceptait `genre-{id}` — un identifiant séquentiel, sans rien à deviner. Les trois
+ * branches partagent désormais `designerLaPersonne`, et la base ne porte plus aucune ligne sans
+ * jeton : le repli ne protégeait plus personne.
+ */
+describe('POST /api/editions/[id]/ticketing/verify (le jeton du QR code)', () => {
+  const mockEvent = {
+    context: { params: { id: '1' }, user: { id: 1, pseudo: 'orga' } },
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(true)
+  })
+
+  it.each([
+    ['volunteer-42', 'editionVolunteerApplication'],
+    ['artist-9', 'editionArtist'],
+    ['organizer-7', 'editionOrganizer'],
+  ])('refuse « %s » sans même interroger la base', async (qrCode, table) => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode })
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.found).toBe(false)
+    expect(prismaMock[table].findFirst).not.toHaveBeenCalled()
+  })
+
+  it('dit quoi faire au guichet plutôt que « introuvable »', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'volunteer-42' })
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.message).toContain('rouvrir')
+  })
+
+  it('exige le jeton dans le where quand le QR code en porte un', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'artist-9-jetonSecret' })
+    prismaMock.editionArtist.findFirst.mockResolvedValue(null)
+
+    await verifyHandler(mockEvent as any)
+
+    expect(prismaMock.editionArtist.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ id: 9, qrCodeToken: 'jetonSecret' }),
+      })
+    )
+  })
+})
+
+/**
+ * La relecture demandée par l'écran de gestion.
+ *
+ * Elle rouvre une fiche déjà affichée après une validation. L'identifiant vient de la réponse
+ * précédente du serveur, et la personne aux commandes a déjà prouvé son droit — le même qui lui
+ * permet de trouver n'importe qui par son nom. C'est ce chemin qui fabriquait auparavant un faux
+ * QR code sans jeton, et qui obligeait donc le scan à accepter cette forme.
+ */
+describe('POST /api/editions/[id]/ticketing/verify (relecture par identifiant)', () => {
+  const mockEvent = {
+    context: { params: { id: '1' }, user: { id: 1, pseudo: 'orga' } },
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(true)
+  })
+
+  it('trouve la personne sans jeton, et sans condition sur le jeton', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ type: 'organizer', id: 7 })
+    prismaMock.editionOrganizer.findFirst.mockResolvedValue(null)
+
+    await verifyHandler(mockEvent as any)
+
+    const where = prismaMock.editionOrganizer.findFirst.mock.calls[0][0].where
+    expect(where).toMatchObject({ id: 7, editionId: 1 })
+    expect(where).not.toHaveProperty('qrCodeToken')
+  })
+
+  it('reste soumise au même droit que le scan', async () => {
+    mockCanAccessEditionData.mockResolvedValue(false)
+    global.readBody = vi.fn().mockResolvedValue({ type: 'volunteer', id: 5 })
+
+    await expect(verifyHandler(mockEvent as any)).rejects.toMatchObject({ statusCode: 403 })
+    expect(prismaMock.editionVolunteerApplication.findFirst).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * Un billet ne dépend que de son édition.
+ *
+ * Cette branche exigeait une configuration HelloAsso avant même de chercher, et rendait donc une
+ * erreur pour toute édition qui n'en a pas — alors que la vente au guichet produit ses propres
+ * QR codes `onsite-…` sans aucun fournisseur externe.
+ */
+describe('POST /api/editions/[id]/ticketing/verify (billet sans billetterie externe)', () => {
+  const mockEvent = {
+    context: { params: { id: '1' }, user: { id: 1, pseudo: 'orga' } },
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockCanAccessEditionData.mockResolvedValue(true)
+    articlesARemettre(true)
+  })
+
+  it('trouve un billet vendu sur place, sans configuration HelloAsso', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'onsite-0168d7ddee737c74' })
+    prismaMock.externalTicketing.findUnique.mockResolvedValue(null)
+    prismaMock.ticketingOrderItem.findFirst.mockResolvedValue({
+      id: 303,
+      helloAssoItemId: null,
+      name: 'Samedi journée',
+      amount: 2500,
+      state: 'Processed',
+      qrCode: 'onsite-0168d7ddee737c74',
+      firstName: 'Charlotte',
+      lastName: 'September',
+      email: 'c@example.com',
+      customFields: null,
+      entryValidated: false,
+      entryValidatedAt: null,
+      entryValidatedBy: null,
+      tier: null,
+      selectedOptions: [],
+      order: {
+        helloAssoOrderId: null,
+        status: 'Onsite',
+        externalTicketing: null,
+        payerFirstName: 'Charlotte',
+        payerLastName: 'September',
+        payerEmail: 'c@example.com',
+        items: [],
+      },
+    })
+
+    const result = await verifyHandler(mockEvent as any)
+
+    expect(result.data.found).toBe(true)
+    expect(result.data.type).toBe('ticket')
+    // La provenance est nulle pour une saisie au guichet, et la réponse sait déjà le dire.
+    expect(result.data.participant.ticket.order.provider).toBeNull()
+  })
+
+  it('ne consulte plus la configuration externe pour trouver le billet', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'onsite-abc' })
+    prismaMock.ticketingOrderItem.findFirst.mockResolvedValue(null)
+
+    await verifyHandler(mockEvent as any)
+
+    expect(prismaMock.externalTicketing.findUnique).not.toHaveBeenCalled()
   })
 })
