@@ -12,38 +12,87 @@ const props = defineProps<{ editionId: number }>()
 
 const { t } = useI18n()
 
+/**
+ * La forme que rend `/volunteers/organizers`, telle qu'elle existe depuis toujours : des
+ * IDENTIFIANTS d'équipe, non des équipes. C'est l'écran qui les rapproche du catalogue.
+ */
 interface OrganisateurRattachable {
-  id: number
+  editionOrganizerId: number
   user: { id: number; pseudo: string | null; prenom: string | null; nom: string | null }
-  teams: Array<{ id: string; name: string; color?: string | null; isLeader: boolean }>
+  teamIds: string[]
+  leaderTeamIds: string[]
+}
+
+interface EquipeDuCatalogue {
+  id: string
+  name: string
+  color?: string | null
 }
 
 const organisateurs = ref<OrganisateurRattachable[]>([])
+const equipes = ref<EquipeDuCatalogue[]>([])
 const modaleOuverte = ref(false)
-const organisateurChoisi = ref<OrganisateurRattachable | null>(null)
+const organisateurChoisi = ref<{
+  id: number
+  user: OrganisateurRattachable['user']
+  teams: Array<{ id: string; name: string }>
+} | null>(null)
 
 const nomAffiche = (user: OrganisateurRattachable['user']) =>
   [user.prenom, user.nom].filter(Boolean).join(' ') || user.pseudo || ''
 
-const { execute: charger, loading } = useApiAction<unknown, OrganisateurRattachable[]>(
-  () => `/api/editions/${props.editionId}/volunteers/organizers`,
+const equipeParId = computed(() => new Map(equipes.value.map((equipe) => [equipe.id, equipe])))
+
+/** Les équipes d'un organisateur, rapprochées du catalogue pour être nommées et colorées. */
+const equipesDe = (organisateur: OrganisateurRattachable) =>
+  organisateur.teamIds.flatMap((id) => {
+    const equipe = equipeParId.value.get(id)
+    return equipe ? [{ ...equipe, isLeader: organisateur.leaderTeamIds.includes(id) }] : []
+  })
+
+const { execute: charger, loading } = useApiAction<
+  unknown,
+  { organizers?: OrganisateurRattachable[] }
+>(() => `/api/editions/${props.editionId}/volunteers/organizers`, {
+  method: 'GET',
+  silentSuccess: true,
+  errorMessages: { default: t('volunteers.organizers_in_teams.load_error') },
+  onSuccess: (resultat) => {
+    organisateurs.value = resultat?.organizers ?? []
+  },
+})
+
+// Le catalogue des équipes, pour nommer les identifiants que rend le point d'API ci-dessus.
+const { execute: chargerEquipes } = useApiAction<unknown, EquipeDuCatalogue[]>(
+  () => `/api/editions/${props.editionId}/volunteer-teams`,
   {
     method: 'GET',
     silentSuccess: true,
     errorMessages: { default: t('volunteers.organizers_in_teams.load_error') },
     onSuccess: (resultat) => {
-      organisateurs.value = resultat ?? []
+      equipes.value = resultat ?? []
     },
   }
 )
 
 const ouvrirRattachement = (organisateur: OrganisateurRattachable) => {
-  organisateurChoisi.value = organisateur
+  // La modale attend la forme de la page des organisateurs : un identifiant et des équipes
+  // nommées. On la lui compose plutôt que de la faire diverger.
+  organisateurChoisi.value = {
+    id: organisateur.editionOrganizerId,
+    user: organisateur.user,
+    teams: equipesDe(organisateur),
+  }
   modaleOuverte.value = true
+}
+
+const rafraichir = () => {
+  void charger()
 }
 
 onMounted(() => {
   void charger()
+  void chargerEquipes()
 })
 </script>
 
@@ -73,7 +122,7 @@ onMounted(() => {
     <div v-else class="space-y-2">
       <div
         v-for="organisateur in organisateurs"
-        :key="organisateur.id"
+        :key="organisateur.editionOrganizerId"
         class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800"
       >
         <div class="min-w-0 flex-1">
@@ -82,9 +131,9 @@ onMounted(() => {
           </p>
 
           <!-- Les équipes déjà rattachées, pour qu'on lise l'état avant d'ouvrir la modale. -->
-          <div v-if="organisateur.teams.length > 0" class="flex flex-wrap gap-1 mt-1">
+          <div v-if="equipesDe(organisateur).length > 0" class="flex flex-wrap gap-1 mt-1">
             <UBadge
-              v-for="equipe in organisateur.teams"
+              v-for="equipe in equipesDe(organisateur)"
               :key="equipe.id"
               variant="soft"
               size="sm"
@@ -118,7 +167,7 @@ onMounted(() => {
       v-model="modaleOuverte"
       :organizer="organisateurChoisi"
       :edition-id="editionId"
-      @teams-saved="charger()"
+      @teams-saved="rafraichir"
     />
   </UCard>
 </template>
