@@ -18,7 +18,22 @@ const { t } = useI18n()
  */
 interface OrganisateurRattachable {
   editionOrganizerId: number
-  user: { id: number; pseudo: string | null; prenom: string | null; nom: string | null }
+  /**
+   * Tout ce qu'il faut pour afficher la personne, avatar compris.
+   *
+   * `emailHash`, `profilePicture` et `updatedAt` ne servent qu'à lui : le repli Gravatar a besoin
+   * de l'empreinte, et l'horodatage casse le cache quand la photo change. Les omettre du typage
+   * suffirait à les faire disparaître de l'appel au composant sans que rien ne le signale.
+   */
+  user: {
+    id: number
+    pseudo: string | null
+    prenom: string | null
+    nom: string | null
+    emailHash?: string | null
+    profilePicture?: string | null
+    updatedAt?: string | Date | null
+  }
   teamIds: string[]
   leaderTeamIds: string[]
 }
@@ -101,7 +116,9 @@ onMounted(() => {
     <template #header>
       <div class="flex items-center gap-2">
         <UIcon name="i-heroicons-user-circle" class="text-indigo-500" />
-        <h2 class="text-lg font-semibold">{{ t('volunteers.organizers_in_teams.title') }}</h2>
+        <h2 class="text-lg font-semibold">
+          {{ t('volunteers.organizers_in_teams.title') }}
+        </h2>
       </div>
       <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
         {{ t('volunteers.organizers_in_teams.description') }}
@@ -125,30 +142,36 @@ onMounted(() => {
         :key="organisateur.editionOrganizerId"
         class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800"
       >
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-gray-900 dark:text-white">
-            {{ nomAffiche(organisateur.user) }}
-          </p>
+        <div class="min-w-0 flex-1 flex items-start gap-3">
+          <!-- Même composant que la modale d'affectation du planning : une personne se reconnaît
+               à sa photo avant de se lire. -->
+          <UiUserAvatar :user="organisateur.user" size="sm" shrink />
 
-          <!-- Les équipes déjà rattachées, pour qu'on lise l'état avant d'ouvrir la modale. -->
-          <div v-if="equipesDe(organisateur).length > 0" class="flex flex-wrap gap-1 mt-1">
-            <UBadge
-              v-for="equipe in equipesDe(organisateur)"
-              :key="equipe.id"
-              variant="soft"
-              size="sm"
-              :style="{
-                backgroundColor: `${equipe.color || '#6b7280'}20`,
-                color: equipe.color || '#6b7280',
-              }"
-            >
-              {{ equipe.name }}
-              <span v-if="equipe.isLeader" class="ml-1">★</span>
-            </UBadge>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ nomAffiche(organisateur.user) }}
+            </p>
+
+            <!-- Les équipes déjà rattachées, pour qu'on lise l'état avant d'ouvrir la modale. -->
+            <div v-if="equipesDe(organisateur).length > 0" class="flex flex-wrap gap-1 mt-1">
+              <UBadge
+                v-for="equipe in equipesDe(organisateur)"
+                :key="equipe.id"
+                variant="soft"
+                size="sm"
+                :style="{
+                  backgroundColor: `${equipe.color || '#6b7280'}20`,
+                  color: equipe.color || '#6b7280',
+                }"
+              >
+                {{ equipe.name }}
+                <span v-if="equipe.isLeader" class="ml-1">★</span>
+              </UBadge>
+            </div>
+            <p v-else class="text-xs text-gray-500 mt-1">
+              {{ t('volunteers.organizers_in_teams.none_yet') }}
+            </p>
           </div>
-          <p v-else class="text-xs text-gray-500 mt-1">
-            {{ t('volunteers.organizers_in_teams.none_yet') }}
-          </p>
         </div>
 
         <UButton
