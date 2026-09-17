@@ -30,8 +30,11 @@ export default wrapApiHandler(
         createdAt: true,
         updatedAt: true,
         _count: {
+          // `assignedApplications` et non `assignments` : c'est le nom que le schéma donne à la
+          // relation. Prisma refusait la requête ENTIÈRE — un 500, pas un compteur manquant — et
+          // le défaut a dormi tant que ce point d'API n'avait aucun appelant côté client.
           select: {
-            assignments: {
+            assignedApplications: {
               where: {
                 application: {
                   status: 'ACCEPTED',
@@ -54,7 +57,7 @@ export default wrapApiHandler(
 
     return equipes.map((equipe) => ({
       ...equipe,
-      assignedVolunteersCount: equipe._count?.assignments || 0,
+      assignedVolunteersCount: equipe._count?.assignedApplications || 0,
       assignedOrganizersCount: organisateurs.get(equipe.id) ?? 0,
     }))
   },
