@@ -31,6 +31,11 @@
 
       <!-- Contenu de la gestion des équipes -->
       <TeamManagement :edition-id="editionId" />
+
+      <!-- Le rattachement des organisateurs aux équipes : il vivait sur la page des
+           organisateurs, fermée au droit « gérer les bénévoles » que son écriture exige pourtant.
+           Il vit désormais là où la décision se prend. -->
+      <VolunteersOrganizersInTeamsCard :edition-id="editionId" />
     </div>
   </div>
 </template>

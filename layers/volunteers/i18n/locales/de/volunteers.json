@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Was Sie uns bringen können",
     "withdraw": "Meine Bewerbung zurückziehen",
     "planning_preview_leader_description": "Du siehst ihn vorab, weil du ein Team leitest und deine Rückmeldung geben sollst. Er ist noch nicht veröffentlicht: gib ihn nicht an dein Team weiter, Schichten können sich noch ändern. In Teams, denen du nicht angehörst, erscheinen Personen unter ihrem Pseudonym, ohne Vor- und Nachnamen.",
-    "planning_preview_leader_title": "Plan im Aufbau — zur Durchsicht"
+    "planning_preview_leader_title": "Plan im Aufbau — zur Durchsicht",
+    "organizers_in_teams": {
+      "description": "Ein Team zugeordneter Organisator übernimmt dort Schichten wie ein Helfer und kann es leiten.",
+      "empty": "Keine Organisatoren in dieser Ausgabe.",
+      "load_error": "Organisatoren konnten nicht geladen werden",
+      "manage": "Teams",
+      "none_yet": "Keinem Team zugeordnet",
+      "title": "Organisatoren in Teams"
+    }
   }
 }

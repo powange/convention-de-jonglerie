@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Wat u ons kunt brengen",
     "withdraw": "Trek mijn aanmelding in",
     "planning_preview_leader_description": "Je ziet ze vooraf omdat je teamverantwoordelijke bent, zodat je je mening kunt geven. Ze is nog niet gepubliceerd: geef ze niet door aan je team, diensten kunnen nog veranderen. In teams waar je geen deel van uitmaakt, verschijnen personen onder hun gebruikersnaam, zonder voor- of achternaam.",
-    "planning_preview_leader_title": "Planning in opbouw — ter nalezing"
+    "planning_preview_leader_title": "Planning in opbouw — ter nalezing",
+    "organizers_in_teams": {
+      "description": "Een organisator die aan een team is gekoppeld, draait daar diensten net als een vrijwilliger en kan het team leiden.",
+      "empty": "Geen organisatoren in deze editie.",
+      "load_error": "Kan de organisatoren niet laden",
+      "manage": "Teams",
+      "none_yet": "Aan geen enkel team gekoppeld",
+      "title": "Organisatoren in teams"
+    }
   }
 }

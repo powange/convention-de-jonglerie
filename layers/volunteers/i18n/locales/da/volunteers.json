@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Hvad du kan bringe os",
     "withdraw": "Træk min ansøgning tilbage",
     "planning_preview_leader_description": "Du ser den på forhånd, fordi du er teamansvarlig og skal kunne give din mening. Den er ikke offentliggjort endnu: send den ikke videre til dit team, vagter kan stadig ændre sig. I teams, du ikke er en del af, vises personer under deres brugernavn, uden for- og efternavn.",
-    "planning_preview_leader_title": "Vagtplan under opbygning — til gennemsyn"
+    "planning_preview_leader_title": "Vagtplan under opbygning — til gennemsyn",
+    "organizers_in_teams": {
+      "description": "En arrangør, der er tilknyttet et team, tager vagter der på lige fod med en frivillig og kan være teamansvarlig.",
+      "empty": "Ingen arrangører i denne udgave.",
+      "load_error": "Kunne ikke indlæse arrangørerne",
+      "manage": "Teams",
+      "none_yet": "Ikke tilknyttet noget team",
+      "title": "Arrangører i teams"
+    }
   }
 }

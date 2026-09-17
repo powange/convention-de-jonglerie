@@ -398,6 +398,14 @@
     "phone_numbers_copied": "Numéros copiés !",
     "phone_numbers_copied_desc": "{count} numéro(s) copié(s) dans le presse-papier",
     "phone_placeholder": "Votre numéro de téléphone",
+    "organizers_in_teams": {
+      "description": "Un organisateur rattaché à une équipe y tient des créneaux au même titre qu'un bénévole, et peut en être responsable.",
+      "empty": "Aucun organisateur sur cette édition.",
+      "load_error": "Impossible de charger les organisateurs",
+      "manage": "Équipes",
+      "none_yet": "Rattaché à aucune équipe",
+      "title": "Organisateurs dans les équipes"
+    },
     "planning_not_published_description": "Il est encore en cours de construction : les responsables y travaillent, et les créneaux peuvent changer d’un jour à l’autre. Rien n’est définitif tant qu’il n’est pas publié. Vos créneaux s’afficheront ici dès ce moment-là — vous serez prévenu.",
     "planning_not_published_title": "Planning en cours de construction — pas encore publié",
     "planning_preview_leader_description": "Vous le voyez en avance parce que vous êtes responsable d'équipe, pour pouvoir donner votre avis. Il n'est pas encore publié : ne le relayez pas à votre équipe, les créneaux peuvent encore changer. Sur les équipes dont vous ne faites pas partie, les personnes apparaissent sous leur pseudo, sans nom ni prénom.",

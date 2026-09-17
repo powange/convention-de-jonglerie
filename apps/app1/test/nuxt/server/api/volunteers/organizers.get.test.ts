@@ -1,95 +1,125 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-const mockCanManage = vi.hoisted(() => vi.fn())
-
 vi.mock('#server/utils/api-helpers', () => ({
   wrapApiHandler: (handler: any) => handler,
-  createSuccessResponse: (data: unknown) => ({ success: true, data }),
 }))
 
 vi.mock('#server/utils/validation-helpers', () => ({
   validateEditionId: (event: any) => parseInt(event?.context?.params?.id, 10),
 }))
 
-vi.mock('#server/volunteers/ports/registry', () => ({
-  useVolunteerPorts: () => ({ organizers: { canManage: mockCanManage } }),
+vi.mock('#server/utils/auth-utils', () => ({
+  requireAuth: (event: any) => event.context.user,
+}))
+
+const mockPeutGererBenevoles = vi.hoisted(() => vi.fn())
+vi.mock('#server/utils/organizer-management', () => ({
+  canManageEditionVolunteers: mockPeutGererBenevoles,
 }))
 
 import handler from '../../../../../../../layers/volunteers/server/api/editions/[id]/volunteers/organizers.get'
 
 const prismaMock = (globalThis as any).prisma
 
-const evenement = { context: { params: { id: '22' }, user: { id: 1 } } }
+const evenement = { context: { params: { id: '22' }, user: { id: 42 } } }
 
-/** `equipesDirigees` : parmi ses équipes, celles dont il est responsable. */
-const ligne = (id: number, pseudo: string, teamIds: string[], equipesDirigees: string[] = []) => ({
+const organisateur = (
+  id: number,
+  prenom: string | null,
+  nom: string | null,
+  pseudo: string | null,
+  equipes: Array<{ id: string; name: string; isLeader?: boolean }> = []
+) => ({
   id,
-  teamAssignments: teamIds.map((teamId) => ({
-    teamId,
-    isLeader: equipesDirigees.includes(teamId),
+  organizer: { user: { id: id * 10, pseudo, prenom, nom } },
+  teamAssignments: equipes.map((equipe) => ({
+    isLeader: equipe.isLeader ?? false,
+    team: { id: equipe.id, name: equipe.name, color: '#123456' },
   })),
-  organizer: { user: { id: id * 10, pseudo } },
 })
 
+/**
+ * Les organisateurs d'une édition, rendus au gestionnaire des BÉNÉVOLES.
+ *
+ * Rattacher un organisateur à une équipe est une décision de bénévolat — l'écriture l'exige
+ * depuis toujours — mais le seul écran qui l'offrait vivait sur la page des organisateurs,
+ * fermée à ce droit. Ce point d'API existe pour que l'écran puisse déménager là où la décision
+ * se prend.
+ */
 describe('GET /api/editions/[id]/volunteers/organizers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockCanManage.mockResolvedValue(true)
-    prismaMock.editionOrganizer.findMany.mockResolvedValue([
-      ligne(7, 'orga', ['accueil', 'bar'], ['bar']),
-      ligne(8, 'autre', []),
-    ])
+    mockPeutGererBenevoles.mockResolvedValue(true)
+    prismaMock.editionOrganizer.findMany.mockResolvedValue([])
   })
 
-  it('rend les organisateurs avec leurs équipes', async () => {
-    const res = await handler(evenement as any)
+  it('exige le droit de gérer les BÉNÉVOLES, et non celui des organisateurs', async () => {
+    mockPeutGererBenevoles.mockResolvedValue(false)
 
-    expect(res.data.organizers).toEqual([
-      {
-        editionOrganizerId: 7,
-        user: { id: 70, pseudo: 'orga' },
-        teamIds: ['accueil', 'bar'],
-        leaderTeamIds: ['bar'],
-      },
-      { editionOrganizerId: 8, user: { id: 80, pseudo: 'autre' }, teamIds: [], leaderTeamIds: [] },
-    ])
-  })
-
-  it("rend aussi ceux qui n'ont aucune équipe", async () => {
-    // Ils sont candidats à un créneau même sans rattachement : la liste ne doit pas les écarter.
-    const res = await handler(evenement as any)
-
-    expect(res.data.organizers.map((o: any) => o.editionOrganizerId)).toContain(8)
-  })
-
-  it("ne lit que les organisateurs de l'édition demandée", async () => {
-    await handler(evenement as any)
-
-    expect(prismaMock.editionOrganizer.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { editionId: 22 } })
-    )
-  })
-
-  /**
-   * La raison d'être de cet endpoint : le responsable du bénévolat n'a ni le droit sur les
-   * organisateurs ni celui sur la billetterie, les deux qu'exige `/organizers/edition-organizers`.
-   * C'est donc la permission du bénévolat qui commande ici, et elle seule.
-   */
-  it('refuse un contributeur sans droit sur les bénévoles', async () => {
-    mockCanManage.mockResolvedValue(false)
-
-    await expect(handler(evenement as any)).rejects.toBeDefined()
+    await expect(handler(evenement as any)).rejects.toThrow(/Droits insuffisants/)
     expect(prismaMock.editionOrganizer.findMany).not.toHaveBeenCalled()
   })
 
-  it('distingue les équipes dirigées de celles où il ne fait que figurer', async () => {
-    // L'étoile de responsable se pose par équipe : confondre les deux listes la ferait
-    // apparaître sur toutes celles de la personne.
-    const res = await handler(evenement as any)
-    const orga = res.data.organizers[0]
+  it('rend chaque organisateur avec ses équipes', async () => {
+    prismaMock.editionOrganizer.findMany.mockResolvedValue([
+      organisateur(1, 'Claire', 'Bernard', 'clairb', [
+        { id: 'bar', name: 'Bar', isLeader: true },
+        { id: 'accueil', name: 'Accueil' },
+      ]),
+    ])
 
-    expect(orga.teamIds).toContain('accueil')
-    expect(orga.leaderTeamIds).not.toContain('accueil')
-    expect(orga.leaderTeamIds).toEqual(['bar'])
+    const resultat = await handler(evenement as any)
+
+    expect(resultat).toHaveLength(1)
+    expect(resultat[0].teams).toEqual([
+      { id: 'bar', name: 'Bar', color: '#123456', isLeader: true },
+      { id: 'accueil', name: 'Accueil', color: '#123456', isLeader: false },
+    ])
+  })
+
+  it('ne rend NI adresse, NI téléphone, NI droit', async () => {
+    // La sélection est la garde : un droit de bénévolat ne doit pas devenir une fenêtre sur les
+    // données personnelles des organisateurs. Assertion sur la réponse entière, pour attraper un
+    // champ qu'on ajouterait un jour sans y penser.
+    prismaMock.editionOrganizer.findMany.mockResolvedValue([
+      organisateur(1, 'Claire', 'Bernard', 'clairb'),
+    ])
+
+    const serialise = JSON.stringify(await handler(evenement as any))
+
+    for (const interdit of ['email', 'phone', 'canManage', 'rights']) {
+      expect(serialise).not.toContain(interdit)
+    }
+  })
+
+  it('ne demande à la base que ce qu’il rend', async () => {
+    // C'est la REQUÊTE qu'il faut tenir : un mock rendrait de toute façon ce qu'on lui dit, et
+    // une sélection trop large ferait transiter des données que la réponse ne montre pas.
+    await handler(evenement as any)
+
+    const appel = prismaMock.editionOrganizer.findMany.mock.calls[0][0]
+    expect(appel.where).toEqual({ editionId: 22 })
+    expect(appel.select.organizer.select.user.select).toEqual({
+      id: true,
+      pseudo: true,
+      prenom: true,
+      nom: true,
+    })
+  })
+
+  it('trie par le nom tel qu’il est affiché', async () => {
+    // L'écran affiche « prénom nom », ou le pseudo à défaut : trier autrement donnerait une liste
+    // qui paraît désordonnée à celui qui la lit.
+    prismaMock.editionOrganizer.findMany.mockResolvedValue([
+      organisateur(1, 'Zoé', 'Alard', 'zoe'),
+      organisateur(2, null, null, 'amandine'),
+      organisateur(3, 'Marc', 'Blin', 'marcb'),
+    ])
+
+    const noms = (await handler(evenement as any)).map(
+      (o: any) => [o.user.prenom, o.user.nom].filter(Boolean).join(' ') || o.user.pseudo
+    )
+
+    expect(noms).toEqual(['amandine', 'Marc Blin', 'Zoé Alard'])
   })
 })

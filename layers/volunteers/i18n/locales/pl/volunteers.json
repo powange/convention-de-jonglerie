@@ -626,6 +626,14 @@
     "what_you_can_bring_title": "Co możesz nam przynieść",
     "withdraw": "Wycofaj moje zgłoszenie",
     "planning_preview_leader_description": "Widzisz go wcześniej, bo jesteś osobą odpowiedzialną za zespół i możesz zgłosić uwagi. Nie jest jeszcze opublikowany: nie przekazuj go swojemu zespołowi, dyżury mogą się jeszcze zmienić. W zespołach, do których nie należysz, osoby są widoczne pod pseudonimem, bez imienia i nazwiska.",
-    "planning_preview_leader_title": "Grafik w budowie — do przejrzenia"
+    "planning_preview_leader_title": "Grafik w budowie — do przejrzenia",
+    "organizers_in_teams": {
+      "description": "Organizator przypisany do zespołu pełni w nim dyżury tak jak wolontariusz i może nim kierować.",
+      "empty": "Brak organizatorów w tej edycji.",
+      "load_error": "Nie udało się wczytać organizatorów",
+      "manage": "Zespoły",
+      "none_yet": "Nieprzypisany do żadnego zespołu",
+      "title": "Organizatorzy w zespołach"
+    }
   }
 }
