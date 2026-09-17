@@ -6,6 +6,8 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
 
 vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
   equipesDontIlEstResponsable: vi.fn(async () => []),
+  // L'appartenance décide de ce qu'on voit NOMMÉMENT ; la responsabilité, de QUAND.
+  equipesDontIlEstMembre: vi.fn(async () => []),
 }))
 
 import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'

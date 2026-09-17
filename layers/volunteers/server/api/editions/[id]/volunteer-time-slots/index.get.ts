@@ -1,8 +1,8 @@
 import { formaterCreneau, inclusionCreneau } from '../../../../utils/creneau-formate'
-import { exigerPlanningPublie } from '../../../../utils/planning-publie'
+import { visibiliteDuPlanning } from '../../../../utils/planning-publie'
+import { PLANNING_NON_PUBLIE } from '../../../../utils/publication-plannings'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import {
   isAcceptedVolunteer,
@@ -40,10 +40,28 @@ export default wrapApiHandler(
     // que le droit de gestion lui aurait retiré un accès qu'il avait — et il est précisément de
     // ceux qui construisent le planning avant sa publication.
     const peutGerer = await canManageEditionVolunteers(editionId, user.id, event)
-    const construitLePlanning =
-      peutGerer || (await equipesDontIlEstResponsable(editionId, user.id)).length > 0
 
-    await exigerPlanningPublie(editionId, construitLePlanning)
+    /*
+     * Ce que cette personne a le droit de voir, en trois niveaux.
+     *
+     * Hors gestionnaires, chacun ne voit les personnes que dans les équipes DONT IL FAIT PARTIE ;
+     * les autres lui sont rendues en anonyme. C'est un durcissement : le planning publié rendait
+     * jusqu'ici tous les noms de toutes les équipes à tout bénévole accepté.
+     *
+     * L'accès, lui, reste gouverné par la publication — et par la responsabilité d'équipe, qui
+     * l'ouvre en avance pour la relecture.
+     */
+    const { niveau, equipesEnDetail } = await visibiliteDuPlanning(editionId, user.id, peutGerer)
+
+    if (niveau === 'aucun') {
+      throw createError({
+        status: 403,
+        message: "Le planning de cette édition n'est pas encore publié.",
+        data: { code: PLANNING_NON_PUBLIE },
+      })
+    }
+
+    const equipesVisiblesEnDetail = new Set(equipesEnDetail)
 
     /**
      * Qui voit les adresses de courriel en clair.
@@ -74,7 +92,15 @@ export default wrapApiHandler(
     // La forme est partagée avec la création et la modification : le client remplace en mémoire
     // le créneau qu'il tient par celui que ces points d'API renvoient, et la moindre différence
     // se voit à l'écran. Voir `creneau-formate`.
-    const formattedTimeSlots = timeSlots.map((slot) => formaterCreneau(slot, voitLesEmails))
+    // Un créneau sans équipe n'appartient à personne : il reste anonyme pour un responsable, qui
+    // n'en répond pas plus que des autres.
+    const formattedTimeSlots = timeSlots.map((slot) =>
+      formaterCreneau(
+        slot,
+        voitLesEmails,
+        niveau === 'partiel' && !(slot.teamId && equipesVisiblesEnDetail.has(slot.teamId))
+      )
+    )
 
     return formattedTimeSlots
   },

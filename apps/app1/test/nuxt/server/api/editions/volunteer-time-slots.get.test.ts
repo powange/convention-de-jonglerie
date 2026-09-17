@@ -15,6 +15,8 @@ vi.mock('../../../../../server/utils/organizer-management', () => ({
 
 vi.mock('../../../../../server/utils/editions/volunteers/responsables-equipe', () => ({
   equipesDontIlEstResponsable: vi.fn(async () => []),
+  // L'appartenance décide de ce qu'on voit NOMMÉMENT ; la responsabilité, de QUAND.
+  equipesDontIlEstMembre: vi.fn(async () => []),
 }))
 
 import {
@@ -200,7 +202,12 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
 
   it('retourne les créneaux pour un gestionnaire avec emails en clair', async () => {
     mockRequirePlanningAccess.mockResolvedValue({ id: 99 })
-    mockIsAcceptedVolunteer.mockResolvedValue(false) // Pas un bénévole, donc un gestionnaire
+    // Un VRAI gestionnaire, et non « pas un bénévole » : la confusion entre les deux est
+    // précisément le défaut que ce point d'API a déjà corrigé une fois. Depuis que le détail
+    // nominatif tient à l'appartenance aux équipes, elle ne produit plus du tout le même
+    // résultat — un organisateur sans équipe ne voit désormais que des pseudos.
+    mockPeutGerer.mockResolvedValue(true)
+    mockIsAcceptedVolunteer.mockResolvedValue(false)
 
     const mockTimeSlots = [
       {
@@ -436,6 +443,7 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
    */
   it('expose les organisateurs affectés à côté du compte de bénévoles', async () => {
     mockRequirePlanningAccess.mockResolvedValue({ id: 10 })
+    mockPeutGerer.mockResolvedValue(true)
     mockIsAcceptedVolunteer.mockResolvedValue(false)
 
     prismaMock.volunteerTimeSlot.findMany.mockResolvedValue([

@@ -52,6 +52,44 @@ export async function equipesDontIlEstResponsable(
   ]
 }
 
+/**
+ * Les équipes d'une édition dont l'utilisateur fait PARTIE, responsable ou non.
+ *
+ * Pendant de `equipesDontIlEstResponsable`, et la distinction porte une vraie règle : la
+ * responsabilité ouvre l'accès ANTICIPÉ au planning en construction, l'appartenance décide de ce
+ * qu'on y voit NOMMÉMENT. Deux questions différentes, deux fonctions.
+ *
+ * Même vigilance que sa jumelle : un organisateur rattaché à une équipe n'a pas de candidature,
+ * et n'interroger que `applicationTeamAssignment` l'oublierait.
+ */
+export async function equipesDontIlEstMembre(
+  eventId: number,
+  userId: number,
+  tx?: PrismaTransaction
+): Promise<string[]> {
+  const client = tx || prisma
+  const [candidatures, organisateurs] = await Promise.all([
+    client.applicationTeamAssignment.findMany({
+      where: { application: { userId, eventId, status: 'ACCEPTED' } },
+      select: { teamId: true },
+    }),
+    client.organizerTeamAssignment.findMany({
+      where: {
+        team: { eventId },
+        editionOrganizer: { editionId: eventId, organizer: { userId } },
+      },
+      select: { teamId: true },
+    }),
+  ])
+
+  return [
+    ...new Set([
+      ...candidatures.map((assignation) => assignation.teamId),
+      ...organisateurs.map((assignation) => assignation.teamId),
+    ]),
+  ]
+}
+
 /** Les identifiants des utilisateurs responsables d'une équipe donnée. */
 export async function utilisateursResponsablesDeLEquipe(
   eventId: number,

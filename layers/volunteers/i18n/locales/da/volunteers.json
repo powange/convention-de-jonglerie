@@ -398,8 +398,8 @@
     "phone_numbers_copied": "Numre kopieret!",
     "phone_numbers_copied_desc": "{count} nummer/numre kopieret til udklipsholder",
     "phone_placeholder": "Dit telefonnummer",
-    "planning_not_published_description": "De ansvarlige er stadig i gang med at lave den. Dine vagter vises her, så snart den er offentliggjort — du får besked.",
-    "planning_not_published_title": "Vagtplanen er endnu ikke offentliggjort",
+    "planning_not_published_description": "Den er stadig under opbygning: de ansvarlige arbejder på den, og vagter kan ændre sig fra dag til dag. Intet er endeligt, før den er offentliggjort. Dine vagter vises her, så snart det sker — du får besked.",
+    "planning_not_published_title": "Vagtplan under opbygning — endnu ikke offentliggjort",
     "planning_publish_label": "Offentliggør vagtplanen for de frivillige",
     "planning_publish_off_hint": "De frivillige kan hverken se deres vagter eller vagtplanen endnu: du kan roligt bygge den færdig.",
     "planning_publish_on_hint": "Accepterede frivillige kan se deres vagter og udgavens vagtplan.",
@@ -624,6 +624,8 @@
     "volunteers_short": "friv.",
     "volunteers_summary": "Frivilligt resumé",
     "what_you_can_bring_title": "Hvad du kan bringe os",
-    "withdraw": "Træk min ansøgning tilbage"
+    "withdraw": "Træk min ansøgning tilbage",
+    "planning_preview_leader_description": "Du ser den på forhånd, fordi du er teamansvarlig og skal kunne give din mening. Den er ikke offentliggjort endnu: send den ikke videre til dit team, vagter kan stadig ændre sig. I teams, du ikke er en del af, vises personer under deres brugernavn, uden for- og efternavn.",
+    "planning_preview_leader_title": "Vagtplan under opbygning — til gennemsyn"
   }
 }

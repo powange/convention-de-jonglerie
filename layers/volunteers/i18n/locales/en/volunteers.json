@@ -398,8 +398,8 @@
     "phone_numbers_copied": "Numbers copied!",
     "phone_numbers_copied_desc": "{count} number(s) copied to clipboard",
     "phone_placeholder": "Your phone number",
-    "planning_not_published_description": "The organisers are still preparing it. Your shifts will appear here as soon as it is published — you will be notified.",
-    "planning_not_published_title": "The schedule is not published yet",
+    "planning_not_published_description": "It is still being built: the organisers are working on it, and shifts may change from one day to the next. Nothing is final until it is published. Your shifts will appear here as soon as it is — you will be notified.",
+    "planning_not_published_title": "Schedule under construction — not published yet",
     "planning_publish_label": "Publish the schedule to volunteers",
     "planning_publish_off_hint": "Volunteers can see neither their shifts nor the schedule yet: you can build it at your own pace.",
     "planning_publish_on_hint": "Accepted volunteers can see their shifts and the edition's schedule.",
@@ -624,6 +624,8 @@
     "volunteers_short": "vol.",
     "volunteers_summary": "Volunteers Summary",
     "what_you_can_bring_title": "What you can bring to us",
-    "withdraw": "Withdraw my application"
+    "withdraw": "Withdraw my application",
+    "planning_preview_leader_description": "You are seeing it early because you lead a team, so that you can give your feedback. It is not published yet: do not pass it on to your team, shifts may still change. On teams you are not part of, people appear under their nickname, without first or last name.",
+    "planning_preview_leader_title": "Schedule under construction — review"
   }
 }

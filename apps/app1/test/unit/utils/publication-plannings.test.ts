@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  niveauDeVisibilite,
   planningVisiblePour,
   PLANNING_NON_PUBLIE,
 } from '../../../../../layers/volunteers/server/utils/publication-plannings'
@@ -64,5 +65,86 @@ describe('PLANNING_NON_PUBLIE', () => {
     // Comme `SWAPS_DISABLED` pour les échanges : l'écran doit distinguer « rien à afficher » de
     // « pas encore publié » pour en dire la raison, sans comparer des messages traduits.
     expect(PLANNING_NON_PUBLIE).toBe('PLANNING_NOT_PUBLISHED')
+  })
+})
+
+/**
+ * Le troisième niveau : le responsable d'équipe.
+ *
+ * Il relit le planning pendant qu'il se construit pour donner son avis avant publication — il est
+ * associé au travail, pas soumis à son résultat. D'où un niveau à lui : ses équipes en détail, le
+ * reste en anonyme.
+ */
+describe('niveauDeVisibilite', () => {
+  it('rend « complet » à un gestionnaire, publié ou non', () => {
+    expect(niveauDeVisibilite({ estGestionnaire: true, planningPublie: false })).toBe('complet')
+    expect(niveauDeVisibilite({ estGestionnaire: true, planningPublie: true })).toBe('complet')
+  })
+
+  it('rend « partiel » — et NON « complet » — à un bénévole sur un planning publié', () => {
+    // Le durcissement : la publication donne l'ACCÈS au planning, pas les noms de toutes les
+    // équipes. Elle rendait jusqu'ici tous les noms à tout bénévole accepté.
+    expect(niveauDeVisibilite({ estGestionnaire: false, planningPublie: true })).toBe('partiel')
+  })
+
+  it('rend « partiel » au responsable d’équipe tant que ce n’est pas publié', () => {
+    expect(
+      niveauDeVisibilite({
+        estGestionnaire: false,
+        planningPublie: false,
+        estResponsableDEquipe: true,
+      })
+    ).toBe('partiel')
+  })
+
+  it('ne donne au responsable RIEN DE PLUS qu’au bénévole une fois publié', () => {
+    // La responsabilité gouverne QUAND on voit, l'appartenance QUI on voit. Une fois publié, la
+    // responsabilité n'apporte donc plus rien : les deux sont au même niveau.
+    const commun = { estGestionnaire: false, planningPublie: true }
+
+    expect(niveauDeVisibilite({ ...commun, estResponsableDEquipe: true })).toBe(
+      niveauDeVisibilite({ ...commun, estResponsableDEquipe: false })
+    )
+  })
+
+  it('seul le gestionnaire obtient « complet »', () => {
+    // C'est désormais la seule porte vers les noms de toutes les équipes.
+    for (const planningPublie of [true, false]) {
+      for (const estResponsableDEquipe of [true, false]) {
+        expect(
+          niveauDeVisibilite({ estGestionnaire: false, planningPublie, estResponsableDEquipe })
+        ).not.toBe('complet')
+      }
+    }
+    expect(niveauDeVisibilite({ estGestionnaire: true, planningPublie: false })).toBe('complet')
+  })
+
+  it('rend « aucun » à un bénévole ordinaire', () => {
+    expect(niveauDeVisibilite({ estGestionnaire: false, planningPublie: false })).toBe('aucun')
+    expect(
+      niveauDeVisibilite({
+        estGestionnaire: false,
+        planningPublie: false,
+        estResponsableDEquipe: false,
+      })
+    ).toBe('aucun')
+  })
+
+  it('rend « aucun » quand l’édition n’a jamais rien configuré', () => {
+    // Une absence ne doit pas ouvrir ce qu'un réglage fermerait.
+    expect(niveauDeVisibilite({ estGestionnaire: false })).toBe('aucun')
+  })
+})
+
+describe('planningVisiblePour et le troisième niveau', () => {
+  it('reste vrai pour un responsable, qui voit quelque chose', () => {
+    // Les surfaces qui posent encore la question en booléen ne doivent pas lui fermer la porte.
+    expect(
+      planningVisiblePour({
+        estGestionnaire: false,
+        planningPublie: false,
+        estResponsableDEquipe: true,
+      })
+    ).toBe(true)
   })
 })

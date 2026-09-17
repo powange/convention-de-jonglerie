@@ -53,7 +53,10 @@ const creneau = (surcharge: Record<string, unknown> = {}) =>
     maxVolunteers: 3,
     delayMinutes: 15,
     team: { id: 'bar', name: 'Bar', color: '#ff0000' },
-    assignments: [{ id: 'a1', user: personne(1) }],
+    // `userId` figure vraiment sur la ligne d'affectation que Prisma rend, à côté de l'objet
+    // `user`. Il manquait ici, et le test de fuite de l'anonymisation passait donc sans rien
+    // prouver — la neutralisation l'a montré.
+    assignments: [{ id: 'a1', userId: 1, timeSlotId: 'c1', user: personne(1) }],
     organizerAssignments: [{ editionOrganizer: { id: 7, organizer: { user: organisateur(2) } } }],
     _count: { assignments: 1 },
     ...surcharge,
@@ -174,5 +177,84 @@ describe('inclusionCreneau', () => {
 
   it('compte les bénévoles affectés', () => {
     expect(inclusionCreneau._count.select.assignments).toBe(true)
+  })
+})
+
+/**
+ * Le créneau pseudonymisé, rendu pour les équipes dont on ne fait PAS partie.
+ *
+ * On y voit qui tient le créneau sous son pseudo, avec sa photo, sans son identité civile. Le
+ * pseudo est ce que la personne a choisi de montrer publiquement ; son nom ne l'est pas.
+ *
+ * Le piège est du côté de ce qui SUBSISTE : une entrée d'affectation porte l'identifiant de la
+ * personne à côté de l'objet `user`, et l'adresse de courriel se glisse dans ce dernier dès que
+ * l'appelant a le droit de la lire ailleurs. D'où des tests qui parcourent la réponse entière
+ * plutôt que d'énumérer des champs.
+ */
+describe('formaterCreneau, identité masquée', () => {
+  const masque = () => formaterCreneau(creneau(), true, true) as any
+
+  it('garde la forme du créneau : horaires, équipe, places', () => {
+    const rendu = masque()
+
+    expect(rendu).toMatchObject({
+      id: 'c1',
+      title: 'Bar du soir',
+      start: '2026-08-01T18:00:00.000Z',
+      teamId: 'bar',
+      maxVolunteers: 3,
+      assignedVolunteers: 1,
+    })
+    expect(rendu.team).toEqual({ id: 'bar', name: 'Bar', color: '#ff0000' })
+  })
+
+  it('CONSERVE le pseudo et de quoi afficher la photo', () => {
+    // C'est ce qui distingue la pseudonymisation de l'effacement : on voit QUI tient le créneau.
+    const rendu = masque()
+
+    expect(rendu.assignments[0].user).toMatchObject({
+      pseudo: 'p1',
+      profilePicture: 'photo.jpg',
+      emailHash: 'empreinte-1',
+    })
+    expect(rendu.organizerAssignments[0].user.pseudo).toBe('p2')
+  })
+
+  it('RETIRE le nom, le prénom et les pronoms', () => {
+    const rendu = masque()
+
+    expect(rendu.assignments[0].user.nom).toBeUndefined()
+    expect(rendu.assignments[0].user.prenom).toBeUndefined()
+    expect(rendu.assignments[0].user.pronouns).toBeUndefined()
+  })
+
+  it('RETIRE l’adresse de courriel même à qui a le droit de la lire', () => {
+    // `voitLesEmails` vaut vrai ici : ce droit porte sur ses propres équipes, pas sur les autres.
+    expect(JSON.stringify(masque())).not.toContain('exemple.fr')
+  })
+
+  it('ne laisse fuir AUCUNE identité civile, où qu’elle se cache', () => {
+    // Assertion sur la réponse entière : un champ ajouté un jour à la sélection — un téléphone,
+    // une adresse — serait attrapé ici sans qu'on ait à y penser.
+    const serialise = JSON.stringify(masque())
+
+    for (const fuite of ['Dupont', 'Jean', 'il/lui', 'exemple.fr']) {
+      expect(serialise).not.toContain(fuite)
+    }
+    // L'identifiant de la LIGNE d'affectation ne doit pas non plus reconduire à la personne.
+    expect(serialise).not.toContain('userId')
+  })
+
+  it('conserve le nombre de places occupées', () => {
+    // Vider les tableaux ferait afficher des créneaux déserts au lieu de créneaux pleins.
+    const rendu = masque()
+
+    expect(rendu.assignments).toHaveLength(1)
+    expect(rendu.organizerAssignments).toHaveLength(1)
+  })
+
+  it('se signale comme masqué', () => {
+    expect(masque().identiteMasquee).toBe(true)
+    expect((formaterCreneau(creneau()) as any).identiteMasquee).toBeUndefined()
   })
 })

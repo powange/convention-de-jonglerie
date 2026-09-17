@@ -105,8 +105,15 @@ export interface CreneauAvecRelations {
  * @param slot           un créneau lu avec `inclusionCreneau`
  * @param voitLesEmails  l'appelant a-t-il le droit de lire les adresses en clair ? Par défaut
  *                       non : un oubli doit retirer une donnée, jamais en divulguer une.
+ * @param identiteMasquee  masquer l'identité civile des personnes — voir `creneauPseudonymise`.
  */
-export function formaterCreneau(slot: CreneauAvecRelations, voitLesEmails = false) {
+export function formaterCreneau(
+  slot: CreneauAvecRelations,
+  voitLesEmails = false,
+  identiteMasquee = false
+) {
+  if (identiteMasquee) return creneauPseudonymise(slot)
+
   return {
     id: slot.id,
     title: slot.title,
@@ -135,5 +142,68 @@ export function formaterCreneau(slot: CreneauAvecRelations, voitLesEmails = fals
     })),
     color: slot.team?.color || '#6b7280',
     resourceId: slot.teamId || 'unassigned',
+  }
+}
+
+/**
+ * Le même créneau, réduit aux pseudonymes.
+ *
+ * Pour les équipes dont on ne fait PAS partie. On y voit qui tient chaque créneau — sous son
+ * pseudo, avec sa photo — sans obtenir son identité civile.
+ *
+ * Ce n'est pas un demi-masquage arbitraire : le pseudo est ce que la personne a choisi de montrer
+ * publiquement, le nom et le prénom ne le sont pas. Garder le premier permet de repérer qu'une
+ * même personne tient deux créneaux à la même heure, ou de lui adresser la parole ; retirer les
+ * seconds évite de distribuer un annuaire à toute l'édition.
+ *
+ * Ce qui part : `nom`, `prenom`, `pronouns`, et l'adresse de courriel — cette dernière QUOI QU'IL
+ * ARRIVE, même pour qui a le droit de la lire ailleurs. Un organisateur non bénévole y a droit sur
+ * ses propres équipes ; les autres ne le regardent pas.
+ *
+ * Ce qui reste : `pseudo`, `profilePicture`, `emailHash` et `updatedAt` — les trois derniers ne
+ * servent qu'à afficher l'avatar, dont le repli Gravatar a besoin de l'empreinte — et `id`, sans
+ * lequel le client ne peut ni lister ni reconnaître deux fois la même personne.
+ *
+ * ⚠️ La coquille est construite de zéro, champ par champ, plutôt que par soustraction. Un champ
+ * ajouté un jour à la sélection — un numéro de téléphone, une adresse — ne se retrouverait pas
+ * ici par accident : ce qu'on n'énumère pas ne peut pas fuir.
+ */
+function creneauPseudonymise(slot: CreneauAvecRelations) {
+  const pseudonyme = (personne: Record<string, unknown> | undefined | null) => {
+    if (!personne) return null
+    return {
+      id: personne.id,
+      pseudo: personne.pseudo,
+      profilePicture: personne.profilePicture,
+      emailHash: personne.emailHash,
+      updatedAt: personne.updatedAt,
+    }
+  }
+
+  return {
+    id: slot.id,
+    title: slot.title,
+    description: slot.description,
+    start: slot.startDateTime.toISOString(),
+    end: slot.endDateTime.toISOString(),
+    teamId: slot.teamId,
+    team: slot.team,
+    maxVolunteers: slot.maxVolunteers,
+    assignedVolunteers: slot._count.assignments,
+    delayMinutes: slot.delayMinutes ?? null,
+    // Les longueurs sont conservées : le client calcule les places occupées en additionnant
+    // `assignedVolunteers` et la taille d'`organizerAssignments`.
+    assignments: (slot.assignments ?? []).map((affectation, index) => ({
+      id: `masque-${slot.id}-${index}`,
+      user: pseudonyme(affectation.user as Record<string, unknown>),
+    })),
+    organizerAssignments: (slot.organizerAssignments ?? []).map((affectation, index) => ({
+      editionOrganizerId: `masque-orga-${slot.id}-${index}`,
+      user: pseudonyme(affectation.editionOrganizer?.organizer?.user),
+    })),
+    color: slot.team?.color || '#6b7280',
+    resourceId: slot.teamId || 'unassigned',
+    /** L'écran doit pouvoir dire pourquoi il ne nomme personne. */
+    identiteMasquee: true as const,
   }
 }

@@ -398,8 +398,8 @@
     "phone_numbers_copied": "Numery skopiowane!",
     "phone_numbers_copied_desc": "{count} numer/y skopiowany/e do schowka",
     "phone_placeholder": "Pana/Pani numer telefonu",
-    "planning_not_published_description": "Organizatorzy jeszcze go przygotowują. Twoje zmiany pojawią się tutaj, gdy tylko zostanie opublikowany — powiadomimy Cię.",
-    "planning_not_published_title": "Grafik nie został jeszcze opublikowany",
+    "planning_not_published_description": "Wciąż powstaje: osoby odpowiedzialne nad nim pracują, a dyżury mogą zmieniać się z dnia na dzień. Nic nie jest ostateczne, dopóki grafik nie zostanie opublikowany. Twoje dyżury pojawią się tutaj, gdy tylko to nastąpi — otrzymasz powiadomienie.",
+    "planning_not_published_title": "Grafik w budowie — jeszcze nieopublikowany",
     "planning_publish_label": "Opublikuj grafik wolontariuszom",
     "planning_publish_off_hint": "Wolontariusze nie widzą jeszcze ani swoich zmian, ani grafiku: możesz go spokojnie budować.",
     "planning_publish_on_hint": "Przyjęci wolontariusze widzą swoje zmiany i grafik edycji.",
@@ -624,6 +624,8 @@
     "volunteers_short": "wol.",
     "volunteers_summary": "Podsumowanie wolontariuszy",
     "what_you_can_bring_title": "Co możesz nam przynieść",
-    "withdraw": "Wycofaj moje zgłoszenie"
+    "withdraw": "Wycofaj moje zgłoszenie",
+    "planning_preview_leader_description": "Widzisz go wcześniej, bo jesteś osobą odpowiedzialną za zespół i możesz zgłosić uwagi. Nie jest jeszcze opublikowany: nie przekazuj go swojemu zespołowi, dyżury mogą się jeszcze zmienić. W zespołach, do których nie należysz, osoby są widoczne pod pseudonimem, bez imienia i nazwiska.",
+    "planning_preview_leader_title": "Grafik w budowie — do przejrzenia"
   }
 }
