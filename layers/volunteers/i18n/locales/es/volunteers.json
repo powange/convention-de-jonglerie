@@ -398,8 +398,8 @@
     "phone_numbers_copied": "¡Números copiados!",
     "phone_numbers_copied_desc": "{count} número(s) copiado(s) al portapapeles",
     "phone_placeholder": "Su número de teléfono",
-    "planning_not_published_description": "Los responsables aún lo están preparando. Tus turnos aparecerán aquí en cuanto se publique — te avisaremos.",
-    "planning_not_published_title": "El planning aún no está publicado",
+    "planning_not_published_description": "Todavía se está preparando: los responsables trabajan en ella y los turnos pueden cambiar de un día para otro. Nada es definitivo mientras no se publique. Tus turnos aparecerán aquí en cuanto lo esté — se te avisará.",
+    "planning_not_published_title": "Planificación en construcción — aún no publicada",
     "planning_publish_label": "Publicar el planning a los voluntarios",
     "planning_publish_off_hint": "Los voluntarios todavía no ven ni sus turnos ni el planning: puedes construirlo con calma.",
     "planning_publish_on_hint": "Los voluntarios aceptados ven sus turnos y el planning de la edición.",
@@ -624,6 +624,8 @@
     "volunteers_short": "vol.",
     "volunteers_summary": "Resumen de voluntarios",
     "what_you_can_bring_title": "Lo que puede aportarnos",
-    "withdraw": "Retirar mi solicitud"
+    "withdraw": "Retirar mi solicitud",
+    "planning_preview_leader_description": "La ves por adelantado porque eres responsable de equipo, para que puedas dar tu opinión. Aún no está publicada: no se la pases a tu equipo, los turnos todavía pueden cambiar. En los equipos de los que no formas parte, las personas aparecen con su seudónimo, sin nombre ni apellidos.",
+    "planning_preview_leader_title": "Planificación en construcción — revisión"
   }
 }

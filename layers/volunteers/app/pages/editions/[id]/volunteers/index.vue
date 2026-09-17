@@ -25,13 +25,23 @@
             authStore.isAuthenticated &&
             volunteersMode === 'INTERNAL' &&
             !planningPublie &&
-            (myApplication?.status === 'ACCEPTED' || mesEquipesOrganisateur.length > 0)
+            (myApplication?.status === 'ACCEPTED' ||
+              mesEquipesOrganisateur.length > 0 ||
+              estResponsableDEquipe)
           "
-          color="info"
+          :color="estResponsableDEquipe ? 'warning' : 'info'"
           variant="subtle"
-          icon="i-heroicons-clock"
-          :title="t('volunteers.planning_not_published_title')"
-          :description="t('volunteers.planning_not_published_description')"
+          :icon="estResponsableDEquipe ? 'i-heroicons-eye' : 'i-heroicons-clock'"
+          :title="
+            estResponsableDEquipe
+              ? t('volunteers.planning_preview_leader_title')
+              : t('volunteers.planning_not_published_title')
+          "
+          :description="
+            estResponsableDEquipe
+              ? t('volunteers.planning_preview_leader_description')
+              : t('volunteers.planning_not_published_description')
+          "
         />
       </ClientOnly>
 
@@ -44,7 +54,7 @@
           v-if="
             authStore.isAuthenticated &&
             volunteersMode === 'INTERNAL' &&
-            planningPublie &&
+            peutVoirLePlanning &&
             (myApplication?.status === 'ACCEPTED' || mesEquipesOrganisateur.length > 0)
           "
           :edition-id="editionId"
@@ -114,9 +124,9 @@
         <EditionVolunteerPlanningCard
           v-if="
             authStore.isAuthenticated &&
-            myApplication?.status === 'ACCEPTED' &&
             volunteersMode === 'INTERNAL' &&
-            planningPublie
+            (myApplication?.status === 'ACCEPTED' || estResponsableDEquipe) &&
+            peutVoirLePlanning
           "
           :edition="edition"
           :can-manage-volunteers="false"
@@ -472,6 +482,42 @@ const myApplication = ref<any>(null)
  */
 const mesEquipesOrganisateur = ref<Array<{ id: string; name: string; isLeader: boolean }>>([])
 
+/**
+ * Les équipes dont on est RESPONSABLE, bénévole ou organisateur.
+ *
+ * Distinct de `mesEquipesOrganisateur`, qui ne couvre que le second titre : un bénévole nommé
+ * responsable n'y figure pas. Le point d'API, lui, réunit les deux.
+ */
+const mesEquipesResponsable = ref<Array<{ id: string; name: string }>>([])
+
+const chargerMesEquipesResponsable = async () => {
+  if (!authStore.isAuthenticated) {
+    mesEquipesResponsable.value = []
+    return
+  }
+  try {
+    mesEquipesResponsable.value =
+      (await $fetch<Array<{ id: string; name: string }>>(
+        `/api/editions/${editionId}/volunteers/my-leader-teams`
+      )) ?? []
+  } catch {
+    // Un échec ne doit pas ouvrir : sans réponse, on s'en tient à ce que le réglage dit.
+    mesEquipesResponsable.value = []
+  }
+}
+
+/** Responsable d'au moins une équipe : c'est ce qui donne la relecture anticipée. */
+const estResponsableDEquipe = computed(() => mesEquipesResponsable.value.length > 0)
+
+/**
+ * Le planning est-il montrable à cette personne&nbsp;?
+ *
+ * Publié pour tout le monde, ou non publié mais relu par un responsable d'équipe. Le serveur
+ * décide seul de ce qu'il en rend — ses équipes en détail, le reste en anonyme ; cette condition
+ * ne fait que rendre l'écran cohérent avec lui.
+ */
+const peutVoirLePlanning = computed(() => planningPublie.value || estResponsableDEquipe.value)
+
 const chargerMesEquipesOrganisateur = async () => {
   if (!authStore.isAuthenticated) {
     mesEquipesOrganisateur.value = []
@@ -717,6 +763,7 @@ const fetchVolunteersInfo = async () => {
       fetchVolunteersSettings(),
       fetchMyApplication(),
       chargerMesEquipesOrganisateur(),
+      chargerMesEquipesResponsable(),
     ])
     if (volunteersInfo.value?.description) {
       volunteersDescriptionHtml.value = await markdownToHtml(volunteersInfo.value.description)
@@ -745,6 +792,7 @@ watch(
     if (connecte) {
       fetchMyApplication()
       chargerMesEquipesOrganisateur()
+      chargerMesEquipesResponsable()
     }
   }
 )

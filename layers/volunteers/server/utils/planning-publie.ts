@@ -1,4 +1,14 @@
-import { planningVisiblePour, PLANNING_NON_PUBLIE } from './publication-plannings'
+import {
+  niveauDeVisibilite,
+  planningVisiblePour,
+  PLANNING_NON_PUBLIE,
+  type NiveauDeVisibilite,
+} from './publication-plannings'
+
+import {
+  equipesDontIlEstMembre,
+  equipesDontIlEstResponsable,
+} from '#server/utils/editions/volunteers/responsables-equipe'
 
 /**
  * La garde du réglage « planning publié », côté serveur.
@@ -60,4 +70,47 @@ export async function exigerPlanningPublie(
     message: "Le planning de cette édition n'est pas encore publié.",
     data: { code: PLANNING_NON_PUBLIE },
   })
+}
+
+/**
+ * Jusqu'où va ce que cette personne voit du planning, et de quelles équipes elle voit les noms.
+ *
+ * DEUX questions, deux sources :
+ *
+ * - l'accès — publication, ou responsabilité d'équipe pour la relecture anticipée ;
+ * - le détail nominatif — les équipes dont elle fait PARTIE, responsable ou non.
+ *
+ * Un gestionnaire n'entraîne aucune lecture : la question est tranchée pour lui, et son écran de
+ * planification appelle ces points d'API en boucle.
+ *
+ * ⚠️ Les deux appartenances passent par `responsables-equipe.ts`, jamais par une lecture directe
+ * de `applicationTeamAssignment` : un organisateur rattaché à une équipe n'a pas de candidature,
+ * et l'interroger seule rouvrirait cet angle mort sans que rien ne le signale.
+ */
+export async function visibiliteDuPlanning(
+  editionId: number,
+  userId: number,
+  estGestionnaire: boolean
+): Promise<{ niveau: NiveauDeVisibilite; equipesEnDetail: string[] }> {
+  if (estGestionnaire) return { niveau: 'complet', equipesEnDetail: [] }
+
+  const planningPublie = await planningPublieDeLEdition(editionId)
+
+  // La responsabilité n'est demandée que lorsqu'elle peut changer la réponse : une fois publié,
+  // l'accès est acquis de toute façon.
+  const equipesDuResponsable = planningPublie
+    ? []
+    : await equipesDontIlEstResponsable(editionId, userId)
+
+  const niveau = niveauDeVisibilite({
+    estGestionnaire: false,
+    planningPublie,
+    estResponsableDEquipe: equipesDuResponsable.length > 0,
+  })
+
+  return {
+    niveau,
+    // Inutile de demander les équipes à qui ne verra rien.
+    equipesEnDetail: niveau === 'aucun' ? [] : await equipesDontIlEstMembre(editionId, userId),
+  }
 }

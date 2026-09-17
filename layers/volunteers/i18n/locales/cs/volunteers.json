@@ -398,8 +398,8 @@
     "phone_numbers_copied": "Zkopírovaná čísla!",
     "phone_numbers_copied_desc": "{count} číslo(a) zkopírované do schránky",
     "phone_placeholder": "Vaše telefonní číslo",
-    "planning_not_published_description": "Organizátoři jej ještě připravují. Vaše směny se zde zobrazí, jakmile bude zveřejněn — dáme vám vědět.",
-    "planning_not_published_title": "Rozpis ještě nebyl zveřejněn",
+    "planning_not_published_description": "Stále se sestavuje: vedoucí na něm pracují a směny se mohou ze dne na den změnit. Nic není definitivní, dokud rozpis nebude zveřejněn. Vaše směny se tu objeví, jakmile k tomu dojde — dáme vám vědět.",
+    "planning_not_published_title": "Rozpis se připravuje — zatím nezveřejněn",
     "planning_publish_label": "Zveřejnit rozpis dobrovolníkům",
     "planning_publish_off_hint": "Dobrovolníci zatím nevidí ani své směny, ani rozpis: můžete jej v klidu sestavovat.",
     "planning_publish_on_hint": "Přijatí dobrovolníci vidí své směny i rozpis ročníku.",
@@ -624,6 +624,8 @@
     "volunteers_short": "dobrovolná práce.",
     "volunteers_summary": "Shrnutí dobrovolníků",
     "what_you_can_bring_title": "Co pro nás můžete udělat",
-    "withdraw": "Stáhnout svou žádost"
+    "withdraw": "Stáhnout svou žádost",
+    "planning_preview_leader_description": "Vidíte ho předem, protože jste vedoucí týmu a máte možnost se k němu vyjádřit. Zatím není zveřejněn: nepředávejte ho svému týmu, směny se ještě mohou změnit. V týmech, do kterých nepatříte, se osoby zobrazují pod přezdívkou, bez jména a příjmení.",
+    "planning_preview_leader_title": "Rozpis se připravuje — k připomínkám"
   }
 }

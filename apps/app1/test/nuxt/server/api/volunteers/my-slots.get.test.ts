@@ -5,6 +5,13 @@ vi.mock('#server/utils/api-helpers', () => ({
   createSuccessResponse: (data: unknown) => ({ success: true, data }),
 }))
 
+// Le point d'API demande désormais de quelles équipes la personne fait partie : l'appartenance
+// décide de ce qu'elle voit nommément, la responsabilité de QUAND elle le voit.
+vi.mock('#server/utils/editions/volunteers/responsables-equipe', () => ({
+  equipesDontIlEstResponsable: vi.fn(async () => []),
+  equipesDontIlEstMembre: vi.fn(async () => []),
+}))
+
 vi.mock('#server/utils/validation-helpers', () => ({
   validateEditionId: (event: any) => parseInt(event?.context?.params?.id, 10),
 }))

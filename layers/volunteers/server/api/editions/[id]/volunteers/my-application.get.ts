@@ -1,5 +1,5 @@
 import { avecCoequipiers, coequipiersSelect } from '../../../../utils/coequipiers-creneau'
-import { planningVisibleSurLEdition } from '../../../../utils/planning-publie'
+import { visibiliteDuPlanning } from '../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -97,7 +97,11 @@ export default wrapApiHandler(
     // On ne demande pas ici si la personne est gestionnaire : cet endpoint rend SA candidature.
     // Un gestionnaire qui consulte la sienne est d'abord un candidat ; s'il veut voir le planning
     // en construction, c'est par son écran de gestion qu'il passe.
-    const planningVisible = await planningVisibleSurLEdition(editionId, false)
+    // Le responsable d'équipe voit SES créneaux avant publication : il relit le planning en
+    // construction, et lui cacher sa propre place y serait absurde. `visibiliteDuPlanning` le
+    // reconnaît ; « pas gestionnaire » reste vrai, c'est bien par sa responsabilité qu'il passe.
+    const { niveau } = await visibiliteDuPlanning(editionId, user.id, false)
+    const planningVisible = niveau !== 'aucun'
 
     // Récupérer les créneaux assignés si la candidature est acceptée
     let assignedTimeSlots = []

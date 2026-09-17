@@ -1,5 +1,5 @@
 import { avecCoequipiers, coequipiersSelect } from '../../../../utils/coequipiers-creneau'
-import { planningVisibleSurLEdition } from '../../../../utils/planning-publie'
+import { visibiliteDuPlanning } from '../../../../utils/planning-publie'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -57,7 +57,11 @@ export default wrapApiHandler(
     // Cet endpoint n'a aujourd'hui aucun appelant côté client, seul son test le référence. Il
     // reste joignable, donc il est protégé : une porte ouverte qu'on croit condamnée est la
     // manière la plus sûre d'annuler tout le reste du travail.
-    const planningVisible = await planningVisibleSurLEdition(editionId, false)
+    // Le responsable d'équipe voit SES créneaux avant publication : il relit le planning en
+    // construction, et lui cacher sa propre place y serait absurde. `visibiliteDuPlanning` le
+    // reconnaît ; « pas gestionnaire » reste vrai, c'est bien par sa responsabilité qu'il passe.
+    const { niveau } = await visibiliteDuPlanning(editionId, user.id, false)
+    const planningVisible = niveau !== 'aucun'
     if (!planningVisible) {
       return createSuccessResponse({ slots: [] })
     }

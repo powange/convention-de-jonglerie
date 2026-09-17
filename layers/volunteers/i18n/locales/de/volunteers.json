@@ -398,8 +398,8 @@
     "phone_numbers_copied": "Nummern kopiert!",
     "phone_numbers_copied_desc": "{count} Nummer(n) in Zwischenablage kopiert",
     "phone_placeholder": "Ihre Telefonnummer",
-    "planning_not_published_description": "Die Verantwortlichen erstellen ihn noch. Deine Schichten erscheinen hier, sobald er veröffentlicht ist — du wirst benachrichtigt.",
-    "planning_not_published_title": "Der Einsatzplan ist noch nicht veröffentlicht",
+    "planning_not_published_description": "Er wird noch erstellt: die Verantwortlichen arbeiten daran, und Schichten können sich von einem Tag auf den anderen ändern. Nichts ist endgültig, solange er nicht veröffentlicht ist. Deine Schichten erscheinen hier, sobald es so weit ist — du wirst benachrichtigt.",
+    "planning_not_published_title": "Plan im Aufbau — noch nicht veröffentlicht",
     "planning_publish_label": "Einsatzplan für die Helfenden veröffentlichen",
     "planning_publish_off_hint": "Die Helfenden sehen weder ihre Schichten noch den Einsatzplan: Du kannst ihn in Ruhe erstellen.",
     "planning_publish_on_hint": "Angenommene Helfende sehen ihre Schichten und den Einsatzplan der Ausgabe.",
@@ -624,6 +624,8 @@
     "volunteers_short": "Freiw.",
     "volunteers_summary": "Freiwilligen-Zusammenfassung",
     "what_you_can_bring_title": "Was Sie uns bringen können",
-    "withdraw": "Meine Bewerbung zurückziehen"
+    "withdraw": "Meine Bewerbung zurückziehen",
+    "planning_preview_leader_description": "Du siehst ihn vorab, weil du ein Team leitest und deine Rückmeldung geben sollst. Er ist noch nicht veröffentlicht: gib ihn nicht an dein Team weiter, Schichten können sich noch ändern. In Teams, denen du nicht angehörst, erscheinen Personen unter ihrem Pseudonym, ohne Vor- und Nachnamen.",
+    "planning_preview_leader_title": "Plan im Aufbau — zur Durchsicht"
   }
 }

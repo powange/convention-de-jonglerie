@@ -263,7 +263,7 @@ const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
 
     convertedTimeSlots.value.forEach((slot) => {
       const myAssignment = slot.assignedVolunteersList?.find(
-        (a: any) => a.user.id === props.currentUserId
+        (a: any) => a.user?.id === props.currentUserId
       )
 
       if (myAssignment) {
@@ -511,9 +511,12 @@ const exportToPdf = async () => {
 
     /** Pseudo, nom complet, ou les deux — même règle pour un bénévole et un organisateur. */
     const nomPersonnePdf = (
-      user: { pseudo?: string | null; prenom?: string | null; nom?: string | null },
+      // `null` sur un créneau anonymisé : le planning des équipes dont on ne fait pas partie
+      // porte ses places occupées sans les personnes. Sans ce cas, l'export PDF tombait dessus.
+      user: { pseudo?: string | null; prenom?: string | null; nom?: string | null } | null,
       defaut = 'Personne'
     ): string => {
+      if (!user) return defaut
       const nomComplet = `${user.prenom || ''} ${user.nom || ''}`.trim()
       if (user.pseudo && nomComplet) return `${user.pseudo} (${nomComplet})`
       return user.pseudo || nomComplet || defaut
@@ -557,7 +560,7 @@ const exportToPdf = async () => {
             (slot) =>
               slot.assignedVolunteersList &&
               slot.assignedVolunteersList.some(
-                (assignment: any) => assignment.user.id === props.currentUserId
+                (assignment: any) => assignment.user?.id === props.currentUserId
               )
           )
         : sortedSlots

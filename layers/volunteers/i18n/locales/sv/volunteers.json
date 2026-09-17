@@ -398,8 +398,8 @@
     "phone_numbers_copied": "Kopierade siffror!",
     "phone_numbers_copied_desc": "{count} antal kopierade till urklipp",
     "phone_placeholder": "Ditt telefonnummer",
-    "planning_not_published_description": "De ansvariga håller fortfarande på med det. Dina pass visas här så snart det är publicerat — du får ett meddelande.",
-    "planning_not_published_title": "Schemat är inte publicerat än",
+    "planning_not_published_description": "Det håller fortfarande på att byggas: de ansvariga arbetar med det och passen kan ändras från en dag till en annan. Inget är slutgiltigt förrän det är publicerat. Dina pass visas här så snart det sker — du får ett meddelande.",
+    "planning_not_published_title": "Schemat byggs — inte publicerat än",
     "planning_publish_label": "Publicera schemat för volontärerna",
     "planning_publish_off_hint": "Volontärerna ser varken sina pass eller schemat än: du kan bygga det i lugn och ro.",
     "planning_publish_on_hint": "Antagna volontärer ser sina pass och upplagans schema.",
@@ -624,6 +624,8 @@
     "volunteers_short": "frivilligt arbete.",
     "volunteers_summary": "Sammanfattning av volontärerna",
     "what_you_can_bring_title": "Vad du kan göra för oss",
-    "withdraw": "Återkalla min ansökan"
+    "withdraw": "Återkalla min ansökan",
+    "planning_preview_leader_description": "Du ser det i förväg för att du är lagansvarig och ska kunna lämna dina synpunkter. Det är inte publicerat än: sprid det inte till ditt lag, passen kan fortfarande ändras. I lag som du inte tillhör visas personer under sitt användarnamn, utan för- och efternamn.",
+    "planning_preview_leader_title": "Schemat byggs — för genomläsning"
   }
 }
