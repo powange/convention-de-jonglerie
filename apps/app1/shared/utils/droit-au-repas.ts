@@ -18,10 +18,31 @@
  * Le fichier vit dans `shared/` parce que la règle sert des deux côtés : le layer `meals` pour ses
  * points d'API, et `apps/app1` pour le port artistes. La dépendance va des layers vers l'app,
  * jamais l'inverse — un util de layer serait inaccessible au port.
+ *
+ * ## Les TROIS formes du droit au repas, et pourquoi elles coexistent
+ *
+ * Ce fichier a longtemps exporté une constante `SELECTION_ACCEPTEE = { accepted: true }`,
+ * présentée comme « la condition Prisma commune à toutes les lectures de sélections ». Elle
+ * n'était employée nulle part, et elle ne pouvait pas tenir cette promesse : il y a trois façons
+ * de poser la question, et chacune est juste dans son contexte.
+ *
+ * 1. **`where: { accepted: true }`** — une vingtaine de lectures. « Quelles lignes disent oui ? »
+ * 2. **`NOT: { mealSelections: { some: { mealId, accepted: false } } }`** — trois lectures
+ *    (`pending.get`, `search.get`, `stats.get`). Question **différente** : « qui n'est pas
+ *    exclu ? ». Elle inclut les personnes qui n'ont **aucune ligne** de sélection, ce que la
+ *    première ne fait pas. C'est le motif des organisateurs, dont la sélection n'existe que pour
+ *    enregistrer une exception.
+ * 3. **`donneDroitAuRepas()`**, ci-dessous — en mémoire, sur un objet déjà chargé.
+ *
+ * Les formes 1 et 3 s'accordent parce que la colonne est `Boolean @default(true)`, **non
+ * nullable** : il n'existe pas de `NULL` sur lequel elles pourraient diverger. La tolérance de la
+ * forme 3 aux valeurs absentes n'est donc pas une divergence de règle, c'est une précaution
+ * contre un `select` partiel qui n'aurait pas ramené le champ.
+ *
+ * ⚠️ `accepted: true` apparaît aussi dans des `select: { … }`, où il signifie « ramène cette
+ * colonne » et non « filtre dessus ». Même chaîne, sens opposé : ne pas y toucher en croyant
+ * uniformiser un filtre.
  */
-
-/** La condition Prisma commune à toutes les lectures de sélections. */
-export const SELECTION_ACCEPTEE = { accepted: true } as const
 
 /** Ce qu'il faut connaître d'une sélection pour juger du droit. */
 export interface SelectionPourDroit {
