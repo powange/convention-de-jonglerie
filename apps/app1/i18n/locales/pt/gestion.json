@@ -412,7 +412,9 @@
       "remove_performance": "Remover esta sessão",
       "message_group": "Escrever ao elenco",
       "message_group_error": "Não foi possível abrir o grupo de mensagens do espetáculo",
-      "message_group_no_artists": "Nenhum artista neste espetáculo"
+      "message_group_no_artists": "Nenhum artista neste espetáculo",
+      "end_datetime": "Hora de fim",
+      "end_datetime_hint": "Calculada a partir da duração do espetáculo."
     },
     "stock": {
       "available_now": "{available}/{total} disponível(eis)",

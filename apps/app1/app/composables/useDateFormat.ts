@@ -26,6 +26,22 @@ export const useDateFormat = () => {
   }
 
   /**
+   * Formate seulement l'heure
+   *
+   * Pour ce qui se lit à côté d'une date déjà écrite — une heure de fin en face de son heure de
+   * début — où répéter le jour à chaque ligne encombre sans rien apprendre. Même fuseau que les
+   * autres, sans quoi deux colonnes voisines annonceraient des heures incomparables.
+   */
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString(intlLocale.value, {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Paris',
+    })
+  }
+
+  /**
    * Formate seulement la date
    */
   const formatDate = (dateString: string) => {
@@ -189,6 +205,7 @@ export const useDateFormat = () => {
 
   return {
     formatDateTime,
+    formatTime,
     formatDate,
     formatDateFull,
     formatDateWithWeekday,

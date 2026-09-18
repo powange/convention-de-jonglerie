@@ -840,7 +840,7 @@ const listeChoisieId = computed<number | null>({
     // Les tags repartent à zéro : ils décrivent le contenu d'UNE liste, et les traîner sur la
     // suivante donnait un tableau amputé par un filtre dont plus rien ne montrait qu'il agissait.
     // Dans la même navigation, et non dans un `watch` séparé : deux `replace` consécutifs se
-    // recouvrent, et le second repartirait d'une `route.query` périmée.
+    // recouvrent, et le second repartirait d'un état d'URL périmé.
     router.replace({
       query: { ...route.query, liste: valeur ? String(valeur) : undefined, tags: undefined },
     })

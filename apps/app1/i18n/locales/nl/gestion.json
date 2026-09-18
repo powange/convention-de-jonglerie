@@ -412,7 +412,9 @@
       "remove_performance": "Deze voorstelling verwijderen",
       "message_group": "De cast berichten",
       "message_group_error": "Kan de groepsconversatie van de voorstelling niet openen",
-      "message_group_no_artists": "Geen artiesten bij deze voorstelling"
+      "message_group_no_artists": "Geen artiesten bij deze voorstelling",
+      "end_datetime": "Eindtijd",
+      "end_datetime_hint": "Berekend op basis van de duur van de voorstelling."
     },
     "stock": {
       "available_now": "{available}/{total} beschikbaar",

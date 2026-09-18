@@ -364,6 +364,8 @@
       "duration": "Durée",
       "edit_acts": "Éditer les numéros",
       "edit_show": "Modifier le spectacle",
+      "end_datetime": "Heure de fin",
+      "end_datetime_hint": "Calculée à partir de la durée du spectacle.",
       "error_create": "Erreur lors de la création du spectacle",
       "error_delete": "Erreur lors de la suppression du spectacle",
       "error_loading": "Erreur lors du chargement du spectacle",

@@ -412,7 +412,9 @@
       "remove_performance": "Ta bort denna föreställning",
       "message_group": "Skriv till ensemblen",
       "message_group_error": "Det gick inte att öppna föreställningens gruppkonversation",
-      "message_group_no_artists": "Inga artister i den här föreställningen"
+      "message_group_no_artists": "Inga artister i den här föreställningen",
+      "end_datetime": "Sluttid",
+      "end_datetime_hint": "Beräknad utifrån föreställningens längd."
     },
     "stock": {
       "available_now": "{available}/{total} tillgängliga",

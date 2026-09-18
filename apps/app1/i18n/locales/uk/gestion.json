@@ -412,7 +412,9 @@
       "remove_performance": "Видалити цей показ",
       "message_group": "Написати складу",
       "message_group_error": "Не вдалося відкрити груповий чат вистави",
-      "message_group_no_artists": "У цій виставі немає артистів"
+      "message_group_no_artists": "У цій виставі немає артистів",
+      "end_datetime": "Час завершення",
+      "end_datetime_hint": "Обчислюється за тривалістю вистави."
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

@@ -412,7 +412,9 @@
       "remove_performance": "Remove this performance",
       "message_group": "Message the cast",
       "message_group_error": "Could not open the show's group conversation",
-      "message_group_no_artists": "No artists on this show"
+      "message_group_no_artists": "No artists on this show",
+      "end_datetime": "End time",
+      "end_datetime_hint": "Calculated from the show's duration."
     },
     "stock": {
       "available_now": "{available}/{total} available",

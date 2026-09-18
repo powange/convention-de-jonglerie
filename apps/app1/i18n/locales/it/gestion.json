@@ -412,7 +412,9 @@
       "remove_performance": "Rimuovi questa replica",
       "message_group": "Scrivere al cast",
       "message_group_error": "Impossibile aprire il gruppo di messaggistica dello spettacolo",
-      "message_group_no_artists": "Nessun artista in questo spettacolo"
+      "message_group_no_artists": "Nessun artista in questo spettacolo",
+      "end_datetime": "Ora di fine",
+      "end_datetime_hint": "Calcolata in base alla durata dello spettacolo."
     },
     "stock": {
       "available_now": "{available}/{total} disponibile/i",
