@@ -13,13 +13,13 @@ const user = (id: number, pseudo: string) => ({ id, pseudo })
 
 const slot = (
   id: number,
-  start: string,
-  end: string,
+  startDateTime: string,
+  endDateTime: string,
   users: Array<{ id: number; pseudo: string }>
 ): TimeSlotWithAssignments => ({
   id,
-  start,
-  end,
+  startDateTime,
+  endDateTime,
   assignedVolunteersList: users.map((u) => ({ user: u })),
 })
 
@@ -91,11 +91,11 @@ describe('volunteer-stats — agrégation des statistiques bénévoles', () => {
 
     it('ignore les créneaux sans liste de bénévoles affectés', () => {
       const slots: TimeSlotWithAssignments[] = [
-        { id: 1, start: '2026-06-16T08:00:00Z', end: '2026-06-16T12:00:00Z' },
+        { id: 1, startDateTime: '2026-06-16T08:00:00Z', endDateTime: '2026-06-16T12:00:00Z' },
         {
           id: 2,
-          start: '2026-06-16T13:00:00Z',
-          end: '2026-06-16T15:00:00Z',
+          startDateTime: '2026-06-16T13:00:00Z',
+          endDateTime: '2026-06-16T15:00:00Z',
           assignedVolunteersList: [],
         },
       ]
@@ -120,11 +120,11 @@ describe('volunteer-stats — agrégation des statistiques bénévoles', () => {
 
     it('ignore les créneaux sans bénévoles affectés', () => {
       const slots: TimeSlotWithAssignments[] = [
-        { id: 1, start: '2026-06-16T08:00:00Z', end: '2026-06-16T12:00:00Z' },
+        { id: 1, startDateTime: '2026-06-16T08:00:00Z', endDateTime: '2026-06-16T12:00:00Z' },
         {
           id: 2,
-          start: '2026-06-16T13:00:00Z',
-          end: '2026-06-16T15:00:00Z',
+          startDateTime: '2026-06-16T13:00:00Z',
+          endDateTime: '2026-06-16T15:00:00Z',
           assignedVolunteersList: [],
         },
       ]
@@ -297,8 +297,8 @@ describe('statistiques avec organisateurs', () => {
     organisateurs: Array<{ id: number; pseudo: string }>
   ): TimeSlotWithAssignments => ({
     id,
-    start: debut,
-    end: fin,
+    startDateTime: debut,
+    endDateTime: fin,
     assignedVolunteersList: benevoles.map((u) => ({ user: u })),
     assignedOrganizersList: organisateurs.map((u) => ({ user: u })),
   })

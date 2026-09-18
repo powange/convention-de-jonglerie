@@ -22,8 +22,8 @@ const bornes = {
 
 const creneau = (debut: string, fin: string, besoin: number, extra: object = {}) => ({
   id: debut,
-  start: debut,
-  end: fin,
+  startDateTime: debut,
+  endDateTime: fin,
   maxVolunteers: besoin,
   teamId: 'bar',
   assignedVolunteersList: [],

@@ -137,7 +137,12 @@ const props = defineProps<{
     [key: string]: any
   } | null
   /** Tous les créneaux du planning : le tri et le filtrage se font ici. */
-  timeSlots: Array<{ id: string | number; start: string; end: string; [key: string]: any }>
+  timeSlots: Array<{
+    id: string | number
+    startDateTime: string
+    endDateTime: string
+    [key: string]: any
+  }>
   /** Les équipes de l'édition, pour nommer et colorer chaque créneau. */
   teams: Array<{ id: string; name: string; color?: string | null }>
   formatDate: (date: string) => string

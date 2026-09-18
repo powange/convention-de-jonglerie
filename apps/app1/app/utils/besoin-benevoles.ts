@@ -30,7 +30,9 @@ export function heuresDesOrganisateurs(timeSlots: TimeSlotWithAssignments[]): nu
     const organisateurs = personnesDuCreneau(slot).filter((personne) => personne.estOrganisateur)
     if (organisateurs.length === 0) continue
 
-    const duree = (new Date(slot.end).getTime() - new Date(slot.start).getTime()) / (1000 * 60 * 60)
+    const duree =
+      (new Date(slot.endDateTime).getTime() - new Date(slot.startDateTime).getTime()) /
+      (1000 * 60 * 60)
     heures += duree * organisateurs.length
   }
 

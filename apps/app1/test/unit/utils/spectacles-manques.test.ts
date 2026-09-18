@@ -11,8 +11,8 @@ const creneau = (options: {
 }) => ({
   id: options.id ?? 'creneau-1',
   title: 'Accueil du public',
-  start: options.debut,
-  end: options.fin,
+  startDateTime: options.debut,
+  endDateTime: options.fin,
   teamId: options.teamId ?? 'equipe-A',
   assignedVolunteersList: (options.benevoles ?? [1]).map((id) => ({
     user: { id, pseudo: `benevole-${id}` },
