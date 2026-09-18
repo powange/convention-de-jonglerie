@@ -6,8 +6,15 @@
  * sont donc inertes sur téléphone et tablette — et une convention se prépare en marchant pendant
  * le montage, pas assis devant un clavier.
  *
- * Les *pointer events* couvrent les deux mondes avec un seul jeu d'événements. Trois précautions
+ * Les *pointer events* couvrent les deux mondes avec un seul jeu d'événements. Quatre précautions
  * les rendent utilisables, et ce sont elles qui justifient un composable plutôt qu'une recopie :
+ *
+ * 0. **Écouter sur la FENÊTRE, pas sur l'élément.** C'est la première, et celle qui se paie le plus
+ *    cher quand on l'oublie : `setPointerCapture` ne peut être appelée qu'une fois l'intention
+ *    établie, donc après un premier mouvement — et si ce mouvement sort déjà de l'élément, son
+ *    `pointermove` part ailleurs et le geste est perdu avant d'avoir commencé. Sur une carte basse,
+ *    vingt pixels suffisent à en sortir. Les écouteurs sont donc posés sur `window` au premier
+ *    appui et retirés au relâchement.
  *
  * 1. **Un seuil avant de saisir.** Sans lui, le moindre appui verrouille le pointeur et la page ne
  *    défile plus : on ne peut littéralement plus descendre dans la liste. Le glissement ne commence
@@ -66,7 +73,6 @@ export function useReordonnancementTactile<T>(options: OptionsReordonnancement<T
   let departX = 0
   let departY = 0
   let saisieConfirmee = false
-  let elementCapturant: HTMLElement | null = null
   let defilement: number | null = null
   let vitesse = 0
 
@@ -108,14 +114,24 @@ export function useReordonnancementTactile<T>(options: OptionsReordonnancement<T
     }
   }
 
+  function detacherEcouteurs() {
+    window.removeEventListener('pointermove', auPointerMove)
+    window.removeEventListener('pointerup', auPointerUp)
+    window.removeEventListener('pointercancel', annuler)
+  }
+
   function reinitialiser() {
+    detacherEcouteurs()
     arreterDefilement()
     cleSaisie.value = null
     cleSurvolee.value = null
     zoneSurvolee.value = null
     cote.value = null
     saisieConfirmee = false
-    elementCapturant = null
+  }
+
+  function annuler() {
+    reinitialiser()
   }
 
   function auPointerDown(element: T, event: PointerEvent) {
@@ -127,7 +143,12 @@ export function useReordonnancementTactile<T>(options: OptionsReordonnancement<T
     departX = event.clientX
     departY = event.clientY
     saisieConfirmee = false
-    elementCapturant = event.currentTarget as HTMLElement
+
+    // Sur la fenêtre : voir la précaution 0 de l'en-tête. Le geste doit survivre à la sortie de
+    // l'élément, y compris avant que la moindre capture ait pu être prise.
+    window.addEventListener('pointermove', auPointerMove, { passive: false })
+    window.addEventListener('pointerup', auPointerUp)
+    window.addEventListener('pointercancel', annuler)
   }
 
   function auPointerMove(event: PointerEvent) {
@@ -137,17 +158,6 @@ export function useReordonnancementTactile<T>(options: OptionsReordonnancement<T
       const distance = Math.hypot(event.clientX - departX, event.clientY - departY)
       if (distance < SEUIL_DE_SAISIE) return
       saisieConfirmee = true
-      // La capture n'est prise qu'ICI, une fois l'intention établie : la prendre au premier appui
-      // confisquerait le défilement de la page à chaque effleurement.
-      //
-      // `setPointerCapture` lève `NotFoundError` quand le pointeur n'est plus actif — un doigt
-      // relevé entre deux images, un événement rejoué. Le glissement fonctionne sans la capture,
-      // simplement moins bien si le doigt sort de l'élément : l'échec ne doit pas tout interrompre.
-      try {
-        elementCapturant?.setPointerCapture?.(event.pointerId)
-      } catch {
-        // Sans capture, `elementFromPoint` suffit à suivre la cible.
-      }
     }
 
     // `preventDefault` empêche le défilement natif de lutter contre le nôtre pendant le glissement.
@@ -229,14 +239,18 @@ export function useReordonnancementTactile<T>(options: OptionsReordonnancement<T
     await options.auDepot(ordreFinal, deplace, zone)
   }
 
-  onScopeDispose(arreterDefilement)
+  // Un composant démonté en plein glissement laisserait des écouteurs sur la fenêtre.
+  onScopeDispose(() => {
+    detacherEcouteurs()
+    arreterDefilement()
+  })
 
   return {
-    /** À lier sur chaque élément réordonnable, avec `:data-reordonnable="cle"`. */
+    /**
+     * Seul `auPointerDown` se lie dans le modèle, avec `:data-reordonnable="cle"` sur le même
+     * élément. Le suivi et le relâchement sont écoutés sur la fenêtre, pas sur l'élément.
+     */
     auPointerDown,
-    auPointerMove,
-    auPointerUp,
-    auPointerCancel: () => reinitialiser(),
     cleSaisie,
     cleSurvolee,
     zoneSurvolee,

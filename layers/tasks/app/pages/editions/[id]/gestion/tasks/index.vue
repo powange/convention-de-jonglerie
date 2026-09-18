@@ -53,9 +53,6 @@
         ]"
         :style="groups.length > 1 ? { touchAction: 'none' } : undefined"
         @pointerdown="reordre.auPointerDown(group, $event)"
-        @pointermove="reordre.auPointerMove($event)"
-        @pointerup="reordre.auPointerUp()"
-        @pointercancel="reordre.auPointerCancel()"
         @click="ouvrirGroupe(group.id)"
       >
         <template #header>

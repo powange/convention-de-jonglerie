@@ -218,9 +218,6 @@
               :ui="{ body: 'p-3' }"
               @click="onTaskClick(task)"
               @pointerdown="saisirTache(task, $event)"
-              @pointermove="reordre.auPointerMove($event)"
-              @pointerup="reordre.auPointerUp()"
-              @pointercancel="reordre.auPointerCancel()"
             >
               <div class="font-medium text-sm mb-2">{{ task.title }}</div>
               <div v-if="task.tagAssignments.length" class="flex flex-wrap gap-1 mb-2">
