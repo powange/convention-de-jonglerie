@@ -120,10 +120,6 @@
         "name_required": "El nombre es obligatorio"
       },
       "volunteer": {
-        "choose_placeholder": "Elegir un artículo a entregar...",
-        "given_to_all": "Entregado a todos los voluntarios",
-        "remove_label": "Retirar artículo",
-        "remove_title": "¿Retirar este artículo?",
         "items_label": "Artículos entregados para este ámbito",
         "save": "Guardar",
         "saved": "Artículos guardados",

@@ -120,10 +120,6 @@
         "name_required": "De naam is verplicht"
       },
       "volunteer": {
-        "choose_placeholder": "Kies een uit te reiken artikel...",
-        "given_to_all": "Gegeven aan alle vrijwilligers",
-        "remove_label": "Artikel verwijderen",
-        "remove_title": "Dit artikel verwijderen?",
         "items_label": "Artikelen die voor dit bereik worden uitgereikt",
         "save": "Opslaan",
         "saved": "Artikelen opgeslagen",

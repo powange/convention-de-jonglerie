@@ -93,14 +93,15 @@
 
       <!-- ONGLET 1 : ce qui manque -->
       <div v-if="ongletActif === 'racheter'" class="space-y-3">
-        <div v-if="manquants.length === 0" class="text-center py-12">
+        <div v-if="tousLesManquants.length === 0" class="text-center py-12">
           <UIcon name="i-heroicons-check-circle" class="size-12 text-green-500 mx-auto mb-3" />
           <p class="text-gray-600 dark:text-gray-400">{{ t('gestion.stock.missing_none') }}</p>
         </div>
 
         <template v-else>
-          <div v-if="canManage" class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-wrap items-center gap-3">
             <UButton
+              v-if="canManage"
               size="sm"
               icon="i-heroicons-shopping-cart"
               :disabled="identifiantsSelectionnes.length === 0"
@@ -112,6 +113,28 @@
                 })
               }}
             </UButton>
+
+            <!-- Le filtre sert aussi à qui ne peut que lire — savoir ce qui n'est prévu nulle part
+                 est une question de consultation, pas d'écriture. D'où sa place hors du `v-if`. -->
+            <UCheckbox
+              v-model="seulementHorsListe"
+              :label="t('gestion.stock.missing_filter_unlisted')"
+              :ui="{ base: 'cursor-pointer', label: 'cursor-pointer' }"
+            />
+          </div>
+
+          <!-- Le filtre ne laisse rien passer : c'est une bonne nouvelle — tout le manque est déjà
+               prévu —, et surtout PAS « rien ne manque ». La barre d'outils reste au-dessus, sans
+               quoi la case qui a produit ce vide disparaîtrait avec lui, et on ne pourrait plus la
+               décocher. -->
+          <div v-if="manquants.length === 0" class="text-center py-12">
+            <UIcon
+              name="i-heroicons-clipboard-document-check"
+              class="size-12 text-green-500 mx-auto mb-3"
+            />
+            <p class="text-gray-600 dark:text-gray-400">
+              {{ t('gestion.stock.missing_all_listed') }}
+            </p>
           </div>
 
           <!-- `get-row-id` fait porter les clés de sélection par l'identifiant de l'objet et non
@@ -120,6 +143,7 @@
                désignerait alors d'autres objets que ceux cochés. Même raison que sur la page d'un
                groupe. -->
           <UTable
+            v-else
             v-model:row-selection="selectionLignes"
             :get-row-id="(objet: any) => String(objet.id)"
             :data="manquants"
@@ -197,6 +221,33 @@
               <UBadge color="error" variant="subtle">
                 {{ quantiteARacheter(row.original) }}
               </UBadge>
+            </template>
+            <!-- Où cet objet est DÉJÀ prévu. La question se pose au moment même où l'on coche des
+                 lignes pour les verser dans une liste : sans cette colonne, il fallait ouvrir le
+                 troisième onglet et parcourir chaque liste pour savoir si le travail avait déjà été
+                 fait. Le vert dit qu'il a même déjà été acheté — auquel cas la ligne manque encore
+                 ici parce que personne n'a recompté depuis. -->
+            <template #listes-cell="{ row }">
+              <div v-if="listesDeLObjet(row.original.id).length" class="flex flex-wrap gap-1">
+                <UTooltip
+                  v-for="appartenance in listesDeLObjet(row.original.id)"
+                  :key="appartenance.id"
+                  :text="
+                    appartenance.purchased
+                      ? t('gestion.stock.missing_in_list_purchased')
+                      : t('gestion.stock.missing_in_list_pending')
+                  "
+                >
+                  <UBadge
+                    :color="appartenance.purchased ? 'success' : 'neutral'"
+                    variant="subtle"
+                    class="max-w-40"
+                  >
+                    <span class="truncate">{{ appartenance.name }}</span>
+                  </UBadge>
+                </UTooltip>
+              </div>
+              <span v-else class="text-sm text-gray-400">—</span>
             </template>
           </UTable>
         </template>
@@ -425,6 +476,7 @@ import { listeEnCours } from '../../../../../utils/compteur-listes-de-courses'
 import { peutGererLeStock } from '../../../../../utils/droits-stock'
 import {
   articleSansObjet,
+  listesParObjet,
   listeTerminee,
   quantiteDeLArticle,
   resumeListe,
@@ -535,7 +587,45 @@ const lignes = computed<ObjetManquant[]>(() =>
   }))
 )
 
-const manquants = computed(() => objetsARacheter(lignes.value))
+/**
+ * Où chaque objet est déjà prévu, lu dans les listes DÉJÀ chargées.
+ *
+ * Le troisième onglet a besoin du contenu des listes de toute façon : l'appartenance s'en déduit
+ * sans une requête de plus, et se recalcule d'elle-même quand `chargerListes` rend la main après
+ * un ajout ou un retrait — la colonne et le filtre suivent sans qu'on ait à y penser.
+ */
+const appartenances = computed(() => listesParObjet(listes.value))
+
+const listesDeLObjet = (id: number) => appartenances.value.get(id) ?? []
+
+/**
+ * Ne montrer que ce qui n'est prévu nulle part.
+ *
+ * Sur une grosse édition, la moitié des manquants est déjà versée dans une liste au moment où l'on
+ * revient sur la page : les relire une par une pour retrouver les quelques-unes qui restent est
+ * exactement le travail que la colonne « Listes » permet d'éviter.
+ *
+ * Volontairement hors de l'URL, à la différence de l'onglet : c'est un réglage de coup d'œil, pas
+ * un endroit vers lequel on envoie quelqu'un.
+ */
+const seulementHorsListe = ref(false)
+
+// Basculer le filtre vide la sélection : ce qui est coché doit toujours être ce qu'on voit. Les
+// clés de sélection survivent à la disparition d'une ligne — c'est voulu pour le recomptage —,
+// si bien que sans cela on cocherait cinq objets, on poserait le filtre, et le bouton en verserait
+// deux qu'on ne regardait plus dans la liste de courses.
+watch(seulementHorsListe, () => {
+  selectionLignes.value = {}
+})
+
+const tousLesManquants = computed(() => objetsARacheter(lignes.value))
+
+const manquants = computed(() =>
+  seulementHorsListe.value
+    ? tousLesManquants.value.filter((objet) => listesDeLObjet(objet.id).length === 0)
+    : tousLesManquants.value
+)
+
 const nonComptes = computed(() => objetsNonComptes(lignes.value))
 const resume = computed(() => resumeRachat(lignes.value))
 const enAttente = computed(() => nombreEnAttente(lignes.value as LigneComptage[]))
@@ -569,6 +659,7 @@ const colonnesManquants = computed((): TableColumn<ObjetManquant>[] => [
   { id: 'quantity', accessorKey: 'quantity', header: t('gestion.stock.count_expected') },
   { id: 'compte', header: t('gestion.stock.count_counted') },
   { id: 'racheter', header: t('gestion.stock.missing_to_buy') },
+  { id: 'listes', header: t('gestion.stock.missing_in_lists') },
 ])
 
 const colonnesACompter = computed((): TableColumn<ObjetManquant>[] => [

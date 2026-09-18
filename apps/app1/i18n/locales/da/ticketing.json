@@ -120,10 +120,6 @@
         "name_required": "Navnet er påkrævet"
       },
       "volunteer": {
-        "choose_placeholder": "Vælg en genstand til udlevering...",
-        "given_to_all": "Udleveret til alle frivillige",
-        "remove_label": "Fjern varen",
-        "remove_title": "Fjern denne vare?",
         "items_label": "Genstande der udleveres for dette omfang",
         "save": "Gem",
         "saved": "Genstande gemt",

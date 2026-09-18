@@ -105,3 +105,53 @@ export function objetsAAjouter(
   )
   return [...new Set(idsChoisis)].filter((id) => !deja.has(id))
 }
+
+/** Une liste de courses avec son contenu, telle que l'écran la reçoit. */
+export interface ListeAvecArticles {
+  id: number
+  name: string
+  items: ArticleDeListe[]
+}
+
+/** Une liste où un objet figure déjà, et ce qu'on y a fait de lui. */
+export interface AppartenanceAListe {
+  id: number
+  name: string
+  /** L'article a-t-il été coché dans cette liste-là ? Un même objet peut l'être ici et pas là. */
+  purchased: boolean
+}
+
+/**
+ * Pour chaque objet, les listes de courses où il figure déjà.
+ *
+ * La lecture se fait dans l'autre sens que le stockage : la base part de la liste et descend vers
+ * ses articles, alors que la page des manquants tient une ligne par objet et demande « celui-ci,
+ * est-il déjà prévu quelque part&nbsp;? ». Retourner l'index une fois plutôt que reparcourir
+ * toutes les listes à chaque ligne de tableau — un même objet peut d'ailleurs appartenir à
+ * plusieurs listes, rien ne l'interdit : l'unicité en base porte sur le couple liste+objet.
+ *
+ * L'ordre d'insertion est conservé, donc celui que l'API a rendu — la liste la plus récente
+ * d'abord, celle qu'on est le plus susceptible d'être en train de remplir.
+ *
+ * Un article privé de son objet est ignoré : il ne désigne plus rien qu'une ligne puisse afficher.
+ */
+export function listesParObjet(listes: ListeAvecArticles[]): Map<number, AppartenanceAListe[]> {
+  const index = new Map<number, AppartenanceAListe[]>()
+
+  for (const liste of listes) {
+    for (const article of liste.items) {
+      const objetId = article.item?.id
+      if (objetId == null) continue
+
+      const appartenances = index.get(objetId) ?? []
+      appartenances.push({
+        id: liste.id,
+        name: liste.name,
+        purchased: article.purchased,
+      })
+      index.set(objetId, appartenances)
+    }
+  }
+
+  return index
+}

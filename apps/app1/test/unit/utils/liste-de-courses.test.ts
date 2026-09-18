@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   articleSansObjet,
   listeTerminee,
+  listesParObjet,
   objetsAAjouter,
   quantiteDeLArticle,
   resumeListe,
@@ -143,5 +144,48 @@ describe('objetsAAjouter', () => {
     const existants = [article({ id: 1, item: item({ id: 5 }) })]
 
     expect(objetsAAjouter([5], existants)).toEqual([])
+  })
+})
+
+describe('listesParObjet', () => {
+  const liste = (id: number, name: string, items: ArticleDeListe[]) => ({ id, name, items })
+
+  it('retourne l’index : une entrée par objet, les listes où il figure', () => {
+    const index = listesParObjet([
+      liste(1, 'Courses samedi', [article({ id: 10, item: item({ id: 5 }) })]),
+      liste(2, 'Courses dimanche', [article({ id: 11, item: item({ id: 5 }), purchased: true })]),
+    ])
+
+    expect(index.get(5)).toEqual([
+      { id: 1, name: 'Courses samedi', purchased: false },
+      { id: 2, name: 'Courses dimanche', purchased: true },
+    ])
+  })
+
+  it('garde l’ordre rendu par l’API, la liste la plus récente d’abord', () => {
+    const index = listesParObjet([
+      liste(2, 'Récente', [article({ id: 10, item: item({ id: 5 }) })]),
+      liste(1, 'Ancienne', [article({ id: 11, item: item({ id: 5 }) })]),
+    ])
+
+    expect(index.get(5)?.map((appartenance) => appartenance.name)).toEqual(['Récente', 'Ancienne'])
+  })
+
+  it('ne dit rien d’un objet qui n’est dans aucune liste', () => {
+    const index = listesParObjet([liste(1, 'Courses', [article({ item: item({ id: 5 }) })])])
+
+    expect(index.get(7)).toBeUndefined()
+  })
+
+  it('ignore un article privé de son objet', () => {
+    // Il ne désigne plus rien qu'une ligne de tableau puisse afficher.
+    const index = listesParObjet([liste(1, 'Courses', [article({ item: null })])])
+
+    expect(index.size).toBe(0)
+  })
+
+  it('n’a rien à dire de listes vides', () => {
+    expect(listesParObjet([liste(1, 'Courses', [])]).size).toBe(0)
+    expect(listesParObjet([]).size).toBe(0)
   })
 })
