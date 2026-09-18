@@ -178,15 +178,13 @@
         <div
           v-for="status in kanbanStatuses"
           :key="status"
+          :data-zone-reordonnable="status"
           class="bg-gray-50 dark:bg-gray-900/40 rounded-lg p-3 min-h-50 transition-colors"
           :class="
-            dragOverStatus === status && draggedFromStatus !== status
+            reordre.zoneSurvolee.value === status && reordre.enCours.value
               ? 'ring-2 ring-primary-500'
               : ''
           "
-          @dragover.prevent="onColumnDragOver(status)"
-          @dragleave="onColumnDragLeave(status, $event)"
-          @drop="onColumnDrop(status)"
         >
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
@@ -197,27 +195,32 @@
             </div>
           </div>
           <div class="space-y-2 min-h-10">
+            <!-- `touch-action: none` est la condition sine qua non du glissement au doigt : sans
+                 lui, le navigateur interprète le geste comme un défilement et cesse d'émettre des
+                 `pointermove`. Il n'est posé que si l'on peut réordonner, faute de quoi on
+                 confisquerait le défilement à qui ne fait que lire son tableau. -->
             <UCard
               v-for="task in tasksByStatus(status)"
               :key="task.id"
-              draggable="true"
+              :data-reordonnable="task.id"
               :class="[
-                'cursor-grab active:cursor-grabbing hover:shadow-md transition-all',
-                draggedTaskId === task.id ? 'opacity-50' : '',
-                dragOverTaskId === task.id && dragOverPosition === 'before'
+                'hover:shadow-md transition-all',
+                'cursor-grab active:cursor-grabbing',
+                reordre.cleSaisie.value === task.id ? 'opacity-50' : '',
+                reordre.cleSurvolee.value === task.id && reordre.cote.value === 'avant'
                   ? 'border-t-2 border-t-primary-500'
                   : '',
-                dragOverTaskId === task.id && dragOverPosition === 'after'
+                reordre.cleSurvolee.value === task.id && reordre.cote.value === 'apres'
                   ? 'border-b-2 border-b-primary-500'
                   : '',
               ]"
+              :style="{ touchAction: 'none' }"
               :ui="{ body: 'p-3' }"
               @click="onTaskClick(task)"
-              @dragstart="onTaskDragStart(task, $event)"
-              @dragend="onTaskDragEnd"
-              @dragover.prevent="onCardDragOver(task, $event)"
-              @dragleave="onCardDragLeave(task)"
-              @drop.stop="onCardDrop(task)"
+              @pointerdown="saisirTache(task, $event)"
+              @pointermove="reordre.auPointerMove($event)"
+              @pointerup="reordre.auPointerUp()"
+              @pointercancel="reordre.auPointerCancel()"
             >
               <div class="font-medium text-sm mb-2">{{ task.title }}</div>
               <div v-if="task.tagAssignments.length" class="flex flex-wrap gap-1 mb-2">
@@ -299,6 +302,24 @@
       @saved="handleTaskSaved"
       @deleted="handleTaskDeleted"
       @task-updated="handleTaskUpdated"
+    />
+
+    <UiConfirmModal
+      v-model="confirmationGroupeOuverte"
+      :title="t('gestion.task.delete_group')"
+      :description="
+        group
+          ? t('gestion.task.confirm_delete_group', {
+              name: group.name,
+              count: group.tasks.length,
+            })
+          : ''
+      "
+      :confirm-label="t('common.delete')"
+      confirm-color="error"
+      :loading="suppressionGroupeEnCours"
+      @confirm="supprimerGroupe"
+      @cancel="confirmationGroupeOuverte = false"
     />
   </UContainer>
 </template>
@@ -650,19 +671,34 @@ const groupActions = computed(() => [
   ],
 ])
 
-async function deleteGroup() {
+const confirmationGroupeOuverte = ref(false)
+const suppressionGroupeEnCours = ref(false)
+
+function deleteGroup() {
   if (!group.value) return
-  if (
-    !confirm(
-      t('gestion.task.confirm_delete_group', {
-        name: group.value.name,
-        count: group.value.tasks.length,
-      })
-    )
-  )
-    return
-  await $fetch(`/api/editions/${editionId}/task-groups/${group.value.id}`, { method: 'DELETE' })
-  router.push(`/editions/${editionId}/gestion/tasks`)
+  confirmationGroupeOuverte.value = true
+}
+
+async function supprimerGroupe() {
+  // `UiConfirmModal` n'émet que `confirm` et `cancel` : la refermer revient à l'appelant. Ici,
+  // le succès quitte la page — la refermer serait de toute façon sans objet.
+  const groupe = group.value
+  if (!groupe) return
+
+  suppressionGroupeEnCours.value = true
+  try {
+    await $fetch(`/api/editions/${editionId}/task-groups/${groupe.id}`, { method: 'DELETE' })
+    router.push(`/editions/${editionId}/gestion/tasks`)
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string } }
+    useToast().add({
+      title: err?.data?.message || t('errors.generic'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    suppressionGroupeEnCours.value = false
+  }
 }
 
 async function handleGroupSaved() {
@@ -728,51 +764,86 @@ function checklistDone(task: TaskItem): number {
  */
 const triActif = computed(() => filters.value.sort !== 'manual')
 
-const draggedTaskId = ref<number | null>(null)
-const draggedFromStatus = ref<TaskStatus | null>(null)
-const dragOverStatus = ref<TaskStatus | null>(null)
-const dragOverTaskId = ref<number | null>(null)
-const dragOverPosition = ref<'before' | 'after' | null>(null)
-// Bloque le click synthétique émis juste après un drag (selon les navigateurs)
-const justDragged = ref(false)
+/**
+ * Le glisser-déposer du kanban : changer de colonne, et réordonner dans une colonne.
+ *
+ * ⚠️ Par *pointer events* et non par le glisser-déposer HTML5, que les navigateurs mobiles
+ * n'émettent pas au toucher : le tableau était inerte sur téléphone et tablette, alors qu'une
+ * convention se prépare en marchant. Le détail des précautions — seuil de saisie, défilement
+ * automatique, clic parasite — vit dans le composable, partagé avec la liste des groupes.
+ */
+/**
+ * La colonne d'où part la carte saisie.
+ *
+ * Retenue au moment de la saisie plutôt que relue depuis le composable : `elements()` aurait eu
+ * besoin de `reordre` avant que `reordre` soit construit, et TypeScript refuse à juste titre une
+ * variable qui se lit dans sa propre définition.
+ */
+const statutSaisi = ref<TaskStatus | null>(null)
 
+function saisirTache(task: TaskItem, event: PointerEvent) {
+  statutSaisi.value = task.status
+  reordre.auPointerDown(task, event)
+}
+
+const reordre = useReordonnancementTactile<TaskItem>({
+  // On réordonne DANS la colonne de départ : les autres colonnes ne sont pas concernées.
+  elements: () => (statutSaisi.value ? tasksByStatus(statutSaisi.value) : []),
+  cle: (task) => task.id,
+  auDepot: async (ordreFinal, deplace, zone) => {
+    const statutVise = (zone ?? deplace.status) as TaskStatus
+
+    // Cas 1 : la carte change de colonne. Le rang ne bouge pas — changer les deux à la fois
+    // demanderait deux écritures dont la seconde pourrait échouer seule.
+    if (statutVise !== deplace.status) {
+      await changeTaskStatus(deplace.id, deplace.status, statutVise)
+      return
+    }
+
+    // Cas 2 : réordonnancement dans la colonne, impossible tant qu'un tri est actif — voir le
+    // commentaire au-dessus de `triActif`, qui explique le dégât que cela causait.
+    if (triActif.value) {
+      useToast().add({
+        title: t('gestion.task.reorder_requires_manual_sort'),
+        icon: 'i-heroicons-arrows-up-down',
+        color: 'warning',
+      })
+      return
+    }
+
+    const taches = group.value?.tasks
+    if (!taches) return
+
+    // Mise à jour optimiste : les cartes de la colonne sont retirées du tableau du groupe, puis
+    // remises dans leur nouvel ordre, pour que `tasksByStatus` reflète immédiatement le dépôt.
+    const ordrePrecedent = [...taches]
+    const idsDeLaColonne = new Set(ordreFinal.map((t) => t.id))
+    const autres = taches.filter((t) => !idsDeLaColonne.has(t.id))
+    taches.length = 0
+    taches.push(...autres, ...ordreFinal)
+
+    try {
+      await $fetch(`/api/editions/${editionId}/task-groups/${groupId.value}/reorder`, {
+        method: 'POST',
+        body: { taskIds: ordreFinal.map((t) => t.id) },
+      })
+    } catch (e: unknown) {
+      taches.length = 0
+      taches.push(...ordrePrecedent)
+      const err = e as { data?: { message?: string } }
+      useToast().add({
+        title: err?.data?.message || t('errors.generic'),
+        icon: 'i-heroicons-exclamation-circle',
+        color: 'error',
+      })
+    }
+  },
+})
+
+/** Ouvrir une tâche, sauf si l'on vient de la déplacer : un `click` suit chaque relâchement. */
 function onTaskClick(task: TaskItem) {
-  if (justDragged.value) return
+  if (reordre.vientDeGlisser.value) return
   openTaskModal(task)
-}
-
-function onTaskDragStart(task: TaskItem, event: DragEvent) {
-  draggedTaskId.value = task.id
-  draggedFromStatus.value = task.status
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = 'move'
-    event.dataTransfer.setData('text/plain', String(task.id))
-  }
-}
-
-function onTaskDragEnd() {
-  draggedTaskId.value = null
-  draggedFromStatus.value = null
-  dragOverStatus.value = null
-  dragOverTaskId.value = null
-  dragOverPosition.value = null
-  // Court délai pour absorber le click synthétique qui suit parfois un drop
-  justDragged.value = true
-  setTimeout(() => {
-    justDragged.value = false
-  }, 50)
-}
-
-function onColumnDragOver(status: TaskStatus) {
-  dragOverStatus.value = status
-}
-
-function onColumnDragLeave(status: TaskStatus, e: DragEvent) {
-  // Ne reset que si on quitte vraiment la colonne (pas une carte enfant)
-  const related = e.relatedTarget as Node | null
-  const current = e.currentTarget as HTMLElement | null
-  if (related && current && current.contains(related)) return
-  if (dragOverStatus.value === status) dragOverStatus.value = null
 }
 
 async function changeTaskStatus(taskId: number, fromStatus: TaskStatus, newStatus: TaskStatus) {
@@ -789,116 +860,6 @@ async function changeTaskStatus(taskId: number, fromStatus: TaskStatus, newStatu
   } catch (e: unknown) {
     // Revert en cas d'erreur API
     task.status = fromStatus
-    const err = e as { data?: { message?: string } }
-    useToast().add({
-      title: err?.data?.message || t('errors.generic'),
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error',
-    })
-  }
-}
-
-async function onColumnDrop(status: TaskStatus) {
-  const taskId = draggedTaskId.value
-  const fromStatus = draggedFromStatus.value
-  draggedTaskId.value = null
-  draggedFromStatus.value = null
-  dragOverStatus.value = null
-  dragOverTaskId.value = null
-  dragOverPosition.value = null
-  if (!taskId || !fromStatus) return
-  await changeTaskStatus(taskId, fromStatus, status)
-}
-
-// --- Drop sur une carte : réordonnancement intra-colonne ou changement de statut ---
-
-function onCardDragOver(task: TaskItem, event: DragEvent) {
-  // Uniquement pour le réordonnancement (même colonne).
-  if (draggedFromStatus.value !== task.status) return
-  // Sous un tri, aucun trait d'insertion : il promettrait un déplacement qui n'aura pas lieu.
-  if (triActif.value) return
-  if (draggedTaskId.value === task.id) return
-  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  const midpoint = rect.top + rect.height / 2
-  dragOverPosition.value = event.clientY < midpoint ? 'before' : 'after'
-  dragOverTaskId.value = task.id
-}
-
-function onCardDragLeave(task: TaskItem) {
-  if (dragOverTaskId.value === task.id) {
-    dragOverTaskId.value = null
-    dragOverPosition.value = null
-  }
-}
-
-async function onCardDrop(task: TaskItem) {
-  const draggedId = draggedTaskId.value
-  const fromStatus = draggedFromStatus.value
-  const position = dragOverPosition.value
-  const targetStatus = task.status
-
-  // Reset du state de drag immédiatement.
-  draggedTaskId.value = null
-  draggedFromStatus.value = null
-  dragOverStatus.value = null
-  dragOverTaskId.value = null
-  dragOverPosition.value = null
-
-  if (!draggedId || !fromStatus || !group.value) return
-  if (draggedId === task.id) return
-
-  // Cas 1 : drop sur une carte d'une autre colonne → changement de statut.
-  if (fromStatus !== targetStatus) {
-    await changeTaskStatus(draggedId, fromStatus, targetStatus)
-    return
-  }
-
-  // Cas 2 : réordonnancement intra-colonne — impossible tant qu'un tri est actif.
-  if (triActif.value) {
-    useToast().add({
-      title: t('gestion.task.reorder_requires_manual_sort'),
-      icon: 'i-heroicons-arrows-up-down',
-      color: 'warning',
-    })
-    return
-  }
-
-  const tasks = group.value.tasks
-  const draggedIdx = tasks.findIndex((t) => t.id === draggedId)
-  if (draggedIdx === -1) return
-
-  // Calcule le nouvel ordre de la colonne (filtrée par statut).
-  const columnTasks = tasksByStatus(targetStatus)
-  const withoutDragged = columnTasks.filter((t) => t.id !== draggedId)
-  const targetIdx = withoutDragged.findIndex((t) => t.id === task.id)
-  if (targetIdx === -1) return
-  const insertIdx = position === 'before' ? targetIdx : targetIdx + 1
-  const draggedTaskRef = tasks[draggedIdx]!
-  const newColumnOrder = [
-    ...withoutDragged.slice(0, insertIdx),
-    draggedTaskRef,
-    ...withoutDragged.slice(insertIdx),
-  ]
-
-  // Mise à jour optimiste : réorganise les tâches dans le tableau pour que le
-  // filtre `tasksByStatus` reflète immédiatement le nouvel ordre.
-  // Sauvegarde de l'ordre original pour revert en cas d'erreur.
-  const originalOrder = [...tasks]
-  // Retire les tâches de la colonne du tableau global.
-  const columnTaskIds = new Set(columnTasks.map((t) => t.id))
-  const otherTasks = tasks.filter((t) => !columnTaskIds.has(t.id))
-  tasks.length = 0
-  tasks.push(...otherTasks, ...newColumnOrder)
-
-  try {
-    await $fetch(`/api/editions/${editionId}/task-groups/${groupId.value}/reorder`, {
-      method: 'POST',
-      body: { taskIds: newColumnOrder.map((t) => t.id) },
-    })
-  } catch (e: unknown) {
-    // Revert
-    tasks.length = 0
-    tasks.push(...originalOrder)
     const err = e as { data?: { message?: string } }
     useToast().add({
       title: err?.data?.message || t('errors.generic'),

@@ -30,7 +30,7 @@
           variant="ghost"
           icon="i-heroicons-trash"
           :loading="deleting"
-          @click="handleDelete"
+          @click="confirmationSuppressionOuverte = true"
         >
           {{ $t('common.delete') }}
         </UButton>
@@ -46,6 +46,20 @@
       </div>
     </template>
   </UModal>
+
+  <!-- La confirmation s'empile par-dessus cette modale : le motif est déjà employé ailleurs dans
+       le dépôt (billetterie, bénévoles). Elle remplaçe la boîte native, qui ignorait le thème
+       sombre et gardait ses boutons en anglais quelle que soit la langue choisie. -->
+  <UiConfirmModal
+    v-model="confirmationSuppressionOuverte"
+    :title="t('gestion.task.delete_group')"
+    :description="group ? t('gestion.task.confirm_delete_group_simple', { name: group.name }) : ''"
+    :confirm-label="t('common.delete')"
+    confirm-color="error"
+    :loading="deleting"
+    @confirm="handleDelete"
+    @cancel="confirmationSuppressionOuverte = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -146,9 +160,11 @@ async function handleSubmit() {
   }
 }
 
+const confirmationSuppressionOuverte = ref(false)
+
 async function handleDelete() {
+  confirmationSuppressionOuverte.value = false
   if (!props.group) return
-  if (!confirm(t('gestion.task.confirm_delete_group_simple', { name: props.group.name }))) return
   deleting.value = true
   try {
     await $fetch(`/api/editions/${props.editionId}/task-groups/${props.group.id}`, {

@@ -69,7 +69,7 @@
                 variant="ghost"
                 class="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
                 :loading="deletingIds.has(tag.id)"
-                @click="deleteTag(tag)"
+                @click="demanderSuppressionTag(tag)"
               />
             </div>
           </li>
@@ -121,6 +121,26 @@
       </div>
     </template>
   </UModal>
+
+  <!-- Ouverte par la seule désignation d'une cible, refermée quand elle repasse à `null` : un
+       second booléen aurait fallu tenir en phase avec elle, et se serait désynchronisé un jour. -->
+  <UiConfirmModal
+    :model-value="tagASupprimer !== null"
+    :title="t('gestion.task.tags.delete_title')"
+    :description="
+      tagASupprimer ? t('gestion.task.tags.confirm_delete', { name: tagASupprimer.name }) : ''
+    "
+    :confirm-label="t('common.delete')"
+    confirm-color="error"
+    :loading="deletingIds.has(tagASupprimer?.id ?? -1)"
+    @update:model-value="
+      (ouvert: boolean) => {
+        if (!ouvert) tagASupprimer = null
+      }
+    "
+    @confirm="deleteTag(tagASupprimer!)"
+    @cancel="tagASupprimer = null"
+  />
 </template>
 
 <script setup lang="ts">
@@ -240,8 +260,14 @@ async function saveEdit(tag: TagItem) {
   }
 }
 
+const tagASupprimer = ref<TagItem | null>(null)
+
+function demanderSuppressionTag(tag: TagItem) {
+  tagASupprimer.value = tag
+}
+
 async function deleteTag(tag: TagItem) {
-  if (!confirm(t('gestion.task.tags.confirm_delete', { name: tag.name }))) return
+  tagASupprimer.value = null
   deletingIds.value.add(tag.id)
   try {
     await $fetch(`/api/editions/${props.editionId}/task-groups/${props.groupId}/tags/${tag.id}`, {
