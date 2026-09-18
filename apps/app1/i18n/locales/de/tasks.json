@@ -6,7 +6,8 @@
       "empty": "Noch keine Kommentare.",
       "placeholder": "Kommentar hinzufügen...",
       "post": "Veröffentlichen",
-      "title": "Kommentare"
+      "title": "Kommentare",
+      "delete_title": "Kommentar löschen"
     },
     "filters": {
       "active_count": "{count} aktiver Filter | {count} aktive Filter",

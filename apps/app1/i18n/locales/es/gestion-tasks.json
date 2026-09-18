@@ -7,7 +7,8 @@
         "add_placeholder": "Nuevo elemento de la lista...",
         "confirm_delete": "¿Eliminar el elemento «{title}»?",
         "empty": "Aún no hay elementos en la lista.",
-        "title": "Lista de tareas"
+        "title": "Lista de tareas",
+        "delete_title": "Eliminar elemento"
       },
       "confirm_delete_group": "¿Eliminar el grupo «{name}» y sus {count} tarea(s)?",
       "confirm_delete_group_simple": "¿Eliminar el grupo «{name}»?",
@@ -34,7 +35,8 @@
         "manage": "Gestionar etiquetas",
         "modal_title": "Etiquetas del grupo",
         "name_placeholder": "Nombre de la etiqueta...",
-        "new_tag": "Nueva etiqueta"
+        "new_tag": "Nueva etiqueta",
+        "delete_title": "Eliminar etiqueta"
       },
       "task_assignees_placeholder": "Seleccionar personas...",
       "task_deadline": "Fecha límite",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} tarea | {count} tareas",
       "view_kanban": "Kanban",
       "view_list": "Lista",
-      "reorder_requires_manual_sort": "Vuelva al «Orden manual» para reordenar las tareas"
+      "reorder_requires_manual_sort": "Vuelva al «Orden manual» para reordenar las tareas",
+      "delete_group": "Eliminar grupo",
+      "delete_task": "Eliminar tarea"
     }
   }
 }

@@ -6,7 +6,8 @@
       "empty": "Nog geen opmerkingen.",
       "placeholder": "Een opmerking toevoegen...",
       "post": "Plaatsen",
-      "title": "Opmerkingen"
+      "title": "Opmerkingen",
+      "delete_title": "Reactie verwijderen"
     },
     "filters": {
       "active_count": "{count} actief filter | {count} actieve filters",

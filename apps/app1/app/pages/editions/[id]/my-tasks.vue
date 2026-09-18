@@ -143,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskFiltersValue } from '~/components/tasks/TaskFilters.vue'
+import type { TaskFiltersValue, TaskSort } from '~/components/tasks/TaskFilters.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
@@ -188,6 +188,7 @@ interface MyTaskItem {
 }
 
 const route = useRoute()
+const router = useRouter()
 const { t } = useI18n()
 const { formatDateShortMonth } = useDateFormat()
 const authStore = useAuthStore()
@@ -244,13 +245,77 @@ onMounted(async () => {
 })
 
 // --- Filtres ---
-const filters = ref<TaskFiltersValue>({
-  q: '',
-  statuses: [],
-  assigneeIds: [],
-  tagIds: [],
-  due: 'all',
+//
+// Dans l'URL, comme sur le tableau d'un groupe : on envoie un lien — « voilà ce qu'il me reste
+// avant vendredi » — et un rechargement ne doit pas perdre le tri qu'on venait de poser.
+//
+// Le filtre par ASSIGNÉ est absent : cet écran passe `hide-assignees`, toutes les tâches y sont
+// les miennes. L'écrire dans l'adresse désignerait un réglage que l'interface n'offre pas.
+// Le TRI l'est aussi : cette page groupe par groupe et n'expose pas de tri.
+const VALID_STATUSES: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED']
+const VALID_DUE = ['overdue', 'today', 'next7', 'next30', 'none'] as const
+
+function filtresDepuisUrl(): TaskFiltersValue {
+  // Un paramètre d'URL peut être string | string[] | null : on ramène à une chaîne pour qu'une URL
+  // portant deux fois le même paramètre ne fasse pas tomber la page.
+  const param = (v: unknown): string => (Array.isArray(v) ? String(v[0] ?? '') : v ? String(v) : '')
+  const due = param(route.query.due)
+
+  return {
+    q: param(route.query.q),
+    statuses: param(route.query.status)
+      .split(',')
+      .filter((s): s is TaskStatus => VALID_STATUSES.includes(s as TaskStatus)),
+    assigneeIds: [],
+    tagIds: param(route.query.tags)
+      .split(',')
+      .map((n) => parseInt(n, 10))
+      .filter((n) => !isNaN(n)),
+    due: (VALID_DUE as readonly string[]).includes(due) ? (due as TaskFiltersValue['due']) : 'all',
+    // Le type l'exige, l'écran ne l'expose pas : cette page groupe par groupe et n'offre aucun
+    // tri. `manual` est la valeur au repos, donc sans effet ici.
+    sort: 'manual' as TaskSort,
+  }
+}
+
+const filters = ref<TaskFiltersValue>(filtresDepuisUrl())
+
+/**
+ * Les étiquettes réellement à l'œuvre.
+ *
+ * ⚠️ Le croisement avec ce que la page propose n'est pas décoratif. Les étiquettes viennent des
+ * tâches reçues, et une adresse peut en nommer une qui n'y figure plus — un lien d'hier, ou une
+ * tâche dont on s'est fait retirer. Sans ce filtrage, elle resterait active tout en étant
+ * introuvable dans le menu : la liste se viderait sans que rien ne l'explique. Le même piège
+ * s'est refermé sur les listes de courses du stock.
+ */
+const tagsActifs = computed(() => {
+  const proposees = new Set(availableTags.value.map((tag) => tag.id))
+  return filters.value.tagIds.filter((id: number) => proposees.has(id))
 })
+
+// `replace` et non `push` : cocher une case n'est pas une navigation dont on veut revenir réglage
+// par réglage avec le bouton « précédent » avant de quitter la page. Les valeurs par défaut ne
+// s'écrivent pas : une adresse partagée ne doit porter que ce qui a été choisi.
+watch(
+  filters,
+  (f) => {
+    const query: Record<string, string> = {}
+    for (const [k, v] of Object.entries(route.query)) {
+      if (typeof v === 'string') query[k] = v
+    }
+    if (f.q) query.q = f.q
+    else delete query.q
+    if (f.statuses.length) query.status = f.statuses.join(',')
+    else delete query.status
+    if (f.tagIds.length) query.tags = f.tagIds.join(',')
+    else delete query.tags
+    if (f.due && f.due !== 'all') query.due = f.due
+    else delete query.due
+    router.replace({ query })
+  },
+  { deep: true }
+)
 
 const hasDeadlines = computed<boolean>(() => tasks.value.some((t) => t.deadline))
 
@@ -268,8 +333,8 @@ const filteredTasks = computed<MyTaskItem[]>(() => {
     list = list.filter((t) => set.has(t.status))
   }
 
-  if (filters.value.tagIds.length) {
-    const set = new Set(filters.value.tagIds)
+  if (tagsActifs.value.length) {
+    const set = new Set(tagsActifs.value)
     list = list.filter((t) => t.tagAssignments.some((a) => set.has(a.tag.id)))
   }
 

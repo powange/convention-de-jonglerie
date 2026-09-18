@@ -2,6 +2,7 @@
   "tasks": {
     "comments": {
       "confirm_delete": "Supprimer ce commentaire ?",
+      "delete_title": "Supprimer le commentaire",
       "edited": "modifié",
       "empty": "Aucun commentaire pour le moment.",
       "placeholder": "Ajouter un commentaire...",

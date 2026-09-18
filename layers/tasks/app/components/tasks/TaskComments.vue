@@ -99,6 +99,24 @@
       </div>
     </div>
   </div>
+
+  <!-- Ouverte par la seule désignation d'une cible, refermée quand elle repasse à `null` : un
+       second booléen aurait fallu tenir en phase avec elle, et se serait désynchronisé un jour. -->
+  <UiConfirmModal
+    :model-value="commentaireASupprimer !== null"
+    :title="t('tasks.comments.delete_title')"
+    :description="t('tasks.comments.confirm_delete')"
+    :confirm-label="t('common.delete')"
+    confirm-color="error"
+    :loading="false"
+    @update:model-value="
+      (ouvert: boolean) => {
+        if (!ouvert) commentaireASupprimer = null
+      }
+    "
+    @confirm="deleteComment(commentaireASupprimer!)"
+    @cancel="commentaireASupprimer = null"
+  />
 </template>
 
 <script setup lang="ts">
@@ -213,7 +231,7 @@ function getActions(c: TaskCommentItem) {
     label: t('common.delete'),
     icon: 'i-heroicons-trash',
     color: 'error' as const,
-    onSelect: () => deleteComment(c),
+    onSelect: () => demanderSuppressionCommentaire(c),
   })
   return [items]
 }
@@ -255,8 +273,14 @@ async function saveEdit(c: TaskCommentItem) {
   }
 }
 
+const commentaireASupprimer = ref<TaskCommentItem | null>(null)
+
+function demanderSuppressionCommentaire(c: TaskCommentItem) {
+  commentaireASupprimer.value = c
+}
+
 async function deleteComment(c: TaskCommentItem) {
-  if (!confirm(t('tasks.comments.confirm_delete'))) return
+  commentaireASupprimer.value = null
   try {
     await $fetch(`/api/editions/${props.editionId}/tasks/${props.taskId}/comments/${c.id}`, {
       method: 'DELETE',

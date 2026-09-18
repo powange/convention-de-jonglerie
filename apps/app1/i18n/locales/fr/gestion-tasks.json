@@ -6,12 +6,15 @@
         "add": "Ajouter",
         "add_placeholder": "Nouvel item de checklist...",
         "confirm_delete": "Supprimer l'item « {title} » ?",
+        "delete_title": "Supprimer l'item",
         "empty": "Aucun item dans la checklist pour le moment.",
         "title": "Checklist"
       },
       "confirm_delete_group": "Supprimer le groupe « {name} » et ses {count} tâche(s) ?",
       "confirm_delete_group_simple": "Supprimer le groupe « {name} » ?",
       "confirm_delete_task": "Supprimer la tâche « {title} » ?",
+      "delete_group": "Supprimer le groupe",
+      "delete_task": "Supprimer la tâche",
       "edit_group": "Modifier le groupe",
       "edit_task": "Modifier la tâche",
       "empty_group": "Aucune tâche dans ce groupe",
@@ -30,6 +33,7 @@
       "reorder_requires_manual_sort": "Repassez en « Ordre manuel » pour réordonner les tâches",
       "tags": {
         "confirm_delete": "Supprimer le tag « {name} » ? Il sera retiré de toutes les tâches du groupe qui le portent.",
+        "delete_title": "Supprimer le tag",
         "description": "Les tags permettent de catégoriser les tâches de ce groupe (ex: urgent, matériel, à valider RH).",
         "empty": "Aucun tag défini pour ce groupe.",
         "manage": "Gérer les tags",

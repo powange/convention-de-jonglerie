@@ -7,7 +7,8 @@
         "add_placeholder": "Nuovo elemento della checklist...",
         "confirm_delete": "Eliminare l'elemento «{title}»?",
         "empty": "Nessun elemento nella checklist al momento.",
-        "title": "Checklist"
+        "title": "Checklist",
+        "delete_title": "Elimina elemento"
       },
       "confirm_delete_group": "Eliminare il gruppo «{name}» e le sue {count} attività?",
       "confirm_delete_group_simple": "Eliminare il gruppo «{name}»?",
@@ -34,7 +35,8 @@
         "manage": "Gestisci i tag",
         "modal_title": "Tag del gruppo",
         "name_placeholder": "Nome del tag...",
-        "new_tag": "Nuovo tag"
+        "new_tag": "Nuovo tag",
+        "delete_title": "Elimina tag"
       },
       "task_assignees_placeholder": "Seleziona persone...",
       "task_deadline": "Scadenza",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} attività | {count} attività",
       "view_kanban": "Kanban",
       "view_list": "Elenco",
-      "reorder_requires_manual_sort": "Torna all'«Ordine manuale» per riordinare le attività"
+      "reorder_requires_manual_sort": "Torna all'«Ordine manuale» per riordinare le attività",
+      "delete_group": "Elimina gruppo",
+      "delete_task": "Elimina attività"
     }
   }
 }

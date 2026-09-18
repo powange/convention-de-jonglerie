@@ -7,7 +7,8 @@
         "add_placeholder": "Nyt punkt på tjeklisten...",
         "confirm_delete": "Slet punktet «{title}»?",
         "empty": "Ingen punkter på tjeklisten endnu.",
-        "title": "Tjekliste"
+        "title": "Tjekliste",
+        "delete_title": "Slet punkt"
       },
       "confirm_delete_group": "Slet gruppen „{name}\" og dens {count} opgave(r)?",
       "confirm_delete_group_simple": "Slet gruppen „{name}\"?",
@@ -34,7 +35,8 @@
         "manage": "Administrér tags",
         "modal_title": "Gruppens tags",
         "name_placeholder": "Tag-navn...",
-        "new_tag": "Nyt tag"
+        "new_tag": "Nyt tag",
+        "delete_title": "Slet tag"
       },
       "task_assignees_placeholder": "Vælg personer...",
       "task_deadline": "Frist",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} opgave | {count} opgaver",
       "view_kanban": "Kanban",
       "view_list": "Liste",
-      "reorder_requires_manual_sort": "Skift til «Manuel rækkefølge» for at omarrangere opgaverne"
+      "reorder_requires_manual_sort": "Skift til «Manuel rækkefølge» for at omarrangere opgaverne",
+      "delete_group": "Slet gruppe",
+      "delete_task": "Slet opgave"
     }
   }
 }

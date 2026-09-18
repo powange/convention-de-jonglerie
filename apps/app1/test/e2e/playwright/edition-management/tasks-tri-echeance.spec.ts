@@ -112,47 +112,55 @@ test.describe.serial('Tâches — tri par échéance', () => {
     }
 
     /**
-     * `dragTo` de Playwright déplace la souris, ce qui ne réveille pas le glisser-déposer HTML5 :
-     * vérifié, l'ordre en base ne bougeait pas même sans tri. Les évènements sont donc émis à la
-     * main, avec le `DataTransfer` que les gestionnaires attendent.
+     * Le kanban écoute désormais des POINTER EVENTS et non plus le glisser-déposer HTML5, qui
+     * n'était pas émis par les navigateurs mobiles au toucher.
+     *
+     * Le geste est donc joué à la souris : Playwright émet de vrais `pointerdown` / `pointermove` /
+     * `pointerup`, avec un `pointerId` valide que `setPointerCapture` accepte. C'est plus fidèle
+     * que les événements synthétiques d'avant, qui n'auraient de toute façon pas survécu à la
+     * capture du pointeur.
+     *
+     * Deux détails viennent du composable et non du confort : le premier déplacement doit dépasser
+     * le seuil de saisie (8 px), sans quoi l'appui reste un simple clic ; et l'approche se fait en
+     * plusieurs pas, parce que la cible survolée est relue à chaque `pointermove`.
      */
-    const glisser = (depuis: string, vers: string) =>
-      page.evaluate(
-        ([titreSource, titreCible]) => {
-          const cartes = [...document.querySelectorAll('[draggable="true"]')]
-          const trouve = (t: string) => cartes.find((c) => (c.textContent || '').includes(t))
-          const source = trouve(titreSource!)
-          const cible = trouve(titreCible!)
-          if (!source || !cible)
-            throw new Error(`carte introuvable : ${titreSource} / ${titreCible}`)
+    const carteDe = (titre: string) =>
+      page.locator('[data-reordonnable]').filter({ hasText: titre }).first()
 
-          const dt = new DataTransfer()
-          const emettre = (el: Element, type: string) => {
-            const r = el.getBoundingClientRect()
-            el.dispatchEvent(
-              new DragEvent(type, {
-                bubbles: true,
-                cancelable: true,
-                dataTransfer: dt,
-                // Sous le milieu : le dépôt se fait « après » la carte visée.
-                clientY: r.top + r.height * 0.75,
-                clientX: r.left + r.width / 2,
-              })
-            )
-          }
-          emettre(source, 'dragstart')
-          emettre(cible, 'dragover')
-          emettre(cible, 'drop')
-        },
-        [depuis, vers]
-      )
+    const boiteDe = async (titre: string) => {
+      const carte = carteDe(titre)
+      await expect(carte).toBeVisible({ timeout: 10000 })
+      const boite = await carte.boundingBox()
+      if (!boite) throw new Error(`carte sans boîte : ${titre}`)
+      return boite
+    }
+
+    const glisser = async (depuis: string, vers: string) => {
+      // ⚠️ La cible doit être DANS la fenêtre avant de viser. `boundingBox` rend la position même
+      // hors écran, et `page.mouse` ne fait défiler pour personne : le pointeur se posait alors
+      // au-delà du bas de la fenêtre, où `elementFromPoint` ne rend rien et où le composable ne
+      // voyait donc aucune carte survolée. Avec quatre tâches de 92 pixels, la dernière sortait
+      // déjà des 720 pixels de haut du navigateur de test.
+      await carteDe(vers).scrollIntoViewIfNeeded()
+      // Les deux boîtes sont relues APRÈS le défilement, qui a déplacé la source aussi.
+      const source = await boiteDe(depuis)
+      const cible = await boiteDe(vers)
+
+      await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2)
+      await page.mouse.down()
+      // Franchir le seuil de saisie : en deçà, le composable tient le geste pour un clic.
+      await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2 + 20)
+      // Sous le milieu de la cible : le dépôt se fait « après » elle.
+      await page.mouse.move(cible.x + cible.width / 2, cible.y + cible.height * 0.75, { steps: 8 })
+      await page.mouse.up()
+    }
 
     const enKanban = async (query = '') => {
       await goto(`/editions/${editionId}/gestion/tasks/${groupId}${query}`, {
         waitUntil: 'hydration',
       })
       await page.getByRole('tab', { name: /kanban/i }).click()
-      await expect(page.locator('[draggable="true"]').first()).toBeVisible({ timeout: 10000 })
+      await expect(page.locator('[data-reordonnable]').first()).toBeVisible({ timeout: 10000 })
     }
 
     // CONTRÔLE : en ordre manuel, le geste doit VRAIMENT déplacer la tâche en base.

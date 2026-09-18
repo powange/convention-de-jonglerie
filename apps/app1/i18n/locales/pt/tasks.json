@@ -6,7 +6,8 @@
       "empty": "Sem comentários ainda.",
       "placeholder": "Adicionar um comentário...",
       "post": "Publicar",
-      "title": "Comentários"
+      "title": "Comentários",
+      "delete_title": "Eliminar comentário"
     },
     "filters": {
       "active_count": "{count} filtro ativo | {count} filtros ativos",

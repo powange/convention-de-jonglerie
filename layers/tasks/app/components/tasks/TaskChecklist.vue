@@ -62,7 +62,7 @@
             variant="ghost"
             class="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity"
             :loading="deletingIds.has(item.id)"
-            @click="deleteItem(item)"
+            @click="demanderSuppressionItem(item)"
           />
         </template>
       </li>
@@ -92,6 +92,28 @@
       </UButton>
     </div>
   </div>
+
+  <!-- Ouverte par la seule désignation d'une cible, refermée quand elle repasse à `null` : un
+       second booléen aurait fallu tenir en phase avec elle, et se serait désynchronisé un jour. -->
+  <UiConfirmModal
+    :model-value="itemASupprimer !== null"
+    :title="t('gestion.task.checklist.delete_title')"
+    :description="
+      itemASupprimer
+        ? t('gestion.task.checklist.confirm_delete', { title: itemASupprimer.title })
+        : ''
+    "
+    :confirm-label="t('common.delete')"
+    confirm-color="error"
+    :loading="deletingIds.has(itemASupprimer?.id ?? -1)"
+    @update:model-value="
+      (ouvert: boolean) => {
+        if (!ouvert) itemASupprimer = null
+      }
+    "
+    @confirm="deleteItem(itemASupprimer!)"
+    @cancel="itemASupprimer = null"
+  />
 </template>
 
 <script setup lang="ts">
@@ -215,8 +237,14 @@ async function saveEdit(item: ChecklistItem) {
   }
 }
 
+const itemASupprimer = ref<ChecklistItem | null>(null)
+
+function demanderSuppressionItem(item: ChecklistItem) {
+  itemASupprimer.value = item
+}
+
 async function deleteItem(item: ChecklistItem) {
-  if (!confirm(t('gestion.task.checklist.confirm_delete', { title: item.title }))) return
+  itemASupprimer.value = null
   deletingIds.value.add(item.id)
   try {
     await $fetch(

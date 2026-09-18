@@ -7,7 +7,8 @@
         "add_placeholder": "Ny punkt i checklistan...",
         "confirm_delete": "Ta bort punkten «{title}»?",
         "empty": "Inga punkter i checklistan ännu.",
-        "title": "Checklista"
+        "title": "Checklista",
+        "delete_title": "Ta bort post"
       },
       "confirm_delete_group": "Ta bort gruppen ”{name}” och dess {count} uppgift(er)?",
       "confirm_delete_group_simple": "Ta bort gruppen ”{name}”?",
@@ -34,7 +35,8 @@
         "manage": "Hantera taggar",
         "modal_title": "Gruppens taggar",
         "name_placeholder": "Namn på taggen...",
-        "new_tag": "Ny tagg"
+        "new_tag": "Ny tagg",
+        "delete_title": "Ta bort tagg"
       },
       "task_assignees_placeholder": "Välj personer...",
       "task_deadline": "Tidsfrist",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} uppgift | {count} uppgifter",
       "view_kanban": "Kanban",
       "view_list": "Lista",
-      "reorder_requires_manual_sort": "Byt tillbaka till «Manuell ordning» för att ordna om uppgifterna"
+      "reorder_requires_manual_sort": "Byt tillbaka till «Manuell ordning» för att ordna om uppgifterna",
+      "delete_group": "Ta bort grupp",
+      "delete_task": "Ta bort uppgift"
     }
   }
 }

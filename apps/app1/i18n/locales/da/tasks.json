@@ -6,7 +6,8 @@
       "empty": "Ingen kommentarer endnu.",
       "placeholder": "Tilføj en kommentar...",
       "post": "Send",
-      "title": "Kommentarer"
+      "title": "Kommentarer",
+      "delete_title": "Slet kommentar"
     },
     "filters": {
       "active_count": "{count} aktivt filter | {count} aktive filtre",

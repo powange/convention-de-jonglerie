@@ -7,7 +7,8 @@
         "add_placeholder": "Nieuw checklist-item...",
         "confirm_delete": "Item «{title}» verwijderen?",
         "empty": "Nog geen items in de checklist.",
-        "title": "Checklist"
+        "title": "Checklist",
+        "delete_title": "Item verwijderen"
       },
       "confirm_delete_group": "Groep „{name}\" en zijn {count} taak/taken verwijderen?",
       "confirm_delete_group_simple": "Groep „{name}\" verwijderen?",
@@ -34,7 +35,8 @@
         "manage": "Tags beheren",
         "modal_title": "Tags van de groep",
         "name_placeholder": "Naam van de tag...",
-        "new_tag": "Nieuwe tag"
+        "new_tag": "Nieuwe tag",
+        "delete_title": "Tag verwijderen"
       },
       "task_assignees_placeholder": "Personen selecteren...",
       "task_deadline": "Deadline",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} taak | {count} taken",
       "view_kanban": "Kanban",
       "view_list": "Lijst",
-      "reorder_requires_manual_sort": "Schakel terug naar «Handmatige volgorde» om taken te herschikken"
+      "reorder_requires_manual_sort": "Schakel terug naar «Handmatige volgorde» om taken te herschikken",
+      "delete_group": "Groep verwijderen",
+      "delete_task": "Taak verwijderen"
     }
   }
 }

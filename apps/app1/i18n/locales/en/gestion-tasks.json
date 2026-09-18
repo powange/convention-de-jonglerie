@@ -7,7 +7,8 @@
         "add_placeholder": "New checklist item...",
         "confirm_delete": "Delete item «{title}»?",
         "empty": "No item in the checklist yet.",
-        "title": "Checklist"
+        "title": "Checklist",
+        "delete_title": "Delete item"
       },
       "confirm_delete_group": "Delete the group \"{name}\" and its {count} task(s)?",
       "confirm_delete_group_simple": "Delete the group \"{name}\"?",
@@ -34,7 +35,8 @@
         "manage": "Manage tags",
         "modal_title": "Group tags",
         "name_placeholder": "Tag name...",
-        "new_tag": "New tag"
+        "new_tag": "New tag",
+        "delete_title": "Delete tag"
       },
       "task_assignees_placeholder": "Select people...",
       "task_deadline": "Deadline",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} task | {count} tasks",
       "view_kanban": "Kanban",
       "view_list": "List",
-      "reorder_requires_manual_sort": "Switch back to «Manual order» to reorder tasks"
+      "reorder_requires_manual_sort": "Switch back to «Manual order» to reorder tasks",
+      "delete_group": "Delete group",
+      "delete_task": "Delete task"
     }
   }
 }

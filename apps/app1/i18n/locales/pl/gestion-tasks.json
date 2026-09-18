@@ -7,7 +7,8 @@
         "add_placeholder": "Nowy element listy...",
         "confirm_delete": "Usunąć element «{title}»?",
         "empty": "Brak elementów na liście.",
-        "title": "Lista kontrolna"
+        "title": "Lista kontrolna",
+        "delete_title": "Usuń pozycję"
       },
       "confirm_delete_group": "Usunąć grupę „{name}\" i jej {count} zadań?",
       "confirm_delete_group_simple": "Usunąć grupę „{name}\"?",
@@ -34,7 +35,8 @@
         "manage": "Zarządzaj tagami",
         "modal_title": "Tagi grupy",
         "name_placeholder": "Nazwa tagu...",
-        "new_tag": "Nowy tag"
+        "new_tag": "Nowy tag",
+        "delete_title": "Usuń tag"
       },
       "task_assignees_placeholder": "Wybierz osoby...",
       "task_deadline": "Termin",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} zadanie | {count} zadania | {count} zadań",
       "view_kanban": "Kanban",
       "view_list": "Lista",
-      "reorder_requires_manual_sort": "Wróć do «Kolejność ręczna», aby zmienić kolejność zadań"
+      "reorder_requires_manual_sort": "Wróć do «Kolejność ręczna», aby zmienić kolejność zadań",
+      "delete_group": "Usuń grupę",
+      "delete_task": "Usuń zadanie"
     }
   }
 }
