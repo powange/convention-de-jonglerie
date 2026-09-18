@@ -33,14 +33,14 @@ const benevole = (options: {
 const creneau = (options: {
   id?: string
   title?: string
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   teamId?: string
 }) => ({
   id: options.id ?? '1',
   title: options.title ?? 'Créneau',
-  start: options.start,
-  end: options.end,
+  startDateTime: options.startDateTime,
+  endDateTime: options.endDateTime,
   teamId: options.teamId,
   maxVolunteers: 1,
   assignedVolunteers: 0,
@@ -53,8 +53,8 @@ describe('VolunteerScheduler', () => {
     // Les préférences sont une liste d'identifiants (z.array(z.string())). Les lire comme des
     // objets `{ teamId }` ne trouvait jamais de correspondance.
     const creneauEquipe = creneau({
-      start: '2026-08-01T16:00:00.000Z',
-      end: '2026-08-01T18:00:00.000Z',
+      startDateTime: '2026-08-01T16:00:00.000Z',
+      endDateTime: '2026-08-01T18:00:00.000Z',
       teamId: 'equipe-A',
     })
 
@@ -108,8 +108,8 @@ describe('VolunteerScheduler', () => {
     // Le pendant des préférences, du côté de la décision : ce que les organisateurs ont
     // déjà tranché en plaçant le bénévole dans une équipe.
     const creneauEquipe = creneau({
-      start: '2026-08-01T16:00:00.000Z',
-      end: '2026-08-01T18:00:00.000Z',
+      startDateTime: '2026-08-01T16:00:00.000Z',
+      endDateTime: '2026-08-01T18:00:00.000Z',
       teamId: 'equipe-A',
     })
 
@@ -192,7 +192,10 @@ describe('VolunteerScheduler', () => {
       const r = new VolunteerScheduler({
         volunteers: [benevole({ event: true, assignedTeams: ['equipe-A'] })],
         timeSlots: [
-          creneau({ start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
+          creneau({
+            startDateTime: '2026-08-01T16:00:00.000Z',
+            endDateTime: '2026-08-01T18:00:00.000Z',
+          }),
         ],
         teams: EQUIPES,
         constraints: { respectStrictAssignedTeams: true },
@@ -215,8 +218,8 @@ describe('VolunteerScheduler', () => {
     const creneauDuSoir = (jour: string, id = '1') =>
       creneau({
         id,
-        start: `${jour}T19:00:00.000Z`,
-        end: `${jour}T22:00:00.000Z`,
+        startDateTime: `${jour}T19:00:00.000Z`,
+        endDateTime: `${jour}T22:00:00.000Z`,
       })
 
     it('refuse le créneau qui referme l’unique représentation', () => {
@@ -294,8 +297,8 @@ describe('VolunteerScheduler', () => {
         volunteers: [benevole({ event: true })],
         timeSlots: [
           creneau({
-            start: '2026-08-01T16:00:00.000Z',
-            end: '2026-08-01T20:00:00.000Z',
+            startDateTime: '2026-08-01T16:00:00.000Z',
+            endDateTime: '2026-08-01T20:00:00.000Z',
           }),
         ],
         teams: EQUIPES,
@@ -313,8 +316,8 @@ describe('VolunteerScheduler', () => {
     // quel que soit son titre. La comparaison porte sur l'instant, pas sur le jour.
     const avantOuverture = creneau({
       title: 'Préparation du site',
-      start: '2026-08-01T09:00:00.000Z',
-      end: '2026-08-01T12:00:00.000Z',
+      startDateTime: '2026-08-01T09:00:00.000Z',
+      endDateTime: '2026-08-01T12:00:00.000Z',
     })
 
     it('classe en montage un créneau antérieur à l’heure d’ouverture, le jour même', () => {
@@ -340,8 +343,8 @@ describe('VolunteerScheduler', () => {
     it('classe en démontage un créneau postérieur à l’heure de fin', () => {
       const apresFin = creneau({
         title: 'Rangement',
-        start: '2026-08-02T09:00:00.000Z',
-        end: '2026-08-02T12:00:00.000Z',
+        startDateTime: '2026-08-02T09:00:00.000Z',
+        endDateTime: '2026-08-02T12:00:00.000Z',
       })
 
       const demontage = new VolunteerScheduler({
@@ -366,8 +369,8 @@ describe('VolunteerScheduler', () => {
     it('classe en événement un créneau compris entre les deux bornes', () => {
       const pendant = creneau({
         title: 'Montage du chapiteau', // titre trompeur : les bornes doivent primer
-        start: '2026-08-01T16:00:00.000Z',
-        end: '2026-08-01T18:00:00.000Z',
+        startDateTime: '2026-08-01T16:00:00.000Z',
+        endDateTime: '2026-08-01T18:00:00.000Z',
       })
 
       const evenement = new VolunteerScheduler({
@@ -385,8 +388,8 @@ describe('VolunteerScheduler', () => {
     it('sans bornes, reconnaît le démontage malgré « montage » contenu dans le mot', () => {
       const sansBornes = creneau({
         title: 'Démontage',
-        start: '2026-08-03T09:00:00.000Z',
-        end: '2026-08-03T12:00:00.000Z',
+        startDateTime: '2026-08-03T09:00:00.000Z',
+        endDateTime: '2026-08-03T12:00:00.000Z',
       })
 
       const demontage = new VolunteerScheduler({
@@ -414,8 +417,16 @@ describe('VolunteerScheduler', () => {
       const r = new VolunteerScheduler({
         volunteers: [benevole({ event: true })],
         timeSlots: [
-          creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
-          creneau({ id: '2', start: '2026-08-01T17:00:00.000Z', end: '2026-08-01T19:00:00.000Z' }),
+          creneau({
+            id: '1',
+            startDateTime: '2026-08-01T16:00:00.000Z',
+            endDateTime: '2026-08-01T18:00:00.000Z',
+          }),
+          creneau({
+            id: '2',
+            startDateTime: '2026-08-01T17:00:00.000Z',
+            endDateTime: '2026-08-01T19:00:00.000Z',
+          }),
         ],
         teams: [],
         constraints: {},
@@ -430,8 +441,16 @@ describe('VolunteerScheduler', () => {
       const r = new VolunteerScheduler({
         volunteers: [benevole({ event: true })],
         timeSlots: [
-          creneau({ id: '1', start: '2026-08-01T14:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
-          creneau({ id: '2', start: '2026-08-01T18:00:00.000Z', end: '2026-08-01T21:00:00.000Z' }),
+          creneau({
+            id: '1',
+            startDateTime: '2026-08-01T14:00:00.000Z',
+            endDateTime: '2026-08-01T17:00:00.000Z',
+          }),
+          creneau({
+            id: '2',
+            startDateTime: '2026-08-01T18:00:00.000Z',
+            endDateTime: '2026-08-01T21:00:00.000Z',
+          }),
         ],
         teams: [],
         constraints: { maxHoursPerVolunteer: 4, maxHoursPerDay: 4 },
@@ -467,8 +486,8 @@ describe('fuseau horaire de l’événement', () => {
     // 18 h - 20 h UTC = 20 h - 22 h à Paris en août : une soirée, entièrement dans la plage.
     const creneauSoiree = creneau({
       id: '1',
-      start: '2026-08-01T18:00:00.000Z',
-      end: '2026-08-01T20:00:00.000Z',
+      startDateTime: '2026-08-01T18:00:00.000Z',
+      endDateTime: '2026-08-01T20:00:00.000Z',
     })
 
     const avecFuseau = new VolunteerScheduler({
@@ -491,8 +510,8 @@ describe('fuseau horaire de l’événement', () => {
     // créneau tombe de 20 h à 22 h, entièrement dans la plage souhaitée.
     const creneauSoiree = creneau({
       id: '1',
-      start: '2026-08-01T18:00:00.000Z',
-      end: '2026-08-01T20:00:00.000Z',
+      startDateTime: '2026-08-01T18:00:00.000Z',
+      endDateTime: '2026-08-01T20:00:00.000Z',
     })
 
     const sansFuseau = new VolunteerScheduler({
@@ -512,8 +531,16 @@ describe('fuseau horaire de l’événement', () => {
     const r = new VolunteerScheduler({
       volunteers: [benevole({ event: true })],
       timeSlots: [
-        creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T17:30:00.000Z' }),
-        creneau({ id: '2', start: '2026-08-01T22:00:00.000Z', end: '2026-08-01T23:30:00.000Z' }),
+        creneau({
+          id: '1',
+          startDateTime: '2026-08-01T16:00:00.000Z',
+          endDateTime: '2026-08-01T17:30:00.000Z',
+        }),
+        creneau({
+          id: '2',
+          startDateTime: '2026-08-01T22:00:00.000Z',
+          endDateTime: '2026-08-01T23:30:00.000Z',
+        }),
       ],
       teams: [],
       constraints: { maxHoursPerDay: 2, maxHoursPerVolunteer: 12 },
@@ -532,9 +559,21 @@ describe('fuseau horaire de l’événement', () => {
  */
 describe('plafond journalier et heures supplémentaires', () => {
   const troisCreneaux = [
-    creneau({ id: '1', start: '2026-08-01T14:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
-    creneau({ id: '2', start: '2026-08-01T17:00:00.000Z', end: '2026-08-01T20:00:00.000Z' }),
-    creneau({ id: '3', start: '2026-08-01T20:00:00.000Z', end: '2026-08-01T23:00:00.000Z' }),
+    creneau({
+      id: '1',
+      startDateTime: '2026-08-01T14:00:00.000Z',
+      endDateTime: '2026-08-01T17:00:00.000Z',
+    }),
+    creneau({
+      id: '2',
+      startDateTime: '2026-08-01T17:00:00.000Z',
+      endDateTime: '2026-08-01T20:00:00.000Z',
+    }),
+    creneau({
+      id: '3',
+      startDateTime: '2026-08-01T20:00:00.000Z',
+      endDateTime: '2026-08-01T23:00:00.000Z',
+    }),
   ]
 
   it('laisse dépasser le plafond du jour, mais pas au-delà des heures supplémentaires', () => {
@@ -585,14 +624,14 @@ describe('effectif souhaité d’une équipe', () => {
       timeSlots: [
         creneau({
           id: '1',
-          start: '2026-08-01T15:00:00.000Z',
-          end: '2026-08-01T17:00:00.000Z',
+          startDateTime: '2026-08-01T15:00:00.000Z',
+          endDateTime: '2026-08-01T17:00:00.000Z',
           teamId: 'equipe-A',
         }),
         creneau({
           id: '2',
-          start: '2026-08-01T18:00:00.000Z',
-          end: '2026-08-01T20:00:00.000Z',
+          startDateTime: '2026-08-01T18:00:00.000Z',
+          endDateTime: '2026-08-01T20:00:00.000Z',
           teamId: 'equipe-A',
         }),
       ],
@@ -617,8 +656,8 @@ describe('diagnostic des refus', () => {
   const creneauDuSoir = () =>
     creneau({
       id: '1',
-      start: '2026-08-01T16:00:00.000Z',
-      end: '2026-08-01T18:00:00.000Z',
+      startDateTime: '2026-08-01T16:00:00.000Z',
+      endDateTime: '2026-08-01T18:00:00.000Z',
       teamId: 'equipe-A',
     })
 
@@ -720,8 +759,8 @@ describe('coût du calcul', () => {
       return {
         ...creneau({
           id: `c${i}`,
-          start: new Date(Date.UTC(2026, 7, jour, heure)).toISOString(),
-          end: new Date(Date.UTC(2026, 7, jour, heure + 2)).toISOString(),
+          startDateTime: new Date(Date.UTC(2026, 7, jour, heure)).toISOString(),
+          endDateTime: new Date(Date.UTC(2026, 7, jour, heure + 2)).toISOString(),
         }),
         maxVolunteers: 3,
       }
@@ -762,8 +801,8 @@ describe('préférences horaires au recouvrement', () => {
 
   const creneauLong = creneau({
     id: '1',
-    start: '2026-08-01T09:00:00.000Z',
-    end: '2026-08-01T17:00:00.000Z',
+    startDateTime: '2026-08-01T09:00:00.000Z',
+    endDateTime: '2026-08-01T17:00:00.000Z',
   })
 
   it('écarte, en mode strict, un créneau qui déborde largement de la plage souhaitée', () => {
@@ -798,8 +837,8 @@ describe('préférences horaires au recouvrement', () => {
     // d'un créneau entièrement souhaité est le même qu'on ait coché une plage ou trois.
     const creneauCourt = creneau({
       id: '1',
-      start: '2026-08-01T09:00:00.000Z',
-      end: '2026-08-01T11:00:00.000Z',
+      startDateTime: '2026-08-01T09:00:00.000Z',
+      endDateTime: '2026-08-01T11:00:00.000Z',
     })
 
     const unePlage = new VolunteerScheduler({
@@ -815,8 +854,8 @@ describe('préférences horaires au recouvrement', () => {
       timeSlots: [
         creneau({
           id: '1',
-          start: '2026-08-01T09:00:00.000Z',
-          end: '2026-08-01T11:00:00.000Z',
+          startDateTime: '2026-08-01T09:00:00.000Z',
+          endDateTime: '2026-08-01T11:00:00.000Z',
         }),
       ],
       teams: [],
@@ -838,8 +877,8 @@ describe('rééquilibrage des charges', () => {
     const creneaux = [0, 1, 2, 3].map((i) =>
       creneau({
         id: `c${i}`,
-        start: `2026-08-01T${String(8 + i * 3).padStart(2, '0')}:00:00.000Z`,
-        end: `2026-08-01T${String(10 + i * 3).padStart(2, '0')}:00:00.000Z`,
+        startDateTime: `2026-08-01T${String(8 + i * 3).padStart(2, '0')}:00:00.000Z`,
+        endDateTime: `2026-08-01T${String(10 + i * 3).padStart(2, '0')}:00:00.000Z`,
       })
     )
 
@@ -863,8 +902,8 @@ describe('rééquilibrage des charges', () => {
     const creneaux = [0, 1, 2, 3].map((i) =>
       creneau({
         id: `c${i}`,
-        start: `2026-08-01T${String(8 + i * 3).padStart(2, '0')}:00:00.000Z`,
-        end: `2026-08-01T${String(10 + i * 3).padStart(2, '0')}:00:00.000Z`,
+        startDateTime: `2026-08-01T${String(8 + i * 3).padStart(2, '0')}:00:00.000Z`,
+        endDateTime: `2026-08-01T${String(10 + i * 3).padStart(2, '0')}:00:00.000Z`,
       })
     )
 
@@ -898,8 +937,8 @@ describe('indicateurs de qualité', () => {
       timeSlots: [
         creneau({
           id: '1',
-          start: '2026-08-01T16:00:00.000Z',
-          end: '2026-08-01T18:00:00.000Z',
+          startDateTime: '2026-08-01T16:00:00.000Z',
+          endDateTime: '2026-08-01T18:00:00.000Z',
           teamId: 'equipe-A',
         }),
       ],
@@ -920,7 +959,11 @@ describe('indicateurs de qualité', () => {
     const r = new VolunteerScheduler({
       volunteers: [benevole({ id: 1, event: true })],
       timeSlots: [
-        creneau({ id: '1', start: '2026-08-01T16:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
+        creneau({
+          id: '1',
+          startDateTime: '2026-08-01T16:00:00.000Z',
+          endDateTime: '2026-08-01T18:00:00.000Z',
+        }),
       ],
       teams: [],
       constraints: {},
@@ -955,14 +998,14 @@ describe('déblocage des créneaux vides', () => {
   const deuxCreneaux = () => [
     creneau({
       id: 'banal',
-      start: '2026-08-01T10:00:00.000Z',
-      end: '2026-08-01T12:00:00.000Z',
+      startDateTime: '2026-08-01T10:00:00.000Z',
+      endDateTime: '2026-08-01T12:00:00.000Z',
       teamId: 'banale',
     }),
     creneau({
       id: 'pointu',
-      start: '2026-08-01T14:00:00.000Z',
-      end: '2026-08-01T16:00:00.000Z',
+      startDateTime: '2026-08-01T14:00:00.000Z',
+      endDateTime: '2026-08-01T16:00:00.000Z',
       teamId: 'pointue',
     }),
   ]
@@ -1006,8 +1049,16 @@ describe('déblocage des créneaux vides', () => {
  */
 describe('plafond total d’heures', () => {
   const deuxCreneaux = () => [
-    creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T18:00:00.000Z' }),
-    creneau({ id: '2', start: '2026-08-01T19:00:00.000Z', end: '2026-08-01T22:00:00.000Z' }),
+    creneau({
+      id: '1',
+      startDateTime: '2026-08-01T15:00:00.000Z',
+      endDateTime: '2026-08-01T18:00:00.000Z',
+    }),
+    creneau({
+      id: '2',
+      startDateTime: '2026-08-01T19:00:00.000Z',
+      endDateTime: '2026-08-01T22:00:00.000Z',
+    }),
   ]
 
   it('nomme le motif quand le maximum d’heures est atteint', () => {
@@ -1050,8 +1101,16 @@ describe('plafond total d’heures', () => {
 describe('le moteur ne modifie pas ses entrées', () => {
   it('rend le même résultat deux fois de suite sur les mêmes objets', () => {
     const creneaux = [
-      creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
-      creneau({ id: '2', start: '2026-08-01T18:00:00.000Z', end: '2026-08-01T20:00:00.000Z' }),
+      creneau({
+        id: '1',
+        startDateTime: '2026-08-01T15:00:00.000Z',
+        endDateTime: '2026-08-01T17:00:00.000Z',
+      }),
+      creneau({
+        id: '2',
+        startDateTime: '2026-08-01T18:00:00.000Z',
+        endDateTime: '2026-08-01T20:00:00.000Z',
+      }),
     ]
     const benevoles = [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })]
 
@@ -1076,7 +1135,11 @@ describe('le moteur ne modifie pas ses entrées', () => {
 
   it('laisse le remplissage des créneaux d’entrée intact', () => {
     const creneaux = [
-      creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
+      creneau({
+        id: '1',
+        startDateTime: '2026-08-01T15:00:00.000Z',
+        endDateTime: '2026-08-01T17:00:00.000Z',
+      }),
     ]
 
     new VolunteerScheduler({
@@ -1103,7 +1166,11 @@ describe('motifs relevés au moment du refus', () => {
     const r = new VolunteerScheduler({
       volunteers: [benevole({ id: 1, event: true }), benevole({ id: 2, event: true })],
       timeSlots: [
-        creneau({ id: '1', start: '2026-08-01T15:00:00.000Z', end: '2026-08-01T17:00:00.000Z' }),
+        creneau({
+          id: '1',
+          startDateTime: '2026-08-01T15:00:00.000Z',
+          endDateTime: '2026-08-01T17:00:00.000Z',
+        }),
       ],
       teams: [],
       constraints: {},
@@ -1136,8 +1203,8 @@ describe('recouvrement horaire par intervalles', () => {
         {
           ...creneau({
             id: '1',
-            start: '2026-08-01T09:00:00.000Z',
-            end: '2026-08-01T11:00:00.000Z',
+            startDateTime: '2026-08-01T09:00:00.000Z',
+            endDateTime: '2026-08-01T11:00:00.000Z',
           }),
           maxVolunteers: 2,
         },
@@ -1156,7 +1223,11 @@ describe('recouvrement horaire par intervalles', () => {
     const contigues = new VolunteerScheduler({
       volunteers: [avecPlages(1, ['morning', 'lunch'])],
       timeSlots: [
-        creneau({ id: '1', start: '2026-08-01T09:00:00.000Z', end: '2026-08-01T13:00:00.000Z' }),
+        creneau({
+          id: '1',
+          startDateTime: '2026-08-01T09:00:00.000Z',
+          endDateTime: '2026-08-01T13:00:00.000Z',
+        }),
       ],
       teams: [],
       bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
@@ -1165,7 +1236,11 @@ describe('recouvrement horaire par intervalles', () => {
     const uneSeule = new VolunteerScheduler({
       volunteers: [avecPlages(1, ['morning'])],
       timeSlots: [
-        creneau({ id: '1', start: '2026-08-01T09:00:00.000Z', end: '2026-08-01T12:00:00.000Z' }),
+        creneau({
+          id: '1',
+          startDateTime: '2026-08-01T09:00:00.000Z',
+          endDateTime: '2026-08-01T12:00:00.000Z',
+        }),
       ],
       teams: [],
       bornes: { debut: '2026-08-01T00:00:00.000Z', fin: '2026-08-02T00:00:00.000Z' },
@@ -1204,8 +1279,8 @@ describe('recherche locale', () => {
     const creneaux = Array.from({ length: 12 }, (_, i) => ({
       ...creneau({
         id: `c${i}`,
-        start: new Date(Date.UTC(2026, 7, 1, 8 + i)).toISOString(),
-        end: new Date(Date.UTC(2026, 7, 1, 9 + i)).toISOString(),
+        startDateTime: new Date(Date.UTC(2026, 7, 1, 8 + i)).toISOString(),
+        endDateTime: new Date(Date.UTC(2026, 7, 1, 9 + i)).toISOString(),
         teamId: i < 6 ? 'A' : 'B',
       }),
       maxVolunteers: 1,
@@ -1292,8 +1367,8 @@ describe('recherche locale', () => {
 
     for (const affectation of r.assignments) {
       const slot = entrees.timeSlots.find((c) => c.id === affectation.slotId)!
-      const debut = new Date(slot.start).getTime()
-      const fin = new Date(slot.end).getTime()
+      const debut = new Date(slot.startDateTime).getTime()
+      const fin = new Date(slot.endDateTime).getTime()
 
       heuresPar.set(
         affectation.volunteerId,
@@ -1318,7 +1393,7 @@ describe('recherche locale', () => {
     // d'elle-même et rendre exactement ce qu'elle a reçu.
     const moteur = new VolunteerScheduler({
       volunteers: [benevole({ id: 1, event: true })],
-      timeSlots: [creneau({ id: '1', start: DEBUT, end: FIN })],
+      timeSlots: [creneau({ id: '1', startDateTime: DEBUT, endDateTime: FIN })],
       teams: [],
       bornes: BORNES,
     })

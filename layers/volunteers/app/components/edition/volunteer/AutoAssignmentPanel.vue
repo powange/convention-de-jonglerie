@@ -738,8 +738,12 @@
 </template>
 
 <script setup lang="ts">
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+
 interface Props {
   editionId: number
+  /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+  fuseau?: string | null
   volunteers: any[]
   timeSlots: any[]
   teams?: any[]
@@ -886,7 +890,11 @@ const getSlotById = (id: string | number) => {
  */
 const heure = (valeur: string | null | undefined) =>
   valeur
-    ? new Date(valeur).toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
+    ? new Date(valeur).toLocaleTimeString(locale.value, {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: fuseauUtilisable(props.fuseau),
+      })
     : ''
 
 const jour = (valeur: string | null | undefined) =>
@@ -895,6 +903,7 @@ const jour = (valeur: string | null | undefined) =>
         weekday: 'long',
         day: 'numeric',
         month: 'long',
+        timeZone: fuseauUtilisable(props.fuseau),
       })
     : ''
 
@@ -909,9 +918,9 @@ const getSlotDisplayInfo = (slotId: string | number) => {
     }
   }
 
-  const debut = heure(slot.start)
-  const fin = heure(slot.end)
-  const date = jour(slot.start)
+  const debut = heure(slot.startDateTime)
+  const fin = heure(slot.endDateTime)
+  const date = jour(slot.startDateTime)
 
   const timeRange =
     debut && fin ? `${date} • ${debut} - ${fin}` : date || (debut && fin ? `${debut} - ${fin}` : '')

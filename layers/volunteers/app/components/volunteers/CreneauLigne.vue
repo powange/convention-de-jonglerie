@@ -21,8 +21,13 @@
 <script setup lang="ts">
 import type { CreneauLisible } from '../../composables/useCreneauLisible'
 
-defineProps<{ creneau: CreneauLisible }>()
+const props = defineProps<{
+  creneau: CreneauLisible
+  /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+  fuseau?: string | null
+}>()
 
 const { t } = useI18n()
-const { horaire } = useCreneauLisible()
+// Un getter, et non la valeur : l'édition arrive parfois après le premier rendu.
+const { horaire } = useCreneauLisible(() => props.fuseau)
 </script>

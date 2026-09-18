@@ -1,5 +1,6 @@
 import { exigerEchangesOuverts } from '../../../../../utils/echanges-ouverts'
 import { exigerPlanningPublie } from '../../../../../utils/planning-publie'
+import { selectionCreneauLisible } from '../../../../../utils/selection-creneau-lisible'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -28,13 +29,7 @@ export default wrapApiHandler(
         id: true,
         user: { select: userWithProfileAndGravatarSelect },
         timeSlot: {
-          select: {
-            id: true,
-            title: true,
-            startDateTime: true,
-            endDateTime: true,
-            team: { select: { id: true, name: true, color: true } },
-          },
+          select: selectionCreneauLisible,
         },
       },
     }

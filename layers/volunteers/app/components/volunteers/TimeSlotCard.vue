@@ -1,10 +1,22 @@
 <template>
-  <div
-    class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+  <!-- Cliquable pour ouvrir le détail : la consigne du poste n'a pas sa place dans la liste, qui
+       doit rester lisible d'un coup d'œil, mais elle doit rester à un geste. `button` et non
+       `div` : au clavier comme au lecteur d'écran, c'est une action, pas un paragraphe. -->
+  <component
+    :is="ouvrable ? 'button' : 'div'"
+    :type="ouvrable ? 'button' : undefined"
+    class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-700 border-l-4"
+    :class="
+      ouvrable
+        ? 'hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer'
+        : undefined
+    "
+    :style="{ borderLeftColor: couleurEquipe }"
+    @click="ouvrable && emit('ouvrir', timeSlot)"
   >
     <div class="flex items-start justify-between gap-3">
       <div class="flex-1 min-w-0">
-        <p class="font-medium text-blue-900 dark:text-blue-100 text-sm mb-1">
+        <p class="font-medium text-gray-900 dark:text-white text-sm mb-1">
           {{ timeSlot.title || t('pages.volunteers.unnamed_slot') }}
         </p>
         <div class="mb-2">
@@ -14,7 +26,7 @@
               :class="
                 timeSlot.delayMinutes && timeSlot.delayMinutes > 0
                   ? 'line-through text-gray-400 dark:text-gray-500'
-                  : 'text-blue-700 dark:text-blue-300'
+                  : 'text-gray-600 dark:text-gray-400'
               "
             >
               {{ formatSlotDateTime(timeSlot.startDateTime, timeSlot.endDateTime) }}
@@ -27,7 +39,7 @@
             <UIcon name="i-heroicons-clock" class="w-3 h-3" />
             <span class="font-medium">
               {{
-                formatSlotDateTimeWithDelay(
+                formatSlotDateTime(
                   timeSlot.startDateTime,
                   timeSlot.endDateTime,
                   timeSlot.delayMinutes
@@ -46,9 +58,6 @@
             {{ timeSlot.team.name }}
           </span>
         </div>
-        <p v-if="timeSlot.description" class="text-xs text-gray-500 mt-2">
-          {{ timeSlot.description }}
-        </p>
 
         <!-- Avec qui l'on tient ce poste : un créneau partagé se prépare autrement qu'un
              créneau tenu seul. -->
@@ -70,10 +79,14 @@
         {{ formatSlotDuration(timeSlot.startDateTime, timeSlot.endDateTime) }}
       </div>
     </div>
-  </div>
+  </component>
 </template>
 
 <script setup lang="ts">
+import { horairesEffectifs } from '../../utils/retard-creneau'
+
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+
 interface TimeSlot {
   id: string
   title: string
@@ -96,40 +109,65 @@ interface TimeSlot {
   }>
 }
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     timeSlot: TimeSlot
     showDuration?: boolean
+    /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+    fuseau?: string | null
+    /**
+     * Rend la carte cliquable. Faux là où aucune modale n'écoute : une carte qui réagit au clic
+     * sans rien ouvrir est pire qu'une carte inerte.
+     */
+    ouvrable?: boolean
   }>(),
   {
     showDuration: false,
+    ouvrable: false,
   }
 )
 
+const emit = defineEmits<{ ouvrir: [creneau: TimeSlot] }>()
+
+/**
+ * La couleur de l'équipe, en bordure gauche, comme dans la liste des créneaux d'un bénévole
+ * côté gestion. Elle situe le créneau d'un coup d'œil, ce qu'un fond uniformément bleu ne
+ * faisait pas : toutes les équipes s'y ressemblaient.
+ *
+ * Gris neutre en dernier recours — un créneau sans équipe ne doit pas emprunter la couleur du
+ * précédent.
+ */
+const couleurEquipe = computed(() => props.timeSlot.team?.color || '#9ca3af')
+
 const { t } = useI18n()
 
-// Fonction pour formater les dates et heures des créneaux
-const formatSlotDateTime = (startDateTime: string, endDateTime: string) => {
-  const start = new Date(startDateTime)
-  const end = new Date(endDateTime)
+/**
+ * « sam. 26 sept. • 14:00 - 16:00 », à l'heure du LIEU.
+ *
+ * Une seule fonction pour les deux cas : la version « avec retard » en était une copie mot pour
+ * mot, au décalage près. Deux copies, c'est deux occasions d'en corriger une seule.
+ */
+const formatSlotDateTime = (startDateTime: string, endDateTime: string, delayMinutes = 0) => {
+  // La règle du décalage vit dans `retard-creneau`, partagée avec les cinq autres surfaces.
+  const horaires = horairesEffectifs(startDateTime, endDateTime, delayMinutes)
+  if (!horaires) return ''
+  const { debut, fin } = horaires
 
-  const dateStr = start.toLocaleDateString('fr-FR', {
+  const zone = fuseauUtilisable(props.fuseau)
+  const jour = new Intl.DateTimeFormat('fr-FR', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
+    timeZone: zone,
   })
-
-  const startTimeStr = start.toLocaleTimeString('fr-FR', {
+  const heure = new Intl.DateTimeFormat('fr-FR', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
+    timeZone: zone,
   })
 
-  const endTimeStr = end.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-
-  return `${dateStr} • ${startTimeStr} - ${endTimeStr}`
+  return `${jour.format(debut)} • ${heure.format(debut)} - ${heure.format(fin)}`
 }
 
 // Fonction pour formater la durée d'un créneau
@@ -144,37 +182,5 @@ const formatSlotDuration = (startDateTime: string, endDateTime: string) => {
     return minutes > 0 ? `${hours}h${minutes}m` : `${hours}h`
   }
   return `${minutes}m`
-}
-
-// Fonction pour formater les dates et heures avec le retard appliqué
-const formatSlotDateTimeWithDelay = (
-  startDateTime: string,
-  endDateTime: string,
-  delayMinutes: number
-) => {
-  const start = new Date(startDateTime)
-  const end = new Date(endDateTime)
-
-  // Ajouter le retard
-  start.setMinutes(start.getMinutes() + delayMinutes)
-  end.setMinutes(end.getMinutes() + delayMinutes)
-
-  const dateStr = start.toLocaleDateString('fr-FR', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  })
-
-  const startTimeStr = start.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-
-  const endTimeStr = end.toLocaleTimeString('fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-
-  return `${dateStr} • ${startTimeStr} - ${endTimeStr}`
 }
 </script>

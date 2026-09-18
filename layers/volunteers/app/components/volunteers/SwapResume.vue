@@ -9,11 +9,11 @@
          deux personnes obligerait à relire deux fois pour savoir de quel côté on est. -->
     <div class="flex gap-2 text-gray-600 dark:text-gray-400">
       <span class="shrink-0 font-medium">{{ t('volunteers.swap_gives') }}</span>
-      <VolunteersCreneauLigne :creneau="creneauCede" />
+      <VolunteersCreneauLigne :creneau="creneauCede" :fuseau="fuseau" />
     </div>
     <div class="flex gap-2 text-gray-600 dark:text-gray-400">
       <span class="shrink-0 font-medium">{{ t('volunteers.swap_receives') }}</span>
-      <VolunteersCreneauLigne :creneau="creneauRecu" />
+      <VolunteersCreneauLigne :creneau="creneauRecu" :fuseau="fuseau" />
     </div>
   </div>
 </template>
@@ -36,6 +36,8 @@ const props = defineProps<{
   }
   /** `sent` : je suis le demandeur. `received` : la proposition m'est adressée. */
   pointDeVue: 'sent' | 'received'
+  /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+  fuseau?: string | null
 }>()
 
 const { t } = useI18n()

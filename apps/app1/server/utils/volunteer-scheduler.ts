@@ -64,15 +64,15 @@ export interface VolunteerApplication {
 export interface AffectationExistante {
   volunteerId: number
   slotId: string
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
 }
 
 export interface TimeSlot {
   id: string
   title: string
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   teamId?: string
   maxVolunteers: number
   assignedVolunteers: number
@@ -602,8 +602,8 @@ export class VolunteerScheduler {
     // des millions de fois sur une grosse édition.
     for (const slot of this.timeSlots) {
       this.creneauParId.set(slot.id, slot)
-      const debut = dt.fromISO(slot.start)
-      const fin = dt.fromISO(slot.end)
+      const debut = dt.fromISO(slot.startDateTime)
+      const fin = dt.fromISO(slot.endDateTime)
       this.dureeParCreneau.set(slot.id, fin.diff(debut, 'hours').hours)
       this.jourParCreneau.set(
         slot.id,
@@ -623,8 +623,8 @@ export class VolunteerScheduler {
      * l'autre.
      */
     for (const affectation of affectationsExistantes) {
-      const debut = dt.fromISO(affectation.start)
-      const fin = dt.fromISO(affectation.end)
+      const debut = dt.fromISO(affectation.startDateTime)
+      const fin = dt.fromISO(affectation.endDateTime)
       const duree = fin.diff(debut, 'hours').hours
       const heures = Number.isFinite(duree) ? duree : 0
       const jour = (fuseau ? debut.setZone(fuseau) : debut.toUTC()).toISODate() ?? ''
@@ -1104,8 +1104,8 @@ export class VolunteerScheduler {
     if (
       presence &&
       !estPresentPendant(presence, {
-        debut: new Date(slot.start).getTime(),
-        fin: new Date(slot.end).getTime(),
+        debut: new Date(slot.startDateTime).getTime(),
+        fin: new Date(slot.endDateTime).getTime(),
       })
     ) {
       return 'absent'
@@ -1266,8 +1266,8 @@ export class VolunteerScheduler {
     const duree = this.dureeParCreneau.get(slot.id) ?? 0
     this.ajouterHeures(assignment.volunteerId, this.jourParCreneau.get(slot.id) ?? '', duree)
     this.ajouterCreneauTenu(assignment.volunteerId, {
-      debut: new Date(slot.start).getTime(),
-      fin: new Date(slot.end).getTime(),
+      debut: new Date(slot.startDateTime).getTime(),
+      fin: new Date(slot.endDateTime).getTime(),
       slotId: slot.id,
     })
     this.totalHeuresPosees += duree
@@ -1360,7 +1360,7 @@ export class VolunteerScheduler {
     }
 
     // Vérification des heures minimum par jour
-    const slotDate = this.local(slot.start).toISODate()
+    const slotDate = this.local(slot.startDateTime).toISODate()
     const currentDailyHours = this.getVolunteerHoursForDate(volunteer.user.id, slotDate!)
     const minHoursPerDay = this.constraints.minHoursPerDay || 1
 
@@ -1464,7 +1464,7 @@ export class VolunteerScheduler {
     // Le type du créneau est classé une fois pour toutes à l'indexation : il ne dépend que du
     // créneau et des bornes de l'édition, jamais du bénévole qu'on lui compare.
     const slotType =
-      this.typeParCreneau.get(slot.id) ?? this.getSlotType(slot, dt.fromISO(slot.start))
+      this.typeParCreneau.get(slot.id) ?? this.getSlotType(slot, dt.fromISO(slot.startDateTime))
 
     switch (slotType) {
       case 'setup':
@@ -1539,8 +1539,8 @@ export class VolunteerScheduler {
     const connu = this.recouvrementParCouple.get(cle)
     if (connu !== undefined) return connu
 
-    const debut = this.local(slot.start)
-    const fin = this.local(slot.end)
+    const debut = this.local(slot.startDateTime)
+    const fin = this.local(slot.endDateTime)
     const dureeMinutes = fin.diff(debut, 'minutes').minutes
     if (!Number.isFinite(dureeMinutes) || dureeMinutes <= 0) return 0
 
@@ -1635,7 +1635,7 @@ export class VolunteerScheduler {
 
     // Un créneau hors index — le cas ne devrait pas se présenter, mais le calculer coûte moins
     // cher que de rendre zéro et de fausser un plafond.
-    return dt.fromISO(slot.end).diff(dt.fromISO(slot.start), 'hours').hours
+    return dt.fromISO(slot.endDateTime).diff(dt.fromISO(slot.startDateTime), 'hours').hours
   }
 
   /**
@@ -1654,7 +1654,7 @@ export class VolunteerScheduler {
     /** Compte les heures supplémentaires dans le plafond : la limite au-delà de la limite. */
     avecHeuresSup = false
   ): boolean {
-    const slotDate = this.local(slot.start).toISODate()
+    const slotDate = this.local(slot.startDateTime).toISODate()
     const currentDailyHours = this.getVolunteerHoursForDate(volunteerId, slotDate!)
     const slotDuration = this.getSlotDuration(slot)
 
@@ -1696,7 +1696,7 @@ export class VolunteerScheduler {
       if (remainingA !== remainingB) return remainingA - remainingB
 
       // Enfin par date
-      return dt.fromISO(a.start).toMillis() - dt.fromISO(b.start).toMillis()
+      return dt.fromISO(a.startDateTime).toMillis() - dt.fromISO(b.startDateTime).toMillis()
     })
   }
 
@@ -1820,8 +1820,8 @@ export class VolunteerScheduler {
     const targetSlot = this.timeSlots.find((s) => s.id === slotId)
     if (!targetSlot) return false
 
-    const targetStart = new Date(targetSlot.start)
-    const targetEnd = new Date(targetSlot.end)
+    const targetStart = new Date(targetSlot.startDateTime)
+    const targetEnd = new Date(targetSlot.endDateTime)
 
     /**
      * Les créneaux que ce bénévole tient déjà — ceux du calcul comme ceux qu'on lui a conservés,
@@ -1851,8 +1851,8 @@ export class VolunteerScheduler {
     if (this.representationsParSpectacle.length === 0) return false
 
     const bornesDe = (creneau: TimeSlot) => ({
-      debut: new Date(creneau.start).getTime(),
-      fin: new Date(creneau.end).getTime(),
+      debut: new Date(creneau.startDateTime).getTime(),
+      fin: new Date(creneau.endDateTime).getTime(),
     })
 
     const nouveau = bornesDe(slot)
@@ -1941,8 +1941,8 @@ export class VolunteerScheduler {
           const duree = this.getSlotDuration(slot)
           this.ajouterHeures(soulage.id, this.jourParCreneau.get(slot.id) ?? '', duree)
           this.ajouterCreneauTenu(soulage.id, {
-            debut: new Date(slot.start).getTime(),
-            fin: new Date(slot.end).getTime(),
+            debut: new Date(slot.startDateTime).getTime(),
+            fin: new Date(slot.endDateTime).getTime(),
             slotId: slot.id,
           })
           this.totalHeuresPosees += duree

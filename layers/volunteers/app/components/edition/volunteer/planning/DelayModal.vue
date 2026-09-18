@@ -18,7 +18,8 @@
             </h4>
           </div>
           <div class="text-xs text-gray-500 dark:text-gray-400 pl-6">
-            {{ formatDateTime(timeSlot?.start) }} - {{ formatDateTime(timeSlot?.end) }}
+            {{ formatDateTime(timeSlot?.startDateTime) }} -
+            {{ formatDateTime(timeSlot?.endDateTime) }}
           </div>
         </div>
 
@@ -147,11 +148,17 @@ import { computed, ref, watch } from 'vue'
 
 import type { VolunteerTimeSlot } from '#imports'
 
+import { decalageTraduisible, horairesEffectifs } from '../../../../utils/retard-creneau'
+
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 // Props
 interface Props {
   modelValue: boolean
   editionId: number
   timeSlot: VolunteerTimeSlot | null
+  /** Fuseau de l'édition : l'heure d'un créneau est celle du LIEU, comme sur le planning. */
+  fuseau?: string | null
 }
 
 const props = defineProps<Props>()
@@ -163,8 +170,7 @@ const emit = defineEmits<{
 }>()
 
 // i18n et utilitaires
-const { t } = useI18n()
-const { formatForDisplay } = useDatetime()
+const { t, locale } = useI18n()
 
 // État
 const delayMinutes = ref<number | null>(null)
@@ -189,53 +195,46 @@ const quickDelays = [
   { label: '-15 min', minutes: -15 },
 ]
 
-// Formatage de la date/heure
-const formatDateTime = (dateTime: string | undefined) => {
+/**
+ * La date et l'heure dans le fuseau de l'ÉDITION.
+ *
+ * Ce `formatDateTime` était recopié à l'identique dans trois modales du planning, et les trois
+ * retombaient sur le fuseau du navigateur : la frise annonçait l'heure du lieu, les modales
+ * qu'on ouvrait depuis elle en annonçaient une autre.
+ */
+const formatDateTime = (dateTime: string | Date | undefined) => {
   if (!dateTime) return '-'
-  return formatForDisplay(new Date(dateTime))
+  return formaterDateHeure(dateTime, props.fuseau, locale.value) || '-'
 }
 
 // Formatage du retard
+/**
+ * Le décalage mis en mots. La règle — retard ou avance, minutes ou heures — vit dans
+ * `retard-creneau`, partagée avec les écrans qui annoncent un créneau déplacé.
+ */
 const formatDelay = (minutes: number) => {
-  if (minutes === 0) return t('volunteers.no_delay')
-  if (minutes > 0) {
-    if (minutes >= 60) {
-      const hours = Math.floor(minutes / 60)
-      const mins = minutes % 60
-      return mins > 0
-        ? t('volunteers.delay_hours_minutes', { hours, minutes: mins })
-        : t('volunteers.delay_hours', { hours })
-    }
-    return t('volunteers.delay_minutes', { minutes })
-  }
-  // Avance (valeur négative)
-  const absoluteMinutes = Math.abs(minutes)
-  if (absoluteMinutes >= 60) {
-    const hours = Math.floor(absoluteMinutes / 60)
-    const mins = absoluteMinutes % 60
-    return mins > 0
-      ? t('volunteers.advance_hours_minutes', { hours, minutes: mins })
-      : t('volunteers.advance_hours', { hours })
-  }
-  return t('volunteers.advance_minutes', { minutes: absoluteMinutes })
+  const decalage = decalageTraduisible(minutes)
+  return decalage ? t(decalage.cle, decalage.valeurs) : t('volunteers.no_delay')
 }
 
 // Nouvelles heures avec le retard appliqué
-const newStartTime = computed(() => {
-  if (delayMinutes.value === null || delayMinutes.value === 0 || !props.timeSlot?.start) return '-'
+/**
+ * L'aperçu du créneau déplacé, par la même règle que les six surfaces qui l'affichent ensuite.
+ *
+ * Elle était recopiée ici, et c'est ce qui a permis à cette modale d'accepter une avance que
+ * personne n'appliquait : l'aperçu la montrait, l'affichage l'ignorait.
+ */
+const horairesApercus = computed(() =>
+  horairesEffectifs(props.timeSlot?.startDateTime, props.timeSlot?.endDateTime, delayMinutes.value)
+)
 
-  const originalStart = new Date(props.timeSlot.start)
-  const newStart = new Date(originalStart.getTime() + delayMinutes.value * 60000)
-  return formatForDisplay(newStart)
-})
+const newStartTime = computed(() =>
+  horairesApercus.value?.decale ? formatDateTime(horairesApercus.value.debut) : '-'
+)
 
-const newEndTime = computed(() => {
-  if (delayMinutes.value === null || delayMinutes.value === 0 || !props.timeSlot?.end) return '-'
-
-  const originalEnd = new Date(props.timeSlot.end)
-  const newEnd = new Date(originalEnd.getTime() + delayMinutes.value * 60000)
-  return formatForDisplay(newEnd)
-})
+const newEndTime = computed(() =>
+  horairesApercus.value?.decale ? formatDateTime(horairesApercus.value.fin) : '-'
+)
 
 // Actions
 const close = () => {

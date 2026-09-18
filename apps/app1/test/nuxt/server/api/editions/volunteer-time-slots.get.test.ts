@@ -430,8 +430,8 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
     const res = await handler(baseEvent as any)
 
     expect(res).toHaveLength(2)
-    expect(res[0].start).toBe('2024-06-01T09:00:00.000Z')
-    expect(res[1].start).toBe('2024-06-02T14:00:00.000Z')
+    expect(res[0].startDateTime).toBe('2024-06-01T09:00:00.000Z')
+    expect(res[1].startDateTime).toBe('2024-06-02T14:00:00.000Z')
     expect(res[0].delayMinutes).toBe(5)
     expect(res[1].delayMinutes).toBe(10)
   })

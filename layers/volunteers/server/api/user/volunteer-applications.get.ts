@@ -63,6 +63,9 @@ export default wrapApiHandler(
             name: true,
             startDate: true,
             endDate: true,
+            // Les créneaux affichés sur cette page s'annoncent à l'heure du LIEU : sans ce champ,
+            // la liste montrait l'heure du téléphone de qui consulte.
+            timezone: true,
             volunteerSettings: true,
             volunteerTeams: {
               select: {
@@ -105,6 +108,8 @@ export default wrapApiHandler(
             select: {
               id: true,
               title: true,
+              // Même raison que dans `my-slots` : la modale de détail l'affiche, la liste non.
+              description: true,
               startDateTime: true,
               endDateTime: true,
               delayMinutes: true,
@@ -177,6 +182,7 @@ export default wrapApiHandler(
           name: app.event.name,
           startDate: app.event.startDate,
           endDate: app.event.endDate,
+          timezone: app.event.timezone,
           volunteersAskDiet: s?.askDiet ?? false,
           volunteersAskAllergies: s?.askAllergies ?? false,
           volunteersAskEmergencyContact: s?.askEmergencyContact ?? false,

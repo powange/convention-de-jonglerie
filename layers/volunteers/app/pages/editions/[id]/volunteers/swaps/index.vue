@@ -24,6 +24,7 @@
               :titre="t('volunteers.swap_choose_mine')"
               :placeholder="t('volunteers.swap_pick_placeholder')"
               :message-vide="t('volunteers.swap_no_assignment')"
+              :fuseau="fuseauEdition"
             />
           </UFormField>
 
@@ -38,6 +39,7 @@
               :message-vide="
                 erreurCandidats ? t('errors.loading_error') : t('volunteers.swap_no_candidate')
               "
+              :fuseau="fuseauEdition"
             />
           </UFormField>
 
@@ -64,7 +66,11 @@
           </p>
           <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
             <li v-for="demande in recues" :key="demande.id" class="space-y-2 py-3">
-              <VolunteersSwapResume :demande="demande" :point-de-vue="'received'" />
+              <VolunteersSwapResume
+                :demande="demande"
+                :point-de-vue="'received'"
+                :fuseau="fuseauEdition"
+              />
               <div v-if="demande.status === 'PENDING_PEER'" class="flex gap-2">
                 <UButton
                   size="xs"
@@ -95,7 +101,11 @@
           </p>
           <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
             <li v-for="demande in envoyees" :key="demande.id" class="space-y-2 py-3">
-              <VolunteersSwapResume :demande="demande" :point-de-vue="'sent'" />
+              <VolunteersSwapResume
+                :demande="demande"
+                :point-de-vue="'sent'"
+                :fuseau="fuseauEdition"
+              />
               <!-- Un bouton franc, et non un libellé fantôme : retirer sa demande annule un
                    accord en cours de route, ce n'est pas une action qu'on effleure. D'où la
                    confirmation qui suit, aussi. -->
@@ -143,6 +153,9 @@ const editionId = computed(() => Number(route.params.id))
 // réglage, et le lire sur un objet pas encore arrivé laisserait la page s'ouvrir malgré tout.
 await editionStore.fetchEditionById(editionId.value)
 const edition = computed(() => editionStore.getEditionById(editionId.value))
+
+/** L'heure d'un créneau est celle du LIEU, pas celle du téléphone de qui consulte. */
+const fuseauEdition = computed(() => (edition.value as any)?.timezone ?? null)
 
 // Fermés par l'organisateur, les échanges font disparaître la page — y compris pour qui en
 // connaîtrait l'adresse. Avant les requêtes, que le serveur refuserait de toute façon.

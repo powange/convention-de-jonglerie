@@ -59,8 +59,10 @@
           "
           :edition-id="editionId"
           :user-id="authStore.user?.id"
+          :fuseau="(edition as any)?.timezone ?? null"
           repliable-sur-mobile
           deplie-par-defaut
+          @ouvrir="ouvrirDetailDepuisMesCreneaux"
         />
 
         <!-- L'échange se propose depuis le planning : c'est en le regardant qu'on s'aperçoit
@@ -427,6 +429,7 @@
         v-model="showSlotDetailsModal"
         :time-slot="selectedSlot"
         :teams="(fetchedTeams as any) || []"
+        :fuseau="(edition as any)?.timezone ?? null"
       />
     </div>
   </div>
@@ -536,6 +539,10 @@ const chargerMesEquipesOrganisateur = async () => {
 
 // Modal de détails de créneau
 const showSlotDetailsModal = ref(false)
+
+// Les créneaux du planning, ceux-là mêmes que la frise affiche : le composable est partagé, et
+// c'est ce qui garantit que les deux chemins ouvrent la modale sur les mêmes données.
+const { timeSlots: creneauxDuPlanning } = useVolunteerTimeSlots(editionIdComputed)
 const selectedSlot = ref<any>(null)
 
 // Expose constants early (avant tout await)
@@ -1025,6 +1032,19 @@ const updateVolunteerApplication = async (data: any) => {
 }
 
 // Fonction pour ouvrir la modal de détails du créneau
+/**
+ * Un créneau cliqué dans « mes créneaux » ouvre la MÊME modale que depuis le planning.
+ *
+ * D'où le détour par les créneaux du planning plutôt que par ceux de la carte : ces derniers
+ * sont volontairement plus pauvres — ni effectif, ni organisateurs affectés. Ouvrir une modale
+ * à moitié remplie selon l'endroit où l'on a cliqué serait exactement le genre d'écart que cet
+ * écran vient de corriger ailleurs.
+ */
+const ouvrirDetailDepuisMesCreneaux = (creneauId: string) => {
+  const complet = (creneauxDuPlanning.value ?? []).find((c: any) => c.id === creneauId)
+  if (complet) openSlotDetailsModal(complet)
+}
+
 const openSlotDetailsModal = (slot: any) => {
   // Préparer les données du créneau pour la modal
   // On passe directement les assignations déjà chargées par l'API
@@ -1034,11 +1054,17 @@ const openSlotDetailsModal = (slot: any) => {
     title: slot.title,
     description: slot.description,
     teamId: slot.teamId,
-    start: slot.start,
-    end: slot.end,
+    startDateTime: slot.startDateTime,
+    endDateTime: slot.endDateTime,
     maxVolunteers: slot.maxVolunteers,
     assignedVolunteers: slot.assignedVolunteers,
+    // Sans lui, la modale annoncerait l'heure enregistrée pendant que le calendrier d'où l'on
+    // vient de cliquer affiche l'heure décalée.
+    delayMinutes: slot.delayMinutes,
     assignedVolunteersList: slot.assignments || [], // Passer les assignations déjà chargées
+    // Les organisateurs tiennent des créneaux comme les bénévoles, et occupent une place dans
+    // le compteur. Les omettre ici faisait paraître vide un créneau qu'ils tenaient à deux.
+    assignedOrganizersList: slot.organizerAssignments || [],
     color: slot.color,
   }
   showSlotDetailsModal.value = true

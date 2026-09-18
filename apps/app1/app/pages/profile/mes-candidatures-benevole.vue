@@ -229,6 +229,7 @@
               "
               :time-slots="getTimeSlotsFromAssignments(application.assignedTimeSlots)"
               :volunteer-name="volunteerFullName"
+              :fuseau="application.edition.timezone"
               show-header
               show-stats
             />

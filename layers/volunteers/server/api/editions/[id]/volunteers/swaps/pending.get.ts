@@ -1,5 +1,6 @@
 import { effectifApresEchange } from '../../../../../utils/echange-creneaux'
 import { exigerEchangesOuverts } from '../../../../../utils/echanges-ouverts'
+import { selectionCreneauLisible } from '../../../../../utils/selection-creneau-lisible'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireVolunteerManagementAccess } from '#server/utils/permissions/volunteer-permissions'
@@ -26,13 +27,7 @@ export default wrapApiHandler(
         timeSlotId: true,
         user: { select: userWithProfileAndGravatarSelect },
         timeSlot: {
-          select: {
-            id: true,
-            title: true,
-            startDateTime: true,
-            endDateTime: true,
-            team: { select: { id: true, name: true, color: true } },
-          },
+          select: selectionCreneauLisible,
         },
       },
     }

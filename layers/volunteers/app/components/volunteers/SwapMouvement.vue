@@ -8,7 +8,7 @@
       <div class="flex gap-2">
         <dt class="shrink-0 font-medium text-gray-500">{{ t('volunteers.swap_gives') }}</dt>
         <dd class="min-w-0 text-gray-700 dark:text-gray-300">
-          <VolunteersCreneauLigne :creneau="cede" />
+          <VolunteersCreneauLigne :creneau="cede" :fuseau="fuseau" />
         </dd>
       </div>
       <div class="flex gap-2">
@@ -16,7 +16,7 @@
           {{ t('volunteers.swap_receives') }}
         </dt>
         <dd class="min-w-0 text-gray-700 dark:text-gray-300">
-          <VolunteersCreneauLigne :creneau="recoit" />
+          <VolunteersCreneauLigne :creneau="recoit" :fuseau="fuseau" />
         </dd>
       </div>
     </dl>
@@ -30,6 +30,8 @@ defineProps<{
   personne: { id: number; pseudo: string; profilePicture?: string | null }
   cede: CreneauLisible
   recoit: CreneauLisible
+  /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+  fuseau?: string | null
 }>()
 
 const { t } = useI18n()

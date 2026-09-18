@@ -447,8 +447,8 @@ export default wrapApiHandler(
       slot.assignments.filter(conservee).map((assignment) => ({
         volunteerId: assignment.userId,
         slotId: slot.id,
-        start: slot.startDateTime.toISOString(),
-        end: slot.endDateTime.toISOString(),
+        startDateTime: slot.startDateTime.toISOString(),
+        endDateTime: slot.endDateTime.toISOString(),
       }))
     )
 
@@ -499,8 +499,8 @@ export default wrapApiHandler(
       .map((slot: TimeSlotWithAssignments) => ({
         id: slot.id.toString(),
         title: slot.title || 'Créneau sans titre',
-        start: slot.startDateTime.toISOString(),
-        end: slot.endDateTime.toISOString(),
+        startDateTime: slot.startDateTime.toISOString(),
+        endDateTime: slot.endDateTime.toISOString(),
         teamId: slot.teamId?.toString() || undefined,
         maxVolunteers: slot.maxVolunteers,
         /**

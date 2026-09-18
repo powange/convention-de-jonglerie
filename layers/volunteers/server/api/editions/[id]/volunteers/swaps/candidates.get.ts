@@ -10,6 +10,7 @@ import {
   exigerEchangesPourCettePersonne,
 } from '../../../../../utils/echanges-ouverts'
 import { exigerPlanningPublie } from '../../../../../utils/planning-publie'
+import { selectionCreneauLisible } from '../../../../../utils/selection-creneau-lisible'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -71,15 +72,11 @@ export default wrapApiHandler(
         user: { select: userWithProfileAndGravatarSelect },
         timeSlot: {
           select: {
-            id: true,
-            title: true,
+            ...selectionCreneauLisible,
             teamId: true,
-            startDateTime: true,
-            endDateTime: true,
             // L'occupation se compte sur les affectations réelles, comme partout dans le dépôt.
             maxVolunteers: true,
             _count: { select: { assignments: true } },
-            team: { select: { id: true, name: true, color: true } },
           },
         },
       },

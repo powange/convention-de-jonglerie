@@ -71,8 +71,17 @@
                     {{ ligne.creneau.title || t('edition.volunteers.untitled_slot') }}
                   </div>
                   <div class="text-sm text-gray-500 mt-0.5">
-                    {{ formatDate(ligne.creneau.start) }} · {{ formatHeure(ligne.creneau.start) }} –
-                    {{ formatHeure(ligne.creneau.end) }}
+                    {{ formatDate(horairesDe(ligne.creneau).debut) }} ·
+                    {{ formatHeure(horairesDe(ligne.creneau).debut, fuseau) }} –
+                    {{ formatHeure(horairesDe(ligne.creneau).fin, fuseau) }}
+                  </div>
+                  <!-- Cette modale s'ouvre depuis le relevé d'heures : annoncer un créneau à son
+                       horaire périmé fausserait la lecture de la journée entière. -->
+                  <div
+                    v-if="decalageDe(ligne.creneau)"
+                    class="text-xs text-orange-600 dark:text-orange-400 mt-0.5"
+                  >
+                    {{ decalageDe(ligne.creneau) }}
                   </div>
                   <!-- La couleur de l'équipe borde le créneau et marque son nom : c'est le repère
                        qu'on a déjà dans la frise, et le retrouver ici évite de retraduire un nom
@@ -115,6 +124,7 @@
 <script setup lang="ts">
 import { creneauxDuBenevole } from '../../../../utils/creneaux-du-benevole'
 import { dureeTraduisible, formatHeure } from '../../../../utils/plage-horaire'
+import { decalageTraduisible, horairesEffectifs } from '../../../../utils/retard-creneau'
 
 const props = defineProps<{
   modelValue: boolean
@@ -131,6 +141,8 @@ const props = defineProps<{
   /** Les équipes de l'édition, pour nommer et colorer chaque créneau. */
   teams: Array<{ id: string; name: string; color?: string | null }>
   formatDate: (date: string) => string
+  /** Fuseau de l'édition : l'heure annoncée est celle du LIEU, comme sur le calendrier. */
+  fuseau?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -150,8 +162,35 @@ const lignes = computed(() =>
   props.user ? creneauxDuBenevole(props.timeSlots, props.user.id) : []
 )
 
-const dureeDe = (creneau: { start: string; end: string }) =>
-  dureeTraduisible(creneau.start, creneau.end)
+/**
+ * Les horaires RÉELS d'un créneau, décalage compris. Repli sur les bornes enregistrées quand
+ * elles sont illisibles : l'affichage reste alors ce qu'il était, plutôt que vide.
+ */
+const horairesDe = (creneau: {
+  startDateTime: string
+  endDateTime: string
+  delayMinutes?: number | null
+}) => {
+  const horaires = horairesEffectifs(
+    creneau.startDateTime,
+    creneau.endDateTime,
+    creneau.delayMinutes
+  )
+  // Des CHAÎNES, et non des `Date` : `formatDate` vient de la page parente et attend une chaîne,
+  // qu'elle inspecte avant de la lire. Lui passer un objet la ferait échouer.
+  return horaires
+    ? { debut: horaires.debut.toISOString(), fin: horaires.fin.toISOString() }
+    : { debut: creneau.startDateTime, fin: creneau.endDateTime }
+}
+
+const decalageDe = (creneau: { delayMinutes?: number | null }) => {
+  const decalage = decalageTraduisible(creneau.delayMinutes)
+  return decalage ? t(decalage.cle, decalage.valeurs) : null
+}
+
+// La durée ne bouge pas avec le décalage : un créneau déplacé n'est pas un créneau rallongé.
+const dureeDe = (creneau: { startDateTime: string; endDateTime: string }) =>
+  dureeTraduisible(creneau.startDateTime, creneau.endDateTime)
 
 const equipeDe = (creneau: any) => props.teams.find((equipe) => equipe.id === creneau.teamId)
 

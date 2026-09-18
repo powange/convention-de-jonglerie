@@ -632,6 +632,9 @@ export default defineNuxtConfig({
         // interrompait l'hydratation, figeant le planning des bénévoles et son menu.
         '@fullcalendar/resource',
         '@fullcalendar/resource-timeline',
+        // Même raison pour l'adaptateur luxon, qui donne au calendrier les fuseaux nommés : il
+        // étend les classes ci-dessus, et l'héritage casse pareillement s'il n'est pas pré-bundlé.
+        '@fullcalendar/luxon3',
         '@fullcalendar/core/locales-all',
         'rehype-sanitize',
         'rehype-stringify',

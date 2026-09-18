@@ -20,7 +20,10 @@
       v-if="creneauxAffiches.length > 0"
       :time-slots="creneauxAffiches"
       :volunteer-name="volunteerFullName"
+      :fuseau="fuseau"
+      ouvrable
       show-stats
+      @ouvrir="(creneau: { id: string }) => emit('ouvrir', creneau.id)"
     />
 
     <p v-else class="text-sm text-gray-500 dark:text-gray-400">
@@ -52,12 +55,17 @@ interface TimeSlotAssignment {
 const props = withDefaults(
   defineProps<{
     editionId: number
+    /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+    fuseau?: string | null
     userId: number
     repliableSurMobile?: boolean
     deplieParDefaut?: boolean
   }>(),
   { repliableSurMobile: false, deplieParDefaut: false }
 )
+
+/** L'identifiant seul : c'est l'écran qui retrouve le créneau COMPLET et ouvre la modale. */
+const emit = defineEmits<{ ouvrir: [creneauId: string] }>()
 
 const { t } = useI18n()
 const { user } = useUserSession()

@@ -43,14 +43,18 @@
                     - {{ warning.slot1.teamName }}</span
                   >
                   <br />
-                  ({{ formatDateTimeRange(warning.slot1.start, warning.slot1.end) }})
+                  ({{
+                    formatDateTimeRange(warning.slot1.startDateTime, warning.slot1.endDateTime)
+                  }})
                   <br />
                   <strong>{{ warning.slot2.title }}</strong>
                   <span v-if="warning.slot2.teamName" class="text-blue-600 dark:text-blue-400">
                     - {{ warning.slot2.teamName }}</span
                   >
                   <br />
-                  ({{ formatDateTimeRange(warning.slot2.start, warning.slot2.end) }})
+                  ({{
+                    formatDateTimeRange(warning.slot2.startDateTime, warning.slot2.endDateTime)
+                  }})
                 </div>
               </div>
             </div>
@@ -103,7 +107,7 @@
                     - {{ warning.teamName }}</span
                   >
                   <br />
-                  ({{ formatDateTimeRange(warning.slot.start, warning.slot.end) }})
+                  ({{ formatDateTimeRange(warning.slot.startDateTime, warning.slot.endDateTime) }})
                   <br />
                   <span class="text-blue-600 dark:text-blue-400">
                     {{
@@ -166,7 +170,7 @@
                     - {{ warning.slot.teamName }}</span
                   >
                   <br />
-                  ({{ formatDateTimeRange(warning.slot.start, warning.slot.end) }})
+                  ({{ formatDateTimeRange(warning.slot.startDateTime, warning.slot.endDateTime) }})
                   <br />
                   <span class="text-blue-600 dark:text-blue-400">
                     {{
@@ -247,7 +251,12 @@
                     >
                       - {{ representation.slot.teamName }}</span
                     >
-                    ({{ formatDateTimeRange(representation.slot.start, representation.slot.end) }})
+                    ({{
+                      formatDateTimeRange(
+                        representation.slot.startDateTime,
+                        representation.slot.endDateTime
+                      )
+                    }})
                   </div>
                 </div>
               </div>
@@ -270,15 +279,15 @@ interface OverlapWarning {
     id: string | number
     title: string
     teamName?: string
-    start: string
-    end: string
+    startDateTime: string
+    endDateTime: string
   }
   slot2: {
     id: string | number
     title: string
     teamName?: string
-    start: string
-    end: string
+    startDateTime: string
+    endDateTime: string
   }
 }
 
@@ -292,8 +301,8 @@ interface PreferenceWarning {
     id: string | number
     title: string
     teamName?: string
-    start: string
-    end: string
+    startDateTime: string
+    endDateTime: string
   }
   teamName: string
 }
@@ -308,8 +317,8 @@ interface MealTimeWarning {
     id: string | number
     title: string
     teamName?: string
-    start: string
-    end: string
+    startDateTime: string
+    endDateTime: string
   }
   mealPeriod: 'lunch' | 'dinner'
 }

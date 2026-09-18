@@ -123,8 +123,8 @@ describe('formaterCreneau', () => {
     const formate = formaterCreneau(creneau())
 
     expect(formate).toMatchObject({
-      start: '2026-08-01T18:00:00.000Z',
-      end: '2026-08-01T22:00:00.000Z',
+      startDateTime: '2026-08-01T18:00:00.000Z',
+      endDateTime: '2026-08-01T22:00:00.000Z',
       resourceId: 'bar',
       color: '#ff0000',
       assignedVolunteers: 1,
@@ -200,7 +200,7 @@ describe('formaterCreneau, identité masquée', () => {
     expect(rendu).toMatchObject({
       id: 'c1',
       title: 'Bar du soir',
-      start: '2026-08-01T18:00:00.000Z',
+      startDateTime: '2026-08-01T18:00:00.000Z',
       teamId: 'bar',
       maxVolunteers: 3,
       assignedVolunteers: 1,

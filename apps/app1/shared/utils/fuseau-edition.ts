@@ -28,7 +28,7 @@ import { DateTime } from 'luxon'
  * aux heures peut-être décalées reste plus utile qu'une page vide, et l'écart se corrige au
  * rechargement suivant. Pour **écrire**, `versInstant` est plus sévère — voir sa note.
  */
-const fuseauUtilisable = (fuseau?: string | null): string | undefined => {
+export const fuseauUtilisable = (fuseau?: string | null): string | undefined => {
   if (!fuseau) return undefined
   return DateTime.local().setZone(fuseau).isValid ? fuseau : undefined
 }

@@ -1,12 +1,15 @@
 import { dureeTraduisible, formatPlage } from '../utils/plage-horaire'
 import { positionInitialeDuPlanning } from '../utils/position-initiale-planning'
 import { creneauAPourvoir, placesOccupees } from '../utils/remplissage-creneau'
+import { horairesEffectifs } from '../utils/retard-creneau'
 
 import type { CalendarOptions, EventInput } from '@fullcalendar/core'
 // `ResourceInput` vit dans le paquet `resource`, pas dans `core` : l'importer de `core`
 // ne résolvait rien, et le type des ressources était silencieusement perdu.
 import type { ResourceInput } from '@fullcalendar/resource'
 import type { ComputedRef, Ref } from 'vue'
+
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 // Type simplifié pour FullCalendar (compatible avec VolunteerTeam)
 export interface VolunteerTeamCalendar {
@@ -22,8 +25,19 @@ export interface VolunteerTeamCalendar {
 export interface VolunteerTimeSlot {
   id: string
   title: string | null
-  start: string
-  end: string
+  /**
+   * `startDateTime` / `endDateTime`, et non `start` / `end`.
+   *
+   * Un créneau portait deux jeux de noms selon le point d'API qui le rendait — celui du schéma
+   * Prisma d'un côté, celui de FullCalendar de l'autre. Chaque rencontre entre les deux mondes
+   * exigeait un adaptateur, et un consommateur branché sur la mauvaise moitié lisait `undefined`
+   * sans que rien ne le signale.
+   *
+   * Un seul nom désormais, de la base à l'écran : celui de la base. `start` / `end` ne survivent
+   * que dans les ÉVÉNEMENTS remis à FullCalendar, qui les impose.
+   */
+  startDateTime: string
+  endDateTime: string
   teamId?: string
   maxVolunteers: number
   assignedVolunteers: number
@@ -62,6 +76,13 @@ export interface UseVolunteerScheduleOptions {
   timeSlots: Ref<VolunteerTimeSlot[]> | ComputedRef<VolunteerTimeSlot[]>
   readOnly?: boolean | Ref<boolean> | ComputedRef<boolean>
   slotDuration?: number | Ref<number> | ComputedRef<number> // en minutes (15, 30, 60)
+  /**
+   * Fuseau de l'édition (IANA). Un horaire de convention est une heure de LIEU : un créneau à 14 h
+   * est à 14 h sur place, que le planning soit consulté depuis Paris ou depuis Tokyo. Sans lui,
+   * le calendrier retombe sur le fuseau du navigateur — et le même créneau change d'heure selon
+   * qui regarde.
+   */
+  fuseau?: string | null | Ref<string | null | undefined> | ComputedRef<string | null | undefined>
   /** Vue d'ouverture du calendrier — jour ou semaine. Reprise de l'URL. */
   vueInitiale?: string
   /** Date d'ouverture, `AAAA-MM-JJ`. Absente, le calendrier s'ouvre au premier jour de l'édition. */
@@ -189,6 +210,16 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   const editionStartDate = computed(() => unref(options.editionStartDate))
   const editionEndDate = computed(() => unref(options.editionEndDate))
   const isReadOnly = computed(() => unref(options.readOnly) ?? false)
+
+  /**
+   * Le fuseau réellement utilisable, ou `undefined` pour celui de la machine.
+   *
+   * La décision de ce qui est « utilisable » n'est pas reprise ici : elle vit dans
+   * `fuseau-edition`, qui écarte aussi bien le fuseau absent que celui devenu invalide après un
+   * import. La recopier ferait diverger le calendrier du reste de l'application le jour où cette
+   * règle changerait.
+   */
+  const fuseauDuCalendrier = computed(() => fuseauUtilisable(unref(options.fuseau)))
   const slotDurationMinutes = computed(() => unref(options.slotDuration) ?? 15)
 
   // En mode lecture seule, calculer les dates du premier et dernier créneau
@@ -204,8 +235,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Trouver le créneau avec la date de début la plus ancienne (en tenant compte du retard)
     const earliestSlot = slots.reduce((earliest, slot) => {
-      const slotStart = new Date(slot.start)
-      const earliestStart = new Date(earliest.start)
+      const slotStart = new Date(slot.startDateTime)
+      const earliestStart = new Date(earliest.startDateTime)
 
       // Appliquer le retard si présent
       if (slot.delayMinutes) {
@@ -218,7 +249,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       return slotStart < earliestStart ? slot : earliest
     })
 
-    return earliestSlot.start
+    return earliestSlot.startDateTime
   })
 
   const endDate = computed(() => {
@@ -233,8 +264,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
     // Trouver le créneau avec la date de fin la plus tardive (en tenant compte du retard)
     const latestSlot = slots.reduce((latest, slot) => {
-      const slotEnd = new Date(slot.end)
-      const latestEnd = new Date(latest.end)
+      const slotEnd = new Date(slot.endDateTime)
+      const latestEnd = new Date(latest.endDateTime)
 
       // Appliquer le retard si présent
       if (slot.delayMinutes) {
@@ -247,7 +278,7 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       return slotEnd > latestEnd ? slot : latest
     })
 
-    return latestSlot.end
+    return latestSlot.endDateTime
   })
 
   const calendarRef = ref<any>(null)
@@ -258,14 +289,22 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   // Charger les plugins dynamiquement
   const loadPlugins = async () => {
     try {
-      const [resourceTimeline, timeline, interaction, locales] = await Promise.all([
+      // `luxon3` est ce qui autorise un fuseau NOMMÉ (« Europe/Paris ») : sans ce greffon,
+      // FullCalendar n'accepte que `local` et `UTC`, et ignore silencieusement le reste.
+      const [resourceTimeline, timeline, interaction, luxon3, locales] = await Promise.all([
         import('@fullcalendar/resource-timeline'),
         import('@fullcalendar/timeline'),
         import('@fullcalendar/interaction'),
+        import('@fullcalendar/luxon3'),
         import('@fullcalendar/core/locales-all'),
       ])
 
-      plugins.value = [resourceTimeline.default, timeline.default, interaction.default]
+      plugins.value = [
+        resourceTimeline.default,
+        timeline.default,
+        interaction.default,
+        luxon3.default,
+      ]
       allLocales.value = locales.default
     } catch (error) {
       console.error('Error loading FullCalendar plugins:', error)
@@ -311,21 +350,11 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const equipe = unref(teams).find((candidate) => candidate.id === slot.teamId)
       const horsCharge = equipe?.isFloatingTeam === true || equipe?.isAutonomousTeam === true
 
-      // Calculer les heures décalées si delayMinutes est présent
-      let adjustedStart = slot.start
-      let adjustedEnd = slot.end
-
-      if (slot.delayMinutes && slot.delayMinutes > 0) {
-        const startDate = new Date(slot.start)
-        const endDate = new Date(slot.end)
-
-        // Ajouter le retard en minutes
-        startDate.setMinutes(startDate.getMinutes() + slot.delayMinutes)
-        endDate.setMinutes(endDate.getMinutes() + slot.delayMinutes)
-
-        adjustedStart = startDate.toISOString()
-        adjustedEnd = endDate.toISOString()
-      }
+      // Les heures réelles du créneau, décalage compris. La règle vit dans `retard-creneau`,
+      // partagée avec les cinq autres surfaces qui annoncent un créneau.
+      const horaires = horairesEffectifs(slot.startDateTime, slot.endDateTime, slot.delayMinutes)
+      const adjustedStart = horaires ? horaires.debut.toISOString() : slot.startDateTime
+      const adjustedEnd = horaires ? horaires.fin.toISOString() : slot.endDateTime
 
       return {
         id: slot.id,
@@ -347,8 +376,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
           teamName: unref(teams).find((equipe) => equipe.id === slot.teamId)?.name ?? null,
           slotTitle, // Titre original pour eventContent
           delayMinutes: slot.delayMinutes, // Retard du créneau
-          originalStart: slot.start, // Heure de début originale
-          originalEnd: slot.end, // Heure de fin originale
+          originalStart: slot.startDateTime, // Heure de début originale
+          originalEnd: slot.endDateTime, // Heure de fin originale
         },
       }
     })
@@ -359,6 +388,11 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
     plugins: plugins.value,
     locales: allLocales.value,
     locale: locale.value,
+
+    // Les heures s'affichent dans le fuseau de l'ÉDITION, pas dans celui du lecteur.
+    // `'local'` en repli : une édition peut ne pas déclarer de fuseau, et un planning aux heures
+    // du navigateur reste plus utile qu'un planning vide.
+    timeZone: fuseauDuCalendrier.value ?? 'local',
 
     // Vue timeline par ressource. Reprise de l'URL quand elle en porte une : un rechargement,
     // ou un lien envoyé à quelqu'un, doit rouvrir la vue qu'on regardait.
@@ -547,7 +581,9 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
 
         // « 15h - 16h (1h) ». Les bornes de l'événement, donc décalées si le créneau a du
         // retard : c'est l'heure à laquelle on se présente, pas celle prévue à l'origine.
-        const plage = formatPlage(arg.event.start, arg.event.end)
+        // L'infobulle doit annoncer la même heure que la case qu'elle survole : sans le fuseau,
+        // FullCalendar affichait l'heure du lieu et l'infobulle celle du navigateur.
+        const plage = formatPlage(arg.event.start, arg.event.end, fuseauDuCalendrier.value)
         if (plage) {
           const duree = dureeTraduisible(arg.event.start, arg.event.end)
           const horaire = document.createElement('div')
@@ -769,8 +805,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         const slot: VolunteerTimeSlot = {
           id: event.id,
           title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
-          start: event.startStr,
-          end: event.endStr,
+          startDateTime: event.startStr,
+          endDateTime: event.endStr,
           teamId: event.extendedProps.teamId,
           maxVolunteers: event.extendedProps.maxVolunteers,
           assignedVolunteers: event.extendedProps.assignedVolunteers,
@@ -803,8 +839,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const updatedSlot: VolunteerTimeSlot = {
         id: event.id,
         title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
-        start: event.startStr,
-        end: event.endStr,
+        startDateTime: event.startStr,
+        endDateTime: event.endStr,
         teamId:
           event.getResources()[0]?.id === 'unassigned' ? undefined : event.getResources()[0]?.id,
         maxVolunteers: event.extendedProps.maxVolunteers,
@@ -829,8 +865,8 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       const updatedSlot: VolunteerTimeSlot = {
         id: event.id,
         title: rawTitle === t('edition.volunteers.untitled_slot') ? null : rawTitle,
-        start: event.startStr,
-        end: event.endStr,
+        startDateTime: event.startStr,
+        endDateTime: event.endStr,
         teamId:
           event.getResources()[0]?.id === 'unassigned' ? undefined : event.getResources()[0]?.id,
         maxVolunteers: event.extendedProps.maxVolunteers,
@@ -852,6 +888,13 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
   watch([plugins, allLocales], ([newPlugins, newLocales]) => {
     calendarOptions.plugins = newPlugins
     calendarOptions.locales = newLocales
+  })
+
+  // L'édition se charge en asynchrone : le calendrier est souvent construit AVANT que son fuseau
+  // soit connu. Sans ce watcher, il resterait figé sur l'heure du navigateur, et seul un
+  // rechargement complet afficherait les bonnes heures.
+  watch(fuseauDuCalendrier, (nouveau) => {
+    calendarOptions.timeZone = nouveau ?? 'local'
   })
 
   // Watchers pour mettre à jour les ressources et événements
