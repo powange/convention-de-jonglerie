@@ -82,9 +82,10 @@ export default wrapApiHandler(
                 category: 'edition',
                 entityType: 'Edition',
                 entityId: edition.id.toString(),
-                title: {
-                  contains: 'Rappel',
-                },
+                // `Notification` n'a pas de colonne `title` : le titre est une CLÉ de
+                // traduction, et c'est elle qui identifie un rappel. Chercher « Rappel » dans un
+                // champ inexistant faisait rejeter la requête entière par Prisma.
+                titleKey: 'notifications.edition.reminder.title',
                 createdAt: {
                   gte: new Date(now.getTime() - 24 * 60 * 60 * 1000), // Dans les dernières 24h
                 },

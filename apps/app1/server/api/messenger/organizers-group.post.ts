@@ -17,10 +17,13 @@ export default wrapApiHandler(
     }
 
     // Vérifier que l'utilisateur est bien un organisateur de cette édition
+    // `EditionOrganizer` n'a pas de `userId` : il pointe l'organisateur de la CONVENTION, qui
+    // lui en porte un. La requête précédente nommait un champ inexistant — Prisma refusait alors
+    // la requête entière, et créer ce groupe rendait 500.
     const isOrganizer = await prisma.editionOrganizer.findFirst({
       where: {
         editionId,
-        userId: user.id,
+        organizer: { userId: user.id },
       },
     })
 
