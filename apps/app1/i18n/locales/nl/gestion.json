@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Alleen wat op geen enkele lijst staat",
       "missing_in_list_pending": "Op deze lijst, nog niet gekocht.",
       "missing_in_list_purchased": "Op deze lijst, al gekocht.",
-      "missing_in_lists": "Lijsten"
+      "missing_in_lists": "Lijsten",
+      "shopping_no_match_tags": "Geen enkel item op deze lijst heeft de gekozen tags.",
+      "shopping_remove_item_confirm": "‘{name}’ wordt van deze boodschappenlijst verwijderd. Het materiaal in de voorraad blijft ongemoeid."
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

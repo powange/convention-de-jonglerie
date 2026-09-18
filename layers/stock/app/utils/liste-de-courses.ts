@@ -10,10 +10,11 @@
  * compris sur une liste déjà imprimée. C'est le choix assumé à la conception ; le noter ici parce
  * que c'est la surprise la plus probable à la lecture du code.
  *
- * ⚠️ Ce fichier ne doit rien importer d'autre que les règles de comptage : il est chargé tel quel
- * par les tests unitaires, hors Nuxt.
+ * ⚠️ Ce fichier ne doit importer que des utilitaires PURS — comptage, filtrage — et jamais rien
+ * de Nuxt : il est chargé tel quel par les tests unitaires, hors Nuxt.
  */
 
+import { filtrerParTags } from './filtre-tags-stock'
 import { quantiteARacheter, type ObjetManquant } from './manquants-stock'
 
 /** Un article de liste, tel que l'écran le reçoit : la case, et l'objet visé. */
@@ -154,4 +155,27 @@ export function listesParObjet(listes: ListeAvecArticles[]): Map<number, Apparte
   }
 
   return index
+}
+
+/**
+ * Les articles d'une liste qui portent au moins un des tags choisis.
+ *
+ * La règle de sélection n'est pas réécrite ici : c'est celle du stock entier — l'union, et non le
+ * cumul —, et deux écrans qui filtreraient différemment sur les mêmes pastilles seraient un piège.
+ * Ce fichier ne fait que la porter de l'article vers l'objet qu'il vise, parce que ce sont les
+ * objets qui portent les tags, pas les lignes de la liste.
+ *
+ * Un article dont l'objet a disparu du stock ne porte plus rien : il sort dès qu'un tag est
+ * demandé, et reste tant qu'aucun ne l'est. C'est le même traitement que n'importe quel objet sans
+ * le tag cherché — l'écran le signale déjà par ailleurs, ce n'est pas au filtre de le rattraper.
+ */
+export function articlesParTags(
+  articles: ArticleDeListe[],
+  tagsChoisis: number[]
+): ArticleDeListe[] {
+  if (tagsChoisis.length === 0) return articles
+
+  return articles.filter(
+    (article) => article.item != null && filtrerParTags([article.item], tagsChoisis).length > 0
+  )
 }

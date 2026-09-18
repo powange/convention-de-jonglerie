@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Лише те, чого немає в жодному списку",
       "missing_in_list_pending": "У цьому списку, ще не куплено.",
       "missing_in_list_purchased": "У цьому списку, вже куплено.",
-      "missing_in_lists": "Списки"
+      "missing_in_lists": "Списки",
+      "shopping_no_match_tags": "Жодна позиція цього списку не має вибраних тегів.",
+      "shopping_remove_item_confirm": "«{name}» буде вилучено з цього списку покупок. Саме обладнання на складі не змінюється."
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

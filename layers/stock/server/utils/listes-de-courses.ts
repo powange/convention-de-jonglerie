@@ -118,6 +118,15 @@ export const selectionDeListe = {
           quantity: true,
           finalQuantity: true,
           group: { select: { id: true, name: true } },
+          // Les étiquettes voyagent avec l'article parce que la liste se lit EN COURSES : « les
+          // fragiles dans le même carton », « ne rien prendre de lourd sans la voiture ». Les
+          // relire ailleurs supposerait une seconde requête au moment où l'on est le moins
+          // disposé à attendre. `displayOrder` fixe l'ordre des pastilles, sans quoi il varierait
+          // d'un chargement à l'autre sous les yeux de qui relit sa liste.
+          tags: {
+            select: { tag: { select: { id: true, name: true, color: true } } },
+            orderBy: { tag: { displayOrder: 'asc' } },
+          },
         },
       },
     },

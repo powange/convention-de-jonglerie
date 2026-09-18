@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Endast det som inte finns på någon lista",
       "missing_in_list_pending": "På den här listan, ännu inte köpt.",
       "missing_in_list_purchased": "På den här listan, redan köpt.",
-      "missing_in_lists": "Listor"
+      "missing_in_lists": "Listor",
+      "shopping_no_match_tags": "Ingen artikel i den här listan har de valda taggarna.",
+      "shopping_remove_item_confirm": "”{name}” tas bort från den här inköpslistan. Materialet i lagret påverkas inte."
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

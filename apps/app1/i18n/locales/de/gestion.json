@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Nur Gegenstände auf keiner Liste",
       "missing_in_list_pending": "Auf dieser Liste, noch nicht gekauft.",
       "missing_in_list_purchased": "Auf dieser Liste, bereits gekauft.",
-      "missing_in_lists": "Listen"
+      "missing_in_lists": "Listen",
+      "shopping_no_match_tags": "Kein Artikel dieser Liste trägt die ausgewählten Tags.",
+      "shopping_remove_item_confirm": "„{name}“ wird von dieser Einkaufsliste entfernt. Das Material im Bestand bleibt unberührt."
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  articlesParTags,
   articleSansObjet,
   listeTerminee,
   listesParObjet,
@@ -187,5 +188,51 @@ describe('listesParObjet', () => {
   it('n’a rien à dire de listes vides', () => {
     expect(listesParObjet([liste(1, 'Courses', [])]).size).toBe(0)
     expect(listesParObjet([]).size).toBe(0)
+  })
+})
+
+describe('articlesParTags', () => {
+  const tague = (...ids: number[]) =>
+    item({ tags: ids.map((id) => ({ tag: { id, name: `t${id}`, color: '#000000' } })) })
+
+  it('garde les articles qui portent au moins un des tags choisis', () => {
+    // L'union et non le cumul : c'est la règle du stock entier, et deux écrans qui filtreraient
+    // différemment sur les mêmes pastilles seraient un piège.
+    const articles = [
+      article({ id: 1, item: tague(1) }),
+      article({ id: 2, item: tague(2) }),
+      article({ id: 3, item: tague(3) }),
+    ]
+
+    expect(articlesParTags(articles, [1, 2]).map((a) => a.id)).toEqual([1, 2])
+  })
+
+  it('garde un article qui porte plusieurs tags dès que l’un est demandé', () => {
+    const articles = [article({ id: 1, item: tague(4, 7) })]
+
+    expect(articlesParTags(articles, [7]).map((a) => a.id)).toEqual([1])
+  })
+
+  it('ne filtre rien quand aucun tag n’est choisi', () => {
+    const articles = [article({ id: 1, item: tague(1) }), article({ id: 2, item: item() })]
+
+    expect(articlesParTags(articles, [])).toHaveLength(2)
+  })
+
+  it('écarte un article privé de son objet dès qu’un tag est demandé', () => {
+    // Il ne porte plus de tag : rien ne permet de dire qu'il répond au filtre.
+    const articles = [article({ id: 1, item: null }), article({ id: 2, item: tague(1) })]
+
+    expect(articlesParTags(articles, [1]).map((a) => a.id)).toEqual([2])
+  })
+
+  it('garde un article privé de son objet tant qu’aucun tag n’est demandé', () => {
+    expect(articlesParTags([article({ id: 1, item: null })], [])).toHaveLength(1)
+  })
+
+  it('écarte un objet sans aucun tag', () => {
+    const articles = [article({ id: 1, item: item() })]
+
+    expect(articlesParTags(articles, [1])).toEqual([])
   })
 })

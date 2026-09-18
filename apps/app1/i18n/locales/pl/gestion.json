@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Tylko to, czego nie ma na żadnej liście",
       "missing_in_list_pending": "Na tej liście, jeszcze nie kupione.",
       "missing_in_list_purchased": "Na tej liście, już kupione.",
-      "missing_in_lists": "Listy"
+      "missing_in_lists": "Listy",
+      "shopping_no_match_tags": "Żadna pozycja na tej liście nie ma wybranych tagów.",
+      "shopping_remove_item_confirm": "„{name}” zostanie usunięta z tej listy zakupów. Sprzęt w magazynie pozostaje nietknięty."
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",
