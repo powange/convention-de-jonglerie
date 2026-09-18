@@ -305,10 +305,58 @@
 
       <!-- ONGLET 3 : les listes de courses -->
       <div v-else class="space-y-4">
-        <div v-if="canManage" class="flex justify-end">
-          <UButton size="sm" icon="i-heroicons-plus" @click="ouvrirCreationVide">
-            {{ t('gestion.stock.shopping_new_list') }}
-          </UButton>
+        <div
+          v-if="canManage || listes.length > 1 || optionsDeTags.length > 0"
+          class="flex flex-wrap items-center gap-3"
+        >
+          <!-- Le sélecteur ne paraît qu'à partir de deux listes : un menu à choix unique n'offre
+               aucun choix, et occuperait une ligne à ne rien dire. -->
+          <USelect
+            v-if="listes.length > 1"
+            v-model="listeChoisieId"
+            :items="optionsDeListes"
+            value-key="value"
+            class="w-64"
+            :aria-label="t('gestion.stock.shopping_lists')"
+          />
+
+          <!-- Les pastilles présentes dans la liste ouverte, et rien d'autre : sans tag à proposer,
+               le menu n'aurait rien à offrir et occuperait une place qu'on lit en courses. -->
+          <USelectMenu
+            v-if="optionsDeTags.length > 0"
+            v-model="tagsSelectionnes"
+            :items="optionsDeTags"
+            multiple
+            :placeholder="t('gestion.stock.tags.filter_placeholder')"
+            searchable
+            :searchable-placeholder="t('common.search')"
+            class="w-64"
+            :aria-label="t('gestion.stock.tags.filter_label')"
+            :ui="{ content: 'min-w-fit' }"
+          >
+            <template #default="{ modelValue: choisis }">
+              <span v-if="!choisis?.length" class="text-gray-400">
+                {{ t('gestion.stock.tags.filter_placeholder') }}
+              </span>
+              <div v-else class="flex flex-wrap gap-1">
+                <StockTagBadge
+                  v-for="option in choisis"
+                  :key="option.value"
+                  :tag="{ name: option.label, color: option.color }"
+                  size="sm"
+                />
+              </div>
+            </template>
+            <template #item-leading="{ item: option }">
+              <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: option.color }" />
+            </template>
+          </USelectMenu>
+
+          <div class="ms-auto">
+            <UButton v-if="canManage" size="sm" icon="i-heroicons-plus" @click="ouvrirCreationVide">
+              {{ t('gestion.stock.shopping_new_list') }}
+            </UButton>
+          </div>
         </div>
 
         <div v-if="listes.length === 0" class="text-center py-12">
@@ -316,7 +364,11 @@
           <p class="text-gray-600 dark:text-gray-400">{{ t('gestion.stock.shopping_no_list') }}</p>
         </div>
 
-        <UCard v-for="liste in listes" :key="liste.id">
+        <!-- Une boucle sur AU PLUS un élément, et non un `v-if` sur la liste choisie : le corps de
+             la carte parle de `liste` à une quinzaine d'endroits, et le `v-for` le lui garde tel
+             quel. Un `v-if` aurait demandé de tout renommer, et laissé le modèle manipuler une
+             valeur que le typage tient pour possiblement absente. -->
+        <UCard v-for="liste in listesAffichees" :key="liste.id">
           <template #header>
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -363,61 +415,93 @@
             {{ t('gestion.stock.shopping_list_empty') }}
           </p>
 
-          <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
-            <li
-              v-for="article in liste.items"
-              :key="article.id"
-              class="flex items-center gap-3 py-2"
-            >
+          <!-- La liste n'est pas vide, c'est le filtre qui ne laisse rien passer. Le dire, plutôt
+               que d'afficher «&nbsp;cette liste est vide&nbsp;» sur une liste qui ne l'est pas. -->
+          <p v-else-if="articlesDe(liste).length === 0" class="text-sm text-gray-500 py-2">
+            {{ t('gestion.stock.shopping_no_match_tags') }}
+          </p>
+
+          <!-- Un tableau et non plus une suite de lignes : en courses, on cherche un objet précis
+               dans la liste, et des colonnes alignées se balaient du regard là où des mentions
+               empilées obligent à lire chaque ligne en entier. Le groupe cesse d'être une
+               sous-ligne grise, les étiquettes deviennent lisibles, et la quantité s'aligne
+               verticalement — on voit d'un coup ce que pèse le chariot.
+
+               La case et le retrait restent aux extrémités, exactement où ils étaient : seule la
+               mise en forme change, aucun geste ne se déplace. -->
+          <UTable v-else :data="articlesDe(liste)" :columns="colonnesArticles">
+            <template #choix-cell="{ row }">
               <UCheckbox
                 v-if="canManage"
-                :model-value="article.purchased"
-                :disabled="bascule.isLoading(cleArticle(liste.id, article.id, !article.purchased))"
-                @update:model-value="basculerAchat(liste.id, article)"
+                :model-value="row.original.purchased"
+                :disabled="
+                  bascule.isLoading(cleArticle(liste.id, row.original.id, !row.original.purchased))
+                "
+                :ui="{ base: 'cursor-pointer' }"
+                @update:model-value="basculerAchat(liste.id, row.original)"
               />
               <!-- Sans droit d’écriture, la case disparaît : l’état de l’achat, lui, doit rester
                    visible — c’est l’information, la case n’était que le moyen de la changer. -->
               <UIcon
                 v-else
-                :name="article.purchased ? 'i-heroicons-check-circle' : 'i-heroicons-minus-circle'"
-                :class="article.purchased ? 'text-green-500' : 'text-gray-300'"
+                :name="
+                  row.original.purchased ? 'i-heroicons-check-circle' : 'i-heroicons-minus-circle'
+                "
+                :class="row.original.purchased ? 'text-green-500' : 'text-gray-300'"
                 class="size-5 shrink-0"
               />
-              <div class="flex-1 min-w-0">
-                <p class="truncate" :class="article.purchased ? 'line-through text-gray-400' : ''">
-                  {{ article.item?.name ?? t('gestion.stock.shopping_item_gone') }}
-                </p>
-                <p class="text-xs text-gray-500 truncate">
-                  {{ article.item?.group?.name }}
-                </p>
+            </template>
+            <template #name-cell="{ row }">
+              <span
+                class="font-medium"
+                :class="row.original.purchased ? 'line-through text-gray-400' : ''"
+              >
+                {{ row.original.item?.name ?? t('gestion.stock.shopping_item_gone') }}
+              </span>
+            </template>
+            <template #group-cell="{ row }">
+              <span class="text-sm text-gray-500">{{ row.original.item?.group?.name }}</span>
+            </template>
+            <template #tags-cell="{ row }">
+              <div v-if="row.original.item?.tags?.length" class="flex flex-wrap gap-1">
+                <StockTagBadge
+                  v-for="assignation in row.original.item.tags"
+                  :key="assignation.tag.id"
+                  :tag="assignation.tag"
+                  size="sm"
+                />
               </div>
-
+              <span v-else class="text-sm text-gray-400">—</span>
+            </template>
+            <template #quantite-cell="{ row }">
               <!-- Le manque a disparu depuis l'ajout : quelqu'un a recompté et retrouvé le
                    matériel. C'est du travail en moins, à condition de le voir. -->
               <UBadge
-                v-if="articleSansObjet(article)"
+                v-if="articleSansObjet(row.original)"
                 color="neutral"
                 variant="subtle"
                 :title="t('gestion.stock.shopping_no_longer_missing_hint')"
               >
                 {{ t('gestion.stock.shopping_no_longer_missing') }}
               </UBadge>
-              <UBadge v-else-if="quantiteDeLArticle(article)" color="error" variant="subtle">
-                {{ quantiteDeLArticle(article) }}
+              <UBadge v-else-if="quantiteDeLArticle(row.original)" color="error" variant="subtle">
+                {{ quantiteDeLArticle(row.original) }}
               </UBadge>
-
-              <UButton
-                v-if="canManage"
-                icon="i-heroicons-x-mark"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                :title="t('gestion.stock.shopping_remove_item')"
-                :loading="retrait.isLoading(cleArticle(liste.id, article.id))"
-                @click="retirerArticle(liste.id, article.id)"
-              />
-            </li>
-          </ul>
+              <span v-else class="text-sm text-gray-400">—</span>
+            </template>
+            <template #retrait-cell="{ row }">
+              <UTooltip :text="t('gestion.stock.shopping_remove_item')">
+                <UButton
+                  icon="i-heroicons-x-mark"
+                  color="neutral"
+                  variant="ghost"
+                  size="xs"
+                  :loading="retrait.isLoading(cleArticle(liste.id, row.original.id))"
+                  @click="demanderRetrait(liste.id, row.original)"
+                />
+              </UTooltip>
+            </template>
+          </UTable>
         </UCard>
       </div>
     </div>
@@ -448,6 +532,23 @@
       @saved="apresEnregistrement"
     />
 
+    <!-- Le retrait d'un article passe par la même porte que la suppression d'une liste. La croix
+         était irréversible et sans filet : rien ne rattrape un article retiré par erreur, il faut
+         retrouver l'objet dans les manquants et le reverser — et sur un téléphone, en courses,
+         elle est voisine de la case à cocher qu'on vise vraiment. -->
+    <UiConfirmModal
+      v-model="retraitConfirmationOuvert"
+      :title="t('gestion.stock.shopping_remove_item')"
+      :description="
+        t('gestion.stock.shopping_remove_item_confirm', { name: nomDeLArticleARetirer })
+      "
+      :confirm-label="t('gestion.stock.shopping_remove_item')"
+      confirm-color="error"
+      :loading="retrait.loading.value"
+      @confirm="confirmerRetrait"
+      @cancel="retraitConfirmationOuvert = false"
+    />
+
     <UiConfirmModal
       v-model="confirmationOuverte"
       :title="t('gestion.stock.shopping_delete_title')"
@@ -474,7 +575,9 @@ import {
 } from '../../../../../utils/comptage-stock'
 import { listeEnCours } from '../../../../../utils/compteur-listes-de-courses'
 import { peutGererLeStock } from '../../../../../utils/droits-stock'
+import { tagsDepuisUrl, urlDepuisTags } from '../../../../../utils/filtre-tags-stock'
 import {
+  articlesParTags,
   articleSansObjet,
   listesParObjet,
   listeTerminee,
@@ -574,6 +677,19 @@ const listeARenommer = ref<{ id: number; name: string } | null>(null)
 const confirmationOuverte = ref(false)
 const listeASupprimer = ref<ListeDeCourses | null>(null)
 
+const retraitConfirmationOuvert = ref(false)
+const articleARetirer = ref<{ listId: number; article: ArticleDeListe } | null>(null)
+
+/**
+ * Le nom à annoncer dans la demande de confirmation.
+ *
+ * Un article dont l'objet a disparu du stock n'a plus de nom à lui : la même mention que dans le
+ * tableau le désigne alors, plutôt qu'un blanc qui ferait lire «&nbsp;«&nbsp;&nbsp;» sera retiré&nbsp;».
+ */
+const nomDeLArticleARetirer = computed(
+  () => articleARetirer.value?.article.item?.name ?? t('gestion.stock.shopping_item_gone')
+)
+
 /**
  * Les objets, augmentés de ce qui vient d'être tapé.
  *
@@ -669,6 +785,150 @@ const colonnesACompter = computed((): TableColumn<ObjetManquant>[] => [
   { id: 'compte', header: t('gestion.stock.count_counted') },
 ])
 
+/**
+ * Les colonnes d'une liste de courses.
+ *
+ * La case et le retrait n'apparaissent qu'avec le droit d'écriture — l'état de l'achat, lui, reste
+ * visible sans lui, à l'icône. Même règle que sur le tableau des manquants, d'où la même forme.
+ *
+ * `quantite` vient AVANT le nom, en deuxième colonne. C'est l'ordre du geste en rayon : on lit
+ * d'abord combien il en faut, puis on cherche quoi — l'inverse oblige à revenir en arrière sur
+ * chaque ligne. C'est aussi la colonne qu'on balaie verticalement pour jauger le chariot, et elle
+ * se balaie mieux près du bord qu'au milieu du tableau.
+ */
+const colonnesArticles = computed((): TableColumn<ArticleDeListe>[] => [
+  { id: 'choix', header: '' },
+  {
+    id: 'quantite',
+    header: t('gestion.stock.missing_to_buy'),
+    // `w-px` ne fait pas un pixel de large : sur un tableau à largeurs automatiques, une largeur
+    // déclarée plus petite que le contenu revient à demander la colonne la plus étroite possible,
+    // et le navigateur s'arrête à ce que le contenu impose. Sans cela la colonne prenait sa part
+    // de l'espace libre et un badge de deux chiffres flottait au milieu d'un vide. `whitespace-
+    // nowrap` empêche la contrepartie : à se rétrécir, l'en-tête se serait cassé en deux lignes.
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap' } },
+  },
+  { id: 'name', header: t('gestion.stock.item_name') },
+  { id: 'group', header: t('gestion.stock.group') },
+  { id: 'tags', header: t('gestion.stock.tags.field_label') },
+  ...(canManage.value ? [{ id: 'retrait', header: '' }] : []),
+])
+
+/**
+ * Quelle liste de courses est ouverte, d'après l'URL.
+ *
+ * Dans l'URL et non dans une simple variable, pour la même raison que l'onglet : on envoie un lien
+ * à quelqu'un — «&nbsp;voilà ce qu'il reste à prendre à la quincaillerie&nbsp;» — et il doit s'ouvrir sur
+ * cette liste-là.
+ *
+ * ⚠️ La lecture RETOMBE toujours sur une liste qui existe. Une URL peut désigner une liste
+ * supprimée depuis — par un lien d'hier, ou parce qu'on vient soi-même de la supprimer —, et s'y
+ * fier aveuglément n'afficherait rien du tout, sans rien dire. La plus récente prend alors le
+ * relais : c'est aussi ce qui donne le comportement par défaut, URL nue comprise.
+ */
+const listeChoisieId = computed<number | null>({
+  get: () => {
+    if (listes.value.length === 0) return null
+    const demandee = Number(route.query.liste)
+    const existe = listes.value.some((liste) => liste.id === demandee)
+    return existe ? demandee : (listes.value[0]?.id ?? null)
+  },
+  set: (valeur) => {
+    // `replace` et non `push` : dérouler un sélecteur n'est pas une navigation dont on veut
+    // revenir liste par liste avec le bouton «&nbsp;précédent&nbsp;» avant de quitter la page.
+    //
+    // Les tags repartent à zéro : ils décrivent le contenu d'UNE liste, et les traîner sur la
+    // suivante donnait un tableau amputé par un filtre dont plus rien ne montrait qu'il agissait.
+    // Dans la même navigation, et non dans un `watch` séparé : deux `replace` consécutifs se
+    // recouvrent, et le second repartirait d'une `route.query` périmée.
+    router.replace({
+      query: { ...route.query, liste: valeur ? String(valeur) : undefined, tags: undefined },
+    })
+  },
+})
+
+/**
+ * La liste à afficher, dans un tableau d'au plus un élément.
+ *
+ * Le modèle itère dessus plutôt que de tester sa présence : voir le commentaire au-dessus de la
+ * carte.
+ */
+const listesAffichees = computed(() =>
+  listes.value.filter((liste) => liste.id === listeChoisieId.value)
+)
+
+const optionsDeListes = computed(() =>
+  listes.value.map((liste) => ({ label: liste.name, value: liste.id }))
+)
+
+/**
+ * Les tags qui filtrent la liste ouverte, portés par l'URL.
+ *
+ * Même lecture tolérante que sur l'inventaire — valeurs absentes, doublons, entrées non
+ * numériques — et même écriture, qui retire le paramètre plutôt que de laisser traîner un
+ * `?tags=` vide dans une adresse qu'on partage.
+ */
+const tagsChoisis = computed<number[]>({
+  get: () => tagsDepuisUrl(route.query.tags),
+  set: (valeur) => {
+    router.replace({ query: { ...route.query, tags: urlDepuisTags(valeur) } })
+  },
+})
+
+/**
+ * Les pastilles proposées au filtre : celles qui figurent dans la liste ouverte, et elles seules.
+ *
+ * Tirées des articles plutôt que demandées au serveur — aucun appel de plus — et calculées AVANT
+ * filtrage : les prendre après ferait disparaître du menu les tags qu'on vient de décocher, et
+ * l'on ne pourrait plus revenir en arrière. Proposer les tags de toute l'édition n'aurait pas
+ * servi non plus : la moitié ne rendrait rien sur cette liste-ci.
+ */
+const optionsDeTags = computed(() => {
+  const vus = new Map<number, { label: string; value: number; color: string }>()
+
+  for (const liste of listesAffichees.value) {
+    for (const article of liste.items) {
+      for (const { tag } of article.item?.tags ?? []) {
+        if (!vus.has(tag.id)) vus.set(tag.id, { label: tag.name, value: tag.id, color: tag.color })
+      }
+    }
+  }
+
+  return [...vus.values()].sort((a, b) => a.label.localeCompare(b.label))
+})
+
+/**
+ * Les tags qui filtrent VRAIMENT : ceux que l'URL demande ET que la liste ouverte propose.
+ *
+ * ⚠️ Ce croisement n'est pas une précaution théorique. Sans lui, un tag absent de la liste ouverte
+ * restait actif tout en étant introuvable dans le menu : le tableau se vidait et rien n'expliquait
+ * pourquoi. Le cas arrivait en changeant de liste, et il arrive encore par un lien reçu qui désigne
+ * un tag disparu depuis — que le sélecteur remette le filtre à zéro ne suffit donc pas.
+ *
+ * C'est cette valeur, et non celle de l'URL, que lisent le tableau comme le menu : une seule source
+ * pour ce qui s'affiche et ce qui filtre, faute de quoi les deux se contrediraient à nouveau.
+ */
+const tagsActifs = computed(() => {
+  const proposes = new Set(optionsDeTags.value.map((option) => option.value))
+  return tagsChoisis.value.filter((id) => proposes.has(id))
+})
+
+/**
+ * Les pastilles cochées, sous la forme que `USelectMenu` manipule.
+ *
+ * Le menu travaille sur les options elles-mêmes, l'URL sur des identifiants : ce va-et-vient les
+ * raccorde.
+ */
+const tagsSelectionnes = computed({
+  get: () => optionsDeTags.value.filter((option) => tagsActifs.value.includes(option.value)),
+  set: (options: { value: number }[]) => {
+    tagsChoisis.value = options.map((option) => option.value)
+  },
+})
+
+/** Les articles de la liste ouverte, une fois les pastilles appliquées. */
+const articlesDe = (liste: ListeDeCourses) => articlesParTags(liste.items, tagsActifs.value)
+
 const listesSimples = computed(() => listes.value.map(({ id, name }) => ({ id, name })))
 
 /**
@@ -731,9 +991,12 @@ function ouvrirRenommage(liste: ListeDeCourses) {
   modaleOuverte.value = true
 }
 
-async function apresEnregistrement() {
+async function apresEnregistrement(listeId?: number) {
   selectionLignes.value = {}
   await chargerListes()
+  // Ouvrir la liste qui vient de recevoir le matériel : sans cela on basculerait sur l'onglet des
+  // listes pour y regarder une AUTRE liste que celle qu'on vient de remplir.
+  if (listeId) listeChoisieId.value = listeId
   ongletActif.value = 'listes'
 }
 
@@ -791,8 +1054,17 @@ function basculerAchat(listId: number, article: ArticleDeListe) {
   bascule.execute(cleArticle(listId, article.id, !article.purchased))
 }
 
-function retirerArticle(listId: number, articleId: number) {
-  retrait.execute(cleArticle(listId, articleId))
+function demanderRetrait(listId: number, article: ArticleDeListe) {
+  articleARetirer.value = { listId, article }
+  retraitConfirmationOuvert.value = true
+}
+
+async function confirmerRetrait() {
+  // `UiConfirmModal` n'émet que `confirm` et `cancel` : la refermer revient à l'appelant.
+  const demande = articleARetirer.value
+  if (demande) await retrait.execute(cleArticle(demande.listId, demande.article.id))
+  retraitConfirmationOuvert.value = false
+  articleARetirer.value = null
 }
 
 function demanderSuppression(liste: ListeDeCourses) {
@@ -806,6 +1078,12 @@ async function supprimerListe() {
   if (liste) await suppressionListe.execute(liste.id)
   confirmationOuverte.value = false
   listeASupprimer.value = null
+
+  // L'affichage se remet seul — le getter retombe sur la plus récente quand l'URL désigne une
+  // liste disparue. L'URL, elle, resterait fausse, et c'est elle qu'on envoie à quelqu'un.
+  if (liste && Number(route.query.liste) === liste.id) {
+    listeChoisieId.value = listes.value[0]?.id ?? null
+  }
 }
 
 async function enregistrerComptage() {

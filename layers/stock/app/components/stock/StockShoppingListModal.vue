@@ -69,7 +69,15 @@ const props = defineProps<{
   listeARenommer?: ListeExistante | null
 }>()
 
-const emit = defineEmits<{ saved: [] }>()
+/**
+ * `saved` porte la liste CONCERNÉE, quand on la connaît.
+ *
+ * L'appelant n'affiche plus qu'une liste à la fois : sans cet identifiant, créer une liste ou y
+ * verser du matériel le laisserait sur celle qu'il regardait déjà, et le travail qu'on vient de
+ * faire resterait invisible. Facultatif, parce que rien ne garantit que la réponse de création
+ * porte un identifiant — l'appelant retombe alors sur son propre défaut.
+ */
+const emit = defineEmits<{ saved: [listeId?: number] }>()
 
 const ouvert = defineModel<boolean>('open', { default: false })
 
@@ -134,7 +142,7 @@ const { execute: creer, loading: creation } = useApiAction(
     body: () => ({ name: nom.value.trim(), itemIds: props.itemIds }),
     successMessage: { title: t('gestion.stock.shopping_list_created') },
     errorMessages: { default: t('gestion.stock.shopping_list_error') },
-    onSuccess: () => fini(),
+    onSuccess: (reponse: any) => fini(reponse?.list?.id),
   }
 )
 
@@ -145,7 +153,8 @@ const { execute: ajouter, loading: ajout } = useApiAction(
     body: () => ({ itemIds: props.itemIds }),
     successMessage: { title: t('gestion.stock.shopping_items_added') },
     errorMessages: { default: t('gestion.stock.shopping_list_error') },
-    onSuccess: () => fini(),
+    // La destination est ici forcément un identifiant : la sentinelle NOUVELLE part dans `creer`.
+    onSuccess: () => fini(destination.value),
   }
 )
 
@@ -156,15 +165,15 @@ const { execute: renommer, loading: renommageEnCours } = useApiAction(
     body: () => ({ name: nom.value.trim() }),
     successMessage: { title: t('common.saved') },
     errorMessages: { default: t('gestion.stock.shopping_list_error') },
-    onSuccess: () => fini(),
+    onSuccess: () => fini(props.listeARenommer?.id),
   }
 )
 
 const enCours = computed(() => creation.value || ajout.value || renommageEnCours.value)
 
-function fini() {
+function fini(listeId?: number) {
   ouvert.value = false
-  emit('saved')
+  emit('saved', listeId)
 }
 
 function valider() {

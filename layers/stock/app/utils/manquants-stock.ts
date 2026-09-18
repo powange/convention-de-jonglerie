@@ -27,6 +27,14 @@ export interface ObjetManquant extends LigneComptage {
    * articles de liste construits ailleurs n'ont pas à le porter.
    */
   description?: string | null
+  /**
+   * Les étiquettes de l'objet, dans la forme où la relation les rend — `{ tag: … }` et non le tag
+   * nu, pour n'avoir rien à remettre à plat entre la requête et l'écran.
+   *
+   * Facultatif au même titre que `description` : aucune règle de ce fichier ne les lit, et les
+   * articles de liste construits ailleurs — les tests, notamment — n'ont pas à les porter.
+   */
+  tags?: { tag: { id: number; name: string; color: string } }[]
   /** Le groupe n'est plus la porte d'entrée, seulement une information portée par la ligne. */
   group: { id: number; name: string }
 }

@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Apenas o que não está em nenhuma lista",
       "missing_in_list_pending": "Nesta lista, ainda não comprado.",
       "missing_in_list_purchased": "Nesta lista, já comprado.",
-      "missing_in_lists": "Listas"
+      "missing_in_lists": "Listas",
+      "shopping_no_match_tags": "Nenhum artigo desta lista tem as etiquetas selecionadas.",
+      "shopping_remove_item_confirm": "«{name}» será retirado desta lista de compras. O material do stock não é afetado."
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

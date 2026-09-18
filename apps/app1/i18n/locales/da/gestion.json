@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Kun det, der ikke står på nogen liste",
       "missing_in_list_pending": "På denne liste, endnu ikke købt.",
       "missing_in_list_purchased": "På denne liste, allerede købt.",
-      "missing_in_lists": "Lister"
+      "missing_in_lists": "Lister",
+      "shopping_no_match_tags": "Ingen vare på denne liste har de valgte tags.",
+      "shopping_remove_item_confirm": "“{name}” fjernes fra denne indkøbsliste. Materiellet på lageret røres ikke."
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

@@ -627,7 +627,9 @@
       "missing_filter_unlisted": "Only items not on any list",
       "missing_in_list_pending": "On this list, not bought yet.",
       "missing_in_list_purchased": "On this list, already bought.",
-      "missing_in_lists": "Lists"
+      "missing_in_lists": "Lists",
+      "shopping_no_match_tags": "No item on this list carries the selected tags.",
+      "shopping_remove_item_confirm": "“{name}” will be removed from this shopping list. The stock item itself is left untouched."
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",
