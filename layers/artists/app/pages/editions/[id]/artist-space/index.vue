@@ -46,25 +46,6 @@
             {{ $t('artists.view_qr_code') }}
           </UButton>
         </div>
-
-        <!-- Dates arrivée/départ -->
-        <div
-          v-if="artist.arrivalDateTime || artist.departureDateTime"
-          class="mt-4 flex flex-wrap gap-4"
-        >
-          <div v-if="artist.arrivalDateTime" class="flex items-center gap-2 text-sm">
-            <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500" />
-            <span class="text-gray-600 dark:text-gray-400">
-              {{ $t('artists.arrival') }} : {{ formatDateTime(artist.arrivalDateTime) }}
-            </span>
-          </div>
-          <div v-if="artist.departureDateTime" class="flex items-center gap-2 text-sm">
-            <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500" />
-            <span class="text-gray-600 dark:text-gray-400">
-              {{ $t('artists.departure') }} : {{ formatDateTime(artist.departureDateTime) }}
-            </span>
-          </div>
-        </div>
       </UCard>
 
       <!-- Informations artistes -->
@@ -176,6 +157,134 @@
         <div v-else class="text-center py-6 text-gray-500">
           <UIcon name="i-heroicons-sparkles" class="w-8 h-8 mx-auto mb-2 text-gray-300" />
           <p>{{ $t('artists.no_shows') }}</p>
+        </div>
+      </UCard>
+
+      <!-- Présence : l'artiste déclare lui-même quand il arrive sur place et quand il repart.
+           C'était jusqu'ici à l'organisateur de le lui demander puis de le ressaisir. -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold flex items-center gap-2">
+              <UIcon name="i-heroicons-calendar-days" class="text-green-500" />
+              {{ $t('artists.presence_section') }}
+            </h2>
+            <UButton
+              v-if="!editingPresence"
+              icon="i-heroicons-pencil-square"
+              variant="ghost"
+              size="xs"
+              color="neutral"
+              :aria-label="$t('common.edit')"
+              @click="ouvrirEditionPresence"
+            />
+          </div>
+        </template>
+
+        <div class="space-y-3">
+          <div v-if="!editingPresence" class="flex flex-wrap gap-4">
+            <div v-if="artist.arrivalDateTime" class="flex items-center gap-2 text-sm">
+              <UIcon name="i-heroicons-arrow-down-tray" class="text-green-500" />
+              <span class="text-gray-600 dark:text-gray-400">
+                {{ $t('artists.arrival') }} :
+                {{ formaterDateHeure(artist.arrivalDateTime, fuseauEdition, locale) }}
+              </span>
+            </div>
+            <div v-if="artist.departureDateTime" class="flex items-center gap-2 text-sm">
+              <UIcon name="i-heroicons-arrow-up-tray" class="text-red-500" />
+              <span class="text-gray-600 dark:text-gray-400">
+                {{ $t('artists.departure') }} :
+                {{ formaterDateHeure(artist.departureDateTime, fuseauEdition, locale) }}
+              </span>
+            </div>
+            <p
+              v-if="!artist.arrivalDateTime && !artist.departureDateTime"
+              class="text-sm text-gray-500 italic"
+            >
+              {{ $t('artists.presence_not_declared') }}
+            </p>
+          </div>
+
+          <!-- La DEMANDE de récupération, telle que l'artiste l'a posée. Qui s'en charge est la
+               réponse de l'organisateur, et s'affiche dans la carte « Transport ». -->
+          <div
+            v-if="!editingPresence && (artist.pickupRequired || artist.dropoffRequired)"
+            class="flex flex-wrap gap-4 border-t border-gray-100 dark:border-gray-800 pt-3"
+          >
+            <div v-if="artist.pickupRequired" class="flex items-center gap-2 text-sm">
+              <UIcon name="i-heroicons-map-pin" class="text-green-500" />
+              <span class="text-gray-600 dark:text-gray-400">
+                {{
+                  artist.pickupLocation
+                    ? $t('artists.pickup_at', { location: artist.pickupLocation })
+                    : $t('artists.pickup_required')
+                }}
+              </span>
+            </div>
+            <div v-if="artist.dropoffRequired" class="flex items-center gap-2 text-sm">
+              <UIcon name="i-heroicons-map-pin" class="text-red-500" />
+              <span class="text-gray-600 dark:text-gray-400">
+                {{
+                  artist.dropoffLocation
+                    ? $t('artists.dropoff_at', { location: artist.dropoffLocation })
+                    : $t('artists.dropoff_required')
+                }}
+              </span>
+            </div>
+          </div>
+
+          <div v-else class="space-y-3">
+            <UiDateTimePicker
+              v-model="presenceForm.arrivalDateTime"
+              :date-label="$t('artists.arrival_date')"
+              :time-label="$t('artists.arrival_time')"
+              :placeholder="$t('artists.arrival')"
+            />
+            <UiDateTimePicker
+              v-model="presenceForm.departureDateTime"
+              :date-label="$t('artists.departure_date')"
+              :time-label="$t('artists.departure_time')"
+              :placeholder="$t('artists.departure')"
+            />
+
+            <!-- La demande de récupération. Le lieu n'apparaît qu'une fois la demande posée :
+                 seul, il ne voudrait rien dire. -->
+            <div class="border-t border-gray-100 dark:border-gray-800 pt-3 space-y-3">
+              <UFormField :label="$t('artists.pickup_required')">
+                <USwitch v-model="presenceForm.pickupRequired" />
+              </UFormField>
+              <UFormField v-if="presenceForm.pickupRequired" :label="$t('artists.pickup_location')">
+                <UInput
+                  v-model="presenceForm.pickupLocation"
+                  :placeholder="$t('artists.pickup_location_placeholder')"
+                  class="w-full"
+                />
+              </UFormField>
+
+              <UFormField :label="$t('artists.dropoff_required')">
+                <USwitch v-model="presenceForm.dropoffRequired" />
+              </UFormField>
+              <UFormField
+                v-if="presenceForm.dropoffRequired"
+                :label="$t('artists.dropoff_location')"
+              >
+                <UInput
+                  v-model="presenceForm.dropoffLocation"
+                  :placeholder="$t('artists.dropoff_location_placeholder')"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
+
+            <div class="flex justify-end gap-2">
+              <UButton variant="ghost" color="neutral" size="sm" @click="editingPresence = false">
+                {{ $t('common.cancel') }}
+              </UButton>
+              <UButton size="sm" :loading="savingPresence" @click="savePresence()">
+                {{ $t('common.save') }}
+              </UButton>
+            </div>
+          </div>
         </div>
       </UCard>
 
@@ -689,6 +798,8 @@ import {
   markdownToHtml,
 } from '#imports'
 
+import { formaterDateHeure, versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+
 interface ArtistShowAct {
   id: number
   title: string
@@ -767,7 +878,7 @@ interface ArtistInfo {
 
 const route = useRoute()
 const editionStore = useEditionStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { formatDateTime, formatDateFull } = useDateFormat()
 const { getMealTypeLabel } = useMealTypeLabel()
 
@@ -800,11 +911,20 @@ watch(
 )
 
 // Charger les données artiste
-const { data: artistResponse, pending: loading } = await useFetch<{ artist: ArtistInfo | null }>(
-  `/api/editions/${editionId}/my-artist-info`
-)
+const {
+  data: artistResponse,
+  pending: loading,
+  refresh: refreshArtist,
+} = await useFetch<{ artist: ArtistInfo | null }>(`/api/editions/${editionId}/my-artist-info`)
 
 const artist = computed(() => artistResponse.value?.artist ?? null)
+
+/** Le fuseau de l'édition : ce que l'artiste saisit et lit est l'heure du LIEU. */
+const fuseauEdition = computed(
+  () =>
+    (editionStore.getEditionById(editionId) as { timezone?: string | null } | undefined)
+      ?.timezone ?? null
+)
 
 /** Nom affichable du responsable : son identité civile si connue, sinon son pseudo. */
 const responsibleName = (person: TransportResponsible) => {
@@ -833,6 +953,61 @@ const artistInfoExpanded = ref(false)
 const accommodationTypeLabel = (type: string) => getAccommodationTypeLabel(type, t)
 
 // Formulaire hébergement
+/**
+ * La présence, déclarée par l'artiste lui-même.
+ *
+ * Le formulaire manipule des heures LOCALES au lieu (ce que rend un champ `datetime-local`), et
+ * l'ancrage au fuseau de l'édition se fait à l'aller comme au retour. Sans lui, un artiste qui
+ * saisit son arrivée depuis un autre fuseau enregistrerait un autre instant que celui qu'il lit.
+ */
+const editingPresence = ref(false)
+const presenceForm = ref({
+  arrivalDateTime: '',
+  departureDateTime: '',
+  pickupRequired: false,
+  pickupLocation: '',
+  dropoffRequired: false,
+  dropoffLocation: '',
+})
+
+const ouvrirEditionPresence = () => {
+  presenceForm.value = {
+    arrivalDateTime: artist.value?.arrivalDateTime
+      ? versChampLocal(artist.value.arrivalDateTime, fuseauEdition.value)
+      : '',
+    departureDateTime: artist.value?.departureDateTime
+      ? versChampLocal(artist.value.departureDateTime, fuseauEdition.value)
+      : '',
+    pickupRequired: artist.value?.pickupRequired ?? false,
+    pickupLocation: artist.value?.pickupLocation ?? '',
+    dropoffRequired: artist.value?.dropoffRequired ?? false,
+    dropoffLocation: artist.value?.dropoffLocation ?? '',
+  }
+  editingPresence.value = true
+}
+
+const { execute: savePresence, loading: savingPresence } = useApiAction(
+  () => `/api/editions/${editionId}/my-presence`,
+  {
+    method: 'PUT',
+    body: () => ({
+      arrivalDateTime: versInstant(presenceForm.value.arrivalDateTime, fuseauEdition.value) || null,
+      departureDateTime:
+        versInstant(presenceForm.value.departureDateTime, fuseauEdition.value) || null,
+      pickupRequired: presenceForm.value.pickupRequired,
+      pickupLocation: presenceForm.value.pickupLocation || null,
+      dropoffRequired: presenceForm.value.dropoffRequired,
+      dropoffLocation: presenceForm.value.dropoffLocation || null,
+    }),
+    successMessage: { title: t('artists.presence_saved') },
+    errorMessages: { default: t('artists.presence_save_error') },
+    onSuccess: async () => {
+      editingPresence.value = false
+      await refreshArtist()
+    },
+  }
+)
+
 const editingAccommodation = ref(false)
 
 const accommodationForm = reactive({

@@ -264,7 +264,7 @@
               <template #arrival-cell="{ row }">
                 <div v-if="row.original.arrivalDateTime" class="space-y-1">
                   <div class="text-gray-900 dark:text-white font-medium">
-                    {{ formatDateTime(row.original.arrivalDateTime) }}
+                    {{ formaterDateHeure(row.original.arrivalDateTime, fuseauEdition, locale) }}
                   </div>
                   <div v-if="row.original.pickupRequired" class="text-xs space-y-0.5">
                     <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
@@ -289,7 +289,7 @@
               <template #departure-cell="{ row }">
                 <div v-if="row.original.departureDateTime" class="space-y-1">
                   <div class="text-gray-900 dark:text-white font-medium">
-                    {{ formatDateTime(row.original.departureDateTime) }}
+                    {{ formaterDateHeure(row.original.departureDateTime, fuseauEdition, locale) }}
                   </div>
                   <div v-if="row.original.dropoffRequired" class="text-xs space-y-0.5">
                     <div class="flex items-center gap-1 text-primary-600 dark:text-primary-400">
@@ -609,6 +609,7 @@ import { filtresDepuisUrl, requeteArtistes } from '../../../../../utils/filtres-
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 definePageMeta({
@@ -621,10 +622,16 @@ const { t, locale } = useI18n()
 const toast = useToast()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const { formatDateTime } = useDateFormat()
-
 const editionId = computed(() => parseInt(route.params.id as string))
 const edition = computed(() => editionStore.getEditionById(editionId.value))
+
+/**
+ * Le fuseau de l'édition : une heure d'arrivée est une heure de LIEU. `formatDateTime` la rendait
+ * dans celui du navigateur, donc décalée pour un organisateur en déplacement.
+ */
+const fuseauEdition = computed(
+  () => (edition.value as { timezone?: string | null } | undefined)?.timezone ?? null
+)
 
 // URL absolue de l'espace artiste, à communiquer aux artistes de l'édition. `useRequestURL()`
 // donne l'origine réelle côté serveur comme côté client, sans la deviner ni la coder en dur.

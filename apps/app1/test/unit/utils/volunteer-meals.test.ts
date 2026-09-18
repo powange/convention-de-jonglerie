@@ -143,6 +143,14 @@ describe('volunteer-meals — fonctions pures d’éligibilité', () => {
     })
   })
 
+  /**
+   * ⚠️ Ces tests employaient le format des BÉNÉVOLES — « 2026-06-17_morning » — pour un artiste.
+   * Les artistes n'ont jamais stocké cela. Les tests validaient donc une hypothèse fausse, et
+   * c'est ce qui a rendu le défaut invisible : la fonction retombait toujours sur « tous les
+   * repas », et aucun test ne pouvait le voir puisqu'ils la nourrissaient du mauvais format.
+   *
+   * Les cas complets vivent dans le bloc dédié, plus bas, sur de vrais instants.
+   */
   describe('isArtistEligibleForMeal', () => {
     it('éligible sans contrainte de dates', () => {
       expect(
@@ -153,34 +161,83 @@ describe('volunteer-meals — fonctions pures d’éligibilité', () => {
     it('inéligible si arrivée après le repas', () => {
       expect(
         isArtistEligibleForMeal(meal({ date: new Date('2026-06-16') }), {
-          arrivalDateTime: '2026-06-17_morning',
+          arrivalDateTime: new Date('2026-06-17T09:00:00.000Z'),
           departureDateTime: null,
         })
       ).toBe(false)
-    })
-
-    it('le jour d’arrivée, filtre selon l’heure', () => {
-      expect(
-        isArtistEligibleForMeal(meal({ mealType: 'BREAKFAST' }), {
-          arrivalDateTime: '2026-06-16_afternoon',
-          departureDateTime: null,
-        })
-      ).toBe(false)
-      expect(
-        isArtistEligibleForMeal(meal({ mealType: 'DINNER' }), {
-          arrivalDateTime: '2026-06-16_afternoon',
-          departureDateTime: null,
-        })
-      ).toBe(true)
     })
 
     it('inéligible si départ avant le repas', () => {
       expect(
         isArtistEligibleForMeal(meal({ date: new Date('2026-06-16') }), {
           arrivalDateTime: null,
-          departureDateTime: '2026-06-15_evening',
+          departureDateTime: new Date('2026-06-15T20:00:00.000Z'),
         })
       ).toBe(false)
     })
+  })
+})
+
+/**
+ * L'éligibilité d'un ARTISTE, réparée en même temps que ses horaires devenaient des instants.
+ *
+ * La fonction découpait la valeur sur un `_`, attendant le format `AAAA-MM-JJ_moment` des
+ * bénévoles. Les artistes n'ont jamais stocké cela : le moment ressortait toujours `undefined`,
+ * et le repli « tous les repas » s'appliquait sans que personne ne le voie.
+ */
+describe('isArtistEligibleForMeal — le moment se déduit de l’heure', () => {
+  const repas = (jour: string, type: 'BREAKFAST' | 'LUNCH' | 'DINNER') => ({
+    date: new Date(`${jour}T00:00:00.000Z`),
+    mealType: type as never,
+  })
+
+  it('refuse le petit-déjeuner du jour où l’artiste arrive le soir', () => {
+    // C'est le cas qui passait avant : arrivée à 23 h, et le petit-déjeuner du matin même était
+    // accordé. Personne n'arrive avant d'être arrivé.
+    const artiste = {
+      arrivalDateTime: new Date('2026-09-25T23:00:00.000Z'),
+      departureDateTime: null,
+    }
+
+    expect(isArtistEligibleForMeal(repas('2026-09-25', 'BREAKFAST'), artiste)).toBe(false)
+    expect(isArtistEligibleForMeal(repas('2026-09-25', 'DINNER'), artiste)).toBe(true)
+  })
+
+  it('accorde les trois repas à qui arrive le matin', () => {
+    const artiste = {
+      arrivalDateTime: new Date('2026-09-25T08:00:00.000Z'),
+      departureDateTime: null,
+    }
+
+    expect(isArtistEligibleForMeal(repas('2026-09-25', 'BREAKFAST'), artiste)).toBe(true)
+    expect(isArtistEligibleForMeal(repas('2026-09-25', 'DINNER'), artiste)).toBe(true)
+  })
+
+  it('refuse le dîner du jour où l’artiste repart le matin', () => {
+    const artiste = {
+      arrivalDateTime: null,
+      departureDateTime: new Date('2026-09-28T09:00:00.000Z'),
+    }
+
+    expect(isArtistEligibleForMeal(repas('2026-09-28', 'BREAKFAST'), artiste)).toBe(true)
+    expect(isArtistEligibleForMeal(repas('2026-09-28', 'DINNER'), artiste)).toBe(false)
+  })
+
+  it('écarte les jours hors du séjour', () => {
+    const artiste = {
+      arrivalDateTime: new Date('2026-09-25T08:00:00.000Z'),
+      departureDateTime: new Date('2026-09-28T09:00:00.000Z'),
+    }
+
+    expect(isArtistEligibleForMeal(repas('2026-09-24', 'DINNER'), artiste)).toBe(false)
+    expect(isArtistEligibleForMeal(repas('2026-09-29', 'BREAKFAST'), artiste)).toBe(false)
+    expect(isArtistEligibleForMeal(repas('2026-09-26', 'LUNCH'), artiste)).toBe(true)
+  })
+
+  it('reste ouvert quand aucun horaire n’est déclaré', () => {
+    // Un artiste qui n'a rien dit ne doit pas se retrouver privé de repas.
+    const artiste = { arrivalDateTime: null, departureDateTime: null }
+
+    expect(isArtistEligibleForMeal(repas('2026-09-25', 'BREAKFAST'), artiste)).toBe(true)
   })
 })

@@ -14,7 +14,7 @@ describe('port artists (câblage jonglerie par défaut)', () => {
     it('upsert uniquement les artistes éligibles selon leurs dates', async () => {
       prismaMock.editionArtist.findMany.mockResolvedValue([
         { id: 1, arrivalDateTime: null, departureDateTime: null }, // toujours éligible
-        { id: 2, arrivalDateTime: '2099-01-01_morning', departureDateTime: null }, // arrive trop tard
+        { id: 2, arrivalDateTime: new Date('2099-01-01T09:00:00.000Z'), departureDateTime: null }, // arrive trop tard
       ])
 
       await createDefaultVolunteerPorts().artists.addEligibleMealSelections({

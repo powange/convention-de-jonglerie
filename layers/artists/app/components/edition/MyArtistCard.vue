@@ -39,13 +39,15 @@
               <div v-if="artist.arrivalDateTime" class="flex items-center gap-2 text-xs">
                 <UIcon name="i-heroicons-arrow-down-tray" class="h-3 w-3 text-gray-500" />
                 <span class="text-gray-600 dark:text-gray-400">
-                  Arrivée : {{ artist.arrivalDateTime }}
+                  {{ t('artists.arrival') }} :
+                  {{ formaterDateHeure(artist.arrivalDateTime, fuseauEdition, locale) }}
                 </span>
               </div>
               <div v-if="artist.departureDateTime" class="flex items-center gap-2 text-xs">
                 <UIcon name="i-heroicons-arrow-up-tray" class="h-3 w-3 text-gray-500" />
                 <span class="text-gray-600 dark:text-gray-400">
-                  Départ : {{ artist.departureDateTime }}
+                  {{ t('artists.departure') }} :
+                  {{ formaterDateHeure(artist.departureDateTime, fuseauEdition, locale) }}
                 </span>
               </div>
             </div>
@@ -197,6 +199,8 @@
 </template>
 
 <script setup lang="ts">
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 interface ArtistShow {
   id: number
   title: string
@@ -228,6 +232,19 @@ interface Artist {
 const props = defineProps<{
   editionId: number
 }>()
+
+const { t, locale } = useI18n()
+const editionStore = useEditionStore()
+
+/**
+ * Le fuseau de l'édition : l'artiste doit lire l'heure à laquelle il est attendu SUR PLACE, pas
+ * celle de son téléphone. La carte affichait jusqu'ici la chaîne brute, « 2025-10-31T15:00 ».
+ */
+const fuseauEdition = computed(
+  () =>
+    (editionStore.getEditionById(props.editionId) as { timezone?: string | null } | undefined)
+      ?.timezone ?? null
+)
 
 const artist = ref<Artist | null>(null)
 const qrModalOpen = ref(false)
