@@ -138,7 +138,6 @@ interface AssignableUser {
   pseudo: string
   prenom: string | null
   nom: string | null
-  email: string
   emailHash: string | null
   profilePicture: string | null
 }

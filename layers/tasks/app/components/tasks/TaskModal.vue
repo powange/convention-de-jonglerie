@@ -146,18 +146,29 @@
 </template>
 
 <script setup lang="ts">
-interface AssignableUser {
+/**
+ * Une personne telle qu'une ASSIGNATION la porte — sans adresse e-mail, que le point d'API des
+ * groupes ne transmet plus.
+ */
+interface AssignedUser {
   id: number
   pseudo: string
   prenom: string | null
   nom: string | null
-  email: string
   emailHash: string | null
   profilePicture: string | null
 }
+
+/**
+ * Une personne à QUI l'on peut assigner. Seule cette source porte l'adresse e-mail, et pour une
+ * raison précise : le sélecteur l'affiche à côté du pseudo pour départager deux homonymes.
+ */
+interface AssignableUser extends AssignedUser {
+  email: string
+}
 interface TaskAssignment {
   id: number
-  user: AssignableUser
+  user: AssignedUser
 }
 interface ChecklistItem {
   id: number
@@ -223,7 +234,13 @@ const statusItems = computed(() =>
   }))
 )
 
-interface UserItem extends AssignableUser {
+interface UserItem extends AssignedUser {
+  /**
+   * Facultative, parce que la liste mélange deux provenances : les assignables, qui la portent, et
+   * les «&nbsp;legacy&nbsp;» — des personnes déjà assignées mais sorties de la liste —, qui arrivent par une
+   * assignation et ne la portent pas.
+   */
+  email?: string
   label: string
   isLegacy?: boolean
   avatar: { src: string; alt: string; loading: 'lazy' }
@@ -231,7 +248,7 @@ interface UserItem extends AssignableUser {
 
 const { getUserAvatar } = useAvatar()
 
-function toUserItem(u: AssignableUser, isLegacy = false): UserItem {
+function toUserItem(u: AssignedUser & { email?: string }, isLegacy = false): UserItem {
   return {
     ...u,
     label: u.pseudo + (u.email ? ' — ' + u.email : ''),

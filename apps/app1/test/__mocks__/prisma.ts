@@ -134,6 +134,9 @@ export const prismaMock = {
   task: createModelMock(),
   taskAssignment: createModelMock(),
   taskComment: createModelMock(),
+  taskChecklistItem: createModelMock(),
+  taskTag: createModelMock(),
+  taskTagAssignment: createModelMock(),
 
   // Modèles stock matériel
   stockGroup: createModelMock(),

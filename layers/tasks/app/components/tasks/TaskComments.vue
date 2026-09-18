@@ -109,7 +109,6 @@ interface CommentUser {
   pseudo: string
   prenom: string | null
   nom: string | null
-  email: string
   emailHash: string | null
   profilePicture: string | null
 }
@@ -129,7 +128,8 @@ const props = defineProps<{
   canModerate: boolean
 }>()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
+const { formatDateTimeShortMonth } = useDateFormat()
 const authStore = useAuthStore()
 
 const comments = ref<TaskCommentItem[]>([])
@@ -273,13 +273,7 @@ async function deleteComment(c: TaskCommentItem) {
 
 function formatDate(iso: string): string {
   try {
-    return new Intl.DateTimeFormat(locale.value, {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(iso))
+    return formatDateTimeShortMonth(iso)
   } catch {
     return iso
   }
