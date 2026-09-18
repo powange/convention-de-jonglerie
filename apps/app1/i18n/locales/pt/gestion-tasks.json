@@ -7,7 +7,8 @@
         "add_placeholder": "Novo item da checklist...",
         "confirm_delete": "Eliminar o item «{title}»?",
         "empty": "Ainda não há itens na checklist.",
-        "title": "Checklist"
+        "title": "Checklist",
+        "delete_title": "Eliminar item"
       },
       "confirm_delete_group": "Eliminar o grupo «{name}» e as suas {count} tarefa(s)?",
       "confirm_delete_group_simple": "Eliminar o grupo «{name}»?",
@@ -34,7 +35,8 @@
         "manage": "Gerir etiquetas",
         "modal_title": "Etiquetas do grupo",
         "name_placeholder": "Nome da etiqueta...",
-        "new_tag": "Nova etiqueta"
+        "new_tag": "Nova etiqueta",
+        "delete_title": "Eliminar etiqueta"
       },
       "task_assignees_placeholder": "Selecionar pessoas...",
       "task_deadline": "Prazo",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} tarefa | {count} tarefas",
       "view_kanban": "Kanban",
       "view_list": "Lista",
-      "reorder_requires_manual_sort": "Volte para «Ordem manual» para reordenar as tarefas"
+      "reorder_requires_manual_sort": "Volte para «Ordem manual» para reordenar as tarefas",
+      "delete_group": "Eliminar grupo",
+      "delete_task": "Eliminar tarefa"
     }
   }
 }

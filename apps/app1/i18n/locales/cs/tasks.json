@@ -6,7 +6,8 @@
       "empty": "Zatím žádné komentáře.",
       "placeholder": "Přidat komentář...",
       "post": "Zveřejnit",
-      "title": "Komentáře"
+      "title": "Komentáře",
+      "delete_title": "Smazat komentář"
     },
     "filters": {
       "active_count": "{count} aktivní filtr | {count} aktivních filtrů",

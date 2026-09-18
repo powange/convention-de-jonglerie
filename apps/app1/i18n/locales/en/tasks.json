@@ -6,7 +6,8 @@
       "empty": "No comments yet.",
       "placeholder": "Add a comment...",
       "post": "Post",
-      "title": "Comments"
+      "title": "Comments",
+      "delete_title": "Delete comment"
     },
     "filters": {
       "active_count": "{count} active filter | {count} active filters",

@@ -7,7 +7,8 @@
         "add_placeholder": "Neues Checklisten-Element...",
         "confirm_delete": "Element «{title}» löschen?",
         "empty": "Noch kein Element in der Checkliste.",
-        "title": "Checkliste"
+        "title": "Checkliste",
+        "delete_title": "Eintrag löschen"
       },
       "confirm_delete_group": "Gruppe „{name}\" und ihre {count} Aufgabe(n) löschen?",
       "confirm_delete_group_simple": "Gruppe „{name}\" löschen?",
@@ -34,7 +35,8 @@
         "manage": "Tags verwalten",
         "modal_title": "Tags der Gruppe",
         "name_placeholder": "Tag-Name...",
-        "new_tag": "Neuer Tag"
+        "new_tag": "Neuer Tag",
+        "delete_title": "Tag löschen"
       },
       "task_assignees_placeholder": "Personen auswählen...",
       "task_deadline": "Frist",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} Aufgabe | {count} Aufgaben",
       "view_kanban": "Kanban",
       "view_list": "Liste",
-      "reorder_requires_manual_sort": "Wechseln Sie zu «Manuelle Reihenfolge», um die Aufgaben neu anzuordnen"
+      "reorder_requires_manual_sort": "Wechseln Sie zu «Manuelle Reihenfolge», um die Aufgaben neu anzuordnen",
+      "delete_group": "Gruppe löschen",
+      "delete_task": "Aufgabe löschen"
     }
   }
 }

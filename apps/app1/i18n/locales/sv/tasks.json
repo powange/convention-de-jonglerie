@@ -6,7 +6,8 @@
       "empty": "Inga kommentarer ännu.",
       "placeholder": "Lägg till en kommentar...",
       "post": "Publicera",
-      "title": "Kommentarer"
+      "title": "Kommentarer",
+      "delete_title": "Ta bort kommentar"
     },
     "filters": {
       "active_count": "{count} aktivt filter | {count} aktiva filter",

@@ -7,7 +7,8 @@
         "add_placeholder": "Новий пункт чек-листа...",
         "confirm_delete": "Видалити пункт «{title}»?",
         "empty": "Поки що немає пунктів у чек-листі.",
-        "title": "Чек-лист"
+        "title": "Чек-лист",
+        "delete_title": "Видалити пункт"
       },
       "confirm_delete_group": "Видалити групу «{name}» та її {count} завдань?",
       "confirm_delete_group_simple": "Видалити групу «{name}»?",
@@ -34,7 +35,8 @@
         "manage": "Керувати тегами",
         "modal_title": "Теги групи",
         "name_placeholder": "Назва тегу...",
-        "new_tag": "Новий тег"
+        "new_tag": "Новий тег",
+        "delete_title": "Видалити тег"
       },
       "task_assignees_placeholder": "Виберіть людей...",
       "task_deadline": "Термін",
@@ -46,7 +48,9 @@
       "tasks_count": "{count} завдання | {count} завдання | {count} завдань",
       "view_kanban": "Канбан",
       "view_list": "Список",
-      "reorder_requires_manual_sort": "Поверніться до «Ручний порядок», щоб змінити порядок завдань"
+      "reorder_requires_manual_sort": "Поверніться до «Ручний порядок», щоб змінити порядок завдань",
+      "delete_group": "Видалити групу",
+      "delete_task": "Видалити завдання"
     }
   }
 }
