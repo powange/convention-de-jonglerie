@@ -1,9 +1,9 @@
 import { NotificationHelpers, safeNotify } from '../utils/notification-service'
 import {
+  cleDeTitreDuRappel,
   PALIERS,
   palierDeRappel,
-  typeDeNotification,
-  TYPES_DE_RAPPEL,
+  PREFIXE_CLE_RAPPEL,
 } from '../utils/rappels-echeance'
 
 /**
@@ -72,16 +72,20 @@ export default defineTask({
       // Une seule query pour récupérer toutes les notifications déjà envoyées
       // pour les tâches concernées (dédup via la table Notification existante).
       const taskIds = tasks.map((t) => t.id.toString())
+      // `notificationType` n'est pas une colonne : c'est un concept de service, utilisé pour les
+      // préférences utilisateur et jamais écrit en base. La requête le nommait quand même, et
+      // Prisma la refusait ENTIÈREMENT — la tâche échouait, donc aucun rappel ne partait.
+      // Ce qui distingue deux rappels en base, c'est leur clé de titre.
       const existingNotifications = await prisma.notification.findMany({
         where: {
           entityType: 'Task',
           entityId: { in: taskIds },
-          notificationType: { in: TYPES_DE_RAPPEL },
+          titleKey: { startsWith: PREFIXE_CLE_RAPPEL },
         },
-        select: { userId: true, entityId: true, notificationType: true },
+        select: { userId: true, entityId: true, titleKey: true },
       })
       const alreadyNotified = new Set(
-        existingNotifications.map((n) => `${n.userId}:${n.entityId}:${n.notificationType}`)
+        existingNotifications.map((n) => `${n.userId}:${n.entityId}:${n.titleKey}`)
       )
 
       let notificationsSent = 0
@@ -93,14 +97,14 @@ export default defineTask({
         const kind = palierDeRappel(task.deadline, todayStart)
         if (!kind) continue
 
-        const notificationType = typeDeNotification(kind)
+        const cleDuRappel = cleDeTitreDuRappel(kind)
 
         const editionId = task.group.edition.id
         const editionName =
           task.group.edition.name || task.group.edition.convention.name || `Édition #${editionId}`
 
         for (const a of task.assignments) {
-          const key = `${a.userId}:${task.id}:${notificationType}`
+          const key = `${a.userId}:${task.id}:${cleDuRappel}`
           if (alreadyNotified.has(key)) continue
 
           await safeNotify(

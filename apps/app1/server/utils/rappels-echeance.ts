@@ -32,6 +32,23 @@ export function typeDeNotification(kind: TaskDeadlineKind): string {
 export const TYPES_DE_RAPPEL = PALIERS.map((p) => typeDeNotification(KIND_PAR_PALIER[p]))
 
 /**
+ * Le préfixe des clés de titre d'un rappel d'échéance.
+ *
+ * `typeDeNotification` ci-dessus ne sert QU'aux préférences utilisateur : il n'est jamais écrit
+ * en base. Ce qui distingue deux rappels en base, c'est leur `titleKey`.
+ *
+ * La déduplication du cron interrogeait une colonne `notificationType` qui n'existe nulle part :
+ * Prisma refusait la requête entière, la tâche échouait, et aucun rappel ne partait. D'où cette
+ * clé, construite ici une seule fois plutôt que recopiée des deux côtés.
+ */
+export const PREFIXE_CLE_RAPPEL = 'notifications.task.deadline_reminder.'
+
+/** La clé de titre exacte d'un rappel, celle que porte la notification enregistrée. */
+export function cleDeTitreDuRappel(kind: TaskDeadlineKind): string {
+  return `${PREFIXE_CLE_RAPPEL}${kind.toLowerCase()}.title`
+}
+
+/**
  * Nombre de jours PLEINS entre le début de la journée courante et l'échéance.
  *
  * L'heure de l'échéance est sans effet : une échéance demain à 8 h et une autre demain à 23 h

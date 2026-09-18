@@ -261,16 +261,50 @@ export default wrapApiHandler(
 
               if (!artist) continue
 
-              // Récupérer tous les organisateurs avec droits de gestion des artistes
-              const artistManagers = await prisma.editionOrganizer.findMany({
-                where: {
-                  editionId: editionId,
-                  canManageArtists: true,
-                },
+              /*
+               * Les organisateurs habilités à gérer les artistes, pour les prévenir de l'arrivée.
+               *
+               * ⚠️ Ce n'est PAS `EditionOrganizer` : ce modèle décrit un organisateur PRÉSENT sur
+               * l'édition — son QR code, sa validation d'entrée — et ne porte ni `userId` ni
+               * droits. La requête précédente nommait les deux, et Prisma refusait donc la
+               * requête entière : scanner le billet d'un artiste rendait 500.
+               *
+               * Le droit vit à deux endroits, comme partout ailleurs dans le dépôt : sur
+               * l'organisateur de la CONVENTION, et sur la permission propre à l'ÉDITION. Voir
+               * `canManageArtistsById`, dont c'est la même lecture.
+               */
+              const habilitations = await prisma.edition.findUnique({
+                where: { id: editionId },
                 select: {
-                  userId: true,
+                  creatorId: true,
+                  convention: {
+                    select: {
+                      authorId: true,
+                      organizers: {
+                        where: { canManageArtists: true },
+                        select: { userId: true },
+                      },
+                    },
+                  },
+                  organizerPermissions: {
+                    where: { canManageArtists: true },
+                    select: { organizer: { select: { userId: true } } },
+                  },
                 },
               })
+
+              // Le créateur de l'édition et l'auteur de la convention en répondent aussi, sans
+              // qu'aucune case ne soit cochée. Un `Set` évite de notifier deux fois qui cumule.
+              const artistManagers = [
+                ...new Set(
+                  [
+                    habilitations?.creatorId,
+                    habilitations?.convention?.authorId,
+                    ...(habilitations?.convention?.organizers ?? []).map((o) => o.userId),
+                    ...(habilitations?.organizerPermissions ?? []).map((p) => p.organizer?.userId),
+                  ].filter((id): id is number => typeof id === 'number')
+                ),
+              ].map((userId) => ({ userId }))
 
               // Construire le nom de l'artiste
               const artistName =
