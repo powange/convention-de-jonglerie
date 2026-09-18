@@ -55,11 +55,12 @@ export default wrapApiHandler(
       throw error
     }
 
-    // Vérifie que toutes les tâches appartiennent bien au groupe (sécurité +
-    // protection contre les payloads forgés).
+    // Vérifie que toutes les tâches appartiennent bien au groupe (sécurité + protection contre les
+    // payloads forgés). La comparaison des longueurs rejette aussi les doublons, que `findMany`
+    // dédoublonne. `displayOrder` est lu au passage : voir juste en dessous.
     const tasks = await prisma.task.findMany({
       where: { id: { in: data.taskIds }, taskGroupId: groupId },
-      select: { id: true },
+      select: { id: true, displayOrder: true },
     })
     if (tasks.length !== data.taskIds.length) {
       throw createError({
@@ -68,17 +69,36 @@ export default wrapApiHandler(
       })
     }
 
-    // Update atomique des displayOrder selon l'index dans le tableau.
-    await prisma.$transaction(
-      data.taskIds.map((taskId, index) =>
-        prisma.task.update({
-          where: { id: taskId },
-          data: { displayOrder: index },
-        })
-      )
-    )
+    /**
+     * On n'écrit que ce qui CHANGE.
+     *
+     * Déplacer une carte d'un rang ne dérange que deux positions : réécrire toute la colonne
+     * envoyait autant de requêtes qu'elle comptait de tâches, pour rien. La position actuelle est
+     * déjà sous la main — la vérification d'appartenance ci-dessus lit les mêmes lignes —, donc
+     * la comparaison ne coûte aucune requête supplémentaire.
+     *
+     * Un réordonnancement qui ne change rien n'écrit plus rien du tout, et ne prend plus de
+     * verrou : c'est le cas d'un glissement relâché à sa place de départ.
+     */
+    const positionActuelle = new Map(tasks.map((t) => [t.id, t.displayOrder]))
+    const aEcrire = data.taskIds
+      .map((taskId, index) => ({ taskId, index }))
+      .filter(({ taskId, index }) => positionActuelle.get(taskId) !== index)
 
-    return createSuccessResponse({ updated: data.taskIds.length })
+    if (aEcrire.length > 0) {
+      // `updateMany` redit `taskGroupId` : une tâche déplacée entre la vérification et l'écriture
+      // ne serait pas touchée.
+      await prisma.$transaction(
+        aEcrire.map(({ taskId, index }) =>
+          prisma.task.updateMany({
+            where: { id: taskId, taskGroupId: groupId },
+            data: { displayOrder: index },
+          })
+        )
+      )
+    }
+
+    return createSuccessResponse({ updated: aEcrire.length })
   },
   { operationName: 'ReorderTasks' }
 )

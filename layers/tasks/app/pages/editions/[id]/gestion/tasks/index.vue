@@ -87,7 +87,7 @@
             <div class="flex items-center gap-2 text-gray-500">
               <UIcon name="i-heroicons-clipboard-document-list" class="size-4" />
               {{
-                $t('gestion.task.tasks_count', { count: group.tasks.length }, group.tasks.length)
+                $t('gestion.task.tasks_count', { count: group._count.tasks }, group._count.tasks)
               }}
             </div>
             <div class="flex items-center gap-1 text-primary-500">
@@ -117,7 +117,7 @@
         groupeASupprimer
           ? t('gestion.task.confirm_delete_group', {
               name: groupeASupprimer.name,
-              count: groupeASupprimer.tasks.length,
+              count: groupeASupprimer._count.tasks,
             })
           : ''
       "
@@ -151,7 +151,8 @@ interface TaskGroupItem {
   name: string
   description: string | null
   displayOrder: number
-  tasks: { id: number }[]
+  /** Le point d'API ne rend qu'un compte : cette page n'affiche rien d'autre des tâches. */
+  _count: { tasks: number }
 }
 
 const groups = ref<TaskGroupItem[]>([])

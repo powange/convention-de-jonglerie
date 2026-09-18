@@ -102,13 +102,12 @@ test.describe.serial('Tâches — tri par échéance', () => {
   test('glisser une carte sous un tri ne réécrit pas l’ordre manuel', async ({ page, goto }) => {
     const { editionId } = loadState()
 
-    // Il n'existe pas de GET pour un groupe seul : la page lit la liste complète.
+    // Un GET rend désormais un groupe seul, avec ses tâches : la liste, elle, ne porte plus que des
+    // résumés — nom, description et nombre de tâches.
     const ordreEnBase = async () => {
-      const r = await page.request.get(`${BASE}/api/editions/${editionId}/task-groups`)
+      const r = await page.request.get(`${BASE}/api/editions/${editionId}/task-groups/${groupId}`)
       const c = await r.json()
-      const groupes = c.data?.groups ?? c.groups ?? []
-      const groupe = groupes.find((g: { id: number }) => g.id === groupId)
-      return (groupe?.tasks ?? []).map((t: { title: string }) => t.title)
+      return ((c.data?.group ?? c.group)?.tasks ?? []).map((t: { title: string }) => t.title)
     }
 
     /**

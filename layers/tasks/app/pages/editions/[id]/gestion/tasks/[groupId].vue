@@ -294,7 +294,7 @@
       :group="group"
       :task="editingTask"
       :assignable-users="assignableUsers"
-      :task-groups="allGroups"
+      :task-groups="resumesDesGroupes"
       :available-tags="availableTags"
       @saved="handleTaskSaved"
       @deleted="handleTaskDeleted"
@@ -411,7 +411,31 @@ interface TaskGroupItem {
   tasks: TaskItem[]
 }
 
-const allGroups = ref<TaskGroupItem[]>([])
+/** Un groupe tel que la liste le rend désormais : sans ses tâches, avec leur nombre. */
+interface ResumeDeGroupe {
+  id: number
+  name: string
+  description: string | null
+  displayOrder: number
+  _count: { tasks: number }
+}
+
+/**
+ * Le groupe affiché, avec tout son contenu — et lui seul.
+ *
+ * ⚠️ Cette page chargeait auparavant TOUS les groupes de l'édition avec leurs tâches, leurs
+ * assignés, leurs checklists et leurs étiquettes, pour en retenir un et jeter le reste. Et elle
+ * recommençait après chaque action : cocher une case rechargeait le tableau de toute l'édition.
+ */
+const group = ref<TaskGroupItem | null>(null)
+
+/**
+ * Les autres groupes, en résumé.
+ *
+ * Utilisés pour une seule chose — le sélecteur « déplacer vers un autre groupe » de la modale d'une
+ * tâche — qui n'a besoin que d'un identifiant et d'un nom.
+ */
+const resumesDesGroupes = ref<ResumeDeGroupe[]>([])
 const assignableUsers = ref<AssignableUser[]>([])
 const availableTags = ref<TagItem[]>([])
 const loading = ref(true)
@@ -432,10 +456,6 @@ const viewItems = computed(() => [
 ])
 
 const kanbanStatuses: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELLED']
-
-const group = computed<TaskGroupItem | null>(
-  () => allGroups.value.find((g) => g.id === groupId.value) || null
-)
 
 // Titre de l'onglet : « {nom du groupe} – Tâches », cohérent avec la page liste /tasks.
 // Tant que le groupe n'est pas chargé, on retombe sur le titre générique de la section.
@@ -597,13 +617,27 @@ watch(
 const fetchGroups = async () => {
   try {
     loading.value = true
-    const res = await $fetch<{ success: boolean; data: { groups: TaskGroupItem[] } }>(
-      `/api/editions/${editionId}/task-groups`
+    const res = await $fetch<{ success: boolean; data: { group: TaskGroupItem } }>(
+      `/api/editions/${editionId}/task-groups/${groupId.value}`
     )
-    allGroups.value = res?.data?.groups || []
+    group.value = res?.data?.group ?? null
+  } catch {
+    // Groupe supprimé ou inaccessible : l'écran affiche déjà son message d'absence.
+    group.value = null
   } finally {
     loading.value = false
   }
+}
+
+/**
+ * Les résumés ne servent qu'au sélecteur de déplacement : ils se chargent une fois, et se
+ * rafraîchissent quand un groupe est créé ou renommé — pas à chaque coche de checklist.
+ */
+const fetchResumesDesGroupes = async () => {
+  const res = await $fetch<{ success: boolean; data: { groups: ResumeDeGroupe[] } }>(
+    `/api/editions/${editionId}/task-groups`
+  )
+  resumesDesGroupes.value = res?.data?.groups || []
 }
 
 const fetchAssignableUsers = async () => {
@@ -625,10 +659,16 @@ const fetchAvailableTags = async () => {
   }
 }
 
-await Promise.all([fetchGroups(), fetchAssignableUsers(), fetchAvailableTags()])
+await Promise.all([
+  fetchGroups(),
+  fetchResumesDesGroupes(),
+  fetchAssignableUsers(),
+  fetchAvailableTags(),
+])
 
-// Refetch les tags si on change de groupId via navigation
+// Changer de groupe par navigation : son contenu et ses étiquettes suivent.
 watch(groupId, () => {
+  fetchGroups()
   fetchAvailableTags()
 })
 
@@ -699,7 +739,7 @@ async function supprimerGroupe() {
 }
 
 async function handleGroupSaved() {
-  await fetchGroups()
+  await Promise.all([fetchGroups(), fetchResumesDesGroupes()])
 }
 async function handleGroupDeleted() {
   router.push(`/editions/${editionId}/gestion/tasks`)
@@ -717,13 +757,10 @@ async function handleTaskUpdated() {
   const currentId = editingTask.value?.id
   await fetchGroups()
   if (currentId == null) return
-  for (const g of allGroups.value) {
-    const task = g.tasks.find((t) => t.id === currentId)
-    if (task) {
-      editingTask.value = task
-      return
-    }
-  }
+  // La recherche se fait dans le seul groupe chargé : une tâche dont la checklist vient de changer
+  // n'a pas changé de groupe — un déplacement passe par `handleTaskSaved`, qui ferme la modale.
+  const task = group.value?.tasks.find((t) => t.id === currentId)
+  if (task) editingTask.value = task
 }
 
 function statusColor(status: TaskStatus): 'neutral' | 'info' | 'success' | 'error' {
