@@ -23,8 +23,15 @@ const artistSchema = z
     email: z.string().email().optional(),
     prenom: z.string().min(1).optional(),
     nom: z.string().min(1).optional(),
-    arrivalDateTime: z.string().optional().nullable(),
-    departureDateTime: z.string().optional().nullable(),
+    /**
+     * Un INSTANT, en ISO. Le client l'ancre au fuseau de l'édition avant de l'envoyer : une heure
+     * de convention est une heure de LIEU, et la chaîne « 15:00 » ne dit pas laquelle.
+     *
+     * `z.coerce.date()` et non `z.string()` : la colonne est un `DateTime` depuis la migration qui
+     * l'a convertie, et Prisma refuserait une chaîne.
+     */
+    arrivalDateTime: z.coerce.date().optional().nullable(),
+    departureDateTime: z.coerce.date().optional().nullable(),
     dietaryPreference: z.enum(['NONE', 'VEGETARIAN', 'VEGAN']).default('NONE'),
     allergies: z.string().optional().nullable(),
     allergySeverity: z.enum(['LIGHT', 'MODERATE', 'SEVERE', 'CRITICAL']).optional().nullable(),

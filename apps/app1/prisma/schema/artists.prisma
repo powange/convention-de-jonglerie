@@ -36,8 +36,16 @@ model EditionArtist {
   id                      Int                @id @default(autoincrement())
   editionId               Int
   userId                  Int
-  arrivalDateTime         String?
-  departureDateTime       String?
+  /// Arrivée et départ sur place, en INSTANTS.
+  ///
+  /// C'étaient des chaînes libres — la valeur brute d'un champ `datetime-local`, sans fuseau :
+  /// impossible à trier, à comparer, ou à afficher à l'heure du lieu. La carte de l'artiste les
+  /// affichait d'ailleurs telles quelles, « 2025-10-31T15:00 ».
+  ///
+  /// La migration qui les convertit ancre chaque valeur au fuseau de son édition, faute de quoi
+  /// une heure saisie « 15 h sur place » serait relue comme 15 h UTC.
+  arrivalDateTime         DateTime?
+  departureDateTime       DateTime?
   qrCodeToken             String?            @unique
   entryValidated          Boolean            @default(false)
   entryValidatedAt        DateTime?

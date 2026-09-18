@@ -494,13 +494,10 @@ import { z } from 'zod'
 
 import type { AllergySeverityLevel } from '~/utils/allergy-severity'
 
-import {
-  getAccommodationTypeSelectOptions,
-  getAllergySeveritySelectOptions,
-  formatDateTimeLocal,
-} from '#imports'
+import { getAccommodationTypeSelectOptions, getAllergySeveritySelectOptions } from '#imports'
 
 import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 const props = defineProps<{
@@ -524,6 +521,17 @@ const { t, locale } = useI18n()
  * il n'expose pas de méthode dédiée.
  */
 const editionStore = useEditionStore()
+
+/**
+ * Le fuseau de l'édition : une heure d'arrivée est une heure de LIEU.
+ *
+ * Le champ `datetime-local` rend « 15:00 » sans fuseau. C'est ici qu'on décide de quel 15 h il
+ * s'agit — pas dans le navigateur de qui saisit, qui peut être à l'autre bout du monde.
+ */
+const fuseauEdition = computed(
+  () =>
+    (editionStore.getEditionById(props.editionId) as { timezone?: string | null })?.timezone ?? null
+)
 
 const currencySymbol = computed(() => {
   const edition = editionStore.getEditionById(props.editionId)
@@ -864,8 +872,9 @@ const handleUserSelection = (user: any) => {
 
 // Construit les données de base pour l'API (commun création/modification)
 const buildBasePayload = () => ({
-  arrivalDateTime: formData.value.arrivalDateTime || null,
-  departureDateTime: formData.value.departureDateTime || null,
+  // Ancrés au fuseau de l'édition avant de partir : « 15:00 » devient un instant.
+  arrivalDateTime: versInstant(formData.value.arrivalDateTime, fuseauEdition.value) || null,
+  departureDateTime: versInstant(formData.value.departureDateTime, fuseauEdition.value) || null,
   dietaryPreference: formData.value.dietaryPreference,
   allergies: formData.value.allergies || null,
   allergySeverity: formData.value.allergySeverity,
@@ -1022,23 +1031,14 @@ const resetForm = () => {
 }
 
 // Fonction helper pour convertir une date en format datetime-local
-const toDateTimeLocal = (dateString: string | null | undefined): string => {
-  if (!dateString) return ''
-
-  // Si la date est déjà au format datetime-local (YYYY-MM-DDTHH:mm), la retourner telle quelle
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateString)) {
-    return dateString
-  }
-
-  // Sinon, tenter de parser et convertir au format datetime-local
-  // Utilise formatDateTimeLocal pour éviter les décalages de timezone
-  try {
-    const date = new Date(dateString)
-    return formatDateTimeLocal(date)
-  } catch {
-    return ''
-  }
-}
+/**
+ * L'instant reçu de l'API, remis dans le champ de saisie à l'heure du LIEU.
+ *
+ * Le test sur le format `AAAA-MM-JJTHH:MM` a disparu avec la colonne texte qui le justifiait :
+ * ces champs sont des instants depuis la migration qui les a convertis.
+ */
+const toDateTimeLocal = (instant: string | Date | null | undefined): string =>
+  instant ? versChampLocal(instant, fuseauEdition.value) : ''
 
 // Charger les données de l'artiste en mode édition
 watch(

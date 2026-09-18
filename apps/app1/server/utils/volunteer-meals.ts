@@ -118,47 +118,74 @@ export function isVolunteerEligibleForMeal(
 }
 
 /**
- * Vérifie si un artiste est éligible à un repas spécifique
- * en fonction de ses dates d'arrivée/départ
+ * Le moment de la journée d'un instant — « morning », « noon », « afternoon », « evening ».
+ *
+ * Les bénévoles le déclarent explicitement, à côté de leur date. Les artistes donnent une heure
+ * précise : on en déduit le moment plutôt que de leur demander deux fois la même chose.
+ */
+function momentDeLaJournee(instant: Date): string {
+  const heure = instant.getUTCHours()
+  if (heure < 11) return 'morning'
+  if (heure < 14) return 'noon'
+  if (heure < 18) return 'afternoon'
+  return 'evening'
+}
+
+/**
+ * Un artiste est-il éligible à ce repas, vu ses horaires d'arrivée et de départ ?
+ *
+ * ⚠️ Cette fonction découpait la valeur sur un `_`, attendant le format `AAAA-MM-JJ_moment` des
+ * BÉNÉVOLES. Les artistes n'ont jamais stocké cela : le découpage rendait donc toujours un moment
+ * `undefined`, et le repli « tous les repas » s'appliquait. Un artiste arrivant à 23 h était
+ * réputé éligible au petit-déjeuner du matin même.
+ *
+ * Depuis que ces champs sont des INSTANTS, `.split` planterait en plus. Le moment se déduit
+ * désormais de l'heure, ce qui est à la fois juste et plus simple.
+ *
+ * L'heure est lue en UTC, comme la date du repas juste au-dessus : ce module ne connaît pas le
+ * fuseau de l'édition. Pour un repas, la marge d'une heure ou deux ne change le résultat qu'aux
+ * bornes — mais c'est une approximation, et elle est assumée ici plutôt que cachée.
  */
 export function isArtistEligibleForMeal(
   meal: { date: Date; mealType: VolunteerMealType },
   artist: {
-    arrivalDateTime: string | null
-    departureDateTime: string | null
+    arrivalDateTime: Date | string | null
+    departureDateTime: Date | string | null
   }
 ): boolean {
-  // Filtrer par dates d'arrivée et de départ si renseignées
   const mealDate = new Date(meal.date)
   mealDate.setUTCHours(0, 0, 0, 0)
 
+  /** L'instant, et la journée à laquelle il appartient. */
+  const journeeDe = (valeur: Date | string) => {
+    const instant = new Date(valeur)
+    if (Number.isNaN(instant.getTime())) return null
+    const journee = new Date(instant)
+    journee.setUTCHours(0, 0, 0, 0)
+    return { instant, journee }
+  }
+
   if (artist.arrivalDateTime) {
-    // Format: YYYY-MM-DD_timeOfDay
-    const [arrivalDatePart, arrivalTimeOfDay] = artist.arrivalDateTime.split('_')
-    const arrivalDate = new Date(arrivalDatePart ?? '')
-    arrivalDate.setUTCHours(0, 0, 0, 0)
+    const arrivee = journeeDe(artist.arrivalDateTime)
+    if (arrivee) {
+      if (mealDate < arrivee.journee) return false
 
-    if (mealDate < arrivalDate) return false
-
-    // Si c'est le jour d'arrivée, vérifier l'heure
-    if (mealDate.getTime() === arrivalDate.getTime()) {
-      const availableMeals = getAvailableMealsOnArrival(arrivalTimeOfDay)
-      if (!availableMeals.includes(meal.mealType)) return false
+      if (mealDate.getTime() === arrivee.journee.getTime()) {
+        const repasPossibles = getAvailableMealsOnArrival(momentDeLaJournee(arrivee.instant))
+        if (!repasPossibles.includes(meal.mealType)) return false
+      }
     }
   }
 
   if (artist.departureDateTime) {
-    // Format: YYYY-MM-DD_timeOfDay
-    const [departureDatePart, departureTimeOfDay] = artist.departureDateTime.split('_')
-    const departureDate = new Date(departureDatePart ?? '')
-    departureDate.setUTCHours(0, 0, 0, 0)
+    const depart = journeeDe(artist.departureDateTime)
+    if (depart) {
+      if (mealDate > depart.journee) return false
 
-    if (mealDate > departureDate) return false
-
-    // Si c'est le jour de départ, vérifier l'heure
-    if (mealDate.getTime() === departureDate.getTime()) {
-      const availableMeals = getAvailableMealsOnDeparture(departureTimeOfDay)
-      if (!availableMeals.includes(meal.mealType)) return false
+      if (mealDate.getTime() === depart.journee.getTime()) {
+        const repasPossibles = getAvailableMealsOnDeparture(momentDeLaJournee(depart.instant))
+        if (!repasPossibles.includes(meal.mealType)) return false
+      }
     }
   }
 
