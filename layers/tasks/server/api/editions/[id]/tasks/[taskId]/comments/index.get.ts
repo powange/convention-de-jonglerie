@@ -48,7 +48,6 @@ export default wrapApiHandler(
             pseudo: true,
             prenom: true,
             nom: true,
-            email: true,
             emailHash: true,
             profilePicture: true,
           },

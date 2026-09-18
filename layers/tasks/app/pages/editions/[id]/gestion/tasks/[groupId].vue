@@ -316,10 +316,33 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
-const { t, locale } = useI18n()
+const { t } = useI18n()
+const { formatDateShortMonth } = useDateFormat()
 const editionId = parseInt(route.params.id as string)
 const groupId = computed(() => parseInt(route.params.groupId as string))
 
+/**
+ * Une personne telle qu'une ASSIGNATION la porte.
+ *
+ * Sans adresse e-mail : le point d'API des groupes ne la transmet plus, parce qu'aucun écran ne
+ * l'affichait et qu'elle partait jusqu'à des bénévoles simplement co-assignés.
+ */
+interface AssignedUser {
+  id: number
+  pseudo: string
+  prenom: string | null
+  nom: string | null
+  emailHash: string | null
+  profilePicture: string | null
+}
+
+/**
+ * Une personne à QUI l'on peut assigner, telle que `assignable-users` la rend.
+ *
+ * Distincte de la précédente pour la seule raison qui compte : celle-ci porte l'adresse e-mail,
+ * que le sélecteur d'assignation affiche à côté du pseudo pour départager deux homonymes. Un type
+ * unique pour les deux sources ferait promettre à l'une ce que l'autre ne livre pas.
+ */
 interface AssignableUser {
   id: number
   pseudo: string
@@ -331,7 +354,7 @@ interface AssignableUser {
 }
 interface TaskAssignment {
   id: number
-  user: AssignableUser
+  user: AssignedUser
 }
 interface ChecklistItem {
   id: number
@@ -440,10 +463,10 @@ const filters = ref<TaskFiltersValue>(parseInitialFilters())
 
 const hasDeadlines = computed<boolean>(() => !!group.value?.tasks.some((t) => t.deadline))
 
-const legacyAssignees = computed<AssignableUser[]>(() => {
+const legacyAssignees = computed<AssignedUser[]>(() => {
   if (!group.value) return []
   const knownIds = new Set(assignableUsers.value.map((u) => u.id))
-  const map = new Map<number, AssignableUser>()
+  const map = new Map<number, AssignedUser>()
   for (const task of group.value.tasks) {
     for (const a of task.assignments) {
       if (!knownIds.has(a.user.id) && !map.has(a.user.id)) {
@@ -890,11 +913,7 @@ async function onCardDrop(task: TaskItem) {
 function formatDeadline(d: string | null): string {
   if (!d) return ''
   try {
-    return new Intl.DateTimeFormat(locale.value, {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }).format(new Date(d))
+    return formatDateShortMonth(d)
   } catch {
     return d
   }

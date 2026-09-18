@@ -78,7 +78,6 @@ interface AssignedUser {
   pseudo: string
   prenom: string | null
   nom: string | null
-  email: string
   emailHash: string | null
   profilePicture: string | null
 }
@@ -107,7 +106,7 @@ const emit = defineEmits<{
   'update:open': [v: boolean]
 }>()
 
-const { locale } = useI18n()
+const { formatDateShortMonth } = useDateFormat()
 
 const isOpen = computed({
   get: () => props.open,
@@ -150,11 +149,7 @@ const deadlineBadgeColor = computed<'neutral' | 'warning' | 'error'>(() => {
 
 function formatDeadline(d: string): string {
   try {
-    return new Intl.DateTimeFormat(locale.value, {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }).format(new Date(d))
+    return formatDateShortMonth(d)
   } catch {
     return d
   }

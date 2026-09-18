@@ -42,6 +42,39 @@ export const useDateFormat = () => {
   }
 
   /**
+   * Formate une date avec le mois abrégé (ex: « 12 août 2026 »)
+   *
+   * Pour une date qui se lit seule plutôt que dans une colonne — une échéance sur une carte, un
+   * horodatage sous un commentaire. Le mois en lettres se reconnaît d'un coup d'œil là où
+   * « 12/08 » demande de savoir si l'on est en notation française ou américaine ; en colonne,
+   * `formatDate` reste préférable parce que ses chiffres s'alignent.
+   */
+  const formatDateShortMonth = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(intlLocale.value, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'Europe/Paris',
+    })
+  }
+
+  /**
+   * Formate une date et une heure avec le mois abrégé (ex: « 12 août 2026 20:00 »)
+   */
+  const formatDateTimeShortMonth = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleString(intlLocale.value, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Paris',
+    })
+  }
+
+  /**
    * Formate seulement la date
    */
   const formatDate = (dateString: string) => {
@@ -206,6 +239,8 @@ export const useDateFormat = () => {
   return {
     formatDateTime,
     formatTime,
+    formatDateShortMonth,
+    formatDateTimeShortMonth,
     formatDate,
     formatDateFull,
     formatDateWithWeekday,
