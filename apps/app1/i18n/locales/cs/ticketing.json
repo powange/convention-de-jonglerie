@@ -120,10 +120,6 @@
         "name_required": "Název je povinný"
       },
       "volunteer": {
-        "choose_placeholder": "Vyberte předmět k vydání...",
-        "given_to_all": "Předáno všem dobrovolníkům",
-        "remove_label": "Odebrat položku",
-        "remove_title": "Stáhnout tento článek?",
         "items_label": "Předměty vydávané v tomto rozsahu",
         "save": "Uložit",
         "saved": "Předměty uloženy",

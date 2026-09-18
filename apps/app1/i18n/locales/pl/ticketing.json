@@ -120,10 +120,6 @@
         "name_required": "Nazwa jest wymagana"
       },
       "volunteer": {
-        "choose_placeholder": "Wybierz przedmiot do wydania...",
-        "given_to_all": "Przekazano wszystkim wolontariuszom",
-        "remove_label": "Usuń przedmiot",
-        "remove_title": "Usunąć ten przedmiot?",
         "items_label": "Przedmioty wydawane w tym zakresie",
         "save": "Zapisz",
         "saved": "Przedmioty zapisane",

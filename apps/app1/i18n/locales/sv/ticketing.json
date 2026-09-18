@@ -120,10 +120,6 @@
         "name_required": "Namnet är obligatoriskt"
       },
       "volunteer": {
-        "choose_placeholder": "Välj ett objekt att lämna ut...",
-        "given_to_all": "Presenteras till alla volontärer",
-        "remove_label": "Ta bort artikel",
-        "remove_title": "Dra tillbaka den här artikeln?",
         "items_label": "Objekt som delas ut för detta omfång",
         "save": "Spara",
         "saved": "Objekten sparade",

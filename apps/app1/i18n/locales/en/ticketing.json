@@ -120,10 +120,6 @@
         "name_required": "The name is required"
       },
       "volunteer": {
-        "choose_placeholder": "Choose an item to hand out...",
-        "given_to_all": "Given to all volunteers",
-        "remove_label": "Remove item",
-        "remove_title": "Remove this item?",
         "items_label": "Items handed out for this scope",
         "save": "Save",
         "saved": "Items saved",

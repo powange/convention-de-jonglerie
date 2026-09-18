@@ -120,10 +120,6 @@
         "name_required": "Der Name ist erforderlich"
       },
       "volunteer": {
-        "choose_placeholder": "Einen auszugebenden Artikel auswählen...",
-        "given_to_all": "An alle Freiwilligen ausgehändigt",
-        "remove_label": "Artikel entfernen",
-        "remove_title": "Diesen Artikel entfernen?",
         "items_label": "Für diesen Geltungsbereich ausgegebene Artikel",
         "save": "Speichern",
         "saved": "Artikel gespeichert",

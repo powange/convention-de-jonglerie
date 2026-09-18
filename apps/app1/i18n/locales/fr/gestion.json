@@ -280,10 +280,8 @@
       "select_to_add": "Sélectionner un organisateur à ajouter",
       "status": "Statut du billet",
       "teams": {
-        "column": "Équipes",
         "description": "Rattachez cet organisateur à des équipes de bénévolat. Il y apparaîtra, sans compter dans les effectifs ni dans l'assignation automatique.",
         "load_error": "Impossible de charger les équipes",
-        "manage": "Gérer les équipes",
         "no_teams": "Aucune équipe de bénévoles sur cette édition",
         "title_for": "Équipes — {name}"
       },
@@ -540,7 +538,12 @@
       "mark_picked_up": "Marquer récupéré",
       "mark_returned": "Marquer rendu",
       "missing_all_counted": "Tout le matériel a été compté.",
+      "missing_all_listed": "Tout ce qui manque est déjà dans une liste de courses.",
       "missing_count": "{count} manquant | {count} manquants",
+      "missing_filter_unlisted": "Seulement ce qui n'est dans aucune liste",
+      "missing_in_list_pending": "Dans cette liste, pas encore acheté.",
+      "missing_in_list_purchased": "Dans cette liste, déjà acheté.",
+      "missing_in_lists": "Listes",
       "missing_incomplete_hint": "Un objet reste à compter : tant qu'il n'est pas compté, on ne sait pas s'il manque. | {count} objets restent à compter : tant qu'ils ne le sont pas, on ne sait pas s'ils manquent.",
       "missing_incomplete_title": "La liste n'est pas complète",
       "missing_items": "Objets incomplets",
