@@ -412,7 +412,9 @@
       "remove_performance": "Odebrat toto představení",
       "message_group": "Napsat obsazení",
       "message_group_error": "Skupinovou konverzaci představení se nepodařilo otevřít",
-      "message_group_no_artists": "V tomto představení nejsou žádní umělci"
+      "message_group_no_artists": "V tomto představení nejsou žádní umělci",
+      "end_datetime": "Čas konce",
+      "end_datetime_hint": "Vypočítán z délky představení."
     },
     "stock": {
       "available_now": "{available}/{total} dostupných",

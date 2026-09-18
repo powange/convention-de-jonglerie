@@ -139,7 +139,37 @@
                     :key="performance.id"
                     class="whitespace-nowrap"
                   >
-                    {{ formatDateTime(performance.startDateTime) }}
+                    {{ formatDateTimeWithWeekday(performance.startDateTime) }}
+                  </div>
+                </div>
+              </template>
+
+              <!-- L'en-tête dit d'où vient cette heure. Sans quoi on la croit saisie et l'on cherche
+                   où la corriger : c'est la durée qu'il faut modifier, jamais la fin. -->
+              <template #endDateTime-header>
+                <span class="inline-flex items-center gap-1">
+                  {{ t('gestion.shows.end_datetime') }}
+                  <UTooltip :text="t('gestion.shows.end_datetime_hint')">
+                    <UIcon
+                      name="i-heroicons-information-circle"
+                      class="size-4 text-gray-400 shrink-0"
+                    />
+                  </UTooltip>
+                </span>
+              </template>
+
+              <!-- Alignée ligne pour ligne sur la colonne des horaires : autant de valeurs que de
+                   représentations, dans le même ordre. Un numéro n'a pas d'horaire propre — il
+                   faudrait cumuler les durées de ceux qui le précèdent — et n'affiche donc rien
+                   ici, comme dans la colonne des débuts. -->
+              <template #endDateTime-cell="{ row }">
+                <div v-if="row.original.kind === 'show'" class="text-gray-600 dark:text-gray-400">
+                  <div
+                    v-for="performance in row.original.show.performances"
+                    :key="performance.id"
+                    class="whitespace-nowrap"
+                  >
+                    {{ finAffichee(performance, row.original.show) }}
                   </div>
                 </div>
               </template>
@@ -341,6 +371,8 @@
 </template>
 
 <script setup lang="ts">
+import { finDeRepresentation } from '../../../../../../utils/horaires-spectacle'
+
 import type { TableColumn, TableRow } from '@nuxt/ui'
 
 definePageMeta({
@@ -352,7 +384,7 @@ const router = useRouter()
 const { t, locale } = useI18n()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
-const { formatDateTime } = useDateFormat()
+const { formatDateTimeWithWeekday, formatTime, formatDate } = useDateFormat()
 const { getImageUrl } = useImageUrl()
 
 const getShowImageUrl = (show: any) => {
@@ -453,7 +485,8 @@ watch(
 
 // Déplier une ligne fait toujours produire à UTable une ligne supplémentaire pour son slot
 // `#expanded`, que nous n'utilisons pas : elle apparaissait vide entre le cabaret et ses
-// numéros. On la reconnaît à sa cellule unique et vide, là où une vraie ligne en a sept.
+// numéros. On la reconnaît à sa cellule unique et vide, là où une vraie ligne en a plusieurs —
+// le sélecteur ne compte pas les colonnes, et n'a donc pas à être revu quand on en ajoute une.
 const tableUi = { tbody: '[&>tr:has(>td:only-child:empty)]:hidden' }
 
 const columns = computed<TableColumn<ShowTableRow>[]>(() => {
@@ -461,6 +494,7 @@ const columns = computed<TableColumn<ShowTableRow>[]>(() => {
     { id: 'title', header: t('gestion.shows.show_title') },
     { id: 'startDateTime', header: t('gestion.shows.start_datetime') },
     { id: 'duration', header: t('gestion.shows.duration') },
+    { id: 'endDateTime', header: t('gestion.shows.end_datetime') },
     { id: 'location', header: t('gestion.shows.location') },
     { id: 'artists', header: t('gestion.shows.artists') },
     {
@@ -478,6 +512,38 @@ const columns = computed<TableColumn<ShowTableRow>[]>(() => {
   }
   return cols
 })
+
+/**
+ * L'heure de fin d'un passage, telle qu'elle s'affiche en face de son début.
+ *
+ * Une valeur par représentation, alignée sur la colonne des horaires : la durée appartient à
+ * l'œuvre mais l'heure de fin appartient au passage, et un spectacle joué deux fois ne finit pas
+ * deux fois à la même heure.
+ *
+ * Le jour n'est répété que s'il CHANGE : un cabaret commencé à 23h et long de deux heures finit
+ * le lendemain, et l'annoncer «&nbsp;01:00&nbsp;» tout court se lirait comme une erreur de saisie. Les
+ * autres n'ont pas à réécrire une date déjà lue dans la colonne voisine. La comparaison passe par
+ * `formatDate`, donc par le même fuseau que l'affichage — comparer des jours autrement reviendrait
+ * à se tromper d'une journée pour tout ce qui se joue autour de minuit.
+ */
+const finAffichee = (
+  performance: { startDateTime: string },
+  show: { duration?: number | null }
+) => {
+  const fin = finDeRepresentation(performance.startDateTime, show.duration)
+  // Sans durée saisie, rien à calculer : le même tiret que la colonne des durées, plutôt qu'une
+  // heure inventée qui passerait pour une information.
+  if (!fin) return '-'
+
+  const iso = fin.toISOString()
+  // Le nom du jour ne paraît que dans le second cas : sur la même ligne, la colonne des débuts
+  // l'annonce déjà, et le répéter en face n'apprendrait rien. C'est précisément quand il CHANGE
+  // qu'il vaut d'être écrit — «&nbsp;jeu. 01:00&nbsp;» dit en deux mots ce que «&nbsp;01:00&nbsp;» ferait prendre pour
+  // une erreur.
+  return formatDate(iso) === formatDate(performance.startDateTime)
+    ? formatTime(iso)
+    : formatDateTimeWithWeekday(iso)
+}
 
 const rowDuration = (row: ShowTableRow) => {
   const duration = row.kind === 'act' ? row.act.duration : row.show.duration

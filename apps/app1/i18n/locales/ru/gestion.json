@@ -412,7 +412,9 @@
       "remove_performance": "Удалить этот показ",
       "message_group": "Написать составу",
       "message_group_error": "Не удалось открыть групповой чат спектакля",
-      "message_group_no_artists": "В этом спектакле нет артистов"
+      "message_group_no_artists": "В этом спектакле нет артистов",
+      "end_datetime": "Время окончания",
+      "end_datetime_hint": "Рассчитывается по продолжительности представления."
     },
     "stock": {
       "available_now": "{available}/{total} доступно",

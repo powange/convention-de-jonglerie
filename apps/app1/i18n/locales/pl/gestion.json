@@ -412,7 +412,9 @@
       "remove_performance": "Usuń to przedstawienie",
       "message_group": "Napisz do obsady",
       "message_group_error": "Nie udało się otworzyć grupy wiadomości spektaklu",
-      "message_group_no_artists": "Brak artystów w tym spektaklu"
+      "message_group_no_artists": "Brak artystów w tym spektaklu",
+      "end_datetime": "Godzina zakończenia",
+      "end_datetime_hint": "Obliczana na podstawie czasu trwania spektaklu."
     },
     "stock": {
       "available_now": "{available}/{total} dostępnych",

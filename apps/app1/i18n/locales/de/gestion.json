@@ -412,7 +412,9 @@
       "remove_performance": "Diese Vorstellung entfernen",
       "message_group": "An die Besetzung schreiben",
       "message_group_error": "Die Gruppenunterhaltung der Show konnte nicht geöffnet werden",
-      "message_group_no_artists": "Keine Künstler in dieser Show"
+      "message_group_no_artists": "Keine Künstler in dieser Show",
+      "end_datetime": "Endzeit",
+      "end_datetime_hint": "Aus der Dauer der Show berechnet."
     },
     "stock": {
       "available_now": "{available}/{total} verfügbar",

@@ -412,7 +412,9 @@
       "remove_performance": "Quitar esta función",
       "message_group": "Escribir al reparto",
       "message_group_error": "No se ha podido abrir el grupo de mensajería del espectáculo",
-      "message_group_no_artists": "Este espectáculo no tiene artistas"
+      "message_group_no_artists": "Este espectáculo no tiene artistas",
+      "end_datetime": "Hora de fin",
+      "end_datetime_hint": "Calculada a partir de la duración del espectáculo."
     },
     "stock": {
       "available_now": "{available}/{total} disponible(s)",

@@ -412,7 +412,9 @@
       "remove_performance": "Fjern denne forestilling",
       "message_group": "Skriv til medvirkende",
       "message_group_error": "Forestillingens gruppesamtale kunne ikke åbnes",
-      "message_group_no_artists": "Ingen artister på denne forestilling"
+      "message_group_no_artists": "Ingen artister på denne forestilling",
+      "end_datetime": "Sluttidspunkt",
+      "end_datetime_hint": "Beregnet ud fra forestillingens varighed."
     },
     "stock": {
       "available_now": "{available}/{total} tilgængelige",
