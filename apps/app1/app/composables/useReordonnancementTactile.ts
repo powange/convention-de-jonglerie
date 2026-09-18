@@ -139,7 +139,15 @@ export function useReordonnancementTactile<T>(options: OptionsReordonnancement<T
       saisieConfirmee = true
       // La capture n'est prise qu'ICI, une fois l'intention établie : la prendre au premier appui
       // confisquerait le défilement de la page à chaque effleurement.
-      elementCapturant?.setPointerCapture?.(event.pointerId)
+      //
+      // `setPointerCapture` lève `NotFoundError` quand le pointeur n'est plus actif — un doigt
+      // relevé entre deux images, un événement rejoué. Le glissement fonctionne sans la capture,
+      // simplement moins bien si le doigt sort de l'élément : l'échec ne doit pas tout interrompre.
+      try {
+        elementCapturant?.setPointerCapture?.(event.pointerId)
+      } catch {
+        // Sans capture, `elementFromPoint` suffit à suivre la cible.
+      }
     }
 
     // `preventDefault` empêche le défilement natif de lutter contre le nôtre pendant le glissement.
