@@ -61,7 +61,7 @@ export default wrapApiHandler(
     // `orderedIds` contenant deux fois le même identifiant produirait sinon un ordre incohérent.
     const groups = await prisma.taskGroup.findMany({
       where: { id: { in: data.orderedIds }, editionId },
-      select: { id: true },
+      select: { id: true, displayOrder: true },
     })
     if (groups.length !== data.orderedIds.length) {
       throw createError({
@@ -70,18 +70,27 @@ export default wrapApiHandler(
       })
     }
 
-    // Défense en profondeur : `updateMany` redit `editionId` dans chaque écriture, si bien qu'une
-    // ligne qui aurait changé d'édition entre la vérification et l'écriture ne serait pas touchée.
-    await prisma.$transaction(
-      data.orderedIds.map((id, index) =>
-        prisma.taskGroup.updateMany({
-          where: { id, editionId },
-          data: { displayOrder: index },
-        })
-      )
-    )
+    // On n'écrit que ce qui CHANGE : déplacer un groupe d'un rang n'en dérange que deux. La
+    // position actuelle vient de la vérification ci-dessus, donc sans requête supplémentaire.
+    const positionActuelle = new Map(groups.map((g) => [g.id, g.displayOrder]))
+    const aEcrire = data.orderedIds
+      .map((id, index) => ({ id, index }))
+      .filter(({ id, index }) => positionActuelle.get(id) !== index)
 
-    return createSuccessResponse({ reordered: data.orderedIds.length })
+    if (aEcrire.length > 0) {
+      // Défense en profondeur : `updateMany` redit `editionId` dans chaque écriture, si bien qu'une
+      // ligne qui aurait changé d'édition entre la vérification et l'écriture ne serait pas touchée.
+      await prisma.$transaction(
+        aEcrire.map(({ id, index }) =>
+          prisma.taskGroup.updateMany({
+            where: { id, editionId },
+            data: { displayOrder: index },
+          })
+        )
+      )
+    }
+
+    return createSuccessResponse({ reordered: aEcrire.length })
   },
   { operationName: 'ReorderTaskGroups' }
 )
