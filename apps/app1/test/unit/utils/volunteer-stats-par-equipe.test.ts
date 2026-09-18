@@ -19,8 +19,8 @@ const creneau = (
   organisateurs: number[] = []
 ) => ({
   id,
-  start: `${jour}T09:00:00.000Z`,
-  end: `${jour}T${String(9 + heures).padStart(2, '0')}:00:00.000Z`,
+  startDateTime: `${jour}T09:00:00.000Z`,
+  endDateTime: `${jour}T${String(9 + heures).padStart(2, '0')}:00:00.000Z`,
   teamId,
   maxVolunteers: besoin,
   assignedVolunteersList: affectes.map(benevole),
@@ -126,8 +126,8 @@ describe('calculateVolunteersStatsByTeam', () => {
   it('retient un créneau sans besoin déclaré comme en demandant un', () => {
     const sansBesoin = {
       id: '1',
-      start: '2026-08-01T09:00:00.000Z',
-      end: '2026-08-01T11:00:00.000Z',
+      startDateTime: '2026-08-01T09:00:00.000Z',
+      endDateTime: '2026-08-01T11:00:00.000Z',
       teamId: 'acc',
       assignedVolunteersList: [],
     }
@@ -139,8 +139,8 @@ describe('calculateVolunteersStatsByTeam', () => {
   it('ignore une durée aberrante plutôt que de propager un NaN', () => {
     const aberrant = {
       id: '1',
-      start: 'pas une date',
-      end: '2026-08-01T10:00:00.000Z',
+      startDateTime: 'pas une date',
+      endDateTime: '2026-08-01T10:00:00.000Z',
       teamId: 'acc',
       maxVolunteers: 2,
       assignedVolunteersList: [benevole(1)],

@@ -26,6 +26,10 @@ export default wrapApiHandler(
     const selectionCreneau = {
       id: true,
       title: true,
+      // La consigne du poste — « se présenter au point B », « prévoir des gants ». Elle n'est pas
+      // affichée dans la liste, qui doit rester lisible, mais dans la modale qu'on ouvre en
+      // cliquant un créneau. Sans ce champ, cette modale n'aurait rien à montrer.
+      description: true,
       startDateTime: true,
       endDateTime: true,
       delayMinutes: true,

@@ -92,8 +92,8 @@ export interface VolunteerStatsIndividual {
 
 export interface TimeSlotWithAssignments {
   id: string | number
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   assignedVolunteersList?: Array<{
     user: {
       id: number
@@ -193,8 +193,8 @@ export function calculateVolunteersStats(
     const personnes = personnesDuCreneau(slot)
     if (personnes.length === 0) return
 
-    const startTime = new Date(slot.start)
-    const endTime = new Date(slot.end)
+    const startTime = new Date(slot.startDateTime)
+    const endTime = new Date(slot.endDateTime)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
 
     personnes.forEach((personne) => {
@@ -257,8 +257,8 @@ export function calculateVolunteersStatsByDay(
     const personnes = personnesDuCreneau(slot)
     if (personnes.length === 0) return
 
-    const startTime = new Date(slot.start)
-    const endTime = new Date(slot.end)
+    const startTime = new Date(slot.startDateTime)
+    const endTime = new Date(slot.endDateTime)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
     const dayKey = jourDeLEdition(startTime, fuseau)
 
@@ -345,8 +345,8 @@ export function calculateVolunteersStatsIndividual(
     const personnes = personnesDuCreneau(slot)
     if (personnes.length === 0) return
 
-    const startTime = new Date(slot.start)
-    const endTime = new Date(slot.end)
+    const startTime = new Date(slot.startDateTime)
+    const endTime = new Date(slot.endDateTime)
     const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
     const dayKey = jourDeLEdition(startTime, fuseau)
 
@@ -505,8 +505,8 @@ export function calculateVolunteersStatsByTeam(
     // quel que soit leur titre.
     const affectes = personnesDuCreneau(slot)
 
-    const debut = new Date(slot.start)
-    const fin = new Date(slot.end)
+    const debut = new Date(slot.startDateTime)
+    const fin = new Date(slot.endDateTime)
     const dureeCreneau = (fin.getTime() - debut.getTime()) / (1000 * 60 * 60)
     if (!Number.isFinite(dureeCreneau) || dureeCreneau <= 0) return
 

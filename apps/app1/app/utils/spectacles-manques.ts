@@ -20,8 +20,8 @@ export type { SpectacleProgramme }
 export interface CreneauAvecBenevoles {
   id: string | number
   title?: string | null
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   teamId?: string | null
   assignedVolunteersList?: Array<{ user?: { id?: number } | null } | null> | null
 }
@@ -29,8 +29,8 @@ export interface CreneauAvecBenevoles {
 export interface CreneauBloquant {
   id: string | number
   title: string
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   teamName: string | null
 }
 
@@ -57,8 +57,8 @@ export function detecterSpectaclesManques(
 
   for (const creneau of creneaux) {
     if (!creneau?.id) continue
-    const debut = enMillisecondes(creneau.start)
-    const fin = enMillisecondes(creneau.end)
+    const debut = enMillisecondes(creneau.startDateTime)
+    const fin = enMillisecondes(creneau.endDateTime)
     // Un créneau aux dates illisibles ne prouve rien : mieux vaut l'ignorer que d'accuser à tort.
     if (Number.isNaN(debut) || Number.isNaN(fin)) continue
 
@@ -97,8 +97,8 @@ export function detecterSpectaclesManques(
           slot: {
             id: bloquant.brut.id,
             title: bloquant.brut.title || 'Sans titre',
-            start: bloquant.brut.start,
-            end: bloquant.brut.end,
+            start: bloquant.brut.startDateTime,
+            end: bloquant.brut.endDateTime,
             teamName: nomEquipe(bloquant.brut.teamId),
           },
         })

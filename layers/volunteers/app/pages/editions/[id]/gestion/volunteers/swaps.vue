@@ -23,11 +23,13 @@
               :personne="demande.requester"
               :cede="demande.requesterAssignment.timeSlot"
               :recoit="demande.targetAssignment.timeSlot"
+              :fuseau="fuseauEdition"
             />
             <VolunteersSwapMouvement
               :personne="demande.target"
               :cede="demande.targetAssignment.timeSlot"
               :recoit="demande.requesterAssignment.timeSlot"
+              :fuseau="fuseauEdition"
             />
 
             <!-- Ce que l'échange produit sur le terrain. Deux noms et deux horaires ne suffisent
@@ -102,7 +104,12 @@ const demandes = computed(() => data.value?.requests ?? [])
 
 // Le titre d'un effectif est du texte : d'où la forme condensée du rendu partagé, qui porte
 // désormais l'équipe elle aussi.
-const { resume } = useCreneauLisible()
+/** L'heure d'un créneau est celle du LIEU, y compris dans un titre d'effectif. */
+const fuseauEdition = computed(
+  () => (editionStore.getEditionById(editionId.value) as any)?.timezone ?? null
+)
+
+const { resume } = useCreneauLisible(fuseauEdition)
 const creneau = (affectation: { timeSlot: CreneauLisible }) => resume(affectation.timeSlot)
 
 // Deux actions, comme côté bénévole : le corps est fixé à la construction du composable.

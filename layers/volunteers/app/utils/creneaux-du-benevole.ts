@@ -13,8 +13,8 @@
 /** Un créneau tel que la page le porte, réduit à ce qui nous intéresse. */
 export interface CreneauAffecte {
   id: string | number
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   [key: string]: any
 }
 
@@ -56,14 +56,14 @@ export function creneauxDuBenevole<T extends CreneauAffecte>(
 ): Array<CreneauAvecIntervalle<T>> {
   const siens = creneaux
     .filter((creneau) => personnesDuCreneau(creneau).includes(userId))
-    .filter((creneau) => Number.isFinite(new Date(creneau.start).getTime()))
-    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+    .filter((creneau) => Number.isFinite(new Date(creneau.startDateTime).getTime()))
+    .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime())
 
   return siens.map((creneau, rang) => {
     if (rang === 0) return { creneau, intervalleMinutes: null }
 
-    const finPrecedente = new Date(siens[rang - 1]!.end).getTime()
-    const debut = new Date(creneau.start).getTime()
+    const finPrecedente = new Date(siens[rang - 1]!.endDateTime).getTime()
+    const debut = new Date(creneau.startDateTime).getTime()
     if (!Number.isFinite(finPrecedente)) return { creneau, intervalleMinutes: null }
 
     return { creneau, intervalleMinutes: Math.round((debut - finPrecedente) / 60000) }

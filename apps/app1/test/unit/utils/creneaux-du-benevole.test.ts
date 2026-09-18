@@ -9,14 +9,14 @@ import { creneauxDuBenevole } from '../../../../../layers/volunteers/app/utils/c
  */
 const creneau = (
   id: string,
-  start: string,
-  end: string,
+  startDateTime: string,
+  endDateTime: string,
   benevoles: number[] = [],
   organisateurs: number[] = []
 ) => ({
   id,
-  start,
-  end,
+  startDateTime,
+  endDateTime,
   assignedVolunteersList: benevoles.map((userId) => ({ user: { id: userId } })),
   assignedOrganizersList: organisateurs.map((userId) => ({ user: { id: userId } })),
 })

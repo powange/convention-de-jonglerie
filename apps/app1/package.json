@@ -86,6 +86,7 @@
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
     "@fullcalendar/list": "^6.1.20",
+    "@fullcalendar/luxon3": "^6.1.21",
     "@fullcalendar/resource": "^6.1.20",
     "@fullcalendar/resource-timeline": "^6.1.20",
     "@fullcalendar/timeline": "^6.1.20",

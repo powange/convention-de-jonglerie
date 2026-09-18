@@ -20,21 +20,26 @@ mockNuxtImport('useAvatar', () => () => ({ getUserAvatar: () => null }))
  * `initialDate` — l'option qui commande la position de FullCalendar. Ces tests fixent la règle :
  * seule une période différente déplace la vue.
  */
-const creneau = (id: string, start: string, end: string) => ({
+const creneau = (id: string, startDateTime: string, endDateTime: string) => ({
   id,
   title: `Créneau ${id}`,
-  start,
-  end,
+  startDateTime,
+  endDateTime,
   maxVolunteers: 2,
   assignedVolunteers: 0,
 })
 
-const monter = (timeSlots: ReturnType<typeof ref<any[]>>, dates = ['2026-09-25', '2026-09-27']) =>
+const monter = (
+  timeSlots: ReturnType<typeof ref<any[]>>,
+  dates = ['2026-09-25', '2026-09-27'],
+  fuseau: string | null = null
+) =>
   useVolunteerSchedule({
     teams: ref([]),
     timeSlots,
     editionStartDate: ref(dates[0]),
     editionEndDate: ref(dates[1]),
+    fuseau,
     onTimeSlotCreate: vi.fn(),
     onTimeSlotUpdate: vi.fn(),
     onTimeSlotClick: vi.fn(),
@@ -211,5 +216,60 @@ describe('useVolunteerSchedule — repères des équipes', () => {
 
     expect(noeud.querySelector('[title]')).toBeNull()
     expect(noeud.textContent).toBe('Cuisine')
+  })
+})
+
+/**
+ * L'heure d'un créneau est une heure de LIEU.
+ *
+ * « Le créneau accueil est à 14 h » veut dire 14 h sur place, que le planning soit consulté
+ * depuis Paris, Tokyo ou un train. Sans fuseau posé, FullCalendar affiche dans celui du
+ * navigateur, et le même créneau change d'heure selon qui regarde — ce qui est précisément ce
+ * qu'un planning ne doit jamais faire.
+ *
+ * Ces tests tiennent l'OPTION passée à FullCalendar, et non le rendu : c'est elle qui commande,
+ * et elle seule se teste sans monter un calendrier.
+ */
+describe('useVolunteerSchedule — fuseau de l’édition', () => {
+  it("affiche dans le fuseau de l'édition quand elle en déclare un", () => {
+    const { calendarOptions } = monter(ref([]), ['2026-09-25', '2026-09-27'], 'Europe/Paris')
+
+    expect(calendarOptions.timeZone).toBe('Europe/Paris')
+  })
+
+  it("retombe sur la machine quand l'édition n'a pas de fuseau", () => {
+    // Le champ est facultatif et les éditions anciennes n'en ont pas : un planning aux heures du
+    // navigateur reste plus utile qu'un planning vide.
+    const { calendarOptions } = monter(ref([]), ['2026-09-25', '2026-09-27'], null)
+
+    expect(calendarOptions.timeZone).toBe('local')
+  })
+
+  it('retombe sur la machine quand le fuseau enregistré est invalide', () => {
+    // La valeur vient parfois d'un import. La donner telle quelle à FullCalendar afficherait des
+    // heures fausses sans rien signaler.
+    const { calendarOptions } = monter(ref([]), ['2026-09-25', '2026-09-27'], 'Europe/Pariss')
+
+    expect(calendarOptions.timeZone).toBe('local')
+  })
+
+  it("suit le fuseau quand l'édition arrive après le montage", async () => {
+    // Cas courant : la carte se construit avant que l'édition soit chargée. Sans réactivité, le
+    // calendrier resterait figé sur l'heure du navigateur jusqu'au rechargement suivant.
+    const fuseau = ref<string | null>(null)
+    const { calendarOptions } = useVolunteerSchedule({
+      teams: ref([]),
+      timeSlots: ref([]),
+      editionStartDate: ref('2026-09-25'),
+      editionEndDate: ref('2026-09-27'),
+      fuseau,
+    } as any)
+
+    expect(calendarOptions.timeZone).toBe('local')
+
+    fuseau.value = 'Europe/Paris'
+    await nextTick()
+
+    expect(calendarOptions.timeZone).toBe('Europe/Paris')
   })
 })

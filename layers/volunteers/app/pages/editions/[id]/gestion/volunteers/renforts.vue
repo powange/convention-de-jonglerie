@@ -158,6 +158,12 @@ const { t, locale } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
 
+/** Le fuseau de l'édition, qui commande toutes les heures de cette page. */
+const editionStore = useEditionStore()
+const fuseauEdition = computed(
+  () => (editionStore.getEditionById(editionId) as any)?.timezone ?? null
+)
+
 interface Equipe {
   id: string
   name: string
@@ -199,14 +205,25 @@ const chargement = ref(true)
 const maintenant = ref(new Date())
 let horloge: ReturnType<typeof setInterval> | null = null
 
+/**
+ * L'heure de l'ÉVÉNEMENT, y compris l'horloge « il est ».
+ *
+ * Sur place, cela ne change rien — le navigateur y est déjà. À distance, c'est ce qui permet de
+ * comparer l'heure courante aux créneaux affichés juste en dessous : deux horloges différentes
+ * sur le même écran rendraient la page inutilisable pour décider d'un renfort.
+ */
+const optionsHeure = computed(() => ({
+  hour: '2-digit' as const,
+  minute: '2-digit' as const,
+  timeZone: fuseauUtilisable(fuseauEdition.value),
+}))
+
 const heureAffichee = computed(() =>
-  maintenant.value.toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
+  maintenant.value.toLocaleTimeString(locale.value, optionsHeure.value)
 )
 
 const heureDe = (date: string | Date | undefined) =>
-  date
-    ? new Date(date).toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
-    : ''
+  date ? new Date(date).toLocaleTimeString(locale.value, optionsHeure.value) : ''
 
 const renfortsTries = computed(() => volantsParDisponibilite(renforts.value, maintenant.value))
 const resume = computed(() => resumeDesRenforts(renforts.value, maintenant.value))

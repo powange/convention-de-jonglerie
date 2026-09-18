@@ -105,3 +105,64 @@ describe('formatPlage', () => {
     expect(formatPlage(null, null)).toBe('')
   })
 })
+
+/**
+ * L'heure d'un créneau est une heure de LIEU.
+ *
+ * Ces fonctions lisaient l'heure avec `getHours()`, c'est-à-dire dans le fuseau de la machine :
+ * le même créneau s'annonçait à 14 h à Paris et à 21 h à Tokyo. Le fuseau est facultatif — ces
+ * formateurs servent aussi aux pages programme, qu'on ne veut pas déplacer ici — mais dès qu'il
+ * est fourni, c'est lui qui commande.
+ *
+ * Les instants sont écrits en UTC explicite : sans le `Z`, le test dépendrait du fuseau de la
+ * machine qui l'exécute, et ne prouverait plus rien.
+ */
+describe('formatHeure — fuseau de l’édition', () => {
+  /**
+   * ⚠️ Les attentes « Paris » ne prouvent RIEN à elles seules ici : le conteneur de test tourne
+   * en `Europe/Paris`, et `getHours()` — le comportement qu'on remplace — y donne par hasard la
+   * même valeur. La neutralisation l'a montré : sur cinq tests écrits d'abord autour de Paris,
+   * un seul rougissait.
+   *
+   * Chaque test porte donc une attente sur un fuseau ÉLOIGNÉ, et celui-ci verrouille l'écart :
+   * quel que soit le fuseau de la machine qui exécute la suite, les deux ne peuvent pas être
+   * simultanément faux sans que ce test le voie.
+   */
+  it('rend deux heures différentes pour deux fuseaux, sur le même instant', () => {
+    const instant = '2026-10-02T12:00:00Z'
+
+    expect(formatHeure(instant, 'Europe/Paris')).not.toBe(formatHeure(instant, 'Asia/Tokyo'))
+  })
+
+  it('lit 12:00 UTC comme 14h à Paris et 21h à Tokyo', () => {
+    expect(formatHeure('2026-10-02T12:00:00Z', 'Europe/Paris')).toBe('14h')
+    expect(formatHeure('2026-10-02T12:00:00Z', 'Asia/Tokyo')).toBe('21h')
+  })
+
+  it('garde les minutes dans le rendu « 21h05 »', () => {
+    // Aucun format standard ne produit cette forme : le découpage manuel doit survivre au fuseau.
+    expect(formatHeure('2026-10-02T12:05:00Z', 'Asia/Tokyo')).toBe('21h05')
+  })
+
+  it('suit le passage à l’heure d’hiver', () => {
+    // Fin novembre, Paris est à UTC+1 et non plus +2 : 13h, et non 14h comme en octobre.
+    // L'attente Sydney, elle, ne dépend pas du fuseau de la machine.
+    expect(formatHeure('2026-11-20T12:00:00Z', 'Europe/Paris')).toBe('13h')
+    expect(formatHeure('2026-11-20T12:00:00Z', 'Australia/Sydney')).toBe('23h')
+  })
+
+  it('retombe sur la machine quand le fuseau est inconnu', () => {
+    // La valeur vient parfois d'un import. Mieux vaut une heure approximative qu'une case vide.
+    expect(formatHeure('2026-10-02T12:00:00Z', 'Europe/Pariss')).toBe(
+      formatHeure('2026-10-02T12:00:00Z')
+    )
+  })
+})
+
+describe('formatPlage — fuseau de l’édition', () => {
+  it('rend les deux bornes dans le fuseau demandé', () => {
+    expect(formatPlage('2026-10-02T12:00:00Z', '2026-10-02T14:30:00Z', 'Asia/Tokyo')).toBe(
+      '21h - 23h30'
+    )
+  })
+})

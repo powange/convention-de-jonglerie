@@ -77,8 +77,8 @@ export function chargeParPeriode(
   }
 
   for (const creneau of creneaux) {
-    const debut = new Date(creneau.start)
-    const fin = new Date(creneau.end)
+    const debut = new Date(creneau.startDateTime)
+    const fin = new Date(creneau.endDateTime)
     const duree = (fin.getTime() - debut.getTime()) / (1000 * 60 * 60)
     if (!Number.isFinite(duree) || duree <= 0) continue
 

@@ -1,4 +1,5 @@
 import { exigerPlanningPublie } from '../../../../utils/planning-publie'
+import { selectionCreneauLisible } from '../../../../utils/selection-creneau-lisible'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
@@ -30,14 +31,10 @@ export default wrapApiHandler(
         id: true,
         timeSlot: {
           select: {
-            id: true,
-            title: true,
-            startDateTime: true,
-            endDateTime: true,
+            ...selectionCreneauLisible,
             // L'occupation se compte sur les affectations réelles, comme partout dans le dépôt.
             maxVolunteers: true,
             _count: { select: { assignments: true } },
-            team: { select: { id: true, name: true, color: true } },
           },
         },
       },

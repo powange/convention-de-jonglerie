@@ -123,8 +123,8 @@ interface Props {
 }
 
 interface SlotCreateData {
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   teamId: string
 }
 
@@ -133,8 +133,8 @@ interface SlotUpdateData {
   title: string
   description?: string
   teamId?: string
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   maxVolunteers: number
 }
 
@@ -224,8 +224,8 @@ const convertedTimeSlots = computed(() => {
     (slot): VolunteerTimeSlot => ({
       id: slot.id,
       title: slot.title,
-      start: slot.start,
-      end: slot.end,
+      startDateTime: slot.startDateTime,
+      endDateTime: slot.endDateTime,
       teamId: slot.teamId,
       maxVolunteers: slot.maxVolunteers,
       assignedVolunteers: slot.assignedVolunteers,
@@ -273,8 +273,8 @@ const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
           myStats.user = userInfo
         }
 
-        const startTime = new Date(slot.start)
-        const endTime = new Date(slot.end)
+        const startTime = new Date(slot.startDateTime)
+        const endTime = new Date(slot.endDateTime)
         const hours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)
         const dayKey = startTime.toISOString().split('T')[0] ?? ''
 
@@ -378,6 +378,9 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   teams: filteredTeams,
   timeSlots: filteredTimeSlots,
   readOnly: computed(() => !props.canManageVolunteers),
+  // L'heure d'un créneau est celle du LIEU. `computed` et non valeur figée : l'édition arrive
+  // souvent après le premier rendu de la carte.
+  fuseau: computed(() => props.edition?.timezone ?? null),
   slotDuration: computed(() => selectedGranularity.value),
   vueInitiale,
   dateInitiale,
@@ -390,8 +393,8 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
   },
   onTimeSlotCreate: (start, end, resourceId) => {
     emit('create-slot', {
-      start,
-      end,
+      startDateTime: start,
+      endDateTime: end,
       teamId: resourceId === 'unassigned' ? '' : resourceId,
     })
   },
@@ -407,8 +410,8 @@ const { calendarRef, calendarOptions, ready } = useVolunteerSchedule({
       title: timeSlot.title,
       description: timeSlot.description ?? undefined,
       teamId: timeSlot.teamId ?? undefined,
-      start: timeSlot.start,
-      end: timeSlot.end,
+      startDateTime: timeSlot.startDateTime,
+      endDateTime: timeSlot.endDateTime,
       maxVolunteers: timeSlot.maxVolunteers,
     })
   },
@@ -422,8 +425,8 @@ const openCreateSlotModal = () => {
   const defaultStart = props.edition?.startDate ? `${props.edition.startDate}T09:00` : ''
   const defaultEnd = props.edition?.startDate ? `${props.edition.startDate}T10:00` : ''
   emit('create-slot', {
-    start: defaultStart,
-    end: defaultEnd,
+    startDateTime: defaultStart,
+    endDateTime: defaultEnd,
     teamId: '',
   })
 }
@@ -551,7 +554,7 @@ const exportToPdf = async () => {
 
       // Trier les créneaux par date de début
       const sortedSlots = [...slotsToExport].sort((a, b) => {
-        return new Date(a.start).getTime() - new Date(b.start).getTime()
+        return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime()
       })
 
       // Filtrer pour le bénévole si c'est une vue bénévole
@@ -614,7 +617,7 @@ const exportToPdf = async () => {
           doc.setFontSize(9)
           doc.setFont('helvetica', 'normal')
           doc.setTextColor(107, 114, 128) // Gris
-          const timeRange = props.formatDateTimeRange(slot.start, slot.end)
+          const timeRange = props.formatDateTimeRange(slot.startDateTime, slot.endDateTime)
           const timeRangeWidth = doc.getTextWidth(timeRange)
           doc.text(timeRange, pageWidth - margin - timeRangeWidth, currentY)
           currentY += 6

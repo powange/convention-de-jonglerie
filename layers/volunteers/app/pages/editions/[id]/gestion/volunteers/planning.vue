@@ -99,6 +99,7 @@
           :volunteers="acceptedVolunteers"
           :time-slots="convertedTimeSlots"
           :teams="[...teams]"
+          :fuseau="fuseauEdition"
           class="mt-6"
           @assignments-applied="refreshData"
         />
@@ -126,6 +127,7 @@
         :time-slots="convertedTimeSlots"
         :teams="convertedTeams"
         :format-date="formatDate"
+        :fuseau="fuseauEdition"
         @slot-click="handleSlotClick"
       />
 
@@ -134,6 +136,7 @@
         :time-slot="selectedTimeSlot"
         :teams="[...teams]"
         :read-only="!canManageVolunteers"
+        :fuseau="fuseauEdition"
         @edit-slot="handleEditSlotFromDetails"
         @manage-assignments="handleManageAssignments"
         @manage-delay="handleManageDelay"
@@ -144,6 +147,7 @@
         v-model="assignmentsModalOpen"
         :edition-id="editionId"
         :time-slot="selectedTimeSlot"
+        :fuseau="fuseauEdition"
         @refresh="refreshData"
       />
 
@@ -152,6 +156,7 @@
         v-model="delayModalOpen"
         :edition-id="editionId"
         :time-slot="selectedTimeSlot"
+        :fuseau="fuseauEdition"
         @refresh="refreshData"
       />
 
@@ -161,6 +166,7 @@
         :teams="[...teams]"
         :edition-id="editionId"
         :initial-slot="slotModalData"
+        :fuseau="fuseauEdition"
         :a-montage-ou-demontage="aMontageOuDemontage"
         @save="handleSlotSave"
         @delete="handleSlotDelete"
@@ -170,7 +176,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDatetime } from '~/composables/useDatetime'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import { effectifParPeriode, PERIODES } from '~/utils/effectif-par-periode'
@@ -190,13 +195,13 @@ import type { VolunteerTimeSlot, VolunteerTeamCalendar } from '#imports'
 
 import { listeTronquee, pagesRestantes } from '../../../../../utils/pagination-complete'
 
+import { fuseauUtilisable, versChampLocal } from '~~/shared/utils/fuseau-edition'
+
 const { t } = useI18n()
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { toDatetimeLocal } = useDatetime()
-
 const editionId = parseInt(route.params.id as string)
 
 /**
@@ -290,8 +295,8 @@ const convertedTimeSlots = computed(() => {
     (slot): VolunteerTimeSlot => ({
       id: slot.id,
       title: slot.title,
-      start: slot.start,
-      end: slot.end,
+      startDateTime: slot.startDateTime,
+      endDateTime: slot.endDateTime,
       teamId: slot.teamId,
       maxVolunteers: slot.maxVolunteers,
       assignedVolunteers: slot.assignedVolunteers,
@@ -322,13 +327,13 @@ const canManageVolunteers = computed(() => {
 })
 
 // Handlers pour les événements du composant de planning
-const handleCreateSlot = (data: { start: string; end: string; teamId: string }) => {
+const handleCreateSlot = (data: { startDateTime: string; endDateTime: string; teamId: string }) => {
   slotModalData.value = {
     title: '',
     description: '',
     teamId: data.teamId || '',
-    startDateTime: toDatetimeLocal(data.start),
-    endDateTime: toDatetimeLocal(data.end),
+    startDateTime: versChampLocal(data.startDateTime, fuseauEdition.value),
+    endDateTime: versChampLocal(data.endDateTime, fuseauEdition.value),
     maxVolunteers: 3,
   }
   slotModalOpen.value = true
@@ -358,8 +363,8 @@ const handleEditSlotFromDetails = () => {
       title: selectedTimeSlot.value.title,
       description: selectedTimeSlot.value.description || '',
       teamId: selectedTimeSlot.value.teamId || '',
-      startDateTime: toDatetimeLocal(selectedTimeSlot.value.start),
-      endDateTime: toDatetimeLocal(selectedTimeSlot.value.end),
+      startDateTime: versChampLocal(selectedTimeSlot.value.start, fuseauEdition.value),
+      endDateTime: versChampLocal(selectedTimeSlot.value.end, fuseauEdition.value),
       maxVolunteers: selectedTimeSlot.value.maxVolunteers,
     }
     slotModalOpen.value = true
@@ -379,8 +384,8 @@ const handleSlotUpdate = async (data: {
   title: string
   description?: string
   teamId?: string
-  start: string
-  end: string
+  startDateTime: string
+  endDateTime: string
   maxVolunteers: number
 }) => {
   try {
@@ -388,8 +393,8 @@ const handleSlotUpdate = async (data: {
       title: data.title,
       description: data.description,
       teamId: data.teamId,
-      startDateTime: data.start,
-      endDateTime: data.end,
+      startDateTime: data.startDateTime,
+      endDateTime: data.endDateTime,
       maxVolunteers: data.maxVolunteers,
     })
     toast.add({
@@ -527,7 +532,8 @@ const canAccess = computed(() => {
 const formatDate = (dateStr: string) => {
   // `new Date('2026-09-25')` est lu comme MINUIT UTC, puis rendu dans le fuseau du navigateur :
   // à l'ouest de Greenwich, l'étiquette affichait la veille. Ces clés sont des dates de calendrier
-  // sans heure — on les ancre donc à minuit LOCAL, comme le fait déjà `formatDateTimeRange`.
+  // sans heure — on les ancre donc à minuit LOCAL. Elles ne passent PAS par le fuseau de
+  // l'édition : une clé de jour n'a pas d'instant, il n'y a donc rien à y convertir.
   const date = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`)
   return new Intl.DateTimeFormat('fr-FR', {
     weekday: 'long',
@@ -537,53 +543,43 @@ const formatDate = (dateStr: string) => {
   }).format(date)
 }
 
-// Fonction utilitaire pour formater une plage horaire avec le jour
+/**
+ * « mar. 2 oct. 14:00 - 16:00 » — dans le fuseau de l'ÉDITION.
+ *
+ * L'ancienne version extrayait les composants un à un pour « éviter les conversions de fuseau ».
+ * Elle évitait surtout de choisir : elle lisait dans celui du navigateur. Un même créneau
+ * s'annonçait donc à des heures différentes selon qui consultait le planning, et pouvait même
+ * changer de JOUR en fin de soirée.
+ *
+ * `Intl` avec un `timeZone` fait le travail en deux formateurs. Sans fuseau déclaré, `undefined`
+ * rend la machine — le comportement d'avant, conservé pour les éditions qui n'en ont pas.
+ */
 const formatDateTimeRange = (start: string, end: string) => {
-  // Parse les dates en tant que dates locales (sans conversion de timezone)
-  const startTime = new Date(start.includes('T') ? start : start + 'T00:00:00')
-  const endTime = new Date(end.includes('T') ? end : end + 'T00:00:00')
+  const zone = fuseauUtilisable(fuseauEdition.value)
+  const debut = new Date(start.includes('T') ? start : `${start}T00:00:00`)
+  const arrivee = new Date(end.includes('T') ? end : `${end}T00:00:00`)
+  if (Number.isNaN(debut.getTime()) || Number.isNaN(arrivee.getTime())) return ''
 
-  // Extraire les composants directement pour éviter les conversions de timezone
-  const startYear = startTime.getFullYear()
-  const startMonth = startTime.getMonth()
-  const startDate = startTime.getDate()
-  const startHours = startTime.getHours()
-  const startMinutes = startTime.getMinutes()
-
-  const endYear = endTime.getFullYear()
-  const endMonth = endTime.getMonth()
-  const endDate = endTime.getDate()
-  const endHours = endTime.getHours()
-  const endMinutes = endTime.getMinutes()
-
-  // Créer une date locale pour le formatage du jour
-  const startDateLocal = new Date(startYear, startMonth, startDate)
-  const endDateLocal = new Date(endYear, endMonth, endDate)
-
-  // Format pour le jour
-  const dayFormat = new Intl.DateTimeFormat('fr-FR', {
+  const jour = new Intl.DateTimeFormat('fr-FR', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
+    timeZone: zone,
+  })
+  const heure = new Intl.DateTimeFormat('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: zone,
   })
 
-  // Formater les heures manuellement
-  const formatTime = (hours: number, minutes: number) => {
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
-  }
+  const jourDebut = jour.format(debut)
+  const jourFin = jour.format(arrivee)
 
-  const startDay = dayFormat.format(startDateLocal)
-  const startTimeStr = formatTime(startHours, startMinutes)
-  const endTimeStr = formatTime(endHours, endMinutes)
-
-  // Si c'est le même jour, on affiche le jour une seule fois
-  if (startDateLocal.toDateString() === endDateLocal.toDateString()) {
-    return `${startDay} ${startTimeStr} - ${endTimeStr}`
-  } else {
-    // Si les créneaux sont sur des jours différents
-    const endDay = dayFormat.format(endDateLocal)
-    return `${startDay} ${startTimeStr} - ${endDay} ${endTimeStr}`
-  }
+  // Le jour n'est répété que si le créneau franchit minuit — sur place, pas chez le lecteur.
+  return jourDebut === jourFin
+    ? `${jourDebut} ${heure.format(debut)} - ${heure.format(arrivee)}`
+    : `${jourDebut} ${heure.format(debut)} - ${jourFin} ${heure.format(arrivee)}`
 }
 
 /**
@@ -645,10 +641,10 @@ const overlapWarnings = computed(() => {
         if (!slot1 || !slot2 || slot1.id === slot2.id) continue
 
         // Vérifier si les créneaux se chevauchent
-        const start1 = new Date(slot1.start)
-        const end1 = new Date(slot1.end)
-        const start2 = new Date(slot2.start)
-        const end2 = new Date(slot2.end)
+        const start1 = new Date(slot1.startDateTime)
+        const end1 = new Date(slot1.endDateTime)
+        const start2 = new Date(slot2.startDateTime)
+        const end2 = new Date(slot2.endDateTime)
 
         // Condition de chevauchement : start1 < end2 && start2 < end1
         if (start1 < end2 && start2 < end1) {
@@ -662,15 +658,15 @@ const overlapWarnings = computed(() => {
             slot1: {
               id: slot1.id,
               title: slot1.title || 'Sans titre',
-              start: slot1.start,
-              end: slot1.end,
+              startDateTime: slot1.startDateTime,
+              endDateTime: slot1.endDateTime,
               teamName: team1?.name || null,
             },
             slot2: {
               id: slot2.id,
               title: slot2.title || 'Sans titre',
-              start: slot2.start,
-              end: slot2.end,
+              startDateTime: slot2.startDateTime,
+              endDateTime: slot2.endDateTime,
               teamName: team2?.name || null,
             },
           })
@@ -724,8 +720,8 @@ const preferenceWarnings = computed(() => {
           slot: {
             id: slot.id,
             title: slot.title || 'Sans titre',
-            start: slot.start,
-            end: slot.end,
+            startDateTime: slot.startDateTime,
+            endDateTime: slot.endDateTime,
             teamName: team?.name || null,
           },
           teamName: team?.name || 'Équipe inconnue',
@@ -784,7 +780,7 @@ const mealTimeWarnings = computed(() => {
       const userId = assignment.user.id
 
       // Vérifier si le créneau couvre la période du déjeuner
-      if (coversEntireMealPeriod(slot.start, slot.end, LUNCH_START, LUNCH_END)) {
+      if (coversEntireMealPeriod(slot.startDateTime, slot.endDateTime, LUNCH_START, LUNCH_END)) {
         const team = convertedTeams.value.find((t) => t.id === slot.teamId)
 
         warnings.push({
@@ -793,8 +789,8 @@ const mealTimeWarnings = computed(() => {
           slot: {
             id: slot.id,
             title: slot.title || 'Sans titre',
-            start: slot.start,
-            end: slot.end,
+            startDateTime: slot.startDateTime,
+            endDateTime: slot.endDateTime,
             teamName: team?.name || null,
           },
           mealPeriod: 'lunch',
@@ -802,7 +798,7 @@ const mealTimeWarnings = computed(() => {
       }
 
       // Vérifier si le créneau couvre la période du dîner
-      if (coversEntireMealPeriod(slot.start, slot.end, DINNER_START, DINNER_END)) {
+      if (coversEntireMealPeriod(slot.startDateTime, slot.endDateTime, DINNER_START, DINNER_END)) {
         const team = convertedTeams.value.find((t) => t.id === slot.teamId)
 
         warnings.push({
@@ -811,8 +807,8 @@ const mealTimeWarnings = computed(() => {
           slot: {
             id: slot.id,
             title: slot.title || 'Sans titre',
-            start: slot.start,
-            end: slot.end,
+            startDateTime: slot.startDateTime,
+            endDateTime: slot.endDateTime,
             teamName: team?.name || null,
           },
           mealPeriod: 'dinner',
@@ -921,6 +917,9 @@ const volunteersStats = computed(() =>
  *
  * Sans lui, les relevés découpaient les jours en UTC quand le planning les affichait en heure
  * locale : un créneau de 00h30 était compté la veille. Voir `jour-edition`.
+ *
+ * Il sert aussi à remplir la modale de créneau : ce qu'elle affiche doit être l'heure du LIEU,
+ * la même que celle lue sur le calendrier juste à côté.
  */
 const fuseauEdition = computed(() => edition.value?.timezone ?? null)
 

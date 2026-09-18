@@ -1,3 +1,5 @@
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+
 /**
  * L'heure et la durée d'un créneau, dites d'une seule façon.
  *
@@ -43,25 +45,49 @@ export function dureeTraduisible(
   return { cle: 'volunteers.duration_minutes', valeurs: { minutes } }
 }
 
-/** Une heure à la française : « 15h », ou « 15h05 » quand les minutes comptent. */
-export function formatHeure(date: string | Date | null | undefined): string {
+/**
+ * Une heure à la française : « 15h », ou « 15h05 » quand les minutes comptent.
+ *
+ * `fuseau` est FACULTATIF, et c'est délibéré : ces deux fonctions servent aussi aux pages
+ * programme, qu'aucune demande ne couvre. Sans fuseau, le comportement reste celui d'avant —
+ * l'heure de la machine. Avec, l'heure est celle du LIEU, la seule qui vaille pour un créneau :
+ * « accueil à 14 h » veut dire 14 h sur place, que le planning soit lu de Paris ou de Tokyo.
+ */
+export function formatHeure(
+  date: string | Date | null | undefined,
+  fuseau?: string | null
+): string {
   if (!date) return ''
   const valeur = new Date(date)
   if (Number.isNaN(valeur.getTime())) return ''
 
-  const minutes = valeur.getMinutes()
-  return minutes === 0
-    ? `${valeur.getHours()}h`
-    : `${valeur.getHours()}h${String(minutes).padStart(2, '0')}`
+  const zone = fuseauUtilisable(fuseau)
+  // `Intl` plutôt que `getHours()` : c'est ce qui permet de lire l'heure AILLEURS que sur la
+  // machine. Le découpage manuel qui suit garde le rendu « 15h05 », qu'aucun format standard
+  // ne produit.
+  const [heures, minutes] = zone
+    ? new Intl.DateTimeFormat('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: zone,
+      })
+        .format(valeur)
+        .split(':')
+        .map(Number)
+    : [valeur.getHours(), valeur.getMinutes()]
+
+  return minutes === 0 ? `${heures}h` : `${heures}h${String(minutes).padStart(2, '0')}`
 }
 
 /** « 15h - 16h ». Vide si l'une des bornes manque. */
 export function formatPlage(
   debut: string | Date | null | undefined,
-  fin: string | Date | null | undefined
+  fin: string | Date | null | undefined,
+  fuseau?: string | null
 ): string {
-  const depart = formatHeure(debut)
-  const arrivee = formatHeure(fin)
+  const depart = formatHeure(debut, fuseau)
+  const arrivee = formatHeure(fin, fuseau)
   if (!depart || !arrivee) return depart || arrivee
   return `${depart} - ${arrivee}`
 }

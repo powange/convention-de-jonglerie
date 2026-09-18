@@ -74,6 +74,9 @@
         :key="slot.id"
         :time-slot="slot"
         :show-duration="showDuration"
+        :fuseau="fuseau"
+        :ouvrable="ouvrable"
+        @ouvrir="(creneau: TimeSlot) => emit('ouvrir', creneau)"
       />
     </div>
   </div>
@@ -81,6 +84,8 @@
 
 <script setup lang="ts">
 import { formatDurationCompact } from '~/utils/date'
+
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
 interface TimeSlot {
   id: string
@@ -112,6 +117,10 @@ const props = withDefaults(
     showDuration?: boolean
     editionName?: string
     volunteerName?: string
+    /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+    fuseau?: string | null
+    /** Rend les créneaux cliquables. Faux là où personne n'écoute `ouvrir`. */
+    ouvrable?: boolean
   }>(),
   {
     showHeader: false,
@@ -122,6 +131,16 @@ const props = withDefaults(
     volunteerName: undefined,
   }
 )
+
+const emit = defineEmits<{ ouvrir: [creneau: TimeSlot] }>()
+
+/**
+ * La liste ne décide pas de ce qu'ouvre un clic : elle le signale.
+ *
+ * Sur la page de bénévolat, l'écran ouvre la MÊME modale que le planning, avec les mêmes
+ * données — c'est le même créneau, il doit se lire pareil d'où qu'on vienne. Héberger ici une
+ * modale nourrie des seules données de la liste en aurait fabriqué une seconde, plus pauvre.
+ */
 
 const { t } = useI18n()
 
@@ -373,6 +392,9 @@ const exportToPdf = () => {
       end.setMinutes(end.getMinutes() + slot.delayMinutes)
     }
 
+    // L'imprimé doit annoncer les mêmes heures que l'écran : c'est le document qu'on emporte
+    // sur place, et deux versions d'un même horaire n'y survivraient pas.
+    const zone = fuseauUtilisable(props.fuseau)
     const formatTime = (date: Date) => {
       return date.toLocaleString('fr-FR', {
         weekday: 'long',
@@ -381,6 +403,7 @@ const exportToPdf = () => {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        timeZone: zone,
       })
     }
 
@@ -396,7 +419,7 @@ const exportToPdf = () => {
           </div>
         </div>
         <div class="time-slot-time">
-          ${formatTime(start)} → ${end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          ${formatTime(start)} → ${end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: zone })}
         </div>
         ${slot.team ? `<div class="time-slot-team" style="background-color: ${teamColor}22; color: ${teamColor};">${escapeHtml(slot.team.name)}</div>` : ''}
         ${slot.description ? `<div class="time-slot-description">${escapeHtml(slot.description)}</div>` : ''}

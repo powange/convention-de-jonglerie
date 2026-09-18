@@ -11,10 +11,10 @@ import {
  * quoi un bénévole déjà affecté à une partie de ses heures serait compté deux fois — une fois
  * dans l'effectif accepté, une fois dans le reste à couvrir.
  */
-const creneau = (start: string, end: string, benevoles = 0, organisateurs = 0) => ({
-  id: `${start}-${end}`,
-  start,
-  end,
+const creneau = (startDateTime: string, endDateTime: string, benevoles = 0, organisateurs = 0) => ({
+  id: `${startDateTime}-${endDateTime}`,
+  startDateTime,
+  endDateTime,
   assignedVolunteersList: Array.from({ length: benevoles }, (_, i) => ({
     user: { id: 100 + i, pseudo: `benevole${i}` },
   })),

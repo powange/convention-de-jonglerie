@@ -264,9 +264,9 @@
 import { computed, ref, watch } from 'vue'
 import { z } from 'zod'
 
-import { useDatetime } from '~/composables/useDatetime'
-
 import type { VolunteerTimeSlot, VolunteerTeam } from '#imports'
+
+import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 
 // Props
 interface Props {
@@ -278,6 +278,12 @@ interface Props {
     endDateTime?: string
   }
   readOnly?: boolean
+  /**
+   * Fuseau de l'édition (IANA). Ce que l'organisateur saisit est une heure de LIEU : « 14 h »
+   * veut dire 14 h sur place, pas 14 h chez lui. Sans ce fuseau, la saisie était ancrée à celle
+   * du navigateur, et le créneau changeait d'heure selon d'où il avait été créé.
+   */
+  fuseau?: string | null
   /**
    * Vrai si l'édition déclare un montage ou un démontage. L'étendue correspondante n'est
    * proposée que dans ce cas : sans ces dates, elle se confondrait avec la période de
@@ -310,7 +316,6 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 // Composable dates
-const { toDatetimeLocal, fromDatetimeLocal, toApiFormat } = useDatetime()
 
 // État
 const loading = ref(false)
@@ -495,15 +500,13 @@ const close = () => {
 const setDuration = (hours: number) => {
   if (!formState.value.startDateTime) return
 
-  // Convertir datetime-local en Date
-  const startDate = fromDatetimeLocal(formState.value.startDateTime)
-  if (!startDate) return
+  // Aller et retour par le fuseau de l'édition. Passer par l'instant plutôt que d'ajouter des
+  // heures au texte saisi est ce qui rend juste la nuit du changement d'heure.
+  const debut = versInstant(formState.value.startDateTime, props.fuseau)
+  if (!debut) return
 
-  // Ajouter la durée
-  const endDate = new Date(startDate.getTime() + hours * 60 * 60 * 1000)
-
-  // Reconvertir en datetime-local pour l'input
-  formState.value.endDateTime = toDatetimeLocal(endDate)
+  const fin = new Date(new Date(debut).getTime() + hours * 60 * 60 * 1000)
+  formState.value.endDateTime = versChampLocal(fin, props.fuseau)
 }
 
 // Gestion du changement de date de début
@@ -525,14 +528,14 @@ const onSubmit = async () => {
     const selectedTeam = props.teams.find((t) => t.id === formState.value.teamId)
     const color = selectedTeam?.color || '#6b7280'
 
-    // Convertir les dates en format ISO pour l'API
-    const startDate = fromDatetimeLocal(formState.value.startDateTime)
-    const endDate = fromDatetimeLocal(formState.value.endDateTime)
-    const start = toApiFormat(startDate)
-    const end = toApiFormat(endDate)
+    // L'heure saisie est ancrée au fuseau de l'ÉDITION, puis envoyée en instant absolu.
+    const start = versInstant(formState.value.startDateTime, props.fuseau)
+    const end = versInstant(formState.value.endDateTime, props.fuseau)
 
-    // Une date illisible rendait `null`, et le créneau partait quand même : le serveur
+    // Une date illisible rend une chaîne vide, et le créneau partait quand même : le serveur
     // recevait un créneau sans début ni fin. On s'arrête là plutôt que de l'envoyer.
+    // `versInstant` rend vide aussi quand le fuseau annoncé est inconnu — enregistrer un instant
+    // faux serait pire, une donnée fausse en base survivant bien plus longtemps qu'un refus.
     if (!start || !end) return
 
     const slotData = {

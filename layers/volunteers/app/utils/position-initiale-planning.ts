@@ -10,14 +10,14 @@
 
 /** Un créneau, réduit à ce qui détermine sa position. */
 export interface CreneauPositionnable {
-  start: string
+  startDateTime: string
   /** Retard appliqué au créneau, en minutes : la frise doit viser l'heure réellement affichée. */
   delayMinutes?: number | null
 }
 
 /** Le début effectif d'un créneau, retard compris. */
 function debutEffectif(creneau: CreneauPositionnable): number {
-  const debut = new Date(creneau.start).getTime()
+  const debut = new Date(creneau.startDateTime).getTime()
   if (!Number.isFinite(debut)) return Number.NaN
   return debut + (creneau.delayMinutes ?? 0) * 60_000
 }

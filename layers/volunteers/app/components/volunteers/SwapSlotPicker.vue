@@ -11,7 +11,7 @@
       @click="ouvert = true"
     >
       <span v-if="choisi" class="min-w-0 text-left">
-        <VolunteersCreneauLigne :creneau="choisi.creneau" />
+        <VolunteersCreneauLigne :creneau="choisi.creneau" :fuseau="fuseau" />
       </span>
       <span v-else class="text-gray-500">{{ placeholder }}</span>
       <UIcon name="i-lucide-chevron-down" class="size-4 shrink-0" />
@@ -29,7 +29,7 @@
               :class="{ 'bg-primary-50 dark:bg-primary-950/30': option.id === modelValue }"
               @click="choisir(option.id)"
             >
-              <VolunteersCreneauLigne :creneau="option.creneau" />
+              <VolunteersCreneauLigne :creneau="option.creneau" :fuseau="fuseau" />
 
               <!-- Qui tient le créneau : l'information décisive pour choisir avec qui échanger. -->
               <span v-if="option.benevole" class="flex items-center gap-2 text-sm">
@@ -65,6 +65,8 @@ const props = defineProps<{
   titre: string
   placeholder: string
   messageVide: string
+  /** Fuseau de l'édition : un créneau s'annonce à l'heure du LIEU. */
+  fuseau?: string | null
 }>()
 
 const emit = defineEmits<{ 'update:modelValue': [value: string | null] }>()

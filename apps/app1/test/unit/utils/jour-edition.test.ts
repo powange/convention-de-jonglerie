@@ -65,8 +65,8 @@ const equipe = [{ id: 'hyg', name: 'Hygiène' }]
 const creneau = (titre: string, debutParis: string, finParis: string, besoin: number) => ({
   id: titre,
   title: titre,
-  start: new Date(`${debutParis}+02:00`).toISOString(),
-  end: new Date(`${finParis}+02:00`).toISOString(),
+  startDateTime: new Date(`${debutParis}+02:00`).toISOString(),
+  endDateTime: new Date(`${finParis}+02:00`).toISOString(),
   teamId: 'hyg',
   maxVolunteers: besoin,
   // Ces relevés lisent la forme CONVERTIE côté client, pas celle de l'API.

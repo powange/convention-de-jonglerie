@@ -1,5 +1,14 @@
 <template>
   <UModal v-model:open="isOpen" size="lg" :title="modalTitle" :description="modalDescription">
+    <!-- La prop `description` reste, pour ce que lisent les technologies d'assistance ; cet
+         emplacement ne change que le rendu, en y ajoutant la couleur de l'équipe. -->
+    <template #description>
+      <span class="flex items-center gap-1.5">
+        <span class="size-2.5 rounded-full shrink-0" :style="{ backgroundColor: couleurEquipe }" />
+        <span>{{ modalDescription }}</span>
+      </span>
+    </template>
+
     <template #body>
       <!-- Mode édition : afficher les options -->
       <div v-if="!readOnly" class="space-y-3">
@@ -90,19 +99,35 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4 pl-6">
+          <!-- Une colonne sur mobile : deux dates complètes côte à côte s'y coupaient en
+               plein milieu, et l'heure se lisait sur deux lignes. -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-6">
             <div class="space-y-1">
               <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('common.start') }}</p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ formatDateTime(timeSlot?.start) }}
+                {{ formatDateTime(horaires?.debut) }}
               </p>
             </div>
             <div class="space-y-1">
               <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('common.end') }}</p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ formatDateTime(timeSlot?.end) }}
+                {{ formatDateTime(horaires?.fin) }}
               </p>
             </div>
+          </div>
+
+          <!-- Le décalage est annoncé avec l'horaire prévu barré à côté : c'est cette modale
+               qu'on ouvre pour VÉRIFIER une heure, elle ne doit pas la donner sans dire qu'elle
+               a bougé. -->
+          <div
+            v-if="libelleDecalage"
+            class="flex flex-wrap items-center gap-2 pl-6 text-xs text-orange-600 dark:text-orange-400"
+          >
+            <UIcon name="i-heroicons-clock" class="w-4 h-4 shrink-0" />
+            <span class="font-medium">{{ libelleDecalage }}</span>
+            <span class="line-through text-gray-400 dark:text-gray-500">
+              {{ formatDateTime(horaires?.debutPrevu) }} – {{ formatDateTime(horaires?.finPrevue) }}
+            </span>
           </div>
         </div>
 
@@ -216,6 +241,9 @@
 import type { VolunteerTimeSlot, VolunteerTeam } from '~/types/volunteer'
 
 import { dureeTraduisible } from '../../../../utils/plage-horaire'
+import { decalageTraduisible, horairesEffectifs } from '../../../../utils/retard-creneau'
+
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
 
 interface Assignment {
   id: string
@@ -239,6 +267,8 @@ interface Props {
   timeSlot: VolunteerTimeSlot | null
   teams: VolunteerTeam[]
   readOnly?: boolean
+  /** Fuseau de l'édition : l'heure d'un créneau est celle du LIEU, comme sur le planning. */
+  fuseau?: string | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -250,8 +280,7 @@ const emit = defineEmits<{
   (e: 'edit-slot' | 'manage-assignments' | 'manage-delay'): void
 }>()
 
-const { t } = useI18n()
-const { formatForDisplay } = useDatetime()
+const { t, locale } = useI18n()
 
 // État de la modal
 const isOpen = computed({
@@ -280,21 +309,59 @@ const modalTitle = computed(() => {
   return props.timeSlot?.title || t('edition.volunteers.untitled_slot')
 })
 
-const modalDescription = computed(() => {
-  const team = props.teams.find((t) => t.id === props.timeSlot?.teamId)
-  return team?.name || t('volunteers.no_team')
-})
+const equipeDuCreneau = computed(() => props.teams.find((e) => e.id === props.timeSlot?.teamId))
+
+const modalDescription = computed(() => equipeDuCreneau.value?.name || t('volunteers.no_team'))
+
+/**
+ * La couleur de l'équipe, celle du créneau à défaut, et un gris neutre en dernier recours : un
+ * créneau sans équipe ne doit pas emprunter la couleur du précédent. Même règle que dans la
+ * liste des créneaux d'un bénévole.
+ */
+const couleurEquipe = computed(
+  () =>
+    equipeDuCreneau.value?.color ||
+    (props.timeSlot as { color?: string } | null)?.color ||
+    '#9ca3af'
+)
 
 // Durée — le calcul vit dans `plage-horaire.ts`, partagé avec l'infobulle du planning.
 const duration = computed(() => {
-  const duree = dureeTraduisible(props.timeSlot?.start, props.timeSlot?.end)
+  const duree = dureeTraduisible(props.timeSlot?.startDateTime, props.timeSlot?.endDateTime)
   return duree ? t(duree.cle, duree.valeurs) : null
 })
 
-// Formatage de la date/heure
-const formatDateTime = (dateTime: string | undefined) => {
+/**
+ * Les horaires RÉELS du créneau, décalage compris.
+ *
+ * Cette modale montrait l'heure enregistrée. Or c'est elle qu'on ouvre pour vérifier un créneau
+ * dont on doute — et le calendrier, juste derrière, affichait déjà l'heure décalée. Deux
+ * réponses contradictoires à la même question, la moins fiable étant donnée au geste le plus
+ * délibéré.
+ */
+const horaires = computed(() =>
+  horairesEffectifs(
+    props.timeSlot?.startDateTime,
+    props.timeSlot?.endDateTime,
+    props.timeSlot?.delayMinutes
+  )
+)
+
+const libelleDecalage = computed(() => {
+  const decalage = decalageTraduisible(horaires.value?.decalageMinutes)
+  return decalage ? t(decalage.cle, decalage.valeurs) : null
+})
+
+/**
+ * La date et l'heure dans le fuseau de l'ÉDITION.
+ *
+ * Elle passait par `formatForDisplay`, qui n'accepte pas de fuseau et retombe donc sur celui du
+ * navigateur : la liste « mes créneaux » annonçait la bonne heure, et la modale qu'on ouvrait
+ * en cliquant dessus en annonçait une autre. Deux réponses contradictoires à un geste.
+ */
+const formatDateTime = (dateTime: string | Date | undefined) => {
   if (!dateTime) return '-'
-  return formatForDisplay(new Date(dateTime))
+  return formaterDateHeure(dateTime, props.fuseau, locale.value) || '-'
 }
 
 // Charger les assignations

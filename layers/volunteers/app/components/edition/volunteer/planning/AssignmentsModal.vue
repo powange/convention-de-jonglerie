@@ -20,13 +20,13 @@
             <div class="space-y-1">
               <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('common.start') }}</p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ formatDateTime(timeSlot?.start) }}
+                {{ formatDateTime(timeSlot?.startDateTime) }}
               </p>
             </div>
             <div class="space-y-1">
               <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('common.end') }}</p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">
-                {{ formatDateTime(timeSlot?.end) }}
+                {{ formatDateTime(timeSlot?.endDateTime) }}
               </p>
             </div>
           </div>
@@ -377,11 +377,15 @@ import { benevolesAffectables } from '../../../../utils/benevoles-affectables'
 import { organisateursAffectables } from '../../../../utils/organisateurs-affectables'
 import { dureeTraduisible } from '../../../../utils/plage-horaire'
 
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 // Props
 interface Props {
   modelValue: boolean
   editionId: number
   timeSlot: VolunteerTimeSlot | null
+  /** Fuseau de l'édition : l'heure d'un créneau est celle du LIEU, comme sur le planning. */
+  fuseau?: string | null
 }
 
 const props = defineProps<Props>()
@@ -393,8 +397,7 @@ const emit = defineEmits<{
 }>()
 
 // i18n
-const { t } = useI18n()
-const { formatForDisplay } = useDatetime()
+const { t, locale } = useI18n()
 
 // État
 const showVolunteerSelector = ref(false)
@@ -496,14 +499,20 @@ const availableOrganizers = computed(() =>
 
 // Durée — le calcul vit dans `plage-horaire.ts`, partagé avec l'infobulle du planning.
 const duration = computed(() => {
-  const duree = dureeTraduisible(props.timeSlot?.start, props.timeSlot?.end)
+  const duree = dureeTraduisible(props.timeSlot?.startDateTime, props.timeSlot?.endDateTime)
   return duree ? t(duree.cle, duree.valeurs) : null
 })
 
-// Formatage de la date/heure
-const formatDateTime = (dateTime: string | undefined) => {
+/**
+ * La date et l'heure dans le fuseau de l'ÉDITION.
+ *
+ * Ce `formatDateTime` était recopié à l'identique dans trois modales du planning, et les trois
+ * retombaient sur le fuseau du navigateur : la frise annonçait l'heure du lieu, les modales
+ * qu'on ouvrait depuis elle en annonçaient une autre.
+ */
+const formatDateTime = (dateTime: string | Date | undefined) => {
   if (!dateTime) return '-'
-  return formatForDisplay(new Date(dateTime))
+  return formaterDateHeure(dateTime, props.fuseau, locale.value) || '-'
 }
 
 /**
