@@ -34,8 +34,15 @@
 
       <!-- Le rattachement des organisateurs aux équipes : il vivait sur la page des
            organisateurs, fermée au droit « gérer les bénévoles » que son écriture exige pourtant.
-           Il vit désormais là où la décision se prend. -->
-      <VolunteersOrganizersInTeamsCard :edition-id="editionId" />
+           Il vit désormais là où la décision se prend.
+
+           Masqué quand l'option est fermée : le point d'API d'écriture la contrôle et refuse par
+           un 403. Sans ce `v-if`, la carte proposait de choisir des équipes puis échouait à
+           l'enregistrement — une promesse tenue jusqu'au dernier clic, sur 47 éditions sur 49. -->
+      <VolunteersOrganizersInTeamsCard
+        v-if="edition?.volunteersOrganizersInTeams"
+        :edition-id="editionId"
+      />
     </div>
   </div>
 </template>
