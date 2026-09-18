@@ -124,8 +124,11 @@ test.describe.serial('Tâches — tri par échéance', () => {
      * le seuil de saisie (8 px), sans quoi l'appui reste un simple clic ; et l'approche se fait en
      * plusieurs pas, parce que la cible survolée est relue à chaque `pointermove`.
      */
+    const carteDe = (titre: string) =>
+      page.locator('[data-reordonnable]').filter({ hasText: titre }).first()
+
     const boiteDe = async (titre: string) => {
-      const carte = page.locator('[data-reordonnable]').filter({ hasText: titre }).first()
+      const carte = carteDe(titre)
       await expect(carte).toBeVisible({ timeout: 10000 })
       const boite = await carte.boundingBox()
       if (!boite) throw new Error(`carte sans boîte : ${titre}`)
@@ -133,6 +136,13 @@ test.describe.serial('Tâches — tri par échéance', () => {
     }
 
     const glisser = async (depuis: string, vers: string) => {
+      // ⚠️ La cible doit être DANS la fenêtre avant de viser. `boundingBox` rend la position même
+      // hors écran, et `page.mouse` ne fait défiler pour personne : le pointeur se posait alors
+      // au-delà du bas de la fenêtre, où `elementFromPoint` ne rend rien et où le composable ne
+      // voyait donc aucune carte survolée. Avec quatre tâches de 92 pixels, la dernière sortait
+      // déjà des 720 pixels de haut du navigateur de test.
+      await carteDe(vers).scrollIntoViewIfNeeded()
+      // Les deux boîtes sont relues APRÈS le défilement, qui a déplacé la source aussi.
       const source = await boiteDe(depuis)
       const cible = await boiteDe(vers)
 

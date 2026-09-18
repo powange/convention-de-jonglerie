@@ -186,7 +186,10 @@ export function useReordonnancementTactile<T>(options: OptionsReordonnancement<T
     }
 
     const boite = cible.getBoundingClientRect()
-    cleSurvolee.value = cleCible
+    // `dataset` ne rend que des chaînes. Les modèles comparent à `task.id`, un nombre : sans cette
+    // conversion, `'45' === 45` est faux et le trait d'insertion ne s'affiche jamais — le
+    // glissement fonctionne, mais à l'aveugle.
+    cleSurvolee.value = /^\d+$/.test(cleCible) ? Number(cleCible) : cleCible
     cote.value = event.clientY < boite.top + boite.height / 2 ? 'avant' : 'apres'
   }
 
