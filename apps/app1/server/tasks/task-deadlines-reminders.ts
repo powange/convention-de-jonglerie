@@ -46,6 +46,14 @@ export default defineTask({
         where: {
           status: { in: ['TODO', 'IN_PROGRESS'] },
           deadline: { gte: todayStart, lte: fenetreFin },
+          // Rien ne part d'une édition qui a éteint le module.
+          //
+          // Le drapeau ne ferme pas la gestion — aucun module de ce dépôt ne le fait, et les
+          // organisateurs gardent la main par l'URL. Ce qu'il gouverne, c'est ce qui ATTEINT les
+          // autres : le menu, la page publique, et « Mes tâches », dont le point d'API rend 404
+          // quand il est faux. Un rappel échappait à cette règle : l'assigné recevait une
+          // notification pour une tâche dont la page lui était fermée, et cliquait dans le vide.
+          group: { edition: { tasksEnabled: true } },
         },
         include: {
           group: {
