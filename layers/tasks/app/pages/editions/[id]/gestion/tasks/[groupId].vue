@@ -308,6 +308,7 @@
 import type { TaskFiltersValue, TaskSort } from '../../../../../components/tasks/TaskFilters.vue'
 
 import { valeurDepuisUrl } from '~~/shared/utils/filtres-url'
+import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -481,13 +482,10 @@ const filteredTasks = computed<TaskItem[]>(() => {
   if (!group.value) return []
   let list = group.value.tasks
 
-  const q = filters.value.q.toLowerCase()
-  if (q) {
-    list = list.filter(
-      (t) =>
-        t.title.toLowerCase().includes(q) ||
-        (t.description ? t.description.toLowerCase().includes(q) : false)
-    )
+  // Accents et casse ignorés : sur un clavier de téléphone, taper « reserver » pour trouver
+  // « Réserver la salle » est le cas courant, pas l'exception.
+  if (filters.value.q.trim()) {
+    list = list.filter((t) => contientLaSaisie(filters.value.q, t.title, t.description))
   }
 
   if (filters.value.statuses.length) {

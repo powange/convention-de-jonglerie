@@ -142,6 +142,10 @@ const IGNORED_MISSING_KEYS = [
   'fetch.mjs',
   // Path d'erreur Zod (locations.{index}.location) — pas une clé i18n
   'locations.0.location',
+  // PRÉFIXE de clé des rappels d'échéance, pas une clé : `rappels-echeance.ts` l'assemble avec le
+  // palier pour obtenir `notifications.task.deadline_reminder.j_minus_7` et ses trois sœurs, qui
+  // existent bien. Le détecteur ne voit que la constante.
+  'notifications.task.deadline_reminder.',
 ]
 
 /**

@@ -2,25 +2,17 @@
  * Les recherches textuelles de la liste du matériel : par nom, et par lieu d'emprunt.
  *
  * Regroupées ici parce qu'elles partagent la même façon de comparer — accents et casse ignorés,
- * saisie découpée en mots. Chacune dans son fichier, la normalisation aurait été recopiée, et
- * deux copies finissent toujours par diverger sur un caractère.
+ * saisie découpée en mots.
+ *
+ * La normalisation elle-même a déménagé dans `shared/` : le module Tâches en avait besoin et ne
+ * peut pas dépendre de celui-ci. C'est exactement le « deux copies finissent toujours par diverger
+ * sur un caractère » que cet en-tête annonçait, une couche plus haut. Elle est réexportée pour les
+ * appelants qui la prenaient ici.
  */
 
-/** Réduit un texte à sa forme comparable : sans accent, sans casse, sans espaces superflus. */
-export function normaliserTexte(valeur: string | null | undefined): string {
-  return (valeur ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-}
+import { motsDeLaRequete, normaliserTexte } from '~~/shared/utils/recherche-texte'
 
-/** Les mots d'une saisie, normalisés, les vides écartés. */
-export function motsDeLaRequete(requete: string | null | undefined): string[] {
-  return normaliserTexte(requete)
-    .split(/\s+/)
-    .filter((mot) => mot.length > 0)
-}
+export { motsDeLaRequete, normaliserTexte }
 
 /** Le champ contient-il tous les mots cherchés ? */
 function contientTousLesMots(champ: string | null | undefined, mots: string[]): boolean {

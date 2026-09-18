@@ -147,6 +147,8 @@ import type { TaskFiltersValue } from '~/components/tasks/TaskFilters.vue'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+import { contientLaSaisie } from '~~/shared/utils/recherche-texte'
+
 definePageMeta({
   middleware: ['auth-protected'],
 })
@@ -255,13 +257,10 @@ const hasDeadlines = computed<boolean>(() => tasks.value.some((t) => t.deadline)
 const filteredTasks = computed<MyTaskItem[]>(() => {
   let list = tasks.value
 
-  const q = filters.value.q.toLowerCase()
-  if (q) {
-    list = list.filter(
-      (t) =>
-        t.title.toLowerCase().includes(q) ||
-        (t.description ? t.description.toLowerCase().includes(q) : false)
-    )
+  // Accents et casse ignorés : sur un clavier de téléphone, taper « reserver » pour trouver
+  // « Réserver la salle » est le cas courant, pas l'exception.
+  if (filters.value.q.trim()) {
+    list = list.filter((t) => contientLaSaisie(filters.value.q, t.title, t.description))
   }
 
   if (filters.value.statuses.length) {
