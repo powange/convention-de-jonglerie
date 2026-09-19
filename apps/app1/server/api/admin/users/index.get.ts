@@ -1,7 +1,18 @@
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { notificationStreamManager } from '#server/utils/notification-stream-manager'
+import { alternativesMotCle, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { validatePagination } from '#server/utils/validation-helpers'
+
+/** Les champs qu'un mot-clé peut viser. L'identifiant s'y ajoute, mais lui n'est pas du texte. */
+const CHAMPS_RECHERCHE = ['email', 'pseudo', 'nom', 'prenom'] as const
+
+/** L'identifiant visé par un mot-clé, quand celui-ci n'est qu'un nombre — sinon rien. */
+function identifiantEventuel(mot: string): Array<{ id: number }> {
+  if (!/^\d+$/.test(mot)) return []
+  const identifiant = Number(mot)
+  return Number.isSafeInteger(identifiant) ? [{ id: identifiant }] : []
+}
 
 export default wrapApiHandler(
   async (event) => {
@@ -19,26 +30,22 @@ export default wrapApiHandler(
     const searchConditions: Record<string, unknown> = {}
     const andConditions: Record<string, unknown>[] = []
 
-    // Filtrage par recherche textuelle
-    if (search) {
-      // Une recherche entièrement numérique vise aussi l'identifiant : c'est ce dont on
-      // dispose quand on arrive depuis un journal d'erreurs ou une trace, et le chercher
-      // par pseudo demanderait de le connaître. Le champ reste inclus dans le `OR` : « 42 »
-      // trouve l'utilisateur 42 comme celui dont le pseudo contient 42.
-      const identifiant = /^\d+$/.test(search.trim()) ? Number(search.trim()) : null
-
-      andConditions.push({
+    // Filtrage par recherche textuelle, mot-clé par mot-clé : chacun doit se retrouver dans au
+    // moins un champ, mais pas forcément le même. La saisie entière était auparavant comparée à
+    // chaque champ pris isolément, si bien que « Camille Bakker » ne trouvait rien — aucun champ
+    // ne porte le prénom ET le nom — alors que chaque moitié trouvait. L'ordre n'importe plus.
+    andConditions.push(
+      ...motsClesDeLaRequete(search).map((mot) => ({
         OR: [
-          ...(identifiant !== null && Number.isSafeInteger(identifiant)
-            ? [{ id: identifiant }]
-            : []),
-          { email: { contains: search } },
-          { pseudo: { contains: search } },
-          { nom: { contains: search } },
-          { prenom: { contains: search } },
+          // Un mot-clé entièrement numérique vise aussi l'identifiant : c'est ce dont on
+          // dispose quand on arrive depuis un journal d'erreurs ou une trace, et le chercher
+          // par pseudo demanderait de le connaître. Le champ reste inclus dans le `OR` : « 42 »
+          // trouve l'utilisateur 42 comme celui dont le pseudo contient 42.
+          ...identifiantEventuel(mot),
+          ...alternativesMotCle(mot, CHAMPS_RECHERCHE),
         ],
-      })
-    }
+      }))
+    )
 
     // Filtrage par statut admin
     const adminFilter = (query.adminFilter as string) || 'all'
