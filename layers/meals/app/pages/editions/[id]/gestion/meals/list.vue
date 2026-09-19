@@ -385,6 +385,10 @@ const dietLabels: Record<string, string> = {
 
 const getDietLabel = (diet: string) => dietLabels[diet] || diet
 
+/** Ce que porte la colonne « Régime » : rien à signaler devient un tiret, pas `NONE`. */
+const regimeAAfficher = (regime: string | null) =>
+  regime && regime !== 'NONE' ? getDietLabel(regime) : '-'
+
 // Formatage de date
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
@@ -412,7 +416,9 @@ const formattedParticipants = computed(() => {
       mealDate: formatDate(p.mealDate),
       mealType: getMealTypeLabel(p.mealType),
       mealPhase: getPhasesLabel(p.mealPhases),
-      dietaryPreference: p.dietaryPreference ? getDietLabel(p.dietaryPreference) : '-',
+      // `'NONE'` n'est pas un régime à nommer : la colonne reste vide, comme pour qui n'a rien
+      // déclaré. Sans ça, elle affichait le mot brut aux organisateurs et aux artistes.
+      dietaryPreference: regimeAAfficher(p.dietaryPreference),
       afterShow: p.type === 'artist' && p.afterShow ? '✓' : '-',
     }
   })
