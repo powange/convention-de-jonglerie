@@ -10,6 +10,7 @@ import {
   selectedOptionsIncludes,
 } from '#server/utils/ticketing/handout-items'
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
+import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 
 /**
  * Deux demandes distinctes, et c'est volontaire : un QR code présenté au scan doit porter son
@@ -93,17 +94,7 @@ export default wrapApiHandler(
         })
 
         if (application) {
-          // Récupérer l'utilisateur qui a validé si applicable
-          let validatedByUser = null
-          if (application.entryValidatedBy) {
-            validatedByUser = await prisma.user.findUnique({
-              where: { id: application.entryValidatedBy },
-              select: {
-                prenom: true,
-                nom: true,
-              },
-            })
-          }
+          const nomDuValidateur = await resoudreLesValidateurs([application.entryValidatedBy])
 
           // Récupérer les créneaux assignés au bénévole
           const volunteerAssignments = await prisma.volunteerAssignment.findMany({
@@ -238,12 +229,7 @@ export default wrapApiHandler(
                 })),
                 entryValidated: application.entryValidated,
                 entryValidatedAt: application.entryValidatedAt,
-                entryValidatedBy: validatedByUser
-                  ? {
-                      firstName: validatedByUser.prenom,
-                      lastName: validatedByUser.nom,
-                    }
-                  : null,
+                entryValidatedBy: nomDuValidateur(application.entryValidatedBy),
               },
             },
           })
@@ -294,17 +280,7 @@ export default wrapApiHandler(
         })
 
         if (artist) {
-          // Récupérer l'utilisateur qui a validé si applicable
-          let validatedByUser = null
-          if (artist.entryValidatedBy) {
-            validatedByUser = await prisma.user.findUnique({
-              where: { id: artist.entryValidatedBy },
-              select: {
-                prenom: true,
-                nom: true,
-              },
-            })
-          }
+          const nomDuValidateur = await resoudreLesValidateurs([artist.entryValidatedBy])
 
           // Articles remis à TOUS les artistes de l'édition, puis ceux de chaque
           // spectacle ; l'agrégation a lieu après les repas (un article cumulable
@@ -392,12 +368,7 @@ export default wrapApiHandler(
                 })),
                 entryValidated: artist.entryValidated,
                 entryValidatedAt: artist.entryValidatedAt,
-                entryValidatedBy: validatedByUser
-                  ? {
-                      firstName: validatedByUser.prenom,
-                      lastName: validatedByUser.nom,
-                    }
-                  : null,
+                entryValidatedBy: nomDuValidateur(artist.entryValidatedBy),
               },
             },
           })
@@ -430,17 +401,7 @@ export default wrapApiHandler(
         })
 
         if (editionOrganizer && editionOrganizer.organizer) {
-          // Récupérer l'utilisateur qui a validé si applicable
-          let validatedByUser = null
-          if (editionOrganizer.entryValidatedBy) {
-            validatedByUser = await prisma.user.findUnique({
-              where: { id: editionOrganizer.entryValidatedBy },
-              select: {
-                prenom: true,
-                nom: true,
-              },
-            })
-          }
+          const nomDuValidateur = await resoudreLesValidateurs([editionOrganizer.entryValidatedBy])
 
           // Les articles de cet organisateur ET ceux de tous les organisateurs, en deux requêtes
           // au lieu de quatre.
@@ -530,12 +491,7 @@ export default wrapApiHandler(
                 })),
                 entryValidated: editionOrganizer.entryValidated,
                 entryValidatedAt: editionOrganizer.entryValidatedAt,
-                entryValidatedBy: validatedByUser
-                  ? {
-                      firstName: validatedByUser.prenom,
-                      lastName: validatedByUser.nom,
-                    }
-                  : null,
+                entryValidatedBy: nomDuValidateur(editionOrganizer.entryValidatedBy),
               },
             },
           })
@@ -595,25 +551,9 @@ export default wrapApiHandler(
            * personnes aurait sinon coûté dix allers-retours. Les trois autres branches font un
            * `findUnique` parce qu'elles n'ont qu'un seul sujet.
            */
-          const idsValidateurs = [
-            ...new Set(
-              orderItem.order.items
-                .map((item) => item.entryValidatedBy)
-                .filter((id): id is number => typeof id === 'number')
-            ),
-          ]
-          const validateurs = idsValidateurs.length
-            ? await prisma.user.findMany({
-                where: { id: { in: idsValidateurs } },
-                select: { id: true, prenom: true, nom: true },
-              })
-            : []
-          const validateurParId = new Map(validateurs.map((u) => [u.id, u]))
-
-          const nomDuValidateur = (id: number | null) => {
-            const u = id === null ? undefined : validateurParId.get(id)
-            return u ? { firstName: u.prenom, lastName: u.nom } : null
-          }
+          const nomDuValidateur = await resoudreLesValidateurs(
+            orderItem.order.items.map((item) => item.entryValidatedBy)
+          )
 
           return createSuccessResponse({
             found: true,

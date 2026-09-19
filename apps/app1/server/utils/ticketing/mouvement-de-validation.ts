@@ -11,6 +11,8 @@
  * Ce module répond à la question que le compte ne posait pas : **qui, et quand**.
  */
 
+import { resoudreLesValidateurs, type NomDeValidateur } from './nom-du-validateur'
+
 import type { TypeDeParticipant } from './journal-des-entrees'
 
 /** Ce qu'une ligne d'entrée doit porter pour être départagée, quelle que soit sa table. */
@@ -25,7 +27,7 @@ export interface LigneDEntree {
 export interface EntreeDejaValidee {
   id: number
   at: Date | null
-  by: { firstName: string | null; lastName: string | null } | null
+  by: NomDeValidateur | null
 }
 
 export interface ConstatDeValidation {
@@ -64,34 +66,19 @@ export async function departagerLesEntrees(options: {
 
   if (restantes.length === 0) return { validees, dejaValidees: [] }
 
-  const idsAuteurs = [
-    ...new Set(
-      restantes
-        .map((ligne) => ligne.entryValidatedBy)
-        .filter((id): id is number => typeof id === 'number')
-    ),
-  ]
-
-  // Une seule requête pour tous les auteurs : une commande peut porter dix billets validés par
-  // des personnes différentes, et un `findUnique` par ligne coûterait dix allers-retours.
-  const auteurs = idsAuteurs.length
-    ? await prisma.user.findMany({
-        where: { id: { in: idsAuteurs } },
-        select: { id: true, prenom: true, nom: true },
-      })
-    : []
-  const auteurParId = new Map(auteurs.map((u) => [u.id, u]))
+  // La résolution des noms vit dans `nom-du-validateur.ts` : elle était écrite neuf fois, et
+  // c'est ce qui a produit deux fois le même défaut (constats B2 et A3).
+  const nomDuValidateur = await resoudreLesValidateurs(
+    restantes.map((ligne) => ligne.entryValidatedBy)
+  )
 
   return {
     validees,
-    dejaValidees: restantes.map((ligne) => {
-      const auteur = ligne.entryValidatedBy ? auteurParId.get(ligne.entryValidatedBy) : undefined
-      return {
-        id: ligne.id,
-        at: ligne.entryValidatedAt,
-        by: auteur ? { firstName: auteur.prenom, lastName: auteur.nom } : null,
-      }
-    }),
+    dejaValidees: restantes.map((ligne) => ({
+      id: ligne.id,
+      at: ligne.entryValidatedAt,
+      by: nomDuValidateur(ligne.entryValidatedBy),
+    })),
   }
 }
 
