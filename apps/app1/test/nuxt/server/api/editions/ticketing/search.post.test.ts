@@ -161,6 +161,94 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
    * changé en groupant les lectures. `mealType` le rend déterministe, comme dans les cinq autres
    * lectures de repas du dépôt.
    */
+  /*
+   * B2, deuxième occurrence — la règle « qui a validé » est écrite huit fois, et la copie de la
+   * branche billet manquait ici comme elle manquait dans `verify.post.ts`.
+   *
+   * Ce test confronte les QUATRE populations d'un coup, et non la seule qui vient d'être
+   * corrigée : c'est ce qui manquait pour que l'oubli ne puisse plus être partiel.
+   */
+  describe("l'auteur de la validation", () => {
+    const valideParGrace = {
+      entryValidated: true,
+      entryValidatedAt: new Date('2026-08-01T12:00:00Z'),
+      entryValidatedBy: 77,
+    }
+
+    beforeEach(() => {
+      prismaMock.user.findMany.mockResolvedValue([{ id: 77, prenom: 'Grace', nom: 'Hopper' }])
+    })
+
+    it('le rend pour un billet, comme pour les trois autres populations', async () => {
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        {
+          id: 1,
+          helloAssoItemId: null,
+          name: 'Pass',
+          amount: 100,
+          state: 'Processed',
+          qrCode: 'x',
+          firstName: 'Ada',
+          lastName: 'Lovelace',
+          email: 'ada@x.fr',
+          customFields: null,
+          tier: null,
+          selectedOptions: [],
+          ...valideParGrace,
+          order: {
+            id: 1,
+            helloAssoOrderId: null,
+            status: 'Processed',
+            payerFirstName: 'Ada',
+            payerLastName: 'Lovelace',
+            payerEmail: 'ada@x.fr',
+            externalTicketing: null,
+            items: [
+              {
+                id: 1,
+                helloAssoItemId: null,
+                name: 'Pass',
+                type: null,
+                amount: 100,
+                state: 'Processed',
+                qrCode: 'x',
+                firstName: 'Ada',
+                lastName: 'Lovelace',
+                email: 'ada@x.fr',
+                customFields: null,
+                tier: null,
+                selectedOptions: [],
+                ...valideParGrace,
+              },
+            ],
+          },
+        },
+      ])
+
+      const resultat = await searchHandler(mockEvent as any)
+      const billet = resultat.data.results.tickets[0].participant.ticket
+
+      expect(billet.entryValidatedBy).toEqual({ firstName: 'Grace', lastName: 'Hopper' })
+      // La modale affiche toute la commande : chaque ligne doit le porter, pas seulement celle
+      // qui a répondu à la recherche.
+      expect(billet.order.items[0].entryValidatedBy).toEqual({
+        firstName: 'Grace',
+        lastName: 'Hopper',
+      })
+    })
+
+    it('le demande en base pour les quatre populations, jamais pour trois', async () => {
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([])
+      await searchHandler(mockEvent as any)
+
+      // Un `select` qui oublie la colonne est la façon dont ce défaut est né : la sérialisation
+      // ne peut pas rendre ce que la requête n'a pas demandé.
+      const selectionBenevole =
+        prismaMock.editionVolunteerApplication.findMany.mock.calls[0][0].select
+      expect(selectionBenevole.entryValidatedBy).toBe(true)
+    })
+  })
+
   it('ordonne les repas par date PUIS par type, pour les trois populations', async () => {
     await chercherAvec(5)
 

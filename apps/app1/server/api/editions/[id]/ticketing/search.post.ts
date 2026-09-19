@@ -220,6 +220,37 @@ export default wrapApiHandler(
         take: 20, // Limiter à 20 résultats
       })
 
+      // Récupérer les utilisateurs qui ont validé les billets.
+      //
+      // Les trois autres populations le faisaient déjà ; celle-ci, non — la fiche d'une personne
+      // trouvée par son nom ne disait donc pas qui l'avait validée, alors que le même manque
+      // venait d'être corrigé dans `verify.post.ts` (constat B2). Une règle recopiée l'est
+      // toujours plus de fois qu'annoncé : celle-ci est écrite quatre fois rien que dans ce
+      // fichier, et huit fois avec `verify`. Son extraction est le seul point d'A3 qui vaille.
+      //
+      // Les identifiants viennent des billets trouvés ET des autres lignes de leur commande : la
+      // modale affiche toute la commande, pas seulement la ligne qui a répondu à la recherche.
+      const ticketValidatorIds = [
+        ...new Set(
+          orderItems
+            .flatMap((item) => [item, ...item.order.items])
+            .map((ligne) => ligne.entryValidatedBy)
+            .filter((id): id is number => typeof id === 'number')
+        ),
+      ]
+      const ticketValidatorUsers = ticketValidatorIds.length
+        ? await prisma.user.findMany({
+            where: { id: { in: ticketValidatorIds } },
+            select: { id: true, prenom: true, nom: true },
+          })
+        : []
+      const ticketValidatorMap = new Map(ticketValidatorUsers.map((u) => [u.id, u]))
+
+      const nomDuValidateur = (id: number | null) => {
+        const u = id === null ? undefined : ticketValidatorMap.get(id)
+        return u ? { firstName: u.prenom, lastName: u.nom } : null
+      }
+
       // Récupérer les utilisateurs qui ont validé les artistes
       const artistValidatorIds = artists
         .filter((a) => a.entryValidatedBy)
@@ -666,6 +697,7 @@ export default wrapApiHandler(
                   customFields: orderItem.customFields as any,
                   entryValidated: orderItem.entryValidated,
                   entryValidatedAt: orderItem.entryValidatedAt,
+                  entryValidatedBy: nomDuValidateur(orderItem.entryValidatedBy),
                   tier: orderItem.tier
                     ? {
                         id: orderItem.tier.id,
@@ -691,6 +723,7 @@ export default wrapApiHandler(
               customFields: item.customFields as any,
               entryValidated: item.entryValidated,
               entryValidatedAt: item.entryValidatedAt,
+              entryValidatedBy: nomDuValidateur(item.entryValidatedBy),
               // Les articles de l'option ne sont plus recopiés ici : ils sont déjà dans la
               // liste agrégée du billet. Les deux sérialisations divergeaient d'ailleurs —
               // l'une portait la quantité, l'autre non — et le client honorait ou perdait la
