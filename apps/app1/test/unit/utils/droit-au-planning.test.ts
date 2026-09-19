@@ -15,6 +15,7 @@ import {
 
 const BENEVOLE_ACCEPTE: EtatDuVisiteur = {
   authentifie: true,
+  modeInterne: true,
   planningVisible: true,
   statutCandidature: 'ACCEPTED',
   responsableDEquipe: false,
@@ -42,6 +43,10 @@ describe('aDroitAuPlanning', () => {
 
   it('refuse un visiteur non connecté', () => {
     expect(aDroitAuPlanning(avec({ authentifie: false }))).toBe(false)
+  })
+
+  it('refuse en mode externe, où aucune des deux surfaces n’est rendue', () => {
+    expect(aDroitAuPlanning(avec({ modeInterne: false }))).toBe(false)
   })
 
   it("refuse tant que le planning n'est pas montrable, même à un bénévole accepté", () => {

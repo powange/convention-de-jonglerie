@@ -540,35 +540,6 @@ const chargerMesEquipesOrganisateur = async () => {
 // Modal de détails de créneau
 const showSlotDetailsModal = ref(false)
 
-/** Cf. `aDroitAuPlanning` : la règle est dans un util pour être vérifiable hors de cette page. */
-const peutConsommerLePlanning = computed(() =>
-  aDroitAuPlanning({
-    authentifie: authStore.isAuthenticated,
-    planningVisible: peutVoirLePlanning.value,
-    statutCandidature: myApplication.value?.status,
-    responsableDEquipe: estResponsableDEquipe.value,
-    equipesOrganisateur: mesEquipesOrganisateur.value.length,
-  })
-)
-
-/**
- * Les créneaux du planning, ceux-là mêmes que la frise affiche : le composable est partagé, et
- * c'est ce qui garantit que les deux chemins ouvrent la modale sur les mêmes données.
- *
- * L'identifiant n'est rendu qu'à qui a le droit de voir le planning. Le composable s'auto-appelle
- * au montage, et aucun `v-if` ne peut l'en empêcher : le `setup` s'exécute pour tout visiteur.
- * L'identifiant partait donc inconditionnellement, et l'API répondait 403 à quiconque n'avait
- * jamais candidaté — un aller-retour pour rien, invisible à l'écran mais consigné dans les logs
- * de production.
- *
- * Passer `undefined` ne demande rien, et la réactivité fait le reste : la candidature n'est connue
- * qu'après un chargement, donc rien ne part au premier rendu, puis la requête part d'elle-même
- * dès que le droit est établi.
- */
-const editionIdSiDroitAuPlanning = computed(() =>
-  peutConsommerLePlanning.value ? editionId : undefined
-)
-const { timeSlots: creneauxDuPlanning } = useVolunteerTimeSlots(editionIdSiDroitAuPlanning)
 const selectedSlot = ref<any>(null)
 
 // Expose constants early (avant tout await)
@@ -756,6 +727,44 @@ const showFullDescription = ref(false)
 const volunteersMode = computed<'INTERNAL' | 'EXTERNAL' | null>(
   () => volunteersInfo.value?.mode || null
 )
+
+/**
+ * Les créneaux du planning, ceux-là mêmes que la frise affiche : le composable est partagé, et
+ * c'est ce qui garantit que les deux chemins ouvrent la modale sur les mêmes données.
+ *
+ * L'identifiant n'est rendu qu'à qui a de quoi les consommer. Le composable s'auto-appelle au
+ * montage, et aucun `v-if` ne peut l'en empêcher : le `setup` s'exécute pour tout visiteur.
+ * L'identifiant partait donc inconditionnellement, et l'API répondait 403 à quiconque n'avait
+ * jamais candidaté — un aller-retour pour rien, invisible à l'écran mais consigné dans les logs
+ * de production.
+ *
+ * Passer `undefined` ne demande rien, et la réactivité fait le reste : la candidature n'est connue
+ * qu'après un chargement, donc rien ne part au premier rendu, puis la requête part d'elle-même
+ * dès que le droit est établi.
+ *
+ * ⚠️ **Cet emplacement n'est pas négociable** : le bloc doit venir APRÈS `volunteersMode` et
+ * `planningPublie`. Contrairement au template, ce getter est évalué pendant le `setup` — à
+ * l'exécution immédiate du `watch` interne au composable. Placé plus haut, il touchait
+ * `peutVoirLePlanning`, qui lit `planningPublie` déclaré bien plus bas : `ReferenceError` en zone
+ * morte temporelle, et la page ne se rendait plus du tout pour un bénévole accepté. Ni le typage
+ * ni les tests unitaires ne le voient — c'est le test de bout en bout
+ * `acces-benevole-en-creneau.spec.ts` qui l'a pris.
+ */
+const peutConsommerLePlanning = computed(() =>
+  aDroitAuPlanning({
+    authentifie: authStore.isAuthenticated,
+    modeInterne: volunteersMode.value === 'INTERNAL',
+    planningVisible: peutVoirLePlanning.value,
+    statutCandidature: myApplication.value?.status,
+    responsableDEquipe: estResponsableDEquipe.value,
+    equipesOrganisateur: mesEquipesOrganisateur.value.length,
+  })
+)
+
+const editionIdSiDroitAuPlanning = computed(() =>
+  peutConsommerLePlanning.value ? editionId : undefined
+)
+const { timeSlots: creneauxDuPlanning } = useVolunteerTimeSlots(editionIdSiDroitAuPlanning)
 // Références de gestion (édition supprimée sur page publique)
 // const volunteersLoadingAction = ref(false) // supprimé
 // const volunteersSaving = ref(false) // supprimé

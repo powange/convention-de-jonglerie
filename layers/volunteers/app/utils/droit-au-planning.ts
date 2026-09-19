@@ -13,6 +13,8 @@
 
 export interface EtatDuVisiteur {
   authentifie: boolean
+  /** Bénévolat géré ici : en mode externe, aucune de ces deux surfaces n'est rendue. */
+  modeInterne: boolean
   /** Planning publié, ou relu en avance par un responsable d'équipe. */
   planningVisible: boolean
   statutCandidature: string | null | undefined
@@ -29,13 +31,13 @@ export interface EtatDuVisiteur {
  * responsable n'en fait pas partie, et c'est voulu : la page publique ne lui montre aucune des
  * deux.
  *
- * `volunteersMode` ne figure pas ici, alors qu'il conditionne aussi ces surfaces. Il est déclaré
- * très bas dans la page et ce prédicat est évalué pendant le `setup` : s'y référer y lèverait une
- * `ReferenceError`. Son absence ne coûte qu'une requête inutile mais AUTORISÉE — un bénévole
- * accepté d'une édition en mode externe —, jamais le 403 que l'on corrige.
+ * L'appelant doit lire ce prédicat **après** avoir déclaré tout ce qu'il lui passe : il est évalué
+ * pendant le `setup`, là où le template ne l'est qu'après. Un `computed` déclaré plus bas y serait
+ * en zone morte temporelle et lèverait une `ReferenceError`.
  */
 export function aDroitAuPlanning(etat: EtatDuVisiteur): boolean {
   if (!etat.authentifie) return false
+  if (!etat.modeInterne) return false
   if (!etat.planningVisible) return false
 
   return (
