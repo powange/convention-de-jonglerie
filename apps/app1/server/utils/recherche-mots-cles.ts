@@ -54,3 +54,43 @@ export function correspondAuxMotsCles(
 
   return motsCles.every((mot) => valeurs.some((valeur) => valeur.includes(mot)))
 }
+
+/** `'user.pseudo'` devient `{ user: { pseudo: { contains: mot } } }`. */
+function conditionSurChamp(chemin: string, mot: string): Record<string, unknown> {
+  let condition: Record<string, unknown> = { contains: mot }
+  for (const segment of chemin.split('.').reverse()) {
+    condition = { [segment]: condition }
+  }
+  return condition
+}
+
+/**
+ * Les endroits où un mot-clé peut se trouver, à mettre dans un `OR` Prisma.
+ *
+ * Les listes paginées en SQL ne peuvent pas passer par [correspondAuxMotsCles] : filtrer après
+ * chargement ne filtrerait que la page courante, et le total annoncé serait celui d'avant le
+ * filtre. Il faut donc traduire les mots-clés en conditions, et c'est à la base de faire la
+ * comparaison — elle l'a en `utf8mb4_unicode_ci`, qui ignore déjà casse et accents.
+ *
+ * Un chemin peut traverser une relation : `'user.nom'` autant que `'nom'`.
+ */
+export function alternativesMotCle(
+  mot: string,
+  champs: readonly string[]
+): Record<string, unknown>[] {
+  return champs.map((champ) => conditionSurChamp(champ, mot))
+}
+
+/**
+ * Les conditions d'une recherche par mots-clés : **chaque** mot dans **au moins un** champ.
+ *
+ * Rend une liste vide sans mot-clé, à joindre telle quelle au `AND` de l'appelant — une saisie
+ * vide ne filtre donc rien, là où [correspondAuxMotsCles] ne rend personne. La différence est
+ * voulue : côté base, on part de tout le monde et on retranche.
+ */
+export function conditionsMotsCles(
+  motsCles: string[],
+  champs: readonly string[]
+): Record<string, unknown>[] {
+  return motsCles.map((mot) => ({ OR: alternativesMotCle(mot, champs) }))
+}

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  alternativesMotCle,
+  conditionsMotsCles,
   correspondAuxMotsCles,
   motsClesDeLaRequete,
   normaliserPourRecherche,
@@ -86,5 +88,45 @@ describe('correspondAuxMotsCles', () => {
   it('tolère des champs absents', () => {
     expect(cherche('omer', ['Omer', null, undefined, ''])).toBe(true)
     expect(cherche('omer', [null, undefined])).toBe(false)
+  })
+})
+
+/**
+ * Variante base de données des mêmes règles, pour les listes paginées en SQL : on ne peut pas y
+ * filtrer après chargement, sans quoi seule la page courante le serait et le total annoncé serait
+ * celui d'avant le filtre.
+ */
+describe('alternativesMotCle', () => {
+  it('décline le mot sur chaque champ', () => {
+    expect(alternativesMotCle('emma', ['nom', 'prenom'])).toEqual([
+      { nom: { contains: 'emma' } },
+      { prenom: { contains: 'emma' } },
+    ])
+  })
+
+  it('traverse une relation quand le chemin est pointé', () => {
+    expect(alternativesMotCle('emma', ['user.pseudo'])).toEqual([
+      { user: { pseudo: { contains: 'emma' } } },
+    ])
+  })
+
+  it('rend une liste vide sans champ à viser', () => {
+    expect(alternativesMotCle('emma', [])).toEqual([])
+  })
+})
+
+describe('conditionsMotsCles', () => {
+  it('exige chaque mot dans au moins un champ, sans imposer le même', () => {
+    // C'est le cas qui ne marchait pas : « omer emma » sur un nom et un prénom séparés.
+    expect(conditionsMotsCles(['omer', 'emma'], ['nom', 'prenom'])).toEqual([
+      { OR: [{ nom: { contains: 'omer' } }, { prenom: { contains: 'omer' } }] },
+      { OR: [{ nom: { contains: 'emma' } }, { prenom: { contains: 'emma' } }] },
+    ])
+  })
+
+  it('ne filtre rien sans mot-clé', () => {
+    // Différence assumée avec `correspondAuxMotsCles`, qui ne rend personne : côté base on part
+    // de tout le monde et on retranche, donc une saisie vide ne doit rien retrancher.
+    expect(conditionsMotsCles([], ['nom'])).toEqual([])
   })
 })
