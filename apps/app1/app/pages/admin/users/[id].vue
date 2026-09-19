@@ -252,6 +252,65 @@
         </div>
       </UCard>
 
+      <!-- Éditions concernées -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-calendar-days" class="text-primary-500" />
+            <h3 class="font-medium text-gray-900 dark:text-white">
+              {{ $t('admin.related_editions') }}
+            </h3>
+            <UBadge v-if="editionsConcernees?.length" color="neutral" variant="soft" size="xs">
+              {{ editionsConcernees.length }}
+            </UBadge>
+          </div>
+        </template>
+
+        <div v-if="editionsPending" class="space-y-3">
+          <USkeleton v-for="n in 2" :key="n" class="h-14 w-full" />
+        </div>
+
+        <p
+          v-else-if="!editionsConcernees?.length"
+          class="text-sm text-gray-500 dark:text-gray-400 text-center py-2"
+        >
+          {{ $t('admin.no_related_edition') }}
+        </p>
+
+        <div v-else class="divide-y divide-gray-200 dark:divide-gray-800">
+          <div
+            v-for="edition in editionsConcernees"
+            :key="edition.id"
+            class="py-3 flex flex-wrap items-start justify-between gap-x-4 gap-y-2"
+          >
+            <div class="min-w-0">
+              <ULink
+                :to="`/editions/${edition.id}`"
+                class="font-medium text-gray-900 dark:text-white hover:underline"
+              >
+                {{ edition.convention.name
+                }}<template v-if="edition.name"> — {{ edition.name }}</template>
+              </ULink>
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                {{ formatDate(edition.startDate) }} – {{ formatDate(edition.endDate) }} ·
+                {{ edition.city }}
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-1">
+              <UBadge
+                v-for="(role, index) in edition.roles"
+                :key="index"
+                :color="libelleRole(role).color"
+                variant="soft"
+                size="xs"
+              >
+                {{ $t(libelleRole(role).label) }}
+              </UBadge>
+            </div>
+          </div>
+        </div>
+      </UCard>
+
       <!-- Données liées -->
       <UCard>
         <template #header>
@@ -620,6 +679,65 @@ const {
   error,
   refresh,
 } = await useFetch<UserProfile>(`/api/admin/users/${userId}`)
+
+type RoleSurEdition =
+  | { type: 'creator' | 'organizer' | 'attendee' | 'artist' }
+  | { type: 'volunteer' | 'show'; statut: 'PENDING' | 'ACCEPTED' | 'REJECTED' }
+
+interface EditionConcernee {
+  id: number
+  name: string | null
+  startDate: string
+  endDate: string
+  city: string
+  country: string
+  imageUrl: string | null
+  convention: { id: number; name: string }
+  roles: RoleSurEdition[]
+}
+
+// Les éditions rattachées à ce profil. Requête à part : la fiche s'affiche sans l'attendre, et un
+// profil ancien peut aligner beaucoup d'éditions.
+const { data: editionsConcernees, pending: editionsPending } = await useFetch<EditionConcernee[]>(
+  `/api/admin/users/${userId}/editions`,
+  { lazy: true, default: () => [] }
+)
+
+/**
+ * Les clés de libellé, écrites en entier.
+ *
+ * Une clé assemblée à l'exécution, en concaténant un préfixe et le nom du rôle, passerait pour
+ * inutilisée aux yeux de l'outillage i18n : un `--delete-unused` l'emporterait, et rien ne casserait
+ * avant l'affichage. Les écrire en entier les rend trouvables.
+ */
+const CLES_ROLE: Record<string, string> = {
+  creator: 'admin.role_creator',
+  organizer: 'admin.role_organizer',
+  attendee: 'admin.role_attendee',
+  artist: 'admin.role_artist',
+  volunteer_PENDING: 'admin.role_volunteer_pending',
+  volunteer_ACCEPTED: 'admin.role_volunteer_accepted',
+  volunteer_REJECTED: 'admin.role_volunteer_rejected',
+  show_PENDING: 'admin.role_show_pending',
+  show_ACCEPTED: 'admin.role_show_accepted',
+  show_REJECTED: 'admin.role_show_rejected',
+}
+
+/** Le libellé et la couleur d'un rôle. Un statut de candidature ne se lit pas comme un rôle tenu. */
+const libelleRole = (role: RoleSurEdition) => {
+  if (role.type === 'volunteer' || role.type === 'show') {
+    return {
+      label: CLES_ROLE[`${role.type}_${role.statut}`] ?? role.type,
+      color:
+        role.statut === 'ACCEPTED'
+          ? ('success' as const)
+          : role.statut === 'REJECTED'
+            ? ('neutral' as const)
+            : ('warning' as const),
+    }
+  }
+  return { label: CLES_ROLE[role.type] ?? role.type, color: 'primary' as const }
+}
 
 // Langue préférée : libellé lisible + classe drapeau (cohérent avec le sélecteur de langue)
 const preferredLanguageLabel = computed(() => {
