@@ -80,6 +80,28 @@ export const userWithGravatarSelect = {
 } satisfies Prisma.UserSelect
 
 /**
+ * Sélection utilisateur avec nom complet ET de quoi afficher un avatar
+ *
+ * Pour tout écran qui montre une personne à côté de sa photo : les assignés d'une tâche, les
+ * auteurs de commentaires. `emailHash` sert le repli Gravatar quand `profilePicture` est vide.
+ *
+ * ⚠️ Sans `email`, délibérément — contrairement à `userWithGravatarSelect`, dont le nom pourrait
+ * le laisser croire. L'adresse n'a rien à faire dans un affichage : elle avait fini par
+ * voyager jusqu'à des bénévoles simplement co-assignés à une tâche, prise dans sept copies de
+ * cette même sélection recopiées à la main. C'est cette duplication qui l'avait laissée s'installer.
+ *
+ * Occurrences: 13 fichiers
+ */
+export const userWithNameAndGravatarSelect = {
+  id: true,
+  pseudo: true,
+  prenom: true,
+  nom: true,
+  emailHash: true,
+  profilePicture: true,
+} satisfies Prisma.UserSelect
+
+/**
  * Sélection utilisateur avec nom complet
  * Utilisée pour les bénévoles, assignations, exports
  *

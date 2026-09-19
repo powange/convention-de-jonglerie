@@ -289,6 +289,7 @@ const COMPTEURS_PAR_ENTREE: Record<string, string[]> = {
   stock: ['stock-emprunts', 'stock-courses'],
   volunteers: ['benevoles-candidatures', 'benevoles-echanges'],
   artists: ['appels-spectacles'],
+  tasks: ['taches-en-retard'],
 }
 
 /**
@@ -310,6 +311,11 @@ const compteursVisibles = computed(() => {
   // d'édition, pour quelqu'un qui n'a rien demandé.
   if (edition.value?.artistsEnabled && canManageArtists.value) {
     cles.push(...(COMPTEURS_PAR_ENTREE.artists ?? []))
+  }
+
+  // Le compteur des tâches exige le droit de les gérer, comme l'entrée à laquelle il pend.
+  if (edition.value?.tasksEnabled && canManageTasks.value) {
+    cles.push(...(COMPTEURS_PAR_ENTREE.tasks ?? []))
   }
 
   // Les deux compteurs bénévoles exigent la gestion et le mode interne, comme les entrées
@@ -773,6 +779,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       icon: 'i-heroicons-clipboard-document-check',
       to: `/editions/${editionId.value}/gestion/tasks`,
       tooltip: { text: t('edition.tasks') },
+      ...pastilleMenu('taches-en-retard'),
     })
   }
 

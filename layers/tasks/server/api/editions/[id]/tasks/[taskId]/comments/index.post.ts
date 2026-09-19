@@ -4,6 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
+import { userWithNameAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { canCommentTask } from '#server/utils/tasks-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
@@ -67,14 +68,7 @@ export default wrapApiHandler(
       },
       include: {
         user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-            emailHash: true,
-            profilePicture: true,
-          },
+          select: userWithNameAndGravatarSelect,
         },
       },
     })

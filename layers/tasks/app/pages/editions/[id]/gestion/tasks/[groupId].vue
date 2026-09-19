@@ -627,6 +627,14 @@ const fetchGroups = async () => {
   } finally {
     loading.value = false
   }
+
+  // La pastille du menu compte les tâches en retard : changer un statut ou une échéance la change.
+  // Le menu ne recalcule qu'au montage, c'est donc ici qu'il faut le lui dire.
+  //
+  // ⚠️ `rafraichirCompteurs` et NON `rafraichirCompteursNavigation` : la seconde prend la liste de
+  // tout ce qui est visible et EFFACE le reste. La viser sur une seule clé éteindrait donc les
+  // pastilles du stock, des bénévoles et des appels à spectacles, qui ne sont pas rechargées ici.
+  await rafraichirCompteurs('taches-en-retard')
 }
 
 /**
@@ -891,6 +899,10 @@ async function changeTaskStatus(taskId: number, fromStatus: TaskStatus, newStatu
       method: 'PUT',
       body: { status: newStatus },
     })
+    // Clore une tâche en retard, ou en rouvrir une, change la pastille du menu. Ce chemin ne
+    // recharge rien — la mise à jour est optimiste —, il doit donc le signaler lui-même. L'appel
+    // isole ses propres erreurs : il ne peut pas déclencher le retour en arrière ci-dessous.
+    await rafraichirCompteurs('taches-en-retard')
   } catch (e: unknown) {
     // Revert en cas d'erreur API
     task.status = fromStatus

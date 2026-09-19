@@ -7,6 +7,7 @@ import {
   canManageTasks,
   getEditionWithPermissions,
 } from '#server/utils/permissions/edition-permissions'
+import { userWithNameAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { assertTagsBelongToGroup } from '#server/utils/task-tags-helpers'
 import { assertAssigneesAreAssignable } from '#server/utils/tasks-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
@@ -173,14 +174,7 @@ export default wrapApiHandler(
           assignments: {
             include: {
               user: {
-                select: {
-                  id: true,
-                  pseudo: true,
-                  prenom: true,
-                  nom: true,
-                  emailHash: true,
-                  profilePicture: true,
-                },
+                select: userWithNameAndGravatarSelect,
               },
             },
           },

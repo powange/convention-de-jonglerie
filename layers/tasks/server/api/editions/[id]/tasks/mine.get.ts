@@ -1,6 +1,7 @@
 import { useTaskboardPorts } from '#server/taskboard/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { userWithNameAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
@@ -36,14 +37,7 @@ export default wrapApiHandler(
         assignments: {
           include: {
             user: {
-              select: {
-                id: true,
-                pseudo: true,
-                prenom: true,
-                nom: true,
-                emailHash: true,
-                profilePicture: true,
-              },
+              select: userWithNameAndGravatarSelect,
             },
           },
         },
