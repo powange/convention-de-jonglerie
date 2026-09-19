@@ -11,6 +11,31 @@ const SLOT_TOLERANCE_MS = 15 * 60 * 1000
 type TeamFilter = Prisma.VolunteerTeamWhereInput
 
 /**
+ * « Cette affectation ouvre-t-elle encore un droit ? »
+ *
+ * Une affectation à un créneau **survit au refus d'une candidature** : les deux vivent dans des
+ * tables distinctes, et le refus ne nettoyait que les équipes, les repas et la validation
+ * d'entrée. Deux lignes de la production étaient dans ce cas.
+ *
+ * Le nettoyage manquant est corrigé à la source, dans le point d'API qui refuse une candidature.
+ * Ce filtre-ci est la **seconde barrière**, et il n'est pas redondant : on parle d'un droit de
+ * valider et d'annuler des entrées à la porte. Le faire dépendre du bon déroulement d'un
+ * nettoyage effectué ailleurs, c'est exactement la forme du défaut qu'on vient de corriger. Il
+ * rend aussi inoffensives les lignes déjà en base, sans avoir à supprimer des données existantes.
+ *
+ * `some` et non une jointure : les deux tables ne sont reliées que par l'utilisateur et
+ * l'événement, sans clé étrangère de l'une vers l'autre.
+ */
+const affectationDUnBenevoleAccepte = (userId: number, editionId: number) => ({
+  userId,
+  user: {
+    volunteerApplications: {
+      some: { eventId: editionId, status: 'ACCEPTED' as const },
+    },
+  },
+})
+
+/**
  * Vérifie si un bénévole est actuellement en créneau actif pour une catégorie d'équipe
  * avec une marge de ±15 minutes (prend en compte les retards)
  *
@@ -28,7 +53,7 @@ export async function isActiveInTeamSlot(
 
   const assignments = await prisma.volunteerAssignment.findMany({
     where: {
-      userId,
+      ...affectationDUnBenevoleAccepte(userId, editionId),
       timeSlot: {
         eventId: editionId,
         team: teamFilter,
@@ -71,7 +96,7 @@ export async function getActiveTeamSlot(userId: number, editionId: number, teamF
 
   const assignments = await prisma.volunteerAssignment.findMany({
     where: {
-      userId,
+      ...affectationDUnBenevoleAccepte(userId, editionId),
       timeSlot: {
         eventId: editionId,
         team: teamFilter,

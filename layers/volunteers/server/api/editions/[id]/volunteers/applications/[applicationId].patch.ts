@@ -271,7 +271,8 @@ export default wrapApiHandler(
       updateData.acceptanceNote = parsed.note
     }
 
-    // Si on remet en attente ou on rejette, supprimer les assignations d'équipes, repas et validation d'entrée
+    // Si on remet en attente ou on rejette, supprimer les assignations d'équipes et de CRÉNEAUX,
+    // les repas et la validation d'entrée
     if (target === 'PENDING' || target === 'REJECTED') {
       // Supprimer les relations avec les équipes
       updateData.teamAssignments = {
@@ -283,6 +284,28 @@ export default wrapApiHandler(
       updateData.entryValidatedBy = null
       // Supprimer les sélections de repas
       await useVolunteerPorts().meals.deleteVolunteerMealSelections(applicationId)
+
+      /**
+       * Les affectations aux CRÉNEAUX, que ce nettoyage oubliait.
+       *
+       * Il retirait les équipes, les repas et la validation d'entrée — trois choses — et laissait
+       * les créneaux : une candidature refusée gardait donc son planning. Deux lignes de la
+       * production étaient dans ce cas. Le danger n'est pas le planning lui-même : c'est qu'un
+       * créneau d'une équipe de CONTRÔLE D'ACCÈS ouvre le droit de valider et d'annuler des
+       * entrées. Une personne refusée aurait tenu la porte.
+       *
+       * Ce sont deux tables distinctes : `teamAssignments` appartient à la candidature,
+       * `VolunteerAssignment` est rattachée à l'utilisateur et au créneau — d'où la suppression
+       * séparée, et d'où l'oubli. Les demandes d'échange qui les visaient tombent avec elles
+       * (`onDelete: Cascade`), ce qui est le comportement voulu : un échange portant sur une
+       * affectation qui n'existe plus n'a pas de sens.
+       */
+      await prisma.volunteerAssignment.deleteMany({
+        where: {
+          userId: application.userId,
+          timeSlot: { eventId: editionId },
+        },
+      })
     }
 
     const updated = await prisma.editionVolunteerApplication.update({
