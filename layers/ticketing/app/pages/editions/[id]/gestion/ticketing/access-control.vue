@@ -334,11 +334,24 @@
         <!-- Dernières validations -->
         <UCard>
           <div class="space-y-4">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-clock" class="text-orange-500" />
-              <h2 class="text-lg font-semibold">
-                {{ $t('edition.ticketing.recent_validations') }}
-              </h2>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <UIcon name="i-heroicons-clock" class="text-orange-500 flex-shrink-0" />
+                <h2 class="text-lg font-semibold truncate">
+                  {{ $t('edition.ticketing.recent_validations') }}
+                </h2>
+              </div>
+              <!-- Le fil ne montre que dix lignes, sans filtre : c'est voulu, il se lit debout.
+                   Tout le reste vit dans la modale d'historique. -->
+              <UButton
+                variant="ghost"
+                size="sm"
+                icon="i-heroicons-list-bullet"
+                class="flex-shrink-0"
+                @click="historiqueOuvert = true"
+              >
+                {{ $t('ticketing.entry_log.open') }}
+              </UButton>
             </div>
 
             <div v-if="loadingValidations" class="text-center py-8">
@@ -442,6 +455,13 @@
 
       <!-- Scanner QR Code -->
       <TicketingQrCodeScanner v-model:open="scannerOpen" @scan="handleScan" />
+
+      <!-- Historique complet des mouvements d'entrée -->
+      <TicketingEntryLogModal
+        v-model:open="historiqueOuvert"
+        :edition-id="editionId"
+        :fuseau="edition?.timezone"
+      />
 
       <!-- Modal détails du participant -->
       <TicketingParticipantDetailsModal
@@ -703,6 +723,7 @@ const showAddParticipantModal = ref(false)
 const selectedParticipant = ref<any>(null)
 const participantType = ref<'ticket' | 'volunteer'>('ticket')
 const isRefundedOrder = ref(false)
+const historiqueOuvert = ref(false)
 const searchTerm = ref('')
 const searchResults = ref<any>(null)
 const recentValidations = ref<any[]>([])

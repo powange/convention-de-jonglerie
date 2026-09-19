@@ -14,7 +14,6 @@
     "typecheck": "nuxt typecheck",
     "geocode": "node scripts/run-geocoding.mjs",
     "db:backfill-custom-field-ids": "npx tsx scripts/backfill-custom-field-ids.ts",
-    "db:reprise-journal-entrees": "npx tsx scripts/reprise-journal-des-entrees.ts",
     "db:clean-tokens": "npx tsx scripts/clean-expired-tokens.ts",
     "admin:add": "npx tsx scripts/manage-admin.ts add",
     "admin:remove": "npx tsx scripts/manage-admin.ts remove",
