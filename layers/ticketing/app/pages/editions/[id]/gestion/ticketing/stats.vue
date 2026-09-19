@@ -202,7 +202,7 @@
             {{ $t('gestion.ticketing.stats_error') }}
           </p>
         </div>
-        <div v-else-if="filteredData && filteredData.labels.length > 0">
+        <div v-else-if="filteredData && filteredData.timestamps.length > 0">
           <AccessValidationChart
             :data="filteredData"
             :show-participants="filters.showParticipants"
@@ -662,13 +662,18 @@ const purchaseFilters = computed(() => ({
 
 // Données de validations
 interface ValidationData {
-  labels: string[]
+  /** Les instants de début de tranche. Le serveur ne compose plus les libellés : il rendait
+   *  « Lun 15/06 14h » en français, à l'heure d'UTC. */
   timestamps: string[]
+  /** Le fuseau dans lequel les tranches ont été découpées — celui de l'édition. */
+  timezone: string | null
   participants: number[]
   volunteers: number[]
   artists: number[]
   organizers: number[]
   others: number[]
+  /** Les annulations d'entrée, série à part : elles ne se retranchent pas des arrivées. */
+  cancellations: number[]
   periods: {
     setup: { start: string; end: string }
     event: { start: string; end: string }
@@ -680,6 +685,7 @@ interface ValidationData {
     artists: number
     organizers: number
     others: number
+    cancellations: number
   }
 }
 
@@ -783,8 +789,17 @@ watch(
 const filteredData = computed(() => {
   if (!validationsData.value) return null
 
-  const { labels, timestamps, participants, others, volunteers, artists, organizers, periods } =
-    validationsData.value
+  const {
+    timestamps,
+    timezone,
+    participants,
+    others,
+    volunteers,
+    artists,
+    organizers,
+    cancellations,
+    periods,
+  } = validationsData.value
 
   // Filtrer par période
   const filteredIndices: number[] = []
@@ -808,7 +823,12 @@ const filteredData = computed(() => {
   })
 
   return {
-    labels: filteredIndices.map((i) => labels[i]).filter((v): v is string => v !== undefined),
+    // Des instants, plus des libellés : le graphique les formate dans la langue du lecteur et au
+    // fuseau de l'édition. Le serveur composait « Lun 15/06 14h » en français, à l'heure d'UTC.
+    timestamps: filteredIndices
+      .map((i) => timestamps[i])
+      .filter((v): v is string => v !== undefined),
+    timezone,
     participants: filteredIndices
       .map((i) => participants[i])
       .filter((v): v is number => v !== undefined),
@@ -820,6 +840,9 @@ const filteredData = computed(() => {
       .map((i) => organizers[i])
       .filter((v): v is number => v !== undefined),
     others: filteredIndices.map((i) => others[i]).filter((v): v is number => v !== undefined),
+    cancellations: filteredIndices
+      .map((i) => cancellations?.[i])
+      .filter((v): v is number => v !== undefined),
   }
 })
 
