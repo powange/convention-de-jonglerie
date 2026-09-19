@@ -174,7 +174,7 @@
 
               <div class="flex items-start gap-3">
                 <input
-                  v-if="!item.entryValidated && !isRefunded"
+                  v-if="estValidable(item)"
                   :id="`participant-${item.id}`"
                   v-model="selectedParticipants"
                   type="checkbox"
@@ -400,7 +400,7 @@
             <UButton
               v-if="
                 selectedParticipants.length <
-                participantItems.filter((item) => !item.entryValidated).length
+                participantItems.filter((item) => estValidable(item)).length
               "
               variant="ghost"
               size="sm"
@@ -1023,6 +1023,26 @@ const nomDuValidateur = (item: {
 const dateDeValidation = (item: { entryValidatedAt?: string | Date }) =>
   item.entryValidatedAt ? formaterDateHeure(item.entryValidatedAt, props.fuseau, locale.value) : ''
 
+/**
+ * « Ce billet peut-il encore être validé ? »
+ *
+ * Trois endroits proposaient de valider une ligne ANNULÉE : la case à cocher, « Tout
+ * sélectionner » et le total à encaisser. Le serveur refuse désormais ces billets — la garde de
+ * `validate-entry` ne connaissait que `Refunded`, une valeur qu'aucune ligne ne porte, et laissait
+ * passer les `Canceled`. Proposer le geste ici n'aboutirait donc qu'à une erreur 400 devant la
+ * file : autant ne pas l'offrir.
+ *
+ * Le vocabulaire est celui relevé sur les données, et non celui qu'on supposait : voir
+ * `server/utils/ticketing/billets-qui-comptent.ts`. Il est recopié ici faute d'un module partagé
+ * entre le serveur et le client — le gabarit voisin, qui affiche l'état du billet, le recopie
+ * déjà lui aussi.
+ */
+const estValidable = (item: { entryValidated?: boolean; state?: string }) =>
+  !item.entryValidated &&
+  !props.isRefunded &&
+  item.state !== 'Canceled' &&
+  item.state !== 'Refunded'
+
 const isOpen = computed({
   get: () => props.open,
   set: (value) => emit('update:open', value),
@@ -1245,7 +1265,7 @@ const selectAllParticipants = () => {
   if (props.participant && 'ticket' in props.participant) {
     // Ne sélectionner que les participants non-validés et non-donations
     selectedParticipants.value =
-      participantItems.value.filter((item) => !item.entryValidated).map((item) => item.id) || []
+      participantItems.value.filter((item) => estValidable(item)).map((item) => item.id) || []
   }
 }
 
@@ -1262,7 +1282,7 @@ const amountToPay = computed(() => {
 
   // Sinon, calculer le total de la commande (seulement les items non validés)
   return participantItems.value
-    .filter((item) => !item.entryValidated)
+    .filter((item) => estValidable(item))
     .reduce((total, item) => total + getItemTotalAmount(item), 0)
 })
 

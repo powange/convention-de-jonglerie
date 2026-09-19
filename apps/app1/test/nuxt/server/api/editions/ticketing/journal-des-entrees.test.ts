@@ -55,55 +55,87 @@ describe("journal des mouvements d'entrée", () => {
     prismaMock.entryValidationLog.createMany.mockResolvedValue({ count: 0 })
   })
 
+  /**
+   * Les lignes sont relues APRÈS la mise à jour et reconnues à l'horodatage exact de l'appel.
+   * Les mocks doivent donc le récupérer au vol : c'est le handler qui le fabrique, et c'est
+   * précisément ce que ces tests vérifient.
+   */
+  const interceptant = (modele: string, lignes: (t: Date) => any[]) => {
+    let horodatage: Date
+    prismaMock[modele].updateMany.mockImplementation((args: any) => {
+      horodatage = args.data.entryValidatedAt
+      return Promise.resolve({
+        count: lignes(horodatage).filter((l) => l.entryValidatedAt === horodatage).length,
+      })
+    })
+    prismaMock[modele].findMany.mockImplementation((args: any) =>
+      Promise.resolve(args?.where?.OR ? [] : lignes(horodatage))
+    )
+  }
+
   describe('validation', () => {
-    it('consigne les bénévoles réellement validés, et eux seuls', async () => {
+    it('consigne les bénévoles que CET appel a fait passer, et eux seuls', async () => {
       global.readBody = vi.fn().mockResolvedValue({ participantIds: [1, 2, 3], type: 'volunteer' })
-      // Le 2 était déjà validé : le critère `entryValidated: false` l'écarte, et il ne doit donc
-      // pas figurer au journal. C'est toute la raison du relevé fait AVANT la mise à jour.
-      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([{ id: 1 }, { id: 3 }])
-      prismaMock.editionVolunteerApplication.updateMany.mockResolvedValue({ count: 2 })
+      // Le 2 avait été validé par quelqu'un d'autre : ni le même auteur, ni le même instant.
+      // Il n'a donc pas bougé, et n'a rien à faire au journal.
+      interceptant('editionVolunteerApplication', (t) => [
+        { id: 1, entryValidated: true, entryValidatedAt: t, entryValidatedBy: 42 },
+        {
+          id: 2,
+          entryValidated: true,
+          entryValidatedAt: new Date('2026-08-01T09:00:00Z'),
+          entryValidatedBy: 99,
+        },
+        { id: 3, entryValidated: true, entryValidatedAt: t, entryValidatedBy: 42 },
+      ])
       prismaMock.editionVolunteerApplication.findUnique.mockResolvedValue(null)
+      prismaMock.user.findMany.mockResolvedValue([{ id: 99, prenom: 'Grace', nom: 'Hopper' }])
 
       await validateHandler(evenement as any)
 
       expect(prismaMock.entryValidationLog.createMany).toHaveBeenCalledTimes(1)
-      expect(prismaMock.entryValidationLog.createMany.mock.calls[0][0].data).toEqual([
-        {
-          editionId: 7,
-          participantKind: 'VOLUNTEER',
-          participantId: 1,
-          movement: 'VALIDATED',
-          actorId: 42,
-        },
-        {
-          editionId: 7,
-          participantKind: 'VOLUNTEER',
-          participantId: 3,
-          movement: 'VALIDATED',
-          actorId: 42,
-        },
-      ])
+      expect(
+        prismaMock.entryValidationLog.createMany.mock.calls[0][0].data.map(
+          (l: any) => l.participantId
+        )
+      ).toEqual([1, 3])
     })
 
-    it('relève les lignes à valider avec le MÊME critère que la mise à jour', async () => {
-      global.readBody = vi.fn().mockResolvedValue({ participantIds: [5], type: 'artist' })
-      prismaMock.editionArtist.findMany.mockResolvedValue([{ id: 5 }])
-      prismaMock.editionArtist.updateMany.mockResolvedValue({ count: 1 })
+    it('reconnaît les lignes à son propre horodatage, pas au seul auteur', async () => {
+      global.readBody = vi.fn().mockResolvedValue({ participantIds: [5, 6], type: 'artist' })
+      // Même agent, scan précédent : le 6 porte bien `actorId` 42, mais un autre instant. Un
+      // départage fondé sur le seul auteur le recompterait à chaque nouveau scan.
+      interceptant('editionArtist', (t) => [
+        { id: 5, entryValidated: true, entryValidatedAt: t, entryValidatedBy: 42 },
+        {
+          id: 6,
+          entryValidated: true,
+          entryValidatedAt: new Date('2026-08-01T09:00:00Z'),
+          entryValidatedBy: 42,
+        },
+      ])
+      prismaMock.user.findMany.mockResolvedValue([{ id: 42, prenom: 'Ada', nom: 'Lovelace' }])
 
       await validateHandler(evenement as any)
 
-      // Deux critères différents feraient entrer au journal des lignes que la mise à jour a
-      // laissées de côté — exactement ce que ce relevé cherche à éviter.
-      expect(prismaMock.editionArtist.findMany.mock.calls[0][0].where).toEqual(
-        prismaMock.editionArtist.updateMany.mock.calls[0][0].where
-      )
-      expect(prismaMock.editionArtist.findMany.mock.calls[0][0].where.entryValidated).toBe(false)
+      expect(
+        prismaMock.entryValidationLog.createMany.mock.calls[0][0].data.map(
+          (l: any) => l.participantId
+        )
+      ).toEqual([5])
     })
 
     it("n'écrit rien quand tout était déjà validé", async () => {
       global.readBody = vi.fn().mockResolvedValue({ participantIds: [9], type: 'organizer' })
-      prismaMock.editionOrganizer.findMany.mockResolvedValue([])
-      prismaMock.editionOrganizer.updateMany.mockResolvedValue({ count: 0 })
+      interceptant('editionOrganizer', () => [
+        {
+          id: 9,
+          entryValidated: true,
+          entryValidatedAt: new Date('2026-08-01T09:00:00Z'),
+          entryValidatedBy: 99,
+        },
+      ])
+      prismaMock.user.findMany.mockResolvedValue([{ id: 99, prenom: 'Grace', nom: 'Hopper' }])
 
       await validateHandler(evenement as any)
 
@@ -112,12 +144,11 @@ describe("journal des mouvements d'entrée", () => {
 
     it('consigne un billet sous le genre TICKET', async () => {
       global.readBody = vi.fn().mockResolvedValue({ participantIds: [11], type: 'ticket' })
-      // La branche billet interroge d'abord les remboursements, avec le MÊME `findMany` : sans
-      // distinguer les deux appels, le remboursement fictif ferait échouer la validation.
-      prismaMock.ticketingOrderItem.findMany.mockImplementation((args: any) =>
-        Promise.resolve(args?.where?.OR ? [] : [{ id: 11 }])
-      )
-      prismaMock.ticketingOrderItem.updateMany.mockResolvedValue({ count: 1 })
+      // La branche billet interroge d'abord les remboursements, avec le MÊME `findMany` :
+      // `interceptant` distingue les deux appels sur la présence d'un `OR` dans le critère.
+      interceptant('ticketingOrderItem', (t) => [
+        { id: 11, entryValidated: true, entryValidatedAt: t, entryValidatedBy: 42 },
+      ])
       prismaMock.ticketingOrderItem.findFirst.mockResolvedValue(null)
 
       await validateHandler(evenement as any)
@@ -126,6 +157,55 @@ describe("journal des mouvements d'entrée", () => {
         participantKind: 'TICKET',
         movement: 'VALIDATED',
       })
+    })
+
+    it('laisse la condition qui rend le double scan atomique dans la mise à jour', async () => {
+      global.readBody = vi.fn().mockResolvedValue({ participantIds: [5], type: 'artist' })
+      interceptant('editionArtist', (t) => [
+        { id: 5, entryValidated: true, entryValidatedAt: t, entryValidatedBy: 42 },
+      ])
+
+      await validateHandler(evenement as any)
+
+      // Sans elle, deux scanners simultanés valideraient deux fois la même personne — et le
+      // départage qui suit n'y pourrait rien, il ne fait que rendre compte.
+      expect(prismaMock.editionArtist.updateMany.mock.calls[0][0].where.entryValidated).toBe(false)
+      // La relecture, elle, ne la porte pas : elle doit VOIR les lignes déjà validées.
+      const relecture = prismaMock.editionArtist.findMany.mock.calls.at(-1)![0]
+      expect(relecture.where.entryValidated).toBeUndefined()
+    })
+  })
+
+  describe('billet annulé', () => {
+    it("refuse un billet annulé, que l'ancienne garde laissait passer", async () => {
+      global.readBody = vi.fn().mockResolvedValue({ participantIds: [11], type: 'ticket' })
+      // Le premier `findMany` de la branche billet est la garde : elle porte un `OR`.
+      prismaMock.ticketingOrderItem.findMany.mockImplementation((args: any) =>
+        Promise.resolve(args?.where?.OR ? [{ id: 11 }] : [])
+      )
+
+      await expect(validateHandler(evenement as any)).rejects.toThrow()
+      // Rien ne doit avoir bougé : ni l'entrée, ni le journal.
+      expect(prismaMock.ticketingOrderItem.updateMany).not.toHaveBeenCalled()
+      expect(prismaMock.entryValidationLog.createMany).not.toHaveBeenCalled()
+    })
+
+    it("cherche l'état d'annulation réellement écrit en base, pas seulement « Refunded »", async () => {
+      global.readBody = vi.fn().mockResolvedValue({ participantIds: [11], type: 'ticket' })
+      interceptant('ticketingOrderItem', (t) => [
+        { id: 11, entryValidated: true, entryValidatedAt: t, entryValidatedBy: 42 },
+      ])
+      prismaMock.ticketingOrderItem.findFirst.mockResolvedValue(null)
+
+      await validateHandler(evenement as any)
+
+      const garde = prismaMock.ticketingOrderItem.findMany.mock.calls.find(
+        (appel: any) => appel[0]?.where?.OR
+      )!
+      // C'est la valeur que la garde d'origine ignorait — et la seule que les 12 lignes annulées
+      // de la production portent réellement. `Refunded`, lui, n'apparaît sur aucune.
+      expect(garde[0].where.OR[0].state.in).toContain('Canceled')
+      expect(garde[0].where.OR[1].order.status).toBe('Refunded')
     })
   })
 
@@ -185,9 +265,40 @@ describe("journal des mouvements d'entrée", () => {
 
       const reponse: any = await validateHandler(evenement as any)
 
-      expect(reponse.data).toEqual({ validated: 2, type: 'volunteer' })
+      expect(reponse.data).toMatchObject({ validated: 2, type: 'volunteer', alreadyValidated: [] })
       // La pluralisation appartient au client, qui seul connaît la langue du lecteur.
       expect(reponse.message).toBeUndefined()
+    })
+
+    it('dit QUI avait déjà validé, et QUAND, quand un collègue a devancé', async () => {
+      global.readBody = vi.fn().mockResolvedValue({ participantIds: [7], type: 'artist' })
+      const avant = new Date('2026-08-01T09:00:00Z')
+      interceptant('editionArtist', () => [
+        { id: 7, entryValidated: true, entryValidatedAt: avant, entryValidatedBy: 99 },
+      ])
+      prismaMock.user.findMany.mockResolvedValue([{ id: 99, prenom: 'Grace', nom: 'Hopper' }])
+
+      const reponse: any = await validateHandler(evenement as any)
+
+      // Sans cela, le second agent lit « 0 validé » dans une réponse de succès et croit avoir
+      // laissé entrer la personne, alors qu'un collègue l'a fait avant lui.
+      expect(reponse.data.validated).toBe(0)
+      expect(reponse.data.alreadyValidated).toEqual([
+        { id: 7, at: avant, by: { firstName: 'Grace', lastName: 'Hopper' } },
+      ])
+    })
+
+    it('ne prétend pas connaître un auteur que la ligne ne porte pas', async () => {
+      global.readBody = vi.fn().mockResolvedValue({ participantIds: [8], type: 'artist' })
+      interceptant('editionArtist', () => [
+        { id: 8, entryValidated: true, entryValidatedAt: null, entryValidatedBy: null },
+      ])
+
+      const reponse: any = await validateHandler(evenement as any)
+
+      expect(reponse.data.alreadyValidated).toEqual([{ id: 8, at: null, by: null }])
+      // Aucun auteur à résoudre : pas de requête inutile sur les utilisateurs.
+      expect(prismaMock.user.findMany).not.toHaveBeenCalled()
     })
   })
 })
