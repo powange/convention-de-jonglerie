@@ -186,6 +186,10 @@ export const USER_REFERENCES: UserReference[] = [
   // à laquelle ce champ sert à répondre — qui appeler devant un total aberrant — resterait sans
   // réponse. `onDelete: SetNull` protège de l'erreur de clé étrangère, pas de la perte.
   { model: 'ticketingCounter', field: 'lastActorId', group: 'misc' },
+  // Journal des mouvements d'entrée. Même raison que le compteur ci-dessus : `SetNull` évite
+  // l'erreur de clé étrangère mais efface le nom de qui a scanné. Un journal dont l'auteur
+  // disparaît à la première fusion de comptes ne tranche plus aucun désaccord à la porte.
+  { model: 'entryValidationLog', field: 'actorId', group: 'misc' },
   // Échanges de créneaux. Les trois rôles suivent le compte conservé : sans quoi la fusion
   // buterait sur les clés étrangères, et l'historique d'un échange perdrait qui l'a demandé.
   { model: 'volunteerSwapRequest', field: 'requesterId', group: 'volunteers' },

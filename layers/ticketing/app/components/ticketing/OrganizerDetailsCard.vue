@@ -35,20 +35,13 @@
             {{ $t('ticketing.participant.entry_validated') }}
           </p>
           <p class="text-sm text-green-700 dark:text-green-300 mt-1">
-            <span v-if="organizer.entryValidatedBy">
-              Validé par {{ organizer.entryValidatedBy.firstName }}
-              {{ organizer.entryValidatedBy.lastName }}
+            <span v-if="nomDuValidateur">
+              {{ $t('ticketing.participant.validated_by', { name: nomDuValidateur }) }}
             </span>
             <span v-else>{{ $t('ticketing.participant.volunteer_validated') }}</span>
             {{
-              organizer.entryValidatedAt
-                ? `le ${new Date(organizer.entryValidatedAt).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}`
+              dateDeValidation
+                ? $t('ticketing.participant.validated_on', { date: dateDeValidation })
                 : ''
             }}
           </p>
@@ -90,6 +83,8 @@
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 interface Organizer {
   id: number
   user: {
@@ -112,13 +107,15 @@ interface Organizer {
   }
 }
 
-defineProps<{
+const props = defineProps<{
   organizer: Organizer
   editableFirstName: string | null
   editableLastName: string | null
   editableEmail: string | null
   editablePhone: string | null
   validating?: boolean
+  /** Fuseau de l'édition : une entrée se date à l'heure du LIEU, pas du navigateur. */
+  fuseau?: string | null
 }>()
 
 defineEmits<{
@@ -129,6 +126,28 @@ defineEmits<{
   validate: []
   invalidate: []
 }>()
+
+const { locale } = useI18n()
+
+/**
+ * Qui a validé, et quand — à l'heure du lieu.
+ *
+ * Les trois cartes composaient ces deux lignes en français dans le gabarit, et dataient avec
+ * `toLocaleDateString('fr-FR')` : la langue était figée pour tout le monde, et l'horodatage était
+ * celui du navigateur. Un contrôle d'accès se relit sur place ; une entrée validée à 23 h se
+ * serait affichée au lendemain pour qui consulte depuis un fuseau plus à l'est.
+ */
+const nomDuValidateur = computed(() =>
+  props.organizer.entryValidatedBy
+    ? `${props.organizer.entryValidatedBy.firstName} ${props.organizer.entryValidatedBy.lastName}`
+    : ''
+)
+
+const dateDeValidation = computed(() =>
+  props.organizer.entryValidatedAt
+    ? formaterDateHeure(props.organizer.entryValidatedAt, props.fuseau, locale.value)
+    : ''
+)
 
 // Référence au composant TicketingUserInfoSection qui contient EmailValidationInput
 const userInfoSection = ref<InstanceType<typeof TicketingUserInfoSection> | null>(null)

@@ -526,7 +526,8 @@ describe('POST /api/editions/[id]/ticketing/verify (le jeton du QR code)', () =>
 
     const result = await verifyHandler(mockEvent as any)
 
-    expect(result.message).toContain('rouvrir')
+    // Le motif remonte en clé : la phrase est composée par le client, dans SA langue.
+    expect(result.data.raison).toBe('qr_format_obsolete')
   })
 
   it('exige le jeton dans le where quand le QR code en porte un', async () => {
@@ -636,6 +637,93 @@ describe('POST /api/editions/[id]/ticketing/verify (billet sans billetterie exte
     expect(result.data.type).toBe('ticket')
     // La provenance est nulle pour une saisie au guichet, et la réponse sait déjà le dire.
     expect(result.data.participant.ticket.order.provider).toBeNull()
+  })
+
+  it('nomme qui a validé chaque billet de la commande', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'onsite-abc' })
+    prismaMock.externalTicketing.findUnique.mockResolvedValue(null)
+    prismaMock.ticketingOrderItem.findFirst.mockResolvedValue({
+      id: 401,
+      helloAssoItemId: null,
+      name: 'Pass week-end',
+      amount: 5000,
+      state: 'Processed',
+      qrCode: 'onsite-abc',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      email: 'ada@example.com',
+      customFields: null,
+      entryValidated: true,
+      entryValidatedAt: new Date('2026-08-01T12:00:00Z'),
+      entryValidatedBy: 77,
+      tier: null,
+      selectedOptions: [],
+      order: {
+        helloAssoOrderId: null,
+        status: 'Onsite',
+        externalTicketing: null,
+        payerFirstName: 'Ada',
+        payerLastName: 'Lovelace',
+        payerEmail: 'ada@example.com',
+        items: [
+          { id: 401, entryValidated: true, entryValidatedBy: 77, selectedOptions: [] },
+          { id: 402, entryValidated: false, entryValidatedBy: null, selectedOptions: [] },
+        ],
+      },
+    })
+    prismaMock.user.findMany.mockResolvedValue([{ id: 77, prenom: 'Grace', nom: 'Hopper' }])
+
+    const result = await verifyHandler(mockEvent as any)
+
+    const billets = result.data.participant.ticket.order.items
+    expect(billets[0].entryValidatedBy).toEqual({ firstName: 'Grace', lastName: 'Hopper' })
+    // Un billet non validé ne s'invente pas d'auteur.
+    expect(billets[1].entryValidatedBy).toBeNull()
+  })
+
+  it('ne fait qu’une requête utilisateur pour toute la commande', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'onsite-abc' })
+    prismaMock.externalTicketing.findUnique.mockResolvedValue(null)
+    prismaMock.ticketingOrderItem.findFirst.mockResolvedValue({
+      id: 401,
+      helloAssoItemId: null,
+      name: 'Pass',
+      amount: 100,
+      state: 'Processed',
+      qrCode: 'onsite-abc',
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      email: 'ada@example.com',
+      customFields: null,
+      entryValidated: true,
+      entryValidatedAt: null,
+      entryValidatedBy: 77,
+      tier: null,
+      selectedOptions: [],
+      order: {
+        helloAssoOrderId: null,
+        status: 'Onsite',
+        externalTicketing: null,
+        payerFirstName: 'Ada',
+        payerLastName: 'Lovelace',
+        payerEmail: 'ada@example.com',
+        items: [
+          { id: 401, entryValidated: true, entryValidatedBy: 77, selectedOptions: [] },
+          { id: 402, entryValidated: true, entryValidatedBy: 78, selectedOptions: [] },
+          { id: 403, entryValidated: true, entryValidatedBy: 77, selectedOptions: [] },
+        ],
+      },
+    })
+    prismaMock.user.findMany.mockResolvedValue([
+      { id: 77, prenom: 'Grace', nom: 'Hopper' },
+      { id: 78, prenom: 'Alan', nom: 'Turing' },
+    ])
+
+    await verifyHandler(mockEvent as any)
+
+    // Une commande de dix billets ne doit pas coûter dix allers-retours.
+    expect(prismaMock.user.findMany).toHaveBeenCalledTimes(1)
+    expect(prismaMock.user.findMany.mock.calls[0][0].where.id.in.sort()).toEqual([77, 78])
   })
 
   it('ne consulte plus la configuration externe pour trouver le billet', async () => {

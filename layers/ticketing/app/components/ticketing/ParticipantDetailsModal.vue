@@ -169,7 +169,7 @@
                 class="absolute top-2 right-2 flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400"
               >
                 <UIcon name="i-heroicons-check-circle-solid" class="h-4 w-4" />
-                Déjà validé
+                {{ $t('ticketing.participant.entry_validated') }}
               </div>
 
               <div class="flex items-start gap-3">
@@ -370,8 +370,18 @@
               <!-- Bouton dévalider en bas de la carte -->
               <div
                 v-if="item.entryValidated"
-                class="mt-3 pt-3 border-t border-green-200 dark:border-green-800 flex justify-end"
+                class="mt-3 pt-3 border-t border-green-200 dark:border-green-800 flex flex-wrap items-center justify-between gap-2"
               >
+                <p class="text-xs text-green-700 dark:text-green-300">
+                  <span v-if="nomDuValidateur(item)">
+                    {{ $t('ticketing.participant.validated_by', { name: nomDuValidateur(item) }) }}
+                  </span>
+                  {{
+                    dateDeValidation(item)
+                      ? $t('ticketing.participant.validated_on', { date: dateDeValidation(item) })
+                      : ''
+                  }}
+                </p>
                 <UButton
                   color="error"
                   variant="soft"
@@ -586,6 +596,7 @@
       <VolunteerDetailsCard
         v-else-if="isVolunteer && participant && 'volunteer' in participant"
         :volunteer="participant.volunteer"
+        :fuseau="fuseau"
         :editable-first-name="editableFirstName"
         :editable-last-name="editableLastName"
         :editable-email="editableEmail"
@@ -603,6 +614,7 @@
       <ArtistDetailsCard
         v-else-if="isArtist && participant && 'artist' in participant"
         :artist="participant.artist"
+        :fuseau="fuseau"
         :editable-first-name="editableFirstName"
         :editable-last-name="editableLastName"
         :editable-email="editableEmail"
@@ -620,6 +632,7 @@
       <OrganizerDetailsCard
         v-else-if="isOrganizer && participant && 'organizer' in participant"
         :organizer="participant.organizer"
+        :fuseau="fuseau"
         :editable-first-name="editableFirstName"
         :editable-last-name="editableLastName"
         :editable-email="editableEmail"
@@ -770,6 +783,8 @@ import ArtistDetailsCard from './ArtistDetailsCard.vue'
 import OrganizerDetailsCard from './OrganizerDetailsCard.vue'
 import VolunteerDetailsCard from './VolunteerDetailsCard.vue'
 
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 const { money } = useEditionCurrency()
 
 const { getParticipantTypeConfig } = useParticipantTypes()
@@ -809,6 +824,10 @@ interface TicketData {
         email?: string
         entryValidated?: boolean
         entryValidatedAt?: string | Date
+        entryValidatedBy?: {
+          firstName: string
+          lastName: string
+        } | null
         customFields?: Array<{
           name: string
           answer: string
@@ -963,6 +982,8 @@ const props = defineProps<{
   participant?: ParticipantData
   type?: 'ticket' | 'volunteer' | 'artist' | 'organizer'
   isRefunded?: boolean // Indique si la commande est annulée
+  /** Fuseau de l'édition : une entrée se date à l'heure du LIEU, pas du navigateur. */
+  fuseau?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -982,6 +1003,25 @@ const emit = defineEmits<{
   ]
   invalidate: [participantId: number]
 }>()
+
+const { locale } = useI18n()
+
+/**
+ * Qui a validé un billet, et quand — à l'heure du lieu.
+ *
+ * Mêmes règles que dans les trois cartes de détail : un contrôle d'accès se relit sur place, et
+ * la langue de l'horodatage est celle du lecteur, pas un `fr-FR` figé dans le gabarit. Le
+ * validateur n'était pas du tout rendu ici : l'API ne le renvoyait pas pour les billets.
+ */
+const nomDuValidateur = (item: {
+  entryValidatedBy?: { firstName: string; lastName: string } | null
+}) =>
+  item.entryValidatedBy
+    ? `${item.entryValidatedBy.firstName} ${item.entryValidatedBy.lastName}`
+    : ''
+
+const dateDeValidation = (item: { entryValidatedAt?: string | Date }) =>
+  item.entryValidatedAt ? formaterDateHeure(item.entryValidatedAt, props.fuseau, locale.value) : ''
 
 const isOpen = computed({
   get: () => props.open,

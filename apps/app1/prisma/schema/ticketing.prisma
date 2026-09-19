@@ -616,3 +616,53 @@ model TicketingCounter {
   @@index([token])
   @@index([lastActorId])
 }
+
+/// Les deux sens d'un mouvement d'entrée.
+enum EntryMovement {
+  VALIDATED
+  INVALIDATED
+}
+
+/// Les quatre populations qui franchissent la porte, chacune dans sa propre table.
+enum EntryParticipantKind {
+  TICKET
+  VOLUNTEER
+  ARTIST
+  ORGANIZER
+}
+
+/// Journal des mouvements d'entrée — qui est entré, quand, et qui l'a annulé.
+///
+/// Les quatre tables du contrôle d'accès ne portent que l'ÉTAT courant : `entryValidated`, la date
+/// et l'auteur. Une dévalidation les remet à zéro, et il ne restait alors plus rien — ni que la
+/// personne était passée, ni à quelle heure, ni qui avait annulé. C'est précisément ce qu'on a
+/// besoin de relire à l'entrée d'une convention : quelqu'un affirme être passé à 14 h, un bracelet
+/// a été retiré par erreur, deux agents se contredisent.
+///
+/// Le motif existait déjà dans le dépôt pour les droits d'organisateur
+/// (`OrganizerPermissionHistory`) ; il n'avait simplement pas été appliqué ici.
+///
+/// Le participant est désigné par un couple (genre, identifiant) et NON par quatre clés
+/// étrangères facultatives : les quatre tables sont indépendantes et le journal doit survivre à la
+/// disparition d'une candidature ou d'une ligne de commande. C'est aussi ce qui fait qu'il n'y a
+/// pas de relation Prisma vers le participant — la lecture se fait par le couple.
+///
+/// `SetNull` sur l'acteur, comme pour `TicketingCounter.lastActorId` : supprimer ou anonymiser un
+/// compte efface le nom de qui a scanné, pas le fait qu'un scan a eu lieu. Un journal qui
+/// disparaît avec son auteur ne prouve rien.
+model EntryValidationLog {
+  id              Int                  @id @default(autoincrement())
+  editionId       Int
+  participantKind EntryParticipantKind
+  participantId   Int
+  movement        EntryMovement
+  actorId         Int?
+  createdAt       DateTime             @default(now())
+
+  edition Edition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  actor   User?   @relation("EntryValidationLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([editionId, createdAt])
+  @@index([participantKind, participantId])
+  @@index([actorId])
+}

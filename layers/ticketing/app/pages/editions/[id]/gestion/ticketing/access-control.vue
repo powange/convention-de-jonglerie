@@ -446,6 +446,7 @@
         :participant="selectedParticipant"
         :type="participantType"
         :is-refunded="isRefundedOrder"
+        :fuseau="edition?.timezone"
         @validate="handleValidateParticipants"
         @invalidate="handleInvalidateEntry"
       />
@@ -805,6 +806,50 @@ const startScanner = () => {
   scannerOpen.value = true
 }
 
+/**
+ * Ce que dit le bandeau après un scan — écrit ICI, et non par l'API.
+ *
+ * Le serveur composait ses phrases en français, pluralisation comprise, et la page les affichait
+ * telles quelles : traduire cet écran était donc impossible sans toucher au serveur. Il renvoie
+ * désormais un type ou un motif, et les trois tables ci-dessous les nomment. Les clés y sont
+ * écrites en toutes lettres : une clé construite par concaténation est invisible à l'outillage
+ * i18n, qui la croirait inutilisée et finirait par la supprimer.
+ */
+const TITRES_DE_DECOUVERTE: Record<string, string> = {
+  volunteer: 'ticketing.access_control.volunteer_found',
+  artist: 'ticketing.access_control.artist_found',
+  organizer: 'ticketing.access_control.organizer_found',
+  ticket: 'ticketing.access_control.ticket_found',
+}
+
+const MOTIFS_DE_REFUS: Record<string, string> = {
+  volunteer: 'ticketing.access_control.not_found_volunteer',
+  artist: 'ticketing.access_control.not_found_artist',
+  organizer: 'ticketing.access_control.not_found_organizer',
+  ticket: 'ticketing.access_control.not_found_ticket',
+  qr_invalide: 'ticketing.access_control.qr_invalide',
+  qr_format_obsolete: 'ticketing.access_control.qr_format_obsolete',
+}
+
+const titreDeDecouverte = (type?: string) =>
+  t(TITRES_DE_DECOUVERTE[type ?? 'ticket'] ?? 'ticketing.access_control.ticket_found')
+
+const motifDeRefus = (raison?: string) =>
+  raison && MOTIFS_DE_REFUS[raison]
+    ? t(MOTIFS_DE_REFUS[raison] as string)
+    : t('ticketing.access_control.no_ticket_found')
+
+/** Le nom de la personne trouvée, quelle que soit la population : c'est ce qu'on lit à l'entrée. */
+const nomDeLaPersonne = (participant: any): string => {
+  const personne =
+    participant?.volunteer?.user ??
+    participant?.artist?.user ??
+    participant?.organizer?.user ??
+    participant?.ticket
+  if (!personne) return ''
+  return [personne.firstName, personne.lastName].filter(Boolean).join(' ')
+}
+
 const handleScan = async (code: string) => {
   try {
     const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
@@ -822,18 +867,15 @@ const handleScan = async (code: string) => {
       participantModalOpen.value = true
 
       toast.add({
-        title:
-          result.data.type === 'volunteer'
-            ? t('ticketing.access_control.volunteer_found')
-            : t('ticketing.access_control.ticket_found'),
-        description: result.message,
+        title: titreDeDecouverte(result.data.type),
+        description: nomDeLaPersonne(result.data.participant),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
     } else {
       toast.add({
-        title: 'Billet introuvable',
-        description: result.message,
+        title: t('ticketing.access_control.no_ticket_found'),
+        description: motifDeRefus(result.data.raison),
         icon: 'i-heroicons-exclamation-triangle',
         color: 'warning',
       })
@@ -841,8 +883,8 @@ const handleScan = async (code: string) => {
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
     toast.add({
-      title: 'Erreur',
-      description: err.data?.message || 'Impossible de vérifier le billet',
+      title: t('ticketing.access_control.error_title'),
+      description: err.data?.message || t('ticketing.access_control.verify_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -864,7 +906,7 @@ const handleValidateParticipants = async (
 ) => {
   try {
     // Appeler l'API pour valider les participants
-    await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
+    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/validate-entry`, {
       method: 'POST',
       body: {
         participantIds,
@@ -876,8 +918,12 @@ const handleValidateParticipants = async (
     })
 
     toast.add({
-      title: 'Entrée validée',
-      description: `${participantIds.length} participant${participantIds.length > 1 ? 's' : ''} validé${participantIds.length > 1 ? 's' : ''}`,
+      title: t('ticketing.access_control.entry_validated_title'),
+      // Le compte rendu porte ce que le SERVEUR a réellement validé, et non ce qu'on lui avait
+      // demandé : une ligne déjà validée entre-temps ne l'est pas deux fois.
+      description: t('ticketing.access_control.entry_validated_count', {
+        count: result?.data?.validated ?? participantIds.length,
+      }),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
@@ -898,8 +944,8 @@ const handleValidateParticipants = async (
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
     toast.add({
-      title: 'Erreur',
-      description: err.data?.message || 'Impossible de valider les participants',
+      title: t('ticketing.access_control.error_title'),
+      description: err.data?.message || t('ticketing.access_control.validate_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -942,8 +988,8 @@ const handleInvalidateEntry = async (participantId: number) => {
     })
 
     toast.add({
-      title: 'Entrée dévalidée',
-      description: "L'entrée a été dévalidée avec succès",
+      title: t('ticketing.access_control.entry_invalidated_title'),
+      description: t('ticketing.access_control.entry_invalidated_description'),
       icon: 'i-heroicons-x-circle',
       color: 'success',
     })
@@ -964,8 +1010,8 @@ const handleInvalidateEntry = async (participantId: number) => {
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
     toast.add({
-      title: 'Erreur',
-      description: err.data?.message || "Impossible de dévalider l'entrée",
+      title: t('ticketing.access_control.error_title'),
+      description: err.data?.message || t('ticketing.access_control.invalidate_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -989,8 +1035,8 @@ const handleOrderCreated = async (qrCode: string) => {
       participantModalOpen.value = true
 
       toast.add({
-        title: 'Commande créée',
-        description: 'La commande a été créée avec succès',
+        title: t('ticketing.access_control.order_created_title'),
+        description: t('ticketing.access_control.order_created_description'),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -1001,8 +1047,8 @@ const handleOrderCreated = async (qrCode: string) => {
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
     toast.add({
-      title: 'Erreur',
-      description: err.data?.message || 'Impossible de charger la commande créée',
+      title: t('ticketing.access_control.error_title'),
+      description: err.data?.message || t('ticketing.access_control.load_order_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })
@@ -1014,7 +1060,7 @@ const { execute: executeSearchTickets, loading: searching } = useApiAction(
   {
     method: 'POST',
     body: () => ({ searchTerm: searchTerm.value }),
-    errorMessages: { default: 'Impossible de rechercher les billets' },
+    errorMessages: { default: t('ticketing.access_control.search_error') },
     onSuccess: (response: any) => {
       searchResults.value = response?.results || null
     },
@@ -1107,14 +1153,16 @@ const { execute: syncHelloAsso, loading: syncingHelloAsso } = useApiAction<
   method: 'GET',
   silentSuccess: true,
   errorMessages: {
-    default: 'Impossible de synchroniser les participants HelloAsso',
+    default: t('ticketing.access_control.sync_helloasso_error'),
   },
   onSuccess: async (result) => {
     if (result.success) {
       const totalParticipants = result.stats?.totalItems || 0
       toast.add({
-        title: 'Synchronisation réussie',
-        description: `${totalParticipants} participant${totalParticipants > 1 ? 's' : ''} synchronisé${totalParticipants > 1 ? 's' : ''} depuis HelloAsso`,
+        title: t('ticketing.access_control.sync_helloasso_success_title'),
+        description: t('ticketing.access_control.sync_helloasso_success_count', {
+          count: totalParticipants,
+        }),
         icon: 'i-heroicons-check-circle',
         color: 'success',
       })
@@ -1127,7 +1175,7 @@ const { execute: syncHelloAsso, loading: syncingHelloAsso } = useApiAction<
 const { execute: loadVolunteersNotValidated, loading: loadingVolunteersNotValidated } =
   useApiAction(`/api/editions/${editionId}/ticketing/volunteers-not-validated`, {
     method: 'GET',
-    errorMessages: { default: 'Impossible de charger les bénévoles non validés' },
+    errorMessages: { default: t('ticketing.access_control.load_volunteers_error') },
     onSuccess: (response: any) => {
       volunteersNotValidated.value = response?.volunteers || []
     },
@@ -1145,7 +1193,7 @@ const { execute: loadArtistsNotValidated, loading: loadingArtistsNotValidated } 
   `/api/editions/${editionId}/ticketing/artists-not-validated`,
   {
     method: 'GET',
-    errorMessages: { default: 'Impossible de charger les artistes non validés' },
+    errorMessages: { default: t('ticketing.access_control.load_artists_error') },
     onSuccess: (response: any) => {
       artistsNotValidated.value = response?.artists || []
     },
@@ -1163,7 +1211,7 @@ const showArtistsNotValidatedModal = async () => {
 const { execute: loadOrganizersNotValidated, loading: loadingOrganizersNotValidated } =
   useApiAction(`/api/editions/${editionId}/ticketing/organizers-not-validated`, {
     method: 'GET',
-    errorMessages: { default: 'Impossible de charger les organisateurs non validés' },
+    errorMessages: { default: t('ticketing.access_control.load_organizers_error') },
     onSuccess: (response: any) => {
       organizersNotValidated.value = response?.organizers || []
     },

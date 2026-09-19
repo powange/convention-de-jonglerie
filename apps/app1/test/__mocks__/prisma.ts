@@ -92,6 +92,8 @@ export const prismaMock = {
   ticketingTierCustomField: createModelMock(),
   ticketingTierCustomFieldQuota: createModelMock(),
   ticketingCounter: createModelMock(),
+  // Journal des mouvements d'entrée : écrit par validate-entry et invalidate-entry.
+  entryValidationLog: createModelMock(),
   externalTicketing: createModelMock(),
   // Configurations de prestataires : leurs secrets sont chiffrés en base, et les endpoints qui les
   // lisent sont ceux qu'il faut le plus tester.

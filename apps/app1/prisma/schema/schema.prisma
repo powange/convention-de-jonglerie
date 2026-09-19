@@ -66,6 +66,7 @@ model User {
   feedbacks                          Feedback[]
   apiErrorLogs                       ApiErrorLog[]
   ticketingCountersTouched           TicketingCounter[]                  @relation("TicketingCounterLastActor")
+  entryValidationLogs                EntryValidationLog[]                @relation("EntryValidationLogActor")
   notifications                      Notification[]
   lostFoundComments                  LostFoundComment[]
   lostFoundItems                     LostFoundItem[]
@@ -283,6 +284,7 @@ model Edition {
   artistNotificationGroups         ArtistNotificationGroup[]
   volunteerMeals                   VolunteerMeal[]
   ticketingCounters                TicketingCounter[]
+  entryValidationLogs              EntryValidationLog[]
   editionOrganizers                EditionOrganizer[]
   conversations                    Conversation[]
   showCalls                        EditionShowCall[]
