@@ -357,16 +357,7 @@
               <div
                 v-for="validation in recentValidations"
                 :key="validation.id"
-                :class="[
-                  'p-3 rounded-lg',
-                  validation.type === 'ticket'
-                    ? `${ticketConfig.bgClass} ${ticketConfig.darkBgClass}`
-                    : validation.type === 'volunteer'
-                      ? `${volunteerConfig.bgClass} ${volunteerConfig.darkBgClass}`
-                      : validation.type === 'artist'
-                        ? `${artistConfig.bgClass} ${artistConfig.darkBgClass}`
-                        : `${organizerConfig.bgClass} ${organizerConfig.darkBgClass}`,
-                ]"
+                :class="['p-3 rounded-lg', fondDuMouvement(validation)]"
               >
                 <div class="flex items-start justify-between gap-3">
                   <div class="flex items-start gap-3 flex-1 min-w-0">
@@ -397,11 +388,23 @@
                     <!-- Participant validé -->
                     <div class="flex-1 min-w-0">
                       <div class="font-medium text-gray-900 dark:text-white">
-                        {{ validation.firstName }} {{ validation.lastName }}
+                        {{
+                          [validation.firstName, validation.lastName].filter(Boolean).join(' ') ||
+                          $t('ticketing.access_control.unknown')
+                        }}
                       </div>
                       <div class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ validation.name }}
+                        {{ libelleDuMouvement(validation) }}
                       </div>
+                      <UBadge
+                        v-if="validation.movement === 'INVALIDATED'"
+                        color="error"
+                        variant="soft"
+                        size="sm"
+                        class="mt-1"
+                      >
+                        {{ $t('ticketing.access_control.entry_cancelled') }}
+                      </UBadge>
                     </div>
                   </div>
 
@@ -1152,6 +1155,50 @@ const loadRecentValidations = async () => {
   } finally {
     loadingValidations.value = false
   }
+}
+
+/**
+ * Le fil des derniers mouvements, désormais lu dans le journal.
+ *
+ * Il affichait l'ÉTAT courant des quatre tables : une entrée validée puis annulée en disparaissait
+ * complètement, et une annulation n'y figurait jamais. Ce sont ces deux cas que ces deux fonctions
+ * rendent visibles — le reste du bloc n'a pas changé.
+ */
+const LIBELLES_DE_POPULATION: Record<string, string> = {
+  ticket: 'common.participant',
+  volunteer: 'common.volunteer',
+  artist: 'common.artist',
+  organizer: 'common.organizer',
+}
+
+/**
+ * Ce qui est écrit sous le nom : le libellé propre à la ligne quand il en existe un — le nom du
+ * billet, le titre de l'organisateur — sinon la population, nommée ICI.
+ *
+ * Le serveur composait « Bénévole », « Artiste » et « Organisateur » en français. Il rend
+ * désormais `null`, et la langue redevient celle du lecteur (constat B4).
+ */
+const libelleDuMouvement = (mouvement: { name?: string | null; type?: string }) =>
+  mouvement.name || t(LIBELLES_DE_POPULATION[mouvement.type ?? 'ticket'] ?? 'common.participant')
+
+/**
+ * Une annulation ne doit pas se lire comme une validation.
+ *
+ * Elle perd la couleur de sa population pour un fond neutre : à la porte, le fil se parcourt du
+ * coin de l'œil, et une ligne rouge parmi des vertes se repère avant d'être lue.
+ */
+const fondDuMouvement = (mouvement: { movement?: string; type?: string }) => {
+  if (mouvement.movement === 'INVALIDATED') return 'bg-gray-100 dark:bg-gray-800'
+
+  const config =
+    mouvement.type === 'volunteer'
+      ? volunteerConfig
+      : mouvement.type === 'artist'
+        ? artistConfig
+        : mouvement.type === 'organizer'
+          ? organizerConfig
+          : ticketConfig
+  return `${config.bgClass} ${config.darkBgClass}`
 }
 
 const formatValidationTime = (dateString: string) => {
