@@ -54,6 +54,7 @@ export default wrapApiHandler(
                     prenom: true,
                     email: true,
                     phone: true,
+                    ...infosPersonnellesSelect,
                   },
                 },
               },
@@ -129,9 +130,10 @@ export default wrapApiHandler(
           mealDate: meal.date,
           mealType: meal.mealType,
           mealPhases: meal.phases,
-          dietaryPreference: selection.volunteer.dietaryPreference,
-          allergies: selection.volunteer.allergies,
-          allergySeverity: selection.volunteer.allergySeverity,
+          // Le profil fait foi. Ces trois informations étaient lues sur la candidature, dont
+          // les colonnes ont été supprimées : elles valaient `undefined` depuis, et le régime
+          // comme les allergies des bénévoles n'apparaissaient plus nulle part.
+          ...infosAlimentaires(selection.volunteer.user as never),
           afterShow: false,
         })
       })
@@ -258,10 +260,15 @@ export default wrapApiHandler(
         LUNCH: participants.filter((p) => p.mealType === 'LUNCH').length,
         DINNER: participants.filter((p) => p.mealType === 'DINNER').length,
       },
+      // Les trois lignes doivent totaliser `total` : c'est ce qu'on lit dans la carte. « Sans
+      // régime particulier » se dit `'NONE'` en base — une valeur, pas une absence —, et le
+      // chercher dans ce qui est vide laissait ces personnes hors des trois compteurs. La
+      // billetterie, elle, n'a pas d'enum et rend `null` quand rien n'est déclaré.
       byDiet: {
         VEGETARIAN: participants.filter((p) => p.dietaryPreference === 'VEGETARIAN').length,
         VEGAN: participants.filter((p) => p.dietaryPreference === 'VEGAN').length,
-        standard: participants.filter((p) => !p.dietaryPreference).length,
+        standard: participants.filter((p) => !p.dietaryPreference || p.dietaryPreference === 'NONE')
+          .length,
       },
       withAllergies: participants.filter((p) => p.allergies && p.allergies.trim() !== '').length,
       afterShow: participants.filter((p) => p.afterShow).length,
