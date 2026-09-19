@@ -33,23 +33,32 @@ import {
 } from 'chart.js'
 import { Bar } from 'vue-chartjs'
 
+import { formaterJournee } from '~~/shared/utils/fuseau-edition'
+
 // Enregistrer les composants Chart.js nécessaires
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 interface Props {
   data: {
-    labels: string[]
+    /** Les instants de début de chaque tranche. Le serveur ne compose plus les libellés : la
+     *  langue de l'écran est celle du lecteur, et l'heure celle du LIEU. */
+    timestamps: string[]
+    /** Le fuseau dans lequel les tranches ont été découpées. */
+    timezone?: string | null
     participants: number[]
     volunteers: number[]
     artists: number[]
     organizers: number[]
     others: number[]
+    /** Les annulations d'entrée, série à part : elles ne se retranchent pas des arrivées. */
+    cancellations?: number[]
   }
   showParticipants?: boolean
   showVolunteers?: boolean
   showArtists?: boolean
   showOrganizers?: boolean
   showOthers?: boolean
+  showCancellations?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -58,9 +67,10 @@ const props = withDefaults(defineProps<Props>(), {
   showArtists: true,
   showOrganizers: true,
   showOthers: true,
+  showCancellations: true,
 })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { getParticipantTypeConfig } = useParticipantTypes()
 const { exportChartToPDF } = useChartExport()
 
@@ -144,11 +154,43 @@ const chartData = computed<ChartData<'bar'>>(() => {
     })
   }
 
+  if (props.showCancellations && props.data.cancellations?.some((n) => n > 0)) {
+    // Une série à part, et seulement quand il y en a : sur une édition antérieure au 19/09/2026,
+    // la reprise du journal n'a reconstitué aucune annulation — une série vide s'y lirait comme
+    // « personne n'a jamais annulé », alors qu'on ne peut plus le savoir.
+    datasets.push({
+      label: t('gestion.ticketing.stats_cancellations'),
+      data: props.data.cancellations,
+      backgroundColor: 'rgba(220, 38, 38, 0.8)', // red-600
+      borderColor: 'rgba(220, 38, 38, 1)',
+      borderWidth: 1,
+    })
+  }
+
   return {
-    labels: props.data.labels,
+    labels: etiquettes.value,
     datasets,
   }
 })
+
+/**
+ * Les étiquettes des tranches, composées ICI.
+ *
+ * Le serveur rendait « Lun 15/06 14h » avec `setLocale('fr')` et l'heure d'UTC : la langue était
+ * décidée par le serveur, et un afflux à 18 h sur place s'affichait à 16 h. Il rend désormais des
+ * instants, et le fuseau dans lequel il les a découpés.
+ */
+const etiquettes = computed(() =>
+  props.data.timestamps.map((instant) =>
+    formaterJournee(instant, props.data.timezone, locale.value, {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  )
+)
 
 const chartOptions = computed<ChartOptions<'bar'>>(() => ({
   responsive: true,
