@@ -650,6 +650,28 @@ enum EntryParticipantKind {
 /// `SetNull` sur l'acteur, comme pour `TicketingCounter.lastActorId` : supprimer ou anonymiser un
 /// compte efface le nom de qui a scanné, pas le fait qu'un scan a eu lieu. Un journal qui
 /// disparaît avec son auteur ne prouve rien.
+///
+/// ## ⚠️ Une partie des lignes est RECONSTITUÉE, et rien ne les distingue
+///
+/// Le journal n'enregistre que depuis le **19 septembre 2026**. Les entrées validées avant cette
+/// date y ont été inscrites après coup, par un script de reprise, à partir de l'état courant des
+/// quatre tables — **740 lignes** en production le 19/09/2026 : 621 billets, 86 bénévoles,
+/// 28 artistes, 5 organisateurs.
+///
+/// Un champ `source` (`ENREGISTRE` / `RECONSTITUE`) a été proposé et **écarté explicitement**. Ce
+/// commentaire est donc la seule mémoire de la distinction. Trois conséquences, à connaître avant
+/// de tirer quoi que ce soit de ce journal :
+///
+/// - ce qui a été **validé puis annulé avant le 19/09** n'y figure pas : l'état avait été effacé,
+///   c'est le trou même que ce modèle est venu combler ;
+/// - **aucune annulation antérieure** n'a été reconstituée, pour la même raison ;
+/// - une personne présentée deux fois avant cette date n'y laisse qu'une ligne, à l'heure de sa
+///   dernière validation connue.
+///
+/// Autrement dit : sur les éditions antérieures, une suite de `VALIDATED` sans le moindre
+/// `INVALIDATED` ne signifie pas que personne n'a annulé — seulement qu'on ne peut plus le savoir.
+/// Le script de reprise (`scripts/reprise-journal-des-entrees.ts`) a été supprimé après usage ;
+/// il reste consultable dans l'historique Git.
 model EntryValidationLog {
   id              Int                  @id @default(autoincrement())
   editionId       Int
