@@ -5,6 +5,7 @@ import { updateUserInfo } from '#server/utils/editions/ticketing/user-info-updat
 import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { journaliserMouvementDEntree } from '#server/utils/ticketing/journal-des-entrees'
 
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
@@ -57,15 +58,24 @@ export default wrapApiHandler(
           updateData.userSnapshotPhone = body.userInfo.phone
         }
 
-        const result = await prisma.editionVolunteerApplication.updateMany({
-          where: {
-            id: {
-              in: body.participantIds,
-            },
-            eventId: editionId,
-            status: 'ACCEPTED',
-            entryValidated: false,
+        // Qui sera réellement validé — relevé AVANT la mise à jour, parce qu'`updateMany` ne
+        // rend qu'un compte. Le journal doit nommer les lignes qui ont bougé, et non celles qu'on
+        // avait demandées : celles déjà validées sont écartées par le même critère.
+        const critereVolunteer = {
+          id: {
+            in: body.participantIds,
           },
+          eventId: editionId,
+          status: 'ACCEPTED' as const,
+          entryValidated: false,
+        }
+        const aValider = await prisma.editionVolunteerApplication.findMany({
+          where: critereVolunteer,
+          select: { id: true },
+        })
+
+        const result = await prisma.editionVolunteerApplication.updateMany({
+          where: critereVolunteer,
           data: updateData,
         })
 
@@ -183,20 +193,34 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return createSuccessResponse(
-          { validated: result.count },
-          `${result.count} bénévole${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
-        )
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'volunteer',
+          participantIds: aValider.map((ligne) => ligne.id),
+          mouvement: 'VALIDATED',
+          actorId: user.id,
+        })
+
+        return createSuccessResponse({ validated: result.count, type: 'volunteer' })
       } else if (body.type === 'artist') {
         // Valider les artistes
-        const result = await prisma.editionArtist.updateMany({
-          where: {
-            id: {
-              in: body.participantIds,
-            },
-            editionId: editionId,
-            entryValidated: false,
+        // Qui sera réellement validé — relevé AVANT la mise à jour, parce qu'`updateMany` ne
+        // rend qu'un compte. Le journal doit nommer les lignes qui ont bougé, et non celles qu'on
+        // avait demandées : celles déjà validées sont écartées par le même critère.
+        const critereArtist = {
+          id: {
+            in: body.participantIds,
           },
+          editionId: editionId,
+          entryValidated: false,
+        }
+        const aValider = await prisma.editionArtist.findMany({
+          where: critereArtist,
+          select: { id: true },
+        })
+
+        const result = await prisma.editionArtist.updateMany({
+          where: critereArtist,
           data: {
             entryValidated: true,
             entryValidatedAt: new Date(),
@@ -354,21 +378,35 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return createSuccessResponse(
-          { validated: result.count },
-          `${result.count} artiste${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
-        )
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'artist',
+          participantIds: aValider.map((ligne) => ligne.id),
+          mouvement: 'VALIDATED',
+          actorId: user.id,
+        })
+
+        return createSuccessResponse({ validated: result.count, type: 'artist' })
       } else if (body.type === 'organizer') {
         // Valider les organisateurs
         // Les participantIds sont les IDs des EditionOrganizer
-        const result = await prisma.editionOrganizer.updateMany({
-          where: {
-            id: {
-              in: body.participantIds,
-            },
-            editionId: editionId,
-            entryValidated: false,
+        // Qui sera réellement validé — relevé AVANT la mise à jour, parce qu'`updateMany` ne
+        // rend qu'un compte. Le journal doit nommer les lignes qui ont bougé, et non celles qu'on
+        // avait demandées : celles déjà validées sont écartées par le même critère.
+        const critereOrganizer = {
+          id: {
+            in: body.participantIds,
           },
+          editionId: editionId,
+          entryValidated: false,
+        }
+        const aValider = await prisma.editionOrganizer.findMany({
+          where: critereOrganizer,
+          select: { id: true },
+        })
+
+        const result = await prisma.editionOrganizer.updateMany({
+          where: critereOrganizer,
           data: {
             entryValidated: true,
             entryValidatedAt: new Date(),
@@ -423,10 +461,15 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return createSuccessResponse(
-          { validated: result.count },
-          `${result.count} organisateur${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
-        )
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'organizer',
+          participantIds: aValider.map((ligne) => ligne.id),
+          mouvement: 'VALIDATED',
+          actorId: user.id,
+        })
+
+        return createSuccessResponse({ validated: result.count, type: 'organizer' })
       } else {
         // Vérifier si des billets appartiennent à des commandes remboursées
         const refundedItems = await prisma.ticketingOrderItem.findMany({
@@ -449,16 +492,25 @@ export default wrapApiHandler(
         }
 
         // Valider les billets en utilisant l'ID de OrderItem
-        const result = await prisma.ticketingOrderItem.updateMany({
-          where: {
-            id: {
-              in: body.participantIds,
-            },
-            order: {
-              editionId: editionId,
-            },
-            entryValidated: false,
+        // Qui sera réellement validé — relevé AVANT la mise à jour, parce qu'`updateMany` ne
+        // rend qu'un compte. Le journal doit nommer les lignes qui ont bougé, et non celles qu'on
+        // avait demandées : celles déjà validées sont écartées par le même critère.
+        const critereTicket = {
+          id: {
+            in: body.participantIds,
           },
+          order: {
+            editionId: editionId,
+          },
+          entryValidated: false,
+        }
+        const aValider = await prisma.ticketingOrderItem.findMany({
+          where: critereTicket,
+          select: { id: true },
+        })
+
+        const result = await prisma.ticketingOrderItem.updateMany({
+          where: critereTicket,
           data: {
             entryValidated: true,
             entryValidatedAt: new Date(),
@@ -535,10 +587,15 @@ export default wrapApiHandler(
           }
         } // fin if (result.count > 0)
 
-        return createSuccessResponse(
-          { validated: result.count },
-          `${result.count} participant${result.count > 1 ? 's' : ''} validé${result.count > 1 ? 's' : ''}`
-        )
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'ticket',
+          participantIds: aValider.map((ligne) => ligne.id),
+          mouvement: 'VALIDATED',
+          actorId: user.id,
+        })
+
+        return createSuccessResponse({ validated: result.count, type: 'ticket' })
       }
     } catch (error: unknown) {
       console.error('Database validate entry error:', error)

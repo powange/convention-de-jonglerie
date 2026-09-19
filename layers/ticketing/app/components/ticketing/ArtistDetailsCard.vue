@@ -31,20 +31,12 @@
             {{ $t('ticketing.participant.entry_validated') }}
           </p>
           <p class="text-sm text-green-700 dark:text-green-300 mt-1">
-            <span v-if="artist.entryValidatedBy">
-              Validé par {{ artist.entryValidatedBy.firstName }}
-              {{ artist.entryValidatedBy.lastName }}
+            <span v-if="nomDuValidateur">
+              {{ $t('ticketing.participant.validated_by', { name: nomDuValidateur }) }}
             </span>
-            <span v-else>Entrée validée</span>
             {{
-              artist.entryValidatedAt
-                ? `le ${new Date(artist.entryValidatedAt).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}`
+              dateDeValidation
+                ? $t('ticketing.participant.validated_on', { date: dateDeValidation })
                 : ''
             }}
           </p>
@@ -149,6 +141,8 @@
 <script setup lang="ts">
 import type TicketingUserInfoSection from './TicketingUserInfoSection.vue'
 
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 // Utiliser le composable pour obtenir la configuration des artistes
 const { getParticipantTypeConfig } = useParticipantTypes()
 const artistConfig = getParticipantTypeConfig('artist')
@@ -186,13 +180,15 @@ interface Artist {
   }
 }
 
-defineProps<{
+const props = defineProps<{
   artist: Artist
   editableFirstName: string | null
   editableLastName: string | null
   editableEmail: string | null
   editablePhone: string | null
   validating: boolean
+  /** Fuseau de l'édition : une entrée se date à l'heure du LIEU, pas du navigateur. */
+  fuseau?: string | null
 }>()
 
 defineEmits<{
@@ -203,6 +199,28 @@ defineEmits<{
   validate: []
   invalidate: []
 }>()
+
+const { locale } = useI18n()
+
+/**
+ * Qui a validé, et quand — à l'heure du lieu.
+ *
+ * Les trois cartes composaient ces deux lignes en français dans le gabarit, et dataient avec
+ * `toLocaleDateString('fr-FR')` : la langue était figée pour tout le monde, et l'horodatage était
+ * celui du navigateur. Un contrôle d'accès se relit sur place ; une entrée validée à 23 h se
+ * serait affichée au lendemain pour qui consulte depuis un fuseau plus à l'est.
+ */
+const nomDuValidateur = computed(() =>
+  props.artist.entryValidatedBy
+    ? `${props.artist.entryValidatedBy.firstName} ${props.artist.entryValidatedBy.lastName}`
+    : ''
+)
+
+const dateDeValidation = computed(() =>
+  props.artist.entryValidatedAt
+    ? formaterDateHeure(props.artist.entryValidatedAt, props.fuseau, locale.value)
+    : ''
+)
 
 // Référence au composant TicketingUserInfoSection qui contient EmailValidationInput
 const userInfoSection = ref<InstanceType<typeof TicketingUserInfoSection> | null>(null)

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { isHttpError } from '#server/types/api'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { journaliserMouvementDEntree } from '#server/utils/ticketing/journal-des-entrees'
 
 const bodySchema = z.object({
   participantId: z.number(),
@@ -53,6 +54,14 @@ export default wrapApiHandler(
           },
         })
 
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'volunteer',
+          participantIds: [body.participantId],
+          mouvement: 'INVALIDATED',
+          actorId: user.id,
+        })
+
         // Notifier via SSE
         try {
           const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
@@ -92,6 +101,14 @@ export default wrapApiHandler(
             entryValidatedAt: null,
             entryValidatedBy: null,
           },
+        })
+
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'artist',
+          participantIds: [body.participantId],
+          mouvement: 'INVALIDATED',
+          actorId: user.id,
         })
 
         // Notifier via SSE
@@ -135,6 +152,14 @@ export default wrapApiHandler(
           },
         })
 
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'organizer',
+          participantIds: [body.participantId],
+          mouvement: 'INVALIDATED',
+          actorId: user.id,
+        })
+
         // Notifier via SSE
         try {
           const { broadcastToEditionSSE } = await import('#server/utils/sse-manager')
@@ -174,7 +199,19 @@ export default wrapApiHandler(
           data: {
             entryValidated: false,
             entryValidatedAt: null,
+            // Les trois autres populations remettaient déjà l'auteur à null ; le billet, non. Une
+            // entrée annulée gardait donc le nom de qui l'avait validée. Le journal, lui, le
+            // conserve — c'est lui qui répond désormais à « qui, et quand ».
+            entryValidatedBy: null,
           },
+        })
+
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'ticket',
+          participantIds: [body.participantId],
+          mouvement: 'INVALIDATED',
+          actorId: user.id,
         })
 
         // Notifier via SSE

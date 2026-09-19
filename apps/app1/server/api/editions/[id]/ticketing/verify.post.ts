@@ -46,7 +46,7 @@ export default wrapApiHandler(
 
     const demande = designerLaPersonne(body)
     if (demande.genre === 'refus') {
-      return createSuccessResponse({ found: false }, demande.message)
+      return createSuccessResponse({ found: false, raison: demande.cle })
     }
 
     try {
@@ -200,61 +200,55 @@ export default wrapApiHandler(
           })
           const allHandoutItems = articlesActifs ? aggregateHandoutItems(volunteerItemEntries) : []
 
-          return createSuccessResponse(
-            {
+          return createSuccessResponse({
+            found: true,
+            type: 'volunteer',
+            participant: {
               found: true,
-              type: 'volunteer',
-              participant: {
-                found: true,
-                volunteer: {
-                  id: application.id,
-                  user: {
-                    firstName: application.user.prenom,
-                    lastName: application.user.nom,
-                    email: application.user.email,
-                    phone: application.userSnapshotPhone || application.user.phone,
-                  },
-                  teams: application.teamAssignments.map((assignment) => ({
-                    id: assignment.team.id,
-                    name: assignment.team.name,
-                    isLeader: assignment.isLeader,
-                  })),
-                  timeSlots: volunteerAssignments.map((assignment) => ({
-                    id: assignment.timeSlot.id,
-                    title: assignment.timeSlot.title,
-                    team: assignment.timeSlot.team?.name,
-                    startDateTime: assignment.timeSlot.startDateTime,
-                    endDateTime: assignment.timeSlot.endDateTime,
-                  })),
-                  handoutItems: allHandoutItems.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                    quantity: item.quantity,
-                  })),
-                  meals: volunteerMeals.map((selection) => ({
-                    id: selection.meal.id,
-                    date: selection.meal.date,
-                    mealType: selection.meal.mealType,
-                    phases: selection.meal.phases,
-                  })),
-                  entryValidated: application.entryValidated,
-                  entryValidatedAt: application.entryValidatedAt,
-                  entryValidatedBy: validatedByUser
-                    ? {
-                        firstName: validatedByUser.prenom,
-                        lastName: validatedByUser.nom,
-                      }
-                    : null,
+              volunteer: {
+                id: application.id,
+                user: {
+                  firstName: application.user.prenom,
+                  lastName: application.user.nom,
+                  email: application.user.email,
+                  phone: application.userSnapshotPhone || application.user.phone,
                 },
+                teams: application.teamAssignments.map((assignment) => ({
+                  id: assignment.team.id,
+                  name: assignment.team.name,
+                  isLeader: assignment.isLeader,
+                })),
+                timeSlots: volunteerAssignments.map((assignment) => ({
+                  id: assignment.timeSlot.id,
+                  title: assignment.timeSlot.title,
+                  team: assignment.timeSlot.team?.name,
+                  startDateTime: assignment.timeSlot.startDateTime,
+                  endDateTime: assignment.timeSlot.endDateTime,
+                })),
+                handoutItems: allHandoutItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  quantity: item.quantity,
+                })),
+                meals: volunteerMeals.map((selection) => ({
+                  id: selection.meal.id,
+                  date: selection.meal.date,
+                  mealType: selection.meal.mealType,
+                  phases: selection.meal.phases,
+                })),
+                entryValidated: application.entryValidated,
+                entryValidatedAt: application.entryValidatedAt,
+                entryValidatedBy: validatedByUser
+                  ? {
+                      firstName: validatedByUser.prenom,
+                      lastName: validatedByUser.nom,
+                    }
+                  : null,
               },
             },
-            `Bénévole trouvé : ${application.user.prenom} ${application.user.nom}`
-          )
+          })
         } else {
-          return createSuccessResponse(
-            { found: false },
-            'Aucun bénévole accepté trouvé avec ce QR code'
-          )
+          return createSuccessResponse({ found: false, raison: 'volunteer' })
         }
       } else if (demande.genre === 'artist') {
         const artistId = demande.id
@@ -367,51 +361,48 @@ export default wrapApiHandler(
           })
           const allHandoutItems = articlesActifs ? aggregateHandoutItems(artistItemEntries) : []
 
-          return createSuccessResponse(
-            {
+          return createSuccessResponse({
+            found: true,
+            type: 'artist',
+            participant: {
               found: true,
-              type: 'artist',
-              participant: {
-                found: true,
-                artist: {
-                  id: artist.id,
-                  user: {
-                    firstName: artist.user.prenom,
-                    lastName: artist.user.nom,
-                    email: artist.user.email,
-                    phone: artist.user.phone,
-                  },
-                  shows: artist.shows.map((showArtist) => ({
-                    id: showArtist.show.id,
-                    title: showArtist.show.title,
-                    performances: showArtist.show.performances,
-                  })),
-                  handoutItems: allHandoutItems.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                    quantity: item.quantity,
-                  })),
-                  meals: artistMeals.map((selection) => ({
-                    id: selection.meal.id,
-                    date: selection.meal.date,
-                    mealType: selection.meal.mealType,
-                    phases: selection.meal.phases,
-                  })),
-                  entryValidated: artist.entryValidated,
-                  entryValidatedAt: artist.entryValidatedAt,
-                  entryValidatedBy: validatedByUser
-                    ? {
-                        firstName: validatedByUser.prenom,
-                        lastName: validatedByUser.nom,
-                      }
-                    : null,
+              artist: {
+                id: artist.id,
+                user: {
+                  firstName: artist.user.prenom,
+                  lastName: artist.user.nom,
+                  email: artist.user.email,
+                  phone: artist.user.phone,
                 },
+                shows: artist.shows.map((showArtist) => ({
+                  id: showArtist.show.id,
+                  title: showArtist.show.title,
+                  performances: showArtist.show.performances,
+                })),
+                handoutItems: allHandoutItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  quantity: item.quantity,
+                })),
+                meals: artistMeals.map((selection) => ({
+                  id: selection.meal.id,
+                  date: selection.meal.date,
+                  mealType: selection.meal.mealType,
+                  phases: selection.meal.phases,
+                })),
+                entryValidated: artist.entryValidated,
+                entryValidatedAt: artist.entryValidatedAt,
+                entryValidatedBy: validatedByUser
+                  ? {
+                      firstName: validatedByUser.prenom,
+                      lastName: validatedByUser.nom,
+                    }
+                  : null,
               },
             },
-            `Artiste trouvé : ${artist.user.prenom} ${artist.user.nom}`
-          )
+          })
         } else {
-          return createSuccessResponse({ found: false }, 'Aucun artiste trouvé avec ce QR code')
+          return createSuccessResponse({ found: false, raison: 'artist' })
         }
       } else if (demande.genre === 'organizer') {
         const editionOrganizerId = demande.id
@@ -512,50 +503,44 @@ export default wrapApiHandler(
                 ...organizerMeals.flatMap((selection) => selection.meal.handoutItems),
               ])
 
-          return createSuccessResponse(
-            {
+          return createSuccessResponse({
+            found: true,
+            type: 'organizer',
+            participant: {
               found: true,
-              type: 'organizer',
-              participant: {
-                found: true,
-                organizer: {
-                  id: editionOrganizer.id,
-                  user: {
-                    firstName: editionOrganizer.organizer.user.prenom,
-                    lastName: editionOrganizer.organizer.user.nom,
-                    email: editionOrganizer.organizer.user.email,
-                    phone: editionOrganizer.organizer.user.phone,
-                  },
-                  title: editionOrganizer.organizer.title,
-                  handoutItems: allHandoutItems.map((item) => ({
-                    id: item.id,
-                    name: item.name,
-                    quantity: item.quantity,
-                  })),
-                  meals: organizerMeals.map((selection) => ({
-                    id: selection.meal.id,
-                    date: selection.meal.date,
-                    mealType: selection.meal.mealType,
-                    phases: selection.meal.phases,
-                  })),
-                  entryValidated: editionOrganizer.entryValidated,
-                  entryValidatedAt: editionOrganizer.entryValidatedAt,
-                  entryValidatedBy: validatedByUser
-                    ? {
-                        firstName: validatedByUser.prenom,
-                        lastName: validatedByUser.nom,
-                      }
-                    : null,
+              organizer: {
+                id: editionOrganizer.id,
+                user: {
+                  firstName: editionOrganizer.organizer.user.prenom,
+                  lastName: editionOrganizer.organizer.user.nom,
+                  email: editionOrganizer.organizer.user.email,
+                  phone: editionOrganizer.organizer.user.phone,
                 },
+                title: editionOrganizer.organizer.title,
+                handoutItems: allHandoutItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  quantity: item.quantity,
+                })),
+                meals: organizerMeals.map((selection) => ({
+                  id: selection.meal.id,
+                  date: selection.meal.date,
+                  mealType: selection.meal.mealType,
+                  phases: selection.meal.phases,
+                })),
+                entryValidated: editionOrganizer.entryValidated,
+                entryValidatedAt: editionOrganizer.entryValidatedAt,
+                entryValidatedBy: validatedByUser
+                  ? {
+                      firstName: validatedByUser.prenom,
+                      lastName: validatedByUser.nom,
+                    }
+                  : null,
               },
             },
-            `Organisateur trouvé : ${editionOrganizer.organizer.user.prenom} ${editionOrganizer.organizer.user.nom}`
-          )
+          })
         } else {
-          return createSuccessResponse(
-            { found: false },
-            'Aucun organisateur trouvé avec ce QR code'
-          )
+          return createSuccessResponse({ found: false, raison: 'organizer' })
         }
       } else {
         // Recherche d'un billet.
@@ -599,79 +584,108 @@ export default wrapApiHandler(
         })
 
         if (orderItem) {
-          return createSuccessResponse(
-            {
+          /*
+           * Qui a validé chaque billet de la commande.
+           *
+           * Les trois autres branches rendaient déjà cette information ; celle-ci, qui porte
+           * pourtant l'essentiel du flux, ne la rendait pas. À la porte, savoir QUI a scanné
+           * est précisément ce qui tranche un désaccord.
+           *
+           * Une seule requête pour toute la commande, et non une par billet : un groupe de dix
+           * personnes aurait sinon coûté dix allers-retours. Les trois autres branches font un
+           * `findUnique` parce qu'elles n'ont qu'un seul sujet.
+           */
+          const idsValidateurs = [
+            ...new Set(
+              orderItem.order.items
+                .map((item) => item.entryValidatedBy)
+                .filter((id): id is number => typeof id === 'number')
+            ),
+          ]
+          const validateurs = idsValidateurs.length
+            ? await prisma.user.findMany({
+                where: { id: { in: idsValidateurs } },
+                select: { id: true, prenom: true, nom: true },
+              })
+            : []
+          const validateurParId = new Map(validateurs.map((u) => [u.id, u]))
+
+          const nomDuValidateur = (id: number | null) => {
+            const u = id === null ? undefined : validateurParId.get(id)
+            return u ? { firstName: u.prenom, lastName: u.nom } : null
+          }
+
+          return createSuccessResponse({
+            found: true,
+            type: 'ticket',
+            isRefunded: orderItem.order.status === 'Refunded', // Nouveau flag pour indiquer si la commande est annulée
+            participant: {
               found: true,
-              type: 'ticket',
-              isRefunded: orderItem.order.status === 'Refunded', // Nouveau flag pour indiquer si la commande est annulée
-              participant: {
-                found: true,
-                ticket: {
-                  id: orderItem.id, // ID de OrderItem
-                  helloAssoItemId: orderItem.helloAssoItemId,
-                  name: orderItem.name,
-                  amount: orderItem.amount,
-                  state: orderItem.state,
-                  qrCode: orderItem.qrCode,
-                  user: {
-                    firstName: orderItem.firstName,
-                    lastName: orderItem.lastName,
-                    email: orderItem.email,
-                  },
-                  order: {
-                    id: orderItem.order.helloAssoOrderId,
-                    status: orderItem.order.status,
-                    /** `null` quand la commande a été saisie sur place. */
-                    provider: orderItem.order.externalTicketing?.provider ?? null,
-                    payer: {
-                      firstName: orderItem.order.payerFirstName,
-                      lastName: orderItem.order.payerLastName,
-                      email: orderItem.order.payerEmail,
-                    },
-                    items: orderItem.order.items.map((item) => ({
-                      id: item.id, // ID de OrderItem (au lieu de helloAssoItemId qui peut être null)
-                      helloAssoItemId: item.helloAssoItemId,
-                      name: item.name,
-                      type: item.type,
-                      amount: item.amount,
-                      state: item.state,
-                      qrCode: item.qrCode,
-                      firstName: item.firstName,
-                      lastName: item.lastName,
-                      email: item.email,
-                      customFields: item.customFields as any,
-                      entryValidated: item.entryValidated,
-                      entryValidatedAt: item.entryValidatedAt,
-                      tier: item.tier
-                        ? {
-                            id: item.tier.id,
-                            name: item.tier.name,
-                          }
-                        : null,
-                      // La liste complète, tarif + options + champs personnalisés déjà
-                      // agrégés : elle est portée par le billet et non par son tarif, puisque
-                      // ses sources le débordent.
-                      handoutItems: articlesActifs ? calculateHandoutItemsForTicket(item) : [],
-                      selectedOptions: item.selectedOptions.map((so) => ({
-                        id: so.id,
-                        amount: so.amount,
-                        option: {
-                          id: so.option.id,
-                          name: so.option.name,
-                          type: so.option.type,
-                          price: so.option.price,
-                        },
-                      })),
-                    })),
-                  },
-                  customFields: orderItem.customFields as any,
+              ticket: {
+                id: orderItem.id, // ID de OrderItem
+                helloAssoItemId: orderItem.helloAssoItemId,
+                name: orderItem.name,
+                amount: orderItem.amount,
+                state: orderItem.state,
+                qrCode: orderItem.qrCode,
+                user: {
+                  firstName: orderItem.firstName,
+                  lastName: orderItem.lastName,
+                  email: orderItem.email,
                 },
+                order: {
+                  id: orderItem.order.helloAssoOrderId,
+                  status: orderItem.order.status,
+                  /** `null` quand la commande a été saisie sur place. */
+                  provider: orderItem.order.externalTicketing?.provider ?? null,
+                  payer: {
+                    firstName: orderItem.order.payerFirstName,
+                    lastName: orderItem.order.payerLastName,
+                    email: orderItem.order.payerEmail,
+                  },
+                  items: orderItem.order.items.map((item) => ({
+                    id: item.id, // ID de OrderItem (au lieu de helloAssoItemId qui peut être null)
+                    helloAssoItemId: item.helloAssoItemId,
+                    name: item.name,
+                    type: item.type,
+                    amount: item.amount,
+                    state: item.state,
+                    qrCode: item.qrCode,
+                    firstName: item.firstName,
+                    lastName: item.lastName,
+                    email: item.email,
+                    customFields: item.customFields as any,
+                    entryValidated: item.entryValidated,
+                    entryValidatedAt: item.entryValidatedAt,
+                    entryValidatedBy: nomDuValidateur(item.entryValidatedBy),
+                    tier: item.tier
+                      ? {
+                          id: item.tier.id,
+                          name: item.tier.name,
+                        }
+                      : null,
+                    // La liste complète, tarif + options + champs personnalisés déjà
+                    // agrégés : elle est portée par le billet et non par son tarif, puisque
+                    // ses sources le débordent.
+                    handoutItems: articlesActifs ? calculateHandoutItemsForTicket(item) : [],
+                    selectedOptions: item.selectedOptions.map((so) => ({
+                      id: so.id,
+                      amount: so.amount,
+                      option: {
+                        id: so.option.id,
+                        name: so.option.name,
+                        type: so.option.type,
+                        price: so.option.price,
+                      },
+                    })),
+                  })),
+                },
+                customFields: orderItem.customFields as any,
               },
             },
-            `Billet trouvé pour ${orderItem.firstName} ${orderItem.lastName}`
-          )
+          })
         } else {
-          return createSuccessResponse({ found: false }, 'Aucun billet trouvé avec ce QR code')
+          return createSuccessResponse({ found: false, raison: 'ticket' })
         }
       }
     } catch (error: unknown) {

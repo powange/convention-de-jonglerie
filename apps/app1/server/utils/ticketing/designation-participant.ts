@@ -44,13 +44,17 @@ export type Designation =
   | { genre: GenreDePersonne; id: number; preuve: PreuveDIdentite }
   /** Tout ce qui ne porte aucun des trois préfixes : le code d'un billet, quel que soit sa forme. */
   | { genre: 'ticket'; qrCode: string }
-  | { genre: 'refus'; message: string }
+  /**
+   * Un refus porte une CLÉ, pas une phrase.
+   *
+   * L'écran de contrôle affichait jusqu'ici le texte du serveur tel quel : la langue d'un agent
+   * d'accueil dépendait donc d'un fichier de l'API. La clé est résolue côté client, où la locale
+   * du lecteur est connue ; `valeurs` porte ce que la phrase doit interpoler.
+   */
+  | { genre: 'refus'; cle: MotifDeRefus }
 
-const LIBELLES: Record<GenreDePersonne, string> = {
-  volunteer: 'bénévole',
-  artist: 'artiste',
-  organizer: 'organisateur',
-}
+/** Les motifs de refus, tels que l'i18n du client les nomme sous `ticketing.access_control`. */
+export type MotifDeRefus = 'qr_invalide' | 'qr_format_obsolete'
 
 const PREFIXES: Array<[GenreDePersonne, string]> = [
   ['volunteer', 'volunteer-'],
@@ -70,19 +74,14 @@ export function designerLaPersonne(demande: DemandeDeLecture): Designation {
     const morceaux = demande.qrCode.slice(prefixe.length).split('-')
     const id = Number.parseInt(morceaux[0] ?? '', 10)
     if (Number.isNaN(id)) {
-      return { genre: 'refus', message: `QR code ${LIBELLES[genre]} invalide` }
+      return { genre: 'refus', cle: 'qr_invalide' }
     }
 
     const jeton = morceaux[1]
     if (!jeton) {
       // Le format `genre-{id}` a existé, et plus aucune ligne de la base n'en dépend : toutes
       // portent un jeton. L'accepter ne servirait donc qu'à laisser entrer qui l'a deviné.
-      return {
-        genre: 'refus',
-        message:
-          'Ce QR code est à un format qui n’est plus accepté. Demandez à la personne de rouvrir ' +
-          'son billet depuis l’application pour en afficher un nouveau.',
-      }
+      return { genre: 'refus', cle: 'qr_format_obsolete' }
     }
 
     return { genre, id, preuve: { qrCodeToken: jeton } }

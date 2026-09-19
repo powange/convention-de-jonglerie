@@ -56,13 +56,14 @@ describe('designerLaPersonne', () => {
     it('dit à la personne au guichet quoi faire, plutôt que « introuvable »', () => {
       const d = designerLaPersonne({ qrCode: 'volunteer-42' })
       if (d.genre !== 'refus') throw new Error('un refus était attendu')
-      expect(d.message).toContain('rouvrir')
+      // Une CLÉ, pas une phrase : c'est le client qui connaît la langue de qui tient le guichet.
+      expect(d.cle).toBe('qr_format_obsolete')
     })
 
     it('refuse un identifiant qui n’est pas un nombre', () => {
       const d = designerLaPersonne({ qrCode: 'volunteer-abc-jeton' })
       if (d.genre !== 'refus') throw new Error('un refus était attendu')
-      expect(d.message).toContain('invalide')
+      expect(d.cle).toBe('qr_invalide')
     })
 
     it('laisse passer au billet tout ce qui ne porte aucun des trois préfixes', () => {
