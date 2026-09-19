@@ -101,9 +101,16 @@ services:
       NUXT_PORT: '3000'
       NODE_ENV: 'development'
       NODE_OPTIONS: '--max-old-space-size=6144'
-      # Force le polling pour Windows (hot reload)
-      CHOKIDAR_USEPOLLING: 'true'
-      CHOKIDAR_INTERVAL: '1000'
+      # Le scrutin des fichiers a été RETIRÉ.
+      #
+      # `CHOKIDAR_USEPOLLING` faisait interroger toute l'arborescence chaque seconde au lieu
+      # d'écouter les événements du noyau. Il était justifié par « Windows » — mais le dépôt vit
+      # dans le système de fichiers Linux de WSL2 (/home/…), où `inotify` fonctionne. Le scrutin
+      # n'est nécessaire que pour des fichiers montés depuis le disque Windows (/mnt/c/…).
+      #
+      # À remettre si le rechargement à chaud cesse de suivre :
+      #   CHOKIDAR_USEPOLLING: 'true'
+      #   CHOKIDAR_INTERVAL: '1000'
       # URL Ollama avec hostname Docker
       OLLAMA_BASE_URL: '${OLLAMA_BASE_URL:-http://ollama:11434}'
     volumes:

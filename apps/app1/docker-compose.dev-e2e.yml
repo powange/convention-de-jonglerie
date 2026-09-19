@@ -1,0 +1,26 @@
+# Surcouche : le même environnement de développement, mais avec Chromium.
+#
+# Playwright pesait 1 005 Mo sur les 3,8 Go de l'image de dev, et ses deux couches étaient les
+# plus lentes à reconstruire. La CI installant son propre Chromium, il ne servait qu'aux
+# exécutions locales DANS le conteneur — celles lancées depuis l'hôte n'en ont jamais eu besoin.
+# Il vit donc dans un stage au-dessus, qu'on ne construit qu'en le demandant.
+#
+#   docker compose -f docker-compose.dev.yml -f docker-compose.dev-e2e.yml up -d --build app
+#   docker compose -f docker-compose.dev.yml -f docker-compose.dev-e2e.yml exec app npm run test:playwright
+#
+# ⚠️ L'image porte le MÊME nom que celle de dev : construire l'une remplace l'autre. C'est
+# volontaire — deux images pour un seul conteneur se marchent dessus — mais cela veut dire qu'un
+# `up` sans cette surcouche, ensuite, reconstruira l'image sans Chromium.
+name: convention-de-jonglerie
+services:
+  app:
+    build:
+      target: dev-e2e
+    volumes:
+      # La configuration Playwright, que le compose de dev ne monte pas et que l'image ne copie
+      # pas non plus. Sans elle, `playwright test` démarre sur une configuration par défaut et
+      # répond « Available projects: "" » — les tests sont là, les projets n'existent pas.
+      #
+      # C'est ce qui prouve que la suite n'a JAMAIS été lançable depuis le conteneur : le
+      # gigaoctet de Chromium qu'il embarquait ne servait à personne.
+      - ./playwright.config.ts:/app/apps/app1/playwright.config.ts:cached
