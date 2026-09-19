@@ -38,6 +38,14 @@ apps/app2
 # Uploads locaux (montés en volume)
 **/public/uploads/*
 
+# Sauvegardes de base (470 Mo, montées en volume en dev).
+# Elles ne coûtent RIEN au balayage du contexte — mesuré : 2,5 s avec comme sans, le coût tenant
+# au nombre de fichiers et non au volume. C'est `COPY apps/app1/ ./` du stage builder qui les
+# embarquerait dans un build de production lancé en local ; en CI elles sont absentes, Git les
+# ignorant déjà. Ligne d'assurance, donc, pas d'optimisation.
+**/backups/*
+!**/backups/.gitkeep
+
 # Tests / rapports (inutiles à l'image de prod ; le stage dev réinstalle ce qu'il faut)
 **/coverage
 **/.nyc_output

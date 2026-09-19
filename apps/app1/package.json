@@ -55,7 +55,7 @@
     "docker:dev:detached": "docker compose -f docker-compose.dev.yml up -d --build",
     "docker:dev:detached:nocache": "docker compose -f docker-compose.dev.yml build --no-cache && docker compose -f docker-compose.dev.yml up -d",
     "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
-    "docker:dev:clean-modules": "docker compose -f docker-compose.dev.yml down && docker volume rm convention-de-jonglerie_node_modules && echo '✓ Volume node_modules supprimé. Relancez docker:dev pour réinstaller.'",
+    "docker:dev:clean-modules": "docker compose -f docker-compose.dev.yml down --remove-orphans && docker volume rm convention-de-jonglerie_node_modules && echo '✓ Volume node_modules supprimé. Relancez docker:dev pour réinstaller.'",
     "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f app",
     "docker:dev:exec": "docker compose -f docker-compose.dev.yml exec app sh",
     "docker:dev:get-lockfile": "docker cp convention-app-dev:/app/apps/app1/package-lock.json ./package-lock.json && echo '✓ package-lock.json copié depuis le conteneur'",

@@ -20,11 +20,16 @@ FROM base AS builder
 
 # Manifests SEULS d'abord : la couche d'install ne dépend que d'eux, donc modifier prisma/
 # (nouvelle migration, édition de schéma) ne l'invalide plus.
+#
 # Le script du `postinstall` doit exister avant `npm ci` : il relie les dépendances aux layers.
-# Copié à part et avant les sources, pour que le cache d'installation ne soit invalidé que
-# lorsqu'un script change — et non à chaque modification du code applicatif.
+# On copie CE SEUL FICHIER, comme dans le stage dev.
+#
+# Le changement est NEUTRE sur l'image produite : `COPY apps/app1/ ./`, plus bas, recopie tout
+# `scripts/`, et le stage runtime le reprend de là. Seul change ce qui invalide le cache — et la
+# CI en a un (`cache-from: type=gha`), donc éditer un utilitaire y relançait `npm ci` à chaque
+# fusion sur un build qui dure déjà 330 à 470 s et conditionne le déploiement.
 COPY apps/app1/package*.json ./
-COPY apps/app1/scripts ./scripts
+COPY apps/app1/scripts/lier-layers-node-modules.mjs ./scripts/
 
 # Installer dépendances complètes (ci si lock, sinon install)
 # --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
@@ -91,34 +96,41 @@ FROM base AS dev
 # Le code (app + layers) est monté en volume pour le hot-reload, node_modules reste dans un volume Docker
 # Manifests SEULS d'abord : ni l'install npm ni Playwright ne dépendent de prisma/,
 # donc une migration ne relance plus aucune des deux couches.
+#
 # Le script du `postinstall` doit exister avant `npm ci` : il relie les dépendances aux layers.
-# Copié à part et avant les sources, pour que le cache d'installation ne soit invalidé que
-# lorsqu'un script change — et non à chaque modification du code applicatif.
+# On copie CE SEUL FICHIER, et non tout `scripts/`.
+#
+# Le dossier en compte 44, dont un seul sert à l'installation. Copier l'ensemble faisait qu'éditer
+# `check-i18n.js` ou `seed-dev.ts` — sans rapport aucun avec les dépendances — invalidait `npm ci`
+# puis les couches Playwright qui suivaient : 243 s de reconstruction mesurées, pour une ligne
+# changée dans un utilitaire. Le reste de `scripts/` est de toute façon monté en volume au
+# runtime : sa présence dans l'image ne servait à rien.
 COPY apps/app1/package*.json ./
-COPY apps/app1/scripts ./scripts
+COPY apps/app1/scripts/lier-layers-node-modules.mjs ./scripts/
 
 # Installer les dépendances dans l'image pour un démarrage rapide
 # --mount=type=cache : réutilise les tarballs npm déjà téléchargés entre les builds Docker
 RUN --mount=type=cache,target=/root/.npm \
     if [ -f package-lock.json ]; then \
-      echo "Using npm ci (dev stage)" && npm ci; \
+      echo "Using npm ci (dev stage)" && npm ci --no-audit --no-fund; \
     else \
-      echo "No package-lock.json -> npm install (dev stage)" && npm install; \
+      echo "No package-lock.json -> npm install (dev stage)" && npm install --no-audit --no-fund; \
+    fi
+
+# L'empreinte de CE QUI VIENT D'ÊTRE INSTALLÉ, inscrite dans node_modules.
+#
+# Elle voyage avec le dossier quand Docker le recopie dans le volume au premier démarrage, et
+# `docker-start.sh` la compare au verrou monté depuis l'hôte. Sans elle, le script devrait
+# SUPPOSER que l'image est à jour — ce qui serait faux après un `clean-modules` suivi d'un `up`
+# sans `--build`, et il enregistrerait alors une empreinte mensongère.
+RUN if [ -f package-lock.json ]; then \
+      md5sum package-lock.json | cut -d' ' -f1 > node_modules/.empreinte-installation; \
+    else \
+      md5sum package.json | cut -d' ' -f1 > node_modules/.empreinte-installation; \
     fi
 
 # Créer les dossiers requis pour le développement
 RUN mkdir -p /app/apps/app1/public/uploads /app/apps/app1/backups /uploads
-
-# Dépendances système de Chromium (libs Debian) — étape séparée du téléchargement du binaire.
-RUN npx playwright install-deps chromium
-
-# Binaire Chromium pour les tests E2E : téléchargé dans un cache persistant entre builds, puis
-# copié dans l'image. Un cache mount n'étant pas committé dans la couche, la copie est ce qui
-# rend le navigateur présent au runtime ; sur un rebuild, le téléchargement (~150 Mo) est sauté.
-RUN --mount=type=cache,target=/opt/pw-browsers \
-    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright install chromium \
-    && mkdir -p /root/.cache/ms-playwright \
-    && cp -a /opt/pw-browsers/. /root/.cache/ms-playwright/
 
 # Prisma en dernier : monté en volume au runtime en dev, présent dans l'image par cohérence.
 # Placé sous les couches coûteuses pour ne pas invalider leur cache à chaque migration.
@@ -128,3 +140,28 @@ COPY apps/app1/prisma ./prisma/
 ENV NODE_ENV=development NUXT_HOST=0.0.0.0 NUXT_PORT=3000
 EXPOSE 3000 24678
 CMD ["npm", "run", "dev"]
+
+# -------------------------
+# Stage dev-e2e : le dev, plus Chromium
+# -------------------------
+# Playwright pesait 1 005 Mo sur les 3,8 Go de l'image de dev, et ses deux couches étaient les
+# plus lentes à reconstruire (59 s pour les seules dépendances système). Or la CI installe SON
+# PROPRE Chromium (`playwright install chromium --with-deps` dans tests.yml) : celui de l'image
+# ne servait qu'aux exécutions locales dans le conteneur.
+#
+# Il vit donc au-dessus du stage de tous les jours. Qui lance Playwright depuis l'hôte ne le paie
+# plus jamais ; qui le lance dans le conteneur construit cette image-ci :
+#
+#   docker compose -f docker-compose.dev.yml -f docker-compose.dev-e2e.yml up -d --build app
+FROM dev AS dev-e2e
+
+# Dépendances système de Chromium (libs Debian) — étape séparée du téléchargement du binaire.
+RUN npx playwright install-deps chromium
+
+# Binaire Chromium : téléchargé dans un cache persistant entre builds, puis copié dans l'image.
+# Un cache mount n'étant pas committé dans la couche, la copie est ce qui rend le navigateur
+# présent au runtime ; sur un rebuild, le téléchargement (~150 Mo) est sauté.
+RUN --mount=type=cache,target=/opt/pw-browsers \
+    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright install chromium \
+    && mkdir -p /root/.cache/ms-playwright \
+    && cp -a /opt/pw-browsers/. /root/.cache/ms-playwright/
