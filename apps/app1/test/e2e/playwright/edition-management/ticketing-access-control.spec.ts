@@ -51,9 +51,11 @@ const BASE = 'http://localhost:3000'
  *    0 si déjà validé).
  *  - `invalidate-entry` attend `{ participantId: number, type }` (singulier ; `type` défaut
  *    `'volunteer'`, on précise donc `'ticket'`). Réponse `data` = `null` (message seul).
- *  - `recent-validations` renvoie `data.validations[]` (max 10), incluant les billets en état
- *    `Pending` ou `Processed` validés. Notre billet `Pending` validé doit donc y apparaître,
- *    identifié par `{ id: OrderItem, type: 'ticket' }`.
+ *  - `recent-validations` renvoie `data.validations[]` (max 10) — les dix derniers MOUVEMENTS lus
+ *    dans `EntryValidationLog`, validations ET annulations. Une ligne s'identifie par
+ *    `{ participantId, type }` : son `id` est celui de la ligne de journal, et une même personne
+ *    y figure autant de fois qu'elle a bougé. Le fil ne connaît donc rien d'antérieur au
+ *    19/09/2026, date de mise en place du journal.
  *  - `volunteers-not-validated` renvoie `data.{volunteers,total}`. On vérifie seulement
  *    qu'il répond 200 et expose un total numérique (les billets ne figurent pas dans cette
  *    liste, dédiée aux bénévoles — voir rapport).
@@ -212,12 +214,20 @@ test.describe.serial("Module Billetterie — contrôle d'accès (validation d'en
     const validations = data.validations ?? data
     expect(Array.isArray(validations)).toBe(true)
 
-    // Notre billet validé (type 'ticket') doit figurer dans les dernières validations.
+    // Notre billet validé doit figurer dans les derniers mouvements.
+    //
+    // On le retrouve par `participantId` et NON par `id` : depuis que le fil est lu dans le
+    // journal, `id` désigne la ligne de journal, pas le participant. Une même personne y apparaît
+    // deux fois — validée, puis annulée — et les deux lignes s'écraseraient sur son identifiant.
+    // Chercher sur `id` faisait d'ailleurs tomber sur le billet d'une AUTRE exécution, dont le
+    // numéro coïncidait : le test trouvait bien « quelque chose », avec le mauvais courriel.
     const found = validations.find(
-      (v: { id: number; type: string }) => v.id === orderItemId && v.type === 'ticket'
+      (v: { participantId: number; type: string }) =>
+        v.participantId === orderItemId && v.type === 'ticket'
     )
     expect(found).toBeTruthy()
     expect(found.email).toBe(payerEmail)
+    expect(found.movement).toBe('VALIDATED')
   })
 
   test('dévalider son entrée via invalidate-entry', async ({ page }) => {
@@ -252,18 +262,28 @@ test.describe.serial("Module Billetterie — contrôle d'accès (validation d'en
     expect(ticketEntry).toBeTruthy()
     expect(ticketEntry.participant.ticket.entryValidated).toBe(false)
 
-    // Après dévalidation, le billet ne doit plus figurer dans recent-validations.
+    // Après dévalidation, le billet doit TOUJOURS figurer dans le fil — et c'est tout l'objet du
+    // journal.
+    //
+    // Cette attente disait l'inverse, et elle avait raison de le dire : le fil se lisait alors
+    // dans l'état courant, où une entrée annulée n'existe plus. C'est précisément ce trou qu'on a
+    // comblé — une personne passée à 14 h et retirée à 14 h 05 ne doit pas s'évaporer du fil, elle
+    // doit y laisser ses deux mouvements.
     const recent = await page.request.get(
       `${BASE}/api/editions/${editionId}/ticketing/recent-validations`
     )
     expect(recent.ok()).toBe(true)
     const recentBody = await recent.json()
     const validations = recentBody.data?.validations ?? recentBody.data ?? recentBody
-    expect(
-      validations.some(
-        (v: { id: number; type: string }) => v.id === orderItemId && v.type === 'ticket'
-      )
-    ).toBe(false)
+
+    const siens = validations.filter(
+      (v: { participantId: number; type: string }) =>
+        v.participantId === orderItemId && v.type === 'ticket'
+    )
+    expect(siens.length).toBeGreaterThanOrEqual(2)
+    // La plus récente est l'annulation ; la validation qui l'a précédée reste visible.
+    expect(siens[0].movement).toBe('INVALIDATED')
+    expect(siens.some((v: { movement: string }) => v.movement === 'VALIDATED')).toBe(true)
   })
 
   test('une liste *-not-validated répond (200) et expose un total', async ({ page }) => {
