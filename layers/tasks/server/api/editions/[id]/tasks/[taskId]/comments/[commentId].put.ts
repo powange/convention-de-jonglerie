@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
+import { userWithNameAndGravatarSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 
@@ -63,14 +64,7 @@ export default wrapApiHandler(
       data: { content: data.content, editedAt: new Date() },
       include: {
         user: {
-          select: {
-            id: true,
-            pseudo: true,
-            prenom: true,
-            nom: true,
-            emailHash: true,
-            profilePicture: true,
-          },
+          select: userWithNameAndGravatarSelect,
         },
       },
     })
