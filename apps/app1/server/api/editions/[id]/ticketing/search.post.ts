@@ -8,6 +8,7 @@ import {
   handoutItemsIncludes,
 } from '#server/utils/ticketing/handout-items'
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
+import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -220,57 +221,6 @@ export default wrapApiHandler(
         take: 20, // Limiter à 20 résultats
       })
 
-      // Récupérer les utilisateurs qui ont validé les billets.
-      //
-      // Les trois autres populations le faisaient déjà ; celle-ci, non — la fiche d'une personne
-      // trouvée par son nom ne disait donc pas qui l'avait validée, alors que le même manque
-      // venait d'être corrigé dans `verify.post.ts` (constat B2). Une règle recopiée l'est
-      // toujours plus de fois qu'annoncé : celle-ci est écrite quatre fois rien que dans ce
-      // fichier, et huit fois avec `verify`. Son extraction est le seul point d'A3 qui vaille.
-      //
-      // Les identifiants viennent des billets trouvés ET des autres lignes de leur commande : la
-      // modale affiche toute la commande, pas seulement la ligne qui a répondu à la recherche.
-      const ticketValidatorIds = [
-        ...new Set(
-          orderItems
-            .flatMap((item) => [item, ...item.order.items])
-            .map((ligne) => ligne.entryValidatedBy)
-            .filter((id): id is number => typeof id === 'number')
-        ),
-      ]
-      const ticketValidatorUsers = ticketValidatorIds.length
-        ? await prisma.user.findMany({
-            where: { id: { in: ticketValidatorIds } },
-            select: { id: true, prenom: true, nom: true },
-          })
-        : []
-      const ticketValidatorMap = new Map(ticketValidatorUsers.map((u) => [u.id, u]))
-
-      const nomDuValidateur = (id: number | null) => {
-        const u = id === null ? undefined : ticketValidatorMap.get(id)
-        return u ? { firstName: u.prenom, lastName: u.nom } : null
-      }
-
-      // Récupérer les utilisateurs qui ont validé les artistes
-      const artistValidatorIds = artists
-        .filter((a) => a.entryValidatedBy)
-        .map((a) => a.entryValidatedBy!)
-      const artistValidatorUsers = await prisma.user.findMany({
-        where: { id: { in: artistValidatorIds } },
-        select: { id: true, prenom: true, nom: true },
-      })
-      const artistValidatorMap = new Map(artistValidatorUsers.map((u) => [u.id, u]))
-
-      // Récupérer les utilisateurs qui ont validé les organisateurs
-      const organizerValidatorIds = organizers
-        .filter((o) => o.entryValidatedBy)
-        .map((o) => o.entryValidatedBy!)
-      const organizerValidatorUsers = await prisma.user.findMany({
-        where: { id: { in: organizerValidatorIds } },
-        select: { id: true, prenom: true, nom: true },
-      })
-      const organizerValidatorMap = new Map(organizerValidatorUsers.map((u) => [u.id, u]))
-
       // Rechercher dans les bénévoles disponibles pendant l'événement
       // On exclut ceux qui sont uniquement disponibles pour le montage/démontage
       const volunteers = await prisma.editionVolunteerApplication.findMany({
@@ -346,15 +296,21 @@ export default wrapApiHandler(
         take: 20, // Limiter à 20 résultats
       })
 
-      // Récupérer les utilisateurs qui ont validé les bénévoles
-      const volunteerValidatorIds = volunteers
-        .filter((v) => v.entryValidatedBy)
-        .map((v) => v.entryValidatedBy!)
-      const validatorUsers = await prisma.user.findMany({
-        where: { id: { in: volunteerValidatorIds } },
-        select: { id: true, prenom: true, nom: true },
-      })
-      const validatorMap = new Map(validatorUsers.map((u) => [u.id, u]))
+      // Qui a validé, pour les QUATRE populations d'un coup.
+      //
+      // Quatre relevés distincts vivaient ici, et celui des billets manquait — comme il manquait
+      // dans `verify.post.ts` (constat B2). Un seul appel les remplace : une requête au lieu de
+      // quatre, et surtout un seul endroit qui puisse encore oublier une population.
+      //
+      // Placé ICI et non plus haut : les bénévoles sont la dernière des quatre listes à être
+      // constituée. Les identifiants des billets viennent des lignes trouvées ET des autres
+      // lignes de leur commande, puisque la modale affiche la commande entière.
+      const nomDuValidateur = await resoudreLesValidateurs([
+        ...orderItems.flatMap((item) => [item, ...item.order.items]).map((l) => l.entryValidatedBy),
+        ...artists.map((a) => a.entryValidatedBy),
+        ...organizers.map((o) => o.entryValidatedBy),
+        ...volunteers.map((v) => v.entryValidatedBy),
+      ])
 
       // Récupérer les créneaux assignés aux bénévoles
       const volunteerUserIds = volunteers.map((v) => v.user.id)
@@ -742,9 +698,6 @@ export default wrapApiHandler(
           },
         })),
         volunteers: volunteers.map((application) => {
-          const validator = application.entryValidatedBy
-            ? validatorMap.get(application.entryValidatedBy)
-            : null
           const assignments = assignmentsByUserId.get(application.user.id) || []
           const handoutItems = handoutItemsByVolunteerId.get(application.id) || []
           const meals = mealsByVolunteerId.get(application.id) || []
@@ -776,20 +729,12 @@ export default wrapApiHandler(
                 meals: meals,
                 entryValidated: application.entryValidated,
                 entryValidatedAt: application.entryValidatedAt,
-                entryValidatedBy: validator
-                  ? {
-                      firstName: validator.prenom,
-                      lastName: validator.nom,
-                    }
-                  : null,
+                entryValidatedBy: nomDuValidateur(application.entryValidatedBy),
               },
             },
           }
         }),
         artists: artists.map((artist) => {
-          const validator = artist.entryValidatedBy
-            ? artistValidatorMap.get(artist.entryValidatedBy)
-            : null
           const handoutItems = handoutItemsByArtistId.get(artist.id) || []
           const meals = mealsByArtistId.get(artist.id) || []
           return {
@@ -813,20 +758,12 @@ export default wrapApiHandler(
                 meals: meals,
                 entryValidated: artist.entryValidated,
                 entryValidatedAt: artist.entryValidatedAt,
-                entryValidatedBy: validator
-                  ? {
-                      firstName: validator.prenom,
-                      lastName: validator.nom,
-                    }
-                  : null,
+                entryValidatedBy: nomDuValidateur(artist.entryValidatedBy),
               },
             },
           }
         }),
         organizers: organizers.map((editionOrganizer) => {
-          const validator = editionOrganizer.entryValidatedBy
-            ? organizerValidatorMap.get(editionOrganizer.entryValidatedBy)
-            : null
           const handoutItems = handoutItemsByOrganizerId.get(editionOrganizer.id) || []
           return {
             type: 'organizer',
@@ -844,12 +781,7 @@ export default wrapApiHandler(
                 handoutItems,
                 entryValidated: editionOrganizer.entryValidated,
                 entryValidatedAt: editionOrganizer.entryValidatedAt,
-                entryValidatedBy: validator
-                  ? {
-                      firstName: validator.prenom,
-                      lastName: validator.nom,
-                    }
-                  : null,
+                entryValidatedBy: nomDuValidateur(editionOrganizer.entryValidatedBy),
               },
             },
           }
