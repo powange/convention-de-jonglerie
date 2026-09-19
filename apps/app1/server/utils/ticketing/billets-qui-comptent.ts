@@ -26,12 +26,14 @@
  * `status: 'Onsite'` et `state: 'Processed'`. L'exclure ici retirerait toutes les ventes sur
  * place, qui sont un tiers des commandes.
  *
- * ## Ce que ce fichier ne fait pas encore
+ * ## La garde d'entrée, refermée depuis
  *
- * Il ne couvre que les **lectures de statistiques**. La garde de `validate-entry.post.ts`, elle,
- * refuse toujours `state: 'Refunded'` — une valeur qui n'existe pas — et laisse donc valider un
- * billet annulé. C'est un constat distinct, et le corriger demandera de faire passer ce
- * vocabulaire côté client aussi, où il est recopié en chaînes littérales.
+ * Ce fichier ne couvrait d'abord que les **lectures de statistiques**, et signalait que la garde
+ * de `validate-entry.post.ts` refusait `state: 'Refunded'` — une valeur qu'aucune ligne ne porte —
+ * et laissait donc valider un billet annulé. C'était exact : **4 billets `Canceled` de la
+ * production portaient un code QR valide et une commande `Processed`**, donc se scannaient et se
+ * validaient comme des billets ordinaires. `billetAnnule` ci-dessous est la réponse, et la garde
+ * s'en sert désormais.
  */
 
 /** Les états de ligne qui valent « ce billet existe toujours ». */
@@ -71,4 +73,34 @@ export const estUnParticipant = { tier: { countAsParticipant: true } }
 
 export const nEstPasUnParticipant = {
   OR: [{ tier: { countAsParticipant: false } }, { tierId: null }],
+}
+
+/**
+ * Les états de ligne qui retirent le droit d'entrer.
+ *
+ * Une **liste explicite**, et non le complément de `ETATS_DE_BILLET_COMPTABILISES` : `state` est
+ * une chaîne libre, et si le fournisseur invente demain une valeur, la traiter d'office comme une
+ * annulation refuserait un billet légitime **à la porte**, devant la file. Laisser entrer
+ * quelqu'un dont l'état est inconnu est la moindre des deux erreurs ; c'est le seul endroit du
+ * module où le doute penche de ce côté.
+ *
+ * `Refunded` n'apparaît sur aucune ligne aujourd'hui — il est conservé parce que la garde
+ * d'origine le visait, et qu'aucune trace ne dit s'il a existé.
+ */
+export const ETATS_DE_BILLET_ANNULE = ['Canceled', 'Refunded'] as const
+
+/**
+ * Le fragment de `where` qui désigne un billet qui **ne donne plus droit d'entrée**.
+ *
+ * Deux façons de l'être, qui ne se recouvrent pas : la ligne est annulée, ou la commande entière
+ * a été remboursée. La garde d'origine ne connaissait que la seconde et une valeur inexistante
+ * pour la première.
+ */
+export function billetAnnule() {
+  return {
+    OR: [
+      { state: { in: [...ETATS_DE_BILLET_ANNULE] } },
+      { order: { status: STATUT_COMMANDE_REMBOURSEE } },
+    ],
+  }
 }

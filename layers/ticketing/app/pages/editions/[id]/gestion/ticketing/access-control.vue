@@ -648,11 +648,13 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { getParticipantTypeConfig } = useParticipantTypes()
 
 // Titre de l'onglet : « Contrôle d'accès - Billetterie », cohérent avec la section Billetterie.
@@ -891,6 +893,61 @@ const handleScan = async (code: string) => {
   }
 }
 
+/**
+ * Ce que l'agent lit après avoir validé — et la distinction qui manquait.
+ *
+ * La mise à jour est atomique : deux scanners simultanés ne valident pas deux fois. Mais le
+ * second recevait un succès annonçant « 0 entrée validée », sans rien pour comprendre qu'un
+ * collègue l'avait devancé. Aux deux portes d'une même convention, les deux croyaient avoir
+ * laissé entrer la personne. Le serveur renvoie désormais QUI a validé et QUAND ; il reste à le
+ * dire autrement qu'un succès.
+ */
+const compteRenduDeValidation = (donnees: any, demandes: number) => {
+  const validees = donnees?.validated ?? demandes
+  const deja = (donnees?.alreadyValidated ?? []) as Array<{
+    at?: string | null
+    by?: { firstName?: string | null; lastName?: string | null } | null
+  }>
+
+  if (validees === 0 && deja.length > 0) {
+    return {
+      title: t('ticketing.access_control.entry_already_validated_title'),
+      description: deja.length === 1 ? circonstanceDe(deja[0]!) : nombreDejaValidees(deja.length),
+      icon: 'i-heroicons-exclamation-triangle',
+      color: 'warning' as const,
+    }
+  }
+
+  return {
+    title: t('ticketing.access_control.entry_validated_title'),
+    // Le compte rendu porte ce que le SERVEUR a réellement validé, et non ce qu'on lui avait
+    // demandé : une ligne déjà validée entre-temps ne l'est pas deux fois.
+    description:
+      t('ticketing.access_control.entry_validated_count', { count: validees }) +
+      (deja.length > 0 ? ' · ' + nombreDejaValidees(deja.length) : ''),
+    icon: 'i-heroicons-check-circle',
+    color: 'success' as const,
+  }
+}
+
+const nombreDejaValidees = (nombre: number) =>
+  t('ticketing.access_control.entry_already_validated_count', { count: nombre })
+
+/** Qui a validé, et quand — à l'heure du LIEU, comme partout ailleurs sur cet écran. */
+const circonstanceDe = (entree: {
+  at?: string | null
+  by?: { firstName?: string | null; lastName?: string | null } | null
+}) => {
+  const nom = [entree.by?.firstName, entree.by?.lastName].filter(Boolean).join(' ')
+  const quand = entree.at ? formaterDateHeure(entree.at, edition.value?.timezone, locale.value) : ''
+
+  if (nom && quand) {
+    return t('ticketing.access_control.entry_already_validated_by', { name: nom, date: quand })
+  }
+  if (quand) return t('ticketing.access_control.entry_already_validated_when', { date: quand })
+  return t('ticketing.access_control.entry_already_validated_unknown')
+}
+
 const handleValidateParticipants = async (
   participantIds: number[],
   paymentInfo?: {
@@ -917,16 +974,7 @@ const handleValidateParticipants = async (
       },
     })
 
-    toast.add({
-      title: t('ticketing.access_control.entry_validated_title'),
-      // Le compte rendu porte ce que le SERVEUR a réellement validé, et non ce qu'on lui avait
-      // demandé : une ligne déjà validée entre-temps ne l'est pas deux fois.
-      description: t('ticketing.access_control.entry_validated_count', {
-        count: result?.data?.validated ?? participantIds.length,
-      }),
-      icon: 'i-heroicons-check-circle',
-      color: 'success',
-    })
+    toast.add(compteRenduDeValidation(result?.data, participantIds.length))
 
     // Recharger les statistiques et les dernières validations
     await Promise.all([loadStats(), loadRecentValidations()])
