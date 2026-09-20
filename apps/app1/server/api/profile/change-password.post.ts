@@ -63,17 +63,22 @@ export default wrapApiHandler(
     // Hasher le nouveau mot de passe
     const hashedNewPassword = await bcrypt.hash(newPassword, 12)
 
-    // Mettre à jour le mot de passe
+    /**
+     * Le mot de passe ET la génération des sessions, d'une seule écriture.
+     *
+     * Incrémenter `sessionVersion` ferme TOUTES les sessions du compte, pas seulement celle-ci :
+     * changer son mot de passe est le geste par lequel on reprend la main, et il serait vain si
+     * l'appareil qu'on soupçonne restait connecté. Le middleware compare ce numéro dans la
+     * lecture du compte qu'il fait déjà à chaque requête — aucune requête de plus.
+     */
     await prisma.user.update({
       where: { id: user.id },
       data: {
         password: hashedNewPassword,
+        sessionVersion: { increment: 1 },
       },
     })
 
-    // Invalider la session courante : force la re-authentification après un changement
-    // de mot de passe. Note : pour invalider également les sessions sur d'autres appareils,
-    // implémenter un mécanisme de versionning (User.sessionVersion en BDD + middleware).
     await clearUserSession(event)
 
     return createSuccessResponse(null, 'Mot de passe mis à jour avec succès')

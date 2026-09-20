@@ -55,10 +55,19 @@ export default wrapApiHandler(
     // Hasher le nouveau mot de passe (salt rounds 12, harmonisé avec change-password)
     const hashedPassword = await bcrypt.hash(newPassword, 12)
 
-    // Mettre à jour le mot de passe de l'utilisateur
+    /**
+     * Le mot de passe ET la génération des sessions.
+     *
+     * Une réinitialisation est demandée par quelqu'un qui a perdu l'accès — ou par quelqu'un qui
+     * soupçonne qu'un autre l'a. Incrémenter `sessionVersion` ferme toutes les sessions ouvertes
+     * du compte, sur tous les appareils, ce que la seule écriture du mot de passe ne faisait pas.
+     */
     await prisma.user.update({
       where: { id: resetToken.userId },
-      data: { password: hashedPassword },
+      data: {
+        password: hashedPassword,
+        sessionVersion: { increment: 1 },
+      },
     })
 
     // Invalider TOUS les tokens de reset de cet utilisateur (sécurité + nettoyage BDD)
@@ -67,9 +76,7 @@ export default wrapApiHandler(
       where: { userId: resetToken.userId },
     })
 
-    // Invalider la session courante : si l'utilisateur était connecté, force la re-authentification.
-    // Note : pour invalider également les sessions sur d'autres appareils, implémenter
-    // un mécanisme de versionning (User.sessionVersion en BDD + middleware).
+    // Et la session courante, pour que le navigateur qui vient de réinitialiser reparte propre.
     await clearUserSession(event)
 
     return createSuccessResponse(null, 'Votre mot de passe a été réinitialisé avec succès')

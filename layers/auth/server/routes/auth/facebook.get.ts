@@ -5,7 +5,7 @@ import { $fetch } from 'ofetch'
 
 import { getEmailHash } from '#server/utils/email-hash'
 import { sanitizeReturnTo } from '#server/utils/safe-redirect'
-import { setAuthSession } from '#server/utils/session-helpers'
+import { ouvrirSession } from '#server/utils/session-helpers'
 
 function slugifyPseudo(base: string) {
   const clean =
@@ -127,7 +127,10 @@ export default defineEventHandler(async (event) => {
     const [prenomRaw, ...rest] = name.trim().split(/\s+/)
     const prenom = (givenName || prenomRaw || email.split('@')[0]).trim()
     const nom = (familyName || rest.join(' ') || 'Facebook').trim()
-    const basePseudo = email.split('@')[0]
+    // `split` rend `string | undefined` pour TypeScript, et `uniquePseudo` attend une chaîne.
+    // Une adresse a toujours une partie locale ; le repli sur l'adresse entière dit la même
+    // chose qu'un `!`, sans affirmer au compilateur ce qu'il ne peut pas vérifier.
+    const basePseudo = email.split('@')[0] ?? email
     const pseudo = await uniquePseudo(basePseudo)
 
     dbUser = await prisma.user.create({
@@ -176,14 +179,9 @@ export default defineEventHandler(async (event) => {
   // Vérifier si l'utilisateur est en mode PWA
   const isPWA = getCookie(event, 'pwa_mode') === 'true'
 
-  // Si PWA, session de 90 jours, sinon 30 jours (défaut configuré)
-  const sessionConfig = isPWA
-    ? {
-        maxAge: 60 * 60 * 24 * 90, // 90 jours pour les PWA
-      }
-    : undefined // Utilise la config par défaut (30 jours)
-
-  await setAuthSession(
+  // La durée voyage désormais DANS la session : la passer à la seule écriture ne servait
+  // à rien, toutes les lectures repassant par la durée par défaut. Cf. session-helpers.ts.
+  await ouvrirSession(
     event,
     {
       user: {
@@ -199,7 +197,7 @@ export default defineEventHandler(async (event) => {
         isEmailVerified: dbUser.isEmailVerified,
       },
     },
-    sessionConfig
+    { seSouvenirDeMoi: isPWA, sessionVersion: dbUser.sessionVersion }
   )
 
   // Nettoyer le cookie PWA

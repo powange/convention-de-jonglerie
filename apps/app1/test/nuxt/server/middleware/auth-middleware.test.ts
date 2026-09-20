@@ -61,7 +61,7 @@ describe("Middleware d'authentification", () => {
     // Reset le mock sans refaire l'import
     mockGetSession.mockResolvedValue({ user: mockUser })
     // Par défaut, l'utilisateur de session existe toujours en base
-    prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id })
+    prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id, sessionVersion: 0 })
   })
 
   describe('Routes publiques', () => {
@@ -268,7 +268,7 @@ describe("Middleware d'authentification", () => {
       it('ne devrait pas invalider la session si le user existe toujours', async () => {
         const event = createMockEvent('/api/protected-route', 'GET')
         mockGetSession.mockResolvedValue({ user: mockUser })
-        prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id })
+        prismaMock.user.findUnique.mockResolvedValue({ id: mockUser.id, sessionVersion: 0 })
 
         await authMiddleware(event as H3Event)
 
@@ -323,6 +323,56 @@ describe("Middleware d'authentification", () => {
       mockGetSession.mockResolvedValue({ user: userWithId42 })
       await authMiddleware(event as H3Event)
       expect(event.context.user.id).toBe(42)
+    })
+  })
+
+  describe('Révocation par génération de session', () => {
+    /**
+     * Les sessions vivent dans un cookie scellé, sans trace en base. Sans ce numéro, rien ne
+     * permettait d'en fermer une à distance : changer son mot de passe ne fermait que la session
+     * courante, et les autres appareils restaient connectés — indéfiniment depuis qu'elles
+     * glissent. Le middleware compare le numéro dans la lecture du compte qu'il fait DÉJÀ.
+     */
+    const evenement = () => createMockEvent('/api/protected-route', 'GET')
+
+    it('refuse une session dont la génération est dépassée', async () => {
+      mockGetSession.mockResolvedValue({ user: { id: 1 }, sessionVersion: 3 })
+      prismaMock.user.findUnique.mockResolvedValue({ id: 1, sessionVersion: 4 })
+
+      await expect(authMiddleware(evenement() as H3Event)).rejects.toThrow()
+      expect(mockClearSession).toHaveBeenCalled()
+    })
+
+    it('accepte une session dont la génération correspond', async () => {
+      mockGetSession.mockResolvedValue({ user: { id: 1 }, sessionVersion: 4 })
+      prismaMock.user.findUnique.mockResolvedValue({ id: 1, sessionVersion: 4 })
+
+      const ev = evenement()
+      await authMiddleware(ev as H3Event)
+      expect((ev.context as any).user.id).toBe(1)
+    })
+
+    it('adopte une session d’avant la correction, qui ne porte aucune génération', async () => {
+      // Lue comme la génération zéro : celle des comptes dont le mot de passe n'a pas changé
+      // depuis. Elle se fermera au premier changement.
+      mockGetSession.mockResolvedValue({ user: { id: 1 } })
+      prismaMock.user.findUnique.mockResolvedValue({ id: 1, sessionVersion: 0 })
+
+      const ev = evenement()
+      await authMiddleware(ev as H3Event)
+      expect((ev.context as any).user.id).toBe(1)
+    })
+
+    it('lit la génération dans la MÊME requête que l’existence du compte', async () => {
+      // L'argument qui a fait retenir ce mécanisme : il ne coûte aucune requête supplémentaire.
+      mockGetSession.mockResolvedValue({ user: { id: 1 }, sessionVersion: 0 })
+      prismaMock.user.findUnique.mockResolvedValue({ id: 1, sessionVersion: 0 })
+
+      await authMiddleware(evenement() as H3Event)
+
+      expect(prismaMock.user.findUnique).toHaveBeenCalledOnce()
+      const [args] = prismaMock.user.findUnique.mock.calls[0]!
+      expect(args.select).toEqual({ id: true, sessionVersion: true })
     })
   })
 })

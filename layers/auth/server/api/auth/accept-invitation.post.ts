@@ -1,12 +1,11 @@
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
-import { setUserSession } from '#imports'
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { NotificationHelpers } from '#server/utils/notification-service'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
+import { ouvrirSession } from '#server/utils/session-helpers'
 import { passwordSchema } from '#server/utils/validation-schemas'
 
 const acceptInvitationSchema = z.object({
@@ -69,23 +68,32 @@ export default wrapApiHandler(
     })
 
     // Connexion automatique
-    await setUserSession(event, {
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        pseudo: updatedUser.pseudo,
-        nom: updatedUser.nom,
-        prenom: updatedUser.prenom,
-        phone: updatedUser.phone,
-        isGlobalAdmin: updatedUser.isGlobalAdmin,
-        isVolunteer: updatedUser.isVolunteer,
-        isArtist: updatedUser.isArtist,
-        isOrganizer: updatedUser.isOrganizer,
-        createdAt: updatedUser.createdAt,
-        updatedAt: updatedUser.updatedAt,
-        isEmailVerified: updatedUser.isEmailVerified,
+    await ouvrirSession(
+      event,
+      {
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          pseudo: updatedUser.pseudo,
+          nom: updatedUser.nom,
+          prenom: updatedUser.prenom,
+          phone: updatedUser.phone,
+          isGlobalAdmin: updatedUser.isGlobalAdmin,
+          isVolunteer: updatedUser.isVolunteer,
+          isArtist: updatedUser.isArtist,
+          isOrganizer: updatedUser.isOrganizer,
+          createdAt: updatedUser.createdAt,
+          updatedAt: updatedUser.updatedAt,
+          isEmailVerified: updatedUser.isEmailVerified,
+        },
       },
-    })
+      {
+        // La génération courante du compte : sans elle, la session naîtrait avec le
+        // numéro 0 et le middleware la rejetterait aussitôt pour tout compte ayant
+        // déjà changé de mot de passe.
+        sessionVersion: updatedUser.sessionVersion,
+      }
+    )
 
     // Notification de bienvenue (non bloquant)
     try {

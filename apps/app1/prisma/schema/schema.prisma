@@ -28,6 +28,19 @@ model User {
   isEmailVerified        Boolean   @default(false)
   verificationCodeExpiry DateTime?
   isGlobalAdmin          Boolean   @default(false)
+
+  /// Le numéro de génération des sessions de ce compte.
+  ///
+  /// Les sessions vivent dans un cookie scellé, sans trace en base : rien ne permettait donc
+  /// d'en fermer une à distance. Changer son mot de passe ne fermait que la session courante,
+  /// et les autres appareils restaient connectés — indéfiniment depuis que les sessions
+  /// glissent.
+  ///
+  /// Chaque session emporte le numéro qu'elle a trouvé à sa création. Le middleware le compare
+  /// à celui du compte, qu'il lit DÉJÀ à chaque requête protégée : l'incrémenter ferme d'un coup
+  /// toutes les sessions ouvertes, sans une requête de plus.
+  sessionVersion         Int       @default(0)
+
   phone                  String?
   pronouns               String?
   preferredLanguage      String    @default("fr")

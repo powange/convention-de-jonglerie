@@ -1,13 +1,12 @@
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
-import { setUserSession } from '#imports'
-
 import type { ApiSuccessResponse } from '#server/types/api'
 import type { LoginResponse } from '#server/types/api-responses'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
+import { ouvrirSession } from '#server/utils/session-helpers'
 import { sanitizeString } from '#server/utils/validation-helpers'
 
 // Les fournisseurs OAuth pris en charge, tels qu'ils sont écrits en base par
@@ -120,15 +119,15 @@ export default wrapApiHandler<ApiSuccessResponse<LoginResponse>>(
       data: updateData,
     })
 
-    // Définir la session côté serveur (cookies scellés via nuxt-auth-utils)
-    // Si "Se souvenir de moi" est coché, la session dure 90 jours, sinon 30 jours (défaut configuré)
-    const sessionConfig = rememberMe
-      ? {
-          maxAge: 60 * 60 * 24 * 90, // 90 jours pour "Se souvenir de moi"
-        }
-      : undefined // Utilise la config par défaut (30 jours configuré dans nuxt.config.ts)
-
-    await setUserSession(
+    /**
+     * La session s'ouvre avec sa durée de vie, portée par ses données.
+     *
+     * Auparavant, « se souvenir de moi » passait `maxAge: 90 jours` à cette seule écriture —
+     * mais toutes les LECTURES appelaient `getUserSession` sans configuration, donc avec les
+     * 30 jours du nuxt.config, et h3 rejetait la session au-delà. La promesse ne pouvait pas
+     * être tenue : elle n'était connue que d'un seul côté.
+     */
+    await ouvrirSession(
       event,
       {
         user: {
@@ -147,7 +146,7 @@ export default wrapApiHandler<ApiSuccessResponse<LoginResponse>>(
           isEmailVerified: user.isEmailVerified,
         },
       },
-      sessionConfig
+      { seSouvenirDeMoi: rememberMe === true, sessionVersion: user.sessionVersion }
     )
 
     return createSuccessResponse({
