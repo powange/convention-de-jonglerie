@@ -2,6 +2,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
 import { checkAdminMode } from '#server/utils/organizer-management'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
 import { editionVisiblePubliquement } from '#server/utils/visibilite-edition'
 
 export default wrapApiHandler(
@@ -179,6 +180,21 @@ export default wrapApiHandler(
     const { event: editionEvent, ...editionRest } = edition
     const vs = editionEvent?.volunteerSettings
 
+    /**
+     * Le bénévolat se ferme tout seul une fois le démontage fini.
+     *
+     * C'est ici que les deux drapeaux sont calculés pour toute l'application — l'écran ne fait
+     * que les lire. Appliquer la règle à cet endroit la rend vraie partout où elle est lue, au
+     * lieu de la recopier dans chaque composant qui l'interroge.
+     */
+    const benevolat = visibiliteDuBenevolat({
+      open: vs?.open ?? false,
+      pagePublic: vs?.pagePublic ?? false,
+      finDemontage: vs?.teardownEndDate,
+      finEdition: editionRest.endDate,
+      maintenant: new Date(),
+    })
+
     return {
       ...editionRest,
       // Ré-aplatir le compte des candidatures (relation déplacée sur Event).
@@ -189,8 +205,8 @@ export default wrapApiHandler(
       },
       // Config bénévole encore consommée côté client, ré-aplatie depuis EventVolunteerSettings
       volunteersEnabled: vs?.enabled ?? false,
-      volunteersOpen: vs?.open ?? false,
-      volunteersPagePublic: vs?.pagePublic ?? false,
+      volunteersOpen: benevolat.open,
+      volunteersPagePublic: benevolat.pagePublic,
       volunteersDescription: vs?.description ?? null,
       volunteersMode: vs?.mode ?? 'INTERNAL',
       volunteersSwapsEnabled: vs?.swapsEnabled ?? true,

@@ -194,6 +194,18 @@
               </div>
             </div>
 
+            <!-- Une édition dont le démontage est fini ne recrute plus : les deux réglages
+                 ci-dessous n'ont alors plus prise, et le dire vaut mieux que de laisser
+                 l'organisateur basculer un interrupteur qui revient seul à sa place. -->
+            <UAlert
+              v-if="benevolatTermine"
+              icon="i-heroicons-clock"
+              color="neutral"
+              variant="subtle"
+              :title="$t('gestion.volunteers.volunteering_ended_title')"
+              :description="$t('gestion.volunteers.volunteering_ended_description')"
+            />
+
             <!-- Visibilité de la page publique -->
             <div class="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
               <div class="flex items-center justify-between">
@@ -219,7 +231,7 @@
               <div class="flex items-center gap-3">
                 <USwitch
                   v-model="volunteersPagePublicLocal"
-                  :disabled="savingVolunteers"
+                  :disabled="savingVolunteers || benevolatTermine"
                   color="primary"
                   @update:model-value="handleTogglePagePublic"
                 />
@@ -264,7 +276,7 @@
               <div class="flex items-center gap-3">
                 <USwitch
                   v-model="volunteersOpenLocal"
-                  :disabled="savingVolunteers"
+                  :disabled="savingVolunteers || benevolatTermine"
                   color="primary"
                   @update:model-value="handleToggleOpen"
                 />
@@ -420,6 +432,14 @@ const {
 // Variables pour les paramètres généraux (mode, visibilité, ouverture)
 const volunteersPagePublicLocal = ref(false)
 const volunteersOpenLocal = ref(false)
+
+/**
+ * L'édition est-elle passée, démontage compris ?
+ *
+ * Le serveur seul en décide — il a l'heure de référence et les deux dates. L'écran se contente
+ * d'obéir, sinon la règle serait écrite deux fois et finirait par diverger.
+ */
+const benevolatTermine = computed(() => volunteersSettings.value?.volunteeringEnded === true)
 const volunteersModeLocal = ref<'INTERNAL' | 'EXTERNAL'>('INTERNAL')
 const volunteersSwapsLocal = ref(true)
 const volunteersOrganizersInTeamsLocal = ref(false)

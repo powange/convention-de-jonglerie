@@ -60,6 +60,7 @@
           variant="outline"
           icon="i-heroicons-document-arrow-down"
           size="sm"
+          :loading="exportEnCours"
           @click="exportToPdf"
         >
           {{ t('pages.volunteers.export_pdf') }}
@@ -84,6 +85,13 @@
 
 <script setup lang="ts">
 import { formatDurationCompact } from '~/utils/date'
+
+import {
+  lignesDePlanning,
+  nomFichierPlanning,
+  resumerPlanning,
+  type CreneauDePlanning,
+} from '../../utils/planning-pdf'
 
 import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
@@ -246,157 +254,22 @@ const exportToIcal = () => {
   window.URL.revokeObjectURL(url)
 }
 
-// Échappement HTML pour prévenir les injections XSS stockées via export PDF
-// (les champs comme title, description, editionName peuvent contenir du HTML malveillant
-// saisi par un organisateur)
-const escapeHtml = (str: string | null | undefined): string => {
-  if (!str) return ''
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
+/**
+ * L'export du planning.
+ *
+ * Il ouvrait auparavant une fenêtre et y écrivait une page HTML complète par concaténation. Deux
+ * défauts pour un seul geste : les bloqueurs de fenêtres le faisaient échouer sans rien dire, et
+ * l'échappement des champs libres était écrit sur place. Il produit désormais un vrai PDF, comme
+ * la fiche d'inventaire du matériel, et ce qui en sort se décide dans `planning-pdf.ts`, à côté
+ * de ses tests.
+ */
+const exportEnCours = ref(false)
 
-// Valide qu'une couleur est un format hex sûr pour éviter les injections CSS
-const sanitizeColor = (color: string | null | undefined): string => {
-  if (!color) return '#3b82f6'
-  return /^#[0-9a-fA-F]{3,8}$/.test(color) ? color : '#3b82f6'
-}
-
-// Fonction pour exporter en PDF
-const exportToPdf = () => {
-  // Créer un contenu HTML pour l'impression
-  const printWindow = window.open('', '_blank')
-  if (!printWindow) return
-
-  // Générer le HTML (toutes les interpolations UGC sont échappées)
-  let html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Planning - ${escapeHtml(props.editionName) || 'Convention de Jonglerie'}</title>
-      <style>
-        body {
-          font-family: system-ui, -apple-system, sans-serif;
-          padding: 20px;
-          max-width: 800px;
-          margin: 0 auto;
-        }
-        h1 {
-          color: #1f2937;
-          border-bottom: 2px solid #3b82f6;
-          padding-bottom: 10px;
-        }
-        .stats {
-          display: flex;
-          gap: 20px;
-          margin: 20px 0;
-          padding: 15px;
-          background: #f3f4f6;
-          border-radius: 8px;
-        }
-        .stat {
-          flex: 1;
-        }
-        .stat-label {
-          font-size: 12px;
-          color: #6b7280;
-          text-transform: uppercase;
-        }
-        .stat-value {
-          font-size: 24px;
-          font-weight: bold;
-          color: #1f2937;
-        }
-        .time-slot {
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          padding: 15px;
-          margin-bottom: 15px;
-          page-break-inside: avoid;
-        }
-        .time-slot-header {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 10px;
-        }
-        .time-slot-title {
-          font-size: 18px;
-          font-weight: 600;
-          color: #1f2937;
-        }
-        .time-slot-time {
-          color: #6b7280;
-          font-size: 14px;
-        }
-        .time-slot-team {
-          display: inline-block;
-          padding: 4px 12px;
-          border-radius: 9999px;
-          font-size: 12px;
-          font-weight: 500;
-          margin-top: 8px;
-        }
-        .time-slot-description {
-          color: #4b5563;
-          margin-top: 8px;
-          font-size: 14px;
-        }
-        .delay-badge {
-          display: inline-block;
-          background: #fef3c7;
-          color: #92400e;
-          padding: 2px 8px;
-          border-radius: 4px;
-          font-size: 12px;
-          margin-left: 8px;
-        }
-        @media print {
-          body { padding: 0; }
-          .time-slot { page-break-inside: avoid; }
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Planning Bénévole${props.volunteerName ? ` - ${escapeHtml(props.volunteerName)}` : ''}${props.editionName ? ` - ${escapeHtml(props.editionName)}` : ''}</h1>
-
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Total heures</div>
-          <div class="stat-value">${totalHoursFormatted.value}</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Créneaux</div>
-          <div class="stat-value">${props.timeSlots.length}</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Équipes</div>
-          <div class="stat-value">${uniqueTeamsCount.value}</div>
-        </div>
-      </div>
-
-      <div class="time-slots">
-  `
-
-  // Ajouter chaque créneau
-  props.timeSlots.forEach((slot) => {
-    const start = new Date(slot.startDateTime)
-    const end = new Date(slot.endDateTime)
-
-    // Appliquer le retard si présent
-    if (slot.delayMinutes) {
-      start.setMinutes(start.getMinutes() + slot.delayMinutes)
-      end.setMinutes(end.getMinutes() + slot.delayMinutes)
-    }
-
-    // L'imprimé doit annoncer les mêmes heures que l'écran : c'est le document qu'on emporte
-    // sur place, et deux versions d'un même horaire n'y survivraient pas.
-    const zone = fuseauUtilisable(props.fuseau)
-    const formatTime = (date: Date) => {
-      return date.toLocaleString('fr-FR', {
+const exportToPdf = async () => {
+  const zone = fuseauUtilisable(props.fuseau)
+  const lignes = lignesDePlanning(props.timeSlots as CreneauDePlanning[], {
+    debut: (date) =>
+      date.toLocaleString('fr-FR', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -404,44 +277,94 @@ const exportToPdf = () => {
         hour: '2-digit',
         minute: '2-digit',
         timeZone: zone,
-      })
-    }
-
-    const teamColor = sanitizeColor(slot.team?.color)
-    const delayMinutes = Number(slot.delayMinutes) || 0
-
-    html += `
-      <div class="time-slot">
-        <div class="time-slot-header">
-          <div class="time-slot-title">
-            ${escapeHtml(slot.title)}
-            ${delayMinutes ? `<span class="delay-badge">Retard: ${delayMinutes}min</span>` : ''}
-          </div>
-        </div>
-        <div class="time-slot-time">
-          ${formatTime(start)} → ${end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: zone })}
-        </div>
-        ${slot.team ? `<div class="time-slot-team" style="background-color: ${teamColor}22; color: ${teamColor};">${escapeHtml(slot.team.name)}</div>` : ''}
-        ${slot.description ? `<div class="time-slot-description">${escapeHtml(slot.description)}</div>` : ''}
-      </div>
-    `
+      }),
+    fin: (date) =>
+      date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: zone }),
   })
 
-  html += `
-      </div>
-    </body>
-    </html>
-  `
+  if (lignes.length === 0) {
+    useToast().add({
+      title: t('pages.volunteers.export_pdf_empty'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'warning',
+    })
+    return
+  }
 
-  printWindow.document.write(html)
-  printWindow.document.close()
+  exportEnCours.value = true
+  try {
+    const { jsPDF } = await import('jspdf')
+    const { applyPlugin } = await import('jspdf-autotable')
+    applyPlugin(jsPDF)
 
-  // Attendre que le contenu soit chargé avant d'imprimer
-  printWindow.onload = () => {
-    printWindow.print()
-    printWindow.onafterprint = () => {
-      printWindow.close()
-    }
+    const doc = new jsPDF()
+    const MARGE = 14
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(t('pages.volunteers.export_pdf_title'), MARGE, 16)
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    const sousTitre = [props.volunteerName, props.editionName].filter(Boolean).join(' - ')
+    if (sousTitre) doc.text(sousTitre, MARGE, 22)
+
+    // Le résumé reprend exactement les trois chiffres de l'écran : la feuille imprimée et la page
+    // doivent se répondre, sinon on doute de celle qu'on a sous les yeux.
+    const resume = resumerPlanning(props.timeSlots as CreneauDePlanning[])
+    doc.setFontSize(9)
+    doc.text(
+      t('pages.volunteers.export_pdf_summary', {
+        creneaux: resume.creneaux,
+        heures: formatDurationCompact(resume.dureeTotaleMs),
+        equipes: resume.equipes,
+      }),
+      MARGE,
+      sousTitre ? 28 : 22
+    )
+
+    // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+    doc.autoTable({
+      startY: sousTitre ? 33 : 27,
+      margin: { left: MARGE, right: MARGE },
+      styles: { fontSize: 9, cellPadding: 2, overflow: 'linebreak' },
+      headStyles: { fillColor: [37, 99, 235] },
+      head: [
+        [
+          t('pages.volunteers.export_pdf_column_when'),
+          t('pages.volunteers.export_pdf_column_slot'),
+          t('pages.volunteers.export_pdf_column_team'),
+        ],
+      ],
+      body: lignes.map((ligne) => [
+        // Le retard est collé à l'horaire, pas relégué dans une colonne : c'est l'heure réelle
+        // qui intéresse, et l'annoncer ailleurs la ferait lire deux fois.
+        ligne.retardMinutes
+          ? `${ligne.debut} → ${ligne.fin}\n${t('pages.volunteers.export_pdf_delay', { minutes: ligne.retardMinutes })}`
+          : `${ligne.debut} → ${ligne.fin}`,
+        ligne.description ? `${ligne.titre}\n${ligne.description}` : ligne.titre,
+        ligne.equipe,
+      ]),
+      columnStyles: { 0: { cellWidth: 62 }, 2: { cellWidth: 34 } },
+      // La couleur de l'équipe est conservée de l'ancien imprimé : sur place, elle répond aux
+      // couleurs des bracelets et des panneaux. Sans elle, la colonne « Équipe » devient un mot
+      // de plus au milieu des autres.
+      didParseCell: (donnees: any) => {
+        if (donnees.section !== 'body' || donnees.column.index !== 2) return
+        const ligne = lignes[donnees.row.index]
+        if (ligne?.equipe) donnees.cell.styles.textColor = ligne.couleurEquipe
+      },
+    })
+
+    doc.save(nomFichierPlanning(props.volunteerName, props.editionName))
+  } catch (e: any) {
+    useToast().add({
+      title: e?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    exportEnCours.value = false
   }
 }
 </script>

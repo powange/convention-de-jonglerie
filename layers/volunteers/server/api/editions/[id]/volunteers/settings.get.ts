@@ -2,8 +2,8 @@ import { droitsSurLaConfiguration } from '../../../../utils/acces-configuration-
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { optionalAuth } from '#server/utils/auth-utils'
-import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 
 /**
@@ -22,13 +22,36 @@ export default wrapApiHandler(
     const editionId = validateEditionId(event)
     const user = optionalAuth(event)
 
-    // Étape 0bis : la config bénévole vit dans EventVolunteerSettings (porté par Event).
-    const eventRecord = await fetchResourceOrFail(prisma.event, editionId, {
-      errorMessage: 'Édition introuvable',
-      select: { volunteerSettings: true },
+    /**
+     * Étape 0bis : la config bénévole vit dans EventVolunteerSettings (porté par Event).
+     *
+     * Appelé directement plutôt que par `fetchResourceOrFail` : ce helper infère son type du
+     * modèle et non du `select`, si bien que les champs demandés n'existent pas pour TypeScript.
+     * Le coût était déjà payé ici avant l'ajout de `edition` — l'écrire ainsi le rend.
+     */
+    const eventRecord = await prisma.event.findUnique({
+      where: { id: editionId },
+      select: { volunteerSettings: true, edition: { select: { endDate: true } } },
     })
+    if (!eventRecord) throw createError({ status: 404, message: 'Édition introuvable' })
 
     const s = eventRecord.volunteerSettings
+
+    /**
+     * Une édition dont le démontage est fini ne recrute plus et n'expose plus sa page.
+     *
+     * La règle est appliquée AVANT le contrôle d'accès, et c'est le point : `pagePublic` est
+     * l'une des trois portes de `droitsSurLaConfiguration`. La refermer ici fait disparaître la
+     * configuration pour un simple visiteur — un gestionnaire et un ancien candidat gardent la
+     * leur, par les deux autres portes.
+     */
+    const benevolat = visibiliteDuBenevolat({
+      open: s?.open ?? false,
+      pagePublic: s?.pagePublic ?? false,
+      finDemontage: s?.teardownEndDate,
+      finEdition: eventRecord.edition?.endDate,
+      maintenant: new Date(),
+    })
 
     const estGestionnaire = user
       ? await useVolunteerPorts().organizers.canManage(editionId, user.id, event)
@@ -44,7 +67,7 @@ export default wrapApiHandler(
       : false
 
     const droits = droitsSurLaConfiguration({
-      pagePublic: s?.pagePublic ?? false,
+      pagePublic: benevolat.pagePublic,
       estGestionnaire,
       aUneCandidature,
     })
@@ -60,8 +83,12 @@ export default wrapApiHandler(
     const counts = droits.compteurs ? await compterLesCandidatures(editionId) : undefined
 
     return {
-      pagePublic: s?.pagePublic ?? false,
-      open: s?.open ?? false,
+      pagePublic: benevolat.pagePublic,
+      open: benevolat.open,
+      // Dérivé, pas stocké : il dit à l'écran de gestion POURQUOI les deux drapeaux ci-dessus
+      // sont retombés, sans quoi l'organisateur d'une édition passée se retrouve devant deux
+      // interrupteurs qui reviennent seuls à leur place.
+      volunteeringEnded: benevolat.terminee,
       description: s?.description ?? null,
       mode: s?.mode ?? 'INTERNAL',
       swapsEnabled: s?.swapsEnabled ?? true,
