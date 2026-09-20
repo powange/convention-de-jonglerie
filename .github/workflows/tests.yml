@@ -457,7 +457,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Le dump ne dépend que de ce qui le produit : l'historique des migrations, le schéma, et le
+      # seed avec les trois utilitaires qu'il importe. Tant qu'aucun d'eux ne bouge, le reconstruire
+      # à chaque run est du calcul jeté.
+      #
+      # ⚠️ Les trois `server/utils` de la clé ne sont pas décoratifs. `event-sync.ts` écrit les
+      # métadonnées d'Event PENDANT le seed : une clé qui ne hacherait que les migrations et
+      # `seed-dev.ts` servirait un dump périmé après sa modification, sans que rien ne le signale.
+      # Le schéma y est aussi, par prudence : une évolution Prisma sans migration est rare, pas
+      # impossible, et une entrée de cache fausse coûte plus cher que quelques reconstructions.
+      #
+      # Le cache est cloisonné par branche : une entrée écrite depuis une PR n'est lisible que par
+      # elle, seules celles de `main` le sont par toutes. Le gain n'arrive donc qu'après le premier
+      # passage sur `main` — même comportement que le cache des node_modules du job `setup`.
+      - name: Cache de la base de test
+        id: cache-base
+        uses: actions/cache@v4
+        with:
+          path: /tmp/base-de-test.sql.gz
+          key: base-de-test-${{ runner.os }}-${{ hashFiles('apps/app1/prisma/migrations/**', 'apps/app1/prisma/schema/**', 'apps/app1/scripts/seed-dev.ts', 'apps/app1/server/utils/email-hash.ts', 'apps/app1/server/utils/event-sync.ts', 'apps/app1/server/utils/prisma.ts') }}
+
+      # Le cache est interrogé AVANT la préparation de l'environnement, et c'est voulu : sur un
+      # cache touché, ni les node_modules ni le client Prisma ne servent à quoi que ce soit. Seul
+      # `hashFiles` a besoin du dépôt, d'où le checkout qui reste inconditionnel.
+      #
+      # Ce qui subsiste sur le chemin du cache touché : le service MySQL, que GitHub instancie
+      # avant le premier step et qu'aucune condition ne peut retenir — ~25 s. Le supprimer
+      # demanderait de démarrer MySQL à la main dans un `docker run`, ce qui n'est pas fait faute
+      # de mesure justifiant la complexité.
       - name: Préparer l'environnement
+        if: steps.cache-base.outputs.cache-hit != 'true'
         uses: ./.github/actions/preparer-env
         with:
           # Comme le job `playwright` : `setup` a déjà amorcé les deux entrées, ce job les lit.
@@ -465,6 +494,7 @@ jobs:
           cache-mode: restaurer
 
       - name: Appliquer les migrations et le seed
+        if: steps.cache-base.outputs.cache-hit != 'true'
         run: |
           npx prisma migrate deploy
           npm run db:seed:dev
@@ -474,6 +504,7 @@ jobs:
       # client MySQL dans l'image du runner — qui n'est garantie par rien et changerait sans
       # préavis. `--network host` donne accès au port 3306 publié par le service.
       - name: Produire le dump
+        if: steps.cache-base.outputs.cache-hit != 'true'
         run: |
           docker run --rm --network host mysql:8.0 \
             mysqldump -h 127.0.0.1 -u root -prootpassword \
@@ -481,6 +512,14 @@ jobs:
             convention_db_test > /tmp/base-de-test.sql
           gzip -9 /tmp/base-de-test.sql
           echo "dump compressé : $(du -h /tmp/base-de-test.sql.gz | cut -f1)"
+
+      # Publié dans les deux cas : c'est l'artifact qui distribue le dump aux quatre lots, que
+      # celui-ci vienne d'être construit ou du cache. Les lots, eux, ne changent pas d'un caractère.
+      - name: Dire d'où vient le dump
+        run: |
+          origine="reconstruit"
+          [ "${{ steps.cache-base.outputs.cache-hit }}" = "true" ] && origine="restauré du cache"
+          echo "base de test $origine — $(du -h /tmp/base-de-test.sql.gz | cut -f1)"
 
       - name: Publier le dump
         uses: actions/upload-artifact@v4
