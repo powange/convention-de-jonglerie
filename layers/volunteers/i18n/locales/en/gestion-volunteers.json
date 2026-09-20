@@ -30,7 +30,9 @@
       "page_public": "Public page visible",
       "page_public_description": "Make the public volunteer page visible to visitors (otherwise only organizers have access)",
       "page_public_hidden": "Page hidden — only organizers have access",
-      "page_public_visible": "Page accessible to everyone"
+      "page_public_visible": "Page accessible to everyone",
+      "volunteering_ended_description": "This edition's teardown is over: applications are closed and the public page is no longer visible to visitors. You and the volunteers who applied keep access to everything that was entered.",
+      "volunteering_ended_title": "Volunteering for this edition is closed"
     }
   }
 }

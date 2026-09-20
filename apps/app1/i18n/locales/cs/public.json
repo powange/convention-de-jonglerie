@@ -212,7 +212,14 @@
       "withdrawal_success": "Úspěšné stažení žádosti",
       "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):",
       "show_past_slots": "Zobrazit uplynulou směnu | Zobrazit {count} uplynulých směn",
-      "no_upcoming_slots": "Žádné nadcházející směny."
+      "no_upcoming_slots": "Žádné nadcházející směny.",
+      "export_pdf_column_slot": "Směna",
+      "export_pdf_column_team": "Tým",
+      "export_pdf_column_when": "Kdy",
+      "export_pdf_delay": "Zpoždění: {minutes} min",
+      "export_pdf_empty": "Žádná směna k tisku",
+      "export_pdf_summary": "{creneaux} směn — {heures} — {equipes} tým(ů)",
+      "export_pdf_title": "Rozpis dobrovolníků"
     }
   },
   "seo": {

@@ -190,7 +190,8 @@
     "yes": "Ja",
     "currency": "Valuta",
     "amount": "Belopp",
-    "treasury_short": "Ekonomi"
+    "treasury_short": "Ekonomi",
+    "type": "Typ"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

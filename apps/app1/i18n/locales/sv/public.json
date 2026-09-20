@@ -212,7 +212,14 @@
       "withdrawal_success": "Ansökan framgångsrikt återkallad",
       "with_you_on_slot": "Tillsammans med dig på detta pass: | Tillsammans med dig på detta pass ({count}):",
       "show_past_slots": "Visa det passerade passet | Visa de {count} passerade passen",
-      "no_upcoming_slots": "Inga kommande pass."
+      "no_upcoming_slots": "Inga kommande pass.",
+      "export_pdf_column_slot": "Pass",
+      "export_pdf_column_team": "Lag",
+      "export_pdf_column_when": "När",
+      "export_pdf_delay": "Försening: {minutes} min",
+      "export_pdf_empty": "Inget pass att skriva ut",
+      "export_pdf_summary": "{creneaux} pass — {heures} — {equipes} lag",
+      "export_pdf_title": "Volontärschema"
     }
   },
   "seo": {

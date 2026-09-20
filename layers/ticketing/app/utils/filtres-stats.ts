@@ -1,3 +1,5 @@
+import { PERIODES_DACHAT } from './periodes-achats'
+
 import {
   entiersDepuisUrl,
   entierDepuisUrl,
@@ -58,6 +60,21 @@ export interface ReglagesDeStats {
   granulariteDesAchats: number
   tarifs: number[]
   vue: VueDeProvenance
+  /**
+   * Les périodes retenues pour le graphique des achats.
+   *
+   * Distinctes de `periodes`, qui découpe les validations d'entrée en montage / événement /
+   * démontage. Les achats se lisent sur d'autres bornes — « avant » y remonte à l'ouverture de la
+   * billetterie, des mois avant le montage — et les deux graphiques se règlent séparément.
+   */
+  periodesDachat: string[]
+  /**
+   * L'édition passée à laquelle on se compare, ou `null` quand on ne compare pas.
+   *
+   * `null` est le défaut et il ne s'écrit pas dans l'URL : un écran sans comparaison doit avoir
+   * exactement l'adresse qu'il avait avant que cette possibilité existe.
+   */
+  comparaison: number | null
 }
 
 /**
@@ -80,7 +97,21 @@ export function reglagesDepuisUrl(
     // à distinguer, et se lit donc directement.
     tarifs: entiersDepuisUrl(query.tiers),
     vue: valeurDepuisUrl(query.view, VUES_DE_PROVENANCE, VUES_DE_PROVENANCE[0]),
+    periodesDachat: selectionDepuisUrl(query.buyPeriods, PERIODES_DACHAT),
+    comparaison: comparaisonDepuisUrl(query.compare),
   }
+}
+
+/**
+ * L'édition de comparaison lue dans l'URL, ou `null`.
+ *
+ * Un identifiant qui n'est pas un entier positif est traité comme une absence plutôt que comme
+ * une erreur : une URL partagée puis tronquée doit rendre un écran normal, pas un écran cassé.
+ * Que l'édition existe et soit lisible est vérifié par le serveur, pas ici.
+ */
+function comparaisonDepuisUrl(brut: unknown): number | null {
+  const valeur = entierDepuisUrl(brut, 0)
+  return Number.isInteger(valeur) && valeur > 0 ? valeur : null
 }
 
 /**
@@ -112,5 +143,8 @@ export function requeteStats(
         : String(reglages.granulariteDesAchats),
     tiers: reglages.tarifs.join(','),
     view: reglages.vue === VUES_DE_PROVENANCE[0] ? '' : reglages.vue,
+    buyPeriods: selectionVersUrl(reglages.periodesDachat, PERIODES_DACHAT),
+    // Vide quand on ne compare pas : le paramètre disparaît de l'URL au lieu d'y écrire « null ».
+    compare: reglages.comparaison === null ? '' : String(reglages.comparaison),
   })
 }

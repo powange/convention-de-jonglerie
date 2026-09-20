@@ -278,7 +278,8 @@
       "status_update_error": "Kunde inte uppdatera statusen",
       "title": "Fellogg",
       "view_flat": "Platt",
-      "view_grouped": "Grupperat"
+      "view_grouped": "Grupperat",
+      "cleanup_action": "Rensa loggen"
     },
     "errors_24h": "Fel (24h)",
     "event_reminders": "Påminnelser om evenemang",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Rensning av tillfälliga uppladdningar",
     "cleanup_empty_conversations": "Rensning av tomma konversationer",
     "cleanup_inactive_subscriptions": "Rensning av inaktiva push-prenumerationer",
-    "task_deadlines_reminders": "Påminnelser om uppgifters tidsfrister"
+    "task_deadlines_reminders": "Påminnelser om uppgifters tidsfrister",
+    "purge_journal_erreurs": "Rensning av felloggen"
   }
 }

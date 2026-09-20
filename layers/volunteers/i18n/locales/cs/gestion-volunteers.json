@@ -30,7 +30,9 @@
       "page_public": "Veřejná stránka viditelná",
       "page_public_description": "Zpřístupnit veřejnou stránku dobrovolníků návštěvníkům (jinak k ní mají přístup pouze organizátoři)",
       "page_public_hidden": "Stránka skryta — přístup mají pouze organizátoři",
-      "page_public_visible": "Stránka je přístupná všem"
+      "page_public_visible": "Stránka je přístupná všem",
+      "volunteering_ended_description": "Demontáž tohoto ročníku skončila: přihlášky jsou uzavřeny a veřejná stránka již není pro návštěvníky viditelná. Vy i dobrovolníci, kteří se přihlásili, si zachováváte přístup ke všemu zadanému.",
+      "volunteering_ended_title": "Dobrovolnictví tohoto ročníku je uzavřeno"
     }
   }
 }

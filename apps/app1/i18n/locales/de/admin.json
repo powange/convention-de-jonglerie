@@ -278,7 +278,8 @@
       "status_update_error": "Status konnte nicht aktualisiert werden",
       "title": "Fehlerprotokoll",
       "view_flat": "Flach",
-      "view_grouped": "Gruppiert"
+      "view_grouped": "Gruppiert",
+      "cleanup_action": "Protokoll bereinigen"
     },
     "errors_24h": "Fehler (24h)",
     "event_reminders": "Veranstaltungserinnerungen",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Aufräumen temporärer Uploads",
     "cleanup_empty_conversations": "Aufräumen leerer Unterhaltungen",
     "cleanup_inactive_subscriptions": "Aufräumen inaktiver Push-Abos",
-    "task_deadlines_reminders": "Erinnerungen an Aufgabenfristen"
+    "task_deadlines_reminders": "Erinnerungen an Aufgabenfristen",
+    "purge_journal_erreurs": "Bereinigung des Fehlerprotokolls"
   }
 }

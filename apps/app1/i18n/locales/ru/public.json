@@ -212,7 +212,14 @@
       "withdrawal_success": "Заявка успешно отозвана",
       "with_you_on_slot": "С вами на этой смене: | С вами на этой смене ({count}):",
       "show_past_slots": "Показать прошедшую смену | Показать прошедшие смены ({count})",
-      "no_upcoming_slots": "Предстоящих смен нет."
+      "no_upcoming_slots": "Предстоящих смен нет.",
+      "export_pdf_column_slot": "Смена",
+      "export_pdf_column_team": "Команда",
+      "export_pdf_column_when": "Когда",
+      "export_pdf_delay": "Задержка: {minutes} мин",
+      "export_pdf_empty": "Нет смен для печати",
+      "export_pdf_summary": "{creneaux} смен — {heures} — {equipes} команд(а)",
+      "export_pdf_title": "Расписание волонтёров"
     }
   },
   "seo": {

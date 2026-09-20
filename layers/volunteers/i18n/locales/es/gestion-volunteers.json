@@ -30,7 +30,9 @@
       "page_public": "Página pública visible",
       "page_public_description": "Hacer visible la página pública de voluntarios para los visitantes (de lo contrario, solo los organizadores tienen acceso)",
       "page_public_hidden": "Página oculta — solo los organizadores tienen acceso",
-      "page_public_visible": "Página accesible para todos"
+      "page_public_visible": "Página accesible para todos",
+      "volunteering_ended_description": "El desmontaje de esta edición ha terminado: las candidaturas están cerradas y la página pública ya no es visible para los visitantes. Usted y los voluntarios que se presentaron conservan el acceso a todo lo registrado.",
+      "volunteering_ended_title": "El voluntariado de esta edición está cerrado"
     }
   }
 }

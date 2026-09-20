@@ -212,7 +212,14 @@
       "withdrawal_success": "Zgłoszenie wycofane pomyślnie",
       "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):",
       "show_past_slots": "Pokaż miniony dyżur | Pokaż {count} minionych dyżurów",
-      "no_upcoming_slots": "Brak nadchodzących dyżurów."
+      "no_upcoming_slots": "Brak nadchodzących dyżurów.",
+      "export_pdf_column_slot": "Zmiana",
+      "export_pdf_column_team": "Zespół",
+      "export_pdf_column_when": "Kiedy",
+      "export_pdf_delay": "Opóźnienie: {minutes} min",
+      "export_pdf_empty": "Brak zmian do wydrukowania",
+      "export_pdf_summary": "{creneaux} zmian — {heures} — {equipes} zespół(ów)",
+      "export_pdf_title": "Grafik wolontariuszy"
     }
   },
   "seo": {

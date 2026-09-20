@@ -12,6 +12,32 @@
       </UButton>
     </div>
 
+    <!-- Lequel des deux anneaux est lequel. Un cercle n'a pas d'axe où l'écrire, et rien dans la
+         légende ne le disait : elle porte les sources, pas les éditions. -->
+    <div
+      v-if="comparaison"
+      class="flex flex-wrap items-center justify-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400"
+    >
+      <span class="flex items-center gap-1.5">
+        <span
+          class="w-4 h-4 rounded-sm shrink-0 ring-1 ring-black/10 dark:ring-white/20"
+          :style="APLAT_CSS"
+        />
+        {{ $t('gestion.ticketing.stats_compare_inner') }}
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span
+          class="w-4 h-4 rounded-sm shrink-0 ring-1 ring-black/10 dark:ring-white/20"
+          :style="MOTIF_CSS"
+        />
+        {{
+          $t('gestion.ticketing.stats_compare_outer', {
+            edition: comparaison.libelle,
+          })
+        }}
+      </span>
+    </div>
+
     <!-- Graphique -->
     <div ref="chartContainer" class="w-full h-96 flex items-center justify-center">
       <Doughnut
@@ -36,8 +62,14 @@ import {
 } from 'chart.js'
 import { Doughnut } from 'vue-chartjs'
 
+import { APLAT_CSS, MOTIF_CSS, motifRaye } from '../../../utils/motifs-graphiques'
+
 // Enregistrer les composants Chart.js nécessaires
 ChartJS.register(ArcElement, Tooltip, Legend)
+
+/** Les couleurs des deux sources, communes aux deux anneaux : seule la texture les distingue. */
+const COULEURS = ['rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)'] // blue-500, green-500
+const BORDURES = ['rgba(59, 130, 246, 1)', 'rgba(16, 185, 129, 1)']
 
 interface Props {
   data: {
@@ -46,10 +78,22 @@ interface Props {
     total: number
   }
   showOrders?: boolean // Si true, affiche les commandes, sinon affiche les items
+  /**
+   * L'édition à laquelle on se compare.
+   *
+   * Un anneau n'a pas d'axe : la comparaison s'y lit comme un SECOND ANNEAU concentrique, à
+   * l'extérieur. C'est la façon idiomatique de comparer deux touts — deux camemberts côte à côte
+   * obligeraient à faire l'aller-retour du regard pour comparer des angles.
+   *
+   * Il reprend les MÊMES couleurs, hachurées : un anneau simplement plus pâle ne disait pas
+   * lequel des deux était lequel, et rien dans la légende ne pouvait l'apprendre.
+   */
+  comparaison?: { libelle: string; manual: number; external: number } | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showOrders: false,
+  comparaison: null,
 })
 
 const { t } = useI18n()
@@ -77,35 +121,55 @@ const handleExport = async () => {
   }
 }
 
-// Calculer les pourcentages
-const manualPercentage = computed(() => {
-  if (props.data.total === 0) return 0
-  return Math.round((props.data.manual / props.data.total) * 100)
-})
+/**
+ * La part d'une valeur dans un tout.
+ *
+ * Prend son total en argument, et c'est le point : les pourcentages étaient calculés sur
+ * le total de la propriété `data` — celui de l'édition en cours — puis écrits sur les DEUX
+ * anneaux. L'anneau
+ * comparé affichait donc ses vraies valeurs assorties des parts de l'autre édition. Un chiffre
+ * faux mais plausible, que rien ne signalait.
+ */
+const part = (valeur: number, total: number) =>
+  total === 0 ? 0 : Math.round((valeur / total) * 100)
 
-const externalPercentage = computed(() => {
-  if (props.data.total === 0) return 0
-  return Math.round((props.data.external / props.data.total) * 100)
-})
+/** Le total de l'édition comparée, tel qu'il se lit au centre et sert aux parts de son anneau. */
+const totalCompare = computed(() =>
+  props.comparaison ? props.comparaison.manual + props.comparaison.external : 0
+)
 
 // Construire les données du graphique
-const chartData = computed<ChartData<'doughnut'>>(() => ({
-  labels: [
-    t('gestion.ticketing.stats_source_manual'),
-    t('gestion.ticketing.stats_source_external'),
-  ],
-  datasets: [
+const chartData = computed<ChartData<'doughnut'>>(() => {
+  const datasets: ChartData<'doughnut'>['datasets'] = [
     {
+      label: props.comparaison ? t('gestion.ticketing.stats_compare_current') : undefined,
       data: [props.data.manual, props.data.external],
-      backgroundColor: [
-        'rgba(59, 130, 246, 0.8)', // blue-500 pour manuel
-        'rgba(16, 185, 129, 0.8)', // green-500 pour externe
-      ],
-      borderColor: ['rgba(59, 130, 246, 1)', 'rgba(16, 185, 129, 1)'],
+      backgroundColor: COULEURS,
+      borderColor: BORDURES,
       borderWidth: 2,
-    },
-  ],
-}))
+    } as any,
+  ]
+
+  if (props.comparaison) {
+    // Placé APRÈS, donc dessiné à l'extérieur : l'année en cours reste au centre, là où le
+    // regard se pose d'abord.
+    datasets.push({
+      label: props.comparaison.libelle,
+      data: [props.comparaison.manual, props.comparaison.external],
+      backgroundColor: COULEURS.map((couleur) => motifRaye(couleur)),
+      borderColor: BORDURES,
+      borderWidth: 2,
+    } as any)
+  }
+
+  return {
+    labels: [
+      t('gestion.ticketing.stats_source_manual'),
+      t('gestion.ticketing.stats_source_external'),
+    ],
+    datasets,
+  }
+})
 
 const chartOptions = computed<ChartOptions<'doughnut'>>(() => ({
   responsive: true,
@@ -123,11 +187,19 @@ const chartOptions = computed<ChartOptions<'doughnut'>>(() => ({
     },
     tooltip: {
       callbacks: {
+        // Le survol d'un anneau dit d'abord DE QUELLE ÉDITION il s'agit : deux anneaux
+        // concentriques portent les mêmes libellés de source, et rien ne les distinguait.
+        title: (contexts) => contexts[0]?.dataset?.label ?? '',
         label: (context) => {
           const label = context.label || ''
           const value = context.parsed
-          const percentage =
-            context.dataIndex === 0 ? manualPercentage.value : externalPercentage.value
+          // La part se calcule sur le total de l'anneau survolé, pas sur celui de l'édition en
+          // cours : sinon l'anneau comparé affiche ses vraies valeurs et les parts de l'autre.
+          const totalDeLAnneau = (context.dataset.data as number[]).reduce(
+            (somme, n) => somme + (typeof n === 'number' ? n : 0),
+            0
+          )
+          const percentage = part(value, totalDeLAnneau)
           const itemType = props.showOrders
             ? value > 1
               ? t('gestion.ticketing.stats_orders')
@@ -158,20 +230,29 @@ const chartPlugins = computed<Plugin<'doughnut'>[]>(() => [
         const meta = chart.getDatasetMeta(datasetIndex)
         if (!meta.data) return
 
+        // Le total de CET anneau : ses parts se calculent sur lui, pas sur l'édition en cours.
+        const valeurs = dataset.data as number[]
+        const totalDeLAnneau = valeurs.reduce(
+          (somme, n) => somme + (typeof n === 'number' ? n : 0),
+          0
+        )
+        // L'anneau comparé est hachuré, donc bien plus pâle : du blanc y serait illisible en
+        // mode clair. Le premier anneau, lui, reste un aplat sur lequel le blanc tranche.
+        const estCompare = datasetIndex > 0
+
         ctx.save()
-        ctx.fillStyle = '#ffffff'
+        ctx.fillStyle = estCompare ? (isDark.value ? '#f9fafb' : '#111827') : '#ffffff'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
 
         meta.data.forEach((element: any, index: number) => {
-          const data = dataset.data[index] as number
+          const data = valeurs[index] as number
           if (data === 0) return // Ne pas afficher les segments à 0
 
           // Calculer la position au milieu de l'arc
           const { x, y } = element.tooltipPosition()
 
-          // Calculer le pourcentage
-          const percentage = index === 0 ? manualPercentage.value : externalPercentage.value
+          const percentage = part(data, totalDeLAnneau)
 
           // Dessiner le nombre (valeur absolue)
           ctx.font = 'bold 18px sans-serif'
@@ -205,6 +286,13 @@ const chartPlugins = computed<Plugin<'doughnut'>[]>(() => [
       ctx.font = '14px sans-serif'
       ctx.fillStyle = isDark.value ? '#9ca3af' : '#6b7280' // gray-400 en dark, gray-500 en light
       ctx.fillText(t('gestion.ticketing.stats_total'), centerX, centerY + 25)
+
+      // En comparaison, le total de l'autre édition juste en dessous : c'est le chiffre qu'on
+      // vient chercher, et le lire en additionnant les segments d'un anneau n'a rien d'évident.
+      if (props.comparaison) {
+        ctx.font = '13px sans-serif'
+        ctx.fillText(`${props.comparaison.libelle} : ${totalCompare.value}`, centerX, centerY + 48)
+      }
 
       ctx.restore()
     },

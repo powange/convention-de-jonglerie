@@ -30,7 +30,9 @@
       "page_public": "Öffentliche Seite sichtbar",
       "page_public_description": "Die öffentliche Freiwilligenseite für Besucher sichtbar machen (andernfalls haben nur Organisatoren Zugriff)",
       "page_public_hidden": "Seite verborgen — nur Organisatoren haben Zugriff",
-      "page_public_visible": "Seite für alle zugänglich"
+      "page_public_visible": "Seite für alle zugänglich",
+      "volunteering_ended_description": "Der Abbau dieser Ausgabe ist beendet: Die Bewerbungen sind geschlossen und die öffentliche Seite ist für Besucher nicht mehr sichtbar. Sie und die Helfer, die sich beworben haben, behalten Zugriff auf alle erfassten Daten.",
+      "volunteering_ended_title": "Das Helferwesen dieser Ausgabe ist abgeschlossen"
     }
   }
 }

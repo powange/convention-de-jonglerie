@@ -30,7 +30,9 @@
       "page_public": "Openbare pagina zichtbaar",
       "page_public_description": "Maak de openbare vrijwilligerspagina zichtbaar voor bezoekers (anders hebben alleen organisatoren toegang)",
       "page_public_hidden": "Pagina verborgen — alleen organisatoren hebben toegang",
-      "page_public_visible": "Pagina toegankelijk voor iedereen"
+      "page_public_visible": "Pagina toegankelijk voor iedereen",
+      "volunteering_ended_description": "De afbouw van deze editie is afgerond: de aanmeldingen zijn gesloten en de openbare pagina is niet langer zichtbaar voor bezoekers. U en de vrijwilligers die zich hebben aangemeld, behouden toegang tot alles wat is ingevoerd.",
+      "volunteering_ended_title": "Het vrijwilligerswerk van deze editie is afgesloten"
     }
   }
 }

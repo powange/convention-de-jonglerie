@@ -190,7 +190,8 @@
     "yes": "Ja",
     "currency": "Valuta",
     "amount": "Bedrag",
-    "treasury_short": "Financiën"
+    "treasury_short": "Financiën",
+    "type": "Type"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

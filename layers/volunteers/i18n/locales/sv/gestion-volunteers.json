@@ -30,7 +30,9 @@
       "page_public": "Offentlig sida synlig",
       "page_public_description": "Gör den offentliga volontärsidan synlig för besökare (annars har endast arrangörer åtkomst)",
       "page_public_hidden": "Sida dold — endast arrangörer har åtkomst",
-      "page_public_visible": "Sida tillgänglig för alla"
+      "page_public_visible": "Sida tillgänglig för alla",
+      "volunteering_ended_description": "Nedmonteringen av denna upplaga är avslutad: ansökningarna är stängda och den publika sidan syns inte längre för besökare. Du och de volontärer som har ansökt behåller åtkomsten till allt som har registrerats.",
+      "volunteering_ended_title": "Volontärarbetet för denna upplaga är avslutat"
     }
   }
 }

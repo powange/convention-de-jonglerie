@@ -190,7 +190,8 @@
     "yes": "Sì",
     "currency": "Valuta",
     "amount": "Importo",
-    "treasury_short": "Tesoreria"
+    "treasury_short": "Tesoreria",
+    "type": "Tipo"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

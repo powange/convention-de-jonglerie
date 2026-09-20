@@ -9,6 +9,7 @@ import {
   TYPES_DACHAT_STATS,
   VUES_DE_PROVENANCE,
 } from '../../../../../layers/ticketing/app/utils/filtres-stats'
+import { PERIODES_DACHAT } from '../../../../../layers/ticketing/app/utils/periodes-achats'
 
 /**
  * Les réglages des graphiques de statistiques dans l'URL.
@@ -27,6 +28,8 @@ const defauts = {
   granulariteDesAchats: GRANULARITE_ACHATS_PAR_DEFAUT,
   tarifs: [],
   vue: VUES_DE_PROVENANCE[0],
+  periodesDachat: [...PERIODES_DACHAT],
+  comparaison: null,
 }
 
 describe('reglagesDepuisUrl', () => {
@@ -34,7 +37,7 @@ describe('reglagesDepuisUrl', () => {
     expect(reglagesDepuisUrl({}, TOUS_LES_TYPES)).toEqual(defauts)
   })
 
-  it('lit les sept réglages', () => {
+  it('lit les neuf réglages', () => {
     expect(
       reglagesDepuisUrl(
         {
@@ -45,6 +48,8 @@ describe('reglagesDepuisUrl', () => {
           buyGrain: '10080',
           tiers: '3,7',
           view: 'orders',
+          buyPeriods: 'pendant',
+          compare: '21',
         },
         TOUS_LES_TYPES
       )
@@ -56,6 +61,8 @@ describe('reglagesDepuisUrl', () => {
       granulariteDesAchats: 10080,
       tarifs: [3, 7],
       vue: 'orders',
+      periodesDachat: ['pendant'],
+      comparaison: 21,
     })
   })
 
@@ -117,10 +124,50 @@ describe('requeteStats', () => {
       granulariteDesAchats: 43200,
       tarifs: [2, 5],
       vue: 'orders',
+      periodesDachat: ['avant', 'apres'],
+      comparaison: 21,
     }
 
     expect(reglagesDepuisUrl(requeteStats({}, reglages, TOUS_LES_TYPES), TOUS_LES_TYPES)).toEqual(
       reglages
     )
+  })
+})
+
+describe('l’édition de comparaison dans l’URL', () => {
+  it('vaut null quand l’URL n’en dit rien', () => {
+    expect(reglagesDepuisUrl({}, TOUS_LES_TYPES).comparaison).toBeNull()
+  })
+
+  it('lit un identifiant d’édition', () => {
+    expect(reglagesDepuisUrl({ compare: '17' }, TOUS_LES_TYPES).comparaison).toBe(17)
+  })
+
+  it('traite une valeur absurde comme une absence, pas comme une erreur', () => {
+    // Une URL partagée puis tronquée doit rendre un écran normal, pas un écran cassé. Que
+    // l'édition existe et soit lisible est vérifié par le serveur, pas ici.
+    for (const brut of ['0', '-3', 'abc', '', '1.5', undefined, null]) {
+      expect(reglagesDepuisUrl({ compare: brut }, TOUS_LES_TYPES).comparaison).toBeNull()
+    }
+  })
+
+  it('n’écrit RIEN dans l’URL quand on ne compare pas', () => {
+    // Un écran sans comparaison doit avoir exactement l'adresse qu'il avait avant que cette
+    // possibilité existe — sans quoi tous les liens déjà partagés changeraient d'aspect.
+    const query = requeteStats({}, { ...defauts, comparaison: null }, TOUS_LES_TYPES)
+    // `requeteAvec` RETIRE les valeurs vides : la clé disparaît de l'URL au lieu d'y rester à
+    // vide. C'est ce qui garantit qu'une adresse sans comparaison est identique à celle d'avant.
+    expect(query.compare).toBeUndefined()
+    expect(Object.keys(query)).not.toContain('compare')
+  })
+
+  it('écrit l’identifiant quand on compare', () => {
+    const query = requeteStats({}, { ...defauts, comparaison: 17 }, TOUS_LES_TYPES)
+    expect(query.compare).toBe('17')
+  })
+
+  it('fait l’aller-retour sur la seule comparaison', () => {
+    const query = requeteStats({}, { ...defauts, comparaison: 42 }, TOUS_LES_TYPES)
+    expect(reglagesDepuisUrl(query, TOUS_LES_TYPES).comparaison).toBe(42)
   })
 })

@@ -190,7 +190,8 @@
     "yes": "Ja",
     "currency": "Währung",
     "amount": "Betrag",
-    "treasury_short": "Buchhaltung"
+    "treasury_short": "Buchhaltung",
+    "type": "Typ"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

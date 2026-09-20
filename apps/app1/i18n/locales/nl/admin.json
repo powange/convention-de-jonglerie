@@ -278,7 +278,8 @@
       "status_update_error": "Kan de status niet bijwerken",
       "title": "Foutenlogboek",
       "view_flat": "Plat",
-      "view_grouped": "Gegroepeerd"
+      "view_grouped": "Gegroepeerd",
+      "cleanup_action": "Logboek opschonen"
     },
     "errors_24h": "Fouten (24u)",
     "event_reminders": "Evenementherinneringen",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Opschonen van tijdelijke uploads",
     "cleanup_empty_conversations": "Opschonen van lege gesprekken",
     "cleanup_inactive_subscriptions": "Opschonen van inactieve push-abonnementen",
-    "task_deadlines_reminders": "Herinneringen voor taakdeadlines"
+    "task_deadlines_reminders": "Herinneringen voor taakdeadlines",
+    "purge_journal_erreurs": "Opschoning van het foutenlogboek"
   }
 }

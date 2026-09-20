@@ -278,7 +278,8 @@
       "status_update_error": "Не удалось обновить статус",
       "title": "Журнал ошибок",
       "view_flat": "Списком",
-      "view_grouped": "Сгруппировано"
+      "view_grouped": "Сгруппировано",
+      "cleanup_action": "Очистить журнал"
     },
     "errors_24h": "Ошибки (24ч)",
     "event_reminders": "Напоминания о событиях",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Очистка временных загрузок",
     "cleanup_empty_conversations": "Очистка пустых бесед",
     "cleanup_inactive_subscriptions": "Очистка неактивных push-подписок",
-    "task_deadlines_reminders": "Напоминания о сроках задач"
+    "task_deadlines_reminders": "Напоминания о сроках задач",
+    "purge_journal_erreurs": "Очистка журнала ошибок"
   }
 }
