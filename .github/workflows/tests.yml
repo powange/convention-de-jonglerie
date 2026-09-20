@@ -412,6 +412,122 @@ jobs:
   #
   # Le nom du job reste `playwright`, à l'identique : c'est le nom du check, et le renommer
   # casserait silencieusement une règle de protection de branche qui l'exigerait.
+  # ---------------------------------------------------------------------------------------------
+  # La base de test, construite UNE fois et distribuée aux quatre lots Playwright.
+  #
+  # Chaque lot rejouait `migrate deploy` puis le seed dans son propre conteneur MySQL. Mesuré sur
+  # deux runs du 20/09 : 100 s cumulées sur l'un, 194 s sur l'autre — et sur le lot du chemin
+  # critique, 21 s dans un run contre 100 s dans l'autre, à code identique. C'est cette VARIANCE qui
+  # décide autant que le cumul : elle tombe où elle veut, y compris sur le job le plus long.
+  #
+  # La cause est dans le travail lui-même : `scripts/seed-dev.ts` fait 31 `create` et aucun
+  # `createMany`, dans 34 boucles — des milliers d'INSERT un par un —, et l'historique compte
+  # 96 migrations de DDL à rejouer.
+  #
+  # Ce qui est mutualisé est la CONSTRUCTION de l'état, pas la base elle-même. Les `services:`
+  # restent instanciés par job : chaque lot garde son propre MySQL, et c'est ce qui permet à
+  # `edition-management` de se partager en trois sans que les lots se disputent l'édition commune.
+  #
+  # ARTIFACT ET NON CACHE, et c'est une mesure qui l'a tranché. Ce job part à t+14 s (il ne dépend
+  # que de `setup`) et les lots Playwright attendent `build`, qui court de t+14 s à t+195 s. Tant
+  # qu'il finit avant le build, son coût en ATTENTE est nul — un cache ne rachèterait donc rien,
+  # alors qu'il coûterait une clé à invalider, un écrivain unique à garantir (cf. #362) et surtout
+  # un jeu de données FIGÉ : le seed tire 125 valeurs au hasard, et les geler d'un run à l'autre
+  # changerait la nature des tests sans qu'on l'ait demandé.
+  base-de-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    needs: setup
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: convention_db_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Le dump ne dépend que de ce qui le produit : l'historique des migrations, le schéma, et le
+      # seed avec les trois utilitaires qu'il importe. Tant qu'aucun d'eux ne bouge, le reconstruire
+      # à chaque run est du calcul jeté.
+      #
+      # ⚠️ Les trois `server/utils` de la clé ne sont pas décoratifs. `event-sync.ts` écrit les
+      # métadonnées d'Event PENDANT le seed : une clé qui ne hacherait que les migrations et
+      # `seed-dev.ts` servirait un dump périmé après sa modification, sans que rien ne le signale.
+      # Le schéma y est aussi, par prudence : une évolution Prisma sans migration est rare, pas
+      # impossible, et une entrée de cache fausse coûte plus cher que quelques reconstructions.
+      #
+      # Le cache est cloisonné par branche : une entrée écrite depuis une PR n'est lisible que par
+      # elle, seules celles de `main` le sont par toutes. Le gain n'arrive donc qu'après le premier
+      # passage sur `main` — même comportement que le cache des node_modules du job `setup`.
+      - name: Cache de la base de test
+        id: cache-base
+        uses: actions/cache@v4
+        with:
+          path: /tmp/base-de-test.sql.gz
+          key: base-de-test-${{ runner.os }}-${{ hashFiles('apps/app1/prisma/migrations/**', 'apps/app1/prisma/schema/**', 'apps/app1/scripts/seed-dev.ts', 'apps/app1/server/utils/email-hash.ts', 'apps/app1/server/utils/event-sync.ts', 'apps/app1/server/utils/prisma.ts') }}
+
+      # Le cache est interrogé AVANT la préparation de l'environnement, et c'est voulu : sur un
+      # cache touché, ni les node_modules ni le client Prisma ne servent à quoi que ce soit. Seul
+      # `hashFiles` a besoin du dépôt, d'où le checkout qui reste inconditionnel.
+      #
+      # Ce qui subsiste sur le chemin du cache touché : le service MySQL, que GitHub instancie
+      # avant le premier step et qu'aucune condition ne peut retenir — ~25 s. Le supprimer
+      # demanderait de démarrer MySQL à la main dans un `docker run`, ce qui n'est pas fait faute
+      # de mesure justifiant la complexité.
+      - name: Préparer l'environnement
+        if: steps.cache-base.outputs.cache-hit != 'true'
+        uses: ./.github/actions/preparer-env
+        with:
+          # Comme le job `playwright` : `setup` a déjà amorcé les deux entrées, ce job les lit.
+          # Le client Prisma est nécessaire — le seed passe par lui.
+          cache-mode: restaurer
+
+      - name: Appliquer les migrations et le seed
+        if: steps.cache-base.outputs.cache-hit != 'true'
+        run: |
+          npx prisma migrate deploy
+          npm run db:seed:dev
+
+      # `mysqldump` est lancé DANS l'image du service plutôt que depuis le runner : l'image est
+      # déjà tirée pour le service, donc c'est gratuit, et cela ne dépend pas de la présence d'un
+      # client MySQL dans l'image du runner — qui n'est garantie par rien et changerait sans
+      # préavis. `--network host` donne accès au port 3306 publié par le service.
+      - name: Produire le dump
+        if: steps.cache-base.outputs.cache-hit != 'true'
+        run: |
+          docker run --rm --network host mysql:8.0 \
+            mysqldump -h 127.0.0.1 -u root -prootpassword \
+            --single-transaction --no-tablespaces \
+            convention_db_test > /tmp/base-de-test.sql
+          gzip -9 /tmp/base-de-test.sql
+          echo "dump compressé : $(du -h /tmp/base-de-test.sql.gz | cut -f1)"
+
+      # Publié dans les deux cas : c'est l'artifact qui distribue le dump aux quatre lots, que
+      # celui-ci vienne d'être construit ou du cache. Les lots, eux, ne changent pas d'un caractère.
+      - name: Dire d'où vient le dump
+        run: |
+          origine="reconstruit"
+          [ "${{ steps.cache-base.outputs.cache-hit }}" = "true" ] && origine="restauré du cache"
+          echo "base de test $origine — $(du -h /tmp/base-de-test.sql.gz | cut -f1)"
+
+      - name: Publier le dump
+        uses: actions/upload-artifact@v4
+        with:
+          name: base-de-test-${{ github.run_id }}
+          path: /tmp/base-de-test.sql.gz
+          retention-days: 1
+
   playwright:
     # Sans ce `name`, GitHub nomme le check d'après TOUTE la valeur de matrice — arguments compris.
     # `main` n'est pas protégée aujourd'hui ; si elle le devenait, ce sont ces quatre noms-là qu'il
@@ -422,7 +538,10 @@ jobs:
     # Ce job ne builde plus rien : il consomme le `.output/` du job `build`. Il démarre donc plus
     # tard qu'avant, où il partait à t=0 en parallèle de tout — le gain est en compute et en
     # justesse (un seul build, et c'est celui de production qui est testé), pas en horloge.
-    needs: build
+    #
+    # `base-de-test` ne retarde rien : il court de t+14 s à bien avant la fin de `build`, que ce
+    # job attendait déjà. C'est la mesure qui a justifié l'artifact plutôt qu'un cache.
+    needs: [build, base-de-test]
 
     # La suite Playwright portait à elle seule les deux tiers de l'attente de la CI : 713 s sur un
     # run de 899, dont 618 s de tests. Tout le reste avait fini à t+313 s.
@@ -535,10 +654,37 @@ jobs:
           test -f .output/server/index.mjs || { echo "::error::.output/server/index.mjs manquant"; exit 1; }
           echo "✅ point d'entrée présent : $(du -sh .output | cut -f1) de build récupéré"
 
-      - name: Apply migrations and seed
+      - name: Récupérer la base de test
+        uses: actions/download-artifact@v4
+        with:
+          name: base-de-test-${{ github.run_id }}
+          path: /tmp
+
+      # Restauration par la même image que le service, pour la même raison que le dump : ne rien
+      # devoir à l'outillage du runner.
+      - name: Restaurer la base de test
         run: |
-          npx prisma migrate deploy
-          npm run db:seed:dev
+          gunzip -c /tmp/base-de-test.sql.gz | docker run --rm --network host -i mysql:8.0 \
+            mysql -h 127.0.0.1 -u root -prootpassword convention_db_test
+
+      # Même esprit que la vérification du build téléchargé, et pour la même raison : un transfert
+      # tronqué doit se voir ICI, et non soixante secondes plus loin dans un test qui ne trouve pas
+      # son édition. On contrôle la table des migrations — elle vient du dump, donc sa présence
+      # prouve que le schéma est celui du commit — et une table peuplée par le seed.
+      - name: Vérifier la base restaurée
+        run: |
+          compte() {
+            docker run --rm --network host mysql:8.0 \
+              mysql -h 127.0.0.1 -u root -prootpassword -N -B \
+              -e "SELECT COUNT(*) FROM convention_db_test.$1" 2>/dev/null
+          }
+          migrations=$(compte _prisma_migrations)
+          utilisateurs=$(compte User)
+          echo "migrations appliquées : ${migrations:-0} · utilisateurs : ${utilisateurs:-0}"
+          if [ "${migrations:-0}" -lt 1 ] || [ "${utilisateurs:-0}" -lt 1 ]; then
+            echo "::error::Base de test vide ou incomplète après restauration"
+            exit 1
+          fi
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -608,7 +754,7 @@ jobs:
   ci-verte:
     runs-on: ubuntu-22.04
     if: always()
-    needs: [setup, lint, typecheck, build, test, playwright]
+    needs: [setup, lint, typecheck, build, base-de-test, test, playwright]
 
     # Le `defaults` du workflow place tous les `run:` dans `apps/app1`. Ce job ne fait AUCUN
     # checkout — il n'a rien à lire —, donc ce répertoire n'existe pas et bash refuse de démarrer :
@@ -626,7 +772,7 @@ jobs:
         run: echo '${{ toJSON(needs) }}'
 
       # `skipped` bloque au même titre que `failure`, et ce n'est pas de la paranoïa : aucun des
-      # six jobs n'a de condition, donc aucun ne peut être sauté légitimement. Un `skipped` ne peut
+      # sept jobs n'a de condition, donc aucun ne peut être sauté légitimement. Un `skipped` ne peut
       # signifier qu'une chose — un échec en amont l'a empêché de tourner.
       - name: Refuser si un job n’est pas passé
         if: >-
