@@ -106,20 +106,22 @@
                 :placeholder="$t('edition.meals.filter_type')"
               />
 
+              <!-- Filtre par date, AVANT le type de repas : on cherche d'abord un jour, puis le
+                   service de ce jour-là. L'ordre inverse faisait choisir « Déjeuner » sans savoir
+                   lequel. -->
+              <USelect
+                v-model="selectedDate"
+                :items="dateOptions"
+                value-key="value"
+                :placeholder="$t('edition.meals.filter_date')"
+              />
+
               <!-- Filtre par type de repas -->
               <USelect
                 v-model="selectedMealType"
                 :items="mealTypeOptions"
                 value-key="value"
                 :placeholder="$t('edition.meals.filter_meal_type')"
-              />
-
-              <!-- Filtre par date -->
-              <USelect
-                v-model="selectedDate"
-                :items="dateOptions"
-                value-key="value"
-                :placeholder="$t('edition.meals.filter_date')"
               />
             </div>
           </div>
