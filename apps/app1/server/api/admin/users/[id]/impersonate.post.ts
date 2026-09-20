@@ -1,8 +1,7 @@
-import { setUserSession } from '#imports'
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { setImpersonationCookie } from '#server/utils/impersonation-helpers'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { ouvrirSession } from '#server/utils/session-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -39,24 +38,33 @@ export default wrapApiHandler(
     })
 
     // Basculer vers l'utilisateur cible dans la session
-    await setUserSession(event, {
-      user: {
-        id: targetUser.id,
-        email: targetUser.email,
-        emailHash: targetUser.emailHash,
-        pseudo: targetUser.pseudo,
-        nom: targetUser.nom,
-        prenom: targetUser.prenom,
-        phone: targetUser.phone,
-        isGlobalAdmin: targetUser.isGlobalAdmin,
-        isVolunteer: targetUser.isVolunteer,
-        isArtist: targetUser.isArtist,
-        isOrganizer: targetUser.isOrganizer,
-        createdAt: targetUser.createdAt,
-        updatedAt: targetUser.updatedAt,
-        isEmailVerified: targetUser.isEmailVerified,
+    await ouvrirSession(
+      event,
+      {
+        user: {
+          id: targetUser.id,
+          email: targetUser.email,
+          emailHash: targetUser.emailHash,
+          pseudo: targetUser.pseudo,
+          nom: targetUser.nom,
+          prenom: targetUser.prenom,
+          phone: targetUser.phone,
+          isGlobalAdmin: targetUser.isGlobalAdmin,
+          isVolunteer: targetUser.isVolunteer,
+          isArtist: targetUser.isArtist,
+          isOrganizer: targetUser.isOrganizer,
+          createdAt: targetUser.createdAt,
+          updatedAt: targetUser.updatedAt,
+          isEmailVerified: targetUser.isEmailVerified,
+        },
       },
-    })
+      {
+        // La génération courante du compte : sans elle, la session naîtrait avec le
+        // numéro 0 et le middleware la rejetterait aussitôt pour tout compte ayant
+        // déjà changé de mot de passe.
+        sessionVersion: targetUser.sessionVersion,
+      }
+    )
 
     return createSuccessResponse(
       {

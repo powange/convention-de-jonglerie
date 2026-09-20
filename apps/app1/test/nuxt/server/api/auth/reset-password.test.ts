@@ -51,9 +51,16 @@ describe('API Reset Password', () => {
       data: null,
     })
 
+    // La génération de session est incrémentée dans la MÊME écriture : une réinitialisation est
+    // demandée par quelqu'un qui a perdu l'accès — ou qui soupçonne qu'un autre l'a. Elle doit
+    // fermer les sessions ouvertes sur tous les appareils, pas seulement celle du navigateur
+    // courant, ce que le seul `clearUserSession` ne faisait pas.
     expect(prismaMock.user.update).toHaveBeenCalledWith({
       where: { id: mockToken.userId },
-      data: { password: 'hashed_NewPassword123!' },
+      data: {
+        password: 'hashed_NewPassword123!',
+        sessionVersion: { increment: 1 },
+      },
     })
 
     // Désormais on supprime tous les tokens de l'utilisateur (au lieu de marquer used: true)

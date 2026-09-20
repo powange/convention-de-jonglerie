@@ -525,7 +525,22 @@ export default defineNuxtConfig({
     // Private keys that are only available on the server
     session: {
       password: process.env.NUXT_SESSION_PASSWORD || '',
-      maxAge: 60 * 60 * 24 * 30, // 30 jours par défaut (peut être overridé par login avec "remember me")
+      /**
+       * Pas de `maxAge` : l'échéance n'appartient plus à h3.
+       *
+       * Elle valait 30 jours ici, et « se souvenir de moi » en passait 90 à la seule ÉCRITURE de
+       * la session. Toutes les lectures repassant par cette valeur, h3 rejetait la session au
+       * bout de 30 jours — en silence, puis en réécrivant le cookie. Pire : son compte à rebours
+       * partait du `createdAt`, posé à la première visite même anonyme, et que rien ne rajeunit.
+       *
+       * La session porte désormais sa propre échéance (`expireAt`), repoussée à chaque visite par
+       * `server/utils/session-helpers.ts`. C'est ce qui la rend glissante — on reste connecté
+       * tant qu'on revient — et c'était impossible tant que h3 tranchait.
+       *
+       * ⚠️ Conséquence à connaître : sans `maxAge`, le sceau du cookie n'a plus de durée de vie
+       * propre. `expireAt` devient la seule barrière — elle est À L'INTÉRIEUR du scellé, donc
+       * inaltérable côté client, mais toute lecture doit passer par `getAuthSession`.
+       */
     },
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
     emailEnabled: process.env.SEND_EMAILS || 'false', // Enable/disable real email sending
