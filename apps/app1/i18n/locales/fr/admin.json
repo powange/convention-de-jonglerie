@@ -211,7 +211,6 @@
     "cleanup_empty_conversations": "Nettoyage des conversations vides",
     "cleanup_expired_tokens": "Nettoyage tokens expirés",
     "cleanup_inactive_subscriptions": "Nettoyage des abonnements push inactifs",
-    "cleanup_resolved_error_logs": "Nettoyage logs d'erreur",
     "cleanup_temp_uploads": "Purge des envois temporaires",
     "config": {
       "ai": "Intelligence Artificielle",
@@ -819,6 +818,7 @@
     "super_admin": "Super Admin",
     "super_administrators": "Super administrateurs",
     "super_admins": "Super admins",
+    "purge_journal_erreurs": "Purge du journal d'erreurs",
     "task_deadlines_reminders": "Rappels d'échéance des tâches",
     "task_executed_details": "La tâche {taskName} a été exécutée en {time}",
     "task_executed_successfully": "Tâche exécutée avec succès",
