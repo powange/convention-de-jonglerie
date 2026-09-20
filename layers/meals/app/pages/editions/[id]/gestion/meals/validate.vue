@@ -610,16 +610,8 @@ watch(
 )
 
 // Formater le label d'un repas
-// Formater la date/heure
-const formatDateTime = (dateTime: string) => {
-  return new Date(dateTime).toLocaleString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+// L'heure d'une validation passe par le composable : Europe/Paris, et la langue choisie.
+const { formatDateTime } = useDateFormat()
 
 // Couleur du badge selon le type de personne
 const getPersonTypeBadgeColor = (type: string) => {

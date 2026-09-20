@@ -128,6 +128,7 @@ import { useRoute } from 'vue-router'
 // Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
 import { useAuthStore, useEditionStore } from '#imports'
 
+const { t } = useI18n()
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
@@ -142,11 +143,13 @@ const loadingMeals = ref(false)
 const pendingMeal = ref<any>(null)
 
 // Options pour le select de phase
-const mealPhaseOptions = [
-  { value: 'SETUP', label: 'Montage' },
-  { value: 'EVENT', label: 'Édition' },
-  { value: 'TEARDOWN', label: 'Démontage' },
-]
+// `computed` et non un tableau figé : les libellés sont traduits, et un changement de langue
+// doit les suivre sans rechargement. C'est ce que fait déjà le filtre de phase de list.vue.
+const mealPhaseOptions = computed(() => [
+  { value: 'SETUP', label: t('common.setup') },
+  { value: 'EVENT', label: t('common.event') },
+  { value: 'TEARDOWN', label: t('common.teardown') },
+])
 
 // Grouper les repas par date
 const groupedMeals = computed(() => {
@@ -161,16 +164,10 @@ const groupedMeals = computed(() => {
   return grouped
 })
 
-// Formater la date pour l'affichage
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+// La date d'un repas vient du composable : il force Europe/Paris et suit la langue choisie.
+// Formatée à la main, elle reculait d'un jour pour qui lit depuis l'ouest — les repas sont
+// stockés à minuit UTC.
+const { formatDateFull: formatDate } = useDateFormat()
 
 // Utiliser les utilitaires meals
 const { getMealTypeLabel } = useMealTypeLabel()
@@ -188,8 +185,8 @@ const fetchVolunteerMeals = async () => {
   } catch (error) {
     console.error('Failed to fetch volunteer meals:', error)
     toast.add({
-      title: 'Erreur',
-      description: 'Impossible de charger les repas',
+      title: t('common.error'),
+      description: t('gestion.meals.error_loading_meals'),
       color: 'error',
     })
   } finally {
@@ -216,10 +213,10 @@ const { execute: executeSaveMeal, loading: savingMeals } = useApiAction<
     }
   },
   successMessage: {
-    title: 'Sauvegardé',
-    description: 'Le repas a été synchronisé avec les bénévoles et artistes',
+    title: t('gestion.meals.saved_title'),
+    description: t('gestion.meals.saved_description'),
   },
-  errorMessages: { default: 'Impossible de sauvegarder le repas' },
+  errorMessages: { default: t('gestion.meals.error_saving_meal') },
   onSuccess: (result) => {
     if (result?.success && result.meals) {
       volunteerMeals.value = result.meals
@@ -259,8 +256,11 @@ onMounted(async () => {
 
 // Métadonnées de la page
 useSeoMeta({
-  title: 'Configuration des repas - ' + (edition.value?.name || 'Édition'),
-  description: 'Configurer les repas pour les bénévoles et artistes',
+  // Le nom de l'édition complète le titre quand il est connu ; sinon le titre se suffit.
+  title: edition.value?.name
+    ? `${t('gestion.meals.configuration_title')} - ${edition.value.name}`
+    : t('gestion.meals.configuration_title'),
+  description: t('gestion.meals.configuration_description'),
   ogTitle: () => edition.value?.name || edition.value?.convention?.name || 'Convention',
 })
 </script>

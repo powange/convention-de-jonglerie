@@ -102,6 +102,37 @@ export const useDateFormat = () => {
   }
 
   /**
+   * Formate une date sans son année (ex: « mercredi 19 février »)
+   *
+   * Pour les listes où l'année n'apprend rien : les dates d'une même édition tiennent toutes
+   * dans la même année, et la répéter à chaque ligne d'un sélecteur ne fait que l'allonger.
+   */
+  const formatDateWeekdayMonth = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(intlLocale.value, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'Europe/Paris',
+    })
+  }
+
+  /**
+   * Formate une date en abrégé, sans année (ex: « mer. 19 févr. »)
+   *
+   * Pour les colonnes d'un tableau, où la place manque.
+   */
+  const formatDateWeekdayMonthShort = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString(intlLocale.value, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'Europe/Paris',
+    })
+  }
+
+  /**
    * Formate une date avec le nom court du jour
    */
   const formatDateWithWeekday = (dateString: string) => {
@@ -243,6 +274,8 @@ export const useDateFormat = () => {
     formatDateTimeShortMonth,
     formatDate,
     formatDateFull,
+    formatDateWeekdayMonth,
+    formatDateWeekdayMonthShort,
     formatDateWithWeekday,
     formatDateTimeWithWeekday,
     formatDateTimeRange,

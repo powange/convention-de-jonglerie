@@ -281,6 +281,10 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { t } = useI18n()
+// Les dates passent par le composable : il force Europe/Paris et suit la langue choisie. Formatées
+// à la main, elles reculaient d'un jour pour qui lit depuis l'ouest — un repas est stocké à minuit
+// UTC, et « samedi 15 » devenait « vendredi 14 » à New York.
+const { formatDateFull, formatDateWeekdayMonth, formatDateWeekdayMonthShort } = useDateFormat()
 const toast = useToast()
 
 const editionId = computed(() => parseInt(route.params.id as string))
@@ -352,25 +356,21 @@ const dateOptions = computed(() => [
   { value: 'all', label: t('edition.meals.all_dates') },
   ...availableDates.value.map((date) => ({
     value: date,
-    label: new Date(date).toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    }),
+    label: formatDateWeekdayMonth(date),
   })),
 ])
 
 // Colonnes du tableau
 const columns = [
-  { accessorKey: 'nom', header: 'Nom' },
-  { accessorKey: 'prenom', header: 'Prénom' },
-  { accessorKey: 'email', header: 'Email' },
-  { accessorKey: 'type', header: 'Type' },
-  { accessorKey: 'mealDate', header: 'Date' },
-  { accessorKey: 'mealType', header: 'Type de repas' },
-  { accessorKey: 'mealPhase', header: 'Phase' },
-  { accessorKey: 'dietaryPreference', header: 'Régime' },
-  { accessorKey: 'afterShow', header: 'Après spectacle' },
+  { accessorKey: 'nom', header: t('common.name') },
+  { accessorKey: 'prenom', header: t('common.first_name') },
+  { accessorKey: 'email', header: t('common.email') },
+  { accessorKey: 'type', header: t('common.type') },
+  { accessorKey: 'mealDate', header: t('common.date') },
+  { accessorKey: 'mealType', header: t('gestion.meals.meal_type') },
+  { accessorKey: 'mealPhase', header: t('gestion.meals.phase') },
+  { accessorKey: 'dietaryPreference', header: t('gestion.meals.diet') },
+  { accessorKey: 'afterShow', header: t('gestion.meals.after_show') },
 ]
 
 // Utiliser les utilitaires meals
@@ -389,15 +389,8 @@ const getDietLabel = (diet: string) => dietLabels[diet] || diet
 const regimeAAfficher = (regime: string | null) =>
   regime && regime !== 'NONE' ? getDietLabel(regime) : '-'
 
-// Formatage de date
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('fr-FR', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  })
-}
+// Formatage de date, en abrégé : la colonne est étroite.
+const formatDate = formatDateWeekdayMonthShort
 
 // Données formatées pour le tableau
 const formattedParticipants = computed(() => {
@@ -518,14 +511,7 @@ const cateringDateOptions = computed(() => {
   if (!edition.value || !volunteersInfo.value) return []
 
   const options = []
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
+  const formatDate = (date: Date) => formatDateFull(date.toISOString())
 
   const startDate = new Date(edition.value!.startDate)
   const endDate = new Date(edition.value!.endDate)
@@ -609,12 +595,7 @@ const generateCateringPdf = async () => {
     doc.setFontSize(18)
     doc.setFont('helvetica', 'bold')
     doc.text(
-      `Restauration - ${new Date(selectedCateringDate.value).toLocaleDateString('fr-FR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })}`,
+      `${t('gestion.meals.catering_pdf_title')} - ${formatDateFull(selectedCateringDate.value)}`,
       105,
       yPosition,
       { align: 'center' }
@@ -635,12 +616,21 @@ const generateCateringPdf = async () => {
     doc.text('Résumé des repas', 20, yPosition)
     yPosition += 10
 
-    const mealTypeLabels = { BREAKFAST: 'Matin', LUNCH: 'Midi', DINNER: 'Soir' }
-    const phaseLabels = { SETUP: 'Montage', EVENT: 'Édition', TEARDOWN: 'Démontage' }
+    const mealTypeLabels = {
+      BREAKFAST: t('gestion.meals.breakfast'),
+      LUNCH: t('gestion.meals.lunch'),
+      DINNER: t('gestion.meals.dinner'),
+    }
+    // Les mêmes clés que le filtre de phase, quelques centaines de lignes plus haut.
+    const phaseLabels = {
+      SETUP: t('common.setup'),
+      EVENT: t('common.event'),
+      TEARDOWN: t('common.teardown'),
+    }
     const dietLabels = {
-      NONE: 'Aucun régime spécial',
-      VEGETARIAN: 'Végétarien',
-      VEGAN: 'Végan',
+      NONE: t('gestion.meals.diet_none'),
+      VEGETARIAN: t('gestion.meals.diet_vegetarian'),
+      VEGAN: t('gestion.meals.diet_vegan'),
     }
     const severityLabels = {
       LIGHT: 'légère',
@@ -793,14 +783,9 @@ const generateCateringPdf = async () => {
 
       // Préparer les données du tableau
       const tableData = meal.participants.map((p: any) => {
-        const typeLabel =
-          p.type === 'volunteer'
-            ? 'Bénévole'
-            : p.type === 'artist'
-              ? 'Artiste'
-              : p.type === 'organizer'
-                ? 'Organisateur'
-                : 'Participant'
+        // Les quatre libellés vivent déjà sous `person_type`, et duplicates.vue comme
+        // validate.vue les lisent de cette façon. Le ternaire les réécrivait en français.
+        const typeLabel = t(`gestion.meals.person_type.${p.type}`)
         const dietLabel =
           p.dietaryPreference === 'VEGETARIAN'
             ? 'Végétarien'
