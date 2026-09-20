@@ -83,14 +83,14 @@ export default defineNitroPlugin(async (_nitroApp) => {
       start: true,
     })
 
-    // Nettoyage des logs d'erreur résolus (quotidien à 3h du matin)
+    // Purge du journal d'erreurs (quotidien à 3h du matin)
     CronJob.from({
       cronTime: '0 3 * * *',
       onTick: async () => {
         try {
-          await runTask('cleanup-resolved-error-logs')
+          await runTask('purge-journal-erreurs')
         } catch (error) {
-          console.error("Erreur lors de l'exécution de cleanup-resolved-error-logs:", error)
+          console.error("Erreur lors de l'exécution de purge-journal-erreurs:", error)
         }
       },
       start: true,
