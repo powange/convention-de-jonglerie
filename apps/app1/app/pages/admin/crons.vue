@@ -339,7 +339,10 @@ const formatExecutionTime = (timestamp: string) => {
   })
 }
 
-const getExecutionStats = (result: Record<string, unknown>) => {
+// `result` est facultatif sur `taskResults`, et le `v-if` du gabarit ne le restreint pas jusqu'ici.
+// La fonction s'y attendait déjà — son premier test porte sur l'absence —, seule sa signature
+// prétendait le contraire.
+const getExecutionStats = (result: Record<string, unknown> | undefined) => {
   if (!result) return {}
 
   const stats: Record<string, number> = {}
