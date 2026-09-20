@@ -276,6 +276,7 @@ import {
   filtresDepuisUrl,
   requeteListeDeRepas,
 } from '../../../../../utils/filtres-liste-repas'
+import { resumerRepas, lignesDeParticipants } from '../../../../../utils/restauration-pdf'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -605,39 +606,24 @@ const generateCateringPdf = async () => {
     // Informations générales
     doc.setFontSize(11)
     doc.setFont('helvetica', 'normal')
-    doc.text(`Convention: ${edition.value?.convention?.name || 'N/A'}`, 20, yPosition)
+    doc.text(
+      `${t('gestion.meals.pdf_convention')} : ${edition.value?.convention?.name || t('common.unknown')}`,
+      20,
+      yPosition
+    )
     yPosition += 7
-    doc.text(`Édition: ${edition.value?.name || 'N/A'}`, 20, yPosition)
+    doc.text(
+      `${t('gestion.meals.pdf_edition')} : ${edition.value?.name || t('common.unknown')}`,
+      20,
+      yPosition
+    )
     yPosition += 15
 
     // Résumé des repas
     doc.setFontSize(14)
     doc.setFont('helvetica', 'bold')
-    doc.text('Résumé des repas', 20, yPosition)
+    doc.text(t('gestion.meals.pdf_summary'), 20, yPosition)
     yPosition += 10
-
-    const mealTypeLabels = {
-      BREAKFAST: t('gestion.meals.breakfast'),
-      LUNCH: t('gestion.meals.lunch'),
-      DINNER: t('gestion.meals.dinner'),
-    }
-    // Les mêmes clés que le filtre de phase, quelques centaines de lignes plus haut.
-    const phaseLabels = {
-      SETUP: t('common.setup'),
-      EVENT: t('common.event'),
-      TEARDOWN: t('common.teardown'),
-    }
-    const dietLabels = {
-      NONE: t('gestion.meals.diet_none'),
-      VEGETARIAN: t('gestion.meals.diet_vegetarian'),
-      VEGAN: t('gestion.meals.diet_vegan'),
-    }
-    const severityLabels = {
-      LIGHT: 'légère',
-      MODERATE: 'modérée',
-      SEVERE: 'sévère',
-      CRITICAL: 'critique',
-    }
 
     // Afficher chaque repas avec ses détails
     for (const meal of cateringData.meals) {
@@ -647,110 +633,66 @@ const generateCateringPdf = async () => {
         yPosition = 20
       }
 
-      const mealLabel =
-        mealTypeLabels[meal.mealType as keyof typeof mealTypeLabels] || meal.mealType
-      const phaseLabel = meal.phases
-        .map((phase: string) => phaseLabels[phase as keyof typeof phaseLabels] || phase)
-        .join(' + ')
+      // Ce qui sort de la fiche est décidé dans `restauration-pdf`, éprouvé à part ; ici, il
+      // n'y a plus que du placement et de la traduction.
+      const resume = resumerRepas(meal)
 
-      // Calculer le nombre d'artistes qui mangent après le spectacle
-      const artistsAfterShowCount = meal.participants.filter(
-        (p: any) => p.type === 'artist' && p.afterShow
-      ).length
-
-      // Titre du repas
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
-      doc.text(`${mealLabel} (${phaseLabel})`, 25, yPosition)
+      const phasesLisibles = resume.clesPhases.map((cle) => t(cle)).join(' + ')
+      doc.text(`${t(resume.cleTypeRepas)} (${phasesLisibles})`, 25, yPosition)
       yPosition += 7
 
       doc.setFontSize(10)
       doc.setFont('helvetica', 'normal')
-
-      // Construire le texte avec les différents types de participants
-      const participantsParts = [
-        `${meal.volunteerCount} bénévole${meal.volunteerCount > 1 ? 's' : ''}`,
-        `${meal.artistCount} artiste${meal.artistCount > 1 ? 's' : ''}`,
-      ]
-
-      if (meal.ticketParticipantCount > 0) {
-        participantsParts.push(
-          `${meal.ticketParticipantCount} participant${meal.ticketParticipantCount > 1 ? 's' : ''}`
-        )
-      }
-
-      if (meal.organizerCount > 0) {
-        participantsParts.push(
-          `${meal.organizerCount} organisateur${meal.organizerCount > 1 ? 's' : ''}`
-        )
-      }
-
-      doc.text(`Total: ${meal.totalParticipants} (${participantsParts.join(', ')})`, 30, yPosition)
+      const populations = resume.populations.map((p) => t(p.cle, p.nombre)).join(', ')
+      doc.text(`${t('gestion.meals.pdf_total')} : ${resume.total} (${populations})`, 30, yPosition)
       yPosition += 5
 
-      // Afficher le nombre d'artistes qui mangent après le spectacle
-      if (artistsAfterShowCount > 0) {
+      if (resume.apresSpectacle > 0) {
         doc.setFontSize(9)
         doc.setFont('helvetica', 'italic')
-        doc.text(`  dont ${artistsAfterShowCount} artiste(s) après spectacle`, 30, yPosition)
+        doc.text(`  ${t('gestion.meals.pdf_after_show', resume.apresSpectacle)}`, 30, yPosition)
         yPosition += 5
       } else {
         yPosition += 1
       }
 
-      // Calculer les régimes pour ce repas
-      const mealDietCounts: Record<string, number> = {}
-      meal.participants.forEach((p: any) => {
-        const diet = p.dietaryPreference || 'NONE'
-        mealDietCounts[diet] = (mealDietCounts[diet] || 0) + 1
-      })
-
-      // Afficher les régimes alimentaires
-      if (Object.keys(mealDietCounts).length > 0) {
+      if (resume.regimes.length > 0) {
         doc.setFontSize(9)
         doc.setFont('helvetica', 'italic')
-        doc.text('Régimes:', 30, yPosition)
+        doc.text(t('gestion.meals.pdf_diets'), 30, yPosition)
         yPosition += 5
 
-        const dietOrder = ['NONE', 'VEGETARIAN', 'VEGAN']
-        for (const diet of dietOrder) {
-          if (mealDietCounts[diet]) {
+        for (const regime of resume.regimes) {
+          doc.text(`  ${t(regime.cle)} : ${regime.nombre}`, 32, yPosition)
+          yPosition += 4
+        }
+      }
+
+      if (resume.allergies.length > 0) {
+        yPosition += 2
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'italic')
+        doc.text(t('gestion.meals.pdf_allergies'), 30, yPosition)
+        yPosition += 5
+
+        for (const personne of resume.allergies) {
+          const gravite = personne.cleGravite ? ` (${t(personne.cleGravite)})` : ''
+
+          doc.setFontSize(8)
+          doc.text(`  • ${personne.nom}${gravite} : ${personne.allergies}`, 32, yPosition)
+          yPosition += 4
+
+          if (personne.telephoneUrgence) {
             doc.text(
-              `  ${dietLabels[diet as keyof typeof dietLabels]}: ${mealDietCounts[diet]}`,
-              32,
+              `    ${t('gestion.meals.pdf_emergency_phone')} : ${personne.telephoneUrgence}`,
+              34,
               yPosition
             )
             yPosition += 4
           }
-        }
-      }
 
-      // Filtrer les allergies pour ce repas
-      const mealAllergies = meal.participants.filter((p: any) => p.allergies && p.allergies.trim())
-
-      if (mealAllergies.length > 0) {
-        yPosition += 2
-        doc.setFontSize(9)
-        doc.setFont('helvetica', 'italic')
-        doc.text('Allergies:', 30, yPosition)
-        yPosition += 5
-
-        for (const participant of mealAllergies) {
-          const name = `${participant.prenom || ''} ${participant.nom || ''}`.trim()
-          const severityText = participant.allergySeverity
-            ? ` (${severityLabels[participant.allergySeverity as keyof typeof severityLabels] || participant.allergySeverity})`
-            : ''
-
-          doc.setFontSize(8)
-          doc.text(`  • ${name}${severityText}: ${participant.allergies}`, 32, yPosition)
-          yPosition += 4
-
-          if (participant.emergencyContactPhone) {
-            doc.text(`    Tel urgence: ${participant.emergencyContactPhone}`, 34, yPosition)
-            yPosition += 4
-          }
-
-          // Vérifier si on dépasse la page
           if (yPosition > 270) {
             doc.addPage()
             yPosition = 20
@@ -766,57 +708,36 @@ const generateCateringPdf = async () => {
       // Ajouter une nouvelle page en format portrait
       doc.addPage('a4', 'portrait')
 
-      const mealLabel =
-        mealTypeLabels[meal.mealType as keyof typeof mealTypeLabels] || meal.mealType
-      const phaseLabel = meal.phases
-        .map((phase: string) => phaseLabels[phase as keyof typeof phaseLabels] || phase)
-        .join(' + ')
+      const resumeDuRepas = resumerRepas(meal)
+      const phasesDuTableau = resumeDuRepas.clesPhases.map((cle) => t(cle)).join(' + ')
 
-      // Titre du repas
       doc.setFontSize(16)
       doc.setFont('helvetica', 'bold')
-      doc.text(`${mealLabel} - ${phaseLabel}`, 20, 20)
+      doc.text(`${t(resumeDuRepas.cleTypeRepas)} - ${phasesDuTableau}`, 20, 20)
 
       doc.setFontSize(11)
       doc.setFont('helvetica', 'normal')
-      doc.text(`Total: ${meal.totalParticipants} participants`, 20, 28)
+      doc.text(
+        `${t('gestion.meals.pdf_total')} : ${t('gestion.meals.count_participants', meal.totalParticipants)}`,
+        20,
+        28
+      )
 
-      // Préparer les données du tableau
-      const tableData = meal.participants.map((p: any) => {
-        // Les quatre libellés vivent déjà sous `person_type`, et duplicates.vue comme
-        // validate.vue les lisent de cette façon. Le ternaire les réécrivait en français.
-        const typeLabel = t(`gestion.meals.person_type.${p.type}`)
-        const dietLabel =
-          p.dietaryPreference === 'VEGETARIAN'
-            ? 'Végétarien'
-            : p.dietaryPreference === 'VEGAN'
-              ? 'Végan'
-              : '-'
-        const severityLabel =
-          p.allergySeverity === 'LIGHT'
-            ? 'Légère'
-            : p.allergySeverity === 'MODERATE'
-              ? 'Modérée'
-              : p.allergySeverity === 'SEVERE'
-                ? 'Sévère'
-                : p.allergySeverity === 'CRITICAL'
-                  ? 'Critique'
-                  : '-'
-        const afterShowLabel = p.type === 'artist' && p.afterShow ? 'Oui' : '-'
-
-        return [
-          '', // Case à cocher vide en première position
-          p.nom || '',
-          p.prenom || '',
-          typeLabel,
-          afterShowLabel,
-          p.email || '',
-          p.phone || '',
-          dietLabel,
-          p.allergies || '-',
-          p.allergies ? severityLabel : '-',
-        ]
-      })
+      // Un tiret plutôt qu'une case vide : sur une fiche imprimée, on doit voir qu'il n'y a rien
+      // à signaler, et non se demander si la colonne a été oubliée.
+      const RIEN = '-'
+      const tableData = lignesDeParticipants(meal).map((ligne) => [
+        '', // Case à cocher vide en première position, pour pointer au service
+        ligne.nom,
+        ligne.prenom,
+        t(ligne.cleType),
+        ligne.apresSpectacle ? t('common.yes') : RIEN,
+        ligne.email,
+        ligne.telephone,
+        ligne.cleRegime ? t(ligne.cleRegime) : RIEN,
+        ligne.allergies ?? RIEN,
+        ligne.cleGravite && ligne.allergies ? t(ligne.cleGravite) : RIEN,
+      ])
 
       // Générer le tableau
       // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
@@ -825,15 +746,15 @@ const generateCateringPdf = async () => {
         head: [
           [
             '',
-            'Nom',
-            'Prénom',
-            'Type',
-            'Après spectacle',
-            'Email',
-            'Téléphone',
-            'Régime',
-            'Allergies',
-            'Sévérité',
+            t('common.name'),
+            t('common.first_name'),
+            t('common.type'),
+            t('gestion.meals.after_show'),
+            t('common.email'),
+            t('common.phone'),
+            t('gestion.meals.diet'),
+            t('gestion.meals.pdf_allergies_header'),
+            t('gestion.meals.pdf_severity_header'),
           ],
         ],
         body: tableData,
