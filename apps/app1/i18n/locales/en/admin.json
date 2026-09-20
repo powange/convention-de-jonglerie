@@ -278,7 +278,8 @@
       "status_update_error": "Could not update the status",
       "title": "Error log",
       "view_flat": "Flat",
-      "view_grouped": "Grouped"
+      "view_grouped": "Grouped",
+      "cleanup_action": "Purge the log"
     },
     "errors_24h": "Errors (24h)",
     "event_reminders": "Event Reminders",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Temporary uploads cleanup",
     "cleanup_empty_conversations": "Empty conversations cleanup",
     "cleanup_inactive_subscriptions": "Inactive push subscriptions cleanup",
-    "task_deadlines_reminders": "Task deadline reminders"
+    "task_deadlines_reminders": "Task deadline reminders",
+    "purge_journal_erreurs": "Error log purge"
   }
 }

@@ -212,7 +212,14 @@
       "withdrawal_success": "Candidatura ritirata con successo",
       "with_you_on_slot": "Con te in questo turno: | Con te in questo turno ({count}):",
       "show_past_slots": "Mostra il turno passato | Mostra i {count} turni passati",
-      "no_upcoming_slots": "Nessun turno in programma."
+      "no_upcoming_slots": "Nessun turno in programma.",
+      "export_pdf_column_slot": "Fascia oraria",
+      "export_pdf_column_team": "Squadra",
+      "export_pdf_column_when": "Quando",
+      "export_pdf_delay": "Ritardo: {minutes} min",
+      "export_pdf_empty": "Nessuna fascia oraria da stampare",
+      "export_pdf_summary": "{creneaux} fasce orarie — {heures} — {equipes} squadra/e",
+      "export_pdf_title": "Planning volontari"
     }
   },
   "seo": {

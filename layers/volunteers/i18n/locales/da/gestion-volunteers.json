@@ -30,7 +30,9 @@
       "page_public": "Offentlig side synlig",
       "page_public_description": "Gør den offentlige frivilligside synlig for besøgende (ellers har kun arrangører adgang)",
       "page_public_hidden": "Side skjult — kun arrangører har adgang",
-      "page_public_visible": "Side tilgængelig for alle"
+      "page_public_visible": "Side tilgængelig for alle",
+      "volunteering_ended_description": "Nedtagningen af denne udgave er afsluttet: ansøgningerne er lukkede, og den offentlige side er ikke længere synlig for besøgende. Du og de frivillige, der har ansøgt, beholder adgangen til alt det registrerede.",
+      "volunteering_ended_title": "Det frivillige arbejde for denne udgave er afsluttet"
     }
   }
 }

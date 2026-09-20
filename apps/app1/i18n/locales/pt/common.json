@@ -190,7 +190,8 @@
     "yes": "Sim",
     "currency": "Moeda",
     "amount": "Montante",
-    "treasury_short": "Tesouraria"
+    "treasury_short": "Tesouraria",
+    "type": "Tipo"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

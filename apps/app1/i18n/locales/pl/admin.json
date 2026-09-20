@@ -278,7 +278,8 @@
       "status_update_error": "Nie udało się zaktualizować statusu",
       "title": "Dziennik błędów",
       "view_flat": "Lista",
-      "view_grouped": "Zgrupowane"
+      "view_grouped": "Zgrupowane",
+      "cleanup_action": "Wyczyść dziennik"
     },
     "errors_24h": "Błędy (24h)",
     "event_reminders": "Przypomnienia o wydarzeniach",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Czyszczenie plików tymczasowych",
     "cleanup_empty_conversations": "Czyszczenie pustych rozmów",
     "cleanup_inactive_subscriptions": "Czyszczenie nieaktywnych subskrypcji push",
-    "task_deadlines_reminders": "Przypomnienia o terminach zadań"
+    "task_deadlines_reminders": "Przypomnienia o terminach zadań",
+    "purge_journal_erreurs": "Czyszczenie dziennika błędów"
   }
 }

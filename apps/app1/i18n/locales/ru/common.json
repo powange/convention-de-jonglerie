@@ -190,7 +190,8 @@
     "yes": "Да",
     "currency": "Валюта",
     "amount": "Сумма",
-    "treasury_short": "Касса"
+    "treasury_short": "Касса",
+    "type": "Тип"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

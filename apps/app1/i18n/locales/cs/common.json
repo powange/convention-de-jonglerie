@@ -190,7 +190,8 @@
     "yes": "Ano",
     "currency": "Měna",
     "amount": "Částka",
-    "treasury_short": "Pokladna"
+    "treasury_short": "Pokladna",
+    "type": "Typ"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

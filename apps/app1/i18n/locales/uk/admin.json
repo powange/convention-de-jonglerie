@@ -278,7 +278,8 @@
       "status_update_error": "Не вдалося оновити статус",
       "title": "Журнал помилок",
       "view_flat": "Списком",
-      "view_grouped": "Згруповано"
+      "view_grouped": "Згруповано",
+      "cleanup_action": "Очистити журнал"
     },
     "errors_24h": "Помилки (24г)",
     "event_reminders": "Нагадування про події",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Очищення тимчасових завантажень",
     "cleanup_empty_conversations": "Очищення порожніх бесід",
     "cleanup_inactive_subscriptions": "Очищення неактивних push-підписок",
-    "task_deadlines_reminders": "Нагадування про терміни завдань"
+    "task_deadlines_reminders": "Нагадування про терміни завдань",
+    "purge_journal_erreurs": "Очищення журналу помилок"
   }
 }

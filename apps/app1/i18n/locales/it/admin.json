@@ -278,7 +278,8 @@
       "status_update_error": "Impossibile aggiornare lo stato",
       "title": "Registro degli errori",
       "view_flat": "Elenco",
-      "view_grouped": "Raggruppate"
+      "view_grouped": "Raggruppate",
+      "cleanup_action": "Svuota il registro"
     },
     "errors_24h": "Errori (24h)",
     "event_reminders": "Promemoria eventi",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Pulizia dei caricamenti temporanei",
     "cleanup_empty_conversations": "Pulizia delle conversazioni vuote",
     "cleanup_inactive_subscriptions": "Pulizia delle iscrizioni push inattive",
-    "task_deadlines_reminders": "Promemoria delle scadenze delle attività"
+    "task_deadlines_reminders": "Promemoria delle scadenze delle attività",
+    "purge_journal_erreurs": "Svuotamento del registro degli errori"
   }
 }

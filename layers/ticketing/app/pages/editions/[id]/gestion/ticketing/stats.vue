@@ -25,6 +25,44 @@
         <p class="text-gray-600 dark:text-gray-400 mt-1">
           {{ $t('gestion.ticketing.stats_description') }}
         </p>
+
+        <!-- Comparaison à une édition passée. Absente quand la convention n'a pas d'autre
+             édition lisible : un sélecteur à une seule entrée ne propose rien. -->
+        <div v-if="editionsComparables.length > 0" class="mt-4 flex flex-wrap items-center gap-3">
+          <UFormField :label="$t('gestion.ticketing.stats_compare_label')" class="min-w-64">
+            <USelect
+              v-model="comparaisonId"
+              :items="choixDeComparaison"
+              value-key="value"
+              :loading="chargementComparables || chargementComparaison"
+              :placeholder="$t('gestion.ticketing.stats_no_comparison')"
+            />
+          </UFormField>
+
+          <UAlert
+            v-if="comparaisonEnPanne"
+            icon="i-heroicons-exclamation-triangle"
+            color="error"
+            variant="subtle"
+            class="flex-1 min-w-72"
+            :title="$t('gestion.ticketing.stats_compare_error')"
+          />
+          <UAlert
+            v-else-if="comparaisonRefusee"
+            icon="i-heroicons-lock-closed"
+            color="warning"
+            variant="subtle"
+            class="flex-1 min-w-72"
+            :title="$t('gestion.ticketing.stats_compare_denied')"
+          />
+          <p
+            v-else-if="enComparaison"
+            class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1"
+          >
+            <UIcon name="i-heroicons-information-circle" />
+            {{ $t('gestion.ticketing.stats_compare_axis_hint') }}
+          </p>
+        </div>
       </div>
 
       <!-- Graphique avec filtres -->
@@ -204,7 +242,17 @@
         </div>
         <div v-else-if="filteredData && filteredData.timestamps.length > 0">
           <AccessValidationChart
-            :data="filteredData"
+            v-if="donneesDesValidations"
+            :data="donneesDesValidations"
+            :etiquettes="comparaisonValidations?.etiquettes ?? null"
+            :comparaison="
+              comparaisonValidations
+                ? {
+                    libelle: comparaisonValidations.libelle,
+                    series: comparaisonValidations.series,
+                  }
+                : null
+            "
             :show-participants="filters.showParticipants"
             :show-volunteers="filters.showVolunteers"
             :show-artists="filters.showArtists"
@@ -299,6 +347,21 @@
           <!-- Graphique en donut -->
           <OrderSourceChart
             :data="viewMode === 'items' ? orderSourcesData.items : orderSourcesData.orders"
+            :comparaison="
+              enComparaison && provenancesComparees
+                ? {
+                    libelle: libelleDEdition(editionComparee?.name, editionComparee?.startDate),
+                    manual: (viewMode === 'orders'
+                      ? provenancesComparees.orders
+                      : provenancesComparees.items
+                    ).manual,
+                    external: (viewMode === 'orders'
+                      ? provenancesComparees.orders
+                      : provenancesComparees.items
+                    ).external,
+                  }
+                : null
+            "
             :show-orders="viewMode === 'orders'"
           />
         </div>
@@ -322,12 +385,35 @@
         </template>
 
         <!-- Filtres -->
-        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Filtres de type -->
           <UFormField :label="$t('gestion.ticketing.stats_filter_type')">
             <USelect
               v-model="selectedPurchaseTypes"
               :items="typeItemsPurchases"
+              multiple
+              value-key="value"
+              :ui="{ content: 'min-w-fit' }"
+            >
+              <template #default="{ modelValue }">
+                <span v-if="Array.isArray(modelValue) && modelValue.length > 0">
+                  {{ modelValue.length }}
+                  {{
+                    modelValue.length > 1 ? $t('common.items_selected') : $t('common.item_selected')
+                  }}
+                </span>
+                <span v-else class="text-gray-400 dark:text-gray-500">
+                  {{ $t('common.select') }}
+                </span>
+              </template>
+            </USelect>
+          </UFormField>
+
+          <!-- Périodes de vente -->
+          <UFormField :label="$t('gestion.ticketing.stats_filter_buy_period')">
+            <USelect
+              v-model="selectedPurchasePeriods"
+              :items="purchasePeriodItems"
               multiple
               value-key="value"
               :ui="{ content: 'min-w-fit' }"
@@ -358,7 +444,7 @@
         </div>
 
         <!-- Totaux -->
-        <div v-if="purchasesData" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div v-if="achatsFiltres" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <UCard v-if="purchaseFilters.showParticipants">
             <div class="flex items-center justify-between">
               <div>
@@ -370,7 +456,7 @@
                 <p
                   :class="`text-2xl font-bold ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
                 >
-                  {{ purchasesData.totals.participantsManual }}
+                  {{ achatsFiltres.totals.participantsManual }}
                 </p>
               </div>
               <UIcon :name="ticketConfig.icon" :class="`h-8 w-8 ${ticketConfig.iconColorClass}`" />
@@ -387,7 +473,7 @@
                 <p
                   :class="`text-2xl font-bold ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
                 >
-                  {{ purchasesData.totals.participantsExternal }}
+                  {{ achatsFiltres.totals.participantsExternal }}
                 </p>
               </div>
               <UIcon :name="ticketConfig.icon" :class="`h-8 w-8 ${ticketConfig.iconColorClass}`" />
@@ -402,7 +488,7 @@
                   }})
                 </p>
                 <p class="text-2xl font-bold text-gray-600 dark:text-gray-400">
-                  {{ purchasesData.totals.othersManual }}
+                  {{ achatsFiltres.totals.othersManual }}
                 </p>
               </div>
               <UIcon name="i-heroicons-user" class="h-8 w-8 text-gray-500" />
@@ -417,7 +503,7 @@
                   }})
                 </p>
                 <p class="text-2xl font-bold text-gray-600 dark:text-gray-400">
-                  {{ purchasesData.totals.othersExternal }}
+                  {{ achatsFiltres.totals.othersExternal }}
                 </p>
               </div>
               <UIcon name="i-heroicons-user" class="h-8 w-8 text-gray-500" />
@@ -444,9 +530,22 @@
             {{ $t('gestion.ticketing.stats_error') }}
           </p>
         </div>
-        <div v-else-if="purchasesData && purchasesData.labels.length > 0">
+        <!-- Ce qui est RÉELLEMENT tracé, et non les données brutes : décocher les trois périodes
+             de vente laissait un graphique vide à l'écran là où « aucune donnée » se lit mieux.
+             Et en comparaison, l'axe reste celui des deux éditions — le graphique garde donc sa
+             raison d'être même si l'édition en cours n'a rien vendu sur la période retenue. -->
+        <div v-else-if="donneesDesAchats && donneesDesAchats.labels.length > 0">
           <PurchaseChart
-            :data="purchasesData"
+            v-if="donneesDesAchats"
+            :data="donneesDesAchats"
+            :comparaison="
+              comparaisonAchats
+                ? {
+                    libelle: comparaisonAchats.libelle,
+                    series: comparaisonAchats.series,
+                  }
+                : null
+            "
             :show-participants="purchaseFilters.showParticipants"
             :show-others="purchaseFilters.showOthers"
           />
@@ -465,6 +564,8 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { comparerSeries, libelleDEdition } from '~/utils/comparaison-stats'
+import { PERIODES_DACHAT, indicesDansLesPeriodes, serieSurIndices } from '~/utils/periodes-achats'
 
 // Import explicite : plusieurs layers exportent un `requeteStats`-like et des constantes de même
 // famille, et l'auto-import ne saurait pas lequel prendre.
@@ -638,9 +739,73 @@ const selectedTypes = ref<string[]>(reglagesInitiaux.types)
 const selectedPeriods = ref<string[]>(reglagesInitiaux.periodes)
 const selectedGranularity = ref<number>(reglagesInitiaux.granularite)
 
+/**
+ * L'édition passée à laquelle on se compare, ou `null`.
+ *
+ * Par défaut aucune : l'écran se comporte exactement comme avant que cette possibilité existe,
+ * et son adresse est la même. La sélection vit dans l'URL, donc un lien transporte la
+ * comparaison avec le reste des réglages.
+ */
+const comparaisonId = ref<number | null>(reglagesInitiaux.comparaison)
+
+/** Les éditions proposables — filtrées côté serveur sur le droit « gérer la billetterie ». */
+const editionsComparables = ref<EditionComparable[]>([])
+const chargementComparables = ref(false)
+
+/** Ce qu'on a chargé de l'édition comparée, ou `null` tant qu'on ne compare pas. */
+const validationsComparees = ref<ValidationData | null>(null)
+const achatsCompares = ref<PurchaseData | null>(null)
+const provenancesComparees = ref<OrderSourcesData | null>(null)
+const chargementComparaison = ref(false)
+/** Le refus explicite du serveur, distinct d'une panne : à dire, pas à taire. */
+const comparaisonRefusee = ref(false)
+/** Une panne de chargement, distincte du refus : à dire aussi, plutôt qu'à taire. */
+const comparaisonEnPanne = ref(false)
+
+/**
+ * Les choix du sélecteur, « aucune comparaison » en tête.
+ *
+ * L'entrée de tête porte la valeur `null` : c'est elle qui permet de REVENIR à l'écran simple,
+ * et sans elle une comparaison choisie par mégarde ne se déferait qu'en rechargeant la page.
+ *
+ * L'année de début figure dans le libellé quand l'édition n'a pas de nom propre — deux éditions
+ * d'une même convention s'appellent souvent pareil, et seule la date les distingue.
+ */
+const choixDeComparaison = computed(() => [
+  { label: t('gestion.ticketing.stats_no_comparison'), value: null },
+  ...editionsComparables.value.map((e) => ({
+    label: e.name || String(new Date(e.startDate).getFullYear()),
+    value: e.id,
+  })),
+])
+
+/** L'édition comparée, telle que le sélecteur la connaît. */
+const editionComparee = computed(
+  () => editionsComparables.value.find((e) => e.id === comparaisonId.value) ?? null
+)
+
+/** Compare-t-on vraiment ? Une sélection qu'on n'a pas pu charger ne compte pas. */
+const enComparaison = computed(
+  () => editionComparee.value !== null && !comparaisonRefusee.value && !comparaisonEnPanne.value
+)
+
 // Filtres sélectionnés pour les achats de billets
 const selectedPurchaseTypes = ref<string[]>(reglagesInitiaux.typesDachat)
 const selectedPurchaseGranularity = ref<number>(reglagesInitiaux.granulariteDesAchats)
+const selectedPurchasePeriods = ref<string[]>(reglagesInitiaux.periodesDachat)
+
+/**
+ * Les trois périodes proposées au graphique des achats.
+ *
+ * Distinctes des périodes du graphique des validations : celles-ci découpent la vente, pas la
+ * présence. « Avant » n'a pas de borne basse — la billetterie ouvre des mois avant le montage.
+ */
+const purchasePeriodItems = computed(() =>
+  PERIODES_DACHAT.map((valeur) => ({
+    label: t(`gestion.ticketing.stats_buy_period_${valeur}`),
+    value: valeur,
+  }))
+)
 
 // Filtres du graphique des validations d'entrée (dérivés de selectedTypes)
 const filters = computed(() => ({
@@ -714,6 +879,14 @@ interface PurchaseData {
   }
 }
 
+/** Une édition proposée à la comparaison, telle que le serveur la rend. */
+interface EditionComparable {
+  id: number
+  name: string | null
+  startDate: string
+  endDate: string
+}
+
 const purchasesData = ref<PurchaseData | null>(null)
 const loadingPurchases = ref(false)
 const purchasesError = ref(false)
@@ -763,8 +936,10 @@ watch(
     selectedGranularity,
     selectedPurchaseTypes,
     selectedPurchaseGranularity,
+    selectedPurchasePeriods,
     selectedTierIds,
     viewMode,
+    comparaisonId,
   ],
   () => {
     router.replace({
@@ -776,8 +951,10 @@ watch(
           granularite: selectedGranularity.value,
           typesDachat: selectedPurchaseTypes.value,
           granulariteDesAchats: selectedPurchaseGranularity.value,
+          periodesDachat: selectedPurchasePeriods.value,
           tarifs: selectedTierIds.value,
           vue: viewMode.value,
+          comparaison: comparaisonId.value,
         },
         typesParDefaut
       ),
@@ -846,6 +1023,191 @@ const filteredData = computed(() => {
   }
 })
 
+/**
+ * Les achats ramenés aux périodes retenues.
+ *
+ * Trois lectures se superposent dans ce graphique : la vente des mois qui précèdent dit si la
+ * communication a porté, celle des jours de l'édition dit combien de monde s'est décidé sur
+ * place, celle d'après est faite de régularisations. Les découper est le seul moyen de lire
+ * chacune pour elle-même.
+ *
+ * La règle vit dans `periodes-achats`, avec ses tests. Ici on ne fait que l'appliquer — aux
+ * quatre séries d'un même geste, par leurs RANGS : les filtrer séparément les désynchroniserait.
+ *
+ * Les totaux sont recalculés depuis les séries découpées, et non repris du serveur. Des cartes
+ * qui annonceraient le total de l'année entière au-dessus d'un graphique réduit à trois jours
+ * donneraient un chiffre juste au mauvais endroit, ce qui revient à un chiffre faux.
+ */
+function filtrerAchats(donnees: PurchaseData | null): PurchaseData | null {
+  if (!donnees) return null
+  const indices = indicesDansLesPeriodes(
+    donnees.timestamps,
+    // Les bornes de CETTE édition, tirées de SES propres données : une édition comparée n'a pas
+    // les mêmes dates, et lui appliquer celles de l'édition en cours la viderait entièrement.
+    { debut: donnees.periods?.event?.start, fin: donnees.periods?.event?.end },
+    selectedPurchasePeriods.value
+  )
+  if (indices.length === donnees.timestamps.length) return donnees
+
+  const participantsManual = serieSurIndices(indices, donnees.participantsManual)
+  const participantsExternal = serieSurIndices(indices, donnees.participantsExternal)
+  const othersManual = serieSurIndices(indices, donnees.othersManual)
+  const othersExternal = serieSurIndices(indices, donnees.othersExternal)
+  const somme = (serie: number[]) => serie.reduce((a, b) => a + b, 0)
+
+  return {
+    ...donnees,
+    labels: indices.map((i) => donnees.labels[i]).filter((v): v is string => v !== undefined),
+    timestamps: indices
+      .map((i) => donnees.timestamps[i])
+      .filter((v): v is string => v !== undefined),
+    participantsManual,
+    participantsExternal,
+    othersManual,
+    othersExternal,
+    totals: {
+      participantsManual: somme(participantsManual),
+      participantsExternal: somme(participantsExternal),
+      othersManual: somme(othersManual),
+      othersExternal: somme(othersExternal),
+    },
+  }
+}
+
+/** Les achats de l'édition en cours, découpés selon les périodes cochées. */
+const achatsFiltres = computed(() => filtrerAchats(purchasesData.value))
+
+/**
+ * Les deux graphiques temporels, recalés sur l'ouverture de chaque édition.
+ *
+ * Tout le calcul vit dans `comparerSeries`, à côté de ses tests : ici on ne fait que lui donner
+ * ce qu'il attend et récupérer ce qu'il rend — série par série, et non un total. Une comparaison
+ * qui ne dit pas d'où vient l'écart n'apprend presque rien.
+ */
+
+/** La comparaison des validations d'entrée, ou `null` quand on ne compare pas. */
+const comparaisonValidations = computed(() => {
+  const courante = filteredData.value
+  const comparee = validationsComparees.value
+  if (!enComparaison.value || !courante || !comparee) return null
+
+  const resultat = comparerSeries(
+    {
+      timestamps: courante.timestamps,
+      series: {
+        participants: courante.participants,
+        volunteers: courante.volunteers,
+        artists: courante.artists,
+        organizers: courante.organizers,
+        others: courante.others,
+        cancellations: courante.cancellations,
+      },
+      // L'ouverture vient des DONNÉES, pas du magasin client : chaque jeu transporte sa propre
+      // date de début d'édition, dans ses périodes, telle que le serveur la connaît. Lire l'une
+      // dans le magasin et l'autre dans la liste des éditions comparables faisait dépendre les
+      // deux côtés de sources différentes — et il suffisait que l'une ne porte pas le champ pour
+      // qu'une édition entière disparaisse du graphique, sans la moindre erreur.
+      ouverture: validationsData.value?.periods?.event?.start,
+      fuseau: courante.timezone,
+    },
+    {
+      timestamps: comparee.timestamps,
+      series: {
+        participants: comparee.participants,
+        volunteers: comparee.volunteers,
+        artists: comparee.artists,
+        organizers: comparee.organizers,
+        others: comparee.others,
+        cancellations: comparee.cancellations,
+      },
+      ouverture: comparee.periods?.event?.start,
+      fuseau: comparee.timezone,
+    },
+    selectedGranularity.value
+  )
+
+  return {
+    etiquettes: resultat.etiquettes,
+    // L'édition courante reprend sa place sur l'axe commun, série par série.
+    courante: resultat.courante,
+    series: resultat.comparee,
+    libelle: libelleDEdition(editionComparee.value?.name, editionComparee.value?.startDate),
+  }
+})
+
+/** La comparaison des achats de billets, ou `null`. */
+const comparaisonAchats = computed(() => {
+  const courante = achatsFiltres.value
+  const comparee = filtrerAchats(achatsCompares.value)
+  if (!enComparaison.value || !courante || !comparee) return null
+
+  const series = (d: PurchaseData) => ({
+    participantsManual: d.participantsManual,
+    participantsExternal: d.participantsExternal,
+    othersManual: d.othersManual,
+    othersExternal: d.othersExternal,
+  })
+
+  const resultat = comparerSeries(
+    {
+      timestamps: courante.timestamps,
+      series: series(courante),
+      ouverture: courante.periods?.event?.start,
+      fuseau: edition.value?.timezone,
+    },
+    {
+      timestamps: comparee.timestamps,
+      series: series(comparee),
+      ouverture: comparee.periods?.event?.start,
+      fuseau: edition.value?.timezone,
+    },
+    selectedPurchaseGranularity.value
+  )
+
+  return {
+    etiquettes: resultat.etiquettes,
+    courante: resultat.courante,
+    series: resultat.comparee,
+    libelle: libelleDEdition(editionComparee.value?.name, editionComparee.value?.startDate),
+  }
+})
+
+/** Ce que le graphique des achats reçoit : recalé en comparaison, inchangé sinon. */
+const donneesDesAchats = computed(() => {
+  const brut = achatsFiltres.value
+  if (!brut) return null
+  const c = comparaisonAchats.value
+  if (!c) return brut
+  return {
+    ...brut,
+    labels: c.etiquettes,
+    participantsManual: (c.courante.participantsManual ?? []).map((v) => v ?? 0),
+    participantsExternal: (c.courante.participantsExternal ?? []).map((v) => v ?? 0),
+    othersManual: (c.courante.othersManual ?? []).map((v) => v ?? 0),
+    othersExternal: (c.courante.othersExternal ?? []).map((v) => v ?? 0),
+  }
+})
+
+/** Ce que le graphique des validations reçoit. */
+const donneesDesValidations = computed(() => {
+  const brut = filteredData.value
+  if (!brut) return null
+  const c = comparaisonValidations.value
+  if (!c) return brut
+  return {
+    ...brut,
+    participants: (c.courante.participants ?? []).map((v) => v ?? 0),
+    volunteers: (c.courante.volunteers ?? []).map((v) => v ?? 0),
+    artists: (c.courante.artists ?? []).map((v) => v ?? 0),
+    organizers: (c.courante.organizers ?? []).map((v) => v ?? 0),
+    others: (c.courante.others ?? []).map((v) => v ?? 0),
+    // Les annulations se recalent comme les autres : laissées brutes, elles gardaient la
+    // longueur de l'axe d'origine et se décalaient dès que l'édition comparée élargissait l'axe.
+    cancellations: (c.courante.cancellations ?? []).map((v) => v ?? 0),
+    timestamps: brut.timestamps,
+  }
+})
+
 // Charger les données de validations
 async function fetchValidations() {
   loadingValidations.value = true
@@ -910,6 +1272,73 @@ async function fetchOrderSources() {
   }
 }
 
+/** Charger les éditions auxquelles on a le droit de se comparer. */
+async function chargerEditionsComparables() {
+  chargementComparables.value = true
+  try {
+    const reponse = await $fetch<{ data?: { editions?: EditionComparable[] } }>(
+      `/api/editions/${editionId}/ticketing/stats/editions-comparables`
+    )
+    editionsComparables.value = reponse?.data?.editions ?? []
+  } catch {
+    // Sans liste, le sélecteur ne s'affiche pas : il n'y a rien à proposer, et une erreur ici
+    // ne doit pas empêcher de lire les statistiques de l'édition courante.
+    editionsComparables.value = []
+  } finally {
+    chargementComparables.value = false
+  }
+}
+
+/**
+ * Charger les trois jeux de données de l'édition comparée.
+ *
+ * Les mêmes points d'API que pour l'édition courante, avec l'autre identifiant — c'est tout ce
+ * que la comparaison demande côté serveur. Les granularités sont celles de l'écran, sans quoi
+ * les deux courbes seraient découpées différemment et ne se superposeraient pas.
+ */
+async function chargerComparaison() {
+  const id = comparaisonId.value
+  if (id === null) {
+    validationsComparees.value = null
+    achatsCompares.value = null
+    provenancesComparees.value = null
+    comparaisonRefusee.value = false
+    comparaisonEnPanne.value = false
+    return
+  }
+
+  chargementComparaison.value = true
+  comparaisonRefusee.value = false
+  comparaisonEnPanne.value = false
+  try {
+    const [validations, achats, provenances] = await Promise.all([
+      $fetch<ValidationData>(
+        `/api/editions/${id}/ticketing/stats/validations?granularity=${selectedGranularity.value}`
+      ),
+      $fetch<PurchaseData>(
+        `/api/editions/${id}/ticketing/stats/purchases?granularity=${selectedPurchaseGranularity.value}`
+      ),
+      $fetch<OrderSourcesData>(`/api/editions/${id}/ticketing/stats/order-sources`),
+    ])
+    validationsComparees.value = validations
+    achatsCompares.value = achats
+    provenancesComparees.value = provenances
+  } catch (erreur: any) {
+    // Un 403 n'est pas une panne : c'est une réponse, et l'écran doit la dire plutôt que
+    // d'afficher une erreur générique. La liste est pourtant filtrée en amont — ce cas ne
+    // survient que si le droit a été retiré entre le chargement de la liste et la sélection.
+    comparaisonRefusee.value = erreur?.statusCode === 403 || erreur?.status === 403
+    // Toute AUTRE panne doit se voir, elle aussi : un chargement qui échoue en silence laisse
+    // l'écran sans courbe et sans explication, et c'est exactement ce qui s'est produit.
+    comparaisonEnPanne.value = !comparaisonRefusee.value
+    validationsComparees.value = null
+    achatsCompares.value = null
+    provenancesComparees.value = null
+  } finally {
+    chargementComparaison.value = false
+  }
+}
+
 // Charger la liste des tarifs
 async function fetchTiers() {
   loadingTiers.value = true
@@ -932,10 +1361,19 @@ watch([selectedTierIds, viewMode], () => {
 
 watch(selectedGranularity, () => {
   fetchValidations()
+  // L'édition comparée doit être redécoupée à la même granularité, sinon les deux courbes ne se
+  // superposent plus : c'est tout l'objet du recalage.
+  if (comparaisonId.value !== null) chargerComparaison()
 })
 
 watch(selectedPurchaseGranularity, () => {
   fetchPurchases()
+  if (comparaisonId.value !== null) chargerComparaison()
+})
+
+// Changer d'édition comparée, ou revenir à « aucune comparaison ».
+watch(comparaisonId, () => {
+  chargerComparaison()
 })
 
 // Charger l'édition si nécessaire
@@ -950,7 +1388,16 @@ onMounted(async () => {
 
   // Charger les données de validations, achats et sources
   if (canAccess.value) {
-    await Promise.all([fetchValidations(), fetchPurchases(), fetchTiers(), fetchOrderSources()])
+    await Promise.all([
+      fetchValidations(),
+      fetchPurchases(),
+      fetchTiers(),
+      fetchOrderSources(),
+      chargerEditionsComparables(),
+    ])
+    // Après la liste, pour qu'une comparaison venue de l'URL trouve son édition dans le
+    // sélecteur — sans quoi l'écran comparerait sans savoir dire à quoi.
+    if (comparaisonId.value !== null) await chargerComparaison()
   }
 })
 

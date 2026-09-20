@@ -212,7 +212,14 @@
       "withdrawal_success": "Bewerbung erfolgreich zurückgezogen",
       "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):",
       "show_past_slots": "Vergangene Schicht anzeigen | Die {count} vergangenen Schichten anzeigen",
-      "no_upcoming_slots": "Keine bevorstehenden Schichten."
+      "no_upcoming_slots": "Keine bevorstehenden Schichten.",
+      "export_pdf_column_slot": "Zeitfenster",
+      "export_pdf_column_team": "Team",
+      "export_pdf_column_when": "Wann",
+      "export_pdf_delay": "Verspätung: {minutes} Min.",
+      "export_pdf_empty": "Kein Zeitfenster zum Drucken",
+      "export_pdf_summary": "{creneaux} Zeitfenster — {heures} — {equipes} Team(s)",
+      "export_pdf_title": "Helferplan"
     }
   },
   "seo": {

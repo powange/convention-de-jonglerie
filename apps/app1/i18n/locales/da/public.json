@@ -212,7 +212,14 @@
       "withdrawal_success": "Ansøgning trukket tilbage succesfuldt",
       "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):",
       "show_past_slots": "Vis den forgangne vagt | Vis de {count} forgangne vagter",
-      "no_upcoming_slots": "Ingen kommende vagter."
+      "no_upcoming_slots": "Ingen kommende vagter.",
+      "export_pdf_column_slot": "Vagt",
+      "export_pdf_column_team": "Hold",
+      "export_pdf_column_when": "Hvornår",
+      "export_pdf_delay": "Forsinkelse: {minutes} min",
+      "export_pdf_empty": "Ingen vagt at udskrive",
+      "export_pdf_summary": "{creneaux} vagter — {heures} — {equipes} hold",
+      "export_pdf_title": "Frivilligplan"
     }
   },
   "seo": {

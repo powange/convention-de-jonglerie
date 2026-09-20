@@ -278,7 +278,8 @@
       "status_update_error": "Kunne ikke opdatere status",
       "title": "Fejllog",
       "view_flat": "Flad",
-      "view_grouped": "Grupperet"
+      "view_grouped": "Grupperet",
+      "cleanup_action": "Ryd loggen"
     },
     "errors_24h": "Fejl (24t)",
     "event_reminders": "Begivenhedspåmindelser",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Oprydning af midlertidige uploads",
     "cleanup_empty_conversations": "Oprydning af tomme samtaler",
     "cleanup_inactive_subscriptions": "Oprydning af inaktive push-abonnementer",
-    "task_deadlines_reminders": "Påmindelser om opgavefrister"
+    "task_deadlines_reminders": "Påmindelser om opgavefrister",
+    "purge_journal_erreurs": "Rydning af fejlloggen"
   }
 }

@@ -212,7 +212,14 @@
       "withdrawal_success": "Application withdrawn successfully",
       "with_you_on_slot": "With you on this shift: | With you on this shift ({count}):",
       "show_past_slots": "Show the past shift | Show the {count} past shifts",
-      "no_upcoming_slots": "No upcoming shifts."
+      "no_upcoming_slots": "No upcoming shifts.",
+      "export_pdf_column_slot": "Slot",
+      "export_pdf_column_team": "Team",
+      "export_pdf_column_when": "When",
+      "export_pdf_delay": "Delay: {minutes} min",
+      "export_pdf_empty": "No slot to print",
+      "export_pdf_summary": "{creneaux} slots — {heures} — {equipes} team(s)",
+      "export_pdf_title": "Volunteer schedule"
     }
   },
   "seo": {

@@ -212,7 +212,14 @@
       "withdrawal_success": "Candidatura retirada com sucesso",
       "with_you_on_slot": "Consigo neste turno: | Consigo neste turno ({count}):",
       "show_past_slots": "Mostrar o turno passado | Mostrar os {count} turnos passados",
-      "no_upcoming_slots": "Nenhum turno próximo."
+      "no_upcoming_slots": "Nenhum turno próximo.",
+      "export_pdf_column_slot": "Turno",
+      "export_pdf_column_team": "Equipa",
+      "export_pdf_column_when": "Quando",
+      "export_pdf_delay": "Atraso: {minutes} min",
+      "export_pdf_empty": "Nenhum turno para imprimir",
+      "export_pdf_summary": "{creneaux} turnos — {heures} — {equipes} equipa(s)",
+      "export_pdf_title": "Planeamento de voluntários"
     }
   },
   "seo": {

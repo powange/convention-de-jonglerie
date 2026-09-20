@@ -278,7 +278,8 @@
       "status_update_error": "No se ha podido actualizar el estado",
       "title": "Registro de errores",
       "view_flat": "Lista",
-      "view_grouped": "Agrupadas"
+      "view_grouped": "Agrupadas",
+      "cleanup_action": "Purgar el registro"
     },
     "errors_24h": "Errores (24h)",
     "event_reminders": "Recordatorios de eventos",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Limpieza de subidas temporales",
     "cleanup_empty_conversations": "Limpieza de conversaciones vacías",
     "cleanup_inactive_subscriptions": "Limpieza de suscripciones push inactivas",
-    "task_deadlines_reminders": "Recordatorios de vencimiento de tareas"
+    "task_deadlines_reminders": "Recordatorios de vencimiento de tareas",
+    "purge_journal_erreurs": "Purga del registro de errores"
   }
 }

@@ -212,7 +212,14 @@
       "withdrawal_success": "Solicitud retirada con éxito",
       "with_you_on_slot": "Contigo en este turno: | Contigo en este turno ({count}):",
       "show_past_slots": "Mostrar el turno pasado | Mostrar los {count} turnos pasados",
-      "no_upcoming_slots": "Ningún turno próximo."
+      "no_upcoming_slots": "Ningún turno próximo.",
+      "export_pdf_column_slot": "Franja",
+      "export_pdf_column_team": "Equipo",
+      "export_pdf_column_when": "Cuándo",
+      "export_pdf_delay": "Retraso: {minutes} min",
+      "export_pdf_empty": "Ninguna franja que imprimir",
+      "export_pdf_summary": "{creneaux} franjas — {heures} — {equipes} equipo(s)",
+      "export_pdf_title": "Planning de voluntarios"
     }
   },
   "seo": {

@@ -278,7 +278,8 @@
       "status_update_error": "Stav se nepodařilo aktualizovat",
       "title": "Protokol chyb",
       "view_flat": "Seznam",
-      "view_grouped": "Seskupené"
+      "view_grouped": "Seskupené",
+      "cleanup_action": "Vyčistit protokol"
     },
     "errors_24h": "Chyby (24h)",
     "event_reminders": "Připomínky událostí",
@@ -860,6 +861,7 @@
     "cleanup_temp_uploads": "Úklid dočasných nahrávek",
     "cleanup_empty_conversations": "Úklid prázdných konverzací",
     "cleanup_inactive_subscriptions": "Úklid neaktivních push odběrů",
-    "task_deadlines_reminders": "Připomínky termínů úkolů"
+    "task_deadlines_reminders": "Připomínky termínů úkolů",
+    "purge_journal_erreurs": "Vyčištění protokolu chyb"
   }
 }

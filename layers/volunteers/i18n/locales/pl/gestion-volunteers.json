@@ -30,7 +30,9 @@
       "page_public": "Strona publiczna widoczna",
       "page_public_description": "Udostępnij stronę publiczną wolontariuszy dla odwiedzających (w przeciwnym razie dostęp mają tylko organizatorzy)",
       "page_public_hidden": "Strona ukryta — dostęp mają tylko organizatorzy",
-      "page_public_visible": "Strona dostępna dla wszystkich"
+      "page_public_visible": "Strona dostępna dla wszystkich",
+      "volunteering_ended_description": "Demontaż tej edycji dobiegł końca: zgłoszenia są zamknięte, a strona publiczna nie jest już widoczna dla odwiedzających. Ty i wolontariusze, którzy się zgłosili, zachowujecie dostęp do wszystkiego, co zostało wprowadzone.",
+      "volunteering_ended_title": "Wolontariat tej edycji został zamknięty"
     }
   }
 }

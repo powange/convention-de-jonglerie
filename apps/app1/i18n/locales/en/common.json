@@ -190,7 +190,8 @@
     "yes": "Yes",
     "currency": "Currency",
     "amount": "Amount",
-    "treasury_short": "Treasury"
+    "treasury_short": "Treasury",
+    "type": "Type"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

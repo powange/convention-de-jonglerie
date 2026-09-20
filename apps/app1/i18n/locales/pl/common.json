@@ -190,7 +190,8 @@
     "yes": "Tak",
     "currency": "Waluta",
     "amount": "Kwota",
-    "treasury_short": "Finanse"
+    "treasury_short": "Finanse",
+    "type": "Typ"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",
