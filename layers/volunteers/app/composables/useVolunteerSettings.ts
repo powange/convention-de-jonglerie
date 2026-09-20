@@ -20,6 +20,14 @@ export interface VolunteerSettings {
   myApplication?: any
   setupStartDate?: string
   teardownEndDate?: string
+  /**
+   * L'édition est-elle derrière nous, démontage compris ?
+   *
+   * Calculé par le serveur, jamais stocké. Absent d'une réponse ancienne, et l'absence se lit
+   * « pas terminée » : une édition en cours ne doit pas se retrouver annoncée close sur la foi
+   * d'une clé manquante.
+   */
+  volunteeringEnded?: boolean
   askSetup?: boolean
   askTeardown?: boolean
   askDiet?: boolean

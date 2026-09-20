@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
 
 export default wrapApiHandler(
   async () => {
@@ -22,6 +23,9 @@ export default wrapApiHandler(
         endDate: true,
         event: {
           select: {
+            // La fin du démontage : le filtre Prisma ci-dessus ne sait pas l'exprimer, la règle
+            // s'applique donc après coup — sur une poignée d'éditions, pas sur une table.
+            volunteerSettings: { select: { teardownEndDate: true } },
             _count: {
               select: {
                 volunteerApplications: true,
@@ -33,7 +37,27 @@ export default wrapApiHandler(
       },
     })
 
-    return editions.map((edition) => {
+    /**
+     * Une édition dont le démontage est fini ne doit plus être annoncée.
+     *
+     * Le filtre Prisma ne retient que les deux booléens ; c'est la même règle que celle appliquée
+     * à la fiche d'édition qui tranche ici, sans quoi le sitemap continuerait d'envoyer les
+     * moteurs vers une page qui répond désormais 404 — exactement le défaut que le commentaire
+     * ci-dessus raconte avoir déjà coûté trois URLs.
+     */
+    const maintenant = new Date()
+    const ouvertes = editions.filter(
+      (edition) =>
+        visibiliteDuBenevolat({
+          open: true,
+          pagePublic: true,
+          finDemontage: edition.event.volunteerSettings?.teardownEndDate,
+          finEdition: edition.endDate,
+          maintenant,
+        }).pagePublic
+    )
+
+    return ouvertes.map((edition) => {
       // Priorité plus élevée pour les éditions à venir avec candidatures ouvertes
       const now = new Date()
       const isUpcoming = new Date(edition.startDate) > now

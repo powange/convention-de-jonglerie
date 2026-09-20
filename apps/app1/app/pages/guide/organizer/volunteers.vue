@@ -526,11 +526,12 @@ const messages = {
     config: {
       title: 'Configuration',
       intro: "Paramétrez l'appel à bénévoles depuis la section de configuration :",
-      toggle: 'Activez ou désactivez les candidatures à tout moment.',
+      toggle:
+        "Activez ou désactivez les candidatures à tout moment. Vous n'avez pas à penser à refermer : les candidatures se ferment d'elles-mêmes une fois le démontage terminé, et la page publique cesse alors d'être visible. Vous et les personnes ayant déjà candidaté gardez accès à tout ce qui a été saisi.",
       page: "Personnalisez la page d'information visible par les bénévoles potentiels (description du bénévolat, avantages, conditions).",
       form: 'Configurez les champs du formulaire de candidature selon vos besoins.',
       dates:
-        "Indiquez les dates de montage et de démontage. Elles étendent la période de bénévolat avant et après l'édition, et ce sont elles qui donnent leur sens aux phases « Montage » et « Démontage » des repas.",
+        "Indiquez les dates de montage et de démontage. Elles étendent la période de bénévolat avant et après l'édition, ce sont elles qui donnent leur sens aux phases « Montage » et « Démontage » des repas, et c'est la fin du démontage qui referme le recrutement. À défaut, c'est la date de fin de l'édition qui sert de repère.",
       swaps:
         'Autorisez ou non les échanges de créneaux entre bénévoles. Ouvert par défaut sur les éditions existantes.',
       organizers:

@@ -12,6 +12,7 @@ import {
 import { infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { sanitizeString, validateEditionId } from '#server/utils/validation-helpers'
+import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
 
 export default wrapApiHandler(
   async (event) => {
@@ -25,6 +26,9 @@ export default wrapApiHandler(
       where: { eventId: editionId },
       select: {
         open: true,
+        // Pour la fermeture automatique : la fin du démontage, et à défaut celle de l'édition.
+        teardownEndDate: true,
+        event: { select: { edition: { select: { endDate: true } } } },
         askDiet: true,
         askAllergies: true,
         askTimePreferences: true,
@@ -39,7 +43,21 @@ export default wrapApiHandler(
         askExperience: true,
       },
     })
-    if (!settings?.open) throw createError({ status: 400, message: 'Recrutement fermé' })
+    // Le test d'existence reste séparé, et il porte : c'est lui qui apprend à TypeScript que
+    // `settings` n'est plus nul pour les cent lignes qui suivent. L'ancien `!settings?.open` le
+    // faisait au passage ; le remplacer sans le remettre coûtait trente-six erreurs de typage.
+    if (!settings) throw createError({ status: 400, message: 'Recrutement fermé' })
+
+    // La même règle que celle qui compose l'écran, appliquée ici parce que c'est ici qu'elle
+    // engage : un formulaire peut être resté ouvert dans un onglet longtemps après le démontage.
+    const benevolat = visibiliteDuBenevolat({
+      open: settings.open,
+      pagePublic: false,
+      finDemontage: settings.teardownEndDate,
+      finEdition: settings.event?.edition?.endDate,
+      maintenant: new Date(),
+    })
+    if (!benevolat.open) throw createError({ status: 400, message: 'Recrutement fermé' })
 
     // Vérifier candidature existante
     const existing = await prisma.editionVolunteerApplication.findUnique({

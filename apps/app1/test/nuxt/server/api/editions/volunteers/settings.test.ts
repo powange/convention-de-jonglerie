@@ -29,6 +29,11 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
     prenom: 'User',
   }
 
+  const JOUR = 24 * 60 * 60 * 1000
+  const DANS_UNE_SEMAINE = new Date(Date.now() + 7 * JOUR)
+  const DANS_DEUX_SEMAINES = new Date(Date.now() + 14 * JOUR)
+  const IL_Y_A_DEUX_SEMAINES = new Date(Date.now() - 14 * JOUR)
+
   // Étape 0bis : config bénévole portée par EventVolunteerSettings (noms sans préfixe volunteers)
   const baseSettings = {
     eventId: 1,
@@ -50,8 +55,11 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
     askSkills: true,
     askExperience: true,
     askEmergencyContact: false,
-    setupStartDate: new Date('2024-05-30'),
-    teardownEndDate: new Date('2024-06-05'),
+    // Relatives à maintenant, et c'est nécessaire depuis que la visibilité dépend du temps :
+    // des dates fixes de 2024 décrivaient une édition terminée, et TOUS ces tests décrivaient
+    // alors la fermeture automatique sans le savoir.
+    setupStartDate: DANS_UNE_SEMAINE,
+    teardownEndDate: DANS_DEUX_SEMAINES,
     askSetup: true,
     askTeardown: true,
     updatedAt: null,
@@ -244,6 +252,8 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         // lancé de calcul. Ils ne sortent que pour un gestionnaire — c'est l'objet du test
         // « ne sortent pas pour un bénévole » plus bas.
         autoAssignConstraints: null,
+        // Dérivé, jamais stocké : l'édition de cette fixture est à venir.
+        volunteeringEnded: false,
       })
     })
 
@@ -335,6 +345,80 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
     })
   })
 
+  /**
+   * La fermeture automatique.
+   *
+   * Une édition recrute pendant le montage, pendant l'événement et pendant le démontage ; ce qui
+   * n'a plus de sens, c'est de recruter une fois le démontage fini. La règle elle-même est
+   * couverte à part (`test/unit/utils/visibilite-benevoles.test.ts`) ; ce qui se vérifie ici est
+   * qu'elle est bien APPLIQUÉE par cet endpoint, et avant le contrôle d'accès.
+   */
+  describe('Une édition terminée se referme seule', () => {
+    const editionPassee = (surcharges: Record<string, unknown> = {}) => ({
+      volunteerSettings: {
+        ...baseSettings,
+        pagePublic: true,
+        open: true,
+        teardownEndDate: IL_Y_A_DEUX_SEMAINES,
+        ...surcharges,
+      },
+    })
+
+    it('ferme les candidatures et retire la page publique', async () => {
+      prismaMock.event.findUnique.mockResolvedValue(editionPassee())
+
+      const result = await appelGestionnaire()
+
+      expect(result.open).toBe(false)
+      expect(result.pagePublic).toBe(false)
+      expect(result.volunteeringEnded).toBe(true)
+    })
+
+    it('rend la configuration invisible à un simple visiteur', async () => {
+      // C'est le point : `pagePublic` est l'une des trois portes du contrôle d'accès. La règle
+      // s'applique AVANT lui, sinon la page resterait offerte à tous.
+      prismaMock.event.findUnique.mockResolvedValue(editionPassee())
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toMatchObject({
+        statusCode: 404,
+      })
+    })
+
+    it('laisse le gestionnaire et l’ancien candidat accéder à ce qui a été saisi', async () => {
+      // Ce qui disparaît est la vitrine, pas les données : une candidature déposée doit rester
+      // relisible par la personne qui l'a remplie, édition passée ou non.
+      prismaMock.event.findUnique.mockResolvedValue(editionPassee())
+      prismaMock.editionVolunteerApplication.findFirst.mockResolvedValue({ id: 7 })
+
+      const result = await handler({ context: { user: mockUser } } as any)
+
+      expect(result.askDiet).toBe(true)
+    })
+
+    it('se replie sur la date de fin de l’édition faute de démontage déclaré', async () => {
+      prismaMock.event.findUnique.mockResolvedValue({
+        ...editionPassee({ teardownEndDate: null }),
+        edition: { endDate: IL_Y_A_DEUX_SEMAINES },
+      })
+
+      const result = await appelGestionnaire()
+
+      expect(result.volunteeringEnded).toBe(true)
+    })
+
+    it('ne ferme rien tant que le démontage n’est pas passé', async () => {
+      prismaMock.event.findUnique.mockResolvedValue(
+        editionPassee({ teardownEndDate: DANS_DEUX_SEMAINES })
+      )
+
+      const result = await appelGestionnaire()
+
+      expect(result.open).toBe(true)
+      expect(result.pagePublic).toBe(true)
+      expect(result.volunteeringEnded).toBe(false)
+    })
+  })
+
   describe('Forme de la réponse', () => {
     it('devrait retourner seulement les champs attendus', async () => {
       const result = await appelGestionnaire()
@@ -367,6 +451,7 @@ describe('/api/editions/[id]/volunteers/settings GET', () => {
         'counts',
         'updatedAt',
         'autoAssignConstraints',
+        'volunteeringEnded',
       ]
 
       expectedFields.forEach((field) => expect(result).toHaveProperty(field))
