@@ -47,7 +47,7 @@
             :loading="cleaningOldLogs"
             @click="cleanupOldLogs"
           >
-            Nettoyer logs > 1 mois
+            {{ $t('admin.error_logs.cleanup_action') }}
           </UButton>
           <UButton
             icon="i-heroicons-arrow-path"
@@ -976,6 +976,7 @@ import 'vue3-json-viewer/dist/vue3-json-viewer.css'
 import { detailsTechniques } from '~/utils/details-techniques-log'
 
 import { composantesDEmpreinte } from '~~/shared/utils/empreinte-erreur'
+import { RETENTION_PAR_DEFAUT } from '~~/shared/utils/retention-journal-erreurs'
 import { libelleDuType, optionsDuFiltreDeType } from '~~/shared/utils/types-erreur'
 
 // Protection admin
@@ -1582,7 +1583,12 @@ const demanderResolutionDesSimilaires = (log: any) => {
 const cleanupOldLogs = () => {
   confirmation.value = {
     titre: $t('admin.error_logs.cleanup_title'),
-    description: $t('admin.error_logs.cleanup_description'),
+    // Les deux durées viennent de la règle elle-même : les réécrire ici en ferait une troisième
+    // copie, et c'est précisément ce que ce lot supprime.
+    description: $t('admin.error_logs.cleanup_description', {
+      resolues: RETENTION_PAR_DEFAUT.resolues,
+      nonResolues: RETENTION_PAR_DEFAUT.nonResolues,
+    }),
     empreinte: null,
     libelleConfirmer: $t('admin.error_logs.cleanup_confirm'),
     agir: executeCleanup,

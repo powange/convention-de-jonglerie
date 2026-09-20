@@ -65,10 +65,13 @@ export const TACHES_PLANIFIEES: TachePlanifiee[] = [
     category: 'Maintenance',
   },
   {
-    name: 'cleanup-resolved-error-logs',
-    description: "Supprime les logs d'erreur résolus de plus d'un mois",
-    schedule: 'Mensuel (1er du mois à 3h)',
-    cronExpression: '0 3 1 * *',
+    name: 'purge-journal-erreurs',
+    // Annoncée « mensuelle » jusqu'ici, alors que l'ordonnanceur la lance toutes les nuits — et
+    // décrite comme ne supprimant que les erreurs résolues, alors qu'elle emporte aussi les
+    // autres. Les deux mensonges portaient sur une suppression définitive.
+    description: "Purge le journal d'erreurs : résolues après 30 jours, non résolues après 90",
+    schedule: 'Quotidien (3h)',
+    cronExpression: '0 3 * * *',
     category: 'Maintenance',
   },
   {

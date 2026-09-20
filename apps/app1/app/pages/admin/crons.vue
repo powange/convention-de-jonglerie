@@ -318,7 +318,7 @@ const getTaskDisplayName = (taskName: string) => {
     'convention-favorites-reminders': t('admin.convention_favorites_reminders'),
     'cleanup-expired-tokens': t('admin.cleanup_expired_tokens'),
     'cleanup-temp-uploads': t('admin.cleanup_temp_uploads'),
-    'cleanup-resolved-error-logs': t('admin.cleanup_resolved_error_logs'),
+    'purge-journal-erreurs': t('admin.purge_journal_erreurs'),
     'cleanup-inactive-subscriptions': t('admin.cleanup_inactive_subscriptions'),
     'cleanup-empty-conversations': t('admin.cleanup_empty_conversations'),
     'task-deadlines-reminders': t('admin.task_deadlines_reminders'),
@@ -339,7 +339,10 @@ const formatExecutionTime = (timestamp: string) => {
   })
 }
 
-const getExecutionStats = (result: Record<string, unknown>) => {
+// `result` est facultatif sur `taskResults`, et le `v-if` du gabarit ne le restreint pas jusqu'ici.
+// La fonction s'y attendait déjà — son premier test porte sur l'absence —, seule sa signature
+// prétendait le contraire.
+const getExecutionStats = (result: Record<string, unknown> | undefined) => {
   if (!result) return {}
 
   const stats: Record<string, number> = {}
