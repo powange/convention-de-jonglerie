@@ -653,7 +653,22 @@
             <!-- Items de la commande -->
             <div class="mb-3">
               <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {{ order.items?.length || 0 }} billet{{ (order.items?.length || 0) > 1 ? 's' : '' }}
+                <!-- Le compte des articles RETENUS, pas de tous ceux de la commande : annoncer
+                     « 2 billets » sous un filtre qui n'en retient qu'un contredisait le bandeau
+                     du haut, et c'est le total du haut qui avait tort. -->
+                {{ nombreDarticlesRetenus(order) }} billet{{
+                  nombreDarticlesRetenus(order) > 1 ? 's' : ''
+                }}
+                <span
+                  v-if="(order.items?.length || 0) > nombreDarticlesRetenus(order)"
+                  class="font-normal text-gray-500 dark:text-gray-400"
+                >
+                  {{
+                    $t('gestion.ticketing.orders_items_filtered_out', {
+                      count: (order.items?.length || 0) - nombreDarticlesRetenus(order),
+                    })
+                  }}
+                </span>
               </h4>
             </div>
             <div class="space-y-2">
@@ -661,11 +676,15 @@
                 v-for="item in order.items"
                 :key="item.id"
                 class="flex items-start justify-between gap-4 p-3 rounded-lg"
-                :class="
+                :class="[
                   item.entryValidated
                     ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800'
-                    : 'bg-gray-50 dark:bg-gray-900/50 border-2 border-gray-200 dark:border-gray-700'
-                "
+                    : 'bg-gray-50 dark:bg-gray-900/50 border-2 border-gray-200 dark:border-gray-700',
+                  // Écarté par le filtre : présent, mais visiblement hors du compte. L'estomper
+                  // plutôt que le masquer — la commande reste ce qu'elle est, et cacher un billet
+                  // ferait croire qu'il n'a pas été vendu.
+                  item.retenuParLesFiltres === false ? 'opacity-40 grayscale' : '',
+                ]"
               >
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1">
@@ -1525,6 +1544,17 @@ const itemTypeOptions = [
 ]
 
 // Icône et couleur selon le type d'item
+/**
+ * Combien d'articles de cette commande le filtre retient.
+ *
+ * Le serveur marque chaque article : il connaît les filtres, et rejouer leur combinaison ici en
+ * ferait un second exemplaire, qui finirait par diverger. Un article non marqué — une réponse
+ * servie avant cette version, ou un cas qu'on n'a pas prévu — compte comme retenu : mieux vaut
+ * un compte inchangé qu'un compte amputé sans raison visible.
+ */
+const nombreDarticlesRetenus = (order: any): number =>
+  (order.items ?? []).filter((item: any) => item.retenuParLesFiltres !== false).length
+
 const getItemIconInfo = (type: string | null) => {
   switch (type) {
     case 'Donation':

@@ -8,6 +8,24 @@
   </div>
 
   <div v-else class="space-y-8">
+    <!-- Une seule porte d'entrée vers le réglage, comme sur les autres publics : le formulaire
+         s'affichait ici même, sous la liste, ce qui mêlait ce qui EST configuré et ce qu'on est
+         en train de configurer. -->
+    <div class="flex items-center justify-between gap-3">
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white">
+        {{ $t('ticketing.handout_items.volunteer.section_title') }}
+      </h3>
+      <UButton
+        size="sm"
+        color="primary"
+        variant="soft"
+        icon="i-heroicons-pencil"
+        @click="ouvrirLaModale"
+      >
+        {{ $t('common.edit') }}
+      </UButton>
+    </div>
+
     <!-- Articles globaux (tous les bénévoles) -->
     <div v-if="globalItems.length > 0">
       <h3
@@ -104,53 +122,67 @@
       </p>
     </div>
 
-    <!-- Section de réglage : une portée à la fois, enregistrée en bloc -->
-    <div class="pt-2 space-y-4 border-t border-gray-200 dark:border-gray-800">
-      <UFormField :label="$t('ticketing.handout_items.volunteer.scope_label')" class="pt-4">
-        <USelect v-model="selectedTeamId" :items="teamOptions" size="lg" class="w-full" />
-      </UFormField>
+    <!--
+      Le réglage, dans une modale.
 
-      <!--
-        F4 : la surcharge, dite AVANT qu'on la déclenche.
+      La coquille mutualisée `TicketingHandoutItemsModal` ne convient pas ici : elle ne porte
+      aucune notion de PORTÉE, et lui en ajouter une pour ce seul écran ferait exactement ce que
+      sa propre documentation met en garde de faire — rendre l'abstraction pire que la
+      duplication qu'elle remplace. Le corps reste donc propre aux bénévoles.
+    -->
+    <UModal
+      v-model:open="modaleOuverte"
+      :title="$t('ticketing.handout_items.volunteer.edit_title')"
+      :ui="{ content: 'sm:max-w-xl' }"
+    >
+      <template #body>
+        <div class="space-y-4">
+          <UFormField :label="$t('ticketing.handout_items.volunteer.scope_label')">
+            <USelect v-model="selectedTeamId" :items="teamOptions" size="lg" class="w-full" />
+          </UFormField>
 
-        L'écran l'annonçait déjà, mais seulement sur une équipe qui avait DÉJÀ des articles —
-        donc après coup. Le moment où l'information compte est celui-ci : on s'apprête à retirer
-        silencieusement le bracelet global aux bénévoles de cette équipe.
-      -->
-      <UAlert
-        v-if="selectedTeamId !== null"
-        color="warning"
-        variant="subtle"
-        icon="i-heroicons-exclamation-triangle"
-        :description="$t('ticketing.handout_items.volunteer.scope_replaces_global_warning')"
-      />
+          <!--
+            F4 : la surcharge, dite AVANT qu'on la déclenche.
 
-      <UFormField :label="$t('ticketing.handout_items.volunteer.items_label')">
-        <TicketingHandoutItemsQuantityPicker v-model="selection" :items="allHandoutItems" />
-      </UFormField>
+            L'écran l'annonçait déjà, mais seulement sur une équipe qui avait DÉJÀ des articles —
+            donc après coup. Le moment où l'information compte est celui-ci : on s'apprête à
+            retirer silencieusement le bracelet global aux bénévoles de cette équipe.
+          -->
+          <UAlert
+            v-if="selectedTeamId !== null"
+            color="warning"
+            variant="subtle"
+            icon="i-heroicons-exclamation-triangle"
+            :description="$t('ticketing.handout_items.volunteer.scope_replaces_global_warning')"
+          />
 
-      <!-- Aperçu de ce que recevra réellement un bénévole de cette portée -->
-      <div class="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-3 space-y-1">
-        <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
-          {{ apercuTitre }}
-        </p>
-        <p class="text-xs text-gray-500 dark:text-gray-400">
-          {{ apercuDetail }}
-        </p>
-      </div>
+          <UFormField :label="$t('ticketing.handout_items.volunteer.items_label')">
+            <TicketingHandoutItemsQuantityPicker v-model="selection" :items="allHandoutItems" />
+          </UFormField>
 
-      <div class="flex justify-end">
-        <UButton
-          icon="i-heroicons-check"
-          color="primary"
-          size="lg"
-          :loading="saving"
-          @click="enregistrer"
-        >
-          {{ $t('ticketing.handout_items.volunteer.save') }}
-        </UButton>
-      </div>
-    </div>
+          <!-- Aperçu de ce que recevra réellement un bénévole de cette portée -->
+          <div class="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-3 space-y-1">
+            <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
+              {{ apercuTitre }}
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ apercuDetail }}
+            </p>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton variant="ghost" color="neutral" @click="modaleOuverte = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :loading="saving" @click="enregistrer">
+            {{ $t('ticketing.handout_items.volunteer.save') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -196,6 +228,43 @@ const selectedTeamId = ref<string | null>(null) // null = global, string = équi
 const selection = ref<Array<{ handoutItemId: number; quantity: number }>>([])
 const allHandoutItems = ref<TicketingHandoutItem[]>([])
 const teams = ref<VolunteerTeam[]>([])
+const modaleOuverte = ref(false)
+
+/**
+ * Les deux chargeurs, déclarés AVANT tout ce qui les appelle.
+ *
+ * Ils vivaient plus bas dans le fichier, sous la surveillance qui les appelle en `immediate`.
+ * Or `immediate` s'exécute pendant le `setup`, et un `const` n'existe pas avant sa ligne : le
+ * `setup` levait `Cannot access 'loadAllHandoutItems' before initialization`, et le composant ne
+ * rendait donc RIEN — ni la liste des articles, ni le formulaire. L'onglet « Bénévoles » était
+ * muet depuis le 2026-09-17, et aucun test ne montait ce composant.
+ *
+ * ⚠️ Une déclaration doit vivre au-dessus de ses lecteurs dans un `setup`. La zone morte
+ * temporelle ne prévient qu'à l'exécution : ni le lint, ni le typage, ni les tests unitaires ne
+ * la voient — seul un montage du composant la révèle.
+ */
+
+// Charger tous les articles à remettre disponibles
+const loadAllHandoutItems = async () => {
+  try {
+    const response = await $fetch<any>(`/api/editions/${props.editionId}/ticketing/handout-items`)
+    allHandoutItems.value = response.data?.handoutItems || []
+  } catch (error) {
+    console.error('Failed to load all handout items:', error)
+  }
+}
+
+// Charger les équipes de bénévoles
+const loadTeams = async () => {
+  try {
+    const response = await $fetch<VolunteerTeam[]>(
+      `/api/editions/${props.editionId}/volunteer-teams`
+    )
+    teams.value = response
+  } catch (error) {
+    console.error('Failed to load teams:', error)
+  }
+}
 
 // La portée démarre sur le global. Les articles disponibles, eux, sont chargés par la
 // surveillance ci-dessous, qui part en `immediate` : les demander ici aussi doublait la requête
@@ -212,16 +281,33 @@ onMounted(() => {
  * réussi laissait le formulaire sur l'état d'avant, et un second clic aurait renvoyé la version
  * périmée. (Ne pas nommer la propriété avec un point ici : le détecteur i18n y lirait une clé.)
  */
+function resynchroniserLaSelection() {
+  selection.value = props.items
+    .filter((item) => (item.teamId ?? null) === selectedTeamId.value)
+    .map((item) => ({ handoutItemId: item.handoutItemId, quantity: item.quantity ?? 1 }))
+}
+
 watch(
   [selectedTeamId, () => props.items],
   () => {
-    selection.value = props.items
-      .filter((item) => (item.teamId ?? null) === selectedTeamId.value)
-      .map((item) => ({ handoutItemId: item.handoutItemId, quantity: item.quantity ?? 1 }))
+    resynchroniserLaSelection()
     loadAllHandoutItems()
   },
   { immediate: true }
 )
+
+/**
+ * Ouvrir le réglage repart de ce qui est ENREGISTRÉ.
+ *
+ * Sans cette remise à plat, une modification abandonnée par « Annuler » restait dans le
+ * formulaire : la rouvrir aurait montré des articles qu'on croyait avoir renoncé à poser, et un
+ * clic sur « Enregistrer » les aurait écrits pour de bon. La portée, elle, est conservée — on
+ * revient d'ordinaire régler la même équipe.
+ */
+function ouvrirLaModale() {
+  resynchroniserLaSelection()
+  modaleOuverte.value = true
+}
 
 // Séparer les articles globaux des articles par équipe
 const globalItems = computed(() => props.items.filter((item) => !item.teamId))
@@ -314,28 +400,6 @@ const apercuDetail = computed(() => {
     : t('ticketing.handout_items.volunteer.preview_nothing_at_all')
 })
 
-// Charger tous les articles à remettre disponibles
-const loadAllHandoutItems = async () => {
-  try {
-    const response = await $fetch<any>(`/api/editions/${props.editionId}/ticketing/handout-items`)
-    allHandoutItems.value = response.data?.handoutItems || []
-  } catch (error) {
-    console.error('Failed to load all handout items:', error)
-  }
-}
-
-// Charger les équipes de bénévoles
-const loadTeams = async () => {
-  try {
-    const response = await $fetch<VolunteerTeam[]>(
-      `/api/editions/${props.editionId}/volunteer-teams`
-    )
-    teams.value = response
-  } catch (error) {
-    console.error('Failed to load teams:', error)
-  }
-}
-
 const { execute: executeSave, loading: saving } = useApiAction(
   () => `/api/editions/${props.editionId}/ticketing/volunteers/handout-items`,
   {
@@ -344,6 +408,7 @@ const { execute: executeSave, loading: saving } = useApiAction(
     successMessage: { title: t('ticketing.handout_items.volunteer.saved') },
     errorMessages: { default: t('ticketing.handout_items.volunteer.error_saving') },
     onSuccess: () => {
+      modaleOuverte.value = false
       emit('refresh')
     },
   }

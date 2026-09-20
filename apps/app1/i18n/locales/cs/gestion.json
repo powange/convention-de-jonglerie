@@ -906,7 +906,8 @@
       "stats_compare_label": "Porovnat s minulým ročníkem",
       "stats_compare_outer": "{edition} (vnější kruh, šrafovaný)",
       "stats_filter_buy_period": "Období prodeje",
-      "stats_no_comparison": "Žádné porovnání"
+      "stats_no_comparison": "Žádné porovnání",
+      "orders_items_filtered_out": "(+{count} mimo filtr)"
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",

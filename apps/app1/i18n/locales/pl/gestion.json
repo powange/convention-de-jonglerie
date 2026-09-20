@@ -906,7 +906,8 @@
       "stats_compare_label": "Porównaj z wcześniejszą edycją",
       "stats_compare_outer": "{edition} (pierścień zewnętrzny, kreskowany)",
       "stats_filter_buy_period": "Okres sprzedaży",
-      "stats_no_comparison": "Brak porównania"
+      "stats_no_comparison": "Brak porównania",
+      "orders_items_filtered_out": "(+{count} poza filtrem)"
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

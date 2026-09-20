@@ -162,7 +162,7 @@
         "error_saving": "Could not save the items",
         "loading": "Loading volunteer items…",
         "none_configured": "No item set up",
-        "none_configured_hint": "Pick a scope below to get started",
+        "none_configured_hint": "Click “Edit” to choose the items handed out to every volunteer, or to one particular team.",
         "preview_falls_back": "{items} — the team replaces nothing until an item is linked to it.",
         "preview_global_title": "What a volunteer with no team settings will receive",
         "preview_nothing_at_all": "Nothing: no team item, and no global item.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "These items completely replace the global items for the volunteers in this team",
         "scope_all_option": "🌍 All volunteers (global)",
         "team_only": "Team only",
-        "unknown_team": "Unknown team"
+        "unknown_team": "Unknown team",
+        "edit_title": "Edit the items handed out to volunteers",
+        "section_title": "Items handed out to volunteers"
       },
       "associations": {
         "tarifs": "{count} tier | {count} tiers",

@@ -906,7 +906,8 @@
       "stats_compare_label": "Compare with a past edition",
       "stats_compare_outer": "{edition} (outer ring, hatched)",
       "stats_filter_buy_period": "Sales period",
-      "stats_no_comparison": "No comparison"
+      "stats_no_comparison": "No comparison",
+      "orders_items_filtered_out": "(+{count} outside the filter)"
     },
     "title": "Management",
     "view_edition": "View edition",

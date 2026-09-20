@@ -162,7 +162,7 @@
         "error_saving": "Kunde inte spara objekten",
         "loading": "Laddar volontärernas objekt…",
         "none_configured": "Inget objekt inställt",
-        "none_configured_hint": "Välj ett omfång nedan för att komma igång",
+        "none_configured_hint": "Klicka på ”Ändra” för att välja vilka artiklar som delas ut till alla volontärer, eller till ett visst lag.",
         "preview_falls_back": "{items} — gruppen ersätter ingenting så länge inget objekt är kopplat till den.",
         "preview_global_title": "Vad en volontär utan gruppinställningar får",
         "preview_nothing_at_all": "Ingenting: varken gruppobjekt eller globalt objekt.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "Dessa objekt ersätter helt de globala objekten för volontärerna i denna grupp",
         "scope_all_option": "🌍 Alla volontärer (globalt)",
         "team_only": "Endast grupp",
-        "unknown_team": "Okänd grupp"
+        "unknown_team": "Okänd grupp",
+        "edit_title": "Ändra artiklarna som delas ut till volontärerna",
+        "section_title": "Artiklar som delas ut till volontärerna"
       },
       "associations": {
         "tarifs": "{count} pris | {count} priser",

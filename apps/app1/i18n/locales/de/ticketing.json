@@ -162,7 +162,7 @@
         "error_saving": "Artikel konnten nicht gespeichert werden",
         "loading": "Helfer-Artikel werden geladen…",
         "none_configured": "Kein Artikel eingerichtet",
-        "none_configured_hint": "Wählen Sie unten einen Geltungsbereich, um zu beginnen",
+        "none_configured_hint": "Klicken Sie auf „Bearbeiten“, um die Artikel für alle Helfer oder für ein bestimmtes Team auszuwählen.",
         "preview_falls_back": "{items} — das Team ersetzt nichts, solange ihm kein Artikel zugeordnet ist.",
         "preview_global_title": "Was ein Helfer ohne Team-Einstellungen erhält",
         "preview_nothing_at_all": "Nichts: weder Team-Artikel noch globaler Artikel.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "Diese Artikel ersetzen die globalen Artikel für die Helfer dieses Teams vollständig",
         "scope_all_option": "🌍 Alle Helfer (global)",
         "team_only": "Nur Team",
-        "unknown_team": "Unbekanntes Team"
+        "unknown_team": "Unbekanntes Team",
+        "edit_title": "Artikel für Helfer bearbeiten",
+        "section_title": "Artikel für Helfer"
       },
       "associations": {
         "tarifs": "{count} Tarif | {count} Tarife",

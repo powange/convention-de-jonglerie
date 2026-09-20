@@ -162,7 +162,7 @@
         "error_saving": "Předměty se nepodařilo uložit",
         "loading": "Načítání předmětů dobrovolníků…",
         "none_configured": "Žádný předmět není nastaven",
-        "none_configured_hint": "Vyberte níže rozsah a začněte",
+        "none_configured_hint": "Klikněte na „Upravit“ a vyberte předměty vydávané všem dobrovolníkům, nebo jednomu konkrétnímu týmu.",
         "preview_falls_back": "{items} — tým nic nenahrazuje, dokud mu není přiřazen žádný předmět.",
         "preview_global_title": "Co dostane dobrovolník bez nastavení týmu",
         "preview_nothing_at_all": "Nic: ani týmový předmět, ani globální předmět.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "Tyto předměty zcela nahrazují globální předměty pro dobrovolníky tohoto týmu",
         "scope_all_option": "🌍 Všichni dobrovolníci (globálně)",
         "team_only": "Pouze tým",
-        "unknown_team": "Neznámý tým"
+        "unknown_team": "Neznámý tým",
+        "edit_title": "Upravit předměty vydávané dobrovolníkům",
+        "section_title": "Předměty vydávané dobrovolníkům"
       },
       "associations": {
         "tarifs": "{count} tarif | {count} tarifů",

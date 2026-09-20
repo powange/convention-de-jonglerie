@@ -906,7 +906,8 @@
       "stats_compare_label": "Jämför med en tidigare upplaga",
       "stats_compare_outer": "{edition} (yttre ring, streckad)",
       "stats_filter_buy_period": "Försäljningsperiod",
-      "stats_no_comparison": "Ingen jämförelse"
+      "stats_no_comparison": "Ingen jämförelse",
+      "orders_items_filtered_out": "(+{count} utanför filtret)"
     },
     "title": "Hantering",
     "view_edition": "Visa upplagan",

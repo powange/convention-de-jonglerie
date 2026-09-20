@@ -162,7 +162,7 @@
         "error_saving": "No se han podido guardar los artículos",
         "loading": "Cargando los artículos de voluntarios…",
         "none_configured": "Ningún artículo configurado",
-        "none_configured_hint": "Seleccione un ámbito abajo para empezar",
+        "none_configured_hint": "Haga clic en «Modificar» para elegir los artículos entregados a todos los voluntarios, o a un equipo en concreto.",
         "preview_falls_back": "{items} — el equipo no sustituye nada mientras no se le asocie ningún artículo.",
         "preview_global_title": "Lo que recibirá un voluntario sin equipo configurado",
         "preview_nothing_at_all": "Nada: ni artículo de equipo, ni artículo global.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "Estos artículos sustituyen por completo a los artículos globales para los voluntarios de este equipo",
         "scope_all_option": "🌍 Todos los voluntarios (global)",
         "team_only": "Solo equipo",
-        "unknown_team": "Equipo desconocido"
+        "unknown_team": "Equipo desconocido",
+        "edit_title": "Modificar los artículos entregados a los voluntarios",
+        "section_title": "Artículos entregados a los voluntarios"
       },
       "associations": {
         "tarifs": "{count} tarifa | {count} tarifas",
