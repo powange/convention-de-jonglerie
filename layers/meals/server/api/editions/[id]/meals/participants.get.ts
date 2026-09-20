@@ -7,6 +7,27 @@ import { validateEditionId, validatePagination } from '#server/utils/validation-
 
 const DEFAULT_PAGE_SIZE = 20
 
+/**
+ * Au-delà de ce nombre de lignes assemblées, l'écran prévient dans les journaux.
+ *
+ * Cette liste rassemble les quatre populations de TOUS les repas actifs de l'édition, puis
+ * filtre, trie et pagine en mémoire : `page` et `pageSize` n'atteignent jamais la base.
+ *
+ * Mesuré le 20 septembre 2026 sur l'édition la plus fournie : 705 lignes — 425 sélections de
+ * bénévoles, 244 d'artistes, 36 d'organisateurs — assemblées en quelques millisecondes. Ce n'est
+ * donc pas un incident, c'est une échéance, et le seuil laisse sept fois cette marge.
+ *
+ * ⚠️ Rien n'est tronqué, délibérément. Masquer des participants coûterait bien plus cher que le
+ * temps qu'on économiserait : quelqu'un se présente au comptoir et ne serait pas trouvé. Cet
+ * avertissement ne protège pas la page — il sert à savoir QUAND la refonte devient nécessaire,
+ * plutôt que de la découvrir un jour d'ouverture.
+ *
+ * Trier et paginer en base demanderait que les quatre populations tiennent dans une même requête,
+ * donc de toucher aux ports `artists` et `ticketing` : le tri est global aux quatre, et n'en
+ * paginer qu'une rendrait les pages fausses.
+ */
+const SEUIL_D_ALERTE = 5000
+
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
@@ -201,6 +222,11 @@ export default wrapApiHandler(
       })
     })
 
+    // Le nombre de lignes réellement assemblées, avant que les filtres n'en retirent : c'est lui
+    // qui mesure le coût payé. Le compter après filtrage laisserait passer le cas qui inquiète —
+    // dix mille lignes montées pour en afficher vingt, sans que rien ne prévienne.
+    const lignesAssemblees = participants.length
+
     // Appliquer les filtres
     if (search) {
       const searchLower = search.toLowerCase()
@@ -272,6 +298,15 @@ export default wrapApiHandler(
       },
       withAllergies: participants.filter((p) => p.allergies && p.allergies.trim() !== '').length,
       afterShow: participants.filter((p) => p.afterShow).length,
+    }
+
+    if (lignesAssemblees > SEUIL_D_ALERTE) {
+      console.warn(
+        `[repas] Liste des participants : ${lignesAssemblees} lignes assemblées en mémoire ` +
+          `pour l'édition ${editionId} (seuil ${SEUIL_D_ALERTE}). ` +
+          `sur ${meals.length} repas actifs. ` +
+          `Le tri et la pagination se font en mémoire : c'est le moment de les passer en base.`
+      )
     }
 
     return {
