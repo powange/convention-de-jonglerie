@@ -11,7 +11,7 @@
               :variant="form.kind === option.value ? 'solid' : 'outline'"
               :icon="option.icon"
               :label="option.label"
-              @click="form.kind = option.value"
+              @click="choisirSens(option.value)"
             />
           </UFieldGroup>
         </UFormField>
@@ -43,7 +43,9 @@
               value-key="value"
               :items="codeItems"
               class="w-full"
-              :search-input="{ placeholder: $t('common.search') }"
+              :search-input="{ placeholder: $t('gestion.treasury.code_search_all') }"
+              :search-term="rechercheCode"
+              @update:search-term="(v: string) => (rechercheCode = v)"
             />
           </UFormField>
         </div>
@@ -217,10 +219,53 @@ const kindOptions = computed(() => [
   },
 ])
 
+/**
+ * Les codes proposés dépendent du sens de la ligne.
+ *
+ * La classe du plan comptable français porte ce sens : 6 pour une charge, 7 pour un produit.
+ * Rien ne l'enregistre sur le code lui-même — c'est déduit du premier chiffre.
+ *
+ * Conséquence assumée : un code qui ne suit pas cette numérotation, saisi librement (« REPAS »,
+ * « A1 »), n'est proposé d'aucun côté. Il reste utilisable sur les lignes qui le portent déjà,
+ * mais ne peut plus être choisi tant qu'il n'est pas renuméroté.
+ */
+/** Terme tapé dans le select des codes. */
+const rechercheCode = ref('')
+
+/** La règle des codes proposés vit dans `codesProposes` : elle sert aussi à la page. */
+const codesAffiches = computed(() =>
+  codesProposes(props.codes, {
+    sens: form.kind,
+    recherche: rechercheCode.value,
+    codeCourantId: form.codeId,
+  })
+)
+
 const codeItems = computed(() => [
   { value: null, label: t('gestion.treasury.no_code') },
-  ...props.codes.map((c) => ({ value: c.id, label: `${c.code} — ${c.label}` })),
+  ...codesAffiches.value.map((c) => ({ value: c.id, label: `${c.code} — ${c.label}` })),
 ])
+
+/**
+ * Changer le sens d'une ligne peut rendre son code inéligible. On le retire alors, plutôt que de
+ * laisser un identifiant sélectionné qui ne figure plus dans la liste : le champ paraîtrait vide
+ * tout en envoyant l'ancien code à l'enregistrement.
+ *
+ * Rattaché au clic et non à un `watch` sur le sens du formulaire : celui-ci écrit lui-même ce champ à
+ * chaque ouverture, et un observateur aurait effacé le code d'une ligne existante au seul motif
+ * qu'elle ne suit pas la numérotation — une perte de donnée silencieuse, à l'affichage.
+ */
+function choisirSens(sens: 'EXPENSE' | 'INCOME') {
+  if (form.kind === sens) return
+  form.kind = sens
+  // Sans recherche : la liste du nouveau sens, celle que la personne va voir. Si le code choisi
+  // n'y figure pas, il n'a plus lieu d'être — on ne garde pas une imputation que le formulaire
+  // ne montre plus.
+  const eligibles = codesProposes(props.codes, { sens })
+  if (form.codeId !== null && !eligibles.some((c) => c.id === form.codeId)) {
+    form.codeId = null
+  }
+}
 
 const isEditing = computed(() => !!props.entry?.entryId)
 const title = computed(() =>

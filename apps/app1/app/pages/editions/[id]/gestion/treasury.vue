@@ -129,11 +129,13 @@
             <USelectMenu
               :model-value="line.code?.id ?? null"
               value-key="value"
-              :items="codeItems"
+              :items="codeItems(line)"
               size="sm"
               class="w-56"
               :placeholder="$t('gestion.treasury.no_code')"
-              :search-input="{ placeholder: $t('common.search') }"
+              :search-input="{ placeholder: $t('gestion.treasury.code_search_all') }"
+              :search-term="recherchesCode[line.key] ?? ''"
+              @update:search-term="(v: string) => (recherchesCode[line.key] = v)"
               @update:model-value="(v: number | null) => assignCode(line, v)"
             />
 
@@ -334,10 +336,22 @@ const sourceLink = (line: TreasuryLine) =>
     ? `/editions/${editionId.value}/gestion/ticketing/orders`
     : `/editions/${editionId.value}/gestion/artists`
 
-const codeItems = computed(() => [
-  { value: null, label: t('gestion.treasury.no_code') },
-  ...(data.value?.codes ?? []).map((c) => ({ value: c.id, label: `${c.code} — ${c.label}` })),
-])
+/** Terme tapé dans le select de chaque ligne. Une ligne, une recherche. */
+const recherchesCode = ref<Record<string, string>>({})
+
+/** La règle des codes proposés vit dans `codesProposes` : elle sert aussi au formulaire. */
+const codeItems = (line: TreasuryLine) => {
+  const proposes = codesProposes(data.value?.codes ?? [], {
+    sens: line.kind,
+    recherche: recherchesCode.value[line.key] ?? '',
+    codeCourantId: line.code?.id ?? null,
+  })
+
+  return [
+    { value: null, label: t('gestion.treasury.no_code') },
+    ...proposes.map((c) => ({ value: c.id, label: `${c.code} — ${c.label}` })),
+  ]
+}
 
 const groups = computed(() => {
   const lines = data.value?.lines ?? []

@@ -1,0 +1,446 @@
+{
+  "id": "fr-pcg",
+  "pays": "FR",
+  "nom": "Plan comptable général",
+  "sousTitre": "Sociétés et entreprises individuelles",
+  "reference": "Règlement ANC 2014-03, modifié par le règlement ANC 2022-06 applicable aux exercices ouverts depuis le 1er janvier 2025",
+  "source": "https://www.anc.gouv.fr/normes-comptables-francaises/reglements-de-lanc",
+  "racines": [
+    {
+      "code": "6",
+      "libelle": "Charges",
+      "enfants": [
+        {
+          "code": "60",
+          "libelle": "Achats",
+          "enfants": [
+            { "code": "601", "libelle": "Achats stockés — matières premières et fournitures" },
+            {
+              "code": "602",
+              "libelle": "Achats stockés — autres approvisionnements",
+              "enfants": [
+                { "code": "6021", "libelle": "Matières consommables" },
+                { "code": "6022", "libelle": "Fournitures consommables" },
+                { "code": "6026", "libelle": "Emballages" }
+              ]
+            },
+            {
+              "code": "603",
+              "libelle": "Variation des stocks",
+              "enfants": [
+                { "code": "6031", "libelle": "Variation des stocks de matières premières" },
+                {
+                  "code": "6032",
+                  "libelle": "Variation des stocks des autres approvisionnements"
+                },
+                { "code": "6037", "libelle": "Variation des stocks de marchandises" }
+              ]
+            },
+            { "code": "604", "libelle": "Achats d'études et prestations de services" },
+            { "code": "605", "libelle": "Achats de matériel, équipements et travaux" },
+            {
+              "code": "606",
+              "libelle": "Achats non stockés de matières et fournitures",
+              "enfants": [
+                { "code": "6061", "libelle": "Fournitures non stockables (eau, énergie)" },
+                { "code": "6063", "libelle": "Fournitures d'entretien et de petit équipement" },
+                { "code": "6064", "libelle": "Fournitures administratives" },
+                { "code": "6068", "libelle": "Autres matières et fournitures" }
+              ]
+            },
+            { "code": "607", "libelle": "Achats de marchandises" },
+            { "code": "608", "libelle": "Frais accessoires incorporés aux achats" },
+            { "code": "609", "libelle": "Rabais, remises et ristournes obtenus sur achats" }
+          ]
+        },
+        {
+          "code": "61",
+          "libelle": "Services extérieurs",
+          "enfants": [
+            { "code": "611", "libelle": "Sous-traitance générale" },
+            { "code": "612", "libelle": "Redevances de crédit-bail" },
+            {
+              "code": "613",
+              "libelle": "Locations",
+              "enfants": [
+                { "code": "6132", "libelle": "Locations immobilières" },
+                { "code": "6135", "libelle": "Locations mobilières" },
+                { "code": "6136", "libelle": "Malis sur emballages" }
+              ]
+            },
+            { "code": "614", "libelle": "Charges locatives et de copropriété" },
+            {
+              "code": "615",
+              "libelle": "Entretien et réparations",
+              "enfants": [
+                { "code": "6152", "libelle": "Entretien et réparations sur biens immobiliers" },
+                { "code": "6155", "libelle": "Entretien et réparations sur biens mobiliers" },
+                { "code": "6156", "libelle": "Maintenance" }
+              ]
+            },
+            {
+              "code": "616",
+              "libelle": "Primes d'assurances",
+              "enfants": [
+                { "code": "6161", "libelle": "Multirisques" },
+                { "code": "6162", "libelle": "Assurance obligatoire dommage construction" },
+                { "code": "6163", "libelle": "Assurance transport sur achats" },
+                { "code": "6165", "libelle": "Assurance responsabilité civile" }
+              ]
+            },
+            { "code": "617", "libelle": "Études et recherches" },
+            {
+              "code": "618",
+              "libelle": "Divers",
+              "enfants": [
+                { "code": "6181", "libelle": "Documentation générale" },
+                { "code": "6183", "libelle": "Documentation technique" },
+                { "code": "6185", "libelle": "Frais de colloques, séminaires, conférences" }
+              ]
+            },
+            {
+              "code": "619",
+              "libelle": "Rabais, remises et ristournes obtenus sur services extérieurs"
+            }
+          ]
+        },
+        {
+          "code": "62",
+          "libelle": "Autres services extérieurs",
+          "enfants": [
+            { "code": "621", "libelle": "Personnel extérieur à l'entreprise" },
+            {
+              "code": "622",
+              "libelle": "Rémunérations d'intermédiaires et honoraires",
+              "enfants": [
+                { "code": "6226", "libelle": "Honoraires" },
+                { "code": "6227", "libelle": "Frais d'actes et de contentieux" },
+                { "code": "6228", "libelle": "Rémunérations d'intermédiaires diverses" }
+              ]
+            },
+            {
+              "code": "623",
+              "libelle": "Publicité, publications, relations publiques",
+              "enfants": [
+                { "code": "6231", "libelle": "Annonces et insertions" },
+                { "code": "6232", "libelle": "Échantillons" },
+                { "code": "6233", "libelle": "Foires et expositions" },
+                { "code": "6234", "libelle": "Cadeaux à la clientèle" },
+                { "code": "6236", "libelle": "Catalogues et imprimés" },
+                { "code": "6237", "libelle": "Publications" }
+              ]
+            },
+            {
+              "code": "624",
+              "libelle": "Transports de biens et transports collectifs du personnel",
+              "enfants": [
+                { "code": "6241", "libelle": "Transports sur achats" },
+                { "code": "6242", "libelle": "Transports sur ventes" },
+                { "code": "6247", "libelle": "Transports collectifs du personnel" }
+              ]
+            },
+            {
+              "code": "625",
+              "libelle": "Déplacements, missions et réceptions",
+              "enfants": [
+                { "code": "6251", "libelle": "Voyages et déplacements" },
+                { "code": "6255", "libelle": "Frais de déménagement" },
+                { "code": "6256", "libelle": "Missions" },
+                { "code": "6257", "libelle": "Réceptions" }
+              ]
+            },
+            {
+              "code": "626",
+              "libelle": "Frais postaux et de télécommunications",
+              "enfants": [
+                { "code": "6261", "libelle": "Frais postaux" },
+                { "code": "6262", "libelle": "Frais de télécommunications" }
+              ]
+            },
+            { "code": "627", "libelle": "Services bancaires et assimilés" },
+            {
+              "code": "628",
+              "libelle": "Divers",
+              "enfants": [
+                { "code": "6281", "libelle": "Concours divers (cotisations)" },
+                { "code": "6284", "libelle": "Frais de recrutement de personnel" }
+              ]
+            },
+            {
+              "code": "629",
+              "libelle": "Rabais, remises et ristournes obtenus sur autres services extérieurs"
+            }
+          ]
+        },
+        {
+          "code": "63",
+          "libelle": "Impôts, taxes et versements assimilés",
+          "enfants": [
+            {
+              "code": "631",
+              "libelle": "Impôts, taxes et versements sur rémunérations (administration des impôts)"
+            },
+            {
+              "code": "633",
+              "libelle": "Impôts, taxes et versements sur rémunérations (autres organismes)"
+            },
+            {
+              "code": "635",
+              "libelle": "Autres impôts, taxes et versements (administration des impôts)",
+              "enfants": [
+                { "code": "6351", "libelle": "Impôts directs (sauf impôts sur les bénéfices)" },
+                { "code": "6353", "libelle": "Impôts indirects" },
+                { "code": "6354", "libelle": "Droits d'enregistrement et de timbre" }
+              ]
+            },
+            {
+              "code": "637",
+              "libelle": "Autres impôts, taxes et versements assimilés (autres organismes)"
+            }
+          ]
+        },
+        {
+          "code": "64",
+          "libelle": "Charges de personnel",
+          "enfants": [
+            {
+              "code": "641",
+              "libelle": "Rémunérations du personnel",
+              "enfants": [
+                { "code": "6411", "libelle": "Salaires et appointements" },
+                { "code": "6413", "libelle": "Primes et gratifications" },
+                { "code": "6414", "libelle": "Indemnités et avantages divers" },
+                { "code": "6416", "libelle": "Supplément familial" }
+              ]
+            },
+            { "code": "644", "libelle": "Rémunération du travail de l'exploitant" },
+            {
+              "code": "645",
+              "libelle": "Charges de sécurité sociale et de prévoyance",
+              "enfants": [
+                { "code": "6451", "libelle": "Cotisations à l'URSSAF" },
+                { "code": "6453", "libelle": "Cotisations aux caisses de retraite" },
+                { "code": "6454", "libelle": "Cotisations aux ASSEDIC" }
+              ]
+            },
+            { "code": "646", "libelle": "Cotisations sociales personnelles de l'exploitant" },
+            { "code": "647", "libelle": "Autres charges sociales" },
+            { "code": "648", "libelle": "Autres charges de personnel" }
+          ]
+        },
+        {
+          "code": "65",
+          "libelle": "Autres charges de gestion courante",
+          "enfants": [
+            {
+              "code": "651",
+              "libelle": "Redevances pour concessions, brevets, licences, marques, procédés"
+            },
+            { "code": "653", "libelle": "Jetons de présence" },
+            { "code": "654", "libelle": "Pertes sur créances irrécouvrables" },
+            { "code": "655", "libelle": "Quote-part de résultat sur opérations faites en commun" },
+            {
+              "code": "657",
+              "libelle": "Valeurs comptables des immobilisations incorporelles et corporelles cédées",
+              "note": "Créé par le règlement ANC 2022-06 : remplace l'ancien compte 675. Attention, le plan comptable des associations utilise ce numéro pour « Aides financières »."
+            },
+            {
+              "code": "658",
+              "libelle": "Charges diverses de gestion courante",
+              "enfants": [{ "code": "6586", "libelle": "Cotisations (organismes professionnels)" }]
+            }
+          ]
+        },
+        {
+          "code": "66",
+          "libelle": "Charges financières",
+          "enfants": [
+            {
+              "code": "661",
+              "libelle": "Charges d'intérêts",
+              "enfants": [
+                { "code": "6611", "libelle": "Intérêts des emprunts et dettes" },
+                { "code": "6616", "libelle": "Intérêts bancaires et sur opérations de financement" }
+              ]
+            },
+            { "code": "664", "libelle": "Pertes sur créances liées à des participations" },
+            { "code": "665", "libelle": "Escomptes accordés" },
+            { "code": "666", "libelle": "Pertes de change" },
+            {
+              "code": "667",
+              "libelle": "Charges sur cession d'éléments financiers",
+              "note": "Créé par le règlement ANC 2022-06."
+            },
+            { "code": "668", "libelle": "Autres charges financières" }
+          ]
+        },
+        {
+          "code": "67",
+          "libelle": "Charges exceptionnelles",
+          "note": "Depuis le 1er janvier 2025, réservé aux seuls événements à la fois majeurs ET inhabituels — les deux critères sont cumulatifs.",
+          "enfants": [
+            { "code": "671", "libelle": "Charges exceptionnelles sur opérations de gestion" },
+            { "code": "672", "libelle": "Charges sur exercices antérieurs" },
+            { "code": "678", "libelle": "Autres charges exceptionnelles" }
+          ]
+        },
+        {
+          "code": "68",
+          "libelle": "Dotations aux amortissements, dépréciations et provisions",
+          "enfants": [
+            {
+              "code": "681",
+              "libelle": "Dotations — charges d'exploitation",
+              "enfants": [
+                {
+                  "code": "6811",
+                  "libelle": "Dotations aux amortissements des immobilisations"
+                },
+                { "code": "6815", "libelle": "Dotations aux provisions d'exploitation" },
+                { "code": "6816", "libelle": "Dotations pour dépréciations des immobilisations" },
+                {
+                  "code": "6817",
+                  "libelle": "Dotations pour dépréciations des actifs circulants"
+                }
+              ]
+            },
+            { "code": "686", "libelle": "Dotations — charges financières" },
+            { "code": "687", "libelle": "Dotations — charges exceptionnelles" }
+          ]
+        },
+        {
+          "code": "69",
+          "libelle": "Participation des salariés, impôts sur les bénéfices",
+          "enfants": [
+            { "code": "691", "libelle": "Participation des salariés aux résultats" },
+            { "code": "695", "libelle": "Impôts sur les bénéfices" },
+            { "code": "698", "libelle": "Intégration fiscale" },
+            { "code": "699", "libelle": "Produits — report en arrière des déficits" }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "7",
+      "libelle": "Produits",
+      "enfants": [
+        {
+          "code": "70",
+          "libelle": "Ventes de produits fabriqués, prestations de services, marchandises",
+          "enfants": [
+            { "code": "701", "libelle": "Ventes de produits finis" },
+            { "code": "702", "libelle": "Ventes de produits intermédiaires" },
+            { "code": "703", "libelle": "Ventes de produits résiduels" },
+            { "code": "704", "libelle": "Travaux" },
+            { "code": "705", "libelle": "Études" },
+            { "code": "706", "libelle": "Prestations de services" },
+            { "code": "707", "libelle": "Ventes de marchandises" },
+            {
+              "code": "708",
+              "libelle": "Produits des activités annexes",
+              "enfants": [
+                {
+                  "code": "7081",
+                  "libelle": "Produits des services exploités dans l'intérêt du personnel"
+                },
+                { "code": "7083", "libelle": "Locations diverses" },
+                { "code": "7085", "libelle": "Ports et frais accessoires facturés" },
+                { "code": "7088", "libelle": "Autres produits d'activités annexes" }
+              ]
+            },
+            { "code": "709", "libelle": "Rabais, remises et ristournes accordés" }
+          ]
+        },
+        {
+          "code": "71",
+          "libelle": "Production stockée",
+          "enfants": [
+            { "code": "7133", "libelle": "Variation des en-cours de production de biens" },
+            { "code": "7134", "libelle": "Variation des en-cours de production de services" },
+            { "code": "7135", "libelle": "Variation des stocks de produits" }
+          ]
+        },
+        {
+          "code": "72",
+          "libelle": "Production immobilisée",
+          "enfants": [
+            { "code": "721", "libelle": "Immobilisations incorporelles" },
+            { "code": "722", "libelle": "Immobilisations corporelles" }
+          ]
+        },
+        { "code": "73", "libelle": "Produits nets partiels sur opérations à long terme" },
+        {
+          "code": "74",
+          "libelle": "Subventions d'exploitation",
+          "enfants": [
+            {
+              "code": "747",
+              "libelle": "Quote-part des subventions d'investissement virée au résultat",
+              "note": "Remplace l'ancien compte 777 depuis le règlement ANC 2022-06."
+            }
+          ]
+        },
+        {
+          "code": "75",
+          "libelle": "Autres produits de gestion courante",
+          "enfants": [
+            {
+              "code": "751",
+              "libelle": "Redevances pour concessions, brevets, licences, marques, procédés"
+            },
+            {
+              "code": "752",
+              "libelle": "Revenus des immeubles non affectés à des activités professionnelles"
+            },
+            { "code": "753", "libelle": "Jetons de présence et rémunérations d'administrateurs" },
+            { "code": "754", "libelle": "Ristournes perçues des coopératives" },
+            { "code": "755", "libelle": "Quote-part de résultat sur opérations faites en commun" },
+            {
+              "code": "757",
+              "libelle": "Produits des cessions d'immobilisations incorporelles et corporelles",
+              "note": "Créé par le règlement ANC 2022-06 : remplace l'ancien compte 775. Attention, le plan comptable des associations utilise ce numéro pour « Gains de change sur créances et dettes d'exploitation »."
+            },
+            { "code": "758", "libelle": "Produits divers de gestion courante" }
+          ]
+        },
+        {
+          "code": "76",
+          "libelle": "Produits financiers",
+          "enfants": [
+            { "code": "761", "libelle": "Produits de participations" },
+            { "code": "762", "libelle": "Produits des autres immobilisations financières" },
+            { "code": "763", "libelle": "Revenus des autres créances" },
+            { "code": "764", "libelle": "Revenus des valeurs mobilières de placement" },
+            { "code": "765", "libelle": "Escomptes obtenus" },
+            { "code": "766", "libelle": "Gains de change" },
+            {
+              "code": "767",
+              "libelle": "Produits sur cession d'éléments financiers",
+              "note": "Créé par le règlement ANC 2022-06."
+            },
+            { "code": "768", "libelle": "Autres produits financiers" }
+          ]
+        },
+        {
+          "code": "77",
+          "libelle": "Produits exceptionnels",
+          "note": "Depuis le 1er janvier 2025, réservé aux seuls événements à la fois majeurs ET inhabituels.",
+          "enfants": [
+            { "code": "771", "libelle": "Produits exceptionnels sur opérations de gestion" },
+            { "code": "772", "libelle": "Produits sur exercices antérieurs" },
+            { "code": "778", "libelle": "Autres produits exceptionnels" }
+          ]
+        },
+        {
+          "code": "78",
+          "libelle": "Reprises sur amortissements, dépréciations et provisions",
+          "enfants": [
+            { "code": "781", "libelle": "Reprises — produits d'exploitation" },
+            { "code": "786", "libelle": "Reprises — produits financiers" },
+            { "code": "787", "libelle": "Reprises — produits exceptionnels" }
+          ]
+        }
+      ]
+    }
+  ]
+}
