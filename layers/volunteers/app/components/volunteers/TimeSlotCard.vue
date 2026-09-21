@@ -174,7 +174,13 @@ const libelleDecalage = computed(() => {
  * Une seule fonction pour les deux cas : la version « avec retard » en était une copie mot pour
  * mot, au décalage près. Deux copies, c'est deux occasions d'en corriger une seule.
  */
-const formatSlotDateTime = (startDateTime: string, endDateTime: string, delayMinutes = 0) => {
+const formatSlotDateTime = (
+  startDateTime: string,
+  endDateTime: string,
+  // `null` autant qu'`undefined` : le champ est nullable en base, et le garde du gabarit ne le
+  // rétrécit plus depuis qu'il teste le LIBELLÉ du décalage et non sa valeur.
+  delayMinutes: number | null | undefined = 0
+) => {
   // La règle du décalage vit dans `retard-creneau`, partagée avec les cinq autres surfaces.
   const horaires = horairesEffectifs(startDateTime, endDateTime, delayMinutes)
   if (!horaires) return ''
