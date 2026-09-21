@@ -549,7 +549,6 @@
     "swap_reject": "Afvis byttet",
     "swap_sent": "Mine forslag",
     "swap_slot_places": "{places} frivillige på denne vagt",
-    "swap_slot_untitled": "Vagt uden titel",
     "swap_status_accepted": "Bytte godkendt",
     "swap_status_cancelled": "Trukket tilbage",
     "swap_status_expired": "Udløbet",
@@ -634,6 +633,12 @@
       "manage": "Teams",
       "none_yet": "Ikke tilknyttet noget team",
       "title": "Arrangører i teams"
-    }
+    },
+    "swap_received_sentence": "{nom} vil gerne bytte en vagt med dig:",
+    "swap_sent_sentence": "Du foreslår {nom} et bytte:",
+    "swap_your_slot": "Din vagt",
+    "swap_their_slot": "Deres vagt",
+    "untitled_slot": "Unavngivet tidsrum",
+    "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):"
   }
 }

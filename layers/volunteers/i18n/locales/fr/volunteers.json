@@ -559,7 +559,6 @@
     "swap_reject": "Refuser l'échange",
     "swap_sent": "Mes propositions",
     "swap_slot_places": "{places} bénévoles sur ce créneau",
-    "swap_slot_untitled": "Créneau sans titre",
     "swap_status_accepted": "Échange validé",
     "swap_status_cancelled": "Retirée",
     "swap_status_expired": "Expirée",
@@ -634,6 +633,12 @@
     "volunteers_short": "bénév.",
     "volunteers_summary": "Résumé des bénévoles",
     "what_you_can_bring_title": "Ce que vous pouvez nous apporter",
-    "withdraw": "Retirer ma candidature"
+    "withdraw": "Retirer ma candidature",
+    "swap_received_sentence": "{nom} souhaite échanger un créneau avec vous :",
+    "swap_sent_sentence": "Vous proposez un échange à {nom} :",
+    "swap_your_slot": "Votre créneau",
+    "swap_their_slot": "Son créneau",
+    "untitled_slot": "Créneau sans titre",
+    "with_you_on_slot": "Avec vous sur ce créneau : | Avec vous sur ce créneau ({count}) :"
   }
 }

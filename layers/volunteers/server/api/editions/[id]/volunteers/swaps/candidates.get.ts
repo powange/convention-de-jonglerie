@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   affectationsEchangeables,
   creneauxProposables,
+  equipesDuPerimetre,
   type AffectationCandidate,
 } from '../../../../../utils/echange-creneaux'
 import {
@@ -20,7 +21,8 @@ import { validateEditionId } from '#server/utils/validation-helpers'
 /**
  * GET .../volunteers/swaps/candidates?assignmentId=… — les créneaux qu'on peut demander.
  *
- * Périmètre : les bénévoles des ÉQUIPES où le demandeur est lui-même affecté. Pas toute l'édition
+ * Périmètre : les bénévoles de ses ÉQUIPES, plus ceux de l'équipe du créneau qu'il offre — les
+ * deux ne se recouvrent pas toujours, et `equipesDuPerimetre` dit pourquoi. Pas toute l'édition
  * — il n'a rien à faire du planning d'une équipe qu'il ne côtoie pas — et pas seulement son
  * créneau — un échange se cherche sur toute la durée de l'événement.
  *
@@ -57,7 +59,12 @@ export default wrapApiHandler(
       where: { application: { userId: user.id, eventId: editionId, status: 'ACCEPTED' } },
       select: { teamId: true },
     })
-    const equipes = sesEquipes.map((e) => e.teamId)
+    // Et celle du créneau offert, qui n'est pas forcément des siennes : voir la règle, qui dit
+    // quel trou cela referme.
+    const equipes = equipesDuPerimetre(
+      sesEquipes.map((e) => e.teamId),
+      offerte.timeSlot.teamId
+    )
     if (equipes.length === 0) {
       return createSuccessResponse({ candidates: [] })
     }

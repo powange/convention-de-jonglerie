@@ -549,7 +549,6 @@
     "swap_reject": "Odmítnout výměnu",
     "swap_sent": "Mé návrhy",
     "swap_slot_places": "{places} dobrovolníků na této směně",
-    "swap_slot_untitled": "Směna bez názvu",
     "swap_status_accepted": "Výměna schválena",
     "swap_status_cancelled": "Stažena",
     "swap_status_expired": "Vypršela",
@@ -634,6 +633,12 @@
       "manage": "Týmy",
       "none_yet": "Nepřiřazen k žádnému týmu",
       "title": "Organizátoři v týmech"
-    }
+    },
+    "swap_received_sentence": "{nom} si s vámi chce vyměnit směnu:",
+    "swap_sent_sentence": "Nabízíte výměnu uživateli {nom}:",
+    "swap_your_slot": "Vaše směna",
+    "swap_their_slot": "Jeho či její směna",
+    "untitled_slot": "Slot bez názvu",
+    "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):"
   }
 }

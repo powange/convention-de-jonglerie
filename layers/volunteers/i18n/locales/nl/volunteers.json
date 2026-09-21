@@ -549,7 +549,6 @@
     "swap_reject": "Ruil weigeren",
     "swap_sent": "Mijn voorstellen",
     "swap_slot_places": "{places} vrijwilligers op deze dienst",
-    "swap_slot_untitled": "Dienst zonder titel",
     "swap_status_accepted": "Ruil goedgekeurd",
     "swap_status_cancelled": "Ingetrokken",
     "swap_status_expired": "Verlopen",
@@ -634,6 +633,12 @@
       "manage": "Teams",
       "none_yet": "Aan geen enkel team gekoppeld",
       "title": "Organisatoren in teams"
-    }
+    },
+    "swap_received_sentence": "{nom} wil een dienst met je ruilen:",
+    "swap_sent_sentence": "Je stelt {nom} een ruil voor:",
+    "swap_your_slot": "Jouw dienst",
+    "swap_their_slot": "Diens dienst",
+    "untitled_slot": "Naamloos tijdslot",
+    "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):"
   }
 }

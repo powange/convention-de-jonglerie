@@ -151,7 +151,6 @@
     "change_profile_picture_description": "Upload or modify this user's profile picture",
     "claim_requests": "Claim requests",
     "cleanup_expired_tokens": "Cleanup expired tokens",
-    "cleanup_resolved_error_logs": "Cleanup error logs",
     "config": {
       "ai": "Artificial Intelligence",
       "email": "Email",

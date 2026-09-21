@@ -1,3 +1,5 @@
+import { formatDurationCompact } from '~/utils/date'
+
 import { decalageTraduisible, horairesEffectifs } from '../utils/retard-creneau'
 
 import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
@@ -62,14 +64,35 @@ export function useCreneauLisible(fuseau?: MaybeRefOrGetter<string | null | unde
     return decalage ? `${plage} (${t(decalage.cle, decalage.valeurs)})` : plage
   }
 
+  /**
+   * « 1h30 » — combien de temps le créneau dure.
+   *
+   * Deux horaires suffisent à la déduire, mais pas d'un coup d'œil : entre « 12:00 – 13:00 » et
+   * « 17:00 – 19:30 », c'est la durée qu'on compare pour juger un échange, et la soustraire de
+   * tête est le genre d'effort qui fait accepter de travers.
+   *
+   * Calculée sur les horaires EFFECTIFS, comme l'affichage : un décalage déplace le créneau, il
+   * ne l'allonge pas — la durée est donc la même, et la lire ailleurs serait incohérent.
+   *
+   * Le formateur est celui du dépôt, déjà employé par la liste des créneaux : une seconde façon
+   * d'écrire une durée finirait par en donner deux.
+   */
+  const duree = (creneau: CreneauLisible) => {
+    const horaires = horairesEffectifs(
+      creneau.startDateTime,
+      creneau.endDateTime,
+      creneau.delayMinutes
+    )
+    if (!horaires) return ''
+    return formatDurationCompact(horaires.fin.getTime() - horaires.debut.getTime())
+  }
+
   /** « Hygiène · Toilettes sèches » — l'équipe d'abord, c'est elle qui situe le créneau. */
   const intitule = (creneau: CreneauLisible) =>
-    [creneau.team?.name, creneau.title || t('volunteers.swap_slot_untitled')]
-      .filter(Boolean)
-      .join(' · ')
+    [creneau.team?.name, creneau.title || t('volunteers.untitled_slot')].filter(Boolean).join(' · ')
 
   /** Tout sur une ligne, là où un composant ne peut pas passer (un titre, une infobulle). */
   const resume = (creneau: CreneauLisible) => `${intitule(creneau)} · ${horaire(creneau, 'court')}`
 
-  return { horaire, intitule, resume }
+  return { horaire, duree, intitule, resume }
 }

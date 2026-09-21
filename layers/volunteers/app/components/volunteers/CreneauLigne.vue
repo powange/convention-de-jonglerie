@@ -12,9 +12,16 @@
       >
         {{ creneau.team.name }}
       </UBadge>
-      <span class="font-medium">{{ creneau.title || t('volunteers.swap_slot_untitled') }}</span>
+      <span class="font-medium">{{ creneau.title || t('volunteers.untitled_slot') }}</span>
     </span>
-    <span class="block text-sm text-gray-600 dark:text-gray-400">{{ horaire(creneau) }}</span>
+    <!-- La durée à côté des horaires : c'est elle qu'on compare pour juger un échange, et la
+         soustraire de tête est le genre d'effort qui fait accepter de travers. -->
+    <span class="block text-sm text-gray-600 dark:text-gray-400">
+      {{ horaire(creneau) }}
+      <span v-if="duree(creneau)" class="whitespace-nowrap text-gray-500 dark:text-gray-500">
+        · {{ duree(creneau) }}
+      </span>
+    </span>
   </span>
 </template>
 
@@ -29,5 +36,5 @@ const props = defineProps<{
 
 const { t } = useI18n()
 // Un getter, et non la valeur : l'édition arrive parfois après le premier rendu.
-const { horaire } = useCreneauLisible(() => props.fuseau)
+const { horaire, duree } = useCreneauLisible(() => props.fuseau)
 </script>

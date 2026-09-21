@@ -151,7 +151,6 @@
     "change_profile_picture_description": "Upload eller ændr denne brugers profilbillede",
     "claim_requests": "Kravforespørgsler",
     "cleanup_expired_tokens": "Oprydning af udløbne tokens",
-    "cleanup_resolved_error_logs": "Oprydning af fejllogge",
     "config": {
       "ai": "Kunstig intelligens",
       "email": "E-mail",

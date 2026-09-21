@@ -151,7 +151,6 @@
     "change_profile_picture_description": "Upload of wijzig de profielfoto van deze gebruiker",
     "claim_requests": "Claimverzoeken",
     "cleanup_expired_tokens": "Opruimen verlopen tokens",
-    "cleanup_resolved_error_logs": "Opruimen foutenlogboeken",
     "config": {
       "ai": "Kunstmatige intelligentie",
       "email": "E-mail",

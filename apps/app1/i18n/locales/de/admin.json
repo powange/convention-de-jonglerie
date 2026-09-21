@@ -151,7 +151,6 @@
     "change_profile_picture_description": "Profilbild dieses Benutzers hochladen oder ändern",
     "claim_requests": "Beanspruchungsanfragen",
     "cleanup_expired_tokens": "Bereinigung abgelaufener Token",
-    "cleanup_resolved_error_logs": "Bereinigung von Fehlerprotokollen",
     "config": {
       "ai": "Künstliche Intelligenz",
       "email": "E-Mail",

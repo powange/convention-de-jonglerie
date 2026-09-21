@@ -151,7 +151,6 @@
     "change_profile_picture_description": "Stažení nebo úprava profilové fotografie tohoto uživatele",
     "claim_requests": "Žádosti o převzetí",
     "cleanup_expired_tokens": "Čištění žetonů s prošlou platností",
-    "cleanup_resolved_error_logs": "Čištění protokolů chyb",
     "config": {
       "ai": "Umělá inteligence",
       "email": "E-mail",

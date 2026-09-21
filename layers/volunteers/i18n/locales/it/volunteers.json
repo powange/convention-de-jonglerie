@@ -549,7 +549,6 @@
     "swap_reject": "Rifiuta lo scambio",
     "swap_sent": "Le mie proposte",
     "swap_slot_places": "{places} volontari su questo turno",
-    "swap_slot_untitled": "Turno senza titolo",
     "swap_status_accepted": "Scambio approvato",
     "swap_status_cancelled": "Ritirata",
     "swap_status_expired": "Scaduta",
@@ -634,6 +633,12 @@
       "manage": "Squadre",
       "none_yet": "Non assegnato ad alcuna squadra",
       "title": "Organizzatori nelle squadre"
-    }
+    },
+    "swap_received_sentence": "{nom} vorrebbe scambiare un turno con te:",
+    "swap_sent_sentence": "Proponi uno scambio a {nom}:",
+    "swap_your_slot": "Il tuo turno",
+    "swap_their_slot": "Il suo turno",
+    "untitled_slot": "Slot senza titolo",
+    "with_you_on_slot": "Con te in questo turno: | Con te in questo turno ({count}):"
   }
 }
