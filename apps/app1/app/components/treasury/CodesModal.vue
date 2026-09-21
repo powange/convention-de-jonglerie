@@ -9,6 +9,19 @@
           :description="$t('gestion.treasury.codes_help')"
         />
 
+        <!-- Aide au choix des codes. Proposée à tout le monde et non aux seules éditions
+             françaises : une convention peut être organisée depuis la France et se tenir
+             ailleurs, et l'inverse est vrai aussi. Le libellé dit de quel plan il s'agit, ce
+             qui suffit à l'écarter d'un coup d'œil. -->
+        <UButton
+          variant="link"
+          size="sm"
+          icon="i-lucide-book-open"
+          class="p-0"
+          :label="$t('gestion.treasury.plan_open')"
+          @click="planOpen = true"
+        />
+
         <div class="flex flex-col gap-2 sm:flex-row">
           <UInput
             v-model="newCode"
@@ -46,7 +59,7 @@
               variant="ghost"
               icon="i-lucide-trash-2"
               :loading="removing.isLoading(code.id)"
-              @click="removeCode(code.id)"
+              @click="demanderSuppression(code)"
             />
           </div>
         </div>
@@ -67,6 +80,32 @@
       </div>
     </template>
   </UModal>
+
+  <TreasuryPlanComptableModal
+    v-model:open="planOpen"
+    :edition-id="editionId"
+    :codes-existants="codes.map((code) => code.code)"
+    @changed="emit('changed')"
+  />
+
+  <!-- La suppression retire l'imputation des lignes concernées : elle mérite qu'on la confirme,
+       d'autant qu'un code se supprime d'un seul clic dans une liste où les lignes se ressemblent. -->
+  <UiConfirmModal
+    v-model="suppressionOpen"
+    :title="$t('gestion.treasury.code_delete_title')"
+    :description="
+      codeASupprimer
+        ? `${codeASupprimer.code} — ${codeASupprimer.label}\n\n${$t('gestion.treasury.code_delete_confirm')}`
+        : ''
+    "
+    :confirm-label="$t('common.delete')"
+    confirm-color="error"
+    confirm-icon="i-lucide-trash-2"
+    icon-name="i-lucide-triangle-alert"
+    icon-color="text-red-500"
+    :loading="codeASupprimer ? removing.isLoading(codeASupprimer.id) : false"
+    @confirm="confirmerSuppression"
+  />
 </template>
 
 <script setup lang="ts">
@@ -122,7 +161,21 @@ const removing = useApiActionById((id) => `/api/editions/${props.editionId}/trea
   onSuccess: () => emit('changed'),
 })
 
-async function removeCode(id: number) {
-  await removing.execute(id)
+const planOpen = ref(false)
+
+const suppressionOpen = ref(false)
+const codeASupprimer = ref<{ id: number; code: string; label: string } | null>(null)
+
+function demanderSuppression(code: { id: number; code: string; label: string }) {
+  codeASupprimer.value = code
+  suppressionOpen.value = true
+}
+
+async function confirmerSuppression() {
+  const code = codeASupprimer.value
+  if (!code) return
+  await removing.execute(code.id)
+  suppressionOpen.value = false
+  codeASupprimer.value = null
 }
 </script>

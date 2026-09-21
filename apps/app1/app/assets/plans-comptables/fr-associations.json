@@ -1,0 +1,226 @@
+{
+  "id": "fr-associations",
+  "pays": "FR",
+  "nom": "Associations et fondations",
+  "sousTitre": "Comptes spécifiques, en complément du plan comptable général",
+  "complementDe": "fr-pcg",
+  "reference": "Règlement ANC 2018-06, article 320-2. Amendé par le règlement ANC 2023-03 pour intégrer la modernisation des états financiers (ANC 2022-06), applicable aux exercices ouverts depuis le 1er janvier 2025.",
+  "source": "https://www.anc.gouv.fr/files/anc/files/1_Normes_fran%C3%A7aises/Reglements/2018/Reglt_2018_06/Reglt_2018-06_Association.pdf",
+  "avertissement": "Une association tient sa comptabilité selon le plan comptable général, sous réserve des comptes listés ici. Pour tout le reste — achats, locations, assurances, personnel — c'est l'onglet « Plan comptable général » qui fait foi. Les intitulés ci-dessous sont recopiés du règlement. Deux numéros diffèrent entre les deux plans : 657 et 757.",
+  "racines": [
+    {
+      "code": "6",
+      "libelle": "Charges",
+      "enfants": [
+        {
+          "code": "622",
+          "libelle": "Rémunérations d'intermédiaires et honoraires",
+          "enfants": [
+            {
+              "code": "6226",
+              "libelle": "Honoraires",
+              "enfants": [
+                {
+                  "code": "62264",
+                  "libelle": "Honoraires sur legs ou donations destinés à être cédés"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "653",
+          "libelle": "Charges de la générosité du public",
+          "enfants": [{ "code": "6531", "libelle": "Autres charges sur legs ou donations" }]
+        },
+        {
+          "code": "657",
+          "libelle": "Aides financières",
+          "note": "Le plan comptable général réformé utilise ce même numéro pour « Valeurs comptables des immobilisations cédées ». Ne pas confondre.",
+          "enfants": [
+            { "code": "6571", "libelle": "Aides financières octroyées" },
+            { "code": "6572", "libelle": "Quotes-parts de générosité reversée" }
+          ]
+        },
+        { "code": "673", "libelle": "Apports ou affectations en numéraire" },
+        {
+          "code": "675",
+          "libelle": "Valeurs comptables des éléments d'actifs cédés",
+          "note": "Tel que publié au règlement ANC 2018-06. Le plan comptable général a déplacé ce compte vers 657 en 2025 : vérifier ce que retient le règlement ANC 2023-03 avant de s'en servir.",
+          "enfants": [{ "code": "6754", "libelle": "Immobilisations reçues par legs ou donations" }]
+        },
+        {
+          "code": "6816",
+          "libelle": "Dotations pour dépréciations des immobilisations incorporelles et corporelles",
+          "enfants": [
+            {
+              "code": "68164",
+              "libelle": "Dotations pour dépréciation d'actifs reçus par legs ou donations destinés à être cédés"
+            }
+          ]
+        },
+        {
+          "code": "689",
+          "libelle": "Reports en fonds dédiés",
+          "note": "La part non utilisée d'une ressource affectée à la clôture. Elle ressort ensuite en produit par le compte 789 au fur et à mesure du projet.",
+          "enfants": [
+            { "code": "6891", "libelle": "Reports en fonds reportés" },
+            { "code": "6894", "libelle": "Reports en fonds dédiés sur subventions d'exploitation" },
+            {
+              "code": "6895",
+              "libelle": "Reports en fonds dédiés sur contributions financières d'autres organismes"
+            },
+            {
+              "code": "6896",
+              "libelle": "Reports en fonds dédiés sur ressources liées à la générosité du public"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "7",
+      "libelle": "Produits",
+      "enfants": [
+        {
+          "code": "706",
+          "libelle": "Ventes de prestations de services",
+          "enfants": [{ "code": "7063", "libelle": "Parrainages" }]
+        },
+        {
+          "code": "707",
+          "libelle": "Ventes de marchandises",
+          "enfants": [{ "code": "7073", "libelle": "Ventes de dons en nature" }]
+        },
+        {
+          "code": "753",
+          "libelle": "Versements des fondateurs ou consommation de la dotation",
+          "enfants": [
+            { "code": "7531", "libelle": "Versements des fondateurs" },
+            {
+              "code": "7532",
+              "libelle": "Quotes-parts de dotation consomptible virée au compte de résultat"
+            }
+          ]
+        },
+        {
+          "code": "754",
+          "libelle": "Ressources liées à la générosité du public",
+          "enfants": [
+            {
+              "code": "7541",
+              "libelle": "Dons manuels",
+              "enfants": [
+                { "code": "75411", "libelle": "Dons manuels" },
+                { "code": "75412", "libelle": "Abandons de frais par les bénévoles" }
+              ]
+            },
+            { "code": "7542", "libelle": "Mécénats" },
+            {
+              "code": "7543",
+              "libelle": "Legs, donations et assurances-vie",
+              "enfants": [
+                { "code": "75431", "libelle": "Assurances-vie" },
+                { "code": "75432", "libelle": "Legs ou donations" },
+                { "code": "75433", "libelle": "Autres produits sur legs ou donations" }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "755",
+          "libelle": "Contributions financières",
+          "enfants": [
+            { "code": "7551", "libelle": "Contributions financières d'autres organismes" },
+            { "code": "7552", "libelle": "Quotes-parts de générosité reçues" }
+          ]
+        },
+        {
+          "code": "756",
+          "libelle": "Cotisations",
+          "enfants": [
+            { "code": "7561", "libelle": "Cotisations sans contrepartie" },
+            { "code": "7562", "libelle": "Cotisations avec contrepartie" }
+          ]
+        },
+        {
+          "code": "757",
+          "libelle": "Gains de change sur créances et dettes d'exploitation",
+          "note": "Le plan comptable général réformé utilise ce même numéro pour « Produits des cessions d'immobilisations ». Ne pas confondre."
+        },
+        {
+          "code": "775",
+          "libelle": "Produits des cessions d'éléments d'actifs",
+          "note": "Tel que publié au règlement ANC 2018-06. Le plan comptable général a déplacé ce compte vers 757 en 2025 : vérifier ce que retient le règlement ANC 2023-03 avant de s'en servir.",
+          "enfants": [
+            {
+              "code": "7754",
+              "libelle": "Immobilisations reçues en legs ou donations destinées à être cédées"
+            }
+          ]
+        },
+        {
+          "code": "781",
+          "libelle": "Reprises sur amortissements, dépréciations et provisions",
+          "enfants": [
+            {
+              "code": "7816",
+              "libelle": "Reprises sur dépréciations des immobilisations incorporelles et corporelles",
+              "enfants": [
+                {
+                  "code": "78164",
+                  "libelle": "Reprises sur dépréciations d'actifs reçus par legs ou donations destinés à être cédés"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "789",
+          "libelle": "Utilisations de fonds reportés et de fonds dédiés",
+          "enfants": [
+            { "code": "7891", "libelle": "Utilisations de fonds reportés" },
+            {
+              "code": "7894",
+              "libelle": "Utilisations des fonds dédiés sur subventions d'exploitation"
+            },
+            {
+              "code": "7895",
+              "libelle": "Utilisations des fonds dédiés sur contributions financières d'autres organismes"
+            },
+            {
+              "code": "7896",
+              "libelle": "Utilisations des fonds dédiés sur ressources liées à la générosité du public"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "8",
+      "libelle": "Contributions volontaires en nature",
+      "note": "Le bénévolat, les prêts de salle et les dons en nature s'enregistrent en charge (86) et en produit (87) pour le même montant : ils ne changent donc pas le résultat, ils le rendent lisible. Utile pour montrer ce que vaut réellement une convention portée par des bénévoles.",
+      "enfants": [
+        {
+          "code": "86",
+          "libelle": "Emplois des contributions volontaires en nature",
+          "enfants": [
+            { "code": "860", "libelle": "Secours en nature" },
+            { "code": "861", "libelle": "Mises à disposition gratuite de biens" },
+            { "code": "862", "libelle": "Prestations" },
+            { "code": "864", "libelle": "Personnel bénévole" }
+          ]
+        },
+        {
+          "code": "87",
+          "libelle": "Contributions volontaires en nature",
+          "enfants": [
+            { "code": "870", "libelle": "Dons en nature" },
+            { "code": "871", "libelle": "Prestations en nature" },
+            { "code": "875", "libelle": "Bénévolat" }
+          ]
+        }
+      ]
+    }
+  ]
+}
