@@ -5,6 +5,7 @@ import {
   demandeExpiree,
   echangePossiblePourLaCible,
   effectifApresEchange,
+  equipesDuPerimetre,
   seChevauchent,
   type AffectationCandidate,
 } from '../../../../../layers/volunteers/server/utils/echange-creneaux'
@@ -136,5 +137,43 @@ describe('effectifApresEchange', () => {
     const resultat = effectifApresEchange([alice, carole], 1, null)
 
     expect(resultat.map((m) => m.pseudo)).toEqual(['carole'])
+  })
+})
+
+describe('equipesDuPerimetre', () => {
+  /**
+   * Le trou que cette règle referme : on peut tenir un créneau d'une équipe sans y être
+   * rattaché — quelqu'un posé à la main sur un créneau de cuisine sans être inscrit en cuisine.
+   * L'ancien périmètre ne regardait que SES équipes, et cette personne recevait une liste vide :
+   * pas un refus, pas un message. Rien à quoi se raccrocher.
+   */
+  it('AJOUTE l’équipe du créneau offert quand elle n’est pas des siennes', () => {
+    expect(equipesDuPerimetre(['accueil'], 'cuisine')).toEqual(['accueil', 'cuisine'])
+  })
+
+  it('suffit à elle seule quand la personne n’a aucune équipe', () => {
+    // Sans cela, le point d'API rendait une liste vide avant même de chercher.
+    expect(equipesDuPerimetre([], 'cuisine')).toEqual(['cuisine'])
+  })
+
+  it('ne dédouble pas une équipe déjà sienne', () => {
+    // Le résultat part dans un `in` : un doublon ne fausserait rien, mais il se lit mal en trace.
+    expect(equipesDuPerimetre(['cuisine', 'accueil'], 'cuisine')).toEqual(['cuisine', 'accueil'])
+  })
+
+  it('n’élargit rien pour un créneau sans équipe', () => {
+    expect(equipesDuPerimetre(['accueil'], null)).toEqual(['accueil'])
+    expect(equipesDuPerimetre(['accueil'], undefined)).toEqual(['accueil'])
+  })
+
+  it('écarte les identifiants absents ou vides plutôt que de les propager', () => {
+    // Un `in` contenant une chaîne vide ne rend rien, en silence.
+    expect(equipesDuPerimetre([null, '', 'accueil', undefined], '')).toEqual(['accueil'])
+  })
+
+  it('rend une liste vide quand il n’y a vraiment aucune équipe', () => {
+    // C'est le seul cas où le point d'API doit encore court-circuiter.
+    expect(equipesDuPerimetre([], null)).toEqual([])
+    expect(equipesDuPerimetre(null, null)).toEqual([])
   })
 })

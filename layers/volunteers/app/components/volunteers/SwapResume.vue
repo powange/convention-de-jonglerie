@@ -5,16 +5,38 @@
       <UBadge :color="couleurStatut" variant="subtle" size="xs">{{ libelleStatut }}</UBadge>
     </div>
 
-    <!-- Toujours formulé du point de vue de qui lit : « vous cédez / vous recevez ». Nommer les
-         deux personnes obligerait à relire deux fois pour savoir de quel côté on est. -->
-    <div class="flex gap-2 text-gray-600 dark:text-gray-400">
-      <span class="shrink-0 font-medium">{{ t('volunteers.swap_gives') }}</span>
-      <VolunteersCreneauLigne :creneau="creneauCede" :fuseau="fuseau" />
-    </div>
-    <div class="flex gap-2 text-gray-600 dark:text-gray-400">
-      <span class="shrink-0 font-medium">{{ t('volunteers.swap_receives') }}</span>
-      <VolunteersCreneauLigne :creneau="creneauRecu" :fuseau="fuseau" />
-    </div>
+    <!--
+      Une phrase qui dit À QUI appartient chaque créneau, et non deux étiquettes « Cède / Reçoit ».
+      Celles-ci étaient formulées du point de vue du lecteur, mais l'avatar juste au-dessus montre
+      l'AUTRE personne : « Milou » suivi de « Cède » se lisait comme « Milou cède », c'est-à-dire
+      l'inverse. Il fallait connaître la convention pour ne pas se tromper de sens — sur un écran
+      où l'on clique ensuite « Accepter ».
+    -->
+    <p class="text-gray-600 dark:text-gray-400">{{ phraseDIntroduction }}</p>
+
+    <!--
+      La même carte que le planning personnel, plutôt qu'une ligne propre à cet écran : on
+      reconnaît un créneau à sa forme — bordure colorée de l'équipe, horaire barré quand il est
+      décalé, durée à droite. Deux représentations du même objet obligeaient à réapprendre à lire
+      d'un écran à l'autre.
+
+      L'étiquette est AU-DESSUS et non à côté : à côté, elle mangeait la largeur d'une carte déjà
+      dense, et les deux créneaux ne s'alignaient plus.
+    -->
+    <dl class="space-y-2">
+      <div>
+        <dt class="mb-1 font-medium text-gray-600 dark:text-gray-400">
+          {{ t('volunteers.swap_your_slot') }}
+        </dt>
+        <dd><VolunteersTimeSlotCard :time-slot="creneauCede" :fuseau="fuseau" show-duration /></dd>
+      </div>
+      <div>
+        <dt class="mb-1 font-medium text-gray-600 dark:text-gray-400">
+          {{ t('volunteers.swap_their_slot') }}
+        </dt>
+        <dd><VolunteersTimeSlotCard :time-slot="creneauRecu" :fuseau="fuseau" show-duration /></dd>
+      </div>
+    </dl>
   </div>
 </template>
 
@@ -58,6 +80,19 @@ const creneauRecu = computed(() =>
   jeSuisLeDemandeur.value
     ? props.demande.targetAssignment.timeSlot
     : props.demande.requesterAssignment.timeSlot
+)
+
+/**
+ * Qui demande quoi, en toutes lettres.
+ *
+ * Le nom est repris DANS la phrase plutôt que laissé au seul avatar : c'est lui qui lève
+ * l'ambiguïté sur le propriétaire de chaque créneau, et il se lit dans le même mouvement que
+ * l'échange proposé.
+ */
+const phraseDIntroduction = computed(() =>
+  jeSuisLeDemandeur.value
+    ? t('volunteers.swap_sent_sentence', { nom: autre.value.pseudo })
+    : t('volunteers.swap_received_sentence', { nom: autre.value.pseudo })
 )
 
 const libelleStatut = computed(() =>

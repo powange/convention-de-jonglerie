@@ -549,7 +549,6 @@
     "swap_reject": "Tausch ablehnen",
     "swap_sent": "Meine Vorschläge",
     "swap_slot_places": "{places} Freiwillige in dieser Schicht",
-    "swap_slot_untitled": "Schicht ohne Titel",
     "swap_status_accepted": "Tausch genehmigt",
     "swap_status_cancelled": "Zurückgezogen",
     "swap_status_expired": "Abgelaufen",
@@ -634,6 +633,12 @@
       "manage": "Teams",
       "none_yet": "Keinem Team zugeordnet",
       "title": "Organisatoren in Teams"
-    }
+    },
+    "swap_received_sentence": "{nom} möchte eine Schicht mit dir tauschen:",
+    "swap_sent_sentence": "Du schlägst {nom} einen Tausch vor:",
+    "swap_your_slot": "Deine Schicht",
+    "swap_their_slot": "Seine bzw. ihre Schicht",
+    "untitled_slot": "Unbenanntes Zeitfenster",
+    "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):"
   }
 }

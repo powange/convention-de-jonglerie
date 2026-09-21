@@ -63,6 +63,36 @@ export function creneauxProposables(
 }
 
 /**
+ * Dans quelles équipes chercher un échange ?
+ *
+ * Les siennes, **et celle du créneau qu'il offre**. Le second terme n'est pas une précaution : il
+ * répare un trou constaté.
+ *
+ * Le périmètre ne tenait compte que des équipes du DEMANDEUR. Or on peut tenir un créneau d'une
+ * équipe sans y être rattaché — c'est le cas de toute personne posée à la main sur un créneau de
+ * la cuisine sans être inscrite en cuisine. Elle offrait alors un créneau dont l'équipe n'entrait
+ * dans aucune recherche, et recevait une **liste vide** : pas un refus, pas un message, rien à
+ * quoi se raccrocher. L'équipe du créneau offert était pourtant déjà chargée par l'appelant, et
+ * simplement inutilisée.
+ *
+ * Élargir de cette façon n'ouvre rien d'indu : on ne voit que le planning d'une équipe dont on
+ * tient soi-même un créneau, ce qui est un titre au moins aussi solide que d'y être rattaché sans
+ * y avoir d'heure.
+ *
+ * Les identifiants absents sont écartés — un créneau sans équipe n'élargit rien — et les doublons
+ * retirés, l'appelant s'en servant dans un `in`.
+ */
+export function equipesDuPerimetre(
+  sesEquipes: readonly (string | null | undefined)[] | null | undefined,
+  equipeDuCreneauOffert: string | null | undefined
+): string[] {
+  const retenues = [...(sesEquipes ?? []), equipeDuCreneauOffert].filter(
+    (id): id is string => typeof id === 'string' && id.length > 0
+  )
+  return [...new Set(retenues)]
+}
+
+/**
  * Le bénévole visé peut-il, lui, accepter ? Le chevauchement se juge dans les deux sens.
  *
  * Vérifié au moment de répondre et non à l'affichage : entre la proposition et la réponse, la

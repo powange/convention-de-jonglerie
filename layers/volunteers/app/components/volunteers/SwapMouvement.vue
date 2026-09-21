@@ -3,21 +3,18 @@
     <UiUserDisplay :user="personne" size="xs" />
 
     <!-- Deux lignes étiquetées plutôt qu'une flèche : « cède » et « reçoit » se lisent sans
-         convention à deviner, et disent d'où part la personne autant que là où elle va. -->
-    <dl class="mt-2 space-y-1 text-sm">
-      <div class="flex gap-2">
-        <dt class="shrink-0 font-medium text-gray-500">{{ t('volunteers.swap_gives') }}</dt>
-        <dd class="min-w-0 text-gray-700 dark:text-gray-300">
-          <VolunteersCreneauLigne :creneau="cede" :fuseau="fuseau" />
-        </dd>
+         convention à deviner, et disent d'où part la personne autant que là où elle va.
+         La carte est celle du planning : un créneau se reconnaît à sa forme, ici comme ailleurs. -->
+    <dl class="mt-2 space-y-2 text-sm">
+      <div>
+        <dt class="mb-1 font-medium text-gray-500">{{ t('volunteers.swap_gives') }}</dt>
+        <dd><VolunteersTimeSlotCard :time-slot="cede" :fuseau="fuseau" show-duration /></dd>
       </div>
-      <div class="flex gap-2">
-        <dt class="shrink-0 font-medium text-emerald-700 dark:text-emerald-400">
+      <div>
+        <dt class="mb-1 font-medium text-emerald-700 dark:text-emerald-400">
           {{ t('volunteers.swap_receives') }}
         </dt>
-        <dd class="min-w-0 text-gray-700 dark:text-gray-300">
-          <VolunteersCreneauLigne :creneau="recoit" :fuseau="fuseau" />
-        </dd>
+        <dd><VolunteersTimeSlotCard :time-slot="recoit" :fuseau="fuseau" show-duration /></dd>
       </div>
     </dl>
   </div>

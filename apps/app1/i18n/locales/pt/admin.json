@@ -151,7 +151,6 @@
     "change_profile_picture_description": "Carregar ou modificar a foto de perfil deste utilizador",
     "claim_requests": "Pedidos de reivindicação",
     "cleanup_expired_tokens": "Limpeza de tokens expirados",
-    "cleanup_resolved_error_logs": "Limpeza de logs de erro",
     "config": {
       "ai": "Inteligência Artificial",
       "email": "Email",

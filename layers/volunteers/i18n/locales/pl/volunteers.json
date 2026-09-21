@@ -549,7 +549,6 @@
     "swap_reject": "Odrzuć wymianę",
     "swap_sent": "Moje propozycje",
     "swap_slot_places": "{places} wolontariuszy na tym dyżurze",
-    "swap_slot_untitled": "Dyżur bez tytułu",
     "swap_status_accepted": "Wymiana zatwierdzona",
     "swap_status_cancelled": "Wycofana",
     "swap_status_expired": "Wygasła",
@@ -634,6 +633,12 @@
       "manage": "Zespoły",
       "none_yet": "Nieprzypisany do żadnego zespołu",
       "title": "Organizatorzy w zespołach"
-    }
+    },
+    "swap_received_sentence": "{nom} chce zamienić się z tobą dyżurem:",
+    "swap_sent_sentence": "Proponujesz zamianę osobie {nom}:",
+    "swap_your_slot": "Twój dyżur",
+    "swap_their_slot": "Jej lub jego dyżur",
+    "untitled_slot": "Przedział bez nazwy",
+    "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):"
   }
 }

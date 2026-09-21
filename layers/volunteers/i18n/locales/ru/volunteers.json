@@ -549,7 +549,6 @@
     "swap_reject": "Отклонить обмен",
     "swap_sent": "Мои предложения",
     "swap_slot_places": "{places} волонтёров на этой смене",
-    "swap_slot_untitled": "Смена без названия",
     "swap_status_accepted": "Обмен утверждён",
     "swap_status_cancelled": "Отозвана",
     "swap_status_expired": "Истекла",
@@ -634,6 +633,12 @@
       "manage": "Команды",
       "none_yet": "Не прикреплён ни к одной команде",
       "title": "Организаторы в командах"
-    }
+    },
+    "swap_received_sentence": "{nom} хочет обменяться с вами сменой:",
+    "swap_sent_sentence": "Вы предлагаете обмен участнику {nom}:",
+    "swap_your_slot": "Ваша смена",
+    "swap_their_slot": "Его или её смена",
+    "untitled_slot": "Слот без названия",
+    "with_you_on_slot": "С вами на этой смене: | С вами на этой смене ({count}):"
   }
 }

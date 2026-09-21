@@ -549,7 +549,6 @@
     "swap_reject": "Відхилити обмін",
     "swap_sent": "Мої пропозиції",
     "swap_slot_places": "{places} волонтерів на цій зміні",
-    "swap_slot_untitled": "Зміна без назви",
     "swap_status_accepted": "Обмін затверджено",
     "swap_status_cancelled": "Відкликано",
     "swap_status_expired": "Прострочено",
@@ -634,6 +633,12 @@
       "manage": "Команди",
       "none_yet": "Не прикріплений до жодної команди",
       "title": "Організатори в командах"
-    }
+    },
+    "swap_received_sentence": "{nom} хоче обмінятися з вами зміною:",
+    "swap_sent_sentence": "Ви пропонуєте обмін учаснику {nom}:",
+    "swap_your_slot": "Ваша зміна",
+    "swap_their_slot": "Його або її зміна",
+    "untitled_slot": "Слот без назви",
+    "with_you_on_slot": "З вами на цій зміні: | З вами на цій зміні ({count}):"
   }
 }

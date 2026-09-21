@@ -2,7 +2,11 @@
   <div>
     <!-- Le déclencheur porte le choix courant. Un bouton pleine largeur plutôt qu'un `select` :
          il peut montrer l'équipe et la personne, ce qu'une liste déroulante native ne sait pas
-         faire — et c'est justement ce qui manquait pour choisir en connaissance de cause. -->
+         faire — et c'est justement ce qui manquait pour choisir en connaissance de cause.
+
+         Ici seulement, la LIGNE et non la carte : un bouton résume un choix déjà fait, et une
+         carte bordée à l'intérieur d'un bouton se lirait comme une seconde zone cliquable. La
+         liste, elle, emploie bien la carte du planning. -->
     <UButton
       color="neutral"
       variant="outline"
@@ -29,7 +33,7 @@
               :class="{ 'bg-primary-50 dark:bg-primary-950/30': option.id === modelValue }"
               @click="choisir(option.id)"
             >
-              <VolunteersCreneauLigne :creneau="option.creneau" :fuseau="fuseau" />
+              <VolunteersTimeSlotCard :time-slot="option.creneau" :fuseau="fuseau" show-duration />
 
               <!-- Qui tient le créneau : l'information décisive pour choisir avec qui échanger. -->
               <span v-if="option.benevole" class="flex items-center gap-2 text-sm">

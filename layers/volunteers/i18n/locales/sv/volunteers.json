@@ -549,7 +549,6 @@
     "swap_reject": "Avböj bytet",
     "swap_sent": "Mina förslag",
     "swap_slot_places": "{places} volontärer på detta pass",
-    "swap_slot_untitled": "Pass utan titel",
     "swap_status_accepted": "Byte godkänt",
     "swap_status_cancelled": "Tillbakadraget",
     "swap_status_expired": "Utgånget",
@@ -634,6 +633,12 @@
       "manage": "Lag",
       "none_yet": "Inte kopplad till något lag",
       "title": "Arrangörer i lagen"
-    }
+    },
+    "swap_received_sentence": "{nom} vill byta ett pass med dig:",
+    "swap_sent_sentence": "Du föreslår ett byte till {nom}:",
+    "swap_your_slot": "Ditt pass",
+    "swap_their_slot": "Hens pass",
+    "untitled_slot": "Obetitlad plats",
+    "with_you_on_slot": "Tillsammans med dig på detta pass: | Tillsammans med dig på detta pass ({count}):"
   }
 }
