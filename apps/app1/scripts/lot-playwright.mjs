@@ -12,10 +12,13 @@
  * alors qu'ils n'avaient JAMAIS partagé une base, et ils se contredisent sur les réglages de
  * l'unique édition que tout le projet se partage (`fullyParallel: false`).
  *
- * Le découpage ci-dessous est donc une SUBDIVISION de celui d'avant : `gestion-1` — qui portait
- * 27 fichiers sur 54 et 235 s de tests — est coupé en deux, les deux autres lots sont recopiés à
- * l'identique depuis ce qu'ils exécutaient réellement. Subdiviser ne peut que défaire des
+ * Le découpage ci-dessous est donc une SUBDIVISION de celui d'avant, en deux temps : `gestion-1` —
+ * qui portait 27 fichiers sur 54 et 235 s de tests — a été coupé en deux le 20/09, puis
+ * `gestion-2` et `gestion-3` le 21/09, à 78/78 s et 69/68 s. Subdiviser ne peut que défaire des
  * cohabitations, jamais en créer : toute paire de fichiers d'un nouveau lot cohabitait déjà.
+ *
+ * `gestion-2` a été coupé AVEC `gestion-3` et non seul, parce qu'il n'avait que 14 s d'avance sur
+ * lui : seul, il n'aurait rapporté que 22 s avant que `gestion-3` ne devienne le mur à son tour.
  *
  * ⚠️ Cette propriété est la seule raison pour laquelle ce changement est sûr. Un futur
  * rééquilibrage qui déplacerait un fichier d'un lot vers un autre la perdrait, et retomberait sur
