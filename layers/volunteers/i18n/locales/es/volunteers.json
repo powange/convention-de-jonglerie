@@ -639,6 +639,7 @@
     "swap_your_slot": "Tu turno",
     "swap_their_slot": "Su turno",
     "untitled_slot": "Franja sin título",
-    "with_you_on_slot": "Contigo en este turno: | Contigo en este turno ({count}):"
+    "with_you_on_slot": "Contigo en este turno: | Contigo en este turno ({count}):",
+    "swap_pick_person": "Con quién intercambiar:"
   }
 }

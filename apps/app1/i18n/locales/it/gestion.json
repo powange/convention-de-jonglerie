@@ -664,7 +664,10 @@
       "missing_in_list_purchased": "In questa lista, già acquistato.",
       "missing_in_lists": "Liste",
       "shopping_no_match_tags": "Nessun articolo di questa lista porta i tag selezionati.",
-      "shopping_remove_item_confirm": "«{name}» verrà rimosso da questa lista della spesa. Il materiale in magazzino non viene toccato."
+      "shopping_remove_item_confirm": "«{name}» verrà rimosso da questa lista della spesa. Il materiale in magazzino non viene toccato.",
+      "confirm_delete_item_cascade": "Questo oggetto sarà eliminato definitivamente. L’azione è irreversibile. | Questo oggetto e la sua prenotazione saranno eliminati definitivamente — potrebbe averla fatta qualcun altro. | Questo oggetto e le sue {count} prenotazioni saranno eliminati definitivamente — alcune potrebbero averle fatte altre persone.",
+      "loan_group_all": "Tutti i gruppi",
+      "loan_tag_all": "Tutti i tag"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

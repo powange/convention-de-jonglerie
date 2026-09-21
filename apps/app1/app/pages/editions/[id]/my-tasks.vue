@@ -411,7 +411,7 @@ function statusColor(status: TaskStatus): 'neutral' | 'info' | 'success' | 'erro
 
 function formatDeadline(d: string): string {
   try {
-    return formatDateShortMonth(d)
+    return formatDateShortMonth(d, edition.value?.timezone ?? null)
   } catch {
     return d
   }

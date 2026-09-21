@@ -108,6 +108,16 @@ const emit = defineEmits<{
 
 const { formatDateShortMonth } = useDateFormat()
 
+/**
+ * Le fuseau de l'édition : une échéance est une heure de LIEU, et c'est dans ce fuseau qu'elle a
+ * été saisie. L'afficher ailleurs montrerait un autre chiffre que celui tapé.
+ */
+const editionStore = useEditionStore()
+const fuseauEdition = computed(
+  () =>
+    (editionStore.getEditionById(props.editionId) as { timezone?: string | null })?.timezone ?? null
+)
+
 const isOpen = computed({
   get: () => props.open,
   set: (v) => emit('update:open', v),
@@ -149,7 +159,7 @@ const deadlineBadgeColor = computed<'neutral' | 'warning' | 'error'>(() => {
 
 function formatDeadline(d: string): string {
   try {
-    return formatDateShortMonth(d)
+    return formatDateShortMonth(d, fuseauEdition.value)
   } catch {
     return d
   }

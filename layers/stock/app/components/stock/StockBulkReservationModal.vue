@@ -152,6 +152,7 @@
 </template>
 
 <script setup lang="ts">
+import { journeeDans, versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 interface BulkItem {
@@ -183,6 +184,16 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+/**
+ * Le fuseau de l'édition : une réservation de matériel est une heure de LIEU. Même raison que
+ * dans `StockReservationModal`, dont cette modale est la variante en lot.
+ */
+const editionStore = useEditionStore()
+const fuseauEdition = computed(
+  () =>
+    (editionStore.getEditionById(props.editionId) as { timezone?: string | null })?.timezone ?? null
+)
 const isOpen = computed({
   get: () => props.open,
   set: (v) => emit('update:open', v),
@@ -242,7 +253,11 @@ function resetFieldErrors() {
   unavailableItems.value = []
 }
 
-function getDefaultStart(): Date {
+/**
+ * Heure murale `AAAA-MM-JJTHH:MM` de début à proposer, dans le fuseau de l'édition : « minuit »
+ * doit désigner minuit sur place, pas minuit chez qui réserve.
+ */
+function debutParDefaut(): string {
   const now = new Date()
   const candidates = [props.editionSetupStartDate, props.editionStartDate]
   for (const iso of candidates) {
@@ -250,21 +265,26 @@ function getDefaultStart(): Date {
     const d = new Date(iso)
     if (isNaN(d.getTime())) continue
     if (d.getTime() >= now.getTime()) {
-      d.setHours(0, 0, 0, 0)
-      return d
+      return `${journeeDans(d, fuseauEdition.value)}T00:00`
     }
   }
-  return now
+  return versChampLocal(now, fuseauEdition.value)
+}
+
+/** Une heure plus tard, sur place. Le calcul se fait sur l'instant, jamais sur la chaîne. */
+function uneHeureApres(heureLocale: string): string {
+  const instant = versInstant(heureLocale, fuseauEdition.value)
+  if (!instant) return heureLocale
+  return versChampLocal(new Date(new Date(instant).getTime() + 3600_000), fuseauEdition.value)
 }
 
 watch(
   () => props.open,
   (open) => {
     if (open) {
-      const start = getDefaultStart()
-      const end = new Date(start.getTime() + 3600_000)
-      formData.startsAt = start.toISOString()
-      formData.endsAt = end.toISOString()
+      const start = debutParDefaut()
+      formData.startsAt = start
+      formData.endsAt = uneHeureApres(start)
       formData.usage = ''
       formData.location = ''
       formData.mapPin = NONE_PIN
@@ -308,14 +328,21 @@ async function handleSubmit() {
     fieldErrors.value = { location: t('gestion.stock.location_or_pin_required') }
     return
   }
+  // Ancrées sur place avant de partir : « 14:00 » devient un instant daté.
+  const startsAt = versInstant(formData.startsAt, fuseauEdition.value)
+  const endsAt = versInstant(formData.endsAt, fuseauEdition.value)
+  if (!startsAt || !endsAt) {
+    fieldErrors.value = { startsAt: t('errors.required_field') }
+    return
+  }
   saving.value = true
   try {
     await $fetch(`/api/editions/${props.editionId}/stock-reservations/bulk`, {
       method: 'POST',
       body: {
         items: props.items.map((i) => ({ id: i.id, quantity: quantities[i.id] ?? 1 })),
-        startsAt: new Date(formData.startsAt).toISOString(),
-        endsAt: new Date(formData.endsAt).toISOString(),
+        startsAt,
+        endsAt,
         usage: formData.usage.trim(),
         location: formData.location.trim() || null,
         zoneId,

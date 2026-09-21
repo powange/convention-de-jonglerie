@@ -664,7 +664,10 @@
       "missing_in_list_purchased": "På denne liste, allerede købt.",
       "missing_in_lists": "Lister",
       "shopping_no_match_tags": "Ingen vare på denne liste har de valgte tags.",
-      "shopping_remove_item_confirm": "“{name}” fjernes fra denne indkøbsliste. Materiellet på lageret røres ikke."
+      "shopping_remove_item_confirm": "“{name}” fjernes fra denne indkøbsliste. Materiellet på lageret røres ikke.",
+      "confirm_delete_item_cascade": "Denne genstand slettes permanent. Handlingen kan ikke fortrydes. | Denne genstand og dens reservation slettes permanent — den kan være oprettet af en anden. | Denne genstand og dens {count} reservationer slettes permanent — nogle kan være oprettet af andre.",
+      "loan_group_all": "Alle grupper",
+      "loan_tag_all": "Alle tags"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

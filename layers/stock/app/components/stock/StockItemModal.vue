@@ -233,16 +233,47 @@
       </form>
     </template>
     <template #footer>
-      <div class="flex w-full justify-end gap-2">
-        <UButton variant="ghost" color="neutral" @click="isOpen = false">
-          {{ $t('common.cancel') }}
+      <!-- La suppression à GAUCHE, séparée des deux autres : c'est la seule action irréversible
+           du pied, et la placer contre « Enregistrer » invite la main à se tromper d'un pixel.
+           Même disposition que la modale de groupe. -->
+      <div class="flex w-full items-center justify-between gap-2">
+        <UButton
+          v-if="props.item"
+          color="error"
+          variant="ghost"
+          icon="i-heroicons-trash"
+          :loading="deleting"
+          @click="confirmationOuverte = true"
+        >
+          {{ $t('common.delete') }}
         </UButton>
-        <UButton color="primary" :loading="saving" @click="handleSubmit">
-          {{ $t('common.save') }}
-        </UButton>
+        <div v-else />
+
+        <div class="flex gap-2">
+          <UButton variant="ghost" color="neutral" @click="isOpen = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <UButton color="primary" :loading="saving" @click="handleSubmit">
+            {{ $t('common.save') }}
+          </UButton>
+        </div>
       </div>
     </template>
   </UModal>
+
+  <!-- Une vraie modale plutôt qu'un `confirm()` natif — ce que fait encore la modale de groupe.
+       Elle peut annoncer CE QUE LA CASCADE EMPORTE, ce qu'une boîte du navigateur dirait mal :
+       supprimer un objet supprime aussi ses réservations, posées par d'autres. -->
+  <UiConfirmModal
+    v-model="confirmationOuverte"
+    :title="$t('gestion.stock.confirm_delete_item', { name: props.item?.name ?? '' })"
+    :description="descriptionDeSuppression"
+    :confirm-label="$t('common.delete')"
+    confirm-color="error"
+    confirm-icon="i-heroicons-trash"
+    :loading="deleting"
+    @confirm="handleDelete"
+  />
 </template>
 
 <script setup lang="ts">
@@ -261,6 +292,14 @@ interface ResponsableFiche {
 interface StockItemLite {
   id: number
   name: string
+  /**
+   * Le nombre de réservations, tel que l'API le rend.
+   *
+   * Déclaré pour la confirmation de suppression : la base est en cascade, et l'objet emporte ses
+   * réservations — posées par d'autres. Le champ arrivait déjà dans la ligne du tableau, le type
+   * ne le disait simplement pas.
+   */
+  _count?: { reservations?: number } | null
   description: string | null
   quantity: number
   finalQuantity?: number | null
@@ -316,10 +355,55 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:open': [v: boolean]
   saved: []
+  deleted: []
 }>()
 
 const { t } = useI18n()
 const ongletActif = ref('general')
+
+const confirmationOuverte = ref(false)
+const deleting = ref(false)
+
+/**
+ * Ce que la suppression emporte, annoncé plutôt que tu.
+ *
+ * La base est en cascade : l'objet part avec SES RÉSERVATIONS, et celles-ci ont pu être posées
+ * par d'autres personnes. C'est la même règle que pour la suppression d'un groupe, où le
+ * commentaire du code dit la chose exactement : « ce sont les réservations qui font mal ».
+ *
+ * Toutes sont comptées, annulées et rendues comprises : la cascade ne fait pas le tri, et
+ * annoncer moins que ce qui disparaît serait mentir par omission.
+ */
+const descriptionDeSuppression = computed(() => {
+  const reservations = props.item?._count?.reservations ?? 0
+  return t('gestion.stock.confirm_delete_item_cascade', { count: reservations }, reservations)
+})
+
+async function handleDelete() {
+  if (!props.item) return
+  deleting.value = true
+  try {
+    await $fetch(`/api/editions/${props.editionId}/stock-items/${props.item.id}`, {
+      method: 'DELETE',
+    })
+    useToast().add({
+      title: t('common.deleted'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+    confirmationOuverte.value = false
+    emit('deleted')
+    isOpen.value = false
+  } catch (e: any) {
+    useToast().add({
+      title: e?.data?.message || t('common.error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  } finally {
+    deleting.value = false
+  }
+}
 
 /**
  * L'onglet du prêt porte un point quand la case est cochée : sans lui, rien ne dirait depuis
@@ -489,6 +573,14 @@ async function handleSubmit() {
       finalQuantity: formData.finalQuantity === '' ? null : Number(formData.finalQuantity),
       isExternalLoan: formData.isExternalLoan,
       ownerContact: formData.isExternalLoan ? formData.ownerContact.trim() || null : null,
+      // ⚠️ Une DATE seule, pas un horaire — et volontairement ancrée sur UTC.
+      //
+      // `new Date('2026-10-01')` est lu en UTC par la spécification (contrairement à une
+      // date-heure sans fuseau, lue en heure locale), et la relecture reprend les dix premiers
+      // caractères de l'instant : l'aller-retour rend exactement le jour saisi, où que l'on soit.
+      //
+      // L'ancrer sur le fuseau de l'édition, comme on l'a fait pour les réservations, ferait
+      // stocker la veille à 22 h et relire le MAUVAIS JOUR. Ne pas « uniformiser » ceci.
       returnDueAt:
         formData.isExternalLoan && formData.returnDueAt
           ? new Date(formData.returnDueAt).toISOString()

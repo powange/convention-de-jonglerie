@@ -44,10 +44,12 @@
             <button
               v-if="groupe.options.length === 1 && !groupe.options[0]!.benevole"
               type="button"
-              class="w-full rounded-lg text-left hover:bg-gray-50 dark:hover:bg-gray-800/40"
-              :class="{
-                'bg-primary-50 dark:bg-primary-950/30': groupe.options[0]!.id === modelValue,
-              }"
+              class="w-full cursor-pointer rounded-lg text-left ring-inset transition hover:bg-gray-100 hover:ring-2 hover:ring-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 dark:hover:bg-gray-700"
+              :class="
+                groupe.options[0]!.id === modelValue
+                  ? 'bg-primary-50 ring-2 ring-primary-500 dark:bg-primary-950/40'
+                  : ''
+              "
               @click="choisir(groupe.options[0]!.id)"
             >
               <VolunteersTimeSlotCard
@@ -68,7 +70,17 @@
                 {{ t('volunteers.swap_slot_places', { places: groupe.places }) }}
               </p>
 
-              <!-- Avec qui échanger : c'est le seul choix qui reste une fois le créneau lu. -->
+              <!-- Avec qui échanger : c'est le seul choix qui reste une fois le créneau lu.
+
+                   TROIS signaux, et il en a fallu trois. `cursor-pointer` d'abord, qui ne va pas
+                   de soi : la préflight de Tailwind rend aux boutons le curseur par défaut du
+                   navigateur, et le dépôt le repose partout ailleurs (90 occurrences). Un fond au
+                   survol ensuite — mais en thème sombre, une nuance de gris sur un fond déjà très
+                   sombre ne se voit pas, constaté à l'écran. D'où le CONTOUR, qui se lit quel que
+                   soit le fond, et la flèche qui s'éclaire.
+
+                   L'état sélectionné garde ce même contour en permanence : il se distingue du
+                   survol par le fond teinté, pas par la présence du contour. -->
               <p class="mt-2 mb-1 text-xs font-medium text-gray-500">
                 {{ t('volunteers.swap_pick_person') }}
               </p>
@@ -77,13 +89,19 @@
                   v-for="option in groupe.options"
                   :key="option.id"
                   type="button"
-                  class="flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-800/40"
-                  :class="{
-                    'bg-primary-50 dark:bg-primary-950/30': option.id === modelValue,
-                  }"
+                  class="group/personne flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm ring-inset transition hover:bg-gray-100 hover:ring-2 hover:ring-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 dark:hover:bg-gray-700"
+                  :class="
+                    option.id === modelValue
+                      ? 'bg-primary-50 ring-2 ring-primary-500 dark:bg-primary-950/40'
+                      : ''
+                  "
                   @click="choisir(option.id)"
                 >
                   <UiUserDisplay :user="option.benevole!" size="xs" />
+                  <UIcon
+                    name="i-heroicons-arrow-right-circle"
+                    class="ml-auto size-4 shrink-0 text-gray-400 transition-colors group-hover/personne:text-primary-500"
+                  />
                 </button>
               </div>
             </template>

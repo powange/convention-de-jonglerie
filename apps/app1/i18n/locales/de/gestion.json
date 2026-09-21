@@ -664,7 +664,10 @@
       "missing_in_list_purchased": "Auf dieser Liste, bereits gekauft.",
       "missing_in_lists": "Listen",
       "shopping_no_match_tags": "Kein Artikel dieser Liste trägt die ausgewählten Tags.",
-      "shopping_remove_item_confirm": "„{name}“ wird von dieser Einkaufsliste entfernt. Das Material im Bestand bleibt unberührt."
+      "shopping_remove_item_confirm": "„{name}“ wird von dieser Einkaufsliste entfernt. Das Material im Bestand bleibt unberührt.",
+      "confirm_delete_item_cascade": "Dieser Gegenstand wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden. | Dieser Gegenstand und seine Reservierung werden endgültig gelöscht — sie stammt möglicherweise von jemand anderem. | Dieser Gegenstand und seine {count} Reservierungen werden endgültig gelöscht — einige stammen möglicherweise von anderen Personen.",
+      "loan_group_all": "Alle Gruppen",
+      "loan_tag_all": "Alle Tags"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

@@ -639,6 +639,7 @@
     "swap_your_slot": "Twój dyżur",
     "swap_their_slot": "Jej lub jego dyżur",
     "untitled_slot": "Przedział bez nazwy",
-    "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):"
+    "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):",
+    "swap_pick_person": "Z kim się zamienić:"
   }
 }

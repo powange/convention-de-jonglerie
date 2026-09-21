@@ -556,7 +556,7 @@ const finConversionProposee = computed(
 const ouvrirConversion = (entree: EntreeProgramme) => {
   elementAConvertir.value = entree
   cibleConversion.value = conversionsPossibles.value[0]?.value ?? 'spectacle'
-  finConversion.value = entree.fin ? versChampLocal(entree.fin) : ''
+  finConversion.value = entree.fin ? versChampLocal(entree.fin, fuseau.value) : ''
   erreurConversion.value = ''
   conversionOuverte.value = true
 }
@@ -567,9 +567,10 @@ const { execute: executerConversion, isLoading: chargeConversion } = useApiActio
     method: 'POST',
     body: () => ({
       cible: cibleConversion.value,
-      endDateTime: finConversion.value
-        ? parseDateTimeLocal(finConversion.value).toISOString()
-        : null,
+      // Ancrée au fuseau de l'édition, comme le formulaire principal : « 23:00 » désigne
+      // 23 h sur place. `parseDateTimeLocal` la lisait dans le fuseau du NAVIGATEUR, si bien
+      // qu'une conversion faite en déplacement décalait l'heure de fin.
+      endDateTime: versInstant(finConversion.value, fuseau.value) || null,
     }),
     successMessage: { title: t('gestion.program.converted') },
     errorMessages: { default: t('common.error') },

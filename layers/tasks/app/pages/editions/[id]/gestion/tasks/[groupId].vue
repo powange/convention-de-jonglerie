@@ -337,7 +337,17 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { formatDateShortMonth } = useDateFormat()
+
 const editionId = parseInt(route.params.id as string)
+
+/**
+ * Le fuseau de l'édition : une échéance est une heure de LIEU, et c'est dans ce fuseau qu'elle a
+ * été saisie. L'afficher ailleurs montrerait un autre chiffre que celui tapé.
+ */
+const editionStore = useEditionStore()
+const fuseauEdition = computed(
+  () => (editionStore.getEditionById(editionId) as { timezone?: string | null })?.timezone ?? null
+)
 const groupId = computed(() => parseInt(route.params.groupId as string))
 
 /**
@@ -918,7 +928,7 @@ async function changeTaskStatus(taskId: number, fromStatus: TaskStatus, newStatu
 function formatDeadline(d: string | null): string {
   if (!d) return ''
   try {
-    return formatDateShortMonth(d)
+    return formatDateShortMonth(d, fuseauEdition.value)
   } catch {
     return d
   }

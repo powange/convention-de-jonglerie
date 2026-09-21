@@ -457,6 +457,7 @@
         :items="planningItems"
         :start-date="planningStartDate"
         :end-date="planningEndDate"
+        :fuseau="edition?.timezone ?? null"
         @reservation-click="openReservationFromPlanning"
       />
 
@@ -581,6 +582,7 @@
       :markers="markers"
       :site-map-enabled="!!edition?.siteMapEnabled"
       @saved="handleItemSaved"
+      @deleted="handleItemSaved"
     />
 
     <StockTagsModal

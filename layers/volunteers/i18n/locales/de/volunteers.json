@@ -639,6 +639,7 @@
     "swap_your_slot": "Deine Schicht",
     "swap_their_slot": "Seine bzw. ihre Schicht",
     "untitled_slot": "Unbenanntes Zeitfenster",
-    "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):"
+    "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):",
+    "swap_pick_person": "Mit wem tauschen:"
   }
 }

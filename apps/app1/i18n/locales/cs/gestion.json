@@ -664,7 +664,10 @@
       "missing_in_list_purchased": "Na tomto seznamu, již koupeno.",
       "missing_in_lists": "Seznamy",
       "shopping_no_match_tags": "Žádná položka v tomto seznamu nemá vybrané štítky.",
-      "shopping_remove_item_confirm": "„{name}“ bude odebrána z tohoto nákupního seznamu. Vybavení ve skladu zůstane nedotčeno."
+      "shopping_remove_item_confirm": "„{name}“ bude odebrána z tohoto nákupního seznamu. Vybavení ve skladu zůstane nedotčeno.",
+      "confirm_delete_item_cascade": "Tento předmět bude trvale smazán. Tuto akci nelze vrátit zpět. | Tento předmět a jeho rezervace budou trvale smazány — mohl ji vytvořit někdo jiný. | Tento předmět a jeho {count} rezervací budou trvale smazány — některé mohl vytvořit někdo jiný.",
+      "loan_group_all": "Všechny skupiny",
+      "loan_tag_all": "Všechny štítky"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

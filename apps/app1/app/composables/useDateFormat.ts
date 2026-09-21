@@ -1,5 +1,7 @@
 import { toIntlLocale } from '~/utils/locales'
 
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+
 /**
  * Composable pour formatter les dates avec horaires
  */
@@ -49,13 +51,17 @@ export const useDateFormat = () => {
    * « 12/08 » demande de savoir si l'on est en notation française ou américaine ; en colonne,
    * `formatDate` reste préférable parce que ses chiffres s'alignent.
    */
-  const formatDateShortMonth = (dateString: string) => {
+  const formatDateShortMonth = (dateString: string, fuseau?: string | null) => {
     const date = new Date(dateString)
     return date.toLocaleDateString(intlLocale.value, {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
-      timeZone: 'Europe/Paris',
+      // Le fuseau de l'édition, et non `Europe/Paris` codé en dur comme auparavant : une échéance
+      // est une heure de LIEU, et l'heure saisie est désormais ancrée sur place. Ramener
+      // l'affichage à Paris aurait montré un autre chiffre que celui tapé, pour toute convention
+      // hors de France. `fuseauUtilisable` retombe sur la machine si l'édition n'en déclare pas.
+      timeZone: fuseauUtilisable(fuseau),
     })
   }
 

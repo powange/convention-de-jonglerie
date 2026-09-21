@@ -45,12 +45,11 @@
         <div class="flex flex-wrap items-center gap-3">
           <UTabs v-model="ongletActif" :items="onglets" color="primary" :ui="{ list: 'w-auto' }" />
 
-          <!-- Une liste fermée, pas une recherche : les lieux sont écrits à la main, et l'on ne
-               retrouve pas « chez Marie » en tapant « marie ». Elle ne propose que des lieux qui
-               existent, et se vide d'elle-même quand l'onglet n'en a aucun. -->
-          <!-- Deux listes fermées, pas des recherches : lieux et personnes sont écrits à la
+          <!-- Quatre listes fermées, pas des recherches : lieux et personnes sont écrits à la
                main, et l'on ne retrouve pas « chez Marie » en tapant « marie ». Chacune ne
-               propose que ce qui existe dans l'onglet ouvert, et disparaît s'il n'y a rien. -->
+               propose que ce qui existe dans l'onglet ouvert, et disparaît s'il n'y a rien —
+               y compris les groupes et les tags, qui viennent des objets affichés et non du
+               catalogue de l'édition. -->
           <div v-if="lieux.length > 0" class="flex items-center gap-1">
             <USelect
               v-model="lieuChoisi"
@@ -114,6 +113,60 @@
               @click="personneChoisie = undefined"
             />
           </div>
+
+          <!-- Multiples : on prépare une tournée qui ramasse la cuisine ET la scène. Les
+               sélections se cumulent en OU à l'intérieur d'un filtre, et les deux filtres se
+               composent entre eux.
+
+               `USelectMenu` et non `USelect` : seul le premier gère le mode multiple. Même
+               forme que les filtres de la page d'un groupe, pastilles comprises. -->
+          <USelectMenu
+            v-if="groupes.length > 0"
+            v-model="groupesChoisis"
+            :items="optionsGroupes"
+            multiple
+            :placeholder="t('gestion.stock.loan_group_all')"
+            :aria-label="t('gestion.stock.loan_group_all')"
+            class="w-52"
+            :ui="{ content: 'min-w-fit' }"
+          >
+            <template #default="{ modelValue: choisis }">
+              <span v-if="!choisis?.length" class="text-gray-400">
+                {{ t('gestion.stock.loan_group_all') }}
+              </span>
+              <span v-else class="truncate">{{ choisis.map((g) => g.label).join(', ') }}</span>
+            </template>
+          </USelectMenu>
+
+          <USelectMenu
+            v-if="tags.length > 0"
+            v-model="tagsChoisis"
+            :items="optionsTags"
+            multiple
+            :placeholder="t('gestion.stock.loan_tag_all')"
+            :aria-label="t('gestion.stock.loan_tag_all')"
+            class="w-52"
+            :ui="{ content: 'min-w-fit' }"
+          >
+            <!-- Les pastilles dans le champ fermé : on reconnaît un tag à sa couleur avant de
+                 lire son nom, et c'est le composant partagé qui sait la rendre. -->
+            <template #default="{ modelValue: choisis }">
+              <span v-if="!choisis?.length" class="text-gray-400">
+                {{ t('gestion.stock.loan_tag_all') }}
+              </span>
+              <div v-else class="flex flex-wrap gap-1">
+                <StockTagBadge
+                  v-for="tag in choisis"
+                  :key="tag.value"
+                  :tag="{ name: tag.label, color: tag.color }"
+                  size="xs"
+                />
+              </div>
+            </template>
+            <template #item-leading="{ item: option }">
+              <span class="h-3 w-3 rounded-full" :style="{ backgroundColor: option.color }" />
+            </template>
+          </USelectMenu>
         </div>
 
         <!-- Un seul geste, celui de l'onglet ouvert : « à récupérer » ne peut mener qu'à marquer
@@ -176,6 +229,22 @@
               ×{{ row.original.quantity }}
             </UBadge>
           </div>
+        </template>
+
+        <!-- Les tags en lecture seule, contrairement à la page d'un groupe où ils se posent et
+             se retirent : ici on prépare une tournée, on ne trie pas l'inventaire. Le rendu
+             reste celui du composant partagé, pour qu'un même tag se reconnaisse d'un écran à
+             l'autre. -->
+        <template #tags-cell="{ row }">
+          <div v-if="row.original.tags?.length" class="flex flex-wrap gap-1">
+            <StockTagBadge
+              v-for="lien in row.original.tags"
+              :key="lien.tag.id"
+              :tag="lien.tag"
+              size="sm"
+            />
+          </div>
+          <span v-else class="text-gray-400">—</span>
         </template>
 
         <template #groupe-cell="{ row }">
@@ -244,9 +313,16 @@
 
 <script setup lang="ts">
 import { prochaineEtapeEmprunt } from '../../../../../utils/etat-emprunt'
+// Le filtre par tags est celui du reste du module — le même sur la liste d'un groupe et sur la
+// liste de courses. En réécrire un ici aurait créé une seconde définition du même mot, et Nuxt
+// aurait choisi laquelle des deux auto-importer.
+import { filtrerParTags } from '../../../../../utils/filtre-tags-stock'
 import {
   actionsOnglet,
   filtrerParEtape,
+  filtrerParGroupes,
+  groupesDesEmprunts,
+  tagsDesEmprunts,
   lignesOnglet,
   ongletDepuisUrl,
   ongletParDefaut,
@@ -289,6 +365,10 @@ interface EmpruntTableau {
   pickupResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
   returnResponsible: { id: number; pseudo: string; profilePicture?: string | null } | null
   group: { id: number; name: string }
+  // La couleur voyage avec le nom : la pastille et le sélecteur en ont besoin. Facultatif, comme
+  // dans `EmpruntRangeable` — une réponse mise en cache avant que le point d'API ne rende les
+  // étiquettes n'en porte pas.
+  tags?: Array<{ tag: { id: number; name: string; color: string } }> | null
 }
 
 const emprunts = ref<EmpruntTableau[]>([])
@@ -306,6 +386,15 @@ const ongletActif = ref<OngletEmprunts>('a_recuperer')
 
 const lieuChoisi = ref<string | undefined>(undefined)
 const personneChoisie = ref<string | undefined>(undefined)
+/**
+ * Les deux filtres portent des LISTES d'options, et non des identifiants.
+ *
+ * C'est ce qu'attend `USelectMenu` en mode multiple, et c'est déjà la forme retenue par les
+ * filtres de la page d'un groupe (`StockItemFilters`). Garder des identifiants ici aurait
+ * demandé de convertir dans les deux sens à chaque rendu.
+ */
+const groupesChoisis = ref<Array<{ label: string; value: number }>>([])
+const tagsChoisis = ref<Array<{ label: string; value: number; color: string }>>([])
 
 /** Les lignes de l'onglet ouvert, avant filtrage : c'est sur elles que les listes se construisent. */
 const lignesOngletOuvert = computed(() => lignesOnglet(emprunts.value, ongletActif.value))
@@ -313,6 +402,30 @@ const lignesOngletOuvert = computed(() => lignesOnglet(emprunts.value, ongletAct
 /** Lieux et personnes tels qu'ils sont réellement saisis sur les objets de cet onglet. */
 const lieux = computed(() => valeursDEtape(lignesOngletOuvert.value, 'lieu'))
 const personnes = computed(() => personnesDEtape(lignesOngletOuvert.value))
+
+/**
+ * Groupes et tags réellement présents dans l'onglet ouvert.
+ *
+ * Même parti que les deux listes ci-dessus, et non le catalogue de l'édition : un groupe dont
+ * aucun objet n'est emprunté n'a rien à proposer, et le choisir laisserait croire à une panne du
+ * filtre plutôt qu'à une absence.
+ */
+const groupes = computed(() => groupesDesEmprunts(lignesOngletOuvert.value))
+const tags = computed(() => tagsDesEmprunts(lignesOngletOuvert.value))
+
+const optionsGroupes = computed(() =>
+  groupes.value.map((groupe) => ({ label: groupe.name, value: groupe.id }))
+)
+
+/**
+ * La couleur accompagne l'option : c'est à elle qu'on reconnaît un tag.
+ *
+ * Nommée `color` et non `couleur`, comme dans `StockItemFilters` : c'est la forme que
+ * `StockTagBadge` attend, et la traduire ici obligerait à la retraduire à l'affichage.
+ */
+const optionsTags = computed(() =>
+  tags.value.map((tag) => ({ label: tag.name, value: tag.id, color: tag.color }))
+)
 
 /**
  * Les personnes telles que le sélecteur les rend.
@@ -337,7 +450,15 @@ const compteChoisi = computed(
 /** Les lignes affichées. Le tri par colonne prend ensuite le relais. */
 const lignes = computed(() => {
   const parLieu = filtrerParEtape(lignesOngletOuvert.value, 'lieu', lieuChoisi.value)
-  return filtrerParEtape(parLieu, 'qui', personneChoisie.value)
+  const parPersonne = filtrerParEtape(parLieu, 'qui', personneChoisie.value)
+  const parGroupe = filtrerParGroupes(
+    parPersonne,
+    groupesChoisis.value.map((option) => option.value)
+  )
+  return filtrerParTags(
+    parGroupe,
+    tagsChoisis.value.map((option) => option.value)
+  )
 })
 
 /**
@@ -382,9 +503,13 @@ function etatCaseGlobale(table: any): boolean | 'indeterminate' {
 watch(ongletActif, () => {
   selection.value = {}
   // Le lieu aussi : les lieux d'un onglet ne sont pas ceux de l'autre, et garder un choix devenu
-  // introuvable afficherait un tableau vide sans qu'on comprenne pourquoi.
+  // introuvable afficherait un tableau vide sans qu'on comprenne pourquoi. Même raison pour les
+  // groupes et les tags — la liste déroulante, elle, se reconstruit sur le nouvel onglet, si bien
+  // qu'un choix conservé n'y serait même plus visible pour qu'on le retire.
   lieuChoisi.value = undefined
   personneChoisie.value = undefined
+  groupesChoisis.value = []
+  tagsChoisis.value = []
 })
 
 /**
@@ -458,6 +583,25 @@ const colonnes = computed((): TableColumn<any>[] => [
     header: t('gestion.stock.item_group'),
   },
   { id: 'name', accessorKey: 'name', header: t('gestion.stock.item_name') },
+  // Les tags après le nom : ils décrivent l'objet, pas son rangement. La colonne n'apparaît que
+  // si l'onglet en contient — sinon elle occuperait de la largeur pour ne rien dire, sur un
+  // tableau qui en manque déjà.
+  //
+  // Triable par la liste des noms : rassembler « fragile » d'un côté est exactement ce qu'on
+  // cherche en préparant une tournée.
+  ...(tags.value.length > 0
+    ? [
+        {
+          id: 'tags',
+          accessorFn: (ligne: any) =>
+            (ligne.tags ?? [])
+              .map((lien: any) => lien?.tag?.name ?? '')
+              .sort((a: string, b: string) => a.localeCompare(b, 'fr'))
+              .join(' '),
+          header: t('gestion.stock.tags.field_label'),
+        },
+      ]
+    : []),
   // L'échéance de retour ne concerne que ce qu'on a déjà récupéré : sur du matériel qu'on n'est
   // pas encore allé chercher, elle donnerait une date à tenir pour un objet qu'on n'a pas.
   ...(ongletActif.value === 'a_rendre'
