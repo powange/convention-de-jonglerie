@@ -262,7 +262,8 @@
       "severity_critical": "critica",
       "severity_light": "lieve",
       "severity_moderate": "moderata",
-      "severity_severe": "grave"
+      "severity_severe": "grave",
+      "export_count": "{count} pasti"
     },
     "organizers": {
       "access_rights": "Diritti di accesso",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Tesoreria"
       },
-      "title_column": "Ruolo"
+      "title_column": "Ruolo",
+      "export_count": "{count} organizzatori"
     },
     "overview": "Panoramica",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Annulla la restituzione ({count}) | Annulla le restituzioni ({count})",
       "cancel_reservation": "Annulla prenotazione",
       "clear_selection": "Cancella selezione",
-      "columns": "Colonne",
       "confirm_cancel_reservation": "Annullare questa prenotazione?",
       "confirm_delete_group": "Eliminare il gruppo «{name}» e i suoi {count} oggetto/i?",
       "confirm_delete_group_simple": "Eliminare il gruppo «{name}»?",
@@ -500,7 +501,6 @@
       "empty_group": "Nessun oggetto in questo gruppo",
       "empty_state": "Nessun gruppo di magazzino al momento",
       "ends_at": "Fine",
-      "export_pdf": "Scheda d'inventario (PDF)",
       "export_pdf_empty": "Nessun oggetto da esportare",
       "export_pdf_summary": "{objets} oggetti · {comptes} contati · {empruntes} in prestito",
       "external_loan": "Materiale prestato da un esterno",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "«{name}» verrà rimosso da questa lista della spesa. Il materiale in magazzino non viene toccato.",
       "confirm_delete_item_cascade": "Questo oggetto sarà eliminato definitivamente. L’azione è irreversibile. | Questo oggetto e la sua prenotazione saranno eliminati definitivamente — potrebbe averla fatta qualcun altro. | Questo oggetto e le sue {count} prenotazioni saranno eliminati definitivamente — alcune potrebbero averle fatte altre persone.",
       "loan_group_all": "Tutti i gruppi",
-      "loan_tag_all": "Tutti i tag"
+      "loan_tag_all": "Tutti i tag",
+      "export_pdf_filtered_empty": "Nessun oggetto corrisponde ai filtri impostati",
+      "export_pdf_extract": "estratto filtrato: {affiches} oggetti su {total}",
+      "filter_no_results": "Nessun oggetto corrisponde ai filtri impostati"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",

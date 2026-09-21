@@ -262,7 +262,8 @@
       "severity_critical": "kritisk",
       "severity_light": "lindrig",
       "severity_moderate": "måttlig",
-      "severity_severe": "svår"
+      "severity_severe": "svår",
+      "export_count": "{count} måltider"
     },
     "organizers": {
       "access_rights": "Åtkomsträttigheter",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Ekonomi"
       },
-      "title_column": "Titel"
+      "title_column": "Titel",
+      "export_count": "{count} arrangörer"
     },
     "overview": "Översikt",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Ångra återlämningen ({count}) | Ångra återlämningarna ({count})",
       "cancel_reservation": "Avbryt bokning",
       "clear_selection": "Rensa val",
-      "columns": "Kolumner",
       "confirm_cancel_reservation": "Avbryt denna bokning?",
       "confirm_delete_group": "Ta bort gruppen ”{name}” och dess {count} föremål?",
       "confirm_delete_group_simple": "Ta bort gruppen ”{name}”?",
@@ -500,7 +501,6 @@
       "empty_group": "Inga föremål i denna grupp",
       "empty_state": "Inga lagergrupper ännu",
       "ends_at": "Slutar",
-      "export_pdf": "Inventarielista (PDF)",
       "export_pdf_empty": "Inget föremål att exportera",
       "export_pdf_summary": "{objets} föremål · {comptes} räknade · {empruntes} lånade",
       "external_loan": "Material lånat av extern",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "”{name}” tas bort från den här inköpslistan. Materialet i lagret påverkas inte.",
       "confirm_delete_item_cascade": "Det här föremålet raderas permanent. Åtgärden kan inte ångras. | Det här föremålet och dess reservation raderas permanent — den kan ha gjorts av någon annan. | Det här föremålet och dess {count} reservationer raderas permanent — några kan ha gjorts av andra.",
       "loan_group_all": "Alla grupper",
-      "loan_tag_all": "Alla taggar"
+      "loan_tag_all": "Alla taggar",
+      "export_pdf_filtered_empty": "Inga föremål matchar de valda filtren",
+      "export_pdf_extract": "filtrerat utdrag: {affiches} av {total} föremål",
+      "filter_no_results": "Inga föremål matchar de valda filtren"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

@@ -640,6 +640,11 @@
     "swap_their_slot": "Jeho či její směna",
     "untitled_slot": "Slot bez názvu",
     "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):",
-    "swap_pick_person": "S kým si vyměnit:"
+    "swap_pick_person": "S kým si vyměnit:",
+    "export_applications_title": "Přihlášky dobrovolníků",
+    "export_count": "{count} přihlášek",
+    "export_application_date": "Datum přihlášky",
+    "export_arrival": "Příjezd",
+    "export_departure": "Odjezd"
   }
 }

@@ -640,6 +640,11 @@
     "swap_their_slot": "Their shift",
     "untitled_slot": "Unnamed slot",
     "with_you_on_slot": "With you on this shift: | With you on this shift ({count}):",
-    "swap_pick_person": "Who to swap with:"
+    "swap_pick_person": "Who to swap with:",
+    "export_applications_title": "Volunteer applications",
+    "export_count": "{count} applications",
+    "export_application_date": "Application date",
+    "export_arrival": "Arrival",
+    "export_departure": "Departure"
   }
 }

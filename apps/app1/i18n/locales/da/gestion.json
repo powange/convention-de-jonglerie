@@ -262,7 +262,8 @@
       "severity_critical": "kritisk",
       "severity_light": "let",
       "severity_moderate": "moderat",
-      "severity_severe": "alvorlig"
+      "severity_severe": "alvorlig",
+      "export_count": "{count} måltider"
     },
     "organizers": {
       "access_rights": "Adgangsrettigheder",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Økonomi"
       },
-      "title_column": "Titel"
+      "title_column": "Titel",
+      "export_count": "{count} arrangører"
     },
     "overview": "Oversigt",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Fortryd aflevering ({count}) | Fortryd afleveringer ({count})",
       "cancel_reservation": "Annullér reservation",
       "clear_selection": "Ryd valg",
-      "columns": "Kolonner",
       "confirm_cancel_reservation": "Annullér denne reservation?",
       "confirm_delete_group": "Slet gruppen »{name}« og dens {count} genstand(e)?",
       "confirm_delete_group_simple": "Slet gruppen »{name}«?",
@@ -500,7 +501,6 @@
       "empty_group": "Ingen genstande i denne gruppe",
       "empty_state": "Ingen lagergrupper endnu",
       "ends_at": "Slutter",
-      "export_pdf": "Inventarliste (PDF)",
       "export_pdf_empty": "Ingen genstand at eksportere",
       "export_pdf_summary": "{objets} genstande · {comptes} talt · {empruntes} lånt",
       "external_loan": "Materiale udlånt af en ekstern",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "“{name}” fjernes fra denne indkøbsliste. Materiellet på lageret røres ikke.",
       "confirm_delete_item_cascade": "Denne genstand slettes permanent. Handlingen kan ikke fortrydes. | Denne genstand og dens reservation slettes permanent — den kan være oprettet af en anden. | Denne genstand og dens {count} reservationer slettes permanent — nogle kan være oprettet af andre.",
       "loan_group_all": "Alle grupper",
-      "loan_tag_all": "Alle tags"
+      "loan_tag_all": "Alle tags",
+      "export_pdf_filtered_empty": "Ingen genstande matcher de valgte filtre",
+      "export_pdf_extract": "filtreret udtræk: {affiches} af {total} genstande",
+      "filter_no_results": "Ingen genstande matcher de valgte filtre"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

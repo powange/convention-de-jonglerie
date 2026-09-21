@@ -2,14 +2,18 @@ import { apparenceEmplacement, libelleEmplacement } from './apparence-emplacemen
 import { etatEmprunt } from './etat-emprunt'
 
 /**
- * La fiche d'inventaire d'un groupe, préparée pour l'impression.
+ * L'inventaire d'un groupe, préparé pour en sortir — sur papier ou dans un tableur.
  *
- * Elle existe pour les moments où l'application ne sert à rien : le hangar sans réseau, le camion
- * qu'on charge, la caisse qu'on ouvre. Ce qu'on emporte sur papier n'est donc pas une copie de
- * l'écran — c'est ce qui aide à retrouver un objet et à noter ce qu'on a trouvé.
+ * Il existe pour les moments où l'application ne sert à rien : le hangar sans réseau, le camion
+ * qu'on charge, la caisse qu'on ouvre. Ce qu'on emporte n'est donc pas une copie de l'écran —
+ * c'est ce qui aide à retrouver un objet et à noter ce qu'on a trouvé.
  *
  * Ce qui sort du site se décide ici, pas dans le code de mise en page : une fiche imprimée ne se
  * rattrape pas, et la colonne qu'on oublie coûte un aller-retour au local.
+ *
+ * Ces lignes ne doivent RIEN au format : chaque colonne est déjà réduite en texte, et les deux
+ * exports les consomment telles quelles. C'est ce qui garantit que la feuille et le fichier
+ * disent la même chose — le fichier n'est pas une seconde lecture des mêmes objets.
  */
 
 /** Un objet, tel que la page le tient. */
@@ -30,7 +34,7 @@ export interface ObjetInventaire {
 /** Une ligne de la fiche, chaque colonne déjà réduite en texte. */
 export interface LigneInventaire {
   nom: string
-  /** La quantité théorique, en texte parce qu'une fiche imprimée n'aligne que du texte. */
+  /** La quantité théorique, en texte : une fiche imprimée comme une cellule n'alignent que ça. */
   quantite: string
   emplacement: string
   tags: string
@@ -41,14 +45,14 @@ export interface LigneInventaire {
 }
 
 /**
- * Les lignes à imprimer, dans l'ordre reçu.
+ * Les lignes à exporter, dans l'ordre reçu.
  *
  * L'ordre est celui de l'écran, et c'est voulu : on parcourt les caisses dans l'ordre où elles
  * sont rangées, et une fiche qui trierait autrement obligerait à chercher chaque ligne.
  *
  * Un objet sans nom est écarté — il n'aurait rien à porter dans la colonne qu'on lit en premier.
  */
-export function preparerInventairePourPdf(objets: ObjetInventaire[]): LigneInventaire[] {
+export function preparerInventairePourExport(objets: ObjetInventaire[]): LigneInventaire[] {
   return objets
     .map((objet) => ({
       nom: (objet.name ?? '').trim(),
@@ -96,11 +100,12 @@ export function resumeInventaire(lignes: LigneInventaire[]): ResumeInventaire {
  *
  * Même forme que la FAQ : accents retirés, ponctuation remplacée par un tiret. Le groupe et
  * l'édition y figurent tous deux — on imprime plusieurs groupes d'affilée, et trois fichiers
- * appelés `inventaire.pdf` dans un dossier de téléchargements ne se distinguent plus.
+ * appelés de la même façon dans un dossier de téléchargements ne se distinguent plus.
  */
 export function nomFichierInventaire(
   nomGroupe: string | null | undefined,
   nomEdition?: string | null,
+  extension: 'pdf' | 'csv' = 'pdf',
   prefixe = 'inventaire'
 ): string {
   const morceaux = [nomEdition, nomGroupe]
@@ -116,5 +121,6 @@ export function nomFichierInventaire(
 
   // Composé plutôt qu'écrit d'une pièce : une chaîne pointée littérale se fait prendre pour une
   // clé de traduction par l'analyse i18n, qui la signale alors comme manquante.
-  return morceaux.length > 0 ? `${prefixe}-${morceaux.join('-')}.pdf` : `${prefixe}.pdf`
+  const suffixe = `.${extension}`
+  return morceaux.length > 0 ? `${prefixe}-${morceaux.join('-')}${suffixe}` : `${prefixe}${suffixe}`
 }

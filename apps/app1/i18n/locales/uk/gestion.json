@@ -262,7 +262,8 @@
       "severity_critical": "критична",
       "severity_light": "легка",
       "severity_moderate": "помірна",
-      "severity_severe": "тяжка"
+      "severity_severe": "тяжка",
+      "export_count": "{count} прийомів їжі"
     },
     "organizers": {
       "access_rights": "Права доступу",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Фінанси"
       },
-      "title_column": "Посада"
+      "title_column": "Посада",
+      "export_count": "{count} організаторів"
     },
     "overview": "Огляд",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Скасувати повернення ({count}) | Скасувати повернення ({count})",
       "cancel_reservation": "Скасувати бронювання",
       "clear_selection": "Очистити вибір",
-      "columns": "Стовпці",
       "confirm_cancel_reservation": "Скасувати це бронювання?",
       "confirm_delete_group": "Видалити групу «{name}» та її {count} предмет(ів)?",
       "confirm_delete_group_simple": "Видалити групу «{name}»?",
@@ -500,7 +501,6 @@
       "empty_group": "У цій групі немає предметів",
       "empty_state": "Поки що немає груп складу",
       "ends_at": "Кінець",
-      "export_pdf": "Інвентарна відомість (PDF)",
       "export_pdf_empty": "Немає предметів для експорту",
       "export_pdf_summary": "{objets} предметів · {comptes} пораховано · {empruntes} позичено",
       "external_loan": "Матеріал, позичений ззовні",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "«{name}» буде вилучено з цього списку покупок. Саме обладнання на складі не змінюється.",
       "confirm_delete_item_cascade": "Цей предмет буде видалено назавжди. Цю дію неможливо скасувати. | Цей предмет і його бронювання буде видалено назавжди — його міг створити хтось інший. | Цей предмет і його {count} бронювань буде видалено назавжди — деякі міг створити хтось інший.",
       "loan_group_all": "Усі групи",
-      "loan_tag_all": "Усі мітки"
+      "loan_tag_all": "Усі мітки",
+      "export_pdf_filtered_empty": "Жоден предмет не відповідає заданим фільтрам",
+      "export_pdf_extract": "відфільтрована вибірка: {affiches} з {total} предметів",
+      "filter_no_results": "Жоден предмет не відповідає заданим фільтрам"
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

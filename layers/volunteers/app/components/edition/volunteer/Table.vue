@@ -193,52 +193,31 @@
           />
         </div>
       </div>
-
-      <UDropdownMenu
-        :items="
-          tableRef?.tableApi
-            ?.getAllColumns()
-            .filter((column: any) => column.getCanHide())
-            .map((column: any) => ({
-              label: getColumnLabel(column.id),
-              type: 'checkbox' as const,
-              checked: column.getIsVisible(),
-              onUpdateChecked(checked: boolean) {
-                tableRef?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-              },
-              onSelect(e?: Event) {
-                e?.preventDefault()
-              },
-            }))
-        "
-      >
-        <UButton
-          icon="i-heroicons-view-columns"
-          color="neutral"
-          size="md"
-          variant="soft"
-          trailing-icon="i-heroicons-chevron-down"
-          class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
-        >
-          <span class="hidden sm:inline">{{ t('volunteers.columns') }}</span>
-        </UButton>
-      </UDropdownMenu>
     </div>
     <div
       class="flex justify-between items-center gap-2 border border-accented border-b-0 px-4 py-2 bg-elevated"
     >
       <span class="text-xs text-gray-500 italic">{{ $t('common.sort_tip') }}</span>
-      <UButton
-        size="md"
-        color="neutral"
-        variant="soft"
-        icon="i-heroicons-arrow-down-tray"
-        :loading="exportingApplications"
-        class="whitespace-nowrap sm:!text-sm sm:!px-3 sm:!py-2"
-        @click="exportApplications"
-      >
-        <span class="hidden sm:inline">{{ t('volunteers.export') }}</span>
-      </UButton>
+      <div class="flex items-center gap-2">
+        <!-- Le choix des colonnes vient de la barre de filtres, où il vivait jusqu'ici. Il se
+             place à côté de l'export parce que les deux répondent à la même question : ce tableau
+             montre plus — ou moins — que ce dont j'ai besoin. Choisir, puis emporter. -->
+        <UiColumnsMenu
+          size="md"
+          variant="soft"
+          :label="t('volunteers.columns')"
+          :table-api="tableRef?.tableApi"
+          :libelle="getColumnLabel"
+        />
+
+        <UiExportMenu
+          size="md"
+          variant="soft"
+          :label="t('volunteers.export')"
+          :on-csv="() => exportApplications('csv')"
+          :on-pdf="() => exportApplications('pdf')"
+        />
+      </div>
     </div>
 
     <UContextMenu :items="items">
@@ -588,12 +567,15 @@ import {
   requiresEmergencyContact,
 } from '~/utils/allergy-severity'
 import { formatDateRange } from '~/utils/date'
+import { exporterTableauEnPdf } from '~/utils/export-pdf-tableau'
+import { telechargerFichier } from '~/utils/telechargement'
 import {
   updateVolunteerApplication,
   updateVolunteerApplicationStatus,
   assignVolunteerTeams,
 } from '~/utils/volunteer-application-api'
 
+import { candidaturesEnCsv, type CandidatureExportable } from '../../../utils/export-candidatures'
 import {
   filtresDepuisUrl,
   pageDepuisUrl,
@@ -607,6 +589,8 @@ import {
 
 import type { ContextMenuItem, TableColumn, TableRow } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
+
+import { nomDeFichierCsv } from '~~/shared/utils/csv'
 
 interface Props {
   volunteersInfo: any
@@ -623,7 +607,7 @@ const emit = defineEmits<{
 
 const props = defineProps<Props>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const { formatDateTimeWithGranularity } = useDateFormat()
 const { teams: volunteerTeams } = useVolunteerTeams(props.editionId)
@@ -1151,7 +1135,17 @@ const confirmTeamsModal = async () => {
   }
 }
 
-const exportApplications = async () => {
+/**
+ * L'export des candidatures.
+ *
+ * Le fichier s'écrit ICI et non sur le serveur, où ses vingt-six en-têtes et toutes ses valeurs
+ * étaient figés en français. Le navigateur a `t()`, donc les treize langues — et le vocabulaire
+ * devient celui des colonnes qu'on vient de lire.
+ *
+ * Le serveur reste indispensable pour autre chose : il rend TOUT ce que les filtres laissent
+ * passer, quand le tableau n'en montre qu'une page.
+ */
+const exportApplications = async (format: 'csv' | 'pdf') => {
   exportingApplications.value = true
   try {
     // Mêmes filtres et même tri que la liste, par construction : ce qu'on exporte est ce qu'on
@@ -1160,15 +1154,44 @@ const exportApplications = async () => {
       parametresDesCandidatures(filtresCourants(), sorting.value, { usage: 'export' })
     )
 
-    const url = `/api/editions/${props.editionId}/volunteers/applications?${queryString}`
+    const reponse = await $fetch<{ data: { applications: CandidatureExportable[] } }>(
+      `/api/editions/${props.editionId}/volunteers/applications?${queryString}`
+    )
+    const candidatures = reponse?.data?.applications ?? []
 
-    // Télécharger le fichier
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `candidatures-benevoles-edition-${props.editionId}.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    // Les heures à l'heure du LIEU : une candidature déposée à 23 h à Montréal ne doit pas
+    // s'écrire au lendemain parce que le fichier a été ouvert à Paris.
+    const formatDesDates = {
+      locale: locale.value,
+      fuseau: props.edition?.timezone ?? null,
+    }
+    const nomDeBase = `candidatures-benevoles-edition-${props.editionId}`
+
+    if (format === 'csv') {
+      telechargerFichier(
+        nomDeFichierCsv(nomDeBase),
+        candidaturesEnCsv(candidatures, t, formatDesDates),
+        'text/csv;charset=utf-8'
+      )
+    } else {
+      // Vingt-six colonnes : le paysage ne suffit pas, et rétrécir la police rendrait la feuille
+      // illisible. On imprime donc les colonnes qu'on EMPORTE — de quoi appeler quelqu'un et
+      // savoir ce qu'il a annoncé — le fichier tableur restant là pour tout le reste.
+      await exporterTableauEnPdf({
+        titre: t('volunteers.export_applications_title'),
+        sousTitre: [props.edition?.convention?.name, props.edition?.name]
+          .filter(Boolean)
+          .join(' - '),
+        mention: `${new Date().toLocaleDateString(locale.value)} — ${t('volunteers.export_count', {
+          count: candidatures.length,
+        })}`,
+        entetes: entetesDesCandidatures(t, COLONNES_A_IMPRIMER),
+        lignes: candidatures.map((candidature) =>
+          ligneDUneCandidature(candidature, t, formatDesDates, COLONNES_A_IMPRIMER)
+        ),
+        nomFichier: nomDeBase,
+      })
+    }
 
     toast.add({
       title: t('common.export_success'),

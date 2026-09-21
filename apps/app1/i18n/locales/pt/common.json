@@ -196,7 +196,9 @@
     "expand": "Expandir",
     "volunteers": "Voluntários",
     "organizers": "Organizadores",
-    "export_csv": "Exportar para CSV"
+    "export_csv": "Exportar para CSV",
+    "export_pdf": "Exportar em PDF",
+    "export": "Exportar"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

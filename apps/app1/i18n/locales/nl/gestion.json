@@ -262,7 +262,8 @@
       "severity_critical": "kritiek",
       "severity_light": "licht",
       "severity_moderate": "matig",
-      "severity_severe": "ernstig"
+      "severity_severe": "ernstig",
+      "export_count": "{count} maaltijden"
     },
     "organizers": {
       "access_rights": "Toegangsrechten",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Financiën"
       },
-      "title_column": "Titel"
+      "title_column": "Titel",
+      "export_count": "{count} organisatoren"
     },
     "overview": "Overzicht",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Teruggave ongedaan maken ({count}) | Teruggaven ongedaan maken ({count})",
       "cancel_reservation": "Reservering annuleren",
       "clear_selection": "Selectie wissen",
-      "columns": "Kolommen",
       "confirm_cancel_reservation": "Deze reservering annuleren?",
       "confirm_delete_group": "Groep „{name}” en zijn {count} voorwerp(en) verwijderen?",
       "confirm_delete_group_simple": "Groep „{name}” verwijderen?",
@@ -500,7 +501,6 @@
       "empty_group": "Geen voorwerpen in deze groep",
       "empty_state": "Nog geen voorraadgroepen",
       "ends_at": "Einde",
-      "export_pdf": "Inventarislijst (PDF)",
       "export_pdf_empty": "Geen item om te exporteren",
       "export_pdf_summary": "{objets} items · {comptes} geteld · {empruntes} geleend",
       "external_loan": "Materiaal geleend van extern",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "‘{name}’ wordt van deze boodschappenlijst verwijderd. Het materiaal in de voorraad blijft ongemoeid.",
       "confirm_delete_item_cascade": "Dit voorwerp wordt definitief verwijderd. Deze actie kan niet ongedaan worden gemaakt. | Dit voorwerp en zijn reservering worden definitief verwijderd — die kan door iemand anders zijn gemaakt. | Dit voorwerp en zijn {count} reserveringen worden definitief verwijderd — sommige kunnen door anderen zijn gemaakt.",
       "loan_group_all": "Alle groepen",
-      "loan_tag_all": "Alle tags"
+      "loan_tag_all": "Alle tags",
+      "export_pdf_filtered_empty": "Geen enkel voorwerp voldoet aan de ingestelde filters",
+      "export_pdf_extract": "gefilterd uittreksel: {affiches} van {total} voorwerpen",
+      "filter_no_results": "Geen enkel voorwerp voldoet aan de ingestelde filters"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

@@ -196,7 +196,9 @@
     "expand": "Espandi",
     "volunteers": "Volontari",
     "organizers": "Organizzatori",
-    "export_csv": "Esporta in CSV"
+    "export_csv": "Esporta in CSV",
+    "export_pdf": "Esporta in PDF",
+    "export": "Esporta"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

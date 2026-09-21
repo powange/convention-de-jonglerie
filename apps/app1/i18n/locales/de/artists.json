@@ -191,7 +191,6 @@
       "max_required_with_actual": "Ein Maximum ist erforderlich, solange ein tatsächlicher Betrag angegeben ist"
     },
     "view_qr_code": "Mein QR-Code",
-    "export_pdf": "PDF-Export",
     "export_pdf_error": "PDF konnte nicht erstellt werden"
   }
 }

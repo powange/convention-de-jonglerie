@@ -272,7 +272,8 @@
         "remove_error": "Le retrait du droit au repas a échoué",
         "remove_forbidden": "Droits insuffisants pour modifier cette source",
         "load_error": "Erreur lors du chargement des doublons"
-      }
+      },
+      "export_count": "{count} repas"
     },
     "organizers": {
       "access_rights": "Droits d'accès",
@@ -305,6 +306,7 @@
       "page_description": "Gérer les organisateurs de la convention et leurs droits d'accès",
       "per_edition_rights": "Droits par édition",
       "present_on_edition": "Organisateurs présents sur l'édition",
+      "export_count": "{count} organisateurs",
       "present_on_edition_description": "Gérer les organisateurs ayant un accès à cette édition",
       "remove_from_edition_error": "Impossible de retirer l'organisateur de l'édition",
       "removed_from_edition": "Organisateur retiré de l'édition avec succès",
@@ -487,7 +489,6 @@
       "bulk_unmark_returned": "Annuler le retour ({count}) | Annuler les retours ({count})",
       "cancel_reservation": "Annuler la réservation",
       "clear_selection": "Effacer la sélection",
-      "columns": "Colonnes",
       "confirm_cancel_reservation": "Annuler cette réservation ?",
       "confirm_delete_group": "Supprimer le groupe « {name} » et ses {objets} objet(s) ? Cette action est irréversible. | Supprimer le groupe « {name} » ? Ses {objets} objet(s) et {count} réservation seront définitivement supprimés — elle a pu être posée par quelqu’un d’autre. | Supprimer le groupe « {name} » ? Ses {objets} objet(s) et {count} réservations seront définitivement supprimés — certaines ont pu être posées par d’autres personnes.",
       "confirm_delete_group_simple": "Supprimer le groupe « {name} » ?",
@@ -510,8 +511,9 @@
       "empty_group": "Aucun objet dans ce groupe",
       "empty_state": "Aucun groupe de stock pour le moment",
       "ends_at": "Fin",
-      "export_pdf": "Fiche d'inventaire (PDF)",
       "export_pdf_empty": "Aucun objet à exporter",
+      "export_pdf_filtered_empty": "Aucun objet ne correspond aux filtres posés",
+      "export_pdf_extract": "extrait filtré : {affiches} objets sur {total}",
       "export_pdf_summary": "{objets} objets · {comptes} comptés · {empruntes} empruntés",
       "external_loan": "Matériel prêté par un externe",
       "external_loan_help": "Cochez si le matériel ne vous appartient pas et doit être rendu à son propriétaire.",

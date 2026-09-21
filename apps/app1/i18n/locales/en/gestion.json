@@ -262,7 +262,8 @@
       "severity_critical": "critical",
       "severity_light": "mild",
       "severity_moderate": "moderate",
-      "severity_severe": "severe"
+      "severity_severe": "severe",
+      "export_count": "{count} meals"
     },
     "organizers": {
       "access_rights": "Access rights",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Treasury"
       },
-      "title_column": "Title"
+      "title_column": "Title",
+      "export_count": "{count} organizers"
     },
     "overview": "Overview",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Undo return ({count}) | Undo returns ({count})",
       "cancel_reservation": "Cancel reservation",
       "clear_selection": "Clear selection",
-      "columns": "Columns",
       "confirm_cancel_reservation": "Cancel this reservation?",
       "confirm_delete_group": "Delete the group \"{name}\" and its {count} item(s)?",
       "confirm_delete_group_simple": "Delete the group \"{name}\"?",
@@ -500,7 +501,6 @@
       "empty_group": "No items in this group",
       "empty_state": "No stock groups yet",
       "ends_at": "Ends",
-      "export_pdf": "Inventory sheet (PDF)",
       "export_pdf_empty": "No item to export",
       "export_pdf_summary": "{objets} items · {comptes} counted · {empruntes} borrowed",
       "external_loan": "Borrowed material",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "“{name}” will be removed from this shopping list. The stock item itself is left untouched.",
       "confirm_delete_item_cascade": "This item will be permanently deleted. This action cannot be undone. | This item and its reservation will be permanently deleted — it may have been made by someone else. | This item and its {count} reservations will be permanently deleted — some may have been made by other people.",
       "loan_group_all": "All groups",
-      "loan_tag_all": "All tags"
+      "loan_tag_all": "All tags",
+      "export_pdf_filtered_empty": "No item matches the filters applied",
+      "export_pdf_extract": "filtered extract: {affiches} of {total} items",
+      "filter_no_results": "No item matches the filters applied"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

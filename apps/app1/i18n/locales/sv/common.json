@@ -196,7 +196,9 @@
     "expand": "Fäll ut",
     "volunteers": "Volontärer",
     "organizers": "Arrangörer",
-    "export_csv": "Exportera till CSV"
+    "export_csv": "Exportera till CSV",
+    "export_pdf": "Exportera som PDF",
+    "export": "Exportera"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

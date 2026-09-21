@@ -640,6 +640,11 @@
     "swap_their_slot": "Il suo turno",
     "untitled_slot": "Slot senza titolo",
     "with_you_on_slot": "Con te in questo turno: | Con te in questo turno ({count}):",
-    "swap_pick_person": "Con chi scambiare:"
+    "swap_pick_person": "Con chi scambiare:",
+    "export_applications_title": "Candidature dei volontari",
+    "export_count": "{count} candidature",
+    "export_application_date": "Data di candidatura",
+    "export_arrival": "Arrivo",
+    "export_departure": "Partenza"
   }
 }

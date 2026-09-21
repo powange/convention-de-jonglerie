@@ -262,7 +262,8 @@
       "severity_critical": "crítica",
       "severity_light": "ligeira",
       "severity_moderate": "moderada",
-      "severity_severe": "grave"
+      "severity_severe": "grave",
+      "export_count": "{count} refeições"
     },
     "organizers": {
       "access_rights": "Direitos de acesso",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Tesouraria"
       },
-      "title_column": "Cargo"
+      "title_column": "Cargo",
+      "export_count": "{count} organizadores"
     },
     "overview": "Visão geral",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Anular a devolução ({count}) | Anular as devoluções ({count})",
       "cancel_reservation": "Cancelar reserva",
       "clear_selection": "Limpar seleção",
-      "columns": "Colunas",
       "confirm_cancel_reservation": "Cancelar esta reserva?",
       "confirm_delete_group": "Eliminar o grupo «{name}» e os seus {count} objeto(s)?",
       "confirm_delete_group_simple": "Eliminar o grupo «{name}»?",
@@ -500,7 +501,6 @@
       "empty_group": "Nenhum objeto neste grupo",
       "empty_state": "Ainda não há grupos de estoque",
       "ends_at": "Fim",
-      "export_pdf": "Ficha de inventário (PDF)",
       "export_pdf_empty": "Nenhum objeto para exportar",
       "export_pdf_summary": "{objets} objetos · {comptes} contados · {empruntes} emprestados",
       "external_loan": "Material emprestado por um externo",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "«{name}» será retirado desta lista de compras. O material do stock não é afetado.",
       "confirm_delete_item_cascade": "Este objeto será eliminado definitivamente. Esta ação é irreversível. | Este objeto e a sua reserva serão eliminados definitivamente — pode ter sido feita por outra pessoa. | Este objeto e as suas {count} reservas serão eliminados definitivamente — algumas podem ter sido feitas por outras pessoas.",
       "loan_group_all": "Todos os grupos",
-      "loan_tag_all": "Todas as etiquetas"
+      "loan_tag_all": "Todas as etiquetas",
+      "export_pdf_filtered_empty": "Nenhum objeto corresponde aos filtros aplicados",
+      "export_pdf_extract": "extrato filtrado: {affiches} de {total} objetos",
+      "filter_no_results": "Nenhum objeto corresponde aos filtros aplicados"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

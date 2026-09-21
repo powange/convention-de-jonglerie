@@ -640,6 +640,11 @@
     "swap_their_slot": "Seine bzw. ihre Schicht",
     "untitled_slot": "Unbenanntes Zeitfenster",
     "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):",
-    "swap_pick_person": "Mit wem tauschen:"
+    "swap_pick_person": "Mit wem tauschen:",
+    "export_applications_title": "Helferbewerbungen",
+    "export_count": "{count} Bewerbungen",
+    "export_application_date": "Bewerbungsdatum",
+    "export_arrival": "Ankunft",
+    "export_departure": "Abreise"
   }
 }

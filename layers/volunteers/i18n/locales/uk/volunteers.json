@@ -640,6 +640,11 @@
     "swap_their_slot": "Його або її зміна",
     "untitled_slot": "Слот без назви",
     "with_you_on_slot": "З вами на цій зміні: | З вами на цій зміні ({count}):",
-    "swap_pick_person": "З ким обмінятися:"
+    "swap_pick_person": "З ким обмінятися:",
+    "export_applications_title": "Заявки волонтерів",
+    "export_count": "{count} заявок",
+    "export_application_date": "Дата заявки",
+    "export_arrival": "Прибуття",
+    "export_departure": "Від'їзд"
   }
 }

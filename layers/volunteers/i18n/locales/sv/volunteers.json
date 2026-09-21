@@ -640,6 +640,11 @@
     "swap_their_slot": "Hens pass",
     "untitled_slot": "Obetitlad plats",
     "with_you_on_slot": "Tillsammans med dig på detta pass: | Tillsammans med dig på detta pass ({count}):",
-    "swap_pick_person": "Vem vill du byta med:"
+    "swap_pick_person": "Vem vill du byta med:",
+    "export_applications_title": "Volontäransökningar",
+    "export_count": "{count} ansökningar",
+    "export_application_date": "Ansökningsdatum",
+    "export_arrival": "Ankomst",
+    "export_departure": "Avresa"
   }
 }
