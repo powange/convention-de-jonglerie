@@ -354,6 +354,18 @@ const selectedCity = ref<any>(null)
 // Schéma de validation
 const baseSchema = z.object({
   locationCity: z.string().min(1, t('carpool.validation.departure_city_required')),
+  /**
+   * Lue dans le fuseau du NAVIGATEUR, et c'est délibéré.
+   *
+   * Contrairement aux horaires d'un programme, d'un atelier ou d'une réservation de matériel, un
+   * départ en covoiturage n'est pas une heure de la convention : « je pars samedi 8 h de Lyon »
+   * désigne 8 h à Lyon, pas 8 h sur le lieu de l'événement. Le fuseau de la ville de départ, lui,
+   * n'est pas connu — seule l'adresse l'est, en texte libre.
+   *
+   * Le fuseau de qui publie reste donc le meilleur indice disponible : on annonce en général son
+   * départ depuis chez soi. Ancrer sur celui de l'édition serait cohérent avec les autres modules
+   * et faux pour la plupart des trajets. Ne pas « corriger » par réflexe d'uniformité.
+   */
   tripDate: z
     .union([z.date(), z.string().transform((val) => new Date(val))])
     .refine((date) => date instanceof Date && !isNaN(date.getTime()), {

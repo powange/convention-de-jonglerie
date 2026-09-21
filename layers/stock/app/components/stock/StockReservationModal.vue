@@ -126,6 +126,7 @@
 </template>
 
 <script setup lang="ts">
+import { journeeDans, versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
 import { getZoneTypeColor, getZoneTypeIcon } from '~~/shared/utils/zone-types'
 
 type StockReservationStatus = 'RESERVED' | 'PICKED_UP' | 'RETURNED' | 'CANCELLED'
@@ -167,6 +168,19 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+/**
+ * Le fuseau de l'édition : une réservation de matériel est une heure de LIEU.
+ *
+ * Le sélecteur rend « 14:00 » sans fuseau. Le lire dans celui du navigateur faisait qu'un
+ * organisateur en déplacement réservait à une heure qui n'était pas celle qu'il voyait, et que
+ * les chevauchements se calculaient sur des instants faux.
+ */
+const editionStore = useEditionStore()
+const fuseauEdition = computed(
+  () =>
+    (editionStore.getEditionById(props.editionId) as { timezone?: string | null })?.timezone ?? null
+)
 const isOpen = computed({
   get: () => props.open,
   set: (v) => emit('update:open', v),
@@ -229,27 +243,36 @@ function resetFieldErrors() {
 }
 
 /**
- * Calcule la date de début à pré-remplir pour une nouvelle réservation :
+ * Date de début à pré-remplir pour une nouvelle réservation, en heure de l'édition :
  * - priorité 1 : `volunteersSetupStartDate` si renseignée et future (minuit)
  * - priorité 2 : `startDate` de l'édition si future (minuit)
- * - sinon : `now`
+ * - sinon : maintenant
  *
  * Évite de proposer une date passée si l'édition est dans plusieurs mois.
+ *
+ * Rend une heure murale `AAAA-MM-JJTHH:MM` et non une `Date` : c'est ce qu'attend le sélecteur,
+ * et « minuit » doit désigner minuit SUR PLACE. Pris dans le fuseau du navigateur, il tombait la
+ * veille au soir ou le lendemain matin pour qui réserve depuis un autre continent.
  */
-function getDefaultStart(): Date {
+function debutParDefaut(): string {
   const now = new Date()
   const candidates = [props.editionSetupStartDate, props.editionStartDate]
   for (const iso of candidates) {
     if (!iso) continue
     const d = new Date(iso)
     if (isNaN(d.getTime())) continue
-    // Si la date est dans le futur (≥ aujourd'hui), on l'utilise à minuit
     if (d.getTime() >= now.getTime()) {
-      d.setHours(0, 0, 0, 0)
-      return d
+      return `${journeeDans(d, fuseauEdition.value)}T00:00`
     }
   }
-  return now
+  return versChampLocal(now, fuseauEdition.value)
+}
+
+/** Une heure plus tard, sur place. Le calcul se fait sur l'instant, jamais sur la chaîne. */
+function uneHeureApres(heureLocale: string): string {
+  const instant = versInstant(heureLocale, fuseauEdition.value)
+  if (!instant) return heureLocale
+  return versChampLocal(new Date(new Date(instant).getTime() + 3600_000), fuseauEdition.value)
 }
 
 watch(
@@ -257,18 +280,17 @@ watch(
   ([open]) => {
     if (open) {
       if (props.reservation) {
-        formData.startsAt = props.reservation.startsAt
-        formData.endsAt = props.reservation.endsAt
+        formData.startsAt = versChampLocal(props.reservation.startsAt, fuseauEdition.value)
+        formData.endsAt = versChampLocal(props.reservation.endsAt, fuseauEdition.value)
         formData.usage = props.reservation.usage
         formData.quantityReserved = props.reservation.quantityReserved
         formData.status = props.reservation.status
         formData.location = props.reservation.location || ''
         formData.mapPin = pinFromReservation(props.reservation)
       } else {
-        const start = getDefaultStart()
-        const end = new Date(start.getTime() + 3600_000)
-        formData.startsAt = start.toISOString()
-        formData.endsAt = end.toISOString()
+        const start = debutParDefaut()
+        formData.startsAt = start
+        formData.endsAt = uneHeureApres(start)
         formData.usage = ''
         formData.quantityReserved = 1
         formData.status = 'RESERVED'
@@ -311,9 +333,17 @@ async function handleSubmit() {
   }
   saving.value = true
   try {
+    // Ancrées sur place avant de partir : « 14:00 » devient un instant daté.
+    const startsAt = versInstant(formData.startsAt, fuseauEdition.value)
+    const endsAt = versInstant(formData.endsAt, fuseauEdition.value)
+    if (!startsAt || !endsAt) {
+      fieldErrors.value = { startsAt: t('errors.required_field') }
+      saving.value = false
+      return
+    }
     const body: Record<string, unknown> = {
-      startsAt: new Date(formData.startsAt).toISOString(),
-      endsAt: new Date(formData.endsAt).toISOString(),
+      startsAt,
+      endsAt,
       usage: formData.usage.trim(),
       quantityReserved: formData.quantityReserved,
       location: formData.location.trim() || null,

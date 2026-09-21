@@ -57,6 +57,8 @@ const props = defineProps<{
   startDate: string | null
   /** Date de fin du périmètre (teardownEndDate ou endDate). Sera +1 jour côté FC. */
   endDate: string | null
+  /** Fuseau de l'édition. Les réservations se lisent en heure de LIEU. */
+  fuseau?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -156,6 +158,13 @@ const calendarOptions = reactive<CalendarOptions>({
   plugins: [],
   locales: [],
   locale: locale.value,
+
+  // Les heures s'affichent dans le fuseau de l'ÉDITION, pas dans celui du lecteur — c'est celui
+  // dans lequel la réservation a été saisie. `'local'` en repli : une édition peut ne pas
+  // déclarer de fuseau, et un planning aux heures du navigateur reste plus utile qu'un planning
+  // vide. Même choix que le planning des bénévoles.
+  timeZone: props.fuseau ?? 'local',
+
   schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
   initialView: 'resourceTimelineWeek',
   initialDate: props.startDate ?? undefined,
@@ -298,6 +307,15 @@ watch(
   },
   { immediate: true }
 )
+// L'édition se charge en asynchrone : le calendrier est souvent construit AVANT que son fuseau
+// soit connu. Sans ce watcher, il resterait figé sur l'heure du navigateur.
+watch(
+  () => props.fuseau,
+  (nouveau) => {
+    calendarOptions.timeZone = nouveau ?? 'local'
+  }
+)
+
 watch(
   () => locale.value,
   (val) => {

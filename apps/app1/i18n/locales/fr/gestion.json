@@ -674,7 +674,10 @@
       "usage": "Utilisation",
       "usage_placeholder": "Ex: Spectacle de feu samedi 22h",
       "bulk_edit_loan_scope_all": "Les champs ci-dessous s'appliqueront à l'objet sélectionné, qui devient prêté. | Les champs ci-dessous s'appliqueront à l'objet sélectionné, qui devient prêté. | Les champs ci-dessous s'appliqueront aux {count} objets sélectionnés, qui deviennent prêtés.",
-      "bulk_edit_loan_scope_none": "La sélection ne sera plus prêtée : les champs ci-dessous resteront sans effet. Les valeurs déjà enregistrées ne sont pas effacées."
+      "bulk_edit_loan_scope_none": "La sélection ne sera plus prêtée : les champs ci-dessous resteront sans effet. Les valeurs déjà enregistrées ne sont pas effacées.",
+      "confirm_delete_item_cascade": "Cet objet sera définitivement supprimé. Cette action est irréversible. | Cet objet et sa réservation seront définitivement supprimés — elle a pu être posée par quelqu’un d’autre. | Cet objet et ses {count} réservations seront définitivement supprimés — certaines ont pu être posées par d’autres personnes.",
+      "loan_group_all": "Tous les groupes",
+      "loan_tag_all": "Tous les tags"
     },
     "ticketing": {
       "access_control_description": "Scanner et valider les billets à l'entrée",

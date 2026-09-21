@@ -639,6 +639,7 @@
     "swap_your_slot": "Jouw dienst",
     "swap_their_slot": "Diens dienst",
     "untitled_slot": "Naamloos tijdslot",
-    "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):"
+    "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):",
+    "swap_pick_person": "Met wie ruilen:"
   }
 }

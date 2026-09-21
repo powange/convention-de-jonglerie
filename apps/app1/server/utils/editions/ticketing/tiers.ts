@@ -1,7 +1,35 @@
+import { z } from 'zod'
+
 import {
   normalizeHandoutItemSelections,
   type HandoutItemSelection,
 } from '#server/utils/ticketing/handout-item-selection'
+import { estUneDateDeValiditeLisible, instantDeValidite } from '~~/shared/utils/date-validite'
+
+/**
+ * Ce qu'un point d'API accepte pour une date de validité.
+ *
+ * Les deux formes que `instantDeValidite` sait lire, et elles seules : un instant daté, ou une
+ * heure murale nue. Toute autre chaîne est refusée à l'entrée plutôt que de devenir `null`
+ * silencieusement en base — perdre une date de validité sans le dire est pire que la refuser.
+ *
+ * Exporté pour que les deux points d'API (création, modification) partagent la MÊME règle : la
+ * recopier des deux côtés, c'est se garantir qu'elles divergeront un jour.
+ */
+export const dateDeValiditeSchema = z
+  .string()
+  .refine(estUneDateDeValiditeLisible, { message: 'Date de validité illisible' })
+  .nullable()
+  .optional()
+
+/** Le fuseau déclaré par l'édition, ou `null` — le champ reste facultatif. */
+async function fuseauDeLEdition(editionId: number): Promise<string | null> {
+  const edition = await prisma.edition.findUnique({
+    where: { id: editionId },
+    select: { timezone: true },
+  })
+  return edition?.timezone ?? null
+}
 
 export interface TierData {
   name: string
@@ -138,6 +166,7 @@ export async function getEditionTiers(
  * Crée un nouveau tarif manuel
  */
 export async function createTier(editionId: number, data: TierData) {
+  const fuseau = await fuseauDeLEdition(editionId)
   return await prisma.ticketingTier.create({
     data: {
       editionId,
@@ -150,8 +179,8 @@ export async function createTier(editionId: number, data: TierData) {
       position: data.position,
       isActive: data.isActive,
       countAsParticipant: data.countAsParticipant ?? true,
-      validFrom: data.validFrom ? new Date(data.validFrom) : null,
-      validUntil: data.validUntil ? new Date(data.validUntil) : null,
+      validFrom: instantDeValidite(data.validFrom, fuseau),
+      validUntil: instantDeValidite(data.validUntil, fuseau),
       // externalTicketingId et helloAssoTierId restent null pour un tarif manuel
       handoutItems: {
         create: normalizeHandoutItemSelections(data.handoutItemIds).map(
@@ -169,6 +198,8 @@ export async function createTier(editionId: number, data: TierData) {
  * Met à jour un tarif existant
  */
 export async function updateTier(tierId: number, editionId: number, data: TierData) {
+  const fuseau = await fuseauDeLEdition(editionId)
+
   // Vérifier que le tarif existe et appartient à cette édition
   const existingTier = await prisma.ticketingTier.findFirst({
     where: {
@@ -209,8 +240,8 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
         data: {
           customName: data.customName,
           countAsParticipant: data.countAsParticipant ?? true,
-          validFrom: data.validFrom ? new Date(data.validFrom) : null,
-          validUntil: data.validUntil ? new Date(data.validUntil) : null,
+          validFrom: instantDeValidite(data.validFrom, fuseau),
+          validUntil: instantDeValidite(data.validUntil, fuseau),
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
@@ -238,8 +269,8 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           position: data.position,
           isActive: data.isActive,
           countAsParticipant: data.countAsParticipant ?? true,
-          validFrom: data.validFrom ? new Date(data.validFrom) : null,
-          validUntil: data.validUntil ? new Date(data.validUntil) : null,
+          validFrom: instantDeValidite(data.validFrom, fuseau),
+          validUntil: instantDeValidite(data.validUntil, fuseau),
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {

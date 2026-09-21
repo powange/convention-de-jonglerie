@@ -13,8 +13,13 @@ import { validateEditionId } from '#server/utils/validation-helpers'
  * Cette liste traverse les groupes, là où tout le reste du module s'organise par groupe : un
  * emprunt à récupérer chez le même prêteur peut concerner la sonorisation et la cuisine, et rien
  * ne le montrait — il fallait ouvrir chaque groupe pour s'en apercevoir. C'est ce qui justifie un
- * point d'API à part plutôt qu'un filtre sur celui des groupes, qui charge aussi les réservations,
- * les tags et les emplacements dont cette vue n'a que faire.
+ * point d'API à part plutôt qu'un filtre sur celui des groupes, qui charge aussi les réservations
+ * et les emplacements dont cette vue n'a que faire.
+ *
+ * Les ÉTIQUETTES, elles, y figurent depuis qu'on filtre et qu'on les affiche sur cette liste. Le
+ * commentaire les rangeait auparavant parmi ce dont « cette vue n'a que faire » : c'était vrai
+ * tant qu'elle ne montrait que des lieux et des dates. Trier une tournée de récupération par
+ * « fragile » ou « lourd » est précisément ce pour quoi on les a posées.
  *
  * Le calcul des états reste côté écran : la règle des trois temps vit dans `etat-emprunt`, elle y
  * est éprouvée, et la dédoubler ici la ferait diverger. On rend les faits, pas leur lecture.
@@ -53,6 +58,9 @@ export default wrapApiHandler(
         pickupResponsible: { select: userWithProfileAndGravatarSelect },
         returnResponsible: { select: userWithProfileAndGravatarSelect },
         group: { select: { id: true, name: true } },
+        // La couleur voyage avec le nom : c'est elle qu'on reconnaît d'un écran à l'autre, et la
+        // pastille comme le sélecteur en ont besoin.
+        tags: { select: { tag: { select: { id: true, name: true, color: true } } } },
       },
       // Un ordre stable, et rien de plus. Trier par échéance ici placerait les emprunts sans date
       // en tête — MySQL ordonne les valeurs nulles en premier —, soit l'inverse de ce qu'on veut

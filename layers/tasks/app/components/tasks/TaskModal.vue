@@ -164,6 +164,8 @@
  * Une personne telle qu'une ASSIGNATION la porte — sans adresse e-mail, que le point d'API des
  * groupes ne transmet plus.
  */
+import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+
 interface AssignedUser {
   id: number
   pseudo: string
@@ -234,6 +236,19 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+/**
+ * Le fuseau de l'édition : une échéance est une heure de LIEU.
+ *
+ * Le sélecteur rend « 18:00 » sans fuseau. C'est ici qu'on décide de quel 18 h il s'agit — pas
+ * dans le navigateur de qui saisit, qui peut être ailleurs que la convention. Sans cela, une
+ * échéance posée depuis un autre fuseau se relisait décalée sur place.
+ */
+const editionStore = useEditionStore()
+const fuseauEdition = computed(
+  () =>
+    (editionStore.getEditionById(props.editionId) as { timezone?: string | null })?.timezone ?? null
+)
 const isOpen = computed({
   get: () => props.open,
   set: (v) => emit('update:open', v),
@@ -318,7 +333,9 @@ watch(
     if (open) {
       formData.title = props.task?.title || ''
       formData.status = props.task?.status || 'TODO'
-      formData.deadline = props.task?.deadline || ''
+      formData.deadline = props.task?.deadline
+        ? versChampLocal(props.task.deadline, fuseauEdition.value)
+        : ''
       formData.description = props.task?.description || ''
       formData.taskGroupId = props.task?.taskGroupId || props.group?.id || 0
       const assignedIds = props.task?.assignments.map((a) => a.user.id) || []
@@ -356,7 +373,9 @@ async function handleSubmit() {
       title: formData.title.trim(),
       description: formData.description.trim() || null,
       status: formData.status,
-      deadline: formData.deadline ? new Date(formData.deadline).toISOString() : null,
+      deadline: formData.deadline
+        ? versInstant(formData.deadline, fuseauEdition.value) || null
+        : null,
       assigneeIds: selectedAssignees.value.map((u) => u.id),
       tagIds: selectedTags.value.map((t) => t.value),
     }

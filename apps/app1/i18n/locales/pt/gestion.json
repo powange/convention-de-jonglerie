@@ -664,7 +664,10 @@
       "missing_in_list_purchased": "Nesta lista, já comprado.",
       "missing_in_lists": "Listas",
       "shopping_no_match_tags": "Nenhum artigo desta lista tem as etiquetas selecionadas.",
-      "shopping_remove_item_confirm": "«{name}» será retirado desta lista de compras. O material do stock não é afetado."
+      "shopping_remove_item_confirm": "«{name}» será retirado desta lista de compras. O material do stock não é afetado.",
+      "confirm_delete_item_cascade": "Este objeto será eliminado definitivamente. Esta ação é irreversível. | Este objeto e a sua reserva serão eliminados definitivamente — pode ter sido feita por outra pessoa. | Este objeto e as suas {count} reservas serão eliminados definitivamente — algumas podem ter sido feitas por outras pessoas.",
+      "loan_group_all": "Todos os grupos",
+      "loan_tag_all": "Todas as etiquetas"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

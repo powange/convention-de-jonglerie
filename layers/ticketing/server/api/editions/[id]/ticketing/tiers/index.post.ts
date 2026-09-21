@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
-import { createTier } from '#server/utils/editions/ticketing/tiers'
+import { createTier, dateDeValiditeSchema } from '#server/utils/editions/ticketing/tiers'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 
 const bodySchema = z.object({
@@ -14,11 +14,13 @@ const bodySchema = z.object({
   position: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
   countAsParticipant: z.boolean().default(true),
-  // Un INSTANT, pas une heure murale : le serveur tourne en UTC, et `new Date('2026-10-02T18:00')`
-  // y lirait 18 h UTC là où l'organisateur avait saisi 18 h sur place. La contrainte de zod est ce
-  // qui refuse une chaîne sans fuseau — c'est elle qui a protégé les autres modules du dépôt.
-  validFrom: z.string().datetime({ offset: true }).nullable().optional(),
-  validUntil: z.string().datetime({ offset: true }).nullable().optional(),
+  // Un instant daté, ou l'heure murale nue d'une page ouverte avant le déploiement : les deux
+  // formes sont acceptées et ancrées au fuseau de l'ÉDITION dans `instantDeValidite`. Ce qu'il ne
+  // faut SURTOUT pas faire, c'est laisser le serveur lire une heure nue lui-même — il tourne en
+  // UTC, et `new Date('2026-10-02T18:00')` y vaut 18 h UTC là où l'organisateur voulait 18 h sur
+  // place. C'était le défaut d'origine.
+  validFrom: dateDeValiditeSchema,
+  validUntil: dateDeValiditeSchema,
   handoutItemIds: z.array(z.number().int()).optional().default([]),
   mealIds: z.array(z.number().int()).optional().default([]),
 })
