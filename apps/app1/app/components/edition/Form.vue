@@ -71,6 +71,7 @@
                     <template #content>
                       <UCalendar
                         v-model="calendarStartDate"
+                        :week-starts-on="debutDeSemaine"
                         class="p-2"
                         @update:model-value="updateStartDate"
                       />
@@ -116,6 +117,7 @@
                     <template #content>
                       <UCalendar
                         v-model="calendarEndDate"
+                        :week-starts-on="debutDeSemaine"
                         class="p-2"
                         :is-date-disabled="
                           (date) => !!calendarStartDate && date < calendarStartDate
@@ -545,6 +547,13 @@ import type { Edition, Convention } from '~/types'
 import { countrySelectOptions } from '~/utils/countries'
 
 import type { StepperItem } from '@nuxt/ui'
+
+import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+
+// La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
+// regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
+const { locale: localeDeSemaine } = useI18n()
+const debutDeSemaine = computed(() => premierJourDeSemaine(localeDeSemaine.value))
 
 // import { useAuthStore } from '~/stores/auth';
 

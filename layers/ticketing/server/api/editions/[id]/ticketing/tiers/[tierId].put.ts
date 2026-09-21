@@ -14,8 +14,11 @@ const bodySchema = z.object({
   position: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
   countAsParticipant: z.boolean().default(true),
-  validFrom: z.string().nullable().optional(),
-  validUntil: z.string().nullable().optional(),
+  // Un INSTANT, pas une heure murale : le serveur tourne en UTC, et `new Date('2026-10-02T18:00')`
+  // y lirait 18 h UTC là où l'organisateur avait saisi 18 h sur place. La contrainte de zod est ce
+  // qui refuse une chaîne sans fuseau — c'est elle qui a protégé les autres modules du dépôt.
+  validFrom: z.string().datetime({ offset: true }).nullable().optional(),
+  validUntil: z.string().datetime({ offset: true }).nullable().optional(),
   // `handoutItemIds` est optionnel SANS default : si la clé n'est pas
   // envoyée, `updateTier` ne touche pas aux associations existantes
   // (gérées désormais via /tiers/[id]/handout-items).

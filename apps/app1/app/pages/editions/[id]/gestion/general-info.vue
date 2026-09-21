@@ -73,6 +73,7 @@
                   <template #content>
                     <UCalendar
                       v-model="calendarStartDate"
+                      :week-starts-on="debutDeSemaine"
                       class="p-2"
                       @update:model-value="updateStartDate"
                     />
@@ -111,6 +112,7 @@
                   <template #content>
                     <UCalendar
                       v-model="calendarEndDate"
+                      :week-starts-on="debutDeSemaine"
                       class="p-2"
                       :is-date-disabled="(date) => !!calendarStartDate && date < calendarStartDate"
                       @update:model-value="updateEndDate"
@@ -322,6 +324,12 @@ import { useEditionStore } from '~/stores/editions'
 import { countrySelectOptions } from '~/utils/countries'
 
 import { DEFAULT_CURRENCY, SUPPORTED_CURRENCIES } from '~~/shared/utils/money'
+import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+
+// La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
+// regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
+const { locale: localeDeSemaine } = useI18n()
+const debutDeSemaine = computed(() => premierJourDeSemaine(localeDeSemaine.value))
 
 definePageMeta({
   middleware: ['auth-protected'],

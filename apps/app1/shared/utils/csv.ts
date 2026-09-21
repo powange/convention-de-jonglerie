@@ -65,8 +65,19 @@ export function ressembleAUneFormule(valeur: string): boolean {
 /**
  * Une valeur, prête à être posée dans une cellule.
  *
- * Toujours entre guillemets, même quand ce n'est pas requis : une règle appliquée partout se
- * vérifie d'un coup d'œil, là où « seulement si nécessaire » demande de relire la condition.
+ * ⚠️ **TOUJOURS entre guillemets, même quand ce n'est pas requis — et ce n'est plus seulement
+ * une question de lisibilité du code.**
+ *
+ * Un tableur devine le type d'une cellule d'après son contenu : `+33612345678` et `0612345678`
+ * sont des nombres parfaitement valides, et il les affiche `33612345678` et `612345678` — le
+ * signe et le zéro initial disparaissent. Constaté sur l'export des organisateurs, et vérifié
+ * dans LibreOffice : l'apostrophe de tête, qui sert de marqueur « texte » dans Excel, s'y
+ * affiche **en clair** et ne répare rien.
+ *
+ * Ce qui répare, sans toucher aux données : l'option « Formater le champ entre guillemets comme
+ * du texte » de la boîte d'import. Elle ne fonctionne que parce que **chaque** cellule est
+ * entourée de guillemets — y compris celles qui n'en auraient pas besoin. Ne pas « optimiser »
+ * ce point : cela casserait le réglage des utilisateurs sans rien signaler.
  *
  * `null` et `undefined` deviennent une cellule vide — et non « null », qui se retrouverait tel
  * quel dans le tableur.

@@ -282,7 +282,7 @@
                 block
               />
               <template #content>
-                <UCalendar v-model="referenceDate" class="p-2" />
+                <UCalendar v-model="referenceDate" :week-starts-on="debutDeSemaine" class="p-2" />
               </template>
             </UPopover>
           </UFormField>
@@ -605,7 +605,7 @@
                 block
               />
               <template #content>
-                <UCalendar v-model="rateStartDate" class="p-2" />
+                <UCalendar v-model="rateStartDate" :week-starts-on="debutDeSemaine" class="p-2" />
               </template>
             </UPopover>
           </UFormField>
@@ -625,7 +625,7 @@
                 block
               />
               <template #content>
-                <UCalendar v-model="rateEndDate" class="p-2" />
+                <UCalendar v-model="rateEndDate" :week-starts-on="debutDeSemaine" class="p-2" />
               </template>
             </UPopover>
           </UFormField>
@@ -657,6 +657,13 @@
 
 <script setup lang="ts">
 import { CalendarDate } from '@internationalized/date'
+
+import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+
+// La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
+// regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
+const { locale: localeDeSemaine } = useI18n()
+const debutDeSemaine = computed(() => premierJourDeSemaine(localeDeSemaine.value))
 
 definePageMeta({
   middleware: ['auth-protected', 'super-admin'],
