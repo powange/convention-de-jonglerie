@@ -184,11 +184,17 @@
                 class="w-full sm:w-64"
               />
 
-              <USelect
+              <!-- Sélection multiple : un même artiste joue souvent dans plusieurs spectacles, et
+                   on veut pouvoir regarder deux plateaux à la fois. Rien de coché vaut « tous »,
+                   ce que dit le libellé affiché à vide. -->
+              <USelectMenu
                 v-model="showFilter"
+                multiple
+                value-key="value"
                 :items="showFilterItems"
-                :placeholder="$t('artists.filter_by_show')"
-                class="w-full sm:w-56"
+                :placeholder="$t('artists.all_shows')"
+                :search-input="{ placeholder: $t('artists.filter_by_show') }"
+                class="w-full sm:w-64"
               />
 
               <div class="flex items-center gap-2 ml-auto">
@@ -197,13 +203,26 @@
                 </UBadge>
 
                 <UButton
-                  v-if="globalFilter || (showFilter && showFilter !== 'ALL')"
+                  v-if="globalFilter || showFilter.length > 0"
                   icon="i-heroicons-x-mark"
                   color="neutral"
                   variant="ghost"
                   size="sm"
                   :title="$t('artists.reset_filters')"
                   @click="resetFilters"
+                />
+
+                <!-- L'export n'a rien à produire sur un tableau vide : un PDF sans lignes se
+                     lit comme un export raté, et l'on cherche l'erreur là où il n'y en a pas. -->
+                <UButton
+                  icon="i-lucide-file-down"
+                  color="neutral"
+                  variant="outline"
+                  size="sm"
+                  :label="$t('artists.export_pdf')"
+                  :loading="exportEnCours"
+                  :disabled="filteredArtists.length === 0"
+                  @click="exporterPdf"
                 />
 
                 <UDropdownMenu :items="columnVisibilityItems">
@@ -604,12 +623,21 @@
 <script setup lang="ts">
 import { getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
+// Chemin relatif, comme `filtres-artistes-url` juste en dessous : l'alias `~` ne résout pas vers
+// le dossier du layer, et un `~/utils/...` d'apparence normale casse la compilation sans que le
+// lint ni les tests ne s'en aperçoivent.
+import {
+  colonnesImprimables,
+  nomFichierArtistes,
+  preparerTableauDArtistes,
+  texteDesRepas,
+} from '../../../../../utils/export-artistes-pdf'
 import { filtresDepuisUrl, requeteArtistes } from '../../../../../utils/filtres-artistes-url'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
-import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
+import { formaterDateHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
 definePageMeta({
@@ -773,17 +801,25 @@ const columnVisibility = ref<Record<string, boolean>>({})
 // cf. `filtres-artistes-url.ts`.
 const filtresInitiaux = filtresDepuisUrl(route.query)
 const globalFilter = ref(filtresInitiaux.recherche)
-const showFilter = ref(filtresInitiaux.spectacle)
+const showFilter = ref<string[]>(filtresInitiaux.spectacles)
 
 // `replace` et non `push` : choisir un filtre n'est pas un pas de navigation à revenir en arrière.
-watch([globalFilter, showFilter], () => {
-  router.replace({
-    query: requeteArtistes(route.query, {
-      spectacle: showFilter.value,
-      recherche: globalFilter.value,
-    }),
-  })
-})
+//
+// `deep` parce que le filtre de spectacles est maintenant un tableau : ce watcher ne ferait rien
+// si le composant le mutait au lieu de le remplacer, et l'URL cesserait de suivre sans que rien
+// ne le signale. Le surcoût est nul — recopier une query identique ne déclenche aucune navigation.
+watch(
+  [globalFilter, showFilter],
+  () => {
+    router.replace({
+      query: requeteArtistes(route.query, {
+        spectacles: showFilter.value,
+        recherche: globalFilter.value,
+      }),
+    })
+  },
+  { deep: true }
+)
 
 // Liste des spectacles pour le filtre
 const allShows = computed(() => {
@@ -801,16 +837,19 @@ const allShows = computed(() => {
   }))
 })
 
-const showFilterItems = computed(() => [
-  { label: t('artists.all_shows'), value: 'ALL' },
-  ...allShows.value,
-])
+// Plus d'entrée « tous les spectacles » : en sélection multiple, ne rien cocher le dit déjà, et
+// une telle entrée cohabiterait mal avec les autres — que signifierait « tous » coché en même
+// temps qu'un spectacle précis ?
+const showFilterItems = computed(() => allShows.value)
 
 // Artistes filtrés par spectacle
 const filteredArtists = computed(() => {
-  if (!showFilter.value || showFilter.value === 'ALL') return artists.value
+  if (showFilter.value.length === 0) return artists.value
+  // Un artiste est retenu dès qu'il joue dans L'UN des spectacles cochés : cocher deux plateaux
+  // montre les deux distributions réunies, et non leur intersection, qui serait presque toujours
+  // vide.
   return artists.value.filter((artist) =>
-    artist.shows?.some((sa: any) => String(sa.show.id) === showFilter.value)
+    artist.shows?.some((sa: any) => showFilter.value.includes(String(sa.show.id)))
   )
 })
 
@@ -866,9 +905,160 @@ const financialTotals = computed(() => [
   },
 ])
 
+/**
+ * Le tableau que l'on a sous les yeux, en PDF.
+ *
+ * Les artistes **filtrés**, dans les **colonnes affichées**, et dans leur ordre à l'écran :
+ * exporter autre chose que ce qui est montré produit un document que personne ne sait relire.
+ *
+ * Ce qui en sort est décidé dans `export-artistes-pdf`, éprouvé par des tests — un PDF ne se
+ * rattrape pas une fois envoyé. Ici ne reste que la mise en forme, qui dépend des traductions.
+ *
+ * `jspdf` est importé à la demande : quelques centaines de kilo-octets qui n'ont rien à faire
+ * dans le chargement d'une page que l'on n'exporte pas à chaque visite.
+ */
+const exportEnCours = ref(false)
+
+/** Le jour d'un repas, nommé dans le fuseau de l'édition — « vendredi ». */
+const jourDuRepas = (journee: string) =>
+  journee ? formaterJournee(journee, fuseauEdition.value, locale.value, { weekday: 'long' }) : ''
+
+/** Le moment de la journée, dans sa forme courte : « matin », « midi », « soir ». */
+const momentDuRepas = (mealType: string) =>
+  ({
+    BREAKFAST: t('gestion.meals.breakfast'),
+    LUNCH: t('gestion.meals.lunch'),
+    DINNER: t('gestion.meals.dinner'),
+  })[mealType] ?? ''
+
+/**
+ * La valeur d'une cellule, réduite en texte.
+ *
+ * Les colonnes que le tableau rend par des composants — repas, hébergement, facture, cachet —
+ * n'ont pas de valeur textuelle à récupérer : on la reconstruit ici, à partir des mêmes
+ * fonctions que l'écran, pour que le PDF dise la même chose que la page.
+ */
+const valeurPourPdf = (artist: any, colonneId: string): string => {
+  switch (colonneId) {
+    case 'name':
+      return [artist.user?.prenom, artist.user?.nom].filter(Boolean).join(' ')
+    case 'email':
+      return artist.user?.email ?? ''
+    case 'phone':
+      return artist.user?.phone ?? ''
+    case 'arrival':
+      return artist.arrivalDateTime
+        ? formaterDateHeure(artist.arrivalDateTime, fuseauEdition.value, locale.value)
+        : ''
+    case 'departure':
+      return artist.departureDateTime
+        ? formaterDateHeure(artist.departureDateTime, fuseauEdition.value, locale.value)
+        : ''
+    // Nommés et non comptés : à l'écran « 2/3 » ouvre le détail d'un clic, sur papier personne
+    // ne peut cliquer — et c'est cette liste qu'on emporte en cuisine.
+    case 'meals':
+      return texteDesRepas(artist.mealSelections, jourDuRepas, momentDuRepas)
+    case 'shows':
+      return (artist.shows ?? []).map((sa: any) => sa.show.title).join(', ')
+    case 'payment':
+      return formatAmount(Number(artist.payment ?? 0))
+    case 'reimbursement':
+      return formatAmount(Number(artist.reimbursementMax || artist.reimbursementActual || 0))
+    case 'consumables':
+      return formatAmount(Number(artist.consumablesMax || artist.consumablesActual || 0))
+    case 'accommodation':
+      return [
+        artist.accommodationAutonomous ? t('artists.accommodation_autonomous_yes') : '',
+        artist.accommodationType ? accommodationTypeLabel(artist.accommodationType) : '',
+        artist.accommodationType === 'OTHER' ? (artist.accommodationTypeOther ?? '') : '',
+      ]
+        .filter(Boolean)
+        .join(' - ')
+    case 'invoice':
+      return getInvoiceStatusText(artist)
+    case 'fee':
+      return getFeeStatusText(artist)
+    case 'notes':
+      return artist.organizerNotes ?? ''
+    default:
+      return ''
+  }
+}
+
+async function exporterPdf() {
+  if (filteredArtists.value.length === 0) return
+
+  exportEnCours.value = true
+  try {
+    // L'ordre et la visibilité viennent de la table elle-même : c'est elle qui fait foi, et non
+    // une liste tenue en parallèle qui finirait par diverger.
+    const idsVisibles = (tableRef.value?.tableApi?.getVisibleLeafColumns() ?? []).map(
+      (colonne: any) => colonne.id
+    )
+    const colonnes = colonnesImprimables(idsVisibles, getColumnLabel)
+    if (colonnes.length === 0) return
+
+    const { entetes, lignes } = preparerTableauDArtistes(
+      filteredArtists.value,
+      colonnes,
+      valeurPourPdf
+    )
+
+    const { jsPDF } = await import('jspdf')
+    const { applyPlugin } = await import('jspdf-autotable')
+    applyPlugin(jsPDF)
+
+    // Paysage : ce tableau peut compter une douzaine de colonnes, dont plusieurs de texte libre.
+    const doc = new jsPDF({ orientation: 'landscape' })
+    const MARGE = 14
+    const maintenant = new Date()
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(t('artists.list_title'), MARGE, 16)
+
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    const sousTitre = [edition.value?.convention?.name, edition.value?.name]
+      .filter(Boolean)
+      .join(' - ')
+    if (sousTitre) doc.text(sousTitre, MARGE, 22)
+
+    // Le nombre d'artistes et la date : sans eux, impossible de savoir, trois semaines plus tard,
+    // si le document qu'on a sous les yeux est à jour ou s'il portait un filtre.
+    doc.setFontSize(9)
+    doc.text(
+      `${formaterJournee(maintenant, fuseauEdition.value, locale.value)} - ${t('common.total')}: ${filteredArtists.value.length}`,
+      MARGE,
+      sousTitre ? 28 : 22
+    )
+
+    // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+    doc.autoTable({
+      startY: sousTitre ? 33 : 27,
+      margin: { left: MARGE, right: MARGE },
+      styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+      headStyles: { fillColor: [124, 58, 237] },
+      head: [entetes],
+      body: lignes,
+    })
+
+    doc.save(nomFichierArtistes(edition.value?.name, maintenant))
+  } catch (error) {
+    console.error('Export PDF des artistes :', error)
+    toast.add({
+      title: t('artists.export_pdf_error'),
+      color: 'error',
+      icon: 'i-heroicons-x-circle',
+    })
+  } finally {
+    exportEnCours.value = false
+  }
+}
+
 const resetFilters = () => {
   globalFilter.value = ''
-  showFilter.value = 'ALL'
+  showFilter.value = []
   sorting.value = []
 }
 

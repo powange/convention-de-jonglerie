@@ -72,6 +72,8 @@
     "error_update": "Erreur lors de la modification de l'artiste",
     "existing_user_found": "Utilisateur existant trouvé",
     "existing_user_found_description": "L'adresse email correspond à l'utilisateur {pseudo} ({email}). Vous pouvez relier l'artiste à ce compte existant.",
+    "export_pdf": "Export PDF",
+    "export_pdf_error": "Impossible de générer le PDF",
     "fee_not_requested": "Cachet non demandé",
     "fee_provided": "Cachet fourni",
     "fee_provided_label": "Cachet fourni à l'artiste",
