@@ -1000,7 +1000,18 @@
       "export_settled": "Betaald",
       "export_subtotal": "Subtotaal",
       "export_total": "Totaal",
-      "export_without_code": "Zonder code"
+      "export_without_code": "Zonder code",
+      "code_delete_confirm": "De boekingen die hem gebruikten behouden hun bedrag en verliezen alleen hun toewijzing. Deze actie is definitief.",
+      "code_delete_title": "Deze code verwijderen?",
+      "code_search_all": "In alle codes zoeken…",
+      "plan_already_imported": "Al geïmporteerd",
+      "plan_description": "Blader door de rekeningen en importeer wat u nodig hebt. U kunt de omschrijving nog aanpassen voordat u bevestigt.",
+      "plan_import": "Importeren",
+      "plan_no_result": "Geen enkele rekening komt overeen met deze zoekopdracht.",
+      "plan_open": "Een code zoeken in de Franse rekeningschema's",
+      "plan_search_placeholder": "Zoek een rekening: ‘verzekering’, ‘6257’, ‘contributies’…",
+      "plan_source": "Officiële tekst",
+      "plan_title": "Franse rekeningschema's"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",

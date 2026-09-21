@@ -191,7 +191,9 @@
     "currency": "Valuta",
     "amount": "Bedrag",
     "treasury_short": "Financiën",
-    "type": "Type"
+    "type": "Type",
+    "collapse": "Inklappen",
+    "expand": "Uitklappen"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

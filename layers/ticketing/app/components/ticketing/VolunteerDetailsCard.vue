@@ -58,6 +58,7 @@
       :email="editableEmail"
       :phone="editablePhone"
       :original-email="volunteer.user.email"
+      :is-email-verified="volunteer.user.isEmailVerified"
       :user-id="volunteer.user.id"
       @update:first-name="$emit('update:firstName', $event)"
       @update:last-name="$emit('update:lastName', $event)"

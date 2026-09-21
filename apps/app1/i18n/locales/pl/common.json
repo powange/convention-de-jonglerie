@@ -191,7 +191,9 @@
     "currency": "Waluta",
     "amount": "Kwota",
     "treasury_short": "Finanse",
-    "type": "Typ"
+    "type": "Typ",
+    "collapse": "Zwiń",
+    "expand": "Rozwiń"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

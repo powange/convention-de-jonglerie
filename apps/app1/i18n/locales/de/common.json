@@ -191,7 +191,9 @@
     "currency": "Währung",
     "amount": "Betrag",
     "treasury_short": "Buchhaltung",
-    "type": "Typ"
+    "type": "Typ",
+    "collapse": "Einklappen",
+    "expand": "Ausklappen"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

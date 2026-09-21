@@ -191,7 +191,9 @@
     "currency": "Moeda",
     "amount": "Montante",
     "treasury_short": "Tesouraria",
-    "type": "Tipo"
+    "type": "Tipo",
+    "collapse": "Recolher",
+    "expand": "Expandir"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

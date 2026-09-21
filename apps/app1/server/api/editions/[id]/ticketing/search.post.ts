@@ -142,6 +142,9 @@ export default wrapApiHandler(
               nom: true,
               email: true,
               phone: true,
+              // L'écran fige le champ quand l'adresse est vérifiée : la laisser saisir
+              // pour que le serveur la refuse ensuite est pire que ne pas la proposer.
+              isEmailVerified: true,
             },
           },
           // Articles demandés pour cet artiste en particulier : chargés avec lui plutôt que
@@ -213,6 +216,7 @@ export default wrapApiHandler(
                   nom: true,
                   email: true,
                   phone: true,
+                  isEmailVerified: true,
                 },
               },
             },
@@ -279,6 +283,9 @@ export default wrapApiHandler(
               nom: true,
               email: true,
               phone: true,
+              // L'écran fige le champ quand l'adresse est vérifiée : la laisser saisir
+              // pour que le serveur la refuse ensuite est pire que ne pas la proposer.
+              isEmailVerified: true,
             },
           },
           teamAssignments: {
@@ -711,6 +718,8 @@ export default wrapApiHandler(
                   firstName: application.user.prenom,
                   lastName: application.user.nom,
                   email: application.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: application.user.isEmailVerified,
                   phone: application.userSnapshotPhone || application.user.phone,
                 },
                 teams: application.teamAssignments.map((assignment) => ({
@@ -747,6 +756,8 @@ export default wrapApiHandler(
                   firstName: artist.user.prenom,
                   lastName: artist.user.nom,
                   email: artist.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: artist.user.isEmailVerified,
                   phone: artist.user.phone,
                 },
                 shows: artist.shows.map((showArtist) => ({
@@ -775,6 +786,8 @@ export default wrapApiHandler(
                   firstName: editionOrganizer.organizer.user.prenom,
                   lastName: editionOrganizer.organizer.user.nom,
                   email: editionOrganizer.organizer.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: editionOrganizer.organizer.user.isEmailVerified,
                   phone: editionOrganizer.organizer.user.phone,
                 },
                 title: editionOrganizer.organizer.title,

@@ -1000,7 +1000,18 @@
       "export_settled": "Zapłacone",
       "export_subtotal": "Suma częściowa",
       "export_total": "Razem",
-      "export_without_code": "Bez kodu"
+      "export_without_code": "Bez kodu",
+      "code_delete_confirm": "Pozycje, które go używały, zachowają swoją kwotę i stracą jedynie dekretację. Tej operacji nie można cofnąć.",
+      "code_delete_title": "Usunąć ten kod?",
+      "code_search_all": "Szukaj we wszystkich kodach…",
+      "plan_already_imported": "Już zaimportowano",
+      "plan_description": "Przejrzyj konta, a następnie zaimportuj te, których potrzebujesz. Nazwę możesz zmienić przed zatwierdzeniem.",
+      "plan_import": "Importuj",
+      "plan_no_result": "Żadne konto nie odpowiada temu wyszukiwaniu.",
+      "plan_open": "Znajdź kod we francuskich planach kont",
+      "plan_search_placeholder": "Szukaj konta: „ubezpieczenie”, „6257”, „składki”…",
+      "plan_source": "Tekst urzędowy",
+      "plan_title": "Francuskie plany kont"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

@@ -191,7 +191,9 @@
     "currency": "Moneda",
     "amount": "Importe",
     "treasury_short": "Tesorería",
-    "type": "Tipo"
+    "type": "Tipo",
+    "collapse": "Plegar",
+    "expand": "Desplegar"
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",

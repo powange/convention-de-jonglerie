@@ -1000,7 +1000,18 @@
       "export_settled": "Pagato",
       "export_subtotal": "Subtotale",
       "export_total": "Totale",
-      "export_without_code": "Senza codice"
+      "export_without_code": "Senza codice",
+      "code_delete_confirm": "Le voci che lo utilizzavano manterranno il loro importo e perderanno soltanto la loro imputazione. Questa azione è definitiva.",
+      "code_delete_title": "Eliminare questo codice?",
+      "code_search_all": "Cerca in tutti i codici…",
+      "plan_already_imported": "Già importato",
+      "plan_description": "Sfoglia i conti, poi importa quelli che ti servono. Potrai cambiarne la denominazione prima di confermare.",
+      "plan_import": "Importa",
+      "plan_no_result": "Nessun conto corrisponde a questa ricerca.",
+      "plan_open": "Trovare un codice nei piani dei conti francesi",
+      "plan_search_placeholder": "Cerca un conto: «assicurazione», «6257», «quote»…",
+      "plan_source": "Testo ufficiale",
+      "plan_title": "Piani dei conti francesi"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

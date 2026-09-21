@@ -191,7 +191,9 @@
     "currency": "Валюта",
     "amount": "Сума",
     "treasury_short": "Каса",
-    "type": "Тип"
+    "type": "Тип",
+    "collapse": "Згорнути",
+    "expand": "Розгорнути"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",

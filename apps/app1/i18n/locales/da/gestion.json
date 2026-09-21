@@ -1000,7 +1000,18 @@
       "export_settled": "Betalt",
       "export_subtotal": "Subtotal",
       "export_total": "I alt",
-      "export_without_code": "Uden kode"
+      "export_without_code": "Uden kode",
+      "code_delete_confirm": "De posteringer, der brugte den, beholder deres beløb og mister kun deres kontering. Handlingen kan ikke fortrydes.",
+      "code_delete_title": "Slet denne kode?",
+      "code_search_all": "Søg i alle koder…",
+      "plan_already_imported": "Allerede importeret",
+      "plan_description": "Gennemse kontiene, og importér dem, du har brug for. Du kan ændre betegnelsen, før du bekræfter.",
+      "plan_import": "Importér",
+      "plan_no_result": "Ingen konto svarer til denne søgning.",
+      "plan_open": "Find en kode i de franske kontoplaner",
+      "plan_search_placeholder": "Søg en konto: “forsikring”, “6257”, “kontingenter”…",
+      "plan_source": "Officiel tekst",
+      "plan_title": "Franske kontoplaner"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

@@ -1000,7 +1000,18 @@
       "export_settled": "Settled",
       "export_subtotal": "Subtotal",
       "export_total": "Total",
-      "export_without_code": "No code"
+      "export_without_code": "No code",
+      "code_delete_confirm": "The entries that used it will keep their amount and only lose their allocation. This action is permanent.",
+      "code_delete_title": "Delete this code?",
+      "code_search_all": "Search across all codes…",
+      "plan_already_imported": "Already imported",
+      "plan_description": "Browse the accounts, then import the ones you need. You can change their label before confirming.",
+      "plan_import": "Import",
+      "plan_no_result": "No account matches this search.",
+      "plan_open": "Find a code in the French charts of accounts",
+      "plan_search_placeholder": "Search for an account: “insurance”, “6257”, “membership fees”…",
+      "plan_source": "Official text",
+      "plan_title": "French charts of accounts"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

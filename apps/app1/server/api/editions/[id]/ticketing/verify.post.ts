@@ -83,6 +83,10 @@ export default wrapApiHandler(
                 nom: true,
                 email: true,
                 phone: true,
+                // L'écran en a besoin pour figer le champ : une adresse vérifiée ne se corrige
+                // plus au guichet, et laisser saisir une valeur que le serveur refusera est pire
+                // que ne pas proposer le champ.
+                isEmailVerified: true,
               },
             },
             teamAssignments: {
@@ -202,6 +206,8 @@ export default wrapApiHandler(
                   firstName: application.user.prenom,
                   lastName: application.user.nom,
                   email: application.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: application.user.isEmailVerified,
                   phone: application.userSnapshotPhone || application.user.phone,
                 },
                 teams: application.teamAssignments.map((assignment) => ({
@@ -252,6 +258,10 @@ export default wrapApiHandler(
                 nom: true,
                 email: true,
                 phone: true,
+                // L'écran en a besoin pour figer le champ : une adresse vérifiée ne se corrige
+                // plus au guichet, et laisser saisir une valeur que le serveur refusera est pire
+                // que ne pas proposer le champ.
+                isEmailVerified: true,
               },
             },
             // distinct : un artiste jouant dans plusieurs numéros d'un cabaret a autant de
@@ -348,6 +358,8 @@ export default wrapApiHandler(
                   firstName: artist.user.prenom,
                   lastName: artist.user.nom,
                   email: artist.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: artist.user.isEmailVerified,
                   phone: artist.user.phone,
                 },
                 shows: artist.shows.map((showArtist) => ({
@@ -393,6 +405,9 @@ export default wrapApiHandler(
                     nom: true,
                     email: true,
                     phone: true,
+                    // L'écran fige le champ quand l'adresse est vérifiée : la laisser saisir
+                    // pour que le serveur la refuse ensuite est pire que ne pas la proposer.
+                    isEmailVerified: true,
                   },
                 },
               },
@@ -475,6 +490,8 @@ export default wrapApiHandler(
                   firstName: editionOrganizer.organizer.user.prenom,
                   lastName: editionOrganizer.organizer.user.nom,
                   email: editionOrganizer.organizer.user.email,
+                  // Porté jusqu'à l'écran : c'est lui qui décide de figer le champ.
+                  isEmailVerified: editionOrganizer.organizer.user.isEmailVerified,
                   phone: editionOrganizer.organizer.user.phone,
                 },
                 title: editionOrganizer.organizer.title,

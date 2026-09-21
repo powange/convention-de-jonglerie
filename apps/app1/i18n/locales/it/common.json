@@ -191,7 +191,9 @@
     "currency": "Valuta",
     "amount": "Importo",
     "treasury_short": "Tesoreria",
-    "type": "Tipo"
+    "type": "Tipo",
+    "collapse": "Comprimi",
+    "expand": "Espandi"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",
