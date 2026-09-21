@@ -906,7 +906,8 @@
       "stats_compare_label": "Vergelijken met een eerdere editie",
       "stats_compare_outer": "{edition} (buitenste ring, gearceerd)",
       "stats_filter_buy_period": "Verkoopperiode",
-      "stats_no_comparison": "Geen vergelijking"
+      "stats_no_comparison": "Geen vergelijking",
+      "orders_items_filtered_out": "(+{count} buiten het filter)"
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",

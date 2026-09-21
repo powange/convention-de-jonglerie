@@ -54,7 +54,14 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
 
     const res = await handler(baseEvent as any)
 
-    expect(res.data).toEqual(mockOrders)
+    // Chaque article dit s'il répond aux filtres. Sans filtre d'article, tous y répondent : le
+    // client n'en grise aucun, et la liste est exactement celle d'avant.
+    expect(res.data).toEqual([
+      {
+        ...mockOrders[0],
+        items: [{ ...mockOrders[0]!.items[0], retenuParLesFiltres: true }],
+      },
+    ])
     expect(res.pagination).toEqual({
       page: 1,
       limit: 20,
@@ -125,7 +132,10 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       {
         id: 1,
         amount: 5000,
-        items: [{ type: 'Participant', amount: 5000 }],
+        // L'article porte son tarif : sous un filtre de tarif, un article sans `tierId` ne peut
+        // pas être celui que la requête a retenu, et le gabarit décrivait une situation qui
+        // n'existe pas.
+        items: [{ type: 'Participant', amount: 5000, tierId: 1, selectedOptions: [] }],
       },
     ]
 
@@ -140,6 +150,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
               id: 1,
               type: 'Participant',
               amount: 5000,
+              tierId: 1,
               tier: { id: 1, name: 'Tarif normal', handoutItems: [] },
             },
           ],
@@ -190,9 +201,14 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
           paymentMethod: true,
           externalTicketingId: true,
           items: {
+            // De quoi rejouer les filtres article par article : sans ces champs, les stats ne
+            // peuvent que compter TOUS les articles des commandes retenues.
             select: {
               type: true,
               amount: true,
+              tierId: true,
+              entryValidated: true,
+              selectedOptions: { select: { optionId: true } },
             },
           },
         },
@@ -208,7 +224,8 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       {
         id: 1,
         amount: 5000,
-        items: [{ type: 'Participant', amount: 5000 }],
+        // Sous un filtre « entrée validée », l'article retenu l'est forcément.
+        items: [{ type: 'Participant', amount: 5000, entryValidated: true, selectedOptions: [] }],
       },
     ]
 
@@ -271,14 +288,144 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
           paymentMethod: true,
           externalTicketingId: true,
           items: {
+            // De quoi rejouer les filtres article par article : sans ces champs, les stats ne
+            // peuvent que compter TOUS les articles des commandes retenues.
             select: {
               type: true,
               amount: true,
+              tierId: true,
+              entryValidated: true,
+              selectedOptions: { select: { optionId: true } },
             },
           },
         },
       })
     )
+  })
+
+  it('ne compte QUE les articles du tarif demandé, pas toute la commande', async () => {
+    // Le défaut signalé, dans sa forme exacte : une commande, deux billets de tarifs
+    // différents, un filtre sur un seul de ces tarifs. Le bandeau annonçait « 1 commande,
+    // 2 billets, 60,00 € » — la commande était juste, les deux autres chiffres comptaient un
+    // billet qu'on n'avait pas demandé.
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', tierIds: '72' })
+
+    const commandeMixte = {
+      id: 602,
+      amount: 6000,
+      status: 'Processed',
+      paymentMethod: 'cash',
+      externalTicketingId: null,
+      items: [
+        { type: 'Registration', amount: 2500, tierId: 72, selectedOptions: [] },
+        { type: 'Registration', amount: 3500, tierId: 87, selectedOptions: [] },
+      ],
+    }
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(1)
+    prismaMock.ticketingOrder.findMany
+      .mockResolvedValueOnce([
+        {
+          ...commandeMixte,
+          externalTicketing: null,
+          items: commandeMixte.items.map((item, index) => ({ ...item, id: 977 + index })),
+        },
+      ] as any) // Pour la pagination
+      .mockResolvedValueOnce([commandeMixte] as any) // Pour les stats
+
+    const res = await handler(baseEvent as any)
+
+    expect(res.stats!.totalOrders).toBe(1)
+    expect(res.stats!.totalItems).toBe(1)
+    // Le montant suit les articles retenus, sans quoi il contredirait le compte affiché à côté.
+    expect(res.stats!.totalAmount).toBe(2500)
+    expect(res.stats!.amountsByPaymentMethod.cash).toBe(2500)
+
+    // Et la liste garde les DEUX articles — la commande reste ce qu'elle est —, en disant lequel
+    // le filtre écarte. Les masquer ferait croire que ce billet n'a pas été vendu.
+    const articles = (res.data as any[])[0].items
+    expect(articles).toHaveLength(2)
+    expect(articles.map((a: any) => a.retenuParLesFiltres)).toEqual([true, false])
+  })
+
+  it('laisse les totaux intacts quand aucun filtre d’article n’est posé', async () => {
+    // Le garde-fou de la correction précédente : sans filtre, on somme le montant de la
+    // COMMANDE, et non ses articles. Sur cette base, 18 commandes sur 565 portent des frais de
+    // billetterie externe qu'aucun article ne représente — les reconstituer ferait baisser un
+    // chiffre qu'on rapproche d'un relevé bancaire.
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20' })
+
+    const avecFrais = {
+      id: 257,
+      amount: 5700,
+      status: 'Processed',
+      paymentMethod: 'card',
+      externalTicketingId: 3,
+      items: [{ type: 'Registration', amount: 5000, tierId: 4, selectedOptions: [] }],
+    }
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(1)
+    prismaMock.ticketingOrder.findMany
+      .mockResolvedValueOnce([
+        { ...avecFrais, externalTicketing: null, items: [{ ...avecFrais.items[0], id: 1 }] },
+      ] as any)
+      .mockResolvedValueOnce([avecFrais] as any)
+
+    const res = await handler(baseEvent as any)
+
+    expect(res.stats!.totalItems).toBe(1)
+    expect(res.stats!.totalAmount).toBe(5700)
+    expect(res.stats!.amountsByPaymentMethod.cardHelloAsso).toBe(5700)
+  })
+
+  it('compte juste quand DEUX commandes sont retenues, dont une seule est mixte', async () => {
+    // Le second signalement, avec ses chiffres réels (tarif 84 de l'édition 22) : deux commandes
+    // retenues, l'une avec un seul billet à 18 €, l'autre avec ce même tarif à 18 € PLUS un
+    // billet à 30 € d'un autre tarif. L'écran annonçait « 3 billets, 66,00 € » — il additionnait
+    // le billet de trop et le montant de la commande entière.
+    mockCanAccess.mockResolvedValue(true)
+    global.getQuery.mockReturnValue({ page: '1', limit: '20', tierIds: '84' })
+
+    const commandes = [
+      {
+        id: 461,
+        amount: 1800,
+        status: 'Processed',
+        paymentMethod: 'cash',
+        externalTicketingId: null,
+        items: [{ type: 'Registration', amount: 1800, tierId: 84, selectedOptions: [] }],
+      },
+      {
+        id: 537,
+        amount: 4800,
+        status: 'Processed',
+        paymentMethod: 'cash',
+        externalTicketingId: null,
+        items: [
+          { type: 'Registration', amount: 1800, tierId: 84, selectedOptions: [] },
+          { type: 'Registration', amount: 3000, tierId: 87, selectedOptions: [] },
+        ],
+      },
+    ]
+
+    prismaMock.ticketingOrder.count.mockResolvedValue(2)
+    prismaMock.ticketingOrder.findMany
+      .mockResolvedValueOnce(
+        commandes.map((c) => ({
+          ...c,
+          externalTicketing: null,
+          items: c.items.map((item, i) => ({ ...item, id: c.id * 10 + i })),
+        })) as any
+      )
+      .mockResolvedValueOnce(commandes as any)
+
+    const res = await handler(baseEvent as any)
+
+    expect(res.stats!.totalOrders).toBe(2)
+    expect(res.stats!.totalItems).toBe(2)
+    expect(res.stats!.totalAmount).toBe(3600)
   })
 
   it('ne calcule pas les stats si recherche active', async () => {

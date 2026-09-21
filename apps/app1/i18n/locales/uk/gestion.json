@@ -906,7 +906,8 @@
       "stats_compare_label": "Порівняти з минулим випуском",
       "stats_compare_outer": "{edition} (зовнішнє кільце, штриховка)",
       "stats_filter_buy_period": "Період продажу",
-      "stats_no_comparison": "Без порівняння"
+      "stats_no_comparison": "Без порівняння",
+      "orders_items_filtered_out": "(+{count} поза фільтром)"
     },
     "title": "Керування",
     "view_edition": "Переглянути випуск",

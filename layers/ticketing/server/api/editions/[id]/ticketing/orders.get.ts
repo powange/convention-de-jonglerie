@@ -2,6 +2,11 @@ import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpe
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { validatePagination, validateEditionId } from '#server/utils/validation-helpers'
+import {
+  articleRetenu,
+  articlesRetenus,
+  filtresDArticlesActifs,
+} from '~~/shared/utils/articles-de-commande-retenus'
 
 interface CustomFieldAnswer {
   name: string
@@ -239,6 +244,21 @@ export default wrapApiHandler(
         (condition) => Object.keys(condition).length > 0
       )
 
+      /**
+       * Les mêmes critères, mais applicables à UN article.
+       *
+       * `items: { some: … }` ci-dessus choisit les COMMANDES : celles qui portent au moins un
+       * article correspondant. Elles arrivent ensuite avec la totalité de leurs articles, y
+       * compris ceux d'un tarif qu'on n'a pas demandé — le bandeau annonçait donc « 1 commande,
+       * 2 billets » là où un seul billet portait le tarif choisi.
+       *
+       * La règle vit dans `articles-de-commande-retenus`, avec ses tests, et le client s'en sert
+       * pour griser les mêmes articles. Elle doit rendre exactement le verdict des conditions
+       * ci-dessus : c'est le seul point qui compte, et c'est ce que ses tests vérifient.
+       */
+      const filtresDArticles = { tierIds, entryStatus, optionIds, itemTypes }
+      const triDesArticlesActif = filtresDArticlesActifs(filtresDArticles)
+
       // `AND` n'apparaît que s'il porte quelque chose : sans filtre, la requête reste le simple
       // `{ editionId }` qu'elle a toujours été, et qui se lit d'un coup d'œil dans un journal.
       const avecCriteres = (conditions: any[]) =>
@@ -335,35 +355,74 @@ export default wrapApiHandler(
             paymentMethod: true,
             externalTicketingId: true,
             items: {
+              // De quoi rejouer les filtres article par article : sans `tierId`, sans
+              // `entryValidated` et sans les options, on ne peut que tout compter.
               select: {
                 type: true,
                 amount: true,
+                tierId: true,
+                entryValidated: true,
+                selectedOptions: { select: { optionId: true } },
               },
             },
           },
         })
 
-        const totalItems = allOrders.reduce((sum, order) => {
-          const ticketItems = order.items.filter((item) => item.type !== 'Donation')
-          return sum + ticketItems.length
-        }, 0)
+        /** Les articles de cette commande que les filtres retiennent réellement. */
+        const retenusDe = (order: (typeof allOrders)[number]) =>
+          articlesRetenus(order.items, filtresDArticles)
 
-        const totalAmount = allOrders.reduce((sum, order) => sum + order.amount, 0)
+        /**
+         * Ce que cette commande apporte au montant affiché.
+         *
+         * Sans tri d'article, c'est le montant de la COMMANDE, et rien ne change : sur 565
+         * commandes de cette base, 18 ont un montant supérieur à la somme de leurs articles —
+         * des frais de billetterie externe, qui ne sont portés par aucun article. Reconstituer
+         * systématiquement le montant en sommant les articles ferait donc baisser un chiffre
+         * qu'on rapproche d'un relevé bancaire.
+         *
+         * Dès qu'un tri est actif, en revanche, le montant suit les articles retenus : c'est ce
+         * que le filtre promet, et laisser le total de la commande entière contredirait le
+         * compte de billets affiché juste à côté.
+         */
+        const montantDe = (
+          order: (typeof allOrders)[number],
+          retenus: ReturnType<typeof retenusDe>
+        ) =>
+          triDesArticlesActif ? retenus.reduce((sum, item) => sum + item.amount, 0) : order.amount
 
-        const totalDonations = allOrders.reduce((sum, order) => {
-          const donations = order.items.filter((item) => item.type === 'Donation')
-          return sum + donations.length
-        }, 0)
+        const parCommande = allOrders.map((order) => {
+          const retenus = retenusDe(order)
+          return { order, retenus, montant: montantDe(order, retenus) }
+        })
 
-        const totalDonationsAmount = allOrders.reduce((sum, order) => {
-          const donations = order.items.filter((item) => item.type === 'Donation')
-          return sum + donations.reduce((itemSum, item) => itemSum + item.amount, 0)
-        }, 0)
+        const totalItems = parCommande.reduce(
+          (sum, { retenus }) => sum + retenus.filter((item) => item.type !== 'Donation').length,
+          0
+        )
+
+        const totalAmount = parCommande.reduce((sum, { montant }) => sum + montant, 0)
+
+        const totalDonations = parCommande.reduce(
+          (sum, { retenus }) => sum + retenus.filter((item) => item.type === 'Donation').length,
+          0
+        )
+
+        const totalDonationsAmount = parCommande.reduce(
+          (sum, { retenus }) =>
+            sum +
+            retenus
+              .filter((item) => item.type === 'Donation')
+              .reduce((itemSum, item) => itemSum + item.amount, 0),
+          0
+        )
 
         // Calculer les montants par méthode de paiement
-        const amountsByPaymentMethod = allOrders.reduce(
-          (acc, order) => {
-            const amount = order.amount
+        const amountsByPaymentMethod = parCommande.reduce(
+          (acc, { order, montant }) => {
+            // La même contribution que celle du total : sinon le détail par moyen de paiement
+            // cesserait d'additionner jusqu'au montant affiché juste au-dessus.
+            const amount = montant
 
             if (order.status === 'Pending') {
               acc.pending += amount
@@ -408,8 +467,25 @@ export default wrapApiHandler(
         }
       }
 
+      /**
+       * Chaque article dit s'il répond aux filtres, ou s'il n'est là que parce que sa commande y
+       * répond.
+       *
+       * La liste montre la commande ENTIÈRE — la masquer amputerait ce qu'on a vendu à cette
+       * personne, et l'écran ne s'appelle pas « billets » mais « commandes ». Le client grise
+       * donc ce que le filtre écarte, plutôt que de le cacher ou de laisser croire que tout y
+       * répond.
+       */
+      const commandesMarquees = orders.map((order) => ({
+        ...order,
+        items: (order.items ?? []).map((item: any) => ({
+          ...item,
+          retenuParLesFiltres: !triDesArticlesActif || articleRetenu(item, filtresDArticles),
+        })),
+      }))
+
       return {
-        ...createPaginatedResponse(orders, total, page, limit),
+        ...createPaginatedResponse(commandesMarquees, total, page, limit),
         stats,
       }
     } catch (error: unknown) {

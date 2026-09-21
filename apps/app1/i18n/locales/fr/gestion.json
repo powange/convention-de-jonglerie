@@ -824,6 +824,7 @@
       "onsite_registration_enabled": "Les organisateurs peuvent ajouter des participants sur place",
       "options_handout_items_manage_for": "Articles à remettre — {name}",
       "orders_description": "Consulter les commandes et participants",
+      "orders_items_filtered_out": "(+{count} hors filtre)",
       "orders_title": "Commandes",
       "origin_site": "Créé sur le site",
       "payment_methods_description": "Choisissez les moyens de paiement acceptés lors de l'ajout de participants sur place",

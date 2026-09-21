@@ -906,7 +906,8 @@
       "stats_compare_label": "Sammenlign med en tidligere udgave",
       "stats_compare_outer": "{edition} (ydre ring, skraveret)",
       "stats_filter_buy_period": "Salgsperiode",
-      "stats_no_comparison": "Ingen sammenligning"
+      "stats_no_comparison": "Ingen sammenligning",
+      "orders_items_filtered_out": "(+{count} uden for filteret)"
     },
     "title": "Administration",
     "view_edition": "Se udgaven",

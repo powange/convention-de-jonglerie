@@ -906,7 +906,8 @@
       "stats_compare_label": "Mit einer früheren Ausgabe vergleichen",
       "stats_compare_outer": "{edition} (äußerer Ring, schraffiert)",
       "stats_filter_buy_period": "Verkaufszeitraum",
-      "stats_no_comparison": "Kein Vergleich"
+      "stats_no_comparison": "Kein Vergleich",
+      "orders_items_filtered_out": "(+{count} außerhalb des Filters)"
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

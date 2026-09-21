@@ -906,7 +906,8 @@
       "stats_compare_label": "Сравнить с прошлым выпуском",
       "stats_compare_outer": "{edition} (внешнее кольцо, штриховка)",
       "stats_filter_buy_period": "Период продаж",
-      "stats_no_comparison": "Без сравнения"
+      "stats_no_comparison": "Без сравнения",
+      "orders_items_filtered_out": "(+{count} вне фильтра)"
     },
     "title": "Управление",
     "view_edition": "Просмотр выпуска",

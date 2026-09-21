@@ -162,7 +162,7 @@
         "error_saving": "Nie udało się zapisać przedmiotów",
         "loading": "Wczytywanie przedmiotów wolontariuszy…",
         "none_configured": "Nie skonfigurowano żadnego przedmiotu",
-        "none_configured_hint": "Wybierz poniżej zakres, aby zacząć",
+        "none_configured_hint": "Kliknij „Zmień”, aby wybrać przedmioty wydawane wszystkim wolontariuszom lub jednemu konkretnemu zespołowi.",
         "preview_falls_back": "{items} — zespół niczego nie zastępuje, dopóki nie przypisano mu żadnego przedmiotu.",
         "preview_global_title": "Co otrzyma wolontariusz bez ustawień zespołu",
         "preview_nothing_at_all": "Nic: ani przedmiotu zespołu, ani przedmiotu globalnego.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "Te przedmioty całkowicie zastępują przedmioty globalne dla wolontariuszy tego zespołu",
         "scope_all_option": "🌍 Wszyscy wolontariusze (globalnie)",
         "team_only": "Tylko zespół",
-        "unknown_team": "Nieznany zespół"
+        "unknown_team": "Nieznany zespół",
+        "edit_title": "Zmień przedmioty wydawane wolontariuszom",
+        "section_title": "Przedmioty wydawane wolontariuszom"
       },
       "associations": {
         "tarifs": "{count} taryfa | {count} taryf",

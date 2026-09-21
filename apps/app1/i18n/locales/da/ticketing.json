@@ -162,7 +162,7 @@
         "error_saving": "Kunne ikke gemme genstandene",
         "loading": "Indlæser de frivilliges genstande…",
         "none_configured": "Ingen genstand opsat",
-        "none_configured_hint": "Vælg et omfang nedenfor for at komme i gang",
+        "none_configured_hint": "Klik på “Rediger” for at vælge de artikler, der udleveres til alle frivillige, eller til et bestemt hold.",
         "preview_falls_back": "{items} — teamet erstatter ingenting, så længe ingen genstand er knyttet til det.",
         "preview_global_title": "Hvad en frivillig uden teamindstillinger får",
         "preview_nothing_at_all": "Ingenting: hverken teamgenstand eller global genstand.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "Disse genstande erstatter fuldstændigt de globale genstande for dette teams frivillige",
         "scope_all_option": "🌍 Alle frivillige (globalt)",
         "team_only": "Kun team",
-        "unknown_team": "Ukendt team"
+        "unknown_team": "Ukendt team",
+        "edit_title": "Rediger artiklerne, der udleveres til de frivillige",
+        "section_title": "Artikler, der udleveres til de frivillige"
       },
       "associations": {
         "tarifs": "{count} pris | {count} priser",

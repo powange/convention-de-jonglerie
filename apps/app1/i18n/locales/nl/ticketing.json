@@ -162,7 +162,7 @@
         "error_saving": "Kan de artikelen niet opslaan",
         "loading": "Vrijwilligersartikelen laden…",
         "none_configured": "Geen artikel ingesteld",
-        "none_configured_hint": "Kies hieronder een bereik om te beginnen",
+        "none_configured_hint": "Klik op ‘Bewerken’ om de items te kiezen die aan alle vrijwilligers worden gegeven, of aan één bepaald team.",
         "preview_falls_back": "{items} — het team vervangt niets zolang er geen artikel aan gekoppeld is.",
         "preview_global_title": "Wat een vrijwilliger zonder teaminstellingen krijgt",
         "preview_nothing_at_all": "Niets: geen teamartikel en geen globaal artikel.",
@@ -174,7 +174,9 @@
         "replaces_global_explanation": "Deze artikelen vervangen de globale artikelen volledig voor de vrijwilligers van dit team",
         "scope_all_option": "🌍 Alle vrijwilligers (globaal)",
         "team_only": "Alleen team",
-        "unknown_team": "Onbekend team"
+        "unknown_team": "Onbekend team",
+        "edit_title": "Items voor vrijwilligers bewerken",
+        "section_title": "Items voor vrijwilligers"
       },
       "associations": {
         "tarifs": "{count} tarief | {count} tarieven",

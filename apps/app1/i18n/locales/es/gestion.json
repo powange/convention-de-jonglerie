@@ -906,7 +906,8 @@
       "stats_compare_label": "Comparar con una edición pasada",
       "stats_compare_outer": "{edition} (anillo exterior, rayado)",
       "stats_filter_buy_period": "Periodo de venta",
-      "stats_no_comparison": "Ninguna comparación"
+      "stats_no_comparison": "Ninguna comparación",
+      "orders_items_filtered_out": "(+{count} fuera del filtro)"
     },
     "title": "Gestión",
     "view_edition": "Ver la edición",
