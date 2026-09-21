@@ -12,21 +12,43 @@
  * ⚠️ Ce fichier ne doit rien importer : il est chargé tel quel par les tests unitaires, hors Nuxt.
  */
 
-/** L'état d'arrivée du filtre de spectacle : aucun filtre. */
-export const SPECTACLE_PAR_DEFAUT = 'ALL'
-
 /** Les filtres, tels que la page les manipule. */
 export interface FiltresDArtistes {
-  /** Identifiant du spectacle retenu, ou `ALL`. */
-  spectacle: string
+  /**
+   * Identifiants des spectacles retenus. Vide signifie « tous » : une liste vide EST l'absence
+   * de filtre, ce qui évite d'avoir à réserver une valeur sentinelle pour le dire.
+   */
+  spectacles: string[]
   /** La recherche libre. */
   recherche: string
+}
+
+/**
+ * Les identifiants portés par `?show=`, séparés par des virgules.
+ *
+ * Le séparateur suit `queryList` de `useQueryFilters`, déjà employé ailleurs dans le dépôt :
+ * une seule façon d'écrire une liste dans une URL vaut mieux que deux.
+ *
+ * Une ancienne URL à un seul spectacle — `?show=3` — se relit sans rien de particulier, ce qui
+ * évite de casser les liens déjà partagés.
+ */
+function listeDepuis(valeur: unknown): string[] {
+  if (Array.isArray(valeur)) {
+    // Vue Router rend un tableau quand la clé apparaît plusieurs fois (`?show=3&show=7`). On
+    // l'accepte plutôt que de le laisser tomber en silence.
+    return valeur.flatMap((element) => listeDepuis(element))
+  }
+  if (typeof valeur !== 'string') return []
+  return valeur
+    .split(',')
+    .map((element) => element.trim())
+    .filter(Boolean)
 }
 
 /** Les filtres que l'URL décrit, ramenés aux défauts pour tout ce qu'elle ne dit pas. */
 export function filtresDepuisUrl(query: Record<string, unknown>): FiltresDArtistes {
   return {
-    spectacle: typeof query.show === 'string' && query.show ? query.show : SPECTACLE_PAR_DEFAUT,
+    spectacles: listeDepuis(query.show),
     recherche: typeof query.search === 'string' ? query.search : '',
   }
 }
@@ -46,8 +68,8 @@ export function requeteArtistes(
   const { show: _show, search: _search, ...autres } = queryActuelle as Record<string, string>
   const query = { ...autres } as Record<string, string>
 
-  if (filtres.spectacle && filtres.spectacle !== SPECTACLE_PAR_DEFAUT) {
-    query.show = filtres.spectacle
+  if (filtres.spectacles.length > 0) {
+    query.show = filtres.spectacles.join(',')
   }
   // La recherche est recopiée telle quelle, espaces compris : c'est ce que la personne a tapé, et
   // la rogner ferait diverger l'URL de ce que montre le champ.
