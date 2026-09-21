@@ -318,11 +318,13 @@ import { prochaineEtapeEmprunt } from '../../../../../utils/etat-emprunt'
 // aurait choisi laquelle des deux auto-importer.
 import { filtrerParTags } from '../../../../../utils/filtre-tags-stock'
 import {
+  filtrerParGroupes,
+  groupesDesObjets,
+  tagsDesObjets,
+} from '../../../../../utils/filtres-objets-stock'
+import {
   actionsOnglet,
   filtrerParEtape,
-  filtrerParGroupes,
-  groupesDesEmprunts,
-  tagsDesEmprunts,
   lignesOnglet,
   ongletDepuisUrl,
   ongletParDefaut,
@@ -410,8 +412,8 @@ const personnes = computed(() => personnesDEtape(lignesOngletOuvert.value))
  * aucun objet n'est emprunté n'a rien à proposer, et le choisir laisserait croire à une panne du
  * filtre plutôt qu'à une absence.
  */
-const groupes = computed(() => groupesDesEmprunts(lignesOngletOuvert.value))
-const tags = computed(() => tagsDesEmprunts(lignesOngletOuvert.value))
+const groupes = computed(() => groupesDesObjets(lignesOngletOuvert.value))
+const tags = computed(() => tagsDesObjets(lignesOngletOuvert.value))
 
 const optionsGroupes = computed(() =>
   groupes.value.map((groupe) => ({ label: groupe.name, value: groupe.id }))

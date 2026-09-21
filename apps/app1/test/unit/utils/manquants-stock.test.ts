@@ -7,6 +7,7 @@ import {
   objetsNonComptes,
   quantiteARacheter,
   resumeRachat,
+  sansSaisie,
   type ObjetManquant,
 } from '../../../../../layers/stock/app/utils/manquants-stock'
 
@@ -190,5 +191,95 @@ describe('estAjoutableAUneListe', () => {
   it('refuse un objet complet ou en surplus', () => {
     expect(estAjoutableAUneListe(objet({ quantity: 4, finalQuantity: 4 }))).toBe(false)
     expect(estAjoutableAUneListe(objet({ quantity: 2, finalQuantity: 5 }))).toBe(false)
+  })
+})
+
+/**
+ * Une saisie non enregistrée ne déplace rien.
+ *
+ * Le défaut constaté : dans l'onglet « reste à compter », taper un chiffre faisait disparaître la
+ * ligne AVANT tout enregistrement — n'importe quelle valeur suffit à ne plus être « non compté ».
+ * On ne pouvait donc pas taper « 12 », la case s'évanouissant après le « 1 ».
+ *
+ * Aucun des vingt tests précédents ne le voyait : ils ne renseignaient que `finalQuantity`, jamais
+ * `saisie`. C'est ce trou-là que ce bloc ferme, et c'est pourquoi chaque cas ci-dessous pose une
+ * saisie qui CONTREDIT l'enregistré — sans cette contradiction, le test passerait quelle que soit
+ * la règle.
+ */
+describe('la saisie du jour ne change pas d’onglet', () => {
+  it('garde dans « reste à compter » un objet tapé mais non enregistré', () => {
+    // Le cas exact du rapport : on tape le premier chiffre de « 12 ».
+    const liste = objetsNonComptes([objet({ name: 'Marmite', quantity: 12, saisie: 1 })])
+    expect(liste.map((o) => o.name)).toEqual(['Marmite'])
+  })
+
+  it('laisse la saisie sur la ligne rendue, pour que la case montre ce qu’on tape', () => {
+    // La ligne ne bouge pas, mais elle n'est pas figée pour autant : c'est l'objet d'origine qui
+    // ressort, saisie comprise, sans quoi la case se serait vidée sous les doigts.
+    const [ligne] = objetsNonComptes([objet({ quantity: 12, saisie: 1 })])
+    expect(ligne?.saisie).toBe(1)
+  })
+
+  it('ne fait pas entrer dans « ce qui manque » un objet seulement tapé', () => {
+    // Sinon le même objet figurerait dans les deux onglets à la fois.
+    expect(objetsARacheter([objet({ quantity: 12, saisie: 1 })])).toEqual([])
+  })
+
+  it('n’en fait pas sortir un objet qu’on vient de corriger sans enregistrer', () => {
+    const liste = objetsARacheter([
+      objet({ name: 'Gobelet', quantity: 10, finalQuantity: 7, saisie: 10 }),
+    ])
+    expect(liste.map((o) => o.name)).toEqual(['Gobelet'])
+  })
+
+  it('résume l’enregistré, pour que le compteur d’un onglet dise son nombre de lignes', () => {
+    const lignes = [
+      objet({ id: 1, quantity: 12, saisie: 1 }),
+      objet({ id: 2, quantity: 10, finalQuantity: 7, saisie: 10 }),
+    ]
+    const resume = resumeRachat(lignes)
+
+    // Un non-compté tapé reste un non-compté ; un manquant corrigé reste un manquant, avec ses
+    // 3 exemplaires. Le tableau montre une ligne dans chaque onglet, le résumé dit la même chose.
+    expect(resume).toEqual({
+      objetsManquants: 1,
+      exemplairesARacheter: 3,
+      nonComptes: 1,
+      total: 2,
+    })
+    expect(resume.nonComptes).toBe(objetsNonComptes(lignes).length)
+    expect(resume.objetsManquants).toBe(objetsARacheter(lignes).length)
+  })
+
+  it('classe les manquants sur l’écart ENREGISTRÉ, pas sur celui qu’on tape', () => {
+    // Sans quoi l'ordre se serait recomposé à chaque frappe, sous le curseur.
+    const liste = objetsARacheter([
+      objet({ id: 1, name: 'Petit manque', quantity: 10, finalQuantity: 9, saisie: 0 }),
+      objet({ id: 2, name: 'Gros manque', quantity: 10, finalQuantity: 2 }),
+    ])
+    expect(liste.map((o) => o.name)).toEqual(['Gros manque', 'Petit manque'])
+  })
+})
+
+describe('sansSaisie', () => {
+  it('efface la saisie sans toucher au reste', () => {
+    const avant = objet({ quantity: 10, finalQuantity: 7, saisie: 3 })
+    expect(sansSaisie(avant)).toEqual({ ...avant, saisie: undefined })
+  })
+
+  it('ne modifie pas la ligne d’origine', () => {
+    // Elle continue d'alimenter l'affichage : la muter viderait la case en cours de frappe.
+    const avant = objet({ saisie: 3 })
+    sansSaisie(avant)
+    expect(avant.saisie).toBe(3)
+  })
+
+  it('distingue « case vidée » de « jamais touchée », comme compteRetenu', () => {
+    // `null` est une valeur — on efface un comptage —, `undefined` une absence. Les confondre
+    // ferait passer un effacement pour une ligne intacte.
+    expect(etatDeRachat(objet({ quantity: 10, finalQuantity: 6, saisie: null }))).toBe('non-compte')
+    expect(etatDeRachat(sansSaisie(objet({ quantity: 10, finalQuantity: 6, saisie: null })))).toBe(
+      'manquant'
+    )
   })
 })

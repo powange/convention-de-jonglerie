@@ -16,9 +16,9 @@ import { validateEditionId } from '#server/utils/validation-helpers'
  * ⚠️ On rend TOUT le matériel de l'édition, y compris ce qui est complet, et non les seuls
  * manquants. Deux raisons :
  *
- * 1. L'écran permet de compter sur place. Un objet qu'on vient de compter juste passe de
- *    « manquant » à « complet » sous le curseur ; s'il avait été filtré côté serveur, corriger une
- *    faute de frappe demanderait de recharger la page pour le voir revenir.
+ * 1. L'écran permet de compter sur place. Un objet qu'on vient de compter juste change d'onglet
+ *    une fois le comptage ENREGISTRÉ ; s'il avait été filtré côté serveur, corriger une faute de
+ *    frappe demanderait de recharger la page pour le voir revenir.
  * 2. Le total des objets de l'édition est ce qui donne son sens au nombre de non-comptés — savoir
  *    qu'il reste 40 objets à compter sur 45 change la lecture d'une liste de rachat.
  *
@@ -54,6 +54,10 @@ export default wrapApiHandler(
         quantity: true,
         finalQuantity: true,
         group: { select: { id: true, name: true } },
+        // Les tags servent à filtrer la séance de comptage — « on fait la cuisine aujourd'hui »,
+        // « on ne s'occupe que du fragile ». La couleur voyage avec : on reconnaît un tag à sa
+        // pastille avant d'en lire le nom, et le même rendu sert sur toutes les pages du module.
+        tags: { select: { tag: { select: { id: true, name: true, color: true } } } },
       },
       orderBy: [{ group: { displayOrder: 'asc' } }, { displayOrder: 'asc' }, { name: 'asc' }],
     })

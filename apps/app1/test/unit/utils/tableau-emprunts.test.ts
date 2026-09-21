@@ -4,9 +4,6 @@ import {
   actionsOnglet,
   compterEmpruntsEnRetard,
   filtrerParEtape,
-  filtrerParGroupes,
-  groupesDesEmprunts,
-  tagsDesEmprunts,
   grouperEmpruntsParEtat,
   lignesEmprunts,
   lignesOnglet,
@@ -17,7 +14,6 @@ import {
   personnesDEtape,
   valeursDEtape,
 } from '../../../../../layers/stock/app/utils/tableau-emprunts'
-import { filtrerParTags } from '../../../../../layers/stock/app/utils/filtre-tags-stock'
 
 /**
  * Le tableau de bord répond à « qu'est-ce qui me tombe dessus en premier ? ». L'ordre est donc la
@@ -439,128 +435,3 @@ describe('personnesDEtape', () => {
  * qu'un tri par nom, et les tests de classement seraient passés quelle que soit la règle — une
  * sonde de mutation l'a montré. Ils ne prouvent quelque chose que si les deux ordres divergent.
  */
-const FRAGILE = { id: 2, name: 'Fragile', color: '#ef4444' }
-const LOURD = { id: 1, name: 'Lourd', color: '#3b82f6' }
-const CUISINE = { id: 20, name: 'Cuisine' }
-const SCENE = { id: 10, name: 'Scène' }
-
-const objet = (
-  nom: string,
-  groupe: { id: number; name: string } | null,
-  etiquettes: Array<{ id: number; name: string; color: string }> = []
-) => ({
-  name: nom,
-  group: groupe,
-  tags: etiquettes.map((tag) => ({ tag })),
-})
-
-describe('groupesDesEmprunts', () => {
-  it('ne rend chaque groupe qu’une fois, quel que soit le nombre d’objets', () => {
-    const groupes = groupesDesEmprunts([
-      objet('Marmite', CUISINE),
-      objet('Louche', CUISINE),
-      objet('Projecteur', SCENE),
-    ])
-    expect(groupes).toEqual([CUISINE, SCENE])
-  })
-
-  it('classe par NOM et non par identifiant', () => {
-    // L'identifiant ne dit rien à qui lit la liste, et l'ordre de la base encore moins.
-    expect(groupesDesEmprunts([objet('a', SCENE), objet('b', CUISINE)]).map((g) => g.name)).toEqual(
-      ['Cuisine', 'Scène']
-    )
-  })
-
-  it('ignore un objet sans groupe plutôt que de lever', () => {
-    expect(groupesDesEmprunts([objet('orphelin', null), objet('Marmite', CUISINE)])).toEqual([
-      CUISINE,
-    ])
-  })
-
-  it('rend une liste vide quand il n’y a rien', () => {
-    expect(groupesDesEmprunts([])).toEqual([])
-  })
-})
-
-describe('tagsDesEmprunts', () => {
-  it('réunit les tags de tous les objets, sans doublon', () => {
-    const etiquettes = tagsDesEmprunts([
-      objet('Marmite', CUISINE, [FRAGILE]),
-      objet('Louche', CUISINE, [FRAGILE, LOURD]),
-    ])
-    // Classées par NOM : « Fragile » avant « Lourd », alors que leurs identifiants disent
-    // l'inverse.
-    expect(etiquettes).toEqual([FRAGILE, LOURD])
-  })
-
-  it('garde la COULEUR, dont le sélecteur a besoin', () => {
-    // On reconnaît une tag à sa couleur : c'est précisément pour cela qu'on l'a posée.
-    expect(tagsDesEmprunts([objet('Marmite', CUISINE, [FRAGILE])])[0]?.color).toBe('#ef4444')
-  })
-
-  it('tient debout sur un objet sans tag', () => {
-    expect(tagsDesEmprunts([objet('Marmite', CUISINE)])).toEqual([])
-    expect(tagsDesEmprunts([{ name: 'x', group: CUISINE } as never])).toEqual([])
-  })
-})
-
-describe('filtrerParGroupe', () => {
-  const liste = [objet('Marmite', CUISINE), objet('Projecteur', SCENE)]
-
-  it('ne garde que les objets du groupe choisi', () => {
-    expect(filtrerParGroupes(liste, [CUISINE.id]).map((o) => o.name)).toEqual(['Marmite'])
-  })
-
-  it('NE FILTRE RIEN sans groupe choisi', () => {
-    // Un filtre vide ne doit pas vider l'écran — même règle que `filtrerParEtape`.
-    expect(filtrerParGroupes(liste, null)).toHaveLength(2)
-    expect(filtrerParGroupes(liste, undefined)).toHaveLength(2)
-  })
-
-  it('compare l’IDENTIFIANT et non le nom', () => {
-    // Deux groupes peuvent porter le même intitulé, et c'est le genre d'égalité qui se
-    // découvre tard.
-    const homonyme = { id: 99, name: 'Cuisine' }
-    expect(filtrerParGroupes([objet('Marmite', CUISINE)], [homonyme.id])).toEqual([])
-  })
-})
-
-describe('les filtres multiples cumulent en OU', () => {
-  /**
-   * Le OU est le seul sens qui rende quelque chose.
-   *
-   * Un ET sur les groupes ne rendrait JAMAIS rien — un objet n'est rangé qu'à un endroit. Sur les
-   * tags il rendrait presque toujours vide, et il faudrait le deviner : rien à l'écran ne dit si
-   * deux cases cochées veulent dire « l'un ou l'autre » ou « les deux à la fois ».
-   */
-  const AUTRE = { id: 3, name: 'Atelier' }
-  const liste = [
-    objet('Marmite', CUISINE, [FRAGILE]),
-    objet('Projecteur', SCENE, [LOURD]),
-    objet('Établi', AUTRE, []),
-  ]
-
-  it('retient les objets de CHACUN des groupes choisis', () => {
-    expect(filtrerParGroupes(liste, [CUISINE.id, SCENE.id]).map((o) => o.name)).toEqual([
-      'Marmite',
-      'Projecteur',
-    ])
-  })
-
-  it('traite une liste VIDE comme une absence de filtre', () => {
-    // Décocher la dernière case doit tout rendre, pas tout cacher.
-    expect(filtrerParGroupes(liste, [])).toHaveLength(3)
-  })
-
-  it('ignore un identifiant qui ne correspond à rien', () => {
-    expect(filtrerParGroupes(liste, [CUISINE.id, 999]).map((o) => o.name)).toEqual(['Marmite'])
-  })
-
-  it('s’enchaîne avec le filtre par tags sans se contredire', () => {
-    // Groupe PUIS tag : les deux filtres se composent en ET entre eux, en OU à l'intérieur.
-    // Le filtre par tags vient du module (`filtre-tags-stock`) : ce qui se vérifie ici, c'est
-    // leur composition sur cet écran, pas le filtre lui-même, éprouvé de son côté.
-    const parGroupe = filtrerParGroupes(liste, [CUISINE.id, SCENE.id])
-    expect(filtrerParTags(parGroupe, [LOURD.id]).map((o) => o.name)).toEqual(['Projecteur'])
-  })
-})
