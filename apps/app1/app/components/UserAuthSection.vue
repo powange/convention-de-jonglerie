@@ -327,8 +327,12 @@ const toggleAdminMode = (checked: boolean) => {
 // Calculer le nom d'affichage
 const displayName = computed(() => authStore.user?.pseudo || authStore.user?.prenom || '')
 
-// Route actuelle pour la redirection après login
-const loginUrl = computed(() => `/login?returnTo=${encodeURIComponent(route.fullPath)}`)
+// Route actuelle pour la redirection après login.
+//
+// Par `buildLoginUrl` et non à la main : l'URL écrite ici était correcte quant au nom du
+// paramètre, mais elle contournait la garde anti-boucle. Affiché depuis `/login`, ce lien
+// renvoyait vers `/login?returnTo=%2Flogin`.
+const loginUrl = computed(() => useReturnTo().buildLoginUrl(route.fullPath))
 
 // Forcer un re-render complet après logout
 const authKey = ref(0)

@@ -100,7 +100,7 @@
                 color="primary"
                 size="sm"
                 icon="i-heroicons-arrow-right-on-rectangle"
-                :to="`/login?redirect=/editions/${editionId}/shows-call/${showCallId}`"
+                :to="buildLoginUrl(route.fullPath)"
               >
                 {{ t('shows_call.login_button') }}
               </UButton>
@@ -197,6 +197,9 @@ import { getEditionDisplayName } from '~/utils/editionName'
 import { convertirRaccourcisEmoji, markdownToHtml } from '~/utils/markdown'
 
 const route = useRoute()
+// `buildLoginUrl` nettoie l'URL, refuse de boucler sur une page d'authentification et
+// encode le paramètre que la page de connexion lit réellement — `returnTo`, et non `redirect`.
+const { buildLoginUrl } = useReturnTo()
 const authStore = useAuthStore()
 const editionStore = useEditionStore()
 const { t } = useI18n()

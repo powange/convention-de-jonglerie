@@ -66,7 +66,7 @@
           <div class="text-center py-4">
             <UIcon name="i-heroicons-chat-bubble-left-right" class="text-gray-400 text-4xl mb-2" />
             <p class="text-gray-600 mb-4">{{ $t('pages.comments.login_to_participate') }}</p>
-            <UButton to="/login" color="primary">
+            <UButton :to="buildLoginUrl(route.fullPath)" color="primary">
               {{ $t('navigation.login') }}
             </UButton>
           </div>
@@ -108,6 +108,9 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 
 const route = useRoute()
+// Sans `returnTo`, qui veut commenter se connecte puis atterrit sur l'accueil, loin de
+// l'édition qu'il lisait.
+const { buildLoginUrl } = useReturnTo()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const { t } = useI18n()

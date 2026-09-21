@@ -914,6 +914,7 @@ watch(
 const {
   data: artistResponse,
   pending: loading,
+  error: artistError,
   refresh: refreshArtist,
 } = await useFetch<{ artist: ArtistInfo | null }>(`/api/editions/${editionId}/my-artist-info`)
 
@@ -932,13 +933,32 @@ const responsibleName = (person: TransportResponsible) => {
   return fullName || person.pseudo
 }
 
-// Redirection si pas artiste
+/**
+ * Où envoyer quelqu'un qui n'a rien à faire ici — et la distinction que cette page ne faisait
+ * pas.
+ *
+ * L'appel répond 401 à un visiteur anonyme. Le code lisait alors `artist === null` et concluait
+ * « cette personne n'est pas artiste », donc la renvoyait vers l'édition. Comme tout cela se
+ * joue pendant le rendu serveur, le lien partagé se soldait par une 302 : la personne n'avait
+ * jamais l'occasion de se connecter, et sa destination était perdue.
+ *
+ * Un 401 veut dire « je ne sais pas qui vous êtes », pas « vous n'êtes pas artiste ».
+ */
+const { buildLoginUrl } = useReturnTo()
+
 watch(
-  artist,
-  (value) => {
-    if (value === null && !loading.value) {
-      navigateTo(`/editions/${editionId}`)
+  [artist, artistError],
+  ([value, erreur]) => {
+    if (loading.value) return
+
+    const code = (erreur as { statusCode?: number } | null)?.statusCode
+    if (code === 401) {
+      navigateTo(buildLoginUrl(route.fullPath))
+      return
     }
+
+    // Réellement connecté, mais pas artiste sur cette édition.
+    if (value === null) navigateTo(`/editions/${editionId}`)
   },
   { immediate: true }
 )
