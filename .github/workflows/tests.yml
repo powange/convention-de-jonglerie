@@ -570,25 +570,47 @@ jobs:
     #
     # Ils ont donc leur propre lot, ce qui est aussi plus juste sur le fond : ils n'ont besoin ni de
     # `data-setup` ni de l'édition partagée, et se trouvaient dans les shards par effet de bord.
-    # Les trois shards ne portent plus que `edition-management`, dont les fichiers se ressemblent et
-    # s'équilibrent mieux.
     #
-    # Trois shards et pas quatre. La préparation d'un lot coûte 105 s — mesurée, et constante d'un
-    # lot à l'autre —, ce qui fixe le rendement décroissant : le quatrième coûterait 105 s de compute
-    # pour une cinquantaine de secondes d'attente.
+    # ---------------------------------------------------------------------------------------
+    # RÉVISION DU 21/09/2026 — la phrase qui tenait ici affirmait que les fichiers d'
+    # `edition-management` « se ressemblent et s'équilibrent mieux », et concluait à trois shards
+    # plutôt que quatre, la préparation d'un lot coûtant 105 s. Les deux moitiés étaient fausses.
     #
-    # La commande est écrite en toutes lettres pour chaque lot plutôt que déduite de `job-total` :
-    # depuis que la matrice n'est plus homogène, ce total ne vaut plus le diviseur du découpage.
+    # Les fichiers ne se ressemblent pas : de 2 s à 30 s. Relevé des trois lots réellement exécutés,
+    # extrait des rapports Playwright archivés :
+    #
+    #   gestion-1   27 fichiers   230 s      ← la moitié du projet dans un seul lot
+    #   gestion-2   14 fichiers   134 s
+    #   gestion-3   13 fichiers   146 s
+    #
+    # `--shard` équilibre le NOMBRE de tests, pas leur durée, et le découpage étant déterministe le
+    # déséquilibre l'était aussi — le même lot en tête à chaque run. Et la préparation ne coûte plus
+    # 105 s mais ~92 s depuis que la base de test est construite une fois (job `base-de-test`).
+    #
+    # `gestion-1` est donc coupé en deux, à 116 s et 114 s. Les deux autres lots sont recopiés à
+    # l'identique, d'où des listes explicites (`scripts/lot-playwright.mjs`) et non des shards.
+    #
+    # ⚠️ POURQUOI UNE SUBDIVISION, ET PAS UN RÉÉQUILIBRAGE GÉNÉRAL. Une première tentative a
+    # réparti les 54 fichiers par durée sans égard pour les lots d'origine ; la CI l'a refusée.
+    # `acces-benevole-en-creneau.spec.ts` et `volunteers.spec.ts` se sont retrouvés ensemble alors
+    # qu'ils n'avaient JAMAIS partagé une base, et ils se contredisent sur les réglages de l'unique
+    # édition que `fullyParallel: false` leur fait partager. Subdiviser un lot ne peut que défaire
+    # des cohabitations, jamais en créer : c'est la seule raison pour laquelle ce découpage-ci est
+    # sûr, et un futur rééquilibrage qui déplacerait un fichier d'un lot vers un autre la perdrait.
+    #
+    # Ce qu'il resterait à gagner, mesuré : `gestion-2` (268 s de job) devient le chemin critique,
+    # et le plancher au-delà est le lot `publics` à 193 s.
     strategy:
       # Comme pour le job `test` : on veut voir tous les échecs, pas seulement celui du premier lot
       # qui tombe. Un lot rouge n'apprend rien sur les autres.
       fail-fast: false
       matrix:
         lot:
-          - { cle: gestion-1, args: --project=edition-management --shard=1/3 }
-          - { cle: gestion-2, args: --project=edition-management --shard=2/3 }
-          - { cle: gestion-3, args: --project=edition-management --shard=3/3 }
-          - { cle: publics, args: --project=public --project=authenticated }
+          - { cle: gestion-1a, projet: edition-management }
+          - { cle: gestion-1b, projet: edition-management }
+          - { cle: gestion-2, projet: edition-management }
+          - { cle: gestion-3, projet: edition-management }
+          - { cle: publics, projet: public, args: --project=authenticated }
 
     # Ces trois variables n'existaient que dans playwright.yml et restent portées par ce seul job :
     # au niveau workflow elles toucheraient lint, typecheck, build et test, qui n'en ont que faire.
@@ -713,10 +735,17 @@ jobs:
             exit 1
           fi
 
+      # Les lots de gestion reçoivent une liste de fichiers, pas un `--shard`. Le script refuse de
+      # rendre une liste si un fichier de test n'appartient à aucun lot : sans ce contrôle, un
+      # fichier ajouté plus tard ne s'exécuterait nulle part et tous les lots resteraient verts.
       - name: Run Playwright tests
-        run: >-
-          NUXT_SERVER_LOG=/tmp/nuxt-server.log
-          npx playwright test ${{ matrix.lot.args }}
+        run: |
+          fichiers=()
+          if [ "${{ matrix.lot.projet }}" = "edition-management" ]; then
+            read -ra fichiers <<< "$(node scripts/lot-playwright.mjs ${{ matrix.lot.cle }})"
+          fi
+          NUXT_SERVER_LOG=/tmp/nuxt-server.log \
+            npx playwright test --project=${{ matrix.lot.projet }} ${{ matrix.lot.args }} "${fichiers[@]}"
 
       - name: Dump server log on failure
         if: failure()
