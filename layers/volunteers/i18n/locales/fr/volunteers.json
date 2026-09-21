@@ -639,6 +639,7 @@
     "swap_your_slot": "Votre créneau",
     "swap_their_slot": "Son créneau",
     "untitled_slot": "Créneau sans titre",
-    "with_you_on_slot": "Avec vous sur ce créneau : | Avec vous sur ce créneau ({count}) :"
+    "with_you_on_slot": "Avec vous sur ce créneau : | Avec vous sur ce créneau ({count}) :",
+    "swap_pick_person": "Avec qui échanger :"
   }
 }

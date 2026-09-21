@@ -143,6 +143,7 @@
                     <template #content>
                       <UCalendar
                         v-model="setupStartDateLocal"
+                        :week-starts-on="debutDeSemaine"
                         :placeholder="setupStartDatePlaceholder"
                         :max-value="setupStartDateMaxValue"
                         @update:model-value="handleSetupStartDateChange"
@@ -184,6 +185,7 @@
                     <template #content>
                       <UCalendar
                         v-model="teardownEndDateLocal"
+                        :week-starts-on="debutDeSemaine"
                         :placeholder="teardownEndDatePlaceholder"
                         :min-value="teardownEndDateMinValue"
                         @update:model-value="handleTeardownEndDateChange"
@@ -402,6 +404,13 @@ import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
 import { useVolunteerSettings } from '#imports'
+
+import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+
+// La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
+// regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
+const { locale: localeDeSemaine } = useI18n()
+const debutDeSemaine = computed(() => premierJourDeSemaine(localeDeSemaine.value))
 
 definePageMeta({
   middleware: ['auth-protected'],

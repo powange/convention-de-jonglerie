@@ -15,6 +15,13 @@ import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
  * La langue vient de l'i18n et n'est plus figée à `fr-FR`, comme elle l'était aux quatre endroits.
  */
 export interface CreneauLisible {
+  /**
+   * Déclaré parce que le sélecteur d'échange REGROUPE par créneau : un créneau à plusieurs
+   * places apparaissait autant de fois qu'il a de titulaires, chaque carte identique à la
+   * précédente. Le serveur l'envoie depuis toujours (`selectionCreneauLisible`), le type ne le
+   * disait simplement pas.
+   */
+  id?: string
   title?: string | null
   startDateTime: string
   endDateTime: string

@@ -140,6 +140,51 @@ describe('effectifApresEchange', () => {
   })
 })
 
+describe('creneauxProposables — les autres places du créneau offert', () => {
+  /**
+   * Un créneau à deux places, tenu par le demandeur ET par quelqu'un d'autre.
+   *
+   * Échanger sa place contre celle du collègue ne change rien : les deux restent exactement où
+   * ils étaient. Le cas se produit dès qu'un créneau a plusieurs places — c'est-à-dire la norme —
+   * et il passait au travers parce que le créneau offert est retiré des « gardées » : ses autres
+   * places ne chevauchaient donc plus rien.
+   */
+  const surLeCreneau = (id: string, userId: number, creneauId: string, heure: number) => ({
+    id,
+    userId,
+    timeSlot: {
+      id: creneauId,
+      startDateTime: `2030-08-01T${String(heure).padStart(2, '0')}:00:00Z`,
+      endDateTime: `2030-08-01T${String(heure + 2).padStart(2, '0')}:00:00Z`,
+    },
+  })
+
+  it('n’offre PAS la place d’un collègue sur le créneau que l’on cède', () => {
+    const toutes = [
+      surLeCreneau('a1', 10, 'cuisine-10h', 10),
+      surLeCreneau('a2', 20, 'cuisine-10h', 10),
+    ]
+    expect(creneauxProposables(10, 'a1', toutes)).toEqual([])
+  })
+
+  it('continue d’offrir un AUTRE créneau à la même heure', () => {
+    // Le créneau offert se libère : le chevaucher reste permis, et c'est le cas le plus courant.
+    const toutes = [
+      surLeCreneau('a1', 10, 'cuisine-10h', 10),
+      surLeCreneau('a2', 20, 'cuisine-10h', 10),
+      surLeCreneau('a3', 30, 'bar-10h', 10),
+    ]
+    expect(creneauxProposables(10, 'a1', toutes).map((a) => a.id)).toEqual(['a3'])
+  })
+
+  it('n’écarte rien quand l’affectation offerte est introuvable', () => {
+    // Le point d'API la vérifie avant d'appeler ; ce repli évite qu'une liste vide passe pour
+    // « aucun échange possible » si cette garde venait à sauter.
+    const toutes = [surLeCreneau('a2', 20, 'cuisine-10h', 10)]
+    expect(creneauxProposables(10, 'inconnue', toutes).map((a) => a.id)).toEqual(['a2'])
+  })
+})
+
 describe('equipesDuPerimetre', () => {
   /**
    * Le trou que cette règle referme : on peut tenir un créneau d'une équipe sans y être

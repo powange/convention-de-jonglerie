@@ -17,6 +17,7 @@
           <template #content>
             <UCalendar
               v-model="calendarDateValue"
+              :week-starts-on="debutDeSemaine"
               class="p-2"
               :placeholder="calendarPlaceholder"
               :is-date-disabled="isCalendarDateDisabled"
@@ -63,6 +64,13 @@ import { watch, shallowRef } from 'vue'
 import { useDateTimePicker } from '~/composables/useDateTimePicker'
 
 import type { TimeValue } from 'reka-ui'
+
+import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+
+// La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
+// regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
+const { locale: localeDeSemaine } = useI18n()
+const debutDeSemaine = computed(() => premierJourDeSemaine(localeDeSemaine.value))
 
 interface Props {
   /** Valeur v-model au format ISO string */

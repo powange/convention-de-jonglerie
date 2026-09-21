@@ -50,6 +50,7 @@
           />
           <template #content>
             <UCalendar
+              :week-starts-on="debutDeSemaine"
               :model-value="calendarStartDate"
               class="p-2"
               @update:model-value="emit('update-start-date', $event)"
@@ -72,6 +73,7 @@
           />
           <template #content>
             <UCalendar
+              :week-starts-on="debutDeSemaine"
               :model-value="calendarEndDate"
               class="p-2"
               :is-date-disabled="(date) => calendarStartDate && date < calendarStartDate"
@@ -159,6 +161,13 @@
 
 <script setup lang="ts">
 import type { CalendarDate } from '@internationalized/date'
+
+import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+
+// La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
+// regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
+const { locale: localeDeSemaine } = useI18n()
+const debutDeSemaine = computed(() => premierJourDeSemaine(localeDeSemaine.value))
 
 interface Props {
   filters: any

@@ -192,32 +192,10 @@
                   </UBadge>
                 </template>
 
-                <!-- Colonne Équipes de bénévolat. Mêmes pastilles colorées que les colonnes
-                     d'équipes de la gestion des candidatures : la couleur porte l'identité de
-                     l'équipe, et c'est elle qu'on reconnaît d'une page à l'autre. -->
-                <template #teams-cell="{ row }">
-                  <div v-if="row.original.teams?.length" class="flex flex-wrap gap-1">
-                    <UBadge
-                      v-for="equipe in row.original.teams"
-                      :key="equipe.id"
-                      color="primary"
-                      variant="soft"
-                      size="sm"
-                      :style="
-                        equipe.color
-                          ? {
-                              backgroundColor: equipe.color + '20',
-                              borderColor: equipe.color,
-                              color: equipe.color,
-                            }
-                          : undefined
-                      "
-                    >
-                      {{ equipe.name }}
-                    </UBadge>
-                  </div>
-                  <span v-else class="text-gray-500">—</span>
-                </template>
+                <!-- Les équipes de bénévolat d'un organisateur ne se lisent PLUS ici : la PR #458
+                     les a déplacées vers /gestion/volunteers/teams, là où vit le droit qui les
+                     gouverne. Le slot `#teams-cell` qui subsistait ici n'était plus rendu — aucune
+                     colonne `teams` ne le réclamait — et laissait croire à une colonne cassée. -->
 
                 <!-- Colonne Rôles : les modules que la personne peut gérer sur CETTE édition,
                      droits de convention compris. Voir `roles-edition`. -->

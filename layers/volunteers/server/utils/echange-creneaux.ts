@@ -40,13 +40,20 @@ export function seChevauchent(a: Creneau, b: Creneau): boolean {
 /**
  * Les affectations qu'un bénévole peut convoiter, parmi celles des autres.
  *
- * Deux exclusions, et une seule raison derrière : ne pas proposer l'impossible.
+ * Trois exclusions, et une seule raison derrière : ne pas proposer l'inutile ni l'impossible.
  *
  * — Ses propres affectations : on n'échange pas avec soi-même.
+ * — Les autres places du créneau qu'il OFFRE. Échanger sa place contre celle d'un collègue sur
+ *   le même créneau ne change rien : les deux restent exactement où ils étaient. Le cas se
+ *   produit dès qu'un créneau a plusieurs places, ce qui est la norme.
  * — Tout créneau qui chevaucherait l'un de ceux qu'il GARDE, c'est-à-dire tous les siens sauf
  *   celui qu'il offre. Le créneau offert, lui, se libère par l'échange : le chevaucher est non
  *   seulement permis, c'est le cas le plus courant — on échange souvent un créneau contre un
  *   autre du même moment.
+ *
+ * ⚠️ L'ordre compte entre les deux dernières. C'est parce que le créneau offert est retiré des
+ * « gardées » que ses autres places échappaient au filtre de chevauchement : elles ne
+ * chevauchaient plus rien. Il faut donc les écarter explicitement.
  */
 export function creneauxProposables(
   demandeurId: number,
@@ -55,9 +62,11 @@ export function creneauxProposables(
 ): AffectationCandidate[] {
   const siennes = toutes.filter((a) => a.userId === demandeurId)
   const gardees = siennes.filter((a) => a.id !== affectationOfferteId)
+  const creneauOffert = toutes.find((a) => a.id === affectationOfferteId)?.timeSlot.id
 
   return toutes.filter((candidate) => {
     if (candidate.userId === demandeurId) return false
+    if (creneauOffert !== undefined && candidate.timeSlot.id === creneauOffert) return false
     return !gardees.some((gardee) => seChevauchent(gardee.timeSlot, candidate.timeSlot))
   })
 }

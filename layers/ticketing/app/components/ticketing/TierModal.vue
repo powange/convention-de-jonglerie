@@ -205,13 +205,22 @@
             </UFormField>
           </div>
 
+          <!-- `clearable` sur les quatre champs : ces bornes sont FACULTATIVES — leur texte à
+               vide dit « Aucune limite » — et rien ne permettait de les retirer une fois
+               posées. Ni le calendrier ni le sélecteur ne se vident d'eux-mêmes. -->
           <UFormField label="Date de début" name="validFrom">
             <UiDateField
               v-if="form.isAllDay"
               v-model="validFromForField"
               placeholder="Aucune limite"
+              clearable
             />
-            <UiDateTimePicker v-else v-model="validFromForDateTime" placeholder="Aucune limite" />
+            <UiDateTimePicker
+              v-else
+              v-model="validFromForDateTime"
+              placeholder="Aucune limite"
+              clearable
+            />
           </UFormField>
 
           <UFormField label="Date de fin" name="validUntil">
@@ -219,8 +228,14 @@
               v-if="form.isAllDay"
               v-model="validUntilForField"
               placeholder="Aucune limite"
+              clearable
             />
-            <UiDateTimePicker v-else v-model="validUntilForDateTime" placeholder="Aucune limite" />
+            <UiDateTimePicker
+              v-else
+              v-model="validUntilForDateTime"
+              placeholder="Aucune limite"
+              clearable
+            />
           </UFormField>
         </div>
 
@@ -267,6 +282,8 @@ import { useEditionStore } from '~/stores/editions'
 
 import { isFreePrice } from '../../utils/ticketing/tiers'
 
+import { versChampLocal, versInstant } from '~~/shared/utils/fuseau-edition'
+
 interface TicketingTier {
   id: number
   name: string
@@ -306,38 +323,33 @@ const isOpen = computed({
   set: (value) => emit('update:open', value),
 })
 
-// Fonction pour convertir une date en format datetime-local sans décalage horaire
-const toDateTimeLocal = (dateString: string | Date) => {
-  const date = new Date(dateString)
-  // Créer une nouvelle date en ajustant pour le fuseau horaire local
-  const tzOffset = date.getTimezoneOffset() * 60000
-  const localDate = new Date(date.getTime() - tzOffset)
-  return localDate.toISOString().slice(0, 16)
-}
+/**
+ * Le fuseau de l'édition : les dates de validité d'un tarif sont celles du LIEU.
+ *
+ * Un tarif qui s'ouvre « le 2 octobre à 18 h » s'ouvre à 18 h sur place, quel que soit l'endroit
+ * d'où l'organisateur le saisit ou le relit.
+ */
+const fuseauEdition = computed(() => (edition.value as { timezone?: string | null })?.timezone)
 
-// Fonction pour convertir une date en format date (sans heure)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const toDateOnly = (dateString: string | Date) => {
-  const date = new Date(dateString)
-  const tzOffset = date.getTimezoneOffset() * 60000
-  const localDate = new Date(date.getTime() - tzOffset)
-  return localDate.toISOString().slice(0, 10)
-}
+/**
+ * L'instant stocké, ramené à l'heure murale de l'édition pour le formulaire.
+ *
+ * Remplace une conversion qui passait par `getTimezoneOffset()`, c'est-à-dire par le fuseau du
+ * NAVIGATEUR. Conjuguée à une écriture sans fuseau, elle décalait les horaires de deux heures en
+ * été — mesuré : 18 h saisi ressortait à 20 h.
+ */
+const versHeureDeLEdition = (instant: string | Date) => versChampLocal(instant, fuseauEdition.value)
 
-// Fonction pour détecter si les dates correspondent à "toute la journée"
+/**
+ * Les deux bornes couvrent-elles des journées entières ?
+ *
+ * Lu sur la chaîne elle-même — `2026-10-02T00:00` — et non sur un objet `Date` : ces valeurs sont
+ * déjà l'heure du lieu, et les relire par `getHours()` les ferait repasser par le fuseau de la
+ * machine, ce que ce correctif s'emploie justement à supprimer.
+ */
 const isAllDayDates = (validFrom: string | null, validUntil: string | null) => {
   if (!validFrom || !validUntil) return false
-
-  const startDate = new Date(validFrom)
-  const endDate = new Date(validUntil)
-
-  // Vérifier si l'heure de début est 00:00 et l'heure de fin est 23:59
-  return (
-    startDate.getHours() === 0 &&
-    startDate.getMinutes() === 0 &&
-    endDate.getHours() === 23 &&
-    endDate.getMinutes() === 59
-  )
+  return validFrom.slice(11, 16) === '00:00' && validUntil.slice(11, 16) === '23:59'
 }
 
 // Fonction pour convertir une date en "toute la journée"
@@ -439,9 +451,11 @@ watch(
 
       if (props.tier) {
         // Mode édition
-        const validFromLocal = props.tier.validFrom ? toDateTimeLocal(props.tier.validFrom) : null
+        const validFromLocal = props.tier.validFrom
+          ? versHeureDeLEdition(props.tier.validFrom)
+          : null
         const validUntilLocal = props.tier.validUntil
-          ? toDateTimeLocal(props.tier.validUntil)
+          ? versHeureDeLEdition(props.tier.validUntil)
           : null
         const isAllDay = isAllDayDates(validFromLocal, validUntilLocal)
 
@@ -490,33 +504,28 @@ watch(
 watch(
   () => form.value.isAllDay,
   (isAllDay, wasAllDay) => {
+    // Les heures tombent ou reviennent ; les JOURNÉES, elles, ne bougent pas. Cocher la case
+    // écrasait la date de fin avec celle de début : un tarif valable du 1er au 2 octobre se
+    // retrouvait valable le 1er seulement, sans que rien ne le signale.
+    const journee = (valeur: string | null) => (valeur ? valeur.slice(0, 10) : null)
+
     if (isAllDay && !wasAllDay) {
-      // Passage vers "toute la journée"
-      let fromDate = null
-      let untilDate = null
+      const debut = journee(form.value.validFrom)
+      const fin = journee(form.value.validUntil)
 
-      // Extraire les dates existantes (enlever les heures si elles existent)
-      if (form.value.validFrom) {
-        fromDate = form.value.validFrom.slice(0, 10)
-      }
-      if (form.value.validUntil) {
-        untilDate = form.value.validUntil.slice(0, 10)
-      }
-
-      // Si on a au moins une date, configurer les deux
-      if (fromDate || untilDate) {
-        const targetDate = fromDate || untilDate
-        form.value.validFrom = targetDate
-        form.value.validUntil = targetDate
-      }
+      // Chaque borne garde la sienne. Celle qui manque emprunte à l'autre — c'était l'intention
+      // d'origine, et elle est utile : une seule date saisie décrit bien une journée entière.
+      form.value.validFrom = debut ?? fin
+      form.value.validUntil = fin ?? debut
     } else if (!isAllDay && wasAllDay) {
-      // Passage vers datetime précis - on garde les dates mais on ajoute des heures par défaut
-      if (form.value.validFrom) {
-        form.value.validFrom = `${form.value.validFrom}T00:00`
-      }
-      if (form.value.validUntil) {
-        form.value.validUntil = `${form.value.validUntil}T23:59`
-      }
+      // `journee()` avant de concaténer : un tarif enregistré en journée entière se recharge
+      // avec ses heures — `2026-10-01T00:00` —, et coller un second suffixe produisait
+      // `2026-10-01T00:00T00:00`, que plus rien ne sait relire.
+      const debut = journee(form.value.validFrom)
+      const fin = journee(form.value.validUntil)
+
+      if (debut) form.value.validFrom = `${debut}T00:00`
+      if (fin) form.value.validUntil = `${fin}T23:59`
     }
   }
 )
@@ -536,31 +545,39 @@ watch(
 )
 
 // Computed pour obtenir les dates finales avec les bonnes heures
-const finalValidFrom = computed(() => {
+/**
+ * Les bornes telles qu'elles partent au serveur : un INSTANT, pas une heure murale.
+ *
+ * C'est ici que se jouait le défaut. La chaîne `2026-10-02T18:00` partait nue, et le serveur —
+ * qui tourne en UTC — la lisait comme 18 h UTC, soit 20 h à Paris. `versInstant` l'ancre dans le
+ * fuseau de l'édition avant l'envoi, et le serveur n'a plus rien à deviner.
+ *
+ * `versInstant` rend une chaîne vide plutôt qu'un instant inventé si le fuseau annoncé est
+ * inconnu ou la saisie illisible : l'API refusera, ce qui vaut mieux qu'une date fausse en base.
+ */
+const versInstantDeLEdition = (heureLocale: string) =>
+  versInstant(heureLocale, fuseauEdition.value) || null
+
+/** L'heure murale retenue, avant ancrage : 00:00 et 23:59 en mode « toute la journée ». */
+const heureLocaleValidFrom = computed(() => {
   if (!form.value.validFrom) return null
-
-  if (form.value.isAllDay) {
-    // En mode "toute la journée", assurer les heures 00:00
-    return form.value.validFrom.length === 10
-      ? `${form.value.validFrom}T00:00`
-      : form.value.validFrom.slice(0, 10) + 'T00:00'
-  }
-
-  return form.value.validFrom
+  if (!form.value.isAllDay) return form.value.validFrom
+  return `${form.value.validFrom.slice(0, 10)}T00:00`
 })
 
-const finalValidUntil = computed(() => {
+const heureLocaleValidUntil = computed(() => {
   if (!form.value.validUntil) return null
-
-  if (form.value.isAllDay) {
-    // En mode "toute la journée", assurer les heures 23:59
-    return form.value.validUntil.length === 10
-      ? `${form.value.validUntil}T23:59`
-      : form.value.validUntil.slice(0, 10) + 'T23:59'
-  }
-
-  return form.value.validUntil
+  if (!form.value.isAllDay) return form.value.validUntil
+  return `${form.value.validUntil.slice(0, 10)}T23:59`
 })
+
+const finalValidFrom = computed(() =>
+  heureLocaleValidFrom.value ? versInstantDeLEdition(heureLocaleValidFrom.value) : null
+)
+
+const finalValidUntil = computed(() =>
+  heureLocaleValidUntil.value ? versInstantDeLEdition(heureLocaleValidUntil.value) : null
+)
 
 // Construit les données du formulaire pour l'API
 const buildFormData = () => {
