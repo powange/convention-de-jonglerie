@@ -195,7 +195,8 @@
     "collapse": "Свернуть",
     "expand": "Развернуть",
     "volunteers": "Волонтёры",
-    "organizers": "Организаторы"
+    "organizers": "Организаторы",
+    "export_csv": "Экспорт в CSV"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

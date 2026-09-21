@@ -195,7 +195,8 @@
     "collapse": "Inklappen",
     "expand": "Uitklappen",
     "volunteers": "Vrijwilligers",
-    "organizers": "Organisatoren"
+    "organizers": "Organisatoren",
+    "export_csv": "Exporteren naar CSV"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

@@ -339,7 +339,8 @@
         "manageWorkshops": "Workshop",
         "manageFAQ": "FAQ",
         "manageTreasury": "Tesoreria"
-      }
+      },
+      "title_column": "Ruolo"
     },
     "overview": "Panoramica",
     "services": {

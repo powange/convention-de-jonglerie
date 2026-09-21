@@ -103,9 +103,22 @@
                   {{ $t('gestion.organizers.present_on_edition') }}
                 </h2>
               </div>
-              <UBadge v-if="editionOrganizers.length > 0" color="indigo" variant="soft">
-                {{ editionOrganizers.length }}
-              </UBadge>
+              <div class="flex items-center gap-2">
+                <UBadge v-if="editionOrganizers.length > 0" color="indigo" variant="soft">
+                  {{ editionOrganizers.length }}
+                </UBadge>
+                <!-- L'export reprend EXACTEMENT les colonnes affichées, conditions comprises :
+                     ce qu'on exporte est ce qu'on voit. -->
+                <UButton
+                  v-if="editionOrganizers.length > 0"
+                  icon="i-heroicons-arrow-down-tray"
+                  color="neutral"
+                  variant="ghost"
+                  size="xs"
+                  :label="$t('common.export_csv')"
+                  @click="exporterLesOrganisateurs"
+                />
+              </div>
             </div>
 
             <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -407,11 +420,14 @@ import { useDebounce } from '~/composables/useDebounce'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { OrganizerRightsFormData } from '~/types/organizer'
+import { organisateursEnCsv } from '~/utils/export-organisateurs'
 import { summarizeRights } from '~/utils/organizerRights'
+import { telechargerFichier } from '~/utils/telechargement'
 
 import type { TableColumn } from '@nuxt/ui'
 
 import { estAdresseEmail } from '~~/shared/utils/adresse-email'
+import { nomDeFichierCsv } from '~~/shared/utils/csv'
 import { couleurDuRole } from '~~/shared/utils/roles-edition'
 
 // Sans ce garde, la page se rendait côté serveur pour un visiteur anonyme, puis affichait
@@ -727,6 +743,33 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
     size: 100,
   },
 ])
+
+/**
+ * L'export CSV du tableau.
+ *
+ * Les colonnes conditionnelles sont calculées ICI à partir des mêmes drapeaux que
+ * `editionOrganizersColumns` : ce qu'on exporte est ce qu'on voit. Les recopier serait la
+ * première occasion de les faire diverger.
+ *
+ * Le contact (courriel, téléphone) suit ce que le SERVEUR a bien voulu envoyer : il le masque
+ * pour qui accède à cette liste par la billetterie. Tester la présence du champ plutôt qu'un
+ * droit reconstruit côté écran évite d'avoir deux vérités sur la même règle.
+ */
+const exporterLesOrganisateurs = () => {
+  const colonnes = {
+    contact: editionOrganizers.value.some((o: any) => o?.user?.email !== undefined),
+    statut: Boolean(edition.value?.ticketingEnabled),
+    repas: Boolean(edition.value?.mealsEnabled) && canManageMeals.value,
+  }
+
+  telechargerFichier(
+    nomDeFichierCsv(`organisateurs-edition-${editionId}`),
+    organisateursEnCsv(editionOrganizers.value, colonnes, t),
+    'text/csv;charset=utf-8'
+  )
+
+  toast.add({ title: t('common.export_success'), color: 'success' })
+}
 
 // Fonctions pour gérer les organisateurs d'édition
 const loadEditionOrganizers = async () => {

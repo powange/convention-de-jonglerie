@@ -195,7 +195,8 @@
     "collapse": "Zwiń",
     "expand": "Rozwiń",
     "volunteers": "Wolontariusze",
-    "organizers": "Organizatorzy"
+    "organizers": "Organizatorzy",
+    "export_csv": "Eksportuj do CSV"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

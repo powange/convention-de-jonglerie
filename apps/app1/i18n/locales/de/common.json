@@ -195,7 +195,8 @@
     "collapse": "Einklappen",
     "expand": "Ausklappen",
     "volunteers": "Helfer",
-    "organizers": "Organisatoren"
+    "organizers": "Organisatoren",
+    "export_csv": "Als CSV exportieren"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

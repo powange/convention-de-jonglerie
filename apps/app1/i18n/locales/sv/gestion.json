@@ -339,7 +339,8 @@
         "manageWorkshops": "Workshops",
         "manageFAQ": "FAQ",
         "manageTreasury": "Ekonomi"
-      }
+      },
+      "title_column": "Titel"
     },
     "overview": "Översikt",
     "services": {

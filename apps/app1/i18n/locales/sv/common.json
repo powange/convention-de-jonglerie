@@ -195,7 +195,8 @@
     "collapse": "Fäll ihop",
     "expand": "Fäll ut",
     "volunteers": "Volontärer",
-    "organizers": "Arrangörer"
+    "organizers": "Arrangörer",
+    "export_csv": "Exportera till CSV"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",
