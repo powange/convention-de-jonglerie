@@ -339,7 +339,8 @@
         "manageWorkshops": "Warsztaty",
         "manageFAQ": "FAQ",
         "manageTreasury": "Finanse"
-      }
+      },
+      "title_column": "Funkcja"
     },
     "overview": "Przegląd",
     "services": {

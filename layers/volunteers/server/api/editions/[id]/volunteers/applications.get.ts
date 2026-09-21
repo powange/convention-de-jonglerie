@@ -10,6 +10,7 @@ import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -451,16 +452,24 @@ export default wrapApiHandler(
           formatBoolean(app.eventAvailability),
           formatDateTimeWithGranularity(app.arrivalDateTime || ''),
           formatDateTimeWithGranularity(app.departureDateTime || ''),
-        ].map((cell) => `"${(cell || '').toString().replace(/"/g, '""')}"`)
+        ]
       })
 
-      const csvContent = [csvHeaders.join(','), ...csvRows.map((row) => row.join(','))].join('\n')
+      /**
+       * Le format passe par `versCsv`, partagé avec l'export des organisateurs.
+       *
+       * Ce qu'il apporte et qui manquait ici : la marque d'ordre des octets, sans laquelle Excel
+       * sous Windows lit « Prénom » en « PrÃ©nom » sur toute la colonne ; l'échappement des
+       * EN-TÊTES, qui tenait par chance faute de virgule dans un libellé ; et la garde contre
+       * l'injection de formule, une motivation étant du texte saisi par un utilisateur.
+       */
+      const csvContent = versCsv(csvHeaders, csvRows)
 
       setHeader(event, 'Content-Type', 'text/csv; charset=utf-8')
       setHeader(
         event,
         'Content-Disposition',
-        `attachment; filename="candidatures-benevoles-edition-${editionId}.csv"`
+        `attachment; filename="${nomDeFichierCsv(`candidatures-benevoles-edition-${editionId}`)}"`
       )
 
       return csvContent

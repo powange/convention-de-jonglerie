@@ -195,7 +195,8 @@
     "collapse": "Sbalit",
     "expand": "Rozbalit",
     "volunteers": "Dobrovolníci",
-    "organizers": "Organizátoři"
+    "organizers": "Organizátoři",
+    "export_csv": "Exportovat do CSV"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

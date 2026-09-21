@@ -339,7 +339,8 @@
         "manageWorkshops": "Workshops",
         "manageFAQ": "FAQ",
         "manageTreasury": "Treasury"
-      }
+      },
+      "title_column": "Title"
     },
     "overview": "Overview",
     "services": {

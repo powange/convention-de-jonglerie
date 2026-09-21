@@ -339,7 +339,8 @@
         "manageWorkshops": "Talleres",
         "manageFAQ": "FAQ",
         "manageTreasury": "Tesorería"
-      }
+      },
+      "title_column": "Cargo"
     },
     "overview": "Vista general",
     "services": {

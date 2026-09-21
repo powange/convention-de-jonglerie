@@ -195,7 +195,8 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "volunteers": "Volunteers",
-    "organizers": "Organisers"
+    "organizers": "Organisers",
+    "export_csv": "Export to CSV"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

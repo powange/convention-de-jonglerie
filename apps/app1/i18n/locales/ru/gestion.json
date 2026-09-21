@@ -339,7 +339,8 @@
         "manageWorkshops": "Воркшопы",
         "manageFAQ": "FAQ",
         "manageTreasury": "Финансы"
-      }
+      },
+      "title_column": "Должность"
     },
     "overview": "Обзор",
     "services": {
