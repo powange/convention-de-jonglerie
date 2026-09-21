@@ -299,6 +299,13 @@
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 
+// Sans ce garde, la page se rendait côté serveur pour un visiteur anonyme, puis affichait
+// « Accès refusé » après hydratation : ne pas être connecté y était confondu avec ne pas avoir
+// les droits. Dix des treize pages de gestion le portaient déjà ; celle-ci l'avait oublié.
+definePageMeta({
+  middleware: ['auth-protected'],
+})
+
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()

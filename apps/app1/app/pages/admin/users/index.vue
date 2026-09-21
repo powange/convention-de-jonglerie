@@ -244,6 +244,10 @@ useSeoMeta({
 
 // Composables
 const router = useRouter()
+// Relevés ici, et non dans le `catch` de `fetchUsers` : celui-ci s'exécute depuis un callback
+// asynchrone, hors du contexte de setup, où ces appels ne sont pas garantis.
+const route = useRoute()
+const { buildLoginUrl } = useReturnTo()
 const { queryValue, queryEnum, queryBool, queryNumber, queryList } = useQueryFilters()
 
 // État réactif
@@ -633,14 +637,20 @@ const columns = [
         return h('div', { class: 'text-sm text-gray-400' }, t('admin.never_connected'))
       }
 
+      // La date est relevée ici plutôt que relue dans la fermeture ci-dessous : la garde
+      // au-dessus la restreint bien à une chaîne, mais TypeScript perd cette restriction dès
+      // qu'on relit la propriété depuis un callback — il ne peut pas prouver qu'elle n'a pas
+      // changé entre-temps.
+      const derniereConnexion = user.lastLoginAt
+
       return h(
         resolveComponent('UTooltip'),
-        { text: formatDateTime(user.lastLoginAt) },
+        { text: formatDateTime(derniereConnexion) },
         {
           default: () =>
             h('div', { class: 'text-sm cursor-help' }, [
-              h('div', formatDate(user.lastLoginAt)),
-              h('div', { class: 'text-gray-500' }, formatRelativeTime(user.lastLoginAt)),
+              h('div', formatDate(derniereConnexion)),
+              h('div', { class: 'text-gray-500' }, formatRelativeTime(derniereConnexion)),
             ]),
         }
       )
@@ -1106,9 +1116,10 @@ const fetchUsers = async () => {
   } catch (error: any) {
     console.error('Error loading users:', error)
 
-    // Si erreur d'authentification, rediriger vers login
+    // Si erreur d'authentification, rediriger vers login — en gardant la destination, sans
+    // quoi l'administrateur se reconnecte et retombe sur l'accueil.
     if (error?.statusCode === 401 || error?.status === 401) {
-      navigateTo('/login')
+      navigateTo(buildLoginUrl(route.fullPath))
       return
     }
 

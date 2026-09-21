@@ -1,11 +1,14 @@
 import { useAuthStore } from '~/stores/auth'
 
-export default defineNuxtRouteMiddleware((_to) => {
+export default defineNuxtRouteMiddleware((to) => {
   if (import.meta.client) {
     const authStore = useAuthStore()
 
     if (!authStore.isAuthenticated) {
-      return navigateTo('/login')
+      // Avec la destination : sans elle, un administrateur dont la session a expiré se
+      // reconnecte et retombe sur l'accueil, à charge pour lui de refaire son chemin.
+      const { buildLoginUrl } = useReturnTo()
+      return navigateTo(buildLoginUrl(to.fullPath))
     }
 
     if (!authStore.user?.isGlobalAdmin) {

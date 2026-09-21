@@ -414,6 +414,13 @@ import type { TableColumn } from '@nuxt/ui'
 import { estAdresseEmail } from '~~/shared/utils/adresse-email'
 import { couleurDuRole } from '~~/shared/utils/roles-edition'
 
+// Sans ce garde, la page se rendait côté serveur pour un visiteur anonyme, puis affichait
+// « Accès refusé » après hydratation : ne pas être connecté y était confondu avec ne pas avoir
+// les droits. Dix des treize pages de gestion le portaient déjà ; celle-ci l'avait oublié.
+definePageMeta({
+  middleware: ['auth-protected'],
+})
+
 const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
