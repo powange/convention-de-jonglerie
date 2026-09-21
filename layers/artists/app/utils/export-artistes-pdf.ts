@@ -13,12 +13,13 @@
  */
 
 /**
- * Colonnes qui n'ont aucun sens sur papier.
+ * Colonnes qui n'ont aucun sens dans un fichier, quel qu'en soit le format.
  *
- * « Actions » ne porte que des boutons ; l'imprimer donnerait une colonne vide, large, et qui
- * pousse les autres hors de la page.
+ * « Actions » ne porte que des boutons. Sur papier, cela donne une colonne vide, large, qui
+ * pousse les autres hors de la page ; dans un tableur, une colonne de cellules vides qu'on
+ * finit par supprimer à la main.
  */
-export const COLONNES_SANS_SENS_EN_PDF = ['actions']
+export const COLONNES_SANS_SENS_A_EXPORTER = ['actions']
 
 /**
  * Colonnes dont les retours à la ligne sont VOULUS.
@@ -47,14 +48,14 @@ export interface TableauDArtistes {
  * Les colonnes à imprimer, dans l'ordre du tableau.
  *
  * On part des identifiants **visibles** tels que la table les donne, et non de la liste complète :
- * masquer une colonne à l'écran doit la retirer du PDF, c'est tout l'intérêt du bouton.
+ * masquer une colonne à l'écran doit la retirer du fichier, c'est tout l'intérêt du bouton.
  */
 export function colonnesImprimables(
   idsVisibles: string[],
   entete: (id: string) => string
 ): ColonneImprimable[] {
   return idsVisibles
-    .filter((id) => !COLONNES_SANS_SENS_EN_PDF.includes(id))
+    .filter((id) => !COLONNES_SANS_SENS_A_EXPORTER.includes(id))
     .map((id) => ({ id, entete: entete(id) }))
 }
 

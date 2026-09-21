@@ -262,7 +262,8 @@
       "severity_critical": "kritická",
       "severity_light": "mírná",
       "severity_moderate": "střední",
-      "severity_severe": "těžká"
+      "severity_severe": "těžká",
+      "export_count": "{count} jídel"
     },
     "organizers": {
       "access_rights": "Přístupová práva",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Finance"
       },
-      "title_column": "Funkce"
+      "title_column": "Funkce",
+      "export_count": "{count} organizátorů"
     },
     "overview": "Přehled",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Zrušit vrácení ({count}) | Zrušit vrácení ({count})",
       "cancel_reservation": "Zrušit rezervaci",
       "clear_selection": "Vymazat výběr",
-      "columns": "Sloupce",
       "confirm_cancel_reservation": "Zrušit tuto rezervaci?",
       "confirm_delete_group": "Smazat skupinu „{name}“ a její {count} předmět(y)?",
       "confirm_delete_group_simple": "Smazat skupinu „{name}“?",
@@ -500,7 +501,6 @@
       "empty_group": "V této skupině nejsou žádné předměty",
       "empty_state": "Zatím žádná skupina skladu",
       "ends_at": "Konec",
-      "export_pdf": "Inventární list (PDF)",
       "export_pdf_empty": "Žádný předmět k exportu",
       "export_pdf_summary": "{objets} předmětů · {comptes} spočítáno · {empruntes} zapůjčeno",
       "external_loan": "Materiál zapůjčený externě",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "„{name}“ bude odebrána z tohoto nákupního seznamu. Vybavení ve skladu zůstane nedotčeno.",
       "confirm_delete_item_cascade": "Tento předmět bude trvale smazán. Tuto akci nelze vrátit zpět. | Tento předmět a jeho rezervace budou trvale smazány — mohl ji vytvořit někdo jiný. | Tento předmět a jeho {count} rezervací budou trvale smazány — některé mohl vytvořit někdo jiný.",
       "loan_group_all": "Všechny skupiny",
-      "loan_tag_all": "Všechny štítky"
+      "loan_tag_all": "Všechny štítky",
+      "export_pdf_filtered_empty": "Žádný předmět neodpovídá nastaveným filtrům",
+      "export_pdf_extract": "filtrovaný výběr: {affiches} z {total} předmětů",
+      "filter_no_results": "Žádný předmět neodpovídá nastaveným filtrům"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

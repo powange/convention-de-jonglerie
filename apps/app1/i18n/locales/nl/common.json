@@ -196,7 +196,9 @@
     "expand": "Uitklappen",
     "volunteers": "Vrijwilligers",
     "organizers": "Organisatoren",
-    "export_csv": "Exporteren naar CSV"
+    "export_csv": "Exporteren naar CSV",
+    "export_pdf": "Exporteren als PDF",
+    "export": "Exporteren"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

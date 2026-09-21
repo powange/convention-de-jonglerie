@@ -196,7 +196,9 @@
     "treasury_short": "Trésorerie",
     "volunteers": "Bénévoles",
     "organizers": "Organisateurs",
-    "export_csv": "Exporter en CSV"
+    "export_csv": "Exporter en CSV",
+    "export_pdf": "Exporter en PDF",
+    "export": "Exporter"
   },
   "dates": {
     "date_range": "Du {startDate} au {endDate}",

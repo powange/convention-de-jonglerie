@@ -196,7 +196,9 @@
     "expand": "Розгорнути",
     "volunteers": "Волонтери",
     "organizers": "Організатори",
-    "export_csv": "Експорт у CSV"
+    "export_csv": "Експорт у CSV",
+    "export_pdf": "Експортувати у PDF",
+    "export": "Експортувати"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",

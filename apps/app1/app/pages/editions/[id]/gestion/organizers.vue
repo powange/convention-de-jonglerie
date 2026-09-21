@@ -104,19 +104,28 @@
                 </h2>
               </div>
               <div class="flex items-center gap-2">
-                <UBadge v-if="editionOrganizers.length > 0" color="indigo" variant="soft">
-                  {{ editionOrganizers.length }}
+                <!-- Le compte à gauche des deux boutons, dans la même forme que sur la liste
+                     des artistes : un chiffre nu se lisait comme une décoration du titre, là où
+                     il appartient à la barre d'outils — c'est le volume de ce qu'on s'apprête à
+                     trier, à choisir et à emporter. -->
+                <UBadge v-if="editionOrganizers.length > 0" color="neutral" variant="soft">
+                  {{ $t('common.total') }}: {{ editionOrganizers.length }}
                 </UBadge>
+
                 <!-- L'export reprend EXACTEMENT les colonnes affichées, conditions comprises :
                      ce qu'on exporte est ce qu'on voit. -->
-                <UButton
+                <UiColumnsMenu
                   v-if="editionOrganizers.length > 0"
-                  icon="i-heroicons-arrow-down-tray"
-                  color="neutral"
-                  variant="ghost"
                   size="xs"
-                  :label="$t('common.export_csv')"
-                  @click="exporterLesOrganisateurs"
+                  variant="ghost"
+                  :table-api="tableOrganisateurs?.tableApi"
+                  :libelle="libelleColonneOrganisateur"
+                />
+                <UiExportMenu
+                  v-if="editionOrganizers.length > 0"
+                  size="xs"
+                  :on-csv="exporterLesOrganisateurs"
+                  :on-pdf="exporterLesOrganisateursEnPdf"
                 />
               </div>
             </div>
@@ -131,6 +140,8 @@
             </div>
             <div v-else-if="editionOrganizers.length > 0">
               <UTable
+                ref="tableOrganisateurs"
+                v-model:column-visibility="colonnesVisibles"
                 :data="editionOrganizers"
                 :columns="editionOrganizersColumns"
                 class="border border-accented"
@@ -398,7 +409,12 @@ import { useDebounce } from '~/composables/useDebounce'
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
 import type { OrganizerRightsFormData } from '~/types/organizer'
-import { organisateursEnCsv } from '~/utils/export-organisateurs'
+import {
+  entetesDesOrganisateurs,
+  ligneDUnOrganisateur,
+  organisateursEnCsv,
+} from '~/utils/export-organisateurs'
+import { exporterTableauEnPdf } from '~/utils/export-pdf-tableau'
 import { summarizeRights } from '~/utils/organizerRights'
 import { telechargerFichier } from '~/utils/telechargement'
 
@@ -419,6 +435,7 @@ const route = useRoute()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
+const { formatDate } = useDateFormat()
 const { t } = useI18n()
 
 const editionId = parseInt(route.params.id as string)
@@ -675,11 +692,37 @@ const availableOrganizersOptions = computed(() => {
 })
 
 // Colonnes de la table des organisateurs d'édition
+const tableOrganisateurs = ref<{ tableApi?: unknown } | null>(null)
+
+/**
+ * Les colonnes masquées au départ : aucune.
+ *
+ * Ce tableau en porte six au plus, et toutes répondent à une question qu'on se pose sur un
+ * organisateur. En masquer d'office obligerait à chercher pourquoi il en manque une.
+ */
+const colonnesVisibles = ref<Record<string, boolean>>({})
+
+/** Le nom lisible d'une colonne, pour le menu qui les propose. */
+const libelleColonneOrganisateur = (id: string): string => {
+  const libelles: Record<string, string> = {
+    organizer: t('gestion.organizers.organizer'),
+    email: t('common.email'),
+    phone: t('common.phone'),
+    status: t('gestion.organizers.status'),
+    roles: t('gestion.organizers.roles_column'),
+    meals: t('common.meals_short'),
+    actions: t('common.actions'),
+  }
+  return libelles[id] ?? id
+}
+
 const editionOrganizersColumns = computed((): TableColumn<any>[] => [
   {
+    // Sans le nom, une ligne ne désigne plus personne.
     id: 'organizer',
     header: t('gestion.organizers.organizer'),
     size: 300,
+    enableHiding: false,
   },
   {
     id: 'email',
@@ -716,9 +759,11 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
       ]
     : []),
   {
+    // Masquer les actions rendrait le tableau inutilisable, sans rien dire.
     id: 'actions',
     header: t('common.actions'),
     size: 100,
+    enableHiding: false,
   },
 ])
 
@@ -733,18 +778,53 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
  * pour qui accède à cette liste par la billetterie. Tester la présence du champ plutôt qu'un
  * droit reconstruit côté écran évite d'avoir deux vérités sur la même règle.
  */
-const exporterLesOrganisateurs = () => {
-  const colonnes = {
-    contact: editionOrganizers.value.some((o: any) => o?.user?.email !== undefined),
-    statut: Boolean(edition.value?.ticketingEnabled),
-    repas: Boolean(edition.value?.mealsEnabled) && canManageMeals.value,
-  }
+/**
+ * Les colonnes que le fichier doit porter : exactement celles du tableau.
+ *
+ * Elles ne se déduisent pas d'une préférence mais de faits — la billetterie est-elle active, le
+ * module repas l'est-il, a-t-on le droit de voir les coordonnées. Les deux formats les lisent au
+ * même endroit : en dupliquer le calcul ferait diverger le CSV du PDF sur une édition
+ * particulière, et personne ne s'en apercevrait avant d'ouvrir les deux.
+ */
+const colonnesExportees = () => ({
+  contact: editionOrganizers.value.some((o: any) => o?.user?.email !== undefined),
+  statut: Boolean(edition.value?.ticketingEnabled),
+  repas: Boolean(edition.value?.mealsEnabled) && canManageMeals.value,
+})
 
+const exporterLesOrganisateurs = () => {
   telechargerFichier(
     nomDeFichierCsv(`organisateurs-edition-${editionId}`),
-    organisateursEnCsv(editionOrganizers.value, colonnes, t),
+    organisateursEnCsv(editionOrganizers.value, colonnesExportees(), t),
     'text/csv;charset=utf-8'
   )
+
+  toast.add({ title: t('common.export_success'), color: 'success' })
+}
+
+/**
+ * La même liste, à emporter.
+ *
+ * Le PDF sert là où le tableur ne sert à rien : à l'accueil, au guichet, une feuille à la main —
+ * d'où la colonne de cases à cocher que la mise en page ajoute d'office.
+ */
+const exporterLesOrganisateursEnPdf = async () => {
+  const colonnes = colonnesExportees()
+
+  await exporterTableauEnPdf({
+    titre: t('gestion.organizers.present_on_edition'),
+    sousTitre: [edition.value?.convention?.name, edition.value?.name].filter(Boolean).join(' - '),
+    // La date et le nombre : une feuille détachée de l'écran n'a plus rien pour se situer, et
+    // deux listes d'années différentes se ressemblent trop pour qu'on les distingue.
+    mention: `${formatDate(new Date().toISOString())} — ${t('gestion.organizers.export_count', {
+      count: editionOrganizers.value.length,
+    })}`,
+    entetes: entetesDesOrganisateurs(colonnes, t),
+    lignes: editionOrganizers.value.map((organisateur: any) =>
+      ligneDUnOrganisateur(organisateur, colonnes, t)
+    ),
+    nomFichier: `organisateurs-edition-${editionId}`,
+  })
 
   toast.add({ title: t('common.export_success'), color: 'success' })
 }

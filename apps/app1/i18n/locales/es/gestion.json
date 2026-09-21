@@ -262,7 +262,8 @@
       "severity_critical": "crítica",
       "severity_light": "leve",
       "severity_moderate": "moderada",
-      "severity_severe": "grave"
+      "severity_severe": "grave",
+      "export_count": "{count} comidas"
     },
     "organizers": {
       "access_rights": "Derechos de acceso",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Tesorería"
       },
-      "title_column": "Cargo"
+      "title_column": "Cargo",
+      "export_count": "{count} organizadores"
     },
     "overview": "Vista general",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Anular la devolución ({count}) | Anular las devoluciones ({count})",
       "cancel_reservation": "Cancelar reserva",
       "clear_selection": "Borrar selección",
-      "columns": "Columnas",
       "confirm_cancel_reservation": "¿Cancelar esta reserva?",
       "confirm_delete_group": "¿Eliminar el grupo «{name}» y sus {count} objeto(s)?",
       "confirm_delete_group_simple": "¿Eliminar el grupo «{name}»?",
@@ -500,7 +501,6 @@
       "empty_group": "No hay objetos en este grupo",
       "empty_state": "Aún no hay grupos de stock",
       "ends_at": "Fin",
-      "export_pdf": "Ficha de inventario (PDF)",
       "export_pdf_empty": "Ningún objeto que exportar",
       "export_pdf_summary": "{objets} objetos · {comptes} contados · {empruntes} prestados",
       "external_loan": "Material prestado por un externo",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "«{name}» se quitará de esta lista de la compra. El material del inventario no se toca.",
       "confirm_delete_item_cascade": "Este objeto se eliminará definitivamente. Esta acción es irreversible. | Este objeto y su reserva se eliminarán definitivamente — puede haberla hecho otra persona. | Este objeto y sus {count} reservas se eliminarán definitivamente — algunas pueden haberlas hecho otras personas.",
       "loan_group_all": "Todos los grupos",
-      "loan_tag_all": "Todas las etiquetas"
+      "loan_tag_all": "Todas las etiquetas",
+      "export_pdf_filtered_empty": "Ningún objeto coincide con los filtros aplicados",
+      "export_pdf_extract": "extracto filtrado: {affiches} de {total} objetos",
+      "filter_no_results": "Ningún objeto coincide con los filtros aplicados"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

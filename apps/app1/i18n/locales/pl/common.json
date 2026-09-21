@@ -196,7 +196,9 @@
     "expand": "Rozwiń",
     "volunteers": "Wolontariusze",
     "organizers": "Organizatorzy",
-    "export_csv": "Eksportuj do CSV"
+    "export_csv": "Eksportuj do CSV",
+    "export_pdf": "Eksportuj do PDF",
+    "export": "Eksportuj"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

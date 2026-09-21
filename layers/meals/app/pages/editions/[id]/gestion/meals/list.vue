@@ -253,7 +253,35 @@
             </p>
           </div>
 
-          <UTable v-else :data="formattedParticipants" :columns="columns" class="w-full" />
+          <template v-else>
+            <!-- La barre appartient à CE tableau. Le bouton de la carte du dessus, lui, ne
+                 produit pas un export mais la feuille de service d'une journée : c'est une
+                 fonctionnalité à part, et les accoler laisserait croire que décocher une colonne
+                 la change. -->
+            <div class="mb-2 flex items-center justify-end gap-2">
+              <UBadge color="neutral" variant="soft">
+                {{ $t('common.total') }}: {{ pagination.total }}
+              </UBadge>
+
+              <UiColumnsMenu
+                :table-api="tableParticipants?.tableApi"
+                :libelle="libelleColonneParticipant"
+              />
+
+              <UiExportMenu
+                :on-csv="() => exporterParticipants('csv')"
+                :on-pdf="() => exporterParticipants('pdf')"
+              />
+            </div>
+
+            <UTable
+              ref="tableParticipants"
+              v-model:column-visibility="colonnesVisibles"
+              :data="formattedParticipants"
+              :columns="columns"
+              class="w-full"
+            />
+          </template>
 
           <!-- Pagination -->
           <div v-if="pagination.totalPages > 1" class="flex justify-center mt-6">
@@ -271,6 +299,10 @@
 </template>
 
 <script setup lang="ts">
+import { exporterTableauEnPdf } from '~/utils/export-pdf-tableau'
+import { dessinerCaseACocher, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
+import { telechargerFichier } from '~/utils/telechargement'
+
 // Import explicite : plusieurs layers exportent un `filtresDepuisUrl`, et l'auto-import ne
 // saurait pas lequel prendre.
 import {
@@ -279,6 +311,8 @@ import {
   requeteListeDeRepas,
 } from '../../../../../utils/filtres-liste-repas'
 import { resumerRepas, lignesDeParticipants } from '../../../../../utils/restauration-pdf'
+
+import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
 
 const route = useRoute()
 const editionStore = useEditionStore()
@@ -364,8 +398,36 @@ const dateOptions = computed(() => [
 ])
 
 // Colonnes du tableau
+const tableParticipants = ref<{ tableApi?: unknown } | null>(null)
+
+/**
+ * Aucune colonne masquée au départ.
+ *
+ * Neuf colonnes tiennent encore à l'écran, et chacune répond à une question du service : qui,
+ * quel repas, quel régime. Ce menu sert à en RETIRER quand on prépare une impression ou qu'on
+ * travaille sur un portable, pas à réparer un tableau illisible d'emblée.
+ */
+const colonnesVisibles = ref<Record<string, boolean>>({})
+
+/** Le nom lisible d'une colonne, pour le menu qui les propose. */
+const libelleColonneParticipant = (id: string): string => {
+  const libelles: Record<string, string> = {
+    nom: t('common.name'),
+    prenom: t('common.first_name'),
+    email: t('common.email'),
+    type: t('common.type'),
+    mealDate: t('common.date'),
+    mealType: t('gestion.meals.meal_type'),
+    mealPhase: t('gestion.meals.phase'),
+    dietaryPreference: t('gestion.meals.diet'),
+    afterShow: t('gestion.meals.after_show'),
+  }
+  return libelles[id] ?? id
+}
+
 const columns = [
-  { accessorKey: 'nom', header: t('common.name') },
+  // Sans le nom, une ligne ne désigne plus personne.
+  { accessorKey: 'nom', header: t('common.name'), enableHiding: false },
   { accessorKey: 'prenom', header: t('common.first_name') },
   { accessorKey: 'email', header: t('common.email') },
   { accessorKey: 'type', header: t('common.type') },
@@ -396,29 +458,108 @@ const regimeAAfficher = (regime: string | null) =>
 const formatDate = formatDateWeekdayMonthShort
 
 // Données formatées pour le tableau
-const formattedParticipants = computed(() => {
-  return participants.value.map((p) => {
-    let typeLabel = ''
-    if (p.type === 'volunteer') typeLabel = t('common.volunteer')
-    else if (p.type === 'artist') typeLabel = t('common.artist')
-    else if (p.type === 'participant') typeLabel = t('common.participant')
-    else if (p.type === 'organizer') typeLabel = t('common.organizer')
+/**
+ * Un participant, mis en forme pour le tableau.
+ *
+ * Fonction et non boucle dans le `computed` : l'export doit produire EXACTEMENT les mêmes
+ * cellules que l'écran, sur une autre liste — celle de toutes les pages et non de la page
+ * affichée. Recopier la mise en forme serait la première occasion de les faire diverger.
+ */
+const formaterParticipant = (p: any) => {
+  let typeLabel = ''
+  if (p.type === 'volunteer') typeLabel = t('common.volunteer')
+  else if (p.type === 'artist') typeLabel = t('common.artist')
+  else if (p.type === 'participant') typeLabel = t('common.participant')
+  else if (p.type === 'organizer') typeLabel = t('common.organizer')
 
-    return {
-      nom: p.nom,
-      prenom: p.prenom,
-      email: p.email,
-      type: typeLabel,
-      mealDate: formatDate(p.mealDate),
-      mealType: getMealTypeLabel(p.mealType),
-      mealPhase: getPhasesLabel(p.mealPhases),
-      // `'NONE'` n'est pas un régime à nommer : la colonne reste vide, comme pour qui n'a rien
-      // déclaré. Sans ça, elle affichait le mot brut aux organisateurs et aux artistes.
-      dietaryPreference: regimeAAfficher(p.dietaryPreference),
-      afterShow: p.type === 'artist' && p.afterShow ? '✓' : '-',
-    }
+  return {
+    nom: p.nom,
+    prenom: p.prenom,
+    email: p.email,
+    type: typeLabel,
+    mealDate: formatDate(p.mealDate),
+    mealType: getMealTypeLabel(p.mealType),
+    mealPhase: getPhasesLabel(p.mealPhases),
+    // `'NONE'` n'est pas un régime à nommer : la colonne reste vide, comme pour qui n'a rien
+    // déclaré. Sans ça, elle affichait le mot brut aux organisateurs et aux artistes.
+    dietaryPreference: regimeAAfficher(p.dietaryPreference),
+    afterShow: p.type === 'artist' && p.afterShow ? '✓' : '-',
+  }
+}
+
+const formattedParticipants = computed(() => participants.value.map(formaterParticipant))
+
+/**
+ * Toutes les lignes que les filtres laissent passer, et non la page affichée.
+ *
+ * Le tableau est paginé côté serveur : exporter `formattedParticipants` ne donnerait que les
+ * vingt lignes sous les yeux. Personne ne s'en apercevrait tout de suite — le fichier a l'air
+ * complet — et l'on compterait les repas sur un cinquième des convives.
+ *
+ * On redemande donc la liste entière, avec les mêmes filtres et un plafond fixé sur le total que
+ * la pagination annonce.
+ */
+const toutesLesLignes = async () => {
+  const reponse: any = await $fetch(`/api/editions/${editionId.value}/meals/participants`, {
+    params: {
+      ...parametresDesFiltres(),
+      page: '1',
+      pageSize: String(Math.max(pagination.value.total, 1)),
+    },
   })
-})
+  return (reponse?.data ?? []).map(formaterParticipant)
+}
+
+/**
+ * Les colonnes retenues pour un export : celles qui sont AFFICHÉES.
+ *
+ * Même source pour les deux formats — la table elle-même — sans quoi décocher une colonne
+ * l'aurait retirée d'un fichier et pas de l'autre.
+ */
+const colonnesAExporter = () => {
+  const visibles: string[] = (
+    tableParticipants.value?.tableApi?.getVisibleLeafColumns?.() ?? []
+  ).map((colonne: any) => colonne.id)
+  const retenues =
+    visibles.length > 0 ? visibles : columns.map((colonne: any) => colonne.accessorKey)
+  return retenues.map((id: string) => ({ id, entete: libelleColonneParticipant(id) }))
+}
+
+/** La liste des repas, en fichier tableur ou en feuille à cocher. */
+const exporterParticipants = async (format: 'csv' | 'pdf') => {
+  const colonnes = colonnesAExporter()
+  const lignes = (await toutesLesLignes()).map((participant: any) =>
+    colonnes.map((colonne) => participant[colonne.id] ?? '')
+  )
+
+  if (lignes.length === 0) return
+
+  const nomDeBase = `repas-edition-${editionId.value}`
+
+  if (format === 'csv') {
+    telechargerFichier(
+      nomDeFichierCsv(nomDeBase),
+      versCsv(
+        colonnes.map((colonne) => colonne.entete),
+        lignes
+      ),
+      'text/csv;charset=utf-8'
+    )
+  } else {
+    await exporterTableauEnPdf({
+      titre: t('edition.meals.list_title'),
+      sousTitre: [edition.value?.convention?.name, edition.value?.name].filter(Boolean).join(' - '),
+      mention: `${formatDate(new Date().toISOString())} — ${t('gestion.meals.export_count', {
+        count: lignes.length,
+      })}`,
+      entetes: colonnes.map((colonne) => colonne.entete),
+      lignes,
+      nomFichier: nomDeBase,
+    })
+  }
+
+  toast.add({ title: t('common.export_success'), color: 'success' })
+}
 
 // Statistiques (reçues de l'API)
 const stats = ref<{
@@ -454,32 +595,33 @@ const onPageChange = (page: number) => {
 }
 
 // Charger les données
+/**
+ * Les filtres posés, en paramètres de requête.
+ *
+ * Partagés entre l'affichage et l'export : ce qu'on exporte est ce qu'on voit, et le seul moyen
+ * d'en être sûr est de ne les écrire qu'une fois.
+ */
+const parametresDesFiltres = (): Record<string, string> => {
+  const params: Record<string, string> = {}
+
+  if (searchQuery.value.trim()) params.search = searchQuery.value.trim()
+  if (selectedPhase.value && selectedPhase.value !== 'all') params.phase = selectedPhase.value
+  if (selectedType.value && selectedType.value !== 'all') params.type = selectedType.value
+  if (selectedMealType.value && selectedMealType.value !== 'all') {
+    params.mealType = selectedMealType.value
+  }
+  if (selectedDate.value && selectedDate.value !== 'all') params.date = selectedDate.value
+
+  return params
+}
+
 const fetchParticipants = async () => {
   loading.value = true
   try {
     const params: Record<string, string> = {
+      ...parametresDesFiltres(),
       page: pagination.value.page.toString(),
       pageSize: pagination.value.pageSize.toString(),
-    }
-
-    if (searchQuery.value.trim()) {
-      params.search = searchQuery.value.trim()
-    }
-
-    if (selectedPhase.value && selectedPhase.value !== 'all') {
-      params.phase = selectedPhase.value
-    }
-
-    if (selectedType.value && selectedType.value !== 'all') {
-      params.type = selectedType.value
-    }
-
-    if (selectedMealType.value && selectedMealType.value !== 'all') {
-      params.mealType = selectedMealType.value
-    }
-
-    if (selectedDate.value && selectedDate.value !== 'all') {
-      params.date = selectedDate.value
     }
 
     const response = await $fetch(`/api/editions/${editionId.value}/meals/participants`, {
@@ -771,7 +913,7 @@ const generateCateringPdf = async () => {
           fontSize: 7,
         },
         columnStyles: {
-          0: { cellWidth: 6 }, // Case à cocher
+          ...styleColonneCoche(),
           1: { cellWidth: 20 }, // Nom
           2: { cellWidth: 20 }, // Prénom
           3: { cellWidth: 16 }, // Type
@@ -783,15 +925,10 @@ const generateCateringPdf = async () => {
           9: { cellWidth: 14 }, // Sévérité
         },
         margin: { left: 20, right: 20 },
-        didDrawCell: (data: any) => {
-          // Dessiner un carré dans la première colonne pour chaque ligne de données
-          if (data.column.index === 0 && data.section === 'body') {
-            const squareSize = 4
-            const x = data.cell.x + (data.cell.width - squareSize) / 2
-            const y = data.cell.y + (data.cell.height - squareSize) / 2
-            doc.rect(x, y, squareSize, squareSize, 'S')
-          }
-        },
+        // Le tracé de la case vient de l'util partagé : ce PDF l'avait inventé pour lui seul,
+        // et deux autres tableaux le réclamaient. Trois copies d'un carré à quatre millimètres
+        // finissent par ne plus faire quatre millimètres partout.
+        didDrawCell: (cellule: unknown) => dessinerCaseACocher(doc, cellule as never),
       })
     }
 

@@ -640,6 +640,11 @@
     "swap_their_slot": "Deres vagt",
     "untitled_slot": "Unavngivet tidsrum",
     "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):",
-    "swap_pick_person": "Hvem vil du bytte med:"
+    "swap_pick_person": "Hvem vil du bytte med:",
+    "export_applications_title": "Frivilligansøgninger",
+    "export_count": "{count} ansøgninger",
+    "export_application_date": "Ansøgningsdato",
+    "export_arrival": "Ankomst",
+    "export_departure": "Afrejse"
   }
 }

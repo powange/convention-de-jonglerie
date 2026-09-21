@@ -262,7 +262,8 @@
       "severity_critical": "kritisch",
       "severity_light": "leicht",
       "severity_moderate": "mittel",
-      "severity_severe": "schwer"
+      "severity_severe": "schwer",
+      "export_count": "{count} Mahlzeiten"
     },
     "organizers": {
       "access_rights": "Zugriffsrechte",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Finanzen"
       },
-      "title_column": "Titel"
+      "title_column": "Titel",
+      "export_count": "{count} Organisatoren"
     },
     "overview": "Übersicht",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Rückgabe rückgängig ({count}) | Rückgaben rückgängig ({count})",
       "cancel_reservation": "Reservierung stornieren",
       "clear_selection": "Auswahl löschen",
-      "columns": "Spalten",
       "confirm_cancel_reservation": "Diese Reservierung stornieren?",
       "confirm_delete_group": "Gruppe „{name}“ und ihre {count} Gegenstand/Gegenstände löschen?",
       "confirm_delete_group_simple": "Gruppe „{name}“ löschen?",
@@ -500,7 +501,6 @@
       "empty_group": "Keine Gegenstände in dieser Gruppe",
       "empty_state": "Noch keine Bestandsgruppe",
       "ends_at": "Ende",
-      "export_pdf": "Inventarbogen (PDF)",
       "export_pdf_empty": "Kein Gegenstand zum Exportieren",
       "export_pdf_summary": "{objets} Gegenstände · {comptes} gezählt · {empruntes} geliehen",
       "external_loan": "Material von extern geliehen",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "„{name}“ wird von dieser Einkaufsliste entfernt. Das Material im Bestand bleibt unberührt.",
       "confirm_delete_item_cascade": "Dieser Gegenstand wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden. | Dieser Gegenstand und seine Reservierung werden endgültig gelöscht — sie stammt möglicherweise von jemand anderem. | Dieser Gegenstand und seine {count} Reservierungen werden endgültig gelöscht — einige stammen möglicherweise von anderen Personen.",
       "loan_group_all": "Alle Gruppen",
-      "loan_tag_all": "Alle Tags"
+      "loan_tag_all": "Alle Tags",
+      "export_pdf_filtered_empty": "Kein Gegenstand entspricht den gesetzten Filtern",
+      "export_pdf_extract": "gefilterter Auszug: {affiches} von {total} Gegenständen",
+      "filter_no_results": "Kein Gegenstand entspricht den gesetzten Filtern"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

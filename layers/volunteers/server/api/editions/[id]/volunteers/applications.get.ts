@@ -10,7 +10,6 @@ import { canManageEditionVolunteers } from '#server/utils/organizer-management'
 import { userWithNameSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId, validatePagination } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
-import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
 
 const DEFAULT_PAGE_SIZE = 20
 
@@ -345,134 +344,23 @@ export default wrapApiHandler(
       }
     }
 
-    // Si c'est un export, générer le CSV
+    /**
+     * L'export ne rend plus un CSV, mais les lignes — le navigateur écrit le fichier.
+     *
+     * Vingt-six en-têtes et toutes les valeurs étaient ici en français dans le code : « Date
+     * candidature », « En attente », « Végétarien », « Oui », « matin ». Sur un site traduit en
+     * treize langues, l'organisateur anglophone recevait un fichier français.
+     *
+     * Le réparer sur place était hors d'atteinte : `server-i18n` ne lit que
+     * `apps/app1/i18n/locales`, or les libellés des bénévoles vivent dans le layer — et l'image
+     * de production ne contient pas ces fichiers. Le navigateur, lui, a `t()` et les treize
+     * langues ; il emploie de surcroît les mots exacts des colonnes qu'on vient de lire.
+     *
+     * Ce qui reste ici, et qui comptait : l'export ignore la pagination et rend TOUT ce que les
+     * filtres laissent passer, quand la liste n'en montre qu'une page.
+     */
     if (isExport) {
-      const csvHeaders = [
-        'Date candidature',
-        'Statut',
-        'Pseudo',
-        'Prénom',
-        'Nom',
-        'Email',
-        'Téléphone',
-        'Motivation',
-        'Régime alimentaire',
-        'Allergies',
-        'Contact urgence nom',
-        'Contact urgence téléphone',
-        'Préférences horaires',
-        'Équipes préférées',
-        'Animaux',
-        'Mineurs',
-        'Véhicule',
-        'Compagnons souhaités',
-        'Personnes à éviter',
-        'Compétences',
-        'Expérience',
-        'Montage',
-        'Démontage',
-        'Événement',
-        'Arrivée',
-        'Départ',
-      ]
-
-      const csvRows = applications.map((app) => {
-        const formatArray = (arr: unknown) => (Array.isArray(arr) ? arr.join('; ') : arr || '')
-        const formatDate = (date: unknown) =>
-          date instanceof Date || typeof date === 'string'
-            ? new Date(date).toLocaleString('fr-FR')
-            : ''
-        const formatBoolean = (bool: boolean | null) => (bool ? 'Oui' : 'Non')
-
-        // Format spécial pour les dates avec granularité (format: date_granularity)
-        const formatDateTimeWithGranularity = (dateTimeString: string) => {
-          if (!dateTimeString || !dateTimeString.includes('_')) {
-            return dateTimeString || ''
-          }
-
-          const [datePart, timePart] = dateTimeString.split('_')
-
-          try {
-            const date = new Date(datePart)
-            const dateFormatted = date.toLocaleDateString('fr-FR', {
-              day: 'numeric',
-              month: 'short',
-            })
-
-            // Traduction des granularités en français
-            const timeTranslations: Record<string, string> = {
-              morning: 'matin',
-              noon: 'midi',
-              afternoon: 'après-midi',
-              evening: 'soir',
-            }
-
-            const timeFormatted = timeTranslations[timePart] || timePart
-
-            return `${dateFormatted} ${timeFormatted}`
-          } catch {
-            return dateTimeString.split('_').join(' ')
-          }
-        }
-
-        return [
-          formatDate(app.createdAt),
-          app.status === 'PENDING'
-            ? 'En attente'
-            : app.status === 'ACCEPTED'
-              ? 'Accepté'
-              : 'Refusé',
-          app.user.pseudo || '',
-          app.user.prenom || '',
-          app.user.nom || '',
-          app.user.email || '',
-          app.user.phone || '',
-          app.motivation || '',
-          app.dietaryPreference === 'VEGETARIAN'
-            ? 'Végétarien'
-            : app.dietaryPreference === 'VEGAN'
-              ? 'Végan'
-              : 'Aucun',
-          app.allergies || '',
-          app.emergencyContactName || '',
-          app.emergencyContactPhone || '',
-          formatArray(app.timePreferences),
-          formatArray(app.teamPreferences),
-          app.hasPets ? `Oui${app.petsDetails ? ` (${app.petsDetails})` : ''}` : 'Non',
-          app.hasMinors ? `Oui${app.minorsDetails ? ` (${app.minorsDetails})` : ''}` : 'Non',
-          app.hasVehicle ? `Oui${app.vehicleDetails ? ` (${app.vehicleDetails})` : ''}` : 'Non',
-          app.companionName || '',
-          app.avoidList || '',
-          app.skills || '',
-          app.hasExperience
-            ? `Oui${app.experienceDetails ? ` (${app.experienceDetails})` : ''}`
-            : 'Non',
-          formatBoolean(app.setupAvailability),
-          formatBoolean(app.teardownAvailability),
-          formatBoolean(app.eventAvailability),
-          formatDateTimeWithGranularity(app.arrivalDateTime || ''),
-          formatDateTimeWithGranularity(app.departureDateTime || ''),
-        ]
-      })
-
-      /**
-       * Le format passe par `versCsv`, partagé avec l'export des organisateurs.
-       *
-       * Ce qu'il apporte et qui manquait ici : la marque d'ordre des octets, sans laquelle Excel
-       * sous Windows lit « Prénom » en « PrÃ©nom » sur toute la colonne ; l'échappement des
-       * EN-TÊTES, qui tenait par chance faute de virgule dans un libellé ; et la garde contre
-       * l'injection de formule, une motivation étant du texte saisi par un utilisateur.
-       */
-      const csvContent = versCsv(csvHeaders, csvRows)
-
-      setHeader(event, 'Content-Type', 'text/csv; charset=utf-8')
-      setHeader(
-        event,
-        'Content-Disposition',
-        `attachment; filename="${nomDeFichierCsv(`candidatures-benevoles-edition-${editionId}`)}"`
-      )
-
-      return csvContent
+      return createSuccessResponse({ applications })
     }
 
     return createPaginatedResponse(applications, total, page, pageSize)

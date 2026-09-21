@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   nomFichierInventaire,
-  preparerInventairePourPdf,
+  preparerInventairePourExport,
   resumeInventaire,
-} from '../../../../../layers/stock/app/utils/inventaire-pdf'
+} from '../../../../../layers/stock/app/utils/inventaire-export'
 
 /**
  * La fiche existe pour les moments où l'application ne sert à rien : le hangar sans réseau, le
@@ -18,9 +18,9 @@ const objet = (nom: string, champs: Record<string, unknown> = {}) => ({
   ...champs,
 })
 
-describe('preparerInventairePourPdf', () => {
+describe('preparerInventairePourExport', () => {
   it('rend les colonnes utiles', () => {
-    const [ligne] = preparerInventairePourPdf([
+    const [ligne] = preparerInventairePourExport([
       objet('Rallonge 10 m', {
         quantity: 12,
         location: 'Étagère du fond',
@@ -38,7 +38,7 @@ describe('preparerInventairePourPdf', () => {
 
   it('préfère le nom de la zone au texte libre', () => {
     // La même règle qu'à l'écran : la carte prime, le texte libre complète.
-    const [ligne] = preparerInventairePourPdf([
+    const [ligne] = preparerInventairePourExport([
       objet('Enceinte', { location: 'Sous la scène', zone: { name: 'Chapiteau', color: '#fff' } }),
     ])
 
@@ -48,17 +48,17 @@ describe('preparerInventairePourPdf', () => {
   it('garde l’ordre reçu', () => {
     // On parcourt les caisses dans l'ordre où elles sont rangées : une fiche qui trierait
     // autrement obligerait à chercher chaque ligne.
-    const lignes = preparerInventairePourPdf([objet('Zèbre'), objet('Âne')])
+    const lignes = preparerInventairePourExport([objet('Zèbre'), objet('Âne')])
 
     expect(lignes.map((l) => l.nom)).toEqual(['Zèbre', 'Âne'])
   })
 
   it('écarte un objet sans nom', () => {
-    expect(preparerInventairePourPdf([objet('   ')])).toEqual([])
+    expect(preparerInventairePourExport([objet('   ')])).toEqual([])
   })
 
   it('signale l’état d’un emprunt', () => {
-    const [ligne] = preparerInventairePourPdf([
+    const [ligne] = preparerInventairePourExport([
       objet('Praticable', { isExternalLoan: true, pickedUpAt: '2026-10-01T10:00:00.000Z' }),
     ])
 
@@ -67,7 +67,7 @@ describe('preparerInventairePourPdf', () => {
 
   it('ne met pas d’état sur le matériel de la convention', () => {
     // Une colonne remplie partout ne signalerait plus rien.
-    const [ligne] = preparerInventairePourPdf([objet('Balles', { isExternalLoan: false })])
+    const [ligne] = preparerInventairePourExport([objet('Balles', { isExternalLoan: false })])
 
     expect(ligne?.etatEmprunt).toBeNull()
   })
@@ -75,7 +75,7 @@ describe('preparerInventairePourPdf', () => {
   it('reporte un comptage déjà fait', () => {
     // Sans lui, on recompte ce qui l'a été, et l'on ne sait pas distinguer « pas encore vu » de
     // « vu, et il n'en reste rien ».
-    const lignes = preparerInventairePourPdf([
+    const lignes = preparerInventairePourExport([
       objet('Comptée', { finalQuantity: 2 }),
       objet('Vidée', { finalQuantity: 0 }),
       objet('Pas comptée'),
@@ -86,13 +86,13 @@ describe('preparerInventairePourPdf', () => {
 
   it('laisse la colonne vide plutôt que d’écrire zéro', () => {
     // Zéro imprimé voudrait dire « il n'en reste aucun » ; la case vide dit « à compter ».
-    const [ligne] = preparerInventairePourPdf([objet('Praticable', { finalQuantity: null })])
+    const [ligne] = preparerInventairePourExport([objet('Praticable', { finalQuantity: null })])
 
     expect(ligne?.compte).toBe('')
   })
 
   it('tolère un objet sans tags ni emplacement', () => {
-    const [ligne] = preparerInventairePourPdf([objet('Nu')])
+    const [ligne] = preparerInventairePourExport([objet('Nu')])
 
     expect(ligne).toMatchObject({ tags: '', emplacement: '' })
   })
@@ -100,7 +100,7 @@ describe('preparerInventairePourPdf', () => {
 
 describe('resumeInventaire', () => {
   it('compte les objets, les comptages et les emprunts', () => {
-    const lignes = preparerInventairePourPdf([
+    const lignes = preparerInventairePourExport([
       objet('A', { finalQuantity: 1 }),
       objet('B', { isExternalLoan: true }),
       objet('C'),
@@ -137,5 +137,25 @@ describe('nomFichierInventaire', () => {
     // Sans ce repli, un nom vide produirait un fichier appelé « inventaire-.pdf ».
     expect(nomFichierInventaire(null)).toBe('inventaire.pdf')
     expect(nomFichierInventaire('   ', '!!!')).toBe('inventaire.pdf')
+  })
+
+  it('sait nommer un fichier TABLEUR', () => {
+    // La feuille et le fichier sortent souvent l'un après l'autre : s'ils portaient le même nom,
+    // le second écraserait le premier dans le dossier de téléchargements.
+    expect(nomFichierInventaire('Sonorisation', 'Convention 2026', 'csv')).toBe(
+      'inventaire-convention-2026-sonorisation.csv'
+    )
+  })
+
+  it('reste sur le PDF quand on ne précise rien', () => {
+    // Le format historique : les appelants qui ne demandent rien doivent obtenir ce qu'ils
+    // obtenaient avant.
+    expect(nomFichierInventaire('Cuisine')).toBe('inventaire-cuisine.pdf')
+  })
+
+  it('applique l’extension AUSSI au nom de repli', () => {
+    // Le cas qu'on oublie en ajoutant un paramètre : la branche sans édition ni groupe.
+    expect(nomFichierInventaire(null, null, 'csv')).toBe('inventaire.csv')
+    expect(nomFichierInventaire(null, null)).toBe('inventaire.pdf')
   })
 })

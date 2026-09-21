@@ -191,7 +191,6 @@
       "max_required_with_actual": "Se requiere un máximo mientras haya un importe real indicado"
     },
     "view_qr_code": "Mi código QR",
-    "export_pdf": "Exportar PDF",
     "export_pdf_error": "No se ha podido generar el PDF"
   }
 }

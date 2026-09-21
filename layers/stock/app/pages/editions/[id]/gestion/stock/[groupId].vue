@@ -108,29 +108,24 @@
           <span class="hidden sm:inline">{{ $t('gestion.stock.tags.manage') }}</span>
         </UButton>
         <!-- Choix des colonnes affichées, servi par l'API du tableau. -->
-        <UDropdownMenu
+        <UiColumnsMenu
           v-if="viewMode === 'list'"
-          :items="
-            tableRef?.tableApi
-              ?.getAllColumns()
-              .filter((colonne: any) => colonne.getCanHide())
-              .map((colonne: any) => ({
-                label: libelleColonne(colonne.id),
-                type: 'checkbox' as const,
-                checked: colonne.getIsVisible(),
-                onUpdateChecked(coche: boolean) {
-                  tableRef?.tableApi?.getColumn(colonne.id)?.toggleVisibility(!!coche)
-                },
-                onSelect(e?: Event) {
-                  e?.preventDefault()
-                },
-              }))
-          "
-        >
-          <UButton icon="i-heroicons-view-columns" color="neutral" variant="outline">
-            <span class="hidden sm:inline">{{ $t('gestion.stock.columns') }}</span>
-          </UButton>
-        </UDropdownMenu>
+          size="md"
+          :table-api="tableRef?.tableApi"
+          :libelle="libelleColonne"
+        />
+
+        <!-- L'export sort du menu d'actions du groupe, où il voisinait « Modifier » et
+             « Supprimer ». Il ne parle pas du groupe mais de la liste qu'on a sous les yeux, et
+             c'est ici qu'on le cherche : à droite des colonnes, une fois celles-ci choisies. -->
+        <UiExportMenu
+          v-if="viewMode === 'list'"
+          size="md"
+          variant="outline"
+          :disabled="objetsAffiches.length === 0"
+          :on-csv="exporterInventaireCsv"
+          :on-pdf="exporterInventaire"
+        />
       </div>
 
       <UModal v-model:open="filtresModalOpen" :title="$t('gestion.stock.filters')">
@@ -690,6 +685,9 @@
 </template>
 
 <script setup lang="ts">
+import { dessinerCaseACocher, ENTETE_COCHE, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
+import { telechargerFichier } from '~/utils/telechargement'
+
 import { useAuthStore, useEditionStore } from '#imports'
 
 import {
@@ -720,13 +718,15 @@ import {
 } from '../../../../../utils/filtre-tags-stock'
 import {
   nomFichierInventaire,
-  preparerInventairePourPdf,
+  preparerInventairePourExport,
   resumeInventaire,
-} from '../../../../../utils/inventaire-pdf'
+} from '../../../../../utils/inventaire-export'
 import { filtrerParLieuEmprunt, filtrerParNom } from '../../../../../utils/recherche-materiel'
 
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
+
+import { versCsv } from '~~/shared/utils/csv'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -1606,25 +1606,96 @@ function goToItem(itemId: number) {
 const exportEnCours = ref(false)
 
 /**
- * La fiche d'inventaire à emporter.
+ * Les lignes à exporter, communes aux deux formats.
  *
- * Elle sert là où l'application ne sert à rien : le hangar sans réseau, le camion qu'on charge.
- * D'où une colonne « Compté » laissée vide pour écrire à la main — une fiche qu'on ne peut pas
- * annoter ne vaut pas le papier.
+ * ⚠️ Les objets AFFICHÉS, pas le groupe entier. La fonction lisait la liste brute du groupe : on
+ * filtrait sur « cuisine », on exportait, et l'on repartait au hangar avec les trois cents lignes
+ * du groupe. Ce qu'on exporte est ce qu'on voit — la règle déjà écrite sur l'export des
+ * organisateurs.
  *
- * La préparation des données vit dans `inventaire-pdf`, éprouvée à part ; ici, il n'y a que de la
- * mise en page. Même partage que la FAQ, qui a fait ce chemin avant.
+ * Rend une liste vide, et prévient, quand il n'y a rien à sortir : le message distingue un groupe
+ * réellement vide d'un filtre qui ne laisse rien passer. Le second se corrige en relâchant le
+ * filtre, encore faut-il le savoir.
  */
-async function exporterInventaire() {
-  const lignes = preparerInventairePourPdf((group.value?.items ?? []) as any[])
+function lignesAExporter() {
+  const lignes = preparerInventairePourExport(objetsAffiches.value as any[])
   if (lignes.length === 0) {
     useToast().add({
-      title: t('gestion.stock.export_pdf_empty'),
+      title:
+        nombreFiltresActifs.value > 0
+          ? t('gestion.stock.export_pdf_filtered_empty')
+          : t('gestion.stock.export_pdf_empty'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'warning',
     })
-    return
   }
+  return lignes
+}
+
+/** Les en-têtes de l'inventaire, dans l'ordre des lignes. */
+function entetesInventaire() {
+  return [
+    t('gestion.stock.item_name'),
+    t('gestion.stock.count_expected'),
+    t('gestion.stock.count_counted'),
+    t('gestion.stock.item_storage_location'),
+    t('gestion.stock.tags.field_label'),
+    t('gestion.stock.loan_state'),
+  ]
+}
+
+/** Une ligne d'inventaire, dans l'ordre des en-têtes. */
+function celluleDeLigne(ligne: ReturnType<typeof preparerInventairePourExport>[number]) {
+  return [
+    ligne.nom,
+    ligne.quantite,
+    ligne.compte,
+    ligne.emplacement,
+    ligne.tags,
+    ligne.etatEmprunt ? t(ligne.etatEmprunt) : '',
+  ]
+}
+
+/**
+ * L'inventaire en fichier tableur.
+ *
+ * L'autre moitié de la même question : la feuille sert au hangar, le fichier sert à comparer deux
+ * inventaires d'une année sur l'autre ou à préparer une commande. Les deux lisent les mêmes
+ * lignes, si bien qu'ils ne peuvent pas se contredire.
+ *
+ * La colonne « Compté » y porte ce qui est DÉJÀ enregistré, comme sur la feuille — c'est sur le
+ * papier qu'on laisse de la place pour écrire, pas dans une cellule.
+ */
+function exporterInventaireCsv() {
+  const lignes = lignesAExporter()
+  if (lignes.length === 0) return
+
+  telechargerFichier(
+    nomFichierInventaire(group.value?.name, edition.value?.name, 'csv'),
+    versCsv(entetesInventaire(), lignes.map(celluleDeLigne)),
+    'text/csv;charset=utf-8'
+  )
+
+  useToast().add({ title: t('common.export_success'), color: 'success' })
+}
+
+/**
+ * La fiche d'inventaire à emporter.
+ *
+ * Elle sert là où l'application ne sert à rien : le hangar sans réseau, le camion qu'on charge.
+ * D'où la colonne à cocher en tête et la colonne « Compté » laissée large — une fiche qu'on ne
+ * peut pas annoter ne vaut pas le papier.
+ *
+ * La préparation des données vit dans l'util d'inventaire, éprouvée à part ; ici, il n'y a que de
+ * la mise en page. Même partage que la FAQ, qui a fait ce chemin avant.
+ *
+ * Le piège inverse de celui décrit plus haut — croire tenir l'inventaire complet alors qu'on n'a
+ * qu'un extrait — est désamorcé par la mention ajoutée au sous-titre, seule chose qui reste vraie
+ * une fois la feuille détachée de l'écran.
+ */
+async function exporterInventaire() {
+  const lignes = lignesAExporter()
+  if (lignes.length === 0) return
 
   exportEnCours.value = true
   try {
@@ -1651,13 +1722,22 @@ async function exporterInventaire() {
     // La date, parce qu'une fiche détachée de l'écran n'en a plus d'autre : deux inventaires
     // d'années différentes se ressemblent trop pour qu'on les distingue sans elle.
     const resume = resumeInventaire(lignes)
+    // Une feuille détachée de l'écran n'a plus ses pastilles de filtre : sans cette mention, rien
+    // ne distingue un extrait de douze lignes d'un inventaire complet de douze objets.
+    const mentionExtrait =
+      nombreFiltresActifs.value > 0
+        ? ` — ${t('gestion.stock.export_pdf_extract', {
+            affiches: lignes.length,
+            total: group.value?.items?.length ?? lignes.length,
+          })}`
+        : ''
     doc.setFontSize(9)
     doc.text(
       `${formatDate(new Date())} — ${t('gestion.stock.export_pdf_summary', {
         objets: resume.objets,
         comptes: resume.comptes,
         empruntes: resume.empruntes,
-      })}`,
+      })}${mentionExtrait}`,
       MARGE,
       sousTitre ? 28 : 22
     )
@@ -1668,29 +1748,21 @@ async function exporterInventaire() {
       margin: { left: MARGE, right: MARGE },
       styles: { fontSize: 9, cellPadding: 2 },
       headStyles: { fillColor: [27, 77, 92] },
-      head: [
-        [
-          t('gestion.stock.item_name'),
-          t('gestion.stock.count_expected'),
-          t('gestion.stock.count_counted'),
-          t('gestion.stock.item_storage_location'),
-          t('gestion.stock.tags.field_label'),
-          t('gestion.stock.loan_state'),
-        ],
-      ],
-      body: lignes.map((ligne) => [
-        ligne.nom,
-        ligne.quantite,
-        ligne.compte,
-        ligne.emplacement,
-        ligne.tags,
-        ligne.etatEmprunt ? t(ligne.etatEmprunt) : '',
-      ]),
+      // La case à cocher en tête, et la colonne « Compté » qui reste : ce ne sont pas les mêmes
+      // gestes. On coche « cette caisse est faite », on écrit « j'en ai trouvé sept ».
+      head: [[ENTETE_COCHE, ...entetesInventaire()]],
+      body: lignes.map((ligne) => ['', ...celluleDeLigne(ligne)]),
       // La colonne « Compté » reste large et vide : c'est là qu'on écrit au crayon.
+      //
+      // ⚠️ Les index sont décalés d'un cran depuis l'ajout de la colonne à cocher en tête : 2 est
+      // la quantité et 3 le compte, là où c'étaient 1 et 2. Un style d'autoTable désigne un rang,
+      // pas un nom — se tromper ne lève rien, cela élargit simplement la mauvaise colonne.
       columnStyles: {
-        1: { cellWidth: 22, halign: 'center' },
-        2: { cellWidth: 26, halign: 'center' },
+        ...styleColonneCoche(),
+        2: { cellWidth: 22, halign: 'center' },
+        3: { cellWidth: 26, halign: 'center' },
       },
+      didDrawCell: (cellule: unknown) => dessinerCaseACocher(doc, cellule as never),
     })
 
     doc.save(nomFichierInventaire(group.value?.name, edition.value?.name))
@@ -1707,11 +1779,6 @@ async function exporterInventaire() {
 
 const groupActions = computed(() => [
   [
-    {
-      label: t('gestion.stock.export_pdf'),
-      icon: 'i-heroicons-document-arrow-down',
-      onSelect: () => exporterInventaire(),
-    },
     {
       label: t('common.edit'),
       icon: 'i-heroicons-pencil-square',

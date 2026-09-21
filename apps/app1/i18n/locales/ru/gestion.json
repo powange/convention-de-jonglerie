@@ -262,7 +262,8 @@
       "severity_critical": "критическая",
       "severity_light": "лёгкая",
       "severity_moderate": "умеренная",
-      "severity_severe": "тяжёлая"
+      "severity_severe": "тяжёлая",
+      "export_count": "{count} приёмов пищи"
     },
     "organizers": {
       "access_rights": "Права доступа",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Финансы"
       },
-      "title_column": "Должность"
+      "title_column": "Должность",
+      "export_count": "{count} организаторов"
     },
     "overview": "Обзор",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Отменить возврат ({count}) | Отменить возвраты ({count})",
       "cancel_reservation": "Отменить бронирование",
       "clear_selection": "Очистить выбор",
-      "columns": "Столбцы",
       "confirm_cancel_reservation": "Отменить это бронирование?",
       "confirm_delete_group": "Удалить группу «{name}» и её {count} предмет(ов)?",
       "confirm_delete_group_simple": "Удалить группу «{name}»?",
@@ -500,7 +501,6 @@
       "empty_group": "В этой группе нет предметов",
       "empty_state": "Пока нет групп склада",
       "ends_at": "Окончание",
-      "export_pdf": "Инвентарная ведомость (PDF)",
       "export_pdf_empty": "Нет предметов для экспорта",
       "export_pdf_summary": "{objets} предметов · {comptes} посчитано · {empruntes} арендовано",
       "external_loan": "Материал, одолженный извне",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "«{name}» будет удалено из этого списка покупок. Само оборудование на складе не затрагивается.",
       "confirm_delete_item_cascade": "Этот предмет будет удалён безвозвратно. Это действие нельзя отменить. | Этот предмет и его бронирование будут удалены безвозвратно — его мог оформить кто-то другой. | Этот предмет и его {count} бронирований будут удалены безвозвратно — некоторые мог оформить кто-то другой.",
       "loan_group_all": "Все группы",
-      "loan_tag_all": "Все метки"
+      "loan_tag_all": "Все метки",
+      "export_pdf_filtered_empty": "Ни один предмет не соответствует заданным фильтрам",
+      "export_pdf_extract": "отфильтрованная выборка: {affiches} из {total} предметов",
+      "filter_no_results": "Ни один предмет не соответствует заданным фильтрам"
     },
     "ticketing": {
       "access_control_description": "Сканирование и проверка билетов на входе",

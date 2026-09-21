@@ -5,8 +5,46 @@ import path from 'node:path'
 const translationsCache = new Map<string, any>()
 
 /**
+ * Fusionne un fichier de traductions dans l'ensemble déjà chargé, en PROFONDEUR.
+ *
+ * Le code faisait un `Object.assign` — un commentaire annonçait pourtant « deep merge simple ».
+ * La nuance n'est pas théorique : **quatre** fichiers partagent la racine `gestion`
+ * (`gestion.json`, `gestion-map`, `gestion-shows-call`, `gestion-tasks`), et une copie à plat fait
+ * que le dernier lu remplace entièrement les trois autres. `shows_call` est dans le même cas,
+ * réparti entre `common.json` et `shows-call.json`.
+ *
+ * Personne ne s'en plaignait : aucune clé de notification ne vit aujourd'hui sous ces racines, et
+ * c'est le seul appelant. Le jour où l'une y passe, `translateServerSide` rend la clé brute — pas
+ * d'erreur, pas de trace, juste `gestion.map.title` dans un courriel.
+ *
+ * Seuls les objets simples se fusionnent : un tableau ou une chaîne REMPLACE ce qu'il trouve,
+ * comme le ferait `Object.assign`. Fusionner deux tableaux de traductions n'aurait pas de sens —
+ * on obtiendrait une liste qui n'est écrite nulle part.
+ */
+export function fusionnerTraductions(cible: any, ajout: any): any {
+  for (const [cle, valeur] of Object.entries(ajout ?? {})) {
+    const existant = cible[cle]
+    const deuxObjets =
+      estUnObjetSimple(existant) && estUnObjetSimple(valeur as Record<string, unknown>)
+    cible[cle] = deuxObjets ? fusionnerTraductions(existant, valeur) : valeur
+  }
+  return cible
+}
+
+/** Un objet de traductions, par opposition à un tableau, une chaîne ou `null`. */
+function estUnObjetSimple(valeur: unknown): valeur is Record<string, unknown> {
+  return typeof valeur === 'object' && valeur !== null && !Array.isArray(valeur)
+}
+
+/**
  * Charge les traductions pour une langue donnée
  * Fusionne tous les fichiers JSON du dossier de la langue
+ *
+ * ⚠️ Ne lit que `apps/app1/i18n/locales` : les traductions portées par un LAYER
+ * (`layers/volunteers/i18n/locales/…`) restent hors de portée, et l'image de production ne les
+ * contient même pas — le Dockerfile ne copie que `apps/app1/i18n`. Une clé `volunteers.*` rendra
+ * donc la clé elle-même. Ce n'est pas un oubli à réparer à la légère : cela change le contenu de
+ * l'image livrée.
  */
 function loadTranslations(lang: string): any {
   if (translationsCache.has(lang)) {
@@ -23,8 +61,7 @@ function loadTranslations(lang: string): any {
     for (const file of files) {
       const filePath = path.join(localesDir, file)
       const content = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-      // Fusionner les objets (deep merge simple)
-      Object.assign(merged, content)
+      fusionnerTraductions(merged, content)
     }
 
     translationsCache.set(lang, merged)

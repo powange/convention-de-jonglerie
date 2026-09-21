@@ -640,6 +640,11 @@
     "swap_their_slot": "Jej lub jego dyżur",
     "untitled_slot": "Przedział bez nazwy",
     "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):",
-    "swap_pick_person": "Z kim się zamienić:"
+    "swap_pick_person": "Z kim się zamienić:",
+    "export_applications_title": "Zgłoszenia wolontariuszy",
+    "export_count": "{count} zgłoszeń",
+    "export_application_date": "Data zgłoszenia",
+    "export_arrival": "Przyjazd",
+    "export_departure": "Wyjazd"
   }
 }

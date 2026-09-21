@@ -262,7 +262,8 @@
       "severity_critical": "krytyczna",
       "severity_light": "łagodna",
       "severity_moderate": "umiarkowana",
-      "severity_severe": "ciężka"
+      "severity_severe": "ciężka",
+      "export_count": "{count} posiłków"
     },
     "organizers": {
       "access_rights": "Prawa dostępu",
@@ -340,7 +341,8 @@
         "manageFAQ": "FAQ",
         "manageTreasury": "Finanse"
       },
-      "title_column": "Funkcja"
+      "title_column": "Funkcja",
+      "export_count": "{count} organizatorów"
     },
     "overview": "Przegląd",
     "services": {
@@ -477,7 +479,6 @@
       "bulk_unmark_returned": "Cofnij zwrot ({count}) | Cofnij zwroty ({count})",
       "cancel_reservation": "Anuluj rezerwację",
       "clear_selection": "Wyczyść wybór",
-      "columns": "Kolumny",
       "confirm_cancel_reservation": "Anulować tę rezerwację?",
       "confirm_delete_group": "Usunąć grupę „{name}” i jej {count} przedmiot(ów)?",
       "confirm_delete_group_simple": "Usunąć grupę „{name}”?",
@@ -500,7 +501,6 @@
       "empty_group": "Brak przedmiotów w tej grupie",
       "empty_state": "Brak grup magazynowych",
       "ends_at": "Koniec",
-      "export_pdf": "Arkusz inwentarza (PDF)",
       "export_pdf_empty": "Brak przedmiotów do wyeksportowania",
       "export_pdf_summary": "{objets} przedmiotów · {comptes} policzonych · {empruntes} wypożyczonych",
       "external_loan": "Materiał wypożyczony z zewnątrz",
@@ -667,7 +667,10 @@
       "shopping_remove_item_confirm": "„{name}” zostanie usunięta z tej listy zakupów. Sprzęt w magazynie pozostaje nietknięty.",
       "confirm_delete_item_cascade": "Ten przedmiot zostanie trwale usunięty. Tej operacji nie można cofnąć. | Ten przedmiot i jego rezerwacja zostaną trwale usunięte — mogła ją złożyć inna osoba. | Ten przedmiot i jego {count} rezerwacji zostaną trwale usunięte — niektóre mogły złożyć inne osoby.",
       "loan_group_all": "Wszystkie grupy",
-      "loan_tag_all": "Wszystkie tagi"
+      "loan_tag_all": "Wszystkie tagi",
+      "export_pdf_filtered_empty": "Żaden przedmiot nie pasuje do ustawionych filtrów",
+      "export_pdf_extract": "wyciąg filtrowany: {affiches} z {total} przedmiotów",
+      "filter_no_results": "Żaden przedmiot nie pasuje do ustawionych filtrów"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",

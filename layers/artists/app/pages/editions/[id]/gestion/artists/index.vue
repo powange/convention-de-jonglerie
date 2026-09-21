@@ -212,24 +212,23 @@
                   @click="resetFilters"
                 />
 
-                <!-- L'export n'a rien à produire sur un tableau vide : un PDF sans lignes se
-                     lit comme un export raté, et l'on cherche l'erreur là où il n'y en a pas. -->
-                <UButton
-                  icon="i-lucide-file-down"
-                  color="neutral"
-                  variant="outline"
-                  size="sm"
-                  :label="$t('artists.export_pdf')"
-                  :loading="exportEnCours"
-                  :disabled="filteredArtists.length === 0"
-                  @click="exporterPdf"
+                <!-- Les colonnes AVANT l'export, partout : on choisit ce qu'on montre, puis
+                     on l'emporte. L'ordre inverse se lisait comme deux boutons sans rapport. -->
+                <UiColumnsMenu
+                  variant="soft"
+                  :table-api="tableRef?.tableApi"
+                  :libelle="getColumnLabel"
                 />
 
-                <UDropdownMenu :items="columnVisibilityItems">
-                  <UButton icon="i-heroicons-view-columns" color="neutral" size="sm" variant="soft">
-                    <span class="hidden sm:inline">{{ $t('common.columns') }}</span>
-                  </UButton>
-                </UDropdownMenu>
+                <!-- L'export n'a rien à produire sur un tableau vide : un fichier sans lignes
+                     se lit comme un export raté, et l'on cherche l'erreur là où il n'y en a
+                     pas. -->
+                <UiExportMenu
+                  variant="outline"
+                  :disabled="filteredArtists.length === 0"
+                  :on-csv="exporterCsv"
+                  :on-pdf="exporterPdf"
+                />
               </div>
             </div>
           </div>
@@ -621,11 +620,15 @@
 </template>
 
 <script setup lang="ts">
+// Ces deux-ci vivent dans la couche application, que l'alias `~` atteint bien.
+import { dessinerCaseACocher, ENTETE_COCHE, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
+import { telechargerFichier } from '~/utils/telechargement'
+
 import { getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
-// Chemin relatif, comme `filtres-artistes-url` juste en dessous : l'alias `~` ne résout pas vers
-// le dossier du layer, et un `~/utils/...` d'apparence normale casse la compilation sans que le
-// lint ni les tests ne s'en aperçoivent.
+// Chemin relatif, comme `filtres-artistes-url` juste en dessous : l'alias `~` ne résout pas
+// vers le dossier du LAYER, et un `~/utils/...` d'apparence normale casse la compilation sans
+// que le lint ni les tests ne s'en aperçoivent.
 import {
   colonnesImprimables,
   nomFichierArtistes,
@@ -637,6 +640,7 @@ import { filtresDepuisUrl, requeteArtistes } from '../../../../../utils/filtres-
 import type { TableColumn } from '@nuxt/ui'
 import type { Column } from '@tanstack/vue-table'
 
+import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
 import { formaterDateHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
 import { DEFAULT_CURRENCY } from '~~/shared/utils/money'
 
@@ -985,17 +989,53 @@ const valeurPourPdf = (artist: any, colonneId: string): string => {
   }
 }
 
+/**
+ * Les colonnes retenues pour un export, telles que la TABLE les donne.
+ *
+ * L'ordre et la visibilité viennent d'elle, et non d'une liste tenue en parallèle qui finirait
+ * par diverger. Les deux formats la lisent au même endroit : sans cela, décocher une colonne
+ * l'aurait retirée du PDF mais pas du fichier tableur, et rien à l'écran ne l'aurait expliqué.
+ */
+const colonnesAExporter = () => {
+  const idsVisibles = (tableRef.value?.tableApi?.getVisibleLeafColumns() ?? []).map(
+    (colonne: any) => colonne.id
+  )
+  return colonnesImprimables(idsVisibles, getColumnLabel)
+}
+
+/**
+ * La même liste, en fichier tableur.
+ *
+ * Sans passer par `texteImprimable` : ses deux corrections ne servent qu'au PDF. Elle remplace
+ * l'espace insécable étroite des montants, qu'une police WinAnsi imprime en barre oblique — un
+ * tableur, lui, la lit très bien — et elle aplatit les retours à la ligne, qu'une cellule CSV
+ * entre guillemets porte sans difficulté.
+ */
+const exporterCsv = () => {
+  if (filteredArtists.value.length === 0) return
+
+  const colonnes = colonnesAExporter()
+
+  telechargerFichier(
+    nomDeFichierCsv(`artistes-edition-${editionId.value}`),
+    versCsv(
+      colonnes.map((colonne) => colonne.entete),
+      filteredArtists.value.map((artiste: any) =>
+        colonnes.map((colonne) => valeurPourPdf(artiste, colonne.id))
+      )
+    ),
+    'text/csv;charset=utf-8'
+  )
+
+  toast.add({ title: t('common.export_success'), color: 'success' })
+}
+
 async function exporterPdf() {
   if (filteredArtists.value.length === 0) return
 
   exportEnCours.value = true
   try {
-    // L'ordre et la visibilité viennent de la table elle-même : c'est elle qui fait foi, et non
-    // une liste tenue en parallèle qui finirait par diverger.
-    const idsVisibles = (tableRef.value?.tableApi?.getVisibleLeafColumns() ?? []).map(
-      (colonne: any) => colonne.id
-    )
-    const colonnes = colonnesImprimables(idsVisibles, getColumnLabel)
+    const colonnes = colonnesAExporter()
     if (colonnes.length === 0) return
 
     const { entetes, lignes } = preparerTableauDArtistes(
@@ -1033,14 +1073,18 @@ async function exporterPdf() {
       sousTitre ? 28 : 22
     )
 
+    // Une colonne de cases en tête : cette liste s'imprime pour appeler les artistes un à un,
+    // et l'on coche au fur et à mesure. Sans case, on coche quand même — sur le nom.
     // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
     doc.autoTable({
       startY: sousTitre ? 33 : 27,
       margin: { left: MARGE, right: MARGE },
       styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
       headStyles: { fillColor: [124, 58, 237] },
-      head: [entetes],
-      body: lignes,
+      columnStyles: styleColonneCoche(),
+      head: [[ENTETE_COCHE, ...entetes]],
+      body: lignes.map((ligne) => ['', ...ligne]),
+      didDrawCell: (cellule: unknown) => dessinerCaseACocher(doc, cellule as never),
     })
 
     doc.save(nomFichierArtistes(edition.value?.name, maintenant))
@@ -1100,27 +1144,6 @@ const getColumnLabel = (columnId: string): string => {
   }
   return labels[columnId] || columnId
 }
-
-// Items du dropdown de visibilité des colonnes
-const columnVisibilityItems = computed(() => {
-  const allColumns = tableRef.value?.tableApi
-    ?.getAllColumns()
-    .filter((column: any) => column.getCanHide())
-
-  if (!allColumns) return []
-
-  return allColumns.map((column: any) => ({
-    label: getColumnLabel(column.id),
-    type: 'checkbox' as const,
-    checked: column.getIsVisible(),
-    onUpdateChecked(checked: boolean) {
-      tableRef.value?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-    },
-    onSelect(e?: Event) {
-      e?.preventDefault()
-    },
-  }))
-})
 
 // Définition des colonnes
 const columns = computed((): TableColumn<any>[] => [
