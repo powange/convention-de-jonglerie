@@ -591,6 +591,7 @@
       "missing_uncounted": "Restent à compter",
       "missing_units": "Exemplaires à racheter",
       "name_filter_placeholder": "Rechercher un objet",
+      "filter_no_results": "Aucun objet ne correspond aux filtres posés",
       "new_group": "Nouveau groupe",
       "new_item": "Nouvel objet",
       "new_reservation": "Réserver",

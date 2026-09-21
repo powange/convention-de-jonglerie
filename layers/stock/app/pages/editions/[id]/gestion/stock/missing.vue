@@ -123,17 +123,40 @@
             />
           </div>
 
+          <!-- Les listes déroulantes se construisent sur l'onglet AVANT filtrage : sinon poser un
+               groupe retirerait tous les autres du choix, et il deviendrait impossible d'en
+               ajouter un second sans tout relâcher. -->
+          <StockFiltresObjets
+            v-model:recherche="rechercheManquants"
+            v-model:groupes="groupesManquants"
+            v-model:tags="tagsManquants"
+            :objets="tousLesManquants"
+          />
+
           <!-- Le filtre ne laisse rien passer : c'est une bonne nouvelle — tout le manque est déjà
                prévu —, et surtout PAS « rien ne manque ». La barre d'outils reste au-dessus, sans
                quoi la case qui a produit ce vide disparaîtrait avec lui, et on ne pourrait plus la
                décocher. -->
           <div v-if="manquants.length === 0" class="text-center py-12">
+            <!-- Deux vides très différents, et il serait grave de les confondre : « tout le
+                 manque est déjà prévu » est une bonne nouvelle, « aucun objet ne passe vos
+                 filtres » n'en est pas une. Afficher la première pendant qu'un filtre cache le
+                 reste ferait clore une séance de rachat qui ne l'est pas. -->
             <UIcon
-              name="i-heroicons-clipboard-document-check"
-              class="size-12 text-green-500 mx-auto mb-3"
+              :name="
+                filtresManquantsPoses
+                  ? 'i-heroicons-funnel'
+                  : 'i-heroicons-clipboard-document-check'
+              "
+              class="size-12 mx-auto mb-3"
+              :class="filtresManquantsPoses ? 'text-gray-400' : 'text-green-500'"
             />
             <p class="text-gray-600 dark:text-gray-400">
-              {{ t('gestion.stock.missing_all_listed') }}
+              {{
+                filtresManquantsPoses
+                  ? t('gestion.stock.filter_no_results')
+                  : t('gestion.stock.missing_all_listed')
+              }}
             </p>
           </div>
 
@@ -144,6 +167,7 @@
                groupe. -->
           <UTable
             v-else
+            v-model:sorting="triManquants"
             v-model:row-selection="selectionLignes"
             :get-row-id="(objet: any) => String(objet.id)"
             :data="manquants"
@@ -203,6 +227,17 @@
             <template #group-cell="{ row }">
               <span class="text-sm text-gray-500">{{ row.original.group.name }}</span>
             </template>
+            <template #tags-cell="{ row }">
+              <div v-if="row.original.tags?.length" class="flex flex-wrap gap-1">
+                <StockTagBadge
+                  v-for="lien in row.original.tags"
+                  :key="lien.tag.id"
+                  :tag="lien.tag"
+                  size="xs"
+                />
+              </div>
+              <span v-else class="text-sm text-gray-400">—</span>
+            </template>
             <template #compte-cell="{ row }">
               <UInput
                 v-if="canManage"
@@ -255,14 +290,34 @@
 
       <!-- ONGLET 2 : ce qui reste à compter -->
       <div v-else-if="ongletActif === 'compter'" class="space-y-3">
+        <!-- La barre reste au-dessus du vide, comme dans l'autre onglet : si elle disparaissait
+             avec le tableau, on ne pourrait plus relâcher le filtre qui a produit ce vide. -->
+        <StockFiltresObjets
+          v-if="tousLesNonComptes.length > 0"
+          v-model:recherche="rechercheACompter"
+          v-model:groupes="groupesACompter"
+          v-model:tags="tagsACompter"
+          :objets="tousLesNonComptes"
+        />
+
         <div v-if="nonComptes.length === 0" class="text-center py-12">
-          <UIcon name="i-heroicons-check-circle" class="size-12 text-green-500 mx-auto mb-3" />
+          <!-- « Tout est compté » est un aboutissement ; « rien ne passe le filtre » n'en est pas
+               un. Les confondre ferait croire la séance finie alors qu'un filtre cache le reste. -->
+          <UIcon
+            :name="filtresACompterPoses ? 'i-heroicons-funnel' : 'i-heroicons-check-circle'"
+            class="size-12 mx-auto mb-3"
+            :class="filtresACompterPoses ? 'text-gray-400' : 'text-green-500'"
+          />
           <p class="text-gray-600 dark:text-gray-400">
-            {{ t('gestion.stock.missing_all_counted') }}
+            {{
+              filtresACompterPoses
+                ? t('gestion.stock.filter_no_results')
+                : t('gestion.stock.missing_all_counted')
+            }}
           </p>
         </div>
 
-        <UTable v-else :data="nonComptes" :columns="colonnesACompter">
+        <UTable v-else v-model:sorting="triACompter" :data="nonComptes" :columns="colonnesACompter">
           <template #name-cell="{ row }">
             <div class="flex items-center gap-1.5">
               <span class="font-medium">{{ row.original.name }}</span>
@@ -285,6 +340,17 @@
           </template>
           <template #group-cell="{ row }">
             <span class="text-sm text-gray-500">{{ row.original.group.name }}</span>
+          </template>
+          <template #tags-cell="{ row }">
+            <div v-if="row.original.tags?.length" class="flex flex-wrap gap-1">
+              <StockTagBadge
+                v-for="lien in row.original.tags"
+                :key="lien.tag.id"
+                :tag="lien.tag"
+                size="xs"
+              />
+            </div>
+            <span v-else class="text-sm text-gray-400">—</span>
           </template>
           <template #compte-cell="{ row }">
             <UInput
@@ -575,7 +641,12 @@ import {
 } from '../../../../../utils/comptage-stock'
 import { listeEnCours } from '../../../../../utils/compteur-listes-de-courses'
 import { peutGererLeStock } from '../../../../../utils/droits-stock'
-import { tagsDepuisUrl, urlDepuisTags } from '../../../../../utils/filtre-tags-stock'
+import {
+  filtrerParTags,
+  tagsDepuisUrl,
+  urlDepuisTags,
+} from '../../../../../utils/filtre-tags-stock'
+import { filtrerParGroupes } from '../../../../../utils/filtres-objets-stock'
 import {
   articlesParTags,
   articleSansObjet,
@@ -592,8 +663,14 @@ import {
   resumeRachat,
   type ObjetManquant,
 } from '../../../../../utils/manquants-stock'
+import { filtrerParNom } from '../../../../../utils/recherche-materiel'
 
+import type {
+  OptionGroupe,
+  OptionTag,
+} from '../../../../../components/stock/StockFiltresObjets.vue'
 import type { TableColumn } from '@nuxt/ui'
+import type { Column, SortingFn } from '@tanstack/vue-table'
 
 definePageMeta({
   layout: 'edition-dashboard',
@@ -726,23 +803,73 @@ const listesDeLObjet = (id: number) => appartenances.value.get(id) ?? []
  */
 const seulementHorsListe = ref(false)
 
-// Basculer le filtre vide la sélection : ce qui est coché doit toujours être ce qu'on voit. Les
+// Toucher à un filtre vide la sélection : ce qui est coché doit toujours être ce qu'on voit. Les
 // clés de sélection survivent à la disparition d'une ligne — c'est voulu pour le recomptage —,
 // si bien que sans cela on cocherait cinq objets, on poserait le filtre, et le bouton en verserait
 // deux qu'on ne regardait plus dans la liste de courses.
-watch(seulementHorsListe, () => {
-  selectionLignes.value = {}
-})
+//
+// Les quatre ensemble, et pas seulement la case « hors liste » : la recherche, les groupes et les
+// tags cachent des lignes exactement de la même façon. N'en surveiller qu'un laisserait le défaut
+// entier, simplement déplacé sur les trois autres.
+watch(
+  [seulementHorsListe, rechercheManquants, groupesManquants, tagsManquants],
+  () => {
+    selectionLignes.value = {}
+  },
+  { deep: true }
+)
 
 const tousLesManquants = computed(() => objetsARacheter(lignes.value))
 
-const manquants = computed(() =>
-  seulementHorsListe.value
+/**
+ * Les trois filtres de la barre, appliqués dans l'ordre.
+ *
+ * Ils se composent en ET entre eux — « les marmites, en cuisine, qui sont fragiles » — chacun
+ * restant un OU à l'intérieur. Aucun des trois n'est écrit ici : la recherche vient de
+ * `recherche-materiel`, qui découpe la requête en mots, les groupes et les tags de leurs utils
+ * respectifs. Les recopier aurait fait diverger cet écran de la liste d'un groupe et des
+ * emprunts, sur des détails qu'on ne découvre qu'à l'usage.
+ */
+function appliquerFiltres<T extends ObjetManquant>(
+  objets: T[],
+  recherche: string,
+  groupes: OptionGroupe[],
+  tags: OptionTag[]
+): T[] {
+  const parNom = filtrerParNom(objets, recherche)
+  const parGroupe = filtrerParGroupes(
+    parNom,
+    groupes.map((option) => option.value)
+  )
+  return filtrerParTags(
+    parGroupe,
+    tags.map((option) => option.value)
+  )
+}
+
+const manquants = computed(() => {
+  const horsListe = seulementHorsListe.value
     ? tousLesManquants.value.filter((objet) => listesDeLObjet(objet.id).length === 0)
     : tousLesManquants.value
-)
+  return appliquerFiltres(
+    horsListe,
+    rechercheManquants.value,
+    groupesManquants.value,
+    tagsManquants.value
+  )
+})
 
-const nonComptes = computed(() => objetsNonComptes(lignes.value))
+/** L'onglet avant filtrage : c'est sur lui que les listes déroulantes se construisent. */
+const tousLesNonComptes = computed(() => objetsNonComptes(lignes.value))
+
+const nonComptes = computed(() =>
+  appliquerFiltres(
+    tousLesNonComptes.value,
+    rechercheACompter.value,
+    groupesACompter.value,
+    tagsACompter.value
+  )
+)
 const resume = computed(() => resumeRachat(lignes.value))
 const enAttente = computed(() => nombreEnAttente(lignes.value as LigneComptage[]))
 
@@ -768,21 +895,204 @@ const onglets = computed(() => [
   },
 ])
 
-const colonnesManquants = computed((): TableColumn<ObjetManquant>[] => [
-  ...(canManage.value ? [{ id: 'choix', header: '' }] : []),
-  { id: 'name', accessorKey: 'name', header: t('gestion.stock.item_name') },
-  { id: 'group', header: t('gestion.stock.group') },
-  { id: 'quantity', accessorKey: 'quantity', header: t('gestion.stock.count_expected') },
-  { id: 'compte', header: t('gestion.stock.count_counted') },
-  { id: 'racheter', header: t('gestion.stock.missing_to_buy') },
-  { id: 'listes', header: t('gestion.stock.missing_in_lists') },
-])
+/**
+ * L'ordre des lignes, par tableau.
+ *
+ * Par le NOM, et non par ce qui manque le plus, qui était pourtant l'ordre que `objetsARacheter`
+ * pose et défend. Les deux réponses sont bonnes à des moments différents : chercher un objet
+ * précis dans la liste demande l'alphabet, jauger la dépense demande le manque. Le second reste
+ * à un clic, sur l'en-tête « À racheter » — c'est tout l'intérêt de rendre les colonnes triables
+ * plutôt que d'arbitrer une fois pour toutes dans l'util.
+ *
+ * Deux états et non un seul : les deux onglets n'ont pas les mêmes colonnes, et un état partagé
+ * ferait porter à l'un un tri que l'autre ne sait pas honorer — un `id` inconnu ne trie rien et
+ * ne dit pas pourquoi.
+ */
+/**
+ * Les filtres, par onglet.
+ *
+ * Deux jeux et non un seul, pour la même raison que les deux états de tri : on ne cherche pas la
+ * même chose selon qu'on décide d'un achat ou qu'on finit une séance de comptage. Garder un jeu
+ * commun ferait aussi disparaître des lignes en changeant d'onglet, sans que rien à l'écran dise
+ * qu'un filtre venu d'ailleurs est encore posé.
+ */
+const rechercheManquants = ref('')
+const groupesManquants = ref<OptionGroupe[]>([])
+const tagsManquants = ref<OptionTag[]>([])
+
+const rechercheACompter = ref('')
+const groupesACompter = ref<OptionGroupe[]>([])
+const tagsACompter = ref<OptionTag[]>([])
+
+/**
+ * Un filtre est-il posé ? Ce qui décide du message affiché sur un tableau vide.
+ *
+ * La case « hors liste » compte pour l'onglet des manquants : elle vide l'écran exactement comme
+ * les trois autres, et le message ne doit pas annoncer que tout est prévu quand c'est elle qui
+ * cache le reste.
+ */
+const filtresManquantsPoses = computed(
+  () =>
+    seulementHorsListe.value ||
+    rechercheManquants.value.trim() !== '' ||
+    groupesManquants.value.length > 0 ||
+    tagsManquants.value.length > 0
+)
+
+const filtresACompterPoses = computed(
+  () =>
+    rechercheACompter.value.trim() !== '' ||
+    groupesACompter.value.length > 0 ||
+    tagsACompter.value.length > 0
+)
+
+const triManquants = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
+const triACompter = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
+
+/** En-tête cliquable, avec la flèche qui dit le sens du tri en cours. */
+function enTeteTriable(column: Column<ObjetManquant>, libelle: string) {
+  const trie = column.getIsSorted()
+  return h(resolveComponent('UButton'), {
+    color: 'neutral',
+    variant: 'ghost',
+    label: libelle,
+    icon: trie
+      ? trie === 'asc'
+        ? 'i-lucide-arrow-up-narrow-wide'
+        : 'i-lucide-arrow-down-wide-narrow'
+      : 'i-lucide-arrow-up-down',
+    class: '-mx-2.5',
+    onClick: () => column.toggleSorting(trie === 'asc'),
+  })
+}
+
+/**
+ * Comparaison de deux textes à la française.
+ *
+ * Le tri par défaut de TanStack compare les chaînes caractère par caractère, sur leur code : « é »
+ * y vaut 233, donc plus que n'importe quelle lettre non accentuée. Mesuré sur l'édition de
+ * développement, 82 des 343 objets du stock portent un accent — « Sérum » se rangeait après
+ * « Serviette », et « Éponge » après « Zébrure », en fin de liste. Ce n'est pas une subtilité de
+ * linguiste : c'est un objet qu'on ne trouve pas là où on le cherche.
+ *
+ * `localeCompare` avec la locale française explicite, et non celle de l'utilisateur : ce sont des
+ * noms de matériel saisis en français par l'équipe, quelle que soit la langue de l'interface.
+ */
+const triTexte: SortingFn<ObjetManquant> = (ligneA, ligneB, colonne) =>
+  String(ligneA.getValue(colonne) ?? '').localeCompare(String(ligneB.getValue(colonne) ?? ''), 'fr')
+
+/**
+ * Ce sur quoi se trie la colonne « Compté », dans le tableau des manquants.
+ *
+ * Un NOMBRE, pas le texte de la case : `saisieAffichee` rend une chaîne, et 10 se serait rangé
+ * avant 9.
+ *
+ * Le `?? undefined` ne devrait jamais servir — un objet n'est « manquant » que si `compteRetenu`
+ * rend un nombre, c'est la définition qu'en donne `etatDeRachat`. Il est là pour que la colonne
+ * tienne quand même si cet invariant bouge : `undefined` — et non `0` — parce que « pas compté »
+ * n'est pas « zéro exemplaire », distinction que `saisir` défend déjà en enregistrant `null` sur
+ * une case vidée. TanStack range les `undefined` en queue dans les deux sens : une absence de
+ * réponse n'a pas de place dans un classement.
+ */
+function compteTriable(objet: ObjetManquant): number | undefined {
+  return compteRetenu(objet) ?? undefined
+}
+
+const colonnesManquants = computed((): TableColumn<ObjetManquant>[] => {
+  // `appartenances` est lu ICI, dans le corps du `computed`, et pas seulement dans l'accesseur
+  // de la colonne « Listes ». Un accesseur s'exécute plus tard, hors de la portée où Vue relève
+  // les dépendances : les colonnes n'auraient donc pas été reconstruites quand une liste de
+  // courses change, et TanStack aurait gardé l'ordre calculé avant l'ajout. La pastille serait
+  // apparue dans la bonne cellule — c'est un slot, il est réactif — mais la ligne ne se serait
+  // pas déplacée, ce qui donne un tableau qui se contredit lui-même.
+  const parObjet = appartenances.value
+
+  return [
+    // La colonne des cases : rien à y ordonner, et un en-tête cliquable y prendrait la place de
+    // la coche « tout sélectionner ».
+    ...(canManage.value ? [{ id: 'choix', header: '', enableSorting: false }] : []),
+    {
+      id: 'name',
+      accessorKey: 'name',
+      sortingFn: triTexte,
+      header: ({ column }) => enTeteTriable(column, t('gestion.stock.item_name')),
+    },
+    {
+      id: 'group',
+      accessorFn: (objet) => objet.group.name,
+      sortingFn: triTexte,
+      header: ({ column }) => enTeteTriable(column, t('gestion.stock.group')),
+    },
+    {
+      // Les tags après le groupe : le groupe dit OÙ l'objet est rangé, les tags CE QU'IL EST. En
+      // lecture seule ici — ils se posent et se retirent sur la liste d'un groupe ; cet écran
+      // décide d'un rachat ou finit un comptage, il ne trie pas l'inventaire.
+      id: 'tags',
+      accessorFn: (objet) => (objet.tags ?? []).map((lien) => lien.tag.name).join(', '),
+      sortingFn: triTexte,
+      header: ({ column }) => enTeteTriable(column, t('gestion.stock.tags.field_label')),
+    },
+    {
+      id: 'quantity',
+      accessorKey: 'quantity',
+      header: ({ column }) => enTeteTriable(column, t('gestion.stock.count_expected')),
+    },
+    {
+      id: 'compte',
+      accessorFn: compteTriable,
+      header: ({ column }) => enTeteTriable(column, t('gestion.stock.count_counted')),
+    },
+    {
+      id: 'racheter',
+      accessorFn: (objet) => quantiteARacheter(objet) ?? undefined,
+      header: ({ column }) => enTeteTriable(column, t('gestion.stock.missing_to_buy')),
+    },
+    {
+      // Le NOMBRE de listes, pas leurs noms : la question posée par cette colonne est « est-ce déjà
+      // prévu quelque part », et trier sur le premier nom de liste n'y répondrait pas.
+      id: 'listes',
+      accessorFn: (objet) => (parObjet.get(objet.id) ?? []).length,
+      header: ({ column }) => enTeteTriable(column, t('gestion.stock.missing_in_lists')),
+    },
+  ]
+})
 
 const colonnesACompter = computed((): TableColumn<ObjetManquant>[] => [
-  { id: 'name', accessorKey: 'name', header: t('gestion.stock.item_name') },
-  { id: 'group', header: t('gestion.stock.group') },
-  { id: 'quantity', accessorKey: 'quantity', header: t('gestion.stock.count_expected') },
-  { id: 'compte', header: t('gestion.stock.count_counted') },
+  {
+    id: 'name',
+    accessorKey: 'name',
+    sortingFn: triTexte,
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.item_name')),
+  },
+  {
+    id: 'group',
+    accessorFn: (objet) => objet.group.name,
+    sortingFn: triTexte,
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.group')),
+  },
+  {
+    // Les tags après le groupe : le groupe dit OÙ l'objet est rangé, les tags CE QU'IL EST. En
+    // lecture seule ici — ils se posent et se retirent sur la liste d'un groupe ; cet écran
+    // décide d'un rachat ou finit un comptage, il ne trie pas l'inventaire.
+    id: 'tags',
+    accessorFn: (objet) => (objet.tags ?? []).map((lien) => lien.tag.name).join(', '),
+    sortingFn: triTexte,
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.tags.field_label')),
+  },
+  {
+    id: 'quantity',
+    accessorKey: 'quantity',
+    header: ({ column }) => enTeteTriable(column, t('gestion.stock.count_expected')),
+  },
+  {
+    // Pas de tri ici, à la différence de l'autre onglet : un objet n'est dans cette liste que
+    // parce que `compteRetenu` rend `null`, donc la colonne ne contient QUE des absences — et
+    // dès qu'on en remplit une, la ligne quitte l'onglet. Un en-tête cliquable qui ne
+    // réordonnerait jamais rien se lit comme une panne, pas comme une règle.
+    id: 'compte',
+    header: t('gestion.stock.count_counted'),
+    enableSorting: false,
+  },
 ])
 
 /**
