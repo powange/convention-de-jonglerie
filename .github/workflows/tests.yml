@@ -617,8 +617,37 @@ jobs:
     # des cohabitations, jamais en créer : c'est la seule raison pour laquelle ce découpage-ci est
     # sûr, et un futur rééquilibrage qui déplacerait un fichier d'un lot vers un autre la perdrait.
     #
-    # Ce qu'il resterait à gagner, mesuré : `gestion-2` (268 s de job) devient le chemin critique,
-    # et le plancher au-delà est le lot `publics` à 193 s.
+    # ---------------------------------------------------------------------------------------
+    # RÉVISION DU 21/09/2026 (suite) — `gestion-2` et `gestion-3` coupés à leur tour.
+    #
+    # Durées de tests relevées sur deux runs consécutifs, qui montrent d'abord que ces durées sont
+    # STABLES — la variance du run vient du build et de la préparation, pas des tests :
+    #
+    #   gestion-2   169 s / 159 s        gestion-1a   128 s / 132 s
+    #   gestion-3   147 s / 154 s        gestion-1b   129 s / 131 s
+    #                                    publics      105 s / 105 s
+    #
+    # Couper `gestion-2` SEUL n'aurait rapporté que 22 s : il n'a que 14 s d'avance sur `gestion-3`,
+    # qui serait devenu le mur aussitôt. Les deux sont donc coupés ensemble, à 78/78 s et 69/68 s,
+    # ce qui ramène le chemin critique sur `gestion-1b` (129 s) : 431 s → ~391 s.
+    #
+    # Le découpage de ces deux lots vient des durées par fichier, extraites des rapports Playwright
+    # archivés du run 35549766498 (un zip base64 dans `index.html`, `report.json` à l'intérieur, la
+    # durée est portée par chaque test). Les fichiers vont de 0,6 s à 30 s : répartir au nombre
+    # n'aurait rien équilibré.
+    #
+    # POURQUOI S'ARRÊTER LÀ. Le chemin critique vaut désormais `fin du build` + ~30 s + le plus long
+    # lot, la préparation d'un lot (81 s) étant entièrement absorbée par l'attente du build depuis
+    # #500 — un lot de plus ne coûte donc rien en horloge, seulement du compute, gratuit ici. Le
+    # plancher du découpage est le lot `publics` à 105 s, soit ~367 s au total. En dessous il ne
+    # reste que le build : 231 s sur ce run, 63 % du total.
+    #
+    # Et le build, mesuré le 21/09 par trois builds enchaînés dans un même job (branche jetable,
+    # supprimée), n'a rien de retirable : `compressPublicAssets` coûte 0,9 s et `nitro.minify`
+    # 1,6 s. Ses 55 % de « bundling Nitro » sont l'écriture des 112 Mo de `.output` — le preset
+    # `node-server` recopie les dépendances externes —, pas de la compilation. À code identique il
+    # a mis 231 s sur un run et 140 s sur le précédent : la loterie du runner pèse plus lourd que
+    # tout ce découpage réuni.
     strategy:
       # Comme pour le job `test` : on veut voir tous les échecs, pas seulement celui du premier lot
       # qui tombe. Un lot rouge n'apprend rien sur les autres.
@@ -627,8 +656,10 @@ jobs:
         lot:
           - { cle: gestion-1a, projet: edition-management }
           - { cle: gestion-1b, projet: edition-management }
-          - { cle: gestion-2, projet: edition-management }
-          - { cle: gestion-3, projet: edition-management }
+          - { cle: gestion-2a, projet: edition-management }
+          - { cle: gestion-2b, projet: edition-management }
+          - { cle: gestion-3a, projet: edition-management }
+          - { cle: gestion-3b, projet: edition-management }
           - { cle: publics, projet: public, args: --project=authenticated }
 
     # Ces trois variables n'existaient que dans playwright.yml et restent portées par ce seul job :
@@ -815,7 +846,7 @@ jobs:
   # Le seul contrôle à déclarer requis dans la protection de branche.
   #
   # Les autres jobs ne peuvent pas l'être : les noms des checks de matrice portent leurs paramètres
-  # — `test (unit, npm run test:unit:run, false)`, `playwright (gestion-2)`… Les exiger nommément
+  # — `test (unit, npm run test:unit:run, false)`, `playwright (gestion-2a)`… Les exiger nommément
   # marche jusqu'au jour où l'on touche à la matrice : le check requis change de nom, n'apparaît
   # plus jamais, et toutes les PR restent bloquées en attente d'un contrôle qui n'existe plus. Ce
   # dépôt a déjà redécoupé ses lots Playwright deux fois (#376, #377, #378) ; ça se reproduira.

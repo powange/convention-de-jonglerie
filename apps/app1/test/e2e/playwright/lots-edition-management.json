@@ -30,32 +30,36 @@
     "panneau-gestion-cibles-tactiles.spec.ts",
     "shows-call-extras.spec.ts"
   ],
-  "gestion-2": [
+  "gestion-2a": [
     "shows-call-survey.spec.ts",
     "shows-call.spec.ts",
     "shows-list.spec.ts",
+    "tasks-tri-echeance.spec.ts",
+    "ticketing-access-control.spec.ts",
+    "ticketing-counters.spec.ts",
+    "ticketing-handout-items.spec.ts"
+  ],
+  "gestion-2b": [
     "status.spec.ts",
     "stock.spec.ts",
     "swaps-mobile.spec.ts",
     "swaps-option.spec.ts",
-    "tasks-tri-echeance.spec.ts",
     "tasks.spec.ts",
-    "ticketing-access-control.spec.ts",
-    "ticketing-counters.spec.ts",
     "ticketing-custom-fields.spec.ts",
-    "ticketing-external-config.spec.ts",
-    "ticketing-handout-items.spec.ts"
+    "ticketing-external-config.spec.ts"
   ],
-  "gestion-3": [
+  "gestion-3a": [
     "ticketing-quotas-options.spec.ts",
     "ticketing.spec.ts",
     "treasury-avances.spec.ts",
-    "treasury.spec.ts",
     "volunteer-application-form.spec.ts",
     "volunteer-assignments.spec.ts",
     "volunteer-form-config.spec.ts",
+    "volunteer-notifications.spec.ts"
+  ],
+  "gestion-3b": [
+    "treasury.spec.ts",
     "volunteer-leader-visibility.spec.ts",
-    "volunteer-notifications.spec.ts",
     "volunteer-planning.spec.ts",
     "volunteer-teams.spec.ts",
     "volunteers.spec.ts",
