@@ -191,7 +191,9 @@
     "currency": "Měna",
     "amount": "Částka",
     "treasury_short": "Pokladna",
-    "type": "Typ"
+    "type": "Typ",
+    "collapse": "Sbalit",
+    "expand": "Rozbalit"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

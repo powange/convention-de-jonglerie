@@ -191,7 +191,9 @@
     "currency": "Valuta",
     "amount": "Belopp",
     "treasury_short": "Ekonomi",
-    "type": "Typ"
+    "type": "Typ",
+    "collapse": "Fäll ihop",
+    "expand": "Fäll ut"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

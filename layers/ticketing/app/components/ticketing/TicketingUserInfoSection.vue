@@ -34,7 +34,32 @@
           @update:model-value="$emit('update:lastName', $event)"
         />
       </div>
+      <!--
+        Une adresse VÉRIFIÉE ne se corrige plus ici.
+
+        Ce champ existe pour rattraper la faute de frappe d'une personne ajoutée à la main, dont
+        le compte vient d'être créé et n'a jamais servi. Dès que l'adresse est vérifiée, le compte
+        appartient à quelqu'un : le réécrire depuis le guichet permettait d'en demander la
+        réinitialisation du mot de passe, donc de le prendre.
+
+        Le champ est montré en lecture seule plutôt que masqué : savoir quelle adresse est
+        enregistrée sert au comptoir, et une case qui disparaît se lit comme un défaut.
+      -->
+      <div v-if="isEmailVerified">
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+          {{ $t('edition.ticketing.email') }}
+        </p>
+        <UInput
+          :model-value="email"
+          type="email"
+          icon="i-heroicons-envelope"
+          size="sm"
+          readonly
+          :ui="{ base: 'cursor-default' }"
+        />
+      </div>
       <EmailValidationInput
+        v-else
         ref="emailInput"
         :model-value="email"
         :original-email="originalEmail"
@@ -64,6 +89,14 @@ defineProps<{
   firstName: string | null
   lastName: string | null
   email: string | null
+  /**
+   * L'adresse du compte est-elle vérifiée ?
+   *
+   * Absente, on suppose qu'elle NE l'est PAS — le champ reste donc modifiable. C'est le serveur
+   * qui tranche pour de bon : une interface trop permissive fait échouer une écriture, une
+   * interface trop stricte empêche la correction qui justifie ce champ.
+   */
+  isEmailVerified?: boolean
   phone: string | null
   originalEmail: string
   userId: number

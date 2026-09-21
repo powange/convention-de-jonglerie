@@ -53,6 +53,7 @@
       :email="editableEmail"
       :phone="editablePhone"
       :original-email="artist.user.email"
+      :is-email-verified="artist.user.isEmailVerified"
       :user-id="artist.user.id"
       @update:first-name="$emit('update:firstName', $event)"
       @update:last-name="$emit('update:lastName', $event)"

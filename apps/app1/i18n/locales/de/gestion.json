@@ -1000,7 +1000,18 @@
       "export_settled": "Bezahlt",
       "export_subtotal": "Zwischensumme",
       "export_total": "Gesamt",
-      "export_without_code": "Ohne Konto"
+      "export_without_code": "Ohne Konto",
+      "code_delete_confirm": "Die Buchungen, die ihn verwendet haben, behalten ihren Betrag und verlieren nur ihre Zuordnung. Diese Aktion ist endgültig.",
+      "code_delete_title": "Diesen Code löschen?",
+      "code_search_all": "In allen Codes suchen…",
+      "plan_already_imported": "Bereits importiert",
+      "plan_description": "Durchsuchen Sie die Konten und importieren Sie die benötigten. Die Bezeichnung lässt sich vor dem Bestätigen ändern.",
+      "plan_import": "Importieren",
+      "plan_no_result": "Kein Konto entspricht dieser Suche.",
+      "plan_open": "Einen Code in den französischen Kontenrahmen finden",
+      "plan_search_placeholder": "Konto suchen: „Versicherung“, „6257“, „Beiträge“…",
+      "plan_source": "Amtlicher Text",
+      "plan_title": "Französische Kontenrahmen"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

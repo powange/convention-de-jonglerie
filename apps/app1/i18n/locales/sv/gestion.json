@@ -1000,7 +1000,18 @@
       "export_settled": "Betalt",
       "export_subtotal": "Delsumma",
       "export_total": "Totalt",
-      "export_without_code": "Utan kod"
+      "export_without_code": "Utan kod",
+      "code_delete_confirm": "De poster som använde den behåller sitt belopp och förlorar endast sin kontering. Åtgärden går inte att ångra.",
+      "code_delete_title": "Ta bort den här koden?",
+      "code_search_all": "Sök bland alla koder…",
+      "plan_already_imported": "Redan importerad",
+      "plan_description": "Bläddra bland kontona och importera dem du behöver. Du kan ändra benämningen innan du bekräftar.",
+      "plan_import": "Importera",
+      "plan_no_result": "Inget konto matchar sökningen.",
+      "plan_open": "Hitta en kod i de franska kontoplanerna",
+      "plan_search_placeholder": "Sök ett konto: ”försäkring”, ”6257”, ”medlemsavgifter”…",
+      "plan_source": "Officiell text",
+      "plan_title": "Franska kontoplaner"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

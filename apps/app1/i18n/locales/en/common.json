@@ -191,7 +191,9 @@
     "currency": "Currency",
     "amount": "Amount",
     "treasury_short": "Treasury",
-    "type": "Type"
+    "type": "Type",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

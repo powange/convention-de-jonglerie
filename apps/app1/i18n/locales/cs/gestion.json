@@ -1000,7 +1000,18 @@
       "export_settled": "Zaplaceno",
       "export_subtotal": "Mezisoučet",
       "export_total": "Celkem",
-      "export_without_code": "Bez kódu"
+      "export_without_code": "Bez kódu",
+      "code_delete_confirm": "Položky, které jej používaly, si ponechají svou částku a ztratí pouze své zaúčtování. Tato akce je nevratná.",
+      "code_delete_title": "Smazat tento kód?",
+      "code_search_all": "Hledat ve všech kódech…",
+      "plan_already_imported": "Již importováno",
+      "plan_description": "Projděte si účty a importujte ty, které potřebujete. Označení můžete před potvrzením změnit.",
+      "plan_import": "Importovat",
+      "plan_no_result": "Tomuto hledání neodpovídá žádný účet.",
+      "plan_open": "Najít kód ve francouzských účtových osnovách",
+      "plan_search_placeholder": "Hledat účet: „pojištění“, „6257“, „příspěvky“…",
+      "plan_source": "Oficiální text",
+      "plan_title": "Francouzské účtové osnovy"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

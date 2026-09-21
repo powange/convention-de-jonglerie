@@ -191,7 +191,9 @@
     "currency": "Valuta",
     "amount": "Beløb",
     "treasury_short": "Økonomi",
-    "type": "Type"
+    "type": "Type",
+    "collapse": "Fold sammen",
+    "expand": "Fold ud"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",
