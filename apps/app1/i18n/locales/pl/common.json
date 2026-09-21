@@ -193,7 +193,9 @@
     "treasury_short": "Finanse",
     "type": "Typ",
     "collapse": "Zwiń",
-    "expand": "Rozwiń"
+    "expand": "Rozwiń",
+    "volunteers": "Wolontariusze",
+    "organizers": "Organizatorzy"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

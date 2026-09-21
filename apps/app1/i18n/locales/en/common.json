@@ -193,7 +193,9 @@
     "treasury_short": "Treasury",
     "type": "Type",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "volunteers": "Volunteers",
+    "organizers": "Organisers"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",

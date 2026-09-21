@@ -190,6 +190,8 @@
       "too_long": "This field cannot exceed {max} characters",
       "max_required_with_actual": "A maximum is required as long as an actual amount is set"
     },
-    "view_qr_code": "My QR Code"
+    "view_qr_code": "My QR Code",
+    "export_pdf": "Export PDF",
+    "export_pdf_error": "Could not generate the PDF"
   }
 }

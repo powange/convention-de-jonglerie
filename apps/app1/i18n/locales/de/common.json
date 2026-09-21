@@ -193,7 +193,9 @@
     "treasury_short": "Buchhaltung",
     "type": "Typ",
     "collapse": "Einklappen",
-    "expand": "Ausklappen"
+    "expand": "Ausklappen",
+    "volunteers": "Helfer",
+    "organizers": "Organisatoren"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

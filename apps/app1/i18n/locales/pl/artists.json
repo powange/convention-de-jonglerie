@@ -190,6 +190,8 @@
       "too_long": "To pole nie może przekraczać {max} znaków",
       "max_required_with_actual": "Maksimum jest wymagane, dopóki podana jest kwota rzeczywista"
     },
-    "view_qr_code": "Mój kod QR"
+    "view_qr_code": "Mój kod QR",
+    "export_pdf": "Eksport PDF",
+    "export_pdf_error": "Nie udało się wygenerować pliku PDF"
   }
 }

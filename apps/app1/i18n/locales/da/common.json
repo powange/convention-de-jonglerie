@@ -193,7 +193,9 @@
     "treasury_short": "Økonomi",
     "type": "Type",
     "collapse": "Fold sammen",
-    "expand": "Fold ud"
+    "expand": "Fold ud",
+    "volunteers": "Frivillige",
+    "organizers": "Arrangører"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",

@@ -193,7 +193,9 @@
     "treasury_short": "Pokladna",
     "type": "Typ",
     "collapse": "Sbalit",
-    "expand": "Rozbalit"
+    "expand": "Rozbalit",
+    "volunteers": "Dobrovolníci",
+    "organizers": "Organizátoři"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

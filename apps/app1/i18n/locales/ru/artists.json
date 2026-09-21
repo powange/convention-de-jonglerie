@@ -190,6 +190,8 @@
       "too_long": "Это поле не может превышать {max} символов",
       "max_required_with_actual": "Максимум обязателен, пока указана фактическая сумма"
     },
-    "view_qr_code": "Мой QR-код"
+    "view_qr_code": "Мой QR-код",
+    "export_pdf": "Экспорт в PDF",
+    "export_pdf_error": "Не удалось создать PDF"
   }
 }

@@ -193,7 +193,9 @@
     "treasury_short": "Tesoreria",
     "type": "Tipo",
     "collapse": "Comprimi",
-    "expand": "Espandi"
+    "expand": "Espandi",
+    "volunteers": "Volontari",
+    "organizers": "Organizzatori"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

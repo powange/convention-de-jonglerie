@@ -190,6 +190,8 @@
       "too_long": "Dit veld mag niet langer zijn dan {max} tekens",
       "max_required_with_actual": "Een maximum is vereist zolang er een werkelijk bedrag is ingevuld"
     },
-    "view_qr_code": "Mijn QR-code"
+    "view_qr_code": "Mijn QR-code",
+    "export_pdf": "PDF exporteren",
+    "export_pdf_error": "Kan de pdf niet genereren"
   }
 }

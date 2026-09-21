@@ -193,7 +193,9 @@
     "treasury_short": "Tesouraria",
     "type": "Tipo",
     "collapse": "Recolher",
-    "expand": "Expandir"
+    "expand": "Expandir",
+    "volunteers": "Voluntários",
+    "organizers": "Organizadores"
   },
   "dates": {
     "date_range": "De {startDate} a {endDate}",

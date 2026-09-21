@@ -190,6 +190,8 @@
       "too_long": "Detta fält får inte överstiga {max} tecken",
       "max_required_with_actual": "Ett maximum krävs så länge ett faktiskt belopp är angivet"
     },
-    "view_qr_code": "Min QR-kod"
+    "view_qr_code": "Min QR-kod",
+    "export_pdf": "Exportera PDF",
+    "export_pdf_error": "Det gick inte att skapa PDF:en"
   }
 }

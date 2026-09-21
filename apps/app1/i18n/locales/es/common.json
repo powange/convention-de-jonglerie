@@ -193,7 +193,9 @@
     "treasury_short": "Tesorería",
     "type": "Tipo",
     "collapse": "Plegar",
-    "expand": "Desplegar"
+    "expand": "Desplegar",
+    "volunteers": "Voluntarios",
+    "organizers": "Organizadores"
   },
   "dates": {
     "date_range": "Del {startDate} al {endDate}",
