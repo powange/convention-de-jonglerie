@@ -535,13 +535,32 @@ jobs:
     name: playwright (${{ matrix.lot.cle }})
     runs-on: ubuntu-22.04
     timeout-minutes: 30
-    # Ce job ne builde plus rien : il consomme le `.output/` du job `build`. Il démarre donc plus
-    # tard qu'avant, où il partait à t=0 en parallèle de tout — le gain est en compute et en
-    # justesse (un seul build, et c'est celui de production qui est testé), pas en horloge.
+    # Ce job ne builde plus rien : il consomme le `.output/` du job `build`. Le gain est en compute
+    # et en justesse (un seul build, et c'est celui de production qui est testé).
     #
-    # `base-de-test` ne retarde rien : il court de t+14 s à bien avant la fin de `build`, que ce
-    # job attendait déjà. C'est la mesure qui a justifié l'artifact plutôt qu'un cache.
-    needs: [build, base-de-test]
+    # ⚠️ `build` n'est PLUS dans `needs:`, et c'est délibéré. Mesuré le 21/09/2026 : les lots
+    # démarraient à t+147 s — après `build` — puis passaient ~100 s à se préparer avant le premier
+    # test. Or cette préparation — conteneur MySQL, navigateurs, restauration de la base — ne doit
+    # RIEN au build. Elle se fait donc maintenant pendant que le build tourne, et l'attente est
+    # reportée juste avant le téléchargement du `.output/`, là où elle est réellement nécessaire.
+    #
+    #   avant   20s→143s build, puis 147s→431s le lot le plus long   → 436 s de run
+    #   après   la préparation couvre le build, les tests démarrent à sa fin
+    #
+    # Le prix de ce montage est qu'une dépendance qui ne s'exprime plus dans `needs:` doit être
+    # tenue à la main : le step « Attendre le job build » échoue explicitement si le build échoue,
+    # là où GitHub aurait simplement sauté le job. Sans lui, les lots téléchargeraient un artifact
+    # inexistant et donneraient une erreur incompréhensible.
+    #
+    # `base-de-test` reste dans `needs:` : son artifact est lu dès le début de la préparation.
+    needs: [setup, base-de-test]
+
+    # Le step d'attente interroge l'API des jobs du run : sans `actions: read`, il échoue et
+    # emporte les cinq lots. Déclarer le bloc restreint le jeton au strict nécessaire, d'où
+    # `contents: read` qui reste indispensable au checkout.
+    permissions:
+      actions: read
+      contents: read
 
     # La suite Playwright portait à elle seule les deux tiers de l'attente de la CI : 713 s sur un
     # run de 899, dont 618 s de tests. Tout le reste avait fini à t+313 s.
@@ -659,23 +678,6 @@ jobs:
           # `.output/`, où tout est déjà résolu.
           cache-mode: restaurer
 
-      - name: Récupérer le build produit par le job build
-        uses: actions/download-artifact@v4
-        with:
-          name: build-output-${{ github.run_id }}
-          # Chemin relatif à la RACINE du dépôt, comme tous les chemins d'actions ici.
-          path: apps/app1/.output
-
-      # Les artifacts transitent par un zip, qui ne conserve ni les bits d'exécution ni les liens
-      # symboliques. Ça ne gêne pas `node .output/server/index.mjs` — node lit le fichier, il ne
-      # l'exécute pas — mais autant que l'absence du point d'entrée se voie ici plutôt que dans un
-      # timeout de `wait-on` soixante secondes plus loin.
-      - name: Vérifier le build téléchargé
-        run: |
-          ls -la .output/ || { echo "::error::.output/ absent après téléchargement"; exit 1; }
-          test -f .output/server/index.mjs || { echo "::error::.output/server/index.mjs manquant"; exit 1; }
-          echo "✅ point d'entrée présent : $(du -sh .output | cut -f1) de build récupéré"
-
       - name: Récupérer la base de test
         uses: actions/download-artifact@v4
         with:
@@ -721,6 +723,50 @@ jobs:
       # tout en perdant la réparation automatique d'un cache restauré mais incomplet.
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
+
+      # Tout ce qui précède — conteneur MySQL, base restaurée, navigateurs — s'est fait pendant que
+      # le job `build` tournait. C'est ici seulement qu'on a besoin de son résultat, donc ici
+      # seulement qu'on l'attend.
+      #
+      # Ce step remplace le `needs: build` retiré plus haut : il doit donc en reproduire la
+      # garantie, échec compris. Un build rouge fait échouer les lots explicitement, au lieu de les
+      # laisser télécharger un artifact qui n'existera jamais.
+      - name: Attendre le job build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for _ in $(seq 1 90); do
+            etat=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs?per_page=100" \
+              --jq '.jobs[] | select(.name == "build") | "\(.status) \(.conclusion)"' || true)
+            case "$etat" in
+              "completed success")
+                echo "✅ build terminé"
+                exit 0 ;;
+              "completed "*)
+                echo "::error::le job build s'est terminé en « $etat » — inutile d'aller plus loin"
+                exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "::error::le job build n'a pas rendu de verdict en 15 minutes"
+          exit 1
+
+      - name: Récupérer le build produit par le job build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output-${{ github.run_id }}
+          # Chemin relatif à la RACINE du dépôt, comme tous les chemins d'actions ici.
+          path: apps/app1/.output
+
+      # Les artifacts transitent par un zip, qui ne conserve ni les bits d'exécution ni les liens
+      # symboliques. Ça ne gêne pas `node .output/server/index.mjs` — node lit le fichier, il ne
+      # l'exécute pas — mais autant que l'absence du point d'entrée se voie ici plutôt que dans un
+      # timeout de `wait-on` soixante secondes plus loin.
+      - name: Vérifier le build téléchargé
+        run: |
+          ls -la .output/ || { echo "::error::.output/ absent après téléchargement"; exit 1; }
+          test -f .output/server/index.mjs || { echo "::error::.output/server/index.mjs manquant"; exit 1; }
+          echo "✅ point d'entrée présent : $(du -sh .output | cut -f1) de build récupéré"
 
       - name: Start application
         run: |
