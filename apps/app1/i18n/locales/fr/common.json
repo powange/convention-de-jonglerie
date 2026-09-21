@@ -193,7 +193,9 @@
     "yes": "Oui",
     "currency": "Devise",
     "amount": "Montant",
-    "treasury_short": "Trésorerie"
+    "treasury_short": "Trésorerie",
+    "volunteers": "Bénévoles",
+    "organizers": "Organisateurs"
   },
   "dates": {
     "date_range": "Du {startDate} au {endDate}",

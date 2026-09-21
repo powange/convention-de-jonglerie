@@ -38,16 +38,31 @@
       </UAlert>
     </div>
     <div v-else>
-      <!-- Titre de la page -->
-      <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <UIcon name="i-heroicons-gift" class="text-orange-600 dark:text-orange-400" />
-          {{ $t('gestion.ticketing.handout_items_title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.ticketing.handout_items_description') }}
-        </p>
+      <!-- Titre de la page. Le bouton passe sous le titre en écran étroit plutôt que de le
+           comprimer : c'est le titre qui situe la page, pas lui. -->
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <UIcon name="i-heroicons-gift" class="text-orange-600 dark:text-orange-400" />
+            {{ $t('gestion.ticketing.handout_items_title') }}
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-1">
+            {{ $t('gestion.ticketing.handout_items_description') }}
+          </p>
+        </div>
+
+        <UButton
+          icon="i-heroicons-calculator"
+          color="primary"
+          variant="soft"
+          class="shrink-0"
+          @click="volumesOuverts = true"
+        >
+          {{ $t('gestion.ticketing.handout_volumes_button') }}
+        </UButton>
       </div>
+
+      <TicketingHandoutItemVolumesModal v-model:open="volumesOuverts" :edition-id="editionId" />
 
       <div class="space-y-8">
         <TicketingHandoutItemsList
@@ -774,6 +789,14 @@ const audienceTabCourant = computed(() =>
 // Items à remettre
 const loadingHandoutItems = ref(true)
 const handoutItems = ref<any[]>([])
+
+/**
+ * Les volumes à prévoir, dans une modale : c'est une lecture ponctuelle — on l'ouvre six
+ * semaines avant pour commander, puis le dernier jour pour savoir qui n'a pas récupéré. La
+ * placer dans la page l'aurait fait calculer à chaque visite, pour une question qu'on ne se pose
+ * pas en venant paramétrer un article.
+ */
+const volumesOuverts = ref(false)
 
 // Items à remettre pour bénévoles
 const loadingVolunteerHandoutItems = ref(true)

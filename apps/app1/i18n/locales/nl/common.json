@@ -193,7 +193,9 @@
     "treasury_short": "Financiën",
     "type": "Type",
     "collapse": "Inklappen",
-    "expand": "Uitklappen"
+    "expand": "Uitklappen",
+    "volunteers": "Vrijwilligers",
+    "organizers": "Organisatoren"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

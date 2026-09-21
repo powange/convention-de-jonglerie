@@ -190,6 +190,8 @@
       "too_long": "Toto pole nesmí překročit {max} znaků",
       "max_required_with_actual": "Maximum je povinné, dokud je uvedena skutečná částka"
     },
-    "view_qr_code": "Můj QR kód"
+    "view_qr_code": "Můj QR kód",
+    "export_pdf": "Export PDF",
+    "export_pdf_error": "PDF se nepodařilo vygenerovat"
   }
 }

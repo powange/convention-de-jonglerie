@@ -248,5 +248,6 @@ Cette commande s'arrête si une étape échoue.
 - **ULink** : Lien stylé (équivalent `NuxtLink` intégré au thème Nuxt UI)
 - **UIcon** : Icône (bibliothèque Nuxt Icon, ex. `i-heroicons-*`)
 - **UTooltip** : Infobulle au survol (`text`), utile pour nommer un bouton réduit à son icône
+- **UCollapsible** : Repli/dépli d'un bloc — le déclencheur va dans le slot par défaut, le contenu dans `#content` (`default-open`, `unmount-on-hide`)
 
 A Chaque fois que tu ajoutes un nouveau component Nuxt UI, ajoute-le à cette liste.

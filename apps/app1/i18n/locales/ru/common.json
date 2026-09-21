@@ -193,7 +193,9 @@
     "treasury_short": "Касса",
     "type": "Тип",
     "collapse": "Свернуть",
-    "expand": "Развернуть"
+    "expand": "Развернуть",
+    "volunteers": "Волонтёры",
+    "organizers": "Организаторы"
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",
