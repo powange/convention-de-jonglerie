@@ -66,6 +66,36 @@ test.describe.serial('Bénévoles — planning et affectations', () => {
     }).toPass({ timeout: 40000, intervals: [2000, 3000, 5000] })
   })
 
+  /**
+   * Le bouton d'enregistrement de la modification, et non le contenu des champs : c'est lui que
+   * l'utilisateur trouve désactivé, et il l'était parce que la page lisait `.start` / `.end` là où
+   * l'API rend `startDateTime` / `endDateTime`. `undefined` devenait une chaîne vide, les deux
+   * champs d'horaire s'ouvraient vides, et `isFormValid` refusait le bouton.
+   *
+   * Aucun test unitaire de la page ni de la modale ne pouvait le voir : le défaut vit entre les
+   * deux, dans le nom d'un champ que l'une passe et que l'autre attend.
+   */
+  test('un créneau existant s’ouvre en modification avec ses horaires', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    await expect(async () => {
+      await goto(`/editions/${editionId}/gestion/volunteers/planning`, { waitUntil: 'hydration' })
+      await expect(page.getByText('Accueil E2E').first()).toBeVisible({ timeout: 8000 })
+    }).toPass({ timeout: 40000, intervals: [2000, 3000, 5000] })
+
+    await page.getByText('Accueil E2E').first().click()
+
+    // Le sous-titre identifie l'action sans ambiguïté : « Modifier le créneau » sert aussi de
+    // titre à la modale qui s'ouvre ensuite.
+    const ouvrirLaModification = page.getByText("Modifier le titre, les horaires et l'équipe")
+    await expect(ouvrirLaModification).toBeVisible({ timeout: 8000 })
+    await ouvrirLaModification.click()
+
+    const enregistrer = page.getByRole('button', { name: 'Enregistrer' })
+    await expect(enregistrer).toBeVisible({ timeout: 8000 })
+    await expect(enregistrer).toBeEnabled()
+  })
+
   test('ajouter un bénévole (create-user-and-add) → candidature ACCEPTED', async ({ page }) => {
     const { editionId } = loadState()
     const response = await apiPost(

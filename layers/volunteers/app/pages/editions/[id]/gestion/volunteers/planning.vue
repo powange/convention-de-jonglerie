@@ -270,7 +270,11 @@ const spectacles = ref<any[]>([])
 
 // État des modals
 const slotDetailsModalOpen = ref(false)
-const selectedTimeSlot = ref<any>(null)
+/**
+ * Typée, et non `ref<any>` : c'est ce `any` qui laissait lire `.start` sur un créneau qui n'en a
+ * pas — le compilateur validait la ligne, et le champ arrivait `undefined` jusqu'à l'écran.
+ */
+const selectedTimeSlot = ref<VolunteerTimeSlot | null>(null)
 const assignmentsModalOpen = ref(false)
 const delayModalOpen = ref(false)
 const slotModalOpen = ref(false)
@@ -363,8 +367,13 @@ const handleEditSlotFromDetails = () => {
       title: selectedTimeSlot.value.title,
       description: selectedTimeSlot.value.description || '',
       teamId: selectedTimeSlot.value.teamId || '',
-      startDateTime: versChampLocal(selectedTimeSlot.value.start, fuseauEdition.value),
-      endDateTime: versChampLocal(selectedTimeSlot.value.end, fuseauEdition.value),
+      // `startDateTime` / `endDateTime`, et non `start` / `end` : c'est le nom que l'API rend
+      // depuis l'unification (cf. `VolunteerTimeSlot`). L'ancien nom ne levait aucune erreur —
+      // il valait `undefined`, que `versChampLocal` traduit en chaîne vide. Les deux champs de
+      // plage horaire s'ouvraient donc vides, et `isFormValid` laissait le bouton « Enregistrer »
+      // désactivé : un créneau existant n'était plus modifiable du tout.
+      startDateTime: versChampLocal(selectedTimeSlot.value.startDateTime, fuseauEdition.value),
+      endDateTime: versChampLocal(selectedTimeSlot.value.endDateTime, fuseauEdition.value),
       maxVolunteers: selectedTimeSlot.value.maxVolunteers,
     }
     slotModalOpen.value = true
