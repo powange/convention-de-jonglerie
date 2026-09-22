@@ -263,7 +263,8 @@
       "severity_light": "lieve",
       "severity_moderate": "moderata",
       "severity_severe": "grave",
-      "export_count": "{count} pasti"
+      "export_count": "{count} pasti",
+      "catering_no_meal": "Nessun pasto previsto quel giorno"
     },
     "organizers": {
       "access_rights": "Diritti di accesso",

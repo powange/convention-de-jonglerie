@@ -263,7 +263,8 @@
       "severity_light": "lindrig",
       "severity_moderate": "måttlig",
       "severity_severe": "svår",
-      "export_count": "{count} måltider"
+      "export_count": "{count} måltider",
+      "catering_no_meal": "Inga måltider planerade den dagen"
     },
     "organizers": {
       "access_rights": "Åtkomsträttigheter",

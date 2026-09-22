@@ -263,7 +263,8 @@
       "severity_light": "лёгкая",
       "severity_moderate": "умеренная",
       "severity_severe": "тяжёлая",
-      "export_count": "{count} приёмов пищи"
+      "export_count": "{count} приёмов пищи",
+      "catering_no_meal": "На этот день приёмы пищи не запланированы"
     },
     "organizers": {
       "access_rights": "Права доступа",
