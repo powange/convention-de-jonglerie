@@ -521,7 +521,7 @@
     <!-- La barre n'apparaît qu'une fois quelque chose saisi, et dit combien attend : sans ce
          nombre, on ne sait pas si l'on a oublié d'enregistrer. -->
     <div
-      v-if="viewMode === 'comptage' && enAttente > 0"
+      v-if="viewMode === 'comptage' && enAttente > 0 && !uneModaleEstOuverte"
       class="fixed bottom-0 inset-x-0 z-[60] bg-default ring ring-accented shadow-xl px-4 py-3"
     >
       <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
@@ -632,7 +632,7 @@
         leave-to-class="translate-y-full opacity-0"
       >
         <div
-          v-if="someSelected"
+          v-if="someSelected && !uneModaleEstOuverte"
           class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] bg-default ring ring-accented shadow-xl rounded-full px-4 py-2 flex items-center gap-3"
         >
           <span class="text-sm text-gray-700 dark:text-gray-300">
@@ -1260,6 +1260,44 @@ function clearSelection() {
 
 const bulkEditModalOpen = ref(false)
 const bulkMoveModalOpen = ref(false)
+
+/**
+ * La barre de sélection s'efface dès qu'une modale s'ouvre.
+ *
+ * Elle est posée en `fixed` tout en bas, par-dessus le reste de l'écran. Sur mobile, elle
+ * recouvrait le bas des modales — signalé sur « Modifier les objets sélectionnés », dont le
+ * bouton d'enregistrement se retrouvait sous le bandeau : on remplissait le formulaire sans
+ * pouvoir le valider, et rien n'indiquait pourquoi.
+ *
+ * L'effacer plutôt que de jouer sur l'ordre d'empilement. Une modale de Nuxt UI se rend dans un
+ * portail avec son propre plan, et lui disputer un rang se règle à coups de nombres arbitraires
+ * qu'un composant tiers peut reprendre à la version suivante. Surtout, la barre n'a rien à
+ * proposer pendant ce temps : ses trois boutons agissent sur la sélection, et c'est justement ce
+ * que la modale ouverte est en train de faire.
+ *
+ * Toutes les modales de la page et pas seulement les trois du bandeau : les tags, les filtres ou
+ * la fiche d'un objet s'ouvrent aussi avec une sélection en cours, et se font recouvrir pareil.
+ *
+ * La MÊME garde protège la barre du comptage, plus haut dans ce fichier. Elle est posée de la
+ * même façon et au même rang : en mode comptage sur mobile, les boutons « Filtres » et « Tags »
+ * sont toujours là, et leur modale se serait fait recouvrir exactement pareil. Corriger l'une en
+ * laissant l'autre aurait fait ressurgir le défaut par un autre chemin.
+ *
+ * ⚠️ Seule la barre de SÉLECTION est couverte par un test (`stock-lot-mobile`). Celle du
+ * comptage ne l'est pas : le test butait sur le basculement d'onglet, et un test instable vaut
+ * moins que pas de test. Le mécanisme est le même, mais c'est une conviction, pas une preuve.
+ */
+const uneModaleEstOuverte = computed(
+  () =>
+    bulkEditModalOpen.value ||
+    bulkMoveModalOpen.value ||
+    bulkModalOpen.value ||
+    tagsModalOpen.value ||
+    filtresModalOpen.value ||
+    groupModalOpen.value ||
+    itemModalOpen.value ||
+    reservationModalOpen.value
+)
 
 /**
  * Combien d'objets cochés sont des emprunts.
