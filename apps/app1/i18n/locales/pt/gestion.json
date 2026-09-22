@@ -54,7 +54,14 @@
         "fin": "Fim",
         "lieu": "Local"
       },
-      "program_compare_failed": "{count} elemento(s) de programa encontrado(s), mas a comparação com o programa existente falhou: nada é proposto, para evitar duplicados."
+      "program_compare_failed": "{count} elemento(s) de programa encontrado(s), mas a comparação com o programa existente falhou: nada é proposto, para evitar duplicados.",
+      "ai_provider": "Fornecedor de IA",
+      "generation_method": "Método de geração",
+      "generation_method_hint": "A exploração segue as ligações do site para encontrar outras páginas; a extração direta limita-se aos endereços indicados.",
+      "method_agent": "Exploração inteligente",
+      "method_agent_description": "Segue as ligações do site para encontrar as páginas úteis (preços, local, voluntários). Mais demorada, mas mais completa.",
+      "method_simple": "Extração direta",
+      "method_simple_description": "Lê apenas os endereços que indicar. Mais rápida e mais barata."
     },
     "artists": {
       "list_title": "Gestão de artistas",

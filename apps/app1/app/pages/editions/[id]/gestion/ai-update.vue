@@ -111,8 +111,30 @@
             {{ $t('gestion.ai_update.search_updates_description') }}
           </p>
 
+          <!-- Choix de la méthode : l'exploration peut suivre les liens du site, l'extraction
+               directe se contente des URL fournies. Le même composable pilote les deux écrans ;
+               seule celui-ci n'offrait pas le choix. -->
+          <UFormField
+            :label="$t('gestion.ai_update.generation_method')"
+            :hint="$t('gestion.ai_update.generation_method_hint')"
+          >
+            <URadioGroup
+              v-model="generationMethod"
+              :items="generationMethodItems"
+              variant="card"
+              :ui="{ fieldset: 'flex flex-col sm:flex-row gap-2', item: 'sm:flex-1' }"
+            />
+          </UFormField>
+
           <!-- Choix du provider IA -->
-          <UFormField v-if="availableProviders.length > 1" :label="$t('admin.import.ai_provider')">
+          <!-- ⚠️ La clé vit dans le domaine `gestion` et non `admin` : les traductions sont
+               chargées PAR ROUTE, et `admin` ne l'est que sous /admin. Cette étiquette affichait
+               « admin.import.ai_provider » en toutes lettres — une clé hors domaine s'affiche
+               brute, sans la moindre erreur. -->
+          <UFormField
+            v-if="availableProviders.length > 1"
+            :label="$t('gestion.ai_update.ai_provider')"
+          >
             <USelect
               v-model="selectedProvider"
               :items="providerItems"
@@ -499,7 +521,27 @@ const {
   loadingProviders,
   loadProviders,
   detectServices,
+  generationMethod,
 } = useImportGeneration()
+
+/**
+ * Les deux méthodes de génération, avec ce qu'elles coûtent et ce qu'elles rapportent.
+ *
+ * Écrites ici plutôt que reprises de la page d'import : leurs libellés vivent dans le domaine
+ * `gestion`, seul chargé sur cette route.
+ */
+const generationMethodItems = computed(() => [
+  {
+    label: t('gestion.ai_update.method_simple'),
+    description: t('gestion.ai_update.method_simple_description'),
+    value: 'simple',
+  },
+  {
+    label: t('gestion.ai_update.method_agent'),
+    description: t('gestion.ai_update.method_agent_description'),
+    value: 'agent',
+  },
+])
 
 /**
  * Programme par journée déjà enregistré, indexé par date.

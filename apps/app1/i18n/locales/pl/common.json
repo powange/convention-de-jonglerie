@@ -198,7 +198,8 @@
     "organizers": "Organizatorzy",
     "export_csv": "Eksportuj do CSV",
     "export_pdf": "Eksportuj do PDF",
-    "export": "Eksportuj"
+    "export": "Eksportuj",
+    "open_in_new_tab": "Otwórz w nowej karcie"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

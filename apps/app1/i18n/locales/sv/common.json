@@ -198,7 +198,8 @@
     "organizers": "Arrangörer",
     "export_csv": "Exportera till CSV",
     "export_pdf": "Exportera som PDF",
-    "export": "Exportera"
+    "export": "Exportera",
+    "open_in_new_tab": "Öppna i en ny flik"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",

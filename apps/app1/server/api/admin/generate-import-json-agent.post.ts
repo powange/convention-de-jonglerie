@@ -60,7 +60,19 @@ const requestSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(5),
 })
 
-const MAX_AGENT_ITERATIONS = 4 // Maximum de pages à explorer
+/**
+ * Nombre de pages que l'agent peut DÉCOUVRIR par lui-même.
+ *
+ * ⚠️ Ce plafond ne compte plus les URL fournies par l'utilisateur. Il valait 4 et s'écrivait
+ * `MAX_AGENT_ITERATIONS - urls.length` : donner quatre liens ramenait l'exploration à ZÉRO, et
+ * cinq — le maximum permis par l'écran — la rendait impossible. Mieux renseigner l'outil le
+ * désactivait, ce qui est l'inverse de ce qu'on veut.
+ *
+ * Porté à 8 parce que les pages sans apport ne coûtent plus rien : leur contenu est retiré de
+ * l'historique dès que le modèle déclare qu'elles n'ont rempli aucun champ (voir `champsRemplis`).
+ * Le budget de contenu, lui, reste le vrai frein.
+ */
+const MAX_AGENT_ITERATIONS = 8
 
 // Limites par défaut (seront ajustées dynamiquement selon le context length)
 const DEFAULT_MAX_TOTAL_CONTENT_SIZE = 10000
@@ -266,7 +278,19 @@ async function callAgentLLM(
   config: any,
   systemPrompt: string,
   conversationHistory: Array<{ role: string; content: string }>
-): Promise<{ action: 'fetch' | 'generate'; url?: string; json?: string }> {
+): Promise<{
+  action: 'fetch' | 'generate'
+  url?: string
+  json?: string
+  /**
+   * Ce que la page PRÉCÉDENTE a apporté, tel que le modèle le déclare.
+   *
+   * On ne lui demande pas si la page était « utile » — à cette question un modèle répond oui dès
+   * que la page parle du sujet. On lui demande QUELS CHAMPS elle a permis de remplir : la réponse
+   * est concrète, et « aucun » devient un constat plutôt qu'un jugement.
+   */
+  champsRemplis?: string
+}> {
   const aiProvider = config.aiProvider || 'lmstudio'
 
   console.log(`[AGENT] Provider IA configuré: ${aiProvider}`)
@@ -352,11 +376,16 @@ async function callAgentLLM(
 
   console.log(`[AGENT] Réponse LLM: ${responseText.substring(0, 200)}...`)
 
+  // Le verdict sur la page précédente, s'il est là. Absent, on ne conclut rien : ne pas répondre
+  // n'est pas dire « aucun », et écarter un contenu sur un silence perdrait de l'information.
+  const verdict = responseText.match(/CHAMPS\s*:\s*([^\n]*)/i)
+  const champsRemplis = verdict?.[1]?.trim()
+
   // Parser la réponse
   if (responseText.includes('FETCH_URL:')) {
     const urlMatch = responseText.match(/FETCH_URL:\s*(\S+)/)
     if (urlMatch) {
-      return { action: 'fetch', url: urlMatch[1] }
+      return { action: 'fetch', url: urlMatch[1], champsRemplis }
     }
   }
 
@@ -365,7 +394,7 @@ async function callAgentLLM(
     if (jsonMatch?.[1]) {
       const cleanedJson = cleanAndParseJson(jsonMatch[1])
       if (cleanedJson) {
-        return { action: 'generate', json: cleanedJson }
+        return { action: 'generate', json: cleanedJson, champsRemplis }
       }
     }
   }
@@ -988,7 +1017,19 @@ INSTRUCTIONS:
   let finalJson: string | undefined
   let consecutiveInvalidRequests = 0 // Compteur de requêtes invalides consécutives
   const MAX_CONSECUTIVE_INVALID = 2 // Après 2 requêtes invalides, forcer la génération
-  const maxAdditionalIterations = MAX_AGENT_ITERATIONS - urls.length // Itérations restantes après phase 1
+  const maxAdditionalIterations = MAX_AGENT_ITERATIONS // Les URL fournies ne consomment plus le plafond
+
+  /**
+   * La dernière page explorée, pour pouvoir RENDRE ce qu'elle a coûté si elle n'apporte rien.
+   *
+   * Son contenu reste dans l'historique — donc renvoyé au modèle à chaque tour — et pèse sur le
+   * budget de contenu, qui est le vrai frein de l'exploration. Une page sans apport le consommait
+   * définitivement.
+   */
+  let dernierePageLue: { index: number; url: string; taille: number } | null = null
+
+  /** Ce qui a été exploré pour rien, pour pouvoir le dire plutôt que de le taire. */
+  const pagesSansApport: string[] = []
 
   while (
     iteration < maxAdditionalIterations &&
@@ -1014,6 +1055,27 @@ INSTRUCTIONS:
     // Appeler le LLM
     const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio', conventionConnue)
     const agentResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory)
+
+    /**
+     * Le verdict porte sur la page lue au tour PRÉCÉDENT : c'est celle que le modèle vient de
+     * lire pour produire cette réponse.
+     *
+     * Le contenu est remplacé par une trace d'une ligne, et non retiré : l'agent garde la mémoire
+     * d'avoir vu cette page — il ne la reproposera pas et n'y gaspillera pas un tour — et l'écran
+     * peut rendre compte de ce qui a été exploré pour rien.
+     */
+    if (dernierePageLue && /^(aucun|aucune|rien|none)\b/i.test(agentResponse.champsRemplis ?? '')) {
+      conversationHistory[dernierePageLue.index] = {
+        role: 'user',
+        content: `Page lue : ${dernierePageLue.url} — n'a rempli aucun champ, son contenu est écarté.`,
+      }
+      totalContentSize -= dernierePageLue.taille
+      pagesSansApport.push(dernierePageLue.url)
+      console.log(
+        `[AGENT] Page sans apport, ${dernierePageLue.taille} caractères rendus au budget : ${dernierePageLue.url}`
+      )
+    }
+    dernierePageLue = null
 
     if (agentResponse.action === 'fetch' && agentResponse.url) {
       const urlToFetch = agentResponse.url
@@ -1085,8 +1147,14 @@ INSTRUCTIONS:
         })
         conversationHistory.push({
           role: 'user',
-          content: `Voici le contenu de la page:\n\n${result.content}\n\nAs-tu maintenant assez d'informations pour générer le JSON ? Si oui, utilise GENERATE_JSON. Sinon, tu peux explorer une autre page avec FETCH_URL.`,
+          content: `Voici le contenu de la page:\n\n${result.content}\n\nCommence ta réponse par « CHAMPS: » suivi des champs que CETTE page t'a permis de remplir, ou « CHAMPS: aucun » si elle n'a rien apporté — on écarte alors son contenu pour explorer plus loin. Puis choisis ton action : GENERATE_JSON si tu as assez d'informations, sinon FETCH_URL pour une autre page.`,
         })
+        // Retenu pour pouvoir rendre son coût au budget si le modèle dit qu'elle n'apporte rien.
+        dernierePageLue = {
+          index: conversationHistory.length - 1,
+          url: urlToFetch,
+          taille: result.content.length,
+        }
       } else {
         conversationHistory.push({
           role: 'assistant',

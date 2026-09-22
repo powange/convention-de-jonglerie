@@ -54,7 +54,14 @@
         "fin": "Slut",
         "lieu": "Plats"
       },
-      "program_compare_failed": "{count} programpunkt(er) hittades, men jämförelsen med det befintliga programmet misslyckades: inget föreslås, för att undvika dubbletter."
+      "program_compare_failed": "{count} programpunkt(er) hittades, men jämförelsen med det befintliga programmet misslyckades: inget föreslås, för att undvika dubbletter.",
+      "ai_provider": "AI-leverantör",
+      "generation_method": "Genereringsmetod",
+      "generation_method_hint": "Utforskningen följer webbplatsens länkar för att hitta andra sidor; direkt extrahering håller sig till de angivna adresserna.",
+      "method_agent": "Smart utforskning",
+      "method_agent_description": "Följer webbplatsens länkar för att hitta de användbara sidorna (priser, plats, volontärer). Tar längre tid, men blir mer komplett.",
+      "method_simple": "Direkt extrahering",
+      "method_simple_description": "Läser bara de adresser du anger. Snabbare och billigare."
     },
     "artists": {
       "list_title": "Artisthantering",

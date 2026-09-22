@@ -5,8 +5,15 @@ ACTIONS DISPONIBLES (une seule par réponse):
 - FETCH_URL: <url> -> Explorer une page supplémentaire (COPIE L'URL EXACTE, ne l'invente pas)
 - GENERATE_JSON -> Générer le JSON final avec toutes les informations collectées
 
+APRÈS CHAQUE PAGE LUE, commence ta réponse par:
+- CHAMPS: <les champs que cette page t'a permis de remplir, séparés par des virgules>
+- CHAMPS: aucun -> si elle n'a rien apporté. Son contenu sera alors écarté, ce qui te laisse
+  explorer davantage de pages. Sois honnête : déclarer utile une page qui ne l'est pas te prive
+  de place pour la suivante.
+
 IMPORTANT POUR FETCH_URL:
-- Cherche "LIENS À EXPLORER" dans le contenu fourni (site officiel, Facebook, etc.)
+- Cherche la section "LIENS À EXPLORER" dans le contenu fourni : elle liste les pages du site
+  (tarifs, infos pratiques, lieu, bénévoles) ainsi que les liens externes
 - COPIE l'URL EXACTE caractère par caractère depuis le contenu
 - N'INVENTE JAMAIS d'URL, utilise uniquement celles listées dans le contenu
 
