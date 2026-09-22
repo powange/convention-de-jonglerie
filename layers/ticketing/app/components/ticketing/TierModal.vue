@@ -279,6 +279,7 @@
 import { computed, ref, watch } from 'vue'
 
 import { useEditionStore } from '~/stores/editions'
+import { entierPositifDuChamp } from '~/utils/champ-numerique'
 
 import { isFreePrice } from '../../utils/ticketing/tiers'
 
@@ -601,7 +602,17 @@ const buildFormData = () => {
       form.value.isFree && form.value.maxAmountInEuros != null && form.value.maxAmountInEuros !== ''
         ? Math.round(parseFloat(form.value.maxAmountInEuros) * 100)
         : null,
-    position: form.value.position,
+    // Vider le champ ne doit pas faire échouer l'enregistrement.
+    //
+    // `v-model.number` n'est pas la garantie qu'on croit : Vue passe la valeur à `parseFloat`
+    // et, quand le résultat est `NaN`, **rend la chaîne d'origine**. Un champ vidé donne donc
+    // `''`, que le schéma refuse — « expected number, received string », 400 en production sur
+    // un formulaire où l'on n'avait touché qu'à ce champ-là pour l'effacer.
+    //
+    // Zéro plutôt qu'une erreur, parce que c'est déjà ce que le serveur fait d'une position
+    // absente (`.default(0)`) : effacer le champ et ne pas le remplir doivent vouloir dire la
+    // même chose. Les montants, juste au-dessus, prennent la même précaution.
+    position: entierPositifDuChamp(form.value.position),
     isActive: form.value.isActive,
     countAsParticipant: form.value.countAsParticipant,
     validFrom: finalValidFrom.value,

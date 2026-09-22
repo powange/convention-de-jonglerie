@@ -175,6 +175,7 @@
 import { computed, ref, watch } from 'vue'
 
 import { useEditionStore } from '~/stores/editions'
+import { entierPositifDuChamp } from '~/utils/champ-numerique'
 
 const { symbol } = useEditionCurrency()
 
@@ -332,7 +333,11 @@ const buildFormData = () => ({
   description: form.value.description.trim() || null,
   type: form.value.type,
   isRequired: form.value.isRequired,
-  position: form.value.position,
+  // Même précaution que sur le formulaire des tarifs, et pour la même raison : `v-model.number`
+  // rend la CHAÎNE d'origine quand `parseFloat` échoue, si bien qu'un champ vidé envoie `''` là
+  // où le schéma attend un nombre. Constaté en production sur les tarifs ; ce formulaire-ci a le
+  // même champ, la même liaison et le même schéma côté serveur.
+  position: entierPositifDuChamp(form.value.position),
   choices:
     form.value.type === 'MultipleChoice' || form.value.type === 'Select'
       ? choicesText.value.split('\n').filter((c) => c.trim())
