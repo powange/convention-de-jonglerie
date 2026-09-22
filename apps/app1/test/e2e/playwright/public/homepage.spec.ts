@@ -41,6 +41,45 @@ test.describe("Page d'accueil", () => {
     await page.getByText('Grille').click()
     await expect(page).not.toHaveURL(/view=/)
   })
+  /**
+   * L'agenda s'ouvre sur le MOIS COURANT, même après avoir parcouru un autre mois.
+   *
+   * Signalé en production le 22/09/2025 : il proposait juin 2026 alors qu'on était en septembre.
+   * La mémoire du mois consulté vivait dans `localStorage`, donc sans fin — un mois parcouru une
+   * fois s'y installait pour toujours, et plus personne ne voyait les conventions du moment.
+   *
+   * ⚠️ Le test SÈME la mémoire d'époque avant de charger la page. Sans cela il ne prouverait
+   * rien : un contexte de test neuf a un stockage vide, et le code fautif y ouvrait aussi sur
+   * aujourd'hui. C'est bien la présence d'une valeur ancienne qui déclenchait le défaut.
+   *
+   * Garder sa place le temps d'une visite reste voulu — c'est `sessionStorage` qui s'en charge
+   * désormais, et ce n'est pas ce qui se vérifie ici.
+   */
+  test('l’agenda s’ouvre sur le mois courant malgré une mémoire ancienne', async ({
+    page,
+    goto,
+  }) => {
+    await goto('/', { waitUntil: 'hydration' })
+    await page.evaluate(() =>
+      localStorage.setItem('calendar-current-date', '2026-06-15T00:00:00.000Z')
+    )
+
+    await goto('/?view=agenda', { waitUntil: 'hydration' })
+
+    // Le titre que FullCalendar écrit en français : « septembre 2026 ». Calculé plutôt qu'écrit
+    // en dur, sans quoi le test deviendrait faux le mois suivant.
+    const moisCourant = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+
+    await expect(page.locator('.fc-toolbar-title').first()).toHaveText(
+      new RegExp(moisCourant, 'i'),
+      { timeout: 15000 }
+    )
+
+    // Et la mémoire d'époque est balayée, plutôt que de rester dans le navigateur à jamais.
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem('calendar-current-date')))
+      .toBeNull()
+  })
 })
 
 test.describe('Navigation', () => {
