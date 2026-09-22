@@ -15,6 +15,8 @@ import {
   defaultCalendarStyle,
   type CalendarEvent,
   type CalendarEventData,
+  CLE_MOIS_DU_CALENDRIER,
+  dateDOuvertureDuCalendrier,
 } from '../../../app/utils/calendar'
 
 // Traducteur factice : renvoie la clé telle quelle (le code fait `t(...) || fallback`)
@@ -461,5 +463,44 @@ describe('calendar utils', () => {
 
       createElementSpy.mockRestore()
     })
+  })
+})
+
+/**
+ * Le mois sur lequel l'agenda s'ouvre.
+ *
+ * Signalé en production le 22/09/2025 : l'agenda de la page d'accueil proposait **juin 2026**
+ * alors qu'on était en septembre. La mémoire du mois consulté vivait dans `localStorage`, donc
+ * sans fin — un mois parcouru une fois s'y installait pour toujours.
+ *
+ * Elle est passée en `sessionStorage`, ce qui lui donne la durée du besoin réel : ne pas perdre
+ * sa place quand le calendrier est démonté, le temps d'une visite. Ce qui se vérifie ici, c'est
+ * la règle de lecture — et surtout qu'une valeur illisible ne produise pas une `Invalid Date`,
+ * que FullCalendar n'affiche pas du tout.
+ */
+describe('dateDOuvertureDuCalendrier', () => {
+  const MAINTENANT = new Date('2026-09-22T10:00:00.000Z')
+
+  it('ouvre sur AUJOURD’HUI quand rien n’est mémorisé', () => {
+    expect(dateDOuvertureDuCalendrier(null, MAINTENANT)).toBe(MAINTENANT)
+    expect(dateDOuvertureDuCalendrier(undefined, MAINTENANT)).toBe(MAINTENANT)
+    expect(dateDOuvertureDuCalendrier('', MAINTENANT)).toBe(MAINTENANT)
+  })
+
+  it('ouvre sur le mois mémorisé quand il est lisible', () => {
+    const memorise = dateDOuvertureDuCalendrier('2026-06-15T00:00:00.000Z', MAINTENANT)
+    expect(memorise.getUTCFullYear()).toBe(2026)
+    expect(memorise.getUTCMonth()).toBe(5)
+  })
+
+  it('retombe sur aujourd’hui plutôt que de rendre une date INVALIDE', () => {
+    // `new Date('n’importe quoi')` rend `Invalid Date`, que FullCalendar n'affiche pas : l'agenda
+    // resterait vide sans qu'aucune erreur ne le dise.
+    expect(dateDOuvertureDuCalendrier('n’importe quoi', MAINTENANT)).toBe(MAINTENANT)
+    expect(dateDOuvertureDuCalendrier('2026-13-45', MAINTENANT)).toBe(MAINTENANT)
+  })
+
+  it('porte la clé de stockage, pour que personne ne la réécrive à la main', () => {
+    expect(CLE_MOIS_DU_CALENDRIER).toBe('calendar-current-date')
   })
 })

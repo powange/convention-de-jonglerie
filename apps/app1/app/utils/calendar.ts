@@ -271,3 +271,31 @@ export function getCalendarOptions(event: CalendarEventData, t: any): CalendarOp
     },
   ]
 }
+
+/** Où le calendrier retient le mois qu'on regardait. */
+export const CLE_MOIS_DU_CALENDRIER = 'calendar-current-date'
+
+/**
+ * Le mois sur lequel le calendrier s'ouvre.
+ *
+ * Il retient le mois consulté pour qu'un aller-retour ne fasse pas perdre sa place : sur la page
+ * d'accueil, basculer de l'agenda vers la carte puis revenir DÉMONTE le calendrier, et sans cette
+ * mémoire on retomberait sur aujourd'hui à chaque fois.
+ *
+ * ⚠️ Cette mémoire vivait dans `localStorage`, donc sans fin. Signalé en production : l'agenda
+ * s'ouvrait sur **juin 2026** alors qu'on était en septembre — un mois parcouru une fois s'y
+ * était installé pour toujours. Elle est passée en `sessionStorage` : elle survit à un
+ * rechargement et à un changement de vue, ce qui est le besoin réel, et disparaît avec l'onglet.
+ *
+ * Une valeur illisible retombe sur aujourd'hui plutôt que de rendre une `Invalid Date`, que
+ * FullCalendar n'affiche pas — l'agenda resterait vide sans rien dire.
+ */
+export function dateDOuvertureDuCalendrier(
+  valeurMemorisee: string | null | undefined,
+  maintenant: Date = new Date()
+): Date {
+  if (!valeurMemorisee) return maintenant
+
+  const date = new Date(valeurMemorisee)
+  return Number.isNaN(date.getTime()) ? maintenant : date
+}

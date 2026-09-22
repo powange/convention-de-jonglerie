@@ -5,6 +5,8 @@ import {
   mobileHeaderToolbar,
   defaultCalendarStyle,
   getCalendarButtonText,
+  CLE_MOIS_DU_CALENDRIER,
+  dateDOuvertureDuCalendrier,
   type CalendarEvent,
 } from '~/utils/calendar'
 
@@ -82,21 +84,47 @@ export function useCalendar(options: UseCalendarOptions) {
 
   const fcLocale = computed(() => getCalendarLocale(locale.value))
 
-  // Récupérer la date sauvegardée ou utiliser aujourd'hui
+  /**
+   * Le mois sur lequel s'ouvrir : celui qu'on regardait, sinon aujourd'hui.
+   *
+   * `sessionStorage` et non `localStorage`. La mémoire sert à ne pas perdre sa place quand le
+   * calendrier est démonté — sur la page d'accueil, passer à la carte puis revenir le démonte —
+   * et ce besoin dure le temps d'une visite. En le stockant sans fin, un mois parcouru une fois
+   * s'installait pour toujours : signalé en production, l'agenda s'ouvrait sur juin 2026 alors
+   * qu'on était en septembre.
+   *
+   * Les accès sont enveloppés : en navigation privée, avec les données de site bloquées ou dans
+   * certains contextes intégrés, lire ou écrire lève — et le calendrier ne s'afficherait pas.
+   */
   const getSavedDate = (): Date => {
-    if (import.meta.client) {
-      const savedDate = localStorage.getItem('calendar-current-date')
-      if (savedDate) {
-        return new Date(savedDate)
-      }
+    if (!import.meta.client) return new Date()
+
+    // L'ancienne mémoire, sans fin, est effacée au passage : elle ne sert plus, et sans ce
+    // ménage elle resterait dans le navigateur de chaque visiteur pour toujours.
+    //
+    // Dans son PROPRE `try` : les deux stockages ne sont pas toujours autorisés ensemble, et un
+    // `localStorage` bloqué ne doit pas empêcher de lire le `sessionStorage` qui, lui, marche —
+    // on perdrait sa place à chaque aller-retour pour un ménage qui ne regarde que le passé.
+    try {
+      localStorage.removeItem(CLE_MOIS_DU_CALENDRIER)
+    } catch {
+      // Tant pis pour le ménage.
     }
-    return new Date()
+
+    try {
+      return dateDOuvertureDuCalendrier(sessionStorage.getItem(CLE_MOIS_DU_CALENDRIER))
+    } catch {
+      return new Date()
+    }
   }
 
-  // Sauvegarder la date courante
   const saveCurrentDate = (date: Date) => {
-    if (import.meta.client) {
-      localStorage.setItem('calendar-current-date', date.toISOString())
+    if (!import.meta.client) return
+
+    try {
+      sessionStorage.setItem(CLE_MOIS_DU_CALENDRIER, date.toISOString())
+    } catch {
+      // Perdre sa place vaut mieux que de ne pas afficher le calendrier.
     }
   }
 
