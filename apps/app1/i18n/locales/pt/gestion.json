@@ -263,7 +263,8 @@
       "severity_light": "ligeira",
       "severity_moderate": "moderada",
       "severity_severe": "grave",
-      "export_count": "{count} refeições"
+      "export_count": "{count} refeições",
+      "catering_no_meal": "Nenhuma refeição prevista nesse dia"
     },
     "organizers": {
       "access_rights": "Direitos de acesso",

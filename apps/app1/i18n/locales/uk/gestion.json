@@ -263,7 +263,8 @@
       "severity_light": "легка",
       "severity_moderate": "помірна",
       "severity_severe": "тяжка",
-      "export_count": "{count} прийомів їжі"
+      "export_count": "{count} прийомів їжі",
+      "catering_no_meal": "На цей день прийоми їжі не заплановані"
     },
     "organizers": {
       "access_rights": "Права доступу",

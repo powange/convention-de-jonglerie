@@ -184,6 +184,7 @@
       "breakfast": "Matin",
       "cancel": "Annuler",
       "catering_pdf_title": "Restauration",
+      "catering_no_meal": "Aucun repas prévu ce jour-là",
       "count_artists": "{count} artiste | {count} artistes",
       "count_organizers": "{count} organisateur | {count} organisateurs",
       "count_participants": "{count} participant | {count} participants",

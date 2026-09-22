@@ -263,7 +263,8 @@
       "severity_light": "licht",
       "severity_moderate": "matig",
       "severity_severe": "ernstig",
-      "export_count": "{count} maaltijden"
+      "export_count": "{count} maaltijden",
+      "catering_no_meal": "Geen maaltijd gepland op die dag"
     },
     "organizers": {
       "access_rights": "Toegangsrechten",

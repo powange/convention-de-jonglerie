@@ -37,7 +37,14 @@
               description="Générez des documents PDF avec les informations de restauration pour chaque jour de l'événement."
             />
 
-            <UFieldGroup>
+            <!-- Le jour d'abord, les documents ensuite.
+                 
+                 Un seul bouton produisait un document unique : le résumé ET les listes de tous
+                 les services. Or ces pages ne vont pas au même endroit — le résumé en cuisine,
+                 chaque liste à son point de distribution. La personne du déjeuner tenait donc
+                 une liasse contenant aussi le dîner, et devait tout imprimer ou chercher sa
+                 page. Un bouton par document, un fichier par document. -->
+            <div class="flex flex-col gap-2">
               <USelect
                 v-model="selectedCateringDate"
                 :items="cateringDateOptions"
@@ -47,15 +54,46 @@
                 :ui="{ content: 'min-w-fit' }"
                 class="min-w-[200px]"
               />
-              <UButton
-                color="primary"
-                :disabled="!selectedCateringDate"
-                :loading="generatingCateringPdf"
-                @click="generateCateringPdf"
+
+              <div v-if="chargementDesRepas" class="flex items-center gap-2 text-sm text-gray-500">
+                <UIcon name="i-heroicons-arrow-path" class="animate-spin size-4" />
+                {{ t('common.loading') }}
+              </div>
+
+              <!-- Rien à proposer pour un jour sans repas : un bouton produirait un document
+                   vide, qu'on croirait raté. -->
+              <div
+                v-else-if="selectedCateringDate && repasDuJour.length > 0"
+                class="flex flex-wrap gap-2"
               >
-                {{ t('edition.volunteers.generate') }}
-              </UButton>
-            </UFieldGroup>
+                <UButton
+                  color="primary"
+                  icon="i-heroicons-document-chart-bar"
+                  :loading="pdfEnCours === 'resume'"
+                  :disabled="pdfEnCours !== null"
+                  @click="genererResumePdf"
+                >
+                  {{ t('gestion.meals.pdf_summary') }}
+                </UButton>
+
+                <UButton
+                  v-for="repas in repasDuJour"
+                  :key="repas.id ?? libelleDuRepas(repas)"
+                  color="neutral"
+                  variant="outline"
+                  icon="i-heroicons-list-bullet"
+                  :loading="pdfEnCours === String(repas.id ?? libelleDuRepas(repas))"
+                  :disabled="pdfEnCours !== null"
+                  @click="genererListePdf(repas)"
+                >
+                  {{ libelleDuRepas(repas) }}
+                </UButton>
+              </div>
+
+              <p v-else-if="selectedCateringDate" class="text-sm text-gray-500 dark:text-gray-400">
+                {{ t('gestion.meals.catering_no_meal') }}
+              </p>
+            </div>
           </div>
         </UCard>
 
@@ -130,17 +168,35 @@
           <div v-if="stats" class="mb-6 space-y-4">
             <!-- Statistiques principales -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Le total reste NEUTRE : il n'appartient à aucun type, et le vert qu'il
+                   portait est précisément celui des bénévoles — on lisait donc « bénévoles » sur
+                   la carte qui les additionne tous.
+
+                   `text-gray-900 dark:text-white` plutôt qu'un blanc sec : sur le thème clair,
+                   du blanc sur une carte blanche ne s'afficherait pas. C'est la paire qu'emploie
+                   déjà la carte « Total » des statistiques d'entrée. -->
               <UCard>
                 <div class="text-center">
-                  <div class="text-2xl font-bold text-primary-500">{{ stats.total }}</div>
+                  <div class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ stats.total }}
+                  </div>
                   <div class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $t('edition.meals.stats.total') }}
                   </div>
                 </div>
               </UCard>
+              <!-- Les couleurs viennent de `useParticipantTypes`, comme les statistiques
+                   d'entrée du contrôle d'accès. Elles étaient posées à la main ici, et TROIS des
+                   quatre contredisaient le reste du site : bénévoles en bleu — la couleur de la
+                   billetterie —, artistes en violet — celle des organisateurs — et organisateurs
+                   en indigo, qui n'appartenait à personne. Un code couleur qui change de sens
+                   d'une page à l'autre est pire que pas de couleur du tout. -->
               <UCard v-if="stats.ticketingParticipants > 0">
                 <div class="text-center">
-                  <div class="text-2xl font-bold text-green-500">
+                  <div
+                    class="text-2xl font-bold"
+                    :class="[couleurBillet.textClass, couleurBillet.darkTextClass]"
+                  >
                     {{ stats.ticketingParticipants }}
                   </div>
                   <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -150,7 +206,12 @@
               </UCard>
               <UCard v-if="stats.volunteers > 0">
                 <div class="text-center">
-                  <div class="text-2xl font-bold text-blue-500">{{ stats.volunteers }}</div>
+                  <div
+                    class="text-2xl font-bold"
+                    :class="[couleurBenevole.textClass, couleurBenevole.darkTextClass]"
+                  >
+                    {{ stats.volunteers }}
+                  </div>
                   <div class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $t('edition.meals.stats.volunteers') }}
                   </div>
@@ -158,7 +219,12 @@
               </UCard>
               <UCard v-if="stats.artists > 0">
                 <div class="text-center">
-                  <div class="text-2xl font-bold text-purple-500">{{ stats.artists }}</div>
+                  <div
+                    class="text-2xl font-bold"
+                    :class="[couleurArtiste.textClass, couleurArtiste.darkTextClass]"
+                  >
+                    {{ stats.artists }}
+                  </div>
                   <div class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $t('edition.meals.stats.artists') }}
                   </div>
@@ -166,7 +232,12 @@
               </UCard>
               <UCard v-if="stats.organizers > 0">
                 <div class="text-center">
-                  <div class="text-2xl font-bold text-indigo-500">{{ stats.organizers }}</div>
+                  <div
+                    class="text-2xl font-bold"
+                    :class="[couleurOrganisateur.textClass, couleurOrganisateur.darkTextClass]"
+                  >
+                    {{ stats.organizers }}
+                  </div>
                   <div class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $t('edition.meals.stats.organizers') }}
                   </div>
@@ -300,7 +371,11 @@
 
 <script setup lang="ts">
 import { exporterTableauEnPdf } from '~/utils/export-pdf-tableau'
-import { dessinerCaseACocher, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
+import {
+  dessinerCaseACocher,
+  LARGEUR_COLONNE_COCHE,
+  styleColonneCoche,
+} from '~/utils/pdf-case-a-cocher'
 import { telechargerFichier } from '~/utils/telechargement'
 
 // Import explicite : plusieurs layers exportent un `filtresDepuisUrl`, et l'auto-import ne
@@ -310,7 +385,13 @@ import {
   filtresDepuisUrl,
   requeteListeDeRepas,
 } from '../../../../../utils/filtres-liste-repas'
-import { resumerRepas, lignesDeParticipants } from '../../../../../utils/restauration-pdf'
+import {
+  couleurDuType,
+  lignesDeParticipants,
+  motLePlusLong,
+  nomFichierRestauration,
+  resumerRepas,
+} from '../../../../../utils/restauration-pdf'
 
 import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
 
@@ -364,7 +445,6 @@ const availableDates = ref<string[]>([])
 
 // Variables pour la génération des PDFs de restauration
 const selectedCateringDate = ref<string | undefined>(undefined)
-const generatingCateringPdf = ref(false)
 
 // Options de filtres
 const phaseOptions = computed(() => [
@@ -398,6 +478,18 @@ const dateOptions = computed(() => [
 ])
 
 // Colonnes du tableau
+/**
+ * Les couleurs par type, servies par le composable partagé.
+ *
+ * Résolues une fois plutôt qu'appelées dans le gabarit : les quatre cartes sont conditionnelles,
+ * et un appel par carte se relirait à quatre endroits pour vérifier qu'ils disent la même chose.
+ */
+const { getParticipantTypeConfig } = useParticipantTypes()
+const couleurBillet = getParticipantTypeConfig('ticket')
+const couleurBenevole = getParticipantTypeConfig('volunteer')
+const couleurArtiste = getParticipantTypeConfig('artist')
+const couleurOrganisateur = getParticipantTypeConfig('organizer')
+
 const tableParticipants = ref<{ tableApi?: unknown } | null>(null)
 
 /**
@@ -714,64 +806,107 @@ const cateringDateOptions = computed(() => {
   return options
 })
 
-const generateCateringPdf = async () => {
-  if (!selectedCateringDate.value) return
+/**
+ * Les repas du jour choisi, chargés dès la sélection.
+ *
+ * Avant, ces données n'arrivaient qu'au clic sur « Générer » : un seul bouton, un seul document.
+ * Maintenant qu'il y a un bouton par repas, il faut les connaître AVANT de dessiner la barre —
+ * on ne peut pas proposer « Déjeuner » sans savoir qu'il y a un déjeuner ce jour-là.
+ */
+const repasDuJour = ref<any[]>([])
+const chargementDesRepas = ref(false)
 
-  generatingCateringPdf.value = true
+/** Quel bouton tourne. Un par document : celui du résumé, ou l'identifiant d'un repas. */
+const pdfEnCours = ref<string | null>(null)
+
+/**
+ * Le jour change, la liste des boutons aussi.
+ *
+ * La liste est vidée AVANT la requête : sans cela, on verrait un instant les boutons de la
+ * veille sous la nouvelle date, et rien ne dirait qu'ils ne correspondent plus.
+ */
+watch(selectedCateringDate, async (jour) => {
+  repasDuJour.value = []
+  if (!jour) return
+
+  chargementDesRepas.value = true
   try {
-    // Importer jsPDF et autoTable dynamiquement
-    const { jsPDF } = await import('jspdf')
-    const { applyPlugin } = await import('jspdf-autotable')
-
-    applyPlugin(jsPDF)
-
-    // Récupérer les données depuis l'API
-    const cateringData = (await $fetch(
-      `/api/editions/${editionId.value}/volunteers/catering/${selectedCateringDate.value}`
+    const donnees = (await $fetch(
+      `/api/editions/${editionId.value}/volunteers/catering/${jour}`
     )) as any
+    repasDuJour.value = donnees?.meals ?? []
+  } catch (e: any) {
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
+  } finally {
+    chargementDesRepas.value = false
+  }
+})
 
-    // Créer le PDF en format portrait pour la première page
+/** Le libellé d'un repas : son type et ses phases, comme la fiche les écrit. */
+const libelleDuRepas = (repas: any): string => {
+  const resume = resumerRepas(repas)
+  const phases = resume.clesPhases.map((cle: string) => t(cle)).join(' + ')
+  return phases ? `${t(resume.cleTypeRepas)} (${phases})` : t(resume.cleTypeRepas)
+}
+
+/** Le bandeau commun aux deux documents : de quoi on parle, et pour quelle édition. */
+const enTeteDuDocument = (doc: any, titre: string, largeurPage: number) => {
+  doc.setFontSize(18)
+  doc.setFont('helvetica', 'bold')
+  doc.text(titre, largeurPage / 2, 20, { align: 'center' })
+
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'normal')
+  doc.text(
+    `${t('gestion.meals.pdf_convention')} : ${edition.value?.convention?.name || t('common.unknown')}`,
+    20,
+    35
+  )
+  doc.text(
+    `${t('gestion.meals.pdf_edition')} : ${edition.value?.name || t('common.unknown')}`,
+    20,
+    42
+  )
+}
+
+/** Charge jsPDF et son greffon de tableaux, à la demande. */
+const chargerJsPdf = async () => {
+  const { jsPDF } = await import('jspdf')
+  const { applyPlugin } = await import('jspdf-autotable')
+  applyPlugin(jsPDF)
+  return jsPDF
+}
+
+/**
+ * Le résumé de la journée, en PDF — un document à lui seul.
+ *
+ * Il part en CUISINE : combien de couverts, quels régimes, quelles allergies et chez qui. Il ne
+ * contient plus les listes nominatives, qui partent ailleurs et n'ont rien à faire sur le plan de
+ * travail.
+ *
+ * Portrait : ce sont des paragraphes, pas un tableau.
+ */
+const genererResumePdf = async () => {
+  if (!selectedCateringDate.value || repasDuJour.value.length === 0) return
+
+  pdfEnCours.value = 'resume'
+  try {
+    const jsPDF = await chargerJsPdf()
     const doc = new jsPDF()
 
-    // === PAGE 1: RÉSUMÉ ===
-    let yPosition = 20
-
-    // Titre du document
-    doc.setFontSize(18)
-    doc.setFont('helvetica', 'bold')
-    doc.text(
+    enTeteDuDocument(
+      doc,
       `${t('gestion.meals.catering_pdf_title')} - ${formatDateFull(selectedCateringDate.value)}`,
-      105,
-      yPosition,
-      { align: 'center' }
+      210
     )
-    yPosition += 15
 
-    // Informations générales
-    doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    doc.text(
-      `${t('gestion.meals.pdf_convention')} : ${edition.value?.convention?.name || t('common.unknown')}`,
-      20,
-      yPosition
-    )
-    yPosition += 7
-    doc.text(
-      `${t('gestion.meals.pdf_edition')} : ${edition.value?.name || t('common.unknown')}`,
-      20,
-      yPosition
-    )
-    yPosition += 15
-
-    // Résumé des repas
+    let yPosition = 57
     doc.setFontSize(14)
     doc.setFont('helvetica', 'bold')
     doc.text(t('gestion.meals.pdf_summary'), 20, yPosition)
     yPosition += 10
 
-    // Afficher chaque repas avec ses détails
-    for (const meal of cateringData.meals) {
-      // Vérifier si on a besoin d'une nouvelle page
+    for (const meal of repasDuJour.value) {
       if (yPosition > 240) {
         doc.addPage()
         yPosition = 20
@@ -847,107 +982,204 @@ const generateCateringPdf = async () => {
       yPosition += 5
     }
 
-    // === PAGES SUIVANTES: TABLEAUX PAR REPAS (FORMAT PORTRAIT) ===
-    for (const meal of cateringData.meals) {
-      // Ajouter une nouvelle page en format portrait
-      doc.addPage('a4', 'portrait')
-
-      const resumeDuRepas = resumerRepas(meal)
-      const phasesDuTableau = resumeDuRepas.clesPhases.map((cle) => t(cle)).join(' + ')
-
-      doc.setFontSize(16)
-      doc.setFont('helvetica', 'bold')
-      doc.text(`${t(resumeDuRepas.cleTypeRepas)} - ${phasesDuTableau}`, 20, 20)
-
-      doc.setFontSize(11)
-      doc.setFont('helvetica', 'normal')
-      doc.text(
-        `${t('gestion.meals.pdf_total')} : ${t('gestion.meals.count_participants', meal.totalParticipants)}`,
-        20,
-        28
+    doc.save(
+      nomFichierRestauration(
+        edition.value?.name,
+        selectedCateringDate.value,
+        t('gestion.meals.pdf_summary')
       )
+    )
+    toast.add({ title: t('common.export_success'), color: 'success' })
+  } catch (e: any) {
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
+  } finally {
+    pdfEnCours.value = null
+  }
+}
 
-      // Un tiret plutôt qu'une case vide : sur une fiche imprimée, on doit voir qu'il n'y a rien
-      // à signaler, et non se demander si la colonne a été oubliée.
-      const RIEN = '-'
-      const tableData = lignesDeParticipants(meal).map((ligne) => [
-        '', // Case à cocher vide en première position, pour pointer au service
-        ligne.nom,
-        ligne.prenom,
-        t(ligne.cleType),
-        ligne.apresSpectacle ? t('common.yes') : RIEN,
-        ligne.email,
-        ligne.telephone,
-        ligne.cleRegime ? t(ligne.cleRegime) : RIEN,
-        ligne.allergies ?? RIEN,
-        ligne.cleGravite && ligne.allergies ? t(ligne.cleGravite) : RIEN,
-      ])
+/**
+ * La liste des personnes d'UN repas, en PDF — un document par service.
+ *
+ * Elle part au point de distribution et s'y coche au fil de la file. Un seul service par
+ * document : la personne du déjeuner tenait jusqu'ici une liasse contenant aussi le dîner et le
+ * petit-déjeuner, et devait soit tout imprimer, soit chercher sa page.
+ *
+ * PAYSAGE, à la différence du résumé. Les dix colonnes tiennent en portrait, mais seulement en
+ * écrasant celle des allergies : les largeurs fixes en consomment 160 des 170 millimètres
+ * utiles, et il en restait dix pour le texte le plus long de la fiche — celui qu'on lit
+ * justement pour savoir quoi ne pas servir. Le paysage en laisse près de cent.
+ */
+const genererListePdf = async (meal: any) => {
+  if (!selectedCateringDate.value) return
 
-      // Générer le tableau
-      // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
-      doc.autoTable({
-        startY: 35,
-        head: [
-          [
-            '',
-            t('common.name'),
-            t('common.first_name'),
-            t('common.type'),
-            t('gestion.meals.after_show'),
-            t('common.email'),
-            t('common.phone'),
-            t('gestion.meals.diet'),
-            t('gestion.meals.pdf_allergies_header'),
-            t('gestion.meals.pdf_severity_header'),
-          ],
-        ],
-        body: tableData,
-        styles: {
-          fontSize: 7,
-          cellPadding: 2,
-        },
-        headStyles: {
-          fillColor: [66, 139, 202],
-          textColor: 255,
-          fontStyle: 'bold',
-          fontSize: 7,
-        },
-        columnStyles: {
-          ...styleColonneCoche(),
-          1: { cellWidth: 20 }, // Nom
-          2: { cellWidth: 20 }, // Prénom
-          3: { cellWidth: 16 }, // Type
-          4: { cellWidth: 14 }, // Après spectacle
-          5: { cellWidth: 35 }, // Email
-          6: { cellWidth: 20 }, // Téléphone
-          7: { cellWidth: 15 }, // Régime
-          8: { cellWidth: 'auto' }, // Allergies (prend l'espace restant)
-          9: { cellWidth: 14 }, // Sévérité
-        },
-        margin: { left: 20, right: 20 },
-        // Le tracé de la case vient de l'util partagé : ce PDF l'avait inventé pour lui seul,
-        // et deux autres tableaux le réclamaient. Trois copies d'un carré à quatre millimètres
-        // finissent par ne plus faire quatre millimètres partout.
-        didDrawCell: (cellule: unknown) => dessinerCaseACocher(doc, cellule as never),
-      })
+  pdfEnCours.value = String(meal.id ?? libelleDuRepas(meal))
+  try {
+    const jsPDF = await chargerJsPdf()
+    const doc = new jsPDF({ orientation: 'landscape' })
+
+    const resumeDuRepas = resumerRepas(meal)
+    const phasesDuTableau = resumeDuRepas.clesPhases.map((cle) => t(cle)).join(' + ')
+
+    enTeteDuDocument(
+      doc,
+      `${t(resumeDuRepas.cleTypeRepas)} - ${phasesDuTableau} - ${formatDateFull(selectedCateringDate.value)}`,
+      297
+    )
+
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    doc.text(
+      `${t('gestion.meals.pdf_total')} : ${t('gestion.meals.count_participants', meal.totalParticipants)}`,
+      20,
+      49
+    )
+
+    // Un tiret plutôt qu'une case vide : sur une fiche imprimée, on doit voir qu'il n'y a rien
+    // à signaler, et non se demander si la colonne a été oubliée.
+    const RIEN = '-'
+    const lignes = lignesDeParticipants(meal)
+    const tableData = lignes.map((ligne) => [
+      '', // Case à cocher vide en première position, pour pointer au service
+      ligne.nom,
+      ligne.prenom,
+      t(ligne.cleType),
+      ligne.apresSpectacle ? t('common.yes') : RIEN,
+      ligne.email,
+      ligne.telephone,
+      ligne.cleRegime ? t(ligne.cleRegime) : RIEN,
+      ligne.allergies ?? RIEN,
+      ligne.cleGravite && ligne.allergies ? t(ligne.cleGravite) : RIEN,
+    ])
+
+    const entetes = [
+      '',
+      t('common.name'),
+      t('common.first_name'),
+      t('common.type'),
+      t('gestion.meals.after_show'),
+      t('common.email'),
+      t('common.phone'),
+      t('gestion.meals.diet'),
+      t('gestion.meals.pdf_allergies_header'),
+      t('gestion.meals.pdf_severity_header'),
+    ]
+
+    /**
+     * La largeur qu'une colonne doit avoir pour ne jamais couper un mot en deux.
+     *
+     * Mesurée avec la police du document plutôt qu'estimée : une largeur moyenne par caractère se
+     * trompe de plusieurs millimètres sur « Wüllenweber » comme sur « iii ». On prend le mot le
+     * plus long de la colonne — en-tête compris, il déborde aussi bien que les valeurs — et on
+     * ajoute la marge intérieure des deux côtés.
+     *
+     * La colonne « Allergies » est la seule exclue : c'est du texte libre, avec des espaces, donc
+     * il s'y coupe proprement. Lui réserver la largeur de sa phrase entière mangerait la page.
+     */
+    const PADDING = 2
+    const largeurPourColonne = (index: number) => {
+      const valeurs = [entetes[index], ...tableData.map((ligne) => String(ligne[index] ?? ''))]
+      return doc.getTextWidth(motLePlusLong(valeurs)) + PADDING * 2 + 1
     }
 
-    // Télécharger le PDF
-    const fileName = `restauration-${edition.value?.name?.replace(/[^a-zA-Z0-9]/g, '-') || 'edition'}-${selectedCateringDate.value}.pdf`
-    doc.save(fileName)
+    /**
+     * La police se réduit jusqu'à ce que tout tienne, plutôt que de laisser couper.
+     *
+     * Sur une édition aux adresses courtes, on reste à 8 points. Sur une autre où quelqu'un
+     * s'appelle « leschapeauxpointus.association@gmail.com », on descend d'un cran ou deux — ce
+     * qui se lit encore, là où « leschapeauxpointus.associa / tion@gmail.com » ne se lit pas.
+     *
+     * Le plancher à 6 points n'est pas un abandon : en dessous, la feuille cesse d'être lisible
+     * au service, et il vaut mieux une coupure visible qu'une page qu'on renonce à déchiffrer.
+     */
+    const LARGEUR_UTILE = 297 - 40
+    const INDEX_TYPE = 3
+    const INDEX_ALLERGIES = 8
+    let taillePolice = 8
+    let largeurs: number[] = []
 
-    toast.add({
-      title: t('common.export_success'),
-      color: 'success',
+    while (taillePolice >= 6) {
+      doc.setFontSize(taillePolice)
+      largeurs = entetes.map((_, index) => {
+        // La première colonne ne se mesure pas : c'est la case à cocher, dont la largeur est
+        // fixée par l'util partagé. La calculer sur son en-tête vide donnerait un budget faux.
+        if (index === 0) return LARGEUR_COLONNE_COCHE
+        return index === INDEX_ALLERGIES ? 0 : largeurPourColonne(index)
+      })
+      const total = largeurs.reduce((somme, largeur) => somme + largeur, 0)
+      // Il faut qu'il reste de quoi écrire les allergies : une colonne à zéro ne vaut rien.
+      if (LARGEUR_UTILE - total >= 25) break
+      taillePolice -= 1
+    }
+
+    // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+    doc.autoTable({
+      startY: 56,
+      head: [entetes],
+      body: tableData,
+      styles: {
+        fontSize: taillePolice,
+        cellPadding: PADDING,
+      },
+      headStyles: {
+        fillColor: [66, 139, 202],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: taillePolice,
+      },
+      // Chaque colonne à la largeur de son plus long mot ; « Allergies » prend le reste, et s'y
+      // coupe aux espaces, ce qui est la seule coupure acceptable.
+      columnStyles: {
+        ...styleColonneCoche(),
+        1: { cellWidth: largeurs[1] },
+        2: { cellWidth: largeurs[2] },
+        3: { cellWidth: largeurs[3] },
+        4: { cellWidth: largeurs[4] },
+        5: { cellWidth: largeurs[5] },
+        6: { cellWidth: largeurs[6] },
+        7: { cellWidth: largeurs[7] },
+        8: { cellWidth: 'auto' },
+        9: { cellWidth: largeurs[9] },
+      },
+      margin: { left: 20, right: 20 },
+      /**
+       * La colonne « Type » se colorise, aux teintes de l'écran.
+       *
+       * Sur une feuille de service, on cherche « les artistes » ou « les bénévoles » plus souvent
+       * qu'une personne précise : la couleur donne le groupe d'un coup d'œil, là où il fallait
+       * lire chaque ligne. Les teintes sont celles des statistiques d'entrée du contrôle
+       * d'accès — un même code d'une page à l'autre.
+       *
+       * On retrouve le type par le RANG de la ligne et non par son libellé traduit : comparer des
+       * textes affichés reviendrait à dépendre de la langue de qui imprime.
+       */
+      didParseCell: (donnees: any) => {
+        if (donnees?.column?.index !== INDEX_TYPE || donnees?.section !== 'body') return
+
+        const couleur = couleurDuType(lignes[donnees.row.index]?.type)
+        if (!couleur) return
+
+        donnees.cell.styles.fillColor = couleur.fond
+        donnees.cell.styles.textColor = couleur.texte
+        donnees.cell.styles.fontStyle = 'bold'
+      },
+      // Le tracé de la case vient de l'util partagé : ce PDF l'avait inventé pour lui seul,
+      // et deux autres tableaux le réclamaient. Trois copies d'un carré à quatre millimètres
+      // finissent par ne plus faire quatre millimètres partout.
+      didDrawCell: (cellule: unknown) => dessinerCaseACocher(doc, cellule as never),
     })
+
+    doc.save(
+      nomFichierRestauration(
+        edition.value?.name,
+        selectedCateringDate.value,
+        `${t(resumeDuRepas.cleTypeRepas)} ${phasesDuTableau}`
+      )
+    )
+    toast.add({ title: t('common.export_success'), color: 'success' })
   } catch (e: any) {
-    console.error('PDF generation error:', e)
-    toast.add({
-      title: e?.message || t('common.error'),
-      color: 'error',
-    })
+    toast.add({ title: e?.message || t('common.error'), color: 'error' })
   } finally {
-    generatingCateringPdf.value = false
+    pdfEnCours.value = null
   }
 }
 

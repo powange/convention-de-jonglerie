@@ -263,7 +263,8 @@
       "severity_light": "mírná",
       "severity_moderate": "střední",
       "severity_severe": "těžká",
-      "export_count": "{count} jídel"
+      "export_count": "{count} jídel",
+      "catering_no_meal": "Na tento den není naplánováno žádné jídlo"
     },
     "organizers": {
       "access_rights": "Přístupová práva",

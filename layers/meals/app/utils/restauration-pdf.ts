@@ -186,6 +186,8 @@ export interface LigneDeParticipant {
   telephone: string
   /** Clé du type de personne — bénévole, artiste, participant, organisateur. */
   cleType: string
+  /** Le type brut, pour la couleur : lire le suffixe d'une clé de traduction serait fragile. */
+  type: string
   /** Clé du régime, ou `null` quand il n'y a rien à signaler à la cuisine. */
   cleRegime: string | null
   allergies: string | null
@@ -210,6 +212,7 @@ export function lignesDeParticipants(repas: RepasDeRestauration): LigneDePartici
       email: p.email ?? '',
       telephone: p.phone ?? '',
       cleType: `gestion.meals.person_type.${p.type}`,
+      type: p.type ?? '',
       cleRegime: regime === 'NONE' ? null : (CLES_REGIME[regime] ?? null),
       allergies: p.allergies && p.allergies.trim() !== '' ? p.allergies.trim() : null,
       cleGravite: p.allergySeverity ? (CLES_GRAVITE[p.allergySeverity] ?? null) : null,
@@ -217,4 +220,104 @@ export function lignesDeParticipants(repas: RepasDeRestauration): LigneDePartici
       apresSpectacle: p.type === 'artist' && p.afterShow === true,
     }
   })
+}
+
+/**
+ * Le nom d'un des fichiers de la journée.
+ *
+ * La feuille de restauration ne sort plus d'un bloc : le résumé part en cuisine, chaque liste
+ * part à son point de distribution. Quatre fichiers téléchargés d'affilée doivent donc se
+ * reconnaître sans qu'on les ouvre — d'où la date ET la partie dans le nom.
+ *
+ * Accents retirés et ponctuation remplacée par un tiret, comme la fiche d'inventaire. L'ancien
+ * nom se contentait d'un `replace` sur les caractères non alphanumériques : « Été à Brévent »
+ * y devenait « -t-à-Br-vent », un tiret là où il y avait une lettre.
+ */
+export function nomFichierRestauration(
+  nomEdition: string | null | undefined,
+  date: string,
+  partie: string
+): string {
+  const morceaux = [nomEdition, date, partie]
+    .map((morceau) =>
+      (morceau ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase()
+    )
+    .filter(Boolean)
+
+  // L'extension à part, jamais collée dans un littéral avec ce qui la précède : une chaîne
+  // pointée entière — « restauration.pdf » — se fait prendre pour une clé de traduction par
+  // l'analyse i18n, qui la signale alors comme manquante.
+  const extension = '.pdf'
+  return morceaux.length > 0
+    ? `restauration-${morceaux.join('-')}${extension}`
+    : `restauration${extension}`
+}
+
+/**
+ * Le mot le plus long d'une colonne — celui qui décide de sa largeur.
+ *
+ * Un PDF coupe une cellule trop étroite **au milieu d'un mot** : `gerard@jongli` puis `ertricks.ch`
+ * sur la ligne suivante. Sur une adresse ou un nom, c'est illisible, et sur une feuille qu'on
+ * emporte au service il n'y a pas d'écran pour aller vérifier.
+ *
+ * Le remède tient en une phrase : aucune colonne ne doit être plus étroite que son plus long mot.
+ * Reste à savoir lequel c'est, et cela dépend des données — d'où cette fonction plutôt qu'une
+ * largeur choisie une fois pour toutes, qui serait fausse à la première édition suivante.
+ *
+ * « Mot » veut dire : suite de caractères sans espace. C'est exactement ce qu'un moteur de rendu
+ * refuse de couper tant qu'il peut l'éviter. Une adresse électronique n'en fait qu'un seul, ce
+ * qui explique qu'elle soit la première à déborder.
+ */
+export function motLePlusLong(valeurs: readonly (string | null | undefined)[]): string {
+  let plusLong = ''
+
+  for (const valeur of valeurs) {
+    for (const mot of (valeur ?? '').split(/\s+/)) {
+      if (mot.length > plusLong.length) plusLong = mot
+    }
+  }
+
+  return plusLong
+}
+
+/** Une couleur de cellule : le fond et le texte, en composantes RVB pour jsPDF. */
+export interface CouleurDeType {
+  fond: [number, number, number]
+  texte: [number, number, number]
+}
+
+/**
+ * La couleur d'un type de personne, sur la feuille imprimée.
+ *
+ * Les teintes sont celles de l'écran — les statistiques d'entrée du contrôle d'accès les posent
+ * déjà : vert pour les bénévoles, jaune pour les artistes, violet pour les organisateurs, bleu
+ * pour la billetterie. Reconnaître un type à sa couleur ne doit pas demander de réapprendre un
+ * code d'une page à l'autre.
+ *
+ * Les NUANCES, elles, sont celles du papier : fond en 100 et texte en 700, là où l'écran emploie
+ * 50 et 600. Un fond à 50 disparaît à l'impression, surtout sur une imprimante qui rend le jaune
+ * plus pâle que l'écran ; et sur une photocopie en niveaux de gris, les quatre teintes doivent
+ * rester quatre gris distincts.
+ *
+ * Un type inconnu ne rend RIEN plutôt qu'une couleur par défaut : une cellule grise au milieu de
+ * quatre couleurs se lit comme une cinquième catégorie, et l'on cherche laquelle.
+ */
+export function couleurDuType(type: string | null | undefined): CouleurDeType | null {
+  const couleurs: Record<string, CouleurDeType> = {
+    // vert
+    volunteer: { fond: [220, 252, 231], texte: [21, 128, 61] },
+    // jaune
+    artist: { fond: [254, 249, 195], texte: [161, 98, 7] },
+    // violet
+    organizer: { fond: [243, 232, 255], texte: [126, 34, 206] },
+    // bleu
+    participant: { fond: [219, 234, 254], texte: [29, 78, 216] },
+  }
+
+  return couleurs[type ?? ''] ?? null
 }

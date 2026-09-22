@@ -263,7 +263,8 @@
       "severity_light": "łagodna",
       "severity_moderate": "umiarkowana",
       "severity_severe": "ciężka",
-      "export_count": "{count} posiłków"
+      "export_count": "{count} posiłków",
+      "catering_no_meal": "Tego dnia nie zaplanowano żadnego posiłku"
     },
     "organizers": {
       "access_rights": "Prawa dostępu",

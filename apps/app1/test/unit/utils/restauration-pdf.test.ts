@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest'
 
 import {
+  couleurDuType,
+  motLePlusLong,
+  nomFichierRestauration,
   resumerRepas,
   lignesDeParticipants,
   type RepasDeRestauration,
@@ -225,5 +228,152 @@ describe('lignesDeParticipants', () => {
       })
     )
     expect(lignes.map((l) => l.nom)).toEqual(['Zola', 'Adam'])
+  })
+})
+
+/**
+ * Le nom des fichiers d'une journée de restauration.
+ *
+ * La feuille ne sort plus d'un bloc : le résumé part en cuisine, chaque liste à son point de
+ * distribution. Quatre fichiers téléchargés d'affilée doivent se reconnaître SANS qu'on les
+ * ouvre, sinon le découpage complique au lieu d'aider.
+ */
+describe('nomFichierRestauration', () => {
+  it('distingue les documents d’une MÊME journée', () => {
+    // Le point qui justifie la fonction : sans la partie dans le nom, le second téléchargement
+    // écraserait le premier, ou s'empilerait en « (1) », « (2) ».
+    const resume = nomFichierRestauration('Jongle en Zik', '2026-10-02', 'Résumé des repas')
+    const dejeuner = nomFichierRestauration('Jongle en Zik', '2026-10-02', 'Déjeuner Convention')
+
+    expect(resume).toBe('restauration-jongle-en-zik-2026-10-02-resume-des-repas.pdf')
+    expect(dejeuner).toBe('restauration-jongle-en-zik-2026-10-02-dejeuner-convention.pdf')
+    expect(resume).not.toBe(dejeuner)
+  })
+
+  it('retire les ACCENTS au lieu de les remplacer par un tiret', () => {
+    // L'ancien nom se contentait d'un remplacement des caractères non alphanumériques :
+    // « Été à Brévent » y devenait « -t--br-vent », un tiret là où il y avait une lettre.
+    expect(nomFichierRestauration('Été à Brévent', '2026-10-02', 'Dîner')).toBe(
+      'restauration-ete-a-brevent-2026-10-02-diner.pdf'
+    )
+  })
+
+  it('ne laisse pas de tirets en trop', () => {
+    expect(nomFichierRestauration('  Jongle !! ', '2026-10-02', '  Petit-déjeuner  ')).toBe(
+      'restauration-jongle-2026-10-02-petit-dejeuner.pdf'
+    )
+  })
+
+  it('se passe du nom de l’édition', () => {
+    expect(nomFichierRestauration(null, '2026-10-02', 'Dîner')).toBe(
+      'restauration-2026-10-02-diner.pdf'
+    )
+  })
+
+  it('retombe sur un nom générique plutôt que sur une extension nue', () => {
+    // Un fichier appelé « .pdf » est invisible sous Linux et illisible ailleurs.
+    expect(nomFichierRestauration(null, '', '')).toBe('restauration.pdf')
+  })
+})
+
+/**
+ * Le mot qui décide de la largeur d'une colonne.
+ *
+ * Un PDF coupe une cellule trop étroite AU MILIEU d'un mot : « leschapeauxpointus.associa » puis
+ * « tion@gmail.com » sur la ligne suivante. Sur une feuille qu'on emporte au service, il n'y a
+ * pas d'écran pour aller vérifier ce qui a été coupé.
+ *
+ * Mesuré sur la base de développement : la plus longue adresse fait 42 caractères, soit 59 mm à
+ * 8 points — la colonne en faisait 45.
+ */
+describe('motLePlusLong', () => {
+  it('trouve le mot le plus long, pas la valeur la plus longue', () => {
+    // La distinction est tout le sujet : « Jean-Baptiste de la Tour » est plus LONG que
+    // « Wüllenweber », mais il se coupe aux espaces. C'est le second qui impose la largeur.
+    expect(motLePlusLong(['Jean Baptiste de la Tour', 'Wüllenweber'])).toBe('Wüllenweber')
+  })
+
+  it('traite une adresse comme UN seul mot', () => {
+    // Elle n'a aucune espace : c'est ce qui en fait la première colonne à déborder.
+    const adresse = 'leschapeauxpointus.association@gmail.com'
+    expect(motLePlusLong(['Alice', adresse])).toBe(adresse)
+  })
+
+  it('regarde aussi l’EN-TÊTE, pas seulement les valeurs', () => {
+    // Un en-tête plus long que sa colonne se coupe exactement pareil.
+    expect(motLePlusLong(['Sévérité', '-', '-'])).toBe('Sévérité')
+  })
+
+  it('ignore les valeurs absentes', () => {
+    expect(motLePlusLong([null, undefined, 'Oui'])).toBe('Oui')
+    expect(motLePlusLong([])).toBe('')
+    expect(motLePlusLong([null])).toBe('')
+  })
+
+  it('n’est pas dupé par les espaces multiples ni les retours à la ligne', () => {
+    expect(motLePlusLong(['  arachides   fruits\nà coque  '])).toBe('arachides')
+  })
+
+  it('compte en CARACTÈRES, la mesure en millimètres venant ensuite', () => {
+    // La fonction ne connaît pas la police : c'est l'appelant qui mesure le mot rendu. Un « iii »
+    // et un « WWW » ont ici la même longueur, et c'est `getTextWidth` qui les départage.
+    expect(motLePlusLong(['iii', 'WW'])).toBe('iii')
+  })
+})
+
+/**
+ * Le code couleur des types de personnes, sur la feuille imprimée.
+ *
+ * Il reprend celui de l'écran — vert pour les bénévoles, jaune pour les artistes, violet pour
+ * les organisateurs, bleu pour la billetterie. Un code qui changerait de sens d'une page à
+ * l'autre serait pire que pas de couleur du tout.
+ */
+describe('couleurDuType', () => {
+  it('donne une couleur aux QUATRE types', () => {
+    for (const type of ['volunteer', 'artist', 'organizer', 'participant']) {
+      expect(couleurDuType(type)).not.toBeNull()
+    }
+  })
+
+  it('donne à chacun une couleur DIFFÉRENTE', () => {
+    // Deux types de la même teinte ne se distinguent plus, et la colorisation ne sert à rien.
+    const fonds = ['volunteer', 'artist', 'organizer', 'participant'].map((type) =>
+      couleurDuType(type)!.fond.join(',')
+    )
+    expect(new Set(fonds).size).toBe(4)
+  })
+
+  it('ne rend RIEN pour un type inconnu', () => {
+    // Plutôt qu'une couleur de repli : une cellule grise au milieu de quatre couleurs se lit
+    // comme une cinquième catégorie, et l'on cherche laquelle.
+    expect(couleurDuType('chaperon')).toBeNull()
+    expect(couleurDuType('')).toBeNull()
+    expect(couleurDuType(null)).toBeNull()
+    expect(couleurDuType(undefined)).toBeNull()
+  })
+
+  it('garde un fond CLAIR et un texte SOMBRE', () => {
+    // Le contraste est ce qui rend la cellule lisible une fois imprimée — et, sur une
+    // photocopie en niveaux de gris, ce qui empêche le texte de se fondre dans son fond.
+    for (const type of ['volunteer', 'artist', 'organizer', 'participant']) {
+      const { fond, texte } = couleurDuType(type)!
+      const clarte = (rvb: number[]) => (rvb[0]! + rvb[1]! + rvb[2]!) / 3
+      expect(clarte(fond)).toBeGreaterThan(200)
+      expect(clarte(texte)).toBeLessThan(150)
+    }
+  })
+
+  it('rend des composantes RVB valides, telles que jsPDF les attend', () => {
+    for (const type of ['volunteer', 'artist', 'organizer', 'participant']) {
+      const couleur = couleurDuType(type)!
+      for (const composantes of [couleur.fond, couleur.texte]) {
+        expect(composantes).toHaveLength(3)
+        for (const composante of composantes) {
+          expect(Number.isInteger(composante)).toBe(true)
+          expect(composante).toBeGreaterThanOrEqual(0)
+          expect(composante).toBeLessThanOrEqual(255)
+        }
+      }
+    }
   })
 })

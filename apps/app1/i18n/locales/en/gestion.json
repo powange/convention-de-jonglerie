@@ -263,7 +263,8 @@
       "severity_light": "mild",
       "severity_moderate": "moderate",
       "severity_severe": "severe",
-      "export_count": "{count} meals"
+      "export_count": "{count} meals",
+      "catering_no_meal": "No meal scheduled on that day"
     },
     "organizers": {
       "access_rights": "Access rights",

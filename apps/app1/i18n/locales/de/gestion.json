@@ -263,7 +263,8 @@
       "severity_light": "leicht",
       "severity_moderate": "mittel",
       "severity_severe": "schwer",
-      "export_count": "{count} Mahlzeiten"
+      "export_count": "{count} Mahlzeiten",
+      "catering_no_meal": "An diesem Tag ist keine Mahlzeit vorgesehen"
     },
     "organizers": {
       "access_rights": "Zugriffsrechte",
