@@ -325,7 +325,7 @@
                   v-for="occurrence in occurrences"
                   :key="occurrence.id"
                   class="flex flex-wrap items-center justify-between gap-2 py-2 cursor-pointer"
-                  @click="showLogDetails(occurrence)"
+                  @click="openLogDetails(occurrence)"
                 >
                   <span class="text-xs text-gray-600 dark:text-gray-400">
                     {{ formatDateTime(occurrence.createdAt) }}
@@ -363,7 +363,7 @@
 
         <UContextMenu v-else :items="contextMenuItems">
           <UTable
-            ref="table"
+            v-model:column-visibility="visibiliteDesColonnes"
             :data="logs"
             :columns="columns"
             class="w-full"
@@ -569,11 +569,19 @@
     </UCard>
 
     <!-- Slideover de détails -->
+    <!--
+      La largeur suit l'écran plutôt qu'un palier fixe.
+
+      Un détail d'erreur, c'est une charge JSON, une pile d'appel et une URL complète : à 768 px
+      tout s'y repliait sur quatre lignes alors que la moitié de l'écran restait vide. Les paliers
+      montent donc jusqu'à 80 % de la largeur sur un grand écran, et le `max-w` en `rem` garde une
+      borne haute pour les très larges moniteurs, où un texte de 2000 px de long ne se lit plus.
+    -->
     <USlideover
       v-model:open="showLogDetails"
       :title="$t('admin.error_details')"
       side="left"
-      :ui="{ content: 'w-full max-w-3xl' }"
+      :ui="{ content: 'w-full sm:w-[85vw] lg:w-[80vw] sm:max-w-[110rem]' }"
     >
       <template #body>
         <div v-if="selectedLog" class="space-y-6">
@@ -583,7 +591,7 @@
           </p>
 
           <!-- Informations principales -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Code de statut
@@ -621,14 +629,16 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {{ $t('admin.error_logs.request_details') }}
             </label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 text-sm">
               <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded break-words">
                 <strong>{{ $t('log.method') }}:</strong> {{ selectedLog.method }}
               </div>
               <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded break-words">
                 <strong>{{ $t('log.path') }}:</strong> {{ selectedLog.path }}
               </div>
-              <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 break-words">
+              <div
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 xl:col-span-4 break-words"
+              >
                 <strong>{{ $t('log.full_url') }}:</strong> {{ selectedLog.url }}
               </div>
               <div
@@ -647,7 +657,7 @@
               </div>
               <div
                 v-if="selectedLog.referer"
-                class="p-3 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 break-words"
+                class="p-3 bg-gray-50 dark:bg-gray-800 rounded sm:col-span-2 xl:col-span-4 break-words"
               >
                 <strong>{{ $t('admin.error_logs.referer_page') }}</strong>
                 <a
@@ -969,11 +979,19 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, useTemplateRef } from 'vue'
+import { shallowRef } from 'vue'
 import { JsonViewer } from 'vue3-json-viewer'
 import 'vue3-json-viewer/dist/vue3-json-viewer.css'
 
 import { detailsTechniques } from '~/utils/details-techniques-log'
+import {
+  construireRequeteUrl,
+  DEFAULT_PAGE_SIZE,
+  FILTER_DEFAULTS,
+  lireEtatDepuisUrl,
+  TRI_PAR_DEFAUT,
+  type ChampDeTri,
+} from '~/utils/filtres-error-logs'
 
 import { composantesDEmpreinte } from '~~/shared/utils/empreinte-erreur'
 import { RETENTION_PAR_DEFAUT } from '~~/shared/utils/retention-journal-erreurs'
@@ -991,7 +1009,6 @@ const { t } = useI18n()
 const colorMode = useColorMode()
 const jsonViewerTheme = computed(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
 const toast = useToast()
-const table = useTemplateRef('table')
 
 // Copier un JSON dans le presse-papier
 const copyJson = async (data: unknown) => {
@@ -1032,17 +1049,6 @@ const filters = ref({
 })
 
 // Valeurs par défaut des filtres (utilisées pour ne pas polluer l'URL)
-const FILTER_DEFAULTS = {
-  search: '',
-  status: 'unresolved',
-  errorType: 'all',
-  statusCode: 'all',
-  path: '',
-  ip: '',
-  user: '',
-  timeRange: '7d',
-} as const
-const DEFAULT_PAGE_SIZE = 20
 
 // Sur mobile, les filtres vivent dans une fenêtre : huit champs empilés repoussaient le tableau
 // hors de l'écran.
@@ -1187,28 +1193,44 @@ const columns = computed(() => [
   { id: 'actions', accessorKey: 'actions', header: '', enableHiding: false },
 ])
 
-// Items du menu de visibilité des colonnes (piloté par l'API TanStack du tableau)
-const columnVisibilityItems = computed(() => {
-  const cols = table.value?.tableApi?.getAllColumns?.() ?? []
-  return cols
-    .filter((column: any) => column.getCanHide())
-    .map((column: any) => ({
-      label: typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id,
+/**
+ * La visibilité des colonnes, tenue par la page et non par le seul tableau.
+ *
+ * Elle était lue et écrite directement sur l'API TanStack, ce qui la rendait inaccessible tant que
+ * le tableau n'était pas monté — or il ne l'est pas en vue groupée, et une URL doit pouvoir la
+ * porter avant tout rendu. `v-model:column-visibility` la ramène ici ; le tableau la reçoit.
+ *
+ * Seules les colonnes masquées y figurent (`false`) : l'objet vide vaut « tout est visible ».
+ */
+const visibiliteDesColonnes = ref<Record<string, boolean>>({})
+
+/** Les colonnes que le lecteur a le droit de masquer — ni le statut, ni les actions. */
+const colonnesMasquables = computed(() =>
+  columns.value.filter((c: any) => c.enableHiding !== false).map((c: any) => c.id as string)
+)
+
+// Items du menu de visibilité des colonnes
+const columnVisibilityItems = computed(() =>
+  columns.value
+    .filter((colonne: any) => colonne.enableHiding !== false)
+    .map((colonne: any) => ({
+      label: typeof colonne.header === 'string' ? colonne.header : colonne.id,
       type: 'checkbox' as const,
-      checked: column.getIsVisible(),
+      checked: visibiliteDesColonnes.value[colonne.id] !== false,
       onUpdateChecked(checked: boolean) {
-        column.toggleVisibility(!!checked)
+        visibiliteDesColonnes.value = { ...visibiliteDesColonnes.value, [colonne.id]: !!checked }
+        syncUrl()
       },
       onSelect(e: Event) {
         e.preventDefault()
       },
     }))
-})
+)
 
 // Tri côté serveur (les seuls champs supportés par l'API sont createdAt/statusCode/path)
-const sort = ref<{ field: 'createdAt' | 'statusCode' | 'path'; dir: 'asc' | 'desc' }>({
-  field: 'createdAt',
-  dir: 'desc',
+const sort = ref<{ field: ChampDeTri; dir: 'asc' | 'desc' }>({
+  field: TRI_PAR_DEFAUT.field,
+  dir: TRI_PAR_DEFAUT.dir,
 })
 
 const toggleSort = (field: 'createdAt' | 'statusCode' | 'path') => {
@@ -1329,33 +1351,30 @@ const truncateUrl = (url: string, maxLength: number = 50) => {
 }
 
 // Construit l'objet query d'URL en n'incluant que les valeurs différentes des défauts
-const buildUrlQuery = (): Record<string, string> => {
-  const q: Record<string, string> = {}
-  for (const key of Object.keys(FILTER_DEFAULTS) as (keyof typeof FILTER_DEFAULTS)[]) {
-    const value = filters.value[key]
-    if (value && value !== FILTER_DEFAULTS[key]) q[key] = String(value)
-  }
-  if (pagination.value.page && pagination.value.page > 1) q.page = String(pagination.value.page)
-  if (pagination.value.pageSize && pagination.value.pageSize !== DEFAULT_PAGE_SIZE)
-    q.pageSize = String(pagination.value.pageSize)
-  return q
-}
+const buildUrlQuery = (): Record<string, string> =>
+  construireRequeteUrl({
+    filtres: filters.value,
+    page: pagination.value.page || 1,
+    pageSize: pagination.value.pageSize || DEFAULT_PAGE_SIZE,
+    vueGroupee: vueGroupee.value,
+    tri: sort.value,
+    visibiliteDesColonnes: visibiliteDesColonnes.value,
+  })
 
 // Reflète l'état courant des filtres dans l'URL (replace pour ne pas polluer l'historique)
 const syncUrl = () => {
   router.replace({ query: buildUrlQuery() })
 }
 
-// Initialise les filtres et la pagination depuis l'URL (au montage / rechargement)
+// Initialise l'écran depuis l'URL (au montage / rechargement)
 const initFiltersFromUrl = () => {
-  const q = route.query
-  for (const key of Object.keys(FILTER_DEFAULTS) as (keyof typeof FILTER_DEFAULTS)[]) {
-    if (typeof q[key] === 'string') filters.value[key] = q[key] as string
-  }
-  const page = parseInt(q.page as string)
-  if (!isNaN(page) && page > 0) pagination.value.page = page
-  const pageSize = parseInt(q.pageSize as string)
-  if (!isNaN(pageSize) && pageSize > 0) pagination.value.pageSize = pageSize
+  const etat = lireEtatDepuisUrl(route.query as Record<string, unknown>, colonnesMasquables.value)
+  if (etat.filtres) Object.assign(filters.value, etat.filtres)
+  if (etat.page) pagination.value.page = etat.page
+  if (etat.pageSize) pagination.value.pageSize = etat.pageSize
+  if (etat.vueGroupee !== undefined) vueGroupee.value = etat.vueGroupee
+  if (etat.tri) sort.value = etat.tri
+  if (etat.visibiliteDesColonnes) visibiliteDesColonnes.value = etat.visibiliteDesColonnes
 }
 
 // Chargement des logs
@@ -1470,6 +1489,7 @@ const changerDeVue = (groupee: boolean) => {
   if (vueGroupee.value === groupee) return
   vueGroupee.value = groupee
   pagination.value.page = 1
+  // `loadLogs` synchronise l'URL dans ses deux branches : inutile de le faire ici en plus.
   loadLogs()
 }
 
