@@ -9,14 +9,29 @@ import {
   checkEmailUniqueness,
   checkPseudoUniqueness,
 } from '#server/utils/validation-helpers'
+import { updateProfileSchema } from '#server/utils/validation-schemas'
 
-const updateUserSchema = z.object({
-  email: z.string().email('Email invalide'),
-  pseudo: z.string().min(2, 'Le pseudo doit contenir au moins 2 caractères'),
-  prenom: z.string().min(1, 'Le prénom est requis'),
-  nom: z.string().min(1, 'Le nom est requis'),
-  phone: z.string().optional(),
-})
+const updateUserSchema = z
+  .object({
+    email: z.string().email('Email invalide'),
+    pseudo: z.string().min(2, 'Le pseudo doit contenir au moins 2 caractères'),
+    prenom: z.string().min(1, 'Le prénom est requis'),
+    nom: z.string().min(1, 'Le nom est requis'),
+    phone: z.string().optional(),
+  })
+  // Les champs de santé sont PRIS au schéma du profil, jamais redéfinis ici.
+  //
+  // Une allergie corrigée par un administrateur doit obéir aux mêmes bornes que celle saisie par
+  // l'intéressé : des règles plus larges d'un côté laisseraient entrer une valeur que le
+  // formulaire de l'autre refuse, et personne ne saurait laquelle des deux fait foi. Les
+  // recopier aurait posé la question à la première modification de l'une des deux.
+  .merge(
+    updateProfileSchema.pick({
+      allergies: true,
+      allergySeverity: true,
+      emergencyContactPhone: true,
+    })
+  )
 
 export default wrapApiHandler(
   async (event) => {
@@ -54,6 +69,17 @@ export default wrapApiHandler(
         prenom: validatedData.prenom,
         nom: validatedData.nom,
         phone: validatedData.phone || null,
+        // `undefined` veut dire « non transmis », et non « à vider » : un appel qui ne porte pas
+        // ces champs ne doit pas effacer une allergie que l'intéressé a saisie.
+        ...(validatedData.allergies !== undefined && {
+          allergies: validatedData.allergies?.trim() || null,
+        }),
+        ...(validatedData.allergySeverity !== undefined && {
+          allergySeverity: validatedData.allergySeverity,
+        }),
+        ...(validatedData.emergencyContactPhone !== undefined && {
+          emergencyContactPhone: validatedData.emergencyContactPhone?.trim() || null,
+        }),
         updatedAt: new Date(),
       },
       select: userAdminSelect,

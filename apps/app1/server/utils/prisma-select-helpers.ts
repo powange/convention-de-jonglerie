@@ -147,6 +147,12 @@ export const userAdminSelect = {
   prenom: true,
   pronouns: true,
   phone: true,
+  // Santé : l'administration doit pouvoir lire et corriger ce qui sert en cuisine et aux
+  // secours. Ces champs ne partent QUE sur la fiche d'un utilisateur — la liste, elle, a sa
+  // propre sélection, et n'a aucune raison de trimballer les allergies de tout le monde.
+  allergies: true,
+  allergySeverity: true,
+  emergencyContactPhone: true,
   profilePicture: true,
   emailHash: true,
   isEmailVerified: true,
