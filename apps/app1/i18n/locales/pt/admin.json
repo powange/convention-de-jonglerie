@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Formulário",
       "view_mode_raw": "JSON bruto",
-      "ticket_tiers": "Tarifas de bilheteira"
+      "ticket_tiers": "Tarifas de bilheteira",
+      "convention_block_ignored": "O bloco «convention» do JSON não foi utilizado: a edição foi associada à convenção escolhida.",
+      "target_convention": "Convenção de acolhimento",
+      "target_convention_hint": "Opcional. Se escolhida, a edição ser-lhe-á associada e a IA não terá de procurar a convenção. Deixado vazio, a convenção é criada a partir do JSON.",
+      "target_convention_new": "Nova convenção, a partir do JSON"
     },
     "inactive": "Inativo",
     "invalidate_email": "Invalidar e-mail",

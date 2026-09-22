@@ -78,11 +78,11 @@ export interface GenerateImportResult {
 // Note: getPrefilledJsonPrompt est importé depuis import-json-schema.ts (partagé ED/EI)
 
 // Génère le prompt système complet pour Anthropic (modèles avec grand contexte)
-function getFullSystemPrompt(): string {
+function getFullSystemPrompt(conventionConnue = false): string {
   return loadPrompt('direct-full', {
     RULES_FULL: loadPrompt('rules-full'),
     FEATURES_DESCRIPTION: generateFeaturesDescription(),
-    JSON_EXAMPLE: generateJsonExample(),
+    JSON_EXAMPLE: generateJsonExample(conventionConnue),
   })
 }
 
@@ -137,6 +137,14 @@ export interface GenerateImportOptions {
   /** Active la recherche des services (caractéristiques) via IA (true par défaut) */
   detectServices?: boolean
   /**
+   * Vrai quand l'édition sera importée dans une convention DÉJÀ choisie.
+   *
+   * Le modèle ne produit alors aucun bloc « convention » : il n'a ni à en deviner le nom ni à en
+   * inventer l'adresse de courriel, ce qu'il faisait jusqu'ici avec une consigne qui l'y invitait
+   * explicitement (« si non trouvé, utiliser contact@domaine-du-site.com »).
+   */
+  conventionConnue?: boolean
+  /**
    * URL de la page décrivant le programme, quand l'édition en désigne une.
    *
    * Elle reçoit une passe dédiée : l'extraction générale partage son budget entre toutes les
@@ -183,6 +191,7 @@ export async function generateImportJson(
     previewedImageUrl,
     provider,
     detectServices = true,
+    conventionConnue = false,
     programUrl,
     extractInfos = true,
     extractProgram = true,
@@ -410,6 +419,7 @@ export async function generateImportJson(
         basesLmStudio(effectiveConfig),
         combinedContent,
         dynamicMaxContent,
+        conventionConnue,
         effectiveConfig.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST,
         effectiveConfig.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
       )
@@ -417,13 +427,15 @@ export async function generateImportJson(
       generatedJson = await callAnthropic(
         effectiveConfig.anthropicApiKey,
         combinedContent,
-        effectiveConfig.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
+        effectiveConfig.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT,
+        conventionConnue
       )
     } else if (aiProvider === 'ollama') {
       generatedJson = await callOllama(
         effectiveConfig.ollamaBaseUrl || 'http://localhost:11434',
         effectiveConfig.ollamaModel || 'llama3',
-        combinedContent
+        combinedContent,
+        conventionConnue
       )
     } else {
       throw new Error(`Provider IA non configuré ou non supporté: ${aiProvider}`)
@@ -1182,6 +1194,7 @@ async function callLMStudio(
   serveurs: ServeurModele[],
   content: string,
   maxContent: number,
+  conventionConnue: boolean,
   // Délai réglable depuis /admin/ai-config : un modèle local lent s'accommode mal des 3 minutes
   // par défaut, et l'administrateur doit pouvoir l'ajuster sans redéploiement.
   timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST,
@@ -1210,7 +1223,7 @@ async function callLMStudio(
         body: JSON.stringify({
           model: serveur.model || 'auto',
           messages: [
-            { role: 'system', content: generateCompactDirectPrompt() },
+            { role: 'system', content: generateCompactDirectPrompt(conventionConnue) },
             {
               role: 'user',
               content: `Données:\n${truncatedContent}\n\nGénère le JSON:`,
@@ -1244,7 +1257,8 @@ async function callLMStudio(
 async function callAnthropic(
   apiKey: string,
   content: string,
-  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT
+  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT,
+  conventionConnue = false
 ): Promise<string> {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')
   const client = new Anthropic({
@@ -1258,7 +1272,7 @@ async function callAnthropic(
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: maxTokens,
-    system: getFullSystemPrompt(),
+    system: getFullSystemPrompt(conventionConnue),
     messages: [
       {
         role: 'user',
@@ -1288,7 +1302,12 @@ async function callAnthropic(
 /**
  * Appel à Ollama
  */
-async function callOllama(baseUrl: string, model: string, content: string): Promise<string> {
+async function callOllama(
+  baseUrl: string,
+  model: string,
+  content: string,
+  conventionConnue = false
+): Promise<string> {
   const response = await fetch(`${baseUrl}/api/generate`, {
     method: 'POST',
     headers: {
@@ -1296,7 +1315,7 @@ async function callOllama(baseUrl: string, model: string, content: string): Prom
     },
     body: JSON.stringify({
       model,
-      prompt: `${getFullSystemPrompt()}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
+      prompt: `${getFullSystemPrompt(conventionConnue)}\n\nVoici le contenu des pages web d'une convention de jonglerie. Génère le JSON d'import:\n\n${content}`,
       stream: false,
     }),
   })

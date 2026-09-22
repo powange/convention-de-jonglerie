@@ -251,12 +251,12 @@ function extractAndApplyTimeFromContent(parsedJson: any, collectedContent: strin
 // Choix du prompt selon le provider IA
 // - Modèles locaux (LM Studio, Ollama) : prompt compact pour contexte limité (4k tokens)
 // - Anthropic : prompt complet avec tous les détails
-function getSystemPrompt(aiProvider: string): string {
+function getSystemPrompt(aiProvider: string, conventionConnue = false): string {
   if (aiProvider === 'anthropic') {
-    return generateAgentSystemPrompt()
+    return generateAgentSystemPrompt(conventionConnue)
   }
   // Pour LM Studio et Ollama, utiliser le prompt compact
-  return generateCompactAgentSystemPrompt()
+  return generateCompactAgentSystemPrompt(conventionConnue)
 }
 
 /**
@@ -675,6 +675,8 @@ export interface AgentExplorationOptions {
   provider?: 'lmstudio' | 'anthropic' | 'ollama'
   /** Active la recherche des services (caractéristiques) via IA (true par défaut) */
   detectServices?: boolean
+  /** Vrai quand la convention d'accueil est déjà choisie : le modèle n'en produit pas le bloc. */
+  conventionConnue?: boolean
 }
 
 /**
@@ -684,7 +686,14 @@ export async function runAgentExploration(
   urls: string[],
   options: AgentExplorationOptions = {}
 ): Promise<AgentGenerateResult> {
-  const { taskId, onProgress, previewedImageUrl, provider, detectServices = true } = options
+  const {
+    taskId,
+    onProgress,
+    previewedImageUrl,
+    provider,
+    detectServices = true,
+    conventionConnue = false,
+  } = options
 
   // Helper pour envoyer les événements de progression (polling + SSE)
   const notifyStep = (
@@ -1003,7 +1012,7 @@ INSTRUCTIONS:
     console.log(`[AGENT] Phase 3 - Iteration ${iteration}/${maxAdditionalIterations}`)
 
     // Appeler le LLM
-    const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
+    const systemPrompt = getSystemPrompt(configToUse.aiProvider || 'lmstudio', conventionConnue)
     const agentResponse = await callAgentLLM(configToUse, systemPrompt, conversationHistory)
 
     if (agentResponse.action === 'fetch' && agentResponse.url) {
@@ -1146,7 +1155,7 @@ Complète les champs vides avec les informations des sources. Réponds UNIQUEMEN
     } else {
       const contentSummary = collectedContent.slice(0, 3).join('\n\n---\n\n')
       forcePrompt = generateForceGenerationPrompt(visitedUrls, contentSummary)
-      systemPromptToUse = getSystemPrompt(configToUse.aiProvider || 'lmstudio')
+      systemPromptToUse = getSystemPrompt(configToUse.aiProvider || 'lmstudio', conventionConnue)
     }
 
     conversationHistory.push({

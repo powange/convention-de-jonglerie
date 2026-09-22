@@ -11,8 +11,7 @@ IMPORTANT POUR FETCH_URL:
 - N'INVENTE JAMAIS d'URL, utilise uniquement celles listées dans le contenu
 
 CHAMPS OBLIGATOIRES (le JSON doit contenir au minimum):
-- convention.name: Nom de la convention
-- convention.email: Email de contact (si non trouvé, utiliser contact@domaine-du-site.com)
+{{CHAMPS_CONVENTION}}
 - edition.startDate: Date de début (format YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS)
 - edition.endDate: Date de fin
 - edition.addressLine1: Adresse

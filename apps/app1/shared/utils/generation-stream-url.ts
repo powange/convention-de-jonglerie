@@ -20,6 +20,8 @@ export interface GenerationStreamParams {
   previewedImageUrl?: string
   provider?: string
   detectServices: boolean
+  /** Vrai quand la convention d'accueil est déjà choisie : le modèle n'en produit pas le bloc. */
+  conventionConnue?: boolean
   /** Page du programme, qui reçoit une passe d'extraction dédiée côté serveur. */
   programUrl?: string
   /** Périmètre demandé : chaque volet omis épargne des minutes d'appels au modèle. */
@@ -41,6 +43,7 @@ export function buildGenerationStreamUrl({
   previewedImageUrl,
   provider,
   detectServices,
+  conventionConnue,
   programUrl,
   extractInfos,
   extractProgram,
@@ -63,6 +66,8 @@ export function buildGenerationStreamUrl({
   if (programDates?.length) params.set('programDates', programDates.join(','))
   // Toujours transmise : le serveur l'active par défaut, l'omettre changerait le comportement.
   params.set('detectServices', detectServices ? 'true' : 'false')
+  // Omis quand il est faux : le schéma serveur le traite comme absent, et l'URL reste lisible.
+  if (conventionConnue) params.set('conventionConnue', 'true')
 
   return `/api/admin/generate-import-json-stream?${params.toString()}`
 }

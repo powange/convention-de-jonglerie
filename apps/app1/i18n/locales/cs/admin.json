@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Formulář",
       "view_mode_raw": "Surové JSON",
-      "ticket_tiers": "Ceny vstupenek"
+      "ticket_tiers": "Ceny vstupenek",
+      "convention_block_ignored": "Blok „convention“ z JSON nebyl použit: ročník byl připojen ke zvolené convention.",
+      "target_convention": "Hostitelská convention",
+      "target_convention_hint": "Nepovinné. Pokud ji zvolíte, ročník k ní bude připojen a AI nebude muset convention hledat. Ponecháte-li prázdné, convention se vytvoří z JSON.",
+      "target_convention_new": "Nová convention, z JSON"
     },
     "inactive": "Neaktivní",
     "invalidate_email": "Zneplatnit e-mail",

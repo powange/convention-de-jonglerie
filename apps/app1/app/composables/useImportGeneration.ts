@@ -227,6 +227,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       editionStartDate?: string
       editionEndDate?: string
       programDates?: string[]
+      /** Convention d'accueil déjà choisie : le modèle n'a pas à en produire le bloc. */
+      conventionConnue?: boolean
     }
   ): Promise<GenerationResult> => {
     return new Promise((resolve, reject) => {
@@ -407,6 +409,8 @@ export function useImportGeneration(options: UseImportGenerationOptions = {}) {
       editionStartDate?: string
       editionEndDate?: string
       programDates?: string[]
+      /** Convention d'accueil déjà choisie : le modèle n'a pas à en produire le bloc. */
+      conventionConnue?: boolean
     }
   ): Promise<GenerationResult | null> => {
     // Réinitialiser l'état

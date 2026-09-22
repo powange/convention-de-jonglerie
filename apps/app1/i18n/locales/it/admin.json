@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Modulo",
       "view_mode_raw": "JSON grezzo",
-      "ticket_tiers": "Tariffe della biglietteria"
+      "ticket_tiers": "Tariffe della biglietteria",
+      "convention_block_ignored": "Il blocco «convention» del JSON non è stato utilizzato: l’edizione è stata collegata alla convention scelta.",
+      "target_convention": "Convention ospitante",
+      "target_convention_hint": "Facoltativo. Se scelta, l’edizione vi sarà collegata e l’IA non dovrà cercare la convention. Lasciato vuoto, la convention viene creata dal JSON.",
+      "target_convention_new": "Nuova convention, dal JSON"
     },
     "inactive": "Inattivo",
     "invalidate_email": "Invalida email",

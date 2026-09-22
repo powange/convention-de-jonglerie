@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Form",
       "view_mode_raw": "Raw JSON",
-      "ticket_tiers": "Ticket prices"
+      "ticket_tiers": "Ticket prices",
+      "convention_block_ignored": "The JSON’s “convention” block was not used: the edition was attached to the chosen convention.",
+      "target_convention": "Host convention",
+      "target_convention_hint": "Optional. When chosen, the edition is attached to it and the AI does not have to look up the convention. Left empty, the convention is created from the JSON.",
+      "target_convention_new": "New convention, from the JSON"
     },
     "inactive": "Inactive",
     "invalidate_email": "Invalidate email",

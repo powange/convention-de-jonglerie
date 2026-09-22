@@ -40,6 +40,16 @@ const querySchema = z.object({
     .enum(['true', 'false'])
     .default('true')
     .transform((value) => value === 'true'),
+  /**
+   * Vrai quand l'édition sera importée dans une convention DÉJÀ choisie à l'écran.
+   *
+   * Le modèle ne produit alors aucun bloc « convention ». Absent vaut « false », pour ne rien
+   * changer aux appelants existants.
+   */
+  conventionConnue: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => value === 'true'),
 })
 
 /**
@@ -65,6 +75,7 @@ export default wrapApiHandler(
       previewedImageUrl,
       provider,
       detectServices,
+      conventionConnue,
       programUrl,
       extractInfos,
       extractProgram,
@@ -200,6 +211,7 @@ export default wrapApiHandler(
                 previewedImageUrl,
                 provider,
                 detectServices,
+                conventionConnue,
                 programUrl,
                 extractInfos,
                 extractProgram,
@@ -215,6 +227,7 @@ export default wrapApiHandler(
                 previewedImageUrl,
                 provider,
                 detectServices,
+                conventionConnue,
               })
             }
 

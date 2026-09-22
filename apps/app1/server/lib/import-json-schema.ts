@@ -18,9 +18,16 @@ import { EDITION_FEATURES_DESCRIPTIONS } from '#server/utils/edition-features-ex
 
 /**
  * Liste des champs obligatoires (partagée ED/EI)
+ *
+ * `name` et `email` sont ceux de la CONVENTION. Quand on importe dans une convention existante,
+ * ils n'ont plus lieu d'être demandés : l'IA les inventerait au mieux, les contredirait au pire.
  */
 export const REQUIRED_FIELDS =
   'name, email, startDate, endDate, addressLine1, city, country, postalCode'
+
+/** Les mêmes, sans ceux de la convention — voir `REQUIRED_FIELDS`. */
+export const REQUIRED_FIELDS_SANS_CONVENTION =
+  'startDate, endDate, addressLine1, city, country, postalCode'
 
 /**
  * Liste des champs optionnels importants (partagée ED/EI)
@@ -31,8 +38,9 @@ export const OPTIONAL_FIELDS =
 /**
  * Génère la section des champs pour les prompts compacts
  */
-export function generateFieldsSection(): string {
-  return `CHAMPS OBLIGATOIRES: ${REQUIRED_FIELDS}
+export function generateFieldsSection(conventionConnue = false): string {
+  const obligatoires = conventionConnue ? REQUIRED_FIELDS_SANS_CONVENTION : REQUIRED_FIELDS
+  return `CHAMPS OBLIGATOIRES: ${obligatoires}
 CHAMPS OPTIONNELS: ${OPTIONAL_FIELDS}`
 }
 
@@ -153,14 +161,19 @@ export const IMPORT_SCHEMA_FIELDS = {
 /**
  * Génère l'exemple JSON complet pour le prompt IA
  */
-export function generateJsonExample(): string {
+export function generateJsonExample(conventionConnue = false): string {
   return JSON.stringify(
     {
-      convention: {
-        name: 'Nom de la convention',
-        email: 'contact@example.com',
-        description: 'Description optionnelle',
-      },
+      // La convention d'accueil est déjà choisie côté écran : ne pas la faire deviner.
+      ...(conventionConnue
+        ? {}
+        : {
+            convention: {
+              name: 'Nom de la convention',
+              email: 'contact@example.com',
+              description: 'Description optionnelle',
+            },
+          }),
       edition: {
         name: 'Édition 2025',
         description: "Description de l'édition",
@@ -231,14 +244,15 @@ export function generateCompactFeaturesDescription(): string {
 /**
  * Génère le JSON format compact avec tous les champs pour les prompts à contexte limité
  */
-export function generateCompactJsonFormat(): string {
+export function generateCompactJsonFormat(conventionConnue = false): string {
   const featuresObj: Record<string, boolean> = {}
   for (const f of COMPACT_FEATURES_LIST) {
     featuresObj[f.key] = false
   }
 
   return JSON.stringify({
-    convention: { name: '', email: '', description: '' },
+    // Même raison que dans `generateJsonExample` : la convention est déjà connue.
+    ...(conventionConnue ? {} : { convention: { name: '', email: '', description: '' } }),
     edition: {
       name: '',
       description: '',
@@ -269,11 +283,14 @@ export function generateCompactJsonFormat(): string {
  * Génère le prompt système complet pour l'agent d'exploration
  * Version complète avec tous les champs
  */
-export function generateAgentSystemPrompt(): string {
+export function generateAgentSystemPrompt(conventionConnue = false): string {
   return loadPrompt('agent-full', {
     FEATURES_DESCRIPTION: generateFeaturesDescription(),
-    JSON_EXAMPLE: generateJsonExample(),
+    JSON_EXAMPLE: generateJsonExample(conventionConnue),
     RULES_FULL: loadPrompt('rules-full'),
+    CHAMPS_CONVENTION: conventionConnue
+      ? "La convention d'accueil est DÉJÀ choisie : ne produis PAS de bloc « convention »."
+      : '- convention.name: Nom de la convention\n- convention.email: Email de contact (si non trouvé, utiliser contact@domaine-du-site.com)',
   })
 }
 
@@ -281,12 +298,12 @@ export function generateAgentSystemPrompt(): string {
  * Génère un prompt système compact pour ED (Extraction Directe)
  * Pour les modèles avec contexte limité (4k tokens)
  */
-export function generateCompactDirectPrompt(): string {
+export function generateCompactDirectPrompt(conventionConnue = false): string {
   return loadPrompt('direct-compact', {
-    FIELDS_SECTION: generateFieldsSection(),
+    FIELDS_SECTION: generateFieldsSection(conventionConnue),
     RULES_COMPACT: loadPrompt('rules-compact'),
     COMPACT_FEATURES: generateCompactFeaturesDescription(),
-    COMPACT_JSON_FORMAT: generateCompactJsonFormat(),
+    COMPACT_JSON_FORMAT: generateCompactJsonFormat(conventionConnue),
   })
 }
 
@@ -294,12 +311,12 @@ export function generateCompactDirectPrompt(): string {
  * Génère un prompt système compact pour EI (Exploration Intelligente)
  * Pour les modèles avec contexte limité (4k tokens)
  */
-export function generateCompactAgentSystemPrompt(): string {
+export function generateCompactAgentSystemPrompt(conventionConnue = false): string {
   return loadPrompt('agent-compact', {
-    FIELDS_SECTION: generateFieldsSection(),
+    FIELDS_SECTION: generateFieldsSection(conventionConnue),
     RULES_COMPACT: loadPrompt('rules-compact'),
     COMPACT_FEATURES: generateCompactFeaturesDescription(),
-    COMPACT_JSON_FORMAT: generateCompactJsonFormat(),
+    COMPACT_JSON_FORMAT: generateCompactJsonFormat(conventionConnue),
   })
 }
 

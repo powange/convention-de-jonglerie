@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Formulier",
       "view_mode_raw": "Ruwe JSON",
-      "ticket_tiers": "Ticketprijzen"
+      "ticket_tiers": "Ticketprijzen",
+      "convention_block_ignored": "Het blok “convention” van de JSON is niet gebruikt: de editie is aan de gekozen conventie gekoppeld.",
+      "target_convention": "Ontvangende conventie",
+      "target_convention_hint": "Optioneel. Indien gekozen wordt de editie eraan gekoppeld en hoeft de AI de conventie niet op te zoeken. Leeg gelaten wordt de conventie uit de JSON aangemaakt.",
+      "target_convention_new": "Nieuwe conventie, uit de JSON"
     },
     "inactive": "Inactief",
     "invalidate_email": "E-mail ongeldig maken",
