@@ -175,6 +175,36 @@ test.describe.serial('Module Stock matériel', () => {
     expect(response.status()).toBe(409)
   })
 
+  /**
+   * Les deux pages transverses du module se RENDENT.
+   *
+   * Elles ne sont pas couvertes ailleurs, et ce sont celles qui ont le plus bougé : filtres,
+   * colonnes, tri, export. « Ce qui manque » a été cassée par une zone morte temporelle — un
+   * `watch` déclaré au-dessus des références qu'il surveille, qui les lisait avant leur
+   * initialisation et faisait échouer le `setup` entier.
+   *
+   * Aucun de nos contrôles habituels ne voit cette classe d'erreur. Une requête HTTP surtout :
+   * ces pages sont rendues CÔTÉ CLIENT derrière `auth-protected`, si bien qu'un `curl` reçoit la
+   * coquille de l'application — huit kilo-octets, titre vide — et un franc 200. Seul un
+   * navigateur authentifié exécute le composant.
+   */
+  for (const page_ of ['missing', 'loans']) {
+    test(`la page stock « ${page_} » se rend sans exception`, async ({ page, goto }) => {
+      const { editionId } = loadState()
+
+      const exceptions: string[] = []
+      page.on('pageerror', (erreur) => exceptions.push(String(erreur)))
+
+      await goto(`/editions/${editionId}/gestion/stock/${page_}`, { waitUntil: 'hydration' })
+
+      // Un élément du CONTENU, pas seulement le gabarit : c'est ce qui distingue « la page
+      // s'affiche » de « la route existe ».
+      await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 15000 })
+
+      expect(exceptions, `exceptions : ${exceptions.join(' | ')}`).toEqual([])
+    })
+  }
+
   test('availability via API : 3 disponibles maintenant', async ({ page }) => {
     const { editionId } = loadState()
     if (!stockItemId) throw new Error('stockItemId manquant')

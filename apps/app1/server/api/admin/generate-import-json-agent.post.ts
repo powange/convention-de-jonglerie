@@ -1151,7 +1151,7 @@ ${contentSummary}
 
 Complète les champs vides avec les informations des sources. Réponds UNIQUEMENT avec le JSON complet.`
 
-      systemPromptToUse = getPrefilledJsonPrompt()
+      systemPromptToUse = getPrefilledJsonPrompt(conventionConnue)
     } else {
       const contentSummary = collectedContent.slice(0, 3).join('\n\n---\n\n')
       forcePrompt = generateForceGenerationPrompt(visitedUrls, contentSummary)

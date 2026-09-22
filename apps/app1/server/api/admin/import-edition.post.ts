@@ -96,7 +96,19 @@ export const importSchema = z
     convention: z
       .object({
         name: z.string().min(1),
-        email: z.string().email(),
+        /**
+         * L'adresse de contact — et ABSENTE plutôt qu'inventée.
+         *
+         * C'est elle qui permet à un organisateur de revendiquer sa convention : le code de
+         * revendication y est envoyé. Une adresse fabriquée depuis le nom de domaine la lui
+         * retire — il ne reçoit jamais rien — ou la donne à qui contrôle cette boîte.
+         *
+         * Le schéma l'exigeait, alors que les prompts ordonnent (à juste titre) de laisser vide
+         * quand on ne la trouve pas : un modèle obéissant produisait donc un JSON refusé, et le
+         * seul chemin qui aboutissait était celui qui inventait. La colonne est nullable en base
+         * depuis toujours, et la revendication sait déjà dire « pas d'email configuré ».
+         */
+        email: z.string().email().or(z.literal('')).nullable().optional(),
         description: z.string().nullable().optional(),
         logo: z.string().nullable().optional(),
       })
@@ -149,6 +161,9 @@ export const importSchema = z
       hasCantine: z.boolean().optional(),
       hasAerialSpace: z.boolean().optional(),
       hasSlacklineSpace: z.boolean().optional(),
+      // Manquait au schéma alors qu'il existe en base et que l'IA le renseigne : zod n'étant pas
+      // `strict`, la valeur était écartée SANS un mot, et l'édition créée sans son espace monocycle.
+      hasUnicycleSpace: z.boolean().optional(),
       hasToilets: z.boolean().optional(),
       hasShowers: z.boolean().optional(),
       hasAccessibility: z.boolean().optional(),
@@ -190,12 +205,21 @@ export default wrapApiHandler(
 
     // Les LECTURES d'abord, hors transaction : elles ne modifient rien, et les tenir dedans
     // garderait un verrou pendant qu'on interroge la base pour rien.
+    /**
+     * L'adresse, normalisée une fois : `''` et l'absence valent `null`.
+     *
+     * Le distinguo compte pour la recherche : un `undefined` passé à Prisma RETIRE le critère au
+     * lieu de chercher « sans adresse », et rattacherait l'édition à n'importe quelle convention
+     * homonyme.
+     */
+    const emailDeConvention = validatedData.convention?.email || null
+
     const existingConvention = validatedData.conventionId
       ? await prisma.convention.findUnique({ where: { id: validatedData.conventionId } })
       : await prisma.convention.findFirst({
           where: {
             name: validatedData.convention!.name,
-            email: validatedData.convention!.email,
+            email: emailDeConvention,
           },
         })
 
@@ -257,7 +281,7 @@ export default wrapApiHandler(
         (await tx.convention.create({
           data: {
             name: validatedData.convention!.name,
-            email: validatedData.convention!.email,
+            email: emailDeConvention,
             description: validatedData.convention!.description,
             logo: validatedData.convention!.logo,
             // Pas d'authorId - convention orpheline
@@ -311,6 +335,7 @@ export default wrapApiHandler(
           hasCantine: validatedData.edition.hasCantine ?? false,
           hasAerialSpace: validatedData.edition.hasAerialSpace ?? false,
           hasSlacklineSpace: validatedData.edition.hasSlacklineSpace ?? false,
+          hasUnicycleSpace: validatedData.edition.hasUnicycleSpace ?? false,
           hasToilets: validatedData.edition.hasToilets ?? false,
           hasShowers: validatedData.edition.hasShowers ?? false,
           hasAccessibility: validatedData.edition.hasAccessibility ?? false,

@@ -183,3 +183,63 @@ describe('convention d’accueil', () => {
     expect(importSchema.safeParse(validBase()).success).toBe(true)
   })
 })
+
+/**
+ * L'adresse de la convention : ABSENTE plutôt qu'inventée.
+ *
+ * C'est elle qui permet à un organisateur de revendiquer sa convention — le code de revendication
+ * y est envoyé. Une adresse fabriquée depuis le nom de domaine la lui retire (il ne reçoit jamais
+ * rien) ou la donne à qui contrôle cette boîte.
+ *
+ * Le schéma l'exigeait pourtant, alors que les deux fichiers de règles ordonnent de laisser vide
+ * quand on ne la trouve pas : un modèle OBÉISSANT produisait donc un JSON refusé, et le seul
+ * chemin qui aboutissait était celui qui inventait. La colonne est nullable en base depuis
+ * toujours, et la revendication sait déjà dire « pas d'email configuré ».
+ */
+describe('adresse de la convention', () => {
+  const avecEmail = (valeur: unknown) => {
+    const payload = validBase()
+    ;(payload.convention as Record<string, unknown>).email = valeur
+    return importSchema.safeParse(payload)
+  }
+
+  it('accepte une adresse absente, vide ou nulle', () => {
+    for (const vide of ['', null]) {
+      expect(avecEmail(vide).success, JSON.stringify(vide)).toBe(true)
+    }
+    const sansChamp = validBase()
+    delete (sansChamp.convention as Record<string, unknown>).email
+    expect(importSchema.safeParse(sansChamp).success).toBe(true)
+  })
+
+  it('accepte toujours une vraie adresse', () => {
+    expect(avecEmail('contact@convention.org').success).toBe(true)
+  })
+
+  it('refuse une adresse mal formée — le laxisme s’arrête au vide', () => {
+    // Accepter l'absence ne veut pas dire accepter n'importe quoi : une chaîne non vide doit
+    // rester une adresse, sans quoi le code de revendication partirait dans le vide.
+    for (const mauvaise of ['pas-une-adresse', 'a@', '@b.org', 'a b@c.org']) {
+      expect(avecEmail(mauvaise).success, mauvaise).toBe(false)
+    }
+  })
+})
+
+/**
+ * Le champ que le schéma laissait tomber en silence.
+ *
+ * `hasUnicycleSpace` existe en base et figure parmi les 25 services proposés à l'IA, mais manquait
+ * aux 24 du schéma. Zod n'étant pas `strict`, il l'écartait SANS un mot : le modèle détectait
+ * l'espace monocycle, et l'édition était créée sans.
+ */
+describe('caractéristiques de l’édition', () => {
+  it('accepte l’espace monocycle, comme les vingt-quatre autres', () => {
+    const payload = validBase()
+    ;(payload.edition as Record<string, unknown>).hasUnicycleSpace = true
+    const res = importSchema.safeParse(payload)
+    expect(res.success).toBe(true)
+    // Et surtout : la valeur SURVIT à l'analyse. C'est ce que le test d'acceptation seul ne dirait
+    // pas, puisque zod accepte en silence un objet dont il a retiré des clés.
+    expect(res.success && (res.data.edition as Record<string, unknown>).hasUnicycleSpace).toBe(true)
+  })
+})

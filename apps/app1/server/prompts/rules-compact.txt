@@ -1,5 +1,5 @@
 - nom=événement (pas site source)
-- email=seulement si explicitement trouvé (NE PAS INVENTER), sinon ""
+- email=seulement si explicitement trouvé (NE PAS INVENTER, ne pas le déduire du domaine), sinon "" — c'est l'adresse de revendication de la convention
 - URLs=COPIER EXACTEMENT caractère par caractère (imageUrl, ticketingUrl...), JAMAIS INVENTER
 - imageUrl=COPIER l'URL og:image EXACTE (ne pas modifier les URLs Google)
 - timezone=DÉDUIS du PAYS (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)

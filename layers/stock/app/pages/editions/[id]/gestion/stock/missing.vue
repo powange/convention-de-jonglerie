@@ -803,6 +803,27 @@ const listesDeLObjet = (id: number) => appartenances.value.get(id) ?? []
  */
 const seulementHorsListe = ref(false)
 
+/**
+ * Les filtres, par onglet.
+ *
+ * Deux jeux et non un seul, pour la même raison que les deux états de tri : on ne cherche pas la
+ * même chose selon qu'on décide d'un achat ou qu'on finit une séance de comptage. Garder un jeu
+ * commun ferait aussi disparaître des lignes en changeant d'onglet, sans que rien à l'écran dise
+ * qu'un filtre venu d'ailleurs est encore posé.
+ */
+const rechercheManquants = ref('')
+const groupesManquants = ref<OptionGroupe[]>([])
+const tagsManquants = ref<OptionTag[]>([])
+
+const rechercheACompter = ref('')
+const groupesACompter = ref<OptionGroupe[]>([])
+const tagsACompter = ref<OptionTag[]>([])
+
+// ⚠️ Ces déclarations doivent rester AU-DESSUS du `watch` qui suit. Elles vivaient plus bas, à
+// côté des états de tri : un `watch` évalue sa source dès l'exécution du `setup`, pour enregistrer
+// ses dépendances, et lisait donc des `const` pas encore initialisées. « Cannot access before
+// initialization » — le `setup` échouait entier, et la page ne s'affichait plus du tout.
+
 // Toucher à un filtre vide la sélection : ce qui est coché doit toujours être ce qu'on voit. Les
 // clés de sélection survivent à la disparition d'une ligne — c'est voulu pour le recomptage —,
 // si bien que sans cela on cocherait cinq objets, on poserait le filtre, et le bouton en verserait
@@ -908,22 +929,6 @@ const onglets = computed(() => [
  * ferait porter à l'un un tri que l'autre ne sait pas honorer — un `id` inconnu ne trie rien et
  * ne dit pas pourquoi.
  */
-/**
- * Les filtres, par onglet.
- *
- * Deux jeux et non un seul, pour la même raison que les deux états de tri : on ne cherche pas la
- * même chose selon qu'on décide d'un achat ou qu'on finit une séance de comptage. Garder un jeu
- * commun ferait aussi disparaître des lignes en changeant d'onglet, sans que rien à l'écran dise
- * qu'un filtre venu d'ailleurs est encore posé.
- */
-const rechercheManquants = ref('')
-const groupesManquants = ref<OptionGroupe[]>([])
-const tagsManquants = ref<OptionTag[]>([])
-
-const rechercheACompter = ref('')
-const groupesACompter = ref<OptionGroupe[]>([])
-const tagsACompter = ref<OptionTag[]>([])
-
 /**
  * Un filtre est-il posé ? Ce qui décide du message affiché sur un tableau vide.
  *
