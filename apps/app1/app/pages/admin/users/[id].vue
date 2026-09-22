@@ -178,6 +178,35 @@
                 >
                 <span class="font-medium">{{ formatDate(user.createdAt) }}</span>
               </div>
+
+              <!-- Santé. La gravité s'affiche en pastille colorée, comme partout ailleurs sur le
+                   site : c'est la seule information de ce bloc qu'on doit saisir d'un coup d'œil,
+                   et le mot seul — « Critique » en noir sur blanc — ne se distingue pas du
+                   reste. Le contact d'urgence ne s'affiche que s'il existe : une ligne « - » de
+                   plus sur une fiche qui en compte déjà huit dilue ce qui compte. -->
+              <div class="flex justify-between gap-4">
+                <span class="text-gray-600 dark:text-gray-400 shrink-0">
+                  {{ $t('profile.health.allergies') }}:
+                </span>
+                <span class="font-medium text-right">{{ user.allergies || '-' }}</span>
+              </div>
+
+              <div v-if="user.allergySeverity" class="flex justify-between">
+                <span class="text-gray-600 dark:text-gray-400">
+                  {{ $t('profile.health.allergy_severity') }}:
+                </span>
+                <UBadge :class="graviteClasses" variant="subtle" size="sm">
+                  <UIcon :name="graviteIcone" class="size-4 mr-1" />
+                  {{ graviteLibelle }}
+                </UBadge>
+              </div>
+
+              <div v-if="user.emergencyContactPhone" class="flex justify-between">
+                <span class="text-gray-600 dark:text-gray-400">
+                  {{ $t('profile.health.emergency_contact_phone') }}:
+                </span>
+                <span class="font-medium">{{ user.emergencyContactPhone }}</span>
+              </div>
             </div>
 
             <!-- Mode édition -->
@@ -215,6 +244,43 @@
                   {{ $t('profile.phone') }} ({{ $t('common.optional') }})
                 </label>
                 <UiPhoneInput v-model="editForm.phone" size="md" />
+              </div>
+
+              <!-- Les mêmes champs que sur le formulaire du profil, dans le même ordre et avec
+                   les mêmes composants : c'est la même information, et un administrateur qui
+                   corrige une saisie doit retrouver ce que l'intéressé avait sous les yeux. -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {{ $t('profile.health.allergies') }} ({{ $t('common.optional') }})
+                </label>
+                <UTextarea
+                  v-model="editForm.allergies"
+                  :rows="3"
+                  :maxlength="1000"
+                  :placeholder="$t('profile.health.allergies_placeholder')"
+                  class="w-full"
+                />
+              </div>
+
+              <!-- Proposée seulement quand une allergie est décrite : sans allergie, une gravité
+                   ne veut rien dire. Même règle que sur le profil. -->
+              <div v-if="editForm.allergies.trim()">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {{ $t('profile.health.allergy_severity') }}
+                </label>
+                <USelect
+                  v-model="editForm.allergySeverity"
+                  :items="severityOptions"
+                  size="md"
+                  class="w-full"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {{ $t('profile.health.emergency_contact_phone') }} ({{ $t('common.optional') }})
+                </label>
+                <UiPhoneInput v-model="editForm.emergencyContactPhone" size="md" />
               </div>
             </div>
           </div>
@@ -427,6 +493,12 @@
 </template>
 
 <script setup lang="ts">
+import {
+  getAllergySeverityBadgeClasses,
+  getAllergySeverityInfo,
+  getAllergySeveritySelectOptions,
+  isValidAllergySeverityLevel,
+} from '~/utils/allergy-severity'
 import { formatDate } from '~/utils/date'
 import { LOCALES_CONFIG, languageCodeToFlag } from '~/utils/locales'
 // Type pour l'utilisateur depuis l'API
@@ -439,6 +511,9 @@ interface UserProfile {
   pronouns?: string | null
   preferredLanguage?: string | null
   phone?: string | null
+  allergies?: string | null
+  allergySeverity?: string | null
+  emergencyContactPhone?: string | null
   profilePicture?: string | null
   isEmailVerified: boolean
   isGlobalAdmin: boolean
@@ -664,12 +739,33 @@ const showDeletionModal = ref(false)
 
 // État pour l'édition
 const isEditing = ref(false)
+/**
+ * « Non précisée » n'est pas une gravité, c'est son absence.
+ *
+ * Le schéma du serveur n'accepte que les quatre niveaux réels ou `null` : cette valeur ne vit
+ * que dans le formulaire, le temps d'offrir un choix qui revient en arrière. Même convention que
+ * sur le formulaire du profil, dont cet écran doit être le reflet.
+ */
+const SEVERITE_NON_PRECISEE = 'UNSET'
+
+// « Non précisée » d'abord : la gravité reste facultative, et il faut pouvoir revenir en arrière
+// après l'avoir renseignée une fois.
+const severityOptions = computed(() => [
+  { value: SEVERITE_NON_PRECISEE, label: t('profile.health.severity_unset') },
+  // Les libellés du helper sont des CLÉS de traduction, pas du texte : les passer tels quels
+  // afficherait « edition.volunteers.allergy_severity_light_short » à l'écran.
+  ...getAllergySeveritySelectOptions().map((o) => ({ value: o.value, label: t(o.label) })),
+])
+
 const editForm = ref({
   email: '',
   pseudo: '',
   prenom: '',
   nom: '',
   phone: '',
+  allergies: '',
+  allergySeverity: SEVERITE_NON_PRECISEE,
+  emergencyContactPhone: '',
 })
 
 // Récupération des données utilisateur
@@ -679,6 +775,24 @@ const {
   error,
   refresh,
 } = await useFetch<UserProfile>(`/api/admin/users/${userId}`)
+
+/**
+ * La gravité telle que la fiche l'affiche : pastille colorée, icône et libellé traduit.
+ *
+ * Déclarée APRÈS `user`, qu'elle lit. Un `computed` est paresseux, donc l'ordre inverse aurait
+ * fonctionné — mais c'est exactement la forme d'une zone morte temporelle, qui a déjà cassé une
+ * page de ce dépôt quand c'était un `watch` et non un `computed`. Autant ne pas laisser traîner
+ * le motif.
+ */
+const graviteInfo = computed(() => {
+  const niveau = user.value?.allergySeverity
+  return niveau && isValidAllergySeverityLevel(niveau) ? getAllergySeverityInfo(niveau) : null
+})
+const graviteClasses = computed(() =>
+  graviteInfo.value ? getAllergySeverityBadgeClasses(graviteInfo.value.value) : ''
+)
+const graviteIcone = computed(() => graviteInfo.value?.icon ?? '')
+const graviteLibelle = computed(() => (graviteInfo.value ? t(graviteInfo.value.label) : ''))
 
 type RoleSurEdition =
   | { type: 'creator' | 'organizer' | 'attendee' | 'artist' }
@@ -826,6 +940,9 @@ const startEditing = () => {
     prenom: user.value.prenom,
     nom: user.value.nom,
     phone: user.value.phone || '',
+    allergies: user.value.allergies || '',
+    allergySeverity: user.value.allergySeverity || SEVERITE_NON_PRECISEE,
+    emergencyContactPhone: user.value.emergencyContactPhone || '',
   }
 
   isEditing.value = true
@@ -840,6 +957,9 @@ const cancelEditing = () => {
     prenom: '',
     nom: '',
     phone: '',
+    allergies: '',
+    allergySeverity: SEVERITE_NON_PRECISEE,
+    emergencyContactPhone: '',
   }
 }
 
@@ -847,7 +967,18 @@ const { execute: executeSaveChanges, loading: saving } = useApiAction(
   () => `/api/admin/users/${userId}`,
   {
     method: 'PUT',
-    body: () => editForm.value,
+    body: () => ({
+      ...editForm.value,
+      allergies: editForm.value.allergies.trim() || null,
+      // Une gravité sans allergie décrite n'a pas de sens : on la remet à néant plutôt que de
+      // laisser traîner une valeur orpheline si la description est effacée. Même règle que sur
+      // le formulaire du profil.
+      allergySeverity:
+        editForm.value.allergies.trim() && editForm.value.allergySeverity !== SEVERITE_NON_PRECISEE
+          ? editForm.value.allergySeverity
+          : null,
+      emergencyContactPhone: editForm.value.emergencyContactPhone.trim() || null,
+    }),
     successMessage: {
       title: t('common.success'),
       description: 'Informations utilisateur mises à jour',

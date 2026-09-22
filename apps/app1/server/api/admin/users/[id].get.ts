@@ -19,6 +19,10 @@ export default wrapApiHandler(
         pronouns: true,
         preferredLanguage: true,
         phone: true,
+        // Santé : ce que la fiche affiche et ce que son formulaire modifie.
+        allergies: true,
+        allergySeverity: true,
+        emergencyContactPhone: true,
         authProvider: true,
         isEmailVerified: true,
         isGlobalAdmin: true,
