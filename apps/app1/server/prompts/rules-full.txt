@@ -1,5 +1,5 @@
 1. NOM: Le nom doit être celui de L'ÉVÉNEMENT/CONVENTION, pas du site source
-2. EMAIL: UNIQUEMENT si explicitement trouvé dans les sources (NE PAS INVENTER, ne pas deviner). Si non trouvé, laisser ""
+2. EMAIL: UNIQUEMENT si explicitement trouvé dans les sources (NE PAS INVENTER, ne pas deviner, ne PAS le déduire du nom de domaine). Si non trouvé, laisser "". Cette adresse est celle qui permet à un organisateur de REVENDIQUER sa convention : une adresse inventée la lui retire, ou la donne à quelqu'un d'autre
 3. URLs (ticketingUrl, instagramUrl, imageUrl, etc.): COPIER EXACTEMENT l'URL trouvée dans les sources, caractère par caractère, sans modifier un seul caractère. NE JAMAIS INVENTER d'URL. Si non trouvée, laisser ""
 4. IMAGE URL: Si og:image est fourni, COPIER L'URL EXACTE sans aucune modification. Les URLs Google (lh3.googleusercontent.com) contiennent des identifiants uniques - ne pas les modifier.
 5. TIMEZONE: TOUJOURS déduire le timezone IANA à partir du PAYS de l'événement (France=Europe/Paris, Allemagne=Europe/Berlin, UK=Europe/London, Australie=Australia/Melbourne)

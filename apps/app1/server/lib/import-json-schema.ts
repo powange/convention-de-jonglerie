@@ -54,7 +54,7 @@ CHAMPS OPTIONNELS: ${OPTIONAL_FIELDS}`
 export const JSON_FORMAT_FOR_COMPLETION = `{
   "convention": {
     "name": "OBLIGATOIRE - Nom de l'événement",
-    "email": "OBLIGATOIRE - Email de contact",
+    "email": "Email de contact — UNIQUEMENT s'il est écrit dans les sources, jamais déduit du domaine. Laisser vide sinon",
     "description": "optionnel"
   },
   "edition": {
@@ -85,9 +85,13 @@ export const JSON_FORMAT_FOR_COMPLETION = `{
  * Prompt pour compléter un JSON pré-rempli (Facebook + autres sources)
  * Utilisé par ED et EI quand des données Facebook sont disponibles
  */
-export function getPrefilledJsonPrompt(): string {
+export function getPrefilledJsonPrompt(conventionConnue = false): string {
   return loadPrompt('complete-prefilled', {
-    JSON_FORMAT_FOR_COMPLETION,
+    // Le chemin pré-rempli — celui qu'emprunte toute source Facebook — réclamait encore le bloc
+    // convention malgré une convention déjà choisie : le drapeau ne l'avait pas atteint.
+    JSON_FORMAT_FOR_COMPLETION: conventionConnue
+      ? JSON_FORMAT_FOR_COMPLETION.replace(/\s*"convention": \{[^}]*\},\n/, '\n')
+      : JSON_FORMAT_FOR_COMPLETION,
   })
 }
 
@@ -290,7 +294,7 @@ export function generateAgentSystemPrompt(conventionConnue = false): string {
     RULES_FULL: loadPrompt('rules-full'),
     CHAMPS_CONVENTION: conventionConnue
       ? "La convention d'accueil est DÉJÀ choisie : ne produis PAS de bloc « convention »."
-      : '- convention.name: Nom de la convention\n- convention.email: Email de contact (si non trouvé, utiliser contact@domaine-du-site.com)',
+      : "- convention.name: Nom de la convention\n- convention.email: Email de contact, UNIQUEMENT s'il est écrit noir sur blanc dans les sources. N'en DÉDUIS jamais un depuis le nom de domaine. Si tu n'en trouves pas, laisse \"\".",
   })
 }
 

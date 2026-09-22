@@ -407,7 +407,8 @@ export async function generateImportJson(
       aiProvider,
       prefilledJson,
       combinedOtherContent,
-      dynamicMaxContent
+      dynamicMaxContent,
+      conventionConnue
     )
   } else {
     // Cas 3: Pas de Facebook - extraction complète par l'IA
@@ -954,7 +955,8 @@ async function callAIToCompleteJson(
   aiProvider: string,
   prefilledJson: FacebookImportJson,
   additionalContent: string,
-  maxContent: number
+  maxContent: number,
+  conventionConnue = false
 ): Promise<string> {
   // Retirer les champs Facebook fiables du JSON envoyé à l'IA pour économiser des tokens
   // Ces champs seront réinjectés dans le post-traitement (description, dates, timezone)
@@ -994,20 +996,23 @@ async function callAIToCompleteJson(
       // Le délai réglé dans /admin/ai-config était ignoré ici : seule la variable
       // d'environnement s'appliquait, et l'augmenter depuis l'écran ne changeait rien.
       config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST,
-      config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
+      config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT,
+      conventionConnue
     )
   } else if (aiProvider === 'anthropic' && config.anthropicApiKey) {
     return await callAnthropicComplete(
       config.anthropicApiKey,
       userPrompt,
-      config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT
+      config.llmMaxTokens ?? LIMITE_JETONS_PAR_DEFAUT,
+      conventionConnue
     )
   } else if (aiProvider === 'ollama') {
     return await callOllamaComplete(
       config.ollamaBaseUrl || 'http://localhost:11434',
       config.ollamaModel || 'llama3',
       userPrompt,
-      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST
+      config.llmTimeoutMs ?? AI_TIMEOUTS.LLM_REQUEST,
+      conventionConnue
     )
   } else {
     throw new Error(`Provider IA non configuré ou non supporté: ${aiProvider}`)
@@ -1024,7 +1029,8 @@ async function callLMStudioComplete(
   timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST,
   // Réglable depuis /admin/ai-config : un modèle qui raisonne avant de répondre dépense ce
   // budget en réflexion et se fait couper avant d'écrire sa réponse.
-  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT
+  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT,
+  conventionConnue = false
 ): Promise<string> {
   // Limiter le contenu selon le context length du modèle
   const truncatedPrompt =
@@ -1052,7 +1058,7 @@ async function callLMStudioComplete(
         body: JSON.stringify({
           model: serveur.model || 'auto',
           messages: [
-            { role: 'system', content: getPrefilledJsonPrompt() },
+            { role: 'system', content: getPrefilledJsonPrompt(conventionConnue) },
             { role: 'user', content: truncatedPrompt },
           ],
           temperature: 0.3,
@@ -1084,7 +1090,8 @@ async function callLMStudioComplete(
 async function callAnthropicComplete(
   apiKey: string,
   userPrompt: string,
-  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT
+  maxTokens: number = LIMITE_JETONS_PAR_DEFAUT,
+  conventionConnue = false
 ): Promise<string> {
   const { default: Anthropic } = await import('@anthropic-ai/sdk')
   const client = new Anthropic({ apiKey, timeout: AI_TIMEOUTS.LLM_REQUEST })
@@ -1095,7 +1102,7 @@ async function callAnthropicComplete(
   const message = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: maxTokens,
-    system: getPrefilledJsonPrompt(),
+    system: getPrefilledJsonPrompt(conventionConnue),
     messages: [{ role: 'user', content: userPrompt }],
   })
 
@@ -1121,7 +1128,8 @@ async function callOllamaComplete(
   baseUrl: string,
   model: string,
   userPrompt: string,
-  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST
+  timeoutMs: number = AI_TIMEOUTS.LLM_REQUEST,
+  conventionConnue = false
 ): Promise<string> {
   // `fetch` nu, sans délai : un modèle qui ne répond jamais laissait la requête suspendue
   // indéfiniment, sans message ni fin.
@@ -1132,7 +1140,7 @@ async function callOllamaComplete(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
-        prompt: `${getPrefilledJsonPrompt()}\n\n${userPrompt}`,
+        prompt: `${getPrefilledJsonPrompt(conventionConnue)}\n\n${userPrompt}`,
         stream: false,
       }),
     },
