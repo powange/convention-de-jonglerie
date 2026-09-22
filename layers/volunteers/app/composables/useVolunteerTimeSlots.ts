@@ -2,8 +2,18 @@ export interface VolunteerTimeSlotAPI {
   id: string
   title: string
   description?: string
-  start: string // ISO string
-  end: string // ISO string
+  /**
+   * `startDateTime` / `endDateTime`, comme partout ailleurs : ce sont les noms que le point d'API
+   * rend (`formaterCreneau`), et ceux de la base.
+   *
+   * Cette interface annonçait `start` / `end` — les noms de FullCalendar, qui ne survivent que
+   * dans les ÉVÉNEMENTS qu'on lui remet. Elle décrivait donc une forme que rien ne produit, et le
+   * compilateur validait d'autant mieux les lectures qui ne trouveraient jamais rien : la page de
+   * planning y lisait `.start`, obtenait `undefined`, et ouvrait la modification d'un créneau avec
+   * ses deux champs d'horaire vides — bouton « Enregistrer » désactivé, créneau non modifiable.
+   */
+  startDateTime: string // ISO string
+  endDateTime: string // ISO string
   teamId?: string
   team?: {
     id: string
