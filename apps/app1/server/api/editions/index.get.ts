@@ -3,7 +3,7 @@ import type { GetEditionsResponse } from '#server/types/api-responses'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { getCountryVariants } from '#server/utils/countries'
 import { editionListSelect } from '#server/utils/prisma-select-helpers'
-import { filtreStatutEdition, type StatutEdition } from '#server/utils/visibilite-edition'
+import { filtreStatutEdition, type StatutEdition } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler<GetEditionsResponse>(
   async (event) => {

@@ -3,7 +3,7 @@ import { optionalAuth } from '#server/utils/auth-utils'
 import { checkAdminMode } from '#server/utils/organizer-management'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { visibiliteDuBenevolat } from '#server/utils/visibilite-benevoles'
-import { editionVisiblePubliquement } from '#server/utils/visibilite-edition'
+import { editionVisiblePubliquement } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler(
   async (event) => {

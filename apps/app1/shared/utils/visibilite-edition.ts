@@ -11,6 +11,11 @@
  * numéro. Cinq copies ne divergent pas tant qu'on n'y touche pas ; c'est le sixième appel, écrit
  * sans les copies sous les yeux, qui coûte.
  *
+ * Il vit dans `shared/` et non dans `server/` parce que la règle se pose aussi côté navigateur :
+ * la fiche publique d'une édition demandait ses tarifs à la route publique même quand l'édition
+ * est `OFFLINE` — ce que cette route refuse, à raison. Une septième copie de la règle dans la
+ * page aurait été exactement ce que ce fichier existe pour éviter.
+ *
  * ⚠️ Ce fichier ne doit rien importer : il est chargé tel quel par les tests unitaires, hors Nuxt.
  */
 
