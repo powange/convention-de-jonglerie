@@ -82,77 +82,93 @@ const dateDImport = z
   .refine(estUneDateReelle, 'Cette date n’existe pas')
 
 // Schéma de validation pour l'import (exporté pour les tests de régression de validation)
-export const importSchema = z.object({
-  convention: z.object({
-    name: z.string().min(1),
-    email: z.string().email(),
-    description: z.string().nullable().optional(),
-    logo: z.string().nullable().optional(),
-  }),
-  edition: z.object({
-    // Nom d'édition facultatif : null/omis OU chaîne vide acceptés. Le handler convertit toute
-    // valeur vide en null (`name || null`) et l'affichage retombe sur le nom de la convention
-    // (getEditionDisplayName). Pas de min(1) ici, contrairement à convention.name (le fallback).
-    name: z.string().nullable().optional(),
-    description: z.string().nullable().optional(),
-    startDate: dateDImport,
-    endDate: dateDImport,
-    addressLine1: z.string().min(1),
-    addressLine2: z.string().nullable().optional(),
-    city: z.string().min(1),
-    region: z.string().nullable().optional(),
-    // Fuseau horaire IANA (ex: "Europe/Paris"). Refusé ici s'il est inconnu, plutôt que de laisser
-    // l'import retomber sur UTC en silence : c'est ce repli qui écrivait des dates fausses.
-    timezone: z
-      .string()
-      .refine((tz) => fuseauUtilisable(tz) !== undefined, 'Fuseau horaire inconnu')
-      .nullable()
+export const importSchema = z
+  .object({
+    /**
+     * La convention d'accueil, quand on importe dans une convention qui EXISTE déjà.
+     *
+     * Le bloc `convention` devient alors inutile — c'est tout l'intérêt : l'IA n'a plus à deviner
+     * le nom ni l'adresse d'une convention qu'on lui désigne. S'il est présent malgré tout (JSON
+     * collé à la main, ou produit avant le choix), il est IGNORÉ et la réponse le signale. On ne
+     * réécrit pas une convention existante depuis un import d'édition.
+     */
+    conventionId: z.number().int().positive().optional(),
+    convention: z
+      .object({
+        name: z.string().min(1),
+        email: z.string().email(),
+        description: z.string().nullable().optional(),
+        logo: z.string().nullable().optional(),
+      })
       .optional(),
-    country: z.string().min(1),
-    postalCode: z.string().min(1),
-    latitude: z.number().nullable().optional(),
-    longitude: z.number().nullable().optional(),
-    ticketingUrl: z.string().url().or(z.literal('')).nullable().optional(),
-    facebookUrl: z.string().url().or(z.literal('')).nullable().optional(),
-    instagramUrl: z.string().url().or(z.literal('')).nullable().optional(),
-    officialWebsiteUrl: z.string().url().or(z.literal('')).nullable().optional(),
-    jugglingEdgeUrl: z.string().url().or(z.literal('')).nullable().optional(),
-    imageUrl: z.string().nullable().optional(),
-    // Lien vers une page qui décrit le programme. Le programme lui-même se compose créneau par
-    // créneau sur la frise, et non plus dans un bloc de texte.
-    programUrl: z.string().url().or(z.literal('')).nullable().optional(),
-    // Caractéristiques booléennes
-    hasFoodTrucks: z.boolean().optional(),
-    hasKidsZone: z.boolean().optional(),
-    acceptsPets: z.boolean().optional(),
-    hasTentCamping: z.boolean().optional(),
-    hasTruckCamping: z.boolean().optional(),
-    hasGym: z.boolean().optional(),
-    hasFamilyCamping: z.boolean().optional(),
-    hasSleepingRoom: z.boolean().optional(),
-    hasFireSpace: z.boolean().optional(),
-    hasGala: z.boolean().optional(),
-    hasOpenStage: z.boolean().optional(),
-    hasConcert: z.boolean().optional(),
-    hasCantine: z.boolean().optional(),
-    hasAerialSpace: z.boolean().optional(),
-    hasSlacklineSpace: z.boolean().optional(),
-    hasToilets: z.boolean().optional(),
-    hasShowers: z.boolean().optional(),
-    hasAccessibility: z.boolean().optional(),
-    hasWorkshops: z.boolean().optional(),
-    hasCashPayment: z.boolean().optional(),
-    hasCreditCardPayment: z.boolean().optional(),
-    hasAfjTokenPayment: z.boolean().optional(),
-    hasATM: z.boolean().optional(),
-    hasLongShow: z.boolean().optional(),
-    status: z.enum(['PLANNED', 'PUBLISHED', 'OFFLINE', 'CANCELLED']).optional(),
-    // Champs bénévoles
-    volunteersOpen: z.boolean().optional(),
-    volunteersDescription: z.string().nullable().optional(),
-    volunteersExternalUrl: z.string().url().or(z.literal('')).nullable().optional(),
-  }),
-})
+    edition: z.object({
+      // Nom d'édition facultatif : null/omis OU chaîne vide acceptés. Le handler convertit toute
+      // valeur vide en null (`name || null`) et l'affichage retombe sur le nom de la convention
+      // (getEditionDisplayName). Pas de min(1) ici, contrairement à convention.name (le fallback).
+      name: z.string().nullable().optional(),
+      description: z.string().nullable().optional(),
+      startDate: dateDImport,
+      endDate: dateDImport,
+      addressLine1: z.string().min(1),
+      addressLine2: z.string().nullable().optional(),
+      city: z.string().min(1),
+      region: z.string().nullable().optional(),
+      // Fuseau horaire IANA (ex: "Europe/Paris"). Refusé ici s'il est inconnu, plutôt que de laisser
+      // l'import retomber sur UTC en silence : c'est ce repli qui écrivait des dates fausses.
+      timezone: z
+        .string()
+        .refine((tz) => fuseauUtilisable(tz) !== undefined, 'Fuseau horaire inconnu')
+        .nullable()
+        .optional(),
+      country: z.string().min(1),
+      postalCode: z.string().min(1),
+      latitude: z.number().nullable().optional(),
+      longitude: z.number().nullable().optional(),
+      ticketingUrl: z.string().url().or(z.literal('')).nullable().optional(),
+      facebookUrl: z.string().url().or(z.literal('')).nullable().optional(),
+      instagramUrl: z.string().url().or(z.literal('')).nullable().optional(),
+      officialWebsiteUrl: z.string().url().or(z.literal('')).nullable().optional(),
+      jugglingEdgeUrl: z.string().url().or(z.literal('')).nullable().optional(),
+      imageUrl: z.string().nullable().optional(),
+      // Lien vers une page qui décrit le programme. Le programme lui-même se compose créneau par
+      // créneau sur la frise, et non plus dans un bloc de texte.
+      programUrl: z.string().url().or(z.literal('')).nullable().optional(),
+      // Caractéristiques booléennes
+      hasFoodTrucks: z.boolean().optional(),
+      hasKidsZone: z.boolean().optional(),
+      acceptsPets: z.boolean().optional(),
+      hasTentCamping: z.boolean().optional(),
+      hasTruckCamping: z.boolean().optional(),
+      hasGym: z.boolean().optional(),
+      hasFamilyCamping: z.boolean().optional(),
+      hasSleepingRoom: z.boolean().optional(),
+      hasFireSpace: z.boolean().optional(),
+      hasGala: z.boolean().optional(),
+      hasOpenStage: z.boolean().optional(),
+      hasConcert: z.boolean().optional(),
+      hasCantine: z.boolean().optional(),
+      hasAerialSpace: z.boolean().optional(),
+      hasSlacklineSpace: z.boolean().optional(),
+      hasToilets: z.boolean().optional(),
+      hasShowers: z.boolean().optional(),
+      hasAccessibility: z.boolean().optional(),
+      hasWorkshops: z.boolean().optional(),
+      hasCashPayment: z.boolean().optional(),
+      hasCreditCardPayment: z.boolean().optional(),
+      hasAfjTokenPayment: z.boolean().optional(),
+      hasATM: z.boolean().optional(),
+      hasLongShow: z.boolean().optional(),
+      status: z.enum(['PLANNED', 'PUBLISHED', 'OFFLINE', 'CANCELLED']).optional(),
+      // Champs bénévoles
+      volunteersOpen: z.boolean().optional(),
+      volunteersDescription: z.string().nullable().optional(),
+      volunteersExternalUrl: z.string().url().or(z.literal('')).nullable().optional(),
+    }),
+  })
+  .refine((d) => d.conventionId !== undefined || d.convention !== undefined, {
+    message:
+      'Il faut choisir une convention d’accueil, ou fournir un bloc « convention » dans le JSON.',
+  })
 
 export default wrapApiHandler(
   async (event) => {
@@ -163,14 +179,34 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = importSchema.parse(body)
 
+    /**
+     * Le bloc `convention` du JSON ne sert plus à rien dès qu'une convention d'accueil est
+     * désignée. On le signale plutôt que de le laisser croire utilisé : quelqu'un a pu y saisir
+     * un nom, et découvrir après coup qu'il n'a servi à rien est pire que de l'apprendre tout de
+     * suite.
+     */
+    const blocConventionIgnore =
+      validatedData.conventionId !== undefined && validatedData.convention !== undefined
+
     // Les LECTURES d'abord, hors transaction : elles ne modifient rien, et les tenir dedans
     // garderait un verrou pendant qu'on interroge la base pour rien.
-    const existingConvention = await prisma.convention.findFirst({
-      where: {
-        name: validatedData.convention.name,
-        email: validatedData.convention.email,
-      },
-    })
+    const existingConvention = validatedData.conventionId
+      ? await prisma.convention.findUnique({ where: { id: validatedData.conventionId } })
+      : await prisma.convention.findFirst({
+          where: {
+            name: validatedData.convention!.name,
+            email: validatedData.convention!.email,
+          },
+        })
+
+    // Une convention d'accueil désignée mais introuvable est une erreur de l'appelant, pas une
+    // invitation à en créer une : on refuse plutôt que d'inventer une convention homonyme.
+    if (validatedData.conventionId && !existingConvention) {
+      throw createError({
+        status: 404,
+        message: `Convention introuvable : ${validatedData.conventionId}`,
+      })
+    }
 
     // Parser les dates avec le timezone
     const timezone = validatedData.edition.timezone
@@ -214,15 +250,16 @@ export default wrapApiHandler(
      * Son échec laisse l'édition sans image, ce qui est le comportement voulu et déjà signalé.
      */
     const { convention, edition } = await prisma.$transaction(async (tx) => {
-      // Créer la convention si elle n'existe pas (sans authorId pour qu'elle soit orpheline)
+      // Créer la convention si elle n'existe pas (sans authorId pour qu'elle soit orpheline).
+      // Le `!` tient au refine du schéma : sans `conventionId`, le bloc `convention` est exigé.
       const convention =
         existingConvention ??
         (await tx.convention.create({
           data: {
-            name: validatedData.convention.name,
-            email: validatedData.convention.email,
-            description: validatedData.convention.description,
-            logo: validatedData.convention.logo,
+            name: validatedData.convention!.name,
+            email: validatedData.convention!.email,
+            description: validatedData.convention!.description,
+            logo: validatedData.convention!.logo,
             // Pas d'authorId - convention orpheline
           },
         }))
@@ -345,6 +382,8 @@ export default wrapApiHandler(
         editionId: edition.id,
         imageDownloaded: imageDownloadResult?.success ?? false,
         imageError: imageDownloadResult?.error,
+        // Pour que l'écran puisse dire que le bloc `convention` du JSON n'a pas servi.
+        conventionBlockIgnored: blocConventionIgnore,
       },
       'Import réussi'
     )

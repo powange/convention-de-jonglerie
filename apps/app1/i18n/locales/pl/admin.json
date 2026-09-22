@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Formularz",
       "view_mode_raw": "Surowy JSON",
-      "ticket_tiers": "Cennik biletów"
+      "ticket_tiers": "Cennik biletów",
+      "convention_block_ignored": "Blok „convention” z JSON-a nie został użyty: edycja została przypisana do wybranego konwentu.",
+      "target_convention": "Konwent goszczący",
+      "target_convention_hint": "Opcjonalne. Po wybraniu edycja zostanie do niego przypisana, a AI nie będzie musiała szukać konwentu. Pozostawione puste — konwent zostanie utworzony z JSON-a.",
+      "target_convention_new": "Nowy konwent, z JSON-a"
     },
     "inactive": "Nieaktywny",
     "invalidate_email": "Unieważnij e-mail",

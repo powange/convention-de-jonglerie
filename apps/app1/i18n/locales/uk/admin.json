@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Форма",
       "view_mode_raw": "Необроблений JSON",
-      "ticket_tiers": "Ціни на квитки"
+      "ticket_tiers": "Ціни на квитки",
+      "convention_block_ignored": "Блок «convention» із JSON не використано: випуск прив’язано до обраного конвенту.",
+      "target_convention": "Приймаючий конвент",
+      "target_convention_hint": "Необов’язково. Якщо обрано, випуск буде прив’язано до нього, і ШІ не доведеться шукати конвент. Якщо залишити порожнім, конвент створюється з JSON.",
+      "target_convention_new": "Новий конвент, із JSON"
     },
     "inactive": "Неактивний",
     "invalidate_email": "Анулювати електронну пошту",

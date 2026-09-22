@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Formular",
       "view_mode_raw": "Rohes JSON",
-      "ticket_tiers": "Ticketpreise"
+      "ticket_tiers": "Ticketpreise",
+      "convention_block_ignored": "Der Block „convention“ des JSON wurde nicht verwendet: Die Ausgabe wurde der gewählten Convention zugeordnet.",
+      "target_convention": "Aufnehmende Convention",
+      "target_convention_hint": "Optional. Bei Auswahl wird die Ausgabe ihr zugeordnet und die KI muss die Convention nicht suchen. Leer gelassen, wird die Convention aus dem JSON erstellt.",
+      "target_convention_new": "Neue Convention, aus dem JSON"
     },
     "inactive": "Inaktiv",
     "invalidate_email": "E-Mail ungültig machen",

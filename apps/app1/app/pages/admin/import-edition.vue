@@ -37,6 +37,25 @@
           {{ $t('admin.import.generate_description') }}
         </p>
 
+        <!-- La convention d'accueil se choisit AVANT de générer : quand elle est connue, l'IA
+             n'a plus à deviner son nom ni son adresse de courriel, et ne produit que l'édition. -->
+        <UFormField
+          :label="$t('admin.import.target_convention')"
+          :hint="$t('admin.import.target_convention_hint')"
+        >
+          <USelectMenu
+            v-model="conventionCibleId"
+            :items="conventionItems"
+            value-key="value"
+            :loading="conventionsLoading"
+            icon="i-heroicons-building-library"
+            :placeholder="$t('admin.import.target_convention_new')"
+            :search-input="{ placeholder: $t('common.search') }"
+            :clear="true"
+            class="w-full max-w-xl"
+          />
+        </UFormField>
+
         <UFormField :label="$t('admin.import.urls_input')" :hint="$t('admin.import.urls_hint')">
           <UTextarea
             v-model="urlsInput"
@@ -336,6 +355,12 @@
             <template #description>
               <div class="mt-2">
                 <p>{{ $t('admin.import.import_success_message') }}</p>
+                <!-- Le dire plutôt que de le taire : quelqu'un a pu saisir un nom de convention
+                     dans le JSON, et découvrir après coup qu'il n'a servi à rien est pire que de
+                     l'apprendre tout de suite. -->
+                <p v-if="importResult.conventionBlockIgnored" class="mt-2 text-sm">
+                  {{ $t('admin.import.convention_block_ignored') }}
+                </p>
                 <div class="mt-3 flex gap-2">
                   <UButton
                     color="neutral"
@@ -430,6 +455,40 @@ const jsonInput = ref('')
 const jsonCopied = ref(false)
 const validationResult = ref<any>(null)
 const importResult = ref<any>(null)
+
+/**
+ * La convention dans laquelle importer l'édition.
+ *
+ * `null` garde le comportement d'origine : la convention est créée depuis le bloc `convention` du
+ * JSON, ou retrouvée par son nom et son adresse. Choisie, elle dispense l'IA de la chercher.
+ */
+const conventionCibleId = ref<number | null>(null)
+const conventionsLoading = ref(false)
+const conventions = ref<{ id: number; name: string }[]>([])
+
+const conventionItems = computed(() =>
+  conventions.value.map((c) => ({ label: c.name, value: c.id }))
+)
+
+/**
+ * Le catalogue des conventions, chargé une fois à l'ouverture.
+ *
+ * Un échec n'empêche pas d'importer : le sélecteur reste vide, et le chemin d'origine — créer la
+ * convention depuis le JSON — fonctionne toujours. C'est une commodité, pas un passage obligé.
+ */
+onMounted(async () => {
+  conventionsLoading.value = true
+  try {
+    const reponse = await $fetch<{ conventions?: { id: number; name: string }[] }>(
+      '/api/admin/conventions'
+    )
+    conventions.value = (reponse?.conventions ?? []).map((c) => ({ id: c.id, name: c.name }))
+  } catch (erreur) {
+    console.error('[import-edition] Chargement des conventions impossible :', erreur)
+  } finally {
+    conventionsLoading.value = false
+  }
+})
 
 // État pour la détection des doublons
 const checkingDuplicates = ref(false)
@@ -591,8 +650,11 @@ const validateJson = (input: string): any => {
     }
   }
 
-  // Vérifier la structure
-  if (!data.convention) {
+  // Vérifier la structure. Le bloc convention n'est exigé que si aucune convention d'accueil
+  // n'est choisie — c'est elle qui le remplace, et le serveur applique la même règle.
+  if (conventionCibleId.value) {
+    // Rien à vérifier : un bloc présent sera ignoré, et l'écran le dira après l'import.
+  } else if (!data.convention) {
     errors.push(t('admin.import.missing_convention'))
   } else {
     // Vérifier les champs requis de la convention
@@ -689,13 +751,22 @@ const { execute: executeImport, loading: importing } = useApiAction<
   { editionId: string; conventionId: string }
 >('/api/admin/import-edition', {
   method: 'POST',
-  body: () => validationResult.value.data,
+  body: () => ({
+    ...validationResult.value.data,
+    // Absent quand aucune convention n'est choisie : le serveur retombe alors sur le bloc du JSON.
+    ...(conventionCibleId.value ? { conventionId: conventionCibleId.value } : {}),
+  }),
   silent: true,
-  onSuccess: (response: { editionId: string; conventionId: string }) => {
+  onSuccess: (response: {
+    editionId: string
+    conventionId: string
+    conventionBlockIgnored?: boolean
+  }) => {
     importResult.value = {
       success: true,
       editionId: response.editionId,
       conventionId: response.conventionId,
+      conventionBlockIgnored: response.conventionBlockIgnored,
     }
 
     toast.add({
@@ -817,7 +888,9 @@ const generateFromUrls = async () => {
   const previewedImage = getPreviewedImageUrl()
 
   // Lancer la génération via le composable
-  const result = await generate(urlsInput.value, previewedImage)
+  const result = await generate(urlsInput.value, previewedImage, undefined, {
+    conventionConnue: Boolean(conventionCibleId.value),
+  })
 
   if (result) {
     // Mettre le JSON généré dans le champ d'input et le formater

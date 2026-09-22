@@ -141,3 +141,45 @@ describe('fuseau horaire de l’import', () => {
     )
   })
 })
+
+/**
+ * Importer dans une convention qui existe déjà.
+ *
+ * Le bloc `convention` n'a alors plus lieu d'être : c'est tout l'intérêt du choix, puisque l'IA
+ * n'a plus à deviner un nom ni à inventer une adresse de courriel — ce que le prompt l'invitait
+ * explicitement à faire (« si non trouvé, utiliser contact@domaine-du-site.com »).
+ */
+describe('convention d’accueil', () => {
+  const sansConvention = () => {
+    const payload = validBase() as Record<string, unknown>
+    delete payload.convention
+    return payload
+  }
+
+  it('accepte un identifiant de convention SANS bloc convention', () => {
+    expect(importSchema.safeParse({ ...sansConvention(), conventionId: 7 }).success).toBe(true)
+  })
+
+  it('refuse un JSON qui n’a NI convention d’accueil NI bloc convention', () => {
+    // Sans l'un des deux, on ne sait pas où rattacher l'édition : mieux vaut le dire à la saisie
+    // que de créer une convention vide.
+    expect(importSchema.safeParse(sansConvention()).success).toBe(false)
+  })
+
+  it('accepte les deux à la fois — le bloc sera ignoré, pas refusé', () => {
+    // Décision du 22/09 : un JSON parfaitement importable ne doit pas échouer pour une raison de
+    // forme. Le handler ignore le bloc et le signale dans sa réponse.
+    expect(importSchema.safeParse({ ...validBase(), conventionId: 7 }).success).toBe(true)
+  })
+
+  it('refuse un identifiant qui n’en est pas un', () => {
+    for (const mauvais of [0, -3, 1.5, '7']) {
+      const res = importSchema.safeParse({ ...sansConvention(), conventionId: mauvais })
+      expect(res.success, String(mauvais)).toBe(false)
+    }
+  })
+
+  it('garde le chemin d’origine : un bloc convention seul suffit toujours', () => {
+    expect(importSchema.safeParse(validBase()).success).toBe(true)
+  })
+})

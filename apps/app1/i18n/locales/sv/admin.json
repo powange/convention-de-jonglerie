@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Formulär",
       "view_mode_raw": "Rå JSON",
-      "ticket_tiers": "Biljettpriser"
+      "ticket_tiers": "Biljettpriser",
+      "convention_block_ignored": "JSON-filens ”convention”-block användes inte: upplagan kopplades till det valda konventet.",
+      "target_convention": "Värdkonvent",
+      "target_convention_hint": "Valfritt. Om det väljs kopplas upplagan dit och AI:n behöver inte leta upp konventet. Lämnas det tomt skapas konventet utifrån JSON-filen.",
+      "target_convention_new": "Nytt konvent, utifrån JSON-filen"
     },
     "inactive": "Inaktiv",
     "invalidate_email": "Ogiltigförklara e-post",

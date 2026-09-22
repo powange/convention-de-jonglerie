@@ -514,7 +514,11 @@
       },
       "view_mode_form": "Formular",
       "view_mode_raw": "Rå JSON",
-      "ticket_tiers": "Billetpriser"
+      "ticket_tiers": "Billetpriser",
+      "convention_block_ignored": "JSON'ens »convention«-blok blev ikke brugt: udgaven blev knyttet til den valgte konvention.",
+      "target_convention": "Værtskonvention",
+      "target_convention_hint": "Valgfrit. Hvis den vælges, knyttes udgaven til den, og AI'en behøver ikke at finde konventionen. Hvis feltet er tomt, oprettes konventionen ud fra JSON'en.",
+      "target_convention_new": "Ny konvention, ud fra JSON'en"
     },
     "inactive": "Inaktiv",
     "invalidate_email": "Ugyldiggør e-mail",
