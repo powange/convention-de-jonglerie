@@ -605,6 +605,8 @@ import type { Edition } from '~/types'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { markdownToHtml } from '~/utils/markdown'
 
+import { editionVisiblePubliquement } from '~~/shared/utils/visibilite-edition'
+
 const { formatDateTimeRange } = useDateFormat()
 
 const route = useRoute()
@@ -659,10 +661,17 @@ const {
 } = await useFetch<Edition>(`/api/editions/${editionId}`)
 
 // Charger les tiers actifs publics pour le Schema.org (sans authentification requise)
+//
+// `immediate` et non un appel inconditionnel : cette page est accessible à un organisateur pour
+// SES éditions `OFFLINE`, que la route des tarifs — publique, et à juste titre stricte — refuse
+// par un 404. L'appel n'échouait donc pas par accident, il demandait à une route publique ce
+// qu'elle est faite pour taire. Et il n'y a rien à y gagner : ces tarifs ne servent qu'au
+// Schema.org, c'est-à-dire aux moteurs de recherche, qui ne voient pas une édition cachée.
 const { data: tiers } = await useFetch<any[]>(`/api/editions/${editionId}/ticketing/tiers/public`, {
   // Charger côté serveur pour le SEO
   server: true,
   lazy: true,
+  immediate: editionVisiblePubliquement(edition.value?.status),
 })
 
 // Gestion des erreurs

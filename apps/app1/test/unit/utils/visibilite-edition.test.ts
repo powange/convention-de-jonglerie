@@ -5,7 +5,7 @@ import {
   filtreStatutEdition,
   STATUTS_VISIBLES_PUBLIQUEMENT,
   type StatutEdition,
-} from '../../../server/utils/visibilite-edition'
+} from '../../../shared/utils/visibilite-edition'
 
 /** Les quatre valeurs de l'enum Prisma `EditionStatus`, dans l'ordre où le schéma les déclare. */
 const TOUS: StatutEdition[] = ['PLANNED', 'PUBLISHED', 'OFFLINE', 'CANCELLED']
