@@ -2,7 +2,7 @@ import type { GenerateImportResult } from '../generate-import-json.post'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { getTask } from '#server/utils/async-tasks'
+import { getTask, perdueAuRedemarrage } from '#server/utils/async-tasks'
 
 /**
  * GET /api/admin/generate-import-json/[taskId]
@@ -27,9 +27,13 @@ export default wrapApiHandler(
     const task = getTask<GenerateImportResult>(taskId)
 
     if (!task) {
+      // Dire POURQUOI : une tâche perdue au redémarrage n'est pas une erreur de l'utilisateur,
+      // et le même message pour les deux cas lui faisait croire qu'il s'était trompé.
       throw createError({
         status: 404,
-        message: 'Tâche non trouvée ou expirée',
+        message: perdueAuRedemarrage(taskId)
+          ? 'Cette génération a été interrompue par un redémarrage du serveur. Son résultat est perdu — relancez-la.'
+          : 'Tâche non trouvée ou expirée',
       })
     }
 

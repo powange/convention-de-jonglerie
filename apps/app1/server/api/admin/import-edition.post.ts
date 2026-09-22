@@ -5,6 +5,20 @@ import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { downloadAndStoreImage } from '#server/utils/file-helpers'
+import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
+
+/**
+ * Vrai si la chaîne désigne une date qui EXISTE, et pas seulement qui a la bonne forme.
+ *
+ * L'expression régulière du schéma ne compte que des chiffres : `2026-13-45` la franchit. Elle
+ * arrivait alors jusqu'à Prisma sous la forme d'un `Invalid Date`, et l'administrateur recevait une
+ * erreur serveur opaque au lieu d'un message nommant le champ fautif.
+ *
+ * Le fuseau ne joue aucun rôle ici : une date lisible l'est dans tous les fuseaux.
+ */
+export function estUneDateReelle(dateString: string): boolean {
+  return DateTime.fromISO(dateString, { zone: 'utc' }).isValid
+}
 
 /**
  * Convertit une date string en Date UTC en tenant compte du timezone.
@@ -12,11 +26,24 @@ import { downloadAndStoreImage } from '#server/utils/file-helpers'
  * Si la date contient déjà un suffixe 'Z' ou un offset (+/-), elle est interprétée telle quelle.
  * Sinon, elle est interprétée comme une date locale dans le timezone spécifié.
  *
+ * ⚠️ **Un fuseau annoncé mais inconnu fait LEVER**, il ne fait plus retomber sur UTC.
+ *
+ * L'ancienne version écrivait un `console.warn` puis enregistrait la date en UTC. C'était la règle
+ * inverse de celle que ce dépôt s'est donnée dans `versInstant` : l'appelant croit tenir le fuseau
+ * de la convention, et une date fausse en base survit longtemps là où un refus se voit tout de
+ * suite. Un décalage de deux heures sur une date d'édition déplace la frontière des journées, donc
+ * le découpage du programme et des créneaux.
+ *
+ * Un fuseau ABSENT reste un cas légitime et courant — le champ est facultatif, et douze éditions
+ * sur quarante-trois n'en déclarent pas. Il retombe sur UTC, comme auparavant.
+ *
+ * Exportée pour être testable : c'est la fonction au cœur du calcul, et elle ne l'était pas.
+ *
  * @param dateString - La date au format ISO (ex: "2025-07-15T14:00:00" ou "2025-07-15")
  * @param timezone - Le timezone IANA (ex: "Europe/Paris"). Si non fourni, UTC est utilisé.
  * @returns La date en UTC
  */
-function parseDateWithTimezone(dateString: string, timezone?: string | null): Date {
+export function parseDateWithTimezone(dateString: string, timezone?: string | null): Date {
   // Si la date contient déjà un indicateur de timezone (Z ou +/-), l'utiliser directement
   if (dateString.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(dateString)) {
     return new Date(dateString)
@@ -28,14 +55,31 @@ function parseDateWithTimezone(dateString: string, timezone?: string | null): Da
     if (dt.isValid) {
       return dt.toJSDate()
     }
-    // Si le timezone n'est pas valide, log et fallback
-    console.warn(`[IMPORT] Timezone invalide "${timezone}", interprétation de la date comme UTC`)
+    throw createError({
+      status: 400,
+      message: `Fuseau horaire inconnu : "${timezone}". La date ne peut pas être ancrée.`,
+    })
   }
 
   // Fallback: interpréter comme UTC
   // Ajouter 'Z' pour forcer l'interprétation UTC
   return new Date(dateString + (dateString.includes('T') ? 'Z' : 'T00:00:00Z'))
 }
+
+/**
+ * Une date d'import : la bonne forme, ET une date qui existe.
+ *
+ * Les deux bornes partagent ce schéma plutôt que de recopier l'expression régulière : une règle
+ * écrite deux fois finit toujours par diverger, et c'est le motif le plus constant des audits de
+ * ce dépôt.
+ */
+const dateDImport = z
+  .string()
+  .regex(
+    /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/,
+    'Format de date attendu : AAAA-MM-JJ'
+  )
+  .refine(estUneDateReelle, 'Cette date n’existe pas')
 
 // Schéma de validation pour l'import (exporté pour les tests de régression de validation)
 export const importSchema = z.object({
@@ -51,13 +95,19 @@ export const importSchema = z.object({
     // (getEditionDisplayName). Pas de min(1) ici, contrairement à convention.name (le fallback).
     name: z.string().nullable().optional(),
     description: z.string().nullable().optional(),
-    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/),
-    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?)?$/),
+    startDate: dateDImport,
+    endDate: dateDImport,
     addressLine1: z.string().min(1),
     addressLine2: z.string().nullable().optional(),
     city: z.string().min(1),
     region: z.string().nullable().optional(),
-    timezone: z.string().nullable().optional(), // Fuseau horaire IANA (ex: "Europe/Paris")
+    // Fuseau horaire IANA (ex: "Europe/Paris"). Refusé ici s'il est inconnu, plutôt que de laisser
+    // l'import retomber sur UTC en silence : c'est ce repli qui écrivait des dates fausses.
+    timezone: z
+      .string()
+      .refine((tz) => fuseauUtilisable(tz) !== undefined, 'Fuseau horaire inconnu')
+      .nullable()
+      .optional(),
     country: z.string().min(1),
     postalCode: z.string().min(1),
     latitude: z.number().nullable().optional(),
@@ -113,28 +163,14 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = importSchema.parse(body)
 
-    // Vérifier si une convention avec le même nom et email existe déjà
+    // Les LECTURES d'abord, hors transaction : elles ne modifient rien, et les tenir dedans
+    // garderait un verrou pendant qu'on interroge la base pour rien.
     const existingConvention = await prisma.convention.findFirst({
       where: {
         name: validatedData.convention.name,
         email: validatedData.convention.email,
       },
     })
-
-    let convention = existingConvention
-
-    // Créer la convention si elle n'existe pas (sans authorId pour qu'elle soit orpheline)
-    if (!convention) {
-      convention = await prisma.convention.create({
-        data: {
-          name: validatedData.convention.name,
-          email: validatedData.convention.email,
-          description: validatedData.convention.description,
-          logo: validatedData.convention.logo,
-          // Pas d'authorId - convention orpheline
-        },
-      })
-    }
 
     // Parser les dates avec le timezone
     const timezone = validatedData.edition.timezone
@@ -145,95 +181,127 @@ export default wrapApiHandler(
       `[ADMIN IMPORT] Dates parsées: start=${startDate.toISOString()}, end=${endDate.toISOString()}, timezone=${timezone || 'UTC'}`
     )
 
-    // Vérifier qu'une édition avec les mêmes dates n'existe pas déjà pour cette convention
-    const existingEdition = await prisma.edition.findFirst({
-      where: {
-        conventionId: convention.id,
-        startDate,
-        endDate,
-        city: validatedData.edition.city,
-      },
-    })
-
-    if (existingEdition) {
-      throw createError({
-        status: 400,
-        message: 'Une édition existe déjà pour cette convention avec ces dates et cette ville',
+    // Vérifier qu'une édition avec les mêmes dates n'existe pas déjà pour cette convention.
+    // Inutile quand la convention est nouvelle : elle n'a encore aucune édition.
+    if (existingConvention) {
+      const existingEdition = await prisma.edition.findFirst({
+        where: {
+          conventionId: existingConvention.id,
+          startDate,
+          endDate,
+          city: validatedData.edition.city,
+        },
       })
+
+      if (existingEdition) {
+        throw createError({
+          status: 400,
+          message: 'Une édition existe déjà pour cette convention avec ces dates et cette ville',
+        })
+      }
     }
 
-    // Ancre Event (l'édition partage son id : invariant Edition.id == eventId)
-    const eventAnchor = await prisma.event.create({ data: {} })
+    /**
+     * Les ÉCRITURES ensuite, d'un seul bloc.
+     *
+     * Elles étaient quatre à s'enchaîner sans filet — la convention, l'ancre `Event`, l'édition,
+     * ses réglages bénévoles — et une étape refusée laissait les précédentes derrière elle : une
+     * ancre que plus rien ne référence, ou une édition PUBLIÉE dont le module bénévoles n'a pas de
+     * configuration.
+     *
+     * Le téléchargement de l'affiche reste DEHORS, et c'est délibéré : c'est un appel réseau, et
+     * tenir un verrou de base pendant plusieurs secondes coûterait plus cher que ce qu'il protège.
+     * Son échec laisse l'édition sans image, ce qui est le comportement voulu et déjà signalé.
+     */
+    const { convention, edition } = await prisma.$transaction(async (tx) => {
+      // Créer la convention si elle n'existe pas (sans authorId pour qu'elle soit orpheline)
+      const convention =
+        existingConvention ??
+        (await tx.convention.create({
+          data: {
+            name: validatedData.convention.name,
+            email: validatedData.convention.email,
+            description: validatedData.convention.description,
+            logo: validatedData.convention.logo,
+            // Pas d'authorId - convention orpheline
+          },
+        }))
 
-    // Créer l'édition (sans creatorId pour qu'elle soit orpheline)
-    // D'abord sans l'image pour avoir l'ID
-    const edition = await prisma.edition.create({
-      data: {
-        id: eventAnchor.id,
-        eventId: eventAnchor.id,
-        conventionId: convention.id,
-        name: validatedData.edition.name || null,
-        description: validatedData.edition.description,
-        programUrl: validatedData.edition.programUrl || null,
-        startDate,
-        endDate,
-        addressLine1: validatedData.edition.addressLine1,
-        addressLine2: validatedData.edition.addressLine2,
-        city: validatedData.edition.city,
-        region: validatedData.edition.region,
-        timezone: validatedData.edition.timezone,
-        country: validatedData.edition.country,
-        postalCode: validatedData.edition.postalCode,
-        latitude: validatedData.edition.latitude,
-        longitude: validatedData.edition.longitude,
-        ticketingUrl: validatedData.edition.ticketingUrl || null,
-        facebookUrl: validatedData.edition.facebookUrl || null,
-        instagramUrl: validatedData.edition.instagramUrl || null,
-        officialWebsiteUrl: validatedData.edition.officialWebsiteUrl || null,
-        jugglingEdgeUrl: validatedData.edition.jugglingEdgeUrl || null,
-        // imageUrl sera mis à jour après téléchargement
-        imageUrl: null,
-        // Caractéristiques
-        hasFoodTrucks: validatedData.edition.hasFoodTrucks ?? false,
-        hasKidsZone: validatedData.edition.hasKidsZone ?? false,
-        acceptsPets: validatedData.edition.acceptsPets ?? false,
-        hasTentCamping: validatedData.edition.hasTentCamping ?? false,
-        hasTruckCamping: validatedData.edition.hasTruckCamping ?? false,
-        hasGym: validatedData.edition.hasGym ?? false,
-        hasFamilyCamping: validatedData.edition.hasFamilyCamping ?? false,
-        hasSleepingRoom: validatedData.edition.hasSleepingRoom ?? false,
-        hasFireSpace: validatedData.edition.hasFireSpace ?? false,
-        hasGala: validatedData.edition.hasGala ?? false,
-        hasOpenStage: validatedData.edition.hasOpenStage ?? false,
-        hasConcert: validatedData.edition.hasConcert ?? false,
-        hasCantine: validatedData.edition.hasCantine ?? false,
-        hasAerialSpace: validatedData.edition.hasAerialSpace ?? false,
-        hasSlacklineSpace: validatedData.edition.hasSlacklineSpace ?? false,
-        hasToilets: validatedData.edition.hasToilets ?? false,
-        hasShowers: validatedData.edition.hasShowers ?? false,
-        hasAccessibility: validatedData.edition.hasAccessibility ?? false,
-        hasWorkshops: validatedData.edition.hasWorkshops ?? false,
-        hasCashPayment: validatedData.edition.hasCashPayment ?? false,
-        hasCreditCardPayment: validatedData.edition.hasCreditCardPayment ?? false,
-        hasAfjTokenPayment: validatedData.edition.hasAfjTokenPayment ?? false,
-        hasATM: validatedData.edition.hasATM ?? false,
-        hasLongShow: validatedData.edition.hasLongShow ?? false,
-        status: validatedData.edition.status ?? 'PUBLISHED', // Par défaut PUBLISHED car une édition importée est publiée
-        // Pas de creatorId - édition orpheline
-      },
-    })
+      // Ancre Event (l'édition partage son id : invariant Edition.id == eventId)
+      const eventAnchor = await tx.event.create({ data: {} })
 
-    // Étape 0bis : config bénévole portée par EventVolunteerSettings
-    await prisma.eventVolunteerSettings.create({
-      data: {
-        eventId: eventAnchor.id,
-        open: validatedData.edition.volunteersOpen ?? false,
-        description: validatedData.edition.volunteersDescription ?? null,
-        externalUrl: validatedData.edition.volunteersExternalUrl || null,
-      },
+      // Créer l'édition (sans creatorId pour qu'elle soit orpheline)
+      // D'abord sans l'image pour avoir l'ID
+      const edition = await tx.edition.create({
+        data: {
+          id: eventAnchor.id,
+          eventId: eventAnchor.id,
+          conventionId: convention.id,
+          name: validatedData.edition.name || null,
+          description: validatedData.edition.description,
+          programUrl: validatedData.edition.programUrl || null,
+          startDate,
+          endDate,
+          addressLine1: validatedData.edition.addressLine1,
+          addressLine2: validatedData.edition.addressLine2,
+          city: validatedData.edition.city,
+          region: validatedData.edition.region,
+          timezone: validatedData.edition.timezone,
+          country: validatedData.edition.country,
+          postalCode: validatedData.edition.postalCode,
+          latitude: validatedData.edition.latitude,
+          longitude: validatedData.edition.longitude,
+          ticketingUrl: validatedData.edition.ticketingUrl || null,
+          facebookUrl: validatedData.edition.facebookUrl || null,
+          instagramUrl: validatedData.edition.instagramUrl || null,
+          officialWebsiteUrl: validatedData.edition.officialWebsiteUrl || null,
+          jugglingEdgeUrl: validatedData.edition.jugglingEdgeUrl || null,
+          // imageUrl sera mis à jour après téléchargement
+          imageUrl: null,
+          // Caractéristiques
+          hasFoodTrucks: validatedData.edition.hasFoodTrucks ?? false,
+          hasKidsZone: validatedData.edition.hasKidsZone ?? false,
+          acceptsPets: validatedData.edition.acceptsPets ?? false,
+          hasTentCamping: validatedData.edition.hasTentCamping ?? false,
+          hasTruckCamping: validatedData.edition.hasTruckCamping ?? false,
+          hasGym: validatedData.edition.hasGym ?? false,
+          hasFamilyCamping: validatedData.edition.hasFamilyCamping ?? false,
+          hasSleepingRoom: validatedData.edition.hasSleepingRoom ?? false,
+          hasFireSpace: validatedData.edition.hasFireSpace ?? false,
+          hasGala: validatedData.edition.hasGala ?? false,
+          hasOpenStage: validatedData.edition.hasOpenStage ?? false,
+          hasConcert: validatedData.edition.hasConcert ?? false,
+          hasCantine: validatedData.edition.hasCantine ?? false,
+          hasAerialSpace: validatedData.edition.hasAerialSpace ?? false,
+          hasSlacklineSpace: validatedData.edition.hasSlacklineSpace ?? false,
+          hasToilets: validatedData.edition.hasToilets ?? false,
+          hasShowers: validatedData.edition.hasShowers ?? false,
+          hasAccessibility: validatedData.edition.hasAccessibility ?? false,
+          hasWorkshops: validatedData.edition.hasWorkshops ?? false,
+          hasCashPayment: validatedData.edition.hasCashPayment ?? false,
+          hasCreditCardPayment: validatedData.edition.hasCreditCardPayment ?? false,
+          hasAfjTokenPayment: validatedData.edition.hasAfjTokenPayment ?? false,
+          hasATM: validatedData.edition.hasATM ?? false,
+          hasLongShow: validatedData.edition.hasLongShow ?? false,
+          status: validatedData.edition.status ?? 'PUBLISHED', // Par défaut PUBLISHED car une édition importée est publiée
+          // Pas de creatorId - édition orpheline
+        },
+      })
+
+      // Étape 0bis : config bénévole portée par EventVolunteerSettings
+      await tx.eventVolunteerSettings.create({
+        data: {
+          eventId: eventAnchor.id,
+          open: validatedData.edition.volunteersOpen ?? false,
+          description: validatedData.edition.volunteersDescription ?? null,
+          externalUrl: validatedData.edition.volunteersExternalUrl || null,
+        },
+      })
+      // Renseigner les métadonnées génériques de l'Event (name/dates/status) depuis l'édition
+      await syncEventMetadataFromEdition(edition.id, tx)
+
+      return { convention, edition }
     })
-    // Renseigner les métadonnées génériques de l'Event (name/dates/status) depuis l'édition
-    await syncEventMetadataFromEdition(edition.id)
 
     // Si une URL d'image est fournie, télécharger et stocker l'image
     let imageDownloadResult: { success: boolean; filename: string | null; error?: string } | null =

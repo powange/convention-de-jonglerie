@@ -21,6 +21,29 @@ const tasks = new Map<string, AsyncTask>()
 const TASK_TTL = 30 * 60 * 1000
 
 /**
+ * Instant de démarrage de ce processus.
+ *
+ * Sert à dire POURQUOI une tâche est introuvable. Sans lui, un redémarrage et un identifiant
+ * inventé rendent le même « tâche non trouvée ou expirée », et l'utilisateur croit s'être trompé
+ * alors que le serveur a simplement perdu son travail — une génération par agent peut durer une
+ * douzaine de minutes, et le dépôt déploie plusieurs fois par jour.
+ */
+const DEMARRAGE_DU_PROCESSUS = Date.now()
+
+/**
+ * Vrai si cette tâche a été créée AVANT le démarrage du processus courant.
+ *
+ * L'identifiant porte son propre horodatage — `task_<date>_<aléa>` —, ce qui permet de trancher
+ * sans rien avoir conservé. Rend `false` pour un identifiant qu'on ne sait pas lire : on ne peut
+ * alors rien affirmer, et mieux vaut le message générique qu'une explication inventée.
+ */
+export function perdueAuRedemarrage(taskId: string): boolean {
+  const horodatage = Number(taskId.split('_')[1])
+  if (!Number.isFinite(horodatage) || horodatage <= 0) return false
+  return horodatage < DEMARRAGE_DU_PROCESSUS
+}
+
+/**
  * Génère un ID unique pour une tâche
  */
 function generateTaskId(): string {
