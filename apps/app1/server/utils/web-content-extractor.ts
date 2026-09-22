@@ -698,6 +698,15 @@ export function extractWebContent(
  * @param maxContentLength - Limite totale de caractères
  * @returns Le texte formaté pour l'IA
  */
+/**
+ * Nombre maximum de liens proposés au modèle pour une page.
+ *
+ * Borné pour deux raisons : le budget d'une page est de 2 500 caractères chez un modèle local, et
+ * une liste de cinquante entrées noie les trois qui comptent. Douze couvre un menu de convention
+ * sans déborder.
+ */
+const MAX_LIENS_A_EXPLORER = 12
+
 export function formatExtractionForAI(
   extraction: WebContentExtraction,
   maxContentLength: number = 2500
@@ -792,18 +801,39 @@ export function formatExtractionForAI(
     text += section
   }
 
-  // Navigation du site (en JSON pour l'IA)
-  if (extraction.navigation.length > 0) {
-    text += '\n=== Navigation du site ===\n'
-    text += JSON.stringify(extraction.navigation, null, 2) + '\n'
+  /**
+   * LES LIENS, en UNE section et sous le nom que le prompt cherche.
+   *
+   * Trois défauts tenaient ensemble, et ils expliquent que l'agent n'explorait presque jamais :
+   *
+   * 1. Le prompt ordonne de chercher « LIENS À EXPLORER ». Ce marqueur n'était produit que par le
+   *    lecteur JugglingEdge. Sur un site ordinaire, les liens arrivaient sous « Navigation du
+   *    site » et « Liens utiles à explorer » — deux noms dont le prompt ne parle pas.
+   * 2. La navigation était rendue en JSON INDENTÉ, et c'était la SEULE section sans borne, écrite
+   *    AVANT le calcul du budget restant. Sur un site au menu fourni, elle pouvait consommer les
+   *    2 500 caractères de la page et faire tomber la condition `remainingBudget > 200` : le
+   *    contenu réel n'était alors pas transmis du tout, et le modèle ne voyait qu'un menu.
+   * 3. Deux sections pour la même chose dispersaient l'attention du modèle.
+   *
+   * D'où : une seule section, bornée, en liste plate, et nommée comme le prompt l'attend.
+   */
+  const liens: string[] = []
+  const ajouterLien = (url: string | undefined, texte?: string) => {
+    if (!url || liens.length >= MAX_LIENS_A_EXPLORER) return
+    if (liens.some((l) => l.includes(url))) return
+    liens.push(texte ? `  - ${texte} : ${url}` : `  - ${url}`)
   }
 
-  // Liens utiles
-  if (extraction.links.length > 0) {
-    text += `\nLiens utiles à explorer:\n`
-    for (const link of extraction.links.slice(0, 5)) {
-      text += `  - ${link}\n`
-    }
+  // La navigation d'abord — c'est elle qui porte les pages d'un site (tarifs, infos, lieu) —,
+  // aplatie sur un niveau : la hiérarchie n'aide pas à choisir une page à lire.
+  for (const entree of extraction.navigation) {
+    ajouterLien(entree.url, entree.text)
+    for (const enfant of entree.children ?? []) ajouterLien(enfant.url, enfant.text)
+  }
+  for (const lien of extraction.links) ajouterLien(lien)
+
+  if (liens.length > 0) {
+    text += `\n=== LIENS À EXPLORER ===\n${liens.join('\n')}\n`
   }
 
   // Contenu textuel (ce qui reste du budget)

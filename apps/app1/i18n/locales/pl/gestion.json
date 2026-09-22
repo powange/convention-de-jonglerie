@@ -54,7 +54,14 @@
         "fin": "Koniec",
         "lieu": "Miejsce"
       },
-      "program_compare_failed": "Znaleziono {count} element(ów) programu, ale porównanie z istniejącym programem nie powiodło się: nic nie jest proponowane, aby uniknąć duplikatów."
+      "program_compare_failed": "Znaleziono {count} element(ów) programu, ale porównanie z istniejącym programem nie powiodło się: nic nie jest proponowane, aby uniknąć duplikatów.",
+      "ai_provider": "Dostawca AI",
+      "generation_method": "Metoda generowania",
+      "generation_method_hint": "Eksploracja podąża za linkami serwisu, by znaleźć inne strony; ekstrakcja bezpośrednia ogranicza się do podanych adresów.",
+      "method_agent": "Inteligentna eksploracja",
+      "method_agent_description": "Podąża za linkami serwisu, by znaleźć przydatne strony (ceny, miejsce, wolontariat). Dłużej, ale pełniej.",
+      "method_simple": "Ekstrakcja bezpośrednia",
+      "method_simple_description": "Czyta tylko podane adresy. Szybciej i taniej."
     },
     "artists": {
       "list_title": "Zarządzanie artystami",

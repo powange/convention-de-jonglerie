@@ -54,7 +54,14 @@
         "fin": "End",
         "lieu": "Location"
       },
-      "program_compare_failed": "{count} programme item(s) found, but comparison with the existing programme failed: nothing is proposed, to avoid creating duplicates."
+      "program_compare_failed": "{count} programme item(s) found, but comparison with the existing programme failed: nothing is proposed, to avoid creating duplicates.",
+      "ai_provider": "AI provider",
+      "generation_method": "Generation method",
+      "generation_method_hint": "Exploration follows the site's links to find other pages; direct extraction is limited to the addresses you provide.",
+      "method_agent": "Smart exploration",
+      "method_agent_description": "Follows the site's links to find the useful pages (prices, venue, volunteers). Slower, but more complete.",
+      "method_simple": "Direct extraction",
+      "method_simple_description": "Reads only the addresses you give. Faster and cheaper."
     },
     "artists": {
       "list_title": "Artist management",

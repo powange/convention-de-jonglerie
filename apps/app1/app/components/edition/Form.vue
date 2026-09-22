@@ -545,6 +545,7 @@ import { useDatetime } from '~/composables/useDatetime'
 import { useTimezones } from '~/composables/useTimezones'
 import type { Edition, Convention } from '~/types'
 import { countrySelectOptions } from '~/utils/countries'
+import { estUnLienHttp } from '~/utils/lien-externe'
 
 import type { StepperItem } from '@nuxt/ui'
 
@@ -952,15 +953,10 @@ const validateGeneralStep = (): boolean => {
   return true
 }
 
-// Vérifie qu'une valeur est une URL http(s) valide
-const isHttpUrl = (value: string): boolean => {
-  try {
-    const url = new URL(value)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch {
-    return false
-  }
-}
+// La règle vit dans `lien-externe`, partagée avec le champ qui propose d'ouvrir le lien : deux
+// définitions auraient fini par diverger sur un protocole ou un espace, et l'on aurait validé une
+// adresse que le bouton refuse d'ouvrir.
+const isHttpUrl = (value: string): boolean => estUnLienHttp(value)
 
 // Valide l'étape « Liens externes » : format et longueur max (191, cf. colonne Prisma).
 // Affiche les erreurs sous les champs concernés via le UForm et retourne false si invalide.

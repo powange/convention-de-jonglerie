@@ -198,7 +198,8 @@
     "organizers": "Організатори",
     "export_csv": "Експорт у CSV",
     "export_pdf": "Експортувати у PDF",
-    "export": "Експортувати"
+    "export": "Експортувати",
+    "open_in_new_tab": "Відкрити в новій вкладці"
   },
   "dates": {
     "date_range": "З {startDate} до {endDate}",

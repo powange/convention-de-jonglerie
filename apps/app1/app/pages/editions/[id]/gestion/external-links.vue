@@ -52,30 +52,18 @@
             :label="$t('components.edition_form.official_website_link')"
             name="officialWebsiteUrl"
           >
-            <UInput
+            <UiExternalLinkField
               v-model="officialWebsiteUrl"
-              type="url"
+              icone="i-heroicons-globe-alt"
               placeholder="https://www.mon-site-officiel.org"
-              class="w-full"
-              @blur="officialWebsiteUrl = officialWebsiteUrl?.trim() || ''"
-            >
-              <template #leading>
-                <UIcon name="i-heroicons-globe-alt" />
-              </template>
-            </UInput>
+            />
           </UFormField>
           <UFormField :label="$t('components.edition_form.ticketing_link')" name="ticketingUrl">
-            <UInput
+            <UiExternalLinkField
               v-model="ticketingUrl"
-              type="url"
+              icone="i-heroicons-ticket"
               placeholder="https://billetterie.com/ma-convention"
-              class="w-full"
-              @blur="ticketingUrl = ticketingUrl?.trim() || ''"
-            >
-              <template #leading>
-                <UIcon name="i-heroicons-ticket" />
-              </template>
-            </UInput>
+            />
           </UFormField>
         </div>
 
@@ -90,17 +78,11 @@
             </p>
           </div>
           <UFormField :label="$t('components.edition_form.program_link')" name="programUrl">
-            <UInput
+            <UiExternalLinkField
               v-model="programUrl"
-              type="url"
+              icone="i-heroicons-calendar-days"
               placeholder="https://ma-convention.fr/programme"
-              class="w-full"
-              @blur="programUrl = programUrl?.trim() || ''"
-            >
-              <template #leading>
-                <UIcon name="i-heroicons-calendar-days" />
-              </template>
-            </UInput>
+            />
           </UFormField>
         </div>
 
@@ -116,33 +98,23 @@
           </div>
           <div class="space-y-4">
             <UFormField :label="$t('components.edition_form.facebook_page')" name="facebookUrl">
-              <UInput
+              <UiExternalLinkField
                 v-model="facebookUrl"
-                type="url"
+                icone="i-simple-icons-facebook"
+                classe-icone="text-blue-600"
                 placeholder="https://facebook.com/ma-convention"
-                class="w-full"
-                @blur="facebookUrl = facebookUrl?.trim() || ''"
-              >
-                <template #leading>
-                  <UIcon name="i-simple-icons-facebook" class="text-blue-600" />
-                </template>
-              </UInput>
+              />
             </UFormField>
             <UFormField
               :label="$t('components.edition_form.instagram_account')"
               name="instagramUrl"
             >
-              <UInput
+              <UiExternalLinkField
                 v-model="instagramUrl"
-                type="url"
+                icone="i-simple-icons-instagram"
+                classe-icone="text-pink-600"
                 placeholder="https://instagram.com/ma-convention"
-                class="w-full"
-                @blur="instagramUrl = instagramUrl?.trim() || ''"
-              >
-                <template #leading>
-                  <UIcon name="i-simple-icons-instagram" class="text-pink-600" />
-                </template>
-              </UInput>
+              />
             </UFormField>
           </div>
         </div>

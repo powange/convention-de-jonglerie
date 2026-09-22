@@ -5,7 +5,9 @@ ACTIONS (une seule par réponse):
 - GENERATE_JSON -> générer le JSON final
 
 IMPORTANT POUR FETCH_URL:
-- Cherche "LIENS À EXPLORER" dans le contenu fourni
+- Cherche la section "LIENS À EXPLORER" dans le contenu fourni (pages du site et liens externes)
+- Après chaque page lue, commence par "CHAMPS: <champs remplis>" ou "CHAMPS: aucun" si elle
+  n'apporte rien — son contenu est alors écarté et tu peux explorer plus loin
 - COPIE l'URL EXACTE caractère par caractère (ex: FETCH_URL: https://www.chocfest.net)
 - N'INVENTE JAMAIS d'URL, utilise uniquement celles listées
 

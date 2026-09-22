@@ -54,7 +54,14 @@
         "fin": "Slut",
         "lieu": "Sted"
       },
-      "program_compare_failed": "{count} programpunkt(er) fundet, men sammenligningen med det eksisterende program mislykkedes: intet foreslås, for at undgå dubletter."
+      "program_compare_failed": "{count} programpunkt(er) fundet, men sammenligningen med det eksisterende program mislykkedes: intet foreslås, for at undgå dubletter.",
+      "ai_provider": "AI-udbyder",
+      "generation_method": "Genereringsmetode",
+      "generation_method_hint": "Udforskningen følger sidens links for at finde andre sider; direkte udtræk holder sig til de angivne adresser.",
+      "method_agent": "Intelligent udforskning",
+      "method_agent_description": "Følger sidens links for at finde de nyttige sider (priser, sted, frivillige). Længere, men mere komplet.",
+      "method_simple": "Direkte udtræk",
+      "method_simple_description": "Læser kun de adresser, du angiver. Hurtigere og billigere."
     },
     "artists": {
       "list_title": "Management af kunstnere",

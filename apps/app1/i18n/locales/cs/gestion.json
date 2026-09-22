@@ -54,7 +54,14 @@
         "fin": "Konec",
         "lieu": "Místo"
       },
-      "program_compare_failed": "Nalezeno {count} bodů programu, ale porovnání se stávajícím programem selhalo: nic se nenavrhuje, aby nevznikly duplicity."
+      "program_compare_failed": "Nalezeno {count} bodů programu, ale porovnání se stávajícím programem selhalo: nic se nenavrhuje, aby nevznikly duplicity.",
+      "ai_provider": "Poskytovatel AI",
+      "generation_method": "Metoda generování",
+      "generation_method_hint": "Průzkum sleduje odkazy na webu a hledá další stránky; přímá extrakce se omezí na zadané adresy.",
+      "method_agent": "Inteligentní průzkum",
+      "method_agent_description": "Sleduje odkazy na webu a hledá užitečné stránky (ceny, místo, dobrovolníci). Déle to trvá, ale je to úplnější.",
+      "method_simple": "Přímá extrakce",
+      "method_simple_description": "Čte pouze adresy, které zadáte. Rychlejší a levnější."
     },
     "artists": {
       "list_title": "Správa umělců",

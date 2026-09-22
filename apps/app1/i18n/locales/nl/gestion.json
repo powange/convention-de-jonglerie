@@ -54,7 +54,14 @@
         "fin": "Einde",
         "lieu": "Locatie"
       },
-      "program_compare_failed": "{count} programmaonderde(e)l(en) gevonden, maar de vergelijking met het bestaande programma is mislukt: er wordt niets voorgesteld, om dubbels te voorkomen."
+      "program_compare_failed": "{count} programmaonderde(e)l(en) gevonden, maar de vergelijking met het bestaande programma is mislukt: er wordt niets voorgesteld, om dubbels te voorkomen.",
+      "ai_provider": "AI-aanbieder",
+      "generation_method": "Generatiemethode",
+      "generation_method_hint": "De verkenning volgt de links van de site om andere pagina's te vinden; directe extractie blijft bij de opgegeven adressen.",
+      "method_agent": "Slimme verkenning",
+      "method_agent_description": "Volgt de links van de site om de nuttige pagina's te vinden (prijzen, locatie, vrijwilligers). Langzamer, maar vollediger.",
+      "method_simple": "Directe extractie",
+      "method_simple_description": "Leest alleen de adressen die je opgeeft. Sneller en goedkoper."
     },
     "artists": {
       "list_title": "Artiestenmanagement",

@@ -198,7 +198,8 @@
     "organizers": "Organizátoři",
     "export_csv": "Exportovat do CSV",
     "export_pdf": "Exportovat do PDF",
-    "export": "Exportovat"
+    "export": "Exportovat",
+    "open_in_new_tab": "Otevřít na nové kartě"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",
