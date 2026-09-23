@@ -1537,11 +1537,21 @@ const { execute: executeCleanup, loading: cleaningOldLogs } = useApiAction(
     method: 'POST',
     silentSuccess: true,
     errorMessages: { default: 'Impossible de nettoyer les logs' },
+    /*
+     * Le nombre supprimé se recompose ici, à partir de `deleted`.
+     *
+     * Il s'affichait auparavant depuis le champ `message` du résultat — la phrase que le serveur
+     * rédige. Or `useApiAction` ne rend que la partie `data` de la réponse : ce champ était retiré
+     * en chemin, et le toast n'avait plus qu'un titre, sans erreur ni trace. La donnée, elle,
+     * était bien là. La reformuler ici la fait passer par l'i18n, ce que la phrase du serveur — en
+     * français dans le code — ne permettait pas.
+     */
     onSuccess: (result: any) => {
+      const supprimees = result?.deleted?.total ?? 0
       toast.add({
         color: 'success',
         title: $t('admin.error_logs.cleanup_done'),
-        description: result.message,
+        description: $t('admin.error_logs.cleanup_count', { count: supprimees }),
       })
       loadLogs()
     },
@@ -1664,11 +1674,23 @@ const { execute: executeResolveLog, loading: resolving } = useApiAction(
     onSuccess: (result: any) => {
       // Le panneau latéral n'est à jour que s'il montre justement l'entrée qu'on vient de traiter :
       // l'action part aussi bien du tableau, sur une autre ligne.
+      //
+      // L'entrée arrive sous `log` — c'est ce que rend l'endpoint. Lue à plat, `resolvedAt` était
+      // toujours `undefined` : le panneau affichait une entrée résolue SANS date de résolution,
+      // alors que le serveur venait de l'écrire.
       if (selectedLog.value && selectedLog.value.id === logCible.value?.id) {
-        selectedLog.value.resolved = result.resolved ?? resolveResolved.value
-        selectedLog.value.resolvedAt = result.resolvedAt ?? null
+        selectedLog.value.resolved = result?.log?.resolved ?? resolveResolved.value
+        selectedLog.value.resolvedAt = result?.log?.resolvedAt ?? null
       }
-      toast.add({ color: 'success', title: $t('common.success'), description: result.message })
+      toast.add({
+        color: 'success',
+        title: $t('common.success'),
+        // Ce qui S'EST PASSÉ, et non le libellé du bouton qui vient d'être cliqué : « Marquer
+        // comme résolu » sous un titre « Succès » se lit comme une consigne restant à suivre.
+        description: resolveResolved.value
+          ? $t('admin.error_logs.marked_resolved')
+          : $t('admin.error_logs.marked_unresolved'),
+      })
       loadLogs()
     },
   }
@@ -1694,7 +1716,11 @@ const { execute: executeResolveSimilar, loading: resolvingSimilarLoading } = use
     silentSuccess: true,
     errorMessages: { default: $t('admin.error_logs.resolve_similar_error') },
     onSuccess: (result: any) => {
-      toast.add({ color: 'success', title: $t('common.success'), description: result.message })
+      toast.add({
+        color: 'success',
+        title: $t('common.success'),
+        description: $t('admin.error_logs.resolve_similar_count', { count: result?.count ?? 0 }),
+      })
       if (selectedLog.value && selectedLog.value.id === logCible.value?.id) {
         selectedLog.value.resolved = true
         selectedLog.value.resolvedAt = new Date().toISOString()
