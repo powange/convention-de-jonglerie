@@ -261,7 +261,7 @@
       "no_participants": "Ingen deltagere fundet",
       "search_placeholder": "Søg på efternavn, fornavn eller e-mail",
       "stats": {
-        "after_show": "Efter forestilling",
+        "after_show": "Tallerkener sat til side",
         "artists": "Kunstnernes måltider",
         "by_diet": "Efter diæt",
         "by_meal_type": "Efter måltidstype",
@@ -426,6 +426,8 @@
       "last_name": "Efternavn",
       "last_name_placeholder": "Dit efternavn",
       "meals": {
+        "after_show": "Efter forestillingen",
+        "check_all": "Markér alle",
         "confirm_close_unsaved": "TODO: Bekræft lukning med ikke-gemte ændringer",
         "description": "TODO: Beskrivelse",
         "error_loading": "TODO: Fejl under indlæsning",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Uden for tilstedeværelsesperioden",
         "saved_success": "TODO: Vellykket registrering",
         "title": "TODO: Måltider",
-        "unsaved_changes": "TODO: Ændringer ikke registreret",
-        "check_all": "Markér alle",
-        "uncheck_all": "Afmarkér alle"
+        "uncheck_all": "Afmarkér alle",
+        "unsaved_changes": "TODO: Ændringer ikke registreret"
       },
       "no_account_link": "Har personen ikke en konto?",
       "no_user_found": "Ingen bruger fundet",

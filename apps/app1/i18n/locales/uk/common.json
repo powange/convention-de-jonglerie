@@ -261,7 +261,7 @@
       "no_participants": "Учасників не знайдено",
       "search_placeholder": "Пошук за прізвищем, ім'ям або електронною поштою",
       "stats": {
-        "after_show": "Після шоу",
+        "after_show": "Відкладені порції",
         "artists": "Харчування артистів",
         "by_diet": "За дієтою",
         "by_meal_type": "За типом страви",
@@ -426,6 +426,8 @@
       "last_name": "Прізвище",
       "last_name_placeholder": "Ваше прізвище",
       "meals": {
+        "after_show": "Після виступу",
+        "check_all": "Вибрати всі",
         "confirm_close_unsaved": "Підтвердіть закриття із незбереженими змінами",
         "description": "TODO: Опис",
         "error_loading": "TODO: Помилка під час завантаження",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Період відвідування поза межами школи",
         "saved_success": "TODO: Успішна реєстрація",
         "title": "СЛУХАЙТЕ: Харчування",
-        "unsaved_changes": "TODO: Зміни не зареєстровані",
-        "check_all": "Вибрати всі",
-        "uncheck_all": "Зняти всі"
+        "uncheck_all": "Зняти всі",
+        "unsaved_changes": "TODO: Зміни не зареєстровані"
       },
       "no_account_link": "У особи немає облікового запису?",
       "no_user_found": "Користувача не знайдено",

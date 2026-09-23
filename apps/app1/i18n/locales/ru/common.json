@@ -261,7 +261,7 @@
       "no_participants": "Участники не найдены",
       "search_placeholder": "Поиск по фамилии, имени или электронной почте",
       "stats": {
-        "after_show": "После шоу",
+        "after_show": "Отложенные порции",
         "artists": "Питание артистов",
         "by_diet": "По диете",
         "by_meal_type": "По типу блюда",
@@ -426,6 +426,8 @@
       "last_name": "Фамилия",
       "last_name_placeholder": "Ваша фамилия",
       "meals": {
+        "after_show": "После выступления",
+        "check_all": "Выбрать все",
         "confirm_close_unsaved": "TODO: Подтверждение закрытия с несохраненными изменениями",
         "description": "TODO: Описание",
         "error_loading": "TODO: Ошибка при загрузке",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Вне периода посещения",
         "saved_success": "TODO: Успешная регистрация",
         "title": "TODO: Питание",
-        "unsaved_changes": "TODO: Изменения не зарегистрированы",
-        "check_all": "Выбрать все",
-        "uncheck_all": "Снять все"
+        "uncheck_all": "Снять все",
+        "unsaved_changes": "TODO: Изменения не зарегистрированы"
       },
       "no_account_link": "У человека нет аккаунта?",
       "no_user_found": "Пользователь не найден",

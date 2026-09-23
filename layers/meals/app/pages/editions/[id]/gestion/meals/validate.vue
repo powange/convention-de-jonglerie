@@ -171,6 +171,18 @@
                         : ''
                     }}
                   </div>
+                  <!-- Toujours visible, contrairement au « restants » qui n'apparaît qu'au survol :
+                       c'est une consigne pour la cuisine, pas un détail de progression. -->
+                  <div
+                    v-if="mealStats.breakdown.volunteers.afterShow > 0"
+                    class="text-xs text-amber-600 dark:text-amber-400 mt-1"
+                  >
+                    {{
+                      $t('gestion.meals.plates_set_aside', {
+                        count: mealStats.breakdown.volunteers.afterShow,
+                      })
+                    }}
+                  </div>
                 </button>
                 <button
                   class="text-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors cursor-pointer group"
@@ -289,6 +301,18 @@
                       1
                         ? 's'
                         : ''
+                    }}
+                  </div>
+                  <!-- Toujours visible, contrairement au « restants » qui n'apparaît qu'au survol :
+                       c'est une consigne pour la cuisine, pas un détail de progression. -->
+                  <div
+                    v-if="mealStats.breakdown.organizers.afterShow > 0"
+                    class="text-xs text-amber-600 dark:text-amber-400 mt-1"
+                  >
+                    {{
+                      $t('gestion.meals.plates_set_aside', {
+                        count: mealStats.breakdown.organizers.afterShow,
+                      })
                     }}
                   </div>
                 </button>
@@ -469,6 +493,16 @@
                   </p>
                   <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {{ person.email || '-' }}
+                  </p>
+                  <!-- Le téléphone à côté de l'adresse : au comptoir, on appelle plutôt qu'on
+                       n'écrit. Absent chez beaucoup, d'où la ligne qui disparaît au lieu d'un
+                       tiret — une ligne vide de plus ferait chercher ce qui n'existe pas. -->
+                  <p
+                    v-if="person.phone"
+                    class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1"
+                  >
+                    <UIcon name="i-heroicons-phone" class="h-3.5 w-3.5 shrink-0" />
+                    {{ person.phone }}
                   </p>
                 </div>
                 <UButton

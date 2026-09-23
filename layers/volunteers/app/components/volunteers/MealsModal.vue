@@ -44,7 +44,7 @@
                 v-for="meal in dayMeals"
                 :key="meal.id"
                 :class="[
-                  'flex items-center gap-3 p-3 border rounded-lg transition-opacity',
+                  'flex flex-col gap-2 p-3 border rounded-lg transition-opacity',
                   !meal.eligible
                     ? 'border-gray-200/30 dark:border-gray-700/30 bg-gray-100/30 dark:bg-gray-900/30 opacity-40'
                     : meal.accepted
@@ -52,32 +52,46 @@
                       : 'border-gray-200/50 dark:border-gray-700/50 bg-gray-100/50 dark:bg-gray-900/50 opacity-60',
                 ]"
               >
-                <UCheckbox
-                  v-model="meal.accepted"
-                  :disabled="savingMeals || !meal.eligible"
-                  :title="!meal.eligible ? $t('edition.volunteers.meals.not_eligible') : ''"
-                />
-                <div class="flex-1 min-w-0">
-                  <p
-                    :class="[
-                      'text-sm font-medium',
-                      meal.eligible
-                        ? 'text-gray-900 dark:text-white'
-                        : 'text-gray-400 dark:text-gray-600',
-                    ]"
-                  >
-                    {{ getMealTypeLabel(meal.mealType) }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ getPhasesLabel(meal.phases) }}
-                  </p>
-                  <p
-                    v-if="!meal.eligible"
-                    class="text-xs text-orange-600 dark:text-orange-400 mt-1"
-                  >
-                    {{ $t('edition.volunteers.meals.not_eligible_reason') }}
-                  </p>
+                <div class="flex items-center gap-3">
+                  <UCheckbox
+                    v-model="meal.accepted"
+                    :disabled="savingMeals || !meal.eligible"
+                    :title="!meal.eligible ? $t('edition.volunteers.meals.not_eligible') : ''"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <p
+                      :class="[
+                        'text-sm font-medium',
+                        meal.eligible
+                          ? 'text-gray-900 dark:text-white'
+                          : 'text-gray-400 dark:text-gray-600',
+                      ]"
+                    >
+                      {{ getMealTypeLabel(meal.mealType) }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ getPhasesLabel(meal.phases) }}
+                    </p>
+                    <p
+                      v-if="!meal.eligible"
+                      class="text-xs text-orange-600 dark:text-orange-400 mt-1"
+                    >
+                      {{ $t('edition.volunteers.meals.not_eligible_reason') }}
+                    </p>
+                  </div>
                 </div>
+
+                <!-- L'après-spectacle n'a de sens que sur un repas accordé : proposer de le
+                     marquer sur un repas décoché ferait promettre une assiette qu'on ne sert
+                     pas. Même règle que chez les artistes. -->
+                <USwitch
+                  v-if="meal.eligible && meal.accepted"
+                  v-model="meal.afterShow"
+                  :disabled="savingMeals"
+                  size="xs"
+                  class="pl-7"
+                  :label="$t('edition.volunteers.meals.after_show')"
+                />
               </div>
             </div>
           </div>
@@ -190,7 +204,7 @@ const hasUnsavedMealChanges = computed(() => {
 
   return meals.value.some((meal, index) => {
     const initialMeal = initialMeals.value[index]
-    return meal.accepted !== initialMeal?.accepted
+    return meal.accepted !== initialMeal?.accepted || meal.afterShow !== initialMeal?.afterShow
   })
 })
 
@@ -230,6 +244,9 @@ const { execute: executeSaveMeals, loading: savingMeals } = useApiAction(
         mealId: meal.id,
         selectionId: meal.selectionId,
         accepted: meal.accepted,
+        // Un repas refusé ne peut pas être « après spectacle » : le serveur recevrait un drapeau
+        // sur une ligne qu'il va justement décocher.
+        afterShow: meal.accepted ? (meal.afterShow ?? false) : false,
       })),
     }),
     successMessage: {

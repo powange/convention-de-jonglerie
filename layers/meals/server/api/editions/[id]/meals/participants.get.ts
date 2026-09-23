@@ -100,7 +100,10 @@ export default wrapApiHandler(
       include: {
         mealSelections: {
           where: { mealId: { in: mealIds } },
-          select: { mealId: true, accepted: true },
+          // `afterShow` manquait à cette sélection : la ligne était bien trouvée, mais le champ
+          // valait `undefined`, ramené à `false` juste après. Un organisateur déclarant manger
+          // après le spectacle n'était donc jamais compté — sans qu'aucune erreur ne le dise.
+          select: { mealId: true, accepted: true, afterShow: true },
         },
         organizer: {
           select: {
@@ -134,6 +137,19 @@ export default wrapApiHandler(
       dietaryPreference: string | null
       allergies: string | null
       allergySeverity: string | null
+      /*
+       * Le contact d'urgence, pour la feuille de restauration.
+       *
+       * Ses deux colonnes étaient DÉJÀ lues en base — `infosPersonnellesSelect` les sélectionne —
+       * puis jetées avant l'envoi par `infosAlimentaires`. Le PDF affichait donc depuis toujours
+       * une colonne « Téléphone d'urgence » vide, sans que rien ne le signale.
+       *
+       * Renseigné pour les seuls BÉNÉVOLES : eux seuls déclarent ce contact. Les artistes, les
+       * organisateurs et les participants venus par billetterie n'en ont pas, et leur case reste
+       * vide plutôt que d'annoncer une donnée qui n'existe pas de leur côté.
+       */
+      emergencyContactName: string | null
+      emergencyContactPhone: string | null
       afterShow: boolean
     }> = []
 
@@ -155,7 +171,9 @@ export default wrapApiHandler(
           // les colonnes ont été supprimées : elles valaient `undefined` depuis, et le régime
           // comme les allergies des bénévoles n'apparaissaient plus nulle part.
           ...infosAlimentaires(selection.volunteer.user as never),
-          afterShow: false,
+          emergencyContactName: selection.volunteer.user.emergencyContactName ?? null,
+          emergencyContactPhone: selection.volunteer.user.emergencyContactPhone ?? null,
+          afterShow: selection.afterShow,
         })
       })
 
@@ -175,6 +193,8 @@ export default wrapApiHandler(
           dietaryPreference: a.dietaryPreference,
           allergies: a.allergies,
           allergySeverity: a.allergySeverity,
+          emergencyContactName: null,
+          emergencyContactPhone: null,
           afterShow: a.afterShow,
         })
       })
@@ -195,6 +215,8 @@ export default wrapApiHandler(
           dietaryPreference: p.dietaryPreference,
           allergies: p.allergies,
           allergySeverity: p.allergySeverity,
+          emergencyContactName: null,
+          emergencyContactPhone: null,
           afterShow: false,
         })
       })
@@ -217,7 +239,11 @@ export default wrapApiHandler(
           mealPhases: meal.phases,
           // Le profil fait foi ; la ligne d'organisateur ne sert que de repli.
           ...infosAlimentaires(eo.organizer.user as never),
-          afterShow: false,
+          emergencyContactName: null,
+          emergencyContactPhone: null,
+          // Sans ligne, c'est un repas ordinaire : l'absence d'enregistrement vaut « pas après
+          // le spectacle », puisqu'une ligne n'existe que pour porter une exception.
+          afterShow: selection?.afterShow ?? false,
         })
       })
     })

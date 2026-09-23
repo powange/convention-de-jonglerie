@@ -60,6 +60,8 @@ export interface MealVolunteerParticipant {
   allergySeverity: string | null
   emergencyContactName: string | null
   emergencyContactPhone: string | null
+  /** Repas pris après le passage sur scène : la cuisine le garde au chaud. */
+  afterShow: boolean
 }
 
 /** Participant organisateur d'un repas (catering). */
@@ -71,6 +73,8 @@ export interface MealOrganizerParticipant {
   dietaryPreference: string | null
   allergies: string | null
   allergySeverity: string | null
+  /** Repas pris après le passage sur scène : la cuisine le garde au chaud. */
+  afterShow: boolean
 }
 
 /**

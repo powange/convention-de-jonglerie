@@ -261,7 +261,7 @@
       "no_participants": "No participants found",
       "search_placeholder": "Search by surname, first name or email",
       "stats": {
-        "after_show": "After show",
+        "after_show": "Plates set aside",
         "artists": "Artists meals",
         "by_diet": "By diet",
         "by_meal_type": "By meal type",
@@ -426,6 +426,8 @@
       "last_name": "Last name",
       "last_name_placeholder": "Your last name",
       "meals": {
+        "after_show": "After show",
+        "check_all": "Check all",
         "confirm_close_unsaved": "TODO: Confirm closure with unsaved changes",
         "description": "TODO: Description",
         "error_loading": "TODO: Error while loading",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Outside attendance period",
         "saved_success": "TODO: Successful registration",
         "title": "TODO: Meals",
-        "unsaved_changes": "TODO: Changes not registered",
-        "check_all": "Check all",
-        "uncheck_all": "Uncheck all"
+        "uncheck_all": "Uncheck all",
+        "unsaved_changes": "TODO: Changes not registered"
       },
       "no_account_link": "Person doesn't have an account?",
       "no_user_found": "No user found",

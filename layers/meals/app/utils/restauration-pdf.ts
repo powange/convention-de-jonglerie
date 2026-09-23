@@ -23,6 +23,7 @@ export interface ParticipantDeRepas {
   dietaryPreference?: string | null
   allergies?: string | null
   allergySeverity?: string | null
+  emergencyContactName?: string | null
   emergencyContactPhone?: string | null
   afterShow?: boolean | null
   email?: string | null
@@ -64,6 +65,20 @@ export interface ResumeDeRepas {
   populations: CompteParCle[]
   /** Combien d'artistes mangent après leur passage. Zéro quand aucun : la ligne disparaît. */
   apresSpectacle: number
+  /**
+   * QUI mange après son passage, et comment le joindre.
+   *
+   * Le compte seul ne suffit pas à la cuisine : ces assiettes se gardent au chaud, et il faut
+   * pouvoir appeler la personne quand elle ne se présente pas — un artiste qui finit tard ne
+   * revient pas toujours à l'heure dite. Le téléphone est celui du participant, et non le contact
+   * d'urgence de la fiche d'allergie : on l'appelle pour le prévenir, pas pour le secourir.
+   */
+  personnesApresSpectacle: Array<{
+    nom: string
+    telephone: string | null
+    /** Clé du type — bénévole, artiste, organisateur : on ne s'adresse pas à eux de la même façon. */
+    cleType: string
+  }>
   /** Les régimes présents, dans un ordre fixe, les absents omis. */
   regimes: CompteParCle[]
   /** Les personnes à allergie, celles pour qui la cuisine doit faire autrement. */
@@ -72,7 +87,14 @@ export interface ResumeDeRepas {
     allergies: string
     /** Clé de la gravité, ou `null` quand elle n'est pas renseignée. */
     cleGravite: string | null
-    telephoneUrgence: string | null
+    /**
+     * Qui appeler, et à quel numéro.
+     *
+     * Le nom AVANT le numéro : on décroche pour parler à quelqu'un, et savoir qui l'on demande
+     * évite d'ouvrir la conversation par une question. Les deux peuvent manquer indépendamment —
+     * un numéro sans nom reste utile, un nom sans numéro ne l'est pas.
+     */
+    contactUrgence: string | null
   }>
 }
 
@@ -117,6 +139,23 @@ const CLES_GRAVITE: Record<string, string> = {
 }
 
 /** Le nom d'une personne, tel qu'on le lit sur une fiche. */
+/**
+ * Le contact d'urgence, prêt à s'écrire : le nom, puis le numéro À LA LIGNE.
+ *
+ * Sur une même ligne, le tiret séparateur poussait la colonne à se replier n'importe où — un
+ * numéro coupé en deux ne se compose pas. Deux lignes, chacune lisible d'un bloc, dans une
+ * colonne qui reste étroite.
+ *
+ * Sans numéro, rien : un nom seul n'aide personne au moment où l'on cherche à joindre quelqu'un.
+ * Sans nom, le numéro seul — il reste composable.
+ */
+function contactDUrgence(p: ParticipantDeRepas): string | null {
+  const telephone = p.emergencyContactPhone?.trim()
+  if (!telephone) return null
+  const nom = p.emergencyContactName?.trim()
+  return nom ? `${nom}\n${telephone}` : telephone
+}
+
 function nomLisible(p: ParticipantDeRepas): string {
   return `${p.prenom ?? ''} ${p.nom ?? ''}`.trim()
 }
@@ -158,13 +197,23 @@ export function resumerRepas(repas: RepasDeRestauration): ResumeDeRepas {
     if (nombre) regimes.push({ cle: CLES_REGIME[regime]!, nombre })
   }
 
+  /*
+   * Le compte et la liste tirés du MÊME filtre : deux filtres qui divergeraient donneraient un
+   * nombre qui ne correspond pas aux noms écrits juste en dessous.
+   *
+   * Plus seulement les artistes : bénévoles et organisateurs peuvent désormais déclarer un repas
+   * d'après spectacle. Le filtre porte donc sur le drapeau seul — c'est la source qui décide qui
+   * peut le porter, pas cette fonction.
+   */
+  const apresSpectacle = repas.participants.filter((p) => p.afterShow)
+
   const allergies = repas.participants
     .filter((p) => p.allergies && p.allergies.trim() !== '')
     .map((p) => ({
       nom: nomLisible(p),
       allergies: p.allergies!.trim(),
       cleGravite: p.allergySeverity ? (CLES_GRAVITE[p.allergySeverity] ?? null) : null,
-      telephoneUrgence: p.emergencyContactPhone ?? null,
+      contactUrgence: contactDUrgence(p),
     }))
 
   return {
@@ -172,7 +221,12 @@ export function resumerRepas(repas: RepasDeRestauration): ResumeDeRepas {
     clesPhases: repas.phases.map((phase) => CLES_PHASE[phase] ?? phase),
     total: repas.totalParticipants,
     populations,
-    apresSpectacle: repas.participants.filter((p) => p.type === 'artist' && p.afterShow).length,
+    apresSpectacle: apresSpectacle.length,
+    personnesApresSpectacle: apresSpectacle.map((p) => ({
+      nom: nomLisible(p),
+      telephone: p.phone ?? null,
+      cleType: `gestion.meals.person_type.${p.type}`,
+    })),
     regimes,
     allergies,
   }
@@ -216,7 +270,7 @@ export function lignesDeParticipants(repas: RepasDeRestauration): LigneDePartici
       cleRegime: regime === 'NONE' ? null : (CLES_REGIME[regime] ?? null),
       allergies: p.allergies && p.allergies.trim() !== '' ? p.allergies.trim() : null,
       cleGravite: p.allergySeverity ? (CLES_GRAVITE[p.allergySeverity] ?? null) : null,
-      telephoneUrgence: p.emergencyContactPhone ?? null,
+      contactUrgence: contactDUrgence(p),
       apresSpectacle: p.type === 'artist' && p.afterShow === true,
     }
   })
@@ -320,4 +374,69 @@ export function couleurDuType(type: string | null | undefined): CouleurDeType | 
   }
 
   return couleurs[type ?? ''] ?? null
+}
+
+/**
+ * Les colonnes de population du tableau des volumes.
+ *
+ * Elles ne sont pas fixes : la billetterie et les organisateurs n'apparaissent que si quelqu'un
+ * est concerné, et une convention sans billetterie n'a pas à lire une colonne vide. On prend donc
+ * l'UNION des populations présentes dans la journée, dans l'ordre où le résumé les range — sans
+ * quoi un repas sans participants décalerait ses chiffres d'une colonne.
+ *
+ * C'est tout l'intérêt d'un tableau plutôt que d'une liste : des nombres alignés se comparent d'un
+ * coup d'œil entre les services, là où trois lignes de texte demandent de les chercher.
+ */
+export function colonnesDePopulation(resumes: readonly ResumeDeRepas[]): string[] {
+  const vues: string[] = []
+  for (const resume of resumes) {
+    for (const population of resume.populations) {
+      if (!vues.includes(population.cle)) vues.push(population.cle)
+    }
+  }
+  return vues
+}
+
+/** Idem pour les régimes, qui suivent déjà un ordre fixe dans le résumé. */
+export function colonnesDeRegime(resumes: readonly ResumeDeRepas[]): string[] {
+  const vues: string[] = []
+  for (const resume of resumes) {
+    for (const regime of resume.regimes) {
+      if (!vues.includes(regime.cle)) vues.push(regime.cle)
+    }
+  }
+  return vues
+}
+
+/**
+ * Le nombre d'une clé donnée, ou `null` si ce repas ne la porte pas.
+ *
+ * `null` et non `0` : la cuisine ne lit pas la même chose. « 0 » dit qu'on a compté et qu'il n'y a
+ * personne ; une case vide dit que la question ne se pose pas pour ce service.
+ */
+export function nombrePourCle(comptes: readonly CompteParCle[], cle: string): number | null {
+  const trouve = comptes.find((compte) => compte.cle === cle)
+  return trouve ? trouve.nombre : null
+}
+
+/**
+ * Le libellé d'en-tête d'une population, à partir de la clé de son compte.
+ *
+ * Les clés de `populations` sont PLURALISÉES et interpolent le nombre — « {count} bénévoles » —
+ * parce qu'elles ont été écrites pour une phrase. Employées telles quelles en tête de colonne,
+ * elles affichent le nombre passé pour choisir le pluriel : l'en-tête annonçait « 2 bénévoles »
+ * au-dessus d'une colonne qui en compte quarante.
+ *
+ * Un en-tête ne porte pas de nombre ; le nombre est dans la case. On rend donc le libellé nu.
+ * À défaut de correspondance, la clé d'origine : mieux vaut un pluriel maladroit qu'une colonne
+ * sans titre.
+ */
+export function cleLibelleDePopulation(cleDuCompte: string): string {
+  const libelles: Record<string, string> = {
+    'gestion.meals.count_volunteers': 'gestion.meals.person_type.volunteer',
+    'gestion.meals.count_artists': 'gestion.meals.person_type.artist',
+    'gestion.meals.count_participants': 'gestion.meals.person_type.participant',
+    'gestion.meals.count_organizers': 'gestion.meals.person_type.organizer',
+  }
+  return libelles[cleDuCompte] ?? cleDuCompte
 }

@@ -323,11 +323,9 @@ model VolunteerAutoAssignRun {
 
   /**
    * L'état du planning tel que ce calcul l'a laissé.
-   *
    * L'annulation ne refusait que si un AUTRE calcul avait été appliqué depuis. Elle ne voyait pas
    * les affectations posées à la main entre-temps : les retirer aurait fait disparaître ce
    * travail, et recréer les anciennes pouvait entrer en conflit avec lui.
-   *
    * Même mécanique que l'empreinte qui protège l'application : on compare avant d'écrire.
    */
   empreinteApres String?

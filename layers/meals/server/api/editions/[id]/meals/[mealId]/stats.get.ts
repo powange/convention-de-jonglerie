@@ -53,6 +53,23 @@ export default wrapApiHandler(
       },
     })
 
+    /*
+     * Les assiettes à garder au chaud pour les BÉNÉVOLES.
+     *
+     * Même règle que pour les artistes : celles déjà consommées en sortent — une part servie
+     * n'est plus une part à mettre de côté, et la compter ferait garder des assiettes pour des
+     * gens déjà passés.
+     */
+    const volunteerAfterShowCount = await prisma.volunteerMealSelection.count({
+      where: {
+        mealId,
+        accepted: true,
+        afterShow: true,
+        consumedAt: null,
+        volunteer: { eventId: editionId, status: 'ACCEPTED' },
+      },
+    })
+
     // 2. Compter les artistes ayant accès à ce repas (via le port artists)
     const artistSelections = await ports.artists.listMealSelections(editionId, mealId)
     const artistCount = artistSelections.length
@@ -89,6 +106,23 @@ export default wrapApiHandler(
       },
     })
 
+    /*
+     * Idem pour les ORGANISATEURS.
+     *
+     * Une ligne d'organisateur ne matérialisait qu'une exception ou une consommation ; porter
+     * l'après-spectacle en crée une avec `accepted: true`. Ce sont donc exactement ces lignes-là
+     * que l'on compte — un organisateur sans ligne mange au service, par définition.
+     */
+    const organizerAfterShowCount = await prisma.organizerMealSelection.count({
+      where: {
+        mealId,
+        accepted: true,
+        afterShow: true,
+        consumedAt: null,
+        editionOrganizer: { editionId },
+      },
+    })
+
     const total = volunteerCount + artistCount + participantCount + organizerCount
     const validated =
       volunteerValidatedCount +
@@ -105,6 +139,7 @@ export default wrapApiHandler(
           volunteers: {
             total: volunteerCount,
             validated: volunteerValidatedCount,
+            afterShow: volunteerAfterShowCount,
           },
           artists: {
             total: artistCount,
@@ -118,6 +153,7 @@ export default wrapApiHandler(
           organizers: {
             total: organizerCount,
             validated: organizerValidatedCount,
+            afterShow: organizerAfterShowCount,
           },
         },
       },

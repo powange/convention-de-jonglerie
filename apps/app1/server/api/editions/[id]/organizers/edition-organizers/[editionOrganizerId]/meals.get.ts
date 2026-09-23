@@ -58,6 +58,8 @@ export default wrapApiHandler(
           mealType: meal.mealType,
           phases: meal.phases,
           accepted: selection?.accepted ?? true,
+          // Sans ligne, c'est un repas ordinaire : l'absence vaut « pas après le spectacle ».
+          afterShow: selection?.afterShow ?? false,
           consumedAt: selection?.consumedAt ?? null,
         }
       }),

@@ -261,7 +261,7 @@
       "no_participants": "Inga deltagare hittades",
       "search_placeholder": "Sök på efternamn, förnamn eller e-post",
       "stats": {
-        "after_show": "Efter föreställning",
+        "after_show": "Undanlagda tallrikar",
         "artists": "Artistmåltider",
         "by_diet": "Efter diet",
         "by_meal_type": "Efter måltidstyp",
@@ -426,6 +426,8 @@
       "last_name": "Namn",
       "last_name_placeholder": "Ditt namn",
       "meals": {
+        "after_show": "Efter föreställningen",
+        "check_all": "Markera alla",
         "confirm_close_unsaved": "TODO: Bekräfta stängning med osparade ändringar",
         "description": "TODO: Beskrivning",
         "error_loading": "TODO: Fel vid inläsning",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Utanför närvarotiden",
         "saved_success": "TODO: Framgångsrik registrering",
         "title": "TODO: Måltider",
-        "unsaved_changes": "TODO: Ändringar som inte registrerats",
-        "check_all": "Markera alla",
-        "uncheck_all": "Avmarkera alla"
+        "uncheck_all": "Avmarkera alla",
+        "unsaved_changes": "TODO: Ändringar som inte registrerats"
       },
       "no_account_link": "Har personen inget konto?",
       "no_user_found": "Inga användare hittades",

@@ -65,6 +65,18 @@
                       </p>
                     </div>
                   </div>
+                  <!-- L'après-spectacle n'a de sens que sur un repas accordé. Le cocher crée une
+                       ligne de sélection là où un organisateur n'en avait aucune — le modèle le
+                       prévoit, c'est le seul moyen de porter l'information. -->
+                  <USwitch
+                    v-if="meal.accepted"
+                    v-model="meal.afterShow"
+                    :disabled="savingMeals"
+                    size="xs"
+                    class="pl-7"
+                    :label="$t('gestion.organizers.meals.after_show')"
+                  />
+
                   <!-- Un repas déjà validé ne peut plus être décoché : il a été consommé. -->
                   <UBadge v-if="meal.consumedAt" color="success" variant="soft" size="sm">
                     {{ $t('gestion.organizers.meals.already_validated') }}
@@ -156,6 +168,7 @@ interface OrganizerProp {
 
 interface OrganizerMeal extends Meal {
   accepted: boolean
+  afterShow: boolean
   consumedAt: string | null
 }
 
@@ -212,7 +225,11 @@ const groupedMeals = computed(() => groupMealsByDate(meals.value))
 
 const currentState = computed(() =>
   JSON.stringify({
-    meals: meals.value.map((meal) => ({ id: meal.id, accepted: meal.accepted })),
+    meals: meals.value.map((meal) => ({
+      id: meal.id,
+      accepted: meal.accepted,
+      afterShow: meal.afterShow,
+    })),
     dietaryPreference: dietaryPreference.value,
     allergies: allergies.value,
     allergySeverity: allergySeverity.value,
@@ -260,7 +277,13 @@ const { execute: executeFetchMeals, loading: loadingMeals } = useApiAction(meals
 const { execute: executeSaveMeals, loading: savingMeals } = useApiAction(mealsUrl, {
   method: 'PUT',
   body: () => ({
-    selections: meals.value.map((meal) => ({ mealId: meal.id, accepted: meal.accepted })),
+    selections: meals.value.map((meal) => ({
+      mealId: meal.id,
+      accepted: meal.accepted,
+      // Un repas refusé ne peut pas être « après spectacle » : le drapeau porterait sur une
+      // assiette qu'on ne sert pas.
+      afterShow: meal.accepted ? (meal.afterShow ?? false) : false,
+    })),
     dietaryPreference: dietaryPreference.value,
     allergies: allergies.value || null,
     allergySeverity: allergies.value ? allergySeverity.value : null,

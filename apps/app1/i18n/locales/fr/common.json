@@ -265,7 +265,7 @@
       "no_participants": "Aucun participant",
       "search_placeholder": "Rechercher par nom, prénom ou email...",
       "stats": {
-        "after_show": "Après spectacle",
+        "after_show": "Assiettes mises de côté",
         "artists": "Repas artistes",
         "by_diet": "Par régime alimentaire",
         "by_meal_type": "Par type de repas",
@@ -445,6 +445,7 @@
       "last_name": "Nom",
       "last_name_placeholder": "Votre nom",
       "meals": {
+        "after_show": "Après spectacle",
         "check_all": "Tout cocher",
         "confirm_close_unsaved": "Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?",
         "description": "Sélectionnez les repas que vous souhaitez prendre pendant votre bénévolat",

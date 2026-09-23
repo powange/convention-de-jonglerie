@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest'
 
 import {
+  colonnesDePopulation,
+  colonnesDeRegime,
+  nombrePourCle,
   couleurDuType,
   motLePlusLong,
   nomFichierRestauration,
@@ -104,18 +107,23 @@ describe('resumerRepas', () => {
     ])
   })
 
-  it('ne compte après spectacle que les artistes', () => {
+  /*
+   * Le compte suivait autrefois le seul type « artiste », faute d'un drapeau ailleurs. Bénévoles
+   * et organisateurs le portent désormais aussi : c'est la SOURCE qui décide qui peut le déclarer,
+   * et le résumé compte ce qu'on lui donne.
+   */
+  it('compte après spectacle quel que soit le type de la personne', () => {
     const r = resumerRepas(
       repas({
         participants: [
           personne({ type: 'artist', afterShow: true }),
           personne({ type: 'artist', afterShow: false }),
-          // Un bénévole marqué « après spectacle » n'a pas de sens : il ne doit pas compter.
           personne({ type: 'volunteer', afterShow: true }),
+          personne({ type: 'organizer', afterShow: true }),
         ],
       })
     )
-    expect(r.apresSpectacle).toBe(1)
+    expect(r.apresSpectacle).toBe(3)
   })
 
   it('retient les allergies, leur gravité et le contact d’urgence', () => {
@@ -139,7 +147,7 @@ describe('resumerRepas', () => {
         nom: 'Sam Bakker',
         allergies: 'arachide',
         cleGravite: 'gestion.meals.severity_critical',
-        telephoneUrgence: '0600000000',
+        contactUrgence: '0600000000',
       },
     ])
   })
@@ -375,5 +383,183 @@ describe('couleurDuType', () => {
         }
       }
     }
+  })
+})
+
+/**
+ * Les colonnes du tableau des volumes.
+ *
+ * Elles ne sont pas fixes : billetterie et organisateurs n'apparaissent que si quelqu'un est
+ * concerné. Une colonne déduite d'un seul repas décalerait les chiffres de tous les autres.
+ */
+describe('colonnesDePopulation', () => {
+  const resume = (populations: Array<{ cle: string; nombre: number }>) =>
+    ({ populations, regimes: [] }) as never
+
+  it("prend l'union des populations de la journée, dans l'ordre rencontré", () => {
+    expect(
+      colonnesDePopulation([
+        resume([
+          { cle: 'benevoles', nombre: 4 },
+          { cle: 'artistes', nombre: 2 },
+        ]),
+        resume([
+          { cle: 'benevoles', nombre: 6 },
+          { cle: 'billetterie', nombre: 30 },
+        ]),
+      ])
+    ).toEqual(['benevoles', 'artistes', 'billetterie'])
+  })
+
+  it('ne répète jamais une colonne', () => {
+    const colonnes = colonnesDePopulation([
+      resume([{ cle: 'benevoles', nombre: 1 }]),
+      resume([{ cle: 'benevoles', nombre: 2 }]),
+    ])
+    expect(colonnes).toEqual(['benevoles'])
+  })
+
+  it('rend une liste vide sans repas', () => {
+    expect(colonnesDePopulation([])).toEqual([])
+  })
+})
+
+describe('colonnesDeRegime', () => {
+  it("prend l'union des régimes déclarés", () => {
+    const resume = (regimes: Array<{ cle: string; nombre: number }>) =>
+      ({ populations: [], regimes }) as never
+    expect(
+      colonnesDeRegime([
+        resume([{ cle: 'vegetarien', nombre: 3 }]),
+        resume([
+          { cle: 'vegan', nombre: 1 },
+          { cle: 'vegetarien', nombre: 2 },
+        ]),
+      ])
+    ).toEqual(['vegetarien', 'vegan'])
+  })
+
+  /* Sans régime déclaré, le tableau entier disparaît : un tableau vide se lit comme un oubli. */
+  it('rend une liste vide quand personne ne déclare de régime', () => {
+    expect(colonnesDeRegime([{ populations: [], regimes: [] } as never])).toEqual([])
+  })
+})
+
+describe('nombrePourCle', () => {
+  const comptes = [
+    { cle: 'benevoles', nombre: 4 },
+    { cle: 'artistes', nombre: 0 },
+  ]
+
+  it('rend le nombre quand la clé est présente, zéro compris', () => {
+    expect(nombrePourCle(comptes, 'benevoles')).toBe(4)
+    expect(nombrePourCle(comptes, 'artistes')).toBe(0)
+  })
+
+  /*
+   * `null` et non `0` : la cuisine ne lit pas la même chose. « 0 » dit qu'on a compté et qu'il n'y
+   * a personne ; une case vide dit que la question ne se pose pas pour ce service.
+   */
+  it('rend null pour une clé absente, jamais zéro', () => {
+    expect(nombrePourCle(comptes, 'billetterie')).toBeNull()
+    expect(nombrePourCle([], 'benevoles')).toBeNull()
+  })
+})
+
+/**
+ * Le contact d'urgence, nom compris.
+ *
+ * Ses deux colonnes étaient déjà LUES en base puis jetées avant l'envoi : la colonne
+ * « Téléphone d'urgence » du PDF était vide depuis toujours, sans que rien ne le signale.
+ */
+describe("contact d'urgence", () => {
+  const avecContact = (nom: string | null, telephone: string | null) =>
+    resumerRepas({
+      mealType: 'LUNCH',
+      phases: ['EVENT'],
+      totalParticipants: 1,
+      volunteerCount: 1,
+      artistCount: 0,
+      ticketParticipantCount: 0,
+      organizerCount: 0,
+      participants: [
+        {
+          type: 'volunteer',
+          prenom: 'Sam',
+          nom: 'Bakker',
+          allergies: 'arachide',
+          emergencyContactName: nom,
+          emergencyContactPhone: telephone,
+        },
+      ],
+    }).allergies[0]!.contactUrgence
+
+  /* Le numéro à la ligne : sur une seule, la colonne se repliait n'importe où et coupait le
+     numéro en deux. */
+  it('écrit le nom, puis le numéro à la ligne', () => {
+    expect(avecContact('Marie Dupont', '0612345678')).toBe('Marie Dupont\n0612345678')
+  })
+
+  /* Un numéro sans nom reste composable ; un nom sans numéro n'aide personne. */
+  it('garde le numéro seul, et rend null pour un nom sans numéro', () => {
+    expect(avecContact(null, '0612345678')).toBe('0612345678')
+    expect(avecContact('Marie Dupont', null)).toBeNull()
+    expect(avecContact(null, null)).toBeNull()
+  })
+
+  it('ignore les espaces qui ne portent rien', () => {
+    expect(avecContact('  ', '  ')).toBeNull()
+    expect(avecContact('  Marie  ', ' 0612345678 ')).toBe('Marie\n0612345678')
+  })
+})
+
+/**
+ * Les personnes du repas d'après spectacle.
+ *
+ * Le compte figurait déjà ; il manquait les noms et les numéros. Compte et liste sortent du MÊME
+ * filtre : deux filtres qui divergeraient donneraient un nombre ne correspondant pas aux noms
+ * écrits juste en dessous.
+ */
+describe('personnesApresSpectacle', () => {
+  const repasAvec = (participants: any[]) =>
+    resumerRepas({
+      mealType: 'DINNER',
+      phases: ['EVENT'],
+      totalParticipants: participants.length,
+      volunteerCount: 0,
+      artistCount: participants.length,
+      ticketParticipantCount: 0,
+      organizerCount: 0,
+      participants,
+    })
+
+  it('rend les noms, types et téléphones, et le compte qui va avec', () => {
+    const r = repasAvec([
+      { type: 'artist', prenom: 'Ada', nom: 'Lovelace', afterShow: true, phone: '0611' },
+      { type: 'artist', prenom: 'Bo', nom: 'Diddley', afterShow: false },
+      { type: 'artist', prenom: 'Cy', nom: 'Twombly', afterShow: true, phone: null },
+    ])
+    expect(r.apresSpectacle).toBe(2)
+    expect(r.personnesApresSpectacle).toEqual([
+      { nom: 'Ada Lovelace', telephone: '0611', cleType: 'gestion.meals.person_type.artist' },
+      { nom: 'Cy Twombly', telephone: null, cleType: 'gestion.meals.person_type.artist' },
+    ])
+  })
+
+  /*
+   * Bénévoles et organisateurs déclarent désormais eux aussi un repas d'après spectacle. Chaque
+   * ligne dit lequel : on n'attend pas un artiste en coulisses comme on croise un bénévole de
+   * plateau au comptoir.
+   */
+  it('retient aussi les bénévoles et les organisateurs, en les nommant', () => {
+    const r = repasAvec([
+      { type: 'volunteer', prenom: 'Dee', nom: 'Dee', afterShow: true, phone: '0622' },
+      { type: 'organizer', prenom: 'Eve', nom: 'Ensler', afterShow: true },
+    ])
+    expect(r.apresSpectacle).toBe(2)
+    expect(r.personnesApresSpectacle.map((p) => p.cleType)).toEqual([
+      'gestion.meals.person_type.volunteer',
+      'gestion.meals.person_type.organizer',
+    ])
   })
 })

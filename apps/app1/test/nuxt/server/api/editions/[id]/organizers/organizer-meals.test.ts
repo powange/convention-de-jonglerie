@@ -129,8 +129,10 @@ describe('repas par organisateur', () => {
 
       expect(prismaMock.organizerMealSelection.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          create: { editionOrganizerId: 5, mealId: 1, accepted: false },
-          update: { accepted: false },
+          // Un repas refusé ne peut pas être « après spectacle » : le drapeau porterait sur une
+          // assiette qu'on ne sert pas.
+          create: { editionOrganizerId: 5, mealId: 1, accepted: false, afterShow: false },
+          update: { accepted: false, afterShow: false },
         })
       )
     })
@@ -158,8 +160,33 @@ describe('repas par organisateur', () => {
 
       expect(prismaMock.organizerMealSelection.updateMany).toHaveBeenCalledWith({
         where: { editionOrganizerId: 5, mealId: 1 },
-        data: { accepted: true },
+        data: { accepted: true, afterShow: false },
       })
+    })
+
+    /*
+     * La dérogation au principe de ce modèle.
+     *
+     * Une ligne d'organisateur ne matérialisait qu'une exception ou une consommation ; un repas
+     * accepté supprimait la sienne. L'après-spectacle en devient une troisième raison : sans
+     * ligne, il n'y a nulle part où l'inscrire, et la supprimer effacerait l'information aussitôt
+     * enregistrée.
+     */
+    it('conserve une ligne pour un repas accepté marqué après spectacle', async () => {
+      ;(globalThis as any).readBody = vi.fn().mockResolvedValue({
+        selections: [{ mealId: 1, accepted: true, afterShow: true }],
+      })
+
+      await putHandler(mockEvent as any)
+
+      expect(prismaMock.organizerMealSelection.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: { editionOrganizerId: 5, mealId: 1, accepted: true, afterShow: true },
+          update: { accepted: true, afterShow: true },
+        })
+      )
+      // Surtout pas de suppression : c'est elle qui effacerait le drapeau.
+      expect(prismaMock.organizerMealSelection.deleteMany).not.toHaveBeenCalled()
     })
 
     it('ignore un repas qui n’appartient pas à l’édition', async () => {

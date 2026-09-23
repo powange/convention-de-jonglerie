@@ -39,11 +39,11 @@ model User {
   /// Chaque session emporte le numéro qu'elle a trouvé à sa création. Le middleware le compare
   /// à celui du compte, qu'il lit DÉJÀ à chaque requête protégée : l'incrémenter ferme d'un coup
   /// toutes les sessions ouvertes, sans une requête de plus.
-  sessionVersion         Int       @default(0)
+  sessionVersion Int @default(0)
 
-  phone                  String?
-  pronouns               String?
-  preferredLanguage      String    @default("fr")
+  phone             String?
+  pronouns          String?
+  preferredLanguage String  @default("fr")
 
   // Informations personnelles renseignables depuis le profil, toutes facultatives.
   //

@@ -160,6 +160,9 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
           dietaryPreference: 'VEGETARIAN',
           allergies: null,
           allergySeverity: null,
+          // Sans ligne de sélection, c'est un repas ordinaire : l'absence vaut « pas après le
+          // spectacle ». Un organisateur qui le déclare porte, lui, une ligne `accepted: true`.
+          afterShow: false,
         },
       ])
     })
@@ -209,6 +212,9 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
           phases: ['EVENT'],
           selectionId: 99,
           accepted: true,
+          // La sélection simulée ne porte pas le drapeau : sans ligne ni valeur, c'est un repas
+          // ordinaire — l'absence vaut « pas après le spectacle ».
+          afterShow: false,
           eligible: true,
         },
       ])
@@ -389,11 +395,11 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
       ])
 
       expect(prismaMock.volunteerMealSelection.create).toHaveBeenCalledWith({
-        data: { volunteerId: 5, mealId: 1, accepted: true },
+        data: { volunteerId: 5, mealId: 1, accepted: true, afterShow: false },
       })
       expect(prismaMock.volunteerMealSelection.update).toHaveBeenCalledWith({
         where: { id: 88, volunteerId: 5 },
-        data: { accepted: false },
+        data: { accepted: false, afterShow: false },
       })
     })
 
@@ -427,7 +433,7 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
 
       expect(prismaMock.volunteerMealSelection.update).toHaveBeenCalledWith({
         where: { id: 88, volunteerId: 5 },
-        data: { accepted: false },
+        data: { accepted: false, afterShow: false },
       })
       // Et surtout : il ne CRÉE pas une seconde ligne au passage.
       expect(prismaMock.volunteerMealSelection.create).not.toHaveBeenCalled()

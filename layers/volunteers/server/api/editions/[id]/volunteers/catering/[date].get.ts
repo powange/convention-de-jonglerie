@@ -60,6 +60,9 @@ export default wrapApiHandler(
         allergySeverity: v.allergySeverity,
         emergencyContactName: v.emergencyContactName,
         emergencyContactPhone: v.emergencyContactPhone,
+        // Comme pour les artistes : la cuisine garde l'assiette au chaud, et la feuille de
+        // restauration liste à part qui elle attend.
+        afterShow: v.afterShow,
       }))
 
       const artists = (artistParticipantsByMeal[meal.id] ?? []).map((a) => ({
@@ -88,6 +91,8 @@ export default wrapApiHandler(
         allergySeverity: null,
         emergencyContactName: null,
         emergencyContactPhone: null,
+        // Un participant venu par billetterie ne passe pas sur scène.
+        afterShow: false,
       }))
 
       const organizers = meal.organizers.map((o) => ({
@@ -101,6 +106,7 @@ export default wrapApiHandler(
         allergySeverity: o.allergySeverity,
         emergencyContactName: null,
         emergencyContactPhone: null,
+        afterShow: o.afterShow,
       }))
 
       const allParticipants = [
