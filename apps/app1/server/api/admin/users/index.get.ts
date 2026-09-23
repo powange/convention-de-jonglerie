@@ -3,9 +3,10 @@ import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpe
 import { notificationStreamManager } from '#server/utils/notification-stream-manager'
 import { alternativesMotCle, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { validatePagination } from '#server/utils/validation-helpers'
+import { fragmentsDeTelephone } from '~~/shared/utils/doublons-utilisateurs'
 
 /** Les champs qu'un mot-clé peut viser. L'identifiant s'y ajoute, mais lui n'est pas du texte. */
-const CHAMPS_RECHERCHE = ['email', 'pseudo', 'nom', 'prenom'] as const
+const CHAMPS_RECHERCHE = ['email', 'pseudo', 'nom', 'prenom', 'phone'] as const
 
 /** L'identifiant visé par un mot-clé, quand celui-ci n'est qu'un nombre — sinon rien. */
 function identifiantEventuel(mot: string): Array<{ id: number }> {
@@ -34,18 +35,40 @@ export default wrapApiHandler(
     // moins un champ, mais pas forcément le même. La saisie entière était auparavant comparée à
     // chaque champ pris isolément, si bien que « Camille Bakker » ne trouvait rien — aucun champ
     // ne porte le prénom ET le nom — alors que chaque moitié trouvait. L'ordre n'importe plus.
-    andConditions.push(
-      ...motsClesDeLaRequete(search).map((mot) => ({
+    const conditionsParMot = motsClesDeLaRequete(search).map((mot) => ({
+      OR: [
+        // Un mot-clé entièrement numérique vise aussi l'identifiant : c'est ce dont on
+        // dispose quand on arrive depuis un journal d'erreurs ou une trace, et le chercher
+        // par pseudo demanderait de le connaître. Le champ reste inclus dans le `OR` : « 42 »
+        // trouve l'utilisateur 42 comme celui dont le pseudo contient 42.
+        ...identifiantEventuel(mot),
+        ...alternativesMotCle(mot, CHAMPS_RECHERCHE),
+      ],
+    }))
+
+    /*
+     * Le téléphone se cherche sur la saisie ENTIÈRE, et non mot par mot.
+     *
+     * « 06 16 81 04 13 » se découpe en cinq mots-clés dont chacun devrait se retrouver quelque
+     * part : « 06 » ne correspondrait à rien, et la recherche ne rendrait personne. Le numéro est
+     * donc traité à part, et cherché sous plusieurs écritures — celle qui est tapée, celle sans
+     * le zéro national, celle réduite aux derniers chiffres — car c'est le préfixe qui diffère
+     * entre ce qu'on tape et ce que la base stocke, jamais le numéro.
+     *
+     * En alternative et non en remplacement : une saisie peut être à la fois un numéro plausible
+     * et autre chose, et rien ne justifie de lui retirer la recherche par mots-clés.
+     */
+    const fragments = fragmentsDeTelephone(search)
+    if (fragments.length) {
+      andConditions.push({
         OR: [
-          // Un mot-clé entièrement numérique vise aussi l'identifiant : c'est ce dont on
-          // dispose quand on arrive depuis un journal d'erreurs ou une trace, et le chercher
-          // par pseudo demanderait de le connaître. Le champ reste inclus dans le `OR` : « 42 »
-          // trouve l'utilisateur 42 comme celui dont le pseudo contient 42.
-          ...identifiantEventuel(mot),
-          ...alternativesMotCle(mot, CHAMPS_RECHERCHE),
+          { AND: conditionsParMot },
+          ...fragments.map((fragment) => ({ phone: { contains: fragment } })),
         ],
-      }))
-    )
+      })
+    } else {
+      andConditions.push(...conditionsParMot)
+    }
 
     // Filtrage par statut admin
     const adminFilter = (query.adminFilter as string) || 'all'
@@ -109,6 +132,9 @@ export default wrapApiHandler(
           pseudo: true,
           nom: true,
           prenom: true,
+          // Le téléphone est affiché dans une colonne de la liste, et cherchable : sans lui, la
+          // recherche trouverait des comptes dont l'écran ne pourrait pas montrer pourquoi.
+          phone: true,
           pronouns: true,
           preferredLanguage: true,
           isEmailVerified: true,
