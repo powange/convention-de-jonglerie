@@ -82,6 +82,15 @@
           :title="t('common.refresh')"
           @click="refreshData"
         />
+
+        <!-- Recherche de doublons : un écran à part, car il ne filtre pas la liste, il la relit. -->
+        <UButton
+          icon="i-heroicons-users"
+          variant="outline"
+          color="neutral"
+          :label="t('admin.duplicates.action')"
+          @click="showDuplicatesModal = true"
+        />
       </div>
 
       <!-- Filtres supplémentaires -->
@@ -187,6 +196,12 @@
       :user="userToMerge"
       @merged="onUsersMerged"
     />
+
+    <!-- Recherche de doublons. Son bouton « fusionner » ouvre la modale ci-dessus, pré-remplie. -->
+    <AdminUserDuplicatesModal
+      v-model:open="showDuplicatesModal"
+      @merge="ouvrirFusionDepuisDoublon"
+    />
   </div>
 </template>
 
@@ -209,6 +224,8 @@ const { t } = useI18n()
 // Types pour les utilisateurs (utilisé dans la page mais défini dans le composable)
 interface AdminUserWithConnection extends AdminUser {
   isConnected: boolean
+  /** Renseigné par l'API, affiché en colonne et cherchable. Souvent absent : beaucoup de comptes n'en ont pas. */
+  phone?: string | null
   authProvider?: string
   lastLoginAt?: string | null
   isVolunteer: boolean
@@ -316,6 +333,7 @@ const showDeletionModal = ref(false)
 // État pour le modal de fusion
 const userToMerge = ref<AdminUserWithConnection | null>(null)
 const showMergeModal = ref(false)
+const showDuplicatesModal = ref(false)
 
 // État pour les stats de connexion
 const connectionStats = ref<{ totalActiveConnections: number; totalActiveUsers: number } | null>(
@@ -436,6 +454,17 @@ const columns = [
               t('admin.not_verified')
             ),
       ])
+    },
+  },
+  {
+    accessorKey: 'phone',
+    header: t('common.phone'),
+    cell: ({ row }: { row: any }) => {
+      const user = row.original as AdminUserWithConnection
+      // Un tiret plutôt qu'une case vide : sans lui, on ne sait pas si la colonne est vide ou
+      // si l'affichage a échoué. Chiffres alignés, la colonne se parcourt à la verticale.
+      if (!user.phone) return h('span', { class: 'text-gray-400' }, '—')
+      return h('span', { class: 'tabular-nums whitespace-nowrap' }, user.phone)
     },
   },
   {
@@ -1025,6 +1054,18 @@ const openDeletionModal = (user: AdminUserWithConnection) => {
 }
 
 // Fonction pour ouvrir le modal de fusion
+/**
+ * Fusionner depuis la recherche de doublons.
+ *
+ * La modale des doublons ne rend que les champs qui servent à comparer ; la modale de fusion, elle,
+ * n'a besoin que de l'identifiant et du pseudo pour poser sa question. On ne va donc PAS rechercher
+ * le compte complet : ce serait un appel de plus pour des champs dont personne ne se sert ici.
+ */
+const ouvrirFusionDepuisDoublon = (compte: { id: number; pseudo: string; email: string }) => {
+  userToMerge.value = compte as unknown as AdminUserWithConnection
+  showMergeModal.value = true
+}
+
 const openMergeModal = (user: AdminUserWithConnection) => {
   userToMerge.value = user
   showMergeModal.value = true

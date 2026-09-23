@@ -59,6 +59,66 @@ function collectUserRelations(): SchemaRelation[] {
   return relations
 }
 
+/**
+ * Les colonnes entières d'apparence « identifiant » que NULLE relation Prisma ne rattache.
+ *
+ * C'est l'angle mort de ce test : une colonne qui porte un `User.id` sans clé étrangère ne
+ * casse rien quand on la laisse pendante — la suppression du compte absorbé réussit, et
+ * l'identifiant orphelin se lit ensuite comme une valeur plausible. C'est ainsi que
+ * `ticketingOrderItem.entryValidatedBy` a manqué à l'inventaire alors que ses trois jumelles y
+ * figuraient.
+ *
+ * Toute colonne relevée ici doit donc être SOIT déclarée dans `USER_REFERENCES`, SOIT inscrite
+ * ci-dessous comme ne désignant pas un utilisateur. Le choix est explicite dans les deux cas.
+ */
+function collectUnrelatedIdColumns(): SchemaRelation[] {
+  const colonnes: SchemaRelation[] = []
+
+  for (const file of readdirSync(SCHEMA_DIR).filter((f) => f.endsWith('.prisma'))) {
+    const content = readFileSync(join(SCHEMA_DIR, file), 'utf8')
+
+    for (const bloc of content.split(/^model\s+/m).slice(1)) {
+      const nom = bloc.match(/^(\w+)/)?.[1]
+      if (!nom || nom === 'User') continue
+      const corps = bloc.slice(0, bloc.indexOf('\n}'))
+
+      // Les colonnes déjà portées par une relation — vers User ou vers autre chose.
+      const liees = new Set<string>()
+      for (const rel of corps.matchAll(/@relation\([^)]*fields:\s*\[([^\]]+)\]/g)) {
+        for (const champ of rel[1]!.split(',')) liees.add(champ.trim())
+      }
+
+      for (const rawLine of corps.split('\n')) {
+        const line = rawLine.split('//')[0]!.trimEnd()
+        const champ = line.match(/^\s+(\w+)\s+Int\??\s*$/)?.[1]
+        if (!champ || champ === 'id' || liees.has(champ)) continue
+        if (!/(Id|By)$/.test(champ)) continue
+        colonnes.push({ model: toDelegateName(nom), field: champ })
+      }
+    }
+  }
+
+  return colonnes
+}
+
+/**
+ * Les colonnes d'identifiant qui ne désignent PAS un utilisateur, et n'ont donc rien à faire
+ * dans une fusion de comptes. Vérifiées une à une :
+ *
+ * - les `helloAsso*` et `infomaniakConfig.eventId` portent des identifiants de services tiers ;
+ * - `entryValidationLog.participantId` va de pair avec `participantKind` : il désigne l'entité
+ *   validée — billet, bénévole, artiste — et non la personne qui a validé, laquelle est
+ *   `actorId`, dûment déclarée.
+ */
+const COLONNES_SANS_RAPPORT_AVEC_UN_UTILISATEUR = new Set([
+  'entryValidationLog.participantId',
+  'infomaniakConfig.eventId',
+  'ticketingOrder.helloAssoOrderId',
+  'ticketingOrderItem.helloAssoItemId',
+  'ticketingTier.helloAssoTierId',
+  'ticketingTierCustomField.helloAssoCustomFieldId',
+])
+
 describe('USER_REFERENCES vs schéma Prisma', () => {
   const schemaRelations = collectUserRelations()
   const declared = new Set(USER_REFERENCES.map((ref) => `${ref.model}.${ref.field}`))
@@ -77,6 +137,26 @@ describe('USER_REFERENCES vs schéma Prisma', () => {
     expect(
       missing,
       `Relations vers User absentes de USER_REFERENCES (server/utils/user-merge-references.ts) : ${missing.join(', ')}`
+    ).toEqual([])
+  })
+
+  /*
+   * Le test qui manquait : sans lui, une colonne « molle » oubliée ne se voit nulle part —
+   * ni ici, ni à l'exécution, puisque aucune clé étrangère ne proteste.
+   */
+  it('range chaque colonne d’identifiant sans relation : déclarée, ou écartée explicitement', () => {
+    const colonnes = collectUnrelatedIdColumns()
+
+    // Garde-fou : si le parsing casse, l'assertion suivante passerait sur une liste vide.
+    expect(colonnes.length).toBeGreaterThan(5)
+
+    const orphelines = colonnes
+      .map((c) => `${c.model}.${c.field}`)
+      .filter((cle) => !declared.has(cle) && !COLONNES_SANS_RAPPORT_AVEC_UN_UTILISATEUR.has(cle))
+
+    expect(
+      orphelines,
+      `Colonnes d'identifiant sans relation Prisma qu'il faut trancher : soit les déclarer dans USER_REFERENCES (avec soft: true), soit les inscrire dans COLONNES_SANS_RAPPORT_AVEC_UN_UTILISATEUR. ${orphelines.join(', ')}`
     ).toEqual([])
   })
 

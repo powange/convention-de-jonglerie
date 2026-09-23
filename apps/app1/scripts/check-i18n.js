@@ -96,6 +96,9 @@ const IGNORED_MISSING_KEYS = [
   'tasksData.value.cronEnabled',
   // Noms de domaine détectés comme clés i18n (dans useUrlValidation.ts et emailService.ts)
   'facebook.com',
+  // Domaines Google comparés dans adresse-email.ts, pour reconnaître une même boîte de réception
+  'gmail.com',
+  'googlemail.com',
   'youtu.be',
   'example.*',
   'player.vimeo.com',

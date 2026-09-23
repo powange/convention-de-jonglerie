@@ -11,6 +11,12 @@
  * la suppression finale échouera sur une contrainte de clé étrangère). Le DMMF exposé par
  * Prisma 7 à l'exécution est réduit (ni `relationFromFields` ni `uniqueFields`) : cette
  * table ne peut pas être dérivée automatiquement.
+ *
+ * ⚠️ Et surtout les colonnes `soft` — celles qui portent un `User.id` SANS relation ni clé
+ * étrangère. Elles sont les plus dangereuses à oublier, précisément parce que rien ne proteste :
+ * la suppression réussit, et l'identifiant reste pendant. `ticketingOrderItem.entryValidatedBy`
+ * manquait ainsi, alors que ses trois jumelles étaient là. Le test `user-merge-schema-sync`
+ * les surveille désormais aussi.
  */
 
 /** Regroupement utilisé pour l'aperçu affiché à l'administrateur. */
@@ -48,7 +54,7 @@ export interface UserReference {
 }
 
 /**
- * 52 colonnes : 48 relations Prisma + 4 références « molles ».
+ * 53 colonnes : 48 relations Prisma + 5 références « molles ».
  * Vérifié contre `prisma/schema/*.prisma`.
  */
 export const USER_REFERENCES: UserReference[] = [
@@ -186,6 +192,15 @@ export const USER_REFERENCES: UserReference[] = [
   // à laquelle ce champ sert à répondre — qui appeler devant un total aberrant — resterait sans
   // réponse. `onDelete: SetNull` protège de l'erreur de clé étrangère, pas de la perte.
   { model: 'ticketingCounter', field: 'lastActorId', group: 'misc' },
+  /*
+   * Qui a validé l'entrée d'un billet.
+   *
+   * `soft` comme ses trois jumelles (organisateur, bénévole, artiste) : la colonne porte un
+   * `User.id` sans relation ni clé étrangère. C'est justement ce qui la rendait dangereuse à
+   * oublier — rien n'aurait échoué au moment de supprimer le compte absorbé, et le journal des
+   * entrées aurait simplement cessé de nommer son validateur.
+   */
+  { model: 'ticketingOrderItem', field: 'entryValidatedBy', group: 'misc', soft: true },
   // Journal des mouvements d'entrée. Même raison que le compteur ci-dessus : `SetNull` évite
   // l'erreur de clé étrangère mais efface le nom de qui a scanné. Un journal dont l'auteur
   // disparaît à la première fusion de comptes ne tranche plus aucun désaccord à la porte.

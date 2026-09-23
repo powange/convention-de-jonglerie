@@ -45,3 +45,44 @@ export function adresseEmailNormalisee(valeur: string | null | undefined): strin
   const resultat = schemaAdresseEmail.safeParse(valeur ?? '')
   return resultat.success ? resultat.data : null
 }
+
+/**
+ * La boîte de réception réellement visée, quand deux adresses écrites différemment y mènent.
+ *
+ * « Jean.Dupont@Gmail.com », « jeandupont@gmail.com » et « jean.dupont+asso@googlemail.com »
+ * sont trois
+ * chaînes distinctes — donc trois lignes possibles en base, `email` étant unique — pour un seul
+ * destinataire. C'est ainsi que naît un double compte sans que personne ne l'ait voulu.
+ *
+ * Trois règles, de la plus sûre à la moins :
+ *
+ * - la **casse** ne compte jamais, c'est le standard ;
+ * - le **sous-adressage** `+quelquechose` est coupé partout. Un `+` littéral dans une adresse
+ *   réelle existe en théorie ; en pratique il désigne un alias, et l'écran montre les deux
+ *   adresses côte à côte pour qu'un humain tranche ;
+ * - les **points du nom local** ne sont retirés que chez Google, seul fournisseur courant à les
+ *   ignorer. Ailleurs, `jean.dupont@` et `jeandupont@` sont deux personnes différentes, et les
+ *   confondre accuserait à tort.
+ *
+ * Rend `null` si l'adresse n'est pas valable : rien à rapprocher.
+ */
+export function cleDeBoiteDeReception(valeur: string | null | undefined): string | null {
+  const adresse = adresseEmailNormalisee(valeur)?.toLowerCase()
+  if (!adresse) return null
+
+  const separateur = adresse.lastIndexOf('@')
+  const domaine = adresse.slice(separateur + 1)
+  let local = adresse.slice(0, separateur)
+
+  const plus = local.indexOf('+')
+  if (plus !== -1) local = local.slice(0, plus)
+
+  // googlemail.com est un ancien nom de gmail.com : même boîte, même traitement.
+  const chezGoogle = domaine === 'gmail.com' || domaine === 'googlemail.com'
+  if (chezGoogle) local = local.replaceAll('.', '')
+
+  // Un nom local vidé par le découpage (« +alias@… ») ne désigne plus rien de comparable.
+  if (!local) return null
+
+  return `${local}@${chezGoogle ? 'gmail.com' : domaine}`
+}
