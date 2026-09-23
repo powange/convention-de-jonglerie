@@ -261,7 +261,7 @@
       "no_participants": "Geen deelnemers gevonden",
       "search_placeholder": "Zoeken op achternaam, voornaam of e-mail",
       "stats": {
-        "after_show": "Na voorstelling",
+        "after_show": "Apart gezette borden",
         "artists": "Maaltijden artiesten",
         "by_diet": "Per dieet",
         "by_meal_type": "Per maaltijdtype",
@@ -426,6 +426,8 @@
       "last_name": "Achternaam",
       "last_name_placeholder": "Uw achternaam",
       "meals": {
+        "after_show": "Na de voorstelling",
+        "check_all": "Alles aanvinken",
         "confirm_close_unsaved": "TODO: Afsluiting met niet-opgeslagen wijzigingen bevestigen",
         "description": "TODO: Beschrijving",
         "error_loading": "TODO: Fout bij laden",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Buiten aanwezigheidsperiode",
         "saved_success": "TODO: Succesvolle registratie",
         "title": "TODO: Maaltijden",
-        "unsaved_changes": "TODO: Wijzigingen niet geregistreerd",
-        "check_all": "Alles aanvinken",
-        "uncheck_all": "Alles uitvinken"
+        "uncheck_all": "Alles uitvinken",
+        "unsaved_changes": "TODO: Wijzigingen niet geregistreerd"
       },
       "no_account_link": "Heeft de persoon geen account?",
       "no_user_found": "Geen gebruiker gevonden",

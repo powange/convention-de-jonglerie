@@ -73,7 +73,7 @@
                   :disabled="pdfEnCours !== null"
                   @click="genererResumePdf"
                 >
-                  {{ t('gestion.meals.pdf_summary') }}
+                  {{ t('gestion.meals.pdf_summary_button') }}
                 </UButton>
 
                 <UButton
@@ -86,7 +86,7 @@
                   :disabled="pdfEnCours !== null"
                   @click="genererListePdf(repas)"
                 >
-                  {{ libelleDuRepas(repas) }}
+                  {{ t('gestion.meals.pdf_list_button', { repas: libelleDuRepas(repas) }) }}
                 </UButton>
               </div>
 
@@ -387,7 +387,11 @@ import {
 } from '../../../../../utils/filtres-liste-repas'
 import {
   couleurDuType,
+  cleLibelleDePopulation,
+  colonnesDePopulation,
+  colonnesDeRegime,
   lignesDeParticipants,
+  nombrePourCle,
   motLePlusLong,
   nomFichierRestauration,
   resumerRepas,
@@ -575,7 +579,10 @@ const formaterParticipant = (p: any) => {
     // `'NONE'` n'est pas un régime à nommer : la colonne reste vide, comme pour qui n'a rien
     // déclaré. Sans ça, elle affichait le mot brut aux organisateurs et aux artistes.
     dietaryPreference: regimeAAfficher(p.dietaryPreference),
-    afterShow: p.type === 'artist' && p.afterShow ? '✓' : '-',
+    // Plus de restriction aux artistes : bénévoles et organisateurs peuvent déclarer un repas
+    // d'après spectacle. La carte de statistiques, elle, les comptait déjà — le tableau affichait
+    // « - » là où elle annonçait un de plus, et c'est la carte qu'on accusait d'être fausse.
+    afterShow: p.afterShow ? '✓' : '-',
   }
 }
 
@@ -900,86 +907,215 @@ const genererResumePdf = async () => {
       210
     )
 
-    let yPosition = 57
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text(t('gestion.meals.pdf_summary'), 20, yPosition)
-    yPosition += 10
+    // Ce qui sort de chaque fiche est décidé dans `restauration-pdf`, éprouvé à part ; ici, il
+    // n'y a plus que du placement et de la traduction.
+    const resumes = repasDuJour.value.map((repas) => resumerRepas(repas))
 
-    for (const meal of repasDuJour.value) {
-      if (yPosition > 240) {
+    /*
+     * Les colonnes sont celles de la JOURNÉE, pas de chaque repas.
+     *
+     * Chaque service a désormais son propre tableau, et l'on pourrait n'y mettre que ses
+     * populations. Mais on lit ce document en le parcourant : le nombre de véganes doit se
+     * trouver au même endroit d'un service à l'autre, sans relire les en-têtes. Un service sans
+     * billetterie laisse donc sa case vide plutôt que de décaler les colonnes suivantes.
+     */
+    const colonnesPopulation = colonnesDePopulation(resumes)
+    const colonnesRegime = colonnesDeRegime(resumes)
+    const aApresSpectacle = resumes.some((resume) => resume.apresSpectacle > 0)
+
+    let y = 55
+
+    const apresLeTableau = (marge: number) => {
+      y = ((doc as any).lastAutoTable?.finalY ?? y) + marge
+    }
+
+    const sautSiBasDePage = (hauteurNecessaire: number) => {
+      if (y > 297 - 20 - hauteurNecessaire) {
         doc.addPage()
-        yPosition = 20
+        y = 20
+      }
+    }
+
+    // « 0 » et non une case vide : sur une feuille de cuisine, une case vide fait douter — a-t-on
+    // oublié de compter ? Un zéro tranche.
+    const nombreOuZero = (comptes: readonly { cle: string; nombre: number }[], cle: string) =>
+      String(nombrePourCle(comptes, cle) ?? 0)
+
+    /*
+     * Un service par section : son intitulé, ses chiffres, puis ses allergies.
+     *
+     * Les trois tableaux transversaux d'avant — volumes, régimes, allergies — obligeaient à
+     * feuilleter : on lisait le nombre de couverts du dîner page 1, ses véganes page 2, ses
+     * allergies page 3. La cuisine prépare UN service à la fois ; tout ce qui le concerne tient
+     * désormais ensemble, et l'on passe au suivant.
+     */
+    for (const [rang, resume] of resumes.entries()) {
+      /*
+       * UNE PAGE PAR SERVICE.
+       *
+       * Ces feuilles ne se lisent pas, elles se distribuent : la personne du petit-déjeuner
+       * emporte sa page, celle du dîner la sienne. Deux services sur une même feuille obligent
+       * soit à photocopier deux fois, soit à faire circuler un document qui parle d'autre chose.
+       *
+       * Pas de saut avant le premier : il suit l'en-tête du document, sur la page de garde.
+       */
+      if (rang > 0) {
+        doc.addPage()
+        y = 20
       }
 
-      // Ce qui sort de la fiche est décidé dans `restauration-pdf`, éprouvé à part ; ici, il
-      // n'y a plus que du placement et de la traduction.
-      const resume = resumerRepas(meal)
-
-      doc.setFontSize(12)
+      doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
-      const phasesLisibles = resume.clesPhases.map((cle) => t(cle)).join(' + ')
-      doc.text(`${t(resume.cleTypeRepas)} (${phasesLisibles})`, 25, yPosition)
-      yPosition += 7
+      doc.setTextColor(79, 70, 229)
+      doc.text(
+        `${t(resume.cleTypeRepas)} — ${resume.clesPhases.map((cle) => t(cle)).join(' + ')}`,
+        20,
+        y
+      )
+      y += 7
 
-      doc.setFontSize(10)
+      /*
+       * Les chiffres du service, sur une seule ligne.
+       *
+       * Deux familles s'y côtoient : QUI mange — les populations, qui se somment pour faire le
+       * total — et COMMENT — les régimes, qui répartissent ce même total autrement. Additionner
+       * les unes aux autres n'aurait aucun sens, d'où l'en-tête des régimes teinté en vert : on
+       * voit qu'il s'agit d'un second découpage sans avoir à y réfléchir.
+       */
+      const premiereColonneRegime = 1 + colonnesPopulation.length
+      // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+      doc.autoTable({
+        startY: y,
+        margin: { left: 20, right: 20 },
+        styles: { fontSize: 9, cellPadding: 2.5, halign: 'center' },
+        headStyles: { fillColor: [79, 70, 229], fontSize: 8 },
+        bodyStyles: { fontStyle: 'bold', fontSize: 11 },
+        head: [
+          [
+            t('common.total'),
+            ...colonnesPopulation.map((cle) => t(cleLibelleDePopulation(cle))),
+            ...colonnesRegime.map((cle) => t(cle)),
+            ...(aApresSpectacle ? [t('gestion.meals.pdf_col_after_show')] : []),
+          ],
+        ],
+        body: [
+          [
+            String(resume.total),
+            ...colonnesPopulation.map((cle) => nombreOuZero(resume.populations, cle)),
+            ...colonnesRegime.map((cle) => nombreOuZero(resume.regimes, cle)),
+            ...(aApresSpectacle ? [String(resume.apresSpectacle)] : []),
+          ],
+        ],
+        didParseCell: (donnees: any) => {
+          if (donnees.section !== 'head') return
+          const index = donnees.column.index
+          if (
+            index >= premiereColonneRegime &&
+            index < premiereColonneRegime + colonnesRegime.length
+          ) {
+            donnees.cell.styles.fillColor = [21, 128, 61]
+          }
+        },
+      })
+      apresLeTableau(6)
+
+      /*
+       * Les allergies du service, juste en dessous.
+       *
+       * En rouge : c'est la seule partie de ce document où se tromper a des conséquences. Absentes
+       * quand il n'y en a pas — une section « Allergies » vide se lit comme une donnée manquante,
+       * et fait chercher ce qui n'existe pas.
+       */
+      if (resume.allergies.length) {
+        // Le titre des allergies ne doit pas rester seul en bas de page ; `autoTable` reprend
+        // ensuite tout seul si la liste déborde.
+        sautSiBasDePage(30)
+        doc.setFontSize(11)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(185, 28, 28)
+        doc.text(t('gestion.meals.pdf_allergies'), 20, y)
+        y += 5
+
+        // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+        doc.autoTable({
+          startY: y,
+          margin: { left: 20, right: 20 },
+          styles: { fontSize: 9, cellPadding: 2.5, overflow: 'linebreak', valign: 'top' },
+          headStyles: { fillColor: [185, 28, 28], fontSize: 8 },
+          columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: 25 }, 3: { cellWidth: 32 } },
+          head: [
+            [
+              t('gestion.meals.pdf_col_person'),
+              t('gestion.meals.pdf_col_severity'),
+              t('gestion.meals.pdf_col_allergies'),
+              t('gestion.meals.pdf_emergency_phone'),
+            ],
+          ],
+          body: resume.allergies.map((personne) => [
+            personne.nom,
+            personne.cleGravite ? t(personne.cleGravite) : '',
+            personne.allergies,
+            personne.contactUrgence ?? '',
+          ]),
+        })
+        apresLeTableau(4)
+      }
+
+      /*
+       * Les repas d'après spectacle, et QUI les attend.
+       *
+       * Le compte figure déjà dans la ligne de chiffres ; ce qui manquait, ce sont les noms. Ces
+       * assiettes se gardent au chaud, et il faut pouvoir appeler la personne quand elle ne se
+       * présente pas — un artiste qui finit tard ne revient pas toujours à l'heure dite.
+       *
+       * Le téléphone est celui du participant, non le contact d'urgence : on appelle pour
+       * prévenir, pas pour secourir.
+       */
+      if (resume.personnesApresSpectacle.length) {
+        sautSiBasDePage(30)
+        doc.setFontSize(11)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(161, 98, 7)
+        doc.text(t('gestion.meals.pdf_after_show_title'), 20, y)
+        y += 5
+
+        // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+        doc.autoTable({
+          startY: y,
+          margin: { left: 20, right: 20 },
+          styles: { fontSize: 9, cellPadding: 2.5, overflow: 'linebreak' },
+          headStyles: { fillColor: [161, 98, 7], fontSize: 8 },
+          columnStyles: { 1: { cellWidth: 35 }, 2: { cellWidth: 45 } },
+          head: [
+            [
+              t('gestion.meals.pdf_col_person'),
+              t('gestion.meals.pdf_col_type'),
+              t('gestion.meals.pdf_col_phone'),
+            ],
+          ],
+          // Le type de personne : on ne s'adresse pas de la même façon à un artiste qu'on attend
+          // en coulisses et à un bénévole de plateau qu'on croise au comptoir.
+          body: resume.personnesApresSpectacle.map((personne) => [
+            personne.nom,
+            t(personne.cleType),
+            personne.telephone ?? '',
+          ]),
+        })
+        apresLeTableau(4)
+      }
+    }
+
+    /*
+     * La numérotation, posée en dernier : le total ne se connaît qu'une fois tous les tableaux
+     * placés. Ces feuilles partent en cuisine et s'y mélangent — « sur 3 » dit qu'il en manque.
+     */
+    const pages = doc.internal.pages.length - 1
+    for (let page = 1; page <= pages; page++) {
+      doc.setPage(page)
+      doc.setFontSize(8)
       doc.setFont('helvetica', 'normal')
-      const populations = resume.populations.map((p) => t(p.cle, p.nombre)).join(', ')
-      doc.text(`${t('gestion.meals.pdf_total')} : ${resume.total} (${populations})`, 30, yPosition)
-      yPosition += 5
-
-      if (resume.apresSpectacle > 0) {
-        doc.setFontSize(9)
-        doc.setFont('helvetica', 'italic')
-        doc.text(`  ${t('gestion.meals.pdf_after_show', resume.apresSpectacle)}`, 30, yPosition)
-        yPosition += 5
-      } else {
-        yPosition += 1
-      }
-
-      if (resume.regimes.length > 0) {
-        doc.setFontSize(9)
-        doc.setFont('helvetica', 'italic')
-        doc.text(t('gestion.meals.pdf_diets'), 30, yPosition)
-        yPosition += 5
-
-        for (const regime of resume.regimes) {
-          doc.text(`  ${t(regime.cle)} : ${regime.nombre}`, 32, yPosition)
-          yPosition += 4
-        }
-      }
-
-      if (resume.allergies.length > 0) {
-        yPosition += 2
-        doc.setFontSize(9)
-        doc.setFont('helvetica', 'italic')
-        doc.text(t('gestion.meals.pdf_allergies'), 30, yPosition)
-        yPosition += 5
-
-        for (const personne of resume.allergies) {
-          const gravite = personne.cleGravite ? ` (${t(personne.cleGravite)})` : ''
-
-          doc.setFontSize(8)
-          doc.text(`  • ${personne.nom}${gravite} : ${personne.allergies}`, 32, yPosition)
-          yPosition += 4
-
-          if (personne.telephoneUrgence) {
-            doc.text(
-              `    ${t('gestion.meals.pdf_emergency_phone')} : ${personne.telephoneUrgence}`,
-              34,
-              yPosition
-            )
-            yPosition += 4
-          }
-
-          if (yPosition > 270) {
-            doc.addPage()
-            yPosition = 20
-          }
-        }
-      }
-
-      yPosition += 5
+      doc.setTextColor(130, 130, 130)
+      doc.text(t('common.page_of', { page, total: pages }), 190, 287, { align: 'right' })
     }
 
     doc.save(

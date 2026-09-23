@@ -261,7 +261,7 @@
       "no_participants": "Não foram encontrados participantes",
       "search_placeholder": "Pesquisa por apelido, nome próprio ou correio eletrónico",
       "stats": {
-        "after_show": "Após o espetáculo",
+        "after_show": "Pratos reservados",
         "artists": "Refeições de artistas",
         "by_diet": "Por dieta",
         "by_meal_type": "Por tipo de refeição",
@@ -426,6 +426,8 @@
       "last_name": "Sobrenome",
       "last_name_placeholder": "O seu sobrenome",
       "meals": {
+        "after_show": "Após o espetáculo",
+        "check_all": "Marcar todos",
         "confirm_close_unsaved": "TODO: Confirmar o encerramento com alterações não guardadas",
         "description": "TODO: Descrição",
         "error_loading": "TODO: Erro ao carregar",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Fora do período de presença",
         "saved_success": "TODO: Registo bem sucedido",
         "title": "TODO: Refeições",
-        "unsaved_changes": "TODO: Alterações não registadas",
-        "check_all": "Marcar todos",
-        "uncheck_all": "Desmarcar todos"
+        "uncheck_all": "Desmarcar todos",
+        "unsaved_changes": "TODO: Alterações não registadas"
       },
       "no_account_link": "A pessoa não tem conta?",
       "no_user_found": "Nenhum usuário encontrado",

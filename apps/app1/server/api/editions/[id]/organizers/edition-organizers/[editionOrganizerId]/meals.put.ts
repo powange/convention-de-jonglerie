@@ -14,6 +14,7 @@ const updateOrganizerMealsSchema = z.object({
       z.object({
         mealId: z.number().int().positive(),
         accepted: z.boolean(),
+        afterShow: z.boolean().optional(),
       })
     )
     .optional(),
@@ -74,24 +75,55 @@ export default wrapApiHandler(
       for (const selection of body.selections) {
         if (!validMealIds.has(selection.mealId)) continue
 
+        // Un repas refusé ne peut pas être « après spectacle » : le drapeau porterait sur une
+        // assiette qu'on ne sert pas.
+        const afterShow = selection.accepted ? (selection.afterShow ?? false) : false
+
         if (!selection.accepted) {
           await prisma.organizerMealSelection.upsert({
             where: {
               editionOrganizerId_mealId: { editionOrganizerId, mealId: selection.mealId },
             },
-            create: { editionOrganizerId, mealId: selection.mealId, accepted: false },
-            update: { accepted: false },
+            create: {
+              editionOrganizerId,
+              mealId: selection.mealId,
+              accepted: false,
+              afterShow: false,
+            },
+            update: { accepted: false, afterShow: false },
+          })
+        } else if (afterShow) {
+          /*
+           * Accepté ET après spectacle : la ligne doit EXISTER pour porter le drapeau.
+           *
+           * C'est la nouveauté, et elle déroge au principe de ce modèle — une ligne
+           * d'organisateur ne matérialisait jusqu'ici qu'une exception ou une consommation.
+           * L'après-spectacle est une troisième raison d'en avoir une : sans ligne, il n'y a
+           * nulle part où l'inscrire. La supprimer, comme le fait la branche suivante,
+           * effacerait l'information aussitôt enregistrée.
+           */
+          await prisma.organizerMealSelection.upsert({
+            where: {
+              editionOrganizerId_mealId: { editionOrganizerId, mealId: selection.mealId },
+            },
+            create: {
+              editionOrganizerId,
+              mealId: selection.mealId,
+              accepted: true,
+              afterShow: true,
+            },
+            update: { accepted: true, afterShow: true },
           })
         } else {
-          // Repas accepté = comportement par défaut : on supprime l'exception, sauf si une
-          // consommation est déjà tracée sur la ligne.
+          // Repas accepté sans particularité = comportement par défaut : on supprime la ligne,
+          // sauf si une consommation y est déjà tracée.
           const deleted = await prisma.organizerMealSelection.deleteMany({
             where: { editionOrganizerId, mealId: selection.mealId, consumedAt: null },
           })
           if (deleted.count === 0) {
             await prisma.organizerMealSelection.updateMany({
               where: { editionOrganizerId, mealId: selection.mealId },
-              data: { accepted: true },
+              data: { accepted: true, afterShow: false },
             })
           }
         }

@@ -417,6 +417,8 @@ export async function getVolunteerMeals(editionId: number, volunteerId: number) 
       phases,
       selectionId: selection?.id || null,
       accepted: selection?.accepted || false,
+      // Sans ligne de sélection, pas de repas accordé — donc pas d'après-spectacle non plus.
+      afterShow: selection?.afterShow ?? false,
       eligible,
     }
   })
@@ -426,7 +428,13 @@ export async function getVolunteerMeals(editionId: number, volunteerId: number) 
 export async function setVolunteerMeals(
   editionId: number,
   volunteerId: number,
-  selections: Array<{ selectionId?: number; mealId?: number; accepted: boolean }>
+  selections: Array<{
+    selectionId?: number
+    mealId?: number
+    accepted: boolean
+    /** Repas pris après le passage sur scène. Absent vaut « non », comme à la création. */
+    afterShow?: boolean
+  }>
 ) {
   const volunteer = await prisma.editionVolunteerApplication.findUnique({
     where: { id: volunteerId },
@@ -440,14 +448,23 @@ export async function setVolunteerMeals(
   await Promise.all(
     selections.map(async (selection) => {
       if (!selection.mealId) return
+      // Un repas refusé ne peut pas être « après spectacle » : le drapeau porterait sur une
+      // assiette qu'on ne sert pas, et resterait à découvrir si le repas était réaccordé plus tard.
+      const afterShow = selection.accepted ? (selection.afterShow ?? false) : false
+
       if (!selection.selectionId) {
         return prisma.volunteerMealSelection.create({
-          data: { volunteerId, mealId: selection.mealId, accepted: selection.accepted },
+          data: {
+            volunteerId,
+            mealId: selection.mealId,
+            accepted: selection.accepted,
+            afterShow,
+          },
         })
       }
       return prisma.volunteerMealSelection.update({
         where: { id: selection.selectionId, volunteerId },
-        data: { accepted: selection.accepted },
+        data: { accepted: selection.accepted, afterShow },
       })
     })
   )
@@ -493,9 +510,19 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
   const editionOrganizers = await prisma.editionOrganizer.findMany({
     where: { editionId },
     include: {
+      /*
+       * TOUTES les lignes de ces repas, et non les seuls refus.
+       *
+       * Une ligne d'organisateur ne matérialisait qu'une exception, d'où le filtre d'origine sur
+       * `accepted: false`. L'après-spectacle en crée désormais une avec `accepted: true` : la
+       * laisser hors de la requête aurait rendu le drapeau invisible ici — le repas se serait
+       * affiché sans jamais dire qu'il est à garder au chaud.
+       *
+       * Le tri entre « refusé » et « après spectacle » se fait donc plus bas, sur `accepted`.
+       */
       mealSelections: {
-        where: { accepted: false, mealId: { in: meals.map((meal) => meal.id) } },
-        select: { mealId: true },
+        where: { mealId: { in: meals.map((meal) => meal.id) } },
+        select: { mealId: true, accepted: true, afterShow: true },
       },
       organizer: {
         select: {
@@ -523,25 +550,39 @@ export async function getCateringMealsForDate(editionId: number, targetDate: str
         prenom: selection.volunteer.user.prenom,
         email: selection.volunteer.user.email,
         phone: selection.volunteer.user.phone,
+        // Repas à garder au chaud : la feuille de cuisine le liste à part, avec de quoi
+        // joindre la personne si elle ne se présente pas.
+        afterShow: selection.afterShow,
         // Le profil fait foi ; la candidature ne sert que de repli tant que ses colonnes
         // existent (cf. `infos-personnelles`).
         ...infosPersonnelles(selection.volunteer.user as never),
       })
     ),
     organizers: editionOrganizers
-      .filter((eo) => !eo.mealSelections.some((selection) => selection.mealId === meal.id))
-      .map(
-        (eo): MealOrganizerParticipant => ({
+      // Seul un REFUS exclut : une ligne « après spectacle » porte `accepted: true` et doit
+      // laisser l'organisateur dans la liste. Filtrer sur la simple existence d'une ligne, comme
+      // avant, l'en aurait retiré au moment même où il déclare y manger.
+      .filter(
+        (eo) =>
+          !eo.mealSelections.some(
+            (selection) => selection.mealId === meal.id && !selection.accepted
+          )
+      )
+      .map((eo): MealOrganizerParticipant => {
+        const selection = eo.mealSelections.find((s) => s.mealId === meal.id)
+        return {
           nom: eo.organizer.user.nom,
           prenom: eo.organizer.user.prenom,
           email: eo.organizer.user.email,
           phone: eo.organizer.user.phone,
+          // Sans ligne, c'est un repas ordinaire : l'absence vaut « pas après le spectacle ».
+          afterShow: selection?.afterShow ?? false,
           // Le profil fait foi ; la ligne d'organisateur ne sert que de repli tant que ses
           // colonnes existent (cf. `infos-personnelles`). Variante alimentaire : un
           // organisateur ne déclare pas de contact d'urgence.
           ...infosAlimentaires(eo.organizer.user as never),
-        })
-      ),
+        }
+      }),
   }))
 }
 

@@ -43,6 +43,10 @@ model VolunteerMealSelection {
   volunteerId Int
   mealId      Int
   accepted    Boolean   @default(true)
+  /// Repas pris APRÈS le passage sur scène, comme pour les artistes : l'assiette se garde au
+  /// chaud. Un bénévole de régie ou de plateau finit après le service, et la cuisine doit le
+  /// savoir pour ne pas tout ranger.
+  afterShow   Boolean   @default(false)
   consumedAt  DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -85,6 +89,11 @@ model OrganizerMealSelection {
   editionOrganizerId Int
   mealId             Int
   accepted           Boolean   @default(true)
+  /// Repas pris après le spectacle. Attention : une ligne n'existait jusqu'ici que pour une
+  /// EXCEPTION (repas décoché) ou une consommation. Marquer l'après-spectacle en crée donc une
+  /// là où il n'y en avait pas, avec `accepted: true` — c'est le seul moyen de porter
+  /// l'information, et le modèle le prévoit déjà pour tracer les consommations.
+  afterShow          Boolean   @default(false)
   consumedAt         DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt

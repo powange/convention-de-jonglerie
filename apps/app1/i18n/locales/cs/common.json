@@ -261,7 +261,7 @@
       "no_participants": "Nebyli nalezeni žádní účastníci",
       "search_placeholder": "Vyhledávání podle příjmení, jména nebo e-mailu",
       "stats": {
-        "after_show": "Po představení",
+        "after_show": "Odložené talíře",
         "artists": "Jídlo umělců",
         "by_diet": "Podle stravy",
         "by_meal_type": "Podle typu jídla",
@@ -426,6 +426,8 @@
       "last_name": "Název",
       "last_name_placeholder": "Vaše jméno",
       "meals": {
+        "after_show": "Po představení",
+        "check_all": "Zaškrtnout vše",
         "confirm_close_unsaved": "TODO: Potvrzení uzavření s neuloženými změnami",
         "description": "TODO: Popis",
         "error_loading": "TODO: Chyba při načítání",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Mimo období docházky",
         "saved_success": "TODO: Úspěšná registrace",
         "title": "TODO: Stravování",
-        "unsaved_changes": "TODO: Změny nebyly zaregistrovány",
-        "check_all": "Zaškrtnout vše",
-        "uncheck_all": "Odškrtnout vše"
+        "uncheck_all": "Odškrtnout vše",
+        "unsaved_changes": "TODO: Změny nebyly zaregistrovány"
       },
       "no_account_link": "Osoba nemá účet?",
       "no_user_found": "Nebyli nalezeni žádní uživatelé",

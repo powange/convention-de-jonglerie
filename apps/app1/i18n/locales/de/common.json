@@ -261,7 +261,7 @@
       "no_participants": "Keine Teilnehmer gefunden",
       "search_placeholder": "Suche nach Name, Vorname oder E-Mail",
       "stats": {
-        "after_show": "Nach Vorstellung",
+        "after_show": "Zurückgestellte Teller",
         "artists": "Künstlermahlzeiten",
         "by_diet": "Nach Diät",
         "by_meal_type": "Nach Mahlzeittyp",
@@ -426,6 +426,8 @@
       "last_name": "Nachname",
       "last_name_placeholder": "Ihr Nachname",
       "meals": {
+        "after_show": "Nach der Vorstellung",
+        "check_all": "Alle auswählen",
         "confirm_close_unsaved": "TODO: Schließen mit nicht gespeicherten Änderungen bestätigen",
         "description": "TODO: Beschreibung",
         "error_loading": "TODO: Fehler beim Laden",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Außerhalb der Präsenzzeit",
         "saved_success": "TODO: Aufnahme erfolgreich",
         "title": "TODO: Mahlzeiten",
-        "unsaved_changes": "TODO: Nicht gespeicherte Änderungen",
-        "check_all": "Alle auswählen",
-        "uncheck_all": "Alle abwählen"
+        "uncheck_all": "Alle abwählen",
+        "unsaved_changes": "TODO: Nicht gespeicherte Änderungen"
       },
       "no_account_link": "Hat die Person kein Konto?",
       "no_user_found": "Kein Benutzer gefunden",

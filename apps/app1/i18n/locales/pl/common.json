@@ -261,7 +261,7 @@
       "no_participants": "Nie znaleziono uczestników",
       "search_placeholder": "Wyszukiwanie według nazwiska, imienia lub adresu e-mail",
       "stats": {
-        "after_show": "Po przedstawieniu",
+        "after_show": "Odłożone talerze",
         "artists": "Posiłki artystów",
         "by_diet": "Według diety",
         "by_meal_type": "Według typu posiłku",
@@ -426,6 +426,8 @@
       "last_name": "Nazwisko",
       "last_name_placeholder": "Pana/Pani nazwisko",
       "meals": {
+        "after_show": "Po występie",
+        "check_all": "Zaznacz wszystkie",
         "confirm_close_unsaved": "TODO: Potwierdzenie zamknięcia z niezapisanymi zmianami",
         "description": "TODO: Opis",
         "error_loading": "TODO: Błąd podczas ładowania",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Poza okresem obecności",
         "saved_success": "TODO: Pomyślna rejestracja",
         "title": "TODO: Posiłki",
-        "unsaved_changes": "TODO: Zmiany nie zostały zarejestrowane",
-        "check_all": "Zaznacz wszystkie",
-        "uncheck_all": "Odznacz wszystkie"
+        "uncheck_all": "Odznacz wszystkie",
+        "unsaved_changes": "TODO: Zmiany nie zostały zarejestrowane"
       },
       "no_account_link": "Osoba nie ma konta?",
       "no_user_found": "Nie znaleziono użytkownika",

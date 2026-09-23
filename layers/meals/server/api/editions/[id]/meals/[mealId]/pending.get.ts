@@ -75,6 +75,9 @@ export default wrapApiHandler(
           pseudo: volunteer.user.pseudo,
           email: volunteer.user.email,
           phone: volunteer.user.phone,
+          // La pastille « mise de côté » de la modale : la personne du comptoir doit savoir que
+          // cette assiette l'attend au chaud plutôt que de la servir au coup de feu.
+          afterShow: selection.afterShow,
         })
       }
     }
@@ -131,7 +134,9 @@ export default wrapApiHandler(
           NOT: { mealSelections: { some: { mealId, accepted: false } } },
         },
         include: {
-          mealSelections: { where: { mealId }, select: { consumedAt: true } },
+          // `afterShow` en plus de `consumedAt` : sans lui, un organisateur déclarant manger après
+          // le spectacle apparaissait dans la liste sans sa pastille, exactement comme les autres.
+          mealSelections: { where: { mealId }, select: { consumedAt: true, afterShow: true } },
           organizer: {
             select: {
               user: {
@@ -161,6 +166,8 @@ export default wrapApiHandler(
           pseudo: eo.organizer.user.pseudo,
           email: eo.organizer.user.email,
           phone: eo.organizer.user.phone,
+          // Sans ligne, c'est un repas ordinaire : l'absence vaut « pas mise de côté ».
+          afterShow: eo.mealSelections[0]?.afterShow ?? false,
         })
       }
     }

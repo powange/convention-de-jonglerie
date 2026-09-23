@@ -220,7 +220,12 @@ export interface MealsPort {
   setVolunteerMeals(
     editionId: number,
     volunteerId: number,
-    selections: Array<{ selectionId?: number; mealId?: number; accepted: boolean }>
+    selections: Array<{
+      selectionId?: number
+      mealId?: number
+      accepted: boolean
+      afterShow?: boolean
+    }>
   ): Promise<VolunteerMealView[]>
   /** Repas (activés) d'une date avec leurs participants bénévoles acceptés (catering). */
   getCateringMealsForDate(editionId: number, targetDate: string): Promise<CateringMeal[]>

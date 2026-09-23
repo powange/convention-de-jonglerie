@@ -261,7 +261,7 @@
       "no_participants": "Nessun partecipante trovato",
       "search_placeholder": "Ricerca per cognome, nome o e-mail",
       "stats": {
-        "after_show": "Dopo spettacolo",
+        "after_show": "Piatti messi da parte",
         "artists": "Pasti artisti",
         "by_diet": "Per dieta",
         "by_meal_type": "Per tipo di pasto",
@@ -426,6 +426,8 @@
       "last_name": "Cognome",
       "last_name_placeholder": "Il vostro cognome",
       "meals": {
+        "after_show": "Dopo lo spettacolo",
+        "check_all": "Seleziona tutti",
         "confirm_close_unsaved": "TODO: Confermare la chiusura con le modifiche non salvate",
         "description": "TODO: Descrizione",
         "error_loading": "TODO: Errore durante il caricamento",
@@ -435,9 +437,8 @@
         "not_eligible_reason": "Fuori dal periodo di presenza",
         "saved_success": "TODO: Registrazione riuscita",
         "title": "TODO: Pasti",
-        "unsaved_changes": "TODO: Modifiche non registrate",
-        "check_all": "Seleziona tutti",
-        "uncheck_all": "Deseleziona tutti"
+        "uncheck_all": "Deseleziona tutti",
+        "unsaved_changes": "TODO: Modifiche non registrate"
       },
       "no_account_link": "La persona non ha un account?",
       "no_user_found": "Nessun utente trovato",
