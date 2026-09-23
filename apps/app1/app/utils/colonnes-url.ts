@@ -80,6 +80,16 @@ export function colonnesMasqueesDepuisUrl(
 }
 
 /**
+ * La part d'une colonne TanStack qui nous intéresse ici.
+ *
+ * `TableColumn` est une UNION de formes — accesseur, groupe, colonne d'affichage —, et aucune
+ * d'elles ne se plie structurellement à ces trois champs : le typage refusait l'appel sur quatre
+ * écrans. On prend donc la définition telle quelle et on la lit ici, ce qui reste honnête :
+ * chacun de ces champs existe bien dans l'une ou l'autre branche de l'union.
+ */
+type ColonneDeTableau = { id?: string; accessorKey?: string; enableHiding?: boolean }
+
+/**
  * Les colonnes qu'un tableau laisse masquer, d'après sa définition.
  *
  * L'identifiant d'une colonne TanStack est son `id` quand il est écrit, et son `accessorKey`
@@ -90,10 +100,9 @@ export function colonnesMasqueesDepuisUrl(
  * Écrit ici plutôt que recopié dans chaque écran : sept tableaux poseraient sept fois la même
  * question, et la première réponse fausse s'y serait propagée.
  */
-export function colonnesMasquablesDe(
-  colonnes: readonly { id?: string; accessorKey?: string; enableHiding?: boolean }[]
-): string[] {
+export function colonnesMasquablesDe(colonnes: readonly unknown[]): string[] {
   return colonnes
+    .map((colonne) => colonne as ColonneDeTableau)
     .filter((colonne) => colonne.enableHiding !== false)
     .map((colonne) => colonne.id ?? colonne.accessorKey)
     .filter((id): id is string => Boolean(id))
