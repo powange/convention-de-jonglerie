@@ -216,19 +216,15 @@
                   @click="changerDeVue(false)"
                 />
               </UFieldGroup>
-              <!-- Sélecteur de colonnes visibles -->
-              <UDropdownMenu
+              <!-- Le menu partagé, comme les six autres tableaux du dépôt. Celui-ci en avait
+                   une septième copie, écrite à la main — exactement ce que ce composant existe
+                   pour éviter. -->
+              <UiColumnsMenu
                 v-if="!vueGroupee && logs.length"
-                :items="columnVisibilityItems"
-                :content="{ align: 'end' }"
-              >
-                <UButton
-                  icon="i-heroicons-view-columns"
-                  color="neutral"
-                  variant="outline"
-                  :label="$t('admin.error_logs.columns_label')"
-                />
-              </UDropdownMenu>
+                variant="outline"
+                :table-api="tableRef?.tableApi"
+                :libelle="libelleDeColonne"
+              />
               <!-- Sélecteur de taille de page -->
               <USelect
                 v-model="pagination.pageSize"
@@ -363,6 +359,7 @@
 
         <UContextMenu v-else :items="contextMenuItems">
           <UTable
+            ref="tableRef"
             v-model:column-visibility="visibiliteDesColonnes"
             :data="logs"
             :columns="columns"
@@ -979,7 +976,7 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef } from 'vue'
+import { shallowRef, useTemplateRef } from 'vue'
 import { JsonViewer } from 'vue3-json-viewer'
 import 'vue3-json-viewer/dist/vue3-json-viewer.css'
 
@@ -1209,23 +1206,18 @@ const colonnesMasquables = computed(() =>
   columns.value.filter((c: any) => c.enableHiding !== false).map((c: any) => c.id as string)
 )
 
-// Items du menu de visibilité des colonnes
-const columnVisibilityItems = computed(() =>
-  columns.value
-    .filter((colonne: any) => colonne.enableHiding !== false)
-    .map((colonne: any) => ({
-      label: typeof colonne.header === 'string' ? colonne.header : colonne.id,
-      type: 'checkbox' as const,
-      checked: visibiliteDesColonnes.value[colonne.id] !== false,
-      onUpdateChecked(checked: boolean) {
-        visibiliteDesColonnes.value = { ...visibiliteDesColonnes.value, [colonne.id]: !!checked }
-        syncUrl()
-      },
-      onSelect(e: Event) {
-        e.preventDefault()
-      },
-    }))
-)
+/*
+ * La référence du tableau, pour que le menu partagé atteigne son API TanStack.
+ *
+ * La visibilité, elle, reste gouvernée par la page via `v-model:column-visibility` : elle doit
+ * exister AVANT le montage, puisqu'on la lit dans l'URL alors que le tableau n'est pas rendu — et
+ * il ne l'est jamais en vue groupée. TanStack tient les deux synchronisés.
+ */
+const tableRef = useTemplateRef('tableRef')
+
+/** Le nom lisible d'une colonne, d'après son identifiant — ce que le menu partagé affiche. */
+const libelleDeColonne = (id: string) =>
+  (columns.value.find((c: any) => c.id === id)?.header as string) ?? id
 
 // Tri côté serveur (les seuls champs supportés par l'API sont createdAt/statusCode/path)
 const sort = ref<{ field: ChampDeTri; dir: 'asc' | 'desc' }>({

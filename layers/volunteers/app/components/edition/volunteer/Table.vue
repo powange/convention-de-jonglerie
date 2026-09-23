@@ -662,9 +662,6 @@ watch(
   }
 )
 const sorting = ref<{ id: string; desc: boolean }[]>([{ id: 'createdAt', desc: true }])
-const columnVisibility = ref<Record<string, boolean>>({
-  id: false,
-})
 const applicationsActingId = ref<number | null>(null)
 const actingAction = ref<'ACCEPTED' | 'REJECTED' | 'PENDING' | null>(null)
 
@@ -2136,6 +2133,19 @@ watch(
   },
   { deep: true }
 )
+
+/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const colonnesMasquables = computed(() => colonnesMasquablesDe(columns.value))
+
+/*
+ * Le choix des colonnes survit au rechargement, et se partage par le lien.
+ *
+ * L'URL ne porte que l'ÉCART à l'état d'arrivée : rien tant qu'on n'a rien réglé.
+ */
+const DEFAUTS_DE_COLONNES = { id: false }
+const { visibilite: columnVisibility } = useColonnesDansUrl(colonnesMasquables, {
+  defauts: DEFAUTS_DE_COLONNES,
+})
 
 // Déclencheur de recherche global (debounce simple)
 let searchTimeout: any

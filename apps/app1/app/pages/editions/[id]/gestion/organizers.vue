@@ -700,8 +700,6 @@ const tableOrganisateurs = ref<{ tableApi?: unknown } | null>(null)
  * Ce tableau en porte six au plus, et toutes répondent à une question qu'on se pose sur un
  * organisateur. En masquer d'office obligerait à chercher pourquoi il en manque une.
  */
-const colonnesVisibles = ref<Record<string, boolean>>({})
-
 /** Le nom lisible d'une colonne, pour le menu qui les propose. */
 const libelleColonneOrganisateur = (id: string): string => {
   const libelles: Record<string, string> = {
@@ -868,6 +866,16 @@ const { execute: executeAddToEdition } = useApiAction(
     },
   }
 )
+
+/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const colonnesMasquables = computed(() => colonnesMasquablesDe(editionOrganizersColumns.value))
+
+/*
+ * Le choix des colonnes survit au rechargement, et se partage par le lien.
+ *
+ * L'URL ne porte que l'ÉCART à l'état d'arrivée : rien tant qu'on n'a rien réglé.
+ */
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(colonnesMasquables)
 
 const addToEdition = () => {
   if (!selectedAvailableOrganizer.value) return

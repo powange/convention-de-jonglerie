@@ -799,8 +799,6 @@ const tableRef = ref()
 const sorting = ref<{ id: string; desc: boolean }[]>([])
 
 // Visibilité des colonnes
-const columnVisibility = ref<Record<string, boolean>>({})
-
 // Filtres, conservés dans l'URL — même règle que le planning et les candidatures de bénévoles,
 // cf. `filtres-artistes-url.ts`.
 const filtresInitiaux = filtresDepuisUrl(route.query)
@@ -1259,6 +1257,16 @@ const { execute: fetchArtists, loading } = useApiAction(
     },
   }
 )
+
+/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const colonnesMasquables = computed(() => colonnesMasquablesDe(columns.value))
+
+/*
+ * Le choix des colonnes survit au rechargement, et se partage par le lien.
+ *
+ * L'URL ne porte que l'ÉCART à l'état d'arrivée : rien tant qu'on n'a rien réglé.
+ */
+const { visibilite: columnVisibility } = useColonnesDansUrl(colonnesMasquables)
 
 // Ouvrir le modal d'ajout
 const openAddArtistModal = () => {
