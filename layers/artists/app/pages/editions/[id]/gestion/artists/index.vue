@@ -1259,12 +1259,7 @@ const { execute: fetchArtists, loading } = useApiAction(
 )
 
 /** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
-const colonnesMasquables = computed(() =>
-  (columns.value as { id?: string; enableHiding?: boolean }[])
-    .filter((c) => c.enableHiding !== false)
-    .map((c) => c.id as string)
-    .filter(Boolean)
-)
+const colonnesMasquables = computed(() => colonnesMasquablesDe(columns.value))
 
 /*
  * Le choix des colonnes survit au rechargement, et se partage par le lien.

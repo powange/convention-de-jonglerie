@@ -572,9 +572,7 @@ const tableRef = useTemplateRef('tableRef')
  * colonnes masquées l'aurait perdu à la première actualisation.
  */
 /** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
-const colonnesMasquables = computed(() =>
-  columns.value.filter((c: any) => c.enableHiding !== false).map((c: any) => c.id as string)
-)
+const colonnesMasquables = computed(() => colonnesMasquablesDe(columns.value))
 
 const DEFAUTS_DE_COLONNES = { description: false, isActive: false }
 const { visibilite: colonnesVisibles } = useColonnesDansUrl(colonnesMasquables, {

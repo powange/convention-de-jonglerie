@@ -904,24 +904,6 @@ const tagItems = computed(() =>
   tags.value.map((tag) => ({ label: tag.name, value: tag.id, color: tag.color }))
 )
 
-/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
-const colonnesMasquables = computed(() =>
-  (colonnes.value as { id?: string; enableHiding?: boolean }[])
-    .filter((c) => c.enableHiding !== false)
-    .map((c) => c.id as string)
-    .filter(Boolean)
-)
-
-/*
- * Le choix des colonnes survit au rechargement, et se partage par le lien.
- *
- * L'URL ne porte que l'ÉCART à l'état d'arrivée : rien tant qu'on n'a rien réglé.
- */
-const DEFAUTS_DE_COLONNES = { lieuEmprunt: false, responsableEmprunt: false }
-const { visibilite: colonnesVisibles } = useColonnesDansUrl(colonnesMasquables, {
-  defauts: DEFAUTS_DE_COLONNES,
-})
-
 /**
  * Les objets réellement affichés : la liste du groupe, resserrée par les tags choisis.
  *
@@ -1180,6 +1162,23 @@ const reservationsOuvertes = computed(() => group.value?.reservationsEnabled ===
 const group = computed<StockGroupItem | null>(
   () => allGroups.value.find((g) => g.id === groupId.value) || null
 )
+
+/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const colonnesMasquables = computed(() => colonnesMasquablesDe(colonnes.value))
+
+/*
+ * Le choix des colonnes survit au rechargement, et se partage par le lien.
+ *
+ * L'URL ne porte que l'ÉCART à l'état d'arrivée : rien tant qu'on n'a rien réglé.
+ *
+ * ⚠️ Placé APRÈS `reservationsOuvertes` et `group` : le composable lit la liste des colonnes
+ * pendant le `setup`, et `colonnes` les interroge. Plus haut dans le fichier, on tombait sur une
+ * variable pas encore initialisée — le `setup` levait, et la page s'affichait entièrement blanche.
+ */
+const DEFAUTS_DE_COLONNES = { lieuEmprunt: false, responsableEmprunt: false }
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(colonnesMasquables, {
+  defauts: DEFAUTS_DE_COLONNES,
+})
 
 // Titre de l'onglet : « {nom du groupe} – Stock matériel », cohérent avec la page liste /stock.
 // Tant que le groupe n'est pas chargé, on retombe sur le titre générique de la section.

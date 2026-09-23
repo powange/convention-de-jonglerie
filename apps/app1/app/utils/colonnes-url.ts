@@ -78,3 +78,23 @@ export function colonnesMasqueesDepuisUrl(
   }
   return visibilite
 }
+
+/**
+ * Les colonnes qu'un tableau laisse masquer, d'après sa définition.
+ *
+ * L'identifiant d'une colonne TanStack est son `id` quand il est écrit, et son `accessorKey`
+ * sinon — la bibliothèque le dérive. Ne lire que `id` laissait de côté la plupart des colonnes
+ * du dépôt, qui n'en déclarent pas : les masquer n'aurait jamais été retenu dans l'URL, sans que
+ * rien ne le signale.
+ *
+ * Écrit ici plutôt que recopié dans chaque écran : sept tableaux poseraient sept fois la même
+ * question, et la première réponse fausse s'y serait propagée.
+ */
+export function colonnesMasquablesDe(
+  colonnes: readonly { id?: string; accessorKey?: string; enableHiding?: boolean }[]
+): string[] {
+  return colonnes
+    .filter((colonne) => colonne.enableHiding !== false)
+    .map((colonne) => colonne.id ?? colonne.accessorKey)
+    .filter((id): id is string => Boolean(id))
+}

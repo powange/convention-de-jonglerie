@@ -23,6 +23,12 @@ import {
  *
  * `replace` et non `push` : choisir ses colonnes n'est pas une navigation, et chaque case cochée
  * laisserait autrement un pas dans l'historique qu'il faudrait défaire un par un.
+ *
+ * ⚠️ **L'appel lit la liste des colonnes PENDANT le `setup`**, là où le reste d'un `<script
+ * setup>` ne fait que déclarer des `computed` paresseux. Il doit donc venir après tout ce que la
+ * définition des colonnes interroge — un `computed` déclaré plus bas n'est pas encore initialisé,
+ * le `setup` lève, et la page s'affiche entièrement blanche : ni erreur serveur, ni encart. C'est
+ * arrivé sur la page d'un groupe de stock, et seul un test de bout en bout l'a vu.
  */
 export function useColonnesDansUrl(
   masquables: MaybeRefOrGetter<readonly string[]>,
@@ -73,6 +79,18 @@ export function useColonnesDansUrl(
         Object.entries(route.query).filter(([cle]) => cle !== parametre)
       )
       if (valeur) query[parametre] = valeur
+
+      /*
+       * On ne navigue QUE si l'adresse change vraiment.
+       *
+       * Sans cette comparaison, le montage écrivait déjà dans l'URL : la liste des colonnes
+       * masquables arrive après le premier rendu, on réaffecte l'état — un nouvel objet, au même
+       * contenu — et ce watcher partait. Une navigation parasite à chaque ouverture de tableau,
+       * qui tombait en pleine hydratation et faisait échouer des tests de bout en bout.
+       */
+      const actuelle = route.query[parametre]
+      const voulue = valeur ?? undefined
+      if (actuelle === voulue) return
 
       router.replace({ query })
     },

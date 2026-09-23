@@ -533,10 +533,7 @@ const columns = [
 ]
 
 /** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
-const colonnesMasquables = (columns as { accessorKey?: string; enableHiding?: boolean }[])
-  .filter((c) => c.enableHiding !== false)
-  .map((c) => c.accessorKey as string)
-  .filter(Boolean)
+const colonnesMasquables = colonnesMasquablesDe(columns)
 
 /*
  * Le choix des colonnes survit au rechargement, et se partage par le lien.
