@@ -758,11 +758,6 @@ const tableRef = ref()
 const tri = ref<{ id: string; desc: boolean }[]>([{ id: 'name', desc: false }])
 // Masquées d'entrée : elles ne servent qu'à préparer une tournée, et le menu « Colonnes » les
 // ramène quand on en a besoin.
-const colonnesVisibles = ref<Record<string, boolean>>({
-  lieuEmprunt: false,
-  responsableEmprunt: false,
-})
-
 /**
  * Remplace les tags d'une seule ligne, après enregistrement.
  *
@@ -908,6 +903,24 @@ const tagsFiltres = ref<{ label: string; value: number; color: string }[]>([])
 const tagItems = computed(() =>
   tags.value.map((tag) => ({ label: tag.name, value: tag.id, color: tag.color }))
 )
+
+/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const colonnesMasquables = computed(() =>
+  (colonnes.value as { id?: string; enableHiding?: boolean }[])
+    .filter((c) => c.enableHiding !== false)
+    .map((c) => c.id as string)
+    .filter(Boolean)
+)
+
+/*
+ * Le choix des colonnes survit au rechargement, et se partage par le lien.
+ *
+ * L'URL ne porte que l'ÉCART à l'état d'arrivée : rien tant qu'on n'a rien réglé.
+ */
+const DEFAUTS_DE_COLONNES = { lieuEmprunt: false, responsableEmprunt: false }
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(colonnesMasquables, {
+  defauts: DEFAUTS_DE_COLONNES,
+})
 
 /**
  * Les objets réellement affichés : la liste du groupe, resserrée par les tags choisis.

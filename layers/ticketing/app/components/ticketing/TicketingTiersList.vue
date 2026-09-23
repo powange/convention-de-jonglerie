@@ -564,7 +564,22 @@ const { formatDateTimeWithWeekday } = useDateFormat()
 const { t } = useI18n()
 
 const tableRef = useTemplateRef('tableRef')
-const colonnesVisibles = ref<Record<string, boolean>>({ description: false, isActive: false })
+/*
+ * Le choix des colonnes survit au rechargement, et se partage par le lien.
+ *
+ * `description` et `isActive` sont masquées dès l'arrivée : elles sont déclarées en défauts, et
+ * l'URL ne porte que l'ÉCART. Révéler la description s'écrit donc, là où une liste des seules
+ * colonnes masquées l'aurait perdu à la première actualisation.
+ */
+/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const colonnesMasquables = computed(() =>
+  columns.value.filter((c: any) => c.enableHiding !== false).map((c: any) => c.id as string)
+)
+
+const DEFAUTS_DE_COLONNES = { description: false, isActive: false }
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(colonnesMasquables, {
+  defauts: DEFAUTS_DE_COLONNES,
+})
 
 /** Le nom lisible d'une colonne, pour le menu de visibilité comme pour les en-têtes d'export. */
 const libelleDeColonne = (id: string) => t(`ticketing.tiers.export.${id}`, id)

@@ -39,8 +39,17 @@
           class="justify-start"
           @click="handleReply"
         />
+        <!--
+          `!isDeleted` autant que `canDelete` : le bouton restait proposé sur un message qu'on
+          venait de supprimer. Le clic partait, le serveur refusait — il ne peut pas modifier un
+          message supprimé —, et l'utilisateur recevait « Impossible de supprimer le message »
+          pour une suppression qui avait pourtant réussi la première fois.
+
+          La garde vit ici plutôt que chez l'appelant : le composant connaissait déjà `isDeleted`,
+          dont il se sert pour désactiver le balayage tactile. Elle manquait au seul bouton.
+        -->
         <UButton
-          v-if="canDelete"
+          v-if="canDelete && !isDeleted"
           color="error"
           variant="soft"
           block

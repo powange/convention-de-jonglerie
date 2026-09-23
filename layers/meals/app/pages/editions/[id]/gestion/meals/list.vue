@@ -503,8 +503,6 @@ const tableParticipants = ref<{ tableApi?: unknown } | null>(null)
  * quel repas, quel régime. Ce menu sert à en RETIRER quand on prépare une impression ou qu'on
  * travaille sur un portable, pas à réparer un tableau illisible d'emblée.
  */
-const colonnesVisibles = ref<Record<string, boolean>>({})
-
 /** Le nom lisible d'une colonne, pour le menu qui les propose. */
 const libelleColonneParticipant = (id: string): string => {
   const libelles: Record<string, string> = {
@@ -533,6 +531,19 @@ const columns = [
   { accessorKey: 'dietaryPreference', header: t('gestion.meals.diet') },
   { accessorKey: 'afterShow', header: t('gestion.meals.after_show') },
 ]
+
+/** Les colonnes que le lecteur a le droit de masquer — l'URL ne peut pas en cacher d'autres. */
+const colonnesMasquables = (columns as { accessorKey?: string; enableHiding?: boolean }[])
+  .filter((c) => c.enableHiding !== false)
+  .map((c) => c.accessorKey as string)
+  .filter(Boolean)
+
+/*
+ * Le choix des colonnes survit au rechargement, et se partage par le lien.
+ *
+ * L'URL ne porte que l'ÉCART à l'état d'arrivée : rien tant qu'on n'a rien réglé.
+ */
+const { visibilite: colonnesVisibles } = useColonnesDansUrl(colonnesMasquables)
 
 // Utiliser les utilitaires meals
 const { getMealTypeLabel } = useMealTypeLabel()

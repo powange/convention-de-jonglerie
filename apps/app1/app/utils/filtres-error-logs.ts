@@ -1,3 +1,5 @@
+import { colonnesMasqueesDepuisUrl, colonnesMasqueesVersUrl } from './colonnes-url'
+
 /**
  * Lecture et écriture, dans l'URL, de l'état du journal d'erreurs.
  *
@@ -65,18 +67,9 @@ export function construireRequeteUrl(etat: EtatDuJournal): Record<string, string
   if (etat.tri.field !== TRI_PAR_DEFAUT.field) q.tri = etat.tri.field
   if (etat.tri.dir !== TRI_PAR_DEFAUT.dir) q.triDir = etat.tri.dir
 
-  /*
-   * Les colonnes MASQUÉES, et non les visibles.
-   *
-   * Toutes le sont au départ : la liste est donc vide dans le cas courant, là où énumérer les
-   * visibles allongerait chaque URL sans rien dire de plus. Triées, pour qu'un même écran donne
-   * toujours le même lien.
-   */
-  const masquees = Object.entries(etat.visibiliteDesColonnes)
-    .filter(([, visible]) => visible === false)
-    .map(([id]) => id)
-    .sort()
-  if (masquees.length) q.colonnes = masquees.join(',')
+  // La règle des colonnes est commune à tous les tableaux du dépôt : elle vit dans `colonnes-url`.
+  const masquees = colonnesMasqueesVersUrl(etat.visibiliteDesColonnes)
+  if (masquees) q.colonnes = masquees
 
   return q
 }
@@ -127,12 +120,7 @@ export function lireEtatDepuisUrl(
   }
 
   if (typeof query.colonnes === 'string' && query.colonnes) {
-    const autorisees = new Set(colonnesMasquables)
-    const visibilite: Record<string, boolean> = {}
-    for (const id of query.colonnes.split(',')) {
-      if (autorisees.has(id)) visibilite[id] = false
-    }
-    etat.visibiliteDesColonnes = visibilite
+    etat.visibiliteDesColonnes = colonnesMasqueesDepuisUrl(query.colonnes, colonnesMasquables)
   }
 
   return etat

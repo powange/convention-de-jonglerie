@@ -313,7 +313,6 @@
       "col_status": "Estado",
       "col_type": "Tipo",
       "col_user": "Usuario",
-      "columns_label": "Columnas",
       "resolved": "Resuelto",
       "unresolved_short": "Sin resolver",
       "clear_filters": "Borrar",
