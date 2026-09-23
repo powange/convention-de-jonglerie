@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Тариф успешно создан",
       "error_saving": "Не удалось сохранить тариф",
+      "export": {
+        "document_title": "Тарифы билетной кассы",
+        "title": "Название",
+        "position": "Порядок",
+        "description": "Описание",
+        "price": "Тариф",
+        "validFrom": "Действует с",
+        "validUntil": "Действует до",
+        "tickets": "Продано билетов",
+        "quotas": "Квоты",
+        "handoutItems": "Предметы к выдаче",
+        "meals": "Питание",
+        "isActive": "Активен"
+      },
       "list": {
         "drag_to_reorder": "Перетащите для изменения порядка",
         "inactive": "Неактивно",

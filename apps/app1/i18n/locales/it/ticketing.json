@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Tariffa creata con successo",
       "error_saving": "Impossibile salvare la tariffa",
+      "export": {
+        "document_title": "Tariffe della biglietteria",
+        "title": "Titolo",
+        "position": "Ordine",
+        "description": "Descrizione",
+        "price": "Tariffa",
+        "validFrom": "Valido dal",
+        "validUntil": "Valido fino al",
+        "tickets": "Biglietti venduti",
+        "quotas": "Quote",
+        "handoutItems": "Articoli da consegnare",
+        "meals": "Pasti",
+        "isActive": "Attivo"
+      },
       "list": {
         "drag_to_reorder": "Trascina per riordinare",
         "inactive": "Inattivo",

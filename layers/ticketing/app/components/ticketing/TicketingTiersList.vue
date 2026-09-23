@@ -1,6 +1,18 @@
 <template>
-  <!-- Bouton ajouter un tarif -->
-  <div class="mb-4 flex justify-end">
+  <!-- Les colonnes AVANT l'export, comme partout : on choisit ce qu'on montre, puis on
+       l'emporte. L'ordre inverse se lit comme deux boutons sans rapport. -->
+  <div class="mb-4 flex flex-wrap justify-end gap-2">
+    <UiColumnsMenu variant="soft" :table-api="tableRef?.tableApi" :libelle="libelleDeColonne" />
+
+    <!-- Rien à produire sur un tableau vide : un fichier sans lignes se lit comme un export
+         raté, et l'on cherche l'erreur là où il n'y en a pas. -->
+    <UiExportMenu
+      variant="outline"
+      :disabled="sortedTiers.length === 0"
+      :on-csv="exporterCsv"
+      :on-pdf="exporterPdf"
+    />
+
     <UButton icon="i-heroicons-plus" color="primary" @click="openTierModal()">
       Ajouter un tarif
     </UButton>
@@ -22,6 +34,8 @@
 
   <div v-else>
     <UTable
+      ref="tableRef"
+      v-model:column-visibility="colonnesVisibles"
       :data="sortedTiers"
       :columns="columns"
       :loading="loading"
@@ -182,6 +196,24 @@
         </div>
       </template>
 
+      <!-- Colonne Description : du texte libre, coupé à l'affichage mais entier dans l'export. -->
+      <template #description-cell="{ row }">
+        <span
+          v-if="row.original.description"
+          class="text-sm text-gray-700 dark:text-gray-300 line-clamp-2"
+        >
+          {{ row.original.description }}
+        </span>
+        <span v-else class="text-gray-400">-</span>
+      </template>
+
+      <!-- Colonne Actif -->
+      <template #isActive-cell="{ row }">
+        <UBadge :color="row.original.isActive ? 'success' : 'neutral'" variant="soft" size="xs">
+          {{ row.original.isActive ? $t('common.yes') : $t('common.no') }}
+        </UBadge>
+      </template>
+
       <!-- Colonne Quotas -->
       <template #quotas-cell="{ row }">
         <div
@@ -290,11 +322,21 @@
 <script setup lang="ts">
 import { useEditionStore } from '~/stores/editions'
 import { formatMealDisplay } from '~/utils/meals'
+import { telechargerFichier } from '~/utils/telechargement'
 
+import {
+  COLONNES_EXPORT_TARIFS,
+  colonnesAExporter,
+  lignesDExportDesTarifs,
+  type FormateursDExport,
+} from '../../utils/ticketing/export-tarifs'
 import { logoDuFournisseur, nomDuFournisseur } from '../../utils/ticketing/fournisseur'
 import { isFixedPrice, type TicketingTier } from '../../utils/ticketing/tiers'
 
 import type { TableColumn } from '@nuxt/ui'
+
+import { nomDeFichierCsv, versCsv } from '~~/shared/utils/csv'
+import { texteImprimable } from '~~/shared/utils/texte-imprimable'
 
 const { money, symbol } = useEditionCurrency()
 
@@ -332,6 +374,24 @@ const columns = computed((): TableColumn<TicketingTier>[] => [
     id: 'title',
     header: 'Titre',
     size: 250,
+  },
+  /*
+   * Description et statut : masqués par défaut, proposés au menu des colonnes.
+   *
+   * Le tableau est déjà large, et ces deux-là n'aident pas à le parcourir — une description tient
+   * sur plusieurs lignes, et un tarif inactif se reconnaît déjà à sa couleur. Mais ils comptent
+   * dans un fichier qu'on relit à froid, et l'export ne prend que ce qui est visible : les cacher
+   * pour de bon les aurait rendus inatteignables.
+   */
+  {
+    id: 'description',
+    header: 'Description',
+    size: 300,
+  },
+  {
+    id: 'isActive',
+    header: 'Actif',
+    size: 80,
   },
   {
     id: 'price',
@@ -500,4 +560,111 @@ const deleteTierAction = () => {
 }
 
 const { formatDateTimeWithWeekday } = useDateFormat()
+
+const { t } = useI18n()
+
+const tableRef = useTemplateRef('tableRef')
+const colonnesVisibles = ref<Record<string, boolean>>({ description: false, isActive: false })
+
+/** Le nom lisible d'une colonne, pour le menu de visibilité comme pour les en-têtes d'export. */
+const libelleDeColonne = (id: string) => t(`ticketing.tiers.export.${id}`, id)
+
+/**
+ * Les formateurs que l'export ne peut pas connaître : la devise et le fuseau viennent de
+ * l'édition, le libellé d'un repas d'un utilitaire d'affichage.
+ */
+const formateursDExport = (): FormateursDExport => ({
+  montant: (centimes: number) => money(centimes),
+  date: (valeur: string | Date) => formatDateTimeWithWeekday(valeur as string),
+  repas: (repas: unknown) => formatMealDisplay(repas as never),
+  oui: t('common.yes'),
+  non: t('common.no'),
+})
+
+/*
+ * Les colonnes viennent du TABLEAU, pas d'une liste tenue à côté : décocher une colonne doit la
+ * retirer des deux formats. Avant le montage, l'API n'existe pas — on retombe alors sur toutes
+ * les colonnes exportables plutôt que sur un fichier vide.
+ */
+const colonnesRetenues = () => {
+  const api = (tableRef.value as { tableApi?: { getVisibleLeafColumns?: () => { id: string }[] } })
+    ?.tableApi
+  const visibles = api?.getVisibleLeafColumns?.().map((colonne) => colonne.id)
+  return colonnesAExporter(visibles ?? [...COLONNES_EXPORT_TARIFS])
+}
+
+/*
+ * L'export porte sur « sortedTiers » et non sur la liste reçue en propriété : c'est l'ordre
+ * affiché, celui que l'organisateur vient éventuellement de composer au glisser-déposer.
+ * Exporter l'ordre d'origine rendrait un document qui ne ressemble pas à l'écran.
+ */
+const exporterCsv = () => {
+  const colonnes = colonnesRetenues()
+  if (sortedTiers.value.length === 0 || colonnes.length === 0) return
+
+  telechargerFichier(
+    nomDeFichierCsv(`tarifs-edition-${props.editionId}`),
+    versCsv(
+      colonnes.map(libelleDeColonne),
+      // Sans `texteImprimable` : ses deux corrections ne servent qu'au PDF. Une cellule CSV entre
+      // guillemets porte sans difficulté les retours à la ligne et l'espace insécable étroite.
+      lignesDExportDesTarifs(sortedTiers.value, formateursDExport(), colonnes)
+    ),
+    'text/csv;charset=utf-8'
+  )
+}
+
+async function exporterPdf() {
+  const colonnes = colonnesRetenues()
+  if (sortedTiers.value.length === 0 || colonnes.length === 0) return
+
+  const { jsPDF } = await import('jspdf')
+  const { applyPlugin } = await import('jspdf-autotable')
+  applyPlugin(jsPDF)
+
+  // Paysage : jusqu'à onze colonnes, dont trois listes (quotas, articles, repas).
+  const doc = new jsPDF({ orientation: 'landscape' })
+  const MARGE = 14
+
+  doc.setFontSize(16)
+  doc.setFont('helvetica', 'bold')
+  doc.text(texteImprimable(t('ticketing.tiers.export.document_title')), MARGE, 16)
+
+  doc.setFontSize(10)
+  doc.setFont('helvetica', 'normal')
+  const sousTitre = texteImprimable(
+    [edition.value?.convention?.name, edition.value?.name].filter(Boolean).join(' - ')
+  )
+  if (sousTitre) doc.text(sousTitre, MARGE, 22)
+
+  // La date d'édition et le total : sans eux, on ne sait pas, trois semaines plus tard, si le
+  // document qu'on a sous les yeux est encore à jour, ni s'il portait un filtre.
+  doc.setFontSize(9)
+  doc.text(
+    texteImprimable(
+      `${formatDateTimeWithWeekday(new Date().toISOString())} - ${t('common.total')}: ${sortedTiers.value.length}`
+    ),
+    MARGE,
+    sousTitre ? 28 : 22
+  )
+
+  // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+  doc.autoTable({
+    startY: sousTitre ? 33 : 27,
+    margin: { left: MARGE, right: MARGE },
+    styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+    headStyles: { fillColor: [124, 58, 237] },
+    head: [colonnes.map((colonne) => texteImprimable(libelleDeColonne(colonne)))],
+    // La description garde ses retours à la ligne, le reste est aplati : c'est la seule colonne
+    // qui porte du texte libre, et `overflow: linebreak` sait la rendre.
+    body: lignesDExportDesTarifs(
+      sortedTiers.value,
+      formateursDExport(),
+      colonnes,
+      (valeur, colonne) => texteImprimable(valeur, { multiligne: colonne === 'description' })
+    ),
+  })
+
+  doc.save(`tarifs-edition-${props.editionId}.pdf`)
+}
 </script>

@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Tarifa creada con éxito",
       "error_saving": "No se puede guardar la tarifa",
+      "export": {
+        "document_title": "Tarifas de la taquilla",
+        "title": "Título",
+        "position": "Orden",
+        "description": "Descripción",
+        "price": "Tarifa",
+        "validFrom": "Válido desde",
+        "validUntil": "Válido hasta",
+        "tickets": "Entradas vendidas",
+        "quotas": "Cuotas",
+        "handoutItems": "Artículos a entregar",
+        "meals": "Comidas",
+        "isActive": "Activo"
+      },
       "list": {
         "drag_to_reorder": "Arrastrar para reordenar",
         "inactive": "Inactivo",

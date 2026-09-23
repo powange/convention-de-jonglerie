@@ -343,6 +343,20 @@
     "tiers": {
       "created": "Tarif créé avec succès",
       "error_saving": "Impossible d'enregistrer le tarif",
+      "export": {
+        "title": "Titre",
+        "position": "Ordre",
+        "description": "Description",
+        "price": "Tarif",
+        "validFrom": "Début de validité",
+        "validUntil": "Fin de validité",
+        "tickets": "Billets vendus",
+        "quotas": "Quotas",
+        "handoutItems": "Articles à remettre",
+        "meals": "Repas",
+        "isActive": "Actif",
+        "document_title": "Tarifs de la billetterie"
+      },
       "list": {
         "drag_to_reorder": "Glisser pour réordonner",
         "inactive": "Inactif",

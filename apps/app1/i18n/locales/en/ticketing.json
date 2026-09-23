@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Tier created successfully",
       "error_saving": "Unable to save tier",
+      "export": {
+        "document_title": "Ticketing prices",
+        "title": "Title",
+        "position": "Order",
+        "description": "Description",
+        "price": "Price",
+        "validFrom": "Valid from",
+        "validUntil": "Valid until",
+        "tickets": "Tickets sold",
+        "quotas": "Quotas",
+        "handoutItems": "Items to hand out",
+        "meals": "Meals",
+        "isActive": "Active"
+      },
       "list": {
         "drag_to_reorder": "Drag to reorder",
         "inactive": "Inactive",
