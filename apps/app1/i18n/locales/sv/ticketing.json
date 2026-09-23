@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Pris skapat framgångsrikt",
       "error_saving": "Kan inte spara pris",
+      "export": {
+        "document_title": "Biljettpriser",
+        "title": "Titel",
+        "position": "Ordning",
+        "description": "Beskrivning",
+        "price": "Pris",
+        "validFrom": "Giltig från",
+        "validUntil": "Giltig till",
+        "tickets": "Sålda biljetter",
+        "quotas": "Kvoter",
+        "handoutItems": "Föremål att dela ut",
+        "meals": "Måltider",
+        "isActive": "Aktiv"
+      },
       "list": {
         "drag_to_reorder": "Dra för att ändra ordning",
         "inactive": "Inaktiv",

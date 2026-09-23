@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Taryfa utworzona pomyślnie",
       "error_saving": "Nie można zapisać taryfy",
+      "export": {
+        "document_title": "Cennik biletów",
+        "title": "Tytuł",
+        "position": "Kolejność",
+        "description": "Opis",
+        "price": "Cena",
+        "validFrom": "Ważny od",
+        "validUntil": "Ważny do",
+        "tickets": "Sprzedane bilety",
+        "quotas": "Limity",
+        "handoutItems": "Przedmioty do wydania",
+        "meals": "Posiłki",
+        "isActive": "Aktywny"
+      },
       "list": {
         "drag_to_reorder": "Przeciągnij, aby zmienić kolejność",
         "inactive": "Nieaktywny",

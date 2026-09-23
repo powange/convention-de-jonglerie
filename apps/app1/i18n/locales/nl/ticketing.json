@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Tarief succesvol aangemaakt",
       "error_saving": "Kan tarief niet opslaan",
+      "export": {
+        "document_title": "Ticketprijzen",
+        "title": "Titel",
+        "position": "Volgorde",
+        "description": "Omschrijving",
+        "price": "Tarief",
+        "validFrom": "Geldig vanaf",
+        "validUntil": "Geldig tot",
+        "tickets": "Verkochte tickets",
+        "quotas": "Quota",
+        "handoutItems": "Uit te delen artikelen",
+        "meals": "Maaltijden",
+        "isActive": "Actief"
+      },
       "list": {
         "drag_to_reorder": "Slepen om te herschikken",
         "inactive": "Inactief",

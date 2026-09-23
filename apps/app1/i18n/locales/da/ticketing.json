@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Pris oprettet med succes",
       "error_saving": "Kan ikke gemme pris",
+      "export": {
+        "document_title": "Billetpriser",
+        "title": "Titel",
+        "position": "Rækkefølge",
+        "description": "Beskrivelse",
+        "price": "Pris",
+        "validFrom": "Gyldig fra",
+        "validUntil": "Gyldig til",
+        "tickets": "Solgte billetter",
+        "quotas": "Kvoter",
+        "handoutItems": "Genstande til udlevering",
+        "meals": "Måltider",
+        "isActive": "Aktiv"
+      },
       "list": {
         "drag_to_reorder": "Træk for at omorganisere",
         "inactive": "Inaktiv",

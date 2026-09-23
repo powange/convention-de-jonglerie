@@ -6,8 +6,8 @@ import {
   nomFichierArtistes,
   preparerTableauDArtistes,
   texteDesRepas,
-  texteImprimable,
 } from '../../../../../layers/artists/app/utils/export-artistes-pdf'
+import { texteImprimable } from '../../../shared/utils/texte-imprimable'
 
 /**
  * Ce qui part dans le PDF des artistes.

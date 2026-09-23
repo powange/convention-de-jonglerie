@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Tarif erfolgreich erstellt",
       "error_saving": "Tarif konnte nicht gespeichert werden",
+      "export": {
+        "document_title": "Ticketpreise",
+        "title": "Titel",
+        "position": "Reihenfolge",
+        "description": "Beschreibung",
+        "price": "Preis",
+        "validFrom": "Gültig ab",
+        "validUntil": "Gültig bis",
+        "tickets": "Verkaufte Tickets",
+        "quotas": "Kontingente",
+        "handoutItems": "Auszugebende Artikel",
+        "meals": "Mahlzeiten",
+        "isActive": "Aktiv"
+      },
       "list": {
         "drag_to_reorder": "Ziehen zum Neuordnen",
         "inactive": "Inaktiv",

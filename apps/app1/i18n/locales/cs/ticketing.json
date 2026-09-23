@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Tarif úspěšně vytvořen",
       "error_saving": "Nelze uložit tarif",
+      "export": {
+        "document_title": "Ceník vstupenek",
+        "title": "Název",
+        "position": "Pořadí",
+        "description": "Popis",
+        "price": "Cena",
+        "validFrom": "Platné od",
+        "validUntil": "Platné do",
+        "tickets": "Prodané vstupenky",
+        "quotas": "Kvóty",
+        "handoutItems": "Předměty k předání",
+        "meals": "Jídla",
+        "isActive": "Aktivní"
+      },
       "list": {
         "drag_to_reorder": "Přetáhněte pro změnu pořadí",
         "inactive": "Neaktivní",

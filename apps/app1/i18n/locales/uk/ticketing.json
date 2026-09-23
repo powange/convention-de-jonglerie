@@ -320,6 +320,20 @@
     "tiers": {
       "created": "Тариф успішно створено",
       "error_saving": "Не вдалося зберегти тариф",
+      "export": {
+        "document_title": "Тарифи квиткової каси",
+        "title": "Назва",
+        "position": "Порядок",
+        "description": "Опис",
+        "price": "Тариф",
+        "validFrom": "Діє з",
+        "validUntil": "Діє до",
+        "tickets": "Продано квитків",
+        "quotas": "Квоти",
+        "handoutItems": "Предмети до видачі",
+        "meals": "Харчування",
+        "isActive": "Активний"
+      },
       "list": {
         "drag_to_reorder": "Перетягніть для зміни порядку",
         "inactive": "Неактивно",
