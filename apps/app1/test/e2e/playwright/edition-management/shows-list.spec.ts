@@ -13,7 +13,7 @@ const JETABLE_TITLE = `E2E Spectacle jetable ${STAMP}`
  * Tableau des spectacles de la gestion : les numéros d'un cabaret y sont des sous-lignes.
  *
  * Rien ne couvrait cette page. Trois comportements ne se vérifient qu'ici, à l'écran :
- * un numéro occupe une ligne (et non une liste tassée sous le titre), le pliage cache et
+ * un numéro occupe une ligne (et non une liste tassée sous le titre), le dépliage rend et
  * rend ses lignes, et la ligne qu'UTable produit pour son slot `#expanded` — que la page
  * n'utilise pas — reste invisible.
  */
@@ -71,19 +71,24 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
     standardId = standard.id
   })
 
-  test('les numéros du cabaret sont des lignes, dépliées à l’ouverture', async ({ page, goto }) => {
+  /*
+   * Repliés à l'ouverture, et non dépliés.
+   *
+   * Ils s'ouvraient d'emblée jusqu'ici. À l'usage, un cabaret de quinze numéros poussait les
+   * spectacles suivants hors de l'écran, et l'on perdait la vue d'ensemble que ce tableau existe
+   * pour donner. Le compte de numéros reste sur la ligne du cabaret : replier ne cache donc pas
+   * qu'il y en a, seulement lesquels.
+   */
+  test('les numéros du cabaret sont repliés à l’ouverture', async ({ page, goto }) => {
     await openShowsPage(page, goto)
 
     const cabaretRow = rowWith(page, CABARET_TITLE).first()
     await expect(cabaretRow).toContainText('Cabaret')
     await expect(cabaretRow).toContainText('2 numéro(s)')
 
-    // Chaque numéro a sa propre ligne, avec son rang et sa durée dans les colonnes
-    const firstAct = rowWith(page, ACT_1_TITLE).first()
-    await expect(firstAct).toBeVisible()
-    await expect(firstAct).toContainText('Numéro 1')
-    await expect(firstAct).toContainText('10 min')
-    await expect(rowWith(page, ACT_2_TITLE).first()).toContainText('Numéro 2')
+    // Les numéros n'ont pas de ligne tant qu'on n'a pas ouvert.
+    await expect(rowWith(page, ACT_1_TITLE)).toHaveCount(0)
+    await expect(rowWith(page, ACT_2_TITLE)).toHaveCount(0)
 
     // La ligne du slot `#expanded` d'UTable : une cellule unique et vide, là où une vraie
     // ligne en a sept. Elle est rendue mais doit rester masquée.
@@ -97,7 +102,7 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
     ).toBeHidden()
   })
 
-  test('le chevron replie puis redéplie les numéros', async ({ page, goto }) => {
+  test('le chevron déplie puis replie les numéros', async ({ page, goto }) => {
     await openShowsPage(page, goto)
 
     const toggle = rowWith(page, CABARET_TITLE)
@@ -105,13 +110,18 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
       .getByRole('button', { name: /afficher ou masquer les numéros/i })
 
     await toggle.click()
+    // Chaque numéro a sa propre ligne, avec son rang et sa durée dans les colonnes
+    const firstAct = rowWith(page, ACT_1_TITLE).first()
+    await expect(firstAct).toBeVisible()
+    await expect(firstAct).toContainText('Numéro 1')
+    await expect(firstAct).toContainText('10 min')
+    await expect(rowWith(page, ACT_2_TITLE).first()).toContainText('Numéro 2')
+
+    await toggle.click()
     await expect(rowWith(page, ACT_1_TITLE)).toHaveCount(0)
     await expect(rowWith(page, ACT_2_TITLE)).toHaveCount(0)
     // Le cabaret, lui, reste affiché : c'est son déroulé qui est replié
     await expect(rowWith(page, CABARET_TITLE).first()).toBeVisible()
-
-    await toggle.click()
-    await expect(rowWith(page, ACT_1_TITLE).first()).toBeVisible()
   })
 
   test('la modale de suppression se referme après confirmation', async ({ page, goto }) => {
