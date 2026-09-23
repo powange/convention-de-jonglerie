@@ -371,9 +371,19 @@
 </template>
 
 <script setup lang="ts">
+import {
+  besoinsPropresDuSpectacle,
+  entetesTechniques,
+  lignesDUnSpectacle,
+  passagesDUnSpectacle,
+  type LibellesTechniques,
+  type SpectacleTechnique,
+} from '../../../../../../utils/export-besoins-techniques'
 import { finDeRepresentation } from '../../../../../../utils/horaires-spectacle'
 
 import type { TableColumn, TableRow } from '@nuxt/ui'
+
+import { texteImprimable } from '~~/shared/utils/texte-imprimable'
 
 definePageMeta({
   middleware: ['auth-protected'],
@@ -635,139 +645,174 @@ const goToEditShow = (show: any) => router.push(`${showsPath.value}/${show.id}`)
 const goToEditActs = (show: any) => router.push(`${showsPath.value}/${show.id}/numeros`)
 
 // --- Export PDF des besoins techniques ---
-interface TechnicalAct {
-  title: string
-  technicalNeeds: string | null
-  stageSetup: string | null
-  artists: string[]
-}
-interface TechnicalShow {
-  title: string
-  type: string
-  technicalNeeds: string | null
-  artists: string[]
-  acts: TechnicalAct[]
-}
 const exportingTechnicalPdf = ref(false)
 
 function slugify(input: string): string {
   return input
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 60)
 }
 
+/**
+ * La feuille technique, en tableaux.
+ *
+ * Elle s'écrivait en paragraphes empilés, composés ligne à ligne : sur un cabaret de quinze
+ * numéros, rien ne distinguait plus la mise en place d'un numéro des besoins du suivant. Un
+ * tableau par spectacle, aux colonnes constantes, et `autoTable` qui gère les sauts de page —
+ * l'ancien découpage à la main pouvait couper un bloc en deux.
+ */
 async function exportTechnicalNeedsPdf() {
   exportingTechnicalPdf.value = true
   try {
     const res = await $fetch<{
       success: boolean
-      data: { editionName: string; shows: TechnicalShow[] }
+      data: { editionName: string; shows: SpectacleTechnique[] }
     }>(`/api/editions/${editionId.value}/shows/technical-needs`)
     const { editionName, shows } = res.data
 
     const { jsPDF } = await import('jspdf')
+    const { applyPlugin } = await import('jspdf-autotable')
+    applyPlugin(jsPDF)
+
     const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+    const MARGE = 15
+    const largeur = doc.internal.pageSize.getWidth()
 
-    const pageWidth = doc.internal.pageSize.getWidth()
-    const pageHeight = doc.internal.pageSize.getHeight()
-    const marginX = 15
-    const maxY = pageHeight - 15
-    const contentWidth = pageWidth - 2 * marginX
-    let y = 20
+    const libelles: LibellesTechniques = {
+      aucunBesoin: t('gestion.shows.technical_pdf_no_needs'),
+      colonneNumero: t('gestion.shows.technical_pdf_col_act'),
+      colonneArtistes: t('gestion.shows.technical_pdf_col_artists'),
+      colonneBesoins: t('gestion.shows.technical_pdf_col_needs'),
+      colonneMiseEnPlace: t('gestion.shows.technical_pdf_col_stage'),
+      // Le fuseau de l'édition, et non celui du lecteur : une feuille technique se lit sur place.
+      date: (instant: string) => formatDateTimeWithWeekday(instant),
+    }
 
-    const ensureSpace = (needed: number) => {
-      if (y + needed > maxY) {
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text(
+      texteImprimable(
+        editionName
+          ? t('gestion.shows.technical_pdf_title_with_edition', { edition: editionName })
+          : t('gestion.shows.technical_pdf_title')
+      ),
+      MARGE,
+      20
+    )
+
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(110, 110, 110)
+    doc.text(
+      texteImprimable(
+        t('gestion.shows.technical_pdf_generated_on', {
+          date: new Date().toLocaleDateString(locale.value, {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          }),
+        })
+      ),
+      MARGE,
+      26
+    )
+
+    let y = 34
+
+    if (!shows.length) {
+      doc.setFontSize(11)
+      doc.setTextColor(20, 20, 20)
+      doc.text(texteImprimable(t('gestion.shows.technical_pdf_empty')), MARGE, y)
+    }
+
+    for (const spectacle of shows) {
+      /*
+       * Un spectacle ne commence jamais en bas de page.
+       *
+       * Son titre suivi de deux lignes de tableau, puis la coupure : on lit un en-tête dont le
+       * contenu est ailleurs. 40 mm, c'est le titre, ses passages, l'en-tête du tableau et une
+       * première ligne — au-delà, `autoTable` reprend proprement sur la page suivante.
+       */
+      if (y > doc.internal.pageSize.getHeight() - 40) {
         doc.addPage()
         y = 20
       }
+
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(80, 50, 130)
+      doc.text(texteImprimable(spectacle.title), MARGE, y)
+      y += 5
+
+      const passages = passagesDUnSpectacle(spectacle, libelles)
+      if (passages) {
+        doc.setFontSize(9)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(110, 110, 110)
+        doc.text(passages, MARGE, y)
+        y += 5
+      }
+
+      // Les besoins du cabaret lui-même — fond de scène, régie commune — au-dessus de ses
+      // numéros : ils ne tiennent dans aucun d'eux, et disparaîtraient d'un tableau qui ne
+      // parlerait que des numéros.
+      const propres = besoinsPropresDuSpectacle(spectacle)
+      if (propres) {
+        doc.setFontSize(10)
+        doc.setTextColor(20, 20, 20)
+        const lignes = doc.splitTextToSize(propres, largeur - 2 * MARGE) as string[]
+        doc.text(lignes, MARGE, y)
+        y += lignes.length * 4.5 + 2
+      }
+
+      // @ts-expect-error - autoTable est ajouté dynamiquement au prototype de jsPDF
+      doc.autoTable({
+        startY: y,
+        margin: { left: MARGE, right: MARGE },
+        styles: { fontSize: 9, cellPadding: 2.5, overflow: 'linebreak', valign: 'top' },
+        headStyles: { fillColor: [80, 50, 130], fontSize: 9 },
+        // La colonne des besoins prend la place : c'est elle qu'on lit, les autres se survolent.
+        columnStyles: {
+          0: { cellWidth: 35, fontStyle: 'bold' },
+          1: { cellWidth: 35 },
+          3: { cellWidth: 35 },
+        },
+        head: [entetesTechniques(libelles)],
+        body: lignesDUnSpectacle(spectacle, libelles),
+      })
+
+      // `lastAutoTable` porte la position atteinte : sans elle, le spectacle suivant se
+      // superposerait au tableau qu'on vient de poser.
+      y =
+        ((doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y) + 10
     }
 
-    const writeWrapped = (
-      text: string,
-      opts: { size: number; bold?: boolean; color?: [number, number, number] }
-    ) => {
-      doc.setFont('helvetica', opts.bold ? 'bold' : 'normal')
-      doc.setFontSize(opts.size)
-      if (opts.color) doc.setTextColor(...opts.color)
-      else doc.setTextColor(20, 20, 20)
-      const lines = doc.splitTextToSize(text, contentWidth) as string[]
-      const lineHeight = opts.size * 0.45
-      for (const line of lines) {
-        ensureSpace(lineHeight)
-        doc.text(line, marginX, y)
-        y += lineHeight
-      }
-    }
-
-    // Titre principal
-    const title = editionName
-      ? t('gestion.shows.technical_pdf_title_with_edition', { edition: editionName })
-      : t('gestion.shows.technical_pdf_title')
-    writeWrapped(title, { size: 18, bold: true })
-    y += 2
-    writeWrapped(
-      t('gestion.shows.technical_pdf_generated_on', {
-        date: new Date().toLocaleDateString(locale.value, {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-        }),
-      }),
-      { size: 9, color: [110, 110, 110] }
-    )
-    y += 4
-
-    if (!shows.length) {
-      writeWrapped(t('gestion.shows.technical_pdf_empty'), { size: 11 })
-    }
-
-    for (const show of shows) {
-      ensureSpace(10)
-      writeWrapped(show.title, { size: 14, bold: true, color: [80, 50, 130] })
-      y += 1
-
-      // Besoins techniques au niveau du spectacle
-      if (show.technicalNeeds?.trim()) {
-        writeWrapped(show.technicalNeeds.trim(), { size: 10 })
-      } else if (show.type !== 'CABARET') {
-        writeWrapped(t('gestion.shows.technical_pdf_no_needs'), { size: 10 })
-      }
-      // Artistes du spectacle (STANDARD : les artistes vivent au niveau du spectacle)
-      if (show.type !== 'CABARET' && show.artists.length) {
-        writeWrapped(
-          t('gestion.shows.technical_pdf_artists', { artists: show.artists.join(', ') }),
-          {
-            size: 9,
-            color: [110, 110, 110],
-          }
-        )
-      }
-
-      // Numéros (CABARET) : besoins techniques + mise en place scène + artistes
-      for (const act of show.acts) {
-        ensureSpace(8)
-        writeWrapped(act.title, { size: 11, bold: true })
-        const needs = act.technicalNeeds?.trim() || t('gestion.shows.technical_pdf_no_needs')
-        writeWrapped(needs, { size: 10 })
-        if (act.stageSetup?.trim()) {
-          writeWrapped(
-            t('gestion.shows.technical_pdf_stage_setup', { value: act.stageSetup.trim() }),
-            { size: 10 }
-          )
-        }
-        if (act.artists.length) {
-          writeWrapped(
-            t('gestion.shows.technical_pdf_artists', { artists: act.artists.join(', ') }),
-            { size: 9, color: [110, 110, 110] }
-          )
-        }
-        y += 3
-      }
-      y += 3
+    /*
+     * La numérotation, posée en DERNIER.
+     *
+     * Le total ne se connaît qu'une fois tous les tableaux placés : l'écrire au fil de l'eau
+     * obligerait à deviner combien de pages viendront encore. On repasse donc sur chaque page une
+     * fois le document fini.
+     *
+     * Elle compte sur une feuille technique : ces pages se distribuent, se posent sur une console
+     * de régie et s'y mélangent. « Page 3 sur 7 » dit aussi qu'il en manque quatre.
+     */
+    const pages = doc.internal.pages.length - 1
+    for (let page = 1; page <= pages; page++) {
+      doc.setPage(page)
+      doc.setFontSize(8)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(130, 130, 130)
+      doc.text(
+        texteImprimable(t('common.page_of', { page, total: pages })),
+        largeur - MARGE,
+        doc.internal.pageSize.getHeight() - 8,
+        { align: 'right' }
+      )
     }
 
     const slug = slugify(editionName || `edition-${editionId.value}`)
