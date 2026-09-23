@@ -468,20 +468,22 @@ const tableRows = computed<ShowTableRow[]>(() =>
   }))
 )
 
-// Les cabarets s'ouvrent d'emblée : leur déroulé était déjà visible avant que les numéros
-// ne deviennent des lignes, le replier par défaut aurait masqué une information acquise.
+/*
+ * Les cabarets arrivent REPLIÉS, et s'ouvrent d'un clic.
+ *
+ * Ils s'ouvraient d'emblée jusqu'ici, au motif que leur déroulé était visible avant que les
+ * numéros ne deviennent des lignes. À l'usage, l'effet s'est inversé : un cabaret de quinze
+ * numéros pousse les spectacles suivants hors de l'écran, et l'on cherche la vue d'ensemble que
+ * ce tableau existe pour donner. Le déroulé d'un cabaret se consulte quand on s'occupe de LUI.
+ *
+ * Remis à zéro quand les lignes changent : l'état d'ouverture est indexé sur la POSITION de la
+ * ligne, et non sur l'identifiant du spectacle. Le conserver après un rechargement qui a décalé
+ * l'ordre ouvrirait un autre cabaret que celui qu'on avait ouvert.
+ */
 const expandedRows = ref<Record<string, boolean>>({})
-watch(
-  tableRows,
-  (rows) => {
-    const next: Record<string, boolean> = {}
-    rows.forEach((row, index) => {
-      if (row.children?.length) next[index] = true
-    })
-    expandedRows.value = next
-  },
-  { immediate: true }
-)
+watch(tableRows, () => {
+  expandedRows.value = {}
+})
 
 // Déplier une ligne fait toujours produire à UTable une ligne supplémentaire pour son slot
 // `#expanded`, que nous n'utilisons pas : elle apparaissait vide entre le cabaret et ses
