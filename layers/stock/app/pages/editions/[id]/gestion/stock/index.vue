@@ -98,6 +98,10 @@
       @saved="handleGroupSaved"
       @deleted="handleGroupDeleted"
     />
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </UContainer>
 </template>
 
@@ -194,7 +198,9 @@ const getGroupActions = (group: StockGroupItem) => [
   ],
 ]
 
-async function deleteGroup(group: StockGroupItem) {
+const confirmation = useConfirmation()
+
+function deleteGroup(group: StockGroupItem) {
   // La base est en cascade : le groupe emporte ses objets, et chaque objet ses réservations. La
   // confirmation ne disait que les objets — or ce sont les réservations qui font mal, puisqu'elles
   // ont été posées par d'autres. Le décompte se fait dans `suppression-groupe`, éprouvé à part.
@@ -204,9 +210,15 @@ async function deleteGroup(group: StockGroupItem) {
     { name: group.name, objets: resume.objets, count: resume.reservations },
     resume.reservations
   )
-  if (!confirm(message)) return
-  await $fetch(`/api/editions/${editionId}/stock-groups/${group.id}`, { method: 'DELETE' })
-  await fetchGroups()
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: message,
+    libelleConfirmer: t('common.delete'),
+    agir: async () => {
+      await $fetch(`/api/editions/${editionId}/stock-groups/${group.id}`, { method: 'DELETE' })
+      await fetchGroups()
+    },
+  })
 }
 
 async function handleGroupSaved() {

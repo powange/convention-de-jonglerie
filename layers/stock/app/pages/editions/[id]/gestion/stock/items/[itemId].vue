@@ -372,6 +372,10 @@
       :edition-setup-start-date="(edition as any)?.volunteersSetupStartDate ?? null"
       @saved="fetchItem"
     />
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </UContainer>
 </template>
 
@@ -719,12 +723,21 @@ const itemActions = computed(() => [
   ],
 ])
 
-async function deleteItem() {
-  if (!item.value) return
-  if (!confirm(t('gestion.stock.confirm_delete_item', { name: item.value.name }))) return
-  const groupId = item.value.group.id
-  await $fetch(`/api/editions/${editionId}/stock-items/${item.value.id}`, { method: 'DELETE' })
-  router.push(`/editions/${editionId}/gestion/stock/${groupId}`)
+const confirmation = useConfirmation()
+
+function deleteItem() {
+  const objet = item.value
+  if (!objet) return
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('gestion.stock.confirm_delete_item', { name: objet.name }),
+    libelleConfirmer: t('common.delete'),
+    agir: async () => {
+      const groupId = objet.group.id
+      await $fetch(`/api/editions/${editionId}/stock-items/${objet.id}`, { method: 'DELETE' })
+      router.push(`/editions/${editionId}/gestion/stock/${groupId}`)
+    },
+  })
 }
 
 function canModifyReservation(r: StockReservation): boolean {
@@ -767,14 +780,30 @@ function reservationActions(r: StockReservation) {
   return actions
 }
 
-async function deleteReservation(r: StockReservation) {
-  if (!confirm(t('gestion.stock.confirm_delete_reservation'))) return
-  await $fetch(`/api/editions/${editionId}/stock-reservations/${r.id}`, { method: 'DELETE' })
-  await fetchItem()
+function deleteReservation(r: StockReservation) {
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('gestion.stock.confirm_delete_reservation'),
+    libelleConfirmer: t('common.delete'),
+    agir: async () => {
+      await $fetch(`/api/editions/${editionId}/stock-reservations/${r.id}`, { method: 'DELETE' })
+      await fetchItem()
+    },
+  })
 }
 
-async function cancelReservation(r: StockReservation) {
-  if (!confirm(t('gestion.stock.confirm_cancel_reservation'))) return
+function cancelReservation(r: StockReservation) {
+  confirmation.demanderConfirmation({
+    titre: t('gestion.stock.cancel_reservation'),
+    description: t('gestion.stock.confirm_cancel_reservation'),
+    // « Annuler la réservation » et non « Annuler » : à côté du bouton qui referme la modale,
+    // le second se lirait comme « ne rien faire ».
+    libelleConfirmer: t('gestion.stock.cancel_reservation'),
+    agir: () => performCancelReservation(r),
+  })
+}
+
+async function performCancelReservation(r: StockReservation) {
   try {
     await $fetch(`/api/editions/${editionId}/stock-reservations/${r.id}`, {
       method: 'PUT',

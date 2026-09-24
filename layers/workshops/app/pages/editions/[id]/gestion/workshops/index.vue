@@ -174,6 +174,10 @@
       :edition="edition"
       @success="handleWorkshopsImportSuccess"
     />
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -299,9 +303,15 @@ const { execute: executeDeleteLocation, isLoading: isDeletingLocation } = useApi
   }
 )
 
+const confirmation = useConfirmation()
+
 const deleteLocation = (locationId: number) => {
-  if (!confirm(t('workshops.confirm_delete_location'))) return
-  executeDeleteLocation(locationId)
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('workshops.confirm_delete_location'),
+    libelleConfirmer: t('common.delete'),
+    agir: () => executeDeleteLocation(locationId),
+  })
 }
 
 const { execute: executeToggleLocationMode, loading: savingLocationMode } = useApiAction(

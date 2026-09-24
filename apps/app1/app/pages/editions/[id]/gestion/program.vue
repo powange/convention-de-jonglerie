@@ -317,6 +317,10 @@
         </UForm>
       </template>
     </UModal>
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -750,9 +754,15 @@ const { execute: executerSuppression, isLoading: chargeSuppression } = useApiAct
   }
 )
 
-const supprimer = async (entree: EntreeProgramme) => {
-  if (!confirm(t('gestion.program.confirm_delete', { title: entree.titre }))) return
-  await executerSuppression(entree.cle)
+const confirmation = useConfirmation()
+
+const supprimer = (entree: EntreeProgramme) => {
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('gestion.program.confirm_delete', { title: entree.titre }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => executerSuppression(entree.cle),
+  })
 }
 
 onMounted(async () => {
