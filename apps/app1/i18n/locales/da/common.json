@@ -801,7 +801,9 @@
     "name_min_3": "Navnet skal indeholde mindst 3 tegn",
     "phone_required": "Telefonnummer er påkrævet",
     "url_invalid": "URL'en skal starte med http:// eller https://",
-    "url_max_191": "URL'en må ikke overstige 191 tegn"
+    "url_max_191": "URL'en må ikke overstige 191 tegn",
+    "emergency_contact_phone_invalid": "Nødkontaktens telefonnummer er ikke gyldigt",
+    "phone_invalid": "Dette telefonnummer er ikke gyldigt"
   },
   "guide": {
     "menu": "Guidemenu",

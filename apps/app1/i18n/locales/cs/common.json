@@ -801,7 +801,9 @@
     "name_min_3": "Název musí obsahovat alespoň 3 znaky",
     "phone_required": "Telefonní číslo je povinné",
     "url_invalid": "Adresa URL musí začínat http:// nebo https://",
-    "url_max_191": "Adresa URL nesmí překročit 191 znaků"
+    "url_max_191": "Adresa URL nesmí překročit 191 znaků",
+    "emergency_contact_phone_invalid": "Číslo nouzového kontaktu není platné",
+    "phone_invalid": "Toto telefonní číslo není platné"
   },
   "guide": {
     "menu": "Nabídka průvodce",
