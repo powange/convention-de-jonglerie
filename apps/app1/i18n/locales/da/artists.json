@@ -191,6 +191,9 @@
       "max_required_with_actual": "Et maksimum er påkrævet, så længe et faktisk beløb er angivet"
     },
     "view_qr_code": "Min QR-kode",
-    "export_pdf_error": "PDF'en kunne ikke genereres"
+    "export_pdf_error": "PDF'en kunne ikke genereres",
+    "delete_empty_shows_intro": "Disse kabaretter ville stå helt uden numre:",
+    "delete_orphan_acts_hint": "Det, der ikke er markeret, bliver stående. Et nummer uden udøver forhindrer ingenting: det står stadig i rækkefølgen og på det tekniske ark, uden navn.",
+    "delete_orphan_acts_intro": "Dette nummer ville ikke have nogen tilbage til at udføre det: | Disse {count} numre ville ikke have nogen tilbage til at udføre dem:"
   }
 }
