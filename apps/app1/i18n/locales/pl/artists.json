@@ -191,6 +191,9 @@
       "max_required_with_actual": "Maksimum jest wymagane, dopóki podana jest kwota rzeczywista"
     },
     "view_qr_code": "Mój kod QR",
-    "export_pdf_error": "Nie udało się wygenerować pliku PDF"
+    "export_pdf_error": "Nie udało się wygenerować pliku PDF",
+    "delete_empty_shows_intro": "Te kabarety zostałyby bez żadnego numeru:",
+    "delete_orphan_acts_hint": "To, co nie zostanie zaznaczone, pozostaje. Numer bez wykonawcy niczemu nie przeszkadza: pojawia się w przebiegu i na karcie technicznej, bez nazwiska.",
+    "delete_orphan_acts_intro": "Ten numer nie miałby już nikogo do wykonania: | Te {count} numery nie miałyby już nikogo do wykonania:"
   }
 }

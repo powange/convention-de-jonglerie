@@ -191,6 +191,9 @@
       "max_required_with_actual": "È richiesto un massimo finché è indicato un importo reale"
     },
     "view_qr_code": "Il mio QR Code",
-    "export_pdf_error": "Impossibile generare il PDF"
+    "export_pdf_error": "Impossibile generare il PDF",
+    "delete_empty_shows_intro": "Questi cabaret resterebbero senza alcun numero:",
+    "delete_orphan_acts_hint": "Ciò che non è selezionato resta. Un numero senza interprete non impedisce nulla: appare nella scaletta e nella scheda tecnica, senza nome.",
+    "delete_orphan_acts_intro": "Questo numero non avrebbe più nessuno a interpretarlo: | Questi {count} numeri non avrebbero più nessuno a interpretarli:"
   }
 }

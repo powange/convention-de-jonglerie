@@ -615,7 +615,50 @@
       :loading="deletingArtist"
       @confirm="deleteArtist"
       @cancel="showDeleteConfirm = false"
-    />
+    >
+      <!-- Les numéros que cette suppression laisserait sans personne. Rien n'est coché d'avance :
+           un numéro muet n'a rien d'incohérent, et on peut vouloir le garder le temps de
+           remplacer l'artiste. -->
+      <div v-if="numerosOrphelins.length" class="space-y-3">
+        <p class="text-sm text-gray-700 dark:text-gray-300">
+          {{ $t('artists.delete_orphan_acts_intro', { count: numerosOrphelins.length }) }}
+        </p>
+
+        <div class="space-y-2">
+          <UCheckbox
+            v-for="orphelin in numerosOrphelins"
+            :key="orphelin.actId"
+            v-model="numerosCoches[orphelin.actId]"
+            :disabled="deletingArtist"
+          >
+            <template #label>
+              <span class="text-sm">
+                {{ orphelin.actTitle }}
+                <span class="text-gray-500 dark:text-gray-400">— {{ orphelin.showTitle }}</span>
+              </span>
+            </template>
+          </UCheckbox>
+        </div>
+
+        <!-- Une case distincte par cabaret, et seulement quand il se viderait pour de bon. -->
+        <div v-if="spectaclesVides.length" class="space-y-2 pt-2 border-t border-default">
+          <p class="text-sm text-gray-700 dark:text-gray-300">
+            {{ $t('artists.delete_empty_shows_intro') }}
+          </p>
+          <UCheckbox
+            v-for="spectacle in spectaclesVides"
+            :key="spectacle.showId"
+            v-model="spectaclesCoches[spectacle.showId]"
+            :disabled="deletingArtist"
+            :label="spectacle.showTitle"
+          />
+        </div>
+
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          {{ $t('artists.delete_orphan_acts_hint') }}
+        </p>
+      </div>
+    </UiConfirmModal>
   </div>
 </template>
 
@@ -1324,9 +1367,84 @@ const handleArtistSaved = () => {
 }
 
 // Confirmer la suppression
-const confirmDeleteArtist = (artist: any) => {
+/*
+ * Ce que la suppression laisserait derrière elle, demandé au serveur avant d'ouvrir la modale.
+ *
+ * L'écran ne peut pas le calculer : la liste des artistes charge les spectacles avec
+ * `distinct: ['showId']`, ce qui écrase le détail des numéros et ignore combien d'autres artistes
+ * y figurent.
+ */
+const numerosOrphelins = ref<
+  Array<{
+    actId: number
+    actTitle: string
+    showId: number
+    showTitle: string
+    dernierDuSpectacle: boolean
+  }>
+>([])
+/*
+ * Les cases cochées, une par identifiant. Rien n'est coché d'avance.
+ *
+ * Un enregistrement de booléens et non un tableau : `UCheckbox` est une case BOOLÉENNE, pas une
+ * case de groupe. Lui donner un `v-model` sur un tableau avec `:value`, comme le permet une case
+ * native, écrase le tableau par `true` au premier clic — et rien ne le signale, ni au typage ni à
+ * l'exécution. Constaté à l'écran : les numéros se cochaient, et la case du cabaret n'apparaissait
+ * jamais.
+ */
+const numerosCoches = ref<Record<number, boolean>>({})
+const spectaclesCoches = ref<Record<number, boolean>>({})
+
+const numerosAEmporter = computed(() =>
+  numerosOrphelins.value.filter((o) => numerosCoches.value[o.actId]).map((o) => o.actId)
+)
+const spectaclesAEmporter = computed(() =>
+  spectaclesVides.value.filter((s) => spectaclesCoches.value[s.showId]).map((s) => s.showId)
+)
+
+/** Les cabarets qui se videraient si l'on emportait tout ce qui est coché. */
+const spectaclesVides = computed(() => {
+  const parSpectacle = new Map<number, { showId: number; showTitle: string; total: number }>()
+  for (const orphelin of numerosOrphelins.value) {
+    const entree = parSpectacle.get(orphelin.showId) ?? {
+      showId: orphelin.showId,
+      showTitle: orphelin.showTitle,
+      total: 0,
+    }
+    entree.total += 1
+    parSpectacle.set(orphelin.showId, entree)
+  }
+  return [...parSpectacle.values()].filter((spectacle) => {
+    // Le cabaret ne se vide que si TOUS ses numéros orphelins sont cochés — et encore faut-il
+    // qu'il n'ait pas d'autres numéros tenus par quelqu'un d'autre.
+    const siens = numerosOrphelins.value.filter((o) => o.showId === spectacle.showId)
+    return (
+      siens.every((o) => o.dernierDuSpectacle) &&
+      siens.every((o) => numerosAEmporter.value.includes(o.actId))
+    )
+  })
+})
+
+const { execute: chargerImpactSuppression } = useApiAction<
+  unknown,
+  { numerosOrphelins: typeof numerosOrphelins.value }
+>(() => `/api/editions/${editionId.value}/artists/${artistToDelete.value?.id}/suppression-impact`, {
+  method: 'GET',
+  silent: true,
+  onSuccess: (resultat) => {
+    numerosOrphelins.value = resultat?.numerosOrphelins ?? []
+  },
+})
+
+const confirmDeleteArtist = async (artist: any) => {
   artistToDelete.value = artist
+  numerosOrphelins.value = []
+  numerosCoches.value = {}
+  spectaclesCoches.value = {}
   showDeleteConfirm.value = true
+  // La modale s'ouvre tout de suite ; les cases arrivent quand le serveur a répondu. L'attendre
+  // aurait fait paraître le bouton inerte.
+  await chargerImpactSuppression()
 }
 
 // Supprimer l'artiste
@@ -1336,6 +1454,12 @@ const { execute: deleteArtist, loading: deletingArtist } = useApiAction(
   () => `/api/editions/${editionId.value}/artists/${artistToDelete.value?.id}`,
   {
     method: 'DELETE',
+    // Ce qu'on accepte d'emporter. Le serveur revérifie chaque identifiant : il ne supprime que
+    // ce qui devient réellement orphelin, et un cabaret que s'il se retrouve vraiment vide.
+    body: () => ({
+      actIds: numerosAEmporter.value,
+      showIds: spectaclesAEmporter.value,
+    }),
     successMessage: { title: t('artists.artist_deleted') },
     errorMessages: { default: t('artists.error_delete') },
     onSuccess: () => {

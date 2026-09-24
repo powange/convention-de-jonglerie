@@ -191,6 +191,9 @@
       "max_required_with_actual": "Ein Maximum ist erforderlich, solange ein tatsächlicher Betrag angegeben ist"
     },
     "view_qr_code": "Mein QR-Code",
-    "export_pdf_error": "PDF konnte nicht erstellt werden"
+    "export_pdf_error": "PDF konnte nicht erstellt werden",
+    "delete_empty_shows_intro": "Diesen Kabaretts bliebe keine einzige Nummer:",
+    "delete_orphan_acts_hint": "Was nicht angehakt ist, bleibt bestehen. Eine Nummer ohne Interpret stört nichts: Sie erscheint im Ablauf und im technischen Blatt, ohne Namen.",
+    "delete_orphan_acts_intro": "Diese Nummer hätte niemanden mehr, der sie aufführt: | Diese {count} Nummern hätten niemanden mehr, der sie aufführt:"
   }
 }

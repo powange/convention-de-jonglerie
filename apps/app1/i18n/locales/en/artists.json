@@ -191,6 +191,9 @@
       "max_required_with_actual": "A maximum is required as long as an actual amount is set"
     },
     "view_qr_code": "My QR Code",
-    "export_pdf_error": "Could not generate the PDF"
+    "export_pdf_error": "Could not generate the PDF",
+    "delete_empty_shows_intro": "These cabarets would be left with no acts at all:",
+    "delete_orphan_acts_hint": "Anything left unchecked stays in place. An act without a performer breaks nothing: it still appears in the running order and the technical sheet, without a name.",
+    "delete_orphan_acts_intro": "This act would have no one left to perform it: | These {count} acts would have no one left to perform them:"
   }
 }
