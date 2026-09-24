@@ -406,6 +406,7 @@ import { useEditionStore } from '~/stores/editions'
 import { useVolunteerSettings } from '#imports'
 
 import { premierJourDeSemaine } from '~~/shared/utils/semaine'
+import { estUrlExterne } from '~~/shared/utils/url-externe'
 
 // La semaine commence le lundi en France, le dimanche ailleurs : la valeur suit la langue de qui
 // regarde plutôt que d'être figée. Sans elle, `UCalendar` démarre toujours le dimanche.
@@ -713,7 +714,23 @@ const persistVolunteerSettings = async (options: { skipRefetch?: boolean } = {})
     if (volunteersModeLocal.value === 'EXTERNAL') {
       // `null` et non `undefined` : un champ absent laisse la valeur en base inchangée,
       // alors qu'une URL vidée en mode EXTERNAL doit remonter l'erreur de validation.
-      body.externalUrl = volunteersExternalUrlLocal.value.trim() || null
+      const lien = volunteersExternalUrlLocal.value.trim()
+      /*
+       * Le lien est jugé ICI, par la règle du point d'API lui-même.
+       *
+       * Auparavant « juggling.fr » partait, le serveur refusait, et le message ne revenait
+       * qu'ensuite. La règle vit dans `shared/utils/url-externe`, d'où le schéma zod du serveur la
+       * lit aussi : il n'y a pas deux règles qui puissent diverger. Un champ vidé continue de
+       * partir tel quel — c'est au serveur de dire qu'il est requis en mode externe.
+       */
+      if (lien && !estUrlExterne(lien)) {
+        fieldErrors.value = {
+          ...fieldErrors.value,
+          externalUrl: t('validation.external_url_invalid'),
+        }
+        return
+      }
+      body.externalUrl = lien || null
     }
 
     const updatedSettings = await updateSettings(body)

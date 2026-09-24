@@ -806,7 +806,8 @@
     "url_invalid": "Adres URL musi zaczynać się od http:// lub https://",
     "url_max_191": "Adres URL nie może przekraczać 191 znaków",
     "emergency_contact_phone_invalid": "Numer kontaktu alarmowego jest nieprawidłowy",
-    "phone_invalid": "Ten numer telefonu jest nieprawidłowy"
+    "phone_invalid": "Ten numer telefonu jest nieprawidłowy",
+    "external_url_invalid": "Ten link jest nieprawidłowy — akceptowane są tylko linki zaczynające się od http:// lub https://"
   },
   "guide": {
     "menu": "Menu przewodnika",

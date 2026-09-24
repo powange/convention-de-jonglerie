@@ -6,6 +6,7 @@ import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { handleValidationError } from '#server/utils/validation-schemas'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { schemaUrlExterne } from '~~/shared/utils/url-externe'
 
 const bodySchema = z
   .object({
@@ -20,35 +21,7 @@ const bodySchema = z
     swapsEnabled: z.boolean().optional(),
     organizersInTeams: z.boolean().optional(),
     planningPublished: z.boolean().optional(),
-    externalUrl: z
-      .string()
-      .url('URL externe invalide')
-      .max(1000, 'URL trop longue (max 1000 caractères)')
-      .refine((url) => {
-        // Rejeter les URLs vides ou incomplètes
-        if (!url || url.trim().length === 0) return false
-
-        // Rejeter les protocoles dangereux
-        const dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:']
-        const lowerUrl = url.toLowerCase()
-        if (dangerousProtocols.some((protocol) => lowerUrl.startsWith(protocol))) {
-          return false
-        }
-
-        // Accepter seulement HTTP et HTTPS
-        if (!lowerUrl.startsWith('http://') && !lowerUrl.startsWith('https://')) {
-          return false
-        }
-
-        // Vérifier que l'URL n'est pas juste le protocole
-        if (lowerUrl === 'http://' || lowerUrl === 'https://') {
-          return false
-        }
-
-        return true
-      }, 'URL externe invalide - seuls les liens HTTP/HTTPS sont autorisés')
-      .optional()
-      .nullable(),
+    externalUrl: schemaUrlExterne.optional().nullable(),
     askDiet: z.boolean().optional(),
     askAllergies: z.boolean().optional(),
     askTimePreferences: z.boolean().optional(),
