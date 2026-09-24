@@ -801,7 +801,9 @@
     "name_min_3": "O nome deve conter pelo menos 3 caracteres",
     "phone_required": "O número de telefone é obrigatório",
     "url_invalid": "O URL deve começar com http:// ou https://",
-    "url_max_191": "O URL não pode exceder 191 caracteres"
+    "url_max_191": "O URL não pode exceder 191 caracteres",
+    "emergency_contact_phone_invalid": "O número do contacto de emergência não é válido",
+    "phone_invalid": "Este número de telefone não é válido"
   },
   "guide": {
     "menu": "Menu do guia",

@@ -801,7 +801,9 @@
     "name_min_3": "Nazwa musi zawierać co najmniej 3 znaki",
     "phone_required": "Numer telefonu jest wymagany",
     "url_invalid": "Adres URL musi zaczynać się od http:// lub https://",
-    "url_max_191": "Adres URL nie może przekraczać 191 znaków"
+    "url_max_191": "Adres URL nie może przekraczać 191 znaków",
+    "emergency_contact_phone_invalid": "Numer kontaktu alarmowego jest nieprawidłowy",
+    "phone_invalid": "Ten numer telefonu jest nieprawidłowy"
   },
   "guide": {
     "menu": "Menu przewodnika",

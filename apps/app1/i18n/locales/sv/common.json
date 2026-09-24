@@ -801,7 +801,9 @@
     "name_min_3": "Namnet måste innehålla minst 3 tecken",
     "phone_required": "Telefonnumret är obligatoriskt",
     "url_invalid": "URL:en måste börja med http:// eller https://",
-    "url_max_191": "URL:en får inte överstiga 191 tecken"
+    "url_max_191": "URL:en får inte överstiga 191 tecken",
+    "emergency_contact_phone_invalid": "Nödkontaktens telefonnummer är inte giltigt",
+    "phone_invalid": "Detta telefonnummer är inte giltigt"
   },
   "guide": {
     "menu": "Guidemeny",
