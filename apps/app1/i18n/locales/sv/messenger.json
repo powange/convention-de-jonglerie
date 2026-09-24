@@ -41,6 +41,10 @@
       "show_group": "Artister och arrangörer"
     },
     "volunteer_managers": "Volontärledare",
-    "seen_by": "Läst av {name}"
+    "seen_by": "Läst av {name}",
+    "copied": "Meddelandet kopierat",
+    "copy": "Kopiera meddelandet",
+    "copy_failed": "Meddelandet kunde inte kopieras",
+    "copy_unavailable": "Din webbläsare tillåter inte kopiering här"
   }
 }

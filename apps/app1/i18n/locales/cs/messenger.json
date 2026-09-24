@@ -41,6 +41,10 @@
       "show_group": "Umělci a organizátoři"
     },
     "volunteer_managers": "Vedoucí dobrovolníků",
-    "seen_by": "Přečetl(a) {name}"
+    "seen_by": "Přečetl(a) {name}",
+    "copied": "Zpráva zkopírována",
+    "copy": "Kopírovat zprávu",
+    "copy_failed": "Zprávu se nepodařilo zkopírovat",
+    "copy_unavailable": "Váš prohlížeč zde kopírování neumožňuje"
   }
 }

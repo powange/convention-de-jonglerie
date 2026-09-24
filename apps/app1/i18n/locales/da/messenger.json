@@ -41,6 +41,10 @@
       "show_group": "Artister og arrangører"
     },
     "volunteer_managers": "Frivilligledere",
-    "seen_by": "Læst af {name}"
+    "seen_by": "Læst af {name}",
+    "copied": "Beskeden er kopieret",
+    "copy": "Kopiér beskeden",
+    "copy_failed": "Beskeden kunne ikke kopieres",
+    "copy_unavailable": "Din browser tillader ikke kopiering her"
   }
 }

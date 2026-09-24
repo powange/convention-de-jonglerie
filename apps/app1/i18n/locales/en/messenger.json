@@ -41,6 +41,10 @@
       "show_group": "Artists and organisers"
     },
     "volunteer_managers": "Volunteer Managers",
-    "seen_by": "Read by {name}"
+    "seen_by": "Read by {name}",
+    "copied": "Message copied",
+    "copy": "Copy message",
+    "copy_failed": "Could not copy the message",
+    "copy_unavailable": "Your browser does not allow copying here"
   }
 }

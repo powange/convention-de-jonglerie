@@ -10,6 +10,10 @@
       "show_group": "Distribution du spectacle"
     },
     "conversations": "Conversations",
+    "copied": "Message copié",
+    "copy": "Copier le message",
+    "copy_failed": "Impossible de copier le message",
+    "copy_unavailable": "Votre navigateur n'autorise pas la copie ici",
     "delete": "Supprimer",
     "edited": "modifié",
     "hours_ago": "Il y a {count}h",

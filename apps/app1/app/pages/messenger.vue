@@ -314,6 +314,8 @@
                         :message-id="message.id"
                         :can-delete="message.isCurrentUser"
                         :is-deleted="message.metadata?.isDeleted"
+                        :texte="getOriginalMessage(message.id)?.content"
+                        :auteur="getOriginalMessage(message.id)?.participant?.user?.pseudo"
                         @reply="handleReplyToMessage(getOriginalMessage(message.id)!)"
                         @delete="handleDeleteMessage(message.id)"
                       >

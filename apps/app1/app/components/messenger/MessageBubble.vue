@@ -29,6 +29,25 @@
   <UModal v-model:open="showActionsModal" :title="$t('messenger.message_actions')">
     <template #body>
       <div class="flex flex-col gap-2">
+        <!--
+          Copier, en tête de liste.
+
+          Sur mobile, l'appui long est capté ici pour ouvrir cette modale, ce qui empêche le geste
+          natif de sélection de texte du navigateur : c'est donc cette modale elle-même qui rendait
+          le copier-coller impossible. Ce bouton ne comble pas un manque, il rend ce que le geste
+          avait pris.
+        -->
+        <UButton
+          v-if="!isDeleted && texte"
+          color="neutral"
+          variant="soft"
+          block
+          size="lg"
+          icon="i-heroicons-clipboard-document"
+          :label="$t('messenger.copy')"
+          class="justify-start"
+          @click="handleCopy"
+        />
         <UButton
           color="neutral"
           variant="soft"
@@ -69,6 +88,10 @@ const props = defineProps<{
   messageId: string
   canDelete: boolean
   isDeleted?: boolean
+  /** Le contenu à copier. Absent, le bouton « Copier » ne s'affiche pas. */
+  texte?: string
+  /** Qui l'a écrit, préfixé au texte copié pour qu'on sache de qui on cite. */
+  auteur?: string
 }>()
 
 const emit = defineEmits<{
@@ -168,6 +191,44 @@ function handleTouchEnd() {
 }
 
 // Actions du menu
+/*
+ * `useClipboard` de VueUse plutôt que l'API du navigateur appelée en direct.
+ *
+ * Sept écrans du dépôt appellent l'API du navigateur sans filet ; celui-ci se replie quand elle
+ * n'est pas disponible — contexte non sécurisé, permission refusée. Et l'on DIT ce qui s'est
+ * passé : une copie qui échoue en silence laisse l'utilisateur coller l'ancien contenu sans
+ * comprendre.
+ */
+const { t } = useI18n()
+const { copy, isSupported } = useClipboard()
+const toast = useToast()
+
+async function handleCopy() {
+  showActionsModal.value = false
+  // L'auteur devant le texte : on copie souvent pour transmettre, et savoir de qui l'on cite.
+  const contenu = props.auteur ? `${props.auteur} : ${props.texte}` : (props.texte ?? '')
+
+  if (!isSupported.value) {
+    toast.add({
+      title: t('messenger.copy_unavailable'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+    return
+  }
+
+  try {
+    await copy(contenu)
+    toast.add({ title: t('messenger.copied'), icon: 'i-heroicons-check-circle', color: 'success' })
+  } catch {
+    toast.add({
+      title: t('messenger.copy_failed'),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+  }
+}
+
 function handleReply() {
   showActionsModal.value = false
   emit('reply')
