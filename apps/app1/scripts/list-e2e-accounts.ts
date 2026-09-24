@@ -87,26 +87,68 @@ async function listE2EAccounts() {
 
     if (CLEANUP_FLAG) {
       // Supprimer les conventions d'abord (cascade → éditions et données liées)
+      let conventionsSupprimees = 0
       if (conventions.length > 0) {
         console.log('🧹 Suppression des conventions E2E...')
         for (const conv of conventions) {
-          await prisma.convention.delete({ where: { id: conv.id } }).catch((e: Error) => {
-            console.log(`⚠️  Impossible de supprimer la convention "${conv.name}": ${e.message}`)
-          })
+          try {
+            await prisma.convention.delete({ where: { id: conv.id } })
+            conventionsSupprimees++
+          } catch (e) {
+            console.log(
+              `⚠️  Impossible de supprimer la convention "${conv.name}": ${(e as Error).message}`
+            )
+          }
         }
         console.log(
-          `   ✅ ${conventions.length} convention(s) supprimée(s) (+ éditions en cascade)`
+          `   ✅ ${conventionsSupprimees} convention(s) supprimée(s) (+ éditions en cascade)`
         )
+      }
+
+      /*
+       * Les envois groupés de notifications retiennent leur auteur.
+       *
+       * `ArtistNotificationGroup` et `VolunteerNotificationGroup` pointent vers l'expéditeur SANS
+       * cascade, délibérément : on garde la trace de ce qui a été annoncé même si le compte
+       * disparaît. Pour un compte de test, cette trace n'a pas d'objet — et sans ce retrait, la
+       * suppression échoue sur une contrainte de clé étrangère.
+       */
+      const idsComptes = accounts.map((compte) => compte.id)
+      const envoisArtistes = await prisma.artistNotificationGroup.deleteMany({
+        where: { senderId: { in: idsComptes } },
+      })
+      const envoisBenevoles = await prisma.volunteerNotificationGroup.deleteMany({
+        where: { senderId: { in: idsComptes } },
+      })
+      const envois = envoisArtistes.count + envoisBenevoles.count
+      if (envois > 0) {
+        console.log(`🧹 ${envois} envoi(s) groupé(s) de notifications retiré(s)`)
       }
 
       // Puis supprimer les users
       console.log('🧹 Suppression des comptes E2E...')
+      let comptesSupprimes = 0
+      const echecs: string[] = []
       for (const account of accounts) {
-        await prisma.user.delete({ where: { id: account.id } }).catch((e: Error) => {
-          console.log(`⚠️  Impossible de supprimer ${account.email}: ${e.message}`)
-        })
+        try {
+          await prisma.user.delete({ where: { id: account.id } })
+          comptesSupprimes++
+        } catch (e) {
+          echecs.push(account.email)
+          console.log(`⚠️  Impossible de supprimer ${account.email}: ${(e as Error).message}`)
+        }
       }
-      console.log(`   ✅ ${accounts.length} compte(s) supprimé(s)`)
+
+      /*
+       * Le décompte porte sur les SUCCÈS, pas sur les tours de boucle.
+       *
+       * Il annonçait `accounts.length` quoi qu'il arrive : un nettoyage se déclarait complet alors
+       * qu'un compte restait en base, l'avertissement étant noyé au-dessus du total rassurant.
+       */
+      console.log(`   ✅ ${comptesSupprimes} compte(s) supprimé(s) sur ${accounts.length}`)
+      if (echecs.length > 0) {
+        console.log(`   ⚠️  ${echecs.length} compte(s) NON supprimé(s) : ${echecs.join(', ')}`)
+      }
 
       // Nettoyer les fichiers d'état Playwright
       if (fs.existsSync(AUTH_DIR)) {
@@ -117,7 +159,11 @@ async function listE2EAccounts() {
         console.log(`🗑️  ${files.length} fichier(s) supprimé(s) dans test-results/.auth/`)
       }
 
-      console.log('\n✅ Nettoyage terminé')
+      console.log(
+        echecs.length > 0
+          ? '\n⚠️  Nettoyage terminé, mais incomplet — voir les comptes listés ci-dessus'
+          : '\n✅ Nettoyage terminé'
+      )
     } else {
       console.log('💡 Utiliser --clean pour supprimer ces comptes et leurs conventions')
     }
