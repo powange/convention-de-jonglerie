@@ -361,6 +361,10 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
           phases: ['EVENT'],
           selectionId: 50,
           accepted: true,
+          // La sélection vient d'être créée : aucune assiette n'est mise de côté tant qu'un
+          // organisateur ne l'a pas demandé. `false` et non absent — un champ manquant se lirait
+          // comme « la donnée n'existe pas » plutôt que « pas d'assiette ».
+          afterShow: false,
         },
       ])
     })
