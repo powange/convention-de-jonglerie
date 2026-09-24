@@ -41,6 +41,10 @@
       "show_group": "Artiesten en organisatoren"
     },
     "volunteer_managers": "Vrijwilligersleiders",
-    "seen_by": "Gelezen door {name}"
+    "seen_by": "Gelezen door {name}",
+    "copied": "Bericht gekopieerd",
+    "copy": "Bericht kopiëren",
+    "copy_failed": "Kon het bericht niet kopiëren",
+    "copy_unavailable": "Je browser staat kopiëren hier niet toe"
   }
 }

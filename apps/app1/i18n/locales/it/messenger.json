@@ -41,6 +41,10 @@
       "show_group": "Artisti e organizzatori"
     },
     "volunteer_managers": "Responsabili volontari",
-    "seen_by": "Letto da {name}"
+    "seen_by": "Letto da {name}",
+    "copied": "Messaggio copiato",
+    "copy": "Copia il messaggio",
+    "copy_failed": "Impossibile copiare il messaggio",
+    "copy_unavailable": "Il tuo browser non consente la copia qui"
   }
 }

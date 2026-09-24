@@ -41,6 +41,10 @@
       "show_group": "Artyści i organizatorzy"
     },
     "volunteer_managers": "Kierownicy wolontariuszy",
-    "seen_by": "Przeczytane przez {name}"
+    "seen_by": "Przeczytane przez {name}",
+    "copied": "Wiadomość skopiowana",
+    "copy": "Kopiuj wiadomość",
+    "copy_failed": "Nie udało się skopiować wiadomości",
+    "copy_unavailable": "Twoja przeglądarka nie pozwala tutaj kopiować"
   }
 }

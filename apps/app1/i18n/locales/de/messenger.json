@@ -41,6 +41,10 @@
       "show_group": "Künstler und Organisatoren"
     },
     "volunteer_managers": "Freiwilligenleiter",
-    "seen_by": "Gelesen von {name}"
+    "seen_by": "Gelesen von {name}",
+    "copied": "Nachricht kopiert",
+    "copy": "Nachricht kopieren",
+    "copy_failed": "Die Nachricht konnte nicht kopiert werden",
+    "copy_unavailable": "Ihr Browser erlaubt das Kopieren hier nicht"
   }
 }
