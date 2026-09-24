@@ -200,7 +200,10 @@
     "warning": "Let op",
     "week": "Week",
     "workshops_short": "Workshops",
-    "yes": "Ja"
+    "yes": "Ja",
+    "leave_without_saving": "Verlaten zonder opslaan",
+    "unsaved_changes": "Niet-opgeslagen wijzigingen",
+    "unsaved_changes_warning": "Je hebt wijzigingen die niet zijn opgeslagen. Als je deze pagina nu verlaat, gaan ze verloren."
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

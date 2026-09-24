@@ -114,3 +114,40 @@ describe('useConfirmation', () => {
     expect(ouverte.value).toBe(false)
   })
 })
+
+describe('useConfirmation — le renoncement', () => {
+  it('prévient l’appelant quand on annule', () => {
+    const renoncer = vi.fn()
+    const { demanderConfirmation, annuler } = useConfirmation()
+    demanderConfirmation({ description: 'x', agir: () => {}, renoncer })
+    annuler()
+    expect(renoncer).toHaveBeenCalledTimes(1)
+  })
+
+  it('prévient aussi quand on referme la modale autrement', () => {
+    const renoncer = vi.fn()
+    const { ouverte, demanderConfirmation } = useConfirmation()
+    demanderConfirmation({ description: 'x', agir: () => {}, renoncer })
+    // Un clic à côté, ou la touche d'échappement.
+    ouverte.value = false
+    expect(renoncer).toHaveBeenCalledTimes(1)
+  })
+
+  it('ne prévient PAS quand on a confirmé', async () => {
+    const renoncer = vi.fn()
+    const { demanderConfirmation, confirmer } = useConfirmation()
+    demanderConfirmation({ description: 'x', agir: () => {}, renoncer })
+    await confirmer()
+    // Sans cette distinction, une garde de sortie annulerait la navigation qu'on vient d'accepter.
+    expect(renoncer).not.toHaveBeenCalled()
+  })
+
+  it('ne prévient qu’une fois, même si l’on annule deux fois', () => {
+    const renoncer = vi.fn()
+    const { demanderConfirmation, annuler } = useConfirmation()
+    demanderConfirmation({ description: 'x', agir: () => {}, renoncer })
+    annuler()
+    annuler()
+    expect(renoncer).toHaveBeenCalledTimes(1)
+  })
+})

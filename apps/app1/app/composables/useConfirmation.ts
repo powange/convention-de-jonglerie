@@ -45,6 +45,14 @@ export interface DemandeDeConfirmation {
   couleurConfirmer?: 'primary' | 'warning' | 'error'
   /** L'action elle-même. Une promesse tient le bouton en chargement jusqu'à son terme. */
   agir: () => void | Promise<void>
+  /**
+   * Ce qu'il faut faire quand on renonce — refus explicite, clic à côté, touche d'échappement.
+   *
+   * Rien, le plus souvent : renoncer, c'est ne rien faire. Mais un appelant qui ATTEND la réponse
+   * a besoin de la connaître dans les deux sens. Sans ce point de sortie, la garde qui protège une
+   * saisie non enregistrée laisserait la navigation en suspens pour toujours.
+   */
+  renoncer?: () => void
 }
 
 export function useConfirmation() {
@@ -61,7 +69,7 @@ export function useConfirmation() {
   const ouverte = computed({
     get: () => demande.value !== null,
     set: (valeur: boolean) => {
-      if (!valeur && !enCours.value) demande.value = null
+      if (!valeur) annuler()
     },
   })
 
@@ -89,7 +97,14 @@ export function useConfirmation() {
   }
 
   function annuler() {
-    if (!enCours.value) demande.value = null
+    if (enCours.value) return
+    // Relevée AVANT d'être effacée : `renoncer` doit partir une fois, sur la demande qui s'en va.
+    const abandonnee = demande.value
+    demande.value = null
+    abandonnee?.renoncer?.()
+    // NE PAS appeler `renoncer` après une confirmation : `confirmer` efface la demande lui-même,
+    // si bien qu'il ne reste rien à abandonner ici. Une garde de sortie annulerait sinon la
+    // navigation qu'on vient tout juste d'accepter.
   }
 
   return { demande, ouverte, enCours, demanderConfirmation, confirmer, annuler }
