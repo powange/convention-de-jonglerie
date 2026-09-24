@@ -9,8 +9,7 @@ import {
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { schemaUrlExterne } from '~~/shared/utils/url-externe'
 
-/** Exporté pour que les tests puissent confronter le formulaire au point d'API sur les mêmes valeurs. */
-export const createShowCallSchema = z.object({
+const createShowCallSchema = z.object({
   name: z.string().min(1, 'Le nom est requis').max(100, 'Le nom est trop long'),
   description: z.string().max(5000).optional().nullable(),
   mode: z.enum(['INTERNAL', 'EXTERNAL']).default('INTERNAL'),
