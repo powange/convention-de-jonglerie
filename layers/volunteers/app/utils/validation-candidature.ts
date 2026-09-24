@@ -14,6 +14,8 @@
  * tests unitaires, hors Nuxt.
  */
 
+import { telephoneCandidatureAcceptable } from '~~/shared/utils/telephone-candidature'
+
 /** Longueur maximale de la motivation, telle que le champ la borne déjà. */
 export const MOTIVATION_MAX = 2000
 
@@ -101,8 +103,18 @@ export function manquementsDeLaCandidature(
   const manquements: ManquementCandidature[] = []
   const exigeUnContact = contactDUrgenceExige(reglages)
 
+  /*
+   * Renseigné, PUIS valide — les deux, et dans cet ordre.
+   *
+   * Ne vérifier que la présence laissait partir des numéros que le point d'API refuse : le champ à
+   * indicatif émet toujours quelque chose, « 123 » devenant `+33123`. Le candidat découvrait le
+   * refus après l'aller-retour, par un message qui ne désignait aucun champ. La règle de validité
+   * est celle du serveur, importée et non recopiée.
+   */
   if (vide(saisie.phone)) {
     manquements.push({ champ: 'phone', cle: 'validation.phone_required' })
+  } else if (!telephoneCandidatureAcceptable(saisie.phone!)) {
+    manquements.push({ champ: 'phone', cle: 'validation.phone_invalid' })
   }
   if (vide(saisie.firstName)) {
     manquements.push({ champ: 'firstName', cle: 'validation.first_name_required' })
@@ -127,6 +139,17 @@ export function manquementsDeLaCandidature(
     manquements.push({
       champ: 'emergencyContactPhone',
       cle: 'validation.emergency_contact_phone_required',
+    })
+  } else if (
+    !vide(saisie.emergencyContactPhone) &&
+    !telephoneCandidatureAcceptable(saisie.emergencyContactPhone!)
+  ) {
+    // Vide reste permis, même quand le contact est exigé par ailleurs : c'est le cas ci-dessus qui
+    // le réclame. Ici on ne juge que ce qui a été saisi — comme le schéma du serveur, où ce champ
+    // accepte la chaîne vide et refuse un numéro invalide.
+    manquements.push({
+      champ: 'emergencyContactPhone',
+      cle: 'validation.emergency_contact_phone_invalid',
     })
   }
 

@@ -1,6 +1,11 @@
-import { isValidPhoneNumber } from 'libphonenumber-js'
 import { z } from 'zod'
 
+import {
+  FORME_TELEPHONE,
+  TELEPHONE_MAX,
+  TELEPHONE_MIN,
+  telephoneCandidatureValide,
+} from '../../../../shared/utils/telephone-candidature'
 import { requiresEmergencyContact } from '../../../utils/allergy-severity'
 import { misesAJourDuProfil } from '../../infos-personnelles'
 
@@ -17,29 +22,18 @@ export const VALID_TIME_SLOTS = [
 ] as const
 
 /**
- * Un numéro de téléphone réellement valide, et pas seulement de la bonne forme.
+ * Champ téléphone d'une candidature : forme, longueur, puis validité réelle.
  *
- * L'ancien contrôle ne regardait que les caractères employés : un numéro français à huit
- * chiffres passait sans broncher, et la candidature partait avec un téléphone injoignable —
- * constaté. `libphonenumber` connaît les longueurs et les préfixes réellement attribués, pays
- * par pays ; c'est lui qui tranche désormais.
- *
- * Le repli en France couvre les versions antérieures de l'application encore en cache sur un
- * téléphone : elles envoient le numéro au format national. Il n'élargit rien par rapport à
- * l'ancien contrôle, qui acceptait déjà `0712345678`.
+ * Les trois contraintes viennent de `shared/utils/telephone-candidature`, d'où le formulaire les
+ * lit aussi. Elles ont longtemps vécu ici seules, et le formulaire se contentait de vérifier que
+ * le champ n'était pas vide : il acceptait donc des numéros que ce schéma refusait, et le candidat
+ * l'apprenait après l'aller-retour, par un toast qui ne désignait pas le champ.
  */
-export function telephoneCandidatureValide(valeur: string): boolean {
-  const v = valeur.trim()
-  if (!v) return false
-  return v.startsWith('+') ? isValidPhoneNumber(v) : isValidPhoneNumber(v, 'FR')
-}
-
-/** Champ téléphone d'une candidature : forme, longueur, puis validité réelle. */
 const telephoneCandidature = z
   .string()
-  .min(6, 'Téléphone trop court')
-  .max(30, 'Téléphone trop long')
-  .regex(/^[+0-9 ().-]{6,30}$/, 'Format de téléphone invalide')
+  .min(TELEPHONE_MIN, 'Téléphone trop court')
+  .max(TELEPHONE_MAX, 'Téléphone trop long')
+  .regex(FORME_TELEPHONE, 'Format de téléphone invalide')
   .refine(telephoneCandidatureValide, 'Numéro de téléphone invalide')
 
 /**

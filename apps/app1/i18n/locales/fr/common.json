@@ -790,6 +790,7 @@
     "description_max_5000": "La description ne peut pas dépasser 5000 caractères",
     "email_format": "L'adresse email n'est pas valide",
     "emergency_contact_name_required": "Le nom du contact d'urgence est requis",
+    "emergency_contact_phone_invalid": "Le numéro du contact d'urgence n'est pas valide",
     "emergency_contact_phone_required": "Le téléphone du contact d'urgence est requis",
     "first_name_required": "Le prénom est requis",
     "last_name_required": "Le nom est requis",
@@ -799,6 +800,7 @@
     "name_max_100": "Le nom ne peut pas dépasser 100 caractères",
     "name_max_200": "Le nom ne peut pas dépasser 200 caractères",
     "name_min_3": "Le nom doit contenir au moins 3 caractères",
+    "phone_invalid": "Ce numéro de téléphone n'est pas valide",
     "phone_required": "Le numéro de téléphone est requis",
     "url_invalid": "L'URL doit commencer par http:// ou https://",
     "url_max_191": "L'URL ne peut pas dépasser 191 caractères"
