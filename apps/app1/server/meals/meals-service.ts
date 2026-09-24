@@ -320,6 +320,9 @@ export async function getVolunteerSelfMeals(editionId: number, userId: number) {
       phases: meal.phases,
       selectionId: selection?.id,
       accepted: selection?.accepted ?? true,
+      // `false` est bien le défaut de la colonne : une sélection sans assiette mise de côté n'en
+      // a pas. La ligne existe toujours ici — elle vient d'être créée au besoin juste au-dessus.
+      afterShow: selection?.afterShow ?? false,
     }
   })
 }
@@ -367,6 +370,10 @@ export async function setVolunteerSelfMealAcceptances(
     phases: selection.meal.phases,
     selectionId: selection.id,
     accepted: selection.accepted,
+    // Rendu ici AUSSI, et pas seulement à la lecture : la carte se recharge depuis cette réponse
+    // après un enregistrement. Sans ce champ, la pastille disparaissait au premier clic sur
+    // « Sauvegarder », alors que l'assiette restait bel et bien mise de côté en base.
+    afterShow: selection.afterShow,
   }))
 }
 

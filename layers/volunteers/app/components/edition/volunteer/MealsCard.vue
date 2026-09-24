@@ -44,6 +44,20 @@
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                   {{ getPhasesLabel(meal.phases) }}
                 </p>
+                <!-- En LECTURE SEULE : seule l'organisation décide d'une assiette mise de côté.
+                     Sans cette pastille, la personne concernée n'avait aucun moyen de vérifier
+                     que sa demande avait bien été notée. -->
+                <UTooltip v-if="meal.afterShow" :text="t('volunteers.meal_set_aside_hint')">
+                  <UBadge
+                    color="warning"
+                    variant="soft"
+                    size="sm"
+                    icon="i-heroicons-moon"
+                    class="mt-1"
+                  >
+                    {{ t('volunteers.meal_set_aside_badge') }}
+                  </UBadge>
+                </UTooltip>
               </div>
             </div>
           </div>
@@ -72,6 +86,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+
+const { t } = useI18n()
 
 // Utiliser les utilitaires meals
 const { getMealTypeLabel } = useMealTypeLabel()

@@ -30,6 +30,14 @@ export interface VolunteerMealView {
   phases: unknown
   selectionId: number | null | undefined
   accepted: boolean
+  /**
+   * Une assiette est-elle mise de côté pour ce repas&nbsp;?
+   *
+   * Réglé par un organisateur, jamais par le bénévole — d'où sa présence ici en lecture seule.
+   * Sans ce champ, la personne concernée n'avait aucun moyen de vérifier que sa demande avait
+   * bien été notée : la donnée existait en base et s'arrêtait à l'écran de gestion.
+   */
+  afterShow: boolean
   eligible?: boolean
 }
 
