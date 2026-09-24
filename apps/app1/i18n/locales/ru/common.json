@@ -200,7 +200,10 @@
     "warning": "Внимание",
     "week": "Неделя",
     "workshops_short": "Мастер-классы",
-    "yes": "Да"
+    "yes": "Да",
+    "leave_without_saving": "Выйти без сохранения",
+    "unsaved_changes": "Несохранённые изменения",
+    "unsaved_changes_warning": "У вас есть изменения, которые не были сохранены. Если вы покинете страницу сейчас, они будут потеряны."
   },
   "dates": {
     "date_range": "С {startDate} до {endDate}",

@@ -200,7 +200,10 @@
     "warning": "Attenzione",
     "week": "Settimana",
     "workshops_short": "Workshop",
-    "yes": "Sì"
+    "yes": "Sì",
+    "leave_without_saving": "Esci senza salvare",
+    "unsaved_changes": "Modifiche non salvate",
+    "unsaved_changes_warning": "Hai modifiche che non sono state salvate. Se esci da questa pagina ora, andranno perse."
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

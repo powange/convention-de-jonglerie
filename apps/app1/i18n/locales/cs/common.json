@@ -200,7 +200,10 @@
     "warning": "Pozor",
     "week": "Týden",
     "workshops_short": "Workshopy",
-    "yes": "Ano"
+    "yes": "Ano",
+    "leave_without_saving": "Odejít bez uložení",
+    "unsaved_changes": "Neuložené změny",
+    "unsaved_changes_warning": "Máte změny, které nebyly uloženy. Pokud nyní tuto stránku opustíte, budou ztraceny."
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

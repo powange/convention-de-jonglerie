@@ -32,6 +32,9 @@
         @cancel="goBackToShows"
       />
     </template>
+
+    <!-- Prévient avant de quitter la page avec un formulaire modifié. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -62,10 +65,14 @@ const formRef = ref<{ isDirty: boolean } | null>(null)
 
 const goBackToShows = () => router.push(showsPath.value)
 
-onBeforeRouteLeave(() => {
-  if (!formRef.value?.isDirty) return true
-  return confirm(t('gestion.shows.leave_confirm'))
-})
+/*
+ * La demande passe par la modale de l'application, et non plus par `confirm()`.
+ *
+ * La boîte native ne suit pas la langue choisie, ne se style pas, et certains navigateurs laissent
+ * l'utilisateur la désactiver — auquel cas on quittait la page sans que rien ne soit demandé.
+ * `useGardeDeSortie` attend la réponse de la modale, ce que `confirm()` obtenait en bloquant.
+ */
+const { confirmation } = useGardeDeSortie(() => !!formRef.value?.isDirty)
 
 const { execute: fetchShow } = useApiAction(
   () => `/api/editions/${editionId.value}/shows/${showId.value}`,

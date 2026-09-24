@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="formulaire">
     <!-- Loading initial -->
     <div v-if="initialLoading" class="flex items-center justify-center py-12">
       <UIcon name="i-lucide-loader-2" class="h-8 w-8 animate-spin text-primary" />
@@ -311,6 +311,10 @@
         />
       </div>
     </div>
+
+    <!-- Prévient avant de quitter la page avec une saisie non enregistrée. Sans cela, un clic
+         dans la barre latérale effaçait le formulaire sans un mot. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -580,8 +584,19 @@ const { execute: save, loading: saving } = useApiAction(() => `/api/editions/${e
     if (response && edition.value) {
       editionStore.setEdition({ ...edition.value, ...response })
     }
+    // Ce qui est enregistré n'est plus à perdre.
+    marquerEnregistre()
   },
 })
+
+/*
+ * La saisie ne se perd plus en silence.
+ *
+ * Mesuré avant d'être corrigé : un champ rempli, un clic dans la barre latérale, un retour — et le
+ * champ était vide, sans qu'aucune boîte ne se soit affichée.
+ */
+const formulaire = useTemplateRef<HTMLElement>('formulaire')
+const { marquerEnregistre, confirmation } = useSaisieNonEnregistree(formulaire)
 
 // Charger l'édition
 onMounted(async () => {
