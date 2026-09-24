@@ -22,8 +22,14 @@ const BASE = 'http://localhost:3000'
  * signalé depuis l'application, aucun n'a été attrapé par les tests — qui vérifiaient les
  * pièces en isolation sans jamais parcourir la séquence complète.
  *
- * C'est cette séquence qui est rejouée ici : échec → affichage du refus → correction →
- * renvoi → modification.
+ * C'est cette séquence qui est rejouée ici : saisie fautive → affichage du refus → correction →
+ * envoi → modification.
+ *
+ * Le refus se produisait à l'origine côté serveur, après un aller-retour. Depuis que le
+ * formulaire lit la même règle de téléphone que le point d'API, il arrive avant l'envoi : ce
+ * parcours vérifie donc qu'AUCUNE requête n'est nécessaire pour l'obtenir. Le mécanisme qui
+ * affiche les refus venus du serveur existe toujours, pour ce que le navigateur ne peut pas
+ * savoir ; il n'est simplement plus éprouvé par ce chemin-ci.
  *
  * **Le compte compte.** Le compte de test habituel est organisateur de l'édition, et un
  * organisateur emprunte un tout autre chemin d'autorisation : modifier sa candidature avec lui
@@ -106,7 +112,9 @@ test.describe.serial('Formulaire de candidature bénévole (parcours interface)'
     await context.close()
   })
 
-  test('candidater par le formulaire : refus lisible, correction, envoi', async ({ browser }) => {
+  test('candidater par le formulaire : refus AVANT envoi, correction, envoi', async ({
+    browser,
+  }) => {
     const { editionId } = loadState()
 
     const context = await browser.newContext({ storageState: { cookies: [], origins: [] } })
@@ -132,26 +140,27 @@ test.describe.serial('Formulaire de candidature bénévole (parcours interface)'
     await choisirDates(modale)
 
     const envoyer = modale.getByRole('button', { name: /postuler comme bénévole/i }).last()
-    await expect(envoyer).toBeEnabled()
-    await Promise.all([
-      page.waitForResponse(
-        (r) => r.url().includes('/volunteers/applications') && r.request().method() === 'POST'
-      ),
-      envoyer.click(),
-    ])
 
-    // 1. Le refus doit se lire DANS le formulaire, pas seulement dans un toast fugace.
-    await expect(modale.getByText(/numéro de téléphone invalide/i).first()).toBeVisible({
-      timeout: 10000,
-    })
+    /*
+     * 1. Le refus se lit dans le formulaire SANS aller-retour.
+     *
+     * Ce test attendait auparavant l'inverse : que l'envoi parte, que le serveur refuse, et que
+     * son message remonte dans le formulaire. C'était le comportement réel, et il coûtait au
+     * candidat une attente pour apprendre ce que le navigateur savait déjà — le journal de
+     * production en portait la trace, sous « Données invalides (phone : …) ».
+     *
+     * Le formulaire applique désormais la règle du serveur, lue dans le même module
+     * (`shared/utils/telephone-candidature`). Le refus est donc immédiat, et rien ne part.
+     */
+    await expect(modale.getByText(/n['’]est pas valide/i).first()).toBeVisible({ timeout: 10000 })
 
-    // 2. Tant que le refus tient, l'envoi est bloqué.
+    // 2. Tant que le refus tient, l'envoi est impossible.
     await expect(envoyer).toBeDisabled()
 
     // 3. Corriger doit lever le refus ET réactiver l'envoi — sans quoi on ne peut plus
-    //    corriger ce que le serveur vient justement de reprocher.
+    //    corriger ce que le formulaire vient justement de reprocher.
     await numero.fill(TELEPHONE_VALIDE)
-    await expect(modale.getByText(/numéro de téléphone invalide/i)).toHaveCount(0)
+    await expect(modale.getByText(/n['’]est pas valide/i)).toHaveCount(0)
     await expect(envoyer).toBeEnabled({ timeout: 10000 })
 
     const [envoi] = await Promise.all([
