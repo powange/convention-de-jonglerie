@@ -3,9 +3,13 @@ import type { Confirmation } from '~/composables/useConfirmation'
 /**
  * Prévenir avant de quitter une page dont la saisie n'est pas enregistrée.
  *
- * Vingt-huit écrans de gestion portent un bouton d'enregistrement ; quatre seulement prévenaient.
- * Sur les autres, un clic dans la barre latérale effaçait la saisie **sans un mot** — vérifié sur
- * `general-info` : un champ rempli, une navigation, un retour, et le champ était vide.
+ * Vérifié sur `general-info` avant d'être corrigé : un champ rempli, un clic dans la barre
+ * latérale, un retour — et le champ était vide, **sans qu'aucune boîte ne se soit affichée**.
+ *
+ * ⚠️ Tous les écrans à bouton d'enregistrement n'en ont PAS besoin. Plusieurs — `ticketing/config`,
+ * `volunteers/config` — enregistrent chaque réglage au fil de l'eau : y poser cette garde ferait
+ * poser la question pour ce qui est déjà sauvegardé, et l'on apprend vite à cliquer sans lire.
+ * Avant d'appliquer ce composable à un écran, vérifier qu'il a réellement quelque chose à perdre.
  *
  * ```ts
  * const formulaire = useTemplateRef<HTMLElement>('formulaire')
