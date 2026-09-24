@@ -62,19 +62,31 @@
         <!-- Sur mobile, le sommaire des catégories remplace la longue page de liens ; ouvrir
              une catégorie n'affiche qu'elle, avec le retour ci-dessous. Au-delà de `md`, ces
              deux blocs disparaissent et tout reste déplié. Le sommaire se construit à partir des
-             sections réellement montées, d'où le rendu côté navigateur seulement. -->
+             sections réellement montées, d'où le rendu côté navigateur seulement.
+
+             Les catégories sont dimensionnées pour le POUCE, pas pour la souris. `lg` et `xl` ont
+             le même rembourrage vertical dans le thème — ils ne diffèrent que par la taille du
+             texte et des icônes — d'où le `py-3` explicite : sans lui, le bouton plafonne autour
+             de 40 px de haut, sous la cible tactile confortable. Signalé comme inutilisable au
+             téléphone. -->
         <ClientOnly>
           <div v-if="!categorieOuverte" class="space-y-2 md:hidden">
             <UButton
               v-for="categorie in categories"
               :key="categorie.id"
               block
-              size="lg"
+              size="xl"
               color="neutral"
               variant="outline"
               :icon="categorie.icone"
               trailing-icon="i-heroicons-chevron-right"
-              :ui="{ base: 'justify-between' }"
+              :ui="{
+                base: 'justify-between py-3',
+                // L'icône reprend la couleur de sa catégorie, celle-là même qui la distingue dans
+                // les sections dépliées. Le chevron reste neutre : il indique le geste, pas le
+                // sujet, et le colorer ferait deux signaux de même force.
+                leadingIcon: categorie.classeIcone,
+              }"
               @click="ouvrir(categorie.id)"
             >
               {{ categorie.titre }}
