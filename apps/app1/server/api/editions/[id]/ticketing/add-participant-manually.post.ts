@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { applyCustomName } from '#server/utils/editions/ticketing/tiers'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 const itemSchema = z.object({
   tierId: z.number(),
@@ -15,7 +16,7 @@ const itemSchema = z.object({
       z.object({
         firstName: z.string().min(1),
         lastName: z.string().min(1),
-        email: z.string().email(),
+        email: schemaAdresseEmail,
         customFields: z
           .array(
             z.object({
@@ -43,7 +44,7 @@ const bodySchema = z.object({
   // Informations de l'acheteur (payeur)
   payerFirstName: z.string().min(1),
   payerLastName: z.string().min(1),
-  payerEmail: z.string().email(),
+  payerEmail: schemaAdresseEmail,
   // Liste des tarifs sélectionnés avec quantités et participants personnalisés
   items: z.array(itemSchema).min(1),
   // Type de paiement (cash, card, check) ou null si non payé

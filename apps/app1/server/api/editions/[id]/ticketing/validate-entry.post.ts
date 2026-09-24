@@ -8,6 +8,7 @@ import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/e
 import { billetAnnule } from '#server/utils/ticketing/billets-qui-comptent'
 import { journaliserMouvementDEntree } from '#server/utils/ticketing/journal-des-entrees'
 import { departagerLesEntrees } from '#server/utils/ticketing/mouvement-de-validation'
+import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 const bodySchema = z.object({
   participantIds: z.array(z.number()).min(1),
@@ -18,7 +19,7 @@ const bodySchema = z.object({
     .object({
       firstName: z.string().nullable().optional(),
       lastName: z.string().nullable().optional(),
-      email: z.string().email().nullable().optional(),
+      email: schemaAdresseEmail.nullable().optional(),
       phone: z.string().nullable().optional(),
     })
     .optional(),

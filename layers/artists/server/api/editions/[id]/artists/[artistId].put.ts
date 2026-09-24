@@ -9,6 +9,7 @@ import {
 } from '#server/utils/permissions/edition-permissions'
 import { buildUpdateData } from '#server/utils/prisma-helpers'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
+import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 import { toCents } from '~~/shared/utils/money'
 
 const updateArtistSchema = z.object({
@@ -47,7 +48,7 @@ const updateArtistSchema = z.object({
   dropoffLocation: z.string().optional().nullable(),
   dropoffResponsibleId: z.number().int().positive().optional().nullable(),
   // Champs utilisateur (modifiables uniquement si authProvider = MANUAL)
-  userEmail: z.string().email().optional(),
+  userEmail: schemaAdresseEmail.optional(),
   userPrenom: z.string().min(1).optional(),
   userNom: z.string().min(1).optional(),
   userPhone: z.string().optional().nullable(),

@@ -806,7 +806,8 @@
     "url_invalid": "La URL debe comenzar con http:// o https://",
     "url_max_191": "La URL no puede superar los 191 caracteres",
     "emergency_contact_phone_invalid": "El número del contacto de emergencia no es válido",
-    "phone_invalid": "Este número de teléfono no es válido"
+    "phone_invalid": "Este número de teléfono no es válido",
+    "external_url_invalid": "Este enlace no es válido: solo se aceptan enlaces que empiecen por http:// o https://"
   },
   "guide": {
     "menu": "Menú de la guía",

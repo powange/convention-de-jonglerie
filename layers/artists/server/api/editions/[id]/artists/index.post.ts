@@ -10,6 +10,7 @@ import {
 } from '#server/utils/permissions/edition-permissions'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 import { toCents } from '~~/shared/utils/money'
 
 // Un montant réel supérieur à son plafond rendrait l'artiste inéditable : le PUT
@@ -20,7 +21,7 @@ const maxCoversActual = (max: number | null | undefined, actual: number | null |
 const artistSchema = z
   .object({
     userId: z.number().int().positive().optional(),
-    email: z.string().email().optional(),
+    email: schemaAdresseEmail.optional(),
     prenom: z.string().min(1).optional(),
     nom: z.string().min(1).optional(),
     /**

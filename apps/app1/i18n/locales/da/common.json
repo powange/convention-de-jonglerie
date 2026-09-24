@@ -806,7 +806,8 @@
     "url_invalid": "URL'en skal starte med http:// eller https://",
     "url_max_191": "URL'en må ikke overstige 191 tegn",
     "emergency_contact_phone_invalid": "Nødkontaktens telefonnummer er ikke gyldigt",
-    "phone_invalid": "Dette telefonnummer er ikke gyldigt"
+    "phone_invalid": "Dette telefonnummer er ikke gyldigt",
+    "external_url_invalid": "Dette link er ikke gyldigt — kun links, der starter med http:// eller https://, accepteres"
   },
   "guide": {
     "menu": "Guidemenu",

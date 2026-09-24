@@ -389,6 +389,8 @@ import { useEditionStore } from '~/stores/editions'
 import type { EditionShowCall, ShowCallVisibility } from '~/types'
 import { formatDateTimeLocal } from '~/utils/date'
 
+import { estUrlExterne } from '~~/shared/utils/url-externe'
+
 definePageMeta({
   middleware: ['auth-protected'],
 })
@@ -670,9 +672,23 @@ const { execute: executePersistSettings, loading: saving } = useApiAction<
   },
 })
 
+/*
+ * Le lien est vérifié AVANT d'être envoyé, par la règle du point d'API lui-même.
+ *
+ * Auparavant, « juggling.fr » partait, le serveur refusait, et le message ne revenait qu'ensuite —
+ * au bon endroit, mais après l'aller-retour. La règle vit dans `shared/utils/url-externe`, d'où le
+ * schéma zod du serveur la lit aussi : il n'y a pas deux règles qui puissent diverger.
+ */
 const persistSettings = () => {
   if (!initialized.value) return
   fieldErrors.value = {}
+
+  const lien = externalUrlLocal.value.trim()
+  if (lien && !estUrlExterne(lien)) {
+    fieldErrors.value.externalUrl = t('validation.external_url_invalid')
+    return
+  }
+
   executePersistSettings()
 }
 

@@ -795,6 +795,7 @@
     "emergency_contact_name_required": "Le nom du contact d'urgence est requis",
     "emergency_contact_phone_invalid": "Le numéro du contact d'urgence n'est pas valide",
     "emergency_contact_phone_required": "Le téléphone du contact d'urgence est requis",
+    "external_url_invalid": "Ce lien n'est pas valide — seuls les liens commençant par http:// ou https:// sont acceptés",
     "first_name_required": "Le prénom est requis",
     "last_name_required": "Le nom est requis",
     "message_required": "Le message est requis",

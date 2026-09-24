@@ -7,9 +7,10 @@ import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { generateVolunteerQrCodeToken } from '#server/utils/token-generator'
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 
 const bodySchema = z.object({
-  email: z.string().email(),
+  email: schemaAdresseEmail,
   prenom: z.string().min(1),
   nom: z.string().min(1),
 })

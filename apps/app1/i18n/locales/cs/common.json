@@ -806,7 +806,8 @@
     "url_invalid": "Adresa URL musí začínat http:// nebo https://",
     "url_max_191": "Adresa URL nesmí překročit 191 znaků",
     "emergency_contact_phone_invalid": "Číslo nouzového kontaktu není platné",
-    "phone_invalid": "Toto telefonní číslo není platné"
+    "phone_invalid": "Toto telefonní číslo není platné",
+    "external_url_invalid": "Tento odkaz není platný – přijímány jsou pouze odkazy začínající http:// nebo https://"
   },
   "guide": {
     "menu": "Nabídka průvodce",

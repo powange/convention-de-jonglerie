@@ -8,12 +8,13 @@ import {
   canManageArtists,
 } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { schemaUrlExterne } from '~~/shared/utils/url-externe'
 
 const updateShowCallSchema = z.object({
   name: z.string().min(1, 'Le nom est requis').max(100, 'Le nom est trop long').optional(),
   description: z.string().max(5000).optional().nullable(),
   mode: z.enum(['INTERNAL', 'EXTERNAL']).optional(),
-  externalUrl: z.string().url('URL invalide').optional().nullable(),
+  externalUrl: schemaUrlExterne.optional().nullable(),
   deadline: z.string().datetime().optional().nullable(),
   visibility: z.enum(['OFFLINE', 'CLOSED', 'PRIVATE', 'PUBLIC']).optional(),
   askPortfolioUrl: z.boolean().optional(),
