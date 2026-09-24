@@ -207,6 +207,10 @@
       :entry="editingEntry"
       @saved="handleEntrySaved"
     />
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </UContainer>
 </template>
 
@@ -484,8 +488,18 @@ async function handleEntrySaved() {
   await fetchEntries()
 }
 
-async function deleteEntry(entry: FaqEntry) {
-  if (!confirm(t('gestion.faq.confirm_delete', { question: entry.question }))) return
+const confirmation = useConfirmation()
+
+function deleteEntry(entry: FaqEntry) {
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('gestion.faq.confirm_delete', { question: entry.question }),
+    libelleConfirmer: t('common.delete'),
+    agir: () => performDeleteEntry(entry),
+  })
+}
+
+async function performDeleteEntry(entry: FaqEntry) {
   try {
     await $fetch(`/api/editions/${editionId}/faq/${entry.id}`, { method: 'DELETE' })
     useToast().add({

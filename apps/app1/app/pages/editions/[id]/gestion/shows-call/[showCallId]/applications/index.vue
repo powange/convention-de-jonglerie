@@ -289,6 +289,10 @@
         </div>
       </UCard>
     </div>
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -533,9 +537,17 @@ const { execute: executeGenerateToken, loading: generatingToken } = useApiAction
 
 const generateSurveyToken = () => executeGenerateToken()
 
-const regenerateSurveyToken = async () => {
-  if (!confirm(t('survey.manage.regenerate_confirm'))) return
-  await generateSurveyToken()
+const confirmation = useConfirmation()
+
+const regenerateSurveyToken = () => {
+  confirmation.demanderConfirmation({
+    titre: t('survey.manage.regenerate_link'),
+    description: t('survey.manage.regenerate_confirm'),
+    libelleConfirmer: t('survey.manage.regenerate_link'),
+    // Régénérer n'efface pas de données : le lien précédent cesse seulement de fonctionner.
+    couleurConfirmer: 'warning',
+    agir: () => generateSurveyToken(),
+  })
 }
 
 const { execute: executeToggleStatus, loading: updatingSurveyStatus } = useApiAction(

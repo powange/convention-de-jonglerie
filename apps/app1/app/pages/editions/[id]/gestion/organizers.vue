@@ -398,6 +398,10 @@
       @confirm="removeFromEdition"
       @cancel="removeFromEditionConfirmOpen = false"
     />
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -652,11 +656,20 @@ const { execute: executeRemoveOrganizer } = useApiAction(
   }
 )
 
+const confirmation = useConfirmation()
+
 const removeOrganizer = () => {
   if (!selectedOrganizer.value || !edition.value) return
-  if (confirm(t('gestion.organizers.confirm_remove'))) {
-    executeRemoveOrganizer()
-  }
+  confirmation.demanderConfirmation({
+    titre: t('common.remove'),
+    // Le nom est ajouté à la description : la boîte native ne disait pas QUI serait retiré.
+    // `?.` comme partout ailleurs sur cet écran — la relation `user` n'est pas garantie.
+    description: [t('gestion.organizers.confirm_remove'), selectedOrganizer.value.user?.pseudo]
+      .filter(Boolean)
+      .join('\n'),
+    libelleConfirmer: t('common.remove'),
+    agir: () => executeRemoveOrganizer(),
+  })
 }
 
 // Vérifier l'accès à cette page

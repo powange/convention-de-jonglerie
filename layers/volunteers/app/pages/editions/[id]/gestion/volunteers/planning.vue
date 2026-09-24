@@ -172,6 +172,10 @@
         @delete="handleSlotDelete"
       />
     </div>
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -423,25 +427,34 @@ const handleSlotUpdate = async (data: {
   }
 }
 
-const handleSlotDelete = async (slotId: string) => {
-  if (confirm(t('volunteers.confirm_delete_slot'))) {
-    try {
-      await deleteTimeSlot(slotId)
-      toast.add({
-        title: t('volunteers.slot_deleted'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } catch (error: unknown) {
-      const err = error as { data?: { message?: string }; message?: string; statusText?: string }
-      toast.add({
-        title: t('errors.error_occurred'),
-        description:
-          err.data?.message || err.message || err.statusText || 'Erreur lors de la suppression',
-        icon: 'i-heroicons-x-circle',
-        color: 'error',
-      })
-    }
+const confirmation = useConfirmation()
+
+const handleSlotDelete = (slotId: string) => {
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('volunteers.confirm_delete_slot'),
+    libelleConfirmer: t('common.delete'),
+    agir: () => performSlotDelete(slotId),
+  })
+}
+
+const performSlotDelete = async (slotId: string) => {
+  try {
+    await deleteTimeSlot(slotId)
+    toast.add({
+      title: t('volunteers.slot_deleted'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string }; message?: string; statusText?: string }
+    toast.add({
+      title: t('errors.error_occurred'),
+      description:
+        err.data?.message || err.message || err.statusText || 'Erreur lors de la suppression',
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
   }
 }
 

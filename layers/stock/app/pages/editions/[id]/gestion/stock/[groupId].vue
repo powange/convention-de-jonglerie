@@ -681,6 +681,10 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Une seule modale pour les confirmations de l'écran. `confirm()` bloquait la page, ne
+         suivait pas la langue choisie et ne disait jamais sur quoi portait l'action. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </UContainer>
 </template>
 
@@ -1845,19 +1849,23 @@ const groupActions = computed(() => [
   ],
 ])
 
-async function deleteGroup() {
-  if (!group.value) return
-  if (
-    !confirm(
-      t('gestion.stock.confirm_delete_group', {
-        name: group.value.name,
-        count: group.value.items.length,
-      })
-    )
-  )
-    return
-  await $fetch(`/api/editions/${editionId}/stock-groups/${group.value.id}`, { method: 'DELETE' })
-  router.push(`/editions/${editionId}/gestion/stock`)
+const confirmation = useConfirmation()
+
+function deleteGroup() {
+  const groupe = group.value
+  if (!groupe) return
+  confirmation.demanderConfirmation({
+    titre: t('common.delete'),
+    description: t('gestion.stock.confirm_delete_group', {
+      name: groupe.name,
+      count: groupe.items.length,
+    }),
+    libelleConfirmer: t('common.delete'),
+    agir: async () => {
+      await $fetch(`/api/editions/${editionId}/stock-groups/${groupe.id}`, { method: 'DELETE' })
+      router.push(`/editions/${editionId}/gestion/stock`)
+    },
+  })
 }
 
 async function handleGroupSaved() {
