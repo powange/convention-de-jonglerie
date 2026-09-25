@@ -280,7 +280,9 @@ test.describe.serial('Module Billetterie — quotas & options', () => {
     // Re-navigue jusqu'à ce que le heading apparaisse (évite la flakiness d'hydratation).
     await expect(async () => {
       await goto(`/editions/${editionId}/gestion/ticketing/tiers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('heading', { name: /tarifs et options/i })).toBeVisible({
+      // La partie stable du titre, et non son libellé complet : ce dernier vient d'une clé de
+      // traduction et a déjà changé une fois, faisant tomber ce test.
+      await expect(page.getByRole('heading', { name: /tarifs/i }).first()).toBeVisible({
         timeout: 5000,
       })
     }).toPass({ timeout: 40000, intervals: [2000, 3000, 5000] })

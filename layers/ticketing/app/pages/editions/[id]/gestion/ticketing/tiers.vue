@@ -21,8 +21,8 @@
       <!-- Titre de la page -->
       <div class="mb-6">
         <ManagementPageHeader
-          titre="Tarifs et options"
-          description="Gérez les tarifs et options synchronisés depuis votre billeterie externe"
+          :titre="$t('gestion.ticketing.tiers_title')"
+          :description="$t('gestion.ticketing.tiers_description')"
         />
       </div>
 

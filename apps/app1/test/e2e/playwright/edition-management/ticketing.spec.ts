@@ -65,7 +65,9 @@ test.describe.serial('Module Billetterie', () => {
     // propagation données API → rendu de la page).
     await expect(async () => {
       await goto(`/editions/${editionId}/gestion/ticketing/tiers`, { waitUntil: 'hydration' })
-      await expect(page.getByRole('heading', { name: /tarifs et options/i })).toBeVisible({
+      // La partie stable du titre, et non son libellé complet : ce dernier vient d'une clé de
+      // traduction et a déjà changé une fois, faisant tomber ce test.
+      await expect(page.getByRole('heading', { name: /tarifs/i }).first()).toBeVisible({
         timeout: 5000,
       })
       await expect(page.getByRole('cell', { name: /pass e2e/i }).first()).toBeVisible({

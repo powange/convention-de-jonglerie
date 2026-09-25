@@ -61,8 +61,18 @@
           </template>
         </UDashboardSidebar>
 
-        <!-- Contenu principal -->
-        <UDashboardPanel>
+        <!--
+          Contenu principal.
+
+          `zone-defilante-gestion` marque le corps du panneau, qui est **le véritable élément
+          défilant** de toute la zone de gestion : `documentElement` y mesure exactement la hauteur
+          de la fenêtre, et le défilement de la fenêtre vaut invariablement 0.
+
+          C'est la classe sur laquelle s'accroche `plugins/defilement-panneau.client.ts`. Les
+          classes du thème de Nuxt UI (`flex-1 overflow-y-auto p-4 sm:p-6`) ne feraient pas un point
+          d'accroche : elles changent avec la bibliothèque, et rien ne le signalerait.
+        -->
+        <UDashboardPanel :ui="{ body: 'zone-defilante-gestion' }">
           <template #header>
             <!-- Navbar en haut -->
             <UDashboardNavbar>
@@ -139,7 +149,9 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { ICONE_DE_MODULE_DANS_UN_LIEN } from '~/utils/couleurs-de-module'
 import { getEditionDisplayName } from '~/utils/editionName'
+import { moduleDeGestion } from '~/utils/modules-de-gestion'
 
 import type { NavigationMenuItem } from '@nuxt/ui'
 
@@ -873,6 +885,38 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
   return items
 })
 
+/**
+ * Donne à chaque entrée l'icône de son module dans sa couleur, celle de sa carte d'accueil.
+ *
+ * La couleur n'est pas écrite dans les entrées ci-dessus, et c'est délibéré : elle est lue dans le
+ * registre d'après le chemin, comme le fait le titre de chaque page. Une seule source, donc aucun
+ * endroit où la barre latérale pourrait se mettre à contredire l'accueil.
+ *
+ * Les entrées sans module — « Voir l'édition », « Vue d'ensemble », les en-têtes de groupe — ne
+ * trouvent rien dans le registre et gardent la couleur du thème. L'oubli d'un module se voit donc à
+ * l'œil, sans rien casser.
+ */
+function teindreSelonLeModule<T extends { to?: unknown; class?: unknown; children?: unknown[] }>(
+  entrees: T[]
+): T[] {
+  return entrees.map((entree) => {
+    const enfants = Array.isArray(entree.children)
+      ? teindreSelonLeModule(entree.children as T[])
+      : undefined
+
+    const chemin = typeof entree.to === 'string' ? entree.to : undefined
+    const couleur = chemin ? moduleDeGestion(chemin)?.couleur : undefined
+    if (!couleur) return enfants ? { ...entree, children: enfants } : entree
+
+    // La classe va sur le LIEN, et atteint l'icône par une variante : une sous-entrée ne peut pas
+    // porter son propre `ui` (Nuxt UI l'en prive), et 36 des 46 entrées sont des sous-entrées.
+    const classes = [entree.class, ICONE_DE_MODULE_DANS_UN_LIEN[couleur]].filter(Boolean).join(' ')
+    return { ...entree, class: classes, ...(enfants ? { children: enfants } : {}) }
+  })
+}
+
 // Filtrer les items selon les permissions (déjà fait dans computed)
-const filteredNavigationItems = computed(() => navigationItems.value)
+const filteredNavigationItems = computed(() =>
+  navigationItems.value.map((section) => teindreSelonLeModule(section))
+)
 </script>

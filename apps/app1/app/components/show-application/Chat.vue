@@ -346,8 +346,18 @@ defineExpose({
 
       <!-- Zone de saisie -->
       <div class="border-t border-default p-3">
+        <!--
+          `autofocus` est coupé, et c'est le correctif d'un défaut signalé à l'usage : on arrivait
+          sur la fiche d'une candidature tout en bas de la page, prêt à écrire un message.
+
+          `UChatPrompt` focalise son champ par défaut (`autofocus: true`). Sur la page de messagerie
+          c'est juste — la page EST la conversation. Ici la discussion n'est qu'une carte au pied
+          d'un long écran : le navigateur amenait le champ focalisé dans le champ de vision, et
+          emportait la page avec lui. Le lecteur venait lire une candidature, pas y répondre.
+        -->
         <UChatPrompt
           v-model="messageInput"
+          :autofocus="false"
           :placeholder="t('components.artist_application.chat.placeholder')"
           :disabled="isSending"
           variant="subtle"

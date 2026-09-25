@@ -170,4 +170,61 @@ test.describe('Titres des pages de gestion', () => {
 
     await context.close()
   })
+
+  test('la barre latérale porte les mêmes couleurs que les cartes', async ({ browser }) => {
+    const { editionId } = loadState()
+    const { page, context } = await ouvrir(browser)
+
+    await page.goto(`${BASE}/editions/${editionId}/gestion`, { waitUntil: 'domcontentloaded' })
+    await expect(page.locator('[data-carte-gestion]').first()).toBeVisible({ timeout: 40000 })
+
+    // Les couleurs du menu viennent du même registre que celles des cartes et des titres. Ce test
+    // compare donc les deux surfaces entre elles, et non à une table écrite ici : c'est leur
+    // désaccord qui serait le défaut.
+    const couleurParModule = await page
+      .locator('[data-carte-gestion][href*="/gestion/"]')
+      .evaluateAll((cartes) =>
+        Object.fromEntries(
+          cartes.flatMap((carte) => {
+            const icone = carte.querySelector('span[class*="i-"], span[class*=":"]')
+            const chemin = (carte.getAttribute('href') ?? '').split('/gestion/')[1]
+            return icone && chemin ? [[chemin, getComputedStyle(icone).color]] : []
+          })
+        )
+      )
+
+    // Déplier les groupes : 36 des 46 entrées du menu sont des sous-entrées, et c'est justement
+    // sur elles que la couleur ne pouvait pas passer par le `ui` d'une entrée.
+    const groupes = page.locator('aside button, nav button')
+    const nombre = await groupes.count()
+    for (let i = 0; i < nombre; i++) {
+      await groupes
+        .nth(i)
+        .click({ timeout: 2000 })
+        .catch(() => {})
+    }
+
+    const ecarts = await page.evaluate((attendu: Record<string, string>) => {
+      const trouves: string[] = []
+      document.querySelectorAll('a[href*="/gestion/"]').forEach((lien) => {
+        if (lien.hasAttribute('data-carte-gestion') || lien.closest('[data-carte-gestion]')) return
+        const chemin = (lien.getAttribute('href') ?? '').split('/gestion/')[1]
+        // Par `data-slot`, jamais par position : une entrée à compteur voit son icône enveloppée
+        // dans une pastille, et un test qui lirait le premier enfant du lien mesurerait cette
+        // enveloppe. C'est précisément le défaut qu'il doit attraper.
+        const icone = lien.querySelector(
+          '[data-slot=linkLeadingIcon], [data-slot=childLinkIcon]'
+        ) as HTMLElement | null
+        if (!chemin || !icone || !(chemin in attendu)) return
+        const vue = getComputedStyle(icone).color
+        if (vue !== attendu[chemin])
+          trouves.push(`${chemin} : menu ${vue}, carte ${attendu[chemin]}`)
+      })
+      return trouves
+    }, couleurParModule)
+
+    expect(ecarts, `écarts entre le menu et les cartes :\n${ecarts.join('\n')}`).toEqual([])
+
+    await context.close()
+  })
 })

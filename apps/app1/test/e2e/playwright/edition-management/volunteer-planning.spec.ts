@@ -61,7 +61,9 @@ test.describe.serial('Bénévoles — planning et affectations', () => {
     await expect(async () => {
       await goto(`/editions/${editionId}/gestion/volunteers/planning`, { waitUntil: 'hydration' })
       await expect(
-        page.getByRole('heading', { name: /planning des bénévoles/i }).first()
+        // La partie stable du titre, et non son libellé complet : ce dernier vient d'une clé de
+        // traduction et a déjà changé une fois, faisant tomber ce test.
+        page.getByRole('heading', { name: /planning/i }).first()
       ).toBeVisible({ timeout: 8000 })
     }).toPass({ timeout: 40000, intervals: [2000, 3000, 5000] })
   })

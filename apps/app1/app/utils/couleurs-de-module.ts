@@ -75,3 +75,59 @@ export const ICONE_DE_MODULE: Record<CouleurDeModule, string> = {
   rose: 'text-rose-600 dark:text-rose-400',
   sky: 'text-sky-600 dark:text-sky-400',
 }
+
+/**
+ * La couleur de l'icône d'un lien de navigation, appliquée depuis le lien lui-même.
+ *
+ * Pourquoi ce détour plutôt que la table ci-dessus : dans la barre latérale de la gestion, 36 des
+ * 46 entrées sont des **sous-entrées**, et `NavigationMenuChildItem` retire justement `ui` de ce
+ * qu'une entrée peut porter (`Omit<NavigationMenuItem, 'type' | 'ui'>`). Une sous-entrée n'a donc
+ * aucun moyen de styler sa propre icône — seulement une `class` sur son lien. La variante va la
+ * chercher depuis là, et vaut pour les deux niveaux : un seul mécanisme, au lieu d'un par
+ * profondeur.
+ *
+ * ⚠️ On vise `data-slot`, PAS une position. Une première version ciblait `[&>:first-child]`, le
+ * premier enfant du lien. C'était juste — sauf pour les entrées à compteur : elles reçoivent un
+ * `chip`, Nuxt UI enveloppe alors l'icône, et le premier enfant devient cette enveloppe. La couleur
+ * allait donc sur l'enveloppe, tandis que l'icône gardait celle du thème — grise en clair, presque
+ * blanche en sombre.
+ *
+ * Le défaut ne touchait que les entrées signalant quelque chose à traiter : candidatures, commandes,
+ * validation des repas. Trois modules verts, d'où le symptôme tel qu'il a été rapporté — « celles
+ * qui devraient être vertes sont grises ». Aucune de mes mesures ne le voyait, l'édition de test
+ * n'ayant rien en attente, donc aucune pastille.
+ *
+ * `data-slot` couvre les deux cas — l'icône le porte qu'elle soit enveloppée ou non — et ne colore
+ * pas le point de la pastille, dont la couleur signale l'urgence.
+ *
+ * ⚠️ Classes écrites en toutes lettres, comme les autres. Tailwind lit les sources pour décider de
+ * ce qu'il génère ; une variante composée à l'exécution n'existerait pas dans la feuille de style.
+ */
+export const ICONE_DE_MODULE_DANS_UN_LIEN: Record<CouleurDeModule, string> = {
+  indigo:
+    '[&_[data-slot=linkLeadingIcon]]:text-indigo-600 [&_[data-slot=childLinkIcon]]:text-indigo-600 dark:[&_[data-slot=linkLeadingIcon]]:text-indigo-400 dark:[&_[data-slot=childLinkIcon]]:text-indigo-400',
+  blue: '[&_[data-slot=linkLeadingIcon]]:text-blue-600 [&_[data-slot=childLinkIcon]]:text-blue-600 dark:[&_[data-slot=linkLeadingIcon]]:text-blue-400 dark:[&_[data-slot=childLinkIcon]]:text-blue-400',
+  green:
+    '[&_[data-slot=linkLeadingIcon]]:text-green-600 [&_[data-slot=childLinkIcon]]:text-green-600 dark:[&_[data-slot=linkLeadingIcon]]:text-green-400 dark:[&_[data-slot=childLinkIcon]]:text-green-400',
+  purple:
+    '[&_[data-slot=linkLeadingIcon]]:text-purple-600 [&_[data-slot=childLinkIcon]]:text-purple-600 dark:[&_[data-slot=linkLeadingIcon]]:text-purple-400 dark:[&_[data-slot=childLinkIcon]]:text-purple-400',
+  orange:
+    '[&_[data-slot=linkLeadingIcon]]:text-orange-600 [&_[data-slot=childLinkIcon]]:text-orange-600 dark:[&_[data-slot=linkLeadingIcon]]:text-orange-400 dark:[&_[data-slot=childLinkIcon]]:text-orange-400',
+  yellow:
+    '[&_[data-slot=linkLeadingIcon]]:text-yellow-600 [&_[data-slot=childLinkIcon]]:text-yellow-600 dark:[&_[data-slot=linkLeadingIcon]]:text-yellow-400 dark:[&_[data-slot=childLinkIcon]]:text-yellow-400',
+  gray: '[&_[data-slot=linkLeadingIcon]]:text-gray-600 [&_[data-slot=childLinkIcon]]:text-gray-600 dark:[&_[data-slot=linkLeadingIcon]]:text-gray-400 dark:[&_[data-slot=childLinkIcon]]:text-gray-400',
+  warning:
+    '[&_[data-slot=linkLeadingIcon]]:text-amber-600 [&_[data-slot=childLinkIcon]]:text-amber-600 dark:[&_[data-slot=linkLeadingIcon]]:text-amber-400 dark:[&_[data-slot=childLinkIcon]]:text-amber-400',
+  error:
+    '[&_[data-slot=linkLeadingIcon]]:text-red-600 [&_[data-slot=childLinkIcon]]:text-red-600 dark:[&_[data-slot=linkLeadingIcon]]:text-red-400 dark:[&_[data-slot=childLinkIcon]]:text-red-400',
+  teal: '[&_[data-slot=linkLeadingIcon]]:text-teal-600 [&_[data-slot=childLinkIcon]]:text-teal-600 dark:[&_[data-slot=linkLeadingIcon]]:text-teal-400 dark:[&_[data-slot=childLinkIcon]]:text-teal-400',
+  amber:
+    '[&_[data-slot=linkLeadingIcon]]:text-amber-600 [&_[data-slot=childLinkIcon]]:text-amber-600 dark:[&_[data-slot=linkLeadingIcon]]:text-amber-400 dark:[&_[data-slot=childLinkIcon]]:text-amber-400',
+  cyan: '[&_[data-slot=linkLeadingIcon]]:text-cyan-600 [&_[data-slot=childLinkIcon]]:text-cyan-600 dark:[&_[data-slot=linkLeadingIcon]]:text-cyan-400 dark:[&_[data-slot=childLinkIcon]]:text-cyan-400',
+  violet:
+    '[&_[data-slot=linkLeadingIcon]]:text-violet-600 [&_[data-slot=childLinkIcon]]:text-violet-600 dark:[&_[data-slot=linkLeadingIcon]]:text-violet-400 dark:[&_[data-slot=childLinkIcon]]:text-violet-400',
+  emerald:
+    '[&_[data-slot=linkLeadingIcon]]:text-emerald-600 [&_[data-slot=childLinkIcon]]:text-emerald-600 dark:[&_[data-slot=linkLeadingIcon]]:text-emerald-400 dark:[&_[data-slot=childLinkIcon]]:text-emerald-400',
+  rose: '[&_[data-slot=linkLeadingIcon]]:text-rose-600 [&_[data-slot=childLinkIcon]]:text-rose-600 dark:[&_[data-slot=linkLeadingIcon]]:text-rose-400 dark:[&_[data-slot=childLinkIcon]]:text-rose-400',
+  sky: '[&_[data-slot=linkLeadingIcon]]:text-sky-600 [&_[data-slot=childLinkIcon]]:text-sky-600 dark:[&_[data-slot=linkLeadingIcon]]:text-sky-400 dark:[&_[data-slot=childLinkIcon]]:text-sky-400',
+}

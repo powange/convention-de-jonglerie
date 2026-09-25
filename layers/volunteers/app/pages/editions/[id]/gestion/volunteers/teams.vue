@@ -21,8 +21,8 @@
       <!-- Titre de la page -->
       <div class="mb-6">
         <ManagementPageHeader
-          titre="Les équipes"
-          description="Organisation et gestion des équipes de bénévoles"
+          :titre="$t('edition.volunteers.teams')"
+          :description="$t('gestion.volunteers.teams_description')"
         />
       </div>
 

@@ -139,9 +139,13 @@ test.describe.serial('Module Billetterie — config externe (SumUp + billetterie
       await goto(`/editions/${editionId}/gestion/ticketing/external`, {
         waitUntil: 'hydration',
       })
-      await expect(page.getByRole('heading', { name: /billeterie externe/i })).toBeVisible({
-        timeout: 5000,
-      })
+      // La partie stable du titre, et non son libellé complet : ce dernier vient d'une clé de
+      // traduction et a déjà changé une fois, faisant tomber ce test.
+      await expect(page.getByRole('heading', { name: /billetterie externe/i }).first()).toBeVisible(
+        {
+          timeout: 5000,
+        }
+      )
       // Cartes des providers (h2 « HelloAsso » et « Infomaniak »)
       await expect(page.getByRole('heading', { name: /helloasso/i })).toBeVisible({
         timeout: 5000,
