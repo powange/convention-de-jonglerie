@@ -42,7 +42,7 @@
            comprimer : c'est le titre qui situe la page, pas lui. -->
       <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <h1 class="text-2xl font-bold flex items-center gap-2">
             <UIcon name="i-heroicons-gift" class="text-orange-600 dark:text-orange-400" />
             {{ $t('gestion.ticketing.handout_items_title') }}
           </h1>

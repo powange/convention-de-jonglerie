@@ -20,7 +20,7 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
           <UIcon name="i-heroicons-shopping-cart" class="text-green-600 dark:text-green-400" />
           Commandes et participants
         </h1>

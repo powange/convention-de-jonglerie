@@ -21,7 +21,7 @@
            titre comme la description en colonnes de deux ou trois mots. -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <h1 class="text-2xl font-bold flex items-center gap-2">
             <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
             {{ $t('gestion.shows_call.title') }}
           </h1>

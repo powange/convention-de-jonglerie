@@ -43,7 +43,7 @@
           <UIcon name="i-heroicons-chevron-right" />
           <span>{{ $t('gestion.shows_call.applications_title') }}</span>
         </div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
           <UIcon name="i-heroicons-document-text" class="text-amber-500" />
           {{ $t('gestion.shows_call.applications_title') }}
         </h1>

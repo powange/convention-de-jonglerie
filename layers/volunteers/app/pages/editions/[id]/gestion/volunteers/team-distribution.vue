@@ -21,7 +21,7 @@
            comprimer. -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <h1 class="text-2xl font-bold flex items-center gap-2">
             <UIcon name="i-heroicons-rectangle-group" class="text-green-600 dark:text-green-400" />
             {{ $t('pages.volunteers.team_distribution.title') }}
           </h1>

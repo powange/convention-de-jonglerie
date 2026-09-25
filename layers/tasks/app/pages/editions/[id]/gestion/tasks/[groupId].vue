@@ -45,6 +45,9 @@
               class="text-rose-500 size-6 mt-1 shrink-0"
             />
             <div class="flex-1 min-w-0">
+              <!-- 20 px et non 24, délibérément : ce titre nomme un ENREGISTREMENT — ce
+                   groupe, cet objet — et non un écran du module. Le cran en dessous dit
+                   qu'on est sur une fiche. Ne pas l'aligner sur les titres de page. -->
               <h1 class="text-xl font-semibold">{{ group.name }}</h1>
               <p v-if="group.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {{ group.description }}

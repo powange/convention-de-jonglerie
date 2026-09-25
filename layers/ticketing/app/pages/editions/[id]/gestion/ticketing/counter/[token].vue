@@ -49,7 +49,7 @@
         <UCard>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 class="text-2xl font-bold">
                 {{ counter.name }}
               </h1>
               <div class="flex items-center gap-2">
