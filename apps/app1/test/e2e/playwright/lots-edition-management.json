@@ -51,6 +51,7 @@
     "ticketing-external-config.spec.ts"
   ],
   "gestion-3a": [
+    "cabaret-numeros-repliables.spec.ts",
     "ticketing-quotas-options.spec.ts",
     "ticketing.spec.ts",
     "treasury-avances.spec.ts",
