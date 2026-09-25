@@ -18,13 +18,10 @@
     <div v-else>
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-chart-bar" class="text-primary-600" />
-          {{ $t('gestion.ticketing.stats_title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.ticketing.stats_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.ticketing.stats_title')"
+          :description="$t('gestion.ticketing.stats_description')"
+        />
 
         <!-- Comparaison à une édition passée. Absente quand la convention n'a pas d'autre
              édition lisible : un sélecteur à une seule entrée ne propose rien. -->

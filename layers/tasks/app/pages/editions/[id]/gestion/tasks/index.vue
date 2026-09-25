@@ -4,7 +4,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div class="flex items-center gap-3">
         <UIcon name="i-heroicons-clipboard-document-check" class="text-rose-500 size-6" />
-        <h1 class="text-2xl font-semibold">{{ $t('edition.tasks') }}</h1>
+        <ManagementPageHeader :titre="$t('edition.tasks')" />
       </div>
       <UButton icon="i-heroicons-plus" color="primary" size="sm" @click="openGroupModal(null)">
         {{ $t('gestion.task.new_group') }}

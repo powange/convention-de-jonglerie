@@ -31,10 +31,10 @@
       <!-- En-tête -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold">{{ $t('edition.site_map') }}</h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ $t('gestion.map.click_to_draw') }}
-          </p>
+          <ManagementPageHeader
+            :titre="$t('edition.site_map')"
+            :description="$t('gestion.map.click_to_draw')"
+          />
         </div>
 
         <!-- Les outils de dessin ne sont plus ici mais sur la carte, à portée du geste qu'ils

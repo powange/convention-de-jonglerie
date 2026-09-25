@@ -21,7 +21,7 @@
           :to="`/editions/${editionId}/gestion/stock`"
         />
         <UIcon name="i-heroicons-hand-raised" class="text-amber-600 size-6" />
-        <h1 class="text-2xl font-semibold">{{ t('gestion.stock.loans_title') }}</h1>
+        <ManagementPageHeader :titre="t('gestion.stock.loans_title')" />
       </div>
     </div>
 

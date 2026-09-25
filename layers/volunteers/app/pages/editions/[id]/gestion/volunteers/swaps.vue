@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6">
     <div>
-      <h1 class="text-2xl font-bold">{{ t('volunteers.swap_pending_title') }}</h1>
+      <ManagementPageHeader :titre="t('volunteers.swap_pending_title')" />
     </div>
 
     <UCard>

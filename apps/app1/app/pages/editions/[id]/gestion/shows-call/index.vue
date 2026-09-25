@@ -21,13 +21,10 @@
            titre comme la description en colonnes de deux ou trois mots. -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold flex items-center gap-2">
-            <UIcon name="i-heroicons-sparkles" class="text-amber-500" />
-            {{ $t('gestion.shows_call.title') }}
-          </h1>
-          <p class="text-gray-600 dark:text-gray-400 mt-1">
-            {{ $t('gestion.shows_call.list_description') }}
-          </p>
+          <ManagementPageHeader
+            :titre="$t('gestion.shows_call.title')"
+            :description="$t('gestion.shows_call.list_description')"
+          />
         </div>
         <UButton
           icon="i-heroicons-plus"

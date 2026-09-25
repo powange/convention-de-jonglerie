@@ -17,13 +17,10 @@
     </div>
     <div v-else>
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-bell" class="text-yellow-600 dark:text-yellow-400" />
-          {{ $t('gestion.artists.notifications.title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.artists.notifications.description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.artists.notifications.title')"
+          :description="$t('gestion.artists.notifications.description')"
+        />
       </div>
 
       <!-- Sans artiste inscrit, le formulaire n'aurait aucun destinataire -->

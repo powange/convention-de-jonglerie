@@ -20,13 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="cbi:mealie" class="text-orange-600 dark:text-orange-400" />
-          {{ $t('gestion.meals.configuration_title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.meals.configuration_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.meals.configuration_title')"
+          :description="$t('gestion.meals.configuration_description')"
+        />
       </div>
 
       <!-- Contenu de la configuration des repas -->

@@ -18,13 +18,10 @@
     <div v-else>
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-cog-6-tooth" class="text-primary-600 dark:text-primary-400" />
-          {{ $t('gestion.volunteers.config_title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.volunteers.config_page_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.volunteers.config_title')"
+          :description="$t('gestion.volunteers.config_page_description')"
+        />
       </div>
 
       <!-- Contenu de la page -->

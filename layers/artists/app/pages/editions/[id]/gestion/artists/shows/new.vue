@@ -18,7 +18,7 @@
         >
           {{ $t('gestion.shows.back_to_shows') }}
         </UButton>
-        <h1 class="text-2xl font-bold mt-2">{{ $t('gestion.shows.add_show') }}</h1>
+        <ManagementPageHeader :titre="$t('gestion.shows.add_show')" />
       </div>
 
       <ShowsShowForm

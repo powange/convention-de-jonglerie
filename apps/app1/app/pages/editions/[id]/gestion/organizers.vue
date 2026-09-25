@@ -18,13 +18,10 @@
     <div v-else>
       <!-- En-tête avec navigation -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-user-group" class="text-purple-500" />
-          {{ $t('gestion.organizers.title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.organizers.page_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.organizers.title')"
+          :description="$t('gestion.organizers.page_description')"
+        />
       </div>
 
       <!-- Contenu de gestion des organisateurs -->

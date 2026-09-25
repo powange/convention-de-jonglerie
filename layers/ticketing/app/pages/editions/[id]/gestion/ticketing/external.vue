@@ -20,13 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-link" class="text-purple-600 dark:text-purple-400" />
-          Lier une billeterie externe
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Connectez votre billetterie HelloAsso, Infomaniak ou autre plateforme externe
-        </p>
+        <ManagementPageHeader
+          titre="Lier une billeterie externe"
+          description="Connectez votre billetterie HelloAsso, Infomaniak ou autre plateforme externe"
+        />
       </div>
 
       <!-- Contenu de la page -->

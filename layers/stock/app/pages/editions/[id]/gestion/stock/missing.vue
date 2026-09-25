@@ -29,7 +29,7 @@
           :to="`/editions/${editionId}/gestion/stock`"
         />
         <UIcon name="i-heroicons-shopping-cart" class="text-primary-600 size-6" />
-        <h1 class="text-2xl font-semibold">{{ t('gestion.stock.missing_title') }}</h1>
+        <ManagementPageHeader :titre="t('gestion.stock.missing_title')" />
       </div>
     </div>
 

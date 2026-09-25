@@ -21,13 +21,10 @@
       <!-- Titre de la page -->
       <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-bold flex items-center gap-2">
-            <UIcon name="i-heroicons-shield-check" class="text-blue-600 dark:text-blue-400" />
-            Contrôle d'accès
-          </h1>
-          <p class="text-gray-600 dark:text-gray-400 mt-1">
-            Scanner et valider les billets à l'entrée
-          </p>
+          <ManagementPageHeader
+            titre="Contrôle d'accès"
+            description="Scanner et valider les billets à l'entrée"
+          />
         </div>
         <div class="flex items-center gap-2 sm:flex-shrink-0">
           <UButton

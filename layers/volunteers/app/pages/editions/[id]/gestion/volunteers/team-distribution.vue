@@ -21,13 +21,10 @@
            comprimer. -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold flex items-center gap-2">
-            <UIcon name="i-heroicons-rectangle-group" class="text-green-600 dark:text-green-400" />
-            {{ $t('pages.volunteers.team_distribution.title') }}
-          </h1>
-          <p class="text-gray-600 dark:text-gray-400 mt-1">
-            {{ $t('pages.volunteers.team_distribution.description') }}
-          </p>
+          <ManagementPageHeader
+            :titre="$t('pages.volunteers.team_distribution.title')"
+            :description="$t('pages.volunteers.team_distribution.description')"
+          />
         </div>
         <UButton
           :to="`/editions/${editionId}/gestion/volunteers/teams`"

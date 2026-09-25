@@ -2,13 +2,10 @@
   <UContainer class="py-6">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-question-mark-circle" class="text-primary-500" />
-          {{ $t('gestion.faq.title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.faq.description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.faq.title')"
+          :description="$t('gestion.faq.description')"
+        />
       </div>
       <div class="flex items-center gap-2">
         <!-- Deux documents pour deux usages : celui qu'on laisse à l'accueil, et celui qui sert

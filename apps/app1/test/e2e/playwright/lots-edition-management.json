@@ -31,6 +31,7 @@
     "shows-call-extras.spec.ts"
   ],
   "gestion-2a": [
+    "entete-de-page-modules.spec.ts",
     "shows-call-survey.spec.ts",
     "shows-call.spec.ts",
     "shows-list.spec.ts",

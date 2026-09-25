@@ -20,13 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-user-group" class="text-purple-600 dark:text-purple-400" />
-          Les équipes
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Organisation et gestion des équipes de bénévoles
-        </p>
+        <ManagementPageHeader
+          titre="Les équipes"
+          description="Organisation et gestion des équipes de bénévoles"
+        />
       </div>
 
       <!-- Contenu de la gestion des équipes -->

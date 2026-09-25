@@ -43,13 +43,10 @@
           <UIcon name="i-heroicons-chevron-right" />
           <span>{{ $t('gestion.shows_call.applications_title') }}</span>
         </div>
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-document-text" class="text-amber-500" />
-          {{ $t('gestion.shows_call.applications_title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ showCall.name }} - {{ $t('gestion.shows_call.applications_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.shows_call.applications_title')"
+          :description="`${showCall.name} - ${$t('gestion.shows_call.applications_description')}`"
+        />
       </div>
 
       <!-- Statistiques -->

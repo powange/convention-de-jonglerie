@@ -20,13 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-calendar-days" class="text-orange-600 dark:text-orange-400" />
-          Planning des bénévoles
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Planifier les créneaux et missions des bénévoles
-        </p>
+        <ManagementPageHeader
+          titre="Planning des bénévoles"
+          description="Planifier les créneaux et missions des bénévoles"
+        />
       </div>
 
       <div class="space-y-6">
