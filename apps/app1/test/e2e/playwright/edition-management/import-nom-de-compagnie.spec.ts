@@ -1,13 +1,13 @@
 import { expect, test } from '@nuxt/test-utils/playwright'
 
 import {
+  apiDelete,
+  apiPost,
   apiPut,
   buildShowApplicationBody,
   createShow,
   enableArtistProfile,
   createShowCall,
-  deleteShow,
-  deleteShowCall,
   getShow,
   importPerformerFromApplication,
   linkApplicationToShow,
@@ -28,16 +28,34 @@ const BASE = 'http://localhost:3000'
  * moment précis où la candidature devenait un spectacle ou un numéro. `Show.companyName` existait
  * pourtant, et son commentaire de schéma désignait exactement cet usage ; rien ne l'écrivait en
  * dehors du formulaire manuel. `ShowAct`, lui, n'avait aucun champ pour le recevoir.
+ *
+ * ⚠️ **Ce spec vit dans le lot `gestion-1b`, et non n'importe lequel.** Candidater met à jour les
+ * informations personnelles du compte — le vrai formulaire le fait, et `buildShowApplicationBody`
+ * le dit. Le compte étant partagé, ce spec laisse donc « E2E-Prenom » derrière lui. Or la
+ * candidature BÉNÉVOLE ne renseigne le profil que s'il est vide : dans le même lot que
+ * `volunteers.spec.ts`, celui-ci cherchait ensuite « E2E-Prénom » — un accent de différence — et ne
+ * le trouvait plus. Il est donc rangé avec les autres specs d'appel à spectacle, qui salissent le
+ * profil de la même manière et cohabitent déjà sans heurt.
  */
 test.describe.serial('Import d’une candidature — nom de compagnie', () => {
   const ts = Date.now()
   const NOM_DE_SCENE = `Cie des Trois Massues ${ts}`
   const NOM_DEJA_SAISI = 'Nom posé par l’organisation'
 
+  /**
+   * Une édition dédiée, et non celle du harnais.
+   *
+   * Ce test crée trois appels à spectacles, trois candidatures, deux spectacles et importe des
+   * artistes — lesquels créent à leur tour des comptes et des lignes `EditionArtist`. Sur l'édition
+   * partagée, `volunteers.spec.ts`, qui vit dans le même lot Playwright, n'y retrouvait plus son
+   * bouton « postuler » : reproductible en les enchaînant, vert en les jouant séparément.
+   *
+   * Le mécanisme exact n'a pas été isolé. L'édition dédiée le rend sans objet, et c'est déjà le
+   * motif qu'emploient les autres specs qui salissent beaucoup.
+   */
+  let editionId = ''
   let standardId = 0
   let cabaretId = 0
-  const aSupprimer: number[] = []
-  const appelsCrees: string[] = []
 
   /**
    * Un appel à spectacles PAR candidature.
@@ -47,14 +65,11 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
    * spectacle standard, pour éprouver le non-écrasement, et une vers le cabaret.
    */
   const candidater = async (page: import('@playwright/test').Page, titre: string) => {
-    const { editionId } = loadState()
-
     const appel = await createShowCall(page, editionId, {
       name: `Appel compagnie ${ts} — ${titre}`,
       description: 'Appel E2E pour le nom de compagnie à l’import',
     })
     const showCallId = String(appel.id)
-    appelsCrees.push(showCallId)
 
     // Public, interne, échéance à venir : sans cela le POST d'une candidature rend 403.
     const echeance = new Date()
@@ -90,8 +105,26 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
     return { showCallId, applicationId: String(candidature.id) }
   }
 
-  test('préparer l’appel à spectacles et les deux spectacles', async ({ page }) => {
-    const { editionId } = loadState()
+  test('préparer une édition dédiée et les deux spectacles', async ({ page }) => {
+    const { conventionId } = loadState()
+    const debut = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const fin = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+
+    const edition = await apiPost(page, `${BASE}/api/editions`, {
+      data: {
+        conventionId: Number(conventionId),
+        startDate: debut.toISOString(),
+        endDate: fin.toISOString(),
+        addressLine1: '1 rue des Massues',
+        postalCode: '75001',
+        city: 'Paris',
+        country: 'France',
+      },
+    })
+    expect(edition.ok(), `création d'édition : ${await edition.text()}`).toBe(true)
+    const corps = await edition.json()
+    editionId = String(corps.data?.id ?? corps.id)
+
     await updateEdition(page, editionId, { artistsEnabled: true })
     // Sans la catégorie « Artiste » sur le compte, le POST d'une candidature rend 403.
     await enableArtistProfile(page)
@@ -102,7 +135,6 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
       duration: 45,
     })
     standardId = Number(standard.id)
-    aSupprimer.push(standardId)
 
     const cabaret = await createShow(page, editionId, {
       title: `Cabaret compagnie ${ts}`,
@@ -111,7 +143,6 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
       duration: 90,
     })
     cabaretId = Number(cabaret.id)
-    aSupprimer.push(cabaretId)
 
     // Le point de départ, mesuré et non supposé : les deux arrivent sans compagnie.
     expect(standard.companyName ?? null).toBeNull()
@@ -120,7 +151,6 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
   test('spectacle STANDARD : le nom de scène devient la compagnie du spectacle', async ({
     page,
   }) => {
-    const { editionId } = loadState()
     const { showCallId, applicationId } = await candidater(page, `Vers le standard ${ts}`)
     await linkApplicationToShow(page, editionId, showCallId, applicationId, standardId)
 
@@ -138,8 +168,6 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
   })
 
   test('spectacle STANDARD : une compagnie déjà saisie n’est pas écrasée', async ({ page }) => {
-    const { editionId } = loadState()
-
     // L'organisation nomme la compagnie à la main.
     const reponse = await apiPut(page, `${BASE}/api/editions/${editionId}/shows/${standardId}`, {
       data: { companyName: NOM_DEJA_SAISI },
@@ -165,7 +193,6 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
   })
 
   test('spectacle CABARET : le nom de scène devient la compagnie du numéro', async ({ page }) => {
-    const { editionId } = loadState()
     const titre = `Vers le cabaret ${ts}`
     const { showCallId, applicationId } = await candidater(page, titre)
     await linkApplicationToShow(page, editionId, showCallId, applicationId, cabaretId)
@@ -187,7 +214,6 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
   })
 
   test('la compagnie du numéro survit à un enregistrement du cabaret', async ({ page }) => {
-    const { editionId } = loadState()
     const cabaret = await getShow(page, editionId, cabaretId)
 
     /*
@@ -216,10 +242,12 @@ test.describe.serial('Import d’une candidature — nom de compagnie', () => {
     expect(numeros.some((a) => a.companyName === NOM_DE_SCENE)).toBe(true)
   })
 
-  test('nettoyage', async ({ page }) => {
-    const { editionId } = loadState()
-    for (const id of aSupprimer) await deleteShow(page, editionId, String(id))
-    for (const id of appelsCrees) await deleteShowCall(page, editionId, id)
-    await updateEdition(page, editionId, { artistsEnabled: false })
+  test('nettoyage : supprimer l’édition dédiée', async ({ page }) => {
+    // Une seule suppression suffit : spectacles, appels, candidatures et artistes importés
+    // dépendent de l'édition et partent avec elle.
+    if (editionId) {
+      const suppression = await apiDelete(page, `${BASE}/api/editions/${editionId}`)
+      expect(suppression.ok(), await suppression.text()).toBe(true)
+    }
   })
 })
