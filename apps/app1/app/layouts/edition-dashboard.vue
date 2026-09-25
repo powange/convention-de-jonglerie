@@ -149,6 +149,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useEditionStore } from '~/stores/editions'
+import { categorieDeGestion } from '~/utils/categories-de-gestion'
 import { ICONE_DE_MODULE_DANS_UN_LIEN } from '~/utils/couleurs-de-module'
 import { getEditionDisplayName } from '~/utils/editionName'
 import { moduleDeGestion } from '~/utils/modules-de-gestion'
@@ -447,6 +448,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     managementSection.push({
       label: t('gestion.infos.title'),
       icon: 'i-lucide-info',
+      categorie: 'infos',
       children: [
         {
           label: t('gestion.general_info.title'),
@@ -608,6 +610,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
       managementSection.push({
         label: t('edition.volunteers.title'),
         icon: 'i-heroicons-user-group',
+        categorie: 'benevoles',
         children: volunteersChildren,
         value: 'volunteers',
         popover: {},
@@ -651,6 +654,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     managementSection.push({
       label: t('gestion.artists.title'),
       icon: 'i-heroicons-star',
+      categorie: 'artistes',
       children: artistsChildren,
       value: 'artists',
       popover: {},
@@ -694,6 +698,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     managementSection.push({
       label: t('gestion.meals.title'),
       icon: 'cbi:mealie',
+      categorie: 'repas',
       children: mealsChildren,
       value: 'meals',
       popover: {},
@@ -768,6 +773,7 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
     managementSection.push({
       label: t('gestion.ticketing.title'),
       icon: 'i-heroicons-ticket',
+      categorie: 'billetterie',
       children: ticketingChildren,
       value: 'ticketing',
       popover: {},
@@ -886,37 +892,47 @@ const navigationItems = computed<NavigationMenuItem[][]>(() => {
 })
 
 /**
- * Donne à chaque entrée l'icône de son module dans sa couleur, celle de sa carte d'accueil.
+ * Donne à chaque entrée du menu la couleur que l'accueil donne à la même chose.
  *
- * La couleur n'est pas écrite dans les entrées ci-dessus, et c'est délibéré : elle est lue dans le
- * registre d'après le chemin, comme le fait le titre de chaque page. Une seule source, donc aucun
- * endroit où la barre latérale pourrait se mettre à contredire l'accueil.
+ * Deux registres, un seul principe : la couleur n'est écrite NI dans les entrées ci-dessus, NI ici.
+ * Une entrée parente est une **catégorie** et prend la couleur de sa section d'accueil ; une entrée
+ * qui porte un chemin est un **module** et prend celle de sa carte. Trois surfaces puisent ainsi à
+ * la même source — cartes, titres de page, barre latérale — et aucune ne peut contredire les autres.
  *
- * Les entrées sans module — « Voir l'édition », « Vue d'ensemble », les en-têtes de groupe — ne
- * trouvent rien dans le registre et gardent la couleur du thème. L'oubli d'un module se voit donc à
- * l'œil, sans rien casser.
+ * Ce qui ne correspond à rien — « Voir l'édition », « Vue d'ensemble » — garde la couleur du thème.
+ * Un oubli se voit donc à l'œil, sans rien casser.
  */
-function teindreSelonLeModule<T extends { to?: unknown; class?: unknown; children?: unknown[] }>(
-  entrees: T[]
-): T[] {
+function teindreSelonLeRegistre<
+  T extends { to?: unknown; class?: unknown; categorie?: unknown; children?: unknown[] },
+>(entrees: T[]): T[] {
   return entrees.map((entree) => {
     const enfants = Array.isArray(entree.children)
-      ? teindreSelonLeModule(entree.children as T[])
+      ? teindreSelonLeRegistre(entree.children as T[])
       : undefined
+
+    // Une entrée parente est une CATÉGORIE, et prend la couleur que l'accueil donne à sa section.
+    // Une entrée avec un chemin est un MODULE, et prend celle de sa carte. Deux registres, mais un
+    // seul principe : la couleur n'est jamais écrite ici.
+    const categorie =
+      typeof entree.categorie === 'string'
+        ? categorieDeGestion(entree.categorie)?.classeDansUnLien
+        : undefined
 
     const chemin = typeof entree.to === 'string' ? entree.to : undefined
     const couleur = chemin ? moduleDeGestion(chemin)?.couleur : undefined
-    if (!couleur) return enfants ? { ...entree, children: enfants } : entree
+
+    const teinte = categorie ?? (couleur ? ICONE_DE_MODULE_DANS_UN_LIEN[couleur] : undefined)
+    if (!teinte) return enfants ? { ...entree, children: enfants } : entree
 
     // La classe va sur le LIEN, et atteint l'icône par une variante : une sous-entrée ne peut pas
     // porter son propre `ui` (Nuxt UI l'en prive), et 36 des 46 entrées sont des sous-entrées.
-    const classes = [entree.class, ICONE_DE_MODULE_DANS_UN_LIEN[couleur]].filter(Boolean).join(' ')
+    const classes = [entree.class, teinte].filter(Boolean).join(' ')
     return { ...entree, class: classes, ...(enfants ? { children: enfants } : {}) }
   })
 }
 
 // Filtrer les items selon les permissions (déjà fait dans computed)
 const filteredNavigationItems = computed(() =>
-  navigationItems.value.map((section) => teindreSelonLeModule(section))
+  navigationItems.value.map((section) => teindreSelonLeRegistre(section))
 )
 </script>

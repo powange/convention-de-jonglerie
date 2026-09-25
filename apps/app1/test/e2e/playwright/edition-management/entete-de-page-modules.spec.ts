@@ -227,4 +227,48 @@ test.describe('Titres des pages de gestion', () => {
 
     await context.close()
   })
+
+  test('les catégories du menu portent une couleur, non le gris du thème', async ({ browser }) => {
+    const { editionId } = loadState()
+    const { page, context } = await ouvrir(browser)
+
+    await page.goto(`${BASE}/editions/${editionId}/gestion`, { waitUntil: 'domcontentloaded' })
+    await expect(page.locator('[data-carte-gestion]').first()).toBeVisible({ timeout: 40000 })
+
+    /*
+     * Une entrée PARENTE du menu est une catégorie : pas de `href`, et sa couleur vient du registre
+     * des catégories, celui que lit aussi l'accueil.
+     *
+     * Ce test ne rejoue pas les valeurs du registre — ce serait le recopier. Il vérifie ce qui
+     * casse en pratique : que la couleur est bien APPLIQUÉE. Les deux façons de la perdre sont une
+     * variante que Tailwind n'a pas générée et un sélecteur qui manque l'icône ; dans les deux cas
+     * l'icône retombe sur la couleur du texte voisin, sans erreur ni avertissement.
+     */
+    const categories = await page.evaluate(() => {
+      const vues: { libelle: string; icone: string; libelleCouleur: string }[] = []
+      document.querySelectorAll('[data-slot=link]').forEach((lien) => {
+        if (lien.getAttribute('href')) return
+        const icone = lien.querySelector('[data-slot=linkLeadingIcon]') as HTMLElement | null
+        const libelle = (lien.textContent ?? '').trim()
+        if (!icone || !libelle) return
+        vues.push({
+          libelle,
+          icone: getComputedStyle(icone).color,
+          libelleCouleur: getComputedStyle(lien as HTMLElement).color,
+        })
+      })
+      return vues
+    })
+
+    // Sans ce garde-fou, un menu qui n'aurait aucune catégorie rendrait le test vert sans rien
+    // avoir comparé.
+    expect(categories.length, 'aucune catégorie lue dans le menu').toBeGreaterThan(0)
+
+    const grises = categories
+      .filter((c) => c.icone === c.libelleCouleur)
+      .map((c) => `${c.libelle} : ${c.icone}, comme son libellé`)
+    expect(grises, `catégories sans couleur propre :\n${grises.join('\n')}`).toEqual([])
+
+    await context.close()
+  })
 })

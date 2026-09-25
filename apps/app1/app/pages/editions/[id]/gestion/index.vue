@@ -106,8 +106,6 @@
         <ManagementCategorySection
           v-if="canEditConvention"
           id="convention"
-          icon="i-heroicons-building-library"
-          icon-class="text-blue-500"
           :title="$t('gestion.convention.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -122,13 +120,7 @@
         </ManagementCategorySection>
 
         <!-- Informations -->
-        <ManagementCategorySection
-          v-if="canEdit"
-          id="infos"
-          icon="i-lucide-info"
-          icon-class="text-blue-500"
-          :title="$t('gestion.infos.title')"
-        >
+        <ManagementCategorySection v-if="canEdit" id="infos" :title="$t('gestion.infos.title')">
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             <!-- Informations générales -->
             <ManagementNavigationCard
@@ -228,8 +220,6 @@
         <ManagementCategorySection
           v-if="canManageOrganizers"
           id="organisateurs"
-          icon="i-heroicons-user-group"
-          icon-class="text-purple-500"
           :title="$t('organizers.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -248,8 +238,6 @@
         <ManagementCategorySection
           v-if="edition.volunteersEnabled && (isOrganizer || isTeamLeaderValue)"
           id="benevoles"
-          icon="i-heroicons-user-group"
-          icon-class="text-primary-500"
           :title="$t('edition.ticketing.volunteer_management')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -371,8 +359,6 @@
         <ManagementCategorySection
           v-if="edition.artistsEnabled && canManageArtists"
           id="artistes"
-          icon="i-heroicons-star"
-          icon-class="text-yellow-500"
           :title="$t('gestion.artists.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -425,8 +411,6 @@
         <ManagementCategorySection
           v-if="edition.mealsEnabled && canManageMeals"
           id="repas"
-          icon="cbi:mealie"
-          icon-class="text-orange-500"
           :title="$t('gestion.meals.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -463,8 +447,6 @@
         <ManagementCategorySection
           v-else-if="edition.mealsEnabled && canAccessMealValidation"
           id="repas"
-          icon="cbi:mealie"
-          icon-class="text-orange-500"
           :title="$t('gestion.meals.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -483,8 +465,6 @@
         <ManagementCategorySection
           v-if="edition.ticketingEnabled && !canManageTicketing && canAccessAccessControl"
           id="billetterie"
-          icon="i-heroicons-ticket"
-          icon-class="text-blue-500"
           :title="$t('gestion.ticketing.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -502,8 +482,6 @@
         <ManagementCategorySection
           v-if="edition.ticketingEnabled && canManageTicketing"
           id="billetterie"
-          icon="i-heroicons-ticket"
-          icon-class="text-blue-500"
           :title="$t('gestion.ticketing.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -595,8 +573,6 @@
         <ManagementCategorySection
           v-if="canManageWorkshops && edition.workshopsEnabled"
           id="ateliers"
-          icon="i-heroicons-academic-cap"
-          icon-class="text-indigo-500"
           :title="$t('gestion.workshops.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -615,8 +591,6 @@
         <ManagementCategorySection
           v-if="edition.tasksEnabled && canManageTasks"
           id="taches"
-          icon="i-heroicons-clipboard-document-check"
-          icon-class="text-rose-500"
           :title="$t('edition.tasks')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -634,8 +608,6 @@
         <ManagementCategorySection
           v-if="edition.stockEnabled && canAccessStock"
           id="stock"
-          icon="i-heroicons-archive-box"
-          icon-class="text-amber-600"
           :title="$t('gestion.stock.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -653,8 +625,6 @@
         <ManagementCategorySection
           v-if="edition.faqEnabled && canManageFAQ"
           id="faq"
-          icon="i-heroicons-question-mark-circle"
-          icon-class="text-indigo-500"
           :title="$t('gestion.faq.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -672,8 +642,6 @@
         <ManagementCategorySection
           v-if="edition.treasuryEnabled && canManageTreasury"
           id="tresorerie"
-          icon="i-heroicons-calculator"
-          icon-class="text-sky-600"
           :title="$t('gestion.treasury.title')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -695,8 +663,6 @@
         <ManagementCategorySection
           v-if="canEdit || canManageVolunteers || isOrganizer"
           id="objets-trouves"
-          icon="i-heroicons-magnifying-glass"
-          icon-class="text-amber-500"
           :title="$t('edition.lost_found')"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
