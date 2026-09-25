@@ -7,6 +7,30 @@
       </div>
 
       <div v-else class="space-y-4">
+        <!--
+          Rafraîchir sur place.
+          
+          La liste ne se chargeait qu'à l'OUVERTURE de la modale : en attendant qu'un artiste
+          confirme sa lecture, il fallait la refermer et la rouvrir pour savoir où l'on en était.
+          
+          Le bouton rappelle le même chargement, et l'encart ci-dessous se recalcule de lui-même
+          puisqu'il dérive de la liste. Il remonte aussi le compte à la page : sans cela, la carte
+          derrière la modale afficherait encore l'ancien ratio, et deux endroits du même écran se
+          contrediraient.
+        -->
+        <div class="flex justify-end">
+          <UButton
+            icon="i-heroicons-arrow-path"
+            color="neutral"
+            variant="outline"
+            size="sm"
+            :loading="chargement"
+            @click="rafraichir"
+          >
+            {{ $t('common.refresh') }}
+          </UButton>
+        </div>
+
         <UAlert
           icon="i-heroicons-check-circle"
           :color="tousConfirme ? 'success' : 'info'"
@@ -109,6 +133,15 @@ interface Confirmation {
 const props = defineProps<{ editionId: number; groupId: string | null }>()
 const ouvert = defineModel<boolean>({ required: true })
 
+/**
+ * Prévient la page que les confirmations ont bougé.
+ *
+ * La carte d'une notification porte le même ratio « confirmés sur total » que l'encart de cette
+ * modale. Sans cet avertissement, rafraîchir ici laisserait la carte sur son ancien compte, et le
+ * même écran donnerait deux chiffres différents pour la même chose.
+ */
+const emit = defineEmits<{ rafraichi: [] }>()
+
 const confirmations = ref<Confirmation[]>([])
 const envoi = ref<{ id: string; message: string } | null>(null)
 const chargement = ref(false)
@@ -193,6 +226,11 @@ const charger = async () => {
   } finally {
     chargement.value = false
   }
+}
+
+const rafraichir = async () => {
+  await charger()
+  emit('rafraichi')
 }
 
 watch(

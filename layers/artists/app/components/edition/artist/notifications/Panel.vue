@@ -89,12 +89,28 @@
       </div>
 
       <div v-else class="space-y-3">
-        <div
+        <!--
+          La carte ENTIÈRE ouvre le détail, et c'est un vrai `button`.
+          
+          L'ouverture ne tenait qu'à une icône de quelques millimètres, à droite. Un bouton plutôt
+          qu'un `@click` sur le bloc : il est atteignable au clavier et annoncé comme tel, là où un
+          `div` cliquable n'est ni l'un ni l'autre.
+          
+          Contrepartie assumée : le texte du message n'est plus sélectionnable à la souris, un bouton
+          avalant la sélection. Le choix a été tranché en faveur de l'accessibilité.
+          
+          L'icône en forme d'œil a été retirée : la carte entière étant cliquable, elle ne désignait
+          plus rien. Le survol et l'anneau de focus sont donc les seuls indices que le bloc s'ouvre.
+        -->
+        <button
           v-for="envoi in historique"
           :key="envoi.id"
-          class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
+          type="button"
+          class="w-full text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          :aria-label="$t('gestion.artists.notifications.who_read')"
+          @click="ouvrirConfirmations(envoi.id)"
         >
-          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+          <div>
             <div class="min-w-0">
               <p class="text-sm text-gray-500">
                 {{ formatDate(envoi.sentAt) }} — {{ envoi.sender.pseudo }}
@@ -124,17 +140,8 @@
                 </UBadge>
               </div>
             </div>
-            <UButton
-              icon="i-heroicons-eye"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              class="shrink-0"
-              :title="$t('gestion.artists.notifications.who_read')"
-              @click="ouvrirConfirmations(envoi.id)"
-            />
           </div>
-        </div>
+        </button>
       </div>
     </UCard>
 
@@ -166,10 +173,13 @@
       </template>
     </UModal>
 
+    <!-- `@rafraichi` : la modale prévient quand les confirmations ont bougé, et la liste de la page
+         reprend ses compteurs. Sans cela, la carte derrière garderait son ancien ratio. -->
     <EditionArtistNotificationsConfirmationsModal
       v-model="confirmationsOuvertes"
       :edition-id="editionId"
       :group-id="groupeConsulte"
+      @rafraichi="chargerHistorique"
     />
   </div>
 </template>
