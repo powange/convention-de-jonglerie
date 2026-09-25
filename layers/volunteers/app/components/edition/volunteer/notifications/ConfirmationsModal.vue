@@ -1,9 +1,34 @@
 <template>
   <UModal v-model:open="isOpen" :ui="{ width: 'sm:max-w-4xl' }">
     <template #header>
-      <div class="flex items-center gap-2">
-        <UIcon name="i-heroicons-users" class="text-primary-500" />
-        <span class="font-semibold">{{ t('volunteers.notification_confirmations') }}</span>
+      <div class="flex items-center justify-between gap-2 w-full">
+        <div class="flex items-center gap-2 min-w-0">
+          <UIcon name="i-heroicons-users" class="text-primary-500 shrink-0" />
+          <span class="font-semibold truncate">
+            {{ t('volunteers.notification_confirmations') }}
+          </span>
+        </div>
+
+        <!--
+          Rafraîchir sur place.
+
+          La liste ne se chargeait qu'à l'OUVERTURE de la modale : en attendant qu'un bénévole
+          confirme sa lecture, il fallait la refermer et la rouvrir pour savoir où l'on en était.
+
+          Il remonte aussi le compte à la page : la carte derrière la modale porte le même taux de
+          confirmation, et sans cela deux endroits du même écran se contrediraient.
+        -->
+        <UButton
+          icon="i-heroicons-arrow-path"
+          color="neutral"
+          variant="outline"
+          size="sm"
+          class="shrink-0"
+          :loading="loading"
+          @click="rafraichir"
+        >
+          {{ t('common.refresh') }}
+        </UButton>
       </div>
     </template>
 
@@ -251,6 +276,13 @@ interface Props {
 
 interface Emits {
   (e: 'update:modelValue', value: boolean): void
+  /**
+   * Les confirmations ont bougé : la page peut reprendre ses compteurs.
+   *
+   * La carte d'une notification porte le même taux de confirmation que cette modale. Sans cet
+   * avertissement, rafraîchir ici laisserait la carte sur son ancien chiffre.
+   */
+  (e: 'rafraichi'): void
 }
 
 const props = defineProps<Props>()
@@ -412,6 +444,11 @@ const refreshData = async () => {
   if (props.notificationData?.id) {
     await refresh()
   }
+}
+
+const rafraichir = async () => {
+  await refreshData()
+  emit('rafraichi')
 }
 
 // Réinitialiser l'onglet quand la modal s'ouvre

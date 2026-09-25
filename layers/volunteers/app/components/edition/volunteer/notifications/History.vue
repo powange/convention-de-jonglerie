@@ -24,10 +24,23 @@
 
     <!-- Tableau des notifications -->
     <div v-else class="space-y-3">
-      <div
+      <!--
+          La carte ENTIÈRE ouvre le détail, et c'est un vrai `button`.
+
+          Même geste que du côté artistes : l'ouverture ne tenait qu'à un bouton en bas à droite. Un
+          `button` plutôt qu'un `@click` sur le bloc — il est atteignable au clavier et annoncé comme
+          tel, là où un `div` cliquable n'est ni l'un ni l'autre.
+
+          Contrepartie assumée : le texte du message n'est plus sélectionnable à la souris, un bouton
+          avalant la sélection.
+        -->
+      <button
         v-for="notification in notifications"
         :key="notification.id"
-        class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
+        type="button"
+        class="w-full text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        :aria-label="t('volunteers.view_details')"
+        @click="openConfirmationsModal(notification)"
       >
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
@@ -131,26 +144,19 @@
             >
               {{ notification.confirmationRate }}% {{ t('volunteers.confirmed') }}
             </UBadge>
-            <UButton
-              size="md"
-              color="primary"
-              variant="soft"
-              icon="i-heroicons-eye"
-              class="sm:!text-xs sm:!py-1 sm:!px-2.5 sm:!gap-1.5"
-              @click="openConfirmationsModal(notification)"
-            >
-              {{ t('volunteers.view_details') }}
-            </UButton>
           </div>
         </div>
-      </div>
+      </button>
     </div>
 
     <!-- Modal des détails de confirmations -->
+    <!-- `@rafraichi` : la modale prévient quand les confirmations ont bougé, et la liste reprend ses
+         compteurs. Sans cela, la carte derrière garderait son ancien taux. -->
     <EditionVolunteerNotificationsConfirmationsModal
       v-model="showConfirmationsModal"
       :notification-data="selectedNotificationData"
       :edition-id="editionId"
+      @rafraichi="refresh"
     />
   </div>
 </template>

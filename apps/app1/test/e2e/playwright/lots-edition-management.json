@@ -33,6 +33,7 @@
   ],
   "gestion-2a": [
     "entete-de-page-modules.spec.ts",
+    "notifications-benevoles-carte-et-rafraichir.spec.ts",
     "shows-call-survey.spec.ts",
     "shows-call.spec.ts",
     "shows-list.spec.ts",
