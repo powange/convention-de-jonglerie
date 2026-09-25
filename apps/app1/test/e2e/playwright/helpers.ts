@@ -332,11 +332,31 @@ export async function updateShowCallApplicationStatus(
 /**
  * Active le profil artiste pour l'utilisateur courant
  */
+/**
+ * Ajoute la catégorie « Artiste » au compte de test, SANS retirer les autres.
+ *
+ * ⚠️ Il posait auparavant `isVolunteer: false, isArtist: true, isOrganizer: false` — il ne
+ * complétait donc pas le profil, il le REMPLAÇAIT. Le compte étant partagé par toutes les specs,
+ * une spec d'appel à spectacle retirait au passage la catégorie bénévole, et `volunteers.spec.ts`
+ * ne trouvait plus son bouton « postuler ». Le défaut ne se voyait pas tant que les deux specs
+ * tombaient dans des lots Playwright différents — il a suffi d'en ajouter une pour les réunir.
+ *
+ * L'état de départ est relevé plutôt que supposé, comme le fait `activerBenevolatTemporairement` :
+ * une catégorie déjà active le reste.
+ */
 export async function enableArtistProfile(page: Page) {
+  const session = await page.request.get(`${BASE_URL}/api/session/me`)
+  const corps = session.ok() ? await session.json() : {}
+  const utilisateur = corps.data?.user ?? corps.user ?? corps.data ?? {}
+
   const response = await apiPut(page, `${BASE_URL}/api/profile/categories`, {
-    data: { isVolunteer: false, isArtist: true, isOrganizer: false },
+    data: {
+      isVolunteer: Boolean(utilisateur.isVolunteer),
+      isArtist: true,
+      isOrganizer: Boolean(utilisateur.isOrganizer),
+    },
   })
-  expect(response.ok()).toBe(true)
+  expect(response.ok(), await response.text()).toBe(true)
   return response
 }
 

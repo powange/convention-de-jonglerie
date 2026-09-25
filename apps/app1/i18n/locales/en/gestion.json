@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Act performers",
+      "act_company_name": "Company or stage name",
+      "act_company_name_placeholder": "E.g. The Three Clubs Company",
       "act_default_title": "Act 1",
       "act_delete": "Delete act",
       "act_delete_confirm": "The act “{name}” will be removed from the list. The removal only takes effect when you save.",

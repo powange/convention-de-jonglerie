@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Artyści numeru",
+      "act_company_name": "Zespół lub nazwa sceniczna",
+      "act_company_name_placeholder": "Np. Trupa Trzech Maczug",
       "act_default_title": "Numer 1",
       "act_delete": "Usuń numer",
       "act_delete_confirm": "Numer „{name}” zostanie usunięty z listy. Usunięcie zadziała dopiero po zapisaniu.",

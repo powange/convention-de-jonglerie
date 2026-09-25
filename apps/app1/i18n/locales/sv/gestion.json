@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Numrets artister",
+      "act_company_name": "Kompani eller artistnamn",
+      "act_company_name_placeholder": "T.ex. Kompaniet Tre Käglor",
       "act_default_title": "Nummer 1",
       "act_delete": "Ta bort numret",
       "act_delete_confirm": "Numret ”{name}” tas bort från listan. Borttagningen gäller först när du sparar.",

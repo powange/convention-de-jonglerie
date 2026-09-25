@@ -22,6 +22,7 @@
     "carpool.spec.ts",
     "carte-menu-empilement.spec.ts",
     "features-toggle.spec.ts",
+    "import-nom-de-compagnie.spec.ts",
     "manual-artist-invitation.spec.ts",
     "map-import.spec.ts",
     "map-selects-modales.spec.ts",

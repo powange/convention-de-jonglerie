@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Künstler der Nummer",
+      "act_company_name": "Kompanie oder Künstlername",
+      "act_company_name_placeholder": "Z. B. Cie des Trois Massues",
       "act_default_title": "Nummer 1",
       "act_delete": "Nummer löschen",
       "act_delete_confirm": "Die Nummer „{name}“ wird aus der Liste entfernt. Die Entfernung wird erst beim Speichern wirksam.",

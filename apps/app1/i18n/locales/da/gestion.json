@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Numrets artister",
+      "act_company_name": "Kompagni eller kunstnernavn",
+      "act_company_name_placeholder": "F.eks. Kompagniet De Tre Kegler",
       "act_default_title": "Nummer 1",
       "act_delete": "Slet nummeret",
       "act_delete_confirm": "Nummeret “{name}” fjernes fra listen. Fjernelsen træder først i kraft ved gemning.",

@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Artiesten van het nummer",
+      "act_company_name": "Gezelschap of artiestennaam",
+      "act_company_name_placeholder": "Bv. Gezelschap De Drie Kegels",
       "act_default_title": "Nummer 1",
       "act_delete": "Nummer verwijderen",
       "act_delete_confirm": "Het nummer “{name}” wordt uit de lijst verwijderd. De verwijdering geldt pas na het opslaan.",
