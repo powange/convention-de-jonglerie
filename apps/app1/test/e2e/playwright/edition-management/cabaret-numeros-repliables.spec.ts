@@ -8,6 +8,8 @@ const BASE = 'http://localhost:3000'
 const TITRE_LONG =
   'Duo de massues et de diabolos avec passages croisés, portés acrobatiques et final au sol'
 const TITRE_COURT = 'Solo de monocycle'
+/** Le nom de scène du premier numéro. Le second n'en a pas : les deux cas doivent se voir. */
+const COMPAGNIE = 'Cie des Trois Massues'
 
 /**
  * Les numéros d'un cabaret se replient.
@@ -46,7 +48,7 @@ test.describe.serial('Numéros d’un cabaret — repli', () => {
       startDateTime: new Date().toISOString(),
       duration: 90,
       acts: [
-        { title: TITRE_LONG, duration: 10 },
+        { title: TITRE_LONG, companyName: COMPAGNIE, duration: 10 },
         { title: TITRE_COURT, duration: 15 },
       ],
     })
@@ -71,6 +73,26 @@ test.describe.serial('Numéros d’un cabaret — repli', () => {
      */
     await expect(page.getByText('Besoins techniques').first()).toBeHidden()
     await expect(page.getByText('Besoins techniques').nth(1)).toBeHidden()
+  })
+
+  test('replié, le nom de scène se lit sous le titre', async ({ page, goto }) => {
+    await ouvrir(page, goto)
+
+    /*
+     * Le titre d'un numéro ne dit pas qui le joue.
+     *
+     * Replié, un numéro se reconnaît à trois choses : son rang, son titre, et le nom sous lequel
+     * ses artistes se présentent. Ce dernier vient de la candidature, reprise à l'import — il
+     * n'existait nulle part dans la gestion avant.
+     */
+    await expect(page.getByText(COMPAGNIE)).toBeVisible()
+
+    // Déplié, il n'est plus répété en tête : il est dans son champ, sous le titre du formulaire.
+    await page.getByText(TITRE_LONG).first().click()
+    await expect(page.getByText('Besoins techniques').first()).toBeVisible()
+    // Il ne reste que l'occurrence du champ, pas celle de l'en-tête.
+    await expect(page.getByText(COMPAGNIE, { exact: true })).toHaveCount(0)
+    await expect(page.locator(`input[value="${COMPAGNIE}"]`)).toHaveCount(1)
   })
 
   test('le titre n’est jamais tronqué : il passe à la ligne', async ({ page, goto }) => {

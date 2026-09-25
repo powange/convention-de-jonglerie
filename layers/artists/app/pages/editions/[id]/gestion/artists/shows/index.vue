@@ -74,11 +74,22 @@
                 <!-- `ps-16` et non `ps-8` : le titre d'un spectacle est déjà décalé par son
                      chevron, un retrait plus court alignerait le numéro sur lui au lieu de
                      l'en distinguer. -->
-                <div v-if="row.original.kind === 'act'" class="flex items-center gap-2 ps-16">
-                  <UBadge color="neutral" variant="subtle" size="sm">
-                    {{ $t('gestion.shows.act_number', { number: row.original.position }) }}
-                  </UBadge>
-                  <span class="font-medium">{{ row.original.act.title }}</span>
+                <div v-if="row.original.kind === 'act'" class="ps-16">
+                  <div class="flex items-center gap-2">
+                    <UBadge color="neutral" variant="subtle" size="sm">
+                      {{ $t('gestion.shows.act_number', { number: row.original.position }) }}
+                    </UBadge>
+                    <span class="font-medium">{{ row.original.act.title }}</span>
+                  </div>
+                  <!-- La compagnie sous le titre : c'est souvent elle que l'on cherche dans un
+                       déroulé de quinze numéros, le titre d'un numéro ne disant pas qui le joue.
+                       Elle vient de la candidature, reprise à l'import. -->
+                  <p
+                    v-if="row.original.act.companyName"
+                    class="mt-0.5 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    {{ row.original.act.companyName }}
+                  </p>
                 </div>
 
                 <div v-else class="flex items-center gap-3">
