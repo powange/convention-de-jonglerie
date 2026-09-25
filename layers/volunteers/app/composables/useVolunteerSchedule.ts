@@ -407,6 +407,23 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
       end: endDate.value,
     },
 
+    /*
+     * La barre verticale rouge de l'instant présent.
+     *
+     * Une seule ligne suffit pour les DEUX plannings — celui de la gestion et la page publique d'un
+     * bénévole — parce que les deux pages emploient la même carte, laquelle passe par ce composable.
+     * L'écrire dans chaque page aurait ouvert la porte à ce qu'elles divergent.
+     *
+     * FullCalendar la place d'après l'horloge réelle, mais dans le FUSEAU DU CALENDRIER, réglé
+     * au-dessus sur celui de l'édition. C'est le bon repère : un planning se lit à l'heure du lieu
+     * où l'on est bénévole, pas à celle du navigateur.
+     *
+     * Elle n'apparaît que si l'instant présent tombe dans la période affichée. Sur une édition à
+     * venir, il n'y a donc rien à voir — et c'est juste : une barre posée au bord de l'écran
+     * mentirait sur ce qu'elle désigne.
+     */
+    nowIndicator: true,
+
     // Configuration temporelle
     slotMinTime: '00:00:00',
     slotMaxTime: '24:00:00',
