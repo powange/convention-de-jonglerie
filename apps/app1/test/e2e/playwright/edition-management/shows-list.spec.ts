@@ -6,6 +6,8 @@ const STAMP = Date.now()
 const CABARET_TITLE = `E2E Cabaret liste ${STAMP}`
 const ACT_1_TITLE = `E2E Numéro un ${STAMP}`
 const ACT_2_TITLE = `E2E Numéro deux ${STAMP}`
+/** Le nom de scène du premier numéro. Le second n'en a pas : les deux cas doivent se voir. */
+const ACT_1_COMPANY = `Cie du Numéro Un ${STAMP}`
 const STANDARD_TITLE = `E2E Spectacle simple ${STAMP}`
 const JETABLE_TITLE = `E2E Spectacle jetable ${STAMP}`
 
@@ -55,7 +57,7 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
       startDateTime: new Date().toISOString(),
       duration: 90,
       acts: [
-        { title: ACT_1_TITLE, duration: 10 },
+        { title: ACT_1_TITLE, companyName: ACT_1_COMPANY, duration: 10 },
         { title: ACT_2_TITLE, duration: 15 },
       ],
     })
@@ -116,6 +118,18 @@ test.describe.serial('Tableau des spectacles (gestion)', () => {
     await expect(firstAct).toContainText('Numéro 1')
     await expect(firstAct).toContainText('10 min')
     await expect(rowWith(page, ACT_2_TITLE).first()).toContainText('Numéro 2')
+
+    /*
+     * La compagnie, sous le titre du numéro.
+     *
+     * Le titre d'un numéro ne dit pas qui le joue : dans un déroulé de quinze numéros, c'est
+     * souvent la compagnie que l'on cherche. Elle vient de la candidature, reprise à l'import.
+     *
+     * Le second numéro n'en a pas, et sa ligne ne doit donc rien inventer — un gabarit qui
+     * afficherait un tiret ou une ligne vide se verrait ici.
+     */
+    await expect(firstAct).toContainText(ACT_1_COMPANY)
+    await expect(rowWith(page, ACT_2_TITLE).first()).not.toContainText(ACT_1_COMPANY)
 
     await toggle.click()
     await expect(rowWith(page, ACT_1_TITLE)).toHaveCount(0)
