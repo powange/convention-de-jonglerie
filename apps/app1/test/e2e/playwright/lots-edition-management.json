@@ -45,6 +45,7 @@
   "gestion-2b": [
     "defilement-panneau.spec.ts",
     "planning-barre-de-maintenant.spec.ts",
+    "planning-infobulle-pas-au-doigt.spec.ts",
     "status.spec.ts",
     "stock.spec.ts",
     "swaps-mobile.spec.ts",
