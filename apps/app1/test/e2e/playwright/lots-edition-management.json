@@ -54,6 +54,7 @@
   ],
   "gestion-3a": [
     "cabaret-numeros-repliables.spec.ts",
+    "notifications-artistes-carte-et-rafraichir.spec.ts",
     "ticketing-quotas-options.spec.ts",
     "ticketing.spec.ts",
     "treasury-avances.spec.ts",
