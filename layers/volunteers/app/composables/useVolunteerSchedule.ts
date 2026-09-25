@@ -660,11 +660,45 @@ export function useVolunteerSchedule(options: UseVolunteerScheduleOptions) {
         infobulle.style.display = 'none'
       }
 
-      arg.el.addEventListener('mouseenter', afficher)
-      arg.el.addEventListener('mousemove', (evenement) =>
-        positionnerInfobulle(infobulle, evenement as MouseEvent)
-      )
-      arg.el.addEventListener('mouseleave', masquer)
+      /*
+       * Des événements de POINTEUR, et le type de pointeur en garde.
+       *
+       * Au doigt, le navigateur émet les événements de souris EN PLUS du clic : `mouseenter` puis
+       * `click`. L'infobulle s'ouvrait donc, la modale du créneau s'ouvrait par-dessus — et comme le
+       * doigt ne « sort » de rien, `mouseleave` ne se déclenchait jamais : l'infobulle restait
+       * suspendue au-dessus de la modale.
+       *
+       * ⚠️ Le TYPE DE POINTEUR, et non une détection d'appareil. Les trois autres façons de faire
+       * échouent chacune sur un cas réel :
+       *
+       * - la largeur de l'écran confondrait une tablette large avec un ordinateur ;
+       * - l'agent utilisateur se trompe souvent et vieillit mal ;
+       * - `(hover: hover)` laisserait passer le défaut sur un portable à écran tactile — son entrée
+       *   PRINCIPALE sait survoler, la règle répondrait « affiche », et le doigt reprendrait le même
+       *   chemin.
+       *
+       * Le type de pointeur se juge geste par geste : sur le même appareil, la souris garde
+       * l'infobulle et le doigt ne l'a plus.
+       *
+       * Rien ne se perd au tactile : l'appui ouvre la modale du créneau, qui porte la même liste
+       * complète. L'infobulle n'existe que pour l'éviter à la souris.
+       */
+      const auDoigt = (evenement: PointerEvent) => evenement.pointerType === 'touch'
+
+      arg.el.addEventListener('pointerenter', (evenement) => {
+        const pointeur = evenement as PointerEvent
+        if (auDoigt(pointeur)) return
+        afficher(pointeur)
+      })
+      arg.el.addEventListener('pointermove', (evenement) => {
+        const pointeur = evenement as PointerEvent
+        if (auDoigt(pointeur)) return
+        positionnerInfobulle(infobulle, pointeur)
+      })
+      arg.el.addEventListener('pointerleave', masquer)
+      // Un stylet ou une souris peut quitter la page sans repasser par le créneau ; et un appui
+      // tactile qui aurait malgré tout ouvert l'infobulle ne doit pas la laisser derrière lui.
+      arg.el.addEventListener('pointercancel', masquer)
       // Sans ça, l'infobulle reste suspendue au-dessus d'un créneau qui n'existe plus.
       ;(arg.el as any).__masquerInfobulle = masquer
     },
