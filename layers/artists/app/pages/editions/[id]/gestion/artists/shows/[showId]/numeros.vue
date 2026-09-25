@@ -24,12 +24,11 @@
         >
           {{ $t('gestion.shows.back_to_shows') }}
         </UButton>
-        <h1 class="text-2xl font-bold mt-2">
-          {{ $t('gestion.shows.acts_of', { title: show.title }) }}
-        </h1>
-        <p v-if="acts.length > 0" class="text-sm text-gray-500 mt-1">
-          {{ $t('gestion.shows.acts_count', { count: acts.length }) }}
-        </p>
+        <ManagementPageHeader :titre="$t('gestion.shows.acts_of', { title: show.title })">
+          <p v-if="acts.length > 0" class="text-sm text-gray-500 mt-1">
+            {{ $t('gestion.shows.acts_count', { count: acts.length }) }}
+          </p>
+        </ManagementPageHeader>
       </div>
 
       <ShowsShowActsEditor v-model="acts" :artists="artists" />

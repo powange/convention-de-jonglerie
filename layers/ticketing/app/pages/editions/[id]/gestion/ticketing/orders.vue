@@ -20,14 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-shopping-cart" class="text-green-600 dark:text-green-400" />
-          Commandes et participants
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Consultez les commandes importées depuis votre billeterie externe et celles créées
-          manuellement
-        </p>
+        <ManagementPageHeader
+          titre="Commandes et participants"
+          description="Consultez les commandes importées depuis votre billeterie externe et celles créées manuellement"
+        />
       </div>
 
       <!-- Message informatif si pas de configuration externe -->

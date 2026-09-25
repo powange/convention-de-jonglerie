@@ -17,10 +17,10 @@
     <div v-else class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold">{{ $t('gestion.treasury.title') }}</h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ $t('gestion.treasury.subtitle') }}
-          </p>
+          <ManagementPageHeader
+            :titre="$t('gestion.treasury.title')"
+            :description="$t('gestion.treasury.subtitle')"
+          />
         </div>
         <div class="flex flex-col gap-2 sm:flex-row">
           <!-- L'export n'a rien à produire sur une trésorerie vide : un PDF de deux tableaux sans

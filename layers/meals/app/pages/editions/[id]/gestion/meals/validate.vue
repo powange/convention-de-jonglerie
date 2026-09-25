@@ -16,28 +16,19 @@
       />
     </div>
     <div v-else>
-      <!-- En-tête avec navigation -->
-
-      <!-- Contenu de la page -->
       <div class="space-y-6">
+        <div class="flex items-start justify-between gap-4">
+          <ManagementPageHeader :titre="$t('gestion.meals.validation_title')" />
+          <UButton
+            icon="i-heroicons-arrow-left"
+            color="neutral"
+            variant="soft"
+            :to="`/editions/${edition.id}/gestion`"
+          >
+            {{ $t('common.back') }}
+          </UButton>
+        </div>
         <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-check-badge" class="text-green-500" />
-                <h2 class="text-lg font-semibold">{{ $t('gestion.meals.validation_title') }}</h2>
-              </div>
-              <UButton
-                icon="i-heroicons-arrow-left"
-                color="neutral"
-                variant="soft"
-                :to="`/editions/${edition.id}/gestion`"
-              >
-                {{ $t('common.back') }}
-              </UButton>
-            </div>
-          </template>
-
           <!-- Étape 1: Sélection du repas -->
           <div
             class="mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 sm:p-6 rounded-lg border-2 border-gray-200 dark:border-gray-700"

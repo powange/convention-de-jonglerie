@@ -26,10 +26,10 @@
     <div v-else class="space-y-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-2xl font-bold">{{ $t('gestion.map.import_title') }}</h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            {{ $t('gestion.map.import_subtitle', { name: data?.mapName ?? '' }) }}
-          </p>
+          <ManagementPageHeader
+            :titre="$t('gestion.map.import_title')"
+            :description="$t('gestion.map.import_subtitle', { name: data?.mapName ?? '' })"
+          />
         </div>
         <UButton
           icon="i-lucide-arrow-left"

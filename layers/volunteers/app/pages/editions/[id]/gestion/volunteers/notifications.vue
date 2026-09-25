@@ -20,13 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-bell" class="text-yellow-600 dark:text-yellow-400" />
-          {{ t('volunteers.notifications') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ t('volunteers.notifications_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="t('volunteers.notifications')"
+          :description="t('volunteers.notifications_description')"
+        />
       </div>
 
       <!-- Contenu des notifications bénévoles -->

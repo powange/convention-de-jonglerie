@@ -26,10 +26,10 @@
     <div v-else class="space-y-6">
       <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-bold">{{ $t('edition.program') }}</h1>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ $t('gestion.program.description') }}
-          </p>
+          <ManagementPageHeader
+            :titre="$t('edition.program')"
+            :description="$t('gestion.program.description')"
+          />
         </div>
         <UButton icon="i-heroicons-plus" color="primary" @click="ouvrirCreation">
           {{ $t('gestion.program.add') }}

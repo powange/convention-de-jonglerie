@@ -30,10 +30,10 @@
     <div v-else class="space-y-6">
       <!-- En-tête -->
       <div>
-        <h1 class="text-2xl font-bold">{{ $t('gestion.about.title') }}</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ $t('gestion.about.description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.about.title')"
+          :description="$t('gestion.about.description')"
+        />
       </div>
 
       <!-- Formulaire -->

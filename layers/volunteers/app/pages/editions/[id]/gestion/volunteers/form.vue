@@ -23,13 +23,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-megaphone" class="text-blue-600 dark:text-blue-400" />
-          {{ $t('edition.volunteers.volunteer_form') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('edition.volunteers.form_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('edition.volunteers.volunteer_form')"
+          :description="$t('edition.volunteers.form_description')"
+        />
       </div>
 
       <!-- Contenu du formulaire d'appel à bénévole -->

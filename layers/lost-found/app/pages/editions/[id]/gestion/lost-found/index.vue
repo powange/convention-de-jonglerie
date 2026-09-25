@@ -16,8 +16,8 @@
       />
     </div>
     <div v-else>
-      <!-- Contenu de la page Lost & Found -->
       <div class="space-y-6">
+        <ManagementPageHeader :titre="$t('gestion.manage_lost_found')" />
         <!-- Card Objets trouvés -->
         <UCard>
           <div class="space-y-4">

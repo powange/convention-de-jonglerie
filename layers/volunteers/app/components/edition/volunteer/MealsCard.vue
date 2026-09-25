@@ -1,6 +1,6 @@
 <template>
   <EditionVolunteerCarteRepliable
-    titre="Mes repas"
+    :titre="t('volunteers.my_meals_title')"
     icone="i-heroicons-cake"
     :repliable-sur-mobile="repliableSurMobile"
   >

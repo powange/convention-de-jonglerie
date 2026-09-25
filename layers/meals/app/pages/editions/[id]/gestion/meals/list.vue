@@ -16,10 +16,18 @@
       />
     </div>
     <div v-else>
-      <!-- En-tête avec navigation -->
-
-      <!-- Contenu de la page -->
       <div class="space-y-6">
+        <div class="flex items-start justify-between gap-4">
+          <ManagementPageHeader :titre="$t('gestion.meals.list_title')" />
+          <UButton
+            icon="i-heroicons-arrow-left"
+            color="neutral"
+            variant="soft"
+            :to="`/editions/${edition.id}/gestion`"
+          >
+            {{ $t('common.back') }}
+          </UButton>
+        </div>
         <!-- Génération informations restauration -->
         <UCard>
           <template #header>
@@ -99,23 +107,6 @@
 
         <!-- Liste des repas -->
         <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UIcon name="cbi:mealie" class="text-orange-500" />
-                <h2 class="text-lg font-semibold">{{ $t('edition.meals.list_title') }}</h2>
-              </div>
-              <UButton
-                icon="i-heroicons-arrow-left"
-                color="neutral"
-                variant="soft"
-                :to="`/editions/${edition.id}/gestion`"
-              >
-                {{ $t('common.back') }}
-              </UButton>
-            </div>
-          </template>
-
           <!-- Filtres -->
           <div class="mb-6 space-y-4">
             <!-- Recherche par nom/prénom/email -->

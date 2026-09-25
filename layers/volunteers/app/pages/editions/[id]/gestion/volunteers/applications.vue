@@ -20,26 +20,23 @@
            propre et réduisait le titre et la note à des colonnes de deux ou trois mots. -->
       <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div class="space-y-2 sm:flex-1">
-          <h1 class="text-2xl font-bold flex items-center gap-2">
-            <UIcon
-              name="i-heroicons-clipboard-document-list"
-              class="text-green-600 dark:text-green-400"
-            />
-            {{ t('volunteers.management_title') }}
-          </h1>
-          <p
-            v-if="volunteersMode === 'INTERNAL'"
-            :class="`text-sm ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass} flex items-start gap-2`"
-          >
-            <UIcon
-              name="i-heroicons-information-circle"
-              :class="`${volunteerConfig.iconColorClass} mt-0.5 shrink-0`"
-              size="16"
-            />
-            {{
-              canManageVolunteers ? t('volunteers.admin_only_note') : t('volunteers.view_only_note')
-            }}
-          </p>
+          <ManagementPageHeader :titre="t('volunteers.management_title')">
+            <p
+              v-if="volunteersMode === 'INTERNAL'"
+              :class="`text-sm mt-1 ${volunteerConfig.textClass} ${volunteerConfig.darkTextClass} flex items-start gap-2`"
+            >
+              <UIcon
+                name="i-heroicons-information-circle"
+                :class="`${volunteerConfig.iconColorClass} mt-0.5 shrink-0`"
+                size="16"
+              />
+              {{
+                canManageVolunteers
+                  ? t('volunteers.admin_only_note')
+                  : t('volunteers.view_only_note')
+              }}
+            </p>
+          </ManagementPageHeader>
         </div>
         <UButton
           v-if="canManageVolunteers && volunteersMode === 'INTERNAL'"

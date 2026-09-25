@@ -30,10 +30,10 @@
     <div v-else class="space-y-6">
       <!-- En-tête -->
       <div>
-        <h1 class="text-2xl font-bold">{{ $t('gestion.convention.title') }}</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ $t('gestion.convention.description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.convention.title')"
+          :description="$t('gestion.convention.description')"
+        />
       </div>
 
       <!-- Ces champs appartiennent à la convention, pas à l'édition : ils valent donc pour

@@ -24,7 +24,7 @@
           :to="`/editions/${editionId}/gestion/volunteers`"
         />
         <UIcon name="i-heroicons-bolt" class="text-info-500 size-6" />
-        <h1 class="text-2xl font-semibold">{{ t('volunteers.renforts_title') }}</h1>
+        <ManagementPageHeader :titre="t('volunteers.renforts_title')" />
       </div>
 
       <!-- L'heure de référence, affichée : sans elle, on ne sait pas de quand date ce qu'on lit. -->

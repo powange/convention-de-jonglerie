@@ -45,7 +45,7 @@
                 <!-- 20 px et non 24, délibérément : ce titre nomme un ENREGISTREMENT — ce
                      groupe, cet objet — et non un écran du module. Le cran en dessous dit
                      qu'on est sur une fiche. Ne pas l'aligner sur les titres de page. -->
-                <h1 class="text-xl font-semibold">{{ item.name }}</h1>
+                <ManagementPageHeader niveau="fiche" :titre="item.name" />
                 <UBadge color="neutral" variant="soft" size="lg">×{{ item.quantity }}</UBadge>
                 <!-- Deux constats distincts, donc deux étiquettes : ce qui a été recompté, et
                      ce qui manque. Les fondre en une seule faisait lire « 3 au rangement — 2

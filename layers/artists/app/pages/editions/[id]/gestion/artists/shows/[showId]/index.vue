@@ -21,7 +21,7 @@
         >
           {{ $t('gestion.shows.back_to_shows') }}
         </UButton>
-        <h1 class="text-2xl font-bold mt-2">{{ show.title }}</h1>
+        <ManagementPageHeader :titre="show.title" />
       </div>
 
       <ShowsShowForm

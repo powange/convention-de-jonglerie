@@ -20,13 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-sparkles" class="text-purple-600 dark:text-purple-400" />
-          {{ $t('gestion.shows.list_title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('gestion.shows.manage_shows_description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('gestion.shows.list_title')"
+          :description="$t('gestion.shows.manage_shows_description')"
+        />
       </div>
 
       <!-- Contenu -->

@@ -20,13 +20,10 @@
 
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-currency-euro" class="text-orange-600 dark:text-orange-400" />
-          Tarifs et options
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Gérez les tarifs et options synchronisés depuis votre billeterie externe
-        </p>
+        <ManagementPageHeader
+          titre="Tarifs et options"
+          description="Gérez les tarifs et options synchronisés depuis votre billeterie externe"
+        />
       </div>
 
       <!-- Contenu principal -->

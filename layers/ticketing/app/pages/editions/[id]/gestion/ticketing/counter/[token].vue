@@ -49,9 +49,7 @@
         <UCard>
           <div class="space-y-4">
             <div class="flex items-center justify-between">
-              <h1 class="text-2xl font-bold">
-                {{ counter.name }}
-              </h1>
+              <ManagementPageHeader :titre="counter.name" />
               <div class="flex items-center gap-2">
                 <div
                   class="flex items-center gap-2 px-3 py-1 rounded-full"

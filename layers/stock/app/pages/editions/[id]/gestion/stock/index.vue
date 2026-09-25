@@ -4,7 +4,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div class="flex items-center gap-3">
         <UIcon name="i-heroicons-archive-box" class="text-amber-600 size-6" />
-        <h1 class="text-2xl font-semibold">{{ $t('gestion.stock.title') }}</h1>
+        <ManagementPageHeader :titre="$t('gestion.stock.title')" />
       </div>
       <UButton
         v-if="canManage"

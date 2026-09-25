@@ -18,13 +18,10 @@
     <div v-else>
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold flex items-center gap-2">
-          <UIcon name="i-heroicons-calculator" class="text-primary-600" />
-          {{ $t('ticketing.counters.title') }}
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          {{ $t('ticketing.counters.description') }}
-        </p>
+        <ManagementPageHeader
+          :titre="$t('ticketing.counters.title')"
+          :description="$t('ticketing.counters.description')"
+        />
       </div>
 
       <!-- Bouton de création -->
