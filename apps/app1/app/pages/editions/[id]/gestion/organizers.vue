@@ -18,7 +18,7 @@
     <div v-else>
       <!-- En-tête avec navigation -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
           <UIcon name="i-heroicons-user-group" class="text-purple-500" />
           {{ $t('gestion.organizers.title') }}
         </h1>

@@ -42,6 +42,9 @@
             <UIcon name="i-heroicons-cube" class="text-amber-600 size-6 mt-1 shrink-0" />
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
+                <!-- 20 px et non 24, délibérément : ce titre nomme un ENREGISTREMENT — ce
+                     groupe, cet objet — et non un écran du module. Le cran en dessous dit
+                     qu'on est sur une fiche. Ne pas l'aligner sur les titres de page. -->
                 <h1 class="text-xl font-semibold">{{ item.name }}</h1>
                 <UBadge color="neutral" variant="soft" size="lg">×{{ item.quantity }}</UBadge>
                 <!-- Deux constats distincts, donc deux étiquettes : ce qui a été recompté, et

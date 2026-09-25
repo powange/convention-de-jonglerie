@@ -2,7 +2,7 @@
   <UContainer class="py-6">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
           <UIcon name="i-heroicons-question-mark-circle" class="text-primary-500" />
           {{ $t('gestion.faq.title') }}
         </h1>

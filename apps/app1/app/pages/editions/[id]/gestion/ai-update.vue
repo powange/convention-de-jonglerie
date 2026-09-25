@@ -18,7 +18,7 @@
     <div v-else>
       <!-- Titre de la page -->
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
           <UIcon name="i-lucide-sparkles" class="text-yellow-500" />
           {{ $t('gestion.ai_update.title') }}
         </h1>
