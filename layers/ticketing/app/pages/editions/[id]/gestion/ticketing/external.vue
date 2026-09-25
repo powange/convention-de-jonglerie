@@ -21,8 +21,8 @@
       <!-- Titre de la page -->
       <div class="mb-6">
         <ManagementPageHeader
-          titre="Lier une billeterie externe"
-          description="Connectez votre billetterie HelloAsso, Infomaniak ou autre plateforme externe"
+          :titre="$t('gestion.ticketing.external_link_title')"
+          :description="$t('gestion.ticketing.external_link_description')"
         />
       </div>
 

@@ -61,8 +61,18 @@
           </template>
         </UDashboardSidebar>
 
-        <!-- Contenu principal -->
-        <UDashboardPanel>
+        <!--
+          Contenu principal.
+
+          `zone-defilante-gestion` marque le corps du panneau, qui est **le véritable élément
+          défilant** de toute la zone de gestion : `documentElement` y mesure exactement la hauteur
+          de la fenêtre, et le défilement de la fenêtre vaut invariablement 0.
+
+          C'est la classe sur laquelle s'accroche `plugins/defilement-panneau.client.ts`. Les
+          classes du thème de Nuxt UI (`flex-1 overflow-y-auto p-4 sm:p-6`) ne feraient pas un point
+          d'accroche : elles changent avec la bibliothèque, et rien ne le signalerait.
+        -->
+        <UDashboardPanel :ui="{ body: 'zone-defilante-gestion' }">
           <template #header>
             <!-- Navbar en haut -->
             <UDashboardNavbar>

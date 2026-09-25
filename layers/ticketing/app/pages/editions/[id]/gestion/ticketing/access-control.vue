@@ -22,8 +22,8 @@
       <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <ManagementPageHeader
-            titre="Contrôle d'accès"
-            description="Scanner et valider les billets à l'entrée"
+            :titre="$t('gestion.ticketing.access_control_title')"
+            :description="$t('gestion.ticketing.access_control_description')"
           />
         </div>
         <div class="flex items-center gap-2 sm:flex-shrink-0">

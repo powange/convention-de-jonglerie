@@ -21,8 +21,8 @@
       <!-- Titre de la page -->
       <div class="mb-6">
         <ManagementPageHeader
-          titre="Commandes et participants"
-          description="Consultez les commandes importées depuis votre billeterie externe et celles créées manuellement"
+          :titre="$t('gestion.ticketing.orders_title')"
+          :description="$t('gestion.ticketing.orders_description')"
         />
       </div>
 

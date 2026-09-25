@@ -641,13 +641,17 @@ function extractHardcodedTexts(filePath) {
     }
   }
 
-  // Attributs title, titre, placeholder, label, alt (excluant les bindings :)
+  // Attributs title, titre, description, placeholder, label, alt (excluant les bindings :)
   //
   // `titre` y figure depuis que les titres de page passent par `ManagementPageHeader` : sans lui,
   // un titre écrit en dur dans cet attribut échappait à ce contrôle. Le texte brut d'un `<h1>` lui
   // échappait déjà — la recherche ci-dessus exige que le texte tienne sur une seule ligne, ce qu'un
   // `<h1>` portant une icône ne fait jamais.
-  const attributeRegex = /(?<!:)(title|titre|placeholder|label|alt)="([^"]+)"/g
+  //
+  // `description` a suivi le jour où `titre` a révélé six titres français en dur : leurs six
+  // descriptions l'étaient aussi, et personne ne les voyait. Une liste d'attributs surveillés ne
+  // vaut que ce que vaut son exhaustivité.
+  const attributeRegex = /(?<!:)(title|titre|description|placeholder|label|alt)="([^"]+)"/g
   while ((match = attributeRegex.exec(template)) !== null) {
     const text = match[2].trim()
     if (text && !text.includes('$t') && !text.includes('t(')) {

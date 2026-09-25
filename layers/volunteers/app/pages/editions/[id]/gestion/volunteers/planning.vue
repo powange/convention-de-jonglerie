@@ -21,8 +21,8 @@
       <!-- Titre de la page -->
       <div class="mb-6">
         <ManagementPageHeader
-          titre="Planning des bénévoles"
-          description="Planifier les créneaux et missions des bénévoles"
+          :titre="$t('edition.volunteers.planning')"
+          :description="$t('gestion.volunteers.planning_description')"
         />
       </div>
 

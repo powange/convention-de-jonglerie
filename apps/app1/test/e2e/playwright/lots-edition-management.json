@@ -41,6 +41,7 @@
     "ticketing-handout-items.spec.ts"
   ],
   "gestion-2b": [
+    "defilement-panneau.spec.ts",
     "status.spec.ts",
     "stock.spec.ts",
     "swaps-mobile.spec.ts",
