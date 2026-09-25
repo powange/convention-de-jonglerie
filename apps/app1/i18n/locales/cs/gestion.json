@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Účinkující čísla",
+      "act_company_name": "Společnost nebo umělecké jméno",
+      "act_company_name_placeholder": "Např. Společnost Tří Kuželek",
       "act_default_title": "Číslo 1",
       "act_delete": "Smazat číslo",
       "act_delete_confirm": "Číslo „{name}“ bude odebráno ze seznamu. Odebrání se uplatní až po uložení.",

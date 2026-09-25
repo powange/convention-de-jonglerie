@@ -70,7 +70,9 @@ const canAccess = computed(() => {
 })
 
 interface ActInput {
+  id?: number
   title: string
+  companyName: string
   duration: number | string | null
   description: string | null
   technicalNeeds: string | null
@@ -90,6 +92,8 @@ const mapActsFromShow = (s: any): ActInput[] =>
     // en train d'y saisir ses besoins techniques.
     id: act.id,
     title: act.title || '',
+    // Vide et non `null` : `UInput` refuse `null`, et l'enregistrement reconvertit.
+    companyName: act.companyName ?? '',
     duration: act.duration ?? null,
     description: act.description ?? null,
     technicalNeeds: act.technicalNeeds ?? null,
@@ -133,6 +137,10 @@ const { execute: save, loading: saving } = useApiAction(
         .map((a) => ({
           id: a.id,
           title: a.title.trim(),
+          // ⚠️ Indispensable : la recomposition côté serveur écrit `companyName` à chaque
+          // enregistrement. Omettre ce champ ici l'y poserait à `null` — et effacerait, au premier
+          // enregistrement, le nom que l'import venait de reprendre de la candidature.
+          companyName: a.companyName.trim() || null,
           duration: a.duration ? Number(a.duration) : null,
           description: a.description || null,
           technicalNeeds: a.technicalNeeds || null,

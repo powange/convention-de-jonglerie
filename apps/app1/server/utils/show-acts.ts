@@ -23,6 +23,9 @@ export const showActSchema = z.object({
   // 191 et non 255 : c'est la taille de la colonne, un titre plus long ferait échouer
   // l'écriture au milieu de la recomposition
   title: z.string().min(1, 'Le titre du numéro est requis').max(191),
+  // 191 pour la même raison que le titre : c'est la taille de la colonne, et c'est aussi celle que
+  // `Show.companyName` accepte déjà — les deux champs disent la même chose à deux niveaux.
+  companyName: z.string().max(191).optional().nullable(),
   duration: z.number().int().positive().max(1440).optional().nullable(),
   // Plafonds alignés sur ceux de la candidature (validation-schemas) pour qu'un numéro importé
   // depuis une candidature reste éditable/ré-enregistrable via le formulaire.
@@ -90,6 +93,7 @@ export async function replaceShowComposition(
     for (const [index, act] of acts.entries()) {
       const donnees = {
         title: act.title,
+        companyName: act.companyName ?? null,
         position: index,
         duration: act.duration ?? null,
         description: act.description ?? null,

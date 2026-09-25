@@ -99,6 +99,7 @@ export default wrapApiHandler(
         showId: true,
         // Champs repris vers le numéro d'un cabaret ou vers un spectacle standard
         // (voir bloc de rattachement)
+        artistName: true,
         showTitle: true,
         showDescription: true,
         showDuration: true,
@@ -235,10 +236,11 @@ export default wrapApiHandler(
     let actCreated = false
     let actFieldsFilled = false
     let showTechNeedsAppended = false
+    let showCompanyNameSet = false
     const targetShow = application.showId
       ? await prisma.show.findUnique({
           where: { id: application.showId },
-          select: { type: true, technicalNeeds: true },
+          select: { type: true, technicalNeeds: true, companyName: true },
         })
       : null
 
@@ -249,6 +251,7 @@ export default wrapApiHandler(
       const actTitle = application.showTitle.slice(0, 191)
       const actFieldsSelect = {
         id: true,
+        companyName: true,
         duration: true,
         description: true,
         technicalNeeds: true,
@@ -269,6 +272,10 @@ export default wrapApiHandler(
           data: {
             showId: application.showId,
             title: actTitle,
+            // Le nom sous lequel la personne a candidaté. Il était jusqu'ici perdu à l'import :
+            // obligatoire pour le candidat, affiché partout dans l'appel à spectacle, et absent
+            // dès que la candidature devenait un numéro.
+            companyName: application.artistName,
             position: (lastAct?.position ?? -1) + 1,
             duration: application.showDuration,
             description: application.showDescription,
@@ -285,11 +292,14 @@ export default wrapApiHandler(
         // candidature après un premier import.
         const isBlank = (v: string | null) => v == null || v.trim() === ''
         const fill: {
+          companyName?: string
           duration?: number
           description?: string
           technicalNeeds?: string
           stageSetup?: string
         } = {}
+        if (isBlank(act.companyName) && !isBlank(application.artistName))
+          fill.companyName = application.artistName
         if (act.duration == null && application.showDuration != null)
           fill.duration = application.showDuration
         if (isBlank(act.description) && !isBlank(application.showDescription))
@@ -347,6 +357,28 @@ export default wrapApiHandler(
           showTechNeedsAppended = true
         }
       }
+
+      /*
+       * La compagnie du spectacle, si elle manque encore.
+       *
+       * `Show.companyName` existait déjà et son commentaire de schéma désigne exactement cet
+       * usage — « compagnie ou nom de scène de l'artiste qui porte le spectacle ». Rien ne
+       * l'écrivait pourtant en dehors du formulaire manuel : un spectacle créé depuis une
+       * candidature arrivait sans compagnie, le nom se trouvant juste à côté.
+       *
+       * Complété seulement s'il est vide, comme tout le reste de cet import : une saisie de
+       * l'organisateur ne se fait jamais écraser. Conséquence assumée quand plusieurs candidatures
+       * rejoignent le même spectacle standard — la première pose son nom, les suivantes non.
+       */
+      if (!application.artistName?.trim()) {
+        // Rien à reprendre.
+      } else if (!targetShow?.companyName?.trim()) {
+        await prisma.show.update({
+          where: { id: application.showId },
+          data: { companyName: application.artistName.trim() },
+        })
+        showCompanyNameSet = true
+      }
     }
 
     // Rien à faire : l'artiste existe déjà, pas de mise à jour, pas de lien ni de besoins ajoutés
@@ -355,6 +387,7 @@ export default wrapApiHandler(
       !showLinkCreated &&
       !artistDataApplied &&
       !showTechNeedsAppended &&
+      !showCompanyNameSet &&
       !actFieldsFilled
     ) {
       throw createError({
@@ -370,6 +403,7 @@ export default wrapApiHandler(
       actCreated,
       actFieldsFilled,
       showTechNeedsAppended,
+      showCompanyNameSet,
       artistDataApplied,
     })
   },

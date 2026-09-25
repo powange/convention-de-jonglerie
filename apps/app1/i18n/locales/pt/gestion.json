@@ -370,6 +370,8 @@
     },
     "shows": {
       "act_artists": "Artistas do número",
+      "act_company_name": "Companhia ou nome artístico",
+      "act_company_name_placeholder": "Ex.: Companhia das Três Maças",
       "act_default_title": "Número 1",
       "act_delete": "Eliminar o número",
       "act_delete_confirm": "O número «{name}» será removido da lista. A remoção só é aplicada ao guardar.",

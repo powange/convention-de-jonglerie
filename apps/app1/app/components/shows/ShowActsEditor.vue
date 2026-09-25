@@ -94,6 +94,15 @@
             </span>
           </UButton>
 
+          <!-- La compagnie, replié seulement : c'est le nom sous lequel le numéro se présente, et
+               souvent celui que l'organisateur cherche. -->
+          <p
+            v-if="!estDeplie(act) && act.companyName.trim()"
+            class="text-sm text-gray-500 dark:text-gray-400"
+          >
+            {{ act.companyName }}
+          </p>
+
           <!-- Ligne 3 : les artistes, replié seulement. Déplié, ils sont déjà dans le corps sous
                leur champ, et les répéter ici n'apprendrait rien. -->
           <div v-if="!estDeplie(act) && artistsOf(act).length > 0" class="flex flex-wrap gap-2">
@@ -118,6 +127,14 @@
             <UInput
               v-model="act.title"
               :placeholder="$t('gestion.shows.act_title_placeholder')"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField :label="$t('gestion.shows.act_company_name')" class="flex-1">
+            <UInput
+              v-model="act.companyName"
+              :placeholder="$t('gestion.shows.act_company_name_placeholder')"
               class="w-full"
             />
           </UFormField>
@@ -226,6 +243,14 @@ interface ActInput {
    */
   id?: number
   title: string
+  /**
+   * Compagnie ou nom de scène. Rempli à l'import d'une candidature, corrigeable ici.
+   *
+   * Une CHAÎNE et non `string | null`, contrairement aux champs voisins : `UInput` refuse `null` en
+   * `v-model`, et c'est précisément ce qui leur vaut une erreur de typage. Vide ici, le champ
+   * redevient `null` à l'enregistrement.
+   */
+  companyName: string
   duration: number | string | null
   description: string | null
   technicalNeeds: string | null
@@ -278,6 +303,7 @@ const add = () => {
   // nom à lire replié.
   const nouveau: ActInput = {
     title: '',
+    companyName: '',
     duration: null,
     description: null,
     technicalNeeds: null,

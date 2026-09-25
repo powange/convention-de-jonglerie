@@ -380,6 +380,8 @@
     },
     "shows": {
       "act_artists": "Artistes du numéro",
+      "act_company_name": "Compagnie ou nom de scène",
+      "act_company_name_placeholder": "Ex : Cie des Trois Massues",
       "act_default_title": "Numéro 1",
       "act_delete": "Supprimer le numéro",
       "act_delete_confirm": "Le numéro « {name} » sera retiré de la liste. Le retrait ne prend effet qu'à l'enregistrement.",

@@ -164,6 +164,13 @@ model ShowAct {
   id             Int      @id @default(autoincrement())
   showId         Int
   title          String
+  // Compagnie ou nom de scène des artistes du numéro. Le pendant de `Show.companyName`, qui ne
+  // vaut que pour un spectacle STANDARD : dans un cabaret, chaque numéro a la sienne.
+  //
+  // Rempli à l'import d'une candidature, depuis son `artistName` — sans quoi ce nom, obligatoire
+  // pour le candidat et affiché partout dans l'appel à spectacle, disparaissait au moment précis
+  // où la candidature devenait un numéro.
+  companyName    String?
   position       Int // Ordre de passage dans le déroulé du cabaret
   duration       Int? // En minutes
   description    String?  @db.Text

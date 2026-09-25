@@ -61,6 +61,7 @@
     "volunteer-notifications.spec.ts"
   ],
   "gestion-3b": [
+    "import-nom-de-compagnie.spec.ts",
     "stock-lot-mobile.spec.ts",
     "treasury.spec.ts",
     "volunteer-leader-visibility.spec.ts",
