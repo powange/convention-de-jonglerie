@@ -6,7 +6,7 @@
     <UCard>
       <div class="space-y-4">
         <div class="flex items-center gap-2">
-          <UIcon :name="icon" :class="iconClass" />
+          <UIcon :name="icone" :class="classeIcone" />
           <h2 class="text-lg font-semibold">{{ title }}</h2>
         </div>
         <slot />
@@ -16,15 +16,25 @@
 </template>
 
 <script setup lang="ts">
+import { categorieDeGestion } from '~/utils/categories-de-gestion'
+
 interface Props {
-  /** Identifiant repris dans l'URL : le garder stable, il est partageable. */
+  /**
+   * Identifiant repris dans l'URL : le garder stable, il est partageable.
+   *
+   * Il désigne aussi la catégorie dans le registre, d'où viennent l'icône et sa couleur. Celles-ci
+   * ne sont donc PAS des props : la barre latérale lit le même registre, et deux surfaces qui
+   * puisent à la même source ne peuvent plus se contredire.
+   */
   id: string
-  icon: string
-  iconClass?: string
   title: string
 }
 
-const props = withDefaults(defineProps<Props>(), { iconClass: 'text-primary-500' })
+const props = defineProps<Props>()
+
+const categorie = computed(() => categorieDeGestion(props.id))
+const icone = computed(() => categorie.value?.icone ?? 'i-heroicons-square-3-stack-3d')
+const classeIcone = computed(() => categorie.value?.classeIcone ?? 'text-primary-500')
 
 const racine = ref<HTMLElement | null>(null)
 const contexte = useCategoriesGestion()
@@ -37,8 +47,8 @@ onMounted(() =>
   contexte?.enregistrer({
     id: props.id,
     titre: props.title,
-    icone: props.icon,
-    classeIcone: props.iconClass,
+    icone: icone.value,
+    classeIcone: classeIcone.value,
     element: () => racine.value,
   })
 )
