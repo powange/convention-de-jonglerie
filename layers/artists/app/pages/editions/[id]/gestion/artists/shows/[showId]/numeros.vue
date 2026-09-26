@@ -159,7 +159,20 @@ onMounted(async () => {
   if (!edition.value || edition.value.id !== editionId.value) {
     await editionStore.fetchEditionById(editionId.value)
   }
-  await Promise.all([fetchShow(), fetchArtists()])
+
+  /*
+   * Les deux appels ne partent que si l'on a le droit de les faire.
+   *
+   * Ils partaient sans condition, et le serveur répondait deux 403 « Droits insuffisants » que le
+   * journal de production enregistrait — avant que la page n'affiche « accès refusé ». Rien ne
+   * cassait à l'écran, mais deux requêtes partaient en sachant qu'elles échoueraient.
+   *
+   * L'édition vient d'être chargée juste au-dessus : `canAccess` est donc connu ici, ce qui n'était
+   * pas le cas au montage.
+   */
+  if (canAccess.value) {
+    await Promise.all([fetchShow(), fetchArtists()])
+  }
   loadingShow.value = false
 })
 
