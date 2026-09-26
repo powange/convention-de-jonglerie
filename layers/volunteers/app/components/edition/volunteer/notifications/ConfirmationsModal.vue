@@ -1,5 +1,12 @@
 <template>
-  <UModal v-model:open="isOpen" :ui="{ width: 'sm:max-w-4xl' }">
+  <!--
+    `content` et non `width` : `width` n'est pas une clé du `:ui` d'`UModal` en Nuxt UI v4 — les
+    clés sont `overlay`, `content`, `header`, `body`… La largeur voulue n'était donc JAMAIS
+    appliquée, et la modale restait plus étroite que ce que son auteur avait écrit. Aucun
+    avertissement à l'écran ; seul le typage le signalait, à condition de lire les erreurs du fichier
+    plutôt que leur seul total.
+  -->
+  <UModal v-model:open="isOpen" :ui="{ content: 'sm:max-w-4xl' }">
     <template #header>
       <div class="flex items-center justify-between gap-2 w-full">
         <div class="flex items-center gap-2 min-w-0">
