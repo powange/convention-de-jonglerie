@@ -186,6 +186,52 @@ describe('/api/conventions/[id]/organizers/[organizerId] PUT', () => {
     expect(mockUpdateRole).toHaveBeenCalled()
   })
 
+  it('ne transmet AUCUN perEdition quand le corps ne porte que le titre', async () => {
+    /*
+     * Le sens de « non fourni », et ce qu'il protège.
+     *
+     * `updateOrganizerRights` supprime toutes les permissions par édition avant de les recréer dès
+     * que `perEdition` est fourni — et `[]` est vrai en JavaScript. « Mes conventions » envoyait un
+     * tableau vide par défaut : renommer un organisateur effaçait donc ses droits de module par
+     * édition. Ce point d'API doit transmettre `undefined` tel quel, sans le remplacer par un
+     * tableau, pour que la garde en aval puisse jouer.
+     */
+    global.readBody.mockResolvedValue({ title: 'Responsable billetterie' })
+    mockUpdateRole.mockResolvedValue({ id: 2, title: 'Responsable billetterie' })
+
+    await handler(mockEvent as any)
+
+    expect(mockUpdateRole).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Responsable billetterie', perEdition: undefined })
+    )
+  })
+
+  it('transmet les onze droits par édition sans en perdre en route', async () => {
+    // Le schéma dérive de la source unique : un droit ajouté y passe sans retoucher l'endpoint.
+    const perEdition = [
+      {
+        editionId: 42,
+        canEdit: true,
+        canDelete: false,
+        canManageVolunteers: true,
+        canManageArtists: true,
+        canManageMeals: true,
+        canManageTicketing: true,
+        canManageTasks: true,
+        canManageStock: true,
+        canManageWorkshops: true,
+        canManageFAQ: true,
+        canManageTreasury: true,
+      },
+    ]
+    global.readBody.mockResolvedValue({ perEdition })
+    mockUpdateRole.mockResolvedValue({ id: 2 })
+
+    await handler(mockEvent as any)
+
+    expect(mockUpdateRole).toHaveBeenCalledWith(expect.objectContaining({ perEdition }))
+  })
+
   it('devrait gérer les erreurs de base de données', async () => {
     const requestBody = { rights: { manageOrganizers: true } }
     global.readBody.mockResolvedValue(requestBody)

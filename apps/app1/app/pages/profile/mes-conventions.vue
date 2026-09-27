@@ -474,7 +474,15 @@ const { execute: executeSaveOrganizer, loading: savingOrganizer } = useApiAction
     body: () => ({
       rights: saveOrgRights.value?.rights,
       title: saveOrgRights.value?.title,
-      perEdition: saveOrgRights.value?.perEdition || [],
+      /*
+       * Sans `|| []`, et c'est le cœur du correctif.
+       *
+       * Le serveur ne remplace les permissions par édition que si `perEdition` est FOURNI. Or `[]`
+       * est vrai en JavaScript : envoyer un tableau vide passait donc la garde, effaçait toutes les
+       * permissions et n'en recréait aucune. `undefined` dit « je n'y touche pas », ce que la page
+       * de gestion d'une édition faisait déjà — les deux écrans parlent enfin le même langage.
+       */
+      perEdition: saveOrgRights.value?.perEdition,
     }),
     successMessage: { title: t('gestion.organizers.organizer_updated') },
     errorMessages: { default: t('errors.update_organizer_error') },
