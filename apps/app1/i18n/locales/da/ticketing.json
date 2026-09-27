@@ -315,7 +315,10 @@
       "artists": "Kunstnere",
       "organizers": "Organisatorer",
       "participants": "Deltagere",
-      "volunteers": "Frivillige"
+      "volunteers": "Frivillige",
+      "count_per_person": "[TODO] par personne",
+      "count_per_ticket": "[TODO] par billet",
+      "count_toggle_hint": "[TODO] Cliquer pour compter par personne : deux billets au même nom et prénom comptent alors pour une seule personne"
     },
     "tiers": {
       "created": "Pris oprettet med succes",

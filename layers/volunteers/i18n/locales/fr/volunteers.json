@@ -628,6 +628,7 @@
     "total_recipients": "Total destinataires",
     "untitled_slot": "Créneau sans titre",
     "update_error": "Erreur lors de la mise à jour",
+    "validation_summary_title": "Il manque des informations pour envoyer votre candidature",
     "vehicle_details_hint": "Ces informations aideront les organisateurs pour la logistique",
     "vehicle_details_label": "Détails sur votre véhicule",
     "vehicle_details_placeholder": "Type de véhicule, nombre de places, capacité de chargement...",

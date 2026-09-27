@@ -563,29 +563,56 @@
     </template>
 
     <template #footer="{ close }">
-      <div class="flex justify-end gap-2 w-full">
-        <UButton
-          size="lg"
-          variant="ghost"
-          :disabled="applying"
-          @click="
-            () => {
-              close()
-              $emit('close')
-            }
-          "
-          >{{ t('common.cancel') }}</UButton
+      <div class="flex flex-col gap-3 w-full">
+        <!-- Le récapitulatif de ce qui manque, dans le pied : il reste sous les yeux au moment où
+             l'on appuie, alors qu'un champ fautif peut se trouver très haut dans un formulaire
+             d'une trentaine de champs. Il n'apparaît qu'après une tentative d'envoi — l'afficher
+             à l'ouverture reprocherait au candidat de n'avoir rien rempli. -->
+        <UAlert
+          v-if="showAllErrors && validationErrors.length > 0"
+          data-testid="recapitulatif-validation"
+          color="error"
+          variant="subtle"
+          icon="i-heroicons-exclamation-triangle"
+          :title="t('volunteers.validation_summary_title')"
         >
-        <UButton
-          size="lg"
-          color="primary"
-          :loading="applying"
-          :disabled="applying || !isFormValid || props.apercu"
-          icon="i-heroicons-paper-airplane"
-          @click="handleSubmit"
-        >
-          {{ props.isEditing ? t('common.save') : t('volunteers.apply') }}
-        </UButton>
+          <template #description>
+            <ul class="list-disc list-inside space-y-0.5">
+              <li v-for="message in validationErrors" :key="message">{{ message }}</li>
+            </ul>
+          </template>
+        </UAlert>
+        <div class="flex justify-end gap-2 w-full">
+          <UButton
+            size="lg"
+            variant="ghost"
+            :disabled="applying"
+            @click="
+              () => {
+                close()
+                $emit('close')
+              }
+            "
+            >{{ t('common.cancel') }}</UButton
+          >
+          <!-- Toujours accessible, même quand la saisie est incomplète : c'est le clic qui
+               déclenche la validation cliente et fait apparaître les erreurs. Désactiver le bouton
+               rendait tout le dispositif inatteignable — `handleSubmit` n'était jamais appelé,
+               donc `showAllErrors` restait faux, donc aucun champ ne s'encadrait. Le candidat
+               n'avait qu'un bouton mort, sans rien pour comprendre. Rien ne part pour autant :
+               `handleSubmit` n'émet que si les règles sont satisfaites. -->
+          <UButton
+            size="lg"
+            color="primary"
+            data-testid="envoyer-candidature"
+            :loading="applying"
+            :disabled="applying || props.apercu"
+            icon="i-heroicons-paper-airplane"
+            @click="handleSubmit"
+          >
+            {{ props.isEditing ? t('common.save') : t('volunteers.apply') }}
+          </UButton>
+        </div>
       </div>
     </template>
   </UModal>

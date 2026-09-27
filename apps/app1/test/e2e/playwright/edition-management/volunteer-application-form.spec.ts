@@ -154,11 +154,30 @@ test.describe.serial('Formulaire de candidature bénévole (parcours interface)'
      */
     await expect(modale.getByText(/n['’]est pas valide/i).first()).toBeVisible({ timeout: 10000 })
 
-    // 2. Tant que le refus tient, l'envoi est impossible.
-    await expect(envoyer).toBeDisabled()
+    /*
+     * 2. Le bouton reste ACCESSIBLE, et son clic n'envoie rien.
+     *
+     * Il était désactivé tant que la saisie était invalide. C'était le refus le plus muet
+     * possible : `handleSubmit` — qui déclenche l'affichage de TOUTES les erreurs — n'était
+     * jamais appelé, un bouton désactivé n'émettant pas de clic. Un champ jamais touché restait
+     * donc silencieux, et le candidat n'avait qu'un bouton mort, sans rien pour comprendre.
+     *
+     * On vérifie les deux moitiés du nouveau contrat : le bouton s'actionne, et rien ne part.
+     */
+    await expect(envoyer).toBeEnabled()
 
-    // 3. Corriger doit lever le refus ET réactiver l'envoi — sans quoi on ne peut plus
-    //    corriger ce que le formulaire vient justement de reprocher.
+    let envoiTente = false
+    page.on('request', (requete) => {
+      if (requete.url().includes('/volunteers/applications') && requete.method() === 'POST') {
+        envoiTente = true
+      }
+    })
+    await envoyer.click()
+    await expect(modale.getByText(/n['’]est pas valide/i).first()).toBeVisible()
+    expect(envoiTente, 'une candidature invalide a été envoyée au serveur').toBe(false)
+
+    // 3. Corriger doit lever le refus — sans quoi on ne peut plus corriger ce que le formulaire
+    //    vient justement de reprocher.
     await numero.fill(TELEPHONE_VALIDE)
     await expect(modale.getByText(/n['’]est pas valide/i)).toHaveCount(0)
     await expect(envoyer).toBeEnabled({ timeout: 10000 })

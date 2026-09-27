@@ -648,6 +648,7 @@
     "volunteers_summary": "Sammanfattning av volontärerna",
     "what_you_can_bring_title": "Vad du kan göra för oss",
     "with_you_on_slot": "Tillsammans med dig på detta pass: | Tillsammans med dig på detta pass ({count}):",
-    "withdraw": "Återkalla min ansökan"
+    "withdraw": "Återkalla min ansökan",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }

@@ -648,6 +648,7 @@
     "volunteers_summary": "Riepilogo volontari",
     "what_you_can_bring_title": "Cosa può portarci",
     "with_you_on_slot": "Con te in questo turno: | Con te in questo turno ({count}):",
-    "withdraw": "Ritira la mia candidatura"
+    "withdraw": "Ritira la mia candidatura",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }

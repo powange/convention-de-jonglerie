@@ -648,6 +648,7 @@
     "volunteers_summary": "Shrnutí dobrovolníků",
     "what_you_can_bring_title": "Co pro nás můžete udělat",
     "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):",
-    "withdraw": "Stáhnout svou žádost"
+    "withdraw": "Stáhnout svou žádost",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }
