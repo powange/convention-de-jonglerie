@@ -43,6 +43,29 @@ export function transformCarpoolOffer(offer: any, viewerId?: number) {
     !!viewerId && bookings.some((b: any) => b.status === 'ACCEPTED' && b.requesterId === viewerId)
   const canSeeOfferPhone = viewerIsOwner || viewerHasAccepted
 
+  /*
+   * Les réservations exposées : tout pour le conducteur, les ACCEPTED seules pour les autres.
+   *
+   * Ces deux points d'API sont PUBLICS — la liste des offres d'une édition et le détail d'une
+   * offre. Ils rendaient jusqu'ici TOUTES les réservations de chaque offre, avec leur message et
+   * leur demandeur, à n'importe quel visiteur. Un message de réservation est adressé au conducteur
+   * seul, et le fait qu'une demande soit en attente ou refusée ne regarde pas les tiers.
+   *
+   * `GET /carpool-offers/:id/bookings` appliquait déjà la bonne règle de son côté : le conducteur
+   * voit tout, un tiers authentifié ne voit que ses propres réservations, un anonyme aucune. Le
+   * présent filtre est plus permissif sur un point, et délibérément : les ACCEPTED restent
+   * visibles, parce que les deux composants du client en ont besoin pour afficher qui est à bord —
+   * et parce que `passengers`, juste au-dessus, expose déjà ces mêmes personnes publiquement.
+   *
+   * ⚠️ `remainingSeats` se calcule sur la liste COMPLÈTE, plus bas : il compte des places prises,
+   * pas des réservations montrées. Le brancher sur la liste filtrée donnerait le bon chiffre par
+   * accident aujourd'hui — les ACCEPTED étant justement celles qu'on garde — et un chiffre faux au
+   * premier resserrement de ce filtre.
+   */
+  const bookingsVisibles = viewerIsOwner
+    ? bookings
+    : bookings.filter((b: any) => b.status === 'ACCEPTED')
+
   return {
     id: offer.id,
     editionId: offer.editionId,
@@ -73,12 +96,15 @@ export function transformCarpoolOffer(offer: any, viewerId?: number) {
       addedAt: passenger.addedAt,
       user: transformUser(passenger.user),
     })),
-    bookings: bookings.map((b: any) => ({
+    bookings: bookingsVisibles.map((b: any) => ({
       id: b.id,
       carpoolOfferId: b.carpoolOfferId,
       requestId: b.requestId,
       seats: b.seats,
-      message: b.message,
+      // Le message n'accompagne la réservation que pour le conducteur : c'est à lui qu'il est
+      // adressé. Un tiers n'en reçoit pas, même s'il s'agit du sien — il le relit par
+      // `GET /carpool-offers/:id/bookings`, qui le lui rend.
+      ...(viewerIsOwner ? { message: b.message } : {}),
       status: b.status,
       createdAt: b.createdAt,
       updatedAt: b.updatedAt,
