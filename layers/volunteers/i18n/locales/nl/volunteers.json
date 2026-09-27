@@ -648,6 +648,7 @@
     "volunteers_summary": "Vrijwilligers samenvatting",
     "what_you_can_bring_title": "Wat u ons kunt brengen",
     "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):",
-    "withdraw": "Trek mijn aanmelding in"
+    "withdraw": "Trek mijn aanmelding in",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }

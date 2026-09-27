@@ -648,6 +648,7 @@
     "volunteers_summary": "Сводка волонтёров",
     "what_you_can_bring_title": "Что вы можете нам принести",
     "with_you_on_slot": "С вами на этой смене: | С вами на этой смене ({count}):",
-    "withdraw": "Отозвать мою заявку"
+    "withdraw": "Отозвать мою заявку",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }

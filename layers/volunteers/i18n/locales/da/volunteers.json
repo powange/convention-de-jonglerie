@@ -648,6 +648,7 @@
     "volunteers_summary": "Frivilligt resumé",
     "what_you_can_bring_title": "Hvad du kan bringe os",
     "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):",
-    "withdraw": "Træk min ansøgning tilbage"
+    "withdraw": "Træk min ansøgning tilbage",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }

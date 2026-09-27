@@ -648,6 +648,7 @@
     "volunteers_summary": "Resumo de voluntários",
     "what_you_can_bring_title": "O que você pode nos trazer",
     "with_you_on_slot": "Consigo neste turno: | Consigo neste turno ({count}):",
-    "withdraw": "Retirar minha inscrição"
+    "withdraw": "Retirar minha inscrição",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }

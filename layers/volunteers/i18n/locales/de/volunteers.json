@@ -648,6 +648,7 @@
     "volunteers_summary": "Freiwilligen-Zusammenfassung",
     "what_you_can_bring_title": "Was Sie uns bringen können",
     "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):",
-    "withdraw": "Meine Bewerbung zurückziehen"
+    "withdraw": "Meine Bewerbung zurückziehen",
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
   }
 }
