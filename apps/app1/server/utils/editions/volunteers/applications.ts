@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { equipeRecoupeLesDisponibilites } from '../../../../shared/utils/periodes-equipe'
 import {
   FORME_TELEPHONE,
   TELEPHONE_MAX,
@@ -297,7 +298,13 @@ export async function validateTeamPreferences(
     // Récupérer les équipes du nouveau système
     const validTeams = await prisma.volunteerTeam.findMany({
       where: { eventId: editionId },
-      select: { id: true, name: true },
+      select: {
+        id: true,
+        name: true,
+        coversSetup: true,
+        coversEvent: true,
+        coversTeardown: true,
+      },
     })
 
     const validTeamIds = validTeams.map((team) => team.id)
@@ -308,6 +315,30 @@ export async function validateTeamPreferences(
     if (invalidTeams.length > 0) {
       errors.push(
         `Équipes invalides : ${invalidTeams.join(', ')}. Équipes valides : ${validTeamNames.join(', ')}`
+      )
+    }
+
+    /*
+     * Une équipe n'intervient pas forcément sur toute la convention, et le formulaire ne propose
+     * déjà que celles qui recoupent les disponibilités annoncées. Le redire ici n'est pas une
+     * redondance : sans ce refus, la règle du navigateur ne serait que décorative, et une
+     * candidature écrite à la main — ou construite avant que le candidat ne change ses
+     * disponibilités — placerait quelqu'un dans une équipe qui n'existe pas quand il est là.
+     *
+     * Même règle, même module que le formulaire : `equipeRecoupeLesDisponibilites`.
+     */
+    const horsPeriode = validTeams.filter(
+      (team) =>
+        parsed.teamPreferences!.includes(team.id) &&
+        !equipeRecoupeLesDisponibilites(team, {
+          setupAvailability: parsed.setupAvailability,
+          eventAvailability: parsed.eventAvailability,
+          teardownAvailability: parsed.teardownAvailability,
+        })
+    )
+    if (horsPeriode.length > 0) {
+      errors.push(
+        `Équipes hors de vos périodes de présence : ${horsPeriode.map((t) => t.name).join(', ')}`
       )
     }
   }

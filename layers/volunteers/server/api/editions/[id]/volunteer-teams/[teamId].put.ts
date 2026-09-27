@@ -4,6 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId, validateStringResourceId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { equipeCouvreAuMoinsUnePeriode } from '~~/shared/utils/periodes-equipe'
 
 const updateTeamSchema = z.object({
   name: z.string().min(1, "Le nom de l'équipe est requis").max(100).optional(),
@@ -19,6 +20,9 @@ const updateTeamSchema = z.object({
   isAutonomousTeam: z.boolean().optional(),
   isMealValidationTeam: z.boolean().optional(),
   isVisibleToVolunteers: z.boolean().optional(),
+  coversSetup: z.boolean().optional(),
+  coversEvent: z.boolean().optional(),
+  coversTeardown: z.boolean().optional(),
 })
 
 export default wrapApiHandler(
@@ -84,6 +88,28 @@ export default wrapApiHandler(
       updateData.isMealValidationTeam = body.isMealValidationTeam
     if (body.isVisibleToVolunteers !== undefined)
       updateData.isVisibleToVolunteers = body.isVisibleToVolunteers
+    if (body.coversSetup !== undefined) updateData.coversSetup = body.coversSetup
+    if (body.coversEvent !== undefined) updateData.coversEvent = body.coversEvent
+    if (body.coversTeardown !== undefined) updateData.coversTeardown = body.coversTeardown
+
+    /*
+     * Au moins une période, contrôlé APRÈS fusion avec l'équipe existante.
+     *
+     * Une garde dans le schéma refuserait à tort un appel qui ne touche pas aux périodes — ce point
+     * d'API est une mise à jour partielle. Et décocher la seule période restante est justement le
+     * geste qui mène à l'état incohérent : l'équipe ne serait plus proposée à personne.
+     */
+    const periodesApresMiseAJour = {
+      coversSetup: body.coversSetup ?? existingTeam.coversSetup,
+      coversEvent: body.coversEvent ?? existingTeam.coversEvent,
+      coversTeardown: body.coversTeardown ?? existingTeam.coversTeardown,
+    }
+    if (!equipeCouvreAuMoinsUnePeriode(periodesApresMiseAJour)) {
+      throw createError({
+        status: 400,
+        message: 'Une équipe doit couvrir au moins une période : montage, événement ou démontage',
+      })
+    }
 
     // Une équipe non visible ne peut pas être obligatoire
     const willBeInvisible =

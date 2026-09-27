@@ -649,6 +649,9 @@
     "what_you_can_bring_title": "Cosa può portarci",
     "with_you_on_slot": "Con te in questo turno: | Con te in questo turno ({count}):",
     "withdraw": "Ritira la mia candidatura",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
+    "team_periods": "[TODO] Périodes d'intervention",
+    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
+    "team_periods_required": "[TODO] Cochez au moins une période"
   }
 }
