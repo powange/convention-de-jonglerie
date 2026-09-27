@@ -731,10 +731,19 @@ const stats = ref({
   ticketsValidated: 0,
   volunteersValidated: 0,
   artistsValidated: 0,
+  // Les organisateurs manquaient à cet objet alors que la carte les attend : le point d'API les
+  // renvoie, mais le premier rendu — avant la réponse — les laissait à `undefined`.
+  organizersValidated: 0,
+  organizersValidatedToday: 0,
+  totalOrganizers: 0,
   ticketsValidatedToday: 0,
   volunteersValidatedToday: 0,
   artistsValidatedToday: 0,
   totalTickets: 0,
+  // Les mêmes participants comptés par personne : la tuile bascule de l'un à l'autre au clic.
+  personnesValidated: 0,
+  personnesValidatedToday: 0,
+  totalPersonnes: 0,
   totalVolunteers: 0,
   totalArtists: 0,
 })

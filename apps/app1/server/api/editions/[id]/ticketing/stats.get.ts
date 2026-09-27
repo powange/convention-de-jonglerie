@@ -1,6 +1,7 @@
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 import { billetsQuiComptent, estUnParticipant } from '#server/utils/ticketing/billets-qui-comptent'
+import { compterLesParticipants } from '~~/shared/utils/participants-par-personne'
 
 export default wrapApiHandler(
   async (event) => {
@@ -20,25 +21,33 @@ export default wrapApiHandler(
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
-      // Compter les validations de billets (uniquement les tarifs avec countAsParticipant = true)
-      const ticketsValidatedToday = await prisma.ticketingOrderItem.count({
+      /*
+       * Les billets qui comptent comme participants, lus UNE fois.
+       *
+       * Trois `count()` tenaient ce rôle. Une seule lecture les remplace parce que le contrôle
+       * d'accès affiche désormais deux comptes — par billet et par personne — et que les tirer de
+       * requêtes séparées les laisserait se contredire à l'écran dès qu'une validation tombe entre
+       * deux : un total regroupé supérieur au total par billet se lirait comme un bug.
+       *
+       * Quatre colonnes par ligne, sur les seuls billets d'une édition : la charge reste celle
+       * d'un des `count()` remplacés.
+       */
+      const billetsParticipants = await prisma.ticketingOrderItem.findMany({
         where: {
           ...billetsQuiComptent(editionId),
           ...estUnParticipant,
+        },
+        select: {
+          firstName: true,
+          lastName: true,
           entryValidated: true,
-          entryValidatedAt: {
-            gte: today,
-          },
+          entryValidatedAt: true,
         },
       })
 
-      const totalTicketsValidated = await prisma.ticketingOrderItem.count({
-        where: {
-          ...billetsQuiComptent(editionId),
-          ...estUnParticipant,
-          entryValidated: true,
-        },
-      })
+      const participants = compterLesParticipants(billetsParticipants, today)
+      const ticketsValidatedToday = participants.billets.validesAujourdhui
+      const totalTicketsValidated = participants.billets.valides
 
       // Compter les validations de bénévoles (uniquement ACCEPTED et disponibles pendant l'événement)
       const volunteersValidatedToday = await prisma.editionVolunteerApplication.count({
@@ -112,13 +121,8 @@ export default wrapApiHandler(
         },
       })
 
-      // Compter le nombre total de billets (uniquement les tarifs avec countAsParticipant = true)
-      const totalTickets = await prisma.ticketingOrderItem.count({
-        where: {
-          ...billetsQuiComptent(editionId),
-          ...estUnParticipant,
-        },
-      })
+      // Le total de billets sort de la même lecture que les validations, ci-dessus.
+      const totalTickets = participants.billets.total
 
       const totalVolunteers = await prisma.editionVolunteerApplication.count({
         where: {
@@ -169,6 +173,14 @@ export default wrapApiHandler(
           artistsValidatedToday: artistsValidatedToday,
           organizersValidatedToday: organizersValidatedToday,
           totalTickets: totalTickets,
+          /*
+           * Les mêmes participants comptés par PERSONNE : deux billets au même nom et prénom font
+           * une seule personne. Le contrôle d'accès bascule d'une lecture à l'autre au clic, sans
+           * nouvelle requête — d'où les deux comptes rendus ensemble.
+           */
+          personnesValidated: participants.personnes.valides,
+          personnesValidatedToday: participants.personnes.validesAujourdhui,
+          totalPersonnes: participants.personnes.total,
           totalVolunteers: totalVolunteers,
           totalArtists: totalArtists,
           totalOrganizers: totalOrganizers,

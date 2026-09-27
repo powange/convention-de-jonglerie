@@ -17,10 +17,10 @@
                 {{ $t('edition.ticketing.total_entries') }}
               </p>
               <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ stats.totalValidated }}
+                {{ totalValide }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                {{ stats.validatedToday }}
+                {{ totalAujourdhui }}
                 {{ $t('edition.ticketing.validated_today').toLowerCase() }}
               </p>
             </div>
@@ -28,8 +28,14 @@
           </div>
         </div>
 
-        <!-- Participants (billets) -->
-        <div :class="`p-4 ${ticketConfig.bgClass} ${ticketConfig.darkBgClass} rounded-lg`">
+        <!-- Participants : par billet, ou regroupés par personne au clic -->
+        <button
+          :class="`p-4 ${ticketConfig.bgClass} ${ticketConfig.darkBgClass} ${ticketConfig.hoverBgClass} ${ticketConfig.darkHoverBgClass} rounded-lg transition-colors cursor-pointer text-left w-full`"
+          :aria-pressed="parPersonne"
+          :title="$t('ticketing.stats.count_toggle_hint')"
+          type="button"
+          @click="parPersonne = !parPersonne"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -38,15 +44,27 @@
               <p
                 :class="`text-2xl font-bold ${ticketConfig.textClass} ${ticketConfig.darkTextClass}`"
               >
-                {{ stats.ticketsValidated }} / {{ stats.totalTickets }}
+                {{ participantsValides }} / {{ participantsTotal }}
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                {{ stats.ticketsValidatedToday }} aujourd'hui
+                {{ participantsAujourdhui }} aujourd'hui
+              </p>
+              <!-- Le mode est écrit, jamais deviné : sans cette ligne, deux chiffres différents
+                   s'affichent au même endroit sans que rien ne dise pourquoi. -->
+              <p
+                class="text-xs text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1 font-medium"
+              >
+                <UIcon :name="parPersonne ? 'i-heroicons-user' : 'i-heroicons-ticket'" />
+                {{
+                  parPersonne
+                    ? $t('ticketing.stats.count_per_person')
+                    : $t('ticketing.stats.count_per_ticket')
+                }}
               </p>
             </div>
             <UIcon :name="ticketConfig.icon" :class="ticketConfig.iconColorClass" size="32" />
           </div>
-        </div>
+        </button>
 
         <!-- Bénévoles -->
         <button
@@ -137,12 +155,16 @@ interface EntryStats {
   artistsValidatedToday: number
   organizersValidatedToday: number
   totalTickets: number
+  /** Les mêmes participants comptés par personne : deux billets au même nom font un. */
+  personnesValidated: number
+  personnesValidatedToday: number
+  totalPersonnes: number
   totalVolunteers: number
   totalArtists: number
   totalOrganizers: number
 }
 
-defineProps<{
+const props = defineProps<{
   stats: EntryStats
 }>()
 
@@ -159,4 +181,66 @@ const ticketConfig = getParticipantTypeConfig('ticket')
 const volunteerConfig = getParticipantTypeConfig('volunteer')
 const artistConfig = getParticipantTypeConfig('artist')
 const organizerConfig = getParticipantTypeConfig('organizer')
+
+/*
+ * Compter par personne plutôt que par billet.
+ *
+ * Quelqu'un qui prend un billet vendredi et un billet samedi comptait deux fois — au numérateur
+ * comme au dénominateur. Les deux lectures sont vraies et répondent à deux questions : combien de
+ * billets ont été scannés, combien de personnes sont entrées. Un clic sur la tuile passe de l'une
+ * à l'autre, un second revient ; le mode par billet reste celui de départ.
+ *
+ * Les deux jeux de chiffres arrivent ensemble dans `stats` : la bascule n'attend aucune requête.
+ */
+const CLE_DE_MEMOIRE = 'cdj-controle-acces-par-personne'
+const parPersonne = ref(false)
+
+// Lu au montage et non pendant le `setup` : le serveur ne connaît pas ce choix, et un rendu qui en
+// dépendrait ne correspondrait pas à celui du navigateur.
+onMounted(() => {
+  try {
+    parPersonne.value = localStorage.getItem(CLE_DE_MEMOIRE) === '1'
+  } catch {
+    // Navigation privée, stockage refusé : le mode par billet fait un défaut acceptable.
+  }
+})
+
+watch(parPersonne, (actif) => {
+  try {
+    localStorage.setItem(CLE_DE_MEMOIRE, actif ? '1' : '0')
+  } catch {
+    // Sans mémoire, la bascule vaut pour la visite en cours — c'est déjà l'essentiel.
+  }
+})
+
+const participantsValides = computed(() =>
+  parPersonne.value ? props.stats.personnesValidated : props.stats.ticketsValidated
+)
+const participantsTotal = computed(() =>
+  parPersonne.value ? props.stats.totalPersonnes : props.stats.totalTickets
+)
+const participantsAujourdhui = computed(() =>
+  parPersonne.value ? props.stats.personnesValidatedToday : props.stats.ticketsValidatedToday
+)
+
+/*
+ * La tuile « Total » suit le même mode, sans quoi deux tuiles voisines se contrediraient : elle
+ * additionne billets, bénévoles, artistes et organisateurs, et continuerait de compter les billets
+ * en double.
+ *
+ * On échange la seule part des billets au lieu de refaire la somme : si une catégorie s'ajoute un
+ * jour au total, elle sera reprise sans que ce calcul ait à le savoir.
+ */
+const totalValide = computed(() =>
+  parPersonne.value
+    ? props.stats.totalValidated - props.stats.ticketsValidated + props.stats.personnesValidated
+    : props.stats.totalValidated
+)
+const totalAujourdhui = computed(() =>
+  parPersonne.value
+    ? props.stats.validatedToday -
+      props.stats.ticketsValidatedToday +
+      props.stats.personnesValidatedToday
+    : props.stats.validatedToday
+)
 </script>
