@@ -22,7 +22,7 @@
           trailing-icon="i-heroicons-chevron-down"
           :data-state="deplie ? 'open' : 'closed'"
           :aria-expanded="deplie"
-          @click="deplie = !deplie"
+          @click="basculer"
         >
           <span class="text-lg font-semibold flex items-center gap-2 min-w-0">
             <UIcon :name="icone" :class="classeIcone" />
@@ -71,6 +71,38 @@ const props = withDefaults(
 const estBureau = useMediaQuery('(min-width: 640px)')
 
 const deplie = ref(props.deplieParDefaut)
+
+/**
+ * L'utilisateur a-t-il lui-même ouvert ou fermé la carte&nbsp;?
+ *
+ * Tant qu'il n'y a pas touché, l'état par défaut peut encore changer d'avis — voir le `watch`
+ * ci-dessous. Dès qu'il y touche, son geste l'emporte définitivement : rien ne doit refermer sous
+ * ses yeux une carte qu'il vient d'ouvrir, ni rouvrir celle qu'il vient de replier.
+ */
+const toucheParLUtilisateur = ref(false)
+
+function basculer() {
+  toucheParLUtilisateur.value = true
+  deplie.value = !deplie.value
+}
+
+/**
+ * Suivre un défaut qui arrive APRÈS le montage.
+ *
+ * `deplieParDefaut` dépend souvent d'une donnée encore absente au premier rendu : sur la page de
+ * bénévolat, la carte s'ouvre pour qui n'a pas encore candidaté, et la candidature n'est connue
+ * qu'après la session, elle-même chargée en retard. Lire le défaut une seule fois à l'initialisation
+ * — `ref(props.deplieParDefaut)` — donnait donc « ouverte » à TOUT LE MONDE : au moment du calcul,
+ * personne n'a encore de candidature.
+ *
+ * Le défaut est donc suivi jusqu'au premier geste de l'utilisateur, et plus jamais après.
+ */
+watch(
+  () => props.deplieParDefaut,
+  (valeur) => {
+    if (!toucheParLUtilisateur.value) deplie.value = valeur
+  }
+)
 
 const repliableIci = computed(() => props.repliableSurMobile && !estBureau.value)
 const ouverte = computed(() => !repliableIci.value || deplie.value)
