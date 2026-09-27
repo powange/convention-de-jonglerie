@@ -165,10 +165,18 @@
         />
       </ClientOnly>
 
+      <!-- Ouverte d'emblée pour qui n'a pas encore candidaté : c'est la carte qui porte le bouton
+           de candidature et la présentation du bénévolat, donc tout ce qu'un nouveau venu est là
+           pour lire. Une fois la candidature déposée, elle se replie sur mobile comme les autres —
+           l'essentiel devient alors ses créneaux, juste au-dessus.
+
+           `myApplication` n'arrive qu'après la session : c'est pourquoi `CarteRepliable` suit ce
+           défaut jusqu'au premier geste de l'utilisateur, au lieu de le lire une seule fois. -->
       <EditionVolunteerCarteRepliable
         :titre="t('edition.volunteers.title')"
         icone="i-heroicons-hand-raised"
         repliable-sur-mobile
+        :deplie-par-defaut="!myApplication"
         class="mb-6"
       >
         <template #actions>
