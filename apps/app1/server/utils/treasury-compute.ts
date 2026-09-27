@@ -1,3 +1,5 @@
+import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
+
 /**
  * Calcul des charges et produits d'une édition.
  *
@@ -40,6 +42,8 @@ export interface TreasuryLine extends TreasuryAmounts {
   isForecast?: boolean
   /** Dépense avancée de sa poche, et son état de remboursement. */
   advancedBy?: PersonneAvance | null
+  /** La même avance quand la personne n'a pas de compte : son nom, saisi librement. */
+  advancedByName?: string | null
   reimbursed?: boolean
   /** Vrai pour les lignes calculées : elles se corrigent à la source, pas ici. */
   readOnly: boolean
@@ -96,6 +100,7 @@ export interface ManualEntryRow {
   isForecast?: boolean
   reimbursed?: boolean
   advancedBy?: PersonneAvance | null
+  advancedByName?: string | null
 }
 
 /** Qui a avancé une dépense — juste de quoi l'afficher et la totaliser. */
@@ -329,6 +334,7 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
       imageUrl: entry.imageUrl,
       isForecast: entry.isForecast ?? false,
       advancedBy: entry.advancedBy ?? null,
+      advancedByName: entry.advancedByName ?? null,
       reimbursed: entry.reimbursed ?? false,
       readOnly: false,
       // Une ligne saisie à la main est réglée par défaut. Marquée prévisionnelle, elle passe en
@@ -377,23 +383,49 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
  * a donc rien à rembourser. Le montant retenu est celui réglé de la ligne, pas son montant brut.
  */
 export function avancesARembourser(lines: TreasuryLine[]): AvancesARembourser {
-  const parPersonne = new Map<number, { personne: PersonneAvance; montant: number }>()
+  /*
+   * La clé porte l'origine de l'avance, et c'est ce qui empêche deux confusions symétriques :
+   * un compte d'identifiant 7 et un nom libre ne se rejoignent jamais, et deux écritures d'un
+   * même nom libre se rejoignent toujours. C'est aussi cette clé que le remboursement en lot
+   * reçoit — il doit solder EXACTEMENT les lignes totalisées ici.
+   */
+  const parBeneficiaire = new Map<string, BeneficiaireAvance & { montant: number }>()
 
   for (const line of lines) {
-    if (line.kind !== 'EXPENSE' || line.reimbursed || !line.advancedBy || !line.settled) continue
+    if (line.kind !== 'EXPENSE' || line.reimbursed || !line.settled) continue
 
-    const deja = parPersonne.get(line.advancedBy.id)
-    if (deja) deja.montant += line.settled
-    else parPersonne.set(line.advancedBy.id, { personne: line.advancedBy, montant: line.settled })
+    const cleNom = line.advancedBy ? null : cleDuNomAvance(line.advancedByName)
+    if (!line.advancedBy && !cleNom) continue
+
+    const cle = line.advancedBy ? `u:${line.advancedBy.id}` : `n:${cleNom}`
+    const deja = parBeneficiaire.get(cle)
+    if (deja) {
+      deja.montant += line.settled
+      continue
+    }
+    parBeneficiaire.set(cle, {
+      cle,
+      personne: line.advancedBy ?? null,
+      nomLibre: line.advancedBy ? null : (line.advancedByName ?? null),
+      montant: line.settled,
+    })
   }
 
-  const detail = [...parPersonne.values()].sort((a, b) => b.montant - a.montant)
+  const detail = [...parBeneficiaire.values()].sort((a, b) => b.montant - a.montant)
   return { total: detail.reduce((somme, d) => somme + d.montant, 0), detail }
+}
+
+/** À qui l'association doit une avance : un compte, ou un nom saisi librement. */
+export interface BeneficiaireAvance {
+  /** Clé stable — `u:<id>` pour un compte, `n:<nom normalisé>` pour un nom libre. */
+  cle: string
+  personne: PersonneAvance | null
+  nomLibre: string | null
 }
 
 export interface AvancesARembourser {
   /** Somme due, en centimes. */
   total: number
-  /** Une entrée par personne, de la plus grosse avance à la plus petite. */
-  detail: { personne: PersonneAvance; montant: number }[]
+  /** Une entrée par bénéficiaire, de la plus grosse avance à la plus petite. */
+  detail: (BeneficiaireAvance & { montant: number })[]
 }

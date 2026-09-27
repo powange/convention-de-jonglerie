@@ -1054,7 +1054,11 @@
       "plan_open": "Buscar un código en los planes contables franceses",
       "plan_search_placeholder": "Buscar una cuenta: «seguro», «6257», «cuotas»…",
       "plan_source": "Texto oficial",
-      "plan_title": "Planes contables franceses"
+      "plan_title": "Planes contables franceses",
+      "entry_advanced_by_free": "[TODO] Un autre nom",
+      "entry_advanced_by_free_placeholder": "[TODO] Choisir ou saisir un nom",
+      "entry_advanced_by_free_search": "[TODO] Rechercher ou saisir un nom…",
+      "entry_advanced_by_member": "[TODO] Un membre"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

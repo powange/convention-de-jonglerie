@@ -1054,7 +1054,11 @@
       "plan_open": "Find a code in the French charts of accounts",
       "plan_search_placeholder": "Search for an account: “insurance”, “6257”, “membership fees”…",
       "plan_source": "Official text",
-      "plan_title": "French charts of accounts"
+      "plan_title": "French charts of accounts",
+      "entry_advanced_by_free": "[TODO] Un autre nom",
+      "entry_advanced_by_free_placeholder": "[TODO] Choisir ou saisir un nom",
+      "entry_advanced_by_free_search": "[TODO] Rechercher ou saisir un nom…",
+      "entry_advanced_by_member": "[TODO] Un membre"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",
