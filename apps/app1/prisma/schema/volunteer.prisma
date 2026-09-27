@@ -213,6 +213,22 @@ model VolunteerTeam {
   /// d'heures et les propose en renfort, l'autonome les garde tenus à leurs heures et les tient
   /// hors de la page des renforts. Voir `benevoles-volants.ts`, où les deux règles cohabitent.
   isAutonomousTeam      Boolean  @default(false)
+  /// Les PÉRIODES sur lesquelles l'équipe intervient — montage, événement, démontage.
+  ///
+  /// Une équipe d'accueil peut n'exister que pendant l'événement, une équipe de chantier
+  /// seulement au montage et au démontage. Le formulaire de candidature ne propose alors, dans les
+  /// équipes préférées, que celles dont une période recoupe les disponibilités annoncées par le
+  /// bénévole : demander à quelqu'un qui ne vient qu'au montage s'il préfère l'équipe de plonge du
+  /// dimanche soir n'avait pas de sens, et son choix n'aurait servi à personne.
+  ///
+  /// `true` par défaut sur les trois : l'`ALTER` remplit ainsi les équipes existantes, qui gardent
+  /// donc exactement le comportement qu'elles avaient. Aucune édition en cours ne change.
+  ///
+  /// ⚠️ Au moins une période doit rester cochée — une équipe qui ne couvre rien ne serait proposée
+  /// à personne. Les deux points d'API le refusent.
+  coversSetup           Boolean  @default(true)
+  coversEvent           Boolean  @default(true)
+  coversTeardown        Boolean  @default(true)
   isVisibleToVolunteers Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

@@ -198,7 +198,7 @@
 
           <!-- Équipes préférées -->
           <div
-            v-if="volunteersInfo?.askTeamPreferences && volunteerTeams.length"
+            v-if="volunteersInfo?.askTeamPreferences && equipesProposees.length"
             class="space-y-2 w-full"
           >
             <UFormField :label="t('volunteers.team_preferences_label')">
@@ -635,6 +635,8 @@ import {
   type ChampCandidature,
 } from '../../../utils/validation-candidature'
 
+import { equipesProposables } from '~~/shared/utils/periodes-equipe'
+
 interface VolunteerInfo {
   open: boolean
   description?: string
@@ -1011,7 +1013,7 @@ const isFormValid = computed(
 const showPreferencesSection = computed(() => {
   return (
     props.volunteersInfo?.askTimePreferences ||
-    (props.volunteersInfo?.askTeamPreferences && volunteerTeams.value.length > 0) ||
+    (props.volunteersInfo?.askTeamPreferences && equipesProposees.value.length > 0) ||
     props.volunteersInfo?.askCompanion ||
     props.volunteersInfo?.askAvoidList
   )
@@ -1296,15 +1298,35 @@ onBeforeUnmount(() => {
   if (minuterieBrouillon) clearTimeout(minuterieBrouillon)
 })
 
+/**
+ * Les équipes qu'on peut proposer, selon les périodes de présence annoncées.
+ *
+ * Une équipe n'intervient pas forcément sur toute la convention : demander à quelqu'un qui ne vient
+ * qu'au montage s'il préfère l'équipe de plonge du dimanche soir n'a pas de sens, et son choix
+ * n'aurait servi à personne. La règle vit dans `equipesProposables`, la même que celle dont le
+ * serveur se sert pour refuser — écrite deux fois, elle divergerait.
+ *
+ * Tant qu'aucune disponibilité n'est cochée, la liste n'est PAS filtrée : à l'ouverture le champ
+ * disparaîtrait, puis surgirait de nulle part au premier clic. Ne rien avoir coché n'est pas un
+ * choix, c'est un formulaire encore vierge.
+ */
+const equipesProposees = computed(() =>
+  equipesProposables(volunteerTeams.value ?? [], {
+    setupAvailability: formData.value.setupAvailability,
+    eventAvailability: formData.value.eventAvailability,
+    teardownAvailability: formData.value.teardownAvailability,
+  })
+)
+
 // Items for select/checkbox components
 const teamItems = computed(() => {
-  if (!props.volunteersInfo?.askTeamPreferences || !volunteerTeams.value.length) {
+  if (!props.volunteersInfo?.askTeamPreferences || !equipesProposees.value.length) {
     return []
   }
   // Pas de filtre sur `isVisibleToVolunteers` ici : c'est l'API qui écarte désormais les équipes
   // cachées. Le filtre vivait des deux côtés, et seul celui du navigateur agissait — c'est cette
   // duplication qui a laissé le nom des équipes cachées sortir dans la réponse.
-  return volunteerTeams.value.map((team) => ({
+  return equipesProposees.value.map((team) => ({
     label: team.isRequired ? `${team.name} (${t('common.required')})` : team.name,
     value: team.id, // Utiliser l'ID au lieu du nom pour le nouveau système
     // Désactiver les équipes obligatoires sauf si c'est un organisateur qui édite
@@ -1438,6 +1460,8 @@ const remplirFormulaire = () => {
 
     // Si c'est le bénévole lui-même qui édite (pas un organisateur), ajouter les équipes obligatoires
     if (!isOrganizerEditingApplication.value) {
+      // Liste brute ici, et c'est voulu : `formData` porte encore les disponibilités précédentes
+      // au moment où on le remplit. Le gardien plus bas élague juste après, sur les valeurs à jour.
       const requiredTeamIds = volunteerTeams.value
         .filter((team) => team.isRequired)
         .map((team) => team.id)
@@ -1548,28 +1572,41 @@ watch(
   { deep: true }
 )
 
-// Pré-sélectionner les équipes obligatoires quand elles sont chargées
+/**
+ * Tenir la sélection d'équipes d'accord avec les périodes annoncées.
+ *
+ * Un seul endroit s'en charge, et il fait DEUX choses indissociables :
+ *
+ * 1. il élague ce qui n'est plus proposable. Décocher « je viens au démontage » après avoir choisi
+ *    une équipe qui n'existe qu'au démontage laisserait sinon ce choix dans la sélection : le champ
+ *    ne le montre plus, le serveur le refuse, et l'envoi échoue sur une case invisible ;
+ * 2. il complète les équipes obligatoires — parmi les proposables seulement. Imposer une équipe
+ *    hors des périodes du bénévole le placerait là où il ne sera pas.
+ *
+ * L'élagage vaut aussi pour un organisateur qui modifie la candidature de quelqu'un : le serveur
+ * refuse dans tous les cas, et lui laisser une sélection intenable ne l'avancerait pas.
+ */
 watch(
-  [() => volunteerTeams.value, () => props.modelValue],
-  ([teams, isOpen]) => {
-    // Seulement en mode création (pas édition) et quand le modal est ouvert
-    if (isOpen && !props.isEditing && teams && teams.length > 0) {
-      const requiredTeamIds = teams.filter((team) => team.isRequired).map((team) => team.id)
+  [() => equipesProposees.value, () => props.modelValue],
+  ([equipes, isOpen]) => {
+    if (!isOpen) return
 
-      // Ne mettre à jour que si les équipes obligatoires ne sont pas déjà toutes sélectionnées
-      if (requiredTeamIds.length > 0) {
-        const missingRequired = requiredTeamIds.filter(
-          (id) => !formData.value.teamPreferences.includes(id)
-        )
+    const proposables = new Set(equipes.map((team) => team.id))
+    const retenues = formData.value.teamPreferences.filter((id) => proposables.has(id))
 
-        if (missingRequired.length > 0) {
-          formData.value.teamPreferences = [
-            ...new Set([...formData.value.teamPreferences, ...requiredTeamIds]),
-          ]
-        }
-      }
-    }
+    const aAjouter =
+      props.isEditing && isOrganizerEditingApplication.value
+        ? []
+        : equipes.filter((team) => team.isRequired).map((team) => team.id)
+
+    const voulues = [...new Set([...retenues, ...aAjouter])]
+
+    // N'écrire que si la liste change vraiment : ce watcher observe une valeur qu'il modifie.
+    const identique =
+      voulues.length === formData.value.teamPreferences.length &&
+      voulues.every((id) => formData.value.teamPreferences.includes(id))
+    if (!identique) formData.value.teamPreferences = voulues
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 </script>

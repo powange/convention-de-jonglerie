@@ -10,6 +10,17 @@ export interface VolunteerTeam {
   isFloatingTeam?: boolean
   isAutonomousTeam?: boolean
   isVisibleToVolunteers?: boolean
+  /**
+   * Les périodes sur lesquelles l'équipe intervient.
+   *
+   * Facultatives dans ce type parce qu'une réponse ancienne, gardée en cache, peut ne pas les
+   * porter — mais jamais absentes en base, où les trois colonnes sont `NOT NULL DEFAULT true`. La
+   * règle qui les lit (`shared/utils/periodes-equipe`) traite l'absence comme « ne couvre pas »,
+   * volontairement : mieux vaut ne rien proposer que de proposer une équipe dont on ignore tout.
+   */
+  coversSetup?: boolean
+  coversEvent?: boolean
+  coversTeardown?: boolean
   createdAt: string
   updatedAt: string
   assignedVolunteersCount?: number
@@ -29,6 +40,9 @@ export interface CreateTeamData {
   isFloatingTeam?: boolean
   isAutonomousTeam?: boolean
   isVisibleToVolunteers?: boolean
+  coversSetup?: boolean
+  coversEvent?: boolean
+  coversTeardown?: boolean
 }
 
 export type UpdateTeamData = Partial<CreateTeamData>

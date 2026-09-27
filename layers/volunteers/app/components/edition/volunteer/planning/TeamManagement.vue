@@ -238,6 +238,28 @@
               </USwitch>
             </UFormField>
 
+            <!-- Périodes d'intervention : toutes cochées par défaut, ce qui reproduit le
+                 comportement d'avant. Décocher restreint qui verra l'équipe dans ses préférences. -->
+            <UFormField name="coversEvent" :label="t('volunteers.team_periods')">
+              <div class="flex flex-wrap gap-4">
+                <UCheckbox
+                  v-model="teamFormState.coversSetup"
+                  :label="t('volunteers.presence_setup')"
+                />
+                <UCheckbox
+                  v-model="teamFormState.coversEvent"
+                  :label="t('volunteers.presence_event')"
+                />
+                <UCheckbox
+                  v-model="teamFormState.coversTeardown"
+                  :label="t('volunteers.presence_teardown')"
+                />
+              </div>
+              <template #hint>
+                <span class="text-xs text-gray-500">{{ t('volunteers.team_periods_hint') }}</span>
+              </template>
+            </UFormField>
+
             <!-- Équipe de contrôle d'accès -->
             <UFormField name="isAccessControlTeam" :label="t('volunteers.access_control_team')">
               <USwitch v-model="teamFormState.isAccessControlTeam">
@@ -334,6 +356,8 @@ import { DEFAULT_HEX_PALETTE } from '~/utils/default-palette'
 
 import type { VolunteerTeam } from '#imports'
 
+import { equipeCouvreAuMoinsUnePeriode } from '~~/shared/utils/periodes-equipe'
+
 // Props
 interface Props {
   editionId: number
@@ -355,18 +379,28 @@ const expandedTeams = ref<Record<string, boolean>>({})
 const { teams, createTeam, updateTeam, deleteTeam } = useVolunteerTeams(props.editionId)
 
 // Schéma de validation
-const teamSchema = z.object({
-  name: z.string().min(1, t('errors.required_field')),
-  description: z.string().optional(),
-  color: z.string().regex(/^#[0-9A-F]{6}$/i, t('errors.invalid_color')),
-  maxVolunteers: z.number().int().positive().optional(),
-  isRequired: z.boolean().optional(),
-  isAccessControlTeam: z.boolean().optional(),
-  isMealValidationTeam: z.boolean().optional(),
-  isFloatingTeam: z.boolean().optional(),
-  isAutonomousTeam: z.boolean().optional(),
-  isVisibleToVolunteers: z.boolean().optional(),
-})
+const teamSchema = z
+  .object({
+    name: z.string().min(1, t('errors.required_field')),
+    description: z.string().optional(),
+    color: z.string().regex(/^#[0-9A-F]{6}$/i, t('errors.invalid_color')),
+    maxVolunteers: z.number().int().positive().optional(),
+    isRequired: z.boolean().optional(),
+    isAccessControlTeam: z.boolean().optional(),
+    isMealValidationTeam: z.boolean().optional(),
+    isFloatingTeam: z.boolean().optional(),
+    isAutonomousTeam: z.boolean().optional(),
+    isVisibleToVolunteers: z.boolean().optional(),
+    coversSetup: z.boolean().optional(),
+    coversEvent: z.boolean().optional(),
+    coversTeardown: z.boolean().optional(),
+  })
+  // Une équipe qui ne couvre rien ne serait proposée à personne : le refus vient du même util que
+  // celui des deux points d'API, pour que l'écran et le serveur ne puissent pas diverger.
+  .refine(equipeCouvreAuMoinsUnePeriode, {
+    message: t('volunteers.team_periods_required'),
+    path: ['coversEvent'],
+  })
 
 // État du formulaire
 const teamFormState = ref({
@@ -380,6 +414,9 @@ const teamFormState = ref({
   isFloatingTeam: false,
   isAutonomousTeam: false,
   isVisibleToVolunteers: true,
+  coversSetup: true,
+  coversEvent: true,
+  coversTeardown: true,
 })
 
 // Désélectionner "obligatoire" si l'équipe n'est plus visible pour les bénévoles
@@ -424,6 +461,9 @@ const openCreateTeamModal = () => {
     isMealValidationTeam: false,
     isFloatingTeam: false,
     isAutonomousTeam: false,
+    coversSetup: true,
+    coversEvent: true,
+    coversTeardown: true,
     isVisibleToVolunteers: true,
   }
   teamModalOpen.value = true
@@ -441,6 +481,11 @@ const openEditTeamModal = (team: VolunteerTeam) => {
     isMealValidationTeam: team.isMealValidationTeam || false,
     isFloatingTeam: team.isFloatingTeam || false,
     isAutonomousTeam: team.isAutonomousTeam || false,
+    // `?? true` et non `|| true` : `false` est une valeur choisie par l'organisateur, pas une
+    // absence. `||` la retournerait silencieusement à `true` à chaque réouverture.
+    coversSetup: team.coversSetup ?? true,
+    coversEvent: team.coversEvent ?? true,
+    coversTeardown: team.coversTeardown ?? true,
     isVisibleToVolunteers: team.isVisibleToVolunteers ?? true,
   }
   teamModalOpen.value = true
@@ -466,6 +511,9 @@ const onTeamSubmit = async () => {
       isFloatingTeam: teamFormState.value.isFloatingTeam,
       isAutonomousTeam: teamFormState.value.isAutonomousTeam,
       isVisibleToVolunteers: teamFormState.value.isVisibleToVolunteers,
+      coversSetup: teamFormState.value.coversSetup,
+      coversEvent: teamFormState.value.coversEvent,
+      coversTeardown: teamFormState.value.coversTeardown,
     }
 
     if (editingTeam.value) {

@@ -49,9 +49,17 @@ describe('/api/editions/[id]/volunteers/applications POST', () => {
   }
 
   // Mock des équipes VolunteerTeam pour les tests de validation
+  /*
+   * Les équipes telles que la base les rend, PÉRIODES COMPRISES.
+   *
+   * Sans elles, `coversSetup`/`coversEvent`/`coversTeardown` valent `undefined`, ce que la règle lit
+   * comme « ne couvre aucune période » : toute préférence d'équipe serait refusée. En base, la
+   * colonne est `NOT NULL DEFAULT true`, donc une équipe réelle couvre toujours quelque chose — le
+   * mock doit décrire cette réalité, pas une forme qui n'existe pas.
+   */
   const mockVolunteerTeams = [
-    { id: 'team1', name: 'Accueil' },
-    { id: 'team2', name: 'Technique' },
+    { id: 'team1', name: 'Accueil', coversSetup: true, coversEvent: true, coversTeardown: true },
+    { id: 'team2', name: 'Technique', coversSetup: true, coversEvent: true, coversTeardown: true },
   ]
 
   beforeEach(() => {

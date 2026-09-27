@@ -649,6 +649,9 @@
     "what_you_can_bring_title": "Was Sie uns bringen können",
     "with_you_on_slot": "Mit dir in dieser Schicht: | Mit dir in dieser Schicht ({count}):",
     "withdraw": "Meine Bewerbung zurückziehen",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature"
+    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
+    "team_periods": "[TODO] Périodes d'intervention",
+    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
+    "team_periods_required": "[TODO] Cochez au moins une période"
   }
 }
