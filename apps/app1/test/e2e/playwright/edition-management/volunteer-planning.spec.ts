@@ -28,8 +28,26 @@ test.describe.serial('Bénévoles — planning et affectations', () => {
 
   test('créer un créneau via API et le voir dans GET time-slots', async ({ page }) => {
     const { editionId } = loadState()
-    // Créneau dans la plage de l'édition (J+7.5 → +4h, entre J+7 et J+9)
-    const start = new Date(Date.now() + 7.5 * 24 * 3600_000)
+    /*
+     * Le créneau doit tomber sur le PREMIER JOUR de l'édition, pas seulement dans sa plage.
+     *
+     * Le planning s'ouvre sur ce premier jour, « Précédent » désactivé, et ne rend pas les
+     * suivants : il faudrait cliquer « Suivant ». Or l'édition de test commence à J+7 à L'HEURE
+     * DE L'EXÉCUTION (data.setup.ts:34-37), et le créneau était placé à J+7,5 — soit douze heures
+     * plus tard. Lancé avant midi UTC, il restait sur le premier jour ; lancé après, il basculait
+     * au lendemain et « Accueil E2E » n'était plus affiché. Le test ne passait donc que le matin :
+     * vert à 11 h 20 sur la PR #555, rouge à 12 h 07 et 12 h 28 sur la #556, pour des lots
+     * identiques.
+     *
+     * Une heure après le début, et non douze : le créneau reste le même jour que celui sur lequel
+     * le calendrier s'ouvre.
+     *
+     * ⚠️ Il reste une fenêtre non couverte : une exécution démarrée entre 23 h et minuit UTC
+     * ferait de nouveau basculer le créneau au lendemain. La corriger pour de bon demande de
+     * normaliser les dates de `data.setup.ts` à minuit, ce qui touche TOUS les lots et mérite sa
+     * propre vérification.
+     */
+    const start = new Date(Date.now() + 7 * 24 * 3600_000 + 3600_000)
     const end = new Date(start.getTime() + 4 * 3600_000)
 
     const response = await apiPost(page, `${BASE}/api/editions/${editionId}/volunteer-time-slots`, {

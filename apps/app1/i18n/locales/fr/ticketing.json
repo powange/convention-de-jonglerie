@@ -336,6 +336,9 @@
     },
     "stats": {
       "artists": "Artistes",
+      "count_per_person": "par personne",
+      "count_per_ticket": "par billet",
+      "count_toggle_hint": "Cliquer pour compter par personne : deux billets au même nom et prénom comptent alors pour une seule personne",
       "organizers": "Organisateurs",
       "participants": "Participants",
       "volunteers": "Bénévoles"
