@@ -81,6 +81,7 @@ export default wrapApiHandler(
           isForecast: true,
           reimbursed: true,
           advancedBy: { select: userWithProfileAndGravatarSelect },
+          advancedByName: true,
           code: { select: codeSelect },
         },
       }),

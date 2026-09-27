@@ -4,10 +4,17 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTreasuryById } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
+import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
 
-const bodySchema = z.object({
-  advancedById: z.number().int().positive(),
-})
+const bodySchema = z
+  .object({
+    advancedById: z.number().int().positive().optional(),
+    /** La même action pour une personne sans compte, désignée par le nom saisi sur les lignes. */
+    advancedByName: z.string().min(1).max(150).optional(),
+  })
+  .refine((corps) => !!corps.advancedById !== !!corps.advancedByName, {
+    message: 'Indiquer un compte OU un nom libre, pas les deux',
+  })
 
 /**
  * POST /api/editions/:id/treasury/entries/reimburse — solde toutes les avances d'une personne.
@@ -30,16 +37,43 @@ export default wrapApiHandler(
       throw createError({ status: 403, message: 'Droits insuffisants pour gérer la trésorerie' })
     }
 
-    const { advancedById } = bodySchema.parse(await readBody(event))
+    const { advancedById, advancedByName } = bodySchema.parse(await readBody(event))
+
+    const communes = {
+      editionId,
+      kind: 'EXPENSE' as const,
+      reimbursed: false,
+      isForecast: false,
+    }
+
+    if (advancedById) {
+      const { count } = await prisma.treasuryEntry.updateMany({
+        where: { ...communes, advancedById },
+        data: { reimbursed: true },
+      })
+      return createSuccessResponse({ count })
+    }
+
+    /*
+     * Un nom libre ne se retrouve pas par égalité de chaîne : le panneau regroupe « Jean-Luc » et
+     * « jean-luc » sur une seule dette, et verser la somme doit solder les deux. La comparaison
+     * passe donc par `cleDuNomAvance`, le MÊME normaliseur que l'agrégat — s'en remettre à la
+     * collation de MySQL marcherait pour la casse et les accents, mais pas pour les espaces, et
+     * laisserait des lignes ouvertes après un versement déjà fait.
+     */
+    const cleVisee = cleDuNomAvance(advancedByName)
+    const candidates = await prisma.treasuryEntry.findMany({
+      where: { ...communes, advancedById: null, NOT: { advancedByName: null } },
+      select: { id: true, advancedByName: true },
+    })
+    const ids = candidates
+      .filter((entry) => cleDuNomAvance(entry.advancedByName) === cleVisee)
+      .map((entry) => entry.id)
+
+    if (ids.length === 0) return createSuccessResponse({ count: 0 })
 
     const { count } = await prisma.treasuryEntry.updateMany({
-      where: {
-        editionId,
-        kind: 'EXPENSE',
-        advancedById,
-        reimbursed: false,
-        isForecast: false,
-      },
+      where: { id: { in: ids }, ...communes },
       data: { reimbursed: true },
     })
 

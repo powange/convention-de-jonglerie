@@ -109,14 +109,16 @@
                 <UBadge v-if="line.isForecast" color="neutral" variant="subtle" size="sm">
                   {{ $t('gestion.treasury.entry_forecast') }}
                 </UBadge>
+                <!-- Le nom affiché vient du compte quand il y en a un, du texte libre sinon :
+                     l'un des deux seulement est renseigné, le serveur s'en assure. -->
                 <UBadge
-                  v-if="line.advancedBy && !line.reimbursed"
+                  v-if="nomDeLAvance(line) && !line.reimbursed"
                   color="warning"
                   variant="subtle"
                   size="sm"
-                  :title="$t('gestion.treasury.advanced_by_name', { name: line.advancedBy.pseudo })"
+                  :title="$t('gestion.treasury.advanced_by_name', { name: nomDeLAvance(line) })"
                 >
-                  {{ $t('gestion.treasury.advanced_by_name', { name: line.advancedBy.pseudo }) }}
+                  {{ $t('gestion.treasury.advanced_by_name', { name: nomDeLAvance(line) }) }}
                 </UBadge>
               </div>
               <p v-if="line.description" class="truncate text-xs text-gray-500 dark:text-gray-400">
@@ -193,10 +195,16 @@
         <ul class="divide-y divide-gray-100 dark:divide-gray-800">
           <li
             v-for="ligne in data?.totals?.toReimburse?.detail ?? []"
-            :key="ligne.personne.id"
+            :key="ligne.cle"
             class="flex flex-wrap items-center justify-between gap-3 py-2"
           >
-            <UiUserDisplay :user="ligne.personne" size="sm" />
+            <UiUserDisplay v-if="ligne.personne" :user="ligne.personne" size="sm" />
+            <!-- Sans compte, il n'y a ni avatar ni pseudo à montrer : le nom saisi suffit, et une
+                 icône dit d'où il vient pour qu'on ne le confonde pas avec un membre. -->
+            <span v-else class="flex items-center gap-2 text-sm">
+              <UIcon name="i-heroicons-user" class="text-gray-400" />
+              {{ ligne.nomLibre }}
+            </span>
             <div class="flex items-center gap-3">
               <span class="font-semibold">{{ money(ligne.montant) }}</span>
               <!-- On rembourse en un versement : pointer les lignes une par une était le geste
@@ -206,9 +214,9 @@
                 color="success"
                 variant="soft"
                 icon="i-lucide-check"
-                :loading="rembourser.isLoading(ligne.personne.id)"
+                :loading="rembourser.isLoading(ligne.cle)"
                 :label="$t('gestion.treasury.mark_reimbursed')"
-                @click="rembourser.execute(ligne.personne.id)"
+                @click="rembourser.execute(ligne.cle)"
               />
             </div>
           </li>
@@ -238,6 +246,7 @@
       :codes="data?.codes ?? []"
       :currency="currency"
       :edition-id="editionId"
+      :noms-avance-connus="nomsAvanceConnus"
       @saved="onEntrySaved"
     />
 
@@ -262,6 +271,7 @@ import {
   type TotalDeNature,
 } from '~/utils/export-tresorerie'
 
+import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
 import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
 
 definePageMeta({
@@ -316,7 +326,13 @@ const { data, pending, error, refresh } = await useFetch<{
     balance: number
     toReimburse: {
       total: number
-      detail: { personne: PersonneAvance; montant: number }[]
+      /** Un compte, ou un nom libre : `cle` porte l'origine et sert d'identifiant d'action. */
+      detail: {
+        cle: string
+        personne: PersonneAvance | null
+        nomLibre: string | null
+        montant: number
+      }[]
     }
   }
 }>(() => `/api/editions/${editionId.value}/treasury`, {
@@ -435,6 +451,37 @@ const totalCards = computed(() => {
   ]
 })
 
+/**
+ * Le nom de qui a avancé, quelle qu'en soit l'origine.
+ *
+ * Deux colonnes portent la même information selon que la personne a un compte ou non. Les lire
+ * ensemble ici évite de répéter le `??` à chaque endroit qui l'affiche — et d'en oublier un, ce qui
+ * ferait disparaître la pastille pour les avances saisies en texte libre.
+ */
+const nomDeLAvance = (line: {
+  advancedBy?: { pseudo: string } | null
+  advancedByName?: string | null
+}) => line.advancedBy?.pseudo ?? line.advancedByName ?? null
+
+/**
+ * Les noms libres déjà employés sur cette édition, pour que la modale les repropose.
+ *
+ * Tirés des lignes DÉJÀ chargées : aucun appel réseau de plus. Les avances remboursées en font
+ * partie — c'est un carnet d'adresses, pas une liste de dettes ouvertes.
+ */
+const nomsAvanceConnus = computed(() => {
+  const vus = new Set<string>()
+  const noms: string[] = []
+  for (const line of data.value?.lines ?? []) {
+    const nom = (line as { advancedByName?: string | null }).advancedByName
+    const cle = cleDuNomAvance(nom)
+    if (!cle || vus.has(cle)) continue
+    vus.add(cle)
+    noms.push(nom as string)
+  }
+  return noms
+})
+
 /** Détail des avances par personne, ouvert depuis la carte « à rembourser ». */
 const detailRemboursements = ref(false)
 
@@ -448,7 +495,17 @@ const rembourser = useApiActionById<{ count: number }>(
   () => `/api/editions/${editionId.value}/treasury/entries/reimburse`,
   {
     method: 'POST',
-    body: (personneId) => ({ advancedById: personneId }),
+    /*
+     * La clé dit d'où vient l'avance : `u:<id>` pour un compte, `n:<nom normalisé>` sinon. Le nom
+     * envoyé est donc déjà normalisé — le point d'API lui applique le même normaliseur, qui est
+     * idempotent, et retrouve ainsi toutes les orthographes regroupées sous cette dette.
+     */
+    body: (cle: string | number) => {
+      const valeur = String(cle)
+      return valeur.startsWith('u:')
+        ? { advancedById: Number(valeur.slice(2)) }
+        : { advancedByName: valeur.slice(2) }
+    },
     successMessage: { title: t('gestion.treasury.reimbursed_done') },
     errorMessages: { default: t('gestion.treasury.reimbursed_error') },
     onSuccess: async () => {

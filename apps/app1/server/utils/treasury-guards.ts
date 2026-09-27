@@ -1,3 +1,5 @@
+import { nomAvanceAEnregistrer } from '~~/shared/utils/avance-nom-libre'
+
 /**
  * Vérifie qu'un code d'imputation appartient bien à la convention de l'édition.
  *
@@ -37,8 +39,28 @@ export async function assertCodeBelongsToEdition(
 export function avanceNormalisee(saisie: {
   kind: 'EXPENSE' | 'INCOME'
   advancedById?: number | null
+  advancedByName?: string | null
   reimbursed?: boolean
 }) {
   const advancedById = saisie.kind === 'EXPENSE' ? (saisie.advancedById ?? null) : null
-  return { advancedById, reimbursed: advancedById ? (saisie.reimbursed ?? false) : false }
+
+  /*
+   * Un compte OU un nom libre, jamais les deux.
+   *
+   * Le compte l'emporte : il désigne une personne sans ambiguïté, là où un nom se regroupe par
+   * ressemblance. Le formulaire est déjà exclusif, mais un client qui enverrait les deux doit
+   * obtenir un état cohérent plutôt qu'une ligne comptant deux fois dans le panneau des avances.
+   */
+  const advancedByName = advancedById
+    ? null
+    : saisie.kind === 'EXPENSE'
+      ? nomAvanceAEnregistrer(saisie.advancedByName)
+      : null
+
+  const avancePortee = !!advancedById || !!advancedByName
+  return {
+    advancedById,
+    advancedByName,
+    reimbursed: avancePortee ? (saisie.reimbursed ?? false) : false,
+  }
 }

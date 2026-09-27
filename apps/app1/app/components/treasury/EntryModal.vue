@@ -61,18 +61,53 @@
         <!-- L'avance ne concerne que les dépenses : une recette n'est avancée par personne. -->
         <template v-if="form.kind === 'EXPENSE'">
           <UFormField :label="$t('gestion.treasury.entry_advanced_by')">
-            <UserSelector
-              v-model="personneAvance"
-              v-model:search-term="rechercheAvance"
-              :searched-users="candidatsAvance"
-              :searching-users="rechercheEnCours"
-              :placeholder="$t('gestion.treasury.entry_advanced_by_placeholder')"
-            />
+            <div class="space-y-2">
+              <!-- Un compte OU un nom libre : beaucoup de ceux qui avancent de l'argent sur une
+                   convention n'ont pas de compte sur le site. Deux contrôles exclusifs plutôt
+                   qu'un seul permissif — la liste des membres garde sa recherche et ses avatars. -->
+              <UFieldGroup>
+                <UButton
+                  v-for="option in modesAvance"
+                  :key="option.value"
+                  :color="modeAvance === option.value ? 'primary' : 'neutral'"
+                  :variant="modeAvance === option.value ? 'solid' : 'outline'"
+                  :icon="option.icon"
+                  :label="option.label"
+                  @click="choisirModeAvance(option.value)"
+                />
+              </UFieldGroup>
+
+              <UserSelector
+                v-if="modeAvance === 'compte'"
+                v-model="personneAvance"
+                v-model:search-term="rechercheAvance"
+                :searched-users="candidatsAvance"
+                :searching-users="rechercheEnCours"
+                :placeholder="$t('gestion.treasury.entry_advanced_by_placeholder')"
+              />
+
+              <!-- `create-item` : les noms déjà saisis sur cette édition sont proposés, et un nom
+                   inédit se tape quand même. Sans cela, il fallait réécrire « Jean-Luc » à
+                   l'identique sur chaque ligne — et la moindre variante d'orthographe aurait
+                   séparé sa dette en deux dans le panneau des avances. -->
+              <USelectMenu
+                v-else
+                v-model="nomAvance"
+                create-item
+                :items="nomsAvanceProposes"
+                class="w-full"
+                :placeholder="$t('gestion.treasury.entry_advanced_by_free_placeholder')"
+                :search-input="{
+                  placeholder: $t('gestion.treasury.entry_advanced_by_free_search'),
+                }"
+                @create="ajouterNomAvance"
+              />
+            </div>
           </UFormField>
 
           <!-- Sans personne désignée, il n'y a rien à rembourser : la case n'aurait aucun sens. -->
           <UCheckbox
-            v-if="personneAvance"
+            v-if="personneAvance || nomAvance"
             v-model="form.reimbursed"
             :label="$t('gestion.treasury.entry_reimbursed')"
           />
@@ -111,6 +146,8 @@ import { useDebounce } from '@vueuse/core'
 
 import type { UserSelectItem } from '~/components/UserSelector.vue'
 
+import { cleDuNomAvance, nomAvanceAEnregistrer } from '~~/shared/utils/avance-nom-libre'
+
 /** Ce que l'API rend d'une personne ayant avancé — de quoi l'afficher, rien de plus. */
 interface CandidatAvance {
   id: number
@@ -133,10 +170,13 @@ const props = defineProps<{
     isForecast?: boolean
     reimbursed?: boolean
     advancedBy?: CandidatAvance | null
+    advancedByName?: string | null
   } | null
   codes: { id: number; code: string; label: string }[]
   currency: string
   editionId: number
+  /** Les noms libres déjà employés sur cette édition, à reproposer plutôt qu'à faire retaper. */
+  nomsAvanceConnus?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -176,6 +216,20 @@ const form = reactive<{
  * composant travaille sur un objet complet là où l'API n'attend qu'un identifiant.
  */
 const personneAvance = ref<UserSelectItem | null>(null)
+
+/**
+ * Le nom libre, et le mode qui décide lequel des deux contrôles compte.
+ *
+ * Les deux valeurs ne coexistent jamais : basculer de mode efface l'autre. Sans cela, une ligne
+ * pourrait partir avec un compte ET un nom, et le serveur devrait trancher à la place de qui
+ * saisit — ce qu'il fait par sécurité, mais en silence.
+ */
+// `undefined` et non `null` : c'est ce que `USelectMenu` accepte comme « rien de choisi ». Le
+// corps envoyé au serveur le retraduit en `null`, qui est ce que la colonne attend.
+const nomAvance = ref<string | undefined>(undefined)
+const modeAvance = ref<'compte' | 'libre'>('compte')
+/** Les noms proposés : ceux déjà en base, plus celui qu'on vient de créer dans cette session. */
+const nomsAjoutes = ref<string[]>([])
 const rechercheAvance = ref('')
 const rechercheDebouncee = useDebounce(rechercheAvance, 300)
 const candidatsAvance = ref<UserSelectItem[]>([])
@@ -203,6 +257,48 @@ watch(rechercheDebouncee, async (terme) => {
     rechercheEnCours.value = false
   }
 })
+
+const modesAvance = computed(() => [
+  {
+    value: 'compte' as const,
+    icon: 'i-heroicons-user-circle',
+    label: t('gestion.treasury.entry_advanced_by_member'),
+  },
+  {
+    value: 'libre' as const,
+    icon: 'i-heroicons-pencil',
+    label: t('gestion.treasury.entry_advanced_by_free'),
+  },
+])
+
+/** Les noms déjà connus de l'édition, plus ceux créés depuis l'ouverture de la modale. */
+const nomsAvanceProposes = computed(() => {
+  const vus = new Set<string>()
+  const noms: string[] = []
+  for (const nom of [...(props.nomsAvanceConnus ?? []), ...nomsAjoutes.value]) {
+    const cle = cleDuNomAvance(nom)
+    if (!cle || vus.has(cle)) continue
+    vus.add(cle)
+    noms.push(nom)
+  }
+  return noms.sort((a, b) => a.localeCompare(b, 'fr'))
+})
+
+/** Basculer de mode efface l'autre saisie : les deux ne coexistent jamais. */
+function choisirModeAvance(mode: 'compte' | 'libre') {
+  if (modeAvance.value === mode) return
+  modeAvance.value = mode
+  if (mode === 'compte') nomAvance.value = undefined
+  else personneAvance.value = null
+}
+
+/** Un nom inédit rejoint la liste et devient la valeur choisie. */
+function ajouterNomAvance(nom: string) {
+  const propre = nomAvanceAEnregistrer(nom)
+  if (!propre) return
+  nomsAjoutes.value.push(propre)
+  nomAvance.value = propre
+}
 
 const kindOptions = computed(() => [
   {
@@ -298,6 +394,11 @@ watch(
           isRealUser: true,
         }
       : null
+    // Le mode se déduit de la ligne : rouvrir une dépense avancée par « Jean-Luc » doit montrer
+    // son nom, pas un sélecteur de membres vide.
+    nomAvance.value = entry?.advancedByName ?? undefined
+    modeAvance.value = nomAvance.value ? 'libre' : 'compte'
+    nomsAjoutes.value = []
     rechercheAvance.value = ''
   },
   { immediate: true }
@@ -311,8 +412,10 @@ const body = () => ({
   codeId: form.codeId,
   imageUrl: form.imageUrl,
   isForecast: form.isForecast,
-  // Le serveur remet ces deux champs à zéro sur une recette : inutile de filtrer ici aussi.
-  advancedById: personneAvance.value?.id ?? null,
+  // Le serveur remet ces champs à zéro sur une recette : inutile de filtrer ici aussi.
+  // Le mode décide lequel part : l'autre est déjà nul, mais le dire ici rend la règle lisible.
+  advancedById: modeAvance.value === 'compte' ? (personneAvance.value?.id ?? null) : null,
+  advancedByName: modeAvance.value === 'libre' ? (nomAvance.value ?? null) : null,
   reimbursed: form.reimbursed,
 })
 

@@ -22,6 +22,7 @@ const bodySchema = z.object({
   imageUrl: z.string().max(500).nullable().optional(),
   isForecast: z.boolean().optional(),
   advancedById: z.number().int().positive().nullable().optional(),
+  advancedByName: z.string().max(150).nullable().optional(),
   reimbursed: z.boolean().optional(),
 })
 

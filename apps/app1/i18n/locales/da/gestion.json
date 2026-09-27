@@ -1054,7 +1054,11 @@
       "plan_open": "Find en kode i de franske kontoplaner",
       "plan_search_placeholder": "Søg en konto: “forsikring”, “6257”, “kontingenter”…",
       "plan_source": "Officiel tekst",
-      "plan_title": "Franske kontoplaner"
+      "plan_title": "Franske kontoplaner",
+      "entry_advanced_by_free": "[TODO] Un autre nom",
+      "entry_advanced_by_free_placeholder": "[TODO] Choisir ou saisir un nom",
+      "entry_advanced_by_free_search": "[TODO] Rechercher ou saisir un nom…",
+      "entry_advanced_by_member": "[TODO] Un membre"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

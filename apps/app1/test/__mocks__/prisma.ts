@@ -56,6 +56,10 @@ export const prismaMock = {
   editionArtistHandoutItem: createModelMock(),
   editionOrganizerHandoutItem: createModelMock(),
   eventVolunteerSettings: createModelMock(),
+  // Trésorerie : lignes saisies à la main, codes d'imputation et leurs liaisons par source.
+  treasuryEntry: createModelMock(),
+  treasuryCode: createModelMock(),
+  treasurySourceCode: createModelMock(),
   apiErrorLog: createModelMock(),
   feedback: createModelMock(),
   notification: createModelMock(),

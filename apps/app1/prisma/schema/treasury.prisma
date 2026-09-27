@@ -68,6 +68,12 @@ model TreasuryEntry {
   /// Dépense avancée de sa poche par quelqu'un — l'association lui doit ce montant.
   /// Sans objet sur une recette, où le serveur le force à `null`.
   advancedById Int?
+  /// La même avance, quand la personne n'a PAS de compte : son nom, saisi librement.
+  ///
+  /// Exclusif de `advancedById` — le serveur efface l'un dès que l'autre est posé. Beaucoup de
+  /// ceux qui avancent de l'argent sur une convention ne sont pas inscrits sur le site : sans ce
+  /// champ, on ne pouvait pas dire à qui l'association devait ce montant.
+  advancedByName String? @db.VarChar(150)
   /// L'avance a-t-elle été remboursée à la personne ? Sans objet sans `advancedById`.
   reimbursed   Boolean           @default(false)
   createdAt    DateTime          @default(now())
