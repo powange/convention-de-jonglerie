@@ -193,8 +193,8 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
           eligible.map((artist) =>
             prisma.artistMealSelection.upsert({
               where: { artistId_mealId: { artistId: artist.id, mealId } },
-              create: { artistId: artist.id, mealId, selected: true },
-              update: { selected: true },
+              create: { artistId: artist.id, mealId, accepted: true },
+              update: { accepted: true },
             })
           )
         )
