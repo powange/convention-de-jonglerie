@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { createDefaultVolunteerPorts } from '../../../../../server/volunteers/ports/default-binding'
+import { champsDuModele } from './champs-du-schema'
 import { corpsDuRetrait } from '../../../../../../../layers/meals/app/utils/retrait-de-repas'
 
 // Mock global de Prisma défini dans test/setup-common.ts
@@ -300,9 +301,20 @@ describe('port meals (câblage jonglerie → module repas cœur)', () => {
       expect(prismaMock.volunteerMeal.update).toHaveBeenCalled()
       expect(prismaMock.volunteerMealSelection.upsert).toHaveBeenCalledWith({
         where: { volunteerId_mealId: { volunteerId: 1, mealId: 1 } },
-        create: { volunteerId: 1, mealId: 1, selected: true },
-        update: { selected: true },
+        create: { volunteerId: 1, mealId: 1, accepted: true },
+        update: { accepted: true },
       })
+
+      /*
+       * Et la même chose sans recopier le littéral : les champs écrits existent-ils dans le
+       * schéma ? Prisma est bouché par un mock, donc l'assertion ci-dessus passerait tout aussi
+       * bien sur une colonne inexistante — c'est précisément ce qui a figé `selected` ici.
+       */
+      const colonnes = champsDuModele('VolunteerMealSelection')
+      const argument = prismaMock.volunteerMealSelection.upsert.mock.calls[0][0]
+      for (const champ of [...Object.keys(argument.create), ...Object.keys(argument.update)]) {
+        expect(colonnes, `champ « ${champ} » écrit sur VolunteerMealSelection`).toContain(champ)
+      }
       expect(toggles).toEqual([
         { mealId: 1, date: new Date('2026-06-16'), mealType: 'LUNCH', enabled: true },
       ])

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { createDefaultVolunteerPorts } from '../../../../../server/volunteers/ports/default-binding'
+import { champsDuModele } from './champs-du-schema'
 
 // Mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -32,9 +33,18 @@ describe('port artists (câblage jonglerie par défaut)', () => {
       expect(prismaMock.artistMealSelection.upsert).toHaveBeenCalledTimes(1)
       expect(prismaMock.artistMealSelection.upsert).toHaveBeenCalledWith({
         where: { artistId_mealId: { artistId: 1, mealId: 42 } },
-        create: { artistId: 1, mealId: 42, selected: true },
-        update: { selected: true },
+        create: { artistId: 1, mealId: 42, accepted: true },
+        update: { accepted: true },
       })
+
+      // Même garde que côté bénévoles : on confronte les champs écrits au schéma, plutôt que de
+      // redire ce que le code écrit. `getMealArtistParticipants` lit déjà `accepted` plus bas —
+      // la lecture et l'écriture se contredisaient dans ce fichier même.
+      const colonnes = champsDuModele('ArtistMealSelection')
+      const argument = prismaMock.artistMealSelection.upsert.mock.calls[0][0]
+      for (const champ of [...Object.keys(argument.create), ...Object.keys(argument.update)]) {
+        expect(colonnes, `champ « ${champ} » écrit sur ArtistMealSelection`).toContain(champ)
+      }
     })
   })
 

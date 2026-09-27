@@ -206,8 +206,8 @@ export async function updateEditionMealsConfig(editionId: number, meals: MealUpd
           eligibleVolunteers.map((volunteer) =>
             prisma.volunteerMealSelection.upsert({
               where: { volunteerId_mealId: { volunteerId: volunteer.id, mealId: meal.id } },
-              create: { volunteerId: volunteer.id, mealId: meal.id, selected: true },
-              update: { selected: true },
+              create: { volunteerId: volunteer.id, mealId: meal.id, accepted: true },
+              update: { accepted: true },
             })
           )
         )
