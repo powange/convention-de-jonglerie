@@ -32,6 +32,7 @@
     "shows-call-extras.spec.ts"
   ],
   "gestion-2a": [
+    "controle-acces-compter-par-personne.spec.ts",
     "entete-de-page-modules.spec.ts",
     "notifications-benevoles-carte-et-rafraichir.spec.ts",
     "shows-call-survey.spec.ts",
@@ -66,7 +67,6 @@
     "volunteer-notifications.spec.ts"
   ],
   "gestion-3b": [
-    "controle-acces-compter-par-personne.spec.ts",
     "stock-lot-mobile.spec.ts",
     "treasury.spec.ts",
     "volunteer-leader-visibility.spec.ts",
