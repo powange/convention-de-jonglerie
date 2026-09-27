@@ -87,6 +87,22 @@ export function applyConventionRights(
   }
 }
 
+/**
+ * Lit les droits de convention d'une ligne Prisma, en clés courtes.
+ *
+ * Le pendant de `readEditionRights` pour l'autre niveau. Il manquait, et son absence se payait
+ * en énumérations à la main : le tableau de bord d'une convention n'en recopiait que sept sur
+ * quinze, si bien que la modale d'édition d'un organisateur s'ouvrait avec huit droits éteints
+ * qu'elle réenregistrait ensuite à `false`.
+ */
+export function readConventionRights(
+  source: Record<string, unknown> | null | undefined
+): Record<ConventionRight, boolean> {
+  return Object.fromEntries(
+    CONVENTION_RIGHTS.map((right) => [right, !!source?.[toCanField(right)]])
+  ) as Record<ConventionRight, boolean>
+}
+
 /** Vrai dès qu'un droit métier est accordé, quel qu'il soit. */
 export function hasAnyEditionRight(source: Record<string, unknown> | null | undefined): boolean {
   return EDITION_RIGHTS.some((right) => !!source?.[right])

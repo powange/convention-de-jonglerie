@@ -3,6 +3,7 @@ import type { Prisma } from '#server/types/prisma'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { checkAdminMode } from '#server/utils/organizer-management'
+import { readConventionRights, readEditionRights } from '#server/utils/permissions/rights-shapes'
 import { userWithProfileSelect } from '#server/utils/prisma-select-helpers'
 import { validateConventionId } from '#server/utils/validation-helpers'
 
@@ -133,20 +134,20 @@ export default wrapApiHandler(
       title: collab.title,
       addedAt: collab.addedAt,
       user: collab.user,
-      rights: {
-        editConvention: collab.canEditConvention,
-        deleteConvention: collab.canDeleteConvention,
-        manageOrganizers: collab.canManageOrganizers,
-        manageVolunteers: collab.canManageVolunteers,
-        addEdition: collab.canAddEdition,
-        editAllEditions: collab.canEditAllEditions,
-        deleteAllEditions: collab.canDeleteAllEditions,
-      },
+      /*
+       * TOUS les droits, dérivés de la source unique — et non une énumération à la main.
+       *
+       * Cette réponse alimente la modale d'édition d'un organisateur de « Mes conventions », qui la
+       * renvoie telle quelle en PUT. Sept droits de convention sur quinze et trois par édition sur
+       * onze y étaient recopiés : les huit droits de module par édition arrivaient donc absents,
+       * s'affichaient décochés, et le serveur les réécrivait à `false`. Quelqu'un à qui l'on avait
+       * confié la billetterie d'une seule édition le perdait dès qu'un responsable changeait son
+       * titre, sans message ni trace.
+       */
+      rights: readConventionRights(collab),
       perEdition: (collab.perEditionPermissions ?? []).map((p) => ({
         editionId: p.editionId,
-        canEdit: p.canEdit,
-        canDelete: p.canDelete,
-        canManageVolunteers: p.canManageVolunteers,
+        ...readEditionRights(p),
       })),
     }))
 

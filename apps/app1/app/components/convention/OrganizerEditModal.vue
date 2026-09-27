@@ -89,7 +89,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 
-import type { OrganizerRights, OrganizerRightsFormData } from '~/types'
+import type { OrganizerPerEditionRights, OrganizerRights, OrganizerRightsFormData } from '~/types'
 
 /** Shape minimale d'un organisateur acceptée par ce modal */
 interface OrganizerEditData {
@@ -103,16 +103,17 @@ interface OrganizerEditData {
   }
   title: string | null
   rights?: OrganizerRights
-  perEdition?: {
-    editionId: number
-    canEdit?: boolean
-    canDelete?: boolean
-    canManageVolunteers?: boolean
-  }[]
-  perEditionRights?: {
-    editionId: number
-    rights: { canEdit?: boolean; canDelete?: boolean; canManageVolunteers?: boolean }
-  }[]
+  /*
+   * Les deux noms de la même chose, et la même forme : `editionId` plus les droits À PLAT.
+   *
+   * `perEdition` vient du tableau de bord d'une convention, `perEditionRights` de la fiche d'une
+   * édition. Ces types n'énuméraient que trois droits sur onze, et la seconde branche annonçait en
+   * plus un objet `rights` imbriqué qui n'existe nulle part : les entrées recopiées telles quelles
+   * seraient parties sans aucun droit, et le serveur les aurait écartées comme vides. On dérive
+   * donc de la source unique, une fois pour les deux.
+   */
+  perEdition?: OrganizerPerEditionRights[]
+  perEditionRights?: OrganizerPerEditionRights[]
 }
 
 /** Shape minimale d'une édition acceptée par ce modal */
