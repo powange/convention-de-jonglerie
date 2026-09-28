@@ -4,6 +4,7 @@ import {
   filtresDepuisUrl,
   pageDepuisUrl,
   requeteCandidatures,
+  SOURCE_PAR_DEFAUT,
   STATUT_PAR_DEFAUT,
 } from '../../../../../layers/volunteers/app/utils/filtres-candidatures-url'
 
@@ -15,6 +16,7 @@ import {
  */
 const defauts = {
   statut: STATUT_PAR_DEFAUT,
+  source: SOURCE_PAR_DEFAUT,
   equipesSouhaitees: [],
   presence: [],
   equipesAssignees: [],
@@ -30,6 +32,7 @@ describe('filtresDepuisUrl', () => {
     expect(
       filtresDepuisUrl({
         status: 'ACCEPTED',
+        source: 'MANUAL',
         teams: 'bar,cuisine',
         presence: 'evenement',
         assignedTeams: 'hygiene',
@@ -37,6 +40,7 @@ describe('filtresDepuisUrl', () => {
       })
     ).toEqual({
       statut: 'ACCEPTED',
+      source: 'MANUAL',
       equipesSouhaitees: ['bar', 'cuisine'],
       presence: ['evenement'],
       equipesAssignees: ['hygiene'],
@@ -79,6 +83,7 @@ describe('requeteCandidatures', () => {
   it('fait l’aller-retour sans rien perdre', () => {
     const filtres = {
       statut: 'REJECTED',
+      source: 'APPLICATION',
       equipesSouhaitees: ['bar'],
       presence: ['montage', 'evenement'],
       equipesAssignees: ['hygiene'],
@@ -111,6 +116,7 @@ describe('pageDepuisUrl', () => {
 describe('requeteCandidatures et la page', () => {
   const defauts = {
     statut: STATUT_PAR_DEFAUT,
+    source: SOURCE_PAR_DEFAUT,
     equipesSouhaitees: [],
     presence: [],
     equipesAssignees: [],

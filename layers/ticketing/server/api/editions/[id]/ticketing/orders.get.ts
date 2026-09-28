@@ -1,6 +1,7 @@
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { billetARembourser, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { validatePagination, validateEditionId } from '#server/utils/validation-helpers'
 import {
   articleRetenu,
@@ -60,6 +61,7 @@ export default wrapApiHandler(
     const optionIdsParam = (query.optionIds as string) || ''
     const optionIds = optionIdsParam ? optionIdsParam.split(',').map((id) => parseInt(id)) : []
     const entryStatus = (query.entryStatus as string) || 'all'
+    const refundStatus = (query.refundStatus as string) || 'all'
     const paymentMethodsParam = (query.paymentMethods as string) || ''
     const paymentMethods = paymentMethodsParam
       ? paymentMethodsParam
@@ -188,6 +190,13 @@ export default wrapApiHandler(
             not: true,
           },
         })
+      }
+
+      // « À rembourser » : billet annulé, réglé, et pas encore remboursé. La condition vient du
+      // même fichier que la règle affichée au guichet — deux écritures de la même question
+      // finissent toujours par ne plus dire la même chose.
+      if (refundStatus === 'du') {
+        itemsConditions.push(billetARembourser())
       }
 
       // Ajouter le filtre par options (mode OU - au moins une des options sélectionnées)
@@ -481,6 +490,20 @@ export default wrapApiHandler(
         items: (order.items ?? []).map((item: any) => ({
           ...item,
           retenuParLesFiltres: !triDesArticlesActif || articleRetenu(item, filtresDArticles),
+          /**
+           * La somme qu'on doit encore pour ce billet, ou `null`.
+           *
+           * Calculée ici et non à l'écran, pour la même raison qu'au guichet : la règle tient en
+           * trois conditions dont une piégeuse — annuler une commande remplace son statut
+           * « payée » par « annulée », et seul le moyen de paiement témoigne encore qu'elle
+           * l'était. Deux écritures de cette question finiraient par ne plus dire la même chose.
+           */
+          refundDue: montantARembourser({
+            state: item.state,
+            refunded: item.refunded,
+            amount: item.amount,
+            order: { status: order.status, paymentMethod: order.paymentMethod },
+          }),
         })),
       }))
 

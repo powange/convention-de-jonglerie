@@ -30,6 +30,11 @@ describe('DELETE /api/editions/[id]/ticketing/orders/[orderId]', () => {
     prismaMock.ticketingOrder.findUnique.mockReset()
     prismaMock.ticketingOrder.update.mockReset()
     prismaMock.ticketingOrder.delete.mockReset()
+    prismaMock.ticketingOrderItem.updateMany.mockReset()
+    // Les deux écritures partent ensemble : l'annulation ne doit pas pouvoir n'en réussir qu'une.
+    prismaMock.$transaction.mockImplementation(async (operations: any) =>
+      Array.isArray(operations) ? operations : operations(prismaMock)
+    )
   })
 
   it('devrait annuler une commande manuelle non annulée', async () => {
@@ -67,6 +72,34 @@ describe('DELETE /api/editions/[id]/ticketing/orders/[orderId]', () => {
       data: { status: 'Refunded' },
     })
     expect(prismaMock.ticketingOrder.delete).not.toHaveBeenCalled()
+  })
+
+  it('marque aussi chacun des billets de la commande', async () => {
+    /**
+     * « Ce billet vaut-il encore ? » se lisait sur deux niveaux — l'état de la ligne OU le statut
+     * de sa commande — et c'est cette double lecture qui a produit les divergences que
+     * `billets-qui-comptent.ts` documente : un écran interrogeait l'un, son voisin l'autre.
+     *
+     * Tout se lit désormais sur le billet. Le remboursement, lui, n'est PAS touché : annuler ne
+     * dit pas qu'on a rendu l'argent, et ces billets doivent apparaître comme dus.
+     */
+    prismaMock.ticketingOrder.findUnique.mockResolvedValue({
+      id: 1,
+      editionId: 1,
+      externalTicketingId: null,
+      status: 'Processed',
+      externalTicketing: null,
+    })
+
+    await handler(mockEvent(1, 1) as any)
+
+    expect(prismaMock.ticketingOrderItem.updateMany).toHaveBeenCalledWith({
+      where: { orderId: 1, state: { not: 'Canceled' } },
+      data: expect.objectContaining({ state: 'Canceled', canceledById: 1 }),
+    })
+    const data = prismaMock.ticketingOrderItem.updateMany.mock.calls[0][0].data
+    expect(data.canceledAt).toBeInstanceOf(Date)
+    expect(data).not.toHaveProperty('refunded')
   })
 
   it('devrait supprimer une commande manuelle déjà annulée', async () => {

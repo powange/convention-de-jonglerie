@@ -69,6 +69,19 @@
                 />
               </UFormField>
 
+              <UFormField :label="t('volunteers.filter_source')">
+                <USelect
+                  v-model="applicationsFilterSource"
+                  :items="volunteerSourceItems"
+                  :placeholder="t('volunteers.source_all')"
+                  icon="i-heroicons-inbox-arrow-down"
+                  size="lg"
+                  variant="soft"
+                  class="w-full"
+                  @change="onStatusFilterChange"
+                />
+              </UFormField>
+
               <UFormField :label="t('volunteers.filter_presence')">
                 <USelect
                   v-model="applicationsFilterPresence"
@@ -139,6 +152,18 @@
             size="md"
             variant="soft"
             class="w-36"
+            :ui="{ content: 'min-w-fit' }"
+            @change="onStatusFilterChange"
+          />
+
+          <USelect
+            v-model="applicationsFilterSource"
+            :items="volunteerSourceItems"
+            :placeholder="t('volunteers.source_all')"
+            icon="i-heroicons-inbox-arrow-down"
+            size="md"
+            variant="soft"
+            class="w-40"
             :ui="{ content: 'min-w-fit' }"
             @change="onStatusFilterChange"
           />
@@ -628,6 +653,7 @@ const serverPagination = ref({
 const filtresInitiaux = filtresDepuisUrl(route.query)
 
 const applicationsFilterStatus = ref<string>(filtresInitiaux.statut)
+const applicationsFilterSource = ref<string>(filtresInitiaux.source)
 const applicationsFilterTeams = ref<string[]>(filtresInitiaux.equipesSouhaitees)
 const applicationsFilterPresence = ref<string[]>(filtresInitiaux.presence)
 const applicationsFilterAssignedTeams = ref<string[]>(filtresInitiaux.equipesAssignees)
@@ -637,6 +663,7 @@ const globalFilter = ref(filtresInitiaux.recherche)
 watch(
   [
     applicationsFilterStatus,
+    applicationsFilterSource,
     applicationsFilterTeams,
     applicationsFilterPresence,
     applicationsFilterAssignedTeams,
@@ -651,6 +678,7 @@ watch(
         route.query,
         {
           statut: applicationsFilterStatus.value,
+          source: applicationsFilterSource.value,
           equipesSouhaitees: applicationsFilterTeams.value,
           presence: applicationsFilterPresence.value,
           equipesAssignees: applicationsFilterAssignedTeams.value,
@@ -690,6 +718,18 @@ const volunteerStatusItems = computed(() => [
   { label: t('volunteers.status_pending'), value: 'PENDING' },
   { label: t('volunteers.status_accepted'), value: 'ACCEPTED' },
   { label: t('volunteers.status_rejected'), value: 'REJECTED' },
+])
+
+/**
+ * Les provenances possibles d'une candidature.
+ *
+ * Mêmes libellés que la colonne « Source » du tableau : le filtre et la cellule doivent nommer la
+ * même chose, sans quoi on cherche « Ajout manuel » dans une liste qui dit « Manuel ».
+ */
+const volunteerSourceItems = computed(() => [
+  { label: t('volunteers.source_all'), value: 'ALL' },
+  { label: t('volunteers.source_application'), value: 'APPLICATION' },
+  { label: t('volunteers.source_manual'), value: 'MANUAL' },
 ])
 
 const volunteerTeamItems = computed(() => {
@@ -813,6 +853,7 @@ const onAssignedTeamsFilterChange = () => {
 
 const resetApplicationsFilters = () => {
   applicationsFilterStatus.value = 'ALL'
+  applicationsFilterSource.value = 'ALL'
   applicationsFilterTeams.value = []
   applicationsFilterPresence.value = []
   applicationsFilterAssignedTeams.value = []

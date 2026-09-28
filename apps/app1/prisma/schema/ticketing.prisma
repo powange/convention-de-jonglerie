@@ -496,6 +496,32 @@ model TicketingOrderItem {
   entryValidatedAt DateTime?
   entryValidatedBy Int?
 
+  /// Quand ce billet a été annulé ici, et par qui.
+  ///
+  /// Le FAIT de l'annulation vit dans `state` (`Canceled`), lu par la porte, les statistiques, les
+  /// repas et la trésorerie. Ces deux colonnes n'ajoutent que la trace — comme `entryValidatedAt`
+  /// et `entryValidatedBy` juste au-dessus le font pour l'entrée.
+  ///
+  /// `null` sur une ligne `Canceled` signifie donc « annulée ailleurs qu'ici » : les 12 lignes
+  /// annulées de la production viennent de HelloAsso.
+  canceledAt   DateTime?
+  canceledById Int?
+
+  /// A-t-on rendu l'argent à la personne, et quand, et qui l'a rendu ?
+  ///
+  /// **Annulé ne veut pas dire remboursé**, et c'est toute la raison d'être de ces colonnes : un
+  /// billet réglé puis annulé reste de l'argent qu'on doit tant que cette case n'est pas cochée.
+  /// Le guichet s'en sert pour afficher la somme due à qui présente son billet.
+  ///
+  /// Un oui/non et non un montant : le choix est assumé, un remboursement partiel — frais retenus
+  /// — n'est pas exprimable ici.
+  ///
+  /// ⚠️ Sans effet sur la trésorerie, volontairement. Le montant quitte l'encaissé dès
+  /// l'annulation, remboursé ou non ; ces colonnes ne servent qu'à savoir à qui l'on doit encore.
+  refunded     Boolean   @default(false)
+  refundedAt   DateTime?
+  refundedById Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -201,6 +201,16 @@ export const USER_REFERENCES: UserReference[] = [
    * entrées aurait simplement cessé de nommer son validateur.
    */
   { model: 'ticketingOrderItem', field: 'entryValidatedBy', group: 'misc', soft: true },
+  /**
+   * Qui a annulé ce billet, et qui en a rendu l'argent.
+   *
+   * `soft` pour la même raison que la validation d'entrée juste au-dessus : un `User.id` sans
+   * relation. Les oublier ne casserait rien au moment de la fusion — et c'est le problème :
+   * l'écran cesserait simplement de nommer qui a sorti la caisse, ce qui est précisément ce
+   * qu'on lui demande de garder.
+   */
+  { model: 'ticketingOrderItem', field: 'canceledById', group: 'misc', soft: true },
+  { model: 'ticketingOrderItem', field: 'refundedById', group: 'misc', soft: true },
   // Journal des mouvements d'entrée. Même raison que le compteur ci-dessus : `SetNull` évite
   // l'erreur de clé étrangère mais efface le nom de qui a scanné. Un journal dont l'auteur
   // disparaît à la première fusion de comptes ne tranche plus aucun désaccord à la porte.

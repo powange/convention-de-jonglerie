@@ -249,6 +249,39 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
     })
   })
 
+  describe('ce qui ne donne pas droit d’entrée', () => {
+    /**
+     * Un don n'est pas une entrée, et il porte le nom du payeur — sur les données réelles, **les
+     * 43 lignes de don portent aussi un code QR**. Chercher « Dupont » ramenait donc son don à
+     * côté de son billet, sans que rien à l'écran ne les distingue.
+     *
+     * Les écarter est mesuré, pas supposé : ces lignes n'ont aucun tarif et aucune n'a jamais eu
+     * son entrée validée. Personne n'est jamais entré avec un don.
+     */
+    it('les écarte de la recherche par nom', async () => {
+      await searchHandler(mockEvent as any)
+
+      const where = prismaMock.ticketingOrderItem.findMany.mock.calls.at(-1)[0].where
+      expect(where.AND).toEqual([
+        { OR: [{ type: null }, { type: { notIn: ['Donation', 'Membership', 'Payment'] } }] },
+      ])
+    })
+
+    it('sans écraser le `OR` qui cherche le nom', async () => {
+      // Le piège : le fragment d'exclusion porte lui aussi un `OR`. L'étaler dans le `where`
+      // remplacerait celui qui cherche prénom, nom et courriel — la recherche rendrait alors
+      // TOUS les billets de l'édition, et rien n'échouerait pour le signaler.
+      await searchHandler(mockEvent as any)
+
+      const where = prismaMock.ticketingOrderItem.findMany.mock.calls.at(-1)[0].where
+      expect(where.OR.map((clause: any) => Object.keys(clause)[0])).toEqual([
+        'firstName',
+        'lastName',
+        'email',
+      ])
+    })
+  })
+
   it('ordonne les repas par date PUIS par type, pour les trois populations', async () => {
     await chercherAvec(5)
 

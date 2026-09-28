@@ -469,6 +469,7 @@
         :fuseau="edition?.timezone"
         @validate="handleValidateParticipants"
         @invalidate="handleInvalidateEntry"
+        @refund="handleRefund"
       />
 
       <!-- Modal ajout de participant -->
@@ -1090,6 +1091,42 @@ const handleInvalidateEntry = async (participantId: number) => {
     toast.add({
       title: t('ticketing.access_control.error_title'),
       description: err.data?.message || t('ticketing.access_control.invalidate_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+/**
+ * « J'ai rendu l'argent de ce billet. »
+ *
+ * Le geste se fait à la porte, face à la personne : c'est pour cela que le point d'API accepte
+ * aussi les bénévoles du contrôle d'accès, et non les seuls gestionnaires de la billetterie.
+ *
+ * L'entrée reste refusée : on solde une dette, on ne rouvre pas un droit.
+ */
+const handleRefund = async (itemId: number) => {
+  try {
+    await $fetch(`/api/editions/${editionId}/ticketing/order-items/${itemId}/refund`, {
+      method: 'PATCH',
+      body: { refunded: true },
+    })
+
+    toast.add({
+      title: t('ticketing.access_control.refund_recorded'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    })
+
+    // Recharger le billet pour que la fiche montre la dette soldée plutôt que la somme due.
+    if (selectedParticipant.value?.ticket?.qrCode) {
+      await reloadParticipant(selectedParticipant.value.ticket.qrCode, 'ticket')
+    }
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
+    toast.add({
+      title: t('ticketing.access_control.error_title'),
+      description: err.data?.message || t('ticketing.access_control.refund_error'),
       icon: 'i-heroicons-exclamation-circle',
       color: 'error',
     })

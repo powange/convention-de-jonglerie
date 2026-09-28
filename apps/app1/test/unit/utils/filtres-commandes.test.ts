@@ -15,6 +15,7 @@ const toutRempli = (): FiltresCommandes => ({
   tarifs: [1, 2],
   options: [7],
   statutEntree: 'validated',
+  remboursement: 'du',
   statuts: ['Pending', 'Refunded'],
   moyensDePaiement: ['cash', 'check'],
   typesDeLigne: ['Registration'],
@@ -57,7 +58,7 @@ describe('nombreDeFiltresActifs', () => {
   it('compte chaque valeur retenue, pas chaque critère', () => {
     // Deux tarifs cochés valent deux restrictions : c'est ce que l'utilisateur voit dans le
     // panneau, et la pastille doit dire la même chose.
-    expect(nombreDeFiltresActifs(toutRempli())).toBe(2 + 1 + 1 + 2 + 2 + 1 + 1)
+    expect(nombreDeFiltresActifs(toutRempli())).toBe(2 + 1 + 1 + 1 + 2 + 2 + 1 + 1)
   })
 
   it('ne compte pas le statut « tous »', () => {
@@ -80,13 +81,14 @@ describe('nombreDeFiltresActifs', () => {
     expect(nombreDeFiltresActifs(filtres)).toBe(0)
   })
 
-  it('voit chacun des sept critères', () => {
+  it('voit chacun des huit critères', () => {
     // Le décompte et l'envoi énuméraient tous deux les filtres à la main, dans deux fonctions
     // différentes. Ce test échouera si l'un des critères disparaît de l'un des deux.
     const criteres: Array<Partial<FiltresCommandes>> = [
       { tarifs: [1] },
       { options: [1] },
       { statutEntree: 'validated' },
+      { remboursement: 'du' },
       { statuts: ['Refunded'] },
       { moyensDePaiement: ['cash'] },
       { typesDeLigne: ['Donation'] },
@@ -105,6 +107,7 @@ describe('requeteDesFiltres', () => {
       tierIds: [1, 2],
       optionIds: [7],
       entryStatus: 'validated',
+      refundStatus: 'du',
       statuses: ['Pending', 'Refunded'],
       paymentMethods: ['cash', 'check'],
       itemTypes: ['Registration'],
@@ -206,6 +209,7 @@ describe('les filtres dans l’URL', () => {
     expect(filtres.moyensDePaiement).toEqual(['cash'])
     expect(filtres.typesDeLigne).toEqual(['Registration'])
     expect(filtres.statutEntree).toBe('all')
+    expect(filtres.remboursement).toBe('all')
     expect(filtres.tarifs).toEqual([1, 4])
   })
 

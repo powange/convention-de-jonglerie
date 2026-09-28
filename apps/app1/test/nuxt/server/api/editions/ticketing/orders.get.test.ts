@@ -43,8 +43,20 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
         payerLastName: 'Doe',
         payerEmail: 'john@example.com',
         externalTicketing: null,
+        // `state`, `refunded` et le statut de la commande servent au calcul de `refundDue` :
+        // sans eux, la ligne serait vue comme « non annulée », ce qui est vrai ici mais par
+        // accident. On dit donc ce qu'elle est.
+        status: 'Processed',
+        paymentMethod: 'card',
         items: [
-          { id: 1, type: 'Participant', amount: 5000, tier: { id: 1, name: 'Tarif normal' } },
+          {
+            id: 1,
+            type: 'Participant',
+            amount: 5000,
+            state: 'Processed',
+            refunded: false,
+            tier: { id: 1, name: 'Tarif normal' },
+          },
         ],
       },
     ]
@@ -59,7 +71,14 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     expect(res.data).toEqual([
       {
         ...mockOrders[0],
-        items: [{ ...mockOrders[0]!.items[0], retenuParLesFiltres: true }],
+        items: [
+          {
+            ...mockOrders[0]!.items[0],
+            retenuParLesFiltres: true,
+            // Le billet n'est pas annulé : on ne doit rien.
+            refundDue: null,
+          },
+        ],
       },
     ])
     expect(res.pagination).toEqual({

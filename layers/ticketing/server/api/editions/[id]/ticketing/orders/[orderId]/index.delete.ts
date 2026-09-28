@@ -61,13 +61,25 @@ export default wrapApiHandler(
         return createSuccessResponse(null, 'Commande supprimée avec succès')
       }
 
-      // Sinon, changer le statut de la commande à "Refunded" (annuler)
-      await prisma.ticketingOrder.update({
-        where: { id: orderId },
-        data: {
-          status: 'Refunded',
-        },
-      })
+      // Sinon, annuler : le statut de la commande, ET l'état de chacun de ses billets.
+      //
+      // Stamper les billets n'est pas redondant. « Ce billet vaut-il encore ? » se lisait sur deux
+      // niveaux — l'état de la ligne OU le statut de sa commande — et c'est cette double lecture
+      // qui a produit les divergences que `billets-qui-comptent.ts` documente : un écran
+      // interrogeait l'un, son voisin l'autre. Tout se lit désormais sur le billet.
+      //
+      // Le remboursement, lui, n'est pas touché : annuler ne dit pas qu'on a rendu l'argent. Ces
+      // billets apparaîtront comme dus, ce qui est exactement l'effet recherché.
+      await prisma.$transaction([
+        prisma.ticketingOrder.update({
+          where: { id: orderId },
+          data: { status: 'Refunded' },
+        }),
+        prisma.ticketingOrderItem.updateMany({
+          where: { orderId, state: { not: 'Canceled' } },
+          data: { state: 'Canceled', canceledAt: new Date(), canceledById: user.id },
+        }),
+      ])
 
       return createSuccessResponse(null, 'Commande annulée avec succès')
     } catch (error: unknown) {

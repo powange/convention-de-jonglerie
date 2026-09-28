@@ -95,6 +95,11 @@ describe('quotas — les options', () => {
   it('n’interroge que les billets payés ou en attente de cette édition', async () => {
     // Le reste du calcul ne retient que `Processed` et `Pending` : une option prise sur un billet
     // annulé ne doit pas occuper de place.
+    //
+    // La condition sur la COMMANDE s'y est ajoutée : le filtre ne regardait que l'état de la
+    // ligne, si bien qu'une option prise sur une commande remboursée gardait sa place. Les trois
+    // requêtes de ce calcul s'appuient désormais sur `billetsQuiComptent()`, qui porte les deux
+    // niveaux — c'est la même règle que la porte et les statistiques appliquent déjà.
     await statsAvec({ options: [{ optionId: 3 }] })
 
     expect(prismaMock.ticketingOrderItemOption.findMany).toHaveBeenCalledWith(
@@ -102,7 +107,7 @@ describe('quotas — les options', () => {
         where: expect.objectContaining({
           orderItem: expect.objectContaining({
             state: { in: ['Processed', 'Pending'] },
-            order: { editionId: 22 },
+            order: { editionId: 22, status: { not: 'Refunded' } },
           }),
         }),
       })

@@ -18,6 +18,51 @@
           description="Cette commande a été annulée. Les billets ne peuvent pas être validés."
         />
 
+        <!--
+          La somme qu'on doit à la personne qui présente ce billet.
+
+          Symétrique du bloc « Montant à payer » de la modale de paiement, et au même endroit du
+          parcours : c'est à la porte qu'on rencontre la personne, donc là qu'on lui rend son
+          argent. L'entrée reste refusée — ce bouton solde une dette, il ne rouvre pas le droit
+          d'entrer.
+        -->
+        <div
+          v-if="montantARembourser !== null"
+          class="p-4 rounded-lg bg-gradient-to-r from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20 border border-warning-200 dark:border-warning-800 space-y-3"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-banknotes"
+                class="text-warning-600 dark:text-warning-400 h-5 w-5"
+              />
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ $t('edition.ticketing.refund_amount_label') }}
+              </span>
+            </div>
+            <span class="text-2xl font-bold text-warning-600 dark:text-warning-400">
+              {{ money(montantARembourser) }}
+            </span>
+          </div>
+          <UButton
+            block
+            color="warning"
+            icon="i-heroicons-check-circle"
+            :label="$t('edition.ticketing.refund_mark_done')"
+            @click="marquerRembourse"
+          />
+        </div>
+
+        <!-- Dette déjà soldée : on le dit, pour qu'on ne rende pas l'argent deux fois. -->
+        <UAlert
+          v-else-if="dejaRembourse"
+          icon="i-heroicons-check-circle"
+          color="success"
+          variant="soft"
+          :title="$t('edition.ticketing.refund_already_done')"
+          :description="dateDuRemboursement"
+        />
+
         <!-- Type d'accès -->
         <div
           :class="`flex items-center justify-between p-4 rounded-lg ${ticketConfig.bgClass} ${ticketConfig.darkBgClass}`"
@@ -107,36 +152,13 @@
             </div>
             <div v-if="participant.ticket.order.status">
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Statut de la commande</p>
-              <UBadge
-                :color="
-                  participant.ticket.order.status === 'Processed'
-                    ? 'success'
-                    : participant.ticket.order.status === 'Pending'
-                      ? 'warning'
-                      : participant.ticket.order.status === 'Onsite'
-                        ? 'info'
-                        : participant.ticket.order.status === 'Refunded' ||
-                            participant.ticket.order.status === 'Canceled'
-                          ? 'error'
-                          : 'neutral'
-                "
-                :size="participant.ticket.order.status === 'Canceled' ? 'lg' : undefined"
-                variant="soft"
-              >
-                {{
-                  participant.ticket.order.status === 'Processed'
-                    ? 'Payée'
-                    : participant.ticket.order.status === 'Pending'
-                      ? 'En attente de paiement'
-                      : participant.ticket.order.status === 'Onsite'
-                        ? 'Sur place'
-                        : participant.ticket.order.status === 'Refunded'
-                          ? 'Annulée'
-                          : participant.ticket.order.status === 'Canceled'
-                            ? 'Annulée'
-                            : participant.ticket.order.status
-                }}
-              </UBadge>
+              <!--
+                `Canceled` ne figure plus ici : c'est un état de LIGNE, jamais un statut de
+                commande. Les deux branches qui le testaient ne se sont donc jamais exécutées —
+                une commande s'annule par `Refunded`, un billet par `Canceled`, et les deux
+                vocabulaires ne se recouvrent pas (cf. `billets-qui-comptent.ts`).
+              -->
+              <UBadge :color="couleurDuStatut" :label="libelleDuStatut" variant="soft" />
             </div>
           </div>
         </div>
@@ -988,6 +1010,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
+  /** « J'ai rendu l'argent de ce billet. » La page appelle le point d'API et rafraîchit la fiche. */
+  refund: [itemId: number]
   validate: [
     participantIds: number[],
     paymentInfo?: {
@@ -1224,6 +1248,71 @@ watch(
       populateEditableFields()
     }
   }
+)
+
+/**
+ * Le billet scanné, quand c'en est un.
+ *
+ * Les autres lignes de la commande sont dans `participantItems` ; celle-ci est celle qu'on vient
+ * de présenter à la porte, et c'est d'elle qu'on parle quand on rend de l'argent.
+ */
+const billetScanne = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return null
+  return props.participant.ticket
+})
+
+/**
+ * La somme due à la personne, ou `null` s'il n'y a rien à rendre.
+ *
+ * Calculée par le serveur (`montantARembourser`, dans `remboursement-du.ts`) et non ici : la règle
+ * tient en trois conditions dont une piégeuse — annuler une commande remplace son statut « payée »
+ * par « annulée », et seul le moyen de paiement témoigne encore qu'elle l'était. La recopier à
+ * l'écran, c'était s'exposer à ce qu'elle diverge du jour où le serveur la corrigerait.
+ */
+const montantARembourser = computed(() => billetScanne.value?.refundDue ?? null)
+
+const dejaRembourse = computed(
+  () => billetScanne.value?.state === 'Canceled' && billetScanne.value?.refunded === true
+)
+
+const dateDuRemboursement = computed(() => {
+  const quand = billetScanne.value?.refundedAt
+  // Les remboursements rattrapés à la reprise n'ont pas de date : on sait QUE l'argent a été
+  // rendu, pas quand. Mieux vaut ne rien dater que dater faux.
+  if (!quand) return undefined
+  return formaterDateHeure(quand, props.fuseau, locale.value)
+})
+
+const marquerRembourse = () => {
+  if (billetScanne.value) emit('refund', billetScanne.value.id)
+}
+
+/**
+ * Le statut de la COMMANDE, rendu lisible.
+ *
+ * Les quatre valeurs sont celles que la billetterie enregistre réellement — relevées sur les
+ * données dans `billets-qui-comptent.ts`, et non supposées. `Canceled` n'en fait pas partie :
+ * c'est un état de billet. Une valeur inconnue s'affiche telle quelle plutôt que d'être traduite
+ * de travers.
+ */
+const STATUTS_DE_COMMANDE: Record<string, { couleur: string; libelle: string }> = {
+  Processed: { couleur: 'success', libelle: 'Payée' },
+  Pending: { couleur: 'warning', libelle: 'En attente de paiement' },
+  Onsite: { couleur: 'info', libelle: 'Sur place' },
+  Refunded: { couleur: 'error', libelle: 'Annulée' },
+}
+
+const statutDeLaCommande = computed(() => {
+  if (!props.participant || !('ticket' in props.participant)) return ''
+  return props.participant.ticket.order.status || ''
+})
+
+const couleurDuStatut = computed(
+  () => STATUTS_DE_COMMANDE[statutDeLaCommande.value]?.couleur ?? 'neutral'
+)
+
+const libelleDuStatut = computed(
+  () => STATUTS_DE_COMMANDE[statutDeLaCommande.value]?.libelle ?? statutDeLaCommande.value
 )
 
 // Computed pour séparer les items entre participants et types spéciaux

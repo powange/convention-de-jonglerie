@@ -305,4 +305,29 @@ describe('quotas — la place qu’occupent les personnes sans billet', () => {
 
     expect(stats.currentCount).toBe(4)
   })
+
+  it('n’occupe plus de place quand la commande a été remboursée', async () => {
+    /**
+     * Les trois requêtes de ce calcul ne regardaient que l'état de la LIGNE
+     * (`Processed`/`Pending`) et jamais le statut de sa commande — là où `billetsQuiComptent()`
+     * écarte aussi les commandes remboursées. Les deux commandes `Refunded` de la production
+     * gardaient donc leur place dans les quotas, indéfiniment.
+     *
+     * Une règle recopiée à la main dans trois `where` : c'est exactement ce que le helper existe
+     * pour éviter.
+     */
+    await statsAvec({ tiers: [{ tier: { orderItems: [] } }] })
+
+    const attendu = {
+      state: { in: ['Processed', 'Pending'] },
+      order: { editionId: 22, status: { not: 'Refunded' } },
+    }
+
+    expect(prismaMock.ticketingOrderItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: attendu })
+    )
+    expect(prismaMock.ticketingOrderItemOption.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { orderItem: attendu } })
+    )
+  })
 })

@@ -70,6 +70,7 @@ export default wrapApiHandler(
     const teamsFilter = query.teams as string | undefined
     const presenceFilter = query.presence as string | undefined
     const assignedTeamsFilter = query.assignedTeams as string | undefined
+    const sourceFilter = query.source as string | undefined
     const isExport = query.export === 'true'
     const { page } = validatePagination(event)
     const pageSize = Math.min(
@@ -86,6 +87,15 @@ export default wrapApiHandler(
     // Filtre par statut
     if (statusFilter) {
       conditions.push({ status: statusFilter })
+    }
+
+    // Filtre par provenance de la candidature : spontanée, ou ajoutée par un organisateur.
+    //
+    // La valeur est comparée à la liste connue plutôt que transmise telle quelle : `source` est un
+    // enum Prisma, et une chaîne venue de l'URL qui n'en fait pas partie ferait échouer la requête
+    // entière — l'écran afficherait une erreur là où il suffit de ne pas filtrer.
+    if (sourceFilter === 'APPLICATION' || sourceFilter === 'MANUAL') {
+      conditions.push({ source: sourceFilter })
     }
 
     // Filtre par équipes

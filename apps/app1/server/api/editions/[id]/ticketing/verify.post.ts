@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { lignesQuiDonnentAcces } from '#server/utils/ticketing/billets-qui-comptent'
 import { designerLaPersonne } from '#server/utils/ticketing/designation-participant'
 import {
   aggregateHandoutItems,
@@ -11,6 +12,7 @@ import {
 } from '#server/utils/ticketing/handout-items'
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
+import { montantARembourser } from '#server/utils/ticketing/remboursement-du'
 
 /**
  * Deux demandes distinctes, et c'est volontaire : un QR code présenté au scan doit porter son
@@ -530,6 +532,10 @@ export default wrapApiHandler(
             order: {
               editionId: editionId,
             },
+            // Même règle qu'à la recherche par nom : un don porte un code QR — les 43 de la base
+            // de développement en ont un — et se scannait donc comme un billet. Scanner un don ne
+            // doit rien rendre, plutôt que de présenter le donateur comme un entrant.
+            AND: [lignesQuiDonnentAcces()],
           },
           include: {
             order: {
@@ -584,6 +590,24 @@ export default wrapApiHandler(
                 name: orderItem.name,
                 amount: orderItem.amount,
                 state: orderItem.state,
+                // Annulé ne veut pas dire remboursé : le guichet affiche la somme due tant
+                // que cette case n'est pas cochée.
+                refunded: orderItem.refunded,
+                refundedAt: orderItem.refundedAt,
+                /**
+                 * La somme due, calculée ICI et non à l'écran : la règle tient en trois
+                 * conditions dont une piégeuse — annuler une commande efface son statut « payée »,
+                 * et seul le moyen de paiement témoigne encore qu'elle l'était.
+                 */
+                refundDue: montantARembourser({
+                  state: orderItem.state,
+                  refunded: orderItem.refunded,
+                  amount: orderItem.amount,
+                  order: {
+                    status: orderItem.order.status,
+                    paymentMethod: orderItem.order.paymentMethod,
+                  },
+                }),
                 qrCode: orderItem.qrCode,
                 user: {
                   firstName: orderItem.firstName,
@@ -607,6 +631,8 @@ export default wrapApiHandler(
                     type: item.type,
                     amount: item.amount,
                     state: item.state,
+                    refunded: item.refunded,
+                    refundedAt: item.refundedAt,
                     qrCode: item.qrCode,
                     firstName: item.firstName,
                     lastName: item.lastName,

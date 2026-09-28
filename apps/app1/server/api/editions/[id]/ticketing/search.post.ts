@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { lignesQuiDonnentAcces } from '#server/utils/ticketing/billets-qui-comptent'
 import {
   aggregateHandoutItems,
   calculateHandoutItemsForTicket,
@@ -9,6 +10,7 @@ import {
 } from '#server/utils/ticketing/handout-items'
 import { articlesARemettreActifs } from '#server/utils/ticketing/handout-items-actifs'
 import { resoudreLesValidateurs } from '#server/utils/ticketing/nom-du-validateur'
+import { montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { sanitizeEmail } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -43,6 +45,13 @@ export default wrapApiHandler(
           order: {
             editionId,
           },
+          // Un don n'est pas une entrée. Il porte le nom du payeur et, sur les données réelles, un
+          // code QR : chercher « Dupont » ramenait donc son don à côté de son billet, sans que
+          // rien à l'écran ne les distingue.
+          //
+          // Sous `AND` et non étalé : le `OR` du fragment écraserait celui de la recherche par nom
+          // juste en dessous, et le filtre disparaîtrait sans bruit.
+          AND: [lignesQuiDonnentAcces()],
           OR: [
             {
               firstName: {
@@ -632,6 +641,17 @@ export default wrapApiHandler(
               name: item.name,
               amount: item.amount,
               state: item.state,
+              // Annulé ne veut pas dire remboursé : le guichet affiche la somme due tant que
+              // cette case n'est pas cochée.
+              refunded: item.refunded,
+              refundedAt: item.refundedAt,
+              /** Voir `verify.post.ts` : la même règle, au même endroit du contrat. */
+              refundDue: montantARembourser({
+                state: item.state,
+                refunded: item.refunded,
+                amount: item.amount,
+                order: { status: item.order.status, paymentMethod: item.order.paymentMethod },
+              }),
               qrCode: item.qrCode,
               user: {
                 firstName: item.firstName,
@@ -653,6 +673,8 @@ export default wrapApiHandler(
                   type: orderItem.type,
                   amount: orderItem.amount,
                   state: orderItem.state,
+                  refunded: orderItem.refunded,
+                  refundedAt: orderItem.refundedAt,
                   qrCode: orderItem.qrCode,
                   firstName: orderItem.firstName,
                   lastName: orderItem.lastName,
