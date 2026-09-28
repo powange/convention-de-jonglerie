@@ -466,6 +466,104 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
     })
   })
 
+  describe('un bénévole qui valide son badge en retard', () => {
+    /**
+     * Le défaut que l'utilisateur a repéré.
+     *
+     * Un bénévole entre par une autre porte et fait valider son billet quand il y pense — parfois le
+     * dernier jour, pour le comptage. Mesuré sur la base de développement : 51 sur 85 valident au
+     * moins un jour après leur arrivée déclarée, dont 22 trois ou quatre jours après.
+     *
+     * Sa date DÉCLARÉE fait donc foi. Un participant, lui, ne peut pas être là sans scanner : sa règle
+     * ne change pas.
+     */
+    it('est compté dès son arrivée déclarée, pas depuis sa validation', async () => {
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        // Validé le dimanche, alors qu'il a déclaré arriver le vendredi.
+        mouvement('VOLUNTEER', 5, VENDREDI + 2 * JOUR + 20 * H),
+      ])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+        {
+          id: 5,
+          user: { email: 'b@exemple.test' },
+          arrivalDateTime: '2026-07-10_morning',
+          departureDateTime: null,
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.parPopulation.benevoles).toEqual([1, 1, 1])
+    })
+
+    it('reste compté depuis sa validation quand il n’a rien déclaré', async () => {
+      // Sans déclaration il ne reste qu'un repli, plus vague que la validation : celle-ci reprend la
+      // main, sinon on le compterait dès l'ouverture sur une case cochée.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('VOLUNTEER', 5, VENDREDI + 2 * JOUR + 10 * H),
+      ])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+        {
+          id: 5,
+          user: { email: 'b@exemple.test' },
+          arrivalDateTime: null,
+          departureDateTime: null,
+          eventAvailability: true,
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.parPopulation.benevoles).toEqual([0, 0, 1])
+    })
+
+    it('un participant reste compté depuis sa validation, lui', async () => {
+      // La règle que l'utilisateur a fixée pour les participants n'est pas touchée.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('TICKET', 900, VENDREDI + 2 * JOUR + 10 * H),
+      ])
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        {
+          id: 900,
+          email: 'p@exemple.test',
+          tier: { ...TARIF_PARTICIPANT, presenceFrom: new Date(VENDREDI) },
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.parPopulation.participants).toEqual([0, 0, 1])
+    })
+
+    it('un artiste et un organisateur suivent la règle des bénévoles', async () => {
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('ARTIST', 3, VENDREDI + 2 * JOUR + 20 * H),
+        mouvement('ORGANIZER', 2, VENDREDI + 2 * JOUR + 20 * H),
+      ])
+      prismaMock.editionArtist.findMany.mockResolvedValue([
+        {
+          id: 3,
+          user: { email: 'a@exemple.test' },
+          arrivalDateTime: new Date(VENDREDI + 6 * H),
+          departureDateTime: null,
+        },
+      ])
+      prismaMock.editionOrganizer.findMany.mockResolvedValue([
+        {
+          id: 2,
+          arrivalDateTime: '2026-07-10_morning',
+          departureDateTime: null,
+          organizer: { user: { email: 'o@exemple.test' } },
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.parPopulation.artistes).toEqual([1, 1, 1])
+      expect(data.parPopulation.organisateurs).toEqual([1, 1, 1])
+    })
+  })
+
   describe('les entrées annulées', () => {
     it('ne compte pas une entrée annulée ensuite', async () => {
       // `INVALIDATED` est une correction de saisie, pas un départ : la personne n'était pas là.

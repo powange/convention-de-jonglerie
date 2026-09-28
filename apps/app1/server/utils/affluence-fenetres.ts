@@ -19,6 +19,24 @@ import { fenetreDe } from '~~/shared/utils/presence-benevole'
  * ici et nulle part ailleurs pour qu'on puisse les relire d'un coup d'œil.
  */
 
+/**
+ * Une fenêtre résolue, et **d'où vient son arrivée**.
+ *
+ * La distinction n'est pas cosmétique : elle décide si la validation d'entrée fait foi. Un bénévole
+ * qui a déclaré « j'arrive vendredi matin » est là vendredi, même s'il ne fait valider son badge que
+ * le dimanche — mesuré sur la base de développement, 51 bénévoles sur 85 valident au moins un jour
+ * après leur arrivée déclarée, dont 22 trois ou quatre jours après.
+ *
+ * Mais un bénévole qui n'a RIEN déclaré n'a qu'un repli — une case « disponible pendant
+ * l'événement » —, et l'écarter au profit de cette case le compterait présent dès l'ouverture sur
+ * une donnée bien plus vague que sa validation. D'où ce drapeau : on ne se passe de la validation
+ * que là où une vraie déclaration la remplace.
+ */
+export interface FenetreResolue extends FenetrePresence {
+  /** Vrai quand l'arrivée vient d'une déclaration, faux quand elle vient d'un repli. */
+  arriveeDeclaree: boolean
+}
+
 /** Les bornes de l'édition, telles que le journal des entrées les lit déjà. */
 export interface PeriodesEdition {
   /** Début du montage, ou début de l'événement à défaut. */
@@ -48,10 +66,13 @@ const instantDe = (date: Date | null | undefined): number | null => (date ? date
 export function fenetreDuBillet(
   tarif: { presenceFrom: Date | null; presenceUntil: Date | null } | null | undefined,
   periodes: PeriodesEdition
-): FenetrePresence {
+): FenetreResolue {
   return {
     arrivee: instantDe(tarif?.presenceFrom) ?? periodes.debut,
     depart: instantDe(tarif?.presenceUntil) ?? periodes.fin,
+    // Renseigné pour la forme : pour un participant, la validation fait TOUJOURS foi — le scan EST
+    // la porte, il ne peut pas être là sans elle. C'est la règle que l'utilisateur a fixée.
+    arriveeDeclaree: instantDe(tarif?.presenceFrom) !== null,
   }
 }
 
@@ -77,7 +98,7 @@ export function fenetreDuBenevole(
   },
   periodes: PeriodesEdition,
   fuseau: string | null | undefined
-): FenetrePresence {
+): FenetreResolue {
   const declaree = fenetreDe(candidature, fuseau)
 
   return {
@@ -85,6 +106,7 @@ export function fenetreDuBenevole(
       declaree.arrivee ?? (candidature.setupAvailability ? periodes.montage : periodes.debut),
     depart:
       declaree.depart ?? (candidature.teardownAvailability ? periodes.demontage : periodes.fin),
+    arriveeDeclaree: declaree.arrivee !== null,
   }
 }
 
@@ -97,10 +119,11 @@ export function fenetreDuBenevole(
 export function fenetreDeLArtiste(
   artiste: { arrivalDateTime: Date | null; departureDateTime: Date | null },
   periodes: PeriodesEdition
-): FenetrePresence {
+): FenetreResolue {
   return {
     arrivee: instantDe(artiste.arrivalDateTime) ?? periodes.debut,
     depart: instantDe(artiste.departureDateTime) ?? periodes.fin,
+    arriveeDeclaree: instantDe(artiste.arrivalDateTime) !== null,
   }
 }
 
@@ -118,11 +141,12 @@ export function fenetreDeLOrganisateur(
   organisateur: { arrivalDateTime?: string | null; departureDateTime?: string | null },
   periodes: PeriodesEdition,
   fuseau: string | null | undefined
-): FenetrePresence {
+): FenetreResolue {
   const declaree = fenetreDe(organisateur, fuseau)
 
   return {
     arrivee: declaree.arrivee ?? periodes.debut,
     depart: declaree.depart ?? periodes.fin,
+    arriveeDeclaree: declaree.arrivee !== null,
   }
 }

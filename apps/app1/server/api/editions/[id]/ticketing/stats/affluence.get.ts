@@ -229,45 +229,67 @@ export default wrapApiHandler(
     const entreeDe = (kind: string, id: number) =>
       entrees.get(`${kind}:${id}`)?.premiere ?? periodes.debut
 
+    /**
+     * La validation fait-elle foi comme moment d'arrivée ?
+     *
+     * Toujours pour un participant : le scan EST la porte. Pour les trois autres populations, non —
+     * dès qu'ils ont DÉCLARÉ leur date. Leur badge se fait valider quand ils y pensent, parfois le
+     * dernier jour, et prendre cette date les effaçait des premiers jours (51 bénévoles sur 85
+     * valident au moins un jour après leur arrivée déclarée). Sans déclaration, en revanche, il ne
+     * reste qu'un repli plus vague que la validation : elle reprend alors la main.
+     */
+    const validationFaitFoi = (
+      population: PresenceDeclaree['population'],
+      fenetre: { arriveeDeclaree: boolean }
+    ) => population === 'participants' || !fenetre.arriveeDeclaree
+
     for (const billet of billets) {
       // Un billet qui ne compte pas comme participant n'ouvre aucune pile : son porteur n'entre au
       // graphique que par un AUTRE titre, s'il en a un.
       if (!billet.tier?.countAsParticipant) continue
 
+      const fenetre = fenetreDuBillet(billet.tier, periodes)
       titres.push({
         identite: identiteDuCourriel(billet.email) ?? `billet:${billet.id}`,
         population: 'participants',
         entree: entreeDe('TICKET', billet.id),
-        fenetre: fenetreDuBillet(billet.tier, periodes),
+        fenetre,
+        laValidationFaitLArrivee: validationFaitFoi('participants', fenetre),
       })
     }
 
     for (const benevole of benevoles) {
+      const fenetre = fenetreDuBenevole(benevole, periodes, fuseau)
       titres.push({
         identite: identiteDuCourriel(benevole.user?.email) ?? `benevole:${benevole.id}`,
         population: 'benevoles',
         entree: entreeDe('VOLUNTEER', benevole.id),
-        fenetre: fenetreDuBenevole(benevole, periodes, fuseau),
+        fenetre,
+        laValidationFaitLArrivee: validationFaitFoi('benevoles', fenetre),
       })
     }
 
     for (const artiste of artistes) {
+      const fenetre = fenetreDeLArtiste(artiste, periodes)
       titres.push({
         identite: identiteDuCourriel(artiste.user?.email) ?? `artiste:${artiste.id}`,
         population: 'artistes',
         entree: entreeDe('ARTIST', artiste.id),
-        fenetre: fenetreDeLArtiste(artiste, periodes),
+        fenetre,
+        laValidationFaitLArrivee: validationFaitFoi('artistes', fenetre),
       })
     }
 
     for (const organisateur of organisateurs) {
+      const fenetre = fenetreDeLOrganisateur(organisateur, periodes, fuseau)
       titres.push({
         identite:
           identiteDuCourriel(organisateur.organizer?.user?.email) ??
           `organisateur:${organisateur.id}`,
         population: 'organisateurs',
         entree: entreeDe('ORGANIZER', organisateur.id),
-        fenetre: fenetreDeLOrganisateur(organisateur, periodes, fuseau),
+        fenetre,
+        laValidationFaitLArrivee: validationFaitFoi('organisateurs', fenetre),
       })
     }
 
@@ -364,13 +386,20 @@ export default wrapApiHandler(
         }),
       ])
 
-    /** Sans validation à confronter, l'entrée EST le début déclaré : le `max` devient sans effet. */
+    /** Sans validation à confronter, l'entrée EST le début déclaré : le régime est sans objet ici. */
     const attendus: PresenceDeclaree[] = []
     const attendu = (
       identite: string,
       population: PresenceDeclaree['population'],
       fenetre: PresenceDeclaree['fenetre']
-    ) => attendus.push({ identite, population, entree: fenetre.arrivee ?? periodes.debut, fenetre })
+    ) =>
+      attendus.push({
+        identite,
+        population,
+        entree: fenetre.arrivee ?? periodes.debut,
+        fenetre,
+        laValidationFaitLArrivee: true,
+      })
 
     for (const billet of billetsAttendus) {
       attendu(
