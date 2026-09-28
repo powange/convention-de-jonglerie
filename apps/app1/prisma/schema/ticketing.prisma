@@ -106,6 +106,17 @@ model TicketingTier {
   countAsParticipant  Boolean   @default(true) // Si ce tarif compte comme participant dans les stats
   validFrom           DateTime? // Date de début de validité (optionnel)
   validUntil          DateTime? // Date de fin de validité (optionnel)
+  /// Quand le porteur de ce tarif est PRÉSENT sur place — à ne pas confondre avec `validFrom` et
+  /// `validUntil` juste au-dessus, qui disent quand le BILLET peut servir.
+  ///
+  /// La distinction se voit sur un pass week-end vendu jusqu'au dernier jour : sa validité court
+  /// jusqu'à la fermeture, sa présence s'arrête au départ du festivalier. C'est cette seconde date
+  /// qui fait redescendre la courbe d'affluence — sans elle, aucune sortie n'étant enregistrée, la
+  /// courbe ne pouvait que monter.
+  ///
+  /// N'a de sens que si `countAsParticipant` : un tee-shirt ou un don n'amène personne.
+  presenceFrom        DateTime?
+  presenceUntil       DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 

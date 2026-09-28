@@ -21,6 +21,9 @@ const bodySchema = z.object({
   // place. C'était le défaut d'origine.
   validFrom: dateDeValiditeSchema,
   validUntil: dateDeValiditeSchema,
+  // La PRÉSENCE du porteur, même forme acceptée que la validité — c'est le sens qui diffère.
+  presenceFrom: dateDeValiditeSchema,
+  presenceUntil: dateDeValiditeSchema,
   handoutItemIds: z.array(z.number().int()).optional().default([]),
   mealIds: z.array(z.number().int()).optional().default([]),
 })
