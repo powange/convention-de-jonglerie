@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Inga avtal motsvarar dina sökkriterier",
     "period": "Period",
     "searched_services": "Tjänster som efterfrågas",
-    "upcoming_editions": "Kommande utgåvor"
+    "upcoming_editions": "Kommande utgåvor",
+    "search_editions": "Sök efter en upplaga",
+    "search_placeholder": "Upplagans namn"
   },
   "pages": {
     "access_denied": {

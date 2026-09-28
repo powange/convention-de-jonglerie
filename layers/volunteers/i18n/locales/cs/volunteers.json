@@ -649,9 +649,9 @@
     "what_you_can_bring_title": "Co pro nás můžete udělat",
     "with_you_on_slot": "S vámi na této směně: | S vámi na této směně ({count}):",
     "withdraw": "Stáhnout svou žádost",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
-    "team_periods": "[TODO] Périodes d'intervention",
-    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
-    "team_periods_required": "[TODO] Cochez au moins une période"
+    "validation_summary_title": "K odeslání přihlášky chybí některé údaje",
+    "team_periods": "Období nasazení",
+    "team_periods_hint": "Tento tým uvidí ve svých preferencích jen dobrovolníci přítomní v některém z těchto období",
+    "team_periods_required": "Zaškrtněte alespoň jedno období"
   }
 }

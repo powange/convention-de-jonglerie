@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Ingen konventioner matcher dine søgekriterier",
     "period": "Periode",
     "searched_services": "Søgte tjenester",
-    "upcoming_editions": "Kommende udgaver"
+    "upcoming_editions": "Kommende udgaver",
+    "search_editions": "Søg efter en udgave",
+    "search_placeholder": "Udgavens navn"
   },
   "pages": {
     "access_denied": {

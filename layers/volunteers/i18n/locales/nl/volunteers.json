@@ -649,9 +649,9 @@
     "what_you_can_bring_title": "Wat u ons kunt brengen",
     "with_you_on_slot": "Samen met jou in deze dienst: | Samen met jou in deze dienst ({count}):",
     "withdraw": "Trek mijn aanmelding in",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
-    "team_periods": "[TODO] Périodes d'intervention",
-    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
-    "team_periods_required": "[TODO] Cochez au moins une période"
+    "validation_summary_title": "Er ontbreekt informatie om je aanmelding te versturen",
+    "team_periods": "Inzetperiodes",
+    "team_periods_hint": "Alleen vrijwilligers die in een van deze periodes aanwezig zijn, zien dit team in hun voorkeuren",
+    "team_periods_required": "Vink minstens één periode aan"
   }
 }

@@ -222,6 +222,34 @@ describe('/api/editions GET', () => {
     })
   })
 
+  it("classe la plus proche d'abord par défaut", async () => {
+    global.getQuery.mockReturnValue({})
+    prismaMock.edition.count.mockResolvedValue(1)
+    prismaMock.edition.findMany.mockResolvedValue([mockEdition])
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
+
+    await handler({} as any)
+
+    expect(prismaMock.edition.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { startDate: 'asc' } })
+    )
+  })
+
+  it("classe la plus récente d'abord quand la recherche le demande", async () => {
+    // Ce que la loupe de l'en-tête envoie : une fois le passé ouvert, l'ordre par défaut
+    // remonterait l'édition la plus ANCIENNE en tête de liste.
+    global.getQuery.mockReturnValue({ name: 'Rennes', showPast: 'true', sort: 'recent' })
+    prismaMock.edition.count.mockResolvedValue(1)
+    prismaMock.edition.findMany.mockResolvedValue([mockEdition])
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
+
+    await handler({} as any)
+
+    expect(prismaMock.edition.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { startDate: 'desc' } })
+    )
+  })
+
   it("devrait gérer les organisateurs d'édition si disponible", async () => {
     global.getQuery.mockReturnValue({})
     prismaMock.edition.count.mockResolvedValue(1)

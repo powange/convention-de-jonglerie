@@ -649,9 +649,9 @@
     "what_you_can_bring_title": "Lo que puede aportarnos",
     "with_you_on_slot": "Contigo en este turno: | Contigo en este turno ({count}):",
     "withdraw": "Retirar mi solicitud",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
-    "team_periods": "[TODO] Périodes d'intervention",
-    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
-    "team_periods_required": "[TODO] Cochez au moins une période"
+    "validation_summary_title": "Faltan datos para enviar tu candidatura",
+    "team_periods": "Periodos de intervención",
+    "team_periods_hint": "Solo el voluntariado presente en alguno de estos periodos verá este equipo en sus preferencias",
+    "team_periods_required": "Marca al menos un periodo"
   }
 }

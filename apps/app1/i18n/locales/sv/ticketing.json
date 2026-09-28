@@ -316,9 +316,9 @@
       "organizers": "Arrangörer",
       "participants": "Deltagare",
       "volunteers": "Volontärer",
-      "count_per_person": "[TODO] par personne",
-      "count_per_ticket": "[TODO] par billet",
-      "count_toggle_hint": "[TODO] Cliquer pour compter par personne : deux billets au même nom et prénom comptent alors pour une seule personne"
+      "count_per_person": "per person",
+      "count_per_ticket": "per biljett",
+      "count_toggle_hint": "Klicka för att räkna per person: två biljetter med samma för- och efternamn räknas då som en enda person"
     },
     "tiers": {
       "created": "Pris skapat framgångsrikt",

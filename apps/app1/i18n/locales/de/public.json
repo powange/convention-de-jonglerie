@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Keine Convention entspricht deinen Suchkriterien",
     "period": "Zeitraum",
     "searched_services": "Gesuchte Services",
-    "upcoming_editions": "Kommende Auflagen"
+    "upcoming_editions": "Kommende Auflagen",
+    "search_editions": "Eine Ausgabe suchen",
+    "search_placeholder": "Name der Ausgabe"
   },
   "pages": {
     "access_denied": {

@@ -16,18 +16,32 @@ export default wrapApiHandler(
         message: 'Droits insuffisants pour accéder à cette fonctionnalité',
       })
 
-    // Récupérer le paramètre de query pour afficher tous les tarifs ou seulement les valides
     const query = getQuery(event)
+    // `showAll` ne parle que de la PÉRIODE DE VALIDITÉ — c'est ce que son libellé annonce à
+    // l'utilisateur : « Y compris les tarifs hors période de validité ».
     const showAll = query.showAll === 'true'
+    // `includeInactive` parle d'autre chose : un tarif désactivé est retiré de la vente, et non
+    // masqué temporairement. Seuls les écrans de CONFIGURATION le demandent — y cacher un tarif
+    // désactivé ferait perdre ses associations au premier enregistrement, puisqu'elles se
+    // rejouent à partir de ce qui est affiché.
+    const includeInactive = query.includeInactive === 'true'
 
     // Récupérer tous les tarifs de l'édition
     const allTiers = await getEditionTiers(editionId)
 
+    // Un tarif désactivé ne se vend plus : il ne doit pas être proposé à l'ajout d'un participant
+    // depuis le contrôle d'accès. La route publique des tarifs le faisait déjà
+    // (`tiers/public.get.ts`, `where: { isActive: true }`) ; celle-ci l'avait oublié, et
+    // l'interrupteur « Tarif actif » restait donc sans effet au guichet.
+    //
+    // Le filtre est INDÉPENDANT de `showAll` : « afficher tous les tarifs » rouvre la période de
+    // validité, pas la vente d'un tarif qu'on a délibérément retiré.
+    let tiers = includeInactive ? allTiers : allTiers.filter((tier) => tier.isActive)
+
     // Si showAll est false, filtrer les tarifs par date de validité
-    let tiers = allTiers
     if (!showAll) {
       const now = new Date()
-      tiers = allTiers.filter((tier) => {
+      tiers = tiers.filter((tier) => {
         // Si validFrom est défini, vérifier qu'on est après cette date
         const validFrom = tier.validFrom ? new Date(tier.validFrom) : null
         const startValid = !validFrom || validFrom <= now

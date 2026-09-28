@@ -18,6 +18,13 @@ interface EditionFilters {
   showPast?: boolean
   showCurrent?: boolean
   showFuture?: boolean
+  /**
+   * L'ordre de la liste. `'recent'` = la plus récente d'abord ; absent = la plus proche d'abord.
+   *
+   * Ce n'est pas un filtre — il ne retire aucune édition — d'où sa place à part et son absence du
+   * compteur de filtres actifs de l'accueil.
+   */
+  sort?: 'recent'
   // Services/équipements
   hasFoodTrucks?: boolean
   hasKidsZone?: boolean
@@ -156,6 +163,10 @@ export const useEditionStore = defineStore('editions', {
         }
         if (filters?.showFuture !== undefined) {
           queryParams.showFuture = filters.showFuture.toString()
+        }
+
+        if (filters?.sort) {
+          queryParams.sort = filters.sort
         }
 
         // Filtres de services - passer tous les services actifs
@@ -722,6 +733,10 @@ export const useEditionStore = defineStore('editions', {
         }
         if (filters?.showFuture !== undefined) {
           queryParams.showFuture = filters.showFuture.toString()
+        }
+
+        if (filters?.sort) {
+          queryParams.sort = filters.sort
         }
 
         // Filtres de services - passer tous les services actifs

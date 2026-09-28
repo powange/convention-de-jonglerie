@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Жодна конвенція не відповідає вашим критеріям пошуку",
     "period": "Період",
     "searched_services": "Шукані послуги",
-    "upcoming_editions": "Майбутні видання"
+    "upcoming_editions": "Майбутні видання",
+    "search_editions": "Знайти випуск",
+    "search_placeholder": "Назва випуску"
   },
   "pages": {
     "access_denied": {

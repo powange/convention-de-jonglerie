@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Nessun convegno corrisponde ai tuoi criteri di ricerca",
     "period": "Periodo",
     "searched_services": "Servizi ricercati",
-    "upcoming_editions": "Edizioni future"
+    "upcoming_editions": "Edizioni future",
+    "search_editions": "Cercare un'edizione",
+    "search_placeholder": "Nome dell'edizione"
   },
   "pages": {
     "access_denied": {

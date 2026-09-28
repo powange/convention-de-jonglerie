@@ -359,6 +359,9 @@ const initFiltersFromUrl = () => {
     showPast: queryBool('showPast', false),
     showCurrent: queryBool('showCurrent', true),
     showFuture: queryBool('showFuture', true),
+    // L'ordre de la liste, posé par la recherche de l'en-tête (cf. HomeSearch.vue). Ce n'est pas
+    // un filtre : il ne retire aucune édition, et ne compte donc pas dans `activeFiltersCount`.
+    sort: queryValue('sort') === 'recent' ? ('recent' as const) : undefined,
     // Initialiser les services depuis l'URL ou false par défaut
     ...Object.fromEntries(
       services.value.map((service: any) => [service.key, queryBool(service.key)])
@@ -389,6 +392,7 @@ const updateUrlFromFilters = (extraParams: Record<string, any> = {}) => {
   if (filters.startDate) query.startDate = filters.startDate
   if (filters.endDate) query.endDate = filters.endDate
   if (filters.countries.length > 0) query.countries = JSON.stringify(filters.countries)
+  if (filters.sort) query.sort = filters.sort
 
   // Filtres temporels (seulement si différents des valeurs par défaut)
   if (filters.showPast !== false) query.showPast = filters.showPast.toString()
@@ -598,6 +602,7 @@ const resetFilters = () => {
   filters.startDate = ''
   filters.endDate = ''
   filters.countries = []
+  filters.sort = undefined
   calendarStartDate.value = null
   calendarEndDate.value = null
   // Réinitialiser les filtres temporels aux valeurs par défaut
