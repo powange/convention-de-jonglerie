@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { transformCarpoolOffer } from '../../../server/utils/carpool-transform'
+import {
+  transformCarpoolOffer,
+  transformCarpoolRequest,
+} from '../../../server/utils/carpool-transform'
 
 /**
  * `transformCarpoolOffer` sert DEUX points d'API publics : la liste des offres d'une édition et le
@@ -156,5 +159,89 @@ describe('transformCarpoolOffer — ce que chaque viewer reçoit des réservatio
     const vu = transformCarpoolOffer(offre())
 
     expect(vu.bookings[0]?.requester?.pseudo).toBe('Passagère')
+  })
+})
+
+/**
+ * Les commentaires, selon le point d'API qui a construit l'objet.
+ *
+ * Les LISTES d'une édition ne demandent plus que `_count` : la carte d'une offre n'affiche qu'un
+ * nombre, et la carte d'une demande ne les lisait même pas — elle laissait sa modale les redemander,
+ * une requête de plus par carte. Le DÉTAIL, lui, charge la conversation.
+ *
+ * Ces cas vivaient dans les tests des deux points d'API de liste. Ils y sont devenus sans objet, mais
+ * le masquage de l'email de l'auteur d'un commentaire reste à vérifier : il se joue ici.
+ */
+describe('transformCarpoolOffer / transformCarpoolRequest — les commentaires', () => {
+  const commentaire = {
+    id: 9,
+    content: 'Je peux te prendre !',
+    createdAt: 'c',
+    updatedAt: 'c',
+    user: { id: 55, pseudo: 'Conductrice', emailHash: 'h9', email: 'secret@example.com' },
+  }
+
+  it('rend le compte sans la conversation quand seul `_count` est chargé', () => {
+    const vu = transformCarpoolOffer({ ...offre(), comments: undefined, _count: { comments: 3 } })
+
+    expect(vu.commentsCount).toBe(3)
+    // ABSENT, et non pas vide. `comments: []` se lirait « aucun commentaire » alors que le compte en
+    // annonce trois : une contradiction qui ne lève aucune erreur et s'aperçoit des mois plus tard.
+    expect(vu).not.toHaveProperty('comments')
+  })
+
+  it('rend la conversation et son compte quand elle est chargée', () => {
+    const vu = transformCarpoolOffer({ ...offre(), comments: [commentaire] })
+
+    expect(vu.commentsCount).toBe(1)
+    expect(vu.comments?.[0]?.content).toBe('Je peux te prendre !')
+  })
+
+  it('masque l’email de l’auteur d’un commentaire', () => {
+    const vu = transformCarpoolOffer({ ...offre(), comments: [commentaire] })
+
+    expect(vu.comments?.[0]?.user).not.toHaveProperty('email')
+    expect(vu.comments?.[0]?.user?.emailHash).toBe('h9')
+    // Et rien ne ressort par un autre chemin.
+    expect(JSON.stringify(vu)).not.toContain('secret@example.com')
+  })
+
+  it('préfère `_count` à la longueur de la liste quand les deux sont là', () => {
+    // Le détail charge tout ; si un jour il demandait aussi le compte, c'est la base qui a raison.
+    const vu = transformCarpoolOffer({
+      ...offre(),
+      comments: [commentaire],
+      _count: { comments: 7 },
+    })
+
+    expect(vu.commentsCount).toBe(7)
+  })
+
+  it('rend zéro quand ni compte ni conversation ne sont chargés', () => {
+    const vu = transformCarpoolOffer({ ...offre(), comments: undefined })
+
+    expect(vu.commentsCount).toBe(0)
+    expect(vu).not.toHaveProperty('comments')
+  })
+
+  it('applique la même règle aux demandes', () => {
+    const demande = {
+      id: 4,
+      editionId: 42,
+      userId: 8,
+      tripDate: '2026-10-02T08:00:00.000Z',
+      locationCity: 'Lyon',
+      seatsNeeded: 2,
+      direction: 'TO_EVENT',
+      phoneNumber: '+33600000000',
+      createdAt: 'd',
+      user: { id: 8, pseudo: 'Demandeur', emailHash: 'h8', updatedAt: 'x' },
+      _count: { comments: 2 },
+    }
+
+    const vu = transformCarpoolRequest(demande)
+
+    expect(vu.commentsCount).toBe(2)
+    expect(vu).not.toHaveProperty('comments')
   })
 })

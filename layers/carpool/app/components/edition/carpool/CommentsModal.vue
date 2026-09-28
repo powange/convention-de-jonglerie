@@ -8,7 +8,7 @@
       icon="i-heroicons-chat-bubble-left"
       @click="showCommentsModal = true"
     >
-      {{ $t('components.carpool.view_comments', { count: comments.length }) }}
+      {{ $t('components.carpool.view_comments', { count: nombreAffiche }) }}
     </UButton>
 
     <template #body>
@@ -93,6 +93,12 @@ interface Comment {
 interface Props {
   id: number
   type: 'offer' | 'request'
+  /**
+   * Le nombre de commentaires, tel que la liste le rend. Il sert à étiqueter le bouton sans rien
+   * demander au serveur : ce composant chargeait la conversation AU MONTAGE, pour ce seul nombre,
+   * donc une requête de plus par carte affichée.
+   */
+  count?: number
 }
 
 const showCommentsModal = ref(false)
@@ -107,6 +113,16 @@ const { t } = useI18n()
 
 const comments = ref<Comment[]>([])
 const newComment = ref('')
+/** Faux tant que la conversation n'a pas été chargée : `comments` vaut alors `[]` sans rien dire. */
+const commentairesCharges = ref(false)
+
+/**
+ * Le nombre affiché sur le bouton : celui de la liste avant ouverture, puis celui de la
+ * conversation réellement chargée — de façon à refléter un commentaire qu'on vient d'ajouter.
+ */
+const nombreAffiche = computed(() =>
+  commentairesCharges.value ? comments.value.length : (props.count ?? 0)
+)
 
 // Charger les commentaires
 const { execute: loadComments, loading } = useApiAction(
@@ -119,6 +135,7 @@ const { execute: loadComments, loading } = useApiAction(
     errorMessages: { default: t('errors.cannot_load_comments') },
     onSuccess: (response: any) => {
       comments.value = response
+      commentairesCharges.value = true
     },
   }
 )
@@ -142,12 +159,8 @@ const { execute: executeAddComment, loading: isAddingComment } = useApiAction(
   }
 )
 
-// Charger le nombre de commentaires au montage
-onMounted(async () => {
-  await loadComments()
-})
-
-// Charger les commentaires quand la modal s'ouvre
+// Rien au montage : le nombre vient de la propriété `count`, et la conversation ne se charge qu'à
+// l'ouverture de la modale. C'est le seul chargement.
 watch(showCommentsModal, async (open) => {
   if (open) {
     await loadComments()

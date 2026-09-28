@@ -26,6 +26,38 @@ function shouldExposePhone(phoneNumber: string | null | undefined, viewerId?: nu
 }
 
 /**
+ * Le nombre de commentaires, et les commentaires eux-mêmes quand ils ont été chargés.
+ *
+ * Les listes d'une édition ne demandent plus que `_count`, le détail charge tout. Deux choses
+ * comptent ici :
+ *
+ * - `commentsCount` vient de `_count` s'il est là, sinon de la liste chargée. Le client a donc
+ *   toujours un nombre, quel que soit le point d'API qui lui répond ;
+ * - `comments` est ABSENT quand il n'a pas été chargé, et non pas `[]`. Un tableau vide se lirait
+ *   « aucun commentaire » alors que le compte en annonce trois — le genre de contradiction qui ne
+ *   lève aucune erreur et se remarque des mois plus tard.
+ */
+function partieCommentaires(entite: any) {
+  const charges: any[] | undefined = entite.comments
+  const compte: number = entite._count?.comments ?? charges?.length ?? 0
+
+  return {
+    commentsCount: compte,
+    ...(charges
+      ? {
+          comments: charges.map((comment: any) => ({
+            id: comment.id,
+            content: comment.content,
+            createdAt: comment.createdAt,
+            updatedAt: comment.updatedAt,
+            user: transformUser(comment.user),
+          })),
+        }
+      : {}),
+  }
+}
+
+/**
  * Transforme une offre de covoiturage pour l'API.
  * - Masque le téléphone pour les utilisateurs non authentifiés
  * - Calcule les places restantes
@@ -34,7 +66,6 @@ function shouldExposePhone(phoneNumber: string | null | undefined, viewerId?: nu
 export function transformCarpoolOffer(offer: any, viewerId?: number) {
   const bookings = offer.bookings ?? []
   const passengers = offer.passengers ?? []
-  const comments = offer.comments ?? []
   const availableSeats = typeof offer.availableSeats === 'number' ? offer.availableSeats : 0
 
   // Pour les offres : téléphone visible uniquement au propriétaire ou passager accepté
@@ -110,13 +141,7 @@ export function transformCarpoolOffer(offer: any, viewerId?: number) {
       updatedAt: b.updatedAt,
       requester: transformUser(b.requester),
     })),
-    comments: comments.map((comment: any) => ({
-      id: comment.id,
-      content: comment.content,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-      user: transformUser(comment.user),
-    })),
+    ...partieCommentaires(offer),
   }
 }
 
@@ -126,8 +151,6 @@ export function transformCarpoolOffer(offer: any, viewerId?: number) {
  * - Anonymise les utilisateurs
  */
 export function transformCarpoolRequest(request: any, viewerId?: number) {
-  const comments = request.comments ?? []
-
   return {
     id: request.id,
     editionId: request.editionId,
@@ -142,12 +165,6 @@ export function transformCarpoolRequest(request: any, viewerId?: number) {
     createdAt: request.createdAt,
     updatedAt: request.updatedAt,
     user: transformUser(request.user),
-    comments: comments.map((comment: any) => ({
-      id: comment.id,
-      content: comment.content,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-      user: transformUser(comment.user),
-    })),
+    ...partieCommentaires(request),
   }
 }
