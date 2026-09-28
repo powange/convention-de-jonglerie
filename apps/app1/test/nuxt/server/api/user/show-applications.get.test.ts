@@ -60,7 +60,8 @@ describe('/api/user/show-applications GET', () => {
     additionalPerformersCount: 2,
     createdAt: new Date('2025-01-15'),
     updatedAt: new Date('2025-01-15'),
-    organizerNotes: null,
+    // Pas d'`organizerNotes` : le `select` du handler ne le demande plus, donc la base ne le
+    // renvoie plus. Le laisser ici décrirait une forme qui n'existe pas.
     decidedAt: null,
     showCall: mockShowCall,
   }
@@ -184,20 +185,34 @@ describe('/api/user/show-applications GET', () => {
       })
     })
 
-    it('devrait inclure les notes organisateur si définies', async () => {
-      const applicationWithNotes = {
+    it('ne demande jamais les notes internes de l’organisateur à la base', async () => {
+      // La garde porte sur le `select`, et c'est donc lui qu'on regarde : le mock de Prisma ignore
+      // le `select` et renvoie ce qu'on lui donne, si bien qu'une assertion sur l'objet retourné
+      // ne prouverait rien du tout — elle testerait le mock.
+      const mockEvent = { context: { user: mockUser } }
+
+      prismaMock.showApplication.findMany.mockResolvedValue([mockApplication])
+
+      await handler(mockEvent as any)
+
+      const { select } = prismaMock.showApplication.findMany.mock.calls[0][0]
+      expect(select).not.toHaveProperty('organizerNotes')
+      // La contrepartie : sans elle, un `select` vide passerait ce test.
+      expect(select).toHaveProperty('showTitle', true)
+    })
+
+    it('devrait inclure la date de décision', async () => {
+      const applicationDecidee = {
         ...mockApplication,
-        organizerNotes: 'Votre spectacle est intéressant',
         status: 'ACCEPTED',
         decidedAt: new Date('2025-01-20'),
       }
       const mockEvent = { context: { user: mockUser } }
 
-      prismaMock.showApplication.findMany.mockResolvedValue([applicationWithNotes])
+      prismaMock.showApplication.findMany.mockResolvedValue([applicationDecidee])
 
       const result = await handler(mockEvent as any)
 
-      expect(result[0].organizerNotes).toBe('Votre spectacle est intéressant')
       expect(result[0].decidedAt).toBeDefined()
     })
   })
@@ -233,7 +248,6 @@ describe('/api/user/show-applications GET', () => {
       const rejectedApplication = {
         ...mockApplication,
         status: 'REJECTED',
-        organizerNotes: 'Programme complet',
         decidedAt: new Date('2025-01-20'),
       }
       const mockEvent = { context: { user: mockUser } }
@@ -243,7 +257,6 @@ describe('/api/user/show-applications GET', () => {
       const result = await handler(mockEvent as any)
 
       expect(result[0].status).toBe('REJECTED')
-      expect(result[0].organizerNotes).toBe('Programme complet')
     })
   })
 

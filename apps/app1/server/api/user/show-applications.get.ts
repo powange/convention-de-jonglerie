@@ -9,6 +9,11 @@ export default wrapApiHandler(
       where: {
         userId: user.id,
       },
+      // `organizerNotes` est volontairement absent : le schéma le décrit comme « Notes internes
+      // organisateurs » et le champ de saisie de la fiche de gestion l'annonce comme tel à celui
+      // qui écrit. Le renvoyer ici le donnait à lire à l'artiste — y compris en PENDING, où il
+      // transitait dans la réponse sans être affiché. Ce qui est destiné à l'artiste passe par la
+      // discussion de la candidature.
       select: {
         id: true,
         status: true,
@@ -20,7 +25,6 @@ export default wrapApiHandler(
         additionalPerformersCount: true,
         createdAt: true,
         updatedAt: true,
-        organizerNotes: true,
         decidedAt: true,
         showCall: {
           select: {
