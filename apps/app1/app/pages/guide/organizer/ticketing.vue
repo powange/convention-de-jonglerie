@@ -156,6 +156,26 @@
             }}</span>
           </li>
         </ul>
+
+        <!--
+          Le tutoriel destiné aux BÉNÉVOLES, à imprimer ou à envoyer avant l'événement. Il vit dans
+          `public/`, servi tel quel : c'est un fichier, pas une page, et il doit rester accessible
+          hors ligne une fois téléchargé — à la porte, le réseau n'est pas acquis.
+
+          Ses sources et la façon de le régénérer sont dans `docs/tutoriels/controle-acces/`.
+        -->
+        <UButton
+          :to="TUTORIEL_CONTROLE_ACCES"
+          external
+          download
+          target="_blank"
+          icon="i-heroicons-document-arrow-down"
+          color="primary"
+          variant="soft"
+          class="mt-2"
+        >
+          {{ t('sections.access.tutorial') }}
+        </UButton>
       </GuideSection>
 
       <GuideSection
@@ -276,6 +296,7 @@ const messages = {
       manual: 'Recherchez un participant par nom en cas de problème avec le QR code.',
       validation:
         "Le système vérifie automatiquement la validité du billet et indique si l'entrée a déjà été validée.",
+      tutorial: 'Télécharger le tutoriel bénévole (PDF)',
     },
     counter: {
       title: 'Comptoirs de vente',
@@ -295,6 +316,15 @@ const messages = {
     },
   },
 }
+
+/**
+ * Le tutoriel PDF du contrôle d'accès, servi depuis `public/`.
+ *
+ * Un chemin écrit une seule fois : le fichier est produit par la chaîne de
+ * `docs/tutoriels/controle-acces/sources/` puis recopié ici, et un lien qui ne correspond plus au
+ * fichier servi ne se voit qu'en cliquant.
+ */
+const TUTORIEL_CONTROLE_ACCES = '/tutoriels/controle-acces-benevole.pdf'
 
 const t = (path: string): string =>
   path.split('.').reduce<any>((value, key) => value?.[key], messages) ?? path
