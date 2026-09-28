@@ -131,8 +131,18 @@
                   {{ $t('gestion.treasury.advanced_by_name', { name: nomDeLAvance(line) }) }}
                 </UBadge>
               </div>
-              <p v-if="line.description" class="truncate text-xs text-gray-500 dark:text-gray-400">
-                {{ line.description }}
+              <p
+                v-if="line.operationDate || line.description"
+                class="truncate text-xs text-gray-500 dark:text-gray-400"
+              >
+                <!-- La date de l'OPÉRATION, pas celle de la saisie. Les entrées antérieures au
+                     champ n'en ont pas : on n'en invente aucune, et elles se lisent simplement
+                     sans date. -->
+                <span v-if="line.operationDate" class="tabular-nums">{{
+                  dateDOperation(line.operationDate)
+                }}</span>
+                <span v-if="line.operationDate && line.description"> · </span>
+                <span v-if="line.description">{{ line.description }}</span>
               </p>
             </div>
 
@@ -334,6 +344,8 @@ interface TreasuryLine {
   code?: TreasuryCodeRef | null
   imageUrl?: string | null
   isForecast?: boolean
+  /** Le jour où l'argent a bougé. Absente sur les entrées antérieures au champ. */
+  operationDate?: string | null
   advancedBy?: PersonneAvance | null
   reimbursed?: boolean
   readOnly: boolean
@@ -363,6 +375,22 @@ const { data, pending, error, refresh } = await useFetch<{
 }>(() => `/api/editions/${editionId.value}/treasury`, {
   transform: (payload: any) => payload?.data ?? payload,
 })
+
+/**
+ * La date d'opération, lisible.
+ *
+ * Formatée **en UTC**, et c'est le point : la colonne est une `DATE` que Prisma rend à minuit UTC.
+ * La rendre dans le fuseau du lecteur la ferait glisser d'un jour à l'ouest de Greenwich — le 12
+ * juin deviendrait le 11. Le formateur partagé du dépôt épingle `Europe/Paris`, ce qui la protège
+ * par coïncidence ; ici c'est explicite, et ça le restera.
+ */
+const dateDOperation = (valeur: string) =>
+  new Date(valeur).toLocaleDateString(locale.value, {
+    timeZone: 'UTC',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
 
 const currency = computed(() => data.value?.currency || DEFAULT_CURRENCY)
 const money = (cents: number) => formatCents(cents, currency.value, locale.value)

@@ -110,6 +110,29 @@ describe('preparerLignesTresorerie', () => {
     expect(rangees[0] && col(rangees[0], 'libelleCode')).toBe('Fournitures')
   })
 
+  describe('la date de l’opération', () => {
+    it('sort en ISO, pas dans le fuseau du lecteur', () => {
+      // La colonne est une DATE que Prisma rend à minuit UTC. La formater en heure locale la
+      // ferait glisser d'un jour à l'ouest de Greenwich — le 12 juin deviendrait le 11 — et un
+      // tableur trie de toute façon mieux une date ISO qu'une date écrite pour l'œil.
+      const rangees = preparerLignesTresorerie(
+        [ligne({ operationDate: '2026-06-12T00:00:00.000Z' })],
+        t,
+        titre
+      )
+
+      expect(col(rangees[0]!, 'dateOperation')).toBe('2026-06-12')
+    })
+
+    it('laisse la cellule vide quand la ligne n’en a pas', () => {
+      // Une ligne calculée n'en a jamais, et les entrées antérieures au champ non plus : on ne
+      // leur invente pas de date, surtout pas celle de leur saisie.
+      const rangees = preparerLignesTresorerie([ligne()], t, titre)
+
+      expect(col(rangees[0]!, 'dateOperation')).toBe('')
+    })
+  })
+
   it('dit oui ou non, et non true ou false', () => {
     const rangees = preparerLignesTresorerie(
       [

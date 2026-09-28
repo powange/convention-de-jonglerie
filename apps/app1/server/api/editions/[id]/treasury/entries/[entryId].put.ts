@@ -16,12 +16,38 @@ const bodySchema = z.object({
   codeId: z.number().int().positive().nullable().optional(),
   imageUrl: z.string().max(500).nullable().optional(),
   isForecast: z.boolean().optional(),
+  /**
+   * La date de l'opération, en `AAAA-MM-JJ`.
+   *
+   * Une date CIVILE, pas un instant : c'est ce que porte un ticket de caisse, et le 12 juin doit
+   * rester le 12 juin quel que soit le fuseau du lecteur. La chaîne est convertie en date UTC à
+   * l'écriture, comme le fait déjà `EditionMeal.date`.
+   */
+  operationDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
   advancedById: z.number().int().positive().nullable().optional(),
   advancedByName: z.string().max(150).nullable().optional(),
   reimbursed: z.boolean().optional(),
 })
 
 /** PUT /api/editions/:id/treasury/entries/:entryId — modifie une ligne saisie à la main. */
+/**
+ * La date d'opération telle que Prisma l'attend, ou `null`.
+ *
+ * Le `Z` est explicite à dessein, mais il ne corrige rien aujourd'hui : une chaîne de forme DATE
+ * SEULE (`2026-06-12`) est déjà interprétée en UTC par la spécification. C'est la forme
+ * date-heure SANS décalage (`2026-06-12T00:00:00`) qui serait lue en heure locale, et glisserait
+ * d'un jour à l'ouest de Greenwich.
+ *
+ * L'écrire en toutes lettres protège donc d'un changement à venir — élargir le format accepté par
+ * le schéma suffirait à faire basculer l'interprétation, sans que rien ne le signale.
+ */
+const dateDOperation = (valeur: string | null | undefined): Date | null =>
+  valeur ? new Date(`${valeur}T00:00:00.000Z`) : null
+
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
@@ -79,6 +105,10 @@ export default wrapApiHandler(
         // `null` explicite = justificatif retiré ; absent = laissé tel quel.
         ...(nouveauJustificatif !== undefined && { imageUrl: nouveauJustificatif }),
         ...(data.isForecast !== undefined && { isForecast: data.isForecast }),
+        // `undefined` = champ non envoyé, on n'y touche pas ; `null` = date effacée.
+        ...(data.operationDate !== undefined && {
+          operationDate: dateDOperation(data.operationDate),
+        }),
         ...avance,
       },
     })

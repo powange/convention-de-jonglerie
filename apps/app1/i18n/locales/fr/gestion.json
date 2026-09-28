@@ -1053,6 +1053,7 @@
       "entry_forecast": "Prévisionnel",
       "entry_forecast_hint": "Montant attendu, pas encore réglé",
       "entry_kind": "Nature",
+      "entry_operation_date": "Date de l'opération",
       "entry_receipt": "Justificatif",
       "entry_receipt_placeholder": "Photographier le ticket, ou déposer une facture PDF",
       "entry_reimbursed": "Déjà remboursé",
