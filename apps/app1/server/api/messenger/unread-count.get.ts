@@ -1,54 +1,20 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { messengerUnreadService } from '#server/utils/messenger-unread-service'
 
 /**
  * GET /api/messenger/unread-count
  * Retourne le nombre total de messages non lus pour l'utilisateur connecté
+ *
+ * Le calcul vit dans `messengerUnreadService` : ce fichier en portait une COPIE, à l'identique,
+ * boucle de comptage comprise. Deux exemplaires d'une même règle finissent par ne plus dire la même
+ * chose, et celui qu'on corrige n'est jamais celui que l'écran interroge.
  */
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
 
-    // Récupérer toutes les conversations où l'utilisateur est participant actif
-    const participations = await prisma.conversationParticipant.findMany({
-      where: {
-        userId: user.id,
-        leftAt: null,
-      },
-      select: {
-        conversationId: true,
-        lastReadAt: true,
-      },
-    })
-
-    const conversationCount = participations.length
-
-    if (conversationCount === 0) {
-      return createSuccessResponse({ unreadCount: 0, conversationCount: 0 })
-    }
-
-    // Compter les messages non lus pour chaque conversation
-    let totalUnread = 0
-
-    for (const participation of participations) {
-      const unreadCount = await prisma.message.count({
-        where: {
-          conversationId: participation.conversationId,
-          deletedAt: null,
-          createdAt: {
-            gt: participation.lastReadAt || new Date(0),
-          },
-          participant: {
-            userId: {
-              not: user.id, // Ne pas compter ses propres messages
-            },
-          },
-        },
-      })
-      totalUnread += unreadCount
-    }
-
-    return createSuccessResponse({ unreadCount: totalUnread, conversationCount })
+    return createSuccessResponse(await messengerUnreadService.getUnreadCount(user.id))
   },
   { operationName: 'GetMessengerUnreadCount' }
 )
