@@ -1029,7 +1029,7 @@
       "entry_forecast": "Prognose",
       "entry_forecast_hint": "Verwacht bedrag, nog niet betaald",
       "entry_receipt": "Bewijsstuk",
-      "entry_receipt_placeholder": "Fotografeer de bon of factuur",
+      "entry_receipt_placeholder": "[TODO] Fotografeer de bon of factuur",
       "entry_reimbursed": "Al terugbetaald",
       "mark_reimbursed": "Terugbetaald",
       "reimbursed_done": "Voorschotten gemarkeerd als terugbetaald",
@@ -1058,7 +1058,12 @@
       "entry_advanced_by_free": "[TODO] Un autre nom",
       "entry_advanced_by_free_placeholder": "[TODO] Choisir ou saisir un nom",
       "entry_advanced_by_free_search": "[TODO] Rechercher ou saisir un nom…",
-      "entry_advanced_by_member": "[TODO] Un membre"
+      "entry_advanced_by_member": "[TODO] Un membre",
+      "export_csv": "[TODO] Export CSV",
+      "export_origin": "[TODO] Origine",
+      "export_origin_computed": "[TODO] Calculé",
+      "export_origin_manual": "[TODO] Saisi",
+      "open_receipt_new_tab": "[TODO] Ouvrir le justificatif dans un nouvel onglet"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",

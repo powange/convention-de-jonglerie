@@ -34,6 +34,16 @@
             :disabled="!(data?.lines?.length ?? 0)"
             @click="exporterPdf"
           />
+          <!-- Le PDF se lit en assemblée ; le CSV se reprend dans le tableur du comptable. Les
+               deux sont désactivés sur une trésorerie vide, pour la même raison. -->
+          <UButton
+            icon="i-lucide-table"
+            color="neutral"
+            variant="outline"
+            :label="$t('gestion.treasury.export_csv')"
+            :disabled="!(data?.lines?.length ?? 0)"
+            @click="exporterCsv"
+          />
           <UButton
             icon="i-lucide-tags"
             color="neutral"
@@ -231,8 +241,21 @@
       @update:open="(v: boolean) => !v && (justificatifOuvert = null)"
     >
       <template #body>
+        <!-- Un justificatif peut être un PDF depuis que les factures le sont : l'afficher en `img`
+             ne rendrait qu'une image cassée. L'`iframe` sert la visionneuse du navigateur, et le
+             lien reste pour celui qui n'en a pas. -->
+        <template v-if="justificatifOuvert && justificatifEstUnPdf">
+          <iframe
+            :src="justificatifOuvert"
+            :title="$t('gestion.treasury.entry_receipt')"
+            class="w-full h-[70vh] rounded-lg border border-default"
+          />
+          <ULink :to="justificatifOuvert" target="_blank" class="mt-2 inline-block text-sm">
+            {{ $t('gestion.treasury.open_receipt_new_tab') }}
+          </ULink>
+        </template>
         <img
-          v-if="justificatifOuvert"
+          v-else-if="justificatifOuvert"
           :src="justificatifOuvert"
           :alt="$t('gestion.treasury.entry_receipt')"
           class="w-full"
@@ -270,8 +293,10 @@ import {
   type GroupeDeCode,
   type TotalDeNature,
 } from '~/utils/export-tresorerie'
+import { tresorerieVersCsv } from '~/utils/export-tresorerie-csv'
 
 import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
+import { BOM_UTF8 } from '~~/shared/utils/csv'
 import { DEFAULT_CURRENCY, formatCents } from '~~/shared/utils/money'
 
 definePageMeta({
@@ -518,6 +543,14 @@ const rembourser = useApiActionById<{ count: number }>(
 /** Justificatif affiché en grand, ou `null`. */
 const justificatifOuvert = ref<string | null>(null)
 
+/**
+ * Le justificatif ouvert est-il un PDF ? Décidé sur l'extension : c'est la seule information portée
+ * par l'URL, et le serveur a déjà croisé type MIME et extension au dépôt.
+ */
+const justificatifEstUnPdf = computed(
+  () => !!justificatifOuvert.value?.toLowerCase().split('?')[0]?.endsWith('.pdf')
+)
+
 const entryModalOpen = ref(false)
 const codesModalOpen = ref(false)
 const editedLine = ref<TreasuryLine | null>(null)
@@ -612,6 +645,34 @@ onMounted(() => {
  * `jspdf` est importé à la demande — quelques centaines de kilo-octets qui n'ont rien à faire dans
  * le chargement d'une page que l'on n'exporte pas à chaque visite.
  */
+/**
+ * La trésorerie en CSV.
+ *
+ * Même ordre de lignes que le PDF — `regrouperParCode`, donc l'ordre du plan comptable avec les
+ * lignes sans code en dernier — et même nom de fichier, à l'extension près : les deux exports d'une
+ * même page doivent se comparer sans effort.
+ *
+ * Construit dans le navigateur comme le PDF : la page détient déjà toutes les lignes, et les
+ * origines calculées portent des clés i18n que le serveur devrait sinon recopier en français.
+ */
+function exporterCsv() {
+  const lignes = (data.value?.lines ?? []) as TreasuryLine[]
+  if (lignes.length === 0) return
+
+  const contenu = tresorerieVersCsv(lignes, t, lineTitle as (l: TreasuryLine) => string)
+  const nom = nomFichierTresorerie(edition.value?.name, new Date()).replace(/\.pdf$/, '.csv')
+
+  // `BOM_UTF8` en tête : sans lui, Excel sous Windows lit le fichier en ANSI et « Réglé » devient
+  // « RÃ©glÃ© » sur toute la colonne. Voir `shared/utils/csv.ts`.
+  const lien = document.createElement('a')
+  lien.href = URL.createObjectURL(
+    new Blob([BOM_UTF8 + contenu], { type: 'text/csv;charset=utf-8' })
+  )
+  lien.download = nom
+  lien.click()
+  URL.revokeObjectURL(lien.href)
+}
+
 async function exporterPdf() {
   const lignes = (data.value?.lines ?? []) as TreasuryLine[]
   if (lignes.length === 0) return

@@ -116,10 +116,27 @@
         <!-- Le justificatif ferme le formulaire : c'est la dernière chose qu'on fait, souvent
              en photographiant le ticket qu'on a encore en main. -->
         <UFormField :label="$t('gestion.treasury.entry_receipt')">
+          <!-- Le PDF est accepté en plus des images : beaucoup de factures n'existent que sous
+               cette forme, et il fallait jusqu'ici en faire une capture d'écran. La même liste est
+               appliquée côté serveur par `ALLOWED_RECEIPT_*` — celle-ci ne fait que cadrer le
+               sélecteur de fichiers. -->
           <UiImageUpload
             v-model="form.imageUrl"
             allow-camera
             :endpoint="{ type: 'treasury', id: editionId }"
+            :options="{
+              validation: {
+                maxSize: 10 * 1024 * 1024,
+                allowedTypes: [
+                  'image/jpeg',
+                  'image/png',
+                  'image/webp',
+                  'image/gif',
+                  'application/pdf',
+                ],
+                allowedExtensions: ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf'],
+              },
+            }"
             :alt="$t('gestion.treasury.entry_receipt')"
             :placeholder="$t('gestion.treasury.entry_receipt_placeholder')"
           />
@@ -164,7 +181,16 @@ const props = defineProps<{
     kind: 'EXPENSE' | 'INCOME'
     title: string
     description?: string | null
+    /**
+     * Le montant réglé, en centimes. Zéro sur une ligne prévisionnelle : `treasury-compute` place
+     * alors le montant dans `pending`.
+     */
     settled: number
+    /**
+     * Le montant engagé mais non réglé, en centimes. C'est là que vit le montant d'une ligne
+     * PRÉVISIONNELLE — sans lui, rouvrir une telle ligne affichait zéro.
+     */
+    pending?: number
     code?: { id: number } | null
     imageUrl?: string | null
     isForecast?: boolean
@@ -378,7 +404,18 @@ watch(
     form.kind = entry?.kind ?? 'EXPENSE'
     form.title = entry?.title ?? ''
     form.description = entry?.description ?? ''
-    form.amount = entry ? entry.settled / 100 : 0
+    /*
+     * `settled + pending`, et non `settled` seul.
+     *
+     * Une ligne prévisionnelle a `settled: 0` et son montant dans `pending`
+     * (`treasury-compute.ts`) : le formulaire s'ouvrait donc à 0, et comme `isValid` exige un
+     * montant strictement positif, le bouton « Enregistrer » restait désactivé. La ligne était
+     * impossible à modifier, même pour n'en changer que le titre.
+     *
+     * Les deux ne sont jamais renseignés en même temps sur une ligne saisie : la somme vaut donc le
+     * montant, prévisionnel ou non.
+     */
+    form.amount = entry ? (entry.settled + (entry.pending ?? 0)) / 100 : 0
     form.codeId = entry?.code?.id ?? null
     form.imageUrl = entry?.imageUrl ?? null
     form.isForecast = entry?.isForecast ?? false

@@ -61,6 +61,9 @@ export default wrapApiHandler(
         select: {
           amount: true,
           type: true,
+          // L'état de la LIGNE, distinct du statut de sa commande : une ligne annulée vit dans une
+          // commande encaissée, et elle était comptée comme un produit.
+          state: true,
           order: { select: { status: true } },
           tier: { select: { countAsParticipant: true } },
           // Le prix d'une option n'est nulle part ailleurs : ni dans la ligne, ni dans le total
@@ -100,6 +103,7 @@ export default wrapApiHandler(
       orderItems.map((item) => ({
         amount: item.amount + item.selectedOptions.reduce((sum, option) => sum + option.amount, 0),
         orderStatus: item.order.status,
+        itemState: item.state,
         countAsParticipant: item.tier?.countAsParticipant ?? null,
         type: item.type,
       }))

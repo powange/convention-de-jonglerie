@@ -236,6 +236,7 @@
     "upload": "Subir",
     "upload_error": "Error de subida",
     "uploading": "Subiendo...",
-    "take_photo": "Hacer una foto"
+    "take_photo": "Hacer una foto",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

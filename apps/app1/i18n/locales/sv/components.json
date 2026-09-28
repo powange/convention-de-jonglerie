@@ -236,6 +236,7 @@
     "upload": "Ladda upp",
     "upload_error": "Fel vid uppladdning",
     "uploading": "Uppladdning pågår...",
-    "take_photo": "Ta ett foto"
+    "take_photo": "Ta ett foto",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

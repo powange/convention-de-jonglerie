@@ -236,6 +236,7 @@
     "upload": "Upload",
     "upload_error": "Upload fejl",
     "uploading": "Uploader...",
-    "take_photo": "Tag et billede"
+    "take_photo": "Tag et billede",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

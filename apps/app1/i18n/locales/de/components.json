@@ -236,6 +236,7 @@
     "upload": "Hochladen",
     "upload_error": "Upload-Fehler",
     "uploading": "Wird hochgeladen...",
-    "take_photo": "Foto aufnehmen"
+    "take_photo": "Foto aufnehmen",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

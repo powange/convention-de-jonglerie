@@ -1,3 +1,5 @@
+import { ETATS_DE_BILLET_ANNULE } from './ticketing/billets-qui-comptent'
+
 import { cleDuNomAvance } from '~~/shared/utils/avance-nom-libre'
 
 /**
@@ -66,7 +68,26 @@ export interface TicketingStatusTotals {
   processed: number
   onsite: number
   pending: number
+  /**
+   * Les lignes des commandes remboursées. **À titre informatif seulement : ce seau n'entre dans
+   * aucun total.**
+   *
+   * Il était soustrait de `processed + onsite`, ce qui comptait deux fois le remboursement : le
+   * statut de commande est EXCLUSIF, donc une commande `Refunded` n'a jamais été ajoutée à
+   * `processed`. La soustraire donnait un produit sous-estimé du montant remboursé, et négatif sur
+   * une édition dont l'essentiel des ventes aurait été remboursé.
+   */
   refunded: number
+  /**
+   * Les lignes annulées, quel que soit le statut de leur commande. **Informatif également.**
+   *
+   * Ce cas n'existait pas : l'agrégation ne regardait que le statut de la COMMANDE. Or les deux
+   * vocabulaires ne se recouvrent pas (`billets-qui-comptent.ts`) — une ligne s'annule par
+   * `state: 'Canceled'`, une commande se rembourse par `status: 'Refunded'`, et aucune ligne n'est
+   * jamais `Refunded`. Douze lignes annulées de la production vivent donc dans des commandes
+   * `Processed` : elles étaient comptées comme un produit encaissé.
+   */
+  canceled: number
 }
 
 /**
@@ -212,6 +233,16 @@ export interface TicketingItemRow {
    * base au total.
    */
   orderStatus: string
+  /**
+   * État de la **ligne**, qui n'a rien à voir avec le statut de sa commande.
+   *
+   * Une ligne annulée porte `Canceled` et peut vivre dans une commande `Processed` : douze de la
+   * production sont dans ce cas. Sans cet état, elles passent pour un produit encaissé — c'est
+   * exactement ce que faisait ce calcul, qui ne lisait que la commande.
+   *
+   * `null` toléré : `state` est une chaîne libre, jamais une énumération.
+   */
+  itemState: string | null
   /** `null` quand la ligne n'a pas de tarif : don, vêtement ajouté à la main. */
   countAsParticipant: boolean | null
   /**
@@ -240,6 +271,7 @@ export function aggregateTicketingItems(rows: TicketingItemRow[]): TicketingTota
     onsite: 0,
     pending: 0,
     refunded: 0,
+    canceled: 0,
   })
   const totals: TicketingTotals = { participants: empty(), donations: empty(), other: empty() }
 
@@ -250,6 +282,15 @@ export function aggregateTicketingItems(rows: TicketingItemRow[]): TicketingTota
         : row.countAsParticipant === true
           ? totals.participants
           : totals.other
+
+    // L'état de la LIGNE passe avant le statut de sa commande : une ligne annulée ne produit rien,
+    // même dans une commande encaissée. `ETATS_DE_BILLET_ANNULE` est la liste que la porte
+    // applique déjà — la trésorerie et le guichet répondent ainsi à la même question.
+    if (row.itemState && (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(row.itemState)) {
+      bucket.canceled += row.amount
+      continue
+    }
+
     if (row.orderStatus === 'Processed') bucket.processed += row.amount
     else if (row.orderStatus === 'Onsite') bucket.onsite += row.amount
     else if (PENDING_STATUSES.includes(row.orderStatus)) bucket.pending += row.amount
@@ -259,10 +300,17 @@ export function aggregateTicketingItems(rows: TicketingItemRow[]): TicketingTota
   return totals
 }
 
-/** Même règle pour les deux produits de billetterie : encaissé moins remboursé, attente à part. */
+/**
+ * Le produit de billetterie : ce qui est encaissé, et ce qui est attendu.
+ *
+ * `refunded` et `canceled` n'entrent dans NI l'un NI l'autre, et c'est le correctif. Le statut de
+ * commande est exclusif : une commande remboursée n'a jamais rejoint `processed`, donc la
+ * soustraire comptait le remboursement deux fois. Les deux seaux restent renseignés pour qu'on
+ * puisse lire ce qui a été écarté, mais ils ne pèsent sur aucun total.
+ */
 function ticketingAmounts(totals: TicketingStatusTotals): TreasuryAmounts {
   return {
-    settled: totals.processed + totals.onsite - totals.refunded,
+    settled: totals.processed + totals.onsite,
     pending: totals.pending,
   }
 }

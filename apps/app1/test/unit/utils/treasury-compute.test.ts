@@ -14,6 +14,7 @@ const statusTotals = (over: Partial<TicketingStatusTotals> = {}): TicketingStatu
   onsite: 0,
   pending: 0,
   refunded: 0,
+  canceled: 0,
   ...over,
 })
 
@@ -178,9 +179,16 @@ describe('computeTreasury — repli sur le plafond', () => {
 })
 
 describe('computeTreasury — billetterie', () => {
-  // Un remboursement est de l'argent encaissé puis rendu : il diminue les produits plutôt que
-  // d'apparaître en charge.
-  it('déduit les remboursements des produits', () => {
+  /*
+   * LE CORRECTIF. Ces deux tests affirmaient l'inverse : « déduit les remboursements des produits »
+   * et « accepte que les remboursements dépassent les encaissements », ce dernier attendant un
+   * produit de −1500.
+   *
+   * Le statut de commande est EXCLUSIF. Une commande `Refunded` n'a jamais rejoint `processed` :
+   * elle n'atterrit que dans `refunded`. La soustraire comptait donc le remboursement deux fois, et
+   * le total négatif que le second test consacrait n'était pas une tolérance — c'était le symptôme.
+   */
+  it('ne soustrait pas une commande remboursée, qui n’a jamais été ajoutée', () => {
     const report = computeTreasury(
       input({
         ticketing: ticketingTotals({
@@ -191,12 +199,34 @@ describe('computeTreasury — billetterie', () => {
 
     expect(lineOf(report, 'source:TICKETING_PARTICIPANTS')).toMatchObject({
       kind: 'INCOME',
-      settled: 820062 + 345250 - 4600,
+      settled: 820062 + 345250,
       pending: 31000,
     })
   })
 
-  it('accepte que les remboursements dépassent les encaissements', () => {
+  it('une commande annulée ne change ni le réglé ni l’engagé', () => {
+    const sansRemboursement = computeTreasury(
+      input({
+        ticketing: ticketingTotals({
+          participants: { processed: 1000, onsite: 500, pending: 200 },
+        }),
+      })
+    )
+    const avecRemboursement = computeTreasury(
+      input({
+        ticketing: ticketingTotals({
+          participants: { processed: 1000, onsite: 500, pending: 200, refunded: 2500 },
+        }),
+      })
+    )
+
+    const attendu = { settled: 1500, pending: 200 }
+    expect(lineOf(sansRemboursement, 'source:TICKETING_PARTICIPANTS')).toMatchObject(attendu)
+    expect(lineOf(avecRemboursement, 'source:TICKETING_PARTICIPANTS')).toMatchObject(attendu)
+  })
+
+  it('un produit ne devient jamais négatif à cause des remboursements', () => {
+    // Le cas que l'ancien comportement rendait possible : plus de remboursé que d'encaissé.
     const report = computeTreasury(
       input({
         ticketing: ticketingTotals({
@@ -204,7 +234,20 @@ describe('computeTreasury — billetterie', () => {
         }),
       })
     )
-    expect(lineOf(report, 'source:TICKETING_PARTICIPANTS').settled).toBe(-1500)
+
+    expect(lineOf(report, 'source:TICKETING_PARTICIPANTS').settled).toBe(1000)
+  })
+
+  it('une ligne annulée ne compte pas davantage', () => {
+    const report = computeTreasury(
+      input({
+        ticketing: ticketingTotals({
+          participants: { processed: 1000, onsite: 0, pending: 0, canceled: 700 },
+        }),
+      })
+    )
+
+    expect(lineOf(report, 'source:TICKETING_PARTICIPANTS').settled).toBe(1000)
   })
 })
 
@@ -319,6 +362,9 @@ describe('aggregateTicketingItems', () => {
   const item = (over: Partial<Parameters<typeof aggregateTicketingItems>[0][number]> = {}) => ({
     amount: 1000,
     orderStatus: 'Processed',
+    // Une ligne vivante. `Canceled` est l'état qui l'annule, et il est indépendant du statut de sa
+    // commande — les deux vocabulaires ne se recouvrent pas (`billets-qui-comptent.ts`).
+    itemState: 'Processed' as string | null,
     countAsParticipant: true as boolean | null,
     type: 'Registration' as string | null,
     ...over,
@@ -382,12 +428,65 @@ describe('aggregateTicketingItems', () => {
       onsite: 200,
       pending: 300,
       refunded: 400,
+      canceled: 0,
     })
+  })
+
+  /*
+   * L'état de la LIGNE, que ce calcul ne regardait pas du tout.
+   *
+   * Douze lignes `Canceled` de la production vivent dans des commandes `Processed` : elles étaient
+   * comptées comme un produit encaissé. Les deux vocabulaires ne se recouvrent pas — aucune ligne
+   * n'est jamais `Refunded`, aucune commande n'est jamais `Canceled` — donc filtrer sur le statut de
+   * commande ne pouvait pas les attraper.
+   */
+  it('écarte une ligne annulée, même dans une commande encaissée', () => {
+    const totals = aggregateTicketingItems([
+      item({ amount: 100, itemState: 'Processed', orderStatus: 'Processed' }),
+      item({ amount: 700, itemState: 'Canceled', orderStatus: 'Processed' }),
+    ])
+
+    expect(totals.participants.processed).toBe(100)
+    // Conservée à titre informatif, pour qu'on puisse lire ce qui a été écarté.
+    expect(totals.participants.canceled).toBe(700)
+  })
+
+  it('écarte aussi une ligne remboursée, valeur qu’aucune ligne ne porte aujourd’hui', () => {
+    // `ETATS_DE_BILLET_ANNULE` la conserve parce que la garde d'origine la visait et qu'aucune trace
+    // ne dit si elle a existé. La trésorerie suit la même liste que la porte.
+    const totals = aggregateTicketingItems([
+      item({ amount: 300, itemState: 'Refunded', orderStatus: 'Processed' }),
+    ])
+
+    expect(totals.participants.processed).toBe(0)
+    expect(totals.participants.canceled).toBe(300)
+  })
+
+  it('compte une ligne dont l’état est inconnu ou absent', () => {
+    /*
+     * `state` est une chaîne libre. Traiter d'office une valeur inconnue comme une annulation
+     * retirerait des produits réels d'un bilan comptable sur une simple nouveauté du fournisseur.
+     * C'est le même arbitrage que `ETATS_DE_BILLET_ANNULE` : une liste explicite, jamais un
+     * complément.
+     */
+    const totals = aggregateTicketingItems([
+      item({ amount: 100, itemState: 'Quelque chose de neuf' }),
+      item({ amount: 200, itemState: null }),
+    ])
+
+    expect(totals.participants.processed).toBe(300)
+    expect(totals.participants.canceled).toBe(0)
   })
 
   it('ignore un statut inconnu plutôt que de l’imputer au hasard', () => {
     const totals = aggregateTicketingItems([item({ amount: 999, orderStatus: 'Draft' })])
-    expect(totals.participants).toEqual({ processed: 0, onsite: 0, pending: 0, refunded: 0 })
+    expect(totals.participants).toEqual({
+      processed: 0,
+      onsite: 0,
+      pending: 0,
+      refunded: 0,
+      canceled: 0,
+    })
   })
 
   /**

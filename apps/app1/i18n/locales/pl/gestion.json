@@ -1029,7 +1029,7 @@
       "entry_forecast": "Planowane",
       "entry_forecast_hint": "Kwota oczekiwana, jeszcze nieopłacona",
       "entry_receipt": "Dowód",
-      "entry_receipt_placeholder": "Zrób zdjęcie paragonu lub faktury",
+      "entry_receipt_placeholder": "[TODO] Zrób zdjęcie paragonu lub faktury",
       "entry_reimbursed": "Już zwrócone",
       "mark_reimbursed": "Zwrócone",
       "reimbursed_done": "Zaliczki oznaczone jako zwrócone",
@@ -1058,7 +1058,12 @@
       "entry_advanced_by_free": "[TODO] Un autre nom",
       "entry_advanced_by_free_placeholder": "[TODO] Choisir ou saisir un nom",
       "entry_advanced_by_free_search": "[TODO] Rechercher ou saisir un nom…",
-      "entry_advanced_by_member": "[TODO] Un membre"
+      "entry_advanced_by_member": "[TODO] Un membre",
+      "export_csv": "[TODO] Export CSV",
+      "export_origin": "[TODO] Origine",
+      "export_origin_computed": "[TODO] Calculé",
+      "export_origin_manual": "[TODO] Saisi",
+      "open_receipt_new_tab": "[TODO] Ouvrir le justificatif dans un nouvel onglet"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",
