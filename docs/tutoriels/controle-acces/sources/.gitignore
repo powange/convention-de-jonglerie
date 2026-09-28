@@ -4,3 +4,7 @@ seed.json
 *.mjpeg
 log.txt
 controle-acces-benevole.pdf
+
+# `mkvid.py` écrit le flux `.mjpeg` de la fausse caméra et, au passage, le QR code seul en `.png`
+# à côté. Artefacts de capture : les images du tutoriel, elles, vivent dans `img/`.
+/*.png
