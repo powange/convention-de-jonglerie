@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { ensureOrganizersGroupConversation } from '#server/utils/messenger-helpers'
+import { compterNonLusParConversation } from '#server/utils/messenger-unread-service'
 import { checkAdminMode } from '#server/utils/organizer-management'
 
 const querySchema = z.object({
@@ -198,53 +199,58 @@ export default wrapApiHandler(
       },
     })
 
-    // Calculer le nombre de messages non lus et enrichir avec isLeader pour chaque conversation
-    const conversationsWithUnreadCount = await Promise.all(
-      conversations.map(async (conversation) => {
-        const currentUserParticipant = conversation.participants.find((p) => p.userId === user.id)
+    /*
+     * Les non-lus de TOUTES les conversations en une requête, et les responsables une fois par
+     * équipe.
+     *
+     * Cette boucle faisait auparavant deux appels par conversation : un `message.count`, et — pour
+     * une conversation d'équipe — une recherche des responsables. Deux équipes n'ayant jamais qu'un
+     * seul jeu de responsables, la seconde était répétée autant de fois qu'il y a de conversations
+     * sur la même équipe.
+     */
+    const nonLusParConversation = await compterNonLusParConversation(user.id)
 
-        if (!currentUserParticipant) {
-          return { ...conversation, unreadCount: 0 }
-        }
+    const responsablesParEquipe = new Map<number, Set<number>>()
+    for (const teamId of new Set(
+      conversations.map((c) => c.teamId).filter((id): id is number => id !== null)
+    )) {
+      responsablesParEquipe.set(
+        teamId,
+        // Responsables de l'équipe, bénévoles comme organisateurs : le badge doit paraître
+        // sur l'un comme sur l'autre.
+        new Set(await utilisateursResponsablesDeLEquipe(editionId, teamId))
+      )
+    }
 
-        const unreadCount = await prisma.message.count({
-          where: {
-            conversationId: conversation.id,
-            deletedAt: null,
-            createdAt: {
-              gt: currentUserParticipant.lastReadAt || new Date(0),
-            },
-            participant: {
-              userId: {
-                not: user.id, // Ne pas compter ses propres messages
-              },
-            },
-          },
-        })
+    const conversationsWithUnreadCount = conversations.map((conversation) => {
+      const estParticipant = conversation.participants.some((p) => p.userId === user.id)
 
-        // Pour les conversations d'équipe, récupérer l'information isLeader pour chaque participant
-        let participantsWithLeaderInfo = conversation.participants
+      /*
+       * Sortie anticipée pour qui n'est pas participant : zéro non-lu, et AUCUN `isLeader` sur les
+       * participants. C'est exactement ce que faisait le code précédent, et c'est conservé tel quel
+       * — un organisateur qui lit une conversation d'équipe sans y être inscrit ne voit donc pas les
+       * badges de responsable. L'asymétrie est douteuse, mais la corriger n'est pas l'objet de ce
+       * lot, qui ne touche qu'au nombre de requêtes.
+       */
+      if (!estParticipant) {
+        return { ...conversation, unreadCount: 0 }
+      }
 
-        if (conversation.teamId) {
-          // Responsables de l'équipe, bénévoles comme organisateurs : le badge doit paraître
-          // sur l'un comme sur l'autre.
-          const responsables = new Set(
-            await utilisateursResponsablesDeLEquipe(editionId, conversation.teamId)
-          )
+      const responsables = conversation.teamId
+        ? responsablesParEquipe.get(conversation.teamId)
+        : undefined
 
-          participantsWithLeaderInfo = conversation.participants.map((participant) => ({
-            ...participant,
-            isLeader: responsables.has(participant.userId),
-          }))
-        }
-
-        return {
-          ...conversation,
-          participants: participantsWithLeaderInfo,
-          unreadCount,
-        }
-      })
-    )
+      return {
+        ...conversation,
+        participants: responsables
+          ? conversation.participants.map((participant) => ({
+              ...participant,
+              isLeader: responsables.has(participant.userId),
+            }))
+          : conversation.participants,
+        unreadCount: nonLusParConversation.get(conversation.id) ?? 0,
+      }
+    })
 
     return createSuccessResponse(conversationsWithUnreadCount)
   },

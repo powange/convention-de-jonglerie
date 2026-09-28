@@ -79,4 +79,9 @@ model Message {
   @@index([participantId])
   @@index([createdAt])
   @@index([replyToId])
+  // Le comptage des non-lus joint sur `conversationId` puis compare `createdAt` : les deux index
+  // séparés obligeaient la base à filtrer la date ligne par ligne, une fois la conversation
+  // trouvée. L'index simple sur `conversationId` devient redondant avec celui-ci — le retirer
+  // serait un gain d'écriture, mais c'est une suppression, donc un autre lot.
+  @@index([conversationId, createdAt])
 }
