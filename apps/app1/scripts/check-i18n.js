@@ -102,6 +102,12 @@ const IGNORED_MISSING_KEYS = [
   'youtu.be',
   'example.*',
   'player.vimeo.com',
+  // Chemins de champs Prisma traversant la relation `user`, passés à `alternativesMotCle`
+  // (search.post.ts). Aucun domaine i18n ne s'appelle `user` : l'exception ne peut masquer
+  // aucune clé réelle.
+  'user.prenom',
+  'user.nom',
+  'user.email',
   // Noms de champs Prisma utilisés dans ai-update.vue (pas des clés i18n)
   'edition.imageUrl',
   'edition.startDate',
