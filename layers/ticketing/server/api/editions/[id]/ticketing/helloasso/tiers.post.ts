@@ -95,14 +95,46 @@ export default wrapApiHandler(
           if (refus) {
             console.warn(`⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${refus}`)
           }
-          if (tiersToDelete.length > 0) {
+          /*
+           * Un tarif retiré chez HelloAsso mais qui porte des billets VENDUS ici est conservé.
+           *
+           * `TicketingOrderItem.tierId` est en `ON DELETE SET NULL` : le supprimer ne supprimerait
+           * pas ses billets, il les détacherait — et un billet détaché perd ses quotas, ses repas,
+           * ses articles à remettre et son `countAsParticipant`. Douze billets de la base portent
+           * déjà cette trace, tous de la marchandise dont les tarifs ont été retirés après la vente.
+           *
+           * Conserver le tarif crée une divergence durable avec HelloAsso, et c'est le prix assumé :
+           * un tarif en trop se voit et se corrige, un billet vidé de son sens ne se remarque pas.
+           * D'où le journal, qui nomme ce qu'on garde et pourquoi.
+           */
+          const idsVendus = new Set(
+            (
+              await tx.ticketingOrderItem.findMany({
+                where: { tierId: { in: tiersToDelete.map((t) => t.id) } },
+                select: { tierId: true },
+                distinct: ['tierId'],
+              })
+            ).map((billet) => billet.tierId)
+          )
+          const tiersConserves = tiersToDelete.filter((t) => idsVendus.has(t.id))
+          const tiersSupprimables = tiersToDelete.filter((t) => !idsVendus.has(t.id))
+
+          if (tiersConserves.length > 0) {
+            console.warn(
+              `⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${tiersConserves.length} ` +
+                `tarif(s) retiré(s) chez HelloAsso mais conservé(s) ici, des billets les utilisent :`,
+              tiersConserves.map((t) => t.name)
+            )
+          }
+
+          if (tiersSupprimables.length > 0) {
             console.log(
-              `🗑️ Suppression de ${tiersToDelete.length} tarif(s) obsolète(s):`,
-              tiersToDelete.map((t) => t.name)
+              `🗑️ Suppression de ${tiersSupprimables.length} tarif(s) obsolète(s):`,
+              tiersSupprimables.map((t) => t.name)
             )
             await tx.ticketingTier.deleteMany({
               where: {
-                id: { in: tiersToDelete.map((t) => t.id) },
+                id: { in: tiersSupprimables.map((t) => t.id) },
               },
             })
           }
