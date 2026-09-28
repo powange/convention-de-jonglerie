@@ -1092,7 +1092,8 @@
       "export_origin": "Походження",
       "export_origin_computed": "Обчислено",
       "export_origin_manual": "Введено",
-      "open_receipt_new_tab": "Відкрити документ у новій вкладці"
+      "open_receipt_new_tab": "Відкрити документ у новій вкладці",
+      "entry_operation_date": "Дата операції"
     },
     "program": {
       "description": "Складіть розклад фестивалю: воркшопи, виступи та інші події.",

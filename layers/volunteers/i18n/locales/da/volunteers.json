@@ -652,6 +652,8 @@
     "validation_summary_title": "Der mangler oplysninger for at sende din ansøgning",
     "team_periods": "Indsatsperioder",
     "team_periods_hint": "Kun frivillige, der er til stede i en af disse perioder, ser dette hold i deres præferencer",
-    "team_periods_required": "Markér mindst én periode"
+    "team_periods_required": "Markér mindst én periode",
+    "filter_source": "Filtrér efter oprindelse",
+    "source_all": "Alle oprindelser"
   }
 }

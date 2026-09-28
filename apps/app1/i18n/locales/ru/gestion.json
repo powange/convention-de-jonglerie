@@ -1092,7 +1092,8 @@
       "export_origin": "Источник",
       "export_origin_computed": "Вычислено",
       "export_origin_manual": "Введено",
-      "open_receipt_new_tab": "Открыть документ в новой вкладке"
+      "open_receipt_new_tab": "Открыть документ в новой вкладке",
+      "entry_operation_date": "Дата операции"
     },
     "program": {
       "description": "Составьте расписание фестиваля: воркшопы, выступления и другие события.",

@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} участник синхронизирован из HelloAsso | {count} участника синхронизированы из HelloAsso | {count} участников синхронизированы из HelloAsso",
       "sync_helloasso_success_title": "Синхронизация прошла успешно",
       "validate_error": "Не удалось подтвердить участников",
-      "verify_error": "Не удалось проверить билет"
+      "verify_error": "Не удалось проверить билет",
+      "refund_error": "Не удалось зарегистрировать возврат",
+      "refund_recorded": "Возврат зарегистрирован",
+      "refund_undone": "Возврат отменён"
     },
     "counters": {
       "connected": "Подключено",
@@ -247,7 +250,23 @@
       "status_pending": "Ожидает оплаты",
       "status_processed": "Оплачено онлайн",
       "tier_origin_external": "Синхронизировано из {fournisseur}",
-      "tier_origin_manual": "Создано на сайте"
+      "tier_origin_manual": "Создано на сайте",
+      "double_refund_badge": "Возвращено с обеих сторон",
+      "refund_error": "Ошибка при регистрации возврата",
+      "refund_filter_all": "Все билеты",
+      "refund_filter_due": "К возврату",
+      "refund_filter_label": "Возврат",
+      "refund_mark_done": "Отметить как возвращённое",
+      "refund_mark_undone": "Отменить возврат",
+      "refund_recorded": "Возврат зарегистрирован",
+      "refund_undone": "Возврат отменён",
+      "refunded_badge": "Возвращено",
+      "ticket_cancel": "Аннулировать этот билет",
+      "ticket_cancel_error": "Ошибка при аннулировании билета",
+      "ticket_canceled": "Билет аннулирован",
+      "ticket_restore": "Восстановить этот билет",
+      "ticket_restored": "Билет восстановлен",
+      "to_refund_badge": "К возврату"
     },
     "participant": {
       "entry_validated": "Вход уже подтвержден",

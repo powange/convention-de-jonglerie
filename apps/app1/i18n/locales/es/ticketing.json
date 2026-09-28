@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} participante sincronizado desde HelloAsso | {count} participantes sincronizados desde HelloAsso",
       "sync_helloasso_success_title": "Sincronización correcta",
       "validate_error": "No se han podido validar los participantes",
-      "verify_error": "No se ha podido verificar la entrada"
+      "verify_error": "No se ha podido verificar la entrada",
+      "refund_error": "No se pudo registrar el reembolso",
+      "refund_recorded": "Reembolso registrado",
+      "refund_undone": "Reembolso anulado"
     },
     "counters": {
       "connected": "Conectado",
@@ -247,7 +250,23 @@
       "status_pending": "Pendiente de pago",
       "status_processed": "Pagado en línea",
       "tier_origin_external": "Sincronizado desde {fournisseur}",
-      "tier_origin_manual": "Creado en el sitio"
+      "tier_origin_manual": "Creado en el sitio",
+      "double_refund_badge": "Reembolsado por ambas partes",
+      "refund_error": "Error al registrar el reembolso",
+      "refund_filter_all": "Todas las entradas",
+      "refund_filter_due": "Por reembolsar",
+      "refund_filter_label": "Reembolso",
+      "refund_mark_done": "Marcar como reembolsado",
+      "refund_mark_undone": "Anular el reembolso",
+      "refund_recorded": "Reembolso registrado",
+      "refund_undone": "Reembolso anulado",
+      "refunded_badge": "Reembolsado",
+      "ticket_cancel": "Anular esta entrada",
+      "ticket_cancel_error": "Error al anular la entrada",
+      "ticket_canceled": "Entrada anulada",
+      "ticket_restore": "Restablecer esta entrada",
+      "ticket_restored": "Entrada restablecida",
+      "to_refund_badge": "Por reembolsar"
     },
     "participant": {
       "entry_validated": "Entrada ya validada",

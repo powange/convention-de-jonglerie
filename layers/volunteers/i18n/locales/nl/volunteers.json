@@ -652,6 +652,8 @@
     "validation_summary_title": "Er ontbreekt informatie om je aanmelding te versturen",
     "team_periods": "Inzetperiodes",
     "team_periods_hint": "Alleen vrijwilligers die in een van deze periodes aanwezig zijn, zien dit team in hun voorkeuren",
-    "team_periods_required": "Vink minstens één periode aan"
+    "team_periods_required": "Vink minstens één periode aan",
+    "filter_source": "Filteren op herkomst",
+    "source_all": "Alle herkomsten"
   }
 }

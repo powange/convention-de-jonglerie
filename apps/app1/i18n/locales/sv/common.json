@@ -395,7 +395,13 @@
       "volunteer_management": "Frivillig förvaltning",
       "free_order_title": "Inget att betala",
       "free_order_help": "Orderbeloppet är noll: den registreras som betald, utan att någon betalningsmetod behöver väljas.",
-      "order_payment_title": "Betalning av ordern"
+      "order_payment_title": "Betalning av ordern",
+      "refund_already_done": "Återbetalning genomförd",
+      "refund_amount_label": "Belopp att återbetala",
+      "refund_confirm_description": "Bekräftar du att du har gett tillbaka {amount} till {name}? Biljetten visas inte längre bland dem som återstår att återbetala.",
+      "refund_confirm_title": "Bekräfta återbetalningen",
+      "refund_mark_done": "Återbetald",
+      "refund_undo": "Ångra återbetalningen"
     },
     "ticketing_title": "Biljetter",
     "useful_links": "Användbara länkar",

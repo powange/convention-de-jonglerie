@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} uczestnik zsynchronizowany z HelloAsso | {count} uczestnicy zsynchronizowani z HelloAsso | {count} uczestników zsynchronizowanych z HelloAsso",
       "sync_helloasso_success_title": "Synchronizacja zakończona powodzeniem",
       "validate_error": "Nie udało się zatwierdzić uczestników",
-      "verify_error": "Nie udało się zweryfikować biletu"
+      "verify_error": "Nie udało się zweryfikować biletu",
+      "refund_error": "Nie udało się zapisać zwrotu",
+      "refund_recorded": "Zwrot zapisany",
+      "refund_undone": "Zwrot cofnięty"
     },
     "counters": {
       "connected": "Połączono",
@@ -247,7 +250,23 @@
       "status_pending": "Oczekuje na płatność",
       "status_processed": "Opłacone online",
       "tier_origin_external": "Zsynchronizowano z {fournisseur}",
-      "tier_origin_manual": "Utworzone na stronie"
+      "tier_origin_manual": "Utworzone na stronie",
+      "double_refund_badge": "Zwrócono po obu stronach",
+      "refund_error": "Błąd podczas zapisywania zwrotu",
+      "refund_filter_all": "Wszystkie bilety",
+      "refund_filter_due": "Do zwrotu",
+      "refund_filter_label": "Zwrot",
+      "refund_mark_done": "Oznacz jako zwrócone",
+      "refund_mark_undone": "Cofnij zwrot",
+      "refund_recorded": "Zwrot zapisany",
+      "refund_undone": "Zwrot cofnięty",
+      "refunded_badge": "Zwrócono",
+      "ticket_cancel": "Anuluj ten bilet",
+      "ticket_cancel_error": "Błąd podczas anulowania biletu",
+      "ticket_canceled": "Bilet anulowany",
+      "ticket_restore": "Przywróć ten bilet",
+      "ticket_restored": "Bilet przywrócony",
+      "to_refund_badge": "Do zwrotu"
     },
     "participant": {
       "entry_validated": "Wejście już zwalidowane",

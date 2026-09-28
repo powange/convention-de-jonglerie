@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} Teilnehmer von HelloAsso synchronisiert | {count} Teilnehmer von HelloAsso synchronisiert",
       "sync_helloasso_success_title": "Synchronisierung erfolgreich",
       "validate_error": "Die Teilnehmer konnten nicht validiert werden",
-      "verify_error": "Das Ticket konnte nicht geprüft werden"
+      "verify_error": "Das Ticket konnte nicht geprüft werden",
+      "refund_error": "Die Erstattung konnte nicht gespeichert werden",
+      "refund_recorded": "Erstattung gespeichert",
+      "refund_undone": "Erstattung rückgängig gemacht"
     },
     "counters": {
       "connected": "Verbunden",
@@ -247,7 +250,23 @@
       "status_pending": "Zahlung ausstehend",
       "status_processed": "Online bezahlt",
       "tier_origin_external": "Synchronisiert von {fournisseur}",
-      "tier_origin_manual": "Auf der Website erstellt"
+      "tier_origin_manual": "Auf der Website erstellt",
+      "double_refund_badge": "Auf beiden Seiten erstattet",
+      "refund_error": "Fehler beim Speichern der Erstattung",
+      "refund_filter_all": "Alle Tickets",
+      "refund_filter_due": "Zu erstatten",
+      "refund_filter_label": "Erstattung",
+      "refund_mark_done": "Als erstattet markieren",
+      "refund_mark_undone": "Erstattung rückgängig machen",
+      "refund_recorded": "Erstattung gespeichert",
+      "refund_undone": "Erstattung rückgängig gemacht",
+      "refunded_badge": "Erstattet",
+      "ticket_cancel": "Dieses Ticket stornieren",
+      "ticket_cancel_error": "Fehler beim Stornieren des Tickets",
+      "ticket_canceled": "Ticket storniert",
+      "ticket_restore": "Dieses Ticket wiederherstellen",
+      "ticket_restored": "Ticket wiederhergestellt",
+      "to_refund_badge": "Zu erstatten"
     },
     "participant": {
       "entry_validated": "Eintritt bereits validiert",

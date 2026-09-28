@@ -395,7 +395,13 @@
       "volunteer_management": "Dobrovolné řízení",
       "free_order_title": "Není co platit",
       "free_order_help": "Částka objednávky je nulová: objednávka se zaznamená jako uhrazená, bez nutnosti volit způsob platby.",
-      "order_payment_title": "Platba objednávky"
+      "order_payment_title": "Platba objednávky",
+      "refund_already_done": "Vrácení provedeno",
+      "refund_amount_label": "Částka k vrácení",
+      "refund_confirm_description": "Potvrzujete, že jste vrátili {amount} osobě {name}? Vstupenka se přestane zobrazovat mezi těmi, které zbývá vrátit.",
+      "refund_confirm_title": "Potvrdit vrácení peněz",
+      "refund_mark_done": "Vráceno",
+      "refund_undo": "Zrušit vrácení peněz"
     },
     "ticketing_title": "Vstupenky",
     "useful_links": "Užitečné odkazy",

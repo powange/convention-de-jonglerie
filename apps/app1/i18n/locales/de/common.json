@@ -395,7 +395,13 @@
       "volunteer_management": "Freiwilligenverwaltung",
       "free_order_title": "Nichts zu zahlen",
       "free_order_help": "Der Bestellbetrag ist null: Die Bestellung wird als beglichen erfasst, ohne dass eine Zahlungsart zu wählen ist.",
-      "order_payment_title": "Zahlung der Bestellung"
+      "order_payment_title": "Zahlung der Bestellung",
+      "refund_already_done": "Erstattung erfolgt",
+      "refund_amount_label": "Zu erstattender Betrag",
+      "refund_confirm_description": "Bestätigen Sie, dass Sie {name} {amount} zurückgegeben haben? Das Ticket erscheint dann nicht mehr unter den noch zu erstattenden.",
+      "refund_confirm_title": "Erstattung bestätigen",
+      "refund_mark_done": "Erstattet",
+      "refund_undo": "Erstattung rückgängig machen"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nützliche Links",

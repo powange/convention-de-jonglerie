@@ -395,7 +395,13 @@
       "volunteer_management": "Zarządzanie wolontariuszami",
       "free_order_title": "Nie ma nic do zapłaty",
       "free_order_help": "Kwota zamówienia wynosi zero: zostaje zapisane jako opłacone, bez wyboru metody płatności.",
-      "order_payment_title": "Płatność za zamówienie"
+      "order_payment_title": "Płatność za zamówienie",
+      "refund_already_done": "Zwrot wykonany",
+      "refund_amount_label": "Kwota do zwrotu",
+      "refund_confirm_description": "Czy potwierdzasz, że zwróciłeś {amount} osobie {name}? Bilet przestanie pojawiać się wśród biletów do zwrotu.",
+      "refund_confirm_title": "Potwierdź zwrot",
+      "refund_mark_done": "Zwrócono",
+      "refund_undo": "Cofnij zwrot"
     },
     "ticketing_title": "System biletowy",
     "useful_links": "Przydatne linki",

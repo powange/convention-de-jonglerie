@@ -1092,7 +1092,8 @@
       "export_origin": "Oprindelse",
       "export_origin_computed": "Beregnet",
       "export_origin_manual": "Indtastet",
-      "open_receipt_new_tab": "Åbn bilaget i en ny fane"
+      "open_receipt_new_tab": "Åbn bilaget i en ny fane",
+      "entry_operation_date": "Transaktionsdato"
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

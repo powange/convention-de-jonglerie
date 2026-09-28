@@ -652,6 +652,8 @@
     "validation_summary_title": "Faltan datos para enviar tu candidatura",
     "team_periods": "Periodos de intervención",
     "team_periods_hint": "Solo el voluntariado presente en alguno de estos periodos verá este equipo en sus preferencias",
-    "team_periods_required": "Marca al menos un periodo"
+    "team_periods_required": "Marca al menos un periodo",
+    "filter_source": "Filtrar por procedencia",
+    "source_all": "Todas las procedencias"
   }
 }

@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} deltager synkroniseret fra HelloAsso | {count} deltagere synkroniseret fra HelloAsso",
       "sync_helloasso_success_title": "Synkroniseringen lykkedes",
       "validate_error": "Deltagerne kunne ikke valideres",
-      "verify_error": "Billetten kunne ikke kontrolleres"
+      "verify_error": "Billetten kunne ikke kontrolleres",
+      "refund_error": "Refunderingen kunne ikke registreres",
+      "refund_recorded": "Refundering registreret",
+      "refund_undone": "Refundering fortrudt"
     },
     "counters": {
       "connected": "Tilsluttet",
@@ -247,7 +250,23 @@
       "status_pending": "Afventer betaling",
       "status_processed": "Betalt online",
       "tier_origin_external": "Synkroniseret fra {fournisseur}",
-      "tier_origin_manual": "Oprettet på siden"
+      "tier_origin_manual": "Oprettet på siden",
+      "double_refund_badge": "Refunderet på begge sider",
+      "refund_error": "Fejl ved registrering af refunderingen",
+      "refund_filter_all": "Alle billetter",
+      "refund_filter_due": "Skal refunderes",
+      "refund_filter_label": "Refundering",
+      "refund_mark_done": "Markér som refunderet",
+      "refund_mark_undone": "Fortryd refunderingen",
+      "refund_recorded": "Refundering registreret",
+      "refund_undone": "Refundering fortrudt",
+      "refunded_badge": "Refunderet",
+      "ticket_cancel": "Annullér denne billet",
+      "ticket_cancel_error": "Fejl ved annullering af billetten",
+      "ticket_canceled": "Billet annulleret",
+      "ticket_restore": "Gendan denne billet",
+      "ticket_restored": "Billet gendannet",
+      "to_refund_badge": "Skal refunderes"
     },
     "participant": {
       "entry_validated": "Adgang allerede valideret",

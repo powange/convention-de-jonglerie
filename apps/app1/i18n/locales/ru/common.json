@@ -395,7 +395,13 @@
       "volunteer_management": "Управление волонтерами",
       "free_order_title": "Платить нечего",
       "free_order_help": "Сумма заказа равна нулю: он записывается как оплаченный, без выбора способа оплаты.",
-      "order_payment_title": "Оплата заказа"
+      "order_payment_title": "Оплата заказа",
+      "refund_already_done": "Возврат выполнен",
+      "refund_amount_label": "Сумма к возврату",
+      "refund_confirm_description": "Вы подтверждаете, что вернули {amount} участнику {name}? Билет больше не будет отображаться среди тех, по которым ещё нужно вернуть деньги.",
+      "refund_confirm_title": "Подтвердить возврат",
+      "refund_mark_done": "Возвращено",
+      "refund_undo": "Отменить возврат"
     },
     "ticketing_title": "Продажа билетов",
     "useful_links": "Полезные ссылки",

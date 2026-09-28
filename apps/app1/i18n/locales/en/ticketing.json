@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} participant synchronised from HelloAsso | {count} participants synchronised from HelloAsso",
       "sync_helloasso_success_title": "Synchronisation successful",
       "validate_error": "The participants could not be validated",
-      "verify_error": "The ticket could not be checked"
+      "verify_error": "The ticket could not be checked",
+      "refund_error": "Unable to record the refund",
+      "refund_recorded": "Refund recorded",
+      "refund_undone": "Refund undone"
     },
     "counters": {
       "connected": "Connected",
@@ -247,7 +250,23 @@
       "status_pending": "Awaiting payment",
       "status_processed": "Paid online",
       "tier_origin_external": "Synced from {fournisseur}",
-      "tier_origin_manual": "Created on the site"
+      "tier_origin_manual": "Created on the site",
+      "double_refund_badge": "Refunded on both sides",
+      "refund_error": "Error while recording the refund",
+      "refund_filter_all": "All tickets",
+      "refund_filter_due": "To refund",
+      "refund_filter_label": "Refund",
+      "refund_mark_done": "Mark as refunded",
+      "refund_mark_undone": "Undo the refund",
+      "refund_recorded": "Refund recorded",
+      "refund_undone": "Refund undone",
+      "refunded_badge": "Refunded",
+      "ticket_cancel": "Cancel this ticket",
+      "ticket_cancel_error": "Error while cancelling the ticket",
+      "ticket_canceled": "Ticket cancelled",
+      "ticket_restore": "Restore this ticket",
+      "ticket_restored": "Ticket restored",
+      "to_refund_badge": "To refund"
     },
     "participant": {
       "entry_validated": "Entry already validated",

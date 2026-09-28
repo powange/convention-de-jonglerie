@@ -652,6 +652,8 @@
     "validation_summary_title": "Für das Absenden deiner Bewerbung fehlen noch Angaben",
     "team_periods": "Einsatzzeiträume",
     "team_periods_hint": "Nur Helferinnen und Helfer, die in einem dieser Zeiträume da sind, sehen dieses Team in ihren Präferenzen",
-    "team_periods_required": "Mindestens einen Zeitraum ankreuzen"
+    "team_periods_required": "Mindestens einen Zeitraum ankreuzen",
+    "filter_source": "Nach Herkunft filtern",
+    "source_all": "Alle Herkünfte"
   }
 }

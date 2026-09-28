@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} partecipante sincronizzato da HelloAsso | {count} partecipanti sincronizzati da HelloAsso",
       "sync_helloasso_success_title": "Sincronizzazione riuscita",
       "validate_error": "Impossibile convalidare i partecipanti",
-      "verify_error": "Impossibile verificare il biglietto"
+      "verify_error": "Impossibile verificare il biglietto",
+      "refund_error": "Impossibile registrare il rimborso",
+      "refund_recorded": "Rimborso registrato",
+      "refund_undone": "Rimborso annullato"
     },
     "counters": {
       "connected": "Connesso",
@@ -247,7 +250,23 @@
       "status_pending": "In attesa di pagamento",
       "status_processed": "Pagato online",
       "tier_origin_external": "Sincronizzato da {fournisseur}",
-      "tier_origin_manual": "Creato sul sito"
+      "tier_origin_manual": "Creato sul sito",
+      "double_refund_badge": "Rimborsato da entrambe le parti",
+      "refund_error": "Errore durante la registrazione del rimborso",
+      "refund_filter_all": "Tutti i biglietti",
+      "refund_filter_due": "Da rimborsare",
+      "refund_filter_label": "Rimborso",
+      "refund_mark_done": "Segna come rimborsato",
+      "refund_mark_undone": "Annulla il rimborso",
+      "refund_recorded": "Rimborso registrato",
+      "refund_undone": "Rimborso annullato",
+      "refunded_badge": "Rimborsato",
+      "ticket_cancel": "Annulla questo biglietto",
+      "ticket_cancel_error": "Errore durante l'annullamento del biglietto",
+      "ticket_canceled": "Biglietto annullato",
+      "ticket_restore": "Ripristina questo biglietto",
+      "ticket_restored": "Biglietto ripristinato",
+      "to_refund_badge": "Da rimborsare"
     },
     "participant": {
       "entry_validated": "Ingresso già convalidato",

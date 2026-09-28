@@ -1092,7 +1092,8 @@
       "export_origin": "Herkomst",
       "export_origin_computed": "Berekend",
       "export_origin_manual": "Ingevoerd",
-      "open_receipt_new_tab": "Het bewijsstuk in een nieuw tabblad openen"
+      "open_receipt_new_tab": "Het bewijsstuk in een nieuw tabblad openen",
+      "entry_operation_date": "Datum van de verrichting"
     },
     "program": {
       "description": "Stel de tijdlijn van de editie samen: workshops, shows en andere momenten.",

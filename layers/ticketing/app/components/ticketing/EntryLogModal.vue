@@ -212,19 +212,25 @@ const couleurDePopulation = (type: string) =>
 const page = ref(1)
 const tailleDePage = 25
 const recherche = ref('')
-const filtreMouvement = ref('')
-const filtrePopulation = ref('')
+/**
+ * « Tous » s'écrit `'all'`, et non `''` : le sélecteur réserve la chaîne vide à « aucune
+ * sélection » et refuse d'en faire la valeur d'une option — l'ouverture de la modale levait une
+ * erreur par option vide. C'est l'idiome déjà en place sur la liste des repas.
+ */
+const TOUS = 'all'
+const filtreMouvement = ref(TOUS)
+const filtrePopulation = ref(TOUS)
 const depuis = ref('')
 const jusqua = ref('')
 
 const choixDeMouvement = computed(() => [
-  { label: t('ticketing.entry_log.all_movements'), value: '' },
+  { label: t('ticketing.entry_log.all_movements'), value: TOUS },
   { label: t('ticketing.entry_log.movement_validated'), value: 'VALIDATED' },
   { label: t('ticketing.entry_log.movement_cancelled'), value: 'INVALIDATED' },
 ])
 
 const choixDePopulation = computed(() => [
-  { label: t('ticketing.entry_log.all_populations'), value: '' },
+  { label: t('ticketing.entry_log.all_populations'), value: TOUS },
   { label: t('common.participant'), value: 'ticket' },
   { label: t('common.volunteer'), value: 'volunteer' },
   { label: t('common.artist'), value: 'artist' },
@@ -234,16 +240,16 @@ const choixDePopulation = computed(() => [
 const unFiltreEstActif = computed(
   () =>
     !!recherche.value ||
-    !!filtreMouvement.value ||
-    !!filtrePopulation.value ||
+    filtreMouvement.value !== TOUS ||
+    filtrePopulation.value !== TOUS ||
     !!depuis.value ||
     !!jusqua.value
 )
 
 const reinitialiser = () => {
   recherche.value = ''
-  filtreMouvement.value = ''
-  filtrePopulation.value = ''
+  filtreMouvement.value = TOUS
+  filtrePopulation.value = TOUS
   depuis.value = ''
   jusqua.value = ''
   page.value = 1
@@ -292,8 +298,8 @@ const charger = async () => {
         page: page.value,
         pageSize: tailleDePage,
         ...(terme.length >= 2 ? { search: terme } : {}),
-        ...(filtreMouvement.value ? { movement: filtreMouvement.value } : {}),
-        ...(filtrePopulation.value ? { kind: filtrePopulation.value } : {}),
+        ...(filtreMouvement.value !== TOUS ? { movement: filtreMouvement.value } : {}),
+        ...(filtrePopulation.value !== TOUS ? { kind: filtrePopulation.value } : {}),
         ...(depuis.value ? { from: depuis.value } : {}),
         ...(jusqua.value ? { to: jusqua.value } : {}),
       },

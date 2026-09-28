@@ -1092,7 +1092,8 @@
       "export_origin": "Ursprung",
       "export_origin_computed": "Beräknat",
       "export_origin_manual": "Inmatat",
-      "open_receipt_new_tab": "Öppna underlaget i en ny flik"
+      "open_receipt_new_tab": "Öppna underlaget i en ny flik",
+      "entry_operation_date": "Transaktionsdatum"
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

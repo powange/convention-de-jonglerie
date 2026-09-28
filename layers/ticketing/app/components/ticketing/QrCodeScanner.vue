@@ -76,8 +76,12 @@
     </template>
 
     <template #footer>
-      <UButton variant="ghost" :disabled="scanning || loading" @click="close">
-        {{ scanning ? 'Arrêter' : 'Annuler' }}
+      <!-- Un seul bouton pour sortir, toujours actif : `close` éteint la caméra lui-même.
+
+           Pendant un scan, il s'appelait « Arrêter » et restait grisé, à côté d'un « Arrêter le
+           scan » rouge qui faisait, lui, le travail : deux arrêts à l'écran, dont un inerte. -->
+      <UButton variant="ghost" :disabled="loading" @click="close">
+        {{ $t('common.close') }}
       </UButton>
       <UButton
         v-if="!scanning && !loading"

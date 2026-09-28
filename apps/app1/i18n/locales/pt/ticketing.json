@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} participante sincronizado a partir do HelloAsso | {count} participantes sincronizados a partir do HelloAsso",
       "sync_helloasso_success_title": "Sincronização bem-sucedida",
       "validate_error": "Não foi possível validar os participantes",
-      "verify_error": "Não foi possível verificar o bilhete"
+      "verify_error": "Não foi possível verificar o bilhete",
+      "refund_error": "Não foi possível registar o reembolso",
+      "refund_recorded": "Reembolso registado",
+      "refund_undone": "Reembolso anulado"
     },
     "counters": {
       "connected": "Conectado",
@@ -247,7 +250,23 @@
       "status_pending": "A aguardar pagamento",
       "status_processed": "Pago online",
       "tier_origin_external": "Sincronizado a partir de {fournisseur}",
-      "tier_origin_manual": "Criado no site"
+      "tier_origin_manual": "Criado no site",
+      "double_refund_badge": "Reembolsado dos dois lados",
+      "refund_error": "Erro ao registar o reembolso",
+      "refund_filter_all": "Todos os bilhetes",
+      "refund_filter_due": "A reembolsar",
+      "refund_filter_label": "Reembolso",
+      "refund_mark_done": "Marcar como reembolsado",
+      "refund_mark_undone": "Anular o reembolso",
+      "refund_recorded": "Reembolso registado",
+      "refund_undone": "Reembolso anulado",
+      "refunded_badge": "Reembolsado",
+      "ticket_cancel": "Anular este bilhete",
+      "ticket_cancel_error": "Erro ao anular o bilhete",
+      "ticket_canceled": "Bilhete anulado",
+      "ticket_restore": "Restabelecer este bilhete",
+      "ticket_restored": "Bilhete restabelecido",
+      "to_refund_badge": "A reembolsar"
     },
     "participant": {
       "entry_validated": "Entrada já validada",

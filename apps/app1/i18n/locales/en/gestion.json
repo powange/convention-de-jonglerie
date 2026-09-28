@@ -1092,7 +1092,8 @@
       "export_origin": "Origin",
       "export_origin_computed": "Computed",
       "export_origin_manual": "Entered",
-      "open_receipt_new_tab": "Open the receipt in a new tab"
+      "open_receipt_new_tab": "Open the receipt in a new tab",
+      "entry_operation_date": "Transaction date"
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

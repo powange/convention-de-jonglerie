@@ -437,13 +437,13 @@
             </div>
           </div>
 
-          <!-- Bouton pour tout sélectionner/désélectionner -->
-          <div class="flex justify-end">
+          <!-- Bouton pour tout sélectionner/désélectionner.
+
+               Absent quand aucun billet ne peut plus être validé — tous entrés, ou annulés : le
+               « Tout désélectionner » qui s'y affichait alors ne portait sur rien. -->
+          <div v-if="participantsValidables.length > 0" class="flex justify-end">
             <UButton
-              v-if="
-                selectedParticipants.length <
-                participantItems.filter((item) => estValidable(item)).length
-              "
+              v-if="selectedParticipants.length < participantsValidables.length"
               variant="ghost"
               size="sm"
               @click="selectAllParticipants"
@@ -1418,11 +1418,15 @@ const getItemTotalAmount = (item: {
   return item.amount + optionsTotal
 }
 
+/** Les billets de la commande qu'on peut encore cocher : ni entrés, ni annulés. */
+const participantsValidables = computed(() =>
+  participantItems.value.filter((item) => estValidable(item))
+)
+
 const selectAllParticipants = () => {
   if (props.participant && 'ticket' in props.participant) {
     // Ne sélectionner que les participants non-validés et non-donations
-    selectedParticipants.value =
-      participantItems.value.filter((item) => estValidable(item)).map((item) => item.id) || []
+    selectedParticipants.value = participantsValidables.value.map((item) => item.id)
   }
 }
 

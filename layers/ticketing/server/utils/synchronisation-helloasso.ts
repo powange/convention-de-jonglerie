@@ -77,3 +77,72 @@ export function decisionSuppression<T>(
 
   return { aSupprimer: candidats }
 }
+
+/** Ce que la base sait déjà d'une ligne, pour décider des suites d'une annulation de la source. */
+export interface LigneDejaSynchronisee {
+  sourceCanceledAt: Date | null
+  refunded: boolean
+}
+
+/**
+ * Ce qu'une annulation annoncée par HelloAsso écrit sur la ligne.
+ *
+ * **Une annulation HelloAsso vaut remboursement.** La plateforme n'annule une ligne qu'en rendant
+ * l'argent — c'est déjà l'hypothèse du rattrapage du 28/09, qui a marqué remboursées les douze
+ * lignes annulées de la production. Sans cette règle, la ligne restait « réglée, annulée, non
+ * remboursée » : le guichet réclamait au bénévole une somme que HelloAsso avait déjà rendue, et
+ * l'alerte de double remboursement ne s'allumait qu'APRÈS qu'il l'eut rendue une seconde fois.
+ *
+ * Le remboursement est inscrit sans auteur : `refundedById` nul veut dire « par la plateforme »,
+ * la convention du rattrapage. C'est ce qui garde l'alerte juste — elle exige `refundedById`, donc
+ * une case cochée ICI avant que la source n'annonce l'annulation.
+ *
+ * Et sans date, comme au rattrapage : on sait QUE la plateforme a rendu l'argent, pas QUAND. La
+ * date de la synchronisation — des jours plus tard, parfois — se lirait comme celle du
+ * remboursement ; le guichet affiche « Remboursement effectué » sans date, et c'est juste.
+ *
+ * Tout se décide au moment où la source annonce l'annulation pour la première fois, et seulement
+ * là (`sourceCanceledAt` encore nul). Un remboursement défait ensuite au guichet — le geste
+ * existe depuis #581 — n'est donc pas recoché à la synchronisation suivante.
+ *
+ * @param existant la ligne en base, ou `null` quand la synchronisation la crée
+ * @param sourceAnnule la charge HelloAsso donne-t-elle la ligne pour annulée ?
+ */
+export function suitesDeLAnnulationSource(
+  existant: LigneDejaSynchronisee | null,
+  sourceAnnule: boolean,
+  maintenant: Date
+): {
+  sourceCanceledAt?: Date
+  refunded?: true
+  refundedAt?: null
+  refundedById?: null
+} {
+  if (!sourceAnnule) return {}
+  // Déjà notée : la décision a été prise au premier passage, on n'y revient pas.
+  if (existant && existant.sourceCanceledAt !== null) return {}
+
+  return {
+    sourceCanceledAt: maintenant,
+    // Remboursée ici avant que la source ne l'annonce : on garde l'auteur, et l'alerte de double
+    // remboursement s'allume — c'est exactement le cas qu'elle existe pour signaler.
+    ...(existant?.refunded ? {} : { refunded: true, refundedAt: null, refundedById: null }),
+  }
+}
+
+/**
+ * Le statut d'une commande HelloAsso, déduit de ses lignes telles que la SOURCE les décrit.
+ *
+ * Il était forcé à `Processed` : une commande entièrement remboursée sur la plateforme s'affichait
+ * « Payée », billets annulés dessous, là où une commande annulée ici s'affiche « Annulée ».
+ *
+ * Seule la source compte. Des billets annulés un à un ICI ne font pas une commande annulée
+ * HelloAsso — la plateforme l'encaisse toujours ; la commande le devient quand HelloAsso annule
+ * toutes ses lignes. Le moyen de paiement, lui, reste renseigné : c'est ce qui dit à la règle du
+ * montant dû que la commande avait été réglée.
+ */
+export function statutDeCommandeHelloAsso(lignesAnnuleesALaSource: readonly boolean[]) {
+  return lignesAnnuleesALaSource.length > 0 && lignesAnnuleesALaSource.every(Boolean)
+    ? ('Refunded' as const)
+    : ('Processed' as const)
+}

@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} deltagare synkroniserad från HelloAsso | {count} deltagare synkroniserade från HelloAsso",
       "sync_helloasso_success_title": "Synkroniseringen lyckades",
       "validate_error": "Deltagarna kunde inte valideras",
-      "verify_error": "Biljetten kunde inte kontrolleras"
+      "verify_error": "Biljetten kunde inte kontrolleras",
+      "refund_error": "Det gick inte att registrera återbetalningen",
+      "refund_recorded": "Återbetalning registrerad",
+      "refund_undone": "Återbetalning ångrad"
     },
     "counters": {
       "connected": "Ansluten",
@@ -247,7 +250,23 @@
       "status_pending": "Väntar på betalning",
       "status_processed": "Betald online",
       "tier_origin_external": "Synkroniserad från {fournisseur}",
-      "tier_origin_manual": "Skapad på webbplatsen"
+      "tier_origin_manual": "Skapad på webbplatsen",
+      "double_refund_badge": "Återbetald på båda håll",
+      "refund_error": "Fel vid registrering av återbetalningen",
+      "refund_filter_all": "Alla biljetter",
+      "refund_filter_due": "Att återbetala",
+      "refund_filter_label": "Återbetalning",
+      "refund_mark_done": "Markera som återbetald",
+      "refund_mark_undone": "Ångra återbetalningen",
+      "refund_recorded": "Återbetalning registrerad",
+      "refund_undone": "Återbetalning ångrad",
+      "refunded_badge": "Återbetald",
+      "ticket_cancel": "Avboka den här biljetten",
+      "ticket_cancel_error": "Fel vid avbokning av biljetten",
+      "ticket_canceled": "Biljett avbokad",
+      "ticket_restore": "Återställ den här biljetten",
+      "ticket_restored": "Biljett återställd",
+      "to_refund_badge": "Att återbetala"
     },
     "participant": {
       "entry_validated": "Posten är redan validerad",

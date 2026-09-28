@@ -652,6 +652,8 @@
     "validation_summary_title": "Some information is missing to send your application",
     "team_periods": "Periods of work",
     "team_periods_hint": "Only volunteers present during one of these periods will see this team in their preferences",
-    "team_periods_required": "Tick at least one period"
+    "team_periods_required": "Tick at least one period",
+    "filter_source": "Filter by source",
+    "source_all": "All sources"
   }
 }

@@ -395,7 +395,13 @@
       "volunteer_management": "Gestão de voluntários",
       "free_order_title": "Nada a pagar",
       "free_order_help": "O montante da encomenda é zero: fica registada como liquidada, sem método de pagamento a escolher.",
-      "order_payment_title": "Pagamento da encomenda"
+      "order_payment_title": "Pagamento da encomenda",
+      "refund_already_done": "Reembolso efetuado",
+      "refund_amount_label": "Montante a reembolsar",
+      "refund_confirm_description": "Confirma que devolveu {amount} a {name}? O bilhete deixará de aparecer entre os que ainda falta reembolsar.",
+      "refund_confirm_title": "Confirmar o reembolso",
+      "refund_mark_done": "Reembolsado",
+      "refund_undo": "Anular o reembolso"
     },
     "ticketing_title": "Bilheteria",
     "useful_links": "Ligações úteis",

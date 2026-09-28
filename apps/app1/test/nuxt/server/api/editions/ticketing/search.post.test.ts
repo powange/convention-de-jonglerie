@@ -355,6 +355,65 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
     })
   })
 
+  describe('la provenance de la commande', () => {
+    const billetDe = (externalTicketing: { provider: string } | null) => {
+      const ligne = {
+        id: 1,
+        helloAssoItemId: null,
+        name: 'Pass',
+        type: null,
+        amount: 100,
+        state: 'Processed',
+        qrCode: 'x',
+        firstName: 'Ada',
+        lastName: 'Lovelace',
+        email: 'ada@x.fr',
+        customFields: null,
+        tier: null,
+        selectedOptions: [],
+      }
+      return {
+        ...ligne,
+        order: {
+          id: 1,
+          helloAssoOrderId: 42,
+          status: 'Processed',
+          payerFirstName: 'Ada',
+          payerLastName: 'Lovelace',
+          payerEmail: 'ada@x.fr',
+          externalTicketing,
+          items: [ligne],
+        },
+      }
+    }
+
+    it('la rend, comme le scan : sans elle, une commande HelloAsso prenait le logo du site', async () => {
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        billetDe({ provider: 'HELLOASSO' }),
+      ])
+
+      const resultat = await searchHandler(mockEvent as any)
+
+      expect(resultat.data.results.tickets[0].participant.ticket.order.provider).toBe('HELLOASSO')
+    })
+
+    it('rend null pour une commande saisie sur place', async () => {
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([billetDe(null)])
+
+      const resultat = await searchHandler(mockEvent as any)
+
+      expect(resultat.data.results.tickets[0].participant.ticket.order.provider).toBeNull()
+    })
+
+    it('la demande en base', async () => {
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([])
+      await searchHandler(mockEvent as any)
+
+      const { include } = prismaMock.ticketingOrderItem.findMany.mock.calls.at(-1)[0]
+      expect(include.order.include.externalTicketing).toEqual({ select: { provider: true } })
+    })
+  })
+
   it('ordonne les repas par date PUIS par type, pour les trois populations', async () => {
     await chercherAvec(5)
 

@@ -1,8 +1,17 @@
+import {
+  statutDeCommandeHelloAsso,
+  suitesDeLAnnulationSource,
+} from '../../../../../utils/synchronisation-helloasso'
+
 import { requireAuth } from '#server/utils/auth-utils'
 import { fetchOrdersFromHelloAsso } from '#server/utils/editions/ticketing/helloasso'
 import { decrypt } from '#server/utils/encryption'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
 import { ETATS_DE_BILLET_ANNULE } from '#server/utils/ticketing/billets-qui-comptent'
+
+/** La charge HelloAsso donne-t-elle cette ligne pour annulée ? */
+const annuleeALaSource = (etat: string) =>
+  (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(etat)
 
 /**
  * Total d'une commande : ses lignes, **options comprises**.
@@ -84,6 +93,11 @@ export default wrapApiHandler(
           console.log('📊 Nombre de tarifs disponibles:', tiers.length)
 
           for (const order of result.data) {
+            // Le statut suit la source : « Annulée » quand HelloAsso a annulé toutes les lignes.
+            const statut = statutDeCommandeHelloAsso(
+              order.items.map((item) => annuleeALaSource(item.state))
+            )
+
             // Créer ou mettre à jour la commande
             const savedOrder = await tx.ticketingOrder.upsert({
               where: {
@@ -100,7 +114,7 @@ export default wrapApiHandler(
                 payerLastName: order.payer.lastName,
                 payerEmail: order.payer.email,
                 amount: orderTotal(order),
-                status: 'Processed', // TODO: récupérer le statut réel
+                status: statut,
                 paymentMethod: 'card', // HelloAsso = paiement par carte
                 orderDate: new Date(order.date), // Date de la commande HelloAsso
               },
@@ -109,7 +123,7 @@ export default wrapApiHandler(
                 payerLastName: order.payer.lastName,
                 payerEmail: order.payer.email,
                 amount: orderTotal(order),
-                status: 'Processed',
+                status: statut,
                 paymentMethod: 'card', // HelloAsso = paiement par carte
                 orderDate: new Date(order.date), // Mettre à jour la date si elle a changé
               },
@@ -175,9 +189,6 @@ export default wrapApiHandler(
                 // gouverne ; renseigné, elle vient d'ici. Lever l'annulation le remet à nul, et la
                 // source reprend la main d'elle-même — aucun état à démêler.
                 const annuleIci = existingItem.canceledAt !== null
-                const sourceAnnule = (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(
-                  item.state
-                )
 
                 await tx.ticketingOrderItem.update({
                   where: { id: existingItem.id },
@@ -190,12 +201,14 @@ export default wrapApiHandler(
                     type: item.type,
                     amount: item.amount,
                     ...(annuleIci ? {} : { state: item.state }),
-                    // Ce que la source dit de l'annulation, qu'on suive son état ou non. C'est la
-                    // moitié manquante de la détection d'un double remboursement : l'autre est
-                    // `refundedById`, qui ne vaut que pour une case cochée ici.
-                    ...(sourceAnnule && existingItem.sourceCanceledAt === null
-                      ? { sourceCanceledAt: new Date() }
-                      : {}),
+                    // Ce que la source dit de l'annulation, qu'on suive son état ou non : sa date,
+                    // moitié de la détection d'un double remboursement, et le remboursement
+                    // qu'elle vaut. Voir `suitesDeLAnnulationSource`.
+                    ...suitesDeLAnnulationSource(
+                      existingItem,
+                      annuleeALaSource(item.state),
+                      new Date()
+                    ),
                     qrCode: item.qrCode,
                     customFields: item.customFields || undefined,
                   },
@@ -217,6 +230,10 @@ export default wrapApiHandler(
                     type: item.type,
                     amount: item.amount,
                     state: item.state,
+                    // Une ligne déjà annulée à sa première synchronisation : même règle. Sa date
+                    // d'annulation n'était pas posée, et l'alerte de double remboursement ne
+                    // pouvait donc jamais s'allumer sur elle.
+                    ...suitesDeLAnnulationSource(null, annuleeALaSource(item.state), new Date()),
                     qrCode: item.qrCode,
                     customFields: item.customFields || undefined,
                   },

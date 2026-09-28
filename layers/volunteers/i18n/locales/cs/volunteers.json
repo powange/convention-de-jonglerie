@@ -652,6 +652,8 @@
     "validation_summary_title": "K odeslání přihlášky chybí některé údaje",
     "team_periods": "Období nasazení",
     "team_periods_hint": "Tento tým uvidí ve svých preferencích jen dobrovolníci přítomní v některém z těchto období",
-    "team_periods_required": "Zaškrtněte alespoň jedno období"
+    "team_periods_required": "Zaškrtněte alespoň jedno období",
+    "filter_source": "Filtrovat podle původu",
+    "source_all": "Všechny původy"
   }
 }
