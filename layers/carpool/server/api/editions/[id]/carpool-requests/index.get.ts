@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { transformCarpoolRequest } from '#server/utils/carpool-transform'
-import { carpoolRequestFullInclude } from '#server/utils/prisma-select-helpers'
+import { carpoolRequestListInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -17,13 +17,8 @@ export default wrapApiHandler(
         editionId,
         ...(includeArchived ? {} : { tripDate: { gte: now } }),
       },
-      include: {
-        ...carpoolRequestFullInclude,
-        comments: {
-          ...carpoolRequestFullInclude.comments,
-          orderBy: { createdAt: 'desc' },
-        },
-      },
+      // Le COMPTE des commentaires, pas leur contenu : la carte d'une demande ne les lisait pas.
+      include: carpoolRequestListInclude,
       orderBy: { tripDate: 'asc' },
     })
 

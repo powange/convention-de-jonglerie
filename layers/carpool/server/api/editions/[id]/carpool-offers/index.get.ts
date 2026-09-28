@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { transformCarpoolOffer } from '#server/utils/carpool-transform'
-import { carpoolOfferFullInclude } from '#server/utils/prisma-select-helpers'
+import { carpoolOfferListInclude } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -17,15 +17,13 @@ export default wrapApiHandler(
         editionId,
         ...(includeArchived ? {} : { tripDate: { gte: now } }),
       },
+      // Le compte des commentaires et les seules réservations acceptées : voir
+      // `carpoolOfferListInclude` pour ce que la carte lit réellement.
       include: {
-        ...carpoolOfferFullInclude,
+        ...carpoolOfferListInclude,
         passengers: {
-          ...carpoolOfferFullInclude.passengers,
+          ...carpoolOfferListInclude.passengers,
           orderBy: { addedAt: 'asc' },
-        },
-        comments: {
-          ...carpoolOfferFullInclude.comments,
-          orderBy: { createdAt: 'desc' },
         },
       },
       orderBy: { tripDate: 'asc' },

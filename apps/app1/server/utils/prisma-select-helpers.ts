@@ -295,6 +295,62 @@ export const carpoolOfferInclude = {
 } satisfies Prisma.CarpoolOfferInclude
 
 /**
+ * Include pour la LISTE des offres d'une édition.
+ *
+ * Deux écarts volontaires avec `carpoolOfferFullInclude`, qui reste pour le détail d'une offre :
+ *
+ * - le COMPTE des commentaires plutôt que leur contenu. La carte d'une offre n'affiche qu'un
+ *   nombre ; charger chaque commentaire avec son auteur pour l'afficher, c'était transporter toute
+ *   la conversation de chaque offre de l'édition à chaque chargement de la page ;
+ * - les seules réservations `ACCEPTED`. La carte n'utilise jamais les autres — ni pour la liste des
+ *   passagers confirmés, ni pour les places restantes — pas même pour le conducteur, à qui
+ *   `transformCarpoolOffer` les donnait pourtant toutes. Le détail d'une offre et
+ *   `GET /carpool-offers/:id/bookings` restent les endroits où le conducteur voit les demandes en
+ *   attente.
+ *
+ * ⚠️ `remainingSeats` se calcule en refiltrant sur `ACCEPTED` dans `transformCarpoolOffer` : le
+ * chiffre reste juste avec cet include, par construction et non par coïncidence. Ne pas retirer ce
+ * refiltrage sous prétexte que la base a déjà filtré — le détail, lui, reçoit toujours tout.
+ */
+export const carpoolOfferListInclude = {
+  user: {
+    select: carpoolUserSelect,
+  },
+  bookings: {
+    where: { status: 'ACCEPTED' },
+    include: {
+      requester: {
+        select: carpoolUserSelect,
+      },
+    },
+  },
+  passengers: {
+    include: {
+      user: {
+        select: carpoolUserSelect,
+      },
+    },
+  },
+  _count: {
+    select: { comments: true },
+  },
+} satisfies Prisma.CarpoolOfferInclude
+
+/**
+ * Include pour la LISTE des demandes d'une édition : le compte des commentaires, jamais leur
+ * contenu. La carte d'une demande ne les lisait même pas — elle laissait sa modale les redemander
+ * un par un, ce qui faisait une requête de plus par carte affichée.
+ */
+export const carpoolRequestListInclude = {
+  user: {
+    select: carpoolUserSelect,
+  },
+  _count: {
+    select: { comments: true },
+  },
+} satisfies Prisma.CarpoolRequestInclude
+
+/**
  * Include pour offre de covoiturage complète (avec bookings, passengers et comments)
  * Utilisée pour l'affichage détaillé des offres
  */

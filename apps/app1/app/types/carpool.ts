@@ -48,7 +48,10 @@ export interface CarpoolOffer {
     addedAt: string
     user: PublicUser
   }>
+  /** Chargés par le détail d'une offre ; absents des listes, qui n'en donnent que le nombre. */
   comments?: CarpoolComment[]
+  /** Toujours présent : les listes le rendent sans transporter les commentaires. */
+  commentsCount?: number
 }
 
 export interface CarpoolRequest {
@@ -65,5 +68,8 @@ export interface CarpoolRequest {
   createdAt: string
   updatedAt?: string
   user: PublicUser
+  /** Chargés par le détail d'une demande ; absents des listes, qui n'en donnent que le nombre. */
   comments?: CarpoolComment[]
+  /** Toujours présent : les listes le rendent sans transporter les commentaires. */
+  commentsCount?: number
 }

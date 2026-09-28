@@ -71,6 +71,7 @@
             <EditionCarpoolCommentsModal
               :id="request.id"
               type="request"
+              :count="request.commentsCount ?? request.comments?.length ?? 0"
               @comment-added="emit('comment-added')"
             />
           </div>

@@ -24,9 +24,15 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
   })
 
   /**
-   * L'offre de référence : trois réservations, une par statut, pour que le filtre appliqué par
-   * `transformCarpoolOffer` ait quelque chose à trancher. Le conducteur est l'utilisateur 1, le
-   * passager accepté l'utilisateur 2.
+   * L'offre de référence, telle que la base la rend POUR CE POINT D'API : la réservation acceptée
+   * seule, et le nombre de commentaires sans leur contenu.
+   *
+   * La version précédente portait trois réservations, une par statut, et la conversation complète.
+   * Elle décrivait un état que la requête ne produit plus — `carpoolOfferListInclude` filtre sur
+   * `ACCEPTED` et ne demande que `_count`. Un mock ignorant le `where`, les assertions bâties
+   * dessus restaient vertes tout en parlant d'une forme qui n'existe pas.
+   *
+   * Le conducteur est l'utilisateur 1, le passager accepté l'utilisateur 2.
    */
   const offreMockee = () => ({
     id: 1,
@@ -63,42 +69,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           updatedAt: new Date(),
         },
       },
-      {
-        id: 11,
-        carpoolOfferId: 1,
-        requestId: null,
-        seats: 1,
-        message: 'Reste-t-il une place ? Mon numéro : 06 11 22 33 44',
-        status: 'PENDING',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        requesterId: 4,
-        requester: {
-          id: 4,
-          emailHash: 'hash4',
-          pseudo: 'candidat',
-          profilePicture: null,
-          updatedAt: new Date(),
-        },
-      },
-      {
-        id: 12,
-        carpoolOfferId: 1,
-        requestId: null,
-        seats: 1,
-        message: 'Finalement non, désolé',
-        status: 'REJECTED',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        requesterId: 5,
-        requester: {
-          id: 5,
-          emailHash: 'hash5',
-          pseudo: 'econduit',
-          profilePicture: null,
-          updatedAt: new Date(),
-        },
-      },
     ],
     passengers: [
       {
@@ -113,20 +83,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         },
       },
     ],
-    comments: [
-      {
-        id: 1,
-        content: 'Intéressé !',
-        createdAt: new Date(),
-        user: {
-          id: 3,
-          emailHash: 'hash3',
-          pseudo: 'commenter',
-          profilePicture: null,
-          updatedAt: new Date(),
-        },
-      },
-    ],
+    _count: { comments: 1 },
   })
 
   it('devrait récupérer les offres de covoiturage avec succès', async () => {
@@ -150,6 +107,8 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           },
         },
         bookings: {
+          // La base ne rend plus que les acceptées : la carte n'a jamais lu les autres.
+          where: { status: 'ACCEPTED' },
           include: {
             requester: {
               select: {
@@ -176,20 +135,8 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           },
           orderBy: { addedAt: 'asc' },
         },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'desc' },
-        },
+        // Le NOMBRE de commentaires, pas la conversation. C'est tout ce que la carte affiche.
+        _count: { select: { comments: true } },
       },
       orderBy: { tripDate: 'asc' },
     })
@@ -198,7 +145,10 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     expect(result[0].user.emailHash).toBe('hash1')
     expect(result[0].user).not.toHaveProperty('email') // Email doit être masqué
     expect(result[0].passengers[0].user.emailHash).toBe('hash2')
-    expect(result[0].comments[0].user.emailHash).toBe('hash3')
+    expect(result[0].commentsCount).toBe(1)
+    // Absent, et non pas vide : `comments: []` se lirait « aucun commentaire » alors que le compte
+    // en annonce un. C'est une contradiction qui ne lève aucune erreur.
+    expect(result[0]).not.toHaveProperty('comments')
 
     /*
      * Ce point d'API est PUBLIC : `mockEvent` n'a pas d'utilisateur. Un visiteur anonyme ne reçoit
@@ -237,7 +187,17 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     }
   })
 
-  it('rend au conducteur la liste complète de ses réservations, messages compris', async () => {
+  it('rend au conducteur le message de ses réservations acceptées, et rien de plus', async () => {
+    /*
+     * Ce test disait autrefois « la liste COMPLÈTE de ses réservations, messages compris », et
+     * vérifiait les trois statuts. Il ne le peut plus : la requête filtre sur `ACCEPTED`, donc les
+     * demandes en attente ou refusées n'arrivent tout simplement pas jusqu'ici. Le conducteur les
+     * consulte par `GET /carpool-offers/:id/bookings` et par le détail de l'offre, qui n'ont pas
+     * changé.
+     *
+     * Ce qui reste propre au conducteur, et qui se vérifie : le message lui est rendu, alors qu'il
+     * est retiré à tout autre.
+     */
     const eventDuConducteur = {
       context: { params: { id: '1' }, query: {}, user: { id: 1 } },
     } as unknown as H3Event
@@ -246,18 +206,25 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
 
     const result = await handler(eventDuConducteur)
 
-    expect(result[0].bookings.map((b: any) => b.status)).toEqual([
-      'ACCEPTED',
-      'PENDING',
-      'REJECTED',
-    ])
-    expect(result[0].bookings.map((b: any) => b.message)).toEqual([
-      'Je monte à Orléans, merci !',
-      'Reste-t-il une place ? Mon numéro : 06 11 22 33 44',
-      'Finalement non, désolé',
-    ])
+    expect(result[0].bookings.map((b: any) => b.message)).toEqual(['Je monte à Orléans, merci !'])
     // Le même chiffre que pour l'anonyme : il ne dépend pas du nombre de réservations montrées.
     expect(result[0].remainingSeats).toBe(2)
+  })
+
+  it('ne demande à la base que les réservations acceptées', async () => {
+    /*
+     * L'assertion qui porte réellement la restriction. Le mock de Prisma ignore le `where`, donc
+     * aucune vérification sur la charge rendue ne pourrait prouver que les réservations en attente
+     * ne sont plus transportées — seule la REQUÊTE le dit.
+     */
+    prismaMock.carpoolOffer.findMany.mockResolvedValue([offreMockee()])
+
+    await handler(mockEvent)
+
+    const { include } = prismaMock.carpoolOffer.findMany.mock.calls[0][0]
+    expect(include.bookings.where).toEqual({ status: 'ACCEPTED' })
+    expect(include).not.toHaveProperty('comments')
+    expect(include._count).toEqual({ select: { comments: true } })
   })
 
   it("devrait échouer avec ID d'édition invalide", async () => {
@@ -308,7 +275,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         user: { id: 1, emailHash: 'hash1', pseudo: 'user1' },
         bookings: [],
         passengers: [],
-        comments: [],
+        _count: { comments: 0 },
       },
       {
         id: 2,
@@ -316,7 +283,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         user: { id: 2, emailHash: 'hash2', pseudo: 'user2' },
         bookings: [],
         passengers: [],
-        comments: [],
+        _count: { comments: 0 },
       },
     ]
 
@@ -356,20 +323,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
             },
           },
         ],
-        comments: [
-          {
-            id: 1,
-            content: 'Test comment',
-            createdAt: new Date(),
-            user: {
-              id: 3,
-              emailHash: 'commenter-hash',
-              pseudo: 'commenter',
-              profilePicture: null,
-              updatedAt: new Date(),
-            },
-          },
-        ],
+        _count: { comments: 1 },
       },
     ]
 
@@ -384,8 +338,11 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     expect(result[0].passengers[0].user).not.toHaveProperty('email')
     expect(result[0].passengers[0].user.emailHash).toBe('passenger-hash')
 
-    expect(result[0].comments[0].user).not.toHaveProperty('email')
-    expect(result[0].comments[0].user.emailHash).toBe('commenter-hash')
+    // La conversation n'arrive plus par ce point d'API, seul son compte. Le masquage de l'email de
+    // l'auteur d'un commentaire est vérifié là où il se joue désormais :
+    // test/unit/utils/carpool-transform.test.ts.
+    expect(result[0].commentsCount).toBe(1)
+    expect(result[0]).not.toHaveProperty('comments')
   })
 
   it('devrait préserver les autres propriétés des utilisateurs', async () => {
@@ -401,7 +358,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         },
         bookings: [],
         passengers: [],
-        comments: [],
+        _count: { comments: 0 },
       },
     ]
 

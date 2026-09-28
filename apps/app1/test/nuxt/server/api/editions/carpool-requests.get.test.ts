@@ -39,22 +39,10 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           profilePicture: null,
           updatedAt: new Date('2024-01-01'),
         },
-        comments: [
-          {
-            id: 1,
-            carpoolRequestId: 1,
-            userId: 2,
-            content: 'Je peux te prendre !',
-            createdAt: new Date('2024-01-02'),
-            user: {
-              id: 2,
-              pseudo: 'driver1',
-              emailHash: 'driver-hash',
-              profilePicture: 'avatar.jpg',
-              updatedAt: new Date('2024-01-02'),
-            },
-          },
-        ],
+        // Le compte, tel que `carpoolRequestListInclude` le demande désormais. La carte d'une
+        // demande ne lisait même pas la conversation : elle laissait sa modale la redemander, une
+        // requête par carte affichée.
+        _count: { comments: 1 },
       },
     ]
 
@@ -83,21 +71,8 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
         profilePicture: null,
         updatedAt: new Date('2024-01-01'),
       },
-      comments: [
-        {
-          id: 1,
-          content: 'Je peux te prendre !',
-          createdAt: new Date('2024-01-02'),
-          updatedAt: undefined,
-          user: {
-            id: 2,
-            pseudo: 'driver1',
-            emailHash: 'driver-hash',
-            profilePicture: 'avatar.jpg',
-            updatedAt: new Date('2024-01-02'),
-          },
-        },
-      ],
+      // `toEqual` est exhaustif : l'absence d'une clé `comments` est donc vérifiée ici même.
+      commentsCount: 1,
     })
 
     expect(prismaMock.carpoolRequest.findMany).toHaveBeenCalledWith({
@@ -115,20 +90,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             updatedAt: true,
           },
         },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'desc' },
-        },
+        _count: { select: { comments: true } },
       },
       orderBy: { tripDate: 'asc' },
     })
@@ -173,7 +135,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           profilePicture: null,
           updatedAt: new Date(),
         },
-        comments: [],
+        _count: { comments: 0 },
       },
       {
         id: 1,
@@ -186,7 +148,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           profilePicture: null,
           updatedAt: new Date(),
         },
-        comments: [],
+        _count: { comments: 0 },
       },
     ]
 
@@ -209,20 +171,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             updatedAt: true,
           },
         },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'desc' },
-        },
+        _count: { select: { comments: true } },
       },
       orderBy: { tripDate: 'asc' }, // Vérification du tri
     })
@@ -244,7 +193,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
           profilePicture: null,
           updatedAt: new Date(),
         },
-        comments: [], // Pas de commentaires
+        _count: { comments: 0 },
       },
     ]
 
@@ -252,134 +201,26 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
 
     const result = await handler(mockEvent as any)
 
-    expect(result[0].comments).toEqual([])
+    expect(result[0].commentsCount).toBe(0)
+    expect(result[0]).not.toHaveProperty('comments')
   })
 
-  it('devrait trier les commentaires par date décroissante', async () => {
-    const mockRequests = [
-      {
-        id: 1,
-        user: {
-          id: 1,
-          pseudo: 'user1',
-          emailHash: 'hash1',
-          profilePicture: null,
-          updatedAt: new Date(),
-        },
-        comments: [
-          {
-            id: 1,
-            createdAt: new Date('2024-01-01'),
-            user: {
-              id: 2,
-              pseudo: 'user2',
-              emailHash: 'hash2',
-              profilePicture: null,
-              updatedAt: new Date(),
-            },
-          },
-          {
-            id: 2,
-            createdAt: new Date('2024-01-02'),
-            user: {
-              id: 3,
-              pseudo: 'user3',
-              emailHash: 'hash3',
-              profilePicture: null,
-              updatedAt: new Date(),
-            },
-          },
-        ],
-      },
-    ]
-
-    prismaMock.carpoolRequest.findMany.mockResolvedValue(mockRequests)
-
-    await handler(mockEvent as any)
-
-    expect(prismaMock.carpoolRequest.findMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({
-        editionId: 1,
-        tripDate: expect.objectContaining({ gte: expect.any(Date) }),
-      }),
-      include: {
-        user: {
-          select: {
-            id: true,
-            pseudo: true,
-            emailHash: true,
-            profilePicture: true,
-            updatedAt: true,
-          },
-        },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'desc' }, // Les commentaires triés par date décroissante
-        },
-      },
-      orderBy: { tripDate: 'asc' },
-    })
-  })
-
-  it('devrait masquer les emails de tous les utilisateurs (demandes et commentaires)', async () => {
-    const mockRequests = [
-      {
-        id: 1,
-        user: {
-          id: 1,
-          pseudo: 'passenger1',
-          emailHash: 'passenger-hash',
-          profilePicture: null,
-          updatedAt: new Date(),
-        },
-        comments: [
-          {
-            id: 1,
-            user: {
-              id: 2,
-              pseudo: 'driver1',
-              emailHash: 'driver1-hash',
-              profilePicture: 'avatar.jpg',
-              updatedAt: new Date(),
-            },
-          },
-          {
-            id: 2,
-            user: {
-              id: 3,
-              pseudo: 'driver2',
-              emailHash: 'driver2-hash',
-              profilePicture: null,
-              updatedAt: new Date(),
-            },
-          },
-        ],
-      },
-    ]
-
-    prismaMock.carpoolRequest.findMany.mockResolvedValue(mockRequests)
-
-    const result = await handler(mockEvent as any)
-
-    expect(result[0].user.emailHash).toBe('passenger-hash')
-    expect(result[0].comments[0].user.emailHash).toBe('driver1-hash')
-    expect(result[0].comments[1].user.emailHash).toBe('driver2-hash')
-
-    // Vérifier que les emails originaux ne sont pas exposés
-    expect(result[0].user).not.toHaveProperty('email')
-    expect(result[0].comments[0].user).not.toHaveProperty('email')
-    expect(result[0].comments[1].user).not.toHaveProperty('email')
-  })
+  /*
+   * DEUX TESTS RETIRÉS ICI, et où leur objet a déménagé.
+   *
+   * « trier les commentaires par date décroissante » : ce point d'API ne charge plus les
+   * commentaires, il n'a donc plus d'ordre à leur donner. Rien n'est perdu — la conversation se lit
+   * par `GET /api/carpool-requests/:id/comments`, qui la rend en ordre CROISSANT
+   * (`commentsHandler.ts`), ce qui est l'ordre d'une conversation. Le tri décroissant de la liste
+   * contredisait d'ailleurs celui de la modale qui affichait ces mêmes commentaires.
+   *
+   * « masquer les emails des commentaires » : l'auteur d'un commentaire n'arrive plus par ici. Le
+   * masquage se vérifie sur `transformCarpoolOffer`/`transformCarpoolRequest` eux-mêmes, dans
+   * test/unit/utils/carpool-transform.test.ts, qui les reçoit toujours par le détail.
+   *
+   * Le masquage de l'email de l'auteur d'une DEMANDE, lui, reste vérifié dans le premier test de ce
+   * fichier.
+   */
 
   it("devrait traiter correctement l'ID numérique", async () => {
     const eventWithStringId = {
@@ -409,20 +250,7 @@ describe('/api/editions/[id]/carpool-requests GET', () => {
             updatedAt: true,
           },
         },
-        comments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-          orderBy: { createdAt: 'desc' },
-        },
+        _count: { select: { comments: true } },
       },
       orderBy: { tripDate: 'asc' },
     })

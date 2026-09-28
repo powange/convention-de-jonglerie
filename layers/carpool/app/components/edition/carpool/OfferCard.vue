@@ -129,11 +129,11 @@
           </div>
         </div>
 
-        <!-- Nombre de commentaires -->
-        <div v-if="offer.comments && offer.comments.length > 0" class="pt-2">
+        <!-- Nombre de commentaires. La liste ne transporte plus que ce compte. -->
+        <div v-if="nombreDeCommentaires > 0" class="pt-2">
           <div class="flex items-center gap-1 text-sm text-gray-500">
             <UIcon name="i-heroicons-chat-bubble-left" class="w-4 h-4" />
-            {{ $t('components.carpool.view_comments', { count: offer.comments.length }) }}
+            {{ $t('components.carpool.view_comments', { count: nombreDeCommentaires }) }}
           </div>
         </div>
       </div>
@@ -222,5 +222,14 @@ const handleDelete = () => {
 
 const acceptedBookings = computed(() =>
   (props.offer.bookings || []).filter((b) => b.status === 'ACCEPTED')
+)
+
+/**
+ * La liste d'une édition ne rend que `commentsCount` ; le détail d'une offre rend les commentaires.
+ * Le repli sur la longueur garde la carte juste dans les deux cas — et ne se contredit pas, parce
+ * que le serveur omet `comments` plutôt que de le rendre vide quand il ne les a pas chargés.
+ */
+const nombreDeCommentaires = computed(
+  () => props.offer.commentsCount ?? props.offer.comments?.length ?? 0
 )
 </script>
