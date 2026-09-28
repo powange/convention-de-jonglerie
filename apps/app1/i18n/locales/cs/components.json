@@ -236,6 +236,7 @@
     "upload": "Nahrát",
     "upload_error": "Chyba při nahrávání",
     "uploading": "Nahrávání probíhá...",
-    "take_photo": "Vyfotit"
+    "take_photo": "Vyfotit",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

@@ -1029,7 +1029,7 @@
       "entry_forecast": "Předběžné",
       "entry_forecast_hint": "Očekávaná částka, dosud neuhrazená",
       "entry_receipt": "Doklad",
-      "entry_receipt_placeholder": "Vyfotit účtenku nebo fakturu",
+      "entry_receipt_placeholder": "[TODO] Vyfotit účtenku nebo fakturu",
       "entry_reimbursed": "Již proplaceno",
       "mark_reimbursed": "Proplaceno",
       "reimbursed_done": "Zálohy označeny jako proplacené",
@@ -1058,7 +1058,12 @@
       "entry_advanced_by_free": "[TODO] Un autre nom",
       "entry_advanced_by_free_placeholder": "[TODO] Choisir ou saisir un nom",
       "entry_advanced_by_free_search": "[TODO] Rechercher ou saisir un nom…",
-      "entry_advanced_by_member": "[TODO] Un membre"
+      "entry_advanced_by_member": "[TODO] Un membre",
+      "export_csv": "[TODO] Export CSV",
+      "export_origin": "[TODO] Origine",
+      "export_origin_computed": "[TODO] Calculé",
+      "export_origin_manual": "[TODO] Saisi",
+      "open_receipt_new_tab": "[TODO] Ouvrir le justificatif dans un nouvel onglet"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

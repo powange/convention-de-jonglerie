@@ -236,6 +236,7 @@
     "upload": "Carica",
     "upload_error": "Errore di caricamento",
     "uploading": "Caricamento...",
-    "take_photo": "Scatta una foto"
+    "take_photo": "Scatta una foto",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

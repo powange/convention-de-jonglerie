@@ -231,6 +231,7 @@
     "formats_accepted": "Formats acceptés",
     "logo_url_optional_placeholder": "URL du logo (optionnel)",
     "max_size": "Taille maximale",
+    "open_pdf": "Ouvrir le PDF",
     "select_file": "Sélectionner un fichier",
     "success_message": "Image uploadée avec succès !",
     "take_photo": "Prendre une photo",

@@ -236,6 +236,7 @@
     "upload": "Uploaden",
     "upload_error": "Upload fout",
     "uploading": "Upload bezig...",
-    "take_photo": "Foto maken"
+    "take_photo": "Foto maken",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

@@ -236,6 +236,7 @@
     "upload": "Загрузить",
     "upload_error": "Ошибка загрузки",
     "uploading": "Загрузка...",
-    "take_photo": "Сделать фото"
+    "take_photo": "Сделать фото",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }

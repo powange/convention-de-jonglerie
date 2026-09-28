@@ -14,6 +14,19 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
 export const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'] as const
 
 /**
+ * Ce qu'un justificatif peut être : une photo, **ou un PDF**.
+ *
+ * Beaucoup de factures n'existent qu'en PDF, et l'organisateur n'avait d'autre choix que d'en faire
+ * une capture d'écran — en y perdant la lisibilité et la valeur de la pièce.
+ *
+ * Deux listes séparées et non une seule : le validateur croise le type MIME et l'extension, et
+ * c'est ce croisement qui sert d'anti-usurpation.
+ */
+export const ALLOWED_RECEIPT_MIME_TYPES = [...ALLOWED_IMAGE_MIME_TYPES, 'application/pdf'] as const
+
+export const ALLOWED_RECEIPT_EXTENSIONS = [...ALLOWED_IMAGE_EXTENSIONS, 'pdf'] as const
+
+/**
  * Taille maximale par défaut pour un upload d'image (10 MB).
  */
 export const DEFAULT_MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024

@@ -4,7 +4,20 @@
     <div class="flex flex-col space-y-3">
       <!-- Preview actuelle ou placeholder -->
       <div v-if="displayImageUrl" class="relative">
+        <!-- Un PDF ne se prévisualise pas en `img` : il s'annonce et s'ouvre. Le cas n'existe que
+             là où l'appelant autorise ce type — un justificatif de trésorerie, aujourd'hui. -->
+        <a
+          v-if="estUnPdf"
+          :href="displayImageUrl"
+          target="_blank"
+          rel="noopener"
+          class="flex items-center gap-3 rounded-lg border-2 border-gray-200 p-4 hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-500"
+        >
+          <UIcon name="i-heroicons-document-text" class="text-3xl text-gray-500" />
+          <span class="text-sm underline">{{ t('upload.open_pdf') }}</span>
+        </a>
         <img
+          v-else
           :src="displayImageUrl"
           :alt="alt"
           class="w-full max-h-64 object-contain rounded-lg border-2 border-gray-200 dark:border-gray-700"
@@ -218,6 +231,17 @@ const error = ref<string | null>(null)
 const serverFiles = ref<any[]>([])
 
 // Validation par défaut
+/**
+ * Le fichier courant est-il un PDF ?
+ *
+ * Décidé sur l'extension de l'URL, la seule information dont le composant dispose : le type MIME
+ * n'est connu qu'au moment du dépôt, et la valeur peut venir de la base. C'est suffisant parce que
+ * le serveur a déjà croisé type et extension à l'entrée.
+ */
+const estUnPdf = computed(
+  () => !!displayImageUrl.value?.toLowerCase().split('?')[0]?.endsWith('.pdf')
+)
+
 const validation = {
   maxSize: props.options?.validation?.maxSize || 5 * 1024 * 1024,
   allowedTypes: props.options?.validation?.allowedTypes || [

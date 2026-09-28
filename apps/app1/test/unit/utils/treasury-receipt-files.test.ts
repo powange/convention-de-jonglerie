@@ -129,4 +129,44 @@ describe('deplacerJustificatif', () => {
     expect(await deplacerJustificatif(null, EDITION)).toBeNull()
     expect(renameMock).not.toHaveBeenCalled()
   })
+
+  /*
+   * « Inchangée » ne veut pas dire « sans regarder ».
+   *
+   * Toute URL sans `/temp/` était rendue telle quelle : un client pouvait donc enregistrer le
+   * justificatif d'une AUTRE édition, ou une adresse externe, que la page de gestion affichait
+   * ensuite dans un `<img>` — c'est-à-dire une requête sortante déclenchée par l'ouverture d'un
+   * écran de trésorerie.
+   */
+  it('refuse le justificatif d’une autre édition', async () => {
+    await expect(
+      deplacerJustificatif('/uploads/conventions/9/editions/99/treasury/ticket.jpg', EDITION)
+    ).rejects.toThrow('Justificatif invalide')
+  })
+
+  it('refuse une adresse externe', async () => {
+    await expect(deplacerJustificatif('https://exemple.test/pixel.gif', EDITION)).rejects.toThrow(
+      'Justificatif invalide'
+    )
+  })
+
+  it('refuse un chemin qui remonte hors du dossier de trésorerie', async () => {
+    // Le nom de fichier ne peut porter aucune barre oblique, sans quoi celui-ci retomberait dans le
+    // motif tout en désignant autre chose.
+    await expect(deplacerJustificatif(`${DOSSIER}/../../../secret.jpg`, EDITION)).rejects.toThrow(
+      'Justificatif invalide'
+    )
+  })
+
+  it('refuse un autre dossier de la même édition', async () => {
+    await expect(
+      deplacerJustificatif('/uploads/conventions/7/editions/21/posters/affiche.jpg', EDITION)
+    ).rejects.toThrow('Justificatif invalide')
+  })
+
+  it('accepte un justificatif PDF du bon dossier', async () => {
+    // Beaucoup de factures n'existent qu'en PDF : le motif ne doit pas se limiter aux images.
+    const pdf = `${DOSSIER}/facture-a1b2c3d4.pdf`
+    expect(await deplacerJustificatif(pdf, EDITION)).toBe(pdf)
+  })
 })

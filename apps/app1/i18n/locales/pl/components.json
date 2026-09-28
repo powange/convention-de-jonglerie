@@ -236,6 +236,7 @@
     "upload": "Prześlij",
     "upload_error": "Błąd przesyłania",
     "uploading": "Przesyłanie...",
-    "take_photo": "Zrób zdjęcie"
+    "take_photo": "Zrób zdjęcie",
+    "open_pdf": "[TODO] Ouvrir le PDF"
   }
 }
