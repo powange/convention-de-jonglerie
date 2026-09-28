@@ -89,7 +89,8 @@ export default wrapApiHandler(
           // travail saisi ici et que HelloAsso ne pourra jamais restituer.
           const { aSupprimer: tiersToDelete, refus } = decisionSuppression(
             existingTiers,
-            fetchedTierIds
+            fetchedTierIds,
+            { cle: (t) => t.helloAssoTierId, rienDeRecu: 'aucun tarif' }
           )
           if (refus) {
             console.warn(`⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${refus}`)
@@ -241,10 +242,22 @@ export default wrapApiHandler(
 
           const fetchedOptionIds = new Set((result.options || []).map((o) => String(o.id)))
 
-          // Supprimer les options qui n'existent plus dans HelloAsso
-          const optionsToDelete = existingOptions.filter(
-            (o) => o.helloAssoOptionId !== null && !fetchedOptionIds.has(o.helloAssoOptionId)
+          /*
+           * Supprimer les options que HelloAsso ne renvoie plus — sous la MÊME garde que les tarifs.
+           *
+           * Elle manquait ici, et la cascade d'une option va plus loin que celle d'un tarif : elle
+           * emporte les `TicketingOrderItemOption`, c'est-à-dire le relevé de ce que chaque
+           * participant a acheté. Une réponse HelloAsso incomplète faisait donc perdre la trace de
+           * ventes déjà encaissées — le montant restait, son détail disparaissait.
+           */
+          const { aSupprimer: optionsToDelete, refus: refusOptions } = decisionSuppression(
+            existingOptions,
+            fetchedOptionIds,
+            { cle: (o) => o.helloAssoOptionId, rienDeRecu: 'aucune option' }
           )
+          if (refusOptions) {
+            console.warn(`⚠️ Synchronisation HelloAsso (édition ${editionId}) : ${refusOptions}`)
+          }
           if (optionsToDelete.length > 0) {
             console.log(
               `🗑️ Suppression de ${optionsToDelete.length} option(s) obsolète(s):`,

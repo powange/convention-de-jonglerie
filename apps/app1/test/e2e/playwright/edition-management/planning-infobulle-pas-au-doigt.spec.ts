@@ -84,6 +84,21 @@ test.describe.serial('Planning — l’infobulle d’un créneau', () => {
     await page.goto(`${BASE}/editions/${editionId}/gestion/volunteers/planning`, {
       waitUntil: 'domcontentloaded',
     })
+    /*
+     * Amener la vue sur la semaine de « maintenant » avant de chercher le créneau.
+     *
+     * Le planning ouvre en vue SEMAINE, sur la semaine du début de l'édition
+     * (`useVolunteerSchedule.ts`). Cette spec cale l'édition sur `now − 24 h` : un LUNDI, ce début
+     * tombe le dimanche, donc dans la semaine précédente — et le créneau, placé autour de
+     * maintenant, n'est pas rendu du tout. La spec échouait ainsi chaque lundi.
+     *
+     * Le bouton est désactivé quand la vue contient déjà aujourd'hui : on ne clique que s'il est
+     * actionnable, sans quoi Playwright attendrait indéfiniment.
+     */
+    const aujourdhui = page.getByRole('button', { name: "Aujourd'hui" }).first()
+    await expect(aujourdhui).toBeVisible({ timeout: 40000 })
+    if (await aujourdhui.isEnabled()) await aujourdhui.click()
+
     const creneau = page.locator('.fc-event').filter({ hasText: TITRE_CRENEAU }).first()
     await expect(creneau).toBeVisible({ timeout: 40000 })
     return { page, context, creneau }

@@ -123,9 +123,30 @@ test.describe.serial('Planning — la barre de l’instant présent', () => {
       { ligne: LIGNE, fleche: FLECHE }
     )
 
+  /**
+   * Amener le calendrier sur la semaine de « maintenant ».
+   *
+   * Le planning ouvre en vue SEMAINE, sur la semaine du début de l'édition
+   * (`useVolunteerSchedule.ts` : `initialView: 'resourceTimelineWeek'`, `initialDate: startDate`).
+   * Ces specs calent l'édition sur `now − 24 h` : un LUNDI, ce début tombe le dimanche, donc dans la
+   * semaine précédente — et « maintenant » se retrouve hors de la vue. Ni la barre de l'instant
+   * présent ni le créneau ne sont alors rendus, et les deux specs échouaient chaque lundi.
+   *
+   * Cliquer « Aujourd'hui » rend la mesure indépendante de la semaine d'ouverture, et c'est aussi le
+   * geste qu'un organisateur ferait. Le bouton est DÉSACTIVÉ quand la vue contient déjà aujourd'hui :
+   * on ne clique donc que s'il est actionnable, sans quoi Playwright attendrait indéfiniment.
+   */
+  const allerAAujourdhui = async (page: import('@playwright/test').Page) => {
+    const bouton = page.getByRole('button', { name: "Aujourd'hui" }).first()
+    await expect(bouton).toBeVisible({ timeout: 20000 })
+    if (await bouton.isEnabled()) await bouton.click()
+  }
+
   test('elle s’affiche sur le planning de la gestion', async ({ page, goto }) => {
     await goto(`/editions/${editionId}/gestion/volunteers/planning`, { waitUntil: 'hydration' })
     await expect(page.locator('.fc').first()).toBeVisible({ timeout: 40000 })
+
+    await allerAAujourdhui(page)
 
     await expect.poll(async () => Boolean(await mesurer(page)), { timeout: 20000 }).toBe(true)
     const barre = (await mesurer(page))!
@@ -138,6 +159,8 @@ test.describe.serial('Planning — la barre de l’instant présent', () => {
   test('elle s’affiche aussi sur la page publique du bénévole', async ({ page, goto }) => {
     await goto(`/editions/${editionId}/volunteers`, { waitUntil: 'hydration' })
     await expect(page.locator('.fc').first()).toBeVisible({ timeout: 40000 })
+
+    await allerAAujourdhui(page)
 
     await expect.poll(async () => Boolean(await mesurer(page)), { timeout: 20000 }).toBe(true)
     const barre = (await mesurer(page))!
