@@ -41,3 +41,14 @@ node pdf.mjs          # produit ../controle-acces-benevole.pdf depuis tutoriel.h
 Le scan est réel : Chromium reçoit une fausse caméra qui filme un QR code généré par `mkvid.py`
 (Python, modules `qrcode` et `Pillow`). Les captures mutent les données (validations,
 remboursement, vente) : relancer le seed ensuite pour retrouver l'état de départ.
+
+## Recapturer après une modification de l'interface
+
+Les captures figent l'écran tel qu'il était à l'instant du passage. Le 28/09, cinq défauts du
+contrôle d'accès ont été relevés **en rédigeant ce tutoriel** puis corrigés : les écrans concernés
+ont été recapturés, mais deux fiches prises avant le correctif ont survécu au tri et montraient un
+« Tout désélectionner » que le correctif venait de supprimer.
+
+D'où la règle : quand un correctif touche un écran du contrôle d'accès, refaire **toutes** les
+captures (`./run.sh` sans argument). Un passage partiel repart d'un seed neuf, et les compteurs
+d'entrées des images refaites ne concordent plus avec ceux des images voisines.
