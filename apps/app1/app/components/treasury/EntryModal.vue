@@ -37,6 +37,13 @@
             />
           </UFormField>
 
+          <!-- La date de l'OPÉRATION : le jour où l'argent a bougé, pas celui où on le note.
+               Pré-remplie à aujourd'hui pour que le cas courant ne coûte rien, et modifiable pour
+               saisir a posteriori les tickets d'un week-end. -->
+          <UFormField :label="$t('gestion.treasury.entry_operation_date')" class="sm:w-48">
+            <UiDateField v-model="form.operationDate" size="md" clearable class="w-full" />
+          </UFormField>
+
           <UFormField :label="$t('gestion.treasury.entry_code')" class="flex-1">
             <USelectMenu
               v-model="form.codeId"
@@ -173,6 +180,25 @@ interface CandidatAvance {
   emailHash?: string | null
 }
 
+/**
+ * La date d'opération à afficher dans le champ, au format `AAAA-MM-JJ`.
+ *
+ * Trois cas, et le troisième est celui qui compte :
+ *
+ * - **nouvelle entrée** : aujourd'hui. C'est le cas courant, et le champ reste modifiable pour
+ *   saisir a posteriori les tickets d'un week-end ;
+ * - **entrée qui a une date** : la sienne ;
+ * - **entrée antérieure au champ** : **vide**. Lui proposer aujourd'hui lui inventerait une date
+ *   d'opération au premier enregistrement — précisément ce qu'on a décidé de ne pas faire.
+ *
+ * Le découpage se fait sur l'ISO en UTC, jamais sur l'heure locale : la colonne est une DATE, et
+ * la relire dans le fuseau du navigateur la ferait glisser d'un jour à l'ouest de Greenwich.
+ */
+const dateDeLEntree = (entree?: { operationDate?: string | null } | null): string => {
+  if (!entree) return new Date().toISOString().slice(0, 10)
+  return entree.operationDate ? new Date(entree.operationDate).toISOString().slice(0, 10) : ''
+}
+
 const props = defineProps<{
   open: boolean
   /** Ligne existante à modifier, ou `null` pour une création. */
@@ -194,6 +220,7 @@ const props = defineProps<{
     code?: { id: number } | null
     imageUrl?: string | null
     isForecast?: boolean
+    operationDate?: string | null
     reimbursed?: boolean
     advancedBy?: CandidatAvance | null
     advancedByName?: string | null
@@ -225,6 +252,8 @@ const form = reactive<{
   codeId: number | null
   imageUrl: string | null
   isForecast: boolean
+  /** Date de l'opération au format `AAAA-MM-JJ`. Vide = non renseignée. */
+  operationDate: string
   reimbursed: boolean
 }>({
   kind: 'EXPENSE',
@@ -234,6 +263,7 @@ const form = reactive<{
   codeId: null,
   imageUrl: null,
   isForecast: false,
+  operationDate: '',
   reimbursed: false,
 })
 
@@ -419,6 +449,7 @@ watch(
     form.codeId = entry?.code?.id ?? null
     form.imageUrl = entry?.imageUrl ?? null
     form.isForecast = entry?.isForecast ?? false
+    form.operationDate = dateDeLEntree(entry)
     form.reimbursed = entry?.reimbursed ?? false
     personneAvance.value = entry?.advancedBy
       ? {
@@ -449,6 +480,7 @@ const body = () => ({
   codeId: form.codeId,
   imageUrl: form.imageUrl,
   isForecast: form.isForecast,
+  operationDate: form.operationDate || null,
   // Le serveur remet ces champs à zéro sur une recette : inutile de filtrer ici aussi.
   // Le mode décide lequel part : l'autre est déjà nul, mais le dire ici rend la règle lisible.
   advancedById: modeAvance.value === 'compte' ? (personneAvance.value?.id ?? null) : null,

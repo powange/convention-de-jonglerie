@@ -31,6 +31,9 @@ type Traducteur = (cle: string, params?: Record<string, unknown>) => string
  */
 export interface LigneTresorerieCsv extends LigneTresorerie {
   description?: string | null
+  /** Le jour où l'argent a bougé, au format ISO. Absent sur les lignes calculées et sur les
+   *  entrées antérieures à ce champ. */
+  operationDate?: string | null
   isForecast?: boolean
   reimbursed?: boolean
   imageUrl?: string | null
@@ -50,6 +53,7 @@ export const COLONNES_TRESORERIE = [
   { id: 'code', cle: 'gestion.treasury.entry_code' },
   { id: 'libelleCode', cle: 'gestion.treasury.export_code_label' },
   { id: 'intitule', cle: 'gestion.treasury.entry_title' },
+  { id: 'dateOperation', cle: 'gestion.treasury.entry_operation_date' },
   { id: 'description', cle: 'common.description' },
   { id: 'engage', cle: 'gestion.treasury.export_engaged' },
   { id: 'regle', cle: 'gestion.treasury.export_settled' },
@@ -62,6 +66,17 @@ export const COLONNES_TRESORERIE = [
 
 export function entetesDeLaTresorerie(t: Traducteur): string[] {
   return COLONNES_TRESORERIE.map((colonne) => t(colonne.cle))
+}
+
+/**
+ * La date d'opération, en `AAAA-MM-JJ`.
+ *
+ * Découpée sur l'ISO en UTC et non formatée pour l'œil : un tableur trie correctement une date
+ * ISO, et la rendre dans le fuseau du lecteur la ferait glisser d'un jour à l'ouest de Greenwich.
+ * Vide quand la ligne n'en a pas — une ligne calculée, ou une entrée antérieure au champ.
+ */
+function dateDOperationIso(valeur?: string | null): string {
+  return valeur ? new Date(valeur).toISOString().slice(0, 10) : ''
 }
 
 /**
@@ -109,6 +124,7 @@ export function preparerLignesTresorerie(
           groupe.code,
           groupe.libelle,
           titreDeLaLigne(ligne),
+          dateDOperationIso(ligne.operationDate),
           ligne.description ?? '',
           // `fromCents` rend `null` pour une valeur non finie : le repli à zéro évite un
           // « Cannot read properties of null » au milieu d'un export.

@@ -73,13 +73,17 @@ export default wrapApiHandler(
       }),
       prisma.treasuryEntry.findMany({
         where: { editionId },
-        orderBy: { createdAt: 'asc' },
+        // La date d'opération commande, la date de saisie départage. Les entrées antérieures au
+        // champ n'en ont pas : MySQL les range en tête sur un tri croissant, c'est-à-dire là où on
+        // les attend — ce sont les plus anciennes — et elles y gardent leur ordre de saisie.
+        orderBy: [{ operationDate: 'asc' }, { createdAt: 'asc' }],
         select: {
           id: true,
           kind: true,
           title: true,
           description: true,
           amount: true,
+          operationDate: true,
           imageUrl: true,
           isForecast: true,
           reimbursed: true,

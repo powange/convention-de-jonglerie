@@ -76,6 +76,20 @@ model TreasuryEntry {
   advancedByName String?           @db.VarChar(150)
   /// L'avance a-t-elle été remboursée à la personne ? Sans objet sans `advancedById`.
   reimbursed     Boolean           @default(false)
+  /// Le jour où l'argent a bougé — celui du ticket de caisse, de la facture, du virement.
+  ///
+  /// À ne pas confondre avec `createdAt` juste en dessous, qui dit seulement quand la ligne a été
+  /// tapée dans l'outil. Les deux étaient confondues, et la seconde faisait office de première :
+  /// saisir le lundi les tickets du week-end datait tout du lundi.
+  ///
+  /// `@db.Date` et non un instant : une date d'opération est une date CIVILE. Le 12 juin reste le
+  /// 12 juin qu'on le lise depuis Paris ou depuis Montréal, alors qu'un instant se RELIT dans le
+  /// fuseau du lecteur et peut alors changer de jour. Le risque est donc à l'affichage, d'où le
+  /// formatage en UTC côté écran. Même choix que `EditionMeal.date`, lu comme lui en UTC.
+  ///
+  /// `null` sur les entrées antérieures à ce champ : on ne leur invente pas de date, et un tri
+  /// croissant les regroupe en tête.
+  operationDate  DateTime?         @db.Date
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 
