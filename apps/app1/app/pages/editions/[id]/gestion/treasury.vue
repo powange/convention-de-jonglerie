@@ -131,19 +131,25 @@
                   {{ $t('gestion.treasury.advanced_by_name', { name: nomDeLAvance(line) }) }}
                 </UBadge>
               </div>
-              <p
-                v-if="line.operationDate || line.description"
-                class="truncate text-xs text-gray-500 dark:text-gray-400"
-              >
-                <!-- La date de l'OPÉRATION, pas celle de la saisie. Les entrées antérieures au
-                     champ n'en ont pas : on n'en invente aucune, et elles se lisent simplement
-                     sans date. -->
-                <span v-if="line.operationDate" class="tabular-nums">{{
-                  dateDOperation(line.operationDate)
-                }}</span>
-                <span v-if="line.operationDate && line.description"> · </span>
-                <span v-if="line.description">{{ line.description }}</span>
+              <p v-if="line.description" class="truncate text-xs text-gray-500 dark:text-gray-400">
+                {{ line.description }}
               </p>
+            </div>
+
+            <!--
+              La date de l'OPÉRATION, en colonne. Glissée devant la description, elle se perdait
+              dans une ligne de texte ; c'est une donnée qu'on parcourt verticalement, comme les
+              montants.
+
+              Rien plutôt qu'un tiret quand elle manque : une ligne calculée — billetterie,
+              artistes — n'en a pas par nature, et les entrées antérieures au champ n'en ont pas
+              reçu. Un tiret dirait « manquante » là où elle est simplement sans objet.
+            -->
+            <div
+              class="shrink-0 text-sm tabular-nums text-gray-500 dark:text-gray-400 lg:w-28"
+              data-testid="treasury-operation-date"
+            >
+              {{ line.operationDate ? dateDOperation(line.operationDate) : '' }}
             </div>
 
             <!-- Code d'imputation : modifiable même sur une ligne calculée, c'est la seule chose

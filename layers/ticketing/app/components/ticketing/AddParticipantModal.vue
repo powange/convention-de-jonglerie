@@ -151,28 +151,30 @@
               class="p-4 border rounded-lg dark:border-gray-700"
             >
               <!--
-                En colonne sur mobile, en ligne dès `sm`. Les deux blocs se disputaient la largeur
-                d'un téléphone : le nom du tarif se coupait en deux ou trois lignes pour laisser
-                passer le sélecteur de quantité, qui fait 14 rem à lui seul. Empilés, ils se lisent
-                dans l'ordre où on les traite — le tarif, ce qu'il donne, son prix, puis combien.
+                Trois lignes, à TOUTES les largeurs : le nom, ce que le tarif donne, puis le prix
+                et la quantité côte à côte.
+
+                Côte à côte, le sélecteur de quantité — 14 rem à lui seul — écrasait le nom du
+                tarif, qui se coupait en deux ou trois lignes. Empilés, ils se lisent dans l'ordre
+                où on les traite, et la dernière ligne réunit les deux chiffres qu'on compare :
+                combien ça coûte, combien on en prend.
               -->
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                <div class="flex-1 min-w-0">
-                  <h4 class="font-medium text-gray-900 dark:text-white">{{ tier.name }}</h4>
-                  <p v-if="tier.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {{ tier.description }}
-                  </p>
+              <div class="flex flex-col gap-3">
+                <h4 class="font-medium text-gray-900 dark:text-white">{{ tier.name }}</h4>
+
+                <p v-if="tier.description" class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ tier.description }}
+                </p>
+
+                <div class="flex items-center justify-between gap-4">
                   <!-- Prix fixe ou fourchette de prix libre -->
                   <p
                     v-if="isFixedPrice(tier)"
-                    class="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-2"
+                    class="text-sm font-semibold text-primary-600 dark:text-primary-400"
                   >
                     {{ formatPrice(tier.price) }}
                   </p>
-                  <p
-                    v-else
-                    class="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-2"
-                  >
+                  <p v-else class="text-sm font-semibold text-primary-600 dark:text-primary-400">
                     Prix libre
                     <span v-if="tier.minAmount != null" class="text-xs text-gray-500">
                       (min: {{ formatPrice(tier.minAmount) }})
@@ -181,43 +183,44 @@
                       (max: {{ formatPrice(tier.maxAmount) }})
                     </span>
                   </p>
-                </div>
-                <div class="flex flex-col items-start sm:items-center gap-2">
-                  <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {{ $t('common.quantity') }}
-                  </span>
-                  <div class="flex items-center gap-2">
-                    <UButton
-                      icon="i-heroicons-minus"
-                      size="lg"
-                      color="neutral"
-                      variant="outline"
-                      :disabled="!tierQuantities[tier.id] || tierQuantities[tier.id] === 0"
-                      @click="decrementQuantity(tier.id)"
-                    />
-                    <div
-                      class="w-14 h-11 flex items-center justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
-                    >
-                      <span class="text-xl font-semibold text-gray-900 dark:text-white">
-                        {{ tierQuantities[tier.id] || 0 }}
-                      </span>
+
+                  <div class="flex flex-col items-end gap-2">
+                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                      {{ $t('common.quantity') }}
+                    </span>
+                    <div class="flex items-center gap-2">
+                      <UButton
+                        icon="i-heroicons-minus"
+                        size="lg"
+                        color="neutral"
+                        variant="outline"
+                        :disabled="!tierQuantities[tier.id] || tierQuantities[tier.id] === 0"
+                        @click="decrementQuantity(tier.id)"
+                      />
+                      <div
+                        class="w-14 h-11 flex items-center justify-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+                      >
+                        <span class="text-xl font-semibold text-gray-900 dark:text-white">
+                          {{ tierQuantities[tier.id] || 0 }}
+                        </span>
+                      </div>
+                      <UButton
+                        icon="i-heroicons-plus"
+                        size="lg"
+                        color="primary"
+                        variant="outline"
+                        @click="incrementQuantity(tier.id)"
+                      />
                     </div>
-                    <UButton
-                      icon="i-heroicons-plus"
-                      size="lg"
-                      color="primary"
-                      variant="outline"
-                      @click="incrementQuantity(tier.id)"
-                    />
+                    <span
+                      v-if="
+                        tierQuantities[tier.id] && tierQuantities[tier.id] > 0 && isFixedPrice(tier)
+                      "
+                      class="text-xs font-semibold text-primary-600 dark:text-primary-400"
+                    >
+                      Total: {{ formatPrice(tier.price * tierQuantities[tier.id]) }}
+                    </span>
                   </div>
-                  <span
-                    v-if="
-                      tierQuantities[tier.id] && tierQuantities[tier.id] > 0 && isFixedPrice(tier)
-                    "
-                    class="text-xs font-semibold text-primary-600 dark:text-primary-400"
-                  >
-                    Total: {{ formatPrice(tier.price * tierQuantities[tier.id]) }}
-                  </span>
                 </div>
               </div>
             </div>

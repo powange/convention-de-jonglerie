@@ -24,8 +24,14 @@
           <UTextarea v-model="form.description" class="w-full" :rows="2" maxlength="2000" />
         </UFormField>
 
-        <div class="flex flex-col gap-4 sm:flex-row">
-          <UFormField :label="$t('common.amount')" required class="sm:w-48">
+        <!--
+          Trois lignes distinctes, à toutes les largeurs. Côte à côte, le montant et la date se
+          serraient sur 12 rem chacun tandis que le code d'imputation prenait le reste : une
+          fenêtre de saisie ne gagne rien à être dense, et ces trois champs se remplissent l'un
+          après l'autre.
+        -->
+        <div class="flex flex-col gap-4">
+          <UFormField :label="$t('common.amount')" required>
             <!-- Saisie en unité courante ; le serveur convertit en centimes. `step-snapping`
                  désactivé, sinon un montant hors du pas serait ramené au multiple le plus proche. -->
             <UInputNumber
@@ -40,11 +46,11 @@
           <!-- La date de l'OPÉRATION : le jour où l'argent a bougé, pas celui où on le note.
                Pré-remplie à aujourd'hui pour que le cas courant ne coûte rien, et modifiable pour
                saisir a posteriori les tickets d'un week-end. -->
-          <UFormField :label="$t('gestion.treasury.entry_operation_date')" class="sm:w-48">
+          <UFormField :label="$t('gestion.treasury.entry_operation_date')">
             <UiDateField v-model="form.operationDate" size="md" clearable class="w-full" />
           </UFormField>
 
-          <UFormField :label="$t('gestion.treasury.entry_code')" class="flex-1">
+          <UFormField :label="$t('gestion.treasury.entry_code')">
             <USelectMenu
               v-model="form.codeId"
               value-key="value"
