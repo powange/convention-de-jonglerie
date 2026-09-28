@@ -68,6 +68,8 @@ describe('POST /api/editions/[id]/ticketing/helloasso/tiers — prudence des sup
       upsert: vi.fn(),
     },
     ticketingTierOption: { findMany: vi.fn(), deleteMany: vi.fn(), create: vi.fn() },
+    /** Interrogé pour savoir si un tarif obsolète porte des billets déjà vendus. */
+    ticketingOrderItem: { findMany: vi.fn() },
   }
 
   beforeEach(() => {
@@ -97,6 +99,8 @@ describe('POST /api/editions/[id]/ticketing/helloasso/tiers — prudence des sup
     tx.ticketingTierCustomField.findMany.mockResolvedValue([])
     tx.ticketingTierCustomFieldAssociation.findMany.mockResolvedValue([])
     tx.ticketingTierOption.findMany.mockResolvedValue([])
+    // Par défaut, aucun billet vendu : les tarifs obsolètes sont supprimables.
+    tx.ticketingOrderItem.findMany.mockResolvedValue([])
     tx.ticketingTier.upsert.mockResolvedValue({ id: 11 })
     tx.ticketingOption.upsert.mockResolvedValue({ id: 21 })
   })
@@ -127,6 +131,42 @@ describe('POST /api/editions/[id]/ticketing/helloasso/tiers — prudence des sup
     await handler(evenement)
 
     expect(tx.ticketingOption.deleteMany).toHaveBeenCalledWith({ where: { id: { in: [21] } } })
+  })
+
+  it('conserve un tarif retiré chez HelloAsso mais qui porte des billets vendus', async () => {
+    /*
+     * Constat D4. `TicketingOrderItem.tierId` est en `ON DELETE SET NULL` : supprimer le tarif ne
+     * supprimerait pas ses billets, il les DÉTACHERAIT — et un billet détaché perd ses quotas, ses
+     * repas, ses articles à remettre et son `countAsParticipant`. Douze billets de la base portent
+     * déjà cette trace.
+     *
+     * La divergence avec HelloAsso est le prix assumé : un tarif en trop se voit, un billet vidé de
+     * son sens ne se remarque pas.
+     */
+    mockRecuperer.mockResolvedValue({
+      tiers: [{ id: 999, name: 'Nouveau tarif', customFields: [] }],
+      options: [{ id: 900, name: 'Tee-shirt' }],
+    })
+    // Le tarif 11 n'est plus renvoyé par HelloAsso, mais un billet l'utilise.
+    tx.ticketingOrderItem.findMany.mockResolvedValue([{ tierId: 11 }])
+
+    await handler(evenement)
+
+    expect(tx.ticketingTier.deleteMany).not.toHaveBeenCalled()
+  })
+
+  it('supprime bien un tarif obsolète que personne n’a acheté', async () => {
+    // La contrepartie : sans elle, la garde pourrait tout bloquer et le test précédent passerait
+    // encore. Le nettoyage doit continuer de fonctionner.
+    mockRecuperer.mockResolvedValue({
+      tiers: [{ id: 999, name: 'Nouveau tarif', customFields: [] }],
+      options: [{ id: 900, name: 'Tee-shirt' }],
+    })
+    tx.ticketingOrderItem.findMany.mockResolvedValue([])
+
+    await handler(evenement)
+
+    expect(tx.ticketingTier.deleteMany).toHaveBeenCalledWith({ where: { id: { in: [11] } } })
   })
 
   it('ne supprime aucun tarif quand HelloAsso n’en renvoie aucun', async () => {

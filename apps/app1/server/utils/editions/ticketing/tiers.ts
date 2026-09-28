@@ -316,6 +316,36 @@ export async function deleteTier(tierId: number, editionId: number) {
     })
   }
 
+  /*
+   * Un tarif qui porte des billets vendus ne se supprime pas.
+   *
+   * La clé étrangère `TicketingOrderItem.tierId` est en `ON DELETE SET NULL` — la SEULE des six qui
+   * pointent vers `TicketingTier`, les cinq autres étant en `CASCADE`. Supprimer le tarif ne
+   * supprimait donc pas les billets : il les DÉTACHAIT, en silence. Or c'est le tarif qui porte ce
+   * qui fait le sens d'un billet — ses quotas, ses articles à remettre, ses repas, ses champs
+   * personnalisés et son `countAsParticipant`. Le billet subsistait, vidé.
+   *
+   * Douze billets de la base portent cette trace : de la marchandise, sur une édition, dont les
+   * tarifs ont vraisemblablement été supprimés une fois la vente close. Ils ne sont pas réparés ici
+   * — on ne sait plus à quel tarif les rattacher.
+   *
+   * Refusé côté application plutôt qu'en passant la clé en `RESTRICT` : la même suppression est
+   * faite par la synchronisation HelloAsso, à l'intérieur d'une transaction. Une erreur de la base
+   * y ferait échouer la synchronisation ENTIÈRE tant que personne n'intervient — un remède plus
+   * coûteux que le mal.
+   */
+  const billetsVendus = await prisma.ticketingOrderItem.count({
+    where: { tierId },
+  })
+  if (billetsVendus > 0) {
+    throw createError({
+      status: 400,
+      message:
+        `Ce tarif ne peut pas être supprimé : ${billetsVendus} billet(s) l'utilisent. ` +
+        'Le supprimer les priverait de leurs quotas, repas et articles à remettre.',
+    })
+  }
+
   await prisma.ticketingTier.delete({
     where: { id: tierId },
   })
