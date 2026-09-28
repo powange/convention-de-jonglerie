@@ -445,14 +445,28 @@ export async function syncOrganizersGroupParticipants(
 }
 
 /**
- * Crée ou récupère une conversation pour une candidature artiste
+ * Crée ou récupère une conversation pour une candidature artiste.
  *
- * Participants initiaux :
- * - L'artiste (userId de la ShowApplication)
- * - L'utilisateur qui envoie le premier message (senderId)
+ * Participants : l'artiste, l'expéditeur, ET tous les organisateurs habilités sur les artistes de
+ * l'édition — la même liste que pour le groupe d'un spectacle.
  *
- * Les autres organisateurs/admins peuvent voir la conversation mais ne sont
- * ajoutés comme participants que quand ils envoient un message.
+ * Auparavant, seuls l'artiste et l'expéditeur étaient inscrits, les autres organisateurs ne
+ * l'étant qu'en écrivant eux-mêmes. Quand l'artiste écrivait le PREMIER, depuis « Mes
+ * candidatures », il se retrouvait donc **seul participant de sa propre conversation**. Comme
+ * l'envoi d'un message ne notifie que les participants, personne n'était prévenu, la conversation
+ * n'apparaissait dans la messagerie d'aucun organisateur, et le message dormait jusqu'à ce qu'un
+ * organisateur ouvre cette fiche par hasard. C'est exactement ce qu'un artiste n'a aucun moyen de
+ * savoir.
+ *
+ * Sur une conversation qui existe déjà, les organisateurs manquants sont ajoutés, et ceux qui
+ * étaient marqués comme partis sont réactivés : `leftAt` n'est jamais posé par un geste de
+ * l'utilisateur dans ce module, seulement par la perte d'une habilitation.
+ *
+ * Ce qui n'est PAS fait ici, contrairement au groupe d'un spectacle : marquer comme partis les
+ * participants qui ne sont plus habilités. Là-bas la liste contient tout le monde, artistes
+ * compris, donc « qui n'est pas dans la liste s'en va » a un sens. Ici l'artiste — et un admin
+ * qui aurait répondu en mode admin — sont des participants légitimes absents de la liste des
+ * organisateurs : la même règle les expulserait.
  *
  * @param applicationId - ID de la candidature
  * @param senderId - ID de l'utilisateur qui crée/envoie le premier message
@@ -491,20 +505,27 @@ export async function ensureShowApplicationConversation(
   const editionId = application.showCall.edition.id
   const artistUserId = application.userId
 
-  // 2. Vérifier si une conversation existe déjà pour cette candidature
+  // 2. Les organisateurs à qui cette conversation doit parvenir
+  const organisateurs = await organisateursHabilitesSurLesArtistes(editionId, client)
+
+  // 3. Vérifier si une conversation existe déjà pour cette candidature
   const existingConversation = await client.conversation.findUnique({
     where: { showApplicationId: applicationId },
     include: { participants: true },
   })
 
   if (existingConversation) {
-    // Ajouter le sender comme participant s'il ne l'est pas déjà
-    await addShowApplicationParticipantIfNeeded(existingConversation, senderId, client)
+    // L'expéditeur et les organisateurs manquants. Dédoublonné : l'expéditeur EST souvent l'un
+    // des organisateurs, et deux créations pour le même couple heurteraient l'unicité
+    // (conversationId, userId).
+    for (const userId of new Set([senderId, ...organisateurs])) {
+      await addShowApplicationParticipantIfNeeded(existingConversation, userId, client)
+    }
     return existingConversation.id
   }
 
-  // 3. Créer la conversation avec l'artiste et l'expéditeur
-  const participantIds = [...new Set([artistUserId, senderId])]
+  // 4. Créer la conversation avec l'artiste, l'expéditeur et les organisateurs
+  const participantIds = [...new Set([artistUserId, senderId, ...organisateurs])]
 
   const conversation = await client.conversation.create({
     data: {
@@ -554,32 +575,19 @@ export async function addShowApplicationParticipantIfNeeded(
 }
 
 /**
- * Les utilisateurs qui composent le groupe d'un spectacle : sa distribution, et les
- * organisateurs habilités sur les artistes.
+ * Les organisateurs habilités sur les artistes d'une édition : ceux que `canManageArtistsById`
+ * accepterait — même règle, mais énumérée plutôt qu'interrogée un par un.
  *
- * La distribution passe par `ShowArtist.showId`, renseigné y compris pour un cabaret dont les
- * artistes sont rattachés à un numéro : « les artistes du spectacle » a donc un sens dans les
- * deux cas. Les organisateurs sont ceux que `canManageArtistsById` accepterait — même règle,
- * mais énumérée plutôt qu'interrogée un par un.
+ * Une seule énumération pour les deux conversations qui en ont besoin, le groupe d'un spectacle
+ * et la candidature d'un artiste : ce sont les mêmes destinataires, et deux listes auraient fini
+ * par divulguer.
  */
-async function participantsDuGroupeSpectacle(
-  showId: number,
+async function organisateursHabilitesSurLesArtistes(
+  editionId: number,
   client: PrismaTransaction | typeof prisma
-): Promise<{ editionId: number; userIds: number[] }> {
-  const show = await client.show.findUnique({
-    where: { id: showId },
-    select: {
-      editionId: true,
-      artists: { select: { artist: { select: { userId: true } } } },
-    },
-  })
-
-  if (!show) {
-    throw new Error('Spectacle introuvable')
-  }
-
+): Promise<number[]> {
   const edition = await client.edition.findUnique({
-    where: { id: show.editionId },
+    where: { id: editionId },
     select: {
       creatorId: true,
       convention: {
@@ -599,12 +607,45 @@ async function participantsDuGroupeSpectacle(
     throw new Error('Édition introuvable')
   }
 
+  return [
+    ...new Set<number>([
+      edition.creatorId,
+      edition.convention.authorId,
+      ...edition.convention.organizers.map((o) => o.userId),
+      ...edition.organizerPermissions.map((p) => p.organizer.userId),
+    ]),
+  ]
+}
+
+/**
+ * Les utilisateurs qui composent le groupe d'un spectacle : sa distribution, et les
+ * organisateurs habilités sur les artistes.
+ *
+ * La distribution passe par `ShowArtist.showId`, renseigné y compris pour un cabaret dont les
+ * artistes sont rattachés à un numéro : « les artistes du spectacle » a donc un sens dans les
+ * deux cas.
+ */
+async function participantsDuGroupeSpectacle(
+  showId: number,
+  client: PrismaTransaction | typeof prisma
+): Promise<{ editionId: number; userIds: number[] }> {
+  const show = await client.show.findUnique({
+    where: { id: showId },
+    select: {
+      editionId: true,
+      artists: { select: { artist: { select: { userId: true } } } },
+    },
+  })
+
+  if (!show) {
+    throw new Error('Spectacle introuvable')
+  }
+
+  const organisateurs = await organisateursHabilitesSurLesArtistes(show.editionId, client)
+
   const userIds = new Set<number>([
     ...show.artists.map((lien) => lien.artist.userId),
-    edition.creatorId,
-    edition.convention.authorId,
-    ...edition.convention.organizers.map((o) => o.userId),
-    ...edition.organizerPermissions.map((p) => p.organizer.userId),
+    ...organisateurs,
   ])
 
   return { editionId: show.editionId, userIds: [...userIds] }

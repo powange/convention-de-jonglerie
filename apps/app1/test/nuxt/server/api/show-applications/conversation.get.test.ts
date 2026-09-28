@@ -43,8 +43,7 @@ vi.mock('../../../../../server/utils/show-application-helpers', () => ({
     return {
       application: { id: applicationId, userId },
       isArtist: userId === 1,
-      isOrganizer: userId === 2,
-      isAdminMode: false,
+      peutGererLesArtistes: userId === 2,
       editionId: 1,
       conventionId: 1,
     }
