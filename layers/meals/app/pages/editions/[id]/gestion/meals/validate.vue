@@ -780,11 +780,16 @@ const validateMeal = async (person: any) => {
   }
 }
 
-// Ouvrir la modal des personnes non validées
-const openPendingModal = async (type: 'volunteer' | 'artist' | 'participant' | 'organizer') => {
+/**
+ * Ouvrir la modal des personnes non validées.
+ *
+ * Aucun chargement ici : le `watch` sur `pendingModalOpen` (plus bas) s'en charge, et il couvre
+ * aussi la réouverture. Les deux coexistaient, ce qui faisait deux `GET /pending` par ouverture —
+ * et l'`await` ne servait à rien, `fetchPendingList` ne rendant pas la promesse.
+ */
+const openPendingModal = (type: 'volunteer' | 'artist' | 'participant' | 'organizer') => {
   pendingType.value = type
   pendingModalOpen.value = true
-  await fetchPendingList()
 }
 
 // Récupérer la liste des personnes non validées
@@ -866,7 +871,13 @@ watch(selectedMeal, () => {
   fetchMealStats()
 })
 
-// Recharger la liste des personnes non validées à chaque ouverture de la modal
+// Recharger la liste des personnes non validées à chaque ouverture de la modal. Seul chargement à
+// l'ouverture : `openPendingModal` n'en déclenche plus.
+//
+// Le cas que ce watcher ne couvre pas : rappeler `openPendingModal` avec un autre type alors que la
+// modal est DÉJÀ ouverte — `pendingModalOpen` ne changeant pas, rien ne serait rechargé. L'interface
+// ne le permet pas, les quatre cartes étant derrière le voile de la modal ; si cela change un jour,
+// c'est ici qu'il faudra aussi observer `pendingType`.
 watch(pendingModalOpen, (isOpen) => {
   if (isOpen && selectedMeal.value) {
     fetchPendingList()
