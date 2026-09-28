@@ -9,6 +9,8 @@
     "no_conventions_found": "Aucune convention trouvée. Soyez le premier à en ajouter une !",
     "no_conventions_match_criteria": "Aucune convention ne correspond à vos critères de recherche",
     "period": "Période",
+    "search_editions": "Rechercher une édition",
+    "search_placeholder": "Nom de l'édition",
     "searched_services": "Services recherchés",
     "upcoming_editions": "Éditions à venir"
   },

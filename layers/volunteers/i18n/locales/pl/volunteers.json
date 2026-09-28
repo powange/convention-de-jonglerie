@@ -649,9 +649,9 @@
     "what_you_can_bring_title": "Co możesz nam przynieść",
     "with_you_on_slot": "Razem z tobą na tym dyżurze: | Razem z tobą na tym dyżurze ({count}):",
     "withdraw": "Wycofaj moje zgłoszenie",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
-    "team_periods": "[TODO] Périodes d'intervention",
-    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
-    "team_periods_required": "[TODO] Cochez au moins une période"
+    "validation_summary_title": "Brakuje informacji, aby wysłać zgłoszenie",
+    "team_periods": "Okresy pracy",
+    "team_periods_hint": "Tylko wolontariusze obecni w jednym z tych okresów zobaczą ten zespół w swoich preferencjach",
+    "team_periods_required": "Zaznacz co najmniej jeden okres"
   }
 }

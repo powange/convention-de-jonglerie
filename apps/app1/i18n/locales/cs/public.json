@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Vašim vyhledávacím kritériím neodpovídají žádné dohody",
     "period": "Období",
     "searched_services": "Vyhledávané služby",
-    "upcoming_editions": "Připravovaná vydání"
+    "upcoming_editions": "Připravovaná vydání",
+    "search_editions": "Vyhledat ročník",
+    "search_placeholder": "Název ročníku"
   },
   "pages": {
     "access_denied": {

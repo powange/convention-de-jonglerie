@@ -41,6 +41,7 @@ export default wrapApiHandler<GetEditionsResponse>(
       hasAfjTokenPayment,
       hasLongShow,
       hasATM,
+      sort,
       page = '1',
       limit = '12',
     } = query
@@ -298,8 +299,11 @@ export default wrapApiHandler<GetEditionsResponse>(
           },
         },
       },
+      // `sort=recent` : la plus récente d'abord. C'est l'ordre d'une RECHERCHE, où le passé est
+      // ouvert et où l'édition cherchée est presque toujours la dernière en date — l'ordre par
+      // défaut, lui, sert à parcourir ce qui vient, et remonterait une édition de 2019 en tête.
       orderBy: {
-        startDate: 'asc', // Tri croissant par date de début (plus proche en premier)
+        startDate: sort === 'recent' ? 'desc' : 'asc',
       },
       skip,
       take: limitNumber,

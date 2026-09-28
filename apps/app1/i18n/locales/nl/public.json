@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Geen conventies voldoen aan je zoekcriteria",
     "period": "Periode",
     "searched_services": "Gezochte diensten",
-    "upcoming_editions": "Aankomende edities"
+    "upcoming_editions": "Aankomende edities",
+    "search_editions": "Een editie zoeken",
+    "search_placeholder": "Naam van de editie"
   },
   "pages": {
     "access_denied": {

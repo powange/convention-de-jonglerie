@@ -649,9 +649,9 @@
     "what_you_can_bring_title": "Что вы можете нам принести",
     "with_you_on_slot": "С вами на этой смене: | С вами на этой смене ({count}):",
     "withdraw": "Отозвать мою заявку",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
-    "team_periods": "[TODO] Périodes d'intervention",
-    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
-    "team_periods_required": "[TODO] Cochez au moins une période"
+    "validation_summary_title": "Не хватает данных, чтобы отправить заявку",
+    "team_periods": "Периоды работы",
+    "team_periods_hint": "Эту команду увидят в своих предпочтениях только волонтёры, присутствующие в один из этих периодов",
+    "team_periods_required": "Отметьте хотя бы один период"
   }
 }

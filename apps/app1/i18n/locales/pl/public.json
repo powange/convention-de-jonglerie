@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Żadna konwencja nie spełnia twoich kryteriów wyszukiwania",
     "period": "Okres",
     "searched_services": "Szukane usługi",
-    "upcoming_editions": "Nadchodzące edycje"
+    "upcoming_editions": "Nadchodzące edycje",
+    "search_editions": "Szukaj edycji",
+    "search_placeholder": "Nazwa edycji"
   },
   "pages": {
     "access_denied": {

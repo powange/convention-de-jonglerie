@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Nenhuma convenção corresponde aos seus critérios de pesquisa",
     "period": "Período",
     "searched_services": "Serviços procurados",
-    "upcoming_editions": "Próximas edições"
+    "upcoming_editions": "Próximas edições",
+    "search_editions": "Procurar uma edição",
+    "search_placeholder": "Nome da edição"
   },
   "pages": {
     "access_denied": {

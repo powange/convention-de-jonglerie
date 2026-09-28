@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "Ни одна конвенция не соответствует вашим критериям поиска",
     "period": "Период",
     "searched_services": "Поисковые сервисы",
-    "upcoming_editions": "Предстоящие издания"
+    "upcoming_editions": "Предстоящие издания",
+    "search_editions": "Найти выпуск",
+    "search_placeholder": "Название выпуска"
   },
   "pages": {
     "access_denied": {

@@ -649,9 +649,9 @@
     "what_you_can_bring_title": "Hvad du kan bringe os",
     "with_you_on_slot": "Sammen med dig på denne vagt: | Sammen med dig på denne vagt ({count}):",
     "withdraw": "Træk min ansøgning tilbage",
-    "validation_summary_title": "[TODO] Il manque des informations pour envoyer votre candidature",
-    "team_periods": "[TODO] Périodes d'intervention",
-    "team_periods_hint": "[TODO] Seuls les bénévoles présents sur l'une de ces périodes verront cette équipe dans leurs préférences",
-    "team_periods_required": "[TODO] Cochez au moins une période"
+    "validation_summary_title": "Der mangler oplysninger for at sende din ansøgning",
+    "team_periods": "Indsatsperioder",
+    "team_periods_hint": "Kun frivillige, der er til stede i en af disse perioder, ser dette hold i deres præferencer",
+    "team_periods_required": "Markér mindst én periode"
   }
 }

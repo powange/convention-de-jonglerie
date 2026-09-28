@@ -316,9 +316,9 @@
       "organizers": "Organizatorzy",
       "participants": "Uczestnicy",
       "volunteers": "Wolontariusze",
-      "count_per_person": "[TODO] par personne",
-      "count_per_ticket": "[TODO] par billet",
-      "count_toggle_hint": "[TODO] Cliquer pour compter par personne : deux billets au même nom et prénom comptent alors pour une seule personne"
+      "count_per_person": "na osobę",
+      "count_per_ticket": "na bilet",
+      "count_toggle_hint": "Kliknij, aby liczyć na osobę: dwa bilety na to samo imię i nazwisko liczą się wtedy jako jedna osoba"
     },
     "tiers": {
       "created": "Taryfa utworzona pomyślnie",

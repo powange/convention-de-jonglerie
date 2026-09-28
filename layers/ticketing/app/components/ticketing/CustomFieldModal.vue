@@ -217,9 +217,13 @@ const removeValue = (index: number) => {
 const loadTiers = async () => {
   loadingTiers.value = true
   try {
+    // Écran de configuration : on y voit tous les tarifs, y compris ceux hors période de validité
+    // et ceux qui sont désactivés — sans quoi on ne pourrait plus associer un champ à un tarif
+    // qu'on a mis de côté le temps de le préparer.
     const response = await $fetch(`/api/editions/${props.editionId}/ticketing/tiers/available`, {
       query: {
         showAll: true,
+        includeInactive: true,
       },
     })
     availableTiers.value = response.tiers || []

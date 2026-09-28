@@ -316,9 +316,9 @@
       "organizers": "Організатори",
       "participants": "Учасники",
       "volunteers": "Волонтери",
-      "count_per_person": "[TODO] par personne",
-      "count_per_ticket": "[TODO] par billet",
-      "count_toggle_hint": "[TODO] Cliquer pour compter par personne : deux billets au même nom et prénom comptent alors pour une seule personne"
+      "count_per_person": "на особу",
+      "count_per_ticket": "на квиток",
+      "count_toggle_hint": "Натисніть, щоб рахувати за особами: два квитки на те саме ім'я та прізвище тоді рахуються як одна особа"
     },
     "tiers": {
       "created": "Тариф успішно створено",

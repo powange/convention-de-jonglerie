@@ -105,8 +105,12 @@ const tierItems = computed(() =>
 const loadTiers = async () => {
   loadingTiers.value = true
   try {
+    // `includeInactive` : c'est un écran de configuration. Les cases cochées ici sont rejouées
+    // telles quelles à l'enregistrement — un tarif désactivé qu'on n'afficherait pas perdrait son
+    // association sans que personne l'ait demandé.
     const response = await $fetch<{ tiers: Tier[] }>(
-      `/api/editions/${props.editionId}/ticketing/tiers/available`
+      `/api/editions/${props.editionId}/ticketing/tiers/available`,
+      { query: { includeInactive: 'true' } }
     )
     availableTiers.value = response.tiers || []
   } catch (error) {

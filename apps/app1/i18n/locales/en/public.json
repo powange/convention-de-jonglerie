@@ -10,7 +10,9 @@
     "no_conventions_match_criteria": "No conventions match your search criteria",
     "period": "Period",
     "searched_services": "Searched services",
-    "upcoming_editions": "Upcoming editions"
+    "upcoming_editions": "Upcoming editions",
+    "search_editions": "Search for an edition",
+    "search_placeholder": "Edition name"
   },
   "pages": {
     "access_denied": {
