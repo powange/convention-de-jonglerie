@@ -741,6 +741,18 @@
                       <UIcon name="i-heroicons-banknotes" class="h-3 w-3 mr-1" />
                       {{ $t('ticketing.orders.refunded_badge') }}
                     </UBadge>
+                    <!-- De l'argent est sorti DEUX fois : quelqu'un a coché le remboursement ici,
+                         et la billetterie externe a annoncé le billet annulé à son tour. C'est un
+                         fait comptable sur lequel il faut agir, pas une information de passage —
+                         d'où un badge et non un message de synchronisation. -->
+                    <UBadge
+                      v-if="item.refundedById && item.sourceCanceledAt"
+                      color="error"
+                      variant="soft"
+                    >
+                      <UIcon name="i-heroicons-exclamation-triangle" class="h-3 w-3 mr-1" />
+                      {{ $t('ticketing.orders.double_refund_badge') }}
+                    </UBadge>
                   </div>
                   <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                     <div v-if="item.firstName || item.lastName">
@@ -822,10 +834,7 @@
                     </UBadge>
                   </div>
                   <!-- Menu d'actions du billet -->
-                  <UDropdownMenu
-                    :items="getItemMenuItems(item, order)"
-                    :ui="{ content: 'min-w-40' }"
-                  >
+                  <UDropdownMenu :items="getItemMenuItems(item)" :ui="{ content: 'min-w-40' }">
                     <UButton
                       icon="i-heroicons-ellipsis-vertical"
                       color="neutral"
@@ -1663,7 +1672,7 @@ const getOrderMenuItems = (order: Order) => {
 }
 
 // Génère les items du menu d'actions pour un billet
-const getItemMenuItems = (item: any, order: any) => {
+const getItemMenuItems = (item: any) => {
   const items: any[][] = []
   const isSpecialType =
     item.type === 'Donation' || item.type === 'Membership' || item.type === 'Payment'
@@ -1696,9 +1705,10 @@ const getItemMenuItems = (item: any, order: any) => {
   // Deux gestes distincts, et c'est tout le propos : **annulé ne veut pas dire remboursé**. Un
   // billet réglé puis annulé reste une dette tant que personne n'a coché la seconde ligne.
   //
-  // Rien de tout cela sur une commande importée : la prochaine synchronisation réécrirait l'état
-  // du billet depuis la charge du fournisseur et effacerait l'annulation sans rien signaler.
-  if (!isSpecialType && !order.externalTicketing) {
+  // Y compris sur une commande importée, désormais : la synchronisation respecte une annulation
+  // faite ici. HelloAsso sait rembourser une commande entière — et l'annulation de commande
+  // continue de renvoyer vers elle — mais pas une partie, et c'est ce qu'on ouvre.
+  if (!isSpecialType) {
     const actions: any[] = [
       item.state === 'Canceled'
         ? {

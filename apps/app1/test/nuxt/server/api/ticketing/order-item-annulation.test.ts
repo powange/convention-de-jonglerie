@@ -8,6 +8,11 @@ vi.mock('#server/utils/permissions/edition-permissions', () => ({
   canAccessEditionDataOrAccessControl: mockCanAccess,
 }))
 
+const mockJournal = vi.hoisted(() => vi.fn())
+vi.mock('#server/utils/ticketing/journal-des-entrees', () => ({
+  journaliserMouvementDEntree: mockJournal,
+}))
+
 import annulation from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/cancellation.patch'
 import remboursement from '../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/order-items/[itemId]/refund.patch'
 import { global } from '../../../globales-nitro'
@@ -36,7 +41,8 @@ describe('annulation et remboursement d’un billet', () => {
     id: 77,
     state: 'Processed',
     refunded: false,
-    order: { editionId: 22, externalTicketingId: null, status: 'Onsite' },
+    entryValidated: false,
+    order: { editionId: 22, status: 'Onsite' },
     ...surcharge,
   })
 
@@ -66,20 +72,21 @@ describe('annulation et remboursement d’un billet', () => {
       expect(ecrit().canceledAt).toBeInstanceOf(Date)
     })
 
-    it('refuse un billet venu d’une billetterie externe', async () => {
-      // La prochaine synchronisation réécrirait `state` depuis la charge du fournisseur et
-      // effacerait l'annulation sans que rien ne le signale.
+    it('accepte désormais un billet venu d’une billetterie externe', async () => {
+      // HelloAsso sait rembourser une commande ENTIÈRE — l'annulation de commande continue de
+      // renvoyer vers elle — mais pas une partie. On ouvre exactement ce qu'elle ne sait pas
+      // faire, et la synchronisation respecte l'annulation grâce à `canceledAt`.
       prismaMock.ticketingOrderItem.findUnique.mockResolvedValue(
-        billet({ order: { editionId: 22, externalTicketingId: 'ext-1', status: 'Processed' } })
+        billet({ order: { editionId: 22, status: 'Processed' } })
       )
 
-      await expect(annuler({ canceled: true })).rejects.toMatchObject({ statusCode: 400 })
-      expect(prismaMock.ticketingOrderItem.update).not.toHaveBeenCalled()
+      await expect(annuler({ canceled: true })).resolves.toBeDefined()
+      expect(ecrit()).toMatchObject({ state: 'Canceled' })
     })
 
     it('refuse un billet d’une autre édition', async () => {
       prismaMock.ticketingOrderItem.findUnique.mockResolvedValue(
-        billet({ order: { editionId: 999, externalTicketingId: null, status: 'Onsite' } })
+        billet({ order: { editionId: 999, status: 'Onsite' } })
       )
 
       await expect(annuler({ canceled: true })).rejects.toMatchObject({ statusCode: 403 })
@@ -90,6 +97,41 @@ describe('annulation et remboursement d’un billet', () => {
 
       await expect(annuler({ canceled: true })).rejects.toMatchObject({ statusCode: 403 })
       expect(prismaMock.ticketingOrderItem.findUnique).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('un billet annulé ne reste pas « entré »', () => {
+    it('dévalide l’entrée et l’inscrit au journal', async () => {
+      /**
+       * Le drapeau seul ne suffirait pas : le graphique d'affluence se lit sur le JOURNAL des
+       * mouvements, et une personne dont l'entrée est effacée sans trace y resterait comptée
+       * présente jusqu'à la fin de l'édition. Les deux écritures vont ensemble.
+       */
+      prismaMock.ticketingOrderItem.findUnique.mockResolvedValue(billet({ entryValidated: true }))
+
+      await annuler({ canceled: true })
+
+      expect(ecrit()).toMatchObject({
+        entryValidated: false,
+        entryValidatedAt: null,
+        entryValidatedBy: null,
+      })
+      expect(mockJournal).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'ticket',
+          participantIds: [77],
+          mouvement: 'INVALIDATED',
+          actorId: 5,
+        })
+      )
+    })
+
+    it('n’écrit rien au journal pour un billet jamais entré', async () => {
+      // Un mouvement de sortie sans entrée correspondante fausserait la courbe dans l'autre sens.
+      await annuler({ canceled: true })
+
+      expect(ecrit()).not.toHaveProperty('entryValidated')
+      expect(mockJournal).not.toHaveBeenCalled()
     })
   })
 
@@ -109,10 +151,7 @@ describe('annulation et remboursement d’un billet', () => {
 
     it('le rend « en attente » si la commande n’était pas réglée', async () => {
       prismaMock.ticketingOrderItem.findUnique.mockResolvedValue(
-        billet({
-          state: 'Canceled',
-          order: { editionId: 22, externalTicketingId: null, status: 'Pending' },
-        })
+        billet({ state: 'Canceled', order: { editionId: 22, status: 'Pending' } })
       )
 
       await annuler({ canceled: false })

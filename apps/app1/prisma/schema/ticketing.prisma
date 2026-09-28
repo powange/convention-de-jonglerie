@@ -522,6 +522,21 @@ model TicketingOrderItem {
   refundedAt   DateTime?
   refundedById Int?
 
+  /// Quand la billetterie externe a, à son tour, annoncé ce billet annulé.
+  ///
+  /// Sert à une seule chose, mais elle compte : repérer un **double remboursement**. On annule ici,
+  /// on rend l'argent à la main — HelloAsso ne sachant pas rembourser partiellement — puis
+  /// quelqu'un rembourse AUSSI chez le fournisseur. La personne a été payée deux fois, et rien ne
+  /// le disait.
+  ///
+  /// L'alerte se déduit de deux colonnes : `refundedById` renseigné (quelqu'un d'ici a coché la
+  /// case) ET `sourceCanceledAt` renseigné. Le rattrapage du 28/09 a délibérément laissé
+  /// `refundedById` nul sur les lignes annulées par HelloAsso : sans quoi elles déclencheraient
+  /// toutes une fausse alerte.
+  ///
+  /// Posée par la synchronisation, jamais par un geste d'ici.
+  sourceCanceledAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

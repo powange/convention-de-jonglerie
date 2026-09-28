@@ -4,6 +4,7 @@ import { isHttpError } from '#server/types/api'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { journaliserMouvementDEntree } from '#server/utils/ticketing/journal-des-entrees'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 const bodySchema = z.object({
@@ -49,8 +50,9 @@ export default wrapApiHandler(
           id: true,
           state: true,
           refunded: true,
+          entryValidated: true,
           order: {
-            select: { editionId: true, externalTicketingId: true, status: true },
+            select: { editionId: true, status: true },
           },
         },
       })
@@ -64,15 +66,13 @@ export default wrapApiHandler(
       if (item.order.editionId !== editionId)
         throw createError({ status: 403, message: "Ce billet n'appartient pas à cette édition" })
 
-      // Même refus que l'annulation d'une commande : ce qui vient d'une billetterie externe se
-      // règle chez elle, sinon la prochaine synchronisation réécrit `state` depuis sa charge et
-      // efface l'annulation sans que rien ne le signale.
-      if (item.order.externalTicketingId !== null)
-        throw createError({
-          status: 400,
-          message:
-            "Impossible d'annuler un billet provenant d'une billetterie externe. Veuillez l'annuler directement sur la plateforme externe.",
-        })
+      // Aucun refus sur les commandes externes, et c'est délibéré : HelloAsso sait rembourser une
+      // commande ENTIÈRE — pour celle-là, « faites-le à la source » reste la bonne réponse, et
+      // `orders/[orderId]/index.delete.ts` continue de le dire — mais elle ne sait PAS rembourser
+      // partiellement. On ouvre donc exactement ce que la plateforme ne peut pas faire.
+      //
+      // Ce qui rendait cela impossible, c'était la synchronisation, qui réécrivait `state` depuis
+      // la charge du fournisseur. Elle respecte désormais une annulation portant `canceledAt`.
 
       if (body.canceled) {
         if (item.state === 'Canceled')
@@ -80,8 +80,28 @@ export default wrapApiHandler(
 
         await prisma.ticketingOrderItem.update({
           where: { id: itemId },
-          data: { state: 'Canceled', canceledAt: new Date(), canceledById: user.id },
+          data: {
+            state: 'Canceled',
+            canceledAt: new Date(),
+            canceledById: user.id,
+            // Un billet annulé ne peut pas rester « entré ». Le drapeau seul ne suffit pas : le
+            // graphique d'affluence se lit sur le JOURNAL des mouvements, et la personne y
+            // resterait comptée présente jusqu'à la fin de l'édition.
+            ...(item.entryValidated
+              ? { entryValidated: false, entryValidatedAt: null, entryValidatedBy: null }
+              : {}),
+          },
         })
+
+        if (item.entryValidated) {
+          await journaliserMouvementDEntree({
+            editionId,
+            type: 'ticket',
+            participantIds: [itemId],
+            mouvement: 'INVALIDATED',
+            actorId: user.id,
+          })
+        }
 
         return createSuccessResponse(null, 'Billet annulé')
       }
@@ -101,6 +121,8 @@ export default wrapApiHandler(
       // L'état d'avant se déduit du paiement de la COMMANDE, que l'annulation d'un billet ne touche
       // jamais : réglée, ses billets valent `Processed` ; en attente, `Pending`. C'est exactement la
       // règle qu'applique la création d'un participant au guichet.
+      // L'entrée, elle, ne se rétablit PAS : rien ne dit que la personne est toujours là, et la
+      // refaire scanner ne coûte rien. La réécrire validée inventerait une présence.
       const regle = item.order.status === 'Processed' || item.order.status === 'Onsite'
 
       await prisma.ticketingOrderItem.update({

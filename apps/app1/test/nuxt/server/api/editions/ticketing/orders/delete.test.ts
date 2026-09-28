@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+const mockJournal = vi.hoisted(() => vi.fn())
+vi.mock('#server/utils/ticketing/journal-des-entrees', () => ({
+  journaliserMouvementDEntree: mockJournal,
+}))
+
 import handler from '../../../../../../../../../layers/ticketing/server/api/editions/[id]/ticketing/orders/[orderId]/index.delete'
 
 // Utiliser le mock global de Prisma défini dans test/setup-common.ts
@@ -31,6 +36,8 @@ describe('DELETE /api/editions/[id]/ticketing/orders/[orderId]', () => {
     prismaMock.ticketingOrder.update.mockReset()
     prismaMock.ticketingOrder.delete.mockReset()
     prismaMock.ticketingOrderItem.updateMany.mockReset()
+    prismaMock.ticketingOrderItem.findMany.mockResolvedValue([])
+    mockJournal.mockReset()
     // Les deux écritures partent ensemble : l'annulation ne doit pas pouvoir n'en réussir qu'une.
     prismaMock.$transaction.mockImplementation(async (operations: any) =>
       Array.isArray(operations) ? operations : operations(prismaMock)
@@ -100,6 +107,54 @@ describe('DELETE /api/editions/[id]/ticketing/orders/[orderId]', () => {
     const data = prismaMock.ticketingOrderItem.updateMany.mock.calls[0][0].data
     expect(data.canceledAt).toBeInstanceOf(Date)
     expect(data).not.toHaveProperty('refunded')
+  })
+
+  it('fait ressortir les billets déjà entrés, journal compris', async () => {
+    /**
+     * Annuler une commande dont des billets ont été validés doit les dévalider — et l'écrire au
+     * JOURNAL des mouvements, car c'est lui que lit le graphique d'affluence. Sans cette trace,
+     * les personnes resteraient comptées présentes jusqu'à la fin de l'édition.
+     *
+     * Les billets concernés sont relevés AVANT la mise à jour : elle efface le drapeau qui permet
+     * de les reconnaître.
+     */
+    prismaMock.ticketingOrder.findUnique.mockResolvedValue({
+      id: 1,
+      editionId: 1,
+      externalTicketingId: null,
+      status: 'Processed',
+      externalTicketing: null,
+    })
+    prismaMock.ticketingOrderItem.findMany.mockResolvedValue([{ id: 11 }, { id: 12 }])
+
+    await handler(mockEvent(1, 1) as any)
+
+    expect(prismaMock.ticketingOrderItem.updateMany.mock.calls[0][0].data).toMatchObject({
+      entryValidated: false,
+      entryValidatedAt: null,
+      entryValidatedBy: null,
+    })
+    expect(mockJournal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'ticket',
+        participantIds: [11, 12],
+        mouvement: 'INVALIDATED',
+      })
+    )
+  })
+
+  it('n’écrit rien au journal si aucun billet n’était entré', async () => {
+    prismaMock.ticketingOrder.findUnique.mockResolvedValue({
+      id: 1,
+      editionId: 1,
+      externalTicketingId: null,
+      status: 'Processed',
+      externalTicketing: null,
+    })
+
+    await handler(mockEvent(1, 1) as any)
+
+    expect(mockJournal).not.toHaveBeenCalled()
   })
 
   it('devrait supprimer une commande manuelle déjà annulée', async () => {
