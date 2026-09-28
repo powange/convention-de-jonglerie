@@ -1279,10 +1279,21 @@ const donneesDesValidations = computed(() => {
 interface DonneesAffluence {
   granularity: number
   timestamps: string[]
+  /** Le total, somme exacte des quatre piles. */
   affluence: number[]
+  /** Une série par population, empilables : une personne n'appartient qu'à une seule. */
+  parPopulation: {
+    organisateurs: number[]
+    artistes: number[]
+    benevoles: number[]
+    participants: number[]
+  }
+  /** La jauge attendue : qui devrait être là, validations d'entrée mises de côté. */
+  jauge: number[]
   sommet: { valeur: number; debut: string | null }
   personnesDistinctes: number
   entreesRetenues: number
+  personnesAttendues: number
 }
 
 const granulariteAffluence = ref<number>(1440)

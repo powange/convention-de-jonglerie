@@ -86,6 +86,19 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
     prismaMock.editionOrganizer.findMany.mockResolvedValue([])
   })
 
+  /**
+   * Un tarif qui fait de son porteur un PARTICIPANT.
+   *
+   * Indispensable dans chaque fixture depuis que le graphique n'a que quatre piles : un billet dont
+   * le tarif ne compte pas comme participant n'entre plus dans le graphique, décision de
+   * l'utilisateur.
+   */
+  const TARIF_PARTICIPANT = {
+    countAsParticipant: true,
+    presenceFrom: null,
+    presenceUntil: null,
+  }
+
   const mouvement = (
     participantKind: string,
     participantId: number,
@@ -154,7 +167,7 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         },
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 900, email: 'camille@exemple.test', tier: null },
+        { id: 900, email: 'camille@exemple.test', tier: TARIF_PARTICIPANT },
       ])
 
       const resultat = await handler(evenement(1440))
@@ -181,7 +194,7 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         },
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 900, email: 'autre@exemple.test', tier: null },
+        { id: 900, email: 'autre@exemple.test', tier: TARIF_PARTICIPANT },
       ])
 
       const resultat = await handler(evenement(1440))
@@ -195,8 +208,8 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         mouvement('TICKET', 901, VENDREDI + 9 * H),
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 900, email: 'Camille@Exemple.test', tier: null },
-        { id: 901, email: 'camille@exemple.test ', tier: null },
+        { id: 900, email: 'Camille@Exemple.test', tier: TARIF_PARTICIPANT },
+        { id: 901, email: 'camille@exemple.test ', tier: TARIF_PARTICIPANT },
       ])
 
       const resultat = await handler(evenement(1440))
@@ -217,8 +230,8 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         mouvement('TICKET', 901, VENDREDI + 8 * H),
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 900, email: null, tier: null },
-        { id: 901, email: null, tier: null },
+        { id: 900, email: null, tier: TARIF_PARTICIPANT },
+        { id: 901, email: null, tier: TARIF_PARTICIPANT },
       ])
 
       const resultat = await handler(evenement(1440))
@@ -251,7 +264,7 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         mouvement('VOLUNTEER', 42, VENDREDI + 9 * H),
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 42, email: null, tier: null },
+        { id: 42, email: null, tier: TARIF_PARTICIPANT },
       ])
       prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
         { id: 42, user: null, arrivalDateTime: null, departureDateTime: null },
@@ -260,6 +273,132 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
       const resultat = await handler(evenement(1440))
 
       expect(resultat.data.personnesDistinctes).toBe(2)
+    })
+  })
+
+  describe('les quatre piles', () => {
+    it('range chacun dans sa pile, et le total est leur somme exacte', async () => {
+      // C'est ce qui autorise à les empiler : une pile plus haute que le nombre de gens sur le site
+      // ferait mentir l'échelle du graphique.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('TICKET', 900, VENDREDI + 8 * H),
+        mouvement('VOLUNTEER', 5, VENDREDI + 8 * H),
+        mouvement('ARTIST', 3, VENDREDI + 8 * H),
+        mouvement('ORGANIZER', 2, VENDREDI + 8 * H),
+      ])
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        { id: 900, email: 'p@exemple.test', tier: TARIF_PARTICIPANT },
+      ])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+        {
+          id: 5,
+          user: { email: 'b@exemple.test' },
+          arrivalDateTime: null,
+          departureDateTime: null,
+        },
+      ])
+      prismaMock.editionArtist.findMany.mockResolvedValue([
+        {
+          id: 3,
+          user: { email: 'a@exemple.test' },
+          arrivalDateTime: null,
+          departureDateTime: null,
+        },
+      ])
+      prismaMock.editionOrganizer.findMany.mockResolvedValue([
+        {
+          id: 2,
+          arrivalDateTime: null,
+          departureDateTime: null,
+          organizer: { user: { email: 'o@exemple.test' } },
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.parPopulation.participants).toEqual([1, 1, 1])
+      expect(data.parPopulation.benevoles).toEqual([1, 1, 1])
+      expect(data.parPopulation.artistes).toEqual([1, 1, 1])
+      expect(data.parPopulation.organisateurs).toEqual([1, 1, 1])
+      expect(data.affluence).toEqual([4, 4, 4])
+    })
+
+    it('range un bénévole qui a aussi un billet dans la pile des bénévoles', async () => {
+      // Choix de l'utilisateur : le rôle engagé d'abord. Le compter en participant sous-estimerait
+      // l'équipe, qui est le chiffre dont on se sert pour organiser.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('TICKET', 900, VENDREDI + 8 * H),
+        mouvement('VOLUNTEER', 5, VENDREDI + 9 * H),
+      ])
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        { id: 900, email: 'camille@exemple.test', tier: TARIF_PARTICIPANT },
+      ])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+        {
+          id: 5,
+          user: { email: 'camille@exemple.test' },
+          arrivalDateTime: null,
+          departureDateTime: null,
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.parPopulation.benevoles).toEqual([1, 1, 1])
+      expect(data.parPopulation.participants).toEqual([0, 0, 0])
+      expect(data.affluence).toEqual([1, 1, 1])
+    })
+
+    it('écarte un billet dont le tarif ne compte pas comme participant', async () => {
+      /*
+       * Décision de l'utilisateur : quatre piles, pas de cinquième pour la marchandise et les dons.
+       * Conséquence assumée, mesurée : cela écarte 6 personnes sur 191 sur l'édition 1 — celles dont
+       * c'est le SEUL titre.
+       */
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('TICKET', 900, VENDREDI + 8 * H),
+      ])
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        {
+          id: 900,
+          email: 'don@exemple.test',
+          tier: { ...TARIF_PARTICIPANT, countAsParticipant: false },
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.affluence).toEqual([0, 0, 0])
+      expect(data.personnesDistinctes).toBe(0)
+    })
+
+    it('garde un bénévole qui n’a qu’un billet de marchandise', async () => {
+      // La contrepartie : l'exclusion porte sur le TITRE, pas sur la personne. Un bénévole qui a
+      // acheté un tee-shirt reste compté — comme bénévole.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('TICKET', 900, VENDREDI + 8 * H),
+        mouvement('VOLUNTEER', 5, VENDREDI + 9 * H),
+      ])
+      prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
+        {
+          id: 900,
+          email: 'camille@exemple.test',
+          tier: { ...TARIF_PARTICIPANT, countAsParticipant: false },
+        },
+      ])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+        {
+          id: 5,
+          user: { email: 'camille@exemple.test' },
+          arrivalDateTime: null,
+          departureDateTime: null,
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.parPopulation.benevoles).toEqual([1, 1, 1])
+      expect(data.affluence).toEqual([1, 1, 1])
     })
   })
 
@@ -277,7 +416,11 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
           id: 900,
           email: 'a@b.test',
           // Présent le vendredi seulement.
-          tier: { presenceFrom: new Date(VENDREDI), presenceUntil: new Date(VENDREDI + JOUR) },
+          tier: {
+            ...TARIF_PARTICIPANT,
+            presenceFrom: new Date(VENDREDI),
+            presenceUntil: new Date(VENDREDI + JOUR),
+          },
         },
       ])
 
@@ -292,7 +435,7 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         mouvement('TICKET', 900, VENDREDI + 8 * H),
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 900, email: 'a@b.test', tier: null },
+        { id: 900, email: 'a@b.test', tier: TARIF_PARTICIPANT },
       ])
 
       const resultat = await handler(evenement(1440))
@@ -309,7 +452,11 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         {
           id: 900,
           email: 'a@b.test',
-          tier: { presenceFrom: new Date(VENDREDI), presenceUntil: new Date(VENDREDI + 3 * JOUR) },
+          tier: {
+            ...TARIF_PARTICIPANT,
+            presenceFrom: new Date(VENDREDI),
+            presenceUntil: new Date(VENDREDI + 3 * JOUR),
+          },
         },
       ])
 
@@ -350,7 +497,7 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         mouvement('TICKET', 900, VENDREDI + JOUR + 10 * H),
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 900, email: 'a@b.test', tier: null },
+        { id: 900, email: 'a@b.test', tier: TARIF_PARTICIPANT },
       ])
 
       const resultat = await handler(evenement(1440))
@@ -371,9 +518,9 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
           id: 900,
           email: 'a@b.test',
           // Repart le dimanche matin : il manque la dernière tranche.
-          tier: { presenceFrom: null, presenceUntil: new Date(VENDREDI + 2 * JOUR) },
+          tier: { ...TARIF_PARTICIPANT, presenceUntil: new Date(VENDREDI + 2 * JOUR) },
         },
-        { id: 901, email: 'b@b.test', tier: null },
+        { id: 901, email: 'b@b.test', tier: TARIF_PARTICIPANT },
       ])
 
       const resultat = await handler(evenement(1440))
@@ -402,7 +549,7 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
         mouvement('ORGANIZER', 2, VENDREDI + 8 * H),
       ])
       prismaMock.ticketingOrderItem.findMany.mockResolvedValue([
-        { id: 900, email: 'a@b.test', tier: null },
+        { id: 900, email: 'a@b.test', tier: TARIF_PARTICIPANT },
       ])
       prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
         {
@@ -452,6 +599,125 @@ describe('GET /api/editions/[id]/ticketing/stats/affluence', () => {
 
       // Présent le vendredi seulement : ses dates le font sortir, comme un bénévole.
       expect(resultat.data.affluence).toEqual([1, 0, 0])
+    })
+  })
+
+  describe('la jauge attendue', () => {
+    /**
+     * Les deux passes interrogent les MÊMES tables avec des `where` différents : le journal d'un côté,
+     * tout le monde de l'autre. Un mock ignorant le `where`, il faut distinguer les appels — sinon
+     * les deux courbes seraient identiques par construction et le test ne dirait rien.
+     *
+     * La requête de la jauge se reconnaît à son `state` (elle passe par `billetsQuiComptent`).
+     */
+    const distinguerLesPasses = (duJournal: unknown[], attendus: unknown[]) => {
+      prismaMock.ticketingOrderItem.findMany.mockImplementation((args: any) =>
+        Promise.resolve(args?.where?.state ? attendus : duJournal)
+      )
+    }
+
+    it('dépasse l’affluence de ceux qui ne sont pas venus', async () => {
+      // Le cœur de la demande : l'écart entre les deux courbes est ce qui n'est pas venu.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([
+        mouvement('TICKET', 900, VENDREDI + 8 * H),
+      ])
+      distinguerLesPasses(
+        [{ id: 900, email: 'venu@exemple.test', tier: TARIF_PARTICIPANT }],
+        [
+          { id: 900, email: 'venu@exemple.test', tier: TARIF_PARTICIPANT },
+          { id: 901, email: 'absent@exemple.test', tier: TARIF_PARTICIPANT },
+          { id: 902, email: 'absente@exemple.test', tier: TARIF_PARTICIPANT },
+        ]
+      )
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.affluence).toEqual([1, 1, 1])
+      expect(data.jauge).toEqual([3, 3, 3])
+      expect(data.personnesAttendues).toBe(3)
+    })
+
+    it('ne regarde AUCUNE validation d’entrée', async () => {
+      // Elle compte quelqu'un dès le début déclaré, même si son billet n'a jamais été scanné.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([])
+      distinguerLesPasses([], [{ id: 901, email: 'jamais@exemple.test', tier: TARIF_PARTICIPANT }])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.affluence).toEqual([0, 0, 0])
+      expect(data.jauge).toEqual([1, 1, 1])
+    })
+
+    it('n’attend pas une candidature de bénévole en attente ou refusée', async () => {
+      /*
+       * La personne ne sait pas si elle est prise : l'attendre serait une invention. Mesuré sur
+       * l'édition 1 : 56 acceptées, 4 refusées, 2 en attente.
+       *
+       * La preuve porte sur la REQUÊTE, le mock ignorant le `where`.
+       */
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([])
+
+      await handler(evenement(1440))
+
+      const appels = prismaMock.editionVolunteerApplication.findMany.mock.calls.map(
+        (c: any[]) => c[0]?.where
+      )
+      expect(appels).toEqual(
+        expect.arrayContaining([expect.objectContaining({ status: 'ACCEPTED' })])
+      )
+    })
+
+    it('n’attend pas un billet annulé ni une commande remboursée', async () => {
+      // La règle partagée du dépôt, `billetsQuiComptent` : c'est elle qui tient les statuts, pas une
+      // recopie locale.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([])
+
+      await handler(evenement(1440))
+
+      const requeteJauge = prismaMock.ticketingOrderItem.findMany.mock.calls
+        .map((c: any[]) => c[0]?.where)
+        .find((where: any) => where?.state)
+
+      expect(requeteJauge.state).toEqual({ in: ['Processed', 'Pending'] })
+      expect(requeteJauge.order).toMatchObject({ status: { not: 'Refunded' } })
+      expect(requeteJauge.tier).toEqual({ countAsParticipant: true })
+    })
+
+    it('rapproche les personnes dans la jauge aussi', async () => {
+      // Un bénévole attendu qui a aussi un billet attendu est une seule personne attendue.
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([])
+      distinguerLesPasses([], [{ id: 901, email: 'camille@exemple.test', tier: TARIF_PARTICIPANT }])
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([
+        {
+          id: 5,
+          user: { email: 'camille@exemple.test' },
+          arrivalDateTime: null,
+          departureDateTime: null,
+        },
+      ])
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.jauge).toEqual([1, 1, 1])
+      expect(data.personnesAttendues).toBe(1)
+    })
+
+    it('respecte la fenêtre du tarif, donc redescend aussi', async () => {
+      prismaMock.entryValidationLog.findMany.mockResolvedValue([])
+      distinguerLesPasses(
+        [],
+        [
+          {
+            id: 901,
+            email: 'vendredi@exemple.test',
+            tier: { ...TARIF_PARTICIPANT, presenceUntil: new Date(VENDREDI + JOUR) },
+          },
+        ]
+      )
+
+      const { data } = await handler(evenement(1440))
+
+      expect(data.jauge).toEqual([1, 0, 0])
     })
   })
 

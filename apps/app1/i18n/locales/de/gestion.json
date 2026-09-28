@@ -974,10 +974,12 @@
       "affluence_granularity_6h": "[TODO] 6 heures",
       "affluence_peak": "[TODO] Au plus fort",
       "affluence_peak_at": "[TODO] le {moment}",
-      "affluence_series": "[TODO] Personnes présentes",
       "affluence_title": "[TODO] Affluence",
       "affluence_tooltip": "[TODO] {count} personne présente | {count} personnes présentes",
-      "affluence_dedup_warning": "[TODO] L'écart est important : des billets partagent probablement l'adresse de la personne qui a payé, et sont alors comptés pour une seule. Renseigner l'adresse de chaque participant affine le chiffre."
+      "affluence_dedup_warning": "[TODO] L'écart est important : des billets partagent probablement l'adresse de la personne qui a payé, et sont alors comptés pour une seule. Renseigner l'adresse de chaque participant affine le chiffre.",
+      "affluence_expected_total": "[TODO] {count} personne attendue en tout | {count} personnes attendues en tout",
+      "affluence_gauge": "[TODO] Jauge attendue",
+      "affluence_gauge_tooltip": "[TODO] {count} attendue | {count} attendues"
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

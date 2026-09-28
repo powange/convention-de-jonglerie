@@ -9,11 +9,13 @@ import {
 } from '#server/utils/affluence-fenetres'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { billetsQuiComptent } from '#server/utils/ticketing/billets-qui-comptent'
 import {
   compterAffluence,
+  reunirLesTitres,
   sommetDeLAffluence,
   tranchesDepuisBornes,
-  type ParticipantPresent,
+  type PresenceDeclaree,
 } from '~~/shared/utils/affluence'
 import { fuseauUtilisable } from '~~/shared/utils/fuseau-edition'
 
@@ -150,7 +152,14 @@ export default wrapApiHandler(
            * vérificateur de sélections du dépôt, qui a refusé un `TicketingOrder.userId` inexistant.
            */
           email: true,
-          tier: { select: { presenceFrom: true, presenceUntil: true } },
+          // `countAsParticipant` décide si ce billet fait de son porteur un PARTICIPANT. Décision de
+          // l'utilisateur : le graphique n'a que quatre piles, donc un billet de marchandise ou un
+          // don n'y entre pas. Mesuré : cela écarte 6 personnes sur 191 sur l'édition 1, et 1 sur 68
+          // sur l'édition 9 — celles dont c'est le SEUL titre. Un bénévole qui a acheté un tee-shirt
+          // reste compté, comme bénévole.
+          tier: {
+            select: { presenceFrom: true, presenceUntil: true, countAsParticipant: true },
+          },
         },
       }),
       prisma.editionVolunteerApplication.findMany({
@@ -216,43 +225,60 @@ export default wrapApiHandler(
       return null
     }
 
-    const participants: ParticipantPresent[] = []
+    const titres: PresenceDeclaree[] = []
     const entreeDe = (kind: string, id: number) =>
       entrees.get(`${kind}:${id}`)?.premiere ?? periodes.debut
 
     for (const billet of billets) {
-      participants.push({
+      // Un billet qui ne compte pas comme participant n'ouvre aucune pile : son porteur n'entre au
+      // graphique que par un AUTRE titre, s'il en a un.
+      if (!billet.tier?.countAsParticipant) continue
+
+      titres.push({
         identite: identiteDuCourriel(billet.email) ?? `billet:${billet.id}`,
+        population: 'participants',
         entree: entreeDe('TICKET', billet.id),
         fenetre: fenetreDuBillet(billet.tier, periodes),
       })
     }
 
     for (const benevole of benevoles) {
-      participants.push({
+      titres.push({
         identite: identiteDuCourriel(benevole.user?.email) ?? `benevole:${benevole.id}`,
+        population: 'benevoles',
         entree: entreeDe('VOLUNTEER', benevole.id),
         fenetre: fenetreDuBenevole(benevole, periodes, fuseau),
       })
     }
 
     for (const artiste of artistes) {
-      participants.push({
+      titres.push({
         identite: identiteDuCourriel(artiste.user?.email) ?? `artiste:${artiste.id}`,
+        population: 'artistes',
         entree: entreeDe('ARTIST', artiste.id),
         fenetre: fenetreDeLArtiste(artiste, periodes),
       })
     }
 
     for (const organisateur of organisateurs) {
-      participants.push({
+      titres.push({
         identite:
           identiteDuCourriel(organisateur.organizer?.user?.email) ??
           `organisateur:${organisateur.id}`,
+        population: 'organisateurs',
         entree: entreeDe('ORGANIZER', organisateur.id),
         fenetre: fenetreDeLOrganisateur(organisateur, periodes, fuseau),
       })
     }
+
+    /*
+     * Une personne, une pile.
+     *
+     * La population retenue est la plus engagée de ses titres, et sa fenêtre est l'UNION des leurs :
+     * un bénévole qui a aussi un pass week-end est là tant que l'un des deux le dit, et il y est
+     * comme bénévole. C'est ce qui fait que les quatre piles s'additionnent exactement au total.
+     */
+    const personnes = reunirLesTitres(titres)
 
     /**
      * Les bornes des tranches, construites avec Luxon et au fuseau de l'édition.
@@ -281,9 +307,107 @@ export default wrapApiHandler(
     // La borne de fermeture de la dernière tranche.
     bornes.push(curseur.toMillis())
 
+    /*
+     * LA JAUGE ATTENDUE : qui DEVRAIT être là, sans regarder les validations d'entrée.
+     *
+     * Même calcul, même rapprochement des personnes, mais la population de départ n'est plus le
+     * journal des entrées : c'est tout le monde qui a un titre — billet participant non annulé,
+     * candidature de bénévole ACCEPTÉE, artiste de l'édition, organisateur de l'édition.
+     *
+     * L'écart entre les deux courbes est ce qui n'est pas venu, ou pas encore. Mesuré sur l'édition 1
+     * de la base de développement : 303 titres attendus contre 274 entrées validées, pour 191
+     * personnes effectivement vues.
+     *
+     * Le début de présence est ici la seule date DÉCLARÉE : il n'y a aucune validation à confronter.
+     * Une candidature en attente ou refusée n'entre pas — la personne ne sait pas si elle est prise,
+     * l'attendre serait une invention (sur l'édition 1 : 56 acceptées, 4 refusées, 2 en attente).
+     */
+    const [billetsAttendus, benevolesAttendus, artistesAttendus, organisateursAttendus] =
+      await Promise.all([
+        prisma.ticketingOrderItem.findMany({
+          where: { ...billetsQuiComptent(editionId), tier: { countAsParticipant: true } },
+          select: {
+            id: true,
+            email: true,
+            tier: { select: { presenceFrom: true, presenceUntil: true } },
+          },
+        }),
+        prisma.editionVolunteerApplication.findMany({
+          where: { eventId: editionId, status: 'ACCEPTED' },
+          select: {
+            id: true,
+            user: { select: { email: true } },
+            arrivalDateTime: true,
+            departureDateTime: true,
+            setupAvailability: true,
+            eventAvailability: true,
+            teardownAvailability: true,
+          },
+        }),
+        prisma.editionArtist.findMany({
+          where: { editionId },
+          select: {
+            id: true,
+            user: { select: { email: true } },
+            arrivalDateTime: true,
+            departureDateTime: true,
+          },
+        }),
+        prisma.editionOrganizer.findMany({
+          where: { editionId },
+          select: {
+            id: true,
+            arrivalDateTime: true,
+            departureDateTime: true,
+            organizer: { select: { user: { select: { email: true } } } },
+          },
+        }),
+      ])
+
+    /** Sans validation à confronter, l'entrée EST le début déclaré : le `max` devient sans effet. */
+    const attendus: PresenceDeclaree[] = []
+    const attendu = (
+      identite: string,
+      population: PresenceDeclaree['population'],
+      fenetre: PresenceDeclaree['fenetre']
+    ) => attendus.push({ identite, population, entree: fenetre.arrivee ?? periodes.debut, fenetre })
+
+    for (const billet of billetsAttendus) {
+      attendu(
+        identiteDuCourriel(billet.email) ?? `billet:${billet.id}`,
+        'participants',
+        fenetreDuBillet(billet.tier, periodes)
+      )
+    }
+    for (const benevole of benevolesAttendus) {
+      attendu(
+        identiteDuCourriel(benevole.user?.email) ?? `benevole:${benevole.id}`,
+        'benevoles',
+        fenetreDuBenevole(benevole, periodes, fuseau)
+      )
+    }
+    for (const artiste of artistesAttendus) {
+      attendu(
+        identiteDuCourriel(artiste.user?.email) ?? `artiste:${artiste.id}`,
+        'artistes',
+        fenetreDeLArtiste(artiste, periodes)
+      )
+    }
+    for (const organisateur of organisateursAttendus) {
+      attendu(
+        identiteDuCourriel(organisateur.organizer?.user?.email) ??
+          `organisateur:${organisateur.id}`,
+        'organisateurs',
+        fenetreDeLOrganisateur(organisateur, periodes, fuseau)
+      )
+    }
+
+    const personnesAttendues = reunirLesTitres(attendus)
+
     const tranches = tranchesDepuisBornes(bornes)
-    const valeurs = compterAffluence(participants, tranches)
-    const sommet = sommetDeLAffluence(valeurs, tranches)
+    const { total, parPopulation } = compterAffluence(personnes, tranches)
+    const jauge = compterAffluence(personnesAttendues, tranches).total
+    const sommet = sommetDeLAffluence(total, tranches)
 
     return createSuccessResponse({
       granularity: granularite,
@@ -294,15 +418,27 @@ export default wrapApiHandler(
        * 14h » côté serveur — donc dans la langue du serveur et à l'heure d'UTC.
        */
       timestamps: tranches.map((t) => new Date(t.debut).toISOString()),
-      affluence: valeurs,
+      /** Le total, qui est la somme exacte des quatre piles. */
+      affluence: total,
+      /** Une série par population, empilables parce qu'une personne n'appartient qu'à une seule. */
+      parPopulation,
+      /**
+       * La jauge attendue : qui devrait être là, validations d'entrée mises de côté.
+       *
+       * Ne s'empile PAS avec les quatre populations — elle les recouvre. Le graphique la place dans
+       * son propre groupe de pile, ce que Chart.js permet par l'option `stack` d'un jeu de données.
+       */
+      jauge,
+      /** Le nombre de personnes attendues en tout, toutes tranches confondues. */
+      personnesAttendues: personnesAttendues.length,
       sommet: {
         valeur: sommet.valeur,
         debut: sommet.debut !== null ? new Date(sommet.debut).toISOString() : null,
       },
       /** Le nombre de personnes distinctes venues, toutes tranches confondues. */
-      personnesDistinctes: new Set(participants.map((p) => p.identite)).size,
-      /** Le nombre d'entrées retenues : l'écart avec le précédent est ce que le dédoublonnage retire. */
-      entreesRetenues: participants.length,
+      personnesDistinctes: personnes.length,
+      /** Le nombre de titres retenus : l'écart avec le précédent est ce que le rapprochement retire. */
+      entreesRetenues: titres.length,
     })
   },
   { operationName: 'GetTicketingAffluence' }
