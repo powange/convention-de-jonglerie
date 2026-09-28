@@ -239,6 +239,43 @@
           </UFormField>
         </div>
 
+        <!-- La PRÉSENCE, distincte de la VALIDITÉ juste au-dessus, et placée à côté d'elle pour que
+             la différence se lise d'un coup d'œil : la validité dit quand le billet peut servir, la
+             présence quand la personne est sur place. Sur un pass week-end vendu jusqu'au dernier
+             jour, les deux ne coïncident pas.
+
+             Réservé aux tarifs qui comptent comme participants : un don ou un tee-shirt n'amène
+             personne sur le site. -->
+        <div
+          v-if="form.countAsParticipant"
+          class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800"
+        >
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+            Présence du participant (optionnel)
+          </h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+            Quand le porteur de ce tarif est sur place. Ces dates alimentent le graphique
+            d'affluence : sans elles, aucune sortie n'étant enregistrée, la courbe ne peut que
+            monter. À défaut, toute la durée de l'édition est retenue.
+          </p>
+
+          <UFormField label="Arrivée" name="presenceFrom">
+            <UiDateTimePicker
+              v-model="presenceFromForField"
+              placeholder="Début de l'édition"
+              clearable
+            />
+          </UFormField>
+
+          <UFormField label="Départ" name="presenceUntil">
+            <UiDateTimePicker
+              v-model="presenceUntilForField"
+              placeholder="Fin de l'édition"
+              clearable
+            />
+          </UFormField>
+        </div>
+
         <UFormField
           v-if="edition?.mealsEnabled"
           :label="$t('ticketing.tiers.modal.meals_label')"
@@ -297,6 +334,9 @@ interface TicketingTier {
   isActive: boolean
   countAsParticipant?: boolean
   position: number
+  /** Quand le PORTEUR est sur place, à ne pas confondre avec la validité du billet. */
+  presenceFrom?: string | Date | null
+  presenceUntil?: string | Date | null
   validFrom?: string | Date | null
   validUntil?: string | Date | null
   helloAssoTierId?: number
@@ -386,6 +426,8 @@ const form = ref({
   isFree: false,
   validFrom: null as string | null,
   validUntil: null as string | null,
+  presenceFrom: null as string | null,
+  presenceUntil: null as string | null,
   isAllDay: false,
   mealIds: [] as number[],
 })
@@ -400,6 +442,23 @@ const validFromForField = computed<string>({
   },
 })
 const validFromForDateTime = validFromForField
+
+/**
+ * Les deux bornes de PRÉSENCE, proxyfiées comme celles de la validité : le sélecteur veut une
+ * chaîne, le corps envoyé veut `null` quand le champ est vide.
+ */
+const presenceFromForField = computed<string>({
+  get: () => form.value.presenceFrom || '',
+  set: (v) => {
+    form.value.presenceFrom = v || null
+  },
+})
+const presenceUntilForField = computed<string>({
+  get: () => form.value.presenceUntil || '',
+  set: (v) => {
+    form.value.presenceUntil = v || null
+  },
+})
 const validUntilForField = computed<string>({
   get: () => form.value.validUntil || '',
   set: (v) => {
@@ -475,6 +534,14 @@ watch(
           isFree: isFreePrice(props.tier),
           validFrom: validFromLocal,
           validUntil: validUntilLocal,
+          // Ancrées au fuseau de l'édition comme les bornes de validité : une heure d'arrivée est
+          // une heure de LIEU, et l'afficher dans celui du navigateur la décalerait.
+          presenceFrom: props.tier.presenceFrom
+            ? versHeureDeLEdition(props.tier.presenceFrom)
+            : null,
+          presenceUntil: props.tier.presenceUntil
+            ? versHeureDeLEdition(props.tier.presenceUntil)
+            : null,
           isAllDay,
           mealIds: props.tier.meals?.map((m: any) => m.mealId) || [],
         }
@@ -493,6 +560,8 @@ watch(
           isFree: false,
           validFrom: null,
           validUntil: null,
+          presenceFrom: null,
+          presenceUntil: null,
           isAllDay: false,
           mealIds: [],
         }
@@ -617,6 +686,10 @@ const buildFormData = () => {
     countAsParticipant: form.value.countAsParticipant,
     validFrom: finalValidFrom.value,
     validUntil: finalValidUntil.value,
+    // Envoyées telles que saisies : le serveur les ancre au fuseau de l'édition, comme il le fait
+    // déjà des bornes de validité.
+    presenceFrom: form.value.presenceFrom,
+    presenceUntil: form.value.presenceUntil,
     // Pas de `quotaIds` : les quotas se règlent sur la page dédiée, et l'endpoint ne les
     // accepte plus du tout — il n'y a donc qu'un seul chemin pour les modifier.
     mealIds: form.value.mealIds,

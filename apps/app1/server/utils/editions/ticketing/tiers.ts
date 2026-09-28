@@ -43,6 +43,14 @@ export interface TierData {
   countAsParticipant?: boolean
   validFrom?: string | null
   validUntil?: string | null
+  /**
+   * Quand le PORTEUR est sur place, à ne pas confondre avec la validité du billet juste au-dessus.
+   *
+   * Lues par le même `instantDeValidite` : la forme acceptée est la même — un instant daté ou une
+   * heure murale nue, ancrée au fuseau de l'édition. Ce qui diffère est le sens, pas le format.
+   */
+  presenceFrom?: string | null
+  presenceUntil?: string | null
   handoutItemIds?: HandoutItemSelection[]
   mealIds?: number[]
 }
@@ -181,6 +189,8 @@ export async function createTier(editionId: number, data: TierData) {
       countAsParticipant: data.countAsParticipant ?? true,
       validFrom: instantDeValidite(data.validFrom, fuseau),
       validUntil: instantDeValidite(data.validUntil, fuseau),
+      presenceFrom: instantDeValidite(data.presenceFrom, fuseau),
+      presenceUntil: instantDeValidite(data.presenceUntil, fuseau),
       // externalTicketingId et helloAssoTierId restent null pour un tarif manuel
       handoutItems: {
         create: normalizeHandoutItemSelections(data.handoutItemIds).map(
@@ -242,6 +252,8 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           countAsParticipant: data.countAsParticipant ?? true,
           validFrom: instantDeValidite(data.validFrom, fuseau),
           validUntil: instantDeValidite(data.validUntil, fuseau),
+          presenceFrom: instantDeValidite(data.presenceFrom, fuseau),
+          presenceUntil: instantDeValidite(data.presenceUntil, fuseau),
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {
@@ -271,6 +283,8 @@ export async function updateTier(tierId: number, editionId: number, data: TierDa
           countAsParticipant: data.countAsParticipant ?? true,
           validFrom: instantDeValidite(data.validFrom, fuseau),
           validUntil: instantDeValidite(data.validUntil, fuseau),
+          presenceFrom: instantDeValidite(data.presenceFrom, fuseau),
+          presenceUntil: instantDeValidite(data.presenceUntil, fuseau),
           ...(data.handoutItemIds !== undefined
             ? {
                 handoutItems: {

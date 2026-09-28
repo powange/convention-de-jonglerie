@@ -226,6 +226,22 @@
                   <span v-else class="text-gray-500">—</span>
                 </template>
 
+                <!-- Colonne Présence : déclarée ou non, le bouton ouvre la même modale -->
+                <template #presence-cell="{ row }">
+                  <UButton
+                    :color="row.original.arrivalDateTime ? 'primary' : 'neutral'"
+                    variant="soft"
+                    size="sm"
+                    :title="$t('gestion.organizers.presence.manage')"
+                    @click="ouvrirLaPresence(row.original)"
+                  >
+                    <span class="font-medium">
+                      {{ resumeDeLaPresence(row.original) }}
+                    </span>
+                    <UIcon name="i-heroicons-chevron-right" class="ml-1 h-4 w-4" />
+                  </UButton>
+                </template>
+
                 <!-- Colonne Repas -->
                 <template #meals-cell="{ row }">
                   <UButton
@@ -378,6 +394,17 @@
       @meals-saved="loadEditionOrganizers"
     />
 
+    <!-- Modal de présence sur place d'un organisateur -->
+    <OrganizersPresenceModal
+      v-model="presenceModalOpen"
+      :organizer="organisateurDeLaPresence"
+      :edition-id="editionId"
+      :debut="bornesDePresence.debut"
+      :fin="bornesDePresence.fin"
+      :timezone="edition?.timezone"
+      @saved="loadEditionOrganizers"
+    />
+
     <!-- Modal de confirmation de suppression d'un organisateur de l'édition -->
     <UiConfirmModal
       v-model="removeFromEditionConfirmOpen"
@@ -475,6 +502,37 @@ const organizerToRemoveFromEdition = ref<{ id: number; name: string } | null>(nu
 // État pour la modal des repas d'un organisateur
 const mealsModalOpen = ref(false)
 const organizerForMeals = ref<any>(null)
+
+const presenceModalOpen = ref(false)
+const organisateurDeLaPresence = ref<any>(null)
+
+/**
+ * Les bornes que le sélecteur propose : du montage au démontage.
+ *
+ * Plus larges que l'événement, délibérément — un organisateur arrive souvent la veille et repart le
+ * lendemain, et lui refuser ces jours-là le forcerait à déclarer une date fausse.
+ */
+const bornesDePresence = computed(() => ({
+  debut: edition.value?.volunteersSetupStartDate ?? edition.value?.startDate ?? null,
+  fin: edition.value?.volunteersTeardownEndDate ?? edition.value?.endDate ?? null,
+}))
+
+const ouvrirLaPresence = (organizer: any) => {
+  organisateurDeLaPresence.value = organizer
+  presenceModalOpen.value = true
+}
+
+/** Ce que la cellule affiche : les deux jours, ou une invitation à les renseigner. */
+const resumeDeLaPresence = (organizer: any) => {
+  const jour = (champ?: string | null) =>
+    champ ? champ.slice(8, 10) + '/' + champ.slice(5, 7) : null
+
+  const arrivee = jour(organizer?.arrivalDateTime)
+  const depart = jour(organizer?.departureDateTime)
+
+  if (!arrivee && !depart) return t('gestion.organizers.presence.not_declared_short')
+  return [arrivee ?? '?', depart ?? '?'].join(' → ')
+}
 
 const canManageMeals = computed(() => {
   if (!edition.value || !authStore.user?.id) return false
@@ -755,6 +813,15 @@ const editionOrganizersColumns = computed((): TableColumn<any>[] => [
     id: 'roles',
     header: t('gestion.organizers.roles_column'),
     size: 260,
+  },
+  {
+    // La PRÉSENCE sur place, sans condition : elle ne dépend d'aucun module, et c'est elle qui
+    // alimente le graphique d'affluence. Sans dates déclarées, l'organisateur y est compté du
+    // premier au dernier jour.
+    id: 'presence',
+    header: t('gestion.organizers.presence.column'),
+    size: 150,
+    meta: { class: { th: 'text-center', td: 'text-center' } },
   },
   ...(edition.value?.mealsEnabled && canManageMeals.value
     ? [

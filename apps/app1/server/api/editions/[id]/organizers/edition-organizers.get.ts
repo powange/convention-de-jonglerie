@@ -89,6 +89,10 @@ export default wrapApiHandler(
           organizerId: true,
           entryValidated: true,
           entryValidatedAt: true,
+          // Arrivée et départ sur place, au format des bénévoles : le tableau les affiche et sa
+          // modale les modifie. Ils alimentent le graphique d'affluence.
+          arrivalDateTime: true,
+          departureDateTime: true,
           createdAt: true,
           mealSelections: {
             where: { accepted: false, mealId: { in: enabledMealIds } },
@@ -168,6 +172,8 @@ export default wrapApiHandler(
           ),
           entryValidated: eo.entryValidated,
           entryValidatedAt: eo.entryValidatedAt,
+          arrivalDateTime: eo.arrivalDateTime,
+          departureDateTime: eo.departureDateTime,
           createdAt: eo.createdAt,
           title: eo.organizer.title,
           meals: {

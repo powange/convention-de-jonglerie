@@ -265,6 +265,63 @@
         </div>
       </UCard>
 
+      <!-- Affluence : le STOCK, là où la carte précédente compte un FLUX -->
+      <UCard class="mt-6">
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-user-group" class="text-primary-600" />
+            <h2 class="text-lg font-semibold">
+              {{ $t('gestion.ticketing.affluence_title') }}
+            </h2>
+          </div>
+          <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.ticketing.affluence_description') }}
+          </p>
+        </template>
+
+        <div class="mb-4 flex flex-wrap items-end gap-4">
+          <UFormField :label="$t('gestion.ticketing.stats_filter_granularity')">
+            <USelect
+              v-model="granulariteAffluence"
+              :items="granularitesAffluence"
+              value-key="value"
+              :ui="{ content: 'min-w-fit' }"
+            />
+          </UFormField>
+        </div>
+
+        <div v-if="chargementAffluence" class="text-center py-12">
+          <UIcon
+            name="i-heroicons-arrow-path"
+            class="h-8 w-8 text-gray-400 mx-auto mb-2 animate-spin"
+          />
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.ticketing.stats_loading') }}
+          </p>
+        </div>
+        <div v-else-if="erreurAffluence" class="text-center py-12">
+          <UIcon
+            name="i-heroicons-exclamation-triangle"
+            class="h-8 w-8 text-red-500 mx-auto mb-2"
+          />
+          <p class="text-red-600 dark:text-red-400">
+            {{ $t('gestion.ticketing.stats_error') }}
+          </p>
+        </div>
+        <AffluenceChart
+          v-else-if="donneesAffluence && donneesAffluence.timestamps.length > 0"
+          :data="donneesAffluence"
+          :timezone="edition?.timezone"
+          :granularite="granulariteAffluence"
+        />
+        <div v-else class="text-center py-12">
+          <UIcon name="i-heroicons-user-group" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <p class="text-gray-600 dark:text-gray-400">
+            {{ $t('gestion.ticketing.stats_no_data') }}
+          </p>
+        </div>
+      </UCard>
+
       <!-- Statistiques des sources de commandes -->
       <UCard class="mt-6">
         <template #header>
@@ -584,6 +641,10 @@ const OrderSourceChart = defineAsyncComponent(
 
 const PurchaseChart = defineAsyncComponent(
   () => import('~/components/ticketing/stats/PurchaseChart.vue')
+)
+
+const AffluenceChart = defineAsyncComponent(
+  () => import('~/components/ticketing/stats/AffluenceChart.vue')
 )
 
 // Utiliser le composable pour obtenir les configurations des types de participants
@@ -1205,6 +1266,54 @@ const donneesDesValidations = computed(() => {
   }
 })
 
+/**
+ * L'AFFLUENCE : combien de personnes sont sur place, et quand.
+ *
+ * Son propre sélecteur de granularité, et non celui des validations : les deux graphiques ne
+ * répondent pas à la même question, et l'on veut souvent regarder les arrivées à l'heure tout en
+ * lisant l'affluence à la journée.
+ *
+ * Les cinq granularités sont celles demandées, et le serveur refuse tout le reste : une valeur
+ * arbitraire découperait une édition en dizaines de milliers de tranches.
+ */
+interface DonneesAffluence {
+  granularity: number
+  timestamps: string[]
+  affluence: number[]
+  sommet: { valeur: number; debut: string | null }
+  personnesDistinctes: number
+  entreesRetenues: number
+}
+
+const granulariteAffluence = ref<number>(1440)
+const donneesAffluence = ref<DonneesAffluence | null>(null)
+const chargementAffluence = ref(false)
+const erreurAffluence = ref(false)
+
+const granularitesAffluence = computed(() => [
+  { value: 1440, label: t('gestion.ticketing.affluence_granularity_1d') },
+  { value: 720, label: t('gestion.ticketing.affluence_granularity_12h') },
+  { value: 360, label: t('gestion.ticketing.affluence_granularity_6h') },
+  { value: 60, label: t('gestion.ticketing.stats_granularity_1h') },
+  { value: 20, label: t('gestion.ticketing.affluence_granularity_20min') },
+])
+
+async function chargerAffluence() {
+  chargementAffluence.value = true
+  erreurAffluence.value = false
+
+  try {
+    const reponse = await $fetch<{ data: DonneesAffluence }>(
+      `/api/editions/${editionId}/ticketing/stats/affluence?granularity=${granulariteAffluence.value}`
+    )
+    donneesAffluence.value = reponse.data
+  } catch {
+    erreurAffluence.value = true
+  } finally {
+    chargementAffluence.value = false
+  }
+}
+
 // Charger les données de validations
 async function fetchValidations() {
   loadingValidations.value = true
@@ -1363,6 +1472,10 @@ watch(selectedGranularity, () => {
   if (comparaisonId.value !== null) chargerComparaison()
 })
 
+watch(granulariteAffluence, () => {
+  chargerAffluence()
+})
+
 watch(selectedPurchaseGranularity, () => {
   fetchPurchases()
   if (comparaisonId.value !== null) chargerComparaison()
@@ -1390,6 +1503,7 @@ onMounted(async () => {
       fetchPurchases(),
       fetchTiers(),
       fetchOrderSources(),
+      chargerAffluence(),
       chargerEditionsComparables(),
     ])
     // Après la liste, pour qu'une comparaison venue de l'URL trouve son édition dans le

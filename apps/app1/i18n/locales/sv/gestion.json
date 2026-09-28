@@ -358,7 +358,21 @@
         "manageTreasury": "Ekonomi"
       },
       "title_column": "Titel",
-      "export_count": "{count} arrangörer"
+      "export_count": "{count} arrangörer",
+      "presence": {
+        "affluence_notice": "[TODO] Ces dates alimentent le graphique d'affluence. Sans elles, cette personne y est comptée présente du premier au dernier jour de l'édition.",
+        "arrival": "[TODO] Arrivée",
+        "clear": "[TODO] Effacer les deux",
+        "column": "[TODO] Présence",
+        "departure": "[TODO] Départ",
+        "departure_before_arrival": "[TODO] Le départ ne peut pas précéder l'arrivée.",
+        "description": "[TODO] Quand cette personne est sur place. Le jour et le moment de la journée suffisent — c'est la même déclaration que celle des bénévoles.",
+        "error_saving": "[TODO] Impossible d'enregistrer la présence",
+        "manage": "[TODO] Déclarer l'arrivée et le départ",
+        "not_declared": "[TODO] Non déclaré",
+        "not_declared_short": "[TODO] À renseigner",
+        "title": "[TODO] Présence de {name} sur l'édition"
+      }
     },
     "overview": "Översikt",
     "services": {
@@ -950,7 +964,20 @@
       "handout_volumes_nobody": "Ingen väntas ännu.",
       "handout_volumes_pending": "Inte uthämtat ännu — {count} person | Inte uthämtat ännu — {count} personer",
       "handout_volumes_scope": "Beräknat på {liste}.",
-      "handout_volumes_title": "Mängder att planera"
+      "handout_volumes_title": "Mängder att planera",
+      "affluence_axis": "[TODO] Personnes",
+      "affluence_dedup_notice": "[TODO] {entrees} entrées validées pour {personnes} personnes distinctes : une même personne présente à plusieurs titres n'est comptée qu'une fois. Le rapprochement se fait sur le compte, à défaut sur l'adresse de courriel — c'est donc une estimation.",
+      "affluence_description": "[TODO] Le nombre de personnes présentes sur l'édition à un moment donné. Une personne n'est comptée qu'une fois, même si elle est là à plusieurs titres.",
+      "affluence_granularity_12h": "[TODO] 12 heures",
+      "affluence_granularity_1d": "[TODO] 1 jour",
+      "affluence_granularity_20min": "[TODO] 20 minutes",
+      "affluence_granularity_6h": "[TODO] 6 heures",
+      "affluence_peak": "[TODO] Au plus fort",
+      "affluence_peak_at": "[TODO] le {moment}",
+      "affluence_series": "[TODO] Personnes présentes",
+      "affluence_title": "[TODO] Affluence",
+      "affluence_tooltip": "[TODO] {count} personne présente | {count} personnes présentes",
+      "affluence_dedup_warning": "[TODO] L'écart est important : des billets partagent probablement l'adresse de la personne qui a payé, et sont alors comptés pour une seule. Renseigner l'adresse de chaque participant affine le chiffre."
     },
     "title": "Hantering",
     "view_edition": "Visa upplagan",

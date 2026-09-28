@@ -118,3 +118,49 @@ export function estPresentPendant(
   if (fenetre.depart !== null && creneau.fin > fenetre.depart) return false
   return true
 }
+
+/** Les moments de la journée que le formulaire propose, dans l'ordre où ils se suivent. */
+export const MOMENTS_DE_PRESENCE = ['morning', 'noon', 'afternoon', 'evening'] as const
+
+export type MomentDePresence = (typeof MOMENTS_DE_PRESENCE)[number]
+
+/**
+ * Les créneaux proposables entre deux dates, pour peupler un sélecteur d'arrivée ou de départ.
+ *
+ * Rend la matière brute — jour et moment — et non des libellés : la traduction appartient à
+ * l'écran, ce fichier étant lu par le serveur.
+ *
+ * ⚠️ La journée est découpée dans le fuseau de l'ÉDITION, par Luxon. La modale des candidatures
+ * bénévoles a son propre générateur, qui extrait le jour par `toISOString().split('T')[0]` — donc en
+ * UTC : sur une édition en fuseau décalé, un créneau peut y porter la date de la veille. Ce n'est
+ * pas corrigé ici, pour ne pas changer le formulaire des bénévoles au détour d'un autre chantier,
+ * mais les deux générateurs devraient n'en faire qu'un.
+ */
+export function creneauxDePresence(
+  debut: Date | string,
+  fin: Date | string,
+  fuseau?: string | null
+): { valeur: string; jour: string; moment: MomentDePresence }[] {
+  const zone = fuseau || 'utc'
+  const premier = DateTime.fromJSDate(new Date(debut), { zone }).startOf('day')
+  const dernier = DateTime.fromJSDate(new Date(fin), { zone }).startOf('day')
+
+  if (!premier.isValid || !dernier.isValid || dernier < premier) return []
+
+  const creneaux: { valeur: string; jour: string; moment: MomentDePresence }[] = []
+
+  // Plafonné : une édition mal saisie — une fin des années après le début — ne doit pas produire un
+  // sélecteur de dizaines de milliers d'entrées.
+  for (
+    let jour = premier, i = 0;
+    jour <= dernier && i < 60;
+    jour = jour.plus({ days: 1 }), i += 1
+  ) {
+    const iso = jour.toISODate()!
+    for (const moment of MOMENTS_DE_PRESENCE) {
+      creneaux.push({ valeur: `${iso}_${moment}`, jour: iso, moment })
+    }
+  }
+
+  return creneaux
+}
