@@ -121,12 +121,62 @@ export default wrapApiHandler(
       // Créer un map des tarifs pour un accès rapide
       const tierMap = new Map(tiersWithCustomName.map((tier) => [tier.id, tier]))
 
+      /*
+       * Les options cochées, chargées UNE fois — avec leur prix et leurs repas.
+       *
+       * Elles étaient relues une par une à l'intérieur de la double boucle de création, et leur prix
+       * n'était jamais lu : chaque ligne d'option partait à `amount: 0`. L'écran, lui, affiche et
+       * fait payer un total qui les inclut. Une entrée à 20 € avec un tee-shirt à 15 € était donc
+       * encaissée 35 € et enregistrée 20 € — et les totaux par moyen de paiement lisent
+       * `order.amount`. Le même défaut avait été corrigé pour l'import HelloAsso (« 291 € de
+       * bouteilles encaissés sans apparaître »), pas pour la saisie sur place.
+       *
+       * Les précharger sert aussi à composer le montant de la commande AVANT de la créer : elle est
+       * écrite avant ses lignes, et son total devait donc déjà connaître les options.
+       */
+      const idsOptionsChoisies = [
+        ...new Set(
+          body.items.flatMap((item) =>
+            (item.customParticipants || []).flatMap((participant) =>
+              (participant.customFields || [])
+                .filter((champ) => champ.optionId)
+                .map((champ) => champ.optionId as number)
+            )
+          )
+        ),
+      ]
+      const optionsChoisies = idsOptionsChoisies.length
+        ? await prisma.ticketingOption.findMany({
+            where: { id: { in: idsOptionsChoisies } },
+            include: { meals: { include: { meal: true } } },
+          })
+        : []
+      const optionParId = new Map(optionsChoisies.map((option) => [option.id, option]))
+
+      /** Le prix d'une option, en centimes. `null` en base veut dire « gratuite ». */
+      const prixDeLOption = (optionId: number) => optionParId.get(optionId)?.price ?? 0
+
       // Calculer le montant total
       const totalAmount = body.items.reduce((sum, item) => {
         const tier = tierMap.get(item.tierId)
         // Utiliser le montant personnalisé si disponible, sinon le prix du tarif
         const itemPrice = item.customAmount ?? tier?.price ?? 0
-        return sum + itemPrice * item.quantity
+
+        /*
+         * Les options sont portées par CHAQUE participant, pas par la ligne : deux billets d'un même
+         * tarif peuvent avoir des options différentes. On ne peut donc pas multiplier par la
+         * quantité — il faut additionner participant par participant, exactement comme la boucle de
+         * création le fera.
+         */
+        const participants = item.customParticipants || []
+        let optionsDeLaLigne = 0
+        for (let rang = 0; rang < item.quantity; rang++) {
+          for (const champ of participants[rang]?.customFields || []) {
+            if (champ.optionId) optionsDeLaLigne += prixDeLOption(champ.optionId as number)
+          }
+        }
+
+        return sum + itemPrice * item.quantity + optionsDeLaLigne
       }, 0)
 
       // Créer la date de commande
@@ -197,17 +247,9 @@ export default wrapApiHandler(
           // Créer les associations d'options et les accès repas
           if (optionFields.length > 0) {
             for (const optionField of optionFields) {
-              // Récupérer l'option avec ses repas associés
-              const option = await prisma.ticketingOption.findUnique({
-                where: { id: optionField.optionId },
-                include: {
-                  meals: {
-                    include: {
-                      meal: true,
-                    },
-                  },
-                },
-              })
+              // L'option vient de la lecture unique faite plus haut : la relire ici faisait une
+              // requête par option et par participant, et son prix restait pourtant ignoré.
+              const option = optionParId.get(optionField.optionId as number)
 
               if (option) {
                 // Créer l'association orderItem <-> option
@@ -215,7 +257,9 @@ export default wrapApiHandler(
                   data: {
                     orderItemId: orderItem.id,
                     optionId: option.id,
-                    amount: 0,
+                    // Le prix réellement encaissé, et non zéro : c'est lui que totalise
+                    // `montantTotalDeLaLigne` et que retrouvent les totaux par moyen de paiement.
+                    amount: option.price ?? 0,
                     customFields: null,
                   },
                 })
