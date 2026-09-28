@@ -104,3 +104,37 @@ export function billetAnnule() {
     ],
   }
 }
+
+/**
+ * Les natures de ligne qui ne donnent AUCUN droit d'entrée.
+ *
+ * Un don, une adhésion ou un paiement portent le nom du payeur, et parfois un code QR : sur la
+ * base de développement, **les 43 dons en ont un**. Ils ressortaient donc d'une recherche par nom
+ * au contrôle d'accès, et se scannaient comme un billet — un bénévole à la porte n'avait rien pour
+ * distinguer le don de l'entrée du même donateur.
+ *
+ * Les écarter est sans risque, et c'est mesuré : ces 43 lignes n'ont **aucun tarif** et **aucune
+ * n'a jamais eu son entrée validée**. Personne n'est jamais entré avec un don.
+ *
+ * Les trois mêmes valeurs servent déjà à l'écran des commandes pour masquer les actions d'entrée
+ * sur ces lignes — c'est la même question, posée à deux endroits.
+ */
+export const TYPES_SANS_DROIT_D_ENTREE = ['Donation', 'Membership', 'Payment'] as const
+
+/**
+ * Le fragment de `where` qui ne retient que les lignes donnant accès.
+ *
+ * ⚠️ **À composer sous `AND`**, jamais à étaler dans un `where` : le fragment porte un `OR`, et
+ * l'étaler à côté d'un autre `OR` — celui d'une recherche par nom, par exemple — écraserait
+ * silencieusement l'un des deux. Écrire `AND: [lignesQuiDonnentAcces()]` ne coûte rien et ne peut
+ * pas se tromper.
+ *
+ * ⚠️ `type` est une colonne NULLABLE, et `NOT IN` écarte les `NULL` en SQL : sans la branche
+ * explicite, une ligne sans type — un import d'ailleurs — disparaîtrait du guichet. À la porte, le
+ * doute doit profiter au porteur du billet, comme pour `ETATS_DE_BILLET_ANNULE`.
+ */
+export function lignesQuiDonnentAcces() {
+  return {
+    OR: [{ type: null }, { type: { notIn: [...TYPES_SANS_DROIT_D_ENTREE] } }],
+  }
+}

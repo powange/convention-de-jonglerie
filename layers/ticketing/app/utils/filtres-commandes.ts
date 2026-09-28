@@ -58,6 +58,16 @@ export interface FiltresCommandes {
   /** `all` n'est pas un filtre : c'est l'absence de filtre sur ce critère. */
   statutEntree: 'all' | 'validated' | 'not_validated'
   /**
+   * Les billets dont on doit encore l'argent.
+   *
+   * `du` retient les billets **annulés, réglés, et pas encore remboursés** — c'est la réponse à
+   * « à qui doit-on de l'argent ? », la seule question que cet écran ne savait pas poser.
+   *
+   * Un critère de BILLET et non de commande : un tiers des commandes en portent plusieurs, et
+   * l'une peut être annulée quand les autres tiennent.
+   */
+  remboursement: 'all' | 'du'
+  /**
    * Les statuts de commande retenus. Vide = tous.
    *
    * Y compris les commandes annulées, qui restent visibles par défaut : les masquer d'office
@@ -78,6 +88,7 @@ export function filtresVides(): FiltresCommandes {
     tarifs: [],
     options: [],
     statutEntree: 'all',
+    remboursement: 'all',
     statuts: [],
     moyensDePaiement: [],
     typesDeLigne: [],
@@ -97,6 +108,7 @@ export function requeteDesFiltres(filtres: FiltresCommandes): {
   tierIds?: number[]
   optionIds?: number[]
   entryStatus: 'all' | 'validated' | 'not_validated'
+  refundStatus?: 'du'
   statuses?: StatutCommande[]
   paymentMethods?: MoyenDePaiement[]
   itemTypes?: TypeDeLigne[]
@@ -109,6 +121,8 @@ export function requeteDesFiltres(filtres: FiltresCommandes): {
     tierIds: siRempli(filtres.tarifs),
     optionIds: siRempli(filtres.options),
     entryStatus: filtres.statutEntree,
+    // `all` ne part pas : côté serveur, l'absence du paramètre EST « aucun filtre ».
+    refundStatus: filtres.remboursement === 'all' ? undefined : filtres.remboursement,
     statuses: siRempli(filtres.statuts),
     paymentMethods: siRempli(filtres.moyensDePaiement),
     itemTypes: siRempli(filtres.typesDeLigne),
@@ -131,6 +145,7 @@ export function nombreDeFiltresActifs(filtres: FiltresCommandes): number {
     filtres.tarifs.length +
     filtres.options.length +
     (filtres.statutEntree === 'all' ? 0 : 1) +
+    (filtres.remboursement === 'all' ? 0 : 1) +
     filtres.statuts.length +
     filtres.moyensDePaiement.length +
     filtres.typesDeLigne.length +
@@ -159,6 +174,7 @@ const VALEURS_ADMISES = {
   moyensDePaiement: ['cash', 'card', 'check', 'unknown'],
   typesDeLigne: ['Registration', 'Donation', 'Membership', 'Payment'],
   statutEntree: ['all', 'validated', 'not_validated'],
+  remboursement: ['all', 'du'],
 } as const
 
 /**
@@ -184,6 +200,7 @@ export function parametresDUrl(filtres: FiltresCommandes): Record<string, string
   liste('itemTypes', filtres.typesDeLigne)
 
   if (filtres.statutEntree !== 'all') parametres.entryStatus = filtres.statutEntree
+  if (filtres.remboursement !== 'all') parametres.refundStatus = filtres.remboursement
 
   if (filtres.champsPersonnalises.length > 0) {
     parametres.customFieldFilters = JSON.stringify(filtres.champsPersonnalises)
@@ -238,11 +255,13 @@ export function filtresDepuisUrl(query: Record<string, unknown>): FiltresCommand
   }
 
   const statutEntree = retenues('entryStatus', VALEURS_ADMISES.statutEntree)[0] ?? 'all'
+  const remboursement = retenues('refundStatus', VALEURS_ADMISES.remboursement)[0] ?? 'all'
 
   return {
     tarifs: identifiants('tierIds'),
     options: identifiants('optionIds'),
     statutEntree,
+    remboursement,
     statuts: retenues('statuses', VALEURS_ADMISES.statuts),
     moyensDePaiement: retenues('paymentMethods', VALEURS_ADMISES.moyensDePaiement),
     typesDeLigne: retenues('itemTypes', VALEURS_ADMISES.typesDeLigne),

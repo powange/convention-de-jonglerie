@@ -23,6 +23,8 @@ export interface ColonneTriee {
 export interface FiltresCandidatures {
   /** Le statut retenu. `ALL`, vide ou absent valent « tous ». */
   statut?: string | null
+  /** La provenance retenue. Mêmes conventions que `statut`. */
+  source?: string | null
   equipesSouhaitees?: string[]
   presence?: string[]
   equipesAssignees?: string[]
@@ -77,6 +79,7 @@ export function parametresDeFiltre(
     // `ALL` est la valeur que porte le contrôle quand il ne filtre rien : la transmettre telle
     // quelle chercherait un statut de ce nom.
     status: filtres.statut && filtres.statut !== 'ALL' ? filtres.statut : undefined,
+    source: filtres.source && filtres.source !== 'ALL' ? filtres.source : undefined,
     teams: liste(filtres.equipesSouhaitees),
     presence: liste(filtres.presence),
     assignedTeams: liste(filtres.equipesAssignees),

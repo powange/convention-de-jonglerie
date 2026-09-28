@@ -601,6 +601,22 @@ describe('POST /api/editions/[id]/ticketing/verify (billet sans billetterie exte
     articlesARemettre(true)
   })
 
+  it('écarte du scan ce qui ne donne pas droit d’entrée', async () => {
+    // Un don porte un code QR — les 43 de la base de développement en ont un — et se scannait
+    // donc comme un billet ordinaire. Écarté, comme dans la recherche par nom : c'est la même
+    // question posée par une autre porte.
+    global.readBody = vi.fn().mockResolvedValue({ qrCode: 'don-abc' })
+    prismaMock.externalTicketing.findUnique.mockResolvedValue(null)
+    prismaMock.ticketingOrderItem.findFirst.mockResolvedValue(null)
+
+    await verifyHandler(mockEvent as any)
+
+    const where = prismaMock.ticketingOrderItem.findFirst.mock.calls.at(-1)[0].where
+    expect(where.AND).toEqual([
+      { OR: [{ type: null }, { type: { notIn: ['Donation', 'Membership', 'Payment'] } }] },
+    ])
+  })
+
   it('trouve un billet vendu sur place, sans configuration HelloAsso', async () => {
     global.readBody = vi.fn().mockResolvedValue({ qrCode: 'onsite-0168d7ddee737c74' })
     prismaMock.externalTicketing.findUnique.mockResolvedValue(null)

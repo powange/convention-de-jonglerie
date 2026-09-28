@@ -150,8 +150,14 @@
               :key="tier.id"
               class="p-4 border rounded-lg dark:border-gray-700"
             >
-              <div class="flex items-center justify-between gap-4">
-                <div class="flex-1">
+              <!--
+                En colonne sur mobile, en ligne dès `sm`. Les deux blocs se disputaient la largeur
+                d'un téléphone : le nom du tarif se coupait en deux ou trois lignes pour laisser
+                passer le sélecteur de quantité, qui fait 14 rem à lui seul. Empilés, ils se lisent
+                dans l'ordre où on les traite — le tarif, ce qu'il donne, son prix, puis combien.
+              -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                <div class="flex-1 min-w-0">
                   <h4 class="font-medium text-gray-900 dark:text-white">{{ tier.name }}</h4>
                   <p v-if="tier.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                     {{ tier.description }}
@@ -176,7 +182,7 @@
                     </span>
                   </p>
                 </div>
-                <div class="flex flex-col items-center gap-2">
+                <div class="flex flex-col items-start sm:items-center gap-2">
                   <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
                     {{ $t('common.quantity') }}
                   </span>

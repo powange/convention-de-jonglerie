@@ -15,9 +15,14 @@
 /** Le statut d'arrivée de l'écran : aucun filtre. */
 export const STATUT_PAR_DEFAUT = 'ALL'
 
+/** La provenance d'arrivée de l'écran : aucun filtre. */
+export const SOURCE_PAR_DEFAUT = 'ALL'
+
 /** Les filtres, tels que le tableau les manipule. */
 export interface FiltresDeCandidatures {
   statut: string
+  /** D'où vient la candidature : `ALL`, `APPLICATION` (spontanée) ou `MANUAL` (ajout). */
+  source: string
   equipesSouhaitees: string[]
   presence: string[]
   equipesAssignees: string[]
@@ -46,6 +51,7 @@ function listeDepuisUrl(brut: unknown): string[] {
 export function filtresDepuisUrl(query: Record<string, unknown>): FiltresDeCandidatures {
   return {
     statut: typeof query.status === 'string' && query.status ? query.status : STATUT_PAR_DEFAUT,
+    source: typeof query.source === 'string' && query.source ? query.source : SOURCE_PAR_DEFAUT,
     equipesSouhaitees: listeDepuisUrl(query.teams),
     presence: listeDepuisUrl(query.presence),
     equipesAssignees: listeDepuisUrl(query.assignedTeams),
@@ -68,6 +74,7 @@ export function requeteCandidatures(
   // refusé par le linter, et l'omission dit la même chose sans détour.
   const {
     status: _s,
+    source: _so,
     teams: _t,
     presence: _p,
     assignedTeams: _a,
@@ -82,6 +89,7 @@ export function requeteCandidatures(
   }
 
   poser('status', filtres.statut === STATUT_PAR_DEFAUT ? '' : filtres.statut)
+  poser('source', filtres.source === SOURCE_PAR_DEFAUT ? '' : filtres.source)
   poser('teams', filtres.equipesSouhaitees.join(','))
   poser('presence', filtres.presence.join(','))
   poser('assignedTeams', filtres.equipesAssignees.join(','))

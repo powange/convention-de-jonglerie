@@ -277,6 +277,23 @@
                   />
                 </div>
 
+                <!-- Filtre « à rembourser » : la seule question que cet écran ne savait pas
+                     poser — à qui doit-on encore de l'argent ? Un billet annulé qui avait été
+                     réglé reste une dette tant que personne n'a coché le remboursement. -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ $t('ticketing.orders.refund_filter_label') }}
+                  </label>
+                  <USelect
+                    v-model="filtres.remboursement"
+                    :items="refundOptions"
+                    value-key="value"
+                    size="md"
+                    class="w-full"
+                    :ui="{ content: 'min-w-fit' }"
+                  />
+                </div>
+
                 <!-- Filtre par statut de commande.
                      Placé avant le moyen de paiement, qui en dépend : une commande en attente n'a
                      pas encore de moyen, et une commande annulée n'en a plus de pertinent. -->
@@ -713,6 +730,17 @@
                       <UIcon name="i-heroicons-check-circle" class="h-3 w-3 mr-1" />
                       Entrée validée
                     </UBadge>
+                    <!-- La dette, ou son extinction. `refundDue` vient du serveur : un billet
+                         annulé qui n'avait jamais été réglé ne doit rien à personne, et ne porte
+                         donc aucun de ces deux badges. -->
+                    <UBadge v-if="item.refundDue !== null" color="warning" variant="soft">
+                      <UIcon name="i-heroicons-banknotes" class="h-3 w-3 mr-1" />
+                      {{ $t('ticketing.orders.to_refund_badge') }} · {{ money(item.refundDue) }}
+                    </UBadge>
+                    <UBadge v-else-if="item.refunded" color="success" variant="soft">
+                      <UIcon name="i-heroicons-banknotes" class="h-3 w-3 mr-1" />
+                      {{ $t('ticketing.orders.refunded_badge') }}
+                    </UBadge>
                   </div>
                   <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                     <div v-if="item.firstName || item.lastName">
@@ -794,7 +822,10 @@
                     </UBadge>
                   </div>
                   <!-- Menu d'actions du billet -->
-                  <UDropdownMenu :items="getItemMenuItems(item)" :ui="{ content: 'min-w-40' }">
+                  <UDropdownMenu
+                    :items="getItemMenuItems(item, order)"
+                    :ui="{ content: 'min-w-40' }"
+                  >
                     <UButton
                       icon="i-heroicons-ellipsis-vertical"
                       color="neutral"
@@ -1499,6 +1530,17 @@ interface TicketingOption {
 const options = ref<TicketingOption[]>([])
 
 // Options pour le filtre de statut d'entrée
+/**
+ * Options du filtre « à rembourser ».
+ *
+ * Deux valeurs seulement : tout, ou ce qu'on doit. « Déjà remboursé » n'est une question que
+ * personne ne pose — on cherche les dettes ouvertes, pas celles qui sont soldées.
+ */
+const refundOptions = computed(() => [
+  { label: $t('ticketing.orders.refund_filter_all'), value: 'all' },
+  { label: $t('ticketing.orders.refund_filter_due'), value: 'du' },
+])
+
 const entryStatusOptions = [
   { label: 'Tous les billets', value: 'all' },
   { label: 'Entrée validée', value: 'validated' },
@@ -1621,7 +1663,7 @@ const getOrderMenuItems = (order: Order) => {
 }
 
 // Génère les items du menu d'actions pour un billet
-const getItemMenuItems = (item: any) => {
+const getItemMenuItems = (item: any, order: any) => {
   const items: any[][] = []
   const isSpecialType =
     item.type === 'Donation' || item.type === 'Membership' || item.type === 'Payment'
@@ -1647,6 +1689,45 @@ const getItemMenuItems = (item: any) => {
         onSelect: () => showValidateModal(item),
       },
     ])
+  }
+
+  // Groupe 3 : annuler le billet, et dire si on a rendu l'argent.
+  //
+  // Deux gestes distincts, et c'est tout le propos : **annulé ne veut pas dire remboursé**. Un
+  // billet réglé puis annulé reste une dette tant que personne n'a coché la seconde ligne.
+  //
+  // Rien de tout cela sur une commande importée : la prochaine synchronisation réécrirait l'état
+  // du billet depuis la charge du fournisseur et effacerait l'annulation sans rien signaler.
+  if (!isSpecialType && !order.externalTicketing) {
+    const actions: any[] = [
+      item.state === 'Canceled'
+        ? {
+            label: $t('ticketing.orders.ticket_restore'),
+            icon: 'i-heroicons-arrow-uturn-left',
+            // Rétablir un billet remboursé le remettrait en circulation sans contrepartie : le
+            // serveur le refuse, l'écran le grise plutôt que de laisser tenter.
+            disabled: item.refunded === true,
+            onSelect: () => basculerAnnulation(item, false),
+          }
+        : {
+            label: $t('ticketing.orders.ticket_cancel'),
+            icon: 'i-heroicons-x-circle',
+            color: 'error' as const,
+            onSelect: () => basculerAnnulation(item, true),
+          },
+    ]
+
+    if (item.state === 'Canceled') {
+      actions.push({
+        label: item.refunded
+          ? $t('ticketing.orders.refund_mark_undone')
+          : $t('ticketing.orders.refund_mark_done'),
+        icon: item.refunded ? 'i-heroicons-arrow-uturn-left' : 'i-heroicons-banknotes',
+        onSelect: () => basculerRemboursement(item, !item.refunded),
+      })
+    }
+
+    items.push(actions)
   }
 
   // Si aucune action disponible
@@ -1753,6 +1834,69 @@ const { execute: executeUpdatePaymentMethod, loading: isUpdatingPaymentMethod } 
 const updatePaymentMethod = () => {
   if (!selectedOrder.value || !selectedPaymentMethod.value) return
   executeUpdatePaymentMethod()
+}
+
+/**
+ * Annuler un billet, ou dire qu'on a rendu l'argent.
+ *
+ * Deux actions, un seul billet à la fois : le même motif que la méthode de paiement juste
+ * au-dessus — une référence tenue dans un `ref`, que l'URL et le corps relisent au moment de
+ * l'appel.
+ */
+const billetEnCours = ref<any>(null)
+const annulationDemandee = ref(false)
+const remboursementDemande = ref(false)
+
+const { execute: executerAnnulation } = useApiAction(
+  () => `/api/editions/${editionId}/ticketing/order-items/${billetEnCours.value?.id}/cancellation`,
+  {
+    method: 'PATCH',
+    body: () => ({ canceled: annulationDemandee.value }),
+    // Le message dépend du SENS de la bascule, que `successMessage` — statique — ne peut pas
+    // exprimer. D'où le toast posé ici, comme le fait déjà le reste de cet écran.
+    errorMessages: { default: $t('ticketing.orders.ticket_cancel_error') },
+    onSuccess: async () => {
+      useToast().add({
+        title: annulationDemandee.value
+          ? $t('ticketing.orders.ticket_canceled')
+          : $t('ticketing.orders.ticket_restored'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+      await loadOrders()
+    },
+  }
+)
+
+const { execute: executerRemboursement } = useApiAction(
+  () => `/api/editions/${editionId}/ticketing/order-items/${billetEnCours.value?.id}/refund`,
+  {
+    method: 'PATCH',
+    body: () => ({ refunded: remboursementDemande.value }),
+    errorMessages: { default: $t('ticketing.orders.refund_error') },
+    onSuccess: async () => {
+      useToast().add({
+        title: remboursementDemande.value
+          ? $t('ticketing.orders.refund_recorded')
+          : $t('ticketing.orders.refund_undone'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      })
+      await loadOrders()
+    },
+  }
+)
+
+const basculerAnnulation = (item: any, annuler: boolean) => {
+  billetEnCours.value = item
+  annulationDemandee.value = annuler
+  executerAnnulation()
+}
+
+const basculerRemboursement = (item: any, rembourser: boolean) => {
+  billetEnCours.value = item
+  remboursementDemande.value = rembourser
+  executerRemboursement()
 }
 
 // Modal et logique de validation/invalidation d'entrée

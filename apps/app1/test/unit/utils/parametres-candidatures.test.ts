@@ -95,6 +95,7 @@ describe('parametresDeFiltre', () => {
       'assignedTeams',
       'presence',
       'search',
+      'source',
       'status',
       'teams',
     ])

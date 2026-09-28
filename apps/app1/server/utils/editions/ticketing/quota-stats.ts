@@ -1,3 +1,4 @@
+import { billetsQuiComptent } from '../../ticketing/billets-qui-comptent'
 import { reponseDesigneLeChamp } from '../../ticketing/rapprochement-champ'
 
 export interface QuotaStats {
@@ -22,10 +23,12 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
         include: {
           tier: {
             include: {
+              // `billetsQuiComptent` plutôt qu'un filtre écrit ici : la règle ne regardait que
+              // l'état de la LIGNE et jamais le statut de sa commande, si bien qu'une commande
+              // remboursée gardait sa place dans les quotas — deux en production. Une règle
+              // recopiée finit toujours par diverger de son original.
               orderItems: {
-                where: {
-                  state: { in: ['Processed', 'Pending'] }, // Billets payés et en attente
-                },
+                where: billetsQuiComptent(editionId),
               },
             },
           },
@@ -62,12 +65,7 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
   // On inclut les billets payés (Processed) et en attente de paiement (Pending)
   // On inclut les billets externes (HelloAsso) ET manuels
   const allOrderItems = await prisma.ticketingOrderItem.findMany({
-    where: {
-      state: { in: ['Processed', 'Pending'] },
-      order: {
-        editionId: editionId,
-      },
-    },
+    where: billetsQuiComptent(editionId),
     select: {
       id: true,
       customFields: true,
@@ -92,10 +90,7 @@ export async function getQuotaStats(editionId: number): Promise<QuotaStats[]> {
    */
   const optionsPrises = await prisma.ticketingOrderItemOption.findMany({
     where: {
-      orderItem: {
-        state: { in: ['Processed', 'Pending'] },
-        order: { editionId },
-      },
+      orderItem: billetsQuiComptent(editionId),
     },
     select: {
       optionId: true,
