@@ -242,47 +242,11 @@
                 </div>
               </div>
 
-              <!-- Notes de l'organisateur -->
-              <div
-                v-if="application.organizerNotes && application.status !== 'PENDING'"
-                class="p-4 rounded-lg border"
-                :class="{
-                  'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800':
-                    application.status === 'ACCEPTED',
-                  'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800':
-                    application.status === 'REJECTED',
-                }"
-              >
-                <h4
-                  class="font-medium mb-2 flex items-center gap-2"
-                  :class="{
-                    'text-green-800 dark:text-green-200': application.status === 'ACCEPTED',
-                    'text-red-800 dark:text-red-200': application.status === 'REJECTED',
-                  }"
-                >
-                  <UIcon
-                    :name="
-                      application.status === 'ACCEPTED'
-                        ? 'i-heroicons-check-circle'
-                        : 'i-heroicons-x-circle'
-                    "
-                    :class="{
-                      'text-green-600 dark:text-green-400': application.status === 'ACCEPTED',
-                      'text-red-600 dark:text-red-400': application.status === 'REJECTED',
-                    }"
-                  />
-                  {{ $t('pages.artists.organizer_notes') }}
-                </h4>
-                <p
-                  class="text-sm"
-                  :class="{
-                    'text-green-700 dark:text-green-300': application.status === 'ACCEPTED',
-                    'text-red-700 dark:text-red-300': application.status === 'REJECTED',
-                  }"
-                >
-                  {{ application.organizerNotes }}
-                </p>
-              </div>
+              <!--
+                Les notes de l'organisateur ne sont plus affichées ici : ce sont des notes internes
+                à l'équipe d'organisation, et l'API ne les renvoie plus. Ce qu'un organisateur veut
+                dire à l'artiste passe par la discussion, juste en dessous.
+              -->
 
               <!-- Bouton pour ouvrir la discussion -->
               <UButton
