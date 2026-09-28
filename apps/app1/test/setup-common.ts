@@ -27,6 +27,12 @@ if (!(globalThis as any).getRouterParam)
 if (!(globalThis as any).getRouterParams)
   (globalThis as any).getRouterParams = vi.fn((event: any) => event?.context?.params ?? {})
 
+// `checkAdminMode` lit `getQuery(event).adminMode` en dernier recours : sans ce repli, tout code
+// qui traverse la vérification du mode admin échoue sur « getQuery is not defined » au lieu de
+// rendre son verdict. Un objet vide, donc, et non `undefined` : c'est une requête sans paramètre.
+if (!(globalThis as any).getQuery)
+  (globalThis as any).getQuery = vi.fn((event: any) => event?.context?.query ?? {})
+
 if (!(globalThis as any).getHeader) (globalThis as any).getHeader = vi.fn()
 
 if (!(globalThis as any).setHeader) (globalThis as any).setHeader = vi.fn()

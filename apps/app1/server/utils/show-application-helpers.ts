@@ -1,4 +1,4 @@
-import { checkAdminMode } from './organizer-management'
+import { canManageArtistsById } from './permissions/edition-permissions'
 
 import type { H3Event, EventHandlerRequest } from 'h3'
 
@@ -17,14 +17,33 @@ export interface ShowApplicationAccess {
     }
   }
   isArtist: boolean
-  isOrganizer: boolean
-  isAdminMode: boolean
+  /**
+   * Le droit de gestion des artistes sur cette édition, tel que `canManageArtistsById` le
+   * décide : créateur de l'édition, auteur de la convention, organisateur habilité au niveau
+   * convention ou par édition, ou admin en mode admin. C'est un seul champ et non un couple
+   * « organisateur / admin » : la distinction n'était lue par personne, et l'entretenir avait
+   * fini par produire deux règles d'accès divergentes.
+   */
+  peutGererLesArtistes: boolean
   editionId: number
   conventionId: number
 }
 
 /**
- * Vérifie l'accès à une candidature de spectacle
+ * Vérifie l'accès à une candidature de spectacle : son artiste, ou quelqu'un qui a le droit de
+ * gérer les artistes de l'édition.
+ *
+ * Ce droit est celui de `canManageArtistsById`, et c'est volontairement le MÊME appel que celui
+ * de la fiche de candidature et de son PATCH. Ces deux fonctions énuméraient auparavant leur
+ * propre règle, et elles avaient divergé de celle-là sur deux points, en sens contraires :
+ *
+ * - l'auteur d'une convention et le créateur d'une édition n'y étaient pas. Or la ligne
+ *   organisateur créée à la création d'une convention n'a pas `canManageArtists` (défaut `false`,
+ *   `conventions/index.post.ts`). L'auteur ouvrait donc la fiche d'une candidature et recevait un
+ *   403 sur sa conversation ;
+ * - un simple `EditionOrganizer`, en repli, l'ouvrait à quelqu'un qui ne peut pas voir la
+ *   candidature. Ce repli est supprimé : il donnait accès aux échanges d'un artiste à tout
+ *   organisateur inscrit comme présent sur l'édition, sans aucun droit sur les artistes.
  *
  * @param event - L'événement H3
  * @param userId - L'ID de l'utilisateur authentifié
@@ -77,46 +96,11 @@ export async function requireShowApplicationAccess(
   const editionId = application.showCall.edition.id
   const conventionId = application.showCall.edition.conventionId
 
-  // Vérifier si l'utilisateur est organisateur avec droits canManageArtists
-  let isOrganizer = false
-  if (!isArtist) {
-    const organizerWithRights = await prisma.conventionOrganizer.findFirst({
-      where: {
-        conventionId,
-        userId,
-        OR: [
-          { canManageArtists: true },
-          {
-            perEditionPermissions: {
-              some: {
-                editionId,
-                canManageArtists: true,
-              },
-            },
-          },
-        ],
-      },
-    })
-    isOrganizer = !!organizerWithRights
+  const peutGererLesArtistes = isArtist
+    ? false
+    : await canManageArtistsById(editionId, userId, event)
 
-    // Fallback : vérifier si c'est un organisateur de l'édition (sans droits spécifiques)
-    if (!isOrganizer) {
-      const editionOrganizer = await prisma.editionOrganizer.findFirst({
-        where: {
-          editionId,
-          organizer: {
-            userId,
-          },
-        },
-      })
-      isOrganizer = !!editionOrganizer
-    }
-  }
-
-  // Les admins ont accès à toutes les candidatures
-  const isAdminMode = await checkAdminMode(userId, event)
-
-  if (!isArtist && !isOrganizer && !isAdminMode) {
+  if (!isArtist && !peutGererLesArtistes) {
     throw createError({
       status: 403,
       message: 'Accès non autorisé',
@@ -126,20 +110,22 @@ export async function requireShowApplicationAccess(
   return {
     application,
     isArtist,
-    isOrganizer,
-    isAdminMode,
+    peutGererLesArtistes,
     editionId,
     conventionId,
   }
 }
 
 /**
- * Vérifie l'accès à une conversation de type ARTIST_APPLICATION
- * Utilisé par les endpoints messenger pour permettre l'accès aux non-participants
+ * Vérifie l'accès à une conversation de type ARTIST_APPLICATION.
+ * Utilisé par les endpoints messenger pour permettre l'accès aux non-participants.
+ *
+ * Même règle que `requireShowApplicationAccess` ci-dessus, et pour la même raison : lire les
+ * échanges d'une candidature ne peut pas être plus ou moins ouvert que lire la candidature.
  *
  * @param conversationId - L'ID de la conversation
  * @param userId - L'ID de l'utilisateur
- * @param event - L'événement H3 (pour checkAdminMode)
+ * @param event - L'événement H3 (le mode admin s'y lit)
  * @returns true si l'accès est autorisé
  * @throws 403 si l'accès est refusé
  */
@@ -160,7 +146,6 @@ export async function checkArtistApplicationConversationAccess(
               edition: {
                 select: {
                   id: true,
-                  conventionId: true,
                 },
               },
             },
@@ -181,44 +166,8 @@ export async function checkArtistApplicationConversationAccess(
   const { showApplication } = conversation
   const isArtist = showApplication.userId === userId
   const editionId = showApplication.showCall.edition.id
-  const conventionId = showApplication.showCall.edition.conventionId
 
-  // Vérifier les droits organisateur
-  let isOrganizer = false
-  if (!isArtist) {
-    const organizerWithRights = await prisma.conventionOrganizer.findFirst({
-      where: {
-        conventionId,
-        userId,
-        OR: [
-          { canManageArtists: true },
-          {
-            perEditionPermissions: {
-              some: {
-                editionId,
-                canManageArtists: true,
-              },
-            },
-          },
-        ],
-      },
-    })
-    isOrganizer = !!organizerWithRights
-
-    if (!isOrganizer) {
-      const editionOrganizer = await prisma.editionOrganizer.findFirst({
-        where: {
-          editionId,
-          organizer: { userId },
-        },
-      })
-      isOrganizer = !!editionOrganizer
-    }
-  }
-
-  const isAdminMode = await checkAdminMode(userId, event)
-
-  if (!isArtist && !isOrganizer && !isAdminMode) {
+  if (!isArtist && !(await canManageArtistsById(editionId, userId, event))) {
     throw createError({
       status: 403,
       message: "Vous n'avez pas accès à cette conversation",
