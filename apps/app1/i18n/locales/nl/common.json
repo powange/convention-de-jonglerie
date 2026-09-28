@@ -395,7 +395,13 @@
       "volunteer_management": "Vrijwilligersbeheer",
       "free_order_title": "Niets te betalen",
       "free_order_help": "Het orderbedrag is nul: de bestelling wordt als voldaan geregistreerd, zonder betaalmethode te kiezen.",
-      "order_payment_title": "Betaling van de bestelling"
+      "order_payment_title": "Betaling van de bestelling",
+      "refund_already_done": "Terugbetaling uitgevoerd",
+      "refund_amount_label": "Terug te betalen bedrag",
+      "refund_confirm_description": "Bevestig je dat je {amount} aan {name} hebt terugbetaald? Het ticket verschijnt dan niet meer bij de nog terug te betalen tickets.",
+      "refund_confirm_title": "Terugbetaling bevestigen",
+      "refund_mark_done": "Terugbetaald",
+      "refund_undo": "Terugbetaling ongedaan maken"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Nuttige links",

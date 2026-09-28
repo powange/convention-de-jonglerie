@@ -395,7 +395,13 @@
       "volunteer_management": "Управління волонтерами",
       "free_order_title": "Немає чого сплачувати",
       "free_order_help": "Сума замовлення нульова: воно записується як оплачене, без вибору способу оплати.",
-      "order_payment_title": "Оплата замовлення"
+      "order_payment_title": "Оплата замовлення",
+      "refund_already_done": "Повернення виконано",
+      "refund_amount_label": "Сума до повернення",
+      "refund_confirm_description": "Ви підтверджуєте, що повернули {amount} учаснику {name}? Квиток більше не відображатиметься серед тих, за якими ще потрібно повернути кошти.",
+      "refund_confirm_title": "Підтвердити повернення",
+      "refund_mark_done": "Повернено",
+      "refund_undo": "Скасувати повернення"
     },
     "ticketing_title": "Продаж квитків",
     "useful_links": "Корисні посилання",

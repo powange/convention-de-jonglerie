@@ -652,6 +652,8 @@
     "validation_summary_title": "Det saknas uppgifter för att skicka din ansökan",
     "team_periods": "Insatsperioder",
     "team_periods_hint": "Bara volontärer som är på plats under någon av dessa perioder ser det här laget bland sina önskemål",
-    "team_periods_required": "Kryssa i minst en period"
+    "team_periods_required": "Kryssa i minst en period",
+    "filter_source": "Filtrera efter ursprung",
+    "source_all": "Alla ursprung"
   }
 }

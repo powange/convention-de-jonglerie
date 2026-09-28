@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest'
 
-import { decisionSuppression } from '../../../../../layers/ticketing/server/utils/synchronisation-helloasso'
+import {
+  decisionSuppression,
+  statutDeCommandeHelloAsso,
+  suitesDeLAnnulationSource,
+} from '../../../../../layers/ticketing/server/utils/synchronisation-helloasso'
 
 const tarif = (id: number, helloAssoTierId: number | null, name = `Tarif ${id}`) => ({
   id,
@@ -104,5 +108,73 @@ describe('decisionSuppression', () => {
     const { aSupprimer, refus } = decisionSuppression(existants, new Set([1]), ESPECE_TARIF)
     expect(aSupprimer.map((t) => t.id)).toEqual([2, 3, 4, 5])
     expect(refus).toBeUndefined()
+  })
+})
+
+describe('suitesDeLAnnulationSource', () => {
+  const maintenant = new Date('2026-10-02T09:00:00Z')
+
+  it('ne fait rien tant que la source n’annule pas', () => {
+    expect(
+      suitesDeLAnnulationSource({ sourceCanceledAt: null, refunded: false }, false, maintenant)
+    ).toEqual({})
+  })
+
+  it('tient pour remboursée, par la plateforme, une ligne que HelloAsso annule', () => {
+    // Sans quoi le guichet réclamait au bénévole une somme que HelloAsso avait déjà rendue.
+    expect(
+      suitesDeLAnnulationSource({ sourceCanceledAt: null, refunded: false }, true, maintenant)
+    ).toEqual({
+      sourceCanceledAt: maintenant,
+      refunded: true,
+      refundedAt: null,
+      refundedById: null,
+    })
+  })
+
+  it('applique la même règle à une ligne créée déjà annulée', () => {
+    expect(suitesDeLAnnulationSource(null, true, maintenant)).toEqual({
+      sourceCanceledAt: maintenant,
+      refunded: true,
+      refundedAt: null,
+      refundedById: null,
+    })
+  })
+
+  it('garde un remboursement fait ici, pour que l’alerte de double remboursement s’allume', () => {
+    // Écraser `refundedById` par nul éteindrait l'alerte, qui l'exige.
+    expect(
+      suitesDeLAnnulationSource({ sourceCanceledAt: null, refunded: true }, true, maintenant)
+    ).toEqual({
+      sourceCanceledAt: maintenant,
+    })
+  })
+
+  it('ne revient pas sur une annulation déjà notée — un remboursement défait au guichet le reste', () => {
+    expect(
+      suitesDeLAnnulationSource(
+        { sourceCanceledAt: new Date('2026-10-01'), refunded: false },
+        true,
+        maintenant
+      )
+    ).toEqual({})
+  })
+})
+
+describe('statutDeCommandeHelloAsso', () => {
+  it('annule la commande quand HelloAsso a annulé toutes ses lignes', () => {
+    expect(statutDeCommandeHelloAsso([true, true, true])).toBe('Refunded')
+  })
+
+  it('la laisse payée tant qu’une ligne vaut encore', () => {
+    expect(statutDeCommandeHelloAsso([true, false, true])).toBe('Processed')
+  })
+
+  it('la laisse payée quand rien n’est annulé', () => {
+    expect(statutDeCommandeHelloAsso([false])).toBe('Processed')
+  })
+
+  it('ne tient pas pour annulée une commande sans ligne', () => {
+    expect(statutDeCommandeHelloAsso([])).toBe('Processed')
   })
 })

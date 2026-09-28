@@ -77,6 +77,9 @@ export default wrapApiHandler(
         include: {
           order: {
             include: {
+              // La provenance, comme au scan : sans elle, une commande HelloAsso ouverte depuis
+              // la recherche s'affichait avec le logo du site.
+              externalTicketing: { select: { provider: true } },
               items: {
                 include: {
                   tier: {
@@ -596,6 +599,8 @@ export default wrapApiHandler(
               order: {
                 id: item.order.helloAssoOrderId,
                 status: item.order.status,
+                /** `null` quand la commande a été saisie sur place. */
+                provider: item.order.externalTicketing?.provider ?? null,
                 payer: {
                   firstName: item.order.payerFirstName,
                   lastName: item.order.payerLastName,

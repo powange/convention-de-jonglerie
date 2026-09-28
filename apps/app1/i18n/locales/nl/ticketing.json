@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} deelnemer gesynchroniseerd vanaf HelloAsso | {count} deelnemers gesynchroniseerd vanaf HelloAsso",
       "sync_helloasso_success_title": "Synchronisatie geslaagd",
       "validate_error": "De deelnemers konden niet worden gevalideerd",
-      "verify_error": "Het ticket kon niet worden gecontroleerd"
+      "verify_error": "Het ticket kon niet worden gecontroleerd",
+      "refund_error": "De terugbetaling kon niet worden geregistreerd",
+      "refund_recorded": "Terugbetaling geregistreerd",
+      "refund_undone": "Terugbetaling ongedaan gemaakt"
     },
     "counters": {
       "connected": "Verbonden",
@@ -247,7 +250,23 @@
       "status_pending": "Wacht op betaling",
       "status_processed": "Online betaald",
       "tier_origin_external": "Gesynchroniseerd vanaf {fournisseur}",
-      "tier_origin_manual": "Aangemaakt op de site"
+      "tier_origin_manual": "Aangemaakt op de site",
+      "double_refund_badge": "Aan beide kanten terugbetaald",
+      "refund_error": "Fout bij het registreren van de terugbetaling",
+      "refund_filter_all": "Alle tickets",
+      "refund_filter_due": "Terug te betalen",
+      "refund_filter_label": "Terugbetaling",
+      "refund_mark_done": "Markeren als terugbetaald",
+      "refund_mark_undone": "Terugbetaling ongedaan maken",
+      "refund_recorded": "Terugbetaling geregistreerd",
+      "refund_undone": "Terugbetaling ongedaan gemaakt",
+      "refunded_badge": "Terugbetaald",
+      "ticket_cancel": "Dit ticket annuleren",
+      "ticket_cancel_error": "Fout bij het annuleren van het ticket",
+      "ticket_canceled": "Ticket geannuleerd",
+      "ticket_restore": "Dit ticket herstellen",
+      "ticket_restored": "Ticket hersteld",
+      "to_refund_badge": "Terug te betalen"
     },
     "participant": {
       "entry_validated": "Toegang al gevalideerd",

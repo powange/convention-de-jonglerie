@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} účastník synchronizován z HelloAsso | {count} účastníci synchronizováni z HelloAsso | {count} účastníků synchronizováno z HelloAsso",
       "sync_helloasso_success_title": "Synchronizace proběhla úspěšně",
       "validate_error": "Účastníky se nepodařilo ověřit",
-      "verify_error": "Vstupenku se nepodařilo ověřit"
+      "verify_error": "Vstupenku se nepodařilo ověřit",
+      "refund_error": "Vrácení peněz se nepodařilo zaznamenat",
+      "refund_recorded": "Vrácení peněz zaznamenáno",
+      "refund_undone": "Vrácení peněz zrušeno"
     },
     "counters": {
       "connected": "Připojeno",
@@ -247,7 +250,23 @@
       "status_pending": "Čeká na platbu",
       "status_processed": "Zaplaceno online",
       "tier_origin_external": "Synchronizováno z {fournisseur}",
-      "tier_origin_manual": "Vytvořeno na webu"
+      "tier_origin_manual": "Vytvořeno na webu",
+      "double_refund_badge": "Vráceno na obou stranách",
+      "refund_error": "Chyba při zaznamenávání vrácení peněz",
+      "refund_filter_all": "Všechny vstupenky",
+      "refund_filter_due": "K vrácení",
+      "refund_filter_label": "Vrácení peněz",
+      "refund_mark_done": "Označit jako vrácené",
+      "refund_mark_undone": "Zrušit vrácení peněz",
+      "refund_recorded": "Vrácení peněz zaznamenáno",
+      "refund_undone": "Vrácení peněz zrušeno",
+      "refunded_badge": "Vráceno",
+      "ticket_cancel": "Zrušit tuto vstupenku",
+      "ticket_cancel_error": "Chyba při rušení vstupenky",
+      "ticket_canceled": "Vstupenka zrušena",
+      "ticket_restore": "Obnovit tuto vstupenku",
+      "ticket_restored": "Vstupenka obnovena",
+      "to_refund_badge": "K vrácení"
     },
     "participant": {
       "entry_validated": "Položka již byla ověřena",

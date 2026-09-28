@@ -652,6 +652,8 @@
     "validation_summary_title": "Brakuje informacji, aby wysłać zgłoszenie",
     "team_periods": "Okresy pracy",
     "team_periods_hint": "Tylko wolontariusze obecni w jednym z tych okresów zobaczą ten zespół w swoich preferencjach",
-    "team_periods_required": "Zaznacz co najmniej jeden okres"
+    "team_periods_required": "Zaznacz co najmniej jeden okres",
+    "filter_source": "Filtruj według źródła",
+    "source_all": "Wszystkie źródła"
   }
 }

@@ -8,11 +8,16 @@
   >
     <template #body>
       <div class="space-y-4">
-        <!-- Indicateur d'étapes (masqué pour l'étape de choix du type) -->
+        <!-- Indicateur d'étapes (masqué pour l'étape de choix du type).
+
+             Sur un écran étroit, les cinq libellés se chevauchaient en une seule ligne illisible.
+             Ils y sont masqués : le titre de la modale nomme déjà l'étape en cours, et les
+             pastilles numérotées suffisent à dire où l'on en est. -->
         <UStepper
           v-if="currentStep >= 0"
           v-model="currentStep"
           :items="stepperItems"
+          :ui="{ wrapper: 'hidden sm:block' }"
           class="mb-6"
         />
 

@@ -57,7 +57,10 @@
       "sync_helloasso_success_count": "{count} учасника синхронізовано з HelloAsso | {count} учасники синхронізовано з HelloAsso | {count} учасників синхронізовано з HelloAsso",
       "sync_helloasso_success_title": "Синхронізацію виконано",
       "validate_error": "Не вдалося підтвердити учасників",
-      "verify_error": "Не вдалося перевірити квиток"
+      "verify_error": "Не вдалося перевірити квиток",
+      "refund_error": "Не вдалося зареєструвати повернення",
+      "refund_recorded": "Повернення зареєстровано",
+      "refund_undone": "Повернення скасовано"
     },
     "counters": {
       "connected": "Підключено",
@@ -247,7 +250,23 @@
       "status_pending": "Очікує оплати",
       "status_processed": "Оплачено онлайн",
       "tier_origin_external": "Синхронізовано з {fournisseur}",
-      "tier_origin_manual": "Створено на сайті"
+      "tier_origin_manual": "Створено на сайті",
+      "double_refund_badge": "Повернено з обох сторін",
+      "refund_error": "Помилка під час реєстрації повернення",
+      "refund_filter_all": "Усі квитки",
+      "refund_filter_due": "До повернення",
+      "refund_filter_label": "Повернення",
+      "refund_mark_done": "Позначити як повернене",
+      "refund_mark_undone": "Скасувати повернення",
+      "refund_recorded": "Повернення зареєстровано",
+      "refund_undone": "Повернення скасовано",
+      "refunded_badge": "Повернено",
+      "ticket_cancel": "Анулювати цей квиток",
+      "ticket_cancel_error": "Помилка під час анулювання квитка",
+      "ticket_canceled": "Квиток анульовано",
+      "ticket_restore": "Відновити цей квиток",
+      "ticket_restored": "Квиток відновлено",
+      "to_refund_badge": "До повернення"
     },
     "participant": {
       "entry_validated": "Вхід вже підтверджено",

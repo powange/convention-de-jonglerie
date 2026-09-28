@@ -1092,7 +1092,8 @@
       "export_origin": "Pochodzenie",
       "export_origin_computed": "Obliczone",
       "export_origin_manual": "Wprowadzone",
-      "open_receipt_new_tab": "Otwórz dowód w nowej karcie"
+      "open_receipt_new_tab": "Otwórz dowód w nowej karcie",
+      "entry_operation_date": "Data operacji"
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

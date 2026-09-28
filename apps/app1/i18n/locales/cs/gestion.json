@@ -1092,7 +1092,8 @@
       "export_origin": "Původ",
       "export_origin_computed": "Vypočteno",
       "export_origin_manual": "Zadáno",
-      "open_receipt_new_tab": "Otevřít doklad na nové kartě"
+      "open_receipt_new_tab": "Otevřít doklad na nové kartě",
+      "entry_operation_date": "Datum operace"
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

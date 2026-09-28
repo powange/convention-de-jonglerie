@@ -395,7 +395,13 @@
       "volunteer_management": "Gestión de voluntarios",
       "free_order_title": "Nada que pagar",
       "free_order_help": "El importe del pedido es cero: se registra como abonado, sin necesidad de elegir un método de pago.",
-      "order_payment_title": "Pago del pedido"
+      "order_payment_title": "Pago del pedido",
+      "refund_already_done": "Reembolso realizado",
+      "refund_amount_label": "Importe a reembolsar",
+      "refund_confirm_description": "¿Confirma que ha devuelto {amount} a {name}? La entrada dejará de aparecer entre las que quedan por reembolsar.",
+      "refund_confirm_title": "Confirmar el reembolso",
+      "refund_mark_done": "Reembolsado",
+      "refund_undo": "Anular el reembolso"
     },
     "ticketing_title": "Venta de entradas",
     "useful_links": "Enlaces útiles",

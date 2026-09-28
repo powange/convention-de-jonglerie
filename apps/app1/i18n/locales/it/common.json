@@ -395,7 +395,13 @@
       "volunteer_management": "Gestione volontari",
       "free_order_title": "Nulla da pagare",
       "free_order_help": "L'importo dell'ordine è zero: viene registrato come saldato, senza dover scegliere un metodo di pagamento.",
-      "order_payment_title": "Pagamento dell'ordine"
+      "order_payment_title": "Pagamento dell'ordine",
+      "refund_already_done": "Rimborso effettuato",
+      "refund_amount_label": "Importo da rimborsare",
+      "refund_confirm_description": "Confermi di aver restituito {amount} a {name}? Il biglietto non comparirà più tra quelli ancora da rimborsare.",
+      "refund_confirm_title": "Conferma il rimborso",
+      "refund_mark_done": "Rimborsato",
+      "refund_undo": "Annulla il rimborso"
     },
     "ticketing_title": "Biglietteria",
     "useful_links": "Link utili",

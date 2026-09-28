@@ -652,6 +652,8 @@
     "validation_summary_title": "Faltam informações para enviar a sua candidatura",
     "team_periods": "Períodos de intervenção",
     "team_periods_hint": "Só os voluntários presentes num destes períodos verão esta equipa nas suas preferências",
-    "team_periods_required": "Marque pelo menos um período"
+    "team_periods_required": "Marque pelo menos um período",
+    "filter_source": "Filtrar por origem",
+    "source_all": "Todas as origens"
   }
 }

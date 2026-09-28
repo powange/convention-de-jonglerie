@@ -1092,7 +1092,8 @@
       "export_origin": "Origen",
       "export_origin_computed": "Calculado",
       "export_origin_manual": "Introducido",
-      "open_receipt_new_tab": "Abrir el justificante en una pestaña nueva"
+      "open_receipt_new_tab": "Abrir el justificante en una pestaña nueva",
+      "entry_operation_date": "Fecha de la operación"
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

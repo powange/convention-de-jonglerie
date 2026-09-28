@@ -1092,7 +1092,8 @@
       "export_origin": "Herkunft",
       "export_origin_computed": "Berechnet",
       "export_origin_manual": "Eingegeben",
-      "open_receipt_new_tab": "Beleg in einem neuen Tab öffnen"
+      "open_receipt_new_tab": "Beleg in einem neuen Tab öffnen",
+      "entry_operation_date": "Buchungsdatum"
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

@@ -395,7 +395,13 @@
       "volunteer_management": "Volunteer management",
       "free_order_title": "Nothing to pay",
       "free_order_help": "The order total is zero: it is recorded as settled, with no payment method to choose.",
-      "order_payment_title": "Order payment"
+      "order_payment_title": "Order payment",
+      "refund_already_done": "Refund completed",
+      "refund_amount_label": "Amount to refund",
+      "refund_confirm_description": "Do you confirm you have given {amount} back to {name}? The ticket will no longer appear among those still to be refunded.",
+      "refund_confirm_title": "Confirm the refund",
+      "refund_mark_done": "Refunded",
+      "refund_undo": "Undo the refund"
     },
     "ticketing_title": "Ticketing",
     "useful_links": "Useful links",

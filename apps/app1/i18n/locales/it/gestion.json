@@ -1092,7 +1092,8 @@
       "export_origin": "Origine",
       "export_origin_computed": "Calcolato",
       "export_origin_manual": "Inserito",
-      "open_receipt_new_tab": "Aprire il giustificativo in una nuova scheda"
+      "open_receipt_new_tab": "Aprire il giustificativo in una nuova scheda",
+      "entry_operation_date": "Data dell'operazione"
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",
