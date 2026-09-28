@@ -69,6 +69,24 @@ export interface PresenceDeclaree {
    * `null` à une borne veut dire « sans limite », comme pour les bénévoles.
    */
   fenetre: FenetrePresence
+  /**
+   * La validation d'entrée fait-elle foi comme moment d'arrivée ?
+   *
+   * **Vrai pour un participant** : le scan EST la porte, il ne peut pas être là sans elle. C'est la
+   * règle que l'utilisateur a fixée — début = le plus tardif de la validation et du début du tarif.
+   *
+   * **Faux pour un bénévole, un artiste ou un organisateur QUI A DÉCLARÉ sa date.** Leur scan est
+   * administratif : ils entrent par une autre porte et font valider leur billet quand ils y pensent.
+   * Mesuré sur la base de développement : 51 bénévoles sur 85 valident au moins un jour après leur
+   * arrivée déclarée, dont 22 trois ou quatre jours après — donc à la fin de l'édition. Prendre le
+   * plus tardif des deux les faisait apparaître au dernier jour alors qu'ils étaient là depuis le
+   * début.
+   *
+   * **Vrai à nouveau quand ils n'ont rien déclaré** : il ne reste alors qu'un repli — une case
+   * « disponible pendant l'événement » —, et s'en contenter les compterait présents dès l'ouverture
+   * sur une donnée plus vague que leur validation.
+   */
+  laValidationFaitLArrivee: boolean
 }
 
 /** Une personne, une fois ses titres réunis. */
@@ -90,16 +108,27 @@ export interface Tranche {
 /**
  * La présence effective d'un titre : ce que l'entrée et la fenêtre disent ensemble.
  *
- * Le début est le PLUS TARDIF des deux — l'entrée validée et le début déclaré. C'est la règle que
- * l'utilisateur a énoncée pour les participants, et elle vaut pour tous : « si le billet a été
- * validé avant même que le tarif ne commence, il faut prendre la date où le tarif commence ». Dans
- * l'autre sens, quelqu'un qui arrive après le début prévu n'était pas là avant.
+ * Deux régimes, et c'est `laValidationFaitLArrivee` qui tranche.
+ *
+ * **Quand la validation fait foi** — un participant, ou quelqu'un qui n'a rien déclaré — le début
+ * est le PLUS TARDIF des deux. C'est la règle que l'utilisateur a énoncée : « si le billet a été
+ * validé avant même que le tarif ne commence, il faut prendre la date où le tarif commence ». Et
+ * dans l'autre sens, quelqu'un qui arrive après le début prévu n'était pas là avant.
+ *
+ * **Quand elle ne fait pas foi** — un bénévole, un artiste ou un organisateur qui a DÉCLARÉ sa date
+ * — c'est la déclaration qui compte, quoi que dise le scan. Leur badge se fait valider quand ils y
+ * pensent, parfois le dernier jour, et prendre cette date les effaçait des premiers jours.
  */
 export function presenceEffective(presence: PresenceDeclaree): {
   debut: number
   fin: number | null
 } {
-  const { entree, fenetre } = presence
+  const { entree, fenetre, laValidationFaitLArrivee } = presence
+
+  if (!laValidationFaitLArrivee && fenetre.arrivee !== null) {
+    return { debut: fenetre.arrivee, fin: fenetre.depart }
+  }
+
   return {
     debut: fenetre.arrivee !== null ? Math.max(entree, fenetre.arrivee) : entree,
     fin: fenetre.depart,

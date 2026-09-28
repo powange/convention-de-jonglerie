@@ -43,6 +43,7 @@ describe('fenetreDuBillet', () => {
     expect(fenetreDuBillet(tarif, periodes)).toEqual({
       arrivee: Date.UTC(2026, 6, 10, 12),
       depart: Date.UTC(2026, 6, 11, 18),
+      arriveeDeclaree: true,
     })
   })
 
@@ -52,6 +53,8 @@ describe('fenetreDuBillet', () => {
     expect(fenetreDuBillet(null, periodes)).toEqual({
       arrivee: periodes.debut,
       depart: periodes.fin,
+      // Un repli, pas une déclaration : c'est ce drapeau qui décide si la validation fait foi.
+      arriveeDeclaree: false,
     })
   })
 
@@ -61,6 +64,7 @@ describe('fenetreDuBillet', () => {
     expect(fenetreDuBillet(tarif, periodes)).toEqual({
       arrivee: periodes.debut,
       depart: Date.UTC(2026, 6, 11),
+      arriveeDeclaree: false,
     })
   })
 
@@ -118,7 +122,11 @@ describe('fenetreDuBenevole', () => {
       FUSEAU
     )
 
-    expect(fenetre).toEqual({ arrivee: periodes.montage, depart: periodes.demontage })
+    expect(fenetre).toEqual({
+      arrivee: periodes.montage,
+      depart: periodes.demontage,
+      arriveeDeclaree: false,
+    })
   })
 
   it('préfère une date déclarée à la disponibilité', () => {
@@ -137,6 +145,7 @@ describe('fenetreDuBenevole', () => {
     expect(fenetreDuBenevole({}, periodes, FUSEAU)).toEqual({
       arrivee: periodes.debut,
       depart: periodes.fin,
+      arriveeDeclaree: false,
     })
   })
 
@@ -159,13 +168,14 @@ describe('fenetreDeLArtiste', () => {
     expect(fenetreDeLArtiste(artiste, periodes)).toEqual({
       arrivee: Date.UTC(2026, 6, 11, 14),
       depart: Date.UTC(2026, 6, 12, 9),
+      arriveeDeclaree: true,
     })
   })
 
   it('retombe sur l’événement hors montage et démontage', () => {
     // Le choix de l'utilisateur, et le cas de 54 artistes sur 89 : il vient jouer, pas monter.
     expect(fenetreDeLArtiste({ arrivalDateTime: null, departureDateTime: null }, periodes)).toEqual(
-      { arrivee: periodes.debut, depart: periodes.fin }
+      { arrivee: periodes.debut, depart: periodes.fin, arriveeDeclaree: false }
     )
   })
 })
@@ -191,6 +201,58 @@ describe('fenetreDeLOrganisateur', () => {
     expect(fenetreDeLOrganisateur({}, periodes, FUSEAU)).toEqual({
       arrivee: periodes.debut,
       depart: periodes.fin,
+      arriveeDeclaree: false,
     })
+  })
+})
+
+/**
+ * Le drapeau `arriveeDeclaree`, qui décide si la validation d'entrée fait foi.
+ *
+ * Vu ses conséquences, il mérite ses propres cas. Une arrivée DÉCLARÉE écarte la validation : mesuré
+ * sur la base de développement, 51 bénévoles sur 85 valident au moins un jour après leur arrivée
+ * déclarée, dont 22 trois ou quatre jours après — donc à la fin de l'édition, où ils font valider
+ * leur badge pour le comptage. Une arrivée seulement DÉDUITE d'un repli, en revanche, est plus vague
+ * que la validation : celle-ci reprend alors la main.
+ */
+describe('arriveeDeclaree', () => {
+  it('est vrai quand la date vient d’une déclaration', () => {
+    expect(
+      fenetreDuBenevole({ arrivalDateTime: '2026-07-10_morning' }, periodes, FUSEAU).arriveeDeclaree
+    ).toBe(true)
+    expect(
+      fenetreDeLOrganisateur({ arrivalDateTime: '2026-07-10_morning' }, periodes, FUSEAU)
+        .arriveeDeclaree
+    ).toBe(true)
+    expect(
+      fenetreDeLArtiste(
+        { arrivalDateTime: new Date(Date.UTC(2026, 6, 11)), departureDateTime: null },
+        periodes
+      ).arriveeDeclaree
+    ).toBe(true)
+  })
+
+  it('est faux quand la date vient d’un repli, aussi précis soit-il', () => {
+    // Une disponibilité de montage est un repli, pas une déclaration d'arrivée : la validation doit
+    // continuer de faire foi, sans quoi on compterait quelqu'un dès l'ouverture sur une case cochée.
+    expect(fenetreDuBenevole({ setupAvailability: true }, periodes, FUSEAU).arriveeDeclaree).toBe(
+      false
+    )
+    expect(fenetreDuBenevole({}, periodes, FUSEAU).arriveeDeclaree).toBe(false)
+  })
+
+  it('est faux quand la date est illisible', () => {
+    // Une donnée qu'on ne comprend pas ne vaut pas déclaration.
+    expect(
+      fenetreDuBenevole({ arrivalDateTime: 'n’importe quoi' }, periodes, FUSEAU).arriveeDeclaree
+    ).toBe(false)
+  })
+
+  it('suit la seule borne d’ARRIVÉE, pas celle de départ', () => {
+    // Déclarer son départ ne dit rien de son arrivée : le drapeau ne porte que sur cette dernière.
+    expect(
+      fenetreDuBenevole({ departureDateTime: '2026-07-12_evening' }, periodes, FUSEAU)
+        .arriveeDeclaree
+    ).toBe(false)
   })
 })
