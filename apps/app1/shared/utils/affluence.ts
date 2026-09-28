@@ -1,5 +1,5 @@
 /**
- * Combien de personnes sont sur place, et quand.
+ * Combien de personnes sont sur place, quand, et à quel titre.
  *
  * ## Pourquoi ce fichier existe
  *
@@ -15,7 +15,7 @@
  *
  * ## Ce que ce fichier ne fait pas
  *
- * Il ne lit pas la base : il reçoit des participants déjà résolus. C'est ce qui permet de le couvrir
+ * Il ne lit pas la base : il reçoit des présences déjà résolues. C'est ce qui permet de le couvrir
  * sans base ni réseau, alors qu'un total d'affluence faux reste un nombre parfaitement plausible.
  *
  * ⚠️ N'importe rien d'autre que ses voisins de `shared/` : il est chargé tel quel par les tests
@@ -24,18 +24,38 @@
 
 import type { FenetrePresence } from './presence-benevole'
 
-/** Une personne présente, telle que l'appelant l'a résolue depuis la base. */
-export interface ParticipantPresent {
+/**
+ * Les quatre populations du graphique, **dans l'ordre de priorité**.
+ *
+ * Cet ordre n'est pas décoratif : c'est lui qui décide dans quelle pile tombe une personne présente
+ * à deux titres. Choix de l'utilisateur — « le rôle engagé d'abord » : quelqu'un qui a un billet ET
+ * tient des créneaux est sur place comme bénévole, et le compter en participant sous-estimerait
+ * l'équipe, qui est le chiffre dont on se sert pour organiser.
+ *
+ * Mesuré sur l'édition 1 de la base de développement : 10 personnes sur 191 portent deux titres, 8
+ * billet + bénévole et 2 billet + artiste. Aucune n'en porte trois — l'ordre complet est donc
+ * surtout une précaution pour demain.
+ */
+export const POPULATIONS_AFFLUENCE = [
+  'organisateurs',
+  'artistes',
+  'benevoles',
+  'participants',
+] as const
+
+export type PopulationAffluence = (typeof POPULATIONS_AFFLUENCE)[number]
+
+/** Un titre à être là : une ligne du journal, résolue par l'appelant. */
+export interface PresenceDeclaree {
   /**
-   * Ce qui fait qu'une personne est UNE personne : son compte quand elle en a un, son adresse de
-   * courriel sinon, et en dernier recours sa clé technique.
+   * Ce qui fait qu'une personne est UNE personne : son adresse de courriel, et à défaut une clé
+   * technique préfixée par sa famille.
    *
-   * C'est ici que se joue le « personnes physiques » demandé : deux lignes de journal qui portent
-   * la même identité — un bénévole qui a aussi acheté un billet — ne comptent qu'une fois. Sans
-   * cela, l'affluence est surévaluée de 43 % sur l'édition 1 de la base de développement (274
-   * entrées pour 191 personnes).
+   * C'est ici que se joue le « personnes physiques » demandé. Sans ce rapprochement, l'affluence est
+   * surévaluée de 30 % sur l'édition 1 de la base de développement — 274 entrées pour 191 personnes.
    */
   identite: string
+  population: PopulationAffluence
   /**
    * L'instant de l'entrée validée, en millisecondes.
    *
@@ -51,6 +71,16 @@ export interface ParticipantPresent {
   fenetre: FenetrePresence
 }
 
+/** Une personne, une fois ses titres réunis. */
+export interface PersonnePresente {
+  identite: string
+  /** La population retenue : la plus engagée de ses titres. */
+  population: PopulationAffluence
+  debut: number
+  /** `null` : présente jusqu'au bout. */
+  fin: number | null
+}
+
 /** Une tranche de temps, bornes en millisecondes. `fin` est exclue. */
 export interface Tranche {
   debut: number
@@ -58,16 +88,18 @@ export interface Tranche {
 }
 
 /**
- * La présence effective d'un participant : ce que l'entrée et la fenêtre disent ensemble.
+ * La présence effective d'un titre : ce que l'entrée et la fenêtre disent ensemble.
  *
- * L'arrivée est la PLUS TARDIVE des deux — l'entrée validée et l'arrivée déclarée. Prendre la plus
- * précoce ferait compter quelqu'un avant qu'il ne soit là, sur la seule foi d'une déclaration.
+ * Le début est le PLUS TARDIF des deux — l'entrée validée et le début déclaré. C'est la règle que
+ * l'utilisateur a énoncée pour les participants, et elle vaut pour tous : « si le billet a été
+ * validé avant même que le tarif ne commence, il faut prendre la date où le tarif commence ». Dans
+ * l'autre sens, quelqu'un qui arrive après le début prévu n'était pas là avant.
  */
-export function presenceEffective(participant: ParticipantPresent): {
+export function presenceEffective(presence: PresenceDeclaree): {
   debut: number
   fin: number | null
 } {
-  const { entree, fenetre } = participant
+  const { entree, fenetre } = presence
   return {
     debut: fenetre.arrivee !== null ? Math.max(entree, fenetre.arrivee) : entree,
     fin: fenetre.depart,
@@ -75,23 +107,58 @@ export function presenceEffective(participant: ParticipantPresent): {
 }
 
 /**
- * Le participant est-il présent pendant cette tranche ?
+ * Réunit les titres d'une même personne en une seule présence.
+ *
+ * Deux règles, et la seconde est moins évidente que la première :
+ *
+ * 1. **la population retenue est la plus engagée** (voir `POPULATIONS_AFFLUENCE`) ;
+ * 2. **la fenêtre est l'UNION** de celles de ses titres. Un bénévole qui a aussi un pass week-end
+ *    est sur place tant que l'un des deux le dit : ne garder que la fenêtre du titre gagnant le
+ *    ferait disparaître du vendredi parce qu'il ne tient de créneau que le samedi. Il est bien là,
+ *    et il y est comme bénévole.
+ */
+export function reunirLesTitres(presences: readonly PresenceDeclaree[]): PersonnePresente[] {
+  const parPersonne = new Map<string, PersonnePresente>()
+
+  for (const presence of presences) {
+    const { debut, fin } = presenceEffective(presence)
+    const connue = parPersonne.get(presence.identite)
+
+    if (!connue) {
+      parPersonne.set(presence.identite, {
+        identite: presence.identite,
+        population: presence.population,
+        debut,
+        fin,
+      })
+      continue
+    }
+
+    if (
+      POPULATIONS_AFFLUENCE.indexOf(presence.population) <
+      POPULATIONS_AFFLUENCE.indexOf(connue.population)
+    ) {
+      connue.population = presence.population
+    }
+
+    connue.debut = Math.min(connue.debut, debut)
+    // `null` gagne : une fenêtre sans fin ne se referme pas, donc l'union non plus.
+    connue.fin = connue.fin === null || fin === null ? null : Math.max(connue.fin, fin)
+  }
+
+  return [...parPersonne.values()]
+}
+
+/**
+ * Cette personne est-elle présente pendant cette tranche ?
  *
  * **Par recouvrement**, et non « à l'instant qui ouvre la tranche ». La nuance décide de tout dès
  * que la granularité est large : quelqu'un qui arrive samedi 10 h n'est pas présent à minuit, mais
  * il l'est bien ce samedi-là — le compter hors de la tranche du jour serait absurde.
- *
- * Une fenêtre sans fin ne se referme jamais : c'est le cas d'une donnée non déclarée, et l'appelant
- * est censé lui avoir donné un repli avant d'arriver ici.
  */
-export function estPresentDansLaTranche(
-  participant: ParticipantPresent,
-  tranche: Tranche
-): boolean {
-  const { debut, fin } = presenceEffective(participant)
-
-  if (debut >= tranche.fin) return false
-  if (fin !== null && fin <= tranche.debut) return false
+export function estPresenteDansLaTranche(personne: PersonnePresente, tranche: Tranche): boolean {
+  if (personne.debut >= tranche.fin) return false
+  if (personne.fin !== null && personne.fin <= tranche.debut) return false
   return true
 }
 
@@ -103,8 +170,6 @@ export function estPresentDansLaTranche(
  * cesserait de commencer à minuit sur place dès le dimanche d'un changement d'heure — elle
  * dériverait d'une heure et toutes les suivantes avec elle. Luxon sait ajouter un jour civil ;
  * `t += 86_400_000` ne le sait pas.
- *
- * Une borne unique ne délimite aucune tranche : il en faut deux pour faire un intervalle.
  */
 export function tranchesDepuisBornes(bornes: readonly number[]): Tranche[] {
   const tranches: Tranche[] = []
@@ -120,27 +185,48 @@ export function tranchesDepuisBornes(bornes: readonly number[]): Tranche[] {
   return tranches
 }
 
+/** Ce que le graphique trace : une série par population, et leur total. */
+export interface AffluenceParPopulation {
+  total: number[]
+  parPopulation: Record<PopulationAffluence, number[]>
+}
+
 /**
- * Le nombre de PERSONNES présentes dans chaque tranche.
+ * Le nombre de personnes présentes dans chaque tranche, par population.
  *
- * Une seule série, volontairement : pas de répartition par population. Une personne qui est là à
- * deux titres — bénévole et détentrice d'un billet — devrait sinon être attribuée à l'une des deux,
- * et toute règle d'attribution serait une invention. La répartition par population existe déjà sur
- * le graphique des arrivées, où chaque entrée compte pour elle-même.
+ * Les quatre séries **s'additionnent exactement au total**, parce que chaque personne n'appartient
+ * qu'à une population : c'est ce qui autorise à les empiler. Une répartition où quelqu'un
+ * compterait deux fois ferait une pile plus haute que le nombre de gens sur le site, et l'échelle
+ * du graphique mentirait.
  */
 export function compterAffluence(
-  participants: readonly ParticipantPresent[],
+  personnes: readonly PersonnePresente[],
   tranches: readonly Tranche[]
-): number[] {
-  return tranches.map((tranche) => {
-    const presentes = new Set<string>()
+): AffluenceParPopulation {
+  const parPopulation = Object.fromEntries(
+    POPULATIONS_AFFLUENCE.map((population) => [population, [] as number[]])
+  ) as Record<PopulationAffluence, number[]>
+  const total: number[] = []
 
-    for (const participant of participants) {
-      if (estPresentDansLaTranche(participant, tranche)) presentes.add(participant.identite)
+  for (const tranche of tranches) {
+    const comptes = Object.fromEntries(
+      POPULATIONS_AFFLUENCE.map((population) => [population, 0])
+    ) as Record<PopulationAffluence, number>
+    let somme = 0
+
+    for (const personne of personnes) {
+      if (!estPresenteDansLaTranche(personne, tranche)) continue
+      comptes[personne.population] += 1
+      somme += 1
     }
 
-    return presentes.size
-  })
+    for (const population of POPULATIONS_AFFLUENCE) {
+      parPopulation[population].push(comptes[population])
+    }
+    total.push(somme)
+  }
+
+  return { total, parPopulation }
 }
 
 /**

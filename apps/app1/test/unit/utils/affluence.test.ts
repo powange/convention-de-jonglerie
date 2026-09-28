@@ -2,26 +2,31 @@ import { describe, expect, it } from 'vitest'
 
 import {
   compterAffluence,
-  estPresentDansLaTranche,
+  estPresenteDansLaTranche,
   presenceEffective,
+  reunirLesTitres,
   sommetDeLAffluence,
   tranchesDepuisBornes,
-  type ParticipantPresent,
+  type PersonnePresente,
+  type PresenceDeclaree,
 } from '../../../shared/utils/affluence'
 
 /**
- * L'affluence : combien de PERSONNES sont sur place, et quand.
+ * L'affluence : combien de PERSONNES sont sur place, quand, et à quel titre.
  *
  * Le graphique voisin compte des arrivées — un flux. Celui-ci compte un stock, et un stock faux
  * reste un nombre parfaitement plausible : personne ne verra jamais à l'œil qu'une courbe annonce
  * 274 présents au lieu de 191.
  *
- * Deux choses se jouent ici, et chacune a sa mesure dans la base de développement :
+ * Trois choses se jouent ici, et chacune a sa mesure dans la base de développement :
  *
  * - **le recouvrement** plutôt que l'instant d'ouverture de la tranche. Compter « présent à minuit »
  *   exclurait de la journée du samedi tous ceux qui arrivent le samedi matin ;
- * - **le dédoublonnage**. Sur l'édition 1, 274 entrées distinctes pour ~191 personnes : compter les
- *   entrées surévalue l'affluence de 43 %.
+ * - **le rapprochement des personnes**. Sur l'édition 1, 274 entrées pour 191 personnes : compter les
+ *   entrées surévalue l'affluence de 30 % ;
+ * - **l'attribution à une population**. 10 personnes sur 191 portent deux titres — 8 billet +
+ *   bénévole, 2 billet + artiste. Les quatre piles doivent s'additionner au total, sans quoi
+ *   l'échelle du graphique mentirait.
  */
 
 const H = 3_600_000
@@ -30,10 +35,19 @@ const JOUR = 24 * H
 /** Vendredi 0 h comme origine, pour que les calculs se lisent en heures. */
 const T0 = Date.UTC(2026, 6, 10, 0, 0, 0)
 
-const participant = (over: Partial<ParticipantPresent> = {}): ParticipantPresent => ({
-  identite: 'compte:1',
+const titre = (over: Partial<PresenceDeclaree> = {}): PresenceDeclaree => ({
+  identite: 'courriel:a@b.test',
+  population: 'participants',
   entree: T0 + 10 * H,
   fenetre: { arrivee: null, depart: null },
+  ...over,
+})
+
+const personne = (over: Partial<PersonnePresente> = {}): PersonnePresente => ({
+  identite: 'courriel:a@b.test',
+  population: 'participants',
+  debut: T0 + 10 * H,
+  fin: null,
   ...over,
 })
 
@@ -53,92 +67,187 @@ const bornesRegulieres = (debut: number, fin: number, minutes: number) => {
   for (let t = debut; t <= fin; t += minutes * 60_000) bornes.push(t)
   return bornes
 }
-const decouperEnTranches = (debut: number, fin: number, minutes: number) =>
-  minutes > 0 ? tranchesDepuisBornes(bornesRegulieres(debut, fin, minutes)) : []
+const decouper = (debut: number, fin: number, minutes: number) =>
+  tranchesDepuisBornes(bornesRegulieres(debut, fin, minutes))
 
 describe('presenceEffective', () => {
   it('part de l’entrée validée quand rien n’est déclaré', () => {
-    const p = participant({ entree: T0 + 10 * H })
-
-    expect(presenceEffective(p)).toEqual({ debut: T0 + 10 * H, fin: null })
+    expect(presenceEffective(titre({ entree: T0 + 10 * H }))).toEqual({
+      debut: T0 + 10 * H,
+      fin: null,
+    })
   })
 
-  it('retient la PLUS TARDIVE de l’entrée et de l’arrivée déclarée', () => {
+  it('retient la date du tarif quand le billet a été validé AVANT elle', () => {
     /*
-     * Le cas qui compte : un billet dont le tarif annonce une présence dès vendredi, mais dont
-     * l'entrée n'a été validée que samedi. Retenir la déclaration ferait compter quelqu'un avant
-     * qu'il ne soit là — sur la seule foi d'un paramétrage de tarif.
+     * La règle telle que l'utilisateur l'a énoncée : « s'il a validé le billet avant même que le
+     * tarif ne commence, il faut prendre la date où le tarif commence ». Le cas réel est la
+     * validation au guichet la veille de l'ouverture.
      */
-    const p = participant({ entree: T0 + 30 * H, fenetre: { arrivee: T0, depart: null } })
+    const t = titre({ entree: T0, fenetre: { arrivee: T0 + 20 * H, depart: null } })
 
-    expect(presenceEffective(p).debut).toBe(T0 + 30 * H)
+    expect(presenceEffective(t).debut).toBe(T0 + 20 * H)
   })
 
-  it('retient l’arrivée déclarée quand elle est postérieure à l’entrée', () => {
-    // L'inverse existe aussi : une entrée validée à l'avance, au guichet, la veille de l'ouverture.
-    const p = participant({ entree: T0, fenetre: { arrivee: T0 + 20 * H, depart: null } })
+  it('retient la validation quand elle est postérieure au début du tarif', () => {
+    // L'autre sens : un tarif qui annonce vendredi, une entrée validée samedi. Retenir le tarif
+    // ferait compter quelqu'un avant qu'il ne soit là, sur la seule foi d'un paramétrage.
+    const t = titre({ entree: T0 + 30 * H, fenetre: { arrivee: T0, depart: null } })
 
-    expect(presenceEffective(p).debut).toBe(T0 + 20 * H)
+    expect(presenceEffective(t).debut).toBe(T0 + 30 * H)
   })
 
   it('prend la fin de la fenêtre, jamais celle de l’entrée', () => {
-    const p = participant({ fenetre: { arrivee: null, depart: T0 + 60 * H } })
-
-    expect(presenceEffective(p).fin).toBe(T0 + 60 * H)
+    expect(presenceEffective(titre({ fenetre: { arrivee: null, depart: T0 + 60 * H } })).fin).toBe(
+      T0 + 60 * H
+    )
   })
 })
 
-describe('estPresentDansLaTranche', () => {
+describe('reunirLesTitres', () => {
+  it('ne fait qu’une personne de deux titres', () => {
+    const personnes = reunirLesTitres([
+      titre({ identite: 'courriel:x@y.test', population: 'benevoles' }),
+      titre({ identite: 'courriel:x@y.test', population: 'participants' }),
+    ])
+
+    expect(personnes).toHaveLength(1)
+  })
+
+  it('retient la population la plus engagée', () => {
+    // Choix de l'utilisateur : « le rôle engagé d'abord ». Quelqu'un qui a un billet ET tient des
+    // créneaux est sur place comme bénévole.
+    const personnes = reunirLesTitres([
+      titre({ identite: 'courriel:x@y.test', population: 'participants' }),
+      titre({ identite: 'courriel:x@y.test', population: 'benevoles' }),
+    ])
+
+    expect(personnes[0]!.population).toBe('benevoles')
+  })
+
+  it('applique la priorité dans les deux sens de déclaration', () => {
+    // L'ordre dans lequel les titres arrivent ne doit rien changer : sinon la population dépendrait
+    // de l'ordre des requêtes.
+    for (const ordre of [
+      ['organisateurs', 'artistes'],
+      ['artistes', 'organisateurs'],
+    ] as const) {
+      const personnes = reunirLesTitres(
+        ordre.map((population) => titre({ identite: 'courriel:x@y.test', population }))
+      )
+      expect(personnes[0]!.population).toBe('organisateurs')
+    }
+  })
+
+  it('respecte l’ordre complet organisateur, artiste, bénévole, participant', () => {
+    const personnes = reunirLesTitres([
+      titre({ identite: 'courriel:x@y.test', population: 'participants' }),
+      titre({ identite: 'courriel:x@y.test', population: 'benevoles' }),
+      titre({ identite: 'courriel:x@y.test', population: 'artistes' }),
+      titre({ identite: 'courriel:x@y.test', population: 'organisateurs' }),
+    ])
+
+    expect(personnes[0]!.population).toBe('organisateurs')
+  })
+
+  it('réunit les fenêtres plutôt que de garder celle du titre gagnant', () => {
+    /*
+     * La règle la moins évidente, et celle qui compte le plus.
+     *
+     * Un bénévole qui a aussi un pass week-end est sur place tant que l'un des deux titres le dit.
+     * Ne garder que la fenêtre du titre gagnant le ferait disparaître du vendredi parce qu'il ne
+     * tient de créneau que le samedi — alors qu'il est bien là, et qu'il y est comme bénévole.
+     */
+    const personnes = reunirLesTitres([
+      titre({
+        identite: 'courriel:x@y.test',
+        population: 'benevoles',
+        entree: T0 + JOUR,
+        fenetre: { arrivee: T0 + JOUR, depart: T0 + JOUR + 12 * H },
+      }),
+      titre({
+        identite: 'courriel:x@y.test',
+        population: 'participants',
+        entree: T0,
+        fenetre: { arrivee: T0, depart: T0 + 3 * JOUR },
+      }),
+    ])
+
+    expect(personnes[0]).toMatchObject({
+      population: 'benevoles',
+      debut: T0,
+      fin: T0 + 3 * JOUR,
+    })
+  })
+
+  it('une fenêtre sans fin emporte l’union', () => {
+    // `null` ne se referme pas : réunir une fenêtre bornée et une fenêtre ouverte donne une fenêtre
+    // ouverte, sans quoi on inventerait un départ.
+    const personnes = reunirLesTitres([
+      titre({ identite: 'courriel:x@y.test', fenetre: { arrivee: null, depart: T0 + JOUR } }),
+      titre({ identite: 'courriel:x@y.test', fenetre: { arrivee: null, depart: null } }),
+    ])
+
+    expect(personnes[0]!.fin).toBeNull()
+  })
+
+  it('garde deux personnes distinctes séparées', () => {
+    const personnes = reunirLesTitres([
+      titre({ identite: 'courriel:x@y.test' }),
+      titre({ identite: 'courriel:z@y.test' }),
+    ])
+
+    expect(personnes).toHaveLength(2)
+  })
+
+  it('ne rend rien sans titre', () => {
+    expect(reunirLesTitres([])).toEqual([])
+  })
+})
+
+describe('estPresenteDansLaTranche', () => {
   it('compte quelqu’un arrivé au milieu de la tranche', () => {
     // LE point du recouvrement. Arrivé samedi 10 h, il est présent « ce samedi », même si la tranche
     // d'un jour commence à minuit.
-    const p = participant({ entree: T0 + 10 * H })
-
-    expect(estPresentDansLaTranche(p, tranche(0, 24))).toBe(true)
+    expect(estPresenteDansLaTranche(personne({ debut: T0 + 10 * H }), tranche(0, 24))).toBe(true)
   })
 
   it('ne le compte pas dans une tranche entièrement antérieure à son arrivée', () => {
-    const p = participant({ entree: T0 + 30 * H })
-
-    expect(estPresentDansLaTranche(p, tranche(0, 24))).toBe(false)
+    expect(estPresenteDansLaTranche(personne({ debut: T0 + 30 * H }), tranche(0, 24))).toBe(false)
   })
 
   it('ne le compte plus après son départ', () => {
-    const p = participant({ entree: T0, fenetre: { arrivee: null, depart: T0 + 20 * H } })
+    const p = personne({ debut: T0, fin: T0 + 20 * H })
 
-    expect(estPresentDansLaTranche(p, tranche(0, 12))).toBe(true)
-    expect(estPresentDansLaTranche(p, tranche(24, 12))).toBe(false)
+    expect(estPresenteDansLaTranche(p, tranche(0, 12))).toBe(true)
+    expect(estPresenteDansLaTranche(p, tranche(24, 12))).toBe(false)
   })
 
   it('le compte encore dans la tranche où il repart', () => {
-    // Il était bien là une partie de cette tranche : l'en exclure ferait disparaître le dernier
-    // jour de tout le monde.
-    const p = participant({ entree: T0, fenetre: { arrivee: null, depart: T0 + 30 * H } })
-
-    expect(estPresentDansLaTranche(p, tranche(24, 24))).toBe(true)
+    // Il était bien là une partie de cette tranche : l'en exclure ferait disparaître le dernier jour
+    // de tout le monde.
+    expect(
+      estPresenteDansLaTranche(personne({ debut: T0, fin: T0 + 30 * H }), tranche(24, 24))
+    ).toBe(true)
   })
 
   it('ne le compte pas quand il repart à l’instant même où la tranche commence', () => {
     // Borne de fin EXCLUE : sans cela, un départ à minuit pile ajouterait une journée entière de
     // présence à tous ceux qui partent la veille au soir.
-    const p = participant({ entree: T0, fenetre: { arrivee: null, depart: T0 + 24 * H } })
+    const p = personne({ debut: T0, fin: T0 + 24 * H })
 
-    expect(estPresentDansLaTranche(p, tranche(24, 24))).toBe(false)
-    expect(estPresentDansLaTranche(p, tranche(0, 24))).toBe(true)
+    expect(estPresenteDansLaTranche(p, tranche(24, 24))).toBe(false)
+    expect(estPresenteDansLaTranche(p, tranche(0, 24))).toBe(true)
   })
 
   it('reste présent indéfiniment sans fin déclarée', () => {
-    // C'est le comportement d'avant les fenêtres, et celui d'une donnée non renseignée : l'appelant
-    // est censé avoir posé un repli, mais cet util ne doit pas inventer une sortie.
-    const p = participant({ entree: T0 })
-
-    expect(estPresentDansLaTranche(p, tranche(240, 24))).toBe(true)
+    expect(estPresenteDansLaTranche(personne({ debut: T0 }), tranche(240, 24))).toBe(true)
   })
 })
 
 describe('tranchesDepuisBornes', () => {
   it('découpe une journée en tranches de vingt minutes', () => {
-    const tranches = decouperEnTranches(T0, T0 + JOUR, 20)
+    const tranches = decouper(T0, T0 + JOUR, 20)
 
     expect(tranches).toHaveLength(72)
     expect(tranches[0]).toEqual({ debut: T0, fin: T0 + 20 * 60_000 })
@@ -149,13 +258,8 @@ describe('tranchesDepuisBornes', () => {
     const attendu = { 1440: 3, 720: 6, 360: 12, 60: 72, 20: 216 }
 
     for (const [minutes, nombre] of Object.entries(attendu)) {
-      expect(decouperEnTranches(T0, T0 + 3 * JOUR, Number(minutes))).toHaveLength(nombre)
+      expect(decouper(T0, T0 + 3 * JOUR, Number(minutes))).toHaveLength(nombre)
     }
-  })
-
-  it('rend un tableau vide sur une période nulle ou inversée', () => {
-    expect(decouperEnTranches(T0, T0, 60)).toEqual([])
-    expect(decouperEnTranches(T0 + JOUR, T0, 60)).toEqual([])
   })
 
   it('ignore une borne qui ne progresse pas', () => {
@@ -170,85 +274,102 @@ describe('tranchesDepuisBornes', () => {
 })
 
 describe('compterAffluence', () => {
-  it('ne compte qu’une fois une personne présente à deux titres', () => {
-    /*
-     * Le cœur du « personnes physiques » demandé. Deux lignes de journal — sa candidature de
-     * bénévole et son billet — mais un seul corps sur le site.
-     */
-    const tranches = decouperEnTranches(T0, T0 + JOUR, 1440)
-    const memePersonne = [
-      participant({ identite: 'compte:7', entree: T0 + 8 * H }),
-      participant({ identite: 'compte:7', entree: T0 + 9 * H }),
+  it('répartit les présents dans les quatre piles', () => {
+    const tranches = decouper(T0, T0 + JOUR, 1440)
+    const gens = [
+      personne({ identite: 'a', population: 'participants' }),
+      personne({ identite: 'b', population: 'participants' }),
+      personne({ identite: 'c', population: 'benevoles' }),
+      personne({ identite: 'd', population: 'artistes' }),
+      personne({ identite: 'e', population: 'organisateurs' }),
     ]
 
-    expect(compterAffluence(memePersonne, tranches)).toEqual([1])
+    const { total, parPopulation } = compterAffluence(gens, tranches)
+
+    expect(parPopulation.participants).toEqual([2])
+    expect(parPopulation.benevoles).toEqual([1])
+    expect(parPopulation.artistes).toEqual([1])
+    expect(parPopulation.organisateurs).toEqual([1])
+    expect(total).toEqual([5])
   })
 
-  it('compte deux personnes distinctes', () => {
-    // La contrepartie : sans elle, un dédoublonnage trop large passerait le test précédent en
-    // ramenant tout le monde à une unité.
-    const tranches = decouperEnTranches(T0, T0 + JOUR, 1440)
-    const deux = [
-      participant({ identite: 'compte:7' }),
-      participant({ identite: 'courriel:a@b.test' }),
+  it('les quatre piles s’additionnent EXACTEMENT au total', () => {
+    /*
+     * Ce qui autorise à les empiler. Une répartition où quelqu'un compterait deux fois ferait une
+     * pile plus haute que le nombre de gens sur le site, et l'échelle du graphique mentirait.
+     */
+    const tranches = decouper(T0, T0 + 3 * JOUR, 360)
+    const gens = [
+      personne({ identite: 'a', population: 'participants', fin: T0 + JOUR }),
+      personne({ identite: 'b', population: 'benevoles', debut: T0 + 12 * H }),
+      personne({ identite: 'c', population: 'artistes', debut: T0 + JOUR, fin: T0 + 2 * JOUR }),
+      personne({ identite: 'd', population: 'organisateurs' }),
     ]
 
-    expect(compterAffluence(deux, tranches)).toEqual([2])
+    const { total, parPopulation } = compterAffluence(gens, tranches)
+
+    total.forEach((somme, i) => {
+      const empilees =
+        parPopulation.participants[i]! +
+        parPopulation.benevoles[i]! +
+        parPopulation.artistes[i]! +
+        parPopulation.organisateurs[i]!
+      expect(empilees, `tranche ${i}`).toBe(somme)
+    })
   })
 
   it('dessine une courbe qui monte puis redescend', () => {
     /*
      * Ce que tout le dispositif cherche à obtenir. Sans fenêtre de fin, aucune sortie n'étant
      * enregistrée, cette courbe ne pourrait que croître.
-     *
-     * Trois personnes sur trois jours : une présente tout le temps, une qui repart au bout d'un
-     * jour, une qui arrive le dernier.
      */
-    const tranches = decouperEnTranches(T0, T0 + 3 * JOUR, 1440)
+    const tranches = decouper(T0, T0 + 3 * JOUR, 1440)
     const gens = [
-      participant({ identite: 'a', entree: T0, fenetre: { arrivee: null, depart: T0 + 3 * JOUR } }),
-      participant({ identite: 'b', entree: T0, fenetre: { arrivee: null, depart: T0 + JOUR } }),
-      participant({
-        identite: 'c',
-        entree: T0 + 2 * JOUR + 10 * H,
-        fenetre: { arrivee: null, depart: T0 + 3 * JOUR },
-      }),
+      personne({ identite: 'a', debut: T0, fin: T0 + 3 * JOUR }),
+      personne({ identite: 'b', debut: T0, fin: T0 + JOUR }),
+      personne({ identite: 'c', debut: T0 + 2 * JOUR + 10 * H, fin: T0 + 3 * JOUR }),
     ]
 
-    expect(compterAffluence(gens, tranches)).toEqual([2, 1, 2])
+    expect(compterAffluence(gens, tranches).total).toEqual([2, 1, 2])
   })
 
-  it('rend des zéros sur une édition où personne n’est entré', () => {
-    const tranches = decouperEnTranches(T0, T0 + 2 * JOUR, 1440)
+  it('rend des zéros partout sur une édition où personne n’est entré', () => {
+    const tranches = decouper(T0, T0 + 2 * JOUR, 1440)
+    const { total, parPopulation } = compterAffluence([], tranches)
 
-    expect(compterAffluence([], tranches)).toEqual([0, 0])
+    expect(total).toEqual([0, 0])
+    expect(parPopulation.benevoles).toEqual([0, 0])
   })
 
-  it('ne rend rien sans tranche', () => {
-    expect(compterAffluence([participant()], [])).toEqual([])
+  it('rend les quatre séries même vides, pour que le graphique ait ses piles', () => {
+    const { parPopulation } = compterAffluence([], [])
+
+    expect(Object.keys(parPopulation).sort()).toEqual([
+      'artistes',
+      'benevoles',
+      'organisateurs',
+      'participants',
+    ])
   })
 })
 
 describe('sommetDeLAffluence', () => {
   it('trouve le maximum et l’instant où il se produit', () => {
-    const tranches = decouperEnTranches(T0, T0 + 3 * JOUR, 1440)
+    const tranches = decouper(T0, T0 + 3 * JOUR, 1440)
 
-    expect(sommetDeLAffluence([2, 9, 4], tranches)).toEqual({
-      valeur: 9,
-      debut: T0 + JOUR,
-    })
+    expect(sommetDeLAffluence([2, 9, 4], tranches)).toEqual({ valeur: 9, debut: T0 + JOUR })
   })
 
   it('retient le PREMIER sommet en cas d’égalité', () => {
-    // Arbitraire mais fixé : « le plus fort a eu lieu à » doit désigner un instant, et le premier
-    // est celui qu'on cherche quand on veut savoir quand la pression est montée.
-    const tranches = decouperEnTranches(T0, T0 + 3 * JOUR, 1440)
+    // Arbitraire mais fixé : « le plus fort a eu lieu à » doit désigner un instant, et le premier est
+    // celui qu'on cherche quand on veut savoir quand la pression est montée.
+    const tranches = decouper(T0, T0 + 3 * JOUR, 1440)
 
     expect(sommetDeLAffluence([5, 5, 1], tranches).debut).toBe(T0)
   })
 
   it('rend zéro et aucun instant sur une courbe plate à zéro', () => {
-    const tranches = decouperEnTranches(T0, T0 + 2 * JOUR, 1440)
+    const tranches = decouper(T0, T0 + 2 * JOUR, 1440)
 
     expect(sommetDeLAffluence([0, 0], tranches)).toEqual({ valeur: 0, debut: null })
   })
