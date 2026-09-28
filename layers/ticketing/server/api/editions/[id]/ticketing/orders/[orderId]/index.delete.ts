@@ -2,6 +2,7 @@ import { isHttpError } from '#server/types/api'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { journaliserMouvementDEntree } from '#server/utils/ticketing/journal-des-entrees'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -70,6 +71,13 @@ export default wrapApiHandler(
       //
       // Le remboursement, lui, n'est pas touché : annuler ne dit pas qu'on a rendu l'argent. Ces
       // billets apparaîtront comme dus, ce qui est exactement l'effet recherché.
+      // Les billets déjà entrés doivent ressortir : relevés AVANT la mise à jour, puisqu'elle
+      // efface le drapeau qui permet de les reconnaître.
+      const billetsEntres = await prisma.ticketingOrderItem.findMany({
+        where: { orderId, entryValidated: true },
+        select: { id: true },
+      })
+
       await prisma.$transaction([
         prisma.ticketingOrder.update({
           where: { id: orderId },
@@ -77,9 +85,28 @@ export default wrapApiHandler(
         }),
         prisma.ticketingOrderItem.updateMany({
           where: { orderId, state: { not: 'Canceled' } },
-          data: { state: 'Canceled', canceledAt: new Date(), canceledById: user.id },
+          data: {
+            state: 'Canceled',
+            canceledAt: new Date(),
+            canceledById: user.id,
+            // Un billet annulé ne reste pas « entré ». Le drapeau ne suffit pas : le graphique
+            // d'affluence se lit sur le journal des mouvements, d'où l'écriture juste après.
+            entryValidated: false,
+            entryValidatedAt: null,
+            entryValidatedBy: null,
+          },
         }),
       ])
+
+      if (billetsEntres.length > 0) {
+        await journaliserMouvementDEntree({
+          editionId,
+          type: 'ticket',
+          participantIds: billetsEntres.map((billet) => billet.id),
+          mouvement: 'INVALIDATED',
+          actorId: user.id,
+        })
+      }
 
       return createSuccessResponse(null, 'Commande annulée avec succès')
     } catch (error: unknown) {

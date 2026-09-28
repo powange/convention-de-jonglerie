@@ -2,6 +2,7 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { fetchOrdersFromHelloAsso } from '#server/utils/editions/ticketing/helloasso'
 import { decrypt } from '#server/utils/encryption'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { ETATS_DE_BILLET_ANNULE } from '#server/utils/ticketing/billets-qui-comptent'
 
 /**
  * Total d'une commande : ses lignes, **options comprises**.
@@ -162,6 +163,22 @@ export default wrapApiHandler(
                 // Mettre à jour l'item existant
                 // Note: customFields contient UNIQUEMENT les vrais champs personnalisés
                 // Les options sont gérées dans TicketingOrderItemOption
+                //
+                // `state` est le seul champ que le fournisseur ne réécrit pas toujours : une
+                // annulation faite ICI doit lui survivre. Sans cette réserve, on annulait un
+                // billet, quelqu'un appuyait sur « Synchroniser », et le billet redevenait valide
+                // sans que rien ne le signale. C'est précisément ce qui interdisait d'annuler le
+                // billet d'une commande HelloAsso — alors que la plateforme, elle, ne sait pas
+                // rembourser partiellement une commande.
+                //
+                // `canceledAt` fait le départ : nul, l'annulation vient de la source et elle
+                // gouverne ; renseigné, elle vient d'ici. Lever l'annulation le remet à nul, et la
+                // source reprend la main d'elle-même — aucun état à démêler.
+                const annuleIci = existingItem.canceledAt !== null
+                const sourceAnnule = (ETATS_DE_BILLET_ANNULE as readonly string[]).includes(
+                  item.state
+                )
+
                 await tx.ticketingOrderItem.update({
                   where: { id: existingItem.id },
                   data: {
@@ -172,7 +189,13 @@ export default wrapApiHandler(
                     name: item.name || null,
                     type: item.type,
                     amount: item.amount,
-                    state: item.state,
+                    ...(annuleIci ? {} : { state: item.state }),
+                    // Ce que la source dit de l'annulation, qu'on suive son état ou non. C'est la
+                    // moitié manquante de la détection d'un double remboursement : l'autre est
+                    // `refundedById`, qui ne vaut que pour une case cochée ici.
+                    ...(sourceAnnule && existingItem.sourceCanceledAt === null
+                      ? { sourceCanceledAt: new Date() }
+                      : {}),
                     qrCode: item.qrCode,
                     customFields: item.customFields || undefined,
                   },
