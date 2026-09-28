@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { conditionsMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { lignesQuiDonnentAcces } from '#server/utils/ticketing/billets-qui-comptent'
 import {
   aggregateHandoutItems,
@@ -34,6 +35,19 @@ export default wrapApiHandler(
     const body = bodySchema.parse(await readBody(event))
     const searchTerm = sanitizeEmail(body.searchTerm)
 
+    // La recherche se fait mot à mot : chercher le terme entier dans chaque champ séparément
+    // faisait échouer « Jean Dupont », qui n'est ni un prénom ni un nom. L'util est celui de la
+    // recherche d'utilisateurs de l'administration — même question, même réponse, et il normalise
+    // au passage les accents.
+    const mots = motsClesDeLaRequete(searchTerm)
+
+    // Une recherche qui ne porte aucun mot ne cherche rien : `min(1)` laisse passer une chaîne
+    // d'espaces, et une liste de conditions vide dans un `AND` ne restreint pas — l'écran rendrait
+    // alors les vingt premiers billets de l'édition comme s'ils correspondaient.
+    if (mots.length === 0) {
+      return createSuccessResponse({ tickets: [], volunteers: [], artists: [], organizers: [] })
+    }
+
     // L'interrupteur de l'édition coupe la remise elle-même, et pas seulement l'entrée de menu :
     // éteint, le guichet ne réclame plus rien à personne. Lu une fois pour les quatre populations.
     const articlesActifs = await articlesARemettreActifs(editionId)
@@ -51,23 +65,13 @@ export default wrapApiHandler(
           //
           // Sous `AND` et non étalé : le `OR` du fragment écraserait celui de la recherche par nom
           // juste en dessous, et le filtre disparaîtrait sans bruit.
-          AND: [lignesQuiDonnentAcces()],
-          OR: [
-            {
-              firstName: {
-                contains: searchTerm,
-              },
-            },
-            {
-              lastName: {
-                contains: searchTerm,
-              },
-            },
-            {
-              email: {
-                contains: searchTerm,
-              },
-            },
+          //
+          // Chaque MOT du terme doit se retrouver dans un champ, d'où le second fragment : chercher
+          // le terme entier dans chaque champ séparément faisait échouer « Jean Dupont », qui n'est
+          // ni un prénom ni un nom.
+          AND: [
+            lignesQuiDonnentAcces(),
+            ...conditionsMotsCles(mots, ['firstName', 'lastName', 'email']),
           ],
         },
         include: {
@@ -119,29 +123,8 @@ export default wrapApiHandler(
       const artists = await prisma.editionArtist.findMany({
         where: {
           editionId: editionId,
-          OR: [
-            {
-              user: {
-                prenom: {
-                  contains: searchTerm,
-                },
-              },
-            },
-            {
-              user: {
-                nom: {
-                  contains: searchTerm,
-                },
-              },
-            },
-            {
-              user: {
-                email: {
-                  contains: searchTerm,
-                },
-              },
-            },
-          ],
+          // Même règle que pour les billets : chaque mot du terme doit se retrouver quelque part.
+          AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
         },
         include: {
           user: {
@@ -190,29 +173,7 @@ export default wrapApiHandler(
         where: {
           editionId: editionId,
           organizer: {
-            OR: [
-              {
-                user: {
-                  prenom: {
-                    contains: searchTerm,
-                  },
-                },
-              },
-              {
-                user: {
-                  nom: {
-                    contains: searchTerm,
-                  },
-                },
-              },
-              {
-                user: {
-                  email: {
-                    contains: searchTerm,
-                  },
-                },
-              },
-            ],
+            AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
           },
         },
         include: {
@@ -251,33 +212,7 @@ export default wrapApiHandler(
               eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
             },
           ],
-          AND: [
-            {
-              OR: [
-                {
-                  user: {
-                    prenom: {
-                      contains: searchTerm,
-                    },
-                  },
-                },
-                {
-                  user: {
-                    nom: {
-                      contains: searchTerm,
-                    },
-                  },
-                },
-                {
-                  user: {
-                    email: {
-                      contains: searchTerm,
-                    },
-                  },
-                },
-              ],
-            },
-          ],
+          AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
         },
         select: {
           id: true,

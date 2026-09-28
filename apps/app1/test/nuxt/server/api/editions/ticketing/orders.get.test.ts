@@ -447,6 +447,69 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     expect(res.stats!.totalAmount).toBe(3600)
   })
 
+  describe('la recherche par mots-clés', () => {
+    /**
+     * Chercher « Jean Dupont » et trouver la commande de Jean Dupont.
+     *
+     * Le terme entier était cherché dans chaque champ séparément : « Jean Dupont » n'étant ni un
+     * prénom ni un nom, la liste ne rendait rien — alors que « Jean » seul trouvait la commande.
+     */
+    const clausesDe = () =>
+      prismaMock.ticketingOrder.findMany.mock.calls.at(-1)?.[0]?.where?.AND ?? []
+
+    beforeEach(() => {
+      mockCanAccess.mockResolvedValue(true)
+      prismaMock.ticketingOrder.count.mockResolvedValue(0)
+      prismaMock.ticketingOrder.findMany.mockResolvedValue([])
+    })
+
+    it('exige que chaque mot se retrouve quelque part', async () => {
+      global.getQuery.mockReturnValue({ page: '1', limit: '20', search: 'jean dupont' })
+
+      await handler(baseEvent as any)
+
+      const clauses = clausesDe()
+      expect(clauses).toHaveLength(2)
+      // Chaque mot cherche sur la commande ET à travers ses billets.
+      for (const [index, mot] of ['jean', 'dupont'].entries()) {
+        const texte = JSON.stringify(clauses[index])
+        expect(texte).toContain(mot)
+        expect(texte).toContain('items')
+      }
+    })
+
+    it('se comporte comme avant sur un mot unique', async () => {
+      // Le cas de loin le plus fréquent : le changement doit être invisible pour qui cherchait
+      // déjà par nom seul.
+      global.getQuery.mockReturnValue({ page: '1', limit: '20', search: 'dupont' })
+
+      await handler(baseEvent as any)
+
+      expect(clausesDe()).toHaveLength(1)
+    })
+
+    it('ne filtre rien quand le terme ne porte aucun mot', async () => {
+      // Ici une recherche vide veut dire « toutes les commandes » — l'écran les liste par défaut,
+      // contrairement à la recherche du contrôle d'accès qui, elle, ne doit rien rendre.
+      global.getQuery.mockReturnValue({ page: '1', limit: '20', search: '   ' })
+
+      await handler(baseEvent as any)
+
+      expect(clausesDe()).toHaveLength(0)
+    })
+
+    it('cherche toujours par identifiant, mot par mot', async () => {
+      global.getQuery.mockReturnValue({ page: '1', limit: '20', search: '123 dupont' })
+
+      await handler(baseEvent as any)
+
+      const clauses = clausesDe()
+      expect(JSON.stringify(clauses[0])).toContain('"id":123')
+      // Un mot qui n'est pas un nombre ne cherche aucun identifiant.
+      expect(JSON.stringify(clauses[1])).not.toContain('"id"')
+    })
+  })
+
   it('ne calcule pas les stats si recherche active', async () => {
     mockCanAccess.mockResolvedValue(true)
     global.getQuery.mockReturnValue({ page: '1', limit: '20', search: 'John' })
@@ -486,12 +549,15 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           editionId: 1,
+          // Les mots sont NORMALISÉS avant la requête — minuscules, accents retirés. Sans
+          // conséquence sur les résultats, la collation de la base ignorant déjà l'un et l'autre ;
+          // le gain est que « jerome » trouve désormais « Jérôme ».
           AND: [
             {
               OR: expect.arrayContaining([
-                { payerFirstName: { contains: 'John' } },
-                { payerLastName: { contains: 'John' } },
-                { payerEmail: { contains: 'John' } },
+                { payerFirstName: { contains: 'john' } },
+                { payerLastName: { contains: 'john' } },
+                { payerEmail: { contains: 'john' } },
               ]),
             },
           ],
@@ -705,7 +771,7 @@ describe('/api/editions/[id]/ticketing/orders GET', () => {
     expect(where.AND).toEqual([
       { OR: [{ paymentMethod: 'cash' }] },
       expect.objectContaining({
-        OR: expect.arrayContaining([{ payerFirstName: { contains: 'John' } }]),
+        OR: expect.arrayContaining([{ payerFirstName: { contains: 'john' } }]),
       }),
     ])
   })

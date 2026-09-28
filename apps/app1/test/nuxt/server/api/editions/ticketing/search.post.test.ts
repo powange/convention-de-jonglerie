@@ -249,6 +249,76 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
     })
   })
 
+  describe('la recherche par mots-clés', () => {
+    /**
+     * Chercher « Jean Dupont » et trouver Jean Dupont.
+     *
+     * Le terme entier était cherché dans chaque champ séparément : « Jean Dupont » n'étant ni un
+     * prénom ni un nom, l'écran ne rendait rien — alors que « Jean » seul trouvait la personne.
+     * À la porte, devant quelqu'un qui donne son nom complet, c'est le geste le plus naturel qui
+     * échouait.
+     */
+    const clausesDuNom = () => {
+      const where = prismaMock.ticketingOrderItem.findMany.mock.calls.at(-1)[0].where
+      // Le premier fragment du `AND` écarte les dons ; les suivants portent les mots.
+      return where.AND.slice(1)
+    }
+
+    it('exige que chaque mot se retrouve dans un champ', async () => {
+      global.readBody = vi.fn().mockResolvedValue({ searchTerm: 'jean dupont' })
+
+      await searchHandler(mockEvent as any)
+
+      expect(clausesDuNom()).toEqual([
+        {
+          OR: [
+            { firstName: { contains: 'jean' } },
+            { lastName: { contains: 'jean' } },
+            { email: { contains: 'jean' } },
+          ],
+        },
+        {
+          OR: [
+            { firstName: { contains: 'dupont' } },
+            { lastName: { contains: 'dupont' } },
+            { email: { contains: 'dupont' } },
+          ],
+        },
+      ])
+    })
+
+    it('applique la même règle aux quatre populations', async () => {
+      // Une règle appliquée à moitié serait pire que pas de règle : « Jean Dupont » trouverait le
+      // billet mais pas le bénévole du même nom, et rien à l'écran ne l'expliquerait.
+      global.readBody = vi.fn().mockResolvedValue({ searchTerm: 'jean dupont' })
+
+      await searchHandler(mockEvent as any)
+
+      for (const modele of [
+        'editionVolunteerApplication',
+        'editionArtist',
+        'editionOrganizer',
+      ] as const) {
+        const appels = prismaMock[modele].findMany.mock.calls
+        const texte = JSON.stringify(appels[0][0].where)
+        expect(texte).toContain('jean')
+        expect(texte).toContain('dupont')
+      }
+    })
+
+    it('ne cherche rien quand le terme ne porte aucun mot', async () => {
+      // `min(1)` laisse passer une chaîne d'espaces, et une clause vide dans un `AND` ne restreint
+      // pas : sans ce court-circuit, l'écran rendrait les vingt premiers billets de l'édition
+      // comme s'ils correspondaient.
+      global.readBody = vi.fn().mockResolvedValue({ searchTerm: '   ' })
+
+      const res: any = await searchHandler(mockEvent as any)
+
+      expect(res.data.tickets).toEqual([])
+      expect(prismaMock.ticketingOrderItem.findMany).not.toHaveBeenCalled()
+    })
+  })
+
   describe('ce qui ne donne pas droit d’entrée', () => {
     /**
      * Un don n'est pas une entrée, et il porte le nom du payeur — sur les données réelles, **les
@@ -262,19 +332,22 @@ describe('POST /api/editions/[id]/ticketing/search', () => {
       await searchHandler(mockEvent as any)
 
       const where = prismaMock.ticketingOrderItem.findMany.mock.calls.at(-1)[0].where
-      expect(where.AND).toEqual([
-        { OR: [{ type: null }, { type: { notIn: ['Donation', 'Membership', 'Payment'] } }] },
-      ])
+      expect(where.AND[0]).toEqual({
+        OR: [{ type: null }, { type: { notIn: ['Donation', 'Membership', 'Payment'] } }],
+      })
     })
 
-    it('sans écraser le `OR` qui cherche le nom', async () => {
-      // Le piège : le fragment d'exclusion porte lui aussi un `OR`. L'étaler dans le `where`
-      // remplacerait celui qui cherche prénom, nom et courriel — la recherche rendrait alors
-      // TOUS les billets de l'édition, et rien n'échouerait pour le signaler.
+    it('sans effacer la recherche elle-même', async () => {
+      // Les deux fragments portent chacun un `OR`, et cohabitent sous le `AND`. Les étaler dans
+      // le `where` en ferait disparaître un des deux — la recherche rendrait alors TOUS les
+      // billets de l'édition, et rien n'échouerait pour le signaler.
       await searchHandler(mockEvent as any)
 
       const where = prismaMock.ticketingOrderItem.findMany.mock.calls.at(-1)[0].where
-      expect(where.OR.map((clause: any) => Object.keys(clause)[0])).toEqual([
+      const clausesDuNom = where.AND.slice(1)
+
+      expect(clausesDuNom).toHaveLength(1)
+      expect(clausesDuNom[0].OR.map((clause: any) => Object.keys(clause)[0])).toEqual([
         'firstName',
         'lastName',
         'email',
