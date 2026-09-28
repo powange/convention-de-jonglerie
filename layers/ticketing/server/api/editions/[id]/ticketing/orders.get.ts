@@ -1,6 +1,7 @@
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import { alternativesMotCle, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { billetARembourser, montantARembourser } from '#server/utils/ticketing/remboursement-du'
 import { validatePagination, validateEditionId } from '#server/utils/validation-helpers'
 import {
@@ -111,37 +112,47 @@ export default wrapApiHandler(
       (query.customFieldFilterMode as string) === 'or' ? 'or' : ('and' as const)
 
     try {
-      // Vérifier si la recherche est un ID numérique
-      const searchAsNumber = parseInt(search)
-      const isNumericSearch = search && !isNaN(searchAsNumber) && searchAsNumber > 0
+      /** L'identifiant visé par un mot, quand ce mot en est un. */
+      const identifiantDuMot = (mot: string) => {
+        const nombre = parseInt(mot)
+        return !isNaN(nombre) && nombre > 0 ? [{ id: nombre }] : []
+      }
 
-      // Construire la condition de recherche
-      const searchCondition = search
-        ? {
-            OR: [
-              // Recherche par ID de commande (si numérique)
-              ...(isNumericSearch ? [{ id: searchAsNumber }] : []),
-              { payerFirstName: { contains: search } },
-              { payerLastName: { contains: search } },
-              { payerEmail: { contains: search } },
-              { checkNumber: { contains: search } },
-              {
-                items: {
-                  some: {
-                    OR: [
-                      // Recherche par ID de billet (si numérique)
-                      ...(isNumericSearch ? [{ id: searchAsNumber }] : []),
-                      { name: { contains: search } },
-                      { firstName: { contains: search } },
-                      { lastName: { contains: search } },
-                      { email: { contains: search } },
-                    ],
-                  },
-                },
+      /**
+       * La recherche, mot par mot.
+       *
+       * **Chaque mot** doit se retrouver quelque part — sur la commande ou sur l'un de ses billets.
+       * Le terme entier était auparavant cherché dans chaque champ séparément : « Jean Dupont »
+       * n'étant ni un prénom ni un nom, la liste ne rendait rien, alors que « Jean » seul trouvait
+       * la commande.
+       *
+       * Les mots sont évalués indépendamment, y compris à travers `items.some` : sur une commande
+       * de plusieurs billets, « Jean Dupont » la retient même si Jean et Dupont sont deux
+       * personnes différentes. C'est voulu — la commande les contient bien toutes les deux, et
+       * c'est elle que cet écran liste.
+       */
+      const clausesDeRecherche = motsClesDeLaRequete(search).map((mot) => ({
+        OR: [
+          ...identifiantDuMot(mot),
+          // Les champs plats de la commande passent par l'util ; la traversée `items.some` ne
+          // s'exprime pas en chemin pointé et reste donc écrite ici.
+          ...alternativesMotCle(mot, [
+            'payerFirstName',
+            'payerLastName',
+            'payerEmail',
+            'checkNumber',
+          ]),
+          {
+            items: {
+              some: {
+                OR: alternativesMotCle(mot, ['name', 'firstName', 'lastName', 'email']).concat(
+                  identifiantDuMot(mot)
+                ),
               },
-            ],
-          }
-        : {}
+            },
+          },
+        ],
+      }))
 
       // Construire la condition de filtre par méthode de paiement
       const paymentMethodCondition =
@@ -275,7 +286,11 @@ export default wrapApiHandler(
 
       /** Les statistiques ne sont calculées qu'en l'absence de recherche : elles n'en ont pas. */
       const filtresSansRecherche = avecCriteres(criteres)
-      const filtreDesCommandes = avecCriteres(search ? [...criteres, searchCondition] : criteres)
+      // Les clauses de recherche rejoignent les autres critères plutôt que de s'imbriquer dans un
+      // `AND` de plus : une recherche vide — ou réduite à des espaces — n'en produit aucune, et
+      // la liste reste alors celle de tous les résultats, ce qui est le bon défaut ICI (l'écran
+      // affiche les commandes par défaut, contrairement à la recherche du contrôle d'accès).
+      const filtreDesCommandes = avecCriteres([...criteres, ...clausesDeRecherche])
 
       // Vérifier si on doit filtrer par customFields (nécessite filtrage JS)
       const hasCustomFieldFilter = customFieldFilters.length > 0
