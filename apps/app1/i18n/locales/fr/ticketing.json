@@ -40,6 +40,7 @@
       "qr_invalide": "Ce QR code est illisible",
       "refund_error": "Impossible d'enregistrer le remboursement",
       "refund_recorded": "Remboursement enregistré",
+      "refund_undone": "Remboursement annulé",
       "scan_qr_code": "Scanner un QR code",
       "search_button_aria": "Lancer la recherche",
       "search_description": "Recherchez un billet par nom, prénom ou email",

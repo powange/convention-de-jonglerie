@@ -49,11 +49,20 @@
             color="warning"
             icon="i-heroicons-check-circle"
             :label="$t('edition.ticketing.refund_mark_done')"
-            @click="marquerRembourse"
+            @click="confirmationDuRemboursement = true"
           />
         </div>
 
-        <!-- Dette déjà soldée : on le dit, pour qu'on ne rende pas l'argent deux fois. -->
+        <!--
+          Dette déjà soldée : on le dit, pour qu'on ne rende pas l'argent deux fois.
+
+          Et on peut revenir dessus, sur place. Sans ce bouton, un bénévole qui s'est trompé devait
+          faire corriger l'erreur dans la gestion, depuis la liste des commandes — c'est-à-dire
+          demander à quelqu'un d'autre, la personne encore devant lui.
+
+          Pas de confirmation ici, à la différence du remboursement : celui-ci efface une dette,
+          celui-là la rétablit. On ne met pas de friction sur le geste qui répare.
+        -->
         <UAlert
           v-else-if="dejaRembourse"
           icon="i-heroicons-check-circle"
@@ -61,7 +70,18 @@
           variant="soft"
           :title="$t('edition.ticketing.refund_already_done')"
           :description="dateDuRemboursement"
-        />
+        >
+          <template #actions>
+            <UButton
+              size="xs"
+              color="neutral"
+              variant="ghost"
+              icon="i-heroicons-arrow-uturn-left"
+              :label="$t('edition.ticketing.refund_undo')"
+              @click="annulerLeRemboursement"
+            />
+          </template>
+        </UAlert>
 
         <!-- Type d'accès -->
         <div
@@ -737,6 +757,36 @@
     @cancel="showInvalidateModal = false"
   />
 
+  <!--
+    Confirmation du remboursement.
+
+    Un geste d'ARGENT, fait à la porte, sur un écran tactile, par quelqu'un qui enchaîne les
+    scans — et le bouton occupe toute la largeur, juste sous le montant dû. Sans cette étape, un
+    doigt qui glisse efface une dette, et plus personne ne saura qu'on la doit : le guichet ne
+    permet pas de revenir dessus, il faut passer par la liste des commandes en gestion.
+
+    Le montant et le nom figurent dans la QUESTION, pas seulement dans le bouton : c'est ce qui
+    arrête un clic de trop. Et cet écran confirmait déjà la dévalidation d'une entrée, qui est le
+    geste le moins lourd des deux.
+  -->
+  <UiConfirmModal
+    v-model="confirmationDuRemboursement"
+    :title="$t('edition.ticketing.refund_confirm_title')"
+    :description="
+      $t('edition.ticketing.refund_confirm_description', {
+        amount: money(montantARembourser ?? 0),
+        name: nomDuPorteur,
+      })
+    "
+    :confirm-label="$t('edition.ticketing.refund_mark_done')"
+    confirm-color="warning"
+    confirm-icon="i-heroicons-banknotes"
+    icon-name="i-heroicons-exclamation-triangle"
+    icon-color="text-amber-500"
+    @confirm="confirmerLeRemboursement"
+    @cancel="confirmationDuRemboursement = false"
+  />
+
   <!-- Modal de confirmation de paiement -->
   <UModal v-model:open="showPaymentConfirmModal" title="Confirmer le paiement">
     <template #body>
@@ -1010,8 +1060,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  /** « J'ai rendu l'argent de ce billet. » La page appelle le point d'API et rafraîchit la fiche. */
-  refund: [itemId: number]
+  /**
+   * L'argent de ce billet a-t-il été rendu ?
+   *
+   * `true` solde la dette, `false` la rétablit — le second sert à défaire une erreur sans quitter
+   * le guichet. La page appelle le point d'API et rafraîchit la fiche.
+   */
+  refund: [itemId: number, refunded: boolean]
   validate: [
     participantIds: number[],
     paymentInfo?: {
@@ -1283,8 +1338,21 @@ const dateDuRemboursement = computed(() => {
   return formaterDateHeure(quand, props.fuseau, locale.value)
 })
 
-const marquerRembourse = () => {
-  if (billetScanne.value) emit('refund', billetScanne.value.id)
+const confirmationDuRemboursement = ref(false)
+
+/** Le nom de qui présente le billet, pour que la question désigne une personne et pas « ce billet ». */
+const nomDuPorteur = computed(() => {
+  const porteur = billetScanne.value?.user
+  return [porteur?.firstName, porteur?.lastName].filter(Boolean).join(' ').trim()
+})
+
+const confirmerLeRemboursement = () => {
+  confirmationDuRemboursement.value = false
+  if (billetScanne.value) emit('refund', billetScanne.value.id, true)
+}
+
+const annulerLeRemboursement = () => {
+  if (billetScanne.value) emit('refund', billetScanne.value.id, false)
 }
 
 /**

@@ -1105,15 +1105,17 @@ const handleInvalidateEntry = async (participantId: number) => {
  *
  * L'entrée reste refusée : on solde une dette, on ne rouvre pas un droit.
  */
-const handleRefund = async (itemId: number) => {
+const handleRefund = async (itemId: number, refunded: boolean) => {
   try {
     await $fetch(`/api/editions/${editionId}/ticketing/order-items/${itemId}/refund`, {
       method: 'PATCH',
-      body: { refunded: true },
+      body: { refunded },
     })
 
     toast.add({
-      title: t('ticketing.access_control.refund_recorded'),
+      title: refunded
+        ? t('ticketing.access_control.refund_recorded')
+        : t('ticketing.access_control.refund_undone'),
       icon: 'i-heroicons-check-circle',
       color: 'success',
     })
