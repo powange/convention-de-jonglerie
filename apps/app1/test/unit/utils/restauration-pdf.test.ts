@@ -208,17 +208,42 @@ describe('lignesDeParticipants', () => {
     ])
   })
 
-  it('ne marque « après spectacle » que pour un artiste', () => {
+  /**
+   * ⚠️ Ce test disait l'inverse : « ne marque après spectacle que pour un artiste ». Il FIGEAIT le
+   * défaut au lieu de l'attraper — la liste ne marquait que les artistes alors que le résumé, juste
+   * au-dessus sur la même feuille, comptait déjà tout le monde. La cuisine lisait donc un nombre
+   * qui ne correspondait pas aux noms marqués en dessous, et les autres repas d'après spectacle
+   * passaient pour du service normal.
+   */
+  it('marque « après spectacle » pour toutes les populations, pas seulement les artistes', () => {
     const lignes = lignesDeParticipants(
       repas({
         participants: [
           personne({ type: 'artist', afterShow: true }),
           personne({ type: 'volunteer', afterShow: true }),
+          personne({ type: 'organizer', afterShow: true }),
           personne({ type: 'artist', afterShow: null }),
+          personne({ type: 'volunteer', afterShow: false }),
         ],
       })
     )
-    expect(lignes.map((l) => l.apresSpectacle)).toEqual([true, false, false])
+    expect(lignes.map((l) => l.apresSpectacle)).toEqual([true, true, true, false, false])
+  })
+
+  it('accorde la liste et le résumé sur le même compte', () => {
+    // L'invariant qui compte vraiment : le nombre annoncé et les lignes marquées sortent du même
+    // filtre. C'est leur divergence qui rendait la feuille trompeuse, pas le filtre en lui-même.
+    const unRepas = repas({
+      participants: [
+        personne({ type: 'volunteer', afterShow: true }),
+        personne({ type: 'organizer', afterShow: true }),
+        personne({ type: 'artist', afterShow: false }),
+      ],
+    })
+
+    expect(lignesDeParticipants(unRepas).filter((l) => l.apresSpectacle)).toHaveLength(
+      resumerRepas(unRepas).apresSpectacle
+    )
   })
 
   it('vide une allergie qui ne contient que des espaces', () => {
