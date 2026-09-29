@@ -64,6 +64,18 @@ export interface MessengerPort {
     userId: number
     tx?: PrismaTransaction
   }): Promise<void>
+  /**
+   * Retire un bénévole de son fil avec les organisateurs de l'événement.
+   *
+   * Distinct des conversations d'équipe : celui-ci existe dès la candidature, indépendamment de
+   * toute affectation. Le refuser sans le fermer laissait la personne lire — et écrire — dans le
+   * fil où se discute la candidature qu'on vient de refuser.
+   */
+  removeFromOrganizersConversation(input: {
+    eventId: number
+    userId: number
+    tx?: PrismaTransaction
+  }): Promise<void>
 }
 
 /**

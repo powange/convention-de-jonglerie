@@ -178,6 +178,81 @@ export async function removeVolunteerFromTeamConversations(
 }
 
 /**
+ * Retire un bénévole de sa conversation avec les organisateurs de l'édition.
+ *
+ * Le pendant de [ensureVolunteerToOrganizersConversation], et le jumeau de
+ * [removeVolunteerFromTeamConversations] un cran plus loin : une candidature refusée retirait le
+ * bénévole des équipes mais le laissait dans ce fil-là, où l'on parle de la candidature qu'on vient
+ * précisément de refuser.
+ *
+ * `leftAt` et non une suppression : l'historique du fil doit rester lisible pour les organisateurs
+ * qui y ont écrit, et c'est déjà la règle des conversations d'équipe. Le contrôle d'accès lit ce
+ * champ — un participant marqué parti ne peut plus lire.
+ *
+ * ⚠️ Le bénévole peut ÊTRE organisateur de l'édition. Sa participation est alors légitime à deux
+ * titres, et le retirer ici lui fermerait un fil auquel il a droit par l'autre. D'où le contrôle
+ * avant retrait, plutôt qu'un `updateMany` aveugle.
+ */
+export async function removeVolunteerFromOrganizersConversation(
+  editionId: number,
+  volunteerId: number,
+  tx?: PrismaTransaction
+) {
+  const client = tx || prisma
+
+  const conversation = await client.conversation.findFirst({
+    where: {
+      editionId,
+      teamId: null,
+      type: 'VOLUNTEER_TO_ORGANIZERS',
+      participants: { some: { userId: volunteerId } },
+    },
+    select: { id: true },
+  })
+
+  if (!conversation) return
+
+  /*
+   * La bonne question n'est pas « est-il organisateur ? » mais « fait-il partie des organisateurs
+   * POUR QUI ce fil existe ? ».
+   *
+   * D'où la même requête que celle qui les y ajoute, quelques lignes plus bas : un membre de la
+   * convention habilité à gérer les bénévoles, globalement ou sur cette édition. Un organisateur
+   * sans ce droit n'est pas dans ce fil, et le retirer d'une candidature refusée est donc juste.
+   */
+  const edition = await client.edition.findUnique({
+    where: { id: editionId },
+    select: { conventionId: true },
+  })
+  if (!edition) return
+
+  const estOrganisateurDuFil = await client.conventionOrganizer.findFirst({
+    where: {
+      conventionId: edition.conventionId,
+      userId: volunteerId,
+      OR: [
+        { canManageVolunteers: true },
+        { perEditionPermissions: { some: { editionId, canManageVolunteers: true } } },
+      ],
+    },
+    select: { id: true },
+  })
+
+  if (estOrganisateurDuFil) return
+
+  const participant = await client.conversationParticipant.findFirst({
+    where: { conversationId: conversation.id, userId: volunteerId },
+  })
+
+  if (participant && !participant.leftAt) {
+    await client.conversationParticipant.update({
+      where: { id: participant.id },
+      data: { leftAt: new Date() },
+    })
+  }
+}
+
+/**
  * Crée ou récupère une conversation entre un bénévole et les organisateurs ayant les droits de gestion des bénévoles
  * @param editionId - ID de l'édition
  * @param volunteerId - ID du bénévole
