@@ -654,6 +654,8 @@
     "team_periods_required": "Marca al menos un periodo",
     "filter_source": "Filtrar por procedencia",
     "source_all": "Todas las procedencias",
-    "delay_bornes": "Entre {min} y {max} minutos. Un valor negativo adelanta el turno."
+    "delay_bornes": "Entre {min} y {max} minutos. Un valor negativo adelanta el turno.",
+    "notify_include_without_slot": "Escribir también a los voluntarios sin turno",
+    "notify_include_without_slot_help": "Recibirán un mensaje anunciando que sus turnos llegarán. Los voluntarios de refuerzo y los miembros de equipos autónomos nunca están incluidos: para ellos, no tener turno es normal."
   }
 }

@@ -654,6 +654,8 @@
     "team_periods_required": "Seleziona almeno un periodo",
     "filter_source": "Filtra per provenienza",
     "source_all": "Tutte le provenienze",
-    "delay_bornes": "Tra {min} e {max} minuti. Un valore negativo anticipa il turno."
+    "delay_bornes": "Tra {min} e {max} minuti. Un valore negativo anticipa il turno.",
+    "notify_include_without_slot": "Scrivere anche ai volontari senza turno",
+    "notify_include_without_slot_help": "Riceveranno un messaggio che annuncia l'arrivo dei loro turni. I volontari di rinforzo e i membri di squadre autonome non sono mai coinvolti: per loro, non avere turni è normale."
   }
 }

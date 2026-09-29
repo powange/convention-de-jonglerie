@@ -654,6 +654,8 @@
     "team_periods_required": "Vink minstens één periode aan",
     "filter_source": "Filteren op herkomst",
     "source_all": "Alle herkomsten",
-    "delay_bornes": "Tussen {min} en {max} minuten. Een negatieve waarde vervroegt de dienst."
+    "delay_bornes": "Tussen {min} en {max} minuten. Een negatieve waarde vervroegt de dienst.",
+    "notify_include_without_slot": "Ook vrijwilligers zonder dienst aanschrijven",
+    "notify_include_without_slot_help": "Zij krijgen een bericht dat hun diensten nog komen. Vliegende vrijwilligers en leden van zelfstandige teams vallen hier nooit onder: voor hen is het normaal geen dienst te hebben."
   }
 }

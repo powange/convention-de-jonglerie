@@ -139,6 +139,16 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">
               {{ t('volunteers.notify_confirm_note') }}
             </p>
+
+            <!-- Par défaut, on n'écrit qu'aux bénévoles qui ont au moins un créneau : annoncer
+                 « vos créneaux sont disponibles » à qui n'en a aucun est un message qui ne dit
+                 rien. La case rétablit l'ancien comportement quand on le veut vraiment — en
+                 début de préparation, pour dire que la planification a commencé. -->
+            <UCheckbox
+              v-model="inclureSansCreneau"
+              :label="t('volunteers.notify_include_without_slot')"
+              :description="t('volunteers.notify_include_without_slot_help')"
+            />
           </div>
         </template>
         <template #footer>
@@ -193,11 +203,18 @@ const acceptedCount = computed(() => volunteersInfo.value?.counts?.ACCEPTED ?? 0
 
 // Variables pour l'envoi des notifications de créneaux
 const showNotifyModal = ref(false)
+/*
+ * Écrire aussi à ceux qui n'ont aucun créneau. Faux par défaut : le serveur les écarte alors, sauf
+ * les volants et les réservés à une équipe autonome, qu'il n'écrit jamais dans ce cas — pour eux,
+ * l'absence de créneau est leur situation et non un retard de planification.
+ */
+const inclureSansCreneau = ref(false)
 
 const { execute: sendScheduleNotifications, loading: sendingNotifications } = useApiAction(
   () => `/api/editions/${editionId}/volunteers/notify-schedules`,
   {
     method: 'POST',
+    body: () => ({ inclureSansCreneau: inclureSansCreneau.value }),
     successMessage: {
       title: t('common.success'),
       description: t('volunteers.notifications_sent_success'),

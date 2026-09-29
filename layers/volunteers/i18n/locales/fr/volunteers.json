@@ -380,6 +380,8 @@
     "notify_confirm_item_link": "Un lien vers la page « Mes candidatures »",
     "notify_confirm_item_notification": "Une notification dans l'application",
     "notify_confirm_note": "Les bénévoles recevront uniquement les créneaux qui leur ont été assignés.",
+    "notify_include_without_slot": "Écrire aussi aux bénévoles sans créneau",
+    "notify_include_without_slot_help": "Ils recevront un message annonçant que leurs créneaux arriveront. Les volants et les membres d'équipes autonomes ne sont jamais concernés : pour eux, ne pas avoir de créneau est normal.",
     "notify_confirm_send": "Confirmer l'envoi",
     "notify_confirm_title": "Confirmer l'envoi des notifications",
     "notify_confirm_warning": "Vous allez envoyer une notification et un email à tous les bénévoles acceptés pour les informer que leurs créneaux sont disponibles.",
