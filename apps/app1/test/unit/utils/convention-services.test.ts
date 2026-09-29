@@ -55,7 +55,7 @@ describe('convention-services utils', () => {
         'hasTentCamping',
         'hasGym',
         'hasToilets',
-        'hasAccessibility',
+        'hasPrmAccess',
         'hasCashPayment',
       ]
       essentialServices.forEach((serviceKey) => {
@@ -75,6 +75,24 @@ describe('convention-services utils', () => {
         expect(service.icon).toMatch(/^(i-)?[\w-]+[:-][\w-]+.*$/)
         expect(SERVICE_CATEGORIES).toContain(service.category)
       })
+    })
+
+    /**
+     * L'accessibilité est une SECTION, pas une case perdue.
+     *
+     * Le retour utilisateur qui a motivé ce lot disait « Accès Handicapé, c'est beaucoup trop
+     * large » : un drapeau unique ne disait pas si l'on parlait de fauteuil roulant, de langue des
+     * signes ou d'audiodescription. Deux services nommés, dans leur propre catégorie, répondent à
+     * ce reproche — et ce test empêche qu'on les redisperse dans « Commodités » sans y penser.
+     */
+    it('range l’accessibilité dans sa propre catégorie', () => {
+      const accessibilite = conventionServices
+        .filter((s) => s.category === 'accessibility')
+        .map((s) => s.key)
+        .sort()
+
+      expect(accessibilite).toEqual(['hasPrmAccess', 'hasSignLanguage'])
+      expect(SERVICE_CATEGORIES).toContain('accessibility')
     })
 
     it('a des clés uniques', () => {

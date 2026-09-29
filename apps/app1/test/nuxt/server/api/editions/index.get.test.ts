@@ -48,7 +48,7 @@ describe('/api/editions GET', () => {
     hasSlacklineSpace: true,
     hasToilets: true,
     hasShowers: true,
-    hasAccessibility: true,
+    hasPrmAccess: true,
     hasWorkshops: true,
     hasLongShow: false,
     hasATM: true,

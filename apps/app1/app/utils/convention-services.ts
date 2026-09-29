@@ -21,6 +21,7 @@ export type ConventionServiceCategory =
   | 'food'
   | 'activities'
   | 'amenities'
+  | 'accessibility'
   | 'payment'
 
 export interface ConventionService {
@@ -60,7 +61,8 @@ export interface ConventionServiceKeys {
   hasUnicycleSpace: boolean
   hasToilets: boolean
   hasShowers: boolean
-  hasAccessibility: boolean
+  hasPrmAccess: boolean
+  hasSignLanguage: boolean
   hasWorkshops: boolean
   hasCashPayment: boolean
   hasCreditCardPayment: boolean
@@ -235,12 +237,31 @@ export const conventionServices: ConventionService[] = [
     importLabel: 'douches',
   },
   {
-    key: 'hasAccessibility',
+    key: 'hasPrmAccess',
     i18nKey: 'services.accessibility',
     icon: 'i-bx:handicap',
     color: 'text-blue-600',
-    category: 'amenities',
-    importLabel: 'accessibilité PMR',
+    category: 'accessibility',
+    importLabel: 'accès PMR',
+  },
+  {
+    /*
+     * La langue des signes pratiquée sur place.
+     *
+     * Nommée par le genre et non par la langue : une convention allemande signe en DGS, une
+     * britannique en BSL. C'est le libellé de chaque langue qui nomme la sienne — « LSF pratiquée
+     * sur site » en français. Nommer la colonne `hasLsf` aurait inscrit le français en base, sur
+     * une plateforme qui en parle treize.
+     *
+     * « Pratiquée » et non « interprétée » : le besoin exprimé est que des gens signent sur
+     * place, pas qu'une prestation d'interprétariat soit assurée.
+     */
+    key: 'hasSignLanguage',
+    i18nKey: 'services.sign_language',
+    icon: 'i-material-symbols:sign-language',
+    color: 'text-indigo-600',
+    category: 'accessibility',
+    importLabel: 'langue des signes pratiquée sur site',
   },
   {
     key: 'hasATM',
@@ -283,6 +304,10 @@ export const SERVICE_CATEGORIES: ConventionServiceCategory[] = [
   'food',
   'activities',
   'amenities',
+  // L'accessibilité entre les commodités et les paiements : c'est une préoccupation pratique du
+  // site, et une SECTION plutôt qu'une case perdue entre les douches et le distributeur — un
+  // organisateur comprend alors qu'on l'interroge sur l'inclusion.
+  'accessibility',
   'payment',
 ]
 

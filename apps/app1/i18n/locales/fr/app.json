@@ -23,13 +23,14 @@
     }
   },
   "services": {
-    "accessibility": "Accessibilité handicapé",
+    "accessibility": "Accès PMR",
     "aerial_space": "Espace aérien",
     "afj_token_payment": "Paiement jetons AFJ",
     "atm": "Distributeur automatique de billets",
     "canteen": "Cantine",
     "cash_payment": "Paiement liquide",
     "categories": {
+      "accessibility": "Accessibilité",
       "accommodation": "Hébergement",
       "activities": "Activités",
       "amenities": "Commodités",
@@ -48,6 +49,7 @@
     "open_stage": "Scène ouverte",
     "pets_accepted": "Animaux acceptés",
     "showers": "Douches",
+    "sign_language": "LSF pratiquée sur site",
     "slackline_space": "Espace slackline",
     "sleeping_room": "Salle de couchage",
     "tent_camping": "Camping tente",

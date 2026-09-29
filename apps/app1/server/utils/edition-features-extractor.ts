@@ -34,7 +34,8 @@ export const EDITION_FEATURES_DESCRIPTIONS: Record<string, string> = {
   // Famille et accessibilité
   hasKidsZone: 'Espace enfants ou garderie',
   acceptsPets: 'Animaux de compagnie acceptés',
-  hasAccessibility: 'Accessibilité PMR (personnes à mobilité réduite)',
+  hasPrmAccess: 'Accessibilité PMR (personnes à mobilité réduite)',
+  hasSignLanguage: 'langue des signes pratiquée sur site',
 
   // Services
   hasToilets: 'Toilettes disponibles sur place',
@@ -68,7 +69,8 @@ export interface EditionFeatures {
   hasSlacklineSpace?: boolean
   hasToilets?: boolean
   hasShowers?: boolean
-  hasAccessibility?: boolean
+  hasPrmAccess?: boolean
+  hasSignLanguage?: boolean
   hasWorkshops?: boolean
   hasCashPayment?: boolean
   hasCreditCardPayment?: boolean

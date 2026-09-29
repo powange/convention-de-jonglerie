@@ -23,7 +23,7 @@
     }
   },
   "services": {
-    "accessibility": "Dostępność dla niepełnosprawnych",
+    "accessibility": "Dostęp dla osób z ograniczoną mobilnością",
     "aerial_space": "Przestrzeń powietrzna",
     "afj_token_payment": "Płatność żetonami AFJ",
     "atm": "Bankomat",
@@ -34,7 +34,8 @@
       "activities": "Aktywności",
       "amenities": "Udogodnienia",
       "food": "Gastronomia",
-      "payment": "Płatności"
+      "payment": "Płatności",
+      "accessibility": "Dostępność"
     },
     "concert": "Koncert",
     "credit_card_payment": "Płatność kartą",
@@ -54,6 +55,7 @@
     "toilets": "Toalety",
     "truck_camping": "Camping dla kamperów",
     "unicycle_space": "Strefa monocykli",
-    "workshops": "Warsztaty"
+    "workshops": "Warsztaty",
+    "sign_language": "Język migowy na miejscu"
   }
 }

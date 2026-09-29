@@ -43,7 +43,8 @@ interface EditionFilters {
   hasSlacklineSpace?: boolean
   hasToilets?: boolean
   hasShowers?: boolean
-  hasAccessibility?: boolean
+  hasPrmAccess?: boolean
+  hasSignLanguage?: boolean
   hasWorkshops?: boolean
   hasCashPayment?: boolean
   hasCreditCardPayment?: boolean

@@ -23,7 +23,7 @@
     }
   },
   "services": {
-    "accessibility": "Доступность для людей с инвалидностью",
+    "accessibility": "Доступ для маломобильных",
     "aerial_space": "Воздушное пространство",
     "afj_token_payment": "Оплата токенами AFJ",
     "atm": "Банкомат",
@@ -34,7 +34,8 @@
       "activities": "Активности",
       "amenities": "Удобства",
       "food": "Еда и Напитки",
-      "payment": "Оплата"
+      "payment": "Оплата",
+      "accessibility": "Доступность"
     },
     "concert": "Концерт",
     "credit_card_payment": "Оплата кредитной картой",
@@ -54,6 +55,7 @@
     "toilets": "Туалеты",
     "truck_camping": "Кемпинг для автодомов",
     "unicycle_space": "Зона для моноциклов",
-    "workshops": "Мастер-классы"
+    "workshops": "Мастер-классы",
+    "sign_language": "Жестовый язык на месте"
   }
 }
