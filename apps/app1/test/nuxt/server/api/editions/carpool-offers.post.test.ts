@@ -87,6 +87,11 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
         direction: requestBody.direction,
         description: requestBody.description,
         phoneNumber: requestBody.phoneNumber,
+        // Absentes du corps : le schéma les pose à false, comme le défaut de la colonne. Elles
+        // doivent apparaître ici, et non manquer — c'est leur absence qui était le défaut.
+        smokingAllowed: false,
+        petsAllowed: false,
+        musicAllowed: false,
       },
       include: {
         user: {
@@ -261,6 +266,75 @@ describe('/api/editions/[id]/carpool-offers POST', () => {
       expect.objectContaining({
         data: expect.objectContaining({
           availableSeats: 4, // Converti en entier
+        }),
+      })
+    )
+  })
+
+  /**
+   * Les trois préférences du trajet, qui étaient perdues en silence.
+   *
+   * ⚠️ Pourquoi rien ne le signalait : le formulaire les envoyait bien, mais `carpoolOfferSchema`
+   * ne les déclarait pas — et zod RETIRE les clés non déclarées au lieu de s'en plaindre. Le corps
+   * validé n'en portait donc plus trace, aucune erreur n'était levée, et l'offre naissait
+   * « non-fumeur, sans animaux, sans musique » quoi que la personne ait coché. Elle ne pouvait le
+   * découvrir qu'en relisant sa propre annonce.
+   *
+   * Le test porte sur ce qui est transmis à `create`, et non sur la réponse : le mock de Prisma
+   * rend ce qu'on lui a dit de rendre, une assertion sur le retour mesurerait le mock.
+   */
+  it('enregistre les trois préférences du trajet quand elles sont cochées', async () => {
+    global.readBody.mockResolvedValue({
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
+      availableSeats: 3,
+      direction: 'TO_EVENT',
+      smokingAllowed: true,
+      petsAllowed: true,
+      musicAllowed: true,
+    })
+    prismaMock.edition.findUnique.mockResolvedValue({ id: 1 })
+    prismaMock.carpoolOffer.create.mockResolvedValue({ id: 1, user: {} })
+
+    await handler(mockEvent as any)
+
+    expect(prismaMock.carpoolOffer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          smokingAllowed: true,
+          petsAllowed: true,
+          musicAllowed: true,
+        }),
+      })
+    )
+  })
+
+  it('distingue une préférence refusée d’une préférence non transmise', async () => {
+    // `false` explicite et absence donnent le même résultat — c'est voulu, la colonne vaut false
+    // par défaut — mais les deux doivent ARRIVER jusqu'à `create`, sans quoi on ne saurait pas
+    // distinguer « le schéma les laisse passer » de « le schéma les efface toutes ».
+    global.readBody.mockResolvedValue({
+      tripDate: '2024-07-15T08:00:00.000Z',
+      locationCity: 'Paris',
+      locationAddress: '123 Rue de la Paix',
+      availableSeats: 3,
+      direction: 'TO_EVENT',
+      smokingAllowed: false,
+      petsAllowed: true,
+      musicAllowed: false,
+    })
+    prismaMock.edition.findUnique.mockResolvedValue({ id: 1 })
+    prismaMock.carpoolOffer.create.mockResolvedValue({ id: 1, user: {} })
+
+    await handler(mockEvent as any)
+
+    expect(prismaMock.carpoolOffer.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          smokingAllowed: false,
+          petsAllowed: true,
+          musicAllowed: false,
         }),
       })
     )
