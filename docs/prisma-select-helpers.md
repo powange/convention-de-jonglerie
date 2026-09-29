@@ -16,7 +16,7 @@ const user = await prisma.user.findUnique({
     id: true,
     pseudo: true,
   },
-})
+});
 
 // Dans d'autres fichiers
 const offer = await prisma.carpoolOffer.update({
@@ -29,22 +29,25 @@ const offer = await prisma.carpoolOffer.update({
       },
     },
   },
-})
+});
 ```
 
 **Après** : Utilisation de helpers réutilisables
 
 ```typescript
-import { userBasicSelect, carpoolOfferInclude } from '#server/utils/prisma-select-helpers'
+import {
+  userBasicSelect,
+  carpoolOfferInclude,
+} from "#server/utils/prisma-select-helpers";
 
 const user = await prisma.user.findUnique({
   where: { id },
   select: userBasicSelect,
-})
+});
 
 const offer = await prisma.carpoolOffer.update({
   include: carpoolOfferInclude,
-})
+});
 ```
 
 ## 📊 Statistiques
@@ -103,12 +106,13 @@ const offer = await prisma.carpoolOffer.update({
 
 ### Autres modules
 
-| Helper                      | Usage typique                   |
-| --------------------------- | ------------------------------- |
-| `lostFoundItemInclude`      | Objets trouvés avec utilisateur |
-| `ticketingOrderInclude`     | Commandes de billetterie        |
-| `editionPostInclude`        | Posts avec auteur               |
-| `editionPostCommentInclude` | Commentaires avec auteur        |
+| Helper                      | Usage typique                             |
+| --------------------------- | ----------------------------------------- |
+| `lostFoundItemInclude`      | Objets trouvés avec utilisateur           |
+| `ticketingOrderInclude`     | Commandes de billetterie                  |
+| `editionPostInclude`        | Posts avec auteur                         |
+| `editionPostCommentInclude` | Commentaires avec auteur                  |
+| `messengerMessageInclude`   | Message de messagerie (auteur + citation) |
 
 ## 📖 Guide d'utilisation
 
@@ -119,7 +123,7 @@ import {
   userBasicSelect,
   userWithProfileSelect,
   editionListInclude,
-} from '#server/utils/prisma-select-helpers'
+} from "#server/utils/prisma-select-helpers";
 ```
 
 ### 2. Utilisation avec `select`
@@ -131,12 +135,12 @@ const users = await prisma.user.findMany({
     id: true,
     pseudo: true,
   },
-})
+});
 
 // Utiliser
 const users = await prisma.user.findMany({
   select: userBasicSelect,
-})
+});
 ```
 
 ### 3. Utilisation avec `include`
@@ -153,29 +157,32 @@ const offers = await prisma.carpoolOffer.findMany({
       },
     },
   },
-})
+});
 
 // Utiliser
 const offers = await prisma.carpoolOffer.findMany({
   include: carpoolOfferInclude,
-})
+});
 ```
 
 ### 4. Utilisation avec typage
 
 ```typescript
-import type { UserBasic, EditionList } from '#server/utils/prisma-select-helpers'
+import type {
+  UserBasic,
+  EditionList,
+} from "#server/utils/prisma-select-helpers";
 
 // Le type est automatiquement inféré
 const user: UserBasic = await prisma.user.findUnique({
   where: { id },
   select: userBasicSelect,
-})
+});
 
 const editions: EditionList[] = await prisma.edition.findMany({
   select: editionListSelect,
   include: editionListInclude,
-})
+});
 ```
 
 ### 5. Extension des helpers
@@ -189,7 +196,7 @@ const users = await prisma.user.findMany({
     email: true, // Champ supplémentaire
     createdAt: true,
   },
-})
+});
 ```
 
 ## 🔄 Exemples de conversion
@@ -210,18 +217,21 @@ const editions = await prisma.edition.findMany({
       select: { id: true, name: true, logo: true },
     },
   },
-})
+});
 ```
 
 **Après** :
 
 ```typescript
-import { editionListSelect, editionListInclude } from '#server/utils/prisma-select-helpers'
+import {
+  editionListSelect,
+  editionListInclude,
+} from "#server/utils/prisma-select-helpers";
 
 const editions = await prisma.edition.findMany({
   select: editionListSelect,
   include: editionListInclude,
-})
+});
 ```
 
 **Gain** : -8 lignes, clarté du code, réutilisabilité
@@ -244,19 +254,19 @@ const updatedOffer = await prisma.carpoolOffer.update({
       },
     },
   },
-})
+});
 ```
 
 **Après** :
 
 ```typescript
-import { carpoolOfferInclude } from '#server/utils/prisma-select-helpers'
+import { carpoolOfferInclude } from "#server/utils/prisma-select-helpers";
 
 const updatedOffer = await prisma.carpoolOffer.update({
   where: { id: offerId },
   data: updateData,
   include: carpoolOfferInclude,
-})
+});
 ```
 
 **Gain** : -7 lignes, cohérence garantie
@@ -273,17 +283,17 @@ const organizers = await prisma.conventionOrganizer.findMany({
     addedBy: { select: { pseudo: true } },
     perEditionPermissions: true,
   },
-})
+});
 ```
 
 **Après** :
 
 ```typescript
-import { organizerWithUserInclude } from '#server/utils/prisma-select-helpers'
+import { organizerWithUserInclude } from "#server/utils/prisma-select-helpers";
 
 const organizers = await prisma.conventionOrganizer.findMany({
   include: organizerWithUserInclude,
-})
+});
 ```
 
 **Gain** : -3 lignes, standardisation
@@ -305,17 +315,17 @@ const applications = await prisma.editionVolunteerApplication.findMany({
       },
     },
   },
-})
+});
 ```
 
 **Après** :
 
 ```typescript
-import { volunteerApplicationInclude } from '#server/utils/prisma-select-helpers'
+import { volunteerApplicationInclude } from "#server/utils/prisma-select-helpers";
 
 const applications = await prisma.editionVolunteerApplication.findMany({
   include: volunteerApplicationInclude,
-})
+});
 ```
 
 **Gain** : -6 lignes, typage automatique
@@ -356,41 +366,43 @@ Migrer les endpoints les plus utilisés :
 Créer `scripts/check-prisma-select.ts` :
 
 ```typescript
-import { glob } from 'glob'
-import { readFile } from 'fs/promises'
+import { glob } from "glob";
+import { readFile } from "fs/promises";
 
 async function checkPrismaSelects() {
-  const apiFiles = await glob('server/api/**/*.ts')
+  const apiFiles = await glob("server/api/**/*.ts");
   const patterns = [
     /select:\s*\{\s*id:\s*true,\s*pseudo:\s*true\s*\}/,
     /select:\s*\{\s*id:\s*true,\s*pseudo:\s*true,\s*profilePicture:\s*true\s*\}/,
     /select:\s*\{\s*id:\s*true,\s*name:\s*true,\s*logo:\s*true\s*\}/,
-  ]
+  ];
 
-  const filesWithOldPatterns: string[] = []
+  const filesWithOldPatterns: string[] = [];
 
   for (const file of apiFiles) {
-    const content = await readFile(file, 'utf-8')
+    const content = await readFile(file, "utf-8");
 
     for (const pattern of patterns) {
       if (pattern.test(content)) {
-        filesWithOldPatterns.push(file)
-        break
+        filesWithOldPatterns.push(file);
+        break;
       }
     }
   }
 
-  console.log(`📊 Fichiers avec patterns non migrés : ${filesWithOldPatterns.length}`)
+  console.log(
+    `📊 Fichiers avec patterns non migrés : ${filesWithOldPatterns.length}`,
+  );
 
   if (filesWithOldPatterns.length > 0) {
-    console.log('\n⚠️ Fichiers à migrer :')
-    filesWithOldPatterns.forEach((file) => console.log(`  - ${file}`))
+    console.log("\n⚠️ Fichiers à migrer :");
+    filesWithOldPatterns.forEach((file) => console.log(`  - ${file}`));
   } else {
-    console.log('✅ Tous les patterns ont été migrés !')
+    console.log("✅ Tous les patterns ont été migrés !");
   }
 }
 
-checkPrismaSelects()
+checkPrismaSelects();
 ```
 
 Ajouter au `package.json` :
@@ -409,10 +421,10 @@ Ajouter au `package.json` :
 
 ```typescript
 // ✅ Bon
-import { userBasicSelect } from '#server/utils/prisma-select-helpers'
+import { userBasicSelect } from "#server/utils/prisma-select-helpers";
 
 // ❌ Mauvais - duplication
-const select = { id: true, pseudo: true }
+const select = { id: true, pseudo: true };
 ```
 
 ### 2. Étendre avec spread si besoin
@@ -455,7 +467,7 @@ Si vous voyez une sélection répétée 3+ fois, ajoutez-la au fichier :
 export const userWithEmailSelect = {
   ...userBasicSelect,
   email: true,
-} satisfies Prisma.UserSelect
+} satisfies Prisma.UserSelect;
 ```
 
 ## 🎓 Avantages

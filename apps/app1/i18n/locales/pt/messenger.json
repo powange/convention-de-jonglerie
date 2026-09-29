@@ -45,6 +45,9 @@
     "copied": "Mensagem copiada",
     "copy": "Copiar a mensagem",
     "copy_failed": "Não foi possível copiar a mensagem",
-    "copy_unavailable": "O seu navegador não permite copiar aqui"
+    "copy_unavailable": "O seu navegador não permite copiar aqui",
+    "edit": "Editar",
+    "edit_expired": "Uma mensagem já não pode ser editada {minutes} minutos após o envio",
+    "editing": "A editar a mensagem"
   }
 }

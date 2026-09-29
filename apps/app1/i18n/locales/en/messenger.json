@@ -45,6 +45,9 @@
     "copied": "Message copied",
     "copy": "Copy message",
     "copy_failed": "Could not copy the message",
-    "copy_unavailable": "Your browser does not allow copying here"
+    "copy_unavailable": "Your browser does not allow copying here",
+    "edit": "Edit",
+    "edit_expired": "A message can no longer be edited {minutes} minutes after it was sent",
+    "editing": "Editing message"
   }
 }

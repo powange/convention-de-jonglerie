@@ -1,6 +1,8 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { conversationPresenceService } from '#server/utils/conversation-presence-service'
+import { masquerMessageSupprime } from '#server/utils/messenger-message-affiche'
+import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
 import { checkArtistApplicationConversationAccess } from '#server/utils/show-application-helpers'
 
 /**
@@ -58,21 +60,7 @@ export default wrapApiHandler(
               gt: lastMessageTime,
             },
           },
-          include: {
-            participant: {
-              select: {
-                id: true,
-                userId: true,
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                    profilePicture: true,
-                  },
-                },
-              },
-            },
-          },
+          include: messengerMessageInclude,
           orderBy: {
             createdAt: 'asc',
           },
@@ -81,7 +69,9 @@ export default wrapApiHandler(
         if (newMessages.length > 0) {
           // Envoyer les nouveaux messages
           for (const message of newMessages) {
-            await eventStream.push(JSON.stringify({ type: 'message', data: message }))
+            await eventStream.push(
+              JSON.stringify({ type: 'message', data: masquerMessageSupprime(message) })
+            )
           }
 
           // Mettre à jour le timestamp
@@ -105,21 +95,7 @@ export default wrapApiHandler(
               },
             ],
           },
-          include: {
-            participant: {
-              select: {
-                id: true,
-                userId: true,
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                    profilePicture: true,
-                  },
-                },
-              },
-            },
-          },
+          include: messengerMessageInclude,
           orderBy: {
             createdAt: 'asc',
           },
@@ -131,11 +107,7 @@ export default wrapApiHandler(
             await eventStream.push(
               JSON.stringify({
                 type: 'message-updated',
-                data: {
-                  ...message,
-                  // Masquer le contenu si le message est supprimé
-                  content: message.deletedAt ? 'Message supprimé' : message.content,
-                },
+                data: masquerMessageSupprime(message),
               })
             )
           }

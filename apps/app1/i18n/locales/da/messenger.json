@@ -45,6 +45,9 @@
     "copied": "Beskeden er kopieret",
     "copy": "Kopiér beskeden",
     "copy_failed": "Beskeden kunne ikke kopieres",
-    "copy_unavailable": "Din browser tillader ikke kopiering her"
+    "copy_unavailable": "Din browser tillader ikke kopiering her",
+    "edit": "Rediger",
+    "edit_expired": "En besked kan ikke længere redigeres {minutes} minutter efter, at den er sendt",
+    "editing": "Redigerer besked"
   }
 }

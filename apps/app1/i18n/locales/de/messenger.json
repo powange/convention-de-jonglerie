@@ -45,6 +45,9 @@
     "copied": "Nachricht kopiert",
     "copy": "Nachricht kopieren",
     "copy_failed": "Die Nachricht konnte nicht kopiert werden",
-    "copy_unavailable": "Ihr Browser erlaubt das Kopieren hier nicht"
+    "copy_unavailable": "Ihr Browser erlaubt das Kopieren hier nicht",
+    "edit": "Bearbeiten",
+    "edit_expired": "Eine Nachricht kann {minutes} Minuten nach dem Senden nicht mehr bearbeitet werden",
+    "editing": "Nachricht bearbeiten"
   }
 }

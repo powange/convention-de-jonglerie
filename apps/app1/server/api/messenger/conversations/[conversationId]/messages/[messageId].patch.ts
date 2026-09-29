@@ -2,9 +2,16 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { masquerMessageSupprime } from '#server/utils/messenger-message-affiche'
+import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
+import {
+  DELAI_MODIFICATION_MESSAGE_MINUTES,
+  messageEncoreModifiable,
+} from '~~/shared/utils/message-modifiable'
 
 const bodySchema = z.object({
-  content: z.string().min(1).max(10000).optional(),
+  // Rogné comme à l'envoi : un message modifié en « \n » seul serait un message vide.
+  content: z.string().trim().min(1).max(10000).optional(),
   deleted: z.boolean().optional(),
 })
 
@@ -46,6 +53,14 @@ export default wrapApiHandler(
       })
     }
 
+    // Le délai ne vaut que pour la modification : on peut toujours retirer un message.
+    if (deleted !== true && content !== undefined && !messageEncoreModifiable(message.createdAt)) {
+      throw createError({
+        status: 400,
+        message: `Un message ne peut plus être modifié ${DELAI_MODIFICATION_MESSAGE_MINUTES} minutes après son envoi`,
+      })
+    }
+
     // Préparer les données de mise à jour
     const updateData: any = {}
 
@@ -60,27 +75,12 @@ export default wrapApiHandler(
     const updatedMessage = await prisma.message.update({
       where: { id: messageId },
       data: updateData,
-      include: {
-        participant: {
-          select: {
-            id: true,
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                profilePicture: true,
-                emailHash: true,
-              },
-            },
-          },
-        },
-      },
+      // La citation aussi : l'écran remplace le message par cette réponse, et sans elle la
+      // citation d'une réponse disparaissait à la première modification.
+      include: messengerMessageInclude,
     })
 
-    // Transformer le message pour supprimer participantId
-    const { participantId: _participantId, ...messageWithoutParticipantId } = updatedMessage
-
-    return createSuccessResponse(messageWithoutParticipantId)
+    return createSuccessResponse(masquerMessageSupprime(updatedMessage))
   },
   { operationName: 'UpdateMessage' }
 )

@@ -45,6 +45,9 @@
     "copied": "Zpráva zkopírována",
     "copy": "Kopírovat zprávu",
     "copy_failed": "Zprávu se nepodařilo zkopírovat",
-    "copy_unavailable": "Váš prohlížeč zde kopírování neumožňuje"
+    "copy_unavailable": "Váš prohlížeč zde kopírování neumožňuje",
+    "edit": "Upravit",
+    "edit_expired": "Zprávu už nelze upravit {minutes} minut po odeslání",
+    "editing": "Úprava zprávy"
   }
 }

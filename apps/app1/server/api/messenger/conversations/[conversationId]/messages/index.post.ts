@@ -8,6 +8,7 @@ import {
   messengerStreamService,
   messengerUnreadService,
 } from '#server/utils/messenger-unread-service'
+import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
 import { unifiedPushService } from '#server/utils/unified-push-service'
 
 const bodySchema = z.object({
@@ -129,39 +130,7 @@ export default wrapApiHandler(
         content: content.trim(),
         replyToId,
       },
-      include: {
-        participant: {
-          select: {
-            id: true,
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                profilePicture: true,
-                emailHash: true,
-              },
-            },
-          },
-        },
-        replyTo: {
-          select: {
-            id: true,
-            content: true,
-            createdAt: true,
-            deletedAt: true,
-            participant: {
-              select: {
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+      include: messengerMessageInclude,
     })
 
     // Mettre à jour la conversation (updatedAt)

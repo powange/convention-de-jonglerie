@@ -2,6 +2,8 @@ import { z } from 'zod'
 
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { masquerMessageSupprime } from '#server/utils/messenger-message-affiche'
+import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
 import { checkArtistApplicationConversationAccess } from '#server/utils/show-application-helpers'
 
 const querySchema = z.object({
@@ -45,39 +47,7 @@ export default wrapApiHandler(
       where: {
         conversationId,
       },
-      include: {
-        participant: {
-          select: {
-            id: true,
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                profilePicture: true,
-                emailHash: true,
-              },
-            },
-          },
-        },
-        replyTo: {
-          select: {
-            id: true,
-            content: true,
-            createdAt: true,
-            deletedAt: true,
-            participant: {
-              select: {
-                user: {
-                  select: {
-                    id: true,
-                    pseudo: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+      include: messengerMessageInclude,
       orderBy: {
         createdAt: 'desc',
       },
@@ -106,36 +76,7 @@ export default wrapApiHandler(
 
     const page = Math.floor(offset / limit) + 1
 
-    // Transformer les messages pour supprimer participantId et masquer le contenu des messages supprimés
-    const transformedMessages = messages.map((message) => {
-      const { participantId: _participantId, ...messageWithoutParticipantId } = message
-
-      // Remplacer le contenu par "Message supprimé" si le message est supprimé
-      if (message.deletedAt) {
-        return {
-          ...messageWithoutParticipantId,
-          content: 'Message supprimé',
-          // Si le message auquel on répond est supprimé, le masquer aussi
-          replyTo: message.replyTo
-            ? {
-                ...message.replyTo,
-                content: message.replyTo.deletedAt ? 'Message supprimé' : message.replyTo.content,
-              }
-            : null,
-        }
-      }
-
-      // Masquer le contenu du message replyTo s'il est supprimé
-      return {
-        ...messageWithoutParticipantId,
-        replyTo: message.replyTo
-          ? {
-              ...message.replyTo,
-              content: message.replyTo.deletedAt ? 'Message supprimé' : message.replyTo.content,
-            }
-          : null,
-      }
-    })
+    const transformedMessages = messages.map((message) => masquerMessageSupprime(message))
 
     return createPaginatedResponse(transformedMessages.reverse(), total, page, limit)
   },
