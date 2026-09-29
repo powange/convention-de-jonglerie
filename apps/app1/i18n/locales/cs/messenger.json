@@ -12,14 +12,11 @@
     "conversations": "Konverzace",
     "delete": "Smazat",
     "edited": "upraveno",
-    "hours_ago": "Před {count}h",
-    "just_now": "Právě teď",
     "loading": "Načítání...",
     "loading_messages": "Načítání zpráv...",
     "loading_previous_messages": "Načítání předchozích zpráv...",
     "message_actions": "Akce",
     "message_placeholder": "Napište svou zprávu...",
-    "minutes_ago": "Před {count}min",
     "no_conversations": "Žádné konverzace",
     "no_messages": "Zatím žádné zprávy",
     "online": "Online",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Váš prohlížeč zde kopírování neumožňuje",
     "edit": "Upravit",
     "edit_expired": "Zprávu už nelze upravit {minutes} minut po odeslání",
-    "editing": "Úprava zprávy"
+    "editing": "Úprava zprávy",
+    "resume_today": "Dnes, {time}",
+    "resume_yesterday": "Včera, {time}"
   }
 }

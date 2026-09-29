@@ -12,14 +12,11 @@
     "conversations": "Conversations",
     "delete": "Delete",
     "edited": "edited",
-    "hours_ago": "{count}h ago",
-    "just_now": "Just now",
     "loading": "Loading...",
     "loading_messages": "Loading messages...",
     "loading_previous_messages": "Loading previous messages...",
     "message_actions": "Actions",
     "message_placeholder": "Write your message...",
-    "minutes_ago": "{count}min ago",
     "no_conversations": "No conversations",
     "no_messages": "No messages yet",
     "online": "Online",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Your browser does not allow copying here",
     "edit": "Edit",
     "edit_expired": "A message can no longer be edited {minutes} minutes after it was sent",
-    "editing": "Editing message"
+    "editing": "Editing message",
+    "resume_today": "Today, {time}",
+    "resume_yesterday": "Yesterday, {time}"
   }
 }

@@ -12,14 +12,11 @@
     "conversations": "Gesprekken",
     "delete": "Verwijderen",
     "edited": "bewerkt",
-    "hours_ago": "{count}u geleden",
-    "just_now": "Zojuist",
     "loading": "Laden...",
     "loading_messages": "Berichten laden...",
     "loading_previous_messages": "Vorige berichten laden...",
     "message_actions": "Acties",
     "message_placeholder": "Schrijf je bericht...",
-    "minutes_ago": "{count}min geleden",
     "no_conversations": "Geen gesprekken",
     "no_messages": "Nog geen berichten",
     "online": "Online",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Je browser staat kopiëren hier niet toe",
     "edit": "Bewerken",
     "edit_expired": "Een bericht kan {minutes} minuten na verzending niet meer worden bewerkt",
-    "editing": "Bericht bewerken"
+    "editing": "Bericht bewerken",
+    "resume_today": "Vandaag, {time}",
+    "resume_yesterday": "Gisteren, {time}"
   }
 }

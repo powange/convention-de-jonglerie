@@ -301,7 +301,22 @@
                   v-for="message in formattedMessages"
                   :id="`message-${message.id}`"
                   :key="message.id"
+                  @click="basculerHeureTactile(message.id)"
                 >
+                  <!--
+                    Repère de reprise, au milieu du fil : la date et l'heure du premier message
+                    après une longue pause ou un changement de jour. Il n'appartient à aucun
+                    message, il situe la suite.
+                  -->
+                  <div
+                    v-if="message.metadata.repereDeReprise"
+                    class="flex items-center gap-3 py-3 text-xs text-muted"
+                  >
+                    <USeparator class="flex-1" />
+                    <span class="shrink-0">{{ message.metadata.repereDeReprise }}</span>
+                    <USeparator class="flex-1" />
+                  </div>
+
                   <!--
                     Pas d'avatar sur ses propres messages : leur place à droite dit déjà qu'ils
                     sont les nôtres. Sur ceux des autres, l'avatar ne vient qu'en tête de série ;
@@ -314,8 +329,10 @@
                     variant="subtle"
                     :color="message.isCurrentUser ? 'secondary' : 'neutral'"
                     :avatar="message.isCurrentUser ? undefined : { src: message.avatarUrl.value }"
-                    :actions="isMobile ? undefined : message.actions"
-                    :ui="message.metadata.debutDeSerie ? undefined : { leadingAvatar: 'invisible' }"
+                    :ui="{
+                      leadingAvatar: message.metadata.debutDeSerie ? undefined : 'invisible',
+                      actions: '[@media(hover:hover)]:opacity-100',
+                    }"
                   >
                     <template #content>
                       <MessengerMessageBubble
@@ -367,17 +384,55 @@
                           >
                             <MessengerMessageText :texte="message.parts[0]?.text ?? ''" />
                           </p>
-                          <!-- Horodatage et statut d'édition -->
-                          <p class="text-xs mt-1 opacity-70">
-                            {{ formatMessageTime(message.metadata?.createdAt) }}
-                            <span
-                              v-if="message.metadata?.editedAt && !message.metadata?.isDeleted"
-                              class="ml-1"
-                              >({{ $t('messenger.edited') }})</span
-                            >
-                          </p>
                         </div>
                       </MessengerMessageBubble>
+                    </template>
+
+                    <!--
+                      Sous la bulle, dans la bande que le composant réserve à ses actions : l'heure,
+                      « modifié », puis les actions. La bande est rendue visible en permanence
+                      (le composant la masque hors survol) pour que « modifié » le reste : c'est
+                      une information sur le contenu, qu'on ne doit pas avoir à chercher. L'heure
+                      et les actions, elles, n'apparaissent qu'au survol ; sur un écran tactile,
+                      où le survol n'existe pas, un appui court sur le message montre l'heure.
+                    -->
+                    <template #actions>
+                      <div
+                        class="flex items-center gap-2 text-xs text-muted"
+                        :class="{ 'flex-row-reverse': message.isCurrentUser }"
+                      >
+                        <span
+                          class="[@media(hover:hover)]:opacity-0 group-hover/message:opacity-100 transition-opacity"
+                          :class="{
+                            '[@media(hover:none)]:hidden': heureTactileVisible !== message.id,
+                          }"
+                          :title="formatDateComplete(message.metadata.createdAt)"
+                        >
+                          {{ formatHeure(message.metadata.createdAt) }}
+                        </span>
+                        <span v-if="message.metadata.editedAt && !message.metadata.isDeleted">
+                          {{ $t('messenger.edited') }}
+                        </span>
+                        <div
+                          v-if="!isMobile && message.actions"
+                          class="flex items-center opacity-0 group-hover/message:opacity-100 transition-opacity"
+                        >
+                          <UTooltip
+                            v-for="action in message.actions"
+                            :key="action.label"
+                            :text="action.label"
+                          >
+                            <UButton
+                              size="sm"
+                              variant="ghost"
+                              :color="action.color"
+                              :icon="action.icon"
+                              :aria-label="action.label"
+                              @click.stop="action.onClick()"
+                            />
+                          </UTooltip>
+                        </div>
+                      </div>
                     </template>
                   </UChatMessage>
 
@@ -528,6 +583,7 @@ import type {
 } from '~/composables/useMessenger'
 import { useAuthStore } from '~/stores/auth'
 import { useAvatar } from '~/utils/avatar'
+import { toIntlLocale } from '~/utils/locales'
 
 import {
   DELAI_MODIFICATION_MESSAGE_MINUTES,
@@ -547,7 +603,7 @@ await useLazyI18n('messenger')
 const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const { copierMessage } = useCopierMessage()
 const {
@@ -590,6 +646,8 @@ const maintenant = useNow({ interval: 30_000 })
 
 // Au-delà de cet écart, deux messages d'une même personne ouvrent chacun leur série.
 const PAUSE_ENTRE_SERIES_MS = 5 * 60 * 1000
+// Au-delà de celui-ci (ou au changement de jour), un repère daté s'affiche au milieu du fil.
+const PAUSE_AVANT_REPERE_MS = 60 * 60 * 1000
 
 // Pagination des messages
 const hasMoreMessages = ref(true)
@@ -720,22 +778,33 @@ const formattedMessages = computed(() => {
     // Une série : des messages consécutifs d'une même personne, sans longue pause entre eux.
     // Seul le premier porte le pseudo et l'avatar.
     const precedent = allMessages.value[index - 1]
+    const envoye = new Date(message.createdAt)
+    const ecart = precedent ? envoye.getTime() - new Date(precedent.createdAt).getTime() : Infinity
+
+    // Le premier message chargé en porte un aussi : sans lui, rien ne daterait le début du fil.
+    const repereDeReprise =
+      !precedent ||
+      ecart > PAUSE_AVANT_REPERE_MS ||
+      !memeJour(new Date(precedent.createdAt), envoye)
+        ? libelleRepere(envoye, maintenant.value)
+        : null
+
+    // Un repère coupe aussi la série : la reprise se lit comme un nouveau départ.
     const debutDeSerie =
+      !!repereDeReprise ||
       !precedent ||
       precedent.participant.user.id !== message.participant.user.id ||
-      new Date(message.createdAt).getTime() - new Date(precedent.createdAt).getTime() >
-        PAUSE_ENTRE_SERIES_MS
+      ecart > PAUSE_ENTRE_SERIES_MS
 
     // Actions natives pour les messages non supprimés
-    // `UChatMessage` rend chaque action en bouton-icône, le libellé dans une infobulle : sans
-    // `aria-label`, les boutons n'avaient aucun nom pour un lecteur d'écran.
+    // Le gabarit les rend lui-même sous la bulle, en boutons-icônes : le libellé y sert
+    // d'infobulle et de nom accessible (`aria-label`).
     const actions = !isDeleted
       ? [
           {
             icon: 'i-heroicons-clipboard-document',
             color: 'neutral' as const,
             label: t('messenger.copy'),
-            'aria-label': t('messenger.copy'),
             trailing: true,
             onClick: () => copierMessage(message.content, message.participant.user.pseudo),
           },
@@ -743,7 +812,6 @@ const formattedMessages = computed(() => {
             icon: 'i-heroicons-arrow-uturn-left',
             color: 'neutral' as const,
             label: t('messenger.reply'),
-            'aria-label': t('messenger.reply'),
             trailing: true,
             onClick: () => handleReplyToMessage(message),
           },
@@ -753,7 +821,6 @@ const formattedMessages = computed(() => {
                   icon: 'i-heroicons-pencil-square',
                   color: 'neutral' as const,
                   label: t('messenger.edit'),
-                  'aria-label': t('messenger.edit'),
                   trailing: true,
                   onClick: () => handleEditMessage(message),
                 },
@@ -765,7 +832,6 @@ const formattedMessages = computed(() => {
                   icon: 'i-lucide-trash',
                   color: 'error' as const,
                   label: t('messenger.delete'),
-                  'aria-label': t('messenger.delete'),
                   trailing: true,
                   onClick: () => handleDeleteMessage(message.id),
                 },
@@ -798,6 +864,7 @@ const formattedMessages = computed(() => {
         isDeleted,
         modifiable,
         debutDeSerie,
+        repereDeReprise,
       },
     }
   })
@@ -1405,25 +1472,54 @@ async function handleDeleteMessage(messageId: string) {
   await deleteMessage(selectedConversationId.value, messageId)
 }
 
-// Formater le temps du message
-function formatMessageTime(date: Date) {
-  const messageDate = new Date(date)
-  const now = new Date()
-  const diffMs = now.getTime() - messageDate.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
+/*
+ * Heures et dates de la conversation, dans le fuseau de celui qui lit — pas `Europe/Paris` comme
+ * `useDateFormat` : « 14:32 » doit être l'heure de sa propre montre. La langue, elle, suit
+ * l'interface (`toIntlLocale`, pour que `en` ne devienne pas `en-US` par défaut).
+ */
+const intlLocale = computed(() => toIntlLocale(locale.value))
 
-  if (diffMins < 1) return t('messenger.just_now')
-  if (diffMins < 60) return t('messenger.minutes_ago', { count: diffMins })
+function formatHeure(date: Date | string) {
+  return new Date(date).toLocaleTimeString(intlLocale.value, { hour: '2-digit', minute: '2-digit' })
+}
 
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return t('messenger.hours_ago', { count: diffHours })
+/** La date complète, en infobulle sur l'heure : l'heure seule ne dit pas quel jour. */
+function formatDateComplete(date: Date | string) {
+  return new Date(date).toLocaleString(intlLocale.value, { dateStyle: 'full', timeStyle: 'short' })
+}
 
-  return messageDate.toLocaleDateString('fr-FR', {
+function memeJour(a: Date, b: Date) {
+  return a.toDateString() === b.toDateString()
+}
+
+/** Le libellé d'un repère de reprise : « Aujourd'hui, 14:32 », « Hier, 09:10 », puis la date. */
+function libelleRepere(date: Date | string, aujourdhui: Date) {
+  const d = new Date(date)
+  const hier = new Date(aujourdhui)
+  hier.setDate(hier.getDate() - 1)
+
+  if (memeJour(d, aujourdhui)) return t('messenger.resume_today', { time: formatHeure(d) })
+  if (memeJour(d, hier)) return t('messenger.resume_yesterday', { time: formatHeure(d) })
+  return d.toLocaleString(intlLocale.value, {
+    weekday: 'long',
     day: 'numeric',
-    month: 'short',
+    month: 'long',
+    // L'année seulement quand ce n'est pas la courante : elle encombrerait tous les autres.
+    year: d.getFullYear() === aujourdhui.getFullYear() ? undefined : 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+/*
+ * Sur un écran tactile, pas de survol : un appui court sur un message en montre l'heure, un
+ * second la masque. Un seul à la fois. Sur ordinateur, le survol suffit et le clic ne fait rien.
+ */
+const heureTactileVisible = ref<string | null>(null)
+
+function basculerHeureTactile(messageId: string) {
+  if (!isMobile.value) return
+  heureTactileVisible.value = heureTactileVisible.value === messageId ? null : messageId
 }
 
 // UChatMessages gère automatiquement le scroll avec should-auto-scroll

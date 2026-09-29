@@ -12,14 +12,11 @@
     "conversations": "Разговоры",
     "delete": "Удалить",
     "edited": "изменено",
-    "hours_ago": "{count}ч назад",
-    "just_now": "Только что",
     "loading": "Загрузка...",
     "loading_messages": "Загрузка сообщений...",
     "loading_previous_messages": "Загрузка предыдущих сообщений...",
     "message_actions": "Действия",
     "message_placeholder": "Напишите ваше сообщение...",
-    "minutes_ago": "{count}мин назад",
     "no_conversations": "Нет разговоров",
     "no_messages": "Пока нет сообщений",
     "online": "В сети",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Ваш браузер не разрешает копирование здесь",
     "edit": "Изменить",
     "edit_expired": "Сообщение нельзя изменить через {minutes} минут после отправки",
-    "editing": "Редактирование сообщения"
+    "editing": "Редактирование сообщения",
+    "resume_today": "Сегодня, {time}",
+    "resume_yesterday": "Вчера, {time}"
   }
 }
