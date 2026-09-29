@@ -247,7 +247,13 @@ export interface LigneDeParticipant {
   allergies: string | null
   cleGravite: string | null
   telephoneUrgence: string | null
-  /** Vrai seulement pour un artiste qui mange après son passage. */
+  /**
+   * Vrai pour qui mange après le spectacle, quelle que soit sa population.
+   *
+   * Ce n'était longtemps le cas que des artistes ; bénévoles et organisateurs peuvent maintenant
+   * le déclarer aussi. Comme `resumerRepas`, ce champ ne porte donc que sur le drapeau — c'est la
+   * source qui décide qui peut le poser, pas cette fonction.
+   */
   apresSpectacle: boolean
 }
 
@@ -271,7 +277,13 @@ export function lignesDeParticipants(repas: RepasDeRestauration): LigneDePartici
       allergies: p.allergies && p.allergies.trim() !== '' ? p.allergies.trim() : null,
       cleGravite: p.allergySeverity ? (CLES_GRAVITE[p.allergySeverity] ?? null) : null,
       contactUrgence: contactDUrgence(p),
-      apresSpectacle: p.type === 'artist' && p.afterShow === true,
+      /*
+       * Le drapeau seul. Restreindre aux artistes faisait diverger la liste du RÉSUMÉ, qui compte
+       * déjà tout le monde (`resumerRepas`) : la cuisine lisait « 7 après spectacle » au-dessus
+       * d'une liste qui n'en marquait que deux, et les autres passaient pour des repas du service
+       * normal. Le commentaire de `resumerRepas` met en garde contre exactement cet écart.
+       */
+      apresSpectacle: p.afterShow === true,
     }
   })
 }
