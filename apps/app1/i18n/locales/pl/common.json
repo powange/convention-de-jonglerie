@@ -203,7 +203,8 @@
     "yes": "Tak",
     "leave_without_saving": "Wyjdź bez zapisywania",
     "unsaved_changes": "Niezapisane zmiany",
-    "unsaved_changes_warning": "Masz zmiany, które nie zostały zapisane. Jeśli teraz opuścisz tę stronę, zostaną utracone."
+    "unsaved_changes_warning": "Masz zmiany, które nie zostały zapisane. Jeśli teraz opuścisz tę stronę, zostaną utracone.",
+    "deleted_account": "Usunięte konto"
   },
   "dates": {
     "date_range": "Od {startDate} do {endDate}",

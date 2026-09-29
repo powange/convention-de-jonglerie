@@ -409,7 +409,8 @@ model ShowCallSurveyVote {
 model ArtistNotificationGroup {
   id             String   @id @default(cuid())
   editionId      Int
-  senderId       Int
+  /// Facultatif : voir son jumeau côté bénévoles. L'envoi survit à son auteur.
+  senderId       Int?
   title          String
   message        String   @db.Text
   targetType     String // 'all' ou 'shows'
@@ -418,7 +419,7 @@ model ArtistNotificationGroup {
   sentAt         DateTime @default(now())
 
   edition       Edition                          @relation(fields: [editionId], references: [id], onDelete: Cascade)
-  sender        User                             @relation(fields: [senderId], references: [id])
+  sender        User?                            @relation(fields: [senderId], references: [id], onDelete: SetNull)
   confirmations ArtistNotificationConfirmation[]
 
   @@index([editionId])
@@ -435,7 +436,9 @@ model ArtistNotificationConfirmation {
   confirmedAt               DateTime?
 
   notificationGroup ArtistNotificationGroup @relation(fields: [artistNotificationGroupId], references: [id], onDelete: Cascade)
-  user              User                    @relation(fields: [userId], references: [id])
+  /// Cascade, pour la même raison que son jumeau côté bénévoles : la ligne appartient au
+  /// destinataire.
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([artistNotificationGroupId, userId])
   @@index([userId])

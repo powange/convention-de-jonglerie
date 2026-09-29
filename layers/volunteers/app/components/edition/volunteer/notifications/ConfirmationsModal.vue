@@ -235,7 +235,8 @@ interface NotificationData {
   selectedTeams?: any
   recipientCount: number
   sentAt: string | Date
-  senderName: string
+  /** Nul quand le compte de l'expéditeur a été supprimé. */
+  senderName: string | null
   confirmationsCount: number
   confirmationRate: number
   volunteers: {

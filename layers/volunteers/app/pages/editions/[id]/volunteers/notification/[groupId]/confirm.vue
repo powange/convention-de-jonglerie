@@ -35,7 +35,11 @@
 
         <!-- Informations sur l'envoyeur -->
         <div class="text-xs text-gray-500 dark:text-gray-400">
-          {{ t('volunteers.notification_sent_by', { sender: notification.senderName }) }}
+          {{
+            t('volunteers.notification_sent_by', {
+              sender: notification.senderName ?? t('common.deleted_account'),
+            })
+          }}
           • {{ formatDate(notification.sentAt) }}
         </div>
 

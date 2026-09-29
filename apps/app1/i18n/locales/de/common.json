@@ -203,7 +203,8 @@
     "yes": "Ja",
     "leave_without_saving": "Ohne Speichern verlassen",
     "unsaved_changes": "Nicht gespeicherte Änderungen",
-    "unsaved_changes_warning": "Sie haben Änderungen, die nicht gespeichert wurden. Wenn Sie diese Seite jetzt verlassen, gehen sie verloren."
+    "unsaved_changes_warning": "Sie haben Änderungen, die nicht gespeichert wurden. Wenn Sie diese Seite jetzt verlassen, gehen sie verloren.",
+    "deleted_account": "Gelöschtes Konto"
   },
   "dates": {
     "date_range": "Vom {startDate} bis {endDate}",

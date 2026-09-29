@@ -51,13 +51,17 @@
             <div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-sm text-gray-500">
               <span class="flex items-center gap-2">
                 <UiUserAvatar :user="notification.sender" size="xs" />
-                {{ notification.senderName }}
+                <!-- L'envoi survit à son auteur : un compte supprimé laisse le message, pas son
+                     expéditeur. Le dire plutôt que d'afficher un vide inexpliqué. -->
+                {{ notification.senderName ?? t('common.deleted_account') }}
                 <span
-                  v-if="notification.sender.prenom || notification.sender.nom"
+                  v-if="notification.sender?.prenom || notification.sender?.nom"
                   class="text-gray-400"
                 >
                   ({{
-                    [notification.sender.prenom, notification.sender.nom].filter(Boolean).join(' ')
+                    [notification.sender?.prenom, notification.sender?.nom]
+                      .filter(Boolean)
+                      .join(' ')
                   }})
                 </span>
               </span>
@@ -190,7 +194,8 @@ interface Notification {
   selectedTeams?: any // JsonValue from Prisma
   recipientCount: number
   sentAt: string | Date
-  senderName: string
+  /** Nul quand le compte de l'expéditeur a été supprimé : l'envoi lui survit. */
+  senderName: string | null
   sender: {
     id: number
     pseudo: string
@@ -200,7 +205,7 @@ interface Notification {
     profilePicture?: string | null
     emailHash: string
     updatedAt?: string
-  }
+  } | null
   confirmationsCount: number
   confirmationRate: number
   volunteers: {

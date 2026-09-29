@@ -203,7 +203,8 @@
     "yes": "Yes",
     "leave_without_saving": "Leave without saving",
     "unsaved_changes": "Unsaved changes",
-    "unsaved_changes_warning": "You have changes that have not been saved. If you leave this page now, they will be lost."
+    "unsaved_changes_warning": "You have changes that have not been saved. If you leave this page now, they will be lost.",
+    "deleted_account": "Deleted account"
   },
   "dates": {
     "date_range": "From {startDate} to {endDate}",
