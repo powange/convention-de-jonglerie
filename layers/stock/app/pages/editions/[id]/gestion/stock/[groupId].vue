@@ -846,7 +846,11 @@ const colonnes = computed((): TableColumn<any>[] => [
   {
     id: 'tags',
     accessorFn: (item: any) => (item.tags ?? []).map((r: any) => r.tag.name).join(', '),
-    header: ({ column }) => enTeteTriable(column, t('gestion.stock.tags.field_label')),
+    // Pas de tri : il porterait sur la liste des noms mise bout à bout, si bien qu'un objet
+    // « fragile, lourd » se rangerait loin d'un objet « lourd » — l'inverse de ce qu'on cherche en
+    // cliquant sur cette colonne. Les tags se lisent, ils n'ordonnent rien.
+    enableSorting: false,
+    header: t('gestion.stock.tags.field_label'),
   },
   {
     id: 'loan',

@@ -585,6 +585,18 @@ const colonnes = computed((): TableColumn<any>[] => [
     header: t('gestion.stock.item_group'),
   },
   { id: 'name', accessorKey: 'name', header: t('gestion.stock.item_name') },
+  // La quantité juste après le nom : elle qualifie l'objet, et c'est ce qu'on lit en même temps
+  // que lui — « six barres », pas « des barres ». Sans elle, une tournée de récupération se
+  // préparait sans savoir combien de choses rapporter.
+  //
+  // Réglée sur son contenu : un nombre n'a aucune raison de s'étirer, et l'écarter de son libellé
+  // obligerait l'œil à traverser la rangée pour les rapprocher.
+  {
+    id: 'quantite',
+    accessorKey: 'quantity',
+    header: t('gestion.stock.item_quantity'),
+    meta: { class: { th: 'w-px whitespace-nowrap', td: 'w-px whitespace-nowrap tabular-nums' } },
+  },
   // Les tags après le nom : ils décrivent l'objet, pas son rangement. La colonne n'apparaît que
   // si l'onglet en contient — sinon elle occuperait de la largeur pour ne rien dire, sur un
   // tableau qui en manque déjà.
