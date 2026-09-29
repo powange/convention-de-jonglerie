@@ -33,6 +33,9 @@ export default wrapApiHandler(
         direction: validatedData.direction,
         description: validatedData.description,
         phoneNumber: validatedData.phoneNumber,
+        smokingAllowed: validatedData.smokingAllowed,
+        petsAllowed: validatedData.petsAllowed,
+        musicAllowed: validatedData.musicAllowed,
       },
       include: {
         user: {

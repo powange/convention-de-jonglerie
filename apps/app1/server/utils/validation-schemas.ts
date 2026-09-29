@@ -398,6 +398,18 @@ export const carpoolOfferSchema = z.object({
   direction: carpoolDirectionSchema,
   description: carpoolDescriptionSchema,
   phoneNumber: phoneSchema,
+  /*
+   * Les trois préférences du trajet. Elles étaient absentes de ce schéma alors que le formulaire
+   * les envoie : zod retire les clés qu'il ne déclare pas, donc elles disparaissaient sans erreur
+   * et l'offre naissait « non-fumeur, sans animaux, sans musique » quoi qu'on ait coché.
+   *
+   * `.default(false)` et non `.optional()` comme dans le schéma de MISE À JOUR : là-bas, absent
+   * signifie « ne change pas », ici il signifie « non », et la valeur doit être un booléen que le
+   * `create` puisse écrire sans repli.
+   */
+  smokingAllowed: z.boolean().default(false),
+  petsAllowed: z.boolean().default(false),
+  musicAllowed: z.boolean().default(false),
 })
 
 export const carpoolRequestSchema = z.object({

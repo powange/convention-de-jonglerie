@@ -350,6 +350,63 @@ describe('Validation Schemas', () => {
         invalidSeats.availableSeats = 9 // Maximum 8
         expect(() => schemas.carpoolOfferSchema.parse(invalidSeats)).toThrow()
       })
+
+      /**
+       * ⚠️ Ces assertions portent sur ce qui SORT du `parse`, et non sur l'absence d'erreur.
+       *
+       * C'est la différence qui a laissé passer le défaut : zod RETIRE les clés qu'il ne déclare
+       * pas, sans rien lever. Les trois préférences du trajet arrivaient donc du formulaire et
+       * disparaissaient du corps validé — un `.not.toThrow()` restait parfaitement vert au-dessus.
+       */
+      it('conserve les trois préférences du trajet', () => {
+        const offre = schemas.carpoolOfferSchema.parse({
+          locationCity: 'Paris',
+          locationAddress: '123 rue de la Gare',
+          tripDate: '2024-06-01T10:00:00Z',
+          availableSeats: 3,
+          direction: 'TO_EVENT',
+          smokingAllowed: true,
+          petsAllowed: true,
+          musicAllowed: true,
+        })
+
+        expect(offre).toMatchObject({
+          smokingAllowed: true,
+          petsAllowed: true,
+          musicAllowed: true,
+        })
+      })
+
+      it('pose les trois préférences à false quand elles sont absentes', () => {
+        // Le défaut du schéma épouse celui de la colonne : une offre créée sans préférence est
+        // « non-fumeur, sans animaux, sans musique », et le handler n'a pas à compléter lui-même.
+        const offre = schemas.carpoolOfferSchema.parse({
+          locationCity: 'Paris',
+          locationAddress: '123 rue de la Gare',
+          tripDate: '2024-06-01T10:00:00Z',
+          availableSeats: 3,
+          direction: 'TO_EVENT',
+        })
+
+        expect(offre).toMatchObject({
+          smokingAllowed: false,
+          petsAllowed: false,
+          musicAllowed: false,
+        })
+      })
+
+      it('refuse une préférence qui n’est pas un booléen', () => {
+        expect(() =>
+          schemas.carpoolOfferSchema.parse({
+            locationCity: 'Paris',
+            locationAddress: '123 rue de la Gare',
+            tripDate: '2024-06-01T10:00:00Z',
+            availableSeats: 3,
+            direction: 'TO_EVENT',
+            smokingAllowed: 'oui',
+          })
+        ).toThrow()
+      })
     })
 
     describe('carpoolRequestSchema', () => {
