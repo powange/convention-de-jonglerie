@@ -2,14 +2,28 @@
 import { useMessenger } from '@@/app/composables/useMessenger'
 import { useMessengerStream } from '@@/app/composables/useMessengerStream'
 
+import {
+  appliquerMisesAJour,
+  fusionnerMessages,
+  remplacerMessage,
+} from '~/utils/messages-conversation'
+
 import type { ConversationMessage } from '@@/app/composables/useMessenger'
 
+/**
+ * La discussion d'une candidature d'artiste, dans une carte : sur la fiche de la candidature en
+ * gestion, et dans « Mes candidatures » côté artiste.
+ *
+ * C'est la même conversation que dans la messagerie, et elle s'y affiche de la même façon : même
+ * fil (`MessengerMessageList`), même zone de saisie (`MessengerComposer`), mêmes actions. Ce qui
+ * lui reste propre : la conversation n'est créée qu'au premier message, et un organisateur peut la
+ * lire sans y être inscrit.
+ */
 const props = defineProps<{
   applicationId: number
 }>()
 
-const { t, locale } = useI18n()
-const { user } = useUserSession()
+const { t } = useI18n()
 const messenger = useMessenger()
 
 // État de la conversation
@@ -22,10 +36,22 @@ const hasConversation = ref(false)
 const isParticipant = ref(false)
 const messageInput = ref('')
 const messagesContainerRef = ref<HTMLElement | null>(null)
+const composerRef = ref<{ focaliser: () => void } | null>(null)
 
 // Messages
 const messages = ref<ConversationMessage[]>([])
 const pagination = ref<{ total: number; hasMore: boolean } | null>(null)
+
+// Réponse ou modification en cours dans la zone de saisie : la même logique que la messagerie.
+const {
+  reponseA,
+  enModification,
+  repondreA,
+  annulerReponse,
+  modifier,
+  annulerModification,
+  enregistrerModification,
+} = useSaisieMessage(messageInput)
 
 // Stream temps réel
 const { realtimeMessages, isConnected, messageUpdates, clearMessages, clearMessageUpdates } =
@@ -100,6 +126,7 @@ const ensureParticipant = async (): Promise<string | null> => {
     if (response.data.conversationId) {
       conversationId.value = response.data.conversationId
       hasConversation.value = true
+      isParticipant.value = true
       return response.data.conversationId
     }
   } catch (error) {
@@ -108,11 +135,24 @@ const ensureParticipant = async (): Promise<string | null> => {
   return null
 }
 
-// Envoyer un message
+// Envoyer un message, ou enregistrer la modification en cours
 const handleSendMessage = async () => {
   if (!messageInput.value.trim() || isSending.value) return
 
+  // Modifier suppose un message déjà envoyé, donc une conversation dont on est participant.
+  if (enModification.value && conversationId.value) {
+    isSending.value = true
+    const modifie = await enregistrerModification(conversationId.value)
+    isSending.value = false
+    if (modifie) {
+      messages.value = remplacerMessage(messages.value, modifie)
+      composerRef.value?.focaliser()
+    }
+    return
+  }
+
   const content = messageInput.value.trim()
+  const replyToId = reponseA.value?.id
   messageInput.value = ''
   isSending.value = true
 
@@ -125,15 +165,34 @@ const handleSendMessage = async () => {
       return
     }
 
-    const newMessage = await messenger.sendMessage(convId, content)
+    const newMessage = await messenger.sendMessage(convId, content, replyToId)
     if (newMessage) {
-      // Le message sera ajouté via le stream SSE
+      messages.value = remplacerMessage(messages.value, newMessage)
+      annulerReponse()
       await nextTick()
       scrollToBottom()
+    } else {
+      messageInput.value = content
     }
   } finally {
     isSending.value = false
   }
+}
+
+function handleReply(message: ConversationMessage) {
+  repondreA(message)
+  composerRef.value?.focaliser()
+}
+
+function handleEdit(message: ConversationMessage) {
+  modifier(message)
+  composerRef.value?.focaliser()
+}
+
+// Supprimer un message : la mise à jour arrive par le flux temps réel (message-updated).
+async function handleDelete(messageId: string) {
+  if (!conversationId.value) return
+  await messenger.deleteMessage(conversationId.value, messageId)
 }
 
 // Scroll vers le bas du conteneur
@@ -143,48 +202,10 @@ const scrollToBottom = () => {
   }
 }
 
-// Vérifier si un message est de l'utilisateur courant
-const isOwnMessage = (message: ConversationMessage) => {
-  return message.participant.user.id === user.value?.id
-}
-
-// Formater la date d'un message
-const formatMessageTime = (date: Date) => {
-  const d = new Date(date)
-  return d.toLocaleTimeString(locale.value, { hour: '2-digit', minute: '2-digit' })
-}
-
-// Formater la date complète pour les séparateurs de jour
-const formatMessageDate = (date: Date) => {
-  const d = new Date(date)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-
-  if (d.toDateString() === today.toDateString()) {
-    return t('components.artist_application.chat.today')
-  }
-  if (d.toDateString() === yesterday.toDateString()) {
-    return t('components.artist_application.chat.yesterday')
-  }
-  return d.toLocaleDateString(locale.value, { day: 'numeric', month: 'long', year: 'numeric' })
-}
-
-// Vérifier si on doit afficher un séparateur de date
-const shouldShowDateSeparator = (index: number) => {
-  if (index === 0) return true
-  const current = allMessages.value[index]
-  const previous = allMessages.value[index - 1]
-  if (!current || !previous) return true
-  return new Date(current.createdAt).toDateString() !== new Date(previous.createdAt).toDateString()
-}
-
-// Combiner messages chargés et messages temps réel
-const allMessages = computed(() => {
-  const existingIds = new Set(messages.value.map((m) => m.id))
-  const newMessages = realtimeMessages.value.filter((m) => !existingIds.has(m.id))
-  return [...messages.value, ...newMessages]
-})
+// Messages chargés et messages du flux : la même fusion que la messagerie.
+const allMessages = computed(() =>
+  fusionnerMessages(messages.value, realtimeMessages.value as unknown as ConversationMessage[])
+)
 
 // Watcher pour les nouveaux messages temps réel
 watch(
@@ -208,12 +229,11 @@ watch(
 watch(
   messageUpdates,
   (updates) => {
-    updates.forEach((update) => {
-      const index = messages.value.findIndex((m) => m.id === update.id)
-      if (index !== -1) {
-        messages.value[index] = update
-      }
-    })
+    if (updates.length === 0) return
+    messages.value = appliquerMisesAJour(
+      messages.value,
+      updates as unknown as ConversationMessage[]
+    )
     clearMessageUpdates()
   },
   { deep: true }
@@ -255,7 +275,7 @@ defineExpose({
       <!-- Zone des messages -->
       <div
         ref="messagesContainerRef"
-        class="flex-1 space-y-4 overflow-y-auto p-4"
+        class="flex-1 overflow-y-auto py-2"
         @scroll="
           ($event.target as HTMLElement).scrollTop < 50 && pagination?.hasMore && loadMoreMessages()
         "
@@ -268,82 +288,20 @@ defineExpose({
         <!-- Messages vides -->
         <div
           v-if="allMessages.length === 0"
-          class="flex h-full flex-col items-center justify-center text-center text-muted"
+          class="flex h-full flex-col items-center justify-center p-4 text-center text-muted"
         >
           <UIcon name="i-lucide-message-square" class="mb-2 h-12 w-12" />
           <p class="text-sm">{{ t('components.artist_application.chat.no_messages') }}</p>
           <p class="mt-1 text-xs">{{ t('components.artist_application.chat.be_first') }}</p>
         </div>
 
-        <!-- Liste des messages -->
-        <template v-for="(message, index) in allMessages" :key="message.id">
-          <!-- Séparateur de date -->
-          <div v-if="shouldShowDateSeparator(index)" class="flex items-center gap-4 py-2">
-            <div class="h-px flex-1 bg-default" />
-            <span class="text-xs text-muted">{{ formatMessageDate(message.createdAt) }}</span>
-            <div class="h-px flex-1 bg-default" />
-          </div>
-
-          <!-- Message -->
-          <div :class="['flex gap-3', isOwnMessage(message) ? 'justify-end' : 'justify-start']">
-            <!-- Avatar (gauche) -->
-            <UiUserAvatar
-              v-if="!isOwnMessage(message)"
-              :user="message.participant.user"
-              size="sm"
-              class="mt-1 shrink-0"
-            />
-
-            <!-- Bulle de message -->
-            <div
-              :class="[
-                'max-w-[75%] rounded-2xl px-4 py-2',
-                isOwnMessage(message)
-                  ? 'bg-primary text-primary-contrast'
-                  : 'bg-elevated text-default',
-                message.deletedAt ? 'italic opacity-60' : '',
-              ]"
-            >
-              <!-- Nom de l'expéditeur (pour les messages des autres) -->
-              <p
-                v-if="!isOwnMessage(message)"
-                class="mb-1 text-xs font-medium"
-                :class="isOwnMessage(message) ? 'text-primary-contrast/80' : 'text-primary'"
-              >
-                {{ message.participant.user.pseudo }}
-              </p>
-
-              <!-- Contenu -->
-              <p v-if="message.deletedAt" class="text-sm">
-                {{ t('components.artist_application.chat.message_deleted') }}
-              </p>
-              <p v-else class="whitespace-pre-wrap text-sm">
-                <MessengerMessageText :texte="message.content" />
-              </p>
-
-              <!-- Heure et statut modifié -->
-              <p
-                :class="[
-                  'mt-1 text-xs',
-                  isOwnMessage(message) ? 'text-primary-contrast/70' : 'text-muted',
-                ]"
-              >
-                {{ formatMessageTime(message.createdAt) }}
-                <span v-if="message.editedAt">
-                  · {{ t('components.artist_application.chat.edited') }}
-                </span>
-              </p>
-            </div>
-
-            <!-- Avatar (droite) -->
-            <UiUserAvatar
-              v-if="isOwnMessage(message)"
-              :user="message.participant.user"
-              size="sm"
-              class="mt-1 shrink-0"
-            />
-          </div>
-        </template>
+        <MessengerMessageList
+          v-else
+          :messages="allMessages"
+          @repondre="handleReply"
+          @modifier="handleEdit"
+          @supprimer="handleDelete"
+        />
       </div>
 
       <!-- Zone de saisie -->
@@ -352,30 +310,22 @@ defineExpose({
           `autofocus` est coupé, et c'est le correctif d'un défaut signalé à l'usage : on arrivait
           sur la fiche d'une candidature tout en bas de la page, prêt à écrire un message.
 
-          `UChatPrompt` focalise son champ par défaut (`autofocus: true`). Sur la page de messagerie
-          c'est juste — la page EST la conversation. Ici la discussion n'est qu'une carte au pied
-          d'un long écran : le navigateur amenait le champ focalisé dans le champ de vision, et
-          emportait la page avec lui. Le lecteur venait lire une candidature, pas y répondre.
+          Sur la page de messagerie, focaliser le champ est juste — la page EST la conversation.
+          Ici la discussion n'est qu'une carte au pied d'un long écran : le navigateur amenait le
+          champ focalisé dans le champ de vision, et emportait la page avec lui. Le lecteur venait
+          lire une candidature, pas y répondre.
         -->
-        <UChatPrompt
+        <MessengerComposer
+          ref="composerRef"
           v-model="messageInput"
+          :reponse-a="reponseA"
+          :en-modification="enModification"
+          :envoi="isSending"
           :autofocus="false"
-          :placeholder="t('components.artist_application.chat.placeholder')"
-          :disabled="isSending"
-          variant="subtle"
-          class="w-full"
-          @submit="handleSendMessage"
-        >
-          <UButton
-            :icon="isSending ? 'i-lucide-loader-2' : 'i-lucide-send'"
-            :loading="isSending"
-            color="primary"
-            variant="solid"
-            size="sm"
-            :disabled="!messageInput.trim() || isSending"
-            @click="handleSendMessage"
-          />
-        </UChatPrompt>
+          @envoyer="handleSendMessage"
+          @annuler-reponse="annulerReponse"
+          @annuler-modification="annulerModification"
+        />
       </div>
     </template>
   </div>

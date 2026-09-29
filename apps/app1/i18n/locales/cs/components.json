@@ -4,13 +4,8 @@
       "chat": {
         "be_first": "Pošlete první zprávu!",
         "connected": "Připojeno",
-        "edited": "upraveno",
-        "message_deleted": "Tato zpráva byla smazána",
         "no_messages": "Žádné zprávy",
-        "placeholder": "Napište svou zprávu...",
-        "title": "Diskuse",
-        "today": "Dnes",
-        "yesterday": "Včera"
+        "title": "Diskuse"
       }
     },
     "carpool": {
