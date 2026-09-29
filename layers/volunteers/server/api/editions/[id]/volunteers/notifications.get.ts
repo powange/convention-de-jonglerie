@@ -164,16 +164,20 @@ export default wrapApiHandler(
           selectedTeams: notification.selectedTeams,
           recipientCount: notification.recipientCount,
           sentAt: notification.sentAt,
-          senderName: notification.sender.pseudo,
-          sender: {
-            id: notification.sender.id,
-            pseudo: notification.sender.pseudo,
-            prenom: notification.sender.prenom,
-            nom: notification.sender.nom,
-            profilePicture: notification.sender.profilePicture,
-            emailHash: notification.sender.emailHash,
-            updatedAt: notification.sender.updatedAt,
-          },
+          // Nuls quand le compte de l'expéditeur a été supprimé. L'envoi lui survit — le message
+          // a bien été reçu, et l'effacer avec son auteur réécrirait l'histoire de l'édition.
+          senderName: notification.sender?.pseudo ?? null,
+          sender: notification.sender
+            ? {
+                id: notification.sender.id,
+                pseudo: notification.sender.pseudo,
+                prenom: notification.sender.prenom,
+                nom: notification.sender.nom,
+                profilePicture: notification.sender.profilePicture,
+                emailHash: notification.sender.emailHash,
+                updatedAt: notification.sender.updatedAt,
+              }
+            : null,
           confirmationsCount: actualConfirmationsCount,
           confirmationRate,
           volunteers: {

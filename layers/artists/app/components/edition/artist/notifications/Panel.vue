@@ -113,7 +113,9 @@
           <div>
             <div class="min-w-0">
               <p class="text-sm text-gray-500">
-                {{ formatDate(envoi.sentAt) }} — {{ envoi.sender.pseudo }}
+                <!-- L'envoi survit à son auteur, cf. son jumeau côté bénévoles. -->
+                {{ formatDate(envoi.sentAt) }} —
+                {{ envoi.sender?.pseudo ?? t('common.deleted_account') }}
               </p>
               <p class="mt-1 whitespace-pre-line break-words">{{ envoi.message }}</p>
               <div class="flex flex-wrap items-center gap-2 mt-2">
@@ -227,7 +229,8 @@ interface EnvoiHistorique {
   recipientCount: number
   confirmedCount: number
   sentAt: string
-  sender: { id: number; pseudo: string }
+  /** Nul quand le compte de l'expéditeur a été supprimé : l'envoi lui survit. */
+  sender: { id: number; pseudo: string } | null
 }
 
 const historique = ref<EnvoiHistorique[]>([])

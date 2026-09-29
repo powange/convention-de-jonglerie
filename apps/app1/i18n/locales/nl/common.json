@@ -203,7 +203,8 @@
     "yes": "Ja",
     "leave_without_saving": "Verlaten zonder opslaan",
     "unsaved_changes": "Niet-opgeslagen wijzigingen",
-    "unsaved_changes_warning": "Je hebt wijzigingen die niet zijn opgeslagen. Als je deze pagina nu verlaat, gaan ze verloren."
+    "unsaved_changes_warning": "Je hebt wijzigingen die niet zijn opgeslagen. Als je deze pagina nu verlaat, gaan ze verloren.",
+    "deleted_account": "Verwijderd account"
   },
   "dates": {
     "date_range": "Van {startDate} tot {endDate}",

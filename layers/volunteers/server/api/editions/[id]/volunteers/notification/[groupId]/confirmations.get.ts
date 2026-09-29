@@ -123,7 +123,7 @@ export default wrapApiHandler(
         selectedTeams: notificationGroup.selectedTeams,
         recipientCount: notificationGroup.recipientCount,
         sentAt: notificationGroup.sentAt,
-        senderName: notificationGroup.sender.pseudo,
+        senderName: notificationGroup.sender?.pseudo ?? null,
         // Étape 0bis : le nom d'affichage générique est porté par Event (« Convention - Edition »)
         editionName: notificationGroup.event.name ?? null,
         conventionName: null,

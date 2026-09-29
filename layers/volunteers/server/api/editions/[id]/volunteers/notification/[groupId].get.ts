@@ -67,7 +67,9 @@ export default wrapApiHandler(
         title: notificationGroup.title,
         message: notificationGroup.message,
         sentAt: notificationGroup.sentAt,
-        senderName: notificationGroup.sender.pseudo,
+        // Nul quand le compte de l'expéditeur a été supprimé : l'envoi lui survit, son auteur
+        // non. L'écran affiche alors « Compte supprimé » plutôt que rien.
+        senderName: notificationGroup.sender?.pseudo ?? null,
         editionName: displayName,
       },
       isConfirmed,

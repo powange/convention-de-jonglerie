@@ -203,7 +203,8 @@
     "yes": "Ja",
     "leave_without_saving": "Forlad uden at gemme",
     "unsaved_changes": "Ikke-gemte ændringer",
-    "unsaved_changes_warning": "Du har ændringer, der ikke er gemt. Hvis du forlader denne side nu, går de tabt."
+    "unsaved_changes_warning": "Du har ændringer, der ikke er gemt. Hvis du forlader denne side nu, går de tabt.",
+    "deleted_account": "Slettet konto"
   },
   "dates": {
     "date_range": "Fra {startDate} til {endDate}",

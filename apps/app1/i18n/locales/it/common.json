@@ -203,7 +203,8 @@
     "yes": "Sì",
     "leave_without_saving": "Esci senza salvare",
     "unsaved_changes": "Modifiche non salvate",
-    "unsaved_changes_warning": "Hai modifiche che non sono state salvate. Se esci da questa pagina ora, andranno perse."
+    "unsaved_changes_warning": "Hai modifiche che non sono state salvate. Se esci da questa pagina ora, andranno perse.",
+    "deleted_account": "Account eliminato"
   },
   "dates": {
     "date_range": "Dal {startDate} al {endDate}",

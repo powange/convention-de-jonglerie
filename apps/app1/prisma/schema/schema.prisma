@@ -382,7 +382,10 @@ model ConventionOrganizer {
   conventionId          Int
   userId                Int
   addedAt               DateTime                     @default(now())
-  addedById             Int
+  /// Facultatif : qui a ajouté cet organisateur est une TRACE. Supprimer le compte de la personne
+  /// qui l'a ajouté ne doit pas retirer l'organisateur de la convention — c'est pourtant ce qu'une
+  /// cascade aurait fait, et le `Restrict` par défaut faisait échouer la suppression en P2003.
+  addedById             Int?
   canAddEdition         Boolean                      @default(false)
   canDeleteAllEditions  Boolean                      @default(false)
   canDeleteConvention   Boolean                      @default(false)
@@ -399,7 +402,7 @@ model ConventionOrganizer {
   canManageWorkshops    Boolean                      @default(false)
   canManageFAQ          Boolean                      @default(false)
   canManageTreasury     Boolean                      @default(false)
-  addedBy               User                         @relation("AddedOrganizers", fields: [addedById], references: [id])
+  addedBy               User?                        @relation("AddedOrganizers", fields: [addedById], references: [id], onDelete: SetNull)
   convention            Convention                   @relation(fields: [conventionId], references: [id], onDelete: Cascade)
   user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
   perEditionPermissions EditionOrganizerPermission[]

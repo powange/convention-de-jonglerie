@@ -148,7 +148,9 @@ model EditionVolunteerApplication {
 model VolunteerNotificationGroup {
   id             String   @id @default(cuid())
   eventId        Int
-  senderId       Int
+  /// Facultatif depuis que la suppression de compte le met à nul : l'envoi reste, son auteur non.
+  /// Le message a été reçu, et l'effacer avec son expéditeur réécrirait l'histoire de l'édition.
+  senderId       Int?
   title          String
   message        String   @db.Text
   targetType     String // 'all' ou 'teams'
@@ -157,7 +159,7 @@ model VolunteerNotificationGroup {
   sentAt         DateTime @default(now())
 
   event         Event                               @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  sender        User                                @relation(fields: [senderId], references: [id])
+  sender        User?                               @relation(fields: [senderId], references: [id], onDelete: SetNull)
   confirmations VolunteerNotificationConfirmation[]
 
   @@index([eventId])
@@ -171,7 +173,10 @@ model VolunteerNotificationConfirmation {
   confirmedAt                  DateTime?
 
   notificationGroup VolunteerNotificationGroup @relation(fields: [volunteerNotificationGroupId], references: [id], onDelete: Cascade)
-  user              User                       @relation(fields: [userId], references: [id])
+  /// Cascade : un accusé de lecture est une ligne PAR DESTINATAIRE. Le destinataire parti, elle ne
+  /// dit plus rien — et sans action de suppression, la relation étant obligatoire, Prisma applique
+  /// `Restrict` et la suppression du compte échouait en P2003.
+  user              User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([volunteerNotificationGroupId, userId])
   @@index([userId])

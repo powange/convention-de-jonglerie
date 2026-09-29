@@ -203,7 +203,8 @@
     "yes": "Ja",
     "leave_without_saving": "Lämna utan att spara",
     "unsaved_changes": "Osparade ändringar",
-    "unsaved_changes_warning": "Du har ändringar som inte har sparats. Om du lämnar den här sidan nu går de förlorade."
+    "unsaved_changes_warning": "Du har ändringar som inte har sparats. Om du lämnar den här sidan nu går de förlorade.",
+    "deleted_account": "Raderat konto"
   },
   "dates": {
     "date_range": "Från {startDate} till {endDate}",
