@@ -21,6 +21,7 @@ vi.mock('#server/utils/auth-utils', () => ({
 }))
 
 import creer from '../../../../../server/api/editions/[id]/treasury/entries.post'
+import modifier from '../../../../../server/api/editions/[id]/treasury/entries/[entryId].put'
 import lire from '../../../../../server/api/editions/[id]/treasury/index.get'
 import { global } from '../../../globales-nitro'
 
@@ -120,5 +121,59 @@ describe('la date d’opération d’une entrée de trésorerie', () => {
       const requete = prismaMock.treasuryEntry.findMany.mock.calls[0][0]
       expect(requete.select.operationDate).toBe(true)
     })
+  })
+})
+
+/**
+ * La MODIFICATION d'une entrée, le chemin qui manquait.
+ *
+ * Les tests ci-dessus couvrent l'écriture à la création et la lecture. Entre les deux, modifier
+ * une entrée existante pour lui poser une date était le geste le plus courant — et le seul sans
+ * filet. C'est par là que le défaut a été signalé, même si la cause était ailleurs : la ligne
+ * partait bien en base, mais `computeTreasury` ne la reportait pas dans la réponse.
+ */
+describe('la date d’opération à la modification', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockCanManage.mockResolvedValue(true)
+    prismaMock.treasuryEntry.findFirst.mockResolvedValue({
+      id: 7,
+      imageUrl: null,
+      kind: 'EXPENSE',
+      advancedById: null,
+      reimbursed: false,
+      edition: { id: 21, conventionId: 2 },
+    })
+    prismaMock.treasuryEntry.update.mockResolvedValue({ id: 7 })
+  })
+
+  const modifierAvec = async (corps: Record<string, unknown>) => {
+    global.readBody = vi.fn().mockResolvedValue(corps)
+    await modifier({
+      context: { params: { id: '21', entryId: '7' }, user: { id: 3 } },
+    } as any)
+    return prismaMock.treasuryEntry.update.mock.calls[0][0].data
+  }
+
+  it('enregistre la date posée sur une entrée qui n’en avait pas', async () => {
+    const data = await modifierAvec({ title: 'Location de salle', operationDate: '2026-06-12' })
+
+    expect(data.operationDate).toBeInstanceOf(Date)
+    expect(data.operationDate.toISOString()).toBe('2026-06-12T00:00:00.000Z')
+  })
+
+  it('efface la date quand elle est explicitement vidée', async () => {
+    // Le bouton d'effacement du champ envoie `null` : une date posée par erreur doit pouvoir
+    // repartir, sans quoi elle serait définitive.
+    const data = await modifierAvec({ operationDate: null })
+
+    expect(data.operationDate).toBeNull()
+  })
+
+  it('n’y touche pas quand le champ n’est pas envoyé', async () => {
+    // `undefined` ≠ `null` : un client qui ne connaît pas le champ ne doit pas effacer la date.
+    const data = await modifierAvec({ title: 'Location de salle' })
+
+    expect(data).not.toHaveProperty('operationDate')
   })
 })

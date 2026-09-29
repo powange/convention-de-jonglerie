@@ -47,6 +47,13 @@ export interface TreasuryLine extends TreasuryAmounts {
   /** La même avance quand la personne n'a pas de compte : son nom, saisi librement. */
   advancedByName?: string | null
   reimbursed?: boolean
+  /**
+   * Le jour où l'argent a bougé, distinct de la date de saisie.
+   *
+   * `Date` telle que Prisma la rend, chaîne ISO une fois passée sur le réseau — comme
+   * `PersonneAvance.updatedAt`. Absente des lignes calculées, et des entrées antérieures au champ.
+   */
+  operationDate?: Date | string | null
   /** Vrai pour les lignes calculées : elles se corrigent à la source, pas ici. */
   readOnly: boolean
 }
@@ -120,6 +127,8 @@ export interface ManualEntryRow {
   imageUrl?: string | null
   isForecast?: boolean
   reimbursed?: boolean
+  /** Colonne `DATE` : Prisma la rend à minuit UTC. */
+  operationDate?: Date | string | null
   advancedBy?: PersonneAvance | null
   advancedByName?: string | null
 }
@@ -384,6 +393,9 @@ export function computeTreasury(input: ComputeInput): TreasuryReport {
       advancedBy: entry.advancedBy ?? null,
       advancedByName: entry.advancedByName ?? null,
       reimbursed: entry.reimbursed ?? false,
+      // Sans cette ligne, la date était lue en base, puis perdue ici : la colonne de l'écran et la
+      // colonne du CSV restaient vides quoi qu'on saisisse, sans qu'aucune erreur ne le dise.
+      operationDate: entry.operationDate ?? null,
       readOnly: false,
       // Une ligne saisie à la main est réglée par défaut. Marquée prévisionnelle, elle passe en
       // engagé : le solde ne bouge pas — il additionne les deux — mais le réglé cesse de compter

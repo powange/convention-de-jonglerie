@@ -611,3 +611,41 @@ describe('computeTreasury — avances à rembourser', () => {
     expect(report.totals.toReimburse.total).toBe(0)
   })
 })
+
+/**
+ * La date d'opération survit au passage par `computeTreasury`.
+ *
+ * C'est le trajet qui manquait. L'API la sélectionnait bien en base et l'écran savait la rendre,
+ * mais la ligne renvoyée était assemblée ici sans elle : la colonne restait vide quoi qu'on
+ * saisisse, et l'export CSV muet, sans qu'aucune erreur ne le signale.
+ *
+ * Les tests d'alors visaient les deux bouts — le `select` de la requête et l'écriture du champ —
+ * et laissaient au milieu le seul endroit qui pouvait la perdre.
+ */
+describe('computeTreasury — date d’opération', () => {
+  const ligneSaisie = (over: Record<string, unknown> = {}) =>
+    computeTreasury(input({ manualEntries: [depense(over)] })).lines.find(
+      (l) => l.origin === 'manual'
+    )!
+
+  it('reporte la date sur la ligne renvoyée', () => {
+    const jour = new Date('2026-06-12T00:00:00.000Z')
+
+    expect(ligneSaisie({ operationDate: jour }).operationDate).toBe(jour)
+  })
+
+  it('rend `null` quand l’entrée n’en porte pas', () => {
+    // Les entrées antérieures au champ. `null` et non `undefined` : l'écran teste la valeur, et
+    // l'absence doit se lire pareil d'une ligne à l'autre.
+    expect(ligneSaisie().operationDate).toBeNull()
+  })
+
+  it('n’en invente pas sur une ligne calculée', () => {
+    // Billetterie, artistes : ces lignes n'ont pas de date d'opération par nature.
+    const report = computeTreasury(input({ manualEntries: [] }))
+
+    for (const ligne of report.lines.filter((l) => l.origin === 'source')) {
+      expect(ligne.operationDate).toBeUndefined()
+    }
+  })
+})
