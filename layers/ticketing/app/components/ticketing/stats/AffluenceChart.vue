@@ -43,7 +43,7 @@
     />
 
     <div ref="chartContainer" class="w-full h-96">
-      <Line v-if="chartData" :data="chartData" :options="chartOptions" />
+      <Bar v-if="chartData" :data="chartData" :options="chartOptions" />
     </div>
   </div>
 </template>
@@ -51,6 +51,7 @@
 <script setup lang="ts">
 import {
   Chart as ChartJS,
+  BarElement,
   CategoryScale,
   LinearScale,
   LineElement,
@@ -62,17 +63,40 @@ import {
   type ChartData,
   type ChartOptions,
 } from 'chart.js'
-import { Line } from 'vue-chartjs'
+import { Bar } from 'vue-chartjs'
+
+import {
+  PILE_COMPAREE,
+  PILE_COURANTE,
+  basculerLesDeuxEditions,
+  jeuCompare,
+  jeuCourant,
+  motifRaye,
+  sansLesJumelles,
+  type SerieDeGraphique,
+} from '../../../utils/motifs-graphiques'
 
 import { formaterJournee } from '~~/shared/utils/fuseau-edition'
 
 /**
  * L'affluence : combien de PERSONNES sont sur place, tranche par tranche, et à quel titre.
  *
- * Des aires EMPILÉES et non des barres, contrairement au graphique des arrivées juste au-dessus :
- * celui-là compte un flux, additif par nature. Celui-ci mesure un stock, une même personne
- * apparaissant dans toutes les tranches où elle est présente — une aire dit mieux « il y avait tant
- * de monde à ce moment ».
+ * Des BARRES empilées, une par tranche.
+ *
+ * Ce graphique portait des aires empilées, au motif qu'il mesure un stock là où les arrivées
+ * comptent un flux. L'argument tenait en théorie ; à l'usage il ne se lisait pas. Quatre aires
+ * superposées en escalier se confondent dès que les tranches sont nombreuses, et l'on ne sait plus
+ * lire une tranche précise — or c'est la question qu'on pose à ce graphique : « combien de monde à
+ * ce moment-là ». Une barre isole la tranche et se compare à sa voisine d'un coup d'œil.
+ *
+ * Ce qu'on perd, et qu'il faut savoir : l'aire suggérait la continuité entre deux mesures, ce que
+ * la barre ne fait pas. C'est plus honnête — entre deux tranches, on ne sait rien — mais la lecture
+ * d'ensemble de la journée y est moins immédiate.
+ *
+ * La jauge attendue COMPLÈTE le bâton plutôt que d'en faire un second : l'écart entre présents et
+ * attendus s'empile au-dessus, hachuré. Le bâton entier monte donc jusqu'à l'attendu, et la partie
+ * hachurée se lit « ce qu'il aurait pu y avoir en plus » — l'écart est un segment, pas une
+ * différence de hauteurs à estimer.
  *
  * Empiler n'est légitime que parce qu'une personne n'appartient qu'à UNE pile : la population
  * retenue est la plus engagée de ses titres (organisateur, puis artiste, puis bénévole, puis
@@ -82,6 +106,7 @@ import { formaterJournee } from '~~/shared/utils/fuseau-edition'
  */
 
 ChartJS.register(
+  BarElement,
   CategoryScale,
   LinearScale,
   LineElement,
@@ -118,9 +143,26 @@ interface Props {
   timezone?: string | null
   /** La granularité en minutes, qui décide si l'étiquette porte une heure. */
   granularite: number
+  /**
+   * Les repères de l'axe, quand on compare.
+   *
+   * En comparaison, l'axe ne porte plus des instants mais des repères relatifs à l'ouverture de
+   * chaque édition : deux éditions qui n'ont pas eu lieu aux mêmes dates n'ont aucune date commune.
+   * Absent, le composant compose ses étiquettes depuis les instants, comme sans comparaison.
+   */
+  etiquettes?: string[] | null
+  /** L'édition comparée, déjà alignée sur le même axe, population par population. */
+  comparaison?: {
+    libelle: string
+    series: Record<string, (number | null)[]>
+  } | null
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  timezone: null,
+  etiquettes: null,
+  comparaison: null,
+})
 
 const { t, locale } = useI18n()
 const { getParticipantTypeConfig } = useParticipantTypes()
@@ -217,50 +259,102 @@ const piles = computed(() => [
   },
 ])
 
-const chartData = computed<ChartData<'line'> | null>(() => {
+const chartData = computed<ChartData<'bar'> | null>(() => {
   if (!props.data?.timestamps?.length) return null
 
+  const comparaison = props.comparaison
+
+  /*
+   * Les quatre populations, dans la forme que les fabriques partagées attendent.
+   *
+   * Elles sont communes aux graphiques de cette page : couleurs, hachure de l'édition comparée,
+   * bascule de la légende. Les recopier ici ferait diverger l'apparence d'un graphique à l'autre
+   * sur un détail, exactement là où la comparaison exige qu'on reconnaisse une série d'un coup.
+   */
+  const series: SerieDeGraphique[] = piles.value.map((pile) => ({
+    cle: pile.cle,
+    label: pile.label,
+    fond: pile.config.chartBgColor,
+    bordure: pile.config.chartBorderColor,
+    valeurs: props.data.parPopulation[pile.cle] ?? [],
+  }))
+
+  // Les deux piles l'une puis l'autre, et non entrelacées : Chart.js groupe par `stack`, et
+  // l'ordre des jeux décide de l'empilement DANS chaque pile. Les mêmes populations doivent
+  // s'empiler dans le même ordre des deux côtés pour se lire en vis-à-vis.
+  const datasets: unknown[] = series.map((serie) => jeuCourant(serie))
+  if (comparaison) {
+    for (const serie of series) datasets.push(jeuCompare(serie, comparaison))
+  }
+
+  /*
+   * La jauge attendue COMPLÈTE le bâton, elle n'en fait pas un second.
+   *
+   * On empile donc l'ÉCART — attendu moins présents — au-dessus des quatre populations, hachuré :
+   * le bâton entier monte jusqu'à l'attendu, et la partie hachurée se lit « ce qu'il aurait pu y
+   * avoir en plus ». Un bâton séparé obligeait à comparer deux hauteurs voisines ; une ligne
+   * au-dessus, à estimer un écart vertical. Ici l'écart EST le segment.
+   *
+   * ⚠️ Borné à zéro, et ce n'est pas une précaution de principe. La jauge compte les personnes
+   * ATTENDUES sur leur fenêtre prévue, l'affluence celles réellement présentes : un bénévole entré
+   * un jour où on ne l'attendait pas compte dans la seconde et pas dans la première. L'affluence
+   * peut donc dépasser l'attendu sur une tranche. Le bâton passe alors au-dessus de la jauge sans
+   * segment hachuré — ce qui est exact et se voit —, là où un écart négatif aurait creusé la pile
+   * et faussé l'échelle sans rien signaler.
+   */
+  const complement = (props.data.jauge ?? []).map((attendu, i) =>
+    Math.max(0, (attendu ?? 0) - (props.data.affluence?.[i] ?? 0))
+  )
+
+  datasets.push({
+    label: t('gestion.ticketing.affluence_gauge'),
+    data: complement,
+    // Hachuré et gris : ce n'est pas une catégorie de gens, c'est une absence.
+    backgroundColor: motifRaye('rgba(107, 114, 128, 0.45)'),
+    borderColor: 'rgba(107, 114, 128, 0.9)',
+    borderWidth: 1,
+    // LA MÊME pile que les populations : c'est ce qui en fait un complément et non un voisin.
+    stack: PILE_COURANTE,
+  })
+
+  if (comparaison) {
+    // Le même complément pour l'édition comparée, dans SA pile — sans quoi les deux bâtons ne
+    // monteraient pas jusqu'au même repère et la comparaison se lirait de travers.
+    const complementCompare = (comparaison.series.jauge ?? []).map((attendu, i) =>
+      Math.max(0, (attendu ?? 0) - (comparaison.series.affluence?.[i] ?? 0))
+    )
+    datasets.push({
+      label: t('gestion.ticketing.affluence_gauge'),
+      data: complementCompare,
+      backgroundColor: motifRaye('rgba(107, 114, 128, 0.25)'),
+      borderColor: 'rgba(107, 114, 128, 0.9)',
+      borderWidth: 1,
+      stack: PILE_COMPAREE,
+      comparaison: true,
+    })
+  }
+
   return {
-    labels: props.data.timestamps.map(etiquetteDe),
-    datasets: [
-      ...piles.value.map((pile) => ({
-        label: pile.label,
-        data: props.data.parPopulation[pile.cle] ?? [],
-        borderColor: pile.config.chartBorderColor,
-        backgroundColor: pile.config.chartBgColor,
-        fill: true,
-        // Une courbe en escalier, et non lissée : entre deux tranches, on ne sait rien. Une
-        // interpolation douce inventerait des valeurs intermédiaires qui n'ont pas été mesurées.
-        stepped: true,
-        pointRadius: props.data.timestamps.length > 60 ? 0 : 2,
-        // Les quatre populations forment UNE pile, celle des gens présents.
-        stack: 'presents',
-      })),
-      {
-        label: t('gestion.ticketing.affluence_gauge'),
-        data: props.data.jauge ?? [],
-        borderColor: 'rgba(107, 114, 128, 1)', // gray-500
-        backgroundColor: 'transparent',
-        // Ni remplie ni empilée : c'est un PLAFOND qu'on compare à la pile, pas une part de plus.
-        // `stack` propre à ce jeu de données — Chart.js forme une pile distincte par groupe, et sans
-        // cela la jauge s'ajouterait aux quatre aires et doublerait la hauteur du graphique.
-        stack: 'jauge',
-        fill: false,
-        stepped: true,
-        borderDash: [6, 4],
-        borderWidth: 2,
-        pointRadius: 0,
-      },
-    ],
+    // Les repères relatifs quand on compare, les instants sinon.
+    labels: props.etiquettes ?? props.data.timestamps.map(etiquetteDe),
+    datasets: datasets as ChartData<'bar'>['datasets'],
   }
 })
 
-const chartOptions = computed<ChartOptions<'line'>>(() => ({
+const chartOptions = computed<ChartOptions<'bar'>>(() => ({
   responsive: true,
   maintainAspectRatio: false,
   interaction: { mode: 'index', intersect: false },
   plugins: {
-    legend: { position: 'top' },
+    legend: {
+      position: 'top',
+      // La légende ne montre QUE l'édition en cours : doubler les entrées n'apprendrait rien, les
+      // jumelles portant les mêmes couleurs. Ce qui distingue les deux — la hachure — est dit une
+      // fois au-dessus du graphique. Et un clic bascule les DEUX éditions d'une population, sans
+      // quoi on masquerait un côté sans l'autre et la comparaison mentirait.
+      labels: { usePointStyle: true, padding: 15, filter: sansLesJumelles },
+      onClick: basculerLesDeuxEditions,
+    },
     tooltip: {
       callbacks: {
         // Le total dans le pied de l'infobulle : empilées, les quatre valeurs ne se somment pas à
