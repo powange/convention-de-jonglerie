@@ -47,6 +47,15 @@
     "edit_expired": "Повідомлення не можна змінити через {minutes} хвилин після надсилання",
     "editing": "Редагування повідомлення",
     "resume_today": "Сьогодні, {time}",
-    "resume_yesterday": "Учора, {time}"
+    "resume_yesterday": "Учора, {time}",
+    "destination": {
+      "artist_application": "Переглянути заявку",
+      "artist_space": "Мій простір артиста",
+      "edition_management": "Керування випуском",
+      "show_call": "Прийом заявок на виступи",
+      "shows": "Виступи",
+      "volunteer_applications": "Заявки волонтерів",
+      "volunteering": "Моє волонтерство"
+    }
   }
 }

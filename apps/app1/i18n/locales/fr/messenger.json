@@ -15,6 +15,15 @@
     "copy_failed": "Impossible de copier le message",
     "copy_unavailable": "Votre navigateur n'autorise pas la copie ici",
     "delete": "Supprimer",
+    "destination": {
+      "artist_application": "Voir la candidature",
+      "artist_space": "Mon espace artiste",
+      "edition_management": "Gestion de l'édition",
+      "show_call": "Appel à spectacles",
+      "shows": "Spectacles",
+      "volunteer_applications": "Candidatures bénévoles",
+      "volunteering": "Mon bénévolat"
+    },
     "edit": "Modifier",
     "edit_expired": "Un message ne peut plus être modifié {minutes} minutes après son envoi",
     "edited": "modifié",

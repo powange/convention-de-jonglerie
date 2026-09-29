@@ -1,3 +1,5 @@
+import type { DestinationDeConversation } from '~~/shared/utils/destination-conversation'
+
 export interface MessengerEdition {
   id: number
   name: string | null
@@ -90,6 +92,11 @@ export interface Conversation {
     }
   } | null
   participants: ConversationParticipant[]
+  /**
+   * Où mène le bouton de l'en-tête, pour l'utilisateur courant : calculé par le serveur, qui
+   * connaît ses droits. Absent pour une conversation privée.
+   */
+  destination?: DestinationDeConversation | null
   messages: Array<{
     id: string
     content: string

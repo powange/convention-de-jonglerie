@@ -199,7 +199,8 @@
         >
           <template #header>
             <div v-if="selectedConversation" class="flex items-center justify-between gap-3">
-              <div class="flex items-center gap-3">
+              <!-- `min-w-0` : un titre long se coupe au lieu d'écraser l'avatar et les boutons. -->
+              <div class="flex items-center gap-3 min-w-0">
                 <!-- Bouton retour (mobile uniquement) -->
                 <UButton
                   color="neutral"
@@ -210,7 +211,7 @@
                 />
 
                 <!-- Avatar pour conversations privées avec pastille de présence, icône sinon -->
-                <div v-if="getOtherParticipant(selectedConversation)" class="relative">
+                <div v-if="getOtherParticipant(selectedConversation)" class="relative shrink-0">
                   <UiUserAvatar :user="getOtherParticipant(selectedConversation)!" size="md" />
                   <!-- Pastille de présence -->
                   <div
@@ -225,10 +226,10 @@
                   :style="
                     selectedConversation.team ? { color: selectedConversation.team.color } : {}
                   "
-                  class="h-6 w-6"
+                  class="h-6 w-6 shrink-0"
                 />
-                <div>
-                  <h3 class="font-semibold">
+                <div class="min-w-0">
+                  <h3 class="font-semibold truncate">
                     {{ getConversationDisplayName(selectedConversation) }}
                   </h3>
                   <p v-if="selectedConversation.type !== 'PRIVATE'" class="text-xs text-gray-500">
@@ -237,15 +238,45 @@
                 </div>
               </div>
 
-              <!-- Bouton participants (masqué pour les conversations privées) -->
-              <UButton
-                v-if="selectedConversation.type !== 'PRIVATE'"
-                color="neutral"
-                variant="ghost"
-                :label="`${selectedConversation.participants.length}`"
-                icon="i-heroicons-users"
-                @click="showParticipantsModal = true"
-              />
+              <div class="flex items-center gap-1 shrink-0">
+                <!--
+                  La page que concerne la conversation : la gestion pour qui gère ce sujet, la page
+                  publique pour le bénévole ou l'artiste. Le serveur a tranché d'après les droits.
+                  Réduit à son icône sur petit écran, le libellé passe en infobulle.
+                -->
+                <UTooltip
+                  v-if="destinationSelectionnee"
+                  :text="destinationSelectionnee.libelle"
+                  class="sm:hidden"
+                >
+                  <UButton
+                    color="neutral"
+                    variant="soft"
+                    :icon="destinationSelectionnee.icone"
+                    :to="destinationSelectionnee.to"
+                    :aria-label="destinationSelectionnee.libelle"
+                  />
+                </UTooltip>
+                <UButton
+                  v-if="destinationSelectionnee"
+                  color="neutral"
+                  variant="soft"
+                  :icon="destinationSelectionnee.icone"
+                  :label="destinationSelectionnee.libelle"
+                  :to="destinationSelectionnee.to"
+                  class="hidden sm:inline-flex"
+                />
+
+                <!-- Bouton participants (masqué pour les conversations privées) -->
+                <UButton
+                  v-if="selectedConversation.type !== 'PRIVATE'"
+                  color="neutral"
+                  variant="ghost"
+                  :label="`${selectedConversation.participants.length}`"
+                  icon="i-heroicons-users"
+                  @click="showParticipantsModal = true"
+                />
+              </div>
             </div>
             <h3 v-else class="font-semibold">{{ $t('messenger.select_conversation') }}</h3>
           </template>
@@ -585,6 +616,8 @@ import { useAuthStore } from '~/stores/auth'
 import { useAvatar } from '~/utils/avatar'
 import { toIntlLocale } from '~/utils/locales'
 
+import type { CibleDeConversation } from '~~/shared/utils/destination-conversation'
+
 import {
   DELAI_MODIFICATION_MESSAGE_MINUTES,
   messageEncoreModifiable,
@@ -669,6 +702,36 @@ const selectedConversation = computed(() => {
     if (conversation) return conversation
   }
   return undefined
+})
+
+// Libellé et icône du bouton de l'en-tête, pour chaque page qu'il peut viser.
+const APPARENCE_DESTINATION: Record<CibleDeConversation, { cle: string; icone: string }> = {
+  'benevolat-public': {
+    cle: 'messenger.destination.volunteering',
+    icone: 'i-heroicons-hand-raised',
+  },
+  'gestion-candidatures-benevoles': {
+    cle: 'messenger.destination.volunteer_applications',
+    icone: 'i-heroicons-document-text',
+  },
+  'gestion-accueil': {
+    cle: 'messenger.destination.edition_management',
+    icone: 'i-heroicons-cog-6-tooth',
+  },
+  'appel-spectacles': { cle: 'messenger.destination.show_call', icone: 'i-heroicons-megaphone' },
+  'gestion-candidature-artiste': {
+    cle: 'messenger.destination.artist_application',
+    icone: 'i-heroicons-document-text',
+  },
+  'espace-artiste': { cle: 'messenger.destination.artist_space', icone: 'i-heroicons-star' },
+  'gestion-spectacles': { cle: 'messenger.destination.shows', icone: 'i-heroicons-film' },
+}
+
+const destinationSelectionnee = computed(() => {
+  const destination = selectedConversation.value?.destination
+  if (!destination) return null
+  const apparence = APPARENCE_DESTINATION[destination.cible]
+  return { to: destination.to, libelle: t(apparence.cle), icone: apparence.icone }
 })
 
 // Trouver l'édition de la conversation sélectionnée (ou 'private' pour les conversations privées)

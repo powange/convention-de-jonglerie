@@ -47,6 +47,15 @@
     "edit_expired": "Wiadomości nie można już edytować po upływie {minutes} minut od wysłania",
     "editing": "Edycja wiadomości",
     "resume_today": "Dzisiaj, {time}",
-    "resume_yesterday": "Wczoraj, {time}"
+    "resume_yesterday": "Wczoraj, {time}",
+    "destination": {
+      "artist_application": "Zobacz zgłoszenie",
+      "artist_space": "Moja przestrzeń artysty",
+      "edition_management": "Zarządzanie edycją",
+      "show_call": "Nabór spektakli",
+      "shows": "Spektakle",
+      "volunteer_applications": "Zgłoszenia wolontariuszy",
+      "volunteering": "Mój wolontariat"
+    }
   }
 }

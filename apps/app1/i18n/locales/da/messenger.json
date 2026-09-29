@@ -47,6 +47,15 @@
     "edit_expired": "En besked kan ikke længere redigeres {minutes} minutter efter, at den er sendt",
     "editing": "Redigerer besked",
     "resume_today": "I dag, {time}",
-    "resume_yesterday": "I går, {time}"
+    "resume_yesterday": "I går, {time}",
+    "destination": {
+      "artist_application": "Se ansøgningen",
+      "artist_space": "Mit kunstnerområde",
+      "edition_management": "Administration af udgaven",
+      "show_call": "Opråb til forestillinger",
+      "shows": "Forestillinger",
+      "volunteer_applications": "Frivilligansøgninger",
+      "volunteering": "Mit frivillige arbejde"
+    }
   }
 }

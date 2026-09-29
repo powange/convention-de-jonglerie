@@ -4,7 +4,9 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { ensureOrganizersGroupConversation } from '#server/utils/messenger-helpers'
 import { compterNonLusParConversation } from '#server/utils/messenger-unread-service'
-import { checkAdminMode } from '#server/utils/organizer-management'
+import { canManageEditionVolunteers, checkAdminMode } from '#server/utils/organizer-management'
+import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
+import { destinationDeConversation } from '~~/shared/utils/destination-conversation'
 
 const querySchema = z.object({
   editionId: z.string().transform((val) => parseInt(val, 10)),
@@ -134,6 +136,9 @@ export default wrapApiHandler(
         showApplication: {
           select: {
             id: true,
+            // L'appel à spectacles : le bouton de l'en-tête mène à sa page, ou à cette
+            // candidature dans sa gestion.
+            showCallId: true,
             showTitle: true,
             artistName: true,
             user: {
@@ -210,6 +215,25 @@ export default wrapApiHandler(
      */
     const nonLusParConversation = await compterNonLusParConversation(user.id)
 
+    // Les droits qui décident où mène le bouton de l'en-tête : une fois pour l'édition, pas par
+    // conversation.
+    const [gereBenevoles, gereArtistes] = await Promise.all([
+      canManageEditionVolunteers(editionId, user.id, event),
+      canManageArtistsById(editionId, user.id, event),
+    ])
+    const destinationDe = (conversation: (typeof conversations)[number]) =>
+      destinationDeConversation(
+        {
+          type: conversation.type,
+          // Une candidature d'artiste n'est rattachée à l'édition que par son appel : c'est
+          // l'édition demandée qui fait foi.
+          editionId,
+          appelASpectaclesId: conversation.showApplication?.showCallId,
+          candidatureArtisteId: conversation.showApplication?.id,
+        },
+        { gereBenevoles, gereArtistes }
+      )
+
     const responsablesParEquipe = new Map<number, Set<number>>()
     for (const teamId of new Set(
       conversations.map((c) => c.teamId).filter((id): id is number => id !== null)
@@ -233,7 +257,7 @@ export default wrapApiHandler(
        * lot, qui ne touche qu'au nombre de requêtes.
        */
       if (!estParticipant) {
-        return { ...conversation, unreadCount: 0 }
+        return { ...conversation, destination: destinationDe(conversation), unreadCount: 0 }
       }
 
       const responsables = conversation.teamId
@@ -242,6 +266,7 @@ export default wrapApiHandler(
 
       return {
         ...conversation,
+        destination: destinationDe(conversation),
         participants: responsables
           ? conversation.participants.map((participant) => ({
               ...participant,

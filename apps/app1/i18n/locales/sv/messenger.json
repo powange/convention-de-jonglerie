@@ -47,6 +47,15 @@
     "edit_expired": "Ett meddelande kan inte längre redigeras {minutes} minuter efter att det skickades",
     "editing": "Redigerar meddelande",
     "resume_today": "I dag, {time}",
-    "resume_yesterday": "I går, {time}"
+    "resume_yesterday": "I går, {time}",
+    "destination": {
+      "artist_application": "Visa ansökan",
+      "artist_space": "Mitt artistutrymme",
+      "edition_management": "Hantering av upplagan",
+      "show_call": "Utlysning av föreställningar",
+      "shows": "Föreställningar",
+      "volunteer_applications": "Volontäransökningar",
+      "volunteering": "Mitt volontärarbete"
+    }
   }
 }
