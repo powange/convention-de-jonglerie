@@ -1,4 +1,5 @@
 import { NotificationService } from '#server/utils/notification-service'
+import { MARGE_RETARD_MS } from '~~/shared/utils/bornes-retard-creneau'
 
 export default defineTask({
   meta: {
@@ -12,12 +13,31 @@ export default defineTask({
       const reminderStart = new Date(now.getTime() + 28 * 60 * 1000) // Dans 28 minutes
       const reminderEnd = new Date(now.getTime() + 32 * 60 * 1000) // Dans 32 minutes
 
-      // Récupérer tous les créneaux des éditions en cours
+      /*
+       * Les créneaux susceptibles d'entrer dans la fenêtre, et eux seuls.
+       *
+       * Cette tâche tourne CHAQUE MINUTE. Elle chargeait tous les créneaux de toutes les éditions
+       * non terminées — avec leurs affectations et les comptes des personnes affectées — pour n'en
+       * retenir ensuite qu'une poignée. La base porte donc l'intégralité du planning soixante fois
+       * par heure, pour envoyer zéro ou deux rappels.
+       *
+       * ⚠️ La borne ne peut PAS être `startDateTime` entre 28 et 32 minutes : le retard décale ce
+       * début, et un créneau retardé d'une heure doit être rappelé une heure plus tard. D'où la
+       * marge de MARGE_RETARD_MS, DÉRIVÉE de la borne du retard — si elle était plus étroite, les
+       * créneaux les plus décalés ne seraient jamais chargés et leurs bénévoles ne recevraient
+       * aucun rappel, sans que rien n'apparaisse dans les journaux.
+       *
+       * Le filtre fin reste en mémoire : c'est lui qui applique le retard créneau par créneau.
+       */
       const allSlots = await prisma.volunteerTimeSlot.findMany({
         where: {
           // Étape 0bis : endDate porté par Event (plus de traversée Edition)
           event: {
             endDate: { gte: now },
+          },
+          startDateTime: {
+            gte: new Date(reminderStart.getTime() - MARGE_RETARD_MS),
+            lte: new Date(reminderEnd.getTime() + MARGE_RETARD_MS),
           },
         },
         include: {

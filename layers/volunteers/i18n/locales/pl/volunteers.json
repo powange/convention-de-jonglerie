@@ -315,7 +315,6 @@
     "minors_details_label": "Szczegóły o niepełnoletnim",
     "minors_details_placeholder": "Wiek, imię, szczególne potrzeby...",
     "minors_label": "Będę towarzyszyć niepełnoletniemu",
-    "minutes": "min",
     "modification_note": "Nota o modyfikacji (opcjonalnie)",
     "modification_note_help": "Ta notatka zostanie wysłana do wolontariusza w celu wyjaśnienia zmian",
     "modification_note_placeholder": "Explain why you are modifying team preferences...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Tylko wolontariusze obecni w jednym z tych okresów zobaczą ten zespół w swoich preferencjach",
     "team_periods_required": "Zaznacz co najmniej jeden okres",
     "filter_source": "Filtruj według źródła",
-    "source_all": "Wszystkie źródła"
+    "source_all": "Wszystkie źródła",
+    "delay_bornes": "Od {min} do {max} minut. Wartość ujemna przesuwa dyżur na wcześniej."
   }
 }

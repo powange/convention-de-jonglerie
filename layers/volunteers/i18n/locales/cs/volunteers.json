@@ -315,7 +315,6 @@
     "minors_details_label": "Podrobnosti o nezletilé osobě",
     "minors_details_placeholder": "Věk, jméno, speciální potřeby...",
     "minors_label": "Doprovodí mě nezletilá osoba",
-    "minutes": "min",
     "modification_note": "Poznámka k úpravám (nepovinné)",
     "modification_note_help": "Dobrovolníkovi bude zaslána tato zpráva s vysvětlením změn.",
     "modification_note_placeholder": "Vysvětlete, proč měníte týmové preference...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Tento tým uvidí ve svých preferencích jen dobrovolníci přítomní v některém z těchto období",
     "team_periods_required": "Zaškrtněte alespoň jedno období",
     "filter_source": "Filtrovat podle původu",
-    "source_all": "Všechny původy"
+    "source_all": "Všechny původy",
+    "delay_bornes": "Mezi {min} a {max} minutami. Negativní hodnota posune směnu dopředu."
   }
 }

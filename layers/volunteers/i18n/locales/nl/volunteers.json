@@ -315,7 +315,6 @@
     "minors_details_label": "Details over de minderjarige",
     "minors_details_placeholder": "Leeftijd, naam, bijzondere behoeften...",
     "minors_label": "Ik word vergezeld door een minderjarige",
-    "minutes": "min",
     "modification_note": "Wijzigingsnotitie (optioneel)",
     "modification_note_help": "Deze notitie wordt naar de vrijwilliger gestuurd om de wijzigingen uit te leggen",
     "modification_note_placeholder": "Explain why you are modifying team preferences...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Alleen vrijwilligers die in een van deze periodes aanwezig zijn, zien dit team in hun voorkeuren",
     "team_periods_required": "Vink minstens één periode aan",
     "filter_source": "Filteren op herkomst",
-    "source_all": "Alle herkomsten"
+    "source_all": "Alle herkomsten",
+    "delay_bornes": "Tussen {min} en {max} minuten. Een negatieve waarde vervroegt de dienst."
   }
 }

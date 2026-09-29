@@ -315,7 +315,6 @@
     "minors_details_label": "Detaljer om den minderåriga",
     "minors_details_placeholder": "Ålder, namn, särskilda behov...",
     "minors_label": "Jag kommer att åtföljas av en minderårig",
-    "minutes": "min",
     "modification_note": "Anteckning om ändring (valfritt)",
     "modification_note_help": "Detta meddelande kommer att skickas till volontären för att förklara ändringarna.",
     "modification_note_placeholder": "Förklara varför du ändrar preferenser för teamet...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Bara volontärer som är på plats under någon av dessa perioder ser det här laget bland sina önskemål",
     "team_periods_required": "Kryssa i minst en period",
     "filter_source": "Filtrera efter ursprung",
-    "source_all": "Alla ursprung"
+    "source_all": "Alla ursprung",
+    "delay_bornes": "Mellan {min} och {max} minuter. Ett negativt värde tidigarelägger passet."
   }
 }

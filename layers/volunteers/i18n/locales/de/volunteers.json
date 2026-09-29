@@ -315,7 +315,6 @@
     "minors_details_label": "Details zur minderjährigen Person",
     "minors_details_placeholder": "Alter, Name, besondere Bedürfnisse...",
     "minors_label": "Ich werde von einer minderjährigen Person begleitet",
-    "minutes": "Min",
     "modification_note": "Änderungsnotiz (optional)",
     "modification_note_help": "Diese Notiz wird an den Freiwilligen gesendet, um die Änderungen zu erklären",
     "modification_note_placeholder": "Explain why you are modifying team preferences...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Nur Helferinnen und Helfer, die in einem dieser Zeiträume da sind, sehen dieses Team in ihren Präferenzen",
     "team_periods_required": "Mindestens einen Zeitraum ankreuzen",
     "filter_source": "Nach Herkunft filtern",
-    "source_all": "Alle Herkünfte"
+    "source_all": "Alle Herkünfte",
+    "delay_bornes": "Zwischen {min} und {max} Minuten. Ein negativer Wert verschiebt den Einsatz nach vorne."
   }
 }

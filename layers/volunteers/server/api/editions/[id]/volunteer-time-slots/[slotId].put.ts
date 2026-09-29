@@ -6,6 +6,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { validateEditionId, validateStringId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { RETARD_MINUTES_MAX, RETARD_MINUTES_MIN } from '~~/shared/utils/bornes-retard-creneau'
 
 const updateTimeSlotSchema = z
   .object({
@@ -21,7 +22,19 @@ const updateTimeSlotSchema = z
       .transform((str) => new Date(str))
       .optional(),
     maxVolunteers: z.number().int().min(1).max(50).optional(),
-    delayMinutes: z.number().int().nullable().optional(),
+    /*
+     * Borné des DEUX côtés : un retard peut être négatif (on avance le créneau), et rien ne le
+     * limitait. Au-delà de douze heures ce n'est plus un retard mais un autre créneau — et un
+     * décalage démesuré ferait surtout sortir le créneau de la fenêtre que la tâche de rappel
+     * relit, donc supprimerait le rappel sans que personne ne le voie.
+     */
+    delayMinutes: z
+      .number()
+      .int()
+      .min(RETARD_MINUTES_MIN)
+      .max(RETARD_MINUTES_MAX)
+      .nullable()
+      .optional(),
   })
   .refine(
     (data) => {

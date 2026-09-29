@@ -315,7 +315,6 @@
     "minors_details_label": "Details about the minor",
     "minors_details_placeholder": "Age, name, special needs...",
     "minors_label": "I will be accompanied by a minor",
-    "minutes": "min",
     "modification_note": "Modification note (optional)",
     "modification_note_help": "This note will be sent to the volunteer to explain the changes",
     "modification_note_placeholder": "Explain why you are modifying team preferences...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Only volunteers present during one of these periods will see this team in their preferences",
     "team_periods_required": "Tick at least one period",
     "filter_source": "Filter by source",
-    "source_all": "All sources"
+    "source_all": "All sources",
+    "delay_bornes": "Between {min} and {max} minutes. A negative value moves the shift earlier."
   }
 }
