@@ -705,7 +705,10 @@
       "loan_tag_all": "Alle tags",
       "export_pdf_filtered_empty": "Ingen genstande matcher de valgte filtre",
       "export_pdf_extract": "filtreret udtræk: {affiches} af {total} genstande",
-      "filter_no_results": "Ingen genstande matcher de valgte filtre"
+      "filter_no_results": "Ingen genstande matcher de valgte filtre",
+      "shopping_mark_counted": "Alt er blevet købt",
+      "shopping_mark_counted_confirm": "Optællingen af {count} afkrydsede genstand(e) fra “{name}” sættes til det forventede antal: de vises ikke længere som manglende. Ikke-afkrydsede genstande ændres ikke.",
+      "shopping_mark_counted_done": "Optælling opdateret"
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",

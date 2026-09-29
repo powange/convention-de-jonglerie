@@ -705,7 +705,10 @@
       "loan_tag_all": "Alla taggar",
       "export_pdf_filtered_empty": "Inga föremål matchar de valda filtren",
       "export_pdf_extract": "filtrerat utdrag: {affiches} av {total} föremål",
-      "filter_no_results": "Inga föremål matchar de valda filtren"
+      "filter_no_results": "Inga föremål matchar de valda filtren",
+      "shopping_mark_counted": "Allt har köpts in",
+      "shopping_mark_counted_confirm": "Räkningen av {count} ikryssade föremål från ”{name}” sätts till det förväntade antalet: de visas inte längre som saknade. Föremål som inte är ikryssade påverkas inte.",
+      "shopping_mark_counted_done": "Räkning uppdaterad"
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",

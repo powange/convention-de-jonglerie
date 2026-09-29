@@ -705,7 +705,10 @@
       "loan_tag_all": "All tags",
       "export_pdf_filtered_empty": "No item matches the filters applied",
       "export_pdf_extract": "filtered extract: {affiches} of {total} items",
-      "filter_no_results": "No item matches the filters applied"
+      "filter_no_results": "No item matches the filters applied",
+      "shopping_mark_counted": "Everything has been bought",
+      "shopping_mark_counted_confirm": "The count of {count} ticked item(s) from “{name}” will be raised to the expected quantity: they will no longer appear as missing. Unticked items are left untouched.",
+      "shopping_mark_counted_done": "Count updated"
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",

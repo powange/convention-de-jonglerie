@@ -705,7 +705,10 @@
       "loan_tag_all": "Todas las etiquetas",
       "export_pdf_filtered_empty": "Ningún objeto coincide con los filtros aplicados",
       "export_pdf_extract": "extracto filtrado: {affiches} de {total} objetos",
-      "filter_no_results": "Ningún objeto coincide con los filtros aplicados"
+      "filter_no_results": "Ningún objeto coincide con los filtros aplicados",
+      "shopping_mark_counted": "Todo ha sido comprado",
+      "shopping_mark_counted_confirm": "El recuento de {count} objeto(s) marcado(s) de «{name}» se ajustará a la cantidad esperada: dejarán de aparecer como faltantes. Los objetos no marcados no cambian.",
+      "shopping_mark_counted_done": "Recuento actualizado"
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",

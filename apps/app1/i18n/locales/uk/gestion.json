@@ -705,7 +705,10 @@
       "loan_tag_all": "Усі мітки",
       "export_pdf_filtered_empty": "Жоден предмет не відповідає заданим фільтрам",
       "export_pdf_extract": "відфільтрована вибірка: {affiches} з {total} предметів",
-      "filter_no_results": "Жоден предмет не відповідає заданим фільтрам"
+      "filter_no_results": "Жоден предмет не відповідає заданим фільтрам",
+      "shopping_mark_counted": "Усе куплено",
+      "shopping_mark_counted_confirm": "Кількість позначених предметів ({count}) зі списку «{name}» буде приведено до очікуваної: вони більше не вважатимуться відсутніми. Непозначені предмети не змінюються.",
+      "shopping_mark_counted_done": "Кількість оновлено"
     },
     "ticketing": {
       "access_control_description": "Скануйте та перевіряйте квитки на вході",

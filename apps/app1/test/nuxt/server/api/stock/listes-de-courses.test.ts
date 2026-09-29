@@ -12,6 +12,7 @@ import renommerListe from '../../../../../../../layers/stock/server/api/editions
 import supprimerListe from '../../../../../../../layers/stock/server/api/editions/[id]/stock-shopping-lists/[listId]/index.delete'
 import ajouterArticles from '../../../../../../../layers/stock/server/api/editions/[id]/stock-shopping-lists/[listId]/items.post'
 import cocherArticle from '../../../../../../../layers/stock/server/api/editions/[id]/stock-shopping-lists/[listId]/items/[articleId].patch'
+import comptageDeLaListe from '../../../../../../../layers/stock/server/api/editions/[id]/stock-shopping-lists/[listId]/comptage.post'
 import { global } from '../../../globales-nitro'
 
 const prismaMock = (globalThis as any).prisma
@@ -254,5 +255,91 @@ describe('les listes de courses du stock', () => {
       await expect(supprimerListe(evenement as any)).rejects.toMatchObject({ statusCode: 400 })
       expect(prismaMock.stockShoppingList.findFirst).not.toHaveBeenCalled()
     })
+  })
+})
+
+/**
+ * « Tout a été acheté » : le comptage des articles COCHÉS rejoint la quantité attendue.
+ *
+ * Deux choses s'y jouent, et aucune ne se voit à l'écran. La première : ce sont les articles
+ * cochés, et EUX SEULS, qui bougent — un objet qu'on n'a pas acheté ne doit pas être déclaré
+ * complet au passage. La seconde : chaque objet reçoit SA quantité attendue, pas une valeur
+ * commune ; un `updateMany` aurait écrit le même nombre partout, ce que rien n'aurait signalé
+ * puisque les nombres restent plausibles.
+ */
+describe('déclarer une liste de courses achetée', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockEdition.mockResolvedValue({ id: 1, stockEnabled: true })
+    global.getRouterParam = vi.fn((_e: any, nom: string) => (nom === 'id' ? '1' : '7'))
+    prismaMock.stockShoppingList.findFirst.mockResolvedValue({ id: 7, name: 'Quincaillerie' })
+    prismaMock.$transaction.mockImplementation(async (operations: any) => operations)
+    prismaMock.stockItem.update.mockResolvedValue({})
+  })
+
+  const evenement = { context: { params: { id: '1' }, user: { id: 10 } } }
+
+  it('porte le comptage de chaque objet coché à SA quantité attendue', async () => {
+    prismaMock.stockShoppingListItem.findMany.mockResolvedValue([
+      { item: { id: 100, quantity: 6 } },
+      { item: { id: 200, quantity: 1 } },
+    ])
+
+    const reponse: any = await comptageDeLaListe(evenement as any)
+
+    expect(reponse.data.updated).toBe(2)
+    expect(prismaMock.stockItem.update).toHaveBeenCalledWith({
+      where: { id: 100 },
+      data: { finalQuantity: 6 },
+    })
+    expect(prismaMock.stockItem.update).toHaveBeenCalledWith({
+      where: { id: 200 },
+      data: { finalQuantity: 1 },
+    })
+  })
+
+  it('ne lit que les articles cochés', async () => {
+    prismaMock.stockShoppingListItem.findMany.mockResolvedValue([])
+
+    await comptageDeLaListe(evenement as any)
+
+    expect(prismaMock.stockShoppingListItem.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { listId: 7, purchased: true } })
+    )
+  })
+
+  it('n’écrit rien quand aucun article n’est coché', async () => {
+    // Le cas du bouton pressé par erreur sur une liste intacte. Rien à déclarer, donc rien à
+    // écrire — et surtout pas une transaction vide qui ferait croire à une action.
+    prismaMock.stockShoppingListItem.findMany.mockResolvedValue([])
+
+    const reponse: any = await comptageDeLaListe(evenement as any)
+
+    expect(reponse.data.updated).toBe(0)
+    expect(prismaMock.stockItem.update).not.toHaveBeenCalled()
+    expect(prismaMock.$transaction).not.toHaveBeenCalled()
+  })
+
+  it('refuse une liste qui n’est pas de cette édition', async () => {
+    // La garde qui compte : les droits sont vérifiés sur l'édition de l'URL, et l'écriture se
+    // ferait sur les objets d'une autre. C'est la REQUÊTE qui protège — elle cherche la liste
+    // dans cette édition-là —, d'où les deux vérifications plutôt qu'une.
+    prismaMock.stockShoppingList.findFirst.mockResolvedValue(null)
+    prismaMock.stockShoppingListItem.findMany.mockResolvedValue([
+      { item: { id: 100, quantity: 6 } },
+    ])
+
+    await expect(comptageDeLaListe(evenement as any)).rejects.toBeDefined()
+    expect(prismaMock.stockItem.update).not.toHaveBeenCalled()
+  })
+
+  it('cherche la liste DANS l’édition de l’URL', async () => {
+    prismaMock.stockShoppingListItem.findMany.mockResolvedValue([])
+
+    await comptageDeLaListe(evenement as any)
+
+    expect(prismaMock.stockShoppingList.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 7, editionId: 1 } })
+    )
   })
 })

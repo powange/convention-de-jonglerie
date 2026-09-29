@@ -705,7 +705,10 @@
       "loan_tag_all": "Tutti i tag",
       "export_pdf_filtered_empty": "Nessun oggetto corrisponde ai filtri impostati",
       "export_pdf_extract": "estratto filtrato: {affiches} oggetti su {total}",
-      "filter_no_results": "Nessun oggetto corrisponde ai filtri impostati"
+      "filter_no_results": "Nessun oggetto corrisponde ai filtri impostati",
+      "shopping_mark_counted": "Tutto è stato acquistato",
+      "shopping_mark_counted_confirm": "Il conteggio di {count} oggetto/i spuntato/i da «{name}» sarà portato alla quantità prevista: non risulteranno più mancanti. Gli oggetti non spuntati restano invariati.",
+      "shopping_mark_counted_done": "Conteggio aggiornato"
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",
