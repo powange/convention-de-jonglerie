@@ -309,8 +309,17 @@
           </p>
         </div>
         <AffluenceChart
-          v-else-if="donneesAffluence && donneesAffluence.timestamps.length > 0"
-          :data="donneesAffluence"
+          v-else-if="donneesDeLAffluence && donneesDeLAffluence.timestamps.length > 0"
+          :data="donneesDeLAffluence"
+          :etiquettes="comparaisonAffluence?.etiquettes ?? null"
+          :comparaison="
+            comparaisonAffluence
+              ? {
+                  libelle: comparaisonAffluence.libelle,
+                  series: comparaisonAffluence.comparee,
+                }
+              : null
+          "
           :timezone="edition?.timezone"
           :granularite="granulariteAffluence"
         />
@@ -1143,6 +1152,54 @@ const achatsFiltres = computed(() => filtrerAchats(purchasesData.value))
  * qui ne dit pas d'où vient l'écart n'apprend presque rien.
  */
 
+/**
+ * La comparaison de l'affluence, ou `null` quand on ne compare pas.
+ *
+ * L'ouverture de chaque édition vient des VALIDATIONS et non de l'affluence : la charge de
+ * l'affluence ne porte pas de période, et c'est elle qui donne le point zéro de l'axe relatif.
+ * Les deux jeux sont chargés ensemble dès qu'on compare, donc la dépendance est toujours
+ * satisfaite — mais elle est réelle, et la retirer là-haut viderait ce graphique sans rien dire.
+ */
+const comparaisonAffluence = computed(() => {
+  const courante = donneesAffluence.value
+  const comparee = affluenceComparee.value
+  if (!enComparaison.value || !courante || !comparee) return null
+
+  const resultat = comparerSeries(
+    {
+      timestamps: courante.timestamps,
+      // La jauge et le total voyagent avec les populations : la ligne du plafond et l'infobulle
+      // se lisent sur le même axe, et les laisser bruts les décalait dès que l'édition comparée
+      // élargissait l'axe.
+      series: {
+        ...(courante.parPopulation as unknown as Record<string, number[]>),
+        jauge: courante.jauge,
+        affluence: courante.affluence,
+      },
+      ouverture: validationsData.value?.periods?.event?.start,
+      fuseau: validationsData.value?.timezone,
+    },
+    {
+      timestamps: comparee.timestamps,
+      series: {
+        ...(comparee.parPopulation as unknown as Record<string, number[]>),
+        jauge: comparee.jauge,
+        affluence: comparee.affluence,
+      },
+      ouverture: validationsComparees.value?.periods?.event?.start,
+      fuseau: validationsComparees.value?.timezone,
+    },
+    granulariteAffluence.value
+  )
+
+  return {
+    etiquettes: resultat.etiquettes,
+    libelle: libelleDEdition(editionComparee.value?.name, editionComparee.value?.startDate),
+    courante: resultat.courante,
+    comparee: resultat.comparee,
+  }
+})
+
 /** La comparaison des validations d'entrée, ou `null` quand on ne compare pas. */
 const comparaisonValidations = computed(() => {
   const courante = filteredData.value
@@ -1246,6 +1303,37 @@ const donneesDesAchats = computed(() => {
   }
 })
 
+/**
+ * Ce que le graphique d'affluence reçoit : les séries réalignées quand on compare.
+ *
+ * Sans ce recalage, les barres de l'édition courante garderaient la longueur de leur axe d'origine
+ * pendant que les étiquettes porteraient l'axe commun — les deux éditions se liraient l'une à côté
+ * de l'autre sans se faire face, ce qui est précisément ce qu'on vient chercher.
+ */
+const donneesDeLAffluence = computed(() => {
+  const brut = donneesAffluence.value
+  if (!brut) return null
+  const c = comparaisonAffluence.value
+  if (!c) return brut
+
+  const serie = (nom: string) => (c.courante[nom] ?? []).map((v) => v ?? 0)
+
+  return {
+    ...brut,
+    parPopulation: {
+      organisateurs: serie('organisateurs'),
+      artistes: serie('artistes'),
+      benevoles: serie('benevoles'),
+      participants: serie('participants'),
+    },
+    jauge: serie('jauge'),
+    affluence: serie('affluence'),
+    // Les instants d'origine restent, mais ne servent plus d'étiquettes : `etiquettes` les
+    // remplace. Les garder évite de rendre le type facultatif pour un cas de figure.
+    timestamps: brut.timestamps,
+  }
+})
+
 /** Ce que le graphique des validations reçoit. */
 const donneesDesValidations = computed(() => {
   const brut = filteredData.value
@@ -1298,6 +1386,8 @@ interface DonneesAffluence {
 
 const granulariteAffluence = ref<number>(1440)
 const donneesAffluence = ref<DonneesAffluence | null>(null)
+/** L'affluence de l'édition comparée, découpée à la MÊME granularité. */
+const affluenceComparee = ref<DonneesAffluence | null>(null)
 const chargementAffluence = ref(false)
 const erreurAffluence = ref(false)
 
@@ -1419,6 +1509,7 @@ async function chargerComparaison() {
     validationsComparees.value = null
     achatsCompares.value = null
     provenancesComparees.value = null
+    affluenceComparee.value = null
     comparaisonRefusee.value = false
     comparaisonEnPanne.value = false
     return
@@ -1428,7 +1519,7 @@ async function chargerComparaison() {
   comparaisonRefusee.value = false
   comparaisonEnPanne.value = false
   try {
-    const [validations, achats, provenances] = await Promise.all([
+    const [validations, achats, provenances, affluence] = await Promise.all([
       $fetch<ValidationData>(
         `/api/editions/${id}/ticketing/stats/validations?granularity=${selectedGranularity.value}`
       ),
@@ -1436,10 +1527,17 @@ async function chargerComparaison() {
         `/api/editions/${id}/ticketing/stats/purchases?granularity=${selectedPurchaseGranularity.value}`
       ),
       $fetch<OrderSourcesData>(`/api/editions/${id}/ticketing/stats/order-sources`),
+      // L'affluence a SA propre granularité, réglée sous son graphique : elle ne suit pas celle
+      // des validations, et la découper autrement décalerait les deux éditions l'une par rapport
+      // à l'autre.
+      $fetch<{ data: DonneesAffluence }>(
+        `/api/editions/${id}/ticketing/stats/affluence?granularity=${granulariteAffluence.value}`
+      ),
     ])
     validationsComparees.value = validations
     achatsCompares.value = achats
     provenancesComparees.value = provenances
+    affluenceComparee.value = affluence.data
   } catch (erreur: any) {
     // Un 403 n'est pas une panne : c'est une réponse, et l'écran doit la dire plutôt que
     // d'afficher une erreur générique. La liste est pourtant filtrée en amont — ce cas ne
@@ -1451,6 +1549,7 @@ async function chargerComparaison() {
     validationsComparees.value = null
     achatsCompares.value = null
     provenancesComparees.value = null
+    affluenceComparee.value = null
   } finally {
     chargementComparaison.value = false
   }
@@ -1485,6 +1584,9 @@ watch(selectedGranularity, () => {
 
 watch(granulariteAffluence, () => {
   chargerAffluence()
+  // L'édition comparée doit être redécoupée à la même granularité, sinon les deux piles ne se
+  // font plus face — même raison que pour les validations, un cran plus haut.
+  if (comparaisonId.value !== null) chargerComparaison()
 })
 
 watch(selectedPurchaseGranularity, () => {

@@ -15,6 +15,9 @@
       title: '',
       toggle: 'hidden',
       left: rechercheOuverte ? 'hidden' : '',
+      // La région centrale n'a pas de largeur propre dans le thème : sans `flex-1`, elle se règle
+      // sur son contenu et le champ s'y écrase. Les régions gauche et droite la portent déjà.
+      center: 'lg:flex-1 lg:justify-center',
       right: rechercheOuverte ? 'w-full' : '',
     }"
   >
@@ -25,11 +28,29 @@
       </div>
     </template>
 
+    <!--
+      Le champ de recherche, au CENTRE et non plus derrière une loupe.
+
+      `UHeader` donne à sa région centrale la classe `hidden lg:flex` : elle ne s'affiche donc que
+      sur grand écran, ce qui est exactement le partage voulu. Sur mobile, où l'en-tête porte déjà
+      quatre boutons, c'est la loupe de droite qui prend le relais et déploie le champ sur toute
+      la largeur.
+
+      Une loupe seule ne disait pas ce qu'elle cherchait — d'où le champ visible, avec son texte
+      d'invite, là où la place ne manque pas.
+    -->
+    <template #default>
+      <ClientOnly>
+        <HomeSearch variante="centre" class="w-full flex justify-center" />
+      </ClientOnly>
+    </template>
+
     <template #right>
       <ClientOnly>
-        <!-- Recherche d'une édition par son nom : ne s'affiche que sur l'accueil, dont elle
-             recharge la liste en écartant les autres filtres (cf. HomeSearch.vue) -->
-        <HomeSearch v-model:open="rechercheOuverte" />
+        <!-- La loupe du mobile : le champ permanent du centre n'y est pas rendu, et un champ qui
+             partagerait cette ligne avec quatre boutons ne serait pas utilisable. Elle disparaît
+             au-delà de `lg`, où le centre prend le relais. -->
+        <HomeSearch v-model:open="rechercheOuverte" class="lg:hidden" />
 
         <!--
           Tout le reste s'efface le temps de la recherche : c'est ce qui libère la largeur.

@@ -111,7 +111,19 @@ describe('/api/editions GET', () => {
     })
   })
 
-  it('devrait filtrer par nom', async () => {
+  /**
+   * La recherche par nom est une recherche par MOTS-CLÉS.
+   *
+   * Elle l'est devenue parce qu'un `contains` d'un bloc exigeait l'ordre exact : « balles 2026 »
+   * ne trouvait pas « Festival des Balles Perdues 2026 », alors qu'on tape ce dont on se souvient,
+   * pas ce qui est écrit.
+   *
+   * Deux choses se vérifient ici, et aucune ne se voit à l'écran : chaque mot devient sa PROPRE
+   * condition — les empiler sur une même clé les ferait s'écraser —, et chacun est cherché aussi
+   * bien dans le nom de l'édition que dans celui de la convention, qu'on retient souvent mieux
+   * d'une année sur l'autre.
+   */
+  it('devrait filtrer par mots-clés, dans l’édition comme dans la convention', async () => {
     global.getQuery.mockReturnValue({ name: 'Test Convention' })
     prismaMock.edition.count.mockResolvedValue(5)
     prismaMock.edition.findMany.mockResolvedValue([mockEdition])
@@ -120,12 +132,26 @@ describe('/api/editions GET', () => {
     const mockEvent = {}
     await handler(mockEvent as any)
 
-    expect(prismaMock.edition.count).toHaveBeenCalledWith({
-      where: {
-        name: { contains: 'Test Convention' },
-        status: { in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] },
-      },
-    })
+    const where = prismaMock.edition.count.mock.calls.at(-1)![0].where
+    expect(where.status).toEqual({ in: ['PUBLISHED', 'PLANNED', 'CANCELLED'] })
+    // Deux mots, donc deux conditions : « test » ET « convention », chacune dans l'un ou l'autre
+    // champ. Une seule condition signifierait que la saisie n'a pas été découpée.
+    expect(where.AND).toHaveLength(2)
+    expect(JSON.stringify(where.AND)).toContain('test')
+    expect(JSON.stringify(where.AND)).toContain('convention')
+    expect(JSON.stringify(where.AND)).toContain('name')
+  })
+
+  it('ne filtre rien sur une saisie vide', async () => {
+    // L'état au repos du champ, pas un filtre : un `AND` vide écarterait tout le monde.
+    global.getQuery.mockReturnValue({ name: '   ' })
+    prismaMock.edition.count.mockResolvedValue(5)
+    prismaMock.edition.findMany.mockResolvedValue([mockEdition])
+    prismaMock.editionOrganizer.findFirst.mockRejectedValue(new Error('Table not found'))
+
+    await handler({} as any)
+
+    expect(prismaMock.edition.count.mock.calls.at(-1)![0].where).not.toHaveProperty('AND')
   })
 
   it('devrait filtrer par pays', async () => {

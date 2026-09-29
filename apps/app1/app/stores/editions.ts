@@ -94,6 +94,13 @@ export const useEditionStore = defineStore('editions', {
     _pendingEditionFetches: {} as Record<number, Promise<Edition> | undefined>,
     // Toutes les éditions pour l'agenda (sans pagination)
     allEditions: [] as Edition[],
+    /**
+     * L'ordre demandé au serveur, retenu pour que le tri local ne le contredise pas.
+     *
+     * `recent` = la plus récente d'abord, l'ordre d'une RECHERCHE ; sinon la plus proche d'abord,
+     * l'ordre où l'on parcourt ce qui vient.
+     */
+    tri: undefined as 'recent' | undefined,
     // Cache pour isTeamLeader par édition (évite les appels doublons)
     _teamLeaderCache: {} as Record<number, Promise<boolean> | undefined>,
     // Cache pour canAccessMealValidation par édition
@@ -115,13 +122,25 @@ export const useEditionStore = defineStore('editions', {
       // et les filtres utilisateur (showPast, showCurrent, showFuture)
     },
 
-    // Trier les éditions par ordre chronologique (plus ancienne en premier)
+    /**
+     * Remet les éditions dans l'ordre demandé.
+     *
+     * ⚠️ Ce tri défaisait celui du serveur. Il était figé en croissant et s'appliquait après
+     * CHAQUE chargement : `sort=recent` partait bien dans la requête, le serveur répondait dans
+     * le bon ordre, et la liste était retournée avant d'être affichée. La recherche montrait donc
+     * l'édition la plus ANCIENNE en tête, c'est-à-dire la moins probable de celles qu'on cherche.
+     *
+     * Le défaut a survécu à un test de bout en bout qui lisait la réponse de l'API et non l'écran :
+     * le serveur triait juste, et c'est tout ce que le test regardait.
+     *
+     * Il reste utile : `addEdition` et `updateEdition` insèrent une édition dans la liste locale
+     * et comptent sur lui pour la remettre à sa place. D'où l'ordre retenu plutôt que supprimé.
+     */
     sortEditions() {
-      this.editions.sort((a, b) => {
-        const dateA = new Date(a.startDate)
-        const dateB = new Date(b.startDate)
-        return dateA.getTime() - dateB.getTime() // Tri croissant (plus ancien en premier)
-      })
+      const sens = this.tri === 'recent' ? -1 : 1
+      this.editions.sort(
+        (a, b) => sens * (new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      )
     },
 
     // Appliquer le filtrage et le tri des éditions
@@ -169,6 +188,9 @@ export const useEditionStore = defineStore('editions', {
         if (filters?.sort) {
           queryParams.sort = filters.sort
         }
+        // Retenu AVANT la réponse : c'est ce que `sortEditions` relira pour ne pas défaire
+        // l'ordre que le serveur vient d'appliquer.
+        this.tri = filters?.sort === 'recent' ? 'recent' : undefined
 
         // Filtres de services - passer tous les services actifs
         if (filters) {
