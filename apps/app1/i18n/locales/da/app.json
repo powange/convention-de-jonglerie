@@ -23,7 +23,7 @@
     }
   },
   "services": {
-    "accessibility": "Handicaptilgængelighed",
+    "accessibility": "Kørestolsvenlig adgang",
     "aerial_space": "Luftakrobatik område",
     "afj_token_payment": "AFJ token betaling",
     "atm": "Hæveautomat",
@@ -34,7 +34,8 @@
       "activities": "Aktiviteter",
       "amenities": "Faciliteter",
       "food": "Forplejning",
-      "payment": "Betalinger"
+      "payment": "Betalinger",
+      "accessibility": "Tilgængelighed"
     },
     "concert": "Koncert",
     "credit_card_payment": "Kreditkortbetaling",
@@ -54,6 +55,7 @@
     "toilets": "Toiletter",
     "truck_camping": "Autocamping",
     "unicycle_space": "Ethjulet område",
-    "workshops": "Workshops"
+    "workshops": "Workshops",
+    "sign_language": "Tegnsprog på stedet"
   }
 }

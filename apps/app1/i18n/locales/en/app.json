@@ -23,7 +23,7 @@
     }
   },
   "services": {
-    "accessibility": "Disability accessibility",
+    "accessibility": "PRM access",
     "aerial_space": "Aerial space",
     "afj_token_payment": "AFJ token payment",
     "atm": "ATM",
@@ -34,7 +34,8 @@
       "activities": "Activities",
       "amenities": "Amenities",
       "food": "Food & Drink",
-      "payment": "Payment"
+      "payment": "Payment",
+      "accessibility": "Accessibility"
     },
     "concert": "Concert",
     "credit_card_payment": "Credit card payment",
@@ -54,6 +55,7 @@
     "toilets": "Toilets",
     "truck_camping": "RV camping",
     "unicycle_space": "Unicycle space",
-    "workshops": "Workshops"
+    "workshops": "Workshops",
+    "sign_language": "Sign language on site"
   }
 }

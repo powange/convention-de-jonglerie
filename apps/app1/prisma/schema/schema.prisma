@@ -203,7 +203,14 @@ model Edition {
   hasTentCamping                   Boolean                       @default(false)
   hasTruckCamping                  Boolean                       @default(false)
   imageUrl                         String?
-  hasAccessibility                 Boolean                       @default(false)
+  /// Accès PMR (personnes à mobilité réduite) — « PRM access » en anglais.
+  hasPrmAccess                     Boolean                       @default(false)
+  /// La langue des signes est pratiquée sur place.
+  ///
+  /// Nommée par le genre et non par la langue : une convention allemande signe en DGS, une
+  /// britannique en BSL. C'est le libellé de chaque langue qui nomme la sienne — « LSF pratiquée
+  /// sur site » en français.
+  hasSignLanguage                  Boolean                       @default(false)
   hasAerialSpace                   Boolean                       @default(false)
   hasCantine                       Boolean                       @default(false)
   hasConcert                       Boolean                       @default(false)

@@ -114,7 +114,8 @@
             <span title="Espace aérien"><code>hasAerialSpace</code></span>
             <span title="Espace feu"><code>hasFireSpace</code></span>
             <span title="Espace slackline"><code>hasSlacklineSpace</code></span>
-            <span title="Accessibilité PMR"><code>hasAccessibility</code></span>
+            <span title="Accès PMR"><code>hasPrmAccess</code></span>
+            <span title="Langue des signes pratiquée sur site"><code>hasSignLanguage</code></span>
             <span title="Paiement espèces"><code>hasCashPayment</code></span>
             <span title="Paiement CB"><code>hasCreditCardPayment</code></span>
             <span title="Jetons AFJ"><code>hasAfjTokenPayment</code></span>

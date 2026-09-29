@@ -191,7 +191,7 @@ describe('/api/editions POST - Tests complets', () => {
         // Commodités
         hasToilets: true,
         hasShowers: false,
-        hasAccessibility: true,
+        hasPrmAccess: true,
         acceptsPets: false,
         // Paiements
         hasCashPayment: true,
@@ -226,7 +226,7 @@ describe('/api/editions POST - Tests complets', () => {
       expect(result.data.hasSlacklineSpace).toBe(true)
       expect(result.data.hasToilets).toBe(true)
       expect(result.data.hasShowers).toBe(false)
-      expect(result.data.hasAccessibility).toBe(true)
+      expect(result.data.hasPrmAccess).toBe(true)
       expect(result.data.acceptsPets).toBe(false)
       expect(result.data.hasCashPayment).toBe(true)
       expect(result.data.hasCreditCardPayment).toBe(true)
@@ -275,7 +275,7 @@ describe('/api/editions POST - Tests complets', () => {
       expect(data.hasSlacklineSpace).toBe(false)
       expect(data.hasToilets).toBe(false)
       expect(data.hasShowers).toBe(false)
-      expect(data.hasAccessibility).toBe(false)
+      expect(data.hasPrmAccess).toBe(false)
       expect(data.hasWorkshops).toBe(false)
       expect(data.hasCashPayment).toBe(false)
       expect(data.hasCreditCardPayment).toBe(false)

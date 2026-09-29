@@ -342,7 +342,7 @@ describe('/api/editions POST', () => {
     expect(createCall.data.hasSlacklineSpace).toBe(false)
     expect(createCall.data.hasToilets).toBe(false)
     expect(createCall.data.hasShowers).toBe(false)
-    expect(createCall.data.hasAccessibility).toBe(false)
+    expect(createCall.data.hasPrmAccess).toBe(false)
     expect(createCall.data.hasWorkshops).toBe(false)
     expect(createCall.data.hasCashPayment).toBe(false)
     expect(createCall.data.hasCreditCardPayment).toBe(false)

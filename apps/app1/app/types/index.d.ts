@@ -91,7 +91,8 @@ export interface Edition {
   hasATM: boolean
   hasToilets: boolean
   hasShowers: boolean
-  hasAccessibility: boolean
+  hasPrmAccess: boolean
+  hasSignLanguage: boolean
   hasWorkshops: boolean
   mealsEnabled?: boolean
   volunteersEnabled?: boolean
@@ -307,7 +308,8 @@ export interface EditionFormData {
   hasSlacklineSpace?: boolean
   hasToilets?: boolean
   hasShowers?: boolean
-  hasAccessibility?: boolean
+  hasPrmAccess?: boolean
+  hasSignLanguage?: boolean
   hasWorkshops?: boolean
   mealsEnabled?: boolean
   volunteersEnabled?: boolean

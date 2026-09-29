@@ -698,7 +698,8 @@ const state = reactive({
   hasSlacklineSpace: props.initialData?.hasSlacklineSpace || false,
   hasToilets: props.initialData?.hasToilets || false,
   hasShowers: props.initialData?.hasShowers || false,
-  hasAccessibility: props.initialData?.hasAccessibility || false,
+  hasPrmAccess: props.initialData?.hasPrmAccess || false,
+  hasSignLanguage: props.initialData?.hasSignLanguage || false,
   hasWorkshops: props.initialData?.hasWorkshops || false,
   hasCashPayment: props.initialData?.hasCashPayment || false,
   hasCreditCardPayment: props.initialData?.hasCreditCardPayment || false,
@@ -1260,7 +1261,8 @@ watch(
       state.hasSlacklineSpace = newVal.hasSlacklineSpace || false
       state.hasToilets = newVal.hasToilets || false
       state.hasShowers = newVal.hasShowers || false
-      state.hasAccessibility = newVal.hasAccessibility || false
+      state.hasPrmAccess = newVal.hasPrmAccess || false
+      state.hasSignLanguage = newVal.hasSignLanguage || false
       state.hasWorkshops = newVal.hasWorkshops || false
       state.hasCashPayment = newVal.hasCashPayment || false
       state.hasCreditCardPayment = newVal.hasCreditCardPayment || false

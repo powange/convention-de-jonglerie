@@ -23,7 +23,7 @@
     }
   },
   "services": {
-    "accessibility": "Accesibilidad para discapacitados",
+    "accessibility": "Acceso PMR",
     "aerial_space": "Espacio aéreo",
     "afj_token_payment": "Pago con tokens AFJ",
     "atm": "Cajero automático",
@@ -34,7 +34,8 @@
       "activities": "Actividades",
       "amenities": "Comodidades",
       "food": "Alimentación",
-      "payment": "Pagos"
+      "payment": "Pagos",
+      "accessibility": "Accesibilidad"
     },
     "concert": "Concierto",
     "credit_card_payment": "Pago con tarjeta",
@@ -54,6 +55,7 @@
     "toilets": "Baños",
     "truck_camping": "Camping con caravanas",
     "unicycle_space": "Espacio de monociclo",
-    "workshops": "Talleres"
+    "workshops": "Talleres",
+    "sign_language": "Lengua de signos en el recinto"
   }
 }

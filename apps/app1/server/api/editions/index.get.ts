@@ -34,7 +34,12 @@ export default wrapApiHandler<GetEditionsResponse>(
       hasUnicycleSpace,
       hasToilets,
       hasShowers,
+      hasPrmAccess,
+      // L'ancien nom du filtre d'accès PMR, encore porté par les adresses déjà partagées : la
+      // page d'accueil écrit la clé du service telle quelle dans l'URL, si bien qu'un lien mis en
+      // favori avant le renommage vaut encore. Le retirer ferait cesser le filtre en silence.
       hasAccessibility,
+      hasSignLanguage,
       hasWorkshops,
       hasCashPayment,
       hasCreditCardPayment,
@@ -73,7 +78,8 @@ export default wrapApiHandler<GetEditionsResponse>(
       hasUnicycleSpace?: boolean
       hasToilets?: boolean
       hasShowers?: boolean
-      hasAccessibility?: boolean
+      hasPrmAccess?: boolean
+      hasSignLanguage?: boolean
       hasWorkshops?: boolean
       hasCashPayment?: boolean
       hasCreditCardPayment?: boolean
@@ -205,8 +211,11 @@ export default wrapApiHandler<GetEditionsResponse>(
     if (hasShowers === 'true') {
       where.hasShowers = true
     }
-    if (hasAccessibility === 'true') {
-      where.hasAccessibility = true
+    if (hasPrmAccess === 'true' || hasAccessibility === 'true') {
+      where.hasPrmAccess = true
+    }
+    if (hasSignLanguage === 'true') {
+      where.hasSignLanguage = true
     }
     if (hasWorkshops === 'true') {
       where.hasWorkshops = true

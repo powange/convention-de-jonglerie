@@ -30,7 +30,10 @@ export default wrapApiHandler(
       hasSlacklineSpace,
       hasToilets,
       hasShowers,
+      hasPrmAccess,
+      // Voir `editions/index.get.ts` : l'ancien nom reste accepté pour les liens déjà partagés.
       hasAccessibility,
+      hasSignLanguage,
       hasWorkshops,
       hasCashPayment,
       hasCreditCardPayment,
@@ -77,7 +80,8 @@ export default wrapApiHandler(
     if (hasSlacklineSpace === 'true') where.hasSlacklineSpace = true
     if (hasToilets === 'true') where.hasToilets = true
     if (hasShowers === 'true') where.hasShowers = true
-    if (hasAccessibility === 'true') where.hasAccessibility = true
+    if (hasPrmAccess === 'true' || hasAccessibility === 'true') where.hasPrmAccess = true
+    if (hasSignLanguage === 'true') where.hasSignLanguage = true
     if (hasWorkshops === 'true') where.hasWorkshops = true
     if (hasCashPayment === 'true') where.hasCashPayment = true
     if (hasCreditCardPayment === 'true') where.hasCreditCardPayment = true

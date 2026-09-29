@@ -23,7 +23,7 @@
     }
   },
   "services": {
-    "accessibility": "Toegankelijkheid voor gehandicapten",
+    "accessibility": "Rolstoeltoegankelijk",
     "aerial_space": "Luchtruimte",
     "afj_token_payment": "AFJ-tokenbetaling",
     "atm": "Geldautomaat",
@@ -34,7 +34,8 @@
       "activities": "Activiteiten",
       "amenities": "Voorzieningen",
       "food": "Eten & Drinken",
-      "payment": "Betaling"
+      "payment": "Betaling",
+      "accessibility": "Toegankelijkheid"
     },
     "concert": "Concert",
     "credit_card_payment": "Creditcardbetaling",
@@ -54,6 +55,7 @@
     "toilets": "Toiletten",
     "truck_camping": "Camperkamperen",
     "unicycle_space": "Eenwielerruimte",
-    "workshops": "Workshops"
+    "workshops": "Workshops",
+    "sign_language": "Gebarentaal op locatie"
   }
 }

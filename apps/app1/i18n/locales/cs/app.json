@@ -34,7 +34,8 @@
       "activities": "Aktivity",
       "amenities": "Vybavení",
       "food": "Catering",
-      "payment": "Platby"
+      "payment": "Platby",
+      "accessibility": "Přístupnost"
     },
     "concert": "Koncert",
     "credit_card_payment": "Platba kreditní kartou",
@@ -54,6 +55,7 @@
     "toilets": "WC",
     "truck_camping": "Truck camping",
     "unicycle_space": "Prostor pro jednokolky",
-    "workshops": "Workshopy"
+    "workshops": "Workshopy",
+    "sign_language": "Znakový jazyk na místě"
   }
 }

@@ -62,7 +62,8 @@ export default wrapApiHandler(
       hasUnicycleSpace,
       hasToilets,
       hasShowers,
-      hasAccessibility,
+      hasPrmAccess,
+      hasSignLanguage,
       hasWorkshops,
       mealsEnabled,
       volunteersEnabled,
@@ -171,7 +172,8 @@ export default wrapApiHandler(
     if (hasUnicycleSpace !== undefined) updatedData.hasUnicycleSpace = hasUnicycleSpace
     if (hasToilets !== undefined) updatedData.hasToilets = hasToilets
     if (hasShowers !== undefined) updatedData.hasShowers = hasShowers
-    if (hasAccessibility !== undefined) updatedData.hasAccessibility = hasAccessibility
+    if (hasPrmAccess !== undefined) updatedData.hasPrmAccess = hasPrmAccess
+    if (hasSignLanguage !== undefined) updatedData.hasSignLanguage = hasSignLanguage
     if (hasWorkshops !== undefined) updatedData.hasWorkshops = hasWorkshops
     if (mealsEnabled !== undefined) updatedData.mealsEnabled = mealsEnabled
     // volunteersEnabled : déplacé vers EventVolunteerSettings (étape 0bis), géré après l'update

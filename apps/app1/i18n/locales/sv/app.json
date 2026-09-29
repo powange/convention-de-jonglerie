@@ -23,7 +23,7 @@
     }
   },
   "services": {
-    "accessibility": "Tillgänglighet för funktionshindrade",
+    "accessibility": "Rullstolsanpassad entré",
     "aerial_space": "Luftrum",
     "afj_token_payment": "Betalning av AFJ-tokens",
     "atm": "Distributeur automatique de billets",
@@ -34,7 +34,8 @@
       "activities": "Aktiviteter",
       "amenities": "Bekvämligheter",
       "food": "Catering",
-      "payment": "Betalningar"
+      "payment": "Betalningar",
+      "accessibility": "Tillgänglighet"
     },
     "concert": "Konsert",
     "credit_card_payment": "Betalning med kreditkort",
@@ -54,6 +55,7 @@
     "toilets": "WC",
     "truck_camping": "Camping med lastbil",
     "unicycle_space": "Enhjulingsyta",
-    "workshops": "Verkstäder"
+    "workshops": "Verkstäder",
+    "sign_language": "Teckenspråk på plats"
   }
 }

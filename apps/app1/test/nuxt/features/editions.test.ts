@@ -669,7 +669,7 @@ describe("Système d'éditions", () => {
         hasSlacklineSpace: true,
         hasToilets: true,
         hasShowers: true,
-        hasAccessibility: true,
+        hasPrmAccess: true,
         hasWorkshops: true,
         hasCashPayment: true,
         hasCreditCardPayment: false,
@@ -695,7 +695,7 @@ describe("Système d'éditions", () => {
             'hasFamilyCamping',
             'hasSleepingRoom',
           ].filter((key) => services[key]),
-          facilities: ['hasToilets', 'hasShowers', 'hasGym', 'hasAccessibility'].filter(
+          facilities: ['hasToilets', 'hasShowers', 'hasGym', 'hasPrmAccess'].filter(
             (key) => services[key]
           ),
           activities: [
