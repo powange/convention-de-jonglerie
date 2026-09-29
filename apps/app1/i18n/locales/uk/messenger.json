@@ -12,14 +12,11 @@
     "conversations": "Розмови",
     "delete": "Видалити",
     "edited": "змінено",
-    "hours_ago": "{count}год тому",
-    "just_now": "Щойно",
     "loading": "Завантаження...",
     "loading_messages": "Завантаження повідомлень...",
     "loading_previous_messages": "Завантаження попередніх повідомлень...",
     "message_actions": "Дії",
     "message_placeholder": "Напишіть ваше повідомлення...",
-    "minutes_ago": "{count}хв тому",
     "no_conversations": "Немає розмов",
     "no_messages": "Поки немає повідомлень",
     "online": "В мережі",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Ваш браузер не дозволяє копіювання тут",
     "edit": "Змінити",
     "edit_expired": "Повідомлення не можна змінити через {minutes} хвилин після надсилання",
-    "editing": "Редагування повідомлення"
+    "editing": "Редагування повідомлення",
+    "resume_today": "Сьогодні, {time}",
+    "resume_yesterday": "Учора, {time}"
   }
 }

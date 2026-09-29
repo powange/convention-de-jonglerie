@@ -12,14 +12,11 @@
     "conversations": "Konversationer",
     "delete": "Ta bort",
     "edited": "redigerad",
-    "hours_ago": "{count}h sedan",
-    "just_now": "Nyss",
     "loading": "Laddar...",
     "loading_messages": "Laddar meddelanden...",
     "loading_previous_messages": "Laddar tidigare meddelanden...",
     "message_actions": "Åtgärder",
     "message_placeholder": "Skriv ditt meddelande...",
-    "minutes_ago": "{count}min sedan",
     "no_conversations": "Inga konversationer",
     "no_messages": "Inga meddelanden ännu",
     "online": "Online",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Din webbläsare tillåter inte kopiering här",
     "edit": "Redigera",
     "edit_expired": "Ett meddelande kan inte längre redigeras {minutes} minuter efter att det skickades",
-    "editing": "Redigerar meddelande"
+    "editing": "Redigerar meddelande",
+    "resume_today": "I dag, {time}",
+    "resume_yesterday": "I går, {time}"
   }
 }

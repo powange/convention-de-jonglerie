@@ -12,14 +12,11 @@
     "conversations": "Konversationen",
     "delete": "Löschen",
     "edited": "bearbeitet",
-    "hours_ago": "Vor {count}h",
-    "just_now": "Gerade eben",
     "loading": "Lädt...",
     "loading_messages": "Lädt Nachrichten...",
     "loading_previous_messages": "Lädt vorherige Nachrichten...",
     "message_actions": "Aktionen",
     "message_placeholder": "Schreiben Sie Ihre Nachricht...",
-    "minutes_ago": "Vor {count}min",
     "no_conversations": "Keine Konversationen",
     "no_messages": "Noch keine Nachrichten",
     "online": "Online",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Ihr Browser erlaubt das Kopieren hier nicht",
     "edit": "Bearbeiten",
     "edit_expired": "Eine Nachricht kann {minutes} Minuten nach dem Senden nicht mehr bearbeitet werden",
-    "editing": "Nachricht bearbeiten"
+    "editing": "Nachricht bearbeiten",
+    "resume_today": "Heute, {time}",
+    "resume_yesterday": "Gestern, {time}"
   }
 }

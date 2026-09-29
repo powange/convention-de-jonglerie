@@ -12,14 +12,11 @@
     "conversations": "Samtaler",
     "delete": "Slet",
     "edited": "redigeret",
-    "hours_ago": "{count}t siden",
-    "just_now": "Lige nu",
     "loading": "Indlæser...",
     "loading_messages": "Indlæser beskeder...",
     "loading_previous_messages": "Indlæser tidligere beskeder...",
     "message_actions": "Handlinger",
     "message_placeholder": "Skriv din besked...",
-    "minutes_ago": "{count}min siden",
     "no_conversations": "Ingen samtaler",
     "no_messages": "Ingen beskeder endnu",
     "online": "Online",
@@ -48,6 +45,8 @@
     "copy_unavailable": "Din browser tillader ikke kopiering her",
     "edit": "Rediger",
     "edit_expired": "En besked kan ikke længere redigeres {minutes} minutter efter, at den er sendt",
-    "editing": "Redigerer besked"
+    "editing": "Redigerer besked",
+    "resume_today": "I dag, {time}",
+    "resume_yesterday": "I går, {time}"
   }
 }
