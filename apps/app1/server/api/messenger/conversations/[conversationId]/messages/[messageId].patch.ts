@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { masquerMessageSupprime } from '#server/utils/messenger-message-affiche'
+import { messengerStreamService } from '#server/utils/messenger-unread-service'
 import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
 import {
   DELAI_MODIFICATION_MESSAGE_MINUTES,
@@ -80,7 +81,38 @@ export default wrapApiHandler(
       include: messengerMessageInclude,
     })
 
-    return createSuccessResponse(masquerMessageSupprime(updatedMessage))
+    const messageAffiche = masquerMessageSupprime(updatedMessage)
+
+    /*
+     * Diffuser la modification aux AUTRES participants actifs.
+     *
+     * C'est la seconde moitié de ce que le sondage faisait : il relisait toutes les cinq secondes
+     * les messages dont `editedAt` ou `deletedAt` avait bougé. La modification est connue ici, il
+     * n'y a rien à retrouver.
+     *
+     * `leftAt: null` : quelqu'un qui a quitté la conversation ne doit plus rien en recevoir — c'est
+     * la même condition que les points d'API de lecture, et la faire diverger rouvrirait par le
+     * flux un accès que la liste refuse.
+     *
+     * L'auteur est exclu : il vient de recevoir la réponse, qui porte la même forme.
+     */
+    const autresParticipants = await prisma.conversationParticipant.findMany({
+      where: { conversationId, leftAt: null, userId: { not: user.id } },
+      select: { userId: true },
+    })
+
+    if (autresParticipants.length > 0) {
+      messengerStreamService
+        .sendMessageUpdatedToUsers(
+          autresParticipants.map((p) => p.userId),
+          messageAffiche
+        )
+        .catch((error) => {
+          console.error('[Messenger] Diffusion de la modification échouée :', error)
+        })
+    }
+
+    return createSuccessResponse(messageAffiche)
   },
   { operationName: 'UpdateMessage' }
 )

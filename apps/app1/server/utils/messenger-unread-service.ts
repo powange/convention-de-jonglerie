@@ -80,6 +80,59 @@ export const messengerStreamService = {
   },
 
   /**
+   * Diffuse un message COMPLET aux participants d'une conversation.
+   *
+   * ⚠️ C'est ce qui remplace le sondage. Le flux par conversation interrogeait la base toutes les
+   * cinq secondes, par connexion ouverte : trois requêtes, pour trouver le plus souvent rien. Un
+   * message qui vient d'être écrit est pourtant connu de celui qui l'enregistre — il n'y a rien à
+   * aller chercher, il suffit de le pousser.
+   *
+   * Les échecs sont rattrapés PAR destinataire : quelqu'un dont la connexion vient de se fermer ne
+   * doit pas empêcher les autres de recevoir le message. C'est le même parti que le reste de ce
+   * service.
+   */
+  async sendMessageToUsers(userIds: number[], message: unknown): Promise<void> {
+    await Promise.all(
+      userIds.map(async (userId) => {
+        try {
+          await notificationStreamManager.sendMessengerMessage(userId, message)
+        } catch (error) {
+          console.error(`[MessengerStream] Message non diffusé à ${userId} :`, error)
+        }
+      })
+    )
+  },
+
+  /** Diffuse un message modifié ou supprimé. */
+  async sendMessageUpdatedToUsers(userIds: number[], message: unknown): Promise<void> {
+    await Promise.all(
+      userIds.map(async (userId) => {
+        try {
+          await notificationStreamManager.sendMessengerMessageUpdated(userId, message)
+        } catch (error) {
+          console.error(`[MessengerStream] Modification non diffusée à ${userId} :`, error)
+        }
+      })
+    )
+  },
+
+  /** Diffuse l'avancée de lecture de quelqu'un aux autres participants. */
+  async sendReadToUsers(
+    userIds: number[],
+    data: { conversationId: string; readerId: number; lastReadMessageId: string }
+  ): Promise<void> {
+    await Promise.all(
+      userIds.map(async (userId) => {
+        try {
+          await notificationStreamManager.sendMessengerRead(userId, data)
+        } catch (error) {
+          console.error(`[MessengerStream] Lecture non diffusée à ${userId} :`, error)
+        }
+      })
+    )
+  },
+
+  /**
    * Envoie un événement de typing à un utilisateur
    */
   async sendTypingToUser(

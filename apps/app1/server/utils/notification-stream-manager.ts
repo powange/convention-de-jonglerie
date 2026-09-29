@@ -104,6 +104,36 @@ class NotificationStreamManager {
   }
 
   /**
+   * Envoie un message COMPLET à un utilisateur, à la forme que rend le GET des messages.
+   *
+   * À distinguer de `sendMessengerNewMessage`, qui l'accompagne et ne change pas : celui-là porte
+   * un résumé — de quoi afficher une pastille et un aperçu partout dans l'application. Celui-ci
+   * porte le message entier, pour que la conversation OUVERTE puisse l'insérer sans rien
+   * redemander. Les deux partent ensemble, à deux usages différents.
+   */
+  async sendMessengerMessage(userId: number, data: unknown) {
+    return this.sendEvent(userId, 'messenger_message', data)
+  }
+
+  /** Un message modifié ou supprimé, à la même forme. */
+  async sendMessengerMessageUpdated(userId: number, data: unknown) {
+    return this.sendEvent(userId, 'messenger_message_updated', data)
+  }
+
+  /**
+   * Quelqu'un a lu jusqu'à tel message — l'indicateur « lu par ».
+   *
+   * `readerId` et non `userId` : le destinataire de l'événement est déjà le premier argument, et
+   * deux champs nommés pareil pour des personnes différentes sont une confusion en attente.
+   */
+  async sendMessengerRead(
+    userId: number,
+    data: { conversationId: string; readerId: number; lastReadMessageId: string }
+  ) {
+    return this.sendEvent(userId, 'messenger_read', data)
+  }
+
+  /**
    * Envoie un événement de typing à un utilisateur
    */
   async sendMessengerTyping(

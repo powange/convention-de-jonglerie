@@ -2,7 +2,10 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { messengerUnreadService } from '#server/utils/messenger-unread-service'
+import {
+  messengerStreamService,
+  messengerUnreadService,
+} from '#server/utils/messenger-unread-service'
 
 const bodySchema = z.object({
   messageId: z.string(),
@@ -67,6 +70,32 @@ export default wrapApiHandler(
     messengerUnreadService.sendUnreadCountToUser(user.id).catch((error) => {
       console.error('[Messenger] Erreur lors de la mise à jour du compteur SSE:', error)
     })
+
+    /*
+     * Prévenir les AUTRES que cette personne a lu jusqu'ici — l'indicateur « lu par ».
+     *
+     * Le flux par conversation le déduisait en relisant toutes les cinq secondes le
+     * `lastReadMessageId` de chaque autre participant, et en comparant à ce qu'il avait mémorisé.
+     * Une requête de plus toutes les cinq secondes, par connexion, pour détecter un changement que
+     * ce point d'API vient précisément d'écrire.
+     *
+     * `leftAt: null`, comme partout ailleurs : qui a quitté la conversation n'en reçoit plus rien.
+     */
+    const autresParticipants = await prisma.conversationParticipant.findMany({
+      where: { conversationId, leftAt: null, userId: { not: user.id } },
+      select: { userId: true },
+    })
+
+    if (autresParticipants.length > 0) {
+      messengerStreamService
+        .sendReadToUsers(
+          autresParticipants.map((p) => p.userId),
+          { conversationId, readerId: user.id, lastReadMessageId: messageId }
+        )
+        .catch((error) => {
+          console.error('[Messenger] Diffusion de la lecture échouée :', error)
+        })
+    }
 
     return createSuccessResponse(null)
   },
