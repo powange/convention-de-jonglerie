@@ -1034,8 +1034,11 @@ const colonnesManquants = computed((): TableColumn<ObjetManquant>[] => {
       // décide d'un rachat ou finit un comptage, il ne trie pas l'inventaire.
       id: 'tags',
       accessorFn: (objet) => (objet.tags ?? []).map((lien) => lien.tag.name).join(', '),
-      sortingFn: triTexte,
-      header: ({ column }) => enTeteTriable(column, t('gestion.stock.tags.field_label')),
+      // Pas de tri : il porterait sur la liste des noms mise bout à bout, si bien qu'un objet
+      // « fragile, lourd » se rangerait loin d'un objet « lourd » — l'inverse de ce qu'on cherche
+      // en cliquant sur cette colonne. Les tags se lisent, ils n'ordonnent rien.
+      enableSorting: false,
+      header: t('gestion.stock.tags.field_label'),
     },
     {
       id: 'quantity',
@@ -1081,8 +1084,10 @@ const colonnesACompter = computed((): TableColumn<ObjetManquant>[] => [
     // décide d'un rachat ou finit un comptage, il ne trie pas l'inventaire.
     id: 'tags',
     accessorFn: (objet) => (objet.tags ?? []).map((lien) => lien.tag.name).join(', '),
-    sortingFn: triTexte,
-    header: ({ column }) => enTeteTriable(column, t('gestion.stock.tags.field_label')),
+    // Pas de tri : voir la colonne jumelle ci-dessus — la liste des noms mise bout à bout ne
+    // rassemble pas ce qu'on croit rassembler.
+    enableSorting: false,
+    header: t('gestion.stock.tags.field_label'),
   },
   {
     id: 'quantity',
