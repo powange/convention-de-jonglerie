@@ -26,6 +26,10 @@ export default wrapApiHandler(
         id: true,
         eventId: true,
         source: true,
+        // Nécessaire au retrait des conversations : `user` ne suffit pas, les fils se joignent par
+        // l'identifiant de l'utilisateur.
+        userId: true,
+        teamAssignments: { select: { teamId: true } },
         user: {
           select: {
             ...userWithNameSelect,
@@ -58,9 +62,33 @@ export default wrapApiHandler(
       })
     }
 
-    // Supprimer la candidature
-    await prisma.editionVolunteerApplication.delete({
-      where: { id: applicationId },
+    /*
+     * La candidature ET les conversations qu'elle ouvrait tombent ENSEMBLE.
+     *
+     * Supprimer la candidature emporte ses affectations en cascade, mais laissait intactes les
+     * participations aux conversations : la personne restait dans les fils de ses anciennes équipes
+     * et dans celui des organisateurs, alors même que plus rien ne la rattachait à l'édition.
+     *
+     * Le retrait vient AVANT la suppression : après, les affectations n'existent plus et l'on ne
+     * saurait plus de quelles équipes retirer la personne.
+     */
+    await prisma.$transaction(async (tx) => {
+      for (const affectation of application.teamAssignments) {
+        await useVolunteerPorts().messenger.removeFromTeamConversations({
+          eventId: editionId,
+          teamId: affectation.teamId,
+          userId: application.userId,
+          tx,
+        })
+      }
+
+      await useVolunteerPorts().messenger.removeFromOrganizersConversation({
+        eventId: editionId,
+        userId: application.userId,
+        tx,
+      })
+
+      await tx.editionVolunteerApplication.delete({ where: { id: applicationId } })
     })
 
     return createSuccessResponse({}, 'Candidature supprimée avec succès')

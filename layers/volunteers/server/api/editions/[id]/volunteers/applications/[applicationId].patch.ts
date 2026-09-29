@@ -274,10 +274,47 @@ export default wrapApiHandler(
     // Si on remet en attente ou on rejette, supprimer les assignations d'équipes et de CRÉNEAUX,
     // les repas et la validation d'entrée
     if (target === 'PENDING' || target === 'REJECTED') {
-      // Supprimer les relations avec les équipes
-      updateData.teamAssignments = {
-        deleteMany: {}, // Supprimer toutes les relations avec les équipes
-      }
+      /*
+       * Les équipes ET les conversations qui en découlent tombent ENSEMBLE.
+       *
+       * Le nettoyage vidait `teamAssignments` sans rien dire à la messagerie : un bénévole refusé
+       * quittait ses équipes mais gardait l'accès à leurs conversations, et au fil où se discutait
+       * la candidature qu'on venait de refuser. Il pouvait y lire et y écrire.
+       *
+       * D'où la transaction : « plus d'affectation » et « plus de conversation » sont le même fait,
+       * et les séparer laisserait une fenêtre où l'un est vrai sans l'autre. Elle ne couvre que ces
+       * deux-là — les repas passent par un port qui n'accepte pas de transaction, et les élargir
+       * demanderait de rouvrir ce contrat.
+       *
+       * Le retrait est déplacé ici depuis `updateData` pour cette raison : imbriqué dans l'update,
+       * il n'aurait pas été joignable par la même transaction.
+       */
+      await prisma.$transaction(async (tx) => {
+        const anciennesEquipes = await tx.applicationTeamAssignment.findMany({
+          where: { applicationId },
+          select: { teamId: true },
+        })
+
+        await tx.applicationTeamAssignment.deleteMany({ where: { applicationId } })
+
+        for (const affectation of anciennesEquipes) {
+          await useVolunteerPorts().messenger.removeFromTeamConversations({
+            eventId: editionId,
+            teamId: affectation.teamId,
+            userId: application.userId,
+            tx,
+          })
+        }
+
+        // Le fil avec les organisateurs existe dès la candidature, sans aucune affectation : il se
+        // ferme donc même quand la personne n'était dans aucune équipe.
+        await useVolunteerPorts().messenger.removeFromOrganizersConversation({
+          eventId: editionId,
+          userId: application.userId,
+          tx,
+        })
+      })
+
       // Réinitialiser la validation d'entrée
       updateData.entryValidated = false
       updateData.entryValidatedAt = null

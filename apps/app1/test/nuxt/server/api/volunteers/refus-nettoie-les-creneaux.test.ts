@@ -4,6 +4,10 @@ const mockCanManage = vi.hoisted(() => vi.fn())
 const mockSupprimerRepas = vi.hoisted(() => vi.fn())
 const mockCreerRepas = vi.hoisted(() => vi.fn())
 const mockNotifier = vi.hoisted(() => vi.fn())
+// Le refus ferme aussi les conversations : le port est simulé ici pour que ce fichier reste
+// concentré sur les CRÉNEAUX, que d'autres tests couvrent la messagerie.
+const mockRetirerDesEquipes = vi.hoisted(() => vi.fn())
+const mockRetirerDesOrganisateurs = vi.hoisted(() => vi.fn())
 
 vi.mock('#server/utils/api-helpers', () => ({
   wrapApiHandler: (handler: any) => handler,
@@ -27,6 +31,10 @@ vi.mock('#server/volunteers/ports/registry', () => ({
       createVolunteerMealSelections: mockCreerRepas,
     },
     notifications: { notify: mockNotifier },
+    messenger: {
+      removeFromTeamConversations: mockRetirerDesEquipes,
+      removeFromOrganizersConversation: mockRetirerDesOrganisateurs,
+    },
   }),
 }))
 
@@ -79,6 +87,13 @@ describe('le refus d’une candidature nettoie les créneaux', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Le retrait des équipes passe désormais par une transaction : sans ces mocks, la boucle
+    // itère sur `undefined` et le handler lève avant d'atteindre les créneaux.
+    prismaMock.$transaction.mockImplementation(async (travail: any) =>
+      typeof travail === 'function' ? travail(prismaMock) : travail
+    )
+    prismaMock.applicationTeamAssignment.findMany.mockResolvedValue([])
+    prismaMock.applicationTeamAssignment.deleteMany.mockResolvedValue({ count: 0 })
     mockCanManage.mockResolvedValue(true)
     candidature('PENDING')
     prismaMock.editionVolunteerApplication.update.mockResolvedValue({

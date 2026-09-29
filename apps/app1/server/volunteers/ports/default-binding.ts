@@ -15,6 +15,7 @@ import { sendEmail } from '#server/utils/emailService'
 import { infosAlimentaires, infosPersonnellesSelect } from '#server/utils/infos-personnelles'
 import {
   ensureVolunteerConversations,
+  removeVolunteerFromOrganizersConversation,
   removeVolunteerFromTeamConversations,
 } from '#server/utils/messenger-helpers'
 import {
@@ -48,6 +49,8 @@ export function createDefaultVolunteerPorts(): VolunteerPorts {
         ensureVolunteerConversations(eventId, teamId, userId, tx),
       removeFromTeamConversations: ({ eventId, teamId, userId, tx }) =>
         removeVolunteerFromTeamConversations(eventId, teamId, userId, tx),
+      removeFromOrganizersConversation: ({ eventId, userId, tx }) =>
+        removeVolunteerFromOrganizersConversation(eventId, userId, tx),
     },
     organizers: {
       requireManagementAccess: (event, eventId) => requireVolunteerManagementAccess(event, eventId),
