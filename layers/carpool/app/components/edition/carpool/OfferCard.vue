@@ -42,7 +42,7 @@
             <div class="text-sm">
               <div class="flex items-center gap-1 justify-end mb-1">
                 <UIcon name="i-heroicons-calendar" class="text-gray-400 w-4 h-4" />
-                <span class="font-medium">{{ formatDate(offer.tripDate) }}</span>
+                <span class="font-medium">{{ formatTripDate(offer.tripDate) }}</span>
               </div>
               <div class="flex items-center gap-1 justify-end mb-1">
                 <UIcon name="i-heroicons-map-pin" class="text-gray-400 w-4 h-4" />
@@ -159,7 +159,7 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // Vérifier si l'utilisateur peut éditer cette offre
 const canEdit = computed(() => {
@@ -190,17 +190,11 @@ const remainingSeats = computed(() => {
   return Math.max(0, props.offer.availableSeats - accepted)
 })
 
-const formatDate = (date: string) => {
-  const { locale } = useI18n()
-  return new Date(date).toLocaleString(locale.value, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Paris',
-  })
-}
+/*
+ * Un seul formateur pour tout le module (`utils/date-covoiturage.ts`), au fuseau du NAVIGATEUR :
+ * cet écran forçait `Europe/Paris` et son voisin non, d'où deux heures pour une même offre.
+ */
+const formatTripDate = (date: string) => formatCarpoolDate(date, locale.value)
 
 const { execute: executeDeleteOffer } = useApiAction(
   () => `/api/carpool-offers/${props.offer.id}`,

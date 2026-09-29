@@ -84,7 +84,7 @@
 <script setup lang="ts">
 import type { CarpoolRequest } from '~/types/carpool'
 
-import { useAuthStore, formatDate } from '#imports'
+import { useAuthStore } from '#imports'
 
 interface Props {
   request: CarpoolRequest
@@ -99,18 +99,20 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 // Vérifier si l'utilisateur peut éditer cette demande
 const canEdit = computed(() => {
   return authStore.user && authStore.user.id === props.request.user.id
 })
 
-// Utilise la fonction importée formatDate
-const formatTripDate = (date: string) => {
-  const { locale } = useI18n()
-  return formatDate(date, { locale: locale.value, includeTime: true, format: 'long' })
-}
+/*
+ * Un seul formateur pour tout le module, au fuseau du NAVIGATEUR. Cet écran passait par le
+ * `formatDate` partagé, qui force `Europe/Paris` — donc une heure fausse hors de France pour un
+ * départ qui n'a rien à voir avec le lieu de l'événement. L'année disparaît au passage : un trajet
+ * se publie pour les jours qui viennent, et les cartes d'offre n'en affichaient déjà pas.
+ */
+const formatTripDate = (date: string) => formatCarpoolDate(date, locale.value)
 
 const { execute: executeDeleteRequest } = useApiAction(
   () => `/api/carpool-requests/${props.request.id}`,

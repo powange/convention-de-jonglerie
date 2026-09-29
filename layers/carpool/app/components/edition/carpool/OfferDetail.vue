@@ -283,7 +283,7 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 
 const canEdit = computed(() => authStore.user?.id === props.offer.user?.id)
@@ -302,16 +302,9 @@ const acceptedBookings = computed(() =>
   (props.offer.bookings || []).filter((b) => b.status === 'ACCEPTED')
 )
 
-const formatTripDate = (date: string) => {
-  const { locale } = useI18n()
-  return new Date(date).toLocaleString(locale.value, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+// Un seul formateur pour tout le module — cet écran était déjà au bon fuseau, mais dupliquait
+// le format, et c'est cette duplication qui avait laissé ses voisins diverger.
+const formatTripDate = (date: string) => formatCarpoolDate(date, locale.value)
 
 // Ma réservation
 interface MyBooking {
