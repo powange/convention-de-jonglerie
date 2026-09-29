@@ -94,6 +94,12 @@ export function getTranslationsToLoad(path: string): string[] {
       pattern: /^\/editions\/\d+\/gestion\/shows-call/,
       translations: ['survey', 'shows-call', 'gestion-shows-call'],
     },
+    // Fiche d'une candidature : sa discussion avec l'artiste réutilise les composants de la
+    // messagerie (fil, zone de saisie), et donc leurs clés `messenger.*`.
+    {
+      pattern: /^\/editions\/\d+\/gestion\/shows-call\/\d+\/applications\/\d+/,
+      translations: ['messenger'],
+    },
     // Routes hors /gestion
     // Confirmation de lecture d'une notification aux artistes : page vue par l'artiste,
     // ses clés vivent donc dans le domaine partagé `artists`, pas dans `gestion`.
@@ -132,6 +138,12 @@ export function getTranslationsToLoad(path: string): string[] {
     {
       pattern: /^\/profile\/mes-candidatures-benevole/,
       translations: ['volunteers'],
+    },
+    // « Mes candidatures artiste » : la discussion d'une candidature, avec les composants de la
+    // messagerie.
+    {
+      pattern: /^\/profile\/mes-candidatures-artiste/,
+      translations: ['messenger'],
     },
     {
       pattern: /^\/survey\//,

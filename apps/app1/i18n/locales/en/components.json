@@ -4,13 +4,8 @@
       "chat": {
         "be_first": "Send the first message!",
         "connected": "Connected",
-        "edited": "edited",
-        "message_deleted": "This message has been deleted",
         "no_messages": "No messages",
-        "placeholder": "Write your message...",
-        "title": "Discussion",
-        "today": "Today",
-        "yesterday": "Yesterday"
+        "title": "Discussion"
       }
     },
     "carpool": {

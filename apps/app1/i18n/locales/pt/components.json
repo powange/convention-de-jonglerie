@@ -4,13 +4,8 @@
       "chat": {
         "be_first": "Envie a primeira mensagem!",
         "connected": "Conectado",
-        "edited": "editado",
-        "message_deleted": "Esta mensagem foi eliminada",
         "no_messages": "Sem mensagens",
-        "placeholder": "Escreva a sua mensagem...",
-        "title": "Discussão",
-        "today": "Hoje",
-        "yesterday": "Ontem"
+        "title": "Discussão"
       }
     },
     "carpool": {
