@@ -317,7 +317,9 @@ defineExpose({
               <p v-if="message.deletedAt" class="text-sm">
                 {{ t('components.artist_application.chat.message_deleted') }}
               </p>
-              <p v-else class="whitespace-pre-wrap text-sm">{{ message.content }}</p>
+              <p v-else class="whitespace-pre-wrap text-sm">
+                <MessengerMessageText :texte="message.content" />
+              </p>
 
               <!-- Heure et statut modifié -->
               <p

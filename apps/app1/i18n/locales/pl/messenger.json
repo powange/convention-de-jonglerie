@@ -45,6 +45,9 @@
     "copied": "Wiadomość skopiowana",
     "copy": "Kopiuj wiadomość",
     "copy_failed": "Nie udało się skopiować wiadomości",
-    "copy_unavailable": "Twoja przeglądarka nie pozwala tutaj kopiować"
+    "copy_unavailable": "Twoja przeglądarka nie pozwala tutaj kopiować",
+    "edit": "Edytuj",
+    "edit_expired": "Wiadomości nie można już edytować po upływie {minutes} minut od wysłania",
+    "editing": "Edycja wiadomości"
   }
 }

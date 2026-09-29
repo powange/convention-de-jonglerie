@@ -58,6 +58,17 @@
           class="justify-start"
           @click="handleReply"
         />
+        <UButton
+          v-if="canEdit && !isDeleted"
+          color="neutral"
+          variant="soft"
+          block
+          size="lg"
+          icon="i-heroicons-pencil-square"
+          :label="$t('messenger.edit')"
+          class="justify-start"
+          @click="handleEdit"
+        />
         <!--
           `!isDeleted` autant que `canDelete` : le bouton restait proposé sur un message qu'on
           venait de supprimer. Le clic partait, le serveur refusait — il ne peut pas modifier un
@@ -87,6 +98,8 @@
 const props = defineProps<{
   messageId: string
   canDelete: boolean
+  /** Auteur du message, encore dans le délai de modification. */
+  canEdit?: boolean
   isDeleted?: boolean
   /** Le contenu à copier. Absent, le bouton « Copier » ne s'affiche pas. */
   texte?: string
@@ -96,6 +109,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   reply: []
+  edit: []
   delete: []
 }>()
 
@@ -191,47 +205,21 @@ function handleTouchEnd() {
 }
 
 // Actions du menu
-/*
- * `useClipboard` de VueUse plutôt que l'API du navigateur appelée en direct.
- *
- * Sept écrans du dépôt appellent l'API du navigateur sans filet ; celui-ci se replie quand elle
- * n'est pas disponible — contexte non sécurisé, permission refusée. Et l'on DIT ce qui s'est
- * passé : une copie qui échoue en silence laisse l'utilisateur coller l'ancien contenu sans
- * comprendre.
- */
-const { t } = useI18n()
-const { copy, isSupported } = useClipboard()
-const toast = useToast()
+const { copierMessage } = useCopierMessage()
 
 async function handleCopy() {
   showActionsModal.value = false
-  // L'auteur devant le texte : on copie souvent pour transmettre, et savoir de qui l'on cite.
-  const contenu = props.auteur ? `${props.auteur} : ${props.texte}` : (props.texte ?? '')
-
-  if (!isSupported.value) {
-    toast.add({
-      title: t('messenger.copy_unavailable'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-    return
-  }
-
-  try {
-    await copy(contenu)
-    toast.add({ title: t('messenger.copied'), icon: 'i-heroicons-check-circle', color: 'success' })
-  } catch {
-    toast.add({
-      title: t('messenger.copy_failed'),
-      icon: 'i-heroicons-x-circle',
-      color: 'error',
-    })
-  }
+  await copierMessage(props.texte ?? '', props.auteur)
 }
 
 function handleReply() {
   showActionsModal.value = false
   emit('reply')
+}
+
+function handleEdit() {
+  showActionsModal.value = false
+  emit('edit')
 }
 
 function handleDelete() {

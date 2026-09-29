@@ -564,6 +564,49 @@ export const editionPostCommentInclude = {
 } satisfies Prisma.EditionPostCommentInclude
 
 // ============================================================================
+// SÉLECTIONS MESSAGERIE
+// ============================================================================
+
+/**
+ * Include d'un message de la messagerie, tel que l'écran l'affiche : auteur (avec de quoi
+ * construire son avatar) et message cité.
+ *
+ * Toute route qui renvoie un message doit le renvoyer sous cette forme. Le flux temps réel et la
+ * modification omettaient la citation : le message reçu en direct remplaçait la version chargée,
+ * et la citation d'une réponse disparaissait de l'écran jusqu'au rechargement.
+ */
+export const messengerMessageInclude = {
+  participant: {
+    select: {
+      id: true,
+      user: {
+        select: {
+          id: true,
+          pseudo: true,
+          profilePicture: true,
+          emailHash: true,
+        },
+      },
+    },
+  },
+  replyTo: {
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      deletedAt: true,
+      participant: {
+        select: {
+          user: {
+            select: userBasicSelect,
+          },
+        },
+      },
+    },
+  },
+} satisfies Prisma.MessageInclude
+
+// ============================================================================
 // TYPES GÉNÉRÉS (pour réutilisation)
 // ============================================================================
 

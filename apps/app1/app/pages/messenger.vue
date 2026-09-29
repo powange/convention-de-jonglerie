@@ -302,27 +302,42 @@
                   :id="`message-${message.id}`"
                   :key="message.id"
                 >
+                  <!--
+                    Pas d'avatar sur ses propres messages : leur place à droite dit déjà qu'ils
+                    sont les nôtres. Sur ceux des autres, l'avatar ne vient qu'en tête de série ;
+                    les suivants gardent sa place (invisible) pour que les bulles restent alignées.
+                  -->
                   <UChatMessage
                     v-bind="message"
                     :role="message.role"
                     :side="message.isCurrentUser ? 'right' : 'left'"
-                    :avatar="{ src: message.avatarUrl.value }"
+                    variant="subtle"
+                    :color="message.isCurrentUser ? 'secondary' : 'neutral'"
+                    :avatar="message.isCurrentUser ? undefined : { src: message.avatarUrl.value }"
                     :actions="isMobile ? undefined : message.actions"
+                    :ui="message.metadata.debutDeSerie ? undefined : { leadingAvatar: 'invisible' }"
                   >
                     <template #content>
                       <MessengerMessageBubble
                         :message-id="message.id"
                         :can-delete="message.isCurrentUser"
+                        :can-edit="message.metadata.modifiable"
                         :is-deleted="message.metadata?.isDeleted"
                         :texte="getOriginalMessage(message.id)?.content"
                         :auteur="getOriginalMessage(message.id)?.participant?.user?.pseudo"
                         @reply="handleReplyToMessage(getOriginalMessage(message.id)!)"
+                        @edit="handleEditMessage(getOriginalMessage(message.id))"
                         @delete="handleDeleteMessage(message.id)"
                       >
                         <div>
-                          <!-- Nom de l'auteur pour les messages des autres -->
+                          <!--
+                            Nom de l'auteur, pour les messages des autres, en tête de série
+                            seulement : répété sur chaque message d'une même personne, il ne
+                            disait rien de plus. (La condition précédente testait un rôle
+                            « assistant » que la page n'attribue jamais : le nom ne s'affichait pas.)
+                          -->
                           <p
-                            v-if="message.role === 'assistant'"
+                            v-if="!message.isCurrentUser && message.metadata.debutDeSerie"
                             class="text-xs font-medium mb-1 opacity-70"
                           >
                             {{ message.metadata?.authorName }}
@@ -350,7 +365,7 @@
                             class="text-sm break-words whitespace-pre-wrap"
                             :class="{ 'italic opacity-50': message.metadata?.isDeleted }"
                           >
-                            {{ message.parts[0]?.text }}
+                            <MessengerMessageText :texte="message.parts[0]?.text ?? ''" />
                           </p>
                           <!-- Horodatage et statut d'édition -->
                           <p class="text-xs mt-1 opacity-70">
@@ -425,15 +440,50 @@
                 </div>
               </div>
 
+              <!--
+                Modification en cours : le texte du message est remonté dans la zone de saisie,
+                comme pour une réponse. La croix, ou Échap, rend le brouillon qu'on écrivait avant.
+              -->
+              <div
+                v-if="editingMessage"
+                class="mb-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-800 border-l-4 border-primary"
+              >
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <UIcon name="i-heroicons-pencil-square" class="h-4 w-4 text-primary" />
+                      <p class="text-xs font-medium text-primary">
+                        {{ $t('messenger.editing') }}
+                      </p>
+                    </div>
+                    <p class="text-sm opacity-70 truncate">
+                      {{ editingMessage.content }}
+                    </p>
+                  </div>
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    size="sm"
+                    @click="cancelEdit"
+                  />
+                </div>
+              </div>
+
               <UChatPrompt
                 ref="chatPromptRef"
                 v-model="newMessage"
                 :placeholder="$t('messenger.message_placeholder')"
                 :disabled="sending"
                 @submit="sendMessage"
-                @input="handleTypingInput"
+                @input="!editingMessage && handleTypingInput()"
+                @keydown.esc="editingMessage && cancelEdit()"
               >
-                <UChatPromptSubmit :disabled="!newMessage.trim()" :loading="sending" />
+                <UChatPromptSubmit
+                  :disabled="!newMessage.trim()"
+                  :loading="sending"
+                  :icon="editingMessage ? 'i-heroicons-check' : undefined"
+                />
               </UChatPrompt>
             </div>
           </div>
@@ -479,6 +529,11 @@ import type {
 import { useAuthStore } from '~/stores/auth'
 import { useAvatar } from '~/utils/avatar'
 
+import {
+  DELAI_MODIFICATION_MESSAGE_MINUTES,
+  messageEncoreModifiable,
+} from '~~/shared/utils/message-modifiable'
+
 const { getUserAvatarWithCache } = useAvatar()
 
 definePageMeta({
@@ -493,12 +548,15 @@ const authStore = useAuthStore()
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+const toast = useToast()
+const { copierMessage } = useCopierMessage()
 const {
   fetchEditions,
   fetchConversations,
   fetchPrivateConversations,
   fetchMessages,
   sendMessage: sendMessageApi,
+  editMessage,
   deleteMessage,
   markMessageAsRead,
 } = useMessenger()
@@ -523,6 +581,15 @@ const openPrivateAccordion = ref<string[]>(['private']) // Ouvert par défaut
 const chatPromptRef = ref()
 const messagesContainerRef = ref<HTMLElement | null>(null)
 const replyingToMessage = ref<ConversationMessage | null>(null)
+// Message en cours de modification, et le brouillon qu'on écrivait avant, rendu à l'annulation.
+const editingMessage = ref<ConversationMessage | null>(null)
+const brouillonAvantModification = ref('')
+
+// Fait disparaître « Modifier » une fois le délai passé, sans attendre un autre rendu.
+const maintenant = useNow({ interval: 30_000 })
+
+// Au-delà de cet écart, deux messages d'une même personne ouvrent chacun leur série.
+const PAUSE_ENTRE_SERIES_MS = 5 * 60 * 1000
 
 // Pagination des messages
 const hasMoreMessages = ref(true)
@@ -617,37 +684,88 @@ const allMessages = computed(() => {
   const baseMessages = [...messages.value]
   const realtimeMessages = streamRealtimeMessages.value as unknown as ConversationMessage[]
 
-  // Combiner et dédupliquer par ID
-  const allMessagesList = [...baseMessages, ...realtimeMessages]
-  const uniqueMessages = Array.from(new Map(allMessagesList.map((msg) => [msg.id, msg])).values())
+  // Combiner et dédupliquer par ID, en gardant la version la plus récemment modifiée.
+  //
+  // Un même message existe souvent deux fois : celui qu'on envoie est ajouté à `messages`, puis
+  // revient par le flux. La copie du flux l'emportait d'office ; après une modification, c'était
+  // l'ancien texte qui restait affiché jusqu'à ce que le flux signale le changement.
+  const parId = new Map<string, ConversationMessage>()
+  for (const msg of [...baseMessages, ...realtimeMessages]) {
+    const connu = parId.get(msg.id)
+    if (!connu || fraicheur(msg) >= fraicheur(connu)) parId.set(msg.id, msg)
+  }
+  const uniqueMessages = Array.from(parId.values())
 
   return uniqueMessages.sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   )
 })
 
+/** Date de la dernière modification ou suppression d'un message : la plus grande l'emporte. */
+function fraicheur(msg: ConversationMessage) {
+  return Math.max(
+    msg.editedAt ? new Date(msg.editedAt).getTime() : 0,
+    msg.deletedAt ? new Date(msg.deletedAt).getTime() : 0
+  )
+}
+
 // Formater les messages au format AI SDK v5 pour UChatMessages
 const formattedMessages = computed(() => {
-  return allMessages.value.map((message) => {
+  return allMessages.value.map((message, index) => {
     const isCurrentUser = message.participant.user.id === authStore.user?.id
     const isDeleted = !!message.deletedAt
+    const modifiable =
+      isCurrentUser && !isDeleted && messageEncoreModifiable(message.createdAt, maintenant.value)
+
+    // Une série : des messages consécutifs d'une même personne, sans longue pause entre eux.
+    // Seul le premier porte le pseudo et l'avatar.
+    const precedent = allMessages.value[index - 1]
+    const debutDeSerie =
+      !precedent ||
+      precedent.participant.user.id !== message.participant.user.id ||
+      new Date(message.createdAt).getTime() - new Date(precedent.createdAt).getTime() >
+        PAUSE_ENTRE_SERIES_MS
 
     // Actions natives pour les messages non supprimés
+    // `UChatMessage` rend chaque action en bouton-icône, le libellé dans une infobulle : sans
+    // `aria-label`, les boutons n'avaient aucun nom pour un lecteur d'écran.
     const actions = !isDeleted
       ? [
+          {
+            icon: 'i-heroicons-clipboard-document',
+            color: 'neutral' as const,
+            label: t('messenger.copy'),
+            'aria-label': t('messenger.copy'),
+            trailing: true,
+            onClick: () => copierMessage(message.content, message.participant.user.pseudo),
+          },
           {
             icon: 'i-heroicons-arrow-uturn-left',
             color: 'neutral' as const,
             label: t('messenger.reply'),
+            'aria-label': t('messenger.reply'),
             trailing: true,
             onClick: () => handleReplyToMessage(message),
           },
+          ...(modifiable
+            ? [
+                {
+                  icon: 'i-heroicons-pencil-square',
+                  color: 'neutral' as const,
+                  label: t('messenger.edit'),
+                  'aria-label': t('messenger.edit'),
+                  trailing: true,
+                  onClick: () => handleEditMessage(message),
+                },
+              ]
+            : []),
           ...(isCurrentUser
             ? [
                 {
                   icon: 'i-lucide-trash',
                   color: 'error' as const,
                   label: t('messenger.delete'),
+                  'aria-label': t('messenger.delete'),
                   trailing: true,
                   onClick: () => handleDeleteMessage(message.id),
                 },
@@ -678,6 +796,8 @@ const formattedMessages = computed(() => {
         replyTo: message.replyTo,
         user: message.participant.user, // Passer l'objet user complet pour UserAvatar
         isDeleted,
+        modifiable,
+        debutDeSerie,
       },
     }
   })
@@ -801,6 +921,8 @@ function getOriginalMessage(messageId: string): ConversationMessage | undefined 
  */
 function handleReplyToMessage(message: ConversationMessage | undefined) {
   if (!message) return
+  // Répondre et modifier se partagent la zone de saisie : l'un chasse l'autre.
+  if (editingMessage.value) cancelEdit()
   replyingToMessage.value = message
   // Focus le champ de saisie
   nextTick(() => {
@@ -819,6 +941,37 @@ function handleReplyToMessage(message: ConversationMessage | undefined) {
 function cancelReply() {
   replyingToMessage.value = null
 }
+
+/** Remonte le texte d'un de ses messages dans la zone de saisie, pour le modifier. */
+function handleEditMessage(message: ConversationMessage | undefined) {
+  if (!message) return
+  replyingToMessage.value = null
+  // On garde le brouillon d'avant une seule fois : passer d'un message à modifier à un autre ne
+  // doit pas faire prendre le texte du premier pour un brouillon.
+  if (!editingMessage.value) brouillonAvantModification.value = newMessage.value
+  editingMessage.value = message
+  newMessage.value = message.content
+  focusChatPrompt()
+}
+
+function cancelEdit() {
+  editingMessage.value = null
+  newMessage.value = brouillonAvantModification.value
+  brouillonAvantModification.value = ''
+}
+
+function focusChatPrompt() {
+  nextTick(() => {
+    const textarea = chatPromptRef.value?.$el?.querySelector('textarea')
+    textarea?.focus()
+  })
+}
+
+// Une réponse ou une modification en cours appartient à la conversation qu'on quitte.
+watch(selectedConversationId, () => {
+  replyingToMessage.value = null
+  if (editingMessage.value) cancelEdit()
+})
 
 /**
  * Gère le scroll de la zone de messages pour charger plus de messages
@@ -1166,6 +1319,11 @@ async function sendMessage() {
     return
   }
 
+  if (editingMessage.value) {
+    await submitEdit()
+    return
+  }
+
   sending.value = true
   const message = await sendMessageApi(
     selectedConversationId.value,
@@ -1199,6 +1357,43 @@ async function sendMessage() {
 
     // Le message arrivera aussi via SSE mais sera dédupliqué par l'ID
   }
+}
+
+// Enregistrer la modification d'un message
+async function submitEdit() {
+  const cible = editingMessage.value
+  if (!cible || !selectedConversationId.value) return
+
+  const contenu = newMessage.value.trim()
+  // Rien n'a changé : on referme sans marquer le message « modifié ».
+  if (contenu === cible.content) {
+    cancelEdit()
+    return
+  }
+
+  // Le serveur refuserait de toute façon ; autant dire pourquoi plutôt qu'une erreur générique.
+  if (!messageEncoreModifiable(cible.createdAt)) {
+    toast.add({
+      title: t('messenger.edit_expired', { minutes: DELAI_MODIFICATION_MESSAGE_MINUTES }),
+      icon: 'i-heroicons-x-circle',
+      color: 'error',
+    })
+    cancelEdit()
+    return
+  }
+
+  sending.value = true
+  const modifie = await editMessage(selectedConversationId.value, cible.id, contenu)
+  sending.value = false
+  if (!modifie) return
+
+  messages.value = messages.value.some((m) => m.id === modifie.id)
+    ? messages.value.map((m) => (m.id === modifie.id ? modifie : m))
+    : [...messages.value, modifie]
+  editingMessage.value = null
+  newMessage.value = brouillonAvantModification.value
+  brouillonAvantModification.value = ''
+  focusChatPrompt()
 }
 
 // Supprimer un message
@@ -1289,16 +1484,20 @@ watch(
   (updates) => {
     if (updates.length === 0) return
 
-    // Prendre la dernière mise à jour
-    const update = updates[updates.length - 1] as unknown as ConversationMessage
-    if (!update) return
-
-    // Mettre à jour le message dans messages.value si présent
-    const messageIndex = messages.value.findIndex((m) => m.id === update.id)
-    if (messageIndex !== -1) {
-      // Remplacer le message par la version mise à jour (approche immutable)
-      messages.value = messages.value.map((m) => (m.id === update.id ? update : m))
+    // Toutes les mises à jour, pas seulement la dernière : le flux peut en livrer plusieurs
+    // avant que ce watcher ne s'exécute, et seule la dernière était appliquée — une modification
+    // suivie d'une suppression d'un autre message perdait la modification. Rejouer la liste est
+    // sans effet sur les messages déjà à jour : on ne remplace que par une version plus récente.
+    const dernieres = new Map<string, ConversationMessage>()
+    for (const update of updates as unknown as ConversationMessage[]) {
+      const connue = dernieres.get(update.id)
+      if (!connue || fraicheur(update) >= fraicheur(connue)) dernieres.set(update.id, update)
     }
+
+    messages.value = messages.value.map((m) => {
+      const update = dernieres.get(m.id)
+      return update && fraicheur(update) >= fraicheur(m) ? update : m
+    })
   },
   { deep: true }
 )

@@ -45,6 +45,9 @@
     "copied": "Bericht gekopieerd",
     "copy": "Bericht kopiëren",
     "copy_failed": "Kon het bericht niet kopiëren",
-    "copy_unavailable": "Je browser staat kopiëren hier niet toe"
+    "copy_unavailable": "Je browser staat kopiëren hier niet toe",
+    "edit": "Bewerken",
+    "edit_expired": "Een bericht kan {minutes} minuten na verzending niet meer worden bewerkt",
+    "editing": "Bericht bewerken"
   }
 }

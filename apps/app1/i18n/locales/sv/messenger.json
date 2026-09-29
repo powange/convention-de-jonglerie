@@ -45,6 +45,9 @@
     "copied": "Meddelandet kopierat",
     "copy": "Kopiera meddelandet",
     "copy_failed": "Meddelandet kunde inte kopieras",
-    "copy_unavailable": "Din webbläsare tillåter inte kopiering här"
+    "copy_unavailable": "Din webbläsare tillåter inte kopiering här",
+    "edit": "Redigera",
+    "edit_expired": "Ett meddelande kan inte längre redigeras {minutes} minuter efter att det skickades",
+    "editing": "Redigerar meddelande"
   }
 }
