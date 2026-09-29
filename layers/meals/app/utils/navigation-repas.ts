@@ -91,6 +91,70 @@ export function journeeVoisine(
 }
 
 /**
+ * Les heures de bascule d'un type de repas au suivant, sur place.
+ *
+ * Avant 11 h on sert le petit-déjeuner, avant 15 h le déjeuner, ensuite le dîner. Ce sont des
+ * bornes de service et non des heures de repas : à 14 h 30 la file du déjeuner existe encore, à
+ * 15 h 30 on prépare le soir.
+ */
+export const AVANT_DEJEUNER = 11
+export const AVANT_DINER = 15
+
+/** Le type de repas qu'on sert à cette heure-là, sur place. */
+export function typeSelonLHeure(heure: number): TypeDeRepas {
+  if (heure < AVANT_DEJEUNER) return 'BREAKFAST'
+  if (heure < AVANT_DINER) return 'LUNCH'
+  return 'DINNER'
+}
+
+/**
+ * Le repas à présenter d'emblée au comptoir, quand aucun n'est demandé par l'URL.
+ *
+ * ⚠️ POURQUOI CETTE FONCTION EXISTE. L'écran choisissait son repas par deux comparaisons
+ * d'instants : une fenêtre de ±3 h autour de « maintenant », puis un repli sur « le premier repas
+ * à venir ». Les deux échouaient, et pour la MÊME raison : un repas est stocké à **minuit UTC** du
+ * jour où il est servi, son heure de service n'existe nulle part. La fenêtre de ±3 h ne rencontrait
+ * donc jamais un déjeuner ni un dîner, et — c'est le vrai coupable — un dîner « minuit UTC » est
+ * déjà passé dès 2 h du matin sur place : à midi, plus aucun repas du jour n'était « à venir », et
+ * le comptoir ouvrait sur **le lendemain**. Corriger la seule fenêtre aurait laissé le défaut
+ * entier.
+ *
+ * D'où un choix par JOURNÉE puis par TYPE, comme le reste de ce module : les seules données fiables
+ * sont la journée du repas et son type.
+ *
+ * ⚠️ `aujourdhui` et `heure` sont reçus en paramètres, et ce n'est pas un détail de style : ce
+ * fichier ne doit rien importer (voir l'en-tête), alors que les résoudre demande le fuseau de
+ * l'édition. C'est donc l'appelant qui les calcule — `journeeDans` et `heureDans` de
+ * `shared/utils/fuseau-edition.ts` — et cette fonction reste pure, donc testable à date fixe.
+ */
+export function repasParDefaut(
+  repas: readonly RepasNavigable[],
+  aujourdhui: string,
+  heure: number
+): RepasNavigable | null {
+  const journees = journeesDesRepas(repas)
+  if (journees.length === 0) return null
+
+  // Le cas courant, et le seul qui compte pendant l'événement : on sert aujourd'hui.
+  if (journees.includes(aujourdhui)) {
+    return repasEnChangeantDeJour(repas, aujourdhui, typeSelonLHeure(heure))
+  }
+
+  /*
+   * Hors des journées de repas — la veille en préparant le comptoir, ou après coup en relisant les
+   * chiffres. On ouvre alors au plus près : le premier repas à venir, sinon le dernier servi.
+   */
+  const aVenir = journees.find((jour) => jour > aujourdhui)
+  if (aVenir) return repasEnChangeantDeJour(repas, aVenir, null)
+
+  const derniereJournee = journees[journees.length - 1]!
+  const types = typesDuJour(repas, derniereJournee)
+  // Le DERNIER repas de la dernière journée, et non le premier : après l'événement, ce qu'on
+  // rouvre est ce qui vient de se passer.
+  return repasDuJour(repas, derniereJournee, types[types.length - 1]!)
+}
+
+/**
  * Le repas à retenir quand on change de journée.
  *
  * On garde le MÊME type si ce jour-là le propose — passer du déjeuner de samedi au déjeuner de

@@ -92,6 +92,22 @@ export const journeeDans = (instant: string | Date, fuseau?: string | null): str
 }
 
 /**
+ * Heure pleine (0-23) d'un instant, telle qu'elle est vécue sur place, ou `null` si illisible.
+ *
+ * `formaterHeure` rend déjà une heure, mais formatée pour l'œil (« 14:30 », et selon la locale) :
+ * la relire pour décider quelque chose obligerait à la découper à nouveau. Ce qu'il faut ici est un
+ * nombre à comparer — « sommes-nous avant le déjeuner ? » — d'où cette seconde porte sur le même
+ * calcul.
+ *
+ * `null` et non `0` pour une date illisible : minuit est une heure valable, et un repli sur zéro
+ * ferait passer une donnée cassée pour le petit matin.
+ */
+export const heureDans = (instant: string | Date, fuseau?: string | null): number | null => {
+  const dt = enDateTime(instant, fuseau)
+  return dt.isValid ? dt.hour : null
+}
+
+/**
  * Journées `AAAA-MM-JJ` couvertes par une édition, bornes comprises, dans son fuseau.
  *
  * Les bornes arrivent en instants — c'est ce que porte l'`Edition` — et doivent être découpées sur
