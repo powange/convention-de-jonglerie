@@ -31,6 +31,27 @@ interface MessengerTypingData {
   isTyping: boolean
 }
 
+/**
+ * Un message COMPLET poussé par le serveur, à la forme exacte que rend le GET des messages.
+ *
+ * ⚠️ À ne pas confondre avec `MessengerNewMessageData`, qui l'accompagne : celui-là est un résumé
+ * — expéditeur, aperçu — pour la pastille et la liste des conversations. Celui-ci est le message
+ * entier, pour la conversation ouverte. Les deux arrivent ensemble, à deux usages différents.
+ *
+ * Volontairement typé large : la forme vient du serveur, la conversation ouverte la passe à ses
+ * composants telle quelle, et la redéclarer ici en ferait une seconde vérité à tenir à jour.
+ */
+interface MessengerMessageEvent {
+  conversationId: string
+  [autre: string]: unknown
+}
+
+interface MessengerReadData {
+  conversationId: string
+  readerId: number
+  lastReadMessageId: string
+}
+
 interface MessengerPresenceData {
   conversationId: string
   changedUserId: number
@@ -69,6 +90,19 @@ const typingTimeouts = new Map<string, NodeJS.Timeout>()
 
 // État de présence par conversation (conversationId -> Set<userId>)
 const messengerPresence = ref<Map<string, Set<number>>>(new Map())
+
+/*
+ * Les messages poussés, toutes conversations confondues, dans l'ordre d'arrivée.
+ *
+ * C'est ce qui remplace le sondage du flux par conversation. La conversation ouverte y pioche ce
+ * qui la concerne (`useMessengerStream`) et vide sa part ; ce qui vise une autre conversation reste
+ * là et ne gêne personne — le compteur de non-lus, lui, arrive par `messenger_unread`.
+ */
+const messengerMessages = ref<MessengerMessageEvent[]>([])
+const messengerMessageUpdates = ref<MessengerMessageEvent[]>([])
+
+/** Dernier message lu par chacun, par conversation : `conversationId` → `readerId` → messageId. */
+const messengerReadReceipts = ref<Map<string, Record<number, string>>>(new Map())
 
 // Instance EventSource
 let eventSource: EventSource | null = null
@@ -182,6 +216,40 @@ export const useNotificationStream = () => {
           messengerNewMessages.value.push(data)
         } catch (error) {
           console.error('[SSE Client] Erreur parsing messenger_new_message:', error)
+        }
+      })
+
+      // Réception d'un message COMPLET (remplace le sondage du flux par conversation)
+      eventSource.addEventListener('messenger_message', (event) => {
+        try {
+          messengerMessages.value.push(JSON.parse(event.data) as MessengerMessageEvent)
+        } catch (error) {
+          console.error('[SSE Client] Erreur parsing messenger_message:', error)
+        }
+      })
+
+      // Réception d'un message modifié ou supprimé
+      eventSource.addEventListener('messenger_message_updated', (event) => {
+        try {
+          messengerMessageUpdates.value.push(JSON.parse(event.data) as MessengerMessageEvent)
+        } catch (error) {
+          console.error('[SSE Client] Erreur parsing messenger_message_updated:', error)
+        }
+      })
+
+      // Réception de l'avancée de lecture d'un autre participant (indicateur « lu par »)
+      eventSource.addEventListener('messenger_read', (event) => {
+        try {
+          const data: MessengerReadData = JSON.parse(event.data)
+          // Une nouvelle `Map` : muter celle-ci en place ne déclencherait aucune réactivité.
+          const parConversation = new Map(messengerReadReceipts.value)
+          parConversation.set(data.conversationId, {
+            ...(parConversation.get(data.conversationId) ?? {}),
+            [data.readerId]: data.lastReadMessageId,
+          })
+          messengerReadReceipts.value = parConversation
+        } catch (error) {
+          console.error('[SSE Client] Erreur parsing messenger_read:', error)
         }
       })
 
@@ -475,6 +543,11 @@ export const useNotificationStream = () => {
 
     // État messenger - nouveaux messages
     messengerNewMessages: readonly(messengerNewMessages),
+
+    // État messenger - messages poussés en entier, pour la conversation ouverte
+    messengerMessages,
+    messengerMessageUpdates,
+    messengerReadReceipts: readonly(messengerReadReceipts),
 
     // État messenger - typing
     messengerTypingUsers: readonly(messengerTypingUsers),

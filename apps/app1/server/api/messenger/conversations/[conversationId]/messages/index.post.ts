@@ -4,6 +4,7 @@ import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getUserAvatarUrl } from '#server/utils/avatar-url'
 import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
+import { masquerMessageSupprime } from '#server/utils/messenger-message-affiche'
 import {
   messengerStreamService,
   messengerUnreadService,
@@ -308,6 +309,10 @@ export default wrapApiHandler(
       })
     )
 
+    // La forme que voit un participant, calculée une fois : elle sert à la réponse ET à la
+    // diffusion, qui doivent être identiques.
+    const messageAffiche = masquerMessageSupprime(message)
+
     // Envoyer les événements SSE aux autres participants
     const otherParticipantIds = participantsWithReadStatus.map((p) => p.userId)
     if (otherParticipantIds.length > 0) {
@@ -325,6 +330,20 @@ export default wrapApiHandler(
       Promise.all([
         // Envoyer la notification de nouveau message
         messengerStreamService.sendNewMessageToUsers(otherParticipantIds, newMessageData),
+        /*
+         * Et le message COMPLET, à la forme exacte de cette réponse.
+         *
+         * C'est ce qui remplace le sondage du flux par conversation : celui-ci interrogeait la
+         * base toutes les cinq secondes, par connexion ouverte, pour retrouver un message que
+         * l'on tient déjà ici. Les deux événements partent ensemble et ne se recouvrent pas —
+         * `messenger_new_message` porte un résumé pour la pastille et l'aperçu, partout dans
+         * l'application ; celui-ci porte le message entier, pour la conversation OUVERTE.
+         *
+         * `masquerMessageSupprime` plutôt qu'un `participantId` retiré à la main : la forme vue
+         * par un participant a un seul endroit, et diffuser une autre forme que celle du GET
+         * ferait apparaître à l'écran un message différent de celui qu'un rechargement montre.
+         */
+        messengerStreamService.sendMessageToUsers(otherParticipantIds, messageAffiche),
         // Envoyer le compteur de messages non lus mis à jour
         messengerUnreadService.sendUnreadCountToUsers(otherParticipantIds),
       ]).catch((error) => {
@@ -332,10 +351,7 @@ export default wrapApiHandler(
       })
     }
 
-    // Transformer le message pour supprimer participantId
-    const { participantId: _participantId, ...messageWithoutParticipantId } = message
-
-    return createSuccessResponse(messageWithoutParticipantId)
+    return createSuccessResponse(messageAffiche)
   },
   { operationName: 'SendMessage' }
 )

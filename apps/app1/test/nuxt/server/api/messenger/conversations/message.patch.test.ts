@@ -51,6 +51,13 @@ describe('API PATCH /messenger/conversations/[conversationId]/messages/[messageI
       name === 'conversationId' ? 'conv-1' : 'msg-1'
     )
     global.readBody = vi.fn()
+    /*
+     * Les autres participants, à qui la modification est diffusée. Un `findMany` réel rend TOUJOURS
+     * un tableau : un mock qui ne le simule pas rend `undefined`, et le handler tombe sur
+     * `.length` — ce qui a été le cas en ajoutant la diffusion. Complété ici plutôt que de rendre
+     * le handler tolérant à une valeur que Prisma ne produit jamais.
+     */
+    prismaMock.conversationParticipant.findMany.mockResolvedValue([])
   })
 
   afterEach(() => {
