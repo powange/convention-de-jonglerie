@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
+import {
+  RETARD_MINUTES_MAX,
+  RETARD_MINUTES_MIN,
+} from '../../../../../shared/utils/bornes-retard-creneau'
+
 const mockRequireManagement = vi.fn()
 
 vi.mock('#server/volunteers/ports/registry', () => ({
@@ -112,5 +117,50 @@ describe('déplacer un créneau', () => {
     const reponse: any = await modifier(evenement as any)
 
     expect(reponse.data.delayMinutes).toBe(15)
+  })
+
+  /**
+   * Les bornes du retard, refusées côté SERVEUR.
+   *
+   * ⚠️ Pourquoi cela compte au-delà de la validation d'entrée : la tâche de rappel ne charge que
+   * les créneaux dont le début tombe dans sa fenêtre, élargie du plus grand retard autorisé. Un
+   * retard enregistré au-delà de cette borne sortirait donc de la fenêtre — et les bénévoles de ce
+   * créneau ne recevraient AUCUN rappel, sans que rien n'apparaisse dans les journaux. La borne
+   * n'est pas une précaution de saisie, c'est ce qui garantit qu'on relit ce qu'on a écrit.
+   *
+   * La modale porte les mêmes bornes, depuis la même constante — mais un client n'est jamais une
+   * garantie : elle se contourne, et elle peut être contournée sans intention (un ancien onglet).
+   */
+  const avecRetard = (delayMinutes: number | null) => {
+    global.readValidatedBody = vi.fn(async (_e: any, valider: any) => valider({ delayMinutes }))
+    return modifier(evenement as any)
+  }
+
+  it('refuse un retard au-delà de la borne haute', async () => {
+    await expect(avecRetard(RETARD_MINUTES_MAX + 1)).rejects.toBeTruthy()
+    expect(prismaMock.volunteerTimeSlot.update).not.toHaveBeenCalled()
+  })
+
+  it('refuse une avance au-delà de la borne basse', async () => {
+    // Les deux sens : une borne posée d'un seul côté est le défaut le plus facile à laisser passer.
+    await expect(avecRetard(RETARD_MINUTES_MIN - 1)).rejects.toBeTruthy()
+    expect(prismaMock.volunteerTimeSlot.update).not.toHaveBeenCalled()
+  })
+
+  it('accepte les bornes elles-mêmes', async () => {
+    // Bornes INCLUSES : refuser la valeur exacte que l'interface propose donnerait une erreur
+    // incompréhensible sur une saisie légitime.
+    await avecRetard(RETARD_MINUTES_MAX)
+    await avecRetard(RETARD_MINUTES_MIN)
+
+    expect(prismaMock.volunteerTimeSlot.update).toHaveBeenCalledTimes(2)
+  })
+
+  it('accepte encore de RETIRER un retard', async () => {
+    // `null` doit passer : c'est le cas le plus courant après une fausse manœuvre, et une borne
+    // écrite sans y penser le refuserait.
+    await avecRetard(null)
+
+    expect(prismaMock.volunteerTimeSlot.update).toHaveBeenCalled()
   })
 })

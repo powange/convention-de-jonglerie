@@ -315,7 +315,6 @@
     "minors_details_label": "Detalhes sobre o menor",
     "minors_details_placeholder": "Idade, nome, necessidades especiais...",
     "minors_label": "Estarei acompanhado/a por um menor",
-    "minutes": "min",
     "modification_note": "Nota de modificação (opcional)",
     "modification_note_help": "Esta nota será enviada ao voluntário para explicar as mudanças",
     "modification_note_placeholder": "Explain why you are modifying team preferences...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Só os voluntários presentes num destes períodos verão esta equipa nas suas preferências",
     "team_periods_required": "Marque pelo menos um período",
     "filter_source": "Filtrar por origem",
-    "source_all": "Todas as origens"
+    "source_all": "Todas as origens",
+    "delay_bornes": "Entre {min} e {max} minutos. Um valor negativo antecipa o turno."
   }
 }

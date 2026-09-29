@@ -59,18 +59,29 @@
         </div>
 
         <!-- Champ personnalisé -->
+        <!-- UInputNumber et non UInput type="number" : les attributs `min`/`max` d'un champ natif ne
+             sont appliqués qu'à la soumission d'un formulaire, et cette modale enregistre par un
+             bouton. Ils y auraient été décoratifs — on aurait encore pu taper 9999, et c'est le
+             serveur qui aurait refusé, après coup. UInputNumber, lui, ramène la valeur dans les
+             bornes. -->
         <UFormField :label="t('volunteers.custom_delay')" name="delayMinutes">
-          <UInput
-            v-model.number="delayMinutes"
-            type="number"
+          <UInputNumber
+            v-model="delayMinutes"
+            :min="RETARD_MINUTES_MIN"
+            :max="RETARD_MINUTES_MAX"
+            :step="5"
+            :step-snapping="false"
             :placeholder="t('volunteers.delay_placeholder')"
-            icon="i-heroicons-clock"
-          >
-            <template #trailing>
-              <span class="text-xs text-gray-500">{{ t('volunteers.minutes') }}</span>
-            </template>
-          </UInput>
+            class="w-full"
+          />
           <template #hint>
+            <span class="text-xs text-gray-500">
+              {{
+                t('volunteers.delay_bornes', { min: RETARD_MINUTES_MIN, max: RETARD_MINUTES_MAX })
+              }}
+            </span>
+          </template>
+          <template #help>
             <span class="text-xs text-gray-500">
               {{ t('volunteers.delay_hint') }}
             </span>
@@ -150,6 +161,7 @@ import type { VolunteerTimeSlot } from '#imports'
 
 import { decalageTraduisible, horairesEffectifs } from '../../../../utils/retard-creneau'
 
+import { RETARD_MINUTES_MAX, RETARD_MINUTES_MIN } from '~~/shared/utils/bornes-retard-creneau'
 import { formaterDateHeure } from '~~/shared/utils/fuseau-edition'
 
 // Props

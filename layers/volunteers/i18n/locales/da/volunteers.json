@@ -315,7 +315,6 @@
     "minors_details_label": "Detaljer om den mindreårige",
     "minors_details_placeholder": "Alder, navn, særlige behov...",
     "minors_label": "Jeg vil blive ledsaget af en mindreårig",
-    "minutes": "min",
     "modification_note": "Ændringsnote (valgfrit)",
     "modification_note_help": "Denne note vil blive sendt til den frivillige for at forklare ændringerne",
     "modification_note_placeholder": "Explain why you are modifying team preferences...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Kun frivillige, der er til stede i en af disse perioder, ser dette hold i deres præferencer",
     "team_periods_required": "Markér mindst én periode",
     "filter_source": "Filtrér efter oprindelse",
-    "source_all": "Alle oprindelser"
+    "source_all": "Alle oprindelser",
+    "delay_bornes": "Mellem {min} og {max} minutter. En negativ værdi fremrykker vagten."
   }
 }

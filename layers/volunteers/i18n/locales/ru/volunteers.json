@@ -315,7 +315,6 @@
     "minors_details_label": "Подробности о несовершеннолетнем",
     "minors_details_placeholder": "Возраст, имя, особые потребности...",
     "minors_label": "Я буду сопровождаться несовершеннолетним",
-    "minutes": "мин",
     "modification_note": "Примечание об изменении (необязательно)",
     "modification_note_help": "Это примечание будет отправлено волонтеру для объяснения изменений",
     "modification_note_placeholder": "Explain why you are modifying team preferences...",
@@ -654,6 +653,7 @@
     "team_periods_hint": "Эту команду увидят в своих предпочтениях только волонтёры, присутствующие в один из этих периодов",
     "team_periods_required": "Отметьте хотя бы один период",
     "filter_source": "Фильтр по источнику",
-    "source_all": "Все источники"
+    "source_all": "Все источники",
+    "delay_bornes": "От {min} до {max} минут. Отрицательное значение сдвигает смену на более раннее время."
   }
 }
