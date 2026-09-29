@@ -290,6 +290,13 @@ export default defineNuxtConfig({
     externals: {
       external: ['@prisma/client'],
     },
+    // `false` explicite — la valeur par défaut de Nitro 2, donc sans effet en production — pour
+    // que les DevTools v4 ne le posent pas elles-mêmes. Elles y mettent un TABLEAU (la forme de
+    // Nitro 3 : « embarquer ces chemins-là »), que Nitro 2 lit comme un simple booléen vrai : il
+    // empaquetait alors TOUTES les dépendances serveur, échouait sur un paquet optionnel de
+    // `sharp` (`@img/sharp-wasm32`, « externals are not allowed ») et le serveur de dev ne
+    // démarrait plus. Les DevTools ne touchent `noExternals` que s'il n'est pas défini.
+    noExternals: false,
     experimental: {
       tasks: true,
     },
