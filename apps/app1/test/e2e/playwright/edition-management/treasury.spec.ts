@@ -1,3 +1,5 @@
+import type { Page } from '@playwright/test'
+
 import { expect, test } from '@nuxt/test-utils/playwright'
 
 import { apiPost, loadState, updateEdition } from '../helpers'
@@ -9,6 +11,19 @@ import { apiPost, loadState, updateEdition } from '../helpers'
  * que la saisie aboutit réellement en base, que le solde retient les produits moins les charges,
  * et que l'imputation se rattache.
  */
+
+/**
+ * Les lignes affichées, charges et produits confondus.
+ *
+ * ⚠️ `<tr>` et non plus un `data-testid` : l'écran est passé d'une liste de blocs à deux `UTable`,
+ * qui ne permet pas de poser un attribut par rangée. Le repère est donc la rangée elle-même — ce
+ * qui vaut mieux, la rangée portant à la fois le libellé qu'on cherche et les boutons d'action.
+ *
+ * Les tableaux vides rendent une rangée « Aucune ligne » : elle ne porte aucun bouton et ne
+ * ressort d'aucun filtre par titre, mais elle compte. Les parcours ci-dessous comparent des
+ * écarts, jamais des valeurs absolues, ce qui la rend sans effet.
+ */
+const lignes = (page: Page) => page.locator('tbody tr')
 
 test.describe.serial("Trésorerie d'une édition", () => {
   test('active la fonctionnalité', async ({ page }) => {
@@ -39,7 +54,7 @@ test.describe.serial("Trésorerie d'une édition", () => {
     // Les lignes calculées sont toujours là, quel que soit leur montant. Leur nombre suit les
     // origines et change quand on en ajoute une — le compter en dur ferait échouer ce parcours
     // à chaque enrichissement de la trésorerie, sans qu'aucune régression n'ait eu lieu.
-    const baseLines = await page.getByTestId('treasury-line').count()
+    const baseLines = await lignes(page).count()
     expect(baseLines, 'aucune ligne calculée : la trésorerie ne charge pas').toBeGreaterThan(0)
 
     // L'édition est partagée avec les autres parcours, qui y ajoutent des artistes : son solde
@@ -49,32 +64,151 @@ test.describe.serial("Trésorerie d'une édition", () => {
     const before = await readBalance(page)
 
     await addEntry(page, { kind: 'Charge', title: 'Location salle E2E', amount: 150 })
-    await expect(page.getByTestId('treasury-line')).toHaveCount(baseLines + 1)
+    await expect(lignes(page)).toHaveCount(baseLines + 1)
 
     await addEntry(page, { kind: 'Produit', title: 'Subvention E2E', amount: 400 })
-    await expect(page.getByTestId('treasury-line')).toHaveCount(baseLines + 2)
+    await expect(lignes(page)).toHaveCount(baseLines + 2)
 
     // 400 encaissés moins 150 dépensés : le solde doit progresser de 250, et lui seul le prouve.
     await expect.poll(() => readBalance(page), { timeout: 15000 }).toBeCloseTo(before + 250, 2)
+  })
+
+  /**
+   * Les filtres, et ce qu'ils ne doivent PAS emporter avec eux.
+   *
+   * Un filtre qui se contenterait de masquer des rangées paraîtrait juste tout en mentant sur deux
+   * points : le solde de l'édition, qui ne doit pas bouger, et l'URL, sans laquelle un écran
+   * filtré ne se recopie ni ne survit à un rafraîchissement. Les deux sont vérifiés ici.
+   */
+  test('filtre par libellé sans toucher au solde de l’édition', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    await expect(lignes(page).first()).toBeVisible({ timeout: 20000 })
+
+    const toutes = await lignes(page).count()
+    const soldeAvant = await readBalance(page)
+
+    // Les mots DANS LE DÉSORDRE : c'est le propos de la recherche par mots-clés, et une recherche
+    // d'un bloc ne trouverait rien ici.
+    await page.getByLabel('Rechercher').fill('salle location')
+
+    // La ligne cherchée reste, les autres partent. Le nombre exact dépend des lignes calculées de
+    // l'édition : c'est la DIMINUTION qui prouve le filtre, pas une valeur figée.
+    await expect(lignes(page).filter({ hasText: 'Location salle E2E' })).toHaveCount(1)
+    await expect.poll(() => lignes(page).count(), { timeout: 10000 }).toBeLessThan(toutes)
+
+    // Le sous-total du filtre apparaît — et les cartes du haut ne bougent pas : elles portent le
+    // solde de l'ÉDITION, pas celui de l'affichage.
+    await expect(page.getByTestId('treasury-filtered-subtotal')).toBeVisible()
+    expect(await readBalance(page)).toBeCloseTo(soldeAvant, 2)
+
+    // Porté par l'URL : sans cela, un écran filtré ne se partage pas et un rafraîchissement le perd.
+    await expect.poll(() => new URL(page.url()).searchParams.get('q')).toBe('salle location')
+
+    await page.getByRole('button', { name: 'Effacer les filtres' }).click()
+    await expect(page.getByTestId('treasury-filtered-subtotal')).toHaveCount(0)
+    await expect.poll(() => lignes(page).count(), { timeout: 10000 }).toBe(toutes)
+  })
+
+  /**
+   * Le clic droit ouvre les actions, NOMMÉES.
+   *
+   * La dernière colonne les réduit à des icônes : un crayon et une corbeille ne se distinguent
+   * qu'au survol, ce qu'un écran tactile n'offre pas. Ce parcours vérifie que le second chemin
+   * existe et qu'il nomme ce qu'il propose.
+   */
+  test('propose les actions au clic droit', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    const ligne = lignes(page).filter({ hasText: 'Location salle E2E' })
+    await expect(ligne).toHaveCount(1, { timeout: 20000 })
+
+    await ligne.click({ button: 'right' })
+
+    await expect(page.getByRole('menuitem', { name: 'Modifier' })).toBeVisible()
+    await expect(page.getByRole('menuitem', { name: 'Supprimer' })).toBeVisible()
+
+    // Refermé sans rien choisir : ce parcours ne doit pas modifier les données qu'il observe.
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('menuitem', { name: 'Supprimer' })).toHaveCount(0)
+  })
+
+  /**
+   * Sur téléphone, les filtres passent dans une modale.
+   *
+   * Quatre contrôles côte à côte y sont illisibles, et empilés ils repousseraient le tableau hors
+   * de l'écran. Le nombre affiché sur le bouton dit qu'un filtre est posé sans avoir à ouvrir.
+   */
+  test('replie les filtres derrière un bouton sur téléphone', async ({ page, goto }) => {
+    const { editionId } = loadState()
+    await page.setViewportSize({ width: 390, height: 844 })
+
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    await expect(page.getByTestId('treasury-filters')).toBeVisible({ timeout: 20000 })
+
+    // La barre de grand écran reste dans le DOM, masquée en CSS : aucun de ses champs n'est
+    // visible. C'est la modale, et elle seule, qui les montre ensuite — d'où le repère restreint
+    // au dialogue, sans quoi les deux copies du champ se confondent.
+    await expect(page.getByLabel('Rechercher')).toBeHidden()
+
+    await page.getByRole('button', { name: 'Filtres' }).click()
+    const champ = page.getByRole('dialog').getByLabel('Rechercher')
+    await expect(champ).toBeVisible()
+
+    await champ.fill('Location salle E2E')
+    await expect.poll(() => new URL(page.url()).searchParams.get('q')).toBe('Location salle E2E')
+
+    await page.keyboard.press('Escape')
+    await expect(lignes(page).filter({ hasText: 'Location salle E2E' })).toHaveCount(1)
+  })
+
+  /**
+   * Le choix des colonnes, et le fait qu'il vaille pour les DEUX tableaux.
+   *
+   * Charges et produits sont rendus séparément : sans visibilité partagée, masquer une colonne
+   * d'un côté laisserait l'autre inchangé, et l'écran montrerait deux tableaux différents pour
+   * une même trésorerie.
+   */
+  test('masque une colonne des deux tableaux à la fois', async ({ page, goto }) => {
+    const { editionId } = loadState()
+
+    await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
+    await expect(lignes(page).first()).toBeVisible({ timeout: 20000 })
+
+    const enTetes = page.getByRole('columnheader', { name: 'Description' })
+    const avant = await enTetes.count()
+    expect(avant, 'les deux tableaux portent la colonne Description').toBe(2)
+
+    await page.getByRole('button', { name: 'Colonnes' }).first().click()
+    await page.getByRole('menuitemcheckbox', { name: 'Description' }).click()
+
+    await expect(enTetes).toHaveCount(0)
+
+    // Porté par l'URL, comme les filtres : le réglage survit à un rafraîchissement.
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('colonnes'))
+      .toContain('description')
   })
 
   test('retire les lignes saisies', async ({ page, goto }) => {
     const { editionId } = loadState()
 
     await goto(`/editions/${editionId}/gestion/treasury`, { waitUntil: 'hydration' })
-    await expect(page.getByTestId('treasury-line').first()).toBeVisible({ timeout: 20000 })
+    await expect(lignes(page).first()).toBeVisible({ timeout: 20000 })
 
-    const before = await page.getByTestId('treasury-line').count()
+    const before = await lignes(page).count()
 
     // Les lignes calculées n'ont pas de bouton de suppression : seules les saisies en portent un.
     for (const title of ['Location salle E2E', 'Subvention E2E']) {
-      const row = page.getByTestId('treasury-line').filter({ hasText: title })
+      const row = lignes(page).filter({ hasText: title })
       await row.getByRole('button').last().click()
       await expect(row).toHaveCount(0, { timeout: 15000 })
     }
 
     // Les deux saisies partent, les lignes calculées restent.
-    await expect(page.getByTestId('treasury-line')).toHaveCount(before - 2)
+    await expect(lignes(page)).toHaveCount(before - 2)
   })
 })
 
