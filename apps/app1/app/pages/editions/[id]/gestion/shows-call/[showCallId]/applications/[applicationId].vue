@@ -866,7 +866,30 @@ const videoEmbed = computed<{ src: string; allow: string } | null>(() => {
 type ArtistShowIndex = Map<string, { showIds: Set<number> }>
 const editionArtistsIndex = ref<ArtistShowIndex>(new Map())
 
+/*
+ * Seuls les artistes dont l'adresse est citée par la candidature.
+ *
+ * On chargeait ici TOUS les artistes de l'édition — avec leurs comptes, leurs responsables de
+ * transport, leurs représentations, leurs articles à remettre et leurs repas — pour n'en garder
+ * qu'une correspondance adresse → identifiants de spectacles. Le paramètre `emails=` demande
+ * exactement cela, et rien de plus.
+ *
+ * Sans co-équipier cité, il n'y a personne à chercher : on n'appelle pas le serveur du tout.
+ */
 const fetchEditionArtistEmails = async () => {
+  const adresses = [
+    ...new Set(
+      (application.value?.additionalPerformers || [])
+        .map((p) => p.email?.trim().toLowerCase())
+        .filter((email): email is string => !!email)
+    ),
+  ]
+
+  if (adresses.length === 0) {
+    editionArtistsIndex.value = new Map()
+    return
+  }
+
   try {
     const response = await $fetch<{
       data: {
@@ -875,7 +898,7 @@ const fetchEditionArtistEmails = async () => {
           shows?: { show: { id: number } }[]
         }[]
       }
-    }>(`/api/editions/${editionId}/artists`)
+    }>(`/api/editions/${editionId}/artists`, { params: { emails: adresses.join(',') } })
     const artists = response.data?.artists || []
     const next: ArtistShowIndex = new Map()
     for (const a of artists) {
@@ -1042,15 +1065,22 @@ const fetchShowCall = async () => {
   }
 }
 
-// Charger la liste des IDs (pour navigation prev/next)
+/*
+ * Les identifiants seuls, pour « précédent » et « suivant ».
+ *
+ * ⚠️ On demandait ici la liste paginée avec `limit: 1000`, or le serveur borne à 100 : la demande
+ * était silencieusement ramenée, et au-delà de cent candidatures les flèches sautaient tout le
+ * reste sans que rien ne le signale. Elle chargeait au passage, pour chacune de ces cent lignes, le
+ * candidat, le décideur et le spectacle lié — pour n'en garder que l'`id`.
+ *
+ * Le point d'API dédié ne rend que les entiers, dans le même ordre, et sans pagination.
+ */
 const fetchApplicationIds = async () => {
   try {
-    // On charge sans pagination pour avoir l'ordre complet (limit assez large)
-    const response = await $fetch<{ applications: { id: number }[] }>(
-      `/api/editions/${editionId}/shows-call/${showCallId}/applications`,
-      { params: { page: 1, limit: 1000 } }
+    const response = await $fetch<{ data: { ids: number[] } }>(
+      `/api/editions/${editionId}/shows-call/${showCallId}/applications/ids`
     )
-    applicationIds.value = (response.applications || []).map((a) => a.id)
+    applicationIds.value = response.data?.ids || []
   } catch (error) {
     console.error('Error fetching application list:', error)
   }
@@ -1070,6 +1100,16 @@ const fetchApplication = async (id: number) => {
     initialDescription.value = details.showDescription || ''
     editingDescription.value = false
     linkedShowId.value = details.showId ?? null
+
+    /*
+     * L'index des artistes déjà importés dépend désormais des adresses de CETTE candidature : il se
+     * charge donc après elle, et se recharge à chaque navigation « précédent »/« suivant ».
+     *
+     * Avant, la requête ramenait tous les artistes de l'édition — indépendante de la candidature,
+     * elle pouvait partir en parallèle. La lancer encore en parallèle la ferait maintenant partir
+     * sans adresse, et les badges « Déjà importé » ne s'afficheraient jamais.
+     */
+    await fetchEditionArtistEmails()
   } catch (error: any) {
     console.error('Error fetching application:', error)
     application.value = null
@@ -1214,7 +1254,6 @@ onMounted(async () => {
     fetchApplication(applicationId.value),
     fetchApplicationIds(),
     fetchEditionShows(),
-    fetchEditionArtistEmails(),
   ])
 })
 

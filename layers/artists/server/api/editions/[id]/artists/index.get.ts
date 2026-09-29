@@ -6,6 +6,33 @@ import { canManageArtistsById } from '#server/utils/permissions/edition-permissi
 import { sanitizeEmail, validateEditionId } from '#server/utils/validation-helpers'
 import { fromCents } from '~~/shared/utils/money'
 
+/** Au-delà, la liste complète redevient plus économique qu'une requête `IN` géante. */
+const MAX_ADRESSES = 50
+
+/**
+ * Les adresses demandées par `emails=`, ou `null` si le paramètre est absent.
+ *
+ * `null` et non un tableau vide : l'absence de paramètre doit rendre la réponse COMPLÈTE, alors
+ * qu'un `emails=` vide ne demande personne. Les confondre ferait basculer tous les appels
+ * existants — la page de gestion des artistes comprise — en mode allégé, et ses colonnes se
+ * videraient sans qu'aucune erreur ne le dise.
+ */
+const adressesDemandees = (brut: unknown): string[] | null => {
+  if (typeof brut !== 'string') return null
+  /*
+   * `sanitizeEmail` plutôt qu'un `toLowerCase` en ligne : c'est le helper du dépôt pour cela, et la
+   * comparaison qui suit s'appuie — comme la connexion, qui interroge `email` sans normaliser — sur
+   * la collation insensible à la casse de MySQL. Normaliser ici rend la requête juste quelle que
+   * soit la casse reçue, sans dépendre de ce que le client a envoyé.
+   */
+  const adresses = brut
+    .split(',')
+    .map((adresse) => sanitizeEmail(adresse))
+    .filter((adresse) => adresse.length > 0)
+  // Dédoublonnées : la même personne peut être citée deux fois dans une candidature.
+  return [...new Set(adresses)].slice(0, MAX_ADRESSES)
+}
+
 export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
@@ -17,6 +44,36 @@ export default wrapApiHandler(
         status: 403,
         message: 'Droits insuffisants pour accéder à ces données',
       })
+    }
+
+    /*
+     * Mode ALLÉGÉ, quand `emails=` est fourni.
+     *
+     * La fiche d'une candidature ne cherche qu'une chose : parmi les personnes citées comme
+     * co-équipiers, lesquelles sont déjà artistes de l'édition, et sur quels spectacles. Elle
+     * chargeait pour cela TOUS les artistes avec leurs comptes, leurs responsables de transport,
+     * leurs représentations, leurs articles à remettre et leurs repas — pour n'en garder qu'une
+     * correspondance adresse → identifiants de spectacles.
+     *
+     * Le paramètre est OPTIONNEL : sans lui, la réponse est exactement celle d'avant, que la page de
+     * gestion des artistes consomme en entier. Un plafond de 50 adresses borne la requête ; au-delà,
+     * c'est la liste complète qui redevient le bon outil.
+     */
+    const emailsDemandes = adressesDemandees(getQuery(event).emails)
+
+    if (emailsDemandes) {
+      const artistesCibles = await prisma.editionArtist.findMany({
+        where: { editionId, user: { email: { in: emailsDemandes } } },
+        select: {
+          id: true,
+          user: { select: { email: true } },
+          // `distinct` comme dans la requête complète : un artiste jouant plusieurs numéros d'un
+          // cabaret porte autant de liens vers le même spectacle.
+          shows: { distinct: ['showId'], select: { show: { select: { id: true } } } },
+        },
+      })
+
+      return createSuccessResponse({ artists: artistesCibles })
     }
 
     const artists = await prisma.editionArtist.findMany({
