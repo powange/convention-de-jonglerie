@@ -42,11 +42,14 @@ mockNuxtImport('useRoute', () => () => routeCourante.valeur)
 let monte: Awaited<ReturnType<typeof mountSuspended>> | null = null
 let replace: ReturnType<typeof vi.fn>
 
-const monter = async (route: { path?: string; query?: Record<string, unknown> } = {}) => {
+const monter = async (
+  route: { path?: string; query?: Record<string, unknown> } = {},
+  props: Record<string, unknown> = {}
+) => {
   // `reactive` : un test change de page en cours de route (`routeCourante.valeur.path = …`) pour
   // vérifier que la loupe se replie. Sur un objet ordinaire, le `computed` ne le verrait pas.
   routeCourante.valeur = reactive({ path: route.path ?? '/', query: route.query ?? {} })
-  monte = await mountSuspended(HomeSearch)
+  monte = await mountSuspended(HomeSearch, { props })
   replace = vi
     .spyOn(
       (monte.vm as unknown as { $router: { replace: () => Promise<void> } }).$router,
@@ -213,5 +216,69 @@ describe("Recherche d'édition dans l'en-tête", () => {
 
     expect(wrapper.find('input').exists()).toBe(false)
     expect(replace).toHaveBeenLastCalledWith({ query: {} })
+  })
+})
+
+/**
+ * La variante du CENTRE, sur grand écran : le champ est là en permanence.
+ *
+ * Elle existe parce qu'une loupe seule ne dit pas ce qu'elle cherche. Ce qui change par rapport à
+ * la loupe du mobile tient en trois points, et chacun se casserait sans bruit :
+ *
+ * 1. le champ s'affiche **sans qu'on ait cliqué** — c'est tout son propos ;
+ * 2. il **reprend ce que l'URL porte déjà**, sans quoi il paraîtrait vide au-dessus de résultats
+ *    filtrés, et l'on chercherait la cause du filtre ailleurs ;
+ * 3. la croix **efface le filtre** au lieu de replier un champ qui ne se replie pas.
+ *
+ * Le contrat de la query, lui, est le même : il est déjà couvert plus haut, et ces tests ne le
+ * redoublent pas — ils vérifient que cette variante l'emprunte bien.
+ */
+describe('Recherche du centre, sur grand écran', () => {
+  const centre = { variante: 'centre' }
+
+  it('affiche son champ sans qu’on ait cliqué', async () => {
+    const wrapper = await monter({}, centre)
+
+    expect(wrapper.find('input').exists()).toBe(true)
+    // Aucune croix tant que rien n'est tapé : un champ vide n'a rien à effacer.
+    expect(wrapper.findAll('button')).toHaveLength(0)
+  })
+
+  it('reprend le nom que l’URL porte déjà', async () => {
+    // Le cas d'une adresse partagée ou d'un retour arrière du navigateur.
+    const wrapper = await monter({ query: { name: 'balles perdues' } }, centre)
+
+    expect(wrapper.find('input').element.value).toBe('balles perdues')
+  })
+
+  it('écrase les autres filtres, comme la loupe', async () => {
+    const wrapper = await monter({ query: { countries: '["FR"]' } }, centre)
+
+    await wrapper.find('input').setValue('rennes')
+    await nextTick()
+
+    expect(replace).toHaveBeenCalledWith({
+      query: { name: 'rennes', showPast: 'true', sort: 'recent' },
+    })
+  })
+
+  it('la croix efface le filtre plutôt que de replier le champ', async () => {
+    const wrapper = await monter({ query: { name: 'rennes' } }, centre)
+
+    // La croix n'apparaît que parce que le champ porte déjà un nom.
+    const croix = wrapper.findAll('button')
+    expect(croix).toHaveLength(1)
+    await croix[0]!.trigger('click')
+    await nextTick()
+
+    // Le champ reste à l'écran : c'est la différence avec la loupe du mobile.
+    expect(wrapper.find('input').exists()).toBe(true)
+    expect(replace).toHaveBeenLastCalledWith({ query: {} })
+  })
+
+  it('ne s’affiche pas ailleurs que sur l’accueil', async () => {
+    const wrapper = await monter({ path: '/editions/12' }, centre)
+
+    expect(wrapper.find('input').exists()).toBe(false)
   })
 })

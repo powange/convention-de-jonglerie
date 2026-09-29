@@ -3,15 +3,55 @@
     La loupe ne s'affiche que sur l'accueil : ce qu'elle recharge, c'est la liste de cette page.
     Ailleurs, elle n'aurait rien à filtrer.
   -->
-  <div v-if="surAccueil" :class="ouvert ? 'w-full' : ''">
+  <div
+    v-if="surAccueil"
+    :class="[variante === 'centre' ? 'w-full max-w-md' : '', ouvert ? 'w-full' : '']"
+  >
+    <!--
+      Sur grand écran, le champ est là en permanence, au centre de l'en-tête.
+
+      Une loupe seule ne dit pas ce qu'elle cherche : sur un site qui liste des conventions, elle
+      pourrait aussi bien filtrer la page ouverte, chercher une personne ou ouvrir une carte. Le
+      champ, lui, porte son intention dans son texte d'invite — et se remplit sans qu'on ait à
+      deviner qu'un clic l'ouvre.
+
+      Arrondi et non rectangulaire : il se distingue ainsi des champs du panneau de filtres, dont
+      il ne partage justement pas la logique — celui-ci ÉCRASE les autres filtres.
+    -->
     <UInput
-      v-if="ouvert"
+      v-if="variante === 'centre'"
+      :model-value="terme"
+      icon="i-heroicons-magnifying-glass"
+      :placeholder="$t('homepage.search_editions')"
+      size="lg"
+      class="w-full"
+      :ui="{ base: 'rounded-full' }"
+      @update:model-value="rechercher"
+      @keydown.escape="effacer"
+    >
+      <!-- La croix n'apparaît qu'une fois quelque chose tapé : un champ vide n'a rien à effacer,
+           et une croix inerte se lit comme une panne. -->
+      <template v-if="terme" #trailing>
+        <UButton
+          icon="i-heroicons-x-mark"
+          size="xs"
+          color="neutral"
+          variant="ghost"
+          :aria-label="$t('common.clear')"
+          @click="effacer"
+        />
+      </template>
+    </UInput>
+
+    <UInput
+      v-else-if="ouvert"
       :model-value="terme"
       autofocus
       icon="i-heroicons-magnifying-glass"
       :placeholder="$t('homepage.search_placeholder')"
-      size="sm"
+      size="lg"
       class="w-full"
+      :ui="{ base: 'rounded-full' }"
       @update:model-value="rechercher"
       @keydown.escape="fermer"
     >
@@ -85,6 +125,21 @@
  * remonte donc par `v-model:open`, et c'est `AppHeader` qui efface ses propres enfants.
  */
 
+const props = withDefaults(
+  defineProps<{
+    /**
+     * `compact` : la loupe qui se déploie, pour l'en-tête étroit du mobile.
+     * `centre` : le champ posé en permanence au centre de l'en-tête, sur grand écran.
+     *
+     * Deux rendus d'un même composant plutôt que deux composants : la règle qui fait tout
+     * l'intérêt de cette recherche — écraser les autres filtres et rouvrir les trois périodes —
+     * vit ici, et deux copies finiraient par diverger sur ce point précis.
+     */
+    variante?: 'compact' | 'centre'
+  }>(),
+  { variante: 'compact' }
+)
+
 /** Le champ est-il déployé ? Piloté par `AppHeader`, qui masque le reste de l'en-tête pendant ce temps. */
 const ouvert = defineModel<boolean>('open', { default: false })
 
@@ -155,6 +210,35 @@ const fermer = () => {
   // sur mobile, où le panneau de filtres vit dans une modale, la cause serait introuvable.
   if (aFiltre) appliquer('')
 }
+
+/**
+ * Vide le champ du centre et rend à l'accueil ses filtres par défaut.
+ *
+ * Il n'y a rien à replier ici — le champ reste à l'écran. Ne pas défaire le filtre laisserait une
+ * liste amputée sous un champ vide, c'est-à-dire sans cause visible.
+ */
+const effacer = () => {
+  terme.value = ''
+  aEcraseLesFiltres.value = false
+  appliquer('')
+}
+
+/*
+ * Le champ du centre montre ce que la liste applique.
+ *
+ * Il est là en permanence, y compris quand la recherche vient d'ailleurs : une adresse partagée,
+ * un retour arrière du navigateur. Paraître vide au-dessus de résultats filtrés ferait chercher
+ * la cause du filtre là où elle n'est pas.
+ */
+watch(
+  () => route.query.name,
+  (nom) => {
+    if (props.variante !== 'centre') return
+    const valeur = typeof nom === 'string' ? nom : ''
+    if (valeur !== terme.value) terme.value = valeur
+  },
+  { immediate: true }
+)
 
 // Quitter l'accueil replie la loupe. Sans cela, le composant cesse de s'afficher alors que son
 // modèle reste à « ouvert » : `AppHeader` continuerait de masquer logo, langue et compte sur toutes

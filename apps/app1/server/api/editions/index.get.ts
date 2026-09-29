@@ -3,6 +3,7 @@ import type { GetEditionsResponse } from '#server/types/api-responses'
 import { wrapApiHandler, createPaginatedResponse } from '#server/utils/api-helpers'
 import { getCountryVariants } from '#server/utils/countries'
 import { editionListSelect } from '#server/utils/prisma-select-helpers'
+import { conditionsMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
 import { filtreStatutEdition, type StatutEdition } from '~~/shared/utils/visibilite-edition'
 
 export default wrapApiHandler<GetEditionsResponse>(
@@ -93,10 +94,22 @@ export default wrapApiHandler<GetEditionsResponse>(
     // paramètre `includeOffline` le permettait, sans le moindre contrôle.
     where.status = filtreStatutEdition()
 
-    if (name) {
-      where.name = {
-        contains: name as string,
-      }
+    /*
+     * La recherche par nom est une recherche par MOTS-CLÉS.
+     *
+     * « balles 2026 » doit trouver « Festival des Balles Perdues 2026 », et « perdues balles »
+     * aussi : on tape ce dont on se souvient, pas ce qui est écrit. Un `contains` d'un bloc
+     * exigeait l'ordre exact et ne rendait rien dès qu'un mot manquait au milieu.
+     *
+     * Les deux champs, et non le seul nom de l'édition : une convention s'appelle souvent
+     * autrement que ses éditions, et c'est son nom qu'on retient d'une année sur l'autre.
+     *
+     * `AND` plutôt que des clés posées sur `where` : chaque mot devient sa propre condition, et
+     * les empiler sur la même clé les ferait s'écraser l'une l'autre.
+     */
+    const motsCles = motsClesDeLaRequete(typeof name === 'string' ? name : null)
+    if (motsCles.length > 0) {
+      where.AND = conditionsMotsCles(motsCles, ['name', 'convention.name'])
     }
 
     if (startDate) {
