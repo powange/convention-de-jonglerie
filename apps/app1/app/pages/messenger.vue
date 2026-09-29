@@ -1,5 +1,15 @@
 <template>
-  <div class="h-[calc(100vh-100px)] flex flex-col p-4">
+  <!--
+    Sur mobile, ni marge autour de la page ni carte autour des colonnes : la liste et la
+    conversation occupent toute la largeur, qui y est précieuse. Les cartes et leurs marges ne
+    reviennent qu'à partir de `lg`, où les deux colonnes s'affichent côte à côte.
+
+    La hauteur retire celle de l'en-tête telle qu'il la déclare (`--ui-header-height`, qui varie
+    selon la largeur) : les 100 px codés en dur n'étaient justes que sur grand écran, et laissaient
+    une bande vide sous la conversation sur mobile. `dvh` plutôt que `vh` : sur mobile, `100vh`
+    compte la barre d'adresse du navigateur même quand elle est affichée.
+  -->
+  <div class="h-[calc(100dvh-var(--ui-header-height))] flex flex-col lg:p-4">
     <!-- Layout principal : 2 colonnes -->
     <div class="grid grid-cols-12 gap-4 flex-1 overflow-hidden">
       <!-- Colonne 1 : Conversations groupées par édition -->
@@ -7,12 +17,21 @@
         class="col-span-12 lg:col-span-5 xl:col-span-4 flex flex-col overflow-hidden"
         :class="{ hidden: showConversationOnMobile, 'lg:flex': showConversationOnMobile }"
       >
-        <UCard class="h-full flex flex-col overflow-hidden">
+        <UCard
+          class="h-full flex flex-col overflow-hidden"
+          :ui="{
+            root: 'rounded-none ring-0 lg:rounded-lg lg:ring',
+            // Le corps prend la hauteur restante sous l'en-tête, sans la dépasser (`min-h-0`) :
+            // sans cela, il grandissait avec la liste, la carte coupait le surplus, et la zone
+            // `overflow-y-auto` ci-dessous n'avait jamais rien à faire défiler.
+            body: 'flex-1 min-h-0 flex flex-col',
+          }"
+        >
           <template #header>
             <h3 class="font-semibold">{{ $t('messenger.conversations') }}</h3>
           </template>
 
-          <div class="flex-1 overflow-y-auto">
+          <div class="flex-1 min-h-0 overflow-y-auto">
             <div v-if="loading" class="text-center py-8">
               <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
               <p class="text-sm text-gray-500 mt-2">{{ $t('messenger.loading') }}</p>
@@ -195,7 +214,10 @@
         <UCard
           variant="soft"
           class="h-full flex flex-col overflow-hidden"
-          :ui="{ body: 'p-0 flex flex-col flex-1 overflow-hidden' }"
+          :ui="{
+            root: 'rounded-none bg-transparent lg:rounded-lg lg:bg-elevated/50',
+            body: 'p-0 flex flex-col flex-1 overflow-hidden',
+          }"
         >
           <template #header>
             <div v-if="selectedConversation" class="flex items-center justify-between gap-3">
