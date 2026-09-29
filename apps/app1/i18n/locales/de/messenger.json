@@ -47,6 +47,15 @@
     "edit_expired": "Eine Nachricht kann {minutes} Minuten nach dem Senden nicht mehr bearbeitet werden",
     "editing": "Nachricht bearbeiten",
     "resume_today": "Heute, {time}",
-    "resume_yesterday": "Gestern, {time}"
+    "resume_yesterday": "Gestern, {time}",
+    "destination": {
+      "artist_application": "Bewerbung ansehen",
+      "artist_space": "Mein Künstlerbereich",
+      "edition_management": "Verwaltung der Ausgabe",
+      "show_call": "Aufruf für Shows",
+      "shows": "Shows",
+      "volunteer_applications": "Helferbewerbungen",
+      "volunteering": "Mein Ehrenamt"
+    }
   }
 }

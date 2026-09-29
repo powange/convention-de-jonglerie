@@ -47,6 +47,15 @@
     "edit_expired": "Zprávu už nelze upravit {minutes} minut po odeslání",
     "editing": "Úprava zprávy",
     "resume_today": "Dnes, {time}",
-    "resume_yesterday": "Včera, {time}"
+    "resume_yesterday": "Včera, {time}",
+    "destination": {
+      "artist_application": "Zobrazit přihlášku",
+      "artist_space": "Můj umělecký prostor",
+      "edition_management": "Správa ročníku",
+      "show_call": "Výzva k vystoupením",
+      "shows": "Vystoupení",
+      "volunteer_applications": "Přihlášky dobrovolníků",
+      "volunteering": "Moje dobrovolnictví"
+    }
   }
 }

@@ -47,6 +47,15 @@
     "edit_expired": "A message can no longer be edited {minutes} minutes after it was sent",
     "editing": "Editing message",
     "resume_today": "Today, {time}",
-    "resume_yesterday": "Yesterday, {time}"
+    "resume_yesterday": "Yesterday, {time}",
+    "destination": {
+      "artist_application": "View application",
+      "artist_space": "My artist space",
+      "edition_management": "Edition management",
+      "show_call": "Show call",
+      "shows": "Shows",
+      "volunteer_applications": "Volunteer applications",
+      "volunteering": "My volunteering"
+    }
   }
 }

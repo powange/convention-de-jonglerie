@@ -47,6 +47,15 @@
     "edit_expired": "Uma mensagem já não pode ser editada {minutes} minutos após o envio",
     "editing": "A editar a mensagem",
     "resume_today": "Hoje, {time}",
-    "resume_yesterday": "Ontem, {time}"
+    "resume_yesterday": "Ontem, {time}",
+    "destination": {
+      "artist_application": "Ver a candidatura",
+      "artist_space": "O meu espaço de artista",
+      "edition_management": "Gestão da edição",
+      "show_call": "Convocatória de espetáculos",
+      "shows": "Espetáculos",
+      "volunteer_applications": "Candidaturas de voluntários",
+      "volunteering": "O meu voluntariado"
+    }
   }
 }

@@ -47,6 +47,15 @@
     "edit_expired": "Een bericht kan {minutes} minuten na verzending niet meer worden bewerkt",
     "editing": "Bericht bewerken",
     "resume_today": "Vandaag, {time}",
-    "resume_yesterday": "Gisteren, {time}"
+    "resume_yesterday": "Gisteren, {time}",
+    "destination": {
+      "artist_application": "Aanmelding bekijken",
+      "artist_space": "Mijn artiestenruimte",
+      "edition_management": "Beheer van de editie",
+      "show_call": "Oproep voor shows",
+      "shows": "Shows",
+      "volunteer_applications": "Vrijwilligersaanmeldingen",
+      "volunteering": "Mijn vrijwilligerswerk"
+    }
   }
 }

@@ -47,6 +47,15 @@
     "edit_expired": "Un messaggio non può più essere modificato {minutes} minuti dopo l'invio",
     "editing": "Modifica del messaggio",
     "resume_today": "Oggi, {time}",
-    "resume_yesterday": "Ieri, {time}"
+    "resume_yesterday": "Ieri, {time}",
+    "destination": {
+      "artist_application": "Vedi la candidatura",
+      "artist_space": "Il mio spazio artista",
+      "edition_management": "Gestione dell'edizione",
+      "show_call": "Bando spettacoli",
+      "shows": "Spettacoli",
+      "volunteer_applications": "Candidature volontari",
+      "volunteering": "Il mio volontariato"
+    }
   }
 }
