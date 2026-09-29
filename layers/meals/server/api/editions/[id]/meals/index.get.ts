@@ -16,8 +16,16 @@ export default wrapApiHandler(
       })
     }
 
+    /*
+     * Seuls les repas ACTIVÉS : le seul consommateur est l'écran de validation au comptoir, et un
+     * repas décoché est un repas que la cuisine ne prépare pas. Il n'a donc rien à faire dans les
+     * flèches jour/type, qui le désignaient jusqu'ici comme n'importe quel autre.
+     *
+     * La page de CONFIGURATION, elle, doit continuer à voir les repas désactivés pour pouvoir les
+     * réactiver — mais elle ne passe pas par ici : elle lit /api/editions/:id/volunteers/meals.
+     */
     const meals = await prisma.volunteerMeal.findMany({
-      where: { editionId },
+      where: { editionId, enabled: true },
       orderBy: [{ date: 'asc' }, { mealType: 'asc' }],
     })
 

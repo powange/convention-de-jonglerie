@@ -61,7 +61,10 @@ const selection = (afterShow: boolean, consumedAt: Date | null) => ({
 describe('statistiques d’un repas : assiettes mises de côté', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 7, editionId: 21 })
+    // `enabled` fait partie de ce que la garde du comptoir relit (assurerRepasServiAuComptoir) :
+    // une fixture qui l'omet rend `undefined`, que la garde lit comme « désactivé » — et les cas
+    // ci-dessous échoueraient sur un 400 sans rapport avec ce qu'ils éprouvent.
+    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 7, editionId: 21, enabled: true })
     prismaMock.volunteerMealSelection.count.mockResolvedValue(0)
     prismaMock.editionOrganizer.count.mockResolvedValue(0)
     prismaMock.organizerMealSelection.count.mockResolvedValue(0)

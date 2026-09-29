@@ -48,7 +48,10 @@ describe('POST /api/editions/[id]/meals/[mealId]/validate — type organizer', (
     ;(globalThis as any).readBody = vi.fn().mockResolvedValue({ type: 'organizer', id: 5 })
 
     prismaMock.volunteerMeal.findFirst.mockReset()
-    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 3, editionId: 17 })
+    // `enabled` fait partie de ce que la garde du comptoir relit (assurerRepasServiAuComptoir) :
+    // une fixture qui l'omet rend `undefined`, que la garde lit comme « désactivé » — et les cas
+    // ci-dessous échoueraient sur un 400 sans rapport avec ce qu'ils éprouvent.
+    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 3, editionId: 17, enabled: true })
     prismaMock.editionOrganizer.findFirst.mockReset()
     prismaMock.editionOrganizer.findFirst.mockResolvedValue({ id: 5 })
 
@@ -131,7 +134,9 @@ describe('POST /api/editions/[id]/meals/[mealId]/cancel — type organizer', () 
     ;(globalThis as any).readBody = vi.fn().mockResolvedValue({ type: 'organizer', id: 5 })
 
     prismaMock.volunteerMeal.findFirst.mockReset()
-    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 3, editionId: 17 })
+    // L'annulation ne relit délibérément pas `enabled` (cf. cancel.post.ts) : elle ne demande
+    // plus que l'id, et la fixture s'aligne sur ce que la requête rend.
+    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 3 })
     prismaMock.organizerMealSelection.updateMany.mockReset()
   })
 

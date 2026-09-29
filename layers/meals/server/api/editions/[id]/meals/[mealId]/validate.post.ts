@@ -4,6 +4,7 @@ import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageMealsOrValidation } from '#server/utils/permissions/edition-permissions'
+import { assurerRepasServiAuComptoir } from '#server/utils/repas-du-comptoir'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 import { donneDroitAuRepas } from '~~/shared/utils/droit-au-repas'
 
@@ -31,21 +32,9 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = validateMealSchema.parse(body)
 
-    // Vérifier que le repas existe et appartient à cette édition (l'accès billetterie est vérifié
+    // Le repas existe, appartient à cette édition et est ACTIVÉ (l'accès billetterie est vérifié
     // par le port ticketing).
-    const meal = await prisma.volunteerMeal.findFirst({
-      where: {
-        id: mealId,
-        editionId,
-      },
-    })
-
-    if (!meal) {
-      throw createError({
-        status: 404,
-        message: 'Repas non trouvé',
-      })
-    }
+    await assurerRepasServiAuComptoir(mealId, editionId)
 
     const now = new Date()
 

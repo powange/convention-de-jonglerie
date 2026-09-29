@@ -55,7 +55,10 @@ describe('recherche de repas : qui y a droit', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.getQuery = vi.fn(() => ({ q: 'juliette' }))
-    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 7, editionId: 21 })
+    // `enabled` fait partie de ce que la garde du comptoir relit (assurerRepasServiAuComptoir) :
+    // une fixture qui l'omet rend `undefined`, que la garde lit comme « désactivé » — et les cas
+    // ci-dessous échoueraient sur un 400 sans rapport avec ce qu'ils éprouvent.
+    prismaMock.volunteerMeal.findFirst.mockResolvedValue({ id: 7, editionId: 21, enabled: true })
     prismaMock.volunteerMealSelection.findMany.mockResolvedValue([])
     prismaMock.editionOrganizer.findMany.mockResolvedValue([])
   })

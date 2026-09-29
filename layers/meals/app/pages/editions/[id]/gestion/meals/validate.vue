@@ -31,6 +31,7 @@
         <UCard>
           <!-- Étape 1: Sélection du repas -->
           <div
+            v-if="!aucunRepasActif"
             class="mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 sm:p-6 rounded-lg border-2 border-gray-200 dark:border-gray-700"
           >
             <label
@@ -84,6 +85,26 @@
               </UButton>
             </UFieldGroup>
           </div>
+
+          <!-- Depuis que les repas désactivés ne sont plus proposés, le comptoir peut n'avoir
+               RIEN à servir. Sans cet encart, l'écran se réduisait à « Choisissez un repas » au
+               dessus de deux flèches grisées, sans jamais dire où aller le réactiver. -->
+          <UAlert
+            v-else
+            icon="i-heroicons-information-circle"
+            color="neutral"
+            variant="soft"
+            :title="$t('gestion.meals.no_enabled_meal')"
+            :description="$t('gestion.meals.no_enabled_meal_description')"
+            :actions="[
+              {
+                label: $t('gestion.meals.configuration_title'),
+                color: 'neutral',
+                variant: 'outline',
+                to: `/editions/${edition.id}/gestion/meals`,
+              },
+            ]"
+          />
 
           <!-- Statistiques du repas sélectionné -->
           <div v-if="selectedMeal && mealStats" class="mb-6">
@@ -545,6 +566,12 @@ const edition = computed(() => editionStore.getEditionById(editionId))
 
 // État
 const meals = ref<any[]>([])
+/*
+ * Le chargement a-t-il eu lieu ? Sans ce drapeau, l'encart « aucun repas activé » apparaîtrait le
+ * temps d'un battement avant la réponse, `meals` partant vide et `loadingMeals` n'étant vrai que
+ * pendant l'appel. Une alarme qui clignote à chaque ouverture ne s'appelle plus une alarme.
+ */
+const repasCharges = ref(false)
 // Le repas regardé est conservé dans l'URL — cf. `repas-dans-url.ts` pour le pourquoi.
 const router = useRouter()
 const selectedMealId = ref<number | null>(repasDepuisUrl(route.query.meal))
@@ -568,6 +595,15 @@ const debouncedSearchQuery = useDebounce(searchQuery, 300)
 // Computed pour récupérer l'objet meal complet à partir de l'ID
 /** La journée du repas regardé, pivot de la navigation par flèches. */
 const journeeCourante = computed(() => (selectedMeal.value ? jourDuRepas(selectedMeal.value) : ''))
+
+/**
+ * Aucun repas à servir : soit l'édition n'en a aucun, soit ils sont tous désactivés.
+ *
+ * Les deux causes se disent d'un même message, et c'est volontaire : le point d'API ne renvoie plus
+ * que les repas activés, l'écran ne peut donc pas les distinguer — et « tous vos repas sont
+ * désactivés » serait faux quand il n'y en a simplement aucun.
+ */
+const aucunRepasActif = computed(() => repasCharges.value && meals.value.length === 0)
 
 const journees = computed(() => journeesDesRepas(meals.value))
 const journeePrecedente = computed(() => journeeVoisine(journees.value, journeeCourante.value, -1))
@@ -662,6 +698,7 @@ const { execute: fetchMeals, loading: loadingMeals } = useApiAction(
     errorMessages: { default: t('gestion.meals.error_loading_meals') },
     onSuccess: (response: any) => {
       meals.value = response?.meals || []
+      repasCharges.value = true
 
       // Un lien peut citer un repas supprimé, ou celui d'une autre édition : on l'écarte avant
       // la sélection automatique, qui ne se déclenche qu'en l'absence de choix. Sans cela,

@@ -29,12 +29,25 @@ export default wrapApiHandler(
     const body = await readBody(event)
     const validatedData = cancelMealSchema.parse(body)
 
-    // Vérifier que le repas existe et appartient à cette édition
+    /*
+     * Vérifier que le repas existe et appartient à cette édition — mais PAS qu'il est activé,
+     * contrairement aux quatre autres points d'API du comptoir (cf. assurerRepasServiAuComptoir).
+     *
+     * L'asymétrie est voulue : valider SERT un repas, annuler n'en sert aucun. Refuser l'annulation
+     * sur un repas désactivé piégerait la consommation saisie par erreur juste avant qu'on le
+     * décoche — pour la corriger il faudrait réactiver le repas, ce qui recrée les sélections des
+     * bénévoles et écrase leurs refus. On force ainsi une opération destructrice pour réparer une
+     * faute de frappe.
+     *
+     * En pratique seuls les organisateurs et les billets sont concernés : les sélections des
+     * bénévoles et des artistes sont supprimées à la désactivation, leur annulation répond déjà 404.
+     */
     const meal = await prisma.volunteerMeal.findFirst({
       where: {
         id: mealId,
         editionId,
       },
+      select: { id: true },
     })
 
     if (!meal) {

@@ -278,7 +278,9 @@
       "validated_lowercase": "validováno",
       "validation_description": "Validovat konzumaci jídel účastníky",
       "validation_title": "Validace jídel",
-      "volunteers": "Dobrovolníci"
+      "volunteers": "Dobrovolníci",
+      "no_enabled_meal": "Žádné jídlo k validaci",
+      "no_enabled_meal_description": "Tento ročník nemá žádné povolené jídlo: buď dosud nebyla nakonfigurována, nebo byla všechna zakázána. Povolte alespoň jedno jídlo, abyste otevřeli výdejní místo."
     },
     "organizers": {
       "access_rights": "Přístupová práva",

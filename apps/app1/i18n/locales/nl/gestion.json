@@ -278,7 +278,9 @@
       "validated_lowercase": "gevalideerd",
       "validation_description": "Valideer maaltijdconsumptie van deelnemers",
       "validation_title": "Maaltijdvalidatie",
-      "volunteers": "Vrijwilligers"
+      "volunteers": "Vrijwilligers",
+      "no_enabled_meal": "Geen maaltijd om te valideren",
+      "no_enabled_meal_description": "Deze editie heeft geen actieve maaltijd: ze zijn nog niet geconfigureerd of ze zijn allemaal uitgeschakeld. Schakel minstens één maaltijd in om de balie te openen."
     },
     "organizers": {
       "access_rights": "Toegangsrechten",

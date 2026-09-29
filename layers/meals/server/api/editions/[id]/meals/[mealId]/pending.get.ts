@@ -2,6 +2,7 @@ import { useMealsPorts } from '#server/meals/ports/registry'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageMealsOrValidation } from '#server/utils/permissions/edition-permissions'
+import { assurerRepasServiAuComptoir } from '#server/utils/repas-du-comptoir'
 import { validateEditionId, validateResourceId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -22,14 +23,9 @@ export default wrapApiHandler(
     const query = getQuery(event)
     const type = (query.type as string) || 'all' // 'volunteer', 'artist', 'participant', 'organizer', 'all'
 
-    // Vérifier que le repas existe et appartient à cette édition
-    const meal = await prisma.volunteerMeal.findFirst({ where: { id: mealId, editionId } })
-    if (!meal) {
-      throw createError({
-        status: 404,
-        message: 'Repas non trouvé',
-      })
-    }
+    // Le repas existe, appartient à cette édition et est ACTIVÉ : un repas décoché ne doit ni
+    // être servi ni peser dans les totaux affichés au comptoir.
+    await assurerRepasServiAuComptoir(mealId, editionId)
 
     const ports = useMealsPorts()
     const pending: any[] = []

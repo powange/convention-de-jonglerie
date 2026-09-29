@@ -278,7 +278,9 @@
       "validated_lowercase": "validados",
       "validation_description": "Validar la toma de comidas por los participantes",
       "validation_title": "Validación de comidas",
-      "volunteers": "Voluntarios"
+      "volunteers": "Voluntarios",
+      "no_enabled_meal": "Ninguna comida por validar",
+      "no_enabled_meal_description": "Esta edición no tiene ninguna comida activada: aún no se han configurado o se han desactivado todas. Active al menos una comida para abrir el mostrador."
     },
     "organizers": {
       "access_rights": "Derechos de acceso",

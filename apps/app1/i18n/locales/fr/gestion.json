@@ -241,6 +241,8 @@
       "meal_type": "Type de repas",
       "meal_validated": "Repas validé avec succès",
       "next_day": "Jour suivant",
+      "no_enabled_meal": "Aucun repas à valider",
+      "no_enabled_meal_description": "Cette édition n'a aucun repas activé : ils n'ont pas encore été configurés, ou ils ont tous été désactivés. Activez au moins un repas pour ouvrir le comptoir.",
       "no_meals_configured": "Aucun repas configuré. Les repas seront générés automatiquement en fonction des dates de l'événement.",
       "no_results": "Aucun résultat trouvé",
       "organizers": "Organisateurs",
