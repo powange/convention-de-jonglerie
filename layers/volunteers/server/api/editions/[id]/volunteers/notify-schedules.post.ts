@@ -1,10 +1,30 @@
+import { z } from 'zod'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { apresLaReponse, enTranches } from '#server/utils/apres-la-reponse'
 import { requireAuth } from '#server/utils/auth-utils'
 import { generateVolunteerScheduleEmailHtml, getSiteUrl } from '#server/utils/emailService'
 import { NotificationService } from '#server/utils/notification-service'
 import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
+import { estHorsAssignationAutomatique } from '~~/shared/utils/benevoles-volants'
+
+/** Envois simultanés par tranche : le nombre de requêtes en vol reste borné. */
+const TAILLE_DE_TRANCHE = 10
+
+/**
+ * Le corps de la requête. Vide est légitime — c'est le cas courant.
+ *
+ * `inclureSansCreneau` écrit AUSSI aux bénévoles à qui aucun créneau n'est attribué, avec le
+ * message de repli. Par défaut on ne le fait plus : leur annoncer « vos créneaux sont
+ * disponibles » alors qu'ils n'en ont aucun est une notification qui ne dit rien, et un courriel
+ * de plus dans une boîte qui en reçoit déjà beaucoup pendant la préparation.
+ */
+const corpsSchema = z
+  .object({ inclureSansCreneau: z.boolean().optional() })
+  .nullish()
+  .transform((corps) => ({ inclureSansCreneau: corps?.inclureSansCreneau === true }))
 
 export default wrapApiHandler(
   async (event) => {
@@ -50,7 +70,10 @@ export default wrapApiHandler(
     }
     const eventName = eventRecord.name || 'votre événement'
 
-    // Récupérer tous les bénévoles acceptés
+    const { inclureSansCreneau } = corpsSchema.parse(await readBody(event).catch(() => null))
+
+    // Les équipes viennent avec la candidature : ce sont elles qui portent « volante » et
+    // « autonome », et c'est ce qui décide plus bas de qui reçoit le message de repli.
     const acceptedVolunteers = await prisma.editionVolunteerApplication.findMany({
       where: {
         eventId: editionId,
@@ -65,6 +88,9 @@ export default wrapApiHandler(
             preferredLanguage: true,
           },
         },
+        teamAssignments: {
+          select: { team: { select: { isFloatingTeam: true, isAutonomousTeam: true } } },
+        },
       },
     })
 
@@ -72,34 +98,55 @@ export default wrapApiHandler(
       return createSuccessResponse({ count: 0 }, 'Aucun bénévole accepté trouvé')
     }
 
-    const siteUrl = getSiteUrl()
-    let successCount = 0
-    let errorCount = 0
+    /*
+     * UNE seule requête d'affectations pour toute l'édition, groupée en mémoire.
+     *
+     * Il y en avait une PAR bénévole. Sur une édition de deux cents bénévoles, cela faisait deux
+     * cents allers-retours pour une donnée qu'une requête ramène — et ces requêtes partaient à la
+     * file, chacune attendant la précédente, avant même le premier envoi.
+     */
+    const toutesLesAffectations = await prisma.volunteerAssignment.findMany({
+      where: { timeSlot: { eventId: editionId } },
+      include: { timeSlot: { include: { team: true } } },
+      orderBy: { timeSlot: { startDateTime: 'asc' } },
+    })
 
-    // Envoyer une notification à chaque bénévole
-    for (const volunteer of acceptedVolunteers) {
+    const affectationsParUtilisateur = new Map<number, typeof toutesLesAffectations>()
+    for (const affectation of toutesLesAffectations) {
+      const liste = affectationsParUtilisateur.get(affectation.userId)
+      if (liste) liste.push(affectation)
+      else affectationsParUtilisateur.set(affectation.userId, [affectation])
+    }
+
+    /*
+     * À qui l'on écrit.
+     *
+     * Ceux qui ont au moins un créneau, toujours. Ceux qui n'en ont aucun seulement si on l'a
+     * demandé — et parmi eux, JAMAIS les volants ni ceux réservés à une équipe autonome : pour
+     * eux, l'absence de créneau n'est pas un retard de planification mais leur situation. Leur
+     * écrire « vos créneaux seront bientôt disponibles » serait faux, et le message de repli dit
+     * exactement cela.
+     *
+     * `estHorsAssignationAutomatique` porte déjà cette règle : le volant parce qu'il n'a pas
+     * d'heures à faire, le réservé parce que ses heures ne se décident pas ici.
+     */
+    const destinataires = acceptedVolunteers.filter((volunteer) => {
+      const creneaux = affectationsParUtilisateur.get(volunteer.user.id) ?? []
+      if (creneaux.length > 0) return true
+      if (!inclureSansCreneau) return false
+      return !estHorsAssignationAutomatique(volunteer.teamAssignments.map((t) => t.team))
+    })
+
+    const siteUrl = getSiteUrl()
+
+    /**
+     * Prévient UN bénévole : notification dans l'application, puis courriel.
+     *
+     * Les créneaux sont lus dans la Map constituée plus haut, non redemandés à la base.
+     */
+    const prevenir = async (volunteer: (typeof destinataires)[number]) => {
       try {
-        // Récupérer les créneaux assignés à ce bénévole
-        const assignments = await prisma.volunteerAssignment.findMany({
-          where: {
-            userId: volunteer.user.id,
-            timeSlot: {
-              eventId: editionId,
-            },
-          },
-          include: {
-            timeSlot: {
-              include: {
-                team: true,
-              },
-            },
-          },
-          orderBy: {
-            timeSlot: {
-              startDateTime: 'asc',
-            },
-          },
-        })
+        const assignments = affectationsParUtilisateur.get(volunteer.user.id) ?? []
 
         // Formater les créneaux pour l'affichage
         const scheduleText = assignments
@@ -195,23 +242,59 @@ export default wrapApiHandler(
 
         if (!emailSent) {
           console.warn(`Échec de l'envoi d'email pour ${volunteer.user.email}`)
-          errorCount++
-        } else {
-          successCount++
         }
       } catch (error) {
         console.error(`Erreur lors de l'envoi pour le bénévole ${volunteer.user.id}:`, error)
-        errorCount++
       }
     }
 
+    /*
+     * La réponse part MAINTENANT, la diffusion suit.
+     *
+     * Deux cents bénévoles, deux envois chacun, en série : le bouton tournait une minute et
+     * l'organisateur rechargeait la page en croyant à une panne — ce qui relançait tout.
+     *
+     * ⚠️ CONSÉQUENCE SUR LE CONTRAT : `count` est désormais le nombre de DESTINATAIRES et non
+     * celui des envois réussis, et le champ `errors` disparaît — la réponse ne peut plus rendre
+     * compte de ce qui n'a pas encore eu lieu. Les échecs individuels restent journalisés. Le seul
+     * client (`gestion/volunteers/notifications.vue`) affiche un message fixe et ne lisait ni l'un
+     * ni l'autre, mais le sens du champ change : c'est à savoir avant de s'y fier.
+     *
+     * L'`upsert` de `planningPublished` est resté AVANT tout cela, et c'est essentiel : la
+     * publication doit être enregistrée même si la diffusion échoue, sans quoi l'écran masquerait
+     * des créneaux dont les bénévoles ont déjà reçu le détail.
+     */
+    apresLaReponse(
+      event,
+      async () => {
+        for (const tranche of enTranches(destinataires, TAILLE_DE_TRANCHE)) {
+          /*
+           * Ce qui protège la diffusion d'un envoi raté, mesuré plutôt que supposé.
+           *
+           * À l'intérieur d'une tranche, `map` démarre tous les envois d'emblée : un échec ne peut
+           * donc pas empêcher ses voisins d'être tentés. Ce qui est en jeu, c'est la tranche
+           * SUIVANTE — avec `all` qui rejette, la boucle s'arrête et le reste ne part jamais. Sur
+           * deux cents bénévoles, un seul courriel refusé priverait les suivants du leur, et la
+           * réponse, déjà partie, ne pourrait rien en dire.
+           *
+           * ⚠️ `allSettled` et le `try/catch` de `prevenir` sont ALTERNATIFS, pas cumulatifs :
+           * chacun seul suffit, et il faut retirer les DEUX pour que la seconde tranche disparaisse
+           * (vérifié dans cet ordre, avec douze destinataires). Les deux sont gardés — le
+           * `try/catch` pour journaliser l'échec par personne, `allSettled` pour que la boucle
+           * survive si quelque chose cessait un jour d'être rattrapé à l'intérieur.
+           */
+          await Promise.allSettled(tranche.map(prevenir))
+        }
+      },
+      'NotifyVolunteerSchedules'
+    )
+
     return createSuccessResponse(
       {
-        count: successCount,
-        errors: errorCount,
+        count: destinataires.length,
         total: acceptedVolunteers.length,
       },
-      `Notifications envoyées à ${successCount} bénévole(s)`
+      `Notifications en cours d'envoi à ${destinataires.length} bénévole(s)`
     )
   },
   { operationName: 'NotifyVolunteerSchedules' }

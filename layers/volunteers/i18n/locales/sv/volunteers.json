@@ -654,6 +654,8 @@
     "team_periods_required": "Kryssa i minst en period",
     "filter_source": "Filtrera efter ursprung",
     "source_all": "Alla ursprung",
-    "delay_bornes": "Mellan {min} och {max} minuter. Ett negativt värde tidigarelägger passet."
+    "delay_bornes": "Mellan {min} och {max} minuter. Ett negativt värde tidigarelägger passet.",
+    "notify_include_without_slot": "Skriv även till volontärer utan pass",
+    "notify_include_without_slot_help": "De får ett meddelande om att deras pass är på väg. Flygande volontärer och medlemmar i självstyrande team omfattas aldrig: för dem är det normalt att inte ha något pass."
   }
 }

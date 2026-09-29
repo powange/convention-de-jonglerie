@@ -1,8 +1,7 @@
 import { z } from 'zod'
 
-import type { H3Event } from 'h3'
-
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { apresLaReponse } from '#server/utils/apres-la-reponse'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import {
@@ -14,35 +13,6 @@ import { schemaUrlExterne } from '~~/shared/utils/url-externe'
 
 /** Comptes artiste notifiés par tranche : le nombre de requêtes simultanées reste borné. */
 const TAILLE_DE_TRANCHE = 20
-
-/**
- * Lance un travail sans faire attendre le client.
- *
- * `event.waitUntil` existe bien dans ce Nitro (2.13.4) : il empile la promesse et la transmet à la
- * plate-forme quand celle-ci en propose un — sur un serveur Node, personne ne l'attend, ce qui est
- * exactement l'effet voulu. Le repli `setImmediate` couvre les contextes où il n'existe pas, dont
- * les tests, où l'événement est un objet nu.
- *
- * Les rejets sont rattrapés ici : une promesse orpheline qui échoue remonterait en
- * `unhandledRejection`, et il n'y a plus personne pour lui répondre.
- */
-function apresLaReponse(event: H3Event, travail: () => Promise<void>): void {
-  const lancer = () =>
-    travail().catch((erreur) => {
-      console.error('[UpdateShowCall] diffusion après réponse échouée', erreur)
-    })
-
-  const { waitUntil } = event as H3Event & { waitUntil?: (p: Promise<unknown>) => void }
-
-  if (typeof waitUntil === 'function') {
-    // La VRAIE promesse, pas une enveloppe déjà résolue : là où la plate-forme l'honore, elle
-    // maintient le processus en vie le temps de la diffusion.
-    waitUntil.call(event, lancer())
-    return
-  }
-
-  setImmediate(lancer)
-}
 
 /**
  * Annonce l'ouverture d'un appel à spectacles à tous les comptes artiste du site.
@@ -250,8 +220,10 @@ export default wrapApiHandler(
         })
         const editionName = editionData?.name || editionData?.convention?.name || ''
 
-        apresLaReponse(event, () =>
-          diffuserOuvertureAuxArtistes(showCall.name, editionName, editionId)
+        apresLaReponse(
+          event,
+          () => diffuserOuvertureAuxArtistes(showCall.name, editionName, editionId),
+          'UpdateShowCall'
         )
       }
     }

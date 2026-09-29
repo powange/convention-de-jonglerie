@@ -654,6 +654,8 @@
     "team_periods_required": "Tick at least one period",
     "filter_source": "Filter by source",
     "source_all": "All sources",
-    "delay_bornes": "Between {min} and {max} minutes. A negative value moves the shift earlier."
+    "delay_bornes": "Between {min} and {max} minutes. A negative value moves the shift earlier.",
+    "notify_include_without_slot": "Also write to volunteers without a shift",
+    "notify_include_without_slot_help": "They will receive a message saying their shifts are coming. Floating volunteers and members of self-managed teams are never included: for them, having no shift is normal."
   }
 }

@@ -654,6 +654,8 @@
     "team_periods_required": "Marque pelo menos um período",
     "filter_source": "Filtrar por origem",
     "source_all": "Todas as origens",
-    "delay_bornes": "Entre {min} e {max} minutos. Um valor negativo antecipa o turno."
+    "delay_bornes": "Entre {min} e {max} minutos. Um valor negativo antecipa o turno.",
+    "notify_include_without_slot": "Escrever também aos voluntários sem turno",
+    "notify_include_without_slot_help": "Receberão uma mensagem a anunciar que os seus turnos vão chegar. Os voluntários de reforço e os membros de equipas autónomas nunca são incluídos: para eles, não ter turno é normal."
   }
 }

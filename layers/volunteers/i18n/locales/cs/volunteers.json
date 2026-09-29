@@ -654,6 +654,8 @@
     "team_periods_required": "Zaškrtněte alespoň jedno období",
     "filter_source": "Filtrovat podle původu",
     "source_all": "Všechny původy",
-    "delay_bornes": "Mezi {min} a {max} minutami. Negativní hodnota posune směnu dopředu."
+    "delay_bornes": "Mezi {min} a {max} minutami. Negativní hodnota posune směnu dopředu.",
+    "notify_include_without_slot": "Napsat i dobrovolníkům bez směny",
+    "notify_include_without_slot_help": "Dostanou zprávu, že jejich směny teprve přijdou. Záskoky a členové samostatných týmů nejsou nikdy zahrnuti: pro ně je normální nemít směnu."
   }
 }

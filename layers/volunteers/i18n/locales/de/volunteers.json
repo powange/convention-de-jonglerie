@@ -654,6 +654,8 @@
     "team_periods_required": "Mindestens einen Zeitraum ankreuzen",
     "filter_source": "Nach Herkunft filtern",
     "source_all": "Alle Herkünfte",
-    "delay_bornes": "Zwischen {min} und {max} Minuten. Ein negativer Wert verschiebt den Einsatz nach vorne."
+    "delay_bornes": "Zwischen {min} und {max} Minuten. Ein negativer Wert verschiebt den Einsatz nach vorne.",
+    "notify_include_without_slot": "Auch Freiwillige ohne Einsatz anschreiben",
+    "notify_include_without_slot_help": "Sie erhalten eine Nachricht, dass ihre Einsätze noch kommen. Springer und Mitglieder eigenständiger Teams sind nie betroffen: für sie ist es normal, keinen Einsatz zu haben."
   }
 }
