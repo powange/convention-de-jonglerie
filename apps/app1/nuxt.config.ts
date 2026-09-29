@@ -175,6 +175,13 @@ export default defineNuxtConfig({
   // Destructuration réactive des props dans <script setup>
   vue: {
     propsDestructure: true,
+    // L'Options API de Vue reste compilée dans le bundle client. Nuxt 4.5.2 la retire par défaut
+    // dès `compatibilityVersion: 5` (option `vue.optionsApi`, qui fixe `__VUE_OPTIONS_API__`) ;
+    // or le composant Vue de FullCalendar est écrit avec elle (`data()`, `methods`). Sans elle,
+    // son `data()` est ignoré et tous les calendriers plantent au rendu — agenda de l'accueil,
+    // plannings des bénévoles — sans que le typage, les tests unitaires ni les tests Nuxt ne le
+    // voient : seul Playwright l'a montré.
+    optionsApi: true,
   },
 
   // Restreindre les collections d'icônes empaquetées côté serveur
