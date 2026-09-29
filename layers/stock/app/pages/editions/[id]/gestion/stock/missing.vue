@@ -454,6 +454,21 @@
                 <UBadge v-if="listeTerminee(liste.items)" color="success" variant="subtle">
                   {{ t('gestion.stock.shopping_done') }}
                 </UBadge>
+                <!-- Le geste qu'on fait en rentrant des courses : ce qui est coché est acheté,
+                     donc compté. Sans lui, il fallait rouvrir chaque objet et retaper un nombre
+                     qu'on connaissait déjà — sur vingt lignes, personne ne le faisait.
+
+                     Absent quand rien n'est coché : il n'aurait rien à déclarer, et un bouton qui
+                     ne fait rien se lit comme une panne. -->
+                <UButton
+                  v-if="canManage && resumeDe(liste).achetes > 0"
+                  icon="i-heroicons-clipboard-document-check"
+                  color="primary"
+                  variant="soft"
+                  size="sm"
+                  :label="t('gestion.stock.shopping_mark_counted')"
+                  @click="demanderComptage(liste)"
+                />
                 <UTooltip v-if="canManage" :text="t('gestion.stock.shopping_rename')">
                   <UButton
                     icon="i-heroicons-pencil-square"
@@ -613,6 +628,24 @@
       :loading="retrait.loading.value"
       @confirm="confirmerRetrait"
       @cancel="retraitConfirmationOuvert = false"
+    />
+
+    <!-- Confirmée, car elle écrit sur PLUSIEURS objets à la fois et affirme quelque chose : un
+         comptage à `null` veut dire « pas encore compté », et le porter à la quantité attendue le
+         remplace par « on a le compte complet ». Celui qui appuie répond de ce qu'il déclare. -->
+    <UiConfirmModal
+      v-model="comptageConfirmationOuvert"
+      :title="t('gestion.stock.shopping_mark_counted')"
+      :description="
+        t('gestion.stock.shopping_mark_counted_confirm', {
+          count: listeAComptabiliser ? resumeDe(listeAComptabiliser).achetes : 0,
+          name: listeAComptabiliser?.name ?? '',
+        })
+      "
+      :confirm-label="t('gestion.stock.shopping_mark_counted')"
+      :loading="comptageDeLaListe.loading.value"
+      @confirm="confirmerComptage"
+      @cancel="comptageConfirmationOuvert = false"
     />
 
     <UiConfirmModal
@@ -1331,6 +1364,43 @@ function cleArticle(listId: number, articleId: number, achete?: boolean): string
   return achete === undefined
     ? `${listId}:${articleId}`
     : `${listId}:${articleId}:${achete ? 1 : 0}`
+}
+
+/*
+ * « Tout a été acheté » : le comptage des objets cochés rejoint la quantité attendue.
+ *
+ * Le serveur relit lui-même les articles cochés plutôt que de recevoir une liste d'identifiants :
+ * deux personnes font les courses ensemble, et celle qui appuie n'a pas forcément à l'écran les
+ * cases que l'autre vient de cocher.
+ */
+const comptageConfirmationOuvert = ref(false)
+const listeAComptabiliser = ref<ListeDeCourses | null>(null)
+
+const comptageDeLaListe = useApiActionById(
+  (listId) => `/api/editions/${editionId}/stock-shopping-lists/${listId}/comptage`,
+  {
+    method: 'POST',
+    successMessage: { title: t('gestion.stock.shopping_mark_counted_done') },
+    errorMessages: { default: t('gestion.stock.shopping_list_error') },
+    // Les DEUX chargements : les comptages changent, donc les manquants aussi. Ne rafraîchir que
+    // les listes laisserait l'onglet voisin annoncer un manque qui vient d'être comblé.
+    onSuccess: async () => {
+      await chargerObjets()
+      await chargerListes()
+    },
+  }
+)
+
+function demanderComptage(liste: ListeDeCourses) {
+  listeAComptabiliser.value = liste
+  comptageConfirmationOuvert.value = true
+}
+
+async function confirmerComptage() {
+  const liste = listeAComptabiliser.value
+  if (liste) await comptageDeLaListe.execute(liste.id)
+  comptageConfirmationOuvert.value = false
+  listeAComptabiliser.value = null
 }
 
 const bascule = useApiActionById(

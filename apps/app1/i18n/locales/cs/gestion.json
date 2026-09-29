@@ -705,7 +705,10 @@
       "loan_tag_all": "Všechny štítky",
       "export_pdf_filtered_empty": "Žádný předmět neodpovídá nastaveným filtrům",
       "export_pdf_extract": "filtrovaný výběr: {affiches} z {total} předmětů",
-      "filter_no_results": "Žádný předmět neodpovídá nastaveným filtrům"
+      "filter_no_results": "Žádný předmět neodpovídá nastaveným filtrům",
+      "shopping_mark_counted": "Vše bylo nakoupeno",
+      "shopping_mark_counted_confirm": "Počet {count} zaškrtnutých položek ze seznamu „{name}“ bude nastaven na očekávané množství: přestanou se zobrazovat jako chybějící. Nezaškrtnuté položky zůstanou beze změny.",
+      "shopping_mark_counted_done": "Počet aktualizován"
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",

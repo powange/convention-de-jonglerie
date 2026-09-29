@@ -705,7 +705,10 @@
       "loan_tag_all": "Alle tags",
       "export_pdf_filtered_empty": "Geen enkel voorwerp voldoet aan de ingestelde filters",
       "export_pdf_extract": "gefilterd uittreksel: {affiches} van {total} voorwerpen",
-      "filter_no_results": "Geen enkel voorwerp voldoet aan de ingestelde filters"
+      "filter_no_results": "Geen enkel voorwerp voldoet aan de ingestelde filters",
+      "shopping_mark_counted": "Alles is gekocht",
+      "shopping_mark_counted_confirm": "De telling van {count} aangevinkt(e) item(s) uit “{name}” wordt op de verwachte hoeveelheid gezet: ze verschijnen niet langer als ontbrekend. Niet-aangevinkte items blijven ongewijzigd.",
+      "shopping_mark_counted_done": "Telling bijgewerkt"
     },
     "ticketing": {
       "access_control_description": "Tickets scannen en valideren bij de ingang",

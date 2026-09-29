@@ -705,7 +705,10 @@
       "loan_tag_all": "Alle Tags",
       "export_pdf_filtered_empty": "Kein Gegenstand entspricht den gesetzten Filtern",
       "export_pdf_extract": "gefilterter Auszug: {affiches} von {total} Gegenständen",
-      "filter_no_results": "Kein Gegenstand entspricht den gesetzten Filtern"
+      "filter_no_results": "Kein Gegenstand entspricht den gesetzten Filtern",
+      "shopping_mark_counted": "Alles wurde gekauft",
+      "shopping_mark_counted_confirm": "Der Bestand von {count} angehakten Artikel(n) aus „{name}“ wird auf die erwartete Menge gesetzt: Sie gelten dann nicht mehr als fehlend. Nicht angehakte Artikel bleiben unverändert.",
+      "shopping_mark_counted_done": "Bestand aktualisiert"
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",

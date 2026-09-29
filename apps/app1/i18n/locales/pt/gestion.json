@@ -705,7 +705,10 @@
       "loan_tag_all": "Todas as etiquetas",
       "export_pdf_filtered_empty": "Nenhum objeto corresponde aos filtros aplicados",
       "export_pdf_extract": "extrato filtrado: {affiches} de {total} objetos",
-      "filter_no_results": "Nenhum objeto corresponde aos filtros aplicados"
+      "filter_no_results": "Nenhum objeto corresponde aos filtros aplicados",
+      "shopping_mark_counted": "Tudo foi comprado",
+      "shopping_mark_counted_confirm": "A contagem de {count} objeto(s) assinalado(s) de «{name}» passará à quantidade esperada: deixarão de aparecer como em falta. Os objetos não assinalados não mudam.",
+      "shopping_mark_counted_done": "Contagem atualizada"
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",

@@ -705,7 +705,10 @@
       "loan_tag_all": "Wszystkie tagi",
       "export_pdf_filtered_empty": "Żaden przedmiot nie pasuje do ustawionych filtrów",
       "export_pdf_extract": "wyciąg filtrowany: {affiches} z {total} przedmiotów",
-      "filter_no_results": "Żaden przedmiot nie pasuje do ustawionych filtrów"
+      "filter_no_results": "Żaden przedmiot nie pasuje do ustawionych filtrów",
+      "shopping_mark_counted": "Wszystko zostało kupione",
+      "shopping_mark_counted_confirm": "Liczba {count} zaznaczonych przedmiotów z „{name}” zostanie ustawiona na oczekiwaną ilość: przestaną być wykazywane jako brakujące. Niezaznaczone przedmioty pozostają bez zmian.",
+      "shopping_mark_counted_done": "Zaktualizowano stan"
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",
