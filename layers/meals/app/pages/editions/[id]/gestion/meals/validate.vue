@@ -552,6 +552,10 @@ import {
 
 import { repasConnu, repasDepuisUrl, requeteRepas } from '../../../../../utils/repas-dans-url'
 
+// La journée et l'heure SUR PLACE, pour le repas présenté d'emblée. Les utils partagés ne sont pas
+// auto-importés dans un layer, contrairement à ceux de `layers/meals/app/utils`.
+import { heureDans, journeeDans } from '~~/shared/utils/fuseau-edition'
+
 // Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
 
 const route = useRoute()
@@ -705,37 +709,22 @@ const { execute: fetchMeals, loading: loadingMeals } = useApiAction(
       // l'écran restait vide sans rien expliquer.
       selectedMealId.value = repasConnu(selectedMealId.value, meals.value)
 
-      // Sélectionner automatiquement le repas en cours ou à venir
+      /*
+       * Le repas présenté d'emblée : la journée d'aujourd'hui et l'heure qu'il est SUR PLACE, la
+       * règle elle-même vivant dans `navigation-repas.ts` (fonction pure, testée à date fixe).
+       *
+       * Le fuseau de l'édition et non celui du navigateur : un organisateur qui prépare le comptoir
+       * depuis chez lui, à l'autre bout de l'Europe, doit voir le repas qu'on sert là-bas.
+       */
       if (meals.value.length > 0 && !selectedMealId.value) {
-        const now = new Date()
-
-        // Chercher le repas en cours ou le prochain repas à venir
-        const currentOrUpcomingMeal = meals.value.find((meal) => {
-          const mealDate = new Date(meal.date)
-          // Considérer un repas comme "en cours" s'il est dans les 3 heures avant ou après l'heure actuelle
-          const threeHoursBefore = new Date(mealDate.getTime() - 3 * 60 * 60 * 1000)
-          const threeHoursAfter = new Date(mealDate.getTime() + 3 * 60 * 60 * 1000)
-          return now >= threeHoursBefore && now <= threeHoursAfter
-        })
-
-        if (currentOrUpcomingMeal) {
-          // Repas en cours trouvé
-          selectedMealId.value = currentOrUpcomingMeal.id
-        } else {
-          // Sinon, chercher le prochain repas à venir
-          const upcomingMeals = meals.value.filter((meal) => new Date(meal.date) > now)
-          if (upcomingMeals.length > 0) {
-            // Trier par date croissante et prendre le premier
-            upcomingMeals.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            selectedMealId.value = upcomingMeals[0].id
-          } else {
-            // Sinon, prendre le dernier repas (le plus récent)
-            const sortedMeals = [...meals.value].sort(
-              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-            )
-            selectedMealId.value = sortedMeals[0].id
-          }
-        }
+        const maintenant = new Date()
+        const fuseau = edition.value?.timezone ?? null
+        const choisi = repasParDefaut(
+          meals.value,
+          journeeDans(maintenant, fuseau),
+          heureDans(maintenant, fuseau) ?? maintenant.getHours()
+        )
+        if (choisi) selectedMealId.value = choisi.id
       }
     },
   }

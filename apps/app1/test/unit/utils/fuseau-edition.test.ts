@@ -5,6 +5,7 @@ import {
   differeDuFuseauLecteur,
   formaterHeure,
   formaterJournee,
+  heureDans,
   journeeDans,
   journeeDeProgramme,
   journeesEntre,
@@ -231,5 +232,27 @@ describe('differeDuFuseauLecteur', () => {
 
   it('ne prévient de rien sans fuseau déclaré', () => {
     expect(differeDuFuseauLecteur('2026-08-01T10:00:00.000Z', null)).toBe(false)
+  })
+})
+
+describe('heureDans', () => {
+  it('rend l’heure pleine vécue sur place, et non celle de la machine', () => {
+    // Minuit UTC, c'est 2 h du matin à Paris en été. C'est tout le sujet : un repas est stocké à
+    // minuit UTC, et l'heure qu'il est sur place décide du repas qu'on sert.
+    expect(heureDans('2026-07-01T00:00:00.000Z', 'Europe/Paris')).toBe(2)
+    expect(heureDans('2026-07-01T00:00:00.000Z', 'America/New_York')).toBe(20)
+  })
+
+  it('suit l’heure d’hiver comme l’heure d’été', () => {
+    // Le décalage n'est pas constant : +2 h en juillet, +1 h en janvier. Une soustraction figée
+    // se tromperait la moitié de l'année.
+    expect(heureDans('2026-01-15T10:00:00.000Z', 'Europe/Paris')).toBe(11)
+    expect(heureDans('2026-07-15T10:00:00.000Z', 'Europe/Paris')).toBe(12)
+  })
+
+  it('rend null sur une date illisible, et surtout pas zéro', () => {
+    // Minuit est une heure valable : un repli sur 0 ferait passer une donnée cassée pour le petit
+    // matin, et le comptoir proposerait un petit-déjeuner sans que rien ne le signale.
+    expect(heureDans('pas une date', 'Europe/Paris')).toBeNull()
   })
 })
