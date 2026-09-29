@@ -278,7 +278,9 @@
       "validated_lowercase": "valideret",
       "validation_description": "Valider deltagernes måltidsindtagelse",
       "validation_title": "Måltidsvalidering",
-      "volunteers": "Frivillige"
+      "volunteers": "Frivillige",
+      "no_enabled_meal": "Intet måltid at validere",
+      "no_enabled_meal_description": "Denne udgave har ingen aktiverede måltider: de er endnu ikke konfigureret, eller de er alle blevet deaktiveret. Aktivér mindst ét måltid for at åbne disken."
     },
     "organizers": {
       "access_rights": "Adgangsrettigheder",

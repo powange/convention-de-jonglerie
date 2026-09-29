@@ -278,7 +278,9 @@
       "validated_lowercase": "validiert",
       "validation_description": "Mahlzeiteinnahme der Teilnehmer validieren",
       "validation_title": "Mahlzeitvalidierung",
-      "volunteers": "Freiwillige"
+      "volunteers": "Freiwillige",
+      "no_enabled_meal": "Keine Mahlzeit zu validieren",
+      "no_enabled_meal_description": "Diese Ausgabe hat keine aktivierte Mahlzeit: Sie wurden noch nicht eingerichtet oder alle deaktiviert. Aktivieren Sie mindestens eine Mahlzeit, um die Ausgabestelle zu öffnen."
     },
     "organizers": {
       "access_rights": "Zugriffsrechte",

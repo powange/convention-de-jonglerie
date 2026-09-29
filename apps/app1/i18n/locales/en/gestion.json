@@ -278,7 +278,9 @@
       "validated_lowercase": "validated",
       "validation_description": "Validate participant meal consumption",
       "validation_title": "Meal validation",
-      "volunteers": "Volunteers"
+      "volunteers": "Volunteers",
+      "no_enabled_meal": "No meal to validate",
+      "no_enabled_meal_description": "This edition has no enabled meal: they have not been configured yet, or they have all been disabled. Enable at least one meal to open the counter."
     },
     "organizers": {
       "access_rights": "Access rights",

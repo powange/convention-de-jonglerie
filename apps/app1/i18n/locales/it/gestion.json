@@ -278,7 +278,9 @@
       "validated_lowercase": "convalidati",
       "validation_description": "Convalida il consumo dei pasti dei partecipanti",
       "validation_title": "Convalida pasti",
-      "volunteers": "Volontari"
+      "volunteers": "Volontari",
+      "no_enabled_meal": "Nessun pasto da convalidare",
+      "no_enabled_meal_description": "Questa edizione non ha alcun pasto attivato: non sono ancora stati configurati oppure sono stati tutti disattivati. Attiva almeno un pasto per aprire il banco."
     },
     "organizers": {
       "access_rights": "Diritti di accesso",
