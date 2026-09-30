@@ -108,6 +108,12 @@ export const NotificationTypeMapping = {
   carpool_booking_accepted: 'carpoolUpdates' as const,
   carpool_booking_rejected: 'carpoolUpdates' as const,
   carpool_booking_cancelled: 'carpoolUpdates' as const,
+  /*
+   * Le commentaire suit le MÊME réglage que les réservations, et c'est ce que le libellé promet
+   * déjà : « Soyez notifié des réservations ET MESSAGES de covoiturage ». Un réglage séparé aurait
+   * créé une case que personne n'a demandée, pour une promesse qui existait sans être tenue.
+   */
+  carpool_comment_received: 'carpoolUpdates' as const,
 
   // Artistes
   artist_arrival: 'artistUpdates' as const,

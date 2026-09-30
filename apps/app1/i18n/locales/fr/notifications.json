@@ -49,6 +49,11 @@
         "action": "Voir les autres offres",
         "message": "{ownerName} a refusé votre demande de {seats} place(s) pour le trajet depuis {locationCity}",
         "title": "Demande refusée"
+      },
+      "comment_received": {
+        "action": "Voir la conversation",
+        "message": "{commenterName} a écrit un message",
+        "title": "Nouveau message de covoiturage 💬"
       }
     },
     "common": {

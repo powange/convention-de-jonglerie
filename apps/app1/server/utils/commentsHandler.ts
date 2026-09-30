@@ -1,5 +1,6 @@
 import { createError, getRouterParam, readBody } from 'h3'
 
+import { NotificationHelpers, safeNotify } from './notification-service'
 import prisma from './prisma'
 import { carpoolUserSelect } from './prisma-select-helpers'
 import { sanitizeUserContent } from './validation-helpers'
@@ -73,6 +74,79 @@ export async function getCommentsForEntity(event: H3Event, config: CommentConfig
   }
 }
 
+/**
+ * Prévient l'auteur de l'offre ou de la demande, et les autres personnes qui y ont commenté.
+ *
+ * ⚠️ POURQUOI CETTE FONCTION EXISTE. Le libellé du réglage promettait déjà ces notifications —
+ * « Soyez notifié des réservations ET MESSAGES de covoiturage » — et rien ne les envoyait. Une
+ * promesse non tenue est pire qu'une absence : on cesse de venir regarder, en croyant qu'on serait
+ * prévenu.
+ *
+ * Qui est prévenu, et pourquoi ces trois règles :
+ *
+ * 1. **l'auteur de l'offre ou de la demande**, parce que c'est à lui qu'on s'adresse en commentant ;
+ * 2. **les autres personnes ayant déjà commenté**, parce qu'un fil de commentaires est une
+ *    conversation : celui qui a posé une question doit savoir qu'on y répond, même si l'annonce
+ *    n'est pas la sienne ;
+ * 3. **jamais celui qui vient d'écrire**, et le dédoublonnage compte ici : l'auteur de l'annonce
+ *    est le plus souvent aussi un commentateur, et sans `Set` il recevrait deux notifications pour
+ *    le même message.
+ *
+ * ⚠️ Les envois passent par `safeNotify` et n'interrompent jamais la création : un commentaire
+ * enregistré puis perdu parce qu'une notification a échoué serait un défaut bien plus grave que
+ * l'absence de notification.
+ */
+async function prevenirLesInteresses(contexte: {
+  typeEntite: 'carpoolOffer' | 'carpoolRequest'
+  entiteId: number
+  champEntite: string
+  modele: any
+  auteurDeLEntite: number | null | undefined
+  editionId: number | null
+  auteurDuCommentaire: number | undefined
+  nomDeLAuteur: string
+}): Promise<void> {
+  const { auteurDuCommentaire } = contexte
+  if (!auteurDuCommentaire) return
+
+  const aPrevenir = new Set<number>()
+
+  if (contexte.auteurDeLEntite && contexte.auteurDeLEntite !== auteurDuCommentaire) {
+    aPrevenir.add(contexte.auteurDeLEntite)
+  }
+
+  // Les autres commentateurs. `distinct` côté base plutôt qu'en mémoire : un fil de vingt
+  // commentaires écrits par trois personnes ne doit pas ramener vingt lignes.
+  const commentateurs: { userId: number | null }[] = await contexte.modele.findMany({
+    where: { [contexte.champEntite]: contexte.entiteId },
+    select: { userId: true },
+    distinct: ['userId'],
+  })
+
+  for (const { userId } of commentateurs) {
+    if (userId && userId !== auteurDuCommentaire) aPrevenir.add(userId)
+  }
+
+  if (aPrevenir.size === 0) return
+
+  const type = contexte.typeEntite === 'carpoolOffer' ? 'offer' : 'request'
+  await Promise.all(
+    [...aPrevenir].map((userId) =>
+      safeNotify(
+        () =>
+          NotificationHelpers.carpoolCommentReceived(
+            userId,
+            contexte.nomDeLAuteur,
+            type,
+            contexte.entiteId,
+            contexte.editionId
+          ),
+        'covoiturage commentaire'
+      )
+    )
+  )
+}
+
 export async function createCommentForEntity(
   event: H3Event,
   config: CommentConfig & { requireAuth?: boolean }
@@ -99,9 +173,11 @@ export async function createCommentForEntity(
     // Vérifier que la ressource parente existe
     const parentModelName = config.entityType === 'carpoolOffer' ? 'carpoolOffer' : 'carpoolRequest'
     const parentModel: any = (prisma as any)[parentModelName]
+    // `userId` et `editionId` en plus de l'existence : ils servent à prévenir l'auteur et à
+    // construire l'URL de la notification, et les redemander ensuite ferait une requête de plus.
     const parentExists = await parentModel.findUnique({
       where: { id: parsedId },
-      select: { id: true },
+      select: { id: true, userId: true, editionId: true },
     })
 
     if (!parentExists) {
@@ -140,6 +216,17 @@ export async function createCommentForEntity(
           select: carpoolUserSelect,
         },
       },
+    })
+
+    await prevenirLesInteresses({
+      typeEntite: config.entityType,
+      entiteId: parsedId,
+      champEntite: config.entityIdField,
+      modele: model,
+      auteurDeLEntite: parentExists.userId,
+      editionId: parentExists.editionId ?? null,
+      auteurDuCommentaire: event.context.user?.id,
+      nomDeLAuteur: comment.user?.pseudo ?? comment.user?.prenom ?? 'Quelqu’un',
     })
 
     return comment

@@ -49,6 +49,11 @@
         "action": "Vedi altre offerte",
         "message": "{ownerName} ha rifiutato la tua richiesta di {seats} posto/i per il viaggio da {locationCity}",
         "title": "Richiesta rifiutata"
+      },
+      "comment_received": {
+        "action": "Vedi la conversazione",
+        "message": "{commenterName} ha scritto un messaggio",
+        "title": "Nuovo messaggio di car sharing 💬"
       }
     },
     "common": {

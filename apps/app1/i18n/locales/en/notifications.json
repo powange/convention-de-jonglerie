@@ -49,6 +49,11 @@
         "action": "View other offers",
         "message": "{ownerName} has declined your request for {seats} seat(s) for the trip from {locationCity}",
         "title": "Request declined"
+      },
+      "comment_received": {
+        "action": "View conversation",
+        "message": "{commenterName} wrote a message",
+        "title": "New carpool message 💬"
       }
     },
     "common": {
