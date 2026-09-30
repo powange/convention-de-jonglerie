@@ -6,8 +6,9 @@
       <LoadingLogo :loaded="sortie" />
     </div>
 
-    <!-- Le contenu est rendu par le serveur : le masquer revenait à cacher une page déjà prête. -->
-    <div>
+    <!-- Le contenu reste masqué jusqu'à l'HYDRATATION, et pas une milliseconde de plus.
+         Voir la note du script : ce `v-show` fait plus qu'éviter un saut de mise en page. -->
+    <div v-show="!voileVisible">
       <ClientOnly>
         <!-- Bannière d'impersonation -->
         <UiImpersonationBanner />
@@ -47,9 +48,20 @@ import { onMounted } from 'vue'
  * passes sur release : LCP de 13 344 ms sur l'accueil pour un `load` à 9 493 ms, et 14 716 ms sur
  * une fiche d'édition pour un `load` à 13 007 ms. L'écart, c'est ce voile.
  *
- * Ce qui le remplace : le contenu n'est plus masqué du tout, et le voile s'efface PAR-DESSUS en un
- * fondu court. Il ne guette plus `load`, il ne compte plus de durée fixe — il sort dès que
- * l'application est montée, c'est-à-dire dès que l'hydratation a eu lieu.
+ * Ce qui le remplace : le voile sort dès que l'application est MONTÉE, avec un fondu de 300 ms. Il
+ * ne guette plus `load` — donc plus les images — et ne compte plus de durée fixe.
+ *
+ * ⚠️ LE CONTENU RESTE MASQUÉ JUSQUE-LÀ, ET C'EST UN CHOIX RELU. Une première version le rendait
+ * visible dès le rendu serveur, ce qui donne le meilleur LCP possible. Elle a fait tomber quatre
+ * lots Playwright, et pour une raison qui n'est pas un artefact de test : les scénarios
+ * remplissaient un champ de mot de passe aussitôt après `DOMContentLoaded`, et Vue le
+ * RÉINITIALISAIT en s'hydratant. Ce que le `display: none` empêchait, ce n'était donc pas seulement
+ * un saut de mise en page — c'était d'écrire dans un formulaire que personne n'écoute encore, et de
+ * perdre sa saisie.
+ *
+ * On garde donc la barrière, en la ramenant de « `load` + une seconde » à « hydratation ». C'est la
+ * seconde branche que l'énoncé laissait ouverte — « visible dès l'hydratation » — et elle retire
+ * les deux attentes coûteuses sans rouvrir ce piège.
  *
  * Le plafond de sécurité reste, pour une seule raison : si le montage n'arrivait jamais — une
  * erreur d'hydratation, un script bloqué — le voile resterait indéfiniment devant la page. Il

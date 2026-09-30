@@ -11,19 +11,22 @@ import { expect, test } from '@nuxt/test-utils/playwright'
  * Mesuré avant correction, en profil mobile bridé (Slow 4G, processeur ÷4), médiane de trois
  * passes : LCP de 13 344 ms sur l'accueil pour un `load` à 9 493 ms. L'écart, c'était ce voile.
  *
- * ⚠️ POURQUOI CE TEST MESURE UN DÉLAI, ce qu'on évite d'ordinaire. Parce que le défaut EST un
+ * ⚠️ POURQUOI CES TESTS MESURENT UN DÉLAI, ce qu'on évite d'ordinaire. Parce que le défaut EST un
  * délai : une assertion de visibilité seule serait restée verte avant comme après — le contenu
  * finissait par apparaître. Le seuil est donc volontairement large (500 ms, contre les 1 000 ms
  * fixes d'avant) : il ne mesure pas une performance, il vérifie qu'aucune attente n'est réintroduite.
+ *
+ * ⚠️ LE REPÈRE EST L'HYDRATATION, ET NON `DOMContentLoaded`. Le contenu reste volontairement masqué
+ * jusque-là : une première version le découvrait dès le rendu serveur, et quatre lots Playwright
+ * sont tombés parce que leurs scénarios remplissaient un champ de mot de passe avant l'hydratation
+ * — Vue le réinitialisait ensuite. Ce que ce voile empêche n'est donc pas seulement un saut de mise
+ * en page, c'est de saisir dans un formulaire que personne n'écoute encore.
  */
 test.describe('Voile de chargement', () => {
-  test('le contenu est visible moins de 500 ms après le chargement du DOM', async ({
-    page,
-    goto,
-  }) => {
-    // `domcontentloaded` et non `hydration` : c'est justement l'écart entre les deux que ce test
-    // surveille, et attendre l'hydratation le rendrait aveugle.
-    await goto('/', { waitUntil: 'domcontentloaded' })
+  test('le contenu est visible moins de 500 ms après l’hydratation', async ({ page, goto }) => {
+    // C'est l'attente APRÈS l'hydratation que ce test surveille : les mille millisecondes fixes
+    // d'animation, plus l'attente de `load` — donc des images — qui les précédait.
+    await goto('/', { waitUntil: 'hydration' })
 
     const depart = Date.now()
     /*
@@ -37,7 +40,7 @@ test.describe('Voile de chargement', () => {
 
     expect(
       ecoule,
-      `le contenu a mis ${ecoule} ms à devenir visible après DOMContentLoaded`
+      `le contenu a mis ${ecoule} ms à devenir visible après l'hydratation`
     ).toBeLessThan(500)
   })
 
@@ -55,10 +58,10 @@ test.describe('Voile de chargement', () => {
     await expect(page.locator('.loading-screen')).toHaveCount(0, { timeout: 5000 })
   })
 
-  test('la page reste cliquable tout de suite', async ({ page, goto }) => {
-    // Le corollaire du précédent, vérifié par l'usage plutôt que par le style : un lien de
-    // l'en-tête doit répondre sans qu'on ait attendu la fin d'un fondu.
-    await goto('/', { waitUntil: 'domcontentloaded' })
+  test('la page est cliquable dès l’hydratation', async ({ page, goto }) => {
+    // Le corollaire du précédent, vérifié par l'usage plutôt que par le style : un lien doit
+    // répondre sans qu'on ait attendu la fin d'un fondu ni le chargement des images.
+    await goto('/', { waitUntil: 'hydration' })
 
     const lien = page.getByRole('link', { name: /connexion/i }).first()
     await expect(lien).toBeVisible({ timeout: 5000 })
