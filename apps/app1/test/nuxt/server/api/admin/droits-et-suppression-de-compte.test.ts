@@ -124,7 +124,16 @@ describe('DELETE /api/admin/users/[id]', () => {
     })
     ;(global as any).readBody = vi.fn().mockResolvedValue({ reason: 'SPAM_ACTIVITY' })
     mockSendEmail.mockResolvedValue(true)
-    prismaMock.user.delete.mockResolvedValue({ id: 42 })
+    // Le `select` du handler rend ces champs, et le courriel se compose désormais SUR EUX : un
+    // mock qui ne rendrait que l'id produirait un courriel adressé à `undefined`, ce qui est
+    // précisément ce que le test d'ordre ci-dessous doit pouvoir distinguer.
+    prismaMock.user.delete.mockResolvedValue({
+      id: 42,
+      email: 'cible@exemple.fr',
+      pseudo: 'cible',
+      nom: 'Martin',
+      prenom: 'Camille',
+    })
     prismaMock.$transaction?.mockImplementation(async (fn: any) =>
       typeof fn === 'function' ? fn(prismaMock) : fn
     )
@@ -135,8 +144,44 @@ describe('DELETE /api/admin/users/[id]', () => {
     expect(prismaMock.user.delete).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 42 } })
     )
-    // Le courriel part AVANT la suppression : après, l'adresse n'existe plus.
+    /*
+     * 📍 Un commentaire de ce test affirmait que le courriel devait partir AVANT la suppression,
+     * « après, l'adresse n'existe plus ». C'était faux : l'adresse est en mémoire, rendue par le
+     * `select` de la suppression elle-même. Cette justification a survécu au défaut qu'elle
+     * expliquait — de quoi dissuader quiconque aurait voulu corriger l'ordre.
+     */
     expect(mockSendEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'cible@exemple.fr' }))
+  })
+
+  it('n’envoie AUCUN courriel quand la suppression échoue', async () => {
+    /*
+     * ⚠️ LE TEST QUI PORTE LE LOT. Le courriel partait AVANT `prisma.user.delete` : toute
+     * défaillance de la suppression — une clé étrangère en RESTRICT, une coupure de base, un
+     * conteneur qui tombe — laissait un compte VIVANT dont le titulaire venait de recevoir
+     * « votre compte a été supprimé », définitif et motivé.
+     *
+     * Il écrit alors pour contester une suppression qui n'a pas eu lieu, et l'administrateur ne
+     * trouve dans les journaux rien qui explique l'écart : le courriel, lui, est bien parti.
+     */
+    prismaMock.user.delete.mockRejectedValue(new Error('contrainte de clé étrangère'))
+
+    await expect(supprimer({} as any)).rejects.toThrow()
+
+    expect(mockSendEmail).not.toHaveBeenCalled()
+  })
+
+  it('envoie le courriel APRÈS la suppression, pas avant', async () => {
+    /*
+     * Le pendant du test précédent, et il n'est pas redondant : celui-ci voit l'ordre même quand
+     * les deux réussissent. Sans lui, remettre l'envoi avant la suppression tout en la laissant
+     * réussir passerait inaperçu — le cas nominal, donc celui qu'on observe le plus.
+     */
+    await supprimer({} as any)
+
+    const ordreSuppression = prismaMock.user.delete.mock.invocationCallOrder[0]
+    const ordreCourriel = mockSendEmail.mock.invocationCallOrder[0]
+
+    expect(ordreSuppression).toBeLessThan(ordreCourriel)
   })
 
   it('refuse de supprimer un administrateur global', async () => {
@@ -171,11 +216,20 @@ describe('DELETE /api/admin/users/[id]', () => {
     }
   })
 
-  it('supprime quand même si le courriel échoue', async () => {
-    // Décision déjà prise dans le code, et qui mérite d'être figée : un serveur de courriel
-    // indisponible ne doit pas empêcher une suppression demandée pour abus.
+  it('ne défait rien si le courriel échoue APRÈS la suppression', async () => {
+    /*
+     * Le risque s'est inversé avec l'ordre, et c'est assumé : un envoi qui échoue laisse un compte
+     * bien supprimé dont le titulaire n'est pas averti. C'est le moindre des deux maux — le
+     * silence se rattrape, l'annonce d'un fait qui n'a pas eu lieu non.
+     *
+     * Et l'échec d'envoi était DÉJÀ toléré auparavant : ce test existait, il change seulement de
+     * raison d'être. Ce qu'il tient désormais, c'est que la réponse reste un succès — sans quoi
+     * l'administrateur relancerait la suppression sur un compte qui n'existe plus.
+     */
     mockSendEmail.mockRejectedValue(new Error('smtp injoignable'))
-    await supprimer({} as any)
+
+    await expect(supprimer({} as any)).resolves.toBeTruthy()
+
     expect(prismaMock.user.delete).toHaveBeenCalled()
   })
 
