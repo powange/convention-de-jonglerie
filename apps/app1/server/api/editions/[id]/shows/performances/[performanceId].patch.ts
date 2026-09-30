@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
+import {
+  verifierRepereDeLEdition,
+  verifierZoneDeLEdition,
+} from '#server/utils/appartenance-a-l-edition'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageArtistsById } from '#server/utils/permissions/edition-permissions'
 import { showZoneMarkerInclude } from '#server/utils/prisma-select-helpers'
@@ -50,8 +54,25 @@ export default wrapApiHandler(
     const data: Record<string, unknown> = {}
     if (body.startDateTime !== undefined) data.startDateTime = new Date(body.startDateTime)
     if (body.location !== undefined) data.location = body.location
-    if (body.zoneId !== undefined) data.zoneId = body.zoneId || null
-    if (body.markerId !== undefined) data.markerId = body.markerId || null
+    /*
+     * ⚠️ LA ZONE ET LE REPÈRE SONT VÉRIFIÉS, et la garde du dessus n'y suffisait PAS. Elle prouve
+     * que la REPRÉSENTATION appartient à l'édition (`show: { editionId } }`) — pas que les
+     * identifiants qu'on lui affecte y appartiennent aussi.
+     *
+     * Une représentation de cette édition pouvait donc pointer la zone ou le repère d'une AUTRE :
+     * le public voyait sur son plan un lieu qui n'existe pas chez lui, ou le nom d'un lieu d'une
+     * autre convention. Aucune erreur, aucune trace — la zone existe, elle a un nom.
+     *
+     * `null` reste permis : c'est ainsi qu'on détache une représentation de son lieu.
+     */
+    if (body.zoneId !== undefined) {
+      await verifierZoneDeLEdition(prisma, editionId, body.zoneId)
+      data.zoneId = body.zoneId || null
+    }
+    if (body.markerId !== undefined) {
+      await verifierRepereDeLEdition(prisma, editionId, body.markerId)
+      data.markerId = body.markerId || null
+    }
     if (body.isPublic !== undefined) data.isPublic = body.isPublic
 
     const updated = await prisma.showPerformance.update({

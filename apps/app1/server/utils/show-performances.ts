@@ -1,5 +1,11 @@
 import { z } from 'zod'
 
+import {
+  editionDuSpectacle,
+  verifierRepereDeLEdition,
+  verifierZoneDeLEdition,
+} from './appartenance-a-l-edition'
+
 import type { Prisma } from '#server/types/prisma'
 
 type PrismaClientLike = Prisma.TransactionClient | typeof prisma
@@ -46,6 +52,20 @@ export async function replaceShowPerformances(
   showId: number,
   performances: ShowPerformanceInput[]
 ): Promise<void> {
+  /*
+   * ⚠️ ZONES ET REPÈRES VÉRIFIÉS AVANT TOUTE ÉCRITURE. Une représentation pouvait pointer la zone
+   * ou le repère de carte d'une AUTRE édition : le public de celle-ci voyait alors, sur son plan,
+   * un lieu qui n'existe pas chez elle — ou pire, le nom d'un lieu d'une autre convention.
+   *
+   * AVANT le `deleteMany`, pour la même raison que dans la composition : lever après avoir
+   * supprimé les représentations existantes les perdrait pour rien.
+   */
+  const editionId = await editionDuSpectacle(client, showId)
+  for (const performance of performances) {
+    await verifierZoneDeLEdition(client, editionId, performance.zoneId)
+    await verifierRepereDeLEdition(client, editionId, performance.markerId)
+  }
+
   await client.showPerformance.deleteMany({ where: { showId } })
 
   if (performances.length === 0) return
