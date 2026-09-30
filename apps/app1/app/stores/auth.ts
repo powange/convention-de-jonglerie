@@ -111,9 +111,27 @@ export const useAuthStore = defineStore('auth', {
       return response
     },
     async logout() {
+      /*
+       * L'identifiant d'appareil part AVEC la déconnexion : le serveur désactive alors le token
+       * FCM de ce navigateur. Sans lui, les notifications push du compte qui vient de partir
+       * continuaient d'arriver — sur un poste partagé, la personne suivante les lisait.
+       *
+       * `getDeviceId` ne touche que `localStorage` et rend `null` côté serveur : aucun besoin de
+       * contexte de composant, et son absence ne bloque pas la déconnexion.
+       */
+      let deviceId: string | null = null
+      try {
+        deviceId = useDeviceId().getDeviceId()
+      } catch {
+        // `localStorage` inaccessible (navigation privée verrouillée) : on se déconnecte quand même.
+      }
+
       // IMPORTANT: D'abord effacer la session serveur, PUIS nettoyer le store
       try {
-        await $fetch('/api/auth/logout', { method: 'POST' })
+        await $fetch('/api/auth/logout', {
+          method: 'POST',
+          body: deviceId ? { deviceId } : {},
+        })
       } catch {
         // ignore network/log out errors
       }
