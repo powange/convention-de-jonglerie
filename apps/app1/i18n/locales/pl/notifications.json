@@ -54,6 +54,11 @@
         "action": "Zobacz rozmowę",
         "message": "{commenterName} napisał wiadomość",
         "title": "Nowa wiadomość o wspólnych przejazdach 💬"
+      },
+      "booking_revoked": {
+        "action": "Poszukaj innej podróży",
+        "message": "{ownerName} odebrał Ci miejsce ({seats}) w podróży z {locationCity}",
+        "title": "Twoje miejsce zostało odebrane"
       }
     },
     "common": {

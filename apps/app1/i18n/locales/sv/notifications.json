@@ -54,6 +54,11 @@
         "action": "Visa konversationen",
         "message": "{commenterName} har skrivit ett meddelande",
         "title": "Nytt samåkningsmeddelande 💬"
+      },
+      "booking_revoked": {
+        "action": "Sök en annan resa",
+        "message": "{ownerName} har tagit bort din plats ({seats}) på resan från {locationCity}",
+        "title": "Din plats har tagits bort"
       }
     },
     "common": {

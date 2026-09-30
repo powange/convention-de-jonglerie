@@ -1,9 +1,21 @@
+import { z } from 'zod'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { NotificationHelpers, safeNotify } from '#server/utils/notification-service'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { userWithProfileSelect } from '#server/utils/prisma-select-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
+
+/**
+ * Les trois actions, et rien d'autre.
+ *
+ * `z.enum` plutôt qu'un test de présence : une valeur inconnue doit produire un 400 qui le dit, et
+ * non un 200 sur une réservation qu'on n'a pas touchée.
+ */
+const corpsSchema = z.object({
+  action: z.enum(['ACCEPT', 'REJECT', 'CANCEL']),
+})
 
 export default wrapApiHandler(
   async (event) => {
@@ -12,11 +24,15 @@ export default wrapApiHandler(
     const offerId = validateResourceId(event, 'id', 'offre')
     const bookingId = validateResourceId(event, 'bookingId', 'demande')
 
-    const body = await readBody(event)
-    const action = body?.action as 'ACCEPT' | 'REJECT' | 'CANCEL'
-    if (!action) {
-      throw createError({ status: 400, message: 'Action manquante' })
-    }
+    /*
+     * ⚠️ Une action INCONNUE renvoyait la réservation inchangée, en 200.
+     *
+     * L'ancien contrôle ne refusait que l'absence d'action. Une valeur comme « DECLINE » passait
+     * donc, `newStatus` restait égal au statut courant, et l'`update` réécrivait la même valeur :
+     * l'appelant recevait un succès et une réservation intacte, sans jamais savoir que son action
+     * n'existait pas. Le plus trompeur des échecs est celui qui répond 200.
+     */
+    const { action } = corpsSchema.parse(await readBody(event))
 
     // Récupérer l'offre et la réservation
     const offer = await prisma.carpoolOffer.findUnique({
@@ -45,8 +61,28 @@ export default wrapApiHandler(
       throw createError({ status: 403, message: 'Annulation non autorisée' })
     }
 
-    // Transitions de statut
-    if (booking.status !== 'PENDING' && action !== 'CANCEL') {
+    /*
+     * Transitions autorisées :
+     *
+     * - ACCEPT  : depuis PENDING seulement. Accepter deux fois n'a pas de sens, et ré-accepter un
+     *             refus effacerait la décision du conducteur sans trace.
+     * - REJECT  : depuis PENDING **ou ACCEPTED**. C'est ce que ce lot ajoute — le conducteur ne
+     *             pouvait pas retirer quelqu'un qu'il avait accepté, alors que sa voiture peut
+     *             tomber en panne ou perdre une place. Il ne lui restait qu'à supprimer l'offre
+     *             entière, ce qui prévient tout le monde pour retirer une personne.
+     * - CANCEL  : depuis n'importe quel état, par le demandeur seul.
+     *
+     * ⚠️ REJECTED et non CANNCELLED pour le retrait par le conducteur, et c'est un choix : CANCELLED
+     * est le geste du DEMANDEUR (« j'annule ma demande »), REJECTED celui du CONDUCTEUR. Les
+     * confondre ferait lire « annulé » au passager dans sa propre liste, comme s'il s'était
+     * désisté — on lui attribuerait une décision qui n'est pas la sienne.
+     */
+    const retraitParLeConducteur = action === 'REJECT' && booking.status === 'ACCEPTED'
+
+    if (action === 'ACCEPT' && booking.status !== 'PENDING') {
+      throw createError({ status: 400, message: 'Réservation déjà traitée' })
+    }
+    if (action === 'REJECT' && booking.status !== 'PENDING' && booking.status !== 'ACCEPTED') {
       throw createError({ status: 400, message: 'Réservation déjà traitée' })
     }
 
@@ -118,6 +154,24 @@ export default wrapApiHandler(
               offer.tripDate
             ),
           'covoiturage réservation acceptée'
+        )
+      } else if (retraitParLeConducteur) {
+        /*
+         * Un RETRAIT, pas un refus. Le passager avait une place et l'organisait : lui envoyer
+         * « votre demande a été refusée » serait faux, et lui laisserait croire qu'il n'en avait
+         * jamais eu. La distinction ne coûte qu'un message, et c'est le seul endroit où elle se
+         * voit.
+         */
+        await safeNotify(
+          () =>
+            NotificationHelpers.carpoolBookingRevoked(
+              booking.requesterId,
+              ownerName,
+              offerId,
+              booking.seats,
+              offer.locationCity
+            ),
+          'covoiturage place retirée'
         )
       } else {
         await safeNotify(

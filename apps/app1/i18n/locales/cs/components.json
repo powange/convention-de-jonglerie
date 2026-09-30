@@ -75,7 +75,10 @@
       "trip_date": "Datum cesty",
       "view_comments": "Zobrazit komentáře ({count})",
       "offer_load_error": "Tuto nabídku se nepodařilo načíst",
-      "request_load_error": "Tento požadavek se nepodařilo načíst"
+      "request_load_error": "Tento požadavek se nepodařilo načíst",
+      "revoke_seat": "Odebrat",
+      "revoke_seat_description": "{pseudo} má na této jízdě potvrzené místo a o odebrání bude informován. Místo nebude možné vrátit: bude nutná nová žádost.",
+      "revoke_seat_title": "Odebrat toto místo?"
     },
     "convention_form": {
       "click_to_select_image": "Kliknutím vyberete obrázek",

@@ -206,11 +206,15 @@ describe('/api/carpool-offers/[id]/bookings/[bookingId] PUT', () => {
       await expect(handler(mockEvent as any)).rejects.toThrow('ID de demande invalide')
     })
 
+    // Le corps est désormais validé par un `z.enum` : l'absence d'action et une action inconnue
+    // passent par le même refus 400 « Données invalides ». Avant, seule l'absence était refusée —
+    // une valeur comme « DECLINE » renvoyait la réservation inchangée en 200. Le détail des
+    // transitions et le retrait d'une place accordée sont couverts par `retirer-place-acceptee`.
     it('devrait rejeter si action manquante', async () => {
       global.getRouterParam = vi.fn().mockReturnValueOnce('1').mockReturnValueOnce('2')
       global.readBody.mockResolvedValue({})
 
-      await expect(handler(mockEvent as any)).rejects.toThrow('Action manquante')
+      await expect(handler(mockEvent as any)).rejects.toThrow('Données invalides')
     })
 
     it('devrait rejeter si offre non trouvée', async () => {

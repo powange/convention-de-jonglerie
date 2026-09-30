@@ -50,6 +50,11 @@
         "message": "{ownerName} a refusé votre demande de {seats} place(s) pour le trajet depuis {locationCity}",
         "title": "Demande refusée"
       },
+      "booking_revoked": {
+        "action": "Chercher un autre trajet",
+        "message": "{ownerName} a retiré votre place ({seats}) sur le trajet depuis {locationCity}",
+        "title": "Votre place a été retirée"
+      },
       "comment_received": {
         "action": "Voir la conversation",
         "message": "{commenterName} a écrit un message",

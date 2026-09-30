@@ -75,7 +75,10 @@
       "trip_date": "Resedatum",
       "view_comments": "Visa kommentarer ({count})",
       "offer_load_error": "Det gick inte att ladda erbjudandet",
-      "request_load_error": "Det gick inte att ladda förfrågan"
+      "request_load_error": "Det gick inte att ladda förfrågan",
+      "revoke_seat": "Ta bort",
+      "revoke_seat_description": "{pseudo} har en bekräftad plats på den här resan och får ett meddelande om borttagningen. Du kan inte ge tillbaka platsen: en ny förfrågan behövs.",
+      "revoke_seat_title": "Ta bort den här platsen?"
     },
     "convention_form": {
       "click_to_select_image": "Klicka för att välja en bild",

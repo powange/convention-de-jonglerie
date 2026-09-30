@@ -75,7 +75,10 @@
       "trip_date": "Reisdatum",
       "view_comments": "Bekijk opmerkingen ({count})",
       "offer_load_error": "Dit aanbod kon niet worden geladen",
-      "request_load_error": "Deze aanvraag kon niet worden geladen"
+      "request_load_error": "Deze aanvraag kon niet worden geladen",
+      "revoke_seat": "Verwijderen",
+      "revoke_seat_description": "{pseudo} heeft een bevestigde plaats op deze rit en krijgt een melding van de verwijdering. Je kunt de plaats niet teruggeven: er is een nieuwe aanvraag nodig.",
+      "revoke_seat_title": "Deze plaats verwijderen?"
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",

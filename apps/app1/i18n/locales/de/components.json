@@ -75,7 +75,10 @@
       "trip_date": "Reisedatum",
       "view_comments": "Kommentare anzeigen ({count})",
       "offer_load_error": "Dieses Angebot konnte nicht geladen werden",
-      "request_load_error": "Diese Anfrage konnte nicht geladen werden"
+      "request_load_error": "Diese Anfrage konnte nicht geladen werden",
+      "revoke_seat": "Entfernen",
+      "revoke_seat_description": "{pseudo} hat einen bestätigten Platz auf dieser Fahrt und wird über die Entfernung benachrichtigt. Du kannst den Platz nicht zurückgeben: Eine neue Anfrage ist erforderlich.",
+      "revoke_seat_title": "Diesen Platz entfernen?"
     },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",

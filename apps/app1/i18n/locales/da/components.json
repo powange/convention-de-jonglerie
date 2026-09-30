@@ -75,7 +75,10 @@
       "trip_date": "Rejsedato",
       "view_comments": "Se kommentarer ({count})",
       "offer_load_error": "Tilbuddet kunne ikke indlæses",
-      "request_load_error": "Forespørgslen kunne ikke indlæses"
+      "request_load_error": "Forespørgslen kunne ikke indlæses",
+      "revoke_seat": "Fjern",
+      "revoke_seat_description": "{pseudo} har en bekræftet plads på denne tur og vil få besked om fjernelsen. Du kan ikke give pladsen tilbage: der skal sendes en ny anmodning.",
+      "revoke_seat_title": "Fjern denne plads?"
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",

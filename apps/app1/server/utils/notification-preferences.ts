@@ -114,6 +114,7 @@ export const NotificationTypeMapping = {
    * créé une case que personne n'a demandée, pour une promesse qui existait sans être tenue.
    */
   carpool_comment_received: 'carpoolUpdates' as const,
+  carpool_booking_revoked: 'carpoolUpdates' as const,
 
   // Artistes
   artist_arrival: 'artistUpdates' as const,

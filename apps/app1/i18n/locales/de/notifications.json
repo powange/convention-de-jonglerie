@@ -54,6 +54,11 @@
         "action": "Unterhaltung ansehen",
         "message": "{commenterName} hat eine Nachricht geschrieben",
         "title": "Neue Mitfahr-Nachricht 💬"
+      },
+      "booking_revoked": {
+        "action": "Eine andere Fahrt suchen",
+        "message": "{ownerName} hat deinen Platz ({seats}) auf der Fahrt ab {locationCity} entfernt",
+        "title": "Dein Platz wurde entfernt"
       }
     },
     "common": {

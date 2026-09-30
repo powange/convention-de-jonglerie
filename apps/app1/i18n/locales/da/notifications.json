@@ -54,6 +54,11 @@
         "action": "Se samtalen",
         "message": "{commenterName} har skrevet en besked",
         "title": "Ny samkørselsbesked 💬"
+      },
+      "booking_revoked": {
+        "action": "Find en anden tur",
+        "message": "{ownerName} har fjernet din plads ({seats}) på turen fra {locationCity}",
+        "title": "Din plads er blevet fjernet"
       }
     },
     "common": {
