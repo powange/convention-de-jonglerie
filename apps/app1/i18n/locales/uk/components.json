@@ -73,7 +73,9 @@
       "suggestions": "Пропозиції",
       "to_add_comment": "щоб додати коментар",
       "trip_date": "Дата поїздки",
-      "view_comments": "Переглянути коментарі ({count})"
+      "view_comments": "Переглянути коментарі ({count})",
+      "offer_load_error": "Не вдалося завантажити цю пропозицію",
+      "request_load_error": "Не вдалося завантажити цей запит"
     },
     "convention_form": {
       "click_to_select_image": "Натисніть, щоб вибрати зображення",

@@ -27,14 +27,32 @@ describe('FormBase — la ville', () => {
     fetchMock.mockClear()
   })
 
+  /*
+   * ⚠️ Démonter, et pas seulement restaurer les mocks. Le champ ville passe par
+   * `refDebounced(searchTerm, 300)` : écrire dans `searchTerm` arme un `setTimeout` de 300 ms qui
+   * déclenche la recherche Nominatim. Le test, lui, se termine en quelques millisecondes — la
+   * minuterie retombait donc APRÈS la destruction de l'environnement happy-dom, le `USelectMenu`
+   * se ré-affichait dans le vide, et reka-ui levait « ReferenceError: Element is not defined ».
+   *
+   * Un rejet non géré ne fait échouer aucun test : les 3479 passaient, et vitest sortait quand
+   * même en 1 sur `Errors 1 error`. C'est ce qui a mis la CI de la #618 au rouge sans qu'aucune
+   * ligne de « Failed Tests » ne l'explique. Démonter arrête le périmètre d'effets du composant,
+   * et la retombée de la minuterie ne ré-affiche plus rien.
+   */
+  const montes: { unmount: () => void }[] = []
+
   afterEach(() => {
+    while (montes.length) montes.pop()?.unmount()
     vi.restoreAllMocks()
   })
 
-  const monter = () =>
-    mountSuspended(FormBase, {
+  const monter = async () => {
+    const composant = await mountSuspended(FormBase, {
       props: { editionId: 22, formType: 'offer' as const },
     })
+    montes.push(composant)
+    return composant
+  }
 
   it('accepte une ville hors des suggestions et la transmet', async () => {
     const composant = await monter()
@@ -86,6 +104,38 @@ describe('FormBase — la ville', () => {
     await nextTick()
 
     expect(vm.form.locationCity).toBe('Innsbruck, Tyrol, Autriche')
+  })
+
+  it('ne lance plus de recherche de ville une fois le composant démonté', async () => {
+    /*
+     * La preuve du démontage, et pas seulement son intention. Sans lui, la minuterie de 300 ms
+     * retombe après la fin du test : la requête de suggestions part dans un environnement déjà
+     * détruit, et reka-ui lève « Element is not defined » — un rejet non géré qui ne fait échouer
+     * aucun test mais fait sortir vitest en 1.
+     *
+     * Ce test mesure exactement ce qui doit ne PLUS se produire : une recherche qui démarre après
+     * le démontage.
+     */
+    const composant = await monter()
+    const vm = composant.vm as unknown as { searchTerm: string; loadingSuggestions: boolean }
+
+    vm.searchTerm = 'Innsbruck'
+    await nextTick()
+
+    composant.unmount()
+    montes.length = 0
+
+    // Laisser largement passer les 300 ms du `refDebounced`.
+    await new Promise((resoudre) => setTimeout(resoudre, 400))
+
+    /*
+     * `loadingSuggestions` est le premier effet de la recherche, et le seul qu'on puisse mesurer
+     * sans dépendre de la sortie réseau : c'est lui qui ré-affiche le `USelectMenu`, et donc lui
+     * qui provoquait l'erreur. Le voir rester à `false` prouve que le watcher est bien arrêté.
+     */
+    expect(vm.loadingSuggestions, 'la recherche ne doit pas démarrer après le démontage').toBe(
+      false
+    )
   })
 
   it('ne porte plus de champ `departureCoordinates`', async () => {

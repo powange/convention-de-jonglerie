@@ -73,7 +73,9 @@
       "suggestions": "Suggestions",
       "to_add_comment": "to add a comment",
       "trip_date": "Trip date",
-      "view_comments": "View comments ({count})"
+      "view_comments": "View comments ({count})",
+      "offer_load_error": "This offer could not be loaded",
+      "request_load_error": "This request could not be loaded"
     },
     "convention_form": {
       "click_to_select_image": "Click to select an image",

@@ -73,7 +73,9 @@
       "suggestions": "Návrhy",
       "to_add_comment": "přidat komentář",
       "trip_date": "Datum cesty",
-      "view_comments": "Zobrazit komentáře ({count})"
+      "view_comments": "Zobrazit komentáře ({count})",
+      "offer_load_error": "Tuto nabídku se nepodařilo načíst",
+      "request_load_error": "Tento požadavek se nepodařilo načíst"
     },
     "convention_form": {
       "click_to_select_image": "Kliknutím vyberete obrázek",

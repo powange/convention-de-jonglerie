@@ -73,7 +73,9 @@
       "suggestions": "Förslag",
       "to_add_comment": "för att lägga till en kommentar",
       "trip_date": "Resedatum",
-      "view_comments": "Visa kommentarer ({count})"
+      "view_comments": "Visa kommentarer ({count})",
+      "offer_load_error": "Det gick inte att ladda erbjudandet",
+      "request_load_error": "Det gick inte att ladda förfrågan"
     },
     "convention_form": {
       "click_to_select_image": "Klicka för att välja en bild",
