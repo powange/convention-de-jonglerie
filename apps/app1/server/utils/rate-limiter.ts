@@ -126,7 +126,13 @@ export const checkEmailRateLimiter = createRateLimiter({
  */
 export const emailRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3,
+  /*
+   * La dérogation en développement et en E2E, que les cinq autres limiteurs de ce fichier avaient
+   * déjà et que celui-ci était seul à ne pas avoir. Sans elle, trois envois par quart d'heure
+   * rendent un parcours intestable dès qu'on l'exerce deux fois — et la panne ressemble alors à un
+   * défaut du code plutôt qu'à un garde-fou qui a joué.
+   */
+  max: import.meta.dev || process.env.E2E_TEST === 'true' ? 100 : 3,
   message: "Trop d'envois d'email, veuillez réessayer plus tard",
   keyGenerator: (event: H3Event) => {
     // Utiliser l'email ou l'ID utilisateur si disponible
