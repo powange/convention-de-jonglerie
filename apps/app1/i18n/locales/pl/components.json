@@ -73,7 +73,9 @@
       "suggestions": "Sugestie",
       "to_add_comment": "aby dodać komentarz",
       "trip_date": "Data podróży",
-      "view_comments": "Zobacz komentarze ({count})"
+      "view_comments": "Zobacz komentarze ({count})",
+      "offer_load_error": "Nie udało się wczytać tej oferty",
+      "request_load_error": "Nie udało się wczytać tej prośby"
     },
     "convention_form": {
       "click_to_select_image": "Kliknij, aby wybrać obraz",

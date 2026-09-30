@@ -73,7 +73,9 @@
       "suggestions": "Forslag",
       "to_add_comment": "for at tilføje en kommentar",
       "trip_date": "Rejsedato",
-      "view_comments": "Se kommentarer ({count})"
+      "view_comments": "Se kommentarer ({count})",
+      "offer_load_error": "Tilbuddet kunne ikke indlæses",
+      "request_load_error": "Forespørgslen kunne ikke indlæses"
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",

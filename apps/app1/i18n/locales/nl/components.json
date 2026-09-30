@@ -73,7 +73,9 @@
       "suggestions": "Suggesties",
       "to_add_comment": "om een opmerking toe te voegen",
       "trip_date": "Reisdatum",
-      "view_comments": "Bekijk opmerkingen ({count})"
+      "view_comments": "Bekijk opmerkingen ({count})",
+      "offer_load_error": "Dit aanbod kon niet worden geladen",
+      "request_load_error": "Deze aanvraag kon niet worden geladen"
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",

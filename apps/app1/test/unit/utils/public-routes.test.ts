@@ -25,6 +25,15 @@ const CHEMINS_SENSIBLES: [string, string][] = [
   ['/api/profile/update', 'PUT'],
   ['/api/notifications', 'GET'],
   ['/api/messenger/conversations', 'GET'],
+  /*
+   * Le MÊME chemin que le détail public, en écriture. Ouvrir une lecture ne doit jamais ouvrir la
+   * modification ni la suppression : le motif ne cite que `GET`, et c'est ce qu'on vérifie ici
+   * plutôt que de s'en remettre à la lecture du fichier.
+   */
+  ['/api/carpool-offers/42', 'PUT'],
+  ['/api/carpool-offers/42', 'DELETE'],
+  ['/api/carpool-requests/42', 'PUT'],
+  ['/api/carpool-requests/42', 'DELETE'],
   // Gestion d'une édition
   ['/api/editions/1/volunteers/applications', 'GET'],
   ['/api/editions/1/ticketing/orders', 'GET'],
@@ -52,6 +61,14 @@ const CHEMINS_PUBLICS: [string, string][] = [
   ['/api/editions/42/faq', 'GET'],
   ['/api/editions/42/posts', 'GET'],
   ['/api/editions/42/carpool-offers', 'GET'],
+  /*
+   * Le DÉTAIL d'une offre et d'une demande. Les listes étaient publiques et leurs cartes y mènent :
+   * un visiteur non connecté lisait « Offre de covoiturage introuvable », qui était en réalité un
+   * 401 du middleware. Un point d'API absent de cette liste répond 401 sans que rien ne le dise —
+   * et un test du handler seul ne l'attrape pas, puisqu'il contourne le middleware.
+   */
+  ['/api/carpool-offers/42', 'GET'],
+  ['/api/carpool-requests/42', 'GET'],
   ['/api/editions/42/volunteers/info', 'GET'],
   ['/api/editions/42/ticketing/tiers/public', 'GET'],
   ['/api/conventions/42', 'GET'],

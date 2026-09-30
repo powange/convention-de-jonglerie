@@ -93,6 +93,19 @@ export const publicRoutes: PublicRoute[] = [
   { pattern: /^\/api\/editions\/\d+\/carpool-requests$/, methods: ['GET'], hydrateSession: true },
   { pattern: /^\/api\/carpool-offers\/\d+\/comments$/, methods: ['GET'], hydrateSession: true },
   { pattern: /^\/api\/carpool-requests\/\d+\/comments$/, methods: ['GET'], hydrateSession: true },
+  /*
+   * Le DÉTAIL d'une offre et d'une demande, qui manquaient.
+   *
+   * ⚠️ Les listes étaient publiques, et leurs cartes mènent au détail : un visiteur non connecté
+   * cliquait donc une carte et lisait « Offre de covoiturage introuvable ». Ce n'était pas une
+   * absence de donnée mais un 401 du middleware, déguisé par l'écran en « introuvable ».
+   *
+   * `hydrateSession` comme les listes : le transform masque déjà le téléphone hors session, et
+   * c'est lui qui décide de ce qu'un anonyme voit. Sans l'hydratation, un visiteur CONNECTÉ
+   * perdrait ce que sa session lui donne — son propre téléphone sur sa propre offre.
+   */
+  { pattern: /^\/api\/carpool-offers\/\d+$/, methods: ['GET'], hydrateSession: true },
+  { pattern: /^\/api\/carpool-requests\/\d+$/, methods: ['GET'], hydrateSession: true },
 
   // ====== Posts d'édition ======
   { pattern: /^\/api\/editions\/\d+\/posts$/, methods: ['GET'], hydrateSession: true },
