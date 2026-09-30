@@ -26,6 +26,12 @@ export default wrapApiHandler<SessionMeResponse>(
         isVolunteer: true,
         isArtist: true,
         isOrganizer: true,
+        /*
+         * La langue du profil, pour que le client l'applique à l'hydratation. Sans ce champ dans la
+         * réponse, l'interface reste dans la langue du NAVIGATEUR alors que la personne a
+         * explicitement choisi la sienne dans son profil — et le réglage paraît sans effet.
+         */
+        preferredLanguage: true,
         dietaryPreference: true,
         allergies: true,
         allergySeverity: true,

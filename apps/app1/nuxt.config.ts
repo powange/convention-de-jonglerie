@@ -509,7 +509,29 @@ export default defineNuxtConfig({
       cookieDomain: null,
       cookieSecure: false,
       cookieCrossOrigin: false,
-      redirectOn: 'root',
+      /*
+       * 'all' plutôt que 'root', et il faut dire ce que cela change RÉELLEMENT : rien, aujourd'hui.
+       *
+       * ⚠️ MESURÉ, et contraire à ce qu'on attendait. Avec `redirectOn: 'root'` — la valeur
+       * précédente, rechargée pour de bon (Nitro reconstruit) — une page PROFONDE demandée sans
+       * cookie répond déjà dans la langue du navigateur : « Politique de confidentialité » en
+       * `Accept-Language: fr`, « Privacy Policy » en `en`. La détection n'était donc PAS limitée
+       * à « / ».
+       *
+       * C'est cohérent avec `strategy: 'no_prefix'` : `redirectOn` gouverne quand une REDIRECTION
+       * de langue a lieu, et sans préfixe d'URL il n'y a aucune redirection à restreindre — la
+       * locale est simplement choisie au rendu, à chaque requête.
+       *
+       * Pourquoi le changer quand même : c'est la valeur documentée pour « détecter partout », et
+       * le guide de migration de @nuxtjs/i18n prévient que les combinaisons stratégie/redirectOn
+       * ont été resserrées sur leur comportement documenté. Un futur resserrement pourrait rendre
+       * 'root' effectif ici — et le défaut apparaîtrait alors sans qu'on ait rien changé.
+       *
+       * ⚠️ Ce n'est donc PAS ce réglage qui protège le comportement : c'est
+       * `test/e2e/playwright/public/langue-du-navigateur.spec.ts`, qui le mesure sur un vrai
+       * navigateur, avec un témoin anglophone.
+       */
+      redirectOn: 'all',
       alwaysRedirect: false,
       fallbackLocale: 'en',
     },

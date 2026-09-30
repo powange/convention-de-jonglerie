@@ -155,6 +155,40 @@ export const useAuthStore = defineStore('auth', {
         document.cookie = 'admin-mode=; path=/; SameSite=Lax; Secure; max-age=0'
       }
     },
+    /**
+     * Bascule l'interface sur la langue du profil, si elle diffère de la langue courante.
+     *
+     * ⚠️ « SI ELLE DIFFÈRE » N'EST PAS UNE OPTIMISATION. Rejouer un changement vers la langue déjà
+     * active vide le cache des domaines et les recharge tous — à chaque chargement de page, pour
+     * tout le monde. Le coût serait invisible en développement et bien réel en production.
+     */
+    async appliquerLaLangueDuProfil(langueDuProfil: string | null): Promise<void> {
+      /*
+       * ⚠️ `import.meta.server` ET NON `!import.meta.client`, et la polarité n'est pas un détail :
+       * ces deux constantes sont INJECTÉES par Nuxt et valent `undefined` ailleurs. Écrite en
+       * `!import.meta.client`, la garde sortait donc AVANT TOUT dans un test unitaire — la
+       * fonction ne faisait jamais rien, et les trois cas « ne fait rien » passaient au vert
+       * au-dessus d'une fonction inerte. Trois tests verts pour une fonction morte.
+       *
+       * L'intention est « ne pas faire cela pendant le rendu serveur ». L'écrire ainsi la rend
+       * juste dans un environnement inconnu : on procède, au lieu d'abandonner.
+       */
+      if (import.meta.server || !langueDuProfil) return
+
+      try {
+        const { locale, locales } = useI18n()
+        if (locale.value === langueDuProfil) return
+
+        // Une langue que l'application ne sert pas (compte ancien, code retiré depuis) : on la
+        // laisse tomber plutôt que de tenter une bascule qui rendrait l'écran en clés brutes.
+        const connue = locales.value.some((l: any) => (l.code ?? l) === langueDuProfil)
+        if (!connue) return
+
+        await useChangementDeLangue().changerDeLangue(langueDuProfil)
+      } catch (erreur) {
+        console.error('Impossible d’appliquer la langue du profil:', erreur)
+      }
+    },
     initializeAuth(): Promise<void> {
       if (!import.meta.client) return Promise.resolve()
 
@@ -193,6 +227,24 @@ export const useAuthStore = defineStore('auth', {
           // Toujours synchroniser le store d'impersonation avec la session
           const impersonationStore = useImpersonationStore()
           impersonationStore.initFromSession(res)
+
+          /*
+           * ⚠️ APPLIQUER LA LANGUE DU PROFIL, une fois la session connue.
+           *
+           * Le réglage existait dans le profil et n'avait AUCUN effet sur l'interface : celle-ci
+           * suivait la langue du navigateur, ou le cookie i18n. Quelqu'un qui choisissait le
+           * français sur un ordinateur en anglais voyait son choix enregistré — et l'interface
+           * rester en anglais à chaque visite. Un réglage sans effet est pire qu'un réglage
+           * absent : on le rechange, en croyant s'être trompé.
+           *
+           * Le rechargement passe par `useChangementDeLangue`, le même que le sélecteur de
+           * langue : les traductions sont chargées PAR DOMAINE et PAR ROUTE, et changer la locale
+           * sans les charger laisse l'écran sur ses clés brutes.
+           *
+           * L'échec est avalé : ne pas pouvoir appliquer une préférence de langue ne doit pas
+           * casser l'hydratation de la session, dont dépend tout le reste de la page.
+           */
+          void this.appliquerLaLangueDuProfil(res.user?.preferredLanguage ?? null)
         })
         .catch((erreur: unknown) => {
           if (!sessionRefusee(erreur)) {
