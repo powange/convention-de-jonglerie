@@ -1,5 +1,6 @@
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { benevolePresentAEvenement } from '#server/utils/ticketing/benevoles-presents'
 
 export default wrapApiHandler(
   async (event) => {
@@ -23,14 +24,7 @@ export default wrapApiHandler(
           eventId: editionId,
           status: 'ACCEPTED',
           entryValidated: false,
-          OR: [
-            {
-              eventAvailability: true,
-            },
-            {
-              eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
-            },
-          ],
+          ...benevolePresentAEvenement(),
         },
         select: {
           id: true,

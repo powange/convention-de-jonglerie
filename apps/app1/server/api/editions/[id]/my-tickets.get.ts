@@ -1,5 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { benevoleAccepteEtPresent } from '#server/utils/ticketing/benevoles-presents'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
@@ -48,12 +49,24 @@ export default wrapApiHandler(
       }))
     )
 
-    // Récupérer la candidature bénévole acceptée de l'utilisateur
+    /*
+     * ⚠️ « ACCEPTÉ » NE SUFFIT PAS : il faut aussi être PRÉSENT pendant l'événement.
+     *
+     * Ce `where` ne portait que `status: 'ACCEPTED'`. Un bénévole qui a explicitement répondu
+     * qu'il n'était pas là pendant l'événement — montage seul, démontage seul — recevait donc un
+     * badge, avec son QR code, dans « mes billets ». Et le guichet le REFUSAIT au scan, puisque
+     * `ticketing/verify.post.ts` applique bien la condition.
+     *
+     * Les deux surfaces répondaient à la même question et se contredisaient : la personne se
+     * présente avec un billet que l'application lui a donné, et s'entend dire qu'il n'est pas
+     * valable.
+     *
+     * La règle vit désormais dans un util partagé — elle était recopiée quatre fois ailleurs.
+     */
     const volunteerApplication = await prisma.editionVolunteerApplication.findFirst({
       where: {
         userId: user.id,
-        eventId: editionId,
-        status: 'ACCEPTED',
+        ...benevoleAccepteEtPresent(editionId),
       },
       include: {
         user: true,

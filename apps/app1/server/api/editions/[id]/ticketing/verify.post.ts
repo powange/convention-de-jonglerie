@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
+import { benevolePresentAEvenement } from '#server/utils/ticketing/benevoles-presents'
 import { lignesQuiDonnentAcces } from '#server/utils/ticketing/billets-qui-comptent'
 import { designerLaPersonne } from '#server/utils/ticketing/designation-participant'
 import {
@@ -62,15 +63,9 @@ export default wrapApiHandler(
             eventId: editionId,
             status: 'ACCEPTED',
             ...demande.preuve,
-            // Filtrer les bénévoles disponibles pendant l'événement
-            OR: [
-              {
-                eventAvailability: true,
-              },
-              {
-                eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
-              },
-            ],
+            // Filtrer les bénévoles disponibles pendant l'événement (règle partagée : elle
+            // manquait dans `my-tickets.get.ts`, qui émettait un badge que ce contrôle refusait)
+            ...benevolePresentAEvenement(),
           },
           select: {
             id: true,
