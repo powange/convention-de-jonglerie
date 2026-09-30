@@ -127,7 +127,12 @@
       "enabled": "Meddelanden aktiverade på den här enheten",
       "not_supported": "Push-meddelanden stöds inte i den här webbläsaren",
       "test_button": "Testa ett meddelande",
-      "title": "Push-meddelanden"
+      "title": "Push-meddelanden",
+      "activation_error_browser": "Aviseringarna kunde inte aktiveras. Prova en annan webbläsare.",
+      "activation_error_generic": "Ett fel uppstod när aviseringarna skulle aktiveras.",
+      "activation_error_title": "Fel på aviseringarna",
+      "browser_unsupported_opera": "Push-aviseringar stöds inte i Opera. Använd Chrome, Edge eller Firefox.",
+      "browser_unsupported_title": "Webbläsaren stöds inte"
     },
     "system": {
       "error": {

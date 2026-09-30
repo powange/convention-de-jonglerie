@@ -54,6 +54,7 @@ export function useFirebaseMessaging() {
   const toast = useToast()
   const config = useRuntimeConfig()
   const { getDeviceId } = useDeviceId()
+  const { t } = useI18n()
   // Résolu dans le contexte du composant (setup), puis passé au loader paresseux.
   const firebaseConfig = getFirebaseConfig()
 
@@ -208,25 +209,30 @@ export function useFirebaseMessaging() {
           console.warn('   Utilisez Chrome, Edge ou Firefox pour les notifications push')
 
           // Afficher un toast informatif
+          /*
+           * ⚠️ API DE NUXT UI v4. `timeout` n'existe plus (c'est `duration`) et les couleurs sont
+           * SÉMANTIQUES : ni `amber`, ni `red`, ni `green`. Les valeurs de la v2 étaient ignorées
+           * en silence — le toast s'affichait donc dans la couleur PRIMAIRE, c'est-à-dire la même
+           * qu'un message de succès. Un avertissement et une erreur avaient exactement l'aspect
+           * d'une bonne nouvelle.
+           */
           toast.add({
-            title: 'Navigateur non compatible',
-            description:
-              'Les notifications push ne sont pas supportées sur Opera. Utilisez Chrome, Edge ou Firefox.',
-            color: 'amber',
+            title: t('notifications.push.browser_unsupported_title'),
+            description: t('notifications.push.browser_unsupported_opera'),
+            color: 'warning',
             icon: 'i-heroicons-exclamation-triangle',
-            timeout: 8000,
+            duration: 8000,
           })
         } else {
           console.error('❌ Erreur de service push:', error)
           console.error('⚠️ Vérifiez que votre navigateur supporte les notifications push')
 
           toast.add({
-            title: 'Erreur de notifications',
-            description:
-              "Impossible d'activer les notifications. Essayez avec un autre navigateur.",
-            color: 'red',
+            title: t('notifications.push.activation_error_title'),
+            description: t('notifications.push.activation_error_browser'),
+            color: 'error',
             icon: 'i-heroicons-x-circle',
-            timeout: 5000,
+            duration: 5000,
           })
         }
       } else {
@@ -234,11 +240,11 @@ export function useFirebaseMessaging() {
         console.error('❌ Erreur lors de la demande de permission FCM:', error)
 
         toast.add({
-          title: 'Erreur',
-          description: "Une erreur est survenue lors de l'activation des notifications.",
-          color: 'red',
+          title: t('common.error'),
+          description: t('notifications.push.activation_error_generic'),
+          color: 'error',
           icon: 'i-heroicons-x-circle',
-          timeout: 5000,
+          duration: 5000,
         })
       }
 
@@ -336,7 +342,8 @@ export function useFirebaseMessaging() {
       // Afficher un toast par défaut
       if (payload.notification) {
         toast.add({
-          title: payload.notification.title || 'Notification',
+          // Le titre vient de la charge FCM, traduite côté serveur. Le repli, lui, était en dur.
+          title: payload.notification.title || t('notifications.push.title'),
           description: payload.notification.body || '',
           color: 'primary',
           icon: 'i-heroicons-bell',

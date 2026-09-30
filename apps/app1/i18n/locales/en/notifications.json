@@ -127,7 +127,12 @@
       "enabled": "Notifications enabled on this device",
       "not_supported": "Push notifications not supported on this browser",
       "test_button": "Test a notification",
-      "title": "Push notifications"
+      "title": "Push notifications",
+      "activation_error_browser": "Notifications could not be enabled. Try another browser.",
+      "activation_error_generic": "Something went wrong while enabling notifications.",
+      "activation_error_title": "Notification error",
+      "browser_unsupported_opera": "Push notifications are not supported on Opera. Use Chrome, Edge or Firefox.",
+      "browser_unsupported_title": "Browser not supported"
     },
     "system": {
       "error": {

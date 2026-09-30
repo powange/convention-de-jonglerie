@@ -127,7 +127,12 @@
       "enabled": "Notificaciones activadas en este dispositivo",
       "not_supported": "Notificaciones push no compatibles con este navegador",
       "test_button": "Probar una notificación",
-      "title": "Notificaciones push"
+      "title": "Notificaciones push",
+      "activation_error_browser": "No se han podido activar las notificaciones. Prueba con otro navegador.",
+      "activation_error_generic": "Se ha producido un error al activar las notificaciones.",
+      "activation_error_title": "Error de notificaciones",
+      "browser_unsupported_opera": "Las notificaciones push no son compatibles con Opera. Usa Chrome, Edge o Firefox.",
+      "browser_unsupported_title": "Navegador no compatible"
     },
     "system": {
       "error": {

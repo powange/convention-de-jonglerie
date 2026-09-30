@@ -127,7 +127,12 @@
       "enabled": "Сповіщення увімкнено на цьому пристрої",
       "not_supported": "Push-сповіщення не підтримуються в цьому браузері",
       "test_button": "Тестувати сповіщення",
-      "title": "Push-сповіщення"
+      "title": "Push-сповіщення",
+      "activation_error_browser": "Не вдалося увімкнути повідомлення. Спробуйте інший браузер.",
+      "activation_error_generic": "Під час увімкнення повідомлень сталася помилка.",
+      "activation_error_title": "Помилка повідомлень",
+      "browser_unsupported_opera": "Push-повідомлення не підтримуються в Opera. Скористайтеся Chrome, Edge або Firefox.",
+      "browser_unsupported_title": "Браузер не підтримується"
     },
     "system": {
       "error": {

@@ -127,7 +127,12 @@
       "enabled": "Уведомления включены на этом устройстве",
       "not_supported": "Push-уведомления не поддерживаются в этом браузере",
       "test_button": "Тестировать уведомление",
-      "title": "Push-уведомления"
+      "title": "Push-уведомления",
+      "activation_error_browser": "Не удалось включить уведомления. Попробуйте другой браузер.",
+      "activation_error_generic": "При включении уведомлений произошла ошибка.",
+      "activation_error_title": "Ошибка уведомлений",
+      "browser_unsupported_opera": "Push-уведомления не поддерживаются в Opera. Используйте Chrome, Edge или Firefox.",
+      "browser_unsupported_title": "Браузер не поддерживается"
     },
     "system": {
       "error": {

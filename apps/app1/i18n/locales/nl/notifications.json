@@ -127,7 +127,12 @@
       "enabled": "Meldingen ingeschakeld op dit apparaat",
       "not_supported": "Push-meldingen worden niet ondersteund op deze browser",
       "test_button": "Test een melding",
-      "title": "Push-meldingen"
+      "title": "Push-meldingen",
+      "activation_error_browser": "Meldingen konden niet worden ingeschakeld. Probeer een andere browser.",
+      "activation_error_generic": "Er is iets misgegaan bij het inschakelen van meldingen.",
+      "activation_error_title": "Fout bij meldingen",
+      "browser_unsupported_opera": "Pushmeldingen worden niet ondersteund in Opera. Gebruik Chrome, Edge of Firefox.",
+      "browser_unsupported_title": "Browser niet ondersteund"
     },
     "system": {
       "error": {

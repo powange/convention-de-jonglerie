@@ -127,7 +127,12 @@
       "enabled": "Powiadomienia włączone na tym urządzeniu",
       "not_supported": "Powiadomienia push nie są obsługiwane w tej przeglądarce",
       "test_button": "Przetestuj powiadomienie",
-      "title": "Powiadomienia push"
+      "title": "Powiadomienia push",
+      "activation_error_browser": "Nie udało się włączyć powiadomień. Spróbuj w innej przeglądarce.",
+      "activation_error_generic": "Podczas włączania powiadomień wystąpił błąd.",
+      "activation_error_title": "Błąd powiadomień",
+      "browser_unsupported_opera": "Powiadomienia push nie są obsługiwane w przeglądarce Opera. Użyj Chrome, Edge lub Firefoksa.",
+      "browser_unsupported_title": "Przeglądarka nieobsługiwana"
     },
     "system": {
       "error": {

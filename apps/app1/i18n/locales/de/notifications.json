@@ -127,7 +127,12 @@
       "enabled": "Benachrichtigungen auf diesem Gerät aktiviert",
       "not_supported": "Push-Benachrichtigungen werden von diesem Browser nicht unterstützt",
       "test_button": "Eine Benachrichtigung testen",
-      "title": "Push-Benachrichtigungen"
+      "title": "Push-Benachrichtigungen",
+      "activation_error_browser": "Benachrichtigungen konnten nicht aktiviert werden. Versuche es mit einem anderen Browser.",
+      "activation_error_generic": "Beim Aktivieren der Benachrichtigungen ist ein Fehler aufgetreten.",
+      "activation_error_title": "Fehler bei den Benachrichtigungen",
+      "browser_unsupported_opera": "Push-Benachrichtigungen werden in Opera nicht unterstützt. Verwende Chrome, Edge oder Firefox.",
+      "browser_unsupported_title": "Browser nicht unterstützt"
     },
     "system": {
       "error": {
