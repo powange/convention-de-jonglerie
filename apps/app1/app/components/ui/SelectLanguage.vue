@@ -23,13 +23,11 @@
 </template>
 
 <script setup lang="ts">
-import { translationLoaders, getTranslationsToLoad } from '~/utils/translation-loaders'
-
 import { languageCodeToFlag } from '~~/app/utils/locales'
 
 withDefaults(defineProps<{ showLabel?: boolean }>(), { showLabel: false })
 
-const { locale, locales, setLocale } = useI18n()
+const { locale, locales } = useI18n()
 
 // Langue courante avec son drapeau
 const currentLanguageFlag = computed(() => {
@@ -52,36 +50,11 @@ const languageItems = computed(() => {
   }))
 })
 
-// Fonction pour changer de langue
-const changeLanguage = async (newLocale: string) => {
-  const nuxtApp = useNuxtApp()
-  const i18n = nuxtApp.$i18n
-
-  // Réinitialiser le cache des traductions pour la nouvelle locale
-  // pour forcer le rechargement des fichiers de traduction lazy-loaded
-  ;(nuxtApp as any)[`_loaded_${newLocale}`] = new Set()
-
-  // Recharger manuellement les traductions pour la route actuelle
-  const route = useRoute()
-  const path = route.path
-
-  // Déterminer quelles traductions charger selon la route
-  const translationsToLoad = getTranslationsToLoad(path)
-
-  // Charger les traductions manuellement
-  for (const translationFile of translationsToLoad) {
-    const loader = translationLoaders[translationFile]?.[newLocale]
-    if (loader) {
-      try {
-        const messages = await loader().then((m) => m.default || m)
-        i18n.mergeLocaleMessage(newLocale, messages)
-      } catch (error) {
-        console.error(`Erreur lors du chargement de ${translationFile} pour ${newLocale}:`, error)
-      }
-    }
-  }
-
-  // Changer la locale
-  await setLocale(newLocale as any)
-}
+/*
+ * La séquence — vider le cache des domaines, recharger ceux de la route, puis changer la locale —
+ * vit désormais dans `useChangementDeLangue`, parce qu'un second appelant la demande :
+ * l'application de la langue du PROFIL à l'hydratation de la session. Recopiée, elle aurait
+ * divergé au premier domaine ajouté, et la moitié d'un écran serait restée en clés brutes.
+ */
+const { changerDeLangue: changeLanguage } = useChangementDeLangue()
 </script>

@@ -47,6 +47,13 @@ export interface SessionMeUser {
   isVolunteer: boolean
   isArtist: boolean
   isOrganizer: boolean
+  /**
+   * La langue choisie dans le profil, appliquée à l'hydratation de la session.
+   *
+   * Nullable : un compte ancien, ou créé par OAuth, peut n'avoir rien choisi — et l'interface
+   * reste alors sur la langue détectée par le navigateur.
+   */
+  preferredLanguage: string | null
   /** Informations personnelles facultatives renseignées depuis le profil. */
   dietaryPreference: 'NONE' | 'VEGETARIAN' | 'VEGAN'
   allergies: string | null
