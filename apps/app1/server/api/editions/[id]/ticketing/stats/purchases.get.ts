@@ -1,7 +1,19 @@
 import { DateTime } from 'luxon'
 
+/*
+ * `wrapApiHandler` est importé EXPLICITEMENT, et non pris dans l'auto-import de Nitro — comme le
+ * fait déjà `order-sources.get.ts`, le graphique voisin. Sans cet import, le fichier n'est pas
+ * montable dans un test : « wrapApiHandler is not defined » au chargement, avant même qu'un test
+ * ne s'exécute. L'auto-import n'existe qu'à l'exécution du serveur.
+ */
+import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canManageTicketingById } from '#server/utils/permissions/edition-permissions'
+import {
+  billetsQuiComptent,
+  estUnParticipant,
+  nEstPasUnParticipant,
+} from '#server/utils/ticketing/billets-qui-comptent'
 
 export default wrapApiHandler(
   async (event) => {
@@ -35,8 +47,14 @@ export default wrapApiHandler(
       })
     }
 
-    // Trouver la date de la première commande pour cette édition
-    // Statuts valides : Processed (payé via HelloAsso) et Onsite (ajouté manuellement sur place)
+    /*
+     * La première commande donne le début de la période affichée.
+     *
+     * Elle garde la seule restriction de statut, sans la règle des lignes : une commande dont tous
+     * les billets seraient annulés reculerait la borne de gauche du graphique, ce qui allongerait
+     * l'axe sans rien y ajouter — désagréable, mais sans conséquence sur les chiffres. Y ajouter
+     * un `items: { some }` coûterait une jointure pour ce seul confort.
+     */
     const firstOrder = await prisma.ticketingOrder.findFirst({
       where: {
         editionId,
@@ -65,121 +83,80 @@ export default wrapApiHandler(
     const teardownEnd = new Date(edition.endDate)
     teardownEnd.setHours(23, 59, 59, 999)
 
-    // Log pour debug
+    /*
+     * ⚠️ DEUX DÉFAUTS CORRIGÉS ICI, et le graphique s'affichait sans rien dire dans les deux cas.
+     *
+     * 1. LES LIGNES N'ÉTAIENT PAS TRIÉES. Seul `order.status` était filtré : un billet ANNULÉ au
+     *    sein d'une commande vivante comptait pour un achat. C'est exactement le défaut corrigé
+     *    dans le graphique de provenance, sur le MÊME écran, et laissé entier dans celui-ci.
+     *
+     * 2. LES BILLETS SANS TARIF DISPARAISSAIENT DES DEUX GROUPES. `countAsParticipant` vit sur le
+     *    TARIF, et `TicketingOrderItem.tierId` est nullable : tester `true` puis `false` ne laisse
+     *    aucune place aux 47 lignes sans tarif — des billets importés qu'aucun tarif n'a
+     *    rapprochés, et de la marchandise vendue au comptoir. Elles n'apparaissaient donc dans
+     *    aucune des quatre courbes, tout en étant validées au guichet. `nEstPasUnParticipant` les
+     *    range dans « autres », ce qu'elles sont.
+     *
+     * ⚠️ POURQUOI C'ÉTAIT DEVENU VISIBLE : les deux graphiques sont côte à côte sur le même écran,
+     * tirés de la même base. Avant la correction de la provenance, ils étaient faux tous les deux
+     * et se recoupaient ; depuis, ils ne se recoupaient plus, et rien ne disait lequel croire.
+     *
+     * La restriction de statut reste ajoutée à la règle commune, comme dans le graphique voisin :
+     * `billetsQuiComptent` écarte `Refunded`, et l'on veut ici la liste POSITIVE `Processed` /
+     * `Onsite` — plus stricte, et identique d'un graphique à l'autre.
+     */
+    const regleDesBillets = billetsQuiComptent(editionId)
 
-    // Récupérer tous les achats (items de commandes payées)
+    /** Les conditions communes aux quatre requêtes, hors provenance et hors nature du billet. */
+    const commandeRetenue = (externe: boolean) => ({
+      ...regleDesBillets.order,
+      status: { in: ['Processed', 'Onsite'] },
+      externalTicketingId: externe ? { not: null } : null,
+      orderDate: { gte: setupStart, lte: teardownEnd },
+    })
+
+    /*
+     * ⚠️ `nEstPasUnParticipant` PORTE UN `OR` — « pas un participant, OU pas de tarif du tout ».
+     * Il est composé sous `AND` et non étalé dans le `where`, comme l'exige son commentaire : un
+     * `OR` étalé à côté d'un autre `OR` en écraserait un, silencieusement. Il n'y en a pas d'autre
+     * ici aujourd'hui, et c'est précisément pourquoi la règle vaut d'être suivie maintenant.
+     */
     const [
       participantsItemsManual,
       participantsItemsExternal,
       othersItemsManual,
       othersItemsExternal,
     ] = await Promise.all([
-      // Participants manuels (billets avec countAsParticipant = true et commande manuelle)
+      // Participants, saisis au guichet
       prisma.ticketingOrderItem.findMany({
-        where: {
-          order: {
-            editionId,
-            status: {
-              in: ['Processed', 'Onsite'],
-            },
-            externalTicketingId: null, // Commandes manuelles
-            orderDate: {
-              gte: setupStart,
-              lte: teardownEnd,
-            },
-          },
-          tier: {
-            countAsParticipant: true,
-          },
-        },
-        select: {
-          order: {
-            select: {
-              orderDate: true,
-            },
-          },
-        },
+        where: { ...regleDesBillets, order: commandeRetenue(false), ...estUnParticipant },
+        select: { order: { select: { orderDate: true } } },
       }),
 
-      // Participants externes (billets avec countAsParticipant = true et commande externe)
+      // Participants, importés d'une billetterie externe
       prisma.ticketingOrderItem.findMany({
-        where: {
-          order: {
-            editionId,
-            status: {
-              in: ['Processed', 'Onsite'],
-            },
-            externalTicketingId: { not: null }, // Commandes externes (HelloAsso, etc.)
-            orderDate: {
-              gte: setupStart,
-              lte: teardownEnd,
-            },
-          },
-          tier: {
-            countAsParticipant: true,
-          },
-        },
-        select: {
-          order: {
-            select: {
-              orderDate: true,
-            },
-          },
-        },
+        where: { ...regleDesBillets, order: commandeRetenue(true), ...estUnParticipant },
+        select: { order: { select: { orderDate: true } } },
       }),
 
-      // Autres manuels (billets avec countAsParticipant = false et commande manuelle)
+      // Autres (dont les lignes sans tarif), saisis au guichet
       prisma.ticketingOrderItem.findMany({
         where: {
-          order: {
-            editionId,
-            status: {
-              in: ['Processed', 'Onsite'],
-            },
-            externalTicketingId: null,
-            orderDate: {
-              gte: setupStart,
-              lte: teardownEnd,
-            },
-          },
-          tier: {
-            countAsParticipant: false,
-          },
+          ...regleDesBillets,
+          order: commandeRetenue(false),
+          AND: [nEstPasUnParticipant],
         },
-        select: {
-          order: {
-            select: {
-              orderDate: true,
-            },
-          },
-        },
+        select: { order: { select: { orderDate: true } } },
       }),
 
-      // Autres externes (billets avec countAsParticipant = false et commande externe)
+      // Autres (dont les lignes sans tarif), importés d'une billetterie externe
       prisma.ticketingOrderItem.findMany({
         where: {
-          order: {
-            editionId,
-            status: {
-              in: ['Processed', 'Onsite'],
-            },
-            externalTicketingId: { not: null },
-            orderDate: {
-              gte: setupStart,
-              lte: teardownEnd,
-            },
-          },
-          tier: {
-            countAsParticipant: false,
-          },
+          ...regleDesBillets,
+          order: commandeRetenue(true),
+          AND: [nEstPasUnParticipant],
         },
-        select: {
-          order: {
-            select: {
-              orderDate: true,
-            },
-          },
-        },
+        select: { order: { select: { orderDate: true } } },
       }),
     ])
 
