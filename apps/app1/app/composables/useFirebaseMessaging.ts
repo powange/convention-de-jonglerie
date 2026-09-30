@@ -247,20 +247,78 @@ export function useFirebaseMessaging() {
   }
 
   /**
-   * Désactiver les notifications FCM (désabonner le token actuel)
+   * Désactiver les notifications FCM sur CET appareil.
+   *
+   * ⚠️ L'appel partait sans corps, et le serveur lisait ce vide comme « tous les appareils ».
+   * Couper les notifications sur son téléphone les coupait donc aussi sur son ordinateur, sans un
+   * mot. On désigne maintenant l'appareil, et lui seul.
    */
   const unsubscribe = async (): Promise<boolean> => {
+    const deviceId = getDeviceId()
+
+    /*
+     * Le token en plus du `deviceId`, quand on peut l'obtenir : Firebase fait tourner les tokens,
+     * et les lignes créées avant la colonne `deviceId` n'en portent pas. Le token les retrouve.
+     *
+     * `getToken` ne redemande PAS la permission — elle est déjà accordée, sinon il n'y aurait rien
+     * à désactiver — et son échec ne doit pas empêcher le désabonnement : d'où le `catch` qui rend
+     * `null` et laisse le `deviceId` faire le travail seul.
+     */
+    let token: string | null = null
     try {
-      // Appeler l'API pour désactiver le token côté serveur
-      await $fetch('/api/notifications/fcm/unsubscribe', {
-        method: 'POST',
-      })
+      const fb = await loadFirebaseMessaging(firebaseConfig)
+      const vapidKey = config.public.firebaseVapidKey as string
+      if (fb && vapidKey && 'serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready
+        token = await fb.getToken(fb.messaging, {
+          vapidKey,
+          serviceWorkerRegistration: registration,
+        })
+      }
+    } catch {
+      // Sans token, le `deviceId` suffit dans le cas courant.
+    }
+
+    const corps = corpsDesabonnementAppareil(deviceId, token)
+    if (!corps) {
+      /*
+       * Ni identifiant d'appareil ni token : on n'envoie RIEN plutôt qu'un corps vide, qui était
+       * précisément la forme que le serveur lisait comme « coupe tout, partout ». Le cas demande
+       * un `localStorage` inaccessible ET un token introuvable — rare, mais c'est exactement là
+       * qu'un repli trop serviable ferait le plus de dégâts.
+       */
+      console.warn('⚠️ Aucun identifiant d’appareil : désabonnement non envoyé')
+      return false
+    }
+
+    try {
+      await $fetch('/api/notifications/fcm/unsubscribe', { method: 'POST', body: corps })
       if (import.meta.dev) {
         console.log('✅ Token FCM désactivé côté serveur')
       }
       return true
     } catch (error) {
       console.error('❌ Erreur lors de la désactivation du token FCM:', error)
+      return false
+    }
+  }
+
+  /**
+   * Couper les notifications sur TOUS les appareils.
+   *
+   * Séparé de `unsubscribe`, et c'est le but du lot : « tout » doit se demander, jamais se déduire
+   * d'un corps vide. Aucun écran ne l'appelle encore — la fonction existe pour que le geste soit
+   * nommé le jour où on l'offrira, plutôt que retrouvé par accident.
+   */
+  const unsubscribeAllDevices = async (): Promise<boolean> => {
+    try {
+      await $fetch('/api/notifications/fcm/unsubscribe', {
+        method: 'POST',
+        body: corpsDesabonnementTousAppareils(),
+      })
+      return true
+    } catch (error) {
+      console.error('❌ Erreur lors de la désactivation de tous les tokens FCM:', error)
       return false
     }
   }
@@ -320,6 +378,7 @@ export function useFirebaseMessaging() {
   return {
     requestPermissionAndGetToken,
     unsubscribe,
+    unsubscribeAllDevices,
     listenToMessages,
     registerServiceWorker,
     isAvailable,
