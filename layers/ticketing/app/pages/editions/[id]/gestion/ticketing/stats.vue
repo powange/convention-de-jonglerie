@@ -1470,8 +1470,12 @@ async function fetchOrderSources() {
       params.toString() ? `?${params.toString()}` : ''
     }`
 
-    const data = await $fetch<OrderSourcesData>(url)
-    orderSourcesData.value = data
+    // La réponse est désormais enveloppée par `createSuccessResponse`, comme les autres points
+    // d'API de statistiques. Le repli sur la forme nue couvre le temps d'un déploiement : un
+    // onglet resté ouvert appelle l'ancien contrat, et lire `undefined` viderait le graphique
+    // sans erreur.
+    const reponse = await $fetch<{ data?: OrderSourcesData } | OrderSourcesData>(url)
+    orderSourcesData.value = ((reponse as any)?.data ?? reponse) as OrderSourcesData
   } catch {
     orderSourcesError.value = true
   } finally {
@@ -1526,7 +1530,9 @@ async function chargerComparaison() {
       $fetch<PurchaseData>(
         `/api/editions/${id}/ticketing/stats/purchases?granularity=${selectedPurchaseGranularity.value}`
       ),
-      $fetch<OrderSourcesData>(`/api/editions/${id}/ticketing/stats/order-sources`),
+      $fetch<{ data?: OrderSourcesData } | OrderSourcesData>(
+        `/api/editions/${id}/ticketing/stats/order-sources`
+      ),
       // L'affluence a SA propre granularité, réglée sous son graphique : elle ne suit pas celle
       // des validations, et la découper autrement décalerait les deux éditions l'une par rapport
       // à l'autre.
@@ -1536,7 +1542,7 @@ async function chargerComparaison() {
     ])
     validationsComparees.value = validations
     achatsCompares.value = achats
-    provenancesComparees.value = provenances
+    provenancesComparees.value = ((provenances as any)?.data ?? provenances) as OrderSourcesData
     affluenceComparee.value = affluence.data
   } catch (erreur: any) {
     // Un 403 n'est pas une panne : c'est une réponse, et l'écran doit la dire plutôt que
