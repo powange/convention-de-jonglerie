@@ -7,6 +7,7 @@ import type {
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { synchroniserApresChangementDeDroits } from '#server/utils/messenger-droits-benevoles'
 import { updateOrganizerRights } from '#server/utils/organizer-management'
 import {
   conventionRightsZodShape,
@@ -138,6 +139,17 @@ export default wrapApiHandler(
         message: 'Échec de la mise à jour du organisateur',
       })
     }
+
+    /*
+     * ⚠️ LES FILS « BÉNÉVOLE ↔ ORGANISATEURS » SUIVENT LE DROIT — le même appel que dans le PATCH
+     * voisin, et c'est délibérément la MÊME fonction : deux points d'API modifient ces droits, et
+     * n'en synchroniser qu'un fermerait la fuite une fois sur deux, sans que rien ne dise
+     * laquelle.
+     *
+     * Quelqu'un dont le droit de gérer les bénévoles est révoqué restait participant des fils et
+     * continuait d'y lire les messages privés des bénévoles. Rien ne l'en retirait jamais.
+     */
+    await synchroniserApresChangementDeDroits(conventionId)
 
     return createSuccessResponse({
       organizer: {
