@@ -8,8 +8,12 @@ export default wrapApiHandler(
     const user = requireAuth(event)
     const editionId = validateEditionId(event)
 
-    // Utiliser l'utilitaire de suppression
-    const result = await deleteEditionImage(editionId, user.id)
+    /*
+     * L'utilisateur COMPLET et non son seul identifiant : la garde de suppression passe désormais
+     * par `getEditionForEdit`, qui reconnaît l'auteur de la convention, un organisateur habilité
+     * et l'admin global — ce que `creatorId === userId` refusait.
+     */
+    const result = await deleteEditionImage(editionId, user)
 
     return createSuccessResponse({ edition: result.entity })
   },

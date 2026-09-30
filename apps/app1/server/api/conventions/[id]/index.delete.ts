@@ -2,6 +2,7 @@ import type { ConventionArchiveSnapshot } from '#server/types/prisma-helpers'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { deletePhysicalImageFile } from '#server/utils/image-deletion'
 import {
   getConventionForDelete,
   shouldArchiveInsteadOfDelete,
@@ -44,6 +45,20 @@ export default wrapApiHandler(
         'Convention archivée (non supprimée car elle possède des éditions)'
       )
     } else {
+      /*
+       * Le logo quitte le disque AVANT la suppression, et SEULEMENT dans cette branche.
+       *
+       * ⚠️ PAS DANS LA BRANCHE QUI ARCHIVE : une convention archivée existe encore, ses éditions
+       * aussi, et son logo s'affiche toujours. L'effacer là reviendrait à casser l'affichage d'une
+       * convention qu'on vient seulement de retirer de la vue.
+       *
+       * Avant la suppression, parce qu'après la ligne n'existe plus et que rien ne dirait quel
+       * fichier lui appartenait.
+       */
+      await deletePhysicalImageFile(convention.logo, {
+        entityId: conventionId,
+        dossier: 'conventions',
+      })
       await prisma.convention.delete({ where: { id: conventionId } })
       return createSuccessResponse(null, 'Convention supprimée avec succès')
     }
