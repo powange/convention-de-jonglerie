@@ -60,6 +60,10 @@ const creneauDans30Minutes = (timezone: string | null) => {
 describe('rappel de créneau — l’heure annoncée', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // La marque d'envoi est posée avant chaque notification : sans ce défaut, `count` vaut 0 et
+    // la tâche saute tous les envois. Le comportement de la marque est éprouvé dans son propre
+    // fichier ; ici, on la laisse passer pour parler d'autre chose.
+    prismaMock.volunteerAssignment.updateMany.mockResolvedValue({ count: 1 })
   })
 
   /** Le message du premier rappel envoyé. */
