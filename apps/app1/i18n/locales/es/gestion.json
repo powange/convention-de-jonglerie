@@ -280,7 +280,10 @@
       "validation_title": "Validación de comidas",
       "volunteers": "Voluntarios",
       "no_enabled_meal": "Ninguna comida por validar",
-      "no_enabled_meal_description": "Esta edición no tiene ninguna comida activada: aún no se han configurado o se han desactivado todas. Active al menos una comida para abrir el mostrador."
+      "no_enabled_meal_description": "Esta edición no tiene ninguna comida activada: aún no se han configurado o se han desactivado todas. Active al menos una comida para abrir el mostrador.",
+      "confirm_disable_description": "Las respuestas de los voluntarios para esta comida se eliminarán, y esta eliminación es definitiva. Reactivar la comida no las restaurará: cada voluntario elegible quedará inscrito de nuevo como aceptando, incluidos los que habían rechazado.",
+      "confirm_disable_label": "Desactivar y eliminar las respuestas",
+      "confirm_disable_title": "¿Desactivar esta comida?"
     },
     "organizers": {
       "access_rights": "Derechos de acceso",
@@ -710,7 +713,9 @@
       "filter_no_results": "Ningún objeto coincide con los filtros aplicados",
       "shopping_mark_counted": "Todo ha sido comprado",
       "shopping_mark_counted_confirm": "El recuento de {count} objeto(s) marcado(s) de «{name}» se ajustará a la cantidad esperada: dejarán de aparecer como faltantes. Los objetos no marcados no cambian.",
-      "shopping_mark_counted_done": "Recuento actualizado"
+      "shopping_mark_counted_done": "Recuento actualizado",
+      "items_filter_help": "La búsqueda abarca el nombre del objeto y los lugares de recogida y devolución, nunca las descripciones.",
+      "name_filter_help": "La búsqueda abarca el nombre del objeto, no su descripción."
     },
     "ticketing": {
       "access_control_description": "Escanear y validar las entradas",
@@ -1114,7 +1119,9 @@
       "filtered_count": "ninguna línea mostrada | 1 línea mostrada | {count} líneas mostradas",
       "filtered_export_notice": "Extracto filtrado: {filters}",
       "filters": "Filtros",
-      "no_line": "Sin líneas"
+      "no_line": "Sin líneas",
+      "filter_search_help": "La búsqueda abarca el concepto y la descripción, por palabras en cualquier orden.",
+      "plan_search_help": "Los códigos se buscan por su inicio; los conceptos, en cualquier posición."
     },
     "program": {
       "description": "Componga la cronología de la edición: workshops, espectáculos y otros momentos.",

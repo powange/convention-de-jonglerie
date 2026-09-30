@@ -60,7 +60,12 @@
       "verify_error": "No se ha podido verificar la entrada",
       "refund_error": "No se pudo registrar el reembolso",
       "refund_recorded": "Reembolso registrado",
-      "refund_undone": "Reembolso anulado"
+      "refund_undone": "Reembolso anulado",
+      "existing_ticket_entered": "Ya ha entrado",
+      "existing_ticket_not_entered": "Aún no ha entrado",
+      "existing_ticket_open": "Abrir la ficha",
+      "existing_tickets_hint": "Compruebe que no se trate de un duplicado antes de añadir. Aun así puede continuar.",
+      "existing_tickets_title": "Ya existe una entrada para esta dirección | Ya existen {count} entradas para esta dirección"
     },
     "counters": {
       "connected": "Conectado",

@@ -280,7 +280,10 @@
       "validation_title": "Validace jídel",
       "volunteers": "Dobrovolníci",
       "no_enabled_meal": "Žádné jídlo k validaci",
-      "no_enabled_meal_description": "Tento ročník nemá žádné povolené jídlo: buď dosud nebyla nakonfigurována, nebo byla všechna zakázána. Povolte alespoň jedno jídlo, abyste otevřeli výdejní místo."
+      "no_enabled_meal_description": "Tento ročník nemá žádné povolené jídlo: buď dosud nebyla nakonfigurována, nebo byla všechna zakázána. Povolte alespoň jedno jídlo, abyste otevřeli výdejní místo.",
+      "confirm_disable_description": "Odpovědi dobrovolníků k tomuto jídlu budou smazány a smazání je nevratné. Opětovné zapnutí jídla je neobnoví: každý oprávněný dobrovolník bude znovu zapsán jako přijímající, včetně těch, kteří odmítli.",
+      "confirm_disable_label": "Vypnout a smazat odpovědi",
+      "confirm_disable_title": "Vypnout toto jídlo?"
     },
     "organizers": {
       "access_rights": "Přístupová práva",
@@ -710,7 +713,9 @@
       "filter_no_results": "Žádný předmět neodpovídá nastaveným filtrům",
       "shopping_mark_counted": "Vše bylo nakoupeno",
       "shopping_mark_counted_confirm": "Počet {count} zaškrtnutých položek ze seznamu „{name}“ bude nastaven na očekávané množství: přestanou se zobrazovat jako chybějící. Nezaškrtnuté položky zůstanou beze změny.",
-      "shopping_mark_counted_done": "Počet aktualizován"
+      "shopping_mark_counted_done": "Počet aktualizován",
+      "items_filter_help": "Vyhledávání se týká názvu předmětu a míst vyzvednutí a vrácení, nikdy popisů.",
+      "name_filter_help": "Vyhledávání se týká názvu předmětu, nikoli jeho popisu."
     },
     "ticketing": {
       "access_control_description": "Skenování a ověřování vstupenek u vstupu",
@@ -1114,7 +1119,9 @@
       "filtered_count": "nezobrazeny žádné řádky | zobrazen 1 řádek | zobrazeno řádků: {count}",
       "filtered_export_notice": "Filtrovaný výpis: {filters}",
       "filters": "Filtry",
-      "no_line": "Žádné řádky"
+      "no_line": "Žádné řádky",
+      "filter_search_help": "Vyhledávání se týká označení a popisu, po slovech v libovolném pořadí.",
+      "plan_search_help": "Kódy se hledají od začátku, označení kdekoli."
     },
     "program": {
       "description": "Sestavte časovou osu ročníku: workshopy, představení a další body programu.",

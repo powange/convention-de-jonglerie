@@ -280,7 +280,10 @@
       "validation_title": "Walidacja posiłków",
       "volunteers": "Wolontariusze",
       "no_enabled_meal": "Brak posiłków do walidacji",
-      "no_enabled_meal_description": "Ta edycja nie ma włączonego żadnego posiłku: albo nie zostały jeszcze skonfigurowane, albo wszystkie zostały wyłączone. Włącz co najmniej jeden posiłek, aby otworzyć punkt wydawania."
+      "no_enabled_meal_description": "Ta edycja nie ma włączonego żadnego posiłku: albo nie zostały jeszcze skonfigurowane, albo wszystkie zostały wyłączone. Włącz co najmniej jeden posiłek, aby otworzyć punkt wydawania.",
+      "confirm_disable_description": "Odpowiedzi wolontariuszy dotyczące tego posiłku zostaną usunięte, a usunięcie jest nieodwracalne. Ponowne włączenie posiłku ich nie przywróci: każdy uprawniony wolontariusz zostanie ponownie zapisany jako akceptujący, w tym ci, którzy odmówili.",
+      "confirm_disable_label": "Wyłącz i usuń odpowiedzi",
+      "confirm_disable_title": "Wyłączyć ten posiłek?"
     },
     "organizers": {
       "access_rights": "Prawa dostępu",
@@ -710,7 +713,9 @@
       "filter_no_results": "Żaden przedmiot nie pasuje do ustawionych filtrów",
       "shopping_mark_counted": "Wszystko zostało kupione",
       "shopping_mark_counted_confirm": "Liczba {count} zaznaczonych przedmiotów z „{name}” zostanie ustawiona na oczekiwaną ilość: przestaną być wykazywane jako brakujące. Niezaznaczone przedmioty pozostają bez zmian.",
-      "shopping_mark_counted_done": "Zaktualizowano stan"
+      "shopping_mark_counted_done": "Zaktualizowano stan",
+      "items_filter_help": "Wyszukiwanie obejmuje nazwę przedmiotu oraz miejsca odbioru i zwrotu, nigdy opisy.",
+      "name_filter_help": "Wyszukiwanie obejmuje nazwę przedmiotu, a nie jego opis."
     },
     "ticketing": {
       "access_control_description": "Skanowanie i zatwierdzanie biletów przy wejściu",
@@ -1114,7 +1119,9 @@
       "filtered_count": "brak wyświetlonych wierszy | 1 wyświetlony wiersz | {count} wyświetlonych wierszy",
       "filtered_export_notice": "Wyciąg filtrowany: {filters}",
       "filters": "Filtry",
-      "no_line": "Brak wierszy"
+      "no_line": "Brak wierszy",
+      "filter_search_help": "Wyszukiwanie obejmuje nazwę i opis, słowo po słowie w dowolnej kolejności.",
+      "plan_search_help": "Kody wyszukiwane są od początku, nazwy w dowolnym miejscu."
     },
     "program": {
       "description": "Ułóż oś czasu edycji: warsztaty, pokazy i inne wydarzenia.",

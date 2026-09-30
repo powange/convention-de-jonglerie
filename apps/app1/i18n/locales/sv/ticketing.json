@@ -60,7 +60,12 @@
       "verify_error": "Biljetten kunde inte kontrolleras",
       "refund_error": "Det gick inte att registrera återbetalningen",
       "refund_recorded": "Återbetalning registrerad",
-      "refund_undone": "Återbetalning ångrad"
+      "refund_undone": "Återbetalning ångrad",
+      "existing_ticket_entered": "Redan insläppt",
+      "existing_ticket_not_entered": "Inte insläppt ännu",
+      "existing_ticket_open": "Öppna posten",
+      "existing_tickets_hint": "Kontrollera att det inte är en dublett innan du lägger till. Du kan ändå fortsätta.",
+      "existing_tickets_title": "Det finns redan en biljett för denna adress | Det finns redan {count} biljetter för denna adress"
     },
     "counters": {
       "connected": "Ansluten",

@@ -60,7 +60,12 @@
       "verify_error": "Das Ticket konnte nicht geprüft werden",
       "refund_error": "Die Erstattung konnte nicht gespeichert werden",
       "refund_recorded": "Erstattung gespeichert",
-      "refund_undone": "Erstattung rückgängig gemacht"
+      "refund_undone": "Erstattung rückgängig gemacht",
+      "existing_ticket_entered": "Bereits eingelassen",
+      "existing_ticket_not_entered": "Noch nicht eingelassen",
+      "existing_ticket_open": "Datensatz öffnen",
+      "existing_tickets_hint": "Prüfen Sie vor dem Hinzufügen, dass es sich nicht um eine Dublette handelt. Sie können dennoch fortfahren.",
+      "existing_tickets_title": "Für diese Adresse existiert bereits ein Ticket | Für diese Adresse existieren bereits {count} Tickets"
     },
     "counters": {
       "connected": "Verbunden",

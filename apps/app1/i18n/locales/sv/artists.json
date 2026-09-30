@@ -194,6 +194,7 @@
     "export_pdf_error": "Det gick inte att skapa PDF:en",
     "delete_empty_shows_intro": "De här kabaréerna skulle bli helt utan nummer:",
     "delete_orphan_acts_hint": "Det som inte är ikryssat blir kvar. Ett nummer utan utövare hindrar ingenting: det syns i ordningen och på det tekniska bladet, utan namn.",
-    "delete_orphan_acts_intro": "Det här numret skulle inte ha någon kvar som framför det: | De här {count} numren skulle inte ha någon kvar som framför dem:"
+    "delete_orphan_acts_intro": "Det här numret skulle inte ha någon kvar som framför det: | De här {count} numren skulle inte ha någon kvar som framför dem:",
+    "search_help": "Sökningen omfattar alla visade kolumner: döljer du en kolumn tas den också bort ur sökningen."
   }
 }

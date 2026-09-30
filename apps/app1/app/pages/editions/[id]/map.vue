@@ -183,6 +183,7 @@ import { escapeHtml } from '~/utils/mapMarkers'
 import type { ExternalMapProvider } from '~~/shared/utils/external-map'
 
 import { externalMapEmbedUrl as buildExternalMapEmbedUrl } from '~~/shared/utils/external-map'
+import { formaterHeure, formaterJournee } from '~~/shared/utils/fuseau-edition'
 
 const route = useRoute()
 const { t, locale } = useI18n()
@@ -229,14 +230,42 @@ const externalMapEmbedUrl = computed(() => {
 })
 
 // Zones
-const { zones, loading: zonesLoading, servedFromCache: zonesFromCache } = useEditionZones(editionId)
+const {
+  zones,
+  loading: zonesLoading,
+  servedFromCache: zonesFromCache,
+  statutErreur: statutZones,
+} = useEditionZones(editionId)
 
 // Markers
 const {
   markers,
   loading: markersLoading,
   servedFromCache: markersFromCache,
+  statutErreur: statutMarqueurs,
 } = useEditionMarkers(editionId)
+
+/**
+ * Une carte non publique se solde par un 404, pas par une carte vide.
+ *
+ * ⚠️ CE QUI N'ALLAIT PAS. L'interrupteur « Rendre la carte publique » n'était respecté que par
+ * l'en-tête, qui masquait l'onglet. Cette page ne vérifiait rien et affichait zones et repères dès
+ * qu'ils existaient : un visiteur qui connaissait l'adresse voyait une carte en cours de
+ * préparation, ses repères de service et ses zones « espace interdit » comprises.
+ *
+ * La garde qui compte est celle du SERVEUR, désormais posée sur les deux points d'API. Celle-ci
+ * n'est que la conséquence visible : sans elle, le visiteur recevrait un 404 de l'API et lirait
+ * une carte vide, ce qui se comprend comme « l'organisation n'a rien placé » — faux, et
+ * décourageant d'y revenir.
+ *
+ * `showError` et non `throw createError` : les deux listes sont chargées APRÈS le montage, donc
+ * bien après l'exécution du `setup`. Lever ici n'aurait aucun effet.
+ */
+watch([statutZones, statutMarqueurs], ([zonesStatut, marqueursStatut]) => {
+  if (zonesStatut === 404 || marqueursStatut === 404) {
+    showError({ statusCode: 404, statusMessage: t('map.not_public'), fatal: true })
+  }
+})
 
 /**
  * Vrai dès qu'une des deux listes vient du cache hors ligne.
@@ -432,16 +461,31 @@ const showsByMarker = computed(() => {
   return map
 })
 
+/**
+ * L'horaire d'un spectacle ou d'un atelier dans un popup, AU FUSEAU DE L'ÉDITION.
+ *
+ * ⚠️ CE QUI N'ALLAIT PAS. Ces popups appelaient `toLocaleDateString`/`toLocaleTimeString` sans
+ * fuseau : l'heure du NAVIGATEUR. Le programme, lui, formate tout au fuseau de l'édition. Un
+ * participant qui prépare son voyage depuis un autre fuseau lisait donc « Gala — sam. 12 juil.
+ * 21:00 » sur le programme et « 22:00 » dans le popup de la même salle, sans rien pour dire
+ * laquelle croire.
+ *
+ * Les deux surfaces montrent la même chose : elles doivent l'écrire pareil.
+ *
+ * `fuseauDeLEdition` peut être `null` — une édition sur deux ne le renseigne pas. Les utilitaires
+ * retombent alors sur le fuseau du lecteur, c'est-à-dire le comportement d'avant : on ne dégrade
+ * rien, et on n'invente pas un lieu qu'on ignore.
+ */
+const fuseauDeLEdition = computed(() => edition.value?.timezone ?? null)
+
 const formatPopupDateTime = (dateTimeStr: string) => {
-  const date = new Date(dateTimeStr)
-  const localeCode = locale.value === 'fr' ? 'fr-FR' : locale.value
-  const day = date.toLocaleDateString(localeCode, {
+  const jour = formaterJournee(dateTimeStr, fuseauDeLEdition.value, locale.value, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
   })
-  const time = date.toLocaleTimeString(localeCode, { hour: '2-digit', minute: '2-digit' })
-  return `${day} ${time}`
+  const heure = formaterHeure(dateTimeStr, fuseauDeLEdition.value, locale.value)
+  return `${jour} ${heure}`
 }
 
 // Workshops — affichés dans les popups des zones/marqueurs.
@@ -540,8 +584,13 @@ const buildItemsPopupHtml = (shows: any[], wsItems: any[]) => {
 }
 
 // Mettre à jour les popups quand les spectacles ou workshops sont chargés
+/*
+ * ⚠️ `edition` FAIT PARTIE DES SOURCES, et c'est indispensable depuis que les horaires suivent son
+ * fuseau : l'édition est chargée APRÈS le montage, donc les premiers popups seraient composés
+ * avec `null` et garderaient l'heure du navigateur jusqu'à ce qu'autre chose les fasse recalculer.
+ */
 watch(
-  [publicShows, workshops, zones, markers, map],
+  [publicShows, workshops, zones, markers, map, edition],
   () => {
     if (!map.value) return
 

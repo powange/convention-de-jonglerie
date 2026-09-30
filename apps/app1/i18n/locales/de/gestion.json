@@ -280,7 +280,10 @@
       "validation_title": "Mahlzeitvalidierung",
       "volunteers": "Freiwillige",
       "no_enabled_meal": "Keine Mahlzeit zu validieren",
-      "no_enabled_meal_description": "Diese Ausgabe hat keine aktivierte Mahlzeit: Sie wurden noch nicht eingerichtet oder alle deaktiviert. Aktivieren Sie mindestens eine Mahlzeit, um die Ausgabestelle zu öffnen."
+      "no_enabled_meal_description": "Diese Ausgabe hat keine aktivierte Mahlzeit: Sie wurden noch nicht eingerichtet oder alle deaktiviert. Aktivieren Sie mindestens eine Mahlzeit, um die Ausgabestelle zu öffnen.",
+      "confirm_disable_description": "Die Antworten der Freiwilligen zu dieser Mahlzeit werden gelöscht, und diese Löschung ist endgültig. Ein erneutes Aktivieren stellt sie nicht wieder her: Jede berechtigte Person wird erneut als zusagend eingetragen, auch wer abgelehnt hatte.",
+      "confirm_disable_label": "Deaktivieren und Antworten löschen",
+      "confirm_disable_title": "Diese Mahlzeit deaktivieren?"
     },
     "organizers": {
       "access_rights": "Zugriffsrechte",
@@ -710,7 +713,9 @@
       "filter_no_results": "Kein Gegenstand entspricht den gesetzten Filtern",
       "shopping_mark_counted": "Alles wurde gekauft",
       "shopping_mark_counted_confirm": "Der Bestand von {count} angehakten Artikel(n) aus „{name}“ wird auf die erwartete Menge gesetzt: Sie gelten dann nicht mehr als fehlend. Nicht angehakte Artikel bleiben unverändert.",
-      "shopping_mark_counted_done": "Bestand aktualisiert"
+      "shopping_mark_counted_done": "Bestand aktualisiert",
+      "items_filter_help": "Die Suche umfasst den Namen des Gegenstands sowie die Abhol- und Rückgabeorte, niemals die Beschreibungen.",
+      "name_filter_help": "Die Suche umfasst den Namen des Gegenstands, nicht seine Beschreibung."
     },
     "ticketing": {
       "access_control_description": "Tickets am Eingang scannen und validieren",
@@ -1114,7 +1119,9 @@
       "filtered_count": "keine Zeilen angezeigt | 1 Zeile angezeigt | {count} Zeilen angezeigt",
       "filtered_export_notice": "Gefilterter Auszug: {filters}",
       "filters": "Filter",
-      "no_line": "Keine Zeilen"
+      "no_line": "Keine Zeilen",
+      "filter_search_help": "Die Suche umfasst Bezeichnung und Beschreibung, Wort für Wort in beliebiger Reihenfolge.",
+      "plan_search_help": "Codes werden ab ihrem Anfang gesucht, Bezeichnungen an beliebiger Stelle."
     },
     "program": {
       "description": "Stellen Sie den Zeitplan der Ausgabe zusammen: Workshops, Shows und weitere Momente.",

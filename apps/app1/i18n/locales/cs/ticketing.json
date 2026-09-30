@@ -60,7 +60,12 @@
       "verify_error": "Vstupenku se nepodařilo ověřit",
       "refund_error": "Vrácení peněz se nepodařilo zaznamenat",
       "refund_recorded": "Vrácení peněz zaznamenáno",
-      "refund_undone": "Vrácení peněz zrušeno"
+      "refund_undone": "Vrácení peněz zrušeno",
+      "existing_ticket_entered": "Již vstoupil",
+      "existing_ticket_not_entered": "Zatím nevstoupil",
+      "existing_ticket_open": "Otevřít záznam",
+      "existing_tickets_hint": "Před přidáním ověřte, že nejde o duplicitu. Přesto můžete pokračovat.",
+      "existing_tickets_title": "Pro tuto adresu už vstupenka existuje | Pro tuto adresu už existuje {count} vstupenek"
     },
     "counters": {
       "connected": "Připojeno",

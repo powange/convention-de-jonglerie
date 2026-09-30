@@ -280,7 +280,10 @@
       "validation_title": "Validação de refeições",
       "volunteers": "Voluntários",
       "no_enabled_meal": "Nenhuma refeição para validar",
-      "no_enabled_meal_description": "Esta edição não tem nenhuma refeição ativada: ainda não foram configuradas ou foram todas desativadas. Ative pelo menos uma refeição para abrir o balcão."
+      "no_enabled_meal_description": "Esta edição não tem nenhuma refeição ativada: ainda não foram configuradas ou foram todas desativadas. Ative pelo menos uma refeição para abrir o balcão.",
+      "confirm_disable_description": "As respostas dos voluntários para esta refeição serão eliminadas, e essa eliminação é definitiva. Reativar a refeição não as reporá: cada voluntário elegível será novamente inscrito como aceitando, incluindo os que tinham recusado.",
+      "confirm_disable_label": "Desativar e eliminar as respostas",
+      "confirm_disable_title": "Desativar esta refeição?"
     },
     "organizers": {
       "access_rights": "Direitos de acesso",
@@ -710,7 +713,9 @@
       "filter_no_results": "Nenhum objeto corresponde aos filtros aplicados",
       "shopping_mark_counted": "Tudo foi comprado",
       "shopping_mark_counted_confirm": "A contagem de {count} objeto(s) assinalado(s) de «{name}» passará à quantidade esperada: deixarão de aparecer como em falta. Os objetos não assinalados não mudam.",
-      "shopping_mark_counted_done": "Contagem atualizada"
+      "shopping_mark_counted_done": "Contagem atualizada",
+      "items_filter_help": "A pesquisa abrange o nome do objeto e os locais de levantamento e devolução, nunca as descrições.",
+      "name_filter_help": "A pesquisa abrange o nome do objeto, não a sua descrição."
     },
     "ticketing": {
       "access_control_description": "Digitalizar e validar bilhetes à entrada",
@@ -1114,7 +1119,9 @@
       "filtered_count": "nenhuma linha apresentada | 1 linha apresentada | {count} linhas apresentadas",
       "filtered_export_notice": "Extrato filtrado: {filters}",
       "filters": "Filtros",
-      "no_line": "Sem linhas"
+      "no_line": "Sem linhas",
+      "filter_search_help": "A pesquisa abrange a designação e a descrição, palavra a palavra em qualquer ordem.",
+      "plan_search_help": "Os códigos procuram-se pelo início, as designações em qualquer posição."
     },
     "program": {
       "description": "Componha a cronologia da edição: workshops, espetáculos e outros momentos.",

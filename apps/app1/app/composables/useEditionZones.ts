@@ -34,6 +34,19 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
   const error = ref<string | null>(null)
 
   /**
+   * Le CODE de la dernière erreur, à côté de son message.
+   *
+   * ⚠️ Le message seul ne permet pas de distinguer « cette carte n'est pas publique » d'une panne
+   * de réseau — et la page publique doit rendre un 404 dans le premier cas, pas une carte vide.
+   * Une carte vide se lit comme « l'organisation n'a rien placé », ce qui est faux et décourage de
+   * revenir.
+   *
+   * Les écrans de GESTION l'ignorent : pour eux un refus n'arrive pas, la garde serveur laissant
+   * passer toute personne de l'organisation.
+   */
+  const statutErreur = ref<number | null>(null)
+
+  /**
    * Vrai quand la réponse vient du cache hors ligne plutôt que du réseau.
    *
    * Le service worker le signale par un en-tête : la requête réussit dans les deux cas, et rien
@@ -47,6 +60,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
 
     loading.value = true
     error.value = null
+    statutErreur.value = null
 
     try {
       const response = await $fetch<{ success: boolean; data: { zones: EditionZone[] } }>(
@@ -60,6 +74,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
       zones.value = response.data.zones
     } catch (err: any) {
       error.value = err.data?.message || t('common.error')
+      statutErreur.value = err.statusCode ?? err.status ?? err.response?.status ?? null
       console.error('Error fetching zones:', err)
     } finally {
       loading.value = false
@@ -192,6 +207,7 @@ export const useEditionZones = (editionId: Ref<number | undefined>) => {
     deleting: readonly(deleting),
     reordering: readonly(reordering),
     error: readonly(error),
+    statutErreur: readonly(statutErreur),
     servedFromCache: readonly(servedFromCache),
     fetchZones,
     createZone: createNewZone,

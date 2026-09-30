@@ -280,7 +280,10 @@
       "validation_title": "Meal validation",
       "volunteers": "Volunteers",
       "no_enabled_meal": "No meal to validate",
-      "no_enabled_meal_description": "This edition has no enabled meal: they have not been configured yet, or they have all been disabled. Enable at least one meal to open the counter."
+      "no_enabled_meal_description": "This edition has no enabled meal: they have not been configured yet, or they have all been disabled. Enable at least one meal to open the counter.",
+      "confirm_disable_description": "The volunteers' answers for this meal will be deleted, and this deletion is permanent. Re-enabling the meal will not restore them: every eligible volunteer will be signed up again as accepting, including those who had declined.",
+      "confirm_disable_label": "Disable and delete the answers",
+      "confirm_disable_title": "Disable this meal?"
     },
     "organizers": {
       "access_rights": "Access rights",
@@ -710,7 +713,9 @@
       "filter_no_results": "No item matches the filters applied",
       "shopping_mark_counted": "Everything has been bought",
       "shopping_mark_counted_confirm": "The count of {count} ticked item(s) from “{name}” will be raised to the expected quantity: they will no longer appear as missing. Unticked items are left untouched.",
-      "shopping_mark_counted_done": "Count updated"
+      "shopping_mark_counted_done": "Count updated",
+      "items_filter_help": "The search covers the item name and the pickup and return locations, never the descriptions.",
+      "name_filter_help": "The search covers the item name, not its description."
     },
     "ticketing": {
       "access_control_description": "Scan and validate tickets at the entrance",
@@ -1114,7 +1119,9 @@
       "filtered_count": "no rows shown | 1 row shown | {count} rows shown",
       "filtered_export_notice": "Filtered extract: {filters}",
       "filters": "Filters",
-      "no_line": "No rows"
+      "no_line": "No rows",
+      "filter_search_help": "The search covers the label and the description, word by word in any order.",
+      "plan_search_help": "Codes are matched from their beginning, labels anywhere."
     },
     "program": {
       "description": "Build the edition's timeline: workshops, shows and other moments.",

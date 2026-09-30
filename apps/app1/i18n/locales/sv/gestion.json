@@ -280,7 +280,10 @@
       "validation_title": "Måltidsvalidering",
       "volunteers": "Volontärer",
       "no_enabled_meal": "Ingen måltid att validera",
-      "no_enabled_meal_description": "Den här upplagan har ingen aktiverad måltid: de har ännu inte konfigurerats, eller alla har inaktiverats. Aktivera minst en måltid för att öppna disken."
+      "no_enabled_meal_description": "Den här upplagan har ingen aktiverad måltid: de har ännu inte konfigurerats, eller alla har inaktiverats. Aktivera minst en måltid för att öppna disken.",
+      "confirm_disable_description": "Volontärernas svar för denna måltid raderas, och raderingen är slutgiltig. Att slå på måltiden igen återställer dem inte: varje behörig volontär skrivs in på nytt som accepterande, även de som tackat nej.",
+      "confirm_disable_label": "Stäng av och radera svaren",
+      "confirm_disable_title": "Stänga av denna måltid?"
     },
     "organizers": {
       "access_rights": "Åtkomsträttigheter",
@@ -710,7 +713,9 @@
       "filter_no_results": "Inga föremål matchar de valda filtren",
       "shopping_mark_counted": "Allt har köpts in",
       "shopping_mark_counted_confirm": "Räkningen av {count} ikryssade föremål från ”{name}” sätts till det förväntade antalet: de visas inte längre som saknade. Föremål som inte är ikryssade påverkas inte.",
-      "shopping_mark_counted_done": "Räkning uppdaterad"
+      "shopping_mark_counted_done": "Räkning uppdaterad",
+      "items_filter_help": "Sökningen omfattar föremålets namn samt hämtnings- och återlämningsplatser, aldrig beskrivningarna.",
+      "name_filter_help": "Sökningen omfattar föremålets namn, inte dess beskrivning."
     },
     "ticketing": {
       "access_control_description": "Skanna och validera biljetter vid entrén",
@@ -1114,7 +1119,9 @@
       "filtered_count": "inga rader visas | 1 rad visas | {count} rader visas",
       "filtered_export_notice": "Filtrerat utdrag: {filters}",
       "filters": "Filter",
-      "no_line": "Inga rader"
+      "no_line": "Inga rader",
+      "filter_search_help": "Sökningen omfattar benämningen och beskrivningen, ord för ord i valfri ordning.",
+      "plan_search_help": "Koder söks från början, benämningar var som helst."
     },
     "program": {
       "description": "Sätt samman upplagans tidslinje: workshops, föreställningar och andra moment.",

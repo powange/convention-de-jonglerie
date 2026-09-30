@@ -90,6 +90,42 @@ function findTodoKeys(obj, prefix = '') {
 }
 
 /**
+ * Trouve les marqueurs de traduction NON RECONNUS par l'outillage.
+ *
+ * ⚠️ POURQUOI CETTE FONCTION EXISTE. Neuf libellés de la modale des repas portaient le préfixe
+ * « TODO: » — sans crochets — dans douze langues. Le marqueur officiel du projet est `[TODO]`, seul
+ * reconnu par `list-todo-keys` et `translate-todos` : ces 106 valeurs leur étaient donc INVISIBLES.
+ * Le diagnostic annonçait « aucune clé [TODO] » pendant qu'un bénévole anglophone lisait
+ * « TODO: Description » dans la fenêtre de ses repas.
+ *
+ * Un marqueur qui échappe à l'outil censé le traquer est pire qu'une traduction manquante : la
+ * traduction manquante, elle, finit par se voir dans un rapport.
+ *
+ * ⚠️ LA CASSE EST SIGNIFIANTE, et une première version l'ignorait : « Todo » veut dire « tout » en
+ * espagnol et en portugais. Un motif insensible à la casse signalait « Todo o período » et « Todo
+ * lo que falta ya está… » — des traductions parfaitement justes. Seul `TODO` tout en majuscules
+ * est un marqueur ; c'est ainsi que l'écrivent le projet et les éditeurs.
+ */
+export function trouverMarqueursNonReconnus(obj, prefix = '') {
+  const trouves = {}
+
+  for (const [key, value] of Object.entries(obj)) {
+    const currentPath = prefix ? `${prefix}.${key}` : key
+
+    if (typeof value === 'string') {
+      const debut = value.trimStart()
+      if (/^TODO\b/.test(debut) && !debut.startsWith('[TODO]')) {
+        trouves[currentPath] = value
+      }
+    } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.assign(trouves, trouverMarqueursNonReconnus(value, currentPath))
+    }
+  }
+
+  return trouves
+}
+
+/**
  * Compte les clés TODO dans toutes les langues
  */
 function countTodoKeys(locales) {
@@ -563,10 +599,43 @@ async function main() {
     console.log(`Total clés [TODO]: ${totalTodoKeys}`)
   }
 
+  /*
+   * Les marqueurs qui échappent à l'outillage, signalés à part et en ERREUR.
+   *
+   * En avertissement, ils resteraient là : c'est ce qui s'est passé pendant des mois avec les neuf
+   * libellés de la modale des repas, qu'aucun rapport ne mentionnait.
+   */
+  let marqueursDouteux = 0
+  for (const [locale, data] of Object.entries(locales)) {
+    const trouves = trouverMarqueursNonReconnus(data)
+    const cles = Object.keys(trouves)
+    if (cles.length === 0) continue
+
+    marqueursDouteux += cles.length
+    console.log(
+      `\n${RED}✗ ${locale} : ${cles.length} valeur(s) commencent par « TODO » sans crochets${RESET}`
+    )
+    console.log(`  Le marqueur reconnu est [TODO] ; celles-ci échappent à /translate-todos.`)
+    for (const cle of cles.slice(0, 10)) {
+      console.log(`    ${cle} = ${JSON.stringify(trouves[cle])}`)
+    }
+    if (cles.length > 10) console.log(`    … et ${cles.length - 10} autres`)
+  }
+  if (marqueursDouteux > 0) hasErrors = true
+
   // Code de sortie
   if (hasErrors) {
     process.exit(1)
   }
 }
 
-main()
+/*
+ * ⚠️ `main()` NE PART QU'EN EXÉCUTION DIRECTE. Ce fichier exporte désormais
+ * `trouverMarqueursNonReconnus` pour pouvoir l'éprouver : sans cette garde, le simple fait
+ * d'importer la fonction depuis un test rejouait tout le rapport — et un `process.exit(1)` sur la
+ * moindre clé manquante aurait fait échouer la suite pour une raison sans rapport.
+ */
+const executeDirectement = process.argv[1] && path.resolve(process.argv[1]) === __filename
+if (executeDirectement) {
+  main()
+}

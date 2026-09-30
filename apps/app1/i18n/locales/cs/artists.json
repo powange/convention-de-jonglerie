@@ -194,6 +194,7 @@
     "export_pdf_error": "PDF se nepodařilo vygenerovat",
     "delete_empty_shows_intro": "Těmto kabaretům by nezůstalo jediné číslo:",
     "delete_orphan_acts_hint": "Co není zaškrtnuto, zůstává. Číslo bez interpreta ničemu nebrání: objeví se v programu i v technickém listu, bez jména.",
-    "delete_orphan_acts_intro": "Toto číslo by nemělo nikoho, kdo by je zahrál: | Tato {count} čísla by neměla nikoho, kdo by je zahrál:"
+    "delete_orphan_acts_intro": "Toto číslo by nemělo nikoho, kdo by je zahrál: | Tato {count} čísla by neměla nikoho, kdo by je zahrál:",
+    "search_help": "Vyhledávání se týká všech zobrazených sloupců: skrytím sloupce jej z vyhledávání také vyřadíte."
   }
 }
