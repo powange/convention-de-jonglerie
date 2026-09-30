@@ -280,7 +280,10 @@
       "validation_title": "Convalida pasti",
       "volunteers": "Volontari",
       "no_enabled_meal": "Nessun pasto da convalidare",
-      "no_enabled_meal_description": "Questa edizione non ha alcun pasto attivato: non sono ancora stati configurati oppure sono stati tutti disattivati. Attiva almeno un pasto per aprire il banco."
+      "no_enabled_meal_description": "Questa edizione non ha alcun pasto attivato: non sono ancora stati configurati oppure sono stati tutti disattivati. Attiva almeno un pasto per aprire il banco.",
+      "confirm_disable_description": "Le risposte dei volontari per questo pasto saranno eliminate, e l'eliminazione è definitiva. Riattivare il pasto non le ripristinerà: ogni volontario idoneo sarà iscritto di nuovo come accettante, compresi quelli che avevano rifiutato.",
+      "confirm_disable_label": "Disattiva ed elimina le risposte",
+      "confirm_disable_title": "Disattivare questo pasto?"
     },
     "organizers": {
       "access_rights": "Diritti di accesso",
@@ -710,7 +713,9 @@
       "filter_no_results": "Nessun oggetto corrisponde ai filtri impostati",
       "shopping_mark_counted": "Tutto è stato acquistato",
       "shopping_mark_counted_confirm": "Il conteggio di {count} oggetto/i spuntato/i da «{name}» sarà portato alla quantità prevista: non risulteranno più mancanti. Gli oggetti non spuntati restano invariati.",
-      "shopping_mark_counted_done": "Conteggio aggiornato"
+      "shopping_mark_counted_done": "Conteggio aggiornato",
+      "items_filter_help": "La ricerca riguarda il nome dell'oggetto e i luoghi di ritiro e di restituzione, mai le descrizioni.",
+      "name_filter_help": "La ricerca riguarda il nome dell'oggetto, non la sua descrizione."
     },
     "ticketing": {
       "access_control_description": "Scansione e convalida dei biglietti all'ingresso",
@@ -1114,7 +1119,9 @@
       "filtered_count": "nessuna riga mostrata | 1 riga mostrata | {count} righe mostrate",
       "filtered_export_notice": "Estratto filtrato: {filters}",
       "filters": "Filtri",
-      "no_line": "Nessuna riga"
+      "no_line": "Nessuna riga",
+      "filter_search_help": "La ricerca riguarda la voce e la descrizione, parola per parola in qualsiasi ordine.",
+      "plan_search_help": "I codici si cercano dall'inizio, le voci ovunque."
     },
     "program": {
       "description": "Componi la cronologia dell'edizione: workshop, spettacoli e altri momenti.",

@@ -194,6 +194,7 @@
     "export_pdf_error": "Kan de pdf niet genereren",
     "delete_empty_shows_intro": "Deze cabarets zouden helemaal zonder nummers komen te zitten:",
     "delete_orphan_acts_hint": "Wat niet is aangevinkt blijft staan. Een nummer zonder uitvoerder belemmert niets: het verschijnt in het verloop en op het technische blad, zonder naam.",
-    "delete_orphan_acts_intro": "Dit nummer zou niemand meer hebben om het uit te voeren: | Deze {count} nummers zouden niemand meer hebben om ze uit te voeren:"
+    "delete_orphan_acts_intro": "Dit nummer zou niemand meer hebben om het uit te voeren: | Deze {count} nummers zouden niemand meer hebben om ze uit te voeren:",
+    "search_help": "De zoekopdracht geldt voor alle weergegeven kolommen: een kolom verbergen haalt die ook uit de zoekopdracht."
   }
 }

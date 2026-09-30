@@ -60,7 +60,12 @@
       "verify_error": "The ticket could not be checked",
       "refund_error": "Unable to record the refund",
       "refund_recorded": "Refund recorded",
-      "refund_undone": "Refund undone"
+      "refund_undone": "Refund undone",
+      "existing_ticket_entered": "Already entered",
+      "existing_ticket_not_entered": "Not entered yet",
+      "existing_ticket_open": "Open the record",
+      "existing_tickets_hint": "Check that this is not a duplicate before adding. You can still continue.",
+      "existing_tickets_title": "A ticket already exists for this address | {count} tickets already exist for this address"
     },
     "counters": {
       "connected": "Connected",

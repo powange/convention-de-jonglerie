@@ -41,6 +41,7 @@
     "zone_entrances": "Entradas:",
     "marker_entrance_of": "Entrada de:",
     "offline_title": "Mapa mostrado sin conexión",
-    "offline_description": "Esta información procede de su última visita y puede haber cambiado desde entonces."
+    "offline_description": "Esta información procede de su última visita y puede haber cambiado desde entonces.",
+    "not_public": "El mapa de esta edición no es público."
   }
 }

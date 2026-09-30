@@ -41,6 +41,7 @@
     "zone_entrances": "Eingänge:",
     "marker_entrance_of": "Eingang zu:",
     "offline_title": "Karte offline angezeigt",
-    "offline_description": "Diese Angaben stammen von Ihrem letzten Besuch und können sich seitdem geändert haben."
+    "offline_description": "Diese Angaben stammen von Ihrem letzten Besuch und können sich seitdem geändert haben.",
+    "not_public": "Die Karte dieser Ausgabe ist nicht öffentlich."
   }
 }

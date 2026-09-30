@@ -60,7 +60,12 @@
       "verify_error": "Het ticket kon niet worden gecontroleerd",
       "refund_error": "De terugbetaling kon niet worden geregistreerd",
       "refund_recorded": "Terugbetaling geregistreerd",
-      "refund_undone": "Terugbetaling ongedaan gemaakt"
+      "refund_undone": "Terugbetaling ongedaan gemaakt",
+      "existing_ticket_entered": "Al binnen",
+      "existing_ticket_not_entered": "Nog niet binnen",
+      "existing_ticket_open": "Fiche openen",
+      "existing_tickets_hint": "Controleer vóór het toevoegen of dit geen dubbele is. Je kunt toch doorgaan.",
+      "existing_tickets_title": "Er bestaat al een ticket voor dit adres | Er bestaan al {count} tickets voor dit adres"
     },
     "counters": {
       "connected": "Verbonden",

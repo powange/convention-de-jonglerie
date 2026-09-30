@@ -60,7 +60,12 @@
       "verify_error": "Не вдалося перевірити квиток",
       "refund_error": "Не вдалося зареєструвати повернення",
       "refund_recorded": "Повернення зареєстровано",
-      "refund_undone": "Повернення скасовано"
+      "refund_undone": "Повернення скасовано",
+      "existing_ticket_entered": "Уже увійшов",
+      "existing_ticket_not_entered": "Ще не увійшов",
+      "existing_ticket_open": "Відкрити картку",
+      "existing_tickets_hint": "Перед додаванням перевірте, що це не дублікат. Ви все одно можете продовжити.",
+      "existing_tickets_title": "Для цієї адреси квиток уже існує | Для цієї адреси вже існує {count} квитків"
     },
     "counters": {
       "connected": "Підключено",

@@ -60,7 +60,12 @@
       "verify_error": "Impossibile verificare il biglietto",
       "refund_error": "Impossibile registrare il rimborso",
       "refund_recorded": "Rimborso registrato",
-      "refund_undone": "Rimborso annullato"
+      "refund_undone": "Rimborso annullato",
+      "existing_ticket_entered": "Già entrato",
+      "existing_ticket_not_entered": "Non ancora entrato",
+      "existing_ticket_open": "Apri la scheda",
+      "existing_tickets_hint": "Verifica che non si tratti di un duplicato prima di aggiungere. Puoi comunque proseguire.",
+      "existing_tickets_title": "Esiste già un biglietto per questo indirizzo | Esistono già {count} biglietti per questo indirizzo"
     },
     "counters": {
       "connected": "Connesso",

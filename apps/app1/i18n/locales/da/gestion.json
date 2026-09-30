@@ -280,7 +280,10 @@
       "validation_title": "Måltidsvalidering",
       "volunteers": "Frivillige",
       "no_enabled_meal": "Intet måltid at validere",
-      "no_enabled_meal_description": "Denne udgave har ingen aktiverede måltider: de er endnu ikke konfigureret, eller de er alle blevet deaktiveret. Aktivér mindst ét måltid for at åbne disken."
+      "no_enabled_meal_description": "Denne udgave har ingen aktiverede måltider: de er endnu ikke konfigureret, eller de er alle blevet deaktiveret. Aktivér mindst ét måltid for at åbne disken.",
+      "confirm_disable_description": "De frivilliges svar for dette måltid slettes, og sletningen er endelig. At slå måltidet til igen genskaber dem ikke: hver berettiget frivillig bliver tilmeldt på ny som accepterende, også dem der havde takket nej.",
+      "confirm_disable_label": "Slå fra og slet svarene",
+      "confirm_disable_title": "Slå dette måltid fra?"
     },
     "organizers": {
       "access_rights": "Adgangsrettigheder",
@@ -710,7 +713,9 @@
       "filter_no_results": "Ingen genstande matcher de valgte filtre",
       "shopping_mark_counted": "Alt er blevet købt",
       "shopping_mark_counted_confirm": "Optællingen af {count} afkrydsede genstand(e) fra “{name}” sættes til det forventede antal: de vises ikke længere som manglende. Ikke-afkrydsede genstande ændres ikke.",
-      "shopping_mark_counted_done": "Optælling opdateret"
+      "shopping_mark_counted_done": "Optælling opdateret",
+      "items_filter_help": "Søgningen omfatter genstandens navn samt afhentnings- og afleveringssteder, aldrig beskrivelserne.",
+      "name_filter_help": "Søgningen omfatter genstandens navn, ikke dens beskrivelse."
     },
     "ticketing": {
       "access_control_description": "Scan og valider billetter ved indgangen",
@@ -1114,7 +1119,9 @@
       "filtered_count": "ingen linjer vist | 1 linje vist | {count} linjer vist",
       "filtered_export_notice": "Filtreret uddrag: {filters}",
       "filters": "Filtre",
-      "no_line": "Ingen linjer"
+      "no_line": "Ingen linjer",
+      "filter_search_help": "Søgningen omfatter betegnelsen og beskrivelsen, ord for ord i vilkårlig rækkefølge.",
+      "plan_search_help": "Koder søges fra begyndelsen, betegnelser hvor som helst."
     },
     "program": {
       "description": "Sammensæt udgavens tidslinje: workshops, shows og andre programpunkter.",

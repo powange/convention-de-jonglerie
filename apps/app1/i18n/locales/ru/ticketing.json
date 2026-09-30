@@ -60,7 +60,12 @@
       "verify_error": "Не удалось проверить билет",
       "refund_error": "Не удалось зарегистрировать возврат",
       "refund_recorded": "Возврат зарегистрирован",
-      "refund_undone": "Возврат отменён"
+      "refund_undone": "Возврат отменён",
+      "existing_ticket_entered": "Уже вошёл",
+      "existing_ticket_not_entered": "Ещё не вошёл",
+      "existing_ticket_open": "Открыть карточку",
+      "existing_tickets_hint": "Перед добавлением проверьте, что это не дубликат. Вы всё равно можете продолжить.",
+      "existing_tickets_title": "Для этого адреса билет уже существует | Для этого адреса уже существует {count} билетов"
     },
     "counters": {
       "connected": "Подключено",

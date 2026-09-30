@@ -60,7 +60,12 @@
       "verify_error": "Nie udało się zweryfikować biletu",
       "refund_error": "Nie udało się zapisać zwrotu",
       "refund_recorded": "Zwrot zapisany",
-      "refund_undone": "Zwrot cofnięty"
+      "refund_undone": "Zwrot cofnięty",
+      "existing_ticket_entered": "Już wszedł",
+      "existing_ticket_not_entered": "Jeszcze nie wszedł",
+      "existing_ticket_open": "Otwórz kartę",
+      "existing_tickets_hint": "Przed dodaniem sprawdź, czy to nie duplikat. Mimo to możesz kontynuować.",
+      "existing_tickets_title": "Dla tego adresu bilet już istnieje | Dla tego adresu istnieje już {count} biletów"
     },
     "counters": {
       "connected": "Połączono",

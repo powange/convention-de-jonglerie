@@ -457,7 +457,9 @@ import { shallowRef } from 'vue'
 import { formatDate } from '~/utils/date'
 
 definePageMeta({
-  middleware: ['super-admin'],
+  // `auth-protected` D'ABORD : c'est lui qui attend la réponse du serveur sur la session.
+  // `super-admin` seul lisait un store encore vide au rechargement — voir son en-tête.
+  middleware: ['auth-protected', 'super-admin'],
 })
 
 // Les libellés de statut sont partagés avec la page publique de suivi, et vivent donc dans le

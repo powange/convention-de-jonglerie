@@ -6,8 +6,17 @@ import zonesGetHandler from '../../../../../../server/api/editions/[id]/zones/in
 const prismaMock = (globalThis as any).prisma
 
 describe('API Zones - Liste (GET)', () => {
+  /*
+   * ⚠️ LES DEUX DRAPEAUX DE CARTE FONT PARTIE DE LA FIXTURE depuis que ce point d'API vérifie que
+   * la carte est publique : sans eux, `assurerCarteLisible` rend 404 et tous les cas ci-dessous
+   * mesurent le refus au lieu du cas nominal.
+   *
+   * Les cas de refus eux-mêmes sont éprouvés à part, dans `editions/carte-non-publique.test.ts`.
+   */
   const mockEdition = {
     id: 1,
+    siteMapEnabled: true,
+    mapPublic: true,
   }
 
   const mockZones = [
@@ -70,7 +79,7 @@ describe('API Zones - Liste (GET)', () => {
 
     expect(prismaMock.edition.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
-      select: { id: true },
+      select: { id: true, siteMapEnabled: true, mapPublic: true },
     })
 
     expect(prismaMock.editionZone.findMany).toHaveBeenCalledWith({
