@@ -78,7 +78,12 @@
       "request_load_error": "Forespørgslen kunne ikke indlæses",
       "revoke_seat": "Fjern",
       "revoke_seat_description": "{pseudo} har en bekræftet plads på denne tur og vil få besked om fjernelsen. Du kan ikke give pladsen tilbage: der skal sendes en ny anmodning.",
-      "revoke_seat_title": "Fjern denne plads?"
+      "revoke_seat_title": "Fjern denne plads?",
+      "confirm_delete_offer_no_passenger": "Ingen har en plads på denne tur: at slette den giver ikke nogen besked.",
+      "confirm_delete_offer_passengers": "{count} bekræftet passager får besked | {count} bekræftede passagerer får besked",
+      "confirm_delete_offer_passengers_hint": "De får en besked om, at turen ikke længere finder sted, og skal finde en anden samkørsel. Anmodninger, der stadig afventer svar, får også besked.",
+      "confirm_delete_offer_title": "Slet dette tilbud?",
+      "confirm_delete_offer_with_passengers": "Dette tilbud har bekræftede passagerer. Sletningen kan ikke fortrydes."
     },
     "convention_form": {
       "click_to_select_image": "Klik for at vælge et billede",

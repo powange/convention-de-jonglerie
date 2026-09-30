@@ -40,6 +40,13 @@ describe('/api/carpool-offers/[id] PUT', () => {
   beforeEach(() => {
     prismaMock.carpoolOffer.findUnique.mockReset()
     prismaMock.carpoolOffer.update.mockReset()
+    prismaMock.carpoolBooking.findMany.mockReset()
+    /*
+     * Un changement de date ou de ville de départ prévient les passagers acceptés : le handler lit
+     * donc leurs réservations. À vide par défaut — la plupart de ces tests ne portent pas sur la
+     * notification, et les mocker ici évite d'en faire dépendre leur passage.
+     */
+    prismaMock.carpoolBooking.findMany.mockResolvedValue([])
     global.readBody = vi.fn()
     global.getRouterParam = vi.fn().mockReturnValue('1')
   })

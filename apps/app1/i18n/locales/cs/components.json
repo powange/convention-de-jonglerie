@@ -78,7 +78,12 @@
       "request_load_error": "Tento požadavek se nepodařilo načíst",
       "revoke_seat": "Odebrat",
       "revoke_seat_description": "{pseudo} má na této jízdě potvrzené místo a o odebrání bude informován. Místo nebude možné vrátit: bude nutná nová žádost.",
-      "revoke_seat_title": "Odebrat toto místo?"
+      "revoke_seat_title": "Odebrat toto místo?",
+      "confirm_delete_offer_no_passenger": "Na této jízdě nikdo nemá místo: jejím smazáním nikoho neupozorníte.",
+      "confirm_delete_offer_passengers": "{count} potvrzený spolujezdec bude informován | {count} potvrzených spolujezdců bude informováno",
+      "confirm_delete_offer_passengers_hint": "Dostanou oznámení, že jízda se už neuskuteční, a budou si muset najít jinou. Informovány jsou i žádosti, které stále čekají na odpověď.",
+      "confirm_delete_offer_title": "Smazat tuto nabídku?",
+      "confirm_delete_offer_with_passengers": "Tato nabídka má potvrzené spolujezdce. Smazání je nezvratné."
     },
     "convention_form": {
       "click_to_select_image": "Kliknutím vyberete obrázek",

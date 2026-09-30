@@ -59,6 +59,16 @@
         "action": "Najít jinou jízdu",
         "message": "{ownerName} ti odebral místo ({seats}) na jízdě z {locationCity}",
         "title": "Vaše místo bylo odebráno"
+      },
+      "offer_changed": {
+        "action": "Zobrazit jízdu",
+        "message": "{ownerName} změnil jízdu: odjezd z {locationCity} dne {date}",
+        "title": "Jízda, kterou jste si zarezervovali, se změnila"
+      },
+      "offer_deleted": {
+        "action": "Najít jinou jízdu",
+        "message": "{ownerName} smazal jízdu z {locationCity}: vaše místo ({seats}) už neexistuje",
+        "title": "Jízda, kterou jste si zarezervovali, byla smazána"
       }
     },
     "common": {

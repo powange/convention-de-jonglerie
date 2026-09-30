@@ -78,7 +78,12 @@
       "request_load_error": "Impossibile caricare questa richiesta",
       "revoke_seat": "Rimuovi",
       "revoke_seat_description": "{pseudo} ha un posto confermato su questo viaggio e riceverà una notifica della rimozione. Non potrai restituirglielo: servirà una nuova richiesta.",
-      "revoke_seat_title": "Rimuovere questo posto?"
+      "revoke_seat_title": "Rimuovere questo posto?",
+      "confirm_delete_offer_no_passenger": "Nessuno ha un posto su questo viaggio: eliminarlo non avviserà nessuno.",
+      "confirm_delete_offer_passengers": "{count} passeggero confermato sarà avvisato | {count} passeggeri confermati saranno avvisati",
+      "confirm_delete_offer_passengers_hint": "Riceveranno una notifica che il viaggio non si terrà più, e dovranno cercare un altro passaggio. Anche le richieste ancora in attesa vengono avvisate.",
+      "confirm_delete_offer_title": "Eliminare questa offerta?",
+      "confirm_delete_offer_with_passengers": "Questa offerta ha passeggeri confermati. Eliminarla è definitivo."
     },
     "convention_form": {
       "click_to_select_image": "Clicca per selezionare un'immagine",

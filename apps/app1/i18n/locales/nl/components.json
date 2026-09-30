@@ -78,7 +78,12 @@
       "request_load_error": "Deze aanvraag kon niet worden geladen",
       "revoke_seat": "Verwijderen",
       "revoke_seat_description": "{pseudo} heeft een bevestigde plaats op deze rit en krijgt een melding van de verwijdering. Je kunt de plaats niet teruggeven: er is een nieuwe aanvraag nodig.",
-      "revoke_seat_title": "Deze plaats verwijderen?"
+      "revoke_seat_title": "Deze plaats verwijderen?",
+      "confirm_delete_offer_no_passenger": "Niemand heeft een plaats op deze rit: verwijderen waarschuwt niemand.",
+      "confirm_delete_offer_passengers": "{count} bevestigde passagier krijgt een melding | {count} bevestigde passagiers krijgen een melding",
+      "confirm_delete_offer_passengers_hint": "Ze krijgen een melding dat de rit niet meer doorgaat en moeten een andere rit zoeken. Nog openstaande aanvragen worden ook gewaarschuwd.",
+      "confirm_delete_offer_title": "Dit aanbod verwijderen?",
+      "confirm_delete_offer_with_passengers": "Dit aanbod heeft bevestigde passagiers. Verwijderen is definitief."
     },
     "convention_form": {
       "click_to_select_image": "Klik om een afbeelding te selecteren",

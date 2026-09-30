@@ -59,6 +59,16 @@
         "action": "Найти другую поездку",
         "message": "{ownerName} убрал ваше место ({seats}) в поездке из {locationCity}",
         "title": "Ваше место убрано"
+      },
+      "offer_changed": {
+        "action": "Посмотреть поездку",
+        "message": "{ownerName} изменил поездку: выезд из {locationCity} {date}",
+        "title": "Поездка, которую вы забронировали, изменилась"
+      },
+      "offer_deleted": {
+        "action": "Найти другую поездку",
+        "message": "{ownerName} удалил поездку из {locationCity}: вашего места ({seats}) больше нет",
+        "title": "Поездка, которую вы забронировали, была удалена"
       }
     },
     "common": {

@@ -59,6 +59,16 @@
         "action": "Poszukaj innej podróży",
         "message": "{ownerName} odebrał Ci miejsce ({seats}) w podróży z {locationCity}",
         "title": "Twoje miejsce zostało odebrane"
+      },
+      "offer_changed": {
+        "action": "Zobacz podróż",
+        "message": "{ownerName} zmienił podróż: wyjazd z {locationCity} w dniu {date}",
+        "title": "Podróż, którą zarezerwowałeś, się zmieniła"
+      },
+      "offer_deleted": {
+        "action": "Poszukaj innej podróży",
+        "message": "{ownerName} usunął podróż z {locationCity}: Twoje miejsce ({seats}) już nie istnieje",
+        "title": "Podróż, którą zarezerwowałeś, została usunięta"
       }
     },
     "common": {

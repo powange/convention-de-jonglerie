@@ -35,6 +35,13 @@ describe('/api/carpool-offers/[id] DELETE', () => {
   beforeEach(() => {
     prismaMock.carpoolOffer.findUnique.mockReset()
     prismaMock.carpoolOffer.delete.mockReset()
+    prismaMock.carpoolBooking.findMany.mockReset()
+    /*
+     * La suppression lit désormais les réservations à prévenir AVANT le `CASCADE`. Mocker ce
+     * `findMany` à vide est le défaut, et non une tolérance : Prisma rend toujours un tableau, et
+     * rendre le handler indulgent à un `undefined` masquerait le vrai oubli — celui d'une fixture.
+     */
+    prismaMock.carpoolBooking.findMany.mockResolvedValue([])
     global.getRouterParam = vi.fn().mockReturnValue('1')
   })
 
@@ -115,8 +122,11 @@ describe('/api/carpool-offers/[id] DELETE', () => {
       // Ignorer l'erreur
     }
 
+    // L'offre est lue avec son conducteur : c'est son pseudo qui nomme l'auteur de la suppression
+    // dans la notification, et il n'y a plus de relation à suivre après le `delete`.
     expect(prismaMock.carpoolOffer.findUnique).toHaveBeenCalledWith({
       where: { id: 42 },
+      include: { user: { select: { id: true, pseudo: true } } },
     })
   })
 })
