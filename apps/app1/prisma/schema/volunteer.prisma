@@ -293,6 +293,17 @@ model VolunteerAssignment {
   // est perdue, et une relance ne doit pas les balayer par surprise.
   source       VolunteerAssignmentSource @default(MANUAL)
 
+  /// Quand le rappel « votre créneau commence dans 30 minutes » a été envoyé pour cette
+  /// affectation. `null` = jamais.
+  ///
+  /// ⚠️ SANS CETTE MARQUE, LE RAPPEL PARTAIT 4 À 5 FOIS. La tâche tourne CHAQUE MINUTE et retient
+  /// les créneaux qui démarrent dans 28 à 32 minutes : un même créneau tombe donc dans la fenêtre
+  /// à quatre ou cinq passages consécutifs, et rien ne gardait trace de l'envoi précédent.
+  ///
+  /// Portée par l'AFFECTATION et non par le créneau : quelqu'un affecté entre deux passages doit
+  /// recevoir son rappel, ce qu'une marque posée sur le créneau lui aurait retiré.
+  reminderSentAt DateTime?
+
   timeSlot       VolunteerTimeSlot      @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
   user           User                   @relation("VolunteerAssignment_user", fields: [userId], references: [id], onDelete: Cascade)
   assignedBy     User                   @relation("VolunteerAssignment_assignedBy", fields: [assignedById], references: [id], onDelete: Cascade)

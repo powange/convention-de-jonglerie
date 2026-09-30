@@ -44,6 +44,19 @@ export default defineTask({
         },
         include: {
           assignments: {
+            /*
+             * ⚠️ SEULEMENT CELLES QUI N'ONT PAS ENCORE REÇU LEUR RAPPEL.
+             *
+             * Sans marque d'envoi, le rappel partait 4 À 5 FOIS : cette tâche tourne CHAQUE MINUTE
+             * et retient les créneaux qui démarrent dans 28 à 32 minutes, si bien qu'un même
+             * créneau tombe dans la fenêtre à quatre ou cinq passages consécutifs. Le bénévole
+             * recevait donc quatre ou cinq notifications identiques, à une minute d'intervalle.
+             *
+             * Le filtre est posé ICI, dans la requête, et pas seulement en mémoire : c'est ce qui
+             * évite de transporter à chaque minute des affectations qu'on ne notifiera pas — dans
+             * le prolongement de l'allègement de cette requête, et non contre lui.
+             */
+            where: { reminderSentAt: null },
             include: {
               user: {
                 select: { id: true, email: true, pseudo: true, nom: true, prenom: true },
@@ -98,6 +111,27 @@ export default defineTask({
 
           for (const assignment of slot.assignments) {
             try {
+              /*
+               * ⚠️ LA MARQUE EST POSÉE AVANT L'ENVOI, et par un `updateMany` CONDITIONNEL.
+               *
+               * Le filtre de la requête ci-dessus suffirait si cette tâche ne tournait jamais deux
+               * fois en même temps. Or elle part chaque minute et rien ne garantit qu'un passage
+               * soit terminé quand le suivant commence — une base lente, un envoi qui traîne, et
+               * deux exécutions lisent la même affectation encore vierge. Le `where` sur
+               * `reminderSentAt: null` fait alors que L'UNE DES DEUX SEULEMENT écrit une ligne :
+               * celle qui n'en écrit aucune n'envoie rien.
+               *
+               * Avant plutôt qu'après : un rappel envoyé sans marque repartirait à la minute
+               * suivante, ce qui est le défaut qu'on corrige. Une marque posée sur un envoi qui
+               * échoue ensuite coûte UN rappel manqué — moins cher que cinq rappels reçus, et la
+               * notification suivante (le courriel de publication, l'écran) reste disponible.
+               */
+              const priseDeMarque = await prisma.volunteerAssignment.updateMany({
+                where: { id: assignment.id, reminderSentAt: null },
+                data: { reminderSentAt: new Date() },
+              })
+              if (priseDeMarque.count === 0) continue
+
               await NotificationService.create({
                 userId: assignment.user.id,
                 type: 'INFO',
