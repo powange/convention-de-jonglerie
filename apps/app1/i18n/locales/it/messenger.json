@@ -56,6 +56,20 @@
       "shows": "Spettacoli",
       "volunteer_applications": "Candidature volontari",
       "volunteering": "Il mio volontariato"
+    },
+    "deleted_message": "Messaggio eliminato",
+    "push": {
+      "action": "Vedi il messaggio",
+      "artist_application": "Nuovo messaggio - Candidatura spettacolo {conventionName}",
+      "fallback": "Nuovo messaggio - {editionName}",
+      "organizers_group": "Nuovo messaggio dagli organizzatori - {editionName}",
+      "private": "Messaggio di {pseudo}",
+      "show_group": "Nuovo messaggio - {title}",
+      "team_group": "Nuovo messaggio in {teamName} - {editionName}",
+      "team_leader_from_leader": "Nuovo messaggio da un responsabile {teamName} - {editionName}",
+      "team_leader_from_volunteer": "Nuovo messaggio da un volontario {teamName} - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Nuovo messaggio da un organizzatore {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Nuovo messaggio da un volontario {editionName}"
     }
   }
 }

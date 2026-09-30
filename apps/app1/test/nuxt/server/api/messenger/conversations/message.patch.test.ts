@@ -105,7 +105,8 @@ describe('API PATCH /messenger/conversations/[conversationId]/messages/[messageI
     expect(prismaMock.message.update).toHaveBeenCalledWith(
       expect.objectContaining({ data: { deletedAt: maintenant } })
     )
-    expect(result.data.content).toBe('Message supprimé')
+    // Chaîne vide, et non plus le libellé français : cf. `messenger-message-affiche.ts`.
+    expect(result.data.content).toBe('')
   })
 
   it('refuse un contenu fait seulement de blancs', async () => {

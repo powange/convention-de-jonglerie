@@ -186,7 +186,9 @@ describe('PATCH message — diffuse la modification', () => {
 
     const diffuse: any = envoyerModification.mock.calls[0]?.[1]
     expect(diffuse).toEqual(reponse.data)
-    expect(diffuse.content).toBe('Message supprimé')
+    // Chaîne vide côté serveur ; le libellé se traduit chez le client. L'invariant du lot 8
+    // reste entier : le GET et le flux passent par la MÊME fonction et rendent la même forme.
+    expect(diffuse.content).toBe('')
   })
 })
 

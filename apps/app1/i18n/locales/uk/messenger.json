@@ -56,6 +56,20 @@
       "shows": "Виступи",
       "volunteer_applications": "Заявки волонтерів",
       "volunteering": "Моє волонтерство"
+    },
+    "deleted_message": "Повідомлення видалено",
+    "push": {
+      "action": "Переглянути повідомлення",
+      "artist_application": "Нове повідомлення - Заявка на виступ {conventionName}",
+      "fallback": "Нове повідомлення - {editionName}",
+      "organizers_group": "Нове повідомлення від організаторів - {editionName}",
+      "private": "Повідомлення від {pseudo}",
+      "show_group": "Нове повідомлення - {title}",
+      "team_group": "Нове повідомлення в «{teamName}» - {editionName}",
+      "team_leader_from_leader": "Нове повідомлення від координатора «{teamName}» - {editionName}",
+      "team_leader_from_volunteer": "Нове повідомлення від волонтера «{teamName}» - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Нове повідомлення від організатора {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Нове повідомлення від волонтера {editionName}"
     }
   }
 }

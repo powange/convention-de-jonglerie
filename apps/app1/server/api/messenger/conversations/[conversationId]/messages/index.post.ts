@@ -10,6 +10,7 @@ import {
   messengerUnreadService,
 } from '#server/utils/messenger-unread-service'
 import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
+import { translateServerSide } from '#server/utils/server-i18n'
 import { unifiedPushService } from '#server/utils/unified-push-service'
 
 const bodySchema = z.object({
@@ -172,6 +173,14 @@ export default wrapApiHandler(
         user: {
           select: {
             pseudo: true,
+            /*
+             * La langue du destinataire, et non celle de l'expéditeur : le titre de la
+             * notification était écrit en français dans le code, si bien qu'un bénévole
+             * néerlandais recevait « Nouveau message d'un responsable Accueil ». Le corps de
+             * l'application est traduit depuis longtemps ; c'est la notification — la seule chose
+             * qu'il voit quand il n'a pas l'application ouverte — qui restait en français.
+             */
+            preferredLanguage: true,
             // Uniquement pour les conversations liées à une édition
             ...(editionId
               ? {
@@ -212,12 +221,29 @@ export default wrapApiHandler(
           // utilisateur et sans expiration : il supprimait les push sur les autres
           // appareils du destinataire (et indéfiniment en cas de connexion SSE perdue).
 
-          // Déterminer le titre de la notification en fonction du type de conversation et du rôle du destinataire
+          /*
+           * ⚠️ LE TITRE SE TRADUIT DANS LA LANGUE DU DESTINATAIRE, pas dans celle du code.
+           *
+           * Les huit variantes étaient des gabarits français écrits en dur. Le corps de
+           * l'application est traduit en treize langues ; la notification push — la seule chose
+           * qu'on voit quand l'application n'est pas ouverte — restait en français pour tout le
+           * monde. Le repli sur `'fr'` couvre un compte qui n'a pas choisi de langue.
+           *
+           * Les clés vivent dans les `messenger.json` de `apps/app1/i18n/locales`, et NON dans un
+           * layer :
+           * `translateServerSide` ne lit que `apps/app1/i18n/locales`, et l'image de production ne
+           * contient même pas les locales des layers. Une clé de layer rendrait la clé elle-même,
+           * sans erreur ni trace.
+           */
+          const langue = (p.user as { preferredLanguage?: string | null }).preferredLanguage || 'fr'
+          const traduire = (cle: string, params: Record<string, unknown> = {}) =>
+            translateServerSide(cle, params, langue)
+
           let notificationTitle: string
 
           // Pour les conversations privées 1-à-1 (sans édition)
           if (conversationType === 'PRIVATE') {
-            notificationTitle = `Message de ${user.pseudo}`
+            notificationTitle = traduire('messenger.push.private', { pseudo: user.pseudo })
           } else {
             // Pour les conversations liées à une édition
             const userWithOrgs = p.user as {
@@ -230,38 +256,41 @@ export default wrapApiHandler(
 
             if (conversationType === 'TEAM_GROUP') {
               // Pour un groupe d'équipe, même titre pour tout le monde
-              notificationTitle = `Nouveau message dans ${teamName} - ${editionName}`
+              notificationTitle = traduire('messenger.push.team_group', { teamName, editionName })
             } else if (conversationType === 'TEAM_LEADER_PRIVATE') {
-              // Pour une conversation privée avec un responsable d'équipe
-              if (isTeamLeader) {
-                // Le destinataire est un responsable
-                notificationTitle = `Nouveau message d'un bénévole ${teamName} - ${editionName}`
-              } else {
-                // Le destinataire est un bénévole
-                notificationTitle = `Nouveau message d'un responsable ${teamName} - ${editionName}`
-              }
+              /*
+               * Le rôle du DESTINATAIRE décide du titre : un responsable lit « message d'un
+               * bénévole », un bénévole lit « message d'un responsable ». L'annoncer de travers
+               * désigne la mauvaise personne.
+               */
+              notificationTitle = traduire(
+                isTeamLeader
+                  ? 'messenger.push.team_leader_from_volunteer'
+                  : 'messenger.push.team_leader_from_leader',
+                { teamName, editionName }
+              )
             } else if (conversationType === 'VOLUNTEER_TO_ORGANIZERS') {
-              // Pour une conversation bénévole <-> organisateurs
-              if (isOrganizer) {
-                // Le destinataire est un organisateur
-                notificationTitle = `Nouveau message d'un bénévole ${editionName}`
-              } else {
-                // Le destinataire est un bénévole
-                notificationTitle = `Nouveau message d'un organisateur ${editionName}`
-              }
+              notificationTitle = traduire(
+                isOrganizer
+                  ? 'messenger.push.volunteer_to_organizers_from_volunteer'
+                  : 'messenger.push.volunteer_to_organizers_from_organizer',
+                { editionName }
+              )
             } else if (conversationType === 'ORGANIZERS_GROUP') {
-              // Pour un groupe d'organisateurs
-              notificationTitle = `Nouveau message des organisateurs - ${editionName}`
+              notificationTitle = traduire('messenger.push.organizers_group', { editionName })
             } else if (conversationType === 'ARTIST_APPLICATION') {
-              // Pour une conversation liée à une candidature artiste
-              notificationTitle = `Nouveau message - Candidature spectacle ${conventionName ?? ''}`
+              notificationTitle = traduire('messenger.push.artist_application', {
+                conventionName: conventionName ?? '',
+              })
             } else if (conversationType === 'SHOW_GROUP') {
               // Pour le groupe d'un spectacle, son titre situe la conversation mieux que
               // le nom de l'édition, un artiste pouvant jouer dans plusieurs spectacles
-              notificationTitle = `Nouveau message - ${showTitle ?? editionName}`
+              notificationTitle = traduire('messenger.push.show_group', {
+                title: showTitle ?? editionName,
+              })
             } else {
               // Fallback
-              notificationTitle = `Nouveau message - ${editionName}`
+              notificationTitle = traduire('messenger.push.fallback', { editionName })
             }
           }
 
@@ -296,7 +325,7 @@ export default wrapApiHandler(
             title: notificationTitle,
             message: `${user.pseudo}: ${truncatedContent}`,
             url: notificationUrl,
-            actionText: 'Voir le message',
+            actionText: traduire('messenger.push.action'),
             icon: senderAvatarUrl, // Avatar de l'expéditeur comme icon principal
             badge: '/favicons/notification-badge.png',
           })

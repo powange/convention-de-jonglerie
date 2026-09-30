@@ -56,6 +56,20 @@
       "shows": "Shows",
       "volunteer_applications": "Vrijwilligersaanmeldingen",
       "volunteering": "Mijn vrijwilligerswerk"
+    },
+    "deleted_message": "Bericht verwijderd",
+    "push": {
+      "action": "Bericht bekijken",
+      "artist_application": "Nieuw bericht - Aanmelding voorstelling {conventionName}",
+      "fallback": "Nieuw bericht - {editionName}",
+      "organizers_group": "Nieuw bericht van de organisatie - {editionName}",
+      "private": "Bericht van {pseudo}",
+      "show_group": "Nieuw bericht - {title}",
+      "team_group": "Nieuw bericht in {teamName} - {editionName}",
+      "team_leader_from_leader": "Nieuw bericht van een teamleider {teamName} - {editionName}",
+      "team_leader_from_volunteer": "Nieuw bericht van een vrijwilliger {teamName} - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Nieuw bericht van de organisatie {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Nieuw bericht van een vrijwilliger {editionName}"
     }
   }
 }

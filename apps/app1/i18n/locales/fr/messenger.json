@@ -15,6 +15,7 @@
     "copy_failed": "Impossible de copier le message",
     "copy_unavailable": "Votre navigateur n'autorise pas la copie ici",
     "delete": "Supprimer",
+    "deleted_message": "Message supprimé",
     "destination": {
       "artist_application": "Voir la candidature",
       "artist_space": "Mon espace artiste",
@@ -40,6 +41,19 @@
     "participants": "Participants",
     "private_conversation": "Conversation privée",
     "private_conversations": "Conversations privées",
+    "push": {
+      "action": "Voir le message",
+      "artist_application": "Nouveau message - Candidature spectacle {conventionName}",
+      "fallback": "Nouveau message - {editionName}",
+      "organizers_group": "Nouveau message des organisateurs - {editionName}",
+      "private": "Message de {pseudo}",
+      "show_group": "Nouveau message - {title}",
+      "team_group": "Nouveau message dans {teamName} - {editionName}",
+      "team_leader_from_leader": "Nouveau message d'un responsable {teamName} - {editionName}",
+      "team_leader_from_volunteer": "Nouveau message d'un bénévole {teamName} - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Nouveau message d'un organisateur {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Nouveau message d'un bénévole {editionName}"
+    },
     "reply": "Répondre",
     "reply_to": "Répondre à {pseudo}",
     "resume_today": "Aujourd'hui, {time}",

@@ -56,6 +56,20 @@
       "shows": "Föreställningar",
       "volunteer_applications": "Volontäransökningar",
       "volunteering": "Mitt volontärarbete"
+    },
+    "deleted_message": "Meddelandet är borttaget",
+    "push": {
+      "action": "Visa meddelandet",
+      "artist_application": "Nytt meddelande - Ansökan till föreställning {conventionName}",
+      "fallback": "Nytt meddelande - {editionName}",
+      "organizers_group": "Nytt meddelande från arrangörerna - {editionName}",
+      "private": "Meddelande från {pseudo}",
+      "show_group": "Nytt meddelande - {title}",
+      "team_group": "Nytt meddelande i {teamName} - {editionName}",
+      "team_leader_from_leader": "Nytt meddelande från en teamledare i {teamName} - {editionName}",
+      "team_leader_from_volunteer": "Nytt meddelande från en volontär i {teamName} - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Nytt meddelande från en arrangör {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Nytt meddelande från en volontär {editionName}"
     }
   }
 }
