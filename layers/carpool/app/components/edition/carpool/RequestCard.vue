@@ -64,16 +64,15 @@
         <!-- Description -->
         <p v-if="request.description" class="text-sm text-gray-600">{{ request.description }}</p>
 
-        <!-- Section commentaires -->
-        <div class="pt-4">
-          <div class="flex items-center justify-between">
-            <!-- Modal des commentaires -->
-            <EditionCarpoolCommentsModal
-              :id="request.id"
-              type="request"
-              :count="request.commentsCount ?? request.comments?.length ?? 0"
-              @comment-added="emit('comment-added')"
-            />
+        <!-- Nombre de commentaires, comme sur la carte d'une offre.
+             ⚠️ C'était une MODALE, et elle ne s'ouvrait jamais : la carte entière est un
+             `NuxtLink`, et le bouton déclencheur n'arrêtait pas la propagation du clic. On
+             naviguait donc vers la page de détail à chaque tentative. La lecture et l'écriture des
+             commentaires vivent là-bas, par `CommentsInline` — l'endroit où l'on arrivait déjà. -->
+        <div v-if="nombreDeCommentaires > 0" class="pt-2">
+          <div class="flex items-center gap-1 text-sm text-gray-500">
+            <UIcon name="i-heroicons-chat-bubble-left" class="w-4 h-4" />
+            {{ $t('components.carpool.view_comments', { count: nombreDeCommentaires }) }}
           </div>
         </div>
       </div>
@@ -92,14 +91,29 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+/*
+ * Plus de `comment-added` : la carte n'écrit plus de commentaire, elle en affiche le nombre. Laisser
+ * l'émission déclarée entretiendrait un contrat que rien n'honore — et son écouteur dans
+ * `Section.vue`, un rafraîchissement qui ne se déclenche jamais.
+ */
 const emit = defineEmits<{
-  'comment-added': []
   edit: []
   deleted: []
 }>()
 
 const authStore = useAuthStore()
 const { t, locale } = useI18n()
+
+/**
+ * La liste d'une édition ne rend que `commentsCount` ; le détail rend les commentaires.
+ *
+ * Le repli sur la longueur garde la carte juste dans les deux cas — et ne se contredit pas, parce
+ * que le serveur OMET `comments` plutôt que de le rendre vide quand il ne les a pas chargés. Même
+ * calcul que sur la carte d'une offre, que ce lot rejoint.
+ */
+const nombreDeCommentaires = computed(
+  () => props.request.commentsCount ?? props.request.comments?.length ?? 0
+)
 
 // Vérifier si l'utilisateur peut éditer cette demande
 const canEdit = computed(() => {
