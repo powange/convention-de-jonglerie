@@ -480,7 +480,9 @@ export async function clearAllCache() {
 
 4. ✅ Implémenter cache pour sitemaps
 5. ✅ Ajouter invalidation sur mutations d'éditions
-6. ✅ Créer composable `useCountries.ts`
+6. ⚠️ Composable `useCountries.ts` — créé, JAMAIS branché, **supprimé le 30/09/2026**. Aucun
+   écran ne l'appelait : le code ci-dessus reste une proposition à réimplémenter le jour où l'on
+   en aura l'emploi, et non un état des lieux.
 
 ### Phase 3 - Monitoring (1h)
 
