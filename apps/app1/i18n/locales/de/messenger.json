@@ -56,6 +56,20 @@
       "shows": "Shows",
       "volunteer_applications": "Helferbewerbungen",
       "volunteering": "Mein Ehrenamt"
+    },
+    "deleted_message": "Nachricht gelöscht",
+    "push": {
+      "action": "Nachricht ansehen",
+      "artist_application": "Neue Nachricht - Show-Bewerbung {conventionName}",
+      "fallback": "Neue Nachricht - {editionName}",
+      "organizers_group": "Neue Nachricht vom Orga-Team - {editionName}",
+      "private": "Nachricht von {pseudo}",
+      "show_group": "Neue Nachricht - {title}",
+      "team_group": "Neue Nachricht in {teamName} - {editionName}",
+      "team_leader_from_leader": "Neue Nachricht von einer Teamleitung {teamName} - {editionName}",
+      "team_leader_from_volunteer": "Neue Nachricht von einem Helfer {teamName} - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Neue Nachricht vom Orga-Team {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Neue Nachricht von einem Helfer {editionName}"
     }
   }
 }

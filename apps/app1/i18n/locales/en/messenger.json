@@ -56,6 +56,20 @@
       "shows": "Shows",
       "volunteer_applications": "Volunteer applications",
       "volunteering": "My volunteering"
+    },
+    "deleted_message": "Message deleted",
+    "push": {
+      "action": "View message",
+      "artist_application": "New message - Show application {conventionName}",
+      "fallback": "New message - {editionName}",
+      "organizers_group": "New message from the organisers - {editionName}",
+      "private": "Message from {pseudo}",
+      "show_group": "New message - {title}",
+      "team_group": "New message in {teamName} - {editionName}",
+      "team_leader_from_leader": "New message from a {teamName} team leader - {editionName}",
+      "team_leader_from_volunteer": "New message from a {teamName} volunteer - {editionName}",
+      "volunteer_to_organizers_from_organizer": "New message from an organiser {editionName}",
+      "volunteer_to_organizers_from_volunteer": "New message from a volunteer {editionName}"
     }
   }
 }

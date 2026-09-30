@@ -51,9 +51,13 @@ describe('appliquerMisesAJour', () => {
     const charges = [message('a', 1), message('b', 2)]
     const resultat = appliquerMisesAJour(charges, [
       message('a', 1, { content: 'a modifié', editedAt: modifieA(1) }),
-      message('b', 2, { content: 'Message supprimé', deletedAt: modifieA(2) }),
+      // Une suppression vide le contenu côté serveur : c'est la forme réelle que reçoit le flux.
+      message('b', 2, { content: '', deletedAt: modifieA(2) }),
     ])
-    expect(resultat.map((m) => m.content)).toEqual(['a modifié', 'Message supprimé'])
+    expect(resultat.map((m) => m.content)).toEqual(['a modifié', ''])
+    // Le `deletedAt` fait la preuve que la seconde mise à jour a bien été appliquée : une chaîne
+    // vide seule pourrait venir d'un contenu initial vide.
+    expect(resultat[1]!.deletedAt).toEqual(modifieA(2))
   })
 
   it('ne revient pas à une version plus ancienne', () => {

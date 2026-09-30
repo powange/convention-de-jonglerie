@@ -56,6 +56,20 @@
       "shows": "Forestillinger",
       "volunteer_applications": "Frivilligansøgninger",
       "volunteering": "Mit frivillige arbejde"
+    },
+    "deleted_message": "Beskeden er slettet",
+    "push": {
+      "action": "Se beskeden",
+      "artist_application": "Ny besked - Ansøgning til show {conventionName}",
+      "fallback": "Ny besked - {editionName}",
+      "organizers_group": "Ny besked fra arrangørerne - {editionName}",
+      "private": "Besked fra {pseudo}",
+      "show_group": "Ny besked - {title}",
+      "team_group": "Ny besked i {teamName} - {editionName}",
+      "team_leader_from_leader": "Ny besked fra en teamleder i {teamName} - {editionName}",
+      "team_leader_from_volunteer": "Ny besked fra en frivillig i {teamName} - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Ny besked fra en arrangør {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Ny besked fra en frivillig {editionName}"
     }
   }
 }

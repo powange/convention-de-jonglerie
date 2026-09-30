@@ -56,6 +56,20 @@
       "shows": "Vystoupení",
       "volunteer_applications": "Přihlášky dobrovolníků",
       "volunteering": "Moje dobrovolnictví"
+    },
+    "deleted_message": "Zpráva smazána",
+    "push": {
+      "action": "Zobrazit zprávu",
+      "artist_application": "Nová zpráva - Přihláška do vystoupení {conventionName}",
+      "fallback": "Nová zpráva - {editionName}",
+      "organizers_group": "Nová zpráva od organizátorů - {editionName}",
+      "private": "Zpráva od {pseudo}",
+      "show_group": "Nová zpráva - {title}",
+      "team_group": "Nová zpráva v {teamName} - {editionName}",
+      "team_leader_from_leader": "Nová zpráva od vedoucího týmu {teamName} - {editionName}",
+      "team_leader_from_volunteer": "Nová zpráva od dobrovolníka {teamName} - {editionName}",
+      "volunteer_to_organizers_from_organizer": "Nová zpráva od organizátora {editionName}",
+      "volunteer_to_organizers_from_volunteer": "Nová zpráva od dobrovolníka {editionName}"
     }
   }
 }

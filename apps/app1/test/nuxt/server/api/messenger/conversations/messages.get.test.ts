@@ -143,7 +143,14 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
-    expect(result.data[0].content).toBe('Message supprimé')
+    /*
+     * Le serveur rend une chaîne VIDE, et non plus « Message supprimé » : il écrivait ce libellé
+     * en français pour tout le monde. Le client affiche `$t('messenger.deleted_message')` quand
+     * `deletedAt` est posé. L'invariant qui compte est inchangé — le TEXTE du message supprimé ne
+     * sort jamais du serveur — et une chaîne vide le garantit mieux qu'un libellé, qu'un vrai
+     * message pouvait imiter.
+     */
+    expect(result.data[0].content).toBe('')
   })
 
   it("devrait masquer le contenu du message replyTo s'il est supprimé", async () => {
@@ -164,7 +171,7 @@ describe('API GET /messenger/conversations/[conversationId]/messages', () => {
     const mockEvent = {} as unknown as H3Event
     const result = await messagesGetHandler(mockEvent)
 
-    expect(result.data[0].replyTo.content).toBe('Message supprimé')
+    expect(result.data[0].replyTo.content).toBe('')
   })
 
   it("devrait rejeter si l'utilisateur n'est pas participant", async () => {

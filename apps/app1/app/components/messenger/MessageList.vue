@@ -24,7 +24,12 @@
       <UChatMessage
         :id="message.id"
         role="user"
-        :parts="[{ type: 'text', text: message.source.content }]"
+        :parts="[
+          {
+            type: 'text',
+            text: message.supprime ? $t('messenger.deleted_message') : message.source.content,
+          },
+        ]"
         :side="message.estLeMien ? 'right' : 'left'"
         variant="subtle"
         :color="message.estLeMien ? 'secondary' : 'neutral'"
@@ -67,20 +72,33 @@
                 <p class="text-xs font-medium text-primary mb-1">
                   {{ message.source.replyTo.participant.user.pseudo }}
                 </p>
+                <!-- Même règle pour la citation : le serveur la vide, le libellé se traduit ici. -->
                 <p
                   class="text-xs opacity-70 truncate"
                   :class="{ italic: message.source.replyTo.deletedAt }"
                 >
-                  {{ message.source.replyTo.content }}
+                  {{
+                    message.source.replyTo.deletedAt
+                      ? $t('messenger.deleted_message')
+                      : message.source.replyTo.content
+                  }}
                 </p>
               </div>
 
-              <!-- Contenu du message (déjà « Message supprimé » si supprimé, côté serveur) -->
+              <!--
+                Contenu du message. Le serveur renvoie une chaîne VIDE pour un message supprimé —
+                il écrivait auparavant « Message supprimé » en français, pour tout le monde. Le
+                libellé se traduit donc ici, où l'état `supprime` était déjà connu.
+
+                Pas de `MessengerMessageText` sur ce libellé : il n'a ni lien ni contenu de
+                l'utilisateur à découper.
+              -->
               <p
                 class="text-sm break-words whitespace-pre-wrap"
                 :class="{ 'italic opacity-50': message.supprime }"
               >
-                <MessengerMessageText :texte="message.source.content" />
+                <template v-if="message.supprime">{{ $t('messenger.deleted_message') }}</template>
+                <MessengerMessageText v-else :texte="message.source.content" />
               </p>
             </div>
           </MessengerMessageBubble>
