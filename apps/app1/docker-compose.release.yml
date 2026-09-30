@@ -52,8 +52,16 @@ services:
       - ../../stack.env
     # Variables d'environnement spécifiques à Docker (peuvent override le .env)
     environment:
-      # Database URL avec le hostname Docker
-      DATABASE_URL: 'mysql://${MYSQL_USER:-convention_user}:${MYSQL_PASSWORD:-convention_password}@database:3306/${MYSQL_DATABASE:-convention_db}'
+      # ⚠️ PLUS DE DATABASE_URL INTERPOLÉE ICI. Le mot de passe y était inséré TEL QUEL : un mot
+      # de passe contenant « @ », « / », « : » ou « # » produisait une URL que `new URL()` découpe
+      # de travers — avec « p@ss », le « @ » supplémentaire fait croire à un second séparateur
+      # d'autorité, et l'hôte lu n'est plus le bon. L'application échouait au démarrage sans qu'aucun
+      # message ne désigne la ponctuation du mot de passe.
+      #
+      # `docker/entrypoint.sh` construit désormais l'URL avec `encodeURIComponent`, depuis
+      # MYSQL_USER / MYSQL_PASSWORD / MYSQL_DATABASE que `env_file` fournit déjà au conteneur. Seul
+      # l'hôte est passé ici, puisqu'il dépend de la pile.
+      DATABASE_HOST: 'database'
       # Configuration Nuxt pour Docker
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'
