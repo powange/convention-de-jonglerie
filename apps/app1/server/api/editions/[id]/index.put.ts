@@ -7,6 +7,7 @@ import { normalizeDateToISO } from '#server/utils/date-helpers'
 import { syncEventMetadataFromEdition } from '#server/utils/event-sync'
 import { handleFileUpload } from '#server/utils/file-helpers'
 import { geocodeEdition } from '#server/utils/geocoding'
+import { getConventionForEditionCreation } from '#server/utils/permissions/convention-permissions'
 import { getEditionForEdit } from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { updateEditionSchema } from '#server/utils/validation-schemas'
@@ -88,37 +89,23 @@ export default wrapApiHandler(
     // Récupère l'édition et vérifie les permissions d'édition
     const edition = await getEditionForEdit(editionId, user)
 
-    // Si une convention est spécifiée, vérifier qu'elle existe et que l'utilisateur a les droits
+    /*
+     * Déplacer une édition vers une autre convention, c'est y CRÉER une édition : on pose la même
+     * règle que la création.
+     *
+     * ⚠️ CE QUI ÉTAIT DEMANDÉ AVANT, et c'était le mauvais droit : `canManageOrganizers` sur la
+     * convention cible. Conséquence à double sens — un organisateur qui peut créer des éditions
+     * (`canAddEdition`) ne pouvait pas y en déplacer une, tandis qu'un gestionnaire
+     * d'organisateurs SANS droit d'ajout le pouvait. Et rien n'interdisait de déplacer une édition
+     * vers une convention ARCHIVÉE, que la création refuse par un 409.
+     *
+     * 📍 CE QUE CE CHANGEMENT NE CORRIGE PAS, contrairement à ce que le constat laissait entendre :
+     * l'admin global reste reconnu SANS mode admin. `canCreateEdition` lit `user.isGlobalAdmin`
+     * brut, exactement comme le bloc remplacé — la création a donc le même écart, et le corriger
+     * ici seulement ferait diverger les deux chemins qu'on vient d'aligner. C'est un point à part.
+     */
     if (conventionId && conventionId !== edition.conventionId) {
-      const convention = await prisma.convention.findUnique({
-        where: { id: conventionId },
-        include: {
-          organizers: {
-            where: {
-              userId: user.id,
-              canManageOrganizers: true,
-            },
-          },
-        },
-      })
-
-      if (!convention) {
-        throw createError({
-          status: 404,
-          message: 'Convention introuvable',
-        })
-      }
-
-      // Seuls l'auteur, les administrateurs, ou les admins globaux peuvent changer la convention d'une édition
-      const canChangeConvention =
-        convention.authorId === user.id || convention.organizers.length > 0 || user.isGlobalAdmin
-
-      if (!canChangeConvention) {
-        throw createError({
-          status: 403,
-          message: "Vous ne pouvez assigner des éditions qu'aux conventions que vous gérez",
-        })
-      }
+      await getConventionForEditionCreation(conventionId, user)
     }
 
     // Gérer l'image avec le helper centralisé
@@ -127,16 +114,34 @@ export default wrapApiHandler(
       resourceType: 'editions',
     })
 
+    /*
+     * ⚠️ DEUX SÉMANTIQUES DIFFÉRENTES ICI, ET C'EST LE SCHÉMA QUI TRANCHE.
+     *
+     * `description`, `region` et `addressLine2` sont `nullable().optional()` dans
+     * `updateEditionSchema` : le formulaire envoie `null` quand on vide le champ, et cette absence
+     * est une VALEUR. Ils suivent donc le motif de `name` — `!== undefined ? … : inchangé` — et
+     * non `|| edition.X`, qui retombait sur l'ancienne valeur : une description effacée
+     * réapparaissait au rechargement, sans erreur.
+     *
+     * `addressLine1`, `postalCode`, `city` et `country` sont `min(1).optional()` : ils ne peuvent
+     * PAS être vides. `|| edition.X` y est équivalent et reste tel quel — les réécrire n'aurait
+     * rien changé, et le faire « par symétrie » aurait laissé croire qu'ils sont vidables.
+     *
+     * 📍 `addressLine2` était simplement ABSENT de cet objet : destructuré, utilisé pour le
+     * géocodage, et jamais écrit. La création l'enregistrait bien (`index.post.ts`), si bien que
+     * le complément d'adresse se posait à la création et ne se corrigeait jamais.
+     */
     const updatedData: Prisma.EditionUpdateInput = {
       name: name !== undefined ? name?.trim() || null : edition.name,
-      description: description || edition.description,
+      description: description !== undefined ? description : edition.description,
       imageUrl: finalImageFilename !== undefined ? finalImageFilename : edition.imageUrl,
       startDate: startDate ? normalizeDateToISO(startDate) || startDate : edition.startDate,
       endDate: endDate ? normalizeDateToISO(endDate) || endDate : edition.endDate,
       addressLine1: addressLine1 || edition.addressLine1,
+      addressLine2: addressLine2 !== undefined ? addressLine2 : edition.addressLine2,
       postalCode: postalCode || edition.postalCode,
       city: city || edition.city,
-      region: region || edition.region,
+      region: region !== undefined ? region : edition.region,
       country: country || edition.country,
     }
 
