@@ -36,21 +36,47 @@ export default wrapApiHandler(
       // téléphone une fois l'application installée, alors que plusieurs pages — planning des
       // bénévoles, tableaux de gestion, carte du site — gagnent à être vues en paysage.
       orientation: 'any',
+      /*
+       * ⚠️ `purpose` EST DÉSORMAIS EXPLICITE, et la distinction n'est pas cosmétique.
+       *
+       * Android ne dessine pas l'icône telle quelle : il la MASQUE selon la forme choisie par le
+       * constructeur — cercle, carré arrondi, goutte. Seul le disque central de 80 % du côté est
+       * garanti visible ; tout ce qui déborde est rogné.
+       *
+       * Les icônes `any` ci-dessous occupent leur carré bord à bord. Leur coller `maskable`
+       * amputerait le J et le C de leurs coins, sans que rien ne le signale ailleurs que sur le
+       * téléphone. D'où une icône SÉPARÉE, où le même logo est réduit pour tenir dans le disque de
+       * sécurité, sur le fond que l'icône utilisait déjà.
+       *
+       * Sans aucune icône `maskable`, Android se rabat sur l'icône `any` en la posant sur une
+       * pastille blanche, d'où l'effet « logo rétréci dans un rond blanc » qu'on voit sur beaucoup
+       * d'applications web. C'est aussi ce que Bubblewrap signale au moment de fabriquer le paquet
+       * Android du Play Store.
+       */
       icons: [
         {
           src: `/favicons/android-chrome-192x192.png?v=${iconVersion}`,
           sizes: '192x192',
           type: 'image/png',
+          purpose: 'any',
         },
         {
           src: `/favicons/android-chrome-512x512.png?v=${iconVersion}`,
           sizes: '512x512',
           type: 'image/png',
+          purpose: 'any',
+        },
+        {
+          src: `/favicons/android-chrome-maskable-512x512.png?v=${iconVersion}`,
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
         },
         {
           src: `/favicons/apple-touch-icon.png?v=${iconVersion}`,
           sizes: '180x180',
           type: 'image/png',
+          purpose: 'any',
         },
       ],
       categories: ['entertainment', 'lifestyle', 'sports'],

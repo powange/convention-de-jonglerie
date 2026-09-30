@@ -1,0 +1,160 @@
+name: Fabriquer le paquet Android
+
+# Fabrication du paquet Android (TWA) à déposer sur le Play Store.
+#
+# ⚠️ CE WORKFLOW NE PUBLIE RIEN. Il produit un `.aab` en artefact, à déposer à la main dans la
+# console Play. Publier automatiquement demanderait un compte de service Google avec droit d'écrire
+# sur la fiche de l'application — un secret qui, s'il fuite, laisse pousser n'importe quoi aux
+# utilisateurs. Tant qu'il n'y a qu'une poignée de versions par an, le dépôt manuel coûte moins que
+# ce risque-là.
+#
+# ⚠️ UNE MISE À JOUR DU SITE NE DEMANDE PAS DE REFABRIQUER LE PAQUET. Un TWA ne contient pas
+# l'application : il ouvre le site en production dans le moteur de Chrome du téléphone. Le site
+# déployé est donc, à l'instant même, ce que voient les utilisateurs de l'application. On ne
+# refabrique que pour changer ce que porte la COQUILLE : nom, couleurs, icônes, version, raccourcis.
+#
+# Déclenché à la main uniquement — un déclenchement sur `push` produirait des paquets que personne
+# ne dépose, et surtout consommerait des numéros de version pour rien.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_affichee:
+        description: "Version affichée aux utilisateurs (ex. 1.0.0)"
+        required: true
+        default: '1.0.0'
+      signer:
+        description: "Signer le paquet (non = paquet non signé, pour une simple vérification)"
+        type: boolean
+        required: false
+        default: true
+
+concurrency:
+  group: publier-android
+  cancel-in-progress: false
+
+jobs:
+  paquet-android:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Java 17 : c'est ce qu'attendent les outils de construction Android employés par Bubblewrap.
+      # Le runner en embarque plusieurs ; on fixe celle-ci plutôt que de dépendre de la valeur par
+      # défaut de l'image, qui change d'une version à l'autre sans prévenir.
+      - name: Préparer Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Préparer le SDK Android
+        uses: android-actions/setup-android@v3
+
+      - name: Préparer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Installer Bubblewrap
+        run: npm install --no-save @bubblewrap/cli@1.25.0
+
+      # ⚠️ SANS CE FICHIER, Bubblewrap propose de TÉLÉCHARGER un JDK et le SDK Android, et attend
+      # une réponse — donc reste bloqué jusqu'au délai du job. On lui désigne ce que le runner a
+      # déjà installé.
+      - name: Désigner le JDK et le SDK à Bubblewrap
+        run: |
+          mkdir -p ~/.bubblewrap
+          cat > ~/.bubblewrap/config.json <<EOF
+          {
+            "jdkPath": "$JAVA_HOME",
+            "androidSdkPath": "$ANDROID_SDK_ROOT"
+          }
+          EOF
+          echo "JDK : $JAVA_HOME"
+          echo "SDK : $ANDROID_SDK_ROOT"
+
+      # Le numéro de version monte à chaque run, et c'est le seul moyen sûr : la console Play
+      # REFUSE un paquet dont le numéro n'est pas strictement supérieur au précédent, et un numéro
+      # choisi à la main finit toujours par être réutilisé. `github.run_number` est monotone.
+      #
+      # ⚠️ Il l'est pour CE fichier de workflow : le renommer remettrait le compteur à zéro, et les
+      # dépôts suivants seraient refusés. Ne pas renommer ce fichier.
+      - name: Fixer la version
+        run: |
+          node -e '
+            const fs = require("node:fs")
+            const chemin = "android/twa-manifest.json"
+            const manifeste = JSON.parse(fs.readFileSync(chemin, "utf8"))
+            manifeste.appVersionName = process.env.VERSION_AFFICHEE
+            manifeste.appVersionCode = Number(process.env.NUMERO_DE_RUN)
+            fs.writeFileSync(chemin, JSON.stringify(manifeste, null, 2) + "\n")
+            console.log("version", manifeste.appVersionName, "code", manifeste.appVersionCode)
+          '
+        env:
+          VERSION_AFFICHEE: ${{ inputs.version_affichee }}
+          NUMERO_DE_RUN: ${{ github.run_number }}
+
+      # La clé d'ENVOI, pas la clé de signature finale : avec « Play App Signing », c'est Google qui
+      # détient celle qui signe l'application livrée. Perdre celle-ci n'est donc pas fatal — Google
+      # la remplace —, ce qui est précisément pourquoi ce mode a été retenu.
+      - name: Restaurer la clé d'envoi
+        if: ${{ inputs.signer }}
+        run: |
+          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "::error::Le secret ANDROID_KEYSTORE_BASE64 est absent. Voir docs/publication-play-store-twa.md."
+            exit 1
+          fi
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/cle-envoi.keystore
+          echo "Clé restaurée ($(stat -c%s android/cle-envoi.keystore) octets)"
+
+      # `update` régénère le projet Android à partir du seul `twa-manifest.json`. C'est ce qui
+      # permet de ne versionner que la recette : rien de ce que Bubblewrap écrit ici n'est conservé,
+      # donc rien ne peut diverger en silence de la PWA.
+      - name: Régénérer le projet Android
+        run: npx bubblewrap update --manifest=android/twa-manifest.json --skipVersionUpgrade
+
+      # `--skipPwaValidation` : la validation de Bubblewrap va chercher le site en production et
+      # juge des critères (hors ligne, temps de chargement) qui ne disent rien de la validité du
+      # PAQUET. Une panne de réseau du runner ferait alors échouer une fabrication parfaitement
+      # correcte. Ce que la qualité de la PWA décide vraiment, c'est l'examen du Play Store, et il
+      # a lieu ailleurs.
+      - name: Construire le paquet
+        run: |
+          if [ "${{ inputs.signer }}" = "true" ]; then
+            npx bubblewrap build --manifest=android/twa-manifest.json --skipPwaValidation
+          else
+            npx bubblewrap build --manifest=android/twa-manifest.json --skipPwaValidation --skipSigning
+          fi
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      # ⚠️ EFFACÉE AVANT TOUTE PUBLICATION D'ARTEFACT : un keystore déposé en artefact est
+      # téléchargeable par quiconque a accès au dépôt, mot de passe mis à part.
+      - name: Effacer la clé
+        if: always()
+        run: rm -f android/cle-envoi.keystore
+
+      - name: Déposer le paquet en artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: paquet-android-${{ inputs.version_affichee }}-${{ github.run_number }}
+          path: |
+            android/*.aab
+            android/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Rappeler la suite
+        run: |
+          echo "Paquet fabriqué : version ${{ inputs.version_affichee }}, code ${{ github.run_number }}."
+          echo ""
+          echo "Rien n'est publié. Télécharger l'artefact, puis le déposer dans la console Play."
+          echo "Au PREMIER envoi seulement : relever l'empreinte SHA-256 dans"
+          echo "« Intégrité de l'application › Signature d'application », et la placer dans la"
+          echo "variable ANDROID_SIGNING_FINGERPRINTS des piles release et production."
+          echo "Sans elle, l'application s'ouvre avec la barre d'adresse de Chrome."

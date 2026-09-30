@@ -73,6 +73,16 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
       DATABASE_HOST: 'database-prod'
+      # ⚠️ L'EMPREINTE DE SIGNATURE ANDROID, listée ici pour la MÊME raison que les identifiants
+      # ci-dessus : une variable de pile Portainer interpole ce fichier, elle ne peuple pas
+      # l'environnement du conteneur. Sans cette ligne, `/.well-known/assetlinks.json` rendrait un
+      # tableau vide — et l'application du Play Store s'ouvrirait avec la barre d'adresse de
+      # Chrome, sans qu'aucune erreur ne soit consignée nulle part.
+      #
+      # Vide tant que l'application n'a pas été déposée une première fois : l'empreinte à mettre
+      # ici est celle de GOOGLE (Play App Signing), relevée dans la console Play après le premier
+      # envoi. Cf. docs/publication-play-store-twa.md.
+      ANDROID_SIGNING_FINGERPRINTS: '${ANDROID_SIGNING_FINGERPRINTS:-}'
       # Configuration Nuxt pour Docker
       NUXT_HOST: '0.0.0.0'
       NUXT_PORT: '3000'

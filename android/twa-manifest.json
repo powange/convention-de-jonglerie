@@ -1,0 +1,38 @@
+{
+  "packageId": "com.jugglingconvention.app",
+  "host": "juggling-convention.com",
+  "name": "Juggling Convention",
+  "launcherName": "JuggConv",
+  "display": "standalone",
+  "themeColor": "#0f172a",
+  "themeColorDark": "#0f172a",
+  "navigationColor": "#0f172a",
+  "navigationColorDark": "#0f172a",
+  "navigationDividerColor": "#0f172a",
+  "navigationDividerColorDark": "#0f172a",
+  "backgroundColor": "#0f172a",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://juggling-convention.com/favicons/android-chrome-512x512.png",
+  "maskableIconUrl": "https://juggling-convention.com/favicons/android-chrome-maskable-512x512.png",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://juggling-convention.com/api/site.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://juggling-convention.com/",
+  "minSdkVersion": 21,
+  "orientation": "any",
+  "signingKey": {
+    "path": "./android/cle-envoi.keystore",
+    "alias": "envoi"
+  }
+}

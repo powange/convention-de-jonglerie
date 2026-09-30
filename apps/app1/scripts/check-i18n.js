@@ -94,6 +94,10 @@ const EXCLUDED_DIRS = [
 const IGNORED_MISSING_KEYS = [
   // Expression JavaScript citée dans un commentaire de crons.vue, pas une clé
   'tasksData.value.cronEnabled',
+  // Identifiant du paquet Android (liens-application-android.ts). Il a la forme d'une clé — trois
+  // segments pointés — sans en être une, et il est DÉFINITIF : on ne peut pas le renommer après la
+  // première publication sur le Play Store, donc l'exception ne vieillira pas.
+  'com.jugglingconvention.app',
   // Noms de domaine détectés comme clés i18n (dans useUrlValidation.ts et emailService.ts)
   'facebook.com',
   // Domaines Google comparés dans adresse-email.ts, pour reconnaître une même boîte de réception
