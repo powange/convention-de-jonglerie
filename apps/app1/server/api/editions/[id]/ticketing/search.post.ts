@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { requireAuth } from '#server/utils/auth-utils'
 import { canAccessEditionDataOrAccessControl } from '#server/utils/permissions/edition-permissions'
 import { conditionsMotsCles, motsClesDeLaRequete } from '#server/utils/recherche-mots-cles'
+import { benevolePresentAEvenement } from '#server/utils/ticketing/benevoles-presents'
 import { lignesQuiDonnentAcces } from '#server/utils/ticketing/billets-qui-comptent'
 import {
   aggregateHandoutItems,
@@ -204,17 +205,7 @@ export default wrapApiHandler(
         where: {
           eventId: editionId,
           status: 'ACCEPTED',
-          // Filtrer les bénévoles disponibles pendant l'événement
-          // eventAvailability peut être null (anciens bénévoles) ou true (explicitement disponible)
-          // On exclut uniquement ceux qui ont explicitement indiqué qu'ils ne sont PAS disponibles pendant l'événement
-          OR: [
-            {
-              eventAvailability: true,
-            },
-            {
-              eventAvailability: null, // Inclure les anciens bénévoles (avant l'ajout de ce champ)
-            },
-          ],
+          ...benevolePresentAEvenement(),
           AND: [...conditionsMotsCles(mots, ['user.prenom', 'user.nom', 'user.email'])],
         },
         select: {
