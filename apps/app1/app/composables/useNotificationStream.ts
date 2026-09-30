@@ -121,6 +121,7 @@ export const useNotificationStream = () => {
   const notificationStore = useNotificationsStore()
   const authStore = useAuthStore()
   const toast = useToast()
+  const { t } = useI18n()
 
   /**
    * Établit la connexion SSE
@@ -173,16 +174,26 @@ export const useNotificationStream = () => {
 
           // Toast de notification si l'utilisateur n'est pas sur la page notifications
           if (!window.location.pathname.includes('/notifications')) {
+            /*
+             * ⚠️ API DE NUXT UI v4, et non v2 : `duration` (et non `timeout`), `onClick` (et non
+             * `click`). Les deux champs de la v2 étaient simplement IGNORÉS — aucun avertissement,
+             * aucune erreur de typage. Résultat : le toast restait à l'écran cinq secondes par
+             * hasard (la valeur par défaut coïncide), et surtout le bouton d'action NE FAISAIT
+             * RIEN. On cliquait « Voir » et la page ne bougeait pas.
+             *
+             * Le repli du libellé passe par i18n : `actionText` vient du serveur, mais un défaut
+             * écrit en français dans le code s'afficherait tel quel à un lecteur allemand.
+             */
             toast.add({
               color: getNotificationColor(notification.type),
               title: notification.title,
               description: notification.message,
-              timeout: 5000,
+              duration: 5000,
               actions: notification.actionUrl
                 ? [
                     {
-                      label: notification.actionText || 'Voir',
-                      click: () => navigateTo(notification.actionUrl!),
+                      label: notification.actionText || t('common.view'),
+                      onClick: () => navigateTo(notification.actionUrl!),
                     },
                   ]
                 : undefined,

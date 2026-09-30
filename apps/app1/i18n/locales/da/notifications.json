@@ -127,7 +127,12 @@
       "enabled": "Notifikationer aktiveret på denne enhed",
       "not_supported": "Push-notifikationer understøttes ikke af denne browser",
       "test_button": "Test en notifikation",
-      "title": "Push-notifikationer"
+      "title": "Push-notifikationer",
+      "activation_error_browser": "Notifikationerne kunne ikke slås til. Prøv en anden browser.",
+      "activation_error_generic": "Der opstod en fejl, da notifikationerne skulle slås til.",
+      "activation_error_title": "Fejl i notifikationer",
+      "browser_unsupported_opera": "Push-notifikationer understøttes ikke i Opera. Brug Chrome, Edge eller Firefox.",
+      "browser_unsupported_title": "Browseren understøttes ikke"
     },
     "system": {
       "error": {

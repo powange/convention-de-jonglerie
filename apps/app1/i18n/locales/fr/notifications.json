@@ -121,7 +121,12 @@
       }
     },
     "push": {
+      "activation_error_browser": "Impossible d'activer les notifications. Essayez avec un autre navigateur.",
+      "activation_error_generic": "Une erreur est survenue lors de l'activation des notifications.",
+      "activation_error_title": "Erreur de notifications",
       "blocked": "Notifications bloquées dans les paramètres du navigateur",
+      "browser_unsupported_opera": "Les notifications push ne sont pas prises en charge sur Opera. Utilisez Chrome, Edge ou Firefox.",
+      "browser_unsupported_title": "Navigateur non compatible",
       "description": "Recevez des notifications même lorsque l'application est fermée",
       "disabled": "Notifications désactivées",
       "enabled": "Notifications activées sur cet appareil",

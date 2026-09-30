@@ -127,7 +127,12 @@
       "enabled": "Oznámení aktivovaná v tomto zařízení",
       "not_supported": "Oznámení Push nejsou v tomto prohlížeči podporována",
       "test_button": "Testování oznámení",
-      "title": "Oznámení Push"
+      "title": "Oznámení Push",
+      "activation_error_browser": "Oznámení se nepodařilo zapnout. Zkuste jiný prohlížeč.",
+      "activation_error_generic": "Při zapínání oznámení došlo k chybě.",
+      "activation_error_title": "Chyba oznámení",
+      "browser_unsupported_opera": "Push oznámení nejsou v prohlížeči Opera podporována. Použijte Chrome, Edge nebo Firefox.",
+      "browser_unsupported_title": "Nepodporovaný prohlížeč"
     },
     "system": {
       "error": {
