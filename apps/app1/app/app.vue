@@ -1,12 +1,14 @@
 <template>
   <UApp>
-    <!-- Loading Screen -->
-    <div v-if="isLoading" class="loading-screen">
-      <LoadingLogo :loaded="siteLoaded" />
+    <!-- Voile de chargement : un FONDU par-dessus le contenu, et non un rideau devant lui.
+         Voir la note du script pour ce qui a changé et pourquoi. -->
+    <div v-if="voileVisible" class="loading-screen" :class="{ 'loading-screen--sortie': sortie }">
+      <LoadingLogo :loaded="sortie" />
     </div>
 
-    <!-- Contenu masqué pendant le chargement pour éviter les sauts de layout -->
-    <div v-show="!isLoading">
+    <!-- Le contenu reste masqué jusqu'à l'HYDRATATION, et pas une milliseconde de plus.
+         Voir la note du script : ce `v-show` fait plus qu'éviter un saut de mise en page. -->
+    <div v-show="!voileVisible">
       <ClientOnly>
         <!-- Bannière d'impersonation -->
         <UiImpersonationBanner />
@@ -33,39 +35,64 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 
-// État de chargement
-const isLoading = ref(true)
-const siteLoaded = ref(false)
+/*
+ * Le voile de chargement, et ce qui a changé.
+ *
+ * ⚠️ IL RETARDAIT UNE PAGE DÉJÀ PRÊTE. Le contenu, rendu par le serveur, était masqué
+ * (`v-show="!isLoading"`) jusqu'à `document.readyState === 'complete'` PUIS mille millisecondes
+ * d'animation. Sur tout chargement complet, c'était au moins une seconde de plus devant une page
+ * déjà écrite — et bien davantage quand les affiches d'éditions tardaient, puisque `load` les
+ * attend.
+ *
+ * Mesuré avant correction, en profil mobile bridé (Slow 4G, processeur ÷4), médiane de trois
+ * passes sur release : LCP de 13 344 ms sur l'accueil pour un `load` à 9 493 ms, et 14 716 ms sur
+ * une fiche d'édition pour un `load` à 13 007 ms. L'écart, c'est ce voile.
+ *
+ * Ce qui le remplace : le voile sort dès que l'application est MONTÉE, avec un fondu de 300 ms. Il
+ * ne guette plus `load` — donc plus les images — et ne compte plus de durée fixe.
+ *
+ * ⚠️ LE CONTENU RESTE MASQUÉ JUSQUE-LÀ, ET C'EST UN CHOIX RELU. Une première version le rendait
+ * visible dès le rendu serveur, ce qui donne le meilleur LCP possible. Elle a fait tomber quatre
+ * lots Playwright, et pour une raison qui n'est pas un artefact de test : les scénarios
+ * remplissaient un champ de mot de passe aussitôt après `DOMContentLoaded`, et Vue le
+ * RÉINITIALISAIT en s'hydratant. Ce que le `display: none` empêchait, ce n'était donc pas seulement
+ * un saut de mise en page — c'était d'écrire dans un formulaire que personne n'écoute encore, et de
+ * perdre sa saisie.
+ *
+ * On garde donc la barrière, en la ramenant de « `load` + une seconde » à « hydratation ». C'est la
+ * seconde branche que l'énoncé laissait ouverte — « visible dès l'hydratation » — et elle retire
+ * les deux attentes coûteuses sans rouvrir ce piège.
+ *
+ * Le plafond de sécurité reste, pour une seule raison : si le montage n'arrivait jamais — une
+ * erreur d'hydratation, un script bloqué — le voile resterait indéfiniment devant la page. Il
+ * garantit qu'il s'en va, quoi qu'il arrive.
+ */
+const DUREE_DU_FONDU = 300
+const PLAFOND_AVANT_SORTIE = 2000
 
-// Durée de l'animation settle (doit correspondre au CSS du composant LoadingLogo)
-const SETTLE_DURATION = 1000
+/** Le voile est-il encore dans le DOM ? */
+const voileVisible = ref(true)
+/** Le fondu est-il lancé ? Déclenche aussi l'animation de sortie du logo. */
+const sortie = ref(false)
 
 onMounted(async () => {
   await nextTick()
 
-  const triggerSettle = () => {
-    // Le site est chargé : déclenche la transition du logo (phase 2+3)
-    siteLoaded.value = true
-
-    // Masque le loading screen après la fin de l'animation settle
+  const effacerLeVoile = () => {
+    if (sortie.value) return
+    sortie.value = true
+    // Retiré du DOM à la fin du fondu : un `position: fixed` laissé en place, même transparent,
+    // continuerait d'intercepter les clics.
     setTimeout(() => {
-      isLoading.value = false
-    }, SETTLE_DURATION)
+      voileVisible.value = false
+    }, DUREE_DU_FONDU)
   }
 
-  // Utiliser useEventListener de VueUse pour gérer automatiquement le cleanup
-  useEventListener(document, 'readystatechange', () => {
-    if (document.readyState === 'complete') {
-      triggerSettle()
-    }
-  })
+  // L'application est montée : il n'y a plus rien à attendre.
+  effacerLeVoile()
 
-  // Si tout est déjà chargé
-  if (document.readyState === 'complete') {
-    triggerSettle()
-  } else {
-    useEventListener(window, 'load', triggerSettle)
-  }
+  // Filet de sécurité, au cas où la ligne ci-dessus n'aurait pas été atteinte.
+  setTimeout(effacerLeVoile, PLAFOND_AVANT_SORTIE)
 })
 
 // Rien ici sur l'indexation, et c'est délibéré : @nuxtjs/seo s'en charge, à partir de
@@ -97,8 +124,23 @@ onMounted(async () => {
   z-index: 9999;
   overflow: hidden;
 
-  /* Transition fluide à la sortie */
-  transition: opacity 0.8s ease-out;
+  /* Un fondu COURT : 800 ms de sortie s'ajoutaient à la seconde d'attente. */
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+/* La sortie. Les clics passent au travers dès qu'elle commence : le contenu est déjà là, et
+   attendre la fin du fondu pour le rendre cliquable rendrait la page inerte sans raison. */
+.loading-screen--sortie {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Un fondu est une animation : qui n'en veut pas voit le voile disparaître d'un coup. */
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen {
+    transition: none;
+  }
 }
 
 /* Support du dark mode */
