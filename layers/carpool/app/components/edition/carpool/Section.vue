@@ -143,7 +143,6 @@
               :key="request.id"
               :request="request"
               :edition-id="props.editionId"
-              @comment-added="refreshRequests"
               @edit="editRequest(request)"
               @deleted="refreshRequests"
             />
