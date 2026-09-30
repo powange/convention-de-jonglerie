@@ -19,13 +19,7 @@ export default wrapApiHandler(
       },
       // Le compte des commentaires et les seules réservations acceptées : voir
       // `carpoolOfferListInclude` pour ce que la carte lit réellement.
-      include: {
-        ...carpoolOfferListInclude,
-        passengers: {
-          ...carpoolOfferListInclude.passengers,
-          orderBy: { addedAt: 'asc' },
-        },
-      },
+      include: carpoolOfferListInclude,
       orderBy: { tripDate: 'asc' },
     })
 

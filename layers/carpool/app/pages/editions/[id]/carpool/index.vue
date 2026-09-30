@@ -11,7 +11,7 @@
       <EditionHeader :edition="edition" current-page="carpool" />
 
       <!-- Contenu du covoiturage -->
-      <EditionCarpoolSection :edition-id="edition.id" :highlight-offer-id="highlightOfferId" />
+      <EditionCarpoolSection :edition-id="edition.id" />
     </div>
   </div>
 </template>
@@ -61,12 +61,6 @@ watch(
   },
   { immediate: true }
 )
-
-// Paramètre pour mettre en évidence une offre spécifique
-const highlightOfferId = computed(() => {
-  const offerId = route.query.offerId
-  return offerId ? parseInt(offerId as string) : null
-})
 
 // Métadonnées SEO avec le nom de l'édition
 const editionName = computed(() => (edition.value ? getEditionDisplayName(edition.value) : ''))

@@ -122,7 +122,6 @@
               :key="offer.id"
               :offer="offer"
               :edition-id="props.editionId"
-              :highlighted="props.highlightOfferId === offer.id"
               @edit="editOffer(offer)"
               @deleted="refreshOffers"
             />
@@ -170,7 +169,6 @@ import { useAuthStore } from '#imports'
 
 interface Props {
   editionId: number
-  highlightOfferId?: number | null
 }
 
 const props = defineProps<Props>()

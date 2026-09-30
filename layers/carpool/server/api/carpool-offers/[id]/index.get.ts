@@ -12,10 +12,6 @@ export default wrapApiHandler(
       where: { id: offerId },
       include: {
         ...carpoolOfferFullInclude,
-        passengers: {
-          ...carpoolOfferFullInclude.passengers,
-          orderBy: { addedAt: 'asc' },
-        },
         comments: {
           ...carpoolOfferFullInclude.comments,
           orderBy: { createdAt: 'desc' },

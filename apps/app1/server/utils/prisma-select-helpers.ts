@@ -325,13 +325,6 @@ export const carpoolOfferListInclude = {
       },
     },
   },
-  passengers: {
-    include: {
-      user: {
-        select: carpoolUserSelect,
-      },
-    },
-  },
   _count: {
     select: { comments: true },
   },
@@ -352,7 +345,7 @@ export const carpoolRequestListInclude = {
 } satisfies Prisma.CarpoolRequestInclude
 
 /**
- * Include pour offre de covoiturage complète (avec bookings, passengers et comments)
+ * Include pour offre de covoiturage complète (avec bookings et comments)
  * Utilisée pour l'affichage détaillé des offres
  */
 export const carpoolOfferFullInclude = {
@@ -362,13 +355,6 @@ export const carpoolOfferFullInclude = {
   bookings: {
     include: {
       requester: {
-        select: carpoolUserSelect,
-      },
-    },
-  },
-  passengers: {
-    include: {
-      user: {
         select: carpoolUserSelect,
       },
     },
