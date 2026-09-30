@@ -77,15 +77,28 @@
            affichées. Sur écran étroit ils passent dans une modale — trois champs côte à côte n'y
            tiennent pas, et les empiler pousserait le tableau hors de vue. -->
       <div v-if="group.items.length" class="flex items-end gap-2">
-        <StockItemFilters
-          v-model:nom="nomFiltre"
-          v-model:tags="tagsFiltres"
-          v-model:etats="etatsFiltres"
-          v-model:lieu="lieuFiltre"
-          :tag-items="tagItems"
-          :etats-items="etatsItems"
-          class="hidden lg:flex flex-1 items-end gap-2 min-w-0"
-        />
+        <!--
+          `items-end` d'origine, conservé : les libellés n'ont pas tous la même hauteur — « Lieu de
+          récupération ou de retour » tient sur deux lignes, « Nom de l'objet » sur une —, et c'est
+          l'alignement par le bas qui remet les quatre saisies sur la même ligne.
+
+          L'aide sur ce que fouillent les deux champs de texte vient donc EN DESSOUS, et non dans
+          un `UFormField :help` qui aurait changé la hauteur de deux champs sur quatre.
+        -->
+        <div class="hidden lg:flex flex-1 min-w-0 flex-col gap-1">
+          <StockItemFilters
+            v-model:nom="nomFiltre"
+            v-model:tags="tagsFiltres"
+            v-model:etats="etatsFiltres"
+            v-model:lieu="lieuFiltre"
+            :tag-items="tagItems"
+            :etats-items="etatsItems"
+            class="flex items-end gap-2 min-w-0"
+          />
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            {{ $t('gestion.stock.items_filter_help') }}
+          </p>
+        </div>
 
         <UButton
           class="lg:hidden"
@@ -143,6 +156,11 @@
             :etats-items="etatsItems"
             class="space-y-4"
           />
+          <!-- La même aide qu'en version bureau : la recopier ici est le prix de deux dispositions
+               distinctes, et l'oublier laisserait la moitié des utilisateurs sans l'information. -->
+          <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+            {{ $t('gestion.stock.items_filter_help') }}
+          </p>
         </template>
         <template #footer>
           <div class="flex w-full justify-between gap-2">

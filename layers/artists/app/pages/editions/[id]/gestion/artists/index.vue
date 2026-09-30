@@ -175,10 +175,11 @@
               class="flex flex-col sm:flex-row items-start sm:items-center gap-3"
             >
               <UInput
-                v-model="globalFilter"
+                v-model="saisieRecherche"
                 :placeholder="$t('artists.search_placeholder')"
                 icon="i-heroicons-magnifying-glass"
                 class="w-full sm:w-64"
+                @keydown.enter="appliquerRecherche"
               />
 
               <!-- Sélection multiple : un même artiste joue souvent dans plusieurs spectacles, et
@@ -200,7 +201,7 @@
                 </UBadge>
 
                 <UButton
-                  v-if="globalFilter || showFilter.length > 0"
+                  v-if="saisieRecherche || showFilter.length > 0"
                   icon="i-heroicons-x-mark"
                   color="neutral"
                   variant="ghost"
@@ -228,6 +229,20 @@
                 />
               </div>
             </div>
+
+            <!--
+              SOUS la barre et non dans un `UFormField :help` autour du champ : la rangée est
+              centrée verticalement, et un champ devenu plus haut que la liste déroulante voisine
+              aurait remonté sa saisie au-dessus de la sienne. Le cas jumeau a été mesuré sur les
+              filtres du stock — vingt pixels d'écart.
+
+              Et la précision compte ici plus qu'ailleurs : le filtre porte sur les colonnes
+              AFFICHÉES, si bien que masquer une colonne la retire aussi de la recherche. Rien ne
+              le disait, et l'on conclurait que la recherche ne trouve pas ce qu'elle voit.
+            -->
+            <p v-if="artists.length > 0" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              {{ $t('artists.search_help') }}
+            </p>
           </div>
         </template>
 
@@ -664,7 +679,7 @@
 import { dessinerCaseACocher, ENTETE_COCHE, styleColonneCoche } from '~/utils/pdf-case-a-cocher'
 import { telechargerFichier } from '~/utils/telechargement'
 
-import { getAccommodationTypeLabel, markdownToHtml } from '#imports'
+import { useSaisieTemporisee, getAccommodationTypeLabel, markdownToHtml } from '#imports'
 
 // Chemin relatif, comme `filtres-artistes-url` juste en dessous : l'alias `~` ne résout pas
 // vers le dossier du LAYER, et un `~/utils/...` d'apparence normale casse la compilation sans
@@ -844,6 +859,17 @@ const sorting = ref<{ id: string; desc: boolean }[]>([])
 const filtresInitiaux = filtresDepuisUrl(route.query)
 const globalFilter = ref(filtresInitiaux.recherche)
 const showFilter = ref<string[]>(filtresInitiaux.spectacles)
+
+/*
+ * ⚠️ TEMPORISÉE, et le filtrage n'est pas le seul coût.
+ *
+ * `globalFilter` alimente le filtre global du tableau, qui reparcourt toutes les colonnes
+ * affichées de tous les artistes — mais il est AUSSI reporté dans l'adresse par le watcher
+ * ci-dessous. Une recherche de dix lettres produisait donc dix écritures d'adresse.
+ *
+ * Le champ se lit sur `saisieRecherche` et suit la frappe ; le tableau et l'adresse attendent.
+ */
+const { saisie: saisieRecherche, appliquer: appliquerRecherche } = useSaisieTemporisee(globalFilter)
 
 // `replace` et non `push` : choisir un filtre n'est pas un pas de navigation à revenir en arrière.
 //
@@ -1139,7 +1165,11 @@ async function exporterPdf() {
 }
 
 const resetFilters = () => {
-  globalFilter.value = ''
+  // La saisie D'ABORD, puis le modèle : la remise à zéro doit vider le champ tout de suite, et
+  // `appliquerRecherche` abandonne au passage l'écriture qui restait en attente — sans quoi elle
+  // réécrirait un quart de seconde plus tard le texte qu'on vient d'effacer.
+  saisieRecherche.value = ''
+  appliquerRecherche()
   showFilter.value = []
   sorting.value = []
 }
