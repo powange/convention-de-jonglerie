@@ -88,7 +88,10 @@ test.describe('Notifications (connecté)', () => {
 
     expect(page.url()).not.toContain('/login')
 
-    const bloc = page.locator('div').filter({ hasText: /^Messagerie/ }).first()
+    const bloc = page
+      .locator('div')
+      .filter({ hasText: /^Messagerie/ })
+      .first()
     await expect(bloc).toBeVisible({ timeout: 15000 })
     await expect(page.getByText(/discussions d’équipe/i).first()).toBeVisible()
 
