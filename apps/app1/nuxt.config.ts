@@ -646,6 +646,13 @@ export default defineNuxtConfig({
         'i18n-iso-countries',
         'firebase/app',
         'firebase/messaging',
+        /*
+         * CONSERVÉ après la suppression du plugin `vue-json-viewer.client.ts` : la page
+         * `admin/error-logs.vue` importe toujours ce paquet (et sa feuille de style) localement.
+         * L'énoncé du lot invitait à le retirer « s'il n'est plus nécessaire au dev » — il l'est
+         * encore. Le retirer ne gagnerait rien et imposerait une ré-optimisation de Vite au
+         * premier affichage de cette page.
+         */
         'vue3-json-viewer',
         '@internationalized/date',
         '@unhead/schema-org/vue',
