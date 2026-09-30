@@ -159,6 +159,7 @@
     "reimbursement_pending": "Défraiement trajet en attente",
     "reimbursement_status": "Statut du défraiement trajet",
     "reset_filters": "Réinitialiser les filtres",
+    "search_help": "La recherche porte sur toutes les colonnes affichées : masquer une colonne la retire aussi de la recherche.",
     "search_placeholder": "Rechercher un artiste...",
     "search_user": "Rechercher par email",
     "select_user": "Entrer l'adresse email",

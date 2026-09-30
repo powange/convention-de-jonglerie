@@ -7,24 +7,35 @@
 
   La disposition vient du parent, par les classes qu'il pose sur ce composant : lui seul sait s'il
   affiche une ligne ou une colonne.
+
+  ⚠️ PAS DE `help` SUR CES CHAMPS, et c'est délibéré. Un `UFormField :help` sous le nom et sous le
+  lieu rendait ces deux champs plus hauts que les deux listes déroulantes voisines, et la rangée
+  est alignée par le BAS : les deux saisies remontaient donc au-dessus des deux autres. Passer la
+  rangée en `items-start` ne réglait rien — « Lieu de récupération ou de retour » tient sur deux
+  lignes là où « Nom de l'objet » en tient une, si bien que les saisies se décalaient de vingt
+  pixels dans l'autre sens. Mesuré par un test Playwright, pas supposé.
+
+  L'aide est donc rendue par le PARENT, en une ligne sous la barre : elle ne touche à aucun
+  alignement et dit la même chose une fois pour les deux champs.
 -->
 <template>
   <div>
     <UFormField :label="$t('gestion.stock.item_name')" class="flex-1 min-w-0">
       <UInput
-        v-model="nom"
+        v-model="saisieNom"
         icon="i-heroicons-magnifying-glass"
         :placeholder="$t('gestion.stock.name_filter_placeholder')"
         class="w-full"
+        @keydown.enter="appliquerNom"
       >
-        <template v-if="nom" #trailing>
+        <template v-if="saisieNom" #trailing>
           <UButton
             color="neutral"
             variant="link"
             size="sm"
             icon="i-heroicons-x-mark"
             :aria-label="$t('common.clear')"
-            @click="nom = ''"
+            @click="effacerNom"
           />
         </template>
       </UInput>
@@ -72,19 +83,20 @@
 
     <UFormField :label="$t('gestion.stock.loan_place_filter')" class="flex-1 min-w-0">
       <UInput
-        v-model="lieu"
+        v-model="saisieLieu"
         icon="i-heroicons-magnifying-glass"
         :placeholder="$t('gestion.stock.loan_place_filter_placeholder')"
         class="w-full"
+        @keydown.enter="appliquerLieu"
       >
-        <template v-if="lieu" #trailing>
+        <template v-if="saisieLieu" #trailing>
           <UButton
             color="neutral"
             variant="link"
             size="sm"
             icon="i-heroicons-x-mark"
             :aria-label="$t('common.clear')"
-            @click="lieu = ''"
+            @click="effacerLieu"
           />
         </template>
       </UInput>
@@ -93,6 +105,9 @@
 </template>
 
 <script setup lang="ts">
+// Composable de l'application, pas de ce layer : la trésorerie et les artistes s'en servent aussi.
+import { useSaisieTemporisee } from '#imports'
+
 interface OptionTag {
   label: string
   value: number
@@ -112,4 +127,30 @@ const nom = defineModel<string>('nom', { required: true })
 const tags = defineModel<OptionTag[]>('tags', { required: true })
 const etats = defineModel<OptionEtat[]>('etats', { required: true })
 const lieu = defineModel<string>('lieu', { required: true })
+
+/*
+ * ⚠️ DEUX TEMPORISATIONS SÉPARÉES, une par champ, et non une pour les deux.
+ *
+ * Les deux filtres se composent en ET : chercher « marmite » puis « cuisine » resserre le
+ * résultat. Les faire partager un minuteur ferait que taper dans l'un repousserait l'écriture de
+ * l'autre — on tape le lieu, la liste ne bouge pas, et c'est le nom saisi trente secondes plus tôt
+ * qu'on croirait fautif.
+ *
+ * La saisie reste immédiate à l'écran dans les deux cas : c'est le filtrage, chez le parent, qui
+ * attend. Ce parent écrit aussi l'adresse à chaque changement — un `replace` d'adresse par lettre
+ * jusqu'ici, qu'il cesse de faire sans qu'on ait eu à le modifier.
+ */
+const { saisie: saisieNom, appliquer: appliquerNom } = useSaisieTemporisee(nom)
+const { saisie: saisieLieu, appliquer: appliquerLieu } = useSaisieTemporisee(lieu)
+
+/** La croix rend tout d'un coup : attendre après un clic sur une croix fait douter du clic. */
+function effacerNom() {
+  saisieNom.value = ''
+  appliquerNom()
+}
+
+function effacerLieu() {
+  saisieLieu.value = ''
+  appliquerLieu()
+}
 </script>

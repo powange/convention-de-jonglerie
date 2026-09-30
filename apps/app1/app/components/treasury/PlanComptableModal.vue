@@ -28,24 +28,28 @@
           :description="planActif.avertissement"
         />
 
-        <UInput
-          v-model="recherche"
-          icon="i-lucide-search"
-          :placeholder="$t('gestion.treasury.plan_search_placeholder')"
-          :trailing="Boolean(recherche)"
-          autocomplete="off"
-        >
-          <template v-if="recherche" #trailing>
-            <UButton
-              size="xs"
-              color="neutral"
-              variant="ghost"
-              icon="i-lucide-x"
-              :aria-label="$t('common.clear')"
-              @click="recherche = ''"
-            />
-          </template>
-        </UInput>
+        <UFormField :help="$t('gestion.treasury.plan_search_help')">
+          <UInput
+            v-model="saisie"
+            icon="i-lucide-search"
+            :placeholder="$t('gestion.treasury.plan_search_placeholder')"
+            :trailing="Boolean(saisie)"
+            autocomplete="off"
+            class="w-full"
+            @keydown.enter="appliquer"
+          >
+            <template v-if="saisie" #trailing>
+              <UButton
+                size="xs"
+                color="neutral"
+                variant="ghost"
+                icon="i-lucide-x"
+                :aria-label="$t('common.clear')"
+                @click="effacer"
+              />
+            </template>
+          </UInput>
+        </UFormField>
 
         <div v-if="chargement" class="space-y-2">
           <USkeleton v-for="n in 6" :key="n" class="h-8 w-full" />
@@ -161,6 +165,24 @@ const plans = ref<PlanComptable[]>([])
 const planActifId = ref<string | null>(null)
 const recherche = ref('')
 const chargement = ref(false)
+
+/*
+ * ⚠️ LA CROIX ET LE DÉPLIAGE RESTENT SUR LA SAISIE, pas sur la valeur temporisée.
+ *
+ * `:trailing` et le `v-if` de la croix se lisent sur `saisie` : une croix qui apparaît un quart de
+ * seconde après la première lettre paraît hésiter. Le FILTRAGE, lui, attend — c'est lui qui
+ * reconstruit l'arbre des comptes à chaque caractère, sur un plan qui en compte plusieurs
+ * centaines, et qui les déplie tous au passage.
+ *
+ * `tout-deplier` suit `recherche` et non `saisie`, à l'inverse : déplier avant d'avoir filtré
+ * montrerait le plan entier ouvert pendant un instant, puis le résultat — un clignotement.
+ */
+const { saisie, appliquer } = useSaisieTemporisee(recherche)
+
+function effacer() {
+  saisie.value = ''
+  appliquer()
+}
 
 const planActif = computed(() => plans.value.find((plan) => plan.id === planActifId.value) ?? null)
 
