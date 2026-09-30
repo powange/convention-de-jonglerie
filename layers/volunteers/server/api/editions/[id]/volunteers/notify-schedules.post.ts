@@ -9,6 +9,8 @@ import { userBasicSelect } from '#server/utils/prisma-select-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { useVolunteerPorts } from '#server/volunteers/ports/registry'
 import { estHorsAssignationAutomatique } from '~~/shared/utils/benevoles-volants'
+// Depuis un layer, l'alias est `~~` : `~` ne résout pas vers la couche application.
+import { formaterHeure, formaterJournee, heureDans } from '~~/shared/utils/fuseau-edition'
 
 /** Envois simultanés par tranche : le nombre de requêtes en vol reste borné. */
 const TAILLE_DE_TRANCHE = 10
@@ -59,7 +61,9 @@ export default wrapApiHandler(
     // Nom d'affichage générique porté par l'Event (étape 0bis)
     const eventRecord = await prisma.event.findUnique({
       where: { id: editionId },
-      select: { name: true },
+      // Le fuseau de l'édition voyage avec le nom : toutes les heures de ce courriel sont des
+      // heures VÉCUES SUR PLACE, et sans lui elles seraient celles du serveur.
+      select: { name: true, edition: { select: { timezone: true } } },
     })
 
     if (!eventRecord) {
@@ -69,6 +73,23 @@ export default wrapApiHandler(
       })
     }
     const eventName = eventRecord.name || 'votre événement'
+
+    /*
+     * ⚠️ TOUTES LES HEURES DE CE MESSAGE SONT CELLES DE L'ÉDITION, et c'est ce qui manquait.
+     *
+     * `toLocaleTimeString('fr-FR')` sans `timeZone` rend l'heure du SERVEUR — donc UTC en
+     * conteneur. Un créneau de 8 h du matin partait annoncé à 6 h, à tout le monde, y compris aux
+     * bénévoles qui vivent à côté du chapiteau. Le décalage ne se voyait pas en développement, où
+     * la machine est à Paris comme la convention.
+     *
+     * Le `timeOfDay` était pire encore : déduit d'un `getHours()` sur le même fuseau, il faisait
+     * basculer un créneau de 8 h du matin dans « matin » ou « nuit » selon la saison — un même
+     * créneau rangé sous deux intitulés différents d'un mois à l'autre.
+     *
+     * `null` quand l'édition n'a pas de fuseau : les utilitaires retombent alors sur le
+     * comportement d'avant, ce qui ne dégrade rien et évite d'inventer un fuseau par défaut.
+     */
+    const fuseau = eventRecord.edition?.timezone ?? null
 
     const { inclureSansCreneau } = corpsSchema.parse(await readBody(event).catch(() => null))
 
@@ -160,12 +181,12 @@ export default wrapApiHandler(
               assignment.timeSlot.endDateTime.getTime() + delay * 60 * 1000
             )
 
-            const date = adjustedStart.toLocaleDateString('fr-FR', {
+            const date = formaterJournee(adjustedStart, fuseau, 'fr', {
               weekday: 'long',
               day: 'numeric',
               month: 'long',
             })
-            const timeRange = `${adjustedStart.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - ${adjustedEnd.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+            const timeRange = `${formaterHeure(adjustedStart, fuseau)} - ${formaterHeure(adjustedEnd, fuseau)}`
             const teamName = assignment.timeSlot.team?.name || 'Équipe non définie'
             return `📅 ${date} (${timeRange}) - ${teamName}`
           })
@@ -202,12 +223,20 @@ export default wrapApiHandler(
           )
           const endDate = new Date(assignment.timeSlot.endDateTime.getTime() + delay * 60 * 1000)
 
-          // Déterminer le moment de la journée basé sur l'heure de début ajustée
-          const hour = startDate.getHours()
+          /*
+           * Le moment de la journée, sur l'heure VÉCUE SUR PLACE.
+           *
+           * `heureDans` rend `null` pour une date illisible — jamais le cas ici, ces dates venant
+           * de la base. Si cela arrivait tout de même, `formaterHeure` rendrait déjà une heure
+           * VIDE juste en dessous : l'intitulé de section serait alors le moindre des problèmes,
+           * et « matin » est retenu comme premier choix de la liste, non comme une supposition sur
+           * la donnée.
+           */
+          const heure = heureDans(startDate, fuseau)
           let timeOfDay: 'MORNING' | 'AFTERNOON' | 'EVENING'
-          if (hour < 12) {
+          if (heure === null || heure < 12) {
             timeOfDay = 'MORNING'
-          } else if (hour < 18) {
+          } else if (heure < 18) {
             timeOfDay = 'AFTERNOON'
           } else {
             timeOfDay = 'EVENING'
@@ -217,11 +246,8 @@ export default wrapApiHandler(
             date: startDate,
             timeOfDay,
             teamName: assignment.timeSlot.team?.name || 'Équipe non définie',
-            startTime: startDate.toLocaleTimeString('fr-FR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            }),
-            endTime: endDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+            startTime: formaterHeure(startDate, fuseau),
+            endTime: formaterHeure(endDate, fuseau),
           }
         })
 

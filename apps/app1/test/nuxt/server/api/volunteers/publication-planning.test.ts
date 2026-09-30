@@ -15,8 +15,11 @@ vi.mock('#server/utils/notification-service', () => ({
   NotificationService: { create: mockNotifier },
 }))
 
+// Hoisté pour pouvoir RELIRE ses arguments : c'est là que passent les heures du courriel, et
+// c'est la seule façon de vérifier sur quel fuseau elles ont été calculées.
+const mockGenererCourriel = vi.hoisted(() => vi.fn(async () => '<p>planning</p>'))
 vi.mock('#server/utils/emailService', () => ({
-  generateVolunteerScheduleEmailHtml: vi.fn(async () => '<p>planning</p>'),
+  generateVolunteerScheduleEmailHtml: mockGenererCourriel,
   getSiteUrl: vi.fn(() => 'https://exemple.test'),
 }))
 
@@ -89,13 +92,113 @@ describe('publier le planning des bénévoles', () => {
     mockEnvoyerCourriel.mockResolvedValue(true)
     global.readBody = vi.fn().mockResolvedValue({})
     prismaMock.eventVolunteerSettings.upsert.mockResolvedValue({})
-    prismaMock.event.findUnique.mockResolvedValue({ name: 'EJC' })
+    prismaMock.event.findUnique.mockResolvedValue({ name: 'EJC', edition: { timezone: null } })
     prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevole(1)])
     prismaMock.volunteerAssignment.findMany.mockResolvedValue([creneau(1)])
   })
 
   // Aucun reste de diffusion ne doit franchir la frontière d'un test.
   afterEach(attendreLaDiffusion)
+
+  /**
+   * Les heures annoncées sont celles VÉCUES SUR PLACE.
+   *
+   * ⚠️ CE QUI N'ALLAIT PAS. `toLocaleTimeString('fr-FR')` était appelé SANS `timeZone`, donc rendait
+   * l'heure du SERVEUR — UTC en conteneur. Un créneau de 10 h du matin à Paris partait annoncé à
+   * 8 h, à tout le monde, y compris aux bénévoles présents sur le site. Et le décalage ne se voit
+   * pas en développement, où la machine est à Paris comme la convention : il n'apparaît qu'en
+   * production.
+   *
+   * 🔬 LE CRÉNEAU DE RÉFÉRENCE EST À 08:00 UTC, et les deux fuseaux éprouvés sont volontairement
+   * éloignés : Paris (10:00) et Auckland (20:00). Un test qui n'en prendrait qu'un, ou qui
+   * prendrait un fuseau proche de celui du serveur, resterait vert sans aucune conversion.
+   */
+  describe('les heures sont celles de l’édition', () => {
+    const avecFuseau = (timezone: string | null) =>
+      prismaMock.event.findUnique.mockResolvedValue({ name: 'EJC', edition: { timezone } })
+
+    /** Les créneaux passés au générateur de courriel, pour le premier destinataire. */
+    const creneauxDuCourriel = () => mockGenererCourriel.mock.calls[0]?.[3] as any[]
+
+    it('rend l’heure de PARIS pour une édition française', async () => {
+      avecFuseau('Europe/Paris')
+
+      await handler(evenement as any)
+      await attendreLaDiffusion()
+
+      expect(creneauxDuCourriel()[0].startTime).toBe('10:00')
+      expect(creneauxDuCourriel()[0].endTime).toBe('14:00')
+    })
+
+    it('rend l’heure d’AUCKLAND pour une édition néo-zélandaise', async () => {
+      /*
+       * 🔬 L'assertion qui voit le défaut. Douze heures d'écart avec UTC : aucune implémentation
+       * qui ignore le fuseau ne peut rendre « 20:00 » par hasard.
+       */
+      avecFuseau('Pacific/Auckland')
+
+      await handler(evenement as any)
+      await attendreLaDiffusion()
+
+      expect(creneauxDuCourriel()[0].startTime).toBe('20:00')
+    })
+
+    it('range le créneau dans le bon MOMENT de la journée', async () => {
+      /*
+       * ⚠️ Le `timeOfDay` était déduit d'un `getHours()` sur le fuseau du serveur : le MÊME créneau
+       * tombait dans « matin » ou dans « soir » selon l'endroit d'où on regardait. C'est l'intitulé
+       * de section du courriel — un bénévole qui cherche son créneau du matin ne le trouvait pas.
+       */
+      avecFuseau('Europe/Paris')
+      await handler(evenement as any)
+      await attendreLaDiffusion()
+      expect(creneauxDuCourriel()[0].timeOfDay).toBe('MORNING')
+
+      vi.clearAllMocks()
+      mockCanManage.mockResolvedValue(true)
+      mockEnvoyerCourriel.mockResolvedValue(true)
+      global.readBody = vi.fn().mockResolvedValue({})
+      prismaMock.eventVolunteerSettings.upsert.mockResolvedValue({})
+      prismaMock.editionVolunteerApplication.findMany.mockResolvedValue([benevole(1)])
+      prismaMock.volunteerAssignment.findMany.mockResolvedValue([creneau(1)])
+      avecFuseau('Pacific/Auckland')
+
+      await handler(evenement as any)
+      await attendreLaDiffusion()
+      // 20 h sur place : le même créneau est une soirée, pas une matinée.
+      expect(creneauxDuCourriel()[0].timeOfDay).toBe('EVENING')
+    })
+
+    it('applique le fuseau AUSSI à la notification dans l’application', async () => {
+      /*
+       * ⚠️ DEUX SURFACES DANS LA MÊME FONCTION, et n'en corriger qu'une déplacerait l'incohérence :
+       * le courriel dirait 20:00 et la cloche 08:00, pour le même créneau.
+       */
+      avecFuseau('Pacific/Auckland')
+
+      await handler(evenement as any)
+      await attendreLaDiffusion()
+
+      const message = mockNotifier.mock.calls[0][0].message as string
+      expect(message).toContain('20:00')
+      expect(message).not.toContain('08:00')
+    })
+
+    it('ne casse RIEN quand l’édition n’a pas de fuseau', async () => {
+      /*
+       * Le champ est facultatif, et beaucoup d'éditions ne le renseignent pas. Sans fuseau, les
+       * utilitaires retombent sur le comportement d'avant : une heure est rendue, l'envoi se fait.
+       * Inventer un fuseau par défaut serait pire — ce serait affirmer un lieu qu'on ignore.
+       */
+      avecFuseau(null)
+
+      await handler(evenement as any)
+      await attendreLaDiffusion()
+
+      expect(creneauxDuCourriel()[0].startTime).toMatch(/^\d{2}:\d{2}$/)
+      expect(mockEnvoyerCourriel).toHaveBeenCalled()
+    })
+  })
 
   it('publie le planning AVANT de diffuser', async () => {
     /*
