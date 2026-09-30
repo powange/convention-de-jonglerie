@@ -237,6 +237,48 @@
       "action": "Se avtalen",
       "message": "Ditt konto har skapats framgångsrikt. Ta reda på mer om jongleringskongresser nära dig!",
       "title": "Välkomna! 🎉"
+    },
+    "categories": {
+      "all": "Alla kategorier",
+      "system": "System",
+      "edition": "Upplagor",
+      "volunteer": "Volontärarbete",
+      "carpool": "Samåkning",
+      "artist": "Artister",
+      "convention": "Konvent",
+      "task": "Uppgifter"
+    },
+    "page": {
+      "title": "Mina aviseringar",
+      "seo_description": "Hantera dina aviseringar och inställningar",
+      "mark_all_read": "Markera alla som lästa",
+      "new": "Ny",
+      "mark_as_read": "Markera som läst",
+      "mark_as_unread": "Markera som oläst",
+      "read_ago": "Läst {time}",
+      "load_more": "Läs in fler",
+      "adjust_filters": "Prova att ändra dina filter",
+      "nothing_yet": "Här visas dina aviseringar"
+    },
+    "status": {
+      "all": "Alla",
+      "unread": "Olästa",
+      "read": "Lästa"
+    },
+    "toasts": {
+      "refreshed_title": "Uppdaterat",
+      "refreshed": "Aviseringar uppdaterade",
+      "refresh_failed": "Aviseringarna kunde inte läsas in",
+      "all_read": "Alla aviseringar har markerats som lästa",
+      "mark_all_failed": "Aviseringarna kunde inte markeras som lästa",
+      "marked_read": "Markerad som läst",
+      "marked_unread": "Markerad som oläst",
+      "updated": "Avisering uppdaterad",
+      "update_failed": "Aviseringen kunde inte uppdateras",
+      "deleted_title": "Borttagen",
+      "deleted": "Avisering borttagen",
+      "delete_failed": "Aviseringen kunde inte tas bort",
+      "load_more_failed": "Det gick inte att läsa in fler aviseringar"
     }
   },
   "push_notifications": {

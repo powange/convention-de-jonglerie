@@ -237,6 +237,48 @@
       "action": "Conventions ansehen",
       "message": "Ihr Konto wurde erfolgreich erstellt. Entdecken Sie Jonglier-Conventions in Ihrer Nähe!",
       "title": "Willkommen! 🎉"
+    },
+    "categories": {
+      "all": "Alle Kategorien",
+      "system": "System",
+      "edition": "Ausgaben",
+      "volunteer": "Freiwilligenarbeit",
+      "carpool": "Mitfahrgelegenheiten",
+      "artist": "Künstler",
+      "convention": "Conventions",
+      "task": "Aufgaben"
+    },
+    "page": {
+      "title": "Meine Benachrichtigungen",
+      "seo_description": "Verwalte deine Benachrichtigungen und Einstellungen",
+      "mark_all_read": "Alle als gelesen markieren",
+      "new": "Neu",
+      "mark_as_read": "Als gelesen markieren",
+      "mark_as_unread": "Als ungelesen markieren",
+      "read_ago": "Gelesen {time}",
+      "load_more": "Mehr laden",
+      "adjust_filters": "Versuche, deine Filter zu ändern",
+      "nothing_yet": "Hier erscheinen deine Benachrichtigungen"
+    },
+    "status": {
+      "all": "Alle",
+      "unread": "Ungelesen",
+      "read": "Gelesen"
+    },
+    "toasts": {
+      "refreshed_title": "Aktualisiert",
+      "refreshed": "Benachrichtigungen aktualisiert",
+      "refresh_failed": "Die Benachrichtigungen konnten nicht geladen werden",
+      "all_read": "Alle Benachrichtigungen wurden als gelesen markiert",
+      "mark_all_failed": "Die Benachrichtigungen konnten nicht als gelesen markiert werden",
+      "marked_read": "Als gelesen markiert",
+      "marked_unread": "Als ungelesen markiert",
+      "updated": "Benachrichtigung aktualisiert",
+      "update_failed": "Die Benachrichtigung konnte nicht aktualisiert werden",
+      "deleted_title": "Gelöscht",
+      "deleted": "Benachrichtigung gelöscht",
+      "delete_failed": "Die Benachrichtigung konnte nicht gelöscht werden",
+      "load_more_failed": "Es konnten keine weiteren Benachrichtigungen geladen werden"
     }
   },
   "push_notifications": {

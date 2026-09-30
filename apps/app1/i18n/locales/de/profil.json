@@ -73,7 +73,9 @@
       "system_notifications": "Systembenachrichtigungen",
       "system_notifications_desc": "Wichtige Updates und Wartung",
       "volunteer_reminders": "Erinnerungen an Freiwilligenschichten",
-      "volunteer_reminders_desc": "Benachrichtigungen 30 Minuten vor Ihren Schichten"
+      "volunteer_reminders_desc": "Benachrichtigungen 30 Minuten vor Ihren Schichten",
+      "messenger_messages": "Nachrichten",
+      "messenger_messages_desc": "Nachrichten aus Team-Chats, von Teamleitungen und Organisatoren"
     },
     "oauth_password_info": "Du hast dich mit Google angemeldet. Du kannst ein Passwort festlegen, um dich mit deiner E-Mail anzumelden.",
     "optional_section_title": "Optionaler Bereich",

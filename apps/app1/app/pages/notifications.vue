@@ -86,7 +86,7 @@
             color="neutral"
             @click="clearFilters"
           >
-            Effacer
+            {{ $t('common.clear') }}
           </UButton>
         </div>
 
@@ -98,7 +98,7 @@
             :loading="notificationsStore.loading"
             @click="refreshNotifications"
           >
-            Actualiser
+            {{ $t('common.refresh') }}
           </UButton>
 
           <!-- Marquer toutes comme lues -->
@@ -107,7 +107,7 @@
             icon="i-heroicons-check"
             @click="markAllAsRead"
           >
-            Marquer toutes comme lues
+            {{ $t('notifications.page.mark_all_read') }}
           </UButton>
         </div>
       </div>
@@ -130,9 +130,9 @@
         <p class="text-gray-500 mb-2">{{ $t('notifications.none_found') }}</p>
         <p class="text-sm text-gray-400">
           {{
-            selectedStatus || selectedCategory
-              ? 'Essayez de modifier vos filtres'
-              : 'Vous recevrez ici vos notifications'
+            filtresActifs
+              ? $t('notifications.page.adjust_filters')
+              : $t('notifications.page.nothing_yet')
           }}
         </p>
       </div>
@@ -169,7 +169,7 @@
                       variant="soft"
                       class="ml-2"
                     >
-                      Nouveau
+                      {{ $t('notifications.page.new') }}
                     </UBadge>
                   </h3>
                   <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-line">
@@ -184,7 +184,11 @@
                     :icon="notification.isRead ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
                     variant="ghost"
                     size="sm"
-                    :title="notification.isRead ? 'Marquer comme non lu' : 'Marquer comme lu'"
+                    :title="
+                      notification.isRead
+                        ? $t('notifications.page.mark_as_unread')
+                        : $t('notifications.page.mark_as_read')
+                    "
                     @click="toggleReadStatus(notification)"
                   />
 
@@ -218,7 +222,11 @@
                   :title="formatDateTime(notification.readAt)"
                 >
                   <UIcon name="i-heroicons-check" class="h-3 w-3" />
-                  Lu {{ formatRelativeTime(notification.readAt) }}
+                  {{
+                    $t('notifications.page.read_ago', {
+                      time: formatRelativeTime(notification.readAt),
+                    })
+                  }}
                 </span>
               </div>
 
@@ -242,7 +250,7 @@
         class="p-6 border-t border-gray-200 dark:border-gray-700"
       >
         <UButton variant="outline" block :loading="notificationsStore.loading" @click="loadMore">
-          Charger plus
+          {{ $t('notifications.page.load_more') }}
         </UButton>
       </div>
     </UCard>
@@ -273,15 +281,15 @@ definePageMeta({
   middleware: 'auth-protected',
 })
 
-useSeoMeta({
-  title: 'Mes Notifications - Convention de Jonglerie',
-  description: 'Gérez vos notifications et préférences',
-})
-
 const notificationsStore = useNotificationsStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+useSeoMeta({
+  title: () => t('notifications.page.title'),
+  description: () => t('notifications.page.seo_description'),
+})
 
 // État réactif
 const selectedStatus = ref('all')
@@ -292,27 +300,57 @@ const stats = ref(null)
 const showDeleteModal = ref(false)
 const notificationToDelete = ref<string | null>(null)
 
-// Options statiques pour les filtres
-const statusOptions = [
-  { label: 'Toutes', value: 'all' },
-  { label: 'Non lues', value: 'false' },
-  { label: 'Lues', value: 'true' },
-]
+const statusOptions = computed(() => [
+  { label: t('notifications.status.all'), value: 'all' },
+  { label: t('notifications.status.unread'), value: 'false' },
+  { label: t('notifications.status.read'), value: 'true' },
+])
 
-const categoryOptions = [
-  { label: 'Toutes les catégories', value: 'all' },
-  { label: 'Système', value: 'system' },
-  { label: 'Éditions', value: 'edition' },
-  { label: 'Covoiturage', value: 'carpool' },
-  { label: 'Bénévolat', value: 'volunteer' },
-  { label: 'Commentaires', value: 'comment' },
-  { label: 'Favoris', value: 'favorite' },
-  { label: 'Réservations', value: 'booking' },
-  { label: 'Autres', value: 'other' },
-]
+/**
+ * Les catégories que les notifications portent RÉELLEMENT.
+ *
+ * ⚠️ CE QUE LE FILTRE PROPOSAIT AVANT. « Commentaires », « Favoris », « Réservations » et
+ * « Autres » : quatre catégories qu'aucune notification ne porte — relevé sur les 30 appels à
+ * `NotificationService.create` de `server/utils/notification-service.ts`, qui n'émettent que les
+ * sept valeurs ci-dessous. Les choisir vidait la liste, sans rien expliquer.
+ *
+ * Et il OMETTAIT « Artistes », « Conventions » et « Tâches », qui existent bel et bien : un
+ * organisateur qui ne voulait voir que les candidatures artistes ne pouvait pas filtrer.
+ *
+ * ⚠️ UNE SEULE TABLE pour le filtre ET pour le libellé affiché sous chaque notification. Les deux
+ * listes vivaient séparément, et celle du libellé ne connaissait que quatre catégories : les
+ * notifications de covoiturage, d'artistes et de tâches affichaient « carpool », « artist »,
+ * « task » en brut, sous les yeux de l'utilisateur.
+ */
+const CATEGORIES = [
+  'system',
+  'edition',
+  'volunteer',
+  'carpool',
+  'artist',
+  'convention',
+  'task',
+] as const
+
+const categoryOptions = computed(() => [
+  { label: t('notifications.categories.all'), value: 'all' },
+  ...CATEGORIES.map((categorie) => ({
+    label: t(`notifications.categories.${categorie}`),
+    value: categorie,
+  })),
+])
 
 // Computed
 const notifications = computed(() => notificationsStore.notifications)
+
+/*
+ * `selectedStatus` et `selectedCategory` valent « all » quand rien n'est filtré, et non une chaîne
+ * vide : le gabarit les testait par vérité, donc l'état vide annonçait TOUJOURS « essayez de
+ * modifier vos filtres », même sans aucun filtre posé.
+ */
+const filtresActifs = computed(
+  () => selectedStatus.value !== 'all' || selectedCategory.value !== 'all'
+)
 
 const weeklyCount = computed(() => {
   const oneWeekAgo = new Date()
@@ -378,13 +416,14 @@ const getNotificationIconColor = (type: string) => {
 }
 
 const getCategoryLabel = (category: string) => {
-  const labels: Record<string, string> = {
-    system: 'Système',
-    edition: 'Édition',
-    volunteer: 'Bénévolat',
-    other: 'Autre',
-  }
-  return labels[category] || category
+  /*
+   * Le repli sur la valeur brute est VOLONTAIRE : `category` est une colonne de texte libre, sans
+   * énumération en base. Une notification enregistrée avant ce lot peut donc porter une catégorie
+   * qui n'est plus émise — mieux vaut l'afficher telle quelle que de l'effacer.
+   */
+  return CATEGORIES.includes(category as (typeof CATEGORIES)[number])
+    ? t(`notifications.categories.${category}`)
+    : category
 }
 
 const formatDateTime = (dateString: string) => {
@@ -398,8 +437,6 @@ const formatDateTime = (dateString: string) => {
     second: '2-digit',
   })
 }
-
-const { locale } = useI18n()
 
 const formatRelativeTime = (dateString: string) => {
   const date = new Date(dateString)
@@ -443,14 +480,14 @@ const refreshNotifications = async () => {
     await loadStats()
     toast.add({
       color: 'success',
-      title: 'Actualisé',
-      description: 'Notifications mises à jour',
+      title: t('notifications.toasts.refreshed_title'),
+      description: t('notifications.toasts.refreshed'),
     })
   } catch {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de charger les notifications',
+      title: t('common.error'),
+      description: t('notifications.toasts.refresh_failed'),
     })
   }
 }
@@ -461,14 +498,14 @@ const markAllAsRead = async () => {
     await loadStats()
     toast.add({
       color: 'success',
-      title: 'Succès',
-      description: 'Toutes les notifications ont été marquées comme lues',
+      title: t('common.success'),
+      description: t('notifications.toasts.all_read'),
     })
   } catch {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de marquer les notifications comme lues',
+      title: t('common.error'),
+      description: t('notifications.toasts.mark_all_failed'),
     })
   }
 }
@@ -479,22 +516,22 @@ const toggleReadStatus = async (notification: Notification) => {
       await notificationsStore.markAsRead(notification.id)
       toast.add({
         color: 'success',
-        title: 'Marquée comme lue',
-        description: 'Notification mise à jour',
+        title: t('notifications.toasts.marked_read'),
+        description: t('notifications.toasts.updated'),
       })
     } else {
       await notificationsStore.markAsUnread(notification.id)
       toast.add({
         color: 'success',
-        title: 'Marquée comme non lue',
-        description: 'Notification mise à jour',
+        title: t('notifications.toasts.marked_unread'),
+        description: t('notifications.toasts.updated'),
       })
     }
   } catch {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de mettre à jour la notification',
+      title: t('common.error'),
+      description: t('notifications.toasts.update_failed'),
     })
   }
 }
@@ -512,14 +549,14 @@ const executeDeleteNotification = async () => {
     await loadStats()
     toast.add({
       color: 'success',
-      title: 'Supprimée',
-      description: 'Notification supprimée',
+      title: t('notifications.toasts.deleted_title'),
+      description: t('notifications.toasts.deleted'),
     })
   } catch {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de supprimer la notification',
+      title: t('common.error'),
+      description: t('notifications.toasts.delete_failed'),
     })
   } finally {
     showDeleteModal.value = false
@@ -533,8 +570,8 @@ const loadMore = async () => {
   } catch {
     toast.add({
       color: 'error',
-      title: 'Erreur',
-      description: 'Impossible de charger plus de notifications',
+      title: t('common.error'),
+      description: t('notifications.toasts.load_more_failed'),
     })
   }
 }

@@ -71,6 +71,16 @@
         "title": "Un trajet que vous aviez réservé a été supprimé"
       }
     },
+    "categories": {
+      "all": "Toutes les catégories",
+      "system": "Système",
+      "edition": "Éditions",
+      "volunteer": "Bénévolat",
+      "carpool": "Covoiturage",
+      "artist": "Artistes",
+      "convention": "Conventions",
+      "task": "Tâches"
+    },
     "common": {
       "view_details": "Voir les détails"
     },
@@ -120,6 +130,18 @@
         "title": "Vous êtes organisateur ! 🎪"
       }
     },
+    "page": {
+      "title": "Mes notifications",
+      "seo_description": "Gérez vos notifications et préférences",
+      "mark_all_read": "Marquer toutes comme lues",
+      "new": "Nouveau",
+      "mark_as_read": "Marquer comme lu",
+      "mark_as_unread": "Marquer comme non lu",
+      "read_ago": "Lu {time}",
+      "load_more": "Charger plus",
+      "adjust_filters": "Essayez de modifier vos filtres",
+      "nothing_yet": "Vous recevrez ici vos notifications"
+    },
     "push": {
       "activation_error_browser": "Impossible d'activer les notifications. Essayez avec un autre navigateur.",
       "activation_error_generic": "Une erreur est survenue lors de l'activation des notifications.",
@@ -133,6 +155,11 @@
       "not_supported": "Notifications push non supportées sur ce navigateur",
       "test_button": "Tester une notification",
       "title": "Notifications push"
+    },
+    "status": {
+      "all": "Toutes",
+      "unread": "Non lues",
+      "read": "Lues"
     },
     "system": {
       "error": {
@@ -175,6 +202,21 @@
       }
     },
     "this_week": "Cette semaine",
+    "toasts": {
+      "refreshed_title": "Actualisé",
+      "refreshed": "Notifications mises à jour",
+      "refresh_failed": "Impossible de charger les notifications",
+      "all_read": "Toutes les notifications ont été marquées comme lues",
+      "mark_all_failed": "Impossible de marquer les notifications comme lues",
+      "marked_read": "Marquée comme lue",
+      "marked_unread": "Marquée comme non lue",
+      "updated": "Notification mise à jour",
+      "update_failed": "Impossible de mettre à jour la notification",
+      "deleted_title": "Supprimée",
+      "deleted": "Notification supprimée",
+      "delete_failed": "Impossible de supprimer la notification",
+      "load_more_failed": "Impossible de charger plus de notifications"
+    },
     "unread": "Non lues",
     "volunteer": {
       "application_accepted": {

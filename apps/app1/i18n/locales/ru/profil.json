@@ -73,7 +73,9 @@
       "system_notifications": "Системные уведомления",
       "system_notifications_desc": "Важные обновления и обслуживание",
       "volunteer_reminders": "Напоминания о сменах волонтёров",
-      "volunteer_reminders_desc": "Уведомления за 30 минут до ваших смен"
+      "volunteer_reminders_desc": "Уведомления за 30 минут до ваших смен",
+      "messenger_messages": "Сообщения",
+      "messenger_messages_desc": "Сообщения из командных чатов, от ответственных и от организаторов"
     },
     "oauth_password_info": "Вы вошли через Google. Вы можете установить пароль для входа с помощью электронной почты.",
     "optional_section_title": "Дополнительный раздел",

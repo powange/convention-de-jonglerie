@@ -73,7 +73,9 @@
       "system_notifications": "Powiadomienia systemowe",
       "system_notifications_desc": "Ważne aktualizacje i konserwacja",
       "volunteer_reminders": "Przypomnienia o zmianach wolontariackich",
-      "volunteer_reminders_desc": "Powiadomienia 30 minut przed Twoimi zmianami"
+      "volunteer_reminders_desc": "Powiadomienia 30 minut przed Twoimi zmianami",
+      "messenger_messages": "Wiadomości",
+      "messenger_messages_desc": "Wiadomości z czatów zespołowych, od liderów i od organizatorów"
     },
     "oauth_password_info": "Zalogowałeś się przez Google. Możesz ustawić hasło, aby logować się za pomocą swojego adresu e-mail.",
     "optional_section_title": "Sekcja opcjonalna",

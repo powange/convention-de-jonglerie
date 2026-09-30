@@ -237,6 +237,48 @@
       "action": "Viz dohody",
       "message": "Váš účet byl úspěšně vytvořen. Zjistěte informace o žonglérských sjezdech ve vašem okolí!",
       "title": "Vítejte! 🎉"
+    },
+    "categories": {
+      "all": "Všechny kategorie",
+      "system": "Systém",
+      "edition": "Ročníky",
+      "volunteer": "Dobrovolnictví",
+      "carpool": "Spolujízda",
+      "artist": "Umělci",
+      "convention": "Konvence",
+      "task": "Úkoly"
+    },
+    "page": {
+      "title": "Moje oznámení",
+      "seo_description": "Správa vašich oznámení a předvoleb",
+      "mark_all_read": "Označit vše jako přečtené",
+      "new": "Nové",
+      "mark_as_read": "Označit jako přečtené",
+      "mark_as_unread": "Označit jako nepřečtené",
+      "read_ago": "Přečteno {time}",
+      "load_more": "Načíst další",
+      "adjust_filters": "Zkuste změnit filtry",
+      "nothing_yet": "Zde se budou zobrazovat vaše oznámení"
+    },
+    "status": {
+      "all": "Všechna",
+      "unread": "Nepřečtená",
+      "read": "Přečtená"
+    },
+    "toasts": {
+      "refreshed_title": "Aktualizováno",
+      "refreshed": "Oznámení aktualizována",
+      "refresh_failed": "Oznámení se nepodařilo načíst",
+      "all_read": "Všechna oznámení byla označena jako přečtená",
+      "mark_all_failed": "Oznámení se nepodařilo označit jako přečtená",
+      "marked_read": "Označeno jako přečtené",
+      "marked_unread": "Označeno jako nepřečtené",
+      "updated": "Oznámení aktualizováno",
+      "update_failed": "Oznámení se nepodařilo aktualizovat",
+      "deleted_title": "Smazáno",
+      "deleted": "Oznámení smazáno",
+      "delete_failed": "Oznámení se nepodařilo smazat",
+      "load_more_failed": "Další oznámení se nepodařilo načíst"
     }
   },
   "push_notifications": {

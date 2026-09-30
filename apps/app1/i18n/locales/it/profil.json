@@ -73,7 +73,9 @@
       "system_notifications": "Notifiche di sistema",
       "system_notifications_desc": "Aggiornamenti importanti e manutenzione",
       "volunteer_reminders": "Promemoria turni volontari",
-      "volunteer_reminders_desc": "Notifiche 30 minuti prima dei tuoi turni"
+      "volunteer_reminders_desc": "Notifiche 30 minuti prima dei tuoi turni",
+      "messenger_messages": "Messaggi",
+      "messenger_messages_desc": "Messaggi delle chat di squadra, dei responsabili e degli organizzatori"
     },
     "oauth_password_info": "Hai effettuato l'accesso con Google. Puoi impostare una password per accedere con la tua email.",
     "optional_section_title": "Sezione opzionale",

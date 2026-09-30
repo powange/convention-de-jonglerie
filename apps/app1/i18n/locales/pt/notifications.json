@@ -237,6 +237,48 @@
       "action": "Ver convenções",
       "message": "A sua conta foi criada com sucesso. Descubra convenções de malabarismo perto de si!",
       "title": "Bem-vindo! 🎉"
+    },
+    "categories": {
+      "all": "Todas as categorias",
+      "system": "Sistema",
+      "edition": "Edições",
+      "volunteer": "Voluntariado",
+      "carpool": "Partilha de viagem",
+      "artist": "Artistas",
+      "convention": "Convenções",
+      "task": "Tarefas"
+    },
+    "page": {
+      "title": "As minhas notificações",
+      "seo_description": "Gerir as suas notificações e preferências",
+      "mark_all_read": "Marcar todas como lidas",
+      "new": "Nova",
+      "mark_as_read": "Marcar como lida",
+      "mark_as_unread": "Marcar como não lida",
+      "read_ago": "Lida {time}",
+      "load_more": "Carregar mais",
+      "adjust_filters": "Tente alterar os seus filtros",
+      "nothing_yet": "As suas notificações aparecerão aqui"
+    },
+    "status": {
+      "all": "Todas",
+      "unread": "Não lidas",
+      "read": "Lidas"
+    },
+    "toasts": {
+      "refreshed_title": "Atualizado",
+      "refreshed": "Notificações atualizadas",
+      "refresh_failed": "Não foi possível carregar as notificações",
+      "all_read": "Todas as notificações foram marcadas como lidas",
+      "mark_all_failed": "Não foi possível marcar as notificações como lidas",
+      "marked_read": "Marcada como lida",
+      "marked_unread": "Marcada como não lida",
+      "updated": "Notificação atualizada",
+      "update_failed": "Não foi possível atualizar a notificação",
+      "deleted_title": "Eliminada",
+      "deleted": "Notificação eliminada",
+      "delete_failed": "Não foi possível eliminar a notificação",
+      "load_more_failed": "Não foi possível carregar mais notificações"
     }
   },
   "push_notifications": {

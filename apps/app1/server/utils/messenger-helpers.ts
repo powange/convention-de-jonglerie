@@ -2,11 +2,191 @@ import type { PrismaTransaction } from '#server/types/prisma-helpers'
 
 import { utilisateursResponsablesDeLEquipe } from '#server/utils/editions/volunteers/responsables-equipe'
 
+/** Un fil privé avec les responsables, réduit à ce qui sert à le reconnaître. */
+type FilDeResponsables = {
+  id: string
+  participants: { id: string; userId: number; leftAt: Date | null }[]
+}
+
+/** Deux ensembles d'identifiants sont-ils exactement les mêmes ? */
+function memeEnsemble(identifiants: number[], attendus: Set<number>): boolean {
+  return identifiants.length === attendus.size && identifiants.every((id) => attendus.has(id))
+}
+
 /**
- * Crée ou récupère les conversations pour une personne rattachée à une équipe.
+ * Crée ou récupère les conversations d'équipe pour PLUSIEURS personnes d'un coup.
  *
- * Sert aussi bien à un bénévole assigné qu'à un organisateur rattaché : c'est la place dans
+ * Sert aussi bien à des bénévoles assignés qu'à des organisateurs rattachés : c'est la place dans
  * l'équipe qui donne accès à sa conversation, pas le titre auquel on l'occupe.
+ *
+ * ⚠️ POURQUOI UNE VERSION EN LOT. L'ouverture de la discussion d'équipe appelait la version à une
+ * personne pour CHACUN des membres acceptés, à chaque clic. Chaque appel coûtait de quatre à huit
+ * requêtes, dont un `findMany` sur tous les fils privés de l'équipe avec leurs participants —
+ * requête identique d'un membre au suivant. Pour une équipe de quarante personnes, un clic
+ * valait ≈ 250 requêtes séquentielles.
+ *
+ * Ici, ce qui ne dépend pas du membre est chargé UNE fois : la conversation de groupe, ses
+ * participants, les responsables de l'équipe, et les fils privés existants. Ne restent par membre
+ * que les écritures réellement nécessaires. Une équipe déjà synchronisée coûte cinq requêtes.
+ *
+ * ⚠️ CE QUE CE RATTRAPAGE EST LE SEUL À FAIRE, et pourquoi on ne peut pas se contenter de
+ * « n'appeler la synchronisation que pour les membres absents du groupe ». Les participants du
+ * groupe sont bien posés à l'affectation (`teams.ts`), mais nommer un responsable ne passe PAS
+ * par là : `setTeamLeader` se borne à écrire `isLeader`. Les fils privés « membre ⇄ responsables »
+ * des membres déjà en place ne sont donc créés par personne — sauf ici. Sauter un membre au motif
+ * qu'il est déjà participant du groupe lui retirerait son fil avec ses responsables, sans erreur
+ * et sans que rien ne le signale. D'où le passage sur TOUS les membres, mais à coût constant.
+ *
+ * @param editionId - ID de l'édition
+ * @param teamId - ID de l'équipe
+ * @param userIds - les personnes concernées
+ * @param tx - Transaction Prisma optionnelle
+ */
+export async function assurerConversationsEquipeDesMembres(
+  editionId: number,
+  teamId: string,
+  userIds: number[],
+  tx?: PrismaTransaction
+) {
+  const client = tx || prisma
+  const membres = [...new Set(userIds)]
+  if (membres.length === 0) return
+
+  // 1. Créer ou récupérer la conversation de groupe de l'équipe
+  let conversationDeGroupe = await client.conversation.findFirst({
+    where: {
+      editionId,
+      teamId,
+      type: 'TEAM_GROUP',
+    },
+  })
+
+  if (!conversationDeGroupe) {
+    conversationDeGroupe = await client.conversation.create({
+      data: {
+        editionId,
+        teamId,
+        type: 'TEAM_GROUP',
+      },
+    })
+  }
+
+  // Figé dans une constante : `conversationDeGroupe` est un `let`, et le typage le rend de nouveau
+  // nullable dès qu'on le lit depuis une fermeture.
+  const idDuGroupe = conversationDeGroupe.id
+
+  // 2. Les participants du groupe, pour tous les membres à la fois
+  const participants = await client.conversationParticipant.findMany({
+    where: { conversationId: idDuGroupe, userId: { in: membres } },
+    select: { id: true, userId: true, leftAt: true },
+  })
+  const dejaInscrits = new Set(participants.map((participant) => participant.userId))
+
+  const aInscrire = membres.filter((userId) => !dejaInscrits.has(userId))
+  if (aInscrire.length > 0) {
+    /*
+     * `skipDuplicates` : deux ouvertures simultanées de la même discussion d'équipe passeraient
+     * ici avec la même liste. La contrainte d'unicité (conversationId, userId) ferait échouer la
+     * seconde, et l'ouverture rendrait 500 à qui n'a rien fait de mal.
+     */
+    await client.conversationParticipant.createMany({
+      data: aInscrire.map((userId) => ({ conversationId: idDuGroupe, userId })),
+      skipDuplicates: true,
+    })
+  }
+
+  // Ceux qui avaient été retirés de l'équipe puis réintégrés reprennent leur place. Une seule
+  // écriture pour tout le monde — c'est `leftAt` qui gouverne la lecture du fil.
+  const aReactiver = participants
+    .filter((participant) => participant.leftAt)
+    .map((participant) => participant.id)
+  if (aReactiver.length > 0) {
+    await client.conversationParticipant.updateMany({
+      where: { id: { in: aReactiver } },
+      data: { leftAt: null },
+    })
+  }
+
+  // 3. Les responsables de l'équipe — bénévoles acceptés comme organisateurs rattachés, les deux
+  // titres se valent. Une seule fois : ils sont les mêmes pour tous les membres.
+  const responsables = await utilisateursResponsablesDeLEquipe(editionId, teamId, tx)
+  if (responsables.length === 0) return
+
+  // 4. Les fils privés déjà existants, avec leurs participants — une seule requête là où il y en
+  // avait une par membre.
+  const filsExistants: FilDeResponsables[] = await client.conversation.findMany({
+    where: {
+      editionId,
+      teamId,
+      type: 'TEAM_LEADER_PRIVATE',
+    },
+    select: {
+      id: true,
+      participants: { select: { id: true, userId: true, leftAt: true } },
+    },
+  })
+
+  const participantsActifs = (fil: FilDeResponsables) =>
+    fil.participants.filter((participant) => !participant.leftAt).map((p) => p.userId)
+
+  for (const membre of membres) {
+    // Le membre et ses responsables, lui-même retiré de la liste s'il en est.
+    const attendus = new Set([membre, ...responsables.filter((chef) => chef !== membre)])
+
+    // Seul responsable de son équipe : il n'a personne à qui écrire en privé.
+    if (attendus.size === 1) continue
+
+    /*
+     * La reconnaissance se fait sur les participants ACTIFS, comme avant : un fil dont un
+     * responsable est parti ne correspond plus, et un nouveau est créé à côté. C'est le
+     * comportement existant, conservé tel quel.
+     *
+     * 📍 La version précédente portait, dans la branche « fil trouvé », une réactivation des
+     * participants partis. Elle ne pouvait JAMAIS s'exécuter : si le fil correspond, c'est que ses
+     * participants actifs sont exactement les attendus — donc tout participant marqué parti est
+     * hors de cette liste, et la condition était toujours fausse. Elle n'est pas reprise ici. Le
+     * défaut qu'elle visait (un fil abandonné et un doublon créé quand un responsable revient)
+     * reste entier ; le traiter change la conversation où les gens atterrissent, donc c'est une
+     * décision à part.
+     */
+    const fil = filsExistants.find((candidat) =>
+      memeEnsemble(participantsActifs(candidat), attendus)
+    )
+    if (fil) continue
+
+    const cree: FilDeResponsables = await client.conversation.create({
+      data: {
+        editionId,
+        teamId,
+        type: 'TEAM_LEADER_PRIVATE',
+        participants: {
+          create: [...attendus].map((userId) => ({ userId })),
+        },
+      },
+      select: {
+        id: true,
+        participants: { select: { id: true, userId: true, leftAt: true } },
+      },
+    })
+
+    /*
+     * ⚠️ AJOUTER LE FIL CRÉÉ À LA LISTE EN MÉMOIRE, ET NON SEULEMENT EN BASE. Deux responsables
+     * d'une même équipe attendent le MÊME fil : pour A, c'est {A, B} ; pour B, {B, A}. La version
+     * à une personne relisait la base à chaque appel et retrouvait donc celui que l'appel
+     * précédent venait de créer. Ici la liste est lue une seule fois — sans cette ligne, le second
+     * responsable en créerait un DOUBLON, et les deux se retrouveraient chacun dans un fil
+     * distinct où l'autre ne lirait jamais rien.
+     */
+    filsExistants.push(cree)
+  }
+}
+
+/**
+ * Crée ou récupère les conversations pour UNE personne rattachée à une équipe.
+ *
+ * Appelée à l'affectation d'un bénévole ou au rattachement d'un organisateur, où il n'y a qu'une
+ * personne à traiter. Le travail est celui de [assurerConversationsEquipeDesMembres], dont ceci
+ * n'est que le cas à un élément.
  *
  * @param editionId - ID de l'édition
  * @param teamId - ID de l'équipe
@@ -19,123 +199,7 @@ export async function ensureVolunteerConversations(
   userId: number,
   tx?: PrismaTransaction
 ) {
-  const client = tx || prisma
-
-  // 1. Créer ou récupérer la conversation de groupe de l'équipe
-  let teamGroupConversation = await client.conversation.findFirst({
-    where: {
-      editionId,
-      teamId,
-      type: 'TEAM_GROUP',
-    },
-  })
-
-  if (!teamGroupConversation) {
-    teamGroupConversation = await client.conversation.create({
-      data: {
-        editionId,
-        teamId,
-        type: 'TEAM_GROUP',
-      },
-    })
-  }
-
-  // Ajouter l'utilisateur comme participant s'il n'est pas déjà participant
-  const existingParticipant = await client.conversationParticipant.findFirst({
-    where: {
-      conversationId: teamGroupConversation.id,
-      userId,
-    },
-  })
-
-  if (!existingParticipant) {
-    await client.conversationParticipant.create({
-      data: {
-        conversationId: teamGroupConversation.id,
-        userId,
-      },
-    })
-  } else if (existingParticipant.leftAt) {
-    // Si l'utilisateur avait quitté, on le réactive
-    await client.conversationParticipant.update({
-      where: { id: existingParticipant.id },
-      data: { leftAt: null },
-    })
-  }
-
-  // 2. Trouver tous les responsables de l'équipe — bénévoles acceptés comme organisateurs
-  // rattachés, les deux titres se valent.
-  const responsables = await utilisateursResponsablesDeLEquipe(editionId, teamId, tx)
-
-  // Filtrer pour exclure l'utilisateur actuel s'il est lui-même responsable
-  const leaderUserIds = responsables.filter((leaderId) => leaderId !== userId)
-
-  // Si il y a au moins un responsable différent de l'utilisateur
-  if (leaderUserIds.length > 0) {
-    // 3. Créer ou récupérer la conversation privée avec les responsables
-    // Tous les participants attendus : l'utilisateur + tous les responsables
-    const expectedParticipantIds = [userId, ...leaderUserIds].sort()
-
-    // Chercher une conversation existante avec exactement ces participants
-    const existingConversations = await client.conversation.findMany({
-      where: {
-        editionId,
-        teamId,
-        type: 'TEAM_LEADER_PRIVATE',
-      },
-      include: {
-        participants: {
-          where: {
-            leftAt: null, // Uniquement les participants actifs
-          },
-          select: {
-            userId: true,
-          },
-        },
-      },
-    })
-
-    // Trouver une conversation qui a exactement les bons participants
-    let leaderConversation = existingConversations.find((conv) => {
-      const actualParticipantIds = conv.participants.map((p) => p.userId).sort()
-      return (
-        actualParticipantIds.length === expectedParticipantIds.length &&
-        actualParticipantIds.every((id, index) => id === expectedParticipantIds[index])
-      )
-    })
-
-    if (!leaderConversation) {
-      // Créer une nouvelle conversation avec tous les participants
-      leaderConversation = await client.conversation.create({
-        data: {
-          editionId,
-          teamId,
-          type: 'TEAM_LEADER_PRIVATE',
-          participants: {
-            create: expectedParticipantIds.map((participantUserId) => ({
-              userId: participantUserId,
-            })),
-          },
-        },
-      })
-    } else {
-      // Vérifier que tous les participants sont actifs et les réactiver si nécessaire
-      const allParticipants = await client.conversationParticipant.findMany({
-        where: {
-          conversationId: leaderConversation.id,
-        },
-      })
-
-      for (const participant of allParticipants) {
-        if (participant.leftAt && expectedParticipantIds.includes(participant.userId)) {
-          await client.conversationParticipant.update({
-            where: { id: participant.id },
-            data: { leftAt: null },
-          })
-        }
-      }
-    }
-  }
+  await assurerConversationsEquipeDesMembres(editionId, teamId, [userId], tx)
 }
 
 /**

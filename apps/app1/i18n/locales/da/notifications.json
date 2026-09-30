@@ -237,6 +237,48 @@
       "action": "Se festivaler",
       "message": "Din konto er blevet oprettet. Opdag jongleringsfestivaler tæt på dig!",
       "title": "Velkommen! 🎉"
+    },
+    "categories": {
+      "all": "Alle kategorier",
+      "system": "System",
+      "edition": "Udgaver",
+      "volunteer": "Frivilligt arbejde",
+      "carpool": "Samkørsel",
+      "artist": "Artister",
+      "convention": "Conventions",
+      "task": "Opgaver"
+    },
+    "page": {
+      "title": "Mine notifikationer",
+      "seo_description": "Administrer dine notifikationer og indstillinger",
+      "mark_all_read": "Marker alle som læst",
+      "new": "Ny",
+      "mark_as_read": "Marker som læst",
+      "mark_as_unread": "Marker som ulæst",
+      "read_ago": "Læst {time}",
+      "load_more": "Indlæs flere",
+      "adjust_filters": "Prøv at ændre dine filtre",
+      "nothing_yet": "Dine notifikationer vises her"
+    },
+    "status": {
+      "all": "Alle",
+      "unread": "Ulæste",
+      "read": "Læste"
+    },
+    "toasts": {
+      "refreshed_title": "Opdateret",
+      "refreshed": "Notifikationer opdateret",
+      "refresh_failed": "Notifikationerne kunne ikke indlæses",
+      "all_read": "Alle notifikationer er markeret som læst",
+      "mark_all_failed": "Notifikationerne kunne ikke markeres som læst",
+      "marked_read": "Markeret som læst",
+      "marked_unread": "Markeret som ulæst",
+      "updated": "Notifikation opdateret",
+      "update_failed": "Notifikationen kunne ikke opdateres",
+      "deleted_title": "Slettet",
+      "deleted": "Notifikation slettet",
+      "delete_failed": "Notifikationen kunne ikke slettes",
+      "load_more_failed": "Der kunne ikke indlæses flere notifikationer"
     }
   },
   "push_notifications": {

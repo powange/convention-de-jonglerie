@@ -73,7 +73,9 @@
       "system_notifications": "Systeemmeldingen",
       "system_notifications_desc": "Belangrijke updates en onderhoud",
       "volunteer_reminders": "Herinneringen vrijwilligersdiensten",
-      "volunteer_reminders_desc": "Meldingen 30 minuten voor uw diensten"
+      "volunteer_reminders_desc": "Meldingen 30 minuten voor uw diensten",
+      "messenger_messages": "Berichten",
+      "messenger_messages_desc": "Berichten uit teamgesprekken, van teamleiders en organisatoren"
     },
     "oauth_password_info": "Je bent ingelogd met Google. Je kunt een wachtwoord instellen om in te loggen met je e-mail.",
     "optional_section_title": "Optionele sectie",

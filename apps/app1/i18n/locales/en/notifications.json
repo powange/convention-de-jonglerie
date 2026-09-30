@@ -237,6 +237,48 @@
       "action": "View conventions",
       "message": "Your account has been successfully created. Discover juggling conventions near you!",
       "title": "Welcome! 🎉"
+    },
+    "categories": {
+      "all": "All categories",
+      "system": "System",
+      "edition": "Editions",
+      "volunteer": "Volunteering",
+      "carpool": "Carpooling",
+      "artist": "Artists",
+      "convention": "Conventions",
+      "task": "Tasks"
+    },
+    "page": {
+      "title": "My notifications",
+      "seo_description": "Manage your notifications and preferences",
+      "mark_all_read": "Mark all as read",
+      "new": "New",
+      "mark_as_read": "Mark as read",
+      "mark_as_unread": "Mark as unread",
+      "read_ago": "Read {time}",
+      "load_more": "Load more",
+      "adjust_filters": "Try adjusting your filters",
+      "nothing_yet": "Your notifications will appear here"
+    },
+    "status": {
+      "all": "All",
+      "unread": "Unread",
+      "read": "Read"
+    },
+    "toasts": {
+      "refreshed_title": "Refreshed",
+      "refreshed": "Notifications updated",
+      "refresh_failed": "Could not load the notifications",
+      "all_read": "All notifications have been marked as read",
+      "mark_all_failed": "Could not mark the notifications as read",
+      "marked_read": "Marked as read",
+      "marked_unread": "Marked as unread",
+      "updated": "Notification updated",
+      "update_failed": "Could not update the notification",
+      "deleted_title": "Deleted",
+      "deleted": "Notification deleted",
+      "delete_failed": "Could not delete the notification",
+      "load_more_failed": "Could not load more notifications"
     }
   },
   "push_notifications": {

@@ -237,6 +237,48 @@
       "action": "Zobacz konwencje",
       "message": "Twoje konto zostało pomyślnie utworzone. Odkryj konwencje żonglerskie w Twojej okolicy!",
       "title": "Witamy! 🎉"
+    },
+    "categories": {
+      "all": "Wszystkie kategorie",
+      "system": "System",
+      "edition": "Edycje",
+      "volunteer": "Wolontariat",
+      "carpool": "Wspólne przejazdy",
+      "artist": "Artyści",
+      "convention": "Konwenty",
+      "task": "Zadania"
+    },
+    "page": {
+      "title": "Moje powiadomienia",
+      "seo_description": "Zarządzaj powiadomieniami i preferencjami",
+      "mark_all_read": "Oznacz wszystkie jako przeczytane",
+      "new": "Nowe",
+      "mark_as_read": "Oznacz jako przeczytane",
+      "mark_as_unread": "Oznacz jako nieprzeczytane",
+      "read_ago": "Przeczytane {time}",
+      "load_more": "Wczytaj więcej",
+      "adjust_filters": "Spróbuj zmienić filtry",
+      "nothing_yet": "Tutaj pojawią się Twoje powiadomienia"
+    },
+    "status": {
+      "all": "Wszystkie",
+      "unread": "Nieprzeczytane",
+      "read": "Przeczytane"
+    },
+    "toasts": {
+      "refreshed_title": "Odświeżono",
+      "refreshed": "Powiadomienia zaktualizowane",
+      "refresh_failed": "Nie udało się wczytać powiadomień",
+      "all_read": "Wszystkie powiadomienia zostały oznaczone jako przeczytane",
+      "mark_all_failed": "Nie udało się oznaczyć powiadomień jako przeczytanych",
+      "marked_read": "Oznaczone jako przeczytane",
+      "marked_unread": "Oznaczone jako nieprzeczytane",
+      "updated": "Powiadomienie zaktualizowane",
+      "update_failed": "Nie udało się zaktualizować powiadomienia",
+      "deleted_title": "Usunięte",
+      "deleted": "Powiadomienie usunięte",
+      "delete_failed": "Nie udało się usunąć powiadomienia",
+      "load_more_failed": "Nie udało się wczytać kolejnych powiadomień"
     }
   },
   "push_notifications": {

@@ -73,7 +73,9 @@
       "system_notifications": "System notifications",
       "system_notifications_desc": "Important updates and maintenance",
       "volunteer_reminders": "Volunteer slot reminders",
-      "volunteer_reminders_desc": "Notifications 30 minutes before your slots"
+      "volunteer_reminders_desc": "Notifications 30 minutes before your slots",
+      "messenger_messages": "Messages",
+      "messenger_messages_desc": "Messages from team chats, team leaders and organisers"
     },
     "oauth_password_info": "You signed in with Google. You can set a password to sign in with your email.",
     "optional_section_title": "Optional Information",
