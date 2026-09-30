@@ -54,6 +54,11 @@
         "action": "View conversation",
         "message": "{commenterName} wrote a message",
         "title": "New carpool message 💬"
+      },
+      "booking_revoked": {
+        "action": "Look for another ride",
+        "message": "{ownerName} has removed your seat ({seats}) on the trip from {locationCity}",
+        "title": "Your seat has been removed"
       }
     },
     "common": {

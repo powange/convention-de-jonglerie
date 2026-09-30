@@ -75,7 +75,10 @@
       "trip_date": "Trip date",
       "view_comments": "View comments ({count})",
       "offer_load_error": "This offer could not be loaded",
-      "request_load_error": "This request could not be loaded"
+      "request_load_error": "This request could not be loaded",
+      "revoke_seat": "Remove",
+      "revoke_seat_description": "{pseudo} has a confirmed seat on this trip and will be notified of the removal. You will not be able to give it back: a new request will be required.",
+      "revoke_seat_title": "Remove this seat?"
     },
     "convention_form": {
       "click_to_select_image": "Click to select an image",

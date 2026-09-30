@@ -54,6 +54,11 @@
         "action": "Zobrazit konverzaci",
         "message": "{commenterName} napsal zprávu",
         "title": "Nová zpráva ke spolujízdě 💬"
+      },
+      "booking_revoked": {
+        "action": "Najít jinou jízdu",
+        "message": "{ownerName} ti odebral místo ({seats}) na jízdě z {locationCity}",
+        "title": "Vaše místo bylo odebráno"
       }
     },
     "common": {

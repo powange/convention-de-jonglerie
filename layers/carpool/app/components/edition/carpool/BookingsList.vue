@@ -30,7 +30,20 @@
             "
             >{{ b.status }}</UBadge
           >
-          <template v-else>
+          <!-- Retirer une place déjà accordée. Le conducteur ne pouvait pas le faire : il ne lui
+               restait qu'à supprimer l'offre entière, ce qui prévient tout le monde pour retirer
+               une seule personne. Le bouton est discret (`ghost`) à côté du badge « accepté » :
+               c'est une exception, pas l'action ordinaire de cette ligne. -->
+          <UButton
+            v-if="b.status === 'ACCEPTED'"
+            size="xs"
+            color="error"
+            variant="ghost"
+            :loading="isUpdating(b.id)"
+            @click="demanderLeRetrait(b)"
+            >{{ $t('components.carpool.revoke_seat') }}</UButton
+          >
+          <template v-if="b.status === 'PENDING'">
             <UButton
               size="xs"
               color="success"
@@ -51,6 +64,33 @@
         </div>
       </div>
     </div>
+
+    <!-- Le retrait est SANS RETOUR : le serveur n'autorise `ACCEPT` que depuis « en attente », donc
+         une place retirée ne peut pas être rendue — le passager doit refaire une demande. Un bouton
+         à un clic, collé au badge « accepté », ne va pas avec une action irréversible qui prévient
+         quelqu'un. D'où cette confirmation, qui nomme la personne concernée. -->
+    <UModal
+      v-model:open="retraitADemander"
+      :title="$t('components.carpool.revoke_seat_title')"
+      :description="
+        $t('components.carpool.revoke_seat_description', {
+          pseudo: reservationARetirer?.requester?.pseudo ?? '',
+        })
+      "
+    >
+      <template #footer>
+        <div class="flex justify-end gap-2 w-full">
+          <UButton color="neutral" variant="ghost" @click="retraitADemander = false">
+            {{ $t('common.cancel') }}
+          </UButton>
+          <!-- Pas de `loading` ici : la modale se referme au clic, et c'est le bouton de la ligne
+               qui porte l'attente — celle-ci reste visible, la modale non. -->
+          <UButton color="error" @click="confirmerLeRetrait">
+            {{ $t('components.carpool.revoke_seat') }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -89,5 +129,23 @@ const { execute: executeUpdate, isLoading: isUpdating } = useApiActionById(
 const update = (bookingId: number, action: 'ACCEPT' | 'REJECT' | 'CANCEL') => {
   pendingAction.value = action
   executeUpdate(bookingId)
+}
+
+const retraitADemander = ref(false)
+const reservationARetirer = ref<any>(null)
+
+const demanderLeRetrait = (booking: any) => {
+  reservationARetirer.value = booking
+  retraitADemander.value = true
+}
+
+const confirmerLeRetrait = () => {
+  const booking = reservationARetirer.value
+  if (!booking) return
+  // Refermer d'abord : `load()` remplace le tableau, et garder une référence vers l'ancienne ligne
+  // ferait afficher un nom qui n'est plus celui de la liste.
+  retraitADemander.value = false
+  reservationARetirer.value = null
+  update(booking.id, 'REJECT')
 }
 </script>

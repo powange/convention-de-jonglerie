@@ -54,6 +54,11 @@
         "action": "Ver a conversa",
         "message": "{commenterName} escreveu uma mensagem",
         "title": "Nova mensagem de partilha de carro 💬"
+      },
+      "booking_revoked": {
+        "action": "Procurar outra viagem",
+        "message": "{ownerName} retirou o seu lugar ({seats}) na viagem a partir de {locationCity}",
+        "title": "O seu lugar foi retirado"
       }
     },
     "common": {

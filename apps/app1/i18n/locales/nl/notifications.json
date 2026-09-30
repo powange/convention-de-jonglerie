@@ -54,6 +54,11 @@
         "action": "Gesprek bekijken",
         "message": "{commenterName} heeft een bericht geschreven",
         "title": "Nieuw carpoolbericht 💬"
+      },
+      "booking_revoked": {
+        "action": "Een andere rit zoeken",
+        "message": "{ownerName} heeft je plaats ({seats}) op de rit vanuit {locationCity} verwijderd",
+        "title": "Je plaats is verwijderd"
       }
     },
     "common": {

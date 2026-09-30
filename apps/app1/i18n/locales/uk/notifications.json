@@ -54,6 +54,11 @@
         "action": "Переглянути переписку",
         "message": "{commenterName} написав повідомлення",
         "title": "Нове повідомлення про поїздку 💬"
+      },
+      "booking_revoked": {
+        "action": "Знайти іншу поїздку",
+        "message": "{ownerName} прибрав ваше місце ({seats}) у поїздці з {locationCity}",
+        "title": "Ваше місце прибрано"
       }
     },
     "common": {

@@ -75,7 +75,10 @@
       "trip_date": "Data da viagem",
       "view_comments": "Ver comentários ({count})",
       "offer_load_error": "Não foi possível carregar esta oferta",
-      "request_load_error": "Não foi possível carregar este pedido"
+      "request_load_error": "Não foi possível carregar este pedido",
+      "revoke_seat": "Retirar",
+      "revoke_seat_description": "{pseudo} tem um lugar confirmado nesta viagem e será notificado da retirada. Não poderá devolvê-lo: será necessário um novo pedido.",
+      "revoke_seat_title": "Retirar este lugar?"
     },
     "convention_form": {
       "click_to_select_image": "Clique para seleccionar uma imagem",

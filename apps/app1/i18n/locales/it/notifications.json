@@ -54,6 +54,11 @@
         "action": "Vedi la conversazione",
         "message": "{commenterName} ha scritto un messaggio",
         "title": "Nuovo messaggio di car sharing 💬"
+      },
+      "booking_revoked": {
+        "action": "Cercare un altro viaggio",
+        "message": "{ownerName} ha rimosso il tuo posto ({seats}) sul viaggio da {locationCity}",
+        "title": "Il tuo posto è stato rimosso"
       }
     },
     "common": {

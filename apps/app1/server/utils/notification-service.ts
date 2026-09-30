@@ -776,6 +776,47 @@ export const NotificationHelpers = {
   /**
    * Notification de demande de covoiturage refusée
    */
+  /**
+   * Notification de place RETIRÉE après avoir été accordée.
+   *
+   * ⚠️ Distinct de `carpoolBookingRejected`, et le message l'est aussi : un refus répond à une
+   * demande en attente, un retrait défait une place déjà promise. Le passager avait organisé son
+   * trajet autour ; lui dire « votre demande a été refusée » serait faux et lui laisserait croire
+   * qu'il n'avait jamais eu de place.
+   */
+  async carpoolBookingRevoked(
+    userId: number,
+    ownerName: string,
+    offerId: number,
+    seats: number,
+    locationCity: string
+  ) {
+    const offer = await prisma.carpoolOffer.findUnique({
+      where: { id: offerId },
+      select: { editionId: true },
+    })
+
+    const actionUrl = offer
+      ? `/editions/${offer.editionId}/carpool/offers/${offerId}`
+      : `/carpool-offers/${offerId}`
+
+    return await NotificationService.create({
+      userId,
+      // `WARNING` comme un refus : c'est une mauvaise nouvelle qui demande d'agir — retrouver un
+      // autre trajet —, pas une simple information.
+      type: 'WARNING',
+      titleKey: 'notifications.carpool.booking_revoked.title',
+      messageKey: 'notifications.carpool.booking_revoked.message',
+      translationParams: { ownerName, seats, locationCity },
+      actionTextKey: 'notifications.carpool.booking_revoked.action',
+      category: 'carpool',
+      entityType: 'CarpoolOffer',
+      entityId: offerId.toString(),
+      actionUrl,
+      notificationType: 'carpool_booking_revoked',
+    })
+  },
+
   async carpoolBookingRejected(
     userId: number,
     ownerName: string,
