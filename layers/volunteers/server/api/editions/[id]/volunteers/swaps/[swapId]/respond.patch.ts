@@ -129,35 +129,50 @@ export default wrapApiHandler(
     }
 
     /**
-     * Les organisateurs habilités à gérer les bénévoles de cette édition.
+     * Ceux qui peuvent TRANCHER cet échange, et qu'il faut donc prévenir.
      *
-     * Le droit se porte soit sur la convention entière, soit par édition : les deux sources sont
-     * réunies, et un même compte présent dans les deux n'est prévenu qu'une fois.
+     * ⚠️ CETTE LISTE ÉTAIT RECOMPOSÉE À LA MAIN, et elle oubliait deux personnes :
+     * `edition.creatorId` et `convention.authorId`. Or `requireVolunteerManagementAccess` les
+     * reconnaît bien comme décideurs — ils PEUVENT trancher, ils n'étaient simplement jamais
+     * avertis.
+     *
+     * ⚠️⚠️ ET CE N'EST PAS UN CAS MARGINAL, MESURÉ : l'auteur d'une convention reçoit six droits à
+     * la création (`conventions/index.post.ts`), et `canManageVolunteers` N'EN FAIT PAS PARTIE.
+     * Une convention gérée par son seul auteur — le cas de la plupart des petites éditions —
+     * n'avait donc AUCUN destinataire. La demande restait en `PENDING_MANAGER` jusqu'à ce que la
+     * tâche d'expiration la ferme, et les deux bénévoles attendaient une décision que personne ne
+     * savait devoir prendre.
+     *
+     * `listerGestionnairesBenevoles` répond à la même question que la garde d'accès, et c'est
+     * déjà elle qui prévient à la RÉCEPTION D'UNE CANDIDATURE : deux réponses différentes à
+     * « qui gère les bénévoles ? » étaient précisément la cause.
+     *
+     * 🔌 IMPORT DYNAMIQUE depuis le layer, comme `applications/index.post.ts` le fait déjà pour
+     * cette même fonction : c'est le motif établi pour atteindre `apps/app1` d'ici.
      */
     async function prevenirLesResponsables() {
       const edition = await prisma.edition.findUnique({
         where: { id: editionId },
         select: {
           name: true,
-          conventionId: true,
           convention: { select: { name: true } },
         },
       })
       if (!edition) return
 
-      const [surLaConvention, surLEdition] = await Promise.all([
-        prisma.conventionOrganizer.findMany({
-          where: { conventionId: edition.conventionId, canManageVolunteers: true },
-          select: { userId: true },
-        }),
-        prisma.editionOrganizerPermission.findMany({
-          where: { editionId, canManageVolunteers: true },
-          select: { organizer: { select: { userId: true } } },
-        }),
-      ])
+      const { listerGestionnairesBenevoles } = await import('#server/utils/organizer-management')
+      const gestionnaires = await listerGestionnairesBenevoles(editionId)
 
-      const destinataires = new Set<number>(surLaConvention.map((o) => o.userId))
-      for (const p of surLEdition) if (p.organizer) destinataires.add(p.organizer.userId)
+      /*
+       * ⚠️ NI LE DEMANDEUR NI LA CIBLE, même s'ils gèrent les bénévoles. Un organisateur qui est
+       * aussi bénévole n'a pas à recevoir une notification lui annonçant son propre échange —
+       * il vient de le demander, ou de l'accepter à l'instant.
+       */
+      const destinataires = new Set(
+        gestionnaires.filter(
+          (identifiant) => identifiant !== demande!.requesterId && identifiant !== user.id
+        )
+      )
 
       for (const destinataire of destinataires) {
         await safeNotify(
