@@ -70,6 +70,23 @@ describe('/api/editions/[id]/shows POST', () => {
       return null
     })
     mockHandleFileUpload.mockResolvedValue(null)
+
+    /*
+     * ⚠️ LA CRÉATION VÉRIFIE AUSSI L'APPARTENANCE À L'ÉDITION, et ce n'était pas prévu : le
+     * spectacle est créé PUIS composé dans la même transaction, donc `replaceShowComposition` et
+     * `replaceShowPerformances` y appliquent la garde comme sur une modification. Sans ces mocks,
+     * les neuf tests de création tombaient en 404 « Spectacle introuvable » — la lecture de
+     * l'édition du spectacle rendait `undefined`.
+     *
+     * C'est le DÉFAUT PERMISSIF : tout appartient à l'édition, pour que les tests qui ne parlent
+     * pas d'appartenance ne dépendent pas d'une garde qui n'est pas leur sujet.
+     */
+    prismaMock.show.findUnique.mockResolvedValue({ editionId: 1 })
+    prismaMock.editionArtist.findMany.mockImplementation(({ where }: any) =>
+      Promise.resolve((where?.id?.in ?? []).map((id: number) => ({ id })))
+    )
+    prismaMock.editionZone.findFirst.mockResolvedValue({ id: 1 })
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ id: 1 })
   })
 
   describe('Permissions', () => {
@@ -333,6 +350,86 @@ describe('/api/editions/[id]/shows POST', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
+    })
+  })
+
+  describe('Appartenance à l’édition', () => {
+    /*
+     * ⚠️ LA CRÉATION EST UNE SURFACE D'ÉCRITURE À PART ENTIÈRE, et l'énoncé du lot ne la nommait
+     * pas — il ne visait que la modification et la correction d'une représentation. Elle est
+     * couverte parce qu'elle passe par les mêmes deux fonctions, dans la même transaction.
+     *
+     * Ne pas l'éprouver aurait laissé le chemin le plus simple — créer un spectacle en y plaçant
+     * d'emblée l'artiste d'une autre convention — reposer sur une déduction plutôt que sur une
+     * mesure.
+     */
+    beforeEach(() => {
+      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.show.create.mockResolvedValue(mockCreatedShow)
+      prismaMock.show.update.mockResolvedValue(mockUpdatedShow)
+    })
+
+    it('REFUSE un artiste d’une autre édition', async () => {
+      // Aucun des artistes demandés n'appartient à l'édition : la requête n'en trouve aucun.
+      prismaMock.editionArtist.findMany.mockResolvedValue([])
+      global.readBody.mockResolvedValue({ ...validBody, artistIds: [77] })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toMatchObject({
+        statusCode: 400,
+      })
+    })
+
+    it('n’écrit AUCUN lien artiste quand un seul est étranger', async () => {
+      /*
+       * Le cas partiel, et le plus important : un artiste légitime accompagné d'un intrus. La
+       * vérification lève AVANT le `deleteMany` et le `createMany`, de sorte que rien n'est écrit
+       * — pas même le lien valide, qui aurait fait croire à un succès partiel.
+       */
+      prismaMock.editionArtist.findMany.mockResolvedValue([{ id: 1 }])
+      global.readBody.mockResolvedValue({ ...validBody, artistIds: [1, 77] })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toMatchObject({
+        statusCode: 400,
+      })
+      expect(prismaMock.showArtist.createMany).not.toHaveBeenCalled()
+    })
+
+    it('REFUSE la zone d’une autre édition', async () => {
+      prismaMock.editionZone.findFirst.mockResolvedValue(null)
+      global.readBody.mockResolvedValue({
+        ...validBody,
+        performances: [{ startDateTime: '2024-06-15T14:30:00Z', zoneId: 88 }],
+      })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toMatchObject({
+        statusCode: 400,
+      })
+      expect(prismaMock.showPerformance.createMany).not.toHaveBeenCalled()
+    })
+
+    it('borne les requêtes à L’ÉDITION du spectacle créé', async () => {
+      /*
+       * 🔬 L'ASSERTION QUI VOIT LE DÉFAUT. Le mock de Prisma ignore le `where` : les trois tests
+       * ci-dessus resteraient verts si la borne `editionId` disparaissait, puisque c'est le mock
+       * qui décide de rendre une liste vide. Seule la forme de la requête le prouve.
+       */
+      global.readBody.mockResolvedValue({
+        ...validBody,
+        artistIds: [1],
+        performances: [{ startDateTime: '2024-06-15T14:30:00Z', zoneId: 5, markerId: 3 }],
+      })
+
+      await handler({ context: { user: mockUser } } as any)
+
+      expect(prismaMock.editionArtist.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: { in: [1] }, editionId: 1 } })
+      )
+      expect(prismaMock.editionZone.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 5, editionId: 1 } })
+      )
+      expect(prismaMock.editionMarker.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: 3, editionId: 1 } })
+      )
     })
   })
 })

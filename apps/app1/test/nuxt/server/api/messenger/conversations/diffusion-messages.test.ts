@@ -76,7 +76,17 @@ const message = {
   participantId: 'participant-1',
   content: 'Bonjour',
   replyToId: null,
-  createdAt: new Date('2026-09-30T10:00:00Z'),
+  /*
+   * ⚠️ RELATIVE À MAINTENANT, et ce n'est pas un détail de confort. La date était figée au
+   * 30 septembre 2026 à 10 h 00 UTC : la modification d'un message n'étant permise que pendant
+   * quinze minutes, les deux tests du PATCH ont passé jusqu'à 10 h 15 ce jour-là, puis ont échoué
+   * définitivement — sur un « Un message ne peut plus être modifié » qui ressemble à une
+   * régression du code alors que c'est la fixture qui a vieilli.
+   *
+   * Une date d'envoi figée dans une règle qui compare à l'instant présent est une bombe à
+   * retardement : elle part verte, et le jour où elle explose, elle accuse le lot en cours.
+   */
+  createdAt: new Date(),
   editedAt: null,
   deletedAt: null,
   participant: { id: 'participant-1', user: { id: 1, pseudo: 'TestUser' } },

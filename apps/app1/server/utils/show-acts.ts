@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { editionDuSpectacle, verifierArtistesDeLEdition } from './appartenance-a-l-edition'
+
 import type { Prisma } from '#server/types/prisma'
 
 /**
@@ -66,6 +68,27 @@ export async function replaceShowComposition(
   artistIds: number[] = [],
   acts: ShowActInput[] = []
 ): Promise<void> {
+  /*
+   * ⚠️ LES ARTISTES SONT VÉRIFIÉS AVANT TOUTE ÉCRITURE, et la vérification porte sur les DEUX
+   * niveaux : ceux du spectacle (`artistIds`) et ceux de chaque numéro (`act.artistIds`).
+   *
+   * Sans elle, un identifiant d'`EditionArtist` appartenant à une AUTRE convention était lié au
+   * spectacle — et cet artiste apparaissait ensuite dans la billetterie de cette édition, dans son
+   * espace artiste, dans ses feuilles de repas. Rien ne le signalait : l'artiste existe, il a un
+   * nom, il a des spectacles ; il n'est simplement pas de cette édition.
+   *
+   * ⚠️ L'écriture est autorisée par le DROIT SUR L'ÉDITION, pas par l'appartenance des données.
+   * C'est ce qui rendait l'oubli exploitable : quelqu'un qui gère légitimement l'édition 42
+   * pouvait y rattacher les artistes de l'édition 17, sans aucun droit sur celle-ci.
+   *
+   * AVANT le `deleteMany` : lever après avoir supprimé les liens existants les perdrait pour rien.
+   * Les appelants passent par une transaction, mais tous ne le garantissent pas — et compter sur
+   * un `rollback` pour réparer un ordre fautif est une dette qu'on finit par payer.
+   */
+  const editionId = await editionDuSpectacle(client, showId)
+  const artistesDemandes = [...artistIds, ...acts.flatMap((act) => act.artistIds ?? [])]
+  await verifierArtistesDeLEdition(client, editionId, artistesDemandes)
+
   // Les liens artiste sont refaits entièrement : personne ne les édite en parallèle, et ils ne
   // portent pas d'identifiant que quiconque conserverait.
   await client.showArtist.deleteMany({ where: { showId } })

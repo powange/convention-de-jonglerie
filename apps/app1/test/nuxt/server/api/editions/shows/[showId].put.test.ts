@@ -66,6 +66,21 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       return null
     })
     mockHandleFileUpload.mockResolvedValue(undefined)
+
+    /*
+     * ⚠️ LA COMPOSITION VÉRIFIE DÉSORMAIS L'APPARTENANCE À L'ÉDITION avant d'écrire : elle remonte
+     * à l'édition du spectacle, puis demande les artistes, la zone et le repère qui s'y rattachent.
+     *
+     * Ces mocks sont le DÉFAUT PERMISSIF — tout appartient à l'édition —, pour que les tests qui
+     * ne parlent pas d'appartenance ne dépendent pas d'une garde qui n'est pas leur sujet. Les
+     * tests de refus les resserrent eux-mêmes.
+     */
+    prismaMock.show.findUnique.mockResolvedValue({ editionId: 1 })
+    prismaMock.editionArtist.findMany.mockImplementation(({ where }: any) =>
+      Promise.resolve((where?.id?.in ?? []).map((id: number) => ({ id })))
+    )
+    prismaMock.editionZone.findFirst.mockResolvedValue({ id: 1 })
+    prismaMock.editionMarker.findFirst.mockResolvedValue({ id: 1 })
   })
 
   describe('Permissions', () => {
@@ -364,6 +379,112 @@ describe('/api/editions/[id]/shows/[showId] PUT', () => {
       const result = await handler(mockEvent as any)
 
       expect(result.success).toBe(true)
+    })
+  })
+
+  describe('Appartenance \u00e0 l\u2019\u00e9dition', () => {
+    /**
+     * ⚠️ CE QUI MANQUAIT, et pourquoi c'\u00e9tait exploitable. La composition \u00e9crivait les `artistIds`
+     * re\u00e7us sans v\u00e9rifier leur \u00e9dition. Un identifiant d'`EditionArtist` appartenant \u00e0 une AUTRE
+     * convention \u00e9tait donc li\u00e9 au spectacle — et cet artiste apparaissait ensuite dans la
+     * billetterie de cette \u00e9dition, dans son espace artiste, dans ses feuilles de repas.
+     *
+     * L'\u00e9criture est autoris\u00e9e par le DROIT SUR L'\u00c9DITION, pas par l'appartenance des donn\u00e9es :
+     * quelqu'un qui g\u00e8re l\u00e9gitimement l'\u00e9dition 1 pouvait y rattacher les artistes de l'\u00e9dition 17,
+     * sans aucun droit sur celle-ci. C'est le contr\u00f4le d'acc\u00e8s qui donnait le change.
+     */
+    beforeEach(() => {
+      prismaMock.edition.findUnique.mockResolvedValue(mockEdition)
+      prismaMock.show.findFirst.mockResolvedValue(mockExistingShow)
+      prismaMock.show.findUniqueOrThrow.mockResolvedValue(mockUpdatedShow)
+    })
+
+    it('REFUSE un artiste qui n\u2019est pas de cette \u00e9dition', async () => {
+      // La requ\u00eate born\u00e9e \u00e0 l'\u00e9dition ne le retrouve pas.
+      prismaMock.editionArtist.findMany.mockResolvedValue([])
+      global.readBody.mockResolvedValue({ title: 'Test', artistIds: [99] })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toThrow(
+        /Artiste inconnu dans cette \u00e9dition/
+      )
+    })
+
+    it('n\u2019\u00e9crit RIEN quand l\u2019artiste est refus\u00e9', async () => {
+      /*
+       * La v\u00e9rification passe AVANT le `deleteMany` des liens : lever apr\u00e8s les avoir supprim\u00e9s
+       * les perdrait pour rien. Ce test mesure l'absence d'\u00e9criture, pas seulement le refus.
+       */
+      prismaMock.editionArtist.findMany.mockResolvedValue([])
+      global.readBody.mockResolvedValue({ title: 'Test', artistIds: [99] })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toThrow()
+
+      expect(prismaMock.showArtist.deleteMany).not.toHaveBeenCalled()
+      expect(prismaMock.showArtist.createMany).not.toHaveBeenCalled()
+    })
+
+    it('REFUSE une zone qui n\u2019est pas de cette \u00e9dition', async () => {
+      /*
+       * Une repr\u00e9sentation de cette \u00e9dition pouvait pointer la zone d'une AUTRE : le public voyait
+       * sur son plan un lieu qui n'existe pas chez lui, ou le nom d'un lieu d'une autre convention.
+       */
+      prismaMock.editionZone.findFirst.mockResolvedValue(null)
+      global.readBody.mockResolvedValue({
+        title: 'Test',
+        performances: [{ startDateTime: '2026-07-15T20:00:00Z', zoneId: 99 }],
+      })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toThrow(
+        /Zone inconnue dans cette \u00e9dition/
+      )
+    })
+
+    it('REFUSE un rep\u00e8re qui n\u2019est pas de cette \u00e9dition', async () => {
+      prismaMock.editionMarker.findFirst.mockResolvedValue(null)
+      global.readBody.mockResolvedValue({
+        title: 'Test',
+        performances: [{ startDateTime: '2026-07-15T20:00:00Z', markerId: 99 }],
+      })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toThrow(
+        /Rep\u00e8re inconnu dans cette \u00e9dition/
+      )
+    })
+
+    it('borne les requ\u00eates \u00e0 L\u2019\u00c9DITION du spectacle', async () => {
+      /*
+       * ⚠️ LE TEST QUI TIENT LA GARDE. Le mock de Prisma IGNORE le `where` : les refus ci-dessus
+       * reposent sur un `findMany`/`findFirst` rendu vide, et resteraient VERTS si le crit\u00e8re
+       * `editionId` disparaissait de la requ\u00eate. Seule une assertion sur sa forme le voit.
+       */
+      global.readBody.mockResolvedValue({
+        title: 'Test',
+        artistIds: [5],
+        performances: [{ startDateTime: '2026-07-15T20:00:00Z', zoneId: 3, markerId: 4 }],
+      })
+
+      await handler({ context: { user: mockUser } } as any)
+
+      expect(prismaMock.editionArtist.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: expect.objectContaining({ editionId: 1 }) })
+      )
+      expect(prismaMock.editionZone.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({ where: expect.objectContaining({ editionId: 1 }) })
+      )
+      expect(prismaMock.editionMarker.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({ where: expect.objectContaining({ editionId: 1 }) })
+      )
+    })
+
+    it('ACCEPTE des donn\u00e9es de la bonne \u00e9dition', async () => {
+      // La non-r\u00e9gression : le cas normal doit continuer de passer.
+      global.readBody.mockResolvedValue({
+        title: 'Test',
+        artistIds: [5],
+        performances: [{ startDateTime: '2026-07-15T20:00:00Z', zoneId: 3 }],
+      })
+
+      await expect(handler({ context: { user: mockUser } } as any)).resolves.toBeTruthy()
     })
   })
 })
