@@ -280,6 +280,25 @@ export default defineNuxtConfig({
     // Preset explicite pour builds déterministes en Docker
     preset: 'node-server',
     ignore: ['**/*.spec.ts', '**/*.test.ts', 'test/**', '__tests__/**', 'scripts/**'],
+    /*
+     * ⚠️ DÉCLARÉE À LA MAIN, et non posée par le nom d'un fichier dans `server/routes/`.
+     *
+     * Cette route devrait s'appeler `server/routes/.well-known/assetlinks.json.get.ts`. Le dossier
+     * commencerait alors par un POINT, et sauter les dossiers cachés est un comportement banal
+     * d'un scan de système de fichiers. Le serveur de développement la sert bien — mais dev et
+     * build ne font pas tourner le même code, et son absence après construction ne produirait
+     * AUCUNE erreur : un 404, donc la barre d'adresse de Chrome au-dessus de l'application
+     * Android, donc rien dans les journaux.
+     *
+     * Le fichier vit dans `server/handlers/`, qui n'est pas un dossier scanné par Nitro : la route
+     * n'existe que par cette ligne, et ne peut pas être enregistrée deux fois.
+     */
+    handlers: [
+      {
+        route: '/.well-known/assetlinks.json',
+        handler: '~~/server/handlers/assetlinks',
+      },
+    ],
     // Routes avec timeout étendu pour les appels IA longs
     routeRules: {
       '/api/admin/generate-import-json': {
