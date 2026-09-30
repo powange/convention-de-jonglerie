@@ -49,6 +49,11 @@
         "action": "Podívejte se na další nabídky",
         "message": "{ownerName} odmítlo vaši žádost o {seats} pro cestu z {locationCity}.",
         "title": "Žádost zamítnuta"
+      },
+      "comment_received": {
+        "action": "Zobrazit konverzaci",
+        "message": "{commenterName} napsal zprávu",
+        "title": "Nová zpráva ke spolujízdě 💬"
       }
     },
     "common": {

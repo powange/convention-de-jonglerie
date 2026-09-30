@@ -49,6 +49,11 @@
         "action": "Ver otras ofertas",
         "message": "{ownerName} ha rechazado tu solicitud de {seats} asiento(s) para el viaje desde {locationCity}",
         "title": "Solicitud rechazada"
+      },
+      "comment_received": {
+        "action": "Ver la conversación",
+        "message": "{commenterName} ha escrito un mensaje",
+        "title": "Nuevo mensaje de coche compartido 💬"
       }
     },
     "common": {

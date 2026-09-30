@@ -49,6 +49,11 @@
         "action": "Посмотреть другие предложения",
         "message": "{ownerName} отклонил ваш запрос на {seats} место/а для поездки из {locationCity}",
         "title": "Запрос отклонён"
+      },
+      "comment_received": {
+        "action": "Посмотреть переписку",
+        "message": "{commenterName} написал сообщение",
+        "title": "Новое сообщение о поездке 💬"
       }
     },
     "common": {

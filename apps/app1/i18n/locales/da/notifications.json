@@ -49,6 +49,11 @@
         "action": "Se andre tilbud",
         "message": "{ownerName} har afvist din anmodning om {seats} plads(er) for rejsen fra {locationCity}",
         "title": "Anmodning afvist"
+      },
+      "comment_received": {
+        "action": "Se samtalen",
+        "message": "{commenterName} har skrevet en besked",
+        "title": "Ny samkørselsbesked 💬"
       }
     },
     "common": {

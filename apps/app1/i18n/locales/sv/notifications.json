@@ -49,6 +49,11 @@
         "action": "Se andra erbjudanden",
         "message": "{ownerName} har avslagit din begäran om {seats} för resan från {locationCity}.",
         "title": "Begäran avslås"
+      },
+      "comment_received": {
+        "action": "Visa konversationen",
+        "message": "{commenterName} har skrivit ett meddelande",
+        "title": "Nytt samåkningsmeddelande 💬"
       }
     },
     "common": {

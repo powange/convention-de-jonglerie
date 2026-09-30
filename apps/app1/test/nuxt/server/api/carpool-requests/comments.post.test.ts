@@ -37,6 +37,13 @@ const createMockComment = (content: string) => ({
 describe('/api/carpool-requests/[id]/comments POST', () => {
   beforeEach(() => {
     // Reset tous les mocks avant chaque test
+    /*
+     * Les commentateurs à prévenir, requête ajoutée avec les notifications de commentaire. Un
+     * `findMany` réel rend TOUJOURS un tableau : un mock qui ne le simule pas rend `undefined`, et
+     * la boucle de diffusion lève. Complété ici plutôt que de rendre le handler tolérant à une
+     * valeur que Prisma ne produit jamais.
+     */
+    prismaMock.carpoolRequestComment.findMany.mockResolvedValue([])
     prismaMock.carpoolRequest.findUnique.mockReset()
     prismaMock.carpoolRequestComment.create.mockReset()
     global.readBody = vi.fn()
@@ -66,7 +73,10 @@ describe('/api/carpool-requests/[id]/comments POST', () => {
     expect(result).toEqual({ success: true, data: mockComment })
     expect(prismaMock.carpoolRequest.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
-      select: { id: true },
+      // `userId` et `editionId` en plus de l'existence : ils servent à prévenir l'auteur de
+      // l'annonce et à construire l'URL de la notification. Les redemander ensuite ferait une
+      // requête de plus pour une donnée qu'on tient déjà.
+      select: { id: true, userId: true, editionId: true },
     })
     expect(prismaMock.carpoolRequestComment.create).toHaveBeenCalledWith({
       data: {

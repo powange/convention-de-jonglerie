@@ -693,6 +693,48 @@ export const NotificationHelpers = {
   },
 
   /**
+   * Notification de commentaire reçu sur une offre ou une demande de covoiturage.
+   *
+   * ⚠️ Le réglage promettait déjà ces notifications — « réservations ET MESSAGES de covoiturage » —
+   * et rien ne les envoyait. Une promesse non tenue est pire qu'une absence : on cesse de venir
+   * regarder, en croyant qu'on serait prévenu.
+   *
+   * `type` distingue l'offre de la demande, parce que l'URL et l'entité en dépendent. Le reste est
+   * identique : même catégorie, même réglage, même forme que `carpoolBookingReceived`.
+   */
+  async carpoolCommentReceived(
+    userId: number,
+    commenterName: string,
+    type: 'offer' | 'request',
+    entityId: number,
+    editionId: number | null
+  ) {
+    const segment = type === 'offer' ? 'offers' : 'requests'
+    /*
+     * Le repli sans édition garde la même forme que `carpoolBookingReceived` : une URL qui ne mène
+     * nulle part vaut mieux qu'une notification qu'on renonce à envoyer, et l'identifiant y reste
+     * lisible pour qui cherche.
+     */
+    const actionUrl = editionId
+      ? `/editions/${editionId}/carpool/${segment}/${entityId}`
+      : `/carpool-${segment}/${entityId}`
+
+    return await NotificationService.create({
+      userId,
+      type: 'INFO',
+      titleKey: 'notifications.carpool.comment_received.title',
+      messageKey: 'notifications.carpool.comment_received.message',
+      translationParams: { commenterName },
+      actionTextKey: 'notifications.carpool.comment_received.action',
+      category: 'carpool',
+      entityType: type === 'offer' ? 'CarpoolOffer' : 'CarpoolRequest',
+      entityId: entityId.toString(),
+      actionUrl,
+      notificationType: 'carpool_comment_received',
+    })
+  },
+
+  /**
    * Notification de demande de covoiturage acceptée
    */
   async carpoolBookingAccepted(

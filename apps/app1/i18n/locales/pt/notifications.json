@@ -49,6 +49,11 @@
         "action": "Ver outras ofertas",
         "message": "{ownerName} recusou o seu pedido de {seats} lugar(es) para a viagem de {locationCity}",
         "title": "Pedido recusado"
+      },
+      "comment_received": {
+        "action": "Ver a conversa",
+        "message": "{commenterName} escreveu uma mensagem",
+        "title": "Nova mensagem de partilha de carro 💬"
       }
     },
     "common": {

@@ -49,6 +49,11 @@
         "action": "Andere Angebote ansehen",
         "message": "{ownerName} hat Ihre Anfrage für {seats} Platz/Plätze für die Fahrt von {locationCity} abgelehnt",
         "title": "Anfrage abgelehnt"
+      },
+      "comment_received": {
+        "action": "Unterhaltung ansehen",
+        "message": "{commenterName} hat eine Nachricht geschrieben",
+        "title": "Neue Mitfahr-Nachricht 💬"
       }
     },
     "common": {

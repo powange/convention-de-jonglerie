@@ -49,6 +49,11 @@
         "action": "Bekijk andere aanbiedingen",
         "message": "{ownerName} heeft je verzoek voor {seats} plaats(en) voor de reis vanaf {locationCity} geweigerd",
         "title": "Verzoek geweigerd"
+      },
+      "comment_received": {
+        "action": "Gesprek bekijken",
+        "message": "{commenterName} heeft een bericht geschreven",
+        "title": "Nieuw carpoolbericht 💬"
       }
     },
     "common": {

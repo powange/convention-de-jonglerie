@@ -49,6 +49,11 @@
         "action": "Zobacz inne oferty",
         "message": "{ownerName} odrzucił Twoją prośbę o {seats} miejsce/a na podróż z {locationCity}",
         "title": "Prośba odrzucona"
+      },
+      "comment_received": {
+        "action": "Zobacz rozmowę",
+        "message": "{commenterName} napisał wiadomość",
+        "title": "Nowa wiadomość o wspólnych przejazdach 💬"
       }
     },
     "common": {
