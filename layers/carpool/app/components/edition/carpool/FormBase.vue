@@ -256,13 +256,12 @@
               {{ $t('common.cancel') }}
             </UButton>
 
-            <UButton
-              type="submit"
-              :loading="loading"
-              :disabled="!isFormValid"
-              size="lg"
-              icon="i-heroicons-paper-airplane"
-            >
+            <!-- Le bouton n'est PLUS grisé selon la validité du formulaire. Un bouton inerte sans
+                 explication est la pire façon de refuser une saisie — et c'est ainsi qu'une ville
+                 hors des neuf pays suggérés bloquait la création sans un mot. `UForm` porte déjà le
+                 schéma zod : il affiche les messages sous les champs fautifs à la soumission. On dit
+                 ce qui manque au lieu de laisser deviner. -->
+            <UButton type="submit" :loading="loading" size="lg" icon="i-heroicons-paper-airplane">
               {{
                 loading ? $t('common.saving') : isEditing ? $t('common.save') : $t('common.create')
               }}
@@ -295,7 +294,6 @@ const { t, locale } = useI18n()
 const form = reactive({
   locationCity: props.initialData?.locationCity || '',
   locationAddress: props.initialData?.locationAddress || '',
-  departureCoordinates: props.initialData?.departureCoordinates || null,
   tripDate: props.initialData?.tripDate || null,
   direction: props.initialData?.direction || 'TO_EVENT',
   availableSeats: props.initialData?.availableSeats || (props.formType === 'offer' ? 1 : undefined),
@@ -398,16 +396,6 @@ const schema = computed(() => {
   }
 })
 
-// Vérification de validité du formulaire
-const isFormValid = computed(() => {
-  try {
-    schema.value.parse(form)
-    return true
-  } catch {
-    return false
-  }
-})
-
 // Construire le payload pour l'API
 const buildPayload = () => {
   const payload: Record<string, unknown> = {
@@ -489,10 +477,15 @@ watch(searchTermDebounced, async (query) => {
 
   try {
     const currentLocale = locale.value || 'fr'
-    const countryCodes = 'fr,be,ch,de,es,it,nl,gb,lu'
 
+    /*
+     * Plus de `countrycodes`. La liste en comptait neuf, et une convention de jonglerie n'a aucune
+     * raison de s'y tenir : un covoiturage vers l'Autriche, la Suède ou le Québec ne pouvait pas
+     * même se saisir. Maintenant que la saisie libre passe, la restriction ne bloquait plus la
+     * création — elle privait seulement de suggestions là où elles servent le plus.
+     */
     const data = await $fetch<any[]>(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${currentLocale}&countrycodes=${countryCodes}&addressdetails=1&featuretype=settlement&class=place&type=city,town,village`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&accept-language=${currentLocale}&addressdetails=1&featuretype=settlement&class=place&type=city,town,village`
     )
 
     if (!data) {
@@ -531,22 +524,33 @@ const onSubmit = () => {
   }
 }
 
-// Watcher pour la sélection d'une ville
+/*
+ * La ville se saisit LIBREMENT, et c'est le cœur de cette correction.
+ *
+ * ⚠️ La ville du modèle n'était renseignée que par la sélection d'une suggestion Nominatim, elle-même
+ * restreinte à neuf pays. Conséquence : une ville hors de cette liste — ou une simple panne du
+ * service — laissait le champ vide côté modèle, le schéma refusait, et le bouton restait grisé SANS
+ * MESSAGE. On voyait son texte dans le champ, et rien n'expliquait pourquoi rien ne se passait.
+ *
+ * Ce que l'on tape EST la ville. Les suggestions restent une commodité : choisir l'une d'elles
+ * remplace la saisie par son libellé canonique, mais ne la conditionne plus.
+ */
+watch(searchTerm, (saisie) => {
+  form.locationCity = (saisie ?? '').trim()
+})
+
 watch(selectedCity, (newCity) => {
   if (newCity) {
     form.locationCity = newCity.name
-    form.departureCoordinates = { lat: newCity.lat, lon: newCity.lon }
   }
 })
 
 // Initialiser selectedCity si on édite
 onMounted(() => {
   if (props.initialData?.locationCity) {
-    selectedCity.value = {
-      name: props.initialData.locationCity,
-      lat: props.initialData.departureCoordinates?.lat,
-      lon: props.initialData.departureCoordinates?.lon,
-    }
+    // Ni `lat` ni `lon` : `departureCoordinates` n'existe ni dans le schéma Prisma ni dans les
+    // schémas zod — le formulaire portait un champ que rien n'enregistrait ni ne relisait.
+    selectedCity.value = { name: props.initialData.locationCity }
     searchTerm.value = props.initialData.locationCity
   }
 })
