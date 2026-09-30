@@ -465,6 +465,10 @@ function dependencyLabel(record: ApiRow['record']): string | null {
   if (d.workshops) parts.push(t('gestion.map.import_dep_workshops', d.workshops))
   if (d.stockItems) parts.push(t('gestion.map.import_dep_stock', d.stockItems))
   if (d.stockReservations) parts.push(t('gestion.map.import_dep_reservations', d.stockReservations))
+  // ⚠️ Les créneaux du programme n'étaient pas comptés, et ce sont les plus nombreux : une zone
+  // portant dix moments de la frise s'annonçait SANS aucune dépendance, et sa suppression vidait
+  // leur lieu en silence.
+  if (d.programItems) parts.push(t('gestion.map.import_dep_program', d.programItems))
   return parts.length ? parts.join(', ') : null
 }
 

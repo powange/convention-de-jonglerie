@@ -5,6 +5,7 @@
     "delete_zone": "Supprimer la zone",
     "edit_marker": "Modifier le point de repère",
     "edit_zone": "Modifier la zone",
+    "export_kml": "Télécharger (KML)",
     "hide_item": "Masquer sur la carte",
     "marker_delete_success": "Point de repère supprimé avec succès",
     "marker_entrance_of": "Entrée de :",

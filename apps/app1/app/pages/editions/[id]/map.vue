@@ -26,24 +26,61 @@
       </div>
 
       <template v-else>
-        <!-- Le sélecteur n'a de sens que si les deux cartes existent : sinon on affiche
+        <!--
+          La barre d'actions de la carte. `flex-wrap` et non une rangée figée : sur un téléphone,
+          le sélecteur de vue et le bouton d'export ne tiennent pas côte à côte.
+        -->
+        <div
+          v-if="canSwitchView || (activeView === 'site' && hasSiteMap)"
+          class="flex flex-wrap items-center gap-2"
+        >
+          <!-- Le sélecteur n'a de sens que si les deux cartes existent : sinon on affiche
              simplement celle qui est disponible. -->
-        <UFieldGroup v-if="canSwitchView" size="sm">
+          <UFieldGroup v-if="canSwitchView" size="sm">
+            <UButton
+              icon="i-lucide-layers"
+              :color="activeView === 'site' ? 'primary' : 'neutral'"
+              :variant="activeView === 'site' ? 'solid' : 'outline'"
+              :label="$t('edition.site_map')"
+              @click="selectedView = 'site'"
+            />
+            <UButton
+              icon="i-lucide-map"
+              :color="activeView === 'google' ? 'primary' : 'neutral'"
+              :variant="activeView === 'google' ? 'solid' : 'outline'"
+              :label="$t('map.view_external')"
+              @click="selectedView = 'google'"
+            />
+          </UFieldGroup>
+
+          <!--
+            Export KML de la carte, pour l'ouvrir dans Google Earth ou une application de
+            randonnée — sur place, souvent sans réseau.
+
+            ⚠️ IL N'ÉTAIT PROPOSÉ NULLE PART. Le point d'API existait, était écrit pour le public
+            et testé pour l'accès public — mais aucun écran ne le référençait, et le middleware
+            répondait 401 aux visiteurs faute d'inscription dans `public-routes.ts`. Une
+            fonctionnalité complète et inatteignable.
+
+            Un lien et non un `@click` : le navigateur enchaîne le téléchargement lui-même, là
+            qu'une ouverture de fenêtre par script se heurte aux bloqueurs.
+
+            📍 Le nom de cette fonction de fenêtre n'est pas écrit entre accents graves à dessein :
+            `check-i18n` lit tout mot pointé ainsi comme une clé de traduction manquante. Troisième
+            fois que ce faux positif se présente dans ce dépôt.
+          -->
           <UButton
-            icon="i-lucide-layers"
-            :color="activeView === 'site' ? 'primary' : 'neutral'"
-            :variant="activeView === 'site' ? 'solid' : 'outline'"
-            :label="$t('edition.site_map')"
-            @click="selectedView = 'site'"
+            v-if="activeView === 'site' && hasSiteMap"
+            :to="`/api/editions/${editionId}/export.kml`"
+            external
+            target="_blank"
+            icon="i-lucide-download"
+            variant="outline"
+            color="neutral"
+            size="sm"
+            :label="$t('map.export_kml')"
           />
-          <UButton
-            icon="i-lucide-map"
-            :color="activeView === 'google' ? 'primary' : 'neutral'"
-            :variant="activeView === 'google' ? 'solid' : 'outline'"
-            :label="$t('map.view_external')"
-            @click="selectedView = 'google'"
-          />
-        </UFieldGroup>
+        </div>
 
         <!-- Carte externe de l'organisateur. Un organisateur qui a déjà cartographié son terrain
              sur Google n'a pas à tout refaire ici. -->

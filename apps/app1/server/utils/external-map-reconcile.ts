@@ -27,7 +27,14 @@ export interface ImportedRecord {
   externalMapImportedAt: Date | null
   updatedAt: Date
   /** Ce qui perdrait son lieu si on supprimait cet objet. */
-  dependencies: { shows: number; workshops: number; stockItems: number; stockReservations: number }
+  dependencies: {
+    shows: number
+    workshops: number
+    stockItems: number
+    stockReservations: number
+    /** Les créneaux du programme rattachés à ce lieu — la dépendance la plus nombreuse. */
+    programItems: number
+  }
 }
 
 export type ReconciledState = 'importable' | 'imported' | 'missing' | 'unsupported'

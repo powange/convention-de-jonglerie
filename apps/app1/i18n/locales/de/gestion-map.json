@@ -68,7 +68,8 @@
       "import_reimport": "Erneut importieren",
       "marker_zone": "Zugeordneter Bereich",
       "marker_zone_help": "Ordnen Sie diesen Punkt einem Bereich zu, dessen Eingang oder Zugang er ist.",
-      "marker_no_zone": "Kein Bereich"
+      "marker_no_zone": "Kein Bereich",
+      "import_dep_program": "{n} Programmpunkt | {n} Programmpunkte"
     }
   }
 }

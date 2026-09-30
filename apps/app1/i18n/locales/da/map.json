@@ -42,6 +42,7 @@
     "marker_entrance_of": "Indgang til:",
     "offline_title": "Kort vist offline",
     "offline_description": "Disse oplysninger stammer fra dit seneste besøg og kan have ændret sig siden.",
-    "not_public": "Kortet for denne udgave er ikke offentligt."
+    "not_public": "Kortet for denne udgave er ikke offentligt.",
+    "export_kml": "Download (KML)"
   }
 }

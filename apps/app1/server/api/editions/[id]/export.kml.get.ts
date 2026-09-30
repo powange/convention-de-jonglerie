@@ -1,4 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { assurerCarteLisible } from '#server/utils/carte-lisible'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 // Convertit une couleur hex #RRGGBB en format KML (AABBGGRR)
@@ -40,6 +41,7 @@ export default wrapApiHandler(
       select: {
         id: true,
         name: true,
+        siteMapEnabled: true,
         mapPublic: true,
         convention: {
           select: {
@@ -56,13 +58,22 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier que la carte est publique
-    if (!edition.mapPublic) {
-      throw createError({
-        status: 403,
-        message: 'Map is not public',
-      })
-    }
+    /*
+     * ⚠️ LA MÊME GARDE QUE LES ZONES ET LES MARQUEURS, et ce n'est pas un choix de style.
+     *
+     * Ce handler ne regardait que `mapPublic`, pas `siteMapEnabled`. Rendre la route publique sans
+     * corriger cela aurait ouvert exactement l'écart que #644 vient de fermer : une édition dont
+     * la carte est « publique » mais dont le MODULE est éteint aurait livré son KML, alors que
+     * `/zones` et `/markers` le refusent. Un export est une copie complète du plan — le pire
+     * endroit pour une exception.
+     *
+     * Et 404 plutôt que 403, comme la garde partagée le fait déjà : distinguer les deux dirait à
+     * un visiteur qu'il EXISTE une carte derrière ce numéro.
+     *
+     * Effet utile au passage : l'organisation peut exporter sa carte AVANT de la publier, ce que
+     * le 403 d'origine interdisait à tout le monde.
+     */
+    await assurerCarteLisible(event, editionId, edition)
 
     // Récupérer les zones et markers
     const [zones, markers] = await Promise.all([

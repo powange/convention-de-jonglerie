@@ -37,6 +37,9 @@ export const prismaMock = {
   editionVolunteerQuota: createModelMock(),
   editionArtistQuota: createModelMock(),
   editionPost: createModelMock(),
+  // Frise du programme. Son absence rendait `program.get.ts` intestable — le handler échouait au
+  // premier `findMany` sur un modèle inexistant du mock, ce qui explique qu'il n'avait aucun test.
+  editionProgramItem: createModelMock(),
   editionPostComment: createModelMock(),
   organizerPermissionHistory: createModelMock(),
   editionVolunteerApplication: createModelMock(),
