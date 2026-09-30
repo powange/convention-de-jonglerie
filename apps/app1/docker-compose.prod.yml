@@ -58,9 +58,20 @@ services:
       # d'autorité, et l'hôte lu n'est plus le bon. L'application échouait au démarrage sans qu'aucun
       # message ne désigne la ponctuation du mot de passe.
       #
-      # `docker/entrypoint.sh` construit désormais l'URL avec `encodeURIComponent`, depuis
-      # MYSQL_USER / MYSQL_PASSWORD / MYSQL_DATABASE que `env_file` fournit déjà au conteneur. Seul
-      # l'hôte est passé ici, puisqu'il dépend de la pile.
+      # `docker/entrypoint.sh` construit désormais l'URL avec `encodeURIComponent`, depuis les
+      # identifiants ci-dessous. Le mot de passe passe donc en CLAIR, dans une variable
+      # d'environnement, et non interpolé dans une URL : sa ponctuation n'a plus aucune importance.
+      #
+      # ⚠️⚠️ LES IDENTIFIANTS SONT LISTÉS ICI EXPLICITEMENT, et c'est indispensable. `env_file`
+      # ne suffit PAS : les variables d'une pile Portainer servent à INTERPOLER le compose
+      # (`${MYSQL_USER}` ci-dessous), elles ne peuplent pas l'environnement du conteneur. Une
+      # première version de ce lot l'avait supposé, et release a refusé de démarrer sur
+      # « ERROR: DATABASE_URL is not set, and MYSQL_USER / MYSQL_PASSWORD are missing to build it ».
+      # `entrypoint.sh` est en `set -e` : ce genre d'erreur n'est pas une dégradation, c'est un
+      # conteneur qui ne se lance pas.
+      MYSQL_USER: ${MYSQL_USER:-convention_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-convention_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-convention_db}
       DATABASE_HOST: 'database-prod'
       # Configuration Nuxt pour Docker
       NUXT_HOST: '0.0.0.0'
