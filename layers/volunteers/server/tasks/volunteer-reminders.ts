@@ -1,5 +1,7 @@
 import { NotificationService } from '#server/utils/notification-service'
 import { MARGE_RETARD_MS } from '~~/shared/utils/bornes-retard-creneau'
+// Depuis un layer, l'alias est `~~` : `~` ne résout pas vers la couche application.
+import { formaterHeure } from '~~/shared/utils/fuseau-edition'
 
 export default defineTask({
   meta: {
@@ -50,7 +52,8 @@ export default defineTask({
           },
           team: { select: { name: true, color: true } },
           event: {
-            select: { name: true },
+            // Le fuseau voyage avec le nom : l'heure annoncée doit être celle vécue SUR PLACE.
+            select: { name: true, edition: { select: { timezone: true } } },
           },
         },
       })
@@ -72,11 +75,26 @@ export default defineTask({
           const teamName = slot.team?.name || 'Équipe non assignée'
           const delay = slot.delayMinutes || 0
           const adjustedStartDateTime = new Date(slot.startDateTime.getTime() + delay * 60 * 1000)
-          const startTime = adjustedStartDateTime.toLocaleTimeString('fr-FR', {
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'Europe/Paris',
-          })
+
+          /*
+           * ⚠️ `Europe/Paris` ÉTAIT CODÉ EN DUR ICI, et c'est un défaut d'une autre nature que
+           * celui du courriel de publication — lequel n'avait aucun fuseau et prenait donc celui
+           * du serveur.
+           *
+           * Codé en dur, il donne la bonne heure aux conventions françaises et la mauvaise aux
+           * autres : un rappel « votre créneau commence à 14:00 » arrive alors avec l'heure de
+           * Paris pour quelqu'un qui est au Québec. Le message dit une heure, la montre en dit
+           * une autre, et rien n'indique laquelle croire — sur un rappel envoyé trente minutes
+           * avant, c'est le genre d'écart qui fait manquer un créneau.
+           *
+           * Les deux surfaces devaient être corrigées ENSEMBLE : n'en traiter qu'une ferait dire
+           * deux heures différentes au même créneau selon qu'on lit le courriel de publication ou
+           * le rappel.
+           */
+          const startTime = formaterHeure(
+            adjustedStartDateTime,
+            slot.event.edition?.timezone ?? null
+          )
 
           for (const assignment of slot.assignments) {
             try {
