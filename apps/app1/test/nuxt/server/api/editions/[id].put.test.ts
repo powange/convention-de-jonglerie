@@ -463,3 +463,254 @@ describe('/api/editions/[id] PUT', () => {
     expect(geocodeEdition).not.toHaveBeenCalled()
   })
 })
+
+/**
+ * Ce qu'on peut VIDER, et ce que la modification enregistrait effectivement.
+ *
+ * ⚠️ TROIS DÉFAUTS DE LA MÊME FAMILLE, tous silencieux : la saisie part, le serveur répond 200, et
+ * l'on retrouve l'ancienne valeur au rechargement. Rien ne signale que rien n'a été écrit.
+ *
+ * ⚠️ LA SÉMANTIQUE VIENT DU SCHÉMA, et c'est ce qui départage les champs. Dans
+ * `updateEditionSchema`, `description`, `region` et `addressLine2` sont `nullable().optional()` :
+ * le formulaire envoie `null` quand on vide le champ, et cette absence est une VALEUR à écrire.
+ * `addressLine1`, `postalCode`, `city` et `country` sont `min(1).optional()` : ils ne peuvent pas
+ * être vides, donc `|| edition.X` y est équivalent — les réécrire « par symétrie » aurait laissé
+ * croire qu'ils sont vidables.
+ */
+describe('/api/editions/[id] PUT — ce qui s’écrit et ce qui se vide', () => {
+  const utilisateur = { id: 1, email: 'user@example.com', pseudo: 'testuser' }
+
+  const edition = {
+    id: 1,
+    conventionId: 1,
+    name: 'Edition 2024',
+    description: 'Description test',
+    startDate: new Date('2024-06-01'),
+    endDate: new Date('2024-06-03'),
+    addressLine1: '123 rue Test',
+    addressLine2: 'Bâtiment B',
+    postalCode: '75001',
+    city: 'Paris',
+    region: 'Île-de-France',
+    country: 'France',
+    imageUrl: null,
+    creatorId: 1,
+    convention: { id: 1, name: 'Convention Test', authorId: 1, organizers: [] },
+  }
+
+  const evenement = { context: { user: utilisateur, params: { id: '1' } } }
+
+  /** Les données réellement envoyées à Prisma. */
+  const ecrit = () => prismaMock.edition.update.mock.calls.at(-1)![0].data
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    global.readBody = vi.fn()
+    global.getRouterParam = vi.fn().mockReturnValue('1')
+    mockGeocodeEdition.mockResolvedValue({ latitude: 48.8566, longitude: 2.3522 })
+    prismaMock.edition.findUnique.mockResolvedValue(edition)
+    prismaMock.edition.update.mockResolvedValue(edition)
+  })
+
+  it('ENREGISTRE le complément d’adresse', async () => {
+    /*
+     * 🔬 `addressLine2` était simplement ABSENT de `updatedData` : destructuré du corps, utilisé
+     * pour le géocodage, et jamais écrit. La CRÉATION l'enregistrait bien — le complément
+     * d'adresse se posait donc une fois et ne se corrigeait jamais.
+     */
+    global.readBody.mockResolvedValue({ addressLine2: 'Bâtiment C, 2e étage' })
+
+    await handler(evenement as any)
+
+    expect(ecrit().addressLine2).toBe('Bâtiment C, 2e étage')
+  })
+
+  it('EFFACE le complément d’adresse quand on le vide', async () => {
+    global.readBody.mockResolvedValue({ addressLine2: null })
+
+    await handler(evenement as any)
+
+    expect(ecrit().addressLine2).toBeNull()
+  })
+
+  it('laisse le complément d’adresse INCHANGÉ quand le corps n’en parle pas', async () => {
+    // Un PUT partiel — le formulaire n'envoie pas toujours tout — ne doit rien effacer.
+    global.readBody.mockResolvedValue({ city: 'Lyon' })
+
+    await handler(evenement as any)
+
+    expect(ecrit().addressLine2).toBe('Bâtiment B')
+  })
+
+  it('EFFACE la description quand on la vide', async () => {
+    /*
+     * 🔬 `description || edition.description` retombait sur l'ancienne valeur : une description
+     * supprimée réapparaissait au rechargement. Le `name`, lui, était déjà correct — c'est ce
+     * motif qui est appliqué ici.
+     */
+    global.readBody.mockResolvedValue({ description: null })
+
+    await handler(evenement as any)
+
+    expect(ecrit().description).toBeNull()
+  })
+
+  it('EFFACE la région quand on la vide', async () => {
+    global.readBody.mockResolvedValue({ region: null })
+
+    await handler(evenement as any)
+
+    expect(ecrit().region).toBeNull()
+  })
+
+  it('laisse description et région INCHANGÉES quand le corps n’en parle pas', async () => {
+    global.readBody.mockResolvedValue({ city: 'Lyon' })
+
+    await handler(evenement as any)
+
+    expect(ecrit().description).toBe('Description test')
+    expect(ecrit().region).toBe('Île-de-France')
+  })
+
+  it('écrit une description vraiment vide, et non l’ancienne', async () => {
+    /*
+     * ⚠️ LE CAS QUE `||` ATTRAPAIT AUSSI, et qu'un test sur `null` seul laisserait passer : la
+     * chaîne vide est également falsy. Selon la façon dont le formulaire vide son champ, c'est
+     * l'une ou l'autre qui arrive.
+     */
+    global.readBody.mockResolvedValue({ description: '' })
+
+    await handler(evenement as any)
+
+    expect(ecrit().description).toBe('')
+  })
+
+  it('ne rend PAS vidables les champs d’adresse obligatoires', async () => {
+    /*
+     * 📍 Le pendant du point précédent, et c'est une garde contre une « correction » par symétrie.
+     * `addressLine1`, `postalCode`, `city` et `country` sont `min(1)` au schéma : une chaîne vide
+     * est REFUSÉE avant d'arriver au handler. Les aligner sur `!== undefined` n'aurait rien changé
+     * au comportement, mais aurait laissé croire qu'on peut les effacer.
+     */
+    global.readBody.mockResolvedValue({ city: '' })
+
+    await expect(handler(evenement as any)).rejects.toMatchObject({ statusCode: 400 })
+  })
+})
+
+/**
+ * Déplacer une édition vers une AUTRE convention : quel droit cela demande.
+ *
+ * ⚠️ CE QUI ÉTAIT DEMANDÉ AVANT, et c'était le mauvais droit : `canManageOrganizers` sur la
+ * convention cible. L'écart jouait dans les deux sens — un organisateur qui peut CRÉER des
+ * éditions ne pouvait pas y en déplacer une, tandis qu'un gestionnaire d'organisateurs SANS droit
+ * d'ajout le pouvait. Et rien n'interdisait de déplacer une édition vers une convention ARCHIVÉE,
+ * que la création refuse.
+ *
+ * Or déplacer une édition vers une convention, c'est y créer une édition : c'est donc la règle de
+ * la création — `getConventionForEditionCreation` — qui s'applique.
+ */
+describe('/api/editions/[id] PUT — changer de convention', () => {
+  const utilisateur = { id: 7, email: 'org@example.com', pseudo: 'org' }
+  const CIBLE = 42
+
+  const edition = {
+    id: 1,
+    conventionId: 1,
+    name: 'Edition 2024',
+    description: 'Description',
+    startDate: new Date('2024-06-01'),
+    endDate: new Date('2024-06-03'),
+    addressLine1: '123 rue Test',
+    addressLine2: null,
+    postalCode: '75001',
+    city: 'Paris',
+    region: null,
+    country: 'France',
+    imageUrl: null,
+    // L'utilisateur peut bien MODIFIER l'édition : c'est le droit sur la CIBLE qui est en jeu.
+    creatorId: 7,
+    convention: { id: 1, name: 'Convention source', authorId: 7, organizers: [] },
+  }
+
+  const evenement = { context: { user: utilisateur, params: { id: '1' } } }
+
+  /** La convention cible, telle que Prisma la rendrait. */
+  const cible = (organisateurs: Record<string, unknown>[], isArchived = false) => ({
+    id: CIBLE,
+    name: 'Convention cible',
+    authorId: 999,
+    isArchived,
+    organizers: organisateurs,
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    global.readBody = vi.fn().mockResolvedValue({ conventionId: CIBLE })
+    global.getRouterParam = vi.fn().mockReturnValue('1')
+    mockGeocodeEdition.mockResolvedValue({ latitude: 48.8566, longitude: 2.3522 })
+    prismaMock.edition.findUnique.mockResolvedValue(edition)
+    prismaMock.edition.update.mockResolvedValue(edition)
+  })
+
+  it('ACCEPTE un organisateur qui peut ajouter une édition', async () => {
+    /*
+     * 🔬 Le cas qui ne passait pas : c'est exactement le droit qu'il faut pour créer une édition
+     * dans cette convention, et il ne permettait pas d'y en déplacer une.
+     */
+    prismaMock.convention.findUnique.mockResolvedValue(
+      cible([{ userId: 7, canAddEdition: true, canManageOrganizers: false }])
+    )
+
+    await expect(handler(evenement as any)).resolves.toBeTruthy()
+  })
+
+  it('REFUSE un gestionnaire d’organisateurs SANS droit d’ajout', async () => {
+    /*
+     * 🔬 L'autre sens de l'écart, et il est plus gênant : gérer les organisateurs d'une convention
+     * n'a rien à voir avec le fait d'y verser une édition entière.
+     */
+    prismaMock.convention.findUnique.mockResolvedValue(
+      cible([{ userId: 7, canAddEdition: false, canManageOrganizers: true }])
+    )
+
+    await expect(handler(evenement as any)).rejects.toMatchObject({ statusCode: 403 })
+    expect(prismaMock.edition.update).not.toHaveBeenCalled()
+  })
+
+  it('ACCEPTE l’auteur de la convention cible', async () => {
+    prismaMock.convention.findUnique.mockResolvedValue({ ...cible([]), authorId: 7 })
+
+    await expect(handler(evenement as any)).resolves.toBeTruthy()
+  })
+
+  it('REFUSE une convention ARCHIVÉE, par un 409', async () => {
+    /*
+     * ⚠️ Rien ne l'interdisait : on pouvait déverser une édition vivante dans une convention
+     * archivée, que la création refuse pourtant. Le 409 est le code de la création — il dit « pas
+     * dans cet état », et non « pas vous ».
+     */
+    prismaMock.convention.findUnique.mockResolvedValue(
+      cible([{ userId: 7, canAddEdition: true }], true)
+    )
+
+    await expect(handler(evenement as any)).rejects.toMatchObject({ statusCode: 409 })
+  })
+
+  it('rend 404 pour une convention cible introuvable', async () => {
+    prismaMock.convention.findUnique.mockResolvedValue(null)
+
+    await expect(handler(evenement as any)).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('ne CONTRÔLE RIEN quand la convention ne change pas', async () => {
+    /*
+     * Un PUT ordinaire porte souvent le `conventionId` courant : le faire passer par le contrôle
+     * de la cible exigerait un droit d'ajout pour une simple correction de faute de frappe.
+     */
+    global.readBody.mockResolvedValue({ conventionId: 1, city: 'Lyon' })
+
+    await expect(handler(evenement as any)).resolves.toBeTruthy()
+    expect(prismaMock.convention.findUnique).not.toHaveBeenCalled()
+  })
+})

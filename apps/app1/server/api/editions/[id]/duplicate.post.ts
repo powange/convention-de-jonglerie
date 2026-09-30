@@ -20,6 +20,10 @@ export default wrapApiHandler(
         startDate: true,
         endDate: true,
         timezone: true,
+        // La devise commande TOUS les montants de la trésorerie et de la billetterie : sans elle,
+        // la copie repartait en EUR et les tarifs recopiés changeaient de sens.
+        currency: true,
+        artistInfo: true,
         // Adresse + géolocalisation
         addressLine1: true,
         addressLine2: true,
@@ -34,6 +38,8 @@ export default wrapApiHandler(
         instagramUrl: true,
         ticketingUrl: true,
         officialWebsiteUrl: true,
+        jugglingEdgeUrl: true,
+        programUrl: true,
         // Services
         hasFoodTrucks: true,
         hasKidsZone: true,
@@ -60,9 +66,15 @@ export default wrapApiHandler(
         hasAfjTokenPayment: true,
         hasATM: true,
         hasLongShow: true,
+        hasUnicycleSpace: true,
         // Config billetterie
         ticketingAllowOnsiteRegistration: true,
         ticketingAllowAnonymousOrders: true,
+        ticketingPaymentCash: true,
+        ticketingPaymentCard: true,
+        ticketingPaymentCheck: true,
+        ticketingSumupEnabled: true,
+        ticketingHandoutItemsEnabled: true,
         // Config repas
         mealsEnabled: true,
         // Config artistes
@@ -72,9 +84,34 @@ export default wrapApiHandler(
         // Config workshops
         workshopsEnabled: true,
         workshopLocationsFreeInput: true,
-        // Carte : les zones et marqueurs sont recopiés plus bas, la carte externe suit le même
-        // sort — sinon une édition dupliquée perdrait sa carte en gardant tout le reste.
-        mapPublic: true,
+        /*
+         * Les autres modules, qui manquaient tous.
+         *
+         * ⚠️ LE CAS LE PLUS VISIBLE ÉTAIT `siteMapEnabled` : les zones et les marqueurs sont
+         * recopiés plus bas, mais le module restait ÉTEINT. La copie avait donc une carte
+         * complète, invisible, et pas même d'onglet pour la trouver. Idem pour la trésorerie, dont
+         * la devise conditionne tous les montants.
+         */
+        siteMapEnabled: true,
+        programEnabled: true,
+        tasksEnabled: true,
+        stockEnabled: true,
+        faqEnabled: true,
+        treasuryEnabled: true,
+        /*
+         * Carte : les zones, les marqueurs et la carte externe sont recopiés — sinon une édition
+         * dupliquée perdrait sa carte en gardant tout le reste.
+         *
+         * ⚠️⚠️ MAIS `mapPublic` N'EST PLUS COPIÉ, et ce n'est pas une préférence : c'est une
+         * brèche que l'ajout de `siteMapEnabled` ci-dessus ouvrirait. Depuis #644, les points
+         * d'API publics des zones et des marqueurs laissent passer un ANONYME dès que
+         * `siteMapEnabled && mapPublic` — et ils ne regardent pas le statut de l'édition. Copier
+         * les deux drapeaux livrerait donc la carte d'une copie fraîche, `OFFLINE`, à qui connaît
+         * son numéro. La copie naît non publiée : elle ne doit rien publier.
+         *
+         * `faqPagePublic` et `programPagePublic` ne sont pas copiés non plus, pour la même
+         * raison — ils ne figuraient déjà pas dans ce `select`.
+         */
         externalMapProvider: true,
         externalMapRef: true,
         // Config bénévole (étape 0bis) : portée par Event/EventVolunteerSettings
