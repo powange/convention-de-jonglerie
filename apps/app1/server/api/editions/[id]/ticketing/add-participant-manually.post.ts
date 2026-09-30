@@ -10,7 +10,22 @@ import { schemaAdresseEmail } from '~~/shared/utils/adresse-email'
 const itemSchema = z.object({
   tierId: z.number(),
   quantity: z.number().min(1),
-  customAmount: z.number().optional(), // Montant personnalisé en centimes pour les tarifs à prix libre
+  /**
+   * Montant personnalisé, EN CENTIMES, pour un tarif à prix libre.
+   *
+   * ⚠️ `z.number()` seul acceptait n'importe quoi : un négatif (qui retirait de l'argent au total
+   * de la commande), un décimal (`12.5` centime, que la base tronque sans rien dire), et un
+   * montant pour un tarif à PRIX FIXE — où il écrasait silencieusement le prix affiché à la
+   * personne au guichet.
+   *
+   * `int()` parce que l'unité est le centime : un « demi-centime » n'existe pas, et l'accepter
+   * produit un total qui ne se recoupe avec aucun encaissement. `min(0)` parce qu'un billet ne
+   * rapporte pas d'argent négatif ; zéro reste permis — un tarif à prix libre peut être offert.
+   *
+   * Les BORNES du tarif (`minAmount`/`maxAmount`), elles, sont vérifiées côté serveur plus bas :
+   * elles dépendent du tarif visé, que le schéma ne connaît pas.
+   */
+  customAmount: z.number().int().min(0).optional(),
   customParticipants: z
     .array(
       z.object({
@@ -105,6 +120,14 @@ export default wrapApiHandler(
           name: true,
           customName: true,
           price: true,
+          /*
+           * Les bornes du prix libre. Sans elles, `customAmount` était accepté pour TOUT tarif et
+           * sans limite : on pouvait enregistrer 1 centime sur une entrée à 20 €, ou 1 € sur un
+           * tarif à prix libre dont le minimum est 5 €. Le guichet affiche pourtant le prix du
+           * tarif, et c'est `order.amount` que lisent les totaux par moyen de paiement.
+           */
+          minAmount: true,
+          maxAmount: true,
         },
       })
 
@@ -147,20 +170,82 @@ export default wrapApiHandler(
       ]
       const optionsChoisies = idsOptionsChoisies.length
         ? await prisma.ticketingOption.findMany({
-            where: { id: { in: idsOptionsChoisies } },
+            /*
+             * ⚠️ BORNÉ À L'ÉDITION. La requête ne filtrait que sur l'identifiant : un `optionId`
+             * appartenant à une AUTRE édition était chargé, son prix entrait dans le total, et son
+             * association était écrite sur le billet. Rien ne le signalait — l'option existe, elle
+             * a un prix, elle a des repas ; elle n'est simplement pas de cette édition.
+             *
+             * Conséquences concrètes : un repas d'une autre convention se retrouvait dû, et les
+             * quotas de l'édition comptaient une option qui ne leur appartient pas.
+             */
+            where: { id: { in: idsOptionsChoisies }, editionId },
             include: { meals: { include: { meal: true } } },
           })
         : []
+
+      /*
+       * Et on REFUSE, plutôt que d'ignorer : la même règle que pour les tarifs juste au-dessus.
+       * Ignorer en silence donnerait une commande au total plus faible que ce que le guichet a
+       * affiché, sans que personne ne sache pourquoi — le pire des deux mondes, puisque
+       * l'encaissement, lui, a bien eu lieu.
+       */
+      if (optionsChoisies.length !== idsOptionsChoisies.length) {
+        throw createError({
+          status: 400,
+          message: 'Certaines options sont invalides',
+        })
+      }
+
       const optionParId = new Map(optionsChoisies.map((option) => [option.id, option]))
 
       /** Le prix d'une option, en centimes. `null` en base veut dire « gratuite ». */
       const prixDeLOption = (optionId: number) => optionParId.get(optionId)?.price ?? 0
 
+      /**
+       * Le prix retenu pour une ligne, en centimes.
+       *
+       * ⚠️ `customAmount` N'EST RETENU QUE SUR UN TARIF À PRIX LIBRE. Le code écrivait
+       * `item.customAmount ?? tier?.price`, donc un montant personnalisé écrasait le prix de
+       * N'IMPORTE QUEL tarif — y compris une entrée à prix fixe. Le guichet affiche pourtant le
+       * prix du tarif, et c'est `order.amount` que lisent les totaux par moyen de paiement : on
+       * encaissait 20 € et on enregistrait ce que le client avait envoyé.
+       *
+       * La règle du prix libre est celle de `isFreePrice` (`layers/ticketing/app/utils/ticketing`) :
+       * `minAmount` ou `maxAmount` non nul. Elle n'est pas recopiée en important cet util — il vit
+       * dans un layer côté APPLICATION, hors de portée du serveur — mais la condition est
+       * identique, et le commentaire le dit pour que les deux se retrouvent.
+       *
+       * Hors des bornes, on REFUSE. Accepter 1 € sur un tarif dont le minimum est 5 € créerait un
+       * billet valide à un prix que la billetterie n'autorise pas, et que rien ne rattraperait.
+       */
+      const prixDeLaLigne = (item: (typeof body.items)[number]) => {
+        const tier = tierMap.get(item.tierId)
+        const prixFixe = tier?.price ?? 0
+
+        if (item.customAmount === undefined) return prixFixe
+
+        const prixLibre = tier?.minAmount != null || tier?.maxAmount != null
+        // Tarif à prix FIXE : le montant envoyé est ignoré, sans erreur — l'écran peut l'envoyer
+        // par habitude, et refuser la commande pour cela bloquerait un guichet sans raison.
+        if (!prixLibre) return prixFixe
+
+        const min = tier?.minAmount ?? 0
+        const max = tier?.maxAmount ?? Number.POSITIVE_INFINITY
+        if (item.customAmount < min || item.customAmount > max) {
+          throw createError({
+            status: 400,
+            // Lisible à l'écran : `AddParticipantModal.vue` affiche ce message tel quel.
+            message: `Le montant saisi pour « ${tier?.name ?? 'ce tarif'} » doit être compris entre ${(min / 100).toFixed(2)} € et ${max === Number.POSITIVE_INFINITY ? '∞' : (max / 100).toFixed(2) + ' €'}`,
+          })
+        }
+
+        return item.customAmount
+      }
+
       // Calculer le montant total
       const totalAmount = body.items.reduce((sum, item) => {
-        const tier = tierMap.get(item.tierId)
-        // Utiliser le montant personnalisé si disponible, sinon le prix du tarif
-        const itemPrice = item.customAmount ?? tier?.price ?? 0
+        const itemPrice = prixDeLaLigne(item)
 
         /*
          * Les options sont portées par CHAQUE participant, pas par la ligne : deux billets d'un même
@@ -209,8 +294,16 @@ export default wrapApiHandler(
       for (const item of body.items) {
         const tier = tierMap.get(item.tierId)!
         const customParticipants = item.customParticipants || []
-        // Utiliser le montant personnalisé si disponible, sinon le prix du tarif
-        const itemPrice = item.customAmount ?? tier.price
+        /*
+         * ⚠️ LE MÊME CALCUL QUE POUR LE TOTAL, par la même fonction. Les deux endroits écrivaient
+         * `item.customAmount ?? tier.price` chacun de leur côté : appliquer la nouvelle règle à un
+         * seul aurait fait diverger le total de la commande et le prix de ses lignes — un écart
+         * qui ne lève aucune erreur, et que seul un rapprochement comptable révèle.
+         *
+         * C'est exactement le défaut qui s'est déjà produit dans ce fichier, quand les options
+         * entraient dans le total sans entrer dans les lignes.
+         */
+        const itemPrice = prixDeLaLigne(item)
 
         // Créer un item pour chaque quantité
         for (let i = 0; i < item.quantity; i++) {
