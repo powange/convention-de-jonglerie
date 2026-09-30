@@ -1,116 +1,73 @@
 <template>
-  <UModal v-model:open="showBanner" :title="$t('pwa.install.title')">
-    <template #body>
-      <div class="space-y-4">
-        <p class="text-sm text-gray-600">
-          {{ $t('pwa.install.description') }}
-        </p>
+  <!--
+    ⚠️ UN BANDEAU, PLUS UNE MODALE. L'invitation s'affichait dans une `UModal` cinq secondes après
+    l'événement du navigateur, par-dessus n'importe quelle page — donc au milieu d'une candidature
+    de bénévole, d'un profil en cours d'édition, ou d'un scan de billets au guichet. Les cinq
+    secondes sont exactement le temps qu'il faut pour commencer à taper.
 
-        <div class="flex gap-2 justify-end">
-          <UButton
-            :label="$t('pwa.install.later')"
-            variant="outline"
-            color="neutral"
-            @click="dismiss"
-          />
-          <UButton :label="$t('pwa.install.button')" color="primary" @click="installApp" />
-        </div>
+    Le bandeau est `fixed` et ne capte ni le focus ni les clics ailleurs que sur ses deux boutons.
+    En bas de l'écran sur mobile, il ne recouvre rien de ce qu'on est en train de lire ; sur
+    ordinateur, il se range dans le coin.
+
+    `UBanner` n'a pas été retenu malgré son nom : il s'affiche en HAUT du site, par conception, et
+    pousse le contenu vers le bas — ce qui déplacerait la page sous les doigts de quelqu'un en
+    train de la lire. `UAlert` dans un conteneur positionné donne exactement ce qu'on veut.
+  -->
+  <ClientOnly>
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0 translate-y-4"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 translate-y-4"
+    >
+      <div
+        v-if="afficherLeBandeau"
+        class="fixed inset-x-0 bottom-0 z-40 p-4 sm:inset-x-auto sm:right-4 sm:bottom-4 sm:max-w-sm"
+      >
+        <UAlert
+          :title="$t('pwa.install.title')"
+          :description="$t('pwa.install.description')"
+          icon="i-heroicons-arrow-down-tray"
+          color="primary"
+          variant="subtle"
+          class="shadow-lg"
+          :close="{ 'aria-label': $t('pwa.install.later') }"
+          :actions="[
+            {
+              label: $t('pwa.install.button'),
+              color: 'primary',
+              onClick: () => installer(),
+            },
+            {
+              label: $t('pwa.install.later'),
+              color: 'neutral',
+              variant: 'ghost',
+              onClick: () => reporter(),
+            },
+          ]"
+          @update:open="reporter()"
+        />
       </div>
-    </template>
-  </UModal>
+    </Transition>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
-const toast = useToast()
+/**
+ * L'invitation à installer l'application.
+ *
+ * Toute la décision — événement du navigateur, report de sept jours, écrans exclus — vit dans
+ * `useInvitePwa`, partagé avec l'entrée du menu utilisateur. Le navigateur n'émet
+ * `beforeinstallprompt` QU'UNE FOIS : deux composants qui l'écouteraient séparément se
+ * disputeraient le même événement, et le second n'aurait jamais rien.
+ */
+const { afficherLeBandeau, installer, reporter, ecouterLeNavigateur } = useInvitePwa()
 
-const showBanner = ref(false)
-let deferredPrompt: any = null
-
-const installApp = async () => {
-  if (!deferredPrompt) return
-
-  try {
-    // Afficher le prompt d'installation
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-
-    if (outcome === 'accepted') {
-      // Installation acceptée
-      showBanner.value = false
-      toast.add({
-        title: t('pwa.install.success.title'),
-        description: t('pwa.install.success.description'),
-        icon: 'i-heroicons-check-circle',
-        color: 'success',
-      })
-    } else {
-      // Installation refusée
-      toast.add({
-        title: t('pwa.install.cancelled.title'),
-        description: t('pwa.install.cancelled.description'),
-        icon: 'i-heroicons-information-circle',
-        color: 'neutral',
-      })
-    }
-
-    deferredPrompt = null
-  } catch (error) {
-    console.error("Erreur lors de l'installation:", error)
-    toast.add({
-      title: t('pwa.install.error.title'),
-      description: t('pwa.install.error.description'),
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error',
-    })
-  }
-}
-
-const dismiss = () => {
-  showBanner.value = false
-  // Stocker le refus pendant 7 jours
-  localStorage.setItem('pwa-dismissed', Date.now().toString())
-}
-
-// Vérifier si on doit afficher la bannière
-const shouldShowBanner = () => {
-  // Vérifier si déjà installé
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    return false
-  }
-
-  // Vérifier si récemment refusé (7 jours)
-  const dismissed = localStorage.getItem('pwa-dismissed')
-  if (dismissed) {
-    const dismissedTime = parseInt(dismissed)
-    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
-    if (dismissedTime > sevenDaysAgo) {
-      return false
-    }
-  }
-
-  return true
-}
-
-onMounted(() => {
-  if (!shouldShowBanner()) return
-
-  // Écouter l'événement d'installation
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault()
-    deferredPrompt = e
-
-    // Attendre 5 secondes avant d'afficher la bannière
-    setTimeout(() => {
-      if (shouldShowBanner()) {
-        showBanner.value = true
-      }
-    }, 5000)
-  })
-
-  // Écouter l'événement d'installation réussie
-  window.addEventListener('appinstalled', () => {
-    showBanner.value = false
-  })
-})
+// Ce composant est monté par le composant racine de l'application, donc sur toutes les pages :
+// c'est le seul endroit d'où l'on peut garantir que l'événement du navigateur ne sera pas manqué.
+// (Le chemin du fichier n'est pas écrit entre accents graves : `check-i18n` lit un mot pointé
+// ainsi comme une clé de traduction manquante — quatrième fois que ce faux positif se présente.)
+onMounted(ecouterLeNavigateur)
 </script>
