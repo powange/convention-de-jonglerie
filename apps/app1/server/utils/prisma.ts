@@ -3,6 +3,8 @@ import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 
 import { PrismaClient, Prisma } from '../generated/prisma/client'
 
+import { analyserUrlDeBase } from './url-de-base-de-donnees'
+
 export { Prisma }
 
 /**
@@ -31,17 +33,24 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable is not set')
 }
 
-// Parse MySQL connection URL (format: mysql://user:password@host:port/database)
-const url = new URL(databaseUrl)
+/*
+ * ⚠️ LES IDENTIFIANTS SONT DÉCODÉS, et ce n'est pas une précaution théorique.
+ *
+ * Le code passait `url.username`, `url.password` et `url.pathname` directement au pilote. Or
+ * `new URL()` rend ces champs POURCENT-ENCODÉS : un mot de passe écrit `p%40ss` dans l'URL — la
+ * seule écriture valable pour `p@ss` — arrivait au pilote sous la forme `p%40ss`, et
+ * l'authentification échouait.
+ *
+ * Le symptôme est trompeur : « Access denied for user », le message qu'on lit quand le mot de
+ * passe est FAUX. On cherche une faute de saisie, et il n'y en a pas — le mot de passe est juste,
+ * c'est son transport qui le corrompt.
+ */
+const identifiants = analyserUrlDeBase(databaseUrl)
 
 // Create Prisma adapter with MariaDB driver
 // L'adaptateur gère automatiquement le pool de connexions
 const adapter = new PrismaMariaDb({
-  host: url.hostname,
-  port: parseInt(url.port) || 3306,
-  user: url.username,
-  password: url.password,
-  database: url.pathname.slice(1),
+  ...identifiants,
   connectionLimit: 10,
   bigIntAsNumber: true,
 })
