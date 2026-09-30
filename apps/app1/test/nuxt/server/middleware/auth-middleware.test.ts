@@ -16,6 +16,7 @@ vi.mock('../../../../server/utils/session-helpers', () => ({
 
 import authMiddleware from '../../../../server/middleware/auth'
 import { global } from '../../globales-nitro'
+import { viderCacheDesSessions } from '../../../../server/utils/cache-session'
 
 // Mock global de Prisma défini dans test/setup-common.ts
 const prismaMock = (globalThis as any).prisma
@@ -50,6 +51,14 @@ describe("Middleware d'authentification", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    /*
+     * ⚠️ Le cache de la génération de session vit au niveau du MODULE : il survit donc à
+     * `clearAllMocks` et fuit d'un test à l'autre. Sans ce vidage, un test qui mémorise la
+     * génération 4 fait accepter la session du suivant, et un test qui compte les lectures Prisma
+     * en trouve zéro. Trois tests de ce fichier sont tombés ainsi en ajoutant le cache — il se
+     * réinitialise comme un mock, parce que c'est de l'état partagé au même titre.
+     */
+    viderCacheDesSessions()
     mockDefineEventHandler.mockImplementation((fn) => fn)
     mockUseRuntimeConfig.mockReturnValue({})
     mockCreateError.mockImplementation(({ statusCode, statusMessage }) => {
@@ -363,16 +372,33 @@ describe("Middleware d'authentification", () => {
       expect((ev.context as any).user.id).toBe(1)
     })
 
-    it('lit la génération dans la MÊME requête que l’existence du compte', async () => {
-      // L'argument qui a fait retenir ce mécanisme : il ne coûte aucune requête supplémentaire.
+    it('ne lit QUE la génération, en une seule requête', async () => {
+      /*
+       * L'argument qui a fait retenir ce mécanisme : il ne coûte pas de requête supplémentaire. La
+       * lecture passe désormais par le cache (`cache-session.ts`), qui ne demande plus `id` —
+       * l'identifiant est déjà connu, et le sélectionner ne servait qu'à distinguer « compte
+       * absent » de « génération nulle », ce que le cache fait par un `null`.
+       */
       mockGetSession.mockResolvedValue({ user: { id: 1 }, sessionVersion: 0 })
-      prismaMock.user.findUnique.mockResolvedValue({ id: 1, sessionVersion: 0 })
+      prismaMock.user.findUnique.mockResolvedValue({ sessionVersion: 0 })
 
       await authMiddleware(evenement() as H3Event)
 
       expect(prismaMock.user.findUnique).toHaveBeenCalledOnce()
       const [args] = prismaMock.user.findUnique.mock.calls[0]!
-      expect(args.select).toEqual({ id: true, sessionVersion: true })
+      expect(args.select).toEqual({ sessionVersion: true })
+    })
+
+    it('ne relit PAS la base pour une seconde requête du même compte', async () => {
+      // Le gain du lot, vu depuis le middleware : un écran de gestion enchaîne cinq à quinze
+      // appels par page, et ils ne paient plus qu'une lecture.
+      mockGetSession.mockResolvedValue({ user: { id: 1 }, sessionVersion: 0 })
+      prismaMock.user.findUnique.mockResolvedValue({ sessionVersion: 0 })
+
+      await authMiddleware(evenement() as H3Event)
+      await authMiddleware(evenement() as H3Event)
+
+      expect(prismaMock.user.findUnique).toHaveBeenCalledOnce()
     })
   })
 })

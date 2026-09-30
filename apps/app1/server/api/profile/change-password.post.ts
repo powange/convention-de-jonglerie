@@ -4,6 +4,7 @@ import { clearUserSession } from '#imports'
 
 import { wrapApiHandler, createSuccessResponse } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { changePasswordSchema, validateAndSanitize } from '#server/utils/validation-schemas'
 
@@ -78,6 +79,10 @@ export default wrapApiHandler(
         sessionVersion: { increment: 1 },
       },
     })
+
+    // La génération vient de changer : le cache du middleware doit la relire, sinon les sessions
+    // ouvertes ailleurs resteraient acceptées le temps de son expiration.
+    oublierSessionDuCompte(user.id)
 
     await clearUserSession(event)
 

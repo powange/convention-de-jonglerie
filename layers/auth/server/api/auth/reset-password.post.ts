@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { clearUserSession } from '#imports'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { fetchResourceByFieldOrFail } from '#server/utils/prisma-helpers'
 import { authRateLimiter } from '#server/utils/rate-limiter'
 import { passwordSchema } from '#server/utils/validation-schemas'
@@ -69,6 +70,13 @@ export default wrapApiHandler(
         sessionVersion: { increment: 1 },
       },
     })
+
+    /*
+     * Oubli IMMÉDIAT, et c'est ici que cela compte le plus : on réinitialise son mot de passe
+     * précisément quand on soupçonne que quelqu'un d'autre le connaît. Un délai de grâce de trente
+     * secondes y serait le pire endroit possible.
+     */
+    oublierSessionDuCompte(resetToken.userId)
 
     // Invalider TOUS les tokens de reset de cet utilisateur (sécurité + nettoyage BDD)
     // Empêche la réutilisation d'un autre token actif et nettoie les tokens obsolètes.

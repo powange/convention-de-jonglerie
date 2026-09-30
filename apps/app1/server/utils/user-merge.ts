@@ -22,6 +22,8 @@ import {
 
 import type { PrismaTransaction } from '../types/prisma-helpers'
 
+import { oublierSessionDuCompte } from '#server/utils/cache-session'
+
 const log = createLogger('USER-MERGE')
 
 /** Champs de profil que l'administrateur peut arbitrer dans le modal de fusion. */
@@ -396,6 +398,9 @@ export async function mergeUsers({
         where: { entityType: 'User', entityId: String(sourceId) },
         data: { entityId: String(targetId) },
       })
+
+      // Le compte absorbé disparaît : ses sessions ouvertes ne doivent plus être acceptées.
+      oublierSessionDuCompte(sourceId)
 
       await tx.user.delete({ where: { id: sourceId } })
 

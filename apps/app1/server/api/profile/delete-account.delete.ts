@@ -4,6 +4,7 @@ import { clearUserSession } from '#imports'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { oublierSessionDuCompte } from '#server/utils/cache-session'
 
 export default wrapApiHandler(
   async (event) => {
@@ -54,6 +55,10 @@ export default wrapApiHandler(
     }
 
     // Supprimer l'utilisateur (les cascades Prisma gèrent les relations)
+    // Le compte disparaît : sans cet oubli, le middleware accepterait encore sa session et les
+    // handlers renverraient le « Utilisateur introuvable » que ce contrôle existe pour éviter.
+    oublierSessionDuCompte(user.id)
+
     await prisma.user.delete({
       where: { id: dbUser.id },
     })
