@@ -37,27 +37,23 @@
       </div>
 
       <!-- Liste des appels -->
-      <div v-if="showCallsLoading" class="flex justify-center py-8">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-gray-400" />
-      </div>
+      <UiSqueletteDeListe v-if="showCallsLoading" :lignes="4" :libelle="$t('common.loading')" />
 
       <div v-else-if="showCalls.length === 0" class="py-12">
         <UCard>
-          <div class="text-center py-8">
-            <UIcon
-              name="i-heroicons-sparkles"
-              class="text-4xl text-gray-300 dark:text-gray-600 mb-4"
-            />
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              {{ $t('gestion.shows_call.no_calls') }}
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-4">
-              {{ $t('gestion.shows_call.no_calls_desc') }}
-            </p>
-            <UButton icon="i-heroicons-plus" color="primary" @click="openCreateModal">
-              {{ $t('gestion.shows_call.create_first') }}
-            </UButton>
-          </div>
+          <UiEtatVide
+            compact
+            icone="i-heroicons-sparkles"
+            classe-icone="text-gray-300 dark:text-gray-600"
+            :titre="$t('gestion.shows_call.no_calls')"
+            :description="$t('gestion.shows_call.no_calls_desc')"
+          >
+            <template #action>
+              <UButton icon="i-heroicons-plus" color="primary" @click="openCreateModal">
+                {{ $t('gestion.shows_call.create_first') }}
+              </UButton>
+            </template>
+          </UiEtatVide>
         </UCard>
       </div>
 

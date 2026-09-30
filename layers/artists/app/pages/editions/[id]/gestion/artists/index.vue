@@ -251,10 +251,12 @@
           <p class="text-gray-500">{{ $t('common.loading') }}</p>
         </div>
 
-        <div v-else-if="artists.length === 0" class="text-center py-8">
-          <UIcon name="i-heroicons-user-group" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <p class="text-gray-500">{{ $t('artists.no_artists') }}</p>
-        </div>
+        <UiEtatVide
+          v-else-if="artists.length === 0"
+          compact
+          icone="i-heroicons-user-group"
+          :titre="$t('artists.no_artists')"
+        />
 
         <div v-else class="overflow-x-auto">
           <UContextMenu :items="contextMenuItems">

@@ -25,18 +25,17 @@
       </div>
     </div>
 
-    <div v-if="chargement" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8 text-gray-400" />
-    </div>
+    <UiSqueletteDeListe v-if="chargement" :lignes="5" :libelle="$t('common.loading')" />
 
     <!-- Rien à signaler est une bonne nouvelle, et mérite d'être dit comme telle plutôt que
          laissé à une page vide qu'on prendrait pour un chargement raté. -->
-    <div v-else-if="emprunts.length === 0" class="text-center py-12">
-      <UIcon name="i-heroicons-check-circle" class="size-12 text-green-500 mx-auto mb-3" />
-      <p class="text-gray-600 dark:text-gray-400">
-        {{ t('gestion.stock.loans_none') }}
-      </p>
-    </div>
+    <!-- La teinte verte dit que ce vide est une bonne nouvelle : plus rien à relancer. -->
+    <UiEtatVide
+      v-else-if="emprunts.length === 0"
+      icone="i-heroicons-check-circle"
+      classe-icone="text-green-500"
+      :titre="t('gestion.stock.loans_none')"
+    />
 
     <div v-else class="space-y-4">
       <!-- Deux moments, deux onglets : aller chercher, puis rapporter. Le compte figure sur

@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Розбіжність велика: частина квитків, імовірно, має адресу того, хто платив, і рахується за одну особу. Заповнення адреси кожного учасника уточнює цифру.",
       "affluence_expected_total": "Загалом очікується {count} особа | Загалом очікується {count} осіб",
       "affluence_gauge": "Очікувана кількість",
-      "affluence_gauge_tooltip": "{count} очікується | {count} очікується"
+      "affluence_gauge_tooltip": "{count} очікується | {count} очікується",
+      "external_no_tiers_found": "Тарифів або опцій не знайдено",
+      "external_no_tiers_found_hint": "Перевірте, чи містить ваша форма HelloAsso тарифи",
+      "orders_no_results": "Результатів не знайдено",
+      "orders_none": "Замовлень не знайдено",
+      "orders_none_hint": "Імпортуйте замовлення з вашої зовнішньої системи продажу квитків"
     },
     "title": "Керування",
     "view_edition": "Переглянути випуск",

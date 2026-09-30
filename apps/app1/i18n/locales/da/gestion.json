@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Forskellen er stor: flere billetter deler sandsynligvis adressen på den, der har betalt, og tælles så som én person. At udfylde hver deltagers adresse gør tallet skarpere.",
       "affluence_expected_total": "{count} person forventet i alt | {count} personer forventet i alt",
       "affluence_gauge": "Forventet antal",
-      "affluence_gauge_tooltip": "{count} forventet | {count} forventet"
+      "affluence_gauge_tooltip": "{count} forventet | {count} forventet",
+      "external_no_tiers_found": "Ingen billettype eller tilvalg fundet",
+      "external_no_tiers_found_hint": "Kontrollér, at din HelloAsso-formular indeholder billettyper",
+      "orders_no_results": "Intet resultat fundet",
+      "orders_none": "Ingen ordre fundet",
+      "orders_none_hint": "Importér ordrerne fra dit eksterne billetsystem"
     },
     "title": "Administration",
     "view_edition": "Se udgaven",

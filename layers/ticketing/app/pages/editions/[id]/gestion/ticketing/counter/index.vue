@@ -32,12 +32,7 @@
       </div>
 
       <!-- Liste des compteurs -->
-      <div v-if="loading" class="text-center py-12">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin h-8 w-8 text-gray-400 mx-auto" />
-        <p class="mt-2 text-gray-600 dark:text-gray-400">
-          {{ $t('ticketing.counters.loading') }}
-        </p>
-      </div>
+      <UiSqueletteDeListe v-if="loading" :lignes="4" :libelle="$t('ticketing.counters.loading')" />
 
       <div v-else-if="fetchError" class="mb-6">
         <UAlert
@@ -49,18 +44,18 @@
         />
       </div>
 
-      <div v-else-if="counters.length === 0" class="text-center py-12">
-        <UIcon name="i-heroicons-calculator" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          {{ $t('ticketing.counters.no_counters') }}
-        </h3>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">
-          {{ $t('ticketing.counters.no_counters_description') }}
-        </p>
-        <UButton icon="i-heroicons-plus" color="primary" @click="showCreateModal = true">
-          {{ $t('ticketing.counters.create_first_counter') }}
-        </UButton>
-      </div>
+      <UiEtatVide
+        v-else-if="counters.length === 0"
+        icone="i-heroicons-calculator"
+        :titre="$t('ticketing.counters.no_counters')"
+        :description="$t('ticketing.counters.no_counters_description')"
+      >
+        <template #action>
+          <UButton icon="i-heroicons-plus" color="primary" @click="showCreateModal = true">
+            {{ $t('ticketing.counters.create_first_counter') }}
+          </UButton>
+        </template>
+      </UiEtatVide>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <UCard

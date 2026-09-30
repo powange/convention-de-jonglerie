@@ -18,6 +18,32 @@ export const STATUT_PAR_DEFAUT = 'ALL'
 /** La provenance d'arrivée de l'écran : aucun filtre. */
 export const SOURCE_PAR_DEFAUT = 'ALL'
 
+/**
+ * Les colonnes sur lesquelles ce tableau sait classer.
+ *
+ * ⚠️ CETTE LISTE RECOPIE `COLONNES` de `server/utils/tri-candidatures.ts`, et il faut qu'elle
+ * reste d'accord avec elle. Ce fichier ne doit rien importer — il est chargé hors Nuxt par les
+ * tests unitaires, et le fichier serveur importe un type de Prisma. Un test compare donc les deux
+ * listes : elles ne peuvent plus diverger en silence.
+ *
+ * Pourquoi cette exigence : la liste est paginée PAR LE SERVEUR. Un champ que lui ignore ferait
+ * revenir les candidatures dans l'ordre par défaut, sous un en-tête de colonne pourtant fléché —
+ * un classement faux mais plausible, le pire des cas.
+ */
+export const COLONNES_TRIABLES = [
+  'pseudo',
+  'prenom',
+  'nom',
+  'allergies',
+  'status',
+  'createdAt',
+  'arrivalDateTime',
+  'departureDateTime',
+] as const
+
+/** Le classement d'arrivée : les candidatures les plus récentes d'abord. */
+export const TRI_PAR_DEFAUT = { champ: 'createdAt', descendant: true } as const
+
 /** Les filtres, tels que le tableau les manipule. */
 export interface FiltresDeCandidatures {
   statut: string

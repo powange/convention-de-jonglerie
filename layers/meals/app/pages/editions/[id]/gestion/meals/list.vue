@@ -305,9 +305,12 @@
           </div>
 
           <!-- Tableau -->
-          <div v-if="loading" class="flex items-center justify-center py-8">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 text-primary-500" />
-          </div>
+          <UiSqueletteDeListe
+            v-if="loading"
+            :lignes="6"
+            avec-avatar
+            :libelle="t('common.loading')"
+          />
 
           <div v-else-if="formattedParticipants.length === 0" class="text-center py-8">
             <p class="text-gray-500 dark:text-gray-400">

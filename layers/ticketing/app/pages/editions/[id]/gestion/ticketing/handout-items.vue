@@ -93,16 +93,14 @@
             :ui="{ list: 'hidden sm:flex' }"
           >
             <template #tiers>
-              <div v-if="loadingTiers" class="text-center py-6">
-                <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-              </div>
-              <div
+              <UiSqueletteDeListe v-if="loadingTiers" :lignes="3" :libelle="$t('common.loading')" />
+              <UiEtatVide
                 v-else-if="tiers.length === 0"
-                class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-              >
-                <UIcon name="i-heroicons-ticket" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                <p class="text-sm text-gray-500">{{ $t('gestion.ticketing.no_tiers_yet') }}</p>
-              </div>
+                compact
+                icone="i-heroicons-ticket"
+                :titre="$t('gestion.ticketing.no_tiers_yet')"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+              />
               <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
                 <li
                   v-for="tier in tiers"
@@ -153,19 +151,18 @@
             </template>
 
             <template #options>
-              <div v-if="loadingOptions" class="text-center py-6">
-                <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-              </div>
-              <div
+              <UiSqueletteDeListe
+                v-if="loadingOptions"
+                :lignes="3"
+                :libelle="$t('common.loading')"
+              />
+              <UiEtatVide
                 v-else-if="ticketingOptions.length === 0"
-                class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-              >
-                <UIcon
-                  name="i-heroicons-adjustments-horizontal"
-                  class="mx-auto h-8 w-8 text-gray-400 mb-2"
-                />
-                <p class="text-sm text-gray-500">{{ $t('gestion.ticketing.no_options_yet') }}</p>
-              </div>
+                compact
+                icone="i-heroicons-adjustments-horizontal"
+                :titre="$t('gestion.ticketing.no_options_yet')"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+              />
               <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
                 <li
                   v-for="option in ticketingOptions"
@@ -216,21 +213,18 @@
             </template>
 
             <template #customfields>
-              <div v-if="loadingCustomFields" class="text-center py-6">
-                <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-              </div>
-              <div
+              <UiSqueletteDeListe
+                v-if="loadingCustomFields"
+                :lignes="3"
+                :libelle="$t('common.loading')"
+              />
+              <UiEtatVide
                 v-else-if="customFields.length === 0"
-                class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-              >
-                <UIcon
-                  name="i-heroicons-document-text"
-                  class="mx-auto h-8 w-8 text-gray-400 mb-2"
-                />
-                <p class="text-sm text-gray-500">
-                  {{ $t('gestion.ticketing.no_custom_fields_yet') }}
-                </p>
-              </div>
+                compact
+                icone="i-heroicons-document-text"
+                :titre="$t('gestion.ticketing.no_custom_fields_yet')"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+              />
               <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
                 <li
                   v-for="cf in customFields"
@@ -308,9 +302,11 @@
                     {{ $t('common.edit') }}
                   </UButton>
                 </div>
-                <div v-if="loadingOrganizerItems" class="text-center py-6">
-                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-                </div>
+                <UiSqueletteDeListe
+                  v-if="loadingOrganizerItems"
+                  :lignes="3"
+                  :libelle="$t('common.loading')"
+                />
                 <div v-else-if="globalOrganizerItems.length > 0" class="flex flex-wrap gap-2">
                   <UBadge
                     v-for="item in globalOrganizerItems"
@@ -335,21 +331,18 @@
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">
                   {{ $t('gestion.ticketing.per_organizer_handout_items_title') }}
                 </h3>
-                <div v-if="loadingEditionOrganizers" class="text-center py-6">
-                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-                </div>
-                <div
+                <UiSqueletteDeListe
+                  v-if="loadingEditionOrganizers"
+                  :lignes="3"
+                  :libelle="$t('common.loading')"
+                />
+                <UiEtatVide
                   v-else-if="editionOrganizers.length === 0"
-                  class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-                >
-                  <UIcon
-                    name="i-heroicons-user-circle"
-                    class="mx-auto h-8 w-8 text-gray-400 mb-2"
-                  />
-                  <p class="text-sm text-gray-500">
-                    {{ $t('gestion.organizers.no_organizers_on_edition') }}
-                  </p>
-                </div>
+                  compact
+                  icone="i-heroicons-user-circle"
+                  :titre="$t('gestion.organizers.no_organizers_on_edition')"
+                  class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+                />
                 <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
                   <li
                     v-for="org in editionOrganizers"
@@ -411,9 +404,11 @@
                     {{ $t('common.edit') }}
                   </UButton>
                 </div>
-                <div v-if="loadingArtistItems" class="text-center py-6">
-                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-                </div>
+                <UiSqueletteDeListe
+                  v-if="loadingArtistItems"
+                  :lignes="3"
+                  :libelle="$t('common.loading')"
+                />
                 <div v-else-if="allArtistItems.length > 0" class="flex flex-wrap gap-2">
                   <UBadge
                     v-for="item in allArtistItems"
@@ -438,16 +433,18 @@
                 <h3 class="text-base font-semibold text-gray-900 dark:text-white">
                   {{ $t('gestion.ticketing.per_show_handout_items_title') }}
                 </h3>
-                <div v-if="loadingShows" class="text-center py-6">
-                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-                </div>
-                <div
+                <UiSqueletteDeListe
+                  v-if="loadingShows"
+                  :lignes="3"
+                  :libelle="$t('common.loading')"
+                />
+                <UiEtatVide
                   v-else-if="shows.length === 0"
-                  class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-                >
-                  <UIcon name="i-heroicons-sparkles" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <p class="text-sm text-gray-500">{{ $t('gestion.shows.no_shows') }}</p>
-                </div>
+                  compact
+                  icone="i-heroicons-sparkles"
+                  :titre="$t('gestion.shows.no_shows')"
+                  class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+                />
                 <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
                   <li
                     v-for="show in shows"
@@ -500,16 +497,18 @@
                 <p class="text-sm text-gray-500">
                   {{ $t('gestion.ticketing.per_artist_handout_items_help') }}
                 </p>
-                <div v-if="loadingArtists" class="text-center py-6">
-                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-                </div>
-                <div
+                <UiSqueletteDeListe
+                  v-if="loadingArtists"
+                  :lignes="3"
+                  :libelle="$t('common.loading')"
+                />
+                <UiEtatVide
                   v-else-if="artists.length === 0"
-                  class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-                >
-                  <UIcon name="i-heroicons-user-group" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <p class="text-sm text-gray-500">{{ $t('gestion.artists.no_artists') }}</p>
-                </div>
+                  compact
+                  icone="i-heroicons-user-group"
+                  :titre="$t('gestion.artists.no_artists')"
+                  class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+                />
                 <ul v-else class="divide-y divide-gray-100 dark:divide-gray-800">
                   <li
                     v-for="artist in artists"
@@ -554,18 +553,18 @@
 
             <template #meals>
               <div class="space-y-3">
-                <div v-if="loadingMeals" class="text-center py-6">
-                  <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-                </div>
-                <div
+                <UiSqueletteDeListe
+                  v-if="loadingMeals"
+                  :lignes="3"
+                  :libelle="$t('common.loading')"
+                />
+                <UiEtatVide
                   v-else-if="enabledMealsGrouped.length === 0"
-                  class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
-                >
-                  <UIcon name="cbi:mealie" class="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <p class="text-sm text-gray-500">
-                    {{ $t('gestion.ticketing.meals_no_enabled_meals') }}
-                  </p>
-                </div>
+                  compact
+                  icone="cbi:mealie"
+                  :titre="$t('gestion.ticketing.meals_no_enabled_meals')"
+                  class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+                />
                 <div v-else class="space-y-6">
                   <section v-for="group in enabledMealsGrouped" :key="group.date">
                     <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2 capitalize">

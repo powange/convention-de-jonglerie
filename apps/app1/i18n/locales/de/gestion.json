@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Die Abweichung ist groß: Mehrere Tickets teilen sich vermutlich die Adresse der zahlenden Person und werden dann als eine gezählt. Die Adresse jeder teilnehmenden Person zu erfassen schärft die Zahl.",
       "affluence_expected_total": "{count} Person insgesamt erwartet | {count} Personen insgesamt erwartet",
       "affluence_gauge": "Erwartete Zahl",
-      "affluence_gauge_tooltip": "{count} erwartet | {count} erwartet"
+      "affluence_gauge_tooltip": "{count} erwartet | {count} erwartet",
+      "external_no_tiers_found": "Kein Tarif oder keine Option gefunden",
+      "external_no_tiers_found_hint": "Prüfe, ob dein HelloAsso-Formular Tarife enthält",
+      "orders_no_results": "Kein Ergebnis gefunden",
+      "orders_none": "Keine Bestellung gefunden",
+      "orders_none_hint": "Importiere die Bestellungen aus deinem externen Ticketsystem"
     },
     "title": "Verwaltung",
     "view_edition": "Ausgabe ansehen",

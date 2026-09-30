@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "La diferencia es grande: es probable que varias entradas compartan la dirección de quien pagó y se cuenten como una sola persona. Rellenar la dirección de cada participante afina la cifra.",
       "affluence_expected_total": "{count} persona esperada en total | {count} personas esperadas en total",
       "affluence_gauge": "Aforo esperado",
-      "affluence_gauge_tooltip": "{count} esperada | {count} esperadas"
+      "affluence_gauge_tooltip": "{count} esperada | {count} esperadas",
+      "external_no_tiers_found": "No se ha encontrado ninguna tarifa ni opción",
+      "external_no_tiers_found_hint": "Comprueba que tu formulario de HelloAsso contiene tarifas",
+      "orders_no_results": "No se ha encontrado ningún resultado",
+      "orders_none": "No se ha encontrado ningún pedido",
+      "orders_none_hint": "Importa los pedidos desde tu sistema de venta externo"
     },
     "title": "Gestión",
     "view_edition": "Ver la edición",

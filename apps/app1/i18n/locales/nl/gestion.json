@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Het verschil is groot: sommige tickets delen waarschijnlijk het adres van wie betaald heeft en tellen dan als één persoon. Het adres van elke deelnemer invullen maakt het cijfer scherper.",
       "affluence_expected_total": "{count} persoon in totaal verwacht | {count} personen in totaal verwacht",
       "affluence_gauge": "Verwacht aantal",
-      "affluence_gauge_tooltip": "{count} verwacht | {count} verwacht"
+      "affluence_gauge_tooltip": "{count} verwacht | {count} verwacht",
+      "external_no_tiers_found": "Geen tarief of optie gevonden",
+      "external_no_tiers_found_hint": "Controleer of je HelloAsso-formulier tarieven bevat",
+      "orders_no_results": "Geen resultaat gevonden",
+      "orders_none": "Geen bestelling gevonden",
+      "orders_none_hint": "Importeer de bestellingen uit je externe ticketsysteem"
     },
     "title": "Beheer",
     "view_edition": "Editie bekijken",

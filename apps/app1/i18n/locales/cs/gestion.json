@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Rozdíl je velký: některé vstupenky patrně sdílejí adresu toho, kdo platil, a počítají se pak za jednu osobu. Vyplnění adresy každého účastníka číslo zpřesní.",
       "affluence_expected_total": "Celkem se očekává {count} osoba | Celkem se očekává {count} osob",
       "affluence_gauge": "Očekávaný počet",
-      "affluence_gauge_tooltip": "{count} očekávaná | {count} očekávaných"
+      "affluence_gauge_tooltip": "{count} očekávaná | {count} očekávaných",
+      "external_no_tiers_found": "Nebyl nalezen žádný tarif ani volba",
+      "external_no_tiers_found_hint": "Zkontrolujte, zda váš formulář HelloAsso obsahuje tarify",
+      "orders_no_results": "Nebyl nalezen žádný výsledek",
+      "orders_none": "Nebyla nalezena žádná objednávka",
+      "orders_none_hint": "Importujte objednávky ze svého externího prodeje vstupenek"
     },
     "title": "Správa",
     "view_edition": "Zobrazit ročník",

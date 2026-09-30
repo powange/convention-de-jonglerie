@@ -13,9 +13,7 @@
       </UButton>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8 text-gray-400" />
-    </div>
+    <UiSqueletteDeListe v-if="loading" :lignes="6" :libelle="$t('common.loading')" />
 
     <div
       v-else-if="!group"
@@ -179,24 +177,24 @@
         </template>
       </UModal>
 
-      <div
+      <UiEtatVide
         v-if="!group.items.length"
-        class="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
+        icone="i-heroicons-cube"
+        :titre="$t('gestion.stock.empty_group')"
+        class="border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
       >
-        <UIcon name="i-heroicons-cube" class="size-10 text-gray-400 mx-auto mb-2" />
-        <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm">
-          {{ $t('gestion.stock.empty_group') }}
-        </p>
-        <UButton
-          v-if="canManage"
-          icon="i-heroicons-plus"
-          color="primary"
-          size="sm"
-          @click="openItemModal(null)"
-        >
-          {{ $t('gestion.stock.new_item') }}
-        </UButton>
-      </div>
+        <template #action>
+          <UButton
+            v-if="canManage"
+            icon="i-heroicons-plus"
+            color="primary"
+            size="sm"
+            @click="openItemModal(null)"
+          >
+            {{ $t('gestion.stock.new_item') }}
+          </UButton>
+        </template>
+      </UiEtatVide>
 
       <UCard v-else-if="viewMode === 'list'" :ui="{ body: 'p-0 sm:p-0' }">
         <!-- `UTable` plutôt qu'un tableau écrit à la main : le tri par colonne et le choix des

@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Skillnaden är stor: flera biljetter delar troligen adressen till den som betalade och räknas då som en enda person. Att fylla i varje deltagares adress skärper siffran.",
       "affluence_expected_total": "{count} person väntas totalt | {count} personer väntas totalt",
       "affluence_gauge": "Förväntat antal",
-      "affluence_gauge_tooltip": "{count} väntad | {count} väntade"
+      "affluence_gauge_tooltip": "{count} väntad | {count} väntade",
+      "external_no_tiers_found": "Ingen biljettyp eller tillval hittades",
+      "external_no_tiers_found_hint": "Kontrollera att ditt HelloAsso-formulär innehåller biljettyper",
+      "orders_no_results": "Inget resultat hittades",
+      "orders_none": "Ingen order hittades",
+      "orders_none_hint": "Importera ordrarna från ditt externa biljettsystem"
     },
     "title": "Hantering",
     "view_edition": "Visa upplagan",

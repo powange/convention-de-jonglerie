@@ -13,9 +13,7 @@
       </UButton>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8 text-gray-400" />
-    </div>
+    <UiSqueletteDeListe v-if="loading" :lignes="6" :libelle="$t('common.loading')" />
 
     <div
       v-else-if="!group"
@@ -91,27 +89,26 @@
 
       <!-- Vue Liste -->
       <div v-if="viewMode === 'list'">
-        <div
+        <UiEtatVide
           v-if="!group.tasks.length"
-          class="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
+          icone="i-heroicons-inbox"
+          :titre="$t('gestion.task.empty_group')"
+          class="border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
         >
-          <UIcon name="i-heroicons-inbox" class="size-10 text-gray-400 mx-auto mb-2" />
-          <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm">
-            {{ $t('gestion.task.empty_group') }}
-          </p>
-          <UButton icon="i-heroicons-plus" color="primary" size="sm" @click="openTaskModal(null)">
-            {{ $t('gestion.task.new_task') }}
-          </UButton>
-        </div>
-        <div
+          <template #action>
+            <UButton icon="i-heroicons-plus" color="primary" size="sm" @click="openTaskModal(null)">
+              {{ $t('gestion.task.new_task') }}
+            </UButton>
+          </template>
+        </UiEtatVide>
+        <!-- L'entonnoir, et non la boîte vide : ici il y a bien des tâches, c'est le filtre qui
+             les cache. Confondre les deux ferait croire le groupe vide. -->
+        <UiEtatVide
           v-else-if="!filteredTasks.length"
-          class="text-center py-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
-        >
-          <UIcon name="i-heroicons-funnel" class="size-8 text-gray-400 mx-auto mb-2" />
-          <p class="text-gray-600 dark:text-gray-400 text-sm">
-            {{ $t('tasks.filters.no_match') }}
-          </p>
-        </div>
+          icone="i-heroicons-funnel"
+          :titre="$t('tasks.filters.no_match')"
+          class="border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
+        />
         <UCard v-else>
           <ul class="divide-y divide-gray-100 dark:divide-gray-800">
             <li

@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "A diferença é grande: alguns bilhetes partilham provavelmente o endereço de quem pagou e são contados como uma só pessoa. Preencher o endereço de cada participante afina o número.",
       "affluence_expected_total": "{count} pessoa esperada no total | {count} pessoas esperadas no total",
       "affluence_gauge": "Lotação esperada",
-      "affluence_gauge_tooltip": "{count} esperada | {count} esperadas"
+      "affluence_gauge_tooltip": "{count} esperada | {count} esperadas",
+      "external_no_tiers_found": "Nenhuma tarifa ou opção encontrada",
+      "external_no_tiers_found_hint": "Verifique se o seu formulário HelloAsso contém tarifas",
+      "orders_no_results": "Nenhum resultado encontrado",
+      "orders_none": "Nenhuma encomenda encontrada",
+      "orders_none_hint": "Importe as encomendas da sua bilheteira externa"
     },
     "title": "Gestão",
     "view_edition": "Ver a edição",
