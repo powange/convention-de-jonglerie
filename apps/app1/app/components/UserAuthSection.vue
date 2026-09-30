@@ -195,6 +195,13 @@ const { t } = useI18n()
 const toast = useToast()
 const route = useRoute()
 
+/*
+ * L'état de l'invitation PWA est partagé avec le bandeau (`useInvitePwa`) : le navigateur n'émet
+ * `beforeinstallprompt` qu'une fois, et écouter séparément ferait que l'un des deux n'aurait
+ * jamais rien.
+ */
+const { entreeDeMenuDisponible, installer: installerLApplication } = useInvitePwa()
+
 // Responsive : desktop si >= 768px (md breakpoint Tailwind)
 const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -284,6 +291,27 @@ const userMenuItems = computed((): DropdownMenuItem[] => {
       type: 'checkbox' as const,
       checked: isAdminModeActive.value,
       onUpdateChecked: (checked: boolean) => toggleAdminMode(checked),
+    })
+  }
+
+  /*
+   * Installer l'application, à la demande.
+   *
+   * ⚠️ POURQUOI CETTE ENTRÉE EXISTE. Le bandeau ne se propose qu'UNE fois, puis se tait sept
+   * jours — et jamais sur les écrans de saisie. Sans point d'entrée volontaire, quelqu'un qui a
+   * cliqué « Plus tard » par réflexe n'avait plus aucun moyen de revenir dessus depuis
+   * l'application : il fallait passer par le menu de son navigateur, que peu de monde connaît.
+   *
+   * L'entrée n'apparaît que si le navigateur a bel et bien proposé l'installation
+   * (`beforeinstallprompt` reçu, application pas déjà installée). Proposer un bouton qui ne peut
+   * rien faire serait pire que ne rien proposer.
+   */
+  if (entreeDeMenuDisponible.value) {
+    items.push({ type: 'separator' as const })
+    items.push({
+      label: t('pwa.install.title'),
+      icon: 'i-heroicons-arrow-down-tray',
+      onSelect: () => installerLApplication(),
     })
   }
 
