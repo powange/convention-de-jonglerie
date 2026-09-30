@@ -347,8 +347,22 @@ model ConventionClaimRequest {
   id           String    @id @default(cuid())
   conventionId Int
   userId       Int
-  code         String    @unique // Code de vérification envoyé par email
+  /// Code de vérification envoyé par courriel.
+  ///
+  /// Plus `@unique` : l'unicité globale n'apportait rien et coûtait un risque. Une demande est
+  /// retrouvée par `(conventionId, userId)` — vérifié dans `claim/verify.post.ts`, qui interroge
+  /// cette clé composite et jamais le code seul —, donc deux conventions différentes peuvent
+  /// parfaitement tirer le même code à six chiffres. Avec l'unicité, la seconde demande échouait
+  /// sur une collision, soit une chance sur un million de refuser une revendication légitime pour
+  /// une raison incompréhensible.
+  code         String
   expiresAt    DateTime // Expiration du code (ex: 1h)
+  /// Nombre de codes faux soumis pour cette demande.
+  ///
+  /// Un code à six chiffres valable une heure sans compteur se force en quelques minutes : le
+  /// limiteur par IP ralentit, il ne ferme pas. Au cinquième échec, la demande est supprimée et il
+  /// faut en redemander une — ce qui tire un nouveau code et remet ce compteur à zéro.
+  attempts     Int       @default(0)
   isVerified   Boolean   @default(false)
   verifiedAt   DateTime?
   createdAt    DateTime  @default(now())

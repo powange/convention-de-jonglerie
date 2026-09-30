@@ -27,6 +27,8 @@ export const prismaMock = {
   // Modèles principaux
   convention: createModelMock(),
   conventionOrganizer: createModelMock(),
+  // Demande de revendication d'une convention par code à six chiffres.
+  conventionClaimRequest: createModelMock(),
   event: createModelMock(),
   edition: createModelMock(),
   editionOrganizerPermission: createModelMock(),

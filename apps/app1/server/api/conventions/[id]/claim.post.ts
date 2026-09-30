@@ -5,10 +5,19 @@ import { requireAuth } from '#server/utils/auth-utils'
 import { createFutureDate, TOKEN_DURATIONS } from '#server/utils/date-utils'
 import { sendEmail } from '#server/utils/emailService'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { emailRateLimiter } from '#server/utils/rate-limiter'
 import { validateConventionId } from '#server/utils/validation-helpers'
 
 export default wrapApiHandler(
   async (event) => {
+    /*
+     * Chaque appel envoie un courriel à l'adresse de contact de la convention, qui n'appartient PAS
+     * à celui qui demande. Sans limite, on pouvait donc inonder une convention en rejouant ce
+     * point d'API — et l'adresse visée est précisément le moyen dont elle dispose pour se
+     * revendiquer.
+     */
+    await emailRateLimiter(event)
+
     // Vérifier que l'utilisateur est connecté
     const user = await requireAuth(event)
     const conventionIdNum = validateConventionId(event)
@@ -62,6 +71,9 @@ export default wrapApiHandler(
         expiresAt: createFutureDate(TOKEN_DURATIONS.CLAIM_CODE), // 1 heure
         isVerified: false,
         verifiedAt: null,
+        // Un nouveau code repart de zéro, sans quoi redemander un code après cinq échecs ne
+        // servirait à rien — c'est justement ce que le message d'erreur invite à faire.
+        attempts: 0,
       },
       create: {
         conventionId: conventionIdNum,

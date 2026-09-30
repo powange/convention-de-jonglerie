@@ -3,14 +3,21 @@ import { z } from 'zod'
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
+import { verificationCodeRateLimiter } from '#server/utils/rate-limiter'
 import { validateConventionId } from '#server/utils/validation-helpers'
 
 const verifyClaimSchema = z.object({
   code: z.string().min(6).max(6),
 })
 
+/** Codes faux tolérés avant que la demande ne soit détruite. */
+const MAX_ESSAIS = 5
+
 export default wrapApiHandler(
   async (event) => {
+    // Protection contre le forçage d'un code à six chiffres, comme la vérification d'adresse.
+    await verificationCodeRateLimiter(event)
+
     // Vérifier que l'utilisateur est connecté
     const user = await requireAuth(event)
     const conventionIdNum = validateConventionId(event)
@@ -58,8 +65,32 @@ export default wrapApiHandler(
       })
     }
 
-    // Vérifier le code
+    /*
+     * Le code faux est COMPTÉ, et au cinquième la demande disparaît.
+     *
+     * Un code à six chiffres valable une heure se force en quelques minutes : le limiteur par IP
+     * ci-dessus ralentit, il ne ferme pas — il suffit de changer d'adresse. Ce compteur-ci ferme,
+     * et il est porté par la demande elle-même, donc indépendant de l'origine des essais.
+     *
+     * L'incrément est fait AVANT de décider, et sa valeur relue depuis la base : deux essais
+     * simultanés incrémenteraient sinon tous deux à partir de la même lecture, et le cinquième
+     * n'arriverait jamais.
+     */
     if (claimRequest.code !== code) {
+      const apresEchec = await prisma.conventionClaimRequest.update({
+        where: { id: claimRequest.id },
+        data: { attempts: { increment: 1 } },
+        select: { attempts: true },
+      })
+
+      if (apresEchec.attempts >= MAX_ESSAIS) {
+        await prisma.conventionClaimRequest.delete({ where: { id: claimRequest.id } })
+        throw createError({
+          status: 400,
+          message: 'Trop d’essais, redemandez un code',
+        })
+      }
+
       throw createError({
         status: 400,
         message: 'Code de vérification incorrect',
