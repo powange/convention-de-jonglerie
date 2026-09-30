@@ -2,6 +2,7 @@ import { readBody } from 'h3'
 
 import { requireGlobalAdminWithDbCheck } from '#server/utils/admin-auth'
 import { wrapApiHandler } from '#server/utils/api-helpers'
+import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { sendEmail, generateAccountDeletionEmailHtml } from '#server/utils/emailService'
 import { fetchResourceOrFail } from '#server/utils/prisma-helpers'
 import { validateResourceId } from '#server/utils/validation-helpers'
@@ -113,6 +114,10 @@ export default wrapApiHandler(
 
     // Supprimer l'utilisateur (suppression réelle pour l'instant)
     // Note: En production, on pourrait implémenter une suppression "soft" avec un champ `deletedAt`
+    // Comme pour la suppression de son propre compte : sans cet oubli, la session de la personne
+    // resterait acceptée par le middleware le temps du cache, alors que son compte n'existe plus.
+    oublierSessionDuCompte(userIdToDelete)
+
     const deletedUser = await prisma.user.delete({
       where: { id: userIdToDelete },
       select: {

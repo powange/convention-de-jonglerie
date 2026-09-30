@@ -3,6 +3,8 @@
 import { trouverRoutePublique } from '../constants/public-routes'
 import { getAuthSession, clearAuthSession } from '../utils/session-helpers'
 
+import { versionDeSessionDuCompte } from '#server/utils/cache-session'
+
 export default defineEventHandler(async (event) => {
   const fullPath = event.path
   // `split` rend `string | undefined` pour TypeScript, alors qu'il rend toujours au moins un
@@ -28,13 +30,16 @@ export default defineEventHandler(async (event) => {
    * reste donc acceptée, et se fermera au premier changement de mot de passe.
    */
   const sessionRecevable = async (session: { user: { id: number } }): Promise<boolean> => {
-    const compte = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { id: true, sessionVersion: true },
-    })
-    if (compte == null) return false
+    /*
+     * La génération passe par un cache de trente secondes (`cache-session.ts`) : cette lecture
+     * avait lieu à CHAQUE requête authentifiée, et un écran de gestion en enchaîne cinq à quinze
+     * par page. Le cache est oublié explicitement par les six écritures qui rendent son contenu
+     * faux — changement et réinitialisation de mot de passe, et les quatre suppressions de compte.
+     */
+    const version = await versionDeSessionDuCompte(session.user.id)
+    if (version == null) return false
     const portee = Number((session as { sessionVersion?: unknown }).sessionVersion ?? 0)
-    return compte.sessionVersion === portee
+    return version === portee
   }
 
   // Chercher une route publique correspondante. La règle vit dans `public-routes.ts`, où elle

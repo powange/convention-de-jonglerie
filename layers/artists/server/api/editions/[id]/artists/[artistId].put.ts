@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { oublierSessionDuCompte } from '#server/utils/cache-session'
 import { misesAJourDuProfil } from '#server/utils/infos-personnelles'
 import {
   getEditionWithPermissions,
@@ -215,6 +216,12 @@ export default wrapApiHandler(
         where: { userId: oldUserId },
       })
       if (oldUserUsages === 0) {
+        // Oublié AVANT la tentative : la suppression peut échouer sur une contrainte et être
+        // ignorée, auquel cas le cache aura simplement été relu pour rien. L'inverse — oublier
+        // seulement en cas de succès — laisserait une entrée fausse si la suppression réussit et
+        // qu'une exception survient ensuite.
+        oublierSessionDuCompte(oldUserId)
+
         await prisma.user.delete({ where: { id: oldUserId } }).catch(() => {
           // Ignorer si la suppression échoue (contraintes FK)
         })
