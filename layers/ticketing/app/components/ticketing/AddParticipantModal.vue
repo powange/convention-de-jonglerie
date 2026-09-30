@@ -99,6 +99,65 @@
             description="Les informations ont été pré-remplies automatiquement"
           />
 
+          <!--
+            ⚠️ CET ENCART SIGNALE UN DOUBLON PROBABLE, et ne bloque RIEN.
+
+            Rien n'avertissait le guichet qu'une personne avait déjà un billet : on saisissait de
+            bonne foi une seconde commande, la personne payait deux fois, et le doublon ne se
+            découvrait qu'au scan — ou jamais.
+
+            Il reste purement informatif : un billet légitime peut parfaitement s'ajouter à un
+            existant (un accompagnant, un second jour, un autre tarif). Le bloquer transformerait
+            une information utile en obstacle, devant quelqu'un qui attend.
+
+            L'état d'entrée est affiché parce qu'il change la conduite à tenir : un billet DÉJÀ
+            VALIDÉ signale que la personne est entrée, donc qu'un second billet est probablement
+            une erreur ; un billet non validé peut simplement être celui qu'elle vient présenter.
+          -->
+          <UAlert
+            v-if="billetsExistants.length > 0"
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="soft"
+            :title="
+              $t('ticketing.access_control.existing_tickets_title', {
+                count: billetsExistants.length,
+              })
+            "
+          >
+            <template #description>
+              <p class="mb-2">{{ $t('ticketing.access_control.existing_tickets_hint') }}</p>
+              <ul class="space-y-1">
+                <li
+                  v-for="billet in billetsExistants"
+                  :key="billet.qrCode"
+                  class="flex flex-wrap items-center gap-2 text-sm"
+                >
+                  <span class="font-medium">{{ billet.nom }}</span>
+                  <span class="opacity-70">{{ billet.tarif }}</span>
+                  <UBadge
+                    :color="billet.entreeValidee ? 'success' : 'neutral'"
+                    variant="soft"
+                    size="xs"
+                  >
+                    {{
+                      billet.entreeValidee
+                        ? $t('ticketing.access_control.existing_ticket_entered')
+                        : $t('ticketing.access_control.existing_ticket_not_entered')
+                    }}
+                  </UBadge>
+                  <UButton
+                    size="xs"
+                    color="neutral"
+                    variant="link"
+                    :label="$t('ticketing.access_control.existing_ticket_open')"
+                    @click="emit('open-existing-ticket', billet.qrCode)"
+                  />
+                </li>
+              </ul>
+            </template>
+          </UAlert>
+
           <!-- Prénom -->
           <UFormField
             v-if="showNameFields"
@@ -842,7 +901,16 @@ interface Props {
 const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'order-created', qrCode: string): void
+  /**
+   * `order-created` annonce une CRÉATION : l'écran parent y affiche une confirmation et recharge
+   * ses statistiques. `open-existing-ticket` demande seulement d'ouvrir la fiche d'un billet qui
+   * existait DÉJÀ — réutiliser le premier ferait croire au caissier qu'il vient de créer un
+   * doublon.
+   *
+   * Les deux sont réunis en une signature parce qu'ils portent la même charge, un QR code ; les
+   * séparer est refusé par `@typescript-eslint/unified-signatures`.
+   */
+  (e: 'order-created' | 'open-existing-ticket', qrCode: string): void
 }>()
 
 const { t } = useI18n()
@@ -1448,12 +1516,78 @@ const submitOrder = () => {
   executeCreateOrder()
 }
 
+/**
+ * Les billets DÉJÀ enregistrés pour l'adresse saisie, dans cette édition.
+ *
+ * ⚠️ POURQUOI CET ENCART EXISTE. Rien ne signalait au guichet qu'une personne avait déjà un
+ * billet : on saisissait de bonne foi une seconde commande, la personne payait deux fois, et le
+ * doublon ne se découvrait qu'au scan — ou jamais. La recherche par adresse existait pourtant
+ * déjà, sur l'écran d'à côté.
+ *
+ * ⚠️ IL N'EST QU'INFORMATIF. Aucune garde n'empêche l'ajout : un billet légitime peut
+ * parfaitement s'ajouter à un existant — un accompagnant, un second jour, un tarif différent. Le
+ * bloquer transformerait une information utile en obstacle, et le guichet a quelqu'un devant lui.
+ */
+const billetsExistants = ref<
+  Array<{ qrCode: string; nom: string; tarif: string; entreeValidee: boolean }>
+>([])
+
+/**
+ * Cherche les billets de cette adresse, et n'en garde que les correspondances EXACTES.
+ *
+ * ⚠️ LE FILTRAGE EXACT EST INDISPENSABLE. Le point d'API de recherche du guichet procède PAR
+ * MOTS-CLÉS (nom de fichier volontairement non écrit entre accents graves : `check-i18n` lit un
+ * mot pointé ainsi comme une clé de traduction manquante) : elle
+ * découpe le terme et rapproche nom, prénom et adresse. Passer une adresse peut donc ramener le
+ * billet de QUELQU'UN D'AUTRE dont le nom contient l'un des mots — et annoncer au guichet un
+ * doublon qui n'existe pas serait pire que de ne rien annoncer : on refuserait une vente
+ * légitime.
+ *
+ * L'échec est avalé : cet encart est un confort, et ne doit pas empêcher l'ajout d'un
+ * participant si la recherche tombe.
+ */
+const chercherBilletsExistants = async (email: string) => {
+  billetsExistants.value = []
+
+  try {
+    const reponse = await $fetch<any>(`/api/editions/${props.editionId}/ticketing/search`, {
+      method: 'POST',
+      body: { searchTerm: email },
+    })
+
+    const billets = reponse?.data?.results?.tickets ?? reponse?.results?.tickets ?? []
+    const recherchee = email.trim().toLowerCase()
+
+    billetsExistants.value = billets
+      .filter((billet: any) => {
+        const b = billet?.participant?.ticket
+        if (!b?.qrCode) return false
+        // L'adresse du BILLET, ou celle du payeur : les deux désignent cette personne.
+        const adresses = [b.user?.email, b.order?.payer?.email]
+          .filter(Boolean)
+          .map((a: string) => a.toLowerCase())
+        return adresses.includes(recherchee)
+      })
+      .map((billet: any) => ({
+        qrCode: billet.participant.ticket.qrCode,
+        nom: [billet.participant.ticket.user?.firstName, billet.participant.ticket.user?.lastName]
+          .filter(Boolean)
+          .join(' '),
+        tarif: billet.participant.ticket.name ?? '',
+        entreeValidee: Boolean(billet.participant.ticket.entryValidated),
+      }))
+  } catch {
+    // Confort seulement : une recherche en panne ne doit pas empêcher d'ajouter un participant.
+  }
+}
+
 const searchUserByEmail = async () => {
   const email = form.value.payerEmail.trim()
 
   // Réinitialiser l'état
   userFound.value = false
   showNameFields.value = false
+  billetsExistants.value = []
   form.value.payerFirstName = ''
   form.value.payerLastName = ''
   errors.value.payerEmail = ''
@@ -1490,6 +1624,9 @@ const searchUserByEmail = async () => {
 
     // Toujours afficher les champs nom/prénom après la recherche
     showNameFields.value = true
+
+    // Et signaler les billets déjà enregistrés pour cette adresse, s'il y en a.
+    await chercherBilletsExistants(email)
   } catch (err) {
     console.error('Error searching user:', err)
     // En cas d'erreur, afficher quand même les champs
@@ -1501,6 +1638,8 @@ const searchUserByEmail = async () => {
 
 const closeModal = () => {
   isOpen.value = false
+  // Sans cela, l'encart d'une personne resterait affiché à l'ouverture suivante, pour une autre.
+  billetsExistants.value = []
   currentStep.value = getInitialStep() // Retour à l'étape de choix du type ou directement à l'étape 0
   participantType.value = 'identified' // Réinitialiser au type par défaut
   paymentMethod.value = null

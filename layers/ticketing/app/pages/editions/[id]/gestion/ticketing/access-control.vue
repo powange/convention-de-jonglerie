@@ -483,6 +483,7 @@
         :sumup-app-id="sumupAppId"
         :edition-name="edition?.name"
         @order-created="handleOrderCreated"
+        @open-existing-ticket="ouvrirBilletExistant"
       />
 
       <!-- Modal liste des bénévoles non validés -->
@@ -1135,22 +1136,30 @@ const handleRefund = async (itemId: number, refunded: boolean) => {
   }
 }
 
+/**
+ * Ouvre la fiche d'un billet par son QR code.
+ *
+ * Extrait de `handleOrderCreated` parce qu'un second appelant la demande : l'encart qui signale,
+ * dans la modale d'ajout, qu'un billet existe déjà pour cette adresse. Recopier la séquence
+ * aurait fait diverger les deux au premier champ ajouté à la fiche.
+ */
+const ouvrirFicheDuBillet = async (qrCode: string): Promise<boolean> => {
+  const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
+    method: 'POST',
+    body: { qrCode },
+  })
+
+  if (!result.data.found || !result.data.participant) return false
+
+  selectedParticipant.value = result.data.participant
+  participantType.value = 'ticket'
+  participantModalOpen.value = true
+  return true
+}
+
 const handleOrderCreated = async (qrCode: string) => {
   try {
-    // Appeler l'API verify pour récupérer les détails de la commande
-    const result: any = await $fetch(`/api/editions/${editionId}/ticketing/verify`, {
-      method: 'POST',
-      body: {
-        qrCode,
-      },
-    })
-
-    if (result.data.found && result.data.participant) {
-      // Afficher la modal avec les détails du participant
-      selectedParticipant.value = result.data.participant
-      participantType.value = 'ticket'
-      participantModalOpen.value = true
-
+    if (await ouvrirFicheDuBillet(qrCode)) {
       toast.add({
         title: t('ticketing.access_control.order_created_title'),
         description: t('ticketing.access_control.order_created_description'),
@@ -1161,6 +1170,28 @@ const handleOrderCreated = async (qrCode: string) => {
       // Recharger les statistiques et les dernières validations
       await Promise.all([loadStats(), loadRecentValidations()])
     }
+  } catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
+    toast.add({
+      title: t('ticketing.access_control.error_title'),
+      description: err.data?.message || t('ticketing.access_control.load_order_error'),
+      icon: 'i-heroicons-exclamation-circle',
+      color: 'error',
+    })
+  }
+}
+
+/**
+ * Ouvrir la fiche d'un billet DÉJÀ EXISTANT, signalé depuis la modale d'ajout.
+ *
+ * ⚠️ Volontairement distinct de `handleOrderCreated` : celui-ci annonce « commande créée » et
+ * recharge les statistiques. Ici rien n'a été créé — réutiliser le même gestionnaire afficherait
+ * une confirmation de création pour un billet qui existait déjà, et le caissier croirait avoir
+ * fait un doublon.
+ */
+const ouvrirBilletExistant = async (qrCode: string) => {
+  try {
+    await ouvrirFicheDuBillet(qrCode)
   } catch (error: unknown) {
     const err = error as { data?: { message?: string } }
     toast.add({
