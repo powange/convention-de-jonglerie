@@ -73,7 +73,9 @@
       "system_notifications": "Notificações do sistema",
       "system_notifications_desc": "Atualizações importantes e manutenção",
       "volunteer_reminders": "Lembretes de turnos de voluntariado",
-      "volunteer_reminders_desc": "Notificações 30 minutos antes dos seus turnos"
+      "volunteer_reminders_desc": "Notificações 30 minutos antes dos seus turnos",
+      "messenger_messages": "Mensagens",
+      "messenger_messages_desc": "Mensagens das conversas de equipa, dos responsáveis e dos organizadores"
     },
     "oauth_password_info": "Iniciou sessão com o Google. Pode definir uma palavra-passe para iniciar sessão com o seu email.",
     "optional_section_title": "Seção opcional",

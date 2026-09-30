@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 const assurerConversationsEquipe = vi.hoisted(() => vi.fn(async () => undefined))
+const assurerConversationsEquipeEnLot = vi.hoisted(() => vi.fn(async () => undefined))
 const assurerBenevoleVersOrganisateurs = vi.hoisted(() => vi.fn(async () => 'conv-vo'))
 const assurerGroupeOrganisateurs = vi.hoisted(() => vi.fn(async () => 'conv-og'))
 
 vi.mock('../../../../../server/utils/messenger-helpers', () => ({
   ensureVolunteerConversations: assurerConversationsEquipe,
+  assurerConversationsEquipeDesMembres: assurerConversationsEquipeEnLot,
   ensureVolunteerToOrganizersConversation: assurerBenevoleVersOrganisateurs,
   ensureOrganizersGroupConversation: assurerGroupeOrganisateurs,
 }))
@@ -74,7 +76,7 @@ describe('POST /api/messenger/team-conversation', () => {
     prismaMock.applicationTeamAssignment.findFirst.mockResolvedValue(null)
 
     await expect(equipe(evenement as any)).rejects.toThrow(/pas membre de cette équipe/)
-    expect(assurerConversationsEquipe).not.toHaveBeenCalled()
+    expect(assurerConversationsEquipeEnLot).not.toHaveBeenCalled()
   })
 
   it('cherche l’appartenance par `eventId`, PAS par `editionId`', async () => {
@@ -103,15 +105,54 @@ describe('POST /api/messenger/team-conversation', () => {
      */
     await equipe(evenement as any)
 
-    const destinataires = assurerConversationsEquipe.mock.calls.map((appel: any) => appel[2])
+    const destinataires = assurerConversationsEquipeEnLot.mock.calls[0][2] as number[]
     expect(destinataires).toContain(UTILISATEUR)
     expect(destinataires).toContain(8)
+  })
+
+  it('ne synchronise qu’UNE FOIS, quelle que soit la taille de l’équipe', async () => {
+    /*
+     * 🔬 LE TEST DU LOT. Auparavant la synchronisation était appelée une fois pour le demandeur
+     * puis une fois PAR MEMBRE, en série — quatre à huit requêtes chacune. Pour quarante
+     * personnes, ouvrir la discussion coûtait ≈ 250 requêtes avant le premier message.
+     *
+     * Ce test échoue si l'on revient à une boucle : il compte les appels, pas les destinataires.
+     */
+    prismaMock.applicationTeamAssignment.findMany.mockResolvedValue(
+      Array.from({ length: 40 }, (_, index) => ({ application: { userId: 100 + index } }))
+    )
+
+    await equipe(evenement as any)
+
+    expect(assurerConversationsEquipeEnLot).toHaveBeenCalledTimes(1)
+    expect(assurerConversationsEquipeEnLot.mock.calls[0][2]).toHaveLength(41)
+  })
+
+  it('refuse un `editionId` manquant', async () => {
+    global.readBody = vi.fn().mockResolvedValue({ teamId: EQUIPE })
+
+    await expect(equipe(evenement as any)).rejects.toMatchObject({ statusCode: 400 })
   })
 
   it('refuse un corps incomplet', async () => {
     global.readBody = vi.fn().mockResolvedValue({ editionId: EDITION })
 
-    await expect(equipe(evenement as any)).rejects.toThrow(/requis/)
+    await expect(equipe(evenement as any)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('ACCEPTE un `editionId` reçu en chaîne, et le convertit', async () => {
+    /*
+     * ⚠️ Le corps n'était pas validé du tout. Un `editionId` en chaîne — ce que fait un client qui
+     * le tire d'un paramètre d'URL — passait le contrôle de présence, puis Prisma refusait la
+     * requête sur un entier attendu : l'ouverture rendait 500. `coerce` accepte les deux écritures.
+     */
+    global.readBody = vi.fn().mockResolvedValue({ editionId: String(EDITION), teamId: EQUIPE })
+
+    await equipe(evenement as any)
+
+    expect(
+      prismaMock.applicationTeamAssignment.findFirst.mock.calls[0][0].where.application.eventId
+    ).toBe(EDITION)
   })
 
   it('refuse un anonyme', async () => {

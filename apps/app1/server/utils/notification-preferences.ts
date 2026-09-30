@@ -5,6 +5,15 @@ export interface NotificationPreferences {
   systemNotifications: boolean
   carpoolUpdates: boolean
   artistUpdates: boolean
+  /**
+   * Les messages de la messagerie.
+   *
+   * ⚠️ AUCUNE DES SIX AUTRES PRÉFÉRENCES NE LES COUVRAIT. Les messages n'appellent pas
+   * `NotificationService.create` : ils envoient un push directement, donc sans passer par
+   * `isNotificationAllowed`. Un membre d'une équipe de quarante personnes actives recevait un push
+   * par message de groupe, sans autre issue que de couper TOUT le push de son compte.
+   */
+  messengerMessages: boolean
   // Préférences email pour chaque type de notification
   emailVolunteerReminders: boolean
   emailApplicationUpdates: boolean
@@ -12,6 +21,16 @@ export interface NotificationPreferences {
   emailSystemNotifications: boolean
   emailCarpoolUpdates: boolean
   emailArtistUpdates: boolean
+  /**
+   * ⚠️ AUCUN COURRIEL N'EST ENVOYÉ POUR UN MESSAGE, et aucun interrupteur n'est proposé pour
+   * celui-ci : une case qui promet des courriels que rien n'envoie est pire que pas de case.
+   *
+   * La clé existe quand même, et à `false` : `isEmailNotificationAllowed` déduit le nom de la clé
+   * d'e-mail de celui de la préférence (`messengerMessages` → `emailMessengerMessages`) et rend
+   * `true` quand elle est absente. Sans cette ligne, brancher un courriel de messagerie plus tard
+   * l'enverrait à tout le monde d'emblée.
+   */
+  emailMessengerMessages: boolean
 }
 
 // Préférences par défaut : notifications in-app activées, emails désactivés
@@ -22,6 +41,7 @@ export const defaultPreferences: NotificationPreferences = {
   systemNotifications: true,
   carpoolUpdates: true,
   artistUpdates: true,
+  messengerMessages: true,
   // Les notifications email sont désactivées par défaut pour éviter de spammer ;
   // chaque utilisateur peut les réactiver depuis ses préférences.
   emailVolunteerReminders: false,
@@ -30,6 +50,27 @@ export const defaultPreferences: NotificationPreferences = {
   emailSystemNotifications: false,
   emailCarpoolUpdates: false,
   emailArtistUpdates: false,
+  emailMessengerMessages: false,
+}
+
+/**
+ * Décide d'après des préférences DÉJÀ CHARGÉES, sans repasser par la base.
+ *
+ * ⚠️ POURQUOI CETTE PORTE EXISTE À CÔTÉ DE [isNotificationAllowed]. L'envoi d'un message de
+ * messagerie boucle sur les participants : interroger la base par destinataire ajouterait une
+ * requête par personne à chaque message, alors que la préférence peut être lue dans le même
+ * `select` que le reste. La règle, elle, ne doit exister qu'une fois — d'où cette fonction, dont
+ * [isNotificationAllowed] n'est que la variante qui charge d'abord.
+ */
+export function notificationAutoriseeDapres(
+  preferencesEnBase: unknown,
+  notificationType: keyof NotificationPreferences
+): boolean {
+  const preferences = {
+    ...defaultPreferences,
+    ...((preferencesEnBase as Partial<NotificationPreferences> | null) ?? {}),
+  }
+  return preferences[notificationType] ?? true
 }
 
 /**
@@ -66,7 +107,7 @@ export async function isNotificationAllowed(
   notificationType: keyof NotificationPreferences
 ): Promise<boolean> {
   const preferences = await getUserNotificationPreferences(userId)
-  return preferences[notificationType] ?? true // Par défaut activé si pas défini
+  return notificationAutoriseeDapres(preferences, notificationType)
 }
 
 /**

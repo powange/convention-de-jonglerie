@@ -65,6 +65,8 @@
       "convention_news": "Nouvelles conventions",
       "convention_news_desc": "Notifications des nouvelles conventions ajoutées",
       "manage_preferences": "Gérer vos préférences de notifications",
+      "messenger_messages": "Messagerie",
+      "messenger_messages_desc": "Messages des discussions d’équipe, des responsables et des organisateurs",
       "preferences_description": "Choisissez les types de notifications que vous souhaitez recevoir",
       "preferences_title": "Préférences de notifications",
       "receive_by_email": "Recevoir par email",

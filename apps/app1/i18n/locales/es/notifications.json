@@ -237,6 +237,48 @@
       "action": "Ver convenciones",
       "message": "Tu cuenta ha sido creada con éxito. ¡Descubre convenciones de malabares cerca de ti!",
       "title": "¡Bienvenido! 🎉"
+    },
+    "categories": {
+      "all": "Todas las categorías",
+      "system": "Sistema",
+      "edition": "Ediciones",
+      "volunteer": "Voluntariado",
+      "carpool": "Coche compartido",
+      "artist": "Artistas",
+      "convention": "Convenciones",
+      "task": "Tareas"
+    },
+    "page": {
+      "title": "Mis notificaciones",
+      "seo_description": "Gestiona tus notificaciones y preferencias",
+      "mark_all_read": "Marcar todas como leídas",
+      "new": "Nueva",
+      "mark_as_read": "Marcar como leída",
+      "mark_as_unread": "Marcar como no leída",
+      "read_ago": "Leída {time}",
+      "load_more": "Cargar más",
+      "adjust_filters": "Prueba a modificar tus filtros",
+      "nothing_yet": "Aquí aparecerán tus notificaciones"
+    },
+    "status": {
+      "all": "Todas",
+      "unread": "No leídas",
+      "read": "Leídas"
+    },
+    "toasts": {
+      "refreshed_title": "Actualizado",
+      "refreshed": "Notificaciones actualizadas",
+      "refresh_failed": "No se han podido cargar las notificaciones",
+      "all_read": "Todas las notificaciones se han marcado como leídas",
+      "mark_all_failed": "No se han podido marcar las notificaciones como leídas",
+      "marked_read": "Marcada como leída",
+      "marked_unread": "Marcada como no leída",
+      "updated": "Notificación actualizada",
+      "update_failed": "No se ha podido actualizar la notificación",
+      "deleted_title": "Eliminada",
+      "deleted": "Notificación eliminada",
+      "delete_failed": "No se ha podido eliminar la notificación",
+      "load_more_failed": "No se han podido cargar más notificaciones"
     }
   },
   "push_notifications": {

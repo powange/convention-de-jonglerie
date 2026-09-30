@@ -237,6 +237,48 @@
       "action": "Vedi convention",
       "message": "Il tuo account è stato creato con successo. Scopri le convention di giocoleria vicino a te!",
       "title": "Benvenuto! 🎉"
+    },
+    "categories": {
+      "all": "Tutte le categorie",
+      "system": "Sistema",
+      "edition": "Edizioni",
+      "volunteer": "Volontariato",
+      "carpool": "Car sharing",
+      "artist": "Artisti",
+      "convention": "Convention",
+      "task": "Attività"
+    },
+    "page": {
+      "title": "Le mie notifiche",
+      "seo_description": "Gestisci le tue notifiche e preferenze",
+      "mark_all_read": "Segna tutte come lette",
+      "new": "Nuova",
+      "mark_as_read": "Segna come letta",
+      "mark_as_unread": "Segna come non letta",
+      "read_ago": "Letta {time}",
+      "load_more": "Carica altre",
+      "adjust_filters": "Prova a modificare i filtri",
+      "nothing_yet": "Qui compariranno le tue notifiche"
+    },
+    "status": {
+      "all": "Tutte",
+      "unread": "Non lette",
+      "read": "Lette"
+    },
+    "toasts": {
+      "refreshed_title": "Aggiornato",
+      "refreshed": "Notifiche aggiornate",
+      "refresh_failed": "Impossibile caricare le notifiche",
+      "all_read": "Tutte le notifiche sono state segnate come lette",
+      "mark_all_failed": "Impossibile segnare le notifiche come lette",
+      "marked_read": "Segnata come letta",
+      "marked_unread": "Segnata come non letta",
+      "updated": "Notifica aggiornata",
+      "update_failed": "Impossibile aggiornare la notifica",
+      "deleted_title": "Eliminata",
+      "deleted": "Notifica eliminata",
+      "delete_failed": "Impossibile eliminare la notifica",
+      "load_more_failed": "Impossibile caricare altre notifiche"
     }
   },
   "push_notifications": {

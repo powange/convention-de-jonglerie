@@ -9,6 +9,7 @@ import {
   messengerStreamService,
   messengerUnreadService,
 } from '#server/utils/messenger-unread-service'
+import { notificationAutoriseeDapres } from '#server/utils/notification-preferences'
 import { messengerMessageInclude } from '#server/utils/prisma-select-helpers'
 import { translateServerSide } from '#server/utils/server-i18n'
 import { unifiedPushService } from '#server/utils/unified-push-service'
@@ -181,6 +182,13 @@ export default wrapApiHandler(
              * qu'il voit quand il n'a pas l'application ouverte — qui restait en français.
              */
             preferredLanguage: true,
+            /*
+             * ⚠️ LA PRÉFÉRENCE EST LUE ICI, dans le `select` qui ramène déjà les participants, et
+             * NON par un appel à `isNotificationAllowed` dans la boucle : ce serait une requête
+             * par destinataire, à chaque message. Une équipe de quarante personnes paierait
+             * quarante allers-retours pour décider d'envoyer un push.
+             */
+            notificationPreferences: true,
             // Uniquement pour les conversations liées à une édition
             ...(editionId
               ? {
@@ -215,6 +223,22 @@ export default wrapApiHandler(
     await Promise.all(
       participantsWithReadStatus.map(async (p) => {
         try {
+          /*
+           * ⚠️ LE SEUL ENDROIT OÙ LA PRÉFÉRENCE DE MESSAGERIE EST RESPECTÉE. Les messages
+           * n'appellent pas `NotificationService.create` — ils poussent directement —, donc
+           * aucune des six autres préférences ne les couvrait : un membre d'une équipe de
+           * quarante personnes actives recevait un push par message de groupe, sans autre issue
+           * que de couper tout le push de son compte.
+           *
+           * Le contrôle vient AVANT la composition du titre : traduire et calculer une URL pour
+           * une notification qu'on ne va pas envoyer serait du travail perdu.
+           */
+          const preferencesDuDestinataire = (p.user as { notificationPreferences?: unknown })
+            .notificationPreferences
+          if (!notificationAutoriseeDapres(preferencesDuDestinataire, 'messengerMessages')) {
+            return
+          }
+
           // On envoie toujours la push : la distinction premier-plan / arrière-plan est
           // gérée par FCM côté client, par appareil (service worker en arrière-plan,
           // onMessage au premier plan). L'ancien filtrage par « présence SSE » était par

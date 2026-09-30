@@ -1,6 +1,18 @@
+import { z } from 'zod'
+
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { ensureVolunteerConversations } from '#server/utils/messenger-helpers'
+import { assurerConversationsEquipeDesMembres } from '#server/utils/messenger-helpers'
+
+/*
+ * Le corps n'était pas validé : un `editionId` reçu en chaîne (« 3 ») passait le contrôle de
+ * présence, puis Prisma refusait la requête et l'ouverture rendait 500. `coerce` accepte les deux
+ * écritures, `int().positive()` refuse le reste.
+ */
+const schemaDuCorps = z.object({
+  editionId: z.coerce.number().int().positive(),
+  teamId: z.string().min(1),
+})
 
 /**
  * POST /api/messenger/team-conversation
@@ -10,15 +22,7 @@ export default wrapApiHandler(
   async (event) => {
     const user = requireAuth(event)
 
-    const body = await readBody(event)
-    const { editionId, teamId } = body
-
-    if (!editionId || !teamId) {
-      throw createError({
-        status: 400,
-        message: "L'ID de l'édition et l'ID de l'équipe sont requis",
-      })
-    }
+    const { editionId, teamId } = schemaDuCorps.parse(await readBody(event))
 
     // Vérifier que l'utilisateur est bien membre de l'équipe
     const teamAssignment = await prisma.applicationTeamAssignment.findFirst({
@@ -39,11 +43,8 @@ export default wrapApiHandler(
       })
     }
 
-    // Créer ou récupérer les conversations de l'équipe pour l'utilisateur actuel
-    await ensureVolunteerConversations(editionId, teamId, user.id)
-
-    // Synchroniser tous les membres de l'équipe dans la conversation
-    const allTeamMembers = await prisma.applicationTeamAssignment.findMany({
+    // Tous les membres acceptés de l'équipe, le demandeur compris
+    const membresDeLEquipe = await prisma.applicationTeamAssignment.findMany({
       where: {
         teamId,
         application: {
@@ -58,10 +59,21 @@ export default wrapApiHandler(
       },
     })
 
-    // S'assurer que tous les membres sont dans la conversation
-    for (const member of allTeamMembers) {
-      await ensureVolunteerConversations(editionId, teamId, member.application.userId)
-    }
+    /*
+     * ⚠️ UN SEUL APPEL POUR TOUTE L'ÉQUIPE. Auparavant, la synchronisation était appelée une fois
+     * pour le demandeur puis une fois par membre accepté, en série — quatre à huit requêtes
+     * chacune, dont plusieurs identiques d'un membre au suivant. Pour une équipe de quarante
+     * personnes, ouvrir la discussion coûtait ≈ 250 requêtes séquentielles avant que le premier
+     * message ne s'affiche.
+     *
+     * Le demandeur reste passé explicitement, comme avant : la garde du dessus vient de prouver
+     * qu'il est bénévole accepté de l'équipe, donc il figure dans `membresDeLEquipe` — le `Set` de
+     * la fonction en lot absorbe le doublon. C'est une ceinture, pas une nécessité.
+     */
+    await assurerConversationsEquipeDesMembres(editionId, teamId, [
+      user.id,
+      ...membresDeLEquipe.map((membre) => membre.application.userId),
+    ])
 
     // Récupérer la conversation de groupe de l'équipe
     const teamGroupConversation = await prisma.conversation.findFirst({

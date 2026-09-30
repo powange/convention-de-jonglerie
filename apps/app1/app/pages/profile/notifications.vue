@@ -250,6 +250,41 @@
           </div>
         </div>
 
+        <!--
+          Messagerie.
+
+          ⚠️ PAS D'INTERRUPTEUR « recevoir par e-mail » ici, contrairement aux six autres blocs :
+          rien n'envoie de courriel pour un message. Une case qui promet des courriels que rien
+          n'envoie est pire que pas de case — on la coche, et il ne se passe jamais rien.
+        -->
+        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center"
+              >
+                <UIcon
+                  name="i-heroicons-chat-bubble-left-right"
+                  class="w-4 h-4 text-indigo-600 dark:text-indigo-400"
+                />
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900 dark:text-white">
+                  {{ $t('profile.notifications.messenger_messages') }}
+                </h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ $t('profile.notifications.messenger_messages_desc') }}
+                </p>
+              </div>
+            </div>
+            <USwitch
+              v-model="notificationPreferences.messengerMessages"
+              color="primary"
+              size="lg"
+            />
+          </div>
+        </div>
+
         <!-- Notifications système -->
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
           <div class="flex items-center justify-between">
@@ -332,12 +367,19 @@ const notificationPreferences = reactive({
   systemNotifications: true,
   carpoolUpdates: true,
   artistUpdates: true,
+  messengerMessages: true,
   emailVolunteerReminders: false,
   emailApplicationUpdates: false,
   emailConventionNews: false,
   emailSystemNotifications: false,
   emailCarpoolUpdates: false,
   emailArtistUpdates: false,
+  /*
+   * Aucun interrupteur ne l'expose — rien n'envoie de courriel pour un message. La clé est
+   * déclarée pour que le corps envoyé au serveur ait toujours la même forme, même si le
+   * chargement des préférences a échoué.
+   */
+  emailMessengerMessages: false,
 })
 
 const loadNotificationPreferences = async () => {

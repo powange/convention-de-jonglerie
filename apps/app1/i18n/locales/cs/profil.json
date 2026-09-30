@@ -73,7 +73,9 @@
       "system_notifications": "Systémová oznámení",
       "system_notifications_desc": "Důležité aktualizace a údržba",
       "volunteer_reminders": "Připomínky dobrovolnických směn",
-      "volunteer_reminders_desc": "Oznámení 30 minut před vašimi směnami"
+      "volunteer_reminders_desc": "Oznámení 30 minut před vašimi směnami",
+      "messenger_messages": "Zprávy",
+      "messenger_messages_desc": "Zprávy z týmových chatů, od vedoucích a od organizátorů"
     },
     "oauth_password_info": "Přihlásili jste se přes Google. Heslo pro přihlášení si můžete nastavit pomocí e-mailu.",
     "optional_section_title": "Nepovinné informace",

@@ -73,7 +73,9 @@
       "system_notifications": "Системні сповіщення",
       "system_notifications_desc": "Важливі оновлення та обслуговування",
       "volunteer_reminders": "Нагадування про волонтерські зміни",
-      "volunteer_reminders_desc": "Сповіщення за 30 хвилин до ваших змін"
+      "volunteer_reminders_desc": "Сповіщення за 30 хвилин до ваших змін",
+      "messenger_messages": "Повідомлення",
+      "messenger_messages_desc": "Повідомлення з командних чатів, від відповідальних і від організаторів"
     },
     "oauth_password_info": "Ви увійшли через Google. Ви можете встановити пароль для входу за допомогою електронної пошти.",
     "optional_section_title": "Додатковий розділ",

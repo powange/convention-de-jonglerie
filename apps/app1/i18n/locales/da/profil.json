@@ -73,7 +73,9 @@
       "system_notifications": "Systemnotifikationer",
       "system_notifications_desc": "Vigtige opdateringer og vedligeholdelse",
       "volunteer_reminders": "Påmindelser om frivilligvagter",
-      "volunteer_reminders_desc": "Notifikationer 30 minutter før dine vagter"
+      "volunteer_reminders_desc": "Notifikationer 30 minutter før dine vagter",
+      "messenger_messages": "Beskeder",
+      "messenger_messages_desc": "Beskeder fra teamsamtaler, teamledere og arrangører"
     },
     "oauth_password_info": "Du loggede ind med Google. Du kan indstille en adgangskode for at logge ind med din email.",
     "optional_section_title": "Valgfri sektion",

@@ -237,6 +237,48 @@
       "action": "Bekijk conventies",
       "message": "Je account is succesvol aangemaakt. Ontdek jongleerconventies bij jou in de buurt!",
       "title": "Welkom! 🎉"
+    },
+    "categories": {
+      "all": "Alle categorieën",
+      "system": "Systeem",
+      "edition": "Edities",
+      "volunteer": "Vrijwilligerswerk",
+      "carpool": "Carpoolen",
+      "artist": "Artiesten",
+      "convention": "Conventies",
+      "task": "Taken"
+    },
+    "page": {
+      "title": "Mijn meldingen",
+      "seo_description": "Beheer je meldingen en voorkeuren",
+      "mark_all_read": "Alles als gelezen markeren",
+      "new": "Nieuw",
+      "mark_as_read": "Als gelezen markeren",
+      "mark_as_unread": "Als ongelezen markeren",
+      "read_ago": "Gelezen {time}",
+      "load_more": "Meer laden",
+      "adjust_filters": "Probeer je filters aan te passen",
+      "nothing_yet": "Hier verschijnen je meldingen"
+    },
+    "status": {
+      "all": "Alle",
+      "unread": "Ongelezen",
+      "read": "Gelezen"
+    },
+    "toasts": {
+      "refreshed_title": "Bijgewerkt",
+      "refreshed": "Meldingen bijgewerkt",
+      "refresh_failed": "De meldingen konden niet worden geladen",
+      "all_read": "Alle meldingen zijn als gelezen gemarkeerd",
+      "mark_all_failed": "De meldingen konden niet als gelezen worden gemarkeerd",
+      "marked_read": "Als gelezen gemarkeerd",
+      "marked_unread": "Als ongelezen gemarkeerd",
+      "updated": "Melding bijgewerkt",
+      "update_failed": "De melding kon niet worden bijgewerkt",
+      "deleted_title": "Verwijderd",
+      "deleted": "Melding verwijderd",
+      "delete_failed": "De melding kon niet worden verwijderd",
+      "load_more_failed": "Er konden geen meldingen meer worden geladen"
     }
   },
   "push_notifications": {
