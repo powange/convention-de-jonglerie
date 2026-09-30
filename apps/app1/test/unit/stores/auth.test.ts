@@ -10,6 +10,17 @@ global.$fetch = vi.fn() as any
 // plus de cookie JWT à gérer côté client
 global.useRoute = vi.fn()
 global.navigateTo = vi.fn()
+/*
+ * `useDeviceId` est un auto-import Nuxt : dans un test unitaire il n'existe pas, et l'appeler
+ * lèverait une `ReferenceError`. Le store l'entoure d'un `try/catch` — la déconnexion ne doit
+ * jamais échouer faute d'identifiant d'appareil —, mais le simuler ici permet d'éprouver le cas
+ * NOMINAL, celui où l'identifiant part bien avec la requête.
+ */
+const identifiantDAppareil = { valeur: 'appareil-de-test' as string | null }
+global.useDeviceId = vi.fn(() => ({
+  getDeviceId: () => identifiantDAppareil.valeur,
+  clearDeviceId: vi.fn(),
+})) as any
 
 // Mock import.meta.client pour les tests côté client
 Object.defineProperty(global, 'import', {
@@ -281,6 +292,7 @@ describe('useAuthStore', () => {
       authStore.user = mockUser
       authStore.rememberMe = true
       authStore.adminMode = true
+      identifiantDAppareil.valeur = 'appareil-de-test'
     })
 
     it("devrait réinitialiser l'état du store", async () => {
@@ -298,9 +310,36 @@ describe('useAuthStore', () => {
       expect(authStore.user).toBeNull()
     })
 
-    it("devrait appeler l'API de logout", () => {
-      authStore.logout()
-      expect($fetch).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST' })
+    it("devrait appeler l'API de logout EN TRANSMETTANT l'appareil", async () => {
+      /*
+       * ⚠️ CE QUI MANQUAIT. L'appel partait sans corps, donc sans identifiant d'appareil : le
+       * serveur ne savait pas quel token FCM désactiver, et les notifications push du compte qui
+       * venait de partir continuaient d'arriver. Sur un poste partagé, la personne suivante les
+       * lisait — titre et message s'affichent dans la notification système, sans qu'il soit besoin
+       * d'être connecté pour les voir.
+       */
+      identifiantDAppareil.valeur = 'appareil-de-test'
+
+      await authStore.logout()
+
+      expect($fetch).toHaveBeenCalledWith('/api/auth/logout', {
+        method: 'POST',
+        body: { deviceId: 'appareil-de-test' },
+      })
+    })
+
+    it('se déconnecte quand même sans identifiant d’appareil', async () => {
+      /*
+       * `localStorage` peut être inaccessible (navigation privée verrouillée, données de site
+       * bloquées). Se déconnecter est un geste qu'on ne refuse à personne : le corps part vide et
+       * le serveur ne désactive simplement aucun token.
+       */
+      identifiantDAppareil.valeur = null
+
+      await authStore.logout()
+
+      expect($fetch).toHaveBeenCalledWith('/api/auth/logout', { method: 'POST', body: {} })
+      expect(authStore.user).toBeNull()
     })
   })
 

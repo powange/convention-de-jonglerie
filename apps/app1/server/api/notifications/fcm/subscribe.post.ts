@@ -21,6 +21,34 @@ export default wrapApiHandler(
 
     const userAgent = getHeader(event, 'user-agent') || null
 
+    /*
+     * ⚠️ UN TOKEN APPARTIENT À UN NAVIGATEUR, PAS À UN COMPTE — et c'est ce que la contrainte
+     * `@@unique([userId, token])` autorise à oublier : le MÊME token peut exister pour deux
+     * comptes.
+     *
+     * Le scénario, sur un poste partagé : quelqu'un se connecte, s'abonne, part. La personne
+     * suivante se connecte et s'abonne — Firebase rend le même token, puisque c'est la même
+     * installation. Deux lignes actives portent alors le même token pour deux comptes, et les
+     * notifications du PREMIER continuent d'arriver sur l'écran du SECOND. Le contenu s'affiche
+     * dans la notification système : titre, message, nom de l'édition.
+     *
+     * On désactive donc ce token chez les AUTRES comptes. Pas chez celui-ci : l'`upsert` qui suit
+     * s'en charge, et le désactiver ici pour le réactiver juste après laisserait une fenêtre où
+     * l'abonné n'est abonné à rien.
+     *
+     * ⚠️ Cela n'efface rien : `isActive: false` garde la ligne, donc l'historique et le lien avec
+     * l'appareil. Le premier compte se réabonnera à sa prochaine visite, sur son propre appareil
+     * comme sur celui-ci.
+     */
+    await prisma.fcmToken.updateMany({
+      where: {
+        token,
+        userId: { not: user.id },
+        isActive: true,
+      },
+      data: { isActive: false },
+    })
+
     await prisma.fcmToken.upsert({
       where: {
         userId_token: {
