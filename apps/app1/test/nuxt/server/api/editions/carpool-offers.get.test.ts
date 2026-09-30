@@ -70,19 +70,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         },
       },
     ],
-    passengers: [
-      {
-        id: 1,
-        addedAt: new Date(),
-        user: {
-          id: 2,
-          emailHash: 'hash2',
-          pseudo: 'passenger1',
-          profilePicture: null,
-          updatedAt: new Date(),
-        },
-      },
-    ],
     _count: { comments: 1 },
   })
 
@@ -121,20 +108,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
             },
           },
         },
-        passengers: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                pseudo: true,
-                emailHash: true,
-                profilePicture: true,
-                updatedAt: true,
-              },
-            },
-          },
-          orderBy: { addedAt: 'asc' },
-        },
         // Le NOMBRE de commentaires, pas la conversation. C'est tout ce que la carte affiche.
         _count: { select: { comments: true } },
       },
@@ -144,7 +117,9 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     expect(result).toHaveLength(1)
     expect(result[0].user.emailHash).toBe('hash1')
     expect(result[0].user).not.toHaveProperty('email') // Email doit être masqué
-    expect(result[0].passengers[0].user.emailHash).toBe('hash2')
+    // Plus de `passengers` : la relation était morte — aucun client ne la lisait, et les deux
+    // points d'API qui l'écrivaient rendaient 410 depuis leur retrait.
+    expect(result[0]).not.toHaveProperty('passengers')
     expect(result[0].commentsCount).toBe(1)
     // Absent, et non pas vide : `comments: []` se lirait « aucun commentaire » alors que le compte
     // en annonce un. C'est une contradiction qui ne lève aucune erreur.
@@ -157,7 +132,7 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
      */
     expect(result[0].bookings.map((b: any) => b.status)).toEqual(['ACCEPTED'])
     expect(result[0].bookings[0]).not.toHaveProperty('message')
-    // Le demandeur reste nommé : `passengers`, juste à côté, expose déjà publiquement ces personnes.
+    // Le demandeur reste nommé : une réservation acceptée est publique, c'est son objet.
     expect(result[0].bookings[0].requester.emailHash).toBe('hash2')
     // 3 places, 1 prise par l'acceptée. Compté sur les places, pas sur les réservations montrées.
     expect(result[0].remainingSeats).toBe(2)
@@ -274,7 +249,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         tripDate: new Date('2024-06-20T10:00:00Z'),
         user: { id: 1, emailHash: 'hash1', pseudo: 'user1' },
         bookings: [],
-        passengers: [],
         _count: { comments: 0 },
       },
       {
@@ -282,7 +256,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
         tripDate: new Date('2024-06-15T10:00:00Z'),
         user: { id: 2, emailHash: 'hash2', pseudo: 'user2' },
         bookings: [],
-        passengers: [],
         _count: { comments: 0 },
       },
     ]
@@ -310,19 +283,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           updatedAt: new Date(),
         },
         bookings: [],
-        passengers: [
-          {
-            id: 1,
-            addedAt: new Date(),
-            user: {
-              id: 2,
-              emailHash: 'passenger-hash',
-              pseudo: 'passenger',
-              profilePicture: null,
-              updatedAt: new Date(),
-            },
-          },
-        ],
         _count: { comments: 1 },
       },
     ]
@@ -334,9 +294,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
     // Vérifier que les emails sont masqués et remplacés par des hash
     expect(result[0].user).not.toHaveProperty('email')
     expect(result[0].user.emailHash).toBe('driver-hash')
-
-    expect(result[0].passengers[0].user).not.toHaveProperty('email')
-    expect(result[0].passengers[0].user.emailHash).toBe('passenger-hash')
 
     // La conversation n'arrive plus par ce point d'API, seul son compte. Le masquage de l'email de
     // l'auteur d'un commentaire est vérifié là où il se joue désormais :
@@ -357,7 +314,6 @@ describe('GET /api/editions/[id]/carpool-offers', () => {
           updatedAt: new Date('2024-01-01'),
         },
         bookings: [],
-        passengers: [],
         _count: { comments: 0 },
       },
     ]

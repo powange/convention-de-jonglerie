@@ -1,12 +1,6 @@
 <template>
   <NuxtLink :to="`/editions/${editionId}/carpool/offers/${offer.id}`" class="block">
-    <UCard
-      :ref="highlighted ? 'highlightedCard' : undefined"
-      :class="[
-        highlighted ? 'ring-2 ring-primary-500 shadow-lg' : '',
-        'hover:shadow-md transition-shadow cursor-pointer',
-      ]"
-    >
+    <UCard class="hover:shadow-md transition-shadow cursor-pointer">
       <div class="space-y-4">
         <!-- En-tête avec les infos utilisateur -->
         <div class="flex items-start justify-between">
@@ -149,7 +143,6 @@ import { useAuthStore } from '#imports'
 interface Props {
   offer: CarpoolOffer
   editionId: number
-  highlighted?: boolean
 }
 
 const props = defineProps<Props>()
@@ -164,20 +157,6 @@ const { t, locale } = useI18n()
 // Vérifier si l'utilisateur peut éditer cette offre
 const canEdit = computed(() => {
   return authStore.user && authStore.user.id === props.offer.user.id
-})
-
-// Défilement automatique vers l'offre mise en évidence
-const highlightedCard = ref<HTMLElement>()
-
-onMounted(() => {
-  if (props.highlighted && highlightedCard.value) {
-    nextTick(() => {
-      highlightedCard.value?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      })
-    })
-  }
 })
 
 // Calculer les places restantes: si fourni par l'API via bookings ACCEPTED, sinon fallback sur passagers

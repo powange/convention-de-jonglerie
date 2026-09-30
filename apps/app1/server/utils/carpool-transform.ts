@@ -65,7 +65,6 @@ function partieCommentaires(entite: any) {
  */
 export function transformCarpoolOffer(offer: any, viewerId?: number) {
   const bookings = offer.bookings ?? []
-  const passengers = offer.passengers ?? []
   const availableSeats = typeof offer.availableSeats === 'number' ? offer.availableSeats : 0
 
   // Pour les offres : téléphone visible uniquement au propriétaire ou passager accepté
@@ -122,11 +121,6 @@ export function transformCarpoolOffer(offer: any, viewerId?: number) {
           .reduce((s: number, b: any) => s + (b.seats || 0), 0)
     ),
     user: transformUser(offer.user),
-    passengers: passengers.map((passenger: any) => ({
-      id: passenger.id,
-      addedAt: passenger.addedAt,
-      user: transformUser(passenger.user),
-    })),
     bookings: bookingsVisibles.map((b: any) => ({
       id: b.id,
       carpoolOfferId: b.carpoolOfferId,

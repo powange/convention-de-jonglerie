@@ -43,11 +43,6 @@ export interface CarpoolOffer {
   updatedAt?: string
   user: PublicUser
   bookings?: CarpoolBooking[]
-  passengers?: Array<{
-    id: number
-    addedAt: string
-    user: PublicUser
-  }>
   /** Chargés par le détail d'une offre ; absents des listes, qui n'en donnent que le nombre. */
   comments?: CarpoolComment[]
   /** Toujours présent : les listes le rendent sans transporter les commentaires. */
