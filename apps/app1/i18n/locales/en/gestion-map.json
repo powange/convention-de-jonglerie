@@ -68,7 +68,8 @@
       "import_reimport": "Re-import",
       "marker_zone": "Attached zone",
       "marker_zone_help": "Attach this point to a zone it serves as an entrance or access to.",
-      "marker_no_zone": "No zone"
+      "marker_no_zone": "No zone",
+      "import_dep_program": "{n} programme item | {n} programme items"
     }
   }
 }

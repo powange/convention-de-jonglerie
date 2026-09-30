@@ -1,5 +1,5 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
-import { canEditEditionById } from '#server/utils/permissions/edition-permissions'
+import { canManageProgram } from '#server/utils/permissions/program-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 import { construireFriseProgramme } from '~~/shared/utils/program-timeline'
 
@@ -43,7 +43,20 @@ export default wrapApiHandler(
     }
 
     const user = event.context.user
-    const peutEditer = user ? await canEditEditionById(editionId, user.id, event) : false
+    /*
+     * ⚠️ `canManageProgram` ET NON `canEditEditionById`, pour que la LECTURE et les ÉCRITURES du
+     * programme répondent à la même question.
+     *
+     * Toutes les écritures (`program-items/**`) passent par `canManageProgram`, qui accorde le
+     * droit à tout administrateur global — précisément pour les conventions NON REVENDIQUÉES, où
+     * il n'est ni créateur ni organisateur. La lecture, elle, passait par `canEditEditionById`,
+     * qui ne le reconnaît qu'en MODE ADMIN.
+     *
+     * Conséquence : un administrateur hors mode admin pouvait créer des éléments (201) et la frise
+     * ne lui rendait que le publié — voire un 404 tant que la page n'est pas publique. Les
+     * brouillons qu'il venait de saisir n'apparaissaient pas, sans qu'aucune erreur ne le dise.
+     */
+    const peutEditer = user ? await canManageProgram(editionId, user, event) : false
 
     /**
      * Un programme activé mais non publié ne se lit qu'en coulisses.

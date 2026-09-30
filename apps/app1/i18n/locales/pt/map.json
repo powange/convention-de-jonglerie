@@ -42,6 +42,7 @@
     "marker_entrance_of": "Entrada de:",
     "offline_title": "Mapa apresentado sem ligação",
     "offline_description": "Estas informações provêm da sua última visita e podem ter mudado desde então.",
-    "not_public": "O mapa desta edição não é público."
+    "not_public": "O mapa desta edição não é público.",
+    "export_kml": "Descarregar (KML)"
   }
 }

@@ -42,6 +42,7 @@
     "marker_entrance_of": "Ingång till:",
     "offline_title": "Karta visad offline",
     "offline_description": "Uppgifterna kommer från ditt senaste besök och kan ha ändrats sedan dess.",
-    "not_public": "Kartan för denna upplaga är inte offentlig."
+    "not_public": "Kartan för denna upplaga är inte offentlig.",
+    "export_kml": "Ladda ner (KML)"
   }
 }

@@ -26,6 +26,14 @@ const importedSelect = {
       workshopLocations: true,
       stockItems: true,
       stockReservations: true,
+      /*
+       * ⚠️ `programItems` MANQUAIT, et c'est la dépendance la plus nombreuse. `EditionProgramItem`
+       * porte `zoneId` et `markerId` en `onDelete: SetNull` : une zone à laquelle sont rattachés
+       * dix créneaux du programme était annoncée SANS AUCUNE dépendance, et sa suppression vidait
+       * silencieusement le lieu de ces dix créneaux. L'écran promettait de prévenir de ce qu'on
+       * allait perdre, et taisait justement cela.
+       */
+      programItems: true,
     },
   },
 } as const
@@ -54,6 +62,7 @@ function toRecord(row: {
     workshopLocations: number
     stockItems: number
     stockReservations: number
+    programItems: number
   }
 }): ImportedRecord {
   const rawTypes = row.zoneTypes ?? row.markerTypes
@@ -72,6 +81,7 @@ function toRecord(row: {
       workshops: row._count.workshopLocations,
       stockItems: row._count.stockItems,
       stockReservations: row._count.stockReservations,
+      programItems: row._count.programItems,
     },
   }
 }

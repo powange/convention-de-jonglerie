@@ -68,7 +68,8 @@
       "import_reimport": "Reimportar",
       "marker_zone": "Zona associada",
       "marker_zone_help": "Associe este ponto a uma zona da qual é a entrada ou o acesso.",
-      "marker_no_zone": "Nenhuma zona"
+      "marker_no_zone": "Nenhuma zona",
+      "import_dep_program": "{n} elemento do programa | {n} elementos do programa"
     }
   }
 }

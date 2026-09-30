@@ -4,7 +4,8 @@ import { prismaTest } from '../setup-db'
 
 /**
  * L'écran d'import d'une carte externe compte ce qui dépend de chaque zone et de chaque point
- * déjà importés — spectacles, ateliers, stock — pour avertir avant qu'un réimport ne les casse.
+ * déjà importés — spectacles, ateliers, stock, créneaux du programme — pour avertir avant qu'un
+ * réimport ne les casse.
  *
  * Ce décompte demandait une relation `shows` qui n'a jamais existé sur aucun des deux modèles :
  * la sélection étant partagée, les DEUX requêtes échouaient, l'endpoint répondait en erreur, et
@@ -22,6 +23,14 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Carte externe — décompte des dép
         workshopLocations: true,
         stockItems: true,
         stockReservations: true,
+        /*
+         * ⚠️ `programItems` MANQUAIT au décompte, et c'est la dépendance la PLUS NOMBREUSE.
+         * `EditionProgramItem` porte `zoneId` et `markerId` en `onDelete: SetNull` : une zone à
+         * laquelle sont rattachés dix créneaux de la frise s'annonçait SANS aucune dépendance, et
+         * sa suppression vidait silencieusement leur lieu. L'écran promettait de prévenir de ce
+         * qu'on allait perdre, et taisait précisément cela.
+         */
+        programItems: true,
       },
     },
   } as const
@@ -35,6 +44,24 @@ describe.skipIf(!process.env.TEST_WITH_DB)('Carte externe — décompte des dép
   it('la sélection des points de repère est acceptée par Prisma', async () => {
     await expect(
       prismaTest.editionMarker.findMany({ take: 1, select: selection })
+    ).resolves.toBeDefined()
+  })
+
+  it('la relation « programItems » existe bien sur LES DEUX modèles', async () => {
+    /*
+     * 🔬 Le pendant positif du test suivant, et il est nécessaire : la sélection est PARTAGÉE par
+     * les zones et les points. Un champ présent sur un seul modèle ferait échouer une des deux
+     * requêtes — donc l'écran d'import entier — et c'est exactement l'histoire de `shows`.
+     *
+     * Seule une vraie requête le montre : c'est Prisma qui refuse une sélection inconnue, aucun
+     * typage ni aucun mock ne le dirait.
+     */
+    const seulement = { id: true, _count: { select: { programItems: true } } } as const
+    await expect(
+      prismaTest.editionZone.findMany({ take: 1, select: seulement })
+    ).resolves.toBeDefined()
+    await expect(
+      prismaTest.editionMarker.findMany({ take: 1, select: seulement })
     ).resolves.toBeDefined()
   })
 

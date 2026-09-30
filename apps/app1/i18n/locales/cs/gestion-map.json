@@ -68,7 +68,8 @@
       "import_reimport": "Znovu importovat",
       "marker_zone": "Přiřazená zóna",
       "marker_zone_help": "Přiřaďte tento bod k zóně, jejímž je vchodem nebo přístupem.",
-      "marker_no_zone": "Žádná zóna"
+      "marker_no_zone": "Žádná zóna",
+      "import_dep_program": "{n} položka programu | {n} položky programu"
     }
   }
 }

@@ -139,6 +139,20 @@ export const publicRoutes: PublicRoute[] = [
   // que les organisateurs y voient aussi leurs brouillons ; un visiteur n'a que le publié.
   { pattern: /^\/api\/editions\/\d+\/program$/, methods: ['GET'], hydrateSession: true },
   { pattern: /^\/api\/editions\/\d+\/markers$/, methods: ['GET'], hydrateSession: true },
+  /*
+   * Export KML de la carte, pour ouvrir le plan dans Google Earth ou une application de
+   * randonnée — sur place, souvent hors réseau.
+   *
+   * ⚠️ IL ÉTAIT INATTEIGNABLE. Le handler est écrit pour le public : il vérifie la publication de
+   * la carte et pose un `Content-Disposition`. Mais la route n'était pas inscrite ici, donc le
+   * middleware répondait 401 à tout visiteur AVANT même d'atteindre cette vérification. Et aucun
+   * écran ne proposait le lien : la fonctionnalité existait, était testée pour l'accès public, et
+   * n'était offerte nulle part.
+   *
+   * `hydrateSession` comme les zones et les marqueurs : la même garde décide, et elle laisse
+   * l'organisation exporter sa propre carte avant publication.
+   */
+  { pattern: /^\/api\/editions\/\d+\/export\.kml$/, methods: ['GET'], hydrateSession: true },
 
   // ====== FAQ (entrées publiques) ======
   { pattern: /^\/api\/editions\/\d+\/faq$/, methods: ['GET'], hydrateSession: true },
