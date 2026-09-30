@@ -1,8 +1,6 @@
-import { promises as fs } from 'fs'
-import { join, dirname } from 'path'
-
-import { deleteFromBothLocations } from './copy-to-output'
+import { deleteOldFile } from './file-helpers'
 import { getConventionForEdit } from './permissions/convention-permissions'
+import { getEditionForEdit } from './permissions/edition-permissions'
 
 import type { Convention, Edition, User } from '#server/types/prisma'
 
@@ -10,8 +8,15 @@ import { isHttpError } from '#server/types/api'
 
 interface OptionsCommunes {
   entityId: number
-  useOutputDeletion?: boolean // Utiliser deleteFromBothLocations (pour conventions)
-  pathExtraction?: 'convention' | 'edition' | 'profile' // Comment extraire le chemin du fichier
+  /**
+   * Le dossier du montage où vit le fichier, sous `NUXT_FILE_STORAGE_MOUNT`.
+   *
+   * ⚠️ MESURÉ, PAS DÉDUIT (base de développement, 1er octobre 2026) : une image d'édition vit dans
+   * `editions/<id>/`, un logo de convention dans `conventions/<id>/`, une photo de profil dans
+   * `profiles/<id>/`. C'est ce que `handleFileUpload` écrit, et ce qui rend le nom de fichier nu
+   * exploitable — sans ce dossier, on ne saurait pas où chercher.
+   */
+  dossier: 'conventions' | 'editions' | 'profiles'
 }
 
 /**
@@ -52,28 +57,70 @@ export async function checkConventionDeletionPermission(
 }
 
 /**
- * Vérifie les permissions pour supprimer l'image d'une édition
+ * Vérifie les permissions pour supprimer l'image d'une édition.
+ *
+ * ⚠️ CE CONTRÔLE N'AUTORISAIT QUE LE CRÉATEUR (`creatorId`), alors que DÉPOSER et REMPLACER la
+ * même image passent par `canEditEdition` : l'auteur de la convention, un organisateur avec
+ * `editAllEditions`, un droit par édition, un admin global. La page « À propos » affiche donc le
+ * bouton de suppression à tous ceux qui ont `canEdit` — et pour eux le clic répondait « Non
+ * autorisé à modifier cette édition ». On pouvait remplacer l'affiche, pas la retirer.
+ *
+ * Et pour une édition IMPORTÉE (`creatorId` nul), personne ne pouvait la supprimer.
+ *
+ * `getEditionForEdit` porte déjà la règle, avec ses 404 et 403 : on la réemploie au lieu d'en
+ * écrire une seconde, puisque c'est précisément leur divergence qui a produit ce défaut.
  */
 export async function checkEditionDeletionPermission(
   editionId: number,
-  userId: number
+  user: { id: number; isGlobalAdmin?: boolean }
 ): Promise<Edition> {
-  const edition = await prisma.edition.findUnique({
-    where: { id: editionId },
-  })
-
-  if (!edition || edition.creatorId !== userId) {
-    throw createError({
-      status: 403,
-      message: 'Non autorisé à modifier cette édition',
-    })
-  }
-
-  return edition
+  return (await getEditionForEdit(editionId, user as never)) as unknown as Edition
 }
 
 /**
- * Supprime physiquement le fichier image
+ * Ce qui n'est PAS un fichier à nous, et qu'il ne faut donc pas tenter de supprimer.
+ *
+ * ⚠️⚠️ CETTE GARDE EST LA PLUS IMPORTANTE DE CE FICHIER, et le constat ne la mentionnait pas.
+ * MESURÉ sur la base de développement le 1er octobre 2026 : 140 des 166 photos de profil sont des
+ * URL Google (`https://lh3.googleusercontent.com/...`), posées à la connexion par OAuth. Ce ne
+ * sont pas des fichiers de notre disque.
+ *
+ * Passer une telle valeur à `deleteOldFile` lui ferait découper « https://lh3... » comme un
+ * chemin et demander la suppression dans un dossier inventé. Inoffensif par chance, mais c'est
+ * exactement le genre de hasard sur lequel on ne construit pas : `..` dans la valeur stockée
+ * donnerait un chemin hors du montage.
+ *
+ * L'ancien code s'en protégeait SANS LE SAVOIR — `extractFilePath` exigeait que le nom commence
+ * par `profile-`, donc une URL Google ne correspondait à rien. Le remplacer sans reposer cette
+ * garde aurait introduit le défaut en corrigeant l'autre.
+ */
+function estUnFichierDeNotreStockage(imageUrl: string): boolean {
+  // Une adresse externe : OAuth pose l'avatar du fournisseur tel quel.
+  if (imageUrl.includes('://')) return false
+  // Une remontée de dossier : rien de légitime n'en contient.
+  if (imageUrl.includes('..')) return false
+  return true
+}
+
+/**
+ * Supprime physiquement le fichier image.
+ *
+ * ⚠️ CE QUI N'ALLAIT PAS, et c'était total : les fichiers vivent sous le montage de
+ * nuxt-file-storage (`NUXT_FILE_STORAGE_MOUNT`, `/uploads`), et cette fonction les cherchait sous
+ * `process.cwd()/public/uploads`. VÉRIFIÉ DANS LE CONTENEUR : `public/uploads` N'EXISTE PAS. Le
+ * `unlink` échouait donc toujours, l'erreur était avalée en `console.warn`, et la base était mise
+ * à jour : l'utilisateur voyait l'image partir, le fichier restait.
+ *
+ * ⚠️ PIRE POUR LES ÉDITIONS : après une modification, `handleFileUpload` rend un NOM DE FICHIER
+ * NU. L'ancien `extractFilePath` exigeait « uploads » ET « conventions » dans l'URL et rendait
+ * `null` — donc AUCUNE tentative, pas même celle qui aurait échoué. Mesuré : 30 des 31 images
+ * d'édition et 21 des 22 logos sont stockés sous cette forme nue. Le défaut concernait donc la
+ * quasi-totalité des images.
+ *
+ * On délègue à `deleteOldFile`, qui passe par `deleteFile` de nuxt-file-storage — donc par le
+ * montage — et qui sait lire les DEUX formes : chemin complet `/uploads/…` ou nom nu sous
+ * `<dossier>/<id>`. C'est déjà elle qui supprime l'ancienne image lors d'un REMPLACEMENT, et ce
+ * chemin-là fonctionnait : il n'y avait pas de règle à écrire, seulement une à réemployer.
  */
 export async function deletePhysicalImageFile(
   imageUrl: string | null,
@@ -81,75 +128,14 @@ export async function deletePhysicalImageFile(
 ): Promise<void> {
   if (!imageUrl) return
 
-  try {
-    if (options.useOutputDeletion) {
-      // Pour les conventions : utiliser deleteFromBothLocations
-      const relativePath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl
-
-      await deleteFromBothLocations(relativePath)
-      console.log('Image supprimée des deux emplacements:', relativePath)
-    } else {
-      // Pour les éditions et profils : suppression directe
-      const filePath = extractFilePath(imageUrl, options)
-      if (filePath) {
-        await fs.unlink(filePath)
-        console.log('Image supprimée:', filePath)
-
-        // Pour les éditions : essayer de supprimer le dossier s'il est vide
-        if (options.pathExtraction === 'edition' && filePath) {
-          try {
-            const dirPath = dirname(filePath)
-            await fs.rmdir(dirPath)
-            console.log("Dossier d'édition supprimé:", dirPath)
-          } catch {
-            // Le dossier n'est pas vide ou erreur, on ignore
-          }
-        }
-      }
-    }
-  } catch (error) {
-    console.warn('Erreur lors de la suppression du fichier:', error)
-    // On continue même si le fichier n'existe pas
-  }
-}
-
-/**
- * Extrait le chemin du fichier selon le type d'entité
- */
-function extractFilePath(imageUrl: string, options: ImageDeletionOptions): string | null {
-  const urlParts = imageUrl.split('/')
-  const filename = urlParts[urlParts.length - 1]
-
-  // Une URL vide ou finissant par « / » ne porte aucun nom de fichier : rien à extraire.
-  if (!filename) return null
-
-  switch (options.pathExtraction) {
-    case 'edition': {
-      if (urlParts.includes('uploads') && urlParts.includes('conventions')) {
-        const folderName = urlParts[urlParts.indexOf('conventions') + 1]
-        if (!folderName) break
-
-        // Pour les éditions, le dossier peut être soit l'ID de l'édition, soit l'ID de la convention
-        // On vérifie que le nom de fichier commence par 'edition-' et que le dossier correspond
-        if (filename.startsWith('edition-') || filename.startsWith('convention-')) {
-          return join(process.cwd(), 'public', 'uploads', 'conventions', folderName, filename)
-        }
-      }
-      break
-    }
-    case 'profile': {
-      if (filename && filename.startsWith('profile-')) {
-        return join(process.cwd(), 'public', 'uploads', 'profiles', filename)
-      }
-      break
-    }
-    case 'convention': {
-      // Les conventions utilisent deleteFromBothLocations, pas cette fonction
-      break
-    }
+  if (!estUnFichierDeNotreStockage(imageUrl)) {
+    console.log('Image non stockée par nous, aucun fichier à supprimer:', imageUrl)
+    return
   }
 
-  return null
+  // `deleteOldFile` avale déjà ses propres erreurs : un fichier absent ne doit pas empêcher de
+  // retirer l'image de la base, sans quoi une entrée cassée serait impossible à nettoyer.
+  await deleteOldFile(imageUrl, options.entityId, options.dossier, true)
 }
 
 /**
@@ -200,13 +186,13 @@ export async function updateEntityRemoveImage(
  */
 export async function handleImageDeletion(
   options: ImageDeletionOptions,
-  // Les deux contrôles de permission n'attendent pas la même chose : celui des conventions a
-  // besoin du drapeau `isGlobalAdmin`, celui des éditions se contente d'un identifiant. Les
-  // appelants passent donc l'un ou l'autre, ce que la signature déclarait à tort comme un
-  // simple `number` — le typage mentait sur ce qui circulait vraiment ici.
+  /*
+   * Convention ET édition ont maintenant besoin du drapeau `isGlobalAdmin` : leurs deux contrôles
+   * passent par une garde de permissions complète. Seule la photo de PROFIL se contente d'un
+   * identifiant — on ne supprime que la sienne —, d'où l'union conservée.
+   */
   auteur: number | { id: number; isGlobalAdmin?: boolean }
 ): Promise<ImageDeletionResult> {
-  const auteurId = typeof auteur === 'number' ? auteur : auteur.id
   const auteurAvecDroits = typeof auteur === 'number' ? { id: auteur } : auteur
 
   try {
@@ -223,7 +209,7 @@ export async function handleImageDeletion(
         break
       }
       case 'edition': {
-        const edition = await checkEditionDeletionPermission(options.entityId, auteurId)
+        const edition = await checkEditionDeletionPermission(options.entityId, auteurAvecDroits)
         imageUrl = edition.imageUrl
         break
       }
@@ -282,23 +268,24 @@ export async function deleteConventionImage(
       entityType: 'convention',
       entityId: conventionId,
       imageField: 'logo',
-      useOutputDeletion: true,
-      pathExtraction: 'convention',
+      dossier: 'conventions',
     },
     user
   )
 }
 
-export async function deleteEditionImage(editionId: number, userId: number) {
+export async function deleteEditionImage(
+  editionId: number,
+  user: { id: number; isGlobalAdmin?: boolean }
+) {
   return handleImageDeletion(
     {
       entityType: 'edition',
       entityId: editionId,
       imageField: 'imageUrl',
-      useOutputDeletion: false,
-      pathExtraction: 'edition',
+      dossier: 'editions',
     },
-    userId
+    user
   )
 }
 
@@ -308,8 +295,7 @@ export async function deleteProfilePicture(userId: number) {
       entityType: 'user',
       entityId: userId,
       imageField: 'profilePicture',
-      useOutputDeletion: false,
-      pathExtraction: 'profile',
+      dossier: 'profiles',
     },
     userId
   )

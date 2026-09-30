@@ -96,7 +96,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, mockEvent.context.user)
     })
 
     it('devrait rejeter les IDs négatifs', async () => {
@@ -110,7 +110,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(999999999, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(999999999, mockEvent.context.user)
     })
   })
 
@@ -120,7 +120,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(1, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(1, mockEvent.context.user)
     })
 
     it('devrait rejeter si édition non trouvée', async () => {
@@ -278,7 +278,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(1, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(1, mockEvent.context.user)
     })
 
     it('devrait gérer les IDs avec des zéros en début', async () => {
@@ -286,7 +286,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, mockEvent.context.user)
     })
 
     it('devrait gérer les IDs décimaux (truncation)', async () => {
@@ -294,7 +294,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, mockEvent.context.user)
     })
 
     it("devrait gérer les espaces dans l'ID", async () => {
@@ -302,7 +302,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(mockEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(123, mockEvent.context.user)
     })
 
     it('devrait rejeter les chaînes vides (parseInt("") = NaN, !NaN = true)', async () => {
@@ -327,7 +327,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
 
       await handler(customEvent as any)
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(456, 789)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(456, customUser)
       expect(mockDeleteEditionImage).toHaveBeenCalledTimes(1)
     })
 
@@ -400,7 +400,7 @@ describe('/api/editions/[id]/delete-image DELETE', () => {
         statusMessage: 'Non autorisé à modifier cette édition',
       })
 
-      expect(mockDeleteEditionImage).toHaveBeenCalledWith(1, 1)
+      expect(mockDeleteEditionImage).toHaveBeenCalledWith(1, mockEvent.context.user)
     })
 
     it("devrait permettre la suppression aux organisateurs avec droits d'édition", async () => {
