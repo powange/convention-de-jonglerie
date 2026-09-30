@@ -78,7 +78,12 @@
       "request_load_error": "Det gick inte att ladda förfrågan",
       "revoke_seat": "Ta bort",
       "revoke_seat_description": "{pseudo} har en bekräftad plats på den här resan och får ett meddelande om borttagningen. Du kan inte ge tillbaka platsen: en ny förfrågan behövs.",
-      "revoke_seat_title": "Ta bort den här platsen?"
+      "revoke_seat_title": "Ta bort den här platsen?",
+      "confirm_delete_offer_no_passenger": "Ingen har en plats på den här resan: att ta bort den meddelar ingen.",
+      "confirm_delete_offer_passengers": "{count} bekräftad passagerare får ett meddelande | {count} bekräftade passagerare får ett meddelande",
+      "confirm_delete_offer_passengers_hint": "De får ett meddelande om att resan inte längre blir av och måste hitta en annan samåkning. Förfrågningar som fortfarande väntar på svar meddelas också.",
+      "confirm_delete_offer_title": "Ta bort det här erbjudandet?",
+      "confirm_delete_offer_with_passengers": "Det här erbjudandet har bekräftade passagerare. Borttagningen går inte att ångra."
     },
     "convention_form": {
       "click_to_select_image": "Klicka för att välja en bild",

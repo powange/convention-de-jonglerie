@@ -78,7 +78,12 @@
       "request_load_error": "No se ha podido cargar esta solicitud",
       "revoke_seat": "Retirar",
       "revoke_seat_description": "{pseudo} tiene una plaza confirmada en este viaje y recibirá una notificación de la retirada. No podrás devolvérsela: hará falta una nueva solicitud.",
-      "revoke_seat_title": "¿Retirar esta plaza?"
+      "revoke_seat_title": "¿Retirar esta plaza?",
+      "confirm_delete_offer_no_passenger": "Nadie tiene plaza en este viaje: eliminarlo no avisará a nadie.",
+      "confirm_delete_offer_passengers": "Se avisará a {count} pasajero confirmado | Se avisará a {count} pasajeros confirmados",
+      "confirm_delete_offer_passengers_hint": "Recibirán una notificación indicando que el viaje ya no se realiza, y tendrán que buscar otro coche compartido. Las solicitudes pendientes también son avisadas.",
+      "confirm_delete_offer_title": "¿Eliminar esta oferta?",
+      "confirm_delete_offer_with_passengers": "Esta oferta tiene pasajeros confirmados. Eliminarla es definitivo."
     },
     "convention_form": {
       "click_to_select_image": "Haz clic para seleccionar una imagen",

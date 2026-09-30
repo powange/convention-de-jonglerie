@@ -78,7 +78,12 @@
       "request_load_error": "Diese Anfrage konnte nicht geladen werden",
       "revoke_seat": "Entfernen",
       "revoke_seat_description": "{pseudo} hat einen bestätigten Platz auf dieser Fahrt und wird über die Entfernung benachrichtigt. Du kannst den Platz nicht zurückgeben: Eine neue Anfrage ist erforderlich.",
-      "revoke_seat_title": "Diesen Platz entfernen?"
+      "revoke_seat_title": "Diesen Platz entfernen?",
+      "confirm_delete_offer_no_passenger": "Niemand hat einen Platz auf dieser Fahrt: das Löschen benachrichtigt niemanden.",
+      "confirm_delete_offer_passengers": "{count} bestätigter Mitfahrer wird benachrichtigt | {count} bestätigte Mitfahrende werden benachrichtigt",
+      "confirm_delete_offer_passengers_hint": "Sie erhalten eine Benachrichtigung, dass die Fahrt nicht mehr stattfindet, und müssen sich eine andere Mitfahrgelegenheit suchen. Noch offene Anfragen werden ebenfalls benachrichtigt.",
+      "confirm_delete_offer_title": "Dieses Angebot löschen?",
+      "confirm_delete_offer_with_passengers": "Dieses Angebot hat bestätigte Mitfahrende. Das Löschen ist endgültig."
     },
     "convention_form": {
       "click_to_select_image": "Klicken, um ein Bild auszuwählen",

@@ -817,6 +817,79 @@ export const NotificationHelpers = {
     })
   },
 
+  /**
+   * Notification de SUPPRESSION d'une offre à laquelle on était inscrit.
+   *
+   * ⚠️ `editionId` et `locationCity` sont passés en ARGUMENTS, contrairement aux autres aides de ce
+   * fichier qui les relisent en base. Ce n'est pas une inconstance : quand cette notification
+   * part, l'offre n'existe plus — le `CASCADE` a emporté avec elle les réservations. Un
+   * `findUnique` ne rendrait donc que `null`, et le lien retomberait sur une URL morte.
+   *
+   * Pour la même raison, `actionUrl` mène à la LISTE de covoiturage de l'édition, et non à l'offre
+   * supprimée : envoyer quelqu'un sur un « introuvable » après lui avoir annoncé qu'il perd sa
+   * place ajouterait l'insulte au dommage.
+   */
+  async carpoolOfferDeleted(
+    userId: number,
+    ownerName: string,
+    editionId: number,
+    seats: number,
+    locationCity: string
+  ) {
+    return await NotificationService.create({
+      userId,
+      // `WARNING` : le passager doit retrouver un trajet, ce n'est pas une information à classer.
+      type: 'WARNING',
+      titleKey: 'notifications.carpool.offer_deleted.title',
+      messageKey: 'notifications.carpool.offer_deleted.message',
+      translationParams: { ownerName, seats, locationCity },
+      actionTextKey: 'notifications.carpool.offer_deleted.action',
+      category: 'carpool',
+      /*
+       * L'entité visée est l'ÉDITION, pas l'offre : l'offre n'a plus d'identifiant vivant, et une
+       * notification qui pointe vers une ligne détruite ne se regroupe ni ne se nettoie
+       * correctement.
+       */
+      entityType: 'Edition',
+      entityId: editionId.toString(),
+      actionUrl: `/editions/${editionId}/carpool`,
+      notificationType: 'carpool_offer_deleted',
+    })
+  },
+
+  /**
+   * Notification de MODIFICATION d'un élément décisif de l'offre : la date du trajet ou la ville de
+   * départ.
+   *
+   * On ne prévient pas de toute modification. Le nombre de places, le téléphone ou la description
+   * ne changent pas le trajet pour un passager déjà accepté ; la date et le lieu, si. C'est
+   * exactement sur ces deux champs qu'un passager qui ne serait pas prévenu se présenterait au
+   * mauvais endroit ou le mauvais jour.
+   */
+  async carpoolOfferChanged(
+    userId: number,
+    ownerName: string,
+    offerId: number,
+    editionId: number,
+    locationCity: string,
+    tripDate: Date
+  ) {
+    return await NotificationService.create({
+      userId,
+      type: 'WARNING',
+      titleKey: 'notifications.carpool.offer_changed.title',
+      messageKey: 'notifications.carpool.offer_changed.message',
+      // La date part en ISO : c'est le client qui la met au format de sa langue.
+      translationParams: { ownerName, locationCity, date: tripDate.toISOString() },
+      actionTextKey: 'notifications.carpool.offer_changed.action',
+      category: 'carpool',
+      entityType: 'CarpoolOffer',
+      entityId: offerId.toString(),
+      actionUrl: `/editions/${editionId}/carpool/offers/${offerId}`,
+      notificationType: 'carpool_offer_changed',
+    })
+  },
+
   async carpoolBookingRejected(
     userId: number,
     ownerName: string,

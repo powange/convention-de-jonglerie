@@ -261,6 +261,12 @@
         @comment-added="emit('comment-added')"
       />
     </UCard>
+
+    <EditionCarpoolConfirmDeleteOffer
+      v-model:open="suppressionADemander"
+      :passenger-count="acceptedBookings.length"
+      @confirm="executeDeleteOffer"
+    />
   </div>
 </template>
 
@@ -395,8 +401,13 @@ const { execute: executeDeleteOffer } = useApiAction(
   }
 )
 
+/*
+ * Même confirmation que sur la carte, par le même composant : la question posée et le compte de
+ * passagers doivent être identiques des deux côtés — c'est la même offre qu'on supprime.
+ */
+const suppressionADemander = ref(false)
+
 const handleDelete = () => {
-  if (!confirm(t('components.carpool.confirm_delete_offer'))) return
-  executeDeleteOffer()
+  suppressionADemander.value = true
 }
 </script>

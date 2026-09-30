@@ -59,6 +59,16 @@
         "action": "Sök en annan resa",
         "message": "{ownerName} har tagit bort din plats ({seats}) på resan från {locationCity}",
         "title": "Din plats har tagits bort"
+      },
+      "offer_changed": {
+        "action": "Se resan",
+        "message": "{ownerName} har ändrat resan: avfärd från {locationCity} den {date}",
+        "title": "En resa du bokat har ändrats"
+      },
+      "offer_deleted": {
+        "action": "Sök en annan resa",
+        "message": "{ownerName} har tagit bort resan från {locationCity}: din plats ({seats}) finns inte längre",
+        "title": "En resa du hade bokat har tagits bort"
       }
     },
     "common": {

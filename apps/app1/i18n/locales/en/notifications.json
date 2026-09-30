@@ -59,6 +59,16 @@
         "action": "Look for another ride",
         "message": "{ownerName} has removed your seat ({seats}) on the trip from {locationCity}",
         "title": "Your seat has been removed"
+      },
+      "offer_changed": {
+        "action": "View the trip",
+        "message": "{ownerName} has changed the trip: departing from {locationCity} on {date}",
+        "title": "A trip you booked has changed"
+      },
+      "offer_deleted": {
+        "action": "Look for another ride",
+        "message": "{ownerName} has deleted the trip from {locationCity}: your seat ({seats}) no longer exists",
+        "title": "A trip you had booked has been deleted"
       }
     },
     "common": {

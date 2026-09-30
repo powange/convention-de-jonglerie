@@ -115,6 +115,13 @@ export const NotificationTypeMapping = {
    */
   carpool_comment_received: 'carpoolUpdates' as const,
   carpool_booking_revoked: 'carpoolUpdates' as const,
+  /*
+   * La suppression et la modification d'une offre suivent le même réglage, pour la même raison : ce
+   * sont des nouvelles de SA réservation, pas une catégorie à part. Les décrocher de `carpoolUpdates`
+   * permettrait d'accepter une place et de ne pas apprendre qu'elle a disparu.
+   */
+  carpool_offer_deleted: 'carpoolUpdates' as const,
+  carpool_offer_changed: 'carpoolUpdates' as const,
 
   // Artistes
   artist_arrival: 'artistUpdates' as const,

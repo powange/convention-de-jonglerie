@@ -133,6 +133,14 @@
       </div>
     </UCard>
   </NuxtLink>
+
+  <!-- Hors du `NuxtLink` : à l'intérieur, un clic dans la modale remonterait jusqu'au lien de la
+       carte et ouvrirait l'offre au lieu de la supprimer. -->
+  <EditionCarpoolConfirmDeleteOffer
+    v-model:open="suppressionADemander"
+    :passenger-count="acceptedBookings.length"
+    @confirm="executeDeleteOffer"
+  />
 </template>
 
 <script setup lang="ts">
@@ -188,9 +196,15 @@ const { execute: executeDeleteOffer } = useApiAction(
   }
 )
 
+/*
+ * La confirmation passe par une `UModal` et non par `confirm()`. Depuis ce lot, supprimer une offre
+ * NOTIFIE ses passagers : la question doit dire combien ils sont, ce que le `confirm()` natif ne
+ * pouvait pas faire.
+ */
+const suppressionADemander = ref(false)
+
 const handleDelete = () => {
-  if (!confirm(t('components.carpool.confirm_delete_offer'))) return
-  executeDeleteOffer()
+  suppressionADemander.value = true
 }
 
 const acceptedBookings = computed(() =>
