@@ -179,6 +179,18 @@ model Notification {
   @@index([isRead])
   @@index([createdAt])
   @@index([category])
+  /// L'entité visée, cherchée par les deux colonnes ensemble.
+  ///
+  /// Trois requêtes filtrent ainsi, et l'une d'elles n'a AUCUN autre index à se mettre sous la
+  /// dent : la fusion de comptes repointe les notifications du compte absorbé
+  /// (`user-merge.ts`, égalité sur `entityType` ET `entityId`), sans `userId` dans son `where` —
+  /// c'était donc un balayage complet de la table. Les deux autres (rappels d'échéance de tâches,
+  /// confirmation d'une notification groupée) portent au moins une égalité sur `entityType` et
+  /// profitent du préfixe de l'index.
+  ///
+  /// Composite et non deux index séparés : `entityType` seul est très peu sélectif — une poignée
+  /// de valeurs pour toute la table — et ne servirait à rien.
+  @@index([entityType, entityId])
 }
 
 model FcmToken {
