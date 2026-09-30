@@ -33,9 +33,7 @@
       </div>
     </div>
 
-    <div v-if="chargement" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8 text-gray-400" />
-    </div>
+    <UiSqueletteDeListe v-if="chargement" :lignes="6" :libelle="$t('common.loading')" />
 
     <div v-else class="space-y-4">
       <!-- Les trois chiffres qui se lisent ensemble : ce qui manque, combien ça fait d'unités, et
@@ -93,10 +91,13 @@
 
       <!-- ONGLET 1 : ce qui manque -->
       <div v-if="ongletActif === 'racheter'" class="space-y-3">
-        <div v-if="tousLesManquants.length === 0" class="text-center py-12">
-          <UIcon name="i-heroicons-check-circle" class="size-12 text-green-500 mx-auto mb-3" />
-          <p class="text-gray-600 dark:text-gray-400">{{ t('gestion.stock.missing_none') }}</p>
-        </div>
+        <!-- La teinte verte dit que ce vide est un aboutissement : plus rien ne manque. -->
+        <UiEtatVide
+          v-if="tousLesManquants.length === 0"
+          icone="i-heroicons-check-circle"
+          classe-icone="text-green-500"
+          :titre="t('gestion.stock.missing_none')"
+        />
 
         <template v-else>
           <div class="flex flex-wrap items-center gap-3">
@@ -137,28 +138,23 @@
                prévu —, et surtout PAS « rien ne manque ». La barre d'outils reste au-dessus, sans
                quoi la case qui a produit ce vide disparaîtrait avec lui, et on ne pourrait plus la
                décocher. -->
-          <div v-if="manquants.length === 0" class="text-center py-12">
-            <!-- Deux vides très différents, et il serait grave de les confondre : « tout le
-                 manque est déjà prévu » est une bonne nouvelle, « aucun objet ne passe vos
-                 filtres » n'en est pas une. Afficher la première pendant qu'un filtre cache le
-                 reste ferait clore une séance de rachat qui ne l'est pas. -->
-            <UIcon
-              :name="
-                filtresManquantsPoses
-                  ? 'i-heroicons-funnel'
-                  : 'i-heroicons-clipboard-document-check'
-              "
-              class="size-12 mx-auto mb-3"
-              :class="filtresManquantsPoses ? 'text-gray-400' : 'text-green-500'"
-            />
-            <p class="text-gray-600 dark:text-gray-400">
-              {{
-                filtresManquantsPoses
-                  ? t('gestion.stock.filter_no_results')
-                  : t('gestion.stock.missing_all_listed')
-              }}
-            </p>
-          </div>
+          <!-- Deux vides très différents, et il serait grave de les confondre : « tout le
+               manque est déjà prévu » est une bonne nouvelle, « aucun objet ne passe vos
+               filtres » n'en est pas une. Afficher la première pendant qu'un filtre cache le
+               reste ferait clore une séance de rachat qui ne l'est pas. L'icône ET sa teinte
+               portent donc la distinction, en plus du texte. -->
+          <UiEtatVide
+            v-if="manquants.length === 0"
+            :icone="
+              filtresManquantsPoses ? 'i-heroicons-funnel' : 'i-heroicons-clipboard-document-check'
+            "
+            :classe-icone="filtresManquantsPoses ? 'text-gray-400' : 'text-green-500'"
+            :titre="
+              filtresManquantsPoses
+                ? t('gestion.stock.filter_no_results')
+                : t('gestion.stock.missing_all_listed')
+            "
+          />
 
           <!-- `get-row-id` fait porter les clés de sélection par l'identifiant de l'objet et non
                par son rang : le tableau se réordonne dès qu'on saisit un comptage — une ligne
@@ -300,22 +296,18 @@
           :objets="tousLesNonComptes"
         />
 
-        <div v-if="nonComptes.length === 0" class="text-center py-12">
-          <!-- « Tout est compté » est un aboutissement ; « rien ne passe le filtre » n'en est pas
-               un. Les confondre ferait croire la séance finie alors qu'un filtre cache le reste. -->
-          <UIcon
-            :name="filtresACompterPoses ? 'i-heroicons-funnel' : 'i-heroicons-check-circle'"
-            class="size-12 mx-auto mb-3"
-            :class="filtresACompterPoses ? 'text-gray-400' : 'text-green-500'"
-          />
-          <p class="text-gray-600 dark:text-gray-400">
-            {{
-              filtresACompterPoses
-                ? t('gestion.stock.filter_no_results')
-                : t('gestion.stock.missing_all_counted')
-            }}
-          </p>
-        </div>
+        <!-- « Tout est compté » est un aboutissement ; « rien ne passe le filtre » n'en est pas
+             un. Les confondre ferait croire la séance finie alors qu'un filtre cache le reste. -->
+        <UiEtatVide
+          v-if="nonComptes.length === 0"
+          :icone="filtresACompterPoses ? 'i-heroicons-funnel' : 'i-heroicons-check-circle'"
+          :classe-icone="filtresACompterPoses ? 'text-gray-400' : 'text-green-500'"
+          :titre="
+            filtresACompterPoses
+              ? t('gestion.stock.filter_no_results')
+              : t('gestion.stock.missing_all_counted')
+          "
+        />
 
         <UTable v-else v-model:sorting="triACompter" :data="nonComptes" :columns="colonnesACompter">
           <template #name-cell="{ row }">
@@ -425,10 +417,12 @@
           </div>
         </div>
 
-        <div v-if="listes.length === 0" class="text-center py-12">
-          <UIcon name="i-heroicons-shopping-cart" class="size-12 text-gray-300 mx-auto mb-3" />
-          <p class="text-gray-600 dark:text-gray-400">{{ t('gestion.stock.shopping_no_list') }}</p>
-        </div>
+        <UiEtatVide
+          v-if="listes.length === 0"
+          icone="i-heroicons-shopping-cart"
+          classe-icone="text-gray-300"
+          :titre="t('gestion.stock.shopping_no_list')"
+        />
 
         <!-- Une boucle sur AU PLUS un élément, et non un `v-if` sur la liste choisie : le corps de
              la carte parle de `liste` à une quinzaine d'endroits, et le `v-for` le lui garde tel

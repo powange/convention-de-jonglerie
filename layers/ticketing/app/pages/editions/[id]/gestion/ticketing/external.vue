@@ -713,22 +713,18 @@
                 </template>
               </UModal>
 
-              <!-- Message si aucune donnée chargée -->
-              <div
+              <!--
+                Aucune donnée chargée. 📍 Les deux libellés étaient écrits en français dans le
+                code ; ils passent par i18n au passage.
+              -->
+              <UiEtatVide
                 v-if="tiersLoaded && !loadedTiers?.length && !loadedOptions?.length"
-                class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
-              >
-                <UIcon
-                  name="i-heroicons-inbox"
-                  class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-3"
-                />
-                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Aucun tarif ou option trouvé
-                </p>
-                <p class="text-xs text-gray-500 mt-1">
-                  Vérifiez que votre formulaire HelloAsso contient des tarifs
-                </p>
-              </div>
+                icone="i-heroicons-inbox"
+                classe-icone="text-gray-300 dark:text-gray-600"
+                :titre="$t('gestion.ticketing.external_no_tiers_found')"
+                :description="$t('gestion.ticketing.external_no_tiers_found_hint')"
+                class="bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
+              />
             </div>
           </div>
         </UCard>
@@ -948,6 +944,7 @@ import type { TabsItem } from '@nuxt/ui'
 const { money, symbol } = useEditionCurrency()
 
 const route = useRoute()
+const router = useRouter()
 const editionStore = useEditionStore()
 const authStore = useAuthStore()
 const toast = useToast()
@@ -1606,8 +1603,39 @@ const loadRawHelloAssoJson = () => {
   executeLoadRawJson()
 }
 
-// Onglet courant : partagé avec le select qui prend le relais sur écran étroit.
-const ongletActif = ref('tarifs')
+/**
+ * Onglet courant : partagé avec le select qui prend le relais sur écran étroit.
+ *
+ * ⚠️ IL EST RETENU DANS L'URL, et c'était le seul des cinquante-sept écrans de gestion à perdre un
+ * onglet au rechargement (mesuré le 1er octobre 2026). Après un F5, resynchroniser et réouvrir la
+ * modale ramène désormais sur l'onglet qu'on regardait, au lieu des tarifs.
+ *
+ * 📍 CE QUE CE N'EST PAS, et le constat d'origine annonçait plus : ces onglets vivent DANS LA
+ * MODALE plein écran ci-dessous et n'existent qu'une fois les tarifs ou les commandes chargés
+ * depuis le prestataire. Un lien partagé n'ouvre donc pas l'onglet — la modale est fermée à
+ * l'arrivée.
+ *
+ * ⚠️ `valeurDepuisUrl` DE PRÉFÉRENCE À UN CONTRÔLE ÉCRIT ICI : une valeur que personne ne
+ * reconnaît — adresse vieillie, tronquée, ou d'une version où un onglet s'appelait autrement —
+ * afficherait un écran où AUCUN panneau ne correspond. La garde du socle partagé retombe sur le
+ * défaut. C'est la même brique qui tient les filtres de la trésorerie, de la FAQ et du stock.
+ *
+ * `replace` et non `push` : changer d'onglet n'est pas une navigation, et chaque clic laisserait
+ * autrement un pas dans l'historique qu'il faudrait défaire un par un.
+ */
+const ONGLETS = ['tarifs', 'options', 'customFields', 'participants'] as const
+const ONGLET_PAR_DEFAUT = 'tarifs'
+
+const ongletActif = ref<string>(valeurDepuisUrl(route.query.onglet, ONGLETS, ONGLET_PAR_DEFAUT))
+
+watch(ongletActif, (onglet) => {
+  const voulu = onglet === ONGLET_PAR_DEFAUT ? '' : onglet
+  // On ne navigue que si l'adresse change vraiment : sinon les deux affectations programmatiques
+  // de l'onglet (après une synchronisation, après un import de commandes) déclencheraient une
+  // navigation parasite alors qu'elles reposent souvent la valeur courante.
+  if ((route.query.onglet ?? '') === voulu) return
+  router.replace({ query: requeteAvec(route.query, { onglet: voulu }) })
+})
 
 // Les résultats chargés depuis HelloAsso s'affichent dans une modale plein écran : leurs
 // tableaux ne tiennent pas dans la carte dès que l'écran se réduit.

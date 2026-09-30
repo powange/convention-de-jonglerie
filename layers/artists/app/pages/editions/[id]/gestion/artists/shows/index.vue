@@ -53,10 +53,12 @@
           <p class="text-gray-500">{{ $t('common.loading') }}</p>
         </div>
 
-        <div v-else-if="shows.length === 0" class="text-center py-8">
-          <UIcon name="i-heroicons-sparkles" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <p class="text-gray-500">{{ $t('gestion.shows.no_shows') }}</p>
-        </div>
+        <UiEtatVide
+          v-else-if="shows.length === 0"
+          compact
+          icone="i-heroicons-sparkles"
+          :titre="$t('gestion.shows.no_shows')"
+        />
 
         <div v-else>
           <UContextMenu :items="contextMenuItems">

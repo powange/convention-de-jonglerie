@@ -221,15 +221,12 @@
           <p class="text-gray-500">{{ $t('common.loading') }}...</p>
         </div>
 
-        <div v-else-if="applications.length === 0" class="py-12 text-center">
-          <UIcon name="i-heroicons-inbox" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            {{ $t('gestion.shows_call.no_applications') }}
-          </h3>
-          <p class="text-gray-500">
-            {{ $t('gestion.shows_call.no_applications_desc') }}
-          </p>
-        </div>
+        <UiEtatVide
+          v-else-if="applications.length === 0"
+          icone="i-heroicons-inbox"
+          :titre="$t('gestion.shows_call.no_applications')"
+          :description="$t('gestion.shows_call.no_applications_desc')"
+        />
 
         <div v-else class="space-y-4">
           <!-- Liste des candidatures -->

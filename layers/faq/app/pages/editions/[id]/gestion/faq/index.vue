@@ -59,28 +59,26 @@
       </div>
     </UCard>
 
-    <div v-if="loading" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8 text-gray-400" />
-    </div>
+    <UiSqueletteDeListe v-if="loading" :lignes="5" :libelle="$t('common.loading')" />
 
-    <div
+    <UiEtatVide
       v-else-if="!entries.length"
-      class="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
+      icone="i-heroicons-question-mark-circle"
+      :titre="$t('gestion.faq.empty_state')"
+      class="border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
     >
-      <UIcon name="i-heroicons-question-mark-circle" class="size-10 text-gray-400 mx-auto mb-2" />
-      <p class="text-gray-600 dark:text-gray-400 mb-3 text-sm">
-        {{ $t('gestion.faq.empty_state') }}
-      </p>
-      <UButton
-        v-if="canManage"
-        icon="i-heroicons-plus"
-        color="primary"
-        size="sm"
-        @click="openEntryModal(null)"
-      >
-        {{ $t('gestion.faq.new_entry') }}
-      </UButton>
-    </div>
+      <template #action>
+        <UButton
+          v-if="canManage"
+          icon="i-heroicons-plus"
+          color="primary"
+          size="sm"
+          @click="openEntryModal(null)"
+        >
+          {{ $t('gestion.faq.new_entry') }}
+        </UButton>
+      </template>
+    </UiEtatVide>
 
     <template v-else>
       <UInput
@@ -102,15 +100,14 @@
         </template>
       </UInput>
 
-      <div
+      <!-- La loupe, et non la boîte vide : il y a des entrées, c'est la recherche qui ne rend
+           rien. -->
+      <UiEtatVide
         v-if="!displayedEntries.length"
-        class="text-center py-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
-      >
-        <UIcon name="i-heroicons-magnifying-glass" class="size-10 text-gray-400 mx-auto mb-2" />
-        <p class="text-gray-600 dark:text-gray-400 text-sm">
-          {{ $t('gestion.faq.no_results', { query: searchQueryDebounced }) }}
-        </p>
-      </div>
+        icone="i-heroicons-magnifying-glass"
+        :titre="$t('gestion.faq.no_results', { query: searchQueryDebounced })"
+        class="border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
+      />
 
       <UCard v-else>
         <ul class="divide-y divide-gray-100 dark:divide-gray-800">

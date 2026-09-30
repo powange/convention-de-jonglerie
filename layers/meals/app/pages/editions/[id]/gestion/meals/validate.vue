@@ -352,18 +352,15 @@
               <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 text-primary-500" />
             </div>
 
-            <div
+            <!-- La loupe : ce vide-ci répond à une recherche, il ne dit pas que le repas n'a
+                 personne. -->
+            <UiEtatVide
               v-else-if="searchQuery && searchResults.length === 0"
-              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            >
-              <UIcon
-                name="i-heroicons-magnifying-glass"
-                class="mx-auto h-8 w-8 text-gray-400 mb-2"
-              />
-              <p class="text-gray-500 dark:text-gray-400">
-                {{ $t('gestion.meals.no_results') }}
-              </p>
-            </div>
+              compact
+              icone="i-heroicons-magnifying-glass"
+              :titre="$t('gestion.meals.no_results')"
+              class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+            />
 
             <!-- Affichage en cartes (mobile-friendly) -->
             <div v-else-if="searchResults.length > 0" class="space-y-3">
@@ -465,9 +462,12 @@
         </template>
 
         <template #body>
-          <div v-if="loadingPending" class="flex items-center justify-center py-8">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 text-primary-500" />
-          </div>
+          <UiSqueletteDeListe
+            v-if="loadingPending"
+            :lignes="4"
+            avec-avatar
+            :libelle="$t('common.loading')"
+          />
 
           <div v-else-if="pendingList.length === 0" class="text-center py-8 text-gray-500">
             {{ $t('gestion.meals.all_validated') }}

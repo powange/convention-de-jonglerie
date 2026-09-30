@@ -483,27 +483,31 @@
         </UCard>
 
         <!-- Liste des commandes -->
-        <div v-if="loading" class="text-center py-12">
-          <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 text-gray-400 animate-spin mx-auto" />
-          <p class="text-sm text-gray-500 mt-2">Chargement...</p>
-        </div>
+        <!-- 📍 Le « Chargement... » était écrit en français dans le code ; il passe par i18n. -->
+        <UiSqueletteDeListe v-if="loading" :lignes="5" :libelle="$t('common.loading')" />
 
-        <div v-else-if="orders.length === 0" class="text-center py-12">
-          <UIcon name="i-heroicons-inbox" class="h-12 w-12 text-gray-300 mb-3 mx-auto" />
-          <p class="text-sm text-gray-500">
-            {{
-              searchQuery || filtres.statutEntree !== 'all'
-                ? 'Aucun résultat trouvé'
-                : 'Aucune commande trouvée'
-            }}
-          </p>
-          <p
-            v-if="!searchQuery && filtres.statutEntree === 'all'"
-            class="text-xs text-gray-400 mt-1"
-          >
-            Importez les commandes depuis votre billeterie externe
-          </p>
-        </div>
+        <!--
+          Deux vides à ne pas confondre : « aucune commande » invite à importer, « aucun résultat »
+          dit qu'un filtre cache le reste. Proposer l'import sur le second ferait recommencer une
+          synchronisation déjà faite.
+
+          📍 Les trois libellés étaient écrits EN FRANÇAIS DANS LE CODE — « Aucun résultat
+          trouvé », « Aucune commande trouvée », et un « billeterie » avec un seul « t ». Ils
+          passent par i18n au passage.
+        -->
+        <UiEtatVide
+          v-else-if="orders.length === 0"
+          icone="i-heroicons-inbox"
+          classe-icone="text-gray-300"
+          :titre="
+            rechercheOuFiltreActif
+              ? $t('gestion.ticketing.orders_no_results')
+              : $t('gestion.ticketing.orders_none')
+          "
+          :description="
+            rechercheOuFiltreActif ? undefined : $t('gestion.ticketing.orders_none_hint')
+          "
+        />
 
         <div v-else class="space-y-4">
           <UCard v-for="order in orders" :key="order.id" class="hover:shadow-md transition-shadow">
@@ -1522,6 +1526,17 @@ const tiers = ref<TicketingTier[]>([])
 // à TROIS endroits : l'envoi à l'API, le décompte de la pastille, la réinitialisation. Ajouter un
 // filtre demandait de penser aux trois ; en oublier un ne cassait rien de visible.
 const filtres = reactive(filtresDepuisUrl(route.query))
+
+/*
+ * Dit si la liste est vide PARCE QU'ON FILTRE, ou parce qu'il n'y a rien.
+ *
+ * ⚠️ Les deux vides appellent des réponses opposées : « aucune commande » invite à importer depuis
+ * la billetterie externe, « aucun résultat » dit qu'un filtre cache le reste. Proposer l'import sur
+ * le second ferait recommencer une synchronisation déjà faite.
+ */
+const rechercheOuFiltreActif = computed(
+  () => Boolean(searchQuery.value) || filtres.statutEntree !== 'all'
+)
 const isFiltersOpen = ref(false)
 
 // Filtres par champs personnalisés (support de plusieurs filtres)

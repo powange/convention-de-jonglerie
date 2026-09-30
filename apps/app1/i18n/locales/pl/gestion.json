@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Różnica jest duża: część biletów prawdopodobnie dzieli adres osoby, która zapłaciła, i są wtedy liczone jako jedna osoba. Uzupełnienie adresu każdego uczestnika uściśla tę liczbę.",
       "affluence_expected_total": "Łącznie oczekiwana {count} osoba | Łącznie oczekiwanych {count} osób",
       "affluence_gauge": "Spodziewana liczba",
-      "affluence_gauge_tooltip": "{count} oczekiwana | {count} oczekiwanych"
+      "affluence_gauge_tooltip": "{count} oczekiwana | {count} oczekiwanych",
+      "external_no_tiers_found": "Nie znaleziono żadnej taryfy ani opcji",
+      "external_no_tiers_found_hint": "Sprawdź, czy Twój formularz HelloAsso zawiera taryfy",
+      "orders_no_results": "Nie znaleziono żadnego wyniku",
+      "orders_none": "Nie znaleziono żadnego zamówienia",
+      "orders_none_hint": "Zaimportuj zamówienia z zewnętrznego systemu biletowego"
     },
     "title": "Zarządzanie",
     "view_edition": "Zobacz edycję",

@@ -33,15 +33,15 @@
       </p>
     </div>
 
-    <div v-if="chargement" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8 text-gray-400" />
-    </div>
+    <UiSqueletteDeListe v-if="chargement" :lignes="5" :libelle="$t('common.loading')" />
 
-    <div v-else-if="renforts.length === 0" class="text-center py-12">
-      <UIcon name="i-heroicons-bolt-slash" class="size-12 text-gray-300 mx-auto mb-3" />
-      <p class="text-gray-600 dark:text-gray-400">{{ t('volunteers.renforts_none') }}</p>
-      <p class="text-sm text-gray-500 mt-1">{{ t('volunteers.renforts_none_hint') }}</p>
-    </div>
+    <UiEtatVide
+      v-else-if="renforts.length === 0"
+      icone="i-heroicons-bolt-slash"
+      classe-icone="text-gray-300"
+      :titre="t('volunteers.renforts_none')"
+      :description="t('volunteers.renforts_none_hint')"
+    />
 
     <div v-else class="space-y-4">
       <div class="grid grid-cols-3 gap-3">

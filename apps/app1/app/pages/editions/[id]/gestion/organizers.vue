@@ -132,9 +132,12 @@
             </p>
 
             <!-- Liste des organisateurs présents -->
-            <div v-if="loadingEditionOrganizers" class="text-center py-4">
-              <UIcon name="i-heroicons-arrow-path" class="animate-spin mx-auto" size="24" />
-            </div>
+            <UiSqueletteDeListe
+              v-if="loadingEditionOrganizers"
+              :lignes="3"
+              avec-avatar
+              :libelle="$t('common.loading')"
+            />
             <div v-else-if="editionOrganizers.length > 0">
               <UTable
                 ref="tableOrganisateurs"

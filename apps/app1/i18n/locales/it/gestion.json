@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Lo scarto è ampio: alcuni biglietti condividono probabilmente l'indirizzo di chi ha pagato e vengono contati come una sola persona. Inserire l'indirizzo di ogni partecipante affina il dato.",
       "affluence_expected_total": "{count} persona attesa in totale | {count} persone attese in totale",
       "affluence_gauge": "Capienza attesa",
-      "affluence_gauge_tooltip": "{count} attesa | {count} attese"
+      "affluence_gauge_tooltip": "{count} attesa | {count} attese",
+      "external_no_tiers_found": "Nessuna tariffa o opzione trovata",
+      "external_no_tiers_found_hint": "Verifica che il tuo modulo HelloAsso contenga delle tariffe",
+      "orders_no_results": "Nessun risultato trovato",
+      "orders_none": "Nessun ordine trovato",
+      "orders_none_hint": "Importa gli ordini dalla tua biglietteria esterna"
     },
     "title": "Gestione",
     "view_edition": "Vedi l'edizione",

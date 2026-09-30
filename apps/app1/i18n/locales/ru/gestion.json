@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "Расхождение велико: часть билетов, вероятно, использует адрес того, кто оплатил, и считается за одного человека. Заполнение адреса каждого участника уточняет цифру.",
       "affluence_expected_total": "Всего ожидается {count} человек | Всего ожидается {count} человек",
       "affluence_gauge": "Ожидаемое число",
-      "affluence_gauge_tooltip": "{count} ожидается | {count} ожидается"
+      "affluence_gauge_tooltip": "{count} ожидается | {count} ожидается",
+      "external_no_tiers_found": "Тарифы и опции не найдены",
+      "external_no_tiers_found_hint": "Убедитесь, что в вашей форме HelloAsso есть тарифы",
+      "orders_no_results": "Ничего не найдено",
+      "orders_none": "Заказы не найдены",
+      "orders_none_hint": "Импортируйте заказы из вашей внешней системы продажи билетов"
     },
     "title": "Управление",
     "view_edition": "Просмотр выпуска",

@@ -989,7 +989,12 @@
       "affluence_dedup_warning": "The gap is large: some tickets probably share the email address of whoever paid, and are then counted as one person. Filling in each attendee's address sharpens the figure.",
       "affluence_expected_total": "{count} person expected in total | {count} people expected in total",
       "affluence_gauge": "Expected headcount",
-      "affluence_gauge_tooltip": "{count} expected | {count} expected"
+      "affluence_gauge_tooltip": "{count} expected | {count} expected",
+      "external_no_tiers_found": "No tier or option found",
+      "external_no_tiers_found_hint": "Check that your HelloAsso form contains tiers",
+      "orders_no_results": "No result found",
+      "orders_none": "No order found",
+      "orders_none_hint": "Import the orders from your external ticketing provider"
     },
     "title": "Management",
     "view_edition": "View edition",

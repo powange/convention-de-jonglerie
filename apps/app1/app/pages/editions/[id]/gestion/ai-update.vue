@@ -456,15 +456,14 @@
           </UButton>
         </div>
 
-        <div
+        <!-- La teinte verte dit que ce vide est un aboutissement : rien à corriger. -->
+        <UiEtatVide
           v-if="differences.length === 0 && planAffiche.length === 0 && !erreurProgramme"
-          class="text-center py-8"
-        >
-          <UIcon name="i-lucide-check-circle" class="mx-auto h-12 w-12 text-green-500 mb-4" />
-          <p class="text-gray-600 dark:text-gray-400">
-            {{ $t('gestion.ai_update.no_differences') }}
-          </p>
-        </div>
+          compact
+          icone="i-lucide-check-circle"
+          classe-icone="text-green-500"
+          :titre="$t('gestion.ai_update.no_differences')"
+        />
       </UCard>
     </div>
   </div>

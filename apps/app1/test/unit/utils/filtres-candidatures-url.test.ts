@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  COLONNES_TRIABLES,
   filtresDepuisUrl,
   pageDepuisUrl,
   requeteCandidatures,
   SOURCE_PAR_DEFAUT,
   STATUT_PAR_DEFAUT,
+  TRI_PAR_DEFAUT,
 } from '../../../../../layers/volunteers/app/utils/filtres-candidatures-url'
+import { estColonneDeTri } from '../../../../../layers/volunteers/server/utils/tri-candidatures'
 
 /**
  * Les filtres de candidatures dans l'URL.
@@ -141,5 +144,49 @@ describe('requeteCandidatures et la page', () => {
 
     expect(pageDepuisUrl(query.page)).toBe(2)
     expect(filtresDepuisUrl(query).statut).toBe('ACCEPTED')
+  })
+})
+
+/**
+ * Le CLASSEMENT dans l'URL — le seul réglage de cet écran à ne pas y figurer.
+ *
+ * ⚠️ POURQUOI C'ÉTAIT PLUS QU'UNE COMMODITÉ. Statut, provenance, équipes, présence, recherche,
+ * page et colonnes masquées survivaient déjà à un rechargement ; le tri repartait sur « les plus
+ * récentes ». Or cette liste est paginée PAR LE SERVEUR : reclasser par nom puis recharger ne
+ * remettait pas seulement l'ordre d'avant, cela changeait QUELLES candidatures s'affichent sur la
+ * page courante. On croyait revenir à ce qu'on regardait, et l'on regardait autre chose.
+ *
+ * ⚠️ LA LECTURE ET L'ÉCRITURE DU TRI NE SONT PAS ÉPROUVÉES ICI : elles vivent dans le socle
+ * partagé `shared/utils/filtres-url.ts` (`tri=nom` croissant, `tri=-nom` décroissant, une seule
+ * clé signée), qui a ses propres tests. Une première version de ce lot les avait RECOPIÉES dans
+ * cet util, sur deux clés — et l'homonyme a silencieusement ÉCLIPSÉ celle du socle, si bien que le
+ * tableau partait sur la colonne par défaut avec le bon sens. Ce qui reste à éprouver ici, c'est
+ * la seule chose propre à cet écran : la liste des colonnes qu'il sait classer.
+ */
+
+describe('la liste des colonnes triables', () => {
+  it('est D’ACCORD avec celle du serveur, colonne pour colonne', () => {
+    /*
+     * ⚠️⚠️ LA GARDE QUI COMPTE. `COLONNES_TRIABLES` RECOPIE `COLONNES` de
+     * `server/utils/tri-candidatures.ts` : l'util client ne doit rien importer, puisqu'il est
+     * chargé hors Nuxt, et le fichier serveur importe un type de Prisma.
+     *
+     * Deux listes recopiées finissent par diverger. Ce dépôt en a déjà payé le prix sur CE
+     * fichier-là : le tri secondaire sur les allergies visait un champ qui n'existe pas sur la
+     * candidature, Prisma refusait la requête, et la liste entière partait en erreur — alors que
+     * le tri principal sur la même colonne, dix-sept lignes plus haut, était juste.
+     *
+     * Ici la divergence serait plus discrète : une colonne ajoutée au serveur et pas ici ne
+     * pourrait pas se partager ; l'inverse écrirait dans l'URL un champ que le serveur ignore, et
+     * la liste s'afficherait dans l'ordre par défaut sous un en-tête fléché.
+     */
+    for (const colonne of COLONNES_TRIABLES) {
+      expect(estColonneDeTri(colonne), `le serveur ne sait pas classer « ${colonne} »`).toBe(true)
+    }
+  })
+
+  it('contient le champ du classement d’arrivée', () => {
+    expect(COLONNES_TRIABLES).toContain(TRI_PAR_DEFAUT.champ)
+    expect(estColonneDeTri(TRI_PAR_DEFAUT.champ)).toBe(true)
   })
 })

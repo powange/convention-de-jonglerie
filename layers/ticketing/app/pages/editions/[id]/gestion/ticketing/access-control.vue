@@ -355,13 +355,13 @@
               <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
-            <div
+            <UiEtatVide
               v-else-if="recentValidations.length === 0"
-              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            >
-              <UIcon name="i-heroicons-ticket" class="mx-auto h-12 w-12 text-gray-400 mb-2" />
-              <p class="text-sm text-gray-500">{{ $t('edition.ticketing.no_validation_yet') }}</p>
-            </div>
+              compact
+              icone="i-heroicons-ticket"
+              :titre="$t('edition.ticketing.no_validation_yet')"
+              class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+            />
 
             <div v-else class="space-y-2">
               <div
@@ -503,18 +503,19 @@
               <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
-            <div
+            <!--
+              La teinte verte porte l'information : ce vide-ci est un ABOUTISSEMENT — tout le monde
+              est passé —, pas un simple « il n'y a rien ». Le neutre par défaut de `UiEtatVide`
+              dirait la mauvaise chose.
+            -->
+            <UiEtatVide
               v-else-if="volunteersNotValidated.length === 0"
-              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            >
-              <UIcon
-                name="i-heroicons-check-circle"
-                class="mx-auto h-12 w-12 text-green-400 mb-2"
-              />
-              <p class="text-sm text-gray-500">
-                {{ $t('ticketing.access_control.all_volunteers_validated') }}
-              </p>
-            </div>
+              compact
+              icone="i-heroicons-check-circle"
+              classe-icone="text-green-400"
+              :titre="$t('ticketing.access_control.all_volunteers_validated')"
+              class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+            />
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
               <div
@@ -563,18 +564,19 @@
               <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
-            <div
+            <!--
+              La teinte verte porte l'information : ce vide-ci est un ABOUTISSEMENT — tout le monde
+              est passé —, pas un simple « il n'y a rien ». Le neutre par défaut de `UiEtatVide`
+              dirait la mauvaise chose.
+            -->
+            <UiEtatVide
               v-else-if="artistsNotValidated.length === 0"
-              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            >
-              <UIcon
-                name="i-heroicons-check-circle"
-                class="mx-auto h-12 w-12 text-green-400 mb-2"
-              />
-              <p class="text-sm text-gray-500">
-                {{ $t('ticketing.access_control.all_artists_validated') }}
-              </p>
-            </div>
+              compact
+              icone="i-heroicons-check-circle"
+              classe-icone="text-green-400"
+              :titre="$t('ticketing.access_control.all_artists_validated')"
+              class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+            />
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
               <div
@@ -621,18 +623,19 @@
               <p class="text-sm text-gray-500">{{ $t('ticketing.access_control.loading') }}</p>
             </div>
 
-            <div
+            <!--
+              La teinte verte porte l'information : ce vide-ci est un ABOUTISSEMENT — tout le monde
+              est passé —, pas un simple « il n'y a rien ». Le neutre par défaut de `UiEtatVide`
+              dirait la mauvaise chose.
+            -->
+            <UiEtatVide
               v-else-if="organizersNotValidated.length === 0"
-              class="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg"
-            >
-              <UIcon
-                name="i-heroicons-check-circle"
-                class="mx-auto h-12 w-12 text-green-400 mb-2"
-              />
-              <p class="text-sm text-gray-500">
-                {{ $t('ticketing.access_control.all_organizers_validated') }}
-              </p>
-            </div>
+              compact
+              icone="i-heroicons-check-circle"
+              classe-icone="text-green-400"
+              :titre="$t('ticketing.access_control.all_organizers_validated')"
+              class="bg-gray-50 dark:bg-gray-800 rounded-lg"
+            />
 
             <div v-else class="space-y-2 max-h-[60vh] overflow-y-auto">
               <div

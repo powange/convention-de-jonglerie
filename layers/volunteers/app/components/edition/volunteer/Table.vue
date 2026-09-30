@@ -689,7 +689,51 @@ watch(
     })
   }
 )
-const sorting = ref<{ id: string; desc: boolean }[]>([{ id: 'createdAt', desc: true }])
+/**
+ * Le classement, retenu dans l'URL comme les filtres et la page.
+ *
+ * ⚠️ IL ÉTAIT LE SEUL RÉGLAGE DE CET ÉCRAN À NE PAS L'ÊTRE. Statut, provenance, équipes,
+ * présence, recherche, page et colonnes masquées survivaient déjà à un rechargement ; le tri
+ * repartait sur « les plus récentes ». Or la liste est paginée PAR LE SERVEUR : reclasser par nom
+ * puis recharger ne remettait pas seulement l'ordre d'avant, cela changeait QUELLES candidatures
+ * s'affichent sur la page courante. On croyait revenir à ce qu'on regardait, et l'on regardait
+ * autre chose.
+ *
+ * ⚠️ ON PASSE PAR `triDepuisUrl`/`triVersUrl` DU SOCLE PARTAGÉ (`shared/utils/filtres-url.ts`),
+ * qui écrit le tri en UNE clé signée — `tri=nom` croissant, `tri=-nom` décroissant. Une première
+ * version employait deux clés (`tri` + `triDir`) dans un util maison : elle A SILENCIEUSEMENT
+ * ÉCLIPSÉ la fonction du socle, homonyme, et le tableau partait alors sur la colonne par défaut
+ * avec le bon SENS — un classement faux mais plausible, que seule une sonde sur la requête
+ * réellement envoyée a révélé.
+ *
+ * Le champ est VALIDÉ contre `COLONNES_TRIABLES` : le serveur retombe sur son défaut sans rien
+ * dire, si bien qu'une adresse citant une colonne inconnue afficherait l'ordre par défaut sous un
+ * en-tête pourtant fléché.
+ */
+const triDeLUrl = triDepuisUrl(route.query.tri).filter((colonne) =>
+  (COLONNES_TRIABLES as readonly string[]).includes(colonne.id)
+)
+const sorting = ref<{ id: string; desc: boolean }[]>(
+  triDeLUrl.length ? triDeLUrl : [{ id: TRI_PAR_DEFAUT.champ, desc: TRI_PAR_DEFAUT.descendant }]
+)
+
+watch(
+  sorting,
+  (colonnes) => {
+    // Seul l'écart au classement d'arrivée est écrit, comme pour les filtres : trier par date
+    // décroissante, c'est déjà ce que fait l'ouverture de l'écran.
+    const estLeDefaut =
+      colonnes.length === 1 &&
+      colonnes[0]?.id === TRI_PAR_DEFAUT.champ &&
+      colonnes[0]?.desc === TRI_PAR_DEFAUT.descendant
+    const voulu = estLeDefaut ? '' : triVersUrl(colonnes)
+    // Même précaution que pour les filtres : ne naviguer que si l'adresse change vraiment. Le
+    // tableau réaffecte `sorting` au montage et à chaque remise à zéro, avec la même valeur.
+    if ((route.query.tri ?? '') === voulu) return
+    router.replace({ query: requeteAvec(route.query, { tri: voulu }) })
+  },
+  { deep: true }
+)
 const applicationsActingId = ref<number | null>(null)
 const actingAction = ref<'ACCEPTED' | 'REJECTED' | 'PENDING' | null>(null)
 
@@ -858,7 +902,7 @@ const resetApplicationsFilters = () => {
   applicationsFilterPresence.value = []
   applicationsFilterAssignedTeams.value = []
   globalFilter.value = ''
-  sorting.value = [{ id: 'createdAt', desc: true }]
+  sorting.value = [{ id: TRI_PAR_DEFAUT.champ, desc: TRI_PAR_DEFAUT.descendant }]
   serverPagination.value.page = 1
   refreshApplications()
 }

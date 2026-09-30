@@ -17,28 +17,26 @@
       </UButton>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-12">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8 text-gray-400" />
-    </div>
+    <UiSqueletteDeListe v-if="loading" :lignes="6" :libelle="$t('common.loading')" />
 
-    <div
+    <UiEtatVide
       v-else-if="!groups.length"
-      class="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
+      icone="i-heroicons-archive-box-x-mark"
+      :titre="$t('gestion.stock.empty_state')"
+      class="border border-dashed border-gray-300 dark:border-gray-700 rounded-xl"
     >
-      <UIcon name="i-heroicons-archive-box-x-mark" class="size-12 text-gray-400 mx-auto mb-3" />
-      <p class="text-gray-600 dark:text-gray-400 mb-4">
-        {{ $t('gestion.stock.empty_state') }}
-      </p>
-      <UButton
-        v-if="canManage"
-        icon="i-heroicons-plus"
-        color="primary"
-        size="sm"
-        @click="openGroupModal(null)"
-      >
-        {{ $t('gestion.stock.new_group') }}
-      </UButton>
-    </div>
+      <template #action>
+        <UButton
+          v-if="canManage"
+          icon="i-heroicons-plus"
+          color="primary"
+          size="sm"
+          @click="openGroupModal(null)"
+        >
+          {{ $t('gestion.stock.new_group') }}
+        </UButton>
+      </template>
+    </UiEtatVide>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <UCard

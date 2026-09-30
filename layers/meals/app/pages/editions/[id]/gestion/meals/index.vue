@@ -44,12 +44,7 @@
 
             <!-- Repas bénévoles -->
             <div class="mt-6 space-y-4">
-              <div v-if="loadingMeals" class="flex items-center justify-center py-8">
-                <UIcon
-                  name="i-heroicons-arrow-path"
-                  class="animate-spin h-6 w-6 text-primary-500"
-                />
-              </div>
+              <UiSqueletteDeListe v-if="loadingMeals" :lignes="4" :libelle="$t('common.loading')" />
 
               <div
                 v-else-if="volunteerMeals.length === 0"
