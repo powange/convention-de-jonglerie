@@ -54,8 +54,9 @@ export interface UserReference {
 }
 
 /**
- * 53 colonnes : 48 relations Prisma + 5 références « molles ».
- * Vérifié contre `prisma/schema/*.prisma`.
+ * 54 colonnes : 49 relations Prisma + 5 références « molles ».
+ * Vérifié contre `prisma/schema/*.prisma` — et le test `user-merge-schema-sync` le revérifie à
+ * chaque exécution, ce qui a rattrapé l'oubli de `conversation.volunteerId`.
  */
 export const USER_REFERENCES: UserReference[] = [
   // --- Conventions, éditions et organisateurs ---
@@ -157,6 +158,16 @@ export const USER_REFERENCES: UserReference[] = [
     uniqueWith: ['conversationId'],
     group: 'messenger',
   },
+  /*
+   * Le bénévole d'un fil « bénévole ↔ organisateurs ». Sans ce transfert, une fusion de comptes
+   * laisserait le fil désigner le compte absorbé : la synchronisation des participants en
+   * retirerait alors le compte conservé, qui perdrait l'accès à sa propre conversation.
+   *
+   * Pas de `uniqueWith` : rien n'empêche une personne d'avoir un fil sur plusieurs éditions, et
+   * deux comptes fusionnés ne peuvent pas entrer en conflit sur la même conversation — un fil n'a
+   * qu'un bénévole.
+   */
+  { model: 'conversation', field: 'volunteerId', group: 'messenger' },
 
   // --- Ateliers ---
   { model: 'workshop', field: 'creatorId', group: 'workshops' },

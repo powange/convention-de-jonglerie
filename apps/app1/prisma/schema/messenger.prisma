@@ -20,6 +20,20 @@ model Conversation {
   // Optionnel : uniquement pour les groupes de spectacle. Unique, car un spectacle n'a qu'un
   // groupe — on le retrouve plutôt que d'en créer un second à chaque ouverture.
   showId            Int?             @unique
+  /// Le bénévole d'un fil VOLUNTEER_TO_ORGANIZERS. `null` pour tous les autres types.
+  ///
+  /// ⚠️ SANS CETTE COLONNE, ON NE POUVAIT PAS SAVOIR À QUI UN FIL APPARTIENT. Les participants
+  /// sont le bénévole ET les organisateurs habilités, mélangés, et un organisateur peut lui-même
+  /// être bénévole de l'édition. Retirer « ceux qui ne sont pas organisateurs » aurait donc retiré
+  /// le bénévole de sa propre conversation — en silence, le contrôle d'accès lisant `leftAt`.
+  ///
+  /// C'est ce qui empêchait de retirer un organisateur dont le droit de gérer les bénévoles a été
+  /// révoqué : il continuait de lire les messages privés des bénévoles.
+  ///
+  /// `onDelete: SetNull` et non `Cascade` : la conversation doit survivre à la suppression du
+  /// compte du bénévole, son historique restant lisible pour les organisateurs qui y ont écrit —
+  /// c'est déjà la règle des participants, qu'on marque `leftAt` plutôt que de les effacer.
+  volunteerId       Int?
   type              ConversationType
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
@@ -28,6 +42,7 @@ model Conversation {
   team            VolunteerTeam?            @relation(fields: [teamId], references: [id], onDelete: Cascade)
   showApplication ShowApplication?          @relation(fields: [showApplicationId], references: [id], onDelete: Cascade)
   show            Show?                     @relation(fields: [showId], references: [id], onDelete: Cascade)
+  volunteer       User?                     @relation("Conversation_volunteer", fields: [volunteerId], references: [id], onDelete: SetNull)
   participants    ConversationParticipant[]
   messages        Message[]
 
@@ -36,6 +51,7 @@ model Conversation {
   @@index([showApplicationId])
   @@index([showId])
   @@index([type])
+  @@index([volunteerId])
 }
 
 model ConversationParticipant {

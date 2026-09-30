@@ -7,6 +7,7 @@ import type {
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { synchroniserApresChangementDeDroits } from '#server/utils/messenger-droits-benevoles'
 import { canManageOrganizers } from '#server/utils/organizer-management'
 import {
   applyConventionRights,
@@ -172,6 +173,25 @@ export default wrapApiHandler(
       }
       return { updated, perEdition: afterSnapshot.perEdition }
     })
+
+    /*
+     * ⚠️ LES FILS « BÉNÉVOLE ↔ ORGANISATEURS » SUIVENT LE DROIT, et ils ne le faisaient pas.
+     *
+     * La liste des participants d'un fil est un instantané pris à sa création. Quelqu'un dont le
+     * droit de gérer les bénévoles est RÉVOQUÉ y restait, et continuait de lire les messages
+     * privés des bénévoles — rien ne l'en retirait jamais, et rien ne le signalait.
+     *
+     * APRÈS la transaction et non dedans : la synchronisation touche potentiellement plusieurs
+     * éditions et plusieurs fils, et son échec ne doit pas annuler une modification de droits
+     * qui, elle, a réussi. Le droit fait foi de toute façon — le contrôle d'accès de chaque écran
+     * le relit —, ce fil n'en est que le reflet dans la messagerie.
+     *
+     * Les éditions concernées : toutes celles où cet organisateur a des droits particuliers, plus
+     * celles de la convention si le droit GLOBAL a bougé. On synchronise large plutôt que fin :
+     * la fonction ne touche que ce qui doit changer, et manquer une édition laisserait la fuite
+     * ouverte précisément là où on croyait l'avoir fermée.
+     */
+    await synchroniserApresChangementDeDroits(conventionId)
 
     return createSuccessResponse({
       organizer: {

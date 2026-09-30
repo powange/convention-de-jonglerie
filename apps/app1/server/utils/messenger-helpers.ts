@@ -337,6 +337,11 @@ export async function ensureVolunteerToOrganizersConversation(
         editionId,
         teamId: null,
         type: 'VOLUNTEER_TO_ORGANIZERS',
+        // ⚠️ À QUI CE FIL APPARTIENT, inscrit dès la création. Les participants sont le bénévole ET
+        // les organisateurs mélangés, et un organisateur peut être bénévole de la même édition :
+        // sans cette colonne, retirer « ceux qui ne sont pas organisateurs » retirerait le
+        // bénévole de sa propre conversation.
+        volunteerId,
         participants: {
           create: allParticipantIds.map((participantUserId) => ({
             userId: participantUserId,
@@ -347,6 +352,20 @@ export async function ensureVolunteerToOrganizersConversation(
   } else {
     // 4. Synchroniser les participants : ajouter les nouveaux organisateurs
     conversation = existingConversation
+
+    /*
+     * Rattrapage des fils créés avant l'existence de `volunteerId`. La migration de rattrapage en
+     * a désigné la plupart, mais elle S'EST ABSTENUE là où la déduction était ambiguë — et ces
+     * fils-là ne se répareraient jamais autrement. Ici, en revanche, on SAIT qui est le bénévole :
+     * c'est le paramètre de cette fonction.
+     */
+    if (!existingConversation.volunteerId) {
+      await client.conversation.update({
+        where: { id: existingConversation.id },
+        data: { volunteerId },
+      })
+      conversation = { ...existingConversation, volunteerId }
+    }
 
     // Pour chaque organisateur actuel avec les droits
     for (const organizerUserId of organizerUserIds) {
@@ -384,6 +403,105 @@ export async function ensureVolunteerToOrganizersConversation(
   }
 
   return conversation.id
+}
+
+/**
+ * Remet les participants des fils « bénévole ↔ organisateurs » d'une édition en accord avec les
+ * droits du moment.
+ *
+ * ⚠️ POURQUOI C'EST NÉCESSAIRE, et pourquoi le défaut était invisible. La liste des participants
+ * d'un fil est un INSTANTANÉ, pris quand le fil est créé ou quand un bénévole y revient.
+ * `ensureVolunteerToOrganizersConversation` AJOUTE les organisateurs habilités et RÉACTIVE ceux
+ * qui étaient partis — mais ne retire JAMAIS celui qui a perdu le droit.
+ *
+ * La dérive était donc à SENS UNIQUE : celui qui gagne le droit finit par être ajouté au prochain
+ * passage du bénévole ; celui qui le PERD reste, et continue de lire les messages privés des
+ * bénévoles aux organisateurs. Rien ne le signalait : ni erreur, ni journal — seulement un fil qui
+ * reste ouvert dans sa messagerie.
+ *
+ * ⚠️ LE BÉNÉVOLE DU FIL EST ÉPARGNÉ, et c'est toute la raison d'être de `volunteerId`. Les
+ * participants sont le bénévole ET les organisateurs, mélangés, et un organisateur peut lui-même
+ * être bénévole de l'édition : retirer « ceux qui ne sont pas organisateurs habilités » le
+ * couperait de sa propre conversation, en silence.
+ *
+ * ⚠️ UN FIL SANS PROPRIÉTAIRE EST ÉPARGNÉ AUSSI. La migration de rattrapage s'est abstenue là où
+ * la déduction était ambiguë ; y synchroniser les participants reviendrait à deviner. La fuite y
+ * persiste — c'est le prix assumé de ne couper personne par erreur, et elle se referme dès que le
+ * bénévole repasse dans son fil, ce qui inscrit son identité.
+ *
+ * `leftAt` et non une suppression : l'historique doit rester lisible pour ceux qui y ont écrit, et
+ * c'est déjà la règle du reste de la messagerie. Le contrôle d'accès lit ce champ.
+ */
+export async function synchroniserParticipantsDesFilsDeBenevoles(
+  editionId: number,
+  tx?: PrismaTransaction
+): Promise<{ retires: number; reintegres: number }> {
+  const client = tx || prisma
+
+  const edition = await client.edition.findUnique({
+    where: { id: editionId },
+    select: { conventionId: true },
+  })
+  if (!edition) return { retires: 0, reintegres: 0 }
+
+  /*
+   * LA MÊME REQUÊTE que celle qui les ajoute, quelques dizaines de lignes plus haut : un membre de
+   * la convention habilité à gérer les bénévoles, globalement ou sur cette édition. Deux
+   * définitions divergentes de « qui a droit à ce fil » produiraient un va-et-vient — retiré par
+   * l'une, réintégré par l'autre au passage suivant du bénévole.
+   */
+  const organisateurs = await client.conventionOrganizer.findMany({
+    where: {
+      conventionId: edition.conventionId,
+      OR: [
+        { canManageVolunteers: true },
+        { perEditionPermissions: { some: { editionId, canManageVolunteers: true } } },
+      ],
+    },
+    select: { userId: true },
+  })
+  const habilites = new Set(organisateurs.map((organisateur) => organisateur.userId))
+
+  const fils = await client.conversation.findMany({
+    where: {
+      editionId,
+      teamId: null,
+      type: 'VOLUNTEER_TO_ORGANIZERS',
+      // Les fils sans propriétaire connu sont laissés tels quels : voir l'en-tête.
+      volunteerId: { not: null },
+    },
+    select: { id: true, volunteerId: true, participants: true },
+  })
+
+  let retires = 0
+  let reintegres = 0
+
+  for (const fil of fils) {
+    for (const participant of fil.participants) {
+      const aDroit = participant.userId === fil.volunteerId || habilites.has(participant.userId)
+
+      if (!aDroit && !participant.leftAt) {
+        await client.conversationParticipant.update({
+          where: { id: participant.id },
+          data: { leftAt: new Date() },
+        })
+        retires++
+      } else if (aDroit && participant.leftAt) {
+        /*
+         * Le sens inverse : quelqu'un retiré par une révocation, puis réhabilité. Sans cette
+         * branche, il faudrait attendre que le bénévole repasse dans son fil pour qu'il y revienne
+         * — et il n'y repasse pas forcément.
+         */
+        await client.conversationParticipant.update({
+          where: { id: participant.id },
+          data: { leftAt: null },
+        })
+        reintegres++
+      }
+    }
+  }
+
+  return { retires, reintegres }
 }
 
 /**
