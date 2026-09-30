@@ -47,6 +47,10 @@ export const prismaMock = {
   volunteerTeam: createModelMock(),
   applicationTeamAssignment: createModelMock(),
   volunteerTimeSlot: createModelMock(),
+  // Échanges de créneaux entre bénévoles. Son absence expliquait qu'AUCUN des quatre points d'API
+  // d'échange n'ait de test : le handler échouait au premier accès sur un modèle inexistant du
+  // mock, avant qu'aucune assertion ne s'exécute.
+  volunteerSwapRequest: createModelMock(),
   volunteerNotificationGroup: createModelMock(),
   artistNotificationGroup: createModelMock(),
   artistNotificationConfirmation: createModelMock(),
