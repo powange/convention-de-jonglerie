@@ -71,6 +71,75 @@ test.describe.serial('Module Repas', () => {
     expect(response.ok()).toBe(true)
   })
 
+  /**
+   * Désactiver un repas demande confirmation, et renoncer ne change RIEN.
+   *
+   * ⚠️ CE QUE CE GESTE DÉTRUIT : le serveur fait un `deleteMany` sur toutes les réponses des
+   * bénévoles pour ce repas. C'est sans retour — et réactiver le repas ne les restaure pas, il
+   * réinscrit chaque bénévole éligible comme ACCEPTANT, y compris ceux qui avaient refusé.
+   *
+   * Le commutateur enregistrait immédiatement, sans rien demander.
+   *
+   * ⚠️ POURQUOI UNE SPEC PLAYWRIGHT ET NON UN TEST DE COMPOSANT : c'est une PAGE de gestion, qui
+   * demande une dizaine de points d'API au montage et n'est rendue que côté client, derrière
+   * l'authentification. Un `curl` y reçoit la coquille de l'application et un franc 200 — seul un
+   * navigateur authentifié exécute la garde.
+   *
+   * 🔬 CE QUE LE TEST MESURE est le RENONCEMENT, pas la confirmation. Vérifier que confirmer
+   * supprime bien reviendrait à détruire des données pour prouver qu'on sait les détruire ; ce qui
+   * compte, c'est que le commutateur REVIENNE à sa place et que rien ne soit parti.
+   */
+  test('désactiver un repas demande confirmation, et renoncer ne change rien', async ({
+    page,
+    goto,
+  }) => {
+    const { editionId } = loadState()
+    await goto(`/editions/${editionId}/gestion/meals`, { waitUntil: 'hydration' })
+
+    /*
+     * 📍 `getByRole('switch')`, comme les autres specs de ce dossier. Une première version
+     * cherchait `button[role="switch"]` : elle n'en trouvait AUCUN et le test se SAUTAIT, donc
+     * passait au vert en ne prouvant rien. Un test sauté ressemble à de la couverture.
+     */
+    await page.waitForSelector('[role="switch"]', { timeout: 10000 })
+    const commutateurs = page.getByRole('switch')
+    expect(
+      await commutateurs.count(),
+      'aucun repas à désactiver sur cette édition'
+    ).toBeGreaterThan(0)
+
+    // Un repas ACTIF : c'est le seul cas où la garde doit se déclencher.
+    const actif = commutateurs.first()
+    await expect(actif).toHaveAttribute('aria-checked', 'true')
+
+    /*
+     * On surveille la requête d'enregistrement : la garde ne vaut que si RIEN ne part avant la
+     * confirmation. Un test qui n'observerait que la modale resterait vert si l'enregistrement
+     * partait quand même en arrière-plan.
+     */
+    let enregistrementParti = false
+    page.on('request', (requete) => {
+      if (requete.method() === 'PUT' && requete.url().includes('/volunteers/meals')) {
+        enregistrementParti = true
+      }
+    })
+
+    await actif.click()
+
+    // La modale s'ouvre, et elle dit ce qui va être détruit — pas seulement « Êtes-vous sûr ? ».
+    const modale = page.getByRole('dialog')
+    await expect(modale).toBeVisible({ timeout: 5000 })
+    await expect(modale).toContainText(/définitive/i)
+
+    // Renoncer.
+    await modale.getByRole('button', { name: /annuler/i }).click()
+    await expect(modale).toBeHidden({ timeout: 5000 })
+
+    // Rien n'est parti, et le commutateur est revenu à sa place.
+    expect(enregistrementParti, 'un enregistrement est parti malgré le renoncement').toBe(false)
+    await expect(actif).toHaveAttribute('aria-checked', 'true')
+  })
+
   test('nettoyage : désactiver les repas', async ({ page }) => {
     const { editionId } = loadState()
     await updateEdition(page, String(editionId), { mealsEnabled: false })

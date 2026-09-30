@@ -115,6 +115,9 @@
         </UCard>
       </div>
     </div>
+
+    <!-- La seule action de cet écran qui détruise quelque chose sans retour possible. -->
+    <UiConfirmationDemandee :confirmation="confirmation" />
   </div>
 </template>
 
@@ -123,7 +126,7 @@ import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 // Layer meals : imports cœur via #imports (résolution cross-layer) plutôt que ~/ (qui pointe le layer).
-import { useAuthStore, useEditionStore } from '#imports'
+import { useAuthStore, useConfirmation, useEditionStore } from '#imports'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -224,9 +227,52 @@ const { execute: executeSaveMeal, loading: savingMeals } = useApiAction<
   },
 })
 
+const confirmation = useConfirmation()
+
+/**
+ * Enregistre un changement de repas, en demandant confirmation AVANT une désactivation.
+ *
+ * ⚠️ DÉSACTIVER UN REPAS DÉTRUIT LES SÉLECTIONS DES BÉNÉVOLES, et c'est sans retour : le serveur
+ * fait un `deleteMany` sur toutes les lignes du repas. Le commutateur enregistrait immédiatement,
+ * sans rien demander — un clic par mégarde, et le travail de chacun disparaissait.
+ *
+ * ⚠️ ET LE RÉACTIVER NE LES RESTAURE PAS. Il recrée une sélection ACCEPTÉE pour chaque bénévole
+ * éligible : celui qui avait REFUSÉ le repas se retrouve inscrit. Réactiver pour « annuler » sa
+ * méprise aggrave donc la situation au lieu de la réparer, et c'est ce que la confirmation doit
+ * dire — sans quoi elle laisserait croire que le geste est réversible.
+ *
+ * Seule la DÉSACTIVATION est gardée. Demander confirmation pour activer un repas, ou pour changer
+ * ses phases, ajouterait un clic à des gestes qui ne détruisent rien — et une confirmation qu'on
+ * voit trop souvent est une confirmation qu'on ne lit plus.
+ */
 const handleMealChange = async (meal: any) => {
-  pendingMeal.value = meal
-  await executeSaveMeal()
+  const desactivation = meal?.enabled === false
+
+  if (!desactivation) {
+    pendingMeal.value = meal
+    await executeSaveMeal()
+    return
+  }
+
+  /*
+   * ⚠️ LE COMMUTATEUR EST DÉJÀ BASCULÉ À L'ÉCRAN quand on arrive ici : `v-model` a écrit dans
+   * l'objet avant que l'événement ne parte. Renoncer doit donc le REMETTRE, sans quoi l'écran
+   * afficherait un repas désactivé que le serveur considère toujours actif — et le prochain
+   * changement partirait avec cette valeur fausse.
+   */
+  confirmation.demanderConfirmation({
+    titre: t('gestion.meals.confirm_disable_title'),
+    description: t('gestion.meals.confirm_disable_description'),
+    libelleConfirmer: t('gestion.meals.confirm_disable_label'),
+    couleurConfirmer: 'error',
+    agir: async () => {
+      pendingMeal.value = meal
+      await executeSaveMeal()
+    },
+    renoncer: () => {
+      meal.enabled = true
+    },
+  })
 }
 
 // Vérifier l'accès à cette page — droit « gérer les repas » (édition ou convention) ;
