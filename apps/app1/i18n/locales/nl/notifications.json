@@ -59,6 +59,16 @@
         "action": "Een andere rit zoeken",
         "message": "{ownerName} heeft je plaats ({seats}) op de rit vanuit {locationCity} verwijderd",
         "title": "Je plaats is verwijderd"
+      },
+      "offer_changed": {
+        "action": "De rit bekijken",
+        "message": "{ownerName} heeft de rit gewijzigd: vertrek uit {locationCity} op {date}",
+        "title": "Een rit die je hebt geboekt is gewijzigd"
+      },
+      "offer_deleted": {
+        "action": "Een andere rit zoeken",
+        "message": "{ownerName} heeft de rit vanuit {locationCity} verwijderd: je plaats ({seats}) bestaat niet meer",
+        "title": "Een rit die je had geboekt is verwijderd"
       }
     },
     "common": {

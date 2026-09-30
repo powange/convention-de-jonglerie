@@ -59,6 +59,16 @@
         "action": "Voir la conversation",
         "message": "{commenterName} a écrit un message",
         "title": "Nouveau message de covoiturage 💬"
+      },
+      "offer_changed": {
+        "action": "Voir le trajet",
+        "message": "{ownerName} a modifié le trajet : départ de {locationCity} le {date}",
+        "title": "Un trajet que vous avez réservé a changé"
+      },
+      "offer_deleted": {
+        "action": "Chercher un autre trajet",
+        "message": "{ownerName} a supprimé le trajet depuis {locationCity} : votre place ({seats}) n'existe plus",
+        "title": "Un trajet que vous aviez réservé a été supprimé"
       }
     },
     "common": {

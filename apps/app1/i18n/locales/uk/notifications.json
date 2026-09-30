@@ -59,6 +59,16 @@
         "action": "Знайти іншу поїздку",
         "message": "{ownerName} прибрав ваше місце ({seats}) у поїздці з {locationCity}",
         "title": "Ваше місце прибрано"
+      },
+      "offer_changed": {
+        "action": "Переглянути поїздку",
+        "message": "{ownerName} змінив поїздку: виїзд з {locationCity} {date}",
+        "title": "Поїздка, яку ви забронювали, змінилася"
+      },
+      "offer_deleted": {
+        "action": "Знайти іншу поїздку",
+        "message": "{ownerName} видалив поїздку з {locationCity}: вашого місця ({seats}) більше немає",
+        "title": "Поїздку, яку ви забронювали, видалено"
       }
     },
     "common": {

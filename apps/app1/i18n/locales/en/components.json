@@ -78,7 +78,12 @@
       "request_load_error": "This request could not be loaded",
       "revoke_seat": "Remove",
       "revoke_seat_description": "{pseudo} has a confirmed seat on this trip and will be notified of the removal. You will not be able to give it back: a new request will be required.",
-      "revoke_seat_title": "Remove this seat?"
+      "revoke_seat_title": "Remove this seat?",
+      "confirm_delete_offer_no_passenger": "Nobody has a seat on this trip: deleting it will notify no one.",
+      "confirm_delete_offer_passengers": "{count} confirmed passenger will be notified | {count} confirmed passengers will be notified",
+      "confirm_delete_offer_passengers_hint": "They will receive a notification telling them the trip is no longer happening, and will have to look for another ride. Requests still pending are notified too.",
+      "confirm_delete_offer_title": "Delete this offer?",
+      "confirm_delete_offer_with_passengers": "This offer has confirmed passengers. Deleting it is permanent."
     },
     "convention_form": {
       "click_to_select_image": "Click to select an image",

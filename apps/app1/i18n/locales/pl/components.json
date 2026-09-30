@@ -78,7 +78,12 @@
       "request_load_error": "Nie udało się wczytać tej prośby",
       "revoke_seat": "Odbierz",
       "revoke_seat_description": "{pseudo} ma potwierdzone miejsce na tej podróży i otrzyma powiadomienie o jego odebraniu. Nie będzie można go zwrócić: konieczna będzie nowa prośba.",
-      "revoke_seat_title": "Odebrać to miejsce?"
+      "revoke_seat_title": "Odebrać to miejsce?",
+      "confirm_delete_offer_no_passenger": "Nikt nie ma miejsca w tej podróży: jej usunięcie nikogo nie powiadomi.",
+      "confirm_delete_offer_passengers": "{count} potwierdzony pasażer zostanie powiadomiony | {count} potwierdzonych pasażerów zostanie powiadomionych",
+      "confirm_delete_offer_passengers_hint": "Otrzymają powiadomienie, że podróż się nie odbędzie, i będą musieli znaleźć inny przejazd. Prośby wciąż oczekujące również są powiadamiane.",
+      "confirm_delete_offer_title": "Usunąć tę ofertę?",
+      "confirm_delete_offer_with_passengers": "Ta oferta ma potwierdzonych pasażerów. Usunięcie jest nieodwracalne."
     },
     "convention_form": {
       "click_to_select_image": "Kliknij, aby wybrać obraz",

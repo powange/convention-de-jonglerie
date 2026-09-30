@@ -59,6 +59,16 @@
         "action": "Buscar otro viaje",
         "message": "{ownerName} ha retirado tu plaza ({seats}) en el viaje desde {locationCity}",
         "title": "Tu plaza ha sido retirada"
+      },
+      "offer_changed": {
+        "action": "Ver el viaje",
+        "message": "{ownerName} ha modificado el viaje: salida de {locationCity} el {date}",
+        "title": "Un viaje que reservaste ha cambiado"
+      },
+      "offer_deleted": {
+        "action": "Buscar otro viaje",
+        "message": "{ownerName} ha eliminado el viaje desde {locationCity}: tu plaza ({seats}) ya no existe",
+        "title": "Un viaje que habías reservado ha sido eliminado"
       }
     },
     "common": {

@@ -59,6 +59,16 @@
         "action": "Eine andere Fahrt suchen",
         "message": "{ownerName} hat deinen Platz ({seats}) auf der Fahrt ab {locationCity} entfernt",
         "title": "Dein Platz wurde entfernt"
+      },
+      "offer_changed": {
+        "action": "Fahrt ansehen",
+        "message": "{ownerName} hat die Fahrt geändert: Abfahrt ab {locationCity} am {date}",
+        "title": "Eine von dir gebuchte Fahrt hat sich geändert"
+      },
+      "offer_deleted": {
+        "action": "Eine andere Fahrt suchen",
+        "message": "{ownerName} hat die Fahrt ab {locationCity} gelöscht: dein Platz ({seats}) existiert nicht mehr",
+        "title": "Eine von dir gebuchte Fahrt wurde gelöscht"
       }
     },
     "common": {
