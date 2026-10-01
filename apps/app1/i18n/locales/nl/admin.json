@@ -887,6 +887,8 @@
     "view_profiles": "Profielen bekijken",
     "volunteer_applications": "Vrijwilligersaanvragen",
     "volunteer_reminders": "Vrijwilligersherinneringen",
-    "workshops_created": "Aangemaakte workshops"
+    "workshops_created": "Aangemaakte workshops",
+    "backup_restore_dropped_tables": "{count} tabel(len) die in de back-up ontbreken, zijn verwijderd",
+    "backup_restore_step_migrations": "Migraties worden toegepast"
   }
 }

@@ -8,16 +8,14 @@ import { promisify } from 'util'
 
 import { backupsDir } from './backup-files'
 
-const execFileAsync = promisify(execFile)
+import {
+  restaurationEnCoursDapres,
+  type EtapeRestauration,
+} from '~~/shared/utils/etapes-restauration'
 
-/** Étapes traversées par une restauration, dans l'ordre. */
-export type EtapeRestauration =
-  | 'PREPARATION'
-  | 'BASE_DE_DONNEES'
-  | 'FICHIERS'
-  | 'TERMINEE'
-  | 'ECHOUEE'
-  | 'INTERROMPUE'
+export type { EtapeRestauration }
+
+const execFileAsync = promisify(execFile)
 
 export interface EtatRestauration {
   id: string
@@ -33,6 +31,13 @@ export interface EtatRestauration {
   /** Progression 0-100 de ce qui a été transmis à mysql (voir la note sur la précision). */
   pourcentage: number
   tableEnCours: string | null
+  /**
+   * Les tables retirées avant l'injection parce qu'absentes de la sauvegarde.
+   *
+   * Rendu à l'écran : restaurer une sauvegarde ancienne SUPPRIME des tables, et l'administrateur
+   * doit le lire. Rien ne le disait — c'est la moitié silencieuse du défaut d'origine.
+   */
+  tablesSupprimees: string[]
   tablesVues: number
   erreur: string | null
 }
@@ -61,9 +66,7 @@ export interface OptionsRestauration {
  */
 const cheminEtat = () => path.join(backupsDir(), 'restore-state.json')
 
-const ETAPES_EN_COURS: EtapeRestauration[] = ['PREPARATION', 'BASE_DE_DONNEES', 'FICHIERS']
-
-export const estEnCours = (etape: EtapeRestauration) => ETAPES_EN_COURS.includes(etape)
+export const estEnCours = restaurationEnCoursDapres
 
 /**
  * Restaurations lancées par CE processus. Un état « en cours » sur le disque sans entrée
@@ -169,11 +172,28 @@ function suiviProgression(
   })
 }
 
-/** Envoie le dump à `mysql`, en tenant l'état à jour au fil de l'eau. */
-function executerDump(cheminSql: string, etat: EtatRestauration): Promise<void> {
+/**
+ * L'URL de la base visée, ou un échec franc.
+ *
+ * Extraite parce que trois étapes en ont besoin — la suppression des tables orphelines, le dump et
+ * le nom de base journalisé —, et qu'un `process.env.DATABASE_URL` relu à chaque endroit finirait
+ * par diverger sur le traitement de son absence.
+ */
+function databaseUrlCourante(): string {
   const databaseUrl = process.env.DATABASE_URL
   if (!databaseUrl) {
-    return Promise.reject(new Error('Configuration de base de données manquante'))
+    throw new Error('Configuration de base de données manquante')
+  }
+  return databaseUrl
+}
+
+/** Envoie le dump à `mysql`, en tenant l'état à jour au fil de l'eau. */
+function executerDump(cheminSql: string, etat: EtatRestauration): Promise<void> {
+  let databaseUrl: string
+  try {
+    databaseUrl = databaseUrlCourante()
+  } catch (erreur) {
+    return Promise.reject(erreur)
   }
 
   const dbUrl = new URL(databaseUrl)
@@ -219,6 +239,117 @@ function executerDump(cheminSql: string, etat: EtatRestauration): Promise<void> 
       }
     })
   })
+}
+
+/**
+ * Les tables que ce dump déclare, lues sans le charger en mémoire.
+ *
+ * `mysqldump --add-drop-table` fait précéder chaque table d'un `DROP TABLE IF EXISTS` : les tables
+ * du dump sont donc remplacées proprement, quoi qu'il arrive. Ce qu'on cherche ici, ce sont les
+ * AUTRES — celles que la base porte et que le dump ignore.
+ *
+ * Le même motif que le suivi de progression, et c'est voulu : une seule définition de « ce qui
+ * nomme une table dans un dump ».
+ */
+async function tablesDuDump(cheminSql: string): Promise<Set<string>> {
+  const trouvees = new Set<string>()
+  let reste = ''
+
+  await new Promise<void>((resolve, reject) => {
+    const flux = createReadStream(cheminSql, { encoding: 'utf8' })
+    flux.on('error', reject)
+    flux.on('data', (morceau) => {
+      const texte = reste + String(morceau)
+      MOTIF_TABLE.lastIndex = 0
+      let correspondance: RegExpExecArray | null
+      while ((correspondance = MOTIF_TABLE.exec(texte)) !== null) {
+        trouvees.add(correspondance[1]!)
+      }
+      // Un marqueur coupé entre deux morceaux serait perdu sans ce chevauchement.
+      reste = texte.slice(-TAILLE_CHEVAUCHEMENT)
+    })
+    flux.on('end', () => resolve())
+  })
+
+  return trouvees
+}
+
+/**
+ * Supprime les tables que la base porte et que le dump NE CONTIENT PAS.
+ *
+ * ⚠️⚠️ LE DÉFAUT QUE CECI RÉPARE BLOQUAIT LA BASE ENTIÈRE. La restauration se contentait de verser
+ * le dump dans `mysql`. Les tables créées DEPUIS la sauvegarde n'y figurent pas, donc elles
+ * survivaient — tandis que `_prisma_migrations`, lui, revenait à l'état du dump et déclarait la
+ * migration N non appliquée. Au déploiement suivant, l'entrypoint (en `set -e`) rejouait N, qui
+ * échouait sur un `CREATE TABLE` déjà existant, et Prisma passait en P3009 : plus AUCUNE migration
+ * ne peut alors être appliquée avant une intervention manuelle. Ce dépôt a déjà connu un P3009, et
+ * il immobilise tout.
+ *
+ * 📍 ON NE VIDE PAS LA BASE, contrairement à ce qu'on pourrait croire plus simple — et c'est une
+ * décision. Tout supprimer avant d'injecter ajouterait un risque réel : un dump tronqué ou corrompu
+ * laisserait alors une base VIDE, là qu'aujourd'hui il laisse au moins les tables qu'il n'a pas
+ * atteintes. Ne retirer que les orphelines ferme le P3009 sans rien ajouter : les tables du dump
+ * étaient déjà supprimées et recréées par lui.
+ *
+ * `FOREIGN_KEY_CHECKS=0` est indispensable : ces tables se référencent entre elles, et l'ordre de
+ * suppression serait sinon à deviner.
+ */
+async function supprimerTablesOrphelines(
+  cheminSql: string,
+  databaseUrl: string
+): Promise<string[]> {
+  const nomDeBase = new URL(databaseUrl).pathname.slice(1)
+
+  const lignes = await prisma.$queryRawUnsafe<{ TABLE_NAME: string }[]>(
+    "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_TYPE = 'BASE TABLE'",
+    nomDeBase
+  )
+  const enBase = lignes.map((l) => l.TABLE_NAME)
+  if (enBase.length === 0) return []
+
+  const duDump = await tablesDuDump(cheminSql)
+  const orphelines = enBase.filter((table) => !duDump.has(table))
+  if (orphelines.length === 0) return []
+
+  /*
+   * ⚠️ Les noms viennent d'`information_schema`, donc de la base elle-même, et non d'une saisie.
+   * Ils sont tout de même entourés d'accents graves et ceux qu'ils pourraient contenir sont
+   * doublés : une table nommée de travers ne doit pas pouvoir refermer l'identifiant.
+   */
+  const identifiants = orphelines.map((t) => '`' + t.replace(/`/g, '``') + '`').join(', ')
+
+  await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0')
+  try {
+    await prisma.$executeRawUnsafe(`DROP TABLE IF EXISTS ${identifiants}`)
+  } finally {
+    await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1')
+  }
+
+  console.log(
+    `Tables absentes de la sauvegarde supprimées avant restauration : ${orphelines.join(', ')}`
+  )
+  return orphelines
+}
+
+/**
+ * Rejoue les migrations après la restauration.
+ *
+ * ⚠️ NÉCESSAIRE POUR UNE SECONDE RAISON, distincte du P3009. Une fois le dump versé, la base est au
+ * schéma de la SAUVEGARDE pendant que le code qui tourne est celui d'AUJOURD'HUI : toute requête
+ * touchant une colonne ou une relation plus récente répond 500, et le restera jusqu'au prochain
+ * déploiement. Supprimer les tables orphelines débloque les migrations à venir ; les appliquer ici
+ * remet l'application en état de marche tout de suite.
+ *
+ * C'est exactement la commande du point d'entrée du conteneur, depuis le même répertoire : le
+ * dossier `prisma/` est présent dans l'image de production (Dockerfile) et `migrate deploy` y est
+ * déjà lancé à chaque démarrage. Rien de neuf, donc, sinon le moment.
+ */
+async function appliquerMigrations(): Promise<void> {
+  const { stdout, stderr } = await execFileAsync('npx', ['prisma', 'migrate', 'deploy'], {
+    cwd: process.cwd(),
+    maxBuffer: 1024 * 1024 * 10,
+  })
+  console.log('Migrations après restauration :', stdout || stderr)
 }
 
 /**
@@ -287,6 +418,15 @@ async function deroulerRestauration(etat: EtatRestauration, options: OptionsRest
     etat.etape = 'BASE_DE_DONNEES'
     await ecrireEtat(etat)
 
+    /*
+     * Avant d'injecter : retirer les tables que la base porte et que la sauvegarde ignore. Sans
+     * cela, restaurer une sauvegarde antérieure à une migration laisse ces tables en place tandis
+     * que `_prisma_migrations` revient en arrière — et le déploiement suivant échoue en P3009,
+     * bloquant TOUTE migration ultérieure. Voir `supprimerTablesOrphelines`.
+     */
+    const orphelines = await supprimerTablesOrphelines(cheminSql, databaseUrlCourante())
+    etat.tablesSupprimees = orphelines
+
     console.log('Restauration de la base de données en cours...')
     await executerDump(cheminSql, etat)
     console.log('Base de données restaurée avec succès')
@@ -294,6 +434,16 @@ async function deroulerRestauration(etat: EtatRestauration, options: OptionsRest
     // Le flux est intégralement transmis : quel que soit l'arrondi, on est à 100 %.
     etat.pourcentage = 100
     etat.octetsEnvoyes = etat.octetsTotal
+
+    /*
+     * Puis rejouer les migrations : la base est au schéma de la sauvegarde, le code au schéma
+     * d'aujourd'hui. Sans cette étape, l'application répond 500 sur tout ce qui touche une colonne
+     * plus récente, jusqu'au prochain déploiement.
+     */
+    etat.etape = 'MIGRATIONS'
+    etat.tableEnCours = null
+    await ecrireEtat(etat)
+    await appliquerMigrations()
 
     if (dossierExtrait) {
       etat.etape = 'FICHIERS'
@@ -342,6 +492,7 @@ export function lancerRestauration(options: OptionsRestauration): EtatRestaurati
     pourcentage: 0,
     tableEnCours: null,
     tablesVues: 0,
+    tablesSupprimees: [],
     erreur: null,
   }
   const promesse = (async () => {

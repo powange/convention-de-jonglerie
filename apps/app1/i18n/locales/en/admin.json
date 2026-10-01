@@ -887,6 +887,8 @@
     "view_profiles": "View profiles",
     "volunteer_applications": "Volunteer applications",
     "volunteer_reminders": "Volunteer reminders",
-    "workshops_created": "Workshops created"
+    "workshops_created": "Workshops created",
+    "backup_restore_dropped_tables": "{count} table(s) missing from the backup were dropped",
+    "backup_restore_step_migrations": "Applying migrations"
   }
 }

@@ -887,6 +887,8 @@
     "view_profiles": "Profile anzeigen",
     "volunteer_applications": "Freiwilligenbewerbungen",
     "volunteer_reminders": "Freiwilligen-Erinnerungen",
-    "workshops_created": "Erstellte Workshops"
+    "workshops_created": "Erstellte Workshops",
+    "backup_restore_dropped_tables": "{count} in der Sicherung fehlende Tabelle(n) wurden gelöscht",
+    "backup_restore_step_migrations": "Migrationen werden angewendet"
   }
 }

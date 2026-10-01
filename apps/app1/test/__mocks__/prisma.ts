@@ -179,6 +179,19 @@ export const prismaMock = {
   $queryRaw: vi.fn(),
   $executeRaw: vi.fn(),
   $executeRawUnsafe: vi.fn(),
+  /*
+   * ⚠️ `$queryRawUnsafe` MANQUAIT, et une méthode absente de ce mock ne rend pas `undefined` : elle
+   * fait lever « n'est pas une fonction » au premier appel, AVANT toute assertion. Le code qui s'en
+   * sert devient alors intestable, ce qui se lit à tort comme une absence de tests.
+   *
+   * C'est la quatrième fois de la journée que ce harnais bloque un test de cette façon — après
+   * `editionProgramItem`, `volunteerSwapRequest` et les auto-imports. Quand un point d'API n'a
+   * aucun test, regarder d'abord ce fichier.
+   *
+   * Rend un tableau vide par défaut : c'est la forme d'un `SELECT` sans résultat, celle qui ne
+   * fait rien faire au code appelant.
+   */
+  $queryRawUnsafe: vi.fn(async () => [] as unknown[]),
 }
 
 // Reset automatique avant chaque test

@@ -162,6 +162,24 @@
               </span>
             </div>
 
+            <!-- Restaurer une sauvegarde plus ancienne que le schéma SUPPRIME les tables qu'elle
+                 ignore : sans elles, le déploiement suivant échouerait en P3009 et bloquerait
+                 toute migration ultérieure. L'administrateur doit lire ce qui a été retiré — rien
+                 ne le disait, et c'était la moitié silencieuse du défaut. -->
+            <UAlert
+              v-if="etatRestauration.tablesSupprimees?.length"
+              color="warning"
+              variant="subtle"
+              icon="i-heroicons-exclamation-triangle"
+              class="mt-3"
+              :title="
+                $t('admin.backup_restore_dropped_tables', {
+                  count: etatRestauration.tablesSupprimees.length,
+                })
+              "
+              :description="etatRestauration.tablesSupprimees.join(', ')"
+            />
+
             <p class="text-xs text-gray-500 mt-2">
               {{ $t('admin.backup_restore_background_hint') }}
             </p>
@@ -750,6 +768,8 @@ const libelleEtape = computed(() => {
       return t('admin.backup_restore_step_preparation')
     case 'BASE_DE_DONNEES':
       return t('admin.backup_restore_step_database')
+    case 'MIGRATIONS':
+      return t('admin.backup_restore_step_migrations')
     case 'FICHIERS':
       return t('admin.backup_restore_step_files')
     default:

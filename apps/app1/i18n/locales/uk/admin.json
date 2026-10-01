@@ -887,6 +887,8 @@
     "view_profiles": "Переглянути профілі",
     "volunteer_applications": "Заявки волонтерів",
     "volunteer_reminders": "Нагадування волонтерам",
-    "workshops_created": "Створені воркшопи"
+    "workshops_created": "Створені воркшопи",
+    "backup_restore_dropped_tables": "Видалено таблиць, відсутніх у резервній копії: {count}",
+    "backup_restore_step_migrations": "Застосування міграцій"
   }
 }
