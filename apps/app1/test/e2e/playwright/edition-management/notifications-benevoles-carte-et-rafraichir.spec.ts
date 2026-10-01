@@ -12,6 +12,7 @@ import {
 
 const BASE = 'http://localhost:3000'
 const MESSAGE = `Briefing bénévoles à 9 h — message de test ${Date.now()}`
+const MESSAGE_EQUIPE = `Briefing d'équipe — message de test ${Date.now()}`
 
 /**
  * Les notifications aux bénévoles : ouvrir le détail d'un envoi, et rafraîchir les lectures.
@@ -28,6 +29,7 @@ const MESSAGE = `Briefing bénévoles à 9 h — message de test ${Date.now()}`
  */
 test.describe.serial('Notifications aux bénévoles — carte et rafraîchissement', () => {
   let editionId = ''
+  let candidatureId = ''
 
   test('préparer une édition avec un bénévole accepté et une notification', async ({ page }) => {
     const { conventionId } = loadState()
@@ -69,7 +71,7 @@ test.describe.serial('Notifications aux bénévoles — carte et rafraîchisseme
     )
     expect(candidature.ok(), `candidature : ${await candidature.text()}`).toBe(true)
     const corps = await candidature.json()
-    const candidatureId = String((corps.data?.application ?? corps.data ?? corps).id)
+    candidatureId = String((corps.data?.application ?? corps.data ?? corps).id)
 
     const acceptation = await apiPatch(
       page,
@@ -138,6 +140,99 @@ test.describe.serial('Notifications aux bénévoles — carte et rafraîchisseme
 
     // Rafraîchir ne doit pas faire perdre sa place au lecteur.
     await expect(modale).toBeVisible()
+  })
+
+  test('🔬 le suivi d’une notification ciblant une ÉQUIPE répond, et ne rend pas 500', async ({
+    page,
+    goto,
+  }) => {
+    /*
+     * ⚠️ RELEVÉ EN PRODUCTION, douze fois en douze minutes, et CE FICHIER NE POUVAIT PAS LE VOIR —
+     * deux fois.
+     *
+     * (1) L'envoi préparé plus haut cible `targetType: 'all'`, donc la branche fautive n'était
+     *     JAMAIS exercée : le filtre par équipe portait sur `assignedTeams`, un champ JSON disparu,
+     *     et Prisma rejetait la requête entière (`Unknown argument`).
+     * (2) Le test de rafraîchissement n'observe que l'APPEL, pas son CODE : un 500 le laissait
+     *     vert. Une assertion sur le nombre de requêtes ne dit rien de leur réponse.
+     *
+     * Ce cas ferme les deux trous : une équipe, un bénévole dedans, une notification qui la cible,
+     * et la réponse du suivi mesurée. Un test d'intégration prouve séparément que Prisma refuse le
+     * champ mort ; celui-ci prouve que l'écran entier répond.
+     */
+    const equipe = await apiPost(page, `${BASE}/api/editions/${editionId}/volunteer-teams`, {
+      data: { name: `Équipe Notif ${Date.now()}` },
+    })
+    expect(equipe.ok(), `création d'équipe : ${await equipe.text()}`).toBe(true)
+    const equipeCorps = await equipe.json()
+    const equipeId = String((equipeCorps.data ?? equipeCorps).id)
+
+    const affectation = await apiPatch(
+      page,
+      `${BASE}/api/editions/${editionId}/volunteers/applications/${candidatureId}/teams`,
+      { data: { teams: [equipeId] } }
+    )
+    expect(affectation.ok(), `affectation : ${await affectation.text()}`).toBe(true)
+
+    const nomEquipe = String((equipeCorps.data ?? equipeCorps).name)
+    const envoiCible = await apiPost(
+      page,
+      `${BASE}/api/editions/${editionId}/volunteers/notifications`,
+      { data: { targetType: 'teams', selectedTeams: [nomEquipe], message: MESSAGE_EQUIPE } }
+    )
+    expect(envoiCible.ok(), `envoi ciblé : ${await envoiCible.text()}`).toBe(true)
+    const envoiCorps = await envoiCible.json()
+    const groupeId = String(envoiCorps.data?.notificationGroupId ?? '')
+    expect(groupeId, `identifiant du groupe : ${JSON.stringify(envoiCorps)}`).toBeTruthy()
+    // L'ENVOI a retenu ce nombre de destinataires avec le filtre d'équipe : on le garde pour le
+    // comparer à ce que la relecture retient, plus bas.
+    const attendus = Number(envoiCorps.data?.recipientCount ?? 0)
+    expect(attendus).toBeGreaterThan(0)
+
+    // On surveille la RÉPONSE, pas seulement la requête : c'est ce qui manquait.
+    const reponses: number[] = []
+    page.on('response', (r) => {
+      if (r.url().includes('/confirmations')) reponses.push(r.status())
+    })
+
+    await goto(`/editions/${editionId}/gestion/volunteers/notifications`, {
+      waitUntil: 'hydration',
+    })
+    await expect(page.getByText(MESSAGE_EQUIPE)).toBeVisible({ timeout: 40000 })
+    await page.locator('button').filter({ hasText: MESSAGE_EQUIPE }).first().click()
+
+    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10000 })
+    await expect.poll(() => reponses.length, { timeout: 15000 }).toBeGreaterThan(0)
+
+    // L'assertion qui porte le point : avant le correctif, ces réponses étaient des 500.
+    expect(
+      reponses.every((code) => code < 400),
+      `codes observés : ${reponses.join(', ')}`
+    ).toBe(true)
+
+    /*
+     * ⚠️ ET LE FILTRE DOIT CORRESPONDRE À QUELQU'UN. Un `where` syntaxiquement valide mais qui ne
+     * retient personne viderait le suivi SANS RIEN DIRE — un 200 avec zéro destinataire, donc un
+     * défaut silencieux là où le précédent criait. L'assertion porte sur la réponse et non sur
+     * l'écran : la carte affiche le pseudo du compte, pas le prénom de la candidature, et chercher
+     * un libellé aurait fait dépendre ce test de la mise en page.
+     */
+    const suivi = await page.request.get(
+      `${BASE}/api/editions/${editionId}/volunteers/notification/${groupeId}/confirmations`
+    )
+    expect(suivi.ok(), await suivi.text()).toBe(true)
+    const corpsSuivi = await suivi.json()
+    const destinataires = [...(corpsSuivi.confirmed ?? []), ...(corpsSuivi.pending ?? [])]
+    expect(destinataires.length, 'destinataires retenus par le filtre d’équipe').toBeGreaterThan(0)
+
+    /*
+     * 🔬 L'ASSERTION QUI PORTE LE PLUS LOIN : l'envoi et la relecture doivent retenir LE MÊME
+     * NOMBRE de destinataires. C'était le cœur du défaut — deux endroits répondaient à « qui est
+     * visé ? », avec deux filtres différents. Celui de la relecture plantait, ce qui était voyant ;
+     * s'il avait seulement divergé, le taux de confirmation aurait été faux sans que rien ne le
+     * dise.
+     */
+    expect(destinataires.length, 'relecture vs envoi').toBe(attendus)
   })
 
   test('nettoyage : supprimer l’édition dédiée', async ({ page }) => {
