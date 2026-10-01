@@ -231,8 +231,27 @@
                               {{ result.participant.volunteer.teams.map((t) => t.name).join(', ') }}
                             </div>
                           </div>
-                          <div class="flex items-center gap-2">
+                          <div class="flex flex-wrap items-center justify-end gap-2">
                             <UBadge color="primary">{{ $t('ticketing.stats.volunteers') }}</UBadge>
+                            <!-- ⚠️ Celui qui n'est PAS attendu pendant l'événement le dit. Il
+                                 apparaît désormais au contrôle d'accès — il est sur place au
+                                 montage ou au démontage, il faut bien le faire entrer —, mais sans
+                                 ce repère le guichet le prendrait pour un bénévole ordinaire. -->
+                            <UBadge
+                              v-if="phaseHorsEvenement(result.participant.volunteer)"
+                              color="warning"
+                              variant="soft"
+                            >
+                              <UIcon
+                                name="i-heroicons-wrench-screwdriver"
+                                class="w-3.5 h-3.5 mr-1"
+                              />
+                              {{
+                                $t(
+                                  `ticketing.access_control.phase.${phaseHorsEvenement(result.participant.volunteer)}`
+                                )
+                              }}
+                            </UBadge>
                             <UIcon
                               v-if="result.participant.volunteer.entryValidated"
                               name="i-heroicons-check-circle"

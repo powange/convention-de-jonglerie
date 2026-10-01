@@ -1,5 +1,5 @@
 /**
- * Quels bénévoles sont PRÉSENTS pendant l'événement.
+ * Quels bénévoles sont PRÉSENTS SUR PLACE — à l'événement, au montage ou au démontage.
  *
  * ⚠️ POURQUOI CET UTIL EXISTE, et ce qu'il répare. La règle « accepté ET présent pendant
  * l'événement » était recopiée QUATRE fois : trois dans `ticketing/stats.get.ts`, une dans
@@ -21,7 +21,7 @@
  */
 
 /**
- * Le fragment de `where` Prisma qui retient les bénévoles présents pendant l'événement.
+ * Le fragment de `where` Prisma qui retient les bénévoles présents sur place.
  *
  * S'emploie par étalement, à côté des autres conditions :
  *
@@ -32,26 +32,36 @@
  * rien de dangereux — mais une modification accidentelle sur place se propagerait partout. Une
  * fonction rend un objet neuf à chaque appel.
  */
-export function benevolePresentAEvenement() {
+export function benevolePresentSurPlace() {
   return {
     OR: [
       { eventAvailability: true },
       // Candidatures antérieures à l'ajout de la colonne : personne ne leur a posé la question.
       { eventAvailability: null },
+      // ⚠️ LE MONTAGE ET LE DÉMONTAGE COMPTENT, et c'est la correction de ce lot. La règle ne
+      // regardait que `eventAvailability` : un bénévole qui a répondu « non » à la présence
+      // PENDANT l'événement mais « oui » au montage était introuvable au contrôle d'accès — par
+      // son nom comme par son adresse. Signalé sur une édition où cinq bénévoles acceptés sont
+      // dans ce cas, neuf toutes éditions confondues.
+      //
+      // Il est pourtant physiquement là, et il faut bien le faire entrer. Le `false` conserve son
+      // sens : celui qui a répondu « non » aux TROIS questions reste écarté.
+      { setupAvailability: true },
+      { teardownAvailability: true },
     ],
   } as const
 }
 
 /**
- * Le `where` complet d'un bénévole ACCEPTÉ et présent sur une édition.
+ * Le `where` complet d'un bénévole ACCEPTÉ et présent sur place sur une édition.
  *
  * La forme la plus employée : les quatre recopies l'écrivaient toutes avec `eventId` et
  * `status: 'ACCEPTED'` autour du fragment.
  */
-export function benevoleAccepteEtPresent(editionId: number) {
+export function benevoleAccepteEtPresentSurPlace(editionId: number) {
   return {
     eventId: editionId,
     status: 'ACCEPTED' as const,
-    ...benevolePresentAEvenement(),
+    ...benevolePresentSurPlace(),
   }
 }

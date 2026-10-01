@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest'
 
 import {
-  benevoleAccepteEtPresent,
-  benevolePresentAEvenement,
+  benevoleAccepteEtPresentSurPlace,
+  benevolePresentSurPlace,
 } from '../../../server/utils/ticketing/benevoles-presents'
 
 /**
- * La règle « bénévole présent pendant l'événement », partagée.
+ * La règle « bénévole présent sur place », partagée.
  *
  * ⚠️ POURQUOI ELLE EST PARTAGÉE, et ce que cela a réparé. Elle était recopiée SIX fois dans le
  * dépôt — trois dans `ticketing/stats.get.ts`, une dans `ticketing/verify.post.ts`, une dans
@@ -24,7 +24,23 @@ import {
  * de `null`, et cette distinction se lit dans le `where`.
  */
 
-describe('benevolePresentAEvenement', () => {
+describe('benevolePresentSurPlace', () => {
+  it('🔬 retient aussi le bénévole du MONTAGE ou du DÉMONTAGE', () => {
+    /*
+     * ⚠️ SIGNALÉ SUR LA BASE DE DÉVELOPPEMENT : une bénévole acceptée, cherchée au contrôle d'accès
+     * par son prénom, son nom et son adresse, ne ressortait pas. Elle avait répondu « non » à la
+     * présence PENDANT l'événement et « oui » au montage. Cinq bénévoles acceptés dans ce cas sur
+     * cette édition, neuf toutes éditions confondues.
+     *
+     * Elle est pourtant physiquement là, et il faut bien la faire entrer. La règle ne regardait
+     * que `eventAvailability` : c'est ce que ce cas corrige, et il échoue si on y revient.
+     */
+    const fragment = benevolePresentSurPlace()
+
+    expect(fragment.OR).toContainEqual({ setupAvailability: true })
+    expect(fragment.OR).toContainEqual({ teardownAvailability: true })
+  })
+
   it('accepte `true` ET `null`, jamais `false`', () => {
     /*
      * ⚠️ LA DISTINCTION QUI PORTE TOUT LE LOT. `null` veut dire « on ne lui a pas posé la
@@ -35,10 +51,15 @@ describe('benevolePresentAEvenement', () => {
      * équivalent) rouvrirait le défaut dans un sens ou dans l'autre : soit on retire leur badge à
      * des bénévoles historiques, soit on en donne un à quelqu'un qui a dit ne pas venir.
      */
-    const fragment = benevolePresentAEvenement()
+    const fragment = benevolePresentSurPlace()
 
-    expect(fragment.OR).toEqual([{ eventAvailability: true }, { eventAvailability: null }])
-    // `false` n'apparaît nulle part : c'est ce que le filtre exclut.
+    expect(fragment.OR).toContainEqual({ eventAvailability: true })
+    expect(fragment.OR).toContainEqual({ eventAvailability: null })
+    /*
+     * ⚠️ `false` N'APPARAÎT NULLE PART, et c'est ce qui survit à l'élargissement : celui qui a
+     * répondu « non » aux TROIS questions reste écarté. Sans cette borne, « présent sur place »
+     * finirait par vouloir dire « accepté », et le réglage ne servirait plus à rien.
+     */
     expect(JSON.stringify(fragment)).not.toContain('false')
   })
 
@@ -49,8 +70,8 @@ describe('benevolePresentAEvenement', () => {
      * accidentelle sur place se propagerait aux six surfaces d'un coup, et le défaut apparaîtrait
      * loin de sa cause.
      */
-    const a = benevolePresentAEvenement()
-    const b = benevolePresentAEvenement()
+    const a = benevolePresentSurPlace()
+    const b = benevolePresentSurPlace()
 
     expect(a).not.toBe(b)
     expect(a.OR).not.toBe(b.OR)
@@ -58,13 +79,18 @@ describe('benevolePresentAEvenement', () => {
   })
 })
 
-describe('benevoleAccepteEtPresent', () => {
+describe('benevoleAccepteEtPresentSurPlace', () => {
   it('porte l’édition, le statut ACCEPTÉ et la présence', () => {
     // Les six recopies écrivaient toutes ces trois conditions ensemble.
-    expect(benevoleAccepteEtPresent(42)).toEqual({
+    expect(benevoleAccepteEtPresentSurPlace(42)).toEqual({
       eventId: 42,
       status: 'ACCEPTED',
-      OR: [{ eventAvailability: true }, { eventAvailability: null }],
+      OR: [
+        { eventAvailability: true },
+        { eventAvailability: null },
+        { setupAvailability: true },
+        { teardownAvailability: true },
+      ],
     })
   })
 
@@ -74,16 +100,16 @@ describe('benevoleAccepteEtPresent', () => {
      * portant un champ inexistant fait échouer la requête ENTIÈRE. Le piège s'est déjà produit
      * dans ce dépôt, sur les conversations d'équipe.
      */
-    const où = benevoleAccepteEtPresent(7) as Record<string, unknown>
+    const où = benevoleAccepteEtPresentSurPlace(7) as Record<string, unknown>
 
     expect(où.eventId).toBe(7)
     expect(où).not.toHaveProperty('editionId')
   })
 
   it('s’étale sans écraser les conditions voisines', () => {
-    // La forme d'emploi réelle : `{ userId, ...benevoleAccepteEtPresent(id) }`. Aucune de ses clés
+    // La forme d'emploi réelle : `{ userId, ...benevoleAccepteEtPresentSurPlace(id) }`. Aucune de ses clés
     // ne doit entrer en collision avec celles qu'un appelant ajoute.
-    const où = { userId: 3, entryValidated: false, ...benevoleAccepteEtPresent(42) }
+    const où = { userId: 3, entryValidated: false, ...benevoleAccepteEtPresentSurPlace(42) }
 
     expect(où.userId).toBe(3)
     expect(où.entryValidated).toBe(false)

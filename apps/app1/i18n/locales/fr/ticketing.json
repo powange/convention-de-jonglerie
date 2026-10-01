@@ -41,6 +41,11 @@
       "organizers_count": "{count} organisateur non validé | {count} organisateurs non validés",
       "organizers_not_validated_description": "Liste des organisateurs qui n'ont pas encore scanné leur billet au contrôle d'accès.",
       "organizers_not_validated_title": "Organisateurs n'ayant pas validé leur billet",
+      "phase": {
+        "montage": "Montage seulement",
+        "demontage": "Démontage seulement",
+        "montage-demontage": "Montage et démontage"
+      },
       "qr_format_obsolete": "Ce QR code est à un format qui n'est plus accepté. Demandez à la personne de rouvrir son billet depuis l'application pour en afficher un nouveau.",
       "qr_invalide": "Ce QR code est illisible",
       "refund_error": "Impossible d'enregistrer le remboursement",
