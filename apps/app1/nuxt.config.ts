@@ -816,6 +816,27 @@ export default defineNuxtConfig({
      * Une bribe durablement inaccessible — bloquée par une extension, par exemple — donne donc UN
      * rechargement, puis la page d'erreur. C'était la seule objection sérieuse à ce réglage.
      *
+     * ⚠️⚠️ CE COMPORTEMENT N'EST PAS COUVERT PAR UN TEST AUTOMATIQUE, et c'est un choix assumé
+     * après quatre tentatives mesurées. Ce qui s'y oppose, pour qui voudra reprendre :
+     *
+     *   1. Le chemin n'existe pas en développement. Vite y sert des modules ESM natifs, non
+     *      enveloppés dans `__vitePreload` : aucun `vite:preloadError`, donc aucun
+     *      `app:chunkError`. Le lot ne peut tourner que sur une application CONSTRUITE, donc en CI.
+     *   2. Couper « la première bribe » coupe le script d'entrée : l'application ne démarre pas,
+     *      le HTML du serveur reste à l'écran, et les assertions passent à vide devant une page
+     *      d'apparence saine.
+     *   3. Les bribes sont hachées par leur contenu : tout nom écrit en dur devient faux au premier
+     *      changement, et un `page.route` qui ne correspond plus ne coupe rien — vert à vide encore.
+     *      Les déduire du build à chaque exécution fonctionne (le composant porte son message
+     *      d'erreur, que la minification conserve).
+     *   4. Et le mur : sur la dernière tentative, les cinq bribes de FullCalendar étaient bien
+     *      demandées APRÈS le clic sur la vue agenda — le bon déclencheur, enfin — mais toutes
+     *      servies en 200. `page.route` avait appelé `continue` 400 fois pendant le chargement
+     *      initial puis ne s'appliquait plus du tout. Cause non identifiée.
+     *
+     * Ce qui tient ce réglage, à défaut : la lecture des deux greffons, citée ci-dessus, et celle
+     * du helper de Vite. Pas un test.
+     *
      * 📍 `restoreState` reste DÉSACTIVÉ : la documentation de Nuxt met en garde contre ses effets
      * de bord, et il exige des clés explicites sur chaque `useState`. Un rechargement perd donc
      * l'état de la page — ce qui reste très au-dessus d'une page d'erreur.
