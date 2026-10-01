@@ -774,8 +774,74 @@ export default defineNuxtConfig({
   experimental: {
     // Améliorer les performances avec la lazy hydration
     lazyHydration: true,
-    // Optimiser la gestion d'erreur des chunks
-    emitRouteChunkError: 'automatic',
+    /*
+     * Rechargement sur échec de chargement d'une bribe JavaScript.
+     *
+     * ⚠️ `'automatic'` NE COUVRAIT QUE LA NAVIGATION, et c'est ce qui a mis des visiteurs devant un
+     * « 500 — Failed to fetch dynamically imported module » en pleine page. Le greffon de Nuxt
+     * n'agit que depuis `router.onError` : une bribe qui échoue AILLEURS — un composant paresseux,
+     * un `import()` dans une page déjà chargée — n'est jamais rattrapée, et l'erreur remonte
+     * jusqu'à la page d'erreur.
+     *
+     * ⚠️⚠️ ET LE CAS LE PLUS COURANT EST LE CHARGEMENT INITIAL. Le greffon `automatic` s'abonne à
+     * `router.onError` et vide sa liste d'erreurs à chaque `beforeEach` : une bribe qui échoue en
+     * ouvrant la page — avant toute navigation — n'est rattrapée par personne. C'est exactement ce
+     * que décrit la capture reçue : l'erreur en pleine page, dès l'arrivée sur le site.
+     *
+     * 📊 Et le dépôt multiplie les occasions : 22 `await import()` côté client, trois
+     * `defineAsyncComponent`, trois `<Lazy…>`, dont plusieurs SANS `try` autour. Sur un téléphone,
+     * une coupure réseau d'une seconde suffit.
+     *
+     * ⚠️ UN `try` AUTOUR DE L'IMPORT NE MET PAS À L'ABRI, contrairement à ce qu'affirmait la
+     * première version de ce commentaire au sujet de `useLazyI18n`. Lu dans le helper de Vite :
+     * `handlePreloadError` ÉMET `vite:preloadError` puis ne relance l'erreur que si personne n'a
+     * appelé `preventDefault`. L'événement part donc avant le `catch` de l'appelant, et Nuxt émet
+     * `app:chunkError` quoi qu'il arrive. Conséquence assumée de ce réglage : un import que
+     * l'application rattrapait proprement — les traductions d'un domaine, les greffons de
+     * FullCalendar — provoque désormais un rechargement au lieu d'une page dégradée. C'est le bon
+     * arbitrage dans le cas courant, celui de la bribe retirée par un déploiement : le
+     * rechargement RÉPARE, là où la page dégradée reste dégradée. Et la garde ci-dessous borne le
+     * cas contraire à un seul rechargement.
+     *
+     * S'y ajoute la cause de fond : un déploiement retire les anciennes bribes du serveur. Un
+     * onglet resté ouvert — cas courant sur mobile — en demande une qui n'existe plus. Le cache de
+     * Cloudflare la sert encore là où il l'a gardée, pas ailleurs : d'où des visiteurs touchés et
+     * d'autres non, sans logique apparente.
+     *
+     * `'automatic-immediate'` recharge la route COURANTE dès qu'une bribe échoue, quelle qu'en soit
+     * l'origine. Le rechargement récupère un HTML neuf, donc les noms de bribes actuels.
+     *
+     * 📍 PAS DE BOUCLE À CRAINDRE, vérifié dans `reloadNuxtApp` : un marqueur `nuxt:reload` en
+     * `sessionStorage` interdit de recharger deux fois le même chemin en moins de dix secondes.
+     * Une bribe durablement inaccessible — bloquée par une extension, par exemple — donne donc UN
+     * rechargement, puis la page d'erreur. C'était la seule objection sérieuse à ce réglage.
+     *
+     * ⚠️⚠️ CE COMPORTEMENT N'EST PAS COUVERT PAR UN TEST AUTOMATIQUE, et c'est un choix assumé
+     * après quatre tentatives mesurées. Ce qui s'y oppose, pour qui voudra reprendre :
+     *
+     *   1. Le chemin n'existe pas en développement. Vite y sert des modules ESM natifs, non
+     *      enveloppés dans `__vitePreload` : aucun `vite:preloadError`, donc aucun
+     *      `app:chunkError`. Le lot ne peut tourner que sur une application CONSTRUITE, donc en CI.
+     *   2. Couper « la première bribe » coupe le script d'entrée : l'application ne démarre pas,
+     *      le HTML du serveur reste à l'écran, et les assertions passent à vide devant une page
+     *      d'apparence saine.
+     *   3. Les bribes sont hachées par leur contenu : tout nom écrit en dur devient faux au premier
+     *      changement, et un `page.route` qui ne correspond plus ne coupe rien — vert à vide encore.
+     *      Les déduire du build à chaque exécution fonctionne (le composant porte son message
+     *      d'erreur, que la minification conserve).
+     *   4. Et le mur : sur la dernière tentative, les cinq bribes de FullCalendar étaient bien
+     *      demandées APRÈS le clic sur la vue agenda — le bon déclencheur, enfin — mais toutes
+     *      servies en 200. `page.route` avait appelé `continue` 400 fois pendant le chargement
+     *      initial puis ne s'appliquait plus du tout. Cause non identifiée.
+     *
+     * Ce qui tient ce réglage, à défaut : la lecture des deux greffons, citée ci-dessus, et celle
+     * du helper de Vite. Pas un test.
+     *
+     * 📍 `restoreState` reste DÉSACTIVÉ : la documentation de Nuxt met en garde contre ses effets
+     * de bord, et il exige des clés explicites sur chaque `useState`. Un rechargement perd donc
+     * l'état de la page — ce qui reste très au-dessus d'une page d'erreur.
+     */
+    emitRouteChunkError: 'automatic-immediate',
     // Cache des artefacts de build (accélère les rebuilds)
     buildCache: true,
     // Transitions natives du navigateur entre pages (respecte prefers-reduced-motion)
