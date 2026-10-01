@@ -725,4 +725,92 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
       await expect(handler(mockEvent as any)).rejects.toThrow()
     })
   })
+
+  /**
+   * L'ÉTAT DE L'ÉDITION, et non seulement celui de l'appel.
+   *
+   * ⚠️ Seule la visibilité de l'APPEL était contrôlée. Une édition `OFFLINE` ou `CANCELLED` dont un
+   * appel restait `PUBLIC` continuait de recevoir des candidatures ET d'envoyer des notifications
+   * aux organisateurs — pour un événement retiré de la vue du public, ou annulé. L'artiste
+   * préparait un dossier, remplissait ses besoins techniques, et postulait dans le vide.
+   *
+   * 📍 LE MESSAGE EST CELUI DE LA GARDE VOISINE, à dessein : du point de vue du candidat, l'appel
+   * n'est pas ouvert. Dire « l'édition est annulée » serait plus précis, mais c'est une
+   * information que la fiche de l'édition donne déjà, et ce point d'API n'a pas à l'annoncer à qui
+   * devine un identifiant.
+   */
+  describe('Statut de l’édition', () => {
+    /*
+     * ⚠️⚠️ UNE CHARGE VALIDE, ET C'EST INDISPENSABLE. Ma première version inventait une charge
+     * incomplète : la validation zod rendait 400 avant même la garde de statut, et les cas
+     * « REFUSE » — qui n'assertent que `statusCode: 400` — PASSAIENT SANS RIEN PROUVER. Le
+     * sabotage les aurait laissés verts.
+     *
+     * Avec cette charge, empruntée au test de succès de ce même fichier, un 400 ne peut plus venir
+     * que de la garde de statut. Le message est vérifié en plus, pour la même raison.
+     */
+    const candidature = {
+      lastName: 'Dupont',
+      firstName: 'Jean',
+      phone: '+33612345678',
+      artistName: 'Artiste Test',
+      showTitle: 'Mon Spectacle',
+      showDescription: 'Description du spectacle avec suffisamment de caractères',
+      showDuration: 30,
+      additionalPerformersCount: 1,
+      additionalPerformers: [defaultPerformer],
+    }
+
+    beforeEach(() => {
+      global.getRouterParam.mockImplementation((_event: any, param: string) => {
+        if (param === 'id') return '1'
+        if (param === 'showCallId') return '1'
+        return null
+      })
+      prismaMock.user.findUnique.mockResolvedValue(mockUser)
+      prismaMock.editionShowCall.findFirst.mockResolvedValue(mockShowCall)
+      prismaMock.showApplication.findUnique.mockResolvedValue(null)
+      prismaMock.convention.findFirst.mockResolvedValue(null)
+      prismaMock.editionOrganizerPermission.findMany.mockResolvedValue([])
+      global.readBody.mockResolvedValue(candidature)
+    })
+
+    it('🔬 REFUSE une candidature sur une édition ANNULÉE', async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({ ...mockEdition, status: 'CANCELLED' })
+
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toMatchObject({
+        statusCode: 400,
+        message: "L'appel à spectacles n'est pas ouvert",
+      })
+      expect(prismaMock.showApplication.create).not.toHaveBeenCalled()
+    })
+
+    it.each(['PUBLISHED', 'PLANNED', 'OFFLINE'])(
+      'ACCEPTE une candidature sur une édition %s',
+      async (status) => {
+        /*
+         * ⚠️⚠️ `OFFLINE` EST ACCEPTÉ, ET C'EST UNE CORRECTION À L'ÉNONCÉ du constat, qui demandait
+         * de le refuser avec `CANCELLED`.
+         *
+         * LE FAIT QUI L'INTERDIT : toute édition NAÎT `OFFLINE` (`editions/index.post.ts`, et le
+         * défaut du schéma). Ce statut ne veut donc pas seulement dire « retirée de la vue du
+         * public » — il veut surtout dire « PAS ENCORE PUBLIÉE ». Or ouvrir un appel à spectacles
+         * AVANT de publier son édition est le parcours NORMAL : on réserve ses artistes des mois à
+         * l'avance, et l'on publie quand le programme tient.
+         *
+         * 📍 C'EST LA CI QUI L'A ATTRAPÉ, PAS MOI : ma première version refusait `OFFLINE`, et
+         * TROIS spécifications Playwright sont tombées — elles exercent précisément ce parcours.
+         * Mon test unitaire, lui, passait : je l'avais écrit d'après l'énoncé, pas d'après l'usage.
+         *
+         * `PLANNED` compte aussi : c'est l'état d'une édition annoncée dont on cherche encore les
+         * spectacles. Une garde écrite sur le seul `PUBLISHED` fermerait les appels au moment où
+         * ils servent.
+         */
+        prismaMock.edition.findUnique.mockResolvedValue({ ...mockEdition, status })
+        prismaMock.showApplication.create.mockResolvedValue({ id: 1 })
+
+        await expect(handler({ context: { user: mockUser } } as any)).resolves.toBeTruthy()
+      }
+    )
+  })
 })

@@ -75,6 +75,36 @@ export default wrapApiHandler(
       })
     }
 
+    /*
+     * ⚠️ ET QUE L'ÉDITION N'EST PAS ANNULÉE. Seule la visibilité de l'APPEL était contrôlée : une
+     * édition `CANCELLED` dont un appel restait `PUBLIC` continuait de recevoir des candidatures et
+     * d'envoyer des notifications aux organisateurs — pour un événement qui n'aura pas lieu.
+     * L'artiste préparait un dossier, remplissait ses besoins techniques, et postulait dans le vide.
+     *
+     * ⚠️⚠️ `OFFLINE` N'EST VOLONTAIREMENT PAS REFUSÉ, et c'est une CORRECTION À L'ÉNONCÉ du constat,
+     * qui demandait de rejeter les deux. LE FAIT QUI L'INTERDIT : toute édition NAÎT `OFFLINE`
+     * (`editions/index.post.ts`, et le défaut du schéma). Ce statut ne veut donc pas seulement dire
+     * « retirée de la vue du public » — il veut surtout dire « PAS ENCORE PUBLIÉE ».
+     *
+     * Or ouvrir un appel à spectacles AVANT de publier son édition est le parcours NORMAL : on
+     * réserve ses artistes des mois à l'avance, et l'on publie quand le programme tient. Refuser
+     * là aurait cassé ce parcours — trois spécifications Playwright l'exercent, et ce sont elles
+     * qui ont attrapé l'erreur.
+     *
+     * La vraie barrière de l'organisateur est la VISIBILITÉ DE L'APPEL, vérifiée juste au-dessus :
+     * c'est le drapeau qu'il pose délibérément.
+     *
+     * La liste est écrite en négatif et en clair, comme celle de `visibilite-edition.ts` : un
+     * statut ajouté demain sera ACCEPTÉ par défaut, ce qui est le bon sens ici — seule l'annulation
+     * ferme la porte, et on la nommera.
+     */
+    if (edition.status === 'CANCELLED') {
+      throw createError({
+        status: 400,
+        message: "L'appel à spectacles n'est pas ouvert",
+      })
+    }
+
     // Vérifier le mode
     if (showCall.mode === 'EXTERNAL') {
       throw createError({

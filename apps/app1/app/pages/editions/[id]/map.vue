@@ -468,10 +468,38 @@ watch(
   { immediate: true }
 )
 
-// Spectacles publics — affichés dans les popups des zones/marqueurs
+/*
+ * Spectacles publics — affichés dans les popups des zones et des marqueurs.
+ *
+ * ⚠️⚠️ CE BLOC NE MONTRAIT RIEN, et pour deux raisons qui se cumulaient sans qu'aucune erreur ne
+ * paraisse :
+ *
+ * 1. le point d'API n'était pas déclaré public, donc un visiteur anonyme recevait 401 ;
+ * 2. le `transform` lisait `payload?.shows`, une clé QUI N'EXISTE PLUS depuis le passage aux
+ *    REPRÉSENTATIONS. La réponse porte `{ performances }`. Le tableau était donc toujours vide,
+ *    et l'on ne pouvait pas le deviner : pas d'erreur, juste des popups sans spectacle.
+ *
+ * ⚠️ ET UNE TROISIÈME, que le constat ne nommait pas : le composeur de popups lit `.title`,
+ * `.startDateTime` et `.duration` à plat, et les partage avec les ateliers. Une représentation
+ * porte son titre sous `show.title`. Corriger la seule clé de la réponse aurait donné des popups
+ * annonçant « undefined » — un défaut plus visible que celui qu'on répare.
+ *
+ * On MET DONC À PLAT ici, dans le `transform` : c'est le seul endroit où la forme de l'API et
+ * celle du popup se rencontrent, et cela laisse `buildItemsPopupHtml` commun aux deux sources.
+ *
+ * `zoneId` et `markerId` sont portés par la REPRÉSENTATION, pas par le spectacle : un même
+ * spectacle peut se jouer à deux endroits.
+ */
 const { data: publicShows } = useApiFetch<any[]>(`/api/editions/${editionId.value}/shows/public`, {
   lazy: true,
-  transform: (payload: any) => payload?.shows || [],
+  transform: (payload: any) =>
+    (payload?.performances ?? []).map((representation: any) => ({
+      title: representation.show?.title,
+      startDateTime: representation.startDateTime,
+      duration: representation.show?.duration,
+      zoneId: representation.zoneId,
+      markerId: representation.markerId,
+    })),
 })
 
 const showsByZone = computed(() => {

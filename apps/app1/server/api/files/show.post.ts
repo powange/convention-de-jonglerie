@@ -1,6 +1,6 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
-import { canEditEdition } from '#server/utils/permissions/edition-permissions'
+import { canManageArtists } from '#server/utils/permissions/edition-permissions'
 import { validateUploadedFile } from '#server/utils/upload-validation'
 
 export default wrapApiHandler(
@@ -55,7 +55,20 @@ export default wrapApiHandler(
       })
     }
 
-    if (!canEditEdition(edition, user)) {
+    /*
+     * ⚠️ `canManageArtists` ET NON `canEditEdition`, pour que DÉPOSER une affiche demande le même
+     * droit que CRÉER le spectacle qu'elle illustre.
+     *
+     * Créer ou modifier un spectacle exige `canManageArtists` (`shows/index.post.ts`). Téléverser
+     * son affiche exigeait `canEditEdition`, qui ne couvre que créateur, auteur, `editAllEditions`
+     * et l'admin — PAS `canManageArtists`. Un organisateur à qui l'on a délégué les seuls artistes
+     * pouvait donc créer le spectacle, puis recevoir 403 au moment d'ajouter l'image. La moitié
+     * d'un geste autorisée, l'autre refusée.
+     *
+     * Le chargement de l'édition convient déjà : `canManageArtists` attend `convention.organizers`
+     * et `organizerPermissions.organizer`, que cette requête inclut.
+     */
+    if (!canManageArtists(edition, user)) {
       throw createError({
         status: 403,
         message: "Vous n'avez pas les droits pour modifier les spectacles de cette édition",

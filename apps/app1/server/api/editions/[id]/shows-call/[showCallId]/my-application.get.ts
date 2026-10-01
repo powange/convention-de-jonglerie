@@ -1,5 +1,9 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import {
+  canManageArtists,
+  getEditionWithPermissions,
+} from '#server/utils/permissions/edition-permissions'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
 /**
@@ -43,6 +47,26 @@ export default wrapApiHandler(
         },
       },
     })
+
+    /*
+     * ⚠️ LES DÉTAILS D'UN APPEL HORS LIGNE NE SORTENT PAS D'ICI.
+     *
+     * Ce point d'API rendait SANS CONDITION le nom, la description, la date limite et les réglages
+     * de n'importe quel appel de l'édition, OFFLINE compris : un identifiant deviné suffisait à
+     * lire un appel en préparation. `public.get.ts` le refuse pourtant depuis toujours — deux
+     * réponses différentes à la même question, et c'est la plus permissive qui servait de porte.
+     *
+     * ⚠️ LA CANDIDATURE, ELLE, EST CONSERVÉE. Elle appartient à qui la demande : la lui cacher
+     * parce que l'organisateur a remis l'appel hors ligne lui retirerait la trace de sa propre
+     * démarche. Seuls les DÉTAILS DE L'APPEL passent à `null`.
+     */
+    if (showCall.visibility === 'OFFLINE') {
+      const editionAvecDroits = await getEditionWithPermissions(editionId, { userId: user.id })
+      const peutGerer = editionAvecDroits ? canManageArtists(editionAvecDroits, user) : false
+      if (!peutGerer) {
+        return { application, showCall: null }
+      }
+    }
 
     // Retourner aussi les infos de l'appel (public)
     return {
