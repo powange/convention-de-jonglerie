@@ -887,6 +887,8 @@
     "view_profiles": "Ver perfis",
     "volunteer_applications": "Candidaturas de voluntário",
     "volunteer_reminders": "Lembretes de voluntários",
-    "workshops_created": "Workshops criados"
+    "workshops_created": "Workshops criados",
+    "backup_restore_dropped_tables": "{count} tabela(s) ausente(s) da cópia de segurança foram eliminadas",
+    "backup_restore_step_migrations": "A aplicar as migrações"
   }
 }

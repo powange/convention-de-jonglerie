@@ -887,6 +887,8 @@
     "view_profiles": "Visa profiler",
     "volunteer_applications": "Volontäransökningar",
     "volunteer_reminders": "Påminnelser om volontärarbete",
-    "workshops_created": "Skapade workshops"
+    "workshops_created": "Skapade workshops",
+    "backup_restore_dropped_tables": "{count} tabell(er) som saknas i säkerhetskopian har tagits bort",
+    "backup_restore_step_migrations": "Tillämpar migreringar"
   }
 }

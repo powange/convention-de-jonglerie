@@ -887,6 +887,8 @@
     "view_profiles": "Просмотреть профили",
     "volunteer_applications": "Заявки волонтёров",
     "volunteer_reminders": "Напоминания волонтерам",
-    "workshops_created": "Созданные мастер-классы"
+    "workshops_created": "Созданные мастер-классы",
+    "backup_restore_dropped_tables": "Удалено таблиц, отсутствующих в резервной копии: {count}",
+    "backup_restore_step_migrations": "Применение миграций"
   }
 }

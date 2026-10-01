@@ -887,6 +887,8 @@
     "view_profiles": "Zobrazit profily",
     "volunteer_applications": "Přihlášky dobrovolníků",
     "volunteer_reminders": "Připomínky pro dobrovolníky",
-    "workshops_created": "Vytvořené workshopy"
+    "workshops_created": "Vytvořené workshopy",
+    "backup_restore_dropped_tables": "Bylo odstraněno {count} tabulek, které v záloze chybí",
+    "backup_restore_step_migrations": "Použití migrací"
   }
 }

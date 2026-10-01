@@ -4,15 +4,17 @@
  * La restauration tourne côté serveur, indépendamment de la fenêtre : on interroge donc son
  * état plutôt que d'attendre la réponse d'une requête. Fermer la page n'interrompt rien, et
  * la rouvrir permet de retrouver l'avancement — ou le verdict final.
+ *
+ * 📍 Les étapes et le prédicat « en cours » viennent de `~~/shared/utils/etapes-restauration` : ils
+ * étaient recopiés ici, et une étape ajoutée côté serveur sans l'être ici faisait CESSER le
+ * sondage au milieu de la restauration, en affichant l'encart final à la place de l'avancement.
  */
+import {
+  restaurationEnCoursDapres,
+  type EtapeRestauration,
+} from '~~/shared/utils/etapes-restauration'
 
-export type EtapeRestauration =
-  | 'PREPARATION'
-  | 'BASE_DE_DONNEES'
-  | 'FICHIERS'
-  | 'TERMINEE'
-  | 'ECHOUEE'
-  | 'INTERROMPUE'
+export type { EtapeRestauration }
 
 export interface EtatRestauration {
   id: string
@@ -26,12 +28,12 @@ export interface EtatRestauration {
   pourcentage: number
   tableEnCours: string | null
   tablesVues: number
+  /** Les tables retirées avant l'injection parce qu'absentes de la sauvegarde. */
+  tablesSupprimees?: string[]
   erreur: string | null
 }
 
-const ETAPES_EN_COURS: EtapeRestauration[] = ['PREPARATION', 'BASE_DE_DONNEES', 'FICHIERS']
-
-export const estRestaurationEnCours = (etape: EtapeRestauration) => ETAPES_EN_COURS.includes(etape)
+export const estRestaurationEnCours = restaurationEnCoursDapres
 
 const INTERVALLE_SONDAGE_MS = 1000
 

@@ -887,6 +887,8 @@
     "view_profiles": "Se profiler",
     "volunteer_applications": "Frivilligansøgninger",
     "volunteer_reminders": "Frivillig påmindelser",
-    "workshops_created": "Oprettede workshops"
+    "workshops_created": "Oprettede workshops",
+    "backup_restore_dropped_tables": "{count} tabel(ler), der mangler i sikkerhedskopien, er blevet slettet",
+    "backup_restore_step_migrations": "Anvender migreringer"
   }
 }
