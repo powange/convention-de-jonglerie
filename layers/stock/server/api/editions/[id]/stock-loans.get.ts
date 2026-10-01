@@ -1,7 +1,7 @@
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
 import { getEditionWithPermissions } from '#server/utils/permissions/edition-permissions'
-import { userWithProfileAndGravatarSelect } from '#server/utils/prisma-select-helpers'
+import { userWithNameAndAvatarSelect } from '#server/utils/prisma-select-helpers'
 import { canAccessStock } from '#server/utils/stock-helpers'
 import { validateEditionId } from '#server/utils/validation-helpers'
 
@@ -55,8 +55,8 @@ export default wrapApiHandler(
         pickupContact: true,
         returnLocation: true,
         returnContact: true,
-        pickupResponsible: { select: userWithProfileAndGravatarSelect },
-        returnResponsible: { select: userWithProfileAndGravatarSelect },
+        pickupResponsible: { select: userWithNameAndAvatarSelect },
+        returnResponsible: { select: userWithNameAndAvatarSelect },
         group: { select: { id: true, name: true } },
         // La couleur voyage avec le nom : c'est elle qu'on reconnaît d'un écran à l'autre, et la
         // pastille comme le sélecteur en ont besoin.

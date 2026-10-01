@@ -116,6 +116,32 @@ export const userWithNameSelect = {
 } satisfies Prisma.UserSelect
 
 /**
+ * Sélection utilisateur avec nom complet ET de quoi afficher son visage.
+ *
+ * ⚠️ POURQUOI UN HELPER DE PLUS, plutôt que d'enrichir un existant. Les écrans du stock
+ * affichaient le seul PSEUDO du responsable, et deux pseudos proches ne se distinguent pas quand
+ * on ne connaît pas tout le monde sur l'événement — c'était la demande de l'utilisateur. Il leur
+ * faut donc le nom ET l'avatar.
+ *
+ * `userWithProfileAndGravatarSelect` porte l'avatar mais pas le nom, et il est employé par une
+ * VINGTAINE de fichiers — le covoiturage surtout. Y ajouter prénom et nom aurait exposé l'état
+ * civil des gens sur des écrans où personne ne l'a demandé, et sans que rien ne le signale.
+ * `userWithNameSelect`, lui, porte le nom mais pas l'avatar.
+ *
+ * 📍 Pas de `pronouns` ici, contrairement à `userWithNameSelect` : les écrans du stock n'affichent
+ * personne à la troisième personne, et une donnée qu'on ne montre pas n'a pas à circuler.
+ */
+export const userWithNameAndAvatarSelect = {
+  id: true,
+  pseudo: true,
+  nom: true,
+  prenom: true,
+  profilePicture: true,
+  emailHash: true,
+  updatedAt: true,
+} satisfies Prisma.UserSelect
+
+/**
  * Sélection utilisateur avec profil complet (sans données sensibles)
  * Utilisée pour les profils publics, affichages détaillés
  */
