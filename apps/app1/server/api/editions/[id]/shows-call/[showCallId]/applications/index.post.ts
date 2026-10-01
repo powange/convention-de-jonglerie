@@ -76,29 +76,29 @@ export default wrapApiHandler(
     }
 
     /*
-     * ⚠️ ET QUE L'ÉDITION ELLE-MÊME EST ENCORE DE CE MONDE. Seule la visibilité de l'APPEL était
-     * contrôlée : une édition `OFFLINE` ou `CANCELLED` dont un appel restait `PUBLIC` continuait
-     * de recevoir des candidatures et d'envoyer des notifications aux organisateurs — pour un
-     * événement retiré ou annulé. L'artiste préparait un dossier, remplissait ses besoins
-     * techniques, et postulait dans le vide.
+     * ⚠️ ET QUE L'ÉDITION N'EST PAS ANNULÉE. Seule la visibilité de l'APPEL était contrôlée : une
+     * édition `CANCELLED` dont un appel restait `PUBLIC` continuait de recevoir des candidatures et
+     * d'envoyer des notifications aux organisateurs — pour un événement qui n'aura pas lieu.
+     * L'artiste préparait un dossier, remplissait ses besoins techniques, et postulait dans le vide.
      *
-     * ⚠️⚠️ `editionVisiblePubliquement` NE CONVIENT PAS ICI, et le découvrir a coûté un test rouge :
-     * elle compte `CANCELLED` comme PUBLIQUE, à raison — une annulation doit rester lisible par
-     * ceux qui avaient prévu de venir. Mais « lisible » n'est pas « accepte des candidatures » :
-     * ce sont deux questions distinctes, et emprunter le prédicat de la première aurait laissé
-     * une édition annulée recevoir des dossiers.
+     * ⚠️⚠️ `OFFLINE` N'EST VOLONTAIREMENT PAS REFUSÉ, et c'est une CORRECTION À L'ÉNONCÉ du constat,
+     * qui demandait de rejeter les deux. LE FAIT QUI L'INTERDIT : toute édition NAÎT `OFFLINE`
+     * (`editions/index.post.ts`, et le défaut du schéma). Ce statut ne veut donc pas seulement dire
+     * « retirée de la vue du public » — il veut surtout dire « PAS ENCORE PUBLIÉE ».
      *
-     * La liste est donc écrite en clair, comme celle de `visibilite-edition.ts` et pour la même
-     * raison : un statut ajouté demain doit REFUSER par défaut, plutôt que devenir ouvert sans que
-     * personne l'ait décidé.
+     * Or ouvrir un appel à spectacles AVANT de publier son édition est le parcours NORMAL : on
+     * réserve ses artistes des mois à l'avance, et l'on publie quand le programme tient. Refuser
+     * là aurait cassé ce parcours — trois spécifications Playwright l'exercent, et ce sont elles
+     * qui ont attrapé l'erreur.
      *
-     * Le même message que la garde du dessus, à dessein : du point de vue du candidat, l'appel
-     * n'est pas ouvert. Dire « l'édition est annulée » serait plus précis, mais c'est une
-     * information que la fiche de l'édition donne déjà, et ce point d'API n'a pas à l'annoncer à
-     * qui devine un identifiant.
+     * La vraie barrière de l'organisateur est la VISIBILITÉ DE L'APPEL, vérifiée juste au-dessus :
+     * c'est le drapeau qu'il pose délibérément.
+     *
+     * La liste est écrite en négatif et en clair, comme celle de `visibilite-edition.ts` : un
+     * statut ajouté demain sera ACCEPTÉ par défaut, ce qui est le bon sens ici — seule l'annulation
+     * ferme la porte, et on la nommera.
      */
-    const STATUTS_QUI_ACCEPTENT = ['PUBLISHED', 'PLANNED']
-    if (!STATUTS_QUI_ACCEPTENT.includes(edition.status)) {
+    if (edition.status === 'CANCELLED') {
       throw createError({
         status: 400,
         message: "L'appel à spectacles n'est pas ouvert",

@@ -775,26 +775,36 @@ describe('/api/editions/[id]/shows-call/[showCallId]/applications POST', () => {
       global.readBody.mockResolvedValue(candidature)
     })
 
-    it.each(['OFFLINE', 'CANCELLED'])(
-      '🔬 REFUSE une candidature sur une édition %s',
-      async (status) => {
-        prismaMock.edition.findUnique.mockResolvedValue({ ...mockEdition, status })
+    it('🔬 REFUSE une candidature sur une édition ANNULÉE', async () => {
+      prismaMock.edition.findUnique.mockResolvedValue({ ...mockEdition, status: 'CANCELLED' })
 
-        await expect(handler({ context: { user: mockUser } } as any)).rejects.toMatchObject({
-          statusCode: 400,
-          message: "L'appel à spectacles n'est pas ouvert",
-        })
-        expect(prismaMock.showApplication.create).not.toHaveBeenCalled()
-      }
-    )
+      await expect(handler({ context: { user: mockUser } } as any)).rejects.toMatchObject({
+        statusCode: 400,
+        message: "L'appel à spectacles n'est pas ouvert",
+      })
+      expect(prismaMock.showApplication.create).not.toHaveBeenCalled()
+    })
 
-    it.each(['PUBLISHED', 'PLANNED'])(
+    it.each(['PUBLISHED', 'PLANNED', 'OFFLINE'])(
       'ACCEPTE une candidature sur une édition %s',
       async (status) => {
         /*
-         * ⚠️ `PLANNED` est public, et il compte ici plus que `PUBLISHED` : c'est précisément l'état
-         * d'une édition annoncée dont on cherche encore les spectacles. Une garde écrite sur le seul
-         * `PUBLISHED` fermerait les appels au moment où ils servent.
+         * ⚠️⚠️ `OFFLINE` EST ACCEPTÉ, ET C'EST UNE CORRECTION À L'ÉNONCÉ du constat, qui demandait
+         * de le refuser avec `CANCELLED`.
+         *
+         * LE FAIT QUI L'INTERDIT : toute édition NAÎT `OFFLINE` (`editions/index.post.ts`, et le
+         * défaut du schéma). Ce statut ne veut donc pas seulement dire « retirée de la vue du
+         * public » — il veut surtout dire « PAS ENCORE PUBLIÉE ». Or ouvrir un appel à spectacles
+         * AVANT de publier son édition est le parcours NORMAL : on réserve ses artistes des mois à
+         * l'avance, et l'on publie quand le programme tient.
+         *
+         * 📍 C'EST LA CI QUI L'A ATTRAPÉ, PAS MOI : ma première version refusait `OFFLINE`, et
+         * TROIS spécifications Playwright sont tombées — elles exercent précisément ce parcours.
+         * Mon test unitaire, lui, passait : je l'avais écrit d'après l'énoncé, pas d'après l'usage.
+         *
+         * `PLANNED` compte aussi : c'est l'état d'une édition annoncée dont on cherche encore les
+         * spectacles. Une garde écrite sur le seul `PUBLISHED` fermerait les appels au moment où
+         * ils servent.
          */
         prismaMock.edition.findUnique.mockResolvedValue({ ...mockEdition, status })
         prismaMock.showApplication.create.mockResolvedValue({ id: 1 })
