@@ -1,14 +1,14 @@
 <template>
   <EditionVolunteerCarteRepliable
-    v-if="leaderTeams.length > 0"
+    v-if="equipes.length > 0"
     :titre="t('volunteers.my_teams_title')"
     icone="i-heroicons-user-group"
     :repliable-sur-mobile="repliableSurMobile"
   >
     <div class="space-y-4">
       <div
-        v-for="team in leaderTeams"
-        :key="team.teamId"
+        v-for="team in equipes"
+        :key="team.id"
         class="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
       >
         <!-- En-tête de l'équipe -->
@@ -16,9 +16,9 @@
           <div class="flex items-center gap-2">
             <div
               class="w-3 h-3 rounded-full"
-              :style="{ backgroundColor: team.team.color || '#3B82F6' }"
+              :style="{ backgroundColor: team.color || '#3B82F6' }"
             />
-            <h4 class="font-semibold text-sm">{{ team.team.name }}</h4>
+            <h4 class="font-semibold text-sm">{{ team.name }}</h4>
           </div>
           <div class="flex items-center gap-2">
             <UButton
@@ -27,7 +27,7 @@
               variant="soft"
               size="sm"
               :label="t('common.edition.volunteers.send_message_to_team')"
-              @click="sendMessageToTeam(team.teamId)"
+              @click="sendMessageToTeam(team.id)"
             />
             <UBadge color="warning" size="sm">
               <UIcon name="i-heroicons-star-solid" size="12" />
@@ -38,27 +38,24 @@
 
         <!-- Description de l'équipe -->
         <p
-          v-if="team.team.description"
+          v-if="team.description"
           class="text-xs text-gray-600 dark:text-gray-400 mb-3 whitespace-pre-line"
         >
-          {{ team.team.description }}
+          {{ team.description }}
         </p>
 
         <!-- Liste des membres -->
-        <div v-if="teamMembers[team.teamId]" class="space-y-2">
+        <div v-if="teamMembers[team.id]" class="space-y-2">
           <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{
               t('volunteers.team_members_count', {
-                count: teamMembers[team.teamId]?.length || 0,
+                count: teamMembers[team.id]?.length || 0,
               })
             }}
           </h5>
 
           <!-- État de chargement -->
-          <div
-            v-if="loadingTeams[team.teamId]"
-            class="flex items-center gap-2 text-xs text-gray-500"
-          >
+          <div v-if="loadingTeams[team.id]" class="flex items-center gap-2 text-xs text-gray-500">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
             {{ t('common.loading') }}
           </div>
@@ -69,7 +66,7 @@
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2"
           >
             <div
-              v-for="member in teamMembers[team.teamId]"
+              v-for="member in teamMembers[team.id]"
               :key="member.id"
               class="p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
             >
@@ -102,7 +99,7 @@
         </div>
 
         <!-- Message si aucun membre -->
-        <div v-else-if="!loadingTeams[team.teamId]" class="text-xs text-gray-500 italic">
+        <div v-else-if="!loadingTeams[team.id]" class="text-xs text-gray-500 italic">
           {{ t('volunteers.no_team_members') }}
         </div>
       </div>
@@ -124,22 +121,29 @@ interface TeamMember {
   assignedAt: string
 }
 
-interface TeamAssignment {
-  teamId: string
-  isLeader: boolean
-  assignedAt: string
-  team: {
-    id: string
-    name: string
-    description: string | null
-    color: string | null
-  }
+/**
+ * Une équipe dont on est RESPONSABLE, telle que `my-leader-teams` la rend.
+ *
+ * ⚠️⚠️ CE N'EST PLUS UNE AFFECTATION DE CANDIDATURE, et c'est tout le correctif. La carte se
+ * nourrissait de `myApplication.teamAssignments`, donc d'une candidature de bénévole. Un
+ * responsable d'équipe qui tient ce rôle comme ORGANISATEUR n'a pas de candidature : la carte ne
+ * s'affichait jamais pour lui, alors que le planning, lui, le reconnaissait — il voyait les
+ * créneaux de ses équipes sans pouvoir ni lister ses bénévoles ni leur écrire.
+ *
+ * `my-leader-teams` réunit les deux titres, comme le fait déjà `equipesDontIlEstResponsable`
+ * côté serveur, et c'est la même liste que la page utilise pour ouvrir le planning en avance.
+ */
+interface EquipeDirigee {
+  id: string
+  name: string
+  description?: string | null
+  color?: string | null
 }
 
 const props = withDefaults(
   defineProps<{
     editionId: number
-    teamAssignments: TeamAssignment[]
+    equipes: EquipeDirigee[]
     repliableSurMobile?: boolean
   }>(),
   { repliableSurMobile: false }
@@ -147,10 +151,7 @@ const props = withDefaults(
 
 const { t } = useI18n()
 
-// Filtrer les équipes où l'utilisateur est leader
-const leaderTeams = computed(() => {
-  return props.teamAssignments.filter((assignment) => assignment.isLeader)
-})
+const equipes = computed(() => props.equipes)
 
 // Stocker les membres de chaque équipe
 const teamMembers = ref<Record<string, TeamMember[]>>({})
@@ -174,10 +175,10 @@ const fetchTeamMembers = async (teamId: string) => {
 
 // Charger les membres de toutes les équipes où l'utilisateur est leader
 watch(
-  leaderTeams,
+  equipes,
   async (teams) => {
     if (teams.length > 0) {
-      await Promise.all(teams.map((team) => fetchTeamMembers(team.teamId)))
+      await Promise.all(teams.map((team) => fetchTeamMembers(team.id)))
     }
   },
   { immediate: true }
