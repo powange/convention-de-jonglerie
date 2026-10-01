@@ -139,16 +139,19 @@
           @slot-click="openSlotDetailsModal"
         />
 
-        <!-- Carte "Mes équipes" - Visible pour les leaders d'équipes -->
+        <!-- Carte « Mes équipes » — pour qui est RESPONSABLE d'au moins une équipe.
+             ⚠️ La condition portait sur `myApplication.status === 'ACCEPTED'` et sur les
+             affectations de cette candidature. Un responsable d'équipe qui tient ce rôle comme
+             organisateur n'a pas de candidature : la carte ne s'affichait jamais pour lui. Le
+             planning, juste au-dessus, le reconnaissait pourtant — il voyait les créneaux de ses
+             équipes sans pouvoir ni lister ses bénévoles ni leur écrire.
+             `estResponsableDEquipe` vient de `my-leader-teams`, qui réunit les deux titres : c'est
+             la même source que celle qui ouvre le planning en avance, donc les deux cartes
+             apparaissent désormais ensemble ou pas du tout. -->
         <EditionVolunteerMyTeamsCard
-          v-if="
-            authStore.isAuthenticated &&
-            myApplication?.status === 'ACCEPTED' &&
-            volunteersMode === 'INTERNAL' &&
-            myApplication?.teamAssignments?.length > 0
-          "
+          v-if="authStore.isAuthenticated && volunteersMode === 'INTERNAL' && estResponsableDEquipe"
           :edition-id="editionId"
-          :team-assignments="myApplication.teamAssignments"
+          :equipes="mesEquipesResponsable"
           repliable-sur-mobile
         />
 
@@ -499,7 +502,14 @@ const mesEquipesOrganisateur = ref<Array<{ id: string; name: string; isLeader: b
  * Distinct de `mesEquipesOrganisateur`, qui ne couvre que le second titre : un bénévole nommé
  * responsable n'y figure pas. Le point d'API, lui, réunit les deux.
  */
-const mesEquipesResponsable = ref<Array<{ id: string; name: string }>>([])
+type EquipeDirigee = {
+  id: string
+  name: string
+  description?: string | null
+  color?: string | null
+}
+
+const mesEquipesResponsable = ref<EquipeDirigee[]>([])
 
 const chargerMesEquipesResponsable = async () => {
   if (!authStore.isAuthenticated) {
@@ -508,9 +518,7 @@ const chargerMesEquipesResponsable = async () => {
   }
   try {
     mesEquipesResponsable.value =
-      (await $fetch<Array<{ id: string; name: string }>>(
-        `/api/editions/${editionId}/volunteers/my-leader-teams`
-      )) ?? []
+      (await $fetch<EquipeDirigee[]>(`/api/editions/${editionId}/volunteers/my-leader-teams`)) ?? []
   } catch {
     // Un échec ne doit pas ouvrir : sans réponse, on s'en tient à ce que le réglage dit.
     mesEquipesResponsable.value = []

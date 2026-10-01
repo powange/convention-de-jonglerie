@@ -44,6 +44,13 @@ export const inclusionCreneau = {
       id: true,
       name: true,
       color: true,
+      // ⚠️ AJOUTÉS POUR LE PLANNING PUBLIC : une équipe masquée au formulaire de candidature
+      // n'est pas rendue par `/volunteer-teams`, et le planning y perdait sa colonne — les
+      // créneaux existaient, l'équipe qui les porte avait disparu. Le planning la reconstitue
+      // donc depuis ses propres créneaux, et il lui faut ces deux réglages pour que la colonne
+      // reconstituée soit la même que les autres, pastilles comprises.
+      isFloatingTeam: true,
+      isAutonomousTeam: true,
     },
   },
   assignments: {
@@ -91,7 +98,13 @@ export interface CreneauAvecRelations {
   teamId: string | null
   maxVolunteers: number
   delayMinutes?: number | null
-  team: { id: string; name: string; color: string } | null
+  team: {
+    id: string
+    name: string
+    color: string
+    isFloatingTeam?: boolean
+    isAutonomousTeam?: boolean
+  } | null
   assignments: Array<{ user: Record<string, unknown> } & Record<string, unknown>>
   organizerAssignments: Array<{
     editionOrganizer: { id: string | number; organizer: { user: Record<string, unknown> } }

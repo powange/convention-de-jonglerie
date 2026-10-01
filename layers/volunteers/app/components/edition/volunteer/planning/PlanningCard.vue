@@ -178,11 +178,22 @@ const dateCourante = ref<string | null>(dateInitiale)
 const exportingPdf = ref(false)
 
 /**
+ * Les équipes du planning : celles de l'API, complétées par celles que portent ses créneaux.
+ *
+ * La règle vit dans `completerEquipesDepuisCreneaux`, avec le pourquoi et ce qu'elle n'ouvre pas.
+ * Elle est ici parce qu'une équipe masquée au formulaire de candidature n'est pas rendue par
+ * `/volunteer-teams` : le planning y perdait sa colonne, et ses créneaux avec.
+ */
+const equipesDuPlanning = computed(() =>
+  completerEquipesDepuisCreneaux(internalTeams.value, internalTimeSlots.value)
+)
+
+/**
  * Une équipe citée par l'URL mais supprimée depuis laissait le planning vide, sans explication.
  * On attend que les équipes soient chargées pour trancher : les effacer plus tôt perdrait le
  * filtre avant même de pouvoir le valider.
  */
-watch(internalTeams, (equipes) => {
+watch(equipesDuPlanning, (equipes) => {
   if (!equipes?.length) return
   const retenues = equipesConnues(selectedTeams.value, equipes)
   if (retenues.length !== selectedTeams.value.length) selectedTeams.value = retenues
@@ -208,11 +219,13 @@ const granularityOptions = [
   { label: '60 minutes', value: 60 },
 ]
 
-// Options pour le filtre d'équipes
+// Options pour le filtre d'équipes. Même liste que les colonnes : une équipe masquée au formulaire
+// de candidature mais présente dans le planning doit aussi pouvoir s'y filtrer, sans quoi on verrait
+// ses créneaux sans pouvoir les isoler.
 const teamFilterOptions = computed(() => {
-  if (!internalTeams.value) return []
+  if (!equipesDuPlanning.value) return []
 
-  return internalTeams.value.map((team) => ({
+  return equipesDuPlanning.value.map((team) => ({
     label: team.name,
     value: team.id,
   }))
@@ -283,7 +296,11 @@ const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
 
         // Un seul chemin plutôt que has/set/get : la valeur manquante est créée sur place,
         // ce qui évite de relire une entrée que rien ne garantissait present.
-        const dayDetail = myStats.dayDetails.get(dayKey) ?? { date: dayKey, hours: 0, slots: 0 }
+        const dayDetail = myStats.dayDetails.get(dayKey) ?? {
+          date: dayKey,
+          hours: 0,
+          slots: 0,
+        }
         dayDetail.hours += hours
         dayDetail.slots += 1
         myStats.dayDetails.set(dayKey, dayDetail)
@@ -304,7 +321,7 @@ const _computedStatsIndividual = computed((): VolunteerStatsIndividual[] => {
 })
 
 const convertedTeams = computed(() => {
-  return internalTeams.value.map(
+  return equipesDuPlanning.value.map(
     // ⚠️ Cette conversion RECONSTRUIT l'équipe : tout champ oublié ici disparaît avant
     // d'atteindre le calendrier. Les deux réglages en faisaient les frais, et les pastilles de la
     // colonne des équipes n'avaient jamais la donnée pour s'afficher.
@@ -520,7 +537,11 @@ const exportToPdf = async () => {
     const nomPersonnePdf = (
       // `null` sur un créneau anonymisé : le planning des équipes dont on ne fait pas partie
       // porte ses places occupées sans les personnes. Sans ce cas, l'export PDF tombait dessus.
-      user: { pseudo?: string | null; prenom?: string | null; nom?: string | null } | null,
+      user: {
+        pseudo?: string | null
+        prenom?: string | null
+        nom?: string | null
+      } | null,
       defaut = 'Personne'
     ): string => {
       if (!user) return defaut
@@ -587,8 +608,10 @@ const exportToPdf = async () => {
           const slotHeight = 20 + (volunteersCount + organisateurs.length) * 5
           checkNewPage(slotHeight)
 
-          // Trouver le nom de l'équipe
-          const team = internalTeams.value?.find((t) => t.id === slot.teamId)
+          // Trouver le nom de l'équipe. `equipesDuPlanning` et non `internalTeams` : sinon une
+          // équipe masquée au formulaire de candidature sortait « Sans équipe » dans le PDF, alors
+          // que ses créneaux y figuraient.
+          const team = equipesDuPlanning.value?.find((t) => t.id === slot.teamId)
           const teamName = team?.name || 'Sans équipe'
 
           // Couleur de fond pour le créneau (très léger)

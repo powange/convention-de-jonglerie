@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { wrapApiHandler } from '#server/utils/api-helpers'
 import { requireAuth } from '#server/utils/auth-utils'
+import { equipesDontIlEstResponsable } from '#server/utils/editions/volunteers/responsables-equipe'
 import { assurerConversationsEquipeDesMembres } from '#server/utils/messenger-helpers'
 
 /*
@@ -24,19 +25,30 @@ export default wrapApiHandler(
 
     const { editionId, teamId } = schemaDuCorps.parse(await readBody(event))
 
-    // Vérifier que l'utilisateur est bien membre de l'équipe
-    const teamAssignment = await prisma.applicationTeamAssignment.findFirst({
-      where: {
-        teamId,
-        application: {
-          eventId: editionId,
-          userId: user.id,
-          status: 'ACCEPTED',
+    /*
+     * ⚠️ MEMBRE DE L'ÉQUIPE **OU** RESPONSABLE, et la seconde moitié est le correctif.
+     *
+     * Cette garde n'interrogeait que `applicationTeamAssignment`, c'est-à-dire les candidatures de
+     * bénévoles. Un responsable d'équipe qui tient ce rôle comme ORGANISATEUR n'a pas de
+     * candidature : le bouton « écrire à l'équipe » lui rendait 403, alors que la page lui montre
+     * ses équipes et la liste de leurs bénévoles. C'est exactement l'angle mort que
+     * `responsables-equipe.ts` dit de ne pas rouvrir en interrogeant cette table directement.
+     */
+    const [teamAssignment, equipesDirigees] = await Promise.all([
+      prisma.applicationTeamAssignment.findFirst({
+        where: {
+          teamId,
+          application: {
+            eventId: editionId,
+            userId: user.id,
+            status: 'ACCEPTED',
+          },
         },
-      },
-    })
+      }),
+      equipesDontIlEstResponsable(editionId, user.id),
+    ])
 
-    if (!teamAssignment) {
+    if (!teamAssignment && !equipesDirigees.includes(teamId)) {
       throw createError({
         status: 403,
         message: "Vous n'êtes pas membre de cette équipe",
@@ -66,9 +78,11 @@ export default wrapApiHandler(
      * personnes, ouvrir la discussion coûtait ≈ 250 requêtes séquentielles avant que le premier
      * message ne s'affiche.
      *
-     * Le demandeur reste passé explicitement, comme avant : la garde du dessus vient de prouver
-     * qu'il est bénévole accepté de l'équipe, donc il figure dans `membresDeLEquipe` — le `Set` de
-     * la fonction en lot absorbe le doublon. C'est une ceinture, pas une nécessité.
+     * ⚠️ LE DEMANDEUR EST PASSÉ EXPLICITEMENT, ET CE N'EST PLUS UNE CEINTURE. Tant que la garde
+     * exigeait une candidature acceptée, il figurait forcément dans `membresDeLEquipe` et le `Set`
+     * de la fonction en lot absorbait le doublon. Depuis qu'un responsable ORGANISATEUR est admis,
+     * il n'y figure pas : le retirer d'ici le laisserait hors de la conversation qu'il vient
+     * d'ouvrir.
      */
     await assurerConversationsEquipeDesMembres(editionId, teamId, [
       user.id,

@@ -144,6 +144,13 @@ describe('/api/editions/[id]/volunteer-time-slots GET', () => {
             id: true,
             name: true,
             color: true,
+            // ⚠️ AJOUTÉS pour le planning public : une équipe masquée au formulaire de
+            // candidature n'est pas rendue par `/volunteer-teams`, donc le planning la
+            // reconstitue depuis ses propres créneaux — et il lui faut ces deux réglages pour que
+            // la colonne reconstituée soit la même que les autres. Les retirer du `select` ferait
+            // réapparaître des pastilles manquantes, sans autre signal que ce test.
+            isFloatingTeam: true,
+            isAutonomousTeam: true,
           },
         },
         assignments: {
